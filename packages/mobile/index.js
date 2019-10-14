@@ -4,7 +4,7 @@ import { AppRegistry } from 'react-native'
 import Logger from 'src/utils/Logger'
 import App from 'src/app/App'
 import { installSentry } from 'src/sentry/Sentry'
-import Sentry from '@sentry/react-native'
+import * as Sentry from '@sentry/react-native'
 import { onBackgroundNotification } from 'src/firebase/firebase'
 
 // Set this to true, if you are modifying Sentry and want to test your changes

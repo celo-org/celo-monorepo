@@ -1,5 +1,4 @@
 import { Linking } from 'react-native'
-import DeviceInfo from 'react-native-device-info'
 import { REHYDRATE } from 'redux-persist/es/constants'
 import { all, call, put, select, spawn, take } from 'redux-saga/effects'
 import { PincodeType } from 'src/account/reducer'
@@ -50,7 +49,7 @@ const mapStateToProps = (state: PersistedRootState): PersistedStateProps | null 
 export function* checkAppDeprecation() {
   yield call(waitForRehydrate)
   yield call(waitForFirebaseAuth)
-  const versionInfo = yield getVersionInfo(DeviceInfo.getVersion())
+  const versionInfo = yield getVersionInfo()
   Logger.info(TAG, 'Version Info', JSON.stringify(versionInfo))
   if (versionInfo && versionInfo.deprecated) {
     Logger.info(TAG, 'this version is deprecated')

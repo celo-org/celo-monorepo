@@ -86,8 +86,9 @@ export default class FirebaseLogUploader {
   }
 
   static async isConnectionWifi(): Promise<boolean> {
-    const connectionInfo = await NetInfo.getConnectionInfo()
-    const isConnectionExpensive = await NetInfo.isConnectionExpensive()
+    const connectionInfo = await NetInfo.fetch()
+    const isConnectionExpensive =
+      connectionInfo.details && connectionInfo.details.isConnectionExpensive
     Logger.debug(TAG, `isConnectionWifi/Connection type is ${connectionInfo.type}`)
     Logger.debug(TAG, `isConnectionWifi/is connection expensive: ${isConnectionExpensive}`)
     return connectionInfo.type.toString().toLowerCase() === 'wifi' && !isConnectionExpensive

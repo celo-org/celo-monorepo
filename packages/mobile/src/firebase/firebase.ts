@@ -1,4 +1,5 @@
-import Sentry from '@sentry/react-native'
+import * as Sentry from '@sentry/react-native'
+import DeviceInfo from 'react-native-device-info'
 import firebase, { Firebase } from 'react-native-firebase'
 import { RemoteMessage } from 'react-native-firebase/messaging'
 import { Notification, NotificationOpen } from 'react-native-firebase/notifications'
@@ -114,7 +115,8 @@ export const writePaymentRequest = (paymentInfo: PaymentRequest) => async () => 
   }
 }
 
-export async function getVersionInfo(version: string) {
+export async function getVersionInfo() {
+  const version = await DeviceInfo.getVersion()
   const versionFSPath = version.split('.').join('/')
   Logger.info(TAG, `Checking version info ${version}`)
   return (await firebase

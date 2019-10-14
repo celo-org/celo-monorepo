@@ -23,13 +23,9 @@ useScreens()
 
 Logger.debug('App/init', 'Current Language: ' + i18n.language)
 YellowBox.ignoreWarnings([
-  'Warning: isMounted(...) is deprecated',
-  'Setting a timer',
+  'componentWillReceiveProps',
   'Remote debugger', // To avoid "Remote debugger in background tab" warning
 ])
-
-// TODO(cmcewen) Figure out why this is crashing and fix
-// configureBackgroundSync(store)
 
 const WrappedNavigator = withNamespaces('common', {
   wait: true,
@@ -44,8 +40,6 @@ export class App extends React.Component {
   async componentDidMount() {
     CeloAnalytics.track(DefaultEventNames.appLoaded, this.props, true)
     const appLoadedAt: Date = new Date()
-    // TODO(cmcewen) see above
-    // scheduleBackgroundSync()
     const appStartListener = DeviceEventEmitter.addListener(
       'AppStartedLoading',
       (appInitializedAtString: string) => {

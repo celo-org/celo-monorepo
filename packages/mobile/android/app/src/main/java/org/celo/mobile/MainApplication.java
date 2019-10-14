@@ -25,6 +25,12 @@ import ru.ivanarh.jndcrash.NDCrashError;
 import ru.ivanarh.jndcrash.NDCrash;
 import ru.ivanarh.jndcrash.NDCrashUnwinder;
 
+import io.invertase.firebase.auth.RNFirebaseAuthPackage;
+import io.invertase.firebase.database.RNFirebaseDatabasePackage;
+import io.invertase.firebase.storage.RNFirebaseStoragePackage;
+import io.invertase.firebase.messaging.RNFirebaseMessagingPackage;
+import io.invertase.firebase.notifications.RNFirebaseNotificationsPackage;
+
 // Disabled due to dex count
 // import com.swmansion.rnscreens.RNScreensPackage;
 
@@ -47,6 +53,11 @@ public class MainApplication extends Application implements ShareApplication, Re
       // packages.add(new RNConfirmDeviceCredentialsPackage());
       // }
       packages.add(new RNGethPackage());
+      packages.add(new RNFirebaseAuthPackage());
+      packages.add(new RNFirebaseDatabasePackage());
+      packages.add(new RNFirebaseStoragePackage());
+      packages.add(new RNFirebaseMessagingPackage());
+      packages.add(new RNFirebaseNotificationsPackage());
       return packages;
     }
 

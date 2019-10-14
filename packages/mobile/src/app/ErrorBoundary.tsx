@@ -1,5 +1,5 @@
 import { getErrorMessage } from '@celo/utils/src/displayFormatting'
-import Sentry from '@sentry/react-native'
+import * as Sentry from '@sentry/react-native'
 import * as React from 'react'
 import { withNamespaces, WithNamespaces } from 'react-i18next'
 import CeloAnalytics from 'src/analytics/CeloAnalytics'

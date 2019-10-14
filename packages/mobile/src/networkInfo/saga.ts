@@ -1,5 +1,4 @@
-import NetInfo from '@react-native-community/netinfo'
-import { ConnectionInfo } from 'react-native'
+import NetInfo, { NetInfoState } from '@react-native-community/netinfo'
 import { REHYDRATE } from 'redux-persist/es/constants'
 import { eventChannel } from 'redux-saga'
 import { call, cancelled, put, spawn, take } from 'redux-saga/effects'
@@ -21,24 +20,22 @@ export function* waitWeb3LastBlock() {
 }
 
 function createNetworkStatusChannel() {
-  return eventChannel((emit: any) => {
-    NetInfo.addEventListener('connectionChange', emit)
-
-    const removeEventListener = () => {
-      NetInfo.removeEventListener('connectionChange', emit)
+  return eventChannel((emit) => {
+    NetInfo.addEventListener((state) => emit(state))
+    return () => {
+      Logger.info('Removed network status monitor')
     }
-    return removeEventListener
   })
 }
 
-const isConnected = (connectionInfo: ConnectionInfo) => {
+const isConnected = (connectionInfo: NetInfoState) => {
   return !(connectionInfo.type === 'none')
 }
 
 function* subscribeToNetworkStatus() {
   yield call(waitForRehydrate)
   const networkStatusChannel = yield createNetworkStatusChannel()
-  let connectionInfo = yield call(NetInfo.getConnectionInfo)
+  let connectionInfo: NetInfoState = yield call(NetInfo.fetch)
   yield put(setNetworkConnectivity(isConnected(connectionInfo)))
   while (true) {
     try {

@@ -1,5 +1,5 @@
 import { anonymizedPhone } from '@celo/utils/src/phoneNumbers'
-import Sentry from '@sentry/react-native'
+import * as Sentry from '@sentry/react-native'
 import DeviceInfo from 'react-native-device-info'
 import * as RNFS from 'react-native-fs'
 import { e164NumberSelector } from 'src/account/reducer'
@@ -16,11 +16,7 @@ export async function installSentry() {
     Logger.info(TAG, 'installSentry', 'Sentry URL not found, skiping instalation')
     return
   }
-  await Sentry.config(SENTRY_URL).install()
-  Sentry.setTagsContext({
-    environment: DeviceInfo.getBundleId(),
-    react: true,
-  })
+  Sentry.init({ dsn: SENTRY_URL, environment: await DeviceInfo.getBundleId() })
   await uploadNdkCrashesIfAny()
   Logger.info(TAG, 'installSentry', 'Sentry installation complete')
 }
@@ -42,11 +38,9 @@ export const initializeSentryUserContext = () => async (
     'initializeSentryUserContext',
     `Setting Sentry user context to "${phoneNumber}" and "${account}"`
   )
-  Sentry.setUserContext({
+  Sentry.setUser({
     username: anonymizedPhone(phoneNumber.slice(0, -4)),
-    extra: {
-      Address: account,
-    },
+    Address: account,
   })
 }
 
