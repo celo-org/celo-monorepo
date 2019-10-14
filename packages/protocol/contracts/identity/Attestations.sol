@@ -518,7 +518,8 @@ contract Attestations is
    * @param identifier Hash of the identifier.
    * @param account Address of the account
    * @param issuer Address of the issuer
-   * @return [Status of the attestation, time of request the attestation, time of completion of the attestation]
+   * @return [Status of the attestation, time of request the attestation,
+              time of completion of the attestation]
    */
   function getAttestationState(
     bytes32 identifier,
