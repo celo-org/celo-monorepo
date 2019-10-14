@@ -1,9 +1,16 @@
 import PhoneNumberInput from '@celo/react-components/components/PhoneNumberInput'
+import ValidatedTextInput from '@celo/react-components/components/ValidatedTextInput'
 import { shallow } from 'enzyme'
 import * as React from 'react'
 import { Text } from 'react-native'
 import Autocomplete from 'react-native-autocomplete-input'
 import * as renderer from 'react-test-renderer'
+
+jest.mock('@celo/react-native-sms-retriever', () => {
+  return {
+    requestPhoneNumber: jest.fn(() => '+49030111111'),
+  }
+})
 
 describe('PhoneNumberInput', () => {
   it('renders correctly with minimum props', () => {
@@ -95,6 +102,32 @@ describe('PhoneNumberInput', () => {
           onEndEditing: onEndEditingPhoneNumber,
         })
       )
+    })
+  })
+
+  describe('Native phone picker', () => {
+    it('can read phone', async () => {
+      const wrapper = shallow<PhoneNumberInput>(
+        <PhoneNumberInput
+          setE164Number={jest.fn()}
+          setCountryCode={jest.fn()}
+          setIsValidNumber={jest.fn()}
+        />
+      )
+
+      await wrapper.instance().triggerPhoneNumberRequest()
+
+      wrapper.instance().setState({})
+
+      expect(wrapper.find(ValidatedTextInput).props().value).toEqual('030 111111')
+
+      expect(wrapper.instance().state.countryCallingCode).toEqual('+49')
+      expect(
+        wrapper.findWhere((node) => node.prop('testID') === 'contryCodeText').props().children
+      ).toBe('+49')
+      expect(
+        wrapper.findWhere((node) => node.prop('testID') === 'CountryNameField').props().defaultValue
+      ).toBe('Germany')
     })
   })
 })

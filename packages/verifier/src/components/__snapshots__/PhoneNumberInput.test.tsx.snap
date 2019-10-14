@@ -79,6 +79,7 @@ exports[`PhoneNumberInput when defaultCountry renders defaults 1`] = `
           "width": 60,
         }
       }
+      testID="contryCodeText"
     >
       +54
     </Text>
@@ -339,6 +340,7 @@ exports[`PhoneNumberInput when no defaultCountry renders AutoComplete 1`] = `
           "width": 60,
         }
       }
+      testID="contryCodeText"
     >
       
     </Text>

@@ -7,7 +7,6 @@ import SmsRetriever from '@celo/react-native-sms-retriever'
 import { Countries } from '@celo/utils/src/countries'
 import { ValidatorKind } from '@celo/utils/src/inputValidation'
 import { getRegionCodeFromCountryCode, parsePhoneNumber } from '@celo/utils/src/phoneNumbers'
-import { parsePhoneNumberFromString } from 'libphonenumber-js'
 import * as React from 'react'
 import { Platform, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
 import Autocomplete from 'react-native-autocomplete-input'
@@ -73,17 +72,21 @@ export default class PhoneNumberInput extends React.Component<Props, State> {
   async triggerPhoneNumberRequest() {
     try {
       const phone = await SmsRetriever.requestPhoneNumber()
-      const phoneNumber = parsePhoneNumberFromString(phone, undefined)
+      const phoneNumber = parsePhoneNumber(phone, '')
+
       if (phoneNumber) {
         this.setState({
-          phoneNumber: phoneNumber.nationalNumber.toString(),
+          phoneNumber: phoneNumber.displayNumber.toString(),
         })
-
-        this.onChangeCountryQuery(
-          this.state.countries.getCountryByPhoneCountryCode(
-            '+' + phoneNumber.countryCallingCode.toString()
+        if (phoneNumber.countryCode) {
+          // TODO known issue, the country code is not enough to
+          // get a country, e.g. +1 could be USA or Canada
+          const displayName = this.state.countries.getCountryByPhoneCountryCode(
+            '+' + phoneNumber.countryCode.toString()
           ).displayName
-        )
+
+          this.onChangeCountryQuery(displayName)
+        }
       }
     } catch (error) {
       console.debug(`${TAG}/Could not request phone`)
@@ -229,7 +232,9 @@ export default class PhoneNumberInput extends React.Component<Props, State> {
           </View>
         )}
         <View style={[style.phoneNumberContainer, style.borderedBox]}>
-          <Text style={style.phoneCountryCode}>{countryCallingCode}</Text>
+          <Text style={style.phoneCountryCode} testID={'contryCodeText'}>
+            {countryCallingCode}
+          </Text>
           <View style={style.line} />
           <ValidatedTextInput<PhoneValidatorProps>
             style={[style.inputBox, style.phoneNumberInput]}

@@ -77,8 +77,9 @@ exports[`PhoneNumberInput renders correctly with minimum props 1`] = `
           "width": 60,
         }
       }
+      testID="contryCodeText"
     >
-      1
+      +1
     </Text>
     <View
       style={
@@ -112,7 +113,7 @@ exports[`PhoneNumberInput renders correctly with minimum props 1`] = `
     >
       <TextInput
         allowFontScaling={true}
-        countryCallingCode="1"
+        countryCallingCode="+1"
         keyboardType="phone-pad"
         onBlur={[Function]}
         onChangeText={[Function]}
