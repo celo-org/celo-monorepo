@@ -199,7 +199,7 @@ const validatorsAbi = [
     ],
     payable: false,
     stateMutability: 'view',
-    type: 'function'
+    type: 'function',
   },
   {
     constant: true,
@@ -208,12 +208,12 @@ const validatorsAbi = [
     outputs: [
       {
         name: '',
-        type: 'uint256'
-      }
+        type: 'uint256',
+      },
     ],
     payable: false,
     stateMutability: 'view',
-    type: 'function'
+    type: 'function',
   },
   {
     constant: true,
@@ -222,12 +222,12 @@ const validatorsAbi = [
     outputs: [
       {
         name: '',
-        type: 'uint256'
-      }
+        type: 'uint256',
+      },
     ],
     payable: false,
     stateMutability: 'view',
-    type: 'function'
+    type: 'function',
   },
   {
     anonymous: false,
@@ -430,7 +430,11 @@ describe('governance tests', () => {
       const quorumValidators = await validators.methods.getByzantineQuorumForCurrentSet().call()
       const size = new BigNumber(numberValidators)
       const quorum = new BigNumber(quorumValidators)
-      const expQuorum = size.multipliedBy(2).dividedBy(3).integerValue().plus(1)
+      const expQuorum = size
+        .multipliedBy(2)
+        .dividedBy(3)
+        .integerValue()
+        .plus(1)
       assert.equal(quorum.toNumber(), expQuorum.toNumber())
     })
   })
