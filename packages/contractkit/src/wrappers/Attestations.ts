@@ -42,13 +42,15 @@ export enum AttestationState {
 export interface ActionableAttestation {
   issuer: Address
   attestationState: AttestationState
-  time: number
+  requestTime: number
+  completionTime: number
   publicKey: string
 }
 
-const parseAttestationInfo = (rawState: { 0: string; 1: string }) => ({
+const parseAttestationInfo = (rawState: { 0: string; 1: string; 2: string }) => ({
   attestationState: parseInt(rawState[0], 10),
-  time: parseInt(rawState[1], 10),
+  requestTime: parseInt(rawState[1], 10),
+  completionTime: parseInt(rawState[2], 10),
 })
 
 function attestationMessageToSign(phoneHash: string, account: Address) {
@@ -185,7 +187,7 @@ export class AttestationsWrapper extends BaseWrapper<Attestations> {
       .filter(
         ([_issuer, attestation, publicKey]) =>
           isIncomplete(attestation.attestationState) &&
-          hasNotExpired(attestation.time) &&
+          hasNotExpired(attestation.requestTime) &&
           isValidKey(publicKey)
       )
       .map(([issuer, attestation, publicKey]) => ({
@@ -309,6 +311,16 @@ export class AttestationsWrapper extends BaseWrapper<Attestations> {
       this.kit,
       this.contract.methods.request(phoneHash, attestationsRequested, tokenAddress)
     )
+  }
+
+  /**
+   * Reveals the issuers for previously requested attestations for a phone number
+   * @param phoneNumber The phone number for which to request attestations for
+   * @param token The token with which to pay for the attestation fee
+   */
+  async revealIssuers(phoneNumber: string) {
+    const phoneHash = PhoneNumberUtils.getPhoneHash(phoneNumber)
+    return wrapSend(this.kit, this.contract.methods.revealIssuers(phoneHash))
   }
 
   /**
