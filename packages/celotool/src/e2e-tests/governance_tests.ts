@@ -418,7 +418,7 @@ describe('governance tests', () => {
     })
   })
 
-  describe('Validators.getByzantineQuorumForCurrentSet()', () => {
+  describe.only('Validators.getByzantineQuorumForCurrentSet()', () => {
     before(async function() {
       this.timeout(0)
       await restart()
