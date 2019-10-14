@@ -2,25 +2,20 @@ import { addLocalAccount as web3utilsAddLocalAccount } from '@celo/walletkit'
 import { Platform } from 'react-native'
 import { DocumentDirectoryPath } from 'react-native-fs'
 import * as net from 'react-native-tcp'
-import { useSelector } from 'react-redux'
 import { DEFAULT_INFURA_URL, DEFAULT_TESTNET } from 'src/config'
-import { Testnets } from 'src/geth/networkConfig'
+import { GethSyncMode } from 'src/geth/consts'
+import networkConfig, { Testnets } from 'src/geth/networkConfig'
 import Logger from 'src/utils/Logger'
-import { zeroSyncSelector } from 'src/web3/selectors'
 import Web3 from 'web3'
 import { Provider } from 'web3/providers'
 
 // Logging tag
 const tag = 'web3/contracts'
 
-export const web3: Web3 = getWeb3()
+export const web3: Web3 = getInitialWeb3()
 
-export function isZeroSyncMode(): boolean {
-  const zeroSync: boolean = useSelector(zeroSyncSelector)
-  Logger.debug(tag, 'ZeroSync mode:', zeroSync.toString())
-  // TODO(anna) must be a cleaner way to get state
-  // Note that this is only used when we must check zeroSync outside of a saga
-  return zeroSync
+export function isInitiallyZeroSyncMode(): boolean {
+  return networkConfig.syncMode === GethSyncMode.ZeroSync
 }
 
 function getIpcProvider(testnet: Testnets) {
@@ -84,12 +79,14 @@ function getWebSocketProvider(url: string): Provider {
   return provider
 }
 
-function getWeb3(): Web3 {
-  Logger.info(`Initializing web3, platform: ${Platform.OS}, geth free mode: ${isZeroSyncMode()}`)
+function getInitialWeb3(): Web3 {
+  Logger.info(
+    `Initializing web3, platform: ${Platform.OS}, geth free mode: ${isInitiallyZeroSyncMode()}`
+  )
 
-  if (isZeroSyncMode() && Platform.OS === 'ios') {
+  if (isInitiallyZeroSyncMode() && Platform.OS === 'ios') {
     throw new Error('Zero sync mode is currently not supported on iOS')
-  } else if (isZeroSyncMode()) {
+  } else if (isInitiallyZeroSyncMode()) {
     // Geth free mode
     const url = DEFAULT_INFURA_URL
     Logger.debug('contracts@getWeb3', `Connecting to url ${url}`)
@@ -99,6 +96,19 @@ function getWeb3(): Web3 {
     return new Web3(getWeb3HttpProviderForIos())
   } else {
     return new Web3(getIpcProvider(DEFAULT_TESTNET))
+  }
+}
+
+export function switchWeb3Provider(web3Instance: Web3, syncMode: GethSyncMode) {
+  // TODO(anna) ensure this works with iOS providers
+  if (syncMode === GethSyncMode.ZeroSync) {
+    const url = DEFAULT_INFURA_URL
+    Logger.debug('contracts@getWeb3', `Connecting to url ${url}`)
+    web3Instance.setProvider(getWebSocketProvider(url))
+  } else if (syncMode === GethSyncMode.Ultralight) {
+    web3Instance.setProvider(getIpcProvider(DEFAULT_TESTNET))
+  } else {
+    throw new Error(`Attempted to switch into unrecognized sync mode ${syncMode}`)
   }
 }
 
