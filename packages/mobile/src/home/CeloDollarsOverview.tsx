@@ -7,7 +7,11 @@ import { StyleSheet, Text, View } from 'react-native'
 import componentWithAnalytics from 'src/analytics/wrapper'
 import useBalanceAutoRefresh from 'src/home/useBalanceAutoRefresh'
 import { Namespaces } from 'src/i18n'
-import { useDollarsToLocalAmount, useLocalCurrencyCode } from 'src/localCurrency/hooks'
+import {
+  useDollarsToLocalAmount,
+  useLocalCurrencyCode,
+  useLocalCurrencySymbol,
+} from 'src/localCurrency/hooks'
 import useSelector from 'src/redux/useSelector'
 import { getMoneyDisplayValue } from 'src/utils/formatting'
 
@@ -16,25 +20,25 @@ type Props = WithNamespaces
 function CeloDollarsOverview({ t }: Props) {
   useBalanceAutoRefresh()
   const localCurrencyCode = useLocalCurrencyCode()
+  const localCurrencySymbol = useLocalCurrencySymbol()
   const dollarBalance = useSelector((state) => state.stableToken.balance)
   const localBalance = useDollarsToLocalAmount(dollarBalance)
   const localValue =
-    localBalance || dollarBalance === null ? getMoneyDisplayValue(localBalance || 0) : '---'
+    localBalance || dollarBalance === null
+      ? getMoneyDisplayValue(localBalance || 0)
+      : getMoneyDisplayValue(dollarBalance || 0)
 
   return (
     <View style={styles.container}>
-      <Text style={[fontStyles.semiBold, styles.label]}>{t('global:celoDollars')}</Text>
-      <Text style={[fontStyles.semiBold, styles.balance]}>
-        {getMoneyDisplayValue(dollarBalance || 0)}
+      <Text style={styles.balance}>
+        <Text style={fontStyles.semiBold}>{localCurrencySymbol}</Text>
+        <Text style={fontStyles.semiBold}>{localValue}</Text>
+        <Text style={styles.code}> {localBalance ? localCurrencyCode : ''}</Text>
       </Text>
       {!!localCurrencyCode && (
         <Text style={[fontStyles.light, styles.localBalance]}>
-          <Trans i18nKey="localCurrencyEqual">
-            Equal to{' '}
-            <Text style={fontStyles.semiBold}>
-              {{ localValue }} {{ localCurrencyCode }}
-            </Text>
-          </Trans>
+          <Text>{getMoneyDisplayValue(dollarBalance || 0)} </Text>
+          <Text>{t('global:celoDollars')}</Text>
         </Text>
       )}
     </View>
@@ -61,6 +65,9 @@ const styles = StyleSheet.create({
   localBalance: {
     fontSize: 18,
     color: '#B0B5B9',
+  },
+  code: {
+    fontSize: 22,
   },
 })
 

@@ -2,8 +2,8 @@ import BigNumber from 'bignumber.js'
 import { convertDollarsToLocalAmount } from 'src/localCurrency/convert'
 import {
   getLocalCurrencyCode,
-  getLocalCurrencySymbol,
   getLocalCurrencyExchangeRate,
+  getLocalCurrencySymbol,
 } from 'src/localCurrency/selectors'
 import useSelector from 'src/redux/useSelector'
 
