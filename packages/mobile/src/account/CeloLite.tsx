@@ -9,13 +9,21 @@ import { connect } from 'react-redux'
 import i18n, { Namespaces } from 'src/i18n'
 import { headerWithCancelButton } from 'src/navigator/Headers'
 import { RootState } from 'src/redux/reducers'
-import { switchToGethFromZeroSync } from 'src/web3/saga'
+import { setZeroSyncMode } from 'src/web3/actions'
 
 interface StateProps {
   zeroSyncEnabled: boolean
 }
 
-type Props = StateProps & WithNamespaces
+interface DispatchProps {
+  setZeroSyncMode: typeof setZeroSyncMode
+}
+
+type Props = StateProps & DispatchProps & WithNamespaces
+
+const mapDispatchToProps = {
+  setZeroSyncMode,
+}
 
 const mapStateToProps = (state: RootState): StateProps => {
   return {
@@ -29,17 +37,13 @@ export class CeloLite extends React.Component<Props> {
     headerTitle: i18n.t('accountScreen10:celoLite'),
   })
 
-  async updateZeroSyncMode() {
-    await switchToGethFromZeroSync()
-  }
-
   render() {
     const { zeroSyncEnabled, t } = this.props
     return (
       <ScrollView style={style.scrollView} keyboardShouldPersistTaps="handled">
         <SettingsSwitchItem
           switchValue={zeroSyncEnabled}
-          onSwitchChange={this.updateZeroSyncMode}
+          onSwitchChange={this.props.setZeroSyncMode}
           details={t('celoLiteDetail')}
         >
           <Text style={fontStyles.body}>{t('enableCeloLite')}</Text>
@@ -73,6 +77,7 @@ const style = StyleSheet.create({
   },
 })
 
-export default connect<StateProps, DispatchProps, {}, RootState>(mapStateToProps)(
-  withNamespaces(Namespaces.accountScreen10)(CeloLite)
-)
+export default connect<StateProps, DispatchProps, {}, RootState>(
+  mapStateToProps,
+  mapDispatchToProps
+)(withNamespaces(Namespaces.accountScreen10)(CeloLite))

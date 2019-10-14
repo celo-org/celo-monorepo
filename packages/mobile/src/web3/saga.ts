@@ -107,13 +107,20 @@ export function* waitForWeb3Sync() {
 }
 
 export function* switchToGethFromZeroSync() {
+  Logger.debug(TAG + 'Switching to geth from zero sync..')
   const account = yield call(ensureAccountInWeb3Keystore)
   setZeroSyncMode(false)
   Logger.debug(
-    TAG + '@ensureAccountInWeb3Keystore',
+    TAG + '@switchToGethFromZeroSync',
     'Importing account from private key to web3 keystore',
     account
   )
+}
+
+export function* switchToZeroSyncFromGeth() {
+  Logger.debug(TAG + 'Switching to zero sync from geth..')
+  setZeroSyncMode(true)
+  // TODO write
 }
 
 export function* ensureAccountInWeb3Keystore() {
