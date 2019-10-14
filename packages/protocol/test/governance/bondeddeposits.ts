@@ -1,4 +1,5 @@
 import { CeloContractName } from '@celo/protocol/lib/registry-utils'
+import { getParsedSignatureOfAddress } from '@celo/protocol/lib/signing-utils'
 import {
   assertEqualBN,
   assertLogMatches,
@@ -45,17 +46,6 @@ contract('LockedGold', (accounts: string[]) => {
   let lockedGold: LockedGoldInstance
   let registry: RegistryInstance
 
-  const getParsedSignatureOfAddress = async (address: string, signer: string) => {
-    // @ts-ignore
-    const hash = web3.utils.soliditySha3({ type: 'address', value: address })
-    const signature = (await web3.eth.sign(hash, signer)).slice(2)
-    return {
-      r: `0x${signature.slice(0, 64)}`,
-      s: `0x${signature.slice(64, 128)}`,
-      v: web3.utils.hexToNumber(signature.slice(128, 130)) + 27,
-    }
-  }
-
   enum roles {
     validating,
     voting,
@@ -94,7 +84,7 @@ contract('LockedGold', (accounts: string[]) => {
     const delegate = accounts[1]
 
     beforeEach(async () => {
-      const sig = await getParsedSignatureOfAddress(account, delegate)
+      const sig = await getParsedSignatureOfAddress(web3, account, delegate)
       await lockedGold.delegateRole(roles.voting, delegate, sig.v, sig.r, sig.s)
     })
 
@@ -168,7 +158,7 @@ contract('LockedGold', (accounts: string[]) => {
     let sig
 
     beforeEach(async () => {
-      sig = await getParsedSignatureOfAddress(account, delegate)
+      sig = await getParsedSignatureOfAddress(web3, account, delegate)
     })
 
     forEachRole((role) => {
@@ -198,7 +188,7 @@ contract('LockedGold', (accounts: string[]) => {
 
       it('should revert if the address is already being delegated to', async () => {
         const otherAccount = accounts[2]
-        const otherSig = await getParsedSignatureOfAddress(otherAccount, delegate)
+        const otherSig = await getParsedSignatureOfAddress(web3, otherAccount, delegate)
         await lockedGold.createAccount({ from: otherAccount })
         await lockedGold.delegateRole(role, delegate, otherSig.v, otherSig.r, otherSig.s, {
           from: otherAccount,
@@ -208,7 +198,7 @@ contract('LockedGold', (accounts: string[]) => {
 
       it('should revert if the signature is incorrect', async () => {
         const nonDelegate = accounts[3]
-        const incorrectSig = await getParsedSignatureOfAddress(account, nonDelegate)
+        const incorrectSig = await getParsedSignatureOfAddress(web3, account, nonDelegate)
         await assertRevert(
           lockedGold.delegateRole(role, delegate, incorrectSig.v, incorrectSig.r, incorrectSig.s)
         )
@@ -219,7 +209,7 @@ contract('LockedGold', (accounts: string[]) => {
         let newSig
         beforeEach(async () => {
           await lockedGold.delegateRole(role, delegate, sig.v, sig.r, sig.s)
-          newSig = await getParsedSignatureOfAddress(account, newDelegate)
+          newSig = await getParsedSignatureOfAddress(web3, account, newDelegate)
         })
 
         it('should set the new delegate', async () => {
@@ -666,7 +656,7 @@ contract('LockedGold', (accounts: string[]) => {
         it('should revert when passed a delegate that is not the role delegate', async () => {
           const delegate = accounts[2]
           const diffRole = (role + 1) % 3
-          const sig = await getParsedSignatureOfAddress(account, delegate)
+          const sig = await getParsedSignatureOfAddress(web3, account, delegate)
           await lockedGold.delegateRole(role, delegate, sig.v, sig.r, sig.s)
           await assertRevert(lockedGold.getAccountFromDelegateAndRole(delegate, diffRole))
         })
@@ -676,7 +666,7 @@ contract('LockedGold', (accounts: string[]) => {
         const delegate = accounts[1]
 
         beforeEach(async () => {
-          const sig = await getParsedSignatureOfAddress(account, delegate)
+          const sig = await getParsedSignatureOfAddress(web3, account, delegate)
           await lockedGold.delegateRole(role, delegate, sig.v, sig.r, sig.s)
         })
 
@@ -691,7 +681,7 @@ contract('LockedGold', (accounts: string[]) => {
         it('should revert when passed a delegate that is not the role delegate', async () => {
           const delegate = accounts[2]
           const diffRole = (role + 1) % 3
-          const sig = await getParsedSignatureOfAddress(account, delegate)
+          const sig = await getParsedSignatureOfAddress(web3, account, delegate)
           await lockedGold.delegateRole(role, delegate, sig.v, sig.r, sig.s)
           await assertRevert(lockedGold.getAccountFromDelegateAndRole(delegate, diffRole))
         })
@@ -711,7 +701,7 @@ contract('LockedGold', (accounts: string[]) => {
         const delegate = accounts[1]
 
         beforeEach(async () => {
-          const sig = await getParsedSignatureOfAddress(account, delegate)
+          const sig = await getParsedSignatureOfAddress(web3, account, delegate)
           await lockedGold.delegateRole(role, delegate, sig.v, sig.r, sig.s)
         })
 
@@ -754,7 +744,7 @@ contract('LockedGold', (accounts: string[]) => {
       const delegate = accounts[1]
 
       beforeEach(async () => {
-        const sig = await getParsedSignatureOfAddress(account, delegate)
+        const sig = await getParsedSignatureOfAddress(web3, account, delegate)
         await lockedGold.delegateRole(roles.voting, delegate, sig.v, sig.r, sig.s)
       })
 
