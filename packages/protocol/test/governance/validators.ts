@@ -1526,7 +1526,7 @@ contract('Validators', (accounts: string[]) => {
     })
   })
 
-  describe.only('#getEpochNumber', () => {
+  describe('#getEpochNumber', () => {
     const compareWeb3ComputedWithContract = async () => {
       // @ts-ignore
       const contractNumber = await validators.getEpochNumber.call()
