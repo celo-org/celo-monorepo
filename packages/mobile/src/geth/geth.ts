@@ -3,7 +3,6 @@ import BigNumber from 'bignumber.js'
 import { Platform } from 'react-native'
 import DeviceInfo from 'react-native-device-info'
 import * as RNFS from 'react-native-fs'
-import { DocumentDirectoryPath } from 'react-native-fs'
 import RNGeth from 'react-native-geth'
 import { DEFAULT_TESTNET } from 'src/config'
 import networkConfig from 'src/geth/networkConfig'
@@ -62,7 +61,9 @@ const INSTANCE_FOLDER = Platform.select({
 // So on iOS, `react-native-geth` changes the current directory to `${DocumentDirectoryPath}/.${DEFAULT_TESTNET}`
 // for the relative path workaround to work.
 export const IPC_PATH =
-  Platform.OS === 'ios' ? './geth.ipc' : `${DocumentDirectoryPath}/.${DEFAULT_TESTNET}/geth.ipc`
+  Platform.OS === 'ios'
+    ? './geth.ipc'
+    : `${RNFS.DocumentDirectoryPath}/.${DEFAULT_TESTNET}/geth.ipc`
 
 function getNodeInstancePath(nodeDir: string) {
   return `${RNFS.DocumentDirectoryPath}/${nodeDir}/${INSTANCE_FOLDER}`

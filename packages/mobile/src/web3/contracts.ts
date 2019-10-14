@@ -55,16 +55,6 @@ function getIpcProvider(testnet: Testnets) {
   return ipcProvider
 }
 
-// Use Http provider on iOS until we add support for local socket on iOS in react-native-tcp
-function getWeb3HttpProviderForIos(): Provider {
-  Logger.debug(tag, 'creating HttpProvider for iOS...')
-
-  const httpProvider = new Web3.providers.HttpProvider('http://localhost:8545')
-  Logger.debug(tag, 'created HttpProvider for iOS')
-
-  return httpProvider
-}
-
 function getWebSocketProvider(url: string): Provider {
   Logger.debug(tag, 'creating HttpProvider...')
   const provider = new Web3.providers.HttpProvider(url)
