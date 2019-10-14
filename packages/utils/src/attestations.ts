@@ -1,13 +1,9 @@
-import { privateToAddress } from 'ethereumjs-util'
 import * as Web3Utils from 'web3-utils'
+import { privateKeyToAddress } from './address'
 import { IdentityUtils } from './identity'
 import { Signature, SignatureUtils } from './signatureUtils'
 
-const privateKeyToAddress = (privateKey: string) => {
-  return '0x' + privateToAddress(Buffer.from(privateKey.slice(2), 'hex')).toString('hex')
-}
-
-async function attestationMessageToSign(identifier: string, account: string) {
+export async function attestationMessageToSign(identifier: string, account: string) {
   const messageHash: string = Web3Utils.soliditySha3(
     {
       type: 'bytes32',

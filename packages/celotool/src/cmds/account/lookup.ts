@@ -37,7 +37,14 @@ export const handler = async (argv: LookupArgv) => {
   console.log(`Looking up addresses attested to ${argv.identifier}`)
   const cb = async () => {
     const kit = newKit('http://localhost:8545')
-    const identifierHash = await IdentityUtils.identityHash(argv.identifier, argv.identifierType)
+    let identifierType
+    switch (argv.identifierType) {
+      case 'phone':
+      case 'phone_number':
+      default:
+        identifierType = IdentityUtils.IdentifierTypeEnum.PHONE_NUMBER
+    }
+    const identifierHash = await IdentityUtils.identityHash(argv.identifier, identifierType)
     const attestations = await kit.contracts.getAttestations()
     const lookupResult = await attestations.lookupPhoneNumbers([identifierHash])
 
