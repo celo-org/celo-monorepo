@@ -1,6 +1,6 @@
 import { envVar, fetchEnv, isVmBased } from 'src/lib/env-utils'
 import { execCmdWithExitOnFailure } from 'src/lib/utils'
-import { getTxNodeLoadBalancerIP } from 'src/lib/vm-testnet-utils'
+import { getInternalTxNodeLoadBalancerIP } from 'src/lib/vm-testnet-utils'
 
 export async function installHelmChart(celoEnv: string) {
   console.info(`Installing helm release ${celoEnv}-transaction-metrics-exporter`)
@@ -38,7 +38,7 @@ async function helmParameters(celoEnv: string) {
     `--set imageTag="${fetchEnv(envVar.TRANSACTION_METRICS_EXPORTER_DOCKER_IMAGE_TAG)}"`,
   ]
   if (isVmBased()) {
-    params.push(`--set web3Provider="ws://${await getTxNodeLoadBalancerIP(celoEnv)}:8546"`)
+    params.push(`--set web3Provider="ws://${await getInternalTxNodeLoadBalancerIP(celoEnv)}:8546"`)
   }
   return params
 }

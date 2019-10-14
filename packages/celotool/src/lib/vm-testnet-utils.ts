@@ -292,7 +292,7 @@ export async function getTestnetOutputs(celoEnv: string) {
   return getTerraformModuleOutputs(testnetTerraformModule, vars)
 }
 
-export async function getTxNodeLoadBalancerIP(celoEnv: string) {
+export async function getInternalTxNodeLoadBalancerIP(celoEnv: string) {
   const outputs = await getTestnetOutputs(celoEnv)
   return outputs.tx_node_lb_internal_ip_address.value
 }
