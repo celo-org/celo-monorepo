@@ -11,7 +11,7 @@ import { InitializationState, isGethConnectedSelector } from 'src/geth/reducer'
 import { navigateToError } from 'src/navigator/NavigationService'
 import { restartApp } from 'src/utils/AppRestart'
 import Logger from 'src/utils/Logger'
-import { zeroSyncSelector } from 'src/web3/selectors'
+import { isZeroSyncMode } from 'src/web3/contracts'
 
 const gethEmitter = new NativeEventEmitter(NativeModules.RNGeth)
 
@@ -42,8 +42,7 @@ export function* waitForGethConnectivity() {
 }
 
 function* waitForGethInstance() {
-  const zeroSyncMode: boolean = yield select(zeroSyncSelector)
-  if (zeroSyncMode) {
+  if (isZeroSyncMode()) {
     return GethInitOutcomes.SUCCESS
   }
   try {
@@ -133,8 +132,8 @@ function createNewBlockChannel() {
 
 function* monitorGeth() {
   const newBlockChannel = yield createNewBlockChannel()
-  const zeroSyncMode: boolean = yield select(zeroSyncSelector)
-  if (zeroSyncMode) {
+
+  if (isZeroSyncMode()) {
     yield put(setGethConnected(true))
     yield delay(GETH_MONITOR_DELAY)
     return

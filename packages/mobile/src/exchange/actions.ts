@@ -27,7 +27,6 @@ import { roundDown } from 'src/utils/formatting'
 import Logger from 'src/utils/Logger'
 import { web3 } from 'src/web3/contracts'
 import { getConnectedAccount, getConnectedUnlockedAccount } from 'src/web3/saga'
-import { zeroSyncSelector } from 'src/web3/selectors'
 import * as util from 'util'
 
 const TAG = 'exchange/actions'
@@ -234,8 +233,7 @@ export function* exchangeGoldAndStableTokens(action: ExchangeTokensAction) {
       Logger.error(TAG, `Unexpected maker token ${makerToken}`)
       return
     }
-    const zeroSyncMode: boolean = yield select(zeroSyncSelector)
-    yield call(sendTransaction, approveTx, account, TAG, 'approval', zeroSyncMode)
+    yield call(sendTransaction, approveTx, account, TAG, 'approval')
     Logger.debug(TAG, `Transaction approved: ${util.inspect(approveTx.arguments)}`)
 
     const tx = exchangeContract.methods.exchange(

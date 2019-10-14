@@ -34,9 +34,8 @@ import { TransactionStatus, TransactionTypes } from 'src/transactions/reducer'
 import { sendAndMonitorTransaction } from 'src/transactions/saga'
 import { sendTransaction } from 'src/transactions/send'
 import Logger from 'src/utils/Logger'
-import { addLocalAccount, web3 } from 'src/web3/contracts'
+import { addLocalAccount, isZeroSyncMode, web3 } from 'src/web3/contracts'
 import { getConnectedAccount, getConnectedUnlockedAccount } from 'src/web3/saga'
-import { zeroSyncSelector } from 'src/web3/selectors'
 
 const TAG = 'escrow/saga'
 
@@ -52,8 +51,7 @@ function* transferStableTokenToEscrow(action: EscrowTransferPaymentAction) {
     const convertedAmount = web3.utils.toWei(amount.toString())
     const approvalTx = stableToken.methods.approve(escrow.options.address, convertedAmount)
 
-    const zeroSyncMode: boolean = yield select(zeroSyncSelector)
-    yield call(sendTransaction, approvalTx, account, TAG, 'approval', zeroSyncMode)
+    yield call(sendTransaction, approvalTx, account, TAG, 'approval')
 
     Logger.debug(TAG + '@transferToEscrow', 'Transfering to escrow')
 
@@ -117,9 +115,7 @@ function* withdrawFromEscrow(action: EndVerificationAction) {
     }
 
     const tempWalletAddress = web3.eth.accounts.privateKeyToAccount(tmpWalletPrivateKey).address
-
-    const zeroSyncMode: boolean = yield select(zeroSyncSelector)
-    if (zeroSyncMode) {
+    if (isZeroSyncMode()) {
       addLocalAccount(web3, tmpWalletPrivateKey)
     }
     Logger.debug(TAG + '@withdrawFromEscrow', 'Added temp account to wallet: ' + tempWalletAddress)
@@ -132,7 +128,7 @@ function* withdrawFromEscrow(action: EndVerificationAction) {
       return
     }
 
-    if (zeroSyncMode) {
+    if (isZeroSyncMode()) {
       Logger.info(
         TAG + '@withdrawFromEscrow',
         'Geth free mode is on, no need to unlock the temporary account'
@@ -156,7 +152,7 @@ function* withdrawFromEscrow(action: EndVerificationAction) {
     const withdrawTx = escrow.methods.withdraw(tempWalletAddress, v, r, s)
     const txID = generateStandbyTransactionId(account)
 
-    yield call(sendTransaction, withdrawTx, account, TAG, txID, zeroSyncMode)
+    yield call(sendTransaction, withdrawTx, account, TAG, txID)
 
     yield put(fetchDollarBalance())
     Logger.showMessage(i18n.t('inviteFlow11:transferDollarsToAccount'))
@@ -199,8 +195,7 @@ function* reclaimFromEscrow({ paymentID }: EscrowReclaimPaymentAction) {
     const account = yield call(getConnectedUnlockedAccount)
 
     const reclaimTx = yield call(createReclaimTransaction, paymentID)
-    const zeroSyncMode: boolean = yield select(zeroSyncSelector)
-    yield call(sendTransaction, reclaimTx, account, TAG, 'escrow reclaim', zeroSyncMode)
+    yield call(sendTransaction, reclaimTx, account, TAG, 'escrow reclaim')
 
     yield put(fetchDollarBalance())
     yield put(fetchSentEscrowPayments())

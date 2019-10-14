@@ -46,7 +46,7 @@ import { sendTransaction, sendTransactionPromises } from 'src/transactions/send'
 import Logger from 'src/utils/Logger'
 import { web3 } from 'src/web3/contracts'
 import { getConnectedAccount, getConnectedUnlockedAccount } from 'src/web3/saga'
-import { privateCommentKeySelector, zeroSyncSelector } from 'src/web3/selectors'
+import { privateCommentKeySelector } from 'src/web3/selectors'
 
 const TAG = 'identity/verification'
 
@@ -141,7 +141,6 @@ export function* doVerificationFlow() {
 
     // Mark codes completed in previous attempts
     yield put(completeAttestationCode(NUM_ATTESTATIONS_REQUIRED - status.numAttestationsRemaining))
-    const zeroSyncMode: boolean = yield select(zeroSyncSelector)
 
     const attestations: ActionableAttestation[] = yield call(
       requestAndRetrieveAttestations,
@@ -149,8 +148,7 @@ export function* doVerificationFlow() {
       stableTokenContract,
       e164NumberHash,
       account,
-      status.numAttestationsRemaining,
-      zeroSyncMode
+      status.numAttestationsRemaining
     )
 
     const issuers = attestations.map((a) => a.issuer)
@@ -164,7 +162,7 @@ export function* doVerificationFlow() {
 
     yield all([
       // Set acccount and data encryption key in contract
-      call(setAccount, attestationsContract, account, dataKey, zeroSyncMode),
+      call(setAccount, attestationsContract, account, dataKey),
       // Request codes for the attestations needed
       call(
         revealNeededAttestations,
@@ -216,8 +214,7 @@ export async function requestAndRetrieveAttestations(
   stableTokenContract: StableTokenType,
   e164NumberHash: string,
   account: string,
-  attestationsRemaining: number,
-  zeroSyncMode: boolean
+  attestationsRemaining: number
 ) {
   // The set of attestations we can reveal right now
   let attestations: ActionableAttestation[] = await getActionableAttestations(
@@ -233,8 +230,7 @@ export async function requestAndRetrieveAttestations(
       stableTokenContract,
       attestationsRemaining - attestations.length,
       e164NumberHash,
-      account,
-      zeroSyncMode
+      account
     )
 
     CeloAnalytics.track(CustomEventNames.verification_actionable_attestation_start)
@@ -287,8 +283,7 @@ async function requestAttestations(
   stableTokenContract: StableTokenType,
   numAttestationsRequestsNeeded: number,
   e164NumberHash: string,
-  account: string,
-  zeroSyncMode: boolean
+  account: string
 ) {
   if (numAttestationsRequestsNeeded <= 0) {
     Logger.debug(`${TAG}@requestNeededAttestations`, 'No additional attestations requests needed')
@@ -309,7 +304,7 @@ async function requestAttestations(
   const {
     confirmation: approveConfirmationPromise,
     transactionHash: approveTransactionHashPromise,
-  } = await sendTransactionPromises(approveTx, account, TAG, 'Approve Attestations', zeroSyncMode)
+  } = await sendTransactionPromises(approveTx, account, TAG, 'Approve Attestations')
 
   await approveTransactionHashPromise
 
@@ -327,7 +322,7 @@ async function requestAttestations(
 
   await Promise.all([
     approveConfirmationPromise,
-    sendTransaction(requestTx, account, TAG, 'Request Attestations', zeroSyncMode, REQUEST_TX_GAS),
+    sendTransaction(requestTx, account, TAG, 'Request Attestations', REQUEST_TX_GAS),
   ])
 
   CeloAnalytics.track(CustomEventNames.verification_requested_attestations)
@@ -428,8 +423,7 @@ function* revealAndCompleteAttestation(
   CeloAnalytics.track(CustomEventNames.verification_reveal_attestation, { issuer })
   const revealTx = yield call(makeRevealTx, attestationsContract, e164Number, issuer)
   // Crude way to prevent sendTransaction being called in parallel and use the same nonces.
-  const zeroSyncMode: boolean = yield select(zeroSyncSelector)
-  yield call(sendTransaction, revealTx, account, TAG, `Reveal ${issuer}`, zeroSyncMode)
+  yield call(sendTransaction, revealTx, account, TAG, `Reveal ${issuer}`)
 
   CeloAnalytics.track(CustomEventNames.verification_revealed_attestation, { issuer })
 
@@ -446,7 +440,7 @@ function* revealAndCompleteAttestation(
     code.issuer,
     code.code
   )
-  yield call(sendTransaction, completeTx, account, TAG, `Confirmation ${issuer}`, zeroSyncMode)
+  yield call(sendTransaction, completeTx, account, TAG, `Confirmation ${issuer}`)
 
   CeloAnalytics.track(CustomEventNames.verification_completed_attestation, { issuer })
 
@@ -473,8 +467,7 @@ function* waitForAttestationCode(issuer: string) {
 async function setAccount(
   attestationsContract: AttestationsType,
   address: string,
-  dataKey: string,
-  zeroSyncMode: boolean
+  dataKey: string
 ) {
   Logger.debug(TAG, 'Setting wallet address and public data encryption key')
   const currentWalletAddress = await getWalletAddress(attestationsContract, address)
@@ -484,7 +477,7 @@ async function setAccount(
     !areAddressesEqual(currentWalletDEK, dataKey)
   ) {
     const setAccountTx = makeSetAccountTx(attestationsContract, address, dataKey)
-    await sendTransaction(setAccountTx, address, TAG, `Set Wallet Address & DEK`, zeroSyncMode)
+    await sendTransaction(setAccountTx, address, TAG, `Set Wallet Address & DEK`)
     CeloAnalytics.track(CustomEventNames.verification_set_account)
   }
 }
@@ -515,8 +508,7 @@ export function* revokeVerification() {
     }
 
     const revokeTx = attestationsContract.methods.revoke(e164NumberHash, index)
-    const zeroSyncMode: boolean = yield select(zeroSyncSelector)
-    yield call(sendTransaction, revokeTx, account, TAG, 'Revoke attestation', zeroSyncMode)
+    yield call(sendTransaction, revokeTx, account, TAG, 'Revoke attestation')
 
     yield put(setNumberVerified(false))
     Logger.debug(TAG + '@revokeVerification', 'Done revoking previous verification')
