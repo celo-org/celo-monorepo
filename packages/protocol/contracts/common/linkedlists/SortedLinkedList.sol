@@ -166,20 +166,16 @@ library SortedLinkedList {
     //   1. The value is less than the current lowest value
     //   2. The value is greater than the current greatest value
     //   3. The value is just greater than the value for `lesserKey`
-    //   4. The value is just less than the value for `greaterKey`
+    //   4. The value is just less than the value for `greaerKey`
     if (lesserKey == bytes32(0) && isValueBetween(list, value, lesserKey, list.list.tail)) {
       return (lesserKey, list.list.tail);
     } else if (
       greaterKey == bytes32(0) && isValueBetween(list, value, list.list.head, greaterKey)
     ) {
       return (list.list.head, greaterKey);
-    } else if (
-      lesserKey != bytes32(0) &&
-      isValueBetween(list, value, lesserKey, list.list.elements[lesserKey].nextKey))
-    {
+    } else if (isValueBetween(list, value, lesserKey, list.list.elements[lesserKey].nextKey)) {
       return (lesserKey, list.list.elements[lesserKey].nextKey);
     } else if (
-      greaterKey != bytes32(0) &&
       isValueBetween(list, value, list.list.elements[greaterKey].previousKey, greaterKey)
     ) {
       return (list.list.elements[greaterKey].previousKey, greaterKey);
