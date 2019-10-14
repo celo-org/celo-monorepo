@@ -1,3 +1,4 @@
+import { assert } from 'chai'
 import Web3 from 'web3'
 import { getContractAddress, getHooks, sleep } from './utils'
 
@@ -67,6 +68,13 @@ describe('exit tests', function(this: any) {
   }
 
   describe('when running a node', () => {
+    it('block limit should have been set using governance', async () => {
+      this.timeout(0)
+      await restartGeth()
+      const current = await web3.eth.getBlockNumber()
+      const block = await web3.eth.getBlock(current)
+      assert.equal(block.gasLimit, 8000000)
+    })
     it('should exit when minimum version is updated', async () => {
       this.timeout(0)
       await restartGeth()
