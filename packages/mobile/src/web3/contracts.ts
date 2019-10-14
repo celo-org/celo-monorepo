@@ -1,9 +1,9 @@
 import { addLocalAccount as web3utilsAddLocalAccount } from '@celo/walletkit'
 import { Platform } from 'react-native'
-import { DocumentDirectoryPath } from 'react-native-fs'
 import * as net from 'react-native-tcp'
 import { DEFAULT_INFURA_URL, DEFAULT_TESTNET } from 'src/config'
 import { GethSyncMode } from 'src/geth/consts'
+import { IPC_PATH } from 'src/geth/geth'
 import networkConfig, { Testnets } from 'src/geth/networkConfig'
 import Logger from 'src/utils/Logger'
 import Web3 from 'web3'
@@ -21,10 +21,7 @@ export function isZeroSyncMode(): boolean {
 function getIpcProvider(testnet: Testnets) {
   Logger.debug(tag, 'creating IPCProvider...')
 
-  const ipcProvider = new Web3.providers.IpcProvider(
-    `${DocumentDirectoryPath}/.${testnet}/geth.ipc`,
-    net
-  )
+  const ipcProvider = new Web3.providers.IpcProvider(IPC_PATH, net)
   Logger.debug(tag, 'created IPCProvider')
 
   // More details on the IPC objects can be seen via this
@@ -89,9 +86,6 @@ function getWeb3(): Web3 {
     const url = DEFAULT_INFURA_URL
     Logger.debug('contracts@getWeb3', `Connecting to url ${url}`)
     return new Web3(getWebSocketProvider(url))
-  } else if (Platform.OS === 'ios') {
-    // iOS + local geth
-    return new Web3(getWeb3HttpProviderForIos())
   } else {
     return new Web3(getIpcProvider(DEFAULT_TESTNET))
   }

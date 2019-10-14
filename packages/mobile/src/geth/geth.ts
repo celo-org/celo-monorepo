@@ -3,6 +3,7 @@ import BigNumber from 'bignumber.js'
 import { Platform } from 'react-native'
 import DeviceInfo from 'react-native-device-info'
 import * as RNFS from 'react-native-fs'
+import { DocumentDirectoryPath } from 'react-native-fs'
 import RNGeth from 'react-native-geth'
 import { DEFAULT_TESTNET } from 'src/config'
 import networkConfig from 'src/geth/networkConfig'
@@ -54,6 +55,15 @@ const INSTANCE_FOLDER = Platform.select({
   default: 'GethMobile',
 })
 
+// Use relative path on iOS to workaround the 104 chars path limit for unix domain socket.
+// On iOS the default path would be something like
+// `/var/mobile/Containers/Data/Application/2E684E03-9EFA-492A-B19A-4759DD32BE67/Documents/.alfajores/geth.ipc`
+// which is too long.
+// So on iOS, `react-native-geth` changes the current directory to `${DocumentDirectoryPath}/.${DEFAULT_TESTNET}`
+// for the relative path workaround to work.
+export const IPC_PATH =
+  Platform.OS === 'ios' ? './geth.ipc' : `${DocumentDirectoryPath}/.${DEFAULT_TESTNET}/geth.ipc`
+
 function getNodeInstancePath(nodeDir: string) {
   return `${RNFS.DocumentDirectoryPath}/${nodeDir}/${INSTANCE_FOLDER}`
 }
@@ -76,6 +86,7 @@ async function createNewGeth(): Promise<typeof RNGeth> {
     genesis,
     syncMode,
     useLightweightKDF: true,
+    ipcPath: IPC_PATH,
   }
 
   // Setup Logging
