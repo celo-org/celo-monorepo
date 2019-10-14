@@ -294,7 +294,7 @@ export async function getTestnetOutputs(celoEnv: string) {
 
 export async function getTxNodeLoadBalancerIP(celoEnv: string) {
   const outputs = await getTestnetOutputs(celoEnv)
-  return outputs.tx_node_lb_ip_address.value
+  return outputs.tx_node_lb_internal_ip_address.value
 }
 
 function getTerraformBackendConfigVars(celoEnv: string, terraformModule: string) {
@@ -305,14 +305,17 @@ function getTerraformBackendConfigVars(celoEnv: string, terraformModule: string)
 
 function getTestnetVars(celoEnv: string) {
   const genesisBuffer = new Buffer(generateGenesisFromEnv())
+  const domainName = fetchEnv(envVar.CLUSTER_DOMAIN_NAME)
   return {
     ...getEnvVarValues(testnetEnvVars),
-    ethstats_host: `${celoEnv}-ethstats.${fetchEnv(envVar.CLUSTER_DOMAIN_NAME)}.org`,
+    dns_zone_name: dnsZoneName(domainName),
+    ethstats_host: `${celoEnv}-ethstats.${domainName}.org`,
     gcloud_secrets_bucket: secretsBucketName,
     gcloud_secrets_base_path: secretsBasePath(celoEnv),
     // only able to view objects (for accessing secrets)
     gcloud_vm_service_account_email: 'terraform-testnet@celo-testnet.iam.gserviceaccount.com',
     genesis_content_base64: genesisBuffer.toString('base64'),
+    infura_setup_host: `${celoEnv}-infura.${domainName}.org`,
     network_name: networkName(celoEnv),
   }
 }
@@ -406,4 +409,9 @@ function useDefaultNetwork() {
 
 export function networkName(celoEnv: string) {
   return useDefaultNetwork() ? 'default' : `${celoEnv}-network`
+}
+
+// name of the DNS zone in Google Cloud for a particular domain
+function dnsZoneName(domain: string) {
+  return `${domain}-org`
 }

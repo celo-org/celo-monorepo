@@ -8,6 +8,11 @@ variable celo_env {
   description = "Name of the testnet Celo environment"
 }
 
+variable dns_zone_name {
+  type        = string
+  description = "Name of the DNS zone for the domain used for the infura-like setup"
+}
+
 variable ethstats_host {
   type        = "string"
   description = "Ethstats url or IP address"
@@ -66,6 +71,11 @@ variable geth_node_docker_image_tag {
 variable geth_verbosity {
   type        = number
   description = "Verbosity of all geth nodes"
+}
+
+variable infura_setup_host {
+  type        = string
+  description = "The host name to use for the tx node infura-setup"
 }
 
 variable in_memory_discovery_table {

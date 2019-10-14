@@ -211,3 +211,10 @@ export function addCeloEnvMiddleware(argv: yargs.Argv) {
 export function isVmBased() {
   return fetchEnv(envVar.VM_BASED) === 'true'
 }
+
+export function failIfVmBased() {
+  if (isVmBased()) {
+    console.error('The celo env is intended for a VM-based testnet, aborting')
+    process.exit(1)
+  }
+}

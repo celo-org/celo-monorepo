@@ -1,4 +1,5 @@
 import { createClusterIfNotExists, setupCluster, switchToClusterFromEnv } from 'src/lib/cluster'
+import { failIfVmBased } from 'src/lib/env-utils'
 import { createStaticIPs, installHelmChart, pollForBootnodeLoadBalancer } from 'src/lib/helm_deploy'
 import {
   uploadEnvFileToGoogleStorage,
@@ -23,6 +24,8 @@ export const builder = (argv: yargs.Argv) => {
 type TestnetInitialArgv = InitialArgv & { skipClusterSetup: boolean }
 
 export const handler = async (argv: TestnetInitialArgv) => {
+  failIfVmBased()
+
   const createdCluster = await createClusterIfNotExists()
   await switchToClusterFromEnv()
 
