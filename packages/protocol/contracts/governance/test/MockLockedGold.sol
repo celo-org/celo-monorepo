@@ -20,14 +20,20 @@ contract MockLockedGold is ILockedGold {
   mapping(address => uint256) public accountTotalLockedGold;
   mapping(address => uint256) public nonvotingAccountBalance;
   mapping(address => address) public authorizedValidators;
+  mapping(address => address) public authorizedBy;
   uint256 private totalLockedGold;
 
   function authorizeValidator(address account, address validator) external {
     authorizedValidators[account] = validator;
+    authorizedBy[validator] = account;
   }
 
   function getAccountFromValidator(address accountOrValidator) external view returns (address) {
-    return accountOrValidator;
+    if (authorizedBy[accountOrValidator] == address(0)) {
+      return accountOrValidator;
+    } else {
+      return authorizedBy[accountOrValidator];
+    }
   }
 
   function getAccountFromVoter(address accountOrVoter) external view returns (address) {
