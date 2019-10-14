@@ -12,6 +12,7 @@ import Button, { BTN } from 'src/shared/Button.3'
 import menu, { CeloLinks } from 'src/shared/menu-items'
 import Responsive from 'src/shared/Responsive'
 import { colors, fonts, standardStyles, textStyles } from 'src/styles'
+import Discord from 'src/icons/Discord'
 
 const menuItems = [menu.HOME, menu.ABOUT_US, menu.JOBS, menu.BUILD, menu.COMMUNITY]
 
@@ -68,6 +69,11 @@ const Social = React.memo(function _Social() {
         <Link href={CeloLinks.discourse}>
           <a>
             <Discourse color={colors.dark} size={height} />
+          </a>
+        </Link>
+        <Link href={CeloLinks.discord}>
+          <a>
+            <Discord color={colors.dark} size={height} />
           </a>
         </Link>
       </View>
