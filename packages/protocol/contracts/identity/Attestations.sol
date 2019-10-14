@@ -209,11 +209,13 @@ contract Attestations is IAttestations, Ownable, Initializable, UsingRegistry, R
       );
     }
 
-    if(state.requests[msg.sender].blockNumber != 0)
-    require(
-      !isAttestationTimeValid(accounts[msg.sender].mostRecentAttestationRequest),
-      "Currently active attestation request that has to be revealed first"
-    );
+    if(state.requests[msg.sender].blockNumber != 0) {
+      require(
+        !isAttestationTimeValid(accounts[msg.sender].mostRecentAttestationRequest),
+        "Currently active attestation request that has to be revealed first"
+      );
+    }
+
 
     state.requests[msg.sender].blockNumber = uint128(block.number);
     state.requests[msg.sender].attestationsRequested = uint128(attestationsRequested);
