@@ -25,7 +25,7 @@ import {
   setZeroSyncMode,
   updateWeb3SyncProgress,
 } from 'src/web3/actions'
-import { addLocalAccount, web3 } from 'src/web3/contracts'
+import { addLocalAccount, switchWeb3ProviderForSyncMode, web3 } from 'src/web3/contracts'
 import { currentAccountSelector, zeroSyncSelector } from 'src/web3/selectors'
 import {
   assignDataKeyFromPrivateKey,
@@ -289,11 +289,13 @@ export function* getConnectedUnlockedAccount() {
 export function* switchToGethFromZeroSync() {
   const account = yield call(ensureAccountInWeb3Keystore)
   setZeroSyncMode(false)
+  switchWeb3ProviderForSyncMode(false)
   Logger.debug(
     TAG + '@switchToGethFromZeroSync',
     'Imported account from private key to web3 keystore',
     account
   )
+  // TODO(anna) will also need to start geth
   const confirmAccount = yield call(getConnectedAccount)
   Logger.debug(TAG + '@switchToGethFromZeroSync', 'Confirmed account is connected', confirmAccount)
   return true
@@ -302,6 +304,7 @@ export function* switchToGethFromZeroSync() {
 export function* switchToZeroSyncFromGeth() {
   Logger.debug(TAG + 'Switching to zero sync from geth..')
   setZeroSyncMode(true)
+  switchWeb3ProviderForSyncMode(true)
   return true // TODO(anna) maybe return account instead?
 }
 

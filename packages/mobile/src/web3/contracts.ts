@@ -99,16 +99,15 @@ function getInitialWeb3(): Web3 {
   }
 }
 
-export function switchWeb3Provider(web3Instance: Web3, syncMode: GethSyncMode) {
+// Mutates web3 provider
+export function switchWeb3ProviderForSyncMode(zeroSync: boolean) {
   // TODO(anna) ensure this works with iOS providers
-  if (syncMode === GethSyncMode.ZeroSync) {
+  if (zeroSync) {
     const url = DEFAULT_INFURA_URL
     Logger.debug('contracts@getWeb3', `Connecting to url ${url}`)
-    web3Instance.setProvider(getWebSocketProvider(url))
-  } else if (syncMode === GethSyncMode.Ultralight) {
-    web3Instance.setProvider(getIpcProvider(DEFAULT_TESTNET))
+    web3.setProvider(getWebSocketProvider(url))
   } else {
-    throw new Error(`Attempted to switch into unrecognized sync mode ${syncMode}`)
+    web3.setProvider(getIpcProvider(DEFAULT_TESTNET))
   }
 }
 
