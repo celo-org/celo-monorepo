@@ -81,13 +81,15 @@ class InflationManager {
     const parametersPost = await this.getParameters()
     assertEqualBN(parametersPost.factor, ONE)
   }
+}
 
-  setGasCurrencyCost = async (cost: number) => {
-    const parameters = await this.kit.contracts.getBlockchainParameters()
-    await parameters
-      .setGasForNonGoldCurrencies(cost.toString())
-      .sendAndWaitForReceipt({ from: this.validatorAddress })
-  }
+const setGasCurrencyCost = async (validatorUri: string, validatorAddress: string, cost: number) => {
+  const kit = newKit(validatorUri)
+  kit.defaultAccount = validatorAddress
+  const parameters = await kit.contracts.getBlockchainParameters()
+  await parameters
+    .setGasForNonGoldCurrencies(cost.toString())
+    .sendAndWaitForReceipt({ from: validatorAddress })
 }
 
 /** Helper to watch balance changes over accounts */
@@ -578,8 +580,7 @@ describe('Transfer tests', function(this: any) {
         before(`start geth on sync: ${syncMode}`, async () => {
           try {
             await startSyncNode(syncMode)
-            const inflationManager = new InflationManager('http://localhost:8545', validatorAddress)
-            await inflationManager.setGasCurrencyCost(34000)
+            await setGasCurrencyCost('http://localhost:8545', validatorAddress, 34000)
           } catch (err) {
             console.debug('some error', err)
           }
