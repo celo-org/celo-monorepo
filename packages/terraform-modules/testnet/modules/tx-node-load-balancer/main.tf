@@ -35,6 +35,14 @@ resource "random_id" "internal" {
   byte_length = 8
 }
 
+# We want to maintain websockets (which are not supposed by the HTTPS external
+# load balancer) & avoid unnecessary egress costs.
+# An internal & external load balancer cannot use the same instance group. To
+# get around this, we allocate 1 of the tx-nodes to be for internal load balancing.
+# It's still included in `static_nodes.json`, but not included in the infura-like
+# setup. In the future, consider moving this node to live in Kubernetes to be
+# along with the services that use it.
+
 # internal load balancer for metrics & blockscout:
 
 resource "google_compute_address" "internal" {
