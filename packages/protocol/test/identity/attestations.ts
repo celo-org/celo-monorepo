@@ -8,6 +8,7 @@ import {
   timeTravel,
 } from '@celo/protocol/lib/test-utils'
 import { attestToIdentifier } from '@celo/utils'
+import { sleep } from '@celo/utils/lib/async'
 import { getPhoneHash } from '@celo/utils/lib/phoneNumbers'
 import BigNumber from 'bignumber.js'
 import { uniq } from 'lodash'
@@ -403,18 +404,20 @@ contract('Attestations', (accounts: string[]) => {
       })
 
       it('should set the block of request in the attestations', async () => {
-        const expectedBlock = await web3.eth.getBlock('latest')
-
         await attestations.revealIssuers(phoneHash)
-
+        const expectedBlock = await web3.eth.getBlock('latest')
         const attestationIssuers = await attestations.getAttestationIssuers(phoneHash, caller)
 
         await Promise.all(
           attestationIssuers.map(async (issuer) => {
-            const [status, time] = await attestations.getAttestationState(phoneHash, caller, issuer)
+            const [status, requestTime] = await attestations.getAttestationState(
+              phoneHash,
+              caller,
+              issuer
+            )
 
             assert.equal(status.toNumber(), 1)
-            assert.equal(time.toNumber(), expectedBlock.timestamp)
+            assert.equal(requestTime.toNumber(), expectedBlock.timestamp)
           })
         )
       })
@@ -519,15 +522,20 @@ contract('Attestations', (accounts: string[]) => {
       assert.equal(numTotal.toNumber(), attestationsRequested)
     })
 
-    it('should set the block number of the successful completion', async () => {
+    it('should set the time of the successful completion', async () => {
+      await sleep(1000)
       await attestations.complete(phoneHash, v, r, s)
 
       const expectedBlock = await web3.eth.getBlock('latest')
 
-      const [status, time] = await attestations.getAttestationState(phoneHash, caller, issuer)
+      const [status, _requestTime, completionTime] = await attestations.getAttestationState(
+        phoneHash,
+        caller,
+        issuer
+      )
 
       assert.equal(status.toNumber(), 2)
-      assert.equal(time.toNumber(), expectedBlock.timestamp)
+      assert.equal(completionTime.toNumber(), expectedBlock.timestamp)
     })
 
     it('should increment pendingWithdrawals for the rewards recipient', async () => {

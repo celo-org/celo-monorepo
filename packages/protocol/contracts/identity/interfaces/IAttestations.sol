@@ -44,7 +44,7 @@ interface IAttestations {
   )
     external
     view
-    returns (uint8, uint128);
+    returns (uint8, uint64, uint64);
 
   function getAttestationRequestFeeToken(address) external view returns (address);
   function getMostRecentAttestationRequest(address) external view returns (uint256);

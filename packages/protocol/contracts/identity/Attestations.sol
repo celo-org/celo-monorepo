@@ -83,9 +83,10 @@ contract Attestations is IAttestations, Ownable, Initializable, UsingRegistry, R
   struct Attestation {
     AttestationStatus status;
 
-    // For outstanding attestations, this is the timestamp of the request
-    // For completed attestations, this is the timestamp of the attestation completion
-    uint128 time;
+    // the timestamp of the request
+    uint64 requestTime;
+    // the timestamp of the attestation completion
+    uint64 completionTime;
   }
 
   struct Account {
@@ -288,7 +289,7 @@ contract Attestations is IAttestations, Ownable, Initializable, UsingRegistry, R
     );
 
     // solhint-disable-next-line not-rely-on-time
-    require(isAttestationTimeValid(attestation.time), "Attestation request timed out");
+    require(isAttestationTimeValid(attestation.requestTime), "Attestation request timed out");
 
     // Generate the yet-to-be-signed attestation code that will be signed and sent to the
     // encrypted phone number via SMS via the 'RequestAttestation' precompiled contract.
@@ -323,7 +324,7 @@ contract Attestations is IAttestations, Ownable, Initializable, UsingRegistry, R
       identifiers[identifier].attestations[msg.sender].issuedAttestations[issuer];
 
     // solhint-disable-next-line not-rely-on-time
-    attestation.time = uint128(now);
+    attestation.completionTime = uint64(now);
     attestation.status = AttestationStatus.Complete;
     identifiers[identifier].attestations[msg.sender].completed++;
 
@@ -497,7 +498,7 @@ contract Attestations is IAttestations, Ownable, Initializable, UsingRegistry, R
    * @param identifier Hash of the identifier.
    * @param account Address of the account
    * @param issuer Address of the issuer
-   * @return [Status of the attestation, time of the attestation]
+   * @return [Status of the attestation, time of request the attestation, time of completion of the attestation]
    */
   function getAttestationState(
     bytes32 identifier,
@@ -506,11 +507,12 @@ contract Attestations is IAttestations, Ownable, Initializable, UsingRegistry, R
   )
     external
     view
-    returns (uint8, uint128)
+    returns (uint8, uint64, uint64)
   {
     return (
       uint8(identifiers[identifier].attestations[account].issuedAttestations[issuer].status),
-      identifiers[identifier].attestations[account].issuedAttestations[issuer].time
+      identifiers[identifier].attestations[account].issuedAttestations[issuer].requestTime,
+      identifiers[identifier].attestations[account].issuedAttestations[issuer].completionTime
     );
 
   }
@@ -655,7 +657,7 @@ contract Attestations is IAttestations, Ownable, Initializable, UsingRegistry, R
       "Attestation code does not match any outstanding attestation"
     );
     // solhint-disable-next-line not-rely-on-time
-    require(isAttestationTimeValid(attestation.time), "Attestation request timed out");
+    require(isAttestationTimeValid(attestation.requestTime), "Attestation request timed out");
 
     return issuer;
   }
@@ -743,7 +745,7 @@ contract Attestations is IAttestations, Ownable, Initializable, UsingRegistry, R
       currentIndex++;
       attestations.status = AttestationStatus.Incomplete;
       // solhint-disable-next-line not-rely-on-time
-      attestations.time = uint128(now);
+      attestations.requestTime = uint64(now);
       state.issuers.push(validator);
     }
   }
