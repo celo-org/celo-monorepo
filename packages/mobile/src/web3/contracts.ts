@@ -112,8 +112,20 @@ export function switchWeb3Provider(web3Instance: Web3, syncMode: GethSyncMode) {
   }
 }
 
+function isZeroSyncMode(web3Instance: Web3) {
+  const provider = web3Instance.currentProvider
+  // TODO(anna) cleaner way once you can see web3 provider types
+  if (Object.getOwnPropertyNames(provider).includes('host')) {
+    // @ts-ignore
+    if (provider.host === DEFAULT_INFURA_URL) {
+      return true
+    }
+  }
+  return false
+}
+
 export function addLocalAccount(web3Instance: Web3, privateKey: string) {
-  if (!isZeroSyncMode()) {
+  if (!isZeroSyncMode(web3Instance)) {
     throw new Error('addLocalAccount can only be called in Zero sync mode')
   }
   if (!web3Instance) {
