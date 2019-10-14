@@ -256,8 +256,6 @@ contract('Election', (accounts: string[]) => {
           resp = await election.markGroupIneligible(group)
         })
 
-        describe('when the group has votes', () => {})
-
         it('should remove the group from the list of eligible groups', async () => {
           assert.deepEqual(await election.getEligibleValidatorGroups(), [])
         })
@@ -767,10 +765,11 @@ contract('Election', (accounts: string[]) => {
     })
 
     describe('when a single group has >= minElectableValidators as members and received votes', () => {
-      beforeEach(async () => {})
+      beforeEach(async () => {
+        await election.vote(group1, voter1.weight, group2, NULL_ADDRESS, { from: voter1.address })
+      })
 
       it("should return that group's member list", async () => {
-        await election.vote(group1, voter1.weight, group2, NULL_ADDRESS, { from: voter1.address })
         assertSameAddresses(await election.electValidators(), [
           validator1,
           validator2,
@@ -780,7 +779,7 @@ contract('Election', (accounts: string[]) => {
       })
     })
 
-    describe("when > maxElectableValidators members's groups receive votes", () => {
+    describe("when > maxElectableValidators members' groups receive votes", () => {
       beforeEach(async () => {
         await election.vote(group1, voter1.weight, group2, NULL_ADDRESS, { from: voter1.address })
         await election.vote(group2, voter2.weight, NULL_ADDRESS, group1, { from: voter2.address })

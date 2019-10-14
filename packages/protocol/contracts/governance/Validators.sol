@@ -162,9 +162,9 @@ contract Validators is IValidators, Ownable, ReentrancyGuard, Initializable, Usi
   {
     _transferOwnership(msg.sender);
     setRegistry(registryAddress);
-    balanceRequirements = BalanceRequirements(groupRequirement, validatorRequirement);
-    deregistrationLockups = DeregistrationLockups(groupLockup, validatorLockup);
-    maxGroupSize = _maxGroupSize;
+    setBalanceRequirements(groupRequirement, validatorRequirement);
+    setDeregistrationLockups(groupLockup, validatorLockup);
+    setMaxGroupSize(_maxGroupSize);
   }
 
   /**
@@ -172,7 +172,7 @@ contract Validators is IValidators, Ownable, ReentrancyGuard, Initializable, Usi
    * @param size The maximum group size.
    * @return True upon success.
    */
-  function setMaxGroupSize(uint256 size) external onlyOwner returns (bool) {
+  function setMaxGroupSize(uint256 size) public onlyOwner returns (bool) {
     require(0 < size && size != maxGroupSize);
     maxGroupSize = size;
     emit MaxGroupSizeSet(size);
@@ -188,52 +188,42 @@ contract Validators is IValidators, Ownable, ReentrancyGuard, Initializable, Usi
   }
 
   /**
-   * @notice Updates the minimum gold requirements to register a validator group or validator.
-   * @param groupRequirement The minimum locked gold needed to register a group.
-   * @param validatorRequirement The minimum locked gold needed to register a validator.
+   * @notice Updates the minimum gold requirements to register a group/validator and earn rewards.
+   * @param group The minimum locked gold needed to register a group and earn rewards.
+   * @param validator The minimum locked gold needed to register a validator and earn rewards.
    * @return True upon success.
-   * @dev The new requirement is only enforced for future validator or group registrations.
    */
-  // TODO(asa): Allow validators to adjust their LockedGold MustMaintain if the registration
-  // requirements fall.
   function setBalanceRequirements(
-    uint256 groupRequirement,
-    uint256 validatorRequirement
+    uint256 group,
+    uint256 validator
   )
-    external
+    public
     onlyOwner
     returns (bool)
   {
-    require(
-      groupRequirement != balanceRequirements.group ||
-      validatorRequirement != balanceRequirements.validator
-    );
-    balanceRequirements = BalanceRequirements(groupRequirement, validatorRequirement);
-    emit BalanceRequirementsSet(groupRequirement, validatorRequirement);
+    require(group != balanceRequirements.group || validator != balanceRequirements.validator);
+    balanceRequirements = BalanceRequirements(group, validator);
+    emit BalanceRequirementsSet(group, validator);
     return true;
   }
 
   /**
    * @notice Updates the duration for which gold remains locked after deregistration.
-   * @param groupLockup The duration for groups in seconds.
-   * @param validatorLockup The duration for validators in seconds.
+   * @param group The lockup duration for groups in seconds.
+   * @param validator The lockup duration for validators in seconds.
    * @return True upon success.
-   * @dev The new requirement is only enforced for future validator or group deregistrations.
    */
   function setDeregistrationLockups(
-    uint256 groupLockup,
-    uint256 validatorLockup
+    uint256 group,
+    uint256 validator
   )
-    external
+    public
     onlyOwner
     returns (bool)
   {
-    require(
-      groupLockup != deregistrationLockups.group ||
-      validatorLockup != deregistrationLockups.validator
-    );
-    deregistrationLockups = DeregistrationLockups(groupLockup, validatorLockup);
-    emit DeregistrationLockupsSet(groupLockup, validatorLockup);
+    require(group != deregistrationLockups.group || validator != deregistrationLockups.validator);
+    deregistrationLockups = DeregistrationLockups(group, validator);
+    emit DeregistrationLockupsSet(group, validator);
     return true;
   }
 
@@ -364,6 +354,8 @@ contract Validators is IValidators, Ownable, ReentrancyGuard, Initializable, Usi
    * @notice Registers a validator group with no member validators.
    * @param name A name for the validator group.
    * @param url A URL for the validator group.
+   * @param commission Fixidity representation of the commission this group receives on epoch
+   *   payments made to its members.
    * @return True upon success.
    * @dev Fails if the account is already a validator or validator group.
    * @dev Fails if the account does not have sufficient weight.
