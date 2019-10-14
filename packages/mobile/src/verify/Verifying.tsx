@@ -8,6 +8,7 @@ import * as React from 'react'
 import { withNamespaces, WithNamespaces } from 'react-i18next'
 import { Clipboard, ScrollView, StyleSheet, Text, View } from 'react-native'
 import KeepAwake from 'react-native-keep-awake'
+import SafeAreaView from 'react-native-safe-area-view'
 import { connect } from 'react-redux'
 import { hideAlert, showError } from 'src/alert/actions'
 import { errorSelector } from 'src/alert/reducer'
@@ -185,7 +186,7 @@ export class Verifying extends React.Component<Props, State> {
     return false
   }
 
-  startVerification = async () => {
+  startVerification = () => {
     Logger.debug(TAG + '@startVerification', 'Starting verification process')
     this.props.startVerification()
   }
@@ -234,95 +235,97 @@ export class Verifying extends React.Component<Props, State> {
     const numCodesReceived = attestationCodes.length
 
     return (
-      <View style={style.container}>
-        <KeepAwake />
-        <DevSkipButton nextScreen={Screens.VerifyVerified} />
-        {!verificationFailed && (
-          <View style={style.buttonCancelContainer}>
-            <CancelButton onCancel={this.onCancelVerification} />
-          </View>
-        )}
-        <DisconnectBanner />
-        <ScrollView style={style.content}>
-          <NuxLogo testID="VerifyLogo" />
-          <ProgressIndicatorRow step={numCompleteAttestations} hasFailure={verificationFailed} />
-          <Text style={style.textPhoneNumber}>
-            <Text style={style.textLight}>{t('verifying')}</Text>
-            {e164Number}
-          </Text>
-          {verificationCodeText(attestationCodes[0], numCompleteAttestations > 0, t)}
-          {verificationCodeText(attestationCodes[1], numCompleteAttestations > 1, t)}
-          {verificationCodeText(attestationCodes[2], numCompleteAttestations > 2, t)}
-          <Text
-            style={[style.textStatus, verificationFailed ? style.textRed : null]}
-            numberOfLines={1}
-            ellipsizeMode="tail"
-          >
-            {this.getStatusText(numCompleteAttestations, verificationFailed)}
-          </Text>
+      <SafeAreaView style={style.container}>
+        <View style={style.innerContainer}>
+          <KeepAwake />
+          <DevSkipButton nextScreen={Screens.VerifyVerified} />
           {!verificationFailed && (
-            <>
-              <Text style={[fontStyles.body, fontStyles.center]}>{t('leaveOpen')}</Text>
-              <Text style={[fontStyles.body, fontStyles.center]}>{t('thisWillTakeTime')}</Text>
-            </>
+            <View style={style.buttonCancelContainer}>
+              <CancelButton onCancel={this.onCancelVerification} />
+            </View>
           )}
-          {verificationFailed && (
-            <Text style={[fontStyles.body, fontStyles.center, style.textRed]}>
-              {t('pleaseRetry')}
+          <DisconnectBanner />
+          <ScrollView style={style.content}>
+            <NuxLogo testID="VerifyLogo" />
+            <ProgressIndicatorRow step={numCompleteAttestations} hasFailure={verificationFailed} />
+            <Text style={style.textPhoneNumber}>
+              <Text style={style.textLight}>{t('verifying')}</Text>
+              {e164Number}
             </Text>
-          )}
-        </ScrollView>
-        <View style={style.content}>
-          {!verificationFailed && (
-            <>
-              {!useManualEntry && (
-                <View>
-                  <Text style={style.textDisclaimer}>
-                    <Text style={fontStyles.bold}>{t('mustDoManualLabel')}</Text>
-                    {t('mustDoManual')}
-                  </Text>
-                  <Button
-                    onPress={this.onEnterManually}
-                    text={t('enterManually')}
-                    standard={true}
-                    type={BtnTypes.SECONDARY}
-                    style={style.buttonEnterManually}
-                  />
-                </View>
-              )}
-              {useManualEntry && (
-                <View>
-                  <Text style={style.textDisclaimer}>
-                    <Text style={fontStyles.bold}>{t('copyPaste')}</Text>
-                    {t('entireSmsMessage')}
-                  </Text>
-                  <GethAwareButton
-                    onPress={this.onPasteVerificationCode}
-                    disabled={isCodeSubmitting || numCodesReceived === NUM_ATTESTATIONS_REQUIRED}
-                    text={t('pasteCode', {
-                      codeNumber: Math.min(numCodesReceived + 1, NUM_ATTESTATIONS_REQUIRED),
-                    })}
-                    standard={true}
-                    type={BtnTypes.PRIMARY}
-                    style={componentStyles.marginTop15}
-                  >
-                    <CopyIcon />
-                  </GethAwareButton>
-                </View>
-              )}
-            </>
-          )}
-          {verificationFailed && (
-            <Button
-              onPress={this.onRetryVerification}
-              text={t('retryVerification')}
-              standard={true}
-              type={BtnTypes.PRIMARY}
-              style={componentStyles.marginTop15}
-            />
-          )}
+            {verificationCodeText(attestationCodes[0], numCompleteAttestations > 0, t)}
+            {verificationCodeText(attestationCodes[1], numCompleteAttestations > 1, t)}
+            {verificationCodeText(attestationCodes[2], numCompleteAttestations > 2, t)}
+            <Text
+              style={[style.textStatus, verificationFailed ? style.textRed : null]}
+              numberOfLines={1}
+              ellipsizeMode="tail"
+            >
+              {this.getStatusText(numCompleteAttestations, verificationFailed)}
+            </Text>
+            {!verificationFailed && (
+              <>
+                <Text style={[fontStyles.body, fontStyles.center]}>{t('leaveOpen')}</Text>
+                <Text style={[fontStyles.body, fontStyles.center]}>{t('thisWillTakeTime')}</Text>
+              </>
+            )}
+            {verificationFailed && (
+              <Text style={[fontStyles.body, fontStyles.center, style.textRed]}>
+                {t('pleaseRetry')}
+              </Text>
+            )}
+          </ScrollView>
+          <View style={style.content}>
+            {!verificationFailed && (
+              <>
+                {!useManualEntry && (
+                  <View>
+                    <Text style={style.textDisclaimer}>
+                      <Text style={fontStyles.bold}>{t('mustDoManualLabel')}</Text>
+                      {t('mustDoManual')}
+                    </Text>
+                    <Button
+                      onPress={this.onEnterManually}
+                      text={t('enterManually')}
+                      standard={true}
+                      type={BtnTypes.SECONDARY}
+                      style={style.buttonEnterManually}
+                    />
+                  </View>
+                )}
+                {useManualEntry && (
+                  <View>
+                    <Text style={style.textDisclaimer}>
+                      <Text style={fontStyles.bold}>{t('copyPaste')}</Text>
+                      {t('entireSmsMessage')}
+                    </Text>
+                    <GethAwareButton
+                      onPress={this.onPasteVerificationCode}
+                      disabled={isCodeSubmitting || numCodesReceived === NUM_ATTESTATIONS_REQUIRED}
+                      text={t('pasteCode', {
+                        codeNumber: Math.min(numCodesReceived + 1, NUM_ATTESTATIONS_REQUIRED),
+                      })}
+                      standard={true}
+                      type={BtnTypes.PRIMARY}
+                      style={componentStyles.marginTop15}
+                    >
+                      <CopyIcon />
+                    </GethAwareButton>
+                  </View>
+                )}
+              </>
+            )}
+            {verificationFailed && (
+              <Button
+                onPress={this.onRetryVerification}
+                text={t('retryVerification')}
+                standard={true}
+                type={BtnTypes.PRIMARY}
+                style={componentStyles.marginTop15}
+              />
+            )}
+          </View>
         </View>
-      </View>
+      </SafeAreaView>
     )
   }
 }
@@ -330,11 +333,14 @@ export class Verifying extends React.Component<Props, State> {
 const style = StyleSheet.create({
   container: {
     flex: 1,
+    backgroundColor: colors.background,
+  },
+  innerContainer: {
+    flex: 1,
     alignItems: 'center',
     justifyContent: 'space-between',
     paddingHorizontal: 20,
     paddingTop: 20,
-    backgroundColor: colors.background,
   },
   content: {
     width: '100%',

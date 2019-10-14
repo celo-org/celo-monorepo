@@ -125,10 +125,11 @@ android {
         minSdkVersion isDetoxTestBuild ? rootProject.ext.minSdkVersion : 18
         targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode appVersionCode
-        versionName "1.4.2"
+        versionName "1.5.0"
         testBuildType System.getProperty('testBuildType', 'debug')
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         resValue "string", "build_config_package", "org.celo.mobile"
+        missingDimensionStrategy 'react-native-camera', 'general'
     }
     signingConfigs {
         release {
@@ -217,6 +218,7 @@ android {
 
     packagingOptions {
         exclude 'META-INF/-no-jdk.kotlin_module'
+        exclude 'META-INF/androidx.exifinterface_exifinterface.version'
     }
 }
 
@@ -253,6 +255,7 @@ dependencies {
     implementation project(':react-native-sms-retriever')
     implementation project(':react-native-share')
     implementation project(':react-native-secure-key-store')
+    implementation project(':react-native-safe-area-context')
 
     androidTestImplementation('com.wix:detox:+') { transitive = true }
     androidTestImplementation 'junit:junit:4.12'

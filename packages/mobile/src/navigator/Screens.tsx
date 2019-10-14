@@ -23,6 +23,7 @@ export enum Screens {
   ExchangeReview = 'ExchangeReview',
   ExchangeTradeScreen = 'ExchangeTradeScreen',
   FeeEducation = 'FeeEducation',
+  FeeExchangeEducation = 'FeeExchangeEducation',
   GoldEducation = 'GoldEducation',
   ImportWallet = 'ImportWallet',
   Invite = 'Invite',
