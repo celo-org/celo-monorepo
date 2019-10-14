@@ -73,16 +73,6 @@ resource "google_compute_firewall" "bootnode_firewall" {
   }
 }
 
-resource "google_compute_firewall" "infura_firewall" {
-  name    = "${var.celo_env}-infura-firewall"
-  network = data.google_compute_network.network.name
-
-  allow {
-    protocol = "tcp"
-    ports    = ["80"]
-  }
-}
-
 module "bootnode" {
   source = "./modules/bootnode"
   # variables
