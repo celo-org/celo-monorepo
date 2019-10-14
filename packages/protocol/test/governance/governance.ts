@@ -1852,7 +1852,7 @@ contract('Governance', (accounts: string[]) => {
     })
   })
 
-  describe.only('#whitelistHotfix()', () => {
+  describe('#whitelistHotfix()', () => {
     beforeEach(async () => {
       await mockValidators.addValidator(accounts[2])
       await mockValidators.addValidator(accounts[3])
@@ -1897,7 +1897,7 @@ contract('Governance', (accounts: string[]) => {
     })
   })
 
-  describe.only('#isHotfixPassing', () => {
+  describe('#isHotfixPassing', () => {
     beforeEach(async () => {
       await mockValidators.addValidator(accounts[2])
       await mockValidators.addValidator(accounts[3])
@@ -1923,7 +1923,7 @@ contract('Governance', (accounts: string[]) => {
     })
   })
 
-  describe.only('#prepareHotfix()', () => {
+  describe('#prepareHotfix()', () => {
     beforeEach(async () => {
       await mockValidators.setByzantineQuorumForCurrentSet(1)
       await mockValidators.addValidator(accounts[2])
@@ -1978,7 +1978,7 @@ contract('Governance', (accounts: string[]) => {
     })
   })
 
-  describe.only('#executeHotfix()', () => {
+  describe('#executeHotfix()', () => {
     const executeHotfixTx = () =>
       governance.executeHotfix(
         [transactionSuccess1.value],
