@@ -152,6 +152,7 @@ export function* addAccountToWeb3Keystore(key: string, currentAccount: string, p
     }
   }
   yield call(web3.eth.personal.unlockAccount, account, pincode, UNLOCK_DURATION)
+  web3.eth.defaultAccount = account
   return account
 }
 
@@ -174,13 +175,12 @@ export function* assignAccountFromPrivateKey(key: string) {
     yield savePrivateKeyToLocalDisk(account, key, pincode)
 
     if (isZeroSyncMode()) {
-      // For zero sync mode, add local account
+      // If zero sync mode, add local account
       Logger.debug(TAG + '@assignAccountFromPrivateKey', 'Init web3 with private key')
       addLocalAccount(web3, key)
     } else {
-      // If geth is running, add to web3 accounts
+      // Else geth is running, add to web3 accounts
       account = yield call(addAccountToWeb3Keystore, key, currentAccount, pincode)
-      web3.eth.defaultAccount = account
     }
 
     Logger.debug(

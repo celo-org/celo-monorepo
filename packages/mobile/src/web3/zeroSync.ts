@@ -4,32 +4,26 @@ import * as Crypto from 'crypto'
 import * as RNFS from 'react-native-fs'
 import { call, put, select } from 'redux-saga/effects'
 import { getPincode } from 'src/account/saga'
-import { UNLOCK_DURATION } from 'src/geth/consts'
 import Logger from 'src/utils/Logger'
-import { setAccountInWeb3Keystore, setPrivateCommentKey } from 'src/web3/actions'
-import { web3 } from 'src/web3/contracts'
+import { setPrivateCommentKey } from 'src/web3/actions'
+import { addAccountToWeb3Keystore } from 'src/web3/saga'
 import { currentAccountInWeb3KeystoreSelector, currentAccountSelector } from 'src/web3/selectors'
 
 const TAG = 'web3/zeroSync'
 
 export function* ensureAccountInWeb3Keystore() {
-  const account = yield select(currentAccountSelector)
-  if (account) {
+  const currentAccount = yield select(currentAccountSelector)
+  if (currentAccount) {
     const accountInWeb3Keystore = yield select(currentAccountInWeb3KeystoreSelector)
     if (!accountInWeb3Keystore) {
       Logger.debug(
         TAG + '@ensureAccountInWeb3Keystore',
         'Importing account from private key to web3 keystore'
       )
-      // Add account to web3 keystore
       const pincode = yield call(getPincode)
-      const privateKey: string = yield readPrivateKeyFromLocalDisk(account, pincode)
-      // TODO use function addAccountToWeb3Keystore() once it exists
-      // @ts-ignore
-      const web3Acc = yield call(web3.eth.personal.importRawKey, String(privateKey), pincode)
-      yield put(setAccountInWeb3Keystore(web3Acc))
-      yield call(web3.eth.personal.unlockAccount, account, pincode, UNLOCK_DURATION)
-      return web3Acc
+      const privateKey: string = yield readPrivateKeyFromLocalDisk(currentAccount, pincode)
+      const account = yield call(addAccountToWeb3Keystore, privateKey, currentAccount, pincode)
+      return account
     } else {
       // TODO check that account and accountInWeb3Keystore are the same
       return accountInWeb3Keystore
