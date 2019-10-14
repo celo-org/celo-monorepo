@@ -4,13 +4,14 @@ import {
   NavigationContainerComponent,
   NavigationParams,
   NavigationState,
-  StackActions,
 } from 'react-navigation'
 import sleep from 'sleep-promise'
 import CeloAnalytics from 'src/analytics/CeloAnalytics'
 import { DefaultEventNames } from 'src/analytics/constants'
 import { Screens } from 'src/navigator/Screens'
 import Logger from 'src/utils/Logger'
+
+const TAG = 'NavigationService'
 
 export enum NavActions {
   SET_NAVIGATOR = 'NAVIGATION/SET_NAVIGATOR',
@@ -19,30 +20,36 @@ export enum NavActions {
 let navigator: NavigationContainerComponent
 
 export const setTopLevelNavigator = (navigatorRef: any) => {
-  Logger.debug('NavigationService@setTopLevelNavigator', 'Initialized')
+  Logger.debug(`${TAG}@setTopLevelNavigator`, 'Initialized')
   navigator = navigatorRef
   return {
     type: NavActions.SET_NAVIGATOR,
   }
 }
 
-export const navigate = async (routeName: string, params?: NavigationParams) => {
-  await waitForNavigator()
-  if (navigator) {
-    Logger.debug('NavigationService@navigate', `Dispatch ${routeName}`)
-    navigator.dispatch(
-      NavigationActions.navigate({
-        routeName,
-        params,
-      })
-    )
-  } else {
-    Logger.error('NavigationService@navigate', 'Cannot navigate yet, navigator is not initialized')
-  }
+export function navigate(routeName: string, params?: NavigationParams) {
+  waitForNavigator()
+    .then(() => {
+      if (!navigator) {
+        Logger.error(`${TAG}@navigate`, 'Cannot navigate yet, navigator is not initialized')
+        return
+      }
+
+      Logger.debug(`${TAG}@navigate`, `Dispatch ${routeName}`)
+      navigator.dispatch(
+        NavigationActions.navigate({
+          routeName,
+          params,
+        })
+      )
+    })
+    .catch((reason) => {
+      Logger.error(`${TAG}@navigate`, `Navigation failure: ${reason}`)
+    })
 }
 
 // Source: https://v1.reactnavigation.org/docs/screen-tracking.html
-export const recordStateChange = (prevState: NavigationState, currentState: NavigationState) => {
+export function recordStateChange(prevState: NavigationState, currentState: NavigationState) {
   const getCurrentRouteName = (navState: NavigationState): string => {
     if (!navState) {
       return ''
@@ -61,30 +68,16 @@ export const recordStateChange = (prevState: NavigationState, currentState: Navi
   CeloAnalytics.page(currentScreen, { previousScreen, currentScreen })
 }
 
-export const navigateReset = (routeName: string, params?: NavigationParams) => {
-  navigator.dispatch(
-    StackActions.reset({
-      index: 0,
-      actions: [
-        NavigationActions.navigate({
-          routeName,
-          params,
-        }),
-      ],
-    })
-  )
-}
-
-export const navigateBack = () => {
+export function navigateBack() {
   navigator.dispatch(NavigationActions.back())
 }
 
-export const navigateHome = (params?: NavigationParams) => {
+export function navigateHome(params?: NavigationParams) {
   navigate(Screens.WalletHome, params)
 }
 
-export const navigateToError = (errorMessage: string, error?: Error) => {
-  Logger.error('NavigationService', `Navigating to error screen: ${errorMessage}`, error)
+export function navigateToError(errorMessage: string, error?: Error) {
+  Logger.error(`${TAG}@navigateToError`, `Navigating to error screen: ${errorMessage}`, error)
   CeloAnalytics.track(DefaultEventNames.errorDisplayed, { error }, true)
   navigate(Screens.ErrorScreen, { errorMessage, error })
 }

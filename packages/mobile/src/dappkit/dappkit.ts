@@ -7,11 +7,11 @@ import {
   SignTxRequest,
   SignTxResponseSuccess,
 } from '@celo/utils/src/dappkit'
-import { Linking } from 'react-native'
 import { call, select, takeLeading } from 'redux-saga/effects'
 import { e164NumberSelector } from 'src/account/reducer'
 import { navigate } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
+import { navigateToURI } from 'src/utils/linking'
 import Logger from 'src/utils/Logger'
 import { web3 } from 'src/web3/contracts'
 import { getConnectedUnlockedAccount } from 'src/web3/saga'
@@ -48,7 +48,7 @@ function* respondToAccountAuth(action: ApproveAccountAuthAction) {
   Logger.debug(TAG, 'Approving auth account')
   const account = yield select(currentAccountSelector)
   const phoneNumber = yield select(e164NumberSelector)
-  Linking.openURL(
+  navigateToURI(
     produceResponseDeeplink(action.request, AccountAuthResponseSuccess(account, phoneNumber))
   )
 }
@@ -79,7 +79,7 @@ function* produceTxSignature(action: RequestTxSignatureAction) {
   )
 
   Logger.debug(TAG, 'Txs signed, opening URL')
-  Linking.openURL(produceResponseDeeplink(action.request, SignTxResponseSuccess(rawTxs)))
+  navigateToURI(produceResponseDeeplink(action.request, SignTxResponseSuccess(rawTxs)))
 }
 
 export function* dappKitSaga() {
