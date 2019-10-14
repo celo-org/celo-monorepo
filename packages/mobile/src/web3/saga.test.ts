@@ -33,7 +33,7 @@ jest.mock('src/web3/contracts', () => ({
         .fn()
         .mockReturnValueOnce({ startingBlock: 0, currentBlock: 10, highestBlock: 100 })
         .mockReturnValueOnce(false),
-      getBlock: jest.fn(() => ({ number: LAST_BLOCK_NUMBER })),
+      getBlock: jest.fn(() => ({ number: 1000 })),
     },
   },
   isZeroSyncMode: jest.fn().mockReturnValueOnce(false),

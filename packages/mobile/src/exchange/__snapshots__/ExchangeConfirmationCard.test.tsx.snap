@@ -236,6 +236,7 @@ exports[`renders correctly with giant numbers 1`] = `
         </Text>
         <View
           accessible={true}
+          focusable={true}
           hitSlop={
             Object {
               "bottom": 10,
@@ -251,6 +252,7 @@ exports[`renders correctly with giant numbers 1`] = `
               "type": "ThemeAttrAndroid",
             }
           }
+          onClick={[Function]}
           onResponderGrant={[Function]}
           onResponderMove={[Function]}
           onResponderRelease={[Function]}
@@ -268,7 +270,7 @@ exports[`renders correctly with giant numbers 1`] = `
           <Image
             source={
               Object {
-                "testUri": "../../../src/images/info.png",
+                "testUri": "../../../packages/mobile/src/images/info.png",
               }
             }
             style={
@@ -324,6 +326,7 @@ exports[`renders correctly with giant numbers 1`] = `
         </Text>
         <View
           accessible={true}
+          focusable={true}
           hitSlop={
             Object {
               "bottom": 10,
@@ -339,6 +342,7 @@ exports[`renders correctly with giant numbers 1`] = `
               "type": "ThemeAttrAndroid",
             }
           }
+          onClick={[Function]}
           onResponderGrant={[Function]}
           onResponderMove={[Function]}
           onResponderRelease={[Function]}
@@ -356,7 +360,7 @@ exports[`renders correctly with giant numbers 1`] = `
           <Image
             source={
               Object {
-                "testUri": "../../../src/images/info.png",
+                "testUri": "../../../packages/mobile/src/images/info.png",
               }
             }
             style={
@@ -752,6 +756,7 @@ exports[`renders correctly with no exchange rate 1`] = `
         </Text>
         <View
           accessible={true}
+          focusable={true}
           hitSlop={
             Object {
               "bottom": 10,
@@ -767,6 +772,7 @@ exports[`renders correctly with no exchange rate 1`] = `
               "type": "ThemeAttrAndroid",
             }
           }
+          onClick={[Function]}
           onResponderGrant={[Function]}
           onResponderMove={[Function]}
           onResponderRelease={[Function]}
@@ -784,7 +790,7 @@ exports[`renders correctly with no exchange rate 1`] = `
           <Image
             source={
               Object {
-                "testUri": "../../../src/images/info.png",
+                "testUri": "../../../packages/mobile/src/images/info.png",
               }
             }
             style={
@@ -840,6 +846,7 @@ exports[`renders correctly with no exchange rate 1`] = `
         </Text>
         <View
           accessible={true}
+          focusable={true}
           hitSlop={
             Object {
               "bottom": 10,
@@ -855,6 +862,7 @@ exports[`renders correctly with no exchange rate 1`] = `
               "type": "ThemeAttrAndroid",
             }
           }
+          onClick={[Function]}
           onResponderGrant={[Function]}
           onResponderMove={[Function]}
           onResponderRelease={[Function]}
@@ -872,7 +880,7 @@ exports[`renders correctly with no exchange rate 1`] = `
           <Image
             source={
               Object {
-                "testUri": "../../../src/images/info.png",
+                "testUri": "../../../packages/mobile/src/images/info.png",
               }
             }
             style={

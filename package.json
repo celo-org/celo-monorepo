@@ -34,9 +34,6 @@
       "packages/*"
     ],
     "nohoist": [
-      "@celo/verifier/react-native",
-      "@celo/mobile/react-native",
-      "@celo/react-components/react-native",
       "@celo/web/@timkendrick/monaco-editor",
       "@celo/web/@types/react-i18next",
       "@celo/web/next-i18next",

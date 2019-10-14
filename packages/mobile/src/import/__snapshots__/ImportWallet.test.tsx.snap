@@ -35,7 +35,7 @@ exports[`ImportWallet renders correctly 1`] = `
           resizeMode="contain"
           source={
             Object {
-              "testUri": "../../../src/images/coins-logo.png",
+              "testUri": "../../../packages/mobile/src/images/coins-logo.png",
             }
           }
           style={
@@ -151,6 +151,7 @@ exports[`ImportWallet renders correctly 1`] = `
   >
     <View
       accessible={true}
+      focusable={false}
       isTVSelectable={true}
       nativeBackgroundAndroid={
         Object {
@@ -158,6 +159,7 @@ exports[`ImportWallet renders correctly 1`] = `
           "type": "ThemeAttrAndroid",
         }
       }
+      onClick={[Function]}
       onResponderGrant={[Function]}
       onResponderMove={[Function]}
       onResponderRelease={[Function]}
@@ -256,7 +258,7 @@ exports[`ImportWallet renders with an empty wallet 1`] = `
         resizeMode="contain"
         source={
           Object {
-            "testUri": "../../../src/images/coins-logo.png",
+            "testUri": "../../../packages/mobile/src/images/coins-logo.png",
           }
         }
         style={
@@ -324,6 +326,7 @@ exports[`ImportWallet renders with an empty wallet 1`] = `
   >
     <View
       accessible={true}
+      focusable={true}
       isTVSelectable={true}
       nativeBackgroundAndroid={
         Object {
@@ -331,6 +334,7 @@ exports[`ImportWallet renders with an empty wallet 1`] = `
           "type": "ThemeAttrAndroid",
         }
       }
+      onClick={[Function]}
       onResponderGrant={[Function]}
       onResponderMove={[Function]}
       onResponderRelease={[Function]}
@@ -408,6 +412,7 @@ exports[`ImportWallet renders with an empty wallet 1`] = `
   >
     <View
       accessible={true}
+      focusable={true}
       isTVSelectable={true}
       nativeBackgroundAndroid={
         Object {
@@ -415,6 +420,7 @@ exports[`ImportWallet renders with an empty wallet 1`] = `
           "type": "ThemeAttrAndroid",
         }
       }
+      onClick={[Function]}
       onResponderGrant={[Function]}
       onResponderMove={[Function]}
       onResponderRelease={[Function]}

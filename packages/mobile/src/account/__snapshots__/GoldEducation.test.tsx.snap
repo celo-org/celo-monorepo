@@ -31,6 +31,7 @@ exports[`GoldEducation renders correctly 1`] = `
     >
       <View
         accessible={true}
+        focusable={true}
         isTVSelectable={true}
         nativeBackgroundAndroid={
           Object {
@@ -38,6 +39,7 @@ exports[`GoldEducation renders correctly 1`] = `
             "type": "ThemeAttrAndroid",
           }
         }
+        onClick={[Function]}
         onResponderGrant={[Function]}
         onResponderMove={[Function]}
         onResponderRelease={[Function]}
@@ -119,7 +121,7 @@ exports[`GoldEducation renders correctly 1`] = `
           resizeMode="contain"
           source={
             Object {
-              "testUri": "../../../src/images/shiny-gold.png",
+              "testUri": "../../../packages/mobile/src/images/shiny-gold.png",
             }
           }
           style={
@@ -164,7 +166,7 @@ exports[`GoldEducation renders correctly 1`] = `
           resizeMode="contain"
           source={
             Object {
-              "testUri": "../../../src/images/gold-value.png",
+              "testUri": "../../../packages/mobile/src/images/gold-value.png",
             }
           }
           style={
@@ -209,7 +211,7 @@ exports[`GoldEducation renders correctly 1`] = `
           resizeMode="contain"
           source={
             Object {
-              "testUri": "../../../src/images/exchange.png",
+              "testUri": "../../../packages/mobile/src/images/exchange.png",
             }
           }
           style={

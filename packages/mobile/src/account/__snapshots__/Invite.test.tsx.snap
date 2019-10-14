@@ -506,7 +506,9 @@ exports[`Invite renders correctly with recipients 1`] = `
         >
           <View
             accessible={true}
+            focusable={true}
             isTVSelectable={true}
+            onClick={[Function]}
             onResponderGrant={[Function]}
             onResponderMove={[Function]}
             onResponderRelease={[Function]}
@@ -560,7 +562,7 @@ exports[`Invite renders correctly with recipients 1`] = `
                   <Image
                     source={
                       Object {
-                        "testUri": "../../../src/images/unknown-user-icon.png",
+                        "testUri": "../../../packages/mobile/src/images/unknown-user-icon.png",
                       }
                     }
                     style={

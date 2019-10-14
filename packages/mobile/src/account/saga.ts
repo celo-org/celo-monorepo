@@ -23,6 +23,8 @@ export function* setPincode({ pincodeType, pin }: SetPincodeAction) {
     if (pincodeType === PincodeType.PhoneAuth) {
       Logger.debug(TAG + '@setPincode', 'Setting pincode with using system auth')
       pin = randomBytes(10).toString('hex')
+      console.log('PIN', pin)
+      console.log(setPinInKeystore)
       yield call(setPinInKeystore, pin)
     } else if (pincodeType === PincodeType.CustomPin && pin) {
       Logger.debug(TAG + '@setPincode', 'Pincode set using user provided pin')

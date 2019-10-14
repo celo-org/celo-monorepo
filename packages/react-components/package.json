@@ -33,7 +33,6 @@
     "enzyme-adapter-react-16": "^1.11.2",
     "react": "16.9.0",
     "react-dom": "16.9.0",
-    "react-native": "^0.61.2",
     "react-navigation": "^4.0.10",
     "react-test-renderer": "16.9.0"
   },

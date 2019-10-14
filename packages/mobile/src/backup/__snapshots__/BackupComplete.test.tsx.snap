@@ -42,7 +42,7 @@ exports[`BackupComplete renders correctly if backup completed 1`] = `
           resizeMode="contain"
           source={
             Object {
-              "testUri": "../../../src/images/coins-logo.png",
+              "testUri": "../../../packages/mobile/src/images/coins-logo.png",
             }
           }
           style={
@@ -111,6 +111,7 @@ exports[`BackupComplete renders correctly if backup completed 1`] = `
       </View>
       <View
         accessible={true}
+        focusable={true}
         hitSlop={
           Object {
             "bottom": 7,
@@ -126,6 +127,7 @@ exports[`BackupComplete renders correctly if backup completed 1`] = `
             "type": "ThemeAttrAndroid",
           }
         }
+        onClick={[Function]}
         onResponderGrant={[Function]}
         onResponderMove={[Function]}
         onResponderRelease={[Function]}
@@ -204,6 +206,7 @@ exports[`BackupComplete renders correctly if backup completed 1`] = `
   >
     <View
       accessible={true}
+      focusable={true}
       isTVSelectable={true}
       nativeBackgroundAndroid={
         Object {
@@ -211,6 +214,7 @@ exports[`BackupComplete renders correctly if backup completed 1`] = `
           "type": "ThemeAttrAndroid",
         }
       }
+      onClick={[Function]}
       onResponderGrant={[Function]}
       onResponderMove={[Function]}
       onResponderRelease={[Function]}
@@ -315,7 +319,7 @@ exports[`BackupComplete renders correctly if backup not completed 1`] = `
           resizeMode="contain"
           source={
             Object {
-              "testUri": "../../../src/images/coins-logo.png",
+              "testUri": "../../../packages/mobile/src/images/coins-logo.png",
             }
           }
           style={
@@ -359,6 +363,7 @@ exports[`BackupComplete renders correctly if backup not completed 1`] = `
       </Text>
       <View
         accessible={true}
+        focusable={true}
         hitSlop={
           Object {
             "bottom": 7,
@@ -374,6 +379,7 @@ exports[`BackupComplete renders correctly if backup not completed 1`] = `
             "type": "ThemeAttrAndroid",
           }
         }
+        onClick={[Function]}
         onResponderGrant={[Function]}
         onResponderMove={[Function]}
         onResponderRelease={[Function]}
@@ -452,6 +458,7 @@ exports[`BackupComplete renders correctly if backup not completed 1`] = `
   >
     <View
       accessible={true}
+      focusable={true}
       isTVSelectable={true}
       nativeBackgroundAndroid={
         Object {
@@ -459,6 +466,7 @@ exports[`BackupComplete renders correctly if backup not completed 1`] = `
           "type": "ThemeAttrAndroid",
         }
       }
+      onClick={[Function]}
       onResponderGrant={[Function]}
       onResponderMove={[Function]}
       onResponderRelease={[Function]}

@@ -51,7 +51,9 @@ exports[`renders correctly when Dollar education NUX flow hasn't been completed 
         </Text>
         <View
           accessible={true}
+          focusable={true}
           isTVSelectable={true}
+          onClick={[Function]}
           onResponderGrant={[Function]}
           onResponderMove={[Function]}
           onResponderRelease={[Function]}
@@ -164,7 +166,9 @@ exports[`renders correctly when Dollar education NUX flow hasn't been completed 
         </Text>
         <View
           accessible={true}
+          focusable={true}
           isTVSelectable={true}
+          onClick={[Function]}
           onResponderGrant={[Function]}
           onResponderMove={[Function]}
           onResponderRelease={[Function]}
@@ -290,7 +294,9 @@ exports[`renders correctly when Gold education NUX flow hasn't been completed 1`
         </Text>
         <View
           accessible={true}
+          focusable={true}
           isTVSelectable={true}
+          onClick={[Function]}
           onResponderGrant={[Function]}
           onResponderMove={[Function]}
           onResponderRelease={[Function]}
@@ -402,7 +408,9 @@ exports[`renders correctly when Gold education NUX flow hasn't been completed 1`
         </Text>
         <View
           accessible={true}
+          focusable={true}
           isTVSelectable={true}
+          onClick={[Function]}
           onResponderGrant={[Function]}
           onResponderMove={[Function]}
           onResponderRelease={[Function]}
@@ -529,7 +537,9 @@ exports[`renders correctly when not ready 1`] = `
         </Text>
         <View
           accessible={true}
+          focusable={true}
           isTVSelectable={true}
+          onClick={[Function]}
           onResponderGrant={[Function]}
           onResponderMove={[Function]}
           onResponderRelease={[Function]}
@@ -641,7 +651,9 @@ exports[`renders correctly when not ready 1`] = `
         </Text>
         <View
           accessible={true}
+          focusable={true}
           isTVSelectable={true}
+          onClick={[Function]}
           onResponderGrant={[Function]}
           onResponderMove={[Function]}
           onResponderRelease={[Function]}
@@ -767,7 +779,9 @@ exports[`renders correctly when ready 1`] = `
         </Text>
         <View
           accessible={true}
+          focusable={true}
           isTVSelectable={true}
+          onClick={[Function]}
           onResponderGrant={[Function]}
           onResponderMove={[Function]}
           onResponderRelease={[Function]}
@@ -879,7 +893,9 @@ exports[`renders correctly when ready 1`] = `
         </Text>
         <View
           accessible={true}
+          focusable={true}
           isTVSelectable={true}
+          onClick={[Function]}
           onResponderGrant={[Function]}
           onResponderMove={[Function]}
           onResponderRelease={[Function]}
@@ -1005,7 +1021,9 @@ exports[`renders correctly when transaction pending 1`] = `
         </Text>
         <View
           accessible={true}
+          focusable={true}
           isTVSelectable={true}
+          onClick={[Function]}
           onResponderGrant={[Function]}
           onResponderMove={[Function]}
           onResponderRelease={[Function]}
@@ -1117,7 +1135,9 @@ exports[`renders correctly when transaction pending 1`] = `
         </Text>
         <View
           accessible={true}
+          focusable={true}
           isTVSelectable={true}
+          onClick={[Function]}
           onResponderGrant={[Function]}
           onResponderMove={[Function]}
           onResponderRelease={[Function]}

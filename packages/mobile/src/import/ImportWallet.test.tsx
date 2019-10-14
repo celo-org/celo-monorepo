@@ -1,4 +1,4 @@
-import Button from '@celo/react-components/components/Button'
+import mockButton from '@celo/react-components/components/Button'
 import * as React from 'react'
 import 'react-native'
 import { mnemonicToSeedHex, validateMnemonic } from 'react-native-bip39'
@@ -13,7 +13,7 @@ import ImportWallet, {
 import { createMockStore, getMockI18nProps } from 'test/utils'
 
 jest.mock('src/geth/GethAwareButton', () => {
-  return Button
+  return mockButton
 })
 
 const SPANISH_MNEMONIC = 'avance colmo poema momia cofre pata res verso secta cinco tubería yacer eterno observar ojo tabaco seta ruina bebé oral miembro gato suelo violín'.normalize(

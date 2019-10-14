@@ -1,7 +1,3 @@
-export const mockSetPinInKeystore = jest.fn()
-export const mockSetCachedPincode = jest.fn()
-export const mockPin = '123456'
-
 import { expectSaga } from 'redux-saga-test-plan'
 import { select } from 'redux-saga/effects'
 import { setPincodeFailure, setPincodeSuccess } from 'src/account/actions'
@@ -9,16 +5,11 @@ import { PincodeType, pincodeTypeSelector } from 'src/account/reducer'
 import { getPincode, setPincode } from 'src/account/saga'
 import { showError } from 'src/alert/actions'
 import { ErrorMessages } from 'src/app/ErrorMessages'
+import { setCachedPincode } from 'src/pincode/PincodeCache'
+// @ts-ignore TS doesn't understand the RN's platform specific file imports
+import { setPinInKeystore } from 'src/pincode/PincodeUtils'
 
-jest.mock('src/pincode/PincodeUtils', () => ({
-  getPinFromKeystore: jest.fn(() => mockPin),
-  setPinInKeystore: mockSetPinInKeystore,
-}))
-
-jest.mock('src/pincode/PincodeCache', () => ({
-  getCachedPincode: jest.fn(() => mockPin),
-  setCachedPincode: mockSetCachedPincode,
-}))
+const mockPin = '123456'
 
 describe('@setPincode', () => {
   it('sets a PIN in phone keystore', async () => {
@@ -26,7 +17,7 @@ describe('@setPincode', () => {
       .put(setPincodeSuccess(PincodeType.PhoneAuth))
       .run()
 
-    expect(mockSetPinInKeystore).toHaveBeenCalled()
+    expect(setPinInKeystore).toHaveBeenCalled()
   })
 
   it('returns custom PIN', async () => {
@@ -34,7 +25,7 @@ describe('@setPincode', () => {
       .put(setPincodeSuccess(PincodeType.CustomPin))
       .run()
 
-    expect(mockSetCachedPincode).toHaveBeenCalled()
+    expect(setCachedPincode).toHaveBeenCalled()
   })
 
   it('throws error for unset pin', async () => {

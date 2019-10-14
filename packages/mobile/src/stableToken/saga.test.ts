@@ -7,7 +7,7 @@ import { fetchDollarBalance, setBalance, transferStableToken } from 'src/stableT
 import { stableTokenFetch, stableTokenTransfer } from 'src/stableToken/saga'
 import { addStandbyTransaction, removeStandbyTransaction } from 'src/transactions/actions'
 import { TransactionStatus, TransactionTypes } from 'src/transactions/reducer'
-import { createMockContract, createMockStore } from 'test/utils'
+import { createMockStore } from 'test/utils'
 import { mockAccount } from 'test/values'
 
 const now = Date.now()
@@ -17,12 +17,15 @@ const BALANCE = '45'
 const TX_ID = '1234'
 const COMMENT = 'a comment'
 
-jest.mock('@celo/walletkit', () => ({
-  getStableTokenContract: jest.fn(async () =>
-    createMockContract({ decimals: () => '10', transferWithComment: () => true })
-  ),
-  getErc20Balance: jest.fn(() => BALANCE),
-}))
+jest.mock('@celo/walletkit', () => {
+  const { createMockContract } = require('test/utils')
+  return {
+    getStableTokenContract: jest.fn(async () =>
+      createMockContract({ decimals: () => '10', transferWithComment: () => true })
+    ),
+    getErc20Balance: jest.fn(() => '45'),
+  }
+})
 
 jest.mock('src/web3/actions', () => ({
   ...jest.requireActual('src/web3/actions'),

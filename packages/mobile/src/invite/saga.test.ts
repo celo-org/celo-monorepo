@@ -20,26 +20,29 @@ import { waitWeb3LastBlock } from 'src/networkInfo/saga'
 import { fetchDollarBalance } from 'src/stableToken/actions'
 import { transactionConfirmed } from 'src/transactions/actions'
 import { getConnectedUnlockedAccount, getOrCreateAccount } from 'src/web3/saga'
-import { createMockContract, createMockStore } from 'test/utils'
+import { createMockStore } from 'test/utils'
 import { mockAccount, mockE164Number, mockName } from 'test/values'
 
 const mockFetch = fetch as FetchMock
 const mockKey = '0x1129eb2fbccdc663f4923a6495c35b096249812b589f7c4cd1dba01e1edaf724'
 const mockBalance = jest.fn(() => 10)
 
-jest.mock('@celo/walletkit', () => ({
-  ...jest.requireActual('@celo/walletkit'),
-  getAttestationsContract: async () =>
-    createMockContract({ getAttestationRequestFee: Math.pow(10, 18) }),
-  getStableTokenContract: jest.fn(async () =>
-    createMockContract({
-      balanceOf: mockBalance,
-      transfer: () => null,
-      transferWithComment: () => null,
-      decimals: () => '10',
-    })
-  ),
-}))
+jest.mock('@celo/walletkit', () => {
+  const { createMockContract } = require('test/utils')
+  return {
+    ...jest.requireActual('@celo/walletkit'),
+    getAttestationsContract: async () =>
+      createMockContract({ getAttestationRequestFee: Math.pow(10, 18) }),
+    getStableTokenContract: jest.fn(async () =>
+      createMockContract({
+        balanceOf: mockBalance,
+        transfer: () => null,
+        transferWithComment: () => null,
+        decimals: () => '10',
+      })
+    ),
+  }
+})
 
 jest.mock('src/account/actions', () => ({
   ...jest.requireActual('src/account/actions'),

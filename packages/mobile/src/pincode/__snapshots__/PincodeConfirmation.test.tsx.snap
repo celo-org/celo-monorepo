@@ -123,6 +123,7 @@ exports[`PincodeConfirmation renders correctly 1`] = `
             >
               <View
                 accessible={true}
+                focusable={true}
                 isTVSelectable={true}
                 nativeBackgroundAndroid={
                   Object {
@@ -130,6 +131,7 @@ exports[`PincodeConfirmation renders correctly 1`] = `
                     "type": "ThemeAttrAndroid",
                   }
                 }
+                onClick={[Function]}
                 onResponderGrant={[Function]}
                 onResponderMove={[Function]}
                 onResponderRelease={[Function]}
@@ -155,6 +157,7 @@ exports[`PincodeConfirmation renders correctly 1`] = `
               </View>
               <View
                 accessible={true}
+                focusable={true}
                 isTVSelectable={true}
                 nativeBackgroundAndroid={
                   Object {
@@ -162,6 +165,7 @@ exports[`PincodeConfirmation renders correctly 1`] = `
                     "type": "ThemeAttrAndroid",
                   }
                 }
+                onClick={[Function]}
                 onResponderGrant={[Function]}
                 onResponderMove={[Function]}
                 onResponderRelease={[Function]}
@@ -187,6 +191,7 @@ exports[`PincodeConfirmation renders correctly 1`] = `
               </View>
               <View
                 accessible={true}
+                focusable={true}
                 isTVSelectable={true}
                 nativeBackgroundAndroid={
                   Object {
@@ -194,6 +199,7 @@ exports[`PincodeConfirmation renders correctly 1`] = `
                     "type": "ThemeAttrAndroid",
                   }
                 }
+                onClick={[Function]}
                 onResponderGrant={[Function]}
                 onResponderMove={[Function]}
                 onResponderRelease={[Function]}
@@ -230,6 +236,7 @@ exports[`PincodeConfirmation renders correctly 1`] = `
             >
               <View
                 accessible={true}
+                focusable={true}
                 isTVSelectable={true}
                 nativeBackgroundAndroid={
                   Object {
@@ -237,6 +244,7 @@ exports[`PincodeConfirmation renders correctly 1`] = `
                     "type": "ThemeAttrAndroid",
                   }
                 }
+                onClick={[Function]}
                 onResponderGrant={[Function]}
                 onResponderMove={[Function]}
                 onResponderRelease={[Function]}
@@ -262,6 +270,7 @@ exports[`PincodeConfirmation renders correctly 1`] = `
               </View>
               <View
                 accessible={true}
+                focusable={true}
                 isTVSelectable={true}
                 nativeBackgroundAndroid={
                   Object {
@@ -269,6 +278,7 @@ exports[`PincodeConfirmation renders correctly 1`] = `
                     "type": "ThemeAttrAndroid",
                   }
                 }
+                onClick={[Function]}
                 onResponderGrant={[Function]}
                 onResponderMove={[Function]}
                 onResponderRelease={[Function]}
@@ -294,6 +304,7 @@ exports[`PincodeConfirmation renders correctly 1`] = `
               </View>
               <View
                 accessible={true}
+                focusable={true}
                 isTVSelectable={true}
                 nativeBackgroundAndroid={
                   Object {
@@ -301,6 +312,7 @@ exports[`PincodeConfirmation renders correctly 1`] = `
                     "type": "ThemeAttrAndroid",
                   }
                 }
+                onClick={[Function]}
                 onResponderGrant={[Function]}
                 onResponderMove={[Function]}
                 onResponderRelease={[Function]}
@@ -337,6 +349,7 @@ exports[`PincodeConfirmation renders correctly 1`] = `
             >
               <View
                 accessible={true}
+                focusable={true}
                 isTVSelectable={true}
                 nativeBackgroundAndroid={
                   Object {
@@ -344,6 +357,7 @@ exports[`PincodeConfirmation renders correctly 1`] = `
                     "type": "ThemeAttrAndroid",
                   }
                 }
+                onClick={[Function]}
                 onResponderGrant={[Function]}
                 onResponderMove={[Function]}
                 onResponderRelease={[Function]}
@@ -369,6 +383,7 @@ exports[`PincodeConfirmation renders correctly 1`] = `
               </View>
               <View
                 accessible={true}
+                focusable={true}
                 isTVSelectable={true}
                 nativeBackgroundAndroid={
                   Object {
@@ -376,6 +391,7 @@ exports[`PincodeConfirmation renders correctly 1`] = `
                     "type": "ThemeAttrAndroid",
                   }
                 }
+                onClick={[Function]}
                 onResponderGrant={[Function]}
                 onResponderMove={[Function]}
                 onResponderRelease={[Function]}
@@ -401,6 +417,7 @@ exports[`PincodeConfirmation renders correctly 1`] = `
               </View>
               <View
                 accessible={true}
+                focusable={true}
                 isTVSelectable={true}
                 nativeBackgroundAndroid={
                   Object {
@@ -408,6 +425,7 @@ exports[`PincodeConfirmation renders correctly 1`] = `
                     "type": "ThemeAttrAndroid",
                   }
                 }
+                onClick={[Function]}
                 onResponderGrant={[Function]}
                 onResponderMove={[Function]}
                 onResponderRelease={[Function]}
@@ -457,6 +475,7 @@ exports[`PincodeConfirmation renders correctly 1`] = `
               />
               <View
                 accessible={true}
+                focusable={true}
                 isTVSelectable={true}
                 nativeBackgroundAndroid={
                   Object {
@@ -464,6 +483,7 @@ exports[`PincodeConfirmation renders correctly 1`] = `
                     "type": "ThemeAttrAndroid",
                   }
                 }
+                onClick={[Function]}
                 onResponderGrant={[Function]}
                 onResponderMove={[Function]}
                 onResponderRelease={[Function]}
@@ -489,6 +509,7 @@ exports[`PincodeConfirmation renders correctly 1`] = `
               </View>
               <View
                 accessible={true}
+                focusable={true}
                 isTVSelectable={true}
                 nativeBackgroundAndroid={
                   Object {
@@ -496,6 +517,7 @@ exports[`PincodeConfirmation renders correctly 1`] = `
                     "type": "ThemeAttrAndroid",
                   }
                 }
+                onClick={[Function]}
                 onResponderGrant={[Function]}
                 onResponderMove={[Function]}
                 onResponderRelease={[Function]}
@@ -564,6 +586,7 @@ exports[`PincodeConfirmation renders correctly 1`] = `
   >
     <View
       accessible={true}
+      focusable={false}
       isTVSelectable={true}
       nativeBackgroundAndroid={
         Object {
@@ -571,6 +594,7 @@ exports[`PincodeConfirmation renders correctly 1`] = `
           "type": "ThemeAttrAndroid",
         }
       }
+      onClick={[Function]}
       onResponderGrant={[Function]}
       onResponderMove={[Function]}
       onResponderRelease={[Function]}

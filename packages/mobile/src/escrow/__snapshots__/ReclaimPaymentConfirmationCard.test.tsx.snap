@@ -30,7 +30,7 @@ exports[`ReclaimPaymentConfirmationCard renders correctly for send payment confi
       resizeMode="contain"
       source={
         Object {
-          "testUri": "../../../src/images/coins-logo.png",
+          "testUri": "../../../packages/mobile/src/images/coins-logo.png",
         }
       }
       style={
@@ -270,6 +270,7 @@ exports[`ReclaimPaymentConfirmationCard renders correctly for send payment confi
         </Text>
         <View
           accessible={true}
+          focusable={true}
           hitSlop={
             Object {
               "bottom": 10,
@@ -285,6 +286,7 @@ exports[`ReclaimPaymentConfirmationCard renders correctly for send payment confi
               "type": "ThemeAttrAndroid",
             }
           }
+          onClick={[Function]}
           onResponderGrant={[Function]}
           onResponderMove={[Function]}
           onResponderRelease={[Function]}
@@ -302,7 +304,7 @@ exports[`ReclaimPaymentConfirmationCard renders correctly for send payment confi
           <Image
             source={
               Object {
-                "testUri": "../../../src/images/info.png",
+                "testUri": "../../../packages/mobile/src/images/info.png",
               }
             }
             style={

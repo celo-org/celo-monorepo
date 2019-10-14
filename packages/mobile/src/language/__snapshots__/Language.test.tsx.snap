@@ -24,7 +24,7 @@ exports[`renders correctly 1`] = `
           resizeMode="contain"
           source={
             Object {
-              "testUri": "../../../src/images/celo-logo.png",
+              "testUri": "../../../packages/mobile/src/images/celo-logo.png",
             }
           }
           style={
@@ -67,7 +67,9 @@ exports[`renders correctly 1`] = `
       />
       <View
         accessible={true}
+        focusable={true}
         isTVSelectable={true}
+        onClick={[Function]}
         onResponderGrant={[Function]}
         onResponderMove={[Function]}
         onResponderRelease={[Function]}
@@ -139,7 +141,9 @@ exports[`renders correctly 1`] = `
       </View>
       <View
         accessible={true}
+        focusable={true}
         isTVSelectable={true}
+        onClick={[Function]}
         onResponderGrant={[Function]}
         onResponderMove={[Function]}
         onResponderRelease={[Function]}
@@ -230,6 +234,7 @@ exports[`renders correctly 1`] = `
   >
     <View
       accessible={true}
+      focusable={true}
       isTVSelectable={true}
       nativeBackgroundAndroid={
         Object {
@@ -237,6 +242,7 @@ exports[`renders correctly 1`] = `
           "type": "ThemeAttrAndroid",
         }
       }
+      onClick={[Function]}
       onResponderGrant={[Function]}
       onResponderMove={[Function]}
       onResponderRelease={[Function]}

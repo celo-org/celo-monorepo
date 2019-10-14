@@ -20,6 +20,7 @@ exports[`BackupIntroduction renders correctly when backup is not too late 1`] = 
   >
     <View
       accessible={true}
+      focusable={true}
       isTVSelectable={true}
       nativeBackgroundAndroid={
         Object {
@@ -27,6 +28,7 @@ exports[`BackupIntroduction renders correctly when backup is not too late 1`] = 
           "type": "ThemeAttrAndroid",
         }
       }
+      onClick={[Function]}
       onResponderGrant={[Function]}
       onResponderMove={[Function]}
       onResponderRelease={[Function]}
@@ -76,7 +78,7 @@ exports[`BackupIntroduction renders correctly when backup is not too late 1`] = 
         <Image
           source={
             Object {
-              "testUri": "../../../src/images/backup-icon.png",
+              "testUri": "../../../packages/mobile/src/images/backup-icon.png",
             }
           }
           style={
@@ -177,16 +179,27 @@ exports[`BackupIntroduction renders correctly when backup is not too late 1`] = 
         hardwareAccelerated={false}
         hideModalContentWhileAnimating={false}
         onModalHide={[Function]}
+        onModalWillHide={[Function]}
+        onModalWillShow={[Function]}
         onRequestClose={[Function]}
+        scrollHorizontal={false}
         scrollOffset={0}
         scrollOffsetMax={0}
         scrollTo={null}
+        supportedOrientations={
+          Array [
+            "portrait",
+            "landscape",
+          ]
+        }
         swipeThreshold={100}
         transparent={true}
         visible={false}
       >
         <View
           accessible={true}
+          focusable={true}
+          onClick={[Function]}
           onResponderGrant={[Function]}
           onResponderMove={[Function]}
           onResponderRelease={[Function]}
@@ -210,7 +223,10 @@ exports[`BackupIntroduction renders correctly when backup is not too late 1`] = 
         <View
           hideModalContentWhileAnimating={false}
           onModalHide={[Function]}
+          onModalWillHide={[Function]}
+          onModalWillShow={[Function]}
           pointerEvents="box-none"
+          scrollHorizontal={false}
           scrollOffset={0}
           scrollOffsetMax={0}
           scrollTo={null}
@@ -225,6 +241,12 @@ exports[`BackupIntroduction renders correctly when backup is not too late 1`] = 
                 },
               ],
             }
+          }
+          supportedOrientations={
+            Array [
+              "portrait",
+              "landscape",
+            ]
           }
           swipeThreshold={100}
         >
@@ -288,7 +310,9 @@ exports[`BackupIntroduction renders correctly when backup is not too late 1`] = 
             >
               <View
                 accessible={true}
+                focusable={true}
                 isTVSelectable={true}
+                onClick={[Function]}
                 onResponderGrant={[Function]}
                 onResponderMove={[Function]}
                 onResponderRelease={[Function]}
@@ -319,7 +343,9 @@ exports[`BackupIntroduction renders correctly when backup is not too late 1`] = 
               </View>
               <View
                 accessible={true}
+                focusable={true}
                 isTVSelectable={true}
+                onClick={[Function]}
                 onResponderGrant={[Function]}
                 onResponderMove={[Function]}
                 onResponderRelease={[Function]}
@@ -375,6 +401,7 @@ exports[`BackupIntroduction renders correctly when backup is not too late 1`] = 
     >
       <View
         accessible={true}
+        focusable={true}
         isTVSelectable={true}
         nativeBackgroundAndroid={
           Object {
@@ -382,6 +409,7 @@ exports[`BackupIntroduction renders correctly when backup is not too late 1`] = 
             "type": "ThemeAttrAndroid",
           }
         }
+        onClick={[Function]}
         onResponderGrant={[Function]}
         onResponderMove={[Function]}
         onResponderRelease={[Function]}
@@ -460,6 +488,7 @@ exports[`BackupIntroduction renders correctly when backup is not too late 1`] = 
     >
       <View
         accessible={true}
+        focusable={true}
         isTVSelectable={true}
         nativeBackgroundAndroid={
           Object {
@@ -467,6 +496,7 @@ exports[`BackupIntroduction renders correctly when backup is not too late 1`] = 
             "type": "ThemeAttrAndroid",
           }
         }
+        onClick={[Function]}
         onResponderGrant={[Function]}
         onResponderMove={[Function]}
         onResponderRelease={[Function]}
@@ -548,6 +578,7 @@ exports[`BackupIntroduction renders correctly when backup too late and delayed 1
   >
     <View
       accessible={true}
+      focusable={true}
       isTVSelectable={true}
       nativeBackgroundAndroid={
         Object {
@@ -555,6 +586,7 @@ exports[`BackupIntroduction renders correctly when backup too late and delayed 1
           "type": "ThemeAttrAndroid",
         }
       }
+      onClick={[Function]}
       onResponderGrant={[Function]}
       onResponderMove={[Function]}
       onResponderRelease={[Function]}
@@ -604,7 +636,7 @@ exports[`BackupIntroduction renders correctly when backup too late and delayed 1
         <Image
           source={
             Object {
-              "testUri": "../../../src/images/backup-icon.png",
+              "testUri": "../../../packages/mobile/src/images/backup-icon.png",
             }
           }
           style={
@@ -705,16 +737,27 @@ exports[`BackupIntroduction renders correctly when backup too late and delayed 1
         hardwareAccelerated={false}
         hideModalContentWhileAnimating={false}
         onModalHide={[Function]}
+        onModalWillHide={[Function]}
+        onModalWillShow={[Function]}
         onRequestClose={[Function]}
+        scrollHorizontal={false}
         scrollOffset={0}
         scrollOffsetMax={0}
         scrollTo={null}
+        supportedOrientations={
+          Array [
+            "portrait",
+            "landscape",
+          ]
+        }
         swipeThreshold={100}
         transparent={true}
         visible={false}
       >
         <View
           accessible={true}
+          focusable={true}
+          onClick={[Function]}
           onResponderGrant={[Function]}
           onResponderMove={[Function]}
           onResponderRelease={[Function]}
@@ -738,7 +781,10 @@ exports[`BackupIntroduction renders correctly when backup too late and delayed 1
         <View
           hideModalContentWhileAnimating={false}
           onModalHide={[Function]}
+          onModalWillHide={[Function]}
+          onModalWillShow={[Function]}
           pointerEvents="box-none"
+          scrollHorizontal={false}
           scrollOffset={0}
           scrollOffsetMax={0}
           scrollTo={null}
@@ -753,6 +799,12 @@ exports[`BackupIntroduction renders correctly when backup too late and delayed 1
                 },
               ],
             }
+          }
+          supportedOrientations={
+            Array [
+              "portrait",
+              "landscape",
+            ]
           }
           swipeThreshold={100}
         >
@@ -816,7 +868,9 @@ exports[`BackupIntroduction renders correctly when backup too late and delayed 1
             >
               <View
                 accessible={true}
+                focusable={true}
                 isTVSelectable={true}
+                onClick={[Function]}
                 onResponderGrant={[Function]}
                 onResponderMove={[Function]}
                 onResponderRelease={[Function]}
@@ -847,7 +901,9 @@ exports[`BackupIntroduction renders correctly when backup too late and delayed 1
               </View>
               <View
                 accessible={true}
+                focusable={true}
                 isTVSelectable={true}
+                onClick={[Function]}
                 onResponderGrant={[Function]}
                 onResponderMove={[Function]}
                 onResponderRelease={[Function]}
@@ -903,6 +959,7 @@ exports[`BackupIntroduction renders correctly when backup too late and delayed 1
     >
       <View
         accessible={true}
+        focusable={true}
         isTVSelectable={true}
         nativeBackgroundAndroid={
           Object {
@@ -910,6 +967,7 @@ exports[`BackupIntroduction renders correctly when backup too late and delayed 1
             "type": "ThemeAttrAndroid",
           }
         }
+        onClick={[Function]}
         onResponderGrant={[Function]}
         onResponderMove={[Function]}
         onResponderRelease={[Function]}
@@ -991,6 +1049,7 @@ exports[`BackupIntroduction renders correctly when backup too late and no delay 
   >
     <View
       accessible={true}
+      focusable={true}
       isTVSelectable={true}
       nativeBackgroundAndroid={
         Object {
@@ -998,6 +1057,7 @@ exports[`BackupIntroduction renders correctly when backup too late and no delay 
           "type": "ThemeAttrAndroid",
         }
       }
+      onClick={[Function]}
       onResponderGrant={[Function]}
       onResponderMove={[Function]}
       onResponderRelease={[Function]}
@@ -1047,7 +1107,7 @@ exports[`BackupIntroduction renders correctly when backup too late and no delay 
         <Image
           source={
             Object {
-              "testUri": "../../../src/images/backup-icon.png",
+              "testUri": "../../../packages/mobile/src/images/backup-icon.png",
             }
           }
           style={
@@ -1148,16 +1208,27 @@ exports[`BackupIntroduction renders correctly when backup too late and no delay 
         hardwareAccelerated={false}
         hideModalContentWhileAnimating={false}
         onModalHide={[Function]}
+        onModalWillHide={[Function]}
+        onModalWillShow={[Function]}
         onRequestClose={[Function]}
+        scrollHorizontal={false}
         scrollOffset={0}
         scrollOffsetMax={0}
         scrollTo={null}
+        supportedOrientations={
+          Array [
+            "portrait",
+            "landscape",
+          ]
+        }
         swipeThreshold={100}
         transparent={true}
         visible={false}
       >
         <View
           accessible={true}
+          focusable={true}
+          onClick={[Function]}
           onResponderGrant={[Function]}
           onResponderMove={[Function]}
           onResponderRelease={[Function]}
@@ -1181,7 +1252,10 @@ exports[`BackupIntroduction renders correctly when backup too late and no delay 
         <View
           hideModalContentWhileAnimating={false}
           onModalHide={[Function]}
+          onModalWillHide={[Function]}
+          onModalWillShow={[Function]}
           pointerEvents="box-none"
+          scrollHorizontal={false}
           scrollOffset={0}
           scrollOffsetMax={0}
           scrollTo={null}
@@ -1196,6 +1270,12 @@ exports[`BackupIntroduction renders correctly when backup too late and no delay 
                 },
               ],
             }
+          }
+          supportedOrientations={
+            Array [
+              "portrait",
+              "landscape",
+            ]
           }
           swipeThreshold={100}
         >
@@ -1259,7 +1339,9 @@ exports[`BackupIntroduction renders correctly when backup too late and no delay 
             >
               <View
                 accessible={true}
+                focusable={true}
                 isTVSelectable={true}
+                onClick={[Function]}
                 onResponderGrant={[Function]}
                 onResponderMove={[Function]}
                 onResponderRelease={[Function]}
@@ -1290,7 +1372,9 @@ exports[`BackupIntroduction renders correctly when backup too late and no delay 
               </View>
               <View
                 accessible={true}
+                focusable={true}
                 isTVSelectable={true}
+                onClick={[Function]}
                 onResponderGrant={[Function]}
                 onResponderMove={[Function]}
                 onResponderRelease={[Function]}
@@ -1346,6 +1430,7 @@ exports[`BackupIntroduction renders correctly when backup too late and no delay 
     >
       <View
         accessible={true}
+        focusable={true}
         isTVSelectable={true}
         nativeBackgroundAndroid={
           Object {
@@ -1353,6 +1438,7 @@ exports[`BackupIntroduction renders correctly when backup too late and no delay 
             "type": "ThemeAttrAndroid",
           }
         }
+        onClick={[Function]}
         onResponderGrant={[Function]}
         onResponderMove={[Function]}
         onResponderRelease={[Function]}
@@ -1431,6 +1517,7 @@ exports[`BackupIntroduction renders correctly when backup too late and no delay 
     >
       <View
         accessible={true}
+        focusable={true}
         isTVSelectable={true}
         nativeBackgroundAndroid={
           Object {
@@ -1438,6 +1525,7 @@ exports[`BackupIntroduction renders correctly when backup too late and no delay 
             "type": "ThemeAttrAndroid",
           }
         }
+        onClick={[Function]}
         onResponderGrant={[Function]}
         onResponderMove={[Function]}
         onResponderRelease={[Function]}

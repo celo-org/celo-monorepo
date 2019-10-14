@@ -11,6 +11,8 @@ exports[`AlertBanner when error message passed in renders error message 1`] = `
 >
   <View
     accessible={true}
+    focusable={true}
+    onClick={[Function]}
     onResponderGrant={[Function]}
     onResponderMove={[Function]}
     onResponderRelease={[Function]}
@@ -102,6 +104,8 @@ exports[`AlertBanner when message and title passed in renders title with message
 >
   <View
     accessible={true}
+    focusable={true}
+    onClick={[Function]}
     onResponderGrant={[Function]}
     onResponderMove={[Function]}
     onResponderRelease={[Function]}
@@ -178,6 +182,8 @@ exports[`AlertBanner when message passed in renders message 1`] = `
 >
   <View
     accessible={true}
+    focusable={true}
+    onClick={[Function]}
     onResponderGrant={[Function]}
     onResponderMove={[Function]}
     onResponderRelease={[Function]}

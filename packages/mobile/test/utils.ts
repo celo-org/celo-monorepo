@@ -74,16 +74,24 @@ export function createMockNavigationProp(params: any) {
 }
 
 export function mockNavigationServiceFor(test: string, navigateMock = jest.fn()) {
-  const navigate = navigateMock
-  const navigateBack = jest.fn()
-  const navigateReset = jest.fn()
-  navigate.mockName(`${test}@navigate`)
-  navigateBack.mockName(`${test}@navigateBack`)
-  navigateReset.mockName(`${test}@navigateReset`)
+  const mockNavigate = navigateMock
+  const mockNavigateBack = jest.fn()
+  const mockNavigateReset = jest.fn()
+  mockNavigate.mockName(`${test}@navigate`)
+  mockNavigateBack.mockName(`${test}@navigateBack`)
+  mockNavigateReset.mockName(`${test}@navigateReset`)
   jest.mock('src/navigator/NavigationService', () => {
-    return { navigate, navigateBack, navigateReset }
+    return {
+      navigate: mockNavigate,
+      navigateBack: mockNavigateBack,
+      navigateReset: mockNavigateReset,
+    }
   })
-  return { navigate, navigateBack, navigateReset }
+  return {
+    navigate: mockNavigate,
+    navigateBack: mockNavigateBack,
+    navigateReset: mockNavigateReset,
+  }
 }
 
 const middlewares = [thunk]
