@@ -5,7 +5,7 @@ import BigNumber from 'bignumber.js'
 import { Linking, Platform } from 'react-native'
 import SendIntentAndroid from 'react-native-send-intent'
 import VersionCheck from 'react-native-version-check'
-import { call, delay, put, race, spawn, takeLeading } from 'redux-saga/effects'
+import { call, delay, put, race, select, spawn, takeLeading } from 'redux-saga/effects'
 import { showError, showMessage } from 'src/alert/actions'
 import CeloAnalytics from 'src/analytics/CeloAnalytics'
 import { CustomEventNames } from 'src/analytics/constants'
@@ -38,8 +38,9 @@ import { waitForTransactionWithId } from 'src/transactions/saga'
 import { sendTransaction } from 'src/transactions/send'
 import { dynamicLink } from 'src/utils/dynamicLink'
 import Logger from 'src/utils/Logger'
-import { addLocalAccount, isZeroSyncMode, web3 } from 'src/web3/contracts'
+import { addLocalAccount, web3 } from 'src/web3/contracts'
 import { getConnectedUnlockedAccount, getOrCreateAccount } from 'src/web3/saga'
+import { zeroSyncSelector } from 'src/web3/selectors'
 
 const TAG = 'invite/saga'
 export const TEMP_PW = 'ce10'
@@ -232,9 +233,16 @@ export function* doRedeemInvite(inviteCode: string) {
     if (!newAccount) {
       throw Error('Unable to create your account')
     }
+    const zeroSyncMode: boolean = yield select(zeroSyncSelector)
 
-    yield call(addTempAccountToWallet, inviteCode)
-    yield call(withdrawFundsFromTempAccount, tempAccount, tempAccountBalanceWei, newAccount)
+    yield call(addTempAccountToWallet, inviteCode, zeroSyncMode)
+    yield call(
+      withdrawFundsFromTempAccount,
+      tempAccount,
+      tempAccountBalanceWei,
+      newAccount,
+      zeroSyncMode
+    )
     yield put(fetchDollarBalance())
     return true
   } catch (e) {
@@ -244,11 +252,12 @@ export function* doRedeemInvite(inviteCode: string) {
   }
 }
 
-async function addTempAccountToWallet(inviteCode: string) {
+async function addTempAccountToWallet(inviteCode: string, zeroSyncMode: boolean) {
   Logger.debug(TAG + '@addTempAccountToWallet', 'Attempting to add temp wallet')
   try {
     let tempAccount: string | null = null
-    if (isZeroSyncMode()) {
+
+    if (zeroSyncMode) {
       tempAccount = web3.eth.accounts.privateKeyToAccount(inviteCode).address
       Logger.debug(
         TAG + '@redeemInviteCode',
@@ -275,10 +284,11 @@ async function addTempAccountToWallet(inviteCode: string) {
 export async function withdrawFundsFromTempAccount(
   tempAccount: string,
   tempAccountBalanceWei: BigNumber,
-  newAccount: string
+  newAccount: string,
+  zeroSyncMode: boolean
 ) {
   Logger.debug(TAG + '@withdrawFundsFromTempAccount', 'Unlocking temporary account')
-  if (!isZeroSyncMode()) {
+  if (!zeroSyncMode) {
     await web3.eth.personal.unlockAccount(tempAccount, TEMP_PW, 600)
   }
   const tempAccountBalance = new BigNumber(web3.utils.fromWei(tempAccountBalanceWei.toString()))
@@ -292,7 +302,7 @@ export async function withdrawFundsFromTempAccount(
   })
 
   Logger.debug(TAG + '@withdrawFundsFromTempAccount', 'Sending transaction')
-  await sendTransaction(tx, tempAccount, TAG, 'Transfer from temp wallet')
+  await sendTransaction(tx, tempAccount, TAG, 'Transfer from temp wallet', zeroSyncMode)
   Logger.debug(TAG + '@withdrawFundsFromTempAccount', 'Done withdrawal')
 }
 

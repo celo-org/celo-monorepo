@@ -25,8 +25,8 @@ import {
   setZeroSyncMode,
   updateWeb3SyncProgress,
 } from 'src/web3/actions'
-import { addLocalAccount, isZeroSyncMode, web3 } from 'src/web3/contracts'
-import { currentAccountSelector } from 'src/web3/selectors'
+import { addLocalAccount, web3 } from 'src/web3/contracts'
+import { currentAccountSelector, zeroSyncSelector } from 'src/web3/selectors'
 import {
   assignDataKeyFromPrivateKey,
   ensureAccountInWeb3Keystore,
@@ -45,7 +45,8 @@ const BLOCK_CHAIN_CORRUPTION_ERROR = "Error: CONNECTION ERROR: Couldn't connect 
 
 // checks if web3 claims it is currently syncing and attempts to wait for it to complete
 export function* checkWeb3SyncProgress() {
-  if (isZeroSyncMode()) {
+  const zeroSyncMode: boolean = yield select(zeroSyncSelector)
+  if (zeroSyncMode) {
     // In this mode, the check seems to fail with
     // web3/saga/checking web3 sync progress: Error: Invalid JSON RPC response: "":
     return true
@@ -174,7 +175,8 @@ export function* assignAccountFromPrivateKey(key: string) {
     account = getAccountAddressFromPrivateKey(key)
     yield savePrivateKeyToLocalDisk(account, key, pincode)
 
-    if (isZeroSyncMode()) {
+    const zeroSyncMode: boolean = yield select(zeroSyncSelector)
+    if (zeroSyncMode) {
       // If zero sync mode, add local account
       Logger.debug(TAG + '@assignAccountFromPrivateKey', 'Init web3 with private key')
       addLocalAccount(web3, key)
@@ -244,7 +246,8 @@ export function* unlockAccount(account: string) {
     }
 
     const pincode = yield call(getPincode)
-    if (isZeroSyncMode()) {
+    const zeroSyncMode: boolean = yield select(zeroSyncSelector)
+    if (zeroSyncMode) {
       if (accountAlreadyAddedInZeroSyncMode) {
         Logger.info(TAG + 'unlockAccount', `Account ${account} already added to web3 for signing`)
       } else {
@@ -291,16 +294,19 @@ export function* switchToGethFromZeroSync() {
     'Imported account from private key to web3 keystore',
     account
   )
+  const confirmAccount = yield call(getConnectedAccount)
+  Logger.debug(TAG + '@switchToGethFromZeroSync', 'Confirmed account is connected', confirmAccount)
+  return true
 }
 
 export function* switchToZeroSyncFromGeth() {
   Logger.debug(TAG + 'Switching to zero sync from geth..')
   setZeroSyncMode(true)
-  // TODO write
+  return true // TODO(anna) maybe return account instead?
 }
 
 export function* switchZeroSyncMode(action: SetIsZeroSyncAction) {
-  Logger.debug(TAG + '@switchZeroSyncMode', `with action payload ${action}`)
+  Logger.debug(TAG + '@switchZeroSyncMode', ` to: ${action.zeroSyncMode}`)
   if (action.zeroSyncMode) {
     yield call(switchToGethFromZeroSync)
   } else {

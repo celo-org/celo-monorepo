@@ -1,4 +1,4 @@
-import { call, put, take } from 'redux-saga/effects'
+import { call, put, select, take } from 'redux-saga/effects'
 import { showError } from 'src/alert/actions'
 import CeloAnalytics from 'src/analytics/CeloAnalytics'
 import { CustomEventNames } from 'src/analytics/constants'
@@ -14,6 +14,7 @@ import {
 } from 'src/transactions/actions'
 import { sendTransactionPromises } from 'src/transactions/send'
 import Logger from 'src/utils/Logger'
+import { zeroSyncSelector } from 'src/web3/selectors'
 
 const TAG = 'transactions/saga'
 
@@ -40,12 +41,14 @@ export function* sendAndMonitorTransaction(
   try {
     Logger.debug(TAG + '@sendAndMonitorTransaction', `Sending transaction with id: ${txId}`)
 
+    const zeroSyncMode: boolean = yield select(zeroSyncSelector)
     const { transactionHash, confirmation } = yield call(
       sendTransactionPromises,
       tx,
       account,
       TAG,
-      txId
+      txId,
+      zeroSyncMode
     )
     const hash = yield transactionHash
     yield put(addHashToStandbyTransaction(txId, hash))

@@ -5,13 +5,12 @@ import { navigateToError } from 'src/navigator/NavigationService'
 import { setLatestBlockNumber, updateWeb3SyncProgress } from 'src/web3/actions'
 import {
   checkWeb3SyncProgress,
-  getDecryptedData,
-  getEncryptedData,
   getOrCreateAccount,
   SYNC_TIMEOUT,
   waitForWeb3Sync,
 } from 'src/web3/saga'
 import { currentAccountSelector } from 'src/web3/selectors'
+import { getDecryptedData, getEncryptedData } from 'src/web3/zeroSync'
 import { createMockStore, sleep } from 'test/utils'
 import { mockAccount } from 'test/values'
 

@@ -2,10 +2,11 @@ import { addLocalAccount as web3utilsAddLocalAccount } from '@celo/walletkit'
 import { Platform } from 'react-native'
 import { DocumentDirectoryPath } from 'react-native-fs'
 import * as net from 'react-native-tcp'
+import { useSelector } from 'react-redux'
 import { DEFAULT_INFURA_URL, DEFAULT_TESTNET } from 'src/config'
-import { GethSyncMode } from 'src/geth/consts'
-import networkConfig, { Testnets } from 'src/geth/networkConfig'
+import { Testnets } from 'src/geth/networkConfig'
 import Logger from 'src/utils/Logger'
+import { zeroSyncSelector } from 'src/web3/selectors'
 import Web3 from 'web3'
 import { Provider } from 'web3/providers'
 
@@ -15,7 +16,11 @@ const tag = 'web3/contracts'
 export const web3: Web3 = getWeb3()
 
 export function isZeroSyncMode(): boolean {
-  return networkConfig.syncMode === GethSyncMode.ZeroSync
+  const zeroSync: boolean = useSelector(zeroSyncSelector)
+  Logger.debug(tag, 'ZeroSync mode:', zeroSync.toString())
+  // TODO(anna) must be a cleaner way to get state
+  // Note that this is only used when we must check zeroSync outside of a saga
+  return zeroSync
 }
 
 function getIpcProvider(testnet: Testnets) {
