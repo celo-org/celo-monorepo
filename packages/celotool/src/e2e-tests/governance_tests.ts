@@ -199,7 +199,35 @@ const validatorsAbi = [
     ],
     payable: false,
     stateMutability: 'view',
-    type: 'function',
+    type: 'function'
+  },
+  {
+    constant: true,
+    inputs: [],
+    name: 'getByzantineQuorumForCurrentSet',
+    outputs: [
+      {
+        name: '',
+        type: 'uint256'
+      }
+    ],
+    payable: false,
+    stateMutability: 'view',
+    type: 'function'
+  },
+  {
+    constant: true,
+    inputs: [],
+    name: 'getEpochNumber',
+    outputs: [
+      {
+        name: '',
+        type: 'uint256'
+      }
+    ],
+    payable: false,
+    stateMutability: 'view',
+    type: 'function'
   },
   {
     anonymous: false,
@@ -387,6 +415,23 @@ describe('governance tests', () => {
 
         assert.equal(numberValidators, 4)
       })
+    })
+  })
+
+  describe('Validators.getByzantineQuorumForCurrentSet()', () => {
+    before(async function() {
+      this.timeout(0)
+      await restart()
+      validators = new web3.eth.Contract(validatorsAbi, await getContractAddress('ValidatorsProxy'))
+    })
+
+    it('should return the computed validator quorum size', async () => {
+      const numberValidators = await validators.methods.numberValidatorsInCurrentSet().call()
+      const quorumValidators = await validators.methods.getByzantineQuorumForCurrentSet().call()
+      const size = new BigNumber(numberValidators)
+      const quorum = new BigNumber(quorumValidators)
+      const expQuorum = size.multipliedBy(2).dividedBy(3).integerValue().plus(1)
+      assert.equal(quorum.toNumber(), expQuorum.toNumber())
     })
   })
 

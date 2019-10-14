@@ -4,6 +4,7 @@ import {
   assertEqualBN,
   assertRevert,
   NULL_ADDRESS,
+  timeTravel,
 } from '@celo/protocol/lib/test-utils'
 import BigNumber from 'bignumber.js'
 import {
@@ -1522,6 +1523,26 @@ contract('Validators', (accounts: string[]) => {
           validator6,
         ])
       })
+    })
+  })
+
+  describe.only('#getEpochNumber', () => {
+    const compareWeb3ComputedWithContract = async () => {
+      // @ts-ignore
+      const contractNumber = await validators.getEpochNumber.call()
+      const blockNumber = (await web3.eth.getBlock('latest')).number
+      const epochNumber = new BigNumber(blockNumber)
+        .dividedBy(30000) // TODO: replace with BlockchainParameters.epochLength
+        .integerValue()
+        .toNumber()
+      assertEqualBN(contractNumber, epochNumber)
+    }
+
+    it('should return the correct epoch at small block number', compareWeb3ComputedWithContract)
+
+    it('should return the correct epoch at large block number', async () => {
+      await timeTravel(100000000, web3) // TODO: replace with fixed multiple of blocktime
+      await compareWeb3ComputedWithContract()
     })
   })
 })
