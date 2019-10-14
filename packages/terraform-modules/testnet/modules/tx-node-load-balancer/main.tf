@@ -85,10 +85,10 @@ resource "google_compute_global_address" "external" {
 resource "google_compute_global_forwarding_rule" "external" {
   name = "${local.name_prefix}-external-fwd-rule"
 
-  ip_address = google_compute_global_address.external.address
+  ip_address            = google_compute_global_address.external.address
   load_balancing_scheme = "EXTERNAL"
-  port_range = "443"
-  target = google_compute_target_https_proxy.external.self_link
+  port_range            = "443"
+  target                = google_compute_target_https_proxy.external.self_link
 }
 
 resource "google_compute_target_https_proxy" "external" {
@@ -98,7 +98,7 @@ resource "google_compute_target_https_proxy" "external" {
 }
 
 resource "google_compute_url_map" "external" {
-  name        = "${local.name_prefix}-external-url-map"
+  name            = "${local.name_prefix}-external-url-map"
   default_service = "${google_compute_backend_service.external.self_link}"
 
   host_rule {
@@ -113,9 +113,9 @@ resource "google_compute_url_map" "external" {
 }
 
 resource "google_compute_backend_service" "external" {
-  name = "${local.name_prefix}-external-service"
+  name      = "${local.name_prefix}-external-service"
   port_name = "http"
-  protocol = "HTTP"
+  protocol  = "HTTP"
 
   backend {
     group = google_compute_instance_group.tx_node_lb.self_link
@@ -147,10 +147,10 @@ resource "google_compute_ssl_certificate" "external" {
 
 resource "google_dns_record_set" "external" {
   # google cloud requires the name to end with a "."
-  name = "${var.infura_setup_host}."
+  name         = "${var.infura_setup_host}."
   managed_zone = data.google_dns_managed_zone.external.name
-  type = "A"
-  ttl  = 3600
+  type         = "A"
+  ttl          = 3600
 
   rrdatas = [google_compute_global_address.external.address]
 }
@@ -171,8 +171,8 @@ resource "acme_registration" "external" {
 }
 
 resource "acme_certificate" "external" {
-  account_key_pem           = acme_registration.external.account_key_pem
-  common_name               = var.infura_setup_host
+  account_key_pem = acme_registration.external.account_key_pem
+  common_name     = var.infura_setup_host
 
   dns_challenge {
     provider = "gcloud"
@@ -181,7 +181,7 @@ resource "acme_certificate" "external" {
       GCE_POLLING_INTERVAL     = "10"
       GCE_PROPAGATION_TIMEOUT  = "180"
       GCE_TTL                  = "60"
-      GCE_PROJECT = var.gcloud_project
+      GCE_PROJECT              = var.gcloud_project
       GCE_SERVICE_ACCOUNT_FILE = var.gcloud_credentials_path
     }
   }
