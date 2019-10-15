@@ -109,10 +109,6 @@ contract Random is IRandom, Ownable, Initializable {
     return _getBlockRandomness(block.number, block.number);
   }
 
-  function _random() external view returns (bytes32) {
-    return _getBlockRandomness(block.number, block.number);
-  }
-
   /**
    * @notice Get randomness values of previous blocks.
    * @param blockNumber The number of block whose randomness value we want to know.
