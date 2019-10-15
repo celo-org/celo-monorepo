@@ -151,8 +151,8 @@ async function verifyCode(
     console.warn('Code was not valid')
     return
   }
-
-  const tx = await (await attestations.complete(phoneNumber, account, matchingIssuer, code)).send()
+  const txObject = await attestations.complete(phoneNumber, account, matchingIssuer, code)
+  const tx = await txObject.send()
   return tx.waitReceipt()
 }
 

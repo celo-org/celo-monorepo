@@ -1,4 +1,5 @@
 import scrypt from 'scrypt-js'
+import { isE164Number } from './phoneNumbers'
 
 enum IdentifierTypeEnum {
   PHONE_NUMBER = 'phone_number',
@@ -16,13 +17,8 @@ const SCRYPT_PARAMS = {
   dkLen: 32,
 }
 
-function isE164Number(phoneNumber: string) {
-  const E164RegEx = /^\+[1-9][0-9]{1,14}$/
-  return E164RegEx.test(phoneNumber)
-}
-
 async function calculateHash(identifier: string) {
-  return new Promise<string>((resolve) => {
+  return new Promise<string>((resolve, reject) => {
     scrypt(
       Buffer.from(identifier.normalize('NFKC')),
       Buffer.from(SCRYPT_PARAMS.salt.normalize('NFKC')),
@@ -32,7 +28,7 @@ async function calculateHash(identifier: string) {
       SCRYPT_PARAMS.dkLen,
       (error: any, progress: any, key: any) => {
         if (error) {
-          throw Error(`Unable to hash ${identifier}, error: ${error}`)
+          reject(`Unable to hash ${identifier}, error: ${error}`)
         } else if (key) {
           let hexHash = ''
           for (const item of key) {
