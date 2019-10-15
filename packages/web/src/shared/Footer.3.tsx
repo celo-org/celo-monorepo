@@ -1,7 +1,8 @@
 import Link from 'next/link'
 import * as React from 'react'
 import { StyleSheet, Text, View } from 'react-native'
-import { I18nProps, NameSpaces, withNamespaces, Trans } from 'src/i18n'
+import { I18nProps, NameSpaces, Trans, withNamespaces } from 'src/i18n'
+import Discord from 'src/icons/Discord'
 import Discourse from 'src/icons/Discourse'
 import MediumLogo from 'src/icons/MediumLogo'
 import Octocat from 'src/icons/Octocat'
@@ -12,7 +13,6 @@ import Button, { BTN } from 'src/shared/Button.3'
 import menu, { CeloLinks } from 'src/shared/menu-items'
 import Responsive from 'src/shared/Responsive'
 import { colors, fonts, standardStyles, textStyles } from 'src/styles'
-import Discord from 'src/icons/Discord'
 
 const menuItems = [menu.HOME, menu.ABOUT_US, menu.JOBS, menu.BUILD, menu.COMMUNITY]
 
