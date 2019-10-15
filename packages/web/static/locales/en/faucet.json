@@ -41,5 +41,6 @@
   "cGLDsent": "cGLD Sent",
   "walletBuilt": "Wallet Built",
   "countryPlaceholder": "Country or Territory",
-  "phonePlaceholder": "Phone Number"
+  "phonePlaceholder": "Phone Number",
+  "chooseMobileOS": "Choose Mobile OS"
 }

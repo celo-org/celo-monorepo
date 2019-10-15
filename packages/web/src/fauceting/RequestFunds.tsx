@@ -16,7 +16,7 @@ import Android from 'src/icons/Android'
 import Apple from 'src/icons/Apple'
 import { colors, fonts, standardStyles, textStyles } from 'src/styles'
 import { Radio } from 'src/table/table'
-import { RequestRecord, RequestType, subscribeRequest } from '../../server/FirebaseClient'
+import { MobileOS, RequestRecord, RequestType, subscribeRequest } from '../../server/FirebaseClient'
 
 interface State {
   beneficiary: string
@@ -25,7 +25,7 @@ interface State {
   dollarTxHash?: string | null
   goldTxHash?: string | null
   escrowTxHash?: string | null
-  mobileOS: OS | null
+  mobileOS: MobileOS | null
 }
 
 interface Props {
@@ -53,7 +53,7 @@ class RequestFunds extends React.PureComponent<Props & I18nProps, State> {
     })
   }
 
-  selectOS = (os: OS) => {
+  selectOS = (os: MobileOS) => {
     this.setState({ mobileOS: os })
   }
 
@@ -148,18 +148,22 @@ class RequestFunds extends React.PureComponent<Props & I18nProps, State> {
         ) : (
           <PhoneInput onChangeNumber={this.setNumber} />
         )}
-        {!this.isFaucet() && (
-          <MobileSelect onSelect={this.selectOS} selectedOS={this.state.mobileOS} />
-        )}
         <ContextualInfo
           requestState={this.state.requestState}
           t={this.props.t}
           isFaucet={this.isFaucet()}
         />
-        <View style={standardStyles.elementalMargin}>
+        {!this.isFaucet() && (
+          <MobileSelect
+            t={this.props.t}
+            onSelect={this.selectOS}
+            selectedOS={this.state.mobileOS}
+          />
+        )}
+        <View style={[styles.recaptcha, standardStyles.elementalMargin]}>
           <ReCAPTCHA sitekey={getCaptchaKey()} onChange={this.onCaptcha} ref={this.recaptchaRef} />
         </View>
-        <View style={[this.isFaucet() && standardStyles.row, standardStyles.elementalMarginTop]}>
+        <View style={[this.isFaucet() && standardStyles.row]}>
           <ButtonWithFeedback
             requestState={requestState}
             isFaucet={this.isFaucet()}
@@ -184,20 +188,15 @@ class RequestFunds extends React.PureComponent<Props & I18nProps, State> {
   }
 }
 
-enum OS {
-  'andriod' = 'android',
-  ios = 'ios',
-}
-
-function MobileSelect({ selectedOS, onSelect }) {
-  const isAndriod = selectedOS === OS.andriod
-  const isIOS = selectedOS === OS.ios
+function MobileSelect({ selectedOS, onSelect, t }) {
+  const isAndriod = selectedOS === MobileOS.andriod
+  const isIOS = selectedOS === MobileOS.ios
   const iOSColor = isIOS ? colors.white : colors.placeholderDarkMode
   const andriodColor = isAndriod ? colors.white : colors.placeholderDarkMode
   return (
     <>
       <Text style={[fonts.h5, textStyles.invert, standardStyles.elementalMarginTop]}>
-        Choose Mobile OS
+        {t('chooseMobileOS')}
       </Text>
       <View style={standardStyles.row}>
         <Radio
@@ -207,9 +206,9 @@ function MobileSelect({ selectedOS, onSelect }) {
           icon={<Android size={18} color={andriodColor} />}
           selected={isAndriod}
           onValueSelected={onSelect}
-          value={OS.andriod}
+          value={MobileOS.andriod}
         />
-        <View style={{ marginStart: 20 }}>
+        <View style={styles.radios}>
           <Radio
             colorWhenSelected={colors.primary}
             label="ios"
@@ -217,7 +216,7 @@ function MobileSelect({ selectedOS, onSelect }) {
             icon={<Apple size={18} color={iOSColor} />}
             selected={isIOS}
             onValueSelected={onSelect}
-            value={OS.ios}
+            value={MobileOS.ios}
           />
         </View>
       </View>
@@ -225,9 +224,9 @@ function MobileSelect({ selectedOS, onSelect }) {
   )
 }
 
-function send(beneficiary: string, kind: RequestType, captchaToken: string) {
+function send(beneficiary: string, kind: RequestType, captchaToken: string, os: MobileOS) {
   const route = kind === RequestType.Invite ? '/invite' : '/faucet'
-  return postForm(route, { captchaToken, beneficiary })
+  return postForm(route, { captchaToken, beneficiary, mobileOS: os })
 }
 
 const styles = StyleSheet.create({
@@ -235,7 +234,12 @@ const styles = StyleSheet.create({
     borderColor: colors.error,
     borderWidth: 1,
   },
-  radios: {},
+  radios: {
+    marginStart: 20,
+  },
+  recaptcha: {
+    height: 80,
+  },
 })
 
 export default withNamespaces(NameSpaces.faucet)(RequestFunds)

@@ -41,10 +41,15 @@ async function getDB(): Promise<firebase.database.Database> {
   return (await getFirebase()).database()
 }
 
-export async function sendRequest(beneficiary: Address | E164Number, type: RequestType) {
+export async function sendRequest(
+  beneficiary: Address | E164Number,
+  type: RequestType,
+  mobileOS: string
+) {
   const newRequest: RequestRecord = {
     beneficiary,
     status: RequestStatus.Pending,
+    mobileOS,
     type,
   }
   try {

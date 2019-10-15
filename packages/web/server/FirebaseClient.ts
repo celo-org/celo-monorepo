@@ -38,10 +38,16 @@ export enum RequestType {
   Invite = 'Invite',
 }
 
+export enum MobileOS {
+  'andriod' = 'android',
+  ios = 'ios',
+}
+
 export interface RequestRecord {
   beneficiary: Address | E164Number
   status: RequestStatus
   type: RequestType
+  mobileOS?: MobileOS // only on Invites
   dollarTxHash?: string
   goldTxHash?: string
   escrowTxHash?: string // only on Invites
