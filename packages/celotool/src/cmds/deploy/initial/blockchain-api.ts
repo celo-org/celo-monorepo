@@ -14,7 +14,7 @@ type BlockchainApiArgv = UpgradeArgv
 export const handler = async (argv: BlockchainApiArgv) => {
   await switchToClusterFromEnv()
   const testnetProjectName = fetchEnv(envVar.TESTNET_PROJECT_NAME)
-  const newFaucetAddress = getAddressFromEnv(AccountType.VALIDATOR, 0)
+  const newFaucetAddress = getAddressFromEnv(AccountType.VALIDATOR, 0) // We use the 0th validator as the faucet
   console.info(`updating blockchain-api yaml file for env ${argv.celoEnv}`)
   await execCmd(
     `sed -i.bak 's/FAUCET_ADDRESS: .*$/FAUCET_ADDRESS: \"${newFaucetAddress}\"/g' ../blockchain-api/app.${
