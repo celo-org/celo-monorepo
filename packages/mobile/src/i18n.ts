@@ -1,6 +1,4 @@
 import locales from '@celo/mobile/locales'
-import en_US from '@celo/mobile/locales/en.json'
-import es_LA from '@celo/mobile/locales/es.json'
 import { currencyTranslations } from '@celo/utils/src/currencies'
 // @ts-ignore
 import i18n from 'i18next'
@@ -28,11 +26,9 @@ export enum Namespaces {
 
 const availableResources = {
   'en-US': {
-    common: en_US,
     ...locales.enUS,
   },
   'es-419': {
-    common: es_LA,
     ...locales.es_419,
   },
 }
