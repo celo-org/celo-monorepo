@@ -14,9 +14,9 @@ export const handler = async (argv: BlockchainApiArgv) => {
   const testnetProjectName = fetchEnv(envVar.TESTNET_PROJECT_NAME)
   console.info(`updating blockchain-api yaml file for env ${argv.celoEnv}`)
   await execCmd(
-    `yarn --cwd ../blockchain-api new_address=$(celotooljs generate address-from-env --index 0 --accountType validator --celo-env ${
+    `new_address=$(celotooljs generate address-from-env --index 0 --accountType validator --celo-env ${
       argv.celoEnv
-    }) | sed -i.bak 's/FAUCET_ADDRESS: .*$/FAUCET_ADDRESS: \"'"$new_address"'\"/g' app.${
+    }) | sed -i.bak 's/FAUCET_ADDRESS: .*$/FAUCET_ADDRESS: \"'"$new_address"'\"/g' ../blockchain-api/app.${
       argv.celoEnv
     }.yaml `
   )
