@@ -55,6 +55,8 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     flexDirection: 'row',
     alignItems: 'flex-start',
+    flexWrap: 'wrap',
+    maxWidth: '100%',
   },
-  mainMobile: { justifyContent: 'space-around' },
+  mainMobile: { justifyContent: 'space-around', flexDirection: 'column', maxWidth: '100%' },
 })
