@@ -1,6 +1,6 @@
 import { AccountArgv } from '@celo/celotool/src/cmds/account'
 import { portForwardAnd } from '@celo/celotool/src/lib/port_forward'
-import { CeloContract, newKit } from '@celo/contractkit'
+import { CeloContract, ContractKit, newKit } from '@celo/contractkit'
 import {
   ActionableAttestation,
   AttestationsWrapper,
@@ -54,7 +54,12 @@ async function verifyCmd(argv: VerifyArgv) {
   const attestations = await kit.contracts.getAttestations()
   await printCurrentCompletedAttestations(attestations, argv.phone, account)
 
-  let attestationsToComplete = await attestations.getActionableAttestations(argv.phone, account)
+  let currentBlockNumber = await kit.web3.eth.getBlockNumber()
+  let attestationsToComplete = await attestations.getActionableAttestations(
+    argv.phone,
+    account,
+    currentBlockNumber
+  )
 
   // Request more attestations
   if (argv.num > attestationsToComplete.length) {
@@ -75,12 +80,17 @@ async function verifyCmd(argv: VerifyArgv) {
     await result.waitReceipt()
   }
 
-  attestationsToComplete = await attestations.getActionableAttestations(argv.phone, account)
+  currentBlockNumber = await kit.web3.eth.getBlockNumber()
+  attestationsToComplete = await attestations.getActionableAttestations(
+    argv.phone,
+    account,
+    currentBlockNumber
+  )
   // Find attestations we can reveal/verify
   console.info(`Revealing ${attestationsToComplete.length} attestations`)
   await revealAttestations(attestationsToComplete, attestations, argv.phone)
 
-  await promptForCodeAndVerify(attestations, argv.phone, account)
+  await promptForCodeAndVerify(kit, attestations, argv.phone, account)
 }
 
 export async function printCurrentCompletedAttestations(
@@ -160,14 +170,17 @@ async function verifyCode(
 }
 
 async function promptForCodeAndVerify(
+  kit: ContractKit,
   attestations: AttestationsWrapper,
   phoneNumber: string,
   account: string
 ) {
   while (true) {
+    const currentBlockNumber = await kit.web3.eth.getBlockNumber()
     const attestationsToComplete = await attestations.getActionableAttestations(
       phoneNumber,
-      account
+      account,
+      currentBlockNumber
     )
 
     if (attestationsToComplete.length === 0) {

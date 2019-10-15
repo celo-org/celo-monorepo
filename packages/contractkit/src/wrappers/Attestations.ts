@@ -26,7 +26,7 @@ export interface AttestationsToken {
 }
 
 export interface AttestationsConfig {
-  attestationExpirySeconds: number
+  attestationExpiryBlocks: number
   attestationRequestFees: AttestationsToken[]
 }
 
@@ -42,15 +42,13 @@ export enum AttestationState {
 export interface ActionableAttestation {
   issuer: Address
   attestationState: AttestationState
-  requestTime: number
-  completionTime: number
+  blockNumber: number
   publicKey: string
 }
 
-const parseAttestationInfo = (rawState: { 0: string; 1: string; 2: string }) => ({
+const parseAttestationInfo = (rawState: { 0: string; 1: string }) => ({
   attestationState: parseInt(rawState[0], 10),
-  requestTime: parseInt(rawState[1], 10),
-  completionTime: parseInt(rawState[2], 10),
+  blockNumber: parseInt(rawState[1], 10),
 })
 
 function attestationMessageToSign(phoneHash: string, account: Address) {
@@ -65,8 +63,8 @@ export class AttestationsWrapper extends BaseWrapper<Attestations> {
   /**
    *  Returns the time an attestation can be completable before it is considered expired
    */
-  attestationExpirySeconds = proxyCall(
-    this.contract.methods.attestationExpirySeconds,
+  attestationExpiryBlocks = proxyCall(
+    this.contract.methods.attestationExpiryBlocks,
     undefined,
     toNumber
   )
@@ -158,11 +156,11 @@ export class AttestationsWrapper extends BaseWrapper<Attestations> {
    */
   async getActionableAttestations(
     phoneNumber: string,
-    account: Address
+    account: Address,
+    currentBlockNumber: number
   ): Promise<ActionableAttestation[]> {
     const phoneHash = PhoneNumberUtils.getPhoneHash(phoneNumber)
-    const expirySeconds = await this.attestationExpirySeconds()
-    const nowInUnixSeconds = Math.floor(new Date().getTime() / 1000)
+    const expirySeconds = await this.attestationExpiryBlocks()
 
     const issuers = await this.contract.methods.getAttestationIssuers(phoneHash, account).call()
     const issuerState = Promise.all(
@@ -180,14 +178,14 @@ export class AttestationsWrapper extends BaseWrapper<Attestations> {
     )
 
     const isIncomplete = (status: AttestationState) => status === AttestationState.Incomplete
-    const hasNotExpired = (time: number) => nowInUnixSeconds < time + expirySeconds
+    const hasNotExpired = (time: number) => currentBlockNumber < time + expirySeconds
     const isValidKey = (key: string) => key !== null && key !== '0x0'
 
     return zip3(issuers, await issuerState, await publicKeys)
       .filter(
         ([_issuer, attestation, publicKey]) =>
           isIncomplete(attestation.attestationState) &&
-          hasNotExpired(attestation.requestTime) &&
+          hasNotExpired(attestation.blockNumber) &&
           isValidKey(publicKey)
       )
       .map(([issuer, attestation, publicKey]) => ({
@@ -250,7 +248,7 @@ export class AttestationsWrapper extends BaseWrapper<Attestations> {
       })
     )
     return {
-      attestationExpirySeconds: await this.attestationExpirySeconds(),
+      attestationExpiryBlocks: await this.attestationExpiryBlocks(),
       attestationRequestFees: fees,
     }
   }
@@ -314,13 +312,13 @@ export class AttestationsWrapper extends BaseWrapper<Attestations> {
   }
 
   /**
-   * Reveals the issuers for previously requested attestations for a phone number
+   * Selecets the issuers for previously requested attestations for a phone number
    * @param phoneNumber The phone number for which to request attestations for
    * @param token The token with which to pay for the attestation fee
    */
-  async revealIssuers(phoneNumber: string) {
+  async selectIssuers(phoneNumber: string) {
     const phoneHash = PhoneNumberUtils.getPhoneHash(phoneNumber)
-    return wrapSend(this.kit, this.contract.methods.revealIssuers(phoneHash))
+    return wrapSend(this.kit, this.contract.methods.selectIssuers(phoneHash))
   }
 
   /**
