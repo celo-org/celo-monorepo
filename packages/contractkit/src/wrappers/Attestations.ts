@@ -11,7 +11,6 @@ import {
   toBigNumber,
   toNumber,
   toTransactionObject,
-  tupleParser,
 } from './BaseWrapper'
 const parseSignature = SignatureUtils.parseSignature
 
