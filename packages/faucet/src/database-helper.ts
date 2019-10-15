@@ -150,6 +150,7 @@ function buildHandleInvite(request: RequestRecord, snap: DataSnapshot, config: N
     await snap.ref.update({ escrowTxHash })
     await escrowTx.waitReceipt()
 
+    // Removed if statement as the top of function throws an error of config.twillioClient is blank anyway
     await config.twilioClient.messages.create({
       body: messageText(inviteCode, request),
       from: config.twilioPhoneNumber,
