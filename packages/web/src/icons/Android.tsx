@@ -1,6 +1,6 @@
 import * as React from 'react'
-import Svg, { ClipPath, Defs, G, Path, Rect } from 'svgs'
 import { colors } from 'src/styles'
+import Svg, { ClipPath, Defs, G, Path, Rect } from 'svgs'
 
 interface Props {
   size: number

@@ -12,11 +12,11 @@ import {
 import { postForm } from 'src/forms/Form'
 import { TextInput } from 'src/forms/FormComponents'
 import { I18nProps, NameSpaces, withNamespaces } from 'src/i18n'
-import { colors, standardStyles, fonts, textStyles } from 'src/styles'
-import { RequestRecord, RequestType, subscribeRequest } from '../../server/FirebaseClient'
-import { Radio } from 'src/table/table'
 import Android from 'src/icons/Android'
 import Apple from 'src/icons/Apple'
+import { colors, fonts, standardStyles, textStyles } from 'src/styles'
+import { Radio } from 'src/table/table'
+import { RequestRecord, RequestType, subscribeRequest } from '../../server/FirebaseClient'
 
 interface State {
   beneficiary: string

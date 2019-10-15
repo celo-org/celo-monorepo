@@ -1,6 +1,6 @@
 import * as React from 'react'
-import Svg, { Path } from 'svgs'
 import { colors } from 'src/styles'
+import Svg, { Path } from 'svgs'
 
 interface Props {
   size: number
