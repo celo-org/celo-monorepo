@@ -14,6 +14,7 @@ import * as bls12377js from 'bls12377js'
 import { LockedGoldInstance, ValidatorsInstance } from 'types'
 
 const Web3 = require('web3')
+const truffle = require('@celo/protocol/truffle-config.js')
 
 function serializeKeystore(keystore: any) {
   return Buffer.from(JSON.stringify(keystore)).toString('base64')
@@ -41,7 +42,8 @@ async function registerValidatorGroup(
   name: string,
   lockedGold: LockedGoldInstance,
   validators: ValidatorsInstance,
-  privateKey: string
+  privateKey: string,
+  fundingAccount: string
 ) {
   // Validators can't also be validator groups, so we create a new account to register the
   // validator group with, and set the group identifier to the private key of this account
@@ -56,7 +58,7 @@ async function registerValidatorGroup(
   const encodedKey = serializeKeystore(encryptedPrivateKey)
 
   await web3.eth.sendTransaction({
-    from: generateAccountAddressFromPrivateKey(privateKey.slice(0)),
+    from: fundingAccount,
     to: account.address,
     value: config.validators.minLockedGoldValue * 2, // Add a premium to cover tx fees
   })
@@ -121,7 +123,7 @@ async function registerValidator(
   return
 }
 
-module.exports = async (_deployer: any) => {
+module.exports = async (_deployer: any, _networkName: string) => {
   const validators: ValidatorsInstance = await getDeployedProxiedContract<ValidatorsInstance>(
     'Validators',
     artifacts
@@ -148,7 +150,7 @@ module.exports = async (_deployer: any) => {
   }
 
   // Split the validator keys into groups that will fit within the max group size.
-  const valKeyGroups: string[] = []
+  const valKeyGroups: string[][] = []
   for (let i = 0; i < valKeys.length; i += config.validators.maxGroupSize) {
     valKeyGroups.push(
       valKeys.slice(i, Math.min(i + config.validators.maxGroupSize, valKeys.length))
@@ -159,12 +161,17 @@ module.exports = async (_deployer: any) => {
     // Append an index to the group name if there is more than one group.
     let groupName: string = config.validators.groupName
     if (valKeyGroups.length > 1) {
-      groupName += ` (${idx})`
+      groupName += ` (${idx + 1})`
     }
 
     console.info(`  Registering Validator Group: ${groupName} ...`)
-    const firstPrivateKey = groupKeys[0]
-    const account = await registerValidatorGroup(groupName, lockedGold, validators, firstPrivateKey)
+    const account = await registerValidatorGroup(
+      groupName,
+      lockedGold,
+      validators,
+      groupKeys[0],
+      truffle.networks[_networkName].from
+    )
 
     console.info('  * Registering Validators ...')
     await Promise.all(
