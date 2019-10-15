@@ -58,7 +58,7 @@ export class Backers extends React.Component<I18nProps & ScreenProps> {
 const styles = StyleSheet.create({
   backerContainer: { justifyContent: 'flex-end' },
   photo: {
-    height: 40,
+    height: 60,
     width: '100%',
   },
   photoList: {
