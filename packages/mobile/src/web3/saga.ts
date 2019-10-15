@@ -27,7 +27,7 @@ import {
   updateWeb3SyncProgress,
 } from 'src/web3/actions'
 import { addLocalAccount, getWebSocketProvider, isZeroSyncMode, web3 } from 'src/web3/contracts'
-import { currentAccountSelector, zeroSyncSelector } from 'src/web3/selectors'
+import { currentAccountSelector } from 'src/web3/selectors'
 import {
   assignDataKeyFromPrivateKey,
   ensureAccountInWeb3Keystore,
@@ -47,8 +47,7 @@ const BLOCK_CHAIN_CORRUPTION_ERROR = "Error: CONNECTION ERROR: Couldn't connect 
 
 // checks if web3 claims it is currently syncing and attempts to wait for it to complete
 export function* checkWeb3SyncProgress() {
-  const zeroSyncMode: boolean = yield select(zeroSyncSelector)
-  if (zeroSyncMode) {
+  if (isZeroSyncMode()) {
     // In this mode, the check seems to fail with
     // web3/saga/checking web3 sync progress: Error: Invalid JSON RPC response: "":
     return true
@@ -177,8 +176,7 @@ export function* assignAccountFromPrivateKey(key: string) {
     account = getAccountAddressFromPrivateKey(key)
     yield savePrivateKeyToLocalDisk(account, key, pincode)
 
-    const zeroSyncMode: boolean = yield select(zeroSyncSelector)
-    if (zeroSyncMode) {
+    if (isZeroSyncMode()) {
       // If zero sync mode, add local account
       Logger.debug(TAG + '@assignAccountFromPrivateKey', 'Init web3 with private key')
       addLocalAccount(web3, key)
@@ -248,8 +246,7 @@ export function* unlockAccount(account: string) {
     }
 
     const pincode = yield call(getPincode)
-    const zeroSyncMode: boolean = yield select(zeroSyncSelector)
-    if (zeroSyncMode) {
+    if (isZeroSyncMode()) {
       if (accountAlreadyAddedInZeroSyncMode) {
         Logger.info(TAG + 'unlockAccount', `Account ${account} already added to web3 for signing`)
       } else {
