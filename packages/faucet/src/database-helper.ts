@@ -100,11 +100,7 @@ function buildHandleFaucet(request: RequestRecord, snap: DataSnapshot, config: N
     await snap.ref.update({ goldTxHash })
     await goldTx.waitReceipt()
 
-    const dollarTx = await celo.transferDollars(request.beneficiary, config.faucetDollarAmount)
-    const dollarTxHash = await dollarTx.getHash()
-    console.info(`req(${snap.key}): Dollar Transaction Sent. txhash:${dollarTxHash}`)
-    await snap.ref.update({ dollarTxHash })
-    await dollarTx.waitReceipt()
+    await sendDollars(celo, request.beneficiary, config.faucetDollarAmount, snap)
   }
 }
 
@@ -130,12 +126,7 @@ function buildHandleInvite(request: RequestRecord, snap: DataSnapshot, config: N
     // console.info(`req(${snap.key}): Gold Transaction Sent. txhash:${goldTxHash}`)
     // await snap.ref.update({ goldTxHash })
     // await goldTx.waitReceipt()
-
-    const dollarTx = await celo.transferDollars(tempAddress, config.inviteDollarAmount)
-    const dollarTxHash = await dollarTx.getHash()
-    console.info(`req(${snap.key}): Dollar Transaction Sent. txhash:${dollarTxHash}`)
-    await snap.ref.update({ dollarTxHash })
-    await dollarTx.waitReceipt()
+    const dollarTxHash = await sendDollars(celo, tempAddress, config.inviteDollarAmount, snap)
 
     const phoneHash = getPhoneHash(request.beneficiary)
     const escrowTx = await celo.escrowDollars(
@@ -157,6 +148,20 @@ function buildHandleInvite(request: RequestRecord, snap: DataSnapshot, config: N
       to: request.beneficiary,
     })
   }
+}
+
+async function sendDollars(
+  celo: CeloAdapter,
+  address: Address,
+  amount: string,
+  snap: DataSnapshot
+) {
+  const dollarTx = await celo.transferDollars(address, amount)
+  const dollarTxHash = await dollarTx.getHash()
+  console.info(`req(${snap.key}): Dollar Transaction Sent. txhash:${dollarTxHash}`)
+  await snap.ref.update({ dollarTxHash })
+  await dollarTx.waitReceipt()
+  return dollarTxHash
 }
 
 function messageText(inviteCode: string, request: RequestRecord) {
