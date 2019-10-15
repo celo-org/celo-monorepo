@@ -3,7 +3,6 @@ const nodeLibs = require('node-libs-react-native')
 const blacklist = require('metro-config/src/defaults/blacklist')
 const escapeStringRegexp = require('escape-string-regexp')
 const isE2E = process.env.CELO_TEST_CONFIG === 'e2e'
-const { resolve } = require('metro-resolver')
 
 const cwd = path.resolve(__dirname)
 const root = path.resolve(cwd, '../..')
