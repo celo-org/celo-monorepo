@@ -26,11 +26,19 @@ export enum RequestType {
   Invite = 'Invite',
 }
 
+enum MobileOS {
+  'andriod' = 'android',
+  ios = 'ios',
+}
+
 export interface RequestRecord {
   beneficiary: Address
   status: RequestStatus
-  txHash?: string
   type: RequestType
+  mobileOS?: MobileOS // only on invite
+  dollarTxHash?: string
+  goldTxHash?: string // only on faucet
+  escrowTxHash?: string // only on Invites
 }
 
 export async function processRequest(snap: DataSnapshot, pool: AccountPool, config: NetworkConfig) {
@@ -116,11 +124,12 @@ function buildHandleInvite(request: RequestRecord, snap: DataSnapshot, config: N
       config.goldTokenAddress
     )
     const { address: tempAddress, inviteCode } = generateInviteCode()
-    const goldTx = await celo.transferGold(tempAddress, config.inviteGoldAmount)
-    const goldTxHash = await goldTx.getHash()
-    console.info(`req(${snap.key}): Gold Transaction Sent. txhash:${goldTxHash}`)
-    await snap.ref.update({ goldTxHash })
-    await goldTx.waitReceipt()
+    // Dont need gold as fees are paid in dollars
+    // const goldTx = await celo.transferGold(tempAddress, config.inviteGoldAmount)
+    // const goldTxHash = await goldTx.getHash()
+    // console.info(`req(${snap.key}): Gold Transaction Sent. txhash:${goldTxHash}`)
+    // await snap.ref.update({ goldTxHash })
+    // await goldTx.waitReceipt()
 
     const dollarTx = await celo.transferDollars(tempAddress, config.inviteDollarAmount)
     const dollarTxHash = await dollarTx.getHash()
@@ -141,15 +150,28 @@ function buildHandleInvite(request: RequestRecord, snap: DataSnapshot, config: N
     await snap.ref.update({ escrowTxHash })
     await escrowTx.waitReceipt()
 
-    if (config.twilioClient) {
-      const messageText = `Hello! Thank you for joining the Celo network. Your invite code is: ${inviteCode} Download the app at https://play.google.com/store/apps/details?id=org.celo.mobile.alfajores`
-      await config.twilioClient.messages.create({
-        body: messageText,
-        from: config.twilioPhoneNumber,
-        to: request.beneficiary,
-      })
-    }
+    await config.twilioClient.messages.create({
+      body: messageText(inviteCode, request),
+      from: config.twilioPhoneNumber,
+      to: request.beneficiary,
+    })
   }
+}
+
+function messageText(inviteCode: string, request: RequestRecord) {
+  return `Hello! Thank you for joining the Celo network. Your invite code is: ${inviteCode} Download the app at ${downloadLink(
+    request.mobileOS as MobileOS
+  )}`
+}
+
+const IOS_URL = ''
+const ANDRIOD_URL = 'https://play.google.com/store/apps/details?id=org.celo.mobile.alfajores'
+
+function downloadLink(mobileOS: MobileOS) {
+  if (mobileOS === MobileOS.ios) {
+    return IOS_URL
+  }
+  return ANDRIOD_URL
 }
 
 function withTimeout<A>(
