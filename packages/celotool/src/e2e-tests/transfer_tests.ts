@@ -83,12 +83,24 @@ class InflationManager {
   }
 }
 
-const setGasCurrencyCost = async (validatorUri: string, validatorAddress: string, cost: number) => {
+const setGasParameters = async (
+  validatorUri: string,
+  validatorAddress: string,
+  creditCost: number,
+  debitCost: number,
+  readCost: number
+) => {
   const kit = newKit(validatorUri)
   kit.defaultAccount = validatorAddress
   const parameters = await kit.contracts.getBlockchainParameters()
   await parameters
-    .setGasForNonGoldCurrencies(cost.toString())
+    .setGasForCreditToTransactions(creditCost.toString())
+    .sendAndWaitForReceipt({ from: validatorAddress })
+  await parameters
+    .setGasForDebitFromTransactions(debitCost.toString())
+    .sendAndWaitForReceipt({ from: validatorAddress })
+  await parameters
+    .setGasToReadErc20Balance(readCost.toString())
     .sendAndWaitForReceipt({ from: validatorAddress })
 }
 
@@ -439,7 +451,7 @@ describe('Transfer tests', function(this: any) {
       )
     })
   }
-
+  /*
   describe('Normal Transfer >', () => {
     before(restartWithCleanNodes)
 
@@ -571,7 +583,7 @@ describe('Transfer tests', function(this: any) {
       })
     }
   })
-
+*/
   describe('Transfer with changed cost >', () => {
     before(restartWithCleanNodes)
 
@@ -580,7 +592,7 @@ describe('Transfer tests', function(this: any) {
         before(`start geth on sync: ${syncMode}`, async () => {
           try {
             await startSyncNode(syncMode)
-            await setGasCurrencyCost('http://localhost:8545', validatorAddress, 34000)
+            await setGasParameters('http://localhost:8545', validatorAddress, 0, 34000, 0)
           } catch (err) {
             console.debug('some error', err)
           }
