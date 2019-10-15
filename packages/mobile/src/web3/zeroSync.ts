@@ -15,21 +15,42 @@ export function* ensureAccountInWeb3Keystore() {
   const currentAccount = yield select(currentAccountSelector)
   if (currentAccount) {
     const accountInWeb3Keystore = yield select(currentAccountInWeb3KeystoreSelector)
+    const pincode = yield call(getPincode)
+    const privateKey: string = yield readPrivateKeyFromLocalDisk(currentAccount, pincode)
+
     if (!accountInWeb3Keystore) {
+      // If account not in keystore, this is the first time running geth (started in zeroSync)
       Logger.debug(
         TAG + '@ensureAccountInWeb3Keystore',
         'Importing account from private key to web3 keystore'
       )
-      const pincode = yield call(getPincode)
-      const privateKey: string = yield readPrivateKeyFromLocalDisk(currentAccount, pincode)
-      const account = yield call(addAccountToWeb3Keystore, privateKey, currentAccount, pincode)
-      return account
+      yield call(addAccountToWeb3Keystore, privateKey, currentAccount, pincode)
+      return true
     } else {
-      // TODO check that account and accountInWeb3Keystore are the same
-      return accountInWeb3Keystore
+      // If account is in keystore, ensure it matches the private key saved locally
+      ensureAddressAndKeyMatch(accountInWeb3Keystore, privateKey)
+      return true
     }
   } else {
-    throw new Error('Account not yet initialized') // TODO(anna) decide how to handle this
+    throw new Error('Account not yet initialized')
+  }
+}
+
+export function* ensureAccountSavedLocally(account: string) {
+  const filePath = getPrivateKeyFilePath(account)
+  Logger.debug('ensureAccountSavedLocally', `Reading encrypted private key from ${filePath}`)
+  const fileExists: boolean = yield call(RNFS.exists, filePath)
+  if (fileExists) {
+    const hexEncodedEncryptedData: string = yield call(RNFS.readFile, filePath)
+    Logger.debug(
+      'ensureAccountSavedLocally',
+      `Found encrypted private key: ${hexEncodedEncryptedData}`
+    )
+    const pincode = yield call(getPincode)
+    yield call(readPrivateKeyFromLocalDisk, account, pincode)
+    return true
+  } else {
+    throw new Error(`Could not find private key on local disk at path ${filePath}`)
   }
 }
 
@@ -39,7 +60,7 @@ export function* assignDataKeyFromPrivateKey(key: string) {
 }
 
 function getPrivateKeyFilePath(account: string): string {
-  return `${RNFS.DocumentDirectoryPath}/private_key_for_${account}.txt`
+  return `${RNFS.DocumentDirectoryPath}/private_key_for_${account.toLowerCase()}.txt`
 }
 
 function ensureAddressAndKeyMatch(address: string, privateKey: string) {

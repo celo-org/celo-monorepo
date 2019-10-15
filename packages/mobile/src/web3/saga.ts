@@ -9,6 +9,7 @@ import { CustomEventNames } from 'src/analytics/constants'
 import { ErrorMessages } from 'src/app/ErrorMessages'
 import { currentLanguageSelector } from 'src/app/reducers'
 import { getWordlist } from 'src/backup/utils'
+import { DEFAULT_INFURA_URL } from 'src/config'
 import { UNLOCK_DURATION } from 'src/geth/consts'
 import { deleteChainData } from 'src/geth/geth'
 import { navigateToError } from 'src/navigator/NavigationService'
@@ -25,11 +26,12 @@ import {
   setZeroSyncMode,
   updateWeb3SyncProgress,
 } from 'src/web3/actions'
-import { addLocalAccount, switchWeb3ProviderForSyncMode, web3 } from 'src/web3/contracts'
+import { addLocalAccount, getWebSocketProvider, isZeroSyncMode, web3 } from 'src/web3/contracts'
 import { currentAccountSelector, zeroSyncSelector } from 'src/web3/selectors'
 import {
   assignDataKeyFromPrivateKey,
   ensureAccountInWeb3Keystore,
+  ensureAccountSavedLocally,
   readPrivateKeyFromLocalDisk,
   savePrivateKeyToLocalDisk,
 } from 'src/web3/zeroSync'
@@ -289,7 +291,6 @@ export function* getConnectedUnlockedAccount() {
 export function* switchToGethFromZeroSync() {
   const account = yield call(ensureAccountInWeb3Keystore)
   setZeroSyncMode(false)
-  switchWeb3ProviderForSyncMode(false)
   Logger.debug(
     TAG + '@switchToGethFromZeroSync',
     'Imported account from private key to web3 keystore',
@@ -304,16 +305,22 @@ export function* switchToGethFromZeroSync() {
 export function* switchToZeroSyncFromGeth() {
   Logger.debug(TAG + 'Switching to zero sync from geth..')
   setZeroSyncMode(true)
-  switchWeb3ProviderForSyncMode(true)
-  return true // TODO(anna) maybe return account instead?
+  web3.setProvider(getWebSocketProvider(DEFAULT_INFURA_URL))
+  const account = yield call(getConnectedAccount)
+  yield call(ensureAccountSavedLocally, account)
+  Logger.debug(TAG + '@switchToZeroSyncFromGeth', ` zero sync mode is now: ${isZeroSyncMode()}`)
+  return true
 }
 
 export function* switchZeroSyncMode(action: SetIsZeroSyncAction) {
-  Logger.debug(TAG + '@switchZeroSyncMode', ` to: ${action.zeroSyncMode}`)
+  Logger.debug(
+    TAG + '@switchZeroSyncMode',
+    ` zero sync mode will change to: ${action.zeroSyncMode}`
+  )
   if (action.zeroSyncMode) {
-    yield call(switchToGethFromZeroSync)
-  } else {
     yield call(switchToZeroSyncFromGeth)
+  } else {
+    yield call(switchToGethFromZeroSync)
   }
 }
 

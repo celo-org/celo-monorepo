@@ -25,7 +25,7 @@ import { sendTransaction } from 'src/transactions/send'
 import { getRateForMakerToken, getTakerAmount } from 'src/utils/currencyExchange'
 import { roundDown } from 'src/utils/formatting'
 import Logger from 'src/utils/Logger'
-import { web3 } from 'src/web3/contracts'
+import { isZeroSyncMode, web3 } from 'src/web3/contracts'
 import { getConnectedAccount, getConnectedUnlockedAccount } from 'src/web3/saga'
 import * as util from 'util'
 
@@ -120,7 +120,8 @@ export function* doFetchExchangeRate(makerAmount?: BigNumber, makerToken?: CURRE
       TAG,
       `Retrieved exchange rate: 
       ${dollarMakerExchangeRate.toString()} gold per dollar, estimated at ${dollarMakerAmount}
-      ${goldMakerExchangeRate.toString()} dollar per gold, estimated at ${goldMakerAmount}`
+      ${goldMakerExchangeRate.toString()} dollar per gold, estimated at ${goldMakerAmount}
+      using zero sync mode: ${isZeroSyncMode().toString()}`
     )
 
     yield put(

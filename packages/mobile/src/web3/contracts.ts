@@ -68,7 +68,7 @@ function getWeb3HttpProviderForIos(): Provider {
   return httpProvider
 }
 
-function getWebSocketProvider(url: string): Provider {
+export function getWebSocketProvider(url: string): Provider {
   Logger.debug(tag, 'creating HttpProvider...')
   const provider = new Web3.providers.HttpProvider(url)
   Logger.debug(tag, 'created HttpProvider')
@@ -99,23 +99,20 @@ function getInitialWeb3(): Web3 {
   }
 }
 
-// Mutates web3 provider
-export function switchWeb3ProviderForSyncMode(zeroSync: boolean) {
-  // TODO(anna) ensure this works with iOS providers
-  if (zeroSync) {
-    const url = DEFAULT_INFURA_URL
-    Logger.debug('contracts@getWeb3', `Connecting to url ${url}`)
-    web3.setProvider(getWebSocketProvider(url))
-  } else {
-    web3.setProvider(getIpcProvider(DEFAULT_TESTNET))
-  }
-}
-
 export function isZeroSyncMode() {
-  if (web3.currentProvider instanceof Web3.providers.HttpProvider) {
-    return true
+  if (web3) {
+    Logger.debug('@isZeroSyncMode', `Current provider ${web3.currentProvider}`)
+    if (web3.currentProvider instanceof Web3.providers.HttpProvider) {
+      Logger.debug('@isZeroSyncMode', `is Http provider!`)
+      return true
+    }
+    Logger.debug('@isZeroSyncMode', `is not Http provider!`)
+    return false
+  } else {
+    // If web3 not initialized, return initial value
+    Logger.debug('@isZeroSyncMode', `web3 not yet intialized`)
+    return isInitiallyZeroSyncMode()
   }
-  return false
 }
 
 export function addLocalAccount(web3Instance: Web3, privateKey: string) {
