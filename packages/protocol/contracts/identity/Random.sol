@@ -95,7 +95,7 @@ contract Random is IRandom, Ownable, Initializable {
     } else if (historySize == randomnessBlockRetentionWindow) {
       delete history[historyFirst];
       historyFirst++;
-    } else /* historySize < randomnessBlockRetentionWindow) */ {
+    } else /* historySize < randomnessBlockRetentionWindow */ {
       historySize++;
     }
   }
