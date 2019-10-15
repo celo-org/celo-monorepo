@@ -58,4 +58,9 @@ post_install do |installer|
       config.build_settings["ENABLE_BITCODE"] = "NO"
     end
   end
+
+  rnfirebase = installer.pods_project.targets.find { |target| target.name == "RNFirebase" }
+  rnfirebase.build_configurations.each do |config|
+    config.build_settings["HEADER_SEARCH_PATHS"] = "$(inherited) ${PODS_ROOT}/Headers/Public/**"
+  end
 end

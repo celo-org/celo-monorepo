@@ -313,6 +313,8 @@ PODS:
     - React
   - react-native-splash-screen (3.2.0):
     - React
+  - react-native-tcp (3.3.0):
+    - React
   - react-native-udp (2.6.1):
     - React
   - react-native-version-check (3.3.0):
@@ -443,6 +445,7 @@ DEPENDENCIES:
   - "react-native-netinfo (from `../node_modules/@react-native-community/netinfo`)"
   - react-native-safe-area-context (from `../../../node_modules/react-native-safe-area-context`)
   - react-native-splash-screen (from `../node_modules/react-native-splash-screen`)
+  - react-native-tcp (from `../../../node_modules/react-native-tcp`)
   - react-native-udp (from `../../../node_modules/react-native-udp`)
   - react-native-version-check (from `../../../node_modules/react-native-version-check`)
   - react-native-webview (from `../../../node_modules/react-native-webview`)
@@ -549,6 +552,8 @@ EXTERNAL SOURCES:
     :path: "../../../node_modules/react-native-safe-area-context"
   react-native-splash-screen:
     :path: "../node_modules/react-native-splash-screen"
+  react-native-tcp:
+    :path: "../../../node_modules/react-native-tcp"
   react-native-udp:
     :path: "../../../node_modules/react-native-udp"
   react-native-version-check:
@@ -655,6 +660,7 @@ SPEC CHECKSUMS:
   react-native-netinfo: 6bb847e64f45a2d69c6173741111cfd95c669301
   react-native-safe-area-context: 13004a45f3021328fdd9ee1f987c3131fb65928d
   react-native-splash-screen: 200d11d188e2e78cea3ad319964f6142b6384865
+  react-native-tcp: e1a8c3ac010774cd71811989805ff3eaebb62f17
   react-native-udp: 54a1aa9bf5c0824f930b1ba6dbfb3fd3e733bba9
   react-native-version-check: 7d578f3405cd9d673bbfd1225f727c87991e9ef9
   react-native-webview: e800df5dd1a0f3555fd543ebf7d881a9014851f2
@@ -688,6 +694,6 @@ SPEC CHECKSUMS:
   Sentry: 26650184fe71eb7476dfd2737acb5ea6cc64b4b1
   Yoga: 14927e37bd25376d216b150ab2a561773d57911f
 
-PODFILE CHECKSUM: 8eaeb595f1c9fefc9591ebaf8ec34a47edd02200
+PODFILE CHECKSUM: 0d3a8018c6a563abba8559d74620bf8b8b370fe8
 
 COCOAPODS: 1.7.5
