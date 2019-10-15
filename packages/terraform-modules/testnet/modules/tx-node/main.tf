@@ -19,6 +19,8 @@ resource "google_compute_instance" "tx_node" {
 
   count = var.tx_node_count
 
+  tags = ["${var.celo_env}-node"]
+
   allow_stopping_for_update = true
 
   boot_disk {

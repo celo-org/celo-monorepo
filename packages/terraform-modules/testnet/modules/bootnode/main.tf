@@ -11,6 +11,8 @@ resource "google_compute_instance" "bootnode" {
   name         = local.name_prefix
   machine_type = "n1-standard-1"
 
+  tags = [local.name_prefix]
+
   allow_stopping_for_update = true
 
   boot_disk {
