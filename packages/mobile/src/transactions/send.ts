@@ -10,7 +10,7 @@ import CeloAnalytics from 'src/analytics/CeloAnalytics'
 import { CustomEventNames } from 'src/analytics/constants'
 import { DEFAULT_INFURA_URL } from 'src/config'
 import Logger from 'src/utils/Logger'
-import { web3 } from 'src/web3/contracts'
+import { isZeroSyncMode, web3 } from 'src/web3/contracts'
 import { TransactionObject } from 'web3/eth/types'
 
 // As per https://www.typescriptlang.org/docs/handbook/advanced-types.html#exhaustiveness-checking
@@ -61,7 +61,6 @@ export const sendTransactionPromises = async (
   account: string,
   tag: string,
   txId: string,
-  zeroSyncMode: boolean,
   staticGas?: number | undefined
 ) => {
   Logger.debug(
@@ -69,8 +68,9 @@ export const sendTransactionPromises = async (
     `Going to send a transaction with id ${txId}`
   )
   const stableToken = await getStableTokenContract(web3)
+
   // This if-else case is temprary and will disappear once we move from `walletkit` to `contractkit`.
-  if (zeroSyncMode) {
+  if (isZeroSyncMode()) {
     // In dev mode, verify that we are actually able to connect to the network. This
     // ensures that we get a more meaningful error if the infura server is down, which
     // can happen with networks without SLA guarantees like `integration`.
@@ -105,12 +105,9 @@ export const sendTransaction = async (
   account: string,
   tag: string,
   txId: string,
-  zeroSyncMode: boolean,
   staticGas?: number | undefined
 ) => {
-  return sendTransactionPromises(tx, account, tag, txId, zeroSyncMode, staticGas).then(
-    awaitConfirmation
-  )
+  return sendTransactionPromises(tx, account, tag, txId, staticGas).then(awaitConfirmation)
 }
 
 async function verifyUrlWorksOrThrow(url: string) {
