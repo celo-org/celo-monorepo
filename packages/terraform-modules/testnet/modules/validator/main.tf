@@ -16,6 +16,8 @@ resource "google_compute_instance" "validator" {
 
   count = var.validator_count
 
+  tags = ["${var.celo_env}-node"]
+
   allow_stopping_for_update = true
 
   boot_disk {
@@ -45,6 +47,8 @@ resource "google_compute_instance" "validator" {
       gcloud_secrets_base_path : var.gcloud_secrets_base_path,
       gcloud_secrets_bucket : var.gcloud_secrets_bucket,
       genesis_content_base64 : var.genesis_content_base64,
+      geth_exporter_docker_image_repository : var.geth_exporter_docker_image_repository,
+      geth_exporter_docker_image_tag : var.geth_exporter_docker_image_tag,
       geth_node_docker_image_repository : var.geth_node_docker_image_repository,
       geth_node_docker_image_tag : var.geth_node_docker_image_tag,
       geth_verbosity : var.geth_verbosity,
