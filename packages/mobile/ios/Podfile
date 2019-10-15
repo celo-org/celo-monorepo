@@ -2,11 +2,6 @@
 platform :ios, "9.0"
 require_relative "../../../node_modules/@react-native-community/cli-platform-ios/native_modules"
 
-pre_install do |installer|
-  # workaround for CocoaPods/CocoaPods#3289
-  Pod::Installer::Xcode::TargetValidator.send(:define_method, :verify_no_static_framework_transitive_dependencies) { }
-end
-
 target "celo" do
   use_frameworks!
 
@@ -40,8 +35,8 @@ target "celo" do
   pod "glog", :podspec => "../../../node_modules/react-native/third-party-podspecs/glog.podspec"
   pod "Folly", :podspec => "../../../node_modules/react-native/third-party-podspecs/Folly.podspec"
 
-  # pod "react-native-geth", :path => "../../../node_modules/react-native-geth"
-  # pod 'CeloBlockchain', :path => '../../../node_modules/@celo/client/CeloBlockchain.podspec'
+  pod "react-native-geth", :path => "../../../node_modules/react-native-geth"
+  pod "CeloBlockchain", :path => "../../../node_modules/@celo/client/CeloBlockchain.podspec"
 
   pod "Firebase/Core", "~> 5.20.2"
   pod "Firebase/Auth"

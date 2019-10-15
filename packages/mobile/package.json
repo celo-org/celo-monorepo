@@ -47,7 +47,7 @@
     ]
   },
   "dependencies": {
-    "@celo/client": "640a41f",
+    "@celo/client": "691d471",
     "@celo/react-components": "1.0.0",
     "@celo/react-native-sms-retriever": "git+https://github.com/celo-org/react-native-sms-retriever#b88e502",
     "@celo/utils": "^0.1.1",
@@ -96,7 +96,7 @@
     "react-native-flag-secure-android": "git://github.com/kristiansorens/react-native-flag-secure-android#e234251",
     "react-native-fs": "^2.14.1",
     "react-native-gesture-handler": "^1.4.1",
-    "react-native-geth": "git+https://github.com/celo-org/react-native-geth#4d9ee15",
+    "react-native-geth": "https://github.com/celo-org/react-native-geth#8ba5091",
     "react-native-install-referrer": "git://github.com/celo-org/react-native-install-referrer#343bf3d",
     "react-native-keep-awake": "^4.0.0",
     "react-native-keyboard-aware-scroll-view": "^0.9.1",
@@ -120,7 +120,7 @@
     "react-native-splash-screen": "^3.2.0",
     "react-native-svg": "^9.11.1",
     "react-native-swiper": "^1.5.14",
-    "react-native-tcp": "git://github.com/cmcewen/react-native-tcp#62986b4",
+    "react-native-tcp": "https://github.com/cmcewen/react-native-tcp#408b674",
     "react-native-udp": "git+https://github.com/celo-org/react-native-udp#730f295",
     "react-native-version-check": "^3.3.0",
     "react-native-webview": "^7.4.1",
