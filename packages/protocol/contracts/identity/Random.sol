@@ -68,7 +68,10 @@ contract Random is IRandom, Ownable, Initializable {
     if (commitments[proposer] != 0) {
       require(randomness != 0, "randomness cannot be zero if there is a previous commitment");
       bytes32 expectedCommitment = computeCommitment(randomness);
-      require(expectedCommitment == commitments[proposer], "commitment didn't match the posted randomness");
+      require(
+        expectedCommitment == commitments[proposer],
+        "commitment didn't match the posted randomness"
+      );
     } else {
       require(randomness == 0, "randomness should be zero if there is no previous commitment");
     }
