@@ -11,5 +11,5 @@ echo "Building sdk for testnet $DEFAULT_TESTNET"
 yarn build:sdk $DEFAULT_TESTNET
 echo "Done building sdk"
 echo "Jetifying react native libraries"
-yarn --cwd celo jetify;
+cd ../../ && yarn run jetify
 echo "Jetified"
