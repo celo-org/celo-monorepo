@@ -13,6 +13,7 @@ import "../common/Initializable.sol";
 import "../governance/UsingLockedGold.sol";
 import "../common/UsingRegistry.sol";
 import "../common/Signatures.sol";
+import "../common/SafeCast.sol";
 
 
 /**
@@ -29,9 +30,7 @@ contract Attestations is
 
 
   using SafeMath for uint256;
-  using SafeMath for uint128;
-  using SafeMath for uint96;
-  using SafeMath for uint32;
+  using SafeCast for uint256;
 
   event AttestationsRequested(
     bytes32 indexed identifier,
@@ -40,7 +39,7 @@ contract Attestations is
     address attestationRequestFeeToken
   );
 
-  event AttestationIssuersRevealed(
+  event AttestationIssuersSelected(
     bytes32 indexed identifier,
     address indexed account,
     uint256 attestationsRequested,
@@ -104,7 +103,7 @@ contract Attestations is
 
   struct Account {
     // The block number of the most recent attestation request
-    uint96 mostRecentAttestationRequest;
+    uint64 mostRecentAttestationRequest;
 
     // The address at which the account expects to receive transfers
     address walletAddress;
@@ -123,7 +122,8 @@ contract Attestations is
   }
 
   // Stores attestations state for a single (identifier, account address) pair.
-  struct AttestationsMapping {
+  struct AttestedAddress {
+    // Number of requested attestations
     uint32 requested;
     // Number of completed attestations
     uint32 completed;
@@ -144,7 +144,7 @@ contract Attestations is
   struct IdentifierState {
     // All account addresses associated with this identifier
     address[] accounts;
-    mapping(address => AttestationsMapping) attestations;
+    mapping(address => AttestedAddress) attestations;
     mapping(address => AttestationRequest) requests;
   }
 
@@ -219,8 +219,6 @@ contract Attestations is
 
     require(attestationsRequested > 0, "You have to request at least 1 attestation");
 
-    IdentifierState storage state = identifiers[identifier];
-
     if (accounts[msg.sender].attestationRequestFeeToken != address(0x0)) {
       require(
         !isAttestationRequestBlockTimeValid(accounts[msg.sender].mostRecentAttestationRequest) ||
@@ -229,24 +227,25 @@ contract Attestations is
       );
     }
 
-    if(state.requests[msg.sender].blockNumber != 0) {
+    IdentifierState storage state = identifiers[identifier];
+    if(state.requests[msg.sender].blockNumber > 0) {
+      // TODO: This should be bound by Random#randomnessBlockRetentionWindow once that gets merged
       require(
         !isAttestationRequestBlockTimeValid(accounts[msg.sender].mostRecentAttestationRequest),
         "Currently active attestation request that has to be revealed first"
       );
     }
 
-
-    state.requests[msg.sender].blockNumber = uint128(block.number);
-    state.requests[msg.sender].attestationsRequested = uint128(attestationsRequested);
+    state.requests[msg.sender].blockNumber = block.number.toUint128();
+    state.requests[msg.sender].attestationsRequested = attestationsRequested.toUint128();
 
     // solhint-disable-next-line not-rely-on-time
-    accounts[msg.sender].mostRecentAttestationRequest = uint96(block.number);
+    accounts[msg.sender].mostRecentAttestationRequest = block.number.toUint64();
     accounts[msg.sender].attestationRequestFeeToken = attestationRequestFeeToken;
 
-    state.attestations[msg.sender].requested = uint32(
-      state.attestations[msg.sender].requested.add(attestationsRequested)
-    );
+    state.attestations[msg.sender].requested = uint256(
+      state.attestations[msg.sender].requested
+      ).add(attestationsRequested).toUint32();
 
     emit AttestationsRequested(
       identifier,
@@ -257,10 +256,10 @@ contract Attestations is
   }
 
   /**
-   * @notice Reveals the issuers for the most recent attestation request.
+   * @notice Selects the issuers for the most recent attestation request.
    * @param identifier The hash of the identifier to be attested.
    */
-  function revealIssuers(bytes32 identifier) external {
+  function selectIssuers(bytes32 identifier) external {
     IdentifierState storage state = identifiers[identifier];
 
     require(
@@ -273,7 +272,7 @@ contract Attestations is
       state.attestations[msg.sender]
     );
 
-    emit AttestationIssuersRevealed(
+    emit AttestationIssuersSelected(
       identifier,
       msg.sender,
       state.requests[msg.sender].attestationsRequested,
@@ -342,7 +341,7 @@ contract Attestations is
       identifiers[identifier].attestations[msg.sender].issuedAttestations[issuer];
 
     // solhint-disable-next-line not-rely-on-time
-    attestation.blockNumber = uint128(block.number);
+    attestation.blockNumber = block.number.toUint128();
     attestation.status = AttestationStatus.Complete;
     identifiers[identifier].attestations[msg.sender].completed++;
 
@@ -831,7 +830,7 @@ contract Attestations is
    */
   function addIncompleteAttestations(
     uint256 n,
-    AttestationsMapping storage state
+    AttestedAddress storage state
   )
     internal
   {
@@ -866,6 +865,6 @@ contract Attestations is
 
   function isAttestationRequestBlockTimeValid(uint128 attestationRequestBlockTime) internal view returns (bool) {
     // solhint-disable-next-line not-rely-on-time
-    return block.number < attestationRequestBlockTime.add(attestationExpiryBlocks);
+    return block.number < uint256(attestationRequestBlockTime).add(attestationExpiryBlocks);
   }
 }
