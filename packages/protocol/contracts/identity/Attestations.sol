@@ -306,7 +306,10 @@ contract Attestations is
     );
 
     // solhint-disable-next-line not-rely-on-time
-    require(isAttestationRequestBlockTimeValid(attestation.blockNumber), "Attestation request timed out");
+    require(
+      isAttestationRequestBlockTimeValid(attestation.blockNumber),
+      "Attestation request timed out"
+    );
 
     // Generate the yet-to-be-signed attestation code that will be signed and sent to the
     // encrypted phone number via SMS via the 'RequestAttestation' precompiled contract.
@@ -769,7 +772,10 @@ contract Attestations is
       "Attestation code does not match any outstanding attestation"
     );
     // solhint-disable-next-line not-rely-on-time
-    require(isAttestationRequestBlockTimeValid(attestation.blockNumber), "Attestation request timed out");
+    require(
+      isAttestationRequestBlockTimeValid(attestation.blockNumber),
+      "Attestation request timed out"
+    );
 
     return issuer;
   }
@@ -863,7 +869,13 @@ contract Attestations is
     }
   }
 
-  function isAttestationRequestBlockTimeValid(uint128 attestationRequestBlockTime) internal view returns (bool) {
+  function isAttestationRequestBlockTimeValid(
+    uint128 attestationRequestBlockTime
+  )
+    internal
+    view
+    returns (bool)
+  {
     // solhint-disable-next-line not-rely-on-time
     return block.number < uint256(attestationRequestBlockTime).add(attestationExpiryBlocks);
   }
