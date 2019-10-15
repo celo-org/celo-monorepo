@@ -2243,10 +2243,10 @@
     lodash "^4.17.13"
     to-fast-properties "^2.0.0"
 
-"@celo/client@c1ae452":
-  version "0.0.155"
-  resolved "https://registry.yarnpkg.com/@celo/client/-/client-0.0.155.tgz#71f658ba39f66d28dedc2c424b983306dd335d7e"
-  integrity sha512-vSKYdJy649CHVBcpzHxeI2MNH9wZA4AsJJdRyDW9etzkeIBbHm1eL1pkUrxgeY/96nWb20YhjC+NL8cmujiqQQ==
+"@celo/client@691d471":
+  version "0.0.156"
+  resolved "https://registry.yarnpkg.com/@celo/client/-/client-0.0.156.tgz#00c738c2988086aca84f585deae018ad95d743e8"
+  integrity sha512-ql8tsyZrMIuuYHbSjNt6IUT/hvEC51MCePcPAt6OLrmlKqBI8xOGAlinuFxo8LuPNHnqBgYc/FoX2Jww3HbCPQ==
 
 "@celo/contractkit@0.1.1":
   version "0.1.1"
@@ -26201,9 +26201,9 @@ react-native-gesture-handler@^1.1.0:
     invariant "^2.2.2"
     prop-types "^15.5.10"
 
-"react-native-geth@git+https://github.com/celo-org/react-native-geth#4d9ee15":
+"react-native-geth@https://github.com/celo-org/react-native-geth#8ba5091":
   version "0.1.0-development"
-  resolved "git+https://github.com/celo-org/react-native-geth#4d9ee15f212a32a1f865a6fd121117130ea71de9"
+  resolved "https://github.com/celo-org/react-native-geth#8ba5091d232f58913026b2df1f2b834e2e0108d0"
 
 "react-native-install-referrer@git://github.com/celo-org/react-native-install-referrer#343bf3d":
   version "2.0.0"
@@ -26399,9 +26399,9 @@ react-native-tab-view@^1.2.0, react-native-tab-view@^1.3.4:
   dependencies:
     prop-types "^15.6.1"
 
-"react-native-tcp@git://github.com/cmcewen/react-native-tcp#08f03c2":
+"react-native-tcp@https://github.com/cmcewen/react-native-tcp#408b674":
   version "3.3.0"
-  resolved "git://github.com/cmcewen/react-native-tcp#08f03c2113570baf9beef85abef83748f005199e"
+  resolved "https://github.com/cmcewen/react-native-tcp#408b674f20df4bfc1e6e80e54e7663c91a0f7b67"
   dependencies:
     base64-js "0.0.8"
     buffer "^5.0.0"
