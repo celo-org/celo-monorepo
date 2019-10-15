@@ -22,15 +22,6 @@ export abstract class BaseWrapper<T extends Contract> {
   }
 }
 
-export interface CeloTransactionObject<O> {
-  /** web3 native TransactionObject. Normally not used */
-  txo: TransactionObject<O>
-  /** send the transaction to the chain */
-  send(params?: Omit<Tx, 'data'>): Promise<TransactionResult>
-  /** send the transaction and waits for the receipt */
-  sendAndWaitForReceipt(params?: Omit<Tx, 'data'>): Promise<TransactionReceipt>
-}
-
 /** Parse string -> BigNumber */
 export function toBigNumber(input: string) {
   return new BigNumber(input)
@@ -205,18 +196,34 @@ export function proxySend<InputArgs extends any[], ParsedInputArgs extends any[]
   if (sendArgs.length === 2) {
     const methodFn = sendArgs[0]
     const preParse = sendArgs[1]
-    return (...args: InputArgs) => wrapSend(kit, methodFn(...preParse(...args)))
+    return (...args: InputArgs) => toTransactionObject(kit, methodFn(...preParse(...args)))
   } else {
     const methodFn = sendArgs[0]
-    return (...args: InputArgs) => wrapSend(kit, methodFn(...args))
+    return (...args: InputArgs) => toTransactionObject(kit, methodFn(...args))
   }
 }
 
-export function wrapSend<O>(kit: ContractKit, txo: TransactionObject<O>): CeloTransactionObject<O> {
-  return {
-    send: (params?: Omit<Tx, 'data'>) => kit.sendTransactionObject(txo, params),
-    txo,
-    sendAndWaitForReceipt: (params?: Omit<Tx, 'data'>) =>
-      kit.sendTransactionObject(txo, params).then((result) => result.waitReceipt()),
+export function toTransactionObject<O>(
+  kit: ContractKit,
+  txo: TransactionObject<O>,
+  defaultParams?: Omit<Tx, 'data'>
+): CeloTransactionObject<O> {
+  return new CeloTransactionObject(kit, txo, defaultParams)
+}
+
+export class CeloTransactionObject<O> {
+  constructor(
+    private kit: ContractKit,
+    readonly txo: TransactionObject<O>,
+    readonly defaultParams?: Omit<Tx, 'data'>
+  ) {}
+
+  /** send the transaction to the chain */
+  send = (params?: Omit<Tx, 'data'>): Promise<TransactionResult> => {
+    return this.kit.sendTransactionObject(this.txo, { ...this.defaultParams, ...params })
   }
+
+  /** send the transaction and waits for the receipt */
+  sendAndWaitForReceipt = (params?: Omit<Tx, 'data'>): Promise<TransactionReceipt> =>
+    this.send(params).then((result) => result.waitReceipt())
 }
