@@ -5,7 +5,11 @@ import Table from 'cli-table'
 import { cli } from 'cli-ux'
 import { Tx } from 'web3/eth/types'
 
-export async function displaySendTx<A>(name: string, txObj: CeloTransactionObject<A>, tx?: Tx) {
+export async function displaySendTx<A>(
+  name: string,
+  txObj: CeloTransactionObject<A>,
+  tx?: Omit<Tx, 'data'>
+) {
   cli.action.start(`Sending Transaction: ${name}`)
   const txResult = await txObj.send(tx)
 
