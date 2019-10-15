@@ -16,8 +16,6 @@ contract Random is IRandom, Ownable, Initializable {
   /* Stores most recent commitment per address */
   mapping(address => bytes32) public commitments;
 
-  bytes32 public _random;
-
   uint256 public randomnessBlockRetentionWindow = 256;
 
   mapping (uint256 => bytes32) private history;
@@ -76,13 +74,12 @@ contract Random is IRandom, Ownable, Initializable {
     }
 
     // add entropy
-    addRandomness(block.number, keccak256(abi.encodePacked(_random, randomness)));
+    addRandomness(block.number, keccak256(abi.encodePacked(history[block.number-1], randomness)));
 
     commitments[proposer] = newCommitment;
   }
 
   function addRandomness(uint blockNumber, bytes32 randomness) internal {
-    _random = randomness;
     history[blockNumber] = randomness;
     if (historySize == 0) {
       historyFirst = block.number;
@@ -105,7 +102,11 @@ contract Random is IRandom, Ownable, Initializable {
   }
 
   function random() external view returns (bytes32) {
-    return _random;
+    return _getBlockRandomness(block.number, block.number);
+  }
+
+  function _random() external view returns (bytes32) {
+    return _getBlockRandomness(block.number, block.number);
   }
 
   /**
