@@ -7,6 +7,7 @@ import {
   Address,
   E164Number,
   NETWORK,
+  MobileOS,
   RequestRecord,
   RequestStatus,
   RequestType,
@@ -44,7 +45,7 @@ async function getDB(): Promise<firebase.database.Database> {
 export async function sendRequest(
   beneficiary: Address | E164Number,
   type: RequestType,
-  mobileOS: string
+  mobileOS: MobileOS
 ) {
   const newRequest: RequestRecord = {
     beneficiary,
