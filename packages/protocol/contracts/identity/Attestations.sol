@@ -32,67 +32,6 @@ contract Attestations is
   using SafeMath for uint256;
   using SafeCast for uint256;
 
-  event AttestationsRequested(
-    bytes32 indexed identifier,
-    address indexed account,
-    uint256 attestationsRequested,
-    address attestationRequestFeeToken
-  );
-
-  event AttestationIssuersSelected(
-    bytes32 indexed identifier,
-    address indexed account,
-    uint256 attestationsRequested,
-    address attestationRequestFeeToken
-  );
-
-  event AttestationCompleted(
-    bytes32 indexed identifier,
-    address indexed account,
-    address indexed issuer
-  );
-
-  event Withdrawal(
-    address indexed account,
-    address indexed token,
-    uint256 amount
-  );
-
-  event AttestationExpiryBlocksSet(
-    uint256 value
-  );
-
-  event AttestationRequestFeeSet(
-    address indexed token,
-    uint256 value
-  );
-
-  event AttestorAuthorized(
-    address indexed account,
-    address attestor
-  );
-
-  event AccountDataEncryptionKeySet(
-    address indexed account,
-    bytes dataEncryptionKey
-  );
-
-  event AccountMetadataURLSet(
-    address indexed account,
-    string metadataURL
-  );
-
-  event AccountWalletAddressSet(
-    address indexed account,
-    address walletAddress
-  );
-
-  enum AttestationStatus {
-    None,
-    Incomplete,
-    Complete
-  }
-
   struct Attestation {
     AttestationStatus status;
 
@@ -166,6 +105,67 @@ contract Attestations is
 
   // Maps a token and attestation issuer to the amount that they're owed.
   mapping(address => mapping(address => uint256)) public pendingWithdrawals;
+
+  event AttestationsRequested(
+    bytes32 indexed identifier,
+    address indexed account,
+    uint256 attestationsRequested,
+    address attestationRequestFeeToken
+  );
+
+  event AttestationIssuersSelected(
+    bytes32 indexed identifier,
+    address indexed account,
+    uint256 attestationsRequested,
+    address attestationRequestFeeToken
+  );
+
+  event AttestationCompleted(
+    bytes32 indexed identifier,
+    address indexed account,
+    address indexed issuer
+  );
+
+  event Withdrawal(
+    address indexed account,
+    address indexed token,
+    uint256 amount
+  );
+
+  event AttestationExpiryBlocksSet(
+    uint256 value
+  );
+
+  event AttestationRequestFeeSet(
+    address indexed token,
+    uint256 value
+  );
+
+  event AttestorAuthorized(
+    address indexed account,
+    address attestor
+  );
+
+  event AccountDataEncryptionKeySet(
+    address indexed account,
+    bytes dataEncryptionKey
+  );
+
+  event AccountMetadataURLSet(
+    address indexed account,
+    string metadataURL
+  );
+
+  event AccountWalletAddressSet(
+    address indexed account,
+    address walletAddress
+  );
+
+  enum AttestationStatus {
+    None,
+    Incomplete,
+    Complete
+  }
 
   function initialize(
     address registryAddress,
