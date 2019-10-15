@@ -220,6 +220,7 @@ exports[`PhoneNumberInput when no defaultCountry renders AutoComplete 1`] = `
           autoCorrect={false}
           data={Array []}
           defaultValue=""
+          flatListProps={Object {}}
           inputContainerStyle={
             Array [
               Object {
@@ -236,6 +237,7 @@ exports[`PhoneNumberInput when no defaultCountry renders AutoComplete 1`] = `
               },
             ]
           }
+          keyExtractor={[Function]}
           keyboardShouldPersistTaps="always"
           listContainerStyle={
             Object {
@@ -278,7 +280,6 @@ exports[`PhoneNumberInput when no defaultCountry renders AutoComplete 1`] = `
           renderItem={[Function]}
           renderSeparator={null}
           renderTextInput={[Function]}
-          rowHasChanged={[Function]}
           style={
             Array [
               Object {
