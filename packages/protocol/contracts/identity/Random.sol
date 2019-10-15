@@ -77,7 +77,7 @@ contract Random is IRandom, Ownable, Initializable {
     }
 
     // add entropy
-    uint blockNumber = block.number == 0 ? 0 : block.number.sub(0);
+    uint blockNumber = block.number == 0 ? 0 : block.number.sub(1);
     addRandomness(block.number, keccak256(abi.encodePacked(history[blockNumber], randomness)));
 
     commitments[proposer] = newCommitment;
