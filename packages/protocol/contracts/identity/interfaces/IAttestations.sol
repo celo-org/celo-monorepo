@@ -13,7 +13,7 @@ interface IAttestations {
   function revoke(bytes32, uint256) external;
   function withdraw(address) external;
 
-  function setAttestationExpirySeconds(uint256) external;
+  function setAttestationExpiryBlocks(uint256) external;
 
   function setAccountDataEncryptionKey(bytes calldata) external;
   function authorizeAttestor(address, uint8, bytes32, bytes32) external;
@@ -48,7 +48,7 @@ interface IAttestations {
   )
     external
     view
-    returns (uint8, uint64, uint64);
+    returns (uint8, uint128);
 
   function getAttestationRequestFeeToken(address) external view returns (address);
   function getMostRecentAttestationRequest(address) external view returns (uint256);

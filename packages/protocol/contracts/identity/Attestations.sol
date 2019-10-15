@@ -59,7 +59,7 @@ contract Attestations is
     uint256 amount
   );
 
-  event AttestationExpirySecondsSet(
+  event AttestationExpiryBlocksSet(
     uint256 value
   );
 
@@ -97,14 +97,13 @@ contract Attestations is
   struct Attestation {
     AttestationStatus status;
 
-    // the timestamp of the request
-    uint64 requestTime;
-    // the timestamp of the attestation completion
-    uint64 completionTime;
+    // For outstanding attestations, this is the block number of the request
+    // For completed attestations, this is the block number of the attestation completion
+    uint128 blockNumber;
   }
 
   struct Account {
-    // The timestamp of the most recent attestation request
+    // The block number of the most recent attestation request
     uint96 mostRecentAttestationRequest;
 
     // The address at which the account expects to receive transfers
@@ -160,7 +159,7 @@ contract Attestations is
   address constant REQUEST_ATTESTATION = address(0xff);
 
   // The duration in seconds in which an attestation can be completed
-  uint256 public attestationExpirySeconds;
+  uint256 public attestationExpiryBlocks;
 
   // The fees that are associated with attestations for a particular token.
   mapping(address => uint256) public attestationRequestFees;
@@ -170,7 +169,7 @@ contract Attestations is
 
   function initialize(
     address registryAddress,
-    uint256 _attestationExpirySeconds,
+    uint256 _attestationExpiryBlocks,
     address[] calldata attestationRequestFeeTokens,
     uint256[] calldata attestationRequestFeeValues
   )
@@ -179,7 +178,7 @@ contract Attestations is
   {
     _transferOwnership(msg.sender);
     setRegistry(registryAddress);
-    setAttestationExpirySeconds(_attestationExpirySeconds);
+    setAttestationExpiryBlocks(_attestationExpiryBlocks);
     require(
       attestationRequestFeeTokens.length > 0 &&
       attestationRequestFeeTokens.length == attestationRequestFeeValues.length,
@@ -224,7 +223,7 @@ contract Attestations is
 
     if (accounts[msg.sender].attestationRequestFeeToken != address(0x0)) {
       require(
-        !isAttestationTimeValid(accounts[msg.sender].mostRecentAttestationRequest) ||
+        !isAttestationRequestBlockTimeValid(accounts[msg.sender].mostRecentAttestationRequest) ||
           accounts[msg.sender].attestationRequestFeeToken == attestationRequestFeeToken,
         "A different fee token was previously specified for this account"
       );
@@ -232,7 +231,7 @@ contract Attestations is
 
     if(state.requests[msg.sender].blockNumber != 0) {
       require(
-        !isAttestationTimeValid(accounts[msg.sender].mostRecentAttestationRequest),
+        !isAttestationRequestBlockTimeValid(accounts[msg.sender].mostRecentAttestationRequest),
         "Currently active attestation request that has to be revealed first"
       );
     }
@@ -242,7 +241,7 @@ contract Attestations is
     state.requests[msg.sender].attestationsRequested = uint128(attestationsRequested);
 
     // solhint-disable-next-line not-rely-on-time
-    accounts[msg.sender].mostRecentAttestationRequest = uint96(now);
+    accounts[msg.sender].mostRecentAttestationRequest = uint96(block.number);
     accounts[msg.sender].attestationRequestFeeToken = attestationRequestFeeToken;
 
     state.attestations[msg.sender].requested = uint32(
@@ -265,7 +264,7 @@ contract Attestations is
     IdentifierState storage state = identifiers[identifier];
 
     require(
-      state.requests[msg.sender].blockNumber != 0,
+      state.requests[msg.sender].blockNumber > 0,
       "No active attestation request to reveal issuers for"
     );
 
@@ -281,8 +280,7 @@ contract Attestations is
       accounts[msg.sender].attestationRequestFeeToken
     );
 
-    state.requests[msg.sender].blockNumber = 0;
-    state.requests[msg.sender].attestationsRequested = 0;
+    delete state.requests[msg.sender];
   }
 
   /**
@@ -309,7 +307,7 @@ contract Attestations is
     );
 
     // solhint-disable-next-line not-rely-on-time
-    require(isAttestationTimeValid(attestation.requestTime), "Attestation request timed out");
+    require(isAttestationRequestBlockTimeValid(attestation.blockNumber), "Attestation request timed out");
 
     // Generate the yet-to-be-signed attestation code that will be signed and sent to the
     // encrypted phone number via SMS via the 'RequestAttestation' precompiled contract.
@@ -344,7 +342,7 @@ contract Attestations is
       identifiers[identifier].attestations[msg.sender].issuedAttestations[issuer];
 
     // solhint-disable-next-line not-rely-on-time
-    attestation.completionTime = uint64(now);
+    attestation.blockNumber = uint128(block.number);
     attestation.status = AttestationStatus.Complete;
     identifiers[identifier].attestations[msg.sender].completed++;
 
@@ -528,12 +526,11 @@ contract Attestations is
   )
     external
     view
-    returns (uint8, uint64, uint64)
+    returns (uint8, uint128)
   {
     return (
       uint8(identifiers[identifier].attestations[account].issuedAttestations[issuer].status),
-      identifiers[identifier].attestations[account].issuedAttestations[issuer].requestTime,
-      identifiers[identifier].attestations[account].issuedAttestations[issuer].completionTime
+      identifiers[identifier].attestations[account].issuedAttestations[issuer].blockNumber
     );
 
   }
@@ -581,14 +578,14 @@ contract Attestations is
   }
 
   /**
-   * @notice Updates 'attestationExpirySeconds'.
-   * @param _attestationExpirySeconds The new limit on blocks allowed to come between requesting
+   * @notice Updates 'attestationExpiryBlocks'.
+   * @param _attestationExpiryBlocks The new limit on blocks allowed to come between requesting
    * an attestation and completing it.
    */
-  function setAttestationExpirySeconds(uint256 _attestationExpirySeconds) public onlyOwner {
-    require(_attestationExpirySeconds > 0, "attestationExpirySeconds has to be greater than 0");
-    attestationExpirySeconds = _attestationExpirySeconds;
-    emit AttestationExpirySecondsSet(_attestationExpirySeconds);
+  function setAttestationExpiryBlocks(uint256 _attestationExpiryBlocks) public onlyOwner {
+    require(_attestationExpiryBlocks > 0, "attestationExpiryBlocks has to be greater than 0");
+    attestationExpiryBlocks = _attestationExpiryBlocks;
+    emit AttestationExpiryBlocksSet(_attestationExpiryBlocks);
   }
 
   /**
@@ -773,7 +770,7 @@ contract Attestations is
       "Attestation code does not match any outstanding attestation"
     );
     // solhint-disable-next-line not-rely-on-time
-    require(isAttestationTimeValid(attestation.requestTime), "Attestation request timed out");
+    require(isAttestationRequestBlockTimeValid(attestation.blockNumber), "Attestation request timed out");
 
     return issuer;
   }
@@ -862,13 +859,13 @@ contract Attestations is
       currentIndex++;
       attestations.status = AttestationStatus.Incomplete;
       // solhint-disable-next-line not-rely-on-time
-      attestations.requestTime = uint64(now);
+      attestations.blockNumber = uint64(block.number);
       state.issuers.push(issuer);
     }
   }
 
-  function isAttestationTimeValid(uint128 attestationTime) internal view returns (bool) {
+  function isAttestationRequestBlockTimeValid(uint128 attestationRequestBlockTime) internal view returns (bool) {
     // solhint-disable-next-line not-rely-on-time
-    return now < attestationTime.add(attestationExpirySeconds);
+    return block.number < attestationRequestBlockTime.add(attestationExpiryBlocks);
   }
 }

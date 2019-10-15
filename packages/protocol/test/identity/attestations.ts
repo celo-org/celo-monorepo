@@ -2,10 +2,10 @@ import Web3 = require('web3')
 
 import { CeloContractName } from '@celo/protocol/lib/registry-utils'
 import {
+  advanceBlockNum,
   assertLogMatches2,
   assertRevert,
   NULL_ADDRESS,
-  timeTravel,
 } from '@celo/protocol/lib/test-utils'
 import { attestToIdentifier } from '@celo/utils'
 import { privateKeyToAddress } from '@celo/utils/lib/address'
@@ -71,7 +71,7 @@ contract('Attestations', (accounts: string[]) => {
   const phoneHash: string = getPhoneHash(phoneNumber)
 
   const attestationsRequested = 3
-  const attestationExpirySeconds = 60
+  const attestationExpiryBlocks = 60
   const attestationFee = new BigNumber(web3.utils.toWei('.05', 'ether').toString())
 
   async function getVerificationCodeSignature(
@@ -154,18 +154,18 @@ contract('Attestations', (accounts: string[]) => {
     await registry.setAddressFor(CeloContractName.LockedGold, mockLockedGold.address)
     await attestations.initialize(
       registry.address,
-      attestationExpirySeconds,
+      attestationExpiryBlocks,
       [mockStableToken.address, otherMockStableToken.address],
       [attestationFee, attestationFee]
     )
   })
 
   describe('#initialize()', () => {
-    it('should have set attestationExpirySeconds', async () => {
-      const actualAttestationExpirySeconds: number = await attestations.attestationExpirySeconds.call(
+    it('should have set attestationExpiryBlocks', async () => {
+      const actualAttestationExpiryBlocks: number = await attestations.attestationExpiryBlocks.call(
         this
       )
-      assert.equal(actualAttestationExpirySeconds, attestationExpirySeconds)
+      assert.equal(actualAttestationExpiryBlocks, attestationExpiryBlocks)
     })
 
     it('should have set the fee', async () => {
@@ -177,7 +177,7 @@ contract('Attestations', (accounts: string[]) => {
       await assertRevert(
         attestations.initialize(
           registry.address,
-          attestationExpirySeconds,
+          attestationExpiryBlocks,
           [mockStableToken.address],
           [attestationFee]
         )
@@ -314,28 +314,28 @@ contract('Attestations', (accounts: string[]) => {
     })
   })
 
-  describe('#setAttestationExpirySeconds()', () => {
-    const newMaxNumBlocksPerAttestation = attestationExpirySeconds + 1
+  describe('#setAttestationExpiryBlocks()', () => {
+    const newMaxNumBlocksPerAttestation = attestationExpiryBlocks + 1
 
-    it('should set attestationExpirySeconds', async () => {
-      await attestations.setAttestationExpirySeconds(newMaxNumBlocksPerAttestation)
-      const actualAttestationExpirySeconds = await attestations.attestationExpirySeconds.call(this)
-      assert.equal(actualAttestationExpirySeconds, newMaxNumBlocksPerAttestation)
+    it('should set attestationExpiryBlocks', async () => {
+      await attestations.setAttestationExpiryBlocks(newMaxNumBlocksPerAttestation)
+      const actualAttestationExpiryBlocks = await attestations.attestationExpiryBlocks.call(this)
+      assert.equal(actualAttestationExpiryBlocks, newMaxNumBlocksPerAttestation)
     })
 
-    it('should emit the AttestationExpirySecondsSet event', async () => {
-      const response = await attestations.setAttestationExpirySeconds(newMaxNumBlocksPerAttestation)
+    it('should emit the AttestationExpiryBlocksSet event', async () => {
+      const response = await attestations.setAttestationExpiryBlocks(newMaxNumBlocksPerAttestation)
       assert.lengthOf(response.logs, 1)
       const event = response.logs[0]
       assertLogMatches2(event, {
-        event: 'AttestationExpirySecondsSet',
+        event: 'AttestationExpiryBlocksSet',
         args: { value: new BigNumber(newMaxNumBlocksPerAttestation) },
       })
     })
 
     it('should revert when set by a non-owner', async () => {
       await assertRevert(
-        attestations.setAttestationExpirySeconds(newMaxNumBlocksPerAttestation, {
+        attestations.setAttestationExpiryBlocks(newMaxNumBlocksPerAttestation, {
           from: accounts[1],
         })
       )
@@ -409,7 +409,7 @@ contract('Attestations', (accounts: string[]) => {
         caller
       )
 
-      assert.equal(requestBlock.timestamp.toString(), mostRecentAttestationRequested.toString())
+      assert.equal(requestBlock.number.toString(), mostRecentAttestationRequested.toString())
     })
 
     it('should set the attestationRequestFeeToken', async () => {
@@ -474,9 +474,9 @@ contract('Attestations', (accounts: string[]) => {
         )
       })
 
-      describe('if attestationExpirySeconds has passed', async () => {
+      describe('if attestationExpiryBlocks has passed', async () => {
         beforeEach(async () => {
-          await timeTravel(attestationExpirySeconds + 1, web3)
+          await advanceBlockNum(attestationExpiryBlocks + 1, web3)
         })
 
         it('should allow using a different attestationRequestFeeToken', async () => {
@@ -511,14 +511,14 @@ contract('Attestations', (accounts: string[]) => {
 
         await Promise.all(
           attestationIssuers.map(async (issuer) => {
-            const [status, requestTime] = await attestations.getAttestationState(
+            const [status, requestBlock] = await attestations.getAttestationState(
               phoneHash,
               caller,
               issuer
             )
 
             assert.equal(status.toNumber(), 1)
-            assert.equal(requestTime.toNumber(), expectedBlock.timestamp)
+            assert.equal(requestBlock.toNumber(), expectedBlock.number)
           })
         )
       })
@@ -575,7 +575,7 @@ contract('Attestations', (accounts: string[]) => {
     })
 
     it('should revert if the request as expired', async () => {
-      await timeTravel(attestationExpirySeconds, web3)
+      await advanceBlockNum(attestationExpiryBlocks, web3)
       // @ts-ignore
       await assertRevert(attestations.reveal(phoneHash, phoneHash, issuer, false))
     })
@@ -630,14 +630,14 @@ contract('Attestations', (accounts: string[]) => {
 
       const expectedBlock = await web3.eth.getBlock('latest')
 
-      const [status, _requestTime, completionTime] = await attestations.getAttestationState(
+      const [status, completionBlock] = await attestations.getAttestationState(
         phoneHash,
         caller,
         issuer
       )
 
       assert.equal(status.toNumber(), 2)
-      assert.equal(completionTime.toNumber(), expectedBlock.timestamp)
+      assert.equal(completionBlock.toNumber(), expectedBlock.number)
     })
 
     it('should increment pendingWithdrawals for the rewards recipient', async () => {
@@ -708,7 +708,7 @@ contract('Attestations', (accounts: string[]) => {
     })
 
     it('does not let you verify beyond the window', async () => {
-      await timeTravel(attestationExpirySeconds, web3)
+      await advanceBlockNum(attestationExpiryBlocks, web3)
       await assertRevert(attestations.complete(phoneHash, v, r, s))
     })
   })
