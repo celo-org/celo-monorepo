@@ -2603,6 +2603,7 @@ exports[`renders the Input step correctly 1`] = `
                 "width": 60,
               }
             }
+            testID="contryCodeText"
           >
             
           </Text>

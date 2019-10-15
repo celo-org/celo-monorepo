@@ -340,6 +340,7 @@ exports[`JoinCeloScreen renders correctly 1`] = `
                 "width": 60,
               }
             }
+            testID="contryCodeText"
           >
             +1
           </Text>
