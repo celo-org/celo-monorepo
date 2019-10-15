@@ -21,7 +21,7 @@ export const handler = async (argv: BlockchainApiArgv) => {
       argv.celoEnv
     }.yaml`
   )
-  await execCmd(`rm ../blockchain-api/app.${argv.celoEnv}.yaml.bak`) // Removing bak file used to edit yaml file
+  await execCmd(`rm ../blockchain-api/app.${argv.celoEnv}.yaml.bak`) // Removing temporary bak file
   console.info(`deploying blockchain-api for env ${argv.config} to ${testnetProjectName}`)
   await execCmd(
     `yarn --cwd ../blockchain-api run deploy -p ${testnetProjectName} -n ${argv.celoEnv}`
