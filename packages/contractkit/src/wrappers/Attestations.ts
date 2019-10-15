@@ -4,7 +4,15 @@ import BigNumber from 'bignumber.js'
 import * as Web3Utils from 'web3-utils'
 import { Address, CeloToken } from '../base'
 import { Attestations } from '../generated/types/Attestations'
-import { BaseWrapper, proxyCall, proxySend, toBigNumber, toNumber, wrapSend } from './BaseWrapper'
+import {
+  BaseWrapper,
+  proxyCall,
+  proxySend,
+  toBigNumber,
+  toNumber,
+  toTransactionObject,
+  tupleParser,
+} from './BaseWrapper'
 const parseSignature = SignatureUtils.parseSignature
 
 export interface AttestationStat {
@@ -200,7 +208,7 @@ export class AttestationsWrapper extends BaseWrapper<Attestations> {
     const identifierHash = await IdentityUtils.identityHash(identifier)
     const expectedSourceMessage = attestationMessageToSign(identifierHash, account)
     const { r, s, v } = parseSignature(expectedSourceMessage, code, issuer.toLowerCase())
-    return wrapSend(this.kit, this.contract.methods.complete(identifierHash, v, r, s))
+    return toTransactionObject(this.kit, this.contract.methods.complete(identifierHash, v, r, s))
   }
 
   /**
@@ -299,7 +307,7 @@ export class AttestationsWrapper extends BaseWrapper<Attestations> {
   async request(identifier: string, attestationsRequested: number, token: CeloToken) {
     const identifierHash = await IdentityUtils.identityHash(identifier)
     const tokenAddress = await this.kit.registry.addressFor(token)
-    return wrapSend(
+    return toTransactionObject(
       this.kit,
       this.contract.methods.request(identifierHash, attestationsRequested, tokenAddress)
     )
@@ -326,7 +334,7 @@ export class AttestationsWrapper extends BaseWrapper<Attestations> {
         Buffer.from(identifer, 'utf8')
       ).toString('hex')
 
-    return wrapSend(
+    return toTransactionObject(
       this.kit,
       this.contract.methods.reveal(
         await IdentityUtils.identityHash(identifer),
