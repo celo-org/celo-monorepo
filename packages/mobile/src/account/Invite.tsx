@@ -1,7 +1,8 @@
 import colors from '@celo/react-components/styles/colors'
 import * as React from 'react'
 import { withNamespaces, WithNamespaces } from 'react-i18next'
-import { StyleSheet, View } from 'react-native'
+import { StyleSheet } from 'react-native'
+import SafeAreaView from 'react-native-safe-area-view'
 import { NavigationInjectedProps, withNavigation } from 'react-navigation'
 import { connect } from 'react-redux'
 import { defaultCountryCodeSelector } from 'src/account/reducer'
@@ -20,7 +21,7 @@ import { filterRecipients, NumberToRecipient, Recipient } from 'src/recipients/r
 import RecipientPicker from 'src/recipients/RecipientPicker'
 import { recipientCacheSelector } from 'src/recipients/reducer'
 import { RootState } from 'src/redux/reducers'
-import { checkContactsPermission } from 'src/utils/androidPermissions'
+import { checkContactsPermission } from 'src/utils/permissions'
 
 interface State {
   searchQuery: string
@@ -113,7 +114,7 @@ class Invite extends React.Component<Props, State> {
 
   render() {
     return (
-      <View style={style.container}>
+      <SafeAreaView style={style.container}>
         <RecipientPicker
           sections={this.buildSections()}
           searchQuery={this.state.searchQuery}
@@ -124,7 +125,7 @@ class Invite extends React.Component<Props, State> {
           showQRCode={false}
           onPermissionsAccepted={this.onPermissionsAccepted}
         />
-      </View>
+      </SafeAreaView>
     )
   }
 }

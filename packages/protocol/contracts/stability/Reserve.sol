@@ -10,7 +10,6 @@ import "./interfaces/IStableToken.sol";
 
 import "../common/Initializable.sol";
 import "../common/UsingRegistry.sol";
-import "../common/interfaces/IERC20Token.sol";
 
 
 /**
@@ -144,8 +143,7 @@ contract Reserve is IReserve, Ownable, Initializable, UsingRegistry, ReentrancyG
     returns (bool)
   {
     require(isSpender[msg.sender], "sender not allowed to transfer Reserve funds");
-    IERC20Token goldToken = IERC20Token(registry.getAddressForOrDie(GOLD_TOKEN_REGISTRY_ID));
-    require(goldToken.transfer(to, value), "transfer of gold token failed");
+    require(getGoldToken().transfer(to, value), "transfer of gold token failed");
     return true;
   }
 

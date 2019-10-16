@@ -49,6 +49,7 @@ resource "google_compute_instance" "tx_node" {
       geth_node_docker_image_repository : var.geth_node_docker_image_repository,
       geth_node_docker_image_tag : var.geth_node_docker_image_tag,
       geth_verbosity : var.geth_verbosity,
+      in_memory_discovery_table : var.in_memory_discovery_table,
       ip_address : google_compute_address.tx_node[count.index].address,
       max_peers : var.tx_node_count * 2,
       network_id : var.network_id,

@@ -69,6 +69,9 @@ echo "Bootnode enode: $BOOTNODE_ENODE"
 echo "Pulling geth..."
 docker pull $GETH_NODE_DOCKER_IMAGE
 
+IN_MEMORY_DISCOVERY_TABLE_FLAG=""
+[[ ${in_memory_discovery_table} == "true" ]] && IN_MEMORY_DISCOVERY_TABLE_FLAG="--use-in-memory-discovery-table"
+
 echo "Starting geth..."
 # We need to override the entrypoint in the geth image (which is originally `geth`).
 # `geth account import` fails when the account has already been imported. In
@@ -112,7 +115,9 @@ docker run -v $DATA_DIR:$DATA_DIR --name geth --net=host --entrypoint /bin/sh -d
       --verbosity=${geth_verbosity} \
       --ethstats=${validator_name}:$ETHSTATS_WEBSOCKETSECRET@${ethstats_host} \
       --istanbul.blockperiod=${block_time} \
+      --istanbul.requesttimeout=${istanbul_request_timeout_ms} \
       --maxpeers=${max_peers} \
       --nat=extip:${ip_address} \
-      --ping-ip-from-packet \
+      --metrics \
+      $IN_MEMORY_DISCOVERY_TABLE_FLAG \
   )"

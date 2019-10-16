@@ -11,7 +11,6 @@ exports[`SmartTopAlert renders correctly 1`] = `
 >
   <View
     accessible={true}
-    isTVSelectable={true}
     onResponderGrant={[Function]}
     onResponderMove={[Function]}
     onResponderRelease={[Function]}
@@ -20,66 +19,59 @@ exports[`SmartTopAlert renders correctly 1`] = `
     onStartShouldSetResponder={[Function]}
     style={
       Object {
-        "opacity": 1,
+        "alignItems": "center",
+        "backgroundColor": "#3C9BF4",
+        "flexDirection": "row",
+        "justifyContent": "center",
+        "paddingBottom": 10,
+        "paddingHorizontal": 25,
+        "paddingTop": 10,
+        "transform": Array [
+          Object {
+            "translateY": -500,
+          },
+        ],
       }
     }
   >
-    <View
+    <Text
       style={
-        Object {
-          "alignItems": "center",
-          "backgroundColor": "#3C9BF4",
-          "flexDirection": "row",
-          "justifyContent": "center",
-          "paddingHorizontal": 25,
-          "paddingVertical": 10,
-          "transform": Array [
-            Object {
-              "translateY": -500,
-            },
-          ],
-        }
+        Array [
+          Object {
+            "color": "#2E3338",
+            "fontFamily": "Hind-Regular",
+            "fontSize": 14,
+            "lineHeight": 18,
+          },
+          Object {
+            "color": "white",
+            "lineHeight": undefined,
+            "textAlign": "center",
+          },
+          false,
+        ]
       }
     >
       <Text
         style={
           Array [
             Object {
-              "color": "#2E3338",
-              "fontFamily": "Hind-Regular",
-              "fontSize": 14,
-              "lineHeight": 18,
-            },
-            Object {
               "color": "white",
               "lineHeight": undefined,
               "textAlign": "center",
             },
-            false,
+            Object {
+              "fontFamily": "Hind-SemiBold",
+            },
           ]
         }
       >
-        <Text
-          style={
-            Array [
-              Object {
-                "color": "white",
-                "lineHeight": undefined,
-                "textAlign": "center",
-              },
-              Object {
-                "fontFamily": "Hind-SemiBold",
-              },
-            ]
-          }
-        >
-           
-          Smart Top Alert
-           
-        </Text>
-        dont get funny
+         
+        Smart Top Alert
+         
       </Text>
-    </View>
+      dont get funny
+    </Text>
   </View>
 </View>
 `;

@@ -4,20 +4,33 @@ exports[`BackupPrompt renders correctly 1`] = `
 <View
   style={
     Object {
-      "backgroundColor": "#3C9BF4",
-      "height": 93,
+      "overflow": "hidden",
     }
   }
+  testID="infoBanner"
 >
   <View
+    accessible={true}
+    onResponderGrant={[Function]}
+    onResponderMove={[Function]}
+    onResponderRelease={[Function]}
+    onResponderTerminate={[Function]}
+    onResponderTerminationRequest={[Function]}
+    onStartShouldSetResponder={[Function]}
     style={
       Object {
         "alignItems": "center",
-        "flex": 1,
+        "backgroundColor": "#3C9BF4",
         "flexDirection": "column",
         "justifyContent": "center",
-        "opacity": 1,
+        "paddingBottom": 10,
         "paddingHorizontal": 25,
+        "paddingTop": 10,
+        "transform": Array [
+          Object {
+            "translateY": -500,
+          },
+        ],
       }
     }
   >
@@ -32,9 +45,10 @@ exports[`BackupPrompt renders correctly 1`] = `
           },
           Object {
             "color": "white",
-            "marginBottom": 10,
+            "lineHeight": undefined,
             "textAlign": "center",
           },
+          false,
         ]
       }
     >
@@ -82,9 +96,11 @@ exports[`BackupPrompt renders correctly 1`] = `
           Object {
             "alignSelf": "center",
             "borderColor": "#FFFFFF",
+            "marginTop": 8,
           },
         ]
       }
+      testID="SmartTopAlertButton"
     >
       <Text
         style={

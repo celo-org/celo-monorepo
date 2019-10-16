@@ -255,6 +255,7 @@ dependencies {
     implementation project(':react-native-sms-retriever')
     implementation project(':react-native-share')
     implementation project(':react-native-secure-key-store')
+    implementation project(':react-native-safe-area-context')
 
     androidTestImplementation('com.wix:detox:+') { transitive = true }
     androidTestImplementation 'junit:junit:4.12'

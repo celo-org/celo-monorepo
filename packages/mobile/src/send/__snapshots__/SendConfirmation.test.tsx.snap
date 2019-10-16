@@ -1,7 +1,7 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`SendConfirmation renders correctly for payment request confirmation 1`] = `
-<View
+<SafeAreaView
   style={
     Object {
       "backgroundColor": "#FFFFFF",
@@ -1086,11 +1086,11 @@ exports[`SendConfirmation renders correctly for payment request confirmation 1`]
       </View>
     </View>
   </View>
-</View>
+</SafeAreaView>
 `;
 
 exports[`SendConfirmation renders correctly for payment request confirmation when fee calculation fails 1`] = `
-<View
+<SafeAreaView
   style={
     Object {
       "backgroundColor": "#FFFFFF",
@@ -2175,11 +2175,11 @@ exports[`SendConfirmation renders correctly for payment request confirmation whe
       </View>
     </View>
   </View>
-</View>
+</SafeAreaView>
 `;
 
 exports[`SendConfirmation renders correctly for payment request confirmation when fee calculation fails 2`] = `
-<View
+<SafeAreaView
   style={
     Object {
       "backgroundColor": "#FFFFFF",
@@ -3258,11 +3258,11 @@ exports[`SendConfirmation renders correctly for payment request confirmation whe
       </View>
     </View>
   </View>
-</View>
+</SafeAreaView>
 `;
 
 exports[`SendConfirmation renders correctly for send payment confirmation 1`] = `
-<View
+<SafeAreaView
   style={
     Object {
       "backgroundColor": "#FFFFFF",
@@ -4347,11 +4347,11 @@ exports[`SendConfirmation renders correctly for send payment confirmation 1`] = 
       </View>
     </View>
   </View>
-</View>
+</SafeAreaView>
 `;
 
 exports[`SendConfirmation renders correctly for send payment confirmation when fee calculation fails 1`] = `
-<View
+<SafeAreaView
   style={
     Object {
       "backgroundColor": "#FFFFFF",
@@ -5436,11 +5436,11 @@ exports[`SendConfirmation renders correctly for send payment confirmation when f
       </View>
     </View>
   </View>
-</View>
+</SafeAreaView>
 `;
 
 exports[`SendConfirmation renders correctly for send payment confirmation when fee calculation fails 2`] = `
-<View
+<SafeAreaView
   style={
     Object {
       "backgroundColor": "#FFFFFF",
@@ -6519,5 +6519,5 @@ exports[`SendConfirmation renders correctly for send payment confirmation when f
       </View>
     </View>
   </View>
-</View>
+</SafeAreaView>
 `;

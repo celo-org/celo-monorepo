@@ -1,7 +1,7 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`Invite renders correctly with no recipients 1`] = `
-<View
+<SafeAreaView
   style={
     Object {
       "backgroundColor": "#FFFFFF",
@@ -235,11 +235,11 @@ exports[`Invite renders correctly with no recipients 1`] = `
       </View>
     </RCTScrollView>
   </View>
-</View>
+</SafeAreaView>
 `;
 
 exports[`Invite renders correctly with recipients 1`] = `
-<View
+<SafeAreaView
   style={
     Object {
       "backgroundColor": "#FFFFFF",
@@ -666,5 +666,5 @@ exports[`Invite renders correctly with recipients 1`] = `
       </View>
     </RCTScrollView>
   </View>
-</View>
+</SafeAreaView>
 `;

@@ -1,13 +1,6 @@
 import colors from '@celo/react-components/styles/colors'
 import * as React from 'react'
-import {
-  Platform,
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-  TouchableWithoutFeedback,
-  View,
-} from 'react-native'
+import { StyleSheet, Text, TouchableOpacity, TouchableWithoutFeedback, View } from 'react-native'
 import { connect } from 'react-redux'
 import { devModeTriggerClicked } from 'src/account/actions'
 import { devModeSelector } from 'src/account/reducer'
@@ -74,8 +67,7 @@ export class DevSkipButton extends React.Component<Props> {
 const styles = StyleSheet.create({
   devButtonContainer: {
     position: 'absolute',
-    // Stop gap solution until we properly fix layout on iOS
-    top: Platform.OS === 'ios' ? 100 : 0,
+    top: 0,
     right: 0,
     width: 70,
     height: 35,

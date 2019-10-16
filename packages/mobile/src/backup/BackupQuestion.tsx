@@ -9,6 +9,7 @@ import * as React from 'react'
 import { WithNamespaces, withNamespaces } from 'react-i18next'
 import { ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
 import Modal from 'react-native-modal'
+import SafeAreaView from 'react-native-safe-area-view'
 import CeloAnalytics from 'src/analytics/CeloAnalytics'
 import { CustomEventNames } from 'src/analytics/constants'
 import CancelButton from 'src/components/CancelButton'
@@ -103,7 +104,7 @@ class BackupQuestion extends React.PureComponent<Props, State> {
   render() {
     const { t } = this.props
     return (
-      <View style={styles.container}>
+      <SafeAreaView style={styles.container}>
         <View style={componentStyles.topBar}>
           <CancelButton onCancel={this.props.onCancel} />
         </View>
@@ -152,7 +153,7 @@ class BackupQuestion extends React.PureComponent<Props, State> {
           <Text style={fontStyles.bodySmall}>{t('dontKnow')} </Text>
           <Link onPress={this.props.onReturnToPhrase}>{t('return')}</Link>
         </View>
-      </View>
+      </SafeAreaView>
     )
   }
 }

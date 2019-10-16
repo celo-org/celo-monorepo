@@ -9,7 +9,7 @@ export interface TerraformVars {
 }
 
 // Terraform requires the `backend-config` options to configure a remote backend
-// with dynamic values
+// with dynamic values. Sends stdout to /dev/null.
 export async function initTerraformModule(
   moduleName: string,
   vars: TerraformVars,
@@ -22,7 +22,8 @@ export async function initTerraformModule(
     modulePath,
     getVarOptions(vars),
     getVarOptions(backendConfigVars, 'backend-config'),
-    '-reconfigure'
+    '-reconfigure',
+    '> /dev/null'
   )
 }
 
@@ -74,12 +75,7 @@ function refreshTerraformModule(moduleName: string, vars: TerraformVars) {
   return buildAndExecTerraformCmd('refresh', getModulePath(moduleName), getVarOptions(vars))
 }
 
-export async function getTerraformModuleOutputs(
-  moduleName: string,
-  vars: TerraformVars,
-  backendConfigVars: TerraformVars
-) {
-  await initTerraformModule(moduleName, vars, backendConfigVars)
+export async function getTerraformModuleOutputs(moduleName: string, vars: TerraformVars) {
   await refreshTerraformModule(moduleName, vars)
   const modulePath = getModulePath(moduleName)
   const [output] = await execCmd(`cd ${modulePath} && terraform output -json`)

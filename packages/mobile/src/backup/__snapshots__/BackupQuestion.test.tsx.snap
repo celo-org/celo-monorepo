@@ -1,7 +1,7 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`renders correctly on 1st question 1`] = `
-<View
+<SafeAreaView
   style={
     Object {
       "backgroundColor": "white",
@@ -688,11 +688,11 @@ exports[`renders correctly on 1st question 1`] = `
       </Text>
     </View>
   </View>
-</View>
+</SafeAreaView>
 `;
 
 exports[`renders correctly on 2nd word 1`] = `
-<View
+<SafeAreaView
   style={
     Object {
       "backgroundColor": "white",
@@ -1379,11 +1379,11 @@ exports[`renders correctly on 2nd word 1`] = `
       </Text>
     </View>
   </View>
-</View>
+</SafeAreaView>
 `;
 
 exports[`renders correctly on 3rd word 1`] = `
-<View
+<SafeAreaView
   style={
     Object {
       "backgroundColor": "white",
@@ -2070,11 +2070,11 @@ exports[`renders correctly on 3rd word 1`] = `
       </Text>
     </View>
   </View>
-</View>
+</SafeAreaView>
 `;
 
 exports[`renders correctly on 3rd word 2`] = `
-<View
+<SafeAreaView
   style={
     Object {
       "backgroundColor": "white",
@@ -2761,11 +2761,11 @@ exports[`renders correctly on 3rd word 2`] = `
       </Text>
     </View>
   </View>
-</View>
+</SafeAreaView>
 `;
 
 exports[`renders correctly on 3rd word 3`] = `
-<View
+<SafeAreaView
   style={
     Object {
       "backgroundColor": "white",
@@ -3452,5 +3452,5 @@ exports[`renders correctly on 3rd word 3`] = `
       </Text>
     </View>
   </View>
-</View>
+</SafeAreaView>
 `;
