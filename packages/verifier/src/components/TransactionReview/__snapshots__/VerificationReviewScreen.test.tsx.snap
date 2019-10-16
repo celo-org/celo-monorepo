@@ -70,7 +70,7 @@ exports[`renders correctly 1`] = `
               }
             }
           >
-            Feb 3 common:at 4:02 AM
+            Feb 3 common:at 12:02 PM
           </Text>
         </View>
       </View>

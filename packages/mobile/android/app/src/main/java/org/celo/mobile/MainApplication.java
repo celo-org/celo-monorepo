@@ -31,9 +31,6 @@ import io.invertase.firebase.storage.RNFirebaseStoragePackage;
 import io.invertase.firebase.messaging.RNFirebaseMessagingPackage;
 import io.invertase.firebase.notifications.RNFirebaseNotificationsPackage;
 
-// Disabled due to dex count
-// import com.swmansion.rnscreens.RNScreensPackage;
-
 public class MainApplication extends Application implements ShareApplication, ReactApplication {
 
   private final ReactNativeHost mReactNativeHost = new ReactNativeHost(this) {
@@ -46,12 +43,12 @@ public class MainApplication extends Application implements ShareApplication, Re
     protected List<ReactPackage> getPackages() {
       @SuppressWarnings("UnnecessaryLocalVariable")
       List<ReactPackage> packages = new PackageList(this).getPackages();
-      // if (android.os.Build.VERSION.SDK_INT >= 23) {
-      // // Don't add this package below API 23, since it leads to
-      // // ClassDefNotFoundError due to classes which are only available
-      // // above API 23.
-      // packages.add(new RNConfirmDeviceCredentialsPackage());
-      // }
+      if (android.os.Build.VERSION.SDK_INT >= 23) {
+        // Don't add this package below API 23, since it leads to
+        // ClassDefNotFoundError due to classes which are only available
+        // above API 23.
+        packages.add(new RNConfirmDeviceCredentialsPackage());
+      }
       packages.add(new RNGethPackage());
       packages.add(new RNFirebaseAuthPackage());
       packages.add(new RNFirebaseDatabasePackage());
