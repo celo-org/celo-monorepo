@@ -1,3 +1,4 @@
+import { upgradeHelmChart } from 'src/lib/prom-to-sd-utils'
 import { deploy, taintTestnet, untaintTestnet } from 'src/lib/vm-testnet-utils'
 import yargs from 'yargs'
 import { UpgradeArgv } from '../../deploy/upgrade'
@@ -24,4 +25,5 @@ export const handler = async (argv: VmTestnetArgv) => {
     await taintTestnet(argv.celoEnv)
   }
   await deploy(argv.celoEnv, onDeployFailed)
+  await upgradeHelmChart(argv.celoEnv)
 }

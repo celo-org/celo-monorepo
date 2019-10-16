@@ -64,6 +64,9 @@ resource "google_compute_firewall" "geth_metrics_firewall" {
 
   target_tags = local.firewall_target_tags_node
 
+  # allow all IPs internal to the VPC
+  source_ranges = ["10.0.0.0/8"]
+
   allow {
     protocol = "tcp"
     ports    = ["9200"]
@@ -118,6 +121,8 @@ module "tx_node" {
   gcloud_secrets_bucket             = var.gcloud_secrets_bucket
   gcloud_vm_service_account_email   = var.gcloud_vm_service_account_email
   genesis_content_base64            = var.genesis_content_base64
+  geth_exporter_docker_image_repository = var.geth_exporter_docker_image_repository
+  geth_exporter_docker_image_tag    = var.geth_exporter_docker_image_tag
   geth_node_docker_image_repository = var.geth_node_docker_image_repository
   geth_node_docker_image_tag        = var.geth_node_docker_image_tag
   geth_verbosity                    = var.geth_verbosity

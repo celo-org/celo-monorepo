@@ -1,3 +1,4 @@
+import { removeHelmRelease } from 'src/lib/prom-to-sd-utils'
 import { destroy } from 'src/lib/vm-testnet-utils'
 import { DestroyArgv } from '../../deploy/destroy'
 
@@ -7,4 +8,5 @@ export const builder = {}
 
 export const handler = async (argv: DestroyArgv) => {
   await destroy(argv.celoEnv)
+  await removeHelmRelease(argv.celoEnv)
 }
