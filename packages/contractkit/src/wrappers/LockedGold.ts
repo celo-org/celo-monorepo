@@ -10,7 +10,7 @@ import {
   proxyCall,
   proxySend,
   toBigNumber,
-  wrapSend,
+  toTransactionObject,
 } from '../wrappers/BaseWrapper'
 
 export interface VotingDetails {
@@ -116,6 +116,21 @@ export class LockedGoldWrapper extends BaseWrapper<LockedGold> {
    * @return Whether or not the account is voting.
    */
   isVoting = proxyCall(this.contract.methods.isVoting)
+
+  /**
+   * Check if an account already exists.
+   * @param account The address of the account
+   * @return Returns `true` if account exists. Returns `false` otherwise.
+   *         In particular it will return `false` if a delegate with given address exists.
+   */
+  isAccount = proxyCall(this.contract.methods.isAccount)
+
+  /**
+   * Check if a delegate already exists.
+   * @param account The address of the delegate
+   * @return Returns `true` if delegate exists. Returns `false` otherwise.
+   */
+  isDelegate = proxyCall(this.contract.methods.isDelegate)
 
   /**
    * Query maximum notice period.
@@ -226,7 +241,7 @@ export class LockedGoldWrapper extends BaseWrapper<LockedGold> {
     role: Roles
   ): Promise<CeloTransactionObject<void>> {
     const sig = await this.getParsedSignatureOfAddress(account, delegate)
-    return wrapSend(
+    return toTransactionObject(
       this.kit,
       this.contract.methods.delegateRole(role, delegate, sig.v, sig.r, sig.s)
     )
