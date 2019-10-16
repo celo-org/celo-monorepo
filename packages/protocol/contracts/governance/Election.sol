@@ -484,12 +484,7 @@ contract Election is
     view
     returns (uint256)
   {
-    bool meetsBalanceRequirements = (
-      getLockedGold().getAccountTotalLockedGold(group) >=
-      getValidators().getAccountBalanceRequirement(group)
-    );
-
-    if (meetsBalanceRequirements && votes.active.total > 0) {
+    if (getValidators().meetsAccountLockedGoldRequirements(group) && votes.active.total > 0) {
       return totalEpochRewards.mul(votes.active.forGroup[group].total).div(votes.active.total);
     } else {
       return 0;
