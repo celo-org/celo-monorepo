@@ -19,7 +19,7 @@ export default class CreateMetadata extends BaseCommand {
 
   async run() {
     const { args } = this.parse(CreateMetadata)
-    const metadata = new IdentityMetadataWrapper(IdentityMetadataWrapper.emptyData)
+    const metadata = new IdentityMetadataWrapper(IdentityMetadataWrapper.fromEmpty())
     writeFileSync(args.file, metadata.toString())
   }
 }
