@@ -6,7 +6,7 @@ patch-package
      def cmdProcess
      def root = getReactNativeProjectRoot()
 -    def command = "node ./node_modules/react-native/cli.js config"
-+    def command = "yarn --silent react-native config"
++    def command = "npx react-native config"
      def reactNativeConfigOutput = ""
  
      try {
