@@ -134,6 +134,7 @@ function getHigerVersion(version1: string, version2: string): string | undefined
 
 export async function getVersionInfo(version: string) {
   // backward compatible
+  let deprecated = false
   const versionFSPath = version.split('.').join('/')
   const versionInfo = (await firebase
     .database()
@@ -147,9 +148,11 @@ export async function getVersionInfo(version: string) {
     .database()
     .ref('versions/minVersion')
     .once('value')).val()
+  if (!minVersion) {
+    return { version, deprecated }
+  }
   const minVersionVal = minVersion.val
   const higherVersion = getHigerVersion(minVersionVal, version)
-  let deprecated = false
   if (higherVersion === minVersion) {
     deprecated = true
   }

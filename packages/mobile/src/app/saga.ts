@@ -49,7 +49,6 @@ const mapStateToProps = (state: PersistedRootState): PersistedStateProps | null 
 
 export function* checkAppDeprecation() {
   yield call(waitForRehydrate)
-  yield call(waitForFirebaseAuth)
   const versionInfo = yield getVersionInfo(DeviceInfo.getVersion())
   Logger.info(TAG, 'Version Info', JSON.stringify(versionInfo))
   if (versionInfo && versionInfo.deprecated) {
