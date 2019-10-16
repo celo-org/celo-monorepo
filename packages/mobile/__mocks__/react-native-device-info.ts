@@ -1,5 +1,6 @@
 export default {
   getApiLevel: jest.fn(),
+  getApiLevelSync: jest.fn(),
   getApplicationName: jest.fn(),
   getBrand: jest.fn(),
   getBuildNumber: jest.fn(),

@@ -110,7 +110,7 @@
     "react-native-restart-android": "^0.0.7",
     "react-native-safe-area-context": "^0.5.0",
     "react-native-safe-area-view": "^1.0.0",
-    "react-native-screens": "^2.0.0-alpha.3",
+    "react-native-screens": "^1.0.0-alpha.23",
     "react-native-secure-key-store": "^2.0.5",
     "react-native-secure-randombytes": "^3.0.0",
     "react-native-send-intent": "git+https://github.com/celo-org/react-native-send-intent#a0f4b00",

@@ -25,6 +25,7 @@ Logger.debug('App/init', 'Current Language: ' + i18n.language)
 YellowBox.ignoreWarnings([
   'componentWillReceiveProps',
   'Remote debugger', // To avoid "Remote debugger in background tab" warning
+  'cancelTouches', // rn-screens warning on iOS
 ])
 
 const WrappedNavigator = withNamespaces('common', {
