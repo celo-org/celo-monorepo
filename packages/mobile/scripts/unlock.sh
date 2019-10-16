@@ -41,3 +41,5 @@ sleep 2
 adb shell input text $SECRET_PIN		# Input Pin
 sleep 1
 adb shell input keyevent 66		# Enter
+
+echo "Done this unlock"
