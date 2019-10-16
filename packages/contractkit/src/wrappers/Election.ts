@@ -11,8 +11,8 @@ import {
   proxySend,
   toBigNumber,
   toNumber,
-  tupleParser,
   toTransactionObject,
+  tupleParser,
 } from './BaseWrapper'
 
 export interface Validator {

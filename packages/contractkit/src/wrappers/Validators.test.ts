@@ -10,7 +10,7 @@ TEST NOTES:
 - In migrations: The only account that has cUSD is accounts[0]
 */
 
-const minLockedGoldValue = Web3.utils.toWei('100', 'ether') // 100 gold
+const minLockedGoldValue = Web3.utils.toWei('10', 'ether') // 10 gold
 
 // A random 64 byte hex string.
 const publicKey =
@@ -28,7 +28,7 @@ testWithGanache('Validators Wrapper', (web3) => {
   let validators: ValidatorsWrapper
   let lockedGold: LockedGoldWrapper
 
-  const registerAccountWithCommitment = async (account: string) => {
+  const registerAccountWithLockedGold = async (account: string) => {
     if (!(await lockedGold.isAccount(account))) {
       await lockedGold.createAccount().sendAndWaitForReceipt({ from: account })
     }
@@ -42,7 +42,7 @@ testWithGanache('Validators Wrapper', (web3) => {
   })
 
   const setupGroup = async (groupAccount: string) => {
-    await registerAccountWithCommitment(groupAccount)
+    await registerAccountWithLockedGold(groupAccount)
     await (await validators.registerValidatorGroup(
       'The Group',
       'thegroup.com',
@@ -51,7 +51,7 @@ testWithGanache('Validators Wrapper', (web3) => {
   }
 
   const setupValidator = async (validatorAccount: string) => {
-    await registerAccountWithCommitment(validatorAccount)
+    await registerAccountWithLockedGold(validatorAccount)
     // set account1 as the validator
     await validators
       .registerValidator(

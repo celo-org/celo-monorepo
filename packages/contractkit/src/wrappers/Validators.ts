@@ -55,9 +55,6 @@ export class ValidatorsWrapper extends BaseWrapper<Validators> {
     url: string,
     commission: BigNumber
   ): Promise<CeloTransactionObject<boolean>> {
-    if (this.kit.defaultAccount == null) {
-      throw new Error(`missing kit.defaultAccount`)
-    }
     return toTransactionObject(
       this.kit,
       this.contract.methods.registerValidatorGroup(name, url, toFixed(commission).toFixed())

@@ -12,8 +12,8 @@ import {
   proxyCall,
   proxySend,
   toBigNumber,
-  tupleParser,
   toTransactionObject,
+  tupleParser,
 } from '../wrappers/BaseWrapper'
 
 export interface VotingDetails {
