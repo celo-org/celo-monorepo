@@ -181,6 +181,27 @@ GraphQL queries. If you make a change to a query, run `yarn build:gen-graphql-ty
 By default, the mobile wallet app runs geth in ultralight sync mode where all the epoch headers are fetched. The default sync mode is defined in [packages/mobile/.env](https://github.com/celo-org/celo-monorepo/blob/master/packages/mobile/.env#L4) file.
 
 To run wallet in zero sync mode, where it would connect to the remote nodes and sign transactions in web3, change the default sync mode in the aforementioned file to -1. The mode has only been tested on Android and is hard-coded to be [crash](https://github.com/celo-org/celo-monorepo/blob/aeddeefbfb230db51d2ef76d50c5f882644a1cd3/packages/mobile/src/web3/contracts.ts#L73) on iOS.
+=======
+## How we handle Geth crashes in wallet app on Android
+
+Our Celo app has three types of codes.
+
+1. Javascript code - generated from Typescript, this runs in Javascript interpreter.
+2. Java bytecode - This runs on Dalvik/Art Virtual Machine.
+3. Native code - Geth code is written in Golang which compiles to native code - this runs directly on the
+CPU, no virtual machines involved.
+
+One should note that, on iOS, there is no byte code and therefore, there are only two layers, one is the Javascript code, and the other is the Native code. Till now, we have been blind towards native crashes except Google Playstore logs.
+
+Sentry, the crash logging mechanism we use, can catch both Javascript Errors as well as unhandled Java exceptions. It, however, does not catch Native crashes. There are quite a few tools to catch native crashes like [Bugsnag](https://www.bugsnag.com) and [Crashlytics](https://firebase.google.com/products/crashlytics). They would have worked for us under normal circumstances. However, the Geth code produced by the Gomobile library and Go compiler logs a major chunk of information about the crash at Error level and not at the Fatal level. We hypothesize that this leads to incomplete stack traces showing up in Google Play store health checks. This issue is [publicly known](https://github.com/golang/go/issues/25035) but has not been fixed.
+
+We cannot use libraries like [Bugsnag](https://www.bugsnag.com) since they do not allow us to extract logcat logs immediately after the crash. Therefore, We use [jndcrash](https://github.com/ivanarh/jndcrash), which uses [ndcrash](https://github.com/ivanarh/ndcrash) and enable us to log the logcat logs immediately after a native crash. We capture the results into a file and on next restart Sentry reads it. We need to do this two-step setup because once a native crash happens, running code to upload the data would be fragile. An error in sentry looks like [this](https://sentry.io/organizations/celo/issues/918120991/events/48285729031/)
+
+Relevant code references:
+
+1. [NDKCrashService](https://github.com/celo-org/celo-monorepo/blob/master/packages/mobile/android/app/src/main/java/org/celo/mobile/NdkCrashService.java)
+2. [Initialization](https://github.com/celo-org/celo-monorepo/blob/8689634a1d10d74ba6d4f3b36b2484db60a95bdb/packages/mobile/android/app/src/main/java/org/celo/mobile/MainApplication.java#L156) of the NDKCrashService
+3. [Sentry code](https://github.com/celo-org/celo-monorepo/blob/799d74675dc09327543c210e88cbf5cc796721a0/packages/mobile/src/sentry/Sentry.ts#L53) to read NDK crash logs on restart
 
 ## Troubleshooting
 
