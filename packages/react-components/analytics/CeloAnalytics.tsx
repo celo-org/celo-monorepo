@@ -92,7 +92,7 @@ class CeloAnalytics {
 
     getDeviceInfo()
       .then((res) => (this.deviceInfo = res))
-      .catch()
+      .catch((err) => Logger.error(TAG, 'getDeviceInfo error', err))
   }
 
   isEnabled() {

@@ -11,4 +11,4 @@ declare var _test: typeof android
 declare var _testDefault: typeof DefaultIos
 declare var _testDefault: typeof DefaultAndroid
 
-export * from 'src/pincode/PincodeUtils.ios'
+export * from 'src/pincode/PincodeUtils.android'
