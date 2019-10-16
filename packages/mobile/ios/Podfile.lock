@@ -1,7 +1,7 @@
 PODS:
   - Analytics (3.7.0)
   - boost-for-react-native (1.63.0)
-  - CeloBlockchain (0.0.1)
+  - CeloBlockchain (0.0.156)
   - Crashlytics (3.13.4):
     - Fabric (~> 1.10.2)
   - DoubleConversion (1.1.6)
@@ -139,6 +139,8 @@ PODS:
     - React
   - react-native-splash-screen (3.1.1):
     - React
+  - react-native-tcp (3.3.0):
+    - React
   - react-native-udp (2.6.1):
     - React
   - react-native-version-check (3.0.2):
@@ -266,6 +268,7 @@ DEPENDENCIES:
   - "react-native-netinfo (from `../../../node_modules/@react-native-community/netinfo`)"
   - react-native-safe-area-context (from `../../../node_modules/react-native-safe-area-context`)
   - react-native-splash-screen (from `../../../node_modules/react-native-splash-screen`)
+  - react-native-tcp (from `../../../node_modules/react-native-tcp`)
   - react-native-udp (from `../../../node_modules/react-native-udp`)
   - react-native-version-check (from `../../../node_modules/react-native-version-check`)
   - React/Core (from `../node_modules/react-native`)
@@ -351,6 +354,8 @@ EXTERNAL SOURCES:
     :path: "../../../node_modules/react-native-safe-area-context"
   react-native-splash-screen:
     :path: "../../../node_modules/react-native-splash-screen"
+  react-native-tcp:
+    :path: "../../../node_modules/react-native-tcp"
   react-native-udp:
     :path: "../../../node_modules/react-native-udp"
   react-native-version-check:
@@ -387,7 +392,7 @@ EXTERNAL SOURCES:
 SPEC CHECKSUMS:
   Analytics: 77fd5fb102a4a5eedafa2c2b0245ceb7b7c15e45
   boost-for-react-native: 39c7adb57c4e60d6c5479dd8623128eb5b3f0f2c
-  CeloBlockchain: 4779210b5840c586b131de638694044ecb362bda
+  CeloBlockchain: f258122010fb610057979254d4a3f88eb7fb0d21
   Crashlytics: 2dfd686bcb918dc10ee0e76f7f853fe42c7bd552
   DoubleConversion: bb338842f62ab1d708ceb63ec3d999f0f3d98ecd
   Fabric: 706c8b8098fff96c33c0db69cbf81f9c551d0d74
@@ -413,12 +418,13 @@ SPEC CHECKSUMS:
   react-native-camera: 571e4cfe70e7021e9077c1699a53e659db971f96
   react-native-config: 8f6b2b9e017f6a5e92a97353c768e19e67294bb1
   react-native-contacts: 348958bb7da4399040b1eb45bfb7f6af08e61412
-  react-native-geth: 8ec5ada8b9c69eea6a515fdfe784878a625c9b6e
+  react-native-geth: b643560e11512a3c0b1d78df929cb9f2409cf4a2
   react-native-keep-awake: abcf6d09d0cc5fe45df4a56a9382e25d10cff8b6
   react-native-mail: 021d8ee60e374609f5689ef354dc8e36839a9ba6
   react-native-netinfo: 1ea4efa22c02519ac8043ac3f000062a4e320795
   react-native-safe-area-context: e380a6f783ccaec848e2f3cc8eb205a62362950d
   react-native-splash-screen: 353334c5ae82d8c74501ea7cbb916cb7cb20c8bf
+  react-native-tcp: e1a8c3ac010774cd71811989805ff3eaebb62f17
   react-native-udp: 54a1aa9bf5c0824f930b1ba6dbfb3fd3e733bba9
   react-native-version-check: 901616b6d258b385628120441bd0b285b24c7be1
   RNAnalytics: 05243c1fa17186f07be3eae30514b43aeb2e0578
@@ -438,6 +444,6 @@ SPEC CHECKSUMS:
   SentryReactNative: 07237139c00366ea2e75ae3e5c566e7a71c27a90
   yoga: 684513b14b03201579ba3cee20218c9d1298b0cc
 
-PODFILE CHECKSUM: 74a2f21d73b361a2ed26a15896af8f4d70b123e0
+PODFILE CHECKSUM: 02a0ed956675dc8aa46eab297cf94e8823e80147
 
 COCOAPODS: 1.7.5
