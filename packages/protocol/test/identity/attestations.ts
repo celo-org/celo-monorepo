@@ -28,6 +28,11 @@ import {
 } from 'types'
 import { getParsedSignatureOfAddress } from '../../lib/signing-utils'
 
+/* We use a contract that behaves like the actual Attestations contract, but
+ * mocks the implementations of validator set getters. These rely on precompiled
+ * contracts, which are not available in our current ganache fork, which we use
+ * for Truffle unit tests.
+ */
 const Attestations: TestAttestationsContract = artifacts.require('TestAttestations')
 const MockStableToken: MockStableTokenContract = artifacts.require('MockStableToken')
 const MockValidators: MockValidatorsContract = artifacts.require('MockValidators')
