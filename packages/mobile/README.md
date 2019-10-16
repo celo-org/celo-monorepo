@@ -182,6 +182,15 @@ By default, the mobile wallet app runs geth in ultralight sync mode where all th
 
 To run wallet in zero sync mode, where it would connect to the remote nodes and sign transactions in web3, change the default sync mode in the aforementioned file to -1. The mode has only been tested on Android and is hard-coded to be [crash](https://github.com/celo-org/celo-monorepo/blob/aeddeefbfb230db51d2ef76d50c5f882644a1cd3/packages/mobile/src/web3/contracts.ts#L73) on iOS.
 
+There are two major differencs in ZeroSync mode:
+
+1. Geth won't run at all. The web3 would instead connect to <testnet>-infura.celo-testnet.org using an https provider, for example, [https://integration-infura.celo-testnet.org](https://integration-infura.celo-testnet.org).
+2. Changes to [sendTransactionAsyncWithWeb3Signing](https://github.com/celo-org/celo-monorepo/blob/8689634a1d10d74ba6d4f3b36b2484db60a95bdb/packages/walletkit/src/contract-utils.ts#L362) in walletkit to poll after sending a transaction for the transaction to succeed. This is needed because http provider, unliked web sockets and IPC provider, does not support subscriptions.
+
+#### Why http(s) provider?
+
+Websockets (`ws`) would have been a better choicee but we cannot use unencrypted `ws` provider since it would be bad to send plain-text data from a privacy perspective. Geth does not support `wss` by [default](https://github.com/ethereum/go-ethereum/issues/16423). And Kubernetes does not support it either. This forced us to use https provider.
+
 ## Troubleshooting
 
 ### `Activity class {org.celo.mobile.staging/org.celo.mobile.MainActivity} does not exist.`
