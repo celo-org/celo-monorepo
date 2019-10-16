@@ -321,8 +321,10 @@ export async function startGeth(gethBinaryPath: string, instance: GethInstanceCo
 export async function migrateContracts(validatorPrivateKeys: string[], to: number = 1000) {
   const migrationOverrides = {
     validators: {
-      minElectableValidators: '1',
       validatorKeys: validatorPrivateKeys.map(ensure0x),
+    },
+    election: {
+      minElectableValidators: '1',
     },
   }
   const args = [
