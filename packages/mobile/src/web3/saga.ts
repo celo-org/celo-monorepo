@@ -347,10 +347,8 @@ export function* getConnectedUnlockedAccount() {
 }
 
 export function* switchZeroSyncMode(action: SetIsZeroSyncAction) {
-  Logger.debug(
-    TAG + '@switchZeroSyncMode',
-    ` zero sync mode will change to: ${action.zeroSyncMode}`
-  )
+  Logger.info(TAG + '@switchZeroSyncMode', `Zero sync mode will change to: ${action.zeroSyncMode}`)
+  // TODO(anna) implement switching geth on/off, changing web3 provider
 }
 
 export function* watchZeroSyncMode() {
