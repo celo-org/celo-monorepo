@@ -11,6 +11,8 @@ exports[`Message Banner when message and title passed in renders title with mess
 >
   <View
     accessible={true}
+    focusable={true}
+    onClick={[Function]}
     onResponderGrant={[Function]}
     onResponderMove={[Function]}
     onResponderRelease={[Function]}
@@ -87,6 +89,8 @@ exports[`Message Banner when message passed in renders message 1`] = `
 >
   <View
     accessible={true}
+    focusable={true}
+    onClick={[Function]}
     onResponderGrant={[Function]}
     onResponderMove={[Function]}
     onResponderRelease={[Function]}

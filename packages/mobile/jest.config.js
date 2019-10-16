@@ -1,4 +1,3 @@
-const defaultConfig = require('../../jest.config.js')
 const reactNativeJestPreset = require('react-native/jest-preset')
 const { defaults: tsjPreset } = require('ts-jest/presets')
 

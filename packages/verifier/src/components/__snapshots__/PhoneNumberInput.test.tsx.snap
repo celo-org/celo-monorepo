@@ -163,7 +163,7 @@ exports[`PhoneNumberInput when no defaultCountry renders AutoComplete 1`] = `
     style={
       Array [
         Object {
-          "zIndex": 1,
+          "flex": 1,
         },
         undefined,
       ]
@@ -176,6 +176,7 @@ exports[`PhoneNumberInput when no defaultCountry renders AutoComplete 1`] = `
             "borderColor": "#b9b9b9",
             "borderRadius": 1,
             "borderWidth": 1,
+            "marginBottom": 0,
           },
           Array [
             Object {
@@ -261,13 +262,9 @@ exports[`PhoneNumberInput when no defaultCountry renders AutoComplete 1`] = `
                 "borderTopWidth": 1,
                 "borderWidth": 1,
                 "flex": 1,
-                "left": undefined,
-                "marginBottom": 6,
                 "marginHorizontal": 0,
                 "paddingHorizontal": 0,
                 "paddingVertical": 6,
-                "position": "relative",
-                "right": undefined,
               },
             ]
           }
