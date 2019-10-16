@@ -157,6 +157,7 @@ module.exports = async (_deployer: any, _networkName: string) => {
     )
   }
 
+  let prevGroupAddress = NULL_ADDRESS
   for (const [idx, groupKeys] of valKeyGroups.entries()) {
     // Append an index to the group name if there is more than one group.
     let groupName: string = config.validators.groupName
@@ -174,9 +175,9 @@ module.exports = async (_deployer: any, _networkName: string) => {
     )
 
     console.info('  * Registering Validators ...')
-    await Promise.all(
-      groupKeys.map((key) => registerValidator(lockedGold, validators, key, account.address))
-    )
+    for (const key of groupKeys) {
+      await registerValidator(lockedGold, validators, key, account.address)
+    }
 
     console.info('  * Adding Validators to Validator Group ...')
     for (const key of groupKeys) {
@@ -197,6 +198,7 @@ module.exports = async (_deployer: any, _networkName: string) => {
         .times(minLockedGoldVotePerValidator)
         .times(config.validators.minLockedGoldValue),
     })
-    await validators.vote(account.address, NULL_ADDRESS, NULL_ADDRESS)
+    await validators.vote(account.address, NULL_ADDRESS, prevGroupAddress)
+    prevGroupAddress = account.address
   }
 }
