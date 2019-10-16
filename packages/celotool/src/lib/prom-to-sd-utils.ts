@@ -1,7 +1,9 @@
 import { envVar, fetchEnv } from 'src/lib/env-utils'
 import { installGenericHelmChart, removeGenericHelmChart } from 'src/lib/helm_deploy'
+import { getStatefulSetReplicas, scaleResource } from 'src/lib/kubernetes'
 import { execCmdWithExitOnFailure } from 'src/lib/utils'
 import { getInternalTxNodeIPs, getInternalValidatorIPs } from 'src/lib/vm-testnet-utils'
+import sleep from 'sleep-promise'
 
 const helmChartPath = '../helm-charts/prometheus-to-sd'
 
@@ -24,6 +26,13 @@ export async function removeHelmRelease(celoEnv: string) {
 export async function upgradeHelmChart(celoEnv: string) {
   console.info(`Upgrading helm release ${releaseName(celoEnv)}`)
 
+  const statefulSetName = `${celoEnv}-prom-to-sd`
+  const replicaCount = await getStatefulSetReplicas(celoEnv, statefulSetName)
+
+  console.info('Scaling StatefulSet down to 0...')
+  await scaleResource(celoEnv, 'statefulset', statefulSetName, 0)
+  await sleep(5000)
+
   const helmParams = await helmParameters(celoEnv)
 
   const upgradeCmdArgs = `${releaseName(
@@ -35,6 +44,9 @@ export async function upgradeHelmChart(celoEnv: string) {
   }
   await execCmdWithExitOnFailure(`helm upgrade ${upgradeCmdArgs}`)
   console.info(`Helm release ${releaseName(celoEnv)} upgrade successful`)
+
+  console.info(`Scaling StatefulSet back up to ${replicaCount}...`)
+  await scaleResource(celoEnv, 'statefulset', statefulSetName, replicaCount)
 }
 
 async function helmParameters(celoEnv: string) {
