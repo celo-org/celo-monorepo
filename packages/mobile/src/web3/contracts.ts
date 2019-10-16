@@ -12,9 +12,9 @@ import { Provider } from 'web3/providers'
 // Logging tag
 const tag = 'web3/contracts'
 
-export const web3: Web3 = getInitialWeb3()
+export const web3: Web3 = getWeb3()
 
-export function isInitiallyZeroSyncMode(): boolean {
+export function isZeroSyncMode(): boolean {
   return networkConfig.syncMode === GethSyncMode.ZeroSync
 }
 
@@ -66,36 +66,18 @@ function getWebSocketProvider(url: string): Provider {
   return provider
 }
 
-function getInitialWeb3(): Web3 {
-  Logger.info(
-    `Initializing web3, platform: ${Platform.OS}, geth free mode: ${isInitiallyZeroSyncMode()}`
-  )
+function getWeb3(): Web3 {
+  Logger.info(`Initializing web3, platform: ${Platform.OS}, geth free mode: ${isZeroSyncMode()}`)
 
-  if (isInitiallyZeroSyncMode() && Platform.OS === 'ios') {
+  if (isZeroSyncMode() && Platform.OS === 'ios') {
     throw new Error('Zero sync mode is currently not supported on iOS')
-  } else if (isInitiallyZeroSyncMode()) {
+  } else if (isZeroSyncMode()) {
     // Geth free mode
     const url = DEFAULT_INFURA_URL
     Logger.debug('contracts@getWeb3', `Connecting to url ${url}`)
     return new Web3(getWebSocketProvider(url))
   } else {
     return new Web3(getIpcProvider(DEFAULT_TESTNET))
-  }
-}
-
-export function isZeroSyncMode() {
-  if (web3) {
-    Logger.debug('@isZeroSyncMode', `Current provider ${web3.currentProvider}`)
-    if (web3.currentProvider instanceof Web3.providers.HttpProvider) {
-      Logger.debug('@isZeroSyncMode', `is Http provider!`)
-      return true
-    }
-    Logger.debug('@isZeroSyncMode', `is not Http provider!`)
-    return false
-  } else {
-    // If web3 not initialized, return initial value
-    Logger.debug('@isZeroSyncMode', `web3 not yet intialized`)
-    return isInitiallyZeroSyncMode()
   }
 }
 

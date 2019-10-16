@@ -68,7 +68,6 @@ export const sendTransactionPromises = async (
     `Going to send a transaction with id ${txId}`
   )
   const stableToken = await getStableTokenContract(web3)
-
   // This if-else case is temprary and will disappear once we move from `walletkit` to `contractkit`.
   if (isZeroSyncMode()) {
     // In dev mode, verify that we are actually able to connect to the network. This
