@@ -84,6 +84,8 @@ project.ext.react = [
         devDisabledInAlfajores: true,
         bundleInPilot: true,
         devDisabledInPilot: true,
+        cliPath: "../../node_modules/react-native/cli.js",
+        hermesCommand: "../../../../node_modules/hermes-engine/%OS-BIN%/hermes"
 ]
 
 project.ext.envConfigFiles = [
