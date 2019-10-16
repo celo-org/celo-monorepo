@@ -114,13 +114,46 @@ export const writePaymentRequest = (paymentInfo: PaymentRequest) => async () => 
   }
 }
 
+function getHigerVersion(version1: string, version2: string): string | undefined {
+  const version1Array = version1.split('.')
+  const version2Array = version2.split('.')
+  const minVersionLength = Math.min(version1Array.length, version2.length)
+  for (let i = 0; i < minVersionLength; i++) {
+    if (version1Array[i] > version2Array[i]) {
+      return version1
+    } else if (version1Array[i] < version2Array[i]) {
+      return version2
+    }
+  }
+  if (version1Array.length > version2Array.length) {
+    return version1
+  } else if (version1Array.length < version2Array.length) {
+    return version2
+  }
+}
+
 export async function getVersionInfo(version: string) {
+  // backward compatible
   const versionFSPath = version.split('.').join('/')
-  Logger.info(TAG, `Checking version info ${version}`)
-  return (await firebase
+  const versionInfo = (await firebase
     .database()
     .ref(`versions/${versionFSPath}`)
     .once('value')).val()
+  if (versionInfo && versionInfo.deprecated !== undefined) {
+    return versionInfo
+  }
+  Logger.info(TAG, `Checking version info ${version}`)
+  const minVersion = (await firebase
+    .database()
+    .ref('versions/minVersion')
+    .once('value')).val()
+  const minVersionVal = minVersion.val
+  const higherVersion = getHigerVersion(minVersionVal, version)
+  let deprecated = false
+  if (higherVersion === minVersion) {
+    deprecated = true
+  }
+  return { version, deprecated }
 }
 
 export async function setUserLanguage(address: string, language: string) {
