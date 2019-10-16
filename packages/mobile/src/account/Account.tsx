@@ -80,7 +80,7 @@ export class Account extends React.Component<Props, State> {
     const phoneNumber = this.props.e164PhoneNumber
     const verified = await isPhoneNumberVerified(phoneNumber)
     this.setState({ verified })
-    this.setState({ version: await DeviceInfo.getVersion() })
+    this.setState({ version: DeviceInfo.getVersion() })
   }
 
   goToProfile = () => {
