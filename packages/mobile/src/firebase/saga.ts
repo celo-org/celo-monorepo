@@ -14,7 +14,7 @@ import {
 } from 'redux-saga/effects'
 import { PaymentRequest, PaymentRequestStatus, updatePaymentRequests } from 'src/account'
 import { showError } from 'src/alert/actions'
-import { Actions as AppActions } from 'src/app/actions'
+import { Actions as AppActions, SetLanguage } from 'src/app/actions'
 import { ErrorMessages } from 'src/app/ErrorMessages'
 import { FIREBASE_ENABLED } from 'src/config'
 import { Actions, firebaseAuthorized, UpdatePaymentRequestStatusAction } from 'src/firebase/actions'
@@ -144,7 +144,7 @@ export function* watchPaymentRequestStatusUpdates() {
   yield takeLeading(Actions.PAYMENT_REQUEST_UPDATE_STATUS, updatePaymentRequestStatus)
 }
 
-export function* syncLanguageSelection({ language }: { language: string }) {
+export function* syncLanguageSelection({ language }: SetLanguage) {
   yield call(waitForFirebaseAuth)
   const address = yield select(currentAccountSelector)
   try {

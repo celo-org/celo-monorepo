@@ -48,7 +48,9 @@ export const initializeCloudMessaging = async (app: Firebase, address: string) =
   if (fcmToken) {
     await registerTokenToDb(app, address, fcmToken)
     // First time setting the fcmToken also set the language selection
-    await setUserLanguage(address, language)
+    if (language) {
+      await setUserLanguage(address, language)
+    }
   }
 
   // Monitor for future token refreshes
@@ -84,9 +86,9 @@ export const initializeCloudMessaging = async (app: Firebase, address: string) =
 
 export async function onBackgroundNotification(remoteMessage: RemoteMessage) {
   Logger.info(TAG, 'recieved Notification while app in Background')
-  Sentry.captureMessage(`Received Unknown RNFirebaseBackgroundMessage `, {
-    extra: remoteMessage,
-  })
+  Sentry.captureMessage(
+    `Received Unknown RNFirebaseBackgroundMessage ${JSON.stringify(remoteMessage)}`
+  )
   // https://facebook.github.io/react-native/docs/0.44/appregistry#registerheadlesstask
   return Promise.resolve() // need to return a resolved promise so native code releases the JS context
 }

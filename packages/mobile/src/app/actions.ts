@@ -26,7 +26,7 @@ interface SetNumberVerifiedAction {
   numberVerified: boolean
 }
 
-interface SetLanguage {
+export interface SetLanguage {
   type: Actions.SET_LANGUAGE
   language: string
 }

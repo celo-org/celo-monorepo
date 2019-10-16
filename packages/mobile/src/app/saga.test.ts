@@ -56,7 +56,6 @@ const numberVerified = {
 
 const navigationSagaTest = (testName: string, state: any, expectedScreen: any) => {
   test(testName, async () => {
-    navigate.mockClear()
     await expectSaga(navigateToProperScreen)
       .withState(state)
       .dispatch({ type: REHYDRATE })

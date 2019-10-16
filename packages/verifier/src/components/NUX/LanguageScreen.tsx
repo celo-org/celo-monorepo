@@ -3,7 +3,7 @@ import { navigate } from '@celo/react-components/services/NavigationService'
 import logo from 'assets/celo-logo.png'
 import * as React from 'react'
 import { WithNamespaces, withNamespaces } from 'react-i18next'
-import { NavigationScreenProps } from 'react-navigation'
+import { NavigationInjectedProps } from 'react-navigation'
 import { connect } from 'react-redux'
 import VerifierAnalytics from 'src/analytics/CeloAnalytics'
 import { CustomEventNames } from 'src/analytics/constants'
@@ -25,7 +25,11 @@ interface DispatchProps {
   setLanguage: typeof setLanguage
 }
 
-type Props = StateProps & DispatchProps & WithNamespaces & NavigationScreenProps
+interface ScreenProp {
+  nextScreen: string
+}
+
+type Props = StateProps & DispatchProps & WithNamespaces & NavigationInjectedProps<ScreenProp>
 
 const mapStateToProps = (state: RootState): StateProps => {
   return {

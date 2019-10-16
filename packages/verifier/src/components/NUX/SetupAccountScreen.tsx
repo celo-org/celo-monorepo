@@ -9,7 +9,7 @@ import * as React from 'react'
 import { WithNamespaces, withNamespaces } from 'react-i18next'
 import { StyleSheet, Text, View } from 'react-native'
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'
-import { NavigationScreenProps } from 'react-navigation'
+import { NavigationInjectedProps } from 'react-navigation'
 import { connect } from 'react-redux'
 import CeloAnalytics from 'src/analytics/CeloAnalytics'
 import { CustomEventNames } from 'src/analytics/constants'
@@ -46,7 +46,7 @@ interface DispatchProps {
   clearError: typeof clearError
 }
 
-type Props = WithNamespaces & DispatchProps & StateProps & NavigationScreenProps<NavigationParams>
+type Props = WithNamespaces & DispatchProps & StateProps & NavigationInjectedProps<NavigationParams>
 
 const mapDispatchToProps = {
   setE164Number,

@@ -4312,11 +4312,6 @@
     eslint-plugin-react-native "3.6.0"
     prettier "1.16.4"
 
-"@react-native-community/netinfo@^2.0.4":
-  version "2.0.4"
-  resolved "https://registry.yarnpkg.com/@react-native-community/netinfo/-/netinfo-2.0.4.tgz#d0d7f7dc77adc9de8621351129816bc0dcacf457"
-  integrity sha512-BNSqLFcOGxcQ8WmsRqTDarMj6PwIAW8hd0WzCTH+4CMcNLmJwGlvUZJFl2RY78kusr8nmUUdbwRtOvGXRORMuQ==
-
 "@react-native-community/netinfo@^4.4.0":
   version "4.4.0"
   resolved "https://registry.yarnpkg.com/@react-native-community/netinfo/-/netinfo-4.4.0.tgz#a18eb9ba082b6aca6add004b4a918250ad7d13bc"
@@ -26445,10 +26440,6 @@ react-native-clock-sync@^1.0.0:
   version "2.0.0"
   resolved "git://github.com/celo-org/react-native-confirm-device-credentials#436afa981889b51178f959f0c8cd137cc46386f1"
 
-"react-native-contacts@git://github.com/celo-org/react-native-contacts#4989b0b":
-  version "4.0.2"
-  resolved "git://github.com/celo-org/react-native-contacts#4989b0b4df8bf84acf1979643af243b51453a504"
-
 "react-native-contacts@git://github.com/celo-org/react-native-contacts#fcf8f0d":
   version "5.0.0"
   resolved "git://github.com/celo-org/react-native-contacts#fcf8f0d434786c4b03443c7d1a6c764b2a9391df"
@@ -26478,15 +26469,10 @@ react-native-debugger-open@^0.3.17:
     minimist "^1.2.0"
     semver "^5.4.1"
 
-react-native-device-info@^2.1.0:
-  version "2.1.0"
-  resolved "https://registry.yarnpkg.com/react-native-device-info/-/react-native-device-info-2.1.0.tgz#55eb82c1ba14c550cef6b71efc368d88b96b826a"
-  integrity sha512-FdHFi0DtISiytXzE2KM16Qd4GPEGnbA8DjTP1vHjcUPFJCLBtm1P0/10Xn5x/kISjEvsz17grdtJxGrd83c6Pw==
-
-react-native-device-info@^3.1.4:
-  version "3.1.4"
-  resolved "https://registry.yarnpkg.com/react-native-device-info/-/react-native-device-info-3.1.4.tgz#58a1d465ce9e2c28809132b1c68dd7ec7ce5f00f"
-  integrity sha512-r+7APHkPO9EA/9w3e9K7yrFigaU+0/g8i3psrNUwCGFxoDewkCHOPj/1YZnAPUwPxgyG3svjZXeCtymI3xcSlA==
+react-native-device-info@^4.0.1:
+  version "4.0.1"
+  resolved "https://registry.yarnpkg.com/react-native-device-info/-/react-native-device-info-4.0.1.tgz#bade972e7a995ac187a82745a458cba98b72dea0"
+  integrity sha512-a0Q/gwy1oQhu17CeMq9xMZ3Sl9foaj8hFwVuy9jieqkkoQwkHnPDI+R7bEW0MNMgUCPPrzzXvka+FLGOWVqacg==
 
 react-native-firebase@5.5.6, react-native-firebase@^5.5.6:
   version "5.5.6"
@@ -26500,14 +26486,6 @@ react-native-firebase@5.5.6, react-native-firebase@^5.5.6:
   version "1.0.0"
   resolved "git://github.com/kristiansorens/react-native-flag-secure-android#e234251220f5d745eec8ebde3e83d4d369e81a14"
 
-react-native-fs@^2.12.1:
-  version "2.12.1"
-  resolved "https://registry.yarnpkg.com/react-native-fs/-/react-native-fs-2.12.1.tgz#55ec15392eb39e9fa9d6628c2c5b60b9f59102b7"
-  integrity sha512-T0vR5c+3fPVr12o4UoKr+gMHVokbLmKFGg2x1rOprwjaoJpV75Tw8mC3RpUp1u9AZHzWC4WcomhfqAlfXqDUug==
-  dependencies:
-    base-64 "^0.1.0"
-    utf8 "^2.1.1"
-
 react-native-fs@^2.14.1:
   version "2.14.1"
   resolved "https://registry.yarnpkg.com/react-native-fs/-/react-native-fs-2.14.1.tgz#61c70a865b5b5bcb020dd4e4befd60a2c20c836f"
@@ -26515,15 +26493,6 @@ react-native-fs@^2.14.1:
   dependencies:
     base-64 "^0.1.0"
     utf8 "^2.1.1"
-
-react-native-gesture-handler@^1.1.0:
-  version "1.1.0"
-  resolved "https://registry.yarnpkg.com/react-native-gesture-handler/-/react-native-gesture-handler-1.1.0.tgz#2a7d545ad2e0ca23adce22b2af441ad360ecccee"
-  integrity sha512-E9IKHpmL+sz/iCYkUriTUjBaQBORWV+oheYPQleADkxjo2sYsQfnlyTz4EQYFONkUwJ6WmfTNkYt2/yc5U4Ziw==
-  dependencies:
-    hoist-non-react-statics "^2.3.1"
-    invariant "^2.2.2"
-    prop-types "^15.5.10"
 
 react-native-gesture-handler@^1.4.1:
   version "1.4.1"
@@ -26566,10 +26535,10 @@ react-native-kill-packager@^1.0.0:
   resolved "https://registry.yarnpkg.com/react-native-kill-packager/-/react-native-kill-packager-1.0.0.tgz#8d5dc706429805800298acabca45598d0d39b391"
   integrity sha1-jV3HBkKYBYACmKyrykVZjQ05s5E=
 
-react-native-languages@^3.0.1:
-  version "3.0.1"
-  resolved "https://registry.yarnpkg.com/react-native-languages/-/react-native-languages-3.0.1.tgz#a35cf89e69e6722205d96cf418411444c328e6c2"
-  integrity sha512-D9L3WZLci0L/XZLhzKKiBisj17VQQvEW29FgaTJBV3gnITYy7uxdp0Zwi4xd+Rdus5r+cjWkoNKcGks6zMlZkA==
+react-native-languages@^3.0.2:
+  version "3.0.2"
+  resolved "https://registry.yarnpkg.com/react-native-languages/-/react-native-languages-3.0.2.tgz#c2c4c5050974fe4b50f7372051ca1f9824c1c778"
+  integrity sha512-LGsTfixFM6hXDhcFJI6mrtrNBsGPSvXT9RtZQ0tlqmGFKmMyZW6eQgJ7kLw8lISD2FIGl4jJwY06EAJpbMsNxg==
 
 react-native-localize@^1.3.0:
   version "1.3.0"
@@ -26718,11 +26687,6 @@ react-native-share@^2.0.0:
   resolved "https://registry.yarnpkg.com/react-native-share/-/react-native-share-2.0.0.tgz#4543a746013e0d8fa9f765fb8937007cfbcffcf7"
   integrity sha512-J8Xl3mq0L9KDFtSYtKsQDAnZWw/niZIpAD1PRiNfZFHo44Rc+oS2bEIhskNnoQXKEgBNdPzCl/DenMXYAHXRYg==
 
-react-native-splash-screen@^3.1.1:
-  version "3.1.1"
-  resolved "https://registry.yarnpkg.com/react-native-splash-screen/-/react-native-splash-screen-3.1.1.tgz#1a4e46c9fdce53ff52af2a2cb4181788c4e30b30"
-  integrity sha512-PU2YocOSGbLjL9Vgcq/cwMNuHHKNjjuPpa1IPMuWo+6EB/fSZ5VOmxSa7+eucQe3631s3NhGuk3eHKahU03a4Q==
-
 react-native-splash-screen@^3.2.0:
   version "3.2.0"
   resolved "https://registry.yarnpkg.com/react-native-splash-screen/-/react-native-splash-screen-3.2.0.tgz#d47ec8557b1ba988ee3ea98d01463081b60fff45"
@@ -26742,11 +26706,6 @@ react-native-svg@^9.3.6:
   version "9.3.6"
   resolved "https://registry.yarnpkg.com/react-native-svg/-/react-native-svg-9.3.6.tgz#99361aa98aabad0d538f63e7096456cf54f48e2c"
   integrity sha512-HEx8tSwzIN2kmY4prpUMQK2DY3aGkPXgKIiHfuvmGvuL+7d4wn4j7v1z/3TyLfwwSxlwGKG036TUQOot1BKGMA==
-
-react-native-svg@^9.8.4:
-  version "9.8.4"
-  resolved "https://registry.yarnpkg.com/react-native-svg/-/react-native-svg-9.8.4.tgz#6fd28198ae991b30cfbea10bb445b55870f0457c"
-  integrity sha512-s0kCURCQyupf9qL3ZPccZ43Hxkvmccf+tZ1/Tq2bAiORLNhVCI0gtI57zqqHsKk5PnTKmnqT8aTWfp5TzYgZWw==
 
 react-native-swiper@^1.5.14:
   version "1.5.14"
@@ -27347,11 +27306,6 @@ redux-mock-store@^1.5.3:
   integrity sha512-ryhkkb/4D4CUGpAV2ln1GOY/uh51aczjcRz9k2L2bPx/Xja3c5pSGJJPyR25GNVRXtKIExScdAgFdiXp68GmJA==
   dependencies:
     lodash.isplainobject "^4.0.6"
-
-redux-persist@^5.10.0:
-  version "5.10.0"
-  resolved "https://registry.yarnpkg.com/redux-persist/-/redux-persist-5.10.0.tgz#5d8d802c5571e55924efc1c3a9b23575283be62b"
-  integrity sha512-sSJAzNq7zka3qVHKce1hbvqf0Vf5DuTVm7dr4GtsqQVOexnrvbV47RWFiPxQ8fscnyiuWyD2O92DOxPl0tGCRg==
 
 redux-persist@^6.0.0:
   version "6.0.0"

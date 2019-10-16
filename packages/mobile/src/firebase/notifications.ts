@@ -82,11 +82,18 @@ export const handleNotification = (
   }
   switch (notification.data.type) {
     case NotificationTypes.PAYMENT_REQUESTED:
-      dispatch(handlePaymentRequested(notification.data, notificationState))
+      dispatch(
+        handlePaymentRequested((notification.data as unknown) as PaymentRequest, notificationState)
+      )
       break
 
     case NotificationTypes.PAYMENT_RECEIVED:
-      dispatch(handlePaymentReceived(notification.data, notificationState))
+      dispatch(
+        handlePaymentReceived(
+          (notification.data as unknown) as TransferNotificationData,
+          notificationState
+        )
+      )
       break
 
     default:

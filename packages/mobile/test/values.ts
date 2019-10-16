@@ -92,6 +92,8 @@ export const mockNavigation = {
   popToTop: jest.fn(),
   isFocused: jest.fn(),
   dangerouslyGetParent: jest.fn(),
+  emit: jest.fn(),
+  isFirstRouteInParent: jest.fn(),
 }
 export const mockAddressToE164Number: AddressToE164NumberType = {
   [mockAccount]: mockE164Number,

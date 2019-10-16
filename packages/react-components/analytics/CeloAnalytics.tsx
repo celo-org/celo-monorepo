@@ -6,22 +6,20 @@ import DeviceInfo from 'react-native-device-info'
 
 const TAG = 'CeloAnalytics'
 
-function getDeviceInfo() {
+async function getDeviceInfo() {
   return {
     AppName: DeviceInfo.getApplicationName(),
     Brand: DeviceInfo.getBrand(),
     BuildNumber: DeviceInfo.getBuildNumber(),
     BundleId: DeviceInfo.getBundleId(),
     Carrier: DeviceInfo.getCarrier(),
-    DeviceCountry: DeviceInfo.getDeviceCountry(),
     DeviceId: DeviceInfo.getDeviceId(),
-    DeviceLocale: DeviceInfo.getDeviceLocale(),
     DeviceName: DeviceInfo.getDeviceName(), // NOTE(nitya) this might contain PII, monitor
     FirstInstallTime: DeviceInfo.getFirstInstallTime(),
     FontScale: DeviceInfo.getFontScale(),
     FreeDiskStorage: DeviceInfo.getFreeDiskStorage(),
     InstallReferrer: DeviceInfo.getInstallReferrer(),
-    InstanceID: DeviceInfo.getInstanceID(),
+    InstanceID: await DeviceInfo.getInstanceId(),
     LastUpdateTime: DeviceInfo.getLastUpdateTime(),
     Manufacturer: DeviceInfo.getManufacturer(),
     MaxMemory: DeviceInfo.getMaxMemory(),
@@ -30,10 +28,9 @@ function getDeviceInfo() {
     SerialNumber: DeviceInfo.getSerialNumber(),
     SystemName: DeviceInfo.getSystemName(),
     SystemVersion: DeviceInfo.getSystemVersion(),
-    Timezone: DeviceInfo.getTimezone(),
     TotalDiskCapacity: DeviceInfo.getTotalDiskCapacity(),
     TotalMemory: DeviceInfo.getTotalMemory(),
-    UniqueID: DeviceInfo.getUniqueID(),
+    UniqueID: DeviceInfo.getUniqueId(),
     UserAgent: DeviceInfo.getUserAgent(),
     Version: DeviceInfo.getVersion(),
     isEmulator: DeviceInfo.isEmulator(),

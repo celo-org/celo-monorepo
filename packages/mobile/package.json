@@ -91,7 +91,7 @@
     "react-native-config": "https://github.com/luggit/react-native-config#89a602b",
     "react-native-confirm-device-credentials": "git://github.com/celo-org/react-native-confirm-device-credentials#436afa9",
     "react-native-contacts": "git://github.com/celo-org/react-native-contacts#fcf8f0d",
-    "react-native-device-info": "^3.1.4",
+    "react-native-device-info": "^4.0.1",
     "react-native-firebase": "^5.5.6",
     "react-native-flag-secure-android": "git://github.com/kristiansorens/react-native-flag-secure-android#e234251",
     "react-native-fs": "^2.14.1",

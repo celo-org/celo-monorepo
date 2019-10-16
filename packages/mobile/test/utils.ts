@@ -1,4 +1,5 @@
 /* Utilities to facilitate testing */
+import { NavigationScreenProp } from 'react-navigation'
 import configureMockStore from 'redux-mock-store'
 import thunk from 'redux-thunk'
 import { InitializationState } from 'src/geth/reducer'
@@ -62,7 +63,7 @@ function createSendMethod(): SendMethod {
   }))
 }
 
-export function createMockNavigationProp(params: any) {
+export function createMockNavigationProp(params: any): NavigationScreenProp<any> {
   return {
     ...mockNavigation,
     state: {
