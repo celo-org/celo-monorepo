@@ -6,8 +6,8 @@ import Sentry from '../fullstack/sentry'
 import {
   Address,
   E164Number,
-  NETWORK,
   MobileOS,
+  NETWORK,
   RequestRecord,
   RequestStatus,
   RequestType,
