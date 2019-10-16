@@ -59,6 +59,18 @@ function preprocessPrefix(identifier: string, type: IdentifierTypeEnum) {
   return `${identifierPrefix}${identifier}`
 }
 
+function preprocessPrefixBulk(identifierList: string[], type: IdentifierTypeEnum) {
+  let identifierPrefix = ''
+  switch (type) {
+    // identifier is phone number
+    case IdentifierTypeEnum.PHONE_NUMBER:
+      identifierPrefix = IdentifierPrefixEnum.PHONE_NUMBER
+    default:
+    // default: wont add prefix
+  }
+  return identifierList.map((identifier) => `${identifierPrefix}${identifier}`)
+}
+
 function identityHash(
   identifier: string,
   type: IdentifierTypeEnum = IdentifierTypeEnum.PHONE_NUMBER
@@ -75,4 +87,5 @@ export const IdentityUtils = {
   IdentifierTypeEnum,
   preprocessPrefix,
   SCRYPT_PARAMS,
+  preprocessPrefixBulk,
 }

@@ -89,7 +89,7 @@
     "react-native-confirm-device-credentials": "^2.0.0",
     "react-native-contacts": "git://github.com/celo-org/react-native-contacts#4989b0b",
     "react-native-device-info": "^2.1.0",
-    "react-native-fast-crypto": "^1.8.1",
+    "react-native-fast-crypto": "git+https://github.com/celo-org/react-native-fast-crypto.git",
     "react-native-firebase": "5.5.4",
     "react-native-flag-secure-android": "git://github.com/kristiansorens/react-native-flag-secure-android#e234251",
     "react-native-fs": "^2.12.1",

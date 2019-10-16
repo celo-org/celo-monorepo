@@ -26187,10 +26187,9 @@ react-native-device-info@^2.1.0:
   resolved "https://registry.yarnpkg.com/react-native-device-info/-/react-native-device-info-2.1.0.tgz#55eb82c1ba14c550cef6b71efc368d88b96b826a"
   integrity sha512-FdHFi0DtISiytXzE2KM16Qd4GPEGnbA8DjTP1vHjcUPFJCLBtm1P0/10Xn5x/kISjEvsz17grdtJxGrd83c6Pw==
 
-react-native-fast-crypto@^1.8.1:
+"react-native-fast-crypto@git+https://github.com/celo-org/react-native-fast-crypto.git":
   version "1.8.1"
-  resolved "https://registry.yarnpkg.com/react-native-fast-crypto/-/react-native-fast-crypto-1.8.1.tgz#9b59d7eb4bcb19f99c62695df9ea4f683bb1e52c"
-  integrity sha512-5Cym09wcYSDXS7+QFg5oWGuW4rz2DyaU09YTeGxn3Qc+rqc01VQ5T6ruW4dWv7bIULtyBcJ2ovTkXTtbsDl3uA==
+  resolved "git+https://github.com/celo-org/react-native-fast-crypto.git#e43a5ab525c3ada129c23ce8a51e459084f89297"
   dependencies:
     buffer "^5.0.8"
     rfc4648 "^1.0.0"

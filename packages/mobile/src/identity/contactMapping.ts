@@ -152,10 +152,7 @@ function* lookupNewRecipients(
 
 async function getAddresses(e164Numbers: string[], attestationsContract: AttestationsType) {
   Logger.debug(TAG, `Get addresses for ${e164Numbers.length} phone numbers`)
-  const phoneHashPromises = e164Numbers.map((phoneNumber) =>
-    IdentityUtils.identityHash(phoneNumber)
-  )
-  const phoneHashes = await Promise.all(phoneHashPromises)
+  const phoneHashes = await IdentityUtils.identityHashBulk(e164Numbers)
   const results = await lookupPhoneNumbers(attestationsContract, phoneHashes)
   if (!results) {
     return null
