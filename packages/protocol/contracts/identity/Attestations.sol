@@ -757,12 +757,9 @@ contract Attestations is
     internal
   {
     IRandom random = IRandom(registry.getAddressForOrDie(RANDOM_REGISTRY_ID));
-    IValidators validators = IValidators(
-      registry.getAddressForOrDie(VALIDATORS_REGISTRY_ID)
-    );
 
     bytes32 seed = random.random();
-    uint256 numberValidators = validators.numberValidatorsInCurrentSet();
+    uint256 numberValidators = numberValidatorsInCurrentSet();
 
     uint256 currentIndex = 0;
     address validator;
@@ -770,9 +767,7 @@ contract Attestations is
 
     while (currentIndex < n) {
       seed = keccak256(abi.encodePacked(seed));
-      validator = validators.validatorAddressFromCurrentSet(
-          uint256(seed) % numberValidators
-      );
+      validator = validatorAddressFromCurrentSet(uint256(seed) % numberValidators);
 
       issuer = getAccountFromValidator(validator);
       Attestation storage attestations =
@@ -794,5 +789,44 @@ contract Attestations is
   function isAttestationTimeValid(uint128 attestationTime) internal view returns (bool) {
     // solhint-disable-next-line not-rely-on-time
     return now < attestationTime.add(attestationExpirySeconds);
+  }
+
+  function validatorAddressFromCurrentSet(uint256 index) internal view returns (address) {
+    address validatorAddress;
+    assembly {
+      let newCallDataPosition := mload(0x40)
+      mstore(newCallDataPosition, index)
+      let success := staticcall(
+        5000,
+        0xfa,
+        newCallDataPosition,
+        32,
+        0,
+        0
+      )
+      returndatacopy(add(newCallDataPosition, 64), 0, 32)
+      validatorAddress := mload(add(newCallDataPosition, 64))
+    }
+
+    return validatorAddress;
+  }
+
+  function numberValidatorsInCurrentSet() internal view returns (uint256) {
+    uint256 numberValidators;
+    assembly {
+      let success := staticcall(
+        5000,
+        0xf9,
+        0,
+        0,
+        0,
+        0
+      )
+      let returnData := mload(0x40)
+      returndatacopy(returnData, 0, 32)
+      numberValidators := mload(returnData)
+    }
+
+    return numberValidators;
   }
 }
