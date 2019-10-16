@@ -58,7 +58,7 @@ export class ValidatorsWrapper extends BaseWrapper<Validators> {
     commission: BigNumber
   ): Promise<CeloTransactionObject<boolean>> {
     if (this.kit.defaultAccount == null) {
-      throw new Error(`missing from at new ValdidatorUtils()`)
+      throw new Error(`missing kit.defaultAccount`)
     }
     return wrapSend(
       this.kit,

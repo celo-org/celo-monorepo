@@ -657,7 +657,6 @@ contract Election is IElection, Ownable, ReentrancyGuard, Initializable, UsingRe
     require(index < list.length && list[index] == element);
     uint256 lastIndex = list.length.sub(1);
     list[index] = list[lastIndex];
-    delete list[lastIndex];
     list.length = lastIndex;
   }
 

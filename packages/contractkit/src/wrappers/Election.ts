@@ -156,7 +156,7 @@ export class ElectionWrapper extends BaseWrapper<Election> {
    */
   async markGroupEligible(validatorGroup: Address): Promise<CeloTransactionObject<boolean>> {
     if (this.kit.defaultAccount == null) {
-      throw new Error(`missing from at new ValdidatorUtils()`)
+      throw new Error(`missing kit.defaultAccount`)
     }
 
     const value = toBigNumber(
@@ -174,7 +174,7 @@ export class ElectionWrapper extends BaseWrapper<Election> {
    */
   async vote(validatorGroup: Address, value: BigNumber): Promise<CeloTransactionObject<boolean>> {
     if (this.kit.defaultAccount == null) {
-      throw new Error(`missing from at new ValdidatorUtils()`)
+      throw new Error(`missing kit.defaultAccount`)
     }
 
     const { lesser, greater } = await this.findLesserAndGreaterAfterVote(validatorGroup, value)

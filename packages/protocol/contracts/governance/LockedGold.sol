@@ -207,7 +207,10 @@ contract LockedGold is ILockedGold, ReentrancyGuard, Initializable, UsingRegistr
     require(isAccount(msg.sender));
     Account storage account = accounts[msg.sender];
     uint256 balanceRequirement = getValidators().getAccountBalanceRequirement(msg.sender);
-    require(balanceRequirement <= getAccountTotalLockedGold(msg.sender).sub(value));
+    require(
+      balanceRequirement == 0 ||
+      balanceRequirement <= getAccountTotalLockedGold(msg.sender).sub(value)
+    );
     _decrementNonvotingAccountBalance(msg.sender, value);
     uint256 available = now.add(unlockingPeriod);
     account.balances.pendingWithdrawals.push(PendingWithdrawal(value, available));

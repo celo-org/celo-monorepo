@@ -29,8 +29,8 @@ interface AccountSummary {
     nonvoting: BigNumber
   }
   authorizations: {
-    voter: string
-    validator: string
+    voter: null | string
+    validator: null | string
   }
   pendingWithdrawals: PendingWithdrawal[]
 }
@@ -140,8 +140,8 @@ export class LockedGoldWrapper extends BaseWrapper<LockedGold> {
         nonvoting,
       },
       authorizations: {
-        voter: eqAddress(voter, account) ? 'None' : voter,
-        validator: eqAddress(validator, account) ? 'None' : validator,
+        voter: eqAddress(voter, account) ? null : voter,
+        validator: eqAddress(validator, account) ? null : validator,
       },
       pendingWithdrawals,
     }
