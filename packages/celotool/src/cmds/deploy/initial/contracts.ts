@@ -73,10 +73,9 @@ async function makeMetadata(testnet: string, address: string, index: number) {
   const fileName = `validator-${testnet}-${address}-metadata.json`
   const filePath = `/tmp/${fileName}`
 
-  const metadata = new IdentityMetadataWrapper(IdentityMetadataWrapper.emptyData)
+  const metadata = IdentityMetadataWrapper.fromEmpty()
   metadata.addClaim(nameClaim)
   metadata.addClaim(attestationServiceClaim)
-
   writeFileSync(filePath, metadata.toString())
 
   await uploadFileToGoogleStorage(
