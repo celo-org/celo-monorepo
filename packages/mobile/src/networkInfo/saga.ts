@@ -21,10 +21,7 @@ export function* waitWeb3LastBlock() {
 
 function createNetworkStatusChannel() {
   return eventChannel((emit) => {
-    NetInfo.addEventListener((state) => emit(state))
-    return () => {
-      Logger.info('Removed network status monitor')
-    }
+    return NetInfo.addEventListener((state) => emit(state))
   })
 }
 

@@ -16,7 +16,7 @@ export async function installSentry() {
     Logger.info(TAG, 'installSentry', 'Sentry URL not found, skiping instalation')
     return
   }
-  Sentry.init({ dsn: SENTRY_URL, environment: await DeviceInfo.getBundleId() })
+  Sentry.init({ dsn: SENTRY_URL, environment: DeviceInfo.getBundleId() })
   await uploadNdkCrashesIfAny()
   Logger.info(TAG, 'installSentry', 'Sentry installation complete')
 }

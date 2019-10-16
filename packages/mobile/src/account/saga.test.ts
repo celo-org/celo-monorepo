@@ -6,7 +6,6 @@ import { getPincode, setPincode } from 'src/account/saga'
 import { showError } from 'src/alert/actions'
 import { ErrorMessages } from 'src/app/ErrorMessages'
 import { setCachedPincode } from 'src/pincode/PincodeCache'
-// @ts-ignore TS doesn't understand the RN's platform specific file imports
 import { setPinInKeystore } from 'src/pincode/PincodeUtils'
 
 const mockPin = '123456'

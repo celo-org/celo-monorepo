@@ -118,7 +118,7 @@ export const writePaymentRequest = (paymentInfo: PaymentRequest) => async () => 
 }
 
 export async function getVersionInfo() {
-  const version = await DeviceInfo.getVersion()
+  const version = DeviceInfo.getVersion()
   const versionFSPath = version.split('.').join('/')
   Logger.info(TAG, `Checking version info ${version}`)
   return (await firebase

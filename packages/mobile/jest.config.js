@@ -7,6 +7,7 @@ module.exports = {
     navigator: true,
     'ts-jest': {
       babelConfig: true,
+      // Disables type-check when running tests as it takes valuable time
       isolatedModules: true,
       tsConfig: 'tsconfig.test.json',
     },
