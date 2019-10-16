@@ -1,10 +1,8 @@
 import firebase, { Firebase } from 'react-native-firebase'
 import { RemoteMessage } from 'react-native-firebase/messaging'
-import { Notification, NotificationOpen } from 'react-native-firebase/notifications'
 import { Sentry } from 'react-native-sentry'
-import { NotificationReceiveState, PaymentRequest } from 'src/account'
-import { handleNotification } from 'src/firebase/notifications'
-import { getReduxStore } from 'src/redux/store'
+import { call } from 'redux-saga/effects'
+import { PaymentRequest } from 'src/account'
 import Logger from 'src/utils/Logger'
 
 const TAG = 'Firebase'
@@ -26,59 +24,66 @@ export const initializeAuth = async (app: Firebase, address: string) => {
   Logger.info(TAG, 'Firebase Auth initialized successfully')
 }
 
-export const initializeCloudMessaging = async (app: Firebase, address: string) => {
+//export const initializeCloudMessaging = async (app: Firebase, address: string) => {
+export function* initializeCloudMessaging(app: Firebase, address: string) {
   // TODO(cmcewen): remove once we move off thunk
-  const store = getReduxStore()
-  const language = store.getState().app.language
-  const dispatch = store.dispatch
+  // const store = getReduxStore()
+  // const language = store.getState().app.language
+  // const dispatch = store.dispatch
+
+  throw Error('fail with dispatch')
 
   Logger.info(TAG, 'Initializing Firebase Cloud Messaging')
-  const enabled = await app.messaging().hasPermission()
+  const enabled = yield call(app.messaging().hasPermission)
   if (!enabled) {
     try {
-      await app.messaging().requestPermission()
+      yield call(app.messaging().requestPermission)
     } catch (error) {
       Logger.error(TAG, 'User has rejected messaging permissions', error)
       throw error
     }
   }
 
-  const fcmToken = await app.messaging().getToken()
+  const fcmToken = yield call(app.messaging().getToken)
   if (fcmToken) {
-    await registerTokenToDb(app, address, fcmToken)
+    yield call(registerTokenToDb, app, address, fcmToken)
     // First time setting the fcmToken also set the language selection
-    await setUserLanguage(address, language)
+    // yield call(setUserLanguage, address, language)
   }
 
-  // Monitor for future token refreshes
-  app.messaging().onTokenRefresh(async (token) => {
-    Logger.info(TAG, 'Cloud Messaging token refreshed')
-    await registerTokenToDb(app, address, token)
-  })
+  // // Monitor for future token refreshes
+  // app.messaging().onTokenRefresh(async (token) => {
+  //   Logger.info(TAG, 'Cloud Messaging token refreshed')
+  //   // await registerTokenToDb(app, address, token)
+  //   await registerTokenToDb(app, address, token)
+  // })
 
-  // Listen for notification messages while the app is open
-  app.notifications().onNotification((notification: Notification) => {
-    Logger.info(TAG, 'Notification received while open')
-    dispatch(handleNotification(notification, NotificationReceiveState.APP_ALREADY_OPEN))
-  })
+  // throw Error("fail with dispatch")
 
-  app.notifications().onNotificationOpened((notification: NotificationOpen) => {
-    Logger.info(TAG, 'App opened via a notification')
-    dispatch(
-      handleNotification(notification.notification, NotificationReceiveState.APP_FOREGROUNDED)
-    )
-  })
+  // // Listen for notification messages while the app is open
+  // app.notifications().onNotification((notification: Notification) => {
+  //   Logger.info(TAG, 'Notification received while open')
 
-  const initialNotification = await app.notifications().getInitialNotification()
-  if (initialNotification) {
-    Logger.info(TAG, 'App opened fresh via a notification')
-    dispatch(
-      handleNotification(
-        initialNotification.notification,
-        NotificationReceiveState.APP_OPENED_FRESH
-      )
-    )
-  }
+  //   dispatch(handleNotification(notification, NotificationReceiveState.APP_ALREADY_OPEN))
+  // })
+
+  // app.notifications().onNotificationOpened((notification: NotificationOpen) => {
+  //   Logger.info(TAG, 'App opened via a notification')
+  //   dispatch(
+  //     handleNotification(notification.notification, NotificationReceiveState.APP_FOREGROUNDED)
+  //   )
+  // })
+
+  // const initialNotification = await app.notifications().getInitialNotification()
+  // if (initialNotification) {
+  //   Logger.info(TAG, 'App opened fresh via a notification')
+  //   dispatch(
+  //     handleNotification(
+  //       initialNotification.notification,
+  //       NotificationReceiveState.APP_OPENED_FRESH
+  //     )
+  //   )
+  // }
 }
 
 export async function onBackgroundNotification(remoteMessage: RemoteMessage) {
