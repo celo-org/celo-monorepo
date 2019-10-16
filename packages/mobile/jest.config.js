@@ -8,6 +8,7 @@ module.exports = {
     'ts-jest': {
       babelConfig: true,
       // Disables type-check when running tests as it takes valuable time
+      // and is redundant with the tsc build step
       isolatedModules: true,
       tsConfig: 'tsconfig.test.json',
     },
