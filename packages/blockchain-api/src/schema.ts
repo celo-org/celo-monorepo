@@ -142,9 +142,7 @@ export const resolvers = {
         obj.type === EventTypes.SENT ||
         obj.type === EventTypes.FAUCET ||
         obj.type === EventTypes.VERIFICATION_FEE ||
-        obj.type === EventTypes.VERIFICATION_REWARD ||
-        obj.type === EventTypes.ESCROW_RECEIVED ||
-        obj.type === EventTypes.ESCROW_SENT
+        obj.type === EventTypes.VERIFICATION_REWARD
       ) {
         return 'Transfer'
       }
