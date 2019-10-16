@@ -629,12 +629,16 @@ contract Election is IElection, Ownable, ReentrancyGuard, Initializable, UsingRe
    * @param group The address of the validator group.
    * @param value The number of active votes being added.
    * @return The delta in active vote denominator for `group`.
+   * @dev Preserves unitsDelta / totalUnits = value / total
    */
   function getActiveVotesUnitsDelta(address group, uint256 value) private view returns (uint256) {
-    // Preserve unitsDelta * total = value * totalUnits
-    return value.mul(votes.active.forGroup[group].totalUnits.add(1)).div(
-      votes.active.forGroup[group].total.add(1)
-    );
+    if (votes.active.forGroup[group].total == 0) {
+      return value;
+    } else {
+      return value.mul(votes.active.forGroup[group].totalUnits).div(
+        votes.active.forGroup[group].total
+      );
+    }
   }
 
   /**

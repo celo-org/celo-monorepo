@@ -12,7 +12,7 @@ import {
   toBigNumber,
   toNumber,
   tupleParser,
-  wrapSend,
+  toTransactionObject,
 } from './BaseWrapper'
 
 export interface Validator {
@@ -164,7 +164,7 @@ export class ElectionWrapper extends BaseWrapper<Election> {
     )
     const { lesser, greater } = await this.findLesserAndGreaterAfterVote(validatorGroup, value)
 
-    return wrapSend(this.kit, this.contract.methods.markGroupEligible(lesser, greater))
+    return toTransactionObject(this.kit, this.contract.methods.markGroupEligible(lesser, greater))
   }
 
   /**
@@ -179,7 +179,7 @@ export class ElectionWrapper extends BaseWrapper<Election> {
 
     const { lesser, greater } = await this.findLesserAndGreaterAfterVote(validatorGroup, value)
 
-    return wrapSend(
+    return toTransactionObject(
       this.kit,
       this.contract.methods.vote(validatorGroup, value.toString(), lesser, greater)
     )

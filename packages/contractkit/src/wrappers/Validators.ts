@@ -1,6 +1,6 @@
 import { fromFixed, toFixed } from '@celo/utils/lib/fixidity'
 import BigNumber from 'bignumber.js'
-import { Address } from '../base'
+import { Address, NULL_ADDRESS } from '../base'
 import { Validators } from '../generated/types/Validators'
 import {
   BaseWrapper,
@@ -8,7 +8,6 @@ import {
   proxyCall,
   proxySend,
   toBigNumber,
-  toNumber,
   toTransactionObject,
 } from './BaseWrapper'
 
@@ -59,7 +58,7 @@ export class ValidatorsWrapper extends BaseWrapper<Validators> {
     if (this.kit.defaultAccount == null) {
       throw new Error(`missing kit.defaultAccount`)
     }
-    return wrapSend(
+    return toTransactionObject(
       this.kit,
       this.contract.methods.registerValidatorGroup(name, url, toFixed(commission).toFixed())
     )
@@ -128,20 +127,6 @@ export class ValidatorsWrapper extends BaseWrapper<Validators> {
   }
 
   /**
-   * Returns whether a particular account is voting for a validator group.
-   * @param account The account.
-   * @return Whether a particular account is voting for a validator group.
-   */
-  isVoting = proxyCall(this.contract.methods.isVoting)
-
-  /**
-   * Returns whether a particular account is a registered validator or validator group.
-   * @param account The account.
-   * @return Whether a particular account is a registered validator or validator group.
-   */
-  isValidating = proxyCall(this.contract.methods.isValidating)
-
-  /**
    * Returns whether a particular account has a registered validator.
    * @param account The account.
    * @return Whether a particular address is a registered validator.
@@ -154,15 +139,6 @@ export class ValidatorsWrapper extends BaseWrapper<Validators> {
    * @return Whether a particular address is a registered validator group.
    */
   isValidatorGroup = proxyCall(this.contract.methods.isValidatorGroup)
-
-  /**
-   * Returns whether an account meets the requirements to register a validator or group.
-   * @param account The account.
-   * @param noticePeriods An array of notice periods of the Locked Gold commitments
-   *   that cumulatively meet the requirements for validator registration.
-   * @return Whether an account meets the requirements to register a validator or group.
-   */
-  meetsRegistrationRequirements = proxyCall(this.contract.methods.meetsRegistrationRequirements)
 
   addMember = proxySend(this.kit, this.contract.methods.addMember)
   removeMember = proxySend(this.kit, this.contract.methods.removeMember)

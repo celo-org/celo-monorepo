@@ -118,7 +118,12 @@ export class LockedGoldWrapper extends BaseWrapper<LockedGold> {
   getValidatorFromAccount: (account: string) => Promise<Address> = proxyCall(
     this.contract.methods.getValidatorFromAccount
   )
-
+  /**
+   * Check if an account already exists.
+   * @param account The address of the account
+   * @return Returns `true` if account exists. Returns `false` otherwise.
+   */
+  isAccount: (account: string) => Promise<boolean> = proxyCall(this.contract.methods.isAccount)
   /**
    * Returns current configuration parameters.
    */
@@ -156,7 +161,10 @@ export class LockedGoldWrapper extends BaseWrapper<LockedGold> {
   async authorizeVoter(account: Address, voter: Address): Promise<CeloTransactionObject<void>> {
     const sig = await this.getParsedSignatureOfAddress(account, voter)
     // TODO(asa): Pass default tx "from" argument.
-    return wrapSend(this.kit, this.contract.methods.authorizeVoter(voter, sig.v, sig.r, sig.s))
+    return toTransactionObject(
+      this.kit,
+      this.contract.methods.authorizeVoter(voter, sig.v, sig.r, sig.s)
+    )
   }
 
   /**
