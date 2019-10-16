@@ -192,13 +192,20 @@ module.exports = async (_deployer: any, _networkName: string) => {
     console.info('  * Voting for Validator Group ...')
     // Make another deposit so our vote has more weight.
     const minLockedGoldVotePerValidator = 10000
-    await lockedGold.newCommitment(0, {
-      // @ts-ignore
+    // @ts-ignore
+    const bondTx = lockedGold.contract.methods.newCommitment(0)
+    await sendTransactionWithPrivateKey(web3, bondTx, groupKeys[0], {
+      to: lockedGold.address,
       value: new BigNumber(groupKeys.length)
         .times(minLockedGoldVotePerValidator)
         .times(config.validators.minLockedGoldValue),
     })
-    await validators.vote(account.address, NULL_ADDRESS, prevGroupAddress)
+
+    // @ts-ignore
+    const voteTx = validators.contract.methods.vote(account.address, NULL_ADDRESS, prevGroupAddress)
+    await sendTransactionWithPrivateKey(web3, voteTx, groupKeys[0], {
+      to: lockedGold.address,
+    })
     prevGroupAddress = account.address
   }
 }
