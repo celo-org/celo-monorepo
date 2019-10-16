@@ -13,6 +13,7 @@ import "../common/Initializable.sol";
 import "../governance/UsingLockedGold.sol";
 import "../common/UsingRegistry.sol";
 import "../common/Signatures.sol";
+import "../common/UsingPrecompiles.sol";
 
 
 /**
@@ -24,7 +25,8 @@ contract Attestations is
   Initializable,
   UsingRegistry,
   ReentrancyGuard,
-  UsingLockedGold
+  UsingLockedGold,
+  UsingPrecompiles
 {
 
 
@@ -789,44 +791,5 @@ contract Attestations is
   function isAttestationTimeValid(uint128 attestationTime) internal view returns (bool) {
     // solhint-disable-next-line not-rely-on-time
     return now < attestationTime.add(attestationExpirySeconds);
-  }
-
-  function validatorAddressFromCurrentSet(uint256 index) internal view returns (address) {
-    address validatorAddress;
-    assembly {
-      let newCallDataPosition := mload(0x40)
-      mstore(newCallDataPosition, index)
-      let success := staticcall(
-        5000,
-        0xfa,
-        newCallDataPosition,
-        32,
-        0,
-        0
-      )
-      returndatacopy(add(newCallDataPosition, 64), 0, 32)
-      validatorAddress := mload(add(newCallDataPosition, 64))
-    }
-
-    return validatorAddress;
-  }
-
-  function numberValidatorsInCurrentSet() internal view returns (uint256) {
-    uint256 numberValidators;
-    assembly {
-      let success := staticcall(
-        5000,
-        0xf9,
-        0,
-        0,
-        0,
-        0
-      )
-      let returnData := mload(0x40)
-      returndatacopy(returnData, 0, 32)
-      numberValidators := mload(returnData)
-    }
-
-    return numberValidators;
   }
 }

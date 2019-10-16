@@ -15,11 +15,11 @@ contract TestAttestations is Attestations {
     __testValidators = validators;
   }
 
-  function numberValidatorsInCurrentSet() internal view returns (uint256) {
+  function numberValidatorsInCurrentSet() public view returns (uint256) {
     return __testValidators.length;
   }
 
-  function validatorAddressFromCurrentSet(uint256 index) internal view returns (address) {
+  function validatorAddressFromCurrentSet(uint256 index) public view returns (address) {
     return __testValidators[index];
   }
 }
