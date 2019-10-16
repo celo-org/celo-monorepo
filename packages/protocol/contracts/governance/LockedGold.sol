@@ -21,8 +21,12 @@ contract LockedGold is ILockedGold, ReentrancyGuard, Initializable, UsingRegistr
 
   struct Authorizations {
     // The address that is authorized to vote on behalf of the account.
+    // The account can vote as well, whether or not an authorized voter has been specified.
     address voting;
     // The address that is authorized to validate on behalf of the account.
+    // The account can manage the validator, whether or not an authorized validator has been
+    // specified. However if an authorized validator has been specified, only that key may actually
+    // participate in consensus.
     address validating;
   }
 
@@ -33,9 +37,11 @@ contract LockedGold is ILockedGold, ReentrancyGuard, Initializable, UsingRegistr
     uint256 timestamp;
   }
 
+  // NOTE: This contract does not store an account's locked gold that is being used in electing
+  // validators.
   struct Balances {
-    // This contract does not store an account's locked gold that is being used in electing
-    // validators.
+    // The amount of locked gold that this account has that is not currently participating in
+    // validator elections.
     uint256 nonvoting;
     // Gold that has been unlocked and will become available for withdrawal.
     PendingWithdrawal[] pendingWithdrawals;
@@ -57,6 +63,7 @@ contract LockedGold is ILockedGold, ReentrancyGuard, Initializable, UsingRegistr
   uint256 public totalNonvoting;
   uint256 public unlockingPeriod;
 
+  event UnlockingPeriodSet(uint256 period);
   event VoterAuthorized(address indexed account, address voter);
   event ValidatorAuthorized(address indexed account, address validator);
   event GoldLocked(address indexed account, uint256 value);
@@ -86,6 +93,7 @@ contract LockedGold is ILockedGold, ReentrancyGuard, Initializable, UsingRegistr
    * @param v The recovery id of the incoming ECDSA signature.
    * @param r Output value r of the ECDSA signature.
    * @param s Output value s of the ECDSA signature.
+   * @dev v, r, s constitute `voter`'s signature on `msg.sender`.
    */
   function authorizeVoter(
     address voter,
@@ -108,6 +116,7 @@ contract LockedGold is ILockedGold, ReentrancyGuard, Initializable, UsingRegistr
    * @param v The recovery id of the incoming ECDSA signature.
    * @param r Output value r of the ECDSA signature.
    * @param s Output value s of the ECDSA signature.
+   * @dev v, r, s constitute `validator`'s signature on `msg.sender`.
    */
   function authorizeValidator(
     address validator,
@@ -125,6 +134,16 @@ contract LockedGold is ILockedGold, ReentrancyGuard, Initializable, UsingRegistr
   }
 
   /**
+   * @notice Sets the duration in seconds users must wait before withdrawing gold after unlocking.
+   * @param value The unlocking period in seconds.
+   */
+  function setUnlockingPeriod(uint256 value) external onlyOwner {
+    require(value != unlockingPeriod);
+    unlockingPeriod = value;
+    emit UnlockingPeriodSet(value);
+  }
+
+  /**
    * @notice Locks gold to be used for voting.
    */
   function lock() external payable nonReentrant {
@@ -138,7 +157,7 @@ contract LockedGold is ILockedGold, ReentrancyGuard, Initializable, UsingRegistr
    * @notice Increments the non-voting balance for an account.
    * @param account The account whose non-voting balance should be incremented.
    * @param value The amount by which to increment.
-   * @dev Can only be called by the registered "Election" smart contract.
+   * @dev Can only be called by the registered Election smart contract.
    */
   function incrementNonvotingAccountBalance(
     address account,
@@ -194,7 +213,10 @@ contract LockedGold is ILockedGold, ReentrancyGuard, Initializable, UsingRegistr
     require(isAccount(msg.sender));
     Account storage account = accounts[msg.sender];
     uint256 balanceRequirement = getValidators().getAccountBalanceRequirement(msg.sender);
-    require(balanceRequirement <= getAccountTotalLockedGold(msg.sender).sub(value));
+    require(
+      balanceRequirement == 0 ||
+      balanceRequirement <= getAccountTotalLockedGold(msg.sender).sub(value)
+    );
     _decrementNonvotingAccountBalance(msg.sender, value);
     uint256 available = now.add(unlockingPeriod);
     account.balances.pendingWithdrawals.push(PendingWithdrawal(value, available));
@@ -217,7 +239,7 @@ contract LockedGold is ILockedGold, ReentrancyGuard, Initializable, UsingRegistr
   }
 
   /**
-   * @notice Withdraws a gold that has been unlocked after the unlocking period has passed.
+   * @notice Withdraws gold that has been unlocked after the unlocking period has passed.
    * @param index The index of the pending withdrawal to withdraw.
    */
   function withdraw(uint256 index) external nonReentrant {
@@ -363,7 +385,7 @@ contract LockedGold is ILockedGold, ReentrancyGuard, Initializable, UsingRegistr
   function getPendingWithdrawals(
     address account
   )
-    public
+    external
     view
     returns (uint256[] memory, uint256[] memory)
   {
@@ -389,7 +411,7 @@ contract LockedGold is ILockedGold, ReentrancyGuard, Initializable, UsingRegistr
    * @param r Output value r of the ECDSA signature.
    * @param s Output value s of the ECDSA signature.
    * @dev Fails if the address is already authorized or is an account.
-   * @dev v, r, s constitute `authorize`'s signature on `msg.sender`.
+   * @dev v, r, s constitute `current`'s signature on `msg.sender`.
    */
   function authorize(
     address current,
@@ -445,6 +467,11 @@ contract LockedGold is ILockedGold, ReentrancyGuard, Initializable, UsingRegistr
     return (authorizedBy[account].account == address(0));
   }
 
+  /**
+   * @notice Deletes a pending withdrawal.
+   * @param list The list of pending withdrawals from which to delete.
+   * @param index The index of the pending withdrawal to delete.
+   */
   function deletePendingWithdrawal(PendingWithdrawal[] storage list, uint256 index) private {
     uint256 lastIndex = list.length.sub(1);
     list[index] = list[lastIndex];

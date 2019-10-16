@@ -1060,6 +1060,67 @@ contract('Governance', (accounts: string[]) => {
         await assertRevert(governance.upvote(proposalId, 0, 0))
       })
     })
+
+    describe('when the previously upvoted proposal is in the queue and expired', () => {
+      const upvotedProposalId = 2
+      // Expire the upvoted proposal without dequeueing it.
+      const queueExpiry = 60
+      beforeEach(async () => {
+        await governance.setQueueExpiry(60)
+        await governance.upvote(proposalId, 0, 0)
+        await timeTravel(queueExpiry, web3)
+        await governance.propose(
+          [transactionSuccess1.value],
+          [transactionSuccess1.destination],
+          transactionSuccess1.data,
+          [transactionSuccess1.data.length],
+          // @ts-ignore: TODO(mcortesi) fix typings for TransactionDetails
+          { value: minDeposit }
+        )
+      })
+
+      it('should increase the number of upvotes for the proposal', async () => {
+        await governance.upvote(upvotedProposalId, 0, 0)
+        assertEqualBN(await governance.getUpvotes(upvotedProposalId), weight)
+      })
+
+      it('should mark the account as having upvoted the proposal', async () => {
+        await governance.upvote(upvotedProposalId, 0, 0)
+        const [recordId, recordWeight] = await governance.getUpvoteRecord(account)
+        assertEqualBN(recordId, upvotedProposalId)
+        assertEqualBN(recordWeight, weight)
+      })
+
+      it('should return true', async () => {
+        const success = await governance.upvote.call(upvotedProposalId, 0, 0)
+        assert.isTrue(success)
+      })
+
+      it('should emit the ProposalExpired event', async () => {
+        const resp = await governance.upvote(upvotedProposalId, 0, 0)
+        assert.equal(resp.logs.length, 2)
+        const log = resp.logs[0]
+        assertLogMatches2(log, {
+          event: 'ProposalExpired',
+          args: {
+            proposalId: new BigNumber(proposalId),
+          },
+        })
+      })
+      it('should emit the ProposalUpvoted event', async () => {
+        const resp = await governance.upvote(upvotedProposalId, 0, 0)
+        assert.equal(resp.logs.length, 2)
+        const log = resp.logs[1]
+        assertLogMatches2(log, {
+          event: 'ProposalUpvoted',
+          args: {
+            proposalId: new BigNumber(upvotedProposalId),
+            account,
+            upvotes: new BigNumber(weight),
+          },
+        })
+      })
+    })
   })
 
   describe('#revokeUpvote()', () => {
@@ -1592,6 +1653,29 @@ contract('Governance', (accounts: string[]) => {
             [transactionFail.destination],
             transactionFail.data,
             [transactionFail.data.length],
+            // @ts-ignore: TODO(mcortesi) fix typings for TransactionDetails
+            { value: minDeposit }
+          )
+          await timeTravel(dequeueFrequency, web3)
+          await governance.approve(proposalId, index)
+          await timeTravel(approvalStageDuration, web3)
+          await mockLockedGold.setAccountTotalLockedGold(account, weight)
+          await governance.vote(proposalId, index, value)
+          await timeTravel(referendumStageDuration, web3)
+        })
+
+        it('should revert', async () => {
+          await assertRevert(governance.execute(proposalId, index))
+        })
+      })
+
+      describe('when the proposal cannot execute because it is not a contract address', () => {
+        beforeEach(async () => {
+          await governance.propose(
+            [transactionSuccess1.value],
+            [accounts[1]],
+            transactionSuccess1.data,
+            [transactionSuccess1.data.length],
             // @ts-ignore: TODO(mcortesi) fix typings for TransactionDetails
             { value: minDeposit }
           )

@@ -1,7 +1,9 @@
 import { CeloContractName } from '@celo/protocol/lib/registry-utils'
+import { getParsedSignatureOfAddress } from '@celo/protocol/lib/signing-utils'
 import {
   assertEqualBN,
   assertLogMatches,
+  assertLogMatches2,
   assertRevert,
   timeTravel,
 } from '@celo/protocol/lib/test-utils'
@@ -44,17 +46,6 @@ contract('LockedGold', (accounts: string[]) => {
 
   const capitalize = (s: string) => {
     return s.charAt(0).toUpperCase() + s.slice(1)
-  }
-
-  const getParsedSignatureOfAddress = async (address: string, signer: string) => {
-    // @ts-ignore
-    const hash = web3.utils.soliditySha3({ type: 'address', value: address })
-    const signature = (await web3.eth.sign(hash, signer)).slice(2)
-    return {
-      r: `0x${signature.slice(0, 64)}`,
-      s: `0x${signature.slice(64, 128)}`,
-      v: web3.utils.hexToNumber(signature.slice(128, 130)) + 27,
-    }
   }
 
   beforeEach(async () => {
@@ -117,6 +108,34 @@ contract('LockedGold', (accounts: string[]) => {
     })
   })
 
+  describe('#setUnlockingPeriod', () => {
+    const newUnlockingPeriod = unlockingPeriod + 1
+    it('should set the unlockingPeriod', async () => {
+      await lockedGold.setUnlockingPeriod(newUnlockingPeriod)
+      assertEqualBN(await lockedGold.unlockingPeriod(), newUnlockingPeriod)
+    })
+
+    it('should emit the UnlockingPeriodSet event', async () => {
+      const resp = await lockedGold.setUnlockingPeriod(newUnlockingPeriod)
+      assert.equal(resp.logs.length, 1)
+      const log = resp.logs[0]
+      assertLogMatches2(log, {
+        event: 'UnlockingPeriodSet',
+        args: {
+          period: newUnlockingPeriod,
+        },
+      })
+    })
+
+    it('should revert when the unlockingPeriod is unchanged', async () => {
+      await assertRevert(lockedGold.setUnlockingPeriod(unlockingPeriod))
+    })
+
+    it('should revert when called by anyone other than the owner', async () => {
+      await assertRevert(lockedGold.setUnlockingPeriod(newUnlockingPeriod, { from: nonOwner }))
+    })
+  })
+
   Object.keys(authorizationTests).forEach((key) => {
     describe('authorization tests:', () => {
       let authorizationTest: any
@@ -129,7 +148,7 @@ contract('LockedGold', (accounts: string[]) => {
         let sig
 
         beforeEach(async () => {
-          sig = await getParsedSignatureOfAddress(account, authorized)
+          sig = await getParsedSignatureOfAddress(web3, account, authorized)
         })
 
         it(`should set the authorized ${key}`, async () => {
@@ -154,7 +173,7 @@ contract('LockedGold', (accounts: string[]) => {
 
         it(`should revert if the ${key} is already authorized`, async () => {
           const otherAccount = accounts[2]
-          const otherSig = await getParsedSignatureOfAddress(otherAccount, authorized)
+          const otherSig = await getParsedSignatureOfAddress(web3, otherAccount, authorized)
           await lockedGold.createAccount({ from: otherAccount })
           await authorizationTest.fn(authorized, otherSig.v, otherSig.r, otherSig.s, {
             from: otherAccount,
@@ -164,7 +183,7 @@ contract('LockedGold', (accounts: string[]) => {
 
         it('should revert if the signature is incorrect', async () => {
           const nonVoter = accounts[3]
-          const incorrectSig = await getParsedSignatureOfAddress(account, nonVoter)
+          const incorrectSig = await getParsedSignatureOfAddress(web3, account, nonVoter)
           await assertRevert(
             authorizationTest.fn(authorized, incorrectSig.v, incorrectSig.r, incorrectSig.s)
           )
@@ -175,7 +194,7 @@ contract('LockedGold', (accounts: string[]) => {
           let newSig
           beforeEach(async () => {
             await authorizationTest.fn(authorized, sig.v, sig.r, sig.s)
-            newSig = await getParsedSignatureOfAddress(account, newAuthorized)
+            newSig = await getParsedSignatureOfAddress(web3, account, newAuthorized)
             await authorizationTest.fn(newAuthorized, newSig.v, newSig.r, newSig.s)
           })
 
@@ -207,7 +226,7 @@ contract('LockedGold', (accounts: string[]) => {
         describe(`when the account has authorized a ${key}`, () => {
           const authorized = accounts[1]
           beforeEach(async () => {
-            const sig = await getParsedSignatureOfAddress(account, authorized)
+            const sig = await getParsedSignatureOfAddress(web3, account, authorized)
             await authorizationTest.fn(authorized, sig.v, sig.r, sig.s)
           })
 
@@ -239,7 +258,7 @@ contract('LockedGold', (accounts: string[]) => {
           const authorized = accounts[1]
 
           beforeEach(async () => {
-            const sig = await getParsedSignatureOfAddress(account, authorized)
+            const sig = await getParsedSignatureOfAddress(web3, account, authorized)
             await authorizationTest.fn(authorized, sig.v, sig.r, sig.s)
           })
 

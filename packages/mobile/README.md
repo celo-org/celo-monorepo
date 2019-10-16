@@ -176,6 +176,12 @@ Where `YOUR_BUILD_VARIANT` can be any of the app's build variants, such as debug
 We're using [GraphQL Code Generator][graphql code generator] to properly type
 GraphQL queries. If you make a change to a query, run `yarn build:gen-graphql-types` to update the typings in the `typings` directory.
 
+## Running Wallet app in ZeroSync mode
+
+By default, the mobile wallet app runs geth in ultralight sync mode where all the epoch headers are fetched. The default sync mode is defined in [packages/mobile/.env](https://github.com/celo-org/celo-monorepo/blob/master/packages/mobile/.env#L4) file.
+
+To run wallet in zero sync mode, where it would connect to the remote nodes and sign transactions in web3, change the default sync mode in the aforementioned file to -1. The mode has only been tested on Android and is hard-coded to be [crash](https://github.com/celo-org/celo-monorepo/blob/aeddeefbfb230db51d2ef76d50c5f882644a1cd3/packages/mobile/src/web3/contracts.ts#L73) on iOS.
+
 ## Troubleshooting
 
 ### `Activity class {org.celo.mobile.staging/org.celo.mobile.MainActivity} does not exist.`

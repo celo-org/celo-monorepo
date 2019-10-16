@@ -31,7 +31,7 @@ export default class Lock extends BaseCommand {
     const value = new BigNumber(res.flags.value)
 
     if (!value.gt(new BigNumber(0))) {
-      failWith(`Provided value must be greater than zero => [${value}]`)
+      failWith(`Provided value must be greater than zero => [${value.toString()}]`)
     }
 
     const tx = lockedGold.lock()

@@ -1,6 +1,6 @@
 import { fromFixed, toFixed } from '@celo/utils/lib/fixidity'
 import BigNumber from 'bignumber.js'
-import { Address } from '../base'
+import { Address, NULL_ADDRESS } from '../base'
 import { Validators } from '../generated/types/Validators'
 import {
   BaseWrapper,
@@ -8,7 +8,7 @@ import {
   proxyCall,
   proxySend,
   toBigNumber,
-  wrapSend,
+  toTransactionObject,
 } from './BaseWrapper'
 
 export interface Validator {
@@ -56,10 +56,7 @@ export class ValidatorsWrapper extends BaseWrapper<Validators> {
     url: string,
     commission: BigNumber
   ): Promise<CeloTransactionObject<boolean>> {
-    if (this.kit.defaultAccount == null) {
-      throw new Error(`missing from at new ValdidatorUtils()`)
-    }
-    return wrapSend(
+    return toTransactionObject(
       this.kit,
       this.contract.methods.registerValidatorGroup(name, url, toFixed(commission).toFixed())
     )
@@ -142,6 +139,50 @@ export class ValidatorsWrapper extends BaseWrapper<Validators> {
       publicKey: res[2] as any,
       affiliation: res[3],
     }
+  }
+
+  /**
+   * Returns whether a particular account has a registered validator.
+   * @param account The account.
+   * @return Whether a particular address is a registered validator.
+   */
+  isValidator = proxyCall(this.contract.methods.isValidator)
+
+  /**
+   * Returns whether a particular account has a registered validator group.
+   * @param account The account.
+   * @return Whether a particular address is a registered validator group.
+   */
+  isValidatorGroup = proxyCall(this.contract.methods.isValidatorGroup)
+
+  async reorderMember(groupAddr: Address, validator: Address, newIndex: number) {
+    const group = await this.getValidatorGroup(groupAddr)
+
+    if (newIndex < 0 || newIndex >= group.members.length) {
+      throw new Error(`Invalid index ${newIndex}; max index is ${group.members.length - 1}`)
+    }
+
+    const currentIdx = group.members.indexOf(validator)
+    if (currentIdx < 0) {
+      throw new Error(`ValidatorGroup ${groupAddr} does not inclue ${validator}`)
+    } else if (currentIdx === newIndex) {
+      throw new Error(`Validator is already in position ${newIndex}`)
+    }
+
+    // remove the element
+    group.members.splice(currentIdx, 1)
+    // add it on new position
+    group.members.splice(newIndex, 0, validator)
+
+    const nextMember =
+      newIndex === group.members.length - 1 ? NULL_ADDRESS : group.members[newIndex + 1]
+    const prevMember = newIndex === 0 ? NULL_ADDRESS : group.members[newIndex - 1]
+
+    return toTransactionObject(
+      this.kit,
+      this.contract.methods.reorderMember(validator, nextMember, prevMember),
+      { from: groupAddr }
+    )
   }
 
   async getRegisteredValidatorGroups(): Promise<ValidatorGroup[]> {

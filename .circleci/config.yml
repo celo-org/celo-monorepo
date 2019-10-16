@@ -117,7 +117,7 @@ jobs:
           paths:
             - .
 
-  mobile_e2e_test:
+  end-to-end-mobile-test:
     <<: *android_config
     resource_class: large
     steps:
@@ -141,6 +141,7 @@ jobs:
             echo 'export ANDROID_SDK_ROOT="/usr/local/share/android-sdk"' >> $BASH_ENV
             echo 'export QEMU_AUDIO_DRV=none' >> $BASH_ENV
             export PATH=$PATH:/usr/local/share/android-sdk/platform-tools/
+            export GRADLE_OPTS='-Dorg.gradle.daemon=true -Dorg.gradle.parallel=true -Dorg.gradle.jvmargs="-Xmx4096m -XX:+HeapDumpOnOutOfMemoryError"'
       - run:
           name: Install Android sdk
           command: |
@@ -207,7 +208,6 @@ jobs:
           command: HOMEBREW_NO_AUTO_UPDATE=1 brew install pidcat watchman
       - restore_cache:
           key: yarn-v3-{{ arch }}-{{ .Branch }}-{{ checksum "packages/mobile/android/build.gradle" }}-{{ checksum "packages/mobile/android/settings.gradle" }}-{{ checksum "packages/mobile/android/app/build.gradle" }}-{{ checksum "packages/mobile/.env.test" }}
-      - run: cd ~/src/packages/mobile && yarn test:build-e2e # tests seem to fail if the app is built at the same time the emulator runs
       - run:
           name: Start emulator
           command: cd ~/src/packages/mobile && bash ./scripts/start_emulator.sh
@@ -218,7 +218,9 @@ jobs:
           background: true
       - run: cp node_modules/.bin/jest packages/mobile/node_modules/.bin/ # for some reason jest is just not there
       # TODO - run: lock device
-      - run: tree packages/mobile/android/app/build/outputs/apk/
+      - run:
+          name: Build end-to-end test
+          command: cd ~/src/packages/mobile && yarn test:build-e2e
       - run:
           name: Sleep until Device connects
           command: cd ~/src/packages/mobile && bash ./scripts/wait_for_emulator_to_connect.sh
@@ -267,6 +269,10 @@ jobs:
       - attach_workspace:
           at: ~/app
 
+      - run:
+          name: Set GRADLE_OPTS to speed up gradle
+          command: |
+            export GRADLE_OPTS='-Dorg.gradle.daemon=true -Dorg.gradle.parallel=true -Dorg.gradle.jvmargs="-Xmx4096m -XX:+HeapDumpOnOutOfMemoryError"'
       - run:
           name: Build Android app (debug version)
           command: |
@@ -741,7 +747,7 @@ workflows:
   celo-monorepo-build:
     jobs:
       - install_dependencies
-      - mobile_e2e_test:
+      - end-to-end-mobile-test:
           requires:
             - install_dependencies
             - mobile-test-build-app
