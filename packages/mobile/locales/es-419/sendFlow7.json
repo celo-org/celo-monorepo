@@ -43,6 +43,7 @@
   "nameOrPhoneNumber": "Nombre o número de teléfono",
   "pending": "Pendiente",
   "sentPayment": "Enviar pago",
+  "sentEscrowPayment": "Pago de depósito enviado",
   "mobileNumber": "Número de teléfono",
   "walletAddress": "Dirección del Monedero",
   "inviteSMS":

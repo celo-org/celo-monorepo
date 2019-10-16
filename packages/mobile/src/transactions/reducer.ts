@@ -39,7 +39,7 @@ export enum TransactionTypes {
   RECEIVED = 'RECEIVED',
   SENT = 'SENT',
   ESCROW_SENT = 'ESCROW_SENT',
-  ESCROW_RECIEVED = 'ESCROW_RECIEVED',
+  ESCROW_RECEIVED = 'ESCROW_RECEIVED',
   FAUCET = 'FAUCET',
   VERIFICATION_REWARD = 'VERIFICATION_REWARD',
   VERIFICATION_FEE = 'VERIFICATION_FEE',
@@ -52,7 +52,7 @@ export enum TransactionTypes {
 type TransferTransactionTypes =
   | TransactionTypes.SENT
   | TransactionTypes.RECEIVED
-  | TransactionTypes.ESCROW_RECIEVED
+  | TransactionTypes.ESCROW_RECEIVED
   | TransactionTypes.ESCROW_SENT
   | TransactionTypes.FAUCET
   | TransactionTypes.VERIFICATION_REWARD

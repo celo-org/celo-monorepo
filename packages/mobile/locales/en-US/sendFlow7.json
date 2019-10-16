@@ -43,6 +43,7 @@
   "nameOrPhoneNumber": "Name or Phone Number",
   "pending": "Pending",
   "sentPayment": "Sent Payment",
+  "sentEscrowPayment": "Sent Escrow Payment",
   "mobileNumber": "Mobile #",
   "walletAddress": "Wallet Address",
   "inviteSMS":

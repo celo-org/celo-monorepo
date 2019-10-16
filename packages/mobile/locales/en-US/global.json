@@ -24,6 +24,7 @@
   "refreshFailedUnexpectedly": "Failed to refresh, please check your connectivity",
   "edit": "Edit",
   "receivedPayment": "Received Payment",
+  "receivedEscrowPayment": "Received Escrow Payment",
   "getBackupKey": "Get Backup Key",
   "readOnlyState":
     "Read Only Mode Set Backup Key to continue sending and receiving {{CeloDollars}}",

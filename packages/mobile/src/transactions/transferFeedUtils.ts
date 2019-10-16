@@ -87,7 +87,7 @@ export function getTransferFeedParams(
         title = t('feedItemSentTitle', { context: 'missingReceiverDetails', address: shortAddr })
       } else if (type === TransactionTypes.ESCROW_SENT) {
         title = t('feedItemSentTitle', { context: 'escrowSent', address: shortAddr })
-      } else if (type === TransactionTypes.ESCROW_RECIEVED) {
+      } else if (type === TransactionTypes.ESCROW_RECEIVED) {
         title = t('feedItemReceivedTitle', { context: 'escrowRecieved', address: shortAddr })
       } else {
         // Fallback to just using the type

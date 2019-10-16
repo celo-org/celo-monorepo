@@ -25,6 +25,7 @@
   "edit": "Editar",
   "needMoreFundsToSend": "Necesita más fondos para enviar el pago",
   "receivedPayment": "Pago recibido",
+  "receivedEscrowPayment": "Pago de fideicomiso recibido",
   "getBackupKey": "Obtener clave de respaldo",
   "readOnlyState":
     "Modo de solo lectura: cree la clave de respaldo para seguir enviando y recibiendo {{CeloDollars}}",

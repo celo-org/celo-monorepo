@@ -59,7 +59,7 @@ function getCurrencyStyles(currency: CURRENCY_ENUM, type: string): CurrencySymbo
     type === TransactionTypes.VERIFICATION_REWARD ||
     type === TransactionTypes.INVITE_RECEIVED ||
     type === TransactionTypes.PAY_REQUEST ||
-    type === TransactionTypes.ESCROW_RECIEVED
+    type === TransactionTypes.ESCROW_RECEIVED
   ) {
     if (currency === CURRENCY_ENUM.DOLLAR) {
       return {

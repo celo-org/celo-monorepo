@@ -9,7 +9,7 @@ export enum EventTypes {
   VERIFICATION_REWARD = 'VERIFICATION_REWARD',
   VERIFICATION_FEE = 'VERIFICATION_FEE',
   ESCROW_SENT = 'ESCROW_SENT',
-  ESCROW_RECEIVED = 'ESCROW_RECIEVED',
+  ESCROW_RECEIVED = 'ESCROW_RECEIVED',
 }
 
 export interface ExchangeEvent {
@@ -137,6 +137,8 @@ export const resolvers = {
       }
       if (
         obj.type === EventTypes.RECEIVED ||
+        obj.type === EventTypes.ESCROW_RECEIVED ||
+        obj.type === EventTypes.ESCROW_SENT ||
         obj.type === EventTypes.SENT ||
         obj.type === EventTypes.FAUCET ||
         obj.type === EventTypes.VERIFICATION_FEE ||
