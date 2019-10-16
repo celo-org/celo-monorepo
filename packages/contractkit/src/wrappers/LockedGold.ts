@@ -13,7 +13,7 @@ import {
   proxySend,
   toBigNumber,
   tupleParser,
-  wrapSend,
+  toTransactionObject,
 } from '../wrappers/BaseWrapper'
 
 export interface VotingDetails {
@@ -170,7 +170,7 @@ export class LockedGoldWrapper extends BaseWrapper<LockedGold> {
     validator: Address
   ): Promise<CeloTransactionObject<void>> {
     const sig = await this.getParsedSignatureOfAddress(account, validator)
-    return wrapSend(
+    return toTransactionObject(
       this.kit,
       this.contract.methods.authorizeValidator(validator, sig.v, sig.r, sig.s)
     )

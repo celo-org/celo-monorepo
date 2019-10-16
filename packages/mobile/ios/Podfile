@@ -1,11 +1,6 @@
 # File contents of "ios/Podfile"
 platform :ios, '9.0'
 
-pre_install do |installer|
-  # workaround for CocoaPods/CocoaPods#3289
-  Pod::Installer::Xcode::TargetValidator.send(:define_method, :verify_no_static_framework_transitive_dependencies) {}
-end
-
 target 'celo' do
   use_frameworks!
 
@@ -54,6 +49,7 @@ target 'celo' do
   pod 'react-native-splash-screen', :path => '../../../node_modules/react-native-splash-screen'
   pod 'react-native-version-check', :path => '../../../node_modules/react-native-version-check'
   pod 'RNRandomBytes', :path => '../../../node_modules/react-native-secure-randombytes'
+  pod 'react-native-tcp', :path => '../../../node_modules/react-native-tcp'
   pod 'react-native-udp', :path => '../../../node_modules/react-native-udp'
   pod 'react-native-netinfo', :path => '../../../node_modules/@react-native-community/netinfo'
   pod 'RNShare', :path => '../../../node_modules/react-native-share'
