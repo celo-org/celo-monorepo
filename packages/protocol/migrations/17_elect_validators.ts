@@ -204,7 +204,7 @@ module.exports = async (_deployer: any, _networkName: string) => {
     // @ts-ignore
     const voteTx = validators.contract.methods.vote(account.address, NULL_ADDRESS, prevGroupAddress)
     await sendTransactionWithPrivateKey(web3, voteTx, groupKeys[0], {
-      to: lockedGold.address,
+      to: validators.address,
     })
     prevGroupAddress = account.address
   }
