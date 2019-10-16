@@ -221,7 +221,7 @@ contract Attestations is
 
     if (accounts[msg.sender].attestationRequestFeeToken != address(0x0)) {
       require(
-        !isAttestationRequestBlockTimeValid(accounts[msg.sender].mostRecentAttestationRequest) ||
+        isAttestationExpired(accounts[msg.sender].mostRecentAttestationRequest) ||
           accounts[msg.sender].attestationRequestFeeToken == attestationRequestFeeToken,
         "A different fee token was previously specified for this account"
       );
@@ -231,7 +231,7 @@ contract Attestations is
     if(state.requests[msg.sender].blockNumber > 0) {
       // TODO: This should be bound by Random#randomnessBlockRetentionWindow once that gets merged
       require(
-        !isAttestationRequestBlockTimeValid(accounts[msg.sender].mostRecentAttestationRequest),
+        isAttestationExpired(accounts[msg.sender].mostRecentAttestationRequest),
         "Currently active attestation request that has to be revealed first"
       );
     }
@@ -307,7 +307,7 @@ contract Attestations is
 
     // solhint-disable-next-line not-rely-on-time
     require(
-      isAttestationRequestBlockTimeValid(attestation.blockNumber),
+      isAttestationExpired(attestation.blockNumber),
       "Attestation request timed out"
     );
 
@@ -412,12 +412,13 @@ contract Attestations is
   }
 
   /**
-   * @notice Returns the current active attestation request for an identifier/account pair, if any
+   * @notice Returns the current attestation request for an identifier/account pair for which
+             issues have not yet been selected, if any
    * @param identifier Hash of the identifier.
    * @param account Address of the account
    * @return [Block numbr at which was requested, Number of requests]
    */
-  function getActiveAttestationRequest(
+  function getAttestationRequest(
     bytes32 identifier,
     address account
   )
@@ -518,8 +519,7 @@ contract Attestations is
    * @param identifier Hash of the identifier.
    * @param account Address of the account
    * @param issuer Address of the issuer
-   * @return [Status of the attestation, time of request the attestation,
-              time of completion of the attestation]
+   * @return [Status of the attestation, block number of request/completion the attestation
    */
   function getAttestationState(
     bytes32 identifier,
@@ -547,9 +547,9 @@ contract Attestations is
   }
 
   /**
-   * @notice Returns timestamp of the most recent attestation request
+   * @notice Returns the block numbert of the most recent attestation request
    * @param account Address of the account
-   * @return Timestamp of the most recent attestation request
+   * @return Block numbert of the most recent attestation request
    */
   function getMostRecentAttestationRequest(address account)
     external
@@ -771,9 +771,8 @@ contract Attestations is
       attestation.status == AttestationStatus.Incomplete,
       "Attestation code does not match any outstanding attestation"
     );
-    // solhint-disable-next-line not-rely-on-time
     require(
-      isAttestationRequestBlockTimeValid(attestation.blockNumber),
+      isAttestationExpired(attestation.blockNumber),
       "Attestation request timed out"
     );
 
@@ -863,20 +862,18 @@ contract Attestations is
 
       currentIndex++;
       attestations.status = AttestationStatus.Incomplete;
-      // solhint-disable-next-line not-rely-on-time
       attestations.blockNumber = uint64(block.number);
       state.issuers.push(issuer);
     }
   }
 
-  function isAttestationRequestBlockTimeValid(
-    uint128 attestationRequestBlockTime
+  function isAttestationExpired(
+    uint128 attestationRequestBlock
   )
     internal
     view
     returns (bool)
   {
-    // solhint-disable-next-line not-rely-on-time
-    return block.number < uint256(attestationRequestBlockTime).add(attestationExpiryBlocks);
+    return block.number >= uint256(attestationRequestBlock).add(attestationExpiryBlocks);
   }
 }
