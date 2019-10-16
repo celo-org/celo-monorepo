@@ -10,6 +10,14 @@ resource "google_compute_address" "validator" {
   count = var.validator_count
 }
 
+resource "google_compute_address" "validator_internal" {
+  name         = "${local.name_prefix}-internal-address-${count.index}"
+  address_type = "INTERNAL"
+  purpose      = "GCE_ENDPOINT"
+
+  count = var.validator_count
+}
+
 resource "google_compute_instance" "validator" {
   name         = "${local.name_prefix}-${count.index}"
   machine_type = "n1-standard-1"
@@ -33,6 +41,7 @@ resource "google_compute_instance" "validator" {
 
   network_interface {
     network = var.network_name
+    network_ip = google_compute_address.validator_internal[count.index].address
     access_config {
       nat_ip = google_compute_address.validator[count.index].address
     }

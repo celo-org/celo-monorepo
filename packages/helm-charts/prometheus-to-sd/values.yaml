@@ -7,3 +7,6 @@ resources: {}
 port: 6060
 metricsSources: {}
 nodeSelector: {}
+promtosd:
+  podIds: ""
+  namespaceId: ""

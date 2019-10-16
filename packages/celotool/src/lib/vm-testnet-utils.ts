@@ -299,6 +299,16 @@ export async function getInternalTxNodeLoadBalancerIP(celoEnv: string) {
   return outputs.tx_node_lb_internal_ip_address.value
 }
 
+export async function getInternalValidatorIPs(celoEnv: string) {
+  const outputs = await getTestnetOutputs(celoEnv)
+  return outputs.validator_internal_ip_addresses.value
+}
+
+export async function getInternalTxNodeIPs(celoEnv: string) {
+  const outputs = await getTestnetOutputs(celoEnv)
+  return outputs.tx_node_internal_ip_addresses.value
+}
+
 function getTerraformBackendConfigVars(celoEnv: string, terraformModule: string) {
   return {
     prefix: `${celoEnv}/${terraformModule}`,
