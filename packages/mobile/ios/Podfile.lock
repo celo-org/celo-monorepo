@@ -366,7 +366,7 @@ PODS:
     - Segment-Firebase
   - RNCAsyncStorage (1.6.2):
     - React
-  - RNDeviceInfo (3.1.4):
+  - RNDeviceInfo (4.0.1):
     - React
   - RNFirebase (5.5.6):
     - Firebase/Core
@@ -438,13 +438,13 @@ DEPENDENCIES:
   - React-jsinspector (from `../../../node_modules/react-native/ReactCommon/jsinspector`)
   - react-native-camera (from `../../../node_modules/react-native-camera`)
   - react-native-config (from `../../../node_modules/react-native-config`)
-  - react-native-contacts (from `../node_modules/react-native-contacts`)
+  - react-native-contacts (from `../../../node_modules/react-native-contacts`)
   - react-native-geth (from `../../../node_modules/react-native-geth`)
   - react-native-keep-awake (from `../../../node_modules/react-native-keep-awake`)
   - react-native-mail (from `../../../node_modules/react-native-mail`)
-  - "react-native-netinfo (from `../node_modules/@react-native-community/netinfo`)"
+  - "react-native-netinfo (from `../../../node_modules/@react-native-community/netinfo`)"
   - react-native-safe-area-context (from `../../../node_modules/react-native-safe-area-context`)
-  - react-native-splash-screen (from `../node_modules/react-native-splash-screen`)
+  - react-native-splash-screen (from `../../../node_modules/react-native-splash-screen`)
   - react-native-tcp (from `../../../node_modules/react-native-tcp`)
   - react-native-udp (from `../../../node_modules/react-native-udp`)
   - react-native-version-check (from `../../../node_modules/react-native-version-check`)
@@ -463,9 +463,9 @@ DEPENDENCIES:
   - "RNAnalytics (from `../../../node_modules/@segment/analytics-react-native`)"
   - "RNAnalyticsIntegration-Firebase (from `../../../node_modules/@segment/analytics-react-native-firebase`)"
   - "RNCAsyncStorage (from `../../../node_modules/@react-native-community/async-storage`)"
-  - RNDeviceInfo (from `../node_modules/react-native-device-info`)
+  - RNDeviceInfo (from `../../../node_modules/react-native-device-info`)
   - RNFirebase (from `../../../node_modules/react-native-firebase/ios`)
-  - RNFS (from `../node_modules/react-native-fs`)
+  - RNFS (from `../../../node_modules/react-native-fs`)
   - RNGestureHandler (from `../../../node_modules/react-native-gesture-handler`)
   - RNLocalize (from `../../../node_modules/react-native-localize`)
   - RNPermissions (from `../../../node_modules/react-native-permissions`)
@@ -539,7 +539,7 @@ EXTERNAL SOURCES:
   react-native-config:
     :path: "../../../node_modules/react-native-config"
   react-native-contacts:
-    :path: "../node_modules/react-native-contacts"
+    :path: "../../../node_modules/react-native-contacts"
   react-native-geth:
     :path: "../../../node_modules/react-native-geth"
   react-native-keep-awake:
@@ -547,11 +547,11 @@ EXTERNAL SOURCES:
   react-native-mail:
     :path: "../../../node_modules/react-native-mail"
   react-native-netinfo:
-    :path: "../node_modules/@react-native-community/netinfo"
+    :path: "../../../node_modules/@react-native-community/netinfo"
   react-native-safe-area-context:
     :path: "../../../node_modules/react-native-safe-area-context"
   react-native-splash-screen:
-    :path: "../node_modules/react-native-splash-screen"
+    :path: "../../../node_modules/react-native-splash-screen"
   react-native-tcp:
     :path: "../../../node_modules/react-native-tcp"
   react-native-udp:
@@ -587,11 +587,11 @@ EXTERNAL SOURCES:
   RNCAsyncStorage:
     :path: "../../../node_modules/@react-native-community/async-storage"
   RNDeviceInfo:
-    :path: "../node_modules/react-native-device-info"
+    :path: "../../../node_modules/react-native-device-info"
   RNFirebase:
     :path: "../../../node_modules/react-native-firebase/ios"
   RNFS:
-    :path: "../node_modules/react-native-fs"
+    :path: "../../../node_modules/react-native-fs"
   RNGestureHandler:
     :path: "../../../node_modules/react-native-gesture-handler"
   RNLocalize:
@@ -677,7 +677,7 @@ SPEC CHECKSUMS:
   RNAnalytics: 67854ebc95a440c6d522babd84cf1968c8629947
   RNAnalyticsIntegration-Firebase: e94d754cae94d5e0d520666c9452c14a35cebc06
   RNCAsyncStorage: 60a80e72d95bf02a01cace55d3697d9724f0d77f
-  RNDeviceInfo: 88099e84466f053bae3f34c307b506738b2b6946
+  RNDeviceInfo: 687c1b2ab6d86ff1ca1208783320cd144138c7f2
   RNFirebase: ac0de8b24c6f91ae9459575491ed6a77327619c6
   RNFS: a8fbe7060fa49157d819466404794ad9c58e58cf
   RNGestureHandler: 4cb47a93019c1a201df2644413a0a1569a51c8aa
