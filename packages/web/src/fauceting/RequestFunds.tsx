@@ -201,7 +201,7 @@ function MobileSelect({ selectedOS, onSelect, t }) {
       <View style={standardStyles.row}>
         <Radio
           colorWhenSelected={colors.primary}
-          label="android"
+          label="Android"
           labelColor={andriodColor}
           icon={<Android size={18} color={andriodColor} />}
           selected={isAndriod}
@@ -211,7 +211,7 @@ function MobileSelect({ selectedOS, onSelect, t }) {
         <View style={styles.radios}>
           <Radio
             colorWhenSelected={colors.primary}
-            label="ios"
+            label="iOS"
             labelColor={iOSColor}
             icon={<Apple size={18} color={iOSColor} />}
             selected={isIOS}
@@ -224,7 +224,7 @@ function MobileSelect({ selectedOS, onSelect, t }) {
   )
 }
 
-function send(beneficiary: string, kind: RequestType, captchaToken: string, os: MobileOS) {
+function send(beneficiary: string, kind: RequestType, captchaToken: string, os?: MobileOS) {
   const route = kind === RequestType.Invite ? '/invite' : '/faucet'
   return postForm(route, { captchaToken, beneficiary, mobileOS: os })
 }
