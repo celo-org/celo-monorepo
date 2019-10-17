@@ -49,7 +49,7 @@ RUN npm install @celo/celocli
 FROM node:10-alpine as final_image
 
 ARG network_name="alfajores"
-ARG network_id="44782"
+ARG network_id="44784"
 
 # Without musl-dev, geth will fail with a confusing "No such file or directory" error.
 # bash is required for start_geth.sh
@@ -62,8 +62,8 @@ COPY packages/cli/start_geth.sh /celo/start_geth.sh
 COPY --from=geth /usr/local/bin/geth /usr/local/bin/geth
 COPY --from=geth /celo/genesis.json /celo
 COPY --from=geth /celo/static-nodes.json /celo
-COPY --from=node /celo-monorepo/node_modules /celo-monorepo/node_modules 
+COPY --from=node /celo-monorepo/node_modules /celo-monorepo/node_modules
 RUN chmod ugo+x /celo/start_geth.sh && ln -s /celo-monorepo/node_modules/.bin/celocli /usr/local/bin/celocli
 
 EXPOSE 8545 8546 30303 30303/udp
-ENTRYPOINT ["/celo/start_geth.sh", "/usr/local/bin/geth", "alfajores", "full", "44782", "/root/.celo", "/celo/genesis.json", "/celo/static-nodes.json"]
+ENTRYPOINT ["/celo/start_geth.sh", "/usr/local/bin/geth", "alfajores", "full", "44784", "/root/.celo", "/celo/genesis.json", "/celo/static-nodes.json"]

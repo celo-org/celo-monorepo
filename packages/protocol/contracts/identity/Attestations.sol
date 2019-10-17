@@ -10,7 +10,6 @@ import "../common/interfaces/IERC20Token.sol";
 import "../governance/interfaces/IValidators.sol";
 
 import "../common/Initializable.sol";
-import "../governance/UsingLockedGold.sol";
 import "../common/UsingRegistry.sol";
 import "../common/Signatures.sol";
 import "../common/UsingPrecompiles.sol";
@@ -25,10 +24,8 @@ contract Attestations is
   Initializable,
   UsingRegistry,
   ReentrancyGuard,
-  UsingLockedGold,
   UsingPrecompiles
 {
-
 
   using SafeMath for uint256;
   using SafeMath for uint128;
@@ -709,17 +706,6 @@ contract Attestations is
   }
 
   /**
-   * @notice Returns the current validator set
-   * TODO: Should be replaced with a precompile
-   */
-  function getValidators() public view returns (address[] memory) {
-    IValidators validatorContract = IValidators(
-      registry.getAddressForOrDie(VALIDATORS_REGISTRY_ID)
-    );
-    return validatorContract.getValidators();
-  }
-
-  /**
    * @notice Helper function for batchGetAttestationStats to calculate the
              total number of addresses that have >0 complete attestations for the identifiers
    * @param identifiersToLookup Array of n identifiers
@@ -771,7 +757,7 @@ contract Attestations is
       seed = keccak256(abi.encodePacked(seed));
       validator = validatorAddressFromCurrentSet(uint256(seed) % numberValidators);
 
-      issuer = getAccountFromValidator(validator);
+      issuer = getLockedGold().getAccountFromValidator(validator);
       Attestation storage attestations =
         state.issuedAttestations[issuer];
 
