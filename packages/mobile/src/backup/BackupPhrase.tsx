@@ -6,7 +6,7 @@ import { fontStyles } from '@celo/react-components/styles/fonts'
 import { componentStyles } from '@celo/react-components/styles/styles'
 import * as React from 'react'
 import { WithNamespaces, withNamespaces } from 'react-i18next'
-import { StyleSheet, Text, View } from 'react-native'
+import { Platform, StyleSheet, Text, View } from 'react-native'
 import FlagSecure from 'react-native-flag-secure-android'
 import SafeAreaView from 'react-native-safe-area-view'
 import CeloAnalytics from 'src/analytics/CeloAnalytics'
@@ -34,11 +34,15 @@ class BackupPhrase extends React.Component<Props, State> {
   }
 
   componentDidMount() {
-    FlagSecure.activate()
+    if (Platform.OS === 'android') {
+      FlagSecure.activate()
+    }
   }
 
   componentWillUnmount() {
-    FlagSecure.deactivate()
+    if (Platform.OS === 'android') {
+      FlagSecure.deactivate()
+    }
   }
 
   onSelectAnswer = (word: string) => this.setState({ selectedAnswer: word })
