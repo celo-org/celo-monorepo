@@ -9,35 +9,183 @@ TEST NOTES:
 */
 
 testWithGanache('SortedOracles Wrapper', (web3) => {
-  // const ONE_USD = web3.utils.toWei('1', 'ether')
-  const oracleAddress = '0xE834EC434DABA538cd1b9Fe1582052B880BD7e63'
-  // const oracleAddress = '0x5409ED021D9299bf6814279A6A1411A7e866A631'
+  // TODO: get these from the config rather than hardcoding
+  const stableTokenOracles = [
+    '0x5409ED021D9299bf6814279A6A1411A7e866A631',
+    '0xE36Ea790bc9d7AB70C55260C66D52b1eca985f84',
+    '0x06cEf8E666768cC40Cc78CF93d9611019dDcB628',
+    '0x7457d5E02197480Db681D3fdF256c7acA21bDc12',
+  ]
+
+  const oracleAddress = stableTokenOracles[stableTokenOracles.length - 1]
+  const nonOracleAddress = '0x91c987bf62D25945dB517BDAa840A6c661374402'
+
   const kit = newKitFromWeb3(web3)
-  let accounts: string[] = []
   let sortedOracles: SortedOraclesWrapper
   let stableTokenAddress: string
 
   beforeAll(async () => {
-    accounts = await web3.eth.getAccounts()
-    console.log(accounts)
-    kit.defaultAccount = oracleAddress
     sortedOracles = await kit.contracts.getSortedOracles()
     stableTokenAddress = await kit.registry.addressFor(CeloContract.StableToken)
   })
 
-  it('SBAT getRates', async () => {
-    const rates = await sortedOracles.getRates(stableTokenAddress)
-    console.log(rates)
+  describe('#report', () => {
+    const numerator = 16
+    const denominator = 1
+
+    describe('when reporting from a whitelisted Oracle', () => {
+      beforeAll(() => (kit.defaultAccount = oracleAddress))
+
+      it('should be able to report a rate', async () => {
+        const initialRates: OracleRate[] = await sortedOracles.getRates(CeloContract.StableToken)
+
+        const tx = await sortedOracles.report(CeloContract.StableToken, numerator, denominator)
+        await tx.sendAndWaitForReceipt()
+
+        const resultingRates: OracleRate[] = await sortedOracles.getRates(CeloContract.StableToken)
+        expect(resultingRates).not.toMatchObject(initialRates)
+      })
+
+      describe('when inserting into the middle of the existing rates', () => {
+        beforeEach(async () => {
+          const rates = [15, 20, 17]
+          for (let i = 0; i < stableTokenOracles.length - 1; i++) {
+            kit.defaultAccount = stableTokenOracles[i]
+            const tx = await sortedOracles.report(CeloContract.StableToken, rates[i], denominator)
+            await tx.sendAndWaitForReceipt()
+          }
+
+          kit.defaultAccount = oracleAddress
+        })
+
+        const expectedLesserKey = stableTokenOracles[0]
+        const expectedGreaterKey = stableTokenOracles[2]
+
+        const expectedOracleOrder = [
+          stableTokenOracles[1],
+          stableTokenOracles[2],
+          oracleAddress,
+          stableTokenOracles[0],
+        ]
+
+        it('passes the correct lesserKey and greaterKey as args', async () => {
+          const tx = await sortedOracles.report(CeloContract.StableToken, numerator, denominator)
+          const actualArgs = tx.txo.arguments
+          expect(actualArgs[3]).toEqual(expectedLesserKey)
+          expect(actualArgs[4]).toEqual(expectedGreaterKey)
+
+          await tx.sendAndWaitForReceipt()
+        })
+
+        it('inserts the new record in the right place', async () => {
+          const tx = await sortedOracles.report(CeloContract.StableToken, numerator, denominator)
+          await tx.sendAndWaitForReceipt()
+
+          const resultingRates: OracleRate[] = await sortedOracles.getRates(
+            CeloContract.StableToken
+          )
+
+          expect(resultingRates.map((r) => r.address)).toEqual(expectedOracleOrder)
+        })
+      })
+    })
+
+    describe('when reporting from a non-oracle address', () => {
+      beforeAll(() => (kit.defaultAccount = nonOracleAddress))
+
+      it('should raise an error', async () => {
+        const tx = await sortedOracles.report(CeloContract.StableToken, numerator, denominator)
+        await expect(tx.sendAndWaitForReceipt()).rejects.toThrow('sender was not an oracle')
+      })
+
+      it('should not change the list of rates', async () => {
+        const initialRates = await sortedOracles.getRates(CeloContract.StableToken)
+        try {
+          const tx = await sortedOracles.report(CeloContract.StableToken, numerator, denominator)
+          await tx.sendAndWaitForReceipt()
+          // @ts-ignore - Ignore empty block: we don't need to do anything with this error
+        } catch (err) {
+          // @ts-ignore
+        } finally {
+          const resultingRates = await sortedOracles.getRates(CeloContract.StableToken)
+          expect(resultingRates).toMatchObject(initialRates)
+        }
+      })
+    })
   })
 
-  it('SBAT reportRate', async () => {
-    const tx = await sortedOracles.report(stableTokenAddress, 16, 1)
-    await tx.sendAndWaitForReceipt()
+  /**
+   * Proxy Calls to view methods
+   *
+   * The purpose of these tests is to verify that these wrapper functions exist,
+   * are calling the contract methods correctly, and get some value back. The
+   * values checked here are often dependent on setup occuring in the protocol
+   * migrations run in `yarn test:prepare`. If these tests are failing, the first
+   * thing to check is if there have been changes to the migrations
+   */
+  describe('#getRates', () => {
+    it('SBAT getRates', async () => {
+      const rates = await sortedOracles.getRates(CeloContract.StableToken)
+      console.log('rates!', rates.map((r) => r.rate.toNumber()))
+    })
+  })
 
-    const tx2 = await sortedOracles.report(stableTokenAddress, 2, 1)
-    await tx2.sendAndWaitForReceipt()
+  describe('#isOracle', () => {
+    it('returns true when this address is a whitelisted oracle for this token', async () => {
+      expect(await sortedOracles.isOracle(CeloContract.StableToken, oracleAddress)).toEqual(true)
+    })
+    it('returns false when this address is not an oracle', async () => {
+      expect(await sortedOracles.isOracle(CeloContract.StableToken, nonOracleAddress)).toEqual(
+        false
+      )
+    })
+  })
 
-    const rates2: OracleRate[] = await sortedOracles.getRates(stableTokenAddress)
-    console.log(rates2.map((r) => r.rate.toNumber()))
+  describe('#numRates', () => {
+    it('returns a count of rates reported for the specified token', async () => {
+      // Why 1? In packages/protocol/08_stabletoken, a single rate is reported
+      expect(await sortedOracles.numRates(CeloContract.StableToken)).toEqBigNumber(1)
+    })
+  })
+
+  describe('#medianRate', () => {
+    it('returns the key for the median', async () => {
+      const returnedMedian = await sortedOracles.medianRate(CeloContract.StableToken)
+      // The value `10` comes from: packages/protocol/migrationsConfig.js:
+      //   stableToken.goldPrice
+      expect(returnedMedian.numerator.div(returnedMedian.denominator)).toEqBigNumber(10)
+    })
+  })
+
+  describe('#reportExpirySeconds', () => {
+    it('returns the number of seconds after which a report expires', async () => {
+      const result = await sortedOracles.reportExpirySeconds()
+      console.log(result)
+      expect(result).toEqBigNumber(3600)
+    })
+  })
+
+  /**
+   * Helper Functions
+   *
+   * These are functions in the wrapper that call other functions, passing in
+   * some regularly used arguments. The purpose of these tests is to verify that
+   * those arguments are being set correctly.
+   */
+  describe('getStableTokenRates', () => {
+    it('gets rates for Stable Token', async () => {
+      const usdRatesResult = await sortedOracles.getStableTokenRates()
+      const getRatesResult = await sortedOracles.getRates(CeloContract.StableToken)
+      expect(usdRatesResult).toEqual(getRatesResult)
+    })
+  })
+
+  describe('reportStableToken', () => {
+    beforeEach(() => (kit.defaultAccount = oracleAddress))
+    it('calls report with the address for StableToken', async () => {
+      const tx = await sortedOracles.reportStableToken(14, 1)
+      await tx.sendAndWaitForReceipt()
+      expect(tx.txo.arguments[0]).toEqual(stableTokenAddress)
+    })
   })
 })

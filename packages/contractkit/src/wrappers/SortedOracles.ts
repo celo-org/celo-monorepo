@@ -1,6 +1,6 @@
 import { eqAddress } from '@celo/utils/lib/address'
 import BigNumber from 'bignumber.js'
-import { Address, CeloContract, NULL_ADDRESS } from '../base'
+import { Address, CeloContract, CeloToken, NULL_ADDRESS } from '../base'
 import { SortedOracles } from '../generated/types/SortedOracles'
 import { BaseWrapper, CeloTransactionObject, proxyCall, toBigNumber, wrapSend } from './BaseWrapper'
 
@@ -20,16 +20,49 @@ export interface OracleRate {
   rate: BigNumber
   medianRelation: MedianRelation
 }
+
+export interface MedianRate {
+  numerator: BigNumber
+  denominator: BigNumber
+}
+
 /**
  * Currency price oracle contract.
  */
 export class SortedOraclesWrapper extends BaseWrapper<SortedOracles> {
-  numRates = proxyCall(this.contract.methods.numRates)
-  medianRate = proxyCall(this.contract.methods.medianRate)
+  /**
+   * Gets the number of rates that have been reported for the given token
+   * @param token The CeloToken token for which the Celo Gold exchange rate is being reported.
+   * @return The number of reported oracle rates for `token`.
+   */
+  async numRates(token: CeloToken): Promise<BigNumber> {
+    const tokenAddress = await this.kit.registry.addressFor(token)
+    const response = await this.contract.methods.numRates(tokenAddress).call()
+    return new BigNumber(response)
+  }
 
-  isOracle: (token: Address, oracle: Address) => Promise<boolean> = proxyCall(
-    this.contract.methods.isOracle
-  )
+  /**
+   * Returns the median rate for the given token
+   * @param token The CeloToken token for which the Celo Gold exchange rate is being reported.
+   * @return The median exchange rate for `token`, expressed as:
+   *   amount of that token / equivalent amount in Celo Gold
+   */
+  async medianRate(token: CeloToken): Promise<MedianRate> {
+    const tokenAddress = await this.kit.registry.addressFor(token)
+    const response = await this.contract.methods.medianRate(tokenAddress).call()
+    return { numerator: toBigNumber(response[0]), denominator: toBigNumber(response[1]) }
+  }
+
+  /**
+   * Checks if the given address is whitelisted as an oracle for the token
+   * @param token The CeloToken token
+   * @param oracle The address that we're checking the oracle status of
+   * @returns boolean describing whether this account is an oracle
+   */
+  async isOracle(token: CeloToken, oracle: Address): Promise<boolean> {
+    const tokenAddress = await this.kit.registry.addressFor(token)
+    return this.contract.methods.isOracle(tokenAddress, oracle).call()
+  }
 
   /**
    * Returns the report expiry parameter.
@@ -44,11 +77,13 @@ export class SortedOraclesWrapper extends BaseWrapper<SortedOracles> {
    * @param denominator The amount of Celo Gold that the `numerator` tokens are equal to.
    */
   async report(
-    token: Address,
+    token: CeloToken,
     numerator: number,
     denominator: number
   ): Promise<CeloTransactionObject<void>> {
-    const { lesserKey, greaterKey } = await this.findLesserAndGreaterAfterReport(
+    const tokenAddress = await this.kit.registry.addressFor(token)
+
+    const { lesserKey, greaterKey } = await this.findLesserAndGreaterKeys(
       token,
       numerator,
       denominator
@@ -56,8 +91,21 @@ export class SortedOraclesWrapper extends BaseWrapper<SortedOracles> {
 
     return wrapSend(
       this.kit,
-      this.contract.methods.report(token, numerator, denominator, lesserKey, greaterKey)
+      this.contract.methods.report(tokenAddress, numerator, denominator, lesserKey, greaterKey)
     )
+  }
+
+  /**
+   * Updates an oracle value and the median.
+   * @param token The address of the token for which the Celo Gold exchange rate is being reported.
+   * @param numerator The amount of tokens equal to `denominator` Celo Gold.
+   * @param denominator The amount of Celo Gold that the `numerator` tokens are equal to.
+   */
+  async reportStableToken(
+    numerator: number,
+    denominator: number
+  ): Promise<CeloTransactionObject<void>> {
+    return this.report(CeloContract.StableToken, numerator, denominator)
   }
 
   /**
@@ -69,33 +117,35 @@ export class SortedOraclesWrapper extends BaseWrapper<SortedOracles> {
     }
   }
 
-  getUsdRates = async (): Promise<OracleRate[]> =>
-    this.getRates(await this.kit.registry.addressFor(CeloContract.StableToken))
+  /**
+   * Helper function to get the rates for StableToken, by passing the address
+   * of StableToken to `getRates`.
+   */
+  getStableTokenRates = async (): Promise<OracleRate[]> => this.getRates(CeloContract.StableToken)
 
   /**
    * Gets all elements from the doubly linked list.
-   * @param token The address of the token for which the Celo Gold exchange rate is being reported.
+   * @param token The CeloToken representing the token for which the Celo
+   *   Gold exchange rate is being reported. Example: CeloContract.StableToken
    * @return An unpacked list of elements from largest to smallest.
    */
-  getRates: (token: Address) => Promise<any> = proxyCall(
-    this.contract.methods.getRates,
-    undefined,
-    (out) => {
-      const rates: OracleRate[] = []
-      for (let i = 0; i < out[0].length; i++) {
-        const medRelIndex = parseInt(out[2][i], 10)
-        rates.push({
-          address: out[0][i],
-          rate: new BigNumber(out[1][i]),
-          medianRelation: medRelIndex,
-        })
-      }
-      return rates
+  async getRates(token: CeloToken): Promise<OracleRate[]> {
+    const tokenAddress = await this.kit.registry.addressFor(token)
+    const response = await this.contract.methods.getRates(tokenAddress).call()
+    const rates: OracleRate[] = []
+    for (let i = 0; i < response[0].length; i++) {
+      const medRelIndex = parseInt(response[2][i], 10)
+      rates.push({
+        address: response[0][i],
+        rate: new BigNumber(response[1][i]),
+        medianRelation: medRelIndex,
+      })
     }
-  )
+    return rates
+  }
 
-  private async findLesserAndGreaterAfterReport(
-    token: Address,
+  private async findLesserAndGreaterKeys(
+    token: CeloToken,
     numerator: number,
     denominator: number
   ): Promise<{ lesserKey: Address; greaterKey: Address }> {
@@ -120,6 +170,7 @@ export class SortedOraclesWrapper extends BaseWrapper<SortedOracles> {
       }
     }
 
+    // If a lesserKey hasn't been found, this item belongs at the tail
     return { lesserKey: NULL_ADDRESS, greaterKey }
   }
 }
