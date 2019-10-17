@@ -66,6 +66,8 @@ function getWebSocketProvider(url: string): Provider {
   return provider
 }
 
+// TODO(anna) figure out caching issues with web3
+// and zeroSync mode
 function getWeb3(): Web3 {
   Logger.info(`Initializing web3, platform: ${Platform.OS}, geth free mode: ${isZeroSyncMode()}`)
 
