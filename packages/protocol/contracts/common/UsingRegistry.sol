@@ -4,6 +4,8 @@ import "openzeppelin-solidity/contracts/ownership/Ownable.sol";
 
 import "./interfaces/IERC20Token.sol";
 import "./interfaces/IRegistry.sol";
+import "./interfaces/IAccounts.sol";
+
 
 import "../governance/interfaces/IElection.sol";
 import "../governance/interfaces/ILockedGold.sol";
@@ -21,6 +23,7 @@ contract UsingRegistry is Ownable {
   event RegistrySet(address indexed registryAddress);
 
   // solhint-disable state-visibility
+  bytes32 constant ACCOUNTS_REGISTRY_ID = keccak256(abi.encodePacked("Accounts"));
   bytes32 constant ATTESTATIONS_REGISTRY_ID = keccak256(abi.encodePacked("Attestations"));
   bytes32 constant ELECTION_REGISTRY_ID = keccak256(abi.encodePacked("Election"));
   bytes32 constant GAS_CURRENCY_WHITELIST_REGISTRY_ID = keccak256(
@@ -48,6 +51,10 @@ contract UsingRegistry is Ownable {
   function setRegistry(address registryAddress) public onlyOwner {
     registry = IRegistry(registryAddress);
     emit RegistrySet(registryAddress);
+  }
+
+  function getAccounts() internal view returns (IAccounts) {
+    return IAccounts(registry.getAddressForOrDie(ACCOUNTS_REGISTRY_ID));
   }
 
   function getElection() internal view returns (IElection) {

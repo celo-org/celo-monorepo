@@ -1,15 +1,15 @@
 import { CeloContractName } from '@celo/protocol/lib/registry-utils'
-import { getParsedSignatureOfAddress } from '@celo/protocol/lib/signing-utils'
 import {
   assertEqualBN,
   assertLogMatches,
   assertLogMatches2,
   assertRevert,
-  NULL_ADDRESS,
   timeTravel,
 } from '@celo/protocol/lib/test-utils'
 import BigNumber from 'bignumber.js'
 import {
+  AccountsContract,
+  AccountsInstance,
   LockedGoldContract,
   LockedGoldInstance,
   MockElectionContract,
@@ -22,6 +22,7 @@ import {
   RegistryInstance,
 } from 'types'
 
+const Accounts: AccountsContract = artifacts.require('Accounts')
 const LockedGold: LockedGoldContract = artifacts.require('LockedGold')
 const MockElection: MockElectionContract = artifacts.require('MockElection')
 const MockGoldToken: MockGoldTokenContract = artifacts.require('MockGoldToken')
@@ -34,43 +35,31 @@ LockedGold.numberFormat = 'BigNumber'
 
 const HOUR = 60 * 60
 const DAY = 24 * HOUR
-let authorizationTests = { voter: {}, validator: {} }
 
 contract('LockedGold', (accounts: string[]) => {
   let account = accounts[0]
   const nonOwner = accounts[1]
   const unlockingPeriod = 3 * DAY
+  let accountsInstance: AccountsInstance
   let lockedGold: LockedGoldInstance
   let mockElection: MockElectionInstance
   let mockValidators: MockValidatorsInstance
   let registry: RegistryInstance
 
-  const capitalize = (s: string) => {
-    return s.charAt(0).toUpperCase() + s.slice(1)
-  }
-
   beforeEach(async () => {
     const mockGoldToken: MockGoldTokenInstance = await MockGoldToken.new()
+    accountsInstance = await Accounts.new()
     lockedGold = await LockedGold.new()
     mockElection = await MockElection.new()
     mockValidators = await MockValidators.new()
     registry = await Registry.new()
+    await registry.setAddressFor(CeloContractName.Accounts, accountsInstance.address)
     await registry.setAddressFor(CeloContractName.GoldToken, mockGoldToken.address)
     await registry.setAddressFor(CeloContractName.Election, mockElection.address)
     await registry.setAddressFor(CeloContractName.Validators, mockValidators.address)
     await lockedGold.initialize(registry.address, unlockingPeriod)
-    await lockedGold.createAccount()
-
-    authorizationTests.voter = {
-      fn: lockedGold.authorizeVoter,
-      getAuthorizedFromAccount: lockedGold.getVoterFromAccount,
-      getAccountFromAuthorized: lockedGold.getAccountFromVoter,
-    }
-    authorizationTests.validator = {
-      fn: lockedGold.authorizeValidator,
-      getAuthorizedFromAccount: lockedGold.getValidatorFromAccount,
-      getAccountFromAuthorized: lockedGold.getAccountFromValidator,
-    }
+    await accountsInstance.initialize()
+    await accountsInstance.createAccount()
   })
 
   describe('#initialize()', () => {
@@ -132,136 +121,6 @@ contract('LockedGold', (accounts: string[]) => {
 
     it('should revert when called by anyone other than the owner', async () => {
       await assertRevert(lockedGold.setUnlockingPeriod(newUnlockingPeriod, { from: nonOwner }))
-    })
-  })
-
-  Object.keys(authorizationTests).forEach((key) => {
-    describe('authorization tests:', () => {
-      let authorizationTest: any
-      beforeEach(async () => {
-        authorizationTest = authorizationTests[key]
-      })
-
-      describe(`#authorize${capitalize(key)}()`, () => {
-        const authorized = accounts[1]
-        let sig
-
-        beforeEach(async () => {
-          sig = await getParsedSignatureOfAddress(web3, account, authorized)
-        })
-
-        it(`should set the authorized ${key}`, async () => {
-          await authorizationTest.fn(authorized, sig.v, sig.r, sig.s)
-          assert.equal(await lockedGold.authorizedBy(authorized), account)
-          assert.equal(await authorizationTest.getAuthorizedFromAccount(account), authorized)
-          assert.equal(await authorizationTest.getAccountFromAuthorized(authorized), account)
-        })
-
-        it(`should emit a ${capitalize(key)}Authorized event`, async () => {
-          const resp = await authorizationTest.fn(authorized, sig.v, sig.r, sig.s)
-          assert.equal(resp.logs.length, 1)
-          const log = resp.logs[0]
-          const expected = { account }
-          expected[key] = authorized
-          assertLogMatches(log, `${capitalize(key)}Authorized`, expected)
-        })
-
-        it(`should revert if the ${key} is an account`, async () => {
-          await lockedGold.createAccount({ from: authorized })
-          await assertRevert(authorizationTest.fn(authorized, sig.v, sig.r, sig.s))
-        })
-
-        it(`should revert if the ${key} is already authorized`, async () => {
-          const otherAccount = accounts[2]
-          const otherSig = await getParsedSignatureOfAddress(web3, otherAccount, authorized)
-          await lockedGold.createAccount({ from: otherAccount })
-          await authorizationTest.fn(authorized, otherSig.v, otherSig.r, otherSig.s, {
-            from: otherAccount,
-          })
-          await assertRevert(authorizationTest.fn(authorized, sig.v, sig.r, sig.s))
-        })
-
-        it('should revert if the signature is incorrect', async () => {
-          const nonVoter = accounts[3]
-          const incorrectSig = await getParsedSignatureOfAddress(web3, account, nonVoter)
-          await assertRevert(
-            authorizationTest.fn(authorized, incorrectSig.v, incorrectSig.r, incorrectSig.s)
-          )
-        })
-
-        describe('when a previous authorization has been made', async () => {
-          const newAuthorized = accounts[2]
-          let newSig
-          beforeEach(async () => {
-            await authorizationTest.fn(authorized, sig.v, sig.r, sig.s)
-            newSig = await getParsedSignatureOfAddress(web3, account, newAuthorized)
-            await authorizationTest.fn(newAuthorized, newSig.v, newSig.r, newSig.s)
-          })
-
-          it(`should set the new authorized ${key}`, async () => {
-            assert.equal(await lockedGold.authorizedBy(newAuthorized), account)
-            assert.equal(await authorizationTest.getAuthorizedFromAccount(account), newAuthorized)
-            assert.equal(await authorizationTest.getAccountFromAuthorized(newAuthorized), account)
-          })
-
-          it('should reset the previous authorization', async () => {
-            assert.equal(await lockedGold.authorizedBy(authorized), NULL_ADDRESS)
-          })
-        })
-      })
-
-      describe(`#getAccountFrom${capitalize(key)}()`, () => {
-        describe(`when the account has not authorized a ${key}`, () => {
-          it('should return the account when passed the account', async () => {
-            assert.equal(await authorizationTest.getAccountFromAuthorized(account), account)
-          })
-
-          it('should revert when passed an address that is not an account', async () => {
-            await assertRevert(authorizationTest.getAccountFromAuthorized(accounts[1]))
-          })
-        })
-
-        describe(`when the account has authorized a ${key}`, () => {
-          const authorized = accounts[1]
-          beforeEach(async () => {
-            const sig = await getParsedSignatureOfAddress(web3, account, authorized)
-            await authorizationTest.fn(authorized, sig.v, sig.r, sig.s)
-          })
-
-          it('should return the account when passed the account', async () => {
-            assert.equal(await authorizationTest.getAccountFromAuthorized(account), account)
-          })
-
-          it(`should return the account when passed the ${key}`, async () => {
-            assert.equal(await authorizationTest.getAccountFromAuthorized(authorized), account)
-          })
-        })
-      })
-
-      describe(`#get${capitalize(key)}FromAccount()`, () => {
-        describe(`when the account has not authorized a ${key}`, () => {
-          it('should return the account when passed the account', async () => {
-            assert.equal(await authorizationTest.getAuthorizedFromAccount(account), account)
-          })
-
-          it('should revert when not passed an account', async () => {
-            await assertRevert(authorizationTest.getAuthorizedFromAccount(accounts[1]), account)
-          })
-        })
-
-        describe(`when the account has authorized a ${key}`, () => {
-          const authorized = accounts[1]
-
-          beforeEach(async () => {
-            const sig = await getParsedSignatureOfAddress(web3, account, authorized)
-            await authorizationTest.fn(authorized, sig.v, sig.r, sig.s)
-          })
-
-          it(`should return the ${key} when passed the account`, async () => {
-            assert.equal(await authorizationTest.getAuthorizedFromAccount(account), authorized)
-          })
-        })
-      })
     })
   })
 

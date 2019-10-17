@@ -269,7 +269,7 @@ contract Election is IElection, Ownable, ReentrancyGuard, Initializable, UsingRe
     require(votes.total.eligible.contains(group));
     require(0 < value);
     require(canReceiveVotes(group, value));
-    address account = getLockedGold().getAccountFromVoter(msg.sender);
+    address account = getAccounts().getAccountFromVoter(msg.sender);
 
     // Add group to the groups voted for by the account.
     address[] storage groups = votes.groupsVotedFor[account];
@@ -294,7 +294,7 @@ contract Election is IElection, Ownable, ReentrancyGuard, Initializable, UsingRe
    */
    // TODO(asa): Prevent users from activating pending votes until an election has been held.
   function activate(address group) external nonReentrant returns (bool) {
-    address account = getLockedGold().getAccountFromVoter(msg.sender);
+    address account = getAccounts().getAccountFromVoter(msg.sender);
     PendingVotes storage pending = votes.pending;
     uint256 value = pending.forGroup[group].byAccount[account].value;
     require(value > 0);
@@ -327,7 +327,7 @@ contract Election is IElection, Ownable, ReentrancyGuard, Initializable, UsingRe
     returns (bool)
   {
     require(group != address(0));
-    address account = getLockedGold().getAccountFromVoter(msg.sender);
+    address account = getAccounts().getAccountFromVoter(msg.sender);
     require(0 < value && value <= getPendingVotesForGroupByAccount(group, account));
     decrementPendingVotes(group, account, value);
     decrementTotalVotes(group, value, lesser, greater);
@@ -364,7 +364,7 @@ contract Election is IElection, Ownable, ReentrancyGuard, Initializable, UsingRe
   {
     // TODO(asa): Dedup with revokePending.
     require(group != address(0));
-    address account = getLockedGold().getAccountFromVoter(msg.sender);
+    address account = getAccounts().getAccountFromVoter(msg.sender);
     require(0 < value && value <= getActiveVotesForGroupByAccount(group, account));
     decrementActiveVotes(group, account, value);
     decrementTotalVotes(group, value, lesser, greater);
@@ -539,7 +539,7 @@ contract Election is IElection, Ownable, ReentrancyGuard, Initializable, UsingRe
     nonReentrant
     returns (bool)
   {
-    address group = getLockedGold().getAccountFromValidator(msg.sender);
+    address group = getAccounts().getAccountFromValidator(msg.sender);
     require(!votes.total.eligible.contains(group));
     require(getValidators().getGroupNumMembers(group) > 0);
     uint256 value = getTotalVotesForGroup(group);

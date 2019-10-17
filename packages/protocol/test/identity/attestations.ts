@@ -13,14 +13,16 @@ import { getPhoneHash } from '@celo/utils/lib/phoneNumbers'
 import BigNumber from 'bignumber.js'
 import { uniq } from 'lodash'
 import {
+  AccountsContract,
+  AccountsInstance,
   AttestationsContract,
   AttestationsInstance,
+  MockElectionContract,
+  MockElectionInstance,
   MockLockedGoldContract,
   MockLockedGoldInstance,
   MockStableTokenContract,
   MockStableTokenInstance,
-  MockElectionContract,
-  MockElectionInstance,
   RandomContract,
   RandomInstance,
   RegistryContract,
@@ -28,6 +30,7 @@ import {
 } from 'types'
 import { getParsedSignatureOfAddress } from '../../lib/signing-utils'
 
+const Accounts: AccountsContract = artifacts.require('Accounts')
 const Attestations: AttestationsContract = artifacts.require('Attestations')
 const MockStableToken: MockStableTokenContract = artifacts.require('MockStableToken')
 const MockElection: MockElectionContract = artifacts.require('MockElection')
@@ -41,6 +44,7 @@ const longDataEncryptionKey =
   '02f2f48ee19680706196e2e339e5da3491186e0c4c5030670656b0e01611111111'
 
 contract('Attestations', (accounts: string[]) => {
+  let accountsInstance: AccountsInstance
   let attestations: AttestationsInstance
   let mockStableToken: MockStableTokenInstance
   let otherMockStableToken: MockStableTokenInstance
@@ -95,59 +99,59 @@ contract('Attestations', (accounts: string[]) => {
     return accounts[nonIssuerIndex]
   }
 
-  const getValidatingKeyAddress = (address: string) => {
-    const pKey = accountPrivateKeys[accounts.indexOf(address)]
-    const aKey = Buffer.from(pKey.slice(2), 'hex')
-    aKey.write((aKey[0] + 2).toString(16))
-    return privateKeyToAddress('0x' + aKey.toString('hex'))
+  enum KeyOffsets {
+    VALIDATING_KEY_OFFSET,
+    ATTESTING_KEY_OFFSET,
   }
 
-  const getAttestationKey = (address: string) => {
+  const getDerivedKey = (offset: number, address: string) => {
     const pKey = accountPrivateKeys[accounts.indexOf(address)]
     const aKey = Buffer.from(pKey.slice(2), 'hex')
-    aKey.write((aKey[0] + 1).toString(16))
+    aKey.write((aKey[0] + offset).toString(16))
     return '0x' + aKey.toString('hex')
   }
 
-  const unlockAttestationKey = async (address: string) => {
-    const attestationKey = getAttestationKey(address)
-    const authorizedAttestor = privateKeyToAddress(attestationKey)
+  const unlockAndAuthorizeKey = async (offset: number, authorizeFn: any, account: string) => {
+    const key = getDerivedKey(offset, account)
+    const addr = privateKeyToAddress(key)
     // @ts-ignore
-    await web3.eth.personal.importRawKey(attestationKey, 'passphrase')
-    await web3.eth.personal.unlockAccount(authorizedAttestor, 'passphrase', 1000000)
-    return authorizedAttestor
-  }
+    await web3.eth.personal.importRawKey(key, 'passphrase')
+    await web3.eth.personal.unlockAccount(addr, 'passphrase', 1000000)
 
-  const authorizeAttestor = async (address: string) => {
-    const attestationKey = getAttestationKey(address)
-    const authorizedAttestor = privateKeyToAddress(attestationKey)
-    const attestationSig = await getParsedSignatureOfAddress(web3, address, authorizedAttestor)
-
-    return attestations.authorizeAttestor(
-      authorizedAttestor,
-      attestationSig.v,
-      attestationSig.r,
-      attestationSig.s,
-      { from: address }
-    )
+    const signature = await getParsedSignatureOfAddress(web3, account, addr)
+    return authorizeFn(addr, signature.v, signature.r, signature.s, {
+      from: account,
+    })
   }
 
   beforeEach(async () => {
+    accountsInstance = await Accounts.new()
     mockStableToken = await MockStableToken.new()
     otherMockStableToken = await MockStableToken.new()
     attestations = await Attestations.new()
     random = await Random.new()
     mockLockedGold = await MockLockedGold.new()
+    await accountsInstance.initialize()
+
     await Promise.all(
-      accounts.map((account) =>
-        mockLockedGold.authorizeValidator(account, getValidatingKeyAddress(account))
-      )
+      accounts.map(async (account) => {
+        await accountsInstance.createAccount({ from: account })
+        await unlockAndAuthorizeKey(
+          KeyOffsets.VALIDATING_KEY_OFFSET,
+          accountsInstance.authorizeValidator,
+          account
+        )
+      })
     )
+
     mockElection = await MockElection.new()
     await mockElection.setElectedValidators(
-      accounts.map((account) => getValidatingKeyAddress(account))
+      accounts.map((account) =>
+        privateKeyToAddress(getDerivedKey(KeyOffsets.VALIDATING_KEY_OFFSET, account))
+      )
     )
     registry = await Registry.new()
+    await registry.setAddressFor(CeloContractName.Accounts, accountsInstance.address)
     await registry.setAddressFor(CeloContractName.Random, random.address)
     await registry.setAddressFor(CeloContractName.Election, mockElection.address)
     await registry.setAddressFor(CeloContractName.LockedGold, mockLockedGold.address)
@@ -236,56 +240,6 @@ contract('Attestations', (accounts: string[]) => {
       const expectedKey = await attestations.getDataEncryptionKey(caller)
       // @ts-ignore
       assert.equal(expectedKey, dataEncryptionKey)
-    })
-  })
-
-  describe('#authorizeAttestor', async () => {
-    let authorizedAttestor
-    beforeEach(async () => {
-      authorizedAttestor = await unlockAttestationKey(caller)
-    })
-
-    it('should authorizes an attestor with the right signature', async () => {
-      await authorizeAttestor(caller)
-      const result = await attestations.getAttestorFromAccount(caller)
-      assert.equal(result, authorizedAttestor)
-    })
-
-    it('should just return the account address if attestor was authorized', async () => {
-      const result = await attestations.getAccountFromAttestor(caller)
-      assert.equal(result, caller)
-    })
-
-    it('should retrieve the account address if attestor has been authorized', async () => {
-      await authorizeAttestor(caller)
-      const result = await attestations.getAccountFromAttestor(authorizedAttestor)
-      assert.equal(result, caller)
-    })
-
-    it('should emit the AttestorAuthorized event', async () => {
-      const response = await authorizeAttestor(caller)
-      assert.lengthOf(response.logs, 1)
-      const event = response.logs[0]
-      assertLogMatches2(event, {
-        event: 'AttestorAuthorized',
-        args: { account: caller, attestor: authorizedAttestor },
-      })
-    })
-
-    it('should revert with the incorrect signature', async () => {
-      const attestationSig = await getParsedSignatureOfAddress(
-        web3,
-        accounts[1],
-        authorizedAttestor
-      )
-      await assertRevert(
-        attestations.authorizeAttestor(
-          authorizedAttestor,
-          attestationSig.v,
-          attestationSig.r,
-          attestationSig.s
-        )
-      )
     })
   })
 
@@ -602,9 +556,12 @@ contract('Attestations', (accounts: string[]) => {
 
     describe('when an attestor has been authorized', () => {
       beforeEach(async () => {
-        const attestationKey = getAttestationKey(issuer)
-        await unlockAttestationKey(issuer)
-        await authorizeAttestor(issuer)
+        const attestationKey = getDerivedKey(KeyOffsets.ATTESTING_KEY_OFFSET, issuer)
+        await unlockAndAuthorizeKey(
+          KeyOffsets.ATTESTING_KEY_OFFSET,
+          accountsInstance.authorizeAttestor,
+          issuer
+        )
         ;({ v, r, s } = attestToIdentifier(phoneNumber, caller, attestationKey))
       })
 

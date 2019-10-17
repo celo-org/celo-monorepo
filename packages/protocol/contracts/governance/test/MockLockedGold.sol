@@ -36,7 +36,7 @@ contract MockLockedGold is ILockedGold {
     }
   }
 
-  function getAccountFromVoter(address accountOrVoter) external view returns (address) {
+  function getAccountFromVoter(address accountOrVoter) external pure returns (address) {
     return accountOrVoter;
   }
 
