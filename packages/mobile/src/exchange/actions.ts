@@ -103,7 +103,7 @@ export function* doFetchExchangeRate(makerAmount?: BigNumber, makerToken?: CURRE
     Logger.debug(TAG, `goldTokenContract ${goldTokenContract}`)
     Logger.debug(TAG, `goldTokenContract2 ${goldTokenContract2}`)
 
-    throw new Error('Line above will throw an Error so you should never reach this')
+    const exchange = yield contractKit.contracts.getExchange
     const dollarMakerExchangeRate: BigNumber = yield call(
       exchange.getUsdExchangeRate,
       dollarMakerAmount
