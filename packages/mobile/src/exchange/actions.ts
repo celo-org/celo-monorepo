@@ -1,21 +1,6 @@
 import BigNumber from 'bignumber.js'
 import { ExchangeRatePair } from 'src/exchange/reducer'
 import { CURRENCY_ENUM } from 'src/geth/consts'
-import { RootState } from 'src/redux/reducers'
-import {
-  addStandbyTransaction,
-  generateStandbyTransactionId,
-  removeStandbyTransaction,
-} from 'src/transactions/actions'
-import { TransactionStatus, TransactionTypes } from 'src/transactions/reducer'
-import { sendAndMonitorTransaction } from 'src/transactions/saga'
-import { sendTransaction } from 'src/transactions/send'
-import { getRateForMakerToken, getTakerAmount } from 'src/utils/currencyExchange'
-import { roundDown } from 'src/utils/formatting'
-import Logger from 'src/utils/Logger'
-import { web3 } from 'src/web3/contracts'
-import { getConnectedAccount, getConnectedUnlockedAccount } from 'src/web3/saga'
-import * as util from 'util'
 
 export enum Actions {
   FETCH_EXCHANGE_RATE = 'EXCHANGE/FETCH_EXCHANGE_RATE',

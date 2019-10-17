@@ -1,4 +1,13 @@
 import { newKitFromWeb3 } from '@celo/contractkit'
+import {
+  ContractUtils,
+  getExchangeContract,
+  getGoldTokenContract,
+  getStableTokenContract,
+} from '@celo/walletkit'
+import { Exchange as ExchangeType } from '@celo/walletkit/types/Exchange'
+import { GoldToken as GoldTokenType } from '@celo/walletkit/types/GoldToken'
+import { StableToken as StableTokenType } from '@celo/walletkit/types/StableToken'
 import BigNumber from 'bignumber.js'
 import { call, put, select, spawn, takeEvery, takeLatest } from 'redux-saga/effects'
 import { showError } from 'src/alert/actions'
