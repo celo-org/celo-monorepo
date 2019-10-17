@@ -193,20 +193,6 @@ const style = StyleSheet.create({
     flex: 1,
     paddingHorizontal: 20,
   },
-  footerLink: {
-    color: colors.celoGreen,
-    textAlign: 'center',
-    marginTop: 10,
-    marginBottom: 25,
-  },
-  circleContainer: {
-    flex: 0,
-    width: PROGRESS_CIRCLE_PASSIVE_SIZE,
-    height: PROGRESS_CIRCLE_PASSIVE_SIZE,
-    alignItems: 'center',
-    justifyContent: 'center',
-    margin: 5,
-  },
   circle,
   circlePassive: {
     ...circle,

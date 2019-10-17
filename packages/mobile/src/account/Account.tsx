@@ -112,6 +112,10 @@ export class Account extends React.Component<Props, State> {
     navigate(Screens.Analytics, { nextScreen: Screens.Account })
   }
 
+  goToCeloLite() {
+    navigate(Screens.CeloLite, { nextScreen: Screens.Account })
+  }
+
   goToFAQ() {
     navigateToURI(FAQ_LINK)
   }
@@ -232,6 +236,9 @@ export class Account extends React.Component<Props, State> {
               <SettingsItem title={t('celoRewards')} onPress={navigateToVerifierApp} />
             )}
             <SettingsItem title={t('analytics')} onPress={this.goToAnalytics} />
+            {/* // TODO(anna) Disabled until switch geth on/off is implemented
+            <SettingsItem title={t('celoLite')} onPress={this.goToCeloLite} /> 
+            */}
             <SettingsItem title={t('languageSettings')} onPress={this.goToLanguageSetting} />
             <SettingsItem
               title={t('localCurrencySetting')}
