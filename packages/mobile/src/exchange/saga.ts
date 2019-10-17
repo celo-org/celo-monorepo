@@ -53,10 +53,16 @@ export function* doFetchExchangeRate(makerAmount?: BigNumber, makerToken?: CURRE
     yield call(getConnectedAccount)
 
     const contractKit = newKitFromWeb3(web3)
-    const exchange = yield contractKit.contracts.getExchange()
+    const exchange = yield call([contractKit.contracts, contractKit.contracts.getExchange])
 
-    const dollarMakerExchangeRate: BigNumber = yield exchange.getUsdExchangeRate(dollarMakerAmount)
-    const goldMakerExchangeRate: BigNumber = yield exchange.getGoldExchangeRate(goldMakerAmount)
+    const dollarMakerExchangeRate: BigNumber = yield call(
+      [exchange, exchange.getUsdExchangeRate],
+      dollarMakerAmount
+    )
+    const goldMakerExchangeRate: BigNumber = yield call(
+      [exchange, exchange.getGoldExchangeRate],
+      goldMakerAmount
+    )
 
     if (!dollarMakerExchangeRate || !goldMakerExchangeRate) {
       Logger.error(TAG, 'Invalid exchange rate')
