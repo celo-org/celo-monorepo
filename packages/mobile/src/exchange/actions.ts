@@ -71,24 +71,6 @@ export const exchangeTokens = (
   makerToken,
   makerAmount,
 })
-
-export enum CeloContract {
-  Attestations = 'Attestations',
-  LockedGold = 'LockedGold',
-  Escrow = 'Escrow',
-  Exchange = 'Exchange',
-  GasCurrencyWhitelist = 'GasCurrencyWhitelist',
-  GasPriceMinimum = 'GasPriceMinimum',
-  GoldToken = 'GoldToken',
-  Governance = 'Governance',
-  Random = 'Random',
-  Registry = 'Registry',
-  Reserve = 'Reserve',
-  SortedOracles = 'SortedOracles',
-  StableToken = 'StableToken',
-  Validators = 'Validators',
-}
-
 export type ActionTypes = SetExchangeRateAction | ExchangeTokensAction
 
 export function* doFetchExchangeRate(makerAmount?: BigNumber, makerToken?: CURRENCY_ENUM) {
