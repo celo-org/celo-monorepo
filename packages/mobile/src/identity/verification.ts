@@ -472,20 +472,16 @@ function* waitForAttestationCode(issuer: string) {
   }
 }
 
-async function setAccount(
-  attestationsContract: AttestationsType,
-  address: string,
-  dataKey: string
-) {
+function* setAccount(attestationsContract: AttestationsType, address: string, dataKey: string) {
   Logger.debug(TAG, 'Setting wallet address and public data encryption key')
-  const currentWalletAddress = await getWalletAddress(attestationsContract, address)
-  const currentWalletDEK = await getDataEncryptionKey(attestationsContract, address)
+  const currentWalletAddress = yield call(getWalletAddress, attestationsContract, address)
+  const currentWalletDEK = yield call(getDataEncryptionKey, attestationsContract, address)
   if (
     !areAddressesEqual(currentWalletAddress, address) ||
     !areAddressesEqual(currentWalletDEK, dataKey)
   ) {
     const setAccountTx = makeSetAccountTx(attestationsContract, address, dataKey)
-    await sendTransaction(setAccountTx, address, TAG, `Set Wallet Address & DEK`)
+    yield call(sendTransaction, setAccountTx, address, TAG, `Set Wallet Address & DEK`)
     CeloAnalytics.track(CustomEventNames.verification_set_account)
   }
 }

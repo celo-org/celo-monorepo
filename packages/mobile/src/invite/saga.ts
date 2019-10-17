@@ -244,7 +244,7 @@ export function* doRedeemInvite(inviteCode: string) {
   }
 }
 
-async function addTempAccountToWallet(inviteCode: string) {
+function* addTempAccountToWallet(inviteCode: string) {
   Logger.debug(TAG + '@addTempAccountToWallet', 'Attempting to add temp wallet')
   try {
     let tempAccount: string | null = null
@@ -253,13 +253,13 @@ async function addTempAccountToWallet(inviteCode: string) {
       Logger.debug(
         TAG + '@redeemInviteCode',
         'web3 is connected:',
-        String(await web3.eth.net.isListening())
+        String(yield call(web3.eth.net.isListening))
       )
       addLocalAccount(web3, inviteCode)
     } else {
       // Import account into the local geth node
       // @ts-ignore
-      tempAccount = await web3.eth.personal.importRawKey(stripHexLeader(inviteCode), TEMP_PW)
+      tempAccount = yield call(web3.eth.personal.importRawKey, stripHexLeader(inviteCode), TEMP_PW)
     }
     Logger.debug(TAG + '@addTempAccountToWallet', 'Account added', tempAccount!)
   } catch (e) {
@@ -272,19 +272,19 @@ async function addTempAccountToWallet(inviteCode: string) {
   }
 }
 
-export async function withdrawFundsFromTempAccount(
+export function* withdrawFundsFromTempAccount(
   tempAccount: string,
   tempAccountBalanceWei: BigNumber,
   newAccount: string
 ) {
   Logger.debug(TAG + '@withdrawFundsFromTempAccount', 'Unlocking temporary account')
   if (!isZeroSyncMode()) {
-    await web3.eth.personal.unlockAccount(tempAccount, TEMP_PW, 600)
+    yield call(web3.eth.personal.unlockAccount, tempAccount, TEMP_PW, 600)
   }
   const tempAccountBalance = new BigNumber(web3.utils.fromWei(tempAccountBalanceWei.toString()))
 
   Logger.debug(TAG + '@withdrawFundsFromTempAccount', 'Creating send transaction')
-  const tx = await createTransaction(getStableTokenContract, {
+  const tx = yield call(createTransaction, getStableTokenContract, {
     recipientAddress: newAccount,
     comment: SENTINEL_INVITE_COMMENT,
     // TODO: appropriately withdraw the balance instead of using gas fees will be less than 1 cent
@@ -292,7 +292,7 @@ export async function withdrawFundsFromTempAccount(
   })
 
   Logger.debug(TAG + '@withdrawFundsFromTempAccount', 'Sending transaction')
-  await sendTransaction(tx, tempAccount, TAG, 'Transfer from temp wallet')
+  yield call(sendTransaction, tx, tempAccount, TAG, 'Transfer from temp wallet')
   Logger.debug(TAG + '@withdrawFundsFromTempAccount', 'Done withdrawal')
 }
 
