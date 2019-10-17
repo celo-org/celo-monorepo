@@ -2,19 +2,15 @@ import { expectSaga } from 'redux-saga-test-plan'
 import { throwError } from 'redux-saga-test-plan/providers'
 import { call, select } from 'redux-saga/effects'
 import { currentLanguageSelector } from 'src/app/reducers'
-import {
-  initializeCloudMessaging,
-  setUserLanguage,
-  _registerTokenToDb,
-} from 'src/firebase/firebase'
+import { initializeCloudMessaging, registerTokenToDb, setUserLanguage } from 'src/firebase/firebase'
 
-const hasPermissionMock = jest.fn(() => {})
-const requestPermissionMock = jest.fn(() => {})
-const getTokenMock = jest.fn(() => {})
-const onTokenRefreshMock = jest.fn(() => {})
-const onNotificationMock = jest.fn((fn) => {})
-const onNotificationOpenedMock = jest.fn((fn) => {})
-const getInitialNotificationMock = jest.fn(() => {})
+const hasPermissionMock = jest.fn(() => null)
+const requestPermissionMock = jest.fn(() => null)
+const getTokenMock = jest.fn(() => null)
+const onTokenRefreshMock = jest.fn(() => null)
+const onNotificationMock = jest.fn((fn) => null)
+const onNotificationOpenedMock = jest.fn((fn) => null)
+const getInitialNotificationMock = jest.fn(() => null)
 
 const address = 'MyAddress'
 const mockFcmToken = 'token'
@@ -65,11 +61,11 @@ describe(initializeCloudMessaging, () => {
       .provide([
         [call(hasPermissionMock), false],
         [call(app.messaging().getToken), mockFcmToken],
-        [call(_registerTokenToDb, app, address, mockFcmToken), null],
+        [call(registerTokenToDb, app, address, mockFcmToken), null],
         [select(currentLanguageSelector), mockLanguage],
         [call(setUserLanguage, address, mockLanguage), null],
       ])
-      .call(_registerTokenToDb, app, address, mockFcmToken)
+      .call(registerTokenToDb, app, address, mockFcmToken)
       .run()
   })
 })

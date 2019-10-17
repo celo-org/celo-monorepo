@@ -110,7 +110,7 @@ export async function onBackgroundNotification(remoteMessage: RemoteMessage) {
   return Promise.resolve() // need to return a resolved promise so native code releases the JS context
 }
 
-const registerTokenToDb = async (app: Firebase, address: string, fcmToken: string) => {
+export const registerTokenToDb = async (app: Firebase, address: string, fcmToken: string) => {
   try {
     Logger.info(TAG, 'Registering Firebase client FCM token')
     const regRef = app.database().ref('registrations')
@@ -155,6 +155,3 @@ export async function setUserLanguage(address: string, language: string) {
     throw error
   }
 }
-
-// for testing purpose only
-export const _registerTokenToDb = registerTokenToDb
