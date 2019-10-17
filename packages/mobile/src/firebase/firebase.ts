@@ -32,9 +32,6 @@ export const initializeAuth = async (app: Firebase, address: string) => {
 //export const initializeCloudMessaging = async (app: Firebase, address: string) => {
 export function* initializeCloudMessaging(app: Firebase, address: string) {
   // TODO(cmcewen): remove once we move off thunk
-  // const store = getReduxStore()
-  // const language = store.getState().app.language
-  // const dispatch = store.dispatch
 
   Logger.info(TAG, 'Initializing Firebase Cloud Messaging')
   const enabled = yield call(app.messaging().hasPermission)
@@ -78,7 +75,8 @@ export function* initializeCloudMessaging(app: Firebase, address: string) {
   put(startFirebaseOnRefreshAction(channelOnNotification))
 
   // Listen for notification messages while the app is open
-  const channelOnNotificationOpened: any = eventChannel((emitter) => {
+  // const channelOnNotificationOpened: any =
+  eventChannel((emitter) => {
     app.notifications().onNotificationOpened((notification: NotificationOpen) => {
       Logger.info(TAG, 'App opened via a notification')
       emitter({ notification: notification.notification })
