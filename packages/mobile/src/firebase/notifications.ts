@@ -1,6 +1,6 @@
 import BigNumber from 'bignumber.js'
 import { Notification } from 'react-native-firebase/notifications'
-import { put } from 'redux-saga/effects'
+import { put, select } from 'redux-saga/effects'
 import {
   NotificationReceiveState,
   NotificationTypes,
@@ -10,8 +10,10 @@ import {
 import { showMessage } from 'src/alert/actions'
 import { resolveCurrency } from 'src/geth/consts'
 import { refreshAllBalances } from 'src/home/actions'
+import { addressToE164NumberSelector } from 'src/identity/reducer'
 import { getRecipientFromPaymentRequest } from 'src/paymentRequest/utils'
 import { getRecipientFromAddress } from 'src/recipients/recipient'
+import { recipientCacheSelector } from 'src/recipients/reducer'
 import { DispatchType, GetStateType } from 'src/redux/reducers'
 import {
   navigateToPaymentTransferReview,
@@ -48,15 +50,15 @@ function* handlePaymentRequested(
   })
 }
 
-const handlePaymentReceived = (
+function* handlePaymentReceivedSaga(
   transferNotification: TransferNotificationData,
   notificationState: NotificationReceiveState
-) => async (dispatch: DispatchType, getState: GetStateType) => {
-  dispatch(refreshAllBalances())
+) {
+  put(refreshAllBalances())
 
   if (notificationState !== NotificationReceiveState.APP_ALREADY_OPEN) {
-    const { recipientCache } = getState().recipients
-    const { addressToE164Number } = getState().identity
+    const { recipientCache } = yield select(recipientCacheSelector)
+    const { addressToE164Number } = yield select(addressToE164NumberSelector)
     const address = transferNotification.sender.toLowerCase()
 
     navigateToPaymentTransferReview(
@@ -109,7 +111,7 @@ export function* handleNotificationSaga(
       break
 
     case NotificationTypes.PAYMENT_RECEIVED:
-      dispatch(handlePaymentReceived(notification.data, notificationState))
+      yield handlePaymentReceivedSaga(notification.data, notificationState)
       break
 
     default:
