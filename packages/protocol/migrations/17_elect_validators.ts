@@ -14,7 +14,6 @@ import * as bls12377js from 'bls12377js'
 import { LockedGoldInstance, ValidatorsInstance } from 'types'
 
 const Web3 = require('web3')
-const truffle = require('@celo/protocol/truffle-config.js')
 
 function serializeKeystore(keystore: any) {
   return Buffer.from(JSON.stringify(keystore)).toString('base64')
@@ -42,8 +41,7 @@ async function registerValidatorGroup(
   name: string,
   lockedGold: LockedGoldInstance,
   validators: ValidatorsInstance,
-  privateKey: string,
-  fundingAccount: string
+  privateKey: string
 ) {
   // Validators can't also be validator groups, so we create a new account to register the
   // validator group with, and set the group identifier to the private key of this account
@@ -57,8 +55,7 @@ async function registerValidatorGroup(
   const encryptedPrivateKey = encryptionWeb3.eth.accounts.encrypt(account.privateKey, privateKey)
   const encodedKey = serializeKeystore(encryptedPrivateKey)
 
-  await web3.eth.sendTransaction({
-    from: fundingAccount,
+  await sendTransactionWithPrivateKey(web3, null, privateKey, {
     to: account.address,
     value: config.validators.minLockedGoldValue * 2, // Add a premium to cover tx fees
   })
@@ -123,7 +120,7 @@ async function registerValidator(
   return
 }
 
-module.exports = async (_deployer: any, _networkName: string) => {
+module.exports = async (_deployer: any) => {
   const validators: ValidatorsInstance = await getDeployedProxiedContract<ValidatorsInstance>(
     'Validators',
     artifacts
@@ -166,13 +163,7 @@ module.exports = async (_deployer: any, _networkName: string) => {
     }
 
     console.info(`  Registering Validator Group: ${groupName} ...`)
-    const account = await registerValidatorGroup(
-      groupName,
-      lockedGold,
-      validators,
-      groupKeys[0],
-      truffle.networks[_networkName].from
-    )
+    const account = await registerValidatorGroup(groupName, lockedGold, validators, groupKeys[0])
 
     console.info('  * Registering Validators ...')
     for (const key of groupKeys) {
