@@ -1,8 +1,12 @@
 import firebase, { Firebase } from 'react-native-firebase'
 import { RemoteMessage } from 'react-native-firebase/messaging'
+import { Notification } from 'react-native-firebase/notifications'
 import { Sentry } from 'react-native-sentry'
-import { call } from 'redux-saga/effects'
+import { eventChannel } from 'redux-saga'
+import { call, put, select } from 'redux-saga/effects'
 import { PaymentRequest } from 'src/account'
+import { currentLanguageSelector } from 'src/app/reducers'
+import { startFirebaseOnRefreshAction } from 'src/firebase/actions'
 import Logger from 'src/utils/Logger'
 
 const TAG = 'Firebase'
@@ -31,10 +35,9 @@ export function* initializeCloudMessaging(app: Firebase, address: string) {
   // const language = store.getState().app.language
   // const dispatch = store.dispatch
 
-  throw Error('fail with dispatch')
-
   Logger.info(TAG, 'Initializing Firebase Cloud Messaging')
   const enabled = yield call(app.messaging().hasPermission)
+
   if (!enabled) {
     try {
       yield call(app.messaging().requestPermission)
@@ -48,24 +51,29 @@ export function* initializeCloudMessaging(app: Firebase, address: string) {
   if (fcmToken) {
     yield call(registerTokenToDb, app, address, fcmToken)
     // First time setting the fcmToken also set the language selection
-    // yield call(setUserLanguage, address, language)
+    yield call(setUserLanguage, address, yield select(currentLanguageSelector))
   }
 
-  // // Monitor for future token refreshes
-  // app.messaging().onTokenRefresh(async (token) => {
-  //   Logger.info(TAG, 'Cloud Messaging token refreshed')
-  //   // await registerTokenToDb(app, address, token)
-  //   await registerTokenToDb(app, address, token)
-  // })
+  app.messaging().onTokenRefresh(async (token) => {
+    Logger.info(TAG, 'Cloud Messaging token refreshed')
+    await registerTokenToDb(app, address, token)
+  })
 
-  // throw Error("fail with dispatch")
+  const channel: any = eventChannel((emitter) => {
+    app.notifications().onNotification(
+      (notification: Notification): any => {
+        Logger.info(TAG, 'Notification received while open')
+        emitter({ notification })
+      }
+    )
 
-  // // Listen for notification messages while the app is open
-  // app.notifications().onNotification((notification: Notification) => {
-  //   Logger.info(TAG, 'Notification received while open')
+    // Return an unsubscribe method
+    return () => {}
+  })
 
-  //   dispatch(handleNotification(notification, NotificationReceiveState.APP_ALREADY_OPEN))
-  // })
+  put(startFirebaseOnRefreshAction(channel))
+
+  // Listen for notification messages while the app is open
 
   // app.notifications().onNotificationOpened((notification: NotificationOpen) => {
   //   Logger.info(TAG, 'App opened via a notification')
@@ -140,3 +148,6 @@ export async function setUserLanguage(address: string, language: string) {
     throw error
   }
 }
+
+// for testing purpose only
+export const _registerTokenToDb = registerTokenToDb

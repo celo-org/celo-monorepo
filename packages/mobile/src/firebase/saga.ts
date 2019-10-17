@@ -1,6 +1,6 @@
 import firebase from 'react-native-firebase'
 import { DataSnapshot } from 'react-native-firebase/database'
-import { eventChannel } from 'redux-saga'
+import { eventChannel, EventChannel } from 'redux-saga'
 import {
   all,
   call,
@@ -158,9 +158,19 @@ export function* watchLanguage() {
   yield takeEvery(AppActions.SET_LANGUAGE, syncLanguageSelection)
 }
 
+export function* startFirebaseOnRefresh(channel: EventChannel) {
+  const { data } = yield take(channel)
+  // do something with data
+}
+
+function* watchStartFirebaseOnRefresh() {
+  const channel = yield takeEvery(Actions.START_FIREBASE_ON_REFRESH, startFirebaseOnRefresh)
+}
+
 export function* firebaseSaga() {
   yield spawn(initializeFirebase)
   yield spawn(watchLanguage)
   yield spawn(subscribeToPaymentRequests)
   yield spawn(watchPaymentRequestStatusUpdates)
+  yield spawn(watchStartFirebaseOnRefresh)
 }

@@ -1,5 +1,6 @@
 import BigNumber from 'bignumber.js'
 import { Notification } from 'react-native-firebase/notifications'
+import { put } from 'redux-saga/effects'
 import {
   NotificationReceiveState,
   NotificationTypes,
@@ -22,10 +23,10 @@ import Logger from 'src/utils/Logger'
 
 const TAG = 'FirebaseNotifications'
 
-const handlePaymentRequested = (
+function* handlePaymentRequested(
   paymentRequest: PaymentRequest,
   notificationState: NotificationReceiveState
-) => async (dispatch: DispatchType, getState: GetStateType) => {
+) {
   if (notificationState === NotificationReceiveState.APP_ALREADY_OPEN) {
     return
   }
@@ -83,6 +84,28 @@ export const handleNotification = (
   switch (notification.data.type) {
     case NotificationTypes.PAYMENT_REQUESTED:
       dispatch(handlePaymentRequested(notification.data, notificationState))
+      break
+
+    case NotificationTypes.PAYMENT_RECEIVED:
+      dispatch(handlePaymentReceived(notification.data, notificationState))
+      break
+
+    default:
+      Logger.info(TAG, `Got unknown notification type ${notification.data.type}`)
+      break
+  }
+}
+
+export function* handleNotificationSaga(
+  notification: Notification,
+  notificationState: NotificationReceiveState
+) {
+  if (notificationState === NotificationReceiveState.APP_ALREADY_OPEN) {
+    yield put(showMessage(notification.title))
+  }
+  switch (notification.data.type) {
+    case NotificationTypes.PAYMENT_REQUESTED:
+      yield handlePaymentRequested(notification.data, notificationState)
       break
 
     case NotificationTypes.PAYMENT_RECEIVED:
