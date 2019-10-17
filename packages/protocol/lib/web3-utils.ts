@@ -42,16 +42,23 @@ export function generateAccountAddressFromPrivateKey(privateKey: string) {
 
 export async function sendTransactionWithPrivateKey<T>(
   web3: Web3,
-  tx: TransactionObject<T>,
+  tx: TransactionObject<T> | null,
   privateKey: string,
   txArgs: any
 ) {
   const address = generateAccountAddressFromPrivateKey(privateKey.slice(2))
-  const encodedTxData = tx.encodeABI()
-  const estimatedGas = await tx.estimateGas({
-    ...txArgs,
-    from: address,
-  })
+
+  // Encode data and estimate gas or use default values for a transfer.
+  let encodedTxData: string|undefined = undefined
+  let estimatedGas = 21000
+  if (tx !== null) {
+    encodedTxData = tx.encodeABI()
+    estimatedGas = await tx.estimateGas({
+      ...txArgs,
+      from: address,
+    })
+  }
+
   const signedTx: any = await signTransaction(
     web3,
     {
