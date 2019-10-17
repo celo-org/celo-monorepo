@@ -12045,10 +12045,10 @@ detect-node@^2.0.4:
   resolved "https://registry.yarnpkg.com/detect-node/-/detect-node-2.0.4.tgz#014ee8f8f669c5c58023da64b8179c083a28c46c"
   integrity sha512-ZIzRpLJrOj7jjP2miAtgqIfmzbxa4ZOr5jJc601zklsfEx9oTzmmj2nVpIPRpNlRTIh8lc1kyViIY7BWSGNmKw==
 
-detox@14.0.2:
-  version "14.0.2"
-  resolved "https://registry.yarnpkg.com/detox/-/detox-14.0.2.tgz#9c7fd7a83227c989b9d12361b1bfa959b197d802"
-  integrity sha512-4OVND4dAWgD2kRB8EkWq7W1vguVVM1iwpoEm+Y52H5q70E01Nf/oQtMSxeR0jHnvZMKcZPzlI3dL1XDO8UbuZg==
+detox@^14.5.0:
+  version "14.5.0"
+  resolved "https://registry.yarnpkg.com/detox/-/detox-14.5.0.tgz#cc96b41a2b76a029ef26be861fb04f69fe70c965"
+  integrity sha512-6LH/Aw/0pnf5llCY5rZICxVK1uoAmV+OZzGPQogpE3ZqxPkViFkg/SHsQqOn1M1Iswia7SzfSgu2KfKMNFXvRA==
   dependencies:
     "@babel/core" "^7.4.5"
     bunyan "^1.8.12"
@@ -12067,6 +12067,7 @@ detox@14.0.2:
     tail "^2.0.0"
     telnet-client "0.15.3"
     tempfile "^2.0.0"
+    which "^1.3.1"
     ws "^3.3.1"
     yargs "^13.0.0"
     yargs-parser "^13.0.0"
