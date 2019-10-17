@@ -270,7 +270,7 @@ jobs:
       - run:
           name: Set GRADLE_OPTS to speed up gradle
           command: |
-            export GRADLE_OPTS='-Dorg.gradle.daemon=true -Dorg.gradle.parallel=true -Dorg.gradle.jvmargs="-Xmx4096m -XX:+HeapDumpOnOutOfMemoryError"'
+            export GRADLE_OPTS='-Dorg.gradle.daemon=true -Dorg.gradle.parallel=true -Dorg.gradle.jvmargs="-Xmx3500m -XX:+HeapDumpOnOutOfMemoryError"'
       - run:
           name: Build Android app (debug version)
           command: |
