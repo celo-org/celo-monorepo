@@ -329,7 +329,7 @@ function* requestAttestations(
   )
 
   yield all([
-    call(approveConfirmationPromise),
+    approveConfirmationPromise,
     call(sendTransaction, requestTx, account, TAG, 'Request Attestations', REQUEST_TX_GAS),
   ])
 
