@@ -80,7 +80,7 @@ export function* sendTransactionPromises(
       `${TAG}@sendTransactionPromises`,
       `Sending transaction with id ${txId} using web3 signing`
     )
-    const transactionPromises = call(
+    const transactionPromises = yield call(
       sendTransactionAsyncWithWeb3Signing,
       web3,
       tx,
@@ -95,7 +95,7 @@ export function* sendTransactionPromises(
       `${TAG}@sendTransactionPromises`,
       `Sending transaction with id ${txId} using geth signing`
     )
-    const transactionPromises = call(
+    const transactionPromises = yield call(
       sendTransactionAsync,
       tx,
       account,
@@ -116,11 +116,8 @@ export function* sendTransaction(
   txId: string,
   staticGas?: number | undefined
 ) {
-  Logger.debug(`${TAG}@sendTransaction`, `Sending transaction ${txId}`)
   const txPromises = yield call(sendTransactionPromises, tx, account, tag, txId, staticGas)
-  Logger.debug(`${TAG}@sendTransaction`, `Got transaction promises`)
   const confirmation = yield call(awaitConfirmation, txPromises)
-  Logger.debug(`${TAG}@sendTransaction`, `Got confirmation: ${confirmation}`)
   return confirmation
 }
 
