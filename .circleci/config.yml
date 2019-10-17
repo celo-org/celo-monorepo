@@ -275,6 +275,7 @@ jobs:
           name: Build Android app (debug version)
           command: |
             set -euo pipefail
+            yarn run jetify
             cd packages/mobile/android
             ENVFILE=.env.test ./gradlew assembleDebug
             cd -
