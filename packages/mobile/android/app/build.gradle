@@ -239,7 +239,7 @@ android {
     applicationVariants.all { variant ->
         variant.outputs.each { output ->
             // https://developer.android.com/studio/build/configure-apk-splits.html
-            def versionCodes = ["armeabi-v7a": 1, "x86": 2, "arm64-v8a": 3, "x86_64": 4]
+            def versionCodes = ["armeabi-v7a":1, "x86":2, "arm64-v8a": 4, "x86_64": 5]
             def abi = output.getFilter(OutputFile.ABI)
             if (abi != null) {  // null for the universal-debug, universal-release variants
                 output.versionCodeOverride =
