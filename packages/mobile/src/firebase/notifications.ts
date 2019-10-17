@@ -14,7 +14,6 @@ import { addressToE164NumberSelector } from 'src/identity/reducer'
 import { getRecipientFromPaymentRequest } from 'src/paymentRequest/utils'
 import { getRecipientFromAddress } from 'src/recipients/recipient'
 import { recipientCacheSelector } from 'src/recipients/reducer'
-import { DispatchType, GetStateType } from 'src/redux/reducers'
 import {
   navigateToPaymentTransferReview,
   navigateToRequestedPaymentReview,
@@ -50,33 +49,6 @@ function* handlePaymentRequested(
   })
 }
 
-// delete
-const handlePaymentReceived = (
-  transferNotification: TransferNotificationData,
-  notificationState: NotificationReceiveState
-) => async (dispatch: DispatchType, getState: GetStateType) => {
-  dispatch(refreshAllBalances())
-
-  if (notificationState !== NotificationReceiveState.APP_ALREADY_OPEN) {
-    const { recipientCache } = getState().recipients
-    const { addressToE164Number } = getState().identity
-    const address = transferNotification.sender.toLowerCase()
-
-    navigateToPaymentTransferReview(
-      TransactionTypes.RECEIVED,
-      new BigNumber(transferNotification.timestamp).toNumber(),
-      {
-        value: divideByWei(transferNotification.value),
-        currency: resolveCurrency(transferNotification.currency),
-        address: transferNotification.sender.toLowerCase(),
-        comment: transferNotification.comment,
-        recipient: getRecipientFromAddress(address, addressToE164Number, recipientCache),
-        type: TransactionTypes.RECEIVED,
-      }
-    )
-  }
-}
-
 function* handlePaymentReceivedSaga(
   transferNotification: TransferNotificationData,
   notificationState: NotificationReceiveState
@@ -100,28 +72,6 @@ function* handlePaymentReceivedSaga(
         type: TransactionTypes.RECEIVED,
       }
     )
-  }
-}
-
-export const handleNotification = (
-  notification: Notification,
-  notificationState: NotificationReceiveState
-) => async (dispatch: DispatchType, getState: GetStateType) => {
-  if (notificationState === NotificationReceiveState.APP_ALREADY_OPEN) {
-    dispatch(showMessage(notification.title))
-  }
-  switch (notification.data.type) {
-    case NotificationTypes.PAYMENT_REQUESTED:
-      dispatch(handlePaymentRequested(notification.data, notificationState))
-      break
-
-    case NotificationTypes.PAYMENT_RECEIVED:
-      dispatch(handlePaymentReceived(notification.data, notificationState))
-      break
-
-    default:
-      Logger.info(TAG, `Got unknown notification type ${notification.data.type}`)
-      break
   }
 }
 
