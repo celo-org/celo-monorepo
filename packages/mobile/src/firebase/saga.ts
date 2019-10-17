@@ -12,13 +12,19 @@ import {
   takeEvery,
   takeLeading,
 } from 'redux-saga/effects'
-import { PaymentRequest, PaymentRequestStatus, updatePaymentRequests } from 'src/account'
+import {
+  NotificationReceiveState,
+  PaymentRequest,
+  PaymentRequestStatus,
+  updatePaymentRequests,
+} from 'src/account'
 import { showError } from 'src/alert/actions'
 import { Actions as AppActions } from 'src/app/actions'
 import { ErrorMessages } from 'src/app/ErrorMessages'
 import { FIREBASE_ENABLED } from 'src/config'
 import { Actions, firebaseAuthorized, UpdatePaymentRequestStatusAction } from 'src/firebase/actions'
 import { initializeAuth, initializeCloudMessaging, setUserLanguage } from 'src/firebase/firebase'
+import { handleNotificationSaga } from 'src/firebase/notifications'
 import Logger from 'src/utils/Logger'
 import { getAccount } from 'src/web3/saga'
 import { currentAccountSelector } from 'src/web3/selectors'
@@ -158,13 +164,13 @@ export function* watchLanguage() {
   yield takeEvery(AppActions.SET_LANGUAGE, syncLanguageSelection)
 }
 
-export function* startFirebaseOnRefresh(channel: EventChannel) {
+export function* startFirebaseOnRefresh(channel: EventChannel<Notification>) {
   const { data } = yield take(channel)
-  // do something with data
+  yield handleNotificationSaga(data.notification, NotificationReceiveState.APP_ALREADY_OPEN)
 }
 
 function* watchStartFirebaseOnRefresh() {
-  const channel = yield takeEvery(Actions.START_FIREBASE_ON_REFRESH, startFirebaseOnRefresh)
+  yield takeEvery(Actions.START_FIREBASE_ON_REFRESH, startFirebaseOnRefresh)
 }
 
 export function* firebaseSaga() {

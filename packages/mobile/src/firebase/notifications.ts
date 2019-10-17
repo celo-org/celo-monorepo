@@ -38,7 +38,7 @@ function* handlePaymentRequested(
     return
   }
 
-  const { recipientCache } = getState().recipients
+  const recipientCache = yield select(recipientCacheSelector)
   const targetRecipient = getRecipientFromPaymentRequest(paymentRequest, recipientCache)
 
   navigateToRequestedPaymentReview({
@@ -48,6 +48,33 @@ function* handlePaymentRequested(
     recipientAddress: targetRecipient.address,
     type: TransactionTypes.PAY_REQUEST,
   })
+}
+
+// delete
+const handlePaymentReceived = (
+  transferNotification: TransferNotificationData,
+  notificationState: NotificationReceiveState
+) => async (dispatch: DispatchType, getState: GetStateType) => {
+  dispatch(refreshAllBalances())
+
+  if (notificationState !== NotificationReceiveState.APP_ALREADY_OPEN) {
+    const { recipientCache } = getState().recipients
+    const { addressToE164Number } = getState().identity
+    const address = transferNotification.sender.toLowerCase()
+
+    navigateToPaymentTransferReview(
+      TransactionTypes.RECEIVED,
+      new BigNumber(transferNotification.timestamp).toNumber(),
+      {
+        value: divideByWei(transferNotification.value),
+        currency: resolveCurrency(transferNotification.currency),
+        address: transferNotification.sender.toLowerCase(),
+        comment: transferNotification.comment,
+        recipient: getRecipientFromAddress(address, addressToE164Number, recipientCache),
+        type: TransactionTypes.RECEIVED,
+      }
+    )
+  }
 }
 
 function* handlePaymentReceivedSaga(

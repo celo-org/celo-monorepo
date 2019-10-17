@@ -51,7 +51,8 @@ export function* initializeCloudMessaging(app: Firebase, address: string) {
   if (fcmToken) {
     yield call(registerTokenToDb, app, address, fcmToken)
     // First time setting the fcmToken also set the language selection
-    yield call(setUserLanguage, address, yield select(currentLanguageSelector))
+    const language = yield select(currentLanguageSelector)
+    yield call(setUserLanguage, address, language)
   }
 
   app.messaging().onTokenRefresh(async (token) => {
@@ -59,6 +60,8 @@ export function* initializeCloudMessaging(app: Firebase, address: string) {
     await registerTokenToDb(app, address, token)
   })
 
+  // TODO type here
+  // TODO test if this channel actually works
   const channel: any = eventChannel((emitter) => {
     app.notifications().onNotification(
       (notification: Notification): any => {
