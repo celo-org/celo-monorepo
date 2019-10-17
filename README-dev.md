@@ -4,10 +4,14 @@
 
 Many packages depend on other packages within the monorepo. When this happens, follow these rules:
 
-  1. All packages must use **master version** of sibyl packages.
+  1. All packages must use **master version** of sibling packages.
   2. Exception to (1) are packages that represent a GAE/firebase app which must use the last published version.
   3. To differentiate published vs unpublished version. Master version (in package.json) must end with suffix `-dev` and should not be published.
   4. If a developer want to publish a version; then after publishing it needs to set master version to next `-dev` version and change all package.json that require on it.
+
+To check which pakages need amending, you can run (in the root pkg):
+
+    yarn check:packages
 
 A practical example:
 
