@@ -4,14 +4,12 @@ import { Provider } from 'react-redux'
 import * as renderer from 'react-test-renderer'
 import BackupPhrase from 'src/backup/BackupPhrase'
 import { createMockStore } from 'test/utils'
+import { mockMnemonic } from 'test/values'
 
 jest.mock('react-native-secure-key-store', () => {
-  const SAMPLE_PHRASE =
-    'prosper winner find donate tape history measure umbrella agent patrol want rhythm old unable wash wrong need fluid hammer coach reveal plastic trust lake'
-
   return {
     get: () => {
-      return SAMPLE_PHRASE
+      return mockMnemonic
     },
   }
 })

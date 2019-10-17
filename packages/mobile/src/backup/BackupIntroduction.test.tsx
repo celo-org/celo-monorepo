@@ -8,7 +8,7 @@ import { createMockStore } from 'test/utils'
 const NOW = new Date().getTime()
 
 describe('BackupIntroduction', () => {
-  it('renders correctly when backup is not too late', () => {
+  it('renders correctly when neither backup nor social backup are complete', () => {
     const tree = renderer.create(
       <Provider store={createMockStore({})}>
         <BackupIntroduction />
