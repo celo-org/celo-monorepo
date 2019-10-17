@@ -1,4 +1,4 @@
-import { newKit } from '@celo/contractkit'
+import { newKitFromWeb3 } from '@celo/contractkit'
 import {
   ContractUtils,
   getExchangeContract,
@@ -72,11 +72,30 @@ export const exchangeTokens = (
   makerAmount,
 })
 
+export enum CeloContract {
+  Attestations = 'Attestations',
+  LockedGold = 'LockedGold',
+  Escrow = 'Escrow',
+  Exchange = 'Exchange',
+  GasCurrencyWhitelist = 'GasCurrencyWhitelist',
+  GasPriceMinimum = 'GasPriceMinimum',
+  GoldToken = 'GoldToken',
+  Governance = 'Governance',
+  Random = 'Random',
+  Registry = 'Registry',
+  Reserve = 'Reserve',
+  SortedOracles = 'SortedOracles',
+  StableToken = 'StableToken',
+  Validators = 'Validators',
+}
+
 export type ActionTypes = SetExchangeRateAction | ExchangeTokensAction
 
 export function* doFetchExchangeRate(makerAmount?: BigNumber, makerToken?: CURRENCY_ENUM) {
   Logger.debug(TAG, 'Calling @doFetchExchangeRate')
 
+  // If makerAmount and makerToken are given, use them to estimate the exchange rate
+  // Else default to preset token's LARGE_SELL_AMOUNT_IN_WEI
   const goldMakerAmount =
     makerAmount && makerToken === CURRENCY_ENUM.GOLD ? makerAmount : LARGE_GOLD_SELL_AMOUNT_IN_WEI
   const dollarMakerAmount =
@@ -86,20 +105,30 @@ export function* doFetchExchangeRate(makerAmount?: BigNumber, makerToken?: CURRE
 
   try {
     yield call(getConnectedAccount)
-    const kit = newKit('https://alfajores-infura.celo-testnet.org:8545')
-    Logger.debug(TAG, kit.toString())
+    const isConnected = yield call(web3.eth.net.isListening)
+    Logger.debug(TAG, `Web3 connected: ${isConnected}`)
+    const contractKit = newKitFromWeb3(web3)
 
+    const isConnected2 = yield call(contractKit.web3.eth.net.isListening)
+    Logger.debug(TAG, `Kit Web3 Connected: ${isConnected2}`)
+    Logger.debug(TAG, `Gas inflation factor is ${contractKit.gasInflationFactor}`)
+
+    // This works
+    const goldTokenContract = yield contractKit.contracts.getGoldToken()
+
+    // This fails with a null pointer error
+    const goldTokenContract2 = yield call(contractKit.contracts.getGoldToken)
+    Logger.debug(TAG, `goldTokenContract ${goldTokenContract}`)
+    Logger.debug(TAG, `goldTokenContract2 ${goldTokenContract2}`)
+
+    throw new Error('Line above will throw an Error so you should never reach this')
     const dollarMakerExchangeRate: BigNumber = yield call(
-      ContractUtils.getExchangeRate,
-      web3,
-      CURRENCY_ENUM.DOLLAR,
-      new BigNumber(dollarMakerAmount)
+      exchange.getUsdExchangeRate,
+      dollarMakerAmount
     )
     const goldMakerExchangeRate: BigNumber = yield call(
-      ContractUtils.getExchangeRate,
-      web3,
-      CURRENCY_ENUM.GOLD,
-      new BigNumber(goldMakerAmount)
+      exchange.getGoldExchangeRate,
+      goldMakerAmount
     )
 
     if (!dollarMakerExchangeRate || !goldMakerExchangeRate) {
@@ -127,9 +156,9 @@ export function* doFetchExchangeRate(makerAmount?: BigNumber, makerToken?: CURRE
 }
 
 export function* exchangeGoldAndStableTokens(action: ExchangeTokensAction) {
-  Logger.debug(`${TAG}@exchangeGoldAndStableTokens`, 'Exchanging gold and stable CURRENCY_ENUM')
+  Logger.debug(`${TAG}@exchangeGoldAndStableTokens`, 'Exchanging gold and stable token')
   const { makerToken, makerAmount } = action
-  Logger.debug(TAG, `Exchanging ${makerAmount.toString()} of CURRENCY_ENUM ${makerToken}`)
+  Logger.debug(TAG, `Exchanging ${makerAmount.toString()} of token ${makerToken}`)
   let txId: string | null = null
   try {
     const account: string = yield call(getConnectedUnlockedAccount)
