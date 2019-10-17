@@ -1,6 +1,5 @@
 import { combineReducers, Dispatch } from 'redux'
 import { PersistState } from 'redux-persist'
-import 'redux-thunk'
 import { reducer as account, State as AccountState } from 'src/account/reducer'
 import { reducer as alert, State as AlertState } from 'src/alert/reducer'
 import { appReducer as app, State as AppState } from 'src/app/reducers'

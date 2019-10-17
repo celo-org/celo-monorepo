@@ -66,7 +66,7 @@ export function* initializeCloudMessaging(app: Firebase, address: string) {
     )
 
     // Return an unsubscribe method
-    return () => {}
+    return () => null
   })
 
   put(startFirebaseOnRefreshAction(channelOnNotification))
@@ -84,7 +84,7 @@ export function* initializeCloudMessaging(app: Firebase, address: string) {
     })
 
     // Return an unsubscribe method
-    return () => {}
+    return () => null
   })
 
   // TODO
