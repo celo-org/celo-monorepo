@@ -29,10 +29,7 @@ export const initializeAuth = async (app: Firebase, address: string) => {
   Logger.info(TAG, 'Firebase Auth initialized successfully')
 }
 
-//export const initializeCloudMessaging = async (app: Firebase, address: string) => {
 export function* initializeCloudMessaging(app: Firebase, address: string) {
-  // TODO(cmcewen): remove once we move off thunk
-
   Logger.info(TAG, 'Initializing Firebase Cloud Messaging')
   const enabled = yield call(app.messaging().hasPermission)
 
