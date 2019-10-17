@@ -1,6 +1,7 @@
-import { CeloContract } from '../base'
+import { Address, CeloContract } from '../base'
 import { newKitFromWeb3 } from '../kit'
 import { testWithGanache } from '../test-utils/ganache-test'
+import { NetworkConfig } from '../test-utils/ganache.setup'
 import { OracleRate, SortedOraclesWrapper } from './SortedOracles'
 
 /*
@@ -9,24 +10,24 @@ TEST NOTES:
 */
 
 testWithGanache('SortedOracles Wrapper', (web3) => {
-  // TODO: get these from the config rather than hardcoding
-  const stableTokenOracles = [
-    '0x5409ED021D9299bf6814279A6A1411A7e866A631',
-    '0xE36Ea790bc9d7AB70C55260C66D52b1eca985f84',
-    '0x06cEf8E666768cC40Cc78CF93d9611019dDcB628',
-    '0x7457d5E02197480Db681D3fdF256c7acA21bDc12',
-  ]
-
+  // NOTE: These values are set in test-utils/network-config.json, and are derived
+  // from the MNEMONIC. If the MNEMONIC has changed, these will need to be reset.
+  // To do that, look at the output of web3.eth.getAccounts(), and pick a few
+  // addresses from that set to be oracles
+  const stableTokenOracles: Address[] = NetworkConfig.stableToken.priceOracleAccounts
   const oracleAddress = stableTokenOracles[stableTokenOracles.length - 1]
-  const nonOracleAddress = '0x91c987bf62D25945dB517BDAa840A6c661374402'
 
   const kit = newKitFromWeb3(web3)
   let sortedOracles: SortedOraclesWrapper
   let stableTokenAddress: string
+  let nonOracleAddresses: Address[]
 
   beforeAll(async () => {
     sortedOracles = await kit.contracts.getSortedOracles()
     stableTokenAddress = await kit.registry.addressFor(CeloContract.StableToken)
+    nonOracleAddresses = (await web3.eth.getAccounts()).filter((addr) => {
+      return !stableTokenOracles.includes(addr)
+    })
   })
 
   describe('#report', () => {
@@ -91,7 +92,7 @@ testWithGanache('SortedOracles Wrapper', (web3) => {
     })
 
     describe('when reporting from a non-oracle address', () => {
-      beforeAll(() => (kit.defaultAccount = nonOracleAddress))
+      beforeAll(() => (kit.defaultAccount = nonOracleAddresses[0]))
 
       it('should raise an error', async () => {
         const tx = await sortedOracles.report(CeloContract.StableToken, numerator, denominator)
@@ -135,7 +136,7 @@ testWithGanache('SortedOracles Wrapper', (web3) => {
       expect(await sortedOracles.isOracle(CeloContract.StableToken, oracleAddress)).toEqual(true)
     })
     it('returns false when this address is not an oracle', async () => {
-      expect(await sortedOracles.isOracle(CeloContract.StableToken, nonOracleAddress)).toEqual(
+      expect(await sortedOracles.isOracle(CeloContract.StableToken, nonOracleAddresses[0])).toEqual(
         false
       )
     })

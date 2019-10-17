@@ -1,8 +1,12 @@
 // @ts-ignore
 import * as ganache from '@celo/ganache-cli'
+import * as fs from 'fs'
 import * as path from 'path'
 
 const MNEMONIC = 'concert load couple harbor equip island argue ramp clarify fence smart topic'
+export const NetworkConfig = JSON.parse(
+  fs.readFileSync('src/test-utils/network-config.json').toString()
+)
 
 export async function startGanache(datadir: string, opts: { verbose?: boolean } = {}) {
   const logFn = opts.verbose

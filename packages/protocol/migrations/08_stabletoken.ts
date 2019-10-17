@@ -54,17 +54,22 @@ module.exports = deploymentForCoreContract<StableTokenInstance>(
       await stableToken.mint(address, initialBalance)
     }
 
-    console.log('Setting GoldToken/USD exchange rate')
     const sortedOracles: SortedOraclesInstance = await getDeployedProxiedContract<
       SortedOraclesInstance
     >('SortedOracles', artifacts)
 
-    // TODO (yerdua): Get rid of this hardcoded nonsense I'm using to figure out how to write tests
-    console.log('stable token config:', config.stableToken)
+    for (const oracle of config.stableToken.priceOracleAccounts) {
+      console.log(`Adding ${oracle} as an Oracle for StableToken`)
+      await sortedOracles.addOracle(stableToken.address, oracle)
+    }
 
-    await sortedOracles.addOracle(stableToken.address, minerAddress)
-    await sortedOracles.addOracle(stableToken.address, '0xE834EC434DABA538cd1b9Fe1582052B880BD7e63')
-    await sortedOracles.addOracle(stableToken.address, config.stableToken.priceOracleAccounts[0])
+    console.log('Setting GoldToken/USD exchange rate')
+    // We need to seed the exchange rate, and that must be done with an account
+    // that's accessible to the migrations. It's in an if statement in case this
+    // account happened to be included in config.stableToken.priceOracleAccounts
+    if (!(await sortedOracles.isOracle(stableToken.address, minerAddress))) {
+      await sortedOracles.addOracle(stableToken.address, minerAddress)
+    }
     await sortedOracles.report(
       stableToken.address,
       config.stableToken.goldPrice,
