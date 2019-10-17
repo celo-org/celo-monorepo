@@ -85,6 +85,7 @@ project.ext.react = [
         bundleInPilot: true,
         devDisabledInPilot: true,
         cliPath: "../../node_modules/react-native/cli.js",
+        composeSourceMapsPath: "../../node_modules/react-native/scripts/compose-source-maps.js",
         hermesCommand: "../../../../node_modules/hermes-engine/%OS-BIN%/hermes"
 ]
 
@@ -98,7 +99,7 @@ project.ext.envConfigFiles = [
 ]
 
 apply from: project(':react-native-config').projectDir.getPath() + "/dotenv.gradle"
-apply from: "../../../../node_modules/react-native/react.gradle"
+apply from: "./react.gradle"
 apply from: "../../../../node_modules/@sentry/react-native/sentry.gradle"
 
 
@@ -277,6 +278,10 @@ dependencies {
     if (enableHermes) {
         def hermesPath = "../../../../node_modules/hermes-engine/android/";
         debugImplementation files(hermesPath + "hermes-debug.aar")
+        integrationImplementation files(hermesPath + "hermes-release.aar")
+        stagingImplementation files(hermesPath + "hermes-release.aar")
+        alfajoresImplementation files(hermesPath + "hermes-release.aar")
+        pilotImplementation files(hermesPath + "hermes-release.aar")
         releaseImplementation files(hermesPath + "hermes-release.aar")
     } else {
         implementation jscFlavor
@@ -299,5 +304,11 @@ if (enableFirebase.toBoolean()){
   println 'Info: Firebase is disabled in .env variable'
 }
 
+// https://github.com/facebook/react-native/issues/26400#issuecomment-539395814
+configurations.all {
+     resolutionStrategy {
+       force "com.facebook.soloader:soloader:0.8.0"
+     }
+}
 
 apply from: file("../../../../node_modules/@react-native-community/cli-platform-android/native_modules.gradle"); applyNativeModulesAppBuildGradle(project)
