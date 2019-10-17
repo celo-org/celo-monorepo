@@ -100,7 +100,6 @@
     "react-native-localize": "^1.2.1",
     "react-native-mail": "^3.0.7",
     "react-native-modal": "^6.1.0",
-    "react-native-modal-dropdown": "^0.6.2",
     "react-native-permissions": "^1.1.1",
     "react-native-progress": "^3.4.0",
     "react-native-qrcode-svg": "^5.1.2",

@@ -14,7 +14,7 @@ import { ErrorMessages } from 'src/app/ErrorMessages'
 import BackupPhraseContainer from 'src/backup/BackupPhraseContainer'
 import { getStoredMnemonic } from 'src/backup/utils'
 import { Namespaces } from 'src/i18n'
-import { headerWithCancelButton } from 'src/navigator/Headers'
+import { headerWithBackButton } from 'src/navigator/Headers'
 import { navigate } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
 import { RootState } from 'src/redux/reducers'
@@ -45,7 +45,7 @@ const mapStateToProps = (state: RootState): StateProps => {
 class BackupPhrase extends React.Component<Props, State> {
   // TODO(Rossy): Show modal when cancelling if backup flow incomplete
   static navigationOptions = () => ({
-    ...headerWithCancelButton,
+    ...headerWithBackButton,
   })
 
   state = {
@@ -101,7 +101,7 @@ class BackupPhrase extends React.Component<Props, State> {
             <Text style={styles.body}>{t('backupKeySummary')}</Text>
             <BackupPhraseContainer words={mnemonic} showCopy={true} />
             <Text style={styles.tipText}>
-              <Text style={[styles.tipText, fontStyles.bold]}>{t('global:tip')}</Text>
+              <Text style={[styles.tipText, fontStyles.bold]}>{t('global:warning')}</Text>
               {t('securityTip')}
             </Text>
           </View>
@@ -109,18 +109,18 @@ class BackupPhrase extends React.Component<Props, State> {
         {!backupCompleted && (
           <View>
             <View style={styles.confirmationSwitchContainer}>
-              <Text style={styles.confirmationSwitchLabel}>{t('savedConfirmation')}</Text>
               <Switch
                 value={isConfirmChecked}
                 onValueChange={this.onPressConfirmSwitch}
                 trackColor={switchTrackColors}
                 thumbColor={colors.celoGreen}
               />
+              <Text style={styles.confirmationSwitchLabel}>{t('savedConfirmation')}</Text>
             </View>
             <Button
               disabled={!isConfirmChecked}
               onPress={this.onPressContinue}
-              text={t('continue')}
+              text={t('global:continue')}
               standard={false}
               type={BtnTypes.PRIMARY}
             />
@@ -139,7 +139,6 @@ const styles = StyleSheet.create({
   },
   scrollContainer: {
     flexGrow: 1,
-    justifyContent: 'space-between',
     paddingHorizontal: 20,
     paddingBottom: 20,
   },
@@ -149,6 +148,7 @@ const styles = StyleSheet.create({
   },
   tipText: {
     ...fontStyles.bodySmall,
+    color: colors.darkSecondary,
     marginTop: 25,
     marginHorizontal: 3,
   },
@@ -159,8 +159,9 @@ const styles = StyleSheet.create({
   },
   confirmationSwitchLabel: {
     ...fontStyles.body,
-    paddingTop: 2,
-    paddingRight: 20,
+    ...fontStyles.semiBold,
+    paddingTop: 3,
+    paddingLeft: 10,
   },
 })
 

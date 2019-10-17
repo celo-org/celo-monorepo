@@ -8,6 +8,12 @@
   "save": "Save",
   "next": "Next",
   "skip": "Skip",
+  "copy": "Copy",
+  "goBack": "Go Back",
+  "reset": "Reset",
+  "done": "Done",
+  "tip": "Tip: ",
+  "warning": "Warning ",
   "downloadRewards": "Download Celo Rewards",
   "chooseLanguage": "Choose Language",
   "wallet": "Wallet",
@@ -62,8 +68,6 @@
   "canNotRequestFromUnverified": "Can not request from unverified users",
   "restartApp": "Restart App",
   "loading": "Loading…",
-  "invalidBackupPhrase": "Invalid Backup Key",
-  "importBackupFailed": "Importing Wallet Failed",
   "inviteFailed": "Failure sending invite",
   "importContactsFailed": "Failed to import contacts",
   "sendPaymentFailed": "Failure sending payment",
@@ -90,7 +94,5 @@
   "errorDuringSync": "Error occurred during sync, please try again later",
   "calculateFeeFailed": "Could not calculate fee",
   "gold": "Gold",
-  "localCurrencyTitle": "Select Currency",
-  "tip": "Tip: ",
-  "copy": "Copy"
+  "localCurrencyTitle": "Select Currency"
 }

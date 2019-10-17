@@ -1,37 +1,33 @@
 {
   "getBackupKey": "Get Backup Key",
+  "getYourKey": "Get Your Key",
   "viewBackupKey": "View Backup Key",
   "setUpSocialBackup": "Set Up Safeguards",
+  "viewSafeguards": "View Safeguards",
   "failedFetchMnemonic": "Failed to fetch your Backup Key",
-  "socialBackupTitle": "Introducing Safeguards",
-  "editProfile": "Edit Profile",
   "backupAndRecovery": "Backup and Recovery",
   "backupKey": "Backup Key",
   "yourBackupKey": "Your Backup Key",
   "delayBackup": "Dismiss for an hour",
-  "languageSettings": "Language Settings",
-  "cancel": "Cancel",
-  "backupKeyImportance": {
-    "0": "Your Backup Key is your Celo Wallet. It is very important to keep it safe.",
-    "1":
-      "If you lose your Backup Key or it is stolen, you will lose your Celo {{dollars}} and Gold."
+  "backupKeyIntro": {
+    "0":
+      "Your Backup Key is the one and only key to your Celo Wallet. With this key, you can access your funds anytime, anywhere.",
+    "1": "KEEP THIS KEY SAFE AND PRIVATE.",
+    "2": "Congrats, you’ve sucessfully retrieved your Backup Key! A reminder, ",
+    "3": "KEEP THIS KEY SAFE.",
+    "4": "For more security set up Safeguards for your wallet.",
+    "5":
+      "You’ve also set up Safeguards! You’ll be able to restore your account with the help of the two friends. ",
+    "6": "KEEP YOUR SAFEGUARDS SECRET"
   },
-  "toKeepSafe": "To keep your funds safe, you should:",
-  "allDone": "You've successfully backed up your Key! Check back here to view it at any time.",
-  "writeDownKey": "1. Write down your Backup Key",
-  "shareSocialBackup": "2. Share Recovery Secrets",
   "backupSkipText": {
     "0": "Without a Backup Key, you can lose access to your wallet ",
     "1": "forever."
   },
   "backupRecovery": "Share your Backup Key with only one other person who you completely trust.",
-  "securityTip":
-    "Keep your Backup Key somewhere you can access if you lose your phone. Do not take a screenshot or save it in your phone’s notes.",
-  "backupKeySummary": "Please write down this Backup Key and store it somewhere safe.",
-  "socialBackupYourKey":
-    "Recovery Secrets allow you to recover your account with the help of two friends. If you lose your Backup Key, you will need to contact your friends and enter both Recovery Secrets.",
-  "sendFirstHalf": "First, send this recovery secret to one contact:",
-  "sendSecondHalf": "Now, send this second recovery secret to another contact:",
+  "securityTip": "If you lose your backup key, you will lose access to your Celo Dollars and Gold.",
+  "backupKeySummary":
+    "Please write down your Backup Key. If your phone is stolen or lost, you will need the Backup Key to access your Celo Wallet.",
   "bothBackupsDone": {
     "0": "Congratulations!",
     "1":
@@ -41,8 +37,33 @@
     "Please do not lose this key. It is critical that you maintain this in a safe place, as this is the only way to unlock your wallet should you lose your phone.",
   "backupPrompt":
     "For the security of your funds, your account is frozen until you get your Backup Key",
-  "copied": "Backup Key copied to clipboard",
+  "copied": "Key copied to clipboard",
   "savedConfirmation": "I have saved my Backup Key.",
-  "verifyBackupKey":
-    "Please verify you have your Backup Key by choosing the words in the correct order."
+  "confirmBackupKey": "Confirm Your Backup Key",
+  "backupQuizInfo":
+    "Please verify your Backup Key by selecting the words below in the correct order.",
+  "backupQuizWordCount": "Word {{index}} of {{total}}",
+  "invalidBackupPhrase": "Invalid Backup Key",
+  "importBackupFailed": "Importing Wallet Failed",
+  "backupQuizFailed": "Incorrect Backup Key, please try again",
+  "backupComplete": {
+    "0": "Success!",
+    "1": "Next, you can set up Safeguards.",
+    "2": "You’re all set!"
+  },
+  "socialBackupIntro": {
+    "header": "Introducing Safeguards",
+    "body":
+      "Safeguards is an additional layer of protection for your account in case you lose your Backup Key. Once set up, you’ll be able to restore your account with the help of two friends or family members. ",
+    "warning": "NEVER TELL ANYONE YOUR SAFEGUARDS’ IDENTITIES.",
+    "skip": "Skip For Now"
+  },
+  "socialBackup": {
+    "body":
+      "Share each phrase below with a friend. Be sure to send only one phrase to each person.",
+    "confirmation": "I have sent each Safeguard phrase to a trusted friend.",
+    "phrase1": "Safeguard Phrase 1",
+    "phrase2": "Safeguard Phrase 2",
+    "yourSafeguards": "Your Safeguards"
+  }
 }

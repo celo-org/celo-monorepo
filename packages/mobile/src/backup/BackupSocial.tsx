@@ -1,19 +1,21 @@
 import Button, { BtnTypes } from '@celo/react-components/components/Button'
+import colors from '@celo/react-components/styles/colors'
 import { fontStyles } from '@celo/react-components/styles/fonts'
+import { componentStyles } from '@celo/react-components/styles/styles'
 import * as React from 'react'
 import { WithNamespaces, withNamespaces } from 'react-i18next'
-import { StyleSheet, Text, View } from 'react-native'
-import FlagSecure from 'react-native-flag-secure-android'
-import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'
+import { StyleSheet, Switch, Text, View } from 'react-native'
+import { ScrollView } from 'react-native-gesture-handler'
+import SafeAreaView from 'react-native-safe-area-view'
 import { connect } from 'react-redux'
-import { hideAlert, showError } from 'src/alert/actions'
-import CeloAnalytics from 'src/analytics/CeloAnalytics'
-import { CustomEventNames } from 'src/analytics/constants'
+import { setSocialBackupCompleted } from 'src/account'
+import { showError } from 'src/alert/actions'
 import componentWithAnalytics from 'src/analytics/wrapper'
 import { ErrorMessages } from 'src/app/ErrorMessages'
 import BackupPhraseContainer from 'src/backup/BackupPhraseContainer'
 import { getStoredMnemonic, splitMnemonic } from 'src/backup/utils'
 import { Namespaces } from 'src/i18n'
+import { headerWithBackButton } from 'src/navigator/Headers'
 import { navigate } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
 import { RootState } from 'src/redux/reducers'
@@ -22,49 +24,41 @@ import Logger from 'src/utils/Logger'
 interface State {
   mnemonic: string
   mnemonicParts: string[]
-  hasShared: boolean
+  isConfirmChecked: boolean
 }
 
 interface StateProps {
+  socialBackupCompleted: boolean
   language: string | null
 }
 
 interface DispatchProps {
+  setSocialBackupCompleted: typeof setSocialBackupCompleted
   showError: typeof showError
-  hideAlert: typeof hideAlert
 }
 
-interface OwnProps {
-  // Must be 0 index!
-  partNumber: number
-}
-
-type Props = OwnProps & WithNamespaces & StateProps & DispatchProps
+type Props = WithNamespaces & StateProps & DispatchProps
 
 const mapStateToProps = (state: RootState): StateProps => {
   return {
     language: state.app.language,
+    socialBackupCompleted: state.account.socialBackupCompleted,
   }
 }
 
 class BackupSocial extends React.Component<Props, State> {
-  static navigationOptions = { header: null }
-  state = {
+  static navigationOptions = () => ({
+    ...headerWithBackButton,
+  })
+
+  state: State = {
     mnemonic: '',
     mnemonicParts: [],
-    hasShared: false,
+    isConfirmChecked: false,
   }
 
   async componentDidMount() {
-    FlagSecure.activate()
     await this.retrieveMnemonic()
-
-    this.setState({ mnemonicParts: splitMnemonic(this.state.mnemonic, this.props.language) })
-  }
-
-  componentWillUnmount() {
-    FlagSecure.deactivate()
-    this.props.hideAlert()
   }
 
   retrieveMnemonic = async () => {
@@ -77,77 +71,81 @@ class BackupSocial extends React.Component<Props, State> {
       if (!mnemonic) {
         throw new Error('Mnemonic not stored in key store')
       }
-      this.setState({ mnemonic })
+      this.setState({ mnemonic, mnemonicParts: splitMnemonic(mnemonic, this.props.language) })
     } catch (e) {
-      Logger.error('backup/retrieveMnemonic', e)
+      Logger.error('BackupSocial/retrieveMnemonic', e)
       this.props.showError(ErrorMessages.FAILED_FETCH_MNEMONIC)
     }
   }
 
-  continueBackup = () => {
-    CeloAnalytics.track(CustomEventNames.backup_continue)
+  onPressConfirmSwitch = (value: boolean) => {
+    this.setState({
+      isConfirmChecked: value,
+    })
+  }
 
-    this.setState({ hasShared: false })
+  onPressDone = () => {
+    this.props.setSocialBackupCompleted()
     navigate(Screens.BackupComplete)
   }
 
-  onShare = () => {
-    this.setState({ hasShared: true })
-  }
-
   render() {
-    const { t, partNumber } = this.props
+    const { t, socialBackupCompleted } = this.props
     const {
-      hasShared,
       mnemonicParts: [firstHalf, secondHalf],
+      isConfirmChecked,
     } = this.state
 
     return (
-      <View style={styles.container}>
-        <KeyboardAwareScrollView
-          contentContainerStyle={styles.scrollContainer}
-          keyboardShouldPersistTaps="always"
-        >
+      <SafeAreaView style={styles.container}>
+        <ScrollView contentContainerStyle={styles.scrollContainer}>
           <View>
-            <Text style={fontStyles.h1}>{t('socialBackupTitle')}</Text>
-            {partNumber === 0 &&
-              firstHalf && (
-                <>
-                  <Text style={styles.verifyText}>{t('socialBackupYourKey')}</Text>
-                  <Text style={styles.verifyText}>{t('sendFirstHalf')}</Text>
-                  <BackupPhraseContainer
-                    words={firstHalf}
-                    showCopy={true}
-                    showWhatsApp={true}
-                    onShare={this.onShare}
-                  />
-                </>
-              )}
-
-            {partNumber === 1 &&
-              secondHalf && (
-                <>
-                  <Text style={styles.verifyText}>{t('sendSecondHalf')}</Text>
-                  <BackupPhraseContainer
-                    words={secondHalf}
-                    showCopy={true}
-                    showWhatsApp={true}
-                    onShare={this.onShare}
-                  />
-                </>
-              )}
+            {!socialBackupCompleted && (
+              <>
+                <Text style={fontStyles.h1}>{t('setUpSocialBackup')}</Text>
+                <Text style={styles.bodyText}>{t('socialBackup.body')}</Text>
+              </>
+            )}
+            {socialBackupCompleted && (
+              <>
+                <Text style={fontStyles.h1}>{t('socialBackup.yourSafeguards')}</Text>
+                <Text style={styles.bodyText}>{t('socialBackupIntro.body')}</Text>
+              </>
+            )}
+            <BackupPhraseContainer
+              headerText={t('socialBackup.phrase1')}
+              words={firstHalf}
+              showCopy={true}
+            />
+            <BackupPhraseContainer
+              headerText={t('socialBackup.phrase2')}
+              words={secondHalf}
+              showCopy={true}
+              style={componentStyles.marginTop20}
+            />
           </View>
-        </KeyboardAwareScrollView>
-        <View>
+          {!socialBackupCompleted && (
+            <View style={styles.confirmationSwitchContainer}>
+              <Switch
+                value={isConfirmChecked}
+                onValueChange={this.onPressConfirmSwitch}
+                trackColor={switchTrackColors}
+                thumbColor={colors.celoGreen}
+              />
+              <Text style={styles.confirmationSwitchLabel}>{t('socialBackup.confirmation')}</Text>
+            </View>
+          )}
+        </ScrollView>
+        {!socialBackupCompleted && (
           <Button
-            onPress={this.continueBackup}
-            text={t('continue')}
+            disabled={!isConfirmChecked}
+            onPress={this.onPressDone}
+            text={t('global:done')}
             standard={false}
-            disabled={!hasShared}
             type={BtnTypes.PRIMARY}
           />
-        </View>
-      </View>
+        )}
+      </SafeAreaView>
     )
   }
 }
@@ -155,30 +153,42 @@ class BackupSocial extends React.Component<Props, State> {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: 'white',
+    backgroundColor: colors.background,
     justifyContent: 'space-between',
   },
   scrollContainer: {
+    flexGrow: 1,
     paddingHorizontal: 20,
-    paddingBottom: 60,
-    flex: 1,
-    flexDirection: 'column',
-    justifyContent: 'center',
+    paddingBottom: 20,
   },
-  verifyText: {
-    ...fontStyles.bodySmall,
-    fontSize: 15,
-    textAlign: 'left',
-    paddingTop: 15,
+  bodyText: {
+    ...fontStyles.body,
+    marginBottom: 20,
+  },
+  confirmationSwitchContainer: {
+    paddingVertical: 20,
+    flexDirection: 'row',
+  },
+  confirmationSwitchLabel: {
+    ...fontStyles.body,
+    ...fontStyles.semiBold,
+    paddingTop: 5,
+    paddingLeft: 8,
+    paddingRight: 5,
   },
 })
+
+const switchTrackColors = {
+  false: colors.inactive,
+  true: colors.celoGreen,
+}
 
 export default componentWithAnalytics(
   connect<StateProps, DispatchProps, {}, RootState>(
     mapStateToProps,
     {
+      setSocialBackupCompleted,
       showError,
-      hideAlert,
     }
   )(withNamespaces(Namespaces.backupKeyFlow6)(BackupSocial))
 )

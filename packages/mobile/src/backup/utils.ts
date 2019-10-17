@@ -7,7 +7,7 @@ const TAG = 'Backup/utils'
 
 export const DAYS_TO_BACKUP = 1
 export const DAYS_TO_DELAY = 1 / 24 // 1 hour delay
-const MNEMONIC_SPLITS = 2
+export const MNEMONIC_SPLITTER = 'celo'
 
 export async function createQuizWordList(mnemonic: string, language: string | null) {
   const disallowedWordSet = new Set(mnemonic.split(' '))
@@ -52,66 +52,34 @@ export function getWordlist(language: string | null) {
   }
 }
 
-// Fallback prefixes that are used in case something goes wrong, must be of size
-// at least equal to number of backup shards
-const FALLBACK_PREFIXES = ['magic', 'prosper']
-
-function getPrefixWords(wordlist: string[], numWords: number): string[] {
-  // Use random words in sorted order for split phrase prefixes from their
-  // corresponding word list chunk. For example: 2 shards = word list split in
-  // half, first shard gets random word in first half, second gets random word
-  // in second half.  This provides random words but also allows mixed shards
-  // that were created at different times.
-
-  // While BIP39 does not avoid repeating words, the prefixes MUST be unique
-  // otherwise it is not possible to differentiate parts.  Prefixes are just
-  // used as a way to determine which mnemonic shard corresponds to which half.
-  const prefixes = _.chain(wordlist)
-    .chunk(wordlist.length / numWords)
-    .flatMap((chunk, i) => _.sample(chunk) || FALLBACK_PREFIXES[i])
-    .uniq()
-    .value()
-    .sort()
-
-  if (prefixes.length < numWords) {
-    Logger.error(TAG, 'Word list has duplicate words')
-    return FALLBACK_PREFIXES
-  }
-
-  return prefixes
-}
-
+// Split a mnemonic into two and insert the mnemonic splitter in between
 export function splitMnemonic(mnemonic: string, language: string | null): string[] {
+  if (!mnemonic) {
+    throw new Error('Cannot split invalid mnemonic')
+  }
+
   const mnemonicWords = mnemonic.split(' ')
-
-  const wordlist = getWordlist(language)
-  const prefixes = getPrefixWords(wordlist, MNEMONIC_SPLITS)
-
-  const chunkSize = Math.ceil(mnemonicWords.length / MNEMONIC_SPLITS)
-  return _.chunk(mnemonicWords, chunkSize).map((words, i) => [prefixes[i], ...words].join(' '))
-}
-
-// Sort function based on the first word in string arrays. Mnemonic prefixes are
-// the first word in each shard
-function sortStringArray(a: string[], b: string[]): number {
-  // localeCompare is slower -- https://jsperf.com/operator-vs-localecompage/3
-  if (a[0] < b[0]) {
-    return -1
-  }
-
-  if (a[0] > b[0]) {
-    return 1
-  }
-
-  return 0
+  const firstHalf = [...mnemonicWords.slice(0, mnemonicWords.length / 2 - 1), MNEMONIC_SPLITTER]
+  const secondHalf = [MNEMONIC_SPLITTER, ...mnemonicWords.slice(mnemonicWords.length / 2)]
+  return [firstHalf.join(' '), secondHalf.join(' ')]
 }
 
 export function joinMnemonic(mnemonicShards: string[]) {
-  return mnemonicShards
-    .map((shard) => shard.split(' '))
-    .sort(sortStringArray)
-    .map((shard) => shard.slice(1).join(' '))
-    .join(' ')
+  if (
+    !mnemonicShards ||
+    !(mnemonicShards.length === 2) ||
+    !mnemonicShards[0].includes(MNEMONIC_SPLITTER) ||
+    !mnemonicShards[1].includes(MNEMONIC_SPLITTER)
+  ) {
+    throw new Error('Cannot join invalid mnemonic shards')
+  }
+
+  if (mnemonicShards[0].startsWith(MNEMONIC_SPLITTER)) {
+    mnemonicShards.reverse()
+  }
+
+  const [firstHalf, secondHalf] = mnemonicShards.map((shard) => shard.split(' '))
+  return [...firstHalf.slice(0, firstHalf.length - 1), secondHalf.slice(1)].join(' ')
 }
 
 export async function getStoredMnemonic(): Promise<string | null> {

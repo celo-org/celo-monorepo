@@ -19,6 +19,7 @@ import BackupIntroduction from 'src/backup/BackupIntroduction'
 import BackupPhrase from 'src/backup/BackupPhrase'
 import BackupQuiz from 'src/backup/BackupQuiz'
 import BackupSocial from 'src/backup/BackupSocial'
+import BackupSocialIntro from 'src/backup/BackupSocialIntro'
 import DappKitAccountScreen from 'src/dappkit/DappKitAccountScreen'
 import DappKitSignTxScreen from 'src/dappkit/DappKitSignTxScreen'
 import DappKitTxDataScreen from 'src/dappkit/DappKitTxDataScreen'
@@ -153,6 +154,7 @@ const BackupStack = createStackNavigator(
     [Screens.BackupIntroduction]: { screen: BackupIntroduction },
     [Screens.BackupPhrase]: { screen: BackupPhrase },
     [Screens.BackupQuiz]: { screen: BackupQuiz },
+    [Screens.BackupSocialIntro]: { screen: BackupSocialIntro },
     [Screens.BackupSocial]: { screen: BackupSocial },
     [Screens.BackupComplete]: { screen: BackupComplete },
   },
