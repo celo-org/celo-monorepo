@@ -28,7 +28,7 @@ interface IGovernance {
   function approve(uint256, uint256) external returns (bool);
   function execute(uint256, uint256) external returns (bool);
 
-  function whitelistHotfix(bytes32, uint256) external;
+  function whitelistHotfix(bytes32) external;
   function prepareHotfix(bytes32) external;
   function executeHotfix(
     uint256[] calldata,

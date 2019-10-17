@@ -68,7 +68,6 @@ contract Governance is IGovernance, Ownable, Initializable, UsingLockedGold, Ree
   struct HotfixRecord {
     mapping(address => bool) whitelisted;
     uint256 preparedEpoch;
-    bool approved;
     bool completed;
   }
 
@@ -98,7 +97,6 @@ contract Governance is IGovernance, Ownable, Initializable, UsingLockedGold, Ree
   mapping(uint256 => Proposals.Proposal) private proposals;
   mapping(address => Voter) public voters;
   mapping(bytes32 => HotfixRecord) public hotfixes;
-  Proposals.Proposal private hotfixProposal;
   SortedLinkedList.List private queue;
   uint256[] public dequeued;
   uint256[] public emptyIndices;
@@ -477,10 +475,24 @@ contract Governance is IGovernance, Ownable, Initializable, UsingLockedGold, Ree
 
     proposalCount = proposalCount.add(1);
     Proposals.Proposal storage proposal = proposals[proposalCount];
-    proposal.make(values, destinations, data, dataLengths, msg.sender, msg.value);
+    Proposals.make(
+      proposal,
+      values,
+      destinations,
+      data,
+      dataLengths,
+      msg.sender,
+      msg.value
+    );
     queue.push(proposalCount);
     // solhint-disable-next-line not-rely-on-time
-    emit ProposalQueued(proposalCount, msg.sender, proposal.transactions.length, msg.value, now);
+    emit ProposalQueued(
+      proposalCount, 
+      msg.sender, 
+      proposals[proposalCount].transactions.length, 
+      msg.value, 
+      now
+    );
     return proposalCount;
   }
 
@@ -672,21 +684,11 @@ contract Governance is IGovernance, Ownable, Initializable, UsingLockedGold, Ree
   }
 
   /**
-   * @notice Whitelists the hash of a hotfix.
-   * @param txHash The abi encoded keccak256 hash of the hotfix transaction to be whitelisted.
-   * @param validatorIndex The index in the validator set of the whitelisting validator.
+   * @notice Whitelists the hash of a hotfix transaction(s).
+   * @param txHash The abi encoded keccak256 hash of the hotfix transaction(s) to be whitelisted.
    */
-  function whitelistHotfix(bytes32 txHash, uint256 validatorIndex) external nonReentrant {
-    if (msg.sender == approver) {
-      require(!hotfixes[txHash].approved);
-      hotfixes[txHash].approved = true;
-    } else {
-      IValidators validators = IValidators(registry.getAddressForOrDie(VALIDATORS_REGISTRY_ID));
-      require(msg.sender == validators.validatorAddressFromCurrentSet(validatorIndex));
-      require(!hotfixes[txHash].whitelisted[msg.sender]);
-      hotfixes[txHash].whitelisted[msg.sender] = true;
-    }
-
+  function whitelistHotfix(bytes32 txHash) external {
+    hotfixes[txHash].whitelisted[msg.sender] = true;
     emit HotfixWhitelisted(txHash, msg.sender);
   }
 
@@ -728,8 +730,15 @@ contract Governance is IGovernance, Ownable, Initializable, UsingLockedGold, Ree
     IValidators validators = IValidators(registry.getAddressForOrDie(VALIDATORS_REGISTRY_ID));
     require(preparedEpoch == validators.getEpochNumber(), "hotfix must be prepared for this epoch");
 
-    hotfixProposal.make(values, destinations, data, dataLengths, msg.sender, 0);
-    hotfixProposal.execute();
+    Proposals.Proposal memory proposal = Proposals.makeMem(
+      values, 
+      destinations, 
+      data, 
+      dataLengths, 
+      msg.sender, 
+      0
+    );
+    proposal.executeMem();
 
     hotfixes[txHash].completed = true;
     emit HotfixExecuted(txHash);
@@ -933,7 +942,11 @@ contract Governance is IGovernance, Ownable, Initializable, UsingLockedGold, Ree
    * @return Hotfix tuple of (approved, completed, preparedEpoch)
    */
   function getHotfixRecord(bytes32 txHash) public view returns (bool, bool, uint256) {
-    return (hotfixes[txHash].approved, hotfixes[txHash].completed, hotfixes[txHash].preparedEpoch);
+    return (
+      hotfixes[txHash].whitelisted[approver], 
+      hotfixes[txHash].completed, 
+      hotfixes[txHash].preparedEpoch
+    );
   }
 
   /**

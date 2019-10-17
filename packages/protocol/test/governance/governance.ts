@@ -1859,26 +1859,13 @@ contract('Governance', (accounts: string[]) => {
     })
 
     it('should mark the hotfix record approved when called by approver', async () => {
-      await governance.whitelistHotfix(proposalHashStr, 0, { from: approver })
+      await governance.whitelistHotfix(proposalHashStr, { from: approver })
       const [approved, ,] = await governance.getHotfixRecord.call(proposalHashStr)
       assert.isTrue(approved)
     })
 
-    it('should revert when called by approver twice', async () => {
-      await governance.whitelistHotfix(proposalHashStr, 0, { from: approver })
-      await assertRevert(governance.whitelistHotfix(proposalHashStr, 0, { from: approver }))
-    })
-
-    it('should revert if the validator address index does not match msg.sender', async () => {
-      await assertRevert(governance.whitelistHotfix(proposalHashStr, 0, { from: accounts[3] }))
-    })
-
-    it('should revert if called by a non-validator, non-approver', async () => {
-      await assertRevert(governance.whitelistHotfix(proposalHashStr, 1, { from: accounts[4] }))
-    })
-
     it('should emit the HotfixWhitelist event', async () => {
-      const resp = await governance.whitelistHotfix(proposalHashStr, 1, { from: accounts[3] })
+      const resp = await governance.whitelistHotfix(proposalHashStr, { from: accounts[3] })
       assert.equal(resp.logs.length, 1)
       const log = resp.logs[0]
       assertLogMatches2(log, {
@@ -1889,11 +1876,6 @@ contract('Governance', (accounts: string[]) => {
         },
       })
       assert.isTrue(Buffer.from(stripHexEncoding(log.args.txHash), 'hex').equals(proposalHash))
-    })
-
-    it('should revert when called by the same validator twice', async () => {
-      await governance.whitelistHotfix(proposalHashStr, 1, { from: accounts[3] })
-      await assertRevert(governance.whitelistHotfix(proposalHashStr, 1, { from: accounts[3] }))
     })
   })
 
@@ -1910,14 +1892,14 @@ contract('Governance', (accounts: string[]) => {
     })
 
     it('should return false when hotfix has been whitelisted but not by quorum', async () => {
-      await governance.whitelistHotfix(proposalHashStr, 0, { from: accounts[2] })
+      await governance.whitelistHotfix(proposalHashStr, { from: accounts[2] })
       const passing = await governance.isHotfixPassing.call(proposalHashStr)
       assert.isFalse(passing)
     })
 
     it('should return true when hotfix is whitelisted by quorum', async () => {
-      await governance.whitelistHotfix(proposalHashStr, 0, { from: accounts[2] })
-      await governance.whitelistHotfix(proposalHashStr, 1, { from: accounts[3] })
+      await governance.whitelistHotfix(proposalHashStr, { from: accounts[2] })
+      await governance.whitelistHotfix(proposalHashStr, { from: accounts[3] })
       const passing = await governance.isHotfixPassing.call(proposalHashStr)
       assert.isTrue(passing)
     })
@@ -1942,7 +1924,7 @@ contract('Governance', (accounts: string[]) => {
     describe('when hotfix is passing', () => {
       beforeEach(async () => {
         await mockValidators.setEpochNumber(1)
-        await governance.whitelistHotfix(proposalHashStr, 0, { from: accounts[2] })
+        await governance.whitelistHotfix(proposalHashStr, { from: accounts[2] })
       })
 
       it('should mark the hotfix record prepared epoch', async () => {
@@ -1994,16 +1976,16 @@ contract('Governance', (accounts: string[]) => {
 
     it('should revert when hotfix not prepared for current epoch', async () => {
       await mockValidators.setEpochNumber(1)
-      await governance.whitelistHotfix(proposalHashStr, 0, { from: approver })
+      await governance.whitelistHotfix(proposalHashStr, { from: approver })
       await assertRevert(executeHotfixTx())
     })
 
     describe('when hotfix is approved and prepared for current epoch', () => {
       beforeEach(async () => {
-        await governance.whitelistHotfix(proposalHashStr, 0, { from: approver })
+        await governance.whitelistHotfix(proposalHashStr, { from: approver })
         await mockValidators.setEpochNumber(2)
         await mockValidators.addValidator(accounts[2])
-        await governance.whitelistHotfix(proposalHashStr, 0, { from: accounts[2] })
+        await governance.whitelistHotfix(proposalHashStr, { from: accounts[2] })
         await governance.prepareHotfix(proposalHashStr)
       })
 

@@ -660,8 +660,7 @@ contract Validators is IValidators, Ownable, ReentrancyGuard, Initializable, Usi
    * @return The byzantine quorum.
    */
   function getByzantineQuorumForCurrentSet() external view returns (uint256) {
-    return FixidityLib.newFixedFraction(numberValidatorsInCurrentSet().mul(2), 3)
-      .fromFixed().add(1); // ceil
+    return numberValidatorsInCurrentSet().mul(2).div(3).add(1);
   }
 
   /**

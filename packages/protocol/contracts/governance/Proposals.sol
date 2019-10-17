@@ -91,11 +91,54 @@ library Proposals {
     uint256 dataPosition = 0;
     delete proposal.transactions;
     for (uint256 i = 0; i < transactionCount; i = i.add(1)) {
-      proposal.transactions.push(
-        Transaction(values[i], destinations[i], data.slice(dataPosition, dataLengths[i]))
+      proposal.transactions.push(Transaction(
+        values[i],
+        destinations[i],
+        data.slice(dataPosition, dataLengths[i])
+      ));
+      dataPosition = dataPosition.add(dataLengths[i]);
+    }
+  }
+
+    /**
+   * @notice Constructs a proposal for use in memory.
+   * @param values The values of Celo Gold to be sent in the proposed transactions.
+   * @param destinations The destination addresses of the proposed transactions.
+   * @param data The concatenated data to be included in the proposed transactions.
+   * @param dataLengths The lengths of each transaction's data.
+   * @param proposer The proposer.
+   * @param deposit The proposal deposit.
+   */
+  function makeMem(
+    uint256[] memory values,
+    address[] memory destinations,
+    bytes memory data,
+    uint256[] memory dataLengths,
+    address proposer,
+    uint256 deposit
+  )
+    internal view returns (Proposal memory)
+  {
+    require(values.length == destinations.length && destinations.length == dataLengths.length);
+    uint256 transactionCount = values.length;
+
+    Proposal memory proposal; 
+    proposal.proposer = proposer;
+    proposal.deposit = deposit;
+    // solhint-disable-next-line not-rely-on-time
+    proposal.timestamp = now;
+
+    uint256 dataPosition = 0;
+    proposal.transactions = new Transaction[](transactionCount);
+    for (uint256 i = 0; i < transactionCount; i = i.add(1)) {
+      proposal.transactions[i] = Transaction(
+        values[i],
+        destinations[i],
+        data.slice(dataPosition, dataLengths[i])
       );
       dataPosition = dataPosition.add(dataLengths[i]);
     }
+    return proposal;
   }
 
   /**
@@ -138,13 +181,36 @@ library Proposals {
    * @dev Reverts if any transaction fails.
    */
   function execute(Proposal storage proposal) public {
-    for (uint256 i = 0; i < proposal.transactions.length; i = i.add(1)) {
+    executeTransactions(proposal.transactions);
+    // for (uint256 i = 0; i < proposal.transactions.length; i = i.add(1)) {
+    //   require(
+    //     externalCall(
+    //       proposal.transactions[i].destination,
+    //       proposal.transactions[i].value,
+    //       proposal.transactions[i].data.length,
+    //       proposal.transactions[i].data
+    //     )
+    //   );
+    // }
+  }
+
+  /**
+   * @notice Executes the proposal.
+   * @param proposal The proposal struct.
+   * @dev Reverts if any transaction fails.
+   */
+  function executeMem(Proposal memory proposal) internal {
+    executeTransactions(proposal.transactions);
+  }
+
+  function executeTransactions(Transaction[] memory transactions) internal {
+    for (uint256 i = 0; i < transactions.length; i = i.add(1)) {
       require(
         externalCall(
-          proposal.transactions[i].destination,
-          proposal.transactions[i].value,
-          proposal.transactions[i].data.length,
-          proposal.transactions[i].data
+          transactions[i].destination,
+          transactions[i].value,
+          transactions[i].data.length,
+          transactions[i].data
         )
       );
     }
