@@ -8,24 +8,26 @@ import {
   _registerTokenToDb,
 } from 'src/firebase/firebase'
 
-const hasPermission = jest.fn(() => {})
-const requestPermission = jest.fn(() => {})
-const getToken = jest.fn(() => {})
-const onTokenRefresh = jest.fn(() => {})
+const hasPermissionMock = jest.fn(() => {})
+const requestPermissionMock = jest.fn(() => {})
+const getTokenMock = jest.fn(() => {})
+const onTokenRefreshMock = jest.fn(() => {})
 const onNotificationMock = jest.fn((fn) => {})
+const onNotificationOpenedMock = jest.fn((fn) => {})
 
 const address = 'MyAddress'
 const mockFcmToken = 'token'
 
 const app: any = {
   messaging: () => ({
-    hasPermission: hasPermission,
-    requestPermission: requestPermission,
-    getToken: getToken,
-    onTokenRefresh: onTokenRefresh,
+    hasPermission: hasPermissionMock,
+    requestPermission: requestPermissionMock,
+    getToken: getTokenMock,
+    onTokenRefresh: onTokenRefreshMock,
   }),
   notifications: () => ({
     onNotification: onNotificationMock,
+    onNotificationOpened: onNotificationOpenedMock,
   }),
 }
 
@@ -43,7 +45,10 @@ describe(initializeCloudMessaging, () => {
     let catchedError
 
     await expectSaga(initializeCloudMessaging, app, address)
-      .provide([[call(hasPermission), false], [call(requestPermission), throwError(errorToRaise)]])
+      .provide([
+        [call(hasPermissionMock), false],
+        [call(requestPermissionMock), throwError(errorToRaise)],
+      ])
       .run()
       .catch((error: Error) => {
         catchedError = error
@@ -57,7 +62,7 @@ describe(initializeCloudMessaging, () => {
     const mockLanguage = 'en_US'
     await expectSaga(initializeCloudMessaging, app, address)
       .provide([
-        [call(hasPermission), false],
+        [call(hasPermissionMock), false],
         [call(app.messaging().getToken), mockFcmToken],
         [call(_registerTokenToDb, app, address, mockFcmToken), null],
         [select(currentLanguageSelector), mockLanguage],

@@ -24,7 +24,7 @@ import { ErrorMessages } from 'src/app/ErrorMessages'
 import { FIREBASE_ENABLED } from 'src/config'
 import { Actions, firebaseAuthorized, UpdatePaymentRequestStatusAction } from 'src/firebase/actions'
 import { initializeAuth, initializeCloudMessaging, setUserLanguage } from 'src/firebase/firebase'
-import { handleNotificationSaga } from 'src/firebase/notifications'
+import { handleNotification } from 'src/firebase/notifications'
 import Logger from 'src/utils/Logger'
 import { getAccount } from 'src/web3/saga'
 import { currentAccountSelector } from 'src/web3/selectors'
@@ -166,7 +166,7 @@ export function* watchLanguage() {
 
 export function* startFirebaseOnRefresh(channel: EventChannel<Notification>) {
   const { data } = yield take(channel)
-  yield handleNotificationSaga(data.notification, NotificationReceiveState.APP_ALREADY_OPEN)
+  yield handleNotification(data.notification, NotificationReceiveState.APP_ALREADY_OPEN)
 }
 
 function* watchStartFirebaseOnRefresh() {
