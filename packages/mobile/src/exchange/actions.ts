@@ -76,8 +76,8 @@ export type ActionTypes = SetExchangeRateAction | ExchangeTokensAction
 export function* doFetchExchangeRate(makerAmount?: BigNumber, makerToken?: CURRENCY_ENUM) {
   Logger.debug(TAG, 'Calling @doFetchExchangeRate')
 
-  // If makerAmount and makerToken are given, use them to estimate the exchange rate
-  // Else default to preset token's LARGE_SELL_AMOUNT_IN_WEI
+  // If makerAmount and makerToken are given, use them to estimate the exchange rate,
+  // as exchange rate depends on amount sold. Else default to present large sell amount.
   const goldMakerAmount =
     makerAmount && makerToken === CURRENCY_ENUM.GOLD ? makerAmount : LARGE_GOLD_SELL_AMOUNT_IN_WEI
   const dollarMakerAmount =
@@ -87,31 +87,12 @@ export function* doFetchExchangeRate(makerAmount?: BigNumber, makerToken?: CURRE
 
   try {
     yield call(getConnectedAccount)
-    const isConnected = yield call(web3.eth.net.isListening)
-    Logger.debug(TAG, `Web3 connected: ${isConnected}`)
+
     const contractKit = newKitFromWeb3(web3)
+    const exchange = yield contractKit.contracts.getExchange()
 
-    const isConnected2 = yield call(contractKit.web3.eth.net.isListening)
-    Logger.debug(TAG, `Kit Web3 Connected: ${isConnected2}`)
-    Logger.debug(TAG, `Gas inflation factor is ${contractKit.gasInflationFactor}`)
-
-    // This works
-    const goldTokenContract = yield contractKit.contracts.getGoldToken()
-
-    // This fails with a null pointer error
-    const goldTokenContract2 = yield call(contractKit.contracts.getGoldToken)
-    Logger.debug(TAG, `goldTokenContract ${goldTokenContract}`)
-    Logger.debug(TAG, `goldTokenContract2 ${goldTokenContract2}`)
-
-    const exchange = yield contractKit.contracts.getExchange
-    const dollarMakerExchangeRate: BigNumber = yield call(
-      exchange.getUsdExchangeRate,
-      dollarMakerAmount
-    )
-    const goldMakerExchangeRate: BigNumber = yield call(
-      exchange.getGoldExchangeRate,
-      goldMakerAmount
-    )
+    const dollarMakerExchangeRate: BigNumber = yield exchange.getUsdExchangeRate(dollarMakerAmount)
+    const goldMakerExchangeRate: BigNumber = yield exchange.getGoldExchangeRate(goldMakerAmount)
 
     if (!dollarMakerExchangeRate || !goldMakerExchangeRate) {
       Logger.error(TAG, 'Invalid exchange rate')
