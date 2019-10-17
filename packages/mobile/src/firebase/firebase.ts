@@ -7,7 +7,7 @@ import { call, put, select } from 'redux-saga/effects'
 import { NotificationReceiveState, PaymentRequest } from 'src/account'
 import { currentLanguageSelector } from 'src/app/reducers'
 import { startFirebaseOnRefreshAction } from 'src/firebase/actions'
-import { handleNotificationSaga } from 'src/firebase/notifications'
+import { handleNotification } from 'src/firebase/notifications'
 import Logger from 'src/utils/Logger'
 
 const TAG = 'Firebase'
@@ -78,7 +78,7 @@ export function* initializeCloudMessaging(app: Firebase, address: string) {
   put(startFirebaseOnRefreshAction(channelOnNotification))
 
   // Listen for notification messages while the app is open
-  const channel: any = eventChannel((emitter) => {
+  const channelOnNotificationOpened: any = eventChannel((emitter) => {
     app.notifications().onNotificationOpened((notification: NotificationOpen) => {
       Logger.info(TAG, 'App opened via a notification')
       emitter({ notification: notification.notification })
@@ -93,13 +93,13 @@ export function* initializeCloudMessaging(app: Firebase, address: string) {
   })
 
   // TODO
-  // put(startFirebaseOnRefreshAction(channelOnNotification))
+  // put(startFirebaseOnRefreshAction(channelOnNotificationOpened))
 
   const initialNotification = yield call(app.notifications().getInitialNotification)
 
   if (initialNotification) {
     Logger.info(TAG, 'App opened fresh via a notification')
-    yield handleNotificationSaga(
+    yield handleNotification(
       initialNotification.notification,
       NotificationReceiveState.APP_OPENED_FRESH
     )

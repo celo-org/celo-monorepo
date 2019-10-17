@@ -49,7 +49,7 @@ function* handlePaymentRequested(
   })
 }
 
-function* handlePaymentReceivedSaga(
+function* handlePaymentReceived(
   transferNotification: TransferNotificationData,
   notificationState: NotificationReceiveState
 ) {
@@ -75,7 +75,7 @@ function* handlePaymentReceivedSaga(
   }
 }
 
-export function* handleNotificationSaga(
+export function* handleNotification(
   notification: Notification,
   notificationState: NotificationReceiveState
 ) {
@@ -88,7 +88,7 @@ export function* handleNotificationSaga(
       break
 
     case NotificationTypes.PAYMENT_RECEIVED:
-      yield handlePaymentReceivedSaga(notification.data, notificationState)
+      yield handlePaymentReceived(notification.data, notificationState)
       break
 
     default:
