@@ -11,7 +11,6 @@ import "../common/FractionUtil.sol";
 import "../common/Initializable.sol";
 import "../common/FixidityLib.sol";
 import "../common/UsingRegistry.sol";
-import "../common/interfaces/IERC20Token.sol";
 
 
 /**
@@ -138,7 +137,7 @@ contract Exchange is IExchange, Initializable, Ownable, UsingRegistry, Reentranc
       goldBucket = goldBucket.add(sellAmount);
       stableBucket = stableBucket.sub(buyAmount);
       require(
-        gold().transferFrom(msg.sender, address(reserve), sellAmount),
+        getGoldToken().transferFrom(msg.sender, address(reserve), sellAmount),
         "Transfer of sell token failed"
       );
       require(IStableToken(stable).mint(msg.sender, buyAmount), "Mint of stable token failed");
@@ -332,7 +331,9 @@ contract Exchange is IExchange, Initializable, Ownable, UsingRegistry, Reentranc
   }
 
   function getUpdatedGoldBucket() private view returns (uint256) {
-    uint256 reserveGoldBalance = gold().balanceOf(registry.getAddressForOrDie(RESERVE_REGISTRY_ID));
+    uint256 reserveGoldBalance = getGoldToken().balanceOf(
+      registry.getAddressForOrDie(RESERVE_REGISTRY_ID)
+    );
     return reserveFraction.multiply(FixidityLib.newFixed(reserveGoldBalance)).fromFixed();
   }
 
@@ -387,9 +388,5 @@ contract Exchange is IExchange, Initializable, Ownable, UsingRegistry, Reentranc
     (rateNumerator, rateDenominator) =
       ISortedOracles(registry.getAddressForOrDie(SORTED_ORACLES_REGISTRY_ID)).medianRate(stable);
     return FractionUtil.Fraction(rateNumerator, rateDenominator);
-  }
-
-  function gold() private view returns (IERC20Token) {
-    return IERC20Token(registry.getAddressForOrDie(GOLD_TOKEN_REGISTRY_ID));
   }
 }
