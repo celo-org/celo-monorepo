@@ -1,12 +1,13 @@
 import firebase, { Firebase } from 'react-native-firebase'
 import { RemoteMessage } from 'react-native-firebase/messaging'
-import { Notification } from 'react-native-firebase/notifications'
+import { Notification, NotificationOpen } from 'react-native-firebase/notifications'
 import { Sentry } from 'react-native-sentry'
 import { eventChannel } from 'redux-saga'
 import { call, put, select } from 'redux-saga/effects'
-import { PaymentRequest } from 'src/account'
+import { NotificationReceiveState, PaymentRequest } from 'src/account'
 import { currentLanguageSelector } from 'src/app/reducers'
 import { startFirebaseOnRefreshAction } from 'src/firebase/actions'
+import { handleNotificationSaga } from 'src/firebase/notifications'
 import Logger from 'src/utils/Logger'
 
 const TAG = 'Firebase'
@@ -62,7 +63,7 @@ export function* initializeCloudMessaging(app: Firebase, address: string) {
 
   // TODO type here
   // TODO test if this channel actually works
-  const channel: any = eventChannel((emitter) => {
+  const channelOnNotification: any = eventChannel((emitter) => {
     app.notifications().onNotification(
       (notification: Notification): any => {
         Logger.info(TAG, 'Notification received while open')
@@ -74,27 +75,35 @@ export function* initializeCloudMessaging(app: Firebase, address: string) {
     return () => {}
   })
 
-  put(startFirebaseOnRefreshAction(channel))
+  put(startFirebaseOnRefreshAction(channelOnNotification))
 
   // Listen for notification messages while the app is open
+  const channel: any = eventChannel((emitter) => {
+    app.notifications().onNotificationOpened((notification: NotificationOpen) => {
+      Logger.info(TAG, 'App opened via a notification')
+      emitter({ notification: notification.notification })
+      // expected side effect:
+      // dispatch(
+      //   handleNotification(notification.notification, NotificationReceiveState.APP_FOREGROUNDED)
+      // )
+    })
 
-  // app.notifications().onNotificationOpened((notification: NotificationOpen) => {
-  //   Logger.info(TAG, 'App opened via a notification')
-  //   dispatch(
-  //     handleNotification(notification.notification, NotificationReceiveState.APP_FOREGROUNDED)
-  //   )
-  // })
+    // Return an unsubscribe method
+    return () => {}
+  })
 
-  // const initialNotification = await app.notifications().getInitialNotification()
-  // if (initialNotification) {
-  //   Logger.info(TAG, 'App opened fresh via a notification')
-  //   dispatch(
-  //     handleNotification(
-  //       initialNotification.notification,
-  //       NotificationReceiveState.APP_OPENED_FRESH
-  //     )
-  //   )
-  // }
+  // TODO
+  // put(startFirebaseOnRefreshAction(channelOnNotification))
+
+  const initialNotification = yield call(app.notifications().getInitialNotification)
+
+  if (initialNotification) {
+    Logger.info(TAG, 'App opened fresh via a notification')
+    yield handleNotificationSaga(
+      initialNotification.notification,
+      NotificationReceiveState.APP_OPENED_FRESH
+    )
+  }
 }
 
 export async function onBackgroundNotification(remoteMessage: RemoteMessage) {
