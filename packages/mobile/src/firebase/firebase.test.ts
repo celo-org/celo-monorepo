@@ -14,6 +14,7 @@ const getTokenMock = jest.fn(() => {})
 const onTokenRefreshMock = jest.fn(() => {})
 const onNotificationMock = jest.fn((fn) => {})
 const onNotificationOpenedMock = jest.fn((fn) => {})
+const getInitialNotificationMock = jest.fn(() => {})
 
 const address = 'MyAddress'
 const mockFcmToken = 'token'
@@ -28,6 +29,7 @@ const app: any = {
   notifications: () => ({
     onNotification: onNotificationMock,
     onNotificationOpened: onNotificationOpenedMock,
+    getInitialNotification: getInitialNotificationMock,
   }),
 }
 
@@ -55,7 +57,6 @@ describe(initializeCloudMessaging, () => {
       })
 
     expect(errorToRaise).toEqual(catchedError)
-    console.log('Todo bien')
   })
 
   it('Firebase has permission', async () => {

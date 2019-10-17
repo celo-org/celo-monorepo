@@ -64,7 +64,7 @@ function* initializeFirebase() {
     )
     yield call(initializeAuth, firebase, address)
     yield put(firebaseAuthorized())
-    yield call(initializeCloudMessaging, firebase, address)
+    yield initializeCloudMessaging(firebase, address)
     Logger.info(TAG, `Firebase initialized`)
 
     return
