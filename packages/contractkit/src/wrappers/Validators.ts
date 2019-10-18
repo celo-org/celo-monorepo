@@ -70,9 +70,12 @@ export class ValidatorsWrapper extends BaseWrapper<Validators> {
       const voteWeight = await election.getTotalVotesForGroup(group)
       const { lesser, greater } = await election.findLesserAndGreaterAfterVote(group, voteWeight)
 
-      return wrapSend(this.kit, this.contract.methods.addFirstMember(member, lesser, greater))
+      return toTransactionObject(
+        this.kit,
+        this.contract.methods.addFirstMember(member, lesser, greater)
+      )
     } else {
-      return wrapSend(this.kit, this.contract.methods.addMember(member))
+      return toTransactionObject(this.kit, this.contract.methods.addMember(member))
     }
   }
   /**
