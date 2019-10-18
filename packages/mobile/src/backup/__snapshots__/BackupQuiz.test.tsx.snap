@@ -714,10 +714,8 @@ exports[`BackupQuiz renders correctly 1`] = `
                 "alignSelf": "flex-start",
                 "borderRadius": 2,
                 "flexDirection": "row",
-                "minWidth": 160,
                 "paddingHorizontal": 16,
                 "paddingVertical": 6,
-                "textAlign": "center",
               },
               Object {
                 "backgroundColor": "transparent",
@@ -744,6 +742,7 @@ exports[`BackupQuiz renders correctly 1`] = `
                 },
                 Object {
                   "lineHeight": 20,
+                  "textAlign": "center",
                 },
                 Object {
                   "color": "#42D689",
@@ -786,10 +785,8 @@ exports[`BackupQuiz renders correctly 1`] = `
                 "alignSelf": "flex-start",
                 "borderRadius": 2,
                 "flexDirection": "row",
-                "minWidth": 160,
                 "paddingHorizontal": 16,
                 "paddingVertical": 6,
-                "textAlign": "center",
               },
               Object {
                 "backgroundColor": "transparent",
@@ -816,6 +813,7 @@ exports[`BackupQuiz renders correctly 1`] = `
                 },
                 Object {
                   "lineHeight": 20,
+                  "textAlign": "center",
                 },
                 Object {
                   "color": "#42D689",
@@ -858,10 +856,8 @@ exports[`BackupQuiz renders correctly 1`] = `
                 "alignSelf": "flex-start",
                 "borderRadius": 2,
                 "flexDirection": "row",
-                "minWidth": 160,
                 "paddingHorizontal": 16,
                 "paddingVertical": 6,
-                "textAlign": "center",
               },
               Object {
                 "backgroundColor": "transparent",
@@ -888,6 +884,7 @@ exports[`BackupQuiz renders correctly 1`] = `
                 },
                 Object {
                   "lineHeight": 20,
+                  "textAlign": "center",
                 },
                 Object {
                   "color": "#42D689",
@@ -930,10 +927,8 @@ exports[`BackupQuiz renders correctly 1`] = `
                 "alignSelf": "flex-start",
                 "borderRadius": 2,
                 "flexDirection": "row",
-                "minWidth": 160,
                 "paddingHorizontal": 16,
                 "paddingVertical": 6,
-                "textAlign": "center",
               },
               Object {
                 "backgroundColor": "transparent",
@@ -960,6 +955,7 @@ exports[`BackupQuiz renders correctly 1`] = `
                 },
                 Object {
                   "lineHeight": 20,
+                  "textAlign": "center",
                 },
                 Object {
                   "color": "#42D689",
@@ -1002,10 +998,8 @@ exports[`BackupQuiz renders correctly 1`] = `
                 "alignSelf": "flex-start",
                 "borderRadius": 2,
                 "flexDirection": "row",
-                "minWidth": 160,
                 "paddingHorizontal": 16,
                 "paddingVertical": 6,
-                "textAlign": "center",
               },
               Object {
                 "backgroundColor": "transparent",
@@ -1032,6 +1026,7 @@ exports[`BackupQuiz renders correctly 1`] = `
                 },
                 Object {
                   "lineHeight": 20,
+                  "textAlign": "center",
                 },
                 Object {
                   "color": "#42D689",
@@ -1074,10 +1069,8 @@ exports[`BackupQuiz renders correctly 1`] = `
                 "alignSelf": "flex-start",
                 "borderRadius": 2,
                 "flexDirection": "row",
-                "minWidth": 160,
                 "paddingHorizontal": 16,
                 "paddingVertical": 6,
-                "textAlign": "center",
               },
               Object {
                 "backgroundColor": "transparent",
@@ -1104,6 +1097,7 @@ exports[`BackupQuiz renders correctly 1`] = `
                 },
                 Object {
                   "lineHeight": 20,
+                  "textAlign": "center",
                 },
                 Object {
                   "color": "#42D689",

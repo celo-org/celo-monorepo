@@ -30,7 +30,6 @@
   "refreshFailedUnexpectedly": "Failed to refresh, please check your connectivity",
   "edit": "Edit",
   "receivedPayment": "Received Payment",
-  "getBackupKey": "Get Backup Key",
   "readOnlyState":
     "Read Only Mode Set Backup Key to continue sending and receiving {{CeloDollars}}",
   "getStarted": "Get Started",
@@ -39,7 +38,6 @@
   "startEarning": "Start Earning",
   "backToWallet": "Back to Wallet",
   "exchangeForGold": "Exchange for Gold",
-  "invalidKey": "Invalid Backup Key ",
   "invalidPhone": "Invalid Phone Number",
   "cantSelectInvalidPhone": "Cannot select contact: invalid phone number",
   "needMoreFundsToSend": "Need more funds to send payment",

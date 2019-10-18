@@ -70,8 +70,6 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignSelf: 'flex-start',
     alignItems: 'center',
-    minWidth: 160,
-    textAlign: 'center',
     paddingVertical: PADDING_VERTICAL,
     paddingHorizontal: PADDING_HORIZONTAL,
     borderRadius: 2,
@@ -87,6 +85,7 @@ const styles = StyleSheet.create({
     borderColor: colors.celoGreen,
   },
   text: {
+    textAlign: 'center',
     lineHeight: 20,
   },
   textPadding: {

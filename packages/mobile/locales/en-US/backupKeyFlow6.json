@@ -9,6 +9,7 @@
   "backupKey": "Backup Key",
   "yourBackupKey": "Your Backup Key",
   "delayBackup": "Dismiss for an hour",
+  "backupKeyNotification": "Without a Backup Key, you may lose access to your wallet.",
   "backupKeyIntro": {
     "0":
       "Your Backup Key is the one and only key to your Celo Wallet. With this key, you can access your funds anytime, anywhere.",

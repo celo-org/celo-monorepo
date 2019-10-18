@@ -90,13 +90,6 @@ export function* navigateToProperScreen() {
     return
   }
 
-  // navigate(Screens.BackupQuiz, {
-  //   mnemonic:
-  //     'oil please secret math suffer mesh retreat prosper quit traffic special creek educate rate weasel wide swing crystal day swim frost oxygen course expire',
-  // })
-  navigate(Screens.BackupIntroduction)
-  return
-
   if (!language) {
     navigate(Stacks.NuxStack)
   } else if (!inSync) {

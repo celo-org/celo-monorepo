@@ -1,5 +1,4 @@
 import Link from '@celo/react-components/components/Link'
-import SmallButton from '@celo/react-components/components/SmallButton'
 import colors from '@celo/react-components/styles/colors'
 import { fontStyles } from '@celo/react-components/styles/fonts'
 import { anonymizedPhone, isE164Number } from '@celo/utils/src/phoneNumbers'
@@ -25,7 +24,6 @@ import { headerWithBackButton } from 'src/navigator/Headers'
 import { navigate } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
 import { RootState } from 'src/redux/reducers'
-import DisconnectBanner from 'src/shared/DisconnectBanner'
 import { navigateToURI, navigateToVerifierApp } from 'src/utils/linking'
 import Logger from 'src/utils/Logger'
 
@@ -217,7 +215,6 @@ export class Account extends React.Component<Props, State> {
     return (
       <ScrollView style={style.scrollView}>
         <SafeAreaView>
-          <DisconnectBanner />
           <View style={style.accountProfile}>
             <TouchableOpacity onPress={this.onPressAvatar}>
               <AvatarSelf />
@@ -229,13 +226,6 @@ export class Account extends React.Component<Props, State> {
                 </Text>
               </TouchableOpacity>
             </View>
-            <SmallButton
-              text={t('editProfile')}
-              testID={'editProfileButton'}
-              onPress={this.goToProfile}
-              solid={false}
-              style={style.buttonSpacing}
-            />
           </View>
           <View style={style.containerList}>
             <SettingsItem
@@ -243,6 +233,7 @@ export class Account extends React.Component<Props, State> {
               onPress={this.backupScreen}
             />
             <SettingsItem title={t('invite')} onPress={this.goToInvite} />
+            <SettingsItem title={t('editProfile')} onPress={this.goToProfile} />
             {features.SHOW_SHOW_REWARDS_APP_LINK && (
               <SettingsItem title={t('celoRewards')} onPress={navigateToVerifierApp} />
             )}
