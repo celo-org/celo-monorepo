@@ -17,6 +17,7 @@ export enum Screens {
   BackupSocialIntro = 'BackupSocialIntro',
   BackupSocial = 'BackupSocial',
   BackupComplete = 'BackupComplete',
+  CeloLite = 'CeloLite',
   DappKitAccountAuth = 'DappKitAccountAuth',
   DappKitSignTxScreen = 'DappKitSignTxScreen',
   DappKitTxDataScreen = 'DappKitTxDataScreen',
