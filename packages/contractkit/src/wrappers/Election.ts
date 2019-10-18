@@ -80,6 +80,12 @@ export class ElectionWrapper extends BaseWrapper<Election> {
     toNumber
   )
 
+  /**
+   * Returns the total votes for `group` made by `account`.
+   * @param group The address of the validator group.
+   * @param account The address of the voting account.
+   * @return The total votes for `group` made by `account`.
+   */
   getTotalVotesForGroup = proxyCall(
     this.contract.methods.getTotalVotesForGroup,
     undefined,

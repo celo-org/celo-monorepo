@@ -14,7 +14,6 @@ import {
 export interface Validator {
   address: Address
   name: string
-  url: string
   publicKey: string
   affiliation: string | null
 }
@@ -22,7 +21,6 @@ export interface Validator {
 export interface ValidatorGroup {
   address: Address
   name: string
-  url: string
   members: Address[]
   commission: BigNumber
 }
@@ -53,12 +51,11 @@ export class ValidatorsWrapper extends BaseWrapper<Validators> {
   registerValidator = proxySend(this.kit, this.contract.methods.registerValidator)
   async registerValidatorGroup(
     name: string,
-    url: string,
     commission: BigNumber
   ): Promise<CeloTransactionObject<boolean>> {
     return toTransactionObject(
       this.kit,
-      this.contract.methods.registerValidatorGroup(name, url, toFixed(commission).toFixed())
+      this.contract.methods.registerValidatorGroup(name, toFixed(commission).toFixed())
     )
   }
   async addMember(member: string): Promise<CeloTransactionObject<boolean>> {
@@ -135,9 +132,8 @@ export class ValidatorsWrapper extends BaseWrapper<Validators> {
     return {
       address,
       name: res[0],
-      url: res[1],
-      publicKey: res[2] as any,
-      affiliation: res[3],
+      publicKey: res[1] as any,
+      affiliation: res[2],
     }
   }
 
@@ -195,9 +191,8 @@ export class ValidatorsWrapper extends BaseWrapper<Validators> {
     return {
       address,
       name: res[0],
-      url: res[1],
-      members: res[2],
-      commission: fromFixed(new BigNumber(res[3])),
+      members: res[1],
+      commission: fromFixed(new BigNumber(res[2])),
     }
   }
 }

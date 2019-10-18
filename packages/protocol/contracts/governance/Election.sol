@@ -484,6 +484,8 @@ contract Election is
     view
     returns (uint256)
   {
+    // The group must meet the balance requirements in order for their voters to receive epoch
+    // rewards.
     bool meetsBalanceRequirements = (
       getLockedGold().getAccountTotalLockedGold(group) >=
       getValidators().getAccountBalanceRequirement(group)
@@ -502,6 +504,7 @@ contract Election is
    * @param value The amount of rewards to distribute to voters for the group.
    * @param lesser The group receiving fewer votes than `group` after the rewards are added.
    * @param greater The group receiving more votes than `group` after the rewards are added.
+   * @dev Can only be called directly by the protocol.
    */
   function distributeEpochRewards(
     address group,
