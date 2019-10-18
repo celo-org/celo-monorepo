@@ -55,11 +55,11 @@ describe('governance tests', () => {
       const groupInfo = await validators.methods
         .getValidatorGroup(groupAddress)
         .call({}, blockNumber)
-      return groupInfo[2]
+      return groupInfo[1]
     } else {
       const [groupAddress] = await validators.methods.getRegisteredValidatorGroups().call()
       const groupInfo = await validators.methods.getValidatorGroup(groupAddress).call()
-      return groupInfo[2]
+      return groupInfo[1]
     }
   }
 
@@ -136,6 +136,7 @@ describe('governance tests', () => {
       }
       await initAndStartGeth(context.hooks.gethBinaryPath, groupInstance)
       allValidators = await getValidatorGroupMembers()
+      console.log(allValidators)
       assert.equal(allValidators.length, 5)
       epoch = new BigNumber(await validators.methods.getEpochSize().call()).toNumber()
       assert.equal(epoch, 10)

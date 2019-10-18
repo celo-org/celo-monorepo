@@ -88,7 +88,6 @@ const DefaultConfig = {
     validatorKeys: [],
     // We register a single validator group during the migration.
     groupName: 'C-Labs',
-    groupUrl: 'celo.org',
     commission: 0.1,
   },
   blockchainParameters: {
