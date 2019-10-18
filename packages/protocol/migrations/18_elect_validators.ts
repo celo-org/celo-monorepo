@@ -120,7 +120,10 @@ async function registerValidator(
   return
 }
 
-module.exports = async (_deployer: any) => {
+module.exports = async (_deployer: any, networkName: string) => {
+  if (networkName === 'development') {
+    return
+  }
   const validators: ValidatorsInstance = await getDeployedProxiedContract<ValidatorsInstance>(
     'Validators',
     artifacts
