@@ -114,28 +114,28 @@ export const writePaymentRequest = (paymentInfo: PaymentRequest) => async () => 
   }
 }
 
-function getHigerVersion(version1: string, version2: string): string | undefined {
-  const version1Array = version1.split('.')
-  const version2Array = version2.split('.')
-  const minVersionLength = Math.min(version1Array.length, version2.length)
+function isDeprecatedVersion(version: string, minVersion: string): boolean {
+  const minVersionArray = minVersion.split('.')
+  const versionArray = version.split('.')
+  const minVersionLength = Math.min(minVersionArray.length, version.length)
   for (let i = 0; i < minVersionLength; i++) {
-    if (version1Array[i] > version2Array[i]) {
-      return version1
-    } else if (version1Array[i] < version2Array[i]) {
-      return version2
+    if (minVersionArray[i] > versionArray[i]) {
+      return true
+    } else if (minVersionArray[i] < versionArray[i]) {
+      return false
     }
   }
-  if (version1Array.length > version2Array.length) {
-    return version1
-  } else if (version1Array.length < version2Array.length) {
-    return version2
+  if (minVersionArray.length > versionArray.length) {
+    return true
   }
+  return false
 }
 
 export async function getVersionInfo(version: string) {
   // backward compatible
   let deprecated = false
   const versionFSPath = version.split('.').join('/')
+  Logger.info(TAG, `Checking version info ${version}`)
   const versionInfo = (await firebase
     .database()
     .ref(`versions/${versionFSPath}`)
@@ -143,19 +143,15 @@ export async function getVersionInfo(version: string) {
   if (versionInfo && versionInfo.deprecated !== undefined) {
     return versionInfo
   }
-  Logger.info(TAG, `Checking version info ${version}`)
-  const minVersion = (await firebase
+  const versionsInfo = (await firebase
     .database()
-    .ref('versions/minVersion')
+    .ref('versions')
     .once('value')).val()
-  if (!minVersion) {
+  if (!versionsInfo || !versionsInfo.minVersion) {
     return { version, deprecated }
   }
-  const minVersionVal = minVersion.val
-  const higherVersion = getHigerVersion(minVersionVal, version)
-  if (higherVersion === minVersion) {
-    deprecated = true
-  }
+  const minVersion = versionsInfo.minVersion
+  deprecated = isDeprecatedVersion(version, minVersion)
   return { version, deprecated }
 }
 

@@ -39,8 +39,9 @@ export function* waitForFirebaseAuth() {
 }
 
 function* initializeFirebase() {
-  const address = yield call(getAccount)
-
+  const address = ''
+  //yield call(getAccount)
+  console.log('=============== 1')
   if (!FIREBASE_ENABLED) {
     Logger.info(TAG, 'Firebase disabled')
     yield put(showError(ErrorMessages.FIREBASE_DISABLED))
@@ -49,14 +50,18 @@ function* initializeFirebase() {
 
   Logger.info(TAG, 'Firebase enabled')
   try {
+    console.log('=============== 2')
     const app = firebase.app()
+    console.log('=============== 3')
     Logger.info(
       TAG,
       `Initializing Firebase for app ${app.name}, appId ${app.options.appId}, db url ${
         app.options.databaseURL
       }`
     )
+    console.log('=============== 4')
     yield call(initializeAuth, firebase, address)
+    console.log('=============== 5')
     yield put(firebaseAuthorized())
     yield call(initializeCloudMessaging, firebase, address)
     Logger.info(TAG, `Firebase initialized`)
