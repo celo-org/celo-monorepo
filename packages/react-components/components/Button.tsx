@@ -15,7 +15,6 @@ export enum BtnTypes {
   PRIMARY = 'Primary', // CeloGreen background and White text
   SECONDARY = 'Secondary', // Transparent background and CeloGreen text
   TERTIARY = 'Tertiary', // Transparent background and Dark text
-  QUATERNARY = 'quaternary', // White background and CeloGreen text
 }
 
 export interface ButtonProps {
@@ -56,7 +55,6 @@ export default class Button extends React.Component<ButtonProps> {
     const isPrimary = type === BtnTypes.PRIMARY
     const isSecondary = type === BtnTypes.SECONDARY
     const isTertiary = type === BtnTypes.TERTIARY
-    const isQuaternary = type === BtnTypes.QUATERNARY
 
     switch (type) {
       case BtnTypes.PRIMARY:
@@ -74,11 +72,6 @@ export default class Button extends React.Component<ButtonProps> {
         backgroundColor = 'transparent'
         borderColor = 'transparent'
         break
-      case BtnTypes.QUATERNARY:
-        textColor = disabled ? colors.celoGreenInactive : colors.celoGreen
-        backgroundColor = colors.white
-        borderColor = colors.white
-        break
       default:
         if (__DEV__) {
           throw new Error('No Button Type Specified')
@@ -91,9 +84,7 @@ export default class Button extends React.Component<ButtonProps> {
       <View
         style={[
           style.row,
-          (isPrimary || isSecondary || isTertiary || isQuaternary) && standard
-            ? { marginVertical: 10 }
-            : null,
+          (isPrimary || isSecondary || isTertiary) && standard ? { marginVertical: 10 } : null,
           standard ? { marginBottom: 10 } : null,
           this.props.style,
           { backgroundColor },
@@ -106,7 +97,7 @@ export default class Button extends React.Component<ButtonProps> {
             style.button,
             { backgroundColor },
             lineHeight !== undefined ? { height: lineHeight } : { height: 50 },
-            standard && (isPrimary || isSecondary || isTertiary || isQuaternary)
+            standard && (isPrimary || isSecondary || isTertiary)
               ? { borderColor, borderRadius: 3, borderWidth: 2 }
               : { borderWidth: 0 },
           ]}

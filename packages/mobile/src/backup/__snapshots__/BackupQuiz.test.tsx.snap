@@ -59,26 +59,12 @@ exports[`BackupQuiz renders correctly 1`] = `
       >
         confirmBackupKey
       </Text>
-      <Text
-        style={
-          Object {
-            "color": "#81868B",
-            "fontFamily": "Hind-Regular",
-            "fontSize": 16,
-            "lineHeight": 24,
-            "textAlign": "center",
-          }
-        }
-      >
-        backupQuizInfo
-      </Text>
       <View
         style={
           Object {
             "flexDirection": "row",
             "flexWrap": "wrap",
             "justifyContent": "center",
-            "marginTop": 20,
           }
         }
       >
@@ -659,6 +645,20 @@ exports[`BackupQuiz renders correctly 1`] = `
           24
         </Text>
       </View>
+      <Text
+        style={
+          Object {
+            "color": "#BDBDBD",
+            "fontFamily": "Hind-Regular",
+            "fontSize": 16,
+            "lineHeight": 24,
+            "marginTop": 20,
+            "textAlign": "center",
+          }
+        }
+      >
+        backupQuizInfo
+      </Text>
       <Text
         style={
           Object {

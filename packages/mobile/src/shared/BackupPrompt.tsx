@@ -41,21 +41,6 @@ export class BackupPrompt extends React.Component<Props> {
     const isVisible = this.isVisible()
 
     return (
-      // <TopAlert
-      //   height={100}
-      //   backgroundColor={colors.messageBlue}
-      //   visible={this.isVisible()}
-      //   style={styles.container}
-      // >
-      //   <Text style={[fontStyles.bodySmall, styles.text]}>{t('backupPrompt')}</Text>
-      //   <SmallButton
-      //     onPress={this.goToBackup}
-      //     text={t('getBackupKey')}
-      //     solid={false}
-      //     style={styles.button}
-      //     textStyle={styles.buttonText}
-      //   />
-      // </TopAlert>
       <SmartTopAlert
         text={isVisible && t('backupPrompt')}
         onPress={this.goToBackup}
