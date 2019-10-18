@@ -1,0 +1,86 @@
+import { Address } from '../base'
+import { Accounts } from '../generated/types/Accounts'
+import {
+  BaseWrapper,
+  CeloTransactionObject,
+  proxyCall,
+  proxySend,
+  toTransactionObject,
+} from '../wrappers/BaseWrapper'
+import Web3 = require('web3')
+
+/**
+ * Contract for handling deposits needed for voting.
+ */
+export class AccountsWrapper extends BaseWrapper<Accounts> {
+  /**
+   * Creates an account.
+   */
+  createAccount = proxySend(this.kit, this.contract.methods.createAccount)
+
+  /**
+   * Returns the voter for the specified account.
+   * @param account The address of the account.
+   * @return The address with which the account can vote.
+   */
+  getVoterFromAccount: (account: string) => Promise<Address> = proxyCall(
+    this.contract.methods.getVoterFromAccount
+  )
+  /**
+   * Returns the validator for the specified account.
+   * @param account The address of the account.
+   * @return The address with which the account can register a validator or group.
+   */
+  getValidatorFromAccount: (account: string) => Promise<Address> = proxyCall(
+    this.contract.methods.getValidatorFromAccount
+  )
+
+  /**
+   * Check if an account already exists.
+   * @param account The address of the account
+   * @return Returns `true` if account exists. Returns `false` otherwise.
+   */
+  isAccount: (account: string) => Promise<boolean> = proxyCall(this.contract.methods.isAccount)
+
+  /**
+   * Authorize voting on behalf of this account to another address.
+   * @param account Address of the active account.
+   * @param voter Address to be used for voting.
+   * @return A CeloTransactionObject
+   */
+  async authorizeVoter(account: Address, voter: Address): Promise<CeloTransactionObject<void>> {
+    const sig = await this.getParsedSignatureOfAddress(account, voter)
+    // TODO(asa): Pass default tx "from" argument.
+    return toTransactionObject(
+      this.kit,
+      this.contract.methods.authorizeVoter(voter, sig.v, sig.r, sig.s)
+    )
+  }
+
+  /**
+   * Authorize validating on behalf of this account to another address.
+   * @param account Address of the active account.
+   * @param voter Address to be used for validating.
+   * @return A CeloTransactionObject
+   */
+  async authorizeValidator(
+    account: Address,
+    validator: Address
+  ): Promise<CeloTransactionObject<void>> {
+    const sig = await this.getParsedSignatureOfAddress(account, validator)
+    return toTransactionObject(
+      this.kit,
+      this.contract.methods.authorizeValidator(validator, sig.v, sig.r, sig.s)
+    )
+  }
+
+  private async getParsedSignatureOfAddress(address: Address, signer: string) {
+    const hash = Web3.utils.soliditySha3({ type: 'address', value: address })
+    const signature = (await this.kit.web3.eth.sign(hash, signer)).slice(2)
+    return {
+      r: `0x${signature.slice(0, 64)}`,
+      s: `0x${signature.slice(64, 128)}`,
+      v: Web3.utils.hexToNumber(signature.slice(128, 130)) + 27,
+    }
+  }
+}
