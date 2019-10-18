@@ -36,6 +36,103 @@ contract('Accounts', (accounts: string[]) => {
     })
   })
 
+  describe('#setAccountDataEncryptionKey()', () => {
+    it('should set dataEncryptionKey', async () => {
+      // @ts-ignore
+      await accountsInstance.setAccountDataEncryptionKey(dataEncryptionKey)
+      // @ts-ignore
+      const fetchedKey: string = await accountsInstance.getDataEncryptionKey(caller)
+      assert.equal(fetchedKey, dataEncryptionKey)
+    })
+
+    it('should allow setting a key with leading zeros', async () => {
+      const keyWithZeros = '0x00000000000000000000000000000000000000000000000f2f48ee19680706191111'
+      // @ts-ignore
+      await accountsInstance.setAccountDataEncryptionKey(keyWithZeros)
+      // @ts-ignore
+      const fetchedKey: string = await accountsInstance.getDataEncryptionKey(caller)
+      assert.equal(fetchedKey, keyWithZeros)
+    })
+
+    it('should revert when the key is invalid', async () => {
+      // @ts-ignore
+      await assertRevert(accountsInstance.setAccountDataEncryptionKey('0x32132931293'))
+    })
+
+    it('should allow a key that is longer than 33 bytes', async () => {
+      // @ts-ignore
+      await accountsInstance.setAccountDataEncryptionKey(longDataEncryptionKey)
+      // @ts-ignore
+      const fetchedKey: string = await accountsInstance.getDataEncryptionKey(caller)
+      assert.equal(fetchedKey, longDataEncryptionKey)
+    })
+
+    it('should emit the AccountDataEncryptionKeySet event', async () => {
+      // @ts-ignore
+      const response = await accountsInstance.setAccountDataEncryptionKey(dataEncryptionKey)
+      assert.lengthOf(response.logs, 1)
+      const event = response.logs[0]
+      assertLogMatches2(event, {
+        event: 'AccountDataEncryptionKeySet',
+        args: { account: caller, dataEncryptionKey },
+      })
+    })
+  })
+
+  describe('#setAccount', async () => {
+    it('should set the dataEncryptionKey and walletAddress', async () => {
+      // @ts-ignore
+      await accountsInstance.setAccount(dataEncryptionKey, caller)
+      const expectedWalletAddress = await accountsInstance.getWalletAddress(caller)
+      assert.equal(expectedWalletAddress, caller)
+      const expectedKey = await accountsInstance.getDataEncryptionKey(caller)
+      // @ts-ignore
+      assert.equal(expectedKey, dataEncryptionKey)
+    })
+  })
+
+  describe('#setWalletAddress', async () => {
+    it('should set the walletAddress', async () => {
+      await accountsInstance.setWalletAddress(caller)
+      const result = await accountsInstance.getWalletAddress(caller)
+      assert.equal(result, caller)
+    })
+
+    it('should set the NULL_ADDRESS', async () => {
+      await accountsInstance.setWalletAddress(NULL_ADDRESS)
+      const result = await accountsInstance.getWalletAddress(caller)
+      assert.equal(result, NULL_ADDRESS)
+    })
+
+    it('should emit the AccountWalletAddressSet event', async () => {
+      const response = await accountsInstance.setWalletAddress(caller)
+      assert.lengthOf(response.logs, 1)
+      const event = response.logs[0]
+      assertLogMatches2(event, {
+        event: 'AccountWalletAddressSet',
+        args: { account: caller, walletAddress: caller },
+      })
+    })
+  })
+
+  describe('#setMetadataURL', async () => {
+    it('should set the metadataURL', async () => {
+      await accountsInstance.setMetadataURL(metadataURL)
+      const result = await accountsInstance.getMetadataURL(caller)
+      assert.equal(result, metadataURL)
+    })
+
+    it('should emit the AccountMetadataURLSet event', async () => {
+      const response = await accountsInstance.setMetadataURL(metadataURL)
+      assert.lengthOf(response.logs, 1)
+      const event = response.logs[0]
+      assertLogMatches2(event, {
+        event: 'AccountMetadataURLSet',
+        args: { account: caller, metadataURL },
+      })
+    })
+  })
+
   Object.keys(authorizationTests).forEach((key) => {
     describe('authorization tests:', () => {
       let authorizationTest: any

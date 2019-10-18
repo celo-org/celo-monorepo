@@ -7,6 +7,7 @@ import "openzeppelin-solidity/contracts/ownership/Ownable.sol";
 import "./interfaces/IAttestations.sol";
 import "./interfaces/IRandom.sol";
 import "../common/interfaces/IERC20Token.sol";
+import "../common/interfaces/IAccounts.sol";
 import "../governance/interfaces/IValidators.sol";
 
 import "../common/Initializable.sol";
@@ -51,26 +52,6 @@ contract Attestations is IAttestations, Ownable, Initializable, UsingRegistry, R
     uint256 value
   );
 
-  event AttestorAuthorized(
-    address indexed account,
-    address attestor
-  );
-
-  event AccountDataEncryptionKeySet(
-    address indexed account,
-    bytes dataEncryptionKey
-  );
-
-  event AccountMetadataURLSet(
-    address indexed account,
-    string metadataURL
-  );
-
-  event AccountWalletAddressSet(
-    address indexed account,
-    address walletAddress
-  );
-
   enum AttestationStatus {
     None,
     Incomplete,
@@ -89,17 +70,8 @@ contract Attestations is IAttestations, Ownable, Initializable, UsingRegistry, R
     // The timestamp of the most recent attestation request
     uint96 mostRecentAttestationRequest;
 
-    // The address at which the account expects to receive transfers
-    address walletAddress;
-
     // The token with which attestation request fees are paid
     address attestationRequestFeeToken;
-
-    // The ECDSA public key used to encrypt and decrypt data for this account
-    bytes dataEncryptionKey;
-
-    // The URL under which an account adds metadata and claims
-    string metadataURL;
   }
 
   // Stores attestations state for a single (identifier, account address) pair.
@@ -322,21 +294,6 @@ contract Attestations is IAttestations, Ownable, Initializable, UsingRegistry, R
   }
 
   /**
-   * @notice Setter for the dataEncryptionKey and wallet address for an account
-   * @param dataEncryptionKey secp256k1 public key for data encryption. Preferably compressed.
-   * @param walletAddress The wallet address to set for the account
-   */
-  function setAccount(
-    bytes calldata dataEncryptionKey,
-    address walletAddress
-  )
-    external
-  {
-    setAccountDataEncryptionKey(dataEncryptionKey);
-    setWalletAddress(walletAddress);
-  }
-
-  /**
    * @notice Returns attestation issuers for a identifier/account pair
    * @param identifier Hash of the identifier.
    * @param account Address of the account
@@ -405,7 +362,7 @@ contract Attestations is IAttestations, Ownable, Initializable, UsingRegistry, R
     for (uint256 i = 0; i < identifiersToLookup.length; i++) {
       address[] memory addrs = identifiers[identifiersToLookup[i]].accounts;
       for (uint256 matchIndex = 0; matchIndex < matches[i]; matchIndex++) {
-        addresses[currentIndex] = accounts[addrs[matchIndex]].walletAddress;
+        addresses[currentIndex] = getAccounts().getWalletAddress(addrs[matchIndex]);
         completed[currentIndex] =
           identifiers[identifiersToLookup[i]].attestations[addrs[matchIndex]].completed;
         total[currentIndex] = uint64(
@@ -492,65 +449,6 @@ contract Attestations is IAttestations, Ownable, Initializable, UsingRegistry, R
     require(_attestationExpirySeconds > 0, "attestationExpirySeconds has to be greater than 0");
     attestationExpirySeconds = _attestationExpirySeconds;
     emit AttestationExpirySecondsSet(_attestationExpirySeconds);
-  }
-
-  /**
-   * @notice Setter for the metadata of an account.
-   * @param metadataURL The URL to access the metadata.
-   */
-  function setMetadataURL(string calldata metadataURL) external {
-    accounts[msg.sender].metadataURL = metadataURL;
-    emit AccountMetadataURLSet(msg.sender, metadataURL);
-  }
-
-  /**
-   * @notice Getter for the metadata of an account.
-   * @param account The address of the account to get the metadata for.
-   * @return metdataURL The URL to access the metadata.
-   */
-  function getMetadataURL(address account) external view returns (string memory) {
-    return accounts[account].metadataURL;
-  }
-
-    /**
-   * @notice Setter for the data encryption key and version.
-   * @param dataEncryptionKey secp256k1 public key for data encryption. Preferably compressed.
-   */
-  function setAccountDataEncryptionKey(bytes memory dataEncryptionKey) public {
-    require(dataEncryptionKey.length >= 33, "data encryption key length <= 32");
-    accounts[msg.sender].dataEncryptionKey = dataEncryptionKey;
-    emit AccountDataEncryptionKeySet(msg.sender, dataEncryptionKey);
-  }
-
-  /**
-   * @notice Getter for the data encryption key and version.
-   * @param account The address of the account to get the key for
-   * @return dataEncryptionKey secp256k1 public key for data encryption. Preferably compressed.
-   */
-  function getDataEncryptionKey(address account) external view returns (bytes memory) {
-    return accounts[account].dataEncryptionKey;
-  }
-
-
-
-
-
-  /**
-   * @notice Setter for the wallet address for an account
-   * @param walletAddress The wallet address to set for the account
-   */
-  function setWalletAddress(address walletAddress) public {
-    accounts[msg.sender].walletAddress = walletAddress;
-    emit AccountWalletAddressSet(msg.sender, walletAddress);
-  }
-
-  /**
-   * @notice Getter for the wallet address for an account
-   * @param account The address of the account to get the wallet address for
-   * @return Wallet address
-   */
-  function getWalletAddress(address account) external view returns (address) {
-    return accounts[account].walletAddress;
   }
 
   /**

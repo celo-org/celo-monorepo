@@ -35,6 +35,15 @@ contract Accounts is IAccounts, ReentrancyGuard, Initializable, UsingRegistry {
     // These keys may not be keys of other accounts, and may not be authorized by any other
     // account for any purpose.
     Authorizations authorizations;
+
+    // The address at which the account expects to receive transfers
+    address walletAddress;
+
+    // The ECDSA public key used to encrypt and decrypt data for this account
+    bytes dataEncryptionKey;
+
+    // The URL under which an account adds metadata and claims
+    string metadataURL;
   }
 
   mapping(address => Account) private accounts;
@@ -46,6 +55,22 @@ contract Accounts is IAccounts, ReentrancyGuard, Initializable, UsingRegistry {
   event AttestorAuthorized(address indexed account, address attestor);
   event VoterAuthorized(address indexed account, address voter);
   event ValidatorAuthorized(address indexed account, address validator);
+
+  event AccountDataEncryptionKeySet(
+    address indexed account,
+    bytes dataEncryptionKey
+  );
+
+  event AccountMetadataURLSet(
+    address indexed account,
+    string metadataURL
+  );
+
+  event AccountWalletAddressSet(
+    address indexed account,
+    address walletAddress
+  );
+
   function initialize() external initializer {
     _transferOwnership(msg.sender);
   }
@@ -59,6 +84,21 @@ contract Accounts is IAccounts, ReentrancyGuard, Initializable, UsingRegistry {
     Account storage account = accounts[msg.sender];
     account.exists = true;
     return true;
+  }
+
+  /**
+   * @notice Convenience Setter for the dataEncryptionKey and wallet address for an account
+   * @param dataEncryptionKey secp256k1 public key for data encryption. Preferably compressed.
+   * @param walletAddress The wallet address to set for the account
+   */
+  function setAccount(
+    bytes calldata dataEncryptionKey,
+    address walletAddress
+  )
+    external
+  {
+    setAccountDataEncryptionKey(dataEncryptionKey);
+    setWalletAddress(walletAddress);
   }
 
   /**
@@ -273,5 +313,60 @@ contract Accounts is IAccounts, ReentrancyGuard, Initializable, UsingRegistry {
    */
   function isNotAuthorized(address account) internal view returns (bool) {
     return (authorizedBy[account] == address(0));
+  }
+
+  /**
+   * @notice Setter for the metadata of an account.
+   * @param metadataURL The URL to access the metadata.
+   */
+  function setMetadataURL(string calldata metadataURL) external {
+    accounts[msg.sender].metadataURL = metadataURL;
+    emit AccountMetadataURLSet(msg.sender, metadataURL);
+  }
+
+  /**
+   * @notice Getter for the metadata of an account.
+   * @param account The address of the account to get the metadata for.
+   * @return metdataURL The URL to access the metadata.
+   */
+  function getMetadataURL(address account) external view returns (string memory) {
+    return accounts[account].metadataURL;
+  }
+
+    /**
+   * @notice Setter for the data encryption key and version.
+   * @param dataEncryptionKey secp256k1 public key for data encryption. Preferably compressed.
+   */
+  function setAccountDataEncryptionKey(bytes memory dataEncryptionKey) public {
+    require(dataEncryptionKey.length >= 33, "data encryption key length <= 32");
+    accounts[msg.sender].dataEncryptionKey = dataEncryptionKey;
+    emit AccountDataEncryptionKeySet(msg.sender, dataEncryptionKey);
+  }
+
+  /**
+   * @notice Getter for the data encryption key and version.
+   * @param account The address of the account to get the key for
+   * @return dataEncryptionKey secp256k1 public key for data encryption. Preferably compressed.
+   */
+  function getDataEncryptionKey(address account) external view returns (bytes memory) {
+    return accounts[account].dataEncryptionKey;
+  }
+
+  /**
+   * @notice Setter for the wallet address for an account
+   * @param walletAddress The wallet address to set for the account
+   */
+  function setWalletAddress(address walletAddress) public {
+    accounts[msg.sender].walletAddress = walletAddress;
+    emit AccountWalletAddressSet(msg.sender, walletAddress);
+  }
+
+  /**
+   * @notice Getter for the wallet address for an account
+   * @param account The address of the account to get the wallet address for
+   * @return Wallet address
+   */
+  function getWalletAddress(address account) external view returns (address) {
+    return accounts[account].walletAddress;
   }
 }

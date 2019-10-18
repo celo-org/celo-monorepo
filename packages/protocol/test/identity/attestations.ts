@@ -38,11 +38,6 @@ const MockLockedGold: MockLockedGoldContract = artifacts.require('MockLockedGold
 const Random: RandomContract = artifacts.require('Random')
 const Registry: RegistryContract = artifacts.require('Registry')
 
-const dataEncryptionKey = '0x02f2f48ee19680706196e2e339e5da3491186e0c4c5030670656b0e01611111111'
-const longDataEncryptionKey =
-  '0x04f2f48ee19680706196e2e339e5da3491186e0c4c5030670656b0e01611111111' +
-  '02f2f48ee19680706196e2e339e5da3491186e0c4c5030670656b0e01611111111'
-
 contract('Attestations', (accounts: string[]) => {
   let accountsInstance: AccountsInstance
   let attestations: AttestationsInstance
@@ -53,7 +48,6 @@ contract('Attestations', (accounts: string[]) => {
   let mockLockedGold: MockLockedGoldInstance
   let registry: RegistryInstance
   const provider = new Web3.providers.HttpProvider('http://localhost:8545')
-  const metadataURL = 'https://www.celo.org'
   const web3: Web3 = new Web3(provider)
   const phoneNumber: string = '+18005551212'
   const caller: string = accounts[0]
@@ -87,7 +81,7 @@ contract('Attestations', (accounts: string[]) => {
   }
 
   async function setAccountWalletAddress() {
-    return attestations.setWalletAddress(caller)
+    return accountsInstance.setWalletAddress(caller)
   }
 
   const getNonIssuer = async () => {
@@ -185,85 +179,6 @@ contract('Attestations', (accounts: string[]) => {
           [attestationFee]
         )
       )
-    })
-  })
-
-  describe('#setAccountDataEncryptionKey()', () => {
-    it('should set dataEncryptionKey', async () => {
-      // @ts-ignore
-      await attestations.setAccountDataEncryptionKey(dataEncryptionKey)
-      // @ts-ignore
-      const fetchedKey: string = await attestations.getDataEncryptionKey(caller)
-      assert.equal(fetchedKey, dataEncryptionKey)
-    })
-
-    it('should allow setting a key with leading zeros', async () => {
-      const keyWithZeros = '0x00000000000000000000000000000000000000000000000f2f48ee19680706191111'
-      // @ts-ignore
-      await attestations.setAccountDataEncryptionKey(keyWithZeros)
-      // @ts-ignore
-      const fetchedKey: string = await attestations.getDataEncryptionKey(caller)
-      assert.equal(fetchedKey, keyWithZeros)
-    })
-
-    it('should revert when the key is invalid', async () => {
-      // @ts-ignore
-      await assertRevert(attestations.setAccountDataEncryptionKey('0x32132931293'))
-    })
-
-    it('should allow a key that is longer than 33 bytes', async () => {
-      // @ts-ignore
-      await attestations.setAccountDataEncryptionKey(longDataEncryptionKey)
-      // @ts-ignore
-      const fetchedKey: string = await attestations.getDataEncryptionKey(caller)
-      assert.equal(fetchedKey, longDataEncryptionKey)
-    })
-
-    it('should emit the AccountDataEncryptionKeySet event', async () => {
-      // @ts-ignore
-      const response = await attestations.setAccountDataEncryptionKey(dataEncryptionKey)
-      assert.lengthOf(response.logs, 1)
-      const event = response.logs[0]
-      assertLogMatches2(event, {
-        event: 'AccountDataEncryptionKeySet',
-        args: { account: caller, dataEncryptionKey },
-      })
-    })
-  })
-
-  describe('#setAccount', async () => {
-    it('should set the dataEncryptionKey and walletAddress', async () => {
-      // @ts-ignore
-      await attestations.setAccount(dataEncryptionKey, caller)
-      const expectedWalletAddress = await attestations.getWalletAddress(caller)
-      assert.equal(expectedWalletAddress, caller)
-      const expectedKey = await attestations.getDataEncryptionKey(caller)
-      // @ts-ignore
-      assert.equal(expectedKey, dataEncryptionKey)
-    })
-  })
-
-  describe('#setWalletAddress', async () => {
-    it('should set the walletAddress', async () => {
-      await attestations.setWalletAddress(caller)
-      const result = await attestations.getWalletAddress(caller)
-      assert.equal(result, caller)
-    })
-
-    it('should set the NULL_ADDRESS', async () => {
-      await attestations.setWalletAddress(NULL_ADDRESS)
-      const result = await attestations.getWalletAddress(caller)
-      assert.equal(result, NULL_ADDRESS)
-    })
-
-    it('should emit the AccountWalletAddressSet event', async () => {
-      const response = await attestations.setWalletAddress(caller)
-      assert.lengthOf(response.logs, 1)
-      const event = response.logs[0]
-      assertLogMatches2(event, {
-        event: 'AccountWalletAddressSet',
-        args: { account: caller, walletAddress: caller },
-      })
     })
   })
 
@@ -760,7 +675,7 @@ contract('Attestations', (accounts: string[]) => {
             const issuer = (await attestations.getAttestationIssuers(phoneHash, other))[0]
             const [v, r, s] = await getVerificationCodeSignature(other, issuer)
             await attestations.complete(phoneHash, v, r, s, { from: other })
-            await attestations.setWalletAddress(other, { from: other })
+            await accountsInstance.setWalletAddress(other, { from: other })
           })
 
           it('should return multiple attested accounts', async () => {
@@ -845,24 +760,6 @@ contract('Attestations', (accounts: string[]) => {
       assert.lengthOf(addresses, 0)
       assert.lengthOf(completed, 0)
       assert.lengthOf(total, 0)
-    })
-  })
-
-  describe('#setMetadataURL', async () => {
-    it('should set the metadataURL', async () => {
-      await attestations.setMetadataURL(metadataURL)
-      const result = await attestations.getMetadataURL(caller)
-      assert.equal(result, metadataURL)
-    })
-
-    it('should emit the AccountMetadataURLSet event', async () => {
-      const response = await attestations.setMetadataURL(metadataURL)
-      assert.lengthOf(response.logs, 1)
-      const event = response.logs[0]
-      assertLogMatches2(event, {
-        event: 'AccountMetadataURLSet',
-        args: { account: caller, metadataURL },
-      })
     })
   })
 })
