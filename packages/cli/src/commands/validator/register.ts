@@ -22,17 +22,17 @@ export default class ValidatorRegister extends BaseCommand {
     const res = this.parse(ValidatorRegister)
     this.kit.defaultAccount = res.flags.from
     const validators = await this.kit.contracts.getValidators()
-    const attestations = await this.kit.contracts.getAttestations()
+    const accounts = await this.kit.contracts.getAccounts()
     await displaySendTx(
       'registerValidator',
       validators.registerValidator(res.flags.name, res.flags.url, res.flags.publicKey as any)
     )
 
-    // register encryption key on attestations contract
+    // register encryption key on accounts contract
     // TODO: Use a different key data encryption
     const pubKey = await getPubKeyFromAddrAndWeb3(res.flags.from, this.web3)
     // TODO fix typing
-    const setKeyTx = attestations.setAccountDataEncryptionKey(pubKey as any)
+    const setKeyTx = accounts.setAccountDataEncryptionKey(pubKey as any)
     await displaySendTx('Set encryption key', setKeyTx)
   }
 }

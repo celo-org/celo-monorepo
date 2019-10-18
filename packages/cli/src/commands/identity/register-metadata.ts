@@ -22,7 +22,7 @@ export default class RegisterMetadata extends BaseCommand {
   async run() {
     const { flags } = this.parse(RegisterMetadata)
     this.kit.defaultAccount = flags.from
-    const attestations = await this.kit.contracts.getAttestations()
-    await displaySendTx('registerMetadata', attestations.setMetadataURL(flags.url))
+    const accounts = await this.kit.contracts.getAccounts()
+    await displaySendTx('registerMetadata', accounts.setMetadataURL(flags.url))
   }
 }
