@@ -765,7 +765,7 @@ workflows:
       - install_dependencies
       - certora-test:
           requires:
-            - install_dependecies
+            - install_dependencies
       - end-to-end-mobile-test:
           requires:
             - install_dependencies
