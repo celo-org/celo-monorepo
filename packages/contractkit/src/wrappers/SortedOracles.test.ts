@@ -104,9 +104,9 @@ testWithGanache('SortedOracles Wrapper', (web3) => {
         try {
           const tx = await sortedOracles.report(CeloContract.StableToken, numerator, denominator)
           await tx.sendAndWaitForReceipt()
-          // @ts-ignore - Ignore empty block: we don't need to do anything with this error
         } catch (err) {
-          // @ts-ignore
+          // We don't need to do anything with this error other than catch it so
+          // it doesn't fail this test.
         } finally {
           const resultingRates = await sortedOracles.getRates(CeloContract.StableToken)
           expect(resultingRates).toMatchObject(initialRates)
