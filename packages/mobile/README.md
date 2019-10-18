@@ -180,16 +180,16 @@ GraphQL queries. If you make a change to a query, run `yarn build:gen-graphql-ty
 
 By default, the mobile wallet app runs geth in ultralight sync mode where all the epoch headers are fetched. The default sync mode is defined in [packages/mobile/.env](https://github.com/celo-org/celo-monorepo/blob/master/packages/mobile/.env#L4) file.
 
-# To run wallet in zero sync mode, where it would connect to the remote nodes and sign transactions in web3, change the default sync mode in the aforementioned file to -1. The mode has only been tested on Android and is hard-coded to be [crash](https://github.com/celo-org/celo-monorepo/blob/aeddeefbfb230db51d2ef76d50c5f882644a1cd3/packages/mobile/src/web3/contracts.ts#L73) on iOS.
-
+To run wallet in zero sync mode, where it would connect to the remote nodes and sign transactions in web3, change the default sync mode in the aforementioned file to -1. The mode has only been tested on Android and is hard-coded to be [crash](https://github.com/celo-org/celo-monorepo/blob/aeddeefbfb230db51d2ef76d50c5f882644a1cd3/packages/mobile/src/web3/contracts.ts#L73) on iOS.
+=======
 ## How we handle Geth crashes in wallet app on Android
 
 Our Celo app has three types of codes.
 
-1.  Javascript code - generated from Typescript, this runs in Javascript interpreter.
-2.  Java bytecode - This runs on Dalvik/Art Virtual Machine.
-3.  Native code - Geth code is written in Golang which compiles to native code - this runs directly on the
-    CPU, no virtual machines involved.
+1. Javascript code - generated from Typescript, this runs in Javascript interpreter.
+2. Java bytecode - This runs on Dalvik/Art Virtual Machine.
+3. Native code - Geth code is written in Golang which compiles to native code - this runs directly on the
+CPU, no virtual machines involved.
 
 One should note that, on iOS, there is no byte code and therefore, there are only two layers, one is the Javascript code, and the other is the Native code. Till now, we have been blind towards native crashes except Google Playstore logs.
 
@@ -199,14 +199,14 @@ We cannot use libraries like [Bugsnag](https://www.bugsnag.com) since they do no
 
 Relevant code references:
 
-1.  [NDKCrashService](https://github.com/celo-org/celo-monorepo/blob/master/packages/mobile/android/app/src/main/java/org/celo/mobile/NdkCrashService.java)
-2.  [Initialization](https://github.com/celo-org/celo-monorepo/blob/8689634a1d10d74ba6d4f3b36b2484db60a95bdb/packages/mobile/android/app/src/main/java/org/celo/mobile/MainApplication.java#L156) of the NDKCrashService
-3.  [Sentry code](https://github.com/celo-org/celo-monorepo/blob/799d74675dc09327543c210e88cbf5cc796721a0/packages/mobile/src/sentry/Sentry.ts#L53) to read NDK crash logs on restart
+1. [NDKCrashService](https://github.com/celo-org/celo-monorepo/blob/master/packages/mobile/android/app/src/main/java/org/celo/mobile/NdkCrashService.java)
+2. [Initialization](https://github.com/celo-org/celo-monorepo/blob/8689634a1d10d74ba6d4f3b36b2484db60a95bdb/packages/mobile/android/app/src/main/java/org/celo/mobile/MainApplication.java#L156) of the NDKCrashService
+3. [Sentry code](https://github.com/celo-org/celo-monorepo/blob/799d74675dc09327543c210e88cbf5cc796721a0/packages/mobile/src/sentry/Sentry.ts#L53) to read NDK crash logs on restart
 
 There are two major differencs in ZeroSync mode:
 
-1.  Geth won't run at all. The web3 would instead connect to <testnet>-infura.celo-testnet.org using an https provider, for example, [https://integration-infura.celo-testnet.org](https://integration-infura.celo-testnet.org).
-2.  Changes to [sendTransactionAsyncWithWeb3Signing](https://github.com/celo-org/celo-monorepo/blob/8689634a1d10d74ba6d4f3b36b2484db60a95bdb/packages/walletkit/src/contract-utils.ts#L362) in walletkit to poll after sending a transaction for the transaction to succeed. This is needed because http provider, unliked web sockets and IPC provider, does not support subscriptions.
+1. Geth won't run at all. The web3 would instead connect to <testnet>-infura.celo-testnet.org using an https provider, for example, [https://integration-infura.celo-testnet.org](https://integration-infura.celo-testnet.org).
+2. Changes to [sendTransactionAsyncWithWeb3Signing](https://github.com/celo-org/celo-monorepo/blob/8689634a1d10d74ba6d4f3b36b2484db60a95bdb/packages/walletkit/src/contract-utils.ts#L362) in walletkit to poll after sending a transaction for the transaction to succeed. This is needed because http provider, unliked web sockets and IPC provider, does not support subscriptions.
 
 #### Why http(s) provider?
 
