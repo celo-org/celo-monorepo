@@ -747,16 +747,23 @@ jobs:
     docker:
       - image: celohq/node10-gcloud
     steps:
-    - run:
-        name: Certora dependencies
-        command: |
-          sudo apt-get update || sudo apt-get update
-          sudo apt-get install -y software-properties-common
-          sudo apt-get install python3-pip
-          pip3 install pycryptodome
-          cd packages/protocol
-          python3 scripts/certora/certoraBuild.py specs/harnesses/SortedListCheck.sol specs/harnesses/IntegerSortedListCheck.sol specs/harnesses/AddressSortedListCheck.sol --verify SortedListCheck:specs/list.spec IntegerSortedListCheck:specs/list.spec AddressSortedListCheck:specs/list.spec
-          java -jar scripts/certora/prover_cli.jar verify . # need to setup key first
+      - attach_workspace:
+          at: ~/app
+      - run:
+          name: Certora dependencies
+          command: |
+            sudo apt-get update || sudo apt-get update
+            sudo apt-get install -y software-properties-common
+            sudo apt-get install python3-pip
+            pip3 install pycryptodome
+      - run:
+          name: Build and run
+          command: |
+            ls
+            ls packages
+            cd packages/protocol
+            python3 scripts/certora/certoraBuild.py specs/harnesses/SortedListCheck.sol specs/harnesses/IntegerSortedListCheck.sol specs/harnesses/AddressSortedListCheck.sol --verify SortedListCheck:specs/list.spec IntegerSortedListCheck:specs/list.spec AddressSortedListCheck:specs/list.spec
+            java -jar scripts/certora/prover_cli.jar verify . # need to setup key first
 
 workflows:
   version: 2
