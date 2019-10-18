@@ -9,7 +9,7 @@ const Random: TestRandomContract = artifacts.require('TestRandom')
 // TODO(mcortesi): Use BN
 Random.numberFormat = 'BigNumber'
 
-contract('Random', (/* accounts: string[] */) => {
+contract('Random', (accounts: string[]) => {
   let random: TestRandomInstance
 
   beforeEach(async () => {
@@ -33,6 +33,10 @@ contract('Random', (/* accounts: string[] */) => {
           value: new BigNumber(1000),
         },
       })
+    })
+
+    it('only owner can set', async () => {
+      assertRevert(random.setRandomnessBlockRetentionWindow(1000, { from: accounts[1] }))
     })
   })
 
