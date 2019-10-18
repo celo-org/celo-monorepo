@@ -758,6 +758,7 @@ jobs:
             pip3 install pycryptodome
             wget https://github.com/ethereum/solidity/releases/download/v0.5.12/solc-static-linux
             mv solc-static-linux solc
+            chmod +x solc
       - run:
           name: Build and run
           command: |
