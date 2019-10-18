@@ -1,0 +1,50 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Licenses renders correctly 1`] = `
+<View
+  style={
+    Object {
+      "flex": 1,
+      "overflow": "hidden",
+    }
+  }
+>
+  <RNCWebView
+    allowFileAccess={false}
+    allowsFullscreenVideo={false}
+    androidHardwareAccelerationDisabled={false}
+    cacheEnabled={true}
+    javaScriptEnabled={true}
+    messagingEnabled={false}
+    onLoadingError={[Function]}
+    onLoadingFinish={[Function]}
+    onLoadingProgress={[Function]}
+    onLoadingStart={[Function]}
+    onMessage={[Function]}
+    onShouldStartLoadWithRequest={[Function]}
+    overScrollMode="always"
+    saveFormDataDisabled={false}
+    scalesPageToFit={true}
+    source={
+      Object {
+        "uri": "file:///android_asset/custom/LicenseDisclaimer.txt",
+      }
+    }
+    style={
+      Array [
+        Object {
+          "flex": 1,
+          "overflow": "hidden",
+        },
+        Object {
+          "backgroundColor": "#ffffff",
+        },
+        Object {
+          "marginHorizontal": 20,
+        },
+      ]
+    }
+    thirdPartyCookiesEnabled={true}
+  />
+</View>
+`;

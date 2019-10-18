@@ -1,6 +1,7 @@
 export enum CeloContractName {
   Attestations = 'Attestations',
   BlockchainParameters = 'BlockchainParameters',
+  Election = 'Election',
   Escrow = 'Escrow',
   Exchange = 'Exchange',
   GasCurrencyWhitelist = 'GasCurrencyWhitelist',
@@ -26,6 +27,7 @@ export const usesRegistry = [
 export const hasEntryInRegistry: string[] = [
   CeloContractName.Attestations,
   CeloContractName.BlockchainParameters,
+  CeloContractName.Election,
   CeloContractName.Escrow,
   CeloContractName.Exchange,
   CeloContractName.GoldToken,
