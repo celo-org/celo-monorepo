@@ -92,7 +92,7 @@ const styles = StyleSheet.create({
 })
 
 export default componentWithAnalytics(
-  connect<StateProps, {}, {}, RootState>(
+  connect<StateProps, DispatchProps, {}, RootState>(
     mapStateToProps,
     {
       exitBackupFlow,

@@ -1,8 +1,7 @@
-import * as _ from 'lodash'
-import { wordlists } from 'react-native-bip39'
 import {
   createQuizWordList,
   joinMnemonic,
+  MNEMONIC_SPLITTER,
   selectQuizWordOptions,
   splitMnemonic,
 } from 'src/backup/utils'
@@ -59,36 +58,21 @@ describe('backup/utils', () => {
     })
   })
 
-  describe('splitMnemonic', () => {
-    const shards = splitMnemonic(mockMnemonic, 'en')
-    const shard0 = shards[0].split(' ')
-    const shard1 = shards[1].split(' ')
-
-    const wordList = wordlists.EN
-    const wordListChunks = _.chunk(wordList, wordList.length / 2)
-
-    it('splits mnemonic with prefixes', () => {
+  describe('mnemonic splitting and joining', () => {
+    it('splits mnemonics correctly', () => {
+      const shards = splitMnemonic(mockMnemonic, 'en')
       expect(shards.length).toBe(2)
-
-      expect(shard0.length).toBe(13)
-      expect(shard1.length).toBe(13)
+      expect(shards[0]).toBe(
+        'abandon ability able about above absent absorb abstract absurd abuse access accident ' +
+          MNEMONIC_SPLITTER
+      )
+      expect(shards[1]).toBe(
+        MNEMONIC_SPLITTER +
+          ' account accuse achieve acid acoustic acquire across act action actor actress actual'
+      )
     })
 
-    it('uses different prefixes in correct parts of the word list', () => {
-      expect(shard0[0]).not.toBe(shard1[0])
-
-      expect(wordListChunks[0]).toContain(shard0[0])
-      expect(wordListChunks[1]).toContain(shard1[0])
-    })
-
-    it('does not use fallback prefixes', () => {
-      expect(shard0[0]).not.toBe('prosper')
-      expect(shard1[0]).not.toBe('magic')
-    })
-  })
-
-  describe('joinMnemonic', () => {
-    it('joins a split mnemonic', () => {
+    it('joins a split mnemonic correctly', () => {
       const split = splitMnemonic(mockMnemonic, 'en')
       const joined = joinMnemonic(split)
 

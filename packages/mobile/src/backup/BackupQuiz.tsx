@@ -12,7 +12,7 @@ import SafeAreaView from 'react-native-safe-area-view'
 import { NavigationInjectedProps } from 'react-navigation'
 import { connect } from 'react-redux'
 import { setBackupCompleted } from 'src/account/actions'
-import { hideAlert, showError } from 'src/alert/actions'
+import { showError } from 'src/alert/actions'
 import componentWithAnalytics from 'src/analytics/wrapper'
 import { ErrorMessages } from 'src/app/ErrorMessages'
 import DevSkipButton from 'src/components/DevSkipButton'
@@ -39,7 +39,6 @@ interface State {
 interface DispatchProps {
   setBackupCompleted: typeof setBackupCompleted
   showError: typeof showError
-  hideAlert: typeof hideAlert
 }
 
 type Props = WithNamespaces & DispatchProps & NavigationInjectedProps
@@ -203,6 +202,7 @@ export class BackupQuiz extends React.Component<Props, State> {
             text={t('global:submit')}
             standard={false}
             type={BtnTypes.PRIMARY}
+            testID={'QuizSubmit'}
           />
         )}
       </SafeAreaView>
@@ -213,7 +213,7 @@ export class BackupQuiz extends React.Component<Props, State> {
 export default componentWithAnalytics(
   connect<{}, DispatchProps, {}, RootState>(
     null,
-    { setBackupCompleted, showError, hideAlert }
+    { setBackupCompleted, showError }
   )(withNamespaces(Namespaces.backupKeyFlow6)(BackupQuiz))
 )
 

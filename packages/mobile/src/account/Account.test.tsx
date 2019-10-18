@@ -10,9 +10,15 @@ import Account from 'src/account/Account'
 import { Screens } from 'src/navigator/Screens'
 import { createMockStore } from 'test/utils'
 
-jest.useFakeTimers()
-
 describe('Account', () => {
+  beforeAll(() => {
+    jest.useFakeTimers()
+  })
+
+  afterAll(() => {
+    jest.useRealTimers()
+  })
+
   it('renders correctly', () => {
     const tree = renderer.create(
       <Provider store={createMockStore({})}>

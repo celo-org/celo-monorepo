@@ -2,10 +2,19 @@ import * as React from 'react'
 import 'react-native'
 import { Provider } from 'react-redux'
 import * as renderer from 'react-test-renderer'
-import BackupComplete from 'src/backup/BackupComplete'
+import BackupSocial from 'src/backup/BackupSocial'
 import { createMockStore } from 'test/utils'
+import { mockMnemonic } from 'test/values'
 
-describe('BackupComplete', () => {
+jest.mock('react-native-secure-key-store', () => {
+  return {
+    get: () => {
+      return mockMnemonic
+    },
+  }
+})
+
+describe('BackupSocialIntro', () => {
   it('renders correctly when social backup is not complete', () => {
     const tree = renderer.create(
       <Provider
@@ -13,7 +22,7 @@ describe('BackupComplete', () => {
           account: { backupCompleted: true, socialBackupCompleted: false },
         })}
       >
-        <BackupComplete />
+        <BackupSocial />
       </Provider>
     )
     expect(tree).toMatchSnapshot()
@@ -24,7 +33,7 @@ describe('BackupComplete', () => {
       <Provider
         store={createMockStore({ account: { backupCompleted: true, socialBackupCompleted: true } })}
       >
-        <BackupComplete />
+        <BackupSocial />
       </Provider>
     )
     expect(tree).toMatchSnapshot()

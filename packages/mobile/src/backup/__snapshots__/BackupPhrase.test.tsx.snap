@@ -1,10 +1,10 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`renders correctly 1`] = `
+exports[`renders correctly with backup completed 1`] = `
 <SafeAreaView
   style={
     Object {
-      "backgroundColor": "white",
+      "backgroundColor": "#FFFFFF",
       "flex": 1,
       "justifyContent": "space-between",
     }
@@ -13,32 +13,23 @@ exports[`renders correctly 1`] = `
   <RCTScrollView
     contentContainerStyle={
       Object {
-        "flex": 1,
-        "flexDirection": "column",
-        "justifyContent": "center",
-        "paddingBottom": 60,
+        "flexGrow": 1,
+        "paddingBottom": 20,
         "paddingHorizontal": 20,
       }
     }
-    keyboardShouldPersistTaps="always"
   >
     <View>
       <View>
         <Text
           style={
-            Array [
-              Object {
-                "color": "#2E3338",
-                "fontFamily": "Hind-Light",
-                "fontSize": 22,
-                "paddingBottom": 20,
-                "textAlign": "center",
-              },
-              Object {
-                "color": "#2E3338",
-                "paddingBottom": 10,
-              },
-            ]
+            Object {
+              "color": "#2E3338",
+              "fontFamily": "Hind-Light",
+              "fontSize": 22,
+              "paddingBottom": 20,
+              "textAlign": "center",
+            }
           }
         >
           yourBackupKey
@@ -48,38 +39,88 @@ exports[`renders correctly 1`] = `
             Object {
               "color": "#2E3338",
               "fontFamily": "Hind-Regular",
-              "fontSize": 15,
-              "lineHeight": 18,
-              "paddingTop": 15,
-              "textAlign": "left",
+              "fontSize": 16,
+              "lineHeight": 24,
+              "marginBottom": 20,
             }
           }
         >
-          heresYourKey
+          backupKeySummary
         </Text>
-        <View
-          style={
-            Object {
-              "alignContent": "center",
-              "backgroundColor": "#EEEEEE",
-              "borderRadius": 4,
-              "justifyContent": "center",
-              "marginBottom": 18,
-              "marginTop": 18,
-              "padding": 16,
-              "position": "relative",
+        <View>
+          <View
+            style={
+              Object {
+                "flexDirection": "row",
+                "justifyContent": "space-between",
+                "paddingHorizontal": 2,
+              }
             }
-          }
-        />
+          >
+            <Text
+              style={
+                Object {
+                  "color": "#2E3338",
+                  "fontFamily": "Hind-SemiBold",
+                  "fontSize": 16,
+                  "lineHeight": 24,
+                }
+              }
+            >
+              backupKey
+            </Text>
+            <View
+              accessible={true}
+              isTVSelectable={true}
+              nativeBackgroundAndroid={
+                Object {
+                  "attribute": "selectableItemBackgroundBorderless",
+                  "type": "ThemeAttrAndroid",
+                }
+              }
+              onResponderGrant={[Function]}
+              onResponderMove={[Function]}
+              onResponderRelease={[Function]}
+              onResponderTerminate={[Function]}
+              onResponderTerminationRequest={[Function]}
+              onStartShouldSetResponder={[Function]}
+            >
+              <Text
+                style={
+                  Object {
+                    "color": "#42D689",
+                    "fontFamily": "Hind-SemiBold",
+                    "fontSize": 16,
+                    "lineHeight": 22,
+                  }
+                }
+              >
+                global:copy
+              </Text>
+            </View>
+          </View>
+          <View
+            style={
+              Object {
+                "alignContent": "center",
+                "backgroundColor": "#EEEEEE",
+                "borderRadius": 4,
+                "justifyContent": "center",
+                "marginTop": 10,
+                "padding": 14,
+              }
+            }
+          />
+        </View>
         <Text
           style={
             Object {
-              "color": "#2E3338",
+              "color": "#81868B",
               "fontFamily": "Hind-Regular",
-              "fontSize": 15,
+              "fontSize": 14,
               "lineHeight": 18,
-              "paddingTop": 15,
-              "textAlign": "left",
+              "marginHorizontal": 3,
+              "marginTop": 25,
             }
           }
         >
@@ -87,12 +128,12 @@ exports[`renders correctly 1`] = `
             style={
               Array [
                 Object {
-                  "color": "#2E3338",
+                  "color": "#81868B",
                   "fontFamily": "Hind-Regular",
-                  "fontSize": 15,
+                  "fontSize": 14,
                   "lineHeight": 18,
-                  "paddingTop": 15,
-                  "textAlign": "left",
+                  "marginHorizontal": 3,
+                  "marginTop": 25,
                 },
                 Object {
                   "fontFamily": "Hind-Bold",
@@ -100,82 +141,46 @@ exports[`renders correctly 1`] = `
               ]
             }
           >
-            tip
+            global:warning
           </Text>
           securityTip
         </Text>
       </View>
     </View>
   </RCTScrollView>
-  <View />
-</View>
+</SafeAreaView>
 `;
 
 exports[`renders correctly with backup not completed 1`] = `
-<View
+<SafeAreaView
   style={
     Object {
-      "backgroundColor": "white",
+      "backgroundColor": "#FFFFFF",
       "flex": 1,
       "justifyContent": "space-between",
     }
   }
 >
   <RCTScrollView
-    automaticallyAdjustContentInsets={false}
     contentContainerStyle={
       Object {
-        "flex": 1,
-        "flexDirection": "column",
-        "justifyContent": "center",
-        "paddingBottom": 60,
+        "flexGrow": 1,
+        "paddingBottom": 20,
         "paddingHorizontal": 20,
       }
     }
-    contentInset={
-      Object {
-        "bottom": 0,
-      }
-    }
-    enableAutomaticScroll={true}
-    enableResetScrollToCoords={true}
-    extraHeight={75}
-    extraScrollHeight={0}
-    getScrollResponder={[Function]}
-    handleOnScroll={[Function]}
-    keyboardDismissMode="interactive"
-    keyboardOpeningTime={250}
-    keyboardShouldPersistTaps="always"
-    keyboardSpace={0}
-    onScroll={[Function]}
-    resetKeyboardSpace={[Function]}
-    scrollEventThrottle={1}
-    scrollForExtraHeightOnAndroid={[Function]}
-    scrollIntoView={[Function]}
-    scrollToEnd={[Function]}
-    scrollToFocusedInput={[Function]}
-    scrollToPosition={[Function]}
-    showsVerticalScrollIndicator={true}
-    update={[Function]}
-    viewIsInsideTabBar={false}
   >
     <View>
       <View>
         <Text
           style={
-            Array [
-              Object {
-                "color": "#2E3338",
-                "fontFamily": "Hind-Light",
-                "fontSize": 22,
-                "paddingBottom": 20,
-                "textAlign": "center",
-              },
-              Object {
-                "color": "#2E3338",
-                "paddingBottom": 10,
-              },
-            ]
+            Object {
+              "color": "#2E3338",
+              "fontFamily": "Hind-Light",
+              "fontSize": 22,
+              "paddingBottom": 20,
+              "textAlign": "center",
+            }
           }
         >
           yourBackupKey
@@ -185,38 +190,88 @@ exports[`renders correctly with backup not completed 1`] = `
             Object {
               "color": "#2E3338",
               "fontFamily": "Hind-Regular",
-              "fontSize": 15,
-              "lineHeight": 18,
-              "paddingTop": 15,
-              "textAlign": "left",
+              "fontSize": 16,
+              "lineHeight": 24,
+              "marginBottom": 20,
             }
           }
         >
-          backupKeySummary.0
+          backupKeySummary
         </Text>
-        <View
-          style={
-            Object {
-              "alignContent": "center",
-              "backgroundColor": "#EEEEEE",
-              "borderRadius": 4,
-              "justifyContent": "center",
-              "marginBottom": 18,
-              "marginTop": 18,
-              "padding": 16,
-              "position": "relative",
+        <View>
+          <View
+            style={
+              Object {
+                "flexDirection": "row",
+                "justifyContent": "space-between",
+                "paddingHorizontal": 2,
+              }
             }
-          }
-        />
+          >
+            <Text
+              style={
+                Object {
+                  "color": "#2E3338",
+                  "fontFamily": "Hind-SemiBold",
+                  "fontSize": 16,
+                  "lineHeight": 24,
+                }
+              }
+            >
+              backupKey
+            </Text>
+            <View
+              accessible={true}
+              isTVSelectable={true}
+              nativeBackgroundAndroid={
+                Object {
+                  "attribute": "selectableItemBackgroundBorderless",
+                  "type": "ThemeAttrAndroid",
+                }
+              }
+              onResponderGrant={[Function]}
+              onResponderMove={[Function]}
+              onResponderRelease={[Function]}
+              onResponderTerminate={[Function]}
+              onResponderTerminationRequest={[Function]}
+              onStartShouldSetResponder={[Function]}
+            >
+              <Text
+                style={
+                  Object {
+                    "color": "#42D689",
+                    "fontFamily": "Hind-SemiBold",
+                    "fontSize": 16,
+                    "lineHeight": 22,
+                  }
+                }
+              >
+                global:copy
+              </Text>
+            </View>
+          </View>
+          <View
+            style={
+              Object {
+                "alignContent": "center",
+                "backgroundColor": "#EEEEEE",
+                "borderRadius": 4,
+                "justifyContent": "center",
+                "marginTop": 10,
+                "padding": 14,
+              }
+            }
+          />
+        </View>
         <Text
           style={
             Object {
-              "color": "#2E3338",
+              "color": "#81868B",
               "fontFamily": "Hind-Regular",
-              "fontSize": 15,
+              "fontSize": 14,
               "lineHeight": 18,
-              "paddingTop": 15,
-              "textAlign": "left",
+              "marginHorizontal": 3,
+              "marginTop": 25,
             }
           }
         >
@@ -224,12 +279,12 @@ exports[`renders correctly with backup not completed 1`] = `
             style={
               Array [
                 Object {
-                  "color": "#2E3338",
+                  "color": "#81868B",
                   "fontFamily": "Hind-Regular",
-                  "fontSize": 15,
+                  "fontSize": 14,
                   "lineHeight": 18,
-                  "paddingTop": 15,
-                  "textAlign": "left",
+                  "marginHorizontal": 3,
+                  "marginTop": 25,
                 },
                 Object {
                   "fontFamily": "Hind-Bold",
@@ -237,7 +292,7 @@ exports[`renders correctly with backup not completed 1`] = `
               ]
             }
           >
-            tip
+            global:warning
           </Text>
           securityTip
         </Text>
@@ -245,6 +300,42 @@ exports[`renders correctly with backup not completed 1`] = `
     </View>
   </RCTScrollView>
   <View>
+    <View
+      style={
+        Object {
+          "flexDirection": "row",
+          "paddingHorizontal": 20,
+          "paddingVertical": 20,
+        }
+      }
+    >
+      <AndroidSwitch
+        accessibilityRole="button"
+        enabled={true}
+        on={false}
+        onChange={[Function]}
+        onResponderTerminationRequest={[Function]}
+        onStartShouldSetResponder={[Function]}
+        thumbTintColor="#42D689"
+        trackColorForFalse="#D1D5D8"
+        trackColorForTrue="#42D689"
+        trackTintColor="#D1D5D8"
+      />
+      <Text
+        style={
+          Object {
+            "color": "#2E3338",
+            "fontFamily": "Hind-SemiBold",
+            "fontSize": 16,
+            "lineHeight": 24,
+            "paddingLeft": 10,
+            "paddingTop": 3,
+          }
+        }
+      >
+        savedConfirmation
+      </Text>
+    </View>
     <View
       style={
         Array [
@@ -257,7 +348,7 @@ exports[`renders correctly with backup not completed 1`] = `
           null,
           undefined,
           Object {
-            "backgroundColor": "#42D689",
+            "backgroundColor": "#A3EBC6",
           },
         ]
       }
@@ -265,6 +356,12 @@ exports[`renders correctly with backup not completed 1`] = `
       <View
         accessible={true}
         isTVSelectable={true}
+        nativeBackgroundAndroid={
+          Object {
+            "attribute": "selectableItemBackground",
+            "type": "ThemeAttrAndroid",
+          }
+        }
         onResponderGrant={[Function]}
         onResponderMove={[Function]}
         onResponderRelease={[Function]}
@@ -272,15 +369,22 @@ exports[`renders correctly with backup not completed 1`] = `
         onResponderTerminationRequest={[Function]}
         onStartShouldSetResponder={[Function]}
         style={
-          Object {
-            "alignItems": "center",
-            "backgroundColor": "#42D689",
-            "borderWidth": 0,
-            "flex": 1,
-            "height": 50,
-            "justifyContent": "center",
-            "opacity": 1,
-          }
+          Array [
+            Object {
+              "alignItems": "center",
+              "flex": 1,
+              "justifyContent": "center",
+            },
+            Object {
+              "backgroundColor": "#A3EBC6",
+            },
+            Object {
+              "height": 50,
+            },
+            Object {
+              "borderWidth": 0,
+            },
+          ]
         }
       >
         <View
@@ -310,11 +414,11 @@ exports[`renders correctly with backup not completed 1`] = `
               ]
             }
           >
-            continue
+            global:continue
           </Text>
         </View>
       </View>
     </View>
-  </RCTScrollView>
+  </View>
 </SafeAreaView>
 `;

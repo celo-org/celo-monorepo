@@ -54,12 +54,14 @@ export function getWordlist(language: string | null) {
 
 // Split a mnemonic into two and insert the mnemonic splitter in between
 export function splitMnemonic(mnemonic: string, language: string | null): string[] {
+  // TODO use language to i18n the splitter word? For now just using 'celo' everywhere
+
   if (!mnemonic) {
     throw new Error('Cannot split invalid mnemonic')
   }
 
   const mnemonicWords = mnemonic.split(' ')
-  const firstHalf = [...mnemonicWords.slice(0, mnemonicWords.length / 2 - 1), MNEMONIC_SPLITTER]
+  const firstHalf = [...mnemonicWords.slice(0, mnemonicWords.length / 2), MNEMONIC_SPLITTER]
   const secondHalf = [MNEMONIC_SPLITTER, ...mnemonicWords.slice(mnemonicWords.length / 2)]
   return [firstHalf.join(' '), secondHalf.join(' ')]
 }
@@ -79,7 +81,7 @@ export function joinMnemonic(mnemonicShards: string[]) {
   }
 
   const [firstHalf, secondHalf] = mnemonicShards.map((shard) => shard.split(' '))
-  return [...firstHalf.slice(0, firstHalf.length - 1), secondHalf.slice(1)].join(' ')
+  return [...firstHalf.slice(0, firstHalf.length - 1), ...secondHalf.slice(1)].join(' ')
 }
 
 export async function getStoredMnemonic(): Promise<string | null> {
