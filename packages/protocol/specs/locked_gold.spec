@@ -1,5 +1,32 @@
 pragma specify 0.1
 
+methods { // potentially old methods, listed here to prune out the rules that need to be updated
+	_lenNoticePeriods(address) returns uint256
+	_lenAvailabilityTimes(address) returns uint256
+	_rewardsDelegate(address) returns address
+	getRewardsLastRedeemed(address) returns address
+	isVotingFrozen(address) returns bool
+	_weight(address) returns uint256
+	delegations(address) returns address
+	getAccountFromRewardsRecipient(address) returns address
+	getLockedCommitment(address,uint256) returns uint256,uint256
+	getNotifiedCommitment(address,uint256) returns uint256,uint256
+	maxNoticePeriod() returns uint256
+	_getFromNoticePeriods(address,uint256) returns uint256
+	getAccountWeight(address) returns uint256
+	totalWeight() returns uint256
+	getCommitmentWeight(uint256,uint256) returns uint256
+	_getFromAvailabilityTimes(address,uint256) returns uint256
+	initialize(address,uint256)
+	ext_updateNotifiedDeposit(address,uint256,uint256)
+	ext_updateLockedCommitment(address,uint256,uint256)
+	notifyCommitment(uint256,uint256)
+	increaseNoticePeriod(uint256,uint256,uint256)
+	withdrawCommitment(uint256)
+	extendCommitment(uint256,uint256)
+
+}
+
 rule account_empty_unless_created(method f, address account) {
 	/* What is an "empty" account?
 		We define an empty account as:

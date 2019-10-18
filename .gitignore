@@ -81,3 +81,4 @@ lerna-debug.log
 
 .terraform/
 tsconfig.tsbuildinfo
+/packages/protocol/certora_verify.json

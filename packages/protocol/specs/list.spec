@@ -1106,7 +1106,9 @@ rule invariants_remove_basic_sorted(uint256 key) {
 		assert _iValue == iValue_, "i=$i that was already contained should not change its value";
 		assert _jValue == jValue_, "j=$j that was already contained should not change its value";
 		assert iValue_ <= jValue_ <=> _iValue <= _jValue, "Two elements that existed in the map must maintain their order"; // subsumed by the above
-	}	
+	} else {
+		assert true;
+	}		
 	
 }
 

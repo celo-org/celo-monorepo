@@ -1,5 +1,12 @@
 pragma specify 0.1
 
+methods { // potentially old methods, listed here to prune out the rules that need to be updated
+	_getVoterFromAccount(address) returns address
+	
+	vote(uint256,uint256,uint8)
+	initialize(address,uint256)
+}
+
 /* we start by learning which functions are most interesting and may demand careful specification */
 rule modifying_stageDuration(method f) {
 

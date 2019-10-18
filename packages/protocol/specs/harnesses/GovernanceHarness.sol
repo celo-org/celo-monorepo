@@ -32,19 +32,19 @@ contract GovernanceHarness is Governance {
 	// requires linkage of registry
 	// TODO: Note in the harness we assume already that getAddressFor always returns just the registry address
 	function _getTotalWeightFromBondedDeposits() public view returns (uint256) {
-		return getTotalWeight();
-		//ILockedGold lockedGold = ILockedGold(registry.getAddressFor(LOCKED_GOLD_REGISTRY_ID));
-		//return lockedGold.getTotalWeight();
+		//return getTotalWeight();
+		ILockedGold lockedGold = ILockedGold(registry.getAddressFor(LOCKED_GOLD_REGISTRY_ID));
+		return lockedGold.getTotalLockedGold();
 	}
 	
-	function _getVoterFromAccount(address account) public view returns (address) {
+	/*function _getVoterFromAccount(address account) public view returns (address) {
 		ILockedGold lockedGold = ILockedGold(registry.getAddressFor(LOCKED_GOLD_REGISTRY_ID));
 		return lockedGold.getDelegateFromAccountAndRole(account, ILockedGold.DelegateRole.Voting); 
-	}
+	}*/
 	
 	function getAccountFromVoter(address voter) public view returns (address) {
 		ILockedGold lockedGold = ILockedGold(registry.getAddressFor(LOCKED_GOLD_REGISTRY_ID));
-		return lockedGold.getAccountFromDelegateAndRole(voter, ILockedGold.DelegateRole.Voting);
+		return lockedGold.getAccountFromVoter(voter);
 	}
 	
 	// overriding get account weight
@@ -58,5 +58,12 @@ contract GovernanceHarness is Governance {
 		Proposals.Proposal storage proposal = _getProposal(proposalId);
 		Proposals.Stage stage = proposal.getDequeuedStage(stageDurations);
 		return isDequeuedProposalExpired(proposal,stage);
+	}
+	
+	// new:
+	function getUpvotedProposal(address account) public view returns (uint256) {
+		uint256 proposalId; uint256 weight;
+		(proposalId,weight) = getUpvoteRecord(account);
+		return proposalId;
 	}
 }

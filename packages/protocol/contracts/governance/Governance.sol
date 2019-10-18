@@ -827,7 +827,7 @@ contract Governance is IGovernance, Ownable, Initializable, ReentrancyGuard, Usi
    * @param account The address of the account.
    * @return The ID of the proposal upvoted by `account` and the weight of that upvote.
    */
-  function getUpvoteRecord(address account) external view returns (uint256, uint256) {
+  function getUpvoteRecord(address account) /*external*/public view returns (uint256, uint256) {
     UpvoteRecord memory upvoteRecord = voters[account].upvote;
     return (upvoteRecord.proposalId, upvoteRecord.weight);
   }

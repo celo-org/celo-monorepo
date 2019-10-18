@@ -14,7 +14,7 @@ contract LockedGold is ILockedGold, ReentrancyGuard, Initializable, UsingRegistr
 
   using SafeMath for uint256;
 	/* SG: SafeMath128 Start */
-	/*function safeCast128(uint256 x) internal pure returns (uint128 y) {
+	function safeCast128(uint256 x) internal pure returns (uint128 y) {
 		require (x < 2**128);
 		y = uint128(x);
 	}
@@ -27,7 +27,7 @@ contract LockedGold is ILockedGold, ReentrancyGuard, Initializable, UsingRegistr
 	function sub128(uint256 x, uint256 y) private pure returns (uint128 z) {
 		uint256 xy = uint256(x).sub(uint256(y));
 		z = safeCast128(xy);
-	}*/
+	}
 	/* SG: SafeMath128 End */
 
   struct Authorizations {
@@ -111,7 +111,7 @@ contract LockedGold is ILockedGold, ReentrancyGuard, Initializable, UsingRegistr
     bytes32 r,
     bytes32 s
   )
-    internal // CERTORA: Changed from external to internal and added an external wrapper. This allows the harness to call into this function to implement methods per each delegate role.
+    /*external*/public // CERTORA: Changed from external to public
   {
     Account storage account = accounts[msg.sender];
     authorize(voter, account.authorizations.voting, v, r, s);
@@ -119,11 +119,6 @@ contract LockedGold is ILockedGold, ReentrancyGuard, Initializable, UsingRegistr
     emit VoterAuthorized(msg.sender, voter);
   }
   
-  // TODO SG: Remove this after updating the spec
-  function delegateRole(DelegateRole role, address delegate, uint8 v, bytes32 r, bytes32 s) external nonReentrant {
-	_delegateRole(role,delegate,v,r,s);
-  }
-
   /**
    * @notice Authorizes an address to validate on behalf of the account.
    * @param validator The address to authorize.
@@ -138,7 +133,7 @@ contract LockedGold is ILockedGold, ReentrancyGuard, Initializable, UsingRegistr
     bytes32 r,
     bytes32 s
   )
-    external
+    /*external*/public // CERTORA: Changed from external to public
     nonReentrant
   {
     Account storage account = accounts[msg.sender];
@@ -237,14 +232,6 @@ contract LockedGold is ILockedGold, ReentrancyGuard, Initializable, UsingRegistr
     emit GoldUnlocked(msg.sender, value, available);
   }
   
-  /** 
-	Certora
-   */
-  function getNoticePeriodsLen(address _account) internal view returns (uint256) {
-    Account storage account = accounts[_account];
-    return account.commitments.noticePeriods.length;
-  }
-
   // TODO(asa): Allow partial relock
   /**
    * @notice Relocks gold that has been unlocked but not withdrawn.
@@ -258,22 +245,6 @@ contract LockedGold is ILockedGold, ReentrancyGuard, Initializable, UsingRegistr
     _incrementNonvotingAccountBalance(msg.sender, value);
     deletePendingWithdrawal(account.balances.pendingWithdrawals, index);
     emit GoldLocked(msg.sender, value);
-  }
-
-  /** 
-	Certora
-   */
-  function getAvailabilityTimesLen(address _account) internal view returns (uint256) {
-    Account storage account = accounts[_account];
-    return account.commitments.availabilityTimes.length;
-  }
-  
-  /** 
-	Certora
-   */
-  function getFromAvailabilityTimes(address _account,uint256 index) internal view returns (uint256) {
-    Account storage account = accounts[_account];
-    return account.commitments.availabilityTimes[index];
   }
     
   /**
@@ -486,8 +457,4 @@ contract LockedGold is ILockedGold, ReentrancyGuard, Initializable, UsingRegistr
     list.length = lastIndex;
   }
   
-  // SG: For specification
-  function getTotalWeight() external view returns (uint256) {
-	return totalWeight;
-  }
 }

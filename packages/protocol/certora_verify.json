@@ -1,7 +1,0 @@
-[
-	{
-		"type":"spec",
-		"primary_contract":"GovernanceHarness",
-		"specfile":"specs/governance.spec"
-	}
-]
