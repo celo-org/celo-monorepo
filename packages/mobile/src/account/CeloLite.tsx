@@ -5,43 +5,47 @@ import * as React from 'react'
 import { WithNamespaces, withNamespaces } from 'react-i18next'
 import { ScrollView, StyleSheet, Text } from 'react-native'
 import { connect } from 'react-redux'
-import { setAnalyticsEnabled } from 'src/app/actions'
 import i18n, { Namespaces } from 'src/i18n'
 import { headerWithCancelButton } from 'src/navigator/Headers'
 import { RootState } from 'src/redux/reducers'
+import { setZeroSyncMode } from 'src/web3/actions'
 
 interface StateProps {
-  analyticsEnabled: boolean
+  zeroSyncEnabled: boolean
 }
 
 interface DispatchProps {
-  setAnalyticsEnabled: typeof setAnalyticsEnabled
+  setZeroSyncMode: typeof setZeroSyncMode
 }
 
 type Props = StateProps & DispatchProps & WithNamespaces
 
+const mapDispatchToProps = {
+  setZeroSyncMode,
+}
+
 const mapStateToProps = (state: RootState): StateProps => {
   return {
-    analyticsEnabled: state.app.analyticsEnabled,
+    zeroSyncEnabled: state.web3.zeroSyncMode,
   }
 }
 
-export class Analytics extends React.Component<Props> {
+export class CeloLite extends React.Component<Props> {
   static navigationOptions = () => ({
     ...headerWithCancelButton,
-    headerTitle: i18n.t('accountScreen10:analytics'),
+    headerTitle: i18n.t('accountScreen10:celoLite'),
   })
 
   render() {
-    const { analyticsEnabled, t } = this.props
+    const { zeroSyncEnabled, t } = this.props
     return (
       <ScrollView style={style.scrollView} keyboardShouldPersistTaps="handled">
         <SettingsSwitchItem
-          switchValue={analyticsEnabled}
-          onSwitchChange={this.props.setAnalyticsEnabled}
-          details={t('shareAnalytics_detail')}
+          switchValue={zeroSyncEnabled}
+          onSwitchChange={this.props.setZeroSyncMode}
+          details={t('celoLiteDetail')}
         >
-          <Text style={fontStyles.body}>{t('shareAnalytics')}</Text>
+          <Text style={fontStyles.body}>{t('enableCeloLite')}</Text>
         </SettingsSwitchItem>
       </ScrollView>
     )
@@ -57,5 +61,5 @@ const style = StyleSheet.create({
 
 export default connect<StateProps, DispatchProps, {}, RootState>(
   mapStateToProps,
-  { setAnalyticsEnabled }
-)(withNamespaces(Namespaces.accountScreen10)(Analytics))
+  mapDispatchToProps
+)(withNamespaces(Namespaces.accountScreen10)(CeloLite))
