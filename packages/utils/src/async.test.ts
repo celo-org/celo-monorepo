@@ -3,7 +3,7 @@ import { concurrentMap, retryAsync, sleep } from './async'
 describe('retryAsync()', () => {
   test('tries once if it works', async () => {
     const mockFunction = jest.fn()
-    await retryAsync(mockFunction, 2, [], 1)
+    await retryAsync(mockFunction, 3, [], 1)
     expect(mockFunction).toHaveBeenCalledTimes(1)
   })
 
@@ -13,7 +13,7 @@ describe('retryAsync()', () => {
     })
 
     try {
-      await retryAsync(mockFunction, 2, [], 1)
+      await retryAsync(mockFunction, 3, [], 1)
       expect(false).toBeTruthy()
     } catch (error) {
       // should never happen

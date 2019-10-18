@@ -1,5 +1,6 @@
-const esData = require('@umpirsky/country-list/data/es_AR/country.json')
+const esData = require('@umpirsky/country-list/data/es/country.json')
 import countryData from 'country-data'
+import { notEmpty } from './collections'
 
 interface CountryNames {
   [name: string]: string
@@ -24,16 +25,39 @@ const EMPTY_COUNTRY: LocalizedCountry = {
   status: '',
 }
 
+const removeDiacritics = (word: string) =>
+  word &&
+  word
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .toLowerCase()
+    .trim()
+
+interface CountrySearch {
+  displayName: string
+  countryCode: string
+}
+
+const matchCountry = (country: CountrySearch, query: string) => {
+  return (
+    country &&
+    ((country.displayName && country.displayName.startsWith(query)) ||
+      country.countryCode.startsWith('+' + query))
+  )
+}
+
 export class Countries {
   language: string
   countryMap: Map<string, LocalizedCountry>
   localizedCountries: LocalizedCountry[]
+  countriesWithNoDiacritics: CountrySearch[]
 
   constructor(language?: string) {
     // fallback to 'en-us'
     this.language = language ? language.toLocaleLowerCase() : 'en-us'
     this.countryMap = new Map()
     this.localizedCountries = Array()
+    this.countriesWithNoDiacritics = Array()
     this.assignCountries()
   }
 
@@ -42,17 +66,14 @@ export class Countries {
       return EMPTY_COUNTRY
     }
 
-    countryName = countryName.toLowerCase().trim()
+    const query = removeDiacritics(countryName)
 
     // also ignoring EU and FX here, only two missing
-    const country = this.localizedCountries.find(
-      (c: LocalizedCountry) =>
-        c.names !== undefined &&
-        c.names[this.language] !== undefined &&
-        c.names[this.language].toLowerCase() === countryName
+    const countryIndex = this.countriesWithNoDiacritics.findIndex(
+      (country) => country.displayName === query
     )
 
-    return country || EMPTY_COUNTRY
+    return countryIndex !== -1 ? this.localizedCountries[countryIndex] : EMPTY_COUNTRY
   }
 
   getCountryByPhoneCountryCode(countryCode: string): LocalizedCountry {
@@ -74,18 +95,15 @@ export class Countries {
   }
 
   getFilteredCountries(query: string): string[] {
-    query = query.toLowerCase().trim()
+    query = removeDiacritics(query)
     // Return empty list if the query is empty or matches a country exactly
     // This is necessary to hide the autocomplete window on country select
     if (!query || !query.length) {
       return []
     }
 
-    const lng = this.language
-
-    const exactMatch = this.localizedCountries.find(
-      (c: LocalizedCountry) =>
-        c.names && c.names[lng] !== undefined && c.names[lng].toLowerCase() === query
+    const exactMatch = this.countriesWithNoDiacritics.find(
+      (country) => country.displayName === query
     )
 
     // since we no longer have the country name as the map key, we have to
@@ -96,15 +114,16 @@ export class Countries {
 
     // ignoring countries without a provided translation, only ones are
     // EU (European Union) and FX (France, Metropolitan) which don't seem to be used?
-    return this.localizedCountries
-      .filter(
-        (c: LocalizedCountry) =>
-          c.names &&
-          c.names[lng] !== undefined &&
-          (c.names[lng].toLowerCase().startsWith(query) ||
-            c.countryCallingCodes[0].startsWith('+' + query))
-      )
-      .map((c: LocalizedCountry) => c.alpha2)
+    return this.countriesWithNoDiacritics
+      .map((country, index) => {
+        if (matchCountry(country, query)) {
+          return index
+        } else {
+          return null
+        }
+      })
+      .filter(notEmpty)
+      .map((countryIndex: number) => this.localizedCountries[countryIndex].alpha2)
   }
 
   private assignCountries() {
@@ -130,5 +149,10 @@ export class Countries {
         return localizedCountry
       }
     )
+
+    this.countriesWithNoDiacritics = this.localizedCountries.map((country: LocalizedCountry) => ({
+      displayName: removeDiacritics(country.displayName),
+      countryCode: country.countryCallingCodes[0],
+    }))
   }
 }

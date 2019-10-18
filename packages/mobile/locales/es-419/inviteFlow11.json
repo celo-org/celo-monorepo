@@ -15,6 +15,7 @@
   "redeemSuccess": "Código de invitación validado de forma exitosa.",
   "redeemFailed": "No pudimos validar el código de invitación",
   "redeemInviteTimeout": "Canjear invitación agotada",
+  "emptyInviteCode": "El código de invitación no tiene fondos",
   "withdrawGoldFromEscrow": "Retirarndo el oro de la cuenta...",
   "transferGoldToAccount": "Oro transferido a tu cuenta!",
   "withdrawDollarsFromEscrow": "Retirando los {{dollars}} de tu cuenta...",

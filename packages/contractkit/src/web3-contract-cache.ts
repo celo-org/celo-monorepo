@@ -1,6 +1,7 @@
 import debugFactory from 'debug'
 import { CeloContract } from './base'
 import { newAttestations } from './generated/Attestations'
+import { newElection } from './generated/Election'
 import { newEscrow } from './generated/Escrow'
 import { newExchange } from './generated/Exchange'
 import { newGasCurrencyWhitelist } from './generated/GasCurrencyWhitelist'
@@ -20,13 +21,14 @@ const debug = debugFactory('kit:web3-contract-cache')
 
 const ContractFactories = {
   [CeloContract.Attestations]: newAttestations,
-  [CeloContract.LockedGold]: newLockedGold,
+  [CeloContract.Election]: newElection,
   [CeloContract.Escrow]: newEscrow,
   [CeloContract.Exchange]: newExchange,
   [CeloContract.GasCurrencyWhitelist]: newGasCurrencyWhitelist,
   [CeloContract.GasPriceMinimum]: newGasPriceMinimum,
   [CeloContract.GoldToken]: newGoldToken,
   [CeloContract.Governance]: newGovernance,
+  [CeloContract.LockedGold]: newLockedGold,
   [CeloContract.Random]: newRandom,
   [CeloContract.Registry]: newRegistry,
   [CeloContract.Reserve]: newReserve,
@@ -38,6 +40,14 @@ const ContractFactories = {
 type CFType = typeof ContractFactories
 type ContractCacheMap = { [K in keyof CFType]?: ReturnType<CFType[K]> }
 
+/**
+ * Native Web3 contracts factory and cache.
+ *
+ * Exposes accessors to all `CeloContract` web3 contracts.
+ *
+ * Mostly a private cache, kit users would normally use
+ * a contract wrapper
+ */
 export class Web3ContractCache {
   private cacheMap: ContractCacheMap = {}
 
@@ -48,6 +58,9 @@ export class Web3ContractCache {
   }
   getLockedGold() {
     return this.getContract(CeloContract.LockedGold)
+  }
+  getElection() {
+    return this.getContract(CeloContract.Election)
   }
   getEscrow() {
     return this.getContract(CeloContract.Escrow)
@@ -86,6 +99,9 @@ export class Web3ContractCache {
     return this.getContract(CeloContract.Validators)
   }
 
+  /**
+   * Get native web3 contract wrapper
+   */
   async getContract<C extends keyof typeof ContractFactories>(contract: C) {
     if (this.cacheMap[contract] == null) {
       debug('Initiating contract %s', contract)

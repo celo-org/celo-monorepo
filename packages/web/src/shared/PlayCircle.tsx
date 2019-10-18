@@ -15,3 +15,21 @@ export default class PlayCircle extends React.PureComponent {
     )
   }
 }
+
+interface Props {
+  height: number
+  color?: colors
+}
+
+export function PlayCircle2(props) {
+  return (
+    <Svg width={props.height} height={props.height} viewBox="0 0 40 40" fill="none">
+      <Path
+        fillRule="evenodd"
+        clipRule="evenodd"
+        d="M20 40C31.0457 40 40 31.0457 40 20C40 8.9543 31.0457 0 20 0C8.9543 0 0 8.9543 0 20C0 31.0457 8.9543 40 20 40ZM16.7857 24.9487L26.4286 20L16.7857 15.0513V24.9487Z"
+        fill={props.color || colors.white}
+      />
+    </Svg>
+  )
+}

@@ -29,6 +29,7 @@ declare module 'react-native' {
     cursor?: string
     display?: 'none' | 'flex' | 'inline' | 'inline-flex'
     fill?: string
+    filter?: string
   }
 
   interface ImageProps {

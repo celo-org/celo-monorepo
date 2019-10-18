@@ -2,13 +2,15 @@ import {
   awaitConfirmation,
   getStableTokenContract,
   sendTransactionAsync,
+  sendTransactionAsyncWithWeb3Signing,
   SendTransactionLogEvent,
   SendTransactionLogEventType,
 } from '@celo/walletkit'
 import CeloAnalytics from 'src/analytics/CeloAnalytics'
 import { CustomEventNames } from 'src/analytics/constants'
+import { DEFAULT_INFURA_URL } from 'src/config'
 import Logger from 'src/utils/Logger'
-import { web3 } from 'src/web3/contracts'
+import { isZeroSyncMode, web3 } from 'src/web3/contracts'
 import { TransactionObject } from 'web3/eth/types'
 
 // As per https://www.typescriptlang.org/docs/handbook/advanced-types.html#exhaustiveness-checking
@@ -61,8 +63,38 @@ export const sendTransactionPromises = async (
   txId: string,
   staticGas?: number | undefined
 ) => {
+  Logger.debug(
+    'transactions/send@sendTransactionPromises',
+    `Going to send a transaction with id ${txId}`
+  )
   const stableToken = await getStableTokenContract(web3)
-  return sendTransactionAsync(tx, account, stableToken, getLogger(tag, txId), staticGas)
+  // This if-else case is temprary and will disappear once we move from `walletkit` to `contractkit`.
+  if (isZeroSyncMode()) {
+    // In dev mode, verify that we are actually able to connect to the network. This
+    // ensures that we get a more meaningful error if the infura server is down, which
+    // can happen with networks without SLA guarantees like `integration`.
+    if (__DEV__) {
+      await verifyUrlWorksOrThrow(DEFAULT_INFURA_URL)
+    }
+    Logger.debug(
+      'transactions/send@sendTransactionPromises',
+      `Sending transaction with id ${txId} using web3 signing`
+    )
+    return sendTransactionAsyncWithWeb3Signing(
+      web3,
+      tx,
+      account,
+      stableToken,
+      getLogger(tag, txId),
+      staticGas
+    )
+  } else {
+    Logger.debug(
+      'transactions/send@sendTransactionPromises',
+      `Sending transaction with id ${txId} using geth signing`
+    )
+    return sendTransactionAsync(tx, account, stableToken, getLogger(tag, txId), staticGas)
+  }
 }
 
 // Send a transaction and await for its confirmation
@@ -75,4 +107,17 @@ export const sendTransaction = async (
   staticGas?: number | undefined
 ) => {
   return sendTransactionPromises(tx, account, tag, txId, staticGas).then(awaitConfirmation)
+}
+
+async function verifyUrlWorksOrThrow(url: string) {
+  try {
+    await fetch(url)
+  } catch (e) {
+    Logger.error(
+      'contracts@verifyUrlWorksOrThrow',
+      `Failed to perform HEAD request to url: \"${url}\"`,
+      e
+    )
+    throw new Error(`Failed to perform HEAD request to url: \"${url}\", is it working?`)
+  }
 }

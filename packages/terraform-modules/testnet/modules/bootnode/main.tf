@@ -11,6 +11,8 @@ resource "google_compute_instance" "bootnode" {
   name         = local.name_prefix
   machine_type = "n1-standard-1"
 
+  allow_stopping_for_update = true
+
   boot_disk {
     initialize_params {
       image = "debian-cloud/debian-9"
@@ -35,11 +37,15 @@ resource "google_compute_instance" "bootnode" {
       geth_bootnode_docker_image_repository : var.geth_bootnode_docker_image_repository,
       geth_bootnode_docker_image_tag : var.geth_bootnode_docker_image_tag,
       ip_address : google_compute_address.bootnode.address,
+      network_id : var.network_id
     }
   )
 
   service_account {
-    email  = var.gcloud_vm_service_account_email
-    scopes = ["storage-ro"]
+    email = var.gcloud_vm_service_account_email
+    scopes = [
+      "https://www.googleapis.com/auth/devstorage.read_only",
+      "https://www.googleapis.com/auth/logging.write"
+    ]
   }
 }

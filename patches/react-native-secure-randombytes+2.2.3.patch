@@ -1,4 +1,18 @@
 patch-package
+--- a/node_modules/react-native-secure-randombytes/RNRandomBytes.m
++++ b/node_modules/react-native-secure-randombytes/RNRandomBytes.m
+@@ -20,6 +20,11 @@ RCT_EXPORT_MODULE()
+ 
+ @synthesize bridge = _bridge;
+ 
+++ (BOOL)requiresMainQueueSetup
++{
++    return YES;
++}
++
+ RCT_EXPORT_METHOD(randomBytes:(NSUInteger)length
+                   callback:(RCTResponseSenderBlock)callback)
+ {
 new file mode 100644
 --- /dev/null
 +++ b/node_modules/react-native-secure-randombytes/RNRandomBytes.podspec

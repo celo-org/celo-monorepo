@@ -37,7 +37,7 @@ import com.learnium.RNDeviceInfo.RNDeviceInfo;
 import com.levelasquez.androidopensettings.AndroidOpenSettingsPackage;
 import com.lugg.ReactNativeConfig.ReactNativeConfigPackage;
 import com.peel.react.TcpSocketsModule;
-import com.reactcommunity.rnlanguages.RNLanguagesPackage;
+import com.reactcommunity.rnlocalize.RNLocalizePackage;
 import com.reactnativegeth.RNGethPackage;
 import com.rnfs.RNFSPackage;
 import com.rt2zz.reactnativecontacts.ReactNativeContacts;
@@ -50,6 +50,7 @@ import cl.json.RNSharePackage;
 import cl.json.ShareApplication;
 import com.rninstallreferrer.RNInstallReferrerPackage;
 import com.reactlibrary.securekeystore.RNSecureKeyStorePackage;
+import com.th3rdwave.safeareacontext.SafeAreaContextPackage;
 
 import android.util.Log;
 
@@ -63,8 +64,6 @@ import ru.ivanarh.jndcrash.NDCrashUnwinder;
 
 // Disabled due to dex count
 // import com.swmansion.rnscreens.RNScreensPackage;
-// import com.instabug.library.invocation.InstabugInvocationEvent;
-// import com.instabug.reactlibrary.RNInstabugReactnativePackage;
 
 public class MainApplication extends Application implements ShareApplication, ReactApplication {
 
@@ -91,7 +90,7 @@ public class MainApplication extends Application implements ShareApplication, Re
               new SplashScreenReactPackage(),
               new AndroidOpenSettingsPackage(),
               new UdpSocketsModule(),
-              new RNLanguagesPackage(),
+              new RNLocalizePackage(),
               new ReactNativeConfigPackage(),
               new RNFirebasePackage(),
               new RNFirebaseMessagingPackage(),
@@ -113,7 +112,8 @@ public class MainApplication extends Application implements ShareApplication, Re
               new RNRestartAndroidPackage(),
               new RNSmsRetrieverPackage(),
               new RNSharePackage(),
-              new RNSecureKeyStorePackage()
+              new RNSecureKeyStorePackage(),
+              new SafeAreaContextPackage()
               // Disabled due to dex count
               // new RNScreensPackage(),
       };
@@ -126,20 +126,6 @@ public class MainApplication extends Application implements ShareApplication, Re
         packageList.add(new RNConfirmDeviceCredentialsPackage());
       }
 
-      // Instabug - disabled due to dex count
-      //
-      // String tempInvocationEvents = BuildConfig.INSTABUG_EVENTS;
-      // String[] instabugInvocationEvents = tempInvocationEvents.split(",");
-
-      // if (instabugInvocationEvents.length > 0) {
-      //   packageList.add(new RNInstabugReactnativePackage.Builder(BuildConfig.INSTABUG_TOKEN, MainApplication.this)
-      //           .setInvocationEvent(instabugInvocationEvents)
-      //           .setPrimaryColor("#42D689")
-      //           .setFloatingEdge("right")
-      //           .setFloatingButtonOffsetFromTop(250)
-      //           .build());
-      // }
-  
       return packageList;
     }
 

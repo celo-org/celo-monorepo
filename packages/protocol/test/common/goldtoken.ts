@@ -17,6 +17,7 @@ GoldToken.numberFormat = 'BigNumber'
 contract('GoldToken', (accounts: string[]) => {
   let goldToken: GoldTokenInstance
   const ONE_GOLDTOKEN = new BigNumber('1000000000000000000')
+  const TWO_GOLDTOKEN = new BigNumber('2000000000000000000')
   const sender = accounts[0]
   const receiver = accounts[1]
 
@@ -54,6 +55,22 @@ contract('GoldToken', (accounts: string[]) => {
   describe('#approve()', () => {
     it('should set "allowed"', async () => {
       await goldToken.approve(receiver, ONE_GOLDTOKEN)
+      assert.equal((await goldToken.allowance(sender, receiver)).valueOf(), ONE_GOLDTOKEN.valueOf())
+    })
+  })
+
+  describe('#increaseAllowance()', () => {
+    it('should increase "allowed"', async () => {
+      await goldToken.increaseAllowance(receiver, ONE_GOLDTOKEN)
+      await goldToken.increaseAllowance(receiver, ONE_GOLDTOKEN)
+      assert.equal((await goldToken.allowance(sender, receiver)).valueOf(), TWO_GOLDTOKEN.valueOf())
+    })
+  })
+
+  describe('#decreaseAllowance()', () => {
+    it('should decrease "allowed"', async () => {
+      await goldToken.approve(receiver, TWO_GOLDTOKEN)
+      await goldToken.decreaseAllowance(receiver, ONE_GOLDTOKEN)
       assert.equal((await goldToken.allowance(sender, receiver)).valueOf(), ONE_GOLDTOKEN.valueOf())
     })
   })

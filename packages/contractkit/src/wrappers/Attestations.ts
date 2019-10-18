@@ -4,7 +4,15 @@ import BigNumber from 'bignumber.js'
 import * as Web3Utils from 'web3-utils'
 import { Address, CeloToken } from '../base'
 import { Attestations } from '../generated/types/Attestations'
-import { BaseWrapper, proxyCall, proxySend, toNumber, tupleParser, wrapSend } from './BaseWrapper'
+import {
+  BaseWrapper,
+  proxyCall,
+  proxySend,
+  toBigNumber,
+  toNumber,
+  toTransactionObject,
+  tupleParser,
+} from './BaseWrapper'
 const parseSignature = SignatureUtils.parseSignature
 
 export interface AttestationStat {
@@ -12,6 +20,19 @@ export interface AttestationStat {
   total: number
 }
 
+export interface AttestationsToken {
+  address: Address
+  fee: BigNumber
+}
+
+export interface AttestationsConfig {
+  attestationExpirySeconds: number
+  attestationRequestFees: AttestationsToken[]
+}
+
+/**
+ * Contract for managing identities
+ */
 export enum AttestationState {
   None,
   Incomplete,
@@ -49,6 +70,17 @@ export class AttestationsWrapper extends BaseWrapper<Attestations> {
   )
 
   /**
+   * Returns the attestation request fee in a given currency.
+   * @param address Token address.
+   * @returns The fee as big number.
+   */
+  attestationRequestFees = proxyCall(
+    this.contract.methods.attestationRequestFees,
+    undefined,
+    toBigNumber
+  )
+
+  /**
    * Returns the attestation stats of a phone number/account pair
    * @param phoneNumber Phone Number
    * @param account Account
@@ -69,6 +101,12 @@ export class AttestationsWrapper extends BaseWrapper<Attestations> {
   getWalletAddress = proxyCall(this.contract.methods.getWalletAddress)
 
   /**
+   * Returns the metadataURL for the account
+   * @param account Account
+   */
+  getMetadataURL = proxyCall(this.contract.methods.getMetadataURL)
+
+  /**
    * Sets the data encryption of the account
    * @param encryptionKey The key to set
    */
@@ -76,6 +114,12 @@ export class AttestationsWrapper extends BaseWrapper<Attestations> {
     this.kit,
     this.contract.methods.setAccountDataEncryptionKey
   )
+
+  /**
+   * Sets the metadataURL for the account
+   * @param url The url to set
+   */
+  setMetadataURL = proxySend(this.kit, this.contract.methods.setMetadataURL)
 
   /**
    * Sets the wallet address for the account
@@ -162,7 +206,7 @@ export class AttestationsWrapper extends BaseWrapper<Attestations> {
     const phoneHash = PhoneNumberUtils.getPhoneHash(phoneNumber)
     const expectedSourceMessage = attestationMessageToSign(phoneHash, account)
     const { r, s, v } = parseSignature(expectedSourceMessage, code, issuer.toLowerCase())
-    return wrapSend(this.kit, this.contract.methods.complete(phoneHash, v, r, s))
+    return toTransactionObject(this.kit, this.contract.methods.complete(phoneHash, v, r, s))
   }
 
   /**
@@ -190,6 +234,23 @@ export class AttestationsWrapper extends BaseWrapper<Attestations> {
       }
     }
     return null
+  }
+
+  /**
+   * Returns the current configuration parameters for the contract.
+   * @param tokens List of tokens used for attestation fees.
+   */
+  async getConfig(tokens: string[]): Promise<AttestationsConfig> {
+    const fees = await Promise.all(
+      tokens.map(async (token) => {
+        const fee = await this.attestationRequestFees(token)
+        return { fee, address: token }
+      })
+    )
+    return {
+      attestationExpirySeconds: await this.attestationExpirySeconds(),
+      attestationRequestFees: fees,
+    }
   }
 
   /**
@@ -244,7 +305,7 @@ export class AttestationsWrapper extends BaseWrapper<Attestations> {
   async request(phoneNumber: string, attestationsRequested: number, token: CeloToken) {
     const phoneHash = PhoneNumberUtils.getPhoneHash(phoneNumber)
     const tokenAddress = await this.kit.registry.addressFor(token)
-    return wrapSend(
+    return toTransactionObject(
       this.kit,
       this.contract.methods.request(phoneHash, attestationsRequested, tokenAddress)
     )
@@ -271,7 +332,7 @@ export class AttestationsWrapper extends BaseWrapper<Attestations> {
         Buffer.from(phoneNumber, 'utf8')
       ).toString('hex')
 
-    return wrapSend(
+    return toTransactionObject(
       this.kit,
       this.contract.methods.reveal(
         PhoneNumberUtils.getPhoneHash(phoneNumber),

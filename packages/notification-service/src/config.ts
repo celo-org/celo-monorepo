@@ -30,8 +30,6 @@ export const FIREBASE_DB = process.env.FIREBASE_DB
 const ENFORCE_NOTIFICATIONS = process.env.ENFORCE_LOCAL_NOTIFICATIONS === 'true'
 export const NOTIFICATIONS_DISABLED = !ENFORCE_NOTIFICATIONS && ENVIRONMENT === 'local'
 export const BLOCKSCOUT_API = process.env.BLOCKSCOUT_API
-export const STABLE_TOKEN_ADDRESS = (process.env.STABLE_TOKEN_ADDRESS || '').toLowerCase()
-export const GOLD_TOKEN_ADDRESS = (process.env.GOLD_TOKEN_ADDRESS || '').toLowerCase()
 export const DEFAULT_LOCALE = process.env.DEFAULT_LOCALE
 export const POLLING_INTERVAL = Number(process.env.POLLING_INTERVAL) || 1000
 export const NOTIFICATIONS_TTL_MS = Number(process.env.NOTIFICATION_TTL_MS) || 3600 * 1000 * 24 * 7 // 1 week in milliseconds

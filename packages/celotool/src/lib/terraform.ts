@@ -9,7 +9,7 @@ export interface TerraformVars {
 }
 
 // Terraform requires the `backend-config` options to configure a remote backend
-// with dynamic values
+// with dynamic values. Sends stdout to /dev/null.
 export async function initTerraformModule(
   moduleName: string,
   vars: TerraformVars,
@@ -21,7 +21,9 @@ export async function initTerraformModule(
     modulePath,
     modulePath,
     getVarOptions(vars),
-    getVarOptions(backendConfigVars, 'backend-config')
+    getVarOptions(backendConfigVars, 'backend-config'),
+    '-reconfigure',
+    '> /dev/null'
   )
 }
 
@@ -73,12 +75,7 @@ function refreshTerraformModule(moduleName: string, vars: TerraformVars) {
   return buildAndExecTerraformCmd('refresh', getModulePath(moduleName), getVarOptions(vars))
 }
 
-export async function getTerraformModuleOutputs(
-  moduleName: string,
-  vars: TerraformVars,
-  backendConfigVars: TerraformVars
-) {
-  await initTerraformModule(moduleName, vars, backendConfigVars)
+export async function getTerraformModuleOutputs(moduleName: string, vars: TerraformVars) {
   await refreshTerraformModule(moduleName, vars)
   const modulePath = getModulePath(moduleName)
   const [output] = await execCmd(`cd ${modulePath} && terraform output -json`)
@@ -89,6 +86,14 @@ export async function getTerraformModuleOutputs(
 export async function getTerraformModuleResourceNames(moduleName: string) {
   const [output] = await execTerraformCmd(`terraform state list`, getModulePath(moduleName), false)
   return output.split('\n')
+}
+
+export function showTerraformModulePlan(moduleName: string) {
+  return execTerraformCmd(
+    `terraform show ${getPlanPath(moduleName)}`,
+    getModulePath(moduleName),
+    true
+  )
 }
 
 function getModulePath(moduleName: string) {

@@ -111,7 +111,9 @@ export class Activity extends React.Component<Props> {
       return
     }
     this.updateStats(data.rewards)
-    createMessagePhoneMapping()
+    createMessagePhoneMapping().catch((err) => {
+      console.error(`createMessagePhoneMapping() error`, err)
+    })
   }
 
   updateStats = (rewards: Array<RewardTransaction | null>) => {

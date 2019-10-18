@@ -15,6 +15,7 @@
   "redeemSuccess": "Successfully redeemed invite code.",
   "redeemFailed": "Failure redeeming code ",
   "redeemInviteTimeout": "Redeem Invite Timed out",
+  "emptyInviteCode": "Invite code has no funds",
   "withdrawGoldFromEscrow": "Withdrawing gold from escrow...",
   "transferGoldToAccount": "Gold transferred to your account!",
   "withdrawDollarsFromEscrow": "Withdrawing {{dollars}} from escrow...",

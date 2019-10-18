@@ -56,6 +56,7 @@ export const vNeg1Schema = {
     account: '0x0000000000000000000000000000000000007E57',
     commentKey: '0x0000000000000000000000000000000000008F68',
     gasPriceLastUpdated: 0,
+    zeroSyncMode: false,
   },
   identity: {
     attestationCodes: [],
@@ -147,8 +148,26 @@ export const v2Schema = {
     pincodeType: PincodeType.Unset,
     isSettingPin: false,
   },
+  invite: {
+    ...v1Schema.invite,
+    isRedeemingInvite: false,
+  },
+}
+
+export const v3Schema = {
+  ...v2Schema,
+  localCurrency: {
+    ...v2Schema.localCurrency,
+    preferredCurrencyCode: 'MXN',
+    fetchedCurrencyCode: 'MXN',
+    symbol: undefined,
+  },
+  imports: {
+    isImportingWallet: false,
+    isWalletEmpty: false,
+  },
 }
 
 export function getLatestSchema(): Partial<RootState> {
-  return v2Schema as Partial<RootState>
+  return v3Schema as Partial<RootState>
 }

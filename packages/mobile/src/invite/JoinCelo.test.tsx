@@ -37,13 +37,11 @@ describe('JoinCeloScreen', () => {
           hideAlert={jest.fn()}
           setPhoneNumber={jest.fn()}
           setName={jest.fn()}
-          error={null}
           language={'en-us'}
           cachedName={''}
           cachedNumber={''}
           cachedCountryCode={''}
           pincodeType={PincodeType.Unset}
-          redeemComplete={jest.fn()}
           {...getMockI18nProps()}
         />
       </Provider>
@@ -61,13 +59,11 @@ describe('JoinCeloScreen', () => {
           hideAlert={jest.fn()}
           setPhoneNumber={jest.fn()}
           setName={jest.fn()}
-          error={null}
           language={'en-us'}
           cachedName={''}
           cachedNumber={''}
           cachedCountryCode={''}
           pincodeType={PincodeType.Unset}
-          redeemComplete={jest.fn()}
           {...getMockI18nProps()}
         />
       </Provider>

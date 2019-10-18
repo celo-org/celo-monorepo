@@ -16,6 +16,7 @@ import {
   StyleSheet,
   View,
 } from 'react-native'
+import SafeAreaView from 'react-native-safe-area-view'
 import { BoxShadow } from 'react-native-shadow'
 import { connect } from 'react-redux'
 import { bindActionCreators } from 'redux'
@@ -209,7 +210,7 @@ export class WalletHome extends React.Component<Props> {
     })
 
     return (
-      <View style={styles.container}>
+      <SafeAreaView style={styles.container}>
         {/* Why this mess? Android only has shadows from elevation, and we have to fade in under
             If we use elevation, it appears on top of the title. The box shadow enables to fade
             in a shadow from underneath */}
@@ -249,7 +250,7 @@ export class WalletHome extends React.Component<Props> {
           ListHeaderComponent={CeloDollarsOverview}
           keyExtractor={this.keyExtractor}
         />
-      </View>
+      </SafeAreaView>
     )
   }
 }

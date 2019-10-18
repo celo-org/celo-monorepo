@@ -1,5 +1,5 @@
 import 'node-libs-react-native/globals'
-import 'src/btoa'
+import 'src/missingGlobals'
 import { AppRegistry } from 'react-native'
 import Logger from 'src/utils/Logger'
 import App from 'src/app/App'

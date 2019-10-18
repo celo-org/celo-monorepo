@@ -5,7 +5,7 @@ import { GoldTokenInstance, StableTokenInstance } from 'types'
  * A simple script to check token balances on a testnet.
  *
  * Expects the following flags:
- * network: name of the network defined in truffle.js to deploy to
+ * network: name of the network defined in truffle-config.js to deploy to
  * account: address of the account to transfer tokens to
  *
  * Run using truffle exec, e.g.:

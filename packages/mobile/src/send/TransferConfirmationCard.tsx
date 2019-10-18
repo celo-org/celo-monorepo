@@ -9,12 +9,14 @@ import * as React from 'react'
 import { withNamespaces, WithNamespaces } from 'react-i18next'
 import { Image, StyleSheet, Text, View } from 'react-native'
 import Avatar from 'src/components/Avatar'
+import { FAQ_LINK } from 'src/config'
 import { CURRENCY_ENUM } from 'src/geth/consts'
 import { Namespaces } from 'src/i18n'
 import { faucetIcon } from 'src/images/Images'
 import { Recipient } from 'src/recipients/recipient'
 import { TransactionTypes } from 'src/transactions/reducer'
-import { getMoneyDisplayValue } from 'src/utils/formatting'
+import { getMoneyDisplayValue, getNetworkFeeDisplayValue } from 'src/utils/formatting'
+import { navigateToURI } from 'src/utils/linking'
 
 const iconSize = 40
 
@@ -32,9 +34,17 @@ export interface OwnProps {
 // Bordered content placed in a ReviewFrame
 // Differs from TransferReviewCard which is used during Send flow, this is for completed txs
 class TransferConfirmationCard extends React.Component<OwnProps & WithNamespaces> {
+  onPressGoToFaq = () => {
+    navigateToURI(FAQ_LINK)
+  }
+
   renderTopSection = () => {
     const { address, recipient, type, e164PhoneNumber } = this.props
-    if (type === TransactionTypes.VERIFICATION_FEE || type === TransactionTypes.FAUCET) {
+    if (
+      type === TransactionTypes.VERIFICATION_FEE ||
+      type === TransactionTypes.NETWORK_FEE ||
+      type === TransactionTypes.FAUCET
+    ) {
       return <Image source={faucetIcon} style={style.icon} />
     } else {
       return (
@@ -51,11 +61,22 @@ class TransferConfirmationCard extends React.Component<OwnProps & WithNamespaces
   renderAmountSection = () => {
     const { currency, type, value } = this.props
 
-    if (type === TransactionTypes.INVITE_SENT || type === TransactionTypes.INVITE_RECEIVED) {
-      return null
+    switch (type) {
+      case TransactionTypes.INVITE_SENT: // fallthrough
+      case TransactionTypes.INVITE_RECEIVED:
+        return null
+      case TransactionTypes.NETWORK_FEE:
+        return (
+          <MoneyAmount
+            symbol={CURRENCIES[currency].symbol}
+            amount={getNetworkFeeDisplayValue(value, true)}
+          />
+        )
+      default:
+        return (
+          <MoneyAmount symbol={CURRENCIES[currency].symbol} amount={getMoneyDisplayValue(value)} />
+        )
     }
-
-    return <MoneyAmount symbol={CURRENCIES[currency].symbol} amount={getMoneyDisplayValue(value)} />
   }
 
   renderBottomSection = () => {
@@ -71,6 +92,17 @@ class TransferConfirmationCard extends React.Component<OwnProps & WithNamespaces
           {getMoneyDisplayValue(this.props.value)}
           {t('receiveFlow8:receivedAmountFromCelo.1')}
         </Text>
+      )
+    } else if (type === TransactionTypes.NETWORK_FEE) {
+      return (
+        <View>
+          <Text style={style.pSmall}>
+            {t('walletFlow5:networkFeeExplanation.0')}
+            <Text onPress={this.onPressGoToFaq} style={fontStyles.link}>
+              {t('walletFlow5:networkFeeExplanation.1')}
+            </Text>
+          </Text>
+        </View>
       )
     } else if (type === TransactionTypes.INVITE_SENT || type === TransactionTypes.INVITE_RECEIVED) {
       return (

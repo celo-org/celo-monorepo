@@ -7,6 +7,7 @@ import * as React from 'react'
 import { WithNamespaces, withNamespaces } from 'react-i18next'
 import { Image, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
 import Modal from 'react-native-modal'
+import SafeAreaView from 'react-native-safe-area-view'
 import CeloAnalytics from 'src/analytics/CeloAnalytics'
 import { CustomEventNames } from 'src/analytics/constants'
 import componentWithAnalytics from 'src/analytics/wrapper'
@@ -93,7 +94,7 @@ class BackupIntroduction extends React.Component<Props, State> {
   render() {
     const { t, backupDelayedTime, backupTooLate } = this.props
     return (
-      <View style={styles.container}>
+      <SafeAreaView style={styles.container}>
         <View style={componentStyles.topBar}>
           <CancelButton onCancel={this.props.onCancel} />
         </View>
@@ -137,7 +138,7 @@ class BackupIntroduction extends React.Component<Props, State> {
             />
           )}
         </View>
-      </View>
+      </SafeAreaView>
     )
   }
 }

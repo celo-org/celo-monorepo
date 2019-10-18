@@ -22,9 +22,12 @@ const fragmentMatcher = new IntrospectionFragmentMatcher({
 
 const cache = new InMemoryCache({ fragmentMatcher })
 
+// TODO what should happen if this fails???
 persistCache({
   cache,
   storage: AsyncStorage,
+}).catch((err) => {
+  console.error('Apollo.persistCache error', err)
 })
 
 export const apolloClient = new ApolloClient<InMemoryCache>({

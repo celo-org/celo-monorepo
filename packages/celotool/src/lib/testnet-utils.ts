@@ -67,7 +67,7 @@ export async function uploadStaticNodesToGoogleStorage(networkName: string) {
 
 export async function uploadEnvFileToGoogleStorage(networkName: string) {
   const envFileName = getEnvFile(networkName)
-  const gitUserInfo = `${await getGitUserName()} <${await getGitUserEmail()}>`
+  const userInfo = `${await getGoogleCloudUserInfo()}`
   const repo = await getGitRepoName()
   const commitHash = await getCommitHash()
 
@@ -78,7 +78,7 @@ export async function uploadEnvFileToGoogleStorage(networkName: string) {
   const envFileData = fs.readFileSync(getEnvFile(networkName)).toString()
   const metaData =
     `# .env file for network "${networkName}"\n` +
-    `# Last modified by "${gitUserInfo}"\n` +
+    `# Last modified by "${userInfo}"\n` +
     `# Last modified on on ${Date()}\n` +
     `# Base commit: "https://github.com/${repo}/commit/${commitHash}"\n`
   const fullData = metaData + '\n' + envFileData
@@ -93,14 +93,8 @@ export async function uploadEnvFileToGoogleStorage(networkName: string) {
   )
 }
 
-async function getGitUserName(): Promise<string> {
-  const cmd = 'git config --get user.name'
-  const stdout = (await execCmdWithExitOnFailure(cmd))[0]
-  return stdout.trim()
-}
-
-async function getGitUserEmail(): Promise<string> {
-  const cmd = 'git config --get user.email'
+async function getGoogleCloudUserInfo(): Promise<string> {
+  const cmd = 'gcloud config get-value account'
   const stdout = (await execCmdWithExitOnFailure(cmd))[0]
   return stdout.trim()
 }

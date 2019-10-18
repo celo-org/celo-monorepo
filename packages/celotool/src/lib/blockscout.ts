@@ -1,7 +1,7 @@
 import { fetchEnv, fetchEnvOrFallback, isVmBased } from './env-utils'
 import { installGenericHelmChart, removeGenericHelmChart } from './helm_deploy'
 import { execCmdWithExitOnFailure } from './utils'
-import { getTestnetOutputs } from './vm-testnet-utils'
+import { getTxNodeLoadBalancerIP } from './vm-testnet-utils'
 
 export async function installHelmChart(
   celoEnv: string,
@@ -70,8 +70,7 @@ async function helmParameters(
     `--set promtosd.export_interval=${fetchEnv('PROMTOSD_EXPORT_INTERVAL')}`,
   ]
   if (isVmBased()) {
-    const outputs = await getTestnetOutputs(celoEnv)
-    const txNodeLbIp = outputs.tx_node_lb_ip_address.value
+    const txNodeLbIp = getTxNodeLoadBalancerIP(celoEnv)
     params.push(`--set blockscout.jsonrpc_http_url=http://${txNodeLbIp}:8545`)
     params.push(`--set blockscout.jsonrpc_ws_url=ws://${txNodeLbIp}:8546`)
   }

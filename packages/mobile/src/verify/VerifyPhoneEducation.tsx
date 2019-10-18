@@ -4,6 +4,7 @@ import { fontStyles } from '@celo/react-components/styles/fonts'
 import * as React from 'react'
 import { withNamespaces, WithNamespaces } from 'react-i18next'
 import { ScrollView, StyleSheet, Text, View } from 'react-native'
+import SafeAreaView from 'react-native-safe-area-view'
 import componentWithAnalytics from 'src/analytics/wrapper'
 import DevSkipButton from 'src/components/DevSkipButton'
 import FindUser from 'src/icons/FindUser'
@@ -24,7 +25,7 @@ export class VerifyPhoneEducation extends React.Component<WithNamespaces> {
   render() {
     const { t } = this.props
     return (
-      <View style={style.container}>
+      <SafeAreaView style={style.container}>
         <ScrollView contentContainerStyle={style.scrollContainer}>
           <DevSkipButton nextScreen={Screens.WalletHome} />
           <NuxLogo testID="VerifyLogo" />
@@ -53,7 +54,7 @@ export class VerifyPhoneEducation extends React.Component<WithNamespaces> {
             testID="VerifyContinueButton"
           />
         </View>
-      </View>
+      </SafeAreaView>
     )
   }
 }

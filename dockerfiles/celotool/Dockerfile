@@ -1,4 +1,4 @@
-FROM node:8
+FROM node:10
 WORKDIR /celo-monorepo
 
 # Needed for gsutil
@@ -23,7 +23,7 @@ COPY packages/protocol/package.json packages/protocol/
 COPY packages/verification-pool-api/package.json packages/verification-pool-api/
 COPY packages/celotool/package.json packages/celotool/
 
-RUN yarn install --frozen-lockfile && yarn cache clean
+RUN yarn install --network-timeout 100000 --frozen-lockfile && yarn cache clean
 
 COPY packages/utils packages/utils/
 COPY packages/typescript packages/typescript/

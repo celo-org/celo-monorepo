@@ -48,7 +48,7 @@ export default class FirebaseLogUploader {
     await RNFS.moveFile(logFilePath, tmpFilePath)
     // Don't "await" here. While everything else in this async method is relatively fast, data upload can be slow
     // and we don't want to block the user from using the app.
-    FirebaseLogUploader.uploadLogsToFirebaseStorage(tmpFilePath, uploadPath, uploadFileName)
+    return FirebaseLogUploader.uploadLogsToFirebaseStorage(tmpFilePath, uploadPath, uploadFileName)
   }
 
   // Uploaded logs can be seen at

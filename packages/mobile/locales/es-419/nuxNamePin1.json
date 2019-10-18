@@ -36,10 +36,7 @@
       "message": "Pegar código de invitación!",
       "hint": "Parece que has copiado un código"
     },
-    "validating": {
-      "0": "Genial! ",
-      "1": "Validando el código de invitación copiado"
-    },
+    "validating": "Genial! Validando el código de invitación copiado",
     "inviteAccepted": "🎉 Invitación aceptada!",
     "askForInvite": {
       "0": "Solicite una invitación de alguien con Celo Monedero o regístrese en Testnet en ",

@@ -1,7 +1,7 @@
 /* Shared mock values to facilitate testing */
 import BigNumber from 'bignumber.js'
 import { MinimalContact } from 'react-native-contacts'
-import { NotificationTypes, PaymentRequest, PaymentRequestStatuses } from 'src/account/types'
+import { NotificationTypes, PaymentRequest, PaymentRequestStatus } from 'src/account/types'
 import { EscrowedPayment } from 'src/escrow/actions'
 import { SHORT_CURRENCIES } from 'src/geth/consts'
 import { AddressToE164NumberType, E164NumberToAddressType } from 'src/identity/reducer'
@@ -146,7 +146,7 @@ export const mockPaymentRequests: PaymentRequest[] = [
     requesteeAddress: mockAccount,
     currency: SHORT_CURRENCIES.DOLLAR,
     comment: mockComment,
-    status: PaymentRequestStatuses.REQUESTED,
+    status: PaymentRequestStatus.REQUESTED,
     notified: true,
     type: NotificationTypes.PAYMENT_REQUESTED,
   },

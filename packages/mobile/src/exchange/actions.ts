@@ -27,6 +27,7 @@ import { roundDown } from 'src/utils/formatting'
 import Logger from 'src/utils/Logger'
 import { web3 } from 'src/web3/contracts'
 import { getConnectedAccount, getConnectedUnlockedAccount } from 'src/web3/saga'
+import * as util from 'util'
 
 const TAG = 'exchange/actions'
 const LARGE_DOLLARS_SELL_AMOUNT_IN_WEI = new BigNumber(1000 * 1000000000000000000) // To estimate exchange rate from exchange contract
@@ -233,7 +234,7 @@ export function* exchangeGoldAndStableTokens(action: ExchangeTokensAction) {
       return
     }
     yield call(sendTransaction, approveTx, account, TAG, 'approval')
-    Logger.debug(TAG, `Transaction approved: ${approveTx}`)
+    Logger.debug(TAG, `Transaction approved: ${util.inspect(approveTx.arguments)}`)
 
     const tx = exchangeContract.methods.exchange(
       convertedMakerAmount.toString(),
@@ -248,9 +249,14 @@ export function* exchangeGoldAndStableTokens(action: ExchangeTokensAction) {
     yield call(sendAndMonitorTransaction, txId, tx, account)
   } catch (error) {
     Logger.error(TAG, 'Error doing exchange', error)
-    yield put(showError(ErrorMessages.EXCHANGE_FAILED))
     if (txId) {
       yield put(removeStandbyTransaction(txId))
+    }
+
+    if (error.message === ErrorMessages.INCORRECT_PIN) {
+      yield put(showError(ErrorMessages.INCORRECT_PIN))
+    } else {
+      yield put(showError(ErrorMessages.EXCHANGE_FAILED))
     }
   }
 }

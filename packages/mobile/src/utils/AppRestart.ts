@@ -8,9 +8,13 @@ import Logger from 'src/utils/Logger'
 export function restartApp() {
   // Delete chain data since that's what is most likely corrupt.
   Logger.info('utils/AppRestart/restartApp', 'deleting chain data')
-  deleteChainData().finally(() => {
-    CeloAnalytics.track(CustomEventNames.user_restart)
-    Logger.info('utils/AppRestart/restartApp', 'Restarting app')
-    RestartAndroid.restart()
-  })
+  deleteChainData()
+    .finally(() => {
+      CeloAnalytics.track(CustomEventNames.user_restart)
+      Logger.info('utils/AppRestart/restartApp', 'Restarting app')
+      RestartAndroid.restart()
+    })
+    .catch((reason) =>
+      Logger.error('utils/AppRestart/restartApp', `Deleting chain data failed: ${reason}`)
+    )
 }

@@ -21,9 +21,9 @@ import {
 } from 'src/identity/reducer'
 import { setRecipientCache } from 'src/recipients/actions'
 import { contactsToRecipients, NumberToRecipient } from 'src/recipients/recipient'
-import { checkContactsPermission } from 'src/utils/androidPermissions'
 import { getAllContacts } from 'src/utils/contacts'
 import Logger from 'src/utils/Logger'
+import { checkContactsPermission } from 'src/utils/permissions'
 import { web3 } from 'src/web3/contracts'
 import { getConnectedAccount } from 'src/web3/saga'
 

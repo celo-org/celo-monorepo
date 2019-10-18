@@ -233,7 +233,7 @@ exports[`TransferConfirmationCard renders correctly for received transaction dri
           ]
         }
       >
-         +1
+        🇺🇸 +1
       </Text>
       <Text
         style={
@@ -431,7 +431,7 @@ exports[`TransferConfirmationCard renders correctly for sent transaction drilldo
           ]
         }
       >
-         +1
+        🇺🇸 +1
       </Text>
       <Text
         style={

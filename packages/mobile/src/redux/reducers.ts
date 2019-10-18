@@ -11,6 +11,7 @@ import { gethReducer as geth, State as GethState } from 'src/geth/reducer'
 import { reducer as goldToken, State as GoldTokenState } from 'src/goldToken/reducer'
 import { homeReducer as home, State as HomeState } from 'src/home/reducers'
 import { reducer as identity, State as IdentityState } from 'src/identity/reducer'
+import { reducer as imports, State as ImportState } from 'src/import/reducer'
 import { inviteReducer as invite, State as InviteState } from 'src/invite/reducer'
 import { reducer as localCurrency, State as LocalCurrencyState } from 'src/localCurrency/reducer'
 import { reducer as networkInfo, State as NetworkInfoState } from 'src/networkInfo/reducer'
@@ -39,6 +40,7 @@ export default combineReducers({
   fees,
   recipients,
   localCurrency,
+  imports,
 }) as () => RootState
 
 export interface RootState {
@@ -61,6 +63,7 @@ export interface RootState {
   fees: FeesState
   recipients: RecipientsState
   localCurrency: LocalCurrencyState
+  imports: ImportState
 }
 
 export interface PersistedRootState {
