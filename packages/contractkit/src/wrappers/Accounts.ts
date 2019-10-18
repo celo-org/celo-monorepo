@@ -74,6 +74,45 @@ export class AccountsWrapper extends BaseWrapper<Accounts> {
     )
   }
 
+  /**
+   * Returns the set data encryption key for the account
+   * @param account Account
+   */
+  getDataEncryptionKey = proxyCall(this.contract.methods.getDataEncryptionKey)
+
+  /**
+   * Returns the set wallet address for the account
+   * @param account Account
+   */
+  getWalletAddress = proxyCall(this.contract.methods.getWalletAddress)
+
+  /**
+   * Returns the metadataURL for the account
+   * @param account Account
+   */
+  getMetadataURL = proxyCall(this.contract.methods.getMetadataURL)
+
+  /**
+   * Sets the data encryption of the account
+   * @param encryptionKey The key to set
+   */
+  setAccountDataEncryptionKey = proxySend(
+    this.kit,
+    this.contract.methods.setAccountDataEncryptionKey
+  )
+
+  /**
+   * Sets the metadataURL for the account
+   * @param url The url to set
+   */
+  setMetadataURL = proxySend(this.kit, this.contract.methods.setMetadataURL)
+
+  /**
+   * Sets the wallet address for the account
+   * @param address The address to set
+   */
+  setWalletAddress = proxySend(this.kit, this.contract.methods.setWalletAddress)
+
   private async getParsedSignatureOfAddress(address: Address, signer: string) {
     const hash = Web3.utils.soliditySha3({ type: 'address', value: address })
     const signature = (await this.kit.web3.eth.sign(hash, signer)).slice(2)

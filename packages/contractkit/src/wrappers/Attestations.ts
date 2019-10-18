@@ -7,7 +7,6 @@ import { Attestations } from '../generated/types/Attestations'
 import {
   BaseWrapper,
   proxyCall,
-  proxySend,
   toBigNumber,
   toNumber,
   toTransactionObject,
@@ -95,39 +94,6 @@ export class AttestationsWrapper extends BaseWrapper<Attestations> {
   )
 
   /**
-   * Returns the set wallet address for the account
-   * @param account Account
-   */
-  getWalletAddress = proxyCall(this.contract.methods.getWalletAddress)
-
-  /**
-   * Returns the metadataURL for the account
-   * @param account Account
-   */
-  getMetadataURL = proxyCall(this.contract.methods.getMetadataURL)
-
-  /**
-   * Sets the data encryption of the account
-   * @param encryptionKey The key to set
-   */
-  setAccountDataEncryptionKey = proxySend(
-    this.kit,
-    this.contract.methods.setAccountDataEncryptionKey
-  )
-
-  /**
-   * Sets the metadataURL for the account
-   * @param url The url to set
-   */
-  setMetadataURL = proxySend(this.kit, this.contract.methods.setMetadataURL)
-
-  /**
-   * Sets the wallet address for the account
-   * @param address The address to set
-   */
-  setWalletAddress = proxySend(this.kit, this.contract.methods.setWalletAddress)
-
-  /**
    * Calculates the amount of CeloToken to request Attestations
    * @param token The token to pay for attestations for
    * @param attestationsRequested The number of attestations to request
@@ -158,6 +124,7 @@ export class AttestationsWrapper extends BaseWrapper<Attestations> {
     phoneNumber: string,
     account: Address
   ): Promise<ActionableAttestation[]> {
+    const accounts = await this.kit.contracts.getAccounts()
     const phoneHash = PhoneNumberUtils.getPhoneHash(phoneNumber)
     const expirySeconds = await this.attestationExpirySeconds()
     const nowInUnixSeconds = Math.floor(new Date().getTime() / 1000)
@@ -174,7 +141,7 @@ export class AttestationsWrapper extends BaseWrapper<Attestations> {
 
     // Typechain is not properly typing getDataEncryptionKey
     const publicKeys: Promise<string[]> = Promise.all(
-      issuers.map((issuer) => this.contract.methods.getDataEncryptionKey(issuer).call() as any)
+      issuers.map((issuer) => accounts.getDataEncryptionKey(issuer) as any)
     )
 
     const isIncomplete = (status: AttestationState) => status === AttestationState.Incomplete
@@ -317,9 +284,8 @@ export class AttestationsWrapper extends BaseWrapper<Attestations> {
    * @param issuer The address of issuer of the attestation
    */
   async reveal(phoneNumber: string, issuer: Address) {
-    const publicKey: string = (await this.contract.methods
-      .getDataEncryptionKey(issuer)
-      .call()) as any
+    const accounts = await this.kit.contracts.getAccounts()
+    const publicKey: string = (await accounts.getDataEncryptionKey(issuer)) as any
 
     if (!publicKey) {
       throw new Error('Issuer data encryption key is null')

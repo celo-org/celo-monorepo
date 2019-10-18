@@ -1,13 +1,25 @@
 import { capitalize } from 'lodash'
 import { AccountsInstance } from 'types'
 import { getParsedSignatureOfAddress } from '../../lib/signing-utils'
-import { assertLogMatches, assertRevert, NULL_ADDRESS } from '../../lib/test-utils'
+import {
+  assertLogMatches,
+  assertLogMatches2,
+  assertRevert,
+  NULL_ADDRESS,
+} from '../../lib/test-utils'
 const Accounts: Truffle.Contract<AccountsInstance> = artifacts.require('Accounts')
 let authorizationTests = { voter: {}, validator: {} }
 
 contract('Accounts', (accounts: string[]) => {
   let accountsInstance: AccountsInstance
   let account = accounts[0]
+  const caller = accounts[0]
+
+  const metadataURL = 'https://www.celo.org'
+  const dataEncryptionKey = '0x02f2f48ee19680706196e2e339e5da3491186e0c4c5030670656b0e01611111111'
+  const longDataEncryptionKey =
+    '0x04f2f48ee19680706196e2e339e5da3491186e0c4c5030670656b0e01611111111' +
+    '02f2f48ee19680706196e2e339e5da3491186e0c4c5030670656b0e01611111111'
 
   beforeEach(async () => {
     accountsInstance = await Accounts.new({ from: account })
