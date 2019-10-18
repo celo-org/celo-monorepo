@@ -26,7 +26,8 @@ contract Random is IRandom, Ownable, Initializable {
 
   /**
    * @notice Initializes the contract with initial parameters.
-   * @param _randomnessBlockRetentionWindow Number of old random blocks whose randomness values can be queried.
+   * @param _randomnessBlockRetentionWindow Number of old random blocks whose randomness
+   * values can be queried.
    */
   function initialize(uint256 _randomnessBlockRetentionWindow) external initializer {
     _transferOwnership(msg.sender);
