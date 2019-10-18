@@ -71,7 +71,7 @@ export async function concurrentMap<A, B>(
     const remaining = xs.length - i
     const sliceSize = Math.min(remaining, concurrency)
     const slice = xs.slice(i, i + sliceSize)
-    res = res.concat(await Promise.all(slice.map(mapFn)))
+    res = res.concat(await Promise.all(slice.map((elem, index) => mapFn(elem, i + index))))
   }
   return res
 }
