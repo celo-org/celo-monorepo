@@ -1,81 +1,70 @@
 {
-  "readOnlyMode":
-    "Modo de solo lectura: cree la clave de respaldo para seguir enviando y recibiendo {{CeloDollars}}",
-  "getBackupKey": "Obtener clave de respaldo",
-  "viewBackupKey": "Ver clave de copia de seguridad",
-  "setUpSocialBackup": "Configurar secretos de recuperación",
-  "viewSocialBackup": "Ver secretos de recuperación",
-  "failedFetchMnemonic": "Error al recuperar su clave de copia de seguridad",
-  "socialBackup": "Respaldo Social",
-  "editProfile": "Editar perfil",
-  "backupKey": "Clave de respaldo",
-  "yourBackupKey": "Su clave de respaldo",
-  "delayBackup": "Despedir por una hora",
-  "inviteFriends": "Invitar a amigos",
-  "verifierApp": "Apli del verificador",
-  "languageSettings": "Configuración de idioma",
-  "cancel": "Cancelar",
-  "backupKeyImportance": {
+  "getBackupKey": "Get Backup Key",
+  "getYourKey": "Get Your Key",
+  "viewBackupKey": "View Backup Key",
+  "setUpSocialBackup": "Set Up Safeguards",
+  "viewSafeguards": "View Safeguards",
+  "failedFetchMnemonic": "Failed to fetch your Backup Key",
+  "backupAndRecovery": "Backup and Recovery",
+  "backupKey": "Backup Key",
+  "yourBackupKey": "Your Backup Key",
+  "delayBackup": "Dismiss for an hour",
+  "backupKeyNotification": "Without a Backup Key, you may lose access to your wallet.",
+  "backupKeyIntro": {
     "0":
-      "Su clave de respaldo controla el acceso a su billetera Celo. Es muy importante mantener segura esta clave",
-    "1":
-      "Si pierde su teléfono o elimina la aplicación Celo, perderá el acceso a su Celo {{dollars}} y Gold"
+      "Your Backup Key is the one and only key to your Celo Wallet. With this key, you can access your funds anytime, anywhere.",
+    "1": "KEEP THIS KEY SAFE AND PRIVATE.",
+    "2": "Congrats, you’ve sucessfully retrieved your Backup Key! A reminder, ",
+    "3": "KEEP THIS KEY SAFE.",
+    "4": "For more security set up Safeguards for your wallet.",
+    "5":
+      "You’ve also set up Safeguards! You’ll be able to restore your account with the help of the two friends. ",
+    "6": "KEEP YOUR SAFEGUARDS SECRET"
   },
-  "toDo": "Para asegurarse de que sus fondos se mantengan seguros, deberá hacer lo siguiente:",
-  "allDone":
-    "¡Has hecho una copia de seguridad de tu clave con éxito! Vuelve aquí para verla en cualquier momento",
-  "writeDownKey": "- Escriba su clave de respaldo",
-  "shareSocialBackup": "- Compartir secretos de recuperación",
-  "setBackupKey": "Crear clave de respaldo",
-  "enterBackupKey": "Ingrese su clave de respaldo",
-  "backupKeyConfirmation":
-    "En el futuro, si pierde su teléfono, deberá proporcionar esta clave de respaldo para permitir que se recupere su cuenta. Para confirmar que tiene su clave de copia de seguridad escrita, ingrésela a continuación:",
-  "areYouSure": "¿Está seguro?",
-  "shareBackupKey": "Compartir clave de respaldo",
-  "backupRecovery":
-    "Comparta la clave de respaldo con una sola persona en la que confíe plenamente.",
   "backupSkipText": {
-    "0": "Comparta la clave de respaldo con una sola persona en la que confíe ",
-    "1": "plenamente."
+    "0": "Without a Backup Key, you can lose access to your wallet ",
+    "1": "forever."
   },
-  "sendWhatsApp": "Enviar por WhatsApp",
-  "continue": "Continuar",
-  "backupWithFriends": "Respaldo con Amigos",
-  "tip": "Consejo ",
-  "securityTip":
-    "No tome una captura de pantalla ni la guarde en las notas de su teléfono. Mantenga su Clave de respaldo en algún lugar al que pueda acceder si pierde su teléfono",
-  "backupKeySummary": {
-    "0": "Escriba esta frase en un papel y guárdela en algún sitio seguro.",
-    "1": "No le muestre la frase a nadie. Si alguien la sabe, podrá acceder a tu monedero."
-  },
-  "heresYourKey": "Aquí está su clave de respaldo. Recuerde, mantenga esto a salvo",
-  "socialBackupYourKey":
-    "La copia de seguridad social es una forma de proteger su cuenta con la ayuda de sus amigos",
-  "sendFirstHalf": "Enviar la primera mitad a un contacto",
-  "sendSecondHalf": "Enviar la segunda mitad a otro contacto",
-  "verifying": "Verificación ({{count}} de {{total}})",
-  "questionPhrase": "¿Cuál de estas palabras está en su clave de respaldo?",
-  "submit": "Enviar",
-  "dontKnow": "¿No la sabe? ",
-  "return": "Vuelva a la clave de respaldo",
-  "tryAgain": "Reintentar",
-  "backToKey":
-    "Le llevaremos a la pantalla con tu clave de respaldo para que verifique que la escribió correctamente.",
-  "seeBackupKey": "Ver clave de respaldo",
+  "backupRecovery": "Share your Backup Key with only one other person who you completely trust.",
+  "securityTip": "If you lose your backup key, you will lose access to your Celo Dollars and Gold.",
+  "backupKeySummary":
+    "Please write down your Backup Key. If your phone is stolen or lost, you will need the Backup Key to access your Celo Wallet.",
   "bothBackupsDone": {
-    "0": "¡Felicidades!",
+    "0": "Congratulations!",
     "1":
-      "¡Ya terminaste! Si quieres revisar tus secretos de recuperación, siempre puedes volver aquí más tarde"
+      "You're all done! If you would like to review your recovery secrets, you can always return here later."
   },
   "dontLoseIt":
-    "No pierda esta clave. Es de suma importancia que la mantenga en un lugar seguro, ya que es la única forma de desbloquear tu monedero si pierde tu celular.",
-  "done": "Listo",
-  "whatsappMessage":
-    "Importante: por favor mantenga esto privado. \n\nTe estoy enviando la frase de respaldo a mi Monedero Celo: ",
+    "Please do not lose this key. It is critical that you maintain this in a safe place, as this is the only way to unlock your wallet should you lose your phone.",
   "backupPrompt":
-    "Para la seguridad de sus fondos, su cuenta está congelada hasta que obtenga su clave de respaldo",
-  "copy": "Copiar",
-  "copied": "Copiada al portapapeles",
-  "clipboardCleared": "Portapapeles borrado",
-  "failedCopy": "Error al copiar al portapapeles"
+    "For the security of your funds, your account is frozen until you get your Backup Key",
+  "copied": "Key copied to clipboard",
+  "savedConfirmation": "I have saved my Backup Key.",
+  "confirmBackupKey": "Confirm Your Backup Key",
+  "backupQuizInfo":
+    "Please verify your Backup Key by selecting the words below in the correct order.",
+  "backupQuizWordCount": "Word {{index}} of {{total}}",
+  "invalidBackupPhrase": "Invalid Backup Key",
+  "importBackupFailed": "Importing Wallet Failed",
+  "backupQuizFailed": "Incorrect Backup Key, please try again",
+  "backupComplete": {
+    "0": "Success!",
+    "1": "Next, you can set up Safeguards.",
+    "2": "You’re all set!"
+  },
+  "socialBackupIntro": {
+    "header": "Introducing Safeguards",
+    "body":
+      "Safeguards is an additional layer of protection for your account in case you lose your Backup Key. Once set up, you’ll be able to restore your account with the help of two friends or family members. ",
+    "warning": "NEVER TELL ANYONE YOUR SAFEGUARDS’ IDENTITIES.",
+    "skip": "Skip For Now"
+  },
+  "socialBackup": {
+    "body":
+      "Share each phrase below with a friend. Be sure to send only one phrase to each person.",
+    "confirmation": "I have sent each Safeguard phrase to a trusted friend.",
+    "phrase1": "Safeguard Phrase 1",
+    "phrase2": "Safeguard Phrase 2",
+    "yourSafeguards": "Your Safeguards"
+  }
 }
