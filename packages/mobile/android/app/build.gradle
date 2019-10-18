@@ -253,6 +253,11 @@ android {
         exclude 'META-INF/-no-jdk.kotlin_module'
         exclude 'META-INF/androidx.exifinterface_exifinterface.version'
     }
+
+    
+    dexOptions {
+       javaMaxHeapSize "3g"
+    }
 }
 
 dependencies {

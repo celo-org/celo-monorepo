@@ -139,7 +139,7 @@ jobs:
             echo 'export ANDROID_SDK_ROOT="/usr/local/share/android-sdk"' >> $BASH_ENV
             echo 'export QEMU_AUDIO_DRV=none' >> $BASH_ENV
             export PATH=$PATH:/usr/local/share/android-sdk/platform-tools/
-            export GRADLE_OPTS='-Dorg.gradle.daemon=true -Dorg.gradle.parallel=true -Dorg.gradle.jvmargs="-Xmx4096m -XX:+HeapDumpOnOutOfMemoryError"'
+            export GRADLE_OPTS='-Dorg.gradle.daemon=true -Dorg.gradle.configureondemand=true -Dorg.gradle.jvmargs="-Xmx6g -XX:MaxPermSize=3g -XX:+HeapDumpOnOutOfMemoryError -Dfile.encoding=UTF-8"'
       - run:
           name: Install Android sdk
           command: |
@@ -271,7 +271,7 @@ jobs:
       - run:
           name: Set GRADLE_OPTS to speed up gradle
           command: |
-            export GRADLE_OPTS='-Dorg.gradle.daemon=true -Dorg.gradle.parallel=true -Dorg.gradle.jvmargs="-Xmx7200m -XX:+HeapDumpOnOutOfMemoryError"'
+            export GRADLE_OPTS='-Dorg.gradle.daemon=true -Dorg.gradle.configureondemand=true -Dorg.gradle.jvmargs="-Xmx6g -XX:MaxPermSize=3g -XX:+HeapDumpOnOutOfMemoryError -Dfile.encoding=UTF-8"'
       - run:
           name: Build Android app (debug version)
           command: |
