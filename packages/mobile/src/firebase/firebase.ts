@@ -3,11 +3,11 @@ import { RemoteMessage } from 'react-native-firebase/messaging'
 import { Notification, NotificationOpen } from 'react-native-firebase/notifications'
 import { Sentry } from 'react-native-sentry'
 import { eventChannel } from 'redux-saga'
-import { call, put, select } from 'redux-saga/effects'
+import { call, select, spawn } from 'redux-saga/effects'
 import { NotificationReceiveState, PaymentRequest } from 'src/account'
 import { currentLanguageSelector } from 'src/app/reducers'
-import { startFirebaseOnNotification } from 'src/firebase/actions'
 import { handleNotification } from 'src/firebase/notifications'
+import { watchFirebaseNotificationChannel } from 'src/firebase/saga'
 import Logger from 'src/utils/Logger'
 
 const TAG = 'Firebase'
@@ -71,7 +71,8 @@ export function* initializeCloudMessaging(app: Firebase, address: string) {
     return () => null
   })
 
-  put(startFirebaseOnNotification(channelOnNotification))
+  spawn(watchFirebaseNotificationChannel, channelOnNotification)
+  // put(startFirebaseOnNotification(channelOnNotification))
 
   // Listen for notification messages while the app is open
   eventChannel((emitter) => {

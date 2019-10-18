@@ -164,7 +164,8 @@ export function* watchLanguage() {
   yield takeEvery(AppActions.SET_LANGUAGE, syncLanguageSelection)
 }
 
-export function* startFirebaseOnRefresh(channel: EventChannel<Notification>) {
+export function* watchFirebaseNotificationChannel(channel: EventChannel<Notification>) {
+  Logger.info(`${TAG}/watchFirebaseNotificationChannel`, 'Started channel watching')
   while (true) {
     const { data } = yield take(channel)
     if (!data) {
@@ -175,14 +176,9 @@ export function* startFirebaseOnRefresh(channel: EventChannel<Notification>) {
   }
 }
 
-function* watchStartFirebaseOnRefresh() {
-  yield takeEvery(Actions.START_FIREBASE_ON_REFRESH, startFirebaseOnRefresh)
-}
-
 export function* firebaseSaga() {
   yield spawn(initializeFirebase)
   yield spawn(watchLanguage)
   yield spawn(subscribeToPaymentRequests)
   yield spawn(watchPaymentRequestStatusUpdates)
-  yield spawn(watchStartFirebaseOnRefresh)
 }

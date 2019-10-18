@@ -1,4 +1,3 @@
-import { Channel } from 'redux-saga'
 import { PaymentRequestStatus } from 'src/account'
 
 export enum Actions {
@@ -24,16 +23,4 @@ export const updatePaymentRequestStatus = (
   type: Actions.PAYMENT_REQUEST_UPDATE_STATUS,
   id,
   status,
-})
-
-export interface StartFirebaseOnNotification {
-  type: Actions.START_FIREBASE_ON_REFRESH
-  channel: Channel<any>
-}
-
-export const startFirebaseOnNotification = (
-  channel: Channel<any>
-): StartFirebaseOnNotification => ({
-  type: Actions.START_FIREBASE_ON_REFRESH,
-  channel,
 })

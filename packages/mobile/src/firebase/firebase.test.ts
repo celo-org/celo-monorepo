@@ -3,6 +3,7 @@ import { throwError } from 'redux-saga-test-plan/providers'
 import { call, select } from 'redux-saga/effects'
 import { currentLanguageSelector } from 'src/app/reducers'
 import { initializeCloudMessaging, registerTokenToDb, setUserLanguage } from 'src/firebase/firebase'
+import { mockAccount2 } from 'test/values'
 
 const hasPermissionMock = jest.fn(() => null)
 const requestPermissionMock = jest.fn(() => null)
@@ -12,7 +13,7 @@ const onNotificationMock = jest.fn((fn) => null)
 const onNotificationOpenedMock = jest.fn((fn) => null)
 const getInitialNotificationMock = jest.fn(() => null)
 
-const address = 'MyAddress'
+const address = mockAccount2
 const mockFcmToken = 'token'
 
 const app: any = {
