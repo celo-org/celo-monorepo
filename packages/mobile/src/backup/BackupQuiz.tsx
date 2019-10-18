@@ -150,7 +150,6 @@ export class BackupQuiz extends React.Component<Props, State> {
         <DevSkipButton nextScreen={Screens.BackupComplete} onSkip={this.onScreenSkip} />
         <ScrollView contentContainerStyle={styles.scrollContainer}>
           <Text style={fontStyles.h1}>{t('confirmBackupKey')}</Text>
-          <Text style={styles.bodyText}>{t('backupQuizInfo')}</Text>
           <View style={styles.chosenWordsContainer}>
             {_.times(mnemonicLength, (i) => (
               <Text
@@ -161,6 +160,7 @@ export class BackupQuiz extends React.Component<Props, State> {
               </Text>
             ))}
           </View>
+          <Text style={styles.bodyText}>{t('backupQuizInfo')}</Text>
           {!isQuizComplete && (
             <Text style={styles.bodyTextBold}>
               {t('backupQuizWordCount', { index: currentWordIndex, total: mnemonicLength })}
@@ -229,7 +229,9 @@ const styles = StyleSheet.create({
     paddingBottom: 20,
   },
   bodyText: {
+    marginTop: 20,
     ...fontStyles.bodySecondary,
+    color: colors.lightGray,
     textAlign: 'center',
   },
   bodyTextBold: {
@@ -239,7 +241,6 @@ const styles = StyleSheet.create({
     marginTop: 25,
   },
   chosenWordsContainer: {
-    marginTop: 20,
     flexDirection: 'row',
     flexWrap: 'wrap',
     justifyContent: 'center',
