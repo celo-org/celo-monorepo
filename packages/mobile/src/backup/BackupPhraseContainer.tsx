@@ -1,18 +1,35 @@
 import Touchable from '@celo/react-components/components/Touchable'
+import withTextInputPasteAware from '@celo/react-components/components/WithTextInputPasteAware'
 import colors from '@celo/react-components/styles/colors'
 import { fontStyles } from '@celo/react-components/styles/fonts'
 import * as React from 'react'
 import { WithNamespaces, withNamespaces } from 'react-i18next'
-import { Clipboard, Platform, StyleSheet, Text, View, ViewStyle } from 'react-native'
+import { Clipboard, Platform, StyleSheet, Text, TextInput, View, ViewStyle } from 'react-native'
 import FlagSecure from 'react-native-flag-secure-android'
+import { isBackupPhraseValid } from 'src/backup/utils'
 import { Namespaces } from 'src/i18n'
 import Logger from 'src/utils/Logger'
 
+const PhraseInput = withTextInputPasteAware(TextInput)
+
+export enum BackupPhraseContainerMode {
+  READONLY = 'READONLY',
+  INPUT = 'INPUT',
+}
+
+export enum BackupPhraseType {
+  BACKUP_KEY = 'BACKUP_KEY',
+  SOCIAL_BACKUP = 'SOCIAL_BACKUP',
+}
+
 type Props = {
-  words: string | null
+  value: string | null
+  mode: BackupPhraseContainerMode
+  type: BackupPhraseType
   showCopy?: boolean
-  headerText?: string
   style?: ViewStyle
+  onChangeText?: (value: string) => void
+  testID?: string
 } & WithNamespaces
 
 export class BackupPhraseContainer extends React.Component<Props> {
@@ -33,7 +50,7 @@ export class BackupPhraseContainer extends React.Component<Props> {
   }
 
   onPressCopy = () => {
-    const { words, t } = this.props
+    const { value: words, t } = this.props
     if (!words) {
       return
     }
@@ -41,22 +58,53 @@ export class BackupPhraseContainer extends React.Component<Props> {
     Logger.showMessage(t('copied'))
   }
 
+  onPhraseInputChange = (value: string) => {
+    if (this.props.onChangeText) {
+      this.props.onChangeText(value)
+    }
+  }
+
   render() {
-    const { t, words, showCopy, headerText, style } = this.props
+    const { t, value: words, showCopy, style, mode, type, testID } = this.props
 
     return (
       <View style={style}>
         <View style={styles.headerContainer}>
-          <Text style={styles.headerText}>{headerText || t('backupKey')}</Text>
+          <Text style={styles.headerText}>
+            {type === BackupPhraseType.BACKUP_KEY ? t('backupKey') : t('socialBackupPhraseHeader')}
+          </Text>
           {showCopy && (
             <Touchable borderless={true} onPress={this.onPressCopy}>
               <Text style={styles.headerButton}>{this.props.t('global:copy')}</Text>
             </Touchable>
           )}
         </View>
-        <View style={styles.phraseContainer}>
-          {!!words && <Text style={styles.phraseText}>{words}</Text>}
-        </View>
+        {mode === BackupPhraseContainerMode.READONLY && (
+          <View style={styles.phraseContainer}>
+            {!!words && <Text style={styles.phraseText}>{words}</Text>}
+          </View>
+        )}
+        {mode === BackupPhraseContainerMode.INPUT && (
+          <View style={styles.phraseInputContainer}>
+            <PhraseInput
+              style={[
+                styles.phraseInputText,
+                type === BackupPhraseType.SOCIAL_BACKUP && styles.socialPhraseInputText,
+              ]}
+              value={words || ''}
+              placeholder={t('backupPhrasePlaceholder')}
+              onChangeText={this.onPhraseInputChange}
+              shouldShowClipboard={isBackupPhraseValid}
+              underlineColorAndroid="transparent"
+              placeholderTextColor={colors.inactive}
+              enablesReturnKeyAutomatically={true}
+              multiline={true}
+              autoCorrect={false}
+              autoCapitalize={'none'}
+              testID={testID}
+            />
+          </View>
+        )}
       </View>
     )
   }
@@ -84,16 +132,30 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     padding: 14,
   },
+  phraseText: {
+    ...fontStyles.body,
+    lineHeight: 27,
+    color: colors.darkSecondary,
+  },
+  phraseInputContainer: {
+    marginTop: 10,
+  },
+  phraseInputText: {
+    ...fontStyles.body,
+    borderWidth: 1,
+    borderColor: colors.inputBorder,
+    borderRadius: 4,
+    minHeight: 145,
+    padding: 14,
+  },
+  socialPhraseInputText: {
+    minHeight: 100,
+  },
   button: {
     alignSelf: 'center',
     flex: 1,
     paddingBottom: 0,
     marginBottom: 0,
-  },
-  phraseText: {
-    ...fontStyles.body,
-    lineHeight: 27,
-    color: colors.darkSecondary,
   },
 })
 

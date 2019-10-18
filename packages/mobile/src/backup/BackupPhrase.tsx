@@ -99,7 +99,7 @@ class BackupPhrase extends React.Component<Props, State> {
           <View>
             <Text style={fontStyles.h1}>{t('yourBackupKey')}</Text>
             <Text style={styles.body}>{t('backupKeySummary')}</Text>
-            <BackupPhraseContainer words={mnemonic} showCopy={true} />
+            <BackupPhraseContainer value={mnemonic} showCopy={true} />
             <Text style={styles.tipText}>
               <Text style={[styles.tipText, fontStyles.bold]}>{t('global:warning')}</Text>
               {t('securityTip')}

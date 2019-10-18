@@ -1,8 +1,7 @@
 // HOC to add a paste button to a text input
 
 import TouchableDefault from '@celo/react-components/components/Touchable'
-import Copy from '@celo/react-components/icons/Copy'
-import colors from '@celo/react-components/styles/colors'
+import Paste from '@celo/react-components/icons/Paste'
 import * as React from 'react'
 import { AppState, Clipboard, StyleSheet, TextInputProps, View } from 'react-native'
 
@@ -55,13 +54,12 @@ export default function withTextInputPasteAware<P extends TextInputProps>(
     render() {
       const { isPasteIconVisible } = this.state
 
-      // TODO(Rossy) Use a more paste-y instead of copy looking icon when we have one
       return (
         <View style={style.container}>
           <WrappedTextInput {...this.props} showClearButton={!isPasteIconVisible} />
           {isPasteIconVisible && (
             <TouchableDefault style={style.pasteIconContainer} onPress={this.onPressPate}>
-              <Copy color={colors.celoGreen} />
+              <Paste />
             </TouchableDefault>
           )}
         </View>
@@ -76,8 +74,8 @@ const style = StyleSheet.create({
   },
   pasteIconContainer: {
     position: 'absolute',
-    right: 16,
-    top: 18,
+    right: 12,
+    bottom: 12,
     width: 20,
     height: 25,
     zIndex: 100,

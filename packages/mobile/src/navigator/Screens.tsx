@@ -33,6 +33,7 @@ export enum Screens {
   FeeExchangeEducation = 'FeeExchangeEducation',
   GoldEducation = 'GoldEducation',
   ImportWallet = 'ImportWallet',
+  ImportWalletSocial = 'ImportWalletSocial',
   Invite = 'Invite',
   InviteReview = 'InviteReview',
   ImportContacts = 'ImportContacts',

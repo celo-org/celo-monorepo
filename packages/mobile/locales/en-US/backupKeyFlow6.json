@@ -66,5 +66,7 @@
     "phrase1": "Safeguard Phrase 1",
     "phrase2": "Safeguard Phrase 2",
     "yourSafeguards": "Your Safeguards"
-  }
+  },
+  "backupPhrasePlaceholder":
+    "horse leopard dog monkey shark tiger lemur whale squid wolf squirrel mouse lion elephant cat shrimp bear penguin deer turtle fox zebra goat giraffe"
 }

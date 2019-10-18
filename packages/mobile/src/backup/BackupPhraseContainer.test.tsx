@@ -5,6 +5,6 @@ import BackupPhraseContainer from 'src/backup/BackupPhraseContainer'
 import { mockMnemonic } from 'test/values'
 
 it('renders correctly', () => {
-  const tree = renderer.create(<BackupPhraseContainer words={mockMnemonic} />)
+  const tree = renderer.create(<BackupPhraseContainer value={mockMnemonic} />)
   expect(tree).toMatchSnapshot()
 })

@@ -113,12 +113,12 @@ class BackupSocial extends React.Component<Props, State> {
             )}
             <BackupPhraseContainer
               headerText={t('socialBackup.phrase1')}
-              words={firstHalf}
+              value={firstHalf}
               showCopy={true}
             />
             <BackupPhraseContainer
               headerText={t('socialBackup.phrase2')}
-              words={secondHalf}
+              value={secondHalf}
               showCopy={true}
               style={componentStyles.marginTop20}
             />
