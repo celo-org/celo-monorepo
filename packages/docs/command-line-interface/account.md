@@ -4,6 +4,26 @@ description: Manage your account, send and receive Celo Gold and Celo Dollars
 
 ## Commands
 
+### Authorize
+
+Authorize validating or voting address
+
+```
+USAGE
+  $ celocli account:authorize
+
+OPTIONS
+  -r, --role=voter|validator                         Role to delegate
+  --from=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) Account Address
+  --to=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d    (required) Account Address
+
+EXAMPLE
+  authorize --from 0x5409ED021D9299bf6814279A6A1411A7e866A631 --role voter --to
+  0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d
+```
+
+_See code: [packages/cli/src/commands/account/authorize.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/account/authorize.ts)_
+
 ### Balance
 
 View Celo Dollar and Gold balances given account address
@@ -45,6 +65,23 @@ EXAMPLE
 ```
 
 _See code: [packages/cli/src/commands/account/new.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/account/new.ts)_
+
+### Register
+
+Register an account
+
+```
+USAGE
+  $ celocli account:register
+
+OPTIONS
+  --from=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) Account Address
+
+EXAMPLE
+  register
+```
+
+_See code: [packages/cli/src/commands/account/register.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/account/register.ts)_
 
 ### Transferdollar
 

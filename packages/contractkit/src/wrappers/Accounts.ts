@@ -1,3 +1,4 @@
+import Web3 from 'web3'
 import { Address } from '../base'
 import { Accounts } from '../generated/types/Accounts'
 import {
@@ -7,7 +8,6 @@ import {
   proxySend,
   toTransactionObject,
 } from '../wrappers/BaseWrapper'
-import Web3 = require('web3')
 
 /**
  * Contract for handling deposits needed for voting.
