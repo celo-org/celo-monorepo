@@ -757,14 +757,14 @@ jobs:
             sudo apt-get install python3-pip
             pip3 install pycryptodome
             wget https://github.com/ethereum/solidity/releases/download/v0.5.12/solc-static-linux
-            mv solc-static-linux /usr/bin/solc
+            mv solc-static-linux solc
       - run:
           name: Build and run
           command: |
             ls
             ls packages
             cd packages/protocol
-            python3 scripts/certora/certoraBuild.py specs/harnesses/SortedListCheck.sol specs/harnesses/IntegerSortedListCheck.sol specs/harnesses/AddressSortedListCheck.sol --verify SortedListCheck:specs/list.spec IntegerSortedListCheck:specs/list.spec AddressSortedListCheck:specs/list.spec
+            python3 scripts/certora/certoraBuild.py specs/harnesses/SortedListCheck.sol specs/harnesses/IntegerSortedListCheck.sol specs/harnesses/AddressSortedListCheck.sol --verify SortedListCheck:specs/list.spec IntegerSortedListCheck:specs/list.spec AddressSortedListCheck:specs/list.spec --solc ~/app/solc
             java -jar scripts/certora/prover_cli.jar verify . # need to setup key first
 
 workflows:
