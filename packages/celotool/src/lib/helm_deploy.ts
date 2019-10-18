@@ -194,10 +194,15 @@ export async function installLegoAndNginx() {
     `kube-lego-release`,
     `kube-lego-release exists, skipping install`
   )
-  if (!legoReleaseExists) {
-    await execCmdWithExitOnFailure(
-      `helm install --name kube-lego-release stable/kube-lego --set config.LEGO_EMAIL=n@celo.org --set rbac.create=true --set rbac.serviceAccountName=kube-lego --set config.LEGO_URL=https://acme-v01.api.letsencrypt.org/directory`
-    )
+  // certManager is the newer version of lego, while we transition
+  // we want to use cert-manager for any new clusters
+  const certManagerExists = await outputIncludes(
+    `helm list`,
+    `cert-manager`,
+    `cert-manager exists, skipping install`
+  )
+  if (!legoReleaseExists && !certManagerExists) {
+    await installCertManager()
   }
   const nginxIngressReleaseExists = await outputIncludes(
     `helm list`,
@@ -207,6 +212,26 @@ export async function installLegoAndNginx() {
   if (!nginxIngressReleaseExists) {
     await execCmdWithExitOnFailure(`helm install --name nginx-ingress-release stable/nginx-ingress`)
   }
+}
+
+export async function installCertManager() {
+  console.info('Installing cert-manager CustomResourceDefinitions')
+  await execCmdWithExitOnFailure(
+    `kubectl apply --validate=false -f https://raw.githubusercontent.com/jetstack/cert-manager/release-0.11/deploy/manifests/00-crds.yaml`
+  )
+  console.info('Adding jetstack repo to helm')
+  await execCmdWithExitOnFailure(
+    `helm repo add jetstack https://charts.jetstack.io && helm repo update`
+  )
+  console.info('Installing jetstack/cert-manager helm chart')
+  await execCmdWithExitOnFailure(
+    `helm install --name cert-manager --version v0.11.0 jetstack/cert-manager --set ingressShim.defaultIssuerName=letsencrypt-prod --set ingressShim.defaultIssuerKind=ClusterIssuer --set webhook.enabled=false`
+  )
+
+  const clusterIssuersHelmChartPath = `../helm-charts/cert-manager-cluster-issuers`
+  await execCmdWithExitOnFailure(
+    `helm install --name cert-manager-cluster-issuers ${clusterIssuersHelmChartPath}`
+  )
 }
 
 export async function installAndEnableMetricsDeps() {
