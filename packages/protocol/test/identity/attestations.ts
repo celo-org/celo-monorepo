@@ -19,10 +19,10 @@ import {
   MockLockedGoldInstance,
   MockStableTokenContract,
   MockStableTokenInstance,
-  MockValidatorsContract,
-  MockValidatorsInstance,
+  MockElectionInstance,
   TestRandomContract,
   TestRandomInstance,
+  MockElectionContract,
   RegistryContract,
   RegistryInstance,
 } from 'types'
@@ -30,7 +30,7 @@ import { getParsedSignatureOfAddress } from '../../lib/signing-utils'
 
 const Attestations: AttestationsContract = artifacts.require('Attestations')
 const MockStableToken: MockStableTokenContract = artifacts.require('MockStableToken')
-const MockValidators: MockValidatorsContract = artifacts.require('MockValidators')
+const MockElection: MockElectionContract = artifacts.require('MockElection')
 const MockLockedGold: MockLockedGoldContract = artifacts.require('MockLockedGold')
 const Random: TestRandomContract = artifacts.require('TestRandom')
 const Registry: RegistryContract = artifacts.require('Registry')
@@ -45,7 +45,7 @@ contract('Attestations', (accounts: string[]) => {
   let mockStableToken: MockStableTokenInstance
   let otherMockStableToken: MockStableTokenInstance
   let random: TestRandomInstance
-  let mockValidators: MockValidatorsInstance
+  let mockElection: MockElectionInstance
   let mockLockedGold: MockLockedGoldInstance
   let registry: RegistryInstance
   const provider = new Web3.providers.HttpProvider('http://localhost:8545')
@@ -138,19 +138,19 @@ contract('Attestations', (accounts: string[]) => {
     attestations = await Attestations.new()
     random = await Random.new()
     random.addTestRandomness(0, '0x00')
-    mockValidators = await MockValidators.new()
-    await Promise.all(
-      accounts.map((account) => mockValidators.addValidator(getValidatingKeyAddress(account)))
-    )
     mockLockedGold = await MockLockedGold.new()
     await Promise.all(
       accounts.map((account) =>
-        mockLockedGold.delegateValidating(account, getValidatingKeyAddress(account))
+        mockLockedGold.authorizeValidator(account, getValidatingKeyAddress(account))
       )
+    )
+    mockElection = await MockElection.new()
+    await mockElection.setElectedValidators(
+      accounts.map((account) => getValidatingKeyAddress(account))
     )
     registry = await Registry.new()
     await registry.setAddressFor(CeloContractName.Random, random.address)
-    await registry.setAddressFor(CeloContractName.Validators, mockValidators.address)
+    await registry.setAddressFor(CeloContractName.Election, mockElection.address)
     await registry.setAddressFor(CeloContractName.LockedGold, mockLockedGold.address)
     await attestations.initialize(
       registry.address,
