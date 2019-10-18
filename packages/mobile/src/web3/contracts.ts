@@ -83,6 +83,18 @@ function getWeb3(): Web3 {
   }
 }
 
+// Mutates web3 provider
+export function switchWeb3ProviderForSyncMode(zeroSync: boolean) {
+  // TODO(anna) ensure this works with iOS providers
+  if (zeroSync) {
+    const url = DEFAULT_INFURA_URL
+    Logger.debug('contracts@getWeb3', `Connecting to url ${url}`)
+    web3.setProvider(getWebSocketProvider(url))
+  } else {
+    web3.setProvider(getIpcProvider(DEFAULT_TESTNET))
+  }
+}
+
 export function addLocalAccount(web3Instance: Web3, privateKey: string) {
   if (!isZeroSyncMode()) {
     throw new Error('addLocalAccount can only be called in Zero sync mode')
