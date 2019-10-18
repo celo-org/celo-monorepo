@@ -11,7 +11,7 @@ interface Props {
   amount: BigNumber
   size: number
   type: CURRENCY_ENUM
-  currencySymbol: LocalCurrencySymbol | null
+  currencySymbol?: LocalCurrencySymbol | null
 }
 
 const symbolRatio = 0.6

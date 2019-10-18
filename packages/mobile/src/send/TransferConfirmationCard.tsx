@@ -188,4 +188,4 @@ const style = StyleSheet.create({
   },
 })
 
-export default withNamespaces(Namespaces.sendFlow7)(React.memo(TransferConfirmationCard))
+export default withNamespaces(Namespaces.sendFlow7)(TransferConfirmationCard)
