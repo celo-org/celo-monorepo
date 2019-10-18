@@ -4,7 +4,7 @@ import { displaySendTx } from '../../utils/cli'
 import { Flags } from '../../utils/command'
 
 export default class Authorize extends BaseCommand {
-  static description = 'Authorize validating or voting address for a Locked Gold account'
+  static description = 'Authorize validating or voting address'
 
   static flags = {
     ...BaseCommand.flags,
@@ -37,12 +37,12 @@ export default class Authorize extends BaseCommand {
     }
 
     this.kit.defaultAccount = res.flags.from
-    const lockedGold = await this.kit.contracts.getLockedGold()
+    const accounts = await this.kit.contracts.getAccounts()
     let tx: any
     if (res.flags.role === 'voter') {
-      tx = await lockedGold.authorizeVoter(res.flags.from, res.flags.to)
+      tx = await accounts.authorizeVoter(res.flags.from, res.flags.to)
     } else if (res.flags.role === 'validator') {
-      tx = await lockedGold.authorizeValidator(res.flags.from, res.flags.to)
+      tx = await accounts.authorizeValidator(res.flags.from, res.flags.to)
     } else {
       this.error(`Invalid role provided`)
       return

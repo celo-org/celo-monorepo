@@ -3,7 +3,7 @@ import { displaySendTx } from '../../utils/cli'
 import { Flags } from '../../utils/command'
 
 export default class Register extends BaseCommand {
-  static description = 'Register an account for Locked Gold'
+  static description = 'Register an account'
 
   static flags = {
     ...BaseCommand.flags,
@@ -17,7 +17,7 @@ export default class Register extends BaseCommand {
   async run() {
     const res = this.parse(Register)
     this.kit.defaultAccount = res.flags.from
-    const lockedGold = await this.kit.contracts.getLockedGold()
-    await displaySendTx('register', lockedGold.createAccount())
+    const accounts = await this.kit.contracts.getAccounts()
+    await displaySendTx('register', accounts.createAccount())
   }
 }
