@@ -1,8 +1,15 @@
 // @ts-ignore
 import * as ganache from '@celo/ganache-cli'
+import * as fs from 'fs'
 import * as path from 'path'
 
 const MNEMONIC = 'concert load couple harbor equip island argue ramp clarify fence smart topic'
+
+// This file specifies accounts available when ganache is running. These are derived
+// from the MNEMONIC
+export const NetworkConfig = JSON.parse(
+  fs.readFileSync('src/test-utils/migration-override.json').toString()
+)
 
 export async function startGanache(datadir: string, opts: { verbose?: boolean } = {}) {
   const logFn = opts.verbose
