@@ -121,13 +121,6 @@ contract StableToken is IStableToken, IERC20Token, ICeloToken, Ownable,
     initializer
   {
     require(inflationRate != 0, "Must provide a non-zero inflation rate.");
-    require(initialBalanceAddresses.length == initialBalanceValues.length);
-    for (uint256 i = 0; i < initialBalanceAddresses.length; i = i.add(1)) {
-      totalSupply_ = totalSupply_.add(initialBalanceValues[i]);
-      balances[initialBalanceAddresses[i]] = balances[initialBalanceAddresses[i]].add(
-        initialBalanceValues[i]
-      );
-    }
 
     _transferOwnership(msg.sender);
     totalSupply_ = 0;
@@ -141,6 +134,10 @@ contract StableToken is IStableToken, IERC20Token, ICeloToken, Ownable,
     // solhint-disable-next-line not-rely-on-time
     inflationState.factorLastUpdated = now;
 
+    require(initialBalanceAddresses.length == initialBalanceValues.length);
+    for (uint256 i = 0; i < initialBalanceAddresses.length; i = i.add(1)) {
+      require(_mint(initialBalanceAddresses[i], initialBalanceValues[i]));
+    }
     setRegistry(registryAddress);
   }
 
@@ -248,7 +245,22 @@ contract StableToken is IStableToken, IERC20Token, ICeloToken, Ownable,
       msg.sender == registry.getAddressFor(EXCHANGE_REGISTRY_ID) ||
       msg.sender == registry.getAddressFor(VALIDATORS_REGISTRY_ID)
     );
+    return _mint(to, value);
+  }
 
+  /**
+   * @notice Mints new StableToken and gives it to 'to'.
+   * @param to The account for which to mint tokens.
+   * @param value The amount of StableToken to mint.
+   */
+  function _mint(
+    address to,
+    uint256 value
+  )
+    private
+    updateInflationFactor
+    returns (bool)
+  {
     uint256 units = _valueToUnits(inflationState.factor, value);
     totalSupply_ = totalSupply_.add(units);
     balances[to] = balances[to].add(units);
