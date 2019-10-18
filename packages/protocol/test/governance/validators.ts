@@ -5,19 +5,22 @@ import {
   assertRevert,
   NULL_ADDRESS,
 } from '@celo/protocol/lib/test-utils'
+import { toFixed } from '@celo/utils/lib/fixidity'
 import BigNumber from 'bignumber.js'
 import {
-  MockLockedGoldContract,
-  MockLockedGoldInstance,
+  AccountsContract,
+  AccountsInstance,
   MockElectionContract,
   MockElectionInstance,
+  MockLockedGoldContract,
+  MockLockedGoldInstance,
   RegistryContract,
   RegistryInstance,
   ValidatorsContract,
   ValidatorsInstance,
 } from 'types'
-import { toFixed } from '@celo/utils/lib/fixidity'
 
+const Accounts: AccountsContract = artifacts.require('Accounts')
 const Validators: ValidatorsContract = artifacts.require('Validators')
 const MockLockedGold: MockLockedGoldContract = artifacts.require('MockLockedGold')
 const MockElection: MockElectionContract = artifacts.require('MockElection')
@@ -48,6 +51,7 @@ const HOUR = 60 * 60
 const DAY = 24 * HOUR
 
 contract('Validators', (accounts: string[]) => {
+  let accountsInstance: AccountsInstance
   let validators: ValidatorsInstance
   let registry: RegistryInstance
   let mockLockedGold: MockLockedGoldInstance
@@ -73,10 +77,13 @@ contract('Validators', (accounts: string[]) => {
   const url = 'test-url'
   const commission = toFixed(1 / 100)
   beforeEach(async () => {
+    accountsInstance = await Accounts.new()
+    await Promise.all(accounts.map((account) => accountsInstance.createAccount({ from: account })))
     validators = await Validators.new()
     mockLockedGold = await MockLockedGold.new()
     mockElection = await MockElection.new()
     registry = await Registry.new()
+    await registry.setAddressFor(CeloContractName.Accounts, accountsInstance.address)
     await registry.setAddressFor(CeloContractName.LockedGold, mockLockedGold.address)
     await registry.setAddressFor(CeloContractName.Election, mockElection.address)
     await validators.initialize(
@@ -353,19 +360,6 @@ contract('Validators', (accounts: string[]) => {
             publicKeysData,
           },
         })
-      })
-    })
-
-    describe('when the account is already a registered validator', () => {
-      beforeEach(async () => {
-        await mockLockedGold.setAccountTotalLockedGold(validator, balanceRequirements.validator)
-        await validators.registerValidator(
-          name,
-          url,
-          // @ts-ignore bytes type
-          publicKeysData
-        )
-        assert.deepEqual(await validators.getRegisteredValidators(), [validator])
       })
     })
 

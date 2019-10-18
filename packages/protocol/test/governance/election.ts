@@ -8,18 +8,21 @@ import {
 import { toFixed } from '@celo/utils/lib/fixidity'
 import BigNumber from 'bignumber.js'
 import {
-  MockLockedGoldContract,
-  MockLockedGoldInstance,
-  MockValidatorsContract,
-  MockValidatorsInstance,
-  MockRandomContract,
-  MockRandomInstance,
-  RegistryContract,
-  RegistryInstance,
+  AccountsContract,
+  AccountsInstance,
   ElectionContract,
   ElectionInstance,
+  MockLockedGoldContract,
+  MockLockedGoldInstance,
+  MockRandomContract,
+  MockRandomInstance,
+  MockValidatorsContract,
+  MockValidatorsInstance,
+  RegistryContract,
+  RegistryInstance,
 } from 'types'
 
+const Accounts: AccountsContract = artifacts.require('Accounts')
 const Election: ElectionContract = artifacts.require('Election')
 const MockLockedGold: MockLockedGoldContract = artifacts.require('MockLockedGold')
 const MockValidators: MockValidatorsContract = artifacts.require('MockValidators')
@@ -31,6 +34,7 @@ const Registry: RegistryContract = artifacts.require('Registry')
 Election.numberFormat = 'BigNumber'
 
 contract('Election', (accounts: string[]) => {
+  let accountsInstance: AccountsInstance
   let election: ElectionInstance
   let registry: RegistryInstance
   let mockLockedGold: MockLockedGoldInstance
@@ -45,10 +49,12 @@ contract('Election', (accounts: string[]) => {
   const electabilityThreshold = new BigNumber(0)
 
   beforeEach(async () => {
+    accountsInstance = await Accounts.new()
     election = await Election.new()
     mockLockedGold = await MockLockedGold.new()
     mockValidators = await MockValidators.new()
     registry = await Registry.new()
+    await registry.setAddressFor(CeloContractName.Accounts, accountsInstance.address)
     await registry.setAddressFor(CeloContractName.LockedGold, mockLockedGold.address)
     await registry.setAddressFor(CeloContractName.Validators, mockValidators.address)
     await election.initialize(
@@ -206,6 +212,7 @@ contract('Election', (accounts: string[]) => {
       describe('when the group has no votes', () => {
         let resp: any
         beforeEach(async () => {
+          await accountsInstance.createAccount({ from: group })
           resp = await election.markGroupEligible(NULL_ADDRESS, NULL_ADDRESS, { from: group })
         })
 
@@ -245,6 +252,7 @@ contract('Election', (accounts: string[]) => {
     const group = accounts[1]
     describe('when the group is eligible', () => {
       beforeEach(async () => {
+        await accountsInstance.createAccount({ from: group })
         await mockValidators.setMembers(group, [accounts[9]])
         await election.markGroupEligible(NULL_ADDRESS, NULL_ADDRESS, { from: group })
       })
@@ -298,6 +306,8 @@ contract('Election', (accounts: string[]) => {
     const value = new BigNumber(1000)
     describe('when the group is eligible', () => {
       beforeEach(async () => {
+        await accountsInstance.createAccount({ from: group })
+        await accountsInstance.createAccount({ from: voter })
         await mockValidators.setMembers(group, [accounts[9]])
         await election.markGroupEligible(NULL_ADDRESS, NULL_ADDRESS, { from: group })
       })
@@ -375,6 +385,7 @@ contract('Election', (accounts: string[]) => {
             await mockLockedGold.incrementNonvotingAccountBalance(voter, value)
             for (let i = 0; i < maxNumGroupsVotedFor.toNumber(); i++) {
               newGroup = accounts[i + 2]
+              await accountsInstance.createAccount({ from: newGroup })
               await mockValidators.setMembers(newGroup, [accounts[9]])
               await election.markGroupEligible(group, NULL_ADDRESS, { from: newGroup })
               await election.vote(newGroup, 1, group, NULL_ADDRESS)
@@ -414,6 +425,9 @@ contract('Election', (accounts: string[]) => {
     const group = accounts[1]
     const value = 1000
     beforeEach(async () => {
+      await accountsInstance.createAccount({ from: group })
+      await accountsInstance.createAccount({ from: voter })
+
       await mockValidators.setMembers(group, [accounts[9]])
       await election.markGroupEligible(NULL_ADDRESS, NULL_ADDRESS, { from: group })
       await mockLockedGold.setTotalLockedGold(value)
@@ -469,6 +483,7 @@ contract('Election', (accounts: string[]) => {
         const voter2 = accounts[2]
         const value2 = 573
         beforeEach(async () => {
+          await accountsInstance.createAccount({ from: voter2 })
           await mockLockedGold.incrementNonvotingAccountBalance(voter2, value2)
           await election.vote(group, value2, NULL_ADDRESS, NULL_ADDRESS, { from: voter2 })
           await election.activate(group, { from: voter2 })
@@ -525,6 +540,8 @@ contract('Election', (accounts: string[]) => {
     const value = 1000
     describe('when the voter has pending votes', () => {
       beforeEach(async () => {
+        await accountsInstance.createAccount({ from: group })
+        await accountsInstance.createAccount({ from: voter })
         await mockValidators.setMembers(group, [accounts[9]])
         await election.markGroupEligible(NULL_ADDRESS, NULL_ADDRESS, { from: group })
         await mockLockedGold.setTotalLockedGold(value)
@@ -625,6 +642,8 @@ contract('Election', (accounts: string[]) => {
     const value = 1000
     describe('when the voter has active votes', () => {
       beforeEach(async () => {
+        await accountsInstance.createAccount({ from: group })
+        await accountsInstance.createAccount({ from: voter })
         await mockValidators.setMembers(group, [accounts[9]])
         await election.markGroupEligible(NULL_ADDRESS, NULL_ADDRESS, { from: group })
         await mockLockedGold.setTotalLockedGold(value)
@@ -745,6 +764,9 @@ contract('Election', (accounts: string[]) => {
     }
 
     beforeEach(async () => {
+      await accountsInstance.createAccount({ from: group1 })
+      await accountsInstance.createAccount({ from: group2 })
+      await accountsInstance.createAccount({ from: group3 })
       await mockValidators.setMembers(group1, [validator1, validator2, validator3, validator4])
       await mockValidators.setMembers(group2, [validator5, validator6])
       await mockValidators.setMembers(group3, [validator7])
