@@ -10,7 +10,7 @@ import { navigateToURI } from 'src/utils/linking'
 type Props = WithNamespaces
 
 function NotAuthorizedView({ t }: Props) {
-  const onPressSettings = useCallback(async () => {
+  const onPressSettings = useCallback(() => {
     if (Platform.OS === 'ios') {
       navigateToURI('app-settings:')
     } else if (Platform.OS === 'android') {
