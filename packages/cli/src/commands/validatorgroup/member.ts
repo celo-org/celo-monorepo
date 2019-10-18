@@ -43,7 +43,7 @@ export default class ValidatorGroupMembers extends BaseCommand {
     this.kit.defaultAccount = res.flags.from
     const validators = await this.kit.contracts.getValidators()
     if (res.flags.accept) {
-      const tx = await validators.addMember((res.args as any).validatorAddress)
+      const tx = await validators.addMember(res.flags.from, (res.args as any).validatorAddress)
       await displaySendTx('addMember', tx)
     } else if (res.flags.remove) {
       await displaySendTx(

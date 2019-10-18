@@ -16,6 +16,7 @@ export interface Validator {
   name: string
   publicKey: string
   affiliation: string | null
+  score: BigNumber
 }
 
 export interface ValidatorGroup {
@@ -44,6 +45,7 @@ export interface ValidatorsConfig {
 /**
  * Contract for voting for validators and managing validator groups.
  */
+// TODO(asa): Support authorized validators
 export class ValidatorsWrapper extends BaseWrapper<Validators> {
   affiliate = proxySend(this.kit, this.contract.methods.affiliate)
   deaffiliate = proxySend(this.kit, this.contract.methods.deaffiliate)
@@ -58,12 +60,7 @@ export class ValidatorsWrapper extends BaseWrapper<Validators> {
       this.contract.methods.registerValidatorGroup(name, toFixed(commission).toFixed())
     )
   }
-  async addMember(member: string): Promise<CeloTransactionObject<boolean>> {
-    if (this.kit.defaultAccount == null) {
-      throw new Error(`missing from at new ValdidatorUtils()`)
-    }
-    // TODO(asa): Support authorized validators
-    const group = this.kit.defaultAccount
+  async addMember(group: string, member: string): Promise<CeloTransactionObject<boolean>> {
     const numMembers = await this.getGroupNumMembers(group)
     if (numMembers.isZero()) {
       const election = await this.kit.contracts.getElection()
@@ -75,7 +72,7 @@ export class ValidatorsWrapper extends BaseWrapper<Validators> {
         this.contract.methods.addFirstMember(member, lesser, greater)
       )
     } else {
-      return toTransactionObject(this.kit, this.contract.methods.addMember(member))
+      return toTransactionObject(this.kit, this.contract.methods.addMember(member), { from: group })
     }
   }
   /**
@@ -137,6 +134,7 @@ export class ValidatorsWrapper extends BaseWrapper<Validators> {
       name: res[0],
       publicKey: res[1] as any,
       affiliation: res[2],
+      score: fromFixed(new BigNumber(res[3])),
     }
   }
 
