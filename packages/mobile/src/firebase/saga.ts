@@ -165,8 +165,14 @@ export function* watchLanguage() {
 }
 
 export function* startFirebaseOnRefresh(channel: EventChannel<Notification>) {
-  const { data } = yield take(channel)
-  yield handleNotification(data.notification, NotificationReceiveState.APP_ALREADY_OPEN)
+  while (true) {
+    const { data } = yield take(channel)
+    if (!data) {
+      break
+    }
+    Logger.info(`${TAG}/startFirebaseOnRefresh`, 'Notification received in the channel')
+    yield handleNotification(data.notification, NotificationReceiveState.APP_ALREADY_OPEN)
+  }
 }
 
 function* watchStartFirebaseOnRefresh() {

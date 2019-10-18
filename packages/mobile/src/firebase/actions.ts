@@ -26,14 +26,14 @@ export const updatePaymentRequestStatus = (
   status,
 })
 
-export interface StartFirebaseOnRefreshAction {
+export interface StartFirebaseOnNotification {
   type: Actions.START_FIREBASE_ON_REFRESH
   channel: Channel<any>
 }
 
-export const startFirebaseOnRefreshAction = (
+export const startFirebaseOnNotification = (
   channel: Channel<any>
-): StartFirebaseOnRefreshAction => ({
+): StartFirebaseOnNotification => ({
   type: Actions.START_FIREBASE_ON_REFRESH,
   channel,
 })

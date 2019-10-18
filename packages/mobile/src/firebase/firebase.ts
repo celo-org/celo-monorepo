@@ -6,7 +6,7 @@ import { eventChannel } from 'redux-saga'
 import { call, put, select } from 'redux-saga/effects'
 import { NotificationReceiveState, PaymentRequest } from 'src/account'
 import { currentLanguageSelector } from 'src/app/reducers'
-import { startFirebaseOnRefreshAction } from 'src/firebase/actions'
+import { startFirebaseOnNotification } from 'src/firebase/actions'
 import { handleNotification } from 'src/firebase/notifications'
 import Logger from 'src/utils/Logger'
 
@@ -62,6 +62,8 @@ export function* initializeCloudMessaging(app: Firebase, address: string) {
       (notification: Notification): any => {
         Logger.info(TAG, 'Notification received while open')
         emitter({ notification })
+        // expected side effect:
+        // yield handleNotification(notification.notification, NotificationReceiveState.APP_FOREGROUNDED)
       }
     )
 
@@ -69,25 +71,22 @@ export function* initializeCloudMessaging(app: Firebase, address: string) {
     return () => null
   })
 
-  put(startFirebaseOnRefreshAction(channelOnNotification))
+  put(startFirebaseOnNotification(channelOnNotification))
 
   // Listen for notification messages while the app is open
-  // const channelOnNotificationOpened: any =
   eventChannel((emitter) => {
     app.notifications().onNotificationOpened((notification: NotificationOpen) => {
       Logger.info(TAG, 'App opened via a notification')
       emitter({ notification: notification.notification })
       // expected side effect:
-      // dispatch(
-      //   handleNotification(notification.notification, NotificationReceiveState.APP_FOREGROUNDED)
-      // )
+      // yield handleNotification(notification.notification, NotificationReceiveState.APP_FOREGROUNDED)
     })
 
     // Return an unsubscribe method
     return () => null
   })
 
-  // TODO
+  // TODO (not doing anything for the moment)
   // put(startFirebaseOnRefreshAction(channelOnNotificationOpened))
 
   const initialNotification = yield call(app.notifications().getInitialNotification)
