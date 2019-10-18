@@ -2,15 +2,26 @@ import firebase, { Firebase } from 'react-native-firebase'
 import { RemoteMessage } from 'react-native-firebase/messaging'
 import { Notification, NotificationOpen } from 'react-native-firebase/notifications'
 import { Sentry } from 'react-native-sentry'
-import { eventChannel } from 'redux-saga'
-import { call, select, spawn } from 'redux-saga/effects'
+import { eventChannel, EventChannel } from 'redux-saga'
+import { call, select, spawn, take } from 'redux-saga/effects'
 import { NotificationReceiveState, PaymentRequest } from 'src/account'
 import { currentLanguageSelector } from 'src/app/reducers'
 import { handleNotification } from 'src/firebase/notifications'
-import { watchFirebaseNotificationChannel } from 'src/firebase/saga'
 import Logger from 'src/utils/Logger'
 
 const TAG = 'Firebase'
+
+export function* watchFirebaseNotificationChannel(channel: EventChannel<Notification>) {
+  Logger.info(`${TAG}/watchFirebaseNotificationChannel`, 'Started channel watching')
+  while (true) {
+    const { data } = yield take(channel)
+    if (!data) {
+      break
+    }
+    Logger.info(`${TAG}/startFirebaseOnRefresh`, 'Notification received in the channel')
+    yield handleNotification(data.notification, NotificationReceiveState.APP_ALREADY_OPEN)
+  }
+}
 
 export const initializeAuth = async (app: Firebase, address: string) => {
   Logger.info(TAG, 'Initializing Firebase auth')
@@ -31,18 +42,18 @@ export const initializeAuth = async (app: Firebase, address: string) => {
 
 export function* initializeCloudMessaging(app: Firebase, address: string) {
   Logger.info(TAG, 'Initializing Firebase Cloud Messaging')
-  const enabled = yield call(app.messaging().hasPermission)
 
+  const enabled = yield call([app.messaging(), 'hasPermission'])
   if (!enabled) {
     try {
-      yield call(app.messaging().requestPermission)
+      yield call([app.messaging(), 'requestPermission'])
     } catch (error) {
       Logger.error(TAG, 'User has rejected messaging permissions', error)
       throw error
     }
   }
 
-  const fcmToken = yield call(app.messaging().getToken)
+  const fcmToken = yield call([app.messaging(), 'getToken'])
   if (fcmToken) {
     yield call(registerTokenToDb, app, address, fcmToken)
     // First time setting the fcmToken also set the language selection
@@ -90,8 +101,7 @@ export function* initializeCloudMessaging(app: Firebase, address: string) {
   // TODO (not doing anything for the moment)
   // put(startFirebaseOnRefreshAction(channelOnNotificationOpened))
 
-  const initialNotification = yield call(app.notifications().getInitialNotification)
-
+  const initialNotification = yield call([app.notifications(), 'getInitialNotification'])
   if (initialNotification) {
     Logger.info(TAG, 'App opened fresh via a notification')
     yield handleNotification(

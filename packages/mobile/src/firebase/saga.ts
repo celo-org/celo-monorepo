@@ -1,6 +1,6 @@
 import firebase from 'react-native-firebase'
 import { DataSnapshot } from 'react-native-firebase/database'
-import { eventChannel, EventChannel } from 'redux-saga'
+import { eventChannel } from 'redux-saga'
 import {
   all,
   call,
@@ -12,19 +12,13 @@ import {
   takeEvery,
   takeLeading,
 } from 'redux-saga/effects'
-import {
-  NotificationReceiveState,
-  PaymentRequest,
-  PaymentRequestStatus,
-  updatePaymentRequests,
-} from 'src/account'
+import { PaymentRequest, PaymentRequestStatus, updatePaymentRequests } from 'src/account'
 import { showError } from 'src/alert/actions'
 import { Actions as AppActions } from 'src/app/actions'
 import { ErrorMessages } from 'src/app/ErrorMessages'
 import { FIREBASE_ENABLED } from 'src/config'
 import { Actions, firebaseAuthorized, UpdatePaymentRequestStatusAction } from 'src/firebase/actions'
 import { initializeAuth, initializeCloudMessaging, setUserLanguage } from 'src/firebase/firebase'
-import { handleNotification } from 'src/firebase/notifications'
 import Logger from 'src/utils/Logger'
 import { getAccount } from 'src/web3/saga'
 import { currentAccountSelector } from 'src/web3/selectors'
@@ -162,18 +156,6 @@ export function* syncLanguageSelection({ language }: { language: string }) {
 
 export function* watchLanguage() {
   yield takeEvery(AppActions.SET_LANGUAGE, syncLanguageSelection)
-}
-
-export function* watchFirebaseNotificationChannel(channel: EventChannel<Notification>) {
-  Logger.info(`${TAG}/watchFirebaseNotificationChannel`, 'Started channel watching')
-  while (true) {
-    const { data } = yield take(channel)
-    if (!data) {
-      break
-    }
-    Logger.info(`${TAG}/startFirebaseOnRefresh`, 'Notification received in the channel')
-    yield handleNotification(data.notification, NotificationReceiveState.APP_ALREADY_OPEN)
-  }
 }
 
 export function* firebaseSaga() {
