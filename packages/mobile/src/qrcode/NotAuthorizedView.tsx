@@ -2,16 +2,17 @@ import Button, { BtnTypes } from '@celo/react-components/components/Button'
 import fontStyles from '@celo/react-components/styles/fonts'
 import React, { useCallback } from 'react'
 import { withNamespaces, WithNamespaces } from 'react-i18next'
-import { Linking, Platform, StyleSheet, Text, View } from 'react-native'
+import { Platform, StyleSheet, Text, View } from 'react-native'
 import * as AndroidOpenSettings from 'react-native-android-open-settings'
 import { Namespaces } from 'src/i18n'
+import { navigateToURI } from 'src/utils/linking'
 
 type Props = WithNamespaces
 
 function NotAuthorizedView({ t }: Props) {
   const onPressSettings = useCallback(async () => {
     if (Platform.OS === 'ios') {
-      await Linking.openURL('app-settings:')
+      navigateToURI('app-settings:')
     } else if (Platform.OS === 'android') {
       AndroidOpenSettings.appDetailsSettings()
     }
