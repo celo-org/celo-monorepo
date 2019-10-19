@@ -5,7 +5,7 @@ pragma solidity ^0.5.0;
 
 import "./SafeCast.sol";
 
-contract MockSafeCast {
+contract SafeCastTest {
   using SafeCast for uint;
 
   function toUint128(uint a) public pure returns (uint128) {

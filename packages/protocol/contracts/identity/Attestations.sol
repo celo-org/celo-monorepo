@@ -42,7 +42,7 @@ contract Attestations is
 
   struct Account {
     // The block number of the most recent attestation request
-    uint64 mostRecentAttestationRequest;
+    uint64 mostRecentAttestationRequestBlockNumber;
 
     // The address at which the account expects to receive transfers
     address walletAddress;
@@ -72,7 +72,7 @@ contract Attestations is
     mapping(address => Attestation) issuedAttestations;
   }
 
-  struct AttestationRequest {
+  struct UnselectedRequest {
     // The block at which the attestations were requested
     uint128 blockNumber;
 
@@ -83,8 +83,11 @@ contract Attestations is
   struct IdentifierState {
     // All account addresses associated with this identifier
     address[] accounts;
+    // Keeps the state of the attestations for each account address
     mapping(address => AttestedAddress) attestations;
-    mapping(address => AttestationRequest) requests;
+    // Temporarily stores attestation requests for which issuers should be
+    // selected by the account
+    mapping(address => UnselectedRequest) unselectedRequests;
   }
 
   mapping(bytes32 => IdentifierState) identifiers;
@@ -97,7 +100,7 @@ contract Attestations is
   // solhint-disable-next-line state-visibility
   address constant REQUEST_ATTESTATION = address(0xff);
 
-  // The duration in seconds in which an attestation can be completed
+  // The duration in blocks in which an attestation can be completed
   uint256 public attestationExpiryBlocks;
 
   // The fees that are associated with attestations for a particular token.
@@ -219,28 +222,24 @@ contract Attestations is
 
     require(attestationsRequested > 0, "You have to request at least 1 attestation");
 
-    if (accounts[msg.sender].attestationRequestFeeToken != address(0x0)) {
-      require(
-        isAttestationExpired(accounts[msg.sender].mostRecentAttestationRequest) ||
-          accounts[msg.sender].attestationRequestFeeToken == attestationRequestFeeToken,
-        "A different fee token was previously specified for this account"
-      );
-    }
-
     IdentifierState storage state = identifiers[identifier];
-    if(state.requests[msg.sender].blockNumber > 0) {
-      // TODO: This should be bound by Random#randomnessBlockRetentionWindow once that gets merged
+    if(!isAttestationRequestExpired(accounts[msg.sender].mostRecentAttestationRequestBlockNumber)) {
       require(
-        isAttestationExpired(accounts[msg.sender].mostRecentAttestationRequest),
-        "Currently active attestation request that has to be revealed first"
+        accounts[msg.sender].attestationRequestFeeToken == address(0) ||
+          accounts[msg.sender].attestationRequestFeeToken == attestationRequestFeeToken,
+        "There exists an unexpired attestation request with a different fee token"
+      );
+      require(
+        state.unselectedRequests[msg.sender].blockNumber == 0,
+        "Currently unselected attestation request that has to be selected first"
       );
     }
 
-    state.requests[msg.sender].blockNumber = block.number.toUint128();
-    state.requests[msg.sender].attestationsRequested = attestationsRequested.toUint128();
+    state.unselectedRequests[msg.sender].blockNumber = block.number.toUint128();
+    state.unselectedRequests[msg.sender].attestationsRequested = attestationsRequested.toUint128();
 
     // solhint-disable-next-line not-rely-on-time
-    accounts[msg.sender].mostRecentAttestationRequest = block.number.toUint64();
+    accounts[msg.sender].mostRecentAttestationRequestBlockNumber = block.number.toUint64();
     accounts[msg.sender].attestationRequestFeeToken = attestationRequestFeeToken;
 
     state.attestations[msg.sender].requested = uint256(
@@ -263,23 +262,23 @@ contract Attestations is
     IdentifierState storage state = identifiers[identifier];
 
     require(
-      state.requests[msg.sender].blockNumber > 0,
+      state.unselectedRequests[msg.sender].blockNumber > 0,
       "No active attestation request to reveal issuers for"
     );
 
     addIncompleteAttestations(
-      state.requests[msg.sender].attestationsRequested,
+      state.unselectedRequests[msg.sender].attestationsRequested,
       state.attestations[msg.sender]
     );
 
     emit AttestationIssuersSelected(
       identifier,
       msg.sender,
-      state.requests[msg.sender].attestationsRequested,
+      state.unselectedRequests[msg.sender].attestationsRequested,
       accounts[msg.sender].attestationRequestFeeToken
     );
 
-    delete state.requests[msg.sender];
+    delete state.unselectedRequests[msg.sender];
   }
 
   /**
@@ -307,7 +306,7 @@ contract Attestations is
 
     // solhint-disable-next-line not-rely-on-time
     require(
-      isAttestationExpired(attestation.blockNumber),
+      !isAttestationRequestExpired(attestation.blockNumber),
       "Attestation request timed out"
     );
 
@@ -397,9 +396,9 @@ contract Attestations is
   }
 
   /**
-   * @notice Setter for the dataEncryptionKey and wallet address for an account
+   * @notice Setter for the dataEncryptionKey and wallet address for an account.
    * @param dataEncryptionKey secp256k1 public key for data encryption. Preferably compressed.
-   * @param walletAddress The wallet address to set for the account
+   * @param walletAddress The wallet address to set for the account.
    */
   function setAccount(
     bytes calldata dataEncryptionKey,
@@ -412,13 +411,12 @@ contract Attestations is
   }
 
   /**
-   * @notice Returns the current attestation request for an identifier/account pair for which
-             issues have not yet been selected, if any
+   * @notice Returns the unselected attestation request for an identifier/account pair, if any.
    * @param identifier Hash of the identifier.
-   * @param account Address of the account
-   * @return [Block numbr at which was requested, Number of requests]
+   * @param account Address of the account.
+   * @return [Block number at which was requested, Number of unselected requests]
    */
-  function getAttestationRequest(
+  function getUnselectedRequest(
     bytes32 identifier,
     address account
   )
@@ -427,16 +425,16 @@ contract Attestations is
     returns (uint128, uint128)
   {
     return (
-      identifiers[identifier].requests[account].blockNumber,
-      identifiers[identifier].requests[account].attestationsRequested
+      identifiers[identifier].unselectedRequests[account].blockNumber,
+      identifiers[identifier].unselectedRequests[account].attestationsRequested
     );
   }
 
   /**
-   * @notice Returns attestation issuers for a identifier/account pair
+   * @notice Returns attestation issuers for a identifier/account pair.
    * @param identifier Hash of the identifier.
-   * @param account Address of the account
-   * @return Addresses of the attestation issuers
+   * @param account Address of the account.
+   * @return Addresses of the attestation issuers.
    */
   function getAttestationIssuers(
     bytes32 identifier,
@@ -450,9 +448,9 @@ contract Attestations is
   }
 
   /**
-   * @notice Returns attestation stats for a identifier/account pair
+   * @notice Returns attestation stats for a identifier/account pair.
    * @param identifier Hash of the identifier.
-   * @param account Address of the account
+   * @param account Address of the account.
    * @return [Number of completed attestations, Number of total requested attestations]
    */
   function getAttestationStats(
@@ -470,13 +468,13 @@ contract Attestations is
   }
 
   /**
-   * @notice Batch lookup function to determine attestation stats for a list of identifiers
-   * @param identifiersToLookup Array of n identifiers
-   * @return [0] Array of number of matching accounts per identifier
-   * @return [1] Array of sum([0]) matching walletAddresses
+   * @notice Batch lookup function to determine attestation stats for a list of identifiers.
+   * @param identifiersToLookup Array of n identifiers.
+   * @return [0] Array of number of matching accounts per identifier.
+   * @return [1] Array of sum([0]) matching walletAddresses.
    * @return [2] Array of sum([0]) numbers indicating the completions for each account
    * @return [3] Array of sum([0]) numbers indicating the total number of requested
-                 attestations for each account
+                 attestations for each account.
    */
   function batchGetAttestationStats(
     bytes32[] calldata identifiersToLookup
@@ -515,11 +513,11 @@ contract Attestations is
   }
 
   /**
-   * @notice Returns the state of a specific attestation
+   * @notice Returns the state of a specific attestation.
    * @param identifier Hash of the identifier.
-   * @param account Address of the account
-   * @param issuer Address of the issuer
-   * @return [Status of the attestation, block number of request/completion the attestation
+   * @param account Address of the account.
+   * @param issuer Address of the issuer.
+   * @return [Status of the attestation, block number of request/completion the attestation]
    */
   function getAttestationState(
     bytes32 identifier,
@@ -538,25 +536,25 @@ contract Attestations is
   }
 
   /**
-   * @notice Returns address of the token in which the account chose to pay attestation fees
-   * @param account Address of the account
-   * @return Address of the token contract
+   * @notice Returns address of the token in which the account chose to pay attestation fees.
+   * @param account Address of the account.
+   * @return Address of the token contract.
    */
   function getAttestationRequestFeeToken(address account) external view returns (address) {
     return accounts[account].attestationRequestFeeToken;
   }
 
   /**
-   * @notice Returns the block numbert of the most recent attestation request
-   * @param account Address of the account
-   * @return Block numbert of the most recent attestation request
+   * @notice Returns the block number of the most recent attestation request.
+   * @param account Address of the account.
+   * @return Block number of the most recent attestation request.
    */
-  function getMostRecentAttestationRequest(address account)
+  function getMostRecentAttestationRequestBlockNumber(address account)
     external
     view
     returns (uint256)
   {
-    return accounts[account].mostRecentAttestationRequest;
+    return accounts[account].mostRecentAttestationRequestBlockNumber;
   }
 
   /**
@@ -771,10 +769,7 @@ contract Attestations is
       attestation.status == AttestationStatus.Incomplete,
       "Attestation code does not match any outstanding attestation"
     );
-    require(
-      isAttestationExpired(attestation.blockNumber),
-      "Attestation request timed out"
-    );
+    require(!isAttestationRequestExpired(attestation.blockNumber), "Attestation request timed out");
 
     return issuer;
   }
@@ -867,7 +862,7 @@ contract Attestations is
     }
   }
 
-  function isAttestationExpired(
+  function isAttestationRequestExpired(
     uint128 attestationRequestBlock
   )
     internal

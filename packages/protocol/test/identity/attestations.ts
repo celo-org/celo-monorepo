@@ -3,13 +3,13 @@ import Web3 = require('web3')
 import { CeloContractName } from '@celo/protocol/lib/registry-utils'
 import {
   advanceBlockNum,
+  assertEqualBN,
   assertLogMatches2,
   assertRevert,
   NULL_ADDRESS,
 } from '@celo/protocol/lib/test-utils'
 import { attestToIdentifier } from '@celo/utils'
 import { privateKeyToAddress } from '@celo/utils/lib/address'
-import { sleep } from '@celo/utils/lib/async'
 import { getPhoneHash } from '@celo/utils/lib/phoneNumbers'
 import BigNumber from 'bignumber.js'
 import { uniq } from 'lodash'
@@ -385,31 +385,32 @@ contract('Attestations', (accounts: string[]) => {
       await attestations.request(phoneHash, attestationsRequested, mockStableToken.address)
       const requestBlock = await web3.eth.getBlock('latest')
 
-      const [
-        blockNumber,
-        actualAttestationsRequested,
-      ] = await attestations.getActiveAttestationRequest(phoneHash, caller)
-      assert.equal(blockNumber.toString(), requestBlock.number.toString())
-      assert.equal(attestationsRequested, actualAttestationsRequested.toNumber())
+      const [blockNumber, actualAttestationsRequested] = await attestations.getUnselectedRequest(
+        phoneHash,
+        caller
+      )
+
+      assertEqualBN(blockNumber, requestBlock.number)
+      assertEqualBN(attestationsRequested, actualAttestationsRequested)
     })
 
     it('should increment the number of attestations requested', async () => {
       await attestations.request(phoneHash, attestationsRequested, mockStableToken.address)
 
       const [completed, total] = await attestations.getAttestationStats(phoneHash, caller)
-      assert.equal(completed.toNumber(), 0)
-      assert.equal(total.toNumber(), attestationsRequested)
+      assertEqualBN(completed, 0)
+      assertEqualBN(total, attestationsRequested)
     })
 
-    it('should set the mostRecentAttestationRequested timestamp', async () => {
+    it('should set the mostRecentAttestationRequested block number', async () => {
       await attestations.request(phoneHash, attestationsRequested, mockStableToken.address)
 
       const requestBlock = await web3.eth.getBlock('latest')
-      const mostRecentAttestationRequested = await attestations.getMostRecentAttestationRequest(
+      const mostRecentAttestationRequestedBlockNumber = await attestations.getMostRecentAttestationRequestBlockNumber(
         caller
       )
 
-      assert.equal(requestBlock.number.toString(), mostRecentAttestationRequested.toString())
+      assertEqualBN(requestBlock.number, mostRecentAttestationRequestedBlockNumber)
     })
 
     it('should set the attestationRequestFeeToken', async () => {
@@ -523,6 +524,16 @@ contract('Attestations', (accounts: string[]) => {
         )
       })
 
+      it('should delete the unselected request', async () => {
+        await attestations.selectIssuers(phoneHash)
+        const [blockNumber, actualAttestationsRequested] = await attestations.getUnselectedRequest(
+          phoneHash,
+          caller
+        )
+        assertEqualBN(blockNumber, 0)
+        assertEqualBN(actualAttestationsRequested, 0)
+      })
+
       it('should emit the AttestationIssuersSelected event', async () => {
         const response = await attestations.selectIssuers(phoneHash)
 
@@ -625,7 +636,7 @@ contract('Attestations', (accounts: string[]) => {
     })
 
     it('should set the time of the successful completion', async () => {
-      await sleep(1000)
+      await advanceBlockNum(1, web3)
       await attestations.complete(phoneHash, v, r, s)
 
       const expectedBlock = await web3.eth.getBlock('latest')

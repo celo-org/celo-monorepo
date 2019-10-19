@@ -3,11 +3,11 @@
 import BN = require('bn.js')
 import { expect } from 'chai'
 import { assertRevert } from '../../lib/test-utils'
-const MockSafeCast = artifacts.require('MockSafeCast')
+const SafeCastTest = artifacts.require('SafeCastTest')
 
 contract('SafeCast', async () => {
   beforeEach(async function() {
-    this.safeCast = await MockSafeCast.new()
+    this.safeCast = await SafeCastTest.new()
   })
 
   function testToUint(bits) {

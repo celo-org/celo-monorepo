@@ -312,7 +312,7 @@ export class AttestationsWrapper extends BaseWrapper<Attestations> {
   }
 
   /**
-   * Selecets the issuers for previously requested attestations for a phone number
+   * Selects the issuers for previously requested attestations for a phone number
    * @param phoneNumber The phone number for which to request attestations for
    * @param token The token with which to pay for the attestation fee
    */
