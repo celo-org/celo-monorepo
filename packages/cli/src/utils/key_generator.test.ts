@@ -2,7 +2,7 @@ import { validateMnemonic } from 'bip39'
 import { ReactNativeBip39MnemonicGenerator } from './key_generator'
 
 describe('Mnemonic validation', () => {
-  it('should generatet 24 word mnemonic', () => {
+  it('should generate 24 word mnemonic', () => {
     const mnemonic: string = ReactNativeBip39MnemonicGenerator.generateMnemonic()
     expect(mnemonic.split(' ').length).toEqual(24)
   })

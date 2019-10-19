@@ -10,7 +10,6 @@ import "../common/interfaces/IERC20Token.sol";
 import "../governance/interfaces/IValidators.sol";
 
 import "../common/Initializable.sol";
-import "../governance/UsingLockedGold.sol";
 import "../common/UsingRegistry.sol";
 import "../common/Signatures.sol";
 import "../common/SafeCast.sol";
@@ -19,15 +18,7 @@ import "../common/SafeCast.sol";
 /**
  * @title Contract mapping identifiers to accounts
  */
-contract Attestations is
-  IAttestations,
-  Ownable,
-  Initializable,
-  UsingRegistry,
-  ReentrancyGuard,
-  UsingLockedGold
-{
-
+contract Attestations is IAttestations, Ownable, Initializable, UsingRegistry, ReentrancyGuard {
 
   using SafeMath for uint256;
   using SafeCast for uint256;
@@ -785,17 +776,6 @@ contract Attestations is
   }
 
   /**
-   * @notice Returns the current validator set
-   * TODO: Should be replaced with a precompile
-   */
-  function getValidators() public view returns (address[] memory) {
-    IValidators validatorContract = IValidators(
-      registry.getAddressForOrDie(VALIDATORS_REGISTRY_ID)
-    );
-    return validatorContract.getValidators();
-  }
-
-  /**
    * @notice Helper function for batchGetAttestationStats to calculate the
              total number of addresses that have >0 complete attestations for the identifiers
    * @param identifiersToLookup Array of n identifiers
@@ -837,7 +817,7 @@ contract Attestations is
     IRandom random = IRandom(registry.getAddressForOrDie(RANDOM_REGISTRY_ID));
 
     bytes32 seed = random.random();
-    address[] memory validators = getValidators();
+    address[] memory validators = getElection().electValidators();
 
     uint256 currentIndex = 0;
     address validator;
@@ -846,7 +826,7 @@ contract Attestations is
     while (currentIndex < n) {
       seed = keccak256(abi.encodePacked(seed));
       validator = validators[uint256(seed) % validators.length];
-      issuer = getAccountFromValidator(validator);
+      issuer = getLockedGold().getAccountFromValidator(validator);
       Attestation storage attestations =
         state.issuedAttestations[issuer];
 
