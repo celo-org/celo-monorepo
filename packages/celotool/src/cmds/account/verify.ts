@@ -49,6 +49,7 @@ async function verifyCmd(argv: VerifyArgv) {
   kit.defaultAccount = account
 
   const attestations = await kit.contracts.getAttestations()
+  const accounts = await kit.contracts.getAccounts()
   await printCurrentCompletedAttestations(attestations, argv.phone, account)
 
   let attestationsToComplete = await attestations.getActionableAttestations(argv.phone, account)
@@ -64,10 +65,10 @@ async function verifyCmd(argv: VerifyArgv) {
   }
 
   // Set the wallet address if not already appropriate
-  const currentWalletAddress = await attestations.getWalletAddress(account)
+  const currentWalletAddress = await accounts.getWalletAddress(account)
 
   if (currentWalletAddress !== account) {
-    const setWalletAddressTx = await attestations.setWalletAddress(account)
+    const setWalletAddressTx = await accounts.setWalletAddress(account)
     const result = await setWalletAddressTx.send()
     await result.waitReceipt()
   }
