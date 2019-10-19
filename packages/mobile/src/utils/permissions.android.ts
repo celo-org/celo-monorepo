@@ -21,16 +21,8 @@ export async function requestContactsPermission() {
   )
 }
 
-export async function requestCameraPermission() {
-  return requestPermission(PermissionsAndroid.PERMISSIONS.CAMERA)
-}
-
 export async function checkContactsPermission() {
   return PermissionsAndroid.check(PermissionsAndroid.PERMISSIONS.READ_CONTACTS)
-}
-
-export async function checkCameraPermission() {
-  return PermissionsAndroid.check(PermissionsAndroid.PERMISSIONS.CAMERA)
 }
 
 async function requestPermission(permission: Permission, title?: string, message?: string) {
