@@ -12,6 +12,10 @@ contract MockValidators is IValidators {
   address[] private validators;
   uint256 private quorum;
   uint256 private epoch;
+  mapping(address => uint256) private numGroupMembers;
+  mapping(address => uint256) private balanceRequirements;
+  mapping(address => address[]) private members;
+  uint256 private numRegisteredValidators;
 
   function isValidating(address account) external view returns (bool) {
     return _isValidating[account];
@@ -21,8 +25,8 @@ contract MockValidators is IValidators {
     return _isVoting[account];
   }
 
-  function getValidators() external view returns (address[] memory) {
-    return validators;
+  function getGroupNumMembers(address group) public view returns (uint256) {
+    return members[group].length;
   }
 
   function setValidating(address account) external {
@@ -33,16 +37,56 @@ contract MockValidators is IValidators {
     _isVoting[account] = true;
   }
 
-  function addValidator(address account) external {
-    validators.push(account);
+  function setNumRegisteredValidators(uint256 value) external {
+    numRegisteredValidators = value;
   }
 
-  function validatorAddressFromCurrentSet(uint256 idx) external view returns (address) {
-    return validators[idx];
+  function getNumRegisteredValidators() external view returns (uint256) {
+    return numRegisteredValidators;
   }
 
-  function numberValidatorsInCurrentSet() external view returns (uint256) {
-    return validators.length;
+  function setMembers(address group, address[] calldata _members) external {
+    members[group] = _members;
+  }
+
+  function setAccountBalanceRequirement(address account, uint256 value) external {
+    balanceRequirements[account] = value;
+  }
+
+  function getAccountBalanceRequirement(address account) external view returns (uint256) {
+    return balanceRequirements[account];
+  }
+
+  function getTopValidatorsFromGroup(
+    address group,
+    uint256 n
+  )
+    external
+    view
+    returns (address[] memory)
+  {
+    require(n <= members[group].length);
+    address[] memory validatorgroup = new address[](n);
+    for (uint256 i = 0; i < n; i++) {
+      validatorgroup[i] = members[group][i];
+    }
+    return validatorgroup;
+  }
+
+  function getGroupsNumMembers(address[] calldata groups) external view returns (uint256[] memory) {
+    uint256[] memory numMembers = new uint256[](groups.length);
+    for (uint256 i = 0; i < groups.length; i++) {
+      numMembers[i] = getGroupNumMembers(groups[i]);
+    }
+    return numMembers;
+  }
+
+  function addValidator(address validator) external {
+    validators.push(validator);
+  }
+
+  function getRegisteredValidators() external view returns (address[] memory) {
+    return validators;
   }
 
   function getByzantineQuorumForCurrentSet() external view returns (uint256) {
