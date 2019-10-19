@@ -616,7 +616,7 @@ contract Validators is IValidators, Ownable, ReentrancyGuard, Initializable, Usi
    * @notice Returns the number of registered validators.
    * @return The number of registered validators.
    */
-  function getNumRegisteredValidators() external view returns (uint256) {
+  function getNumRegisteredValidators() public view returns (uint256) {
     return _validators.length;
   }
 

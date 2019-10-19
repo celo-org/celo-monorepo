@@ -11,7 +11,6 @@ import "./Proposals.sol";
 import "../common/ExtractFunctionSignature.sol";
 import "../common/Initializable.sol";
 import "../common/FixidityLib.sol";
-import "../common/FractionUtil.sol";
 import "../common/linkedlists/IntegerSortedLinkedList.sol";
 import "../common/UsingRegistry.sol";
 
@@ -22,7 +21,6 @@ import "../common/UsingRegistry.sol";
 contract Governance is IGovernance, Ownable, Initializable, ReentrancyGuard, UsingRegistry {
   using Proposals for Proposals.Proposal;
   using FixidityLib for FixidityLib.Fraction;
-  using FractionUtil for FractionUtil.Fraction;
   using SafeMath for uint256;
   using IntegerSortedLinkedList for SortedLinkedList.List;
   using BytesLib for bytes;
@@ -493,10 +491,10 @@ contract Governance is IGovernance, Ownable, Initializable, ReentrancyGuard, Usi
     queue.push(proposalCount);
     // solhint-disable-next-line not-rely-on-time
     emit ProposalQueued(
-      proposalCount, 
-      msg.sender, 
-      proposals[proposalCount].transactions.length, 
-      msg.value, 
+      proposalCount,
+      msg.sender,
+      proposals[proposalCount].transactions.length,
+      msg.value,
       now
     );
     return proposalCount;
@@ -748,11 +746,11 @@ contract Governance is IGovernance, Ownable, Initializable, ReentrancyGuard, Usi
     require(preparedEpoch == validators.getEpochNumber(), "hotfix must be prepared for this epoch");
 
     Proposals.Proposal memory proposal = Proposals.makeMem(
-      values, 
-      destinations, 
-      data, 
-      dataLengths, 
-      msg.sender, 
+      values,
+      destinations,
+      data,
+      dataLengths,
+      msg.sender,
       0
     );
     proposal.executeMem();
@@ -942,7 +940,7 @@ contract Governance is IGovernance, Ownable, Initializable, ReentrancyGuard, Usi
   function isHotfixPassing(bytes32 txHash) public view returns (bool) {
     IValidators validators = IValidators(registry.getAddressForOrDie(VALIDATORS_REGISTRY_ID));
     uint256 quorum = validators.getRegisteredValidatorsByzantineQuorum();
-    address[] validatorSet = validators.getRegisteredValidators();
+    address[] memory validatorSet = validators.getRegisteredValidators();
 
     uint256 tally = 0;
     for (uint256 idx = 0; idx < validatorSet.length; idx++) {
@@ -961,25 +959,10 @@ contract Governance is IGovernance, Ownable, Initializable, ReentrancyGuard, Usi
    */
   function getHotfixRecord(bytes32 txHash) public view returns (bool, bool, uint256) {
     return (
-      hotfixes[txHash].whitelisted[approver], 
-      hotfixes[txHash].completed, 
+      hotfixes[txHash].whitelisted[approver],
+      hotfixes[txHash].completed,
       hotfixes[txHash].preparedEpoch
     );
-  }
-
-  /**
-   * @notice Returns whether or not a particular account is voting on proposals.
-   * @param account The address of the account.
-   * @return Whether or not the account is voting on proposals.
-   */
-  function isVoting(address account) external view returns (bool) {
-    Voter storage voter = voters[account];
-    bool isVotingQueue = voter.upvotedProposal != 0 && isQueued(voter.upvotedProposal);
-    Proposals.Proposal storage proposal = proposals[voter.mostRecentReferendumProposal];
-    bool isVotingReferendum = (
-      proposal.getDequeuedStage(stageDurations) == Proposals.Stage.Referendum
-    );
-    return isVotingQueue || isVotingReferendum;
   }
 
   /**
