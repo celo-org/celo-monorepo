@@ -23,7 +23,7 @@ describe('Account', () => {
     expect(tree).toMatchSnapshot()
   })
 
-  it('renders correctly hen dev mode active', () => {
+  it('renders correctly when dev mode active', () => {
     const tree = renderer.create(
       <Provider
         store={createMockStore({
