@@ -44,7 +44,7 @@ class BackupComplete extends React.Component<Props> {
       } else if (backupCompleted) {
         navigate(Screens.BackupIntroduction)
       } else {
-        throw new Error('Backup complete ccreen should not be reachable without completing backup')
+        throw new Error('Backup complete screen should not be reachable without completing backup')
       }
     }, 2000)
   }
