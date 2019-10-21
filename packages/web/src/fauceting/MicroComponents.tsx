@@ -49,7 +49,7 @@ export function HashingStatus({
       style={isFaucet ? [std.row, styles.statusesContainerTicker] : styles.statusesContainerLog}
     >
       {[
-        goldTxHash && t('cGLDsent'),
+        goldTxHash && isFaucet && t('cGLDsent'),
         dollarTxHash && t('cUSDsent'),
         escrowTxHash && t('walletBuilt'),
       ]

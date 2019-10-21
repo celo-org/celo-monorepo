@@ -37,7 +37,7 @@ export interface RequestRecord {
   type: RequestType
   mobileOS?: MobileOS // only on invite
   dollarTxHash?: string
-  goldTxHash?: string // only on faucet
+  goldTxHash?: string
   escrowTxHash?: string // only on Invites
 }
 
