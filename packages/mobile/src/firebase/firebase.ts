@@ -114,7 +114,7 @@ export const writePaymentRequest = (paymentInfo: PaymentRequest) => async () => 
   }
 }
 
-function isDeprecatedVersion(version: string, minVersion: string): boolean {
+export function isDeprecatedVersion(version: string, minVersion: string): boolean {
   const minVersionArray = minVersion.split('.')
   const versionArray = version.split('.')
   const minVersionLength = Math.min(minVersionArray.length, version.length)
@@ -131,26 +131,44 @@ function isDeprecatedVersion(version: string, minVersion: string): boolean {
   return false
 }
 
-export async function getVersionInfo(version: string) {
-  // backward compatible
-  let deprecated = false
-  const versionFSPath = version.split('.').join('/')
-  Logger.info(TAG, `Checking version info ${version}`)
-  const versionInfo = (await firebase
-    .database()
-    .ref(`versions/${versionFSPath}`)
-    .once('value')).val()
-  if (versionInfo && versionInfo.deprecated !== undefined) {
-    return versionInfo
+export function getNestedValue(dict: object, keyList: string[]): any {
+  let nestedDict: any = dict
+  for (const key of keyList) {
+    if (typeof nestedDict !== 'object' || nestedDict[key] === undefined) {
+      return undefined
+    }
+    nestedDict = nestedDict[key]
   }
+  return nestedDict
+}
+
+/*
+Get the Version deprecation information.
+@param version: string The version to check for deprecation
+@return: object { version: <VERSION>, deprecated: <BOOLEAN> }
+Firebase DB Format: 
+  (Backward Compatibility) Add child to versions category in the format versions>1>5>0>{deprecated: true}
+  (New) Add minVersion child to versions category with a string of the mininum version as string
+*/
+export async function getVersionInfo(version: string) {
+  let deprecated: boolean = false
+  Logger.info(TAG, `Checking version info ${version}`)
   const versionsInfo = (await firebase
     .database()
     .ref('versions')
     .once('value')).val()
-  if (!versionsInfo || !versionsInfo.minVersion) {
+  if (!versionsInfo) {
+    return { deprecated, version }
+  }
+  // backward compatible check
+  const currentVersionInfo = getNestedValue(versionsInfo, version.split('.'))
+  if (currentVersionInfo && currentVersionInfo.deprecated !== undefined) {
+    return currentVersionInfo
+  }
+  if (!versionsInfo.minVersion) {
     return { version, deprecated }
   }
-  const minVersion = versionsInfo.minVersion
+  const minVersion: string = versionsInfo.minVersion
   deprecated = isDeprecatedVersion(version, minVersion)
   return { version, deprecated }
 }
