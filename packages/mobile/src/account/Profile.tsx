@@ -65,9 +65,6 @@ export class Profile extends React.Component<Props> {
 }
 
 const style = StyleSheet.create({
-  accountHeader: {
-    paddingTop: 20,
-  },
   accountProfile: {
     paddingLeft: 10,
     paddingTop: 30,
@@ -75,26 +72,6 @@ const style = StyleSheet.create({
     paddingBottom: 15,
     flexDirection: 'column',
     alignItems: 'center',
-  },
-  accountFooter: {
-    flex: 1,
-    flexDirection: 'row',
-    justifyContent: 'center',
-    alignItems: 'center',
-    height: 50,
-    margin: 10,
-  },
-  accountFooterText: {
-    paddingBottom: 10,
-  },
-  editProfileButton: {
-    height: 28,
-    width: 110,
-  },
-  image: {
-    height: 55,
-    width: 55,
-    borderRadius: 50,
   },
   underlinedBox: {
     borderTopWidth: 1,

@@ -144,6 +144,17 @@ library SortedLinkedList {
     return list.list.getKeys();
   }
 
+  /**
+   * @notice Returns first N greatest elements of the list.
+   * @param n The number of elements to return.
+   * @return The keys of the first n elements.
+   * @dev Reverts if n is greater than the number of elements in the list.
+   */
+  function headN(List storage list, uint256 n) public view returns (bytes32[] memory) {
+    return list.list.headN(n);
+  }
+
+
   // TODO(asa): Gas optimizations by passing in elements to isValueBetween
   /**
    * @notice Returns the keys of the elements greaterKey than and less than the provided value.
@@ -173,9 +184,13 @@ library SortedLinkedList {
       greaterKey == bytes32(0) && isValueBetween(list, value, list.list.head, greaterKey)
     ) {
       return (list.list.head, greaterKey);
-    } else if (isValueBetween(list, value, lesserKey, list.list.elements[lesserKey].nextKey)) {
+    } else if (
+      lesserKey != bytes32(0) &&
+      isValueBetween(list, value, lesserKey, list.list.elements[lesserKey].nextKey))
+    {
       return (lesserKey, list.list.elements[lesserKey].nextKey);
     } else if (
+      greaterKey != bytes32(0) &&
       isValueBetween(list, value, list.list.elements[greaterKey].previousKey, greaterKey)
     ) {
       return (list.list.elements[greaterKey].previousKey, greaterKey);

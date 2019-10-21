@@ -4,7 +4,7 @@ import * as Crypto from 'crypto'
 import { generateMnemonic, mnemonicToSeedHex } from 'react-native-bip39'
 import * as RNFS from 'react-native-fs'
 import { REHYDRATE } from 'redux-persist/es/constants'
-import { call, delay, put, race, select, take } from 'redux-saga/effects'
+import { call, delay, put, race, select, spawn, take, takeLatest } from 'redux-saga/effects'
 import { setAccountCreationTime } from 'src/account/actions'
 import { getPincode } from 'src/account/saga'
 import CeloAnalytics from 'src/analytics/CeloAnalytics'
@@ -22,6 +22,7 @@ import {
   Actions,
   getLatestBlock,
   setAccount,
+  SetIsZeroSyncAction,
   setLatestBlockNumber,
   setPrivateCommentKey,
   updateWeb3SyncProgress,
@@ -343,4 +344,18 @@ export function* getConnectedUnlockedAccount() {
   } else {
     throw new Error(ErrorMessages.INCORRECT_PIN)
   }
+}
+
+export function* switchZeroSyncMode(action: SetIsZeroSyncAction) {
+  Logger.info(TAG + '@switchZeroSyncMode', `Zero sync mode will change to: ${action.zeroSyncMode}`)
+  // TODO(anna) implement switching geth on/off, changing web3 provider
+  return true
+}
+
+export function* watchZeroSyncMode() {
+  yield takeLatest(Actions.SET_IS_ZERO_SYNC, switchZeroSyncMode)
+}
+
+export function* web3Saga() {
+  yield spawn(watchZeroSyncMode)
 }
