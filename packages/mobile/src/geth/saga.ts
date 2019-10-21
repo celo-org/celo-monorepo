@@ -66,7 +66,7 @@ function* waitForGethInstance() {
   }
 }
 
-function* initGethSaga() {
+export function* initGethSaga() {
   Logger.debug(TAG, 'Initializing Geth')
   yield put(setInitState(InitializationState.INITIALIZING))
 

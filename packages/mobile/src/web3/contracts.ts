@@ -2,7 +2,6 @@ import { addLocalAccount as web3utilsAddLocalAccount } from '@celo/walletkit'
 import { Platform } from 'react-native'
 import * as net from 'react-native-tcp'
 import { DEFAULT_INFURA_URL, DEFAULT_TESTNET } from 'src/config'
-import { GethSyncMode } from 'src/geth/consts'
 import { IPC_PATH } from 'src/geth/geth'
 import networkConfig, { Testnets } from 'src/geth/networkConfig'
 import Logger from 'src/utils/Logger'
@@ -15,7 +14,7 @@ const tag = 'web3/contracts'
 export const web3: Web3 = getWeb3()
 
 export function isInitiallyZeroSyncMode(): boolean {
-  return networkConfig.syncMode === GethSyncMode.ZeroSync
+  return networkConfig.initiallyZeroSync
 }
 
 function getIpcProvider(testnet: Testnets) {
@@ -95,10 +94,6 @@ export function switchWeb3ProviderForSyncMode(zeroSync: boolean) {
 }
 
 export function addLocalAccount(web3Instance: Web3, privateKey: string) {
-  // Ensure web3 instance is in zeroSync mode
-  if (!(web3Instance.currentProvider instanceof Web3.providers.HttpProvider)) {
-    throw new Error('addLocalAccount can only be called in zeroSync mode')
-  }
   if (!web3Instance) {
     throw new Error(`web3 instance is ${web3Instance}`)
   }

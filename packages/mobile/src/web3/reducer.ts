@@ -1,4 +1,3 @@
-import { GethSyncMode } from 'src/geth/consts'
 import networkConfig from 'src/geth/networkConfig'
 import { getRehydratePayload, REHYDRATE, RehydrateAction } from 'src/redux/persist-helper'
 import { Actions, ActionTypes } from 'src/web3/actions'
@@ -26,7 +25,7 @@ const initialState: State = {
   account: null,
   accountInWeb3Keystore: null,
   commentKey: null,
-  zeroSyncMode: networkConfig.syncMode === GethSyncMode.ZeroSync,
+  zeroSyncMode: networkConfig.initiallyZeroSync,
 }
 
 export const reducer = (

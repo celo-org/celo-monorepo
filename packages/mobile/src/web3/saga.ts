@@ -36,6 +36,7 @@ import {
   zeroSyncSelector,
 } from 'src/web3/selectors'
 import { Block } from 'web3/eth/types'
+import { initGethSaga } from 'src/geth/saga'
 
 const ETH_PRIVATE_KEY_LENGTH = 64
 const MNEMONIC_BIT_LENGTH = (ETH_PRIVATE_KEY_LENGTH * 8) / 2
@@ -390,9 +391,9 @@ export function* addAccountToWeb3Keystore(key: string, currentAccount: string, p
 }
 
 export function* ensureAccountInWeb3Keystore() {
-  const currentAccount = yield select(currentAccountSelector)
+  const currentAccount: string = yield select(currentAccountSelector)
   if (currentAccount) {
-    const accountInWeb3Keystore = yield select(currentAccountInWeb3KeystoreSelector)
+    const accountInWeb3Keystore: string = yield select(currentAccountInWeb3KeystoreSelector)
     if (!accountInWeb3Keystore) {
       Logger.debug(
         TAG + '@ensureAccountInWeb3Keystore',
@@ -400,12 +401,19 @@ export function* ensureAccountInWeb3Keystore() {
       )
       const pincode = yield call(getPincode)
       const privateKey: string = yield readPrivateKeyFromLocalDisk(currentAccount, pincode)
-      const account = yield call(addAccountToWeb3Keystore, privateKey, currentAccount, pincode)
+      const account: string = yield call(
+        addAccountToWeb3Keystore,
+        privateKey,
+        currentAccount,
+        pincode
+      )
       return account
-    } else if (accountInWeb3Keystore === currentAccount) {
+    } else if (accountInWeb3Keystore.toLowerCase() === currentAccount.toLowerCase()) {
       return accountInWeb3Keystore
     } else {
-      throw new Error('Account in web3 keystore does not match current account')
+      throw new Error(
+        `Account in web3 keystore (${accountInWeb3Keystore}) does not match current account (${currentAccount})`
+      )
     }
   } else {
     throw new Error('Account not yet initialized')
@@ -413,7 +421,8 @@ export function* ensureAccountInWeb3Keystore() {
 }
 
 export function* switchToGethFromZeroSync() {
-  Logger.debug(TAG + 'Switching to geth mode from zeroSync..')
+  yield call(initGethSaga)
+
   setZeroSyncMode(false)
   switchWeb3ProviderForSyncMode(false)
 
