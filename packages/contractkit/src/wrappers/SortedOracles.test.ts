@@ -1,4 +1,3 @@
-import BigNumber from 'bignumber.js'
 import { Address, CeloContract } from '../base'
 import { newKitFromWeb3 } from '../kit'
 import { NetworkConfig, testWithGanache } from '../test-utils/ganache-test'
@@ -175,7 +174,7 @@ testWithGanache('SortedOracles Wrapper', (web3) => {
     })
 
     it('returns the rate as the result of the calculation numerator/denominator', async () => {
-      const expectedRates = [4, 3, 2, 1].map((n) => new BigNumber(n).div(2).toString())
+      const expectedRates = ['2', '1.5', '1', '0.5']
       const response = await sortedOracles.getRates(CeloContract.StableToken)
       const actualRates = response.map((r) => r.rate.toString())
       expect(actualRates).toEqual(expectedRates)
