@@ -18,7 +18,11 @@ async function calculateHashRN(identifier: string) {
   for (const item of result) {
     hexHash += item.toString(16)
   }
-  return '0x' + hexHash.padStart(64, '0')
+  hexHash = hexHash.padStart(64, '0')
+  if (hexHash.startsWith('0x')) {
+    return hexHash
+  }
+  return '0x' + hexHash
 }
 
 async function calculateHashRNBulk(identifierList: string[]) {
@@ -44,7 +48,8 @@ async function calculateHashRNBulk(identifierList: string[]) {
     for (const hash of itemArray) {
       hexHash += hash.toString(16)
     }
-    hashList[index] = '0x' + hexHash.padStart(64, '0')
+    hexHash = hexHash.padStart(64, '0')
+    hashList[index] = hexHash.startsWith('0x') ? hexHash : '0x' + hexHash
     hexHash = ''
   }
   return hashList

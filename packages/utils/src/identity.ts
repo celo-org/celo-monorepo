@@ -35,7 +35,12 @@ async function calculateHash(identifier: string) {
             hexHash += item.toString(16)
           }
           // @ts-ignore
-          resolve('0x' + hexHash.padStart(64, '0'))
+          hexHash = hexHash.padStart(64, '0')
+          if (hexHash.startsWith('0x')) {
+            resolve(hexHash)
+          } else {
+            resolve('0x' + hexHash)
+          }
         } else if (progress) {
           // do nothing
         }
