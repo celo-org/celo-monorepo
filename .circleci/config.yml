@@ -31,7 +31,7 @@ android-defaults: &android-defaults
     GRADLE_OPTS: '-Dorg.gradle.daemon=false -Dorg.gradle.jvmargs="-Xmx1024m -XX:+HeapDumpOnOutOfMemoryError"'
 
 e2e-defaults: &e2e-defaults
-  working_directory: ~/app
+  <<: *defaults
   docker:
     - image: celohq/circleci
 
