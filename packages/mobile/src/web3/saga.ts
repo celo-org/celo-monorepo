@@ -22,6 +22,7 @@ import {
   Actions,
   getLatestBlock,
   setAccount,
+  setAccountInWeb3Keystore,
   SetIsZeroSyncAction,
   setLatestBlockNumber,
   setPrivateCommentKey,
