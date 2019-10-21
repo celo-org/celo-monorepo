@@ -1,5 +1,3 @@
-// fu watchInitializeSentryUserContext
-
 export enum Actions {
   INITIALIZE_SENTRY_USER_CONTEXT = 'SENTRY/INITIALIZESENTRYUSERCONTEXT',
 }

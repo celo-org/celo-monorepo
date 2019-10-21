@@ -45,8 +45,6 @@ interface DispatchProps {
   writePaymentRequest: typeof writePaymentRequest
 }
 
-// Use bindActionCreators to workaround a typescript error with the shorthand syntax with redux-thunk actions
-// see https://github.com/DefinitelyTyped/DefinitelyTyped/issues/37369
 const mapDispatchToProps = { showError, writePaymentRequest }
 
 const mapStateToProps = (state: RootState): StateProps => {

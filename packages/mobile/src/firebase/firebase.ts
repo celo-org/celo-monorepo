@@ -78,7 +78,7 @@ export function* initializeCloudMessaging(app: Firebase, address: string) {
         Logger.info(TAG, 'Notification received while open')
         emitter({ notification })
         // expected side effect:
-        // yield handleNotification(notification.notification, NotificationReceiveState.APP_FOREGROUNDED)
+        // yield handleNotification(notification, NotificationReceiveState.APP_ALREADY_OPEN)
       }
     )
 
@@ -87,7 +87,6 @@ export function* initializeCloudMessaging(app: Firebase, address: string) {
   })
 
   spawn(watchFirebaseNotificationChannel, channelOnNotification)
-  // put(startFirebaseOnNotification(channelOnNotification))
 
   // Listen for notification messages while the app is open
   eventChannel((emitter) => {
@@ -101,9 +100,6 @@ export function* initializeCloudMessaging(app: Firebase, address: string) {
     // Return an unsubscribe method
     return () => null
   })
-
-  // TODO (not doing anything for the moment)
-  // put(startFirebaseOnRefreshAction(channelOnNotificationOpened))
 
   const initialNotification = yield call([app.notifications(), 'getInitialNotification'])
   if (initialNotification) {

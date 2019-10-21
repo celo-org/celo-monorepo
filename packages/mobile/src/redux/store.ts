@@ -40,12 +40,4 @@ export const configureStore = (initialState = {}) => {
 }
 
 const { store, persistor } = configureStore()
-
-// TODO(cmcewen): remove once we we remove thunk
-const reduxStore = store
-
-export const getReduxStore = () => {
-  return reduxStore
-}
-
 export { store, persistor }

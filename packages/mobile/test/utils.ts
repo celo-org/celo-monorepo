@@ -85,8 +85,7 @@ export function mockNavigationServiceFor(test: string, navigateMock = jest.fn())
   return { navigate, navigateBack, navigateReset }
 }
 
-const middlewares: any = []
-const mockStore = configureMockStore(middlewares)
+const mockStore = configureMockStore()
 
 /* Create a mock store with some reasonable default values */
 type RecursivePartial<T> = { [P in keyof T]?: RecursivePartial<T[P]> }
