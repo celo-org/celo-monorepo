@@ -418,15 +418,21 @@ export function* switchToZeroSyncFromGeth() {
   Logger.debug(TAG + 'Switching to zero sync from geth..')
   setZeroSyncMode(true)
   switchWeb3ProviderForSyncMode(true)
+  const confirmAccount = yield call(getConnectedAccount)
+  Logger.debug(
+    TAG + '@switchToZeroSyncFromGeth',
+    'Confirmed account is connected with new provider',
+    confirmAccount
+  )
   return true // TODO(anna) maybe return account instead?
 }
 
 export function* switchZeroSyncMode(action: SetIsZeroSyncAction) {
   Logger.debug(TAG + '@switchZeroSyncMode', ` to: ${action.zeroSyncMode}`)
   if (action.zeroSyncMode) {
-    yield call(switchToGethFromZeroSync)
-  } else {
     yield call(switchToZeroSyncFromGeth)
+  } else {
+    yield call(switchToGethFromZeroSync)
   }
 }
 export function* watchZeroSyncMode() {
