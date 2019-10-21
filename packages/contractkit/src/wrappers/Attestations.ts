@@ -318,7 +318,7 @@ export class AttestationsWrapper extends BaseWrapper<Attestations> {
    */
   async selectIssuers(phoneNumber: string) {
     const phoneHash = PhoneNumberUtils.getPhoneHash(phoneNumber)
-    return wrapSend(this.kit, this.contract.methods.selectIssuers(phoneHash))
+    return toTransactionObject(this.kit, this.contract.methods.selectIssuers(phoneHash))
   }
 
   /**
