@@ -6,11 +6,11 @@ import * as React from 'react'
 import { WithNamespaces, withNamespaces } from 'react-i18next'
 import { Clipboard, Platform, StyleSheet, Text, TextInput, View, ViewStyle } from 'react-native'
 import FlagSecure from 'react-native-flag-secure-android'
-import { isBackupPhraseValid } from 'src/backup/utils'
+import { isValidBackupPhrase, isValidSocialBackupPhrase } from 'src/backup/utils'
 import { Namespaces } from 'src/i18n'
 import Logger from 'src/utils/Logger'
 
-const PhraseInput = withTextInputPasteAware(TextInput)
+const PhraseInput = withTextInputPasteAware(TextInput, { top: undefined, right: 12, bottom: 12 })
 
 export enum BackupPhraseContainerMode {
   READONLY = 'READONLY',
@@ -26,6 +26,7 @@ type Props = {
   value: string | null
   mode: BackupPhraseContainerMode
   type: BackupPhraseType
+  index?: number // e.g. index of safeguard phrase
   showCopy?: boolean
   style?: ViewStyle
   onChangeText?: (value: string) => void
@@ -65,13 +66,15 @@ export class BackupPhraseContainer extends React.Component<Props> {
   }
 
   render() {
-    const { t, value: words, showCopy, style, mode, type, testID } = this.props
+    const { t, value: words, showCopy, style, mode, type, index, testID } = this.props
 
     return (
       <View style={style}>
         <View style={styles.headerContainer}>
           <Text style={styles.headerText}>
-            {type === BackupPhraseType.BACKUP_KEY ? t('backupKey') : t('socialBackupPhraseHeader')}
+            {type === BackupPhraseType.BACKUP_KEY
+              ? t('backupKey')
+              : t('socialBackupPhraseHeader', { index })}
           </Text>
           {showCopy && (
             <Touchable borderless={true} onPress={this.onPressCopy}>
@@ -94,7 +97,11 @@ export class BackupPhraseContainer extends React.Component<Props> {
               value={words || ''}
               placeholder={t('backupPhrasePlaceholder')}
               onChangeText={this.onPhraseInputChange}
-              shouldShowClipboard={isBackupPhraseValid}
+              shouldShowClipboard={
+                type === BackupPhraseType.BACKUP_KEY
+                  ? isValidBackupPhrase
+                  : isValidSocialBackupPhrase
+              }
               underlineColorAndroid="transparent"
               placeholderTextColor={colors.inactive}
               enablesReturnKeyAutomatically={true}

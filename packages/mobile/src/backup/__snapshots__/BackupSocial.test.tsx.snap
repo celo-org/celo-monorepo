@@ -67,7 +67,7 @@ exports[`BackupSocialIntro renders correctly when social backup is complete 1`] 
                 }
               }
             >
-              socialBackup.phrase1
+              socialBackupPhraseHeader
             </Text>
             <View
               accessible={true}
@@ -138,7 +138,7 @@ exports[`BackupSocialIntro renders correctly when social backup is complete 1`] 
                 }
               }
             >
-              socialBackup.phrase2
+              socialBackupPhraseHeader
             </Text>
             <View
               accessible={true}
@@ -256,7 +256,7 @@ exports[`BackupSocialIntro renders correctly when social backup is not complete 
                 }
               }
             >
-              socialBackup.phrase1
+              socialBackupPhraseHeader
             </Text>
             <View
               accessible={true}
@@ -327,7 +327,7 @@ exports[`BackupSocialIntro renders correctly when social backup is not complete 
                 }
               }
             >
-              socialBackup.phrase2
+              socialBackupPhraseHeader
             </Text>
             <View
               accessible={true}

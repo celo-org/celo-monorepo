@@ -3,7 +3,7 @@
 import TouchableDefault from '@celo/react-components/components/Touchable'
 import Paste from '@celo/react-components/icons/Paste'
 import * as React from 'react'
-import { AppState, Clipboard, StyleSheet, TextInputProps, View } from 'react-native'
+import { AppState, Clipboard, StyleSheet, TextInputProps, View, ViewStyle } from 'react-native'
 
 interface PasteAwareProps {
   value: string
@@ -12,7 +12,8 @@ interface PasteAwareProps {
 }
 
 export default function withTextInputPasteAware<P extends TextInputProps>(
-  WrappedTextInput: React.ComponentType<P>
+  WrappedTextInput: React.ComponentType<P>,
+  pasteIconContainerStyle?: ViewStyle
 ) {
   return class WithTextInputLabeling extends React.Component<P & PasteAwareProps> {
     state = {
@@ -58,7 +59,10 @@ export default function withTextInputPasteAware<P extends TextInputProps>(
         <View style={style.container}>
           <WrappedTextInput {...this.props} showClearButton={!isPasteIconVisible} />
           {isPasteIconVisible && (
-            <TouchableDefault style={style.pasteIconContainer} onPress={this.onPressPate}>
+            <TouchableDefault
+              style={[style.pasteIconContainer, pasteIconContainerStyle]}
+              onPress={this.onPressPate}
+            >
               <Paste />
             </TouchableDefault>
           )}
@@ -74,8 +78,8 @@ const style = StyleSheet.create({
   },
   pasteIconContainer: {
     position: 'absolute',
-    right: 12,
-    bottom: 12,
+    right: 16,
+    top: 18,
     width: 20,
     height: 25,
     zIndex: 100,

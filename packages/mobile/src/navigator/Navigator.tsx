@@ -30,6 +30,7 @@ import ExchangeTradeScreen from 'src/exchange/ExchangeTradeScreen'
 import FeeExchangeEducation from 'src/exchange/FeeExchangeEducation'
 import ImportContacts from 'src/import/ImportContacts'
 import ImportWallet from 'src/import/ImportWallet'
+import ImportWalletEmpty from 'src/import/ImportWalletEmpty'
 import ImportWalletSocial from 'src/import/ImportWalletSocial'
 import EnterInviteCode from 'src/invite/EnterInviteCode'
 import JoinCelo from 'src/invite/JoinCelo'
@@ -93,6 +94,7 @@ const NuxStack = createStackNavigator(
     [Screens.EnterInviteCode]: { screen: EnterInviteCode },
     [Screens.ImportWallet]: { screen: ImportWallet },
     [Screens.ImportWalletSocial]: { screen: ImportWalletSocial },
+    [Screens.ImportWalletEmpty]: { screen: ImportWalletEmpty },
     [Screens.ImportContacts]: { screen: ImportContacts },
     [Screens.VerifyEducation]: { screen: VerifyEducation },
     [Screens.VerifyInput]: { screen: VerifyInput },

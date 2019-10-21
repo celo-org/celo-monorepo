@@ -59,7 +59,7 @@
     "warning": "NEVER TELL ANYONE YOUR SAFEGUARDS’ IDENTITIES.",
     "skip": "Skip For Now"
   },
-  "socialBackupPhraseHeader ": "Safeguard Phrase {{index}}",
+  "socialBackupPhraseHeader": "Safeguard Phrase {{index}}",
   "socialBackup": {
     "body":
       "Share each phrase below with a friend. Be sure to send only one phrase to each person.",

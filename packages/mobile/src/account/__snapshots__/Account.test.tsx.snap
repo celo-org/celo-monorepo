@@ -919,7 +919,7 @@ exports[`Account renders correctly 1`] = `
 </RCTScrollView>
 `;
 
-exports[`Account renders correctly hen dev mode active 1`] = `
+exports[`Account renders correctly when dev mode active 1`] = `
 <RCTScrollView
   style={
     Object {

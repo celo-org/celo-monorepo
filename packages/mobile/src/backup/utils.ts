@@ -115,11 +115,19 @@ export function formatBackupPhraseOnSubmit(phrase: string) {
     .toLocaleLowerCase()
 }
 
-export function isBackupPhraseValid(phrase: string) {
+function isValidMnemonic(phrase: string, length: number) {
   return (
     !!phrase &&
     formatBackupPhraseOnEdit(phrase)
       .trim()
-      .split(/\s+/g).length >= 12
+      .split(/\s+/g).length === length
   )
+}
+
+export function isValidBackupPhrase(phrase: string) {
+  return isValidMnemonic(phrase, 24)
+}
+
+export function isValidSocialBackupPhrase(phrase: string) {
+  return isValidMnemonic(phrase, 13)
 }
