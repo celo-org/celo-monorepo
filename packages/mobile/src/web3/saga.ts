@@ -152,8 +152,8 @@ export function* assignAccountFromPrivateKey(key: string) {
     let account: string
 
     // Save the account to a local file on the disk.
-    // This is done for all sync modes, to allow users to switch in to zero sync mode.
-    // Note that if geth is running it saves the encrypted key in the web3 keystore.
+    // This is done for all sync modes, to allow users to switch into zeroSync mode.
+    // Note that if geth is running it saves the key using web3.personal.
     const privateKey = String(key)
     account = getAccountAddressFromPrivateKey(privateKey)
     yield savePrivateKeyToLocalDisk(account, privateKey, pincode)
@@ -357,6 +357,7 @@ export function* getConnectedUnlockedAccount() {
   }
 }
 
+// Stores account and private key in web3 keystore using web3.eth.personal
 export function* addAccountToWeb3Keystore(key: string, currentAccount: string, pincode: any) {
   let account: string
   Logger.debug(TAG + '@addAccountToWeb3Keystore', `using key ${key} for account ${currentAccount}`)
@@ -401,61 +402,47 @@ export function* ensureAccountInWeb3Keystore() {
       const privateKey: string = yield readPrivateKeyFromLocalDisk(currentAccount, pincode)
       const account = yield call(addAccountToWeb3Keystore, privateKey, currentAccount, pincode)
       return account
-    } else {
-      // TODO check that account and accountInWeb3Keystore are the same
+    } else if (accountInWeb3Keystore === currentAccount) {
       return accountInWeb3Keystore
+    } else {
+      throw new Error('Account in web3 keystore does not match current account')
     }
   } else {
-    throw new Error('Account not yet initialized') // TODO(anna) decide how to handle this
+    throw new Error('Account not yet initialized')
   }
 }
 
 export function* switchToGethFromZeroSync() {
+  Logger.debug(TAG + 'Switching to geth mode from zeroSync..')
   setZeroSyncMode(false)
   switchWeb3ProviderForSyncMode(false)
-
-  // TODO(anna) will also need to start geth
-  const confirmAccount = yield call(getConnectedAccount)
-  Logger.debug(TAG + '@switchToGethFromZeroSync', 'Confirmed account is connected', confirmAccount)
 
   // After switching off zeroSync mode, ensure key is stored in web3.personal
   // Note that this must happen after the sync mode is switched
   // as the web3.personal where the key is stored is not available in zeroSync mode
-  const account = yield call(ensureAccountInWeb3Keystore)
-  Logger.debug(
-    TAG + '@switchToGethFromZeroSync',
-    'Imported account from private key to web3 keystore',
-    account
-  )
-
-  // Unlock account to ensure private keys are accessible in new mode
-  const unlockedAccount = yield call(unlockAccount, account)
-  Logger.debug(TAG + '@switchToGethFromZeroSync', `Able to unlock account ${unlockedAccount}`)
-  return true
+  yield call(ensureAccountInWeb3Keystore)
 }
 
 export function* switchToZeroSyncFromGeth() {
-  Logger.debug(TAG + 'Switching to zero sync from geth..')
+  Logger.debug(TAG + 'Switching to zeroSync from geth..')
   setZeroSyncMode(true)
-
-  yield call(getConnectedAccount) // Ensure web3 connected before switching provider
   switchWeb3ProviderForSyncMode(true)
-
-  // Unlock account to ensure private keys are accessible in new mode
-  const confirmAccount = yield call(getConnectedAccount)
-  const unlockedAccount = yield call(unlockAccount, confirmAccount)
-  Logger.debug(TAG + '@switchToGethFromZeroSync', `Able to unlock account ${unlockedAccount}`)
-
-  return true // TODO(anna) maybe return account instead?
 }
 
 export function* switchZeroSyncMode(action: SetIsZeroSyncAction) {
   Logger.debug(TAG + '@switchZeroSyncMode', ` to: ${action.zeroSyncMode}`)
+  yield call(getConnectedAccount) // Ensure web3 connected before switching provider
   if (action.zeroSyncMode) {
     yield call(switchToZeroSyncFromGeth)
   } else {
     yield call(switchToGethFromZeroSync)
   }
+  // Unlock account to ensure private keys are accessible in new mode
+  const account = yield call(getConnectedUnlockedAccount)
+  Logger.debug(
+    TAG + '@switchZeroSyncMode',
+    `Switched to ${action.zeroSyncMode} and able to unlock account ${account}`
+  )
 }
 export function* watchZeroSyncMode() {
   yield takeLatest(Actions.SET_IS_ZERO_SYNC, switchZeroSyncMode)

@@ -66,9 +66,6 @@ function getWebSocketProvider(url: string): Provider {
   return provider
 }
 
-// TODO(anna) figure out caching issues with web3
-// Right now, every time the app is reopened, the web3 cache resets
-// to the sync mode set in the env file
 function getWeb3(): Web3 {
   Logger.info(
     `Initializing web3, platform: ${Platform.OS}, geth free mode: ${isInitiallyZeroSyncMode()}`
@@ -86,7 +83,7 @@ function getWeb3(): Web3 {
   }
 }
 
-// Mutates web3 provider
+// Mutates web3 with new provider
 export function switchWeb3ProviderForSyncMode(zeroSync: boolean) {
   if (zeroSync) {
     const url = DEFAULT_INFURA_URL
@@ -100,7 +97,7 @@ export function switchWeb3ProviderForSyncMode(zeroSync: boolean) {
 export function addLocalAccount(web3Instance: Web3, privateKey: string) {
   // Ensure web3 instance is in zeroSync mode
   if (!(web3Instance.currentProvider instanceof Web3.providers.HttpProvider)) {
-    throw new Error('addLocalAccount can only be called in Zero sync mode')
+    throw new Error('addLocalAccount can only be called in zeroSync mode')
   }
   if (!web3Instance) {
     throw new Error(`web3 instance is ${web3Instance}`)
