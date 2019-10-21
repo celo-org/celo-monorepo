@@ -214,7 +214,7 @@ contract Attestations is IAttestations, Ownable, Initializable, UsingRegistry, R
     require(attestationsRequested > 0, "You have to request at least 1 attestation");
 
     IdentifierState storage state = identifiers[identifier];
-    if(!isAttestationRequestExpired(accounts[msg.sender].mostRecentAttestationRequestBlockNumber)) {
+    if(!isAttestationExpired(accounts[msg.sender].mostRecentAttestationRequestBlockNumber)) {
       require(
         accounts[msg.sender].attestationRequestFeeToken == address(0) ||
           accounts[msg.sender].attestationRequestFeeToken == attestationRequestFeeToken,
@@ -235,7 +235,7 @@ contract Attestations is IAttestations, Ownable, Initializable, UsingRegistry, R
 
     state.attestations[msg.sender].requested = uint256(
       state.attestations[msg.sender].requested
-      ).add(attestationsRequested).toUint32();
+    ).add(attestationsRequested).toUint32();
 
     emit AttestationsRequested(
       identifier,
@@ -297,8 +297,8 @@ contract Attestations is IAttestations, Ownable, Initializable, UsingRegistry, R
 
     // solhint-disable-next-line not-rely-on-time
     require(
-      !isAttestationRequestExpired(attestation.blockNumber),
-      "Attestation request timed out"
+      !isAttestationExpired(attestation.blockNumber),
+      "Attestation timed out"
     );
 
     // Generate the yet-to-be-signed attestation code that will be signed and sent to the
@@ -760,7 +760,7 @@ contract Attestations is IAttestations, Ownable, Initializable, UsingRegistry, R
       attestation.status == AttestationStatus.Incomplete,
       "Attestation code does not match any outstanding attestation"
     );
-    require(!isAttestationRequestExpired(attestation.blockNumber), "Attestation request timed out");
+    require(!isAttestationExpired(attestation.blockNumber), "Attestation timed out");
 
     return issuer;
   }
@@ -842,9 +842,7 @@ contract Attestations is IAttestations, Ownable, Initializable, UsingRegistry, R
     }
   }
 
-  function isAttestationRequestExpired(
-    uint128 attestationRequestBlock
-  )
+  function isAttestationExpired(uint128 attestationRequestBlock)
     internal
     view
     returns (bool)
