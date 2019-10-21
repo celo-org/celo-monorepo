@@ -1,3 +1,4 @@
+import BigNumber from 'bignumber.js'
 import { Address, CeloContract } from '../base'
 import { newKitFromWeb3 } from '../kit'
 import { NetworkConfig, testWithGanache } from '../test-utils/ganache-test'
@@ -149,6 +150,20 @@ testWithGanache('SortedOracles Wrapper', (web3) => {
    * thing to check is if there have been changes to the migrations
    */
   describe('#getRates', () => {
+    beforeEach(async () => {
+      for (let i = 0; i < stableTokenOracles.length; i++) {
+        // reports these values:
+        // 1/2, 2/2, 3/2, 4/2
+        // resulting in: 0.5, 1, 1.5, 2
+        const tx = await sortedOracles.report(
+          CeloContract.StableToken,
+          i + 1,
+          2,
+          stableTokenOracles[i]
+        )
+        await tx.sendAndWaitForReceipt()
+      }
+    })
     it('SBAT getRates', async () => {
       const rates = await sortedOracles.getRates(CeloContract.StableToken)
       expect(rates.length).toBeGreaterThan(0)
@@ -157,6 +172,13 @@ testWithGanache('SortedOracles Wrapper', (web3) => {
         expect(rate).toHaveProperty('rate')
         expect(rate).toHaveProperty('medianRelation')
       }
+    })
+
+    it('returns the rate as the result of the calculation numerator/denominator', async () => {
+      const expectedRates = [4, 3, 2, 1].map((n) => new BigNumber(n).div(2).toString())
+      const response = await sortedOracles.getRates(CeloContract.StableToken)
+      const actualRates = response.map((r) => r.rate.toString())
+      expect(actualRates).toEqual(expectedRates)
     })
   })
 
@@ -183,7 +205,7 @@ testWithGanache('SortedOracles Wrapper', (web3) => {
       const returnedMedian = await sortedOracles.medianRate(CeloContract.StableToken)
       // The value `10` comes from: packages/protocol/migrationsConfig.js:
       //   stableToken.goldPrice
-      expect(returnedMedian.numerator.div(returnedMedian.denominator)).toEqBigNumber(10)
+      expect(returnedMedian.rate).toEqBigNumber(10)
     })
   })
 

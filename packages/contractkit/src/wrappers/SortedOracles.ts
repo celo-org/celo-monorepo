@@ -28,8 +28,7 @@ export interface OracleRate {
 }
 
 export interface MedianRate {
-  numerator: BigNumber
-  denominator: BigNumber
+  rate: BigNumber
 }
 
 /**
@@ -44,7 +43,7 @@ export class SortedOraclesWrapper extends BaseWrapper<SortedOracles> {
   async numRates(token: CeloToken): Promise<BigNumber> {
     const tokenAddress = await this.kit.registry.addressFor(token)
     const response = await this.contract.methods.numRates(tokenAddress).call()
-    return new BigNumber(response)
+    return toBigNumber(response)
   }
 
   /**
@@ -56,7 +55,9 @@ export class SortedOraclesWrapper extends BaseWrapper<SortedOracles> {
   async medianRate(token: CeloToken): Promise<MedianRate> {
     const tokenAddress = await this.kit.registry.addressFor(token)
     const response = await this.contract.methods.medianRate(tokenAddress).call()
-    return { numerator: toBigNumber(response[0]), denominator: toBigNumber(response[1]) }
+    return {
+      rate: toBigNumber(response[0]).div(toBigNumber(response[1])),
+    }
   }
 
   /**
@@ -143,15 +144,21 @@ export class SortedOraclesWrapper extends BaseWrapper<SortedOracles> {
     const tokenAddress = await this.kit.registry.addressFor(token)
     const response = await this.contract.methods.getRates(tokenAddress).call()
     const rates: OracleRate[] = []
+    const denominator = await this.getInternalDenominator()
+
     for (let i = 0; i < response[0].length; i++) {
       const medRelIndex = parseInt(response[2][i], 10)
       rates.push({
         address: response[0][i],
-        rate: new BigNumber(response[1][i]),
+        rate: toBigNumber(response[1][i]).div(denominator),
         medianRelation: medRelIndex,
       })
     }
     return rates
+  }
+
+  private async getInternalDenominator(): Promise<BigNumber> {
+    return toBigNumber(await this.contract.methods.DENOMINATOR().call())
   }
 
   private async findLesserAndGreaterKeys(
@@ -161,12 +168,11 @@ export class SortedOraclesWrapper extends BaseWrapper<SortedOracles> {
     oracleAddress: Address
   ): Promise<{ lesserKey: Address; greaterKey: Address }> {
     const currentRates: OracleRate[] = await this.getRates(token)
-    const internalDenominator = new BigNumber(await this.contract.methods.DENOMINATOR().call())
 
     // This is how the contract calculates the rate from the numerator and denominator.
     // To figure out where this new report goes in the list, we need to compare this
     // value with the other rates
-    const value = internalDenominator.times(numerator).div(denominator)
+    const value = toBigNumber(numerator.toString()).div(toBigNumber(denominator.toString()))
 
     let greaterKey = NULL_ADDRESS
     let lesserKey = NULL_ADDRESS
