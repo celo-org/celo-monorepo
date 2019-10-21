@@ -12,6 +12,8 @@ import { Screens, Stacks } from 'src/navigator/Screens'
 import { PersistedRootState } from 'src/redux/reducers'
 import Logger from 'src/utils/Logger'
 import { clockInSync } from 'src/utils/time'
+import { switchToZeroSyncFromGeth } from 'src/web3/saga'
+import { zeroSyncSelector } from 'src/web3/selectors'
 
 const TAG = 'app/saga'
 
@@ -55,6 +57,22 @@ export function* checkAppDeprecation() {
   if (versionInfo && versionInfo.deprecated) {
     Logger.info(TAG, 'this version is deprecated')
     navigate(Screens.UpgradeScreen)
+  }
+}
+
+export function* toggleToProperSyncMode() {
+  Logger.info(TAG, '@toggleToProperSyncMode ensuring proper sync mode...')
+  yield take(REHYDRATE)
+  Logger.info(TAG, '@toggleToProperSyncMode rehydrated')
+  const zeroSyncMode = yield select(zeroSyncSelector)
+  if (zeroSyncMode) {
+    Logger.info(TAG, `@toggleToProperSyncMode got syncMode ${zeroSyncMode}`)
+
+    // TODO(anna) don't assume it starts in geth modeo
+    yield call(switchToZeroSyncFromGeth)
+
+    // yield put(setZeroSyncMode(zeroSyncMode))
+    Logger.info(TAG, `@toggleToProperSyncMode set zeroSync mode to ${zeroSyncMode}`)
   }
 }
 
@@ -120,4 +138,5 @@ export function handleDeepLink(deepLink: string) {
 export function* appSaga() {
   yield spawn(checkAppDeprecation)
   yield spawn(navigateToProperScreen)
+  yield spawn(toggleToProperSyncMode)
 }

@@ -418,7 +418,7 @@ export function* switchToGethFromZeroSync() {
   const confirmAccount = yield call(getConnectedAccount)
   Logger.debug(TAG + '@switchToGethFromZeroSync', 'Confirmed account is connected', confirmAccount)
 
-  // After switching to sync mode, ensure
+  // After switching off zeroSync mode, ensure key is stored in web3.personal
   // Note that this must happen after the sync mode is switched
   // as the web3.personal where the key is stored is not available in zeroSync mode
   const account = yield call(ensureAccountInWeb3Keystore)
@@ -427,19 +427,25 @@ export function* switchToGethFromZeroSync() {
     'Imported account from private key to web3 keystore',
     account
   )
+
+  // Unlock account to ensure private keys are accessible in new mode
+  const unlockedAccount = yield call(unlockAccount, account)
+  Logger.debug(TAG + '@switchToGethFromZeroSync', `Able to unlock account ${unlockedAccount}`)
   return true
 }
 
 export function* switchToZeroSyncFromGeth() {
   Logger.debug(TAG + 'Switching to zero sync from geth..')
   setZeroSyncMode(true)
+
+  yield call(getConnectedAccount) // Ensure web3 connected before switching provider
   switchWeb3ProviderForSyncMode(true)
+
+  // Unlock account to ensure private keys are accessible in new mode
   const confirmAccount = yield call(getConnectedAccount)
-  Logger.debug(
-    TAG + '@switchToZeroSyncFromGeth',
-    'Confirmed account is connected with new provider',
-    confirmAccount
-  )
+  const unlockedAccount = yield call(unlockAccount, confirmAccount)
+  Logger.debug(TAG + '@switchToGethFromZeroSync', `Able to unlock account ${unlockedAccount}`)
+
   return true // TODO(anna) maybe return account instead?
 }
 
