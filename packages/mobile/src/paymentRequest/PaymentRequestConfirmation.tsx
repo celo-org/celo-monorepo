@@ -9,18 +9,15 @@ import { StyleSheet } from 'react-native'
 import SafeAreaView from 'react-native-safe-area-view'
 import { NavigationInjectedProps } from 'react-navigation'
 import { connect } from 'react-redux'
-import { bindActionCreators } from 'redux'
 import { PaymentRequestStatus } from 'src/account'
 import { showError } from 'src/alert/actions'
 import CeloAnalytics from 'src/analytics/CeloAnalytics'
 import { CustomEventNames } from 'src/analytics/constants'
 import componentWithAnalytics from 'src/analytics/wrapper'
-import { ErrorMessages } from 'src/app/ErrorMessages'
 import { writePaymentRequest } from 'src/firebase/firebase'
 import { currencyToShortMap } from 'src/geth/consts'
 import { Namespaces } from 'src/i18n'
-import { navigate, navigateBack } from 'src/navigator/NavigationService'
-import { Screens } from 'src/navigator/Screens'
+import { navigateBack } from 'src/navigator/NavigationService'
 import PaymentRequestReviewCard from 'src/paymentRequest/PaymentRequestReviewCard'
 import { Recipient } from 'src/recipients/recipient'
 import { RootState } from 'src/redux/reducers'
@@ -43,20 +40,13 @@ interface StateProps {
 }
 
 interface DispatchProps {
-  writePaymentRequest: typeof writePaymentRequest
   showError: typeof showError
+  writePaymentRequest: typeof writePaymentRequest
 }
 
 // Use bindActionCreators to workaround a typescript error with the shorthand syntax with redux-thunk actions
 // see https://github.com/DefinitelyTyped/DefinitelyTyped/issues/37369
-const mapDispatchToProps = (dispatch: any) =>
-  bindActionCreators(
-    {
-      writePaymentRequest,
-      showError,
-    },
-    dispatch
-  )
+const mapDispatchToProps = { showError, writePaymentRequest }
 
 const mapStateToProps = (state: RootState): StateProps => {
   return {
@@ -114,15 +104,7 @@ class PaymentRequestConfirmation extends React.Component<Props> {
       notified: false,
     }
 
-    try {
-      this.props.writePaymentRequest(paymentInfo)
-    } catch (error) {
-      Logger.error(TAG, 'Payment request failed, show error message', error)
-      this.props.showError(ErrorMessages.PAYMENT_REQUEST_FAILED)
-      return
-    }
-
-    navigate(Screens.WalletHome)
+    this.props.writePaymentRequest(paymentInfo)
     Logger.showMessage(t('requestSent'))
   }
 

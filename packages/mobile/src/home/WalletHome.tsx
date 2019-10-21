@@ -69,23 +69,6 @@ interface DispatchProps {
 
 type Props = StateProps & DispatchProps & WithNamespaces
 
-// Use bindActionCreators to workaround a typescript error with the shorthand syntax with redux - thunk actions
-// see https://github.com/DefinitelyTyped/DefinitelyTyped/issues/37369
-// const mapDispatchToProps = (dispatch: any) =>
-//   bindActionCreators(
-//     {
-//       refreshAllBalances,
-//       resetStandbyTransactions,
-//       initializeSentryUserContext,
-//       exitBackupFlow,
-//       setLoading,
-//       showMessage,
-//       hideAlert,
-//       importContacts,
-//     },
-//     dispatch
-//   )
-
 const mapDispatchToProps = {
   refreshAllBalances,
   resetStandbyTransactions,
@@ -153,9 +136,7 @@ export class WalletHome extends React.Component<Props> {
 
   componentDidMount() {
     this.props.resetStandbyTransactions()
-    console.log('Made it here')
     this.props.initializeSentryUserContext()
-    console.log('NOt Made it here')
     this.importContactsIfNeeded()
     if (SHOW_TESTNET_BANNER) {
       this.showTestnetBanner()

@@ -3,10 +3,14 @@ import { RemoteMessage } from 'react-native-firebase/messaging'
 import { Notification, NotificationOpen } from 'react-native-firebase/notifications'
 import { Sentry } from 'react-native-sentry'
 import { eventChannel, EventChannel } from 'redux-saga'
-import { call, select, spawn, take } from 'redux-saga/effects'
+import { call, put, select, spawn, take } from 'redux-saga/effects'
 import { NotificationReceiveState, PaymentRequest } from 'src/account'
+import { showError } from 'src/alert/actions'
+import { ErrorMessages } from 'src/app/ErrorMessages'
 import { currentLanguageSelector } from 'src/app/reducers'
 import { handleNotification } from 'src/firebase/notifications'
+import { navigate } from 'src/navigator/NavigationService'
+import { Screens } from 'src/navigator/Screens'
 import Logger from 'src/utils/Logger'
 
 const TAG = 'Firebase'
@@ -49,7 +53,6 @@ export function* initializeCloudMessaging(app: Firebase, address: string) {
       yield call([app.messaging(), 'requestPermission'])
     } catch (error) {
       Logger.error(TAG, 'User has rejected messaging permissions', error)
-      throw error
     }
   }
 
@@ -133,14 +136,16 @@ export const registerTokenToDb = async (app: Firebase, address: string, fcmToken
   }
 }
 
-export const writePaymentRequest = (paymentInfo: PaymentRequest) => async () => {
+export function* writePaymentRequest(paymentInfo: PaymentRequest) {
   try {
     Logger.info(TAG, `Writing pending request to database`)
     const pendingRequestRef = firebase.database().ref(`pendingRequests`)
-    return pendingRequestRef.push(paymentInfo)
+    pendingRequestRef.push(paymentInfo)
+
+    navigate(Screens.WalletHome)
   } catch (error) {
     Logger.error(TAG, 'Failed to write payment request to Firebase DB', error)
-    throw error
+    yield put(showError(ErrorMessages.PAYMENT_REQUEST_FAILED))
   }
 }
 
