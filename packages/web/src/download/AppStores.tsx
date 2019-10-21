@@ -18,7 +18,7 @@ export default withNamespaces(NameSpaces.download)(
   memo(function AppStores({ t }: I18nProps) {
     return (
       <View>
-        <Title title={t('downloadDirect')} />
+        <Title ariaLevel="2" title={t('downloadDirect')} />
         <GridRow desktopStyle={standardStyles.centered}>
           <Logos />
         </GridRow>
