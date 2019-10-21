@@ -39,7 +39,7 @@ export enum RequestType {
 }
 
 export enum MobileOS {
-  'andriod' = 'android',
+  android = 'android',
   ios = 'ios',
 }
 

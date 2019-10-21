@@ -189,10 +189,10 @@ class RequestFunds extends React.PureComponent<Props & I18nProps, State> {
 }
 
 function MobileSelect({ selectedOS, onSelect, t }) {
-  const isAndriod = selectedOS === MobileOS.andriod
+  const isandroid = selectedOS === MobileOS.android
   const isIOS = selectedOS === MobileOS.ios
   const iOSColor = isIOS ? colors.white : colors.placeholderDarkMode
-  const andriodColor = isAndriod ? colors.white : colors.placeholderDarkMode
+  const androidColor = isandroid ? colors.white : colors.placeholderDarkMode
   return (
     <>
       <Text style={[fonts.h5, textStyles.invert, standardStyles.elementalMarginTop]}>
@@ -202,11 +202,11 @@ function MobileSelect({ selectedOS, onSelect, t }) {
         <Radio
           colorWhenSelected={colors.primary}
           label="Android"
-          labelColor={andriodColor}
-          icon={<Android size={18} color={andriodColor} />}
-          selected={isAndriod}
+          labelColor={androidColor}
+          icon={<Android size={18} color={androidColor} />}
+          selected={isandroid}
           onValueSelected={onSelect}
-          value={MobileOS.andriod}
+          value={MobileOS.android}
         />
         <View style={styles.radios}>
           <Radio

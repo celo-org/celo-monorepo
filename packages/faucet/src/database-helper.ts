@@ -27,7 +27,7 @@ export enum RequestType {
 }
 
 enum MobileOS {
-  'andriod' = 'android',
+  android = 'android',
   ios = 'ios',
 }
 
@@ -120,12 +120,13 @@ function buildHandleInvite(request: RequestRecord, snap: DataSnapshot, config: N
       config.goldTokenAddress
     )
     const { address: tempAddress, inviteCode } = generateInviteCode()
-    // Dont need gold as fees are paid in dollars
-    // const goldTx = await celo.transferGold(tempAddress, config.inviteGoldAmount)
-    // const goldTxHash = await goldTx.getHash()
-    // console.info(`req(${snap.key}): Gold Transaction Sent. txhash:${goldTxHash}`)
-    // await snap.ref.update({ goldTxHash })
-    // await goldTx.waitReceipt()
+
+    const goldTx = await celo.transferGold(tempAddress, config.inviteGoldAmount)
+    const goldTxHash = await goldTx.getHash()
+    console.info(`req(${snap.key}): Gold Transaction Sent. txhash:${goldTxHash}`)
+    await snap.ref.update({ goldTxHash })
+    await goldTx.waitReceipt()
+
     const dollarTxHash = await sendDollars(celo, tempAddress, config.inviteDollarAmount, snap)
 
     const phoneHash = getPhoneHash(request.beneficiary)
@@ -141,7 +142,6 @@ function buildHandleInvite(request: RequestRecord, snap: DataSnapshot, config: N
     await snap.ref.update({ escrowTxHash })
     await escrowTx.waitReceipt()
 
-    // Removed if statement as the top of function throws an error of config.twillioClient is blank anyway
     await config.twilioClient.messages.create({
       body: messageText(inviteCode, request),
       from: config.twilioPhoneNumber,
@@ -171,13 +171,10 @@ function messageText(inviteCode: string, request: RequestRecord) {
 }
 
 const IOS_URL = ''
-const ANDRIOD_URL = 'https://play.google.com/store/apps/details?id=org.celo.mobile.alfajores'
+const ANDROID_URL = 'https://play.google.com/store/apps/details?id=org.celo.mobile.alfajores'
 
 function downloadLink(mobileOS: MobileOS) {
-  if (mobileOS === MobileOS.ios) {
-    return IOS_URL
-  }
-  return ANDRIOD_URL
+  return mobileOS === MobileOS.ios ? IOS_URL : ANDROID_URL
 }
 
 function withTimeout<A>(
