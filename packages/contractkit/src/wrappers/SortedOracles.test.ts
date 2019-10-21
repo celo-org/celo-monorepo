@@ -104,9 +104,9 @@ testWithGanache('SortedOracles Wrapper', (web3) => {
         try {
           const tx = await sortedOracles.report(CeloContract.StableToken, numerator, denominator)
           await tx.sendAndWaitForReceipt()
-          // @ts-ignore - Ignore empty block: we don't need to do anything with this error
         } catch (err) {
-          // @ts-ignore
+          // We don't need to do anything with this error other than catch it so
+          // it doesn't fail this test.
         } finally {
           const resultingRates = await sortedOracles.getRates(CeloContract.StableToken)
           expect(resultingRates).toMatchObject(initialRates)
@@ -127,7 +127,12 @@ testWithGanache('SortedOracles Wrapper', (web3) => {
   describe('#getRates', () => {
     it('SBAT getRates', async () => {
       const rates = await sortedOracles.getRates(CeloContract.StableToken)
-      console.log('rates!', rates.map((r) => r.rate.toNumber()))
+      expect(rates.length).toBeGreaterThan(0)
+      for (const rate of rates) {
+        expect(rate).toHaveProperty('address')
+        expect(rate).toHaveProperty('rate')
+        expect(rate).toHaveProperty('medianRelation')
+      }
     })
   })
 
@@ -161,7 +166,6 @@ testWithGanache('SortedOracles Wrapper', (web3) => {
   describe('#reportExpirySeconds', () => {
     it('returns the number of seconds after which a report expires', async () => {
       const result = await sortedOracles.reportExpirySeconds()
-      console.log(result)
       expect(result).toEqBigNumber(3600)
     })
   })

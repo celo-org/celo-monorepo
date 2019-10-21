@@ -65,6 +65,7 @@ const DefaultConfig = {
     inflationRate: 1.00009591886,
     inflationPeriod: 7 * 24 * 60 * 60, // 1 week
     initialAccounts: [],
+    priceOracleAccounts: [],
   },
   validators: {
     registrationRequirements: {

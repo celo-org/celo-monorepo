@@ -2,7 +2,13 @@ import { eqAddress } from '@celo/utils/lib/address'
 import BigNumber from 'bignumber.js'
 import { Address, CeloContract, CeloToken, NULL_ADDRESS } from '../base'
 import { SortedOracles } from '../generated/types/SortedOracles'
-import { BaseWrapper, CeloTransactionObject, proxyCall, toBigNumber, wrapSend } from './BaseWrapper'
+import {
+  BaseWrapper,
+  CeloTransactionObject,
+  proxyCall,
+  toBigNumber,
+  toTransactionObject,
+} from './BaseWrapper'
 
 export enum MedianRelation {
   Undefined,
@@ -89,7 +95,7 @@ export class SortedOraclesWrapper extends BaseWrapper<SortedOracles> {
       denominator
     )
 
-    return wrapSend(
+    return toTransactionObject(
       this.kit,
       this.contract.methods.report(tokenAddress, numerator, denominator, lesserKey, greaterKey)
     )

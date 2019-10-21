@@ -8,6 +8,12 @@ export const NetworkConfig = JSON.parse(
   fs.readFileSync('src/test-utils/network-config.json').toString()
 )
 
+// This file specifies accounts available when ganache is running. These are derived
+// from the MNEMONIC
+export const NetworkConfig = JSON.parse(
+  fs.readFileSync('src/test-utils/migration-override.json').toString()
+)
+
 export async function startGanache(datadir: string, opts: { verbose?: boolean } = {}) {
   const logFn = opts.verbose
     ? // tslint:disable-next-line: no-console

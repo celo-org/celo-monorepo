@@ -1,0 +1,11 @@
+{
+  "stableToken": {
+    "initialAccounts": [],
+    "priceOracleAccounts": [
+      "0x5409ED021D9299bf6814279A6A1411A7e866A631",
+      "0xE36Ea790bc9d7AB70C55260C66D52b1eca985f84",
+      "0x06cEf8E666768cC40Cc78CF93d9611019dDcB628",
+      "0x7457d5E02197480Db681D3fdF256c7acA21bDc12"
+    ]
+  }
+}
