@@ -45,7 +45,7 @@ module.exports = deploymentForCoreContract<GovernanceInstance>(
     )
     await reserve.addSpender(governance.address)
 
-    const proxyOwnedByGovernance = ['GoldToken', 'Random']
+    const proxyOwnedByGovernance = ['GoldToken']
     await Promise.all(
       proxyOwnedByGovernance.map((contractName) =>
         transferOwnershipOfProxy(contractName, governance.address, artifacts)
@@ -62,6 +62,7 @@ module.exports = deploymentForCoreContract<GovernanceInstance>(
       'GasPriceMinimum',
       'Governance',
       'LockedGold',
+      'Random',
       'Registry',
       'Reserve',
       'SortedOracles',

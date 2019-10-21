@@ -28,7 +28,7 @@ contract('StableToken', (accounts: string[]) => {
   beforeEach(async () => {
     registry = await Registry.new()
     stableToken = await StableToken.new()
-    await stableToken.initialize(
+    const response = await stableToken.initialize(
       'Celo Dollar',
       'cUSD',
       18,
@@ -36,7 +36,7 @@ contract('StableToken', (accounts: string[]) => {
       fixed1,
       SECONDS_IN_A_WEEK
     )
-    initializationTime = (await web3.eth.getBlock('latest')).timestamp
+    initializationTime = (await web3.eth.getBlock(response.receipt.blockNumber)).timestamp
   })
 
   describe('#initialize()', () => {
