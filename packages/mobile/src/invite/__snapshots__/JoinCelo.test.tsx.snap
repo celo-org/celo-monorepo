@@ -224,6 +224,7 @@ exports[`JoinCeloScreen renders correctly 1`] = `
                 autoCorrect={false}
                 data={Array []}
                 defaultValue="Canadá"
+                flatListProps={Object {}}
                 inputContainerStyle={
                   Array [
                     Object {
@@ -240,6 +241,7 @@ exports[`JoinCeloScreen renders correctly 1`] = `
                     },
                   ]
                 }
+                keyExtractor={[Function]}
                 keyboardShouldPersistTaps="always"
                 listContainerStyle={
                   Object {
@@ -279,7 +281,6 @@ exports[`JoinCeloScreen renders correctly 1`] = `
                 renderItem={[Function]}
                 renderSeparator={null}
                 renderTextInput={[Function]}
-                rowHasChanged={[Function]}
                 style={
                   Array [
                     Object {
@@ -749,6 +750,7 @@ exports[`JoinCeloScreen renders with an error 1`] = `
                 autoCorrect={false}
                 data={Array []}
                 defaultValue="Canadá"
+                flatListProps={Object {}}
                 inputContainerStyle={
                   Array [
                     Object {
@@ -765,6 +767,7 @@ exports[`JoinCeloScreen renders with an error 1`] = `
                     },
                   ]
                 }
+                keyExtractor={[Function]}
                 keyboardShouldPersistTaps="always"
                 listContainerStyle={
                   Object {
@@ -804,7 +807,6 @@ exports[`JoinCeloScreen renders with an error 1`] = `
                 renderItem={[Function]}
                 renderSeparator={null}
                 renderTextInput={[Function]}
-                rowHasChanged={[Function]}
                 style={
                   Array [
                     Object {

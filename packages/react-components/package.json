@@ -17,7 +17,7 @@
     "@celo/utils": "^0.1.0",
     "hoist-non-react-statics": "^3.3.0",
     "lodash": "^4.17.14",
-    "react-native-autocomplete-input": "^3.6.0",
+    "react-native-autocomplete-input": "^4.1.0",
     "react-native-contacts": "git://github.com/celo-org/react-native-contacts#4989b0b",
     "react-native-platform-touchable": "^1.1.1",
     "svgs": "^4.1.0"
@@ -28,6 +28,7 @@
     "@types/hoist-non-react-statics": "^3.3.1",
     "@types/react": "^16.8.19",
     "@types/react-native": "^0.57.47",
+    "@types/react-native-autocomplete-input": "^4.0.1",
     "enzyme": "^3.9.0",
     "enzyme-adapter-react-16": "^1.11.2",
     "react": "16.8.3",

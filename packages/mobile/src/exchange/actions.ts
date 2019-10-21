@@ -249,9 +249,14 @@ export function* exchangeGoldAndStableTokens(action: ExchangeTokensAction) {
     yield call(sendAndMonitorTransaction, txId, tx, account)
   } catch (error) {
     Logger.error(TAG, 'Error doing exchange', error)
-    yield put(showError(ErrorMessages.EXCHANGE_FAILED))
     if (txId) {
       yield put(removeStandbyTransaction(txId))
+    }
+
+    if (error.message === ErrorMessages.INCORRECT_PIN) {
+      yield put(showError(ErrorMessages.INCORRECT_PIN))
+    } else {
+      yield put(showError(ErrorMessages.EXCHANGE_FAILED))
     }
   }
 }

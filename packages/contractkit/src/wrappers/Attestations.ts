@@ -10,8 +10,8 @@ import {
   proxySend,
   toBigNumber,
   toNumber,
+  toTransactionObject,
   tupleParser,
-  wrapSend,
 } from './BaseWrapper'
 const parseSignature = SignatureUtils.parseSignature
 
@@ -206,7 +206,7 @@ export class AttestationsWrapper extends BaseWrapper<Attestations> {
     const phoneHash = PhoneNumberUtils.getPhoneHash(phoneNumber)
     const expectedSourceMessage = attestationMessageToSign(phoneHash, account)
     const { r, s, v } = parseSignature(expectedSourceMessage, code, issuer.toLowerCase())
-    return wrapSend(this.kit, this.contract.methods.complete(phoneHash, v, r, s))
+    return toTransactionObject(this.kit, this.contract.methods.complete(phoneHash, v, r, s))
   }
 
   /**
@@ -305,7 +305,7 @@ export class AttestationsWrapper extends BaseWrapper<Attestations> {
   async request(phoneNumber: string, attestationsRequested: number, token: CeloToken) {
     const phoneHash = PhoneNumberUtils.getPhoneHash(phoneNumber)
     const tokenAddress = await this.kit.registry.addressFor(token)
-    return wrapSend(
+    return toTransactionObject(
       this.kit,
       this.contract.methods.request(phoneHash, attestationsRequested, tokenAddress)
     )
@@ -332,7 +332,7 @@ export class AttestationsWrapper extends BaseWrapper<Attestations> {
         Buffer.from(phoneNumber, 'utf8')
       ).toString('hex')
 
-    return wrapSend(
+    return toTransactionObject(
       this.kit,
       this.contract.methods.reveal(
         PhoneNumberUtils.getPhoneHash(phoneNumber),
