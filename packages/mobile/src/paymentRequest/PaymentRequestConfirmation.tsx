@@ -25,6 +25,7 @@ import DisconnectBanner from 'src/shared/DisconnectBanner'
 import Logger from 'src/utils/Logger'
 import { currentAccountSelector } from 'src/web3/selectors'
 
+// @ts-ignore
 const TAG = 'paymentRequest/confirmation'
 
 export interface ConfirmationInput {
