@@ -857,7 +857,7 @@ contract Election is IElection, Ownable, ReentrancyGuard, Initializable, UsingRe
    * @return The permuted array.
    */
   function shuffleArray(address[] memory array) private view returns (address[] memory) {
-    bytes32 r = getRandom().random();
+    bytes32 r = getRandom().getBlockRandomness(block.number);
     for (uint256 i = array.length - 1; i > 0; i = i.sub(1)) {
       uint256 j = uint256(r) % (i + 1);
       (array[i], array[j]) = (array[j], array[i]);

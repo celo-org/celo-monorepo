@@ -16,14 +16,14 @@ import { uniq } from 'lodash'
 import {
   AttestationsContract,
   AttestationsInstance,
+  MockElectionContract,
+  MockElectionInstance,
   MockLockedGoldContract,
   MockLockedGoldInstance,
+  MockRandomContract,
+  MockRandomInstance,
   MockStableTokenContract,
   MockStableTokenInstance,
-  MockElectionInstance,
-  TestRandomContract,
-  TestRandomInstance,
-  MockElectionContract,
   RegistryContract,
   RegistryInstance,
 } from 'types'
@@ -33,7 +33,7 @@ const Attestations: AttestationsContract = artifacts.require('Attestations')
 const MockStableToken: MockStableTokenContract = artifacts.require('MockStableToken')
 const MockElection: MockElectionContract = artifacts.require('MockElection')
 const MockLockedGold: MockLockedGoldContract = artifacts.require('MockLockedGold')
-const Random: TestRandomContract = artifacts.require('TestRandom')
+const Random: MockRandomContract = artifacts.require('MockRandom')
 const Registry: RegistryContract = artifacts.require('Registry')
 
 const dataEncryptionKey = '0x02f2f48ee19680706196e2e339e5da3491186e0c4c5030670656b0e01611111111'
@@ -45,7 +45,7 @@ contract('Attestations', (accounts: string[]) => {
   let attestations: AttestationsInstance
   let mockStableToken: MockStableTokenInstance
   let otherMockStableToken: MockStableTokenInstance
-  let random: TestRandomInstance
+  let random: MockRandomInstance
   let mockElection: MockElectionInstance
   let mockLockedGold: MockLockedGoldInstance
   let registry: RegistryInstance
@@ -72,6 +72,7 @@ contract('Attestations', (accounts: string[]) => {
 
   const attestationsRequested = 3
   const attestationExpiryBlocks = 60
+  const selectIssuersWaitBlocks = 4
   const attestationFee = new BigNumber(web3.utils.toWei('.05', 'ether').toString())
 
   async function getVerificationCodeSignature(
@@ -138,7 +139,6 @@ contract('Attestations', (accounts: string[]) => {
     otherMockStableToken = await MockStableToken.new()
     attestations = await Attestations.new()
     random = await Random.new()
-    random.addTestRandomness(0, '0x00')
     mockLockedGold = await MockLockedGold.new()
     await Promise.all(
       accounts.map((account) =>
@@ -156,6 +156,7 @@ contract('Attestations', (accounts: string[]) => {
     await attestations.initialize(
       registry.address,
       attestationExpiryBlocks,
+      selectIssuersWaitBlocks,
       [mockStableToken.address, otherMockStableToken.address],
       [attestationFee, attestationFee]
     )
@@ -179,6 +180,7 @@ contract('Attestations', (accounts: string[]) => {
         attestations.initialize(
           registry.address,
           attestationExpiryBlocks,
+          selectIssuersWaitBlocks,
           [mockStableToken.address],
           [attestationFee]
         )
@@ -458,6 +460,8 @@ contract('Attestations', (accounts: string[]) => {
 
       describe('when the issuers have been revealed', async () => {
         beforeEach(async () => {
+          const requestBlockNumber = await web3.eth.getBlockNumber()
+          await random.addTestRandomness(requestBlockNumber + selectIssuersWaitBlocks, '0x1')
           await attestations.selectIssuers(phoneHash)
         })
 
@@ -497,58 +501,71 @@ contract('Attestations', (accounts: string[]) => {
         await attestations.request(phoneHash, attestationsRequested, mockStableToken.address)
       })
 
-      it('should add the correct number attestation issuers', async () => {
-        assert.isEmpty(await attestations.getAttestationIssuers(phoneHash, caller))
-        await attestations.selectIssuers(phoneHash)
-
-        const attestationIssuers = await attestations.getAttestationIssuers(phoneHash, caller)
-        assert.lengthOf(attestationIssuers, attestationsRequested)
-        assert.lengthOf(uniq(attestationIssuers), attestationsRequested)
-      })
-
-      it('should set the block of request in the attestations', async () => {
-        await attestations.selectIssuers(phoneHash)
-        const expectedBlock = await web3.eth.getBlock('latest')
-        const attestationIssuers = await attestations.getAttestationIssuers(phoneHash, caller)
-
-        await Promise.all(
-          attestationIssuers.map(async (issuer) => {
-            const [status, requestBlock] = await attestations.getAttestationState(
-              phoneHash,
-              caller,
-              issuer
-            )
-
-            assert.equal(status.toNumber(), 1)
-            assert.equal(requestBlock.toNumber(), expectedBlock.number)
-          })
-        )
-      })
-
-      it('should delete the unselected request', async () => {
-        await attestations.selectIssuers(phoneHash)
-        const [blockNumber, actualAttestationsRequested] = await attestations.getUnselectedRequest(
-          phoneHash,
-          caller
-        )
-        assertEqualBN(blockNumber, 0)
-        assertEqualBN(actualAttestationsRequested, 0)
-      })
-
-      it('should emit the AttestationIssuersSelected event', async () => {
-        const response = await attestations.selectIssuers(phoneHash)
-
-        assert.lengthOf(response.logs, 1)
-        const event = response.logs[0]
-        assertLogMatches2(event, {
-          event: 'AttestationIssuersSelected',
-          args: {
-            identifier: phoneHash,
-            account: caller,
-            attestationsRequested: new BigNumber(attestationsRequested),
-            attestationRequestFeeToken: mockStableToken.address,
-          },
+      describe('when the randomness of the right block has been set', async () => {
+        beforeEach(async () => {
+          const requestBlockNumber = await web3.eth.getBlockNumber()
+          await random.addTestRandomness(requestBlockNumber + selectIssuersWaitBlocks, '0x1')
         })
+
+        it('should add the correct number attestation issuers', async () => {
+          assert.isEmpty(await attestations.getAttestationIssuers(phoneHash, caller))
+          await attestations.selectIssuers(phoneHash)
+
+          const attestationIssuers = await attestations.getAttestationIssuers(phoneHash, caller)
+          assert.lengthOf(attestationIssuers, attestationsRequested)
+          assert.lengthOf(uniq(attestationIssuers), attestationsRequested)
+        })
+
+        it('should set the block of request in the attestations', async () => {
+          await attestations.selectIssuers(phoneHash)
+          const expectedBlock = await web3.eth.getBlock('latest')
+          const attestationIssuers = await attestations.getAttestationIssuers(phoneHash, caller)
+
+          await Promise.all(
+            attestationIssuers.map(async (issuer) => {
+              const [status, requestBlock] = await attestations.getAttestationState(
+                phoneHash,
+                caller,
+                issuer
+              )
+
+              assert.equal(status.toNumber(), 1)
+              assert.equal(requestBlock.toNumber(), expectedBlock.number)
+            })
+          )
+        })
+
+        it('should delete the unselected request', async () => {
+          await attestations.selectIssuers(phoneHash)
+          const [
+            blockNumber,
+            actualAttestationsRequested,
+          ] = await attestations.getUnselectedRequest(phoneHash, caller)
+          assertEqualBN(blockNumber, 0)
+          assertEqualBN(actualAttestationsRequested, 0)
+        })
+
+        it('should emit the AttestationIssuersSelected event', async () => {
+          const response = await attestations.selectIssuers(phoneHash)
+
+          assert.lengthOf(response.logs, 1)
+          const event = response.logs[0]
+          assertLogMatches2(event, {
+            event: 'AttestationIssuersSelected',
+            args: {
+              identifier: phoneHash,
+              account: caller,
+              attestationsRequested: new BigNumber(attestationsRequested),
+              attestationRequestFeeToken: mockStableToken.address,
+            },
+          })
+        })
+      })
+
+      it('should revert when selecting too soon', async () => {
+        const requestBlockNumber = await web3.eth.getBlockNumber()
+        await random.addTestRandomness(requestBlockNumber + selectIssuersWaitBlocks - 1, '0x1')
+        await assertRevert(attestations.selectIssuers(phoneHash))
       })
     })
 
@@ -564,6 +581,8 @@ contract('Attestations', (accounts: string[]) => {
 
     beforeEach(async () => {
       await attestations.request(phoneHash, attestationsRequested, mockStableToken.address)
+      const requestBlockNumber = await web3.eth.getBlockNumber()
+      await random.addTestRandomness(requestBlockNumber + selectIssuersWaitBlocks, '0x1')
       await attestations.selectIssuers(phoneHash)
       issuer = (await attestations.getAttestationIssuers(phoneHash, caller))[0]
     })
@@ -600,6 +619,8 @@ contract('Attestations', (accounts: string[]) => {
 
     beforeEach(async () => {
       await attestations.request(phoneHash, attestationsRequested, mockStableToken.address)
+      const requestBlockNumber = await web3.eth.getBlockNumber()
+      await random.addTestRandomness(requestBlockNumber + selectIssuersWaitBlocks, '0x1')
       await attestations.selectIssuers(phoneHash)
       issuer = (await attestations.getAttestationIssuers(phoneHash, caller))[0]
       ;[v, r, s] = await getVerificationCodeSignature(caller, issuer)
@@ -729,6 +750,8 @@ contract('Attestations', (accounts: string[]) => {
     let issuer: string
     beforeEach(async () => {
       await attestations.request(phoneHash, attestationsRequested, mockStableToken.address)
+      const requestBlockNumber = await web3.eth.getBlockNumber()
+      await random.addTestRandomness(requestBlockNumber + selectIssuersWaitBlocks, '0x1')
       await attestations.selectIssuers(phoneHash)
       issuer = (await attestations.getAttestationIssuers(phoneHash, caller))[0]
       const [v, r, s] = await getVerificationCodeSignature(caller, issuer)
@@ -771,6 +794,8 @@ contract('Attestations', (accounts: string[]) => {
 
   const requestAttestations = async () => {
     await attestations.request(phoneHash, attestationsRequested, mockStableToken.address)
+    const requestBlockNumber = await web3.eth.getBlockNumber()
+    await random.addTestRandomness(requestBlockNumber + selectIssuersWaitBlocks, '0x1')
     await attestations.selectIssuers(phoneHash)
   }
   const requestAndCompleteAttestations = async () => {
@@ -877,6 +902,8 @@ contract('Attestations', (accounts: string[]) => {
             await attestations.request(phoneHash, attestationsRequested, mockStableToken.address, {
               from: other,
             })
+            const requestBlockNumber = await web3.eth.getBlockNumber()
+            await random.addTestRandomness(requestBlockNumber + selectIssuersWaitBlocks, '0x1')
             await attestations.selectIssuers(phoneHash, {
               from: other,
             })
