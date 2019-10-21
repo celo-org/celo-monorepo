@@ -1,6 +1,8 @@
-import { createStackNavigator, createSwitchNavigator } from 'react-navigation'
+import { Platform } from 'react-native'
+import { createStackNavigator, createSwitchNavigator, StackNavigatorConfig } from 'react-navigation'
 import Account from 'src/account/Account'
 import Analytics from 'src/account/Analytics'
+import CeloLite from 'src/account/CeloLite'
 import DollarEducation from 'src/account/DollarEducation'
 import EditProfile from 'src/account/EditProfile'
 import GoldEducation from 'src/account/GoldEducation'
@@ -47,10 +49,21 @@ import VerifyVerified from 'src/verify/Verified'
 import VerifyVerifying from 'src/verify/Verifying'
 import VerifyEducation from 'src/verify/VerifyPhoneEducation'
 
-export const headerArea = {
+export const headerArea: StackNavigatorConfig = {
+  // Force this for now on iOS so screen transitions look normal
+  // given we intentionally hide the bottom separator from the nav bar
+  headerMode: 'screen',
   defaultNavigationOptions: {
     headerStyle: {
-      elevation: 0,
+      ...Platform.select({
+        android: {
+          elevation: 0,
+        },
+        ios: {
+          borderBottomWidth: 0,
+          borderBottomColor: 'transparent',
+        },
+      }),
     },
   },
 }
@@ -140,6 +153,7 @@ const AppStack = createStackNavigator(
     [Stacks.RequestStack]: { screen: RequestStack },
     [Screens.Language]: { screen: Language },
     [Screens.Analytics]: { screen: Analytics },
+    [Screens.CeloLite]: { screen: CeloLite },
     [Screens.SetClock]: { screen: SetClock },
     [Screens.EditProfile]: { screen: EditProfile },
     [Screens.Profile]: { screen: Profile },

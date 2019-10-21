@@ -14,8 +14,8 @@ import { headerWithBackButton } from 'src/navigator/Headers'
 import { navigate } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
 import { handleBarcodeDetected } from 'src/send/actions'
-import { requestCameraPermission } from 'src/utils/androidPermissions'
 import Logger from 'src/utils/Logger'
+import { requestCameraPermission } from 'src/utils/permissions'
 
 enum BarcodeTypes {
   QR_CODE = 'QR_CODE',

@@ -5,6 +5,7 @@ import variables from '@celo/react-components/styles/variables'
 import * as React from 'react'
 import { WithNamespaces, withNamespaces } from 'react-i18next'
 import { ScrollView, StyleSheet, View } from 'react-native'
+import SafeAreaView from 'react-native-safe-area-view'
 import { connect } from 'react-redux'
 import { getPaymentRequests } from 'src/account/selectors'
 import { PaymentRequest } from 'src/account/types'
@@ -71,7 +72,7 @@ export class PaymentRequestListScreen extends React.Component<Props> {
 
   render() {
     return (
-      <View style={styles.container}>
+      <SafeAreaView style={styles.container}>
         <DisconnectBanner />
         <PaymentRequestBalance dollarBalance={this.props.dollarBalance} />
         <SectionHeader text={this.props.t('requests')} />
@@ -84,7 +85,7 @@ export class PaymentRequestListScreen extends React.Component<Props> {
         ) : (
           <PaymentRequestListEmpty />
         )}
-      </View>
+      </SafeAreaView>
     )
   }
 }

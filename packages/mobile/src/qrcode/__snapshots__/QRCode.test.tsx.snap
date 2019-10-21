@@ -1,7 +1,7 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`QRCode renders correctly 1`] = `
-<View
+<SafeAreaView
   style={
     Object {
       "alignItems": "center",
@@ -361,5 +361,5 @@ exports[`QRCode renders correctly 1`] = `
       </View>
     </View>
   </View>
-</View>
+</SafeAreaView>
 `;

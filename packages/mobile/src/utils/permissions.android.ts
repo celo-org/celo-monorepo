@@ -3,7 +3,7 @@ import Logger from 'src/utils/Logger'
 
 // TODO(Rossy) i18n in this file
 
-const TAG = 'utils/androidPermissions'
+const TAG = 'utils/permissions.android'
 
 export async function requestPhoneStatePermission() {
   return requestPermission(

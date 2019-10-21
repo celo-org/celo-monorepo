@@ -43,6 +43,8 @@ const testnetEnvVars: TerraformVars = {
   geth_bootnode_docker_image_tag: envVar.GETH_BOOTNODE_DOCKER_IMAGE_TAG,
   geth_node_docker_image_repository: envVar.GETH_NODE_DOCKER_IMAGE_REPOSITORY,
   geth_node_docker_image_tag: envVar.GETH_NODE_DOCKER_IMAGE_TAG,
+  in_memory_discovery_table: envVar.IN_MEMORY_DISCOVERY_TABLE,
+  istanbul_request_timeout_ms: envVar.ISTANBUL_REQUEST_TIMEOUT_MS,
   network_id: envVar.NETWORK_ID,
   tx_node_count: envVar.TX_NODES,
   validator_count: envVar.VALIDATORS,
@@ -286,8 +288,13 @@ export async function getTestnetOutputs(celoEnv: string) {
     celoEnv,
     testnetTerraformModule
   )
+  await initTerraformModule(testnetTerraformModule, vars, backendConfigVars)
+  return getTerraformModuleOutputs(testnetTerraformModule, vars)
+}
 
-  return getTerraformModuleOutputs(testnetTerraformModule, vars, backendConfigVars)
+export async function getTxNodeLoadBalancerIP(celoEnv: string) {
+  const outputs = await getTestnetOutputs(celoEnv)
+  return outputs.tx_node_lb_ip_address.value
 }
 
 function getTerraformBackendConfigVars(celoEnv: string, terraformModule: string) {

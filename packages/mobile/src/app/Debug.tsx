@@ -1,8 +1,9 @@
 import Button, { BtnTypes } from '@celo/react-components/components/Button'
 import { anonymizedPhone } from '@celo/utils/src/phoneNumbers'
 import * as React from 'react'
-import { Clipboard, StyleSheet, Text, View } from 'react-native'
+import { Clipboard, StyleSheet, Text } from 'react-native'
 import DeviceInfo from 'react-native-device-info'
+import SafeAreaView from 'react-native-safe-area-view'
 import { connect } from 'react-redux'
 import LogView from 'src/app/LogView'
 import { RootState } from 'src/redux/reducers'
@@ -65,8 +66,9 @@ export class Debug extends React.Component<RootState, State> {
     const buildNumber = DeviceInfo.getBuildNumber()
     const apiLevel = DeviceInfo.getAPILevel()
     const deviceId = DeviceInfo.getDeviceId()
+
     return (
-      <View style={style.container}>
+      <SafeAreaView style={style.container}>
         <Text
           onPress={this.onClickText(deviceId, phoneNumber)}
           style={style.singleLine}
@@ -100,7 +102,7 @@ export class Debug extends React.Component<RootState, State> {
           type={BtnTypes.PRIMARY}
           style={style.button}
         />
-      </View>
+      </SafeAreaView>
     )
   }
 }

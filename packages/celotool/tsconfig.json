@@ -13,7 +13,7 @@
       "@google-cloud/monitoring": ["types/monitoring"]
     }
   },
-  "include": ["src/"],
+  "include": ["src", "../contractkit/types"],
   "exclude": ["node_modules/"],
-  "references": [{ "path": "../utils" }]
+  "references": [{ "path": "../utils" }, { "path": "../contractkit" }]
 }

@@ -49,9 +49,8 @@ interface IGovernance {
   function getUpvotes(uint256) external view returns (uint256);
   function getQueue() external view returns (uint256[] memory, uint256[] memory);
   function getDequeue() external view returns (uint256[] memory);
-  function getUpvotedProposal(address) external view returns (uint256);
+  function getUpvoteRecord(address) external view returns (uint256, uint256);
   function getMostRecentReferendumProposal(address) external view returns (uint256);
-  function isVoting(address) external view returns (bool);
   function isQueued(uint256) external view returns (bool);
   function isProposalPassing(uint256) external view returns (bool);
 }

@@ -1,7 +1,7 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`EnterInviteCode Screen renders correctly 1`] = `
-<View
+<SafeAreaView
   style={
     Object {
       "backgroundColor": "#FFFFFF",
@@ -470,11 +470,11 @@ exports[`EnterInviteCode Screen renders correctly 1`] = `
       </View>
     </View>
   </View>
-</View>
+</SafeAreaView>
 `;
 
 exports[`EnterInviteCode Screen renders with an error 1`] = `
-<View
+<SafeAreaView
   style={
     Object {
       "backgroundColor": "#FFFFFF",
@@ -943,5 +943,5 @@ exports[`EnterInviteCode Screen renders with an error 1`] = `
       </View>
     </View>
   </View>
-</View>
+</SafeAreaView>
 `;
