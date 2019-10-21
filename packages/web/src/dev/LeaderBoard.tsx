@@ -1,0 +1,107 @@
+import * as React from 'react'
+import { LayoutChangeEvent, StyleSheet, Text, View } from 'react-native'
+import Racer from 'src/dev/Racer'
+import { colors, fonts, standardStyles, textStyles } from 'src/styles'
+
+interface BoardProps {
+  leaders: Competitor[]
+}
+
+interface Competitor {
+  identity: string
+  points: number
+}
+
+interface State {
+  width: number
+}
+
+class LeaderBoard extends React.PureComponent<BoardProps, State> {
+  state: State = {
+    width: 0,
+  }
+
+  onLayout = (event: LayoutChangeEvent) => {
+    const { width } = event.nativeEvent.layout
+    this.setState({ width })
+  }
+
+  render() {
+    const sortedLeaders = this.props.leaders.sort(sorter)
+    const maxPoints = round(sortedLeaders[0].points * 1.1, 100)
+    const width = this.state.width
+    return (
+      <View onLayout={this.onLayout}>
+        {sortedLeaders
+          .map(({ points, identity }) => {
+            return {
+              identity,
+              relativePoints: round((points / maxPoints) * width),
+            }
+          })
+          .map((leader, index) => ({ ...leader, color: getJersey(index) }))
+          .map((leader) => (
+            <Racer
+              key={leader.identity}
+              relativePoints={leader.relativePoints}
+              color={leader.color}
+              identity={leader.identity}
+            />
+          ))}
+        <Axis max={maxPoints} />
+      </View>
+    )
+  }
+}
+export default LeaderBoard
+
+const JERSEYS = [colors.primary, colors.lightBlue, colors.red, colors.purple, colors.gold]
+
+function getJersey(rank: number): colors {
+  const index = rank % JERSEYS.length
+  return JERSEYS[index]
+}
+
+function sorter(alpha: Competitor, bravo: Competitor) {
+  if (alpha.points === bravo.points) {
+    return 0
+  } else if (alpha.points < bravo.points) {
+    return 1
+  }
+  return -1
+}
+
+const PORTIONS = 8
+
+function Axis({ max }: { max: number }) {
+  const portion = max / PORTIONS
+
+  return (
+    <View style={[standardStyles.row, styles.xaxis]}>
+      {Array(PORTIONS)
+        .fill(portion)
+        .map((ratio, index) => {
+          const amount = round(ratio * index)
+          return (
+            <Text key={amount} style={[fonts.small, textStyles.invert]}>
+              {amount}
+            </Text>
+          )
+        })}
+      <Text key={max} style={[fonts.small, textStyles.invert]}>
+        {max}
+      </Text>
+    </View>
+  )
+}
+
+const styles = StyleSheet.create({
+  xaxis: {
+    justifyContent: 'space-between',
+  },
+})
+
+function round(number: number, magnitude?: number) {
+  const precision = magnitude || 10
+  return Math.ceil(number / precision) * precision
+}

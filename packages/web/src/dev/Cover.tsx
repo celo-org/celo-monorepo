@@ -11,17 +11,31 @@ import Button, { BTN, SIZE } from 'src/shared/Button.3'
 import { CeloLinks } from 'src/shared/menu-items'
 import { HEADER_HEIGHT } from 'src/shared/Styles'
 import { colors, standardStyles, textStyles } from 'src/styles'
-
+import LeaderBoard from 'src/dev/LeaderBoard'
 const DELAY = 400
 const DELAY_2 = DELAY * 1.3
 const DURATION = 400
 
+const LEADERS = [
+  { points: 83, identity: 'Rex' },
+  { points: 840, identity: 'Jon' },
+  { points: 321, identity: 'Heisenberg' },
+  { points: 380, identity: 'Harry' },
+  { points: 764, identity: 'DX-West' },
+  { points: 500, identity: 'Simone2148' },
+  { points: 497, identity: '$celo-$' },
+  { points: 1020, identity: '77zepher' },
+  { points: 940, identity: 'Gatsby & Durben' },
+]
+
 const CoverComponent = React.memo(function Cover({ t }: I18nProps) {
   return (
     <View style={styles.cover}>
-      <View style={styles.phone}>
-        <Phone />
-      </View>
+      <GridRow>
+        <Cell span={Spans.full}>
+          <LeaderBoard leaders={LEADERS} />
+        </Cell>
+      </GridRow>
       <GridRow
         allStyle={standardStyles.centered}
         desktopStyle={standardStyles.sectionMarginBottom}
