@@ -4,9 +4,6 @@ import * as fs from 'fs'
 import * as path from 'path'
 
 const MNEMONIC = 'concert load couple harbor equip island argue ramp clarify fence smart topic'
-export const NetworkConfig = JSON.parse(
-  fs.readFileSync('src/test-utils/network-config.json').toString()
-)
 
 // This file specifies accounts available when ganache is running. These are derived
 // from the MNEMONIC
