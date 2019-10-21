@@ -53,6 +53,7 @@ export function* initializeCloudMessaging(app: Firebase, address: string) {
       yield call([app.messaging(), 'requestPermission'])
     } catch (error) {
       Logger.error(TAG, 'User has rejected messaging permissions', error)
+      throw error
     }
   }
 

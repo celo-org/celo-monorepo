@@ -31,10 +31,6 @@ const app: any = {
 }
 
 describe(initializeCloudMessaging, () => {
-  // beforeAll(() => {
-  //   jest.useRealTimers()
-  // })
-
   afterEach(() => {
     jest.clearAllMocks()
   })
@@ -45,8 +41,8 @@ describe(initializeCloudMessaging, () => {
 
     await expectSaga(initializeCloudMessaging, app, address)
       .provide([
-        [call(hasPermissionMock), false],
-        [call(requestPermissionMock), throwError(errorToRaise)],
+        [call([app.messaging(), 'hasPermission']), false],
+        [call([app.messaging(), 'requestPermission']), throwError(errorToRaise)],
       ])
       .run()
       .catch((error: Error) => {
@@ -60,8 +56,8 @@ describe(initializeCloudMessaging, () => {
     const mockLanguage = 'en_US'
     await expectSaga(initializeCloudMessaging, app, address)
       .provide([
-        [call(hasPermissionMock), false],
-        [call(app.messaging().getToken), mockFcmToken],
+        [call([app.messaging(), 'hasPermission']), true],
+        [call([app.messaging(), 'getToken']), mockFcmToken],
         [call(registerTokenToDb, app, address, mockFcmToken), null],
         [select(currentLanguageSelector), mockLanguage],
         [call(setUserLanguage, address, mockLanguage), null],
