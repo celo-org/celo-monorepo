@@ -85,19 +85,22 @@ export class SortedOraclesWrapper extends BaseWrapper<SortedOracles> {
   async report(
     token: CeloToken,
     numerator: number,
-    denominator: number
+    denominator: number,
+    oracleAddress: Address
   ): Promise<CeloTransactionObject<void>> {
     const tokenAddress = await this.kit.registry.addressFor(token)
 
     const { lesserKey, greaterKey } = await this.findLesserAndGreaterKeys(
       token,
       numerator,
-      denominator
+      denominator,
+      oracleAddress
     )
 
     return toTransactionObject(
       this.kit,
-      this.contract.methods.report(tokenAddress, numerator, denominator, lesserKey, greaterKey)
+      this.contract.methods.report(tokenAddress, numerator, denominator, lesserKey, greaterKey),
+      { from: oracleAddress }
     )
   }
 
@@ -109,9 +112,10 @@ export class SortedOraclesWrapper extends BaseWrapper<SortedOracles> {
    */
   async reportStableToken(
     numerator: number,
-    denominator: number
+    denominator: number,
+    oracleAddress: Address
   ): Promise<CeloTransactionObject<void>> {
-    return this.report(CeloContract.StableToken, numerator, denominator)
+    return this.report(CeloContract.StableToken, numerator, denominator, oracleAddress)
   }
 
   /**
@@ -153,7 +157,8 @@ export class SortedOraclesWrapper extends BaseWrapper<SortedOracles> {
   private async findLesserAndGreaterKeys(
     token: CeloToken,
     numerator: number,
-    denominator: number
+    denominator: number,
+    oracleAddress: Address
   ): Promise<{ lesserKey: Address; greaterKey: Address }> {
     const currentRates: OracleRate[] = await this.getRates(token)
     const internalDenominator = new BigNumber(await this.contract.methods.DENOMINATOR().call())
@@ -162,21 +167,22 @@ export class SortedOraclesWrapper extends BaseWrapper<SortedOracles> {
     // To figure out where this new report goes in the list, we need to compare this
     // value with the other rates
     const value = internalDenominator.times(numerator).div(denominator)
+
     let greaterKey = NULL_ADDRESS
+    let lesserKey = NULL_ADDRESS
 
     // This leverages the fact that the currentRates are already sorted from
     // greatest to lowest value
     for (const rate of currentRates) {
-      if (!eqAddress(rate.address, this.kit.defaultAccount)) {
-        if (rate.rate.isGreaterThanOrEqualTo(value)) {
-          greaterKey = rate.address
-        } else if (rate.rate.isLessThanOrEqualTo(value)) {
-          return { lesserKey: rate.address, greaterKey }
+      if (!eqAddress(rate.address, oracleAddress)) {
+        if (rate.rate.isLessThanOrEqualTo(value)) {
+          lesserKey = rate.address
+          break
         }
+        greaterKey = rate.address
       }
     }
 
-    // If a lesserKey hasn't been found, this item belongs at the tail
-    return { lesserKey: NULL_ADDRESS, greaterKey }
+    return { lesserKey, greaterKey }
   }
 }

@@ -1,6 +1,13 @@
+import * as fs from 'fs'
 import Web3 from 'web3'
 import { JsonRPCResponse } from 'web3/providers'
 import { injectDebugProvider } from '../providers/debug-provider'
+
+// This file specifies accounts available when ganache is running. These are derived
+// from the MNEMONIC
+export const NetworkConfig = JSON.parse(
+  fs.readFileSync('src/test-utils/migration-override.json').toString()
+)
 
 export function jsonRpcCall<O>(web3: Web3, method: string, params: any[]): Promise<O> {
   return new Promise<O>((resolve, reject) => {
