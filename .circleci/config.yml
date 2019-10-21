@@ -707,24 +707,22 @@ workflows:
             - install_dependencies
       - end-to-end-geth-transfer-test:
           requires:
-            - lint-checks
-            - walletkit-test
+            - install_dependencies
       - end-to-end-geth-exit-test:
           requires:
-            - lint-checks
-            - walletkit-test
+            - install_dependencies
       - end-to-end-geth-governance-test:
           requires:
-            - lint-checks
-            - walletkit-test
+            - install_dependencies
       - end-to-end-geth-sync-test:
           requires:
-            - lint-checks
-            - walletkit-test
+            - install_dependencies
       - end-to-end-geth-integration-sync-test:
           requires:
-            - lint-checks
-            - walletkit-test
+            - install_dependencies
+      - end-to-end-geth-attestations-test:
+          requires:
+            - install_dependencies
   npm-install-testing-cron-workflow:
     triggers:
       - schedule:
