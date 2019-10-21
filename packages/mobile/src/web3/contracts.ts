@@ -14,7 +14,7 @@ const tag = 'web3/contracts'
 
 export const web3: Web3 = getWeb3()
 
-export function isZeroSyncMode(): boolean {
+export function isInitiallyZeroSyncMode(): boolean {
   return networkConfig.syncMode === GethSyncMode.ZeroSync
 }
 
@@ -70,11 +70,13 @@ function getWebSocketProvider(url: string): Provider {
 // Right now, every time the app is reopened, the web3 cache resets
 // to the sync mode set in the env file
 function getWeb3(): Web3 {
-  Logger.info(`Initializing web3, platform: ${Platform.OS}, geth free mode: ${isZeroSyncMode()}`)
+  Logger.info(
+    `Initializing web3, platform: ${Platform.OS}, geth free mode: ${isInitiallyZeroSyncMode()}`
+  )
 
-  if (isZeroSyncMode() && Platform.OS === 'ios') {
+  if (isInitiallyZeroSyncMode() && Platform.OS === 'ios') {
     throw new Error('Zero sync mode is currently not supported on iOS')
-  } else if (isZeroSyncMode()) {
+  } else if (isInitiallyZeroSyncMode()) {
     // Geth free mode
     const url = DEFAULT_INFURA_URL
     Logger.debug('contracts@getWeb3', `Connecting to url ${url}`)

@@ -12,7 +12,7 @@ import { Screens, Stacks } from 'src/navigator/Screens'
 import { PersistedRootState } from 'src/redux/reducers'
 import Logger from 'src/utils/Logger'
 import { clockInSync } from 'src/utils/time'
-import { switchToZeroSyncFromGeth } from 'src/web3/saga'
+import { setZeroSyncMode } from 'src/web3/actions'
 import { zeroSyncSelector } from 'src/web3/selectors'
 
 const TAG = 'app/saga'
@@ -60,19 +60,15 @@ export function* checkAppDeprecation() {
   }
 }
 
+// Web3 is initialized according to .env file
+// This updates it based on the zeroSync mode in store
 export function* toggleToProperSyncMode() {
   Logger.info(TAG, '@toggleToProperSyncMode ensuring proper sync mode...')
   yield take(REHYDRATE)
-  Logger.info(TAG, '@toggleToProperSyncMode rehydrated')
   const zeroSyncMode = yield select(zeroSyncSelector)
   if (zeroSyncMode) {
-    Logger.info(TAG, `@toggleToProperSyncMode got syncMode ${zeroSyncMode}`)
-
-    // TODO(anna) don't assume it starts in geth modeo
-    yield call(switchToZeroSyncFromGeth)
-
-    // yield put(setZeroSyncMode(zeroSyncMode))
-    Logger.info(TAG, `@toggleToProperSyncMode set zeroSync mode to ${zeroSyncMode}`)
+    // }) !== isInitiallyZeroSyncMode) {
+    yield put(setZeroSyncMode(zeroSyncMode))
   }
 }
 
