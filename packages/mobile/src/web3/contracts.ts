@@ -96,11 +96,10 @@ export function switchWeb3ProviderForSyncMode(zeroSync: boolean) {
 }
 
 export function addLocalAccount(web3Instance: Web3, privateKey: string) {
-  /*
-  if (!isZeroSyncMode()) {
+  // Ensure web3 instance is in zeroSync mode
+  if (!(web3Instance.currentProvider instanceof Web3.providers.HttpProvider)) {
     throw new Error('addLocalAccount can only be called in Zero sync mode')
   }
-  */
   if (!web3Instance) {
     throw new Error(`web3 instance is ${web3Instance}`)
   }
