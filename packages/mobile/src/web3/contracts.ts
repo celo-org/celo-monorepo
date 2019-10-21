@@ -67,7 +67,8 @@ function getWebSocketProvider(url: string): Provider {
 }
 
 // TODO(anna) figure out caching issues with web3
-// and zeroSync mode
+// Right now, every time the app is reopened, the web3 cache resets
+// to the sync mode set in the env file
 function getWeb3(): Web3 {
   Logger.info(`Initializing web3, platform: ${Platform.OS}, geth free mode: ${isZeroSyncMode()}`)
 
@@ -85,7 +86,6 @@ function getWeb3(): Web3 {
 
 // Mutates web3 provider
 export function switchWeb3ProviderForSyncMode(zeroSync: boolean) {
-  // TODO(anna) ensure this works with iOS providers
   if (zeroSync) {
     const url = DEFAULT_INFURA_URL
     Logger.debug('contracts@getWeb3', `Connecting to url ${url}`)

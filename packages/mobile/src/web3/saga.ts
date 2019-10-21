@@ -359,16 +359,27 @@ export function* getConnectedUnlockedAccount() {
 
 export function* addAccountToWeb3Keystore(key: string, currentAccount: string, pincode: any) {
   let account: string
+  Logger.debug(TAG + '@addAccountToWeb3Keystore', `using key ${key} for account ${currentAccount}`)
+  const zeroSyncMode = yield select(zeroSyncSelector)
+  if (zeroSyncMode) {
+    // web3.eth.personal is not accessible in zeroSync mode
+    throw new Error('Cannot add account to Web3 keystore while in zeroSync mode')
+  }
   try {
     // @ts-ignore
     account = yield call(web3.eth.personal.importRawKey, String(key), pincode)
+    Logger.debug(
+      TAG + '@addAccountToWeb3Keystore',
+      `Successfully imported raw key for account ${account}`
+    )
     yield put(setAccountInWeb3Keystore(account))
   } catch (e) {
+    Logger.debug(TAG + '@addAccountToWeb3Keystore', 'Failed to import raw key')
     if (e.toString().includes('account already exists')) {
       account = currentAccount
-      Logger.debug(TAG + '@assignAccountFromPrivateKey', 'Importing same account as current one')
+      Logger.debug(TAG + '@addAccountToWeb3Keystore', 'Importing same account as current one')
     } else {
-      Logger.error(TAG + '@assignAccountFromPrivateKey', 'Error importing raw key')
+      Logger.error(TAG + '@addAccountToWeb3Keystore', 'Error importing raw key')
       throw e
     }
   }
@@ -400,17 +411,22 @@ export function* ensureAccountInWeb3Keystore() {
 }
 
 export function* switchToGethFromZeroSync() {
-  const account = yield call(ensureAccountInWeb3Keystore)
   setZeroSyncMode(false)
   switchWeb3ProviderForSyncMode(false)
+
+  // TODO(anna) will also need to start geth
+  const confirmAccount = yield call(getConnectedAccount)
+  Logger.debug(TAG + '@switchToGethFromZeroSync', 'Confirmed account is connected', confirmAccount)
+
+  // After switching to sync mode, ensure
+  // Note that this must happen after the sync mode is switched
+  // as the web3.personal where the key is stored is not available in zeroSync mode
+  const account = yield call(ensureAccountInWeb3Keystore)
   Logger.debug(
     TAG + '@switchToGethFromZeroSync',
     'Imported account from private key to web3 keystore',
     account
   )
-  // TODO(anna) will also need to start geth
-  const confirmAccount = yield call(getConnectedAccount)
-  Logger.debug(TAG + '@switchToGethFromZeroSync', 'Confirmed account is connected', confirmAccount)
   return true
 }
 
