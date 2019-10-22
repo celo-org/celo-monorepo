@@ -73,9 +73,6 @@ export class EditProfile extends React.Component<Props> {
 }
 
 const style = StyleSheet.create({
-  accountHeader: {
-    paddingTop: 20,
-  },
   input: {
     borderWidth: 1,
     borderRadius: 3,
@@ -89,10 +86,6 @@ const style = StyleSheet.create({
   scrollView: {
     flex: 1,
     backgroundColor: colors.background,
-  },
-  container: {
-    flex: 1,
-    paddingLeft: 20,
   },
 })
 

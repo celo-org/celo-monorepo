@@ -1,7 +1,6 @@
 import SettingsSwitchItem from '@celo/react-components/components/SettingsSwitchItem'
 import colors from '@celo/react-components/styles/colors'
 import fontStyles from '@celo/react-components/styles/fonts'
-import variables from '@celo/react-components/styles/variables'
 import * as React from 'react'
 import { WithNamespaces, withNamespaces } from 'react-i18next'
 import { ScrollView, StyleSheet, Text } from 'react-native'
@@ -50,26 +49,9 @@ export class Analytics extends React.Component<Props> {
 }
 
 const style = StyleSheet.create({
-  accountHeader: {
-    paddingTop: 20,
-  },
-  input: {
-    borderWidth: 1,
-    borderRadius: 3,
-    borderColor: '#EEEEEE',
-    padding: 5,
-    height: 54,
-    margin: 20,
-    width: variables.width - 40,
-    fontSize: 16,
-  },
   scrollView: {
     flex: 1,
     backgroundColor: colors.background,
-  },
-  container: {
-    flex: 1,
-    paddingLeft: 20,
   },
 })
 
