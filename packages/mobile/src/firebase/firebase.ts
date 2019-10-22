@@ -25,7 +25,7 @@ export function* watchFirebaseNotificationChannel(
       break
     }
     Logger.info(`${TAG}/startFirebaseOnRefresh`, 'Notification received in the channel')
-    yield handleNotification(data.notification, data.stateType)
+    yield call(handleNotification, data.notification, data.stateType)
   }
 }
 
@@ -105,7 +105,8 @@ export function* initializeCloudMessaging(app: Firebase, address: string) {
   const initialNotification = yield call([app.notifications(), 'getInitialNotification'])
   if (initialNotification) {
     Logger.info(TAG, 'App opened fresh via a notification')
-    yield handleNotification(
+    yield call(
+      handleNotification,
       initialNotification.notification,
       NotificationReceiveState.APP_OPENED_FRESH
     )

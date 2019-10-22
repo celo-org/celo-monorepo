@@ -1,6 +1,6 @@
 import BigNumber from 'bignumber.js'
 import { Notification } from 'react-native-firebase/notifications'
-import { put, select } from 'redux-saga/effects'
+import { call, put, select } from 'redux-saga/effects'
 import {
   NotificationReceiveState,
   NotificationTypes,
@@ -53,7 +53,7 @@ function* handlePaymentReceived(
   transferNotification: TransferNotificationData,
   notificationState: NotificationReceiveState
 ) {
-  put(refreshAllBalances())
+  yield put(refreshAllBalances())
 
   if (notificationState !== NotificationReceiveState.APP_ALREADY_OPEN) {
     const { recipientCache } = yield select(recipientCacheSelector)
@@ -84,11 +84,11 @@ export function* handleNotification(
   }
   switch (notification.data.type) {
     case NotificationTypes.PAYMENT_REQUESTED:
-      yield handlePaymentRequested(notification.data, notificationState)
+      yield call(handlePaymentRequested, notification.data, notificationState)
       break
 
     case NotificationTypes.PAYMENT_RECEIVED:
-      yield handlePaymentReceived(notification.data, notificationState)
+      yield call(handlePaymentReceived, notification.data, notificationState)
       break
 
     default:
