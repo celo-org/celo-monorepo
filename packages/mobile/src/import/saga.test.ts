@@ -7,7 +7,7 @@ import { showError } from 'src/alert/actions'
 import { ErrorMessages } from 'src/app/ErrorMessages'
 import { refreshAllBalances } from 'src/home/actions'
 import {
-  importBackupPhraseEmpty,
+  backupPhraseEmpty,
   importBackupPhraseFailure,
   importBackupPhraseSuccess,
 } from 'src/import/actions'
@@ -57,7 +57,7 @@ describe('Import wallet saga', () => {
         [call(waitWeb3LastBlock), true],
         [matchers.call.fn(fetchTokenBalanceWithRetry), new BigNumber(0)],
       ])
-      .put(importBackupPhraseEmpty())
+      .put(backupPhraseEmpty())
       .run()
   })
 })

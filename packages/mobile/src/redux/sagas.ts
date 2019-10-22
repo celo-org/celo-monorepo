@@ -19,6 +19,7 @@ import { networkInfoSaga } from 'src/networkInfo/saga'
 import { sendSaga } from 'src/send/saga'
 import { stableTokenSaga } from 'src/stableToken/saga'
 import Logger from 'src/utils/Logger'
+import { web3Saga } from 'src/web3/saga'
 
 const loggerBlacklist = [
   'persist/REHYDRATE',
@@ -43,6 +44,9 @@ function* loggerSaga() {
 
   yield takeEvery('*', (action: AnyAction) => {
     if (action && action.type && loggerBlacklist.includes(action.type)) {
+      // Log only action type, but not the payload as it can have
+      // sensitive information.
+      Logger.debug('redux/saga@logger', `${action.type} (payload not logged)`)
       return
     }
     try {
@@ -72,4 +76,5 @@ export function* rootSaga() {
   yield spawn(dappKitSaga)
   yield spawn(feesSaga)
   yield spawn(localCurrencySaga)
+  yield spawn(web3Saga)
 }

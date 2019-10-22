@@ -4,6 +4,7 @@ import "openzeppelin-solidity/contracts/math/SafeMath.sol";
 import "solidity-bytes-utils/contracts/BytesLib.sol";
 
 import "../common/FixidityLib.sol";
+import "../common/libraries/AddressesHelper.sol";
 
 /**
  * @title A library operating on Celo Governance proposals.
@@ -100,13 +101,15 @@ library Proposals {
   /**
    * @notice Adds or changes a vote on a proposal.
    * @param proposal The proposal struct.
-   * @param weight The weight of the vote.
+   * @param previousWeight The previous weight of the vote.
+   * @param currentWeight The current weight of the vote.
    * @param previousVote The vote to be removed, or None for a new vote.
    * @param currentVote The vote to be set.
    */
   function updateVote(
     Proposal storage proposal,
-    uint256 weight,
+    uint256 previousWeight,
+    uint256 currentWeight,
     VoteValue previousVote,
     VoteValue currentVote
   )
@@ -114,20 +117,20 @@ library Proposals {
   {
     // Subtract previous vote.
     if (previousVote == VoteValue.Abstain) {
-      proposal.votes.abstain = proposal.votes.abstain.sub(weight);
+      proposal.votes.abstain = proposal.votes.abstain.sub(previousWeight);
     } else if (previousVote == VoteValue.Yes) {
-      proposal.votes.yes = proposal.votes.yes.sub(weight);
+      proposal.votes.yes = proposal.votes.yes.sub(previousWeight);
     } else if (previousVote == VoteValue.No) {
-      proposal.votes.no = proposal.votes.no.sub(weight);
+      proposal.votes.no = proposal.votes.no.sub(previousWeight);
     }
 
     // Add new vote.
     if (currentVote == VoteValue.Abstain) {
-      proposal.votes.abstain = proposal.votes.abstain.add(weight);
+      proposal.votes.abstain = proposal.votes.abstain.add(currentWeight);
     } else if (currentVote == VoteValue.Yes) {
-      proposal.votes.yes = proposal.votes.yes.add(weight);
+      proposal.votes.yes = proposal.votes.yes.add(currentWeight);
     } else if (currentVote == VoteValue.No) {
-      proposal.votes.no = proposal.votes.no.add(weight);
+      proposal.votes.no = proposal.votes.no.add(currentWeight);
     }
   }
 
@@ -324,6 +327,10 @@ library Proposals {
     returns (bool)
   {
     bool result;
+
+    if (dataLength > 0)
+      require(AddressesHelper.isContract(destination), "Invalid contract address");
+
     /* solhint-disable no-inline-assembly */
     assembly {
       /* solhint-disable max-line-length */
