@@ -239,6 +239,11 @@ export function assertEqualBN(
   )
 }
 
+export function assertEqualBNArray(value: number[] | BN[] | BigNumber[], expected: number[] | BN[] | BigNumber[], msg?: string) {
+  assert.equal(value.length, expected.length, msg)
+  value.forEach((x, i) => assertEqualBN(x, expected[i]))
+}
+
 export function assertGteBN(
   value: number | BN | BigNumber,
   expected: number | BN | BigNumber,

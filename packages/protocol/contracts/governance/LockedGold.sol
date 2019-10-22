@@ -14,15 +14,14 @@ contract LockedGold is ILockedGold, ReentrancyGuard, Initializable, UsingRegistr
 
   using SafeMath for uint256;
 
-  struct AuthorizedBy {
-    address account;
-    bool active;
-  }
-
   struct Authorizations {
     // The address that is authorized to vote on behalf of the account.
+    // The account can vote as well, whether or not an authorized voter has been specified.
     address voting;
     // The address that is authorized to validate on behalf of the account.
+    // The account can manage the validator, whether or not an authorized validator has been
+    // specified. However if an authorized validator has been specified, only that key may actually
+    // participate in consensus.
     address validating;
   }
 
@@ -33,9 +32,11 @@ contract LockedGold is ILockedGold, ReentrancyGuard, Initializable, UsingRegistr
     uint256 timestamp;
   }
 
+  // NOTE: This contract does not store an account's locked gold that is being used in electing
+  // validators.
   struct Balances {
-    // This contract does not store an account's locked gold that is being used in electing
-    // validators.
+    // The amount of locked gold that this account has that is not currently participating in
+    // validator elections.
     uint256 nonvoting;
     // Gold that has been unlocked and will become available for withdrawal.
     PendingWithdrawal[] pendingWithdrawals;
@@ -53,10 +54,11 @@ contract LockedGold is ILockedGold, ReentrancyGuard, Initializable, UsingRegistr
   mapping(address => Account) private accounts;
   // Maps voting and validating keys to the account that provided the authorization.
   // Authorized addresses may not be reused.
-  mapping(address => AuthorizedBy) private authorizedBy;
+  mapping(address => address) private authorizedBy;
   uint256 public totalNonvoting;
   uint256 public unlockingPeriod;
 
+  event UnlockingPeriodSet(uint256 period);
   event VoterAuthorized(address indexed account, address voter);
   event ValidatorAuthorized(address indexed account, address validator);
   event GoldLocked(address indexed account, uint256 value);
@@ -86,6 +88,7 @@ contract LockedGold is ILockedGold, ReentrancyGuard, Initializable, UsingRegistr
    * @param v The recovery id of the incoming ECDSA signature.
    * @param r Output value r of the ECDSA signature.
    * @param s Output value s of the ECDSA signature.
+   * @dev v, r, s constitute `voter`'s signature on `msg.sender`.
    */
   function authorizeVoter(
     address voter,
@@ -97,7 +100,7 @@ contract LockedGold is ILockedGold, ReentrancyGuard, Initializable, UsingRegistr
     nonReentrant
   {
     Account storage account = accounts[msg.sender];
-    authorize(voter, account.authorizations.voting, v, r, s);
+    authorize(voter, v, r, s);
     account.authorizations.voting = voter;
     emit VoterAuthorized(msg.sender, voter);
   }
@@ -108,6 +111,7 @@ contract LockedGold is ILockedGold, ReentrancyGuard, Initializable, UsingRegistr
    * @param v The recovery id of the incoming ECDSA signature.
    * @param r Output value r of the ECDSA signature.
    * @param s Output value s of the ECDSA signature.
+   * @dev v, r, s constitute `validator`'s signature on `msg.sender`.
    */
   function authorizeValidator(
     address validator,
@@ -119,9 +123,19 @@ contract LockedGold is ILockedGold, ReentrancyGuard, Initializable, UsingRegistr
     nonReentrant
   {
     Account storage account = accounts[msg.sender];
-    authorize(validator, account.authorizations.validating, v, r, s);
+    authorize(validator, v, r, s);
     account.authorizations.validating = validator;
     emit ValidatorAuthorized(msg.sender, validator);
+  }
+
+  /**
+   * @notice Sets the duration in seconds users must wait before withdrawing gold after unlocking.
+   * @param value The unlocking period in seconds.
+   */
+  function setUnlockingPeriod(uint256 value) external onlyOwner {
+    require(value != unlockingPeriod);
+    unlockingPeriod = value;
+    emit UnlockingPeriodSet(value);
   }
 
   /**
@@ -138,7 +152,7 @@ contract LockedGold is ILockedGold, ReentrancyGuard, Initializable, UsingRegistr
    * @notice Increments the non-voting balance for an account.
    * @param account The account whose non-voting balance should be incremented.
    * @param value The amount by which to increment.
-   * @dev Can only be called by the registered "Election" smart contract.
+   * @dev Can only be called by the registered Election smart contract.
    */
   function incrementNonvotingAccountBalance(
     address account,
@@ -194,7 +208,7 @@ contract LockedGold is ILockedGold, ReentrancyGuard, Initializable, UsingRegistr
     require(isAccount(msg.sender));
     Account storage account = accounts[msg.sender];
     uint256 balanceRequirement = getValidators().getAccountLockedGoldRequirement(msg.sender);
-    require(balanceRequirement <= getAccountTotalLockedGold(msg.sender).sub(value));
+    require(balanceRequirement == 0 || balanceRequirement <= getAccountTotalLockedGold(msg.sender).sub(value));
     _decrementNonvotingAccountBalance(msg.sender, value);
     uint256 available = now.add(unlockingPeriod);
     account.balances.pendingWithdrawals.push(PendingWithdrawal(value, available));
@@ -217,7 +231,7 @@ contract LockedGold is ILockedGold, ReentrancyGuard, Initializable, UsingRegistr
   }
 
   /**
-   * @notice Withdraws a gold that has been unlocked after the unlocking period has passed.
+   * @notice Withdraws gold that has been unlocked after the unlocking period has passed.
    * @param index The index of the pending withdrawal to withdraw.
    */
   function withdraw(uint256 index) external nonReentrant {
@@ -240,9 +254,10 @@ contract LockedGold is ILockedGold, ReentrancyGuard, Initializable, UsingRegistr
    * @return The associated account.
    */
   function getAccountFromActiveVoter(address accountOrVoter) external view returns (address) {
-    AuthorizedBy memory ab = authorizedBy[accountOrVoter];
-    if (ab.active && ab.account != address(0)) {
-      return ab.account;
+    address account = authorizedBy[accountOrVoter];
+    if (account != address(0)) {
+      require(accounts[account].authorizations.voting == accountOrVoter);
+      return account;
     } else {
       require(isAccount(accountOrVoter));
       return accountOrVoter;
@@ -292,9 +307,10 @@ contract LockedGold is ILockedGold, ReentrancyGuard, Initializable, UsingRegistr
    * @return The associated account.
    */
   function getAccountFromActiveValidator(address accountOrValidator) public view returns (address) {
-    AuthorizedBy memory ab = authorizedBy[accountOrValidator];
-    if (ab.active && ab.account != address(0)) {
-      return ab.account;
+    address account = authorizedBy[accountOrValidator];
+    if (account != address(0)) {
+      require(accounts[account].authorizations.validating == accountOrValidator);
+      return account;
     } else {
       require(isAccount(accountOrValidator));
       return accountOrValidator;
@@ -308,9 +324,9 @@ contract LockedGold is ILockedGold, ReentrancyGuard, Initializable, UsingRegistr
    * @return The associated account.
    */
   function getAccountFromVoter(address accountOrVoter) public view returns (address) {
-    AuthorizedBy memory ab = authorizedBy[accountOrVoter];
-    if (ab.account != address(0)) {
-      return ab.account;
+    address account = authorizedBy[accountOrVoter];
+    if (account != address(0)) {
+      return account;
     } else {
       require(isAccount(accountOrVoter));
       return accountOrVoter;
@@ -324,9 +340,9 @@ contract LockedGold is ILockedGold, ReentrancyGuard, Initializable, UsingRegistr
    * @return The associated account.
    */
   function getAccountFromValidator(address accountOrValidator) public view returns (address) {
-    AuthorizedBy memory ab = authorizedBy[accountOrValidator];
-    if (ab.account != address(0)) {
-      return ab.account;
+    address account = authorizedBy[accountOrValidator];
+    if (account != address(0)) {
+      return account;
     } else {
       require(isAccount(accountOrValidator));
       return accountOrValidator;
@@ -363,7 +379,7 @@ contract LockedGold is ILockedGold, ReentrancyGuard, Initializable, UsingRegistr
   function getPendingWithdrawals(
     address account
   )
-    public
+    external
     view
     returns (uint256[] memory, uint256[] memory)
   {
@@ -383,30 +399,27 @@ contract LockedGold is ILockedGold, ReentrancyGuard, Initializable, UsingRegistr
 
   /**
    * @notice Authorizes voting or validating power of `msg.sender`'s account to another address.
-   * @param current The address to authorize.
-   * @param previous The previous authorized address.
+   * @param authorized The address to authorize.
    * @param v The recovery id of the incoming ECDSA signature.
    * @param r Output value r of the ECDSA signature.
    * @param s Output value s of the ECDSA signature.
    * @dev Fails if the address is already authorized or is an account.
-   * @dev v, r, s constitute `authorize`'s signature on `msg.sender`.
+   * @dev v, r, s constitute `current`'s signature on `msg.sender`.
    */
   function authorize(
-    address current,
-    address previous,
+    address authorized,
     uint8 v,
     bytes32 r,
     bytes32 s
   )
     private
   {
-    require(isAccount(msg.sender) && isNotAccount(current) && isNotAuthorized(current));
+    require(isAccount(msg.sender) && isNotAccount(authorized) && isNotAuthorized(authorized));
 
     address signer = Signatures.getSignerOfAddress(msg.sender, v, r, s);
-    require(signer == current);
+    require(signer == authorized);
 
-    authorizedBy[previous].active = false;
-    authorizedBy[current] = AuthorizedBy(msg.sender, true);
+    authorizedBy[authorized] = msg.sender;
   }
 
   /**
@@ -433,7 +446,7 @@ contract LockedGold is ILockedGold, ReentrancyGuard, Initializable, UsingRegistr
    * @return Returns `true` if authorized. Returns `false` otherwise.
    */
   function isAuthorized(address account) external view returns (bool) {
-    return (authorizedBy[account].account != address(0));
+    return (authorizedBy[account] != address(0));
   }
 
   /**
@@ -442,9 +455,14 @@ contract LockedGold is ILockedGold, ReentrancyGuard, Initializable, UsingRegistr
    * @return Returns `false` if authorized. Returns `true` otherwise.
    */
   function isNotAuthorized(address account) internal view returns (bool) {
-    return (authorizedBy[account].account == address(0));
+    return (authorizedBy[account] == address(0));
   }
 
+  /**
+   * @notice Deletes a pending withdrawal.
+   * @param list The list of pending withdrawals from which to delete.
+   * @param index The index of the pending withdrawal to delete.
+   */
   function deletePendingWithdrawal(PendingWithdrawal[] storage list, uint256 index) private {
     uint256 lastIndex = list.length.sub(1);
     list[index] = list[lastIndex];

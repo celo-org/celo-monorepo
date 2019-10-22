@@ -138,7 +138,15 @@ function createDirIfMissing(dir: string) {
 }
 
 function runMigrations(opts: { upto?: number } = {}) {
-  const cmdArgs = ['truffle', 'migrate']
+  const migrationOverrides = {
+    stableToken: {
+      initialBalances: {
+        addresses: ['0x5409ed021d9299bf6814279a6a1411a7e866a631'],
+        values: ['10000000000000000000000'],
+      },
+    },
+  }
+  const cmdArgs = ['truffle', 'migrate', '--migration_override', JSON.stringify(migrationOverrides)]
 
   if (opts.upto) {
     cmdArgs.push('--to')

@@ -11,8 +11,8 @@ import {
   proxySend,
   toBigNumber,
   toNumber,
+  toTransactionObject,
   tupleParser,
-  wrapSend,
 } from './BaseWrapper'
 
 export interface Validator {
@@ -80,6 +80,12 @@ export class ElectionWrapper extends BaseWrapper<Election> {
     toNumber
   )
 
+  /**
+   * Returns the total votes for `group` made by `account`.
+   * @param group The address of the validator group.
+   * @param account The address of the voting account.
+   * @return The total votes for `group` made by `account`.
+   */
   getTotalVotesForGroup = proxyCall(
     this.contract.methods.getTotalVotesForGroup,
     undefined,
@@ -162,12 +168,12 @@ export class ElectionWrapper extends BaseWrapper<Election> {
    */
   async vote(validatorGroup: Address, value: BigNumber): Promise<CeloTransactionObject<boolean>> {
     if (this.kit.defaultAccount == null) {
-      throw new Error(`missing from at new ValdidatorUtils()`)
+      throw new Error(`missing kit.defaultAccount`)
     }
 
     const { lesser, greater } = await this.findLesserAndGreaterAfterVote(validatorGroup, value)
 
-    return wrapSend(
+    return toTransactionObject(
       this.kit,
       this.contract.methods.vote(validatorGroup, value.toString(), lesser, greater)
     )

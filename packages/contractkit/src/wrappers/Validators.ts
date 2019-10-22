@@ -1,6 +1,6 @@
 import { fromFixed, toFixed } from '@celo/utils/lib/fixidity'
 import BigNumber from 'bignumber.js'
-import { Address } from '../base'
+import { Address, NULL_ADDRESS } from '../base'
 import { Validators } from '../generated/types/Validators'
 import {
   BaseWrapper,
@@ -8,21 +8,20 @@ import {
   proxyCall,
   proxySend,
   toBigNumber,
-  wrapSend,
+  toTransactionObject,
 } from './BaseWrapper'
 
 export interface Validator {
   address: Address
   name: string
-  url: string
   publicKey: string
   affiliation: string | null
+  score: BigNumber
 }
 
 export interface ValidatorGroup {
   address: Address
   name: string
-  url: string
   members: Address[]
   commission: BigNumber
 }
@@ -46,6 +45,7 @@ export interface ValidatorsConfig {
 /**
  * Contract for voting for validators and managing validator groups.
  */
+// TODO(asa): Support authorized validators
 export class ValidatorsWrapper extends BaseWrapper<Validators> {
   affiliate = proxySend(this.kit, this.contract.methods.affiliate)
   deaffiliate = proxySend(this.kit, this.contract.methods.deaffiliate)
@@ -53,32 +53,26 @@ export class ValidatorsWrapper extends BaseWrapper<Validators> {
   registerValidator = proxySend(this.kit, this.contract.methods.registerValidator)
   async registerValidatorGroup(
     name: string,
-    url: string,
     commission: BigNumber
   ): Promise<CeloTransactionObject<boolean>> {
-    if (this.kit.defaultAccount == null) {
-      throw new Error(`missing from at new ValdidatorUtils()`)
-    }
-    return wrapSend(
+    return toTransactionObject(
       this.kit,
-      this.contract.methods.registerValidatorGroup(name, url, toFixed(commission).toFixed())
+      this.contract.methods.registerValidatorGroup(name, toFixed(commission).toFixed())
     )
   }
-  async addMember(member: string): Promise<CeloTransactionObject<boolean>> {
-    if (this.kit.defaultAccount == null) {
-      throw new Error(`missing from at new ValdidatorUtils()`)
-    }
-    // TODO(asa): Support authorized validators
-    const group = this.kit.defaultAccount
+  async addMember(group: string, member: string): Promise<CeloTransactionObject<boolean>> {
     const numMembers = await this.getGroupNumMembers(group)
     if (numMembers.isZero()) {
       const election = await this.kit.contracts.getElection()
       const voteWeight = await election.getTotalVotesForGroup(group)
       const { lesser, greater } = await election.findLesserAndGreaterAfterVote(group, voteWeight)
 
-      return wrapSend(this.kit, this.contract.methods.addFirstMember(member, lesser, greater))
+      return toTransactionObject(
+        this.kit,
+        this.contract.methods.addFirstMember(member, lesser, greater)
+      )
     } else {
-      return wrapSend(this.kit, this.contract.methods.addMember(member))
+      return toTransactionObject(this.kit, this.contract.methods.addMember(member), { from: group })
     }
   }
   /**
@@ -138,10 +132,54 @@ export class ValidatorsWrapper extends BaseWrapper<Validators> {
     return {
       address,
       name: res[0],
-      url: res[1],
-      publicKey: res[2] as any,
-      affiliation: res[3],
+      publicKey: res[1] as any,
+      affiliation: res[2],
+      score: fromFixed(new BigNumber(res[3])),
     }
+  }
+
+  /**
+   * Returns whether a particular account has a registered validator.
+   * @param account The account.
+   * @return Whether a particular address is a registered validator.
+   */
+  isValidator = proxyCall(this.contract.methods.isValidator)
+
+  /**
+   * Returns whether a particular account has a registered validator group.
+   * @param account The account.
+   * @return Whether a particular address is a registered validator group.
+   */
+  isValidatorGroup = proxyCall(this.contract.methods.isValidatorGroup)
+
+  async reorderMember(groupAddr: Address, validator: Address, newIndex: number) {
+    const group = await this.getValidatorGroup(groupAddr)
+
+    if (newIndex < 0 || newIndex >= group.members.length) {
+      throw new Error(`Invalid index ${newIndex}; max index is ${group.members.length - 1}`)
+    }
+
+    const currentIdx = group.members.indexOf(validator)
+    if (currentIdx < 0) {
+      throw new Error(`ValidatorGroup ${groupAddr} does not inclue ${validator}`)
+    } else if (currentIdx === newIndex) {
+      throw new Error(`Validator is already in position ${newIndex}`)
+    }
+
+    // remove the element
+    group.members.splice(currentIdx, 1)
+    // add it on new position
+    group.members.splice(newIndex, 0, validator)
+
+    const nextMember =
+      newIndex === group.members.length - 1 ? NULL_ADDRESS : group.members[newIndex + 1]
+    const prevMember = newIndex === 0 ? NULL_ADDRESS : group.members[newIndex - 1]
+
+    return toTransactionObject(
+      this.kit,
+      this.contract.methods.reorderMember(validator, nextMember, prevMember),
+      { from: groupAddr }
+    )
   }
 
   async getRegisteredValidatorGroups(): Promise<ValidatorGroup[]> {
@@ -154,9 +192,8 @@ export class ValidatorsWrapper extends BaseWrapper<Validators> {
     return {
       address,
       name: res[0],
-      url: res[1],
-      members: res[2],
-      commission: fromFixed(new BigNumber(res[3])),
+      members: res[1],
+      commission: fromFixed(new BigNumber(res[2])),
     }
   }
 }

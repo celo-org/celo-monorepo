@@ -55,7 +55,6 @@ contract Validators is
 
   struct ValidatorGroup {
     string name;
-    string url;
     LinkedList.List members;
     // TODO(asa): Add a function that allows groups to update their commission.
     FixidityLib.Fraction commission;
@@ -69,19 +68,21 @@ contract Validators is
     address group;
   }
 
-  // Stores a circular buffer storing the per-epoch membership history of a validator, used to
-  // determine which group commission should be paid to.
+  // Stores a the per-epoch membership history of a validator, used to determine which group
+  // commission should be paid to at the end of an epoch.
   // Stores a timestamp of the last time the validator was removed from a group, used to determine
   // whether or not a group can de-register.
   struct MembershipHistory {
-    uint256 head;
-    MembershipHistoryEntry[] entries;
+    // The key to the most recent entry in the entries mapping.
+    uint256 tail;
+    // The number of entries in this validators membership history.
+    uint256 numEntries;
+    mapping(uint256 => MembershipHistoryEntry) entries;
     uint256 lastRemovedFromGroupTimestamp;
   }
 
   struct Validator {
     string name;
-    string url;
     bytes publicKeysData;
     address affiliation;
     FixidityLib.Fraction score;
@@ -110,16 +111,12 @@ contract Validators is
   event ValidatorScoreParametersSet(uint256 exponent, uint256 adjustmentSpeed);
   event GroupLockedGoldRequirementsSet(uint256 value, uint256 duration);
   event ValidatorLockedGoldRequirementsSet(uint256 value, uint256 duration);
-  event ValidatorRegistered(
-    address indexed validator,
-    string name,
-    string url,
-    bytes publicKeysData
-  );
+  event MembershipHistoryLengthSet(uint256 length);
+  event ValidatorRegistered(address indexed validator, string name, bytes publicKeysData);
   event ValidatorDeregistered(address indexed validator);
   event ValidatorAffiliated(address indexed validator, address indexed group);
   event ValidatorDeaffiliated(address indexed validator, address indexed group);
-  event ValidatorGroupRegistered(address indexed group, string name, string url);
+  event ValidatorGroupRegistered(address indexed group, string name, uint256 commission);
   event ValidatorGroupDeregistered(address indexed group);
   event ValidatorGroupMemberAdded(address indexed group, address indexed validator);
   event ValidatorGroupMemberRemoved(address indexed group, address indexed validator);
@@ -166,7 +163,7 @@ contract Validators is
     setValidatorScoreParameters(validatorScoreExponent, validatorScoreAdjustmentSpeed);
     setMaxGroupSize(_maxGroupSize);
     setValidatorEpochPayment(_validatorEpochPayment);
-    membershipHistoryLength = _membershipHistoryLength;
+    setMembershipHistoryLength(_membershipHistoryLength);
   }
 
   /**
@@ -178,6 +175,18 @@ contract Validators is
     require(0 < size && size != maxGroupSize);
     maxGroupSize = size;
     emit MaxGroupSizeSet(size);
+    return true;
+  }
+
+  /**
+   * @notice Updates the number of validator group membership entries to store.
+   * @param length The number of validator group membership entries to store.
+   * @return True upon success.
+   */
+  function setMembershipHistoryLength(uint256 length) public onlyOwner returns (bool) {
+    require(0 < length && length != membershipHistoryLength);
+    membershipHistoryLength = length;
+    emit MembershipHistoryLengthSet(length);
     return true;
   }
 
@@ -265,7 +274,6 @@ contract Validators is
   /**
    * @notice Registers a validator unaffiliated with any validator group.
    * @param name A name for the validator.
-   * @param url A URL for the validator.
    * @param publicKeysData Comprised of three tightly-packed elements:
    *    - publicKey - The public key that the validator is using for consensus, should match
    *      msg.sender. 64 bytes.
@@ -278,7 +286,6 @@ contract Validators is
    */
   function registerValidator(
     string calldata name,
-    string calldata url,
     bytes calldata publicKeysData
   )
     external
@@ -287,7 +294,6 @@ contract Validators is
   {
     require(
       bytes(name).length > 0 &&
-      bytes(url).length > 0 &&
       // secp256k1 public key + BLS public key + BLS proof of possession
       publicKeysData.length == (64 + 48 + 96)
     );
@@ -300,11 +306,10 @@ contract Validators is
     require(lockedGoldBalance >= validatorLockedGoldRequirements.value);
     Validator storage validator = validators[account];
     validator.name = name;
-    validator.url = url;
     validator.publicKeysData = publicKeysData;
     registeredValidators.push(account);
     updateMembershipHistory(account, address(0));
-    emit ValidatorRegistered(account, name, url, publicKeysData);
+    emit ValidatorRegistered(account, name, publicKeysData);
     return true;
   }
 
@@ -372,14 +377,14 @@ contract Validators is
   /**
    * @notice Registers a validator group with no member validators.
    * @param name A name for the validator group.
-   * @param url A URL for the validator group.
+   * @param commission Fixidity representation of the commission this group receives on epoch
+   *   payments made to its members.
    * @return True upon success.
    * @dev Fails if the account is already a validator or validator group.
    * @dev Fails if the account does not have sufficient weight.
    */
   function registerValidatorGroup(
     string calldata name,
-    string calldata url,
     uint256 commission
   )
     external
@@ -387,7 +392,6 @@ contract Validators is
     returns (bool)
   {
     require(bytes(name).length > 0);
-    require(bytes(url).length > 0);
     require(commission <= FixidityLib.fixed1().unwrap(), "Commission can't be greater than 100%");
     address account = getLockedGold().getAccountFromActiveValidator(msg.sender);
     require(!isValidator(account) && !isValidatorGroup(account));
@@ -395,10 +399,9 @@ contract Validators is
     require(lockedGoldBalance >= groupLockedGoldRequirements.value);
     ValidatorGroup storage group = groups[account];
     group.name = name;
-    group.url = url;
     group.commission = FixidityLib.wrap(commission);
     registeredGroups.push(account);
-    emit ValidatorGroupRegistered(account, name, url);
+    emit ValidatorGroupRegistered(account, name, commission);
     return true;
   }
 
@@ -547,12 +550,13 @@ contract Validators is
    * @notice Updates a validator's score based on its uptime for the epoch.
    * @param validator The address of the validator.
    * @param uptime The Fixidity representation of the validator's uptime, between 0 and 1.
+   * @dev new_score = uptime ** exponent * adjustmentSpeed + old_score * (1 - adjustmentSpeed)
    * @return True upon success.
    */
   function _updateValidatorScore(address validator, uint256 uptime) internal {
     address account = getLockedGold().getAccountFromValidator(validator);
-    require(isValidator(account));
-    require(uptime <= FixidityLib.fixed1().unwrap());
+    require(isValidator(account), "isvalidator");
+    require(uptime <= FixidityLib.fixed1().unwrap(), "uptime");
 
     uint256 numerator;
     uint256 denominator;
@@ -658,12 +662,12 @@ contract Validators is
     returns (uint256[] memory, address[] memory, uint256)
   {
     MembershipHistory storage history = validators[account].membershipHistory;
-    MembershipHistoryEntry[] memory entries = history.entries;
-    uint256[] memory epochs = new uint256[](entries.length);
-    address[] memory membershipGroups = new address[](entries.length);
-    for (uint256 i = 0; i < entries.length; i = i.add(1)) {
-      epochs[i] = entries[i].epochNumber;
-      membershipGroups[i] = entries[i].group;
+    uint256[] memory epochs = new uint256[](history.numEntries);
+    address[] memory membershipGroups = new address[](history.numEntries);
+    for (uint256 i = 0; i < history.numEntries; i = i.add(1)) {
+      uint256 index = history.tail.add(i);
+      epochs[i] = history.entries[index].epochNumber;
+      membershipGroups[i] = history.entries[index].group;
     }
     return (epochs, membershipGroups, history.lastRemovedFromGroupTimestamp);
   }
@@ -714,7 +718,6 @@ contract Validators is
     view
     returns (
       string memory name,
-      string memory url,
       bytes memory publicKeysData,
       address affiliation,
       uint256 score
@@ -724,7 +727,6 @@ contract Validators is
     Validator storage validator = validators[account];
     return (
       validator.name,
-      validator.url,
       validator.publicKeysData,
       validator.affiliation,
       validator.score.unwrap()
@@ -741,13 +743,12 @@ contract Validators is
   )
     external
     view
-    returns (string memory, string memory, address[] memory, uint256, uint256[] memory)
+    returns (string memory, address[] memory, uint256, uint256[] memory)
   {
     require(isValidatorGroup(account));
     ValidatorGroup storage group = groups[account];
     return (
       group.name,
-      group.url,
       group.members.getKeys(),
       group.commission.unwrap(),
       group.sizeHistory
@@ -895,26 +896,35 @@ contract Validators is
   function updateMembershipHistory(address account, address group) private returns (bool) {
     MembershipHistory storage history = validators[account].membershipHistory;
     uint256 epochNumber = getEpochNumber();
-    if (history.entries.length > 0) {
-      if (group == address(0)) {
-        history.lastRemovedFromGroupTimestamp = now;
-      }
+    uint256 head = history.numEntries == 0 ? 0 : history.tail.add(history.numEntries.sub(1));
 
-      if (epochNumber == history.entries[history.head].epochNumber) {
-        // There have been no elections since the validator last changed membership, overwrite the
-        // previous entry.
-        history.entries[history.head] = MembershipHistoryEntry(epochNumber, group);
-        return true;
-      } else {
-        // MembershipHistoryEntries are a circular buffer.
-        history.head = history.head.add(1) % membershipHistoryLength;
-      }
+    if (history.numEntries > 0 && group == address(0)) {
+      history.lastRemovedFromGroupTimestamp = now;
     }
 
-    if (history.head >= history.entries.length) {
-      history.entries.push(MembershipHistoryEntry(epochNumber, group));
+    if (history.entries[head].epochNumber == epochNumber) {
+      // There have been no elections since the validator last changed membership, overwrite the
+      // previous entry.
+      history.entries[head] = MembershipHistoryEntry(epochNumber, group);
+      return true;
+    }
+
+    // There have been elections since the validator last changed membership, create a new entry.
+    uint256 index = history.numEntries == 0 ? 0 : head.add(1);
+    history.entries[index] = MembershipHistoryEntry(epochNumber, group);
+    if (history.numEntries < membershipHistoryLength) {
+      // Not enough entries, don't remove any.
+      history.numEntries = history.numEntries.add(1);
+    } else if (history.numEntries == membershipHistoryLength) {
+      // Exactly enough entries, delete the oldest one to account for the one we added.
+      delete history.entries[history.tail];
+      history.tail = history.tail.add(1);
     } else {
-      history.entries[history.head] = MembershipHistoryEntry(epochNumber, group);
+      // Too many entries, delete the oldest two to account for the one we added.
+      delete history.entries[history.tail];
+      delete history.entries[history.tail.add(1)];
+      history.numEntries = history.numEntries.sub(1);
+      history.tail = history.tail.add(2);
     }
     return true;
   }
@@ -938,14 +948,12 @@ contract Validators is
   function getMembershipInLastEpoch(address account) public view returns (address) {
     uint256 epochNumber = getEpochNumber();
     MembershipHistory storage history = validators[account].membershipHistory;
-    uint256 head = history.head;
+    uint256 head = history.numEntries == 0 ? 0 : history.tail.add(history.numEntries.sub(1));
     // If the most recent entry in the membership history is for the current epoch number, we need
     // to look at the previous entry.
     if (history.entries[head].epochNumber == epochNumber) {
-      if (head > 0) {
+      if (head > history.tail) {
         head = head.sub(1);
-      } else if (history.entries.length > 1) {
-        head = history.entries.length.sub(1);
       }
     }
     return history.entries[head].group;

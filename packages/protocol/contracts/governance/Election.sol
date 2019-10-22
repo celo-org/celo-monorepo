@@ -497,6 +497,7 @@ contract Election is
    * @param value The amount of rewards to distribute to voters for the group.
    * @param lesser The group receiving fewer votes than `group` after the rewards are added.
    * @param greater The group receiving more votes than `group` after the rewards are added.
+   * @dev Can only be called directly by the protocol.
    */
   function distributeEpochRewards(
     address group,
@@ -693,12 +694,16 @@ contract Election is
    * @param group The address of the validator group.
    * @param value The number of active votes being added.
    * @return The delta in active vote denominator for `group`.
+   * @dev Preserves unitsDelta / totalUnits = value / total
    */
   function getActiveVotesUnitsDelta(address group, uint256 value) private view returns (uint256) {
-    // Preserve unitsDelta * total = value * totalUnits
-    return value.mul(votes.active.forGroup[group].totalUnits.add(1)).div(
-      votes.active.forGroup[group].total.add(1)
-    );
+    if (votes.active.forGroup[group].total == 0) {
+      return value;
+    } else {
+      return value.mul(votes.active.forGroup[group].totalUnits).div(
+        votes.active.forGroup[group].total
+      );
+    }
   }
 
   /**
@@ -721,7 +726,6 @@ contract Election is
     require(index < list.length && list[index] == element);
     uint256 lastIndex = list.length.sub(1);
     list[index] = list[lastIndex];
-    delete list[lastIndex];
     list.length = lastIndex;
   }
 

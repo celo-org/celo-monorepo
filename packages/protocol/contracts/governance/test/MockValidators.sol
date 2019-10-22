@@ -10,9 +10,13 @@ contract MockValidators is IValidators {
   mapping(address => bool) private _isValidating;
   mapping(address => bool) private _isVoting;
   mapping(address => uint256) private numGroupMembers;
-  mapping(address => uint256) private balanceRequirements;
+  mapping(address => uint256) private lockedGoldRequirements;
   mapping(address => address[]) private members;
   uint256 private numRegisteredValidators;
+
+  function meetsAccountLockedGoldRequirements(address) external view returns (bool) {
+    return true;
+  }
 
   function isValidating(address account) external view returns (bool) {
     return _isValidating[account];
@@ -46,12 +50,12 @@ contract MockValidators is IValidators {
     members[group] = _members;
   }
 
-  function setAccountBalanceRequirement(address account, uint256 value) external {
-    balanceRequirements[account] = value;
+  function setAccountLockedGoldRequirement(address account, uint256 value) external {
+    lockedGoldRequirements[account] = value;
   }
 
-  function getAccountBalanceRequirement(address account) external view returns (uint256) {
-    return balanceRequirements[account];
+  function getAccountLockedGoldRequirement(address account) external view returns (uint256) {
+    return lockedGoldRequirements[account];
   }
 
   function getTopGroupValidators(

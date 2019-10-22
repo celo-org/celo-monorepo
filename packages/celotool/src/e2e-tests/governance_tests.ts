@@ -55,11 +55,11 @@ describe('governance tests', () => {
       const groupInfo = await validators.methods
         .getValidatorGroup(groupAddress)
         .call({}, blockNumber)
-      return groupInfo[2]
+      return groupInfo[1]
     } else {
       const [groupAddress] = await validators.methods.getRegisteredValidatorGroups().call()
       const groupInfo = await validators.methods.getValidatorGroup(groupAddress).call()
-      return groupInfo[2]
+      return groupInfo[1]
     }
   }
 
@@ -140,8 +140,8 @@ describe('governance tests', () => {
       epoch = new BigNumber(await validators.methods.getEpochSize().call()).toNumber()
       assert.equal(epoch, 10)
 
-      // Give the node time to sync.
-      await sleep(15)
+      // Give the node time to sync, and time for an epoch transition so we can activate our vote.
+      await sleep(20)
       await activate(allValidators[0])
       const groupWeb3 = new Web3('ws://localhost:8567')
       const groupKit = newKitFromWeb3(groupWeb3)
@@ -228,24 +228,28 @@ describe('governance tests', () => {
 
       const assertScoreUnchanged = async (validator: string, blockNumber: number) => {
         const score = new BigNumber(
-          (await validators.methods.getValidator(validator).call({}, blockNumber))[4]
+          (await validators.methods.getValidator(validator).call({}, blockNumber))[3]
         )
         const previousScore = new BigNumber(
-          (await validators.methods.getValidator(validator).call({}, blockNumber - 1))[4]
+          (await validators.methods.getValidator(validator).call({}, blockNumber - 1))[3]
         )
+        assert.isNotNaN(score)
+        assert.isNotNaN(previousScore)
         assert.equal(score.toFixed(), previousScore.toFixed())
       }
 
       const assertScoreChanged = async (validator: string, blockNumber: number) => {
         const score = new BigNumber(
-          (await validators.methods.getValidator(validator).call({}, blockNumber))[4]
+          (await validators.methods.getValidator(validator).call({}, blockNumber))[3]
         )
         const previousScore = new BigNumber(
-          (await validators.methods.getValidator(validator).call({}, blockNumber - 1))[4]
+          (await validators.methods.getValidator(validator).call({}, blockNumber - 1))[3]
         )
         const expectedScore = adjustmentSpeed
           .times(uptime)
           .plus(new BigNumber(1).minus(adjustmentSpeed).times(fromFixed(previousScore)))
+        assert.isNotNaN(score)
+        assert.isNotNaN(previousScore)
         assert.equal(score.toFixed(), toFixed(expectedScore).toFixed())
       }
 
@@ -289,6 +293,8 @@ describe('governance tests', () => {
         const previousBalance = new BigNumber(
           await stableToken.methods.balanceOf(validator).call({}, blockNumber - 1)
         )
+        assert.isNotNaN(currentBalance)
+        assert.isNotNaN(previousBalance)
         assert.equal(expected.toFixed(), currentBalance.minus(previousBalance).toFixed())
       }
 
@@ -298,8 +304,9 @@ describe('governance tests', () => {
 
       const getExpectedTotalPayment = async (validator: string, blockNumber: number) => {
         const score = new BigNumber(
-          (await validators.methods.getValidator(validator).call({}, blockNumber))[4]
+          (await validators.methods.getValidator(validator).call({}, blockNumber))[3]
         )
+        assert.isNotNaN(score)
         return validatorEpochPayment.times(fromFixed(score))
       }
 

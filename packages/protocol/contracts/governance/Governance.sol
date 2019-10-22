@@ -497,6 +497,15 @@ contract Governance is IGovernance, Ownable, Initializable, ReentrancyGuard, Usi
       return false;
     }
     Voter storage voter = voters[account];
+    // If the previously upvoted proposal is still in the queue but has expired, expire the
+    // proposal from the queue.
+    if (
+      queue.contains(voter.upvote.proposalId) &&
+      now >= proposals[voter.upvote.proposalId].timestamp.add(queueExpiry)
+    ) {
+      queue.remove(voter.upvote.proposalId);
+      emit ProposalExpired(voter.upvote.proposalId);
+    }
     // We can upvote a proposal in the queue if we're not already upvoting a proposal in the queue.
     uint256 weight = getLockedGold().getAccountTotalLockedGold(account);
     require(weight > 0, "cannot upvote without locking gold");

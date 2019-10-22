@@ -64,7 +64,6 @@ async function registerValidatorGroup(
   // @ts-ignore
   const tx = validators.contract.methods.registerValidatorGroup(
     `${config.validators.groupName} ${encodedKey}`,
-    config.validators.groupUrl,
     toFixed(config.validators.commission).toString()
   )
 
@@ -100,11 +99,7 @@ async function registerValidator(
   )
 
   // @ts-ignore
-  const registerTx = validators.contract.methods.registerValidator(
-    address,
-    config.validators.groupUrl,
-    add0x(publicKeysData)
-  )
+  const registerTx = validators.contract.methods.registerValidator(address, add0x(publicKeysData))
 
   await sendTransactionWithPrivateKey(web3, registerTx, validatorPrivateKey, {
     to: validators.address,

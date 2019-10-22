@@ -88,7 +88,6 @@ const DefaultConfig = {
     validatorKeys: [],
     // We register a single validator group during the migration.
     groupName: 'C-Labs',
-    groupUrl: 'celo.org',
     commission: 0.1,
   },
   blockchainParameters: {
@@ -123,7 +122,7 @@ const linkedLibraries = {
   AddressSortedLinkedList: ['Election', 'ElectionTest'],
   IntegerSortedLinkedList: ['Governance', 'IntegerSortedLinkedListTest'],
   AddressSortedLinkedListWithMedian: ['SortedOracles', 'AddressSortedLinkedListWithMedianTest'],
-  Signatures: ['LockedGold', 'Escrow'],
+  Signatures: ['Attestations', 'LockedGold', 'Escrow'],
 }
 
 const argv = minimist(process.argv.slice(2), {

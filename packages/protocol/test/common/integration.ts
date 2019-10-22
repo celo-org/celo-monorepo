@@ -31,7 +31,7 @@ contract('Integration: Governance', (accounts: string[]) => {
   let governance: GovernanceInstance
   let registry: RegistryInstance
   let proposalTransactions: any
-  let value: BigNumber
+  const value = new BigNumber('1000000000000000000')
 
   before(async () => {
     lockedGold = await getDeployedProxiedContract('LockedGold', artifacts)
@@ -39,7 +39,6 @@ contract('Integration: Governance', (accounts: string[]) => {
     registry = await getDeployedProxiedContract('Registry', artifacts)
     // Set up a LockedGold account with which we can vote.
     await lockedGold.createAccount()
-    value = new BigNumber('1000000000000000000')
     // @ts-ignore
     await lockedGold.lock({ value })
     proposalTransactions = [
