@@ -1,6 +1,6 @@
 import { Request, Response } from 'express'
+import { RequestStatus, RequestType } from '../src/fauceting/FaucetInterfaces'
 import captchaVerify from './captchaVerify'
-import { RequestStatus, RequestType } from './FirebaseClient'
 import { sendRequest } from './FirebaseServerSide'
 
 export async function faucetOrInviteController(req: Request, res: Response, type: RequestType) {

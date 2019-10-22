@@ -1,8 +1,11 @@
+import dynamic from 'next/dynamic'
 import * as React from 'react'
 import ReCAPTCHA from 'react-google-recaptcha'
 import { StyleSheet, Text, View } from 'react-native'
+import { MobileOS, RequestRecord, RequestType } from 'src/fauceting/FaucetInterfaces'
 import { ButtonWithFeedback, ContextualInfo, HashingStatus } from 'src/fauceting/MicroComponents'
-import PhoneInput from 'src/fauceting/PhoneInput'
+// @ts-ignore
+const PhoneInput = dynamic(() => import('src/fauceting/PhoneInput'))
 import {
   getCaptchaKey,
   RequestState,
@@ -16,7 +19,7 @@ import Android from 'src/icons/Android'
 import Apple from 'src/icons/Apple'
 import { colors, fonts, standardStyles, textStyles } from 'src/styles'
 import { Radio } from 'src/table/table'
-import { MobileOS, RequestRecord, RequestType, subscribeRequest } from '../../server/FirebaseClient'
+import subscribeRequest from '../../server/FirebaseClient'
 
 interface State {
   beneficiary: string

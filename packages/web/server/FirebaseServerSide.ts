@@ -11,7 +11,7 @@ import {
   RequestRecord,
   RequestStatus,
   RequestType,
-} from './FirebaseClient'
+} from '../src/fauceting/FaucetInterfaces'
 
 async function getFirebase() {
   if (!firebase.apps.length) {
