@@ -945,15 +945,6 @@ contract Validators is
   }
 
   /**
-   * Tail: 0
-   * numEntries: 0
-   * index: 0
-   *
-   * Tail: 0
-   * numEntries: 1
-   * index: 1
-   *
-   *
    * @notice Updates the group membership history of a particular account.
    * @param account The account whose group membership has changed.
    * @param group The group that the account is now a member of.
