@@ -7,50 +7,51 @@ import {
   NULL_ADDRESS,
   timeTravel,
 } from '@celo/protocol/lib/test-utils'
-import { SignatureUtils } from '@celo/utils'
+import { attestToIdentifier } from '@celo/utils'
+import { privateKeyToAddress } from '@celo/utils/lib/address'
 import { getPhoneHash } from '@celo/utils/lib/phoneNumbers'
 import BigNumber from 'bignumber.js'
 import { uniq } from 'lodash'
 import {
-  AttestationsContract,
-  AttestationsInstance,
+  TestAttestationsContract,
+  TestAttestationsInstance,
+  MockLockedGoldContract,
+  MockLockedGoldInstance,
   MockStableTokenContract,
   MockStableTokenInstance,
-  MockValidatorsContract,
-  MockValidatorsInstance,
+  MockElectionContract,
+  MockElectionInstance,
   RandomContract,
   RandomInstance,
   RegistryContract,
   RegistryInstance,
 } from 'types'
-import * as Web3Utils from 'web3-utils'
+import { getParsedSignatureOfAddress } from '../../lib/signing-utils'
 
-function attestationMessageToSign(phoneHash: string, account: string) {
-  const messageHash: string = Web3Utils.soliditySha3(
-    { type: 'bytes32', value: phoneHash },
-    { type: 'address', value: account }
-  )
-  return messageHash
-}
-
-const Attestations: AttestationsContract = artifacts.require('Attestations')
+/* We use a contract that behaves like the actual Attestations contract, but
+ * mocks the implementations of validator set getters. These rely on precompiled
+ * contracts, which are not available in our current ganache fork, which we use
+ * for Truffle unit tests.
+ */
+const Attestations: TestAttestationsContract = artifacts.require('TestAttestations')
 const MockStableToken: MockStableTokenContract = artifacts.require('MockStableToken')
-const MockValidators: MockValidatorsContract = artifacts.require('MockValidators')
+const MockElection: MockElectionContract = artifacts.require('MockElection')
+const MockLockedGold: MockLockedGoldContract = artifacts.require('MockLockedGold')
 const Random: RandomContract = artifacts.require('Random')
 const Registry: RegistryContract = artifacts.require('Registry')
 
-const signMessage = SignatureUtils.signMessage
 const dataEncryptionKey = '0x02f2f48ee19680706196e2e339e5da3491186e0c4c5030670656b0e01611111111'
 const longDataEncryptionKey =
   '0x04f2f48ee19680706196e2e339e5da3491186e0c4c5030670656b0e01611111111' +
   '02f2f48ee19680706196e2e339e5da3491186e0c4c5030670656b0e01611111111'
 
 contract('Attestations', (accounts: string[]) => {
-  let attestations: AttestationsInstance
+  let attestations: TestAttestationsInstance
   let mockStableToken: MockStableTokenInstance
   let otherMockStableToken: MockStableTokenInstance
   let random: RandomInstance
-  let mockValidators: MockValidatorsInstance
+  let mockElection: MockElectionInstance
+  let mockLockedGold: MockLockedGoldInstance
   let registry: RegistryInstance
   const provider = new Web3.providers.HttpProvider('http://localhost:8545')
   const metadataURL = 'https://www.celo.org'
@@ -78,16 +79,11 @@ contract('Attestations', (accounts: string[]) => {
   const attestationFee = new BigNumber(web3.utils.toWei('.05', 'ether').toString())
 
   async function getVerificationCodeSignature(
-    phoneHashToSign: string,
     account: string,
     issuer: string
   ): Promise<[number, string, string]> {
     const privateKey = accountPrivateKeys[accounts.indexOf(issuer)]
-    const { v, r, s } = signMessage(
-      attestationMessageToSign(phoneHashToSign, account),
-      privateKey,
-      issuer
-    )
+    const { v, r, s } = attestToIdentifier(phoneNumber, account, privateKey)
     return [v, r, s]
   }
 
@@ -104,23 +100,69 @@ contract('Attestations', (accounts: string[]) => {
     return accounts[nonIssuerIndex]
   }
 
+  const getValidatingKeyAddress = (address: string) => {
+    const pKey = accountPrivateKeys[accounts.indexOf(address)]
+    const aKey = Buffer.from(pKey.slice(2), 'hex')
+    aKey.write((aKey[0] + 2).toString(16))
+    return privateKeyToAddress('0x' + aKey.toString('hex'))
+  }
+
+  const getAttestationKey = (address: string) => {
+    const pKey = accountPrivateKeys[accounts.indexOf(address)]
+    const aKey = Buffer.from(pKey.slice(2), 'hex')
+    aKey.write((aKey[0] + 1).toString(16))
+    return '0x' + aKey.toString('hex')
+  }
+
+  const unlockAttestationKey = async (address: string) => {
+    const attestationKey = getAttestationKey(address)
+    const authorizedAttestor = privateKeyToAddress(attestationKey)
+    // @ts-ignore
+    await web3.eth.personal.importRawKey(attestationKey, 'passphrase')
+    await web3.eth.personal.unlockAccount(authorizedAttestor, 'passphrase', 1000000)
+    return authorizedAttestor
+  }
+
+  const authorizeAttestor = async (address: string) => {
+    const attestationKey = getAttestationKey(address)
+    const authorizedAttestor = privateKeyToAddress(attestationKey)
+    const attestationSig = await getParsedSignatureOfAddress(web3, address, authorizedAttestor)
+
+    return attestations.authorizeAttestor(
+      authorizedAttestor,
+      attestationSig.v,
+      attestationSig.r,
+      attestationSig.s,
+      { from: address }
+    )
+  }
+
   beforeEach(async () => {
     mockStableToken = await MockStableToken.new()
     otherMockStableToken = await MockStableToken.new()
     attestations = await Attestations.new()
     random = await Random.new()
-    mockValidators = await MockValidators.new()
-    await Promise.all(accounts.map((account) => mockValidators.addValidator(account)))
+    mockLockedGold = await MockLockedGold.new()
+    await Promise.all(
+      accounts.map((account) =>
+        mockLockedGold.authorizeValidator(account, getValidatingKeyAddress(account))
+      )
+    )
+    mockElection = await MockElection.new()
+    await mockElection.setElectedValidators(
+      accounts.map((account) => getValidatingKeyAddress(account))
+    )
     registry = await Registry.new()
     await registry.setAddressFor(CeloContractName.Random, random.address)
-    await registry.setAddressFor(CeloContractName.Validators, mockValidators.address)
-
+    await registry.setAddressFor(CeloContractName.Election, mockElection.address)
+    await registry.setAddressFor(CeloContractName.LockedGold, mockLockedGold.address)
     await attestations.initialize(
       registry.address,
       attestationExpirySeconds,
       [mockStableToken.address, otherMockStableToken.address],
       [attestationFee, attestationFee]
     )
+    await attestations.__setValidators(accounts)
   })
 
   describe('#initialize()', () => {
@@ -200,6 +242,56 @@ contract('Attestations', (accounts: string[]) => {
       const expectedKey = await attestations.getDataEncryptionKey(caller)
       // @ts-ignore
       assert.equal(expectedKey, dataEncryptionKey)
+    })
+  })
+
+  describe('#authorizeAttestor', async () => {
+    let authorizedAttestor
+    beforeEach(async () => {
+      authorizedAttestor = await unlockAttestationKey(caller)
+    })
+
+    it('should authorizes an attestor with the right signature', async () => {
+      await authorizeAttestor(caller)
+      const result = await attestations.getAttestorFromAccount(caller)
+      assert.equal(result, authorizedAttestor)
+    })
+
+    it('should just return the account address if attestor was authorized', async () => {
+      const result = await attestations.getAccountFromAttestor(caller)
+      assert.equal(result, caller)
+    })
+
+    it('should retrieve the account address if attestor has been authorized', async () => {
+      await authorizeAttestor(caller)
+      const result = await attestations.getAccountFromAttestor(authorizedAttestor)
+      assert.equal(result, caller)
+    })
+
+    it('should emit the AttestorAuthorized event', async () => {
+      const response = await authorizeAttestor(caller)
+      assert.lengthOf(response.logs, 1)
+      const event = response.logs[0]
+      assertLogMatches2(event, {
+        event: 'AttestorAuthorized',
+        args: { account: caller, attestor: authorizedAttestor },
+      })
+    })
+
+    it('should revert with the incorrect signature', async () => {
+      const attestationSig = await getParsedSignatureOfAddress(
+        web3,
+        accounts[1],
+        authorizedAttestor
+      )
+      await assertRevert(
+        attestations.authorizeAttestor(
+          authorizedAttestor,
+          attestationSig.v,
+          attestationSig.r,
+          attestationSig.s
+        )
+      )
     })
   })
 
@@ -424,7 +516,7 @@ contract('Attestations', (accounts: string[]) => {
     })
 
     it('should revert if a user reveals a request that has been completed', async () => {
-      const [v, r, s] = await getVerificationCodeSignature(phoneHash, caller, issuer)
+      const [v, r, s] = await getVerificationCodeSignature(caller, issuer)
       await attestations.complete(phoneHash, v, r, s)
 
       // @ts-ignore
@@ -442,10 +534,11 @@ contract('Attestations', (accounts: string[]) => {
     let issuer: string
     let v: number
     let r: string, s: string
+
     beforeEach(async () => {
       await attestations.request(phoneHash, attestationsRequested, mockStableToken.address)
       issuer = (await attestations.getAttestationIssuers(phoneHash, caller))[0]
-      ;[v, r, s] = await getVerificationCodeSignature(phoneHash, caller, issuer)
+      ;[v, r, s] = await getVerificationCodeSignature(caller, issuer)
     })
 
     it('should add the account to the list upon completion', async () => {
@@ -461,7 +554,7 @@ contract('Attestations', (accounts: string[]) => {
     it('should not add the account twice to the list', async () => {
       await attestations.complete(phoneHash, v, r, s)
       const secondIssuer = (await attestations.getAttestationIssuers(phoneHash, caller))[1]
-      ;[v, r, s] = await getVerificationCodeSignature(phoneHash, caller, secondIssuer)
+      ;[v, r, s] = await getVerificationCodeSignature(caller, secondIssuer)
 
       await attestations.complete(phoneHash, v, r, s)
       const attestedAccounts = await attestations.lookupAccountsForIdentifier(phoneHash)
@@ -513,13 +606,42 @@ contract('Attestations', (accounts: string[]) => {
       })
     })
 
+    describe('when an attestor has been authorized', () => {
+      beforeEach(async () => {
+        const attestationKey = getAttestationKey(issuer)
+        await unlockAttestationKey(issuer)
+        await authorizeAttestor(issuer)
+        ;({ v, r, s } = attestToIdentifier(phoneNumber, caller, attestationKey))
+      })
+
+      it('should correctly complete the attestation', async () => {
+        let attestedAccounts = await attestations.lookupAccountsForIdentifier(phoneHash)
+        assert.isEmpty(attestedAccounts)
+
+        await attestations.complete(phoneHash, v, r, s)
+        attestedAccounts = await attestations.lookupAccountsForIdentifier(phoneHash)
+        assert.lengthOf(attestedAccounts, 1)
+        assert.equal(attestedAccounts[0], caller)
+      })
+
+      it('should mark the attestation by the issuer as complete', async () => {
+        await attestations.complete(phoneHash, v, r, s)
+        const [status, _blockNumber] = await attestations.getAttestationState(
+          phoneHash,
+          caller,
+          issuer
+        )
+        assert.equal(status.toNumber(), 2)
+      })
+    })
+
     it('should revert when an invalid attestation code is provided', async () => {
-      ;[v, r, s] = await getVerificationCodeSignature(phoneHash, accounts[1], issuer)
+      ;[v, r, s] = await getVerificationCodeSignature(accounts[1], issuer)
       await assertRevert(attestations.complete(phoneHash, v, r, s))
     })
 
     it('should revert with a non-requested issuer', async () => {
-      ;[v, r, s] = await getVerificationCodeSignature(phoneHash, caller, await getNonIssuer())
+      ;[v, r, s] = await getVerificationCodeSignature(caller, await getNonIssuer())
       await assertRevert(attestations.complete(phoneHash, v, r, s))
     })
 
@@ -539,7 +661,7 @@ contract('Attestations', (accounts: string[]) => {
     beforeEach(async () => {
       await attestations.request(phoneHash, attestationsRequested, mockStableToken.address)
       issuer = (await attestations.getAttestationIssuers(phoneHash, caller))[0]
-      const [v, r, s] = await getVerificationCodeSignature(phoneHash, caller, issuer)
+      const [v, r, s] = await getVerificationCodeSignature(caller, issuer)
       await attestations.complete(phoneHash, v, r, s)
     })
 
@@ -583,7 +705,7 @@ contract('Attestations', (accounts: string[]) => {
   const requestAndCompleteAttestations = async () => {
     await requestAttestations()
     const issuer = (await attestations.getAttestationIssuers(phoneHash, caller))[0]
-    const [v, r, s] = await getVerificationCodeSignature(phoneHash, caller, issuer)
+    const [v, r, s] = await getVerificationCodeSignature(caller, issuer)
     await attestations.complete(phoneHash, v, r, s)
   }
 
@@ -685,7 +807,7 @@ contract('Attestations', (accounts: string[]) => {
               from: other,
             })
             const issuer = (await attestations.getAttestationIssuers(phoneHash, other))[0]
-            const [v, r, s] = await getVerificationCodeSignature(phoneHash, other, issuer)
+            const [v, r, s] = await getVerificationCodeSignature(other, issuer)
             await attestations.complete(phoneHash, v, r, s, { from: other })
             await attestations.setWalletAddress(other, { from: other })
           })

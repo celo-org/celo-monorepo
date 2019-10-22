@@ -8,7 +8,6 @@ interface Props {
   word: string
   selected: boolean
   onSelectAnswer: (word: string, data: any) => void
-  key: string
   data?: any
   testID?: string
 }

@@ -32,4 +32,13 @@ steps:
   ]
   waitFor: ['-']
 
+- id: "docker:attestation-service"
+  name: gcr.io/kaniko-project/executor:latest
+  args: [
+    "--dockerfile=dockerfiles/attestation-service/Dockerfile",
+    "--cache=true",
+    "--destination=gcr.io/$PROJECT_ID/celo-monorepo:attestation-service-$COMMIT_SHA"
+  ]
+  waitFor: ['-']
+
 timeout: 3000s

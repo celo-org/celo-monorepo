@@ -34,6 +34,12 @@
   "letsGetStartedByFirstTransaction": "Empezemos enviando tu primera transacción",
   "sendMoney": "Enviar Dinero",
   "verificationFee": "Tasa de Verificación",
+  "networkFee": "Tasa de Red",
+  "networkFeeExplanation": {
+    "0":
+      "Cada semana, se utiliza una tarifa muy pequeña (menos del 0.01%) del saldo de Celo Dollar de cada usuario para mantener estable el valor del Celo Dollar. Para obtener más información sobre las tarifas de Celo, visite ",
+    "1": "las Preguntas frecuentes."
+  },
   "confirmingPayment": "Confirmando…",
   "confirmingExchange": "Confirmando…",
   "paymentFailed": "Pago Falló",
@@ -51,16 +57,20 @@
   "reclaimPayment": "Reclamar el Pago",
   "sendMessage": "Enviar Mensaje",
   "escrowedPaymentReminder": "Recuérdele a {{mobile #}} que acepte el pago",
+  "escrowedPaymentReminderSms":
+    "¡Un recordatorio amistoso de que aún no ha canjeado sus dólares de celo!",
   "testnetAlert": {
     "0": "Testnet",
     "1":
       "Un recordatorio amistoso de que está utilizando una compilación de Testnet - los saldos aquí no son reales."
   },
   "dismiss": "Ocultar",
-  "localCurrencyEqual": "Igual a <2>{{localValue}} {{localCurrencySymbol}}</2>",
-  "localCurrencyValue": "{{localValue}} {{localCurrencySymbol}}",
+  "localCurrencyEqual": "Igual a <2>{{localValue}} {{localCurrencyCode}}</2>",
+  "localCurrencyValue": "{{localValue}} {{localCurrencyCode}}",
   "feedItemVerificationFeeTitle": "Celo",
   "feedItemVerificationFeeInfo": "$t(verificationFee)",
+  "feedItemNetworkFeeTitle": "Celo",
+  "feedItemNetworkFeeInfo": "Tasa de Red",
   "feedItemVerificationRewardTitle": "Celo",
   "feedItemVerificationRewardInfo": "Recompensa del Verificador",
   "feedItemFaucetTitle": "Celo",

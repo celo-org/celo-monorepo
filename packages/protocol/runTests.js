@@ -4,7 +4,7 @@ const glob = require('glob-fs')({
 })
 const { exec } = require('./lib/test-utils')
 const minimist = require('minimist')
-const network = require('./truffle.js').networks.development
+const network = require('./truffle-config.js').networks.development
 
 const sleep = (seconds) => new Promise((resolve) => setTimeout(resolve, 1000 * seconds))
 

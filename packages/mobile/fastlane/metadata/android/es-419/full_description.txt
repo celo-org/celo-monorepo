@@ -1,5 +1,5 @@
 INFORMACIÓN DE TESTNET Y DECLARACIÓN DE PRIVACIDAD
-Esta aplicación se conecta a 'Alfajores', una red de prueba que ejecuta el Protocolo Celo. Cualquier saldo en esta red no se puede canjear por valor real. La Red de Alfajores almacena hashes de números de teléfono para permitir pagos a un número de teléfono. Al verificar su número de teléfono, usted acepta que el hash de su número de teléfono se almacene en la Blockchain de Celo.
+Esta aplicación se conecta a 'Alfajores', una red de prueba que ejecuta el Protocolo Celo. Cualquier saldo en esta red no se puede canjear por valor real. La Red de Alfajores almacena hashes de números de teléfono para permitir pagos a un número de teléfono. Al verificar tu número de teléfono, usted acepta que el hash de tu número de teléfono se almacene en la Blockchain de Celo.
 
 Para obtener más información, lea nuestro <a href="https://docs.celo.org/community/code-of-conduct">Código de conducta</a> y <a href="http://celo.org/terms">Términos de Servicio</a>
 
@@ -7,10 +7,10 @@ ACERCA DE ESTA APLICACIÓN
 Celo le permite enviar y solicitar valor fácilmente a cualquier persona, en cualquier lugar.
 
 AHORRA Y GASTA VALOR ESTABLE
-Envíe, solicite y guarde Celo dólares, que son estables en relación con los dólares estadounidenses. Verifique fácilmente la propiedad de su número de teléfono para comenzar. Después de eso, enviar o solicitar el pago a un amigo es fácil: todo lo que necesita es su número de teléfono y una pequeña tarifa.
+Envíe, solicite y guarde Celo dólares, que son estables en relación con los dólares estadounidenses. Verifique fácilmente la propiedad de tu número de teléfono para comenzar. Después de eso, enviar o solicitar el pago a un amigo es fácil: todo lo que necesita es tu número de teléfono y una pequeña tarifa.
 
 SEGURO SEGURO
-Envíe de forma segura el valor a cualquier número de teléfono móvil o reciba un valor en su número de teléfono. Para mantener su valor seguro, proteja su monedero con una clave de respaldo. Esta clave protege sus fondos para que solo usted pueda acceder a ellos, ¡no la pierda!
+Envíe de forma segura el valor a cualquier número de teléfono móvil o reciba un valor en tu número de teléfono. Para mantener tu valor seguro, proteja tu monedero con una clave de respaldo. Esta clave protege sus fondos para que solo usted pueda acceder a ellos, ¡no la pierda!
 
 CAMBIO POR CELO GOLD
 Cambia Celo dólares por Celo gold.

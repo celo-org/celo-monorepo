@@ -10,6 +10,7 @@ export enum Actions {
   SET_COMMENT_KEY = 'WEB3/SET_COMMENT_KEY',
   SET_PROGRESS = 'WEB3/SET_PROGRESS',
   SET_IS_READY = 'WEB3/SET_IS_READY',
+  SET_IS_ZERO_SYNC = 'WEB3/SET_IS_ZERO_SYNC',
   SET_BLOCK_NUMBER = 'WEB3/SET_BLOCK_NUMBER',
   REQUEST_SYNC_PROGRESS = 'WEB3/REQUEST_SYNC_PROGRESS',
   UPDATE_WEB3_SYNC_PROGRESS = 'WEB3/UPDATE_WEB3_SYNC_PROGRESS',
@@ -18,6 +19,11 @@ export enum Actions {
 export interface SetAccountAction {
   type: Actions.SET_ACCOUNT
   address: string
+}
+
+export interface SetIsZeroSyncAction {
+  type: Actions.SET_IS_ZERO_SYNC
+  zeroSyncMode: boolean
 }
 
 export interface SetCommentKeyAction {
@@ -41,15 +47,23 @@ export interface UpdateWeb3SyncProgressAction {
 
 export type ActionTypes =
   | SetAccountAction
+  | SetIsZeroSyncAction
   | SetCommentKeyAction
   | SetLatestBlockNumberAction
   | UpdateWeb3SyncProgressAction
 
 export const setAccount = (address: string): SetAccountAction => {
-  CeloAnalytics.track(DefaultEventNames.accountSet, { address })
+  CeloAnalytics.track(DefaultEventNames.accountSet)
   return {
     type: Actions.SET_ACCOUNT,
     address,
+  }
+}
+
+export const setZeroSyncMode = (zeroSyncMode: boolean): SetIsZeroSyncAction => {
+  return {
+    type: Actions.SET_IS_ZERO_SYNC,
+    zeroSyncMode,
   }
 }
 
@@ -76,11 +90,13 @@ export const updateWeb3SyncProgress = (payload: {
 
 export const checkSyncProgress = () => ({ type: Actions.REQUEST_SYNC_PROGRESS })
 
+// Note: This returns Promise<Block>
 export function getLatestBlock() {
   Logger.debug(TAG, 'Getting latest block')
   return web3.eth.getBlock('latest')
 }
 
+// Note: This returns Promise<Block>
 export function getBlock(blockNumber: number) {
   Logger.debug(TAG, 'Getting block ' + blockNumber)
   return web3.eth.getBlock(blockNumber)

@@ -1,6 +1,6 @@
 import { PincodeType } from 'src/account/reducer'
 import { migrations } from 'src/redux/migrations'
-import { v0Schema, v1Schema, vNeg1Schema } from 'test/schemas'
+import { v0Schema, v1Schema, v2Schema, vNeg1Schema } from 'test/schemas'
 
 describe('Redux persist migrations', () => {
   it('work for v-1 to v0', () => {
@@ -41,5 +41,18 @@ describe('Redux persist migrations', () => {
     }
     const migratedSchema = migrations[2](v1Stub)
     expect(migratedSchema.account.pincodeType).toEqual(PincodeType.PhoneAuth)
+  })
+
+  it('work for v2 to v3', () => {
+    const v2Stub = {
+      ...v2Schema,
+      localCurrency: {
+        ...v2Schema.localCurrency,
+        symbol: 'ABC',
+      },
+    }
+    const migratedSchema = migrations[3](v2Stub)
+    expect(migratedSchema.localCurrency.symbol).toBeUndefined()
+    expect(migratedSchema.localCurrency.fetchedCurrencyCode).toEqual('ABC')
   })
 })

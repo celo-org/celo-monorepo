@@ -12,10 +12,16 @@ const DefaultConfig = {
     attestationRequestFeeInDollars: 0.05,
   },
   lockedGold: {
-    maxNoticePeriod: 60 * 60 * 24 * 365 * 3, // 3 years
+    unlockingPeriod: 60 * 60 * 24 * 3, // 3 days
   },
   oracles: {
     reportExpiry: 60 * 60, // 1 hour
+  },
+  election: {
+    minElectableValidators: '22',
+    maxElectableValidators: '100',
+    maxVotesPerAccount: 3,
+    electabilityThreshold: '0', // no threshold
   },
   exchange: {
     spread: 5 / 1000,
@@ -40,7 +46,7 @@ const DefaultConfig = {
     initialMinimum: 10000,
     targetDensity: 1 / 2,
     adjustmentSpeed: 1 / 2,
-    infrastructureFraction: 1 / 2,
+    proposerFraction: 1 / 2,
   },
   registry: {
     predeployedProxyAddress: '0x000000000000000000000000000000000000ce10',
@@ -61,17 +67,28 @@ const DefaultConfig = {
     initialAccounts: [],
   },
   validators: {
-    minElectableValidators: '10',
-    maxElectableValidators: '100',
-    minLockedGoldValue: '1000000000000000000', // 1 gold
-    minLockedGoldNoticePeriod: 60 * 24 * 60 * 60, // 60 days
-    electionThreshold: '0', // no threshold
-    maxGroupSize: '10',
+    registrationRequirements: {
+      group: '1000000000000000000', // 1 gold
+      validator: '1000000000000000000', // 1 gold
+    },
+    deregistrationLockups: {
+      group: 60 * 24 * 60 * 60, // 60 days
+      validator: 60 * 24 * 60 * 60, // 60 days
+    },
+    maxGroupSize: '70',
 
     validatorKeys: [],
     // We register a single validator group during the migration.
     groupName: 'C-Labs',
-    groupUrl: 'https://www.celo.org',
+    groupUrl: 'celo.org',
+    commission: 0.1,
+  },
+  blockchainParameters: {
+    minimumClientVersion: {
+      major: 1,
+      minor: 8,
+      patch: 23,
+    },
   },
 }
 
@@ -95,10 +112,10 @@ const linkedLibraries = {
   ],
   SortedLinkedListWithMedian: ['AddressSortedLinkedListWithMedian'],
   AddressLinkedList: ['Validators'],
-  AddressSortedLinkedList: ['Validators'],
+  AddressSortedLinkedList: ['Election'],
   IntegerSortedLinkedList: ['Governance', 'IntegerSortedLinkedListTest'],
   AddressSortedLinkedListWithMedian: ['SortedOracles', 'AddressSortedLinkedListWithMedianTest'],
-  Signatures: ['LockedGold', 'Escrow'],
+  Signatures: ['TestAttestations', 'Attestations', 'LockedGold', 'Escrow'],
 }
 
 const argv = minimist(process.argv.slice(2), {

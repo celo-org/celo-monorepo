@@ -16,5 +16,6 @@
     "target": "es2015",
     "strict": true
   },
-  "exclude": ["node_modules", "vendor", ".bundle"]
+  "exclude": ["node_modules", "vendor", ".bundle"],
+  "references": [{ "path": "../utils" }]
 }

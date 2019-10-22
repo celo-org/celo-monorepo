@@ -1,7 +1,7 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`EnterInviteCode Screen renders correctly 1`] = `
-<View
+<SafeAreaView
   style={
     Object {
       "backgroundColor": "#FFFFFF",
@@ -119,18 +119,14 @@ exports[`EnterInviteCode Screen renders correctly 1`] = `
       </svg>
       <Text
         style={
-          Array [
-            Object {
-              "color": "#2E3338",
-              "fontFamily": "Hind-Light",
-              "fontSize": 22,
-              "paddingBottom": 20,
-              "textAlign": "center",
-            },
-            Object {
-              "marginTop": 20,
-            },
-          ]
+          Object {
+            "color": "#2E3338",
+            "fontFamily": "Hind-Light",
+            "fontSize": 22,
+            "marginTop": 20,
+            "paddingBottom": 20,
+            "textAlign": "center",
+          }
         }
         testID="InviteCodeTitle"
       >
@@ -138,18 +134,14 @@ exports[`EnterInviteCode Screen renders correctly 1`] = `
       </Text>
       <View
         style={
-          Array [
-            Object {
-              "borderColor": "#EEEEEE",
-              "borderRadius": 3,
-              "borderWidth": 1,
-            },
-            Object {
-              "marginHorizontal": 20,
-              "marginVertical": 30,
-              "padding": 30,
-            },
-          ]
+          Object {
+            "borderColor": "#EEEEEE",
+            "borderRadius": 3,
+            "borderWidth": 1,
+            "marginHorizontal": 20,
+            "marginVertical": 30,
+            "padding": 30,
+          }
         }
       >
         <Text
@@ -172,20 +164,14 @@ exports[`EnterInviteCode Screen renders correctly 1`] = `
         <View>
           <Text
             style={
-              Array [
-                Object {
-                  "alignSelf": "center",
-                  "color": "#2E3338",
-                  "fontFamily": "Hind-Regular",
-                  "fontSize": 14,
-                  "lineHeight": 18,
-                  "textAlign": "center",
-                },
-                Object {
-                  "fontSize": 12,
-                  "marginVertical": 10,
-                },
-              ]
+              Object {
+                "color": "#2E3338",
+                "fontFamily": "Hind-Regular",
+                "fontSize": 12,
+                "lineHeight": 16,
+                "marginVertical": 10,
+                "textAlign": "center",
+              }
             }
           >
             <Text
@@ -231,10 +217,9 @@ exports[`EnterInviteCode Screen renders correctly 1`] = `
                   "alignItems": "center",
                   "alignSelf": "flex-start",
                   "borderRadius": 2,
-                  "minWidth": 160,
+                  "flexDirection": "row",
                   "paddingHorizontal": 16,
                   "paddingVertical": 6,
-                  "textAlign": "center",
                 },
                 Object {
                   "backgroundColor": "#42D689",
@@ -261,10 +246,12 @@ exports[`EnterInviteCode Screen renders correctly 1`] = `
                   },
                   Object {
                     "lineHeight": 20,
+                    "textAlign": "center",
                   },
                   Object {
                     "color": "#FFFFFF",
                   },
+                  null,
                   undefined,
                 ]
               }
@@ -299,22 +286,13 @@ exports[`EnterInviteCode Screen renders correctly 1`] = `
       <Text
         onPress={[Function]}
         style={
-          Array [
-            Object {
-              "color": "#2E3338",
-              "fontFamily": "Hind-Bold",
-              "fontSize": 14,
-              "lineHeight": 18,
-            },
-            Object {
-              "color": "#42D689",
-              "fontFamily": "Hind-SemiBold",
-            },
-            Object {
-              "fontSize": 12,
-              "fontWeight": "300",
-            },
-          ]
+          Object {
+            "color": "#42D689",
+            "fontFamily": "Hind-SemiBold",
+            "fontSize": 12,
+            "fontWeight": "300",
+            "lineHeight": 18,
+          }
         }
       >
         inviteCodeText.askForInvite.1
@@ -478,7 +456,7 @@ exports[`EnterInviteCode Screen renders correctly 1`] = `
                   "fontSize": 16,
                 },
                 Object {
-                  "color": "#42D689",
+                  "color": "#A3EBC6",
                 },
                 Object {
                   "paddingLeft": 5,
@@ -493,11 +471,11 @@ exports[`EnterInviteCode Screen renders correctly 1`] = `
       </View>
     </View>
   </View>
-</View>
+</SafeAreaView>
 `;
 
 exports[`EnterInviteCode Screen renders with an error 1`] = `
-<View
+<SafeAreaView
   style={
     Object {
       "backgroundColor": "#FFFFFF",
@@ -615,18 +593,14 @@ exports[`EnterInviteCode Screen renders with an error 1`] = `
       </svg>
       <Text
         style={
-          Array [
-            Object {
-              "color": "#2E3338",
-              "fontFamily": "Hind-Light",
-              "fontSize": 22,
-              "paddingBottom": 20,
-              "textAlign": "center",
-            },
-            Object {
-              "marginTop": 20,
-            },
-          ]
+          Object {
+            "color": "#2E3338",
+            "fontFamily": "Hind-Light",
+            "fontSize": 22,
+            "marginTop": 20,
+            "paddingBottom": 20,
+            "textAlign": "center",
+          }
         }
         testID="InviteCodeTitle"
       >
@@ -634,18 +608,14 @@ exports[`EnterInviteCode Screen renders with an error 1`] = `
       </Text>
       <View
         style={
-          Array [
-            Object {
-              "borderColor": "#EEEEEE",
-              "borderRadius": 3,
-              "borderWidth": 1,
-            },
-            Object {
-              "marginHorizontal": 20,
-              "marginVertical": 30,
-              "padding": 30,
-            },
-          ]
+          Object {
+            "borderColor": "#EEEEEE",
+            "borderRadius": 3,
+            "borderWidth": 1,
+            "marginHorizontal": 20,
+            "marginVertical": 30,
+            "padding": 30,
+          }
         }
       >
         <Text
@@ -668,20 +638,14 @@ exports[`EnterInviteCode Screen renders with an error 1`] = `
         <View>
           <Text
             style={
-              Array [
-                Object {
-                  "alignSelf": "center",
-                  "color": "#2E3338",
-                  "fontFamily": "Hind-Regular",
-                  "fontSize": 14,
-                  "lineHeight": 18,
-                  "textAlign": "center",
-                },
-                Object {
-                  "fontSize": 12,
-                  "marginVertical": 10,
-                },
-              ]
+              Object {
+                "color": "#2E3338",
+                "fontFamily": "Hind-Regular",
+                "fontSize": 12,
+                "lineHeight": 16,
+                "marginVertical": 10,
+                "textAlign": "center",
+              }
             }
           >
             <Text
@@ -727,10 +691,9 @@ exports[`EnterInviteCode Screen renders with an error 1`] = `
                   "alignItems": "center",
                   "alignSelf": "flex-start",
                   "borderRadius": 2,
-                  "minWidth": 160,
+                  "flexDirection": "row",
                   "paddingHorizontal": 16,
                   "paddingVertical": 6,
-                  "textAlign": "center",
                 },
                 Object {
                   "backgroundColor": "#42D689",
@@ -757,10 +720,12 @@ exports[`EnterInviteCode Screen renders with an error 1`] = `
                   },
                   Object {
                     "lineHeight": 20,
+                    "textAlign": "center",
                   },
                   Object {
                     "color": "#FFFFFF",
                   },
+                  null,
                   undefined,
                 ]
               }
@@ -795,22 +760,13 @@ exports[`EnterInviteCode Screen renders with an error 1`] = `
       <Text
         onPress={[Function]}
         style={
-          Array [
-            Object {
-              "color": "#2E3338",
-              "fontFamily": "Hind-Bold",
-              "fontSize": 14,
-              "lineHeight": 18,
-            },
-            Object {
-              "color": "#42D689",
-              "fontFamily": "Hind-SemiBold",
-            },
-            Object {
-              "fontSize": 12,
-              "fontWeight": "300",
-            },
-          ]
+          Object {
+            "color": "#42D689",
+            "fontFamily": "Hind-SemiBold",
+            "fontSize": 12,
+            "fontWeight": "300",
+            "lineHeight": 18,
+          }
         }
       >
         inviteCodeText.askForInvite.1
@@ -974,7 +930,7 @@ exports[`EnterInviteCode Screen renders with an error 1`] = `
                   "fontSize": 16,
                 },
                 Object {
-                  "color": "#42D689",
+                  "color": "#A3EBC6",
                 },
                 Object {
                   "paddingLeft": 5,
@@ -989,5 +945,5 @@ exports[`EnterInviteCode Screen renders with an error 1`] = `
       </View>
     </View>
   </View>
-</View>
+</SafeAreaView>
 `;

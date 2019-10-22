@@ -16,5 +16,6 @@
     "baseUrl": ".",
     "lib": ["es7", "esnext", "dom"]
   },
-  "exclude": ["node_modules", "vendor", ".bundle"]
+  "exclude": ["node_modules", "vendor", ".bundle"],
+  "references": [{ "path": "../utils" }]
 }

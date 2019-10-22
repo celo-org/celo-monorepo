@@ -3,17 +3,23 @@ locals {
 }
 
 resource "google_compute_address" "tx_node" {
-  name         = "${local.name_prefix}-address-${count.index}"
+  name         = "${local.name_prefix}-address-${count.index}-${random_id.tx_node[count.index].hex}"
   address_type = "EXTERNAL"
 
   count = var.tx_node_count
+
+  lifecycle {
+    create_before_destroy = true
+  }
 }
 
 resource "google_compute_instance" "tx_node" {
-  name         = "${local.name_prefix}-${count.index}"
+  name         = "${local.name_prefix}-${count.index}-${random_id.tx_node[count.index].hex}"
   machine_type = "n1-standard-1"
 
   count = var.tx_node_count
+
+  allow_stopping_for_update = true
 
   boot_disk {
     initialize_params {
@@ -43,6 +49,7 @@ resource "google_compute_instance" "tx_node" {
       geth_node_docker_image_repository : var.geth_node_docker_image_repository,
       geth_node_docker_image_tag : var.geth_node_docker_image_tag,
       geth_verbosity : var.geth_verbosity,
+      in_memory_discovery_table : var.in_memory_discovery_table,
       ip_address : google_compute_address.tx_node[count.index].address,
       max_peers : var.tx_node_count * 2,
       network_id : var.network_id,
@@ -53,7 +60,20 @@ resource "google_compute_instance" "tx_node" {
   )
 
   service_account {
-    email  = var.gcloud_vm_service_account_email
-    scopes = ["storage-ro"]
+    email = var.gcloud_vm_service_account_email
+    scopes = [
+      "https://www.googleapis.com/auth/devstorage.read_only",
+      "https://www.googleapis.com/auth/logging.write"
+    ]
   }
+
+  lifecycle {
+    create_before_destroy = true
+  }
+}
+
+resource "random_id" "tx_node" {
+  count = var.tx_node_count
+
+  byte_length = 8
 }

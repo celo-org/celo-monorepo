@@ -1,7 +1,5 @@
-import {
-  encryptComment as encryptCommentRaw,
-  stripHexLeader,
-} from '@celo/utils/src/commentEncryption'
+import { encryptComment as encryptCommentRaw } from '@celo/utils/src/commentEncryption'
+import { stripHexLeader } from '@celo/utils/src/signatureUtils'
 import { getAttestationsContract, getDataEncryptionKey } from '@celo/walletkit'
 import { web3 } from 'src/web3/contracts'
 

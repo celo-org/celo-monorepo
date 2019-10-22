@@ -1,0 +1,23 @@
+{{ range $index, $e := until (.Values.geth.validators | int) }}
+
+kind: Service
+apiVersion: v1
+metadata:
+  name: {{ $.Release.Name }}-{{ $index | toString }}
+  labels:
+    app: attestation-service
+    chart: attestation-service
+    release: {{ $.Release.Name }}
+    heritage: {{ $.Release.Service }}
+    component: attestation-service
+spec:
+  selector:
+    app: attestation-service
+    release: {{ $.Release.Name }}
+    component: attestation-service
+    statefulset.kubernetes.io/pod-name: {{ $.Release.Name }}-{{ $index | toString }}
+  ports:
+  - port: 3000
+
+---
+{{ end }}

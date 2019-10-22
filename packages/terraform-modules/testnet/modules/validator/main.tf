@@ -16,6 +16,8 @@ resource "google_compute_instance" "validator" {
 
   count = var.validator_count
 
+  allow_stopping_for_update = true
+
   boot_disk {
     initialize_params {
       image = "debian-cloud/debian-9"
@@ -46,7 +48,9 @@ resource "google_compute_instance" "validator" {
       geth_node_docker_image_repository : var.geth_node_docker_image_repository,
       geth_node_docker_image_tag : var.geth_node_docker_image_tag,
       geth_verbosity : var.geth_verbosity,
+      in_memory_discovery_table : var.in_memory_discovery_table,
       ip_address : google_compute_address.validator[count.index].address,
+      istanbul_request_timeout_ms : var.istanbul_request_timeout_ms,
       max_peers : (var.validator_count + var.tx_node_count) * 2,
       network_id : var.network_id,
       rid : count.index,
@@ -56,8 +60,11 @@ resource "google_compute_instance" "validator" {
   )
 
   service_account {
-    email  = var.gcloud_vm_service_account_email
-    scopes = ["storage-ro"]
+    email = var.gcloud_vm_service_account_email
+    scopes = [
+      "https://www.googleapis.com/auth/devstorage.read_only",
+      "https://www.googleapis.com/auth/logging.write"
+    ]
   }
 }
 

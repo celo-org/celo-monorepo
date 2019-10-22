@@ -33,6 +33,12 @@
   "letsGetStartedByFirstTransaction": "Let’s get started by sending your first transaction",
   "sendMoney": "Send Money",
   "verificationFee": "Verification Fee",
+  "networkFee": "Network Fee",
+  "networkFeeExplanation": {
+    "0":
+      "Each week, a very small fee (less than 0.01%) of every user's Celo Dollar Balance is used to keep the Celo Dollar's value stable. To learn more about Celo fees, visit the ",
+    "1": "FAQ"
+  },
   "confirmingPayment": "Confirming…",
   "confirmingExchange": "Confirming…",
   "paymentFailed": "Payment Failed",
@@ -50,15 +56,19 @@
   "reclaimPayment": "Reclaim Payment",
   "sendMessage": "Send Message",
   "escrowedPaymentReminder": "Remind {{mobile}} to Accept Payment",
+  "escrowedPaymentReminderSms":
+    "A friendly reminder that you haven't yet redeemed your Celo Dollars!",
   "testnetAlert": {
     "0": "Testnet",
     "1": "A friendly reminder you're using a Testnet build - the balances here are not real."
   },
   "dismiss": "Dismiss",
-  "localCurrencyEqual": "Equal to <2>{{localValue}} {{localCurrencySymbol}}</2>",
-  "localCurrencyValue": "{{localValue}} {{localCurrencySymbol}}",
+  "localCurrencyEqual": "Equal to <2>{{localValue}} {{localCurrencyCode}}</2>",
+  "localCurrencyValue": "{{localValue}} {{localCurrencyCode}}",
   "feedItemVerificationFeeTitle": "Celo",
   "feedItemVerificationFeeInfo": "$t(verificationFee)",
+  "feedItemNetworkFeeTitle": "Celo",
+  "feedItemNetworkFeeInfo": "Network Fee",
   "feedItemVerificationRewardTitle": "Celo",
   "feedItemVerificationRewardInfo": "Verifier Reward",
   "feedItemFaucetTitle": "Celo",

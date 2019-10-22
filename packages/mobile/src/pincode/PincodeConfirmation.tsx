@@ -7,6 +7,7 @@ import { componentStyles } from '@celo/react-components/styles/styles'
 import * as React from 'react'
 import { WithNamespaces, withNamespaces } from 'react-i18next'
 import { ScrollView, StyleSheet, Text, View } from 'react-native'
+import SafeAreaView from 'react-native-safe-area-view'
 import { NavigationInjectedProps } from 'react-navigation'
 import { Namespaces } from 'src/i18n'
 import { nuxNavigationOptions } from 'src/navigator/Headers'
@@ -65,7 +66,7 @@ class PincodeConfirmation extends React.Component<Props, State> {
     const { t } = this.props
     const { pin } = this.state
     return (
-      <View style={style.container}>
+      <SafeAreaView style={style.container}>
         <ScrollView contentContainerStyle={style.scrollContainer}>
           <View>
             <Text style={[fontStyles.h1, componentStyles.marginTop15]}>
@@ -89,12 +90,12 @@ class PincodeConfirmation extends React.Component<Props, State> {
         <Button
           testID="Pincode-Enter"
           text={t('global:submit')}
-          standard={true}
+          standard={false}
           type={BtnTypes.PRIMARY}
           onPress={this.onPressConfirm}
           disabled={!this.isPinValid()}
         />
-      </View>
+      </SafeAreaView>
     )
   }
 }

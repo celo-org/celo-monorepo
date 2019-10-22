@@ -1,6 +1,8 @@
-import { createStackNavigator, createSwitchNavigator } from 'react-navigation'
+import { Platform } from 'react-native'
+import { createStackNavigator, createSwitchNavigator, StackNavigatorConfig } from 'react-navigation'
 import Account from 'src/account/Account'
 import Analytics from 'src/account/Analytics'
+import CeloLite from 'src/account/CeloLite'
 import DollarEducation from 'src/account/DollarEducation'
 import EditProfile from 'src/account/EditProfile'
 import GoldEducation from 'src/account/GoldEducation'
@@ -13,18 +15,27 @@ import AppLoading from 'src/app/AppLoading'
 import Debug from 'src/app/Debug'
 import ErrorScreen from 'src/app/ErrorScreen'
 import UpgradeScreen from 'src/app/UpgradeScreen'
-import Backup from 'src/backup/Backup'
+import BackupComplete from 'src/backup/BackupComplete'
+import BackupIntroduction from 'src/backup/BackupIntroduction'
+import BackupPhrase from 'src/backup/BackupPhrase'
+import BackupQuiz from 'src/backup/BackupQuiz'
+import BackupSocial from 'src/backup/BackupSocial'
+import BackupSocialIntro from 'src/backup/BackupSocialIntro'
 import DappKitAccountScreen from 'src/dappkit/DappKitAccountScreen'
 import DappKitSignTxScreen from 'src/dappkit/DappKitSignTxScreen'
 import DappKitTxDataScreen from 'src/dappkit/DappKitTxDataScreen'
 import ReclaimPaymentConfirmationScreen from 'src/escrow/ReclaimPaymentConfirmationScreen'
 import ExchangeReview from 'src/exchange/ExchangeReview'
 import ExchangeTradeScreen from 'src/exchange/ExchangeTradeScreen'
+import FeeExchangeEducation from 'src/exchange/FeeExchangeEducation'
 import ImportContacts from 'src/import/ImportContacts'
 import ImportWallet from 'src/import/ImportWallet'
+import ImportWalletEmpty from 'src/import/ImportWalletEmpty'
+import ImportWalletSocial from 'src/import/ImportWalletSocial'
 import EnterInviteCode from 'src/invite/EnterInviteCode'
 import JoinCelo from 'src/invite/JoinCelo'
 import Language from 'src/language/Language'
+import SelectLocalCurrency from 'src/localCurrency/SelectLocalCurrency'
 import { Screens, Stacks } from 'src/navigator/Screens'
 import TabNavigator from 'src/navigator/TabNavigator'
 import PaymentRequestConfirmation from 'src/paymentRequest/PaymentRequestConfirmation'
@@ -45,10 +56,21 @@ import VerifyVerified from 'src/verify/Verified'
 import VerifyVerifying from 'src/verify/Verifying'
 import VerifyEducation from 'src/verify/VerifyPhoneEducation'
 
-export const headerArea = {
+export const headerArea: StackNavigatorConfig = {
+  // Force this for now on iOS so screen transitions look normal
+  // given we intentionally hide the bottom separator from the nav bar
+  headerMode: 'screen',
   defaultNavigationOptions: {
     headerStyle: {
-      elevation: 0,
+      ...Platform.select({
+        android: {
+          elevation: 0,
+        },
+        ios: {
+          borderBottomWidth: 0,
+          borderBottomColor: 'transparent',
+        },
+      }),
     },
   },
 }
@@ -71,6 +93,8 @@ const NuxStack = createStackNavigator(
     [Screens.PincodeSet]: { screen: PincodeSet },
     [Screens.EnterInviteCode]: { screen: EnterInviteCode },
     [Screens.ImportWallet]: { screen: ImportWallet },
+    [Screens.ImportWalletSocial]: { screen: ImportWalletSocial },
+    [Screens.ImportWalletEmpty]: { screen: ImportWalletEmpty },
     [Screens.ImportContacts]: { screen: ImportContacts },
     [Screens.VerifyEducation]: { screen: VerifyEducation },
     [Screens.VerifyInput]: { screen: VerifyInput },
@@ -105,6 +129,7 @@ const ExchangeStack = createStackNavigator(
     // Note, ExchangeHomeScreen isn't in this stack because it's part of the tab navigator
     [Screens.ExchangeTradeScreen]: { screen: ExchangeTradeScreen },
     [Screens.ExchangeReview]: { screen: ExchangeReview },
+    [Screens.FeeExchangeEducation]: { screen: FeeExchangeEducation },
   },
   {
     navigationOptions: {
@@ -129,6 +154,24 @@ const RequestStack = createStackNavigator(
   }
 )
 
+const BackupStack = createStackNavigator(
+  {
+    [Screens.BackupIntroduction]: { screen: BackupIntroduction },
+    [Screens.BackupPhrase]: { screen: BackupPhrase },
+    [Screens.BackupQuiz]: { screen: BackupQuiz },
+    [Screens.BackupSocialIntro]: { screen: BackupSocialIntro },
+    [Screens.BackupSocial]: { screen: BackupSocial },
+    [Screens.BackupComplete]: { screen: BackupComplete },
+  },
+  {
+    navigationOptions: {
+      header: null,
+    },
+    ...headerArea,
+    initialRouteName: Screens.BackupIntroduction,
+  }
+)
+
 const AppStack = createStackNavigator(
   {
     [Screens.TabNavigator]: { screen: TabNavigator },
@@ -137,12 +180,15 @@ const AppStack = createStackNavigator(
     [Stacks.RequestStack]: { screen: RequestStack },
     [Screens.Language]: { screen: Language },
     [Screens.Analytics]: { screen: Analytics },
+    [Screens.CeloLite]: { screen: CeloLite },
     [Screens.SetClock]: { screen: SetClock },
     [Screens.EditProfile]: { screen: EditProfile },
     [Screens.Profile]: { screen: Profile },
     [Screens.Account]: { screen: Account },
+    [Stacks.BackupStack]: { screen: BackupStack },
     [Screens.Invite]: { screen: Invite },
     [Screens.InviteReview]: { screen: InviteReview },
+    [Screens.SelectLocalCurrency]: { screen: SelectLocalCurrency },
     [Screens.Licenses]: { screen: Licenses },
     [Screens.DollarEducation]: { screen: DollarEducation },
     [Screens.TransactionReview]: { screen: TransactionReviewScreen },
@@ -150,7 +196,6 @@ const AppStack = createStackNavigator(
     [Screens.QRCode]: { screen: QRCode },
     [Screens.QRScanner]: { screen: QRScanner },
     [Screens.GoldEducation]: { screen: GoldEducation },
-    [Screens.Backup]: { screen: Backup },
     [Screens.PaymentRequestListScreen]: { screen: PaymentRequestListScreen },
     [Screens.ReclaimPaymentConfirmationScreen]: { screen: ReclaimPaymentConfirmationScreen },
     [Screens.FeeEducation]: { screen: FeeEducation },

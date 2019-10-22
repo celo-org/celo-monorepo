@@ -5,7 +5,7 @@ import { currencyTranslations } from '@celo/utils/src/currencies'
 // @ts-ignore
 import i18n from 'i18next'
 import { reactI18nextModule } from 'react-i18next'
-import RNLanguages from 'react-native-languages'
+import * as RNLocalize from 'react-native-localize'
 import Logger from 'src/utils/Logger'
 
 export enum Namespaces {
@@ -26,12 +26,28 @@ export enum Namespaces {
   dappkit = 'dappkit',
 }
 
+const availableResources = {
+  'en-US': {
+    common: en_US,
+    ...locales.enUS,
+  },
+  'es-419': {
+    common: es_LA,
+    ...locales.es_419,
+  },
+}
+
+function getLanguage() {
+  const fallback = { languageTag: 'en', isRTL: false }
+  const { languageTag } =
+    RNLocalize.findBestAvailableLanguage(Object.keys(availableResources)) || fallback
+  return languageTag
+}
+
 const languageDetector = {
   type: 'languageDetector',
   async: false,
-  detect: () => {
-    return RNLanguages.language
-  },
+  detect: getLanguage,
   // tslint:disable-next-line
   init: () => {},
   // tslint:disable-next-line
@@ -61,16 +77,7 @@ i18n
       default: ['en-US'],
       'es-US': ['es-LA'],
     },
-    resources: {
-      'en-US': {
-        common: en_US,
-        ...locales.enUS,
-      },
-      'es-419': {
-        common: es_LA,
-        ...locales.es_419,
-      },
-    },
+    resources: availableResources,
     ns: ['common', ...Object.keys(Namespaces)],
     defaultNS: 'common',
     debug: true,
@@ -80,8 +87,8 @@ i18n
     missingInterpolationHandler: currencyInterpolator,
   })
 
-RNLanguages.addEventListener('change', ({ language }: { language: string }) => {
-  i18n.changeLanguage(language)
+RNLocalize.addEventListener('change', () => {
+  i18n.changeLanguage(getLanguage())
 })
 
 export default i18n

@@ -1,0 +1,7 @@
+name: attestation-service
+version: 0.0.1
+description: Chart which is used to deploy an attestation service for a celo testnet
+keywords:
+- ethereum
+- blockchain
+appVersion: v1.7.3

@@ -8,7 +8,7 @@
 /packages/cli/ @mcortesi @asaj
 /packages/helm-charts/ @nambrot @timmoreton
 /packages/mobile/ @cmcewen @jmrossy
-/packages/notification-service/ @jmrossy @cmcewen
+/packages/notification-service/ @annakaz @cmcewen
 /packages/protocol/ @asaj @m-chrzan
 /packages/react-components/ @cmcewen @jmrossy
 /packages/walletkit/ @ashishb @yerdua

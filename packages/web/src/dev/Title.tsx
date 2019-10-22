@@ -9,9 +9,10 @@ interface Props {
   title: string
   invert?: boolean
   nativeID?: string
+  ariaLevel?: '2' | '3'
 }
 
-const TitleComponent = React.memo(function Title({ title, invert, nativeID }: Props) {
+const TitleComponent = React.memo(function Title({ title, invert, nativeID, ariaLevel }: Props) {
   return (
     <GridRow
       nativeID={nativeID}
@@ -22,7 +23,9 @@ const TitleComponent = React.memo(function Title({ title, invert, nativeID }: Pr
       <Cell span={Spans.full}>
         <Fade>
           <View>
-            <H1 style={[textStyles.center, invert && textStyles.invert]}>{title}</H1>
+            <H1 ariaLevel={ariaLevel} style={[textStyles.center, invert && textStyles.invert]}>
+              {title}
+            </H1>
           </View>
         </Fade>
       </Cell>

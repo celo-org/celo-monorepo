@@ -45,15 +45,15 @@ export const initializeCloudMessaging = async (app: Firebase, address: string) =
 
   const fcmToken = await app.messaging().getToken()
   if (fcmToken) {
-    registerTokenToDb(app, address, fcmToken)
+    await registerTokenToDb(app, address, fcmToken)
     // First time setting the fcmToken also set the language selection
-    setUserLanguage(address, language)
+    await setUserLanguage(address, language)
   }
 
   // Monitor for future token refreshes
-  app.messaging().onTokenRefresh((token) => {
+  app.messaging().onTokenRefresh(async (token) => {
     Logger.info(TAG, 'Cloud Messaging token refreshed')
-    registerTokenToDb(app, address, token)
+    await registerTokenToDb(app, address, token)
   })
 
   // Listen for notification messages while the app is open

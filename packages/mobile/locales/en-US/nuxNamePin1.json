@@ -35,10 +35,7 @@
       "message": "Paste Invite Code!",
       "hint": "Looks like you've copied a code"
     },
-    "validating": {
-      "0": "Great! ",
-      "1": "Validating copied invite code"
-    },
+    "validating": "Great! Validating copied invite code",
     "inviteAccepted": "🎉 Invite Accepted!",
     "askForInvite": {
       "0": "Request an invite from someone with Celo Wallet or sign up for the Testnet at ",
@@ -50,7 +47,7 @@
   "InvitationCode": "Invitation Code",
   "optIn": "Opt In",
   "submitting": "Submitting ...",
-  "importIt": "Import Existing Wallet",
+  "importIt": "Restore Existing Wallet",
   "cancel": "Cancel",
   "important": "Important",
   "createPin": {

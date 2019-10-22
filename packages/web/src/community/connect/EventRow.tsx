@@ -107,7 +107,7 @@ interface EventLinkProps {
 class EventLink extends React.PureComponent<EventLinkProps> {
   render() {
     const { link, recap, isPastEvent, t, isMobile } = this.props
-    if (!isPastEvent && !isMobile) {
+    if (link && !isPastEvent && !isMobile) {
       return <Button text={t('events.eventPage')} kind={BTN.NAKED} href={link} target="_external" />
     }
     if (recap && recap.length) {

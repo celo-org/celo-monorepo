@@ -19,5 +19,6 @@
       "next-i18next": ["src/next-i18next-aug.d.ts"]
     }
   },
-  "exclude": ["dist"]
+  "exclude": ["dist"],
+  "references": [{ "path": "../utils" }]
 }

@@ -21,7 +21,7 @@ export interface Application {
 
 export const ApplicationKeys = Object.keys(ApplicationFields)
 
-// https://airtable.com/apppO5poOzAE5YYJN/api/docs#javascript/table:Recommendationss
+// https://airtable.com/apppO5poOzAE5YYJN/api/docs#javascript/table:Referrals
 export enum RecommendationFields {
   email = 'Your Email Address',
   org = 'Organization you are Recommending',
@@ -43,5 +43,5 @@ export const RecommendationKeys = Object.keys(RecommendationFields)
 // Must match table name on Airtable
 export enum Tables {
   Applicants = 'Applicants',
-  Recommendations = 'Recommendations',
+  Recommendations = 'Referrals',
 }

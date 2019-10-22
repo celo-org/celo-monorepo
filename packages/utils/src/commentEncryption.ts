@@ -144,21 +144,9 @@ export function deriveCEK(privateKey: string): Buffer {
   return hkdf(buf, 32, { hash: 'sha-256' })
 }
 
-/**
- * Strips out the leading '0x' from a hex string. Does not fail on a string that does not
- * contain a leading '0x'
- *
- * @param hexString Hex string that may have '0x' prepended to it.
- * @returns hexString with no leading '0x'.
- */
-export function stripHexLeader(hexString: string): string {
-  return hexString.indexOf('0x') === 0 ? hexString.slice(2) : hexString
-}
-
 export const commentEncryption = {
   encryptComment,
   decryptComment,
   compressedPubKey,
   deriveCEK,
-  stripHexLeader,
 }

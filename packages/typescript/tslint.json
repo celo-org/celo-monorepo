@@ -27,6 +27,8 @@
     "no-inner-declarations": [true, "functions"],
     "no-for-in": true,
     "void-zero": false,
-    "no-global-arrow-functions": true
+    "no-global-arrow-functions": true,
+    "no-floating-promises": true,
+    "no-promise-as-boolean": true
   }
 }

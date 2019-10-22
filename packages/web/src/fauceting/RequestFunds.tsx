@@ -2,8 +2,8 @@ import * as React from 'react'
 import ReCAPTCHA from 'react-google-recaptcha'
 import { StyleSheet, View } from 'react-native'
 import { ButtonWithFeedback, ContextualInfo, HashingStatus } from 'src/fauceting/MicroComponents'
+import PhoneInput from 'src/fauceting/PhoneInput'
 import {
-  formatNumber,
   getCaptchaKey,
   RequestState,
   requestStatusToState,
@@ -14,11 +14,6 @@ import { TextInput } from 'src/forms/FormComponents'
 import { I18nProps, NameSpaces, withNamespaces } from 'src/i18n'
 import { colors, standardStyles } from 'src/styles'
 import { RequestRecord, RequestType, subscribeRequest } from '../../server/FirebaseClient'
-
-function send(beneficiary: string, kind: RequestType, captchaToken: string) {
-  const route = kind === RequestType.Invite ? '/invite' : '/faucet'
-  return postForm(route, { captchaToken, beneficiary })
-}
 
 interface State {
   beneficiary: string
@@ -42,16 +37,19 @@ class RequestFunds extends React.PureComponent<Props & I18nProps, State> {
 
   recaptchaRef = React.createRef<ReCAPTCHA>()
 
-  setBeneficiary = ({ currentTarget }: React.SyntheticEvent<HTMLInputElement>) => {
+  setAddress = ({ currentTarget }: React.SyntheticEvent<HTMLInputElement>) => {
     const { value } = currentTarget
-    const beneficiary = this.props.kind === RequestType.Invite ? formatNumber(value) : value
     this.setState({
-      beneficiary,
+      beneficiary: value,
       requestState:
         this.state.requestState !== RequestState.Working
           ? RequestState.Initial
           : this.state.requestState,
     })
+  }
+
+  setNumber = (number: string) => {
+    this.setState({ beneficiary: number })
   }
 
   onCaptcha = (value: string | null) => {
@@ -116,10 +114,6 @@ class RequestFunds extends React.PureComponent<Props & I18nProps, State> {
     return this.props.kind === RequestType.Faucet
   }
 
-  getPlaceholder = () => {
-    return this.isFaucet() ? this.props.t('testnetAddress') : '+1 555 555 5555'
-  }
-
   render() {
     const { requestState, dollarTxHash, goldTxHash, escrowTxHash } = this.state
     const isInvalid = requestState === RequestState.Invalid
@@ -128,24 +122,23 @@ class RequestFunds extends React.PureComponent<Props & I18nProps, State> {
         <View style={standardStyles.elementalMarginBottom}>
           <ReCAPTCHA sitekey={getCaptchaKey()} onChange={this.onCaptcha} ref={this.recaptchaRef} />
         </View>
-        <TextInput
-          type={this.isFaucet() ? 'tel' : 'text'}
-          focusStyle={
-            this.isFaucet() ? standardStyles.inputFocused : standardStyles.inputDarkFocused
-          }
-          name="beneficiary"
-          style={[
-            standardStyles.input,
-            !this.isFaucet() && standardStyles.inputDarkMode,
-            isInvalid && styles.error,
-          ]}
-          placeholder={this.getPlaceholder()}
-          // TODO: is it normal that setBeneficiary is using React.SyntheticEvent<HTMLInputElement>
-          // and not NativeSyntheticEvent<TextInputChangeEventData> ?
-          // @ts-ignore
-          onChange={this.setBeneficiary}
-          value={this.state.beneficiary}
-        />
+        {this.isFaucet() ? (
+          <TextInput
+            type={'text'}
+            focusStyle={standardStyles.inputFocused}
+            name="beneficiary"
+            style={[standardStyles.input, isInvalid && styles.error]}
+            placeholder={this.props.t('testnetAddress')}
+            // TODO: is it normal that setBeneficiary is using React.SyntheticEvent<HTMLInputElement>
+            // and not NativeSyntheticEvent<TextInputChangeEventData> ?
+            // @ts-ignore
+            onChange={this.setAddress}
+            value={this.state.beneficiary}
+          />
+        ) : (
+          <PhoneInput onChangeNumber={this.setNumber} />
+        )}
+
         <ContextualInfo
           requestState={this.state.requestState}
           t={this.props.t}
@@ -157,6 +150,7 @@ class RequestFunds extends React.PureComponent<Props & I18nProps, State> {
             isFaucet={this.isFaucet()}
             captchaOK={this.state.captchaOK}
             onSubmit={this.onSubmit}
+            disabled={this.state.beneficiary.length === 0}
             t={this.props.t}
           />
           <View>
@@ -175,7 +169,10 @@ class RequestFunds extends React.PureComponent<Props & I18nProps, State> {
   }
 }
 
-export default withNamespaces(NameSpaces.faucet)(RequestFunds)
+function send(beneficiary: string, kind: RequestType, captchaToken: string) {
+  const route = kind === RequestType.Invite ? '/invite' : '/faucet'
+  return postForm(route, { captchaToken, beneficiary })
+}
 
 const styles = StyleSheet.create({
   error: {
@@ -183,3 +180,5 @@ const styles = StyleSheet.create({
     borderWidth: 1,
   },
 })
+
+export default withNamespaces(NameSpaces.faucet)(RequestFunds)

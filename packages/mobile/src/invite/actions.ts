@@ -10,11 +10,17 @@ export enum Actions {
   SEND_INVITE_FAILURE = 'INVITE/SEND_INVITE_FAILURE',
   REDEEM_INVITE = 'INVITE/REDEEM_INVITE',
   STORE_REDEEMED_INVITE_CODE = 'STORE_REDEEMED_INVITE_CODE',
-  REDEEM_COMPLETE = 'INVITE/REDEEM_COMPLETE',
+  REDEEM_INVITE_SUCCESS = 'INVITE/REDEEM_INVITE_SUCCESS',
+  REDEEM_INVITE_FAILURE = 'INVITE/REDEEM_INVITE_FAILURE',
 }
 
 export interface Invitees {
   [tempAddress: string]: string // tempAddress -> e164Number
+}
+
+export enum InviteBy {
+  WhatsApp = 'WhatsApp',
+  SMS = 'SMS',
 }
 
 export interface StoreInviteeDataAction {
@@ -22,6 +28,12 @@ export interface StoreInviteeDataAction {
   address: string
   e164Number: string
 }
+
+export const storeInviteeData = (address: string, e164Number: string): StoreInviteeDataAction => ({
+  type: Actions.STORE_INVITEE_DATA,
+  address,
+  e164Number,
+})
 
 export interface SendInviteAction {
   type: Actions.SEND_INVITE
@@ -31,45 +43,6 @@ export interface SendInviteAction {
   amount?: BigNumber
   currency?: CURRENCY_ENUM
 }
-
-export interface SendInviteSuccessAction {
-  type: Actions.SEND_INVITE_SUCCESS
-}
-
-export interface SendInviteFailureAction {
-  type: Actions.SEND_INVITE_FAILURE
-  error: ErrorMessages
-}
-
-export interface RedeemInviteAction {
-  type: Actions.REDEEM_INVITE
-  inviteCode: string
-  name: string
-}
-
-export interface RedeemCompleteAction {
-  type: Actions.REDEEM_COMPLETE
-  redeemComplete: boolean
-}
-
-export type ActionTypes =
-  | StoreInviteeDataAction
-  | SendInviteAction
-  | RedeemInviteAction
-  | RedeemCompleteAction
-  | SendInviteFailureAction
-  | SendInviteSuccessAction
-
-export enum InviteBy {
-  WhatsApp = 'WhatsApp',
-  SMS = 'SMS',
-}
-
-export const storeInviteeData = (address: string, e164Number: string): StoreInviteeDataAction => ({
-  type: Actions.STORE_INVITEE_DATA,
-  address,
-  e164Number,
-})
 
 export const sendInvite = (
   recipientName: string,
@@ -86,22 +59,55 @@ export const sendInvite = (
   currency,
 })
 
+export interface SendInviteSuccessAction {
+  type: Actions.SEND_INVITE_SUCCESS
+}
+
 export const sendInviteSuccess = (): SendInviteSuccessAction => ({
   type: Actions.SEND_INVITE_SUCCESS,
 })
+
+export interface SendInviteFailureAction {
+  type: Actions.SEND_INVITE_FAILURE
+  error: ErrorMessages
+}
 
 export const sendInviteFailure = (error: ErrorMessages): SendInviteFailureAction => ({
   type: Actions.SEND_INVITE_FAILURE,
   error,
 })
 
-export const redeemInvite = (inviteCode: string, name: string): RedeemInviteAction => ({
+export interface RedeemInviteAction {
+  type: Actions.REDEEM_INVITE
+  inviteCode: string
+}
+
+export const redeemInvite = (inviteCode: string): RedeemInviteAction => ({
   type: Actions.REDEEM_INVITE,
   inviteCode,
-  name,
 })
 
-export const redeemComplete = (complete: boolean): RedeemCompleteAction => ({
-  type: Actions.REDEEM_COMPLETE,
-  redeemComplete: complete,
+export interface RedeemInviteSuccessAction {
+  type: Actions.REDEEM_INVITE_SUCCESS
+}
+
+export const redeemInviteSuccess = (): RedeemInviteSuccessAction => ({
+  type: Actions.REDEEM_INVITE_SUCCESS,
 })
+
+export interface RedeemInviteFailureAction {
+  type: Actions.REDEEM_INVITE_FAILURE
+}
+
+export const redeemInviteFailure = (): RedeemInviteFailureAction => ({
+  type: Actions.REDEEM_INVITE_FAILURE,
+})
+
+export type ActionTypes =
+  | StoreInviteeDataAction
+  | SendInviteAction
+  | RedeemInviteAction
+  | RedeemInviteSuccessAction
+  | RedeemInviteFailureAction
+  | SendInviteFailureAction
+  | SendInviteSuccessAction

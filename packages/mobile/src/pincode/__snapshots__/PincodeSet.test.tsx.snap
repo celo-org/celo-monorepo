@@ -1,7 +1,7 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`Pincode renders correctly 1`] = `
-<View
+<SafeAreaView
   style={
     Object {
       "backgroundColor": "#FFFFFF",
@@ -579,12 +579,8 @@ exports[`Pincode renders correctly 1`] = `
           "borderRadius": 3,
           "flexDirection": "row",
         },
-        Object {
-          "marginVertical": 10,
-        },
-        Object {
-          "marginBottom": 10,
-        },
+        null,
+        null,
         undefined,
         Object {
           "backgroundColor": "#A3EBC6",
@@ -621,9 +617,7 @@ exports[`Pincode renders correctly 1`] = `
             "height": 50,
           },
           Object {
-            "borderColor": "#A3EBC6",
-            "borderRadius": 3,
-            "borderWidth": 2,
+            "borderWidth": 0,
           },
         ]
       }
@@ -661,11 +655,11 @@ exports[`Pincode renders correctly 1`] = `
       </View>
     </View>
   </View>
-</View>
+</SafeAreaView>
 `;
 
 exports[`Pincode renders correctly 2`] = `
-<View
+<SafeAreaView
   style={
     Object {
       "backgroundColor": "#FFFFFF",
@@ -1243,12 +1237,8 @@ exports[`Pincode renders correctly 2`] = `
           "borderRadius": 3,
           "flexDirection": "row",
         },
-        Object {
-          "marginVertical": 10,
-        },
-        Object {
-          "marginBottom": 10,
-        },
+        null,
+        null,
         undefined,
         Object {
           "backgroundColor": "#42D689",
@@ -1285,9 +1275,7 @@ exports[`Pincode renders correctly 2`] = `
             "height": 50,
           },
           Object {
-            "borderColor": "#42D689",
-            "borderRadius": 3,
-            "borderWidth": 2,
+            "borderWidth": 0,
           },
         ]
       }
@@ -1325,5 +1313,5 @@ exports[`Pincode renders correctly 2`] = `
       </View>
     </View>
   </View>
-</View>
+</SafeAreaView>
 `;
