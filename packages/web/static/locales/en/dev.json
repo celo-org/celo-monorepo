@@ -4,7 +4,7 @@
   "viewGitHub": "View on Github",
   "getStarted": "Get Wallet",
   "seeTutorial": "See Tutorial",
-  "featureTitle": "Celo Platform Features",
+  "featureTitle": "Platform Features",
   "techTitle": "Full Stack Approach",
   "learnMore": "Learn More",
   "readMore": "Read More",
@@ -96,5 +96,8 @@
     "latestUpdates": "Receive the latest updates to your inbox",
     "signUp": "Sign Up",
     "signUpThanks": "Thank you for signing up"
-  }
+  },
+  "stackBrowseTitle": "Browse the Code",
+  "stackBrowseCopy": "Explore and contribute to the Celo codebase",
+  "stackBrowseButton": "View On Github"
 }

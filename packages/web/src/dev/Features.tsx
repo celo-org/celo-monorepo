@@ -5,8 +5,8 @@ import Feature from 'src/dev/Feature'
 import { I18nProps, withNamespaces } from 'src/i18n'
 import { Cell, GridRow, Spans } from 'src/layout/GridRow'
 import { hashNav } from 'src/shared/menu-items'
-import Title from './Title'
-import { colors } from 'src/styles'
+import { colors, textStyles, standardStyles } from 'src/styles'
+import { H3 } from 'src/fonts/Fonts'
 const stableImg = require('src/dev/features/stable.png')
 const pkiImg = require('src/dev/features/pki.png')
 const govImg = require('src/dev/features/gov.png')
@@ -24,7 +24,15 @@ export default withNamespaces('dev')(
       <View style={styles.darkBackground}>
         <Fade bottom={true} distance={'40px'}>
           <View nativeID={hashNav.build.features}>
-            <Title invert={true} title={t('featureTitle')} />
+            <GridRow
+              desktopStyle={standardStyles.sectionMarginTop}
+              tabletStyle={standardStyles.sectionMarginTopTablet}
+              mobileStyle={standardStyles.sectionMarginTopMobile}
+            >
+              <Cell span={Spans.full}>
+                <H3 style={textStyles.invert}>{t('featureTitle')}</H3>
+              </Cell>
+            </GridRow>
             <GridRow mobileStyle={styles.featuresMobile}>
               <Cell span={Spans.fourth} mobileSpan={Spans.half}>
                 <Feature

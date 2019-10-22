@@ -1,8 +1,8 @@
+import dynamic from 'next/dynamic'
 import * as React from 'react'
 import { StyleSheet, View } from 'react-native'
 import Fade from 'react-reveal/Fade'
 import CoverActions from 'src/dev/CoverActions'
-import Phone from 'src/dev/Phone'
 import { H1, H4 } from 'src/fonts/Fonts'
 import { I18nProps, withNamespaces } from 'src/i18n'
 import Android from 'src/icons/Android'
@@ -18,7 +18,7 @@ const DURATION = 400
 
 const LEADERS = [
   { points: 83, identity: 'Rex' },
-  { points: 840, identity: 'Jon' },
+  { points: 840, identity: '100%_that_validator_who_is_an_absolute_diva' },
   { points: 321, identity: 'Heisenberg' },
   { points: 380, identity: 'Harry' },
   { points: 764, identity: 'DX-West' },

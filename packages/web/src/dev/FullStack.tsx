@@ -3,7 +3,7 @@ import * as React from 'react'
 import { findNodeHandle, StyleSheet, Text, View } from 'react-native'
 import LayersIllo from 'src/dev/LayersIllo'
 import StackSection from 'src/dev/StackSection'
-import { H2, H3, Li } from 'src/fonts/Fonts'
+import { H2, H3, H4, Li } from 'src/fonts/Fonts'
 import { I18nProps, withNamespaces } from 'src/i18n'
 import { Cell, GridRow, Spans } from 'src/layout/GridRow'
 import { scrollTo } from 'src/utils/utils'
@@ -11,6 +11,8 @@ import { CeloLinks, hashNav } from 'src/shared/menu-items'
 import { fonts, standardStyles, textStyles, colors } from 'src/styles'
 import { HEADER_HEIGHT } from 'src/shared/Styles'
 import { withScreenSize, ScreenProps, ScreenSizes } from 'src/layout/ScreenSize'
+import Button, { BTN } from 'src/shared/Button.3'
+import Octocat from 'src/icons/Octocat'
 
 enum Levels {
   apps,
@@ -98,6 +100,7 @@ class FullStack extends React.PureComponent<I18nProps & ScreenProps, State> {
     }
   }
 
+  // TODO repace scroll listening with intersection observer api
   componentDidMount() {
     window.addEventListener('scroll', this.handleScroll)
   }
@@ -173,6 +176,21 @@ class FullStack extends React.PureComponent<I18nProps & ScreenProps, State> {
               <Li style={textStyles.invert}>{t('proof.rewardsWeighted')}</Li>
               <Li style={textStyles.invert}>{t('proof.onChain')}</Li>
             </StackSection>
+            <View style={[standardStyles.centered, standardStyles.blockMarginBottom]}>
+              <H4 style={[textStyles.invert, textStyles.center]}>{t('stackBrowseTitle')}</H4>
+              <Text
+                style={[standardStyles.elementalMarginBottom, textStyles.invert, textStyles.center]}
+              >
+                {t('stackBrowseCopy')}{' '}
+              </Text>
+              <Button
+                kind={BTN.PRIMARY}
+                text={t('stackBrowseButton')}
+                target="_blank"
+                href={CeloLinks.gitHub}
+                iconRight={<Octocat color={colors.white} size={20} />}
+              />
+            </View>
           </Cell>
         </GridRow>
       </View>
