@@ -247,10 +247,11 @@ const styles = StyleSheet.create({
   },
   chosenWord: {
     ...fontStyles.bodySmall,
+    lineHeight: undefined,
     color: colors.lightGray,
     textAlign: 'center',
-    paddingTop: 5,
-    paddingHorizontal: 3,
+    paddingVertical: 2,
+    paddingHorizontal: 4,
     marginHorizontal: 3,
     marginVertical: 4,
     minWidth: 55,
