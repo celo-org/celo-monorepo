@@ -1,4 +1,4 @@
-import { PaymentRequestStatus } from 'src/account'
+import { PaymentRequest, PaymentRequestStatus } from 'src/account'
 
 export enum Actions {
   AUTHORIZED = 'FIREBASE/AUTHORIZED',
