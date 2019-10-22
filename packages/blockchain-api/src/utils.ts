@@ -50,9 +50,9 @@ let attestationsAddress: string
 let escrowAddress: string
 let tokenAddressMapping: { [key: string]: string }
 export async function getContractAddresses() {
-  if (goldTokenAddress && stableTokenAddress && attestationsAddress) {
+  if (goldTokenAddress && stableTokenAddress && attestationsAddress && escrowAddress) {
     console.info('Already got token addresses')
-    return { tokenAddressMapping, attestationsAddress }
+    return { tokenAddressMapping, attestationsAddress, escrowAddress }
   }
   try {
     const kit = await getContractKit()
