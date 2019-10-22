@@ -16,6 +16,14 @@ export const mockName = 'John Doe'
 export const mockAccount = '0x0000000000000000000000000000000000007E57'
 export const mockAccount2 = '0x1Ff482D42D8727258A1686102Fa4ba925C46Bc42'
 
+export const mockMnemonic =
+  'prosper winner find donate tape history measure umbrella agent patrol want rhythm old unable wash wrong need fluid hammer coach reveal plastic trust lake'
+
+export const mockMnemonicShard1 =
+  'prosper winner find donate tape history measure umbrella agent patrol want rhythm celo'
+export const mockMnemonicShard2 =
+  'celo old unable wash wrong need fluid hammer coach reveal plastic trust lake'
+
 export const mockPrivateDEK = Buffer.from(
   '41e8e8593108eeedcbded883b8af34d2f028710355c57f4c10a056b72486aa04',
   'hex'

@@ -1,7 +1,7 @@
 import * as React from 'react'
 import { Provider } from 'react-redux'
 import * as renderer from 'react-test-renderer'
-import { DAYS_TO_BACKUP } from 'src/backup/Backup'
+import { DAYS_TO_BACKUP } from 'src/backup/utils'
 import NotificationBox from 'src/home/NotificationBox'
 import { createMockStore } from 'test/utils'
 import { mockPaymentRequests } from 'test/values'
