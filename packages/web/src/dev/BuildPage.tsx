@@ -1,8 +1,8 @@
 import * as React from 'react'
 import { View } from 'react-native'
 import Cover from 'src/dev/Cover'
-import DeveloperUpdates from 'src/dev/DeveloperUpdates'
 import Features from 'src/dev/Features'
+import ConnectionFooter from 'src/shared/ConnectionFooter'
 
 import FullStack from 'src/dev/FullStack'
 import OpenGraph from 'src/header/OpenGraph'
@@ -32,7 +32,7 @@ class BuildPage extends React.PureComponent<I18nProps> {
         <Cover />
         <FullStack />
         <Features />
-        <DeveloperUpdates />
+        <ConnectionFooter />
       </View>
     )
   }
