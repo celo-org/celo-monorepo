@@ -81,6 +81,7 @@ export const vNeg1Schema = {
     paymentRequests: [],
     showFakeData: false,
     backupCompleted: false,
+    socialBackupCompleted: false,
     backupDelayedTime: 0,
     dismissedEarnRewards: false,
     dismissedInviteFriends: false,

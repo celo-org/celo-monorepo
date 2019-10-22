@@ -5,12 +5,18 @@ export enum Stacks {
   NuxStack = 'NuxStack',
   SendStack = 'SendStack',
   RequestStack = 'RequestStack',
+  BackupStack = 'BackupStack',
 }
 
 export enum Screens {
   Account = 'Account',
   Analytics = 'Analytics',
-  Backup = 'Backup',
+  BackupIntroduction = 'BackupIntroduction',
+  BackupPhrase = 'BackupPhrase',
+  BackupQuiz = 'BackupQuiz',
+  BackupSocialIntro = 'BackupSocialIntro',
+  BackupSocial = 'BackupSocial',
+  BackupComplete = 'BackupComplete',
   CeloLite = 'CeloLite',
   DappKitAccountAuth = 'DappKitAccountAuth',
   DappKitSignTxScreen = 'DappKitSignTxScreen',

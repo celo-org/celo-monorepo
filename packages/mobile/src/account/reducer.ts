@@ -18,6 +18,7 @@ export interface State {
   accountCreationTime: number
   backupCompleted: boolean
   backupDelayedTime: number
+  socialBackupCompleted: boolean
   paymentRequests: PaymentRequest[]
   dismissedEarnRewards: boolean
   dismissedInviteFriends: boolean
@@ -51,6 +52,7 @@ export const initialState = {
   paymentRequests: [],
   backupCompleted: false,
   backupDelayedTime: 0,
+  socialBackupCompleted: false,
   dismissedEarnRewards: false,
   dismissedInviteFriends: false,
 }
@@ -114,6 +116,18 @@ export const reducer = (state: State | undefined = initialState, action: ActionT
       return {
         ...state,
         backupDelayedTime: getRemoteTime(),
+      }
+    case Actions.SET_SOCIAL_BACKUP_COMPLETED_ACTION:
+      return {
+        ...state,
+        socialBackupCompleted: true,
+      }
+    case Actions.RESET_BACKUP_STATE:
+      return {
+        ...state,
+        backupCompleted: false,
+        socialBackupCompleted: false,
+        backupDelayedTime: 0,
       }
     case Actions.UPDATE_PAYMENT_REQUESTS:
       return {

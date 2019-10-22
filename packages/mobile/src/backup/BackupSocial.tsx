@@ -1,18 +1,18 @@
 import Button, { BtnTypes } from '@celo/react-components/components/Button'
 import colors from '@celo/react-components/styles/colors'
 import { fontStyles } from '@celo/react-components/styles/fonts'
+import { componentStyles } from '@celo/react-components/styles/styles'
 import * as React from 'react'
 import { WithNamespaces, withNamespaces } from 'react-i18next'
 import { ScrollView, StyleSheet, Switch, Text, View } from 'react-native'
 import SafeAreaView from 'react-native-safe-area-view'
 import { connect } from 'react-redux'
-import { hideAlert, showError } from 'src/alert/actions'
-import CeloAnalytics from 'src/analytics/CeloAnalytics'
-import { CustomEventNames } from 'src/analytics/constants'
+import { setSocialBackupCompleted } from 'src/account'
+import { showError } from 'src/alert/actions'
 import componentWithAnalytics from 'src/analytics/wrapper'
 import { ErrorMessages } from 'src/app/ErrorMessages'
 import BackupPhraseContainer from 'src/backup/BackupPhraseContainer'
-import { getStoredMnemonic } from 'src/backup/utils'
+import { getStoredMnemonic, splitMnemonic } from 'src/backup/utils'
 import { Namespaces } from 'src/i18n'
 import { headerWithBackButton } from 'src/navigator/Headers'
 import { navigate } from 'src/navigator/NavigationService'
@@ -22,43 +22,42 @@ import Logger from 'src/utils/Logger'
 
 interface State {
   mnemonic: string
+  mnemonicParts: string[]
   isConfirmChecked: boolean
 }
 
 interface StateProps {
-  backupCompleted: boolean
+  socialBackupCompleted: boolean
+  language: string | null
 }
 
 interface DispatchProps {
+  setSocialBackupCompleted: typeof setSocialBackupCompleted
   showError: typeof showError
-  hideAlert: typeof hideAlert
 }
 
-type Props = StateProps & DispatchProps & WithNamespaces
+type Props = WithNamespaces & StateProps & DispatchProps
 
 const mapStateToProps = (state: RootState): StateProps => {
   return {
-    backupCompleted: state.account.backupCompleted,
+    language: state.app.language,
+    socialBackupCompleted: state.account.socialBackupCompleted,
   }
 }
 
-class BackupPhrase extends React.Component<Props, State> {
-  // TODO(Rossy): Show modal when cancelling if backup flow incomplete
+class BackupSocial extends React.Component<Props, State> {
   static navigationOptions = () => ({
     ...headerWithBackButton,
   })
 
-  state = {
+  state: State = {
     mnemonic: '',
+    mnemonicParts: [],
     isConfirmChecked: false,
   }
 
   async componentDidMount() {
     await this.retrieveMnemonic()
-  }
-
-  componentWillUnmount() {
-    this.props.hideAlert()
   }
 
   retrieveMnemonic = async () => {
@@ -69,11 +68,11 @@ class BackupPhrase extends React.Component<Props, State> {
     try {
       const mnemonic = await getStoredMnemonic()
       if (!mnemonic) {
-        throw new Error('Mnemonic not found in key store')
+        throw new Error('Mnemonic not stored in key store')
       }
-      this.setState({ mnemonic })
+      this.setState({ mnemonic, mnemonicParts: splitMnemonic(mnemonic, this.props.language) })
     } catch (e) {
-      Logger.error('BackupPhrase/retrieveMnemonic', 'Failed to retrieve mnemonic', e)
+      Logger.error('BackupSocial/retrieveMnemonic', e)
       this.props.showError(ErrorMessages.FAILED_FETCH_MNEMONIC)
     }
   }
@@ -84,30 +83,47 @@ class BackupPhrase extends React.Component<Props, State> {
     })
   }
 
-  onPressContinue = () => {
-    const { mnemonic } = this.state
-    CeloAnalytics.track(CustomEventNames.backup_continue)
-    navigate(Screens.BackupQuiz, { mnemonic })
+  onPressDone = () => {
+    this.props.setSocialBackupCompleted()
+    navigate(Screens.BackupComplete)
   }
 
   render() {
-    const { t, backupCompleted } = this.props
-    const { mnemonic, isConfirmChecked } = this.state
+    const { t, socialBackupCompleted } = this.props
+    const {
+      mnemonicParts: [firstHalf, secondHalf],
+      isConfirmChecked,
+    } = this.state
+
     return (
       <SafeAreaView style={styles.container}>
         <ScrollView contentContainerStyle={styles.scrollContainer}>
           <View>
-            <Text style={fontStyles.h1}>{t('yourBackupKey')}</Text>
-            <Text style={styles.body}>{t('backupKeySummary')}</Text>
-            <BackupPhraseContainer words={mnemonic} showCopy={true} />
-            <Text style={styles.tipText}>
-              <Text style={[styles.tipText, fontStyles.bold]}>{t('global:warning')}</Text>
-              {t('securityTip')}
-            </Text>
+            {!socialBackupCompleted && (
+              <>
+                <Text style={fontStyles.h1}>{t('setUpSocialBackup')}</Text>
+                <Text style={styles.bodyText}>{t('socialBackup.body')}</Text>
+              </>
+            )}
+            {socialBackupCompleted && (
+              <>
+                <Text style={fontStyles.h1}>{t('socialBackup.yourSafeguards')}</Text>
+                <Text style={styles.bodyText}>{t('socialBackupIntro.body')}</Text>
+              </>
+            )}
+            <BackupPhraseContainer
+              headerText={t('socialBackup.phrase1')}
+              words={firstHalf}
+              showCopy={true}
+            />
+            <BackupPhraseContainer
+              headerText={t('socialBackup.phrase2')}
+              words={secondHalf}
+              showCopy={true}
+              style={componentStyles.marginTop20}
+            />
           </View>
-        </ScrollView>
-        {!backupCompleted && (
-          <View>
+          {!socialBackupCompleted && (
             <View style={styles.confirmationSwitchContainer}>
               <Switch
                 value={isConfirmChecked}
@@ -115,16 +131,18 @@ class BackupPhrase extends React.Component<Props, State> {
                 trackColor={switchTrackColors}
                 thumbColor={colors.celoGreen}
               />
-              <Text style={styles.confirmationSwitchLabel}>{t('savedConfirmation')}</Text>
+              <Text style={styles.confirmationSwitchLabel}>{t('socialBackup.confirmation')}</Text>
             </View>
-            <Button
-              disabled={!isConfirmChecked}
-              onPress={this.onPressContinue}
-              text={t('global:continue')}
-              standard={false}
-              type={BtnTypes.PRIMARY}
-            />
-          </View>
+          )}
+        </ScrollView>
+        {!socialBackupCompleted && (
+          <Button
+            disabled={!isConfirmChecked}
+            onPress={this.onPressDone}
+            text={t('global:done')}
+            standard={false}
+            type={BtnTypes.PRIMARY}
+          />
         )}
       </SafeAreaView>
     )
@@ -142,26 +160,20 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     paddingBottom: 20,
   },
-  body: {
+  bodyText: {
     ...fontStyles.body,
     marginBottom: 20,
   },
-  tipText: {
-    ...fontStyles.bodySmall,
-    color: colors.darkSecondary,
-    marginTop: 25,
-    marginHorizontal: 3,
-  },
   confirmationSwitchContainer: {
-    paddingHorizontal: 20,
     paddingVertical: 20,
     flexDirection: 'row',
   },
   confirmationSwitchLabel: {
     ...fontStyles.body,
     ...fontStyles.semiBold,
-    paddingTop: 3,
-    paddingLeft: 10,
+    paddingTop: 5,
+    paddingLeft: 8,
+    paddingRight: 5,
   },
 })
 
@@ -173,6 +185,9 @@ const switchTrackColors = {
 export default componentWithAnalytics(
   connect<StateProps, DispatchProps, {}, RootState>(
     mapStateToProps,
-    { showError, hideAlert }
-  )(withNamespaces(Namespaces.backupKeyFlow6)(BackupPhrase))
+    {
+      setSocialBackupCompleted,
+      showError,
+    }
+  )(withNamespaces(Namespaces.backupKeyFlow6)(BackupSocial))
 )

@@ -1,29 +1,53 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`renders correctly 1`] = `
-<View
-  style={
-    Object {
-      "alignContent": "center",
-      "backgroundColor": "#F8F8F8",
-      "justifyContent": "center",
-      "marginTop": 30,
-      "padding": 16,
-      "position": "relative",
-    }
-  }
->
-  <Text
+<View>
+  <View
     style={
       Object {
-        "color": "#2E3338",
-        "fontFamily": "Hind-Light",
-        "fontSize": 18,
-        "textAlign": "left",
+        "flexDirection": "row",
+        "justifyContent": "space-between",
+        "paddingHorizontal": 2,
       }
     }
   >
-    tuna assault reward enjoy quit trash eyebrow spatial core south pilot wall sample swim humor over garlic charge mix radio sudden transfer mirror wide
-  </Text>
+    <Text
+      style={
+        Object {
+          "color": "#2E3338",
+          "fontFamily": "Hind-SemiBold",
+          "fontSize": 16,
+          "lineHeight": 24,
+        }
+      }
+    >
+      backupKey
+    </Text>
+  </View>
+  <View
+    style={
+      Object {
+        "alignContent": "center",
+        "backgroundColor": "#EEEEEE",
+        "borderRadius": 4,
+        "justifyContent": "center",
+        "marginTop": 10,
+        "padding": 14,
+      }
+    }
+  >
+    <Text
+      style={
+        Object {
+          "color": "#81868B",
+          "fontFamily": "Hind-Regular",
+          "fontSize": 16,
+          "lineHeight": 27,
+        }
+      }
+    >
+      prosper winner find donate tape history measure umbrella agent patrol want rhythm old unable wash wrong need fluid hammer coach reveal plastic trust lake
+    </Text>
+  </View>
 </View>
 `;
