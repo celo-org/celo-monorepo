@@ -32,7 +32,7 @@ class BuildPage extends React.PureComponent<I18nProps> {
         <Cover />
         <FullStack />
         <Features />
-        <ConnectionFooter />
+        <ConnectionFooter includeDividerLine={false} />
       </View>
     )
   }

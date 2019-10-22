@@ -55,7 +55,11 @@ export default withNamespaces('dev')(
                 />
               </Cell>
             </GridRow>
-            <GridRow mobileStyle={styles.featuresMobile}>
+            <GridRow
+              desktopStyle={standardStyles.sectionMarginBottom}
+              tabletStyle={standardStyles.sectionMarginBottomTablet}
+              mobileStyle={[standardStyles.sectionMarginBottomMobile, styles.featuresMobile]}
+            >
               <Cell span={Spans.fourth} mobileSpan={Spans.half}>
                 <Feature
                   title={t('feat.selfCustody')}
