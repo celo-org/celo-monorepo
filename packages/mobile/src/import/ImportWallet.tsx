@@ -88,52 +88,50 @@ export class ImportWallet extends React.Component<Props, State> {
 
     return (
       <SafeAreaView style={styles.container}>
-        <>
-          <KeyboardAwareScrollView
-            contentContainerStyle={styles.scrollContainer}
-            keyboardShouldPersistTaps="always"
-          >
-            <Image source={backupIcon} style={styles.logo} />
-            <Text style={fontStyles.h1}>{t('title')}</Text>
-            <Text style={fontStyles.body}>{t('userYourBackupKey')}</Text>
-            <BackupPhraseContainer
-              onChangeText={this.setBackupPhrase}
-              value={backupPhrase}
-              testID="ImportWalletBackupKeyInputField"
-              mode={BackupPhraseContainerMode.INPUT}
-              type={BackupPhraseType.BACKUP_KEY}
-              style={componentStyles.marginTop20}
-            />
-            <Text style={styles.tip}>
-              <Text style={fontStyles.semiBold}>{t('tip')}</Text>
-              {t('backupKeyTip')}
-            </Text>
-          </KeyboardAwareScrollView>
-
-          {isImportingWallet && (
-            <View style={styles.loadingSpinnerContainer} testID="ImportWalletLoadingCircle">
-              <ActivityIndicator size="large" color={colors.celoGreen} />
-            </View>
-          )}
-
-          <GethAwareButton
-            disabled={isImportingWallet || !isValidBackupPhrase(backupPhrase)}
-            onPress={this.onPressRestore}
-            text={t('restoreWallet')}
-            standard={false}
-            type={BtnTypes.PRIMARY}
-            testID="ImportWalletButton"
+        <KeyboardAwareScrollView
+          contentContainerStyle={styles.scrollContainer}
+          keyboardShouldPersistTaps="always"
+        >
+          <Image source={backupIcon} style={styles.logo} />
+          <Text style={fontStyles.h1}>{t('title')}</Text>
+          <Text style={fontStyles.body}>{t('userYourBackupKey')}</Text>
+          <BackupPhraseContainer
+            onChangeText={this.setBackupPhrase}
+            value={backupPhrase}
+            testID="ImportWalletBackupKeyInputField"
+            mode={BackupPhraseContainerMode.INPUT}
+            type={BackupPhraseType.BACKUP_KEY}
+            style={componentStyles.marginTop20}
           />
+          <Text style={styles.tip}>
+            <Text style={fontStyles.semiBold}>{t('tip')}</Text>
+            {t('backupKeyTip')}
+          </Text>
+        </KeyboardAwareScrollView>
 
-          <Button
-            disabled={isImportingWallet}
-            onPress={this.onPressRestoreSocial}
-            text={t('restoreSocial')}
-            standard={false}
-            type={BtnTypes.SECONDARY}
-            testID="ImportWalletSocialButton"
-          />
-        </>
+        {isImportingWallet && (
+          <View style={styles.loadingSpinnerContainer} testID="ImportWalletLoadingCircle">
+            <ActivityIndicator size="large" color={colors.celoGreen} />
+          </View>
+        )}
+
+        <GethAwareButton
+          disabled={isImportingWallet || !isValidBackupPhrase(backupPhrase)}
+          onPress={this.onPressRestore}
+          text={t('restoreWallet')}
+          standard={false}
+          type={BtnTypes.PRIMARY}
+          testID="ImportWalletButton"
+        />
+
+        <Button
+          disabled={isImportingWallet}
+          onPress={this.onPressRestoreSocial}
+          text={t('restoreSocial')}
+          standard={false}
+          type={BtnTypes.SECONDARY}
+          testID="ImportWalletSocialButton"
+        />
         <KeyboardSpacer />
       </SafeAreaView>
     )
