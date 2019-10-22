@@ -691,6 +691,22 @@ contract Governance is IGovernance, Ownable, Initializable, ReentrancyGuard, Usi
   }
 
   /**
+   * @notice Returns whether or not a particular account is voting on proposals.
+   * @param account The address of the account.
+   * @return Whether or not the account is voting on proposals.
+   */
+  function isVoting(address account) external view returns (bool) {
+    Voter storage voter = voters[account];
+    uint256 upvotedProposal = voter.upvote.proposalId;
+    bool isVotingQueue = upvotedProposal != 0 && isQueued(upvotedProposal);
+    Proposals.Proposal storage proposal = proposals[voter.mostRecentReferendumProposal];
+    bool isVotingReferendum = (
+      proposal.getDequeuedStage(stageDurations) == Proposals.Stage.Referendum
+    );
+    return isVotingQueue || isVotingReferendum;
+  }
+
+  /**
    * @notice Returns the number of seconds proposals stay in the approval stage.
    * @return The number of seconds proposals stay in the execution stage.
    */

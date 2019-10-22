@@ -207,8 +207,14 @@ contract LockedGold is ILockedGold, ReentrancyGuard, Initializable, UsingRegistr
   function unlock(uint256 value) external nonReentrant {
     require(isAccount(msg.sender));
     Account storage account = accounts[msg.sender];
+    // Prevent unlocking gold when voting on governance proposals so that the gold cannot be
+    // used to vote more than once.
+    require(!getGovernance().isVoting(msg.sender));
     uint256 balanceRequirement = getValidators().getAccountLockedGoldRequirement(msg.sender);
-    require(balanceRequirement == 0 || balanceRequirement <= getAccountTotalLockedGold(msg.sender).sub(value));
+    require(
+      balanceRequirement == 0 ||
+      balanceRequirement <= getAccountTotalLockedGold(msg.sender).sub(value)
+    );
     _decrementNonvotingAccountBalance(msg.sender, value);
     uint256 available = now.add(unlockingPeriod);
     account.balances.pendingWithdrawals.push(PendingWithdrawal(value, available));

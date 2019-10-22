@@ -6,6 +6,7 @@ import "./interfaces/IERC20Token.sol";
 import "./interfaces/IRegistry.sol";
 
 import "../governance/interfaces/IElection.sol";
+import "../governance/interfaces/IGovernance.sol";
 import "../governance/interfaces/ILockedGold.sol";
 import "../governance/interfaces/IValidators.sol";
 
@@ -61,6 +62,10 @@ contract UsingRegistry is Ownable {
 
   function getGoldToken() internal view returns (IERC20Token) {
     return IERC20Token(registry.getAddressForOrDie(GOLD_TOKEN_REGISTRY_ID));
+  }
+
+  function getGovernance() internal view returns (IGovernance) {
+    return IGovernance(registry.getAddressForOrDie(GOVERNANCE_REGISTRY_ID));
   }
 
   function getLockedGold() internal view returns (ILockedGold) {

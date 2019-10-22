@@ -11,11 +11,16 @@ contract MockValidators is IValidators {
   mapping(address => bool) private _isVoting;
   mapping(address => uint256) private numGroupMembers;
   mapping(address => uint256) private lockedGoldRequirements;
+  mapping(address => bool) private doesNotMeetAccountLockedGoldRequirements;
   mapping(address => address[]) private members;
   uint256 private numRegisteredValidators;
 
-  function meetsAccountLockedGoldRequirements(address) external view returns (bool) {
-    return true;
+  function setDoesNotMeetAccountLockedGoldRequirements(address account) external {
+    doesNotMeetAccountLockedGoldRequirements[account] = true;
+  }
+
+  function meetsAccountLockedGoldRequirements(address account) external view returns (bool) {
+    return !doesNotMeetAccountLockedGoldRequirements[account];
   }
 
   function isValidating(address account) external view returns (bool) {

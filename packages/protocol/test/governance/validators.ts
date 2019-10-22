@@ -11,10 +11,10 @@ import {
 } from '@celo/protocol/lib/test-utils'
 import BigNumber from 'bignumber.js'
 import {
-  MockLockedGoldContract,
-  MockLockedGoldInstance,
   MockElectionContract,
   MockElectionInstance,
+  MockLockedGoldContract,
+  MockLockedGoldInstance,
   MockStableTokenContract,
   MockStableTokenInstance,
   RegistryContract,
@@ -25,8 +25,8 @@ import {
 import { fromFixed, toFixed } from '@celo/utils/lib/fixidity'
 
 const Validators: ValidatorsTestContract = artifacts.require('ValidatorsTest')
-const MockLockedGold: MockLockedGoldContract = artifacts.require('MockLockedGold')
 const MockElection: MockElectionContract = artifacts.require('MockElection')
+const MockLockedGold: MockLockedGoldContract = artifacts.require('MockLockedGold')
 const MockStableToken: MockStableTokenContract = artifacts.require('MockStableToken')
 const Registry: RegistryContract = artifacts.require('Registry')
 
@@ -69,8 +69,8 @@ const EPOCH = 100
 contract('Validators', (accounts: string[]) => {
   let validators: ValidatorsTestInstance
   let registry: RegistryInstance
-  let mockLockedGold: MockLockedGoldInstance
   let mockElection: MockElectionInstance
+  let mockLockedGold: MockLockedGoldInstance
   const nonOwner = accounts[1]
 
   const validatorLockedGoldRequirements = {
@@ -101,11 +101,11 @@ contract('Validators', (accounts: string[]) => {
   const commission = toFixed(1 / 100)
   beforeEach(async () => {
     validators = await Validators.new()
-    mockLockedGold = await MockLockedGold.new()
-    mockElection = await MockElection.new()
     registry = await Registry.new()
-    await registry.setAddressFor(CeloContractName.LockedGold, mockLockedGold.address)
+    mockElection = await MockElection.new()
+    mockLockedGold = await MockLockedGold.new()
     await registry.setAddressFor(CeloContractName.Election, mockElection.address)
+    await registry.setAddressFor(CeloContractName.LockedGold, mockLockedGold.address)
     await validators.initialize(
       registry.address,
       groupLockedGoldRequirements.value,
@@ -1203,7 +1203,7 @@ contract('Validators', (accounts: string[]) => {
 
           describe('when it has been less than `groupLockedGoldRequirements.duration` since the validator was removed from the group', () => {
             beforeEach(async () => {
-              await timeTravel(groupLockedGoldRequirements.duration.toNumber().minus(1), web3)
+              await timeTravel(groupLockedGoldRequirements.duration.minus(1).toNumber(), web3)
             })
 
             it('should revert', async () => {

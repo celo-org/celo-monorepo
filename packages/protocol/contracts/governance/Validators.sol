@@ -230,6 +230,14 @@ contract Validators is
   }
 
   /**
+   * @notice Returns the maximum number of members a group can add.
+   * @return The maximum number of members a group can add.
+   */
+  function getMaxGroupSize() external view returns (uint256) {
+    return maxGroupSize;
+  }
+
+  /**
    * @notice Updates the Locked Gold requirements for Validator Groups.
    * @param value The per-member amount of Locked Gold required.
    * @param duration The time (in seconds) that these requirements persist for.
@@ -651,30 +659,6 @@ contract Validators is
   }
 
   /**
-   * @notice Returns the Locked Gold requirements for validators.
-   * @return The Locked Gold requirements for validators.
-   */
-  function getValidatorLockedGoldRequirements() external view returns (uint256, uint256) {
-    return (validatorLockedGoldRequirements.value, validatorLockedGoldRequirements.duration);
-  }
-
-  /**
-   * @notice Returns the Locked Gold requirements for validator groups.
-   * @return The Locked Gold requirements for validator groups.
-   */
-  function getGroupLockedGoldRequirements() external view returns (uint256, uint256) {
-    return (groupLockedGoldRequirements.value, groupLockedGoldRequirements.duration);
-  }
-
-  /**
-   * @notice Returns the maximum number of members a group can add.
-   * @return The maximum number of members a group can add.
-   */
-  function getMaxGroupSize() external view returns (uint256) {
-    return maxGroupSize;
-  }
-
-  /**
    * @notice Returns the locked gold balance requirement for the supplied account.
    * @param account The account that may have to meet locked gold balance requirements.
    * @return The locked gold balance requirement for the supplied account.
@@ -817,6 +801,22 @@ contract Validators is
   }
 
   /**
+   * @notice Returns the Locked Gold requirements for validators.
+   * @return The Locked Gold requirements for validators.
+   */
+  function getValidatorLockedGoldRequirements() external view returns (uint256, uint256) {
+    return (validatorLockedGoldRequirements.value, validatorLockedGoldRequirements.duration);
+  }
+
+  /**
+   * @notice Returns the Locked Gold requirements for validator groups.
+   * @return The Locked Gold requirements for validator groups.
+   */
+  function getGroupLockedGoldRequirements() external view returns (uint256, uint256) {
+    return (groupLockedGoldRequirements.value, groupLockedGoldRequirements.duration);
+  }
+
+  /**
    * @notice Returns the list of registered validator accounts.
    * @return The list of registered validator accounts.
    */
@@ -833,18 +833,18 @@ contract Validators is
   }
 
   /**
-   * @notice Returns whether a particular account has a validator group.
+   * @notice Returns whether a particular account has a registered validator group.
    * @param account The account.
-   * @return Whether a particular address is a validator group.
+   * @return Whether a particular address is a registered validator group.
    */
   function isValidatorGroup(address account) public view returns (bool) {
     return bytes(groups[account].name).length > 0;
   }
 
   /**
-   * @notice Returns whether a particular account has a validator.
+   * @notice Returns whether a particular account has a registered validator.
    * @param account The account.
-   * @return Whether a particular address is a validator.
+   * @return Whether a particular address is a registered validator.
    */
   function isValidator(address account) public view returns (bool) {
     return bytes(validators[account].name).length > 0;

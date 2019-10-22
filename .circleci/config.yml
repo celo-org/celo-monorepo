@@ -596,7 +596,7 @@ jobs:
           command: |
             set -e
             cd packages/celotool
-            ./ci_test_sync_with_network.sh checkout asaj/pos-2
+            ./ci_test_attestations.sh checkout asaj/pos-2
 
   web:
     working_directory: ~/app

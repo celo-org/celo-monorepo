@@ -15,6 +15,8 @@ import {
   MockElectionInstance,
   MockGoldTokenContract,
   MockGoldTokenInstance,
+  MockGovernanceContract,
+  MockGovernanceInstance,
   MockValidatorsContract,
   MockValidatorsInstance,
   RegistryContract,
@@ -24,6 +26,7 @@ import {
 const LockedGold: LockedGoldContract = artifacts.require('LockedGold')
 const MockElection: MockElectionContract = artifacts.require('MockElection')
 const MockGoldToken: MockGoldTokenContract = artifacts.require('MockGoldToken')
+const MockGovernance: MockGovernanceContract = artifacts.require('MockGovernance')
 const MockValidators: MockValidatorsContract = artifacts.require('MockValidators')
 const Registry: RegistryContract = artifacts.require('Registry')
 
@@ -41,6 +44,7 @@ contract('LockedGold', (accounts: string[]) => {
   const unlockingPeriod = 3 * DAY
   let lockedGold: LockedGoldInstance
   let mockElection: MockElectionInstance
+  let mockGovernance: MockGovernanceInstance
   let mockValidators: MockValidatorsInstance
   let registry: RegistryInstance
 
@@ -53,9 +57,11 @@ contract('LockedGold', (accounts: string[]) => {
     lockedGold = await LockedGold.new()
     mockElection = await MockElection.new()
     mockValidators = await MockValidators.new()
+    mockGovernance = await MockGovernance.new()
     registry = await Registry.new()
-    await registry.setAddressFor(CeloContractName.GoldToken, mockGoldToken.address)
     await registry.setAddressFor(CeloContractName.Election, mockElection.address)
+    await registry.setAddressFor(CeloContractName.GoldToken, mockGoldToken.address)
+    await registry.setAddressFor(CeloContractName.Governance, mockGovernance.address)
     await registry.setAddressFor(CeloContractName.Validators, mockValidators.address)
     await lockedGold.initialize(registry.address, unlockingPeriod)
     await lockedGold.createAccount()
@@ -326,43 +332,57 @@ contract('LockedGold', (accounts: string[]) => {
       beforeEach(async () => {
         // @ts-ignore: TODO(mcortesi) fix typings for TransactionDetails
         await lockedGold.lock({ value })
-        resp = await lockedGold.unlock(value)
-        availabilityTime = new BigNumber(unlockingPeriod).plus(
-          (await web3.eth.getBlock('latest')).timestamp
-        )
+      })
+      describe('when the account is not voting in governance', () => {
+        beforeEach(async () => {
+          resp = await lockedGold.unlock(value)
+          availabilityTime = new BigNumber(unlockingPeriod).plus(
+            (await web3.eth.getBlock('latest')).timestamp
+          )
+        })
+
+        it('should add a pending withdrawal', async () => {
+          const [values, timestamps] = await lockedGold.getPendingWithdrawals(account)
+          assert.equal(values.length, 1)
+          assert.equal(timestamps.length, 1)
+          assertEqualBN(values[0], value)
+          assertEqualBN(timestamps[0], availabilityTime)
+        })
+
+        it("should decrease the account's nonvoting locked gold balance", async () => {
+          assertEqualBN(await lockedGold.getAccountNonvotingLockedGold(account), 0)
+        })
+
+        it("should decrease the account's total locked gold balance", async () => {
+          assertEqualBN(await lockedGold.getAccountTotalLockedGold(account), 0)
+        })
+
+        it('should decrease the nonvoting locked gold balance', async () => {
+          assertEqualBN(await lockedGold.getNonvotingLockedGold(), 0)
+        })
+
+        it('should decrease the total locked gold balance', async () => {
+          assertEqualBN(await lockedGold.getTotalLockedGold(), 0)
+        })
+
+        it('should emit a GoldUnlocked event', async () => {
+          assert.equal(resp.logs.length, 1)
+          const log = resp.logs[0]
+          assertLogMatches(log, 'GoldUnlocked', {
+            account,
+            value: new BigNumber(value),
+            available: availabilityTime,
+          })
+        })
       })
 
-      it('should add a pending withdrawal', async () => {
-        const [values, timestamps] = await lockedGold.getPendingWithdrawals(account)
-        assert.equal(values.length, 1)
-        assert.equal(timestamps.length, 1)
-        assertEqualBN(values[0], value)
-        assertEqualBN(timestamps[0], availabilityTime)
-      })
+      describe('when the account is voting in governance', () => {
+        beforeEach(async () => {
+          await mockGovernance.setVoting(account)
+        })
 
-      it("should decrease the account's nonvoting locked gold balance", async () => {
-        assertEqualBN(await lockedGold.getAccountNonvotingLockedGold(account), 0)
-      })
-
-      it("should decrease the account's total locked gold balance", async () => {
-        assertEqualBN(await lockedGold.getAccountTotalLockedGold(account), 0)
-      })
-
-      it('should decrease the nonvoting locked gold balance', async () => {
-        assertEqualBN(await lockedGold.getNonvotingLockedGold(), 0)
-      })
-
-      it('should decrease the total locked gold balance', async () => {
-        assertEqualBN(await lockedGold.getTotalLockedGold(), 0)
-      })
-
-      it('should emit a GoldUnlocked event', async () => {
-        assert.equal(resp.logs.length, 1)
-        const log = resp.logs[0]
-        assertLogMatches(log, 'GoldUnlocked', {
-          account,
-          value: new BigNumber(value),
-          available: availabilityTime,
+        it('should revert', async () => {
+          await assertRevert(lockedGold.unlock(value))
         })
       })
     })

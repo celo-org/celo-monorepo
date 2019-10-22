@@ -906,7 +906,6 @@ contract('Election', (accounts: string[]) => {
     const voteValue1 = new BigNumber(2000000)
     const voteValue2 = new BigNumber(1000000)
     const totalRewardValue = new BigNumber(3000000)
-    const lockedGoldRequirement = new BigNumber(1000000)
     beforeEach(async () => {
       await registry.setAddressFor(CeloContractName.Validators, accounts[0])
       await election.markGroupEligible(group1, NULL_ADDRESS, NULL_ADDRESS)
@@ -919,8 +918,6 @@ contract('Election', (accounts: string[]) => {
       await mockLockedGold.incrementNonvotingAccountBalance(voter, voteValue1.plus(voteValue2))
       await election.vote(group1, voteValue1, group2, NULL_ADDRESS)
       await election.vote(group2, voteValue2, NULL_ADDRESS, group1)
-      await mockValidators.setAccountLockedGoldRequirement(group1, lockedGoldRequirement)
-      await mockValidators.setAccountLockedGoldRequirement(group2, lockedGoldRequirement)
     })
 
     describe('when one group has active votes', () => {
@@ -930,10 +927,6 @@ contract('Election', (accounts: string[]) => {
       })
 
       describe('when the group meets the locked gold requirements ', () => {
-        beforeEach(async () => {
-          await mockLockedGold.setAccountTotalLockedGold(group1, lockedGoldRequirement)
-        })
-
         it('should return the total reward value', async () => {
           assertEqualBN(
             await election.getGroupEpochRewards(group1, totalRewardValue),
@@ -944,7 +937,7 @@ contract('Election', (accounts: string[]) => {
 
       describe('when the group does not meet the locked gold requirements ', () => {
         beforeEach(async () => {
-          await mockLockedGold.setAccountTotalLockedGold(group1, lockedGoldRequirement.minus(1))
+          await mockValidators.setDoesNotMeetAccountLockedGoldRequirements(group1)
         })
 
         it('should return zero', async () => {
@@ -954,7 +947,6 @@ contract('Election', (accounts: string[]) => {
     })
 
     describe('when two groups have active votes', () => {
-      const lockedGoldRequirement = new BigNumber(1000000)
       const expectedGroup1EpochRewards = voteValue1
         .div(voteValue1.plus(voteValue2))
         .times(totalRewardValue)
@@ -965,30 +957,26 @@ contract('Election', (accounts: string[]) => {
         await election.activate(group2)
       })
 
-      describe('when one group meets the locked gold requirements ', () => {
+      describe('when one group does not meet the locked gold requirements ', () => {
         beforeEach(async () => {
-          await mockLockedGold.setAccountTotalLockedGold(group1, lockedGoldRequirement)
+          await mockValidators.setDoesNotMeetAccountLockedGoldRequirements(group2)
         })
 
-        it('should return the proportional reward value for that group', async () => {
+        it('should return zero for that group', async () => {
+          assertEqualBN(await election.getGroupEpochRewards(group2, totalRewardValue), 0)
+        })
+
+        it('should return the proportional reward value for the other group', async () => {
           assertEqualBN(
             await election.getGroupEpochRewards(group1, totalRewardValue),
             expectedGroup1EpochRewards
           )
-        })
-
-        it('should return zero for the other group', async () => {
-          assertEqualBN(await election.getGroupEpochRewards(group2, totalRewardValue), 0)
         })
       })
     })
 
     describe('when the group does not have active votes', () => {
       describe('when the group meets the locked gold requirements ', () => {
-        beforeEach(async () => {
-          await mockLockedGold.setAccountTotalLockedGold(group1, lockedGoldRequirement)
-        })
-
         it('should return zero', async () => {
           assertEqualBN(await election.getGroupEpochRewards(group1, totalRewardValue), 0)
         })
