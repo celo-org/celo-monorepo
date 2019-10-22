@@ -163,7 +163,7 @@ export function* watchLanguage() {
   yield takeEvery(AppActions.SET_LANGUAGE, syncLanguageSelection)
 }
 
-function* watchWritePaymentRequest() {
+export function* watchWritePaymentRequest() {
   yield takeEvery(Actions.PAYMENT_REQUEST_WRITE, writePaymentRequest)
 }
 

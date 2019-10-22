@@ -15,7 +15,9 @@ import Logger from 'src/utils/Logger'
 
 const TAG = 'Firebase'
 
-export function* watchFirebaseNotificationChannel(channel: EventChannel<Notification>) {
+export function* watchFirebaseNotificationChannel(
+  channel: EventChannel<{ notification: Notification }>
+) {
   Logger.info(`${TAG}/watchFirebaseNotificationChannel`, 'Started channel watching')
   while (true) {
     const { data } = yield take(channel)
@@ -72,19 +74,21 @@ export function* initializeCloudMessaging(app: Firebase, address: string) {
 
   // TODO type here
   // TODO test if this channel actually works
-  const channelOnNotification: any = eventChannel((emitter) => {
-    app.notifications().onNotification(
-      (notification: Notification): any => {
-        Logger.info(TAG, 'Notification received while open')
-        emitter({ notification })
-        // expected side effect:
-        // yield handleNotification(notification, NotificationReceiveState.APP_ALREADY_OPEN)
-      }
-    )
+  const channelOnNotification: EventChannel<{ notification: Notification }> = eventChannel(
+    (emitter) => {
+      app.notifications().onNotification(
+        (notification: Notification): any => {
+          Logger.info(TAG, 'Notification received while open')
+          emitter({ notification })
+          // expected side effect:
+          // yield handleNotification(notification, NotificationReceiveState.APP_ALREADY_OPEN)
+        }
+      )
 
-    // Return an unsubscribe method
-    return () => null
-  })
+      // Return an unsubscribe method
+      return () => null
+    }
+  )
 
   spawn(watchFirebaseNotificationChannel, channelOnNotification)
 
