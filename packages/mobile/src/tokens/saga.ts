@@ -17,10 +17,12 @@ import * as utf8 from 'utf8'
 
 const TAG = 'tokens/saga'
 
+// The number of wei that represent one unit in a contract
 const contractWeiPerUnit: { [key in CURRENCY_ENUM]: BigNumber | null } = {
   [CURRENCY_ENUM.GOLD]: null,
   [CURRENCY_ENUM.DOLLAR]: null,
 }
+
 async function convertFromContractDecimals(value: BigNumber, token: CURRENCY_ENUM) {
   let weiPerUnit = contractWeiPerUnit[token]
   if (!weiPerUnit) {
