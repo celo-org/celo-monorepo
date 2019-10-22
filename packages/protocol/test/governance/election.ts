@@ -8,16 +8,16 @@ import {
 import { toFixed } from '@celo/utils/lib/fixidity'
 import BigNumber from 'bignumber.js'
 import {
-  MockLockedGoldContract,
-  MockLockedGoldInstance,
-  MockValidatorsContract,
-  MockValidatorsInstance,
-  MockRandomContract,
-  MockRandomInstance,
-  RegistryContract,
-  RegistryInstance,
   ElectionContract,
   ElectionInstance,
+  MockLockedGoldContract,
+  MockLockedGoldInstance,
+  MockRandomContract,
+  MockRandomInstance,
+  MockValidatorsContract,
+  MockValidatorsInstance,
+  RegistryContract,
+  RegistryInstance,
 } from 'types'
 
 const Election: ElectionContract = artifacts.require('Election')
@@ -715,6 +715,10 @@ contract('Election', (accounts: string[]) => {
   })
 
   describe('#electValidators', () => {
+    const setRandomnessForElection = async (hash: string) => {
+      return random.addTestRandomness((await web3.eth.getBlockNumber()) + 1, hash)
+    }
+
     let random: MockRandomInstance
     let totalLockedGold: number
     const group1 = accounts[0]
@@ -761,12 +765,12 @@ contract('Election', (accounts: string[]) => {
 
       random = await MockRandom.new()
       await registry.setAddressFor(CeloContractName.Random, random.address)
-      await random.setRandom(hash1)
     })
 
     describe('when a single group has >= minElectableValidators as members and received votes', () => {
       beforeEach(async () => {
         await election.vote(group1, voter1.weight, group2, NULL_ADDRESS, { from: voter1.address })
+        await setRandomnessForElection(hash1)
       })
 
       it("should return that group's member list", async () => {
@@ -784,6 +788,7 @@ contract('Election', (accounts: string[]) => {
         await election.vote(group1, voter1.weight, group2, NULL_ADDRESS, { from: voter1.address })
         await election.vote(group2, voter2.weight, NULL_ADDRESS, group1, { from: voter2.address })
         await election.vote(group3, voter3.weight, NULL_ADDRESS, group2, { from: voter3.address })
+        await setRandomnessForElection(hash1)
       })
 
       it('should return maxElectableValidators elected validators', async () => {
@@ -806,9 +811,9 @@ contract('Election', (accounts: string[]) => {
       })
 
       it('should return different results', async () => {
-        await random.setRandom(hash1)
+        await setRandomnessForElection(hash1)
         const valsWithHash1 = (await election.electValidators()).map((x) => x.toLowerCase())
-        await random.setRandom(hash2)
+        await setRandomnessForElection(hash2)
         const valsWithHash2 = (await election.electValidators()).map((x) => x.toLowerCase())
         assert.sameMembers(valsWithHash1, valsWithHash2)
         assert.notDeepEqual(valsWithHash1, valsWithHash2)
@@ -825,6 +830,7 @@ contract('Election', (accounts: string[]) => {
         await election.vote(group3, votes, group2, NULL_ADDRESS, { from: voter3.address })
         await election.vote(group1, voter1.weight, NULL_ADDRESS, group3, { from: voter1.address })
         await election.vote(group2, voter2.weight, NULL_ADDRESS, group1, { from: voter2.address })
+        await setRandomnessForElection(hash1)
       })
 
       it('should elect only n members from that group', async () => {
@@ -843,6 +849,7 @@ contract('Election', (accounts: string[]) => {
       beforeEach(async () => {
         await election.vote(group2, voter2.weight, group1, NULL_ADDRESS, { from: voter2.address })
         await election.vote(group3, voter3.weight, NULL_ADDRESS, group2, { from: voter3.address })
+        await setRandomnessForElection(hash1)
       })
 
       it('should revert', async () => {
