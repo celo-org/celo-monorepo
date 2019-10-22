@@ -165,7 +165,6 @@ export const v3Schema = {
   },
   imports: {
     isImportingWallet: false,
-    isWalletEmpty: false,
   },
 }
 

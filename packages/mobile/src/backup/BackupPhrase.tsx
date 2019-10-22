@@ -11,7 +11,10 @@ import CeloAnalytics from 'src/analytics/CeloAnalytics'
 import { CustomEventNames } from 'src/analytics/constants'
 import componentWithAnalytics from 'src/analytics/wrapper'
 import { ErrorMessages } from 'src/app/ErrorMessages'
-import BackupPhraseContainer from 'src/backup/BackupPhraseContainer'
+import BackupPhraseContainer, {
+  BackupPhraseContainerMode,
+  BackupPhraseType,
+} from 'src/backup/BackupPhraseContainer'
 import { getStoredMnemonic } from 'src/backup/utils'
 import { Namespaces } from 'src/i18n'
 import { headerWithBackButton } from 'src/navigator/Headers'
@@ -99,7 +102,12 @@ class BackupPhrase extends React.Component<Props, State> {
           <View>
             <Text style={fontStyles.h1}>{t('yourBackupKey')}</Text>
             <Text style={styles.body}>{t('backupKeySummary')}</Text>
-            <BackupPhraseContainer words={mnemonic} showCopy={true} />
+            <BackupPhraseContainer
+              value={mnemonic}
+              showCopy={true}
+              mode={BackupPhraseContainerMode.READONLY}
+              type={BackupPhraseType.BACKUP_KEY}
+            />
             <Text style={styles.tipText}>
               <Text style={[styles.tipText, fontStyles.bold]}>{t('global:warning')}</Text>
               {t('securityTip')}

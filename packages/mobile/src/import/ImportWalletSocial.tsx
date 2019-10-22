@@ -1,4 +1,4 @@
-import Button, { BtnTypes } from '@celo/react-components/components/Button'
+import { BtnTypes } from '@celo/react-components/components/Button'
 import KeyboardAwareScrollView from '@celo/react-components/components/KeyboardAwareScrollView'
 import KeyboardSpacer from '@celo/react-components/components/KeyboardSpacer'
 import colors from '@celo/react-components/styles/colors'
@@ -19,19 +19,19 @@ import BackupPhraseContainer, {
 import {
   formatBackupPhraseOnEdit,
   formatBackupPhraseOnSubmit,
-  isValidBackupPhrase,
+  isValidSocialBackupPhrase,
+  joinMnemonic,
 } from 'src/backup/utils'
 import GethAwareButton from 'src/geth/GethAwareButton'
 import { Namespaces } from 'src/i18n'
 import { backupIcon } from 'src/images/Images'
 import { importBackupPhrase } from 'src/import/actions'
 import { nuxNavigationOptions } from 'src/navigator/Headers'
-import { navigate } from 'src/navigator/NavigationService'
-import { Screens } from 'src/navigator/Screens'
 import { RootState } from 'src/redux/reducers'
 
 interface State {
-  backupPhrase: string
+  phrase1: string
+  phrase2: string
 }
 
 interface DispatchProps {
@@ -51,39 +51,48 @@ const mapStateToProps = (state: RootState): StateProps => {
   }
 }
 
-export class ImportWallet extends React.Component<Props, State> {
+export class ImportWalletSocial extends React.Component<Props, State> {
   static navigationOptions = nuxNavigationOptions
 
-  state = {
-    backupPhrase: '',
+  state: State = {
+    phrase1: '',
+    phrase2: '',
   }
 
-  setBackupPhrase = (input: string) => {
+  setBackupPhrase = (phraseNum: number) => (input: string) => {
     this.props.hideAlert()
-    this.setState({
-      backupPhrase: formatBackupPhraseOnEdit(input),
-    })
+    const formattedInput = formatBackupPhraseOnEdit(input)
+    if (phraseNum === 1) {
+      this.setState({
+        phrase1: formattedInput,
+      })
+    } else {
+      this.setState({
+        phrase2: formattedInput,
+      })
+    }
   }
 
   onPressRestore = () => {
+    const { phrase1, phrase2 } = this.state
     Keyboard.dismiss()
     this.props.hideAlert()
     CeloAnalytics.track(CustomEventNames.import_wallet_submit)
 
-    const formattedPhrase = formatBackupPhraseOnSubmit(this.state.backupPhrase)
+    const formattedPhrase1 = formatBackupPhraseOnSubmit(phrase1)
+    const formattedPhrase2 = formatBackupPhraseOnSubmit(phrase2)
+
     this.setState({
-      backupPhrase: formattedPhrase,
+      phrase1: formattedPhrase1,
+      phrase2: formattedPhrase2,
     })
 
-    this.props.importBackupPhrase(formattedPhrase, false)
-  }
-
-  onPressRestoreSocial = () => {
-    navigate(Screens.ImportWalletSocial)
+    const fullPhrase = joinMnemonic([formattedPhrase1, formattedPhrase2])
+    this.props.importBackupPhrase(fullPhrase, false)
   }
 
   render() {
-    const { backupPhrase } = this.state
+    const { phrase1, phrase2 } = this.state
     const { t, isImportingWallet } = this.props
 
     return (
@@ -93,19 +102,29 @@ export class ImportWallet extends React.Component<Props, State> {
           keyboardShouldPersistTaps="always"
         >
           <Image source={backupIcon} style={styles.logo} />
-          <Text style={fontStyles.h1}>{t('title')}</Text>
-          <Text style={fontStyles.body}>{t('userYourBackupKey')}</Text>
+          <Text style={fontStyles.h1}>{t('restoreSocial')}</Text>
+          <Text style={fontStyles.body}>{t('socialImportInfo')}</Text>
           <BackupPhraseContainer
-            onChangeText={this.setBackupPhrase}
-            value={backupPhrase}
-            testID="ImportWalletBackupKeyInputField"
+            onChangeText={this.setBackupPhrase(1)}
+            value={phrase1}
+            testID="SocialBackupKeyInputField1"
             mode={BackupPhraseContainerMode.INPUT}
-            type={BackupPhraseType.BACKUP_KEY}
+            type={BackupPhraseType.SOCIAL_BACKUP}
+            index={1}
+            style={componentStyles.marginTop20}
+          />
+          <BackupPhraseContainer
+            onChangeText={this.setBackupPhrase(2)}
+            value={phrase2}
+            testID="SocialBackupKeyInputField2"
+            mode={BackupPhraseContainerMode.INPUT}
+            type={BackupPhraseType.SOCIAL_BACKUP}
+            index={2}
             style={componentStyles.marginTop20}
           />
           <Text style={styles.tip}>
             <Text style={fontStyles.semiBold}>{t('tip')}</Text>
-            {t('backupKeyTip')}
+            {t('socialTip')}
           </Text>
         </KeyboardAwareScrollView>
 
@@ -116,20 +135,15 @@ export class ImportWallet extends React.Component<Props, State> {
         )}
 
         <GethAwareButton
-          disabled={isImportingWallet || !isValidBackupPhrase(backupPhrase)}
+          disabled={
+            isImportingWallet ||
+            !isValidSocialBackupPhrase(phrase1) ||
+            !isValidSocialBackupPhrase(phrase2)
+          }
           onPress={this.onPressRestore}
           text={t('restoreWallet')}
           standard={false}
           type={BtnTypes.PRIMARY}
-          testID="ImportWalletButton"
-        />
-
-        <Button
-          disabled={isImportingWallet}
-          onPress={this.onPressRestoreSocial}
-          text={t('restoreSocial')}
-          standard={false}
-          type={BtnTypes.SECONDARY}
           testID="ImportWalletSocialButton"
         />
         <KeyboardSpacer />
@@ -170,4 +184,4 @@ export default connect<StateProps, DispatchProps, {}, RootState>(
     importBackupPhrase,
     hideAlert,
   }
-)(withNamespaces(Namespaces.nuxRestoreWallet3)(ImportWallet))
+)(withNamespaces(Namespaces.nuxRestoreWallet3)(ImportWalletSocial))

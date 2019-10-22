@@ -40,10 +40,10 @@ export class SortedOraclesWrapper extends BaseWrapper<SortedOracles> {
    * @param token The CeloToken token for which the Celo Gold exchange rate is being reported.
    * @return The number of reported oracle rates for `token`.
    */
-  async numRates(token: CeloToken): Promise<BigNumber> {
+  async numRates(token: CeloToken): Promise<number> {
     const tokenAddress = await this.kit.registry.addressFor(token)
     const response = await this.contract.methods.numRates(tokenAddress).call()
-    return toBigNumber(response)
+    return toBigNumber(response).toNumber()
   }
 
   /**

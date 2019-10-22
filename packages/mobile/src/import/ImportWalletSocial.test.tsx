@@ -3,19 +3,21 @@ import * as React from 'react'
 import 'react-native'
 import { fireEvent, render } from 'react-native-testing-library'
 import { Provider } from 'react-redux'
-import ImportWallet, { ImportWallet as ImportWalletClass } from 'src/import/ImportWallet'
+import ImportWalletSocial, {
+  ImportWalletSocial as ImportWalletSocialClass,
+} from 'src/import/ImportWalletSocial'
 import { createMockStore, getMockI18nProps } from 'test/utils'
-import { mockMnemonic } from 'test/values'
+import { mockMnemonic, mockMnemonicShard1, mockMnemonicShard2 } from 'test/values'
 
 jest.mock('src/geth/GethAwareButton', () => {
   return Button
 })
 
-describe('ImportWallet', () => {
+describe('ImportWalletSocial', () => {
   it('renders correctly and is disabled with no text', () => {
     const wrapper = render(
       <Provider store={createMockStore()}>
-        <ImportWallet />
+        <ImportWalletSocial />
       </Provider>
     )
 
@@ -28,7 +30,7 @@ describe('ImportWallet', () => {
 
     const wrapper = render(
       <Provider store={createMockStore()}>
-        <ImportWalletClass
+        <ImportWalletSocialClass
           importBackupPhrase={importFn}
           hideAlert={jest.fn()}
           isImportingWallet={false}
@@ -37,8 +39,9 @@ describe('ImportWallet', () => {
       </Provider>
     )
 
-    fireEvent.changeText(wrapper.getByTestId('ImportWalletBackupKeyInputField'), mockMnemonic)
-    fireEvent.press(wrapper.getByTestId('ImportWalletButton'))
+    fireEvent.changeText(wrapper.getByTestId('SocialBackupKeyInputField1'), mockMnemonicShard1)
+    fireEvent.changeText(wrapper.getByTestId('SocialBackupKeyInputField2'), mockMnemonicShard2)
+    fireEvent.press(wrapper.getByTestId('ImportWalletSocialButton'))
     expect(importFn).toHaveBeenCalledWith(mockMnemonic, false)
   })
 })
