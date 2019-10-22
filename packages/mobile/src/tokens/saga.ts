@@ -34,7 +34,7 @@ async function getWeiPerUnit(token: CURRENCY_ENUM) {
   return weiPerUnit
 }
 
-async function convertFromContractDecimals(value: BigNumber, token: CURRENCY_ENUM) {
+export async function convertFromContractDecimals(value: BigNumber, token: CURRENCY_ENUM) {
   const weiPerUnit = await getWeiPerUnit(token)
   return value.dividedBy(weiPerUnit)
 }

@@ -1,10 +1,11 @@
 import { CURRENCY_ENUM } from '@celo/utils/src/currencies'
-import { getErc20Balance, getStableTokenContract } from '@celo/walletkit'
+import { getTokenContract } from '@celo/walletkit'
 import { expectSaga } from 'redux-saga-test-plan'
 import { call } from 'redux-saga/effects'
 import { waitWeb3LastBlock } from 'src/networkInfo/saga'
 import { fetchDollarBalance, setBalance, transferStableToken } from 'src/stableToken/actions'
 import { stableTokenFetch, stableTokenTransfer } from 'src/stableToken/saga'
+import { convertFromContractDecimals } from 'src/tokens/saga'
 import { addStandbyTransaction, removeStandbyTransaction } from 'src/transactions/actions'
 import { TransactionStatus, TransactionTypes } from 'src/transactions/reducer'
 import { createMockContract, createMockStore } from 'test/utils'
@@ -43,14 +44,14 @@ const TRANSFER_ACTION = transferStableToken({
 describe('stableToken saga', () => {
   jest.useRealTimers()
 
-  it('should fetch the balance and put the new balance', async () => {
+  it('should fetch the balance, convert to correct decimals and put the new balance', async () => {
     await expectSaga(stableTokenFetch)
       .provide([[call(waitWeb3LastBlock), true]])
       .withState(state)
       .dispatch(fetchDollarBalance())
       .put(setBalance(BALANCE))
       .run()
-    expect(getErc20Balance).toHaveBeenCalled()
+    expect(convertFromContractDecimals).toHaveBeenCalled()
   })
 
   it('should add a standby transaction and dispatch a sendAndMonitorTransaction', async () => {
@@ -100,7 +101,7 @@ describe('stableToken saga', () => {
       .withState(state)
       .dispatch(TRANSFER_ACTION)
       .run()
-    expect(getStableTokenContract).toHaveBeenCalled()
+    expect(getTokenContract).toHaveBeenCalled()
   })
 
   it('should remove standby transaction when pin unlock fails', async () => {

@@ -8,13 +8,12 @@ import { Exchange as ExchangeType } from '@celo/walletkit/types/Exchange'
 import { GoldToken as GoldTokenType } from '@celo/walletkit/types/GoldToken'
 import { StableToken as StableTokenType } from '@celo/walletkit/types/StableToken'
 import BigNumber from 'bignumber.js'
-import { call, put, select, spawn, takeEvery, takeLatest } from 'redux-saga/effects'
+import { all, call, put, select, spawn, takeEvery, takeLatest } from 'redux-saga/effects'
 import { showError } from 'src/alert/actions'
 import { ErrorMessages } from 'src/app/ErrorMessages'
 import { Actions, ExchangeTokensAction, setExchangeRate } from 'src/exchange/actions'
-import { ExchangeRatePair } from 'src/exchange/reducer'
+import { ExchangeRatePair, exchangeRatePairSelector } from 'src/exchange/reducer'
 import { CURRENCY_ENUM } from 'src/geth/consts'
-import { RootState } from 'src/redux/reducers'
 import { convertToContractDecimals } from 'src/tokens/saga'
 import {
   addStandbyTransaction,
@@ -53,14 +52,10 @@ export function* doFetchExchangeRate(makerAmount?: BigNumber, makerToken?: CURRE
     yield call(getConnectedAccount)
     const exchange = yield call([contractKit.contracts, contractKit.contracts.getExchange])
 
-    const dollarMakerExchangeRate: BigNumber = yield call(
-      [exchange, exchange.getUsdExchangeRate],
-      dollarMakerAmount
-    )
-    const goldMakerExchangeRate: BigNumber = yield call(
-      [exchange, exchange.getGoldExchangeRate],
-      goldMakerAmount
-    )
+    const [dollarMakerExchangeRate, goldMakerExchangeRate]: [BigNumber, BigNumber] = yield all([
+      call([exchange, exchange.getUsdExchangeRate], dollarMakerAmount),
+      call([exchange, exchange.getGoldExchangeRate], goldMakerAmount),
+    ])
 
     if (!dollarMakerExchangeRate || !goldMakerExchangeRate) {
       Logger.error(TAG, 'Invalid exchange rate')
@@ -93,9 +88,7 @@ export function* exchangeGoldAndStableTokens(action: ExchangeTokensAction) {
   let txId: string | null = null
   try {
     const account: string = yield call(getConnectedUnlockedAccount)
-    const exchangeRatePair: ExchangeRatePair = yield select(
-      (state: RootState) => state.exchange.exchangeRatePair
-    )
+    const exchangeRatePair: ExchangeRatePair = yield select(exchangeRatePairSelector)
     const exchangeRate = getRateForMakerToken(exchangeRatePair, makerToken)
     if (!exchangeRate) {
       Logger.error(TAG, 'Invalid exchange rate from exchange contract')
