@@ -15,6 +15,7 @@ import { Actions, ExchangeTokensAction, setExchangeRate } from 'src/exchange/act
 import { ExchangeRatePair } from 'src/exchange/reducer'
 import { CURRENCY_ENUM } from 'src/geth/consts'
 import { RootState } from 'src/redux/reducers'
+import { convertToContractDecimals } from 'src/tokens/saga'
 import {
   addStandbyTransaction,
   generateStandbyTransactionId,
@@ -111,13 +112,10 @@ export function* exchangeGoldAndStableTokens(action: ExchangeTokensAction) {
     const stableTokenContract: StableTokenType = yield call(getStableTokenContract, web3)
     const exchangeContract: ExchangeType = yield call(getExchangeContract, web3)
 
-    const makerTokenContract =
-      makerToken === CURRENCY_ENUM.DOLLAR ? stableTokenContract : goldTokenContract
-
     const convertedMakerAmount: BigNumber = yield call(
       convertToContractDecimals,
       makerAmount,
-      makerTokenContract
+      makerToken
     )
     const sellGold = makerToken === CURRENCY_ENUM.GOLD
 
@@ -156,10 +154,10 @@ export function* exchangeGoldAndStableTokens(action: ExchangeTokensAction) {
       return
     }
 
-    const takerTokenContract =
-      makerToken === CURRENCY_ENUM.DOLLAR ? goldTokenContract : stableTokenContract
+    const takerToken =
+      makerToken === CURRENCY_ENUM.DOLLAR ? CURRENCY_ENUM.GOLD : CURRENCY_ENUM.DOLLAR
     const convertedTakerAmount: BigNumber = roundDown(
-      yield call(convertToContractDecimals, minimumTakerAmount, takerTokenContract),
+      yield call(convertToContractDecimals, minimumTakerAmount, takerToken),
       0
     )
     Logger.debug(
@@ -232,13 +230,6 @@ function* createStandbyTx(
     })
   )
   return txId
-}
-
-async function convertToContractDecimals(value: BigNumber | string | number, contract: any) {
-  // TODO(Rossy): Move this function to SDK and cache this decimals amount
-  const decimals = await contract.methods.decimals().call()
-  const one = new BigNumber(10).pow(new BigNumber(decimals).toNumber())
-  return one.times(value)
 }
 
 export function* watchFetchExchangeRate() {

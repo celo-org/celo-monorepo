@@ -23,7 +23,7 @@ const contractWeiPerUnit: { [key in CURRENCY_ENUM]: BigNumber | null } = {
   [CURRENCY_ENUM.DOLLAR]: null,
 }
 
-async function convertFromContractDecimals(value: BigNumber, token: CURRENCY_ENUM) {
+async function getWeiPerUnit(token: CURRENCY_ENUM) {
   let weiPerUnit = contractWeiPerUnit[token]
   if (!weiPerUnit) {
     const contract = await getTokenContract(token)
@@ -31,7 +31,17 @@ async function convertFromContractDecimals(value: BigNumber, token: CURRENCY_ENU
     weiPerUnit = new BigNumber(10).pow(decimals)
     contractWeiPerUnit[token] = weiPerUnit
   }
+  return weiPerUnit
+}
+
+async function convertFromContractDecimals(value: BigNumber, token: CURRENCY_ENUM) {
+  const weiPerUnit = await getWeiPerUnit(token)
   return value.dividedBy(weiPerUnit)
+}
+
+export async function convertToContractDecimals(value: BigNumber, token: CURRENCY_ENUM) {
+  const weiPerUnit = await getWeiPerUnit(token)
+  return value.times(weiPerUnit)
 }
 
 export async function getTokenContract(token: CURRENCY_ENUM) {
