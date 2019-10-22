@@ -69,7 +69,8 @@ export class ValidatorsWrapper extends BaseWrapper<Validators> {
 
       return toTransactionObject(
         this.kit,
-        this.contract.methods.addFirstMember(member, lesser, greater)
+        this.contract.methods.addFirstMember(member, lesser, greater),
+        { from: group }
       )
     } else {
       return toTransactionObject(this.kit, this.contract.methods.addMember(member), { from: group })

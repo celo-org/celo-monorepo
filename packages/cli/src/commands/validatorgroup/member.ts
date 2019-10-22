@@ -10,6 +10,7 @@ export default class ValidatorGroupMembers extends BaseCommand {
   static flags = {
     ...BaseCommand.flags,
     from: Flags.address({ required: true, description: "ValidatorGroup's address" }),
+    group: Flags.address({ required: false, description: "ValidatorGroup's address" }),
     accept: flags.boolean({
       exclusive: ['remove', 'reorder'],
       description: 'Accept a validator whose affiliation is already set to the group',
