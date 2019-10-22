@@ -1,5 +1,5 @@
 import { retryAsync } from '@celo/utils/src/async'
-import { getErc20Balance, getGoldTokenContract, getStableTokenContract } from '@celo/walletkit'
+import { getGoldTokenContract, getStableTokenContract } from '@celo/walletkit'
 import BigNumber from 'bignumber.js'
 import { call, put, take, takeEvery } from 'redux-saga/effects'
 import { showError } from 'src/alert/actions'
@@ -11,7 +11,7 @@ import { addStandbyTransaction, removeStandbyTransaction } from 'src/transaction
 import { TransactionStatus, TransactionTypes } from 'src/transactions/reducer'
 import { sendAndMonitorTransaction } from 'src/transactions/saga'
 import Logger from 'src/utils/Logger'
-import { web3 } from 'src/web3/contracts'
+import { contractKit, web3 } from 'src/web3/contracts'
 import { getConnectedAccount, getConnectedUnlockedAccount } from 'src/web3/saga'
 import * as utf8 from 'utf8'
 
@@ -19,23 +19,46 @@ const TAG = 'tokens/saga'
 
 interface TokenFetchFactory {
   actionName: string
-  contractGetter: (web3: any) => any
+  token: CURRENCY_ENUM
   actionCreator: (balance: string) => any
   tag: string
 }
 
-export function tokenFetchFactory({
-  actionName,
-  contractGetter,
-  actionCreator,
-  tag,
-}: TokenFetchFactory) {
+export async function getTokenContract(token: CURRENCY_ENUM) {
+  Logger.debug(TAG + '@getTokenContract', `Fetching contract for ${token}`)
+  await getConnectedAccount()
+  let tokenContract: any
+  switch (token) {
+    case CURRENCY_ENUM.GOLD:
+      tokenContract = await contractKit.contracts.getGoldToken()
+      break
+    case CURRENCY_ENUM.DOLLAR:
+      tokenContract = await contractKit.contracts.getStableToken()
+      break
+    default:
+      throw new Error(`Could not fetch contract for unknown token ${token}`)
+  }
+  return tokenContract
+}
+
+async function convertFromContractDecimals(value: BigNumber, contract: any) {
+  const decimals = await contract.decimals()
+  const weiPerUnit = new BigNumber(10).pow(decimals)
+  return value.dividedBy(weiPerUnit)
+}
+
+export function tokenFetchFactory({ actionName, token, actionCreator, tag }: TokenFetchFactory) {
   function* tokenFetch() {
     try {
       Logger.debug(tag, 'Fetching balance')
       const account = yield call(getConnectedAccount)
-      const tokenContract = yield call(contractGetter, web3)
-      const balance = yield call(getErc20Balance, tokenContract, account, web3)
+      const tokenContract = yield call(getTokenContract, token)
+      const balanceInWei: BigNumber = yield call([tokenContract, tokenContract.balanceOf], account)
+      const balance: BigNumber = yield call(
+        convertFromContractDecimals,
+        balanceInWei,
+        tokenContract
+      )
       CeloAnalytics.track(CustomEventNames.fetch_balance)
       yield put(actionCreator(balance.toString()))
     } catch (error) {
@@ -94,16 +117,14 @@ export async function createTransaction(
   return tx
 }
 
-export async function fetchTokenBalanceWithRetry(
-  contractGetter: typeof getStableTokenContract | typeof getGoldTokenContract,
-  account: string
-) {
+export async function fetchTokenBalanceWithRetry(token: CURRENCY_ENUM, account: string) {
   Logger.debug(TAG + '@fetchTokenBalanceWithRetry', 'Checking account balance', account)
-  const tokenContract = await contractGetter(web3)
+  const tokenContract = await getTokenContract(token)
   // Retry needed here because it's typically the app's first tx and seems to fail on occasion
-  const tokenBalance = await retryAsync(tokenContract.methods.balanceOf(account).call, 3, [])
-  Logger.debug(TAG + '@fetchTokenBalanceWithRetry', 'Account balance', tokenBalance)
-  return new BigNumber(tokenBalance)
+  const balanceInWei = await retryAsync(tokenContract.balanceOf, 3, [account])
+  const balance = await convertFromContractDecimals(balanceInWei, tokenContract)
+  Logger.debug(TAG + '@fetchTokenBalanceWithRetry', 'Account balance', balance.toString())
+  return balance
 }
 
 export function tokenTransferFactory({

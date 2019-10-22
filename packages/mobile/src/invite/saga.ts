@@ -220,7 +220,7 @@ export function* doRedeemInvite(inviteCode: string) {
     Logger.debug(`TAG@doRedeemInvite`, 'Invite code contains temp account', tempAccount)
     const tempAccountBalanceWei: BigNumber = yield call(
       fetchTokenBalanceWithRetry,
-      getStableTokenContract,
+      CURRENCY_ENUM.DOLLAR,
       tempAccount
     )
     if (tempAccountBalanceWei.isLessThanOrEqualTo(0)) {

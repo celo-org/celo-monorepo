@@ -1,4 +1,3 @@
-import { newKitFromWeb3 } from '@celo/contractkit'
 import {
   ContractUtils,
   getExchangeContract,
@@ -27,7 +26,7 @@ import { sendTransaction } from 'src/transactions/send'
 import { getRateForMakerToken, getTakerAmount } from 'src/utils/currencyExchange'
 import { roundDown } from 'src/utils/formatting'
 import Logger from 'src/utils/Logger'
-import { web3 } from 'src/web3/contracts'
+import { contractKit, web3 } from 'src/web3/contracts'
 import { getConnectedAccount, getConnectedUnlockedAccount } from 'src/web3/saga'
 import * as util from 'util'
 
@@ -41,7 +40,7 @@ export function* doFetchExchangeRate(makerAmount?: BigNumber, makerToken?: CURRE
   Logger.debug(TAG, 'Calling @doFetchExchangeRate')
 
   // If makerAmount and makerToken are given, use them to estimate the exchange rate,
-  // as exchange rate depends on amount sold. Else default to present large sell amount.
+  // as exchange rate depends on amount sold. Else default to preset large sell amount.
   const goldMakerAmount =
     makerAmount && makerToken === CURRENCY_ENUM.GOLD ? makerAmount : LARGE_GOLD_SELL_AMOUNT_IN_WEI
   const dollarMakerAmount =
@@ -51,8 +50,6 @@ export function* doFetchExchangeRate(makerAmount?: BigNumber, makerToken?: CURRE
 
   try {
     yield call(getConnectedAccount)
-
-    const contractKit = newKitFromWeb3(web3)
     const exchange = yield call([contractKit.contracts, contractKit.contracts.getExchange])
 
     const dollarMakerExchangeRate: BigNumber = yield call(
