@@ -116,7 +116,7 @@ const linkedLibraries = {
   AddressSortedLinkedList: ['Election'],
   IntegerSortedLinkedList: ['Governance', 'IntegerSortedLinkedListTest'],
   AddressSortedLinkedListWithMedian: ['SortedOracles', 'AddressSortedLinkedListWithMedianTest'],
-  Signatures: ['Attestations', 'LockedGold', 'Escrow'],
+  Signatures: ['TestAttestations', 'Attestations', 'LockedGold', 'Escrow'],
 }
 
 const argv = minimist(process.argv.slice(2), {
