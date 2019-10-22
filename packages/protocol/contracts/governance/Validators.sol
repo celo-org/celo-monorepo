@@ -314,6 +314,118 @@ contract Validators is
   }
 
   /**
+   * @notice Returns the parameters that goven how a validator's score is calculated.
+   * @return The parameters that goven how a validator's score is calculated.
+   */
+  function getValidatorScoreParameters() external view returns (uint256, uint256) {
+    return (validatorScoreParameters.exponent, validatorScoreParameters.adjustmentSpeed.unwrap());
+  }
+
+  /**
+   * @notice Returns the group membership history of a validator.
+   * @param account The validator whose membership history to return.
+   * @return The group membership history of a validator.
+   */
+  function getMembershipHistory(
+    address account
+  )
+    external
+    view
+    returns (uint256[] memory, address[] memory, uint256)
+  {
+    MembershipHistory storage history = validators[account].membershipHistory;
+    uint256[] memory epochs = new uint256[](history.numEntries);
+    address[] memory membershipGroups = new address[](history.numEntries);
+    for (uint256 i = 0; i < history.numEntries; i = i.add(1)) {
+      uint256 index = history.tail.add(i);
+      epochs[i] = history.entries[index].epochNumber;
+      membershipGroups[i] = history.entries[index].group;
+    }
+    return (epochs, membershipGroups, history.lastRemovedFromGroupTimestamp);
+  }
+
+  /**
+   * @notice Updates a validator's score based on its uptime for the epoch.
+   * @param validator The address of the validator.
+   * @param uptime The Fixidity representation of the validator's uptime, between 0 and 1.
+   * @return True upon success.
+   */
+  function updateValidatorScore(address validator, uint256 uptime) external onlyVm() {
+    _updateValidatorScore(validator, uptime);
+  }
+
+  /**
+   * @notice Updates a validator's score based on its uptime for the epoch.
+   * @param validator The address of the validator.
+   * @param uptime The Fixidity representation of the validator's uptime, between 0 and 1.
+   * @dev new_score = uptime ** exponent * adjustmentSpeed + old_score * (1 - adjustmentSpeed)
+   * @return True upon success.
+   */
+  function _updateValidatorScore(address validator, uint256 uptime) internal {
+    address account = getLockedGold().getAccountFromValidator(validator);
+    require(isValidator(account));
+    require(uptime <= FixidityLib.fixed1().unwrap());
+
+    uint256 numerator;
+    uint256 denominator;
+    (numerator, denominator) = fractionMulExp(
+      FixidityLib.fixed1().unwrap(),
+      FixidityLib.fixed1().unwrap(),
+      uptime,
+      FixidityLib.fixed1().unwrap(),
+      validatorScoreParameters.exponent,
+      18
+    );
+
+    FixidityLib.Fraction memory epochScore = FixidityLib.wrap(numerator).divide(
+      FixidityLib.wrap(denominator)
+    );
+    FixidityLib.Fraction memory newComponent = validatorScoreParameters.adjustmentSpeed.multiply(
+      epochScore
+    );
+
+    FixidityLib.Fraction memory currentComponent = FixidityLib.fixed1().subtract(
+      validatorScoreParameters.adjustmentSpeed
+    );
+    currentComponent = currentComponent.multiply(validators[account].score);
+    validators[account].score = FixidityLib.wrap(
+      Math.min(
+        epochScore.unwrap(),
+        newComponent.add(currentComponent).unwrap()
+      )
+    );
+  }
+
+  /**
+   * @notice Distributes epoch payments to `validator` and its group.
+   */
+  function distributeEpochPayment(address validator) external onlyVm() {
+    _distributeEpochPayment(validator);
+  }
+
+  /**
+   * @notice Distributes epoch payments to `validator` and its group.
+   */
+  function _distributeEpochPayment(address validator) internal {
+    address account = getLockedGold().getAccountFromValidator(validator);
+    require(isValidator(account));
+    // The group that should be paid is the group that the validator was a member of at the
+    // time it was elected.
+    address group = getMembershipInLastEpoch(account);
+    // Both the validator and the group must maintain the minimum locked gold balance in order to
+    // receive epoch payments.
+    if (meetsAccountLockedGoldRequirements(account) && meetsAccountLockedGoldRequirements(group)) {
+      FixidityLib.Fraction memory totalPayment = FixidityLib.newFixed(
+        validatorEpochPayment
+      ).multiply(validators[account].score);
+      uint256 groupPayment = totalPayment.multiply(groups[group].commission).fromFixed();
+      uint256 validatorPayment = totalPayment.fromFixed().sub(groupPayment);
+      getStableToken().mint(group, groupPayment);
+      getStableToken().mint(account, validatorPayment);
+    }
+  }
+
+  /**
    * @notice De-registers a validator.
    * @param index The index of this validator in the list of all registered validators.
    * @return True upon success.
@@ -327,12 +439,12 @@ contract Validators is
     // `validatorLockedGoldRequirements.duration` seconds.
     Validator storage validator = validators[account];
     if (validator.affiliation != address(0)) {
-      require(!groups[validator.affiliation].members.contains(account), 'two');
+      require(!groups[validator.affiliation].members.contains(account));
     }
     uint256 requirementEndTime = validator.membershipHistory.lastRemovedFromGroupTimestamp.add(
       validatorLockedGoldRequirements.duration
     );
-    require(requirementEndTime < now, 'one');
+    require(requirementEndTime < now);
 
     // Remove the validator.
     deleteElement(registeredValidators, account, index);
@@ -350,7 +462,8 @@ contract Validators is
   function affiliate(address group) external nonReentrant returns (bool) {
     address account = getLockedGold().getAccountFromActiveValidator(msg.sender);
     require(isValidator(account) && isValidatorGroup(group));
-    require(meetsAccountLockedGoldRequirements(account) && meetsAccountLockedGoldRequirements(group), "three");
+    require(meetsAccountLockedGoldRequirements(account));
+    require(meetsAccountLockedGoldRequirements(group));
     Validator storage validator = validators[account];
     if (validator.affiliation != address(0)) {
       _deaffiliate(validator, account);
@@ -485,7 +598,8 @@ contract Validators is
     require(_group.members.numElements < maxGroupSize, "group would exceed maximum size");
     require(validators[validator].affiliation == group && !_group.members.contains(validator));
     uint256 numMembers = _group.members.numElements.add(1);
-    require(meetsAccountLockedGoldRequirements(group) && meetsAccountLockedGoldRequirements(validator));
+    require(meetsAccountLockedGoldRequirements(group));
+    require(meetsAccountLockedGoldRequirements(validator));
     _group.members.push(validator);
     if (numMembers == 1) {
       getElection().markGroupEligible(group, lesser, greater);
@@ -537,95 +651,6 @@ contract Validators is
   }
 
   /**
-   * @notice Updates a validator's score based on its uptime for the epoch.
-   * @param validator The address of the validator.
-   * @param uptime The Fixidity representation of the validator's uptime, between 0 and 1.
-   * @return True upon success.
-   */
-  function updateValidatorScore(address validator, uint256 uptime) external onlyVm() {
-    _updateValidatorScore(validator, uptime);
-  }
-
-  /**
-   * @notice Updates a validator's score based on its uptime for the epoch.
-   * @param validator The address of the validator.
-   * @param uptime The Fixidity representation of the validator's uptime, between 0 and 1.
-   * @dev new_score = uptime ** exponent * adjustmentSpeed + old_score * (1 - adjustmentSpeed)
-   * @return True upon success.
-   */
-  function _updateValidatorScore(address validator, uint256 uptime) internal {
-    address account = getLockedGold().getAccountFromValidator(validator);
-    require(isValidator(account), "isvalidator");
-    require(uptime <= FixidityLib.fixed1().unwrap(), "uptime");
-
-    uint256 numerator;
-    uint256 denominator;
-    (numerator, denominator) = fractionMulExp(
-      FixidityLib.fixed1().unwrap(),
-      FixidityLib.fixed1().unwrap(),
-      uptime,
-      FixidityLib.fixed1().unwrap(),
-      validatorScoreParameters.exponent,
-      18
-    );
-
-    FixidityLib.Fraction memory epochScore = FixidityLib.wrap(numerator).divide(
-      FixidityLib.wrap(denominator)
-    );
-    FixidityLib.Fraction memory newComponent = validatorScoreParameters.adjustmentSpeed.multiply(
-      epochScore
-    );
-
-    FixidityLib.Fraction memory currentComponent = FixidityLib.fixed1().subtract(
-      validatorScoreParameters.adjustmentSpeed
-    );
-    currentComponent = currentComponent.multiply(validators[account].score);
-    validators[account].score = FixidityLib.wrap(
-      Math.min(
-        epochScore.unwrap(),
-        newComponent.add(currentComponent).unwrap()
-      )
-    );
-  }
-
-  /**
-   * @notice Distributes epoch payments to `validator` and its group.
-   */
-  function distributeEpochPayment(address validator) external onlyVm() {
-    _distributeEpochPayment(validator);
-  }
-
-  /**
-   * @notice Distributes epoch payments to `validator` and its group.
-   */
-  function _distributeEpochPayment(address validator) internal {
-    address account = getLockedGold().getAccountFromValidator(validator);
-    require(isValidator(account));
-    // The group that should be paid is the group that the validator was a member of at the
-    // time it was elected.
-    address group = getMembershipInLastEpoch(account);
-    // Both the validator and the group must maintain the minimum locked gold balance in order to
-    // receive epoch payments.
-    if (meetsAccountLockedGoldRequirements(account) && meetsAccountLockedGoldRequirements(group)) {
-      FixidityLib.Fraction memory totalPayment = FixidityLib.newFixed(
-        validatorEpochPayment
-      ).multiply(validators[account].score);
-      uint256 groupPayment = totalPayment.multiply(groups[group].commission).fromFixed();
-      uint256 validatorPayment = totalPayment.fromFixed().sub(groupPayment);
-      getStableToken().mint(group, groupPayment);
-      getStableToken().mint(account, validatorPayment);
-    }
-  }
-
-  /**
-   * @notice Returns the parameters that goven how a validator's score is calculated.
-   * @return The parameters that goven how a validator's score is calculated.
-   */
-  function getValidatorScoreParameters() external view returns (uint256, uint256) {
-    return (validatorScoreParameters.exponent, validatorScoreParameters.adjustmentSpeed.unwrap());
-  }
-
-  /**
    * @notice Returns the Locked Gold requirements for validators.
    * @return The Locked Gold requirements for validators.
    */
@@ -647,29 +672,6 @@ contract Validators is
    */
   function getMaxGroupSize() external view returns (uint256) {
     return maxGroupSize;
-  }
-
-  /**
-   * @notice Returns the group membership history of a validator.
-   * @param account The validator whose membership history to return.
-   * @return The group membership history of a validator.
-   */
-  function getMembershipHistory(
-    address account
-  )
-    external
-    view
-    returns (uint256[] memory, address[] memory, uint256)
-  {
-    MembershipHistory storage history = validators[account].membershipHistory;
-    uint256[] memory epochs = new uint256[](history.numEntries);
-    address[] memory membershipGroups = new address[](history.numEntries);
-    for (uint256 i = 0; i < history.numEntries; i = i.add(1)) {
-      uint256 index = history.tail.add(i);
-      epochs[i] = history.entries[index].epochNumber;
-      membershipGroups[i] = history.entries[index].group;
-    }
-    return (epochs, membershipGroups, history.lastRemovedFromGroupTimestamp);
   }
 
   /**

@@ -484,6 +484,8 @@ contract Election is
     view
     returns (uint256)
   {
+    // The group must meet the balance requirements in order for their voters to receive epoch
+    // rewards.
     if (getValidators().meetsAccountLockedGoldRequirements(group) && votes.active.total > 0) {
       return totalEpochRewards.mul(votes.active.forGroup[group].total).div(votes.active.total);
     } else {

@@ -1201,9 +1201,9 @@ contract('Validators', (accounts: string[]) => {
             })
           })
 
-          describe('when it has been `groupLockedGoldRequirements.duration` since the validator was removed from the group', () => {
+          describe('when it has been less than `groupLockedGoldRequirements.duration` since the validator was removed from the group', () => {
             beforeEach(async () => {
-              await timeTravel(groupLockedGoldRequirements.duration.toNumber(), web3)
+              await timeTravel(groupLockedGoldRequirements.duration.toNumber().minus(1), web3)
             })
 
             it('should revert', async () => {
