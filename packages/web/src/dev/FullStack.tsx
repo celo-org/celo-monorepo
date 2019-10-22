@@ -100,7 +100,6 @@ class FullStack extends React.PureComponent<I18nProps & ScreenProps, State> {
     }
   }
 
-  // TODO repace scroll listening with intersection observer api
   componentDidMount() {
     window.addEventListener('scroll', this.handleScroll)
   }
