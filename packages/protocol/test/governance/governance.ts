@@ -1107,6 +1107,7 @@ contract('Governance', (accounts: string[]) => {
         await governance.propose(
           [transactionSuccess1.value],
           [transactionSuccess1.destination],
+          // @ts-ignore
           transactionSuccess1.data,
           [transactionSuccess1.data.length],
           // @ts-ignore: TODO(mcortesi) fix typings for TransactionDetails
@@ -1719,6 +1720,7 @@ contract('Governance', (accounts: string[]) => {
           await governance.propose(
             [transactionSuccess1.value],
             [accounts[1]],
+            // @ts-ignore
             transactionSuccess1.data,
             [transactionSuccess1.data.length],
             // @ts-ignore: TODO(mcortesi) fix typings for TransactionDetails

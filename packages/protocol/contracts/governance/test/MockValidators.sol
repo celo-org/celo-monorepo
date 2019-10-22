@@ -89,7 +89,7 @@ contract MockValidators is IValidators {
     return validators;
   }
 
-  function getByzantineQuorumForCurrentSet() external view returns (uint256) {
+  function getRegisteredValidatorsByzantineQuorum() external view returns (uint256) {
     return quorum;
   }
 
