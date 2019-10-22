@@ -1,5 +1,3 @@
-jest.useFakeTimers()
-
 import Button from '@celo/react-components/components/Button'
 import * as React from 'react'
 import 'react-native'
@@ -19,6 +17,14 @@ jest.mock('src/identity/verification', () => {
 })
 
 describe('InviteReview', () => {
+  beforeAll(() => {
+    jest.useFakeTimers()
+  })
+
+  afterAll(() => {
+    jest.useRealTimers()
+  })
+
   it('renders correctly', () => {
     const tree = renderer.create(
       <Provider store={createMockStore()}>

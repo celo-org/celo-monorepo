@@ -3,8 +3,7 @@
 
 version: 2
 reference:
-  workspace: &workspace
-    ~/src
+  workspace: &workspace ~/src
   ## Configurations
   android_config: &android_config
     working_directory: *workspace
@@ -14,7 +13,6 @@ reference:
     environment:
       TERM: dumb
       JVM_OPTS: -Xmx3200m
-
 
 defaults: &defaults
   working_directory: ~/app
@@ -31,6 +29,11 @@ android-defaults: &android-defaults
   environment:
     _JAVA_OPTIONS: "-XX:+UnlockExperimentalVMOptions -XX:+UseCGroupMemoryLimitForHeap"
     GRADLE_OPTS: '-Dorg.gradle.daemon=false -Dorg.gradle.jvmargs="-Xmx1024m -XX:+HeapDumpOnOutOfMemoryError"'
+
+e2e-defaults: &e2e-defaults
+  <<: *defaults
+  docker:
+    - image: celohq/circleci
 
 general:
   artifacts:
@@ -117,7 +120,7 @@ jobs:
           paths:
             - .
 
-  mobile_e2e_test:
+  end-to-end-mobile-test:
     <<: *android_config
     resource_class: large
     steps:
@@ -141,6 +144,7 @@ jobs:
             echo 'export ANDROID_SDK_ROOT="/usr/local/share/android-sdk"' >> $BASH_ENV
             echo 'export QEMU_AUDIO_DRV=none' >> $BASH_ENV
             export PATH=$PATH:/usr/local/share/android-sdk/platform-tools/
+            export GRADLE_OPTS='-Dorg.gradle.daemon=true -Dorg.gradle.parallel=true -Dorg.gradle.jvmargs="-Xmx4096m -XX:+HeapDumpOnOutOfMemoryError"'
       - run:
           name: Install Android sdk
           command: |
@@ -160,7 +164,7 @@ jobs:
             HOMEBREW_NO_AUTO_UPDATE=1 brew cask install android-platform-tools
             HOMEBREW_NO_AUTO_UPDATE=1 brew tap homebrew/cask-versions
             HOMEBREW_NO_AUTO_UPDATE=1 brew cask install homebrew/cask-versions/adoptopenjdk8
-      - run: 
+      - run:
           name: Creace Android Virtual Device (AVD)
           command: |
             avdmanager create avd -n Nexus_5X_API_28_x86 -k "system-images;android-26;google_apis;x86" -g google_apis -d "Nexus 5"
@@ -181,7 +185,7 @@ jobs:
           name: install miscellaneous
           command: HOMEBREW_NO_AUTO_UPDATE=1 brew install tree
       # Currently not used
-      # - run: npm install --global react-native-kill-packager 
+      # - run: npm install --global react-native-kill-packager
       - run:
           # need to run this because it's another OS than install_dependecies job
           name: yarn
@@ -195,7 +199,7 @@ jobs:
             #   yarn postinstall
             # fi
             yarn
-            yarn build 
+            yarn build
       - save_cache:
           key: yarn-v4-macos-{{ .Branch }}-{{ checksum "yarn.lock" }}
           paths:
@@ -207,18 +211,19 @@ jobs:
           command: HOMEBREW_NO_AUTO_UPDATE=1 brew install pidcat watchman
       - restore_cache:
           key: yarn-v3-{{ arch }}-{{ .Branch }}-{{ checksum "packages/mobile/android/build.gradle" }}-{{ checksum "packages/mobile/android/settings.gradle" }}-{{ checksum "packages/mobile/android/app/build.gradle" }}-{{ checksum "packages/mobile/.env.test" }}
-      - run: cd ~/src/packages/mobile && yarn test:build-e2e # tests seem to fail if the app is built at the same time the emulator runs
       - run:
           name: Start emulator
           command: cd ~/src/packages/mobile && bash ./scripts/start_emulator.sh
           background: true
-      - run: 
+      - run:
           name: Start metro
           command: cd ~/src/packages/mobile && yarn start
           background: true
       - run: cp node_modules/.bin/jest packages/mobile/node_modules/.bin/ # for some reason jest is just not there
       # TODO - run: lock device
-      - run: tree packages/mobile/android/app/build/outputs/apk/
+      - run:
+          name: Build end-to-end test
+          command: cd ~/src/packages/mobile && yarn test:build-e2e
       - run:
           name: Sleep until Device connects
           command: cd ~/src/packages/mobile && bash ./scripts/wait_for_emulator_to_connect.sh
@@ -235,13 +240,13 @@ jobs:
           paths:
             - ~/src/packages/mobile/android/app/build/outputs/apk/
             - ~/.gradle/
-  
+
   lint-checks:
     <<: *defaults
     steps:
       - attach_workspace:
           at: ~/app
-      # If this fails, fix it with 
+      # If this fails, fix it with
       # `./node_modules/.bin/prettier --config .prettierrc.js --write '**/*.+(ts|tsx|js|jsx)'`
       - run: yarn run prettify:diff
       - run: yarn run lint
@@ -267,6 +272,10 @@ jobs:
       - attach_workspace:
           at: ~/app
 
+      - run:
+          name: Set GRADLE_OPTS to speed up gradle
+          command: |
+            export GRADLE_OPTS='-Dorg.gradle.daemon=true -Dorg.gradle.parallel=true -Dorg.gradle.jvmargs="-Xmx4096m -XX:+HeapDumpOnOutOfMemoryError"'
       - run:
           name: Build Android app (debug version)
           command: |
@@ -454,7 +463,7 @@ jobs:
     steps:
       - attach_workspace:
           at: ~/app
-   
+
       - run:
           name: Install and test the npm package
           command: |
@@ -469,7 +478,7 @@ jobs:
     steps:
       - attach_workspace:
           at: ~/app
-   
+
       - run:
           name: Install and test the npm package
           command: |
@@ -480,7 +489,7 @@ jobs:
             npm install ~/app/packages/utils/*.tgz
 
   end-to-end-geth-transfer-test:
-    <<: *defaults
+    <<: *e2e-defaults
     steps:
       - attach_workspace:
           at: ~/app
@@ -490,36 +499,15 @@ jobs:
             FILES_TO_CHECK="${PWD}/packages/celotool,${PWD}/packages/protocol,${PWD}/.circleci/config.yml"
             ./scripts/ci_check_if_test_should_run_v2.sh ${FILES_TO_CHECK}
       - run:
-          name: Setup Go language
-          command: |
-            set -e
-            set -v
-            wget https://dl.google.com/go/go1.11.5.linux-amd64.tar.gz
-            tar xf go1.11.5.linux-amd64.tar.gz -C /tmp
-            ls /tmp/go/bin/go
-            /tmp/go/bin/go version
-      - run:
-          name: Setup Rust language
-          command: |
-            set -e
-            set -v
-            curl https://sh.rustup.rs -sSf | sh -s -- -y
-            export PATH=${PATH}:~/.cargo/bin:/tmp/go/bin
-            rustup install 1.36.0
-            rustup default 1.36.0
-      - run:
           name: Run test
           no_output_timeout: 20m
           command: |
             set -e
-            export PATH=${PATH}:~/.cargo/bin:/tmp/go/bin
-            go version
             cd packages/celotool
-            mkdir ~/.ssh/ && echo -e "Host github.com\n\tStrictHostKeyChecking no\n" > ~/.ssh/config
             ./ci_test_transfers.sh checkout master
 
   end-to-end-geth-exit-test:
-    <<: *defaults
+    <<: *e2e-defaults
     steps:
       - attach_workspace:
           at: ~/app
@@ -529,36 +517,15 @@ jobs:
             FILES_TO_CHECK="${PWD}/packages/celotool,${PWD}/packages/protocol,${PWD}/.circleci/config.yml"
             ./scripts/ci_check_if_test_should_run_v2.sh ${FILES_TO_CHECK}
       - run:
-          name: Setup Go language
-          command: |
-            set -e
-            set -v
-            wget https://dl.google.com/go/go1.11.5.linux-amd64.tar.gz
-            tar xf go1.11.5.linux-amd64.tar.gz -C /tmp
-            ls /tmp/go/bin/go
-            /tmp/go/bin/go version
-      - run:
-          name: Setup Rust language
-          command: |
-            set -e
-            set -v
-            curl https://sh.rustup.rs -sSf | sh -s -- -y
-            export PATH=${PATH}:~/.cargo/bin:/tmp/go/bin
-            rustup install 1.36.0
-            rustup default 1.36.0
-      - run:
           name: Run test
           no_output_timeout: 20m
           command: |
             set -e
-            export PATH=${PATH}:~/.cargo/bin:/tmp/go/bin
-            go version
             cd packages/celotool
-            mkdir ~/.ssh/ && echo -e "Host github.com\n\tStrictHostKeyChecking no\n" > ~/.ssh/config
             ./ci_test_exit.sh checkout master
 
   end-to-end-geth-governance-test:
-    <<: *defaults
+    <<: *e2e-defaults
     # Source: https://circleci.com/docs/2.0/configuration-reference/#resource_class
     resource_class: medium+
     steps:
@@ -569,37 +536,16 @@ jobs:
           command: |
             FILES_TO_CHECK="${PWD}/packages/celotool,${PWD}/packages/protocol,${PWD}/.circleci/config.yml"
             ./scripts/ci_check_if_test_should_run_v2.sh ${FILES_TO_CHECK}
-      - run:
-          name: Setup Go language
-          command: |
-            set -e
-            set -v
-            wget https://dl.google.com/go/go1.11.5.linux-amd64.tar.gz
-            tar xf go1.11.5.linux-amd64.tar.gz -C /tmp
-            ls /tmp/go/bin/go
-            /tmp/go/bin/go version
-      - run:
-          name: Setup Rust language
-          command: |
-            set -e
-            set -v
-            curl https://sh.rustup.rs -sSf | sh -s -- -y
-            export PATH=${PATH}:~/.cargo/bin:/tmp/go/bin
-            rustup install 1.36.0
-            rustup default 1.36.0
       - run:
           name: Run test
           no_output_timeout: 20m
           command: |
             set -e
-            export PATH=${PATH}:~/.cargo/bin:/tmp/go/bin
-            go version
             cd packages/celotool
-            mkdir ~/.ssh/ && echo -e "Host github.com\n\tStrictHostKeyChecking no\n" > ~/.ssh/config
             ./ci_test_governance.sh checkout master
 
   end-to-end-geth-sync-test:
-    <<: *defaults
+    <<: *e2e-defaults
     # Source: https://circleci.com/docs/2.0/configuration-reference/#resource_class
     resource_class: medium+
     steps:
@@ -611,35 +557,14 @@ jobs:
             FILES_TO_CHECK="${PWD}/packages/celotool,${PWD}/packages/protocol,${PWD}/.circleci/config.yml"
             ./scripts/ci_check_if_test_should_run_v2.sh ${FILES_TO_CHECK}
       - run:
-          name: Setup Go language
-          command: |
-            set -e
-            set -v
-            wget https://dl.google.com/go/go1.11.5.linux-amd64.tar.gz
-            tar xf go1.11.5.linux-amd64.tar.gz -C /tmp
-            ls /tmp/go/bin/go
-            /tmp/go/bin/go version
-      - run:
-          name: Setup Rust language
-          command: |
-            set -e
-            set -v
-            curl https://sh.rustup.rs -sSf | sh -s -- -y
-            export PATH=${PATH}:~/.cargo/bin:/tmp/go/bin
-            rustup install 1.36.0
-            rustup default 1.36.0
-      - run:
           name: Run test
           command: |
             set -e
-            export PATH=${PATH}:~/.cargo/bin:/tmp/go/bin
-            go version
             cd packages/celotool
-            mkdir ~/.ssh/ && echo -e "Host github.com\n\tStrictHostKeyChecking no\n" > ~/.ssh/config
             ./ci_test_sync.sh checkout master
 
   end-to-end-geth-integration-sync-test:
-    <<: *defaults
+    <<: *e2e-defaults
     steps:
       - attach_workspace:
           at: ~/app
@@ -649,27 +574,29 @@ jobs:
             FILES_TO_CHECK="${PWD}/packages/celotool,${PWD}/packages/protocol,${PWD}/.circleci/config.yml"
             ./scripts/ci_check_if_test_should_run_v2.sh ${FILES_TO_CHECK}
       - run:
-          name: Setup Go language
+          name: Run test
           command: |
             set -e
-            set -v
-            wget https://dl.google.com/go/go1.11.5.linux-amd64.tar.gz
-            tar xf go1.11.5.linux-amd64.tar.gz -C /tmp
-            ls /tmp/go/bin/go
-            /tmp/go/bin/go version
-            curl https://sh.rustup.rs -sSf | sh -s -- -y
-            export PATH=${PATH}:~/.cargo/bin:/tmp/go/bin
-            rustup install 1.36.0
-            rustup default 1.36.0
+            cd packages/celotool
+            ./ci_test_sync_with_network.sh checkout master
+
+  end-to-end-geth-attestations-test:
+    <<: *e2e-defaults
+    resource_class: medium+
+    steps:
+      - attach_workspace:
+          at: ~/app
+      - run:
+          name: Check if the test should run
+          command: |
+            FILES_TO_CHECK="${PWD}/packages/celotool,${PWD}/packages/protocol,${PWD}/.circleci/config.yml"
+            ./scripts/ci_check_if_test_should_run_v2.sh ${FILES_TO_CHECK}
       - run:
           name: Run test
           command: |
             set -e
-            export PATH=${PATH}:~/.cargo/bin:/tmp/go/bin
-            go version
             cd packages/celotool
-            mkdir ~/.ssh/ && echo -e "Host github.com\n\tStrictHostKeyChecking no\n" > ~/.ssh/config
-            ./ci_test_sync_with_network.sh checkout master
+            ./ci_test_attestations.sh checkout master
 
   web:
     working_directory: ~/app
@@ -741,7 +668,7 @@ workflows:
   celo-monorepo-build:
     jobs:
       - install_dependencies
-      - mobile_e2e_test:
+      - end-to-end-mobile-test:
           requires:
             - install_dependencies
             - mobile-test-build-app
@@ -782,23 +709,27 @@ workflows:
       - end-to-end-geth-transfer-test:
           requires:
             - lint-checks
-            - walletkit-test
+            - contractkit-test
       - end-to-end-geth-exit-test:
           requires:
             - lint-checks
-            - walletkit-test
+            - contractkit-test
       - end-to-end-geth-governance-test:
           requires:
             - lint-checks
-            - walletkit-test
+            - contractkit-test
       - end-to-end-geth-sync-test:
           requires:
             - lint-checks
-            - walletkit-test
+            - contractkit-test
       - end-to-end-geth-integration-sync-test:
           requires:
             - lint-checks
-            - walletkit-test
+            - contractkit-test
+      - end-to-end-geth-attestations-test:
+          requires:
+            - lint-checks
+            - contractkit-test
   npm-install-testing-cron-workflow:
     triggers:
       - schedule:

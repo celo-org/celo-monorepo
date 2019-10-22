@@ -2487,6 +2487,7 @@ exports[`renders the Input step correctly 1`] = `
                 autoCorrect={false}
                 data={Array []}
                 defaultValue=""
+                flatListProps={Object {}}
                 inputContainerStyle={
                   Array [
                     Object {
@@ -2503,6 +2504,7 @@ exports[`renders the Input step correctly 1`] = `
                     },
                   ]
                 }
+                keyExtractor={[Function]}
                 keyboardShouldPersistTaps="always"
                 listContainerStyle={
                   Object {
@@ -2542,22 +2544,15 @@ exports[`renders the Input step correctly 1`] = `
                 renderItem={[Function]}
                 renderSeparator={null}
                 renderTextInput={[Function]}
-                rowHasChanged={[Function]}
                 style={
-                  Array [
-                    Object {
-                      "fontFamily": "Hind-Regular",
-                    },
-                    Object {
-                      "borderColor": "#D1D5D8",
-                      "borderRadius": 3,
-                      "padding": 8,
-                    },
-                    Object {
-                      "backgroundColor": "#FFFFFF",
-                      "flex": 1,
-                    },
-                  ]
+                  Object {
+                    "backgroundColor": "#FFFFFF",
+                    "borderColor": "#D1D5D8",
+                    "borderRadius": 3,
+                    "flex": 1,
+                    "fontFamily": "Hind-Regular",
+                    "padding": 8,
+                  }
                 }
                 testID="CountryNameField"
                 underlineColorAndroid="transparent"
@@ -2646,20 +2641,14 @@ exports[`renders the Input step correctly 1`] = `
               placeholderTextColor="#D1D5D8"
               rejectResponderTermination={true}
               style={
-                Array [
-                  Object {
-                    "fontFamily": "Hind-Regular",
-                  },
-                  Object {
-                    "borderColor": "#D1D5D8",
-                    "borderRadius": 3,
-                    "padding": 8,
-                  },
-                  Object {
-                    "backgroundColor": "#FFFFFF",
-                    "flex": 1,
-                  },
-                ]
+                Object {
+                  "backgroundColor": "#FFFFFF",
+                  "borderColor": "#D1D5D8",
+                  "borderRadius": 3,
+                  "flex": 1,
+                  "fontFamily": "Hind-Regular",
+                  "padding": 8,
+                }
               }
               testID="PhoneNumberField"
               underlineColorAndroid="transparent"

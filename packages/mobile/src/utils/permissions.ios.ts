@@ -17,11 +17,6 @@ export async function requestContactsPermission(): Promise<boolean> {
   })
 }
 
-export async function requestCameraPermission() {
-  throw new Error('Unimplemented method')
-  return false
-}
-
 export async function checkContactsPermission(): Promise<boolean> {
   return new Promise((resolve, reject) => {
     Contacts.checkPermission((err, permission) => {
@@ -32,9 +27,4 @@ export async function checkContactsPermission(): Promise<boolean> {
       }
     })
   })
-}
-
-export async function checkCameraPermission() {
-  throw new Error('Unimplemented method')
-  return false
 }

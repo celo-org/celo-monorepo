@@ -1,7 +1,7 @@
 {
   "name": "@celo/celocli",
   "description": "CLI Tool for transacting with the Celo protocol",
-  "version": "0.0.18",
+  "version": "0.0.27",
   "author": "Celo",
   "license": "Apache-2.0",
   "repository": "celo-org/celo-monorepo",
@@ -29,12 +29,11 @@
     "test": "TZ=UTC jest"
   },
   "dependencies": {
+    "@celo/contractkit": "^0.1.6",
     "@celo/utils": "^0.1.0",
-    "@celo/contractkit": "^0.1.1",
     "@oclif/command": "^1",
     "@oclif/config": "^1",
     "@oclif/plugin-help": "^2",
-    "ethereumjs-util": "^5.2.0",
     "bip32": "^1.0.2",
     "bip39": "^2.5.0",
     "chalk": "^2.4.2",
@@ -42,6 +41,7 @@
     "cli-ux": "^5.3.1",
     "debug": "^4.1.1",
     "elliptic": "^6.4.1",
+    "ethereumjs-util": "^5.2.0",
     "events": "^3.0.0",
     "firebase": "^6.2.4",
     "fs-extra": "^8.1.0",
@@ -54,11 +54,11 @@
     "@celo/dev-cli": "^2.0.3",
     "@types/bip32": "^1.0.1",
     "@types/bip39": "^2.4.2",
-    "@types/elliptic": "^6.4.9",
-    "@types/mocha": "^5.2.7",
     "@types/cli-table": "^0.3.0",
     "@types/debug": "^4.1.4",
+    "@types/elliptic": "^6.4.9",
     "@types/fs-extra": "^8.0.0",
+    "@types/mocha": "^5.2.7",
     "@types/node": "^10",
     "@types/web3": "^1.0.18",
     "globby": "^8",
@@ -80,20 +80,23 @@
       "config": {
         "description": "Configure CLI options which persist across commands"
       },
+      "election": {
+        "description": "View and manage validator elections"
+      },
       "exchange": {
         "description": "Commands for interacting with the Exchange"
       },
       "lockedgold": {
-        "description": "Manage Locked Gold to participate in governance and earn rewards"
+        "description": "View and manage locked Celo Gold"
       },
       "node": {
         "description": "Manage your full node"
       },
       "validator": {
-        "description": "View validator information and register your own"
+        "description": "View and manage validators"
       },
       "validatorgroup": {
-        "description": "View validator group information and cast votes"
+        "description": "View and manage validator groups"
       }
     },
     "bin": "celocli",

@@ -120,10 +120,9 @@ exports[`renders home 1`] = `
           "alignItems": "center",
           "alignSelf": "flex-start",
           "borderRadius": 2,
-          "minWidth": 160,
+          "flexDirection": "row",
           "paddingHorizontal": 16,
           "paddingVertical": 6,
-          "textAlign": "center",
         },
         Object {
           "backgroundColor": "#42D689",
@@ -148,10 +147,12 @@ exports[`renders home 1`] = `
           },
           Object {
             "lineHeight": 20,
+            "textAlign": "center",
           },
           Object {
             "color": "#FFFFFF",
           },
+          null,
           undefined,
         ]
       }
