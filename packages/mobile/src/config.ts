@@ -73,4 +73,6 @@ export const DEFAULT_SYNC_MODE: GethSyncMode = Config.DEFAULT_SYNC_MODE
   ? new BigNumber(Config.DEFAULT_SYNC_MODE).toNumber()
   : GethSyncMode.Ultralight
 
-export const ZERO_SYNC_INITIALLY = stringToBoolean(Config.ZERO_SYNC_INITIALLY)
+export const ZERO_SYNC_INITIALLY = Config.ZERO_SYNC_INITIALLY
+  ? stringToBoolean(Config.ZERO_SYNC_INITIALLY)
+  : false
