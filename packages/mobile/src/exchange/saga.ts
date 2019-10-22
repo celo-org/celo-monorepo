@@ -11,7 +11,7 @@ import BigNumber from 'bignumber.js'
 import { call, put, select, spawn, takeEvery, takeLatest } from 'redux-saga/effects'
 import { showError } from 'src/alert/actions'
 import { ErrorMessages } from 'src/app/ErrorMessages'
-import { Actions, ExchangeTokensAction, setExchangeRate } from 'src/exchange/actions'
+import { Actions, ExchangeTokensAction, setExchangeRate, setTobinTax } from 'src/exchange/actions'
 import { ExchangeRatePair } from 'src/exchange/reducer'
 import { CURRENCY_ENUM } from 'src/geth/consts'
 import { RootState } from 'src/redux/reducers'
@@ -36,6 +36,33 @@ const TAG = 'exchange/saga'
 const LARGE_DOLLARS_SELL_AMOUNT_IN_WEI = new BigNumber(1000 * 1000000000000000000) // To estimate exchange rate from exchange contract
 const LARGE_GOLD_SELL_AMOUNT_IN_WEI = new BigNumber(100 * 1000000000000000000)
 const EXCHANGE_DIFFERENCE_TOLERATED = 0.01 // Maximum difference between actual and displayed takerAmount
+
+export function* doFetchTobinTax() {
+  try {
+    yield call(getConnectedAccount)
+
+    // Using native web3 contract wrapper since contractkit
+    // hasn't yet implemented tobin tax interface
+    const reserve = yield call(contractKit._web3Contracts.getReserve)
+
+    const tobinTax: BigNumber = yield call(reserve.methods.getOrComputeTobinTax().call)
+    // TODO anna may need to convert decimals
+
+    if (!tobinTax) {
+      Logger.error(TAG, 'Unable to fetch tobin tax')
+      throw new Error('Unable to fetch tobin tax')
+    }
+    Logger.debug(
+      TAG,
+      `Retrieved Tobin tax rate: 
+      ${tobinTax.toString()}`
+    )
+    yield put(setTobinTax(tobinTax.toString()))
+  } catch (error) {
+    Logger.error(TAG, 'Error fetching Tobin tax', error)
+    yield put(showError(ErrorMessages.CALCULATE_FEE_FAILED))
+  }
+}
 
 export function* doFetchExchangeRate(makerAmount?: BigNumber, makerToken?: CURRENCY_ENUM) {
   Logger.debug(TAG, 'Calling @doFetchExchangeRate')
@@ -230,6 +257,10 @@ function* createStandbyTx(
     })
   )
   return txId
+}
+
+export function* watchFetchTobinTax() {
+  yield takeLatest(Actions.FETCH_TOBIN_TAX, doFetchTobinTax)
 }
 
 export function* watchFetchExchangeRate() {

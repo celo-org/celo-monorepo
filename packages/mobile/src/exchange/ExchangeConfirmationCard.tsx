@@ -33,6 +33,10 @@ class ExchangeConfirmationCard extends React.PureComponent<Props> {
       : CURRENCY_ENUM.DOLLAR
   }
 
+  getTobinTax() {
+    return '0.01'
+  }
+
   getExchangeRate() {
     const { makerAmount, takerAmount, exchangeRate } = this.props
 
@@ -105,7 +109,7 @@ class ExchangeConfirmationCard extends React.PureComponent<Props> {
           />
           <LineItemRow
             currencySymbol={this.getTakerToken()}
-            amount={'0.01'}
+            amount={this.getTobinTax()}
             title={t('exchangeFee')}
             titleIcon={<FeeExchangeIcon />}
           />
