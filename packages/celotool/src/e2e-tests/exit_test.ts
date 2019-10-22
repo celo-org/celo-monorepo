@@ -1,5 +1,5 @@
 import Web3 from 'web3'
-import { getContractAddress, getHooks, sleep } from './utils'
+import { getContractAddress, getHooks, GethTestConfig, sleep } from './utils'
 
 const blockchainParametersAbi = [
   {
@@ -29,9 +29,8 @@ const blockchainParametersAbi = [
 describe('exit tests', function(this: any) {
   this.timeout(0)
 
-  const gethConfig = {
+  const gethConfig: GethTestConfig = {
     migrateTo: 15,
-    migrateGovernance: false,
     instances: [
       { name: 'validator', validating: true, syncmode: 'full', port: 30303, rpcport: 8545 },
     ],
