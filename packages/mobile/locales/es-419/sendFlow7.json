@@ -55,9 +55,11 @@
   "scanCode": "Escanear código",
   "writeStorageNeededForQrDownload":
     "Se necesita permiso de escritura de almacenamiento para descargar el código QR",
-  "ScanCodeByPlacingItInTheBox": "Escanee el código colocándolo en la caja",
-  "needCameraPermissionToScan":
-    "La aplicación necesita permiso de la cámara para escanear códigos QR",
+  "cameraScanInfo": "Escanee el código colocándolo en la caja",
+  "cameraNotAuthorizedTitle": "Habilitar Cámara",
+  "cameraNotAuthorizedDescription":
+    "Habilite la cámara en la configuración de su teléfono. Lo necesitará para escanear códigos QR.",
+  "cameraSettings": "Configuraciones",
   "showYourQRCode": "Muestra tu código QR",
   "toSentOrRequestPayment": "enviar o solicitar pago",
   "requestSent": "Solicitud Enviada",
