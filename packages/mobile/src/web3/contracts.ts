@@ -85,11 +85,11 @@ function getWeb3(): Web3 {
 // Mutates web3 with new provider
 export function switchWeb3ProviderForSyncMode(zeroSync: boolean) {
   if (zeroSync) {
-    const url = DEFAULT_INFURA_URL
-    Logger.debug('contracts@getWeb3', `Connecting to url ${url}`)
-    web3.setProvider(getWebSocketProvider(url))
+    web3.setProvider(getWebSocketProvider(DEFAULT_INFURA_URL))
+    Logger.info(`${tag}@switchWeb3ProviderForSyncMode`, `Set provider to ${DEFAULT_INFURA_URL}`)
   } else {
     web3.setProvider(getIpcProvider(DEFAULT_TESTNET))
+    Logger.info(`${tag}@switchWeb3ProviderForSyncMode`, `Set provider to IPC provider`)
   }
 }
 

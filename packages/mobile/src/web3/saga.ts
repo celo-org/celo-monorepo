@@ -7,6 +7,7 @@ import { REHYDRATE } from 'redux-persist/es/constants'
 import { call, delay, put, race, select, spawn, take, takeLatest } from 'redux-saga/effects'
 import { setAccountCreationTime } from 'src/account/actions'
 import { getPincode } from 'src/account/saga'
+import { showError } from 'src/alert/actions'
 import CeloAnalytics from 'src/analytics/CeloAnalytics'
 import { CustomEventNames } from 'src/analytics/constants'
 import { ErrorMessages } from 'src/app/ErrorMessages'
@@ -14,6 +15,7 @@ import { currentLanguageSelector } from 'src/app/reducers'
 import { getWordlist } from 'src/backup/utils'
 import { UNLOCK_DURATION } from 'src/geth/consts'
 import { deleteChainData } from 'src/geth/geth'
+import { initGethSaga } from 'src/geth/saga'
 import { navigateToError } from 'src/navigator/NavigationService'
 import { waitWeb3LastBlock } from 'src/networkInfo/saga'
 import { setKey } from 'src/utils/keyStore'
@@ -36,7 +38,6 @@ import {
   zeroSyncSelector,
 } from 'src/web3/selectors'
 import { Block } from 'web3/eth/types'
-import { initGethSaga } from 'src/geth/saga'
 
 const ETH_PRIVATE_KEY_LENGTH = 64
 const MNEMONIC_BIT_LENGTH = (ETH_PRIVATE_KEY_LENGTH * 8) / 2
@@ -359,7 +360,7 @@ export function* getConnectedUnlockedAccount() {
 }
 
 // Stores account and private key in web3 keystore using web3.eth.personal
-export function* addAccountToWeb3Keystore(key: string, currentAccount: string, pincode: any) {
+export function* addAccountToWeb3Keystore(key: string, currentAccount: string, pincode: string) {
   let account: string
   Logger.debug(TAG + '@addAccountToWeb3Keystore', `using key ${key} for account ${currentAccount}`)
   const zeroSyncMode = yield select(zeroSyncSelector)
@@ -369,7 +370,7 @@ export function* addAccountToWeb3Keystore(key: string, currentAccount: string, p
   }
   try {
     // @ts-ignore
-    account = yield call(web3.eth.personal.importRawKey, String(key), pincode)
+    account = yield call(web3.eth.personal.importRawKey, key, pincode)
     Logger.debug(
       TAG + '@addAccountToWeb3Keystore',
       `Successfully imported raw key for account ${account}`
@@ -400,7 +401,7 @@ export function* ensureAccountInWeb3Keystore() {
         'Importing account from private key to web3 keystore'
       )
       const pincode = yield call(getPincode)
-      const privateKey: string = yield readPrivateKeyFromLocalDisk(currentAccount, pincode)
+      const privateKey: string = yield call(readPrivateKeyFromLocalDisk, currentAccount, pincode)
       const account: string = yield call(
         addAccountToWeb3Keystore,
         privateKey,
@@ -421,26 +422,31 @@ export function* ensureAccountInWeb3Keystore() {
 }
 
 export function* switchToGethFromZeroSync() {
-  yield call(initGethSaga)
+  try {
+    yield call(initGethSaga)
 
-  setZeroSyncMode(false)
-  switchWeb3ProviderForSyncMode(false)
+    yield put(setZeroSyncMode(false))
+    switchWeb3ProviderForSyncMode(false)
 
-  // After switching off zeroSync mode, ensure key is stored in web3.personal
-  // Note that this must happen after the sync mode is switched
-  // as the web3.personal where the key is stored is not available in zeroSync mode
-  yield call(ensureAccountInWeb3Keystore)
+    // After switching off zeroSync mode, ensure key is stored in web3.personal
+    // Note that this must happen after the sync mode is switched
+    // as the web3.personal where the key is stored is not available in zeroSync mode
+    yield call(ensureAccountInWeb3Keystore)
+  } catch (e) {
+    Logger.error(TAG + '@switchToGethFromZeroSync', 'Error switching to geth from zeroSync')
+    yield put(showError(ErrorMessages.FAILED_TO_SWITCH_SYNC_MODES))
+  }
 }
 
 export function* switchToZeroSyncFromGeth() {
   Logger.debug(TAG + 'Switching to zeroSync from geth..')
-  setZeroSyncMode(true)
+  yield put(setZeroSyncMode(true))
   switchWeb3ProviderForSyncMode(true)
 }
 
-export function* switchZeroSyncMode(action: SetIsZeroSyncAction) {
-  Logger.debug(TAG + '@switchZeroSyncMode', ` to: ${action.zeroSyncMode}`)
-  yield call(getConnectedAccount) // Ensure web3 connected before switching provider
+export function* toggleZeroSyncMode(action: SetIsZeroSyncAction) {
+  Logger.debug(TAG + '@toggleZeroSyncMode', ` to: ${action.zeroSyncMode}`)
+  // yield call(getConnectedAccount) // Ensure web3 connected before switching provider
   if (action.zeroSyncMode) {
     yield call(switchToZeroSyncFromGeth)
   } else {
@@ -449,12 +455,12 @@ export function* switchZeroSyncMode(action: SetIsZeroSyncAction) {
   // Unlock account to ensure private keys are accessible in new mode
   const account = yield call(getConnectedUnlockedAccount)
   Logger.debug(
-    TAG + '@switchZeroSyncMode',
+    TAG + '@toggleZeroSyncMode',
     `Switched to ${action.zeroSyncMode} and able to unlock account ${account}`
   )
 }
 export function* watchZeroSyncMode() {
-  yield takeLatest(Actions.SET_IS_ZERO_SYNC, switchZeroSyncMode)
+  yield takeLatest(Actions.SET_IS_ZERO_SYNC, toggleZeroSyncMode)
 }
 
 export function* web3Saga() {
