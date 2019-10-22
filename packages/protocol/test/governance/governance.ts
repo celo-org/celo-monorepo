@@ -1872,7 +1872,6 @@ contract('Governance', (accounts: string[]) => {
     })
   })
 
-  /*
   describe('#isVoting()', () => {
     describe('when the account has never acted on a proposal', () => {
       it('should return false', async () => {
@@ -1955,7 +1954,6 @@ contract('Governance', (accounts: string[]) => {
       })
     })
   })
-  */
 
   describe('#isProposalPassing()', () => {
     const proposalId = 1
