@@ -26,6 +26,16 @@ function makeEven(hex: string) {
   return hex
 }
 
+export const getParsedSignatureOfAddress = async (web3: Web3, address: string, signer: string) => {
+  const addressHash = web3.utils.soliditySha3({ type: 'address', value: address })
+  const signature = (await web3.eth.sign(addressHash, signer)).slice(2)
+  return {
+    r: `0x${signature.slice(0, 64)}`,
+    s: `0x${signature.slice(64, 128)}`,
+    v: web3.utils.hexToNumber(signature.slice(128, 130)) + 27,
+  }
+}
+
 export async function signTransaction(web3: Web3, txn: any, privateKey: string) {
   let result: any
 
