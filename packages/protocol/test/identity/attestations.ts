@@ -15,8 +15,6 @@ import { uniq } from 'lodash'
 import {
   AccountsContract,
   AccountsInstance,
-  AttestationsContract,
-  AttestationsInstance,
   MockElectionContract,
   MockElectionInstance,
   MockLockedGoldContract,
@@ -27,11 +25,18 @@ import {
   RandomInstance,
   RegistryContract,
   RegistryInstance,
+  TestAttestationsContract,
+  TestAttestationsInstance,
 } from 'types'
 import { getParsedSignatureOfAddress } from '../../lib/signing-utils'
 
 const Accounts: AccountsContract = artifacts.require('Accounts')
-const Attestations: AttestationsContract = artifacts.require('Attestations')
+/* We use a contract that behaves like the actual Attestations contract, but
+ * mocks the implementations of validator set getters. These rely on precompiled
+ * contracts, which are not available in our current ganache fork, which we use
+ * for Truffle unit tests.
+ */
+const Attestations: TestAttestationsContract = artifacts.require('TestAttestations')
 const MockStableToken: MockStableTokenContract = artifacts.require('MockStableToken')
 const MockElection: MockElectionContract = artifacts.require('MockElection')
 const MockLockedGold: MockLockedGoldContract = artifacts.require('MockLockedGold')
@@ -40,7 +45,7 @@ const Registry: RegistryContract = artifacts.require('Registry')
 
 contract('Attestations', (accounts: string[]) => {
   let accountsInstance: AccountsInstance
-  let attestations: AttestationsInstance
+  let attestations: TestAttestationsInstance
   let mockStableToken: MockStableTokenInstance
   let otherMockStableToken: MockStableTokenInstance
   let random: RandomInstance
@@ -155,6 +160,7 @@ contract('Attestations', (accounts: string[]) => {
       [mockStableToken.address, otherMockStableToken.address],
       [attestationFee, attestationFee]
     )
+    await attestations.__setValidators(accounts)
   })
 
   describe('#initialize()', () => {

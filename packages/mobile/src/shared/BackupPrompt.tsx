@@ -28,7 +28,7 @@ const mapStateToProps = (state: RootState): StateProps => {
 
 export class BackupPrompt extends React.Component<Props> {
   goToBackup = () => {
-    navigate(Screens.Backup)
+    navigate(Screens.BackupIntroduction)
   }
 
   isVisible = () => {

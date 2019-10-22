@@ -1,8 +1,9 @@
+import Touchable, { Props as TouchableProps } from '@celo/react-components/components/Touchable'
 import { fontStyles } from '@celo/react-components/styles/fonts'
 import * as React from 'react'
-import { Text, TextStyle, TouchableOpacity, TouchableOpacityProps } from 'react-native'
+import { Text, TextStyle } from 'react-native'
 
-type Props = TouchableOpacityProps & {
+type Props = TouchableProps & {
   style?: TextStyle | TextStyle[]
   testID?: string
 }
@@ -11,9 +12,9 @@ export default class Link extends React.PureComponent<Props> {
   render() {
     const { onPress, style: extraStyle, children, disabled, testID } = this.props
     return (
-      <TouchableOpacity onPress={onPress} disabled={disabled} testID={testID}>
+      <Touchable onPress={onPress} borderless={true} disabled={disabled} testID={testID}>
         <Text style={[fontStyles.bodySmall, fontStyles.link, extraStyle]}>{children}</Text>
-      </TouchableOpacity>
+      </Touchable>
     )
   }
 }
