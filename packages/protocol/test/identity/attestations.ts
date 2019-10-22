@@ -16,12 +16,12 @@ import { uniq } from 'lodash'
 import {
   AttestationsContract,
   AttestationsInstance,
+  MockElectionContract,
+  MockElectionInstance,
   MockLockedGoldContract,
   MockLockedGoldInstance,
   MockStableTokenContract,
   MockStableTokenInstance,
-  MockElectionContract,
-  MockElectionInstance,
   RandomContract,
   RandomInstance,
   RegistryContract,
@@ -453,6 +453,13 @@ contract('Attestations', (accounts: string[]) => {
         it('should revert requesting more attestations', async () => {
           await assertRevert(attestations.request(phoneHash, 1, mockStableToken.address))
         })
+
+        describe('when the original request has expired', () => {
+          it('should allow to request more attestations', async () => {
+            await advanceBlockNum(attestationExpiryBlocks, web3)
+            await attestations.request(phoneHash, 1, mockStableToken.address)
+          })
+        })
       })
 
       describe('when the issuers have been revealed', async () => {
@@ -506,8 +513,8 @@ contract('Attestations', (accounts: string[]) => {
       })
 
       it('should set the block of request in the attestations', async () => {
-        await attestations.selectIssuers(phoneHash)
         const expectedBlock = await web3.eth.getBlock('latest')
+        await attestations.selectIssuers(phoneHash)
         const attestationIssuers = await attestations.getAttestationIssuers(phoneHash, caller)
 
         await Promise.all(
@@ -548,6 +555,11 @@ contract('Attestations', (accounts: string[]) => {
             attestationRequestFeeToken: mockStableToken.address,
           },
         })
+      })
+
+      it('should revert when the request has expired', async () => {
+        await advanceBlockNum(attestationExpiryBlocks + 1, web3)
+        await assertRevert(attestations.selectIssuers(phoneHash))
       })
     })
 
@@ -876,9 +888,7 @@ contract('Attestations', (accounts: string[]) => {
             await attestations.request(phoneHash, attestationsRequested, mockStableToken.address, {
               from: other,
             })
-            await attestations.selectIssuers(phoneHash, {
-              from: other,
-            })
+            await attestations.selectIssuers(phoneHash, { from: other })
 
             const issuer = (await attestations.getAttestationIssuers(phoneHash, other))[0]
             const [v, r, s] = await getVerificationCodeSignature(other, issuer)

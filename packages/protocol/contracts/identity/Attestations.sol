@@ -26,58 +26,60 @@ contract Attestations is IAttestations, Ownable, Initializable, UsingRegistry, R
   struct Attestation {
     AttestationStatus status;
 
-    // For outstanding attestations, this is the block number of the request
-    // For completed attestations, this is the block number of the attestation completion
+    // For outstanding attestations, this is the block number of the request.
+    // For completed attestations, this is the block number of the attestation completion.
     uint128 blockNumber;
   }
 
   struct Account {
-    // The block number of the most recent attestation request
+    // The block number of the most recent attestation request.
     uint64 mostRecentAttestationRequestBlockNumber;
 
-    // The address at which the account expects to receive transfers
+    // The address at which the account expects to receive transfers.
     address walletAddress;
 
-    // The token with which attestation request fees are paid
+    // The token with which attestation request fees are paid.
     address attestationRequestFeeToken;
 
-    // The address of the key with which this account wants to sign attestations
+    // The address of the key with which this account wants to sign attestations.
     address authorizedAttestor;
 
-    // The ECDSA public key used to encrypt and decrypt data for this account
+    // The ECDSA public key used to encrypt and decrypt data for this account.
     bytes dataEncryptionKey;
 
-    // The URL under which an account adds metadata and claims
+    // The URL under which an account adds metadata and claims.
     string metadataURL;
   }
 
   // Stores attestations state for a single (identifier, account address) pair.
   struct AttestedAddress {
-    // Number of requested attestations
+    // Total number of requested attestations.
     uint32 requested;
-    // Number of completed attestations
+    // Total number of completed attestations.
     uint32 completed;
-    // List of issuers responsible for attestations
-    address[] issuers;
-    // State of each attestation keyed by issuer
+    // List of selected issuers responsible for attestations. Users may not select
+    // issuers for attestation requests in which `selectedIssuers.length` will be
+    // smaller than `requested`, which represents the total number of requested
+    // attestations.
+    address[] selectedIssuers;
+    // State of each attestation keyed by issuer.
     mapping(address => Attestation) issuedAttestations;
   }
 
   struct UnselectedRequest {
-    // The block at which the attestations were requested
+    // The block at which the attestations were requested.
     uint128 blockNumber;
 
-    // The number of attestations that were requested
+    // The number of attestations that were requested.
     uint128 attestationsRequested;
   }
 
   struct IdentifierState {
-    // All account addresses associated with this identifier
+    // All account addresses associated with this identifier.
     address[] accounts;
-    // Keeps the state of the attestations for each account address
+    // Keeps the state of attestations for account addresses for this identifier.
     mapping(address => AttestedAddress) attestations;
-    // Temporarily stores attestation requests for which issuers should be
-    // selected by the account
+    // Temporarily stores attestation requests for which issuers should be selected by the account.
     mapping(address => UnselectedRequest) unselectedRequests;
   }
 
@@ -91,7 +93,8 @@ contract Attestations is IAttestations, Ownable, Initializable, UsingRegistry, R
   // solhint-disable-next-line state-visibility
   address constant REQUEST_ATTESTATION = address(0xff);
 
-  // The duration in blocks in which an attestation can be completed
+  // The duration in blocks in which an attestation can be completed from the block in which the
+  // attestation was requested.
   uint256 public attestationExpiryBlocks;
 
   // The fees that are associated with attestations for a particular token.
@@ -186,7 +189,7 @@ contract Attestations is IAttestations, Ownable, Initializable, UsingRegistry, R
   /**
    * @notice Commit to the attestation request of a hashed identifier.
    * @param identifier The hash of the identifier to be attested.
-   * @param attestationsRequested The number of requested attestations for this request
+   * @param attestationsRequested The number of requested attestations for this request.
    * @param attestationRequestFeeToken The address of the token with which the attestation fee will
    * be paid.
    */
@@ -222,7 +225,7 @@ contract Attestations is IAttestations, Ownable, Initializable, UsingRegistry, R
       );
       require(
         state.unselectedRequests[msg.sender].blockNumber == 0,
-        "Currently unselected attestation request that has to be selected first"
+        "There exists an unexpired, unselected attestation request"
       );
     }
 
@@ -250,16 +253,22 @@ contract Attestations is IAttestations, Ownable, Initializable, UsingRegistry, R
    * @param identifier The hash of the identifier to be attested.
    */
   function selectIssuers(bytes32 identifier) external {
+    require(
+      !isAttestationExpired(accounts[msg.sender].mostRecentAttestationRequestBlockNumber),
+      "The attestation request has expired"
+    );
+
     IdentifierState storage state = identifiers[identifier];
 
     require(
       state.unselectedRequests[msg.sender].blockNumber > 0,
-      "No active attestation request to reveal issuers for"
+      "No unselected attestation request to select issuers for"
     );
 
     addIncompleteAttestations(
       state.unselectedRequests[msg.sender].attestationsRequested,
-      state.attestations[msg.sender]
+      state.attestations[msg.sender],
+      uint256(state.unselectedRequests[msg.sender].blockNumber).toUint64()
     );
 
     emit AttestationIssuersSelected(
@@ -276,7 +285,7 @@ contract Attestations is IAttestations, Ownable, Initializable, UsingRegistry, R
    * @notice Reveal the encrypted phone number to the issuer.
    * @param identifier The hash of the identifier to be attested.
    * @param encryptedPhone The number ECIES encrypted with the issuer's public key.
-   * @param issuer The issuer of the attestation
+   * @param issuer The issuer of the attestation.
    * @param sendSms Whether or not to send an SMS. For testing purposes.
    */
   function reveal(
@@ -290,16 +299,10 @@ contract Attestations is IAttestations, Ownable, Initializable, UsingRegistry, R
     Attestation storage attestation =
       identifiers[identifier].attestations[msg.sender].issuedAttestations[issuer];
 
-    require(
-      attestation.status == AttestationStatus.Incomplete,
-      "Attestation is not incomplete"
-    );
+    require(attestation.status == AttestationStatus.Incomplete, "Attestation is not incomplete");
 
     // solhint-disable-next-line not-rely-on-time
-    require(
-      !isAttestationExpired(attestation.blockNumber),
-      "Attestation timed out"
-    );
+    require(!isAttestationExpired(attestation.blockNumber), "Attestation timed out");
 
     // Generate the yet-to-be-signed attestation code that will be signed and sent to the
     // encrypted phone number via SMS via the 'RequestAttestation' precompiled contract.
@@ -353,9 +356,9 @@ contract Attestations is IAttestations, Ownable, Initializable, UsingRegistry, R
   }
 
   /**
-   * @notice Revokes an account for an identifier
-   * @param identifier The identifier for which to revoke
-   * @param index The index of the account in the accounts array
+   * @notice Revokes an account for an identifier.
+   * @param identifier The identifier for which to revoke.
+   * @param index The index of the account in the accounts array.
    */
   function revoke(bytes32 identifier, uint256 index) external {
     uint256 numAccounts = identifiers[identifier].accounts.length;
@@ -422,10 +425,10 @@ contract Attestations is IAttestations, Ownable, Initializable, UsingRegistry, R
   }
 
   /**
-   * @notice Returns attestation issuers for a identifier/account pair.
+   * @notice Returns seleted attestation issuers for a identifier/account pair.
    * @param identifier Hash of the identifier.
    * @param account Address of the account.
-   * @return Addresses of the attestation issuers.
+   * @return Addresses of the selected attestation issuers.
    */
   function getAttestationIssuers(
     bytes32 identifier,
@@ -435,7 +438,7 @@ contract Attestations is IAttestations, Ownable, Initializable, UsingRegistry, R
     view
     returns (address[] memory)
   {
-    return identifiers[identifier].attestations[account].issuers;
+    return identifiers[identifier].attestations[account].selectedIssuers;
   }
 
   /**
@@ -463,7 +466,7 @@ contract Attestations is IAttestations, Ownable, Initializable, UsingRegistry, R
    * @param identifiersToLookup Array of n identifiers.
    * @return [0] Array of number of matching accounts per identifier.
    * @return [1] Array of sum([0]) matching walletAddresses.
-   * @return [2] Array of sum([0]) numbers indicating the completions for each account
+   * @return [2] Array of sum([0]) numbers indicating the completions for each account.
    * @return [3] Array of sum([0]) numbers indicating the total number of requested
                  attestations for each account.
    */
@@ -493,9 +496,9 @@ contract Attestations is IAttestations, Ownable, Initializable, UsingRegistry, R
         addresses[currentIndex] = accounts[addrs[matchIndex]].walletAddress;
         completed[currentIndex] =
           identifiers[identifiersToLookup[i]].attestations[addrs[matchIndex]].completed;
-        total[currentIndex] = uint64(
-          identifiers[identifiersToLookup[i]].attestations[addrs[matchIndex]].issuers.length
-        );
+        total[currentIndex] =
+          identifiers[identifiersToLookup[i]].attestations[addrs[matchIndex]].requested;
+
         currentIndex++;
       }
     }
@@ -609,7 +612,7 @@ contract Attestations is IAttestations, Ownable, Initializable, UsingRegistry, R
 
   /**
    * @notice Getter for the data encryption key and version.
-   * @param account The address of the account to get the key for
+   * @param account The address of the account to get the key for.
    * @return dataEncryptionKey secp256k1 public key for data encryption. Preferably compressed.
    */
   function getDataEncryptionKey(address account) external view returns (bytes memory) {
@@ -663,8 +666,8 @@ contract Attestations is IAttestations, Ownable, Initializable, UsingRegistry, R
   }
 
   /**
-   * @notice Authorizes an address to attest on behalf
-   * @param attestor The address of the attestor to set for the account
+   * @notice Authorizes an address to attest on behalf.
+   * @param attestor The address of the attestor to set for the account.
    * @param v The recovery id of the incoming ECDSA signature.
    * @param r Output value r of the ECDSA signature.
    * @param s Output value s of the ECDSA signature.
@@ -711,8 +714,8 @@ contract Attestations is IAttestations, Ownable, Initializable, UsingRegistry, R
   }
 
   /**
-   * @notice Setter for the wallet address for an account
-   * @param walletAddress The wallet address to set for the account
+   * @notice Setter for the wallet address for an account.
+   * @param walletAddress The wallet address to set for the account.
    */
   function setWalletAddress(address walletAddress) public {
     accounts[msg.sender].walletAddress = walletAddress;
@@ -720,9 +723,9 @@ contract Attestations is IAttestations, Ownable, Initializable, UsingRegistry, R
   }
 
   /**
-   * @notice Getter for the wallet address for an account
-   * @param account The address of the account to get the wallet address for
-   * @return Wallet address
+   * @notice Getter for the wallet address for an account.
+   * @param account The address of the account to get the wallet address for.
+   * @return Wallet address.
    */
   function getWalletAddress(address account) external view returns (address) {
     return accounts[account].walletAddress;
@@ -777,10 +780,10 @@ contract Attestations is IAttestations, Ownable, Initializable, UsingRegistry, R
 
   /**
    * @notice Helper function for batchGetAttestationStats to calculate the
-             total number of addresses that have >0 complete attestations for the identifiers
-   * @param identifiersToLookup Array of n identifiers
+             total number of addresses that have >0 complete attestations for the identifiers.
+   * @param identifiersToLookup Array of n identifiers.
    * @return Array of n numbers that indicate the number of matching addresses per identifier
-   *         and array of addresses preallocated for total number of matches
+   *         and array of addresses preallocated for total number of matches.
    */
   function batchlookupAccountsForIdentifier(
     bytes32[] memory identifiersToLookup
@@ -804,13 +807,15 @@ contract Attestations is IAttestations, Ownable, Initializable, UsingRegistry, R
   }
 
   /**
-   * @notice Adds additional attestations given the current randomness
-   * @param n Number of attestations to add
-   * @param state The accountState of the address to add attestations for
+   * @notice Adds additional attestations given the current randomness.
+   * @param n Number of attestations to add.
+   * @param state The accountState of the address to add attestations for.
+   * @param requestBlockNumber The block number at which attestations were requested.
    */
   function addIncompleteAttestations(
     uint256 n,
-    AttestedAddress storage state
+    AttestedAddress storage state,
+    uint64 requestBlockNumber
   )
     internal
   {
@@ -830,15 +835,15 @@ contract Attestations is IAttestations, Ownable, Initializable, UsingRegistry, R
       Attestation storage attestations =
         state.issuedAttestations[issuer];
 
-      // Attestation issuers can only be added if they haven't already
+      // Attestation issuers can only be added if they haven't already.
       if (attestations.status != AttestationStatus.None) {
         continue;
       }
 
       currentIndex++;
       attestations.status = AttestationStatus.Incomplete;
-      attestations.blockNumber = uint64(block.number);
-      state.issuers.push(issuer);
+      attestations.blockNumber = requestBlockNumber;
+      state.selectedIssuers.push(issuer);
     }
   }
 
