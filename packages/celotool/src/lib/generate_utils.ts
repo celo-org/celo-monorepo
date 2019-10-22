@@ -142,15 +142,14 @@ export const generateGenesisFromEnv = (enablePetersburg: boolean = true) => {
 
   // Assing DEFAULT ammount of gold to 2 faucet accounts
   const faucetAddresses = getStrippedAddressesFor(AccountType.FAUCET, mnemonic, 2)
+
   const priceOracleAddress = getStrippedAddressesFor(AccountType.PRICE_ORACLE, mnemonic, 1)
 
   return generateGenesis({
     validators,
     consensusType,
     blockTime,
-    initialAccounts: faucetAddresses
-      .concat(priceOracleAddress)
-      .concat('5409ED021D9299bf6814279A6A1411A7e866A631'),
+    initialAccounts: faucetAddresses.concat(priceOracleAddress),
     epoch,
     chainId,
     requestTimeout,
