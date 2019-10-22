@@ -259,7 +259,7 @@ contract Validators is IValidators, Ownable, ReentrancyGuard, Initializable, Usi
     // Use the proof of possession bytes
     require(checkProofOfPossession(publicKeysData.slice(64, 48 + 96)));
 
-    address account = getAccounts().getAccountFromValidator(msg.sender);
+    address account = getAccounts().getAccountFromValidationSigner(msg.sender);
     require(!isValidator(account) && !isValidatorGroup(account));
     require(meetsValidatorBalanceRequirements(account));
 
@@ -305,7 +305,7 @@ contract Validators is IValidators, Ownable, ReentrancyGuard, Initializable, Usi
    * @dev Fails if the account is not a validator.
    */
   function deregisterValidator(uint256 index) external nonReentrant returns (bool) {
-    address account = getAccounts().getAccountFromValidator(msg.sender);
+    address account = getAccounts().getAccountFromValidationSigner(msg.sender);
     require(isValidator(account));
     Validator storage validator = validators[account];
     if (validator.affiliation != address(0)) {
@@ -325,7 +325,7 @@ contract Validators is IValidators, Ownable, ReentrancyGuard, Initializable, Usi
    * @dev De-affiliates with the previously affiliated group if present.
    */
   function affiliate(address group) external nonReentrant returns (bool) {
-    address account = getAccounts().getAccountFromValidator(msg.sender);
+    address account = getAccounts().getAccountFromValidationSigner(msg.sender);
     require(isValidator(account) && isValidatorGroup(group));
     Validator storage validator = validators[account];
     if (validator.affiliation != address(0)) {
@@ -342,7 +342,7 @@ contract Validators is IValidators, Ownable, ReentrancyGuard, Initializable, Usi
    * @dev Fails if the account is not a validator with non-zero affiliation.
    */
   function deaffiliate() external nonReentrant returns (bool) {
-    address account = getAccounts().getAccountFromValidator(msg.sender);
+    address account = getAccounts().getAccountFromValidationSigner(msg.sender);
     require(isValidator(account));
     Validator storage validator = validators[account];
     require(validator.affiliation != address(0));
@@ -372,7 +372,7 @@ contract Validators is IValidators, Ownable, ReentrancyGuard, Initializable, Usi
     require(bytes(name).length > 0);
     require(bytes(url).length > 0);
     require(commission <= FixidityLib.fixed1().unwrap(), "Commission can't be greater than 100%");
-    address account = getAccounts().getAccountFromValidator(msg.sender);
+    address account = getAccounts().getAccountFromValidationSigner(msg.sender);
     require(!isValidator(account) && !isValidatorGroup(account));
     require(meetsValidatorGroupBalanceRequirements(account));
 
@@ -392,7 +392,7 @@ contract Validators is IValidators, Ownable, ReentrancyGuard, Initializable, Usi
    * @dev Fails if the account is not a validator group with no members.
    */
   function deregisterValidatorGroup(uint256 index) external nonReentrant returns (bool) {
-    address account = getAccounts().getAccountFromValidator(msg.sender);
+    address account = getAccounts().getAccountFromValidationSigner(msg.sender);
     // Only empty Validator Groups can be deregistered.
     require(isValidatorGroup(account) && groups[account].members.numElements == 0);
     delete groups[account];
@@ -409,7 +409,7 @@ contract Validators is IValidators, Ownable, ReentrancyGuard, Initializable, Usi
    * @dev Fails if `validator` has not set their affiliation to this account.
    */
   function addMember(address validator) external nonReentrant returns (bool) {
-    address account = getAccounts().getAccountFromValidator(msg.sender);
+    address account = getAccounts().getAccountFromValidationSigner(msg.sender);
     require(isValidatorGroup(account) && isValidator(validator));
     return _addMember(account, validator);
   }
@@ -436,7 +436,7 @@ contract Validators is IValidators, Ownable, ReentrancyGuard, Initializable, Usi
    * @dev Fails if `validator` is not a member of the account's group.
    */
   function removeMember(address validator) external nonReentrant returns (bool) {
-    address account = getAccounts().getAccountFromValidator(msg.sender);
+    address account = getAccounts().getAccountFromValidationSigner(msg.sender);
     require(isValidatorGroup(account) && isValidator(validator), "is not group and validator");
     return _removeMember(account, validator);
   }
@@ -460,7 +460,7 @@ contract Validators is IValidators, Ownable, ReentrancyGuard, Initializable, Usi
     nonReentrant
     returns (bool)
   {
-    address account = getAccounts().getAccountFromValidator(msg.sender);
+    address account = getAccounts().getAccountFromValidationSigner(msg.sender);
     require(isValidatorGroup(account) && isValidator(validator));
     ValidatorGroup storage group = groups[account];
     require(group.members.contains(validator));
@@ -571,7 +571,7 @@ contract Validators is IValidators, Ownable, ReentrancyGuard, Initializable, Usi
     address[] memory topAccounts = groups[account].members.headN(n);
     address[] memory topValidators = new address[](n);
     for (uint256 i = 0; i < n; i = i.add(1)) {
-      topValidators[i] = getAccounts().getValidatorFromAccount(topAccounts[i]);
+      topValidators[i] = getAccounts().getValidationSignerFromAccount(topAccounts[i]);
     }
     return topValidators;
   }

@@ -14,14 +14,14 @@ contract Accounts is IAccounts, ReentrancyGuard, Initializable, UsingRegistry {
 
   using SafeMath for uint256;
 
-  struct Authorizations {
-    // The address that is authorized to vote on behalf of the account.
-    // The account can vote as well, whether or not an authorized voter has been specified.
+  struct Signers {
+    // The address that is authorized to sign a vote on behalf of the account.
+    // The account can vote as well, whether or not an vote signing key has been specified.
     address voting;
-    // The address that is authorized to validate on behalf of the account.
-    // The account can manage the validator, whether or not an authorized validator has been
-    // specified. However if an authorized validator has been specified, only that key may actually
-    // participate in consensus.
+    // The address that is authorized to sign consensus messages on behalf of the account.
+    // The account can manage the validator, whether or not an validation signing key has been
+    // specified. However if an validation signing key has been specified, only that key may
+    // actually participate in consensus.
     address validating;
 
     // The address of the key with which this account wants to sign attestations on the Attestations
@@ -31,10 +31,10 @@ contract Accounts is IAccounts, ReentrancyGuard, Initializable, UsingRegistry {
 
   struct Account {
     bool exists;
-    // Each account may authorize additional keys to use for voting or valdiating.
+    // Each account may authorize signing keys to use for voting, valdiating or attestation.
     // These keys may not be keys of other accounts, and may not be authorized by any other
     // account for any purpose.
-    Authorizations authorizations;
+    Signers signers;
 
     // The address at which the account expects to receive transfers
     address walletAddress;
@@ -52,9 +52,9 @@ contract Accounts is IAccounts, ReentrancyGuard, Initializable, UsingRegistry {
   mapping(address => address) public authorizedBy;
 
 
-  event AttestorAuthorized(address indexed account, address attestor);
-  event VoterAuthorized(address indexed account, address voter);
-  event ValidatorAuthorized(address indexed account, address validator);
+  event AttestationSignerAuthorized(address indexed account, address signer);
+  event VoteSignerAuthorized(address indexed account, address signer);
+  event ValidationSignerAuthorized(address indexed account, address signer);
 
   event AccountDataEncryptionKeySet(
     address indexed account,
@@ -102,14 +102,14 @@ contract Accounts is IAccounts, ReentrancyGuard, Initializable, UsingRegistry {
   }
 
   /**
-   * @notice Authorizes an address to vote on behalf of the account.
-   * @param voter The address to authorize.
+   * @notice Authorizes an address to sign votes on behalf of the account.
+   * @param voter The address of the signing key to authorize.
    * @param v The recovery id of the incoming ECDSA signature.
    * @param r Output value r of the ECDSA signature.
    * @param s Output value s of the ECDSA signature.
    * @dev v, r, s constitute `voter`'s signature on `msg.sender`.
    */
-  function authorizeVoter(
+  function authorizeVoteSigner(
     address voter,
     uint8 v,
     bytes32 r,
@@ -119,20 +119,20 @@ contract Accounts is IAccounts, ReentrancyGuard, Initializable, UsingRegistry {
     nonReentrant
   {
     Account storage account = accounts[msg.sender];
-    authorize(voter, account.authorizations.voting, v, r, s);
-    account.authorizations.voting = voter;
-    emit VoterAuthorized(msg.sender, voter);
+    authorize(voter, account.signers.voting, v, r, s);
+    account.signers.voting = voter;
+    emit VoteSignerAuthorized(msg.sender, voter);
   }
 
   /**
-   * @notice Authorizes an address to validate on behalf of the account.
-   * @param validator The address to authorize.
+   * @notice Authorizes an address to sign consensus messages on behalf of the account.
+   * @param validator The address of the signing key to authorize.
    * @param v The recovery id of the incoming ECDSA signature.
    * @param r Output value r of the ECDSA signature.
    * @param s Output value s of the ECDSA signature.
    * @dev v, r, s constitute `validator`'s signature on `msg.sender`.
    */
-  function authorizeValidator(
+  function authorizeValidationSigner(
     address validator,
     uint8 v,
     bytes32 r,
@@ -142,20 +142,20 @@ contract Accounts is IAccounts, ReentrancyGuard, Initializable, UsingRegistry {
     nonReentrant
   {
     Account storage account = accounts[msg.sender];
-    authorize(validator, account.authorizations.validating, v, r, s);
-    account.authorizations.validating = validator;
-    emit ValidatorAuthorized(msg.sender, validator);
+    authorize(validator, account.signers.validating, v, r, s);
+    account.signers.validating = validator;
+    emit ValidationSignerAuthorized(msg.sender, validator);
   }
 
   /**
-   * @notice Authorizes an address to attest on behalf
-   * @param attestor The address of the attestor to set for the account
+   * @notice Authorizes an address to sign attestations on behalf of the account.
+   * @param attestor The address of the signing key to authorize.
    * @param v The recovery id of the incoming ECDSA signature.
    * @param r Output value r of the ECDSA signature.
    * @param s Output value s of the ECDSA signature.
    * @dev v, r, s constitute `attestor`'s signature on `msg.sender`.
    */
-  function authorizeAttestor(
+  function authorizeAttestationSigner(
     address attestor,
     uint8 v,
     bytes32 r,
@@ -164,90 +164,100 @@ contract Accounts is IAccounts, ReentrancyGuard, Initializable, UsingRegistry {
     public
   {
     Account storage account = accounts[msg.sender];
-    authorize(attestor, account.authorizations.attesting, v, r, s);
-    account.authorizations.attesting = attestor;
-    emit AttestorAuthorized(msg.sender, attestor);
+    authorize(attestor, account.signers.attesting, v, r, s);
+    account.signers.attesting = attestor;
+    emit AttestationSignerAuthorized(msg.sender, attestor);
   }
 
   /**
-   * @notice Returns the account associated with `accountOrAttestor`.
-   * @param accountOrAttestor The address of the account or authorized attestor.
-   * @dev Fails if the `accountOrAttestor` is not an account or authorized attestor.
+   * @notice Returns the account associated with `accountOrAttestationSigner`.
+   * @param accountOrAttestationSigner The address of the account or authorized attestation
+   *                                   signing key.
+   * @dev Fails if the `accountOrAttestationSigner` is not an account or authorized attestation
+   *      signing key.
    * @return The associated account.
    */
-  function getAccountFromAttestor(address accountOrAttestor) public view returns (address) {
-    address authorizingAccount = authorizedBy[accountOrAttestor];
+  function getAccountFromAttestationSigner(address accountOrAttestationSigner)
+    public
+    view
+    returns (address)
+  {
+    address authorizingAccount = authorizedBy[accountOrAttestationSigner];
     if (authorizingAccount != address(0)) {
-      require(accounts[authorizingAccount].authorizations.attesting == accountOrAttestor);
+      require(accounts[authorizingAccount].signers.attesting == accountOrAttestationSigner);
       return authorizingAccount;
     } else {
-      return accountOrAttestor;
+      return accountOrAttestationSigner;
     }
   }
 
   /**
-   * @notice Returns the account associated with `accountOrVoter`.
-   * @param accountOrVoter The address of the account or authorized voter.
-   * @dev Fails if the `accountOrVoter` is not an account or authorized voter.
+   * @notice Returns the account associated with `accountOrVoteSigner`.
+   * @param accountOrVoteSigner The address of the account or authorized voter.
+   * @dev Fails if the `accountOrVoteSigner` is not an account or authorized voter.
    * @return The associated account.
    */
-  function getAccountFromVoter(address accountOrVoter) external view returns (address) {
-    address authorizingAccount = authorizedBy[accountOrVoter];
+  function getAccountFromVoteSigner(address accountOrVoteSigner) external view returns (address) {
+    address authorizingAccount = authorizedBy[accountOrVoteSigner];
     if (authorizingAccount != address(0)) {
-      require(accounts[authorizingAccount].authorizations.voting == accountOrVoter);
+      require(accounts[authorizingAccount].signers.voting == accountOrVoteSigner);
       return authorizingAccount;
     } else {
-      require(isAccount(accountOrVoter));
-      return accountOrVoter;
+      require(isAccount(accountOrVoteSigner));
+      return accountOrVoteSigner;
     }
   }
 
   /**
-   * @notice Returns the account associated with `accountOrValidator`.
-   * @param accountOrValidator The address of the account or authorized validator.
-   * @dev Fails if the `accountOrValidator` is not an account or authorized validator.
+   * @notice Returns the account associated with `accountOrValidationSigner`.
+   * @param accountOrValidationSigner The address of the account or authorized validator.
+   * @dev Fails if the `accountOrValidationSigner` is not an account or authorized validator.
    * @return The associated account.
    */
-  function getAccountFromValidator(address accountOrValidator) public view returns (address) {
-    address authorizingAccount = authorizedBy[accountOrValidator];
+  function getAccountFromValidationSigner(address accountOrValidationSigner)
+    public
+    view
+    returns (address)
+  {
+    address authorizingAccount = authorizedBy[accountOrValidationSigner];
     if (authorizingAccount != address(0)) {
-      require(accounts[authorizingAccount].authorizations.validating == accountOrValidator);
+      require(accounts[authorizingAccount].signers.validating == accountOrValidationSigner);
       return authorizingAccount;
     } else {
-      require(isAccount(accountOrValidator));
-      return accountOrValidator;
+      require(isAccount(accountOrValidationSigner));
+      return accountOrValidationSigner;
     }
   }
 
   /**
-   * @notice Returns the voter for the specified account.
+   * @notice Returns the vote signer for the specified account.
    * @param account The address of the account.
-   * @return The address with which the account can vote.
+   * @return The address with which the account can sign votes.
    */
-  function getVoterFromAccount(address account) public view returns (address) {
+  function getVoteSignerFromAccount(address account) public view returns (address) {
     require(isAccount(account));
-    address voter = accounts[account].authorizations.voting;
+    address voter = accounts[account].signers.voting;
     return voter == address(0) ? account : voter;
   }
 
   /**
-   * @notice Returns the validator for the specified account.
+   * @notice Returns the validation signer for the specified account.
    * @param account The address of the account.
    * @return The address with which the account can register a validator or group.
    */
-  function getValidatorFromAccount(address account) public view returns (address) {
+  function getValidationSignerFromAccount(address account) public view returns (address) {
     require(isAccount(account));
-    address validator = accounts[account].authorizations.validating;
+    address validator = accounts[account].signers.validating;
     return validator == address(0) ? account : validator;
   }
 
   /**
-   * @notice Returns the attestor for the specified account.
+   * @notice Returns the attestation signer for the specified account.
    * @param account The address of the account.
-   * @return The address with which the account can attest.
+   * @return The address with which the account can sign attestations.
    */
-  function getAttestorFromAccount(address account) public view returns (address) {
-    address attestor = accounts[account].authorizations.attesting;
+  function getAttestionSignerFromAccount(address account) public view returns (address) {
+    address attestor = accounts[account].signers.attesting;
     return attestor == address(0) ? account : attestor;
   }
 

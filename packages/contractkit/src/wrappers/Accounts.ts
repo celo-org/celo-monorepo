@@ -23,16 +23,16 @@ export class AccountsWrapper extends BaseWrapper<Accounts> {
    * @param account The address of the account.
    * @return The address with which the account can vote.
    */
-  getVoterFromAccount: (account: string) => Promise<Address> = proxyCall(
-    this.contract.methods.getVoterFromAccount
+  getVoteSignerFromAccount: (account: string) => Promise<Address> = proxyCall(
+    this.contract.methods.getVoteSignerFromAccount
   )
   /**
    * Returns the validator for the specified account.
    * @param account The address of the account.
    * @return The address with which the account can register a validator or group.
    */
-  getValidatorFromAccount: (account: string) => Promise<Address> = proxyCall(
-    this.contract.methods.getValidatorFromAccount
+  getValidationSignerFromAccount: (account: string) => Promise<Address> = proxyCall(
+    this.contract.methods.getValidationSignerFromAccount
   )
 
   /**
@@ -48,12 +48,15 @@ export class AccountsWrapper extends BaseWrapper<Accounts> {
    * @param voter Address to be used for voting.
    * @return A CeloTransactionObject
    */
-  async authorizeVoter(account: Address, voter: Address): Promise<CeloTransactionObject<void>> {
+  async authorizeVoteSigner(
+    account: Address,
+    voter: Address
+  ): Promise<CeloTransactionObject<void>> {
     const sig = await this.getParsedSignatureOfAddress(account, voter)
     // TODO(asa): Pass default tx "from" argument.
     return toTransactionObject(
       this.kit,
-      this.contract.methods.authorizeVoter(voter, sig.v, sig.r, sig.s)
+      this.contract.methods.authorizeVoteSigner(voter, sig.v, sig.r, sig.s)
     )
   }
 
@@ -63,14 +66,14 @@ export class AccountsWrapper extends BaseWrapper<Accounts> {
    * @param voter Address to be used for validating.
    * @return A CeloTransactionObject
    */
-  async authorizeValidator(
+  async authorizeValidationSigner(
     account: Address,
     validator: Address
   ): Promise<CeloTransactionObject<void>> {
     const sig = await this.getParsedSignatureOfAddress(account, validator)
     return toTransactionObject(
       this.kit,
-      this.contract.methods.authorizeValidator(validator, sig.v, sig.r, sig.s)
+      this.contract.methods.authorizeValidationSigner(validator, sig.v, sig.r, sig.s)
     )
   }
 

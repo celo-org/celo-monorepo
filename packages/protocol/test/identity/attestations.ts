@@ -132,7 +132,7 @@ contract('Attestations', (accounts: string[]) => {
         await accountsInstance.createAccount({ from: account })
         await unlockAndAuthorizeKey(
           KeyOffsets.VALIDATING_KEY_OFFSET,
-          accountsInstance.authorizeValidator,
+          accountsInstance.authorizeValidationSigner,
           account
         )
       })
@@ -474,7 +474,7 @@ contract('Attestations', (accounts: string[]) => {
         const attestationKey = getDerivedKey(KeyOffsets.ATTESTING_KEY_OFFSET, issuer)
         await unlockAndAuthorizeKey(
           KeyOffsets.ATTESTING_KEY_OFFSET,
-          accountsInstance.authorizeAttestor,
+          accountsInstance.authorizeAttestationSigner,
           issuer
         )
         ;({ v, r, s } = attestToIdentifier(phoneNumber, caller, attestationKey))

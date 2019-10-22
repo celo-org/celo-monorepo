@@ -474,7 +474,7 @@ contract Attestations is IAttestations, Ownable, Initializable, UsingRegistry, R
   {
     bytes32 codehash = keccak256(abi.encodePacked(identifier, account));
     address signer = ecrecover(codehash, v, r, s);
-    address issuer = getAccounts().getAccountFromAttestor(signer);
+    address issuer = getAccounts().getAccountFromAttestationSigner(signer);
 
     Attestation storage attestation =
       identifiers[identifier].attestations[account].issuedAttestations[issuer];
@@ -550,7 +550,7 @@ contract Attestations is IAttestations, Ownable, Initializable, UsingRegistry, R
     while (currentIndex < n) {
       seed = keccak256(abi.encodePacked(seed));
       validator = validators[uint256(seed) % validators.length];
-      issuer = getAccounts().getAccountFromValidator(validator);
+      issuer = getAccounts().getAccountFromValidationSigner(validator);
       Attestation storage attestations =
         state.issuedAttestations[issuer];
 

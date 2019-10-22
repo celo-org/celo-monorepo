@@ -58,8 +58,6 @@ contract LockedGold is ILockedGold, ReentrancyGuard, Initializable, UsingRegistr
   uint256 public unlockingPeriod;
 
   event UnlockingPeriodSet(uint256 period);
-  event VoterAuthorized(address indexed account, address voter);
-  event ValidatorAuthorized(address indexed account, address validator);
   event GoldLocked(address indexed account, uint256 value);
   event GoldUnlocked(address indexed account, uint256 value, uint256 available);
   event GoldWithdrawn(address indexed account, uint256 value);

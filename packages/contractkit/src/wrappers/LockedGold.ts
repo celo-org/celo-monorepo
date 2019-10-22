@@ -111,8 +111,8 @@ export class LockedGoldWrapper extends BaseWrapper<LockedGold> {
     const accounts = await this.kit.contracts.getAccounts()
     const nonvoting = await this.getAccountNonvotingLockedGold(account)
     const total = await this.getAccountTotalLockedGold(account)
-    const voter = await accounts.getVoterFromAccount(account)
-    const validator = await accounts.getValidatorFromAccount(account)
+    const voter = await accounts.getVoteSignerFromAccount(account)
+    const validator = await accounts.getValidationSignerFromAccount(account)
     const pendingWithdrawals = await this.getPendingWithdrawals(account)
     return {
       lockedGold: {

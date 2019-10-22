@@ -26,14 +26,14 @@ contract('Accounts', (accounts: string[]) => {
     await accountsInstance.initialize()
 
     authorizationTests.voter = {
-      fn: accountsInstance.authorizeVoter,
-      getAuthorizedFromAccount: accountsInstance.getVoterFromAccount,
-      getAccountFromAuthorized: accountsInstance.getAccountFromVoter,
+      fn: accountsInstance.authorizeVoteSigner,
+      getAuthorizedFromAccount: accountsInstance.getVoteSignerFromAccount,
+      getAccountFromAuthorized: accountsInstance.getAccountFromVoteSigner,
     }
     authorizationTests.validator = {
-      fn: accountsInstance.authorizeValidator,
-      getAuthorizedFromAccount: accountsInstance.getValidatorFromAccount,
-      getAccountFromAuthorized: accountsInstance.getAccountFromValidator,
+      fn: accountsInstance.authorizeValidationSigner,
+      getAuthorizedFromAccount: accountsInstance.getValidationSignerFromAccount,
+      getAccountFromAuthorized: accountsInstance.getAccountFromValidationSigner,
     }
   })
 

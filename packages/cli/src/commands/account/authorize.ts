@@ -40,9 +40,9 @@ export default class Authorize extends BaseCommand {
     const accounts = await this.kit.contracts.getAccounts()
     let tx: any
     if (res.flags.role === 'voter') {
-      tx = await accounts.authorizeVoter(res.flags.from, res.flags.to)
+      tx = await accounts.authorizeVoteSigner(res.flags.from, res.flags.to)
     } else if (res.flags.role === 'validator') {
-      tx = await accounts.authorizeValidator(res.flags.from, res.flags.to)
+      tx = await accounts.authorizeValidationSigner(res.flags.from, res.flags.to)
     } else {
       this.error(`Invalid role provided`)
       return
