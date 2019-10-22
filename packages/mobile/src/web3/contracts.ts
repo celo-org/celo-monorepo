@@ -13,7 +13,7 @@ const tag = 'web3/contracts'
 
 export const web3: Web3 = getWeb3()
 
-export function isInitiallyZeroSyncMode(): boolean {
+export function isInitiallyZeroSyncMode() {
   return networkConfig.initiallyZeroSync
 }
 
