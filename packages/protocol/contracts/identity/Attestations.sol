@@ -28,18 +28,15 @@ contract Attestations is IAttestations, Ownable, Initializable, UsingRegistry, R
 
     // For outstanding attestations, this is the block number of the request.
     // For completed attestations, this is the block number of the attestation completion.
-    uint128 blockNumber;
-  }
-
-  struct Account {
-    // The block number of the most recent attestation request.
-    uint64 mostRecentAttestationRequestBlockNumber;
-
-    // The address at which the account expects to receive transfers.
-    address walletAddress;
+    uint32 blockNumber;
 
     // The token with which attestation request fees are paid.
     address attestationRequestFeeToken;
+  }
+
+  struct Account {
+    // The address at which the account expects to receive transfers.
+    address walletAddress;
 
     // The address of the key with which this account wants to sign attestations.
     address authorizedAttestor;
@@ -68,10 +65,13 @@ contract Attestations is IAttestations, Ownable, Initializable, UsingRegistry, R
 
   struct UnselectedRequest {
     // The block at which the attestations were requested.
-    uint128 blockNumber;
+    uint32 blockNumber;
 
     // The number of attestations that were requested.
-    uint128 attestationsRequested;
+    uint32 attestationsRequested;
+
+    // The token with which attestation request fees are paid in this request.
+    address attestationRequestFeeToken;
   }
 
   struct IdentifierState {
@@ -217,24 +217,16 @@ contract Attestations is IAttestations, Ownable, Initializable, UsingRegistry, R
     require(attestationsRequested > 0, "You have to request at least 1 attestation");
 
     IdentifierState storage state = identifiers[identifier];
-    if(!isAttestationExpired(accounts[msg.sender].mostRecentAttestationRequestBlockNumber)) {
-      require(
-        accounts[msg.sender].attestationRequestFeeToken == address(0) ||
-          accounts[msg.sender].attestationRequestFeeToken == attestationRequestFeeToken,
-        "There exists an unexpired attestation request with a different fee token"
-      );
-      require(
-        state.unselectedRequests[msg.sender].blockNumber == 0,
-        "There exists an unexpired, unselected attestation request"
-      );
-    }
 
-    state.unselectedRequests[msg.sender].blockNumber = block.number.toUint128();
-    state.unselectedRequests[msg.sender].attestationsRequested = attestationsRequested.toUint128();
+    require(
+      state.unselectedRequests[msg.sender].blockNumber == 0 ||
+        isAttestationExpired(state.unselectedRequests[msg.sender].blockNumber),
+      "There exists an unexpired, unselected attestation request"
+    );
 
-    // solhint-disable-next-line not-rely-on-time
-    accounts[msg.sender].mostRecentAttestationRequestBlockNumber = block.number.toUint64();
-    accounts[msg.sender].attestationRequestFeeToken = attestationRequestFeeToken;
+    state.unselectedRequests[msg.sender].blockNumber = block.number.toUint32();
+    state.unselectedRequests[msg.sender].attestationsRequested = attestationsRequested.toUint32();
+    state.unselectedRequests[msg.sender].attestationRequestFeeToken = attestationRequestFeeToken;
 
     state.attestations[msg.sender].requested = uint256(
       state.attestations[msg.sender].requested
@@ -253,11 +245,6 @@ contract Attestations is IAttestations, Ownable, Initializable, UsingRegistry, R
    * @param identifier The hash of the identifier to be attested.
    */
   function selectIssuers(bytes32 identifier) external {
-    require(
-      !isAttestationExpired(accounts[msg.sender].mostRecentAttestationRequestBlockNumber),
-      "The attestation request has expired"
-    );
-
     IdentifierState storage state = identifiers[identifier];
 
     require(
@@ -265,20 +252,18 @@ contract Attestations is IAttestations, Ownable, Initializable, UsingRegistry, R
       "No unselected attestation request to select issuers for"
     );
 
-    addIncompleteAttestations(
-      state.unselectedRequests[msg.sender].attestationsRequested,
-      state.attestations[msg.sender],
-      uint256(state.unselectedRequests[msg.sender].blockNumber).toUint64()
+    require(
+      !isAttestationExpired(state.unselectedRequests[msg.sender].blockNumber),
+      "The attestation request has expired"
     );
 
+    addIncompleteAttestations(identifier);
     emit AttestationIssuersSelected(
       identifier,
       msg.sender,
       state.unselectedRequests[msg.sender].attestationsRequested,
-      accounts[msg.sender].attestationRequestFeeToken
+      state.unselectedRequests[msg.sender].attestationRequestFeeToken
     );
-
-    delete state.unselectedRequests[msg.sender];
   }
 
   /**
@@ -336,12 +321,13 @@ contract Attestations is IAttestations, Ownable, Initializable, UsingRegistry, R
     Attestation storage attestation =
       identifiers[identifier].attestations[msg.sender].issuedAttestations[issuer];
 
-    // solhint-disable-next-line not-rely-on-time
-    attestation.blockNumber = block.number.toUint128();
-    attestation.status = AttestationStatus.Complete;
-    identifiers[identifier].attestations[msg.sender].completed++;
+    address token = attestation.attestationRequestFeeToken;
 
-    address token = accounts[msg.sender].attestationRequestFeeToken;
+    // solhint-disable-next-line not-rely-on-time
+    attestation.blockNumber = block.number.toUint32();
+    attestation.status = AttestationStatus.Complete;
+    delete attestation.attestationRequestFeeToken;
+    identifiers[identifier].attestations[msg.sender].completed++;
 
     pendingWithdrawals[token][issuer] = pendingWithdrawals[token][issuer].add(
       attestationRequestFees[token]
@@ -408,7 +394,11 @@ contract Attestations is IAttestations, Ownable, Initializable, UsingRegistry, R
    * @notice Returns the unselected attestation request for an identifier/account pair, if any.
    * @param identifier Hash of the identifier.
    * @param account Address of the account.
-   * @return [Block number at which was requested, Number of unselected requests]
+   * @return [
+   *           Block number at which was requested,
+   *           Number of unselected requests,
+   *           Address of the token with which this attestation request was paid for
+   *         ]
    */
   function getUnselectedRequest(
     bytes32 identifier,
@@ -416,11 +406,12 @@ contract Attestations is IAttestations, Ownable, Initializable, UsingRegistry, R
   )
     external
     view
-    returns (uint128, uint128)
+    returns (uint32, uint32, address)
   {
     return (
       identifiers[identifier].unselectedRequests[account].blockNumber,
-      identifiers[identifier].unselectedRequests[account].attestationsRequested
+      identifiers[identifier].unselectedRequests[account].attestationsRequested,
+      identifiers[identifier].unselectedRequests[account].attestationRequestFeeToken
     );
   }
 
@@ -511,7 +502,11 @@ contract Attestations is IAttestations, Ownable, Initializable, UsingRegistry, R
    * @param identifier Hash of the identifier.
    * @param account Address of the account.
    * @param issuer Address of the issuer.
-   * @return [Status of the attestation, block number of request/completion the attestation]
+   * @return [
+   *           Status of the attestation,
+   *           Block number of request/completion the attestation,
+   *           Address of the token with which this attestation request was paid for
+   *         ]
    */
   function getAttestationState(
     bytes32 identifier,
@@ -520,35 +515,14 @@ contract Attestations is IAttestations, Ownable, Initializable, UsingRegistry, R
   )
     external
     view
-    returns (uint8, uint128)
+    returns (uint8, uint32, address)
   {
     return (
       uint8(identifiers[identifier].attestations[account].issuedAttestations[issuer].status),
-      identifiers[identifier].attestations[account].issuedAttestations[issuer].blockNumber
+      identifiers[identifier].attestations[account].issuedAttestations[issuer].blockNumber,
+      identifiers[identifier].attestations[account].issuedAttestations[issuer].attestationRequestFeeToken
     );
 
-  }
-
-  /**
-   * @notice Returns address of the token in which the account chose to pay attestation fees.
-   * @param account Address of the account.
-   * @return Address of the token contract.
-   */
-  function getAttestationRequestFeeToken(address account) external view returns (address) {
-    return accounts[account].attestationRequestFeeToken;
-  }
-
-  /**
-   * @notice Returns the block number of the most recent attestation request.
-   * @param account Address of the account.
-   * @return Block number of the most recent attestation request.
-   */
-  function getMostRecentAttestationRequestBlockNumber(address account)
-    external
-    view
-    returns (uint256)
-  {
-    return accounts[account].mostRecentAttestationRequestBlockNumber;
   }
 
   /**
@@ -808,17 +782,16 @@ contract Attestations is IAttestations, Ownable, Initializable, UsingRegistry, R
 
   /**
    * @notice Adds additional attestations given the current randomness.
-   * @param n Number of attestations to add.
-   * @param state The accountState of the address to add attestations for.
-   * @param requestBlockNumber The block number at which attestations were requested.
+   * @param identifier The hash of the identifier to be attested.
    */
   function addIncompleteAttestations(
-    uint256 n,
-    AttestedAddress storage state,
-    uint64 requestBlockNumber
+    bytes32 identifier
   )
     internal
   {
+    AttestedAddress storage state = identifiers[identifier].attestations[msg.sender];
+    UnselectedRequest storage unselectedRequest = identifiers[identifier].unselectedRequests[msg.sender];
+
     IRandom random = IRandom(registry.getAddressForOrDie(RANDOM_REGISTRY_ID));
 
     bytes32 seed = random.random();
@@ -828,23 +801,25 @@ contract Attestations is IAttestations, Ownable, Initializable, UsingRegistry, R
     address validator;
     address issuer;
 
-    while (currentIndex < n) {
+    while (currentIndex < unselectedRequest.attestationsRequested) {
       seed = keccak256(abi.encodePacked(seed));
       validator = validators[uint256(seed) % validators.length];
       issuer = getLockedGold().getAccountFromValidator(validator);
-      Attestation storage attestations =
-        state.issuedAttestations[issuer];
+      Attestation storage attestation = state.issuedAttestations[issuer];
 
       // Attestation issuers can only be added if they haven't already.
-      if (attestations.status != AttestationStatus.None) {
+      if (attestation.status != AttestationStatus.None) {
         continue;
       }
 
       currentIndex++;
-      attestations.status = AttestationStatus.Incomplete;
-      attestations.blockNumber = requestBlockNumber;
+      attestation.status = AttestationStatus.Incomplete;
+      attestation.blockNumber = unselectedRequest.blockNumber;
+      attestation.attestationRequestFeeToken = unselectedRequest.attestationRequestFeeToken;
       state.selectedIssuers.push(issuer);
     }
+
+    delete state.unselectedRequests[msg.sender];
   }
 
   function isAttestationExpired(uint128 attestationRequestBlock)

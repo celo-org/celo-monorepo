@@ -28,7 +28,7 @@ interface IAttestations {
   function getWalletAddress(address) external view returns (address);
   function getMetadataURL(address) external view returns (string memory);
 
-  function getUnselectedRequest(bytes32, address) external view returns (uint128, uint128);
+  function getUnselectedRequest(bytes32, address) external view returns (uint32, uint32, address);
   function getAttestationRequestFee(address) external view returns (uint256);
 
   function lookupAccountsForIdentifier(bytes32) external view returns (address[] memory);
@@ -48,8 +48,6 @@ interface IAttestations {
   )
     external
     view
-    returns (uint8, uint128);
+    returns (uint8, uint32, address);
 
-  function getAttestationRequestFeeToken(address) external view returns (address);
-  function getMostRecentAttestationRequestBlockNumber(address) external view returns (uint256);
 }
