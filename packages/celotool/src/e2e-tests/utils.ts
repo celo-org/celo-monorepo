@@ -342,8 +342,8 @@ export async function startGeth(gethBinaryPath: string, instance: GethInstanceCo
   } else if (isSentry) {
     gethArgs.push('--sentry')
     if (sentryport) {
-      gethArgs.push('--proxiedvalidatorport')
-      gethArgs.push(sentryport.toString())
+      gethArgs.push('--proxiedvalidatorendpoint')
+      gethArgs.push(`127.0.0.1:${sentryport.toString()}`)
     }
     gethArgs.push(`--nodekeyhex=${privateKey}`)
   }
