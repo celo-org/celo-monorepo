@@ -131,23 +131,11 @@ export function isDeprecatedVersion(version: string, minVersion: string): boolea
   return false
 }
 
-export function getNestedValue(dict: object, keyList: string[]): any {
-  let nestedDict: any = dict
-  for (const key of keyList) {
-    if (typeof nestedDict !== 'object' || nestedDict[key] === undefined) {
-      return undefined
-    }
-    nestedDict = nestedDict[key]
-  }
-  return nestedDict
-}
-
 /*
 Get the Version deprecation information.
 @param version: string The version to check for deprecation
 @return: object { version: <VERSION>, deprecated: <BOOLEAN> }
 Firebase DB Format: 
-  (Backward Compatibility) Add child to versions category in the format versions>1>5>0>{deprecated: true}
   (New) Add minVersion child to versions category with a string of the mininum version as string
 */
 export async function getVersionInfo(version: string) {
@@ -157,16 +145,8 @@ export async function getVersionInfo(version: string) {
     .database()
     .ref('versions')
     .once('value')).val()
-  if (!versionsInfo) {
+  if (!versionsInfo || !versionsInfo.minVersion) {
     return { deprecated, version }
-  }
-  // backward compatible check
-  const currentVersionInfo = getNestedValue(versionsInfo, version.split('.'))
-  if (currentVersionInfo && currentVersionInfo.deprecated !== undefined) {
-    return currentVersionInfo
-  }
-  if (!versionsInfo.minVersion) {
-    return { version, deprecated }
   }
   const minVersion: string = versionsInfo.minVersion
   deprecated = isDeprecatedVersion(version, minVersion)
