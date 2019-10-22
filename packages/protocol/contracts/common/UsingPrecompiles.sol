@@ -89,7 +89,12 @@ contract UsingPrecompiles {
     return epochNumber;
   }
 
-  function validatorAddressFromCurrentSet(uint256 index) external view returns (address) {
+  /**
+   * @notice Gets a validator address from the current validator set.
+   * @param index Index of requested validator in the validator set as sorted by the election.
+   * @return Address of validator at the requested index.
+   */
+  function validatorAddressFromCurrentSet(uint256 index) public view returns (address) {
     address validatorAddress;
     assembly {
       let newCallDataPosition := mload(0x40)
@@ -102,7 +107,11 @@ contract UsingPrecompiles {
     return validatorAddress;
   }
 
-  function numberValidatorsInCurrentSet() external view returns (uint256) {
+  /**
+   * @notice Gets the size of the current elected validator set.
+   * @return Size of the current elected validator set.
+   */
+  function numberValidatorsInCurrentSet() public view returns (uint256) {
     uint256 numberValidators;
     assembly {
       let success := staticcall(5000, 0xf9, 0, 0, 0, 0)
