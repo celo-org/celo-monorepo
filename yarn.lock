@@ -26167,10 +26167,10 @@ react-native-debugger-open@^0.3.17:
     minimist "^1.2.0"
     semver "^5.4.1"
 
-react-native-device-info@^2.1.0:
-  version "2.1.0"
-  resolved "https://registry.yarnpkg.com/react-native-device-info/-/react-native-device-info-2.1.0.tgz#55eb82c1ba14c550cef6b71efc368d88b96b826a"
-  integrity sha512-FdHFi0DtISiytXzE2KM16Qd4GPEGnbA8DjTP1vHjcUPFJCLBtm1P0/10Xn5x/kISjEvsz17grdtJxGrd83c6Pw==
+react-native-device-info@^2.3.2:
+  version "2.3.2"
+  resolved "https://registry.yarnpkg.com/react-native-device-info/-/react-native-device-info-2.3.2.tgz#db2b8f135aaf2515583e367ab791dcc7d2f0d14c"
+  integrity sha512-ccpPuUbwhw5uYdVwN1UJp6ykMZz6U/u82HNM3oJ7O6MP8RIMlMDkHbqR4O0sDtUSuRMGiqqRzFtmOLFYeQ0ODw==
 
 react-native-firebase@5.5.4:
   version "5.5.4"

@@ -10,6 +10,7 @@ import { getRegionCodeFromCountryCode, parsePhoneNumber } from '@celo/utils/src/
 import * as React from 'react'
 import { Platform, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
 import Autocomplete from 'react-native-autocomplete-input'
+import DeviceInfo from 'react-native-device-info'
 
 const TAG = 'PhoneNumberInput'
 
@@ -69,27 +70,42 @@ export default class PhoneNumberInput extends React.Component<Props, State> {
     }
   }
 
-  async triggerPhoneNumberRequest() {
+  async triggerPhoneNumberRequestAndroid() {
     try {
       const phone = await SmsRetriever.requestPhoneNumber()
       const phoneNumber = parsePhoneNumber(phone, '')
 
-      if (phoneNumber) {
-        this.setState({
-          phoneNumber: phoneNumber.displayNumber.toString(),
-        })
-        if (phoneNumber.countryCode) {
-          // TODO known issue, the country code is not enough to
-          // get a country, e.g. +1 could be USA or Canada
-          const displayName = this.state.countries.getCountryByPhoneCountryCode(
-            '+' + phoneNumber.countryCode.toString()
-          ).displayName
+      if (!phoneNumber) {
+        return
+      }
 
-          this.onChangeCountryQuery(displayName)
-        }
+      this.setState({ phoneNumber: phoneNumber.displayNumber.toString() })
+
+      if (phoneNumber.countryCode) {
+        // TODO known issue, the country code is not enough to
+        // get a country, e.g. +1 could be USA or Canada
+        const displayName = this.state.countries.getCountryByPhoneCountryCode(
+          '+' + phoneNumber.countryCode.toString()
+        ).displayName
+
+        this.onChangeCountryQuery(displayName)
       }
     } catch (error) {
-      console.debug(`${TAG}/Could not request phone`)
+      console.error(`${TAG}/triggerPhoneNumberRequestAndroid`, 'Could not request phone', error)
+    }
+  }
+
+  async triggerPhoneNumberRequest() {
+    try {
+      await this.triggerPhoneNumberRequestAndroid()
+      const baseOS = await DeviceInfo.getBaseOS()
+      if (baseOS === 'Android') {
+        await this.triggerPhoneNumberRequestAndroid()
+      }
+
+      console.info(`${TAG}/triggerPhoneNumberRequest`, 'Not implemented in this platform')
+    } catch (error) {
+      console.error(`${TAG}/triggerPhoneNumberRequest`, 'Could not request phone', error)
     }
   }
 
