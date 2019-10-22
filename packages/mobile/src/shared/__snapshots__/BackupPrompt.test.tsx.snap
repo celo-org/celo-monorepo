@@ -83,10 +83,9 @@ exports[`BackupPrompt renders correctly 1`] = `
             "alignItems": "center",
             "alignSelf": "flex-start",
             "borderRadius": 2,
-            "minWidth": 160,
+            "flexDirection": "row",
             "paddingHorizontal": 16,
             "paddingVertical": 6,
-            "textAlign": "center",
           },
           Object {
             "backgroundColor": "transparent",
@@ -113,10 +112,12 @@ exports[`BackupPrompt renders correctly 1`] = `
             },
             Object {
               "lineHeight": 20,
+              "textAlign": "center",
             },
             Object {
               "color": "#42D689",
             },
+            null,
             Object {
               "color": "#FFFFFF",
             },
