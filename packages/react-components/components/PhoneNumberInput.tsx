@@ -98,12 +98,14 @@ export default class PhoneNumberInput extends React.Component<Props, State> {
   async triggerPhoneNumberRequest() {
     try {
       await this.triggerPhoneNumberRequestAndroid()
+      // TODO if `react-native-device-info` upgrades to >=3
+      // Next line should be: `DeviceInfo.getBaseOs()` (lowercased)
       const baseOS = await DeviceInfo.getBaseOS()
       if (baseOS === 'Android') {
         await this.triggerPhoneNumberRequestAndroid()
+      } else {
+        console.info(`${TAG}/triggerPhoneNumberRequest`, 'Not implemented in this platform')
       }
-
-      console.info(`${TAG}/triggerPhoneNumberRequest`, 'Not implemented in this platform')
     } catch (error) {
       console.error(`${TAG}/triggerPhoneNumberRequest`, 'Could not request phone', error)
     }
