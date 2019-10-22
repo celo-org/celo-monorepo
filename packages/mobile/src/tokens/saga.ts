@@ -17,11 +17,19 @@ import * as utf8 from 'utf8'
 
 const TAG = 'tokens/saga'
 
-interface TokenFetchFactory {
-  actionName: string
-  token: CURRENCY_ENUM
-  actionCreator: (balance: string) => any
-  tag: string
+const contractWeiPerUnit: { [key in CURRENCY_ENUM]: BigNumber | null } = {
+  [CURRENCY_ENUM.GOLD]: null,
+  [CURRENCY_ENUM.DOLLAR]: null,
+}
+async function convertFromContractDecimals(value: BigNumber, token: CURRENCY_ENUM) {
+  let weiPerUnit = contractWeiPerUnit[token]
+  if (!weiPerUnit) {
+    const contract = await getTokenContract(token)
+    const decimals = await contract.decimals()
+    weiPerUnit = new BigNumber(10).pow(decimals)
+    contractWeiPerUnit[token] = weiPerUnit
+  }
+  return value.dividedBy(weiPerUnit)
 }
 
 export async function getTokenContract(token: CURRENCY_ENUM) {
@@ -41,10 +49,11 @@ export async function getTokenContract(token: CURRENCY_ENUM) {
   return tokenContract
 }
 
-async function convertFromContractDecimals(value: BigNumber, contract: any) {
-  const decimals = await contract.decimals()
-  const weiPerUnit = new BigNumber(10).pow(decimals)
-  return value.dividedBy(weiPerUnit)
+interface TokenFetchFactory {
+  actionName: string
+  token: CURRENCY_ENUM
+  actionCreator: (balance: string) => any
+  tag: string
 }
 
 export function tokenFetchFactory({ actionName, token, actionCreator, tag }: TokenFetchFactory) {
@@ -54,11 +63,7 @@ export function tokenFetchFactory({ actionName, token, actionCreator, tag }: Tok
       const account = yield call(getConnectedAccount)
       const tokenContract = yield call(getTokenContract, token)
       const balanceInWei: BigNumber = yield call([tokenContract, tokenContract.balanceOf], account)
-      const balance: BigNumber = yield call(
-        convertFromContractDecimals,
-        balanceInWei,
-        tokenContract
-      )
+      const balance: BigNumber = yield call(convertFromContractDecimals, balanceInWei, token)
       CeloAnalytics.track(CustomEventNames.fetch_balance)
       yield put(actionCreator(balance.toString()))
     } catch (error) {
@@ -122,7 +127,7 @@ export async function fetchTokenBalanceWithRetry(token: CURRENCY_ENUM, account: 
   const tokenContract = await getTokenContract(token)
   // Retry needed here because it's typically the app's first tx and seems to fail on occasion
   const balanceInWei = await retryAsync(tokenContract.balanceOf, 3, [account])
-  const balance = await convertFromContractDecimals(balanceInWei, tokenContract)
+  const balance = await convertFromContractDecimals(balanceInWei, token)
   Logger.debug(TAG + '@fetchTokenBalanceWithRetry', 'Account balance', balance.toString())
   return balance
 }
