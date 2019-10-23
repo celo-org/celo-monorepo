@@ -1,8 +1,8 @@
 import * as React from 'react'
-import LazyLoad from 'react-lazyload'
-import { Image, StyleSheet, Text, View } from 'react-native'
+import LazyLoadFadin from 'react-lazyload-fadein'
+import { Image, ImageURISource, StyleSheet, Text, View } from 'react-native'
 import shuffleSeed from 'shuffle-seed'
-import teamList from 'src/about/team/team-list'
+import teamList, { Person } from 'src/about/team/team-list'
 import { H1, H4 } from 'src/fonts/Fonts'
 import { I18nProps, withNamespaces } from 'src/i18n'
 import BookLayout from 'src/layout/BookLayout'
@@ -35,18 +35,20 @@ export class Team extends React.Component<Props & I18nProps & ScreenProps> {
                 screen === ScreenSizes.MOBILE && { justifyContent: 'center' },
               ]}
             >
-              {shuffledTeamList.map((person) => (
+              {shuffledTeamList.map((person: Person) => (
                 <Responsive
                   key={person.name}
                   medium={styles.mediumPerson}
                   large={styles.largePerson}
                 >
                   <View style={styles.person}>
-                    <LazyLoad height={200}>
-                      <AspectRatio style={styles.photoContainer} ratio={275 / 400}>
-                        <Image source={{ uri: person.photo }} style={styles.photo} />
-                      </AspectRatio>
-                    </LazyLoad>
+                    <View style={styles.imageBackground}>
+                      <LazyLoadFadin>
+                        {(onLoad: () => void) => (
+                          <Portrait source={{ uri: person.photo }} onLoad={onLoad} />
+                        )}
+                      </LazyLoadFadin>
+                    </View>
                     <H4>{person.name}</H4>
                     <Text style={fonts.p}>{t(person.role) as string}</Text>
                   </View>
@@ -66,6 +68,21 @@ export class Team extends React.Component<Props & I18nProps & ScreenProps> {
   }
 }
 
+interface PortraitProps {
+  source: ImageURISource
+  onLoad?: () => void
+}
+
+const Portrait = React.memo(function _Portrait({ source, onLoad }: PortraitProps) {
+  return (
+    <AspectRatio ratio={275 / 400}>
+      <Image source={source} onLoad={onLoad} style={styles.photo} />
+    </AspectRatio>
+  )
+})
+
+const PHOTO_BACKGROUND = '#E5E2DD'
+
 // @ts-ignore
 const styles = StyleSheet.create({
   container: {
@@ -74,7 +91,7 @@ const styles = StyleSheet.create({
     justifyContent: 'flex-start',
     alignItems: 'center',
   },
-  photoContainer: { marginBottom: 20 },
+  imageBackground: { backgroundColor: PHOTO_BACKGROUND, marginBottom: 20 },
   photo: {
     height: '100%',
     width: '100%',

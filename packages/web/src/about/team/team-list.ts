@@ -1,4 +1,4 @@
-interface Person {
+export interface Person {
   name: string
   role: string
   photo: string
