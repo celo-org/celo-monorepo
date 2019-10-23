@@ -208,6 +208,8 @@ PODS:
     - Segment-Firebase
   - RNDeviceInfo (2.1.0):
     - React
+  - RNExitApp (1.1.0):
+    - React
   - RNFirebase (5.5.4):
     - Firebase/Core
     - React
@@ -288,6 +290,7 @@ DEPENDENCIES:
   - "RNAnalytics (from `../../../node_modules/@segment/analytics-react-native`)"
   - "RNAnalyticsIntegration-Firebase (from `../../../node_modules/@segment/analytics-react-native-firebase`)"
   - RNDeviceInfo (from `../../../node_modules/react-native-device-info`)
+  - RNExitApp (from `../../../node_modules/react-native-exit-app`)
   - RNFirebase (from `../../../node_modules/react-native-firebase/ios`)
   - RNFS (from `../../../node_modules/react-native-fs`)
   - RNGestureHandler (from `../node_modules/react-native-gesture-handler`)
@@ -366,6 +369,8 @@ EXTERNAL SOURCES:
     :path: "../../../node_modules/@segment/analytics-react-native-firebase"
   RNDeviceInfo:
     :path: "../../../node_modules/react-native-device-info"
+  RNExitApp:
+    :path: "../../../node_modules/react-native-exit-app"
   RNFirebase:
     :path: "../../../node_modules/react-native-firebase/ios"
   RNFS:
@@ -430,6 +435,7 @@ SPEC CHECKSUMS:
   RNAnalytics: 05243c1fa17186f07be3eae30514b43aeb2e0578
   RNAnalyticsIntegration-Firebase: 82b879019b012d1aa1cbcb6dfc466acd7233bb97
   RNDeviceInfo: 2b4f76adc479657bf37bfc927bbfb027b17515d4
+  RNExitApp: c4e052df2568b43bec8a37c7cd61194d4cfee2c3
   RNFirebase: 7d4733713a0f436d55388b55ca3744385c70fd2d
   RNFS: 0f4d630b538e93e0e9e3519ff0b7b7b48760d8ed
   RNGestureHandler: b65d391f4f570178d657b99a16ec99d09b8656b0
@@ -444,6 +450,6 @@ SPEC CHECKSUMS:
   SentryReactNative: 07237139c00366ea2e75ae3e5c566e7a71c27a90
   yoga: 684513b14b03201579ba3cee20218c9d1298b0cc
 
-PODFILE CHECKSUM: 02a0ed956675dc8aa46eab297cf94e8823e80147
+PODFILE CHECKSUM: 4fd5dd293e11126639ca80f4cd528455f4af5ffa
 
 COCOAPODS: 1.7.5
