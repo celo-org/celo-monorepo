@@ -264,6 +264,8 @@ contract Attestations is IAttestations, Ownable, Initializable, UsingRegistry, R
       state.unselectedRequests[msg.sender].attestationsRequested,
       state.unselectedRequests[msg.sender].attestationRequestFeeToken
     );
+
+    delete state.unselectedRequests[msg.sender];
   }
 
   /**
@@ -821,8 +823,6 @@ contract Attestations is IAttestations, Ownable, Initializable, UsingRegistry, R
       attestation.attestationRequestFeeToken = unselectedRequest.attestationRequestFeeToken;
       state.selectedIssuers.push(issuer);
     }
-
-    delete identifiers[identifier].unselectedRequests[msg.sender];
   }
 
   function isAttestationExpired(uint128 attestationRequestBlock)
