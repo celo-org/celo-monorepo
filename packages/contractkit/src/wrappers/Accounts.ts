@@ -9,6 +9,11 @@ import {
   toTransactionObject,
 } from '../wrappers/BaseWrapper'
 
+enum SignerRole {
+  Attestation,
+  Validation,
+  Vote,
+}
 /**
  * Contract for handling deposits needed for voting.
  */
@@ -60,12 +65,7 @@ export class AccountsWrapper extends BaseWrapper<Accounts> {
     account: Address,
     attestationSigner: Address
   ): Promise<CeloTransactionObject<void>> {
-    const sig = await this.getParsedSignatureOfAddress(account, attestationSigner)
-    // TODO(asa): Pass default tx "from" argument.
-    return toTransactionObject(
-      this.kit,
-      this.contract.methods.authorizeVoteSigner(attestationSigner, sig.v, sig.r, sig.s)
-    )
+    return this.authorizeSigner(SignerRole.Attestation, account, attestationSigner)
   }
   /**
    * Authorizes an address to sign votes on behalf of the account.
@@ -77,12 +77,7 @@ export class AccountsWrapper extends BaseWrapper<Accounts> {
     account: Address,
     voteSigner: Address
   ): Promise<CeloTransactionObject<void>> {
-    const sig = await this.getParsedSignatureOfAddress(account, voteSigner)
-    // TODO(asa): Pass default tx "from" argument.
-    return toTransactionObject(
-      this.kit,
-      this.contract.methods.authorizeVoteSigner(voteSigner, sig.v, sig.r, sig.s)
-    )
+    return this.authorizeSigner(SignerRole.Vote, account, voteSigner)
   }
 
   /**
@@ -95,11 +90,7 @@ export class AccountsWrapper extends BaseWrapper<Accounts> {
     account: Address,
     validationSigner: Address
   ): Promise<CeloTransactionObject<void>> {
-    const sig = await this.getParsedSignatureOfAddress(account, validationSigner)
-    return toTransactionObject(
-      this.kit,
-      this.contract.methods.authorizeValidationSigner(validationSigner, sig.v, sig.r, sig.s)
-    )
+    return this.authorizeSigner(SignerRole.Validation, account, validationSigner)
   }
 
   /**
@@ -154,6 +145,18 @@ export class AccountsWrapper extends BaseWrapper<Accounts> {
    * @param address The address to set
    */
   setWalletAddress = proxySend(this.kit, this.contract.methods.setWalletAddress)
+
+  private authorizeFns = {
+    [SignerRole.Attestation]: this.contract.methods.authorizeAttestationSigner,
+    [SignerRole.Validation]: this.contract.methods.authorizeValidationSigner,
+    [SignerRole.Vote]: this.contract.methods.authorizeVoteSigner,
+  }
+
+  private async authorizeSigner(role: SignerRole, account: Address, signer: Address) {
+    const sig = await this.getParsedSignatureOfAddress(account, signer)
+    // TODO(asa): Pass default tx "from" argument.
+    return toTransactionObject(this.kit, this.authorizeFns[role](signer, sig.v, sig.r, sig.s))
+  }
 
   private async getParsedSignatureOfAddress(address: Address, signer: string) {
     const hash = Web3.utils.soliditySha3({ type: 'address', value: address })
