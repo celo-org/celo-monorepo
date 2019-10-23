@@ -13,9 +13,10 @@ import { navigate } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
 import Logger from 'src/utils/Logger'
 
-const TAG = 'Firebase'
+const TAG = 'firebase/firebase'
 
-function* watchFirebaseNotificationChannel(
+// only exported for testing
+export function* watchFirebaseNotificationChannel(
   channel: EventChannel<{ notification: Notification; stateType: NotificationReceiveState }>
 ) {
   try {
@@ -60,6 +61,7 @@ export const initializeAuth = async (app: Firebase, address: string) => {
 export function* initializeCloudMessaging(app: Firebase, address: string) {
   Logger.info(TAG, 'Initializing Firebase Cloud Messaging')
 
+  // this call needs to include context: https://github.com/redux-saga/redux-saga/issues/27
   const enabled = yield call([app.messaging(), 'hasPermission'])
   if (!enabled) {
     try {

@@ -43,6 +43,12 @@ describe(initializeCloudMessaging, () => {
       .provide([
         [call([app.messaging(), 'hasPermission']), false],
         [call([app.messaging(), 'requestPermission']), throwError(errorToRaise)],
+        {
+          spawn(effect, next) {
+            // mock all spawns
+            return
+          },
+        },
       ])
       .run()
       .catch((error: Error) => {
@@ -61,8 +67,15 @@ describe(initializeCloudMessaging, () => {
         [call(registerTokenToDb, app, address, mockFcmToken), null],
         [select(currentLanguageSelector), mockLanguage],
         [call(setUserLanguage, address, mockLanguage), null],
+        {
+          spawn(effect, next) {
+            // mock all spawns
+            return
+          },
+        },
       ])
       .call(registerTokenToDb, app, address, mockFcmToken)
+      .call(setUserLanguage, address, mockLanguage)
       .run()
   })
 })
