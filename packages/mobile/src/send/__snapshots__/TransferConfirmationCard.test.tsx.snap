@@ -192,7 +192,7 @@ exports[`TransferConfirmationCard renders correctly for escrow sent transaction 
         ]
       }
     >
-      100.00
+      133.00
     </Text>
   </View>
   <Text
@@ -707,7 +707,7 @@ exports[`TransferConfirmationCard renders correctly for received transaction dri
         ]
       }
     >
-      100.00
+      133.00
     </Text>
   </View>
 </View>
