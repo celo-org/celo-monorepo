@@ -517,10 +517,12 @@ contract Attestations is IAttestations, Ownable, Initializable, UsingRegistry, R
     view
     returns (uint8, uint32, address)
   {
+    Attestation storage attestation =
+      identifiers[identifier].attestations[account].issuedAttestations[issuer];
     return (
-      uint8(identifiers[identifier].attestations[account].issuedAttestations[issuer].status),
-      identifiers[identifier].attestations[account].issuedAttestations[issuer].blockNumber,
-      identifiers[identifier].attestations[account].issuedAttestations[issuer].attestationRequestFeeToken
+      uint8(attestation.status),
+      attestation.blockNumber,
+      attestation.attestationRequestFeeToken
     );
 
   }
@@ -790,7 +792,8 @@ contract Attestations is IAttestations, Ownable, Initializable, UsingRegistry, R
     internal
   {
     AttestedAddress storage state = identifiers[identifier].attestations[msg.sender];
-    UnselectedRequest storage unselectedRequest = identifiers[identifier].unselectedRequests[msg.sender];
+    UnselectedRequest storage unselectedRequest =
+      identifiers[identifier].unselectedRequests[msg.sender];
 
     IRandom random = IRandom(registry.getAddressForOrDie(RANDOM_REGISTRY_ID));
 
