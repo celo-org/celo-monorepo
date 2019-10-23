@@ -6,19 +6,19 @@ description: Manage your account, send and receive Celo Gold and Celo Dollars
 
 ### Authorize
 
-Authorize validating or voting address
+Authorize an attestation, validation or vote signing key
 
 ```
 USAGE
   $ celocli account:authorize
 
 OPTIONS
-  -r, --role=voter|validator                         Role to delegate
+  -r, --role=vote|validation|attestation             Role to delegate
   --from=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) Account Address
   --to=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d    (required) Account Address
 
 EXAMPLE
-  authorize --from 0x5409ED021D9299bf6814279A6A1411A7e866A631 --role voter --to
+  authorize --from 0x5409ED021D9299bf6814279A6A1411A7e866A631 --role vote --to
   0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d
 ```
 
