@@ -192,7 +192,7 @@ export function* assignAccountFromPrivateKey(key: string) {
     yield put(setAccountCreationTime())
     yield call(assignDataKeyFromPrivateKey, key)
 
-    if (zeroSyncMode) {
+    if (!zeroSyncMode) {
       web3.eth.defaultAccount = account
     }
     return account
