@@ -1,0 +1,1127 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`BackupQuiz renders correctly 1`] = `
+<SafeAreaView
+  style={
+    Object {
+      "backgroundColor": "#FFFFFF",
+      "flex": 1,
+      "justifyContent": "space-between",
+    }
+  }
+>
+  <View
+    style={
+      Object {
+        "height": 35,
+        "paddingRight": 10,
+        "paddingTop": 10,
+        "position": "absolute",
+        "right": 0,
+        "top": 0,
+        "width": 70,
+        "zIndex": 100,
+      }
+    }
+  >
+    <Text
+      accessible={true}
+      onResponderGrant={[Function]}
+      onResponderMove={[Function]}
+      onResponderRelease={[Function]}
+      onResponderTerminate={[Function]}
+      onResponderTerminationRequest={[Function]}
+      onStartShouldSetResponder={[Function]}
+    >
+         
+    </Text>
+  </View>
+  <RCTScrollView
+    contentContainerStyle={
+      Object {
+        "flexGrow": 1,
+        "paddingBottom": 20,
+        "paddingHorizontal": 20,
+      }
+    }
+  >
+    <View>
+      <Text
+        style={
+          Object {
+            "color": "#2E3338",
+            "fontFamily": "Hind-Light",
+            "fontSize": 22,
+            "paddingBottom": 20,
+            "textAlign": "center",
+          }
+        }
+      >
+        confirmBackupKey
+      </Text>
+      <View
+        style={
+          Object {
+            "flexDirection": "row",
+            "flexWrap": "wrap",
+            "justifyContent": "center",
+          }
+        }
+      >
+        <Text
+          style={
+            Array [
+              Object {
+                "borderColor": "#EEEEEE",
+                "borderRadius": 100,
+                "borderWidth": 1,
+                "color": "#BDBDBD",
+                "fontFamily": "Hind-Regular",
+                "fontSize": 14,
+                "lineHeight": undefined,
+                "marginHorizontal": 3,
+                "marginVertical": 4,
+                "minWidth": 55,
+                "paddingHorizontal": 4,
+                "paddingVertical": 2,
+                "textAlign": "center",
+              },
+              undefined,
+            ]
+          }
+        >
+          1
+        </Text>
+        <Text
+          style={
+            Array [
+              Object {
+                "borderColor": "#EEEEEE",
+                "borderRadius": 100,
+                "borderWidth": 1,
+                "color": "#BDBDBD",
+                "fontFamily": "Hind-Regular",
+                "fontSize": 14,
+                "lineHeight": undefined,
+                "marginHorizontal": 3,
+                "marginVertical": 4,
+                "minWidth": 55,
+                "paddingHorizontal": 4,
+                "paddingVertical": 2,
+                "textAlign": "center",
+              },
+              undefined,
+            ]
+          }
+        >
+          2
+        </Text>
+        <Text
+          style={
+            Array [
+              Object {
+                "borderColor": "#EEEEEE",
+                "borderRadius": 100,
+                "borderWidth": 1,
+                "color": "#BDBDBD",
+                "fontFamily": "Hind-Regular",
+                "fontSize": 14,
+                "lineHeight": undefined,
+                "marginHorizontal": 3,
+                "marginVertical": 4,
+                "minWidth": 55,
+                "paddingHorizontal": 4,
+                "paddingVertical": 2,
+                "textAlign": "center",
+              },
+              undefined,
+            ]
+          }
+        >
+          3
+        </Text>
+        <Text
+          style={
+            Array [
+              Object {
+                "borderColor": "#EEEEEE",
+                "borderRadius": 100,
+                "borderWidth": 1,
+                "color": "#BDBDBD",
+                "fontFamily": "Hind-Regular",
+                "fontSize": 14,
+                "lineHeight": undefined,
+                "marginHorizontal": 3,
+                "marginVertical": 4,
+                "minWidth": 55,
+                "paddingHorizontal": 4,
+                "paddingVertical": 2,
+                "textAlign": "center",
+              },
+              undefined,
+            ]
+          }
+        >
+          4
+        </Text>
+        <Text
+          style={
+            Array [
+              Object {
+                "borderColor": "#EEEEEE",
+                "borderRadius": 100,
+                "borderWidth": 1,
+                "color": "#BDBDBD",
+                "fontFamily": "Hind-Regular",
+                "fontSize": 14,
+                "lineHeight": undefined,
+                "marginHorizontal": 3,
+                "marginVertical": 4,
+                "minWidth": 55,
+                "paddingHorizontal": 4,
+                "paddingVertical": 2,
+                "textAlign": "center",
+              },
+              undefined,
+            ]
+          }
+        >
+          5
+        </Text>
+        <Text
+          style={
+            Array [
+              Object {
+                "borderColor": "#EEEEEE",
+                "borderRadius": 100,
+                "borderWidth": 1,
+                "color": "#BDBDBD",
+                "fontFamily": "Hind-Regular",
+                "fontSize": 14,
+                "lineHeight": undefined,
+                "marginHorizontal": 3,
+                "marginVertical": 4,
+                "minWidth": 55,
+                "paddingHorizontal": 4,
+                "paddingVertical": 2,
+                "textAlign": "center",
+              },
+              undefined,
+            ]
+          }
+        >
+          6
+        </Text>
+        <Text
+          style={
+            Array [
+              Object {
+                "borderColor": "#EEEEEE",
+                "borderRadius": 100,
+                "borderWidth": 1,
+                "color": "#BDBDBD",
+                "fontFamily": "Hind-Regular",
+                "fontSize": 14,
+                "lineHeight": undefined,
+                "marginHorizontal": 3,
+                "marginVertical": 4,
+                "minWidth": 55,
+                "paddingHorizontal": 4,
+                "paddingVertical": 2,
+                "textAlign": "center",
+              },
+              undefined,
+            ]
+          }
+        >
+          7
+        </Text>
+        <Text
+          style={
+            Array [
+              Object {
+                "borderColor": "#EEEEEE",
+                "borderRadius": 100,
+                "borderWidth": 1,
+                "color": "#BDBDBD",
+                "fontFamily": "Hind-Regular",
+                "fontSize": 14,
+                "lineHeight": undefined,
+                "marginHorizontal": 3,
+                "marginVertical": 4,
+                "minWidth": 55,
+                "paddingHorizontal": 4,
+                "paddingVertical": 2,
+                "textAlign": "center",
+              },
+              undefined,
+            ]
+          }
+        >
+          8
+        </Text>
+        <Text
+          style={
+            Array [
+              Object {
+                "borderColor": "#EEEEEE",
+                "borderRadius": 100,
+                "borderWidth": 1,
+                "color": "#BDBDBD",
+                "fontFamily": "Hind-Regular",
+                "fontSize": 14,
+                "lineHeight": undefined,
+                "marginHorizontal": 3,
+                "marginVertical": 4,
+                "minWidth": 55,
+                "paddingHorizontal": 4,
+                "paddingVertical": 2,
+                "textAlign": "center",
+              },
+              undefined,
+            ]
+          }
+        >
+          9
+        </Text>
+        <Text
+          style={
+            Array [
+              Object {
+                "borderColor": "#EEEEEE",
+                "borderRadius": 100,
+                "borderWidth": 1,
+                "color": "#BDBDBD",
+                "fontFamily": "Hind-Regular",
+                "fontSize": 14,
+                "lineHeight": undefined,
+                "marginHorizontal": 3,
+                "marginVertical": 4,
+                "minWidth": 55,
+                "paddingHorizontal": 4,
+                "paddingVertical": 2,
+                "textAlign": "center",
+              },
+              undefined,
+            ]
+          }
+        >
+          10
+        </Text>
+        <Text
+          style={
+            Array [
+              Object {
+                "borderColor": "#EEEEEE",
+                "borderRadius": 100,
+                "borderWidth": 1,
+                "color": "#BDBDBD",
+                "fontFamily": "Hind-Regular",
+                "fontSize": 14,
+                "lineHeight": undefined,
+                "marginHorizontal": 3,
+                "marginVertical": 4,
+                "minWidth": 55,
+                "paddingHorizontal": 4,
+                "paddingVertical": 2,
+                "textAlign": "center",
+              },
+              undefined,
+            ]
+          }
+        >
+          11
+        </Text>
+        <Text
+          style={
+            Array [
+              Object {
+                "borderColor": "#EEEEEE",
+                "borderRadius": 100,
+                "borderWidth": 1,
+                "color": "#BDBDBD",
+                "fontFamily": "Hind-Regular",
+                "fontSize": 14,
+                "lineHeight": undefined,
+                "marginHorizontal": 3,
+                "marginVertical": 4,
+                "minWidth": 55,
+                "paddingHorizontal": 4,
+                "paddingVertical": 2,
+                "textAlign": "center",
+              },
+              undefined,
+            ]
+          }
+        >
+          12
+        </Text>
+        <Text
+          style={
+            Array [
+              Object {
+                "borderColor": "#EEEEEE",
+                "borderRadius": 100,
+                "borderWidth": 1,
+                "color": "#BDBDBD",
+                "fontFamily": "Hind-Regular",
+                "fontSize": 14,
+                "lineHeight": undefined,
+                "marginHorizontal": 3,
+                "marginVertical": 4,
+                "minWidth": 55,
+                "paddingHorizontal": 4,
+                "paddingVertical": 2,
+                "textAlign": "center",
+              },
+              undefined,
+            ]
+          }
+        >
+          13
+        </Text>
+        <Text
+          style={
+            Array [
+              Object {
+                "borderColor": "#EEEEEE",
+                "borderRadius": 100,
+                "borderWidth": 1,
+                "color": "#BDBDBD",
+                "fontFamily": "Hind-Regular",
+                "fontSize": 14,
+                "lineHeight": undefined,
+                "marginHorizontal": 3,
+                "marginVertical": 4,
+                "minWidth": 55,
+                "paddingHorizontal": 4,
+                "paddingVertical": 2,
+                "textAlign": "center",
+              },
+              undefined,
+            ]
+          }
+        >
+          14
+        </Text>
+        <Text
+          style={
+            Array [
+              Object {
+                "borderColor": "#EEEEEE",
+                "borderRadius": 100,
+                "borderWidth": 1,
+                "color": "#BDBDBD",
+                "fontFamily": "Hind-Regular",
+                "fontSize": 14,
+                "lineHeight": undefined,
+                "marginHorizontal": 3,
+                "marginVertical": 4,
+                "minWidth": 55,
+                "paddingHorizontal": 4,
+                "paddingVertical": 2,
+                "textAlign": "center",
+              },
+              undefined,
+            ]
+          }
+        >
+          15
+        </Text>
+        <Text
+          style={
+            Array [
+              Object {
+                "borderColor": "#EEEEEE",
+                "borderRadius": 100,
+                "borderWidth": 1,
+                "color": "#BDBDBD",
+                "fontFamily": "Hind-Regular",
+                "fontSize": 14,
+                "lineHeight": undefined,
+                "marginHorizontal": 3,
+                "marginVertical": 4,
+                "minWidth": 55,
+                "paddingHorizontal": 4,
+                "paddingVertical": 2,
+                "textAlign": "center",
+              },
+              undefined,
+            ]
+          }
+        >
+          16
+        </Text>
+        <Text
+          style={
+            Array [
+              Object {
+                "borderColor": "#EEEEEE",
+                "borderRadius": 100,
+                "borderWidth": 1,
+                "color": "#BDBDBD",
+                "fontFamily": "Hind-Regular",
+                "fontSize": 14,
+                "lineHeight": undefined,
+                "marginHorizontal": 3,
+                "marginVertical": 4,
+                "minWidth": 55,
+                "paddingHorizontal": 4,
+                "paddingVertical": 2,
+                "textAlign": "center",
+              },
+              undefined,
+            ]
+          }
+        >
+          17
+        </Text>
+        <Text
+          style={
+            Array [
+              Object {
+                "borderColor": "#EEEEEE",
+                "borderRadius": 100,
+                "borderWidth": 1,
+                "color": "#BDBDBD",
+                "fontFamily": "Hind-Regular",
+                "fontSize": 14,
+                "lineHeight": undefined,
+                "marginHorizontal": 3,
+                "marginVertical": 4,
+                "minWidth": 55,
+                "paddingHorizontal": 4,
+                "paddingVertical": 2,
+                "textAlign": "center",
+              },
+              undefined,
+            ]
+          }
+        >
+          18
+        </Text>
+        <Text
+          style={
+            Array [
+              Object {
+                "borderColor": "#EEEEEE",
+                "borderRadius": 100,
+                "borderWidth": 1,
+                "color": "#BDBDBD",
+                "fontFamily": "Hind-Regular",
+                "fontSize": 14,
+                "lineHeight": undefined,
+                "marginHorizontal": 3,
+                "marginVertical": 4,
+                "minWidth": 55,
+                "paddingHorizontal": 4,
+                "paddingVertical": 2,
+                "textAlign": "center",
+              },
+              undefined,
+            ]
+          }
+        >
+          19
+        </Text>
+        <Text
+          style={
+            Array [
+              Object {
+                "borderColor": "#EEEEEE",
+                "borderRadius": 100,
+                "borderWidth": 1,
+                "color": "#BDBDBD",
+                "fontFamily": "Hind-Regular",
+                "fontSize": 14,
+                "lineHeight": undefined,
+                "marginHorizontal": 3,
+                "marginVertical": 4,
+                "minWidth": 55,
+                "paddingHorizontal": 4,
+                "paddingVertical": 2,
+                "textAlign": "center",
+              },
+              undefined,
+            ]
+          }
+        >
+          20
+        </Text>
+        <Text
+          style={
+            Array [
+              Object {
+                "borderColor": "#EEEEEE",
+                "borderRadius": 100,
+                "borderWidth": 1,
+                "color": "#BDBDBD",
+                "fontFamily": "Hind-Regular",
+                "fontSize": 14,
+                "lineHeight": undefined,
+                "marginHorizontal": 3,
+                "marginVertical": 4,
+                "minWidth": 55,
+                "paddingHorizontal": 4,
+                "paddingVertical": 2,
+                "textAlign": "center",
+              },
+              undefined,
+            ]
+          }
+        >
+          21
+        </Text>
+        <Text
+          style={
+            Array [
+              Object {
+                "borderColor": "#EEEEEE",
+                "borderRadius": 100,
+                "borderWidth": 1,
+                "color": "#BDBDBD",
+                "fontFamily": "Hind-Regular",
+                "fontSize": 14,
+                "lineHeight": undefined,
+                "marginHorizontal": 3,
+                "marginVertical": 4,
+                "minWidth": 55,
+                "paddingHorizontal": 4,
+                "paddingVertical": 2,
+                "textAlign": "center",
+              },
+              undefined,
+            ]
+          }
+        >
+          22
+        </Text>
+        <Text
+          style={
+            Array [
+              Object {
+                "borderColor": "#EEEEEE",
+                "borderRadius": 100,
+                "borderWidth": 1,
+                "color": "#BDBDBD",
+                "fontFamily": "Hind-Regular",
+                "fontSize": 14,
+                "lineHeight": undefined,
+                "marginHorizontal": 3,
+                "marginVertical": 4,
+                "minWidth": 55,
+                "paddingHorizontal": 4,
+                "paddingVertical": 2,
+                "textAlign": "center",
+              },
+              undefined,
+            ]
+          }
+        >
+          23
+        </Text>
+        <Text
+          style={
+            Array [
+              Object {
+                "borderColor": "#EEEEEE",
+                "borderRadius": 100,
+                "borderWidth": 1,
+                "color": "#BDBDBD",
+                "fontFamily": "Hind-Regular",
+                "fontSize": 14,
+                "lineHeight": undefined,
+                "marginHorizontal": 3,
+                "marginVertical": 4,
+                "minWidth": 55,
+                "paddingHorizontal": 4,
+                "paddingVertical": 2,
+                "textAlign": "center",
+              },
+              undefined,
+            ]
+          }
+        >
+          24
+        </Text>
+      </View>
+      <Text
+        style={
+          Object {
+            "color": "#BDBDBD",
+            "fontFamily": "Hind-Regular",
+            "fontSize": 16,
+            "lineHeight": 24,
+            "marginTop": 20,
+            "textAlign": "center",
+          }
+        }
+      >
+        backupQuizInfo
+      </Text>
+      <Text
+        style={
+          Object {
+            "color": "#2E3338",
+            "fontFamily": "Hind-SemiBold",
+            "fontSize": 16,
+            "lineHeight": 24,
+            "marginTop": 25,
+            "textAlign": "center",
+          }
+        }
+      >
+        backupQuizWordCount
+      </Text>
+      <View
+        style={
+          Object {
+            "flexDirection": "row",
+            "flexWrap": "wrap",
+            "justifyContent": "center",
+            "marginTop": 25,
+            "paddingHorizontal": 20,
+          }
+        }
+      >
+        <View
+          accessible={true}
+          hitSlop={
+            Object {
+              "bottom": 7,
+              "left": 7,
+              "right": 7,
+              "top": 7,
+            }
+          }
+          isTVSelectable={true}
+          nativeBackgroundAndroid={
+            Object {
+              "attribute": "selectableItemBackground",
+              "type": "ThemeAttrAndroid",
+            }
+          }
+          onResponderGrant={[Function]}
+          onResponderMove={[Function]}
+          onResponderRelease={[Function]}
+          onResponderTerminate={[Function]}
+          onResponderTerminationRequest={[Function]}
+          onStartShouldSetResponder={[Function]}
+          style={
+            Array [
+              Object {
+                "alignItems": "center",
+                "alignSelf": "flex-start",
+                "borderRadius": 2,
+                "flexDirection": "row",
+                "paddingHorizontal": 16,
+                "paddingVertical": 6,
+              },
+              Object {
+                "backgroundColor": "transparent",
+                "borderColor": "#42D689",
+                "borderWidth": 2,
+              },
+              Object {
+                "borderRadius": 100,
+                "marginHorizontal": 5,
+                "marginVertical": 5,
+                "minWidth": 0,
+              },
+            ]
+          }
+        >
+          <Text
+            style={
+              Array [
+                Object {
+                  "color": "#81868B",
+                  "fontFamily": "Hind-SemiBold",
+                  "fontSize": 13,
+                  "lineHeight": 17,
+                },
+                Object {
+                  "lineHeight": 20,
+                  "textAlign": "center",
+                },
+                Object {
+                  "color": "#42D689",
+                },
+                null,
+                undefined,
+              ]
+            }
+          >
+            prosper
+          </Text>
+        </View>
+        <View
+          accessible={true}
+          hitSlop={
+            Object {
+              "bottom": 7,
+              "left": 7,
+              "right": 7,
+              "top": 7,
+            }
+          }
+          isTVSelectable={true}
+          nativeBackgroundAndroid={
+            Object {
+              "attribute": "selectableItemBackground",
+              "type": "ThemeAttrAndroid",
+            }
+          }
+          onResponderGrant={[Function]}
+          onResponderMove={[Function]}
+          onResponderRelease={[Function]}
+          onResponderTerminate={[Function]}
+          onResponderTerminationRequest={[Function]}
+          onStartShouldSetResponder={[Function]}
+          style={
+            Array [
+              Object {
+                "alignItems": "center",
+                "alignSelf": "flex-start",
+                "borderRadius": 2,
+                "flexDirection": "row",
+                "paddingHorizontal": 16,
+                "paddingVertical": 6,
+              },
+              Object {
+                "backgroundColor": "transparent",
+                "borderColor": "#42D689",
+                "borderWidth": 2,
+              },
+              Object {
+                "borderRadius": 100,
+                "marginHorizontal": 5,
+                "marginVertical": 5,
+                "minWidth": 0,
+              },
+            ]
+          }
+        >
+          <Text
+            style={
+              Array [
+                Object {
+                  "color": "#81868B",
+                  "fontFamily": "Hind-SemiBold",
+                  "fontSize": 13,
+                  "lineHeight": 17,
+                },
+                Object {
+                  "lineHeight": 20,
+                  "textAlign": "center",
+                },
+                Object {
+                  "color": "#42D689",
+                },
+                null,
+                undefined,
+              ]
+            }
+          >
+            winner
+          </Text>
+        </View>
+        <View
+          accessible={true}
+          hitSlop={
+            Object {
+              "bottom": 7,
+              "left": 7,
+              "right": 7,
+              "top": 7,
+            }
+          }
+          isTVSelectable={true}
+          nativeBackgroundAndroid={
+            Object {
+              "attribute": "selectableItemBackground",
+              "type": "ThemeAttrAndroid",
+            }
+          }
+          onResponderGrant={[Function]}
+          onResponderMove={[Function]}
+          onResponderRelease={[Function]}
+          onResponderTerminate={[Function]}
+          onResponderTerminationRequest={[Function]}
+          onStartShouldSetResponder={[Function]}
+          style={
+            Array [
+              Object {
+                "alignItems": "center",
+                "alignSelf": "flex-start",
+                "borderRadius": 2,
+                "flexDirection": "row",
+                "paddingHorizontal": 16,
+                "paddingVertical": 6,
+              },
+              Object {
+                "backgroundColor": "transparent",
+                "borderColor": "#42D689",
+                "borderWidth": 2,
+              },
+              Object {
+                "borderRadius": 100,
+                "marginHorizontal": 5,
+                "marginVertical": 5,
+                "minWidth": 0,
+              },
+            ]
+          }
+        >
+          <Text
+            style={
+              Array [
+                Object {
+                  "color": "#81868B",
+                  "fontFamily": "Hind-SemiBold",
+                  "fontSize": 13,
+                  "lineHeight": 17,
+                },
+                Object {
+                  "lineHeight": 20,
+                  "textAlign": "center",
+                },
+                Object {
+                  "color": "#42D689",
+                },
+                null,
+                undefined,
+              ]
+            }
+          >
+            find
+          </Text>
+        </View>
+        <View
+          accessible={true}
+          hitSlop={
+            Object {
+              "bottom": 7,
+              "left": 7,
+              "right": 7,
+              "top": 7,
+            }
+          }
+          isTVSelectable={true}
+          nativeBackgroundAndroid={
+            Object {
+              "attribute": "selectableItemBackground",
+              "type": "ThemeAttrAndroid",
+            }
+          }
+          onResponderGrant={[Function]}
+          onResponderMove={[Function]}
+          onResponderRelease={[Function]}
+          onResponderTerminate={[Function]}
+          onResponderTerminationRequest={[Function]}
+          onStartShouldSetResponder={[Function]}
+          style={
+            Array [
+              Object {
+                "alignItems": "center",
+                "alignSelf": "flex-start",
+                "borderRadius": 2,
+                "flexDirection": "row",
+                "paddingHorizontal": 16,
+                "paddingVertical": 6,
+              },
+              Object {
+                "backgroundColor": "transparent",
+                "borderColor": "#42D689",
+                "borderWidth": 2,
+              },
+              Object {
+                "borderRadius": 100,
+                "marginHorizontal": 5,
+                "marginVertical": 5,
+                "minWidth": 0,
+              },
+            ]
+          }
+        >
+          <Text
+            style={
+              Array [
+                Object {
+                  "color": "#81868B",
+                  "fontFamily": "Hind-SemiBold",
+                  "fontSize": 13,
+                  "lineHeight": 17,
+                },
+                Object {
+                  "lineHeight": 20,
+                  "textAlign": "center",
+                },
+                Object {
+                  "color": "#42D689",
+                },
+                null,
+                undefined,
+              ]
+            }
+          >
+            donate
+          </Text>
+        </View>
+        <View
+          accessible={true}
+          hitSlop={
+            Object {
+              "bottom": 7,
+              "left": 7,
+              "right": 7,
+              "top": 7,
+            }
+          }
+          isTVSelectable={true}
+          nativeBackgroundAndroid={
+            Object {
+              "attribute": "selectableItemBackground",
+              "type": "ThemeAttrAndroid",
+            }
+          }
+          onResponderGrant={[Function]}
+          onResponderMove={[Function]}
+          onResponderRelease={[Function]}
+          onResponderTerminate={[Function]}
+          onResponderTerminationRequest={[Function]}
+          onStartShouldSetResponder={[Function]}
+          style={
+            Array [
+              Object {
+                "alignItems": "center",
+                "alignSelf": "flex-start",
+                "borderRadius": 2,
+                "flexDirection": "row",
+                "paddingHorizontal": 16,
+                "paddingVertical": 6,
+              },
+              Object {
+                "backgroundColor": "transparent",
+                "borderColor": "#42D689",
+                "borderWidth": 2,
+              },
+              Object {
+                "borderRadius": 100,
+                "marginHorizontal": 5,
+                "marginVertical": 5,
+                "minWidth": 0,
+              },
+            ]
+          }
+        >
+          <Text
+            style={
+              Array [
+                Object {
+                  "color": "#81868B",
+                  "fontFamily": "Hind-SemiBold",
+                  "fontSize": 13,
+                  "lineHeight": 17,
+                },
+                Object {
+                  "lineHeight": 20,
+                  "textAlign": "center",
+                },
+                Object {
+                  "color": "#42D689",
+                },
+                null,
+                undefined,
+              ]
+            }
+          >
+            tape
+          </Text>
+        </View>
+        <View
+          accessible={true}
+          hitSlop={
+            Object {
+              "bottom": 7,
+              "left": 7,
+              "right": 7,
+              "top": 7,
+            }
+          }
+          isTVSelectable={true}
+          nativeBackgroundAndroid={
+            Object {
+              "attribute": "selectableItemBackground",
+              "type": "ThemeAttrAndroid",
+            }
+          }
+          onResponderGrant={[Function]}
+          onResponderMove={[Function]}
+          onResponderRelease={[Function]}
+          onResponderTerminate={[Function]}
+          onResponderTerminationRequest={[Function]}
+          onStartShouldSetResponder={[Function]}
+          style={
+            Array [
+              Object {
+                "alignItems": "center",
+                "alignSelf": "flex-start",
+                "borderRadius": 2,
+                "flexDirection": "row",
+                "paddingHorizontal": 16,
+                "paddingVertical": 6,
+              },
+              Object {
+                "backgroundColor": "transparent",
+                "borderColor": "#42D689",
+                "borderWidth": 2,
+              },
+              Object {
+                "borderRadius": 100,
+                "marginHorizontal": 5,
+                "marginVertical": 5,
+                "minWidth": 0,
+              },
+            ]
+          }
+        >
+          <Text
+            style={
+              Array [
+                Object {
+                  "color": "#81868B",
+                  "fontFamily": "Hind-SemiBold",
+                  "fontSize": 13,
+                  "lineHeight": 17,
+                },
+                Object {
+                  "lineHeight": 20,
+                  "textAlign": "center",
+                },
+                Object {
+                  "color": "#42D689",
+                },
+                null,
+                undefined,
+              ]
+            }
+          >
+            history
+          </Text>
+        </View>
+      </View>
+      <View
+        style={
+          Object {
+            "alignItems": "center",
+            "flexDirection": "row",
+            "justifyContent": "center",
+            "marginTop": 20,
+          }
+        }
+      />
+    </View>
+  </RCTScrollView>
+</SafeAreaView>
+`;

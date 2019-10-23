@@ -65,6 +65,7 @@ const DefaultConfig = {
     inflationRate: 1.00009591886,
     inflationPeriod: 7 * 24 * 60 * 60, // 1 week
     initialAccounts: [],
+    priceOracleAccounts: [],
   },
   validators: {
     registrationRequirements: {
@@ -115,7 +116,7 @@ const linkedLibraries = {
   AddressSortedLinkedList: ['Election'],
   IntegerSortedLinkedList: ['Governance', 'IntegerSortedLinkedListTest'],
   AddressSortedLinkedListWithMedian: ['SortedOracles', 'AddressSortedLinkedListWithMedianTest'],
-  Signatures: ['Attestations', 'LockedGold', 'Escrow'],
+  Signatures: ['TestAttestations', 'Attestations', 'LockedGold', 'Escrow'],
 }
 
 const argv = minimist(process.argv.slice(2), {
