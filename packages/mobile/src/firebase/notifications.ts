@@ -1,5 +1,6 @@
 import BigNumber from 'bignumber.js'
 import { Notification } from 'react-native-firebase/notifications'
+import { call, put, select } from 'redux-saga/effects'
 import {
   NotificationReceiveState,
   NotificationTypes,
@@ -9,9 +10,10 @@ import {
 import { showMessage } from 'src/alert/actions'
 import { resolveCurrency } from 'src/geth/consts'
 import { refreshAllBalances } from 'src/home/actions'
+import { addressToE164NumberSelector } from 'src/identity/reducer'
 import { getRecipientFromPaymentRequest } from 'src/paymentRequest/utils'
 import { getRecipientFromAddress } from 'src/recipients/recipient'
-import { DispatchType, GetStateType } from 'src/redux/reducers'
+import { recipientCacheSelector } from 'src/recipients/reducer'
 import {
   navigateToPaymentTransferReview,
   navigateToRequestedPaymentReview,
@@ -22,10 +24,10 @@ import Logger from 'src/utils/Logger'
 
 const TAG = 'FirebaseNotifications'
 
-const handlePaymentRequested = (
+function* handlePaymentRequested(
   paymentRequest: PaymentRequest,
   notificationState: NotificationReceiveState
-) => async (dispatch: DispatchType, getState: GetStateType) => {
+) {
   if (notificationState === NotificationReceiveState.APP_ALREADY_OPEN) {
     return
   }
@@ -35,7 +37,7 @@ const handlePaymentRequested = (
     return
   }
 
-  const { recipientCache } = getState().recipients
+  const recipientCache = yield select(recipientCacheSelector)
   const targetRecipient = getRecipientFromPaymentRequest(paymentRequest, recipientCache)
 
   navigateToRequestedPaymentReview({
@@ -47,15 +49,15 @@ const handlePaymentRequested = (
   })
 }
 
-const handlePaymentReceived = (
+function* handlePaymentReceived(
   transferNotification: TransferNotificationData,
   notificationState: NotificationReceiveState
-) => async (dispatch: DispatchType, getState: GetStateType) => {
-  dispatch(refreshAllBalances())
+) {
+  yield put(refreshAllBalances())
 
   if (notificationState !== NotificationReceiveState.APP_ALREADY_OPEN) {
-    const { recipientCache } = getState().recipients
-    const { addressToE164Number } = getState().identity
+    const recipientCache = yield select(recipientCacheSelector)
+    const addressToE164Number = yield select(addressToE164NumberSelector)
     const address = transferNotification.sender.toLowerCase()
 
     navigateToPaymentTransferReview(
@@ -73,20 +75,20 @@ const handlePaymentReceived = (
   }
 }
 
-export const handleNotification = (
+export function* handleNotification(
   notification: Notification,
   notificationState: NotificationReceiveState
-) => async (dispatch: DispatchType, getState: GetStateType) => {
+) {
   if (notificationState === NotificationReceiveState.APP_ALREADY_OPEN) {
-    dispatch(showMessage(notification.title))
+    yield put(showMessage(notification.title))
   }
   switch (notification.data.type) {
     case NotificationTypes.PAYMENT_REQUESTED:
-      dispatch(handlePaymentRequested(notification.data, notificationState))
+      yield call(handlePaymentRequested, notification.data, notificationState)
       break
 
     case NotificationTypes.PAYMENT_RECEIVED:
-      dispatch(handlePaymentReceived(notification.data, notificationState))
+      yield call(handlePaymentReceived, notification.data, notificationState)
       break
 
     default:

@@ -1,5 +1,4 @@
 {
-  "backupKey": "Clave de respaldo",
   "invite": "Invitar",
   "celoRewards": "Recompensas Celo",
   "languageSettings": "Configuración de idioma",
@@ -10,6 +9,10 @@
   "shareAnalytics": "Compartir estadisticas de uso",
   "shareAnalytics_detail":
     "Recopilamos datos anónimos sobre cómo utiliza Celo para ayudar a mejorar la aplicación para todos.",
+  "celoLite": "Celo Lite",
+  "enableCeloLite": "Habilitar Celo Lite",
+  "celoLiteDetail":
+    "El modo Celo Lite te permite comunicarte con la Red Celo  a través de un nodo confiable. Puedes cambiar este modo en la configuración de la aplicación.",
   "testFaqHere": "<1>Aquí</1><0> están las preguntas frecuentes de la prueba. </0>",
   "termsOfServiceHere": "<1>Aquí</1><0> están las Condiciones de servicio.</0>",
   "editProfile": "Editar perfil",

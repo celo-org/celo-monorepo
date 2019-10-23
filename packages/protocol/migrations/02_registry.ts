@@ -10,7 +10,7 @@ const ContractProxy = artifacts.require(name + 'Proxy')
 
 module.exports = (deployer: any, _networkName: string, _accounts: string[]) => {
   // tslint:disable-next-line: no-console
-  console.log('Deploying Registry')
+  console.info('Deploying Registry')
   deployer.deploy(ContractProxy)
   deployer.deploy(Contract)
   deployer.then(async () => {

@@ -1,522 +1,140 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`BackupComplete renders correctly if backup completed 1`] = `
+exports[`BackupComplete renders correctly when social backup is complete 1`] = `
 <SafeAreaView
   style={
     Object {
       "backgroundColor": "#FFFFFF",
       "flex": 1,
-      "justifyContent": "space-between",
     }
   }
 >
-  <RCTScrollView
-    contentContainerStyle={
-      Object {
-        "alignItems": "center",
-        "backgroundColor": "#FFFFFF",
-        "flexGrow": 1,
-        "paddingHorizontal": 20,
-        "paddingTop": 40,
-      }
-    }
-    style={
-      Object {
-        "flex": 1,
-      }
-    }
-  >
-    <View>
-      <View
-        style={
-          Array [
-            Object {
-              "alignItems": "center",
-              "marginBottom": 20,
-            },
-            Object {},
-          ]
-        }
-      >
-        <Image
-          resizeMode="contain"
-          source={
-            Object {
-              "testUri": "../../../src/images/coins-logo.png",
-            }
-          }
-          style={
-            Object {
-              "height": 35,
-              "width": 35,
-            }
-          }
-        />
-      </View>
-      <Text
-        style={
-          Array [
-            Object {
-              "color": "#2E3338",
-              "fontFamily": "Hind-Light",
-              "fontSize": 22,
-              "paddingBottom": 20,
-              "textAlign": "center",
-            },
-            Object {
-              "color": "#2E3338",
-              "paddingTop": 25,
-            },
-          ]
-        }
-      >
-        backupKey
-      </Text>
-      <Text
-        style={
-          Object {
-            "color": "#2E3338",
-            "fontFamily": "Hind-Regular",
-            "fontSize": 16,
-            "lineHeight": 24,
-          }
-        }
-      >
-        dontLoseIt
-      </Text>
-      <View
-        style={
-          Object {
-            "alignContent": "center",
-            "backgroundColor": "#F8F8F8",
-            "justifyContent": "center",
-            "marginTop": 30,
-            "padding": 16,
-            "position": "relative",
-          }
-        }
-      >
-        <Text
-          style={
-            Object {
-              "color": "#2E3338",
-              "fontFamily": "Hind-Light",
-              "fontSize": 18,
-              "textAlign": "left",
-            }
-          }
-        >
-          foo bar
-        </Text>
-      </View>
-      <View
-        accessible={true}
-        hitSlop={
-          Object {
-            "bottom": 7,
-            "left": 7,
-            "right": 7,
-            "top": 7,
-          }
-        }
-        isTVSelectable={true}
-        nativeBackgroundAndroid={
-          Object {
-            "attribute": "selectableItemBackground",
-            "type": "ThemeAttrAndroid",
-          }
-        }
-        onResponderGrant={[Function]}
-        onResponderMove={[Function]}
-        onResponderRelease={[Function]}
-        onResponderTerminate={[Function]}
-        onResponderTerminationRequest={[Function]}
-        onStartShouldSetResponder={[Function]}
-        style={
-          Array [
-            Object {
-              "alignItems": "center",
-              "alignSelf": "flex-start",
-              "borderRadius": 2,
-              "minWidth": 160,
-              "paddingHorizontal": 16,
-              "paddingVertical": 6,
-              "textAlign": "center",
-            },
-            Object {
-              "backgroundColor": "transparent",
-              "borderColor": "#42D689",
-              "borderWidth": 2,
-            },
-            Object {
-              "alignSelf": "center",
-              "fontSize": 14,
-              "marginTop": 50,
-            },
-          ]
-        }
-        testID="pasteMessageButton"
-      >
-        <Text
-          style={
-            Array [
-              Object {
-                "color": "#81868B",
-                "fontFamily": "Hind-SemiBold",
-                "fontSize": 13,
-                "lineHeight": 17,
-              },
-              Object {
-                "lineHeight": 20,
-              },
-              Object {
-                "color": "#42D689",
-              },
-              undefined,
-            ]
-          }
-        >
-          copyToClipboard
-        </Text>
-      </View>
-    </View>
-  </RCTScrollView>
   <View
     style={
-      Array [
-        Object {
-          "alignItems": "center",
-          "borderRadius": 3,
-          "flexDirection": "row",
-        },
-        Object {
-          "marginVertical": 10,
-        },
-        Object {
-          "marginBottom": 10,
-        },
-        undefined,
-        Object {
-          "backgroundColor": "#42D689",
-        },
-      ]
+      Object {
+        "alignItems": "center",
+        "flex": 1,
+        "justifyContent": "center",
+      }
     }
   >
     <View
-      accessible={true}
-      isTVSelectable={true}
-      nativeBackgroundAndroid={
-        Object {
-          "attribute": "selectableItemBackground",
-          "type": "ThemeAttrAndroid",
-        }
-      }
-      onResponderGrant={[Function]}
-      onResponderMove={[Function]}
-      onResponderRelease={[Function]}
-      onResponderTerminate={[Function]}
-      onResponderTerminationRequest={[Function]}
-      onStartShouldSetResponder={[Function]}
       style={
         Array [
           Object {
             "alignItems": "center",
-            "flex": 1,
-            "justifyContent": "center",
+            "marginBottom": 20,
           },
-          Object {
-            "backgroundColor": "#42D689",
-          },
-          Object {
-            "height": 50,
-          },
-          Object {
-            "borderColor": "#42D689",
-            "borderRadius": 3,
-            "borderWidth": 2,
-          },
+          Object {},
         ]
       }
     >
-      <View
-        style={
+      <Image
+        resizeMode="contain"
+        source={
           Object {
-            "alignItems": "center",
-            "flex": 1,
-            "flexDirection": "row",
-            "justifyContent": "space-between",
+            "testUri": "../../../src/images/coins-logo.png",
           }
         }
-      >
-        <Text
-          style={
-            Array [
-              Object {
-                "fontFamily": "Hind-SemiBold",
-                "fontSize": 16,
-              },
-              Object {
-                "color": "#FFFFFF",
-              },
-              Object {
-                "paddingLeft": 5,
-                "paddingRight": 5,
-              },
-            ]
+        style={
+          Object {
+            "height": 70,
+            "width": 70,
           }
-        >
-          done
-        </Text>
-      </View>
+        }
+      />
     </View>
+    <Text
+      style={
+        Object {
+          "color": "#2E3338",
+          "fontFamily": "Hind-Light",
+          "fontSize": 22,
+          "marginTop": 20,
+          "paddingBottom": 20,
+          "paddingHorizontal": 40,
+          "textAlign": "center",
+        }
+      }
+    >
+      backupComplete.2
+    </Text>
   </View>
 </SafeAreaView>
 `;
 
-exports[`BackupComplete renders correctly if backup not completed 1`] = `
+exports[`BackupComplete renders correctly when social backup is not complete 1`] = `
 <SafeAreaView
   style={
     Object {
       "backgroundColor": "#FFFFFF",
       "flex": 1,
-      "justifyContent": "space-between",
     }
   }
 >
-  <RCTScrollView
-    contentContainerStyle={
-      Object {
-        "alignItems": "center",
-        "backgroundColor": "#FFFFFF",
-        "flexGrow": 1,
-        "paddingHorizontal": 20,
-        "paddingTop": 40,
-      }
-    }
-    style={
-      Object {
-        "flex": 1,
-      }
-    }
-  >
-    <View>
-      <View
-        style={
-          Array [
-            Object {
-              "alignItems": "center",
-              "marginBottom": 20,
-            },
-            Object {},
-          ]
-        }
-      >
-        <Image
-          resizeMode="contain"
-          source={
-            Object {
-              "testUri": "../../../src/images/coins-logo.png",
-            }
-          }
-          style={
-            Object {
-              "height": 35,
-              "width": 35,
-            }
-          }
-        />
-      </View>
-      <Text
-        style={
-          Array [
-            Object {
-              "color": "#2E3338",
-              "fontFamily": "Hind-Light",
-              "fontSize": 22,
-              "paddingBottom": 20,
-              "textAlign": "center",
-            },
-            Object {
-              "color": "#2E3338",
-              "paddingTop": 25,
-            },
-          ]
-        }
-      >
-        backupKeySet
-      </Text>
-      <Text
-        style={
-          Object {
-            "color": "#2E3338",
-            "fontFamily": "Hind-Regular",
-            "fontSize": 16,
-            "lineHeight": 24,
-          }
-        }
-      >
-        dontLoseIt
-      </Text>
-      <View
-        accessible={true}
-        hitSlop={
-          Object {
-            "bottom": 7,
-            "left": 7,
-            "right": 7,
-            "top": 7,
-          }
-        }
-        isTVSelectable={true}
-        nativeBackgroundAndroid={
-          Object {
-            "attribute": "selectableItemBackground",
-            "type": "ThemeAttrAndroid",
-          }
-        }
-        onResponderGrant={[Function]}
-        onResponderMove={[Function]}
-        onResponderRelease={[Function]}
-        onResponderTerminate={[Function]}
-        onResponderTerminationRequest={[Function]}
-        onStartShouldSetResponder={[Function]}
-        style={
-          Array [
-            Object {
-              "alignItems": "center",
-              "alignSelf": "flex-start",
-              "borderRadius": 2,
-              "minWidth": 160,
-              "paddingHorizontal": 16,
-              "paddingVertical": 6,
-              "textAlign": "center",
-            },
-            Object {
-              "backgroundColor": "transparent",
-              "borderColor": "#42D689",
-              "borderWidth": 2,
-            },
-            Object {
-              "alignSelf": "center",
-              "fontSize": 14,
-              "marginTop": 50,
-            },
-          ]
-        }
-        testID="pasteMessageButton"
-      >
-        <Text
-          style={
-            Array [
-              Object {
-                "color": "#81868B",
-                "fontFamily": "Hind-SemiBold",
-                "fontSize": 13,
-                "lineHeight": 17,
-              },
-              Object {
-                "lineHeight": 20,
-              },
-              Object {
-                "color": "#42D689",
-              },
-              undefined,
-            ]
-          }
-        >
-          copyToClipboard
-        </Text>
-      </View>
-    </View>
-  </RCTScrollView>
   <View
     style={
-      Array [
-        Object {
-          "alignItems": "center",
-          "borderRadius": 3,
-          "flexDirection": "row",
-        },
-        Object {
-          "marginVertical": 10,
-        },
-        Object {
-          "marginBottom": 10,
-        },
-        undefined,
-        Object {
-          "backgroundColor": "#42D689",
-        },
-      ]
+      Object {
+        "alignItems": "center",
+        "flex": 1,
+        "justifyContent": "center",
+      }
     }
   >
     <View
-      accessible={true}
-      isTVSelectable={true}
-      nativeBackgroundAndroid={
-        Object {
-          "attribute": "selectableItemBackground",
-          "type": "ThemeAttrAndroid",
-        }
-      }
-      onResponderGrant={[Function]}
-      onResponderMove={[Function]}
-      onResponderRelease={[Function]}
-      onResponderTerminate={[Function]}
-      onResponderTerminationRequest={[Function]}
-      onStartShouldSetResponder={[Function]}
       style={
         Array [
           Object {
             "alignItems": "center",
-            "flex": 1,
-            "justifyContent": "center",
+            "marginBottom": 20,
           },
-          Object {
-            "backgroundColor": "#42D689",
-          },
-          Object {
-            "height": 50,
-          },
-          Object {
-            "borderColor": "#42D689",
-            "borderRadius": 3,
-            "borderWidth": 2,
-          },
+          Object {},
         ]
       }
     >
-      <View
-        style={
+      <Image
+        resizeMode="contain"
+        source={
           Object {
-            "alignItems": "center",
-            "flex": 1,
-            "flexDirection": "row",
-            "justifyContent": "space-between",
+            "testUri": "../../../src/images/coins-logo.png",
           }
         }
-      >
-        <Text
-          style={
-            Array [
-              Object {
-                "fontFamily": "Hind-SemiBold",
-                "fontSize": 16,
-              },
-              Object {
-                "color": "#FFFFFF",
-              },
-              Object {
-                "paddingLeft": 5,
-                "paddingRight": 5,
-              },
-            ]
+        style={
+          Object {
+            "height": 70,
+            "width": 70,
           }
-        >
-          done
-        </Text>
-      </View>
+        }
+      />
     </View>
+    <Text
+      style={
+        Object {
+          "color": "#2E3338",
+          "fontFamily": "Hind-Light",
+          "fontSize": 22,
+          "marginTop": 20,
+          "paddingBottom": 20,
+          "paddingHorizontal": 40,
+          "textAlign": "center",
+        }
+      }
+    >
+      backupComplete.0
+    </Text>
+    <Text
+      style={
+        Object {
+          "color": "#2E3338",
+          "fontFamily": "Hind-Light",
+          "fontSize": 18,
+          "paddingHorizontal": 40,
+          "textAlign": "center",
+        }
+      }
+    >
+      backupComplete.1
+    </Text>
   </View>
 </SafeAreaView>
 `;

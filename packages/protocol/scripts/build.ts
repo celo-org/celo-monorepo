@@ -8,14 +8,15 @@ const BUILD_DIR = path.join(ROOT_DIR, 'build')
 const CONTRACTKIT_GEN_DIR = path.normalize(path.join(ROOT_DIR, '../contractkit/src/generated'))
 
 export const ProxyContracts = [
-  'GasCurrencyWhitelistProxy',
-  'GasPriceMinimumProxy',
-  'MultiSigProxy',
-  'LockedGoldProxy',
   'AttestationsProxy',
+  'ElectionProxy',
   'EscrowProxy',
   'ExchangeProxy',
+  'GasCurrencyWhitelistProxy',
+  'GasPriceMinimumProxy',
   'GoldTokenProxy',
+  'LockedGoldProxy',
+  'MultiSigProxy',
   'ReserveProxy',
   'StableTokenProxy',
   'SortedOraclesProxy',
@@ -32,8 +33,10 @@ export const CoreContracts = [
   'Validators',
 
   // governance
-  'LockedGold',
+  'Election',
   'Governance',
+  'LockedGold',
+  'Validators',
 
   // identity
   'Attestations',

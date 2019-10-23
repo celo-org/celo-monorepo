@@ -16,4 +16,18 @@ RUN export CLOUD_SDK_REPO="cloud-sdk-$(lsb_release -c -s)" && \
   curl https://packages.cloud.google.com/apt/doc/apt-key.gpg | sudo apt-key add - && \
   sudo apt-get update -y && sudo apt-get install google-cloud-sdk -y
 
+RUN sudo wget https://dl.google.com/go/go1.11.5.linux-amd64.tar.gz && \
+  sudo tar xf go1.11.5.linux-amd64.tar.gz -C /usr/local
+
+RUN curl https://sh.rustup.rs -sSf | sh -s -- -y
+
+ENV PATH="/usr/local/go/bin:/home/circleci/.cargo/bin:${PATH}"
+
+RUN go version
+
+RUN rustup install 1.36.0 && \
+  rustup default 1.36.0
+
+RUN mkdir ~/.ssh/ && echo -e "Host github.com\n\tStrictHostKeyChecking no\n" > ~/.ssh/config
+
 CMD ["/bin/sh"]
