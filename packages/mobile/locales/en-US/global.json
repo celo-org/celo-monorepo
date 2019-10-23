@@ -65,6 +65,7 @@
   "verifyFailed": "Failed to verify",
   "canNotRequestFromUnverified": "Can not request from unverified users",
   "restartApp": "Restart App",
+  "quitApp": "Quit",
   "loading": "Loading…",
   "inviteFailed": "Failure sending invite",
   "importContactsFailed": "Failed to import contacts",
