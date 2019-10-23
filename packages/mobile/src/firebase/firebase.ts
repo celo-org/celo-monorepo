@@ -88,6 +88,12 @@ export function* initializeCloudMessaging(app: Firebase, address: string) {
     notification: Notification
     stateType: NotificationReceiveState
   }> = eventChannel((emitter) => {
+    const unsuscribe = () => {
+      Logger.info(TAG, 'Notification channel closed, reseting callbacks. This is likely an error.')
+      app.notifications().onNotification(() => null)
+      app.notifications().onNotificationOpened(() => null)
+    }
+
     app.notifications().onNotification((notification: Notification) => {
       Logger.info(TAG, 'Notification received while open')
       emitter({ notification, stateType: NotificationReceiveState.APP_ALREADY_OPEN })
@@ -100,7 +106,7 @@ export function* initializeCloudMessaging(app: Firebase, address: string) {
         stateType: NotificationReceiveState.APP_FOREGROUNDED,
       })
     })
-    return () => null // Return an unsubscribe method
+    return unsuscribe
   })
   yield spawn(watchFirebaseNotificationChannel, channelOnNotification)
 
@@ -141,7 +147,7 @@ export function* writePaymentRequest(paymentInfo: PaymentRequest) {
   try {
     Logger.info(TAG, `Writing pending request to database`)
     const pendingRequestRef = firebase.database().ref(`pendingRequests`)
-    pendingRequestRef.push(paymentInfo)
+    yield call(() => pendingRequestRef.push(paymentInfo))
 
     navigate(Screens.WalletHome)
   } catch (error) {
