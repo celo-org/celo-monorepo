@@ -819,7 +819,7 @@ contract Attestations is IAttestations, Ownable, Initializable, UsingRegistry, R
       state.selectedIssuers.push(issuer);
     }
 
-    delete state.unselectedRequests[msg.sender];
+    delete identifiers[identifier].unselectedRequests[msg.sender];
   }
 
   function isAttestationExpired(uint128 attestationRequestBlock)
