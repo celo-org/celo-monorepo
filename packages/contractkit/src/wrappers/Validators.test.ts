@@ -46,11 +46,9 @@ testWithGanache('Validators Wrapper', (web3) => {
 
   const setupGroup = async (groupAccount: string) => {
     await registerAccountWithLockedGold(groupAccount)
-    await (await validators.registerValidatorGroup(
-      'The Group',
-      'thegroup.com',
-      new BigNumber(0.1)
-    )).sendAndWaitForReceipt({ from: groupAccount })
+    await (await validators.registerValidatorGroup(new BigNumber(0.1))).sendAndWaitForReceipt({
+      from: groupAccount,
+    })
   }
 
   const setupValidator = async (validatorAccount: string) => {
@@ -58,8 +56,6 @@ testWithGanache('Validators Wrapper', (web3) => {
     // set account1 as the validator
     await validators
       .registerValidator(
-        'Good old validator',
-        'goodold.com',
         // @ts-ignore
         publicKeysData
       )
