@@ -30,7 +30,6 @@
   "refreshFailedUnexpectedly": "Error al actualizar, por favor revise tu conectividad",
   "edit": "Editar",
   "receivedPayment": "Pago recibido",
-  "receivedEscrowPayment": "Pago de fideicomiso recibido",
   "readOnlyState":
     "Modo de solo lectura: cree la clave de respaldo para seguir enviando y recibiendo {{CeloDollars}}",
   "getStarted": "Primeros pasos",
