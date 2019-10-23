@@ -217,10 +217,9 @@ exports[`EnterInviteCode Screen renders correctly 1`] = `
                   "alignItems": "center",
                   "alignSelf": "flex-start",
                   "borderRadius": 2,
-                  "minWidth": 160,
+                  "flexDirection": "row",
                   "paddingHorizontal": 16,
                   "paddingVertical": 6,
-                  "textAlign": "center",
                 },
                 Object {
                   "backgroundColor": "#42D689",
@@ -247,10 +246,12 @@ exports[`EnterInviteCode Screen renders correctly 1`] = `
                   },
                   Object {
                     "lineHeight": 20,
+                    "textAlign": "center",
                   },
                   Object {
                     "color": "#FFFFFF",
                   },
+                  null,
                   undefined,
                 ]
               }
@@ -690,10 +691,9 @@ exports[`EnterInviteCode Screen renders with an error 1`] = `
                   "alignItems": "center",
                   "alignSelf": "flex-start",
                   "borderRadius": 2,
-                  "minWidth": 160,
+                  "flexDirection": "row",
                   "paddingHorizontal": 16,
                   "paddingVertical": 6,
-                  "textAlign": "center",
                 },
                 Object {
                   "backgroundColor": "#42D689",
@@ -720,10 +720,12 @@ exports[`EnterInviteCode Screen renders with an error 1`] = `
                   },
                   Object {
                     "lineHeight": 20,
+                    "textAlign": "center",
                   },
                   Object {
                     "color": "#FFFFFF",
                   },
+                  null,
                   undefined,
                 ]
               }
