@@ -9,8 +9,8 @@ import {
 
 describe('utils->formatting', () => {
   describe('getMoneyDisplayValue', () => {
-    const UNROUNDED_NUMBER = 5.239895
-    const ROUNDED_NUMBER_2_DECIMALS = '5.23'
+    const UNROUNDED_NUMBER = 5.239835
+    const ROUNDED_NUMBER_2_DECIMALS = '5.24'
     const ROUNDED_NUMBER_3_DECIMALS = '5.239'
 
     it('formats correctly for default case', () => {
