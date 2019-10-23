@@ -14,7 +14,7 @@ import { ErrorMessages } from 'src/app/ErrorMessages'
 import { currentLanguageSelector } from 'src/app/reducers'
 import { getWordlist } from 'src/backup/utils'
 import { UNLOCK_DURATION } from 'src/geth/consts'
-import { deleteChainData } from 'src/geth/geth'
+import { deleteChainData, stopGethIfInitialized } from 'src/geth/geth'
 import { initGethSaga } from 'src/geth/saga'
 import { navigateToError } from 'src/navigator/NavigationService'
 import { waitWeb3LastBlock } from 'src/networkInfo/saga'
@@ -29,7 +29,6 @@ import {
   SetIsZeroSyncAction,
   setLatestBlockNumber,
   setPrivateCommentKey,
-  setZeroSyncMode,
   updateWeb3SyncProgress,
 } from 'src/web3/actions'
 import { addLocalAccount, switchWeb3ProviderForSyncMode, web3 } from 'src/web3/contracts'
@@ -440,7 +439,13 @@ export function* switchToGethFromZeroSync() {
 
 export function* switchToZeroSyncFromGeth() {
   Logger.debug(TAG + 'Switching to zeroSync from geth..')
-  switchWeb3ProviderForSyncMode(true)
+  try {
+    yield call(stopGethIfInitialized)
+    switchWeb3ProviderForSyncMode(true)
+  } catch (e) {
+    Logger.error(TAG + '@switchToGethFromZeroSync', 'Error switching to zeroSync from geth')
+    yield put(showError(ErrorMessages.FAILED_TO_SWITCH_SYNC_MODES))
+  }
 }
 
 export function* toggleZeroSyncMode(action: SetIsZeroSyncAction) {
