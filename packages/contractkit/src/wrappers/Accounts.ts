@@ -19,7 +19,15 @@ export class AccountsWrapper extends BaseWrapper<Accounts> {
   createAccount = proxySend(this.kit, this.contract.methods.createAccount)
 
   /**
-   * Returns the voter for the specified account.
+   * Returns the attestation signer for the specified account.
+   * @param account The address of the account.
+   * @return The address with which the account can vote.
+   */
+  getAttestationSignerFromAccount: (account: string) => Promise<Address> = proxyCall(
+    this.contract.methods.getAttestationSignerFromAccount
+  )
+  /**
+   * Returns the vote signer for the specified account.
    * @param account The address of the account.
    * @return The address with which the account can vote.
    */
@@ -27,7 +35,7 @@ export class AccountsWrapper extends BaseWrapper<Accounts> {
     this.contract.methods.getVoteSignerFromAccount
   )
   /**
-   * Returns the validator for the specified account.
+   * Returns the validation signere for the specified account.
    * @param account The address of the account.
    * @return The address with which the account can register a validator or group.
    */
@@ -43,37 +51,54 @@ export class AccountsWrapper extends BaseWrapper<Accounts> {
   isAccount: (account: string) => Promise<boolean> = proxyCall(this.contract.methods.isAccount)
 
   /**
-   * Authorize voting on behalf of this account to another address.
+   * Authorize an attestation signing key on behalf of this account to another address.
    * @param account Address of the active account.
-   * @param voter Address to be used for voting.
+   * @param attestationSigner The address of the signing key to authorize.
+   * @return A CeloTransactionObject
+   */
+  async authorizeAttestationSigner(
+    account: Address,
+    attestationSigner: Address
+  ): Promise<CeloTransactionObject<void>> {
+    const sig = await this.getParsedSignatureOfAddress(account, attestationSigner)
+    // TODO(asa): Pass default tx "from" argument.
+    return toTransactionObject(
+      this.kit,
+      this.contract.methods.authorizeVoteSigner(attestationSigner, sig.v, sig.r, sig.s)
+    )
+  }
+  /**
+   * Authorizes an address to sign votes on behalf of the account.
+   * @param account Address of the active account.
+   * @param voteSigner The address of the vote signing key to authorize.
    * @return A CeloTransactionObject
    */
   async authorizeVoteSigner(
     account: Address,
-    voter: Address
+    voteSigner: Address
   ): Promise<CeloTransactionObject<void>> {
-    const sig = await this.getParsedSignatureOfAddress(account, voter)
+    const sig = await this.getParsedSignatureOfAddress(account, voteSigner)
     // TODO(asa): Pass default tx "from" argument.
     return toTransactionObject(
       this.kit,
-      this.contract.methods.authorizeVoteSigner(voter, sig.v, sig.r, sig.s)
+      this.contract.methods.authorizeVoteSigner(voteSigner, sig.v, sig.r, sig.s)
     )
   }
 
   /**
-   * Authorize validating on behalf of this account to another address.
+   * Authorizes an address to sign consensus messages on behalf of the account.
    * @param account Address of the active account.
-   * @param voter Address to be used for validating.
+   * @param validationSigner The address of the signing key to authorize.
    * @return A CeloTransactionObject
    */
   async authorizeValidationSigner(
     account: Address,
-    validator: Address
+    validationSigner: Address
   ): Promise<CeloTransactionObject<void>> {
-    const sig = await this.getParsedSignatureOfAddress(account, validator)
+    const sig = await this.getParsedSignatureOfAddress(account, validationSigner)
     return toTransactionObject(
       this.kit,
-      this.contract.methods.authorizeValidationSigner(validator, sig.v, sig.r, sig.s)
+      this.contract.methods.authorizeValidationSigner(validationSigner, sig.v, sig.r, sig.s)
     )
   }
 

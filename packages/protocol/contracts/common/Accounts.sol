@@ -103,7 +103,7 @@ contract Accounts is IAccounts, ReentrancyGuard, Initializable, UsingRegistry {
 
   /**
    * @notice Authorizes an address to sign votes on behalf of the account.
-   * @param voter The address of the signing key to authorize.
+   * @param voter The address of the vote signing key to authorize.
    * @param v The recovery id of the incoming ECDSA signature.
    * @param r Output value r of the ECDSA signature.
    * @param s Output value s of the ECDSA signature.
