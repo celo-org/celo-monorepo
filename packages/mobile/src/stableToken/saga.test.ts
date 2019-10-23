@@ -1,11 +1,10 @@
 import { CURRENCY_ENUM } from '@celo/utils/src/currencies'
-import { getTokenContract } from '@celo/walletkit'
 import { expectSaga } from 'redux-saga-test-plan'
 import { call } from 'redux-saga/effects'
 import { waitWeb3LastBlock } from 'src/networkInfo/saga'
 import { fetchDollarBalance, setBalance, transferStableToken } from 'src/stableToken/actions'
 import { stableTokenFetch, stableTokenTransfer } from 'src/stableToken/saga'
-import { convertFromContractDecimals } from 'src/tokens/saga'
+import { convertFromContractDecimals, getTokenContract } from 'src/tokens/saga'
 import { addStandbyTransaction, removeStandbyTransaction } from 'src/transactions/actions'
 import { TransactionStatus, TransactionTypes } from 'src/transactions/reducer'
 import { createMockContract, createMockStore } from 'test/utils'
@@ -14,16 +13,9 @@ import { mockAccount } from 'test/values'
 const now = Date.now()
 Date.now = jest.fn(() => now)
 
-const BALANCE = '45'
+const BALANCE = '45.00'
 const TX_ID = '1234'
 const COMMENT = 'a comment'
-
-jest.mock('@celo/walletkit', () => ({
-  getStableTokenContract: jest.fn(async () =>
-    createMockContract({ decimals: () => '10', transferWithComment: () => true })
-  ),
-  getErc20Balance: jest.fn(() => BALANCE),
-}))
 
 jest.mock('src/web3/actions', () => ({
   ...jest.requireActual('src/web3/actions'),
