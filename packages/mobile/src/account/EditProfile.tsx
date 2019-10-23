@@ -10,7 +10,7 @@ import { setName } from 'src/account/actions'
 import CeloAnalytics from 'src/analytics/CeloAnalytics'
 import { CustomEventNames } from 'src/analytics/constants'
 import { Namespaces } from 'src/i18n'
-import { headerWithCancelButton } from 'src/navigator/Headers'
+import { headerWithBackButton } from 'src/navigator/Headers'
 import { navigate } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
 import { RootState } from 'src/redux/reducers'
@@ -32,7 +32,7 @@ const mapStateToProps = (state: RootState): StateProps => {
 }
 
 export class EditProfile extends React.Component<Props> {
-  static navigationOptions = headerWithCancelButton
+  static navigationOptions = headerWithBackButton
 
   state = {
     name: this.props.name,
