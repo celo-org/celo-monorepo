@@ -59,12 +59,13 @@
     "warning": "NEVER TELL ANYONE YOUR SAFEGUARDS’ IDENTITIES.",
     "skip": "Skip For Now"
   },
+  "socialBackupPhraseHeader": "Safeguard Phrase {{index}}",
   "socialBackup": {
     "body":
       "Share each phrase below with a friend. Be sure to send only one phrase to each person.",
     "confirmation": "I have sent each Safeguard phrase to a trusted friend.",
-    "phrase1": "Safeguard Phrase 1",
-    "phrase2": "Safeguard Phrase 2",
     "yourSafeguards": "Your Safeguards"
-  }
+  },
+  "backupPhrasePlaceholder":
+    "horse leopard dog monkey shark tiger lemur whale squid wolf squirrel mouse lion elephant cat shrimp bear penguin deer turtle fox zebra goat giraffe"
 }

@@ -11,7 +11,10 @@ import { setSocialBackupCompleted } from 'src/account'
 import { showError } from 'src/alert/actions'
 import componentWithAnalytics from 'src/analytics/wrapper'
 import { ErrorMessages } from 'src/app/ErrorMessages'
-import BackupPhraseContainer from 'src/backup/BackupPhraseContainer'
+import BackupPhraseContainer, {
+  BackupPhraseContainerMode,
+  BackupPhraseType,
+} from 'src/backup/BackupPhraseContainer'
 import { getStoredMnemonic, splitMnemonic } from 'src/backup/utils'
 import { Namespaces } from 'src/i18n'
 import { headerWithBackButton } from 'src/navigator/Headers'
@@ -112,14 +115,16 @@ class BackupSocial extends React.Component<Props, State> {
               </>
             )}
             <BackupPhraseContainer
-              headerText={t('socialBackup.phrase1')}
-              words={firstHalf}
+              value={firstHalf}
               showCopy={true}
+              mode={BackupPhraseContainerMode.READONLY}
+              type={BackupPhraseType.SOCIAL_BACKUP}
             />
             <BackupPhraseContainer
-              headerText={t('socialBackup.phrase2')}
-              words={secondHalf}
+              value={secondHalf}
               showCopy={true}
+              mode={BackupPhraseContainerMode.READONLY}
+              type={BackupPhraseType.SOCIAL_BACKUP}
               style={componentStyles.marginTop20}
             />
           </View>
