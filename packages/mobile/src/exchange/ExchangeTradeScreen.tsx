@@ -119,8 +119,12 @@ export class ExchangeTradeScreen extends React.Component<Props, State> {
   }
 
   onInputFocus = () => {
+    const { exchangeRatePair, dollarBalance, goldBalance, error } = this.props
     CeloAnalytics.track(DefaultEventNames.fieldFocused, {
-      ...this.props,
+      exchangeRatePair,
+      dollarBalance,
+      goldBalance,
+      error,
       label: 'Exchange Amount',
     })
   }
