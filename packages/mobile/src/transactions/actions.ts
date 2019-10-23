@@ -3,7 +3,7 @@ import i18n from 'src/i18n'
 import { navigate } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
 import { ConfirmationInput as SendConfirmationCardProps } from 'src/send/SendConfirmation'
-import { OwnProps as TransferConfirmationCardProps } from 'src/send/TransferConfirmationCard'
+import { TransferConfirmationCardProps } from 'src/send/TransferConfirmationCard'
 import { StandbyTransaction, TransactionTypes } from 'src/transactions/reducer'
 import { web3 } from 'src/web3/contracts'
 
