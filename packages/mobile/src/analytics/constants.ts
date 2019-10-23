@@ -229,6 +229,7 @@ export const PROPERTY_PATH_WHITELIST = [
   'testnet',
   'timeElapsed',
   'title',
+  'tti',
   'txId',
   'verificationIndex',
   'verificationsRemaining',
