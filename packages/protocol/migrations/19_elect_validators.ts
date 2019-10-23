@@ -73,6 +73,18 @@ async function registerValidatorGroup(
   )
 
   // @ts-ignore
+  const createAccountTx = accounts.contracts.createAccount()
+  await sendTransactionWithPrivateKey(web3, createAccountTx, account.privateKey, {
+    to: accounts.address,
+  })
+
+  // @ts-ignore
+  const setNameTx = accounts.contracts.setName(`${config.validators.groupName} ${encodedKey}`)
+  await sendTransactionWithPrivateKey(web3, setNameTx, account.privateKey, {
+    to: accounts.address,
+  })
+
+  // @ts-ignore
   const tx = validators.contract.methods.registerValidatorGroup(
     `${config.validators.groupName} ${encodedKey}`,
     config.validators.groupUrl,
@@ -94,7 +106,6 @@ async function registerValidator(
   groupAddress: string
 ) {
   const validatorPrivateKeyHexStripped = validatorPrivateKey.slice(2)
-  const address = generateAccountAddressFromPrivateKey(validatorPrivateKeyHexStripped)
   const publicKey = generatePublicKeyFromPrivateKey(validatorPrivateKeyHexStripped)
   const blsValidatorPrivateKeyBytes = blsPrivateKeyToProcessedPrivateKey(
     validatorPrivateKeyHexStripped
@@ -113,11 +124,7 @@ async function registerValidator(
   )
 
   // @ts-ignore
-  const registerTx = validators.contract.methods.registerValidator(
-    address,
-    config.validators.groupUrl,
-    add0x(publicKeysData)
-  )
+  const registerTx = validators.contract.methods.registerValidator(add0x(publicKeysData))
 
   await sendTransactionWithPrivateKey(web3, registerTx, validatorPrivateKey, {
     to: validators.address,
