@@ -426,8 +426,6 @@ export function* ensureAccountInWeb3Keystore() {
 export function* switchToGethFromZeroSync() {
   try {
     yield call(initGethSaga)
-
-    yield put(setZeroSyncMode(false))
     switchWeb3ProviderForSyncMode(false)
 
     // After switching off zeroSync mode, ensure key is stored in web3.personal
@@ -442,13 +440,11 @@ export function* switchToGethFromZeroSync() {
 
 export function* switchToZeroSyncFromGeth() {
   Logger.debug(TAG + 'Switching to zeroSync from geth..')
-  yield put(setZeroSyncMode(true))
   switchWeb3ProviderForSyncMode(true)
 }
 
 export function* toggleZeroSyncMode(action: SetIsZeroSyncAction) {
   Logger.debug(TAG + '@toggleZeroSyncMode', ` to: ${action.zeroSyncMode}`)
-  // yield call(getConnectedAccount) // Ensure web3 connected before switching provider
   if (action.zeroSyncMode) {
     yield call(switchToZeroSyncFromGeth)
   } else {
