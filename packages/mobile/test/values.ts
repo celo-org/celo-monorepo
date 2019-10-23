@@ -42,7 +42,6 @@ export const mockE164Number2 = '+12095559790'
 export const mockDisplayNumber2 = '(209) 555-9790'
 export const mockComment = 'Rent request for June, it is already late!!!'
 export const mockCountryCode = '+1'
-export const mockNestedObject = { '1': { '2': { '3': true, '4': false } } }
 
 export const mockQrCodeData = `{"address":"${mockAccount}","e164PhoneNumber":"${mockE164Number}","displayName":"${mockName}"}`
 
