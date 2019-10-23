@@ -73,12 +73,6 @@ async function registerValidatorGroup(
   )
 
   // @ts-ignore
-  const createAccountTx = accounts.contracts.createAccount()
-  await sendTransactionWithPrivateKey(web3, createAccountTx, account.privateKey, {
-    to: accounts.address,
-  })
-
-  // @ts-ignore
   const setNameTx = accounts.contracts.setName(`${config.validators.groupName} ${encodedKey}`)
   await sendTransactionWithPrivateKey(web3, setNameTx, account.privateKey, {
     to: accounts.address,
@@ -103,7 +97,9 @@ async function registerValidator(
   lockedGold: LockedGoldInstance,
   validators: ValidatorsInstance,
   validatorPrivateKey: string,
-  groupAddress: string
+  groupAddress: string,
+  index: number,
+  networkName: string
 ) {
   const validatorPrivateKeyHexStripped = validatorPrivateKey.slice(2)
   const publicKey = generatePublicKeyFromPrivateKey(validatorPrivateKeyHexStripped)
@@ -122,6 +118,12 @@ async function registerValidator(
     config.validators.registrationRequirements.validator,
     validatorPrivateKey
   )
+
+  // @ts-ignore
+  const setNameTx = accounts.contracts.setName(`CLabs Validator #${index} on ${networkName}`)
+  await sendTransactionWithPrivateKey(web3, setNameTx, validatorPrivateKey, {
+    to: accounts.address,
+  })
 
   // @ts-ignore
   const registerTx = validators.contract.methods.registerValidator(add0x(publicKeysData))
@@ -195,7 +197,9 @@ module.exports = async (_deployer: any, networkName: string) => {
 
   console.info('  Registering Validators ...')
   await Promise.all(
-    valKeys.map((key) => registerValidator(accounts, lockedGold, validators, key, account.address))
+    valKeys.map((key, index) =>
+      registerValidator(accounts, lockedGold, validators, key, account.address, index, networkName)
+    )
   )
 
   console.info('  Adding Validators to Validator Group ...')
