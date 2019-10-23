@@ -3,6 +3,7 @@ import { RemoteMessage } from 'react-native-firebase/messaging'
 import { Notification, NotificationOpen } from 'react-native-firebase/notifications'
 import { Sentry } from 'react-native-sentry'
 import { NotificationReceiveState, PaymentRequest } from 'src/account'
+import { FIREBASE_ENABLED } from 'src/config'
 import { handleNotification } from 'src/firebase/notifications'
 import { getReduxStore } from 'src/redux/store'
 import Logger from 'src/utils/Logger'
@@ -141,6 +142,9 @@ Firebase DB Format:
 export async function getVersionInfo(version: string) {
   let deprecated: boolean = false
   Logger.info(TAG, `Checking version info ${version}`)
+  if (!FIREBASE_ENABLED) {
+    return { deprecated, version }
+  }
   const versionsInfo = (await firebase
     .database()
     .ref('versions')
