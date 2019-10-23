@@ -1,6 +1,5 @@
 import * as React from 'react'
-import { createElement, Image, NetInfo, StyleSheet, View, ViewStyle } from 'react-native'
-import { BeautifulMoneyPreview } from 'src/about/images/index'
+import { createElement, Image, StyleSheet, View, ViewStyle } from 'react-native'
 import { H1, H3 } from 'src/fonts/Fonts'
 import { I18nProps, NameSpaces, withNamespaces } from 'src/i18n'
 import { ScreenProps, ScreenSizes, withScreenSize } from 'src/layout/ScreenSize'
@@ -9,7 +8,12 @@ import { PlayCircle2 } from 'src/shared/PlayCircle'
 import VideoModal from 'src/shared/VideoModal'
 import { standardStyles, textStyles } from 'src/styles'
 
-import { getEffectiveConnection, SLOW_CONNECTIONS } from 'src/utils/utils'
+import {
+  Capacity,
+  getDeviceCapacity,
+  getEffectiveConnection,
+  SLOW_CONNECTIONS,
+} from 'src/utils/utils'
 interface State {
   isHovering: boolean
   supportsVideo: boolean
@@ -43,7 +47,7 @@ class VideoCover extends React.PureComponent<I18nProps & ScreenProps, State> {
 
   componentDidMount = () => {
     const connectionType = getEffectiveConnection(window.navigator)
-    if (!SLOW_CONNECTIONS.has(connectionType)) {
+    if (!SLOW_CONNECTIONS.has(connectionType) && getDeviceCapacity() === Capacity.high) {
       this.setState({ supportsVideo: true })
     }
   }

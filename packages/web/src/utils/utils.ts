@@ -32,3 +32,21 @@ export const SLOW_CONNECTIONS = new Set([
   EffectiveTypes['slow-2g'],
   EffectiveTypes['3g'],
 ])
+
+export enum Capacity {
+  low,
+  medium,
+  high,
+}
+
+const HIGH_END_GIGS = 2
+
+export function getDeviceCapacity(): Capacity {
+  const deviceMemory = window.navigator.deviceMemory
+
+  if (!deviceMemory || deviceMemory >= HIGH_END_GIGS) {
+    return Capacity.high
+  } else {
+    return Capacity.low
+  }
+}
