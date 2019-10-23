@@ -10,8 +10,8 @@ import { ErrorMessages } from 'src/app/ErrorMessages'
 import { refreshAllBalances } from 'src/home/actions'
 import {
   Actions,
+  backupPhraseEmpty,
   ImportBackupPhraseAction,
-  importBackupPhraseEmpty,
   importBackupPhraseFailure,
   importBackupPhraseSuccess,
 } from 'src/import/actions'
@@ -54,7 +54,8 @@ export function* importBackupPhraseSaga({ phrase, useEmptyWallet }: ImportBackup
       // TODO(Rossy) Check gold here too once verificiation is made optional
 
       if (dollarBalance.isLessThanOrEqualTo(0)) {
-        yield put(importBackupPhraseEmpty())
+        yield put(backupPhraseEmpty())
+        navigate(Screens.ImportWalletEmpty, { backupPhrase: phrase })
         return
       }
     }
