@@ -43,7 +43,7 @@ module.exports = deploymentForCoreContract<StableTokenInstance>(
       config.stableToken.minerDollarBalance.toString(),
       stableToken
     )
-    console.log(
+    console.info(
       `Minting ${minerAddress} ${config.stableToken.minerDollarBalance.toString()} StableToken`
     )
     await stableToken.setMinter(minerAddress)
@@ -59,11 +59,11 @@ module.exports = deploymentForCoreContract<StableTokenInstance>(
     >('SortedOracles', artifacts)
 
     for (const oracle of config.stableToken.priceOracleAccounts) {
-      console.log(`Adding ${oracle} as an Oracle for StableToken`)
+      console.info(`Adding ${oracle} as an Oracle for StableToken`)
       await sortedOracles.addOracle(stableToken.address, oracle)
     }
 
-    console.log('Setting GoldToken/USD exchange rate')
+    console.info('Setting GoldToken/USD exchange rate')
     // We need to seed the exchange rate, and that must be done with an account
     // that's accessible to the migrations. It's in an if statement in case this
     // account happened to be included in config.stableToken.priceOracleAccounts
@@ -82,10 +82,10 @@ module.exports = deploymentForCoreContract<StableTokenInstance>(
       'Reserve',
       artifacts
     )
-    console.log('Adding StableToken to Reserve')
+    console.info('Adding StableToken to Reserve')
     await reserve.addToken(stableToken.address)
 
-    console.log('Whitelisting StableToken as a gas currency')
+    console.info('Whitelisting StableToken as a gas currency')
     const gasCurrencyWhitelist: GasCurrencyWhitelistInstance = await getDeployedProxiedContract<
       GasCurrencyWhitelistInstance
     >('GasCurrencyWhitelist', artifacts)
