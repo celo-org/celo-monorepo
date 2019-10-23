@@ -1,14 +1,33 @@
 import * as React from 'react'
 import 'react-native'
+import { Provider } from 'react-redux'
 import * as renderer from 'react-test-renderer'
 import BackupPhrase from 'src/backup/BackupPhrase'
+import { createMockStore } from 'test/utils'
+import { mockMnemonic } from 'test/values'
 
-const SAMPLE_PHRASE =
-  'prosper winner find donate tape history measure umbrella agent patrol want rhythm old unable wash wrong need fluid hammer coach reveal plastic trust lake'
+jest.mock('react-native-secure-key-store', () => {
+  return {
+    get: () => {
+      return mockMnemonic
+    },
+  }
+})
 
-it('renders correctly', () => {
+it('renders correctly with backup not completed', () => {
   const tree = renderer.create(
-    <BackupPhrase words={SAMPLE_PHRASE} onPress={jest.fn()} onCancel={jest.fn()} />
+    <Provider store={createMockStore()}>
+      <BackupPhrase />
+    </Provider>
+  )
+  expect(tree).toMatchSnapshot()
+})
+
+it('renders correctly with backup completed', () => {
+  const tree = renderer.create(
+    <Provider store={createMockStore({ account: { backupCompleted: true } })}>
+      <BackupPhrase />
+    </Provider>
   )
   expect(tree).toMatchSnapshot()
 })

@@ -18,6 +18,7 @@ import { deleteChainData } from 'src/geth/geth'
 import { initGethSaga } from 'src/geth/saga'
 import { navigateToError } from 'src/navigator/NavigationService'
 import { waitWeb3LastBlock } from 'src/networkInfo/saga'
+import { setCachedPincode } from 'src/pincode/PincodeCache'
 import { setKey } from 'src/utils/keyStore'
 import Logger from 'src/utils/Logger'
 import {
@@ -336,6 +337,7 @@ export function* unlockAccount(account: string) {
       return true
     }
   } catch (error) {
+    setCachedPincode(null)
     Logger.error(TAG + '@unlockAccount', 'Web3 account unlock failed', error)
     return false
   }

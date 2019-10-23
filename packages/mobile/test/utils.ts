@@ -1,6 +1,5 @@
 /* Utilities to facilitate testing */
 import configureMockStore from 'redux-mock-store'
-import thunk from 'redux-thunk'
 import { InitializationState } from 'src/geth/reducer'
 import i18n from 'src/i18n'
 import { RootState } from 'src/redux/reducers'
@@ -86,8 +85,7 @@ export function mockNavigationServiceFor(test: string, navigateMock = jest.fn())
   return { navigate, navigateBack, navigateReset }
 }
 
-const middlewares = [thunk]
-const mockStore = configureMockStore(middlewares)
+const mockStore = configureMockStore()
 
 /* Create a mock store with some reasonable default values */
 type RecursivePartial<T> = { [P in keyof T]?: RecursivePartial<T[P]> }
