@@ -13,14 +13,14 @@ import { getPhoneHash } from '@celo/utils/lib/phoneNumbers'
 import BigNumber from 'bignumber.js'
 import { uniq } from 'lodash'
 import {
-  AttestationsContract,
-  AttestationsInstance,
+  TestAttestationsContract,
+  TestAttestationsInstance,
   MockLockedGoldContract,
   MockLockedGoldInstance,
   MockStableTokenContract,
   MockStableTokenInstance,
-  MockValidatorsContract,
-  MockValidatorsInstance,
+  MockElectionContract,
+  MockElectionInstance,
   RandomContract,
   RandomInstance,
   RegistryContract,
@@ -28,9 +28,14 @@ import {
 } from 'types'
 import { getParsedSignatureOfAddress } from '../../lib/signing-utils'
 
-const Attestations: AttestationsContract = artifacts.require('Attestations')
+/* We use a contract that behaves like the actual Attestations contract, but
+ * mocks the implementations of validator set getters. These rely on precompiled
+ * contracts, which are not available in our current ganache fork, which we use
+ * for Truffle unit tests.
+ */
+const Attestations: TestAttestationsContract = artifacts.require('TestAttestations')
 const MockStableToken: MockStableTokenContract = artifacts.require('MockStableToken')
-const MockValidators: MockValidatorsContract = artifacts.require('MockValidators')
+const MockElection: MockElectionContract = artifacts.require('MockElection')
 const MockLockedGold: MockLockedGoldContract = artifacts.require('MockLockedGold')
 const Random: RandomContract = artifacts.require('Random')
 const Registry: RegistryContract = artifacts.require('Registry')
@@ -41,11 +46,11 @@ const longDataEncryptionKey =
   '02f2f48ee19680706196e2e339e5da3491186e0c4c5030670656b0e01611111111'
 
 contract('Attestations', (accounts: string[]) => {
-  let attestations: AttestationsInstance
+  let attestations: TestAttestationsInstance
   let mockStableToken: MockStableTokenInstance
   let otherMockStableToken: MockStableTokenInstance
   let random: RandomInstance
-  let mockValidators: MockValidatorsInstance
+  let mockElection: MockElectionInstance
   let mockLockedGold: MockLockedGoldInstance
   let registry: RegistryInstance
   const provider = new Web3.providers.HttpProvider('http://localhost:8545')
@@ -137,19 +142,19 @@ contract('Attestations', (accounts: string[]) => {
     otherMockStableToken = await MockStableToken.new()
     attestations = await Attestations.new()
     random = await Random.new()
-    mockValidators = await MockValidators.new()
-    await Promise.all(
-      accounts.map((account) => mockValidators.addValidator(getValidatingKeyAddress(account)))
-    )
     mockLockedGold = await MockLockedGold.new()
     await Promise.all(
       accounts.map((account) =>
-        mockLockedGold.delegateValidating(account, getValidatingKeyAddress(account))
+        mockLockedGold.authorizeValidator(account, getValidatingKeyAddress(account))
       )
+    )
+    mockElection = await MockElection.new()
+    await mockElection.setElectedValidators(
+      accounts.map((account) => getValidatingKeyAddress(account))
     )
     registry = await Registry.new()
     await registry.setAddressFor(CeloContractName.Random, random.address)
-    await registry.setAddressFor(CeloContractName.Validators, mockValidators.address)
+    await registry.setAddressFor(CeloContractName.Election, mockElection.address)
     await registry.setAddressFor(CeloContractName.LockedGold, mockLockedGold.address)
     await attestations.initialize(
       registry.address,
@@ -157,6 +162,7 @@ contract('Attestations', (accounts: string[]) => {
       [mockStableToken.address, otherMockStableToken.address],
       [attestationFee, attestationFee]
     )
+    await attestations.__setValidators(accounts)
   })
 
   describe('#initialize()', () => {

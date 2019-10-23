@@ -62,8 +62,10 @@ const isOfType = <K extends ClaimTypes>(type: K) => (
 export class IdentityMetadataWrapper {
   data: IdentityMetadata
 
-  static emptyData: IdentityMetadata = {
-    claims: [],
+  static fromEmpty() {
+    return new IdentityMetadataWrapper({
+      claims: [],
+    })
   }
 
   static async fetchFromURL(url: string) {
