@@ -6,7 +6,6 @@ import { PincodeType } from 'src/account/reducer'
 import { setLanguage } from 'src/app/actions'
 import { handleDappkitDeepLink } from 'src/dappkit/dappkit'
 import { getVersionInfo } from 'src/firebase/firebase'
-import { waitForFirebaseAuth } from 'src/firebase/saga'
 import { NavActions, navigate } from 'src/navigator/NavigationService'
 import { Screens, Stacks } from 'src/navigator/Screens'
 import { PersistedRootState } from 'src/redux/reducers'
@@ -49,7 +48,6 @@ const mapStateToProps = (state: PersistedRootState): PersistedStateProps | null 
 
 export function* checkAppDeprecation() {
   yield call(waitForRehydrate)
-  yield call(waitForFirebaseAuth)
   const versionInfo = yield getVersionInfo(DeviceInfo.getVersion())
   Logger.info(TAG, 'Version Info', JSON.stringify(versionInfo))
   if (versionInfo && versionInfo.deprecated) {

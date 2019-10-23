@@ -3,6 +3,7 @@ import { RemoteMessage } from 'react-native-firebase/messaging'
 import { Notification, NotificationOpen } from 'react-native-firebase/notifications'
 import { Sentry } from 'react-native-sentry'
 import { NotificationReceiveState, PaymentRequest } from 'src/account'
+import { FIREBASE_ENABLED } from 'src/config'
 import { handleNotification } from 'src/firebase/notifications'
 import { getReduxStore } from 'src/redux/store'
 import Logger from 'src/utils/Logger'
@@ -118,13 +119,46 @@ export const writePaymentRequest = (paymentInfo: PaymentRequest) => async () => 
   }
 }
 
+export function isDeprecatedVersion(version: string, minVersion: string): boolean {
+  const minVersionArray = minVersion.split('.')
+  const versionArray = version.split('.')
+  const minVersionLength = Math.min(minVersionArray.length, version.length)
+  for (let i = 0; i < minVersionLength; i++) {
+    if (minVersionArray[i] > versionArray[i]) {
+      return true
+    } else if (minVersionArray[i] < versionArray[i]) {
+      return false
+    }
+  }
+  if (minVersionArray.length > versionArray.length) {
+    return true
+  }
+  return false
+}
+
+/*
+Get the Version deprecation information.
+@param version: string The version to check for deprecation
+@return: object { version: <VERSION>, deprecated: <BOOLEAN> }
+Firebase DB Format: 
+  (New) Add minVersion child to versions category with a string of the mininum version as string
+*/
 export async function getVersionInfo(version: string) {
-  const versionFSPath = version.split('.').join('/')
+  let deprecated: boolean = false
   Logger.info(TAG, `Checking version info ${version}`)
-  return (await firebase
+  if (!FIREBASE_ENABLED) {
+    return { deprecated, version }
+  }
+  const versionsInfo = (await firebase
     .database()
-    .ref(`versions/${versionFSPath}`)
+    .ref('versions')
     .once('value')).val()
+  if (!versionsInfo || !versionsInfo.minVersion) {
+    return { deprecated, version }
+  }
+  const minVersion: string = versionsInfo.minVersion
+  deprecated = isDeprecatedVersion(version, minVersion)
+  return { version, deprecated }
 }
 
 export async function setUserLanguage(address: string, language: string) {
