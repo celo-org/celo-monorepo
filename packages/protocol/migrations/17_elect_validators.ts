@@ -207,7 +207,7 @@ module.exports = async (_deployer: any) => {
     // @ts-ignore
     const voteTx = election.contract.methods.vote(
       account.address,
-      value,
+      '0x' + value.toString(16),
       NULL_ADDRESS,
       prevGroupAddress
     )
