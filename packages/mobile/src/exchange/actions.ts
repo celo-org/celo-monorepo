@@ -52,4 +52,4 @@ export const exchangeTokens = (
   makerToken,
   makerAmount,
 })
-export type ActionTypes = SetExchangeRateAction | ExchangeTokensAction
+export type ActionTypes = SetExchangeRateAction | ExchangeTokensAction | SetTobinTaxAction

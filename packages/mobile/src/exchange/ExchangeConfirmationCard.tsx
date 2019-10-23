@@ -4,12 +4,16 @@ import BigNumber from 'bignumber.js'
 import * as React from 'react'
 import { withNamespaces, WithNamespaces } from 'react-i18next'
 import { StyleSheet, Text, View } from 'react-native'
+import { connect } from 'react-redux'
+import componentWithAnalytics from 'src/analytics/wrapper'
 import CurrencyDisplay from 'src/components/CurrencyDisplay'
 import LineItemRow from 'src/components/LineItemRow'
+import { fetchTobinTax } from 'src/exchange/actions'
 import ExchangeRate from 'src/exchange/ExchangeRate'
 import FeeExchangeIcon from 'src/exchange/FeeExchangeIcon'
 import { CURRENCY_ENUM } from 'src/geth/consts'
 import { Namespaces } from 'src/i18n'
+import { RootState } from 'src/redux/reducers'
 import FeeIcon from 'src/send/FeeIcon'
 import RoundedArrow from 'src/shared/RoundedArrow'
 import { getMoneyDisplayValue } from 'src/utils/formatting'
@@ -24,9 +28,25 @@ export interface ExchangeConfirmationCardProps {
   newGoldBalance?: BigNumber
 }
 
-type Props = ExchangeConfirmationCardProps & WithNamespaces
+interface StateProps {
+  tobinTax: string
+}
+
+interface DispatchProps {
+  fetchTobinTax: typeof fetchTobinTax
+}
+
+type Props = ExchangeConfirmationCardProps & WithNamespaces & DispatchProps
+
+const mapStateToProps = (state: RootState): StateProps => ({
+  tobinTax: state.exchange.tobinTax,
+})
 
 class ExchangeConfirmationCard extends React.PureComponent<Props> {
+  componentDidMount() {
+    this.props.fetchTobinTax()
+  }
+
   getTakerToken() {
     return this.props.makerToken === CURRENCY_ENUM.DOLLAR
       ? CURRENCY_ENUM.GOLD
@@ -180,4 +200,11 @@ const styles = StyleSheet.create({
   },
 })
 
-export default withNamespaces(Namespaces.exchangeFlow9)(ExchangeConfirmationCard)
+export default componentWithAnalytics(
+  connect<StateProps, DispatchProps, {}, RootState>(
+    mapStateToProps,
+    {
+      fetchTobinTax,
+    }
+  )(withNamespaces(Namespaces.exchangeFlow9)(ExchangeConfirmationCard))
+)

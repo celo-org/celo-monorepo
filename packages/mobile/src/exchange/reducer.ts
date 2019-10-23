@@ -7,10 +7,12 @@ export interface ExchangeRatePair {
 
 export interface State {
   exchangeRatePair: ExchangeRatePair | null
+  tobinTax: string
 }
 
 const initialState = {
   exchangeRatePair: null,
+  tobinTax: '0.00',
 }
 
 export const reducer = (state: State | undefined = initialState, action: ActionTypes): State => {
@@ -19,6 +21,11 @@ export const reducer = (state: State | undefined = initialState, action: ActionT
       return {
         ...state,
         exchangeRatePair: action.exchangeRatePair,
+      }
+    case Actions.SET_TOBIN_TAX:
+      return {
+        ...state,
+        tobinTax: action.tobinTax,
       }
     default:
       return state
