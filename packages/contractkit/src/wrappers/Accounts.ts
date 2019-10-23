@@ -130,6 +130,14 @@ export class AccountsWrapper extends BaseWrapper<Accounts> {
   )
 
   /**
+   * Convenience Setter for the dataEncryptionKey and wallet address for an account
+   * @param name A string to set as the name of the account
+   * @param dataEncryptionKey secp256k1 public key for data encryption. Preferably compressed.
+   * @param walletAddress The wallet address to set for the account
+   */
+  setAccount = proxySend(this.kit, this.contract.methods.setAccount)
+
+  /**
    * Sets the metadataURL for the account
    * @param url The url to set
    */

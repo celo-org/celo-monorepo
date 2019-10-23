@@ -28,6 +28,7 @@ contract('Accounts', (accounts: string[]) => {
   let account = accounts[0]
   const caller = accounts[0]
 
+  const name = 'Account'
   const metadataURL = 'https://www.celo.org'
   const dataEncryptionKey = '0x02f2f48ee19680706196e2e339e5da3491186e0c4c5030670656b0e01611111111'
   const longDataEncryptionKey =
@@ -113,14 +114,16 @@ contract('Accounts', (accounts: string[]) => {
   })
 
   describe('#setAccount', async () => {
-    it('should set the dataEncryptionKey and walletAddress', async () => {
+    it('should set the name, dataEncryptionKey and walletAddress', async () => {
       // @ts-ignore
-      await accountsInstance.setAccount(dataEncryptionKey, caller)
+      await accountsInstance.setAccount(name, dataEncryptionKey, caller)
       const expectedWalletAddress = await accountsInstance.getWalletAddress(caller)
       assert.equal(expectedWalletAddress, caller)
       const expectedKey = await accountsInstance.getDataEncryptionKey(caller)
       // @ts-ignore
       assert.equal(expectedKey, dataEncryptionKey)
+      const expectedName = await accountsInstance.getName(caller)
+      assert.equal(expectedName, name)
     })
   })
 
@@ -162,6 +165,24 @@ contract('Accounts', (accounts: string[]) => {
       assertLogMatches2(event, {
         event: 'AccountMetadataURLSet',
         args: { account: caller, metadataURL },
+      })
+    })
+  })
+
+  describe('#setName', async () => {
+    it('should set the name', async () => {
+      await accountsInstance.setName(name)
+      const result = await accountsInstance.getName(caller)
+      assert.equal(result, name)
+    })
+
+    it('should emit the AccountNameSet event', async () => {
+      const response = await accountsInstance.setName(name)
+      assert.lengthOf(response.logs, 1)
+      const event = response.logs[0]
+      assertLogMatches2(event, {
+        event: 'AccountNameSet',
+        args: { account: caller, name },
       })
     })
   })

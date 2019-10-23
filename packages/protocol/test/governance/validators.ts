@@ -32,18 +32,14 @@ Validators.numberFormat = 'BigNumber'
 
 const parseValidatorParams = (validatorParams: any) => {
   return {
-    name: validatorParams[0],
-    url: validatorParams[1],
-    publicKeysData: validatorParams[2],
-    affiliation: validatorParams[3],
+    publicKeysData: validatorParams[0],
+    affiliation: validatorParams[1],
   }
 }
 
 const parseValidatorGroupParams = (groupParams: any) => {
   return {
-    name: groupParams[0],
-    url: groupParams[1],
-    members: groupParams[2],
+    members: groupParams[0],
   }
 }
 
@@ -73,8 +69,6 @@ contract('Validators', (accounts: string[]) => {
     validator: new BigNumber(60 * DAY),
   }
   const maxGroupSize = 5
-  const name = 'test-name'
-  const url = 'test-url'
   const commission = toFixed(1 / 100)
   beforeEach(async () => {
     accountsInstance = await Accounts.new()
@@ -99,8 +93,6 @@ contract('Validators', (accounts: string[]) => {
   const registerValidator = async (validator: string) => {
     await mockLockedGold.setAccountTotalLockedGold(validator, balanceRequirements.validator)
     await validators.registerValidator(
-      name,
-      url,
       // @ts-ignore bytes type
       publicKeysData,
       { from: validator }
@@ -109,7 +101,7 @@ contract('Validators', (accounts: string[]) => {
 
   const registerValidatorGroup = async (group: string) => {
     await mockLockedGold.setAccountTotalLockedGold(group, balanceRequirements.group)
-    await validators.registerValidatorGroup(name, url, commission, { from: group })
+    await validators.registerValidatorGroup(commission, { from: group })
   }
 
   const registerValidatorGroupWithMembers = async (group: string, members: string[]) => {
@@ -321,8 +313,6 @@ contract('Validators', (accounts: string[]) => {
       beforeEach(async () => {
         await mockLockedGold.setAccountTotalLockedGold(validator, balanceRequirements.validator)
         resp = await validators.registerValidator(
-          name,
-          url,
           // @ts-ignore bytes type
           publicKeysData
         )
@@ -336,10 +326,8 @@ contract('Validators', (accounts: string[]) => {
         assert.deepEqual(await validators.getRegisteredValidators(), [validator])
       })
 
-      it('should set the validator name, url, and public key', async () => {
+      it('should set the validator public key', async () => {
         const parsedValidator = parseValidatorParams(await validators.getValidator(validator))
-        assert.equal(parsedValidator.name, name)
-        assert.equal(parsedValidator.url, url)
         assert.equal(parsedValidator.publicKeysData, publicKeysData)
       })
 
@@ -355,8 +343,6 @@ contract('Validators', (accounts: string[]) => {
           event: 'ValidatorRegistered',
           args: {
             validator,
-            name,
-            url,
             publicKeysData,
           },
         })
@@ -366,14 +352,12 @@ contract('Validators', (accounts: string[]) => {
     describe('when the account is already a registered validator', () => {
       beforeEach(async () => {
         await mockLockedGold.setAccountTotalLockedGold(validator, balanceRequirements.group)
-        await validators.registerValidatorGroup(name, url, commission)
+        await validators.registerValidatorGroup(commission)
       })
 
       it('should revert', async () => {
         await assertRevert(
           validators.registerValidator(
-            name,
-            url,
             // @ts-ignore bytes type
             publicKeysData
           )
@@ -392,8 +376,6 @@ contract('Validators', (accounts: string[]) => {
       it('should revert', async () => {
         await assertRevert(
           validators.registerValidator(
-            name,
-            url,
             // @ts-ignore bytes type
             publicKeysData
           )
@@ -693,7 +675,7 @@ contract('Validators', (accounts: string[]) => {
     describe('when the account is not a registered validator group', () => {
       beforeEach(async () => {
         await mockLockedGold.setAccountTotalLockedGold(group, balanceRequirements.group)
-        resp = await validators.registerValidatorGroup(name, url, commission)
+        resp = await validators.registerValidatorGroup(commission)
       })
 
       it('should mark the account as a validator group', async () => {
@@ -702,12 +684,6 @@ contract('Validators', (accounts: string[]) => {
 
       it('should add the account to the list of validator groups', async () => {
         assert.deepEqual(await validators.getRegisteredValidatorGroups(), [group])
-      })
-
-      it('should set the validator group name and url', async () => {
-        const parsedGroup = parseValidatorGroupParams(await validators.getValidatorGroup(group))
-        assert.equal(parsedGroup.name, name)
-        assert.equal(parsedGroup.url, url)
       })
 
       it('should set account balance requirements', async () => {
@@ -722,8 +698,6 @@ contract('Validators', (accounts: string[]) => {
           event: 'ValidatorGroupRegistered',
           args: {
             group,
-            name,
-            url,
           },
         })
       })
@@ -735,18 +709,18 @@ contract('Validators', (accounts: string[]) => {
       })
 
       it('should revert', async () => {
-        await assertRevert(validators.registerValidatorGroup(name, url, balanceRequirements.group))
+        await assertRevert(validators.registerValidatorGroup(balanceRequirements.group))
       })
     })
 
     describe('when the account is already a registered validator group', () => {
       beforeEach(async () => {
         await mockLockedGold.setAccountTotalLockedGold(group, balanceRequirements.group)
-        await validators.registerValidatorGroup(name, url, commission)
+        await validators.registerValidatorGroup(commission)
       })
 
       it('should revert', async () => {
-        await assertRevert(validators.registerValidatorGroup(name, url, commission))
+        await assertRevert(validators.registerValidatorGroup(commission))
       })
     })
 
@@ -756,7 +730,7 @@ contract('Validators', (accounts: string[]) => {
       })
 
       it('should revert', async () => {
-        await assertRevert(validators.registerValidatorGroup(name, url, commission))
+        await assertRevert(validators.registerValidatorGroup(commission))
       })
     })
   })

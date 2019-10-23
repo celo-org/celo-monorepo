@@ -39,6 +39,8 @@ contract Accounts is IAccounts, ReentrancyGuard, Initializable, UsingRegistry {
     // The address at which the account expects to receive transfers
     address walletAddress;
 
+    string name;
+
     // The ECDSA public key used to encrypt and decrypt data for this account
     bytes dataEncryptionKey;
 
@@ -61,6 +63,12 @@ contract Accounts is IAccounts, ReentrancyGuard, Initializable, UsingRegistry {
     bytes dataEncryptionKey
   );
 
+  event AccountNameSet(
+    address indexed account,
+    string name
+  );
+
+
   event AccountMetadataURLSet(
     address indexed account,
     string metadataURL
@@ -71,6 +79,11 @@ contract Accounts is IAccounts, ReentrancyGuard, Initializable, UsingRegistry {
     address walletAddress
   );
 
+  event AccountCreated(
+    address indexed account,
+    string name
+  );
+
   function initialize() external initializer {
     _transferOwnership(msg.sender);
   }
@@ -79,7 +92,7 @@ contract Accounts is IAccounts, ReentrancyGuard, Initializable, UsingRegistry {
    * @notice Creates an account.
    * @return True if account creation succeeded.
    */
-  function createAccount() external returns (bool) {
+  function createAccount() public returns (bool) {
     require(isNotAccount(msg.sender) && isNotAuthorized(msg.sender));
     Account storage account = accounts[msg.sender];
     account.exists = true;
@@ -88,15 +101,21 @@ contract Accounts is IAccounts, ReentrancyGuard, Initializable, UsingRegistry {
 
   /**
    * @notice Convenience Setter for the dataEncryptionKey and wallet address for an account
+   * @param name A string to set as the name of the account
    * @param dataEncryptionKey secp256k1 public key for data encryption. Preferably compressed.
    * @param walletAddress The wallet address to set for the account
    */
   function setAccount(
+    string calldata name,
     bytes calldata dataEncryptionKey,
     address walletAddress
   )
     external
   {
+    if(!isAccount(msg.sender)) {
+      createAccount();
+    }
+    setName(name);
     setAccountDataEncryptionKey(dataEncryptionKey);
     setWalletAddress(walletAddress);
   }
@@ -337,9 +356,27 @@ contract Accounts is IAccounts, ReentrancyGuard, Initializable, UsingRegistry {
   }
 
   /**
+   * @notice Setter for the name of an account.
+   * @param name The name to set.
+   */
+  function setName(string memory name) public {
+    accounts[msg.sender].name = name;
+    emit AccountNameSet(msg.sender, name);
+  }
+
+  /**
+   * @notice Getter for the name of an account.
+   * @param account The address of the account to get the name for.
+   * @return name The name of the account.
+   */
+  function getName(address account) external view returns (string memory) {
+    return accounts[account].name;
+  }
+
+  /**
    * @notice Getter for the metadata of an account.
    * @param account The address of the account to get the metadata for.
-   * @return metdataURL The URL to access the metadata.
+   * @return metadataURL The URL to access the metadata.
    */
   function getMetadataURL(address account) external view returns (string memory) {
     return accounts[account].metadataURL;

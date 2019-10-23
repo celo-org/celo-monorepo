@@ -13,16 +13,12 @@ import {
 
 export interface Validator {
   address: Address
-  name: string
-  url: string
   publicKey: string
   affiliation: string | null
 }
 
 export interface ValidatorGroup {
   address: Address
-  name: string
-  url: string
   members: Address[]
   commission: BigNumber
 }
@@ -50,14 +46,10 @@ export class ValidatorsWrapper extends BaseWrapper<Validators> {
   affiliate = proxySend(this.kit, this.contract.methods.affiliate)
   deaffiliate = proxySend(this.kit, this.contract.methods.deaffiliate)
   registerValidator = proxySend(this.kit, this.contract.methods.registerValidator)
-  async registerValidatorGroup(
-    name: string,
-    url: string,
-    commission: BigNumber
-  ): Promise<CeloTransactionObject<boolean>> {
+  async registerValidatorGroup(commission: BigNumber): Promise<CeloTransactionObject<boolean>> {
     return toTransactionObject(
       this.kit,
-      this.contract.methods.registerValidatorGroup(name, url, toFixed(commission).toFixed())
+      this.contract.methods.registerValidatorGroup(toFixed(commission).toFixed())
     )
   }
   /**
@@ -116,10 +108,8 @@ export class ValidatorsWrapper extends BaseWrapper<Validators> {
     const res = await this.contract.methods.getValidator(address).call()
     return {
       address,
-      name: res[0],
-      url: res[1],
-      publicKey: res[2] as any,
-      affiliation: res[3],
+      publicKey: res[0] as any,
+      affiliation: res[1],
     }
   }
 
@@ -179,10 +169,8 @@ export class ValidatorsWrapper extends BaseWrapper<Validators> {
     const res = await this.contract.methods.getValidatorGroup(address).call()
     return {
       address,
-      name: res[0],
-      url: res[1],
-      members: res[2],
-      commission: fromFixed(new BigNumber(res[3])),
+      members: res[0],
+      commission: fromFixed(new BigNumber(res[1])),
     }
   }
 }

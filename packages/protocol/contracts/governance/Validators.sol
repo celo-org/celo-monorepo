@@ -56,16 +56,13 @@ contract Validators is IValidators, Ownable, ReentrancyGuard, Initializable, Usi
   }
 
   struct ValidatorGroup {
-    string name;
-    string url;
+    bool exists;
     // TODO(asa): Add a function that allows groups to update their commission.
     FixidityLib.Fraction commission;
     LinkedList.List members;
   }
 
   struct Validator {
-    string name;
-    string url;
     bytes publicKeysData;
     address affiliation;
   }
@@ -95,8 +92,6 @@ contract Validators is IValidators, Ownable, ReentrancyGuard, Initializable, Usi
 
   event ValidatorRegistered(
     address indexed validator,
-    string name,
-    string url,
     bytes publicKeysData
   );
 
@@ -115,9 +110,7 @@ contract Validators is IValidators, Ownable, ReentrancyGuard, Initializable, Usi
   );
 
   event ValidatorGroupRegistered(
-    address indexed group,
-    string name,
-    string url
+    address indexed group
   );
 
   event ValidatorGroupDeregistered(
@@ -229,8 +222,6 @@ contract Validators is IValidators, Ownable, ReentrancyGuard, Initializable, Usi
 
   /**
    * @notice Registers a validator unaffiliated with any validator group.
-   * @param name A name for the validator.
-   * @param url A URL for the validator.
    * @param publicKeysData Comprised of three tightly-packed elements:
    *    - publicKey - The public key that the validator is using for consensus, should match
    *      msg.sender. 64 bytes.
@@ -242,8 +233,6 @@ contract Validators is IValidators, Ownable, ReentrancyGuard, Initializable, Usi
    * @dev Fails if the account does not have sufficient weight.
    */
   function registerValidator(
-    string calldata name,
-    string calldata url,
     bytes calldata publicKeysData
   )
     external
@@ -251,8 +240,6 @@ contract Validators is IValidators, Ownable, ReentrancyGuard, Initializable, Usi
     returns (bool)
   {
     require(
-      bytes(name).length > 0 &&
-      bytes(url).length > 0 &&
       // secp256k1 public key + BLS public key + BLS proof of possession
       publicKeysData.length == (64 + 48 + 96)
     );
@@ -263,9 +250,9 @@ contract Validators is IValidators, Ownable, ReentrancyGuard, Initializable, Usi
     require(!isValidator(account) && !isValidatorGroup(account));
     require(meetsValidatorBalanceRequirements(account));
 
-    validators[account] = Validator(name, url, publicKeysData, address(0));
+    validators[account] = Validator(publicKeysData, address(0));
     _validators.push(account);
-    emit ValidatorRegistered(account, name, url, publicKeysData);
+    emit ValidatorRegistered(account, publicKeysData);
     return true;
   }
 
@@ -352,8 +339,6 @@ contract Validators is IValidators, Ownable, ReentrancyGuard, Initializable, Usi
 
   /**
    * @notice Registers a validator group with no member validators.
-   * @param name A name for the validator group.
-   * @param url A URL for the validator group.
    * @param commission Fixidity representation of the commission this group receives on epoch
    *   payments made to its members.
    * @return True upon success.
@@ -361,27 +346,22 @@ contract Validators is IValidators, Ownable, ReentrancyGuard, Initializable, Usi
    * @dev Fails if the account does not have sufficient weight.
    */
   function registerValidatorGroup(
-    string calldata name,
-    string calldata url,
     uint256 commission
   )
     external
     nonReentrant
     returns (bool)
   {
-    require(bytes(name).length > 0);
-    require(bytes(url).length > 0);
     require(commission <= FixidityLib.fixed1().unwrap(), "Commission can't be greater than 100%");
     address account = getAccounts().getAccountFromValidationSigner(msg.sender);
     require(!isValidator(account) && !isValidatorGroup(account));
     require(meetsValidatorGroupBalanceRequirements(account));
 
     ValidatorGroup storage group = groups[account];
-    group.name = name;
-    group.url = url;
+    group.exists = true;
     group.commission = FixidityLib.wrap(commission);
     _groups.push(account);
-    emit ValidatorGroupRegistered(account, name, url);
+    emit ValidatorGroupRegistered(account);
     return true;
   }
 
@@ -511,8 +491,6 @@ contract Validators is IValidators, Ownable, ReentrancyGuard, Initializable, Usi
     external
     view
     returns (
-      string memory name,
-      string memory url,
       bytes memory publicKeysData,
       address affiliation
     )
@@ -520,8 +498,6 @@ contract Validators is IValidators, Ownable, ReentrancyGuard, Initializable, Usi
     require(isValidator(account));
     Validator storage validator = validators[account];
     return (
-      validator.name,
-      validator.url,
       validator.publicKeysData,
       validator.affiliation
     );
@@ -537,11 +513,11 @@ contract Validators is IValidators, Ownable, ReentrancyGuard, Initializable, Usi
   )
     external
     view
-    returns (string memory, string memory, address[] memory, uint256)
+    returns (address[] memory, uint256)
   {
     require(isValidatorGroup(account));
     ValidatorGroup storage group = groups[account];
-    return (group.name, group.url, group.members.getKeys(), group.commission.unwrap());
+    return ( group.members.getKeys(), group.commission.unwrap());
   }
 
   /**
@@ -641,7 +617,7 @@ contract Validators is IValidators, Ownable, ReentrancyGuard, Initializable, Usi
    * @return Whether a particular address is a registered validator group.
    */
   function isValidatorGroup(address account) public view returns (bool) {
-    return bytes(groups[account].name).length > 0;
+    return groups[account].exists;
   }
 
   /**
@@ -650,7 +626,7 @@ contract Validators is IValidators, Ownable, ReentrancyGuard, Initializable, Usi
    * @return Whether a particular address is a registered validator.
    */
   function isValidator(address account) public view returns (bool) {
-    return bytes(validators[account].name).length > 0;
+    return validators[account].publicKeysData.length > 0;
   }
 
   /**
