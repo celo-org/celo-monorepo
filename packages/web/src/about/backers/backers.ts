@@ -34,7 +34,7 @@ const people: Backer[] = [
 
   {
     name: 'A.Capital',
-    photo: require('./a-capital-logo.png'),
+    photo: require('./a-capital.jpg'),
   },
   {
     name: 'Dragonfly Capital Partners',
