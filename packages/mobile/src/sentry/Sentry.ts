@@ -2,9 +2,9 @@ import { anonymizedPhone } from '@celo/utils/src/phoneNumbers'
 import DeviceInfo from 'react-native-device-info'
 import * as RNFS from 'react-native-fs'
 import { Sentry } from 'react-native-sentry'
+import { call, select } from 'redux-saga/effects'
 import { e164NumberSelector } from 'src/account/reducer'
 import { SENTRY_URL } from 'src/config'
-import { DispatchType, GetStateType } from 'src/redux/reducers'
 import Logger from 'src/utils/Logger'
 import { currentAccountSelector } from 'src/web3/selectors'
 
@@ -26,17 +26,15 @@ export async function installSentry() {
 }
 
 // This should not be called at cold start since it can slow down the cold start.
-export const initializeSentryUserContext = () => async (
-  dispatch: DispatchType,
-  getState: GetStateType
-) => {
-  const state = getState()
-  const account = currentAccountSelector(state)
+export function* initializeSentryUserContext() {
+  const account = yield select(currentAccountSelector)
+
   if (!account) {
     return
   }
-  const phoneNumber =
-    e164NumberSelector(state) || (await DeviceInfo.getPhoneNumber()) || 'unknownPhoneNumber'
+  const phoneNumber = yield select(e164NumberSelector) ||
+    (yield call([DeviceInfo, 'getPhoneNumber'])) ||
+    'unknownPhoneNumber'
   Logger.debug(
     TAG,
     'initializeSentryUserContext',

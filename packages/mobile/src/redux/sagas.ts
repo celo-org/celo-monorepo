@@ -17,6 +17,7 @@ import { inviteSaga } from 'src/invite/saga'
 import { localCurrencySaga } from 'src/localCurrency/saga'
 import { networkInfoSaga } from 'src/networkInfo/saga'
 import { sendSaga } from 'src/send/saga'
+import { sentrySaga } from 'src/sentry/saga'
 import { stableTokenSaga } from 'src/stableToken/saga'
 import Logger from 'src/utils/Logger'
 import { web3Saga } from 'src/web3/saga'
@@ -77,4 +78,5 @@ export function* rootSaga() {
   yield spawn(feesSaga)
   yield spawn(localCurrencySaga)
   yield spawn(web3Saga)
+  yield spawn(sentrySaga)
 }
