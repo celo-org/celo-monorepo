@@ -143,7 +143,9 @@ Get the Version deprecation information.
 Firebase DB Format: 
   (New) Add minVersion child to versions category with a string of the mininum version as string
 */
-export async function getVersionInfo(version: string) {
+export async function getVersionInfo(
+  version: string
+): Promise<{ deprecated: boolean; version: string }> {
   let deprecated: boolean = false
   Logger.info(TAG, `Checking version info ${version}`)
   if (!FIREBASE_ENABLED) {
