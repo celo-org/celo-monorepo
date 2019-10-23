@@ -1,6 +1,9 @@
 import { CURRENCY_ENUM } from '@celo/utils/src/currencies'
+import { getErc20Balance, getStableTokenContract } from '@celo/walletkit'
+
 import { expectSaga } from 'redux-saga-test-plan'
 import { call } from 'redux-saga/effects'
+
 import { waitWeb3LastBlock } from 'src/networkInfo/saga'
 import { fetchDollarBalance, setBalance, transferStableToken } from 'src/stableToken/actions'
 import { stableTokenFetch, stableTokenTransfer } from 'src/stableToken/saga'
@@ -93,7 +96,7 @@ describe('stableToken saga', () => {
       .withState(state)
       .dispatch(TRANSFER_ACTION)
       .run()
-    expect(getTokenContract).toHaveBeenCalled()
+    expect(getStableTokenContract).toHaveBeenCalled()
   })
 
   it('should remove standby transaction when pin unlock fails', async () => {
