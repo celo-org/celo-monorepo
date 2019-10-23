@@ -79,7 +79,7 @@ exports[`TransferConfirmationCard renders correctly for faucet drilldown 1`] = `
         ]
       }
     >
-      100.00
+      133.00
     </Text>
   </View>
   <Text
@@ -293,7 +293,7 @@ exports[`TransferConfirmationCard renders correctly for received transaction dri
         ]
       }
     >
-      100.00
+      133.00
     </Text>
   </View>
 </View>
@@ -491,7 +491,7 @@ exports[`TransferConfirmationCard renders correctly for sent transaction drilldo
         ]
       }
     >
-      100.00
+      133.00
     </Text>
   </View>
   <Text
@@ -594,7 +594,7 @@ exports[`TransferConfirmationCard renders correctly for verification fee drilldo
         ]
       }
     >
-      0.30
+      0.39
     </Text>
   </View>
   <Text

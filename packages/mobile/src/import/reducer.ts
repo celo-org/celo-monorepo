@@ -2,12 +2,10 @@ import { Actions, ActionTypes } from 'src/import/actions'
 
 export interface State {
   isImportingWallet: boolean
-  isWalletEmpty: boolean
 }
 
 const initialState = {
   isImportingWallet: false,
-  isWalletEmpty: false,
 }
 
 export const reducer = (state: State | undefined = initialState, action: ActionTypes) => {
@@ -24,18 +22,11 @@ export const reducer = (state: State | undefined = initialState, action: ActionT
         isImportingWallet: false,
       }
 
-    case Actions.IMPORT_BACKUP_PHRASE_EMPTY:
+    case Actions.BACKUP_PHRASE_EMPTY:
       return {
         ...state,
         isImportingWallet: false,
-        isWalletEmpty: true,
       }
-    case Actions.TRY_ANOTHER_BACKUP_PHRASE: {
-      return {
-        ...state,
-        isWalletEmpty: false,
-      }
-    }
 
     default:
       return state
