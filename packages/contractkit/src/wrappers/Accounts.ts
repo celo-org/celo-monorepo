@@ -138,6 +138,12 @@ export class AccountsWrapper extends BaseWrapper<Accounts> {
   setAccount = proxySend(this.kit, this.contract.methods.setAccount)
 
   /**
+   * Sets the name for the account
+   * @param name The name to set
+   */
+  setName = proxySend(this.kit, this.contract.methods.setName)
+
+  /**
    * Sets the metadataURL for the account
    * @param url The url to set
    */

@@ -10,8 +10,6 @@ export default class ValidatorGroupRegister extends BaseCommand {
   static flags = {
     ...BaseCommand.flags,
     from: Flags.address({ required: true, description: 'Address for the Validator Group' }),
-    name: flags.string({ required: true }),
-    url: flags.string({ required: true }),
     commission: flags.string({ required: true }),
   }
 
@@ -24,11 +22,7 @@ export default class ValidatorGroupRegister extends BaseCommand {
 
     this.kit.defaultAccount = res.flags.from
     const validators = await this.kit.contracts.getValidators()
-    const tx = await validators.registerValidatorGroup(
-      res.flags.name,
-      res.flags.url,
-      new BigNumber(res.flags.commission)
-    )
+    const tx = await validators.registerValidatorGroup(new BigNumber(res.flags.commission))
     await displaySendTx('registerValidatorGroup', tx)
   }
 }

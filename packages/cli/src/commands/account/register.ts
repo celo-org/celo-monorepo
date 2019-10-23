@@ -1,3 +1,4 @@
+import { flags } from '@oclif/command'
 import { BaseCommand } from '../../base'
 import { displaySendTx } from '../../utils/cli'
 import { Flags } from '../../utils/command'
@@ -7,6 +8,7 @@ export default class Register extends BaseCommand {
 
   static flags = {
     ...BaseCommand.flags,
+    name: flags.string({ required: true }),
     from: Flags.address({ required: true }),
   }
 
@@ -19,5 +21,6 @@ export default class Register extends BaseCommand {
     this.kit.defaultAccount = res.flags.from
     const accounts = await this.kit.contracts.getAccounts()
     await displaySendTx('register', accounts.createAccount())
+    await displaySendTx('setName', accounts.setName(name))
   }
 }
