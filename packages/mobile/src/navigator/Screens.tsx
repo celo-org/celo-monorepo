@@ -4,6 +4,8 @@ export enum Stacks {
   HomeStack = 'HomeStack',
   NuxStack = 'NuxStack',
   SendStack = 'SendStack',
+  QRSendStack = 'QRSendStack',
+  SettingsStack = 'SettingsStack',
   RequestStack = 'RequestStack',
   BackupStack = 'BackupStack',
 }
