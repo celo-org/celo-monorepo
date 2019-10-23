@@ -49,7 +49,7 @@ export async function sendTransactionWithPrivateKey<T>(
   const address = generateAccountAddressFromPrivateKey(privateKey.slice(2))
 
   // Encode data and estimate gas or use default values for a transfer.
-  let encodedTxData: string|undefined = undefined
+  let encodedTxData: string|undefined
   let estimatedGas = 21000 // Enough to spend a transfer transaction.
   if (tx !== null) {
     encodedTxData = tx.encodeABI()
