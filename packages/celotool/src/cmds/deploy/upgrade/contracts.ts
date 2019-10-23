@@ -1,6 +1,6 @@
 import { downloadArtifacts, uploadArtifacts } from 'src/lib/artifacts'
-import { migrationOverrides, truffleOverrides } from 'src/lib/migration-utils'
 import { switchToClusterFromEnv } from 'src/lib/cluster'
+import { migrationOverrides, truffleOverrides } from 'src/lib/migration-utils'
 import { portForwardAnd } from 'src/lib/port_forward'
 import { execCmd } from 'src/lib/utils'
 import { UpgradeArgv } from '../../deploy/upgrade'

@@ -1,3 +1,4 @@
+import { envVar, fetchEnv } from './env-utils'
 import {
   AccountType,
   generatePrivateKey,
@@ -5,9 +6,8 @@ import {
   getPrivateKeysFor,
   privateKeyToAddress,
 } from './generate_utils'
-import { ensure0x } from './utils'
 import { OG_ACCOUNTS } from './genesis_constants'
-import { envVar, fetchEnv } from './env-utils'
+import { ensure0x } from './utils'
 
 export function minerForEnv() {
   if (fetchEnv(envVar.VALIDATORS) === 'og') {
