@@ -1,4 +1,4 @@
-import { capitalize } from 'lodash'
+import { upperFirst } from 'lodash'
 import { AccountsInstance } from 'types'
 import { getParsedSignatureOfAddress } from '../../lib/signing-utils'
 import {
@@ -8,7 +8,20 @@ import {
   NULL_ADDRESS,
 } from '../../lib/test-utils'
 const Accounts: Truffle.Contract<AccountsInstance> = artifacts.require('Accounts')
-let authorizationTests = { voter: {}, validator: {} }
+let authorizationTests: any = {
+  voting: {
+    me: 'vote signing key',
+    subject: 'voteSigner',
+  },
+  validating: {
+    me: 'validation signing key',
+    subject: 'validationSigner',
+  },
+  attesting: {
+    me: 'attestation signing key',
+    subject: 'attestationSigner',
+  },
+}
 
 contract('Accounts', (accounts: string[]) => {
   let accountsInstance: AccountsInstance
@@ -25,15 +38,23 @@ contract('Accounts', (accounts: string[]) => {
     accountsInstance = await Accounts.new({ from: account })
     await accountsInstance.initialize()
 
-    authorizationTests.voter = {
+    authorizationTests.voting = {
       fn: accountsInstance.authorizeVoteSigner,
+      eventName: 'VoteSignerAuthorized',
       getAuthorizedFromAccount: accountsInstance.getVoteSignerFromAccount,
       getAccountFromAuthorized: accountsInstance.getAccountFromVoteSigner,
     }
-    authorizationTests.validator = {
+    authorizationTests.validating = {
       fn: accountsInstance.authorizeValidationSigner,
+      eventName: 'ValidationSignerAuthorized',
       getAuthorizedFromAccount: accountsInstance.getValidationSignerFromAccount,
       getAccountFromAuthorized: accountsInstance.getAccountFromValidationSigner,
+    }
+    authorizationTests.attesting = {
+      fn: accountsInstance.authorizeAttestationSigner,
+      eventName: 'AttestationSignerAuthorized',
+      getAuthorizedFromAccount: accountsInstance.getAttestationSignerFromAccount,
+      getAccountFromAuthorized: accountsInstance.getAccountFromAttestationSigner,
     }
   })
 
@@ -153,7 +174,7 @@ contract('Accounts', (accounts: string[]) => {
         await accountsInstance.createAccount()
       })
 
-      describe(`#authorize${capitalize(key)}()`, () => {
+      describe(`#authorize${upperFirst(authorizationTests[key].subject)}()`, () => {
         const authorized = accounts[1]
         let sig
 
@@ -161,28 +182,27 @@ contract('Accounts', (accounts: string[]) => {
           sig = await getParsedSignatureOfAddress(web3, account, authorized)
         })
 
-        it(`should set the authorized ${key}`, async () => {
+        it(`should set the authorized ${authorizationTests[key].me}`, async () => {
           await authorizationTest.fn(authorized, sig.v, sig.r, sig.s)
           assert.equal(await accountsInstance.authorizedBy(authorized), account)
           assert.equal(await authorizationTest.getAuthorizedFromAccount(account), authorized)
           assert.equal(await authorizationTest.getAccountFromAuthorized(authorized), account)
         })
 
-        it(`should emit a ${capitalize(key)}Authorized event`, async () => {
+        it(`should emit the right event`, async () => {
           const resp = await authorizationTest.fn(authorized, sig.v, sig.r, sig.s)
           assert.equal(resp.logs.length, 1)
           const log = resp.logs[0]
-          const expected = { account }
-          expected[key] = authorized
-          assertLogMatches(log, `${capitalize(key)}Authorized`, expected)
+          const expected = { account, signer: authorized }
+          assertLogMatches(log, authorizationTest.eventName, expected)
         })
 
-        it(`should revert if the ${key} is an account`, async () => {
+        it(`should revert if the ${authorizationTests[key].me} is an account`, async () => {
           await accountsInstance.createAccount({ from: authorized })
           await assertRevert(authorizationTest.fn(authorized, sig.v, sig.r, sig.s))
         })
 
-        it(`should revert if the ${key} is already authorized`, async () => {
+        it(`should revert if the ${authorizationTests[key].me} is already authorized`, async () => {
           const otherAccount = accounts[2]
           const otherSig = await getParsedSignatureOfAddress(web3, otherAccount, authorized)
           await accountsInstance.createAccount({ from: otherAccount })
@@ -209,7 +229,7 @@ contract('Accounts', (accounts: string[]) => {
             await authorizationTest.fn(newAuthorized, newSig.v, newSig.r, newSig.s)
           })
 
-          it(`should set the new authorized ${key}`, async () => {
+          it(`should set the new authorized ${authorizationTests[key].me}`, async () => {
             assert.equal(await accountsInstance.authorizedBy(newAuthorized), account)
             assert.equal(await authorizationTest.getAuthorizedFromAccount(account), newAuthorized)
             assert.equal(await authorizationTest.getAccountFromAuthorized(newAuthorized), account)
@@ -221,8 +241,8 @@ contract('Accounts', (accounts: string[]) => {
         })
       })
 
-      describe(`#getAccountFrom${capitalize(key)}()`, () => {
-        describe(`when the account has not authorized a ${key}`, () => {
+      describe(`#getAccountFrom${upperFirst(authorizationTests[key].subject)}()`, () => {
+        describe(`when the account has not authorized a ${authorizationTests[key].me}`, () => {
           it('should return the account when passed the account', async () => {
             assert.equal(await authorizationTest.getAccountFromAuthorized(account), account)
           })
@@ -232,7 +252,7 @@ contract('Accounts', (accounts: string[]) => {
           })
         })
 
-        describe(`when the account has authorized a ${key}`, () => {
+        describe(`when the account has authorized a ${authorizationTests[key].me}`, () => {
           const authorized = accounts[1]
           beforeEach(async () => {
             const sig = await getParsedSignatureOfAddress(web3, account, authorized)
@@ -243,14 +263,16 @@ contract('Accounts', (accounts: string[]) => {
             assert.equal(await authorizationTest.getAccountFromAuthorized(account), account)
           })
 
-          it(`should return the account when passed the ${key}`, async () => {
+          it(`should return the account when passed the ${
+            authorizationTests[key].me
+          }`, async () => {
             assert.equal(await authorizationTest.getAccountFromAuthorized(authorized), account)
           })
         })
       })
 
-      describe(`#get${capitalize(key)}FromAccount()`, () => {
-        describe(`when the account has not authorized a ${key}`, () => {
+      describe(`#get${upperFirst(authorizationTests[key].subject)}FromAccount()`, () => {
+        describe(`when the account has not authorized a ${authorizationTests[key].me}`, () => {
           it('should return the account when passed the account', async () => {
             assert.equal(await authorizationTest.getAuthorizedFromAccount(account), account)
           })
@@ -260,7 +282,7 @@ contract('Accounts', (accounts: string[]) => {
           })
         })
 
-        describe(`when the account has authorized a ${key}`, () => {
+        describe(`when the account has authorized a ${authorizationTests[key].me}`, () => {
           const authorized = accounts[1]
 
           beforeEach(async () => {

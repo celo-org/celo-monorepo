@@ -187,6 +187,7 @@ contract Accounts is IAccounts, ReentrancyGuard, Initializable, UsingRegistry {
       require(accounts[authorizingAccount].signers.attesting == accountOrAttestationSigner);
       return authorizingAccount;
     } else {
+      require(isAccount(accountOrAttestationSigner));
       return accountOrAttestationSigner;
     }
   }
@@ -256,7 +257,8 @@ contract Accounts is IAccounts, ReentrancyGuard, Initializable, UsingRegistry {
    * @param account The address of the account.
    * @return The address with which the account can sign attestations.
    */
-  function getAttestionSignerFromAccount(address account) public view returns (address) {
+  function getAttestationSignerFromAccount(address account) public view returns (address) {
+    require(isAccount(account));
     address attestor = accounts[account].signers.attesting;
     return attestor == address(0) ? account : attestor;
   }

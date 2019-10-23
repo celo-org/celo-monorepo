@@ -7,7 +7,7 @@ interface IAccounts {
   function getAccountFromValidationSigner(address) external view returns (address);
   function getValidationSignerFromAccount(address) external view returns (address);
   function getAccountFromAttestationSigner(address) external view returns (address);
-  function getAttestionSignerFromAccount(address) external view returns (address);
+  function getAttestationSignerFromAccount(address) external view returns (address);
 
   function setAccountDataEncryptionKey(bytes calldata) external;
   function setMetadataURL(string calldata) external;
