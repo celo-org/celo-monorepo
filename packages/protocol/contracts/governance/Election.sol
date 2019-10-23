@@ -162,7 +162,7 @@ contract Election is
    * @param max The maximum number of validators that can be elected.
    * @return True upon success.
    */
-  function setElectableValidators(uint256 min, uint256 max) external onlyOwner returns (bool) {
+  function setElectableValidators(uint256 min, uint256 max) public onlyOwner returns (bool) {
     require(0 < min && min <= max);
     require(min != electableValidators.min || max != electableValidators.max);
     electableValidators = ElectableValidators(min, max);
@@ -186,7 +186,7 @@ contract Election is
   function setMaxNumGroupsVotedFor(
     uint256 _maxNumGroupsVotedFor
   )
-    external
+    public
     onlyOwner
     returns (bool)
   {
@@ -754,6 +754,14 @@ contract Election is
    */
   function getTotalVotes() public view returns (uint256) {
     return votes.active.total.add(votes.pending.total);
+  }
+
+  /**
+   * @notice Returns the active votes received across all groups.
+   * @return The active votes received across all groups.
+   */
+  function getActiveVotes() public view returns (uint256) {
+    return votes.active.total;
   }
 
   /**

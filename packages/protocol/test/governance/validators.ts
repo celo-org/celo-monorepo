@@ -65,7 +65,6 @@ const DAY = 24 * HOUR
 // Hard coded in ganache.
 const EPOCH = 100
 
-// TODO(asa): Test epoch payment distribution
 contract('Validators', (accounts: string[]) => {
   let validators: ValidatorsTestInstance
   let registry: RegistryInstance
@@ -85,7 +84,6 @@ contract('Validators', (accounts: string[]) => {
     exponent: new BigNumber(5),
     adjustmentSpeed: toFixed(0.25),
   }
-  const validatorEpochPayment = new BigNumber(10000000000000)
   const membershipHistoryLength = new BigNumber(5)
   const maxGroupSize = new BigNumber(5)
 
@@ -114,7 +112,6 @@ contract('Validators', (accounts: string[]) => {
       validatorLockedGoldRequirements.duration,
       validatorScoreParameters.exponent,
       validatorScoreParameters.adjustmentSpeed,
-      validatorEpochPayment,
       membershipHistoryLength,
       maxGroupSize
     )
@@ -172,11 +169,6 @@ contract('Validators', (accounts: string[]) => {
       assertEqualBN(adjustmentSpeed, validatorScoreParameters.adjustmentSpeed)
     })
 
-    it('should have set the validator epoch payment', async () => {
-      const actual = await validators.validatorEpochPayment()
-      assertEqualBN(actual, validatorEpochPayment)
-    })
-
     it('should have set the membership history length', async () => {
       const actual = await validators.membershipHistoryLength()
       assertEqualBN(actual, membershipHistoryLength)
@@ -197,56 +189,10 @@ contract('Validators', (accounts: string[]) => {
           validatorLockedGoldRequirements.duration,
           validatorScoreParameters.exponent,
           validatorScoreParameters.adjustmentSpeed,
-          validatorEpochPayment,
           membershipHistoryLength,
           maxGroupSize
         )
       )
-    })
-  })
-
-  describe('#setValidatorEpochPayment()', () => {
-    describe('when the payment is different', () => {
-      const newPayment = validatorEpochPayment.plus(1)
-
-      describe('when called by the owner', () => {
-        let resp: any
-
-        beforeEach(async () => {
-          resp = await validators.setValidatorEpochPayment(newPayment)
-        })
-
-        it('should set the validator epoch payment', async () => {
-          assertEqualBN(await validators.validatorEpochPayment(), newPayment)
-        })
-
-        it('should emit the ValidatorEpochPaymentSet event', async () => {
-          assert.equal(resp.logs.length, 1)
-          const log = resp.logs[0]
-          assertContainSubset(log, {
-            event: 'ValidatorEpochPaymentSet',
-            args: {
-              value: new BigNumber(newPayment),
-            },
-          })
-        })
-
-        describe('when called by a non-owner', () => {
-          it('should revert', async () => {
-            await assertRevert(
-              validators.setValidatorEpochPayment(newPayment, {
-                from: nonOwner,
-              })
-            )
-          })
-        })
-      })
-
-      describe('when the payment is the same', () => {
-        it('should revert', async () => {
-          await assertRevert(validators.setValidatorEpochPayment(validatorEpochPayment))
-        })
-      })
     })
   })
 
@@ -1757,6 +1703,7 @@ contract('Validators', (accounts: string[]) => {
   describe('#distributeEpochPayment', () => {
     const validator = accounts[0]
     const group = accounts[1]
+    const maxPayment = new BigNumber(20122394876)
     let mockStableToken: MockStableTokenInstance
     beforeEach(async () => {
       await registerValidatorGroupWithMembers(group, [validator])
@@ -1765,6 +1712,7 @@ contract('Validators', (accounts: string[]) => {
     })
 
     describe('when the validator score is non-zero', () => {
+      let ret: BigNumber
       const uptime = new BigNumber(0.99)
       const adjustmentSpeed = fromFixed(validatorScoreParameters.adjustmentSpeed)
       // @ts-ignore
@@ -1780,7 +1728,8 @@ contract('Validators', (accounts: string[]) => {
 
       describe('when the validator and group meet the balance requirements', () => {
         beforeEach(async () => {
-          await validators.distributeEpochPayment(validator)
+          ret = await validators.distributeEpochPayment(validator, maxPayment).call()
+          await validators.distributeEpochPayment(validator, maxPayment)
         })
 
         it('should pay the validator', async () => {
@@ -1790,6 +1739,10 @@ contract('Validators', (accounts: string[]) => {
         it('should pay the group', async () => {
           assertEqualBN(await mockStableToken.balanceOf(group), expectedGroupPayment)
         })
+
+        it('should return the expected total payment', async () => {
+          assertEqualBN(ret, expectedTotalPayment)
+        })
       })
 
       describe('when the validator does not meet the balance requirements', () => {
@@ -1798,7 +1751,8 @@ contract('Validators', (accounts: string[]) => {
             validator,
             validatorLockedGoldRequirements.value.minus(1)
           )
-          await validators.distributeEpochPayment(validator)
+          ret = await validators.distributeEpochPayment(validator, maxPayment).call()
+          await validators.distributeEpochPayment(validator, maxPayment)
         })
 
         it('should not pay the validator', async () => {
@@ -1807,6 +1761,10 @@ contract('Validators', (accounts: string[]) => {
 
         it('should not pay the group', async () => {
           assertEqualBN(await mockStableToken.balanceOf(group), 0)
+        })
+
+        it('should return zero', async () => {
+          assertEqualBN(ret, 0)
         })
       })
 
@@ -1816,7 +1774,8 @@ contract('Validators', (accounts: string[]) => {
             group,
             groupLockedGoldRequirements.value.minus(1)
           )
-          await validators.distributeEpochPayment(validator)
+          ret = await validators.distributeEpochPayment(validator, maxPayment).call()
+          await validators.distributeEpochPayment(validator, maxPayment)
         })
 
         it('should not pay the validator', async () => {
@@ -1825,6 +1784,10 @@ contract('Validators', (accounts: string[]) => {
 
         it('should not pay the group', async () => {
           assertEqualBN(await mockStableToken.balanceOf(group), 0)
+        })
+
+        it('should return zero', async () => {
+          assertEqualBN(ret, 0)
         })
       })
     })

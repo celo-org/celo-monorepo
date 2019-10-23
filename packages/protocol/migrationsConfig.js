@@ -23,6 +23,11 @@ const DefaultConfig = {
     maxVotesPerAccount: 3,
     electabilityThreshold: 1 / 100,
   },
+  epochRewards: {
+    maxValidatorEpochPayment: '1000000000000000000',
+    maxTargetVotingYield: 2 / 10,
+    initialTargetVotingYield: 5 / 100,
+  },
   exchange: {
     spread: 5 / 1000,
     reserveFraction: 1,
@@ -81,7 +86,6 @@ const DefaultConfig = {
       exponent: 1,
       adjustmentSpeed: 0.1,
     },
-    validatorEpochPayment: '1000000000000000000',
     membershipHistoryLength: 60,
     maxGroupSize: '70',
 
