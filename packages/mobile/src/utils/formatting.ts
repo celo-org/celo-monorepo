@@ -9,11 +9,12 @@ const numeral = require('numeral')
 export const getMoneyDisplayValue = (
   value: BigNumber.Value,
   currency: CURRENCY_ENUM = CURRENCY_ENUM.DOLLAR,
-  includeSymbol: boolean = false
+  includeSymbol: boolean = false,
+  roundingTolerance: number = 1
 ): string => {
   const decimals = CURRENCIES[currency].displayDecimals
   const symbol = CURRENCIES[currency].symbol
-  const formattedValue = numeral(roundDown(value, decimals).toNumber()).format(
+  const formattedValue = numeral(roundDown(value, decimals, roundingTolerance).toNumber()).format(
     '0,0.' + '0'.repeat(decimals)
   )
   return includeSymbol ? symbol + formattedValue : formattedValue
@@ -57,11 +58,31 @@ export const divideByWei = (value: BigNumber.Value, decimals?: number) => {
   return decimals ? bn.decimalPlaces(decimals) : bn
 }
 
-export function roundDown(value: BigNumber.Value, decimals: number = 2): BigNumber {
+export function roundDown(
+  value: BigNumber.Value,
+  decimals: number = 2,
+  roundingTolerance: number = 0
+): BigNumber {
+  if (roundingTolerance) {
+    value = new BigNumber(value).decimalPlaces(
+      decimals + roundingTolerance,
+      BigNumber.ROUND_HALF_DOWN
+    )
+  }
   return new BigNumber(value).decimalPlaces(decimals, BigNumber.ROUND_DOWN)
 }
 
-export function roundUp(value: BigNumber.Value, decimals: number = 2): BigNumber {
+export function roundUp(
+  value: BigNumber.Value,
+  decimals: number = 2,
+  roundingTolerance: number = 0
+): BigNumber {
+  if (roundingTolerance) {
+    value = new BigNumber(value).decimalPlaces(
+      decimals + roundingTolerance,
+      BigNumber.ROUND_HALF_DOWN
+    )
+  }
   return new BigNumber(value).decimalPlaces(decimals, BigNumber.ROUND_UP)
 }
 
