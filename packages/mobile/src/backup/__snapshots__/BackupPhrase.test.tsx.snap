@@ -1,236 +1,424 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`renders correctly 1`] = `
+exports[`renders correctly with backup completed 1`] = `
 <SafeAreaView
   style={
     Object {
-      "backgroundColor": "white",
+      "backgroundColor": "#FFFFFF",
       "flex": 1,
       "justifyContent": "space-between",
     }
   }
 >
-  <View
-    style={
-      Object {
-        "height": 56,
-      }
-    }
-  >
-    <View
-      accessible={true}
-      isTVSelectable={true}
-      nativeBackgroundAndroid={
-        Object {
-          "attribute": "selectableItemBackgroundBorderless",
-          "type": "ThemeAttrAndroid",
-        }
-      }
-      onResponderGrant={[Function]}
-      onResponderMove={[Function]}
-      onResponderRelease={[Function]}
-      onResponderTerminate={[Function]}
-      onResponderTerminationRequest={[Function]}
-      onStartShouldSetResponder={[Function]}
-      style={
-        Object {
-          "paddingHorizontal": 20,
-          "paddingVertical": 10,
-        }
-      }
-      testID="CancelButton"
-    >
-      <Text
-        style={
-          Object {
-            "color": "#42D689",
-            "fontFamily": "Hind-SemiBold",
-            "fontSize": 14,
-            "lineHeight": 22,
-          }
-        }
-      >
-        cancel
-      </Text>
-    </View>
-  </View>
   <RCTScrollView
     contentContainerStyle={
       Object {
         "flexGrow": 1,
-        "justifyContent": "space-between",
+        "paddingBottom": 20,
         "paddingHorizontal": 20,
       }
     }
-    keyboardShouldPersistTaps="always"
   >
     <View>
       <View>
         <Text
           style={
-            Array [
-              Object {
-                "color": "#2E3338",
-                "fontFamily": "Hind-Light",
-                "fontSize": 22,
-                "paddingBottom": 20,
-                "textAlign": "center",
-              },
-              Object {
-                "color": "#2E3338",
-                "marginVertical": 10,
-              },
-            ]
+            Object {
+              "color": "#2E3338",
+              "fontFamily": "Hind-Light",
+              "fontSize": 22,
+              "paddingBottom": 20,
+              "textAlign": "center",
+            }
           }
         >
-          learnBackupKey
+          yourBackupKey
         </Text>
         <Text
           style={
             Object {
               "color": "#2E3338",
               "fontFamily": "Hind-Regular",
-              "fontSize": 15,
-              "lineHeight": 18,
-              "paddingTop": 15,
-              "textAlign": "left",
+              "fontSize": 16,
+              "lineHeight": 24,
+              "marginBottom": 20,
             }
           }
         >
-          learnYourKey
+          backupKeySummary
         </Text>
+        <View>
+          <View
+            style={
+              Object {
+                "flexDirection": "row",
+                "justifyContent": "space-between",
+                "paddingHorizontal": 2,
+              }
+            }
+          >
+            <Text
+              style={
+                Object {
+                  "color": "#2E3338",
+                  "fontFamily": "Hind-SemiBold",
+                  "fontSize": 16,
+                  "lineHeight": 24,
+                }
+              }
+            >
+              backupKey
+            </Text>
+            <View
+              accessible={true}
+              isTVSelectable={true}
+              nativeBackgroundAndroid={
+                Object {
+                  "attribute": "selectableItemBackgroundBorderless",
+                  "type": "ThemeAttrAndroid",
+                }
+              }
+              onResponderGrant={[Function]}
+              onResponderMove={[Function]}
+              onResponderRelease={[Function]}
+              onResponderTerminate={[Function]}
+              onResponderTerminationRequest={[Function]}
+              onStartShouldSetResponder={[Function]}
+            >
+              <Text
+                style={
+                  Object {
+                    "color": "#42D689",
+                    "fontFamily": "Hind-SemiBold",
+                    "fontSize": 16,
+                    "lineHeight": 22,
+                  }
+                }
+              >
+                global:copy
+              </Text>
+            </View>
+          </View>
+          <View
+            style={
+              Object {
+                "alignContent": "center",
+                "backgroundColor": "#EEEEEE",
+                "borderRadius": 4,
+                "justifyContent": "center",
+                "marginTop": 10,
+                "padding": 14,
+              }
+            }
+          />
+        </View>
         <Text
           style={
             Object {
-              "color": "#2E3338",
+              "color": "#81868B",
               "fontFamily": "Hind-Regular",
-              "fontSize": 15,
+              "fontSize": 14,
               "lineHeight": 18,
-              "paddingTop": 15,
-              "textAlign": "left",
-            }
-          }
-        >
-          keyWillBeVerified
-        </Text>
-        <View
-          style={
-            Object {
-              "alignContent": "center",
-              "backgroundColor": "#F8F8F8",
-              "justifyContent": "center",
-              "marginTop": 30,
-              "padding": 16,
-              "position": "relative",
+              "marginHorizontal": 3,
+              "marginTop": 25,
             }
           }
         >
           <Text
             style={
-              Object {
-                "color": "#2E3338",
-                "fontFamily": "Hind-Light",
-                "fontSize": 18,
-                "textAlign": "left",
-              }
-            }
-          >
-            prosper winner find donate tape history measure umbrella agent patrol want rhythm old unable wash wrong need fluid hammer coach reveal plastic trust lake
-          </Text>
-        </View>
-      </View>
-      <View>
-        <View
-          style={
-            Array [
-              Object {
-                "alignItems": "center",
-                "borderRadius": 3,
-                "flexDirection": "row",
-              },
-              Object {
-                "marginVertical": 10,
-              },
-              Object {
-                "marginBottom": 10,
-              },
-              undefined,
-              Object {
-                "backgroundColor": "#42D689",
-              },
-            ]
-          }
-        >
-          <View
-            accessible={true}
-            isTVSelectable={true}
-            nativeBackgroundAndroid={
-              Object {
-                "attribute": "selectableItemBackground",
-                "type": "ThemeAttrAndroid",
-              }
-            }
-            onResponderGrant={[Function]}
-            onResponderMove={[Function]}
-            onResponderRelease={[Function]}
-            onResponderTerminate={[Function]}
-            onResponderTerminationRequest={[Function]}
-            onStartShouldSetResponder={[Function]}
-            style={
               Array [
                 Object {
-                  "alignItems": "center",
-                  "flex": 1,
-                  "justifyContent": "center",
+                  "color": "#81868B",
+                  "fontFamily": "Hind-Regular",
+                  "fontSize": 14,
+                  "lineHeight": 18,
+                  "marginHorizontal": 3,
+                  "marginTop": 25,
                 },
                 Object {
-                  "backgroundColor": "#42D689",
-                },
-                Object {
-                  "height": 50,
-                },
-                Object {
-                  "borderColor": "#42D689",
-                  "borderRadius": 3,
-                  "borderWidth": 2,
+                  "fontFamily": "Hind-Bold",
                 },
               ]
             }
           >
-            <View
-              style={
-                Object {
-                  "alignItems": "center",
-                  "flex": 1,
-                  "flexDirection": "row",
-                  "justifyContent": "space-between",
-                }
-              }
-            >
-              <Text
-                style={
-                  Array [
-                    Object {
-                      "fontFamily": "Hind-SemiBold",
-                      "fontSize": 16,
-                    },
-                    Object {
-                      "color": "#FFFFFF",
-                    },
-                    Object {
-                      "paddingLeft": 5,
-                      "paddingRight": 5,
-                    },
-                  ]
-                }
-              >
-                continue
-              </Text>
-            </View>
-          </View>
-        </View>
+            global:warning
+          </Text>
+          securityTip
+        </Text>
       </View>
     </View>
   </RCTScrollView>
+</SafeAreaView>
+`;
+
+exports[`renders correctly with backup not completed 1`] = `
+<SafeAreaView
+  style={
+    Object {
+      "backgroundColor": "#FFFFFF",
+      "flex": 1,
+      "justifyContent": "space-between",
+    }
+  }
+>
+  <RCTScrollView
+    contentContainerStyle={
+      Object {
+        "flexGrow": 1,
+        "paddingBottom": 20,
+        "paddingHorizontal": 20,
+      }
+    }
+  >
+    <View>
+      <View>
+        <Text
+          style={
+            Object {
+              "color": "#2E3338",
+              "fontFamily": "Hind-Light",
+              "fontSize": 22,
+              "paddingBottom": 20,
+              "textAlign": "center",
+            }
+          }
+        >
+          yourBackupKey
+        </Text>
+        <Text
+          style={
+            Object {
+              "color": "#2E3338",
+              "fontFamily": "Hind-Regular",
+              "fontSize": 16,
+              "lineHeight": 24,
+              "marginBottom": 20,
+            }
+          }
+        >
+          backupKeySummary
+        </Text>
+        <View>
+          <View
+            style={
+              Object {
+                "flexDirection": "row",
+                "justifyContent": "space-between",
+                "paddingHorizontal": 2,
+              }
+            }
+          >
+            <Text
+              style={
+                Object {
+                  "color": "#2E3338",
+                  "fontFamily": "Hind-SemiBold",
+                  "fontSize": 16,
+                  "lineHeight": 24,
+                }
+              }
+            >
+              backupKey
+            </Text>
+            <View
+              accessible={true}
+              isTVSelectable={true}
+              nativeBackgroundAndroid={
+                Object {
+                  "attribute": "selectableItemBackgroundBorderless",
+                  "type": "ThemeAttrAndroid",
+                }
+              }
+              onResponderGrant={[Function]}
+              onResponderMove={[Function]}
+              onResponderRelease={[Function]}
+              onResponderTerminate={[Function]}
+              onResponderTerminationRequest={[Function]}
+              onStartShouldSetResponder={[Function]}
+            >
+              <Text
+                style={
+                  Object {
+                    "color": "#42D689",
+                    "fontFamily": "Hind-SemiBold",
+                    "fontSize": 16,
+                    "lineHeight": 22,
+                  }
+                }
+              >
+                global:copy
+              </Text>
+            </View>
+          </View>
+          <View
+            style={
+              Object {
+                "alignContent": "center",
+                "backgroundColor": "#EEEEEE",
+                "borderRadius": 4,
+                "justifyContent": "center",
+                "marginTop": 10,
+                "padding": 14,
+              }
+            }
+          />
+        </View>
+        <Text
+          style={
+            Object {
+              "color": "#81868B",
+              "fontFamily": "Hind-Regular",
+              "fontSize": 14,
+              "lineHeight": 18,
+              "marginHorizontal": 3,
+              "marginTop": 25,
+            }
+          }
+        >
+          <Text
+            style={
+              Array [
+                Object {
+                  "color": "#81868B",
+                  "fontFamily": "Hind-Regular",
+                  "fontSize": 14,
+                  "lineHeight": 18,
+                  "marginHorizontal": 3,
+                  "marginTop": 25,
+                },
+                Object {
+                  "fontFamily": "Hind-Bold",
+                },
+              ]
+            }
+          >
+            global:warning
+          </Text>
+          securityTip
+        </Text>
+      </View>
+    </View>
+  </RCTScrollView>
+  <View>
+    <View
+      style={
+        Object {
+          "flexDirection": "row",
+          "paddingHorizontal": 20,
+          "paddingVertical": 20,
+        }
+      }
+    >
+      <AndroidSwitch
+        accessibilityRole="button"
+        enabled={true}
+        on={false}
+        onChange={[Function]}
+        onResponderTerminationRequest={[Function]}
+        onStartShouldSetResponder={[Function]}
+        thumbTintColor="#42D689"
+        trackColorForFalse="#D1D5D8"
+        trackColorForTrue="#42D689"
+        trackTintColor="#D1D5D8"
+      />
+      <Text
+        style={
+          Object {
+            "color": "#2E3338",
+            "fontFamily": "Hind-SemiBold",
+            "fontSize": 16,
+            "lineHeight": 24,
+            "paddingLeft": 10,
+            "paddingTop": 3,
+          }
+        }
+      >
+        savedConfirmation
+      </Text>
+    </View>
+    <View
+      style={
+        Array [
+          Object {
+            "alignItems": "center",
+            "borderRadius": 3,
+            "flexDirection": "row",
+          },
+          null,
+          null,
+          undefined,
+          Object {
+            "backgroundColor": "#A3EBC6",
+          },
+        ]
+      }
+    >
+      <View
+        accessible={true}
+        isTVSelectable={true}
+        nativeBackgroundAndroid={
+          Object {
+            "attribute": "selectableItemBackground",
+            "type": "ThemeAttrAndroid",
+          }
+        }
+        onResponderGrant={[Function]}
+        onResponderMove={[Function]}
+        onResponderRelease={[Function]}
+        onResponderTerminate={[Function]}
+        onResponderTerminationRequest={[Function]}
+        onStartShouldSetResponder={[Function]}
+        style={
+          Array [
+            Object {
+              "alignItems": "center",
+              "flex": 1,
+              "justifyContent": "center",
+            },
+            Object {
+              "backgroundColor": "#A3EBC6",
+            },
+            Object {
+              "height": 50,
+            },
+            Object {
+              "borderWidth": 0,
+            },
+          ]
+        }
+      >
+        <View
+          style={
+            Object {
+              "alignItems": "center",
+              "flex": 1,
+              "flexDirection": "row",
+              "justifyContent": "space-between",
+            }
+          }
+        >
+          <Text
+            style={
+              Array [
+                Object {
+                  "fontFamily": "Hind-SemiBold",
+                  "fontSize": 16,
+                },
+                Object {
+                  "color": "#FFFFFF",
+                },
+                Object {
+                  "paddingLeft": 5,
+                  "paddingRight": 5,
+                },
+              ]
+            }
+          >
+            global:continue
+          </Text>
+        </View>
+      </View>
+    </View>
+  </View>
 </SafeAreaView>
 `;

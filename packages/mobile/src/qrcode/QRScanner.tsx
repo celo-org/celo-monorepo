@@ -3,6 +3,7 @@ import QRCode from '@celo/react-components/icons/QRCode'
 import colors from '@celo/react-components/styles/colors'
 import { fontStyles } from '@celo/react-components/styles/fonts'
 import variables from '@celo/react-components/styles/variables'
+import * as _ from 'lodash'
 import * as React from 'react'
 import { WithNamespaces, withNamespaces } from 'react-i18next'
 import { Platform, StyleSheet, Text, View } from 'react-native'
@@ -17,16 +18,13 @@ import { navigate } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
 import NotAuthorizedView from 'src/qrcode/NotAuthorizedView'
 import { handleBarcodeDetected } from 'src/send/actions'
+import Logger from 'src/utils/Logger'
 
 interface DispatchProps {
   handleBarcodeDetected: typeof handleBarcodeDetected
 }
 
 type Props = DispatchProps & WithNamespaces & NavigationFocusInjectedProps
-
-const goToQrCodeScreen = () => {
-  navigate(Screens.QRCode)
-}
 
 class QRScanner extends React.Component<Props> {
   static navigationOptions = () => ({
@@ -36,16 +34,13 @@ class QRScanner extends React.Component<Props> {
 
   camera: RNCamera | null = null
 
-  state = {
-    qrSubmitted: false,
-  }
+  onBardCodeDetected = _.debounce((rawData: any) => {
+    Logger.debug('QRScanner', 'Bar code detected')
+    this.props.handleBarcodeDetected(rawData)
+  }, 1000)
 
-  onBardCodeDetected = (rawData: any) => {
-    if (!this.state.qrSubmitted) {
-      this.setState({ qrSubmitted: true }, () => {
-        this.props.handleBarcodeDetected(rawData)
-      })
-    }
+  onPressShowYourCode = () => {
+    navigate(Screens.QRCode)
   }
 
   render() {
@@ -58,7 +53,6 @@ class QRScanner extends React.Component<Props> {
               ref={(ref) => {
                 this.camera = ref
               }}
-              // @ts-ignore
               style={styles.preview}
               type={RNCamera.Constants.Type.back}
               onBarCodeRead={this.onBardCodeDetected}
@@ -90,7 +84,7 @@ class QRScanner extends React.Component<Props> {
         </View>
         <View style={styles.footerContainer}>
           <Button
-            onPress={goToQrCodeScreen}
+            onPress={this.onPressShowYourCode}
             text={t('showYourQRCode')}
             standard={false}
             type={BtnTypes.SECONDARY}
