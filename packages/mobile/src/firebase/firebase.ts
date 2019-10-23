@@ -15,17 +15,28 @@ import Logger from 'src/utils/Logger'
 
 const TAG = 'Firebase'
 
-export function* watchFirebaseNotificationChannel(
+function* watchFirebaseNotificationChannel(
   channel: EventChannel<{ notification: Notification; stateType: NotificationReceiveState }>
 ) {
-  Logger.info(`${TAG}/watchFirebaseNotificationChannel`, 'Started channel watching')
-  while (true) {
-    const { data } = yield take(channel)
-    if (!data) {
-      break
+  try {
+    Logger.info(`${TAG}/watchFirebaseNotificationChannel`, 'Started channel watching')
+    while (true) {
+      const data = yield take(channel)
+      if (!data) {
+        Logger.info(`${TAG}/watchFirebaseNotificationChannel`, 'Data in channel was empty')
+        continue
+      }
+      Logger.info(`${TAG}/watchFirebaseNotificationChannel`, 'Notification received in the channel')
+      yield call(handleNotification, data.notification, data.stateType)
     }
-    Logger.info(`${TAG}/startFirebaseOnRefresh`, 'Notification received in the channel')
-    yield call(handleNotification, data.notification, data.stateType)
+  } catch (error) {
+    Logger.error(
+      `${TAG}/watchFirebaseNotificationChannel`,
+      'Error proccesing notification channel event',
+      error
+    )
+  } finally {
+    Logger.info(`${TAG}/watchFirebaseNotificationChannel`, 'Notification channel terminated')
   }
 }
 
@@ -77,20 +88,11 @@ export function* initializeCloudMessaging(app: Firebase, address: string) {
     notification: Notification
     stateType: NotificationReceiveState
   }> = eventChannel((emitter) => {
-    app.notifications().onNotification(
-      (notification: Notification): any => {
-        Logger.info(TAG, 'Notification received while open')
-        emitter({ notification, stateType: NotificationReceiveState.APP_ALREADY_OPEN })
-      }
-    )
-    return () => null // Return an unsubscribe method
-  })
-  spawn(watchFirebaseNotificationChannel, channelOnNotification)
+    app.notifications().onNotification((notification: Notification) => {
+      Logger.info(TAG, 'Notification received while open')
+      emitter({ notification, stateType: NotificationReceiveState.APP_ALREADY_OPEN })
+    })
 
-  const channelNotificationOpened: EventChannel<{
-    notification: Notification
-    stateType: NotificationReceiveState
-  }> = eventChannel((emitter) => {
     app.notifications().onNotificationOpened((notification: NotificationOpen) => {
       Logger.info(TAG, 'App opened via a notification')
       emitter({
@@ -100,7 +102,7 @@ export function* initializeCloudMessaging(app: Firebase, address: string) {
     })
     return () => null // Return an unsubscribe method
   })
-  spawn(watchFirebaseNotificationChannel, channelNotificationOpened)
+  yield spawn(watchFirebaseNotificationChannel, channelOnNotification)
 
   const initialNotification = yield call([app.notifications(), 'getInitialNotification'])
   if (initialNotification) {
