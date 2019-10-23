@@ -69,6 +69,7 @@ export function recordStateChange(prevState: NavigationState, currentState: Navi
 }
 
 export function navigateBack() {
+  Logger.debug(`${TAG}@navigate`, `Dispatch navigate back`)
   navigator.dispatch(NavigationActions.back())
 }
 
