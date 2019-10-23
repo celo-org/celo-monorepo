@@ -151,9 +151,9 @@ contract Election is
   {
     _transferOwnership(msg.sender);
     setRegistry(registryAddress);
-    _setElectableValidators(minElectableValidators, maxElectableValidators);
-    _setMaxNumGroupsVotedFor(_maxNumGroupsVotedFor);
-    _setElectabilityThreshold(_electabilityThreshold);
+    setElectableValidators(minElectableValidators, maxElectableValidators);
+    setMaxNumGroupsVotedFor(_maxNumGroupsVotedFor);
+    setElectabilityThreshold(_electabilityThreshold);
   }
 
   /**
@@ -163,7 +163,11 @@ contract Election is
    * @return True upon success.
    */
   function setElectableValidators(uint256 min, uint256 max) external onlyOwner returns (bool) {
-    return _setElectableValidators(min, max);
+    require(0 < min && min <= max);
+    require(min != electableValidators.min || max != electableValidators.max);
+    electableValidators = ElectableValidators(min, max);
+    emit ElectableValidatorsSet(min, max);
+    return true;
   }
 
   /**
@@ -172,20 +176,6 @@ contract Election is
    */
   function getElectableValidators() external view returns (uint256, uint256) {
     return (electableValidators.min, electableValidators.max);
-  }
-
-  /**
-   * @notice Updates the minimum and maximum number of validators that can be elected.
-   * @param min The minimum number of validators that can be elected.
-   * @param max The maximum number of validators that can be elected.
-   * @return True upon success.
-   */
-  function _setElectableValidators(uint256 min, uint256 max) private returns (bool) {
-    require(0 < min && min <= max);
-    require(min != electableValidators.min || max != electableValidators.max);
-    electableValidators = ElectableValidators(min, max);
-    emit ElectableValidatorsSet(min, max);
-    return true;
   }
 
   /**
@@ -200,15 +190,6 @@ contract Election is
     onlyOwner
     returns (bool)
   {
-    return _setMaxNumGroupsVotedFor(_maxNumGroupsVotedFor);
-  }
-
-  /**
-   * @notice Updates the maximum number of groups an account can be voting for at once.
-   * @param _maxNumGroupsVotedFor The maximum number of groups an account can vote for.
-   * @return True upon success.
-   */
-  function _setMaxNumGroupsVotedFor(uint256 _maxNumGroupsVotedFor) private returns (bool) {
     require(_maxNumGroupsVotedFor != maxNumGroupsVotedFor);
     maxNumGroupsVotedFor = _maxNumGroupsVotedFor;
     emit MaxNumGroupsVotedForSet(_maxNumGroupsVotedFor);
@@ -221,15 +202,6 @@ contract Election is
    * @return True upon success.
    */
   function setElectabilityThreshold(uint256 threshold) public onlyOwner returns (bool) {
-    return _setElectabilityThreshold(threshold);
-  }
-
-  /**
-   * @notice Sets the electability threshold.
-   * @param threshold Electability threshold as unwrapped Fraction.
-   * @return True upon success.
-   */
-  function _setElectabilityThreshold(uint256 threshold) private returns (bool) {
     electabilityThreshold = FixidityLib.wrap(threshold);
     require(
       electabilityThreshold.lt(FixidityLib.fixed1()),
