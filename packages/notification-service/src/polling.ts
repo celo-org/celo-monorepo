@@ -1,7 +1,12 @@
 import AsyncPolling from 'async-polling'
 import { handleTransferNotifications } from './blockscout/transfers'
-import { EXCHANGE_POLLING_INTERVAL, POLLING_INTERVAL } from './config'
-import { handleExchangeQuery } from './exchange/exchangeQuery'
+import {
+  FIAT_EXCHANGE_POLLING_INTERVAL,
+  GOLD_EXCHANGE_POLLING_INTERVAL,
+  POLLING_INTERVAL,
+} from './config'
+import { handleFiatExchangeQuery } from './currency/currencyQuery'
+import { handleGoldExchangeQuery } from './exchange/exchangeQuery'
 import { handlePaymentRequests } from './handlers'
 
 export const notificationPolling = AsyncPolling(async (end) => {
@@ -15,12 +20,22 @@ export const notificationPolling = AsyncPolling(async (end) => {
   }
 }, POLLING_INTERVAL)
 
-export const exchangePolling = AsyncPolling(async (end) => {
+export const goldExchangePolling = AsyncPolling(async (end) => {
   try {
-    await handleExchangeQuery()
+    await handleGoldExchangeQuery()
   } catch (e) {
-    console.error('Exchange polling failed', e)
+    console.error('Gold exchange polling failed', e)
   } finally {
     end()
   }
-}, EXCHANGE_POLLING_INTERVAL)
+}, GOLD_EXCHANGE_POLLING_INTERVAL)
+
+export const fiatExchangePolling = AsyncPolling(async (end) => {
+  try {
+    await handleFiatExchangeQuery()
+  } catch (e) {
+    console.error('Fiat exchange polling failed', e)
+  } finally {
+    end()
+  }
+}, FIAT_EXCHANGE_POLLING_INTERVAL)

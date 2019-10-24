@@ -1,4 +1,5 @@
 import { CURRENCY_ENUM } from '@celo/utils'
+import { LocalCurrencyCode } from '@celo/utils/src/currencies'
 import * as admin from 'firebase-admin'
 import i18next from 'i18next'
 import { Currencies } from './blockscout/transfers'
@@ -9,6 +10,7 @@ let registrationsRef: admin.database.Reference
 let lastBlockRef: admin.database.Reference
 let pendingRequestsRef: admin.database.Reference
 let exchangeRatesRef: admin.database.Reference
+let fiatExchangeRatesRef: admin.database.Reference
 
 export interface Registrations {
   [address: string]:
@@ -43,8 +45,15 @@ interface PendingRequests {
   [uid: string]: PaymentRequest
 }
 
-interface ExchangeRateObject {
+interface GoldExchangeRateObject {
   makerToken: CURRENCY_ENUM
+  exchangeRate: string
+  timestamp: string
+}
+
+interface FiatExchangeRateObject {
+  makerToken: LocalCurrencyCode
+  takerToken: LocalCurrencyCode
   exchangeRate: string
   timestamp: string
 }
@@ -77,6 +86,7 @@ export function initializeDb() {
   lastBlockRef = database.ref('/lastBlockNotified')
   pendingRequestsRef = database.ref('/pendingRequests')
   exchangeRatesRef = database.ref('/exchangeRates')
+  fiatExchangeRatesRef = database.ref('/fiatExchangeRates')
 
   // Attach to the registration ref to keep local registrations mapping up to date
   registrationsRef.on(
@@ -148,14 +158,30 @@ export function setPaymentRequestNotified(uid: string): Promise<void> {
   return database.ref(`/pendingRequests/${uid}`).update({ notified: true })
 }
 
-export function writeExchangeRatePair(
+export function writeGoldExchangeRatePair(
   makerToken: CURRENCY_ENUM,
   exchangeRate: string,
   timestamp: string
 ) {
-  const exchangeRateRecord: ExchangeRateObject = { makerToken, exchangeRate, timestamp }
-  exchangeRatesRef.push(exchangeRateRecord)
-  console.debug('Recorded exchange rate ', exchangeRateRecord)
+  const goldExchangeRateRecord: GoldExchangeRateObject = { makerToken, exchangeRate, timestamp }
+  exchangeRatesRef.push(goldExchangeRateRecord)
+  console.debug('Recorded gold exchange rate ', goldExchangeRateRecord)
+}
+
+export function writeFiatExchangeRatePair(
+  makerToken: LocalCurrencyCode,
+  takerToken: LocalCurrencyCode,
+  exchangeRate: string,
+  timestamp: string
+) {
+  const fiatExchangeRateRecord: FiatExchangeRateObject = {
+    makerToken,
+    takerToken,
+    exchangeRate,
+    timestamp,
+  }
+  fiatExchangeRatesRef.push(fiatExchangeRateRecord)
+  console.debug('Recorded fiat exchange rate ', fiatExchangeRateRecord)
 }
 
 export function setLastBlockNotified(newBlock: number): Promise<void> | undefined {
