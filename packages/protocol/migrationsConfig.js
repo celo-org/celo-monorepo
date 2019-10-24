@@ -24,9 +24,16 @@ const DefaultConfig = {
     electabilityThreshold: 1 / 100,
   },
   epochRewards: {
+    targetVotingYieldParameters: {
+      initial: 5 / 100,
+      max: 2 / 10,
+      adjustmentFactor: 1,
+    },
+    rewardsMultiplierAdjustmentFactors: {
+      underspend: 1 / 2,
+      overspend: 5,
+    },
     maxValidatorEpochPayment: '1000000000000000000',
-    maxTargetVotingYield: 2 / 10,
-    initialTargetVotingYield: 5 / 100,
   },
   exchange: {
     spread: 5 / 1000,

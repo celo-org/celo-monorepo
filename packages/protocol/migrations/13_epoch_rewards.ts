@@ -7,9 +7,12 @@ import { EpochRewardsInstance } from 'types'
 const initializeArgs = async (): Promise<any[]> => {
   return [
     config.registry.predeployedProxyAddress,
+    toFixed(config.epochRewards.targetVotingYieldParameters.initial).toFixed(),
+    toFixed(config.epochRewards.targetVotingYieldParameters.max).toFixed(),
+    toFixed(config.epochRewards.targetVotingYieldParameters.adjustmentFactor).toFixed(),
+    toFixed(config.epochRewards.rewardsMultiplierAdjustmentFactors.underspend).toFixed(),
+    toFixed(config.epochRewards.rewardsMultiplierAdjustmentFactors.overspend).toFixed(),
     config.epochRewards.maxValidatorEpochPayment,
-    toFixed(config.epochRewards.maxTargetVotingYield).toFixed(),
-    toFixed(config.epochRewards.initialTargetVotingYield).toFixed(),
   ]
 }
 
