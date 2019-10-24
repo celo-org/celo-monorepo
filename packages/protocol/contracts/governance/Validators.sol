@@ -764,15 +764,6 @@ contract Validators is
   }
 
   /**
-   * @notice Returns the current epoch number.
-   * @return The epoch number.
-   */
-  function getEpochNumber() external view returns (uint256) {
-    // TODO: replace 30000 with BlockchainParameters.epochLength
-    return block.number.div(30000);
-  }
-
-  /**
    * @notice Returns validator information.
    * @param account The account that registered the validator.
    * @return The unpacked validator struct.

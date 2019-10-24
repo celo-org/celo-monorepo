@@ -698,8 +698,7 @@ contract Governance is IGovernance, Ownable, Initializable, ReentrancyGuard, Usi
    * @param txHash The hash of the hotfix to be prepared.
    */
   function prepareHotfix(bytes32 txHash) external {
-    IValidators validators = IValidators(registry.getAddressForOrDie(VALIDATORS_REGISTRY_ID));
-    uint256 epoch = validators.getEpochNumber();
+    uint256 epoch = getEpochNumberTEMP();
     require(hotfixes[txHash].preparedEpoch < epoch, "hotfix already prepared for this epoch");
     require(isHotfixPassing(txHash), "hotfix not whitelisted by 2f+1 validators");
     hotfixes[txHash].preparedEpoch = epoch;
@@ -727,9 +726,7 @@ contract Governance is IGovernance, Ownable, Initializable, ReentrancyGuard, Usi
     (bool approved, bool executed, uint256 preparedEpoch) = getHotfixRecord(txHash);
     require(!executed, "hotfix already executed");
     require(approved, "hotfix not approved");
-
-    IValidators validators = IValidators(registry.getAddressForOrDie(VALIDATORS_REGISTRY_ID));
-    require(preparedEpoch == validators.getEpochNumber(), "hotfix must be prepared for this epoch");
+    require(preparedEpoch == getEpochNumberTEMP(), "hotfix must be prepared for this epoch");
 
     Proposals.Proposal memory proposal = Proposals.makeMem(
       values,
@@ -743,6 +740,11 @@ contract Governance is IGovernance, Ownable, Initializable, ReentrancyGuard, Usi
 
     hotfixes[txHash].executed = true;
     emit HotfixExecuted(txHash);
+  }
+
+  // TODO(yorke): replace with UsingPrecompiles.getEpochNumber()
+  function getEpochNumberTEMP() external view returns (uint256) {
+    return block.number / 30000;
   }
 
   /**

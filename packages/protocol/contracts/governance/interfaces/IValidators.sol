@@ -8,6 +8,5 @@ interface IValidators {
   function getNumRegisteredValidators() external view returns (uint256);
   function getRegisteredValidators() external view returns (address[] memory);
   function getRegisteredValidatorsByzantineQuorum() external view returns (uint256);
-  function getEpochNumber() external view returns (uint256);
   function getTopGroupValidators(address, uint256) external view returns (address[] memory);
 }
