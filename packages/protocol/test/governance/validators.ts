@@ -1,22 +1,22 @@
+import BigNumber from 'bignumber.js'
+import {
+  MockElectionContract,
+  MockElectionInstance,
+  MockLockedGoldContract,
+  MockLockedGoldInstance,
+  RegistryContract,
+  RegistryInstance,
+  ValidatorsContract,
+  ValidatorsInstance,
+} from 'types'
+
 import { CeloContractName } from '@celo/protocol/lib/registry-utils'
 import {
   assertContainSubset,
   assertEqualBN,
   assertRevert,
   NULL_ADDRESS,
-  timeTravel,
 } from '@celo/protocol/lib/test-utils'
-import BigNumber from 'bignumber.js'
-import {
-  MockLockedGoldContract,
-  MockLockedGoldInstance,
-  MockElectionContract,
-  MockElectionInstance,
-  RegistryContract,
-  RegistryInstance,
-  ValidatorsContract,
-  ValidatorsInstance,
-} from 'types'
 import { toFixed } from '@celo/utils/lib/fixidity'
 
 const Validators: ValidatorsContract = artifacts.require('Validators')
