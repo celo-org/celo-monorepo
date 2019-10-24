@@ -82,8 +82,6 @@ async function registerValidatorGroup(
 
   // @ts-ignore
   const tx = validators.contract.methods.registerValidatorGroup(
-    `${config.validators.groupName} ${encodedKey}`,
-    config.validators.groupUrl,
     toFixed(config.validators.commission).toString()
   )
 
