@@ -2,12 +2,18 @@ import { LocalCurrencyCode } from 'src/localCurrency/consts'
 
 export enum Actions {
   FETCH_CURRENT_RATE = 'LOCAL_CURRENCY/FETCH_CURRENT_RATE',
+  FETCH_HISTORIC_RATE = 'LOCAL_CURRENCY/FETCH_HISTORIC_RATE',
   FETCH_CURRENT_RATE_SUCCESS = 'LOCAL_CURRENCY/FETCH_CURRENT_RATE_SUCCESS',
   FETCH_CURRENT_RATE_FAILURE = 'LOCAL_CURRENCY/FETCH_CURRENT_RATE_FAILURE',
   SELECT_PREFERRED_CURRENCY = 'LOCAL_CURRENCY/SELECT_PREFERRED_CURRENCY',
 }
 export interface FetchCurrentRateAction {
   type: Actions.FETCH_CURRENT_RATE
+}
+
+export interface FetchHistoricRateAction {
+  type: Actions.FETCH_CURRENT_RATE
+  timestamp: number
 }
 
 export interface FetchCurrentRateSuccessAction {

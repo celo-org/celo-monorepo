@@ -58,6 +58,24 @@ export function* fetchLocalCurrencyRateSaga() {
   }
 }
 
+export function* fetchLocalCurrencyHistoricRateSaga() {
+  try {
+    const localCurrencyCode: LocalCurrencyCode | null = yield select(getLocalCurrencyCode)
+    if (!localCurrencyCode) {
+      throw new Error("Can't fetch local currency rate without a currency code")
+    }
+    const rate = yield call(fetchExchangeRate, localCurrencyCode)
+    yield put(fetchCurrentRateSuccess(localCurrencyCode, rate, timestamp))
+  } catch (error) {
+    Logger.error(`${TAG}@fetchLocalCurrencyRateSaga`, error)
+    yield put(fetchCurrentRateFailure())
+  }
+}
+
+export function* watchFetchHistoricRate() {
+  yield take(Actions.FETCH_HISTORIC_RATE, fetchLocalCurrencyRateSaga)
+}
+
 export function* watchFetchCurrentRate() {
   yield takeLatest(Actions.FETCH_CURRENT_RATE, fetchLocalCurrencyRateSaga)
 }
