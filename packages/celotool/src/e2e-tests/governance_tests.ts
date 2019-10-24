@@ -174,9 +174,6 @@ describe('governance tests', () => {
       await sleep(epoch)
     })
 
-    // Note that this returns the validator set at the END of `blockNumber`, i.e. the validator set
-    // that will validate the next block, and NOT necessarily the validator set that validated this
-    // block.
     const getValidatorSetAtBlock = async (blockNumber: number) => {
       const validatorSetSize = await election.methods
         .numberValidatorsInCurrentSet()
@@ -212,9 +209,7 @@ describe('governance tests', () => {
 
     it('should only have created blocks whose miner was in the current validator set', async () => {
       for (const blockNumber of blockNumbers) {
-        // The validators responsible for creating `blockNumber` were those in the validator set at
-        // `blockNumber-1`.
-        const validatorSet = await getValidatorSetAtBlock(blockNumber - 1)
+        const validatorSet = await getValidatorSetAtBlock(blockNumber)
         const block = await web3.eth.getBlock(blockNumber)
         assert.include(validatorSet.map((x) => x.toLowerCase()), block.miner.toLowerCase())
       }
@@ -257,7 +252,7 @@ describe('governance tests', () => {
         let expectUnchangedScores: string[]
         let expectChangedScores: string[]
         if (isLastBlockOfEpoch(blockNumber, epoch)) {
-          expectChangedScores = await getValidatorSetAtBlock(blockNumber - 1)
+          expectChangedScores = await getValidatorSetAtBlock(blockNumber)
           expectUnchangedScores = allValidators.filter((x) => !expectChangedScores.includes(x))
         } else {
           expectUnchangedScores = allValidators
@@ -314,7 +309,7 @@ describe('governance tests', () => {
         let expectUnchangedBalances: string[]
         let expectChangedBalances: string[]
         if (isLastBlockOfEpoch(blockNumber, epoch)) {
-          expectChangedBalances = await getValidatorSetAtBlock(blockNumber - 1)
+          expectChangedBalances = await getValidatorSetAtBlock(blockNumber)
           expectUnchangedBalances = allValidators.filter((x) => !expectChangedBalances.includes(x))
         } else {
           expectUnchangedBalances = allValidators
