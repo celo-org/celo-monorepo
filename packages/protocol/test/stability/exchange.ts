@@ -119,6 +119,7 @@ contract('Exchange', (accounts: string[]) => {
     exchange = await Exchange.new()
     await exchange.initialize(
       registry.address,
+      accounts[0],
       stableToken.address,
       spread,
       reserveFraction,
@@ -139,6 +140,7 @@ contract('Exchange', (accounts: string[]) => {
       await assertRevert(
         exchange.initialize(
           registry.address,
+          accounts[0],
           stableToken.address,
           spread,
           reserveFraction,
@@ -790,6 +792,17 @@ contract('Exchange', (accounts: string[]) => {
           // Gold Bucket value), minus the amount purchased during the exchange
           assertEqualBN(newStableBucket, updatedStableBucket.plus(stableTokenBalance))
         })
+      })
+    })
+
+    describe('when the contract is frozen', () => {
+      beforeEach(async () => {
+        await exchange.freeze()
+      })
+
+      it('should revert', async () => {
+        await goldToken.approve(exchange.address, 1000)
+        await assertRevert(exchange.exchange(1000, 1, true))
       })
     })
   })

@@ -10,6 +10,7 @@ import "./interfaces/IStableToken.sol";
 import "../common/FractionUtil.sol";
 import "../common/Initializable.sol";
 import "../common/FixidityLib.sol";
+import "../common/Freezable.sol";
 import "../common/UsingRegistry.sol";
 
 
@@ -17,7 +18,7 @@ import "../common/UsingRegistry.sol";
  * @title Contract that allows to exchange StableToken for GoldToken and vice versa
  * using a Constant Product Market Maker Model
  */
-contract Exchange is IExchange, Initializable, Ownable, UsingRegistry, ReentrancyGuard {
+contract Exchange is IExchange, Initializable, Ownable, UsingRegistry, ReentrancyGuard, Freezable {
   using SafeMath for uint256;
   using FractionUtil for FractionUtil.Fraction;
   using FixidityLib for FixidityLib.Fraction;
@@ -89,6 +90,7 @@ contract Exchange is IExchange, Initializable, Ownable, UsingRegistry, Reentranc
    */
   function initialize(
     address registryAddress,
+    address _freezer,
     address stableToken,
     uint256 _spread,
     uint256 _reserveFraction,
@@ -99,6 +101,7 @@ contract Exchange is IExchange, Initializable, Ownable, UsingRegistry, Reentranc
     initializer
   {
     _transferOwnership(msg.sender);
+    setFreezer(_freezer);
     setRegistry(registryAddress);
     setStableToken(stableToken);
     setSpread(_spread);
@@ -123,6 +126,7 @@ contract Exchange is IExchange, Initializable, Ownable, UsingRegistry, Reentranc
     bool sellGold
   )
     external
+    onlyWhenNotFrozenOrThrow
     updateBucketsIfNecessary
     nonReentrant
     returns (uint256)
@@ -252,6 +256,10 @@ contract Exchange is IExchange, Initializable, Ownable, UsingRegistry, Reentranc
   function setMinimumReports(uint256 newMininumReports) public onlyOwner {
     minimumReports = newMininumReports;
     emit MinimumReportsSet(newMininumReports);
+  }
+
+  function setFreezer(address freezer) public onlyOwner {
+      _setFreezer(freezer);
   }
 
   /**

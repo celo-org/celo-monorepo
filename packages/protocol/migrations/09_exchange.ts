@@ -8,8 +8,10 @@ import {
 import { config } from '@celo/protocol/migrationsConfig'
 import { toFixed } from '@celo/utils/lib/fixidity'
 import { ExchangeInstance, ReserveInstance, StableTokenInstance } from 'types'
+const truffle = require('@celo/protocol/truffle-config.js')
 
-const initializeArgs = async (): Promise<any[]> => {
+const initializeArgs = async (networkName: string): Promise<any[]> => {
+  const network: any = truffle.networks[networkName]
   const stableToken: StableTokenInstance = await getDeployedProxiedContract<StableTokenInstance>(
     'StableToken',
     artifacts
@@ -17,6 +19,7 @@ const initializeArgs = async (): Promise<any[]> => {
   return [
     config.registry.predeployedProxyAddress,
     stableToken.address,
+    network.from,
     toFixed(config.exchange.spread).toString(),
     toFixed(config.exchange.reserveFraction).toString(),
     config.exchange.updateFrequency,
