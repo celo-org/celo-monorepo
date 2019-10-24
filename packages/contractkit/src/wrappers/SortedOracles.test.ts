@@ -13,7 +13,7 @@ testWithGanache('SortedOracles Wrapper', (web3) => {
   // from the MNEMONIC. If the MNEMONIC has changed, these will need to be reset.
   // To do that, look at the output of web3.eth.getAccounts(), and pick a few
   // addresses from that set to be oracles
-  const stableTokenOracles: Address[] = NetworkConfig.stableToken.priceOracleAccounts
+  const stableTokenOracles: Address[] = NetworkConfig.stableToken.oracles
   const oracleAddress = stableTokenOracles[stableTokenOracles.length - 1]
 
   const kit = newKitFromWeb3(web3)
