@@ -1,6 +1,44 @@
 const ethjsutil = require('ethereumjs-util')
 
-export function signMessage(messageHash: string, privateKey: string, address: string) {
+import * as Web3Utils from 'web3-utils'
+
+// If messages is a hex, the length of it should be the number of bytes
+function messageLength(message: string) {
+  if (Web3Utils.isHexStrict(message)) {
+    return (message.length - 2) / 2
+  }
+  return message.length
+}
+// Ethereum has a special signature format that requires a prefix
+// https://github.com/ethereum/wiki/wiki/JSON-RPC#eth_sign
+export function hashMessageWithPrefix(message: string) {
+  const prefix = '\x19Ethereum Signed Message:\n' + messageLength(message)
+  return Web3Utils.soliditySha3(prefix, message)
+}
+
+export function hashMessage(message: string) {
+  return Web3Utils.soliditySha3({ type: 'string', value: message })
+}
+
+// Uses a native function to sign (as signFn), most commonly `web.eth.sign`
+export async function signMessageNatively(
+  message: string,
+  signer: string,
+  signFn: (message: string, signer: string) => Promise<string>
+) {
+  const signature = (await signFn(message, signer)).slice(2)
+  return {
+    r: `0x${signature.slice(0, 64)}`,
+    s: `0x${signature.slice(64, 128)}`,
+    v: Web3Utils.hexToNumber(signature.slice(128, 130)) + 27,
+  }
+}
+
+export function signMessage(message: string, privateKey: string, address: string) {
+  return signMessageHash(hashMessageWithPrefix(message), privateKey, address)
+}
+
+export function signMessageHash(messageHash: string, privateKey: string, address: string) {
   const publicKey = ethjsutil.privateToPublic(ethjsutil.toBuffer(privateKey))
   const derivedAddress: string = ethjsutil.bufferToHex(ethjsutil.pubToAddress(publicKey))
   if (derivedAddress.toLowerCase() !== address.toLowerCase()) {
@@ -28,10 +66,18 @@ export function serializeSignature(signature: Signature) {
   const serializedV = signature.v.toString(16)
   const serializedR = signature.r.slice(2)
   const serializedS = signature.s.slice(2)
-  return serializedV + serializedR + serializedS
+  return '0x' + serializedV + serializedR + serializedS
 }
 
-export function parseSignature(messageHash: string, signature: string, signer: string) {
+export function parseSignature(message: string, signature: string, signer: string) {
+  return parseSignatureForMessageHash(hashMessageWithPrefix(message), signature, signer)
+}
+
+export function parseSignatureForMessageHash(
+  messageHash: string,
+  signature: string,
+  signer: string
+) {
   let { r, s, v } = parseSignatureAsRsv(signature.slice(2))
   if (isValidSignature(signer, messageHash, v, r, s)) {
     return { v, r, s }
@@ -118,7 +164,9 @@ export function areAddressesEqual(address1: string | null, address2: string | nu
 
 export const SignatureUtils = {
   signMessage,
+  signMessageHash,
   parseSignature,
+  parseSignatureForMessageHash,
   stripHexLeader,
   ensureHexLeader,
   serializeSignature,

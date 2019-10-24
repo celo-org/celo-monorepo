@@ -13,18 +13,18 @@ import { getPhoneHash } from '@celo/utils/lib/phoneNumbers'
 import BigNumber from 'bignumber.js'
 import { uniq } from 'lodash'
 import {
-  TestAttestationsContract,
-  TestAttestationsInstance,
+  MockElectionContract,
+  MockElectionInstance,
   MockLockedGoldContract,
   MockLockedGoldInstance,
   MockStableTokenContract,
   MockStableTokenInstance,
-  MockElectionContract,
-  MockElectionInstance,
   RandomContract,
   RandomInstance,
   RegistryContract,
   RegistryInstance,
+  TestAttestationsContract,
+  TestAttestationsInstance,
 } from 'types'
 import { getParsedSignatureOfAddress } from '../../lib/signing-utils'
 
