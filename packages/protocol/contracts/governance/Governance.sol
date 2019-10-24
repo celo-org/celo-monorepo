@@ -479,24 +479,10 @@ contract Governance is IGovernance, Ownable, Initializable, ReentrancyGuard, Usi
 
     proposalCount = proposalCount.add(1);
     Proposals.Proposal storage proposal = proposals[proposalCount];
-    Proposals.make(
-      proposal,
-      values,
-      destinations,
-      data,
-      dataLengths,
-      msg.sender,
-      msg.value
-    );
+    proposal.make(values, destinations, data, dataLengths, msg.sender, msg.value);
     queue.push(proposalCount);
     // solhint-disable-next-line not-rely-on-time
-    emit ProposalQueued(
-      proposalCount,
-      msg.sender,
-      proposals[proposalCount].transactions.length,
-      msg.value,
-      now
-    );
+    emit ProposalQueued(proposalCount, msg.sender, proposal.transactions.length, msg.value, now);
     return proposalCount;
   }
 
