@@ -65,7 +65,7 @@ for file_path in "${files[@]}"; do
   gcloud kms $1 --ciphertext-file=$encrypted_file_path --plaintext-file=$file_path --key=github-key --keyring=celo-keyring --location=global --project celo-testnet
   if [[ $? -eq 1 ]]; then
     echo "Only C Labs employees can $1 keys - skipping ${1}ion"
-    exit 1
+    exit 0
   fi
 done
 
