@@ -17,9 +17,11 @@
     "clean": "tsc -b . --clean",
     "clean:all": "yarn clean && rm -rf lib",
     "prepublishOnly": "yarn build:gen && yarn build",
-    "start": "TS_NODE_FILES=true ts-node src/index.ts",
+    "start-ts": "TS_NODE_FILES=true ts-node src/index.ts",
+    "start": "node lib/index.js",
     "db:create:dev": "mkdir -p db && touch db/dev.db",
     "db:migrate": "sequelize db:migrate",
+    "db:migrate:undo": "sequelize db:migrate:undo",
     "db:migrate:dev": "sequelize db:migrate",
     "dev": "CONFIG=config/.env.development nodemon",
     "lint": "tslint -c tslint.json --project ."

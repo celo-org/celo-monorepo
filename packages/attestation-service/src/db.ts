@@ -1,7 +1,7 @@
 import { ContractKit, newKit } from '@celo/contractkit'
 import { Sequelize } from 'sequelize'
-import Attestation, { AttestationStatic } from '../models/attestation'
 import { fetchEnv } from './env'
+import Attestation, { AttestationStatic } from './models/attestation'
 
 export let sequelize: Sequelize | undefined
 
