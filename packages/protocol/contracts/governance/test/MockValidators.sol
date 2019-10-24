@@ -57,7 +57,7 @@ contract MockValidators is IValidators {
     return balanceRequirements[account];
   }
 
-  function getTopValidatorsFromGroup(
+  function getTopGroupValidators(
     address group,
     uint256 n
   )

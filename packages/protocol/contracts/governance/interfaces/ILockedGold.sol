@@ -2,7 +2,8 @@ pragma solidity ^0.5.3;
 
 
 interface ILockedGold {
-  function getAccountFromVoter(address) external view returns (address);
+  function getAccountFromActiveVoter(address) external view returns (address);
+  function getAccountFromActiveValidator(address) external view returns (address);
   function getAccountFromValidator(address) external view returns (address);
   function getValidatorFromAccount(address) external view returns (address);
   function incrementNonvotingAccountBalance(address, uint256) external;
