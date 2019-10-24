@@ -48,7 +48,7 @@ command -v gcloud > /dev/null 2>&1
 
 if [[ $? -eq 1 ]]; then
   echo "gcloud is not installed - skipping ${1}ion"
-  exit 1
+  exit 0
 fi
 
 for file_path in "${files[@]}"; do
