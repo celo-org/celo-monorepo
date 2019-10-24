@@ -10,6 +10,11 @@ import { Image, StyleSheet, Text, View } from 'react-native'
 import { HomeExchangeFragment } from 'src/apollo/types'
 import { CURRENCY_ENUM, resolveCurrency } from 'src/geth/consts'
 import { Namespaces } from 'src/i18n'
+import {
+  useDollarsToLocalAmount,
+  useLocalCurrencyCode,
+  useLocalCurrencySymbol,
+} from 'src/localCurrency/hooks'
 import { navigateToExchangeReview } from 'src/transactions/actions'
 import { ExchangeStandby, TransactionStatus } from 'src/transactions/reducer'
 import { getMoneyDisplayValue } from 'src/utils/formatting'
@@ -64,7 +69,8 @@ function getDollarAmountProps({ dollarAmount, dollarDirection }: ExchangeProps) 
 }
 
 export function ExchangeFeedItem(props: Props) {
-  const { showGoldAmount, inSymbol, inValue, outValue, status, timestamp, t, i18n } = props
+  const { showGoldAmount, inSymbol, status, timestamp, t, i18n } = props
+  let { inValue, outValue } = props
 
   const onPress = () => {
     navigateToExchangeReview(timestamp, {
@@ -79,9 +85,24 @@ export function ExchangeFeedItem(props: Props) {
     inCurrency === CURRENCY_ENUM.DOLLAR
       ? getDollarExchangeProps(props)
       : getGoldExchangeProps(props)
-  const { amount, amountDirection, amountColor } = showGoldAmount
+  const amountProps = showGoldAmount
     ? getGoldAmountProps(exchangeProps)
     : getDollarAmountProps(exchangeProps)
+
+  const { amountDirection, amountColor } = amountProps
+  let { amount } = amountProps
+
+  const localCurrencyCode = useLocalCurrencyCode()
+  const localCurrencySymbol = useLocalCurrencySymbol()
+
+  if (!showGoldAmount) {
+    amount = !localCurrencyCode ? amount : useDollarsToLocalAmount(amount) || 0
+  }
+  if (inCurrency === CURRENCY_ENUM.DOLLAR) {
+    inValue = !localCurrencyCode ? inValue : useDollarsToLocalAmount(inValue) || 0
+  } else {
+    outValue = !localCurrencyCode ? outValue : useDollarsToLocalAmount(outValue) || 0
+  }
 
   const timeFormatted = formatFeedTime(timestamp, i18n)
   const dateTimeFormatted = getDatetimeDisplayString(timestamp, t, i18n)
@@ -112,7 +133,9 @@ export function ExchangeFeedItem(props: Props) {
               ]}
             >
               {amountDirection}
-              {getMoneyDisplayValue(amount)}
+              {showGoldAmount
+                ? getMoneyDisplayValue(amount)
+                : localCurrencySymbol + getMoneyDisplayValue(amount) + (localCurrencyCode || '')}
             </Text>
           </View>
           <View style={styles.exchangeContainer}>
