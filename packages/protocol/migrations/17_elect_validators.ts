@@ -169,7 +169,7 @@ module.exports = async (_deployer: any) => {
       await registerValidator(lockedGold, validators, key, account.address)
     }
 
-    console.info('  Adding Validators to Validator Group ...')
+    console.info('  * Adding Validators to Validator Group ...')
     for (const [i, key] of groupKeys.entries()) {
       const address = generateAccountAddressFromPrivateKey(key.slice(2))
       if (i === 0) {
