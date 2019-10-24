@@ -73,7 +73,9 @@ async function registerValidatorGroup(
   )
 
   // @ts-ignore
-  const setNameTx = accounts.contracts.setName(`${config.validators.groupName} ${encodedKey}`)
+  const setNameTx = accounts.contract.methods.setName(
+    `${config.validators.groupName} ${encodedKey}`
+  )
   await sendTransactionWithPrivateKey(web3, setNameTx, account.privateKey, {
     to: accounts.address,
   })
@@ -120,7 +122,7 @@ async function registerValidator(
   )
 
   // @ts-ignore
-  const setNameTx = accounts.contracts.setName(`CLabs Validator #${index} on ${networkName}`)
+  const setNameTx = accounts.contract.methods.setName(`CLabs Validator #${index} on ${networkName}`)
   await sendTransactionWithPrivateKey(web3, setNameTx, validatorPrivateKey, {
     to: accounts.address,
   })
