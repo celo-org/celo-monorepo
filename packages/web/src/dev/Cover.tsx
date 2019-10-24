@@ -1,8 +1,9 @@
-import dynamic from 'next/dynamic'
 import * as React from 'react'
 import { StyleSheet, View } from 'react-native'
 import Fade from 'react-reveal/Fade'
 import CoverActions from 'src/dev/CoverActions'
+import LeaderBoard from 'src/dev/LeaderBoard'
+import Transceive from 'src/dev/Transceive'
 import { H1, H4 } from 'src/fonts/Fonts'
 import { I18nProps, withNamespaces } from 'src/i18n'
 import Android from 'src/icons/Android'
@@ -11,7 +12,6 @@ import Button, { BTN, SIZE } from 'src/shared/Button.3'
 import { CeloLinks } from 'src/shared/menu-items'
 import { HEADER_HEIGHT } from 'src/shared/Styles'
 import { colors, standardStyles, textStyles } from 'src/styles'
-import LeaderBoard from 'src/dev/LeaderBoard'
 const DELAY = 400
 const DELAY_2 = DELAY * 1.3
 const DURATION = 400
@@ -31,6 +31,9 @@ const LEADERS = [
 const CoverComponent = React.memo(function Cover({ t }: I18nProps) {
   return (
     <View style={styles.cover}>
+      <View style={[styles.phone, standardStyles.centered]}>
+        <Transceive />
+      </View>
       <GridRow>
         <Cell span={Spans.full}>
           <LeaderBoard leaders={LEADERS} />
