@@ -1,3 +1,4 @@
+import { LocalCurrencyCode } from '@celo/utils/src/currencies'
 import { gql } from 'apollo-server-express'
 import { DataSources } from './apolloServer'
 
@@ -49,7 +50,7 @@ export interface ExchangeRate {
 }
 
 export interface CurrencyConversionArgs {
-  currencyCode: string
+  currencyCode: LocalCurrencyCode
   timestamp?: number
 }
 

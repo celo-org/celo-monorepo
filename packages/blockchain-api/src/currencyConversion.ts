@@ -1,18 +1,19 @@
+import { LocalCurrencyCode } from '@celo/utils/src/currencies'
 import { RESTDataSource } from 'apollo-datasource-rest'
 import { EXCHANGE_RATES_API } from './config'
 import { CurrencyConversionArgs, ExchangeRate } from './schema'
 import { formatDateString } from './utils'
 
 interface ExchangeRateApiResult {
-  rates: { [currencyCode: string]: number }
-  base: string
+  rates: { [value in LocalCurrencyCode]: number }
+  base: LocalCurrencyCode
   date: string
 }
 
 export class CurrencyConversionAPI extends RESTDataSource {
   // TODO move this caching to FirebaseDb
   // Currency code to date string to exchange rate
-  exchangeRateCache = new Map<string, Map<string, number>>()
+  exchangeRateCache = new Map<LocalCurrencyCode, Map<string, number>>()
 
   constructor() {
     super()
@@ -46,7 +47,7 @@ export class CurrencyConversionAPI extends RESTDataSource {
     }
   }
 
-  private async queryExchangeRate(currencyCode: string, date: Date) {
+  private async queryExchangeRate(currencyCode: LocalCurrencyCode, date: Date) {
     console.debug('Querying exchange rate', currencyCode, date)
     const path = `/${formatDateString(date)}`
     const params = {
@@ -59,7 +60,7 @@ export class CurrencyConversionAPI extends RESTDataSource {
     return rate
   }
 
-  private getRateForCurrencyCode(currencyCode: string, date: Date) {
+  private getRateForCurrencyCode(currencyCode: LocalCurrencyCode, date: Date) {
     return (
       (this.exchangeRateCache.get(currencyCode) &&
         this.exchangeRateCache.get(currencyCode)!.get(date.toDateString())) ||
@@ -67,7 +68,7 @@ export class CurrencyConversionAPI extends RESTDataSource {
     )
   }
 
-  private setRateForCurrencyCode(currencyCode: string, date: Date, rate: number) {
+  private setRateForCurrencyCode(currencyCode: LocalCurrencyCode, date: Date, rate: number) {
     if (!this.exchangeRateCache.get(currencyCode)) {
       this.exchangeRateCache.set(currencyCode, new Map())
     }

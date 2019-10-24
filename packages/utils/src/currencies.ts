@@ -63,3 +63,19 @@ export const currencyTranslations: { [key: string]: any } = {
   ['en-US']: currencyTranslationsENUS,
   ['es-419']: currencyTranslationsESAR,
 }
+
+export enum LocalCurrencyCode {
+  USD = 'USD',
+  CAD = 'CAD',
+  EUR = 'EUR',
+  MXN = 'MXN',
+  PHP = 'PHP',
+}
+
+export enum LocalCurrencySymbol {
+  USD = '$',
+  CAD = '$',
+  EUR = '€',
+  MXN = '$',
+  PHP = '₱',
+}
