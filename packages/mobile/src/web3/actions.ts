@@ -7,6 +7,7 @@ const TAG = 'web3/actions'
 
 export enum Actions {
   SET_ACCOUNT = 'WEB3/SET_ACCOUNT',
+  SET_ACCOUNT_IN_WEB3_KEYSTORE = 'WEB3/SET_ACCOUNT_IN_WEB3_KEYSTORE',
   SET_COMMENT_KEY = 'WEB3/SET_COMMENT_KEY',
   SET_PROGRESS = 'WEB3/SET_PROGRESS',
   SET_IS_READY = 'WEB3/SET_IS_READY',
@@ -18,6 +19,11 @@ export enum Actions {
 
 export interface SetAccountAction {
   type: Actions.SET_ACCOUNT
+  address: string
+}
+
+export interface SetAccountInWeb3KeystoreAction {
+  type: Actions.SET_ACCOUNT_IN_WEB3_KEYSTORE
   address: string
 }
 
@@ -47,6 +53,7 @@ export interface UpdateWeb3SyncProgressAction {
 
 export type ActionTypes =
   | SetAccountAction
+  | SetAccountInWeb3KeystoreAction
   | SetIsZeroSyncAction
   | SetCommentKeyAction
   | SetLatestBlockNumberAction
@@ -56,6 +63,13 @@ export const setAccount = (address: string): SetAccountAction => {
   CeloAnalytics.track(DefaultEventNames.accountSet)
   return {
     type: Actions.SET_ACCOUNT,
+    address,
+  }
+}
+
+export const setAccountInWeb3Keystore = (address: string): SetAccountInWeb3KeystoreAction => {
+  return {
+    type: Actions.SET_ACCOUNT_IN_WEB3_KEYSTORE,
     address,
   }
 }
