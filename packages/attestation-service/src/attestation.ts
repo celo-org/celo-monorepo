@@ -100,7 +100,7 @@ export async function handleAttestationRequest(
     await validateAttestation(attestationRequest, attestationCode)
   } catch (error) {
     console.error(error)
-    res.status(422).json({ success: false, error })
+    res.status(422).json({ success: false, error: error.toString() })
     return
   }
 
