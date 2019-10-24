@@ -10,7 +10,7 @@ import "./interfaces/IStableToken.sol";
 import "../common/FractionUtil.sol";
 import "../common/Initializable.sol";
 import "../common/FixidityLib.sol";
-import "../common/Freezable.sol";
+import "../baklava/Freezable.sol";
 import "../common/UsingRegistry.sol";
 
 
