@@ -20,7 +20,7 @@
     "clean:all": "yarn clean && rm -rf src/generated",
     "build:gen": "yarn --cwd ../protocol build",
     "prepublishOnly": "yarn build:gen && yarn build",
-    "test:prepare": "yarn --cwd ../protocol devchain generate .devchain",
+    "test:prepare": "yarn --cwd ../protocol devchain generate .devchain --migration_override src/test-utils/migration-override.json",
     "test": "jest --runInBand",
     "lint": "tslint -c tslint.json --project ."
   },

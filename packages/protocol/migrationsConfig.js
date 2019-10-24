@@ -67,6 +67,7 @@ const DefaultConfig = {
       addresses: [],
       values: [],
     },
+    oracles: [],
   },
   validators: {
     registrationRequirements: {

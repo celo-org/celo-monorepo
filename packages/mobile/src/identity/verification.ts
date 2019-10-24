@@ -209,7 +209,7 @@ interface AttestationsStatus {
 }
 
 // Requests if necessary additional attestations and returns all revealable attetations
-export async function requestAndRetrieveAttestations(
+export function* requestAndRetrieveAttestations(
   attestationsContract: AttestationsType,
   stableTokenContract: StableTokenType,
   e164NumberHash: string,
@@ -217,7 +217,8 @@ export async function requestAndRetrieveAttestations(
   attestationsRemaining: number
 ) {
   // The set of attestations we can reveal right now
-  let attestations: ActionableAttestation[] = await getActionableAttestations(
+  let attestations: ActionableAttestation[] = yield call(
+    getActionableAttestations,
     attestationsContract,
     e164NumberHash,
     account
@@ -225,7 +226,8 @@ export async function requestAndRetrieveAttestations(
 
   while (attestations.length < attestationsRemaining) {
     // Request any additional attestations beyond the original set
-    await requestAttestations(
+    yield call(
+      requestAttestations,
       attestationsContract,
       stableTokenContract,
       attestationsRemaining - attestations.length,
@@ -235,7 +237,12 @@ export async function requestAndRetrieveAttestations(
 
     CeloAnalytics.track(CustomEventNames.verification_actionable_attestation_start)
     // Check if we have a sufficient set now by fetching the new total set
-    attestations = await getActionableAttestations(attestationsContract, e164NumberHash, account)
+    attestations = yield call(
+      getActionableAttestations,
+      attestationsContract,
+      e164NumberHash,
+      account
+    )
     CeloAnalytics.track(CustomEventNames.verification_actionable_attestation_finish)
   }
 
@@ -278,7 +285,7 @@ async function getAttestationsStatus(
   }
 }
 
-async function requestAttestations(
+function* requestAttestations(
   attestationsContract: AttestationsType,
   stableTokenContract: StableTokenType,
   numAttestationsRequestsNeeded: number,
@@ -295,7 +302,8 @@ async function requestAttestations(
     `Approving ${numAttestationsRequestsNeeded} new attestations`
   )
 
-  const approveTx = await makeApproveAttestationFeeTx(
+  const approveTx = yield call(
+    makeApproveAttestationFeeTx,
     attestationsContract,
     stableTokenContract,
     numAttestationsRequestsNeeded
@@ -304,9 +312,9 @@ async function requestAttestations(
   const {
     confirmation: approveConfirmationPromise,
     transactionHash: approveTransactionHashPromise,
-  } = await sendTransactionPromises(approveTx, account, TAG, 'Approve Attestations')
+  } = yield call(sendTransactionPromises, approveTx, account, TAG, 'Approve Attestations')
 
-  await approveTransactionHashPromise
+  yield approveTransactionHashPromise
 
   Logger.debug(
     `${TAG}@requestNeededAttestations`,
@@ -320,9 +328,9 @@ async function requestAttestations(
     stableTokenContract
   )
 
-  await Promise.all([
+  yield all([
     approveConfirmationPromise,
-    sendTransaction(requestTx, account, TAG, 'Request Attestations', REQUEST_TX_GAS),
+    call(sendTransaction, requestTx, account, TAG, 'Request Attestations', REQUEST_TX_GAS),
   ])
 
   CeloAnalytics.track(CustomEventNames.verification_requested_attestations)
@@ -464,20 +472,16 @@ function* waitForAttestationCode(issuer: string) {
   }
 }
 
-async function setAccount(
-  attestationsContract: AttestationsType,
-  address: string,
-  dataKey: string
-) {
+function* setAccount(attestationsContract: AttestationsType, address: string, dataKey: string) {
   Logger.debug(TAG, 'Setting wallet address and public data encryption key')
-  const currentWalletAddress = await getWalletAddress(attestationsContract, address)
-  const currentWalletDEK = await getDataEncryptionKey(attestationsContract, address)
+  const currentWalletAddress = yield call(getWalletAddress, attestationsContract, address)
+  const currentWalletDEK = yield call(getDataEncryptionKey, attestationsContract, address)
   if (
     !areAddressesEqual(currentWalletAddress, address) ||
     !areAddressesEqual(currentWalletDEK, dataKey)
   ) {
     const setAccountTx = makeSetAccountTx(attestationsContract, address, dataKey)
-    await sendTransaction(setAccountTx, address, TAG, `Set Wallet Address & DEK`)
+    yield call(sendTransaction, setAccountTx, address, TAG, `Set Wallet Address & DEK`)
     CeloAnalytics.track(CustomEventNames.verification_set_account)
   }
 }
