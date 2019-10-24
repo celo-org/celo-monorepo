@@ -20,6 +20,10 @@ export interface AttestationStat {
   total: number
 }
 
+export interface AttestationStateForIssuer {
+  attestationState: AttestationState
+}
+
 export interface AttestationsToken {
   address: Address
   fee: BigNumber
@@ -59,6 +63,7 @@ function attestationMessageToSign(phoneHash: string, account: Address) {
   return messageHash
 }
 
+const stringIdentity = (x: string) => x
 export class AttestationsWrapper extends BaseWrapper<Attestations> {
   /**
    *  Returns the time an attestation can be completable before it is considered expired
@@ -92,6 +97,21 @@ export class AttestationsWrapper extends BaseWrapper<Attestations> {
     this.contract.methods.getAttestationStats,
     tupleParser(PhoneNumberUtils.getPhoneHash, (x: string) => x),
     (stat) => ({ completed: toNumber(stat[0]), total: toNumber(stat[1]) })
+  )
+
+  /**
+   * Returns the attestation state of a phone number/account/issuer tuple
+   * @param phoneNumber Phone Number
+   * @param account Account
+   */
+  getAttestationState: (
+    phoneNumber: string,
+    account: Address,
+    issuer: Address
+  ) => Promise<AttestationStateForIssuer> = proxyCall(
+    this.contract.methods.getAttestationState,
+    tupleParser(PhoneNumberUtils.getPhoneHash, stringIdentity, stringIdentity),
+    (state) => ({ attestationState: parseInt(state[0], 10) })
   )
 
   /**
