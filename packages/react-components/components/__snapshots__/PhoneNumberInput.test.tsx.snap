@@ -1,6 +1,254 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`PhoneNumberInput renders correctly with minimum props 1`] = `
+exports[`PhoneNumberInput when defaultCountry is falsy renders an AutoComplete and a country can be selected 1`] = `
+<View
+  style={
+    Array [
+      undefined,
+      Object {
+        "backgroundColor": "#FFFFFF",
+        "position": "relative",
+      },
+    ]
+  }
+>
+  <View
+    style={
+      Array [
+        Object {
+          "zIndex": 1,
+        },
+        undefined,
+      ]
+    }
+  >
+    <View
+      style={
+        Array [
+          Object {
+            "borderColor": "#b9b9b9",
+            "borderRadius": 1,
+            "borderWidth": 1,
+          },
+          Array [
+            Object {
+              "borderColor": "#D1D5D8",
+              "borderRadius": 3,
+              "borderWidth": 1,
+            },
+            Object {
+              "height": 50,
+            },
+            Object {
+              "marginTop": 1,
+              "padding": 3,
+            },
+          ],
+        ]
+      }
+    >
+      <View
+        style={
+          Array [
+            Object {
+              "alignItems": "center",
+              "flex": 1,
+              "flexDirection": "row",
+              "justifyContent": "center",
+            },
+            Array [
+              Object {
+                "backgroundColor": "white",
+                "height": 40,
+                "paddingLeft": 3,
+              },
+              undefined,
+            ],
+          ]
+        }
+      >
+        <TextInput
+          allowFontScaling={true}
+          autoCapitalize="none"
+          autoCorrect={false}
+          data={Array []}
+          defaultValue=""
+          flatListProps={Object {}}
+          inputContainerStyle={
+            Array [
+              Object {
+                "borderColor": "#D1D5D8",
+                "borderRadius": 3,
+                "borderWidth": 1,
+              },
+              Object {
+                "height": 50,
+              },
+              Object {
+                "marginTop": 1,
+                "padding": 3,
+              },
+            ]
+          }
+          keyExtractor={[Function]}
+          keyboardShouldPersistTaps="always"
+          listContainerStyle={
+            Object {
+              "flex": 1,
+              "padding": 0,
+              "position": "relative",
+              "top": 3,
+            }
+          }
+          listStyle={
+            Array [
+              Object {
+                "borderColor": "#D1D5D8",
+                "borderRadius": 3,
+                "borderWidth": 1,
+              },
+              Object {
+                "backgroundColor": "#FFFFFF",
+                "borderColor": "#D1D5D8",
+                "borderRadius": 3,
+                "borderTopWidth": 1,
+                "borderWidth": 1,
+                "flex": 1,
+                "left": undefined,
+                "marginBottom": 6,
+                "marginHorizontal": 0,
+                "paddingHorizontal": 0,
+                "paddingVertical": 6,
+                "position": "relative",
+                "right": undefined,
+              },
+            ]
+          }
+          onBlur={[Function]}
+          onChangeText={[Function]}
+          onFocus={[Function]}
+          onStartShouldSetResponderCapture={[Function]}
+          placeholderTextColor="#D1D5D8"
+          rejectResponderTermination={true}
+          renderItem={[Function]}
+          renderSeparator={null}
+          renderTextInput={[Function]}
+          style={
+            Object {
+              "backgroundColor": "#FFFFFF",
+              "borderColor": "#D1D5D8",
+              "borderRadius": 3,
+              "flex": 1,
+              "fontFamily": "Hind-Regular",
+              "padding": 8,
+            }
+          }
+          testID="CountryNameField"
+          underlineColorAndroid="transparent"
+          value=""
+        />
+      </View>
+    </View>
+    <View
+      onStartShouldSetResponderCapture={[Function]}
+      style={
+        Object {
+          "flex": 1,
+          "padding": 0,
+          "position": "relative",
+          "top": 3,
+        }
+      }
+    />
+  </View>
+  <View
+    style={
+      Array [
+        Object {
+          "alignItems": "center",
+          "flexDirection": "row",
+          "marginTop": 5,
+          "paddingVertical": 2,
+        },
+        Object {
+          "borderColor": "#D1D5D8",
+          "borderRadius": 3,
+          "borderWidth": 1,
+        },
+      ]
+    }
+  >
+    <Text
+      style={
+        Object {
+          "lineHeight": 35,
+          "textAlign": "center",
+          "width": 60,
+        }
+      }
+    >
+      
+    </Text>
+    <View
+      style={
+        Object {
+          "borderColor": "#D1D5D8",
+          "borderRightWidth": 1,
+          "height": 35,
+        }
+      }
+    />
+    <View
+      style={
+        Array [
+          Object {
+            "alignItems": "center",
+            "flex": 1,
+            "flexDirection": "row",
+            "justifyContent": "center",
+          },
+          Array [
+            Object {
+              "height": 50,
+            },
+            Object {
+              "flex": 1,
+              "marginLeft": 9,
+            },
+          ],
+        ]
+      }
+    >
+      <TextInput
+        allowFontScaling={true}
+        countryCallingCode=""
+        keyboardType="phone-pad"
+        onBlur={[Function]}
+        onChangeText={[Function]}
+        onFocus={[Function]}
+        placeholderTextColor="#D1D5D8"
+        rejectResponderTermination={true}
+        style={
+          Object {
+            "backgroundColor": "#FFFFFF",
+            "borderColor": "#D1D5D8",
+            "borderRadius": 3,
+            "flex": 1,
+            "fontFamily": "Hind-Regular",
+            "padding": 8,
+          }
+        }
+        testID="PhoneNumberField"
+        underlineColorAndroid="transparent"
+        validator="phone"
+        value=""
+      />
+    </View>
+  </View>
+</View>
+`;
+
+exports[`when defaultCountry is truthy does not render an AutoComplete 1`] = `
 <View
   style={
     Array [
@@ -40,7 +288,9 @@ exports[`PhoneNumberInput renders correctly with minimum props 1`] = `
           "fontSize": 23,
         }
       }
-    />
+    >
+      🇨🇦
+    </Text>
     <Text
       style={
         Object {
@@ -49,7 +299,7 @@ exports[`PhoneNumberInput renders correctly with minimum props 1`] = `
         }
       }
     >
-      USA
+      Canada
     </Text>
   </View>
   <View
@@ -78,7 +328,7 @@ exports[`PhoneNumberInput renders correctly with minimum props 1`] = `
         }
       }
     >
-      1
+      +1
     </Text>
     <View
       style={
@@ -112,7 +362,7 @@ exports[`PhoneNumberInput renders correctly with minimum props 1`] = `
     >
       <TextInput
         allowFontScaling={true}
-        countryCallingCode="1"
+        countryCallingCode="+1"
         keyboardType="phone-pad"
         onBlur={[Function]}
         onChangeText={[Function]}

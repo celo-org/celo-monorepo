@@ -22,6 +22,7 @@
 @import Firebase;
 #import "RNFirebaseNotifications.h"
 #import "RNFirebaseMessaging.h"
+#import "RNSplashScreen.h"
 
 // Use same key as react-native-secure-key-store
 // so we don't reset already working installs
@@ -42,6 +43,7 @@ static NSString * const kHasRunBeforeKey = @"RnSksIsAppInstalled";
                                                    moduleName:@"celo"
                                             initialProperties:nil];
 
+  [RNSplashScreen showSplash:@"LaunchScreen" inRootView:rootView];
   [RNSentry installWithRootView:rootView];
 
   rootView.backgroundColor = [[UIColor alloc] initWithRed:1.0f green:1.0f blue:1.0f alpha:1];

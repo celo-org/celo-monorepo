@@ -45,6 +45,7 @@
   "sentPayment": "Enviar pago",
   "mobileNumber": "Número de teléfono",
   "walletAddress": "Dirección del Monedero",
+  "unknown": "Desconocido",
   "inviteSMS":
     "Hola{{name}}! Me gustaría invitarte a que te unas a la red de pagos de Celo. Tu código de invitación es: {{code}} Podés instalarte la aplicación Celo desde el siguiente vínculo: {{link}}",
   "inviteSent": "Código de invitación enviado!",
