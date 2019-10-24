@@ -32,12 +32,14 @@ export function validatorKeys() {
 }
 
 export function migrationOverrides() {
+  const mnemonic = fetchEnv(envVar.MNEMONIC)
   return {
     validators: {
       validatorKeys: validatorKeys(),
     },
     stableToken: {
-      initialAccounts: getAddressesFor(AccountType.FAUCET, fetchEnv(envVar.MNEMONIC), 2),
+      initialAccounts: getAddressesFor(AccountType.FAUCET, mnemonic, 2),
+      values: getAddressesFor(AccountType.FAUCET, mnemonic, 2).map(() => '60000000000000000000000'), // 60k Celo Dollars
     },
   }
 }
