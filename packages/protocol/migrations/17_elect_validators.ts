@@ -177,7 +177,7 @@ module.exports = async (_deployer: any) => {
         const addTx = validators.contract.methods.addFirstMember(
           address,
           NULL_ADDRESS,
-          prevGroupAddr
+          prevGroupAddress
         )
         await sendTransactionWithPrivateKey(web3, addTx, account.privateKey, {
           to: validators.address,
