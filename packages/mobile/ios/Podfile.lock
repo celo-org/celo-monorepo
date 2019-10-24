@@ -137,7 +137,7 @@ PODS:
     - React
   - react-native-safe-area-context (0.3.6):
     - React
-  - react-native-splash-screen (3.1.1):
+  - react-native-splash-screen (3.2.0):
     - React
   - react-native-tcp (3.3.0):
     - React
@@ -428,7 +428,7 @@ SPEC CHECKSUMS:
   react-native-mail: 021d8ee60e374609f5689ef354dc8e36839a9ba6
   react-native-netinfo: 1ea4efa22c02519ac8043ac3f000062a4e320795
   react-native-safe-area-context: e380a6f783ccaec848e2f3cc8eb205a62362950d
-  react-native-splash-screen: 353334c5ae82d8c74501ea7cbb916cb7cb20c8bf
+  react-native-splash-screen: 200d11d188e2e78cea3ad319964f6142b6384865
   react-native-tcp: e1a8c3ac010774cd71811989805ff3eaebb62f17
   react-native-udp: 54a1aa9bf5c0824f930b1ba6dbfb3fd3e733bba9
   react-native-version-check: 901616b6d258b385628120441bd0b285b24c7be1

@@ -5,7 +5,7 @@ import BigNumber from 'bignumber.js'
 import { Linking, Platform } from 'react-native'
 import SendIntentAndroid from 'react-native-send-intent'
 import VersionCheck from 'react-native-version-check'
-import { call, delay, put, race, spawn, takeLeading } from 'redux-saga/effects'
+import { call, delay, put, race, select, spawn, takeLeading } from 'redux-saga/effects'
 import { showError, showMessage } from 'src/alert/actions'
 import CeloAnalytics from 'src/analytics/CeloAnalytics'
 import { CustomEventNames } from 'src/analytics/constants'
@@ -38,8 +38,9 @@ import { waitForTransactionWithId } from 'src/transactions/saga'
 import { sendTransaction } from 'src/transactions/send'
 import { dynamicLink } from 'src/utils/dynamicLink'
 import Logger from 'src/utils/Logger'
-import { addLocalAccount, isZeroSyncMode, web3 } from 'src/web3/contracts'
+import { addLocalAccount, web3 } from 'src/web3/contracts'
 import { getConnectedUnlockedAccount, getOrCreateAccount } from 'src/web3/saga'
+import { zeroSyncSelector } from 'src/web3/selectors'
 
 const TAG = 'invite/saga'
 export const TEMP_PW = 'ce10'
@@ -244,22 +245,23 @@ export function* doRedeemInvite(inviteCode: string) {
   }
 }
 
-async function addTempAccountToWallet(inviteCode: string) {
+function* addTempAccountToWallet(inviteCode: string) {
   Logger.debug(TAG + '@addTempAccountToWallet', 'Attempting to add temp wallet')
   try {
     let tempAccount: string | null = null
-    if (isZeroSyncMode()) {
+    const zeroSyncMode = yield select(zeroSyncSelector)
+    if (zeroSyncMode) {
       tempAccount = web3.eth.accounts.privateKeyToAccount(inviteCode).address
       Logger.debug(
         TAG + '@redeemInviteCode',
         'web3 is connected:',
-        String(await web3.eth.net.isListening())
+        String(yield call(web3.eth.net.isListening))
       )
       addLocalAccount(web3, inviteCode)
     } else {
       // Import account into the local geth node
       // @ts-ignore
-      tempAccount = await web3.eth.personal.importRawKey(stripHexLeader(inviteCode), TEMP_PW)
+      tempAccount = yield call(web3.eth.personal.importRawKey, stripHexLeader(inviteCode), TEMP_PW)
     }
     Logger.debug(TAG + '@addTempAccountToWallet', 'Account added', tempAccount!)
   } catch (e) {
@@ -272,19 +274,20 @@ async function addTempAccountToWallet(inviteCode: string) {
   }
 }
 
-export async function withdrawFundsFromTempAccount(
+export function* withdrawFundsFromTempAccount(
   tempAccount: string,
   tempAccountBalanceWei: BigNumber,
   newAccount: string
 ) {
   Logger.debug(TAG + '@withdrawFundsFromTempAccount', 'Unlocking temporary account')
-  if (!isZeroSyncMode()) {
-    await web3.eth.personal.unlockAccount(tempAccount, TEMP_PW, 600)
+  const zeroSyncMode = yield select(zeroSyncSelector)
+  if (!zeroSyncMode) {
+    yield call(web3.eth.personal.unlockAccount, tempAccount, TEMP_PW, 600)
   }
   const tempAccountBalance = new BigNumber(web3.utils.fromWei(tempAccountBalanceWei.toString()))
 
   Logger.debug(TAG + '@withdrawFundsFromTempAccount', 'Creating send transaction')
-  const tx = await createTransaction(getStableTokenContract, {
+  const tx = yield call(createTransaction, getStableTokenContract, {
     recipientAddress: newAccount,
     comment: SENTINEL_INVITE_COMMENT,
     // TODO: appropriately withdraw the balance instead of using gas fees will be less than 1 cent
@@ -292,7 +295,7 @@ export async function withdrawFundsFromTempAccount(
   })
 
   Logger.debug(TAG + '@withdrawFundsFromTempAccount', 'Sending transaction')
-  await sendTransaction(tx, tempAccount, TAG, 'Transfer from temp wallet')
+  yield call(sendTransaction, tx, tempAccount, TAG, 'Transfer from temp wallet')
   Logger.debug(TAG + '@withdrawFundsFromTempAccount', 'Done withdrawal')
 }
 
