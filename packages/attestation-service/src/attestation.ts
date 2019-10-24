@@ -50,7 +50,7 @@ async function validateAttestationRequest(request: AttestationRequest) {
 
   console.info(state)
   if (state.attestationState !== AttestationState.Incomplete) {
-    throw new Error('No attestation found')
+    throw new Error('No incomplete attestation found')
   }
 
   // TODO: Check expiration
@@ -81,7 +81,7 @@ function signAttestation(phoneNumber: E164Number, account: Address) {
 }
 
 function toBase64(str: string) {
-  return Buffer.from(str, 'hex').toString('base64')
+  return Buffer.from(str.slice(2), 'hex').toString('base64')
 }
 
 function createAttestationTextMessage(attestationCode: string) {
