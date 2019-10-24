@@ -6,7 +6,7 @@ import { WithNamespaces, withNamespaces } from 'react-i18next'
 import { ScrollView, StyleSheet, Text } from 'react-native'
 import { connect } from 'react-redux'
 import i18n, { Namespaces } from 'src/i18n'
-import { headerWithCancelButton } from 'src/navigator/Headers'
+import { headerWithBackButton } from 'src/navigator/Headers'
 import { RootState } from 'src/redux/reducers'
 import { setZeroSyncMode } from 'src/web3/actions'
 
@@ -32,7 +32,7 @@ const mapStateToProps = (state: RootState): StateProps => {
 
 export class CeloLite extends React.Component<Props> {
   static navigationOptions = () => ({
-    ...headerWithCancelButton,
+    ...headerWithBackButton,
     headerTitle: i18n.t('accountScreen10:celoLite'),
   })
 

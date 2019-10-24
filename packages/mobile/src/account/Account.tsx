@@ -238,9 +238,7 @@ export class Account extends React.Component<Props, State> {
               <SettingsItem title={t('celoRewards')} onPress={navigateToVerifierApp} />
             )}
             <SettingsItem title={t('analytics')} onPress={this.goToAnalytics} />
-            {/* // TODO(anna) Disabled until switch geth on/off is implemented
-            <SettingsItem title={t('celoLite')} onPress={this.goToCeloLite} /> 
-            */}
+            <SettingsItem title={t('celoLite')} onPress={this.goToCeloLite} />
             <SettingsItem title={t('languageSettings')} onPress={this.goToLanguageSetting} />
             <SettingsItem
               title={t('localCurrencySetting')}

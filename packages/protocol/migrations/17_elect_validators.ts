@@ -139,12 +139,12 @@ module.exports = async (_deployer: any) => {
   const valKeys: string[] = config.validators.validatorKeys
 
   if (valKeys.length === 0) {
-    console.log('  No validators to register')
+    console.info('  No validators to register')
     return
   }
 
   if (valKeys.length < config.validators.minElectableValidators) {
-    console.log(
+    console.info(
       `  Warning: Have ${valKeys.length} Validator keys but require a minimum of ${
         config.validators.minElectableValidators
       } Validators in order for a new validator set to be elected.`
