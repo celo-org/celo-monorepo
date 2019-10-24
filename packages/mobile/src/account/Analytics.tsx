@@ -1,14 +1,13 @@
 import SettingsSwitchItem from '@celo/react-components/components/SettingsSwitchItem'
 import colors from '@celo/react-components/styles/colors'
 import fontStyles from '@celo/react-components/styles/fonts'
-import variables from '@celo/react-components/styles/variables'
 import * as React from 'react'
 import { WithNamespaces, withNamespaces } from 'react-i18next'
 import { ScrollView, StyleSheet, Text } from 'react-native'
 import { connect } from 'react-redux'
 import { setAnalyticsEnabled } from 'src/app/actions'
 import i18n, { Namespaces } from 'src/i18n'
-import { headerWithCancelButton } from 'src/navigator/Headers'
+import { headerWithBackButton } from 'src/navigator/Headers'
 import { RootState } from 'src/redux/reducers'
 
 interface StateProps {
@@ -29,7 +28,7 @@ const mapStateToProps = (state: RootState): StateProps => {
 
 export class Analytics extends React.Component<Props> {
   static navigationOptions = () => ({
-    ...headerWithCancelButton,
+    ...headerWithBackButton,
     headerTitle: i18n.t('accountScreen10:analytics'),
   })
 
@@ -50,26 +49,9 @@ export class Analytics extends React.Component<Props> {
 }
 
 const style = StyleSheet.create({
-  accountHeader: {
-    paddingTop: 20,
-  },
-  input: {
-    borderWidth: 1,
-    borderRadius: 3,
-    borderColor: '#EEEEEE',
-    padding: 5,
-    height: 54,
-    margin: 20,
-    width: variables.width - 40,
-    fontSize: 16,
-  },
   scrollView: {
     flex: 1,
     backgroundColor: colors.background,
-  },
-  container: {
-    flex: 1,
-    paddingLeft: 20,
   },
 })
 

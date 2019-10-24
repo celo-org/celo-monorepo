@@ -30,14 +30,14 @@ module.exports = deploymentForCoreContract<ExchangeInstance>(
   CeloContractName.Exchange,
   initializeArgs,
   async (exchange: ExchangeInstance) => {
-    console.log('Setting Exchange as StableToken minter')
+    console.info('Setting Exchange as StableToken minter')
     const stableToken: StableTokenInstance = await getDeployedProxiedContract<StableTokenInstance>(
       'StableToken',
       artifacts
     )
     await stableToken.setMinter(exchange.address)
 
-    console.log('Setting Exchange as a Reserve spender')
+    console.info('Setting Exchange as a Reserve spender')
     const reserve: ReserveInstance = await getDeployedProxiedContract<ReserveInstance>(
       'Reserve',
       artifacts

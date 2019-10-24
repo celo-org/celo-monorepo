@@ -135,15 +135,6 @@ const style = StyleSheet.create({
     flex: 1,
     backgroundColor: colors.background,
   },
-  inviteHeadline: {
-    fontSize: 24,
-    lineHeight: 39,
-    color: colors.dark,
-  },
-  label: {
-    alignSelf: 'center',
-    textAlign: 'center',
-  },
 })
 
 export default componentWithAnalytics(

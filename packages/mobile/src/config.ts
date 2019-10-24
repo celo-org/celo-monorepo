@@ -72,3 +72,7 @@ export const GOLD_TRANSACTION_MIN_AMOUNT = 0.001
 export const DEFAULT_SYNC_MODE: GethSyncMode = Config.DEFAULT_SYNC_MODE
   ? new BigNumber(Config.DEFAULT_SYNC_MODE).toNumber()
   : GethSyncMode.Ultralight
+
+export const ZERO_SYNC_ENABLED_INITIALLY = Config.ZERO_SYNC_ENABLED_INITIALLY
+  ? stringToBoolean(Config.ZERO_SYNC_ENABLED_INITIALLY)
+  : false
