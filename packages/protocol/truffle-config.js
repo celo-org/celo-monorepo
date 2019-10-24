@@ -42,7 +42,6 @@ const networks = {
     gasPrice: 0,
     gas: gasLimit,
     defaultBalance: 1000000,
-    allowUnlimitedContractSize: true,
     mnemonic: 'concert load couple harbor equip island argue ramp clarify fence smart topic',
   },
   coverage: {

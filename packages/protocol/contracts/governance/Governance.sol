@@ -72,7 +72,7 @@ contract Governance is IGovernance, Ownable, Initializable, ReentrancyGuard, Usi
   struct HotfixRecord {
     mapping(address => bool) whitelisted;
     uint256 preparedEpoch;
-    bool completed;
+    bool executed;
   }
 
   // The baseline is updated as
@@ -726,7 +726,7 @@ contract Governance is IGovernance, Ownable, Initializable, ReentrancyGuard, Usi
    * @param destinations The destination addresses of the proposed transactions.
    * @param data The concatenated data to be included in the proposed transactions.
    * @param dataLengths The lengths of each transaction's data.
-   * @dev Reverts if hotfix is already completed, not approved, or not prepared for current epoch.
+   * @dev Reverts if hotfix is already executed, not approved, or not prepared for current epoch.
    */
   function executeHotfix(
     uint256[] calldata values,
@@ -738,8 +738,8 @@ contract Governance is IGovernance, Ownable, Initializable, ReentrancyGuard, Usi
   {
     bytes32 txHash = keccak256(abi.encode(values, destinations, data, dataLengths));
 
-    (bool approved, bool completed, uint256 preparedEpoch) = getHotfixRecord(txHash);
-    require(!completed, "hotfix already executed");
+    (bool approved, bool executed, uint256 preparedEpoch) = getHotfixRecord(txHash);
+    require(!executed, "hotfix already executed");
     require(approved, "hotfix not approved");
 
     IValidators validators = IValidators(registry.getAddressForOrDie(VALIDATORS_REGISTRY_ID));
@@ -755,7 +755,7 @@ contract Governance is IGovernance, Ownable, Initializable, ReentrancyGuard, Usi
     );
     proposal.executeMem();
 
-    hotfixes[txHash].completed = true;
+    hotfixes[txHash].executed = true;
     emit HotfixExecuted(txHash);
   }
 
@@ -955,12 +955,12 @@ contract Governance is IGovernance, Ownable, Initializable, ReentrancyGuard, Usi
   /**
    * @notice Gets information about a hotfix.
    * @param txHash The abi encoded keccak256 hash of the hotfix transaction.
-   * @return Hotfix tuple of (approved, completed, preparedEpoch)
+   * @return Hotfix tuple of (approved, executed, preparedEpoch)
    */
   function getHotfixRecord(bytes32 txHash) public view returns (bool, bool, uint256) {
     return (
       hotfixes[txHash].whitelisted[approver],
-      hotfixes[txHash].completed,
+      hotfixes[txHash].executed,
       hotfixes[txHash].preparedEpoch
     );
   }
