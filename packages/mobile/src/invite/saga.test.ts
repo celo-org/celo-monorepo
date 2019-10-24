@@ -21,12 +21,16 @@ import { waitWeb3LastBlock } from 'src/networkInfo/saga'
 import { fetchDollarBalance } from 'src/stableToken/actions'
 import { transactionConfirmed } from 'src/transactions/actions'
 import { getConnectedUnlockedAccount, getOrCreateAccount } from 'src/web3/saga'
-import { createMockContract, createMockStore } from 'test/utils'
+import {
+  createMockContract,
+  createMockStore,
+  mockContractKitBalance,
+  mockContractKitContract,
+} from 'test/utils'
 import { mockAccount, mockE164Number, mockName } from 'test/values'
 
 const mockFetch = fetch as FetchMock
 const mockKey = '0x1129eb2fbccdc663f4923a6495c35b096249812b589f7c4cd1dba01e1edaf724'
-const mockContractKitBalance = jest.fn(() => new BigNumber(10))
 
 jest.mock('@celo/walletkit', () => ({
   ...jest.requireActual('@celo/walletkit'),
@@ -49,11 +53,6 @@ jest.mock('src/account/actions', () => ({
 jest.mock('src/transactions/send', () => ({
   sendTransaction: async () => true,
 }))
-
-const mockContractKitContract = {
-  balanceOf: mockContractKitBalance,
-  decimals: jest.fn(async () => '10'),
-}
 
 jest.mock('src/web3/contracts', () => ({
   web3: {
