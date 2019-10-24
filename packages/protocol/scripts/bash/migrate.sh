@@ -14,7 +14,7 @@ RESET=""
 # https://github.com/trufflesuite/truffle-migrate/blob/develop/index.js#L161
 # Default to larger than the number of contracts we will ever have
 
-while getopts 'n:rtf:c:m:' flag; do
+while getopts 'n:rt:f:c:m:' flag; do
   case "${flag}" in
     n) NETWORK="$OPTARG" ;;
     r) RESET="--reset" ;;
