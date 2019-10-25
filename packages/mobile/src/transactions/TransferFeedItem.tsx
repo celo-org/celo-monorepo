@@ -140,6 +140,7 @@ export function TransferFeedItem(props: Props) {
     invitees,
     addressToE164Number,
     recipientCache,
+    showLocalCurrency,
   } = props
 
   const localCurrencyCode = useLocalCurrencyCode()
@@ -153,7 +154,7 @@ export function TransferFeedItem(props: Props) {
   const transactionValue =
     type === TransactionTypes.NETWORK_FEE
       ? getNetworkFeeDisplayValue(props.value)
-      : localCurrencyCode
+      : showLocalCurrency && localCurrencyCode
         ? getMoneyDisplayValue(localValue || 0)
         : getMoneyDisplayValue(props.value)
 
@@ -189,9 +190,9 @@ export function TransferFeedItem(props: Props) {
               ]}
             >
               {currencyStyle.direction}
-              {localCurrencySymbol}
+              {showLocalCurrency && localCurrencySymbol}
               {transactionValue}
-              {localCurrencyCode}
+              {showLocalCurrency && localCurrencyCode}
             </Text>
           </View>
           {!!info && <Text style={styles.info}>{info}</Text>}
