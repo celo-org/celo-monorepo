@@ -2243,10 +2243,10 @@
     lodash "^4.17.13"
     to-fast-properties "^2.0.0"
 
-"@celo/client@691d471":
-  version "0.0.156"
-  resolved "https://registry.yarnpkg.com/@celo/client/-/client-0.0.156.tgz#00c738c2988086aca84f585deae018ad95d743e8"
-  integrity sha512-ql8tsyZrMIuuYHbSjNt6IUT/hvEC51MCePcPAt6OLrmlKqBI8xOGAlinuFxo8LuPNHnqBgYc/FoX2Jww3HbCPQ==
+"@celo/client@9575a01":
+  version "0.0.173"
+  resolved "https://registry.yarnpkg.com/@celo/client/-/client-0.0.173.tgz#30d8266f8f4897f1db5c9bf4ad344801e620326f"
+  integrity sha512-pAzo3Oy+V/BEkKb7ZZe0l71s6mOdPLLJZfLNo2Ihm2bx37nx8g4LNkcfj+0vVtRQPtiLrGiQ42U8pby3LwmC4Q==
 
 "@celo/contractkit@0.1.1":
   version "0.1.1"
