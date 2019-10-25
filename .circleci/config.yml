@@ -563,6 +563,23 @@ jobs:
             cd packages/celotool
             ./ci_test_sync.sh checkout master
 
+  end-to-end-geth-integration-sync-test:
+    <<: *e2e-defaults
+    steps:
+      - attach_workspace:
+          at: ~/app
+      - run:
+          name: Check if the test should run
+          command: |
+            FILES_TO_CHECK="${PWD}/packages/celotool,${PWD}/packages/protocol,${PWD}/.circleci/config.yml"
+            ./scripts/ci_check_if_test_should_run_v2.sh ${FILES_TO_CHECK}
+      - run:
+          name: Run test
+          command: |
+            set -e
+            cd packages/celotool
+            ./ci_test_sync_with_network.sh checkout master
+
   end-to-end-geth-attestations-test:
     <<: *e2e-defaults
     resource_class: medium+
