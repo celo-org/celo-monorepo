@@ -119,6 +119,7 @@ contract Exchange is IExchange, Initializable, Ownable, UsingRegistry, Reentranc
    * transaction to succeed
    * @param sellGold `true` if gold is the sell token
    * @return The amount of buyToken that was transfered
+   * @dev This function can be frozen using the Freezable interface.
    */
   function exchange(
     uint256 sellAmount,
