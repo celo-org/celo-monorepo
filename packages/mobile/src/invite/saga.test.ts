@@ -1,3 +1,4 @@
+import BigNumber from 'bignumber.js'
 import { FetchMock } from 'jest-fetch-mock'
 import { Linking } from 'react-native'
 import SendIntentAndroid from 'react-native-send-intent'
@@ -20,12 +21,16 @@ import { waitWeb3LastBlock } from 'src/networkInfo/saga'
 import { fetchDollarBalance } from 'src/stableToken/actions'
 import { transactionConfirmed } from 'src/transactions/actions'
 import { getConnectedUnlockedAccount, getOrCreateAccount } from 'src/web3/saga'
-import { createMockContract, createMockStore } from 'test/utils'
+import {
+  createMockContract,
+  createMockStore,
+  mockContractKitBalance,
+  mockContractKitContract,
+} from 'test/utils'
 import { mockAccount, mockE164Number, mockName } from 'test/values'
 
 const mockFetch = fetch as FetchMock
 const mockKey = '0x1129eb2fbccdc663f4923a6495c35b096249812b589f7c4cd1dba01e1edaf724'
-const mockBalance = jest.fn(() => 10)
 
 jest.mock('@celo/walletkit', () => ({
   ...jest.requireActual('@celo/walletkit'),
@@ -33,7 +38,6 @@ jest.mock('@celo/walletkit', () => ({
     createMockContract({ getAttestationRequestFee: Math.pow(10, 18) }),
   getStableTokenContract: jest.fn(async () =>
     createMockContract({
-      balanceOf: mockBalance,
       transfer: () => null,
       transferWithComment: () => null,
       decimals: () => '10',
@@ -72,6 +76,11 @@ jest.mock('src/web3/contracts', () => ({
     utils: {
       fromWei: (x: any) => x / 1e18,
       sha3: (x: any) => `a sha3 hash`,
+    },
+  },
+  contractKit: {
+    contracts: {
+      getStableToken: () => mockContractKitContract,
     },
   },
   isZeroSyncMode: () => false,
@@ -123,13 +132,13 @@ describe(watchRedeemInvite, () => {
   })
 
   beforeEach(() => {
-    mockBalance.mockReset()
+    mockContractKitBalance.mockReset()
   })
 
   it('works with a valid private key and enough money on it', async () => {
-    mockBalance
-      .mockReturnValueOnce(10) // temp account
-      .mockReturnValueOnce(10) // new account
+    mockContractKitBalance
+      .mockReturnValueOnce(new BigNumber(10)) // temp account
+      .mockReturnValueOnce(new BigNumber(10)) // temp account
 
     await expectSaga(watchRedeemInvite)
       .provide([[call(waitWeb3LastBlock), true], [call(getOrCreateAccount), mockAccount]])
@@ -141,9 +150,9 @@ describe(watchRedeemInvite, () => {
   })
 
   it('fails with a valid private key but unsuccessful transfer', async () => {
-    mockBalance
-      .mockReturnValueOnce(10) // temp account
-      .mockReturnValueOnce(0) // new account
+    mockContractKitBalance
+      .mockReturnValueOnce(new BigNumber(10)) // temp account
+      .mockReturnValueOnce(new BigNumber(0)) // new account
 
     await expectSaga(watchRedeemInvite)
       .provide([
@@ -159,9 +168,9 @@ describe(watchRedeemInvite, () => {
   })
 
   it('fails with a valid private key but no money on key', async () => {
-    mockBalance
-      .mockReturnValueOnce(0) // temp account
-      .mockReturnValueOnce(0) // current account
+    mockContractKitBalance
+      .mockReturnValueOnce(new BigNumber(0)) // temp account
+      .mockReturnValueOnce(new BigNumber(0)) // current account
 
     await expectSaga(watchRedeemInvite)
       .provide([[call(waitWeb3LastBlock), true], [call(getOrCreateAccount), mockAccount]])
@@ -173,7 +182,7 @@ describe(watchRedeemInvite, () => {
   })
 
   it('fails with error creating account', async () => {
-    mockBalance.mockReturnValueOnce(10) // temp account
+    mockContractKitBalance.mockReturnValueOnce(new BigNumber(10)) // temp account
 
     await expectSaga(watchRedeemInvite)
       .provide([

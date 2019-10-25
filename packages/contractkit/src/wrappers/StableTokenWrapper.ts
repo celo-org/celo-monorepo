@@ -71,7 +71,6 @@ export class StableTokenWrapper extends BaseWrapper<StableToken> {
     toBigNumber
   )
 
-  minter = proxyCall(this.contract.methods.minter)
   owner = proxyCall(this.contract.methods.owner)
 
   /**
