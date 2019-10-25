@@ -6,19 +6,26 @@ import "openzeppelin-solidity/contracts/math/Math.sol";
 import "openzeppelin-solidity/contracts/math/SafeMath.sol";
 
 import "./interfaces/IGovernance.sol";
-import "./interfaces/IValidators.sol";
 import "./Proposals.sol";
 import "../common/ExtractFunctionSignature.sol";
 import "../common/Initializable.sol";
 import "../common/FixidityLib.sol";
 import "../common/linkedlists/IntegerSortedLinkedList.sol";
 import "../common/UsingRegistry.sol";
+import "../common/UsingPrecompiles.sol";
 
 // TODO(asa): Hardcode minimum times for queueExpiry, etc.
 /**
  * @title A contract for making, passing, and executing on-chain governance proposals.
  */
-contract Governance is IGovernance, Ownable, Initializable, ReentrancyGuard, UsingRegistry {
+contract Governance is 
+  IGovernance,
+  Ownable,
+  Initializable,
+  ReentrancyGuard,
+  UsingRegistry,
+  UsingPrecompiles
+{
   using Proposals for Proposals.Proposal;
   using FixidityLib for FixidityLib.Fraction;
   using SafeMath for uint256;
@@ -698,9 +705,9 @@ contract Governance is IGovernance, Ownable, Initializable, ReentrancyGuard, Usi
    * @param txHash The hash of the hotfix to be prepared.
    */
   function prepareHotfix(bytes32 txHash) external {
-    uint256 epoch = getEpochNumberTEMP();
-    require(hotfixes[txHash].preparedEpoch < epoch, "hotfix already prepared for this epoch");
     require(isHotfixPassing(txHash), "hotfix not whitelisted by 2f+1 validators");
+    uint256 epoch = getEpochNumber();
+    require(hotfixes[txHash].preparedEpoch < epoch, "hotfix already prepared for this epoch");
     hotfixes[txHash].preparedEpoch = epoch;
     emit HotfixPrepared(txHash, epoch);
   }
@@ -726,7 +733,7 @@ contract Governance is IGovernance, Ownable, Initializable, ReentrancyGuard, Usi
     (bool approved, bool executed, uint256 preparedEpoch) = getHotfixRecord(txHash);
     require(!executed, "hotfix already executed");
     require(approved, "hotfix not approved");
-    require(preparedEpoch == getEpochNumberTEMP(), "hotfix must be prepared for this epoch");
+    require(preparedEpoch == getEpochNumber(), "hotfix must be prepared for this epoch");
 
     Proposals.Proposal memory proposal = Proposals.makeMem(
       values,
@@ -740,11 +747,6 @@ contract Governance is IGovernance, Ownable, Initializable, ReentrancyGuard, Usi
 
     hotfixes[txHash].executed = true;
     emit HotfixExecuted(txHash);
-  }
-
-  // TODO(yorke): replace with UsingPrecompiles.getEpochNumber()
-  function getEpochNumberTEMP() external view returns (uint256) {
-    return block.number / 30000;
   }
 
   /**
@@ -926,9 +928,7 @@ contract Governance is IGovernance, Ownable, Initializable, ReentrancyGuard, Usi
    * @return Whether validator whitelist tally >= validator byztanine quorum (2f+1)
    */
   function isHotfixPassing(bytes32 txHash) public view returns (bool) {
-    IValidators validators = IValidators(registry.getAddressForOrDie(VALIDATORS_REGISTRY_ID));
-    uint256 quorum = validators.getRegisteredValidatorsByzantineQuorum();
-    address[] memory validatorSet = validators.getRegisteredValidators();
+    address[] memory validatorSet = getValidators().getRegisteredValidators();
 
     uint256 tally = 0;
     for (uint256 idx = 0; idx < validatorSet.length; idx++) {
@@ -937,7 +937,7 @@ contract Governance is IGovernance, Ownable, Initializable, ReentrancyGuard, Usi
       }
     }
 
-    return tally >= quorum;
+    return tally >= getValidators().getRegisteredValidatorsByzantineQuorum();
   }
 
   /**

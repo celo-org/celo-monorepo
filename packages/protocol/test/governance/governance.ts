@@ -8,6 +8,7 @@ import {
   NULL_ADDRESS,
   stripHexEncoding,
   timeTravel,
+  mineBlocks
 } from '@celo/protocol/lib/test-utils'
 import { fixed1, multiply, toFixed } from '@celo/utils/lib/fixidity'
 import BigNumber from 'bignumber.js'
@@ -1973,32 +1974,31 @@ contract('Governance', (accounts: string[]) => {
     })
   })
 
+  // hard code in ganache
+  const EPOCH = 100
+
   describe('#prepareHotfix()', () => {
     beforeEach(async () => {
       await mockValidators.setByzantineQuorumForCurrentSet(1)
       await mockValidators.addValidator(accounts[2])
     })
 
-    it('should revert when epoch == preparedEpoch (zero)', async () => {
-      await mockValidators.setEpochNumber(0)
-      await assertRevert(governance.prepareHotfix(proposalHashStr))
-    })
-
     it('should revert when hotfix is not passing', async () => {
-      await mockValidators.setEpochNumber(1)
       await assertRevert(governance.prepareHotfix(proposalHashStr))
     })
 
     describe('when hotfix is passing', () => {
+      let currEpoch = 1
       beforeEach(async () => {
-        await mockValidators.setEpochNumber(1)
+        await mineBlocks(EPOCH, web3)
+        currEpoch += 1
         await governance.whitelistHotfix(proposalHashStr, { from: accounts[2] })
       })
 
       it('should mark the hotfix record prepared epoch', async () => {
         await governance.prepareHotfix(proposalHashStr)
         const [, , preparedEpoch] = await governance.getHotfixRecord.call(proposalHashStr)
-        assertEqualBN(preparedEpoch, 1)
+        assertEqualBN(preparedEpoch, currEpoch)
       })
 
       it('should emit the HotfixPrepared event', async () => {
@@ -2009,20 +2009,20 @@ contract('Governance', (accounts: string[]) => {
           event: 'HotfixPrepared',
           args: {
             txHash: matchAny,
-            epoch: 1,
+            epoch: currEpoch,
           },
         })
         assert.isTrue(Buffer.from(stripHexEncoding(log.args.txHash), 'hex').equals(proposalHash))
       })
 
-      it('should revert when epoch == preparedEpoch (non-zero)', async () => {
+      it('should revert when epoch == preparedEpoch', async () => {
         await governance.prepareHotfix(proposalHashStr)
         await assertRevert(governance.prepareHotfix(proposalHashStr))
       })
 
-      it('should succeed for epoch != preparedEpoch (non-zero)', async () => {
+      it('should succeed for epoch != preparedEpoch', async () => {
         await governance.prepareHotfix(proposalHashStr)
-        await mockValidators.setEpochNumber(2)
+        await mineBlocks(EPOCH, web3)
         await governance.prepareHotfix(proposalHashStr)
       })
     })
@@ -2043,7 +2043,7 @@ contract('Governance', (accounts: string[]) => {
     })
 
     it('should revert when hotfix not prepared for current epoch', async () => {
-      await mockValidators.setEpochNumber(1)
+      await mineBlocks(EPOCH, web3)
       await governance.whitelistHotfix(proposalHashStr, { from: approver })
       await assertRevert(executeHotfixTx())
     })
@@ -2051,7 +2051,7 @@ contract('Governance', (accounts: string[]) => {
     describe('when hotfix is approved and prepared for current epoch', () => {
       beforeEach(async () => {
         await governance.whitelistHotfix(proposalHashStr, { from: approver })
-        await mockValidators.setEpochNumber(2)
+        await mineBlocks(EPOCH, web3)
         await mockValidators.addValidator(accounts[2])
         await governance.whitelistHotfix(proposalHashStr, { from: accounts[2] })
         await governance.prepareHotfix(proposalHashStr)
@@ -2062,10 +2062,10 @@ contract('Governance', (accounts: string[]) => {
         assert.equal(await testTransactions.getValue(1).valueOf(), 1)
       })
 
-      it('should mark the hotfix record as completed', async () => {
+      it('should mark the hotfix record as executed', async () => {
         await executeHotfixTx()
-        const [, completed] = await governance.getHotfixRecord.call(proposalHashStr)
-        assert.isTrue(completed)
+        const [, executed] = await governance.getHotfixRecord.call(proposalHashStr)
+        assert.isTrue(executed)
       })
 
       it('should emit the HotfixExecuted event', async () => {
@@ -2081,7 +2081,7 @@ contract('Governance', (accounts: string[]) => {
         assert.isTrue(Buffer.from(stripHexEncoding(log.args.txHash), 'hex').equals(proposalHash))
       })
 
-      it('should not be callable again', async () => {
+      it('should not be executable again', async () => {
         await executeHotfixTx()
         await assertRevert(executeHotfixTx())
       })
