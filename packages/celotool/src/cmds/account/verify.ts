@@ -1,6 +1,6 @@
 import { AccountArgv } from '@celo/celotool/src/cmds/account'
 import { portForwardAnd } from '@celo/celotool/src/lib/port_forward'
-import { CeloContract, ContractKit, newKit } from '@celo/contractkit'
+import { CeloContract, newKit } from '@celo/contractkit'
 import {
   ActionableAttestation,
   AttestationsWrapper,
@@ -80,7 +80,7 @@ async function verifyCmd(argv: VerifyArgv) {
   console.info(`Revealing ${attestationsToComplete.length} attestations`)
   await revealAttestations(attestationsToComplete, attestations, argv.phone)
 
-  await promptForCodeAndVerify(kit, attestations, argv.phone, account)
+  await promptForCodeAndVerify(attestations, argv.phone, account)
 }
 
 export async function printCurrentCompletedAttestations(
@@ -160,7 +160,6 @@ async function verifyCode(
 }
 
 async function promptForCodeAndVerify(
-  kit: ContractKit,
   attestations: AttestationsWrapper,
   phoneNumber: string,
   account: string
