@@ -58,11 +58,11 @@ describe('governance tests', () => {
       const groupInfo = await validators.methods
         .getValidatorGroup(groupAddress)
         .call({}, blockNumber)
-      return groupInfo[1]
+      return groupInfo[0]
     } else {
       const [groupAddress] = await validators.methods.getRegisteredValidatorGroups().call()
       const groupInfo = await validators.methods.getValidatorGroup(groupAddress).call()
-      return groupInfo[1]
+      return groupInfo[0]
     }
   }
 
