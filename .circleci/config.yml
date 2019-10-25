@@ -246,7 +246,7 @@ jobs:
     steps:
       - attach_workspace:
           at: ~/app
-      # If this fails, fix it with 
+      # If this fails, fix it with
       # `./node_modules/.bin/prettier --config .prettierrc.js --write '**/*.+(ts|tsx|js|jsx)'`
       - run: yarn run prettify:diff
       - run: yarn run lint
@@ -578,12 +578,7 @@ jobs:
           command: |
             set -e
             cd packages/celotool
-<<<<<<< HEAD
             ./ci_test_sync_with_network.sh checkout master
-=======
-            mkdir ~/.ssh/ && echo -e "Host github.com\n\tStrictHostKeyChecking no\n" > ~/.ssh/config
-            ./ci_test_sync.sh checkout master
->>>>>>> parent of 17ff6831... Implement proof-of-stake changes (#1177)
 
   end-to-end-geth-attestations-test:
     <<: *e2e-defaults
@@ -601,12 +596,7 @@ jobs:
           command: |
             set -e
             cd packages/celotool
-<<<<<<< HEAD
             ./ci_test_attestations.sh checkout master
-=======
-            mkdir ~/.ssh/ && echo -e "Host github.com\n\tStrictHostKeyChecking no\n" > ~/.ssh/config
-            ./ci_test_sync_with_network.sh checkout master
->>>>>>> parent of 17ff6831... Implement proof-of-stake changes (#1177)
 
   web:
     working_directory: ~/app
