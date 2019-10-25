@@ -260,7 +260,7 @@ contract Exchange is IExchange, Initializable, Ownable, UsingRegistry, Reentranc
   }
 
   function setFreezer(address freezer) public onlyOwner {
-      _setFreezer(freezer);
+    _setFreezer(freezer);
   }
 
   /**

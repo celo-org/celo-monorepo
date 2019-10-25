@@ -7,15 +7,15 @@ contract Freezable {
 
   // onlyFreezer functions can only be called by the specified `freezer` address
   modifier onlyFreezer() {
-      require(msg.sender == freezer);
-      _;
+    require(msg.sender == freezer);
+    _;
   }
 
   // onlyWhenNotFrozen functions can only be called when `frozen` is false, otherwise they are
   // noops.
   modifier onlyWhenNotFrozen() {
     if (!frozen) {
-        _;
+      _;
     }
   }
 
@@ -32,20 +32,20 @@ contract Freezable {
    * @dev This function is `internal` and leaves its permissioning up to the inheriting contract.
    */
   function _setFreezer(address _freezer) internal {
-      freezer = _freezer;
+    freezer = _freezer;
   }
 
   /**
    * @notice Freezes the contract, disabling `onlyWhenNotFrozen` functions.
    */
   function freeze() external onlyFreezer {
-      frozen = true;
+    frozen = true;
   }
 
   /**
    * @notice Unreezes the contract, enabling `onlyWhenNotFrozen` functions.
    */
   function unfreeze() external onlyFreezer {
-      frozen = false;
+    frozen = false;
   }
 }

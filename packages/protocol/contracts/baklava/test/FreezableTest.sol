@@ -4,21 +4,21 @@ import "../Freezable.sol";
 
 
 contract FreezableTest is Freezable {
-    event FunctionCalled();
+  event FunctionCalled();
 
-    function setFreezer(address _freezer) external {
-        _setFreezer(_freezer);
-    }
+  function setFreezer(address _freezer) external {
+    _setFreezer(_freezer);
+  }
 
-    function freezableFunction() external onlyWhenNotFrozen {
-        emit FunctionCalled();
-    }
+  function freezableFunction() external onlyWhenNotFrozen {
+    emit FunctionCalled();
+  }
 
-    function freezableFunctionWithThrow() external onlyWhenNotFrozenOrThrow {
-        emit FunctionCalled();
-    }
+  function freezableFunctionWithThrow() external onlyWhenNotFrozenOrThrow {
+    emit FunctionCalled();
+  }
 
-    function nonfreezableFunction() external {
-        emit FunctionCalled();
-    }
+  function nonfreezableFunction() external {
+    emit FunctionCalled();
+  }
 }
