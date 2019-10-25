@@ -928,16 +928,17 @@ contract Governance is
    * @return Whether validator whitelist tally >= validator byztanine quorum (2f+1)
    */
   function isHotfixPassing(bytes32 txHash) public view returns (bool) {
-    address[] memory validatorSet = getValidators().getRegisteredValidators();
-
     uint256 tally = 0;
-    for (uint256 idx = 0; idx < validatorSet.length; idx++) {
-      if (hotfixes[txHash].whitelisted[validatorSet[idx]]) {
+    uint256 n = numberValidatorsInCurrentSet();
+    for (uint256 idx = 0; idx < n; idx++) {
+      address validator = validatorAddressFromCurrentSet(index);
+      if (hotfixes[txHash].whitelisted[validator]) {
         tally = tally.add(1);
       }
     }
 
-    return tally >= getValidators().getRegisteredValidatorsByzantineQuorum();
+    uint256 byzantineQuorum = n.mul(2).div(3).add(1);
+    return tally >= byzantineQuorum;
   }
 
   /**

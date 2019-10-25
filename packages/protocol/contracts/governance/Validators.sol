@@ -756,14 +756,6 @@ contract Validators is
   }
 
   /**
-   * @notice Returns number of registered validators required for 2f+1 quorum.
-   * @return The byzantine quorum.
-   */
-  function getRegisteredValidatorsByzantineQuorum() external view returns (uint256) {
-    return getNumRegisteredValidators().mul(2).div(3).add(1);
-  }
-
-  /**
    * @notice Returns validator information.
    * @param account The account that registered the validator.
    * @return The unpacked validator struct.
