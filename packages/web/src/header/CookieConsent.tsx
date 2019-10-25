@@ -12,7 +12,7 @@ interface State {
   showConsent: boolean
 }
 
-export class CookieConsent extends React.Component<I18nProps, State> {
+export class CookieConsent extends React.PureComponent<I18nProps, State> {
   state = {
     showConsent: false,
   }
@@ -30,6 +30,7 @@ export class CookieConsent extends React.Component<I18nProps, State> {
     })
     initSentry()
   }
+
   onDisagree = () => {
     disagree()
     this.setState({
