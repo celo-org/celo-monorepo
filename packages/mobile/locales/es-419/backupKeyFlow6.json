@@ -2,7 +2,7 @@
   "getYourKey": "Consigue tu llave",
   "yourBackupKey": "Su llave de respaldo",
   "getBackupKey": "Obtener llave de respaldo",
-  "backupAndRecovery": "Copia de seguridad y recuperación",
+  "backupAndRecovery": "Seguridad y recuperación",
   "viewSafeguards": "Ver salvaguardas",
   "backupKey": "Llave de respaldo",
   "delayBackup": "Descartar por una hora",
@@ -48,11 +48,11 @@
     "0":
       "Su llave de respaldo es la única llave para su billetera Celo. Con esta llave, puede acceder a sus fondos en cualquier momento y en cualquier lugar.",
     "1": "MANTENGA ESTA CLAVE SEGURA Y PRIVADA.",
-    "2": "¡Felicidades, ha recuperado con éxito su llave de copia de seguridad! Un recordatorio,",
+    "2": "¡Felicidades, ha recuperado con éxito su llave de copia de seguridad! Un recordatorio, ",
     "3": "MANTENGA ESTA LLAVE SEGURA.",
     "4": "Para mayor seguridad, configure Salvaguardas para su billetera.",
     "5":
-      "¡También ha configurado Salvaguardas! Podrá restaurar su cuenta con la ayuda de los dos amigos.",
+      "¡También ha configurado Salvaguardas! Podrá restaurar su cuenta con la ayuda de los dos amigos. ",
     "6": "MANTENGA SU SECRETO DE SALVAGUARDIAS"
   },
   "bothBackupsDone": {
