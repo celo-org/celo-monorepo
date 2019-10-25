@@ -382,7 +382,7 @@ contract('Attestations', (accounts: string[]) => {
   })
 
   describe('#request()', () => {
-    it('should indicate an active attestation request', async () => {
+    it('should indicate an unselected attestation request', async () => {
       await attestations.request(phoneHash, attestationsRequested, mockStableToken.address)
       const requestBlock = await web3.eth.getBlock('latest')
 

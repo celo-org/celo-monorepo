@@ -127,7 +127,7 @@ export default async function getInstance(web3: Web3) {
   {
     "constant": true,
     "inputs": [],
-    "name": "attestationExpirySeconds",
+    "name": "attestationExpiryBlocks",
     "outputs": [
       {
         "name": "",
@@ -340,7 +340,7 @@ export default async function getInstance(web3: Web3) {
         "type": "address"
       },
       {
-        "name": "_attestationExpirySeconds",
+        "name": "_attestationExpiryBlocks",
         "type": "uint256"
       },
       {
@@ -673,7 +673,7 @@ export default async function getInstance(web3: Web3) {
     "constant": false,
     "inputs": [
       {
-        "name": "_attestationExpirySeconds",
+        "name": "_attestationExpiryBlocks",
         "type": "uint256"
       }
     ],

@@ -79,7 +79,7 @@ const stubUserUnverified = {
   reveal: null,
   getAttestationRequestFee: Math.pow(10, 18),
   getAttestationStats: [0, 0],
-  attestationExpirySeconds: '86400', // 1 day
+  attestationExpiryBlocks: '86400', // 1 day
   getAttestationIssuers: [
     attestationCode0.issuer,
     attestationCode1.issuer,

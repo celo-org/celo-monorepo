@@ -22,7 +22,7 @@ const initializeArgs = async (): Promise<[string, string, string[], string[]]> =
   )
   return [
     config.registry.predeployedProxyAddress,
-    config.attestations.attestationExpirySeconds.toString(),
+    config.attestations.attestationExpiryBlocks.toString(),
     [stableToken.address],
     [attestationFee.toString()],
   ]

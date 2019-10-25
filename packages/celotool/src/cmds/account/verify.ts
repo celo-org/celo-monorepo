@@ -5,7 +5,7 @@ import {
   ActionableAttestation,
   AttestationsWrapper,
 } from '@celo/contractkit/lib/wrappers/Attestations'
-import { decodeAttestationCode } from '@celo/walletkit'
+import { base64ToHex } from '@celo/utils/lib/attestations'
 import prompts from 'prompts'
 import { switchToClusterFromEnv } from 'src/lib/cluster'
 import * as yargs from 'yargs'
@@ -141,7 +141,7 @@ async function verifyCode(
   account: string,
   attestationsToComplete: ActionableAttestation[]
 ) {
-  const code = decodeAttestationCode(base64Code)
+  const code = base64ToHex(base64Code)
   const matchingIssuer = attestations.findMatchingIssuer(
     phoneNumber,
     account,

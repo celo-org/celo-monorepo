@@ -30,7 +30,7 @@ contract Attestations is IAttestations, Ownable, Initializable, UsingRegistry, R
     // For completed attestations, this is the block number of the attestation completion.
     uint32 blockNumber;
 
-    // The token with which attestation request fees are paid.
+    // The token with which attestation request fees were paid.
     address attestationRequestFeeToken;
   }
 
@@ -54,10 +54,9 @@ contract Attestations is IAttestations, Ownable, Initializable, UsingRegistry, R
     uint32 requested;
     // Total number of completed attestations.
     uint32 completed;
-    // List of selected issuers responsible for attestations. Users may not select
-    // issuers for attestation requests in which `selectedIssuers.length` will be
-    // smaller than `requested`, which represents the total number of requested
-    // attestations.
+    // List of selected issuers responsible for attestations. The length of this list
+    // might be smaller than `requested` (which represents the total number of requested
+    // attestations) if users are not calling `selectIssuers` on unselected requests.
     address[] selectedIssuers;
     // State of each attestation keyed by issuer.
     mapping(address => Attestation) issuedAttestations;
@@ -70,7 +69,7 @@ contract Attestations is IAttestations, Ownable, Initializable, UsingRegistry, R
     // The number of attestations that were requested.
     uint32 attestationsRequested;
 
-    // The token with which attestation request fees are paid in this request.
+    // The token with which attestation request fees were paid in this request.
     address attestationRequestFeeToken;
   }
 
@@ -418,7 +417,7 @@ contract Attestations is IAttestations, Ownable, Initializable, UsingRegistry, R
   }
 
   /**
-   * @notice Returns seleted attestation issuers for a identifier/account pair.
+   * @notice Returns selected attestation issuers for a identifier/account pair.
    * @param identifier Hash of the identifier.
    * @param account Address of the account.
    * @return Addresses of the selected attestation issuers.
@@ -812,7 +811,7 @@ contract Attestations is IAttestations, Ownable, Initializable, UsingRegistry, R
       issuer = getLockedGold().getAccountFromValidator(validator);
       Attestation storage attestation = state.issuedAttestations[issuer];
 
-      // Attestation issuers can only be added if they haven't already.
+      // Attestation issuers can only be added if they haven't been already.
       if (attestation.status != AttestationStatus.None) {
         continue;
       }

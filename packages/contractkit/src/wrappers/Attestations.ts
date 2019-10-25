@@ -156,11 +156,11 @@ export class AttestationsWrapper extends BaseWrapper<Attestations> {
    */
   async getActionableAttestations(
     phoneNumber: string,
-    account: Address,
-    currentBlockNumber: number
+    account: Address
   ): Promise<ActionableAttestation[]> {
     const phoneHash = PhoneNumberUtils.getPhoneHash(phoneNumber)
-    const expirySeconds = await this.attestationExpiryBlocks()
+    const expiryBlocks = await this.attestationExpiryBlocks()
+    const currentBlockNumber = await this.kit.web3.eth.getBlockNumber()
 
     const issuers = await this.contract.methods.getAttestationIssuers(phoneHash, account).call()
     const issuerState = Promise.all(
@@ -178,7 +178,7 @@ export class AttestationsWrapper extends BaseWrapper<Attestations> {
     )
 
     const isIncomplete = (status: AttestationState) => status === AttestationState.Incomplete
-    const hasNotExpired = (time: number) => currentBlockNumber < time + expirySeconds
+    const hasNotExpired = (blockNumber: number) => currentBlockNumber < blockNumber + expiryBlocks
     const isValidKey = (key: string) => key !== null && key !== '0x0'
 
     return zip3(issuers, await issuerState, await publicKeys)
