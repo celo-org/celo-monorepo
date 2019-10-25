@@ -32,7 +32,7 @@ export default class Commitment extends BaseCommand {
     const noticePeriod = new BigNumber(res.flags.noticePeriod)
     const goldAmount = new BigNumber(res.flags.goldAmount)
 
-    if (!(await lockedGold.isVoting(address))) {
+    if (await lockedGold.isVoting(address)) {
       failWith(`require(!isVoting(address)) => false`)
     }
 
