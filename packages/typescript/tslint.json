@@ -29,7 +29,6 @@
     "void-zero": false,
     "no-global-arrow-functions": true,
     "no-floating-promises": true,
-    "no-promise-as-boolean": true,
-    "react-hooks-nesting": "error"
+    "no-promise-as-boolean": true
   }
 }
