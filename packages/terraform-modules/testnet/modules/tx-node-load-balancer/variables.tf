@@ -5,7 +5,7 @@ variable celo_env {
 
 variable dns_zone_name {
   type        = string
-  description = "Name of the DNS zone for the domain used for the infura-like setup"
+  description = "Name of the DNS zone for the domain used for the forno setup"
 }
 
 variable gcloud_credentials_path {
@@ -18,9 +18,9 @@ variable gcloud_project {
   description = "Name of the Google Cloud project to use"
 }
 
-variable infura_setup_host {
+variable forno_host {
   type        = string
-  description = "The host name to use for the tx node infura-setup"
+  description = "The host name to use for the tx node forno setup"
 }
 
 variable network_name {

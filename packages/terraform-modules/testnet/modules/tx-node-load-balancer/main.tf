@@ -39,7 +39,7 @@ resource "random_id" "internal" {
 # load balancer) & avoid unnecessary egress costs.
 # An internal & external load balancer cannot use the same instance group. To
 # get around this, we allocate 1 of the tx-nodes to be for internal load balancing.
-# It's still included in `static_nodes.json`, but not included in the infura-like
+# It's still included in `static_nodes.json`, but not included in the forno
 # setup. In the future, consider moving this node to live in Kubernetes to be
 # along with the services that use it.
 
@@ -83,7 +83,7 @@ resource "google_compute_health_check" "internal" {
   }
 }
 
-# external load balancer for infura-like setup
+# external load balancer for forno setup
 
 resource "google_compute_global_address" "external" {
   name         = "${local.name_prefix}-external-address"
@@ -110,7 +110,7 @@ resource "google_compute_url_map" "external" {
   default_service = "${google_compute_backend_service.external.self_link}"
 
   host_rule {
-    hosts        = [var.infura_setup_host]
+    hosts        = [var.forno_host]
     path_matcher = "allpaths"
   }
 
@@ -155,7 +155,7 @@ resource "google_compute_ssl_certificate" "external" {
 
 resource "google_dns_record_set" "external" {
   # google cloud requires the name to end with a "."
-  name         = "${var.infura_setup_host}."
+  name         = "${var.forno_host}."
   managed_zone = data.google_dns_managed_zone.external.name
   type         = "A"
   ttl          = 3600
@@ -180,7 +180,7 @@ resource "acme_registration" "external" {
 
 resource "acme_certificate" "external" {
   account_key_pem = acme_registration.external.account_key_pem
-  common_name     = var.infura_setup_host
+  common_name     = var.forno_host
 
   dns_challenge {
     provider = "gcloud"

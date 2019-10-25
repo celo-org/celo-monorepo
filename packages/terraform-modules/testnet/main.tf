@@ -145,7 +145,7 @@ module "tx_node_lb" {
   dns_zone_name           = var.dns_zone_name
   gcloud_credentials_path = var.gcloud_credentials_path
   gcloud_project          = var.gcloud_project
-  infura_setup_host       = var.infura_setup_host
+  forno_host              = var.forno_host
   network_name            = data.google_compute_network.network.name
   tx_node_self_links      = module.tx_node.self_links
 }

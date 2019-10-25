@@ -10,7 +10,7 @@ variable celo_env {
 
 variable dns_zone_name {
   type        = string
-  description = "Name of the DNS zone for the domain used for the infura-like setup"
+  description = "Name of the DNS zone for the domain used for the forno setup"
 }
 
 variable ethstats_host {
@@ -83,9 +83,9 @@ variable geth_verbosity {
   description = "Verbosity of all geth nodes"
 }
 
-variable infura_setup_host {
+variable forno_host {
   type        = string
-  description = "The host name to use for the tx node infura-setup"
+  description = "The host name to use for the tx node forno setup"
 }
 
 variable in_memory_discovery_table {

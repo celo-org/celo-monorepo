@@ -327,7 +327,8 @@ function getTestnetVars(celoEnv: string) {
     // only able to view objects (for accessing secrets)
     gcloud_vm_service_account_email: 'terraform-testnet@celo-testnet.iam.gserviceaccount.com',
     genesis_content_base64: genesisBuffer.toString('base64'),
-    infura_setup_host: `${celoEnv}-infura.${domainName}.org`,
+    // forno is the name for our setup that has tx-nodes reachable via a domain name
+    forno_host: `${celoEnv}-forno.${domainName}.org`,
     network_name: networkName(celoEnv),
   }
 }
