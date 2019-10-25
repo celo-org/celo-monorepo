@@ -8,7 +8,7 @@
     "start": "react-native start",
     "start:bg": "react-native start &",
     "start:android": "react-native run-android",
-    "start:ios": "react-native run-ios",
+    "start:ios": "react-native run-ios --simulator \"iPhone 11\"",
     "lint": "tslint -c tslint.json --project tsconfig.json",
     "build": "yarn run build:ts && yarn run build:metro",
     "build:sdk": "yarn --cwd ../walletkit build:for-env",
