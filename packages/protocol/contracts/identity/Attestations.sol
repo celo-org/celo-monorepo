@@ -25,14 +25,9 @@ contract Attestations is
   Initializable,
   UsingRegistry,
   ReentrancyGuard,
-<<<<<<< HEAD
+  UsingLockedGold,
   UsingPrecompiles
 {
-=======
-  UsingLockedGold
-{
-
->>>>>>> parent of 17ff6831... Implement proof-of-stake changes (#1177)
 
   using SafeMath for uint256;
   using SafeMath for uint128;
@@ -775,7 +770,7 @@ contract Attestations is
       seed = keccak256(abi.encodePacked(seed));
       validator = validatorAddressFromCurrentSet(uint256(seed) % numberValidators);
 
-      issuer = getLockedGold().getAccountFromValidator(validator);
+      issuer = getAccountFromValidator(validator);
       Attestation storage attestations =
         state.issuedAttestations[issuer];
 
