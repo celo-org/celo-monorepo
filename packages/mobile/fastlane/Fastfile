@@ -14,7 +14,7 @@ def get_bundle(env)
   return $bundle_name + env
 end
 
-def fastlane_supply(env, track, bundle_suffix, skip_deploy)
+def fastlane_supply(env, track, bundle_suffix)
   return supply(
     json_key: 'fastlane/google-play-service-account.json',
     track: track,
