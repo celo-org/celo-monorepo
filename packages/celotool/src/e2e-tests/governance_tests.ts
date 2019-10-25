@@ -187,9 +187,14 @@ describe('governance tests', () => {
       return validatorSet
     }
 
+    const getLastEpochBlock = (blockNumber: number) => {
+      const epochNumber = Math.floor((blockNumber - 1) / epoch)
+      return epochNumber * epoch
+    }
+
     it('should always return a validator set size equal to the number of group members at the end of the last epoch', async () => {
       for (const blockNumber of blockNumbers) {
-        const lastEpochBlock = blockNumber - (blockNumber % epoch)
+        const lastEpochBlock = getLastEpochBlock(blockNumber)
         const validatorSetSize = await election.methods
           .numberValidatorsInCurrentSet()
           .call({}, blockNumber)
@@ -200,7 +205,7 @@ describe('governance tests', () => {
 
     it('should always return a validator set equal to the group members at the end of the last epoch', async () => {
       for (const blockNumber of blockNumbers) {
-        const lastEpochBlock = blockNumber - (blockNumber % epoch)
+        const lastEpochBlock = getLastEpochBlock(blockNumber)
         const groupMembership = await getValidatorGroupMembers(lastEpochBlock)
         const validatorSet = await getValidatorSetAtBlock(blockNumber)
         assert.sameMembers(groupMembership, validatorSet)
