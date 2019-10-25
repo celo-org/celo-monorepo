@@ -76,6 +76,22 @@ fastlane android pilotapp
 
 Ship Pilot to Playstore Internal
 
+### android build_apk
+
+```
+fastlane android build_apk
+```
+
+Build an Android apk
+
+### android build_bundle
+
+```
+fastlane android build_bundle
+```
+
+Build an Android bundle
+
 ---
 
 This README.md is auto-generated and will be re-generated every time [fastlane](https://fastlane.tools) is run.

@@ -1,4 +1,5 @@
 import { Actions, ActionTypes } from 'src/exchange/actions'
+import { RootState } from 'src/redux/reducers'
 
 export interface ExchangeRatePair {
   goldMaker: string // number of dollarTokens received for one goldToken
@@ -14,6 +15,8 @@ const initialState = {
   exchangeRatePair: null,
   tobinTax: '0.00',
 }
+
+export const exchangeRatePairSelector = (state: RootState) => state.exchange.exchangeRatePair
 
 export const reducer = (state: State | undefined = initialState, action: ActionTypes): State => {
   switch (action.type) {

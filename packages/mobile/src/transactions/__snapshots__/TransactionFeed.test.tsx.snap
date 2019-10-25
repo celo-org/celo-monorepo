@@ -306,7 +306,9 @@ exports[`renders for gold to dollar exchange properly 1`] = `
                 }
               >
                 -
-                100.00
+                $
+                133.00
+                MXN
               </Text>
             </View>
             <Text
@@ -370,27 +372,6 @@ exports[`renders for gold to dollar exchange properly 1`] = `
                   confirmingPayment
                 </Text>
                  undefined
-              </Text>
-              <Text
-                style={
-                  Array [
-                    Object {
-                      "color": "#2E3338",
-                      "fontFamily": "Hind-Regular",
-                      "fontSize": 14,
-                      "lineHeight": 18,
-                    },
-                    Object {
-                      "color": "#BDBDBD",
-                      "fontSize": 14,
-                      "lineHeight": 18,
-                      "marginLeft": "auto",
-                      "paddingLeft": 10,
-                    },
-                  ]
-                }
-              >
-                localCurrencyValue
               </Text>
             </View>
           </View>
@@ -505,8 +486,7 @@ exports[`renders for gold to dollar exchange properly 1`] = `
                   ]
                 }
               >
-                -
-                20.00
+                -$26.60MXN
               </Text>
             </View>
             <View
@@ -532,7 +512,7 @@ exports[`renders for gold to dollar exchange properly 1`] = `
                   ]
                 }
               >
-                20.00
+                26.60
               </Text>
               <View
                 style={
@@ -735,7 +715,9 @@ exports[`renders for gold to dollar exchange properly 1`] = `
                 }
               >
                 
+                $
                 &lt;0.001
+                MXN
               </Text>
             </View>
             <Text
@@ -799,27 +781,6 @@ exports[`renders for gold to dollar exchange properly 1`] = `
                   confirmingPayment
                 </Text>
                  undefined
-              </Text>
-              <Text
-                style={
-                  Array [
-                    Object {
-                      "color": "#2E3338",
-                      "fontFamily": "Hind-Regular",
-                      "fontSize": 14,
-                      "lineHeight": 18,
-                    },
-                    Object {
-                      "color": "#BDBDBD",
-                      "fontSize": 14,
-                      "lineHeight": 18,
-                      "marginLeft": "auto",
-                      "paddingLeft": 10,
-                    },
-                  ]
-                }
-              >
-                localCurrencyValue
               </Text>
             </View>
           </View>
@@ -934,8 +895,7 @@ exports[`renders for gold to dollar exchange properly 1`] = `
                   ]
                 }
               >
-                -
-                30.00
+                -$39.90MXN
               </Text>
             </View>
             <View
@@ -961,7 +921,7 @@ exports[`renders for gold to dollar exchange properly 1`] = `
                   ]
                 }
               >
-                30.00
+                39.90
               </Text>
               <View
                 style={
@@ -1229,7 +1189,9 @@ exports[`renders for loading 1`] = `
                 }
               >
                 -
-                100.00
+                $
+                133.00
+                MXN
               </Text>
             </View>
             <Text
@@ -1293,27 +1255,6 @@ exports[`renders for loading 1`] = `
                   confirmingPayment
                 </Text>
                  undefined
-              </Text>
-              <Text
-                style={
-                  Array [
-                    Object {
-                      "color": "#2E3338",
-                      "fontFamily": "Hind-Regular",
-                      "fontSize": 14,
-                      "lineHeight": 18,
-                    },
-                    Object {
-                      "color": "#BDBDBD",
-                      "fontSize": 14,
-                      "lineHeight": 18,
-                      "marginLeft": "auto",
-                      "paddingLeft": 10,
-                    },
-                  ]
-                }
-              >
-                localCurrencyValue
               </Text>
             </View>
           </View>
@@ -1428,8 +1369,7 @@ exports[`renders for loading 1`] = `
                   ]
                 }
               >
-                -
-                20.00
+                -$26.60MXN
               </Text>
             </View>
             <View
@@ -1455,7 +1395,7 @@ exports[`renders for loading 1`] = `
                   ]
                 }
               >
-                20.00
+                26.60
               </Text>
               <View
                 style={
@@ -1658,7 +1598,9 @@ exports[`renders for loading 1`] = `
                 }
               >
                 
+                $
                 &lt;0.001
+                MXN
               </Text>
             </View>
             <Text
@@ -1722,27 +1664,6 @@ exports[`renders for loading 1`] = `
                   confirmingPayment
                 </Text>
                  undefined
-              </Text>
-              <Text
-                style={
-                  Array [
-                    Object {
-                      "color": "#2E3338",
-                      "fontFamily": "Hind-Regular",
-                      "fontSize": 14,
-                      "lineHeight": 18,
-                    },
-                    Object {
-                      "color": "#BDBDBD",
-                      "fontSize": 14,
-                      "lineHeight": 18,
-                      "marginLeft": "auto",
-                      "paddingLeft": 10,
-                    },
-                  ]
-                }
-              >
-                localCurrencyValue
               </Text>
             </View>
           </View>
@@ -1942,7 +1863,9 @@ exports[`renders for no transactions 1`] = `
                 }
               >
                 -
-                100.00
+                $
+                133.00
+                MXN
               </Text>
             </View>
             <Text
@@ -2006,27 +1929,6 @@ exports[`renders for no transactions 1`] = `
                   confirmingPayment
                 </Text>
                  undefined
-              </Text>
-              <Text
-                style={
-                  Array [
-                    Object {
-                      "color": "#2E3338",
-                      "fontFamily": "Hind-Regular",
-                      "fontSize": 14,
-                      "lineHeight": 18,
-                    },
-                    Object {
-                      "color": "#BDBDBD",
-                      "fontSize": 14,
-                      "lineHeight": 18,
-                      "marginLeft": "auto",
-                      "paddingLeft": 10,
-                    },
-                  ]
-                }
-              >
-                localCurrencyValue
               </Text>
             </View>
           </View>
@@ -2141,8 +2043,7 @@ exports[`renders for no transactions 1`] = `
                   ]
                 }
               >
-                -
-                20.00
+                -$26.60MXN
               </Text>
             </View>
             <View
@@ -2168,7 +2069,7 @@ exports[`renders for no transactions 1`] = `
                   ]
                 }
               >
-                20.00
+                26.60
               </Text>
               <View
                 style={
@@ -2371,7 +2272,9 @@ exports[`renders for no transactions 1`] = `
                 }
               >
                 
+                $
                 &lt;0.001
+                MXN
               </Text>
             </View>
             <Text
@@ -2435,27 +2338,6 @@ exports[`renders for no transactions 1`] = `
                   confirmingPayment
                 </Text>
                  undefined
-              </Text>
-              <Text
-                style={
-                  Array [
-                    Object {
-                      "color": "#2E3338",
-                      "fontFamily": "Hind-Regular",
-                      "fontSize": 14,
-                      "lineHeight": 18,
-                    },
-                    Object {
-                      "color": "#BDBDBD",
-                      "fontSize": 14,
-                      "lineHeight": 18,
-                      "marginLeft": "auto",
-                      "paddingLeft": 10,
-                    },
-                  ]
-                }
-              >
-                localCurrencyValue
               </Text>
             </View>
           </View>
@@ -2655,7 +2537,9 @@ exports[`renders for standbyTransactions 1`] = `
                 }
               >
                 -
-                100.00
+                $
+                133.00
+                MXN
               </Text>
             </View>
             <Text
@@ -2719,27 +2603,6 @@ exports[`renders for standbyTransactions 1`] = `
                   confirmingPayment
                 </Text>
                  undefined
-              </Text>
-              <Text
-                style={
-                  Array [
-                    Object {
-                      "color": "#2E3338",
-                      "fontFamily": "Hind-Regular",
-                      "fontSize": 14,
-                      "lineHeight": 18,
-                    },
-                    Object {
-                      "color": "#BDBDBD",
-                      "fontSize": 14,
-                      "lineHeight": 18,
-                      "marginLeft": "auto",
-                      "paddingLeft": 10,
-                    },
-                  ]
-                }
-              >
-                localCurrencyValue
               </Text>
             </View>
           </View>
@@ -2854,8 +2717,7 @@ exports[`renders for standbyTransactions 1`] = `
                   ]
                 }
               >
-                -
-                20.00
+                -$26.60MXN
               </Text>
             </View>
             <View
@@ -2881,7 +2743,7 @@ exports[`renders for standbyTransactions 1`] = `
                   ]
                 }
               >
-                20.00
+                26.60
               </Text>
               <View
                 style={
@@ -3084,7 +2946,9 @@ exports[`renders for standbyTransactions 1`] = `
                 }
               >
                 
+                $
                 &lt;0.001
+                MXN
               </Text>
             </View>
             <Text
@@ -3148,27 +3012,6 @@ exports[`renders for standbyTransactions 1`] = `
                   confirmingPayment
                 </Text>
                  undefined
-              </Text>
-              <Text
-                style={
-                  Array [
-                    Object {
-                      "color": "#2E3338",
-                      "fontFamily": "Hind-Regular",
-                      "fontSize": 14,
-                      "lineHeight": 18,
-                    },
-                    Object {
-                      "color": "#BDBDBD",
-                      "fontSize": 14,
-                      "lineHeight": 18,
-                      "marginLeft": "auto",
-                      "paddingLeft": 10,
-                    },
-                  ]
-                }
-              >
-                localCurrencyValue
               </Text>
             </View>
           </View>

@@ -53,7 +53,8 @@ contract LockedGold is ILockedGold, ReentrancyGuard, Initializable, UsingRegistr
 
   mapping(address => Account) private accounts;
   // Maps voting and validating keys to the account that provided the authorization.
-  mapping(address => address) public authorizedBy;
+  // Authorized addresses may not be reused.
+  mapping(address => address) private authorizedBy;
   uint256 public totalNonvoting;
   uint256 public unlockingPeriod;
 
@@ -99,7 +100,7 @@ contract LockedGold is ILockedGold, ReentrancyGuard, Initializable, UsingRegistr
     nonReentrant
   {
     Account storage account = accounts[msg.sender];
-    authorize(voter, account.authorizations.voting, v, r, s);
+    authorize(voter, v, r, s);
     account.authorizations.voting = voter;
     emit VoterAuthorized(msg.sender, voter);
   }
@@ -122,7 +123,7 @@ contract LockedGold is ILockedGold, ReentrancyGuard, Initializable, UsingRegistr
     nonReentrant
   {
     Account storage account = accounts[msg.sender];
-    authorize(validator, account.authorizations.validating, v, r, s);
+    authorize(validator, v, r, s);
     account.authorizations.validating = validator;
     emit ValidatorAuthorized(msg.sender, validator);
   }
@@ -251,15 +252,15 @@ contract LockedGold is ILockedGold, ReentrancyGuard, Initializable, UsingRegistr
   // TODO(asa): Dedup
   /**
    * @notice Returns the account associated with `accountOrVoter`.
-   * @param accountOrVoter The address of the account or authorized voter.
-   * @dev Fails if the `accountOrVoter` is not an account or authorized voter.
+   * @param accountOrVoter The address of the account or active authorized voter.
+   * @dev Fails if the `accountOrVoter` is not an account or active authorized voter.
    * @return The associated account.
    */
-  function getAccountFromVoter(address accountOrVoter) external view returns (address) {
-    address authorizingAccount = authorizedBy[accountOrVoter];
-    if (authorizingAccount != address(0)) {
-      require(accounts[authorizingAccount].authorizations.voting == accountOrVoter);
-      return authorizingAccount;
+  function getAccountFromActiveVoter(address accountOrVoter) external view returns (address) {
+    address account = authorizedBy[accountOrVoter];
+    if (account != address(0)) {
+      require(accounts[account].authorizations.voting == accountOrVoter);
+      return account;
     } else {
       require(isAccount(accountOrVoter));
       return accountOrVoter;
@@ -304,15 +305,47 @@ contract LockedGold is ILockedGold, ReentrancyGuard, Initializable, UsingRegistr
 
   /**
    * @notice Returns the account associated with `accountOrValidator`.
-   * @param accountOrValidator The address of the account or authorized validator.
-   * @dev Fails if the `accountOrValidator` is not an account or authorized validator.
+   * @param accountOrValidator The address of the account or active authorized validator.
+   * @dev Fails if the `accountOrValidator` is not an account or active authorized validator.
+   * @return The associated account.
+   */
+  function getAccountFromActiveValidator(address accountOrValidator) public view returns (address) {
+    address account = authorizedBy[accountOrValidator];
+    if (account != address(0)) {
+      require(accounts[account].authorizations.validating == accountOrValidator);
+      return account;
+    } else {
+      require(isAccount(accountOrValidator));
+      return accountOrValidator;
+    }
+  }
+
+  /**
+   * @notice Returns the account associated with `accountOrVoter`.
+   * @param accountOrVoter The address of the account or previously authorized voter.
+   * @dev Fails if the `accountOrVoter` is not an account or previously authorized voter.
+   * @return The associated account.
+   */
+  function getAccountFromVoter(address accountOrVoter) public view returns (address) {
+    address account = authorizedBy[accountOrVoter];
+    if (account != address(0)) {
+      return account;
+    } else {
+      require(isAccount(accountOrVoter));
+      return accountOrVoter;
+    }
+  }
+
+  /**
+   * @notice Returns the account associated with `accountOrValidator`.
+   * @param accountOrValidator The address of the account or previously authorized validator.
+   * @dev Fails if the `accountOrValidator` is not an account or previously authorized validator.
    * @return The associated account.
    */
   function getAccountFromValidator(address accountOrValidator) public view returns (address) {
-    address authorizingAccount = authorizedBy[accountOrValidator];
-    if (authorizingAccount != address(0)) {
-      require(accounts[authorizingAccount].authorizations.validating == accountOrValidator);
-      return authorizingAccount;
+    address account = authorizedBy[accountOrValidator];
+    if (account != address(0)) {
+      return account;
     } else {
       require(isAccount(accountOrValidator));
       return accountOrValidator;
@@ -369,8 +402,7 @@ contract LockedGold is ILockedGold, ReentrancyGuard, Initializable, UsingRegistr
 
   /**
    * @notice Authorizes voting or validating power of `msg.sender`'s account to another address.
-   * @param current The address to authorize.
-   * @param previous The previous authorized address.
+   * @param authorized The address to authorize.
    * @param v The recovery id of the incoming ECDSA signature.
    * @param r Output value r of the ECDSA signature.
    * @param s Output value s of the ECDSA signature.
@@ -378,21 +410,19 @@ contract LockedGold is ILockedGold, ReentrancyGuard, Initializable, UsingRegistr
    * @dev v, r, s constitute `current`'s signature on `msg.sender`.
    */
   function authorize(
-    address current,
-    address previous,
+    address authorized,
     uint8 v,
     bytes32 r,
     bytes32 s
   )
     private
   {
-    require(isAccount(msg.sender) && isNotAccount(current) && isNotAuthorized(current));
+    require(isAccount(msg.sender) && isNotAccount(authorized) && isNotAuthorized(authorized));
 
     address signer = Signatures.getSignerOfAddress(msg.sender, v, r, s);
-    require(signer == current);
+    require(signer == authorized);
 
-    authorizedBy[previous] = address(0);
-    authorizedBy[current] = msg.sender;
+    authorizedBy[authorized] = msg.sender;
   }
 
   /**
