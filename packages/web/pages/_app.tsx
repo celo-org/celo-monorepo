@@ -3,13 +3,13 @@ import getConfig from 'next/config'
 import * as React from 'react'
 import { View } from 'react-native'
 import config from 'react-reveal/globals'
+import scrollIntoView from 'scroll-into-view'
 import Header from 'src/header/Header.3'
 import { ScreenSizeProvider } from 'src/layout/ScreenSize'
 import Footer from 'src/shared/Footer.3'
+import { HEADER_HEIGHT } from 'src/shared/Styles'
 import Sentry, { initSentry } from '../fullstack/sentry'
 import { appWithTranslation } from '../src/i18n'
-import { HEADER_HEIGHT } from 'src/shared/Styles'
-import scrollIntoView from 'scroll-into-view'
 
 config({ ssrReveal: true })
 class MyApp extends App {
@@ -26,7 +26,7 @@ class MyApp extends App {
     }
   }
 
-  // there are a few pages we dont want the header on for artist reasons
+  // there are a few pages we dont want the header on for artistic reasons
   // currently this is just the animation demo pages
   skipHeader() {
     return this.props.router.asPath.startsWith('/animation')
