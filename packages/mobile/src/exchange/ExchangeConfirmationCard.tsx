@@ -38,6 +38,7 @@ const getTakerToken = (props: Props) => {
 
 const getExchangeRate = (props: Props) => {
   const { makerAmount, takerAmount, exchangeRate } = props
+
   if (exchangeRate) {
     return exchangeRate
   }

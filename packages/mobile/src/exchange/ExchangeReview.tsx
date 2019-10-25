@@ -33,7 +33,7 @@ interface StateProps {
   dollarBalance: string | null
   goldBalance: string | null
   exchangeRatePair: ExchangeRatePair | null
-  tobinTax: string | null
+  tobinTax: string
   fee: string
   appConnected: boolean
 }
