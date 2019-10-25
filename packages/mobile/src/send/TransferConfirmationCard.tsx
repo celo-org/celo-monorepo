@@ -67,11 +67,12 @@ const renderTopSection = (props: Props) => {
 const renderAmountSection = (props: Props) => {
   const { currency, type, value } = props
 
+  // tslint:disable react-hooks-nesting
   const localCurrencyCode = useLocalCurrencyCode()
   const localCurrencySymbol = useLocalCurrencySymbol()
-  const transactionValue = getMoneyDisplayValue(
-    localCurrencyCode ? useDollarsToLocalAmount(value) || 0 : value
-  )
+  const localValue = useDollarsToLocalAmount(value) || 0
+  // tslint:enable react-hooks-nesting
+  const transactionValue = getMoneyDisplayValue(localCurrencyCode ? localValue : value)
 
   switch (type) {
     case TransactionTypes.INVITE_SENT: // fallthrough

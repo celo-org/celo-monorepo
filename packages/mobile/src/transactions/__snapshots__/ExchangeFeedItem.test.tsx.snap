@@ -96,7 +96,6 @@ exports[`ExchangeFeedItem renders correctly 1`] = `
             ]
           }
         >
-          
           10.00
         </Text>
       </View>
