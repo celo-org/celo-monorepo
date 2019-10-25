@@ -191,7 +191,6 @@ contract SortedOracles is ISortedOracles, Ownable, Initializable {
     external
     onlyOracle(token)
   {
-    uint256 originalMedian = limitedMedianRate[token];
     uint256 value = numerator.mul(DENOMINATOR).div(denominator);
     if (rates[token].contains(msg.sender)) {
       rates[token].update(msg.sender, value, lesserKey, greaterKey);
@@ -218,6 +217,11 @@ contract SortedOracles is ISortedOracles, Ownable, Initializable {
       address(0)
     );
     emit OracleReported(token, msg.sender, now, value, DENOMINATOR);
+    recomputeRate(token);
+  }
+
+  function recomputeRate(address token) internal {
+    uint256 originalMedian = limitedMedianRate[token];
     uint256 newMedian = rates[token].getMedianValue();
     if (limitedMedianRateTimestamp[token] != 0 && maxMedianChangeRatePerDay.unwrap() != 0) {
       uint256 td = now.sub(limitedMedianRateTimestamp[token]);
@@ -239,7 +243,7 @@ contract SortedOracles is ISortedOracles, Ownable, Initializable {
     limitedMedianRateTimestamp[token] = now;
     limitedMedianRate[token] = newMedian;
     if (newMedian != originalMedian) {
-      emit MedianUpdated(token, newMedian, DENOMINATOR);
+      emit MedianUpdated(token, newMedian, numRates(token) == 0 ? 0 : DENOMINATOR);
     }
   }
 
@@ -260,11 +264,6 @@ contract SortedOracles is ISortedOracles, Ownable, Initializable {
   function medianRate(address token) external view returns (uint256, uint256) {
     return (limitedMedianRate[token], numRates(token) == 0 ? 0 : DENOMINATOR);
   }
-
-  /*
-  function medianRate(address token) external view returns (uint256, uint256) {
-    return (rates[token].getMedianValue(), numRates(token) == 0 ? 0 : DENOMINATOR);
-  }*/
 
   /**
    * @notice Gets all elements from the doubly linked list.
@@ -338,13 +337,9 @@ contract SortedOracles is ISortedOracles, Ownable, Initializable {
    * @dev This can be used to delete elements for oracles that have been removed.
    */
   function removeReport(address token, address oracle) private {
-    uint256 originalMedian = rates[token].getMedianValue();
     rates[token].remove(oracle);
     timestamps[token].remove(oracle);
     emit OracleReportRemoved(token, oracle);
-    uint256 newMedian = rates[token].getMedianValue();
-    if (newMedian != originalMedian) {
-      emit MedianUpdated(token, newMedian, numRates(token) == 0 ? 0 : DENOMINATOR);
-    }
+    recomputeRate(token);
   }
 }
