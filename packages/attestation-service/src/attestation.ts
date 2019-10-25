@@ -114,13 +114,10 @@ export async function handleAttestationRequest(
     await retryAsyncWithBackOff(sendSms, 10, [attestationRequest.phoneNumber, textMessage], 1000)
   } catch (error) {
     console.error(error)
-    res
-      .status(500)
-      .json({
-        success: false,
-        error: 'Something went wrong while attempting to send SMS, try again later',
-      })
-      .status(422)
+    res.status(500).json({
+      success: false,
+      error: 'Something went wrong while attempting to send SMS, try again later',
+    })
     return
   }
 
