@@ -1,6 +1,14 @@
-import { LocalCurrencyCode } from '@celo/utils/src/currencies'
+// import { LocalCurrencyCode } from '@celo/utils/src/currencies' // TODO(anna) import from @celo/utils once republished
 import { gql } from 'apollo-server-express'
 import { DataSources } from './apolloServer'
+
+export enum LocalCurrencyCode {
+  USD = 'USD',
+  CAD = 'CAD',
+  EUR = 'EUR',
+  MXN = 'MXN',
+  PHP = 'PHP',
+}
 
 export enum EventTypes {
   EXCHANGE = 'EXCHANGE',

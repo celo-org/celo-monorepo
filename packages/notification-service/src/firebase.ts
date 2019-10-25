@@ -1,7 +1,7 @@
 import { CURRENCY_ENUM } from '@celo/utils'
-import { LocalCurrencyCode } from '@celo/utils/src/currencies'
 import * as admin from 'firebase-admin'
 import i18next from 'i18next'
+import { LocalCurrencyCode } from 'src/currency/consts'
 import { Currencies } from './blockscout/transfers'
 import { NOTIFICATIONS_DISABLED, NOTIFICATIONS_TTL_MS, NotificationTypes } from './config'
 

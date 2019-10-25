@@ -1,7 +1,6 @@
-import { LocalCurrencyCode } from '@celo/utils/src/currencies'
 import { RESTDataSource } from 'apollo-datasource-rest'
 import { EXCHANGE_RATES_API } from './config'
-import { CurrencyConversionArgs, ExchangeRate } from './schema'
+import { CurrencyConversionArgs, ExchangeRate, LocalCurrencyCode } from './schema'
 import { formatDateString } from './utils'
 
 interface ExchangeRateApiResult {

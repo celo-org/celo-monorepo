@@ -1,7 +1,12 @@
-import { LocalCurrencyCode } from '@celo/utils/src/currencies'
-import * as request from 'request-promise'
-import { AVAILABLE_CURRENCIES, BASE_CURRENCY, EXCHANGE_RATES_API } from 'src/currency/consts'
+// import { LocalCurrencyCode } from '@celo/utils/src/currencies' // TODO(anna) import from @celo/utils once republished on npm
+import request from 'request-promise'
 import { writeFiatExchangeRatePair } from '../firebase'
+import {
+  AVAILABLE_CURRENCIES,
+  BASE_CURRENCY,
+  EXCHANGE_RATES_API,
+  LocalCurrencyCode,
+} from './consts'
 
 const currenciesDesired = Object.values(LocalCurrencyCode)
 const currenciesToQuery = currenciesDesired.filter((currency) =>
@@ -22,6 +27,7 @@ export async function handleFiatExchangeQuery() {
   const rates = await queryFiatExchangeRates(fetchTime)
 
   for (const currency of Object.values(LocalCurrencyCode)) {
+    console.info(`Writing for ${currency}...`)
     writeFiatExchangeRatePair(
       LocalCurrencyCode.USD,
       currency,
@@ -37,8 +43,9 @@ export function formatDateString(date: Date) {
 }
 
 async function queryFiatExchangeRates(date: Date) {
-  console.debug('Querying exchange rate', date)
+  console.debug('Querying fiat exchange rate', date)
   const path = `/${formatDateString(date)}`
+  console.info(`Currencies to query: ${currenciesToQuery}...`)
   const options = {
     uri: EXCHANGE_RATES_API + path,
     qs: {
