@@ -19,7 +19,7 @@ import { redeemInviteSuccess } from 'src/invite/actions'
 import { navigate } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
 import { waitWeb3LastBlock } from 'src/networkInfo/saga'
-import { fetchTokenBalanceWithRetry } from 'src/tokens/saga'
+import { fetchTokenBalanceInWeiWithRetry } from 'src/tokens/saga'
 import { setKey } from 'src/utils/keyStore'
 import Logger from 'src/utils/Logger'
 import { web3 } from 'src/web3/contracts'
@@ -46,7 +46,7 @@ export function* importBackupPhraseSaga({ phrase, useEmptyWallet }: ImportBackup
         .address
 
       const dollarBalance: BigNumber = yield call(
-        fetchTokenBalanceWithRetry,
+        fetchTokenBalanceInWeiWithRetry,
         CURRENCY_ENUM.DOLLAR,
         backupAccount
       )
