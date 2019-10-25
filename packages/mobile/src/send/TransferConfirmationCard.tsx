@@ -72,7 +72,9 @@ const renderAmountSection = (props: Props) => {
   const localCurrencySymbol = useLocalCurrencySymbol()
   const localValue = useDollarsToLocalAmount(value) || 0
   // tslint:enable react-hooks-nesting
-  const transactionValue = getMoneyDisplayValue(localCurrencyCode ? localValue : value)
+  const transactionValue = getMoneyDisplayValue(
+    currency === CURRENCY_ENUM.DOLLAR && localCurrencyCode ? localValue : value
+  )
 
   switch (type) {
     case TransactionTypes.INVITE_SENT: // fallthrough
@@ -88,7 +90,10 @@ const renderAmountSection = (props: Props) => {
     default:
       return (
         <MoneyAmount
-          symbol={localCurrencySymbol || CURRENCIES[currency].symbol}
+          symbol={
+            (currency === CURRENCY_ENUM.DOLLAR && localCurrencySymbol) ||
+            CURRENCIES[currency].symbol
+          }
           amount={transactionValue}
         />
       )
