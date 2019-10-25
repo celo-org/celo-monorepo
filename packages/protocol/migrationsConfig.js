@@ -12,16 +12,10 @@ const DefaultConfig = {
     attestationRequestFeeInDollars: 0.05,
   },
   lockedGold: {
-    unlockingPeriod: 60 * 60 * 24 * 3, // 3 days
+    maxNoticePeriod: 60 * 60 * 24 * 365 * 3, // 3 years
   },
   oracles: {
     reportExpiry: 60 * 60, // 1 hour
-  },
-  election: {
-    minElectableValidators: '22',
-    maxElectableValidators: '100',
-    maxVotesPerAccount: 3,
-    electabilityThreshold: '0', // no threshold
   },
   exchange: {
     spread: 5 / 1000,
@@ -68,21 +62,17 @@ const DefaultConfig = {
     priceOracleAccounts: [],
   },
   validators: {
-    registrationRequirements: {
-      group: '1000000000000000000', // 1 gold
-      validator: '1000000000000000000', // 1 gold
-    },
-    deregistrationLockups: {
-      group: 60 * 24 * 60 * 60, // 60 days
-      validator: 60 * 24 * 60 * 60, // 60 days
-    },
+    minElectableValidators: '10',
+    maxElectableValidators: '100',
+    minLockedGoldValue: '1000000000000000000', // 1 gold
+    minLockedGoldNoticePeriod: 60 * 24 * 60 * 60, // 60 days
+    electionThreshold: '0', // no threshold
     maxGroupSize: '70',
 
     validatorKeys: [],
     // We register a single validator group during the migration.
     groupName: 'C-Labs',
-    groupUrl: 'celo.org',
-    commission: 0.1,
+    groupUrl: 'https://www.celo.org',
   },
   blockchainParameters: {
     minimumClientVersion: {
@@ -113,7 +103,7 @@ const linkedLibraries = {
   ],
   SortedLinkedListWithMedian: ['AddressSortedLinkedListWithMedian'],
   AddressLinkedList: ['Validators'],
-  AddressSortedLinkedList: ['Election'],
+  AddressSortedLinkedList: ['Validators'],
   IntegerSortedLinkedList: ['Governance', 'IntegerSortedLinkedListTest'],
   AddressSortedLinkedListWithMedian: ['SortedOracles', 'AddressSortedLinkedListWithMedianTest'],
   Signatures: ['TestAttestations', 'Attestations', 'LockedGold', 'Escrow'],

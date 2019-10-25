@@ -1,10 +1,15 @@
 export const LockedGoldArgs = {
-  pendingWithdrawalIndexArg: {
-    name: 'pendingWithdrawalIndex',
-    description: 'index of pending withdrawal whose unlocking period has passed',
+  noticePeriodArg: {
+    name: 'noticePeriod',
+    description:
+      'duration (seconds) from notice to withdrawable; doubles as ID of a Locked Gold commitment; ',
   },
-  valueArg: {
-    name: 'value',
-    description: 'unit amount of Celo Gold (cGLD)',
+  availabilityTimeArg: {
+    name: 'availabilityTime',
+    description: 'unix timestamp at which withdrawable; doubles as ID of a notified commitment',
+  },
+  goldAmountArg: {
+    name: 'goldAmount',
+    description: 'unit amount of gold token (cGLD)',
   },
 }

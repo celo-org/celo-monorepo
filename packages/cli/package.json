@@ -80,23 +80,20 @@
       "config": {
         "description": "Configure CLI options which persist across commands"
       },
-      "election": {
-        "description": "View and manage validator elections"
-      },
       "exchange": {
         "description": "Commands for interacting with the Exchange"
       },
       "lockedgold": {
-        "description": "View and manage locked Celo Gold"
+        "description": "Manage Locked Gold to participate in governance and earn rewards"
       },
       "node": {
         "description": "Manage your full node"
       },
       "validator": {
-        "description": "View and manage validators"
+        "description": "View validator information and register your own"
       },
       "validatorgroup": {
-        "description": "View and manage validator groups"
+        "description": "View validator group information and cast votes"
       }
     },
     "bin": "celocli",

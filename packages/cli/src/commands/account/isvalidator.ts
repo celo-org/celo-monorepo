@@ -17,11 +17,11 @@ export default class IsValidator extends BaseCommand {
   async run() {
     const { args } = this.parse(IsValidator)
 
-    const election = await this.kit.contracts.getElection()
-    const numberValidators = await election.numberValidatorsInCurrentSet()
+    const validators = await this.kit.contracts.getValidators()
+    const numberValidators = await validators.numberValidatorsInCurrentSet()
 
     for (let i = 0; i < numberValidators; i++) {
-      const validatorAddress = await election.validatorAddressFromCurrentSet(i)
+      const validatorAddress = await validators.validatorAddressFromCurrentSet(i)
       if (eqAddress(validatorAddress, args.address)) {
         console.log(`${args.address} is in the current validator set`)
         return

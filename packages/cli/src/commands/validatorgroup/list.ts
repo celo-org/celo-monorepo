@@ -16,13 +16,15 @@ export default class ValidatorGroupList extends BaseCommand {
     cli.action.start('Fetching Validator Groups')
     const validators = await this.kit.contracts.getValidators()
     const vgroups = await validators.getRegisteredValidatorGroups()
+    const votes = await validators.getValidatorGroupsVotes()
     cli.action.stop()
 
     cli.table(vgroups, {
       address: {},
+      id: {},
       name: {},
       url: {},
-      commission: { get: (r) => r.commission.toFixed() },
+      votes: { get: (r) => votes.find((v) => v.address === r.address)!.votes.toString() },
       members: { get: (r) => r.members.length },
     })
   }

@@ -4,8 +4,8 @@ import { BaseCommand } from '../../base'
 import { displaySendTx } from '../../utils/cli'
 import { Args, Flags } from '../../utils/command'
 
-export default class ValidatorGroupMembers extends BaseCommand {
-  static description = 'Add or remove members from a Validator Group'
+export default class ValidatorGroupRegister extends BaseCommand {
+  static description = 'Manage members of a Validator Group'
 
   static flags = {
     ...BaseCommand.flags,
@@ -33,7 +33,7 @@ export default class ValidatorGroupMembers extends BaseCommand {
   ]
 
   async run() {
-    const res = this.parse(ValidatorGroupMembers)
+    const res = this.parse(ValidatorGroupRegister)
 
     if (!(res.flags.accept || res.flags.remove || res.flags.reorder)) {
       this.error(`Specify action: --accept, --remove or --reorder`)
@@ -42,14 +42,9 @@ export default class ValidatorGroupMembers extends BaseCommand {
 
     this.kit.defaultAccount = res.flags.from
     const validators = await this.kit.contracts.getValidators()
-    const election = await this.kit.contracts.getElection()
 
     if (res.flags.accept) {
       await displaySendTx('addMember', validators.addMember((res.args as any).validatorAddress))
-      if ((await validators.getGroupNumMembers(res.flags.from)).isEqualTo(1)) {
-        const tx = await election.markGroupEligible(res.flags.from)
-        await displaySendTx('markGroupEligible', tx)
-      }
     } else if (res.flags.remove) {
       await displaySendTx(
         'removeMember',

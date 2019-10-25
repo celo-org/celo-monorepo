@@ -1,19 +1,16 @@
-import { eqAddress } from '@celo/utils/lib/address'
 import { zip } from '@celo/utils/lib/collections'
 import BigNumber from 'bignumber.js'
 import Web3 from 'web3'
+import { TransactionObject } from 'web3/eth/types'
 import { Address } from '../base'
 import { LockedGold } from '../generated/types/LockedGold'
 import {
   BaseWrapper,
   CeloTransactionObject,
-  NumberLike,
-  parseNumber,
   proxyCall,
   proxySend,
   toBigNumber,
   toTransactionObject,
-  tupleParser,
 } from '../wrappers/BaseWrapper'
 
 export interface VotingDetails {
@@ -23,25 +20,28 @@ export interface VotingDetails {
   weight: BigNumber
 }
 
-interface AccountSummary {
-  lockedGold: {
-    total: BigNumber
-    nonvoting: BigNumber
-  }
-  authorizations: {
-    voter: null | string
-    validator: null | string
-  }
-  pendingWithdrawals: PendingWithdrawal[]
-}
-
-interface PendingWithdrawal {
+interface Commitment {
   time: BigNumber
   value: BigNumber
 }
 
+export interface Commitments {
+  locked: Commitment[]
+  notified: Commitment[]
+  total: {
+    gold: BigNumber
+    weight: BigNumber
+  }
+}
+
+export enum Roles {
+  Validating = '0',
+  Voting = '1',
+  Rewards = '2',
+}
+
 export interface LockedGoldConfig {
-  unlockingPeriod: BigNumber
+  maxNoticePeriod: BigNumber
 }
 
 /**
@@ -49,155 +49,239 @@ export interface LockedGoldConfig {
  */
 export class LockedGoldWrapper extends BaseWrapper<LockedGold> {
   /**
-   * Unlocks gold that becomes withdrawable after the unlocking period.
-   * @param value The amount of gold to unlock.
+   * Notifies a Locked Gold commitment, allowing funds to be withdrawn after the notice
+   *   period.
+   * @param value The amount of the commitment to eventually withdraw.
+   * @param noticePeriod The notice period of the Locked Gold commitment.
+   * @return CeloTransactionObject
    */
-  unlock: (value: NumberLike) => CeloTransactionObject<void> = proxySend(
-    this.kit,
-    this.contract.methods.unlock,
-    tupleParser(parseNumber)
-  )
+  notifyCommitment: (
+    value: string | number,
+    noticePeriod: string | number
+  ) => CeloTransactionObject<string> = proxySend(this.kit, this.contract.methods.notifyCommitment)
+
   /**
    * Creates an account.
+   * @return CeloTransactionObject
    */
-  createAccount = proxySend(this.kit, this.contract.methods.createAccount)
-  /**
-   * Withdraws a gold that has been unlocked after the unlocking period has passed.
-   * @param index The index of the pending withdrawal to withdraw.
-   */
-  withdraw: (index: number) => CeloTransactionObject<void> = proxySend(
+  createAccount: () => CeloTransactionObject<boolean> = proxySend(
     this.kit,
-    this.contract.methods.withdraw
-  )
-  /**
-   * @notice Locks gold to be used for voting.
-   */
-  lock = proxySend(this.kit, this.contract.methods.lock)
-  /**
-   * Relocks gold that has been unlocked but not withdrawn.
-   * @param index The index of the pending withdrawal to relock.
-   */
-  relock: (index: number) => CeloTransactionObject<void> = proxySend(
-    this.kit,
-    this.contract.methods.relock
+    this.contract.methods.createAccount
   )
 
   /**
-   * Returns the total amount of locked gold for an account.
-   * @param account The account.
-   * @return The total amount of locked gold for an account.
+   * Withdraws a notified commitment after the duration of the notice period.
+   * @param availabilityTime The availability time of the notified commitment.
+   * @return CeloTransactionObject
    */
-  getAccountTotalLockedGold = proxyCall(
-    this.contract.methods.getAccountTotalLockedGold,
-    undefined,
-    toBigNumber
-  )
+  withdrawCommitment: (
+    availabilityTime: string | number
+  ) => CeloTransactionObject<string> = proxySend(this.kit, this.contract.methods.withdrawCommitment)
+
   /**
-   * Returns the total amount of non-voting locked gold for an account.
-   * @param account The account.
-   * @return The total amount of non-voting locked gold for an account.
+   * Redeems rewards accrued since the last redemption for the specified account.
+   * @return CeloTransactionObject
    */
-  getAccountNonvotingLockedGold = proxyCall(
-    this.contract.methods.getAccountNonvotingLockedGold,
-    undefined,
-    toBigNumber
+  redeemRewards: () => CeloTransactionObject<string> = proxySend(
+    this.kit,
+    this.contract.methods.redeemRewards
   )
+
   /**
-   * Returns the voter for the specified account.
+   * Adds a Locked Gold commitment to `msg.sender`'s account.
+   * @param noticePeriod The notice period for the commitment.
+   * @return CeloTransactionObject
+   */
+  newCommitment: (noticePeriod: string | number) => CeloTransactionObject<string> = proxySend(
+    this.kit,
+    this.contract.methods.newCommitment
+  )
+
+  /**
+   * Rebonds a notified commitment, with notice period >= the remaining time to
+   * availability.
+   *
+   * @param value The amount of the commitment to rebond.
+   * @param availabilityTime The availability time of the notified commitment.
+   * @return CeloTransactionObject
+   */
+  extendCommitment: (
+    value: string | number,
+    availabilityTime: string | number
+  ) => CeloTransactionObject<string> = proxySend(this.kit, this.contract.methods.extendCommitment)
+
+  /**
+   * Returns whether or not a specified account is voting.
    * @param account The address of the account.
-   * @return The address with which the account can vote.
+   * @return Whether or not the account is voting.
    */
-  getVoterFromAccount: (account: string) => Promise<Address> = proxyCall(
-    this.contract.methods.getVoterFromAccount
-  )
-  /**
-   * Returns the validator for the specified account.
-   * @param account The address of the account.
-   * @return The address with which the account can register a validator or group.
-   */
-  getValidatorFromAccount: (account: string) => Promise<Address> = proxyCall(
-    this.contract.methods.getValidatorFromAccount
-  )
+  isVoting = proxyCall(this.contract.methods.isVoting)
+
   /**
    * Check if an account already exists.
    * @param account The address of the account
    * @return Returns `true` if account exists. Returns `false` otherwise.
+   *         In particular it will return `false` if a delegate with given address exists.
    */
-  isAccount: (account: string) => Promise<boolean> = proxyCall(this.contract.methods.isAccount)
+  isAccount = proxyCall(this.contract.methods.isAccount)
+
+  /**
+   * Check if a delegate already exists.
+   * @param account The address of the delegate
+   * @return Returns `true` if delegate exists. Returns `false` otherwise.
+   */
+  isDelegate = proxyCall(this.contract.methods.isDelegate)
+
+  /**
+   * Query maximum notice period.
+   * @returns Current maximum notice period.
+   */
+  maxNoticePeriod = proxyCall(this.contract.methods.maxNoticePeriod, undefined, toBigNumber)
+
+  /**
+   * Returns the weight of a specified account.
+   * @param _account The address of the account.
+   * @return The weight of the specified account.
+   */
+  getAccountWeight = proxyCall(this.contract.methods.getAccountWeight, undefined, toBigNumber)
+  /**
+   * Get the delegate for a role.
+   * @param account Address of the active account.
+   * @param role one of Roles Enum ("validating", "voting", "rewards")
+   * @return Address of the delegate
+   */
+  getDelegateFromAccountAndRole: (account: string, role: Roles) => Promise<Address> = proxyCall(
+    this.contract.methods.getDelegateFromAccountAndRole
+  )
+
   /**
    * Returns current configuration parameters.
    */
+
   async getConfig(): Promise<LockedGoldConfig> {
     return {
-      unlockingPeriod: toBigNumber(await this.contract.methods.unlockingPeriod().call()),
+      maxNoticePeriod: await this.maxNoticePeriod(),
     }
   }
 
-  async getAccountSummary(account: string): Promise<AccountSummary> {
-    const nonvoting = await this.getAccountNonvotingLockedGold(account)
-    const total = await this.getAccountTotalLockedGold(account)
-    const voter = await this.getVoterFromAccount(account)
-    const validator = await this.getValidatorFromAccount(account)
-    const pendingWithdrawals = await this.getPendingWithdrawals(account)
+  /**
+   * Get voting details for an address
+   * @param accountOrVoterAddress Accout or Voter address
+   */
+  async getVotingDetails(accountOrVoterAddress: Address): Promise<VotingDetails> {
+    const accountAddress = await this.contract.methods
+      .getAccountFromDelegateAndRole(accountOrVoterAddress, Roles.Voting)
+      .call()
+
     return {
-      lockedGold: {
-        total,
-        nonvoting,
-      },
-      authorizations: {
-        voter: eqAddress(voter, account) ? null : voter,
-        validator: eqAddress(validator, account) ? null : validator,
-      },
-      pendingWithdrawals,
+      accountAddress,
+      voterAddress: accountOrVoterAddress,
+      weight: await this.getAccountWeight(accountAddress),
+    }
+  }
+
+  async getLockedCommitmentValue(account: Address, noticePeriod: string): Promise<BigNumber> {
+    const commitment = await this.contract.methods.getLockedCommitment(account, noticePeriod).call()
+    return this.getValueFromCommitment(commitment)
+  }
+
+  async getLockedCommitments(account: Address): Promise<Commitment[]> {
+    return this.zipAccountTimesAndValuesToCommitments(
+      account,
+      this.contract.methods.getNoticePeriods,
+      this.getLockedCommitmentValue.bind(this)
+    )
+  }
+
+  async getNotifiedCommitmentValue(account: Address, availTime: string): Promise<BigNumber> {
+    const commitment = await this.contract.methods.getNotifiedCommitment(account, availTime).call()
+    return this.getValueFromCommitment(commitment)
+  }
+
+  async getNotifiedCommitments(account: Address): Promise<Commitment[]> {
+    return this.zipAccountTimesAndValuesToCommitments(
+      account,
+      this.contract.methods.getAvailabilityTimes,
+      this.getNotifiedCommitmentValue.bind(this)
+    )
+  }
+
+  /**
+   * Get commitments for an Account
+   * @param account Account address
+   */
+  async getCommitments(account: Address): Promise<Commitments> {
+    const locked = await this.getLockedCommitments(account)
+    const notified = await this.getNotifiedCommitments(account)
+    const weight = await this.getAccountWeight(account)
+
+    const totalLocked = locked.reduce(
+      (acc, commitment) => acc.plus(commitment.value),
+      new BigNumber(0)
+    )
+    const gold = notified.reduce((acc, commitment) => acc.plus(commitment.value), totalLocked)
+
+    return {
+      locked,
+      notified,
+      total: { weight, gold },
     }
   }
 
   /**
-   * Authorize voting on behalf of this account to another address.
+   * Delegate a Role to another account.
    * @param account Address of the active account.
-   * @param voter Address to be used for voting.
+   * @param delegate Address of the delegate
+   * @param role one of Roles Enum ("Validating", "Voting", "Rewards")
    * @return A CeloTransactionObject
    */
-  async authorizeVoter(account: Address, voter: Address): Promise<CeloTransactionObject<void>> {
-    const sig = await this.getParsedSignatureOfAddress(account, voter)
-    // TODO(asa): Pass default tx "from" argument.
-    return toTransactionObject(
-      this.kit,
-      this.contract.methods.authorizeVoter(voter, sig.v, sig.r, sig.s)
-    )
-  }
-
-  /**
-   * Authorize validating on behalf of this account to another address.
-   * @param account Address of the active account.
-   * @param voter Address to be used for validating.
-   * @return A CeloTransactionObject
-   */
-  async authorizeValidator(
+  async delegateRoleTx(
     account: Address,
-    validator: Address
+    delegate: Address,
+    role: Roles
   ): Promise<CeloTransactionObject<void>> {
-    const sig = await this.getParsedSignatureOfAddress(account, validator)
+    const sig = await this.getParsedSignatureOfAddress(account, delegate)
     return toTransactionObject(
       this.kit,
-      this.contract.methods.authorizeValidator(validator, sig.v, sig.r, sig.s)
+      this.contract.methods.delegateRole(role, delegate, sig.v, sig.r, sig.s)
     )
   }
 
   /**
-   * Returns the pending withdrawals from unlocked gold for an account.
-   * @param account The address of the account.
-   * @return The value and timestamp for each pending withdrawal.
+   * Delegate a Rewards to another account.
+   * @param account Address of the active account.
+   * @param delegate Address of the delegate
+   * @return A CeloTransactionObject
    */
-  async getPendingWithdrawals(account: string) {
-    const withdrawals = await this.contract.methods.getPendingWithdrawals(account).call()
-    return zip(
-      (time, value) =>
-        // tslint:disable-next-line: no-object-literal-type-assertion
-        ({ time: toBigNumber(time), value: toBigNumber(value) } as PendingWithdrawal),
-      withdrawals[1],
-      withdrawals[0]
-    )
+  async delegateRewards(account: Address, delegate: Address): Promise<CeloTransactionObject<void>> {
+    return this.delegateRoleTx(account, delegate, Roles.Rewards)
+  }
+
+  /**
+   * Delegate a voting to another account.
+   * @param account Address of the active account.
+   * @param delegate Address of the delegate
+   * @return A CeloTransactionObject
+   */
+  async delegateVoting(account: Address, delegate: Address): Promise<CeloTransactionObject<void>> {
+    return this.delegateRoleTx(account, delegate, Roles.Voting)
+  }
+
+  /**
+   * Delegate a validating to another account.
+   * @param account Address of the active account.
+   * @param delegate Address of the delegate
+   * @return A CeloTransactionObject
+   */
+  async delegateValidating(
+    account: Address,
+    delegate: Address
+  ): Promise<CeloTransactionObject<void>> {
+    return this.delegateRoleTx(account, delegate, Roles.Validating)
+  }
+
+  private getValueFromCommitment(commitment: { 0: string; 1: string }) {
+    return new BigNumber(commitment[0])
   }
 
   private async getParsedSignatureOfAddress(address: Address, signer: string) {
@@ -208,5 +292,20 @@ export class LockedGoldWrapper extends BaseWrapper<LockedGold> {
       s: `0x${signature.slice(64, 128)}`,
       v: Web3.utils.hexToNumber(signature.slice(128, 130)) + 27,
     }
+  }
+
+  private async zipAccountTimesAndValuesToCommitments(
+    account: Address,
+    timesFunc: (account: string) => TransactionObject<string[]>,
+    valueFunc: (account: string, time: string) => Promise<BigNumber>
+  ) {
+    const accountTimes = await timesFunc(account).call()
+    const accountValues = await Promise.all(accountTimes.map((time) => valueFunc(account, time)))
+    return zip(
+      // tslint:disable-next-line: no-object-literal-type-assertion
+      (time, value) => ({ time, value } as Commitment),
+      accountTimes.map((time) => new BigNumber(time)),
+      accountValues
+    )
   }
 }

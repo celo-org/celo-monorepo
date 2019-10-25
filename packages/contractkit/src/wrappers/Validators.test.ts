@@ -1,4 +1,3 @@
-import BigNumber from 'bignumber.js'
 import Web3 from 'web3'
 import { newKitFromWeb3 } from '../kit'
 import { testWithGanache } from '../test-utils/ganache-test'
@@ -10,7 +9,8 @@ TEST NOTES:
 - In migrations: The only account that has cUSD is accounts[0]
 */
 
-const minLockedGoldValue = Web3.utils.toWei('10', 'ether') // 10 gold
+const minLockedGoldValue = Web3.utils.toWei('100', 'ether') // 1 gold
+const minLockedGoldNoticePeriod = 120 * 24 * 60 * 60 // 120 days
 
 // A random 64 byte hex string.
 const publicKey =
@@ -28,11 +28,16 @@ testWithGanache('Validators Wrapper', (web3) => {
   let validators: ValidatorsWrapper
   let lockedGold: LockedGoldWrapper
 
-  const registerAccountWithLockedGold = async (account: string) => {
+  const registerAccountWithCommitment = async (account: string) => {
+    // console.log('isAccount', )
+    // console.log('isDelegate', await lockedGold.isDelegate(account))
+
     if (!(await lockedGold.isAccount(account))) {
       await lockedGold.createAccount().sendAndWaitForReceipt({ from: account })
     }
-    await lockedGold.lock().sendAndWaitForReceipt({ from: account, value: minLockedGoldValue })
+    await lockedGold
+      .newCommitment(minLockedGoldNoticePeriod)
+      .sendAndWaitForReceipt({ from: account, value: minLockedGoldValue })
   }
 
   beforeAll(async () => {
@@ -42,23 +47,23 @@ testWithGanache('Validators Wrapper', (web3) => {
   })
 
   const setupGroup = async (groupAccount: string) => {
-    await registerAccountWithLockedGold(groupAccount)
-    await (await validators.registerValidatorGroup(
-      'The Group',
-      'thegroup.com',
-      new BigNumber(0.1)
-    )).sendAndWaitForReceipt({ from: groupAccount })
+    await registerAccountWithCommitment(groupAccount)
+    await validators
+      .registerValidatorGroup('thegroup', 'The Group', 'thegroup.com', [minLockedGoldNoticePeriod])
+      .sendAndWaitForReceipt({ from: groupAccount })
   }
 
   const setupValidator = async (validatorAccount: string) => {
-    await registerAccountWithLockedGold(validatorAccount)
+    await registerAccountWithCommitment(validatorAccount)
     // set account1 as the validator
     await validators
       .registerValidator(
+        'goodoldvalidator',
         'Good old validator',
         'goodold.com',
         // @ts-ignore
-        publicKeysData
+        publicKeysData,
+        [minLockedGoldNoticePeriod]
       )
       .sendAndWaitForReceipt({ from: validatorAccount })
   }

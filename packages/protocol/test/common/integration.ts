@@ -31,7 +31,7 @@ contract('Integration: Governance', (accounts: string[]) => {
   let governance: GovernanceInstance
   let registry: RegistryInstance
   let proposalTransactions: any
-  const value = new BigNumber('1000000000000000000')
+  let weight: BigNumber
 
   before(async () => {
     lockedGold = await getDeployedProxiedContract('LockedGold', artifacts)
@@ -39,8 +39,11 @@ contract('Integration: Governance', (accounts: string[]) => {
     registry = await getDeployedProxiedContract('Registry', artifacts)
     // Set up a LockedGold account with which we can vote.
     await lockedGold.createAccount()
+    const noticePeriod = 60 * 60 * 24 // 1 day
+    const value = new BigNumber('1000000000000000000')
     // @ts-ignore
-    await lockedGold.lock({ value })
+    await lockedGold.newCommitment(noticePeriod, { value })
+    weight = await lockedGold.getAccountWeight(accounts[0])
     proposalTransactions = [
       {
         value: 0,
@@ -91,7 +94,7 @@ contract('Integration: Governance', (accounts: string[]) => {
     })
 
     it('should increase the number of upvotes for the proposal', async () => {
-      assertEqualBN(await governance.getUpvotes(proposalId), value)
+      assertEqualBN(await governance.getUpvotes(proposalId), weight)
     })
   })
 
@@ -114,7 +117,7 @@ contract('Integration: Governance', (accounts: string[]) => {
 
     it('should increment the vote totals', async () => {
       const [yes, ,] = await governance.getVoteTotals(proposalId)
-      assertEqualBN(yes, value)
+      assertEqualBN(yes, weight)
     })
   })
 

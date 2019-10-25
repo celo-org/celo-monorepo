@@ -10,6 +10,7 @@ import "../common/interfaces/IERC20Token.sol";
 import "../governance/interfaces/IValidators.sol";
 
 import "../common/Initializable.sol";
+import "../governance/UsingLockedGold.sol";
 import "../common/UsingRegistry.sol";
 import "../common/Signatures.sol";
 import "../common/UsingPrecompiles.sol";
@@ -24,8 +25,14 @@ contract Attestations is
   Initializable,
   UsingRegistry,
   ReentrancyGuard,
+<<<<<<< HEAD
   UsingPrecompiles
 {
+=======
+  UsingLockedGold
+{
+
+>>>>>>> parent of 17ff6831... Implement proof-of-stake changes (#1177)
 
   using SafeMath for uint256;
   using SafeMath for uint128;
@@ -703,6 +710,17 @@ contract Attestations is
     returns (address[] memory)
   {
     return identifiers[identifier].accounts;
+  }
+
+  /**
+   * @notice Returns the current validator set
+   * TODO: Should be replaced with a precompile
+   */
+  function getValidators() public view returns (address[] memory) {
+    IValidators validatorContract = IValidators(
+      registry.getAddressForOrDie(VALIDATORS_REGISTRY_ID)
+    );
+    return validatorContract.getValidators();
   }
 
   /**

@@ -9,10 +9,9 @@ import {
 } from '@celo/protocol/lib/web3-utils'
 import { config } from '@celo/protocol/migrationsConfig'
 import { blsPrivateKeyToProcessedPrivateKey } from '@celo/utils/lib/bls'
-import { toFixed } from '@celo/utils/lib/fixidity'
 import { BigNumber } from 'bignumber.js'
 import * as bls12377js from 'bls12377js'
-import { ElectionInstance, LockedGoldInstance, ValidatorsInstance } from 'types'
+import { LockedGoldInstance, ValidatorsInstance } from 'types'
 
 const Web3 = require('web3')
 
@@ -20,7 +19,7 @@ function serializeKeystore(keystore: any) {
   return Buffer.from(JSON.stringify(keystore)).toString('base64')
 }
 
-async function lockGold(lockedGold: LockedGoldInstance, value: BigNumber, privateKey: string) {
+async function makeMinimumDeposit(lockedGold: LockedGoldInstance, privateKey: string) {
   // @ts-ignore
   const createAccountTx = lockedGold.contract.methods.createAccount()
   await sendTransactionWithPrivateKey(web3, createAccountTx, privateKey, {
@@ -28,11 +27,13 @@ async function lockGold(lockedGold: LockedGoldInstance, value: BigNumber, privat
   })
 
   // @ts-ignore
-  const lockTx = lockedGold.contract.methods.lock()
+  const bondTx = lockedGold.contract.methods.newCommitment(
+    config.validators.minLockedGoldNoticePeriod
+  )
 
-  await sendTransactionWithPrivateKey(web3, lockTx, privateKey, {
+  await sendTransactionWithPrivateKey(web3, bondTx, privateKey, {
     to: lockedGold.address,
-    value,
+    value: config.validators.minLockedGoldValue,
   })
 }
 
@@ -56,16 +57,17 @@ async function registerValidatorGroup(
   await web3.eth.sendTransaction({
     from: generateAccountAddressFromPrivateKey(privateKey.slice(0)),
     to: account.address,
-    value: config.validators.registrationRequirements.group * 2, // Add a premium to cover tx fees
+    value: config.validators.minLockedGoldValue * 2, // Add a premium to cover tx fees
   })
 
-  await lockGold(lockedGold, config.validators.registrationRequirements.group, account.privateKey)
+  await makeMinimumDeposit(lockedGold, account.privateKey)
 
   // @ts-ignore
   const tx = validators.contract.methods.registerValidatorGroup(
-    `${config.validators.groupName} ${encodedKey}`,
+    encodedKey,
+    config.validators.groupName,
     config.validators.groupUrl,
-    toFixed(config.validators.commission).toString()
+    [config.validators.minLockedGoldNoticePeriod]
   )
 
   await sendTransactionWithPrivateKey(web3, tx, account.privateKey, {
@@ -93,17 +95,15 @@ async function registerValidator(
   const blsPoP = bls12377js.BLS.signPoP(blsValidatorPrivateKeyBytes).toString('hex')
   const publicKeysData = publicKey + blsPublicKey + blsPoP
 
-  await lockGold(
-    lockedGold,
-    config.validators.registrationRequirements.validator,
-    validatorPrivateKey
-  )
+  await makeMinimumDeposit(lockedGold, validatorPrivateKey)
 
   // @ts-ignore
   const registerTx = validators.contract.methods.registerValidator(
     address,
+    address,
     config.validators.groupUrl,
-    add0x(publicKeysData)
+    add0x(publicKeysData),
+    [config.validators.minLockedGoldNoticePeriod]
   )
 
   await sendTransactionWithPrivateKey(web3, registerTx, validatorPrivateKey, {
@@ -128,11 +128,6 @@ module.exports = async (_deployer: any) => {
 
   const lockedGold: LockedGoldInstance = await getDeployedProxiedContract<LockedGoldInstance>(
     'LockedGold',
-    artifacts
-  )
-
-  const election: ElectionInstance = await getDeployedProxiedContract<ElectionInstance>(
-    'Election',
     artifacts
   )
 
@@ -170,20 +165,14 @@ module.exports = async (_deployer: any) => {
     })
   }
 
-  console.info('  Marking Validator Group as eligible for election ...')
-  // @ts-ignore
-  const markTx = election.contract.methods.markGroupEligible(NULL_ADDRESS, NULL_ADDRESS)
-  await sendTransactionWithPrivateKey(web3, markTx, account.privateKey, {
-    to: election.address,
-  })
-
   console.info('  Voting for Validator Group ...')
   // Make another deposit so our vote has more weight.
   const minLockedGoldVotePerValidator = 10000
-  const value = new BigNumber(valKeys.length)
-    .times(minLockedGoldVotePerValidator)
-    .times(web3.utils.toWei('1'))
-  // @ts-ignore
-  await lockedGold.lock({ value })
-  await election.vote(account.address, value, NULL_ADDRESS, NULL_ADDRESS)
+  await lockedGold.newCommitment(0, {
+    // @ts-ignore
+    value: new BigNumber(valKeys.length)
+      .times(minLockedGoldVotePerValidator)
+      .times(config.validators.minLockedGoldValue),
+  })
+  await validators.vote(account.address, NULL_ADDRESS, NULL_ADDRESS)
 }

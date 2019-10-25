@@ -1,13 +1,23 @@
-pragma solidity ^0.5.3;
+pragma solidity ^0.5.8;
 
-import "openzeppelin-solidity/contracts/math/SafeMath.sol";
+import "../interfaces/IRandom.sol";
 
+/**
+ * @title Returns a fixed value to test 'random' things
+ */
+contract MockRandom is IRandom {
 
-contract MockRandom {
+  bytes32 public _r;
 
-  bytes32 public random;
-
-  function setRandom(bytes32 value) external {
-    random = value;
+  function revealAndCommit(
+    bytes32 randomness,
+    bytes32 newCommitment,
+    address proposer
+  ) external {
+    _r = randomness;
+  }
+  
+  function random() external view returns (bytes32) {
+    return _r;
   }
 }

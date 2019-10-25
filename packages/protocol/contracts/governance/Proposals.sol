@@ -101,15 +101,13 @@ library Proposals {
   /**
    * @notice Adds or changes a vote on a proposal.
    * @param proposal The proposal struct.
-   * @param previousWeight The previous weight of the vote.
-   * @param currentWeight The current weight of the vote.
+   * @param weight The weight of the vote.
    * @param previousVote The vote to be removed, or None for a new vote.
    * @param currentVote The vote to be set.
    */
   function updateVote(
     Proposal storage proposal,
-    uint256 previousWeight,
-    uint256 currentWeight,
+    uint256 weight,
     VoteValue previousVote,
     VoteValue currentVote
   )
@@ -117,20 +115,20 @@ library Proposals {
   {
     // Subtract previous vote.
     if (previousVote == VoteValue.Abstain) {
-      proposal.votes.abstain = proposal.votes.abstain.sub(previousWeight);
+      proposal.votes.abstain = proposal.votes.abstain.sub(weight);
     } else if (previousVote == VoteValue.Yes) {
-      proposal.votes.yes = proposal.votes.yes.sub(previousWeight);
+      proposal.votes.yes = proposal.votes.yes.sub(weight);
     } else if (previousVote == VoteValue.No) {
-      proposal.votes.no = proposal.votes.no.sub(previousWeight);
+      proposal.votes.no = proposal.votes.no.sub(weight);
     }
 
     // Add new vote.
     if (currentVote == VoteValue.Abstain) {
-      proposal.votes.abstain = proposal.votes.abstain.add(currentWeight);
+      proposal.votes.abstain = proposal.votes.abstain.add(weight);
     } else if (currentVote == VoteValue.Yes) {
-      proposal.votes.yes = proposal.votes.yes.add(currentWeight);
+      proposal.votes.yes = proposal.votes.yes.add(weight);
     } else if (currentVote == VoteValue.No) {
-      proposal.votes.no = proposal.votes.no.add(currentWeight);
+      proposal.votes.no = proposal.votes.no.add(weight);
     }
   }
 

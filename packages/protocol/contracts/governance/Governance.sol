@@ -7,18 +7,18 @@ import "openzeppelin-solidity/contracts/math/SafeMath.sol";
 
 import "./interfaces/IGovernance.sol";
 import "./Proposals.sol";
-import "../common/ExtractFunctionSignature.sol";
+import "./UsingLockedGold.sol";
 import "../common/Initializable.sol";
 import "../common/FixidityLib.sol";
 import "../common/FractionUtil.sol";
 import "../common/linkedlists/IntegerSortedLinkedList.sol";
-import "../common/UsingRegistry.sol";
+import "../common/ExtractFunctionSignature.sol";
 
 // TODO(asa): Hardcode minimum times for queueExpiry, etc.
 /**
  * @title A contract for making, passing, and executing on-chain governance proposals.
  */
-contract Governance is IGovernance, Ownable, Initializable, ReentrancyGuard, UsingRegistry {
+contract Governance is IGovernance, Ownable, Initializable, UsingLockedGold, ReentrancyGuard {
   using Proposals for Proposals.Proposal;
   using FixidityLib for FixidityLib.Fraction;
   using FractionUtil for FractionUtil.Fraction;
@@ -45,20 +45,14 @@ contract Governance is IGovernance, Ownable, Initializable, ReentrancyGuard, Usi
     Yes
   }
 
-  struct UpvoteRecord {
-    uint256 proposalId;
-    uint256 weight;
-  }
-
   struct VoteRecord {
     Proposals.VoteValue value;
     uint256 proposalId;
-    uint256 weight;
   }
 
   struct Voter {
     // Key of the proposal voted for in the proposal queue
-    UpvoteRecord upvote;
+    uint256 upvotedProposal;
     uint256 mostRecentReferendumProposal;
     // Maps a `dequeued` index to a voter's vote record.
     mapping(uint256 => VoteRecord) referendumVotes;
@@ -95,7 +89,7 @@ contract Governance is IGovernance, Ownable, Initializable, ReentrancyGuard, Usi
   mapping(address => uint256) public refundedDeposits;
   mapping(address => ContractConstitution) private constitution;
   mapping(uint256 => Proposals.Proposal) private proposals;
-  mapping(address => Voter) private voters;
+  mapping(address => Voter) public voters;
   SortedLinkedList.List private queue;
   uint256[] public dequeued;
   uint256[] public emptyIndices;
@@ -485,7 +479,8 @@ contract Governance is IGovernance, Ownable, Initializable, ReentrancyGuard, Usi
     nonReentrant
     returns (bool)
   {
-    address account = getLockedGold().getAccountFromVoter(msg.sender);
+    address account = getAccountFromVoter(msg.sender);
+    require(!isVotingFrozen(account));
     // TODO(asa): When upvoting a proposal that will get dequeued, should we let the tx succeed
     // and return false?
     dequeueProposalsIfReady();
@@ -497,26 +492,16 @@ contract Governance is IGovernance, Ownable, Initializable, ReentrancyGuard, Usi
       return false;
     }
     Voter storage voter = voters[account];
-    // If the previously upvoted proposal is still in the queue but has expired, expire the
-    // proposal from the queue.
-    if (
-      queue.contains(voter.upvote.proposalId) &&
-      now >= proposals[voter.upvote.proposalId].timestamp.add(queueExpiry)
-    ) {
-      queue.remove(voter.upvote.proposalId);
-      emit ProposalExpired(voter.upvote.proposalId);
-    }
     // We can upvote a proposal in the queue if we're not already upvoting a proposal in the queue.
-    uint256 weight = getLockedGold().getAccountTotalLockedGold(account);
-    require(weight > 0, "cannot upvote without locking gold");
-    require(isQueued(proposalId), "cannot upvote a proposal not in the queue");
+    uint256 weight = getAccountWeight(account);
     require(
-      voter.upvote.proposalId == 0 || !queue.contains(voter.upvote.proposalId),
-      "cannot upvote more than one queued proposal"
+      isQueued(proposalId) &&
+      (voter.upvotedProposal == 0 || !queue.contains(voter.upvotedProposal)) &&
+      weight > 0
     );
-    uint256 upvotes = queue.getValue(proposalId).add(weight);
+    uint256 upvotes = queue.getValue(proposalId).add(uint256(weight));
     queue.update(proposalId, upvotes, lesser, greater);
-    voter.upvote = UpvoteRecord(proposalId, weight);
+    voter.upvotedProposal = proposalId;
     emit ProposalUpvoted(proposalId, account, weight);
     return true;
   }
@@ -539,9 +524,9 @@ contract Governance is IGovernance, Ownable, Initializable, ReentrancyGuard, Usi
     returns (bool)
   {
     dequeueProposalsIfReady();
-    address account = getLockedGold().getAccountFromVoter(msg.sender);
+    address account = getAccountFromVoter(msg.sender);
     Voter storage voter = voters[account];
-    uint256 proposalId = voter.upvote.proposalId;
+    uint256 proposalId = voter.upvotedProposal;
     Proposals.Proposal storage proposal = proposals[proposalId];
     require(proposal.exists());
     // If acting on an expired proposal, expire the proposal.
@@ -552,16 +537,13 @@ contract Governance is IGovernance, Ownable, Initializable, ReentrancyGuard, Usi
         queue.remove(proposalId);
         emit ProposalExpired(proposalId);
       } else {
-        queue.update(
-          proposalId,
-          queue.getValue(proposalId).sub(voter.upvote.weight),
-          lesser,
-          greater
-        );
-        emit ProposalUpvoteRevoked(proposalId, account, voter.upvote.weight);
+        uint256 weight = getAccountWeight(account);
+        require(weight > 0);
+        queue.update(proposalId, queue.getValue(proposalId).sub(weight), lesser, greater);
+        emit ProposalUpvoteRevoked(proposalId, account, weight);
       }
     }
-    voter.upvote = UpvoteRecord(0, 0);
+    voter.upvotedProposal = 0;
     return true;
   }
 
@@ -585,7 +567,7 @@ contract Governance is IGovernance, Ownable, Initializable, ReentrancyGuard, Usi
     require(msg.sender == approver && !proposal.isApproved() && stage == Proposals.Stage.Approval);
     proposal.approved = true;
     // Ensures networkWeight is set by the end of the Referendum stage, even if 0 votes are cast.
-    proposal.networkWeight = getLockedGold().getTotalLockedGold();
+    proposal.networkWeight = getTotalWeight();
     emit ProposalApproved(proposalId);
     return true;
   }
@@ -607,7 +589,8 @@ contract Governance is IGovernance, Ownable, Initializable, ReentrancyGuard, Usi
     nonReentrant
     returns (bool)
   {
-    address account = getLockedGold().getAccountFromVoter(msg.sender);
+    address account = getAccountFromVoter(msg.sender);
+    require(!isVotingFrozen(account));
     dequeueProposalsIfReady();
     Proposals.Proposal storage proposal = proposals[proposalId];
     require(isDequeuedProposal(proposal, proposalId, index));
@@ -617,7 +600,7 @@ contract Governance is IGovernance, Ownable, Initializable, ReentrancyGuard, Usi
       return false;
     }
     Voter storage voter = voters[account];
-    uint256 weight = getLockedGold().getAccountTotalLockedGold(account);
+    uint256 weight = getAccountWeight(account);
     require(
       proposal.isApproved() &&
       stage == Proposals.Stage.Referendum &&
@@ -626,13 +609,13 @@ contract Governance is IGovernance, Ownable, Initializable, ReentrancyGuard, Usi
     );
     VoteRecord storage voteRecord = voter.referendumVotes[index];
     proposal.updateVote(
-      voteRecord.weight,
       weight,
       (voteRecord.proposalId == proposalId) ? voteRecord.value : Proposals.VoteValue.None,
       value
     );
-    proposal.networkWeight = getLockedGold().getTotalLockedGold();
-    voter.referendumVotes[index] = VoteRecord(value, proposalId, weight);
+    proposal.networkWeight = getTotalWeight();
+    voteRecord.proposalId = proposalId;
+    voteRecord.value = value;
     if (proposal.timestamp > voter.mostRecentReferendumProposal) {
       voter.mostRecentReferendumProposal = proposalId;
     }
@@ -820,13 +803,12 @@ contract Governance is IGovernance, Ownable, Initializable, ReentrancyGuard, Usi
   }
 
   /**
-   * @notice Returns the ID of the proposal upvoted by `account` and the weight of that upvote.
+   * @notice Returns the ID of the proposal upvoted by `account`.
    * @param account The address of the account.
-   * @return The ID of the proposal upvoted by `account` and the weight of that upvote.
+   * @return The ID of the proposal upvoted by `account`.
    */
-  function getUpvoteRecord(address account) external view returns (uint256, uint256) {
-    UpvoteRecord memory upvoteRecord = voters[account].upvote;
-    return (upvoteRecord.proposalId, upvoteRecord.weight);
+  function getUpvotedProposal(address account) external view returns (uint256) {
+    return voters[account].upvotedProposal;
   }
 
   /**
@@ -836,6 +818,21 @@ contract Governance is IGovernance, Ownable, Initializable, ReentrancyGuard, Usi
    */
   function getMostRecentReferendumProposal(address account) external view returns (uint256) {
     return voters[account].mostRecentReferendumProposal;
+  }
+
+  /**
+   * @notice Returns whether or not a particular account is voting on proposals.
+   * @param account The address of the account.
+   * @return Whether or not the account is voting on proposals.
+   */
+  function isVoting(address account) external view returns (bool) {
+    Voter storage voter = voters[account];
+    bool isVotingQueue = voter.upvotedProposal != 0 && isQueued(voter.upvotedProposal);
+    Proposals.Proposal storage proposal = proposals[voter.mostRecentReferendumProposal];
+    bool isVotingReferendum = (
+      proposal.getDequeuedStage(stageDurations) == Proposals.Stage.Referendum
+    );
+    return isVotingQueue || isVotingReferendum;
   }
 
   /**
