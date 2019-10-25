@@ -11,7 +11,7 @@ import { connect } from 'react-redux'
 import CeloAnalytics from 'src/analytics/CeloAnalytics'
 import { CustomEventNames } from 'src/analytics/constants'
 import componentWithAnalytics from 'src/analytics/wrapper'
-import { exchangeTokens, fetchExchangeRate } from 'src/exchange/actions'
+import { exchangeTokens, fetchExchangeRate, fetchTobinTax } from 'src/exchange/actions'
 import ExchangeConfirmationCard from 'src/exchange/ExchangeConfirmationCard'
 import { ExchangeRatePair } from 'src/exchange/reducer'
 import { CURRENCY_ENUM as Token } from 'src/geth/consts'
@@ -33,6 +33,7 @@ interface StateProps {
   dollarBalance: string | null
   goldBalance: string | null
   exchangeRatePair: ExchangeRatePair | null
+  tobinTax: string | null
   fee: string
   appConnected: boolean
 }
@@ -44,6 +45,7 @@ interface ConfirmationInput {
 
 interface DispatchProps {
   fetchExchangeRate: typeof fetchExchangeRate
+  fetchTobinTax: typeof fetchTobinTax
   exchangeTokens: typeof exchangeTokens
 }
 
@@ -53,6 +55,7 @@ const mapStateToProps = (state: RootState): StateProps => ({
   goldBalance: state.goldToken.balance,
   dollarBalance: state.stableToken.balance,
   exchangeRatePair: state.exchange.exchangeRatePair,
+  tobinTax: getMoneyDisplayValue(state.exchange.tobinTax || 0),
   fee: getMoneyDisplayValue(0),
   appConnected: isAppConnected(state),
 })
@@ -87,6 +90,7 @@ class ExchangeReview extends React.Component<Props> {
   componentDidMount() {
     const { makerToken, makerAmount } = this.getConfirmationInput()
     this.props.fetchExchangeRate(makerAmount, makerToken)
+    this.props.fetchTobinTax(makerAmount, makerToken)
   }
 
   renderHeader = () => {
@@ -94,7 +98,15 @@ class ExchangeReview extends React.Component<Props> {
   }
 
   render() {
-    const { exchangeRatePair, fee, t, appConnected, dollarBalance, goldBalance } = this.props
+    const {
+      exchangeRatePair,
+      fee,
+      t,
+      appConnected,
+      dollarBalance,
+      goldBalance,
+      tobinTax,
+    } = this.props
     const { makerToken, makerAmount } = this.getConfirmationInput()
     const rate = getRateForMakerToken(exchangeRatePair, makerToken)
     const takerAmount = getTakerAmount(makerAmount, rate)
@@ -126,6 +138,7 @@ class ExchangeReview extends React.Component<Props> {
             takerAmount={takerAmount}
             exchangeRate={rate}
             fee={fee}
+            tobinTax={tobinTax}
           />
         </ReviewFrame>
       </SafeAreaView>
@@ -144,6 +157,6 @@ const styles = StyleSheet.create({
 export default componentWithAnalytics(
   connect<StateProps, DispatchProps, {}, RootState>(
     mapStateToProps,
-    { exchangeTokens, fetchExchangeRate }
+    { exchangeTokens, fetchExchangeRate, fetchTobinTax }
   )(withNamespaces(Namespaces.exchangeFlow9)(ExchangeReview))
 )

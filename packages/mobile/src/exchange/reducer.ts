@@ -8,12 +8,12 @@ export interface ExchangeRatePair {
 
 export interface State {
   exchangeRatePair: ExchangeRatePair | null
-  tobinTax: string
+  tobinTax: string | null
 }
 
 const initialState = {
   exchangeRatePair: null,
-  tobinTax: '0.00',
+  tobinTax: null,
 }
 
 export const exchangeRatePairSelector = (state: RootState) => state.exchange.exchangeRatePair

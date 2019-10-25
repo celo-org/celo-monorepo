@@ -20,6 +20,18 @@ export interface SetTobinTaxAction {
   tobinTax: string
 }
 
+export interface FetchExchangeRateAction {
+  type: Actions.FETCH_TOBIN_TAX
+  makerToken?: CURRENCY_ENUM
+  makerAmount?: BigNumber
+}
+
+export interface FetchTobinTaxAction {
+  type: Actions.FETCH_TOBIN_TAX
+  makerToken: CURRENCY_ENUM
+  makerAmount: BigNumber
+}
+
 export interface ExchangeTokensAction {
   type: Actions.EXCHANGE_TOKENS
   makerToken: CURRENCY_ENUM
@@ -37,7 +49,11 @@ export const setExchangeRate = (exchangeRatePair: ExchangeRatePair): SetExchange
   exchangeRatePair,
 })
 
-export const fetchTobinTax = () => ({ type: Actions.FETCH_TOBIN_TAX })
+export const fetchTobinTax = (makerAmount: BigNumber, makerToken: CURRENCY_ENUM) => ({
+  type: Actions.FETCH_TOBIN_TAX,
+  makerAmount,
+  makerToken,
+})
 
 export const setTobinTax = (tobinTax: string): SetTobinTaxAction => ({
   type: Actions.SET_TOBIN_TAX,

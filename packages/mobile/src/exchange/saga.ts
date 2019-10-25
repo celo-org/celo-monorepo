@@ -11,7 +11,14 @@ import BigNumber from 'bignumber.js'
 import { all, call, put, select, spawn, takeEvery, takeLatest } from 'redux-saga/effects'
 import { showError } from 'src/alert/actions'
 import { ErrorMessages } from 'src/app/ErrorMessages'
-import { Actions, ExchangeTokensAction, setExchangeRate, setTobinTax } from 'src/exchange/actions'
+import {
+  Actions,
+  ExchangeTokensAction,
+  FetchExchangeRateAction,
+  FetchTobinTaxAction,
+  setExchangeRate,
+  setTobinTax,
+} from 'src/exchange/actions'
 import { ExchangeRatePair, exchangeRatePairSelector } from 'src/exchange/reducer'
 import { CURRENCY_ENUM } from 'src/geth/consts'
 import { convertToContractDecimals } from 'src/tokens/saga'
@@ -36,25 +43,39 @@ const LARGE_DOLLARS_SELL_AMOUNT_IN_WEI = new BigNumber(1000 * 100000000000000000
 const LARGE_GOLD_SELL_AMOUNT_IN_WEI = new BigNumber(100 * 1000000000000000000)
 const EXCHANGE_DIFFERENCE_TOLERATED = 0.01 // Maximum difference between actual and displayed takerAmount
 
-export function* doFetchTobinTax() {
+export function* doFetchTobinTax({ makerAmount, makerToken }: FetchTobinTaxAction) {
   try {
-    yield call(getConnectedAccount)
+    let tobinTax
+    if (makerToken === CURRENCY_ENUM.GOLD) {
+      yield call(getConnectedAccount)
 
-    // Using native web3 contract wrapper since contractkit
-    // hasn't yet implemented tobin tax interface
-    const reserve = yield call(contractKit._web3Contracts.getReserve)
+      // Using native web3 contract wrapper since contractkit
+      // hasn't yet implemented tobin tax interface
+      const reserve = yield call([
+        contractKit._web3Contracts,
+        contractKit._web3Contracts.getReserve,
+      ])
 
-    const tobinTax: BigNumber = yield call(reserve.methods.getOrComputeTobinTax().call)
-    // TODO anna may need to convert decimals
+      const tobinTaxFraction = yield call(reserve.methods.getOrComputeTobinTax().call)
+      if (!tobinTaxFraction) {
+        Logger.error(TAG, 'Unable to fetch tobin tax')
+        throw new Error('Unable to fetch tobin tax')
+      }
 
-    if (!tobinTax) {
-      Logger.error(TAG, 'Unable to fetch tobin tax')
-      throw new Error('Unable to fetch tobin tax')
+      // Tobin tax represents % tax on gold transfer, stored as fraction tuple
+      tobinTax = tobinTaxFraction['0'] / tobinTaxFraction['1']
+      if (tobinTax > 0) {
+        tobinTax = makerAmount.times(tobinTax).toString()
+      }
+    } else {
+      // Tobin tax only charged for gold transfers
+      tobinTax = 0
     }
+
     Logger.debug(
       TAG,
       `Retrieved Tobin tax rate: 
-      ${tobinTax.toString()}`
+      ${tobinTax}`
     )
     yield put(setTobinTax(tobinTax.toString()))
   } catch (error) {
@@ -63,19 +84,29 @@ export function* doFetchTobinTax() {
   }
 }
 
-export function* doFetchExchangeRate(makerAmount?: BigNumber, makerToken?: CURRENCY_ENUM) {
+export function* doFetchExchangeRate({ makerAmount, makerToken }: FetchExchangeRateAction) {
   Logger.debug(TAG, 'Calling @doFetchExchangeRate')
 
-  // If makerAmount and makerToken are given, use them to estimate the exchange rate,
-  // as exchange rate depends on amount sold. Else default to preset large sell amount.
-  const goldMakerAmount =
-    makerAmount && makerToken === CURRENCY_ENUM.GOLD ? makerAmount : LARGE_GOLD_SELL_AMOUNT_IN_WEI
-  const dollarMakerAmount =
-    makerAmount && makerToken === CURRENCY_ENUM.DOLLAR
-      ? makerAmount
-      : LARGE_DOLLARS_SELL_AMOUNT_IN_WEI
-
   try {
+    // If makerAmount and makerToken are given, use them to estimate the exchange rate,
+    // as exchange rate depends on amount sold. Else default to preset large sell amount.
+    let goldMakerAmount
+    let dollarMakerAmount
+    if (makerAmount && makerToken) {
+      const makerAmountInWei: BigNumber = yield call(
+        convertToContractDecimals,
+        makerAmount,
+        makerToken
+      )
+      goldMakerAmount =
+        makerToken === CURRENCY_ENUM.GOLD ? makerAmountInWei : LARGE_GOLD_SELL_AMOUNT_IN_WEI
+      dollarMakerAmount =
+        makerToken === CURRENCY_ENUM.DOLLAR ? makerAmountInWei : LARGE_DOLLARS_SELL_AMOUNT_IN_WEI
+    } else {
+      goldMakerAmount = LARGE_GOLD_SELL_AMOUNT_IN_WEI
+      dollarMakerAmount = LARGE_DOLLARS_SELL_AMOUNT_IN_WEI
+    }
+
     yield call(getConnectedAccount)
     const exchange = yield call([contractKit.contracts, contractKit.contracts.getExchange])
 
@@ -267,5 +298,6 @@ export function* watchExchangeTokens() {
 
 export function* exchangeSaga() {
   yield spawn(watchFetchExchangeRate)
+  yield spawn(watchFetchTobinTax)
   yield spawn(watchExchangeTokens)
 }

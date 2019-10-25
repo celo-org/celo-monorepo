@@ -6,7 +6,6 @@ import { withNamespaces, WithNamespaces } from 'react-i18next'
 import { StyleSheet, Text, View } from 'react-native'
 import CurrencyDisplay from 'src/components/CurrencyDisplay'
 import LineItemRow from 'src/components/LineItemRow'
-import { fetchTobinTax } from 'src/exchange/actions'
 import ExchangeRate from 'src/exchange/ExchangeRate'
 import FeeExchangeIcon from 'src/exchange/FeeExchangeIcon'
 import { CURRENCY_ENUM } from 'src/geth/consts'
@@ -25,16 +24,13 @@ export interface ExchangeConfirmationCardProps {
   makerAmount: BigNumber
   takerAmount: BigNumber
   fee?: string
+  tobinTax?: string
   exchangeRate?: BigNumber
   newDollarBalance?: BigNumber
   newGoldBalance?: BigNumber
 }
 
-interface DispatchProps {
-  fetchTobinTax: typeof fetchTobinTax
-}
-
-type Props = ExchangeConfirmationCardProps & WithNamespaces & DispatchProps
+type Props = ExchangeConfirmationCardProps & WithNamespaces
 
 const getTakerToken = (props: Props) => {
   return props.makerToken === CURRENCY_ENUM.DOLLAR ? CURRENCY_ENUM.GOLD : CURRENCY_ENUM.DOLLAR
@@ -90,6 +86,7 @@ export function ExchangeConfirmationCard(props: Props) {
     takerAmount,
     makerToken: token,
     fee,
+    tobinTax,
   } = props
 
   const localCurrencyCode = useLocalCurrencyCode()
@@ -140,7 +137,7 @@ export function ExchangeConfirmationCard(props: Props) {
         />
         <LineItemRow
           currencySymbol={takerToken}
-          amount={'0.01'}
+          amount={tobinTax}
           title={t('exchangeFee')}
           titleIcon={<FeeExchangeIcon />}
         />
