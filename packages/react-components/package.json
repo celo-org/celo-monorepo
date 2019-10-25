@@ -34,7 +34,8 @@
     "react": "16.9.0",
     "react-dom": "16.9.0",
     "react-navigation": "^4.0.10",
-    "react-test-renderer": "16.9.0"
+    "react-test-renderer": "16.9.0",
+    "react-native-testing-library": "^1.9.1"
   },
   "peerDependencies": {
     "react": "*",

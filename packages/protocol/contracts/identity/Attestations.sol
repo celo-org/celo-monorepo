@@ -12,12 +12,20 @@ import "../governance/interfaces/IValidators.sol";
 import "../common/Initializable.sol";
 import "../common/UsingRegistry.sol";
 import "../common/Signatures.sol";
+import "../common/UsingPrecompiles.sol";
 
 
 /**
  * @title Contract mapping identifiers to accounts
  */
-contract Attestations is IAttestations, Ownable, Initializable, UsingRegistry, ReentrancyGuard {
+contract Attestations is
+  IAttestations,
+  Ownable,
+  Initializable,
+  UsingRegistry,
+  ReentrancyGuard,
+  UsingPrecompiles
+{
 
   using SafeMath for uint256;
   using SafeMath for uint128;
@@ -739,7 +747,7 @@ contract Attestations is IAttestations, Ownable, Initializable, UsingRegistry, R
     IRandom random = IRandom(registry.getAddressForOrDie(RANDOM_REGISTRY_ID));
 
     bytes32 seed = random.random();
-    address[] memory validators = getElection().electValidators();
+    uint256 numberValidators = numberValidatorsInCurrentSet();
 
     uint256 currentIndex = 0;
     address validator;
@@ -747,7 +755,8 @@ contract Attestations is IAttestations, Ownable, Initializable, UsingRegistry, R
 
     while (currentIndex < n) {
       seed = keccak256(abi.encodePacked(seed));
-      validator = validators[uint256(seed) % validators.length];
+      validator = validatorAddressFromCurrentSet(uint256(seed) % numberValidators);
+
       issuer = getLockedGold().getAccountFromValidator(validator);
       Attestation storage attestations =
         state.issuedAttestations[issuer];

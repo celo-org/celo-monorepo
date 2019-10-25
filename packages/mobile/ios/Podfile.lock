@@ -1,7 +1,7 @@
 PODS:
   - Analytics (3.7.0)
   - boost-for-react-native (1.63.0)
-  - CeloBlockchain (0.0.156)
+  - CeloBlockchain (0.0.173)
   - Crashlytics (3.13.4):
     - Fabric (~> 1.10.2)
   - DoubleConversion (1.1.6)
@@ -368,6 +368,8 @@ PODS:
     - React
   - RNDeviceInfo (4.0.1):
     - React
+  - RNExitApp (1.1.0):
+    - React
   - RNFirebase (5.5.6):
     - Firebase/Core
     - React
@@ -464,6 +466,7 @@ DEPENDENCIES:
   - "RNAnalyticsIntegration-Firebase (from `../../../node_modules/@segment/analytics-react-native-firebase`)"
   - "RNCAsyncStorage (from `../../../node_modules/@react-native-community/async-storage`)"
   - RNDeviceInfo (from `../../../node_modules/react-native-device-info`)
+  - RNExitApp (from `../../../node_modules/react-native-exit-app`)
   - RNFirebase (from `../../../node_modules/react-native-firebase/ios`)
   - RNFS (from `../../../node_modules/react-native-fs`)
   - RNGestureHandler (from `../../../node_modules/react-native-gesture-handler`)
@@ -588,6 +591,8 @@ EXTERNAL SOURCES:
     :path: "../../../node_modules/@react-native-community/async-storage"
   RNDeviceInfo:
     :path: "../../../node_modules/react-native-device-info"
+  RNExitApp:
+    :path: "../../../node_modules/react-native-exit-app"
   RNFirebase:
     :path: "../../../node_modules/react-native-firebase/ios"
   RNFS:
@@ -618,7 +623,7 @@ EXTERNAL SOURCES:
 SPEC CHECKSUMS:
   Analytics: 77fd5fb102a4a5eedafa2c2b0245ceb7b7c15e45
   boost-for-react-native: 39c7adb57c4e60d6c5479dd8623128eb5b3f0f2c
-  CeloBlockchain: f258122010fb610057979254d4a3f88eb7fb0d21
+  CeloBlockchain: 6c7de89c718d54424ad9f49a37372656d9833451
   Crashlytics: 2dfd686bcb918dc10ee0e76f7f853fe42c7bd552
   DoubleConversion: 5805e889d232975c086db112ece9ed034df7a0b2
   Fabric: 706c8b8098fff96c33c0db69cbf81f9c551d0d74
@@ -678,6 +683,7 @@ SPEC CHECKSUMS:
   RNAnalyticsIntegration-Firebase: e94d754cae94d5e0d520666c9452c14a35cebc06
   RNCAsyncStorage: 60a80e72d95bf02a01cace55d3697d9724f0d77f
   RNDeviceInfo: 687c1b2ab6d86ff1ca1208783320cd144138c7f2
+  RNExitApp: c4e052df2568b43bec8a37c7cd61194d4cfee2c3
   RNFirebase: ac0de8b24c6f91ae9459575491ed6a77327619c6
   RNFS: a8fbe7060fa49157d819466404794ad9c58e58cf
   RNGestureHandler: 4cb47a93019c1a201df2644413a0a1569a51c8aa

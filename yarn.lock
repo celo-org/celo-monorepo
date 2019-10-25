@@ -2172,10 +2172,10 @@
     lodash "^4.17.13"
     to-fast-properties "^2.0.0"
 
-"@celo/client@691d471":
-  version "0.0.156"
-  resolved "https://registry.yarnpkg.com/@celo/client/-/client-0.0.156.tgz#00c738c2988086aca84f585deae018ad95d743e8"
-  integrity sha512-ql8tsyZrMIuuYHbSjNt6IUT/hvEC51MCePcPAt6OLrmlKqBI8xOGAlinuFxo8LuPNHnqBgYc/FoX2Jww3HbCPQ==
+"@celo/client@9575a01":
+  version "0.0.173"
+  resolved "https://registry.yarnpkg.com/@celo/client/-/client-0.0.173.tgz#30d8266f8f4897f1db5c9bf4ad344801e620326f"
+  integrity sha512-pAzo3Oy+V/BEkKb7ZZe0l71s6mOdPLLJZfLNo2Ihm2bx37nx8g4LNkcfj+0vVtRQPtiLrGiQ42U8pby3LwmC4Q==
 
 "@celo/contractkit@0.1.1":
   version "0.1.1"
@@ -2223,9 +2223,9 @@
     qqjs "^0.3.10"
     tslib "^1.9.3"
 
-"@celo/ganache-cli@git+https://github.com/celo-org/ganache-cli.git#816a475":
+"@celo/ganache-cli@git+https://github.com/celo-org/ganache-cli.git#4cf9664":
   version "6.6.0"
-  resolved "git+https://github.com/celo-org/ganache-cli.git#816a475d82535c05b59c4c43b3603c39dd31cd88"
+  resolved "git+https://github.com/celo-org/ganache-cli.git#4cf9664597fff315f7318e9376d079bd6d548624"
   dependencies:
     ethereumjs-util "6.1.0"
     source-map-support "0.5.12"
@@ -26475,6 +26475,11 @@ react-native-device-info@^4.0.1:
   resolved "https://registry.yarnpkg.com/react-native-device-info/-/react-native-device-info-4.0.1.tgz#bade972e7a995ac187a82745a458cba98b72dea0"
   integrity sha512-a0Q/gwy1oQhu17CeMq9xMZ3Sl9foaj8hFwVuy9jieqkkoQwkHnPDI+R7bEW0MNMgUCPPrzzXvka+FLGOWVqacg==
 
+react-native-exit-app@^1.1.0:
+  version "1.1.0"
+  resolved "https://registry.yarnpkg.com/react-native-exit-app/-/react-native-exit-app-1.1.0.tgz#5ec082152974240e2d6a93f1608efb49a4385f21"
+  integrity sha512-Spne19zfMfJvnUTX909EHUqWMk69rATtLJq9XMBGpNSHhx0M7v5yetx2Z87egBhLOqQm+CWfD/oxWzDG8rbIQA==
+
 react-native-firebase@5.5.6, react-native-firebase@^5.5.6:
   version "5.5.6"
   resolved "https://registry.yarnpkg.com/react-native-firebase/-/react-native-firebase-5.5.6.tgz#17b34ec0d5dc39afaaf0e159fd160f6339e0f707"
@@ -26726,7 +26731,7 @@ react-native-tab-view@^2.9.0:
     process "^0.11.9"
     util "^0.10.3"
 
-react-native-testing-library@^1.11.1:
+react-native-testing-library@^1.11.1, react-native-testing-library@^1.9.1:
   version "1.11.1"
   resolved "https://registry.yarnpkg.com/react-native-testing-library/-/react-native-testing-library-1.11.1.tgz#0e2d73991110cf7d7800d86610ad7b7f8a4c9455"
   integrity sha512-PTwDn1sgegvFqqF1v9zrRUChHqFqp5rWVUjXgkk134wssVhfc2oAuS6kiOvr3w7tLmFzuspxvT5sw0gMrRnDfQ==
@@ -27326,11 +27331,6 @@ redux-saga@^1.1.1:
   integrity sha512-guSnGJ/uEF8yL8Mn4aNa7HxRGCpVUALCkec9iTTD0fOhQqkF6bRQkBLeS+7/cAH3nFnr299bi/DOurTi1apcCA==
   dependencies:
     "@redux-saga/core" "^1.1.1"
-
-redux-thunk@^2.2.0:
-  version "2.2.0"
-  resolved "https://registry.yarnpkg.com/redux-thunk/-/redux-thunk-2.2.0.tgz#e615a16e16b47a19a515766133d1e3e99b7852e5"
-  integrity sha1-5hWhbha0ehmlFXZhM9Hj6Zt4UuU=
 
 redux@^4.0.0, redux@^4.0.4:
   version "4.0.4"
@@ -31582,6 +31582,11 @@ tslint-microsoft-contrib@^6.2.0:
   integrity sha512-6tfi/2tHqV/3CL77pULBcK+foty11Rr0idRDxKnteTaKm6gWF9qmaCNU17HVssOuwlYNyOmd9Jsmjd+1t3a3qw==
   dependencies:
     tsutils "^2.27.2 <2.29.0"
+
+tslint-react-hooks@^2.2.1:
+  version "2.2.1"
+  resolved "https://registry.yarnpkg.com/tslint-react-hooks/-/tslint-react-hooks-2.2.1.tgz#c52c7df65ee1517b2d6c92bc716e9ef72ccdf208"
+  integrity sha512-bqIg2uZe+quJMfSOGc4OOZ4awo6TP1ejGDGS6IKg2WIrS0XnWfhUJ99i3B8rUpnZhuD4vRSvyYIbXPUmEqQxxQ==
 
 tslint-react@^4.1.0:
   version "4.1.0"

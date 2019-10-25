@@ -399,6 +399,12 @@ exports[`PaymentRequestListScreen renders correctly with requests 1`] = `
                         accessible={true}
                         focusable={true}
                         isTVSelectable={true}
+                        nativeBackgroundAndroid={
+                          Object {
+                            "attribute": "selectableItemBackgroundBorderless",
+                            "type": "ThemeAttrAndroid",
+                          }
+                        }
                         onClick={[Function]}
                         onResponderGrant={[Function]}
                         onResponderMove={[Function]}
@@ -406,11 +412,6 @@ exports[`PaymentRequestListScreen renders correctly with requests 1`] = `
                         onResponderTerminate={[Function]}
                         onResponderTerminationRequest={[Function]}
                         onStartShouldSetResponder={[Function]}
-                        style={
-                          Object {
-                            "opacity": 1,
-                          }
-                        }
                       >
                         <Text
                           style={
@@ -440,6 +441,12 @@ exports[`PaymentRequestListScreen renders correctly with requests 1`] = `
                         accessible={true}
                         focusable={true}
                         isTVSelectable={true}
+                        nativeBackgroundAndroid={
+                          Object {
+                            "attribute": "selectableItemBackgroundBorderless",
+                            "type": "ThemeAttrAndroid",
+                          }
+                        }
                         onClick={[Function]}
                         onResponderGrant={[Function]}
                         onResponderMove={[Function]}
@@ -447,11 +454,6 @@ exports[`PaymentRequestListScreen renders correctly with requests 1`] = `
                         onResponderTerminate={[Function]}
                         onResponderTerminationRequest={[Function]}
                         onStartShouldSetResponder={[Function]}
-                        style={
-                          Object {
-                            "opacity": 1,
-                          }
-                        }
                       >
                         <Text
                           style={
@@ -684,6 +686,12 @@ exports[`PaymentRequestListScreen renders correctly with requests 1`] = `
                         accessible={true}
                         focusable={true}
                         isTVSelectable={true}
+                        nativeBackgroundAndroid={
+                          Object {
+                            "attribute": "selectableItemBackgroundBorderless",
+                            "type": "ThemeAttrAndroid",
+                          }
+                        }
                         onClick={[Function]}
                         onResponderGrant={[Function]}
                         onResponderMove={[Function]}
@@ -691,11 +699,6 @@ exports[`PaymentRequestListScreen renders correctly with requests 1`] = `
                         onResponderTerminate={[Function]}
                         onResponderTerminationRequest={[Function]}
                         onStartShouldSetResponder={[Function]}
-                        style={
-                          Object {
-                            "opacity": 1,
-                          }
-                        }
                       >
                         <Text
                           style={
@@ -725,6 +728,12 @@ exports[`PaymentRequestListScreen renders correctly with requests 1`] = `
                         accessible={true}
                         focusable={true}
                         isTVSelectable={true}
+                        nativeBackgroundAndroid={
+                          Object {
+                            "attribute": "selectableItemBackgroundBorderless",
+                            "type": "ThemeAttrAndroid",
+                          }
+                        }
                         onClick={[Function]}
                         onResponderGrant={[Function]}
                         onResponderMove={[Function]}
@@ -732,11 +741,6 @@ exports[`PaymentRequestListScreen renders correctly with requests 1`] = `
                         onResponderTerminate={[Function]}
                         onResponderTerminationRequest={[Function]}
                         onStartShouldSetResponder={[Function]}
-                        style={
-                          Object {
-                            "opacity": 1,
-                          }
-                        }
                       >
                         <Text
                           style={
@@ -969,6 +973,12 @@ exports[`PaymentRequestListScreen renders correctly with requests 1`] = `
                         accessible={true}
                         focusable={true}
                         isTVSelectable={true}
+                        nativeBackgroundAndroid={
+                          Object {
+                            "attribute": "selectableItemBackgroundBorderless",
+                            "type": "ThemeAttrAndroid",
+                          }
+                        }
                         onClick={[Function]}
                         onResponderGrant={[Function]}
                         onResponderMove={[Function]}
@@ -976,11 +986,6 @@ exports[`PaymentRequestListScreen renders correctly with requests 1`] = `
                         onResponderTerminate={[Function]}
                         onResponderTerminationRequest={[Function]}
                         onStartShouldSetResponder={[Function]}
-                        style={
-                          Object {
-                            "opacity": 1,
-                          }
-                        }
                       >
                         <Text
                           style={
@@ -1010,6 +1015,12 @@ exports[`PaymentRequestListScreen renders correctly with requests 1`] = `
                         accessible={true}
                         focusable={true}
                         isTVSelectable={true}
+                        nativeBackgroundAndroid={
+                          Object {
+                            "attribute": "selectableItemBackgroundBorderless",
+                            "type": "ThemeAttrAndroid",
+                          }
+                        }
                         onClick={[Function]}
                         onResponderGrant={[Function]}
                         onResponderMove={[Function]}
@@ -1017,11 +1028,6 @@ exports[`PaymentRequestListScreen renders correctly with requests 1`] = `
                         onResponderTerminate={[Function]}
                         onResponderTerminationRequest={[Function]}
                         onStartShouldSetResponder={[Function]}
-                        style={
-                          Object {
-                            "opacity": 1,
-                          }
-                        }
                       >
                         <Text
                           style={

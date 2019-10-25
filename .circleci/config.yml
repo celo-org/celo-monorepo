@@ -30,6 +30,11 @@ android-defaults: &android-defaults
     _JAVA_OPTIONS: "-XX:+UnlockExperimentalVMOptions -XX:+UseCGroupMemoryLimitForHeap"
     GRADLE_OPTS: '-Dorg.gradle.daemon=false -Dorg.gradle.jvmargs="-Xmx1024m -XX:+HeapDumpOnOutOfMemoryError"'
 
+e2e-defaults: &e2e-defaults
+  <<: *defaults
+  docker:
+    - image: celohq/circleci
+
 general:
   artifacts:
     - "mobile/coverage"
@@ -486,7 +491,7 @@ jobs:
             npm install ~/app/packages/utils/*.tgz
 
   end-to-end-geth-transfer-test:
-    <<: *defaults
+    <<: *e2e-defaults
     steps:
       - attach_workspace:
           at: ~/app
@@ -496,36 +501,15 @@ jobs:
             FILES_TO_CHECK="${PWD}/packages/celotool,${PWD}/packages/protocol,${PWD}/.circleci/config.yml"
             ./scripts/ci_check_if_test_should_run_v2.sh ${FILES_TO_CHECK}
       - run:
-          name: Setup Go language
-          command: |
-            set -e
-            set -v
-            wget https://dl.google.com/go/go1.11.5.linux-amd64.tar.gz
-            tar xf go1.11.5.linux-amd64.tar.gz -C /tmp
-            ls /tmp/go/bin/go
-            /tmp/go/bin/go version
-      - run:
-          name: Setup Rust language
-          command: |
-            set -e
-            set -v
-            curl https://sh.rustup.rs -sSf | sh -s -- -y
-            export PATH=${PATH}:~/.cargo/bin:/tmp/go/bin
-            rustup install 1.36.0
-            rustup default 1.36.0
-      - run:
           name: Run test
           no_output_timeout: 20m
           command: |
             set -e
-            export PATH=${PATH}:~/.cargo/bin:/tmp/go/bin
-            go version
             cd packages/celotool
-            mkdir ~/.ssh/ && echo -e "Host github.com\n\tStrictHostKeyChecking no\n" > ~/.ssh/config
             ./ci_test_transfers.sh checkout master
 
   end-to-end-geth-exit-test:
-    <<: *defaults
+    <<: *e2e-defaults
     steps:
       - attach_workspace:
           at: ~/app
@@ -535,36 +519,15 @@ jobs:
             FILES_TO_CHECK="${PWD}/packages/celotool,${PWD}/packages/protocol,${PWD}/.circleci/config.yml"
             ./scripts/ci_check_if_test_should_run_v2.sh ${FILES_TO_CHECK}
       - run:
-          name: Setup Go language
-          command: |
-            set -e
-            set -v
-            wget https://dl.google.com/go/go1.11.5.linux-amd64.tar.gz
-            tar xf go1.11.5.linux-amd64.tar.gz -C /tmp
-            ls /tmp/go/bin/go
-            /tmp/go/bin/go version
-      - run:
-          name: Setup Rust language
-          command: |
-            set -e
-            set -v
-            curl https://sh.rustup.rs -sSf | sh -s -- -y
-            export PATH=${PATH}:~/.cargo/bin:/tmp/go/bin
-            rustup install 1.36.0
-            rustup default 1.36.0
-      - run:
           name: Run test
           no_output_timeout: 20m
           command: |
             set -e
-            export PATH=${PATH}:~/.cargo/bin:/tmp/go/bin
-            go version
             cd packages/celotool
-            mkdir ~/.ssh/ && echo -e "Host github.com\n\tStrictHostKeyChecking no\n" > ~/.ssh/config
             ./ci_test_exit.sh checkout master
 
   end-to-end-geth-governance-test:
-    <<: *defaults
+    <<: *e2e-defaults
     # Source: https://circleci.com/docs/2.0/configuration-reference/#resource_class
     resource_class: medium+
     steps:
@@ -575,37 +538,16 @@ jobs:
           command: |
             FILES_TO_CHECK="${PWD}/packages/celotool,${PWD}/packages/protocol,${PWD}/.circleci/config.yml"
             ./scripts/ci_check_if_test_should_run_v2.sh ${FILES_TO_CHECK}
-      - run:
-          name: Setup Go language
-          command: |
-            set -e
-            set -v
-            wget https://dl.google.com/go/go1.11.5.linux-amd64.tar.gz
-            tar xf go1.11.5.linux-amd64.tar.gz -C /tmp
-            ls /tmp/go/bin/go
-            /tmp/go/bin/go version
-      - run:
-          name: Setup Rust language
-          command: |
-            set -e
-            set -v
-            curl https://sh.rustup.rs -sSf | sh -s -- -y
-            export PATH=${PATH}:~/.cargo/bin:/tmp/go/bin
-            rustup install 1.36.0
-            rustup default 1.36.0
       - run:
           name: Run test
           no_output_timeout: 20m
           command: |
             set -e
-            export PATH=${PATH}:~/.cargo/bin:/tmp/go/bin
-            go version
             cd packages/celotool
-            mkdir ~/.ssh/ && echo -e "Host github.com\n\tStrictHostKeyChecking no\n" > ~/.ssh/config
             ./ci_test_governance.sh checkout master
 
   end-to-end-geth-sync-test:
-    <<: *defaults
+    <<: *e2e-defaults
     # Source: https://circleci.com/docs/2.0/configuration-reference/#resource_class
     resource_class: medium+
     steps:
@@ -617,35 +559,14 @@ jobs:
             FILES_TO_CHECK="${PWD}/packages/celotool,${PWD}/packages/protocol,${PWD}/.circleci/config.yml"
             ./scripts/ci_check_if_test_should_run_v2.sh ${FILES_TO_CHECK}
       - run:
-          name: Setup Go language
-          command: |
-            set -e
-            set -v
-            wget https://dl.google.com/go/go1.11.5.linux-amd64.tar.gz
-            tar xf go1.11.5.linux-amd64.tar.gz -C /tmp
-            ls /tmp/go/bin/go
-            /tmp/go/bin/go version
-      - run:
-          name: Setup Rust language
-          command: |
-            set -e
-            set -v
-            curl https://sh.rustup.rs -sSf | sh -s -- -y
-            export PATH=${PATH}:~/.cargo/bin:/tmp/go/bin
-            rustup install 1.36.0
-            rustup default 1.36.0
-      - run:
           name: Run test
           command: |
             set -e
-            export PATH=${PATH}:~/.cargo/bin:/tmp/go/bin
-            go version
             cd packages/celotool
-            mkdir ~/.ssh/ && echo -e "Host github.com\n\tStrictHostKeyChecking no\n" > ~/.ssh/config
             ./ci_test_sync.sh checkout master
 
   end-to-end-geth-integration-sync-test:
-    <<: *defaults
+    <<: *e2e-defaults
     steps:
       - attach_workspace:
           at: ~/app
@@ -655,27 +576,29 @@ jobs:
             FILES_TO_CHECK="${PWD}/packages/celotool,${PWD}/packages/protocol,${PWD}/.circleci/config.yml"
             ./scripts/ci_check_if_test_should_run_v2.sh ${FILES_TO_CHECK}
       - run:
-          name: Setup Go language
+          name: Run test
           command: |
             set -e
-            set -v
-            wget https://dl.google.com/go/go1.11.5.linux-amd64.tar.gz
-            tar xf go1.11.5.linux-amd64.tar.gz -C /tmp
-            ls /tmp/go/bin/go
-            /tmp/go/bin/go version
-            curl https://sh.rustup.rs -sSf | sh -s -- -y
-            export PATH=${PATH}:~/.cargo/bin:/tmp/go/bin
-            rustup install 1.36.0
-            rustup default 1.36.0
+            cd packages/celotool
+            ./ci_test_sync_with_network.sh checkout master
+
+  end-to-end-geth-attestations-test:
+    <<: *e2e-defaults
+    resource_class: medium+
+    steps:
+      - attach_workspace:
+          at: ~/app
+      - run:
+          name: Check if the test should run
+          command: |
+            FILES_TO_CHECK="${PWD}/packages/celotool,${PWD}/packages/protocol,${PWD}/.circleci/config.yml"
+            ./scripts/ci_check_if_test_should_run_v2.sh ${FILES_TO_CHECK}
       - run:
           name: Run test
           command: |
             set -e
-            export PATH=${PATH}:~/.cargo/bin:/tmp/go/bin
-            go version
             cd packages/celotool
-            mkdir ~/.ssh/ && echo -e "Host github.com\n\tStrictHostKeyChecking no\n" > ~/.ssh/config
-            ./ci_test_sync_with_network.sh checkout master
+            ./ci_test_attestations.sh checkout master
 
   web:
     working_directory: ~/app
@@ -788,23 +711,27 @@ workflows:
       - end-to-end-geth-transfer-test:
           requires:
             - lint-checks
-            - walletkit-test
+            - contractkit-test
       - end-to-end-geth-exit-test:
           requires:
             - lint-checks
-            - walletkit-test
+            - contractkit-test
       - end-to-end-geth-governance-test:
           requires:
             - lint-checks
-            - walletkit-test
+            - contractkit-test
       - end-to-end-geth-sync-test:
           requires:
             - lint-checks
-            - walletkit-test
+            - contractkit-test
       - end-to-end-geth-integration-sync-test:
           requires:
             - lint-checks
-            - walletkit-test
+            - contractkit-test
+      - end-to-end-geth-attestations-test:
+          requires:
+            - lint-checks
+            - contractkit-test
   npm-install-testing-cron-workflow:
     triggers:
       - schedule:

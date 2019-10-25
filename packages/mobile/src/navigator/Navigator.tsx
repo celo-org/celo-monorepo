@@ -26,7 +26,12 @@ import AppLoading from 'src/app/AppLoading'
 import Debug from 'src/app/Debug'
 import ErrorScreen from 'src/app/ErrorScreen'
 import UpgradeScreen from 'src/app/UpgradeScreen'
-import Backup from 'src/backup/Backup'
+import BackupComplete from 'src/backup/BackupComplete'
+import BackupIntroduction from 'src/backup/BackupIntroduction'
+import BackupPhrase from 'src/backup/BackupPhrase'
+import BackupQuiz from 'src/backup/BackupQuiz'
+import BackupSocial from 'src/backup/BackupSocial'
+import BackupSocialIntro from 'src/backup/BackupSocialIntro'
 import DappKitAccountScreen from 'src/dappkit/DappKitAccountScreen'
 import DappKitSignTxScreen from 'src/dappkit/DappKitSignTxScreen'
 import DappKitTxDataScreen from 'src/dappkit/DappKitTxDataScreen'
@@ -36,6 +41,8 @@ import ExchangeTradeScreen from 'src/exchange/ExchangeTradeScreen'
 import FeeExchangeEducation from 'src/exchange/FeeExchangeEducation'
 import ImportContacts from 'src/import/ImportContacts'
 import ImportWallet from 'src/import/ImportWallet'
+import ImportWalletEmpty from 'src/import/ImportWalletEmpty'
+import ImportWalletSocial from 'src/import/ImportWalletSocial'
 import EnterInviteCode from 'src/invite/EnterInviteCode'
 import JoinCelo from 'src/invite/JoinCelo'
 import Language from 'src/language/Language'
@@ -102,6 +109,8 @@ const NuxStack = createStackNavigator(
     [Screens.PincodeSet]: { screen: PincodeSet },
     [Screens.EnterInviteCode]: { screen: EnterInviteCode },
     [Screens.ImportWallet]: { screen: ImportWallet },
+    [Screens.ImportWalletSocial]: { screen: ImportWalletSocial },
+    [Screens.ImportWalletEmpty]: { screen: ImportWalletEmpty },
     [Screens.ImportContacts]: { screen: ImportContacts },
     [Screens.VerifyEducation]: { screen: VerifyEducation },
     [Screens.VerifyInput]: { screen: VerifyInput },
@@ -118,6 +127,7 @@ const NuxStack = createStackNavigator(
 const SendStack = createStackNavigator(
   {
     [Screens.Send]: { screen: Send },
+    [Screens.QRScanner]: { screen: QRScanner },
     [Screens.SendAmount]: { screen: SendAmount },
     [Screens.SendConfirmation]: { screen: SendConfirmation },
     [Screens.PaymentRequestConfirmation]: { screen: PaymentRequestConfirmation },
@@ -128,6 +138,23 @@ const SendStack = createStackNavigator(
     },
     ...headerArea,
     initialRouteName: Screens.Send,
+  }
+)
+
+const QRSendStack = createStackNavigator(
+  {
+    [Screens.QRCode]: { screen: QRCode },
+    [Screens.QRScanner]: { screen: QRScanner },
+    [Screens.SendAmount]: { screen: SendAmount },
+    [Screens.SendConfirmation]: { screen: SendConfirmation },
+    [Screens.PaymentRequestConfirmation]: { screen: PaymentRequestConfirmation },
+  },
+  {
+    navigationOptions: {
+      header: null,
+    },
+    ...headerArea,
+    initialRouteName: Screens.QRCode,
   }
 )
 
@@ -161,30 +188,61 @@ const RequestStack = createStackNavigator(
   }
 )
 
-const AppStack = createStackNavigator(
+const BackupStack = createStackNavigator(
   {
-    [Screens.TabNavigator]: { screen: TabNavigator },
-    [Stacks.SendStack]: { screen: SendStack },
-    [Stacks.ExchangeStack]: { screen: ExchangeStack },
-    [Stacks.RequestStack]: { screen: RequestStack },
+    [Screens.BackupIntroduction]: { screen: BackupIntroduction },
+    [Screens.BackupPhrase]: { screen: BackupPhrase },
+    [Screens.BackupQuiz]: { screen: BackupQuiz },
+    [Screens.BackupSocialIntro]: { screen: BackupSocialIntro },
+    [Screens.BackupSocial]: { screen: BackupSocial },
+    [Screens.BackupComplete]: { screen: BackupComplete },
+  },
+  {
+    navigationOptions: {
+      header: null,
+    },
+    ...headerArea,
+    initialRouteName: Screens.BackupIntroduction,
+  }
+)
+
+const SettingsStack = createStackNavigator(
+  {
+    [Screens.Account]: { screen: Account },
+    [Stacks.BackupStack]: { screen: BackupStack },
     [Screens.Language]: { screen: Language },
     [Screens.Analytics]: { screen: Analytics },
     [Screens.CeloLite]: { screen: CeloLite },
-    [Screens.SetClock]: { screen: SetClock },
     [Screens.EditProfile]: { screen: EditProfile },
     [Screens.Profile]: { screen: Profile },
-    [Screens.Account]: { screen: Account },
     [Screens.Invite]: { screen: Invite },
     [Screens.InviteReview]: { screen: InviteReview },
     [Screens.SelectLocalCurrency]: { screen: SelectLocalCurrency },
     [Screens.Licenses]: { screen: Licenses },
+  },
+  {
+    navigationOptions: {
+      header: null,
+    },
+    ...headerArea,
+    initialRouteName: Screens.Account,
+  }
+)
+
+const AppStack = createStackNavigator(
+  {
+    // Note, WalletHome isn't in this stack because it's part of the tab navigator
+    [Screens.TabNavigator]: { screen: TabNavigator },
+    [Stacks.SendStack]: { screen: SendStack },
+    [Stacks.QRSendStack]: { screen: QRSendStack },
+    [Stacks.ExchangeStack]: { screen: ExchangeStack },
+    [Stacks.RequestStack]: { screen: RequestStack },
+    [Stacks.SettingsStack]: { screen: SettingsStack },
+    [Screens.SetClock]: { screen: SetClock },
     [Screens.DollarEducation]: { screen: DollarEducation },
     [Screens.TransactionReview]: { screen: TransactionReviewScreen },
     [Screens.PhotosEducation]: { screen: PhotosEducation },
-    [Screens.QRCode]: { screen: QRCode },
-    [Screens.QRScanner]: { screen: QRScanner },
     [Screens.GoldEducation]: { screen: GoldEducation },
-    [Screens.Backup]: { screen: Backup },
     [Screens.PaymentRequestListScreen]: { screen: PaymentRequestListScreen },
     [Screens.ReclaimPaymentConfirmationScreen]: {
       screen: ReclaimPaymentConfirmationScreen,

@@ -93,15 +93,15 @@ export class NotificationBox extends React.Component<Props, State> {
 
     if (!backupCompleted) {
       actions.push({
-        title: t('getBackupKey'),
-        text: t('setBackupKey'),
+        title: t('backupKeyFlow6:yourBackupKey'),
+        text: t('backupKeyFlow6:backupKeyNotification'),
         image: backupIcon,
         ctaList: [
           {
-            text: t('getBackupKey'),
+            text: t('backupKeyFlow6:getBackupKey'),
             onPress: () => {
               CeloAnalytics.track(CustomEventNames.get_backup_key)
-              navigate(Screens.Backup)
+              navigate(Screens.BackupIntroduction)
             },
           },
         ],

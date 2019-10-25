@@ -149,6 +149,12 @@ exports[`PaymentRequestListItem renders correctly 1`] = `
               accessible={true}
               focusable={true}
               isTVSelectable={true}
+              nativeBackgroundAndroid={
+                Object {
+                  "attribute": "selectableItemBackgroundBorderless",
+                  "type": "ThemeAttrAndroid",
+                }
+              }
               onClick={[Function]}
               onResponderGrant={[Function]}
               onResponderMove={[Function]}
@@ -156,11 +162,6 @@ exports[`PaymentRequestListItem renders correctly 1`] = `
               onResponderTerminate={[Function]}
               onResponderTerminationRequest={[Function]}
               onStartShouldSetResponder={[Function]}
-              style={
-                Object {
-                  "opacity": 1,
-                }
-              }
             >
               <Text
                 style={
@@ -190,6 +191,12 @@ exports[`PaymentRequestListItem renders correctly 1`] = `
               accessible={true}
               focusable={true}
               isTVSelectable={true}
+              nativeBackgroundAndroid={
+                Object {
+                  "attribute": "selectableItemBackgroundBorderless",
+                  "type": "ThemeAttrAndroid",
+                }
+              }
               onClick={[Function]}
               onResponderGrant={[Function]}
               onResponderMove={[Function]}
@@ -197,11 +204,6 @@ exports[`PaymentRequestListItem renders correctly 1`] = `
               onResponderTerminate={[Function]}
               onResponderTerminationRequest={[Function]}
               onStartShouldSetResponder={[Function]}
-              style={
-                Object {
-                  "opacity": 1,
-                }
-              }
             >
               <Text
                 style={

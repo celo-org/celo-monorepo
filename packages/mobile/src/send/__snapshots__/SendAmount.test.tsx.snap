@@ -264,20 +264,14 @@ exports[`SendAmount renders correctly for request payment confirmation 1`] = `
             placeholderTextColor="#A3EBC6"
             rejectResponderTermination={true}
             style={
-              Array [
-                Object {
-                  "fontFamily": "Hind-Regular",
-                },
-                Object {
-                  "borderColor": "#D1D5D8",
-                  "borderRadius": 3,
-                  "padding": 8,
-                },
-                Object {
-                  "backgroundColor": "#FFFFFF",
-                  "flex": 1,
-                },
-              ]
+              Object {
+                "backgroundColor": "#FFFFFF",
+                "borderColor": "#D1D5D8",
+                "borderRadius": 3,
+                "flex": 1,
+                "fontFamily": "Hind-Regular",
+                "padding": 8,
+              }
             }
             title="MXN"
             underlineColorAndroid="transparent"
@@ -372,20 +366,14 @@ exports[`SendAmount renders correctly for request payment confirmation 1`] = `
             placeholderTextColor="rgba(0, 0, 0, .4)"
             rejectResponderTermination={true}
             style={
-              Array [
-                Object {
-                  "fontFamily": "Hind-Regular",
-                },
-                Object {
-                  "borderColor": "#D1D5D8",
-                  "borderRadius": 3,
-                  "padding": 8,
-                },
-                Object {
-                  "backgroundColor": "#FFFFFF",
-                  "flex": 1,
-                },
-              ]
+              Object {
+                "backgroundColor": "#FFFFFF",
+                "borderColor": "#D1D5D8",
+                "borderRadius": 3,
+                "flex": 1,
+                "fontFamily": "Hind-Regular",
+                "padding": 8,
+              }
             }
             title="for"
             underlineColorAndroid="transparent"
