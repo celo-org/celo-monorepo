@@ -32,7 +32,7 @@ import { Screens } from 'src/navigator/Screens'
 import { waitWeb3LastBlock } from 'src/networkInfo/saga'
 import { getSendTxGas } from 'src/send/saga'
 import { fetchDollarBalance, transferStableToken } from 'src/stableToken/actions'
-import { createTransaction, fetchTokenBalanceWithRetry } from 'src/tokens/saga'
+import { createTransaction, fetchTokenBalanceInWeiWithRetry } from 'src/tokens/saga'
 import { generateStandbyTransactionId } from 'src/transactions/actions'
 import { waitForTransactionWithId } from 'src/transactions/saga'
 import { sendTransaction } from 'src/transactions/send'
@@ -220,7 +220,7 @@ export function* doRedeemInvite(inviteCode: string) {
     const tempAccount = web3.eth.accounts.privateKeyToAccount(inviteCode).address
     Logger.debug(`TAG@doRedeemInvite`, 'Invite code contains temp account', tempAccount)
     const tempAccountBalanceWei: BigNumber = yield call(
-      fetchTokenBalanceWithRetry,
+      fetchTokenBalanceInWeiWithRetry,
       CURRENCY_ENUM.DOLLAR,
       tempAccount
     )

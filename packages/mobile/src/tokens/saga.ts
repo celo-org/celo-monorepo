@@ -134,14 +134,13 @@ export async function createTransaction(
   return tx
 }
 
-export async function fetchTokenBalanceWithRetry(token: CURRENCY_ENUM, account: string) {
-  Logger.debug(TAG + '@fetchTokenBalanceWithRetry', 'Checking account balance', account)
+export async function fetchTokenBalanceInWeiWithRetry(token: CURRENCY_ENUM, account: string) {
+  Logger.debug(TAG + '@fetchTokenBalanceInWeiWithRetry', 'Checking account balance', account)
   const tokenContract = await getTokenContract(token)
   // Retry needed here because it's typically the app's first tx and seems to fail on occasion
   const balanceInWei = await retryAsync(tokenContract.balanceOf, 3, [account])
-  const balance = await convertFromContractDecimals(balanceInWei, token)
-  Logger.debug(TAG + '@fetchTokenBalanceWithRetry', 'Account balance', balance.toString())
-  return balance
+  Logger.debug(TAG + '@fetchTokenBalanceInWeiWithRetry', 'Account balance', balanceInWei.toString())
+  return balanceInWei
 }
 
 export function tokenTransferFactory({
