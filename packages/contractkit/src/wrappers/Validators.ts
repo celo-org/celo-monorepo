@@ -129,6 +129,7 @@ export class ValidatorsWrapper extends BaseWrapper<Validators> {
       address,
       publicKey: res[0] as any,
       affiliation: res[1],
+      score: res[2],
     }
   }
 
