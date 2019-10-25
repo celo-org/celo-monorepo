@@ -14,7 +14,7 @@ import {
 import { importBackupPhraseSaga } from 'src/import/saga'
 import { redeemInviteSuccess } from 'src/invite/actions'
 import { waitWeb3LastBlock } from 'src/networkInfo/saga'
-import { fetchTokenBalanceWithRetry } from 'src/tokens/saga'
+import { fetchTokenBalanceInWeiWithRetry } from 'src/tokens/saga'
 import { setKey } from 'src/utils/keyStore'
 import { assignAccountFromPrivateKey } from 'src/web3/saga'
 import { mockAccount } from 'test/values'
@@ -30,7 +30,7 @@ describe('Import wallet saga', () => {
     await expectSaga(importBackupPhraseSaga, { phrase: mockPhraseValid, useEmptyWallet: false })
       .provide([
         [call(waitWeb3LastBlock), true],
-        [matchers.call.fn(fetchTokenBalanceWithRetry), new BigNumber(10)],
+        [matchers.call.fn(fetchTokenBalanceInWeiWithRetry), new BigNumber(10)],
         [matchers.call.fn(assignAccountFromPrivateKey), mockAccount],
         [call(setKey, 'mnemonic', mockPhraseValid), true],
       ])
@@ -55,7 +55,7 @@ describe('Import wallet saga', () => {
     await expectSaga(importBackupPhraseSaga, { phrase: mockPhraseValid, useEmptyWallet: false })
       .provide([
         [call(waitWeb3LastBlock), true],
-        [matchers.call.fn(fetchTokenBalanceWithRetry), new BigNumber(0)],
+        [matchers.call.fn(fetchTokenBalanceInWeiWithRetry), new BigNumber(0)],
       ])
       .put(backupPhraseEmpty())
       .run()
