@@ -5,11 +5,9 @@ import * as chaiSubset from 'chai-subset'
 import { spawn } from 'child_process'
 import { keccak256 } from 'ethereumjs-util'
 import {
-  ExchangeInstance,
   ProxyInstance,
   RegistryInstance,
   ReserveInstance,
-  StableTokenInstance,
   UsingRegistryInstance,
 } from 'types'
 const soliditySha3 = new (require('web3'))().utils.soliditySha3
@@ -83,6 +81,12 @@ export async function jsonRpc(web3: Web3, method: string, params: any[] = []): P
 export async function timeTravel(seconds: number, web3: Web3) {
   await jsonRpc(web3, 'evm_increaseTime', [seconds])
   await jsonRpc(web3, 'evm_mine', [])
+}
+
+export async function mineBlocks(blocks: number, web3: Web3) {
+  for (let i = 0; i < blocks; i++) {
+    await jsonRpc(web3, 'evm_mine', [])
+  }
 }
 
 export async function assertBalance(address: string, balance: BigNumber) {
@@ -178,16 +182,6 @@ export const assertContractsOwnedByMultiSig = async (getContract: any) => {
   }
 }
 
-export const assertStableTokenMinter = async (getContract: any) => {
-  const stableToken: StableTokenInstance = await getContract('StableToken', 'proxiedContract')
-  const exchange: ExchangeInstance = await getContract('Exchange', 'proxiedContract')
-  assert.equal(
-    await stableToken.minter(),
-    exchange.address,
-    'StableToken minter not set to Exchange'
-  )
-}
-
 export const assertFloatEquality = (
   a: BigNumber,
   b: BigNumber,
@@ -243,6 +237,11 @@ export function assertEqualBN(
     web3.utils.toBN(value).eq(web3.utils.toBN(expected)),
     `expected ${expected.toString()} and got ${value.toString()}. ${msg || ''}`
   )
+}
+
+export function assertEqualBNArray(value: number[] | BN[] | BigNumber[], expected: number[] | BN[] | BigNumber[], msg?: string) {
+  assert.equal(value.length, expected.length, msg)
+  value.forEach((x, i) => assertEqualBN(x, expected[i]))
 }
 
 export function assertGteBN(
