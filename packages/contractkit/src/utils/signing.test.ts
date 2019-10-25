@@ -10,7 +10,7 @@ import { ACCOUNT_PRIVATE_KEYS } from '../test-utils/ganache.setup'
 // This only really tests signatureUtils in @celo/utils, but is tested here
 // to avoid the web3/ganache setup in @celo/utils
 testWithGanache('Signing', (web3) => {
-  it('signs a message the same way natively and with an explicit private key', async () => {
+  it('signs a message the same way via RPC and with an explicit private key', async () => {
     const accounts = await web3.eth.getAccounts()
     const account = accounts[0]
     const message = 'message'
@@ -23,7 +23,9 @@ testWithGanache('Signing', (web3) => {
     expect(nativeSignature).toEqual(simulatedSignature)
   })
 
-  it('signs a message that was hashed the same way natively and with an explicit private key', async () => {
+  it('signs a message that was hashed the same way via RPC and with an explicit private key', async () => {
+    // This test checks that the prefixing in `signMessage` appropriately considers hex strings
+    // as bytes the same way the native RPC signing would
     const accounts = await web3.eth.getAccounts()
     const account = accounts[0]
     const message = web3.utils.soliditySha3('message')

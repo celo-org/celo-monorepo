@@ -35,10 +35,10 @@ export async function signMessageNatively(
 }
 
 export function signMessage(message: string, privateKey: string, address: string) {
-  return signMessageHash(hashMessageWithPrefix(message), privateKey, address)
+  return signMessageNoPrefix(hashMessageWithPrefix(message), privateKey, address)
 }
 
-export function signMessageHash(messageHash: string, privateKey: string, address: string) {
+export function signMessageNoPrefix(messageHash: string, privateKey: string, address: string) {
   const publicKey = ethjsutil.privateToPublic(ethjsutil.toBuffer(privateKey))
   const derivedAddress: string = ethjsutil.bufferToHex(ethjsutil.pubToAddress(publicKey))
   if (derivedAddress.toLowerCase() !== address.toLowerCase()) {
@@ -70,14 +70,10 @@ export function serializeSignature(signature: Signature) {
 }
 
 export function parseSignature(message: string, signature: string, signer: string) {
-  return parseSignatureForMessageHash(hashMessageWithPrefix(message), signature, signer)
+  return parseSignatureNoPrefix(hashMessageWithPrefix(message), signature, signer)
 }
 
-export function parseSignatureForMessageHash(
-  messageHash: string,
-  signature: string,
-  signer: string
-) {
+export function parseSignatureNoPrefix(messageHash: string, signature: string, signer: string) {
   let { r, s, v } = parseSignatureAsRsv(signature.slice(2))
   if (isValidSignature(signer, messageHash, v, r, s)) {
     return { v, r, s }
@@ -164,9 +160,10 @@ export function areAddressesEqual(address1: string | null, address2: string | nu
 
 export const SignatureUtils = {
   signMessage,
-  signMessageHash,
+  signMessageNatively,
+  signMessageNoPrefix,
   parseSignature,
-  parseSignatureForMessageHash,
+  parseSignatureNoPrefix,
   stripHexLeader,
   ensureHexLeader,
   serializeSignature,
