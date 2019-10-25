@@ -186,13 +186,7 @@ Where `YOUR_BUILD_VARIANT` can be any of the app's build variants, such as debug
 
 On android, the wallet app uses the SMS Retriever API to automatically input codes during phone number verification.
 
-The service that route SMS messages to the app needs to be configured to [append this app signature to the message][sms retriever]. To generate the code for an app build, run the following:
-
-```sh
-keytool -exportcert -alias celo-key-alias -keystore celo-release-key.keystore | xxd -p | tr -d "[:space:]" | echo -n org.celo.mobile.YOUR_BUILD_VARIANT_HERE `cat` | shasum -a 256 | tr -d "[:space:]-" | xxd -r -p | base64 | cut -c1-11
-```
-
-_Note: This will only work if you have the real keystore in place, not a fake one for testing._
+The service that route SMS messages to the app needs to be configured to [append this app signature to the message][sms retriever]. Note, the signature will need to be computed using the signing key from the google play dashboard.
 
 ## Generating GraphQL Types
 
