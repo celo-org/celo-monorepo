@@ -5,6 +5,7 @@ import {
   assertLogMatches,
   assertLogMatches2,
   assertRevert,
+  NULL_ADDRESS,
   timeTravel,
 } from '@celo/protocol/lib/test-utils'
 import BigNumber from 'bignumber.js'
@@ -63,13 +64,11 @@ contract('LockedGold', (accounts: string[]) => {
     authorizationTests.voter = {
       fn: lockedGold.authorizeVoter,
       getAuthorizedFromAccount: lockedGold.getVoterFromAccount,
-      getAccountFromActiveAuthorized: lockedGold.getAccountFromActiveVoter,
       getAccountFromAuthorized: lockedGold.getAccountFromVoter,
     }
     authorizationTests.validator = {
       fn: lockedGold.authorizeValidator,
       getAuthorizedFromAccount: lockedGold.getValidatorFromAccount,
-      getAccountFromActiveAuthorized: lockedGold.getAccountFromActiveValidator,
       getAccountFromAuthorized: lockedGold.getAccountFromValidator,
     }
   })
@@ -153,8 +152,9 @@ contract('LockedGold', (accounts: string[]) => {
 
         it(`should set the authorized ${key}`, async () => {
           await authorizationTest.fn(authorized, sig.v, sig.r, sig.s)
+          assert.equal(await lockedGold.authorizedBy(authorized), account)
           assert.equal(await authorizationTest.getAuthorizedFromAccount(account), authorized)
-          assert.equal(await authorizationTest.getAccountFromActiveAuthorized(authorized), account)
+          assert.equal(await authorizationTest.getAccountFromAuthorized(authorized), account)
         })
 
         it(`should emit a ${capitalize(key)}Authorized event`, async () => {
@@ -199,15 +199,13 @@ contract('LockedGold', (accounts: string[]) => {
           })
 
           it(`should set the new authorized ${key}`, async () => {
+            assert.equal(await lockedGold.authorizedBy(newAuthorized), account)
             assert.equal(await authorizationTest.getAuthorizedFromAccount(account), newAuthorized)
-            assert.equal(
-              await authorizationTest.getAccountFromActiveAuthorized(newAuthorized),
-              account
-            )
+            assert.equal(await authorizationTest.getAccountFromAuthorized(newAuthorized), account)
           })
 
-          it('should preserve the previous authorization', async () => {
-            assert.equal(await authorizationTest.getAccountFromAuthorized(authorized), account)
+          it('should reset the previous authorization', async () => {
+            assert.equal(await lockedGold.authorizedBy(authorized), NULL_ADDRESS)
           })
         })
       })
@@ -215,11 +213,11 @@ contract('LockedGold', (accounts: string[]) => {
       describe(`#getAccountFrom${capitalize(key)}()`, () => {
         describe(`when the account has not authorized a ${key}`, () => {
           it('should return the account when passed the account', async () => {
-            assert.equal(await authorizationTest.getAccountFromActiveAuthorized(account), account)
+            assert.equal(await authorizationTest.getAccountFromAuthorized(account), account)
           })
 
           it('should revert when passed an address that is not an account', async () => {
-            await assertRevert(authorizationTest.getAccountFromActiveAuthorized(accounts[1]))
+            await assertRevert(authorizationTest.getAccountFromAuthorized(accounts[1]))
           })
         })
 
@@ -231,14 +229,11 @@ contract('LockedGold', (accounts: string[]) => {
           })
 
           it('should return the account when passed the account', async () => {
-            assert.equal(await authorizationTest.getAccountFromActiveAuthorized(account), account)
+            assert.equal(await authorizationTest.getAccountFromAuthorized(account), account)
           })
 
           it(`should return the account when passed the ${key}`, async () => {
-            assert.equal(
-              await authorizationTest.getAccountFromActiveAuthorized(authorized),
-              account
-            )
+            assert.equal(await authorizationTest.getAccountFromAuthorized(authorized), account)
           })
         })
       })

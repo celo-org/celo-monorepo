@@ -21,6 +21,7 @@ export default class ValidatorGroupList extends BaseCommand {
     cli.table(vgroups, {
       address: {},
       name: {},
+      url: {},
       commission: { get: (r) => r.commission.toFixed() },
       members: { get: (r) => r.members.length },
     })

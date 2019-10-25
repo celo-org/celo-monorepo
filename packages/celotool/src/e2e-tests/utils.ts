@@ -318,23 +318,13 @@ export async function startGeth(gethBinaryPath: string, instance: GethInstanceCo
   return instance
 }
 
-export async function migrateContracts(
-  validatorPrivateKeys: string[],
-  validators: string[],
-  to: number = 1000
-) {
+export async function migrateContracts(validatorPrivateKeys: string[], to: number = 1000) {
   const migrationOverrides = {
     validators: {
       validatorKeys: validatorPrivateKeys.map(ensure0x),
     },
     election: {
       minElectableValidators: '1',
-    },
-    stableToken: {
-      initialBalances: {
-        addresses: validators.map(ensure0x),
-        values: validators.map(() => '10000000000000000000000'),
-      },
     },
   }
   const args = [
@@ -435,11 +425,7 @@ export function getContext(gethConfig: GethTestConfig) {
       await initAndStartGeth(gethBinaryPath, instance)
     }
     if (gethConfig.migrate || gethConfig.migrateTo) {
-      await migrateContracts(
-        validatorPrivateKeys,
-        validators.map((x) => x.address),
-        gethConfig.migrateTo
-      )
+      await migrateContracts(validatorPrivateKeys, gethConfig.migrateTo)
     }
     await killGeth()
     await sleep(2)

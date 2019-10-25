@@ -64,6 +64,7 @@ async function registerValidatorGroup(
   // @ts-ignore
   const tx = validators.contract.methods.registerValidatorGroup(
     `${config.validators.groupName} ${encodedKey}`,
+    config.validators.groupUrl,
     toFixed(config.validators.commission).toString()
   )
 
@@ -99,7 +100,11 @@ async function registerValidator(
   )
 
   // @ts-ignore
-  const registerTx = validators.contract.methods.registerValidator(address, add0x(publicKeysData))
+  const registerTx = validators.contract.methods.registerValidator(
+    address,
+    config.validators.groupUrl,
+    add0x(publicKeysData)
+  )
 
   await sendTransactionWithPrivateKey(web3, registerTx, validatorPrivateKey, {
     to: validators.address,
@@ -156,23 +161,21 @@ module.exports = async (_deployer: any) => {
   )
 
   console.info('  Adding Validators to Validator Group ...')
-  for (let i = 0; i < valKeys.length; i++) {
-    const key = valKeys[i]
+  for (const key of valKeys) {
     const address = generateAccountAddressFromPrivateKey(key.slice(2))
-    if (i === 0) {
-      // @ts-ignore
-      const addTx = validators.contract.methods.addFirstMember(address, NULL_ADDRESS, NULL_ADDRESS)
-      await sendTransactionWithPrivateKey(web3, addTx, account.privateKey, {
-        to: validators.address,
-      })
-    } else {
-      // @ts-ignore
-      const addTx = validators.contract.methods.addMember(address)
-      await sendTransactionWithPrivateKey(web3, addTx, account.privateKey, {
-        to: validators.address,
-      })
-    }
+    // @ts-ignore
+    const addTx = validators.contract.methods.addMember(address)
+    await sendTransactionWithPrivateKey(web3, addTx, account.privateKey, {
+      to: validators.address,
+    })
   }
+
+  console.info('  Marking Validator Group as eligible for election ...')
+  // @ts-ignore
+  const markTx = election.contract.methods.markGroupEligible(NULL_ADDRESS, NULL_ADDRESS)
+  await sendTransactionWithPrivateKey(web3, markTx, account.privateKey, {
+    to: election.address,
+  })
 
   console.info('  Voting for Validator Group ...')
   // Make another deposit so our vote has more weight.

@@ -1,4 +1,3 @@
-import { CeloContractName } from '@celo/protocol/lib/registry-utils'
 import {
   assertEqualBN,
   assertLogMatches2,
@@ -88,10 +87,10 @@ contract('Exchange', (accounts: string[]) => {
   beforeEach(async () => {
     registry = await Registry.new()
     goldToken = await GoldToken.new()
-    await registry.setAddressFor(CeloContractName.GoldToken, goldToken.address)
+    await registry.setAddressFor('GoldToken', goldToken.address)
 
     mockReserve = await MockReserve.new()
-    await registry.setAddressFor(CeloContractName.Reserve, mockReserve.address)
+    await registry.setAddressFor('Reserve', mockReserve.address)
     await mockReserve.setGoldToken(goldToken.address)
 
     stableToken = await StableToken.new()
@@ -102,13 +101,11 @@ contract('Exchange', (accounts: string[]) => {
       decimals,
       registry.address,
       fixed1,
-      SECONDS_IN_A_WEEK,
-      [],
-      []
+      SECONDS_IN_A_WEEK
     )
 
     mockSortedOracles = await MockSortedOracles.new()
-    await registry.setAddressFor(CeloContractName.SortedOracles, mockSortedOracles.address)
+    await registry.setAddressFor('SortedOracles', mockSortedOracles.address)
     await mockSortedOracles.setMedianRate(
       stableToken.address,
       stableAmountForRate,
@@ -128,7 +125,8 @@ contract('Exchange', (accounts: string[]) => {
       updateFrequency,
       minimumReports
     )
-    await registry.setAddressFor(CeloContractName.Exchange, exchange.address)
+
+    await stableToken.setMinter(exchange.address)
   })
 
   describe('#initialize()', () => {
@@ -590,9 +588,9 @@ contract('Exchange', (accounts: string[]) => {
       let oldGoldBalance: BigNumber
       let oldReserveGoldBalance: BigNumber
       beforeEach(async () => {
-        await registry.setAddressFor(CeloContractName.Exchange, owner)
+        await stableToken.setMinter(owner)
         await stableToken.mint(user, stableTokenBalance)
-        await registry.setAddressFor(CeloContractName.Exchange, exchange.address)
+        await stableToken.setMinter(exchange.address)
 
         oldReserveGoldBalance = await goldToken.balanceOf(mockReserve.address)
         await stableToken.approve(exchange.address, stableTokenBalance, { from: user })

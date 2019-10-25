@@ -14,14 +14,15 @@ import {
 export interface Validator {
   address: Address
   name: string
+  url: string
   publicKey: string
   affiliation: string | null
-  score: BigNumber
 }
 
 export interface ValidatorGroup {
   address: Address
   name: string
+  url: string
   members: Address[]
   commission: BigNumber
 }
@@ -45,36 +46,19 @@ export interface ValidatorsConfig {
 /**
  * Contract for voting for validators and managing validator groups.
  */
-// TODO(asa): Support authorized validators
 export class ValidatorsWrapper extends BaseWrapper<Validators> {
   affiliate = proxySend(this.kit, this.contract.methods.affiliate)
   deaffiliate = proxySend(this.kit, this.contract.methods.deaffiliate)
-  removeMember = proxySend(this.kit, this.contract.methods.removeMember)
   registerValidator = proxySend(this.kit, this.contract.methods.registerValidator)
   async registerValidatorGroup(
     name: string,
+    url: string,
     commission: BigNumber
   ): Promise<CeloTransactionObject<boolean>> {
     return toTransactionObject(
       this.kit,
-      this.contract.methods.registerValidatorGroup(name, toFixed(commission).toFixed())
+      this.contract.methods.registerValidatorGroup(name, url, toFixed(commission).toFixed())
     )
-  }
-  async addMember(group: string, member: string): Promise<CeloTransactionObject<boolean>> {
-    const numMembers = await this.getGroupNumMembers(group)
-    if (numMembers.isZero()) {
-      const election = await this.kit.contracts.getElection()
-      const voteWeight = await election.getTotalVotesForGroup(group)
-      const { lesser, greater } = await election.findLesserAndGreaterAfterVote(group, voteWeight)
-
-      return toTransactionObject(
-        this.kit,
-        this.contract.methods.addFirstMember(member, lesser, greater),
-        { from: group }
-      )
-    } else {
-      return toTransactionObject(this.kit, this.contract.methods.addMember(member), { from: group })
-    }
   }
   /**
    * Returns the current registration requirements.
@@ -133,9 +117,9 @@ export class ValidatorsWrapper extends BaseWrapper<Validators> {
     return {
       address,
       name: res[0],
-      publicKey: res[1] as any,
-      affiliation: res[2],
-      score: fromFixed(new BigNumber(res[3])),
+      url: res[1],
+      publicKey: res[2] as any,
+      affiliation: res[3],
     }
   }
 
@@ -152,6 +136,9 @@ export class ValidatorsWrapper extends BaseWrapper<Validators> {
    * @return Whether a particular address is a registered validator group.
    */
   isValidatorGroup = proxyCall(this.contract.methods.isValidatorGroup)
+
+  addMember = proxySend(this.kit, this.contract.methods.addMember)
+  removeMember = proxySend(this.kit, this.contract.methods.removeMember)
 
   async reorderMember(groupAddr: Address, validator: Address, newIndex: number) {
     const group = await this.getValidatorGroup(groupAddr)
@@ -193,8 +180,9 @@ export class ValidatorsWrapper extends BaseWrapper<Validators> {
     return {
       address,
       name: res[0],
-      members: res[1],
-      commission: fromFixed(new BigNumber(res[2])),
+      url: res[1],
+      members: res[2],
+      commission: fromFixed(new BigNumber(res[3])),
     }
   }
 }

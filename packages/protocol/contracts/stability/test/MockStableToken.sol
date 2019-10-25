@@ -11,7 +11,6 @@ contract MockStableToken {
   bool public _needsRebase;
   uint256 public _totalSupply;
   uint256 public _targetTotalSupply;
-  mapping (address => uint256) public balanceOf;
 
   function setNeedsRebase() external {
     _needsRebase = true;
@@ -25,8 +24,7 @@ contract MockStableToken {
     _targetTotalSupply = value;
   }
 
-  function mint(address to, uint256 value) external returns (bool) {
-    balanceOf[to] = balanceOf[to] + value;
+  function mint(address, uint256) external pure returns (bool) {
     return true;
   }
 

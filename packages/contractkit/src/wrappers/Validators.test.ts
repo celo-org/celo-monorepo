@@ -45,6 +45,7 @@ testWithGanache('Validators Wrapper', (web3) => {
     await registerAccountWithLockedGold(groupAccount)
     await (await validators.registerValidatorGroup(
       'The Group',
+      'thegroup.com',
       new BigNumber(0.1)
     )).sendAndWaitForReceipt({ from: groupAccount })
   }
@@ -55,6 +56,7 @@ testWithGanache('Validators Wrapper', (web3) => {
     await validators
       .registerValidator(
         'Good old validator',
+        'goodold.com',
         // @ts-ignore
         publicKeysData
       )
@@ -79,7 +81,7 @@ testWithGanache('Validators Wrapper', (web3) => {
     await setupGroup(groupAccount)
     await setupValidator(validatorAccount)
     await validators.affiliate(groupAccount).sendAndWaitForReceipt({ from: validatorAccount })
-    await (await validators.addMember(groupAccount, validatorAccount)).sendAndWaitForReceipt()
+    await validators.addMember(validatorAccount).sendAndWaitForReceipt({ from: groupAccount })
 
     const members = await validators.getValidatorGroup(groupAccount).then((group) => group.members)
     expect(members).toContain(validatorAccount)
@@ -98,7 +100,7 @@ testWithGanache('Validators Wrapper', (web3) => {
       for (const validator of [validator1, validator2]) {
         await setupValidator(validator)
         await validators.affiliate(groupAccount).sendAndWaitForReceipt({ from: validator })
-        await (await validators.addMember(groupAccount, validator)).sendAndWaitForReceipt()
+        await validators.addMember(validator).sendAndWaitForReceipt({ from: groupAccount })
       }
 
       const members = await validators

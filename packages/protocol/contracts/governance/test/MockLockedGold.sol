@@ -36,17 +36,7 @@ contract MockLockedGold is ILockedGold {
     }
   }
 
-  function getAccountFromActiveValidator(
-    address accountOrValidator
-  )
-    external
-    view
-    returns (address)
-  {
-    return accountOrValidator;
-  }
-
-  function getAccountFromActiveVoter(address accountOrVoter) external view returns (address) {
+  function getAccountFromVoter(address accountOrVoter) external view returns (address) {
     return accountOrVoter;
   }
 
