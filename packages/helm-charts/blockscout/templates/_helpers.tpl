@@ -18,16 +18,16 @@ volumes:
 {{- end -}}
 
 {{- define "celo.blockscout-env-vars" -}}
-- name: DATABASE_USER
+- name: DB_USERNAME
   valueFrom:
     secretKeyRef:
       name: {{ .Release.Namespace }}-blockscout
-      key: DATABASE_USER
-- name: DATABASE_PASSWORD
+      key: DB_USERNAME
+- name: DB_PASSWORD
   valueFrom:
     secretKeyRef:
       name: {{ .Release.Namespace }}-blockscout
-      key: DATABASE_PASSWORD
+      key: DB_PASSWORD
 - name: NETWORK
   value: Celo
 - name: SUBNETWORK
@@ -43,17 +43,7 @@ volumes:
 - name: ETHEREUM_JSONRPC_WS_URL
   value: {{ .Values.blockscout.jsonrpc_ws_url }}
 - name: DATABASE_URL
-  value: postgres://$(DATABASE_USER):$(DATABASE_PASSWORD)@127.0.0.1:5432/{{ .Values.blockscout.db.name }}
-- name: DATABASE_DB
-  value: {{ .Values.blockscout.db.name }}
-- name: DATABASE_HOSTNAME
-  value: "127.0.0.1"
-- name: DATABASE_PORT
-  value: "5432"
-- name: MIX_ENV
-  value: prod
-- name: LOGO
-  value: /images/celo_logo.svg
+  value: postgres://$(DB_USERNAME):$(DB_PASSWORD)@127.0.0.1:5432/{{ .Values.blockscout.db.name }}
 {{- end -}}
 
 {{- define "celo.prom-to-sd-container" -}}
