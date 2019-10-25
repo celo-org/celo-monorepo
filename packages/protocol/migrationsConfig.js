@@ -11,11 +11,12 @@ const DefaultConfig = {
     attestationExpirySeconds: 60 * 60, // 1 hour,
     attestationRequestFeeInDollars: 0.05,
   },
-  lockedGold: {
-    unlockingPeriod: 60 * 60 * 24 * 3, // 3 days
-  },
-  oracles: {
-    reportExpiry: 60 * 60, // 1 hour
+  blockchainParameters: {
+    minimumClientVersion: {
+      major: 1,
+      minor: 8,
+      patch: 23,
+    },
   },
   election: {
     minElectableValidators: '22',
@@ -28,6 +29,12 @@ const DefaultConfig = {
     reserveFraction: 1,
     updateFrequency: 3600,
     minimumReports: 1,
+  },
+  gasPriceMinimum: {
+    initialMinimum: 10000,
+    targetDensity: 1 / 2,
+    adjustmentSpeed: 1 / 2,
+    proposerFraction: 1 / 2,
   },
   governance: {
     approvalStageDuration: 15 * 60, // 15 minutes
@@ -42,11 +49,14 @@ const DefaultConfig = {
     participationBaselineUpdateFactor: 1 / 5,
     participationBaselineQuorumFactor: 1,
   },
-  gasPriceMinimum: {
-    initialMinimum: 10000,
-    targetDensity: 1 / 2,
-    adjustmentSpeed: 1 / 2,
-    proposerFraction: 1 / 2,
+  lockedGold: {
+    unlockingPeriod: 60 * 60 * 24 * 3, // 3 days
+  },
+  oracles: {
+    reportExpiry: 60 * 60, // 1 hour
+  },
+  random: {
+    randomnessBlockRetentionWindow: 256,
   },
   registry: {
     predeployedProxyAddress: '0x000000000000000000000000000000000000ce10',
@@ -90,13 +100,6 @@ const DefaultConfig = {
     validatorKeys: [],
     groupName: 'C-Labs',
     commission: 0.1,
-  },
-  blockchainParameters: {
-    minimumClientVersion: {
-      major: 1,
-      minor: 8,
-      patch: 23,
-    },
   },
 }
 
