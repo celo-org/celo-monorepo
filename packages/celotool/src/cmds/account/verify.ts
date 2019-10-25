@@ -54,12 +54,7 @@ async function verifyCmd(argv: VerifyArgv) {
   const attestations = await kit.contracts.getAttestations()
   await printCurrentCompletedAttestations(attestations, argv.phone, account)
 
-  let currentBlockNumber = await kit.web3.eth.getBlockNumber()
-  let attestationsToComplete = await attestations.getActionableAttestations(
-    argv.phone,
-    account,
-    currentBlockNumber
-  )
+  let attestationsToComplete = await attestations.getActionableAttestations(argv.phone, account)
 
   // Request more attestations
   if (argv.num > attestationsToComplete.length) {
@@ -80,12 +75,7 @@ async function verifyCmd(argv: VerifyArgv) {
     await result.waitReceipt()
   }
 
-  currentBlockNumber = await kit.web3.eth.getBlockNumber()
-  attestationsToComplete = await attestations.getActionableAttestations(
-    argv.phone,
-    account,
-    currentBlockNumber
-  )
+  attestationsToComplete = await attestations.getActionableAttestations(argv.phone, account)
   // Find attestations we can reveal/verify
   console.info(`Revealing ${attestationsToComplete.length} attestations`)
   await revealAttestations(attestationsToComplete, attestations, argv.phone)
@@ -176,11 +166,9 @@ async function promptForCodeAndVerify(
   account: string
 ) {
   while (true) {
-    const currentBlockNumber = await kit.web3.eth.getBlockNumber()
     const attestationsToComplete = await attestations.getActionableAttestations(
       phoneNumber,
-      account,
-      currentBlockNumber
+      account
     )
 
     if (attestationsToComplete.length === 0) {
