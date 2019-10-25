@@ -1,5 +1,5 @@
 ---
-description: Delegate validating, voting and reward roles for Locked Gold account
+description: Manage Locked Gold to participate in governance and earn rewards
 ---
 
 ## Commands

@@ -40,7 +40,7 @@ const DefaultConfig = {
     initialMinimum: 10000,
     targetDensity: 1 / 2,
     adjustmentSpeed: 1 / 2,
-    infrastructureFraction: 1 / 2,
+    proposerFraction: 1 / 2,
   },
   registry: {
     predeployedProxyAddress: '0x000000000000000000000000000000000000ce10',
@@ -59,6 +59,7 @@ const DefaultConfig = {
     inflationRate: 1.00009591886,
     inflationPeriod: 7 * 24 * 60 * 60, // 1 week
     initialAccounts: [],
+    priceOracleAccounts: [],
   },
   validators: {
     minElectableValidators: '10',
@@ -68,10 +69,17 @@ const DefaultConfig = {
     electionThreshold: '0', // no threshold
     maxGroupSize: '70',
 
+    // We register the specified validators split over a number of groups to satisfy maxGroupSize.
     validatorKeys: [],
-    // We register a single validator group during the migration.
     groupName: 'C-Labs',
     groupUrl: 'https://www.celo.org',
+  },
+  blockchainParameters: {
+    minimumClientVersion: {
+      major: 1,
+      minor: 8,
+      patch: 23,
+    },
   },
 }
 
@@ -98,7 +106,7 @@ const linkedLibraries = {
   AddressSortedLinkedList: ['Validators'],
   IntegerSortedLinkedList: ['Governance', 'IntegerSortedLinkedListTest'],
   AddressSortedLinkedListWithMedian: ['SortedOracles', 'AddressSortedLinkedListWithMedianTest'],
-  Signatures: ['LockedGold', 'Escrow'],
+  Signatures: ['TestAttestations', 'Attestations', 'LockedGold', 'Escrow'],
 }
 
 const argv = minimist(process.argv.slice(2), {

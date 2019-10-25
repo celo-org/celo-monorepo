@@ -91,6 +91,13 @@ export function stripHexLeader(hexString: string): string {
   return hexString.indexOf('0x') === 0 ? hexString.slice(2) : hexString
 }
 
+/**
+ * Returns a hex string with 0x prepended if it's not already starting with 0x
+ */
+export function ensureHexLeader(hexString: string): string {
+  return '0x' + stripHexLeader(hexString)
+}
+
 export function isValidAddress(address: string) {
   return (
     typeof address === 'string' &&
@@ -113,6 +120,7 @@ export const SignatureUtils = {
   signMessage,
   parseSignature,
   stripHexLeader,
+  ensureHexLeader,
   serializeSignature,
   isValidAddress,
   areAddressesEqual,

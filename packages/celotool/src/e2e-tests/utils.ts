@@ -315,6 +315,7 @@ export async function startGeth(gethBinaryPath: string, instance: GethInstanceCo
       console.info(`geth:${instance.name}: jsonRPC port open ${waitForPort}`)
     }
   }
+  return instance
 }
 
 export async function migrateContracts(validatorPrivateKeys: string[], to: number = 1000) {

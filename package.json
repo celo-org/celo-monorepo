@@ -21,7 +21,8 @@
     "postinstall": "yarn run lerna run postinstall && patch-package && yarn keys:decrypt",
     "preinstall": "bash scripts/create_key_templates.sh",
     "keys:decrypt": "bash scripts/key_placer.sh decrypt",
-    "keys:encrypt": "bash scripts/key_placer.sh encrypt"
+    "keys:encrypt": "bash scripts/key_placer.sh encrypt",
+    "check:packages": "node ./scripts/check-packages.js"
   },
   "husky": {
     "hooks": {

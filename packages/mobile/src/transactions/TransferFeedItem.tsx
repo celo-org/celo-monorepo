@@ -11,7 +11,11 @@ import { CURRENCIES, CURRENCY_ENUM, resolveCurrency } from 'src/geth/consts'
 import { Namespaces } from 'src/i18n'
 import { AddressToE164NumberType } from 'src/identity/reducer'
 import { Invitees } from 'src/invite/actions'
-import { useDollarsToLocalAmount, useLocalCurrencyCode } from 'src/localCurrency/hooks'
+import {
+  useDollarsToLocalAmount,
+  useLocalCurrencyCode,
+  useLocalCurrencySymbol,
+} from 'src/localCurrency/hooks'
 import { getRecipientFromAddress, NumberToRecipient } from 'src/recipients/recipient'
 import { navigateToPaymentTransferReview } from 'src/transactions/actions'
 import { TransactionStatus, TransactionTypes, TransferStandby } from 'src/transactions/reducer'
@@ -136,16 +140,22 @@ export function TransferFeedItem(props: Props) {
     invitees,
     addressToE164Number,
     recipientCache,
-    showLocalCurrency,
   } = props
 
   const localCurrencyCode = useLocalCurrencyCode()
+  const localCurrencySymbol = useLocalCurrencySymbol()
   const localValue = useDollarsToLocalAmount(value)
   const timeFormatted = formatFeedTime(timestamp, i18n)
   const dateTimeFormatted = getDatetimeDisplayString(timestamp, t, i18n)
   const currency = resolveCurrency(symbol)
   const currencyStyle = getCurrencyStyles(currency, type)
   const isPending = status === TransactionStatus.Pending
+  const transactionValue =
+    type === TransactionTypes.NETWORK_FEE
+      ? getNetworkFeeDisplayValue(props.value)
+      : localCurrencyCode
+        ? getMoneyDisplayValue(localValue || 0)
+        : getMoneyDisplayValue(props.value)
 
   const { title, info, recipient } = getTransferFeedParams(
     type,
@@ -166,7 +176,7 @@ export function TransferFeedItem(props: Props) {
         </View>
         <View style={styles.contentContainer}>
           <View style={styles.titleContainer}>
-            <Text style={[fontStyles.semiBold, styles.title]}>{title}</Text>
+            <Text style={styles.title}>{title}</Text>
             <Text
               style={[
                 currencyStyle.direction === '-'
@@ -179,12 +189,12 @@ export function TransferFeedItem(props: Props) {
               ]}
             >
               {currencyStyle.direction}
-              {type === TransactionTypes.NETWORK_FEE
-                ? getNetworkFeeDisplayValue(props.value)
-                : getMoneyDisplayValue(props.value)}
+              {localCurrencySymbol}
+              {transactionValue}
+              {localCurrencyCode}
             </Text>
           </View>
-          {!!info && <Text style={fontStyles.comment}>{info}</Text>}
+          {!!info && <Text style={styles.info}>{info}</Text>}
           <View style={[styles.statusContainer, !!info && styles.statusContainerUnderComment]}>
             {isPending && (
               <Text style={[fontStyles.bodySmall, styles.transactionStatus]}>
@@ -205,16 +215,6 @@ export function TransferFeedItem(props: Props) {
                 {' ' + timeFormatted}
               </Text>
             )}
-            {showLocalCurrency &&
-              !!localCurrencyCode &&
-              localValue && (
-                <Text style={[fontStyles.bodySmall, styles.localAmount]}>
-                  {t('localCurrencyValue', {
-                    localValue: `${currencyStyle.direction}${getMoneyDisplayValue(localValue)}`,
-                    localCurrencyCode,
-                  })}
-                </Text>
-              )}
           </View>
         </View>
       </View>
@@ -239,12 +239,16 @@ const styles = StyleSheet.create({
   },
   titleContainer: {
     flexDirection: 'row',
-    marginTop: 3,
+    marginTop: -1,
   },
   title: {
+    ...fontStyles.semiBold,
     fontSize: 15,
-    lineHeight: 20,
     color: colors.dark,
+  },
+  info: {
+    ...fontStyles.comment,
+    marginTop: -2,
   },
   amount: {
     marginLeft: 'auto',

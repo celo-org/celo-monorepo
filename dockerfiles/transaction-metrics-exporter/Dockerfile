@@ -1,4 +1,4 @@
-FROM node:8
+FROM node:10
 WORKDIR /celo-monorepo
 
 # Needed for gsutil
@@ -35,4 +35,4 @@ COPY packages/transaction-metrics-exporter packages/transaction-metrics-exporter
 RUN yarn build
 
 WORKDIR /celo-monorepo/packages/transaction-metrics-exporter
-CMD ["node lib/index.js"]
+CMD ["node", "lib/index.js"]

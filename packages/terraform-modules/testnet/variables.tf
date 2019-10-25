@@ -68,6 +68,16 @@ variable geth_verbosity {
   description = "Verbosity of all geth nodes"
 }
 
+variable in_memory_discovery_table {
+  type        = bool
+  description = "Specifies whether to use an in memory discovery table"
+}
+
+variable istanbul_request_timeout_ms {
+  type        = number
+  description = "The number of ms for the istanbul request timeout"
+}
+
 variable network_id {
   type        = number
   description = "The network ID number"

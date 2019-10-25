@@ -1,5 +1,26 @@
 # README GUIDE FOR CELO DEVELOPERS
 
+## Monorepo inter-package dependencies
+
+Many packages depend on other packages within the monorepo. When this happens, follow these rules:
+
+1.  All packages must use **master version** of sibling packages.
+2.  Exception to (1) are packages that represent a GAE/firebase app which must use the last published version.
+3.  To differentiate published vs unpublished version. Master version (in package.json) must end with suffix `-dev` and should not be published.
+4.  If a developer want to publish a version; then after publishing it needs to set master version to next `-dev` version and change all package.json that require on it.
+
+To check which pakages need amending, you can run (in the root pkg):
+
+    yarn check:packages
+
+A practical example:
+
+- In any given moment, `contractkit/package.json#version` field **must** of the form `x.y.z-dev`
+- If current version of contractkit is: `0.1.6-dev` and we want to publish a new version, we should:
+  - publish version `0.1.6`
+  - change `package.json#version` to `0.1.7-dev`
+  - change in other packages within monorepo that were using `0.1.6-dev` to `0.1.7-dev`
+
 ## How to publish a new npm package
 
 First checkout the alfajores branch.
@@ -13,8 +34,8 @@ Before publishing a new celocli package, test in isolation using Docker. This co
 
 ```
 # To test utils package, change $PWD/packages/cli to $PWD/packages/utils
-# To test contractkit package, change $PWD/packages/contractkit to $PWD/packages/contractkit
-celo-monorepo $ docker run -v $PWD/packages/cli:/tmp/npm_package -it --entrypoint bash node:8
+# To test contractkit package, change $PWD/packages/cli to $PWD/packages/contractkit
+celo-monorepo $ docker run -v $PWD/packages/cli:/tmp/npm_package -it --entrypoint bash node:10
 root@e0d56700584f:/# mkdir /tmp/tmp1 && cd /tmp/tmp1
 root@e0d56700584f:/tmp/tmp1# npm install /tmp/npm_package/
 ```
@@ -27,7 +48,7 @@ celo-monorepo/packages/cli $ yarn publish --access=public
 # Increment the version number, after testing, we will push that commit to GitHub
 ```
 
-Let's say the published package version number 0.0.15, verify that it is installable
+Let's say the published package version number 0.0.20, verify that it is installable
 
 ```
 /tmp/tmp1 $ npm install @celo/cli@0.0.20
@@ -43,7 +64,7 @@ Once you publish do some manual tests, for example, after publishing `celocli`
 
 ```
 # Docker for an isolated environment again
-celo-monorepo $ docker run -it --entrypoint bash node:8
+celo-monorepo $ docker run -it --entrypoint bash node:10
 root@e0d56700584f:/# mkdir /tmp/tmp1 && cd /tmp/tmp1
 root@e0d56700584f:/tmp/tmp1# npm install @celo/celocli@0.0.20
 /tmp/tmp1# ./node_modules/.bin/celocli

@@ -38,6 +38,14 @@ const ContractFactories = {
 type CFType = typeof ContractFactories
 type ContractCacheMap = { [K in keyof CFType]?: ReturnType<CFType[K]> }
 
+/**
+ * Native Web3 contracts factory and cache.
+ *
+ * Exposes accessors to all `CeloContract` web3 contracts.
+ *
+ * Mostly a private cache, kit users would normally use
+ * a contract wrapper
+ */
 export class Web3ContractCache {
   private cacheMap: ContractCacheMap = {}
 
@@ -86,6 +94,9 @@ export class Web3ContractCache {
     return this.getContract(CeloContract.Validators)
   }
 
+  /**
+   * Get native web3 contract wrapper
+   */
   async getContract<C extends keyof typeof ContractFactories>(contract: C) {
     if (this.cacheMap[contract] == null) {
       debug('Initiating contract %s', contract)

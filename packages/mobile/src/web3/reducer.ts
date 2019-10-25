@@ -1,3 +1,4 @@
+import networkConfig from 'src/geth/networkConfig'
 import { getRehydratePayload, REHYDRATE, RehydrateAction } from 'src/redux/persist-helper'
 import { Actions, ActionTypes } from 'src/web3/actions'
 
@@ -9,7 +10,9 @@ export interface State {
   }
   latestBlockNumber: number
   account: string | null
+  accountInWeb3Keystore: string | null
   commentKey: string | null
+  zeroSyncMode: boolean
 }
 
 const initialState: State = {
@@ -20,7 +23,9 @@ const initialState: State = {
   },
   latestBlockNumber: 0,
   account: null,
+  accountInWeb3Keystore: null,
   commentKey: null,
+  zeroSyncMode: networkConfig.initiallyZeroSync,
 }
 
 export const reducer = (
@@ -45,6 +50,16 @@ export const reducer = (
       return {
         ...state,
         account: action.address,
+      }
+    case Actions.SET_ACCOUNT_IN_WEB3_KEYSTORE:
+      return {
+        ...state,
+        accountInWeb3Keystore: action.address,
+      }
+    case Actions.SET_IS_ZERO_SYNC:
+      return {
+        ...state,
+        zeroSyncMode: action.zeroSyncMode,
       }
     case Actions.SET_COMMENT_KEY:
       return {

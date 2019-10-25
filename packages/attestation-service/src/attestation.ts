@@ -1,7 +1,7 @@
 import { attestToIdentifier, SignatureUtils } from '@celo/utils'
+import { retryAsyncWithBackOff } from '@celo/utils/lib/async'
 import express from 'express'
 import { sendSms } from './sms'
-
 function signAttestation(phoneNumber: string, account: string) {
   if (process.env.ATTESTATION_KEY === undefined) {
     console.error('Did not specify ATTESTATION_KEY')
@@ -32,7 +32,7 @@ export async function handleAttestationRequest(req: express.Request, res: expres
   const textMessage = createAttestationTextMessage(attestationCode)
 
   // Send the SMS
-  await sendSms(req.body.phoneNumber, textMessage)
+  await retryAsyncWithBackOff(sendSms, 10, [req.body.phoneNumber, textMessage], 1000)
 
   res.json({ success: true })
 }

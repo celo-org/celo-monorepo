@@ -201,6 +201,23 @@ const validatorsAbi = [
     stateMutability: 'view',
     type: 'function',
   },
+  {
+    anonymous: false,
+    inputs: [
+      {
+        indexed: true,
+        name: 'previousOwner',
+        type: 'address',
+      },
+      {
+        indexed: true,
+        name: 'newOwner',
+        type: 'address',
+      },
+    ],
+    name: 'OwnershipTransferred',
+    type: 'event',
+  },
 ]
 
 describe('governance tests', () => {
@@ -593,7 +610,13 @@ describe('governance tests', () => {
       // that gold is sent.
       // We don't set the total supply until block rewards are paid out, which can happen once
       // either LockedGold or Governance are registered.
-      const blockNumber = 175
+      const _validators = new web3.eth.Contract(
+        validatorsAbi,
+        await getContractAddress('ValidatorsProxy')
+      )
+      const events = await _validators.getPastEvents('OwnershipTransferred', { fromBlock: 0 })
+
+      const blockNumber = events[events.length - 1].blockNumber + 1
       const goldTotalSupply = await goldToken.methods.totalSupply().call({}, blockNumber)
       const balances = await Promise.all(
         addressesWithBalance.map(

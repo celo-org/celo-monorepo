@@ -63,22 +63,17 @@ exports[`transfer feed item renders correctly for <0.000001 network fee 1`] = `
         style={
           Object {
             "flexDirection": "row",
-            "marginTop": 3,
+            "marginTop": -1,
           }
         }
       >
         <Text
           style={
-            Array [
-              Object {
-                "fontFamily": "Hind-SemiBold",
-              },
-              Object {
-                "color": "#2E3338",
-                "fontSize": 15,
-                "lineHeight": 20,
-              },
-            ]
+            Object {
+              "color": "#2E3338",
+              "fontFamily": "Hind-SemiBold",
+              "fontSize": 15,
+            }
           }
         >
           feedItemNetworkFeeTitle
@@ -100,7 +95,9 @@ exports[`transfer feed item renders correctly for <0.000001 network fee 1`] = `
           }
         >
           
+          $
           &lt;0.001
+          MXN
         </Text>
       </View>
       <Text
@@ -109,7 +106,7 @@ exports[`transfer feed item renders correctly for <0.000001 network fee 1`] = `
             "color": "#81868B",
             "fontFamily": "Hind-Regular",
             "fontSize": 15,
-            "lineHeight": 20,
+            "marginTop": -2,
           }
         }
       >
@@ -128,29 +125,7 @@ exports[`transfer feed item renders correctly for <0.000001 network fee 1`] = `
             },
           ]
         }
-      >
-        <Text
-          style={
-            Array [
-              Object {
-                "color": "#2E3338",
-                "fontFamily": "Hind-Regular",
-                "fontSize": 14,
-                "lineHeight": 18,
-              },
-              Object {
-                "color": "#BDBDBD",
-                "fontSize": 14,
-                "lineHeight": 18,
-                "marginLeft": "auto",
-                "paddingLeft": 10,
-              },
-            ]
-          }
-        >
-          localCurrencyValue
-        </Text>
-      </View>
+      />
     </View>
   </View>
 </View>
@@ -219,22 +194,17 @@ exports[`transfer feed item renders correctly for faucet 1`] = `
         style={
           Object {
             "flexDirection": "row",
-            "marginTop": 3,
+            "marginTop": -1,
           }
         }
       >
         <Text
           style={
-            Array [
-              Object {
-                "fontFamily": "Hind-SemiBold",
-              },
-              Object {
-                "color": "#2E3338",
-                "fontSize": 15,
-                "lineHeight": 20,
-              },
-            ]
+            Object {
+              "color": "#2E3338",
+              "fontFamily": "Hind-SemiBold",
+              "fontSize": 15,
+            }
           }
         >
           feedItemFaucetTitle
@@ -256,7 +226,9 @@ exports[`transfer feed item renders correctly for faucet 1`] = `
           }
         >
           
-          100.00
+          $
+          133.00
+          MXN
         </Text>
       </View>
       <Text
@@ -265,7 +237,7 @@ exports[`transfer feed item renders correctly for faucet 1`] = `
             "color": "#81868B",
             "fontFamily": "Hind-Regular",
             "fontSize": 15,
-            "lineHeight": 20,
+            "marginTop": -2,
           }
         }
       >
@@ -284,29 +256,7 @@ exports[`transfer feed item renders correctly for faucet 1`] = `
             },
           ]
         }
-      >
-        <Text
-          style={
-            Array [
-              Object {
-                "color": "#2E3338",
-                "fontFamily": "Hind-Regular",
-                "fontSize": 14,
-                "lineHeight": 18,
-              },
-              Object {
-                "color": "#BDBDBD",
-                "fontSize": 14,
-                "lineHeight": 18,
-                "marginLeft": "auto",
-                "paddingLeft": 10,
-              },
-            ]
-          }
-        >
-          localCurrencyValue
-        </Text>
-      </View>
+      />
     </View>
   </View>
 </View>
@@ -405,22 +355,17 @@ exports[`transfer feed item renders correctly for known received 1`] = `
         style={
           Object {
             "flexDirection": "row",
-            "marginTop": 3,
+            "marginTop": -1,
           }
         }
       >
         <Text
           style={
-            Array [
-              Object {
-                "fontFamily": "Hind-SemiBold",
-              },
-              Object {
-                "color": "#2E3338",
-                "fontSize": 15,
-                "lineHeight": 20,
-              },
-            ]
+            Object {
+              "color": "#2E3338",
+              "fontFamily": "Hind-SemiBold",
+              "fontSize": 15,
+            }
           }
         >
           John Doe
@@ -442,7 +387,9 @@ exports[`transfer feed item renders correctly for known received 1`] = `
           }
         >
           
-          100.00
+          $
+          133.00
+          MXN
         </Text>
       </View>
       <View
@@ -456,29 +403,7 @@ exports[`transfer feed item renders correctly for known received 1`] = `
             false,
           ]
         }
-      >
-        <Text
-          style={
-            Array [
-              Object {
-                "color": "#2E3338",
-                "fontFamily": "Hind-Regular",
-                "fontSize": 14,
-                "lineHeight": 18,
-              },
-              Object {
-                "color": "#BDBDBD",
-                "fontSize": 14,
-                "lineHeight": 18,
-                "marginLeft": "auto",
-                "paddingLeft": 10,
-              },
-            ]
-          }
-        >
-          localCurrencyValue
-        </Text>
-      </View>
+      />
     </View>
   </View>
 </View>
@@ -577,22 +502,17 @@ exports[`transfer feed item renders correctly for known sent 1`] = `
         style={
           Object {
             "flexDirection": "row",
-            "marginTop": 3,
+            "marginTop": -1,
           }
         }
       >
         <Text
           style={
-            Array [
-              Object {
-                "fontFamily": "Hind-SemiBold",
-              },
-              Object {
-                "color": "#2E3338",
-                "fontSize": 15,
-                "lineHeight": 20,
-              },
-            ]
+            Object {
+              "color": "#2E3338",
+              "fontFamily": "Hind-SemiBold",
+              "fontSize": 15,
+            }
           }
         >
           John Doe
@@ -614,7 +534,9 @@ exports[`transfer feed item renders correctly for known sent 1`] = `
           }
         >
           -
-          100.00
+          $
+          133.00
+          MXN
         </Text>
       </View>
       <View
@@ -628,29 +550,7 @@ exports[`transfer feed item renders correctly for known sent 1`] = `
             false,
           ]
         }
-      >
-        <Text
-          style={
-            Array [
-              Object {
-                "color": "#2E3338",
-                "fontFamily": "Hind-Regular",
-                "fontSize": 14,
-                "lineHeight": 18,
-              },
-              Object {
-                "color": "#BDBDBD",
-                "fontSize": 14,
-                "lineHeight": 18,
-                "marginLeft": "auto",
-                "paddingLeft": 10,
-              },
-            ]
-          }
-        >
-          localCurrencyValue
-        </Text>
-      </View>
+      />
     </View>
   </View>
 </View>
@@ -719,22 +619,17 @@ exports[`transfer feed item renders correctly for network fee 1`] = `
         style={
           Object {
             "flexDirection": "row",
-            "marginTop": 3,
+            "marginTop": -1,
           }
         }
       >
         <Text
           style={
-            Array [
-              Object {
-                "fontFamily": "Hind-SemiBold",
-              },
-              Object {
-                "color": "#2E3338",
-                "fontSize": 15,
-                "lineHeight": 20,
-              },
-            ]
+            Object {
+              "color": "#2E3338",
+              "fontFamily": "Hind-SemiBold",
+              "fontSize": 15,
+            }
           }
         >
           feedItemNetworkFeeTitle
@@ -756,7 +651,9 @@ exports[`transfer feed item renders correctly for network fee 1`] = `
           }
         >
           
+          $
           0.002
+          MXN
         </Text>
       </View>
       <Text
@@ -765,7 +662,7 @@ exports[`transfer feed item renders correctly for network fee 1`] = `
             "color": "#81868B",
             "fontFamily": "Hind-Regular",
             "fontSize": 15,
-            "lineHeight": 20,
+            "marginTop": -2,
           }
         }
       >
@@ -784,29 +681,7 @@ exports[`transfer feed item renders correctly for network fee 1`] = `
             },
           ]
         }
-      >
-        <Text
-          style={
-            Array [
-              Object {
-                "color": "#2E3338",
-                "fontFamily": "Hind-Regular",
-                "fontSize": 14,
-                "lineHeight": 18,
-              },
-              Object {
-                "color": "#BDBDBD",
-                "fontSize": 14,
-                "lineHeight": 18,
-                "marginLeft": "auto",
-                "paddingLeft": 10,
-              },
-            ]
-          }
-        >
-          localCurrencyValue
-        </Text>
-      </View>
+      />
     </View>
   </View>
 </View>
@@ -905,22 +780,17 @@ exports[`transfer feed item renders correctly for received 1`] = `
         style={
           Object {
             "flexDirection": "row",
-            "marginTop": 3,
+            "marginTop": -1,
           }
         }
       >
         <Text
           style={
-            Array [
-              Object {
-                "fontFamily": "Hind-SemiBold",
-              },
-              Object {
-                "color": "#2E3338",
-                "fontSize": 15,
-                "lineHeight": 20,
-              },
-            ]
+            Object {
+              "color": "#2E3338",
+              "fontFamily": "Hind-SemiBold",
+              "fontSize": 15,
+            }
           }
         >
           feedItemReceivedTitle
@@ -942,7 +812,9 @@ exports[`transfer feed item renders correctly for received 1`] = `
           }
         >
           
-          100.00
+          $
+          133.00
+          MXN
         </Text>
       </View>
       <View
@@ -956,29 +828,7 @@ exports[`transfer feed item renders correctly for received 1`] = `
             false,
           ]
         }
-      >
-        <Text
-          style={
-            Array [
-              Object {
-                "color": "#2E3338",
-                "fontFamily": "Hind-Regular",
-                "fontSize": 14,
-                "lineHeight": 18,
-              },
-              Object {
-                "color": "#BDBDBD",
-                "fontSize": 14,
-                "lineHeight": 18,
-                "marginLeft": "auto",
-                "paddingLeft": 10,
-              },
-            ]
-          }
-        >
-          localCurrencyValue
-        </Text>
-      </View>
+      />
     </View>
   </View>
 </View>
@@ -1047,22 +897,17 @@ exports[`transfer feed item renders correctly for received invite 1`] = `
         style={
           Object {
             "flexDirection": "row",
-            "marginTop": 3,
+            "marginTop": -1,
           }
         }
       >
         <Text
           style={
-            Array [
-              Object {
-                "fontFamily": "Hind-SemiBold",
-              },
-              Object {
-                "color": "#2E3338",
-                "fontSize": 15,
-                "lineHeight": 20,
-              },
-            ]
+            Object {
+              "color": "#2E3338",
+              "fontFamily": "Hind-SemiBold",
+              "fontSize": 15,
+            }
           }
         >
           feedItemInviteReceivedTitle
@@ -1084,7 +929,9 @@ exports[`transfer feed item renders correctly for received invite 1`] = `
           }
         >
           
-          1.00
+          $
+          1.33
+          MXN
         </Text>
       </View>
       <Text
@@ -1093,7 +940,7 @@ exports[`transfer feed item renders correctly for received invite 1`] = `
             "color": "#81868B",
             "fontFamily": "Hind-Regular",
             "fontSize": 15,
-            "lineHeight": 20,
+            "marginTop": -2,
           }
         }
       >
@@ -1112,29 +959,7 @@ exports[`transfer feed item renders correctly for received invite 1`] = `
             },
           ]
         }
-      >
-        <Text
-          style={
-            Array [
-              Object {
-                "color": "#2E3338",
-                "fontFamily": "Hind-Regular",
-                "fontSize": 14,
-                "lineHeight": 18,
-              },
-              Object {
-                "color": "#BDBDBD",
-                "fontSize": 14,
-                "lineHeight": 18,
-                "marginLeft": "auto",
-                "paddingLeft": 10,
-              },
-            ]
-          }
-        >
-          localCurrencyValue
-        </Text>
-      </View>
+      />
     </View>
   </View>
 </View>
@@ -1233,22 +1058,17 @@ exports[`transfer feed item renders correctly for received with encrypted commen
         style={
           Object {
             "flexDirection": "row",
-            "marginTop": 3,
+            "marginTop": -1,
           }
         }
       >
         <Text
           style={
-            Array [
-              Object {
-                "fontFamily": "Hind-SemiBold",
-              },
-              Object {
-                "color": "#2E3338",
-                "fontSize": 15,
-                "lineHeight": 20,
-              },
-            ]
+            Object {
+              "color": "#2E3338",
+              "fontFamily": "Hind-SemiBold",
+              "fontSize": 15,
+            }
           }
         >
           feedItemReceivedTitle
@@ -1270,7 +1090,9 @@ exports[`transfer feed item renders correctly for received with encrypted commen
           }
         >
           
-          100.00
+          $
+          133.00
+          MXN
         </Text>
       </View>
       <Text
@@ -1279,7 +1101,7 @@ exports[`transfer feed item renders correctly for received with encrypted commen
             "color": "#81868B",
             "fontFamily": "Hind-Regular",
             "fontSize": 15,
-            "lineHeight": 20,
+            "marginTop": -2,
           }
         }
       >
@@ -1298,29 +1120,7 @@ exports[`transfer feed item renders correctly for received with encrypted commen
             },
           ]
         }
-      >
-        <Text
-          style={
-            Array [
-              Object {
-                "color": "#2E3338",
-                "fontFamily": "Hind-Regular",
-                "fontSize": 14,
-                "lineHeight": 18,
-              },
-              Object {
-                "color": "#BDBDBD",
-                "fontSize": 14,
-                "lineHeight": 18,
-                "marginLeft": "auto",
-                "paddingLeft": 10,
-              },
-            ]
-          }
-        >
-          localCurrencyValue
-        </Text>
-      </View>
+      />
     </View>
   </View>
 </View>
@@ -1419,22 +1219,17 @@ exports[`transfer feed item renders correctly for sent 1`] = `
         style={
           Object {
             "flexDirection": "row",
-            "marginTop": 3,
+            "marginTop": -1,
           }
         }
       >
         <Text
           style={
-            Array [
-              Object {
-                "fontFamily": "Hind-SemiBold",
-              },
-              Object {
-                "color": "#2E3338",
-                "fontSize": 15,
-                "lineHeight": 20,
-              },
-            ]
+            Object {
+              "color": "#2E3338",
+              "fontFamily": "Hind-SemiBold",
+              "fontSize": 15,
+            }
           }
         >
           feedItemSentTitle
@@ -1456,7 +1251,9 @@ exports[`transfer feed item renders correctly for sent 1`] = `
           }
         >
           -
-          100.00
+          $
+          133.00
+          MXN
         </Text>
       </View>
       <View
@@ -1470,29 +1267,7 @@ exports[`transfer feed item renders correctly for sent 1`] = `
             false,
           ]
         }
-      >
-        <Text
-          style={
-            Array [
-              Object {
-                "color": "#2E3338",
-                "fontFamily": "Hind-Regular",
-                "fontSize": 14,
-                "lineHeight": 18,
-              },
-              Object {
-                "color": "#BDBDBD",
-                "fontSize": 14,
-                "lineHeight": 18,
-                "marginLeft": "auto",
-                "paddingLeft": 10,
-              },
-            ]
-          }
-        >
-          localCurrencyValue
-        </Text>
-      </View>
+      />
     </View>
   </View>
 </View>
@@ -1561,22 +1336,17 @@ exports[`transfer feed item renders correctly for sent invite 1`] = `
         style={
           Object {
             "flexDirection": "row",
-            "marginTop": 3,
+            "marginTop": -1,
           }
         }
       >
         <Text
           style={
-            Array [
-              Object {
-                "fontFamily": "Hind-SemiBold",
-              },
-              Object {
-                "color": "#2E3338",
-                "fontSize": 15,
-                "lineHeight": 20,
-              },
-            ]
+            Object {
+              "color": "#2E3338",
+              "fontFamily": "Hind-SemiBold",
+              "fontSize": 15,
+            }
           }
         >
           feedItemInviteSentTitle
@@ -1598,7 +1368,9 @@ exports[`transfer feed item renders correctly for sent invite 1`] = `
           }
         >
           -
-          1.00
+          $
+          1.33
+          MXN
         </Text>
       </View>
       <Text
@@ -1607,7 +1379,7 @@ exports[`transfer feed item renders correctly for sent invite 1`] = `
             "color": "#81868B",
             "fontFamily": "Hind-Regular",
             "fontSize": 15,
-            "lineHeight": 20,
+            "marginTop": -2,
           }
         }
       >
@@ -1626,29 +1398,7 @@ exports[`transfer feed item renders correctly for sent invite 1`] = `
             },
           ]
         }
-      >
-        <Text
-          style={
-            Array [
-              Object {
-                "color": "#2E3338",
-                "fontFamily": "Hind-Regular",
-                "fontSize": 14,
-                "lineHeight": 18,
-              },
-              Object {
-                "color": "#BDBDBD",
-                "fontSize": 14,
-                "lineHeight": 18,
-                "marginLeft": "auto",
-                "paddingLeft": 10,
-              },
-            ]
-          }
-        >
-          localCurrencyValue
-        </Text>
-      </View>
+      />
     </View>
   </View>
 </View>
@@ -1747,22 +1497,17 @@ exports[`transfer feed item renders correctly for sent transaction 1`] = `
         style={
           Object {
             "flexDirection": "row",
-            "marginTop": 3,
+            "marginTop": -1,
           }
         }
       >
         <Text
           style={
-            Array [
-              Object {
-                "fontFamily": "Hind-SemiBold",
-              },
-              Object {
-                "color": "#2E3338",
-                "fontSize": 15,
-                "lineHeight": 20,
-              },
-            ]
+            Object {
+              "color": "#2E3338",
+              "fontFamily": "Hind-SemiBold",
+              "fontSize": 15,
+            }
           }
         >
           feedItemSentTitle
@@ -1784,7 +1529,9 @@ exports[`transfer feed item renders correctly for sent transaction 1`] = `
           }
         >
           -
-          1.00
+          $
+          1.33
+          MXN
         </Text>
       </View>
       <Text
@@ -1793,7 +1540,7 @@ exports[`transfer feed item renders correctly for sent transaction 1`] = `
             "color": "#81868B",
             "fontFamily": "Hind-Regular",
             "fontSize": 15,
-            "lineHeight": 20,
+            "marginTop": -2,
           }
         }
       >
@@ -1812,29 +1559,7 @@ exports[`transfer feed item renders correctly for sent transaction 1`] = `
             },
           ]
         }
-      >
-        <Text
-          style={
-            Array [
-              Object {
-                "color": "#2E3338",
-                "fontFamily": "Hind-Regular",
-                "fontSize": 14,
-                "lineHeight": 18,
-              },
-              Object {
-                "color": "#BDBDBD",
-                "fontSize": 14,
-                "lineHeight": 18,
-                "marginLeft": "auto",
-                "paddingLeft": 10,
-              },
-            ]
-          }
-        >
-          localCurrencyValue
-        </Text>
-      </View>
+      />
     </View>
   </View>
 </View>
@@ -1933,22 +1658,17 @@ exports[`transfer feed item renders correctly for sent with encrypted comment 1`
         style={
           Object {
             "flexDirection": "row",
-            "marginTop": 3,
+            "marginTop": -1,
           }
         }
       >
         <Text
           style={
-            Array [
-              Object {
-                "fontFamily": "Hind-SemiBold",
-              },
-              Object {
-                "color": "#2E3338",
-                "fontSize": 15,
-                "lineHeight": 20,
-              },
-            ]
+            Object {
+              "color": "#2E3338",
+              "fontFamily": "Hind-SemiBold",
+              "fontSize": 15,
+            }
           }
         >
           feedItemSentTitle
@@ -1970,7 +1690,9 @@ exports[`transfer feed item renders correctly for sent with encrypted comment 1`
           }
         >
           -
-          1.00
+          $
+          1.33
+          MXN
         </Text>
       </View>
       <Text
@@ -1979,7 +1701,7 @@ exports[`transfer feed item renders correctly for sent with encrypted comment 1`
             "color": "#81868B",
             "fontFamily": "Hind-Regular",
             "fontSize": 15,
-            "lineHeight": 20,
+            "marginTop": -2,
           }
         }
       >
@@ -1998,29 +1720,7 @@ exports[`transfer feed item renders correctly for sent with encrypted comment 1`
             },
           ]
         }
-      >
-        <Text
-          style={
-            Array [
-              Object {
-                "color": "#2E3338",
-                "fontFamily": "Hind-Regular",
-                "fontSize": 14,
-                "lineHeight": 18,
-              },
-              Object {
-                "color": "#BDBDBD",
-                "fontSize": 14,
-                "lineHeight": 18,
-                "marginLeft": "auto",
-                "paddingLeft": 10,
-              },
-            ]
-          }
-        >
-          localCurrencyValue
-        </Text>
-      </View>
+      />
     </View>
   </View>
 </View>
@@ -2089,22 +1789,17 @@ exports[`transfer feed item renders correctly for verification fee 1`] = `
         style={
           Object {
             "flexDirection": "row",
-            "marginTop": 3,
+            "marginTop": -1,
           }
         }
       >
         <Text
           style={
-            Array [
-              Object {
-                "fontFamily": "Hind-SemiBold",
-              },
-              Object {
-                "color": "#2E3338",
-                "fontSize": 15,
-                "lineHeight": 20,
-              },
-            ]
+            Object {
+              "color": "#2E3338",
+              "fontFamily": "Hind-SemiBold",
+              "fontSize": 15,
+            }
           }
         >
           feedItemVerificationFeeTitle
@@ -2126,7 +1821,9 @@ exports[`transfer feed item renders correctly for verification fee 1`] = `
           }
         >
           -
-          0.33
+          $
+          0.43
+          MXN
         </Text>
       </View>
       <Text
@@ -2135,7 +1832,7 @@ exports[`transfer feed item renders correctly for verification fee 1`] = `
             "color": "#81868B",
             "fontFamily": "Hind-Regular",
             "fontSize": 15,
-            "lineHeight": 20,
+            "marginTop": -2,
           }
         }
       >
@@ -2154,29 +1851,7 @@ exports[`transfer feed item renders correctly for verification fee 1`] = `
             },
           ]
         }
-      >
-        <Text
-          style={
-            Array [
-              Object {
-                "color": "#2E3338",
-                "fontFamily": "Hind-Regular",
-                "fontSize": 14,
-                "lineHeight": 18,
-              },
-              Object {
-                "color": "#BDBDBD",
-                "fontSize": 14,
-                "lineHeight": 18,
-                "marginLeft": "auto",
-                "paddingLeft": 10,
-              },
-            ]
-          }
-        >
-          localCurrencyValue
-        </Text>
-      </View>
+      />
     </View>
   </View>
 </View>
@@ -2264,22 +1939,17 @@ exports[`transfer feed item renders correctly for verification reward 1`] = `
         style={
           Object {
             "flexDirection": "row",
-            "marginTop": 3,
+            "marginTop": -1,
           }
         }
       >
         <Text
           style={
-            Array [
-              Object {
-                "fontFamily": "Hind-SemiBold",
-              },
-              Object {
-                "color": "#2E3338",
-                "fontSize": 15,
-                "lineHeight": 20,
-              },
-            ]
+            Object {
+              "color": "#2E3338",
+              "fontFamily": "Hind-SemiBold",
+              "fontSize": 15,
+            }
           }
         >
           feedItemVerificationRewardTitle
@@ -2301,7 +1971,9 @@ exports[`transfer feed item renders correctly for verification reward 1`] = `
           }
         >
           
-          1.00
+          $
+          1.33
+          MXN
         </Text>
       </View>
       <Text
@@ -2310,7 +1982,7 @@ exports[`transfer feed item renders correctly for verification reward 1`] = `
             "color": "#81868B",
             "fontFamily": "Hind-Regular",
             "fontSize": 15,
-            "lineHeight": 20,
+            "marginTop": -2,
           }
         }
       >
@@ -2329,29 +2001,7 @@ exports[`transfer feed item renders correctly for verification reward 1`] = `
             },
           ]
         }
-      >
-        <Text
-          style={
-            Array [
-              Object {
-                "color": "#2E3338",
-                "fontFamily": "Hind-Regular",
-                "fontSize": 14,
-                "lineHeight": 18,
-              },
-              Object {
-                "color": "#BDBDBD",
-                "fontSize": 14,
-                "lineHeight": 18,
-                "marginLeft": "auto",
-                "paddingLeft": 10,
-              },
-            ]
-          }
-        >
-          localCurrencyValue
-        </Text>
-      </View>
+      />
     </View>
   </View>
 </View>

@@ -6,6 +6,7 @@ import { componentStyles } from '@celo/react-components/styles/styles'
 import { TranslationFunction } from 'i18next'
 import * as React from 'react'
 import { Image, ImageSourcePropType, ScrollView, StyleSheet, Text, View } from 'react-native'
+import SafeAreaView from 'react-native-safe-area-view'
 
 interface LanguageType {
   name: string
@@ -35,7 +36,7 @@ class LanguageSelectUI extends React.PureComponent<Props> {
     } = this.props
 
     return (
-      <View style={styles.container}>
+      <SafeAreaView style={styles.container}>
         <ScrollView>
           <View style={{ alignItems: 'center' }}>
             <Image source={logo} style={styles.logo} resizeMode={'contain'} />
@@ -63,7 +64,7 @@ class LanguageSelectUI extends React.PureComponent<Props> {
           disabled={isSubmitDisabled}
           testID="ChooseLanguageButton"
         />
-      </View>
+      </SafeAreaView>
     )
   }
 }

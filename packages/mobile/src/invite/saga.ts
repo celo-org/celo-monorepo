@@ -1,4 +1,3 @@
-import { retryAsync } from '@celo/utils/src/async'
 import { getPhoneHash } from '@celo/utils/src/phoneNumbers'
 import { stripHexLeader } from '@celo/utils/src/signatureUtils'
 import { getEscrowContract, getGoldTokenContract, getStableTokenContract } from '@celo/walletkit'
@@ -6,7 +5,7 @@ import BigNumber from 'bignumber.js'
 import { Linking, Platform } from 'react-native'
 import SendIntentAndroid from 'react-native-send-intent'
 import VersionCheck from 'react-native-version-check'
-import { call, delay, put, race, spawn, takeLeading } from 'redux-saga/effects'
+import { call, delay, put, race, select, spawn, takeLeading } from 'redux-saga/effects'
 import { showError, showMessage } from 'src/alert/actions'
 import CeloAnalytics from 'src/analytics/CeloAnalytics'
 import { CustomEventNames } from 'src/analytics/constants'
@@ -33,14 +32,15 @@ import { Screens } from 'src/navigator/Screens'
 import { waitWeb3LastBlock } from 'src/networkInfo/saga'
 import { getSendTxGas } from 'src/send/saga'
 import { fetchDollarBalance, transferStableToken } from 'src/stableToken/actions'
-import { createTransaction } from 'src/tokens/saga'
+import { createTransaction, fetchTokenBalanceWithRetry } from 'src/tokens/saga'
 import { generateStandbyTransactionId } from 'src/transactions/actions'
 import { waitForTransactionWithId } from 'src/transactions/saga'
 import { sendTransaction } from 'src/transactions/send'
 import { dynamicLink } from 'src/utils/dynamicLink'
 import Logger from 'src/utils/Logger'
-import { web3 } from 'src/web3/contracts'
+import { addLocalAccount, web3 } from 'src/web3/contracts'
 import { getConnectedUnlockedAccount, getOrCreateAccount } from 'src/web3/saga'
+import { zeroSyncSelector } from 'src/web3/selectors'
 
 const TAG = 'invite/saga'
 export const TEMP_PW = 'ce10'
@@ -212,7 +212,6 @@ export function* redeemInviteSaga({ inviteCode }: RedeemInviteAction) {
     yield put(redeemInviteFailure())
     yield put(showError(ErrorMessages.REDEEM_INVITE_TIMEOUT))
   }
-  Logger.debug(TAG, 'Done Redeem invite')
 }
 
 export function* doRedeemInvite(inviteCode: string) {
@@ -220,8 +219,11 @@ export function* doRedeemInvite(inviteCode: string) {
   try {
     const tempAccount = web3.eth.accounts.privateKeyToAccount(inviteCode).address
     Logger.debug(`TAG@doRedeemInvite`, 'Invite code contains temp account', tempAccount)
-
-    const tempAccountBalanceWei: BigNumber = yield call(getAccountBalance, tempAccount)
+    const tempAccountBalanceWei: BigNumber = yield call(
+      fetchTokenBalanceWithRetry,
+      getStableTokenContract,
+      tempAccount
+    )
     if (tempAccountBalanceWei.isLessThanOrEqualTo(0)) {
       yield put(showError(ErrorMessages.EMPTY_INVITE_CODE))
       return false
@@ -243,12 +245,25 @@ export function* doRedeemInvite(inviteCode: string) {
   }
 }
 
-async function addTempAccountToWallet(inviteCode: string) {
+function* addTempAccountToWallet(inviteCode: string) {
   Logger.debug(TAG + '@addTempAccountToWallet', 'Attempting to add temp wallet')
   try {
-    // @ts-ignore
-    const tempAccount = await web3.eth.personal.importRawKey(stripHexLeader(inviteCode), TEMP_PW)
-    Logger.debug(TAG + '@addTempAccountToWallet', 'Account added', tempAccount)
+    let tempAccount: string | null = null
+    const zeroSyncMode = yield select(zeroSyncSelector)
+    if (zeroSyncMode) {
+      tempAccount = web3.eth.accounts.privateKeyToAccount(inviteCode).address
+      Logger.debug(
+        TAG + '@redeemInviteCode',
+        'web3 is connected:',
+        String(yield call(web3.eth.net.isListening))
+      )
+      addLocalAccount(web3, inviteCode)
+    } else {
+      // Import account into the local geth node
+      // @ts-ignore
+      tempAccount = yield call(web3.eth.personal.importRawKey, stripHexLeader(inviteCode), TEMP_PW)
+    }
+    Logger.debug(TAG + '@addTempAccountToWallet', 'Account added', tempAccount!)
   } catch (e) {
     if (e.toString().includes('account already exists')) {
       Logger.warn(TAG + '@addTempAccountToWallet', 'Account already exists, using it')
@@ -259,27 +274,20 @@ async function addTempAccountToWallet(inviteCode: string) {
   }
 }
 
-async function getAccountBalance(account: string) {
-  Logger.debug(TAG + '@getAccountBalance', 'Checking account balance', account)
-  const StableToken = await getStableTokenContract(web3)
-  // Retry needed here because it's typically the app's first tx and seems to fail on occasion
-  const stableBalance = await retryAsync(StableToken.methods.balanceOf(account).call, 3, [])
-  Logger.debug(TAG + '@getAccountBalance', 'Account balance', stableBalance)
-  return new BigNumber(stableBalance)
-}
-
-export async function withdrawFundsFromTempAccount(
+export function* withdrawFundsFromTempAccount(
   tempAccount: string,
   tempAccountBalanceWei: BigNumber,
   newAccount: string
 ) {
   Logger.debug(TAG + '@withdrawFundsFromTempAccount', 'Unlocking temporary account')
-  await web3.eth.personal.unlockAccount(tempAccount, TEMP_PW, 600)
-
+  const zeroSyncMode = yield select(zeroSyncSelector)
+  if (!zeroSyncMode) {
+    yield call(web3.eth.personal.unlockAccount, tempAccount, TEMP_PW, 600)
+  }
   const tempAccountBalance = new BigNumber(web3.utils.fromWei(tempAccountBalanceWei.toString()))
 
   Logger.debug(TAG + '@withdrawFundsFromTempAccount', 'Creating send transaction')
-  const tx = await createTransaction(getStableTokenContract, {
+  const tx = yield call(createTransaction, getStableTokenContract, {
     recipientAddress: newAccount,
     comment: SENTINEL_INVITE_COMMENT,
     // TODO: appropriately withdraw the balance instead of using gas fees will be less than 1 cent
@@ -287,7 +295,7 @@ export async function withdrawFundsFromTempAccount(
   })
 
   Logger.debug(TAG + '@withdrawFundsFromTempAccount', 'Sending transaction')
-  await sendTransaction(tx, tempAccount, TAG, 'Transfer from temp wallet')
+  yield call(sendTransaction, tx, tempAccount, TAG, 'Transfer from temp wallet')
   Logger.debug(TAG + '@withdrawFundsFromTempAccount', 'Done withdrawal')
 }
 

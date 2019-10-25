@@ -1,4 +1,4 @@
-import { PaymentRequest, PaymentRequestStatuses } from 'src/account'
+import { PaymentRequest, PaymentRequestStatus } from 'src/account'
 import { SHORT_CURRENCIES } from 'src/geth/consts'
 
 export function paymentRequestDouble(partial: object): PaymentRequest {
@@ -11,7 +11,7 @@ export function paymentRequestDouble(partial: object): PaymentRequest {
     currency: SHORT_CURRENCIES.DOLLAR,
     timestamp: new Date(),
     requesterAddress: '101929292929',
-    status: PaymentRequestStatuses.REQUESTED,
+    status: PaymentRequestStatus.REQUESTED,
     notified: true,
     ...partial,
   }

@@ -3,8 +3,10 @@ import colors from '@celo/react-components/styles/colors'
 import * as React from 'react'
 import { withNamespaces, WithNamespaces } from 'react-i18next'
 import { StyleSheet, View } from 'react-native'
+import SafeAreaView from 'react-native-safe-area-view'
 import { Namespaces } from 'src/i18n'
-import { restartApp } from 'src/utils/AppRestart'
+import { RESTART_APP_I18N_KEY, restartApp } from 'src/utils/AppRestart'
+
 const SHOW_RESTART_BUTTON_TIMEOUT = 10000
 
 interface State {
@@ -40,19 +42,19 @@ export class AppLoading extends React.Component<Props, State> {
     const { t } = this.props
 
     return (
-      <View style={styles.content}>
+      <SafeAreaView style={styles.content}>
         <View style={styles.button}>
           {this.state.showRestartButton && (
             <Button
               onPress={restartApp}
-              text={t('restartApp')}
+              text={t(RESTART_APP_I18N_KEY)}
               standard={false}
               type={BtnTypes.PRIMARY}
               testID="RestartButton"
             />
           )}
         </View>
-      </View>
+      </SafeAreaView>
     )
   }
 }

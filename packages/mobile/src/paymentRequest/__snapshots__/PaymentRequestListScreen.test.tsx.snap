@@ -1,7 +1,7 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`PaymentRequestListScreen renders correctly with no requests 1`] = `
-<View
+<SafeAreaView
   style={
     Object {
       "backgroundColor": "#FFFFFF",
@@ -117,11 +117,11 @@ exports[`PaymentRequestListScreen renders correctly with no requests 1`] = `
   >
     empty
   </Text>
-</View>
+</SafeAreaView>
 `;
 
 exports[`PaymentRequestListScreen renders correctly with requests 1`] = `
-<View
+<SafeAreaView
   style={
     Object {
       "backgroundColor": "#FFFFFF",
@@ -396,17 +396,18 @@ exports[`PaymentRequestListScreen renders correctly with requests 1`] = `
                       <View
                         accessible={true}
                         isTVSelectable={true}
+                        nativeBackgroundAndroid={
+                          Object {
+                            "attribute": "selectableItemBackgroundBorderless",
+                            "type": "ThemeAttrAndroid",
+                          }
+                        }
                         onResponderGrant={[Function]}
                         onResponderMove={[Function]}
                         onResponderRelease={[Function]}
                         onResponderTerminate={[Function]}
                         onResponderTerminationRequest={[Function]}
                         onStartShouldSetResponder={[Function]}
-                        style={
-                          Object {
-                            "opacity": 1,
-                          }
-                        }
                       >
                         <Text
                           style={
@@ -435,17 +436,18 @@ exports[`PaymentRequestListScreen renders correctly with requests 1`] = `
                       <View
                         accessible={true}
                         isTVSelectable={true}
+                        nativeBackgroundAndroid={
+                          Object {
+                            "attribute": "selectableItemBackgroundBorderless",
+                            "type": "ThemeAttrAndroid",
+                          }
+                        }
                         onResponderGrant={[Function]}
                         onResponderMove={[Function]}
                         onResponderRelease={[Function]}
                         onResponderTerminate={[Function]}
                         onResponderTerminationRequest={[Function]}
                         onStartShouldSetResponder={[Function]}
-                        style={
-                          Object {
-                            "opacity": 1,
-                          }
-                        }
                       >
                         <Text
                           style={
@@ -675,17 +677,18 @@ exports[`PaymentRequestListScreen renders correctly with requests 1`] = `
                       <View
                         accessible={true}
                         isTVSelectable={true}
+                        nativeBackgroundAndroid={
+                          Object {
+                            "attribute": "selectableItemBackgroundBorderless",
+                            "type": "ThemeAttrAndroid",
+                          }
+                        }
                         onResponderGrant={[Function]}
                         onResponderMove={[Function]}
                         onResponderRelease={[Function]}
                         onResponderTerminate={[Function]}
                         onResponderTerminationRequest={[Function]}
                         onStartShouldSetResponder={[Function]}
-                        style={
-                          Object {
-                            "opacity": 1,
-                          }
-                        }
                       >
                         <Text
                           style={
@@ -714,17 +717,18 @@ exports[`PaymentRequestListScreen renders correctly with requests 1`] = `
                       <View
                         accessible={true}
                         isTVSelectable={true}
+                        nativeBackgroundAndroid={
+                          Object {
+                            "attribute": "selectableItemBackgroundBorderless",
+                            "type": "ThemeAttrAndroid",
+                          }
+                        }
                         onResponderGrant={[Function]}
                         onResponderMove={[Function]}
                         onResponderRelease={[Function]}
                         onResponderTerminate={[Function]}
                         onResponderTerminationRequest={[Function]}
                         onStartShouldSetResponder={[Function]}
-                        style={
-                          Object {
-                            "opacity": 1,
-                          }
-                        }
                       >
                         <Text
                           style={
@@ -954,17 +958,18 @@ exports[`PaymentRequestListScreen renders correctly with requests 1`] = `
                       <View
                         accessible={true}
                         isTVSelectable={true}
+                        nativeBackgroundAndroid={
+                          Object {
+                            "attribute": "selectableItemBackgroundBorderless",
+                            "type": "ThemeAttrAndroid",
+                          }
+                        }
                         onResponderGrant={[Function]}
                         onResponderMove={[Function]}
                         onResponderRelease={[Function]}
                         onResponderTerminate={[Function]}
                         onResponderTerminationRequest={[Function]}
                         onStartShouldSetResponder={[Function]}
-                        style={
-                          Object {
-                            "opacity": 1,
-                          }
-                        }
                       >
                         <Text
                           style={
@@ -993,17 +998,18 @@ exports[`PaymentRequestListScreen renders correctly with requests 1`] = `
                       <View
                         accessible={true}
                         isTVSelectable={true}
+                        nativeBackgroundAndroid={
+                          Object {
+                            "attribute": "selectableItemBackgroundBorderless",
+                            "type": "ThemeAttrAndroid",
+                          }
+                        }
                         onResponderGrant={[Function]}
                         onResponderMove={[Function]}
                         onResponderRelease={[Function]}
                         onResponderTerminate={[Function]}
                         onResponderTerminationRequest={[Function]}
                         onStartShouldSetResponder={[Function]}
-                        style={
-                          Object {
-                            "opacity": 1,
-                          }
-                        }
                       >
                         <Text
                           style={
@@ -1066,5 +1072,5 @@ exports[`PaymentRequestListScreen renders correctly with requests 1`] = `
       </View>
     </View>
   </RCTScrollView>
-</View>
+</SafeAreaView>
 `;
