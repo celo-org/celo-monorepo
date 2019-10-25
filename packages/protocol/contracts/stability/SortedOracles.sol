@@ -6,7 +6,8 @@ import "./interfaces/ISortedOracles.sol";
 import "../common/Initializable.sol";
 import "../common/linkedlists/AddressSortedLinkedListWithMedian.sol";
 import "../common/linkedlists/SortedLinkedListWithMedian.sol";
-
+import "../common/FractionUtil.sol";
+import "../common/FixidityLib.sol";
 
 // TODO: don't treat timestamps as Fixidity values
 /**
@@ -15,6 +16,9 @@ import "../common/linkedlists/SortedLinkedListWithMedian.sol";
 contract SortedOracles is ISortedOracles, Ownable, Initializable {
   using SafeMath for uint256;
   using AddressSortedLinkedListWithMedian for SortedLinkedListWithMedian.List;
+  using FractionUtil for FractionUtil.Fraction;
+  using FixidityLib for FixidityLib.Fraction;
+
   // All oracle rates are assumed to have a denominator of 2 ^ 64.
   uint256 public constant DENOMINATOR = 0x10000000000000000;
 
@@ -24,8 +28,11 @@ contract SortedOracles is ISortedOracles, Ownable, Initializable {
   mapping(address => SortedLinkedListWithMedian.List) private timestamps;
   mapping(address => mapping(address => bool)) public isOracle;
   mapping(address => address[]) public oracles;
+  mapping(address => uint) private limitedMedianRate;
+  mapping(address => uint) private limitedMedianRateTimestamp;
 
   uint256 public reportExpirySeconds;
+  FixidityLib.Fraction public maxMedianChangeRatePerDay;
 
   event OracleAdded(
     address indexed token,
@@ -60,6 +67,10 @@ contract SortedOracles is ISortedOracles, Ownable, Initializable {
     uint256 reportExpiry
   );
 
+  event MaxMedianChangeRatePerDaySet(
+    uint256 rate
+  );
+
   modifier onlyOracle(address token) {
     require(isOracle[token][msg.sender], "sender was not an oracle for token addr");
     _;
@@ -77,6 +88,34 @@ contract SortedOracles is ISortedOracles, Ownable, Initializable {
   function setReportExpiry(uint256 _reportExpirySeconds) external onlyOwner {
     reportExpirySeconds = _reportExpirySeconds;
     emit ReportExpirySet(_reportExpirySeconds);
+  }
+
+  /**
+   * @notice Sets the maximum change rate for median.
+   * @param rate Maximum median chaneg rate as unwrapped Fraction.
+   * @return True upon success.
+   */
+  function setMaxMedianChangeRatePerDay(uint256 rate) public onlyOwner returns (bool) {
+    return _setMaxMedianChangeRatePerDay(rate);
+  }
+
+  /**
+   * @notice Sets the maximum change rate for median.
+   * @param rate Maximum median chaneg rate as unwrapped Fraction.
+   * @return True upon success.
+   */
+  function _setMaxMedianChangeRatePerDay(uint256 rate) private returns (bool) {
+    maxMedianChangeRatePerDay = FixidityLib.wrap(rate);
+    emit MaxMedianChangeRatePerDaySet(rate);
+    return true;
+  }
+
+  /**
+   * @notice Get maximum median change rate.
+   * @return Max median change rate as unwrapped fraction.
+   */
+  function getMaxMedianChangeRatePerDay() public view returns (uint256) {
+    return maxMedianChangeRatePerDay.unwrap();
   }
 
   /**
@@ -152,7 +191,7 @@ contract SortedOracles is ISortedOracles, Ownable, Initializable {
     external
     onlyOracle(token)
   {
-    uint256 originalMedian = rates[token].getMedianValue();
+    uint256 originalMedian = limitedMedianRate[token];
     uint256 value = numerator.mul(DENOMINATOR).div(denominator);
     if (rates[token].contains(msg.sender)) {
       rates[token].update(msg.sender, value, lesserKey, greaterKey);
@@ -180,6 +219,25 @@ contract SortedOracles is ISortedOracles, Ownable, Initializable {
     );
     emit OracleReported(token, msg.sender, now, value, DENOMINATOR);
     uint256 newMedian = rates[token].getMedianValue();
+    if (limitedMedianRateTimestamp[token] != 0 && maxMedianChangeRatePerDay.unwrap() != 0) {
+      uint256 td = now.sub(limitedMedianRateTimestamp[token]);
+      if (td > 1 days) td = 1 days;
+      FixidityLib.Fraction memory timeFraction = FixidityLib.newFixedFraction(td, 1 days);
+      FixidityLib.Fraction memory maxChangeRate = timeFraction.multiply(maxMedianChangeRatePerDay);
+      uint256 maxChange = FixidityLib.newFixed(originalMedian).multiply(maxChangeRate).fromFixed();
+      if (newMedian > originalMedian) {
+        if (maxChange < newMedian.sub(originalMedian)) {
+          newMedian = originalMedian.add(maxChange);
+        }
+      }
+      else /* if (newMedian <= originalMedian) */ {
+        if (maxChange < originalMedian.sub(newMedian)) {
+          newMedian = originalMedian.sub(maxChange);
+        }
+      }
+    }
+    limitedMedianRateTimestamp[token] = now;
+    limitedMedianRate[token] = newMedian;
     if (newMedian != originalMedian) {
       emit MedianUpdated(token, newMedian, DENOMINATOR);
     }
@@ -200,8 +258,13 @@ contract SortedOracles is ISortedOracles, Ownable, Initializable {
    * @return The median exchange rate for `token`.
    */
   function medianRate(address token) external view returns (uint256, uint256) {
-    return (rates[token].getMedianValue(), numRates(token) == 0 ? 0 : DENOMINATOR);
+    return (limitedMedianRate[token], numRates(token) == 0 ? 0 : DENOMINATOR);
   }
+
+  /*
+  function medianRate(address token) external view returns (uint256, uint256) {
+    return (rates[token].getMedianValue(), numRates(token) == 0 ? 0 : DENOMINATOR);
+  }*/
 
   /**
    * @notice Gets all elements from the doubly linked list.

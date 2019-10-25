@@ -9,6 +9,7 @@ import {
 } from '@celo/protocol/lib/test-utils'
 import BigNumber from 'bignumber.js'
 import { SortedOraclesContract, SortedOraclesInstance } from 'types'
+import { toFixed } from '@celo/utils/lib/fixidity'
 
 const SortedOracles: SortedOraclesContract = artifacts.require('SortedOracles')
 
@@ -39,6 +40,60 @@ contract('SortedOracles', (accounts: string[]) => {
 
     it('should not be callable again', async () => {
       await assertRevert(sortedOracles.initialize(aReportExpiry))
+    })
+  })
+
+  describe('#setMaxMedianChangeRatePerDay', () => {
+    const newMaxMedianChangeRatePerDay = toFixed(1)
+    const denominator = new BigNumber(2).pow(64)
+    const smallChange = new BigNumber(2).pow(64).plus(1)
+    const largeChange = new BigNumber(2).pow(64).multipliedBy(2)
+    beforeEach(async () => {
+      await sortedOracles.addOracle(aToken, anOracle)
+      await sortedOracles.report(aToken, denominator, denominator, NULL_ADDRESS, NULL_ADDRESS, {
+        from: anOracle,
+      })
+    })
+    it('should update maxMedianChangeRatePerDay', async () => {
+      await sortedOracles.setMaxMedianChangeRatePerDay(newMaxMedianChangeRatePerDay)
+      assertEqualBN(
+        await sortedOracles.getMaxMedianChangeRatePerDay(),
+        newMaxMedianChangeRatePerDay
+      )
+    })
+    it('should revert when called by a non-owner', async () => {
+      await assertRevert(
+        sortedOracles.setMaxMedianChangeRatePerDay(newMaxMedianChangeRatePerDay, {
+          from: accounts[1],
+        })
+      )
+    })
+    it('should emit the MaxMedianChangeRatePerDaySet event', async () => {
+      const resp = await sortedOracles.setMaxMedianChangeRatePerDay(newMaxMedianChangeRatePerDay)
+      assert.equal(resp.logs.length, 1)
+      const log = resp.logs[0]
+      assertLogMatches2(log, {
+        event: 'MaxMedianChangeRatePerDaySet',
+        args: {
+          rate: new BigNumber(newMaxMedianChangeRatePerDay),
+        },
+      })
+    })
+    it('should allow a small change', async () => {
+      await sortedOracles.setMaxMedianChangeRatePerDay(newMaxMedianChangeRatePerDay)
+      await timeTravel(10, web3)
+      await sortedOracles.report(aToken, smallChange, denominator, NULL_ADDRESS, NULL_ADDRESS, {
+        from: anOracle,
+      })
+      assertEqualBN((await sortedOracles.medianRate(aToken))[0], smallChange)
+    })
+    it('should limit a large change', async () => {
+      await sortedOracles.setMaxMedianChangeRatePerDay(newMaxMedianChangeRatePerDay)
+      await timeTravel(10, web3)
+      await sortedOracles.report(aToken, largeChange, denominator, NULL_ADDRESS, NULL_ADDRESS, {
+        from: anOracle,
+      })
+      assert((await sortedOracles.medianRate(aToken))[0].lt(largeChange))
     })
   })
 
@@ -182,8 +237,8 @@ contract('SortedOracles', (accounts: string[]) => {
 
       it('should reset the median rate', async () => {
         await sortedOracles.removeOracle(aToken, anOracle, 0)
-        const [actualNumerator] = await sortedOracles.medianRate(aToken)
-        assert.equal(actualNumerator.toNumber(), 0)
+        const [_, actualDenumerator] = await sortedOracles.medianRate(aToken)
+        assert.equal(actualDenumerator.toNumber(), 0)
       })
 
       it('should decrease the number of timestamps', async () => {
