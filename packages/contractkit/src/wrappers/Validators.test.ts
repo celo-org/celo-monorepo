@@ -80,7 +80,7 @@ testWithGanache('Validators Wrapper', (web3) => {
     await setupGroup(groupAccount)
     await setupValidator(validatorAccount)
     await validators.affiliate(groupAccount).sendAndWaitForReceipt({ from: validatorAccount })
-    await validators.addMember(validatorAccount).sendAndWaitForReceipt({ from: groupAccount })
+    await (await validators.addMember(groupAccount, validatorAccount)).sendAndWaitForReceipt()
 
     const members = await validators.getValidatorGroup(groupAccount).then((group) => group.members)
     expect(members).toContain(validatorAccount)
@@ -99,7 +99,7 @@ testWithGanache('Validators Wrapper', (web3) => {
       for (const validator of [validator1, validator2]) {
         await setupValidator(validator)
         await validators.affiliate(groupAccount).sendAndWaitForReceipt({ from: validator })
-        await validators.addMember(validator).sendAndWaitForReceipt({ from: groupAccount })
+        await (await validators.addMember(groupAccount, validator)).sendAndWaitForReceipt()
       }
 
       const members = await validators

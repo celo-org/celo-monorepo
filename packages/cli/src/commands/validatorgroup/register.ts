@@ -14,7 +14,7 @@ export default class ValidatorGroupRegister extends BaseCommand {
   }
 
   static examples = [
-    'register --from 0x47e172F6CfB6c7D01C1574fa3E2Be7CC73269D95 --name myName --url "http://vgroup.com" --commission 0.1',
+    'register --from 0x47e172F6CfB6c7D01C1574fa3E2Be7CC73269D95 --name myName --commission 0.1',
   ]
 
   async run() {

@@ -6,12 +6,16 @@ import {
   SendTransactionLogEvent,
   SendTransactionLogEventType,
 } from '@celo/walletkit'
+import { call, select } from 'redux-saga/effects'
 import CeloAnalytics from 'src/analytics/CeloAnalytics'
 import { CustomEventNames } from 'src/analytics/constants'
 import { DEFAULT_INFURA_URL } from 'src/config'
 import Logger from 'src/utils/Logger'
-import { isZeroSyncMode, web3 } from 'src/web3/contracts'
+import { web3 } from 'src/web3/contracts'
+import { zeroSyncSelector } from 'src/web3/selectors'
 import { TransactionObject } from 'web3/eth/types'
+
+const TAG = 'transactions/send'
 
 // As per https://www.typescriptlang.org/docs/handbook/advanced-types.html#exhaustiveness-checking
 function assertNever(x: never): never {
@@ -56,31 +60,30 @@ const getLogger = (tag: string, txId: string) => {
 
 // Sends a transaction and async returns promises for the txhash, confirmation, and receipt
 // Only use this method if you need more granular control of the different events
-export const sendTransactionPromises = async (
+export function* sendTransactionPromises(
   tx: TransactionObject<any>,
   account: string,
   tag: string,
   txId: string,
   staticGas?: number | undefined
-) => {
-  Logger.debug(
-    'transactions/send@sendTransactionPromises',
-    `Going to send a transaction with id ${txId}`
-  )
-  const stableToken = await getStableTokenContract(web3)
+) {
+  Logger.debug(`${TAG}@sendTransactionPromises`, `Going to send a transaction with id ${txId}`)
+  const stableToken = yield call(getStableTokenContract, web3)
   // This if-else case is temprary and will disappear once we move from `walletkit` to `contractkit`.
-  if (isZeroSyncMode()) {
+  const zeroSyncMode = yield select(zeroSyncSelector)
+  if (zeroSyncMode) {
     // In dev mode, verify that we are actually able to connect to the network. This
     // ensures that we get a more meaningful error if the infura server is down, which
     // can happen with networks without SLA guarantees like `integration`.
     if (__DEV__) {
-      await verifyUrlWorksOrThrow(DEFAULT_INFURA_URL)
+      yield call(verifyUrlWorksOrThrow, DEFAULT_INFURA_URL)
     }
     Logger.debug(
-      'transactions/send@sendTransactionPromises',
+      `${TAG}@sendTransactionPromises`,
       `Sending transaction with id ${txId} using web3 signing`
     )
-    return sendTransactionAsyncWithWeb3Signing(
+    const transactionPromises = yield call(
+      sendTransactionAsyncWithWeb3Signing,
       web3,
       tx,
       account,
@@ -88,25 +91,36 @@ export const sendTransactionPromises = async (
       getLogger(tag, txId),
       staticGas
     )
+    return transactionPromises
   } else {
     Logger.debug(
-      'transactions/send@sendTransactionPromises',
+      `${TAG}@sendTransactionPromises`,
       `Sending transaction with id ${txId} using geth signing`
     )
-    return sendTransactionAsync(tx, account, stableToken, getLogger(tag, txId), staticGas)
+    const transactionPromises = yield call(
+      sendTransactionAsync,
+      tx,
+      account,
+      stableToken,
+      getLogger(tag, txId),
+      staticGas
+    )
+    return transactionPromises
   }
 }
 
 // Send a transaction and await for its confirmation
 // Use this method for sending transactions and awaiting them to be confirmed
-export const sendTransaction = async (
+export function* sendTransaction(
   tx: TransactionObject<any>,
   account: string,
   tag: string,
   txId: string,
   staticGas?: number | undefined
-) => {
-  return sendTransactionPromises(tx, account, tag, txId, staticGas).then(awaitConfirmation)
+) {
+  const txPromises = yield call(sendTransactionPromises, tx, account, tag, txId, staticGas)
+  const confirmation = yield call(awaitConfirmation, txPromises)
+  return confirmation
 }
 
 async function verifyUrlWorksOrThrow(url: string) {

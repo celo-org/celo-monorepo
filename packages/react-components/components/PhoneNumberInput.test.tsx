@@ -1,100 +1,41 @@
 import PhoneNumberInput from '@celo/react-components/components/PhoneNumberInput'
-import { shallow } from 'enzyme'
 import * as React from 'react'
-import { Text } from 'react-native'
-import Autocomplete from 'react-native-autocomplete-input'
-import * as renderer from 'react-test-renderer'
+import { fireEvent, render } from 'react-native-testing-library'
 
 describe('PhoneNumberInput', () => {
-  it('renders correctly with minimum props', () => {
-    const tree = renderer.create(
+  describe('when defaultCountry is falsy', () => {
+    it('renders an AutoComplete and a country can be selected', () => {
+      const mockSetCountryCode = jest.fn()
+      const { getByTestId, toJSON } = render(
+        <PhoneNumberInput
+          defaultCountry={null}
+          setE164Number={jest.fn()}
+          setIsValidNumber={jest.fn()}
+          setCountryCode={mockSetCountryCode}
+        />
+      )
+
+      expect(toJSON()).toMatchSnapshot()
+      const autocomplete = getByTestId('CountryNameField')
+      expect(autocomplete).toBeTruthy()
+      fireEvent.changeText(autocomplete, 'Canada')
+      expect(mockSetCountryCode).toHaveBeenCalledWith('+1')
+    })
+  })
+})
+
+describe('when defaultCountry is truthy', () => {
+  it('does not render an AutoComplete', () => {
+    const { queryByTestId, toJSON } = render(
       <PhoneNumberInput
-        defaultCountry={'USA'}
+        defaultCountry={'Canada'}
         setE164Number={jest.fn()}
         setIsValidNumber={jest.fn()}
         setCountryCode={jest.fn()}
       />
     )
-    expect(tree).toMatchSnapshot()
-  })
-
-  describe('when defaultCountry is falsy', () => {
-    it('renders an AutoComplete', () => {
-      const numberInput = shallow(
-        <PhoneNumberInput
-          defaultCountry={null}
-          setE164Number={jest.fn()}
-          setIsValidNumber={jest.fn()}
-          setCountryCode={jest.fn()}
-          inputCountryPlaceholder="Nations"
-        />
-      )
-      expect(numberInput.find(Autocomplete).props()).toEqual(
-        expect.objectContaining({ placeholder: 'Nations' })
-      )
-    })
-
-    describe('#renderItem', () => {
-      it('returns JSX with country name', () => {
-        const mockSetCountryCode = jest.fn()
-        const numberInput = shallow(
-          <PhoneNumberInput
-            defaultCountry={null}
-            setE164Number={jest.fn()}
-            setIsValidNumber={jest.fn()}
-            setCountryCode={mockSetCountryCode}
-            inputCountryPlaceholder="Nations"
-          />
-        )
-        const instance = numberInput.instance()
-
-        // @ts-ignore
-        const renderedItem = shallow(instance.renderItem({ item: 'GB' }))
-        expect(
-          renderedItem
-            .find(Text)
-            .last()
-            .children()
-            .text()
-        ).toEqual('UK')
-      })
-    })
-  })
-  describe('when defaultCountry is truthy', () => {
-    let onEndEditingPhoneNumber: () => void
-
-    beforeEach(() => {
-      onEndEditingPhoneNumber = jest.fn()
-    })
-
-    const numberInput = () => {
-      return shallow(
-        <PhoneNumberInput
-          defaultCountry={'USA'}
-          setE164Number={jest.fn()}
-          setIsValidNumber={jest.fn()}
-          setCountryCode={jest.fn()}
-          inputPhonePlaceholder="1800-867-5309"
-          onEndEditingPhoneNumber={onEndEditingPhoneNumber}
-        />
-      )
-    }
-
-    it('does not render an AutoComplete', () => {
-      expect(numberInput().find(Autocomplete).length).toEqual(0)
-    })
-
-    it('renders a TextInput', () => {
-      expect(
-        numberInput()
-          .find('ValidatedTextInput')
-          .props()
-      ).toEqual(
-        expect.objectContaining({
-          placeholder: '1800-867-5309',
-          onEndEditing: onEndEditingPhoneNumber,
-        })
-      )
-    })
+    expect(toJSON()).toMatchSnapshot()
+    const autocomplete = queryByTestId('CountryNameField')
+    expect(autocomplete).toBeFalsy()
   })
 })

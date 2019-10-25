@@ -190,14 +190,14 @@ contract Accounts is IAccounts, ReentrancyGuard, Initializable, UsingRegistry {
 
   /**
    * @notice Returns the account associated with `accountOrAttestationSigner`.
-   * @param accountOrAttestationSigner The address of the account or authorized attestation
-   *                                   signing key.
-   * @dev Fails if the `accountOrAttestationSigner` is not an account or authorized attestation
-   *      signing key.
+   * @param accountOrAttestationSigner The address of the account or active authorized attestation
+                                       signer.
+   * @dev Fails if the `accountOrAttestationSigner` is not an account or active authorized
+          attestation signer.
    * @return The associated account.
    */
-  function getAccountFromAttestationSigner(address accountOrAttestationSigner)
-    public
+  function getAccountFromActiveAttestationSigner(address accountOrAttestationSigner)
+    external
     view
     returns (address)
   {
@@ -212,12 +212,38 @@ contract Accounts is IAccounts, ReentrancyGuard, Initializable, UsingRegistry {
   }
 
   /**
-   * @notice Returns the account associated with `accountOrVoteSigner`.
-   * @param accountOrVoteSigner The address of the account or authorized voter.
-   * @dev Fails if the `accountOrVoteSigner` is not an account or authorized voter.
+   * @notice Returns the account associated with `accountOrAttestationSigner`.
+   * @param accountOrAttestationSigner The address of the account or previously authorized
+   *                                   attestation signing key.
+   * @dev Fails if the `accountOrAttestationSigner` is not an account or previously authorized
+   *      attestation signing key.
    * @return The associated account.
    */
-  function getAccountFromVoteSigner(address accountOrVoteSigner) external view returns (address) {
+  function getAccountFromAttestationSigner(address accountOrAttestationSigner)
+    public
+    view
+    returns (address)
+  {
+    address authorizingAccount = authorizedBy[accountOrAttestationSigner];
+    if (authorizingAccount != address(0)) {
+      return authorizingAccount;
+    } else {
+      require(isAccount(accountOrAttestationSigner));
+      return accountOrAttestationSigner;
+    }
+  }
+
+  /**
+   * @notice Returns the account associated with `accountOrVoteSigner`.
+   * @param accountOrVoteSigner The address of the account or active authorized vote signer.
+   * @dev Fails if the `accountOrVoteSigner` is not an account or active authorized vote signer.
+   * @return The associated account.
+   */
+  function getAccountFromActiveVoteSigner(address accountOrVoteSigner)
+    external
+    view
+    returns (address)
+  {
     address authorizingAccount = authorizedBy[accountOrVoteSigner];
     if (authorizingAccount != address(0)) {
       require(accounts[authorizingAccount].signers.voting == accountOrVoteSigner);
@@ -229,9 +255,46 @@ contract Accounts is IAccounts, ReentrancyGuard, Initializable, UsingRegistry {
   }
 
   /**
+   * @notice Returns the account associated with `accountOrVoteSigner`.
+   * @param accountOrVoteSigner The address of the account or previously authorized vote signer.
+   * @dev Fails if the `accountOrVoteSigner` is not an account or previously authorized vote signer.
+   * @return The associated account.
+   */
+  function getAccountFromVoteSigner(address accountOrVoteSigner) external view returns (address) {
+    address authorizingAccount = authorizedBy[accountOrVoteSigner];
+    if (authorizingAccount != address(0)) {
+      return authorizingAccount;
+    } else {
+      require(isAccount(accountOrVoteSigner));
+      return accountOrVoteSigner;
+    }
+  }
+  /**
    * @notice Returns the account associated with `accountOrValidationSigner`.
-   * @param accountOrValidationSigner The address of the account or authorized validator.
-   * @dev Fails if the `accountOrValidationSigner` is not an account or authorized validator.
+   * @param accountOrValidationSigner The address of the account or active authorized validator.
+   * @dev Fails if the `accountOrValidationSigner` is not an account or active authorized validator.
+   * @return The associated account.
+   */
+  function getAccountFromActiveValidationSigner(address accountOrValidationSigner)
+    public
+    view
+    returns (address)
+  {
+    address authorizingAccount = authorizedBy[accountOrValidationSigner];
+    if (authorizingAccount != address(0)) {
+      require(accounts[authorizingAccount].signers.validating == accountOrValidationSigner);
+      return authorizingAccount;
+    } else {
+      require(isAccount(accountOrValidationSigner));
+      return accountOrValidationSigner;
+    }
+  }
+
+  /**
+   * @notice Returns the account associated with `accountOrValidationSigner`.
+   * @param accountOrValidationSigner The address of the account or previously authorized validator.
+   * @dev Fails if the `accountOrValidationSigner` is not an account or previously authorized
+          validator.
    * @return The associated account.
    */
   function getAccountFromValidationSigner(address accountOrValidationSigner)
@@ -241,7 +304,6 @@ contract Accounts is IAccounts, ReentrancyGuard, Initializable, UsingRegistry {
   {
     address authorizingAccount = authorizedBy[accountOrValidationSigner];
     if (authorizingAccount != address(0)) {
-      require(accounts[authorizingAccount].signers.validating == accountOrValidationSigner);
       return authorizingAccount;
     } else {
       require(isAccount(accountOrValidationSigner));
