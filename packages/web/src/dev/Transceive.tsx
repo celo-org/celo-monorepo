@@ -7,27 +7,27 @@ import Svg from 'svgs'
 export default React.memo(function Transceive() {
   const phase1 = VALIDATOR_PATHS.length
   return (
-    <Svg width="100%" height="360" viewBox="0 0 550 360" fill="none">
-      <Path
-        d={
-          'M17.2856 166.012C11.003 166.012 4.23449 171.89 1.57066 179.71C0.0293159 184.231 0.263867 188.551 2.2408 191.582C3.59785 193.692 5.72557 194.965 8.22187 195.199C8.48993 195.233 8.75799 195.233 9.02605 195.233C11.9747 195.233 15.1411 193.776 17.939 191.331C20.7369 188.903 23.1494 185.47 24.6405 181.535C26.3829 176.913 26.1818 172.509 24.0876 169.462C22.5295 167.235 20.117 166.012 17.2856 166.012Z'
-        }
-        key={'validator'}
-        fill="#FCBA27"
-      />
+    <Svg width="100%" height="100%" viewBox="0 0 550 360" fill="none">
       <G style={{ mixBlendMode: 'screen' }} opacity="0.8">
+        <Path
+          d={
+            'M17.2856 166.012C11.003 166.012 4.23449 171.89 1.57066 179.71C0.0293159 184.231 0.263867 188.551 2.2408 191.582C3.59785 193.692 5.72557 194.965 8.22187 195.199C8.48993 195.233 8.75799 195.233 9.02605 195.233C11.9747 195.233 15.1411 193.776 17.939 191.331C20.7369 188.903 23.1494 185.47 24.6405 181.535C26.3829 176.913 26.1818 172.509 24.0876 169.462C22.5295 167.235 20.117 166.012 17.2856 166.012Z'
+          }
+          key={'validator'}
+          fill="#FCBA27"
+        />
         {VALIDATOR_PATHS.map((d, index) => {
           return (
             <Path
               d={d}
               key={d.substr(16)}
               fill="#FCBA27"
-              style={[styles.ripple, { animationDelay: `${decelerate(index)}ms` }]}
+              style={[styles.animate, styles.ripple, { animationDelay: `${decelerate(index)}ms` }]}
             />
           )
         })}
         <Path
-          style={[styles.ripple, { animationDelay: `${decelerate(phase1)}ms` }]}
+          style={[styles.animate, styles.ripple, { animationDelay: `${decelerate(phase1)}ms` }]}
           key={'middle'}
           fill="#FDEE90"
           d="M314.141 2.57935C348.308 2.57935 377.263 17.3074 395.689 44.0811C421.108 80.8884 423.508 134.255 402.27 190.485C384.67 236.862 355.586 279.344 320.308 310.064C285.392 340.629 247.018 357.446 212.283 357.446C208.567 357.446 205.521 357.317 202.605 357.008C172.592 354.248 147.121 338.875 130.889 313.649C107.121 277.074 104.231 224.558 122.941 169.567C155.405 74.3627 237.599 2.57935 314.141 2.57935ZM314.141 0C236.67 0 153.315 72.4798 120.489 168.741C101.547 224.429 104.463 277.744 128.721 315.042C145.418 340.964 171.586 356.75 202.373 359.561C205.65 359.897 208.902 360 212.308 360C248.747 360 287.637 342.073 322.037 311.972C356.437 282.026 386.321 239.88 404.695 191.388C426.244 134.358 423.766 80.1404 397.805 42.5851C378.863 15.115 349.108 0 314.141 0Z"
@@ -36,6 +36,7 @@ export default React.memo(function Transceive() {
           return (
             <Path
               style={[
+                styles.animate,
                 styles.ripple,
                 { animationDelay: `${accelerate(phase1 + index - 1, decelerate(phase1 - 2))}ms` },
               ]}
@@ -50,6 +51,7 @@ export default React.memo(function Transceive() {
           stroke={colors.greenScreen}
           strokeWidth="2"
           style={[
+            styles.animate,
             styles.solidify,
             {
               animationDelay: `${accelerate(
@@ -69,11 +71,13 @@ const OVERLAP_MULTLIER = 6
 const DURATION = SPEED * OVERLAP_MULTLIER
 
 const styles = StyleSheet.create({
-  solidify: {
+  animate: {
     animationDuration: `${DURATION}ms`,
     animationFillMode: 'both',
     animationIterationCount: '1',
     animationTimingFunction: 'linear',
+  },
+  solidify: {
     animationKeyframes: [
       {
         from: { fill: 'transparent' },
@@ -83,10 +87,6 @@ const styles = StyleSheet.create({
   },
   ripple: {
     opacity: 0,
-    animationFillMode: 'both',
-    animationDuration: `${DURATION}ms`,
-    animationIterationCount: '1',
-    animationTimingFunction: 'linear',
     animationKeyframes: [
       {
         from: { opacity: 0 },
