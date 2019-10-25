@@ -16,14 +16,19 @@ export default class ReportPrice extends BaseCommand {
       required: true,
       description: 'The token to report on',
     }),
-    price: flags.string({
+    numerator: flags.string({
       required: true,
-      description: 'The amount of the specified token equal to 1 cGLD',
+      description: 'Amount of the specified token equal to the amount of cGLD in the denominator',
+    }),
+    denominator: flags.string({
+      required: false,
+      description: 'Amount of cGLD equal to the numerator. Defaults to 1 if left blank',
     }),
   }
 
   static example = [
-    'report --token StableToken --price 1.02 --from 0x8c349AAc7065a35B7166f2659d6C35D75A3893C1',
+    'report --token StableToken --numerator 1.02 --from 0x8c349AAc7065a35B7166f2659d6C35D75A3893C1',
+    'report --token StableToken --numerator 102 --denominator 100 --from 0x8c349AAc7065a35B7166f2659d6C35D75A3893C1',
   ]
 
   async run() {
@@ -36,14 +41,26 @@ export default class ReportPrice extends BaseCommand {
     }
 
     const sortedOracles = await this.kit.contracts.getSortedOracles()
-    const price = new BigNumber(res.flags.price)
-    const denominator = new BigNumber(10).pow(price.decimalPlaces()).toNumber()
-    const numerator = price.multipliedBy(denominator).toNumber()
+    let numerator = new BigNumber(res.flags.numerator)
+    let denominator = new BigNumber(res.flags.denominator || 1)
+    if (numerator.decimalPlaces() > 0) {
+      const multiplier = new BigNumber(10).pow(numerator.decimalPlaces()).toNumber()
+      numerator = numerator.multipliedBy(multiplier)
+      denominator = denominator.multipliedBy(multiplier)
+    }
+    // const numerator = price.multipliedBy(denominator).toNumber()
 
     await displaySendTx(
       'sortedOracles.report',
-      await sortedOracles.report(token, numerator, denominator, res.flags.from)
+      await sortedOracles.report(
+        token,
+        numerator.toNumber(),
+        denominator.toNumber(),
+        res.flags.from
+      )
     )
-    this.log(`Reported oracle value of ${price} ${token} for 1 CeloGold`)
+    this.log(
+      `Reported oracle value of ${numerator.div(denominator).toNumber()} ${token} for 1 CeloGold`
+    )
   }
 }
