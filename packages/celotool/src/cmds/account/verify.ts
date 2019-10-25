@@ -99,13 +99,12 @@ async function requestMoreAttestations(
   phoneNumber: string,
   attestationsRequested: number
 ) {
-  console.log(attestations, phoneNumber, attestationsRequested)
-  // await attestations
-  //   .approveAttestationFee(attestationsRequested)
-  //   .then((txo) => txo.sendAndWaitForReceipt())
-  // await attestations
-  //   .request(phoneNumber, attestationsRequested)
-  //   .then((txo) => txo.sendAndWaitForReceipt())
+  await attestations
+    .approveAttestationFee(attestationsRequested)
+    .then((txo) => txo.sendAndWaitForReceipt())
+  await attestations
+    .request(phoneNumber, attestationsRequested)
+    .then((txo) => txo.sendAndWaitForReceipt())
 }
 
 async function revealAttestations(
