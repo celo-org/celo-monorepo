@@ -6,6 +6,7 @@ import * as _ from 'underscore'
 import * as helpers from 'web3-core-helpers'
 import * as Account from 'web3-eth-accounts/node_modules/eth-lib/lib/account'
 import * as utils from 'web3-utils'
+
 import Web3 = require('web3')
 
 function isNot(value: any) {
