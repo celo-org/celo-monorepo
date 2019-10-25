@@ -54,6 +54,7 @@ contract('Election', (accounts: string[]) => {
 
   beforeEach(async () => {
     accountsInstance = await Accounts.new()
+    await Promise.all(accounts.map((account) => accountsInstance.createAccount({ from: account })))
     election = await ElectionTest.new()
     mockLockedGold = await MockLockedGold.new()
     mockValidators = await MockValidators.new()
@@ -216,7 +217,6 @@ contract('Election', (accounts: string[]) => {
       describe('when the group has no votes', () => {
         let resp: any
         beforeEach(async () => {
-          await accountsInstance.createAccount({ from: group })
           resp = await election.markGroupEligible(group, NULL_ADDRESS, NULL_ADDRESS)
         })
 
@@ -254,7 +254,6 @@ contract('Election', (accounts: string[]) => {
     const group = accounts[1]
     describe('when the group is eligible', () => {
       beforeEach(async () => {
-        await accountsInstance.createAccount({ from: group })
         await mockValidators.setMembers(group, [accounts[9]])
         await registry.setAddressFor(CeloContractName.Validators, accounts[0])
         await election.markGroupEligible(group, NULL_ADDRESS, NULL_ADDRESS)
@@ -310,8 +309,6 @@ contract('Election', (accounts: string[]) => {
     const value = new BigNumber(1000)
     describe('when the group is eligible', () => {
       beforeEach(async () => {
-        await accountsInstance.createAccount({ from: group })
-        await accountsInstance.createAccount({ from: voter })
         await mockValidators.setMembers(group, [accounts[9]])
         await registry.setAddressFor(CeloContractName.Validators, accounts[0])
         await election.markGroupEligible(group, NULL_ADDRESS, NULL_ADDRESS)
@@ -391,7 +388,6 @@ contract('Election', (accounts: string[]) => {
             await mockLockedGold.incrementNonvotingAccountBalance(voter, value)
             for (let i = 0; i < maxNumGroupsVotedFor.toNumber(); i++) {
               newGroup = accounts[i + 2]
-              await accountsInstance.createAccount({ from: newGroup })
               await mockValidators.setMembers(newGroup, [accounts[9]])
               await registry.setAddressFor(CeloContractName.Validators, accounts[0])
               await election.markGroupEligible(newGroup, group, NULL_ADDRESS)
@@ -434,9 +430,6 @@ contract('Election', (accounts: string[]) => {
     const group = accounts[1]
     const value = 1000
     beforeEach(async () => {
-      await accountsInstance.createAccount({ from: group })
-      await accountsInstance.createAccount({ from: voter })
-
       await mockValidators.setMembers(group, [accounts[9]])
       await registry.setAddressFor(CeloContractName.Validators, accounts[0])
       await election.markGroupEligible(group, NULL_ADDRESS, NULL_ADDRESS)
@@ -564,8 +557,6 @@ contract('Election', (accounts: string[]) => {
     const value = 1000
     describe('when the voter has pending votes', () => {
       beforeEach(async () => {
-        await accountsInstance.createAccount({ from: group })
-        await accountsInstance.createAccount({ from: voter })
         await mockValidators.setMembers(group, [accounts[9]])
         await registry.setAddressFor(CeloContractName.Validators, accounts[0])
         await election.markGroupEligible(group, NULL_ADDRESS, NULL_ADDRESS)
@@ -668,8 +659,6 @@ contract('Election', (accounts: string[]) => {
     const value = 1000
     describe('when the voter has active votes', () => {
       beforeEach(async () => {
-        await accountsInstance.createAccount({ from: group })
-        await accountsInstance.createAccount({ from: voter })
         await mockValidators.setMembers(group, [accounts[9]])
         await registry.setAddressFor(CeloContractName.Validators, accounts[0])
         await election.markGroupEligible(group, NULL_ADDRESS, NULL_ADDRESS)
@@ -793,9 +782,6 @@ contract('Election', (accounts: string[]) => {
     }
 
     beforeEach(async () => {
-      await accountsInstance.createAccount({ from: group1 })
-      await accountsInstance.createAccount({ from: group2 })
-      await accountsInstance.createAccount({ from: group3 })
       await mockValidators.setMembers(group1, [validator1, validator2, validator3, validator4])
       await mockValidators.setMembers(group2, [validator5, validator6])
       await mockValidators.setMembers(group3, [validator7])

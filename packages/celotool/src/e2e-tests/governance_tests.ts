@@ -1,4 +1,5 @@
 import { ContractKit, newKitFromWeb3 } from '@celo/contractkit'
+import { AccountsWrapper } from '@celo/contractkit/lib/wrappers/Accounts'
 import { fromFixed, toFixed } from '@celo/utils/lib/fixidity'
 import BigNumber from 'bignumber.js'
 import { assert } from 'chai'
@@ -23,6 +24,7 @@ describe('governance tests', () => {
   let validators: any
   let goldToken: any
   let registry: any
+  let accounts: AccountsWrapper
   let kit: ContractKit
 
   before(async function(this: any) {
@@ -40,6 +42,7 @@ describe('governance tests', () => {
     validators = await kit._web3Contracts.getValidators()
     registry = await kit._web3Contracts.getRegistry()
     election = await kit._web3Contracts.getElection()
+    accounts = await kit.contracts.getAccounts()
   }
 
   const unlockAccount = async (address: string, theWeb3: any) => {
@@ -65,8 +68,8 @@ describe('governance tests', () => {
 
   const getValidatorGroupKeys = async () => {
     const [groupAddress] = await validators.methods.getRegisteredValidatorGroups().call()
-    const groupInfo = await validators.methods.getValidatorGroup(groupAddress).call()
-    const encryptedKeystore64 = groupInfo[0].split(' ')[1]
+    const name = await accounts.getName(groupAddress)
+    const encryptedKeystore64 = name.split(' ')[1]
     const encryptedKeystore = JSON.parse(Buffer.from(encryptedKeystore64, 'base64').toString())
     // The validator group ID is the validator group keystore encrypted with validator 0's
     // private key.

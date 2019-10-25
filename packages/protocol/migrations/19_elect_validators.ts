@@ -48,7 +48,7 @@ async function registerValidatorGroup(
   privateKey: string
 ) {
   // Validators can't also be validator groups, so we create a new account to register the
-  // validator group with, and set the group identifier to the private key of this account
+  // validator group with, and set the name of the group account to the private key of this account
   // encrypted with the private key of the first validator, so that the group private key
   // can be recovered.
   const account = web3.eth.accounts.create()

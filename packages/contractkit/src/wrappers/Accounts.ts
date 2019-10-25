@@ -94,6 +94,12 @@ export class AccountsWrapper extends BaseWrapper<Accounts> {
   }
 
   /**
+   * Returns the set name for the account
+   * @param account Account
+   */
+  getName = proxyCall(this.contract.methods.getName)
+
+  /**
    * Returns the set data encryption key for the account
    * @param account Account
    */
