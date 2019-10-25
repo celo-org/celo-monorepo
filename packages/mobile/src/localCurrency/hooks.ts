@@ -11,7 +11,7 @@ export function useExchangeRate() {
   return useSelector(getLocalCurrencyExchangeRate)
 }
 
-export function useDollarsToLocalAmount(amount: BigNumber.Value | null, timestamp: number) {
+export function useDollarsToLocalAmount(amount: BigNumber.Value | null) {
   const exchangeRate = useExchangeRate()
   const convertedAmount = convertDollarsToLocalAmount(amount, exchangeRate)
   if (!convertedAmount) {

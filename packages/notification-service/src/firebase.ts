@@ -52,7 +52,7 @@ interface GoldExchangeRateObject {
 }
 
 interface FiatExchangeRateObject {
-  makerToken: LocalCurrencyCode
+  makerToken: LocalCurrencyCode // For now, makerToken is always USD
   takerToken: LocalCurrencyCode
   exchangeRate: string
   timestamp: string

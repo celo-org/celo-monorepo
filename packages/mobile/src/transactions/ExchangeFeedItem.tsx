@@ -96,12 +96,12 @@ export function ExchangeFeedItem(props: Props) {
   const localCurrencySymbol = useLocalCurrencySymbol()
 
   if (!showGoldAmount) {
-    amount = !localCurrencyCode ? amount : useDollarsToLocalAmount(amount, timestamp) || 0
+    amount = !localCurrencyCode ? amount : useDollarsToLocalAmount(amount) || 0
   }
   if (inCurrency === CURRENCY_ENUM.DOLLAR) {
-    inValue = !localCurrencyCode ? inValue : useDollarsToLocalAmount(inValue, timestamp) || 0
+    inValue = !localCurrencyCode ? inValue : useDollarsToLocalAmount(inValue) || 0
   } else {
-    outValue = !localCurrencyCode ? outValue : useDollarsToLocalAmount(outValue, timestamp) || 0
+    outValue = !localCurrencyCode ? outValue : useDollarsToLocalAmount(outValue) || 0
   }
 
   const timeFormatted = formatFeedTime(timestamp, i18n)
