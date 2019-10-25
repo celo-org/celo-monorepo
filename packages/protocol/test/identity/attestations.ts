@@ -13,8 +13,8 @@ import { getPhoneHash } from '@celo/utils/lib/phoneNumbers'
 import BigNumber from 'bignumber.js'
 import { uniq } from 'lodash'
 import {
-  AttestationsContract,
-  AttestationsInstance,
+  TestAttestationsContract,
+  TestAttestationsInstance,
   MockLockedGoldContract,
   MockLockedGoldInstance,
   MockStableTokenContract,
@@ -28,7 +28,12 @@ import {
 } from 'types'
 import { getParsedSignatureOfAddress } from '../../lib/signing-utils'
 
-const Attestations: AttestationsContract = artifacts.require('Attestations')
+/* We use a contract that behaves like the actual Attestations contract, but
+ * mocks the implementations of validator set getters. These rely on precompiled
+ * contracts, which are not available in our current ganache fork, which we use
+ * for Truffle unit tests.
+ */
+const Attestations: TestAttestationsContract = artifacts.require('TestAttestations')
 const MockStableToken: MockStableTokenContract = artifacts.require('MockStableToken')
 const MockElection: MockElectionContract = artifacts.require('MockElection')
 const MockLockedGold: MockLockedGoldContract = artifacts.require('MockLockedGold')
@@ -41,7 +46,7 @@ const longDataEncryptionKey =
   '02f2f48ee19680706196e2e339e5da3491186e0c4c5030670656b0e01611111111'
 
 contract('Attestations', (accounts: string[]) => {
-  let attestations: AttestationsInstance
+  let attestations: TestAttestationsInstance
   let mockStableToken: MockStableTokenInstance
   let otherMockStableToken: MockStableTokenInstance
   let random: TestRandomInstance
@@ -158,6 +163,7 @@ contract('Attestations', (accounts: string[]) => {
       [mockStableToken.address, otherMockStableToken.address],
       [attestationFee, attestationFee]
     )
+    await attestations.__setValidators(accounts)
   })
 
   describe('#initialize()', () => {

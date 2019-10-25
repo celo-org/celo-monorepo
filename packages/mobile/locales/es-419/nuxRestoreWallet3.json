@@ -10,5 +10,9 @@
   "emptyWalletWarning": "Este Monedero esta vacio",
   "useEmptyAnyway": "¿Te gustaría usarlo de todos modos?",
   "useEmptyWallet": "Usar Monedero Vacío",
-  "tryAnotherKey": "Probar con otra Clave de Respaldo"
+  "tryAnotherKey": "Probar con otra Clave de Respaldo",
+  "restoreSocial": "Restaurar con Salvaguardas",
+  "socialImportInfo":
+    "Si habilitó las Salvaguardas, envió Frases de Salvaguarda a dos amigos. Recupere estas frases e ingréselas aquí (en cualquier orden) para recuperar el acceso a sus fondos.",
+  "socialTip": "Las frases son listas de 13 palabras separadas por espacios."
 }

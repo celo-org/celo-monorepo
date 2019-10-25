@@ -1,5 +1,4 @@
 import { ensureHexLeader } from '@celo/utils/src/signatureUtils'
-import { getStableTokenContract } from '@celo/walletkit'
 import BigNumber from 'bignumber.js'
 import { validateMnemonic } from 'bip39'
 import { mnemonicToSeedHex } from 'react-native-bip39'
@@ -7,11 +6,12 @@ import { call, put, spawn, takeLeading } from 'redux-saga/effects'
 import { setBackupCompleted } from 'src/account'
 import { showError } from 'src/alert/actions'
 import { ErrorMessages } from 'src/app/ErrorMessages'
+import { CURRENCY_ENUM } from 'src/geth/consts'
 import { refreshAllBalances } from 'src/home/actions'
 import {
   Actions,
+  backupPhraseEmpty,
   ImportBackupPhraseAction,
-  importBackupPhraseEmpty,
   importBackupPhraseFailure,
   importBackupPhraseSuccess,
 } from 'src/import/actions'
@@ -47,14 +47,15 @@ export function* importBackupPhraseSaga({ phrase, useEmptyWallet }: ImportBackup
 
       const dollarBalance: BigNumber = yield call(
         fetchTokenBalanceWithRetry,
-        getStableTokenContract,
+        CURRENCY_ENUM.DOLLAR,
         backupAccount
       )
 
       // TODO(Rossy) Check gold here too once verificiation is made optional
 
       if (dollarBalance.isLessThanOrEqualTo(0)) {
-        yield put(importBackupPhraseEmpty())
+        yield put(backupPhraseEmpty())
+        navigate(Screens.ImportWalletEmpty, { backupPhrase: phrase })
         return
       }
     }

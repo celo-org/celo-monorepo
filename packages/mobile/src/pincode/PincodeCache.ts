@@ -22,7 +22,7 @@ export function getCachedPincode() {
   return null
 }
 
-export function setCachedPincode(pincode: string) {
+export function setCachedPincode(pincode: string | null) {
   pincodeCache.timestamp = Date.now()
   pincodeCache.pincode = pincode
 }

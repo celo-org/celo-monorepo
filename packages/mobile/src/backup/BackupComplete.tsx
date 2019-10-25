@@ -1,77 +1,70 @@
-import Button, { BtnTypes } from '@celo/react-components/components/Button'
-import SmallButton from '@celo/react-components/components/SmallButton'
 import colors from '@celo/react-components/styles/colors'
 import { fontStyles } from '@celo/react-components/styles/fonts'
 import * as React from 'react'
 import { WithNamespaces, withNamespaces } from 'react-i18next'
-import { Clipboard, ScrollView, StyleSheet, Text } from 'react-native'
+import { StyleSheet, Text, View } from 'react-native'
 import SafeAreaView from 'react-native-safe-area-view'
-import CeloAnalytics from 'src/analytics/CeloAnalytics'
-import { CustomEventNames } from 'src/analytics/constants'
+import { connect } from 'react-redux'
 import componentWithAnalytics from 'src/analytics/wrapper'
-import BackupPhraseContainer from 'src/backup/BackupPhraseContainer'
+import { exitBackupFlow } from 'src/app/actions'
 import { Namespaces } from 'src/i18n'
 import NuxLogo from 'src/icons/NuxLogo'
-import Logger from 'src/utils/Logger'
+import { navigate, navigateHome } from 'src/navigator/NavigationService'
+import { Screens } from 'src/navigator/Screens'
+import { RootState } from 'src/redux/reducers'
 
-type Props = {
-  onPress: () => void
-  mnemonic: string | null
-  backupCompleted?: boolean
-} & WithNamespaces
-
-interface State {
-  selectedAnswer: string | null
+interface StateProps {
+  backupCompleted: boolean
+  socialBackupCompleted: boolean
 }
 
-class BackupComplete extends React.Component<Props, State> {
+interface DispatchProps {
+  exitBackupFlow: typeof exitBackupFlow
+}
+
+type Props = StateProps & DispatchProps & WithNamespaces
+
+const mapStateToProps = (state: RootState): StateProps => {
+  return {
+    backupCompleted: state.account.backupCompleted,
+    socialBackupCompleted: state.account.socialBackupCompleted,
+  }
+}
+
+class BackupComplete extends React.Component<Props> {
   static navigationOptions = { header: null }
 
-  state = {
-    selectedAnswer: null,
-  }
-
-  onSelectAnswer = (word: string) => this.setState({ selectedAnswer: word })
-
-  onDone = () => {
-    const { backupCompleted } = this.props
-
-    // Only track when going through backup flow, not viewing the backup again
-    if (!backupCompleted) {
-      CeloAnalytics.track(CustomEventNames.questions_done)
-    }
-    this.props.onPress()
-  }
-
-  copyToClipboard = () => {
-    const { t } = this.props
-    Clipboard.setString(this.props.mnemonic || '')
-    Logger.showMessage(t('copiedToClipboard'))
+  componentDidMount() {
+    // Show success text for a while before leaving screen
+    const { backupCompleted, socialBackupCompleted } = this.props
+    setTimeout(() => {
+      if (socialBackupCompleted) {
+        this.props.exitBackupFlow()
+        navigateHome()
+      } else if (backupCompleted) {
+        navigate(Screens.BackupIntroduction)
+      } else {
+        throw new Error('Backup complete screen should not be reachable without completing backup')
+      }
+    }, 2000)
   }
 
   render() {
-    const { t, backupCompleted, mnemonic } = this.props
+    const { t, backupCompleted, socialBackupCompleted } = this.props
     return (
       <SafeAreaView style={styles.container}>
-        <ScrollView
-          style={styles.questionTextContainer}
-          contentContainerStyle={styles.scrollContainer}
-        >
-          <NuxLogo />
-          <Text style={[fontStyles.h1, styles.h1]}>
-            {t(backupCompleted ? 'backupKey' : 'backupKeySet')}
-          </Text>
-          <Text style={fontStyles.body}>{t('dontLoseIt')}</Text>
-          {backupCompleted && <BackupPhraseContainer words={mnemonic} />}
-          <SmallButton
-            text={t('copyToClipboard')}
-            testID={'pasteMessageButton'}
-            onPress={this.copyToClipboard}
-            solid={false}
-            style={styles.copyToClipboardButton}
-          />
-        </ScrollView>
-        <Button onPress={this.onDone} text={t('done')} standard={true} type={BtnTypes.PRIMARY} />
+        <View style={styles.innerContainer}>
+          <NuxLogo height={70} />
+          {backupCompleted &&
+            !socialBackupCompleted && (
+              <>
+                <Text style={styles.h1}>{t('backupComplete.0')}</Text>
+                <Text style={styles.h2}>{t('backupComplete.1')}</Text>
+              </>
+            )}
+          {backupCompleted &&
+            socialBackupCompleted && <Text style={styles.h1}>{t('backupComplete.2')}</Text>}
+        </View>
       </SafeAreaView>
     )
   }
@@ -81,28 +74,28 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: colors.background,
-    justifyContent: 'space-between',
   },
-  scrollContainer: {
-    // https://medium.com/@peterpme/taming-react-natives-scrollview-with-flex-144e6ff76c08
-    flexGrow: 1,
-    backgroundColor: colors.background,
-    paddingHorizontal: 20,
-    paddingTop: 40,
+  innerContainer: {
+    flex: 1,
+    justifyContent: 'center',
     alignItems: 'center',
   },
-  questionTextContainer: {
-    flex: 1,
-  },
   h1: {
-    color: colors.dark,
-    paddingTop: 25,
+    ...fontStyles.h1,
+    marginTop: 20,
+    paddingHorizontal: 40,
   },
-  copyToClipboardButton: {
-    marginTop: 50,
-    alignSelf: 'center',
-    fontSize: 14,
+  h2: {
+    ...fontStyles.h2,
+    paddingHorizontal: 40,
   },
 })
 
-export default componentWithAnalytics(withNamespaces(Namespaces.backupKeyFlow6)(BackupComplete))
+export default componentWithAnalytics(
+  connect<StateProps, DispatchProps, {}, RootState>(
+    mapStateToProps,
+    {
+      exitBackupFlow,
+    }
+  )(withNamespaces(Namespaces.backupKeyFlow6)(BackupComplete))
+)
