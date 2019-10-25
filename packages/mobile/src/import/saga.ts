@@ -1,5 +1,4 @@
 import { ensureHexLeader } from '@celo/utils/src/signatureUtils'
-import { getStableTokenContract } from '@celo/walletkit'
 import BigNumber from 'bignumber.js'
 import { validateMnemonic } from 'bip39'
 import { mnemonicToSeedHex } from 'react-native-bip39'
@@ -7,6 +6,7 @@ import { call, put, spawn, takeLeading } from 'redux-saga/effects'
 import { setBackupCompleted } from 'src/account'
 import { showError } from 'src/alert/actions'
 import { ErrorMessages } from 'src/app/ErrorMessages'
+import { CURRENCY_ENUM } from 'src/geth/consts'
 import { refreshAllBalances } from 'src/home/actions'
 import {
   Actions,
@@ -19,7 +19,7 @@ import { redeemInviteSuccess } from 'src/invite/actions'
 import { navigate } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
 import { waitWeb3LastBlock } from 'src/networkInfo/saga'
-import { fetchTokenBalanceWithRetry } from 'src/tokens/saga'
+import { fetchTokenBalanceInWeiWithRetry } from 'src/tokens/saga'
 import { setKey } from 'src/utils/keyStore'
 import Logger from 'src/utils/Logger'
 import { web3 } from 'src/web3/contracts'
@@ -46,8 +46,8 @@ export function* importBackupPhraseSaga({ phrase, useEmptyWallet }: ImportBackup
         .address
 
       const dollarBalance: BigNumber = yield call(
-        fetchTokenBalanceWithRetry,
-        getStableTokenContract,
+        fetchTokenBalanceInWeiWithRetry,
+        CURRENCY_ENUM.DOLLAR,
         backupAccount
       )
 

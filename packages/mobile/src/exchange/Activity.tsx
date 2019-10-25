@@ -6,6 +6,7 @@ import { RootState } from 'src/redux/reducers'
 import { resetStandbyTransactions } from 'src/transactions/actions'
 import { StandbyTransaction, TransactionTypes } from 'src/transactions/reducer'
 import TransactionFeed, { FeedType } from 'src/transactions/TransactionFeed'
+import Logger from 'src/utils/Logger'
 import { currentAccountSelector } from 'src/web3/selectors'
 
 interface DispatchProps {
@@ -29,6 +30,7 @@ function filterToExchangeTxs(tx: StandbyTransaction) {
 export class Activity extends React.Component<Props> {
   componentDidMount() {
     this.props.resetStandbyTransactions()
+    Logger.info('Activity feed', JSON.stringify(transactionQuery))
   }
 
   render() {

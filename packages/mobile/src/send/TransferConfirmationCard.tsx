@@ -67,10 +67,13 @@ const renderTopSection = (props: Props) => {
 const renderAmountSection = (props: Props) => {
   const { currency, type, value } = props
 
+  // tslint:disable react-hooks-nesting
   const localCurrencyCode = useLocalCurrencyCode()
   const localCurrencySymbol = useLocalCurrencySymbol()
+  const localValue = useDollarsToLocalAmount(value) || 0
+  // tslint:enable react-hooks-nesting
   const transactionValue = getMoneyDisplayValue(
-    localCurrencyCode ? useDollarsToLocalAmount(value) || 0 : value
+    currency === CURRENCY_ENUM.DOLLAR && localCurrencyCode ? localValue : value
   )
 
   switch (type) {
@@ -87,7 +90,10 @@ const renderAmountSection = (props: Props) => {
     default:
       return (
         <MoneyAmount
-          symbol={localCurrencySymbol || CURRENCIES[currency].symbol}
+          symbol={
+            (currency === CURRENCY_ENUM.DOLLAR && localCurrencySymbol) ||
+            CURRENCIES[currency].symbol
+          }
           amount={transactionValue}
         />
       )
