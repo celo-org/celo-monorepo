@@ -160,6 +160,11 @@ export CELO_RELEASE_KEY_PASSWORD=celoFakeReleaseKeyPass
 ### Building an APK or Bundle
 
 ```sh
+# With fastlane:
+bundle install
+bundle exec fastlane android build_apk env:YOUR_BUILDING_VARIANT sdkEnv:YOUR_SDK_ENV
+
+# Or, manually
 cd android/
 ./gradlew clean
 ./gradlew bundle{YOUR_BUILDING_VARIANT}JsAndAssets
