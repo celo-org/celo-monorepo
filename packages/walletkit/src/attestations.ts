@@ -129,7 +129,7 @@ export async function getActionableAttestations(
   phoneHash: string,
   account: string
 ): Promise<ActionableAttestation[]> {
-  const attestationExpiryBlocks = parseInt(
+  const attestationExpirySeconds = parseInt(
     await attestations.methods.attestationExpirySeconds().call(),
     16
   )
@@ -144,7 +144,7 @@ export async function getActionableAttestations(
     .filter(
       (attestation) =>
         attestation.attestationState === AttestationState.Incomplete &&
-        now < attestation.time + attestationExpiryBlocks
+        now < attestation.time + attestationExpirySeconds
     )
 
   const publicKeys = await Promise.all(
