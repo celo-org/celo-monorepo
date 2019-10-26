@@ -601,7 +601,24 @@ contract('Validators', (accounts: string[]) => {
       })
     })
 
-    describe('when the account is already a registered validator', () => {
+    describe('when the account is already a registered validator ', () => {
+      beforeEach(async () => {
+        await mockLockedGold.setAccountTotalLockedGold(validator, balanceRequirements.group)
+        // @ts-ignore bytes type
+        await validators.registerValidator(publicKeysData)
+      })
+
+      it('should revert', async () => {
+        await assertRevert(
+          validators.registerValidator(
+            // @ts-ignore bytes type
+            publicKeysData
+          )
+        )
+      })
+    })
+
+    describe('when the account is already a registered validator group', () => {
       beforeEach(async () => {
         await mockLockedGold.setAccountTotalLockedGold(validator, balanceRequirements.group)
         await validators.registerValidatorGroup(commission)

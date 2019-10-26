@@ -5,6 +5,5 @@ import { AccountsInstance } from 'types'
 module.exports = deploymentForCoreContract<AccountsInstance>(
   web3,
   artifacts,
-  CeloContractName.Accounts,
-  async () => []
+  CeloContractName.Accounts
 )

@@ -40,7 +40,6 @@ contract('Integration: Governance', (accounts: string[]) => {
     lockedGold = await getDeployedProxiedContract('LockedGold', artifacts)
     governance = await getDeployedProxiedContract('Governance', artifacts)
     registry = await getDeployedProxiedContract('Registry', artifacts)
-    // Set up a LockedGold account with which we can vote.
     await accountsInstance.createAccount()
     // @ts-ignore
     await lockedGold.lock({ value })

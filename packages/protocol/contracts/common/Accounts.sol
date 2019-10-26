@@ -2,7 +2,6 @@ pragma solidity ^0.5.3;
 
 import "openzeppelin-solidity/contracts/utils/ReentrancyGuard.sol";
 import "openzeppelin-solidity/contracts/math/SafeMath.sol";
-import "openzeppelin-solidity/contracts/ownership/Ownable.sol";
 
 import "./interfaces/IAccounts.sol";
 
@@ -18,6 +17,7 @@ contract Accounts is IAccounts, ReentrancyGuard, Initializable, UsingRegistry {
     // The address that is authorized to sign a vote on behalf of the account.
     // The account can vote as well, whether or not an vote signing key has been specified.
     address voting;
+
     // The address that is authorized to sign consensus messages on behalf of the account.
     // The account can manage the validator, whether or not an validation signing key has been
     // specified. However if an validation signing key has been specified, only that key may
@@ -36,9 +36,11 @@ contract Accounts is IAccounts, ReentrancyGuard, Initializable, UsingRegistry {
     // account for any purpose.
     Signers signers;
 
-    // The address at which the account expects to receive transfers
+    // The address at which the account expects to receive transfers. If it's empty/0x0, the
+    // account indicates that an address exchange should be initiated with the dataEncryptionKey
     address walletAddress;
 
+    // The name the account wishes to be addressed as
     string name;
 
     // The ECDSA public key used to encrypt and decrypt data for this account
@@ -49,7 +51,6 @@ contract Accounts is IAccounts, ReentrancyGuard, Initializable, UsingRegistry {
   }
 
   mapping(address => Account) private accounts;
-
   // Maps voting and validating keys to the account that provided the authorization.
   mapping(address => address) public authorizedBy;
 
@@ -57,47 +58,11 @@ contract Accounts is IAccounts, ReentrancyGuard, Initializable, UsingRegistry {
   event AttestationSignerAuthorized(address indexed account, address signer);
   event VoteSignerAuthorized(address indexed account, address signer);
   event ValidationSignerAuthorized(address indexed account, address signer);
-
-  event AccountDataEncryptionKeySet(
-    address indexed account,
-    bytes dataEncryptionKey
-  );
-
-  event AccountNameSet(
-    address indexed account,
-    string name
-  );
-
-
-  event AccountMetadataURLSet(
-    address indexed account,
-    string metadataURL
-  );
-
-  event AccountWalletAddressSet(
-    address indexed account,
-    address walletAddress
-  );
-
-  event AccountCreated(
-    address indexed account,
-    string name
-  );
-
-  function initialize() external initializer {
-    _transferOwnership(msg.sender);
-  }
-
-  /**
-   * @notice Creates an account.
-   * @return True if account creation succeeded.
-   */
-  function createAccount() public returns (bool) {
-    require(isNotAccount(msg.sender) && isNotAuthorized(msg.sender));
-    Account storage account = accounts[msg.sender];
-    account.exists = true;
-    return true;
-  }
+  event AccountDataEncryptionKeySet(address indexed account, bytes dataEncryptionKey);
+  event AccountNameSet(address indexed account, string name);
+  event AccountMetadataURLSet(address indexed account, string metadataURL);
+  event AccountWalletAddressSet(address indexed account, address walletAddress);
+  event AccountCreated(address indexed account);
 
   /**
    * @notice Convenience Setter for the dataEncryptionKey and wallet address for an account
@@ -118,6 +83,16 @@ contract Accounts is IAccounts, ReentrancyGuard, Initializable, UsingRegistry {
     setName(name);
     setAccountDataEncryptionKey(dataEncryptionKey);
     setWalletAddress(walletAddress);
+  }
+
+  /**
+   * @notice Setter for the metadata of an account.
+   * @param metadataURL The URL to access the metadata.
+   */
+  function setMetadataURL(string calldata metadataURL) external {
+    require(isAccount(msg.sender));
+    accounts[msg.sender].metadataURL = metadataURL;
+    emit AccountMetadataURLSet(msg.sender, metadataURL);
   }
 
   /**
@@ -167,25 +142,12 @@ contract Accounts is IAccounts, ReentrancyGuard, Initializable, UsingRegistry {
   }
 
   /**
-   * @notice Authorizes an address to sign attestations on behalf of the account.
-   * @param attestor The address of the signing key to authorize.
-   * @param v The recovery id of the incoming ECDSA signature.
-   * @param r Output value r of the ECDSA signature.
-   * @param s Output value s of the ECDSA signature.
-   * @dev v, r, s constitute `attestor`'s signature on `msg.sender`.
+   * @notice Check if an address has been authorized by an account for voting or validating.
+   * @param account The possibly authorized address.
+   * @return Returns `true` if authorized. Returns `false` otherwise.
    */
-  function authorizeAttestationSigner(
-    address attestor,
-    uint8 v,
-    bytes32 r,
-    bytes32 s
-  )
-    public
-  {
-    Account storage account = accounts[msg.sender];
-    authorize(attestor, account.signers.attesting, v, r, s);
-    account.signers.attesting = attestor;
-    emit AttestationSignerAuthorized(msg.sender, attestor);
+  function isAuthorized(address account) external view returns (bool) {
+    return (authorizedBy[account] != address(0));
   }
 
   /**
@@ -204,28 +166,6 @@ contract Accounts is IAccounts, ReentrancyGuard, Initializable, UsingRegistry {
     address authorizingAccount = authorizedBy[accountOrAttestationSigner];
     if (authorizingAccount != address(0)) {
       require(accounts[authorizingAccount].signers.attesting == accountOrAttestationSigner);
-      return authorizingAccount;
-    } else {
-      require(isAccount(accountOrAttestationSigner));
-      return accountOrAttestationSigner;
-    }
-  }
-
-  /**
-   * @notice Returns the account associated with `accountOrAttestationSigner`.
-   * @param accountOrAttestationSigner The address of the account or previously authorized
-   *                                   attestation signing key.
-   * @dev Fails if the `accountOrAttestationSigner` is not an account or previously authorized
-   *      attestation signing key.
-   * @return The associated account.
-   */
-  function getAccountFromAttestationSigner(address accountOrAttestationSigner)
-    public
-    view
-    returns (address)
-  {
-    address authorizingAccount = authorizedBy[accountOrAttestationSigner];
-    if (authorizingAccount != address(0)) {
       return authorizingAccount;
     } else {
       require(isAccount(accountOrAttestationSigner));
@@ -269,6 +209,129 @@ contract Accounts is IAccounts, ReentrancyGuard, Initializable, UsingRegistry {
       return accountOrVoteSigner;
     }
   }
+
+  /**
+   * @notice Getter for the name of an account.
+   * @param account The address of the account to get the name for.
+   * @return name The name of the account.
+   */
+  function getName(address account) external view returns (string memory) {
+    return accounts[account].name;
+  }
+
+  /**
+   * @notice Getter for the metadata of an account.
+   * @param account The address of the account to get the metadata for.
+   * @return metadataURL The URL to access the metadata.
+   */
+  function getMetadataURL(address account) external view returns (string memory) {
+    return accounts[account].metadataURL;
+  }
+
+    /**
+   * @notice Getter for the data encryption key and version.
+   * @param account The address of the account to get the key for
+   * @return dataEncryptionKey secp256k1 public key for data encryption. Preferably compressed.
+   */
+  function getDataEncryptionKey(address account) external view returns (bytes memory) {
+    return accounts[account].dataEncryptionKey;
+  }
+
+  /**
+   * @notice Getter for the wallet address for an account
+   * @param account The address of the account to get the wallet address for
+   * @return Wallet address
+   */
+  function getWalletAddress(address account) external view returns (address) {
+    return accounts[account].walletAddress;
+  }
+
+  /**
+   * @notice Creates an account.
+   * @return True if account creation succeeded.
+   */
+  function createAccount() public returns (bool) {
+    require(isNotAccount(msg.sender) && isNotAuthorized(msg.sender));
+    Account storage account = accounts[msg.sender];
+    account.exists = true;
+    emit AccountCreated(msg.sender);
+    return true;
+  }
+
+  /**
+   * @notice Setter for the name of an account.
+   * @param name The name to set.
+   */
+  function setName(string memory name) public {
+    require(isAccount(msg.sender));
+    accounts[msg.sender].name = name;
+    emit AccountNameSet(msg.sender, name);
+  }
+
+  /**
+   * @notice Setter for the wallet address for an account
+   * @param walletAddress The wallet address to set for the account
+   */
+  function setWalletAddress(address walletAddress) public {
+    require(isAccount(msg.sender));
+    accounts[msg.sender].walletAddress = walletAddress;
+    emit AccountWalletAddressSet(msg.sender, walletAddress);
+  }
+
+  /**
+   * @notice Setter for the data encryption key and version.
+   * @param dataEncryptionKey secp256k1 public key for data encryption. Preferably compressed.
+   */
+  function setAccountDataEncryptionKey(bytes memory dataEncryptionKey) public {
+    require(dataEncryptionKey.length >= 33, "data encryption key length <= 32");
+    accounts[msg.sender].dataEncryptionKey = dataEncryptionKey;
+    emit AccountDataEncryptionKeySet(msg.sender, dataEncryptionKey);
+  }
+
+  /**
+   * @notice Authorizes an address to sign attestations on behalf of the account.
+   * @param attestor The address of the signing key to authorize.
+   * @param v The recovery id of the incoming ECDSA signature.
+   * @param r Output value r of the ECDSA signature.
+   * @param s Output value s of the ECDSA signature.
+   * @dev v, r, s constitute `attestor`'s signature on `msg.sender`.
+   */
+  function authorizeAttestationSigner(
+    address attestor,
+    uint8 v,
+    bytes32 r,
+    bytes32 s
+  )
+    public
+  {
+    Account storage account = accounts[msg.sender];
+    authorize(attestor, account.signers.attesting, v, r, s);
+    account.signers.attesting = attestor;
+    emit AttestationSignerAuthorized(msg.sender, attestor);
+  }
+
+  /**
+   * @notice Returns the account associated with `accountOrAttestationSigner`.
+   * @param accountOrAttestationSigner The address of the account or previously authorized
+   *                                   attestation signing key.
+   * @dev Fails if the `accountOrAttestationSigner` is not an account or previously authorized
+   *      attestation signing key.
+   * @return The associated account.
+   */
+  function getAccountFromAttestationSigner(address accountOrAttestationSigner)
+    public
+    view
+    returns (address)
+  {
+    address authorizingAccount = authorizedBy[accountOrAttestationSigner];
+    if (authorizingAccount != address(0)) {
+      return authorizingAccount;
+    } else {
+      require(isAccount(accountOrAttestationSigner));
+      return accountOrAttestationSigner;
+    }
+  }
+
   /**
    * @notice Returns the account associated with `accountOrValidationSigner`.
    * @param accountOrValidationSigner The address of the account or active authorized validator.
@@ -344,7 +407,34 @@ contract Accounts is IAccounts, ReentrancyGuard, Initializable, UsingRegistry {
     return attestor == address(0) ? account : attestor;
   }
 
-    /**
+  /**
+   * @notice Check if an account already exists.
+   * @param account The address of the account
+   * @return Returns `true` if account exists. Returns `false` otherwise.
+   */
+  function isAccount(address account) public view returns (bool) {
+    return (accounts[account].exists);
+  }
+
+  /**
+   * @notice Check if an account already exists.
+   * @param account The address of the account
+   * @return Returns `false` if account exists. Returns `true` otherwise.
+   */
+  function isNotAccount(address account) internal view returns (bool) {
+    return (!accounts[account].exists);
+  }
+
+  /**
+   * @notice Check if an address has been authorized by an account for voting or validating.
+   * @param account The possibly authorized address.
+   * @return Returns `false` if authorized. Returns `true` otherwise.
+   */
+  function isNotAuthorized(address account) internal view returns (bool) {
+    return (authorizedBy[account] == address(0));
+  }
+
+  /**
    * @notice Authorizes voting or validating power of `msg.sender`'s account to another address.
    * @param current The address to authorize.
    * @param previous The previous authorized address.
@@ -370,114 +460,5 @@ contract Accounts is IAccounts, ReentrancyGuard, Initializable, UsingRegistry {
 
     authorizedBy[previous] = address(0);
     authorizedBy[current] = msg.sender;
-  }
-
-  /**
-   * @notice Check if an account already exists.
-   * @param account The address of the account
-   * @return Returns `true` if account exists. Returns `false` otherwise.
-   */
-  function isAccount(address account) public view returns (bool) {
-    return (accounts[account].exists);
-  }
-
-  /**
-   * @notice Check if an account already exists.
-   * @param account The address of the account
-   * @return Returns `false` if account exists. Returns `true` otherwise.
-   */
-  function isNotAccount(address account) internal view returns (bool) {
-    return (!accounts[account].exists);
-  }
-
-    /**
-   * @notice Check if an address has been authorized by an account for voting or validating.
-   * @param account The possibly authorized address.
-   * @return Returns `true` if authorized. Returns `false` otherwise.
-   */
-  function isAuthorized(address account) external view returns (bool) {
-    return (authorizedBy[account] != address(0));
-  }
-
-  /**
-   * @notice Check if an address has been authorized by an account for voting or validating.
-   * @param account The possibly authorized address.
-   * @return Returns `false` if authorized. Returns `true` otherwise.
-   */
-  function isNotAuthorized(address account) internal view returns (bool) {
-    return (authorizedBy[account] == address(0));
-  }
-
-  /**
-   * @notice Setter for the metadata of an account.
-   * @param metadataURL The URL to access the metadata.
-   */
-  function setMetadataURL(string calldata metadataURL) external {
-    accounts[msg.sender].metadataURL = metadataURL;
-    emit AccountMetadataURLSet(msg.sender, metadataURL);
-  }
-
-  /**
-   * @notice Setter for the name of an account.
-   * @param name The name to set.
-   */
-  function setName(string memory name) public {
-    accounts[msg.sender].name = name;
-    emit AccountNameSet(msg.sender, name);
-  }
-
-  /**
-   * @notice Getter for the name of an account.
-   * @param account The address of the account to get the name for.
-   * @return name The name of the account.
-   */
-  function getName(address account) external view returns (string memory) {
-    return accounts[account].name;
-  }
-
-  /**
-   * @notice Getter for the metadata of an account.
-   * @param account The address of the account to get the metadata for.
-   * @return metadataURL The URL to access the metadata.
-   */
-  function getMetadataURL(address account) external view returns (string memory) {
-    return accounts[account].metadataURL;
-  }
-
-    /**
-   * @notice Setter for the data encryption key and version.
-   * @param dataEncryptionKey secp256k1 public key for data encryption. Preferably compressed.
-   */
-  function setAccountDataEncryptionKey(bytes memory dataEncryptionKey) public {
-    require(dataEncryptionKey.length >= 33, "data encryption key length <= 32");
-    accounts[msg.sender].dataEncryptionKey = dataEncryptionKey;
-    emit AccountDataEncryptionKeySet(msg.sender, dataEncryptionKey);
-  }
-
-  /**
-   * @notice Getter for the data encryption key and version.
-   * @param account The address of the account to get the key for
-   * @return dataEncryptionKey secp256k1 public key for data encryption. Preferably compressed.
-   */
-  function getDataEncryptionKey(address account) external view returns (bytes memory) {
-    return accounts[account].dataEncryptionKey;
-  }
-
-  /**
-   * @notice Setter for the wallet address for an account
-   * @param walletAddress The wallet address to set for the account
-   */
-  function setWalletAddress(address walletAddress) public {
-    accounts[msg.sender].walletAddress = walletAddress;
-    emit AccountWalletAddressSet(msg.sender, walletAddress);
-  }
-
-  /**
-   * @notice Getter for the wallet address for an account
-   * @param account The address of the account to get the wallet address for
-   * @return Wallet address
-   */
-  function getWalletAddress(address account) external view returns (address) {
-    return accounts[account].walletAddress;
   }
 }

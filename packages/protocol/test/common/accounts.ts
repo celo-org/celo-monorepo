@@ -8,7 +8,8 @@ import {
   NULL_ADDRESS,
 } from '../../lib/test-utils'
 const Accounts: Truffle.Contract<AccountsInstance> = artifacts.require('Accounts')
-let authorizationTests: any = {
+const authorizationTests: any = {}
+const authorizationTestDescriptions = {
   voting: {
     me: 'vote signing key',
     subject: 'voteSigner',
@@ -25,7 +26,7 @@ let authorizationTests: any = {
 
 contract('Accounts', (accounts: string[]) => {
   let accountsInstance: AccountsInstance
-  let account = accounts[0]
+  const account = accounts[0]
   const caller = accounts[0]
 
   const name = 'Account'
@@ -37,7 +38,6 @@ contract('Accounts', (accounts: string[]) => {
 
   beforeEach(async () => {
     accountsInstance = await Accounts.new({ from: account })
-    await accountsInstance.initialize()
 
     authorizationTests.voting = {
       fn: accountsInstance.authorizeVoteSigner,
@@ -62,14 +62,21 @@ contract('Accounts', (accounts: string[]) => {
     }
   })
 
-  describe('#initialize()', () => {
-    it('should set the owner', async () => {
-      const owner: string = await accountsInstance.owner()
-      assert.equal(owner, account)
+  describe('#createAccount', () => {
+    it('creates the account', async () => {
+      let isAccount = await accountsInstance.isAccount(account)
+      assert.isFalse(isAccount)
+      await accountsInstance.createAccount()
+      isAccount = await accountsInstance.isAccount(account)
+      assert.isTrue(isAccount)
     })
 
-    it('should revert if already initialized', async () => {
-      await assertRevert(accountsInstance.initialize())
+    it('emits an AccountCreated event', async () => {
+      const resp = await accountsInstance.createAccount()
+      assertLogMatches2(resp.logs[0], {
+        event: 'AccountCreated',
+        args: { account },
+      })
     })
   })
 
@@ -117,80 +124,201 @@ contract('Accounts', (accounts: string[]) => {
   })
 
   describe('#setAccount', async () => {
-    it('should set the name, dataEncryptionKey and walletAddress', async () => {
-      // @ts-ignore
-      await accountsInstance.setAccount(name, dataEncryptionKey, caller)
-      const expectedWalletAddress = await accountsInstance.getWalletAddress(caller)
-      assert.equal(expectedWalletAddress, caller)
-      const expectedKey = await accountsInstance.getDataEncryptionKey(caller)
-      // @ts-ignore
-      assert.equal(expectedKey, dataEncryptionKey)
-      const expectedName = await accountsInstance.getName(caller)
-      assert.equal(expectedName, name)
+    describe('when the account has been created', () => {
+      beforeEach(async () => {
+        await accountsInstance.createAccount()
+      })
+
+      it('should set the name, dataEncryptionKey and walletAddress', async () => {
+        // @ts-ignore
+        await accountsInstance.setAccount(name, dataEncryptionKey, caller)
+        const expectedWalletAddress = await accountsInstance.getWalletAddress(caller)
+        assert.equal(expectedWalletAddress, caller)
+        const expectedKey = await accountsInstance.getDataEncryptionKey(caller)
+        // @ts-ignore
+        assert.equal(expectedKey, dataEncryptionKey)
+        const expectedName = await accountsInstance.getName(caller)
+        assert.equal(expectedName, name)
+      })
+
+      it('emits the AccountNameSet event', async () => {
+        // @ts-ignore
+        const resp = await accountsInstance.setAccount(name, dataEncryptionKey, caller)
+        assertLogMatches2(resp.logs[0], {
+          event: 'AccountNameSet',
+          args: { account: caller, name },
+        })
+      })
+
+      it('emits the AccountDataEncryptionKeySet event', async () => {
+        // @ts-ignore
+        const resp = await accountsInstance.setAccount(name, dataEncryptionKey, caller)
+        assertLogMatches2(resp.logs[1], {
+          event: 'AccountDataEncryptionKeySet',
+          args: { account: caller, dataEncryptionKey },
+        })
+      })
+
+      it('emits the AccountWalletAddressSet event', async () => {
+        // @ts-ignore
+        const resp = await accountsInstance.setAccount(name, dataEncryptionKey, caller)
+        assertLogMatches2(resp.logs[2], {
+          event: 'AccountWalletAddressSet',
+          args: { account: caller, walletAddress: caller },
+        })
+      })
+    })
+
+    describe('when the account has not yet been created', () => {
+      it('should set the name, dataEncryptionKey and walletAddress', async () => {
+        // @ts-ignore
+        await accountsInstance.setAccount(name, dataEncryptionKey, caller)
+        const expectedWalletAddress = await accountsInstance.getWalletAddress(caller)
+        assert.equal(expectedWalletAddress, caller)
+        const expectedKey = await accountsInstance.getDataEncryptionKey(caller)
+        // @ts-ignore
+        assert.equal(expectedKey, dataEncryptionKey)
+        const expectedName = await accountsInstance.getName(caller)
+        assert.equal(expectedName, name)
+        const isAccount = await accountsInstance.isAccount(caller)
+        assert.isTrue(isAccount)
+      })
+
+      it('emits the AccountCreated event', async () => {
+        // @ts-ignore
+        const resp = await accountsInstance.setAccount(name, dataEncryptionKey, caller)
+        assertLogMatches2(resp.logs[0], {
+          event: 'AccountCreated',
+          args: { account: caller },
+        })
+      })
+
+      it('emits the AccountNameSet event', async () => {
+        // @ts-ignore
+        const resp = await accountsInstance.setAccount(name, dataEncryptionKey, caller)
+        assertLogMatches2(resp.logs[1], {
+          event: 'AccountNameSet',
+          args: { account: caller, name },
+        })
+      })
+
+      it('emits the AccountDataEncryptionKeySet event', async () => {
+        // @ts-ignore
+        const resp = await accountsInstance.setAccount(name, dataEncryptionKey, caller)
+        assertLogMatches2(resp.logs[2], {
+          event: 'AccountDataEncryptionKeySet',
+          args: { account: caller, dataEncryptionKey },
+        })
+      })
+
+      it('emits the AccountWalletAddressSet event', async () => {
+        // @ts-ignore
+        const resp = await accountsInstance.setAccount(name, dataEncryptionKey, caller)
+        assertLogMatches2(resp.logs[3], {
+          event: 'AccountWalletAddressSet',
+          args: { account: caller, walletAddress: caller },
+        })
+      })
     })
   })
 
   describe('#setWalletAddress', async () => {
-    it('should set the walletAddress', async () => {
-      await accountsInstance.setWalletAddress(caller)
-      const result = await accountsInstance.getWalletAddress(caller)
-      assert.equal(result, caller)
+    describe('when the account has not been created', () => {
+      it('should revert', async () => {
+        await assertRevert(accountsInstance.setWalletAddress(caller))
+      })
     })
 
-    it('should set the NULL_ADDRESS', async () => {
-      await accountsInstance.setWalletAddress(NULL_ADDRESS)
-      const result = await accountsInstance.getWalletAddress(caller)
-      assert.equal(result, NULL_ADDRESS)
-    })
+    describe('when the account has been created', () => {
+      beforeEach(async () => {
+        accountsInstance.createAccount()
+      })
 
-    it('should emit the AccountWalletAddressSet event', async () => {
-      const response = await accountsInstance.setWalletAddress(caller)
-      assert.lengthOf(response.logs, 1)
-      const event = response.logs[0]
-      assertLogMatches2(event, {
-        event: 'AccountWalletAddressSet',
-        args: { account: caller, walletAddress: caller },
+      it('should set the walletAddress', async () => {
+        await accountsInstance.setWalletAddress(caller)
+        const result = await accountsInstance.getWalletAddress(caller)
+        assert.equal(result, caller)
+      })
+
+      it('should set the NULL_ADDRESS', async () => {
+        await accountsInstance.setWalletAddress(NULL_ADDRESS)
+        const result = await accountsInstance.getWalletAddress(caller)
+        assert.equal(result, NULL_ADDRESS)
+      })
+
+      it('should emit the AccountWalletAddressSet event', async () => {
+        const response = await accountsInstance.setWalletAddress(caller)
+        assert.lengthOf(response.logs, 1)
+        const event = response.logs[0]
+        assertLogMatches2(event, {
+          event: 'AccountWalletAddressSet',
+          args: { account: caller, walletAddress: caller },
+        })
       })
     })
   })
 
   describe('#setMetadataURL', async () => {
-    it('should set the metadataURL', async () => {
-      await accountsInstance.setMetadataURL(metadataURL)
-      const result = await accountsInstance.getMetadataURL(caller)
-      assert.equal(result, metadataURL)
+    describe('when the account has not been created', () => {
+      it('should revert', async () => {
+        await assertRevert(accountsInstance.setMetadataURL(caller))
+      })
     })
 
-    it('should emit the AccountMetadataURLSet event', async () => {
-      const response = await accountsInstance.setMetadataURL(metadataURL)
-      assert.lengthOf(response.logs, 1)
-      const event = response.logs[0]
-      assertLogMatches2(event, {
-        event: 'AccountMetadataURLSet',
-        args: { account: caller, metadataURL },
+    describe('when the account has been created', () => {
+      beforeEach(async () => {
+        accountsInstance.createAccount()
+      })
+
+      it('should set the metadataURL', async () => {
+        await accountsInstance.setMetadataURL(metadataURL)
+        const result = await accountsInstance.getMetadataURL(caller)
+        assert.equal(result, metadataURL)
+      })
+
+      it('should emit the AccountMetadataURLSet event', async () => {
+        const response = await accountsInstance.setMetadataURL(metadataURL)
+        assert.lengthOf(response.logs, 1)
+        const event = response.logs[0]
+        assertLogMatches2(event, {
+          event: 'AccountMetadataURLSet',
+          args: { account: caller, metadataURL },
+        })
       })
     })
   })
 
   describe('#setName', async () => {
-    it('should set the name', async () => {
-      await accountsInstance.setName(name)
-      const result = await accountsInstance.getName(caller)
-      assert.equal(result, name)
+    describe('when the account has not been created', () => {
+      it('should revert', async () => {
+        await assertRevert(accountsInstance.setWalletAddress(caller))
+      })
     })
 
-    it('should emit the AccountNameSet event', async () => {
-      const response = await accountsInstance.setName(name)
-      assert.lengthOf(response.logs, 1)
-      const event = response.logs[0]
-      assertLogMatches2(event, {
-        event: 'AccountNameSet',
-        args: { account: caller, name },
+    describe('when the account has been created', () => {
+      beforeEach(async () => {
+        accountsInstance.createAccount()
+      })
+
+      it('should set the name', async () => {
+        await accountsInstance.setName(name)
+        const result = await accountsInstance.getName(caller)
+        assert.equal(result, name)
+      })
+
+      it('should emit the AccountNameSet event', async () => {
+        const response = await accountsInstance.setName(name)
+        assert.lengthOf(response.logs, 1)
+        const event = response.logs[0]
+        assertLogMatches2(event, {
+          event: 'AccountNameSet',
+          args: { account: caller, name },
+        })
       })
     })
   })
 
-  Object.keys(authorizationTests).forEach((key) => {
+  Object.keys(authorizationTestDescriptions).forEach((key) => {
     describe('authorization tests:', () => {
       let authorizationTest: any
       beforeEach(async () => {
@@ -198,7 +326,7 @@ contract('Accounts', (accounts: string[]) => {
         await accountsInstance.createAccount()
       })
 
-      describe(`#authorize${upperFirst(authorizationTests[key].subject)}()`, () => {
+      describe(`#authorize${upperFirst(authorizationTestDescriptions[key].subject)}()`, () => {
         const authorized = accounts[1]
         let sig
 
@@ -206,7 +334,7 @@ contract('Accounts', (accounts: string[]) => {
           sig = await getParsedSignatureOfAddress(web3, account, authorized)
         })
 
-        it(`should set the authorized ${authorizationTests[key].me}`, async () => {
+        it(`should set the authorized ${authorizationTestDescriptions[key].me}`, async () => {
           await authorizationTest.fn(authorized, sig.v, sig.r, sig.s)
           assert.equal(await accountsInstance.authorizedBy(authorized), account)
           assert.equal(await authorizationTest.getAuthorizedFromAccount(account), authorized)
@@ -221,12 +349,16 @@ contract('Accounts', (accounts: string[]) => {
           assertLogMatches(log, authorizationTest.eventName, expected)
         })
 
-        it(`should revert if the ${authorizationTests[key].me} is an account`, async () => {
+        it(`should revert if the ${
+          authorizationTestDescriptions[key].me
+        } is an account`, async () => {
           await accountsInstance.createAccount({ from: authorized })
           await assertRevert(authorizationTest.fn(authorized, sig.v, sig.r, sig.s))
         })
 
-        it(`should revert if the ${authorizationTests[key].me} is already authorized`, async () => {
+        it(`should revert if the ${
+          authorizationTestDescriptions[key].me
+        } is already authorized`, async () => {
           const otherAccount = accounts[2]
           const otherSig = await getParsedSignatureOfAddress(web3, otherAccount, authorized)
           await accountsInstance.createAccount({ from: otherAccount })
@@ -253,7 +385,7 @@ contract('Accounts', (accounts: string[]) => {
             await authorizationTest.fn(newAuthorized, newSig.v, newSig.r, newSig.s)
           })
 
-          it(`should set the new authorized ${authorizationTests[key].me}`, async () => {
+          it(`should set the new authorized ${authorizationTestDescriptions[key].me}`, async () => {
             assert.equal(await accountsInstance.authorizedBy(newAuthorized), account)
             assert.equal(await authorizationTest.getAuthorizedFromAccount(account), newAuthorized)
             assert.equal(
@@ -268,8 +400,10 @@ contract('Accounts', (accounts: string[]) => {
         })
       })
 
-      describe(`#getAccountFrom${upperFirst(authorizationTests[key].subject)}()`, () => {
-        describe(`when the account has not authorized a ${authorizationTests[key].me}`, () => {
+      describe(`#getAccountFrom${upperFirst(authorizationTestDescriptions[key].subject)}()`, () => {
+        describe(`when the account has not authorized a ${
+          authorizationTestDescriptions[key].me
+        }`, () => {
           it('should return the account when passed the account', async () => {
             assert.equal(await authorizationTest.getAccountFromActiveAuthorized(account), account)
           })
@@ -279,7 +413,9 @@ contract('Accounts', (accounts: string[]) => {
           })
         })
 
-        describe(`when the account has authorized a ${authorizationTests[key].me}`, () => {
+        describe(`when the account has authorized a ${
+          authorizationTestDescriptions[key].me
+        }`, () => {
           const authorized = accounts[1]
           beforeEach(async () => {
             const sig = await getParsedSignatureOfAddress(web3, account, authorized)
@@ -291,7 +427,7 @@ contract('Accounts', (accounts: string[]) => {
           })
 
           it(`should return the account when passed the ${
-            authorizationTests[key].me
+            authorizationTestDescriptions[key].me
           }`, async () => {
             assert.equal(
               await authorizationTest.getAccountFromActiveAuthorized(authorized),
@@ -301,8 +437,10 @@ contract('Accounts', (accounts: string[]) => {
         })
       })
 
-      describe(`#get${upperFirst(authorizationTests[key].subject)}FromAccount()`, () => {
-        describe(`when the account has not authorized a ${authorizationTests[key].me}`, () => {
+      describe(`#get${upperFirst(authorizationTestDescriptions[key].subject)}FromAccount()`, () => {
+        describe(`when the account has not authorized a ${
+          authorizationTestDescriptions[key].me
+        }`, () => {
           it('should return the account when passed the account', async () => {
             assert.equal(await authorizationTest.getAuthorizedFromAccount(account), account)
           })
@@ -312,7 +450,9 @@ contract('Accounts', (accounts: string[]) => {
           })
         })
 
-        describe(`when the account has authorized a ${authorizationTests[key].me}`, () => {
+        describe(`when the account has authorized a ${
+          authorizationTestDescriptions[key].me
+        }`, () => {
           const authorized = accounts[1]
 
           beforeEach(async () => {
