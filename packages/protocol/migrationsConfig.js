@@ -11,23 +11,30 @@ const DefaultConfig = {
     attestationExpiryBlocks: (60 * 60) / 5, // 1 hour,
     attestationRequestFeeInDollars: 0.05,
   },
-  lockedGold: {
-    unlockingPeriod: 60 * 60 * 24 * 3, // 3 days
-  },
-  oracles: {
-    reportExpiry: 60 * 60, // 1 hour
+  blockchainParameters: {
+    minimumClientVersion: {
+      major: 1,
+      minor: 8,
+      patch: 23,
+    },
   },
   election: {
     minElectableValidators: '22',
     maxElectableValidators: '100',
     maxVotesPerAccount: 3,
-    electabilityThreshold: '0', // no threshold
+    electabilityThreshold: 1 / 100,
   },
   exchange: {
     spread: 5 / 1000,
     reserveFraction: 1,
     updateFrequency: 3600,
     minimumReports: 1,
+  },
+  gasPriceMinimum: {
+    initialMinimum: 10000,
+    targetDensity: 1 / 2,
+    adjustmentSpeed: 1 / 2,
+    proposerFraction: 1 / 2,
   },
   governance: {
     approvalStageDuration: 15 * 60, // 15 minutes
@@ -42,11 +49,14 @@ const DefaultConfig = {
     participationBaselineUpdateFactor: 1 / 5,
     participationBaselineQuorumFactor: 1,
   },
-  gasPriceMinimum: {
-    initialMinimum: 10000,
-    targetDensity: 1 / 2,
-    adjustmentSpeed: 1 / 2,
-    proposerFraction: 1 / 2,
+  lockedGold: {
+    unlockingPeriod: 60 * 60 * 24 * 3, // 3 days
+  },
+  oracles: {
+    reportExpiry: 60 * 60, // 1 hour
+  },
+  random: {
+    randomnessBlockRetentionWindow: 256,
   },
   registry: {
     predeployedProxyAddress: '0x000000000000000000000000000000000000ce10',
@@ -58,13 +68,16 @@ const DefaultConfig = {
   stableToken: {
     decimals: 18,
     goldPrice: 10,
-    minerDollarBalance: 60000,
     tokenName: 'Celo Dollar',
     tokenSymbol: 'cUSD',
     // 52nd root of 1.005, equivalent to 0.5% annual inflation
     inflationRate: 1.00009591886,
     inflationPeriod: 7 * 24 * 60 * 60, // 1 week
-    initialAccounts: [],
+    initialBalances: {
+      addresses: [],
+      values: [],
+    },
+    oracles: [],
   },
   validators: {
     registrationRequirements: {
@@ -75,20 +88,18 @@ const DefaultConfig = {
       group: 60 * 24 * 60 * 60, // 60 days
       validator: 60 * 24 * 60 * 60, // 60 days
     },
+    validatorScoreParameters: {
+      exponent: 1,
+      adjustmentSpeed: 0.1,
+    },
+    validatorEpochPayment: '1000000000000000000',
+    membershipHistoryLength: 60,
     maxGroupSize: '70',
 
     validatorKeys: [],
     // We register a single validator group during the migration.
     groupName: 'C-Labs',
-    groupUrl: 'celo.org',
     commission: 0.1,
-  },
-  blockchainParameters: {
-    minimumClientVersion: {
-      major: 1,
-      minor: 8,
-      patch: 23,
-    },
   },
 }
 
@@ -111,11 +122,11 @@ const linkedLibraries = {
     'SortedLinkedListWithMedian',
   ],
   SortedLinkedListWithMedian: ['AddressSortedLinkedListWithMedian'],
-  AddressLinkedList: ['Validators'],
-  AddressSortedLinkedList: ['Election'],
+  AddressLinkedList: ['Validators', 'ValidatorsTest'],
+  AddressSortedLinkedList: ['Election', 'ElectionTest'],
   IntegerSortedLinkedList: ['Governance', 'IntegerSortedLinkedListTest'],
   AddressSortedLinkedListWithMedian: ['SortedOracles', 'AddressSortedLinkedListWithMedianTest'],
-  Signatures: ['Attestations', 'LockedGold', 'Escrow'],
+  Signatures: ['TestAttestations', 'Attestations', 'LockedGold', 'Escrow'],
 }
 
 const argv = minimist(process.argv.slice(2), {

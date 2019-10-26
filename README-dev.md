@@ -4,10 +4,10 @@
 
 Many packages depend on other packages within the monorepo. When this happens, follow these rules:
 
-  1. All packages must use **master version** of sibling packages.
-  2. Exception to (1) are packages that represent a GAE/firebase app which must use the last published version.
-  3. To differentiate published vs unpublished version. Master version (in package.json) must end with suffix `-dev` and should not be published.
-  4. If a developer want to publish a version; then after publishing it needs to set master version to next `-dev` version and change all package.json that require on it.
+1.  All packages must use **master version** of sibling packages.
+2.  Exception to (1) are packages that represent a GAE/firebase app which must use the last published version.
+3.  To differentiate published vs unpublished version. Master version (in package.json) must end with suffix `-dev` and should not be published.
+4.  If a developer want to publish a version; then after publishing it needs to set master version to next `-dev` version and change all package.json that require on it.
 
 To check which pakages need amending, you can run (in the root pkg):
 
@@ -15,12 +15,12 @@ To check which pakages need amending, you can run (in the root pkg):
 
 A practical example:
 
- * In any given moment, `contractkit/package.json#version` field **must** of the form `x.y.z-dev`
- * If current version of contractkit is: `0.1.6-dev` and we want to publish a new version, we should:
-    * publish version `0.1.6`
-    * change `package.json#version` to `0.1.7-dev`
-    * change in other packages within monorepo that were using `0.1.6-dev` to `0.1.7-dev`
-  
+- In any given moment, `contractkit/package.json#version` field **must** of the form `x.y.z-dev`
+- If current version of contractkit is: `0.1.6-dev` and we want to publish a new version, we should:
+  - publish version `0.1.6`
+  - change `package.json#version` to `0.1.7-dev`
+  - change in other packages within monorepo that were using `0.1.6-dev` to `0.1.7-dev`
+
 ## How to publish a new npm package
 
 First checkout the alfajores branch.

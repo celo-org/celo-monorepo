@@ -1,6 +1,6 @@
 /* Utilities to facilitate testing */
+import BigNumber from 'bignumber.js'
 import configureMockStore from 'redux-mock-store'
-import thunk from 'redux-thunk'
 import { InitializationState } from 'src/geth/reducer'
 import i18n from 'src/i18n'
 import { RootState } from 'src/redux/reducers'
@@ -15,6 +15,13 @@ import {
 // Sleep for a number of ms
 export const sleep = (time: number) =>
   new Promise((resolve) => setTimeout(() => resolve(true), time))
+
+// ContractKit test utils
+export const mockContractKitBalance = jest.fn(() => new BigNumber(10))
+export const mockContractKitContract = {
+  balanceOf: mockContractKitBalance,
+  decimals: jest.fn(async () => '10'),
+}
 
 interface MockContract {
   methods: {
@@ -86,8 +93,7 @@ export function mockNavigationServiceFor(test: string, navigateMock = jest.fn())
   return { navigate, navigateBack, navigateReset }
 }
 
-const middlewares = [thunk]
-const mockStore = configureMockStore(middlewares)
+const mockStore = configureMockStore()
 
 /* Create a mock store with some reasonable default values */
 type RecursivePartial<T> = { [P in keyof T]?: RecursivePartial<T[P]> }

@@ -34,8 +34,9 @@ import { TransactionStatus, TransactionTypes } from 'src/transactions/reducer'
 import { sendAndMonitorTransaction } from 'src/transactions/saga'
 import { sendTransaction } from 'src/transactions/send'
 import Logger from 'src/utils/Logger'
-import { addLocalAccount, isZeroSyncMode, web3 } from 'src/web3/contracts'
+import { addLocalAccount, web3 } from 'src/web3/contracts'
 import { getConnectedAccount, getConnectedUnlockedAccount } from 'src/web3/saga'
+import { zeroSyncSelector } from 'src/web3/selectors'
 
 const TAG = 'escrow/saga'
 
@@ -115,7 +116,8 @@ function* withdrawFromEscrow(action: EndVerificationAction) {
     }
 
     const tempWalletAddress = web3.eth.accounts.privateKeyToAccount(tmpWalletPrivateKey).address
-    if (isZeroSyncMode()) {
+    const zeroSyncMode = yield select(zeroSyncSelector)
+    if (zeroSyncMode) {
       addLocalAccount(web3, tmpWalletPrivateKey)
     }
     Logger.debug(TAG + '@withdrawFromEscrow', 'Added temp account to wallet: ' + tempWalletAddress)
@@ -128,7 +130,7 @@ function* withdrawFromEscrow(action: EndVerificationAction) {
       return
     }
 
-    if (isZeroSyncMode()) {
+    if (zeroSyncMode) {
       Logger.info(
         TAG + '@withdrawFromEscrow',
         'Geth free mode is on, no need to unlock the temporary account'

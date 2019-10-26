@@ -1,6 +1,6 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`ImportWallet renders correctly 1`] = `
+exports[`ImportWallet renders correctly and is disabled with no text 1`] = `
 <SafeAreaView
   style={
     Object {
@@ -20,32 +20,20 @@ exports[`ImportWallet renders correctly 1`] = `
     keyboardShouldPersistTaps="always"
   >
     <View>
-      <View
-        style={
-          Array [
-            Object {
-              "alignItems": "center",
-              "marginBottom": 20,
-            },
-            Object {},
-          ]
+      <Image
+        source={
+          Object {
+            "testUri": "../../../src/images/backup-icon.png",
+          }
         }
-      >
-        <Image
-          resizeMode="contain"
-          source={
-            Object {
-              "testUri": "../../../src/images/coins-logo.png",
-            }
+        style={
+          Object {
+            "alignSelf": "center",
+            "height": 75,
+            "width": 75,
           }
-          style={
-            Object {
-              "height": 35,
-              "width": 35,
-            }
-          }
-        />
-      </View>
+        }
+      />
       <Text
         style={
           Object {
@@ -74,46 +62,88 @@ exports[`ImportWallet renders correctly 1`] = `
       <View
         style={
           Object {
-            "borderColor": "#D1D5D8",
-            "borderRadius": 3,
-            "borderWidth": 1,
-            "height": 145,
             "marginTop": 20,
           }
         }
       >
-        <TextInput
-          allowFontScaling={true}
-          autoCapitalize="none"
-          autoCorrect={false}
-          enablesReturnKeyAutomatically={true}
-          multiline={true}
-          onChangeText={[Function]}
-          onEndEditing={[Function]}
-          placeholder="backupKeyPrompt"
-          placeholderTextColor="#D1D5D8"
-          rejectResponderTermination={true}
+        <View
           style={
             Object {
-              "color": "#555",
-              "flex": 1,
-              "fontFamily": "Hind-Regular",
-              "fontSize": 16,
-              "marginLeft": 10,
+              "flexDirection": "row",
+              "justifyContent": "space-between",
+              "paddingHorizontal": 2,
             }
           }
-          testID="ImportWalletBackupKeyInputField"
-          underlineColorAndroid="transparent"
-          value=""
-        />
+        >
+          <Text
+            style={
+              Object {
+                "color": "#2E3338",
+                "fontFamily": "Hind-SemiBold",
+                "fontSize": 16,
+                "lineHeight": 24,
+              }
+            }
+          >
+            backupKey
+          </Text>
+        </View>
+        <View
+          style={
+            Object {
+              "marginTop": 10,
+            }
+          }
+        >
+          <View
+            style={
+              Object {
+                "position": "relative",
+              }
+            }
+          >
+            <TextInput
+              allowFontScaling={true}
+              autoCapitalize="none"
+              autoCorrect={false}
+              enablesReturnKeyAutomatically={true}
+              multiline={true}
+              onChangeText={[Function]}
+              placeholder="backupPhrasePlaceholder"
+              placeholderTextColor="#D1D5D8"
+              rejectResponderTermination={true}
+              shouldShowClipboard={[Function]}
+              showClearButton={true}
+              style={
+                Array [
+                  Object {
+                    "borderColor": "#D1D5D8",
+                    "borderRadius": 4,
+                    "borderWidth": 1,
+                    "color": "#2E3338",
+                    "fontFamily": "Hind-Regular",
+                    "fontSize": 16,
+                    "lineHeight": 24,
+                    "minHeight": 145,
+                    "padding": 14,
+                  },
+                  false,
+                ]
+              }
+              testID="ImportWalletBackupKeyInputField"
+              underlineColorAndroid="transparent"
+              value=""
+            />
+          </View>
+        </View>
       </View>
       <Text
         style={
           Object {
-            "color": "#2E3338",
+            "color": "#81868B",
             "fontFamily": "Hind-Regular",
-            "fontSize": 12,
-            "lineHeight": 16,
+            "fontSize": 14,
+            "lineHeight": 18,
             "marginHorizontal": 2,
             "marginTop": 20,
           }
@@ -216,179 +246,6 @@ exports[`ImportWallet renders correctly 1`] = `
       </View>
     </View>
   </View>
-</SafeAreaView>
-`;
-
-exports[`ImportWallet renders with an empty wallet 1`] = `
-<SafeAreaView
-  style={
-    Object {
-      "backgroundColor": "#FFFFFF",
-      "flex": 1,
-      "justifyContent": "space-between",
-    }
-  }
->
-  <View
-    style={
-      Object {
-        "alignItems": "center",
-        "flex": 1,
-        "justifyContent": "center",
-        "paddingBottom": 30,
-        "paddingHorizontal": 30,
-        "textAlign": "center",
-      }
-    }
-  >
-    <View
-      style={
-        Array [
-          Object {
-            "alignItems": "center",
-            "marginBottom": 20,
-          },
-          Object {},
-        ]
-      }
-    >
-      <Image
-        resizeMode="contain"
-        source={
-          Object {
-            "testUri": "../../../src/images/coins-logo.png",
-          }
-        }
-        style={
-          Object {
-            "height": 35,
-            "width": 35,
-          }
-        }
-      />
-    </View>
-    <Text
-      style={
-        Object {
-          "color": "#2E3338",
-          "fontFamily": "Hind-Light",
-          "fontSize": 22,
-          "paddingBottom": 20,
-          "textAlign": "center",
-        }
-      }
-    >
-      0.00
-    </Text>
-    <Text
-      style={
-        Object {
-          "color": "#2E3338",
-          "fontFamily": "Hind-Regular",
-          "fontSize": 17,
-          "lineHeight": 26,
-        }
-      }
-    >
-      emptyWalletWarning
-    </Text>
-    <Text
-      style={
-        Object {
-          "color": "#2E3338",
-          "fontFamily": "Hind-Regular",
-          "fontSize": 17,
-          "lineHeight": 26,
-        }
-      }
-    >
-      useEmptyAnyway
-    </Text>
-  </View>
-  <View
-    style={
-      Array [
-        Object {
-          "alignItems": "center",
-          "borderRadius": 3,
-          "flexDirection": "row",
-        },
-        null,
-        null,
-        undefined,
-        Object {
-          "backgroundColor": "#42D689",
-        },
-      ]
-    }
-  >
-    <View
-      accessible={true}
-      isTVSelectable={true}
-      nativeBackgroundAndroid={
-        Object {
-          "attribute": "selectableItemBackground",
-          "type": "ThemeAttrAndroid",
-        }
-      }
-      onResponderGrant={[Function]}
-      onResponderMove={[Function]}
-      onResponderRelease={[Function]}
-      onResponderTerminate={[Function]}
-      onResponderTerminationRequest={[Function]}
-      onStartShouldSetResponder={[Function]}
-      style={
-        Array [
-          Object {
-            "alignItems": "center",
-            "flex": 1,
-            "justifyContent": "center",
-          },
-          Object {
-            "backgroundColor": "#42D689",
-          },
-          Object {
-            "height": 50,
-          },
-          Object {
-            "borderWidth": 0,
-          },
-        ]
-      }
-      testID="UseEmptyWalletButton"
-    >
-      <View
-        style={
-          Object {
-            "alignItems": "center",
-            "flex": 1,
-            "flexDirection": "row",
-            "justifyContent": "space-between",
-          }
-        }
-      >
-        <Text
-          style={
-            Array [
-              Object {
-                "fontFamily": "Hind-SemiBold",
-                "fontSize": 16,
-              },
-              Object {
-                "color": "#FFFFFF",
-              },
-              Object {
-                "paddingLeft": 5,
-                "paddingRight": 5,
-              },
-            ]
-          }
-        >
-          useEmptyWallet
-        </Text>
-      </View>
-    </View>
-  </View>
   <View
     style={
       Array [
@@ -439,7 +296,7 @@ exports[`ImportWallet renders with an empty wallet 1`] = `
           },
         ]
       }
-      testID="TryAnotherKeyButton"
+      testID="ImportWalletSocialButton"
     >
       <View
         style={
@@ -468,7 +325,7 @@ exports[`ImportWallet renders with an empty wallet 1`] = `
             ]
           }
         >
-          tryAnotherKey
+          restoreSocial
         </Text>
       </View>
     </View>

@@ -16,7 +16,7 @@ const fellows = [
     role: ' Go-to-Market',
     color: colors.purpleScreen,
     quote:
-      '“My grandparents were Mexican migrant farmers—I saw first hand how access to basic financial tools can save lives.”',
+      '“My grandparents were Mexican migrant farmers—I saw first hand how access to basic financial tools can change lives.”',
     text:
       'Xochitl recently graduated from Stanford Graduate School of Business. Prior to Stanford, she was a Director at Cisco where she led expansion into 26 Emerging Markets. She is leveraging her background and expertise to explore Mexico as a potential launch country for Celo. Her key activities include country landscaping, user research, pilot scoping and implementation, analysis and final recommendations.',
   },
