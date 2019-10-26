@@ -1,6 +1,6 @@
 import { AccountArgv } from '@celo/celotool/src/cmds/account'
 import { portForwardAnd } from '@celo/celotool/src/lib/port_forward'
-import { CeloContract, newKit } from '@celo/contractkit'
+import { newKit } from '@celo/contractkit'
 import { AttestationsWrapper } from '@celo/contractkit/lib/wrappers/Attestations'
 import { ActionableAttestation, decodeAttestationCode } from '@celo/walletkit'
 import prompts from 'prompts'
@@ -100,10 +100,10 @@ async function requestMoreAttestations(
   attestationsRequested: number
 ) {
   await attestations
-    .approveAttestationFee(CeloContract.StableToken, attestationsRequested)
+    .approveAttestationFee(attestationsRequested)
     .then((txo) => txo.sendAndWaitForReceipt())
   await attestations
-    .request(phoneNumber, attestationsRequested, CeloContract.StableToken)
+    .request(phoneNumber, attestationsRequested)
     .then((txo) => txo.sendAndWaitForReceipt())
 }
 

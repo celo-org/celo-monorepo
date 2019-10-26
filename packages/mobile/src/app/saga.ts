@@ -12,6 +12,9 @@ import { Screens, Stacks } from 'src/navigator/Screens'
 import { PersistedRootState } from 'src/redux/reducers'
 import Logger from 'src/utils/Logger'
 import { clockInSync } from 'src/utils/time'
+import { setZeroSyncMode } from 'src/web3/actions'
+import { isInitiallyZeroSyncMode } from 'src/web3/contracts'
+import { zeroSyncSelector } from 'src/web3/selectors'
 
 const TAG = 'app/saga'
 
@@ -55,6 +58,17 @@ export function* checkAppDeprecation() {
   if (versionInfo && versionInfo.deprecated) {
     Logger.info(TAG, 'this version is deprecated')
     navigate(Screens.UpgradeScreen)
+  }
+}
+
+// Upon every app restart, web3 is initialized according to .env file
+// This updates to the chosen zeroSync mode in store
+export function* toggleToProperSyncMode() {
+  Logger.info(TAG, '@toggleToProperSyncMode ensuring proper sync mode...')
+  yield take(REHYDRATE)
+  const zeroSyncMode = yield select(zeroSyncSelector)
+  if (zeroSyncMode !== isInitiallyZeroSyncMode()) {
+    yield put(setZeroSyncMode(zeroSyncMode))
   }
 }
 
@@ -120,4 +134,5 @@ export function handleDeepLink(deepLink: string) {
 export function* appSaga() {
   yield spawn(checkAppDeprecation)
   yield spawn(navigateToProperScreen)
+  yield spawn(toggleToProperSyncMode)
 }
