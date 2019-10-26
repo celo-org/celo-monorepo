@@ -125,7 +125,7 @@ android {
         minSdkVersion isDetoxTestBuild ? rootProject.ext.minSdkVersion : 18
         targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode appVersionCode
-        versionName "1.5.0"
+        versionName "1.5.1"
         testBuildType System.getProperty('testBuildType', 'debug')
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         resValue "string", "build_config_package", "org.celo.mobile"

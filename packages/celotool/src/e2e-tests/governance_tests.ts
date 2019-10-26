@@ -177,9 +177,6 @@ describe('governance tests', () => {
       await sleep(epoch)
     })
 
-    // Note that this returns the validator set at the END of `blockNumber`, i.e. the validator set
-    // that will validate the next block, and NOT necessarily the validator set that validated this
-    // block.
     const getValidatorSetAtBlock = async (blockNumber: number) => {
       const validatorSetSize = await election.methods
         .numberValidatorsInCurrentSet()
@@ -193,9 +190,14 @@ describe('governance tests', () => {
       return validatorSet
     }
 
+    const getLastEpochBlock = (blockNumber: number) => {
+      const epochNumber = Math.floor((blockNumber - 1) / epoch)
+      return epochNumber * epoch
+    }
+
     it('should always return a validator set size equal to the number of group members at the end of the last epoch', async () => {
       for (const blockNumber of blockNumbers) {
-        const lastEpochBlock = blockNumber - (blockNumber % epoch)
+        const lastEpochBlock = getLastEpochBlock(blockNumber)
         const validatorSetSize = await election.methods
           .numberValidatorsInCurrentSet()
           .call({}, blockNumber)
@@ -206,7 +208,7 @@ describe('governance tests', () => {
 
     it('should always return a validator set equal to the group members at the end of the last epoch', async () => {
       for (const blockNumber of blockNumbers) {
-        const lastEpochBlock = blockNumber - (blockNumber % epoch)
+        const lastEpochBlock = getLastEpochBlock(blockNumber)
         const groupMembership = await getValidatorGroupMembers(lastEpochBlock)
         const validatorSet = await getValidatorSetAtBlock(blockNumber)
         assert.sameMembers(groupMembership, validatorSet)
@@ -215,9 +217,7 @@ describe('governance tests', () => {
 
     it('should only have created blocks whose miner was in the current validator set', async () => {
       for (const blockNumber of blockNumbers) {
-        // The validators responsible for creating `blockNumber` were those in the validator set at
-        // `blockNumber-1`.
-        const validatorSet = await getValidatorSetAtBlock(blockNumber - 1)
+        const validatorSet = await getValidatorSetAtBlock(blockNumber)
         const block = await web3.eth.getBlock(blockNumber)
         assert.include(validatorSet.map((x) => x.toLowerCase()), block.miner.toLowerCase())
       }
@@ -260,7 +260,7 @@ describe('governance tests', () => {
         let expectUnchangedScores: string[]
         let expectChangedScores: string[]
         if (isLastBlockOfEpoch(blockNumber, epoch)) {
-          expectChangedScores = await getValidatorSetAtBlock(blockNumber - 1)
+          expectChangedScores = await getValidatorSetAtBlock(blockNumber)
           expectUnchangedScores = allValidators.filter((x) => !expectChangedScores.includes(x))
         } else {
           expectUnchangedScores = allValidators
@@ -317,7 +317,7 @@ describe('governance tests', () => {
         let expectUnchangedBalances: string[]
         let expectChangedBalances: string[]
         if (isLastBlockOfEpoch(blockNumber, epoch)) {
-          expectChangedBalances = await getValidatorSetAtBlock(blockNumber - 1)
+          expectChangedBalances = await getValidatorSetAtBlock(blockNumber)
           expectUnchangedBalances = allValidators.filter((x) => !expectChangedBalances.includes(x))
         } else {
           expectUnchangedBalances = allValidators

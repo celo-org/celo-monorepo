@@ -11,8 +11,8 @@
   "useEmptyAnyway": "¿Te gustaría usarlo de todos modos?",
   "useEmptyWallet": "Usar Monedero Vacío",
   "tryAnotherKey": "Probar con otra Clave de Respaldo",
-  "restoreSocial": "Restore with Safeguards",
+  "restoreSocial": "Restaurar con Salvaguardas",
   "socialImportInfo":
-    "If you enabled Safeguards, you sent Safeguard Phrases to two friends. Please retrieve these phrases and enter them here (in any order) to regain access to your funds.",
-  "socialTip": "Phrases are lists of 13 words separated by spaces."
+    "Si habilitó las Salvaguardas, envió Frases de Salvaguarda a dos amigos. Recupere estas frases e ingréselas aquí (en cualquier orden) para recuperar el acceso a sus fondos.",
+  "socialTip": "Las frases son listas de 13 palabras separadas por espacios."
 }

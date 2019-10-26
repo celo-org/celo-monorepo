@@ -21,12 +21,12 @@ import {
   MockLockedGoldInstance,
   MockStableTokenContract,
   MockStableTokenInstance,
-  RandomContract,
-  RandomInstance,
   RegistryContract,
   RegistryInstance,
   TestAttestationsContract,
   TestAttestationsInstance,
+  TestRandomContract,
+  TestRandomInstance,
 } from 'types'
 import { getParsedSignatureOfAddress } from '../../lib/signing-utils'
 
@@ -40,7 +40,7 @@ const Attestations: TestAttestationsContract = artifacts.require('TestAttestatio
 const MockStableToken: MockStableTokenContract = artifacts.require('MockStableToken')
 const MockElection: MockElectionContract = artifacts.require('MockElection')
 const MockLockedGold: MockLockedGoldContract = artifacts.require('MockLockedGold')
-const Random: RandomContract = artifacts.require('Random')
+const Random: TestRandomContract = artifacts.require('TestRandom')
 const Registry: RegistryContract = artifacts.require('Registry')
 
 contract('Attestations', (accounts: string[]) => {
@@ -48,7 +48,7 @@ contract('Attestations', (accounts: string[]) => {
   let attestations: TestAttestationsInstance
   let mockStableToken: MockStableTokenInstance
   let otherMockStableToken: MockStableTokenInstance
-  let random: RandomInstance
+  let random: TestRandomInstance
   let mockElection: MockElectionInstance
   let mockLockedGold: MockLockedGoldInstance
   let registry: RegistryInstance
@@ -129,6 +129,7 @@ contract('Attestations', (accounts: string[]) => {
     otherMockStableToken = await MockStableToken.new()
     attestations = await Attestations.new()
     random = await Random.new()
+    random.addTestRandomness(0, '0x00')
     mockLockedGold = await MockLockedGold.new()
     await accountsInstance.initialize()
 
