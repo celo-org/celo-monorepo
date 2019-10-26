@@ -7,9 +7,8 @@ interface AttestationModel extends Model {
   issuer: string
 }
 
-export type AttestationStatic = typeof Model & {
-  new (values?: object, options?: BuildOptions): AttestationModel
-}
+export type AttestationStatic = typeof Model &
+  (new (values?: object, options?: BuildOptions) => AttestationModel)
 
 export default (sequelize: Sequelize) =>
   sequelize.define('Attestations', {
