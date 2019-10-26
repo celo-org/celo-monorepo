@@ -131,7 +131,6 @@ contract('Attestations', (accounts: string[]) => {
     random = await Random.new()
     random.addTestRandomness(0, '0x00')
     mockLockedGold = await MockLockedGold.new()
-    await accountsInstance.initialize()
 
     await Promise.all(
       accounts.map(async (account) => {
