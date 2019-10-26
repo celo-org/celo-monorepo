@@ -13,43 +13,19 @@ import { getPhoneHash } from '@celo/utils/lib/phoneNumbers'
 import BigNumber from 'bignumber.js'
 import { uniq } from 'lodash'
 import {
-  MockElectionContract,
   MockElectionInstance,
-  MockLockedGoldContract,
   MockLockedGoldInstance,
-  MockStableTokenContract,
   MockStableTokenInstance,
-  RandomContract,
-  RandomInstance,
-  RegistryContract,
   RegistryInstance,
-  TestAttestationsContract,
   TestAttestationsInstance,
+  TestRandomInstance,
 } from 'types'
 import { getParsedSignatureOfAddress } from '../../lib/signing-utils'
-
-/* We use a contract that behaves like the actual Attestations contract, but
- * mocks the implementations of validator set getters. These rely on precompiled
- * contracts, which are not available in our current ganache fork, which we use
- * for Truffle unit tests.
- */
-const Attestations: TestAttestationsContract = artifacts.require('TestAttestations')
-const MockStableToken: MockStableTokenContract = artifacts.require('MockStableToken')
-const MockElection: MockElectionContract = artifacts.require('MockElection')
-const MockLockedGold: MockLockedGoldContract = artifacts.require('MockLockedGold')
-const Random: RandomContract = artifacts.require('Random')
-const Registry: RegistryContract = artifacts.require('Registry')
-
-const dataEncryptionKey = '0x02f2f48ee19680706196e2e339e5da3491186e0c4c5030670656b0e01611111111'
-const longDataEncryptionKey =
-  '0x04f2f48ee19680706196e2e339e5da3491186e0c4c5030670656b0e01611111111' +
-  '02f2f48ee19680706196e2e339e5da3491186e0c4c5030670656b0e01611111111'
-
 contract('Attestations', (accounts: string[]) => {
   let attestations: TestAttestationsInstance
   let mockStableToken: MockStableTokenInstance
   let otherMockStableToken: MockStableTokenInstance
-  let random: RandomInstance
+  let random: TestRandomInstance
   let mockElection: MockElectionInstance
   let mockLockedGold: MockLockedGoldInstance
   let registry: RegistryInstance
@@ -142,6 +118,7 @@ contract('Attestations', (accounts: string[]) => {
     otherMockStableToken = await MockStableToken.new()
     attestations = await Attestations.new()
     random = await Random.new()
+    random.addTestRandomness(0, '0x00')
     mockLockedGold = await MockLockedGold.new()
     await Promise.all(
       accounts.map((account) =>

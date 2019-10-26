@@ -8,7 +8,7 @@ const tag = 'goldToken/saga'
 
 export const goldFetch = tokenFetchFactory({
   actionName: Actions.FETCH_BALANCE,
-  contractGetter: getGoldTokenContract,
+  token: CURRENCY_ENUM.GOLD,
   actionCreator: setBalance,
   tag,
 })

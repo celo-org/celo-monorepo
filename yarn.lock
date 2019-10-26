@@ -2243,10 +2243,10 @@
     lodash "^4.17.13"
     to-fast-properties "^2.0.0"
 
-"@celo/client@691d471":
-  version "0.0.156"
-  resolved "https://registry.yarnpkg.com/@celo/client/-/client-0.0.156.tgz#00c738c2988086aca84f585deae018ad95d743e8"
-  integrity sha512-ql8tsyZrMIuuYHbSjNt6IUT/hvEC51MCePcPAt6OLrmlKqBI8xOGAlinuFxo8LuPNHnqBgYc/FoX2Jww3HbCPQ==
+"@celo/client@9575a01":
+  version "0.0.173"
+  resolved "https://registry.yarnpkg.com/@celo/client/-/client-0.0.173.tgz#30d8266f8f4897f1db5c9bf4ad344801e620326f"
+  integrity sha512-pAzo3Oy+V/BEkKb7ZZe0l71s6mOdPLLJZfLNo2Ihm2bx37nx8g4LNkcfj+0vVtRQPtiLrGiQ42U8pby3LwmC4Q==
 
 "@celo/contractkit@0.1.1":
   version "0.1.1"
@@ -2294,17 +2294,9 @@
     qqjs "^0.3.10"
     tslib "^1.9.3"
 
-"@celo/ganache-cli@git+https://github.com/celo-org/ganache-cli.git#816a475":
+"@celo/ganache-cli@git+https://github.com/celo-org/ganache-cli.git#9d77e02":
   version "6.6.0"
-  resolved "git+https://github.com/celo-org/ganache-cli.git#816a475d82535c05b59c4c43b3603c39dd31cd88"
-  dependencies:
-    ethereumjs-util "6.1.0"
-    source-map-support "0.5.12"
-    yargs "13.2.4"
-
-"@celo/ganache-cli@git+https://github.com/celo-org/ganache-cli.git#98ad2ba":
-  version "6.6.0"
-  resolved "git+https://github.com/celo-org/ganache-cli.git#98ad2ba3d813b399294492596058e067512d712b"
+  resolved "git+https://github.com/celo-org/ganache-cli.git#9d77e022286739c3a453d90b85f15d1efe8cd089"
   dependencies:
     ethereumjs-util "6.1.0"
     source-map-support "0.5.12"
@@ -31086,6 +31078,11 @@ tslint-microsoft-contrib@^6.2.0:
   integrity sha512-6tfi/2tHqV/3CL77pULBcK+foty11Rr0idRDxKnteTaKm6gWF9qmaCNU17HVssOuwlYNyOmd9Jsmjd+1t3a3qw==
   dependencies:
     tsutils "^2.27.2 <2.29.0"
+
+tslint-react-hooks@^2.2.1:
+  version "2.2.1"
+  resolved "https://registry.yarnpkg.com/tslint-react-hooks/-/tslint-react-hooks-2.2.1.tgz#c52c7df65ee1517b2d6c92bc716e9ef72ccdf208"
+  integrity sha512-bqIg2uZe+quJMfSOGc4OOZ4awo6TP1ejGDGS6IKg2WIrS0XnWfhUJ99i3B8rUpnZhuD4vRSvyYIbXPUmEqQxxQ==
 
 tslint-react@^4.1.0:
   version "4.1.0"
