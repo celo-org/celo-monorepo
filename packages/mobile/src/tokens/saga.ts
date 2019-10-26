@@ -47,18 +47,14 @@ export async function convertToContractDecimals(value: BigNumber, token: CURRENC
 export async function getTokenContract(token: CURRENCY_ENUM) {
   Logger.debug(TAG + '@getTokenContract', `Fetching contract for ${token}`)
   await waitForWeb3Sync()
-  let tokenContract: any
   switch (token) {
     case CURRENCY_ENUM.GOLD:
-      tokenContract = await contractKit.contracts.getGoldToken()
-      break
+      return contractKit.contracts.getGoldToken()
     case CURRENCY_ENUM.DOLLAR:
-      tokenContract = await contractKit.contracts.getStableToken()
-      break
+      return contractKit.contracts.getStableToken()
     default:
       throw new Error(`Could not fetch contract for unknown token ${token}`)
   }
-  return tokenContract
 }
 
 interface TokenFetchFactory {
