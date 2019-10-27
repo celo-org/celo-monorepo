@@ -9,9 +9,6 @@ contract MockValidators is IValidators {
 
   mapping(address => bool) private _isValidating;
   mapping(address => bool) private _isVoting;
-  address[] private validators;
-  uint256 private quorum;
-  uint256 private epoch;
   mapping(address => uint256) private numGroupMembers;
   mapping(address => uint256) private balanceRequirements;
   mapping(address => address[]) private members;
@@ -66,11 +63,11 @@ contract MockValidators is IValidators {
     returns (address[] memory)
   {
     require(n <= members[group].length);
-    address[] memory validatorgroup = new address[](n);
+    address[] memory validators = new address[](n);
     for (uint256 i = 0; i < n; i++) {
-      validatorgroup[i] = members[group][i];
+      validators[i] = members[group][i];
     }
-    return validatorgroup;
+    return validators;
   }
 
   function getGroupsNumMembers(address[] calldata groups) external view returns (uint256[] memory) {
@@ -79,29 +76,5 @@ contract MockValidators is IValidators {
       numMembers[i] = getGroupNumMembers(groups[i]);
     }
     return numMembers;
-  }
-
-  function addValidator(address validator) external {
-    validators.push(validator);
-  }
-
-  function getRegisteredValidators() external view returns (address[] memory) {
-    return validators;
-  }
-
-  function getRegisteredValidatorsByzantineQuorum() external view returns (uint256) {
-    return quorum;
-  }
-
-  function setByzantineQuorumForCurrentSet(uint256 q) external {
-    quorum = q;
-  }
-
-  function getEpochNumber() external view returns (uint256) {
-    return epoch;
-  }
-
-  function setEpochNumber(uint256 e) external {
-    epoch = e;
   }
 }
