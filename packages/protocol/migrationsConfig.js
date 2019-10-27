@@ -108,7 +108,7 @@ const linkedLibraries = {
     'LockedGold',
     'Exchange',
     'GasPriceMinimum',
-    'Governance', 
+    'Governance',
     'GovernanceTest',
     'Proposals',
     'SortedOracles',

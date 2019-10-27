@@ -2043,13 +2043,13 @@ contract('Governance', (accounts: string[]) => {
     })
 
     it('should revert when hotfix prepared but not for current epoch', async () => {
-        await governance.whitelistHotfix(proposalHashStr, { from: approver })
-        await governance.addValidator(accounts[2])
-        await governance.whitelistHotfix(proposalHashStr, { from: accounts[2] })
-        await governance.prepareHotfix(proposalHashStr, { from: accounts[2] })
-        await mineBlocks(EPOCH, web3)
-        await assertRevert(executeHotfixTx())
-      })
+      await governance.whitelistHotfix(proposalHashStr, { from: approver })
+      await governance.addValidator(accounts[2])
+      await governance.whitelistHotfix(proposalHashStr, { from: accounts[2] })
+      await governance.prepareHotfix(proposalHashStr, { from: accounts[2] })
+      await mineBlocks(EPOCH, web3)
+      await assertRevert(executeHotfixTx())
+    })
 
     describe('when hotfix is approved and prepared for current epoch', () => {
       beforeEach(async () => {
