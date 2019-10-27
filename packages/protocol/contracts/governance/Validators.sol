@@ -377,9 +377,15 @@ contract Validators is
    * @param proofOfPossessionBytes The public key and signature of the proof of possession.
    * @return True upon success.
    */
-  function checkProofOfPossession(address sender, bytes memory proofOfPossessionBytes) private returns (bool) {
+  function checkProofOfPossession(
+    address sender, 
+    bytes memory proofOfPossessionBytes
+  ) private returns (bool) {
     bool success;
-    (success, ) = PROOF_OF_POSSESSION.call.value(0).gas(gasleft())(abi.encodePacked(sender, proofOfPossessionBytes));
+    (success, ) = PROOF_OF_POSSESSION
+      .call
+      .value(0)
+      .gas(gasleft())(abi.encodePacked(sender, proofOfPossessionBytes));
     return success;
   }
 
