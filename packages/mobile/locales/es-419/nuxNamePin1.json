@@ -39,7 +39,7 @@
     "validating": "Genial! Validando el código de invitación copiado",
     "inviteAccepted": "🎉 Invitación aceptada!",
     "askForInvite": {
-      "0": "Solicite una invitación de alguien con Celo Monedero o regístrese en Testnet en ",
+      "0": "Solicite una invitación de alguien con Celo Monedero o regístrese en red Alfajores en ",
       "1": "celo.org/build/wallet"
     }
   },
