@@ -1,3 +1,4 @@
+import { newKitFromWeb3 } from '@celo/contractkit'
 import { addLocalAccount as web3utilsAddLocalAccount } from '@celo/walletkit'
 import { Platform } from 'react-native'
 import * as net from 'react-native-tcp'
@@ -12,6 +13,7 @@ import { Provider } from 'web3/providers'
 const tag = 'web3/contracts'
 
 export const web3: Web3 = getWeb3()
+export const contractKit = newKitFromWeb3(web3)
 
 export function isInitiallyZeroSyncMode() {
   return networkConfig.initiallyZeroSync

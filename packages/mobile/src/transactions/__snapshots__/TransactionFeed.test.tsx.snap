@@ -486,8 +486,7 @@ exports[`renders for gold to dollar exchange properly 1`] = `
                   ]
                 }
               >
-                -
-                $26.60MXN
+                -$26.60MXN
               </Text>
             </View>
             <View
@@ -896,8 +895,7 @@ exports[`renders for gold to dollar exchange properly 1`] = `
                   ]
                 }
               >
-                -
-                $39.90MXN
+                -$39.90MXN
               </Text>
             </View>
             <View
@@ -1371,8 +1369,7 @@ exports[`renders for loading 1`] = `
                   ]
                 }
               >
-                -
-                $26.60MXN
+                -$26.60MXN
               </Text>
             </View>
             <View
@@ -2046,8 +2043,7 @@ exports[`renders for no transactions 1`] = `
                   ]
                 }
               >
-                -
-                $26.60MXN
+                -$26.60MXN
               </Text>
             </View>
             <View
@@ -2721,8 +2717,7 @@ exports[`renders for standbyTransactions 1`] = `
                   ]
                 }
               >
-                -
-                $26.60MXN
+                -$26.60MXN
               </Text>
             </View>
             <View
