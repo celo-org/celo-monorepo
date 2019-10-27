@@ -10,6 +10,8 @@ import {
 } from '@celo/protocol/lib/test-utils'
 import BigNumber from 'bignumber.js'
 import {
+  MockLockedGoldContract,
+  MockLockedGoldInstance,
   MockElectionContract,
   MockElectionInstance,
   MockStableTokenContract,
