@@ -60,9 +60,9 @@
   "escrowedPaymentReminderSms":
     "¡Un recordatorio amistoso de que aún no ha canjeado sus dólares de celo!",
   "testnetAlert": {
-    "0": "Testnet",
+    "0": "{{testnet}}",
     "1":
-      "Un recordatorio amistoso de que está utilizando una compilación de Testnet - los saldos aquí no son reales."
+      "Un recordatorio amistoso de que está utilizando la compilación {{testnet}} - los saldos aquí no son reales."
   },
   "dismiss": "Ocultar",
   "localCurrencyEqual": "Igual a <2>{{localValue}} {{localCurrencyCode}}</2>",
