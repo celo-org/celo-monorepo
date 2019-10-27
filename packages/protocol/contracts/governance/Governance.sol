@@ -72,7 +72,7 @@ contract Governance is
 
   struct ContractConstitution {
     FixidityLib.Fraction defaultThreshold;
-    // Maps a function ID to a corresponding passing function, overriding the default.
+    // Maps a function ID to a corresponding threshold function, overriding the default.
     mapping(bytes4 => FixidityLib.Fraction) functionThresholds;
   }
 
@@ -211,8 +211,9 @@ contract Governance is
     uint256 baselineQuorumFactor
   );
 
-  event HotfixExecuted(
-    bytes32 txHash
+  event HotfixWhitelisted(
+    bytes32 txHash,
+    address whitelister
   );
 
   event HotfixPrepared(
@@ -220,9 +221,8 @@ contract Governance is
     uint256 epoch
   );
 
-  event HotfixWhitelisted(
-    bytes32 txHash,
-    address whitelister
+  event HotfixExecuted(
+    bytes32 txHash
   );
 
   function() external payable {} // solhint-disable no-empty-blocks
@@ -735,16 +735,15 @@ contract Governance is
     require(approved, "hotfix not approved");
     require(preparedEpoch == getEpochNumber(), "hotfix must be prepared for this epoch");
 
-    Proposals.Proposal memory proposal = Proposals.makeMem(
+    Proposals.makeMem(
       values,
       destinations,
       data,
       dataLengths,
       msg.sender,
       0
-    );
-    proposal.executeMem();
-
+    ).executeMem();
+    
     hotfixes[txHash].executed = true;
     emit HotfixExecuted(txHash);
   }
@@ -931,14 +930,21 @@ contract Governance is
     uint256 tally = 0;
     uint256 n = numberValidatorsInCurrentSet();
     for (uint256 idx = 0; idx < n; idx++) {
-      address validator = validatorAddressFromCurrentSet(index);
+      address validator = validatorAddressFromCurrentSet(idx);
       if (hotfixes[txHash].whitelisted[validator]) {
         tally = tally.add(1);
       }
     }
 
-    uint256 byzantineQuorum = n.mul(2).div(3).add(1);
-    return tally >= byzantineQuorum;
+    return tally >= byzantineQuorumValidatorsInCurrentSet();
+  }
+
+  /**
+   * @notice Computes byzantine quorum from current validator set size
+   * @return Byzantine quorum of validators.
+   */
+  function byzantineQuorumValidatorsInCurrentSet() public view returns (uint256) {
+    return numberValidatorsInCurrentSet().mul(2).div(3).add(1);
   }
 
   /**

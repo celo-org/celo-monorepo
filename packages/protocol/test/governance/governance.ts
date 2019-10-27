@@ -1,3 +1,16 @@
+import BigNumber from 'bignumber.js'
+import { keccak256 } from 'ethereumjs-util'
+import {
+  GovernanceTestContract,
+  GovernanceTestInstance,
+  MockLockedGoldContract,
+  MockLockedGoldInstance,
+  RegistryContract,
+  RegistryInstance,
+  TestTransactionsContract,
+  TestTransactionsInstance,
+} from 'types'
+
 import { CeloContractName } from '@celo/protocol/lib/registry-utils'
 import {
   assertBalance,
@@ -5,30 +18,15 @@ import {
   assertLogMatches2,
   assertRevert,
   matchAny,
+  mineBlocks,
   NULL_ADDRESS,
   stripHexEncoding,
   timeTravel,
-  mineBlocks
 } from '@celo/protocol/lib/test-utils'
 import { fixed1, multiply, toFixed } from '@celo/utils/lib/fixidity'
-import BigNumber from 'bignumber.js'
-import { keccak256 } from 'ethereumjs-util'
-import {
-  GovernanceContract,
-  GovernanceInstance,
-  MockLockedGoldContract,
-  MockLockedGoldInstance,
-  MockValidatorsContract,
-  MockValidatorsInstance,
-  RegistryContract,
-  RegistryInstance,
-  TestTransactionsContract,
-  TestTransactionsInstance,
-} from 'types'
 
-const Governance: GovernanceContract = artifacts.require('Governance')
+const Governance: GovernanceTestContract = artifacts.require('GovernanceTest')
 const MockLockedGold: MockLockedGoldContract = artifacts.require('MockLockedGold')
-const MockValidators: MockValidatorsContract = artifacts.require('MockValidators')
 const Registry: RegistryContract = artifacts.require('Registry')
 const TestTransactions: TestTransactionsContract = artifacts.require('TestTransactions')
 
@@ -66,12 +64,14 @@ interface Transaction {
   data: Buffer
 }
 
+// hard code in ganache
+const EPOCH = 100
+
 // TODO(asa): Test dequeueProposalsIfReady
 // TODO(asa): Dequeue explicitly to make the gas cost of operations more clear
 contract('Governance', (accounts: string[]) => {
-  let governance: GovernanceInstance
+  let governance: GovernanceTestInstance
   let mockLockedGold: MockLockedGoldInstance
-  let mockValidators: MockValidatorsInstance
   let testTransactions: TestTransactionsInstance
   let registry: RegistryInstance
   const nullFunctionId = '0x00000000'
@@ -96,7 +96,6 @@ contract('Governance', (accounts: string[]) => {
   const expectedParticipationBaseline = multiply(baselineUpdateFactor, participation).plus(
     multiply(fixed1.minus(baselineUpdateFactor), participationBaseline)
   )
-
   let transactionSuccess1: Transaction
   let transactionSuccess2: Transaction
   let transactionFail: Transaction
@@ -105,7 +104,6 @@ contract('Governance', (accounts: string[]) => {
   beforeEach(async () => {
     governance = await Governance.new()
     mockLockedGold = await MockLockedGold.new()
-    mockValidators = await MockValidators.new()
     registry = await Registry.new()
     testTransactions = await TestTransactions.new()
     await governance.initialize(
@@ -123,8 +121,8 @@ contract('Governance', (accounts: string[]) => {
       baselineUpdateFactor,
       baselineQuorumFactor
     )
+    await governance.setEpochSize(EPOCH)
     await registry.setAddressFor(CeloContractName.LockedGold, mockLockedGold.address)
-    await registry.setAddressFor(CeloContractName.Validators, mockValidators.address)
     await mockLockedGold.setAccountTotalLockedGold(account, weight)
     await mockLockedGold.setTotalLockedGold(weight)
     transactionSuccess1 = {
@@ -1923,8 +1921,9 @@ contract('Governance', (accounts: string[]) => {
 
   describe('#whitelistHotfix()', () => {
     beforeEach(async () => {
-      await mockValidators.addValidator(accounts[2])
-      await mockValidators.addValidator(accounts[3])
+      // from GovernanceTest
+      await governance.addValidator(accounts[2])
+      await governance.addValidator(accounts[3])
     })
 
     it('should mark the hotfix record approved when called by approver', async () => {
@@ -1950,9 +1949,8 @@ contract('Governance', (accounts: string[]) => {
 
   describe('#isHotfixPassing', () => {
     beforeEach(async () => {
-      await mockValidators.addValidator(accounts[2])
-      await mockValidators.addValidator(accounts[3])
-      await mockValidators.setByzantineQuorumForCurrentSet(2)
+      await governance.addValidator(accounts[2])
+      await governance.addValidator(accounts[3])
     })
 
     it('should return false when hotfix has not been whitelisted', async () => {
@@ -1974,13 +1972,9 @@ contract('Governance', (accounts: string[]) => {
     })
   })
 
-  // hard code in ganache
-  const EPOCH = 100
-
   describe('#prepareHotfix()', () => {
     beforeEach(async () => {
-      await mockValidators.setByzantineQuorumForCurrentSet(1)
-      await mockValidators.addValidator(accounts[2])
+      await governance.addValidator(accounts[2])
     })
 
     it('should revert when hotfix is not passing', async () => {
@@ -1988,10 +1982,10 @@ contract('Governance', (accounts: string[]) => {
     })
 
     describe('when hotfix is passing', () => {
-      let currEpoch = 1
+      let currEpoch: BigNumber
       beforeEach(async () => {
         await mineBlocks(EPOCH, web3)
-        currEpoch += 1
+        currEpoch = new BigNumber(await governance.getEpochNumber())
         await governance.whitelistHotfix(proposalHashStr, { from: accounts[2] })
       })
 
@@ -2048,11 +2042,20 @@ contract('Governance', (accounts: string[]) => {
       await assertRevert(executeHotfixTx())
     })
 
+    it('should revert when hotfix prepared but not for current epoch', async () => {
+        await governance.whitelistHotfix(proposalHashStr, { from: approver })
+        await governance.addValidator(accounts[2])
+        await governance.whitelistHotfix(proposalHashStr, { from: accounts[2] })
+        await governance.prepareHotfix(proposalHashStr, { from: accounts[2] })
+        await mineBlocks(EPOCH, web3)
+        await assertRevert(executeHotfixTx())
+      })
+
     describe('when hotfix is approved and prepared for current epoch', () => {
       beforeEach(async () => {
         await governance.whitelistHotfix(proposalHashStr, { from: approver })
         await mineBlocks(EPOCH, web3)
-        await mockValidators.addValidator(accounts[2])
+        await governance.addValidator(accounts[2])
         await governance.whitelistHotfix(proposalHashStr, { from: accounts[2] })
         await governance.prepareHotfix(proposalHashStr)
       })
