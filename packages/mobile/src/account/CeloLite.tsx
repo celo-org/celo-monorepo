@@ -8,20 +8,20 @@ import { connect } from 'react-redux'
 import i18n, { Namespaces } from 'src/i18n'
 import { headerWithBackButton } from 'src/navigator/Headers'
 import { RootState } from 'src/redux/reducers'
-import { setZeroSyncMode } from 'src/web3/actions'
+import { toggleZeroSyncMode } from 'src/web3/actions'
 
 interface StateProps {
   zeroSyncEnabled: boolean
 }
 
 interface DispatchProps {
-  setZeroSyncMode: typeof setZeroSyncMode
+  toggleZeroSyncMode: typeof toggleZeroSyncMode
 }
 
 type Props = StateProps & DispatchProps & WithNamespaces
 
 const mapDispatchToProps = {
-  setZeroSyncMode,
+  toggleZeroSyncMode,
 }
 
 const mapStateToProps = (state: RootState): StateProps => {
@@ -42,7 +42,7 @@ export class CeloLite extends React.Component<Props> {
       <ScrollView style={style.scrollView} keyboardShouldPersistTaps="handled">
         <SettingsSwitchItem
           switchValue={zeroSyncEnabled}
-          onSwitchChange={this.props.setZeroSyncMode}
+          onSwitchChange={this.props.toggleZeroSyncMode}
           details={t('celoLiteDetail')}
         >
           <Text style={fontStyles.body}>{t('enableCeloLite')}</Text>

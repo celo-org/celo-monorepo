@@ -29,6 +29,7 @@ import {
   SetIsZeroSyncAction,
   setLatestBlockNumber,
   setPrivateCommentKey,
+  setZeroSyncMode,
   updateWeb3SyncProgress,
 } from 'src/web3/actions'
 import { addLocalAccount, switchWeb3ProviderForSyncMode, web3 } from 'src/web3/contracts'
@@ -50,6 +51,11 @@ const BLOCK_CHAIN_CORRUPTION_ERROR = "Error: CONNECTION ERROR: Couldn't connect 
 // checks if web3 claims it is currently syncing and attempts to wait for it to complete
 export function* checkWeb3SyncProgress() {
   const zeroSyncMode = yield select(zeroSyncSelector)
+  Logger.debug(
+    TAG,
+    'checkWeb3SyncProgress',
+    `Checking sync progress, zeroSync mode is: ${zeroSyncMode}`
+  )
   if (zeroSyncMode) {
     // In this mode, the check seems to fail with
     // web3/saga/checking web3 sync progress: Error: Invalid JSON RPC response: "":
@@ -79,6 +85,7 @@ export function* checkWeb3SyncProgress() {
 
       yield delay(100) // wait 100ms while web3 syncs
     } catch (error) {
+      Logger.error(TAG, 'checkWeb3SyncProgress error: ', error)
       if (error.toString().toLowerCase() === BLOCK_CHAIN_CORRUPTION_ERROR.toLowerCase()) {
         CeloAnalytics.track(CustomEventNames.blockChainCorruption, {}, true)
         const deleted = yield call(deleteChainData)
@@ -314,12 +321,17 @@ export function* unlockAccount(account: string) {
   Logger.debug(TAG + '@unlockAccount', `Unlocking account: ${account}`)
   try {
     const isAccountLocked = yield call(isLocked, account)
+    Logger.debug(TAG + '@unlockAccount', `Account is locked: ${isAccountLocked}`)
     if (!isAccountLocked) {
+      Logger.debug(TAG + '@unlockAccount', `Account already unlocked`)
       return true
     }
 
+    Logger.debug(TAG + '@unlockAccount', `About to request pincode`)
     const pincode = yield call(getPincode)
+    Logger.debug(TAG + '@unlockAccount', `Got pincode: ${pincode}`)
     const zeroSyncMode = yield select(zeroSyncSelector)
+    Logger.debug(TAG + '@unlockAccount', `ZeroSync mode: ${zeroSyncMode}`)
     if (zeroSyncMode) {
       if (accountAlreadyAddedInZeroSyncMode) {
         Logger.info(TAG + 'unlockAccount', `Account ${account} already added to web3 for signing`)
@@ -331,6 +343,10 @@ export function* unlockAccount(account: string) {
       }
       return true
     } else {
+      Logger.debug(TAG + '@unlockAccount', `Unlocking account...`)
+      const connected = yield call(web3.eth.net.isListening)
+      Logger.debug(TAG + '@unlockAccount', `Connected: ${connected}`)
+
       yield call(web3.eth.personal.unlockAccount, account, pincode, UNLOCK_DURATION)
       Logger.debug(TAG + '@unlockAccount', `Account unlocked: ${account}`)
       return true
@@ -352,6 +368,7 @@ export function* getConnectedAccount() {
 // Wait for geth to be connected, geth ready, and get unlocked account
 export function* getConnectedUnlockedAccount() {
   const account: string = yield call(getConnectedAccount)
+  Logger.debug(TAG + '@getConnectedUnlockedAccount', `Got account ${account}`)
   const success: boolean = yield call(unlockAccount, account)
   if (success) {
     return account
@@ -378,7 +395,7 @@ export function* addAccountToWeb3Keystore(key: string, currentAccount: string, p
     )
     yield put(setAccountInWeb3Keystore(account))
   } catch (e) {
-    Logger.debug(TAG + '@addAccountToWeb3Keystore', 'Failed to import raw key')
+    Logger.debug(TAG + '@addAccountToWeb3Keystore', `Failed to import raw key: ${e}`)
     if (e.toString().includes('account already exists')) {
       account = currentAccount
       Logger.debug(TAG + '@addAccountToWeb3Keystore', 'Importing same account as current one')
@@ -424,16 +441,22 @@ export function* ensureAccountInWeb3Keystore() {
 
 export function* switchToGethFromZeroSync() {
   try {
+    Logger.error(TAG + '@switchToGethFromZeroSync', 'About to initialize geth')
+    // yield call(getGeth)
     yield call(initGethSaga)
+
+    Logger.error(TAG + '@switchToGethFromZeroSync', 'Called initGethSaga')
     switchWeb3ProviderForSyncMode(false)
+    yield put(setZeroSyncMode(false))
+
+    // Ensure web3 is fully synced using new provider
+    yield call(waitForWeb3Sync)
 
     // After switching off zeroSync mode, ensure key is stored in web3.personal
     // Note that this must happen after the sync mode is switched
     // as the web3.personal where the key is stored is not available in zeroSync mode
     yield call(ensureAccountInWeb3Keystore)
-
-    // Ensure web3 is fully synced using new provider
-    yield call(waitForWeb3Sync)
+    Logger.error(TAG + '@switchToGethFromZeroSync', 'Ensure keys in keystore')
   } catch (e) {
     Logger.error(TAG + '@switchToGethFromZeroSync', 'Error switching to geth from zeroSync')
     yield put(showError(ErrorMessages.FAILED_TO_SWITCH_SYNC_MODES))
@@ -444,7 +467,12 @@ export function* switchToZeroSyncFromGeth() {
   Logger.debug(TAG + 'Switching to zeroSync from geth..')
   try {
     yield call(stopGethIfInitialized)
+
     switchWeb3ProviderForSyncMode(true)
+    yield put(setZeroSyncMode(true))
+
+    // Ensure web3 is fully synced using new provider
+    yield call(waitForWeb3Sync)
   } catch (e) {
     Logger.error(TAG + '@switchToGethFromZeroSync', 'Error switching to zeroSync from geth')
     yield put(showError(ErrorMessages.FAILED_TO_SWITCH_SYNC_MODES))
@@ -466,7 +494,7 @@ export function* toggleZeroSyncMode(action: SetIsZeroSyncAction) {
   )
 }
 export function* watchZeroSyncMode() {
-  yield takeLatest(Actions.SET_IS_ZERO_SYNC, toggleZeroSyncMode)
+  yield takeLatest(Actions.TOGGLE_IS_ZERO_SYNC, toggleZeroSyncMode)
 }
 
 export function* web3Saga() {

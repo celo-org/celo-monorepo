@@ -70,10 +70,14 @@ export function* initGethSaga() {
   Logger.debug(TAG, 'Initializing Geth')
   yield put(setInitState(InitializationState.INITIALIZING))
 
+  Logger.error(TAG + '@initGethSaga', 'About to wait for geth instance')
+
   const { result } = yield race({
     result: call(waitForGethInstance),
     timeout: delay(INIT_GETH_TIMEOUT),
   })
+
+  Logger.error(TAG + '@initGethSaga', `Got result: ${result}`)
 
   let restartAppAutomatically: boolean = false
   switch (result) {
@@ -152,11 +156,18 @@ function* monitorGeth() {
         yield put(setGethConnected(true))
         yield delay(GETH_MONITOR_DELAY)
       } else {
-        Logger.error(
-          `${TAG}@monitorGeth`,
-          `Did not receive a block in ${NEW_BLOCK_TIMEOUT} milliseconds`
-        )
-        yield put(setGethConnected(false))
+        // Check whether reason for now new blocks is zeroSync mode
+        const switchedToZeroSync = yield select(zeroSyncSelector)
+        if (switchedToZeroSync) {
+          yield put(setGethConnected(true))
+          return
+        } else {
+          Logger.error(
+            `${TAG}@monitorGeth`,
+            `Did not receive a block in ${NEW_BLOCK_TIMEOUT} milliseconds`
+          )
+          yield put(setGethConnected(false))
+        }
       }
     } catch (error) {
       Logger.error(`${TAG}@monitorGeth`, error)
