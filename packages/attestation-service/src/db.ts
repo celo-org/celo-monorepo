@@ -21,13 +21,21 @@ export function initializeKit() {
   }
 }
 
+let AttestationTable: AttestationStatic
+
+async function getAttestationTable() {
+  if (AttestationTable) {
+    return AttestationTable
+  }
+  return Attestation(sequelize!)
+}
+
 export async function existingAttestationRequest(
   phoneNumber: string,
   account: string,
   issuer: string
 ): Promise<AttestationStatic | null> {
-  const AttestationTable = await Attestation(sequelize!)
-  return AttestationTable.findOne({ where: { phoneNumber, account, issuer } })
+  return (await getAttestationTable()).findOne({ where: { phoneNumber, account, issuer } })
 }
 
 export async function persistAttestationRequest(
@@ -35,6 +43,5 @@ export async function persistAttestationRequest(
   account: string,
   issuer: string
 ) {
-  const AttestationTable = await Attestation(sequelize!)
-  return AttestationTable.create({ phoneNumber, account, issuer })
+  return (await getAttestationTable()).create({ phoneNumber, account, issuer })
 }

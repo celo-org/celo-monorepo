@@ -4,9 +4,9 @@ import express from 'express'
 import { either, isLeft } from 'fp-ts/lib/Either'
 import * as t from 'io-ts'
 
-export function parseRequest<T>(
+export function createValidatedHandler<T>(
   requestType: t.Type<T>,
-  processor: (req: express.Request, res: express.Response, parsedRequest: T) => Promise<void>
+  handler: (req: express.Request, res: express.Response, parsedRequest: T) => Promise<void>
 ) {
   return async (req: express.Request, res: express.Response) => {
     const parsedRequest = requestType.decode(req.body)
@@ -18,7 +18,7 @@ export function parseRequest<T>(
       })
     } else {
       try {
-        await processor(req, res, parsedRequest.right)
+        await handler(req, res, parsedRequest.right)
       } catch (error) {
         console.error(error)
         res.status(500).json({ success: false, error: 'Something went wrong' })

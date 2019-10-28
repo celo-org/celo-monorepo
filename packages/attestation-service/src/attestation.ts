@@ -48,7 +48,6 @@ async function validateAttestationRequest(request: AttestationRequest) {
     request.issuer
   )
 
-  console.info(state)
   if (state.attestationState !== AttestationState.Incomplete) {
     throw new Error('No incomplete attestation found')
   }
