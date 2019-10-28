@@ -58,7 +58,6 @@ contract('LockedGold', (accounts: string[]) => {
     await registry.setAddressFor(CeloContractName.Election, mockElection.address)
     await registry.setAddressFor(CeloContractName.Validators, mockValidators.address)
     await lockedGold.initialize(registry.address, unlockingPeriod)
-    await accountsInstance.initialize()
     await accountsInstance.createAccount()
   })
 

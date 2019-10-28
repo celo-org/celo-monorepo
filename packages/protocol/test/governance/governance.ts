@@ -98,7 +98,6 @@ contract('Governance', (accounts: string[]) => {
     mockLockedGold = await MockLockedGold.new()
     registry = await Registry.new()
     testTransactions = await TestTransactions.new()
-    await accountsInstance.initialize()
     await governance.initialize(
       registry.address,
       approver,
