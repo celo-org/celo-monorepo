@@ -67,16 +67,16 @@ describe('governance tests', () => {
       const validators = blocks.map((block) => block.miner)
 
       // Ensure each validator has an equal number of blocks.
-      const expected_count = BLOCK_COUNT / VALIDATORS
+      const expectedCount = BLOCK_COUNT / VALIDATORS
       for (const [validator, count] of Object.entries(_.countBy(validators))) {
         assert.equal(
           count,
           expected_count,
-          `${validator} should have mined ${expected_count} blocks`
+          `${validator} should have mined ${expectedCount} blocks`
         )
       }
 
-      let orderings: string[][] = []
+      const orderings: string[][] = []
       for (let i = 0; i < EPOCHS_TO_WAIT; i++) {
         const epochValidators = validators.slice(i * EPOCH, (i + 1) * EPOCH)
         const ordering = epochValidators.slice(0, VALIDATORS)
