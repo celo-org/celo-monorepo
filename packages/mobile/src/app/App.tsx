@@ -19,6 +19,8 @@ import Navigator from 'src/navigator/NavigatorWrapper'
 import { persistor, store } from 'src/redux/store'
 import Logger from 'src/utils/Logger'
 
+// This is not actually a hook
+// tslint:disable-next-line
 useScreens()
 
 Logger.debug('App/init', 'Current Language: ' + i18n.language)
