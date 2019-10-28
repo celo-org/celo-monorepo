@@ -13,6 +13,7 @@
   "country": "Country",
   "phoneNumber": "Phone Number",
   "invalidPhone": "Invalid Phone Number",
+  "missingFullName": "Please enter full name",
   "allowSmsPermissions": "Allow Celo Wallet to send and view SMS messages",
   "dontAsk": "Don't ask again",
   "deny": "Deny",
