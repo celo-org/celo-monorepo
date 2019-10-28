@@ -39,7 +39,7 @@
     "inviteAccepted": "🎉 Invite Accepted!",
     "askForInvite": {
       "0":
-        "Request an invite from someone with Celo Wallet or sign up for the Alfajores network at ",
+        "Request an invite from someone with Celo Wallet or sign up for the {{testnet}} network at ",
       "1": "celo.org/build/wallet"
     }
   },
