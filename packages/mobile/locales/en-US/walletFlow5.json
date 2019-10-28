@@ -60,7 +60,8 @@
     "A friendly reminder that you haven't yet redeemed your Celo Dollars!",
   "testnetAlert": {
     "0": "{{testnet}}",
-    "1": "A friendly reminder you're using the {{testnet}} build - the balances here are not real."
+    "1":
+      "A friendly reminder you're using the {{testnet}} network build - the balances here are not real."
   },
   "dismiss": "Dismiss",
   "localCurrencyEqual": "Equal to <2>{{localValue}} {{localCurrencyCode}}</2>",
