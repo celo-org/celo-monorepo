@@ -81,6 +81,18 @@ export class ElectionWrapper extends BaseWrapper<Election> {
   )
 
   /**
+   * Returns the total votes for `group` made by `account`.
+   * @param group The address of the validator group.
+   * @param account The address of the voting account.
+   * @return The total votes for `group` made by `account`.
+   */
+  getTotalVotesForGroup = proxyCall(
+    this.contract.methods.getTotalVotesForGroup,
+    undefined,
+    toBigNumber
+  )
+
+  /**
    * Returns the groups that `account` has voted for.
    * @param account The address of the account casting votes.
    * @return The groups that `account` has voted for.
@@ -147,24 +159,6 @@ export class ElectionWrapper extends BaseWrapper<Election> {
   async getEligibleValidatorGroupsVotes(): Promise<ValidatorGroupVote[]> {
     const res = await this.contract.methods.getTotalVotesForEligibleValidatorGroups().call()
     return zip((a, b) => ({ address: a, votes: new BigNumber(b), eligible: true }), res[0], res[1])
-  }
-
-  /**
-   * Marks a group eligible for electing validators.
-   * @param lesser The address of the group that has received fewer votes than this group.
-   * @param greater The address of the group that has received more votes than this group.
-   */
-  async markGroupEligible(validatorGroup: Address): Promise<CeloTransactionObject<boolean>> {
-    if (this.kit.defaultAccount == null) {
-      throw new Error(`missing kit.defaultAccount`)
-    }
-
-    const value = toBigNumber(
-      await this.contract.methods.getTotalVotesForGroup(validatorGroup).call()
-    )
-    const { lesser, greater } = await this.findLesserAndGreaterAfterVote(validatorGroup, value)
-
-    return toTransactionObject(this.kit, this.contract.methods.markGroupEligible(lesser, greater))
   }
 
   /**

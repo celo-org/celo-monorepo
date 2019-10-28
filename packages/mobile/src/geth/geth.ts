@@ -187,6 +187,12 @@ async function ensureStaticNodesInitialized(): Promise<boolean> {
   }
 }
 
+export async function stopGethIfInitialized() {
+  if (gethInstance) {
+    await stop()
+  }
+}
+
 async function stop() {
   try {
     Logger.debug('Geth@stop', 'Stopping Geth')
