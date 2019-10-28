@@ -18,8 +18,8 @@ const initializeArgs = async (networkName: string): Promise<any[]> => {
   )
   return [
     config.registry.predeployedProxyAddress,
-    stableToken.address,
     network.from,
+    stableToken.address,
     toFixed(config.exchange.spread).toString(),
     toFixed(config.exchange.reserveFraction).toString(),
     config.exchange.updateFrequency,
