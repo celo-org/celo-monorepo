@@ -3,7 +3,7 @@ pragma solidity ^0.5.3;
 
 interface IAttestations {
 
-  function initialize(address, uint256, address[] calldata, uint256[] calldata) external;
+  function initialize(address, uint256, uint256, address[] calldata, uint256[] calldata) external;
 
   function setAttestationRequestFee(address, uint256) external;
   function request(bytes32, uint256, address) external;

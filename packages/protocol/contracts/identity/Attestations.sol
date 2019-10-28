@@ -110,6 +110,9 @@ contract Attestations is
   // attestation was requested.
   uint256 public attestationExpiryBlocks;
 
+  // The duration to wait until selectIssuers can be called for an attestation request.
+  uint256 public selectIssuersWaitBlocks;
+
   // The fees that are associated with attestations for a particular token.
   mapping(address => uint256) public attestationRequestFees;
 
@@ -143,10 +146,12 @@ contract Attestations is
   event AccountDataEncryptionKeySet(address indexed account, bytes dataEncryptionKey);
   event AccountMetadataURLSet(address indexed account, string metadataURL);
   event AccountWalletAddressSet(address indexed account, address walletAddress);
+  event SelectIssuersWaitBlocksSet(uint256 value);
 
   function initialize(
     address registryAddress,
     uint256 _attestationExpiryBlocks,
+    uint256 _selectIssuersWaitBlocks,
     address[] calldata attestationRequestFeeTokens,
     uint256[] calldata attestationRequestFeeValues
   )
@@ -156,6 +161,8 @@ contract Attestations is
     _transferOwnership(msg.sender);
     setRegistry(registryAddress);
     setAttestationExpiryBlocks(_attestationExpiryBlocks);
+    setSelectIssuersWaitBlocks(_selectIssuersWaitBlocks);
+
     require(
       attestationRequestFeeTokens.length > 0 &&
       attestationRequestFeeTokens.length == attestationRequestFeeValues.length,
@@ -540,6 +547,17 @@ contract Attestations is
     emit AttestationExpiryBlocksSet(_attestationExpiryBlocks);
   }
 
+    /**
+   * @notice Updates 'selectIssuersWaitBlocks'.
+   * @param _selectIssuersWaitBlocks The wait period in blocks to call selectIssuers on attestation
+   *                                 requests.
+   */
+  function setSelectIssuersWaitBlocks(uint256 _selectIssuersWaitBlocks) public onlyOwner {
+    require(_selectIssuersWaitBlocks > 0, "selectIssuersWaitBlocks has to be greater than 0");
+    selectIssuersWaitBlocks = _selectIssuersWaitBlocks;
+    emit SelectIssuersWaitBlocksSet(_selectIssuersWaitBlocks);
+  }
+
   /**
    * @notice Setter for the metadata of an account.
    * @param metadataURL The URL to access the metadata.
@@ -779,7 +797,7 @@ contract Attestations is
 
     IRandom random = IRandom(registry.getAddressForOrDie(RANDOM_REGISTRY_ID));
 
-    bytes32 seed = random.random();
+    bytes32 seed = random.getBlockRandomness(unselectedRequest.blockNumber + selectIssuersWaitBlocks);
     uint256 numberValidators = numberValidatorsInCurrentSet();
 
     uint256 currentIndex = 0;
