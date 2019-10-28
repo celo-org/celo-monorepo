@@ -11,6 +11,7 @@ export enum ErrorMessages {
   INVALID_BACKUP_PHRASE = 'backupKeyFlow6:invalidBackupPhrase',
   IMPORT_BACKUP_FAILED = 'backupKeyFlow6:importBackupFailed',
   BACKUP_QUIZ_FAILED = 'backupKeyFlow6:backupQuizFailed',
+  FAILED_FETCH_MNEMONIC = 'backupKeyFlow6:failedFetchMnemonic',
   INVALID_PHONE_NUMBER = 'nuxVerification2:invalidPhone',
   NOT_READY_FOR_CODE = 'nuxVerification2:notReadyForCode',
   EMPTY_ATTESTATION_CODE = 'nuxVerification2:emptyVerificationCode',
@@ -33,6 +34,7 @@ export enum ErrorMessages {
   EMPTY_INVITE_CODE = 'inviteFlow11:emptyInviteCode',
   REDEEM_INVITE_FAILED = 'inviteFlow11:redeemFailed',
   REDEEM_INVITE_TIMEOUT = 'inviteFlow11:redeemInviteTimeout',
+  ACCOUNT_SETUP_FAILED = 'inviteFlow11:accountSetupFailed',
   FIREBASE_DISABLED = 'dev:firebaseDisabled',
   FIREBASE_FAILED = 'firebaseFailed',
   IMPORT_CONTACTS_FAILED = 'importContactsFailed',
@@ -42,5 +44,4 @@ export enum ErrorMessages {
   CORRUPTED_CHAIN_DELETED = 'corruptedChainDeleted',
   CALCULATE_FEE_FAILED = 'calculateFeeFailed',
   FAILED_TO_SWITCH_SYNC_MODES = 'failedToSwitchSyncModes',
-  FAILED_FETCH_MNEMONIC = 'failedFetchMnemonic',
 }

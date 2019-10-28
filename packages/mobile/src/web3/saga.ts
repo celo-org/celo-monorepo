@@ -3,6 +3,7 @@ import { getAccountAddressFromPrivateKey } from '@celo/walletkit'
 import * as Crypto from 'crypto'
 import { generateMnemonic, mnemonicToSeedHex } from 'react-native-bip39'
 import * as RNFS from 'react-native-fs'
+import Sentry from 'react-native-sentry'
 import { REHYDRATE } from 'redux-persist/es/constants'
 import { call, delay, put, race, select, spawn, take, takeLatest } from 'redux-saga/effects'
 import { setAccountCreationTime } from 'src/account/actions'
@@ -123,27 +124,38 @@ export function* getOrCreateAccount() {
     )
     return account
   }
-  Logger.debug(TAG + '@getOrCreateAccount', 'Creating a new account')
-  const wordlist = getWordlist(yield select(currentLanguageSelector))
-  const mnemonic = String(yield call(generateMnemonic, MNEMONIC_BIT_LENGTH, null, wordlist))
-  const privateKey = yield call(mnemonicToSeedHex, mnemonic)
-  const accountAddress = yield call(assignAccountFromPrivateKey, privateKey)
 
-  if (accountAddress) {
-    try {
-      yield call(setKey, 'mnemonic', mnemonic)
-    } catch (e) {
-      Logger.error(TAG + '@getOrCreateAccount', 'Failed to set mnemonic', e)
+  try {
+    Logger.debug(TAG + '@getOrCreateAccount', 'Creating a new account')
+
+    const wordlist = getWordlist(yield select(currentLanguageSelector))
+    const mnemonic = yield call(generateMnemonic, MNEMONIC_BIT_LENGTH, null, wordlist)
+    if (!mnemonic) {
+      throw new Error('Failed to generate mnemonic')
     }
+
+    const privateKey = mnemonicToSeedHex(mnemonic)
+    if (!privateKey) {
+      throw new Error('Failed to convert mnemonic to hex')
+    }
+
+    const accountAddress = yield call(assignAccountFromPrivateKey, privateKey)
+    if (!accountAddress) {
+      throw new Error('Failed to assign account from private key')
+    }
+
+    yield call(setKey, 'mnemonic', mnemonic)
+
     return accountAddress
-  } else {
-    return null
+  } catch (error) {
+    // Capturing error in sentry for now as we debug backup key issue
+    Sentry.captureException(error)
+    Logger.error(TAG + '@getOrCreateAccount', 'Error creating account', error)
+    throw new Error(ErrorMessages.ACCOUNT_SETUP_FAILED)
   }
 }
 
-export function* assignAccountFromPrivateKey(key: string) {
-  const currentAccount = yield select(currentAccountSelector)
-
+export function* assignAccountFromPrivateKey(privateKey: string) {
   try {
     const pincode = yield call(getPincode)
     if (!pincode) {
@@ -151,14 +163,11 @@ export function* assignAccountFromPrivateKey(key: string) {
       throw Error('Cannot create account without having the pin set')
     }
 
-    let account: string
-
     // Save the account to a local file on the disk.
     // This is done for all sync modes, to allow users to switch into zeroSync mode.
     // Note that if geth is running it saves the key using web3.personal.
-    const privateKey = String(key)
-    account = getAccountAddressFromPrivateKey(privateKey)
-    yield savePrivateKeyToLocalDisk(account, privateKey, pincode)
+    const account = getAccountAddressFromPrivateKey(privateKey)
+    yield call(savePrivateKeyToLocalDisk, account, privateKey, pincode)
 
     const zeroSyncMode = yield select(zeroSyncSelector)
     if (zeroSyncMode) {
@@ -167,47 +176,32 @@ export function* assignAccountFromPrivateKey(key: string) {
     } else {
       try {
         // @ts-ignore
-        account = yield call(web3.eth.personal.importRawKey, String(key), pincode)
+        yield call(web3.eth.personal.importRawKey, privateKey, pincode)
       } catch (e) {
         if (e.toString().includes('account already exists')) {
-          account = currentAccount
-          Logger.debug(
-            TAG + '@assignAccountFromPrivateKey',
-            'Importing same account as current one'
-          )
+          Logger.warn(TAG + '@assignAccountFromPrivateKey', 'Attempted to import same account')
         } else {
           Logger.error(TAG + '@assignAccountFromPrivateKey', 'Error importing raw key')
           throw e
         }
       }
       yield call(web3.eth.personal.unlockAccount, account, pincode, UNLOCK_DURATION)
-    }
-
-    Logger.debug(
-      TAG + '@assignAccountFromPrivateKey',
-      `Created account from mnemonic and added to wallet: ${account}`
-    )
-
-    yield put(setAccount(account))
-    yield put(setAccountCreationTime())
-    yield call(assignDataKeyFromPrivateKey, key)
-
-    if (!zeroSyncMode) {
       web3.eth.defaultAccount = account
     }
+
+    Logger.debug(TAG + '@assignAccountFromPrivateKey', `Added to wallet: ${account}`)
+    yield put(setAccount(account))
+    yield put(setAccountCreationTime())
+    yield call(assignDataKeyFromPrivateKey, privateKey)
     return account
   } catch (e) {
-    Logger.error(
-      TAG + '@assignAccountFromPrivateKey',
-      'Error assigning account from private key',
-      e
-    )
-    return null
+    Logger.error(TAG + '@assignAccountFromPrivateKey', 'Error assigning account', e)
+    throw e
   }
 }
 
-function* assignDataKeyFromPrivateKey(key: string) {
-  const privateCEK = deriveCEK(key).toString('hex')
+function* assignDataKeyFromPrivateKey(privateKey: string) {
+  const privateCEK = deriveCEK(privateKey).toString('hex')
   yield put(setPrivateCommentKey(privateCEK))
 }
 
@@ -228,7 +222,7 @@ function ensureAddressAndKeyMatch(address: string, privateKey: string) {
   Logger.debug(TAG + '@ensureAddressAndKeyMatch', `Sender and private key match`)
 }
 
-async function savePrivateKeyToLocalDisk(
+function savePrivateKeyToLocalDisk(
   account: string,
   privateKey: string,
   encryptionPassword: string
@@ -238,7 +232,7 @@ async function savePrivateKeyToLocalDisk(
   const plainTextData = privateKey
   const encryptedData: Buffer = getEncryptedData(plainTextData, encryptionPassword)
   Logger.debug('savePrivateKeyToLocalDisk', `Writing encrypted private key to ${filePath}`)
-  await RNFS.writeFile(getPrivateKeyFilePath(account), encryptedData.toString('hex'))
+  return RNFS.writeFile(getPrivateKeyFilePath(account), encryptedData.toString('hex'))
 }
 
 // Reads and returns unencrypted private key
