@@ -1,7 +1,5 @@
 /* tslint:disable:no-console */
 
-import { GovernanceInstance, ReserveInstance } from 'types'
-
 import { CeloContractName } from '@celo/protocol/lib/registry-utils'
 import {
   deploymentForCoreContract,
@@ -11,6 +9,7 @@ import {
 } from '@celo/protocol/lib/web3-utils'
 import { config } from '@celo/protocol/migrationsConfig'
 import { toFixed } from '@celo/utils/lib/fixidity'
+import { GovernanceInstance, ReserveInstance } from 'types'
 
 const initializeArgs = async (networkName: string): Promise<any[]> => {
   const approver = require('@celo/protocol/truffle-config.js').networks[networkName].from
@@ -38,14 +37,14 @@ module.exports = deploymentForCoreContract<GovernanceInstance>(
   CeloContractName.Governance,
   initializeArgs,
   async (governance: GovernanceInstance) => {
-    console.log('Setting Governance as a Reserve spender')
+    console.info('Setting Governance as a Reserve spender')
     const reserve: ReserveInstance = await getDeployedProxiedContract<ReserveInstance>(
       'Reserve',
       artifacts
     )
     await reserve.addSpender(governance.address)
 
-    const proxyOwnedByGovernance = ['GoldToken', 'Random']
+    const proxyOwnedByGovernance = ['GoldToken']
     await Promise.all(
       proxyOwnedByGovernance.map((contractName) =>
         transferOwnershipOfProxy(contractName, governance.address, artifacts)
@@ -55,12 +54,14 @@ module.exports = deploymentForCoreContract<GovernanceInstance>(
     const proxyAndImplementationOwnedByGovernance = [
       'Attestations',
       'BlockchainParameters',
+      'Election',
       'Escrow',
       'Exchange',
       'GasCurrencyWhitelist',
       'GasPriceMinimum',
       'Governance',
       'LockedGold',
+      'Random',
       'Registry',
       'Reserve',
       'SortedOracles',

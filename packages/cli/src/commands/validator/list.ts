@@ -20,9 +20,7 @@ export default class ValidatorList extends BaseCommand {
     cli.action.stop()
     cli.table(validatorList, {
       address: {},
-      id: {},
       name: {},
-      url: {},
       publicKey: {},
       affiliation: {},
     })
