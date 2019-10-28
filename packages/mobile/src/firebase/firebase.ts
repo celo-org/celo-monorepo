@@ -5,10 +5,11 @@ import { RemoteMessage } from 'react-native-firebase/messaging'
 import { Notification, NotificationOpen } from 'react-native-firebase/notifications'
 import { eventChannel, EventChannel } from 'redux-saga'
 import { call, put, select, spawn, take } from 'redux-saga/effects'
-import { NotificationReceiveState, PaymentRequest } from 'src/account'
+import { NotificationReceiveState } from 'src/account'
 import { showError } from 'src/alert/actions'
 import { ErrorMessages } from 'src/app/ErrorMessages'
 import { currentLanguageSelector } from 'src/app/reducers'
+import { WritePaymentRequest } from 'src/firebase/actions'
 import { handleNotification } from 'src/firebase/notifications'
 import { navigate } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
@@ -150,7 +151,7 @@ export const registerTokenToDb = async (app: Firebase, address: string, fcmToken
   }
 }
 
-export function* writePaymentRequest(paymentInfo: PaymentRequest) {
+export function* paymentRequestWriter({ paymentInfo }: WritePaymentRequest) {
   try {
     Logger.info(TAG, `Writing pending request to database`)
     const pendingRequestRef = firebase.database().ref(`pendingRequests`)

@@ -21,8 +21,8 @@ import { Actions, firebaseAuthorized, UpdatePaymentRequestStatusAction } from 's
 import {
   initializeAuth,
   initializeCloudMessaging,
+  paymentRequestWriter,
   setUserLanguage,
-  writePaymentRequest,
 } from 'src/firebase/firebase'
 import Logger from 'src/utils/Logger'
 import { getAccount } from 'src/web3/saga'
@@ -164,7 +164,7 @@ export function* watchLanguage() {
 }
 
 export function* watchWritePaymentRequest() {
-  yield takeEvery(Actions.PAYMENT_REQUEST_WRITE, writePaymentRequest)
+  yield takeEvery(Actions.PAYMENT_REQUEST_WRITE, paymentRequestWriter)
 }
 
 export function* firebaseSaga() {
