@@ -18,6 +18,11 @@ variable ethstats_host {
   description = "Ethstats url or IP address"
 }
 
+variable forno_host {
+  type        = string
+  description = "The host name to use for the tx node forno setup"
+}
+
 variable gcloud_credentials_path {
   type        = string
   description = "Path to the file containing the Google Cloud credentials to use"
@@ -81,11 +86,6 @@ variable geth_node_docker_image_tag {
 variable geth_verbosity {
   type        = number
   description = "Verbosity of all geth nodes"
-}
-
-variable forno_host {
-  type        = string
-  description = "The host name to use for the tx node forno setup"
 }
 
 variable in_memory_discovery_table {

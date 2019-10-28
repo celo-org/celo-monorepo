@@ -8,6 +8,11 @@ variable dns_zone_name {
   description = "Name of the DNS zone for the domain used for the forno setup"
 }
 
+variable forno_host {
+  type        = string
+  description = "The host name to use for the tx node forno setup"
+}
+
 variable gcloud_credentials_path {
   type        = string
   description = "Path to the file containing the Google Cloud credentials to use"
@@ -18,9 +23,9 @@ variable gcloud_project {
   description = "Name of the Google Cloud project to use"
 }
 
-variable forno_host {
+variable gcloud_vm_service_account_email {
   type        = string
-  description = "The host name to use for the tx node forno setup"
+  description = "The email of the service account to associate virtual machines with"
 }
 
 variable network_name {

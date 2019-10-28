@@ -1,0 +1,37 @@
+#cloud-config
+
+users:
+- name: cloudservice
+  uid: 2000
+
+write_files:
+- path: /etc/systemd/system/ssl-letsencrypt.service
+  permissions: 0644
+  owner: root
+  content: |
+    [Unit]
+    Description=Automatically updates https proxy SSL certificates every month
+
+    [Service]
+    ExecStart=/usr/bin/docker run \
+      --rm \
+      -u 2000 \
+      -v /home/lego:/root/.lego \
+      --env GCE_PROJECT=${gcloud_project} \
+      --env LETSENCRYPT_EMAIL=${letsencrypt_email} \
+      --env TARGET_PROXY=${target_https_proxy_name} \
+      --env DOMAINS_LIST="-d ${forno_host}" \
+      --env USE_STAGING_SERVER=true \
+      --env CERT_ID_PREFIX=${cert_prefix} \
+      --name=ssl-letsencrypt \
+      tkporter/letsencrypt-gcloud-balancer:v02-fix-1
+    ExecStop=/usr/bin/docker stop ssl-letsencrypt
+    ExecStopPost=/usr/bin/docker rm ssl-letsencrypt
+
+runcmd:
+- systemctl daemon-reload
+- systemctl start ssl-letsencrypt.service
+
+# Once-per-boot setup
+bootcmd:
+- mkdir -p /home/lego

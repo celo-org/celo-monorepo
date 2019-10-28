@@ -1,5 +1,6 @@
 locals {
   name_prefix = "${var.celo_env}-tx-node-lb"
+  target_https_proxy_name = "${var.celo_env}-tx-node-lb-external-http-proxy"
 }
 
 resource "google_compute_instance_group" "tx_node_lb" {
@@ -144,9 +145,9 @@ resource "google_compute_health_check" "external" {
 
 resource "google_compute_ssl_certificate" "external" {
   name_prefix = "${local.name_prefix}-ssl-cert"
-  private_key = acme_certificate.external.private_key_pem
+  private_key = tls_private_key.tmp.private_key_pem
   # acme_certificate's `certificate_pem` does not include the issuer pem in the chain
-  certificate = "${acme_certificate.external.certificate_pem}${acme_certificate.external.issuer_pem}"
+  certificate = tls_self_signed_cert.tmp.cert_pem
 
   lifecycle {
     create_before_destroy = true
@@ -169,28 +170,87 @@ data "google_dns_managed_zone" "external" {
 
 # SSL certificate from Let's Encrypt:
 
-resource "tls_private_key" "acme" {
-  algorithm = "RSA"
-}
+resource "google_compute_instance" "external_ssl" {
+  name         = "${local.name_prefix}-external-ssl"
+  machine_type = "f1-micro"
 
-resource "acme_registration" "external" {
-  account_key_pem = tls_private_key.acme.private_key_pem
-  email_address   = "trevor@celo.org"
-}
+  tags = ["${var.celo_env}-external-ssl"]
 
-resource "acme_certificate" "external" {
-  account_key_pem = acme_registration.external.account_key_pem
-  common_name     = var.forno_host
+  allow_stopping_for_update = true
 
-  dns_challenge {
-    provider = "gcloud"
-
-    config = {
-      GCE_POLLING_INTERVAL     = "10"
-      GCE_PROPAGATION_TIMEOUT  = "180"
-      GCE_TTL                  = "60"
-      GCE_PROJECT              = var.gcloud_project
-      GCE_SERVICE_ACCOUNT_FILE = var.gcloud_credentials_path
+  boot_disk {
+    initialize_params {
+      image = "cos-cloud/cos-stable-77-12371-89-0"
     }
   }
+
+  network_interface {
+    network = var.network_name
+    access_config {
+    }
+  }
+
+  metadata = {
+    user-data = templatefile(
+      format("%s/ssl-cloud-init.yaml.tmpl", path.module), {
+        cert_prefix : "${local.name_prefix}-forno-",
+        forno_host : var.forno_host,
+        gcloud_project : var.gcloud_project,
+        letsencrypt_email : "n@celo.org",
+        target_https_proxy_name : local.target_https_proxy_name
+      }
+    )
+  }
+
+  service_account {
+    email = var.gcloud_vm_service_account_email
+    scopes = [
+      "https://www.googleapis.com/auth/compute",
+      "https://www.googleapis.com/auth/devstorage.read_only",
+      "https://www.googleapis.com/auth/logging.write",
+      "https://www.googleapis.com/auth/ndev.clouddns.readwrite"
+    ]
+  }
 }
+
+resource "tls_self_signed_cert" "tmp" {
+  key_algorithm   = "RSA"
+  private_key_pem = tls_private_key.tmp.private_key_pem
+
+  subject {
+    common_name  = var.forno_host
+    organization = "Temporary self signed cert"
+  }
+
+  validity_period_hours = 12
+
+  allowed_uses = [
+    "server_auth",
+  ]
+}
+
+resource "tls_private_key" "tmp" {
+  algorithm = "RSA"
+}
+#
+# resource "acme_registration" "external" {
+#   account_key_pem = tls_private_key.acme.private_key_pem
+#   email_address   = "trevor@celo.org"
+# }
+#
+# resource "acme_certificate" "external" {
+#   account_key_pem = acme_registration.external.account_key_pem
+#   common_name     = var.forno_host
+#
+#   dns_challenge {
+#     provider = "gcloud"
+#
+#     config = {
+#       GCE_POLLING_INTERVAL     = "10"
+#       GCE_PROPAGATION_TIMEOUT  = "180"
+#       GCE_TTL                  = "60"
+#       GCE_PROJECT              = var.gcloud_project
+#       GCE_SERVICE_ACCOUNT_FILE = var.gcloud_credentials_path
+#     }
+#   }
+# }

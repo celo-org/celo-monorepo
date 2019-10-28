@@ -37,7 +37,11 @@ resource "google_compute_firewall" "ssh_firewall" {
   name    = "${var.celo_env}-ssh-firewall"
   network = data.google_compute_network.network.name
 
-  target_tags = concat(local.firewall_target_tags_bootnode, local.firewall_target_tags_node)
+  target_tags = concat(
+    local.firewall_target_tags_bootnode,
+    local.firewall_target_tags_node,
+    ["${var.celo_env}-external-ssl"]
+  )
 
   allow {
     protocol = "tcp"
@@ -141,13 +145,14 @@ module "tx_node" {
 module "tx_node_lb" {
   source = "./modules/tx-node-load-balancer"
   # variables
-  celo_env                = var.celo_env
-  dns_zone_name           = var.dns_zone_name
-  gcloud_credentials_path = var.gcloud_credentials_path
-  gcloud_project          = var.gcloud_project
-  forno_host              = var.forno_host
-  network_name            = data.google_compute_network.network.name
-  tx_node_self_links      = module.tx_node.self_links
+  celo_env                        = var.celo_env
+  dns_zone_name                   = var.dns_zone_name
+  gcloud_credentials_path         = var.gcloud_credentials_path
+  gcloud_project                  = var.gcloud_project
+  gcloud_vm_service_account_email = var.gcloud_vm_service_account_email
+  forno_host                      = var.forno_host
+  network_name                    = data.google_compute_network.network.name
+  tx_node_self_links              = module.tx_node.self_links
 }
 
 module "validator" {
