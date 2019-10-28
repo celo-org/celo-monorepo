@@ -126,8 +126,13 @@ export class JoinCelo extends React.Component<Props, State> {
       return
     }
 
-    if (!name || !e164Number || !isValidNumber || !countryCode) {
+    if (!e164Number || !isValidNumber || !countryCode) {
       this.props.showError(ErrorMessages.INVALID_PHONE_NUMBER)
+      return
+    }
+
+    if (!name) {
+      this.props.showError(ErrorMessages.MISSING_FULL_NAME)
       return
     }
 
