@@ -1,6 +1,7 @@
 const ethjsutil = require('ethereumjs-util')
 
 import * as Web3Utils from 'web3-utils'
+import { privateKeyToAddress } from './address'
 
 // If messages is a hex, the length of it should be the number of bytes
 function messageLength(message: string) {
@@ -31,6 +32,29 @@ export async function signMessageNatively(
     r: `0x${signature.slice(0, 64)}`,
     s: `0x${signature.slice(64, 128)}`,
     v: Web3Utils.hexToNumber(signature.slice(128, 130)) + 27,
+  }
+}
+
+export interface Signer {
+  sign: (message: string) => Promise<string>
+}
+
+export function NativeSigner(
+  signFn: (message: string, signer: string) => Promise<string>,
+  signer: string
+): Signer {
+  return {
+    sign: async (message: string) => {
+      return serializeSignature(await signMessageNatively(message, signer, signFn))
+    },
+  }
+}
+export function LocalSigner(privateKey: string): Signer {
+  return {
+    sign: async (message: string) =>
+      Promise.resolve(
+        serializeSignature(signMessage(message, privateKey, privateKeyToAddress(privateKey)))
+      ),
   }
 }
 
@@ -159,6 +183,8 @@ export function areAddressesEqual(address1: string | null, address2: string | nu
 }
 
 export const SignatureUtils = {
+  NativeSigner,
+  LocalSigner,
   signMessage,
   signMessageNatively,
   signMessageNoPrefix,
