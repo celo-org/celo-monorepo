@@ -1,5 +1,5 @@
 import { CURRENCY_ENUM } from '@celo/utils/src/currencies'
-import { getErc20Balance, getStableTokenContract } from '@celo/walletkit'
+import BigNumber from 'bignumber.js'
 import { expectSaga } from 'redux-saga-test-plan'
 import { call } from 'redux-saga/effects'
 import { waitWeb3LastBlock } from 'src/networkInfo/saga'
@@ -7,13 +7,19 @@ import { fetchDollarBalance, setBalance, transferStableToken } from 'src/stableT
 import { stableTokenFetch, stableTokenTransfer } from 'src/stableToken/saga'
 import { addStandbyTransaction, removeStandbyTransaction } from 'src/transactions/actions'
 import { TransactionStatus, TransactionTypes } from 'src/transactions/reducer'
-import { createMockContract, createMockStore } from 'test/utils'
+import {
+  createMockContract,
+  createMockStore,
+  mockContractKitBalance,
+  mockContractKitContract,
+} from 'test/utils'
 import { mockAccount } from 'test/values'
 
 const now = Date.now()
 Date.now = jest.fn(() => now)
 
 const BALANCE = '45'
+const BALANCE_IN_WEI = '450000000000'
 const TX_ID = '1234'
 const COMMENT = 'a comment'
 
@@ -22,6 +28,14 @@ jest.mock('@celo/walletkit', () => ({
     createMockContract({ decimals: () => '10', transferWithComment: () => true })
   ),
   getErc20Balance: jest.fn(() => BALANCE),
+}))
+
+jest.mock('src/web3/contracts', () => ({
+  contractKit: {
+    contracts: {
+      getStableToken: () => mockContractKitContract,
+    },
+  },
 }))
 
 jest.mock('src/web3/actions', () => ({
@@ -44,13 +58,14 @@ describe('stableToken saga', () => {
   jest.useRealTimers()
 
   it('should fetch the balance and put the new balance', async () => {
+    mockContractKitBalance.mockReturnValueOnce(new BigNumber(BALANCE_IN_WEI))
+
     await expectSaga(stableTokenFetch)
       .provide([[call(waitWeb3LastBlock), true]])
       .withState(state)
       .dispatch(fetchDollarBalance())
       .put(setBalance(BALANCE))
       .run()
-    expect(getErc20Balance).toHaveBeenCalled()
   })
 
   it('should add a standby transaction and dispatch a sendAndMonitorTransaction', async () => {
@@ -91,16 +106,6 @@ describe('stableToken saga', () => {
         })
       )
       .run()
-  })
-
-  // TODO(cmcewen): Figure out how to mock this so we can get actual contract calls
-  it('should call the contract getter', async () => {
-    await expectSaga(stableTokenTransfer)
-      .provide([[call(waitWeb3LastBlock), true]])
-      .withState(state)
-      .dispatch(TRANSFER_ACTION)
-      .run()
-    expect(getStableTokenContract).toHaveBeenCalled()
   })
 
   it('should remove standby transaction when pin unlock fails', async () => {

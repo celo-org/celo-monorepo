@@ -19,10 +19,10 @@ import {
   MockLockedGoldInstance,
   MockStableTokenContract,
   MockStableTokenInstance,
-  MockElectionContract,
   MockElectionInstance,
-  RandomContract,
-  RandomInstance,
+  TestRandomContract,
+  TestRandomInstance,
+  MockElectionContract,
   RegistryContract,
   RegistryInstance,
 } from 'types'
@@ -37,7 +37,7 @@ const Attestations: TestAttestationsContract = artifacts.require('TestAttestatio
 const MockStableToken: MockStableTokenContract = artifacts.require('MockStableToken')
 const MockElection: MockElectionContract = artifacts.require('MockElection')
 const MockLockedGold: MockLockedGoldContract = artifacts.require('MockLockedGold')
-const Random: RandomContract = artifacts.require('Random')
+const Random: TestRandomContract = artifacts.require('TestRandom')
 const Registry: RegistryContract = artifacts.require('Registry')
 
 const dataEncryptionKey = '0x02f2f48ee19680706196e2e339e5da3491186e0c4c5030670656b0e01611111111'
@@ -49,7 +49,7 @@ contract('Attestations', (accounts: string[]) => {
   let attestations: TestAttestationsInstance
   let mockStableToken: MockStableTokenInstance
   let otherMockStableToken: MockStableTokenInstance
-  let random: RandomInstance
+  let random: TestRandomInstance
   let mockElection: MockElectionInstance
   let mockLockedGold: MockLockedGoldInstance
   let registry: RegistryInstance
@@ -142,6 +142,7 @@ contract('Attestations', (accounts: string[]) => {
     otherMockStableToken = await MockStableToken.new()
     attestations = await Attestations.new()
     random = await Random.new()
+    random.addTestRandomness(0, '0x00')
     mockLockedGold = await MockLockedGold.new()
     await Promise.all(
       accounts.map((account) =>
