@@ -3,6 +3,7 @@
 exports[`ExchangeFeedItem renders correctly 1`] = `
 <View
   accessible={true}
+  focusable={true}
   isTVSelectable={true}
   nativeBackgroundAndroid={
     Object {
@@ -10,6 +11,7 @@ exports[`ExchangeFeedItem renders correctly 1`] = `
       "type": "ThemeAttrAndroid",
     }
   }
+  onClick={[Function]}
   onResponderGrant={[Function]}
   onResponderMove={[Function]}
   onResponderRelease={[Function]}
@@ -42,7 +44,7 @@ exports[`ExchangeFeedItem renders correctly 1`] = `
         resizeMode="contain"
         source={
           Object {
-            "testUri": "../../../src/transactions/ExchangeGreenGold.png",
+            "testUri": "../../../packages/mobile/src/transactions/ExchangeGreenGold.png",
           }
         }
         style={

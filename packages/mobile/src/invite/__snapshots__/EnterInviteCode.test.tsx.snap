@@ -38,6 +38,8 @@ exports[`EnterInviteCode Screen renders correctly 1`] = `
       >
         <Text
           accessible={true}
+          focusable={true}
+          onClick={[Function]}
           onResponderGrant={[Function]}
           onResponderMove={[Function]}
           onResponderRelease={[Function]}
@@ -190,6 +192,7 @@ exports[`EnterInviteCode Screen renders correctly 1`] = `
           </Text>
           <View
             accessible={true}
+            focusable={true}
             hitSlop={
               Object {
                 "bottom": 7,
@@ -205,6 +208,7 @@ exports[`EnterInviteCode Screen renders correctly 1`] = `
                 "type": "ThemeAttrAndroid",
               }
             }
+            onClick={[Function]}
             onResponderGrant={[Function]}
             onResponderMove={[Function]}
             onResponderRelease={[Function]}
@@ -319,6 +323,7 @@ exports[`EnterInviteCode Screen renders correctly 1`] = `
     >
       <View
         accessible={true}
+        focusable={false}
         isTVSelectable={true}
         nativeBackgroundAndroid={
           Object {
@@ -326,6 +331,7 @@ exports[`EnterInviteCode Screen renders correctly 1`] = `
             "type": "ThemeAttrAndroid",
           }
         }
+        onClick={[Function]}
         onResponderGrant={[Function]}
         onResponderMove={[Function]}
         onResponderRelease={[Function]}
@@ -405,6 +411,7 @@ exports[`EnterInviteCode Screen renders correctly 1`] = `
     >
       <View
         accessible={true}
+        focusable={false}
         isTVSelectable={true}
         nativeBackgroundAndroid={
           Object {
@@ -412,6 +419,7 @@ exports[`EnterInviteCode Screen renders correctly 1`] = `
             "type": "ThemeAttrAndroid",
           }
         }
+        onClick={[Function]}
         onResponderGrant={[Function]}
         onResponderMove={[Function]}
         onResponderRelease={[Function]}
@@ -512,6 +520,8 @@ exports[`EnterInviteCode Screen renders with an error 1`] = `
       >
         <Text
           accessible={true}
+          focusable={true}
+          onClick={[Function]}
           onResponderGrant={[Function]}
           onResponderMove={[Function]}
           onResponderRelease={[Function]}
@@ -664,6 +674,7 @@ exports[`EnterInviteCode Screen renders with an error 1`] = `
           </Text>
           <View
             accessible={true}
+            focusable={true}
             hitSlop={
               Object {
                 "bottom": 7,
@@ -679,6 +690,7 @@ exports[`EnterInviteCode Screen renders with an error 1`] = `
                 "type": "ThemeAttrAndroid",
               }
             }
+            onClick={[Function]}
             onResponderGrant={[Function]}
             onResponderMove={[Function]}
             onResponderRelease={[Function]}
@@ -793,6 +805,7 @@ exports[`EnterInviteCode Screen renders with an error 1`] = `
     >
       <View
         accessible={true}
+        focusable={false}
         isTVSelectable={true}
         nativeBackgroundAndroid={
           Object {
@@ -800,6 +813,7 @@ exports[`EnterInviteCode Screen renders with an error 1`] = `
             "type": "ThemeAttrAndroid",
           }
         }
+        onClick={[Function]}
         onResponderGrant={[Function]}
         onResponderMove={[Function]}
         onResponderRelease={[Function]}
@@ -879,6 +893,7 @@ exports[`EnterInviteCode Screen renders with an error 1`] = `
     >
       <View
         accessible={true}
+        focusable={false}
         isTVSelectable={true}
         nativeBackgroundAndroid={
           Object {
@@ -886,6 +901,7 @@ exports[`EnterInviteCode Screen renders with an error 1`] = `
             "type": "ThemeAttrAndroid",
           }
         }
+        onClick={[Function]}
         onResponderGrant={[Function]}
         onResponderMove={[Function]}
         onResponderRelease={[Function]}
