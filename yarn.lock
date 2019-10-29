@@ -4647,6 +4647,46 @@
     source-map-support "^0.5.7"
     tslib "^1.9.3"
 
+"@stablelib/binary@^0.7.2":
+  version "0.7.2"
+  resolved "https://registry.yarnpkg.com/@stablelib/binary/-/binary-0.7.2.tgz#1b3392170c8a8741c8b8f843ea294de71aeb2cf7"
+  integrity sha1-GzOSFwyKh0HIuPhD6ilN5xrrLPc=
+  dependencies:
+    "@stablelib/int" "^0.5.0"
+
+"@stablelib/blake2s@^0.10.4":
+  version "0.10.4"
+  resolved "https://registry.yarnpkg.com/@stablelib/blake2s/-/blake2s-0.10.4.tgz#8a708f28a9c78d4a1a9fbcc6ce8bacbda469f302"
+  integrity sha512-IasdklC7YfXXLmVbnsxqmd66+Ki+Ysbp0BtcrNxAtrGx/HRGjkUZbSTbEa7HxFhBWIstJRcE5ExgY+RCqAiULQ==
+  dependencies:
+    "@stablelib/binary" "^0.7.2"
+    "@stablelib/hash" "^0.5.0"
+    "@stablelib/wipe" "^0.5.0"
+
+"@stablelib/blake2xs@0.10.4":
+  version "0.10.4"
+  resolved "https://registry.yarnpkg.com/@stablelib/blake2xs/-/blake2xs-0.10.4.tgz#b3ae9e145cbf924a7f598412b586e4af24d10cb7"
+  integrity sha512-1N0S4cruso/StV9TmoujPGj3RU0Cy42wlZneBWLWby7m2ssnY57l/CsYQSm03TshOoYss4hqc5kwSy5pmWAdUA==
+  dependencies:
+    "@stablelib/blake2s" "^0.10.4"
+    "@stablelib/hash" "^0.5.0"
+    "@stablelib/wipe" "^0.5.0"
+
+"@stablelib/hash@^0.5.0":
+  version "0.5.0"
+  resolved "https://registry.yarnpkg.com/@stablelib/hash/-/hash-0.5.0.tgz#89fe9040a3d4383b1921c7d8a60948bc30846068"
+  integrity sha1-if6QQKPUODsZIcfYpglIvDCEYGg=
+
+"@stablelib/int@^0.5.0":
+  version "0.5.0"
+  resolved "https://registry.yarnpkg.com/@stablelib/int/-/int-0.5.0.tgz#cca9225951d55d2de48656755784788633660c2b"
+  integrity sha1-zKkiWVHVXS3khlZ1V4R4hjNmDCs=
+
+"@stablelib/wipe@^0.5.0":
+  version "0.5.0"
+  resolved "https://registry.yarnpkg.com/@stablelib/wipe/-/wipe-0.5.0.tgz#a682d5f9448e950e099e537e6f72fc960275d151"
+  integrity sha1-poLV+USOlQ4JnlN+b3L8lgJ10VE=
+
 "@szmarczak/http-timer@^1.1.2":
   version "1.1.2"
   resolved "https://registry.yarnpkg.com/@szmarczak/http-timer/-/http-timer-1.1.2.tgz#b1665e2c461a2cd92f4c1bbf50d5454de0d4b421"
@@ -8798,10 +8838,6 @@ bl@~1.1.2:
   dependencies:
     readable-stream "~2.0.5"
 
-"blake2s-js@git+https://github.com/celo-org/blake2s-js#3d0c2d2d30c96bf8a697cb164876c913acac8e5e":
-  version "1.3.0"
-  resolved "git+https://github.com/celo-org/blake2s-js#3d0c2d2d30c96bf8a697cb164876c913acac8e5e"
-
 block-stream@0.0.9:
   version "0.0.9"
   resolved "https://registry.yarnpkg.com/block-stream/-/block-stream-0.0.9.tgz#13ebfe778a03205cfe03751481ebb4b3300c126a"
@@ -8809,13 +8845,13 @@ block-stream@0.0.9:
   dependencies:
     inherits "~2.0.0"
 
-"bls12377js@https://github.com/celo-org/bls12377js#45c6468eaac024873da103efefdd55fd143c5e79":
+"bls12377js@https://github.com/celo-org/bls12377js#cada1105f4a5e4c2ddd239c1874df3bf33144a10":
   version "0.1.0"
-  resolved "https://github.com/celo-org/bls12377js#45c6468eaac024873da103efefdd55fd143c5e79"
+  resolved "https://github.com/celo-org/bls12377js#cada1105f4a5e4c2ddd239c1874df3bf33144a10"
   dependencies:
+    "@stablelib/blake2xs" "0.10.4"
     "@types/node" "^12.11.7"
     big-integer "^1.6.44"
-    blake2s-js "git+https://github.com/celo-org/blake2s-js#3d0c2d2d30c96bf8a697cb164876c913acac8e5e"
     chai "^4.2.0"
     mocha "^6.2.2"
     ts-node "^8.4.1"
