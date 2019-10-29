@@ -1,72 +1,72 @@
 {
-  "getYourKey": "Consigue tu llave",
-  "yourBackupKey": "Su llave de respaldo",
-  "getBackupKey": "Obtener llave de respaldo",
-  "backupAndRecovery": "Seguridad y recuperación",
-  "viewSafeguards": "Ver salvaguardas",
-  "backupKey": "Llave de respaldo",
+  "getBackupKey": "Obtener Clave de Respaldo",
+  "getYourKey": "Obtenga su clave",
+  "viewBackupKey": "Ver Clave de Respaldo",
+  "setUpSocialBackup": "Configurar Salvaguardas",
+  "viewSafeguards": "Ver Salvaguardas",
+  "failedFetchMnemonic": "No se pudo obtener su clave de respaldo",
+  "backupAndRecovery": "Respaldo y recuperación",
+  "backupKey": "Clave de respaldo",
+  "yourBackupKey": "Su clave de respaldo",
   "delayBackup": "Descartar por una hora",
-  "backupRecovery":
-    "Comparta su llave de respaldo con solo otra persona en quien confíe por completo.",
-  "viewBackupKey": "Ver llave de respaldo",
-  "backupKeyNotification": "Sin una llave de respaldo, puede perder el acceso a su billetera.",
-  "setUpSocialBackup": "Establecer salvaguardas",
-  "securityTip": "Si pierde su llave de respaldo, perderá el acceso a sus Celo Dollars y Gold.",
-  "backupPrompt":
-    "Para la seguridad de sus fondos, su cuenta se congela hasta que obtenga su Llave de respaldo",
-  "backupQuizWordCount": "Palabra {{index}} de {{total}}",
-  "socialBackupPhraseHeader": "Frase de protección {{index}}",
-  "backupSkipText": {
-    "0": "Sin una llave de respaldo, puede perder el acceso a su billetera",
-    "1": "Siempre."
-  },
-  "confirmBackupKey": "Confirme su llave de respaldo",
-  "importBackupFailed": "Se produjo un error al importar la billetera",
-  "backupPhrasePlaceholder":
-    "caballo leopardo perro mono tiburón tigre lémur ballena calamar lobo ardilla ratón león elefante gato camarones oso pingüino ciervo tortuga zorro cebra cabra jirafa",
-  "invalidBackupPhrase": "Llave de respaldo inválida",
-  "copied": "Llave copiada al portapapeles",
-  "backupComplete": {
-    "0": "¡Éxito!",
-    "1": "A continuación, puede configurar Salvaguardas.",
-    "2": "¡Ya está todo listo!"
-  },
-  "failedFetchMnemonic": "No se pudo recuperar su llave de copia de seguridad",
-  "backupKeySummary":
-    "Por favor escriba su llave de respaldo. Si le roban o pierde su teléfono, necesitará la llave de respaldo para acceder a su Celo Wallet.",
-  "backupQuizInfo":
-    "Verifique su llave de respaldo seleccionando las siguientes palabras en el orden correcto.",
-  "dontLoseIt":
-    "Por favor no pierda esta llave. Es fundamental que mantenga esto en un lugar seguro, ya que esta es la única forma de desbloquear su billetera en caso de que pierda su teléfono.",
-  "socialBackup": {
-    "body":
-      "Comparte cada frase a continuación con un amigo. Asegúrese de enviar solo una frase a cada persona.",
-    "confirmation": "He enviado cada frase de Safeguard a un amigo de confianza.",
-    "yourSafeguards": "Sus salvaguardas"
-  },
+  "backupKeyNotification": "Sin una clave de respaldo, puede perder el acceso a la billetera.",
   "backupKeyIntro": {
     "0":
-      "Su llave de respaldo es la única llave para su billetera Celo. Con esta llave, puede acceder a sus fondos en cualquier momento y en cualquier lugar.",
-    "1": "MANTENGA ESTA CLAVE SEGURA Y PRIVADA.",
-    "2": "¡Felicidades, ha recuperado con éxito su llave de copia de seguridad! Un recordatorio, ",
-    "3": "MANTENGA ESTA LLAVE SEGURA.",
-    "4": "Para mayor seguridad, configure Salvaguardas para su billetera.",
+      "Su clave de respaldo es la única clave para la billetera Celo. Con esta clave, puede acceder a sus fondos en cualquier momento y en cualquier lugar.",
+    "1": "MANTENGA LA SEGURIDAD Y PRIVACIDAD DE ESTA CLAVE.",
+    "2": "¡Felicitaciones! Ha recuperado correctamente su clave de respaldo. Un recordatorio, ",
+    "3": "MANTENGA LA SEGURIDAD DE ESTA CLAVE.",
+    "4": "Para mayor seguridad, configure las Salvaguardas de su billetera.",
     "5":
-      "¡También ha configurado Salvaguardas! Podrá restaurar su cuenta con la ayuda de los dos amigos. ",
-    "6": "MANTENGA SU SECRETO DE SALVAGUARDIAS"
+      "¡También ha configurado las salvaguardas! Podrá restaurar su cuenta con la ayuda de dos amigos. ",
+    "6": "MANTENGA EN SECRETO SUS SALVAGUARDAS"
   },
+  "backupSkipText": {
+    "0": "Sin una clave de respaldo, puede perder el acceso a la billetera ",
+    "1": "para siempre."
+  },
+  "backupRecovery":
+    "Comparta la clave de respaldo con una sola persona en la que confíe plenamente.",
+  "securityTip": "Si pierde su clave de respaldo, perderá el acceso a sus dólares y oro Celo.",
+  "backupKeySummary":
+    "Escriba su clave de respaldo. Si se pierde o le roban su teléfono, necesitará su clave de respaldo para acceder a la billetera Celo.",
   "bothBackupsDone": {
-    "0": "¡Felicidades!",
+    "0": "¡Felicitaciones!",
     "1":
-      "¡Ya terminaste! Si desea revisar sus secretos de recuperación, siempre puede regresar aquí más tarde."
+      "¡Listo! Si desea revisar sus secretos para recuperación, siempre puede volver aquí más tarde."
   },
-  "savedConfirmation": "He guardado mi llave de respaldo.",
-  "backupQuizFailed": "Llave de respaldo incorrecta, por favor intente nuevamente",
+  "dontLoseIt":
+    "No pierda esta clave. Es de suma importancia que la mantenga en un lugar seguro, ya que es la única forma de desbloquear su billetera si pierde su celular.",
+  "backupPrompt":
+    "Para seguridad de sus fondos, su cuenta está bloqueada hasta que obtenga su clave de respaldo.",
+  "copied": "Clave copiada al portapapeles",
+  "savedConfirmation": "He guardado mi clave de respaldo",
+  "confirmBackupKey": "Confirme su clave de respaldo",
+  "backupQuizInfo":
+    "Verifique su clave de respaldo seleccionando las palabras que aparecen debajo en el orden correcto.",
+  "backupQuizWordCount": "Palabra {{index}} de {{total}}",
+  "invalidBackupPhrase": "Clave de respaldo inválida",
+  "importBackupFailed": "No se pudo importar la billetera",
+  "backupQuizFailed": "Clave de respaldo incorrecta; vuelva a intentarlo",
+  "backupComplete": {
+    "0": "¡Correcto!",
+    "1": "Ahora puede configurar las salvaguardas.",
+    "2": "¡Está todo configurado!"
+  },
   "socialBackupIntro": {
+    "header": "Cómo incluir salvaguardas",
     "body":
-      "Safeguard es una capa adicional de protección para su cuenta en caso de que pierda su llave de respaldo. Una vez configurado, podrá restaurar su cuenta con la ayuda de dos amigos o familiares.",
-    "header": "Introduciendo salvaguardas",
-    "warning": "NUNCA LE DIGA A NADIE LAS IDENTIDADES DE SUS SALVAGUARDIAS.",
-    "skip": "Saltar por ahora"
-  }
+      "Las salvaguardas son una capa adicional de resguardo para su cuenta en el caso de que pierda la clave de respaldo. Una vez configuradas las salvaguardas, podrá restaurar su cuenta con la ayuda de dos amigos o miembros de su familia. ",
+    "warning": "NO DEBE REVELARLE A NADIE LAS IDENTIDADES DE SUS SALVAGUARDAS.",
+    "skip": "Omitir por ahora"
+  },
+  "socialBackupPhraseHeader": "Frase de protección {{index}}",
+  "socialBackup": {
+    "body":
+      "Comparta cada frase que aparece a continuación con un amigo. Asegúrese de enviar solo una frase a cada persona.",
+    "confirmation": "He enviado cada una de las salvaguardas a un amigo de confianza.",
+    "yourSafeguards": "Sus salvaguardas"
+  },
+  "backupPhrasePlaceholder":
+    "caballo leopardo perro mono tiburón tigre lémur ballena calamar lobo ardilla ratón león elefante gato langostino oso pingüino ciervo tortuga zorro cebra cabra jirafa"
 }

@@ -64,7 +64,7 @@ export class Debug extends React.Component<RootState, State> {
     const phoneNumber = this.props.account.e164PhoneNumber
     const version = DeviceInfo.getVersion()
     const buildNumber = DeviceInfo.getBuildNumber()
-    const apiLevel = DeviceInfo.getAPILevel()
+    const apiLevel = DeviceInfo.getApiLevelSync()
     const deviceId = DeviceInfo.getDeviceId()
 
     return (

@@ -63,7 +63,7 @@ exports[`SendAmount renders correctly for request payment confirmation 1`] = `
             <Image
               source={
                 Object {
-                  "testUri": "../../../src/images/unknown-user-icon.png",
+                  "testUri": "../../../packages/mobile/src/images/unknown-user-icon.png",
                 }
               }
               style={
@@ -479,6 +479,8 @@ exports[`SendAmount renders correctly for request payment confirmation 1`] = `
   </RCTScrollView>
   <View
     accessible={true}
+    focusable={true}
+    onClick={[Function]}
     onResponderGrant={[Function]}
     onResponderMove={[Function]}
     onResponderRelease={[Function]}
@@ -524,6 +526,7 @@ exports[`SendAmount renders correctly for request payment confirmation 1`] = `
       >
         <View
           accessible={true}
+          focusable={false}
           isTVSelectable={true}
           nativeBackgroundAndroid={
             Object {
@@ -531,6 +534,7 @@ exports[`SendAmount renders correctly for request payment confirmation 1`] = `
               "type": "ThemeAttrAndroid",
             }
           }
+          onClick={[Function]}
           onResponderGrant={[Function]}
           onResponderMove={[Function]}
           onResponderRelease={[Function]}
@@ -645,6 +649,7 @@ exports[`SendAmount renders correctly for request payment confirmation 1`] = `
       >
         <View
           accessible={true}
+          focusable={false}
           isTVSelectable={true}
           nativeBackgroundAndroid={
             Object {
@@ -652,6 +657,7 @@ exports[`SendAmount renders correctly for request payment confirmation 1`] = `
               "type": "ThemeAttrAndroid",
             }
           }
+          onClick={[Function]}
           onResponderGrant={[Function]}
           onResponderMove={[Function]}
           onResponderRelease={[Function]}
