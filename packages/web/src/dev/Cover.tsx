@@ -1,26 +1,21 @@
 import * as React from 'react'
-import { StyleSheet, View } from 'react-native'
+import { Image, StyleSheet, View } from 'react-native'
 import Fade from 'react-reveal/Fade'
-import CoverActions from 'src/dev/CoverActions'
 import LeaderBoard from 'src/dev/LeaderBoard'
 import Transceive from 'src/dev/Transceive'
-import { H1, H4 } from 'src/fonts/Fonts'
+import { H2, H4 } from 'src/fonts/Fonts'
 import { I18nProps, withNamespaces } from 'src/i18n'
-import Android from 'src/icons/Android'
 import { Cell, GridRow, Spans } from 'src/layout/GridRow'
-import Button, { BTN, SIZE } from 'src/shared/Button.3'
-import { CeloLinks } from 'src/shared/menu-items'
 import { HEADER_HEIGHT } from 'src/shared/Styles'
 import { colors, standardStyles, textStyles } from 'src/styles'
-const DELAY = 400
-const DELAY_2 = DELAY * 1.3
+const DELAY = 100
 const DURATION = 400
 
 const LEADERS = [
   { points: 83, identity: 'Rex' },
   { points: 840, identity: '100%_that_validator_who_is_an_absolute_diva' },
   { points: 321, identity: 'Heisenberg' },
-  { points: 380, identity: 'Harry' },
+
   { points: 764, identity: 'DX-West' },
   { points: 500, identity: 'Simone2148' },
   { points: 497, identity: '$celo-$' },
@@ -34,63 +29,73 @@ const CoverComponent = React.memo(function Cover({ t }: I18nProps) {
       <View style={[styles.phone, standardStyles.centered]}>
         <Transceive />
       </View>
-      <GridRow>
-        <Cell span={Spans.full}>
-          <LeaderBoard leaders={LEADERS} />
-        </Cell>
-      </GridRow>
       <GridRow
         allStyle={standardStyles.centered}
         desktopStyle={standardStyles.sectionMarginBottom}
         tabletStyle={standardStyles.sectionMarginBottomTablet}
       >
-        <Cell span={Spans.three4th} style={[standardStyles.centered]}>
-          <H1
-            style={[
-              textStyles.center,
-              textStyles.invert,
-              standardStyles.blockMarginTopTablet,
-              standardStyles.elementalMarginBottom,
-            ]}
-          >
-            {t('buildCoverTitle')}
-          </H1>
-
-          <H4 style={[textStyles.center, textStyles.invert, standardStyles.elementalMarginBottom]}>
-            <Fade ssrReveal={true} delay={DELAY} duration={DURATION}>
-              {t('buildCoverSubtitle')}
-            </Fade>
-          </H4>
-          <Fade ssrReveal={true} delay={DELAY} duration={DURATION}>
-            <View style={styles.buttons}>
-              <View style={[standardStyles.elementalMargin, styles.button]}>
-                <Button
-                  iconRight={<Android size={18} />}
-                  text={t('getStarted')}
-                  kind={BTN.PRIMARY}
-                  size={SIZE.big}
-                  href={CeloLinks.walletApp}
-                />
-              </View>
-              <View style={[standardStyles.elementalMargin, styles.button]}>
-                <Button
-                  text={t('exploreCLI')}
-                  kind={BTN.NAKED}
-                  size={SIZE.big}
-                  align="center"
-                  href={CeloLinks.tutorial}
-                />
-              </View>
-            </View>
+        <TitleAndSubTitle title={t('makeWithCelo')} subtitle={t('makeWithCeloSubtitle')} />
+      </GridRow>
+      <GridRow allStyle={standardStyles.centered}>
+        <TitleAndSubTitle title={t('greatStakeOff')} subtitle={t('greatStakeOffSubtitle')}>
+          <Fade delay={DELAY} duration={DURATION}>
+            <Image
+              style={{ height: 151, width: 169 }}
+              source={require('src/dev/bakeoff.png')}
+              resizeMode={'contain'}
+            />
           </Fade>
+        </TitleAndSubTitle>
+      </GridRow>
+      <GridRow>
+        <Cell span={Spans.full}>
+          <LeaderBoard leaders={LEADERS} />
         </Cell>
       </GridRow>
-      <Fade ssrReveal={true} delay={DELAY_2} duration={DURATION} bottom={true} distance={'40px'}>
-        <View>
-          <CoverActions />
-        </View>
-      </Fade>
+      <GridRow>
+        <Cell span={Spans.full}>
+          <H4 style={[textStyles.center, textStyles.invert, standardStyles.elementalMarginBottom]}>
+            {t('')}
+          </H4>
+        </Cell>
+      </GridRow>
     </View>
+  )
+})
+
+interface TitleProps {
+  title: string
+  subtitle: string
+  children?: React.ReactNode
+}
+
+const TitleAndSubTitle = React.memo(function _TitleAndSubtile({
+  title,
+  subtitle,
+  children,
+}: TitleProps) {
+  return (
+    <Cell span={Spans.half} style={[standardStyles.centered]}>
+      {children}
+      <H2
+        style={[
+          textStyles.center,
+          textStyles.invert,
+          standardStyles.blockMarginTopTablet,
+          standardStyles.elementalMarginBottom,
+        ]}
+      >
+        <Fade delay={DELAY} duration={DURATION}>
+          {title}
+        </Fade>
+      </H2>
+
+      <H4 style={[textStyles.center, textStyles.invert, standardStyles.elementalMarginBottom]}>
+        <Fade delay={DELAY} duration={DURATION}>
+          {subtitle}
+        </Fade>
+      </H4>
+    </Cell>
   )
 })
 
