@@ -255,6 +255,7 @@ const style = StyleSheet.create({
     padding: 3,
     marginTop: 1, // 6 vs 5 top vs bot space difference
   },
+  // @ts-ignore
   listAutocomplete: {
     paddingHorizontal: 0,
     paddingVertical: 6,
