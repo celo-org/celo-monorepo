@@ -262,9 +262,7 @@ jobs:
             yarn run lerna --ignore @celo/contractkit --ignore @celo/mobile --ignore @celo/protocol --ignore @celo/celotool --ignore @celo/walletkit --ignore @celo/celocli run test
 
   mobile-test-build-app:
-    working_directory: ~/app
-    docker:
-      - image: circleci/android:api-28-node
+    <<: *android_defaults
     resource_class: large
 
     steps:
