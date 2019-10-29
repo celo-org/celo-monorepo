@@ -27,7 +27,8 @@ async function getAttestationTable() {
   if (AttestationTable) {
     return AttestationTable
   }
-  return Attestation(sequelize!)
+  AttestationTable = await Attestation(sequelize!)
+  return AttestationTable
 }
 
 export async function existingAttestationRequest(
