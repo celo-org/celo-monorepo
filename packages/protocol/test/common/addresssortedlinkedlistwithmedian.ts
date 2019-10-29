@@ -206,6 +206,14 @@ contract('AddressSortedLinkedListWithMedianTest', (accounts: string[]) => {
       ]
     }
 
+    const randomElementOrNullAddress = (list: string[]): string => {
+      if (BigNumber.random().isLessThan(0.5)) {
+        return NULL_ADDRESS
+      } else {
+        return randomElement(list)
+      }
+    }
+
     const makeActionSequence = (length: number, numKeys: number): SortedListAction[] => {
       const sequence: SortedListAction[] = []
       const listKeys: Set<string> = new Set([])
@@ -394,8 +402,8 @@ contract('AddressSortedLinkedListWithMedianTest', (accounts: string[]) => {
         let greater = NULL_ADDRESS
         const [keys, , ,] = await addressSortedLinkedListWithMedianTest.getElements()
         if (keys.length > 0) {
-          lesser = randomElement(keys)
-          greater = randomElement(keys)
+          lesser = randomElementOrNullAddress(keys)
+          greater = randomElementOrNullAddress(keys)
         }
         return { lesser, greater }
       }

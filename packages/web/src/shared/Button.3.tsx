@@ -46,6 +46,7 @@ type PrimaryProps = {
 
 type InlineProps = {
   kind: BTN.INLINE
+  style?: TextStyle
 } & AllButtonProps
 
 type NavProps = {

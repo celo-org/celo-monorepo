@@ -22,7 +22,9 @@ exports[`Account renders correctly 1`] = `
       >
         <View
           accessible={true}
+          focusable={true}
           isTVSelectable={true}
+          onClick={[Function]}
           onResponderGrant={[Function]}
           onResponderMove={[Function]}
           onResponderRelease={[Function]}
@@ -78,7 +80,7 @@ exports[`Account renders correctly 1`] = `
                 <Image
                   source={
                     Object {
-                      "testUri": "../../../src/images/unknown-user-icon.png",
+                      "testUri": "../../../packages/mobile/src/images/unknown-user-icon.png",
                     }
                   }
                   style={
@@ -122,7 +124,9 @@ exports[`Account renders correctly 1`] = `
         <View>
           <View
             accessible={true}
+            focusable={true}
             isTVSelectable={true}
+            onClick={[Function]}
             onResponderGrant={[Function]}
             onResponderMove={[Function]}
             onResponderRelease={[Function]}
@@ -152,75 +156,6 @@ exports[`Account renders correctly 1`] = `
             </Text>
           </View>
         </View>
-        <View
-          accessible={true}
-          hitSlop={
-            Object {
-              "bottom": 7,
-              "left": 7,
-              "right": 7,
-              "top": 7,
-            }
-          }
-          isTVSelectable={true}
-          nativeBackgroundAndroid={
-            Object {
-              "attribute": "selectableItemBackground",
-              "type": "ThemeAttrAndroid",
-            }
-          }
-          onResponderGrant={[Function]}
-          onResponderMove={[Function]}
-          onResponderRelease={[Function]}
-          onResponderTerminate={[Function]}
-          onResponderTerminationRequest={[Function]}
-          onStartShouldSetResponder={[Function]}
-          style={
-            Array [
-              Object {
-                "alignItems": "center",
-                "alignSelf": "flex-start",
-                "borderRadius": 2,
-                "minWidth": 160,
-                "paddingHorizontal": 16,
-                "paddingVertical": 6,
-                "textAlign": "center",
-              },
-              Object {
-                "backgroundColor": "transparent",
-                "borderColor": "#42D689",
-                "borderWidth": 2,
-              },
-              Object {
-                "alignSelf": "center",
-                "marginTop": 10,
-              },
-            ]
-          }
-          testID="editProfileButton"
-        >
-          <Text
-            style={
-              Array [
-                Object {
-                  "color": "#81868B",
-                  "fontFamily": "Hind-SemiBold",
-                  "fontSize": 13,
-                  "lineHeight": 17,
-                },
-                Object {
-                  "lineHeight": 20,
-                },
-                Object {
-                  "color": "#42D689",
-                },
-                undefined,
-              ]
-            }
-          >
-            editProfile
-          </Text>
-        </View>
       </View>
       <View
         style={
@@ -234,6 +169,7 @@ exports[`Account renders correctly 1`] = `
       >
         <View
           accessible={true}
+          focusable={true}
           isTVSelectable={true}
           nativeBackgroundAndroid={
             Object {
@@ -241,6 +177,7 @@ exports[`Account renders correctly 1`] = `
               "type": "ThemeAttrAndroid",
             }
           }
+          onClick={[Function]}
           onResponderGrant={[Function]}
           onResponderMove={[Function]}
           onResponderRelease={[Function]}
@@ -279,7 +216,7 @@ exports[`Account renders correctly 1`] = `
                   }
                 }
               >
-                backupKey
+                backupKeyFlow6:backupAndRecovery
               </Text>
             </View>
             <View
@@ -309,6 +246,7 @@ exports[`Account renders correctly 1`] = `
         </View>
         <View
           accessible={true}
+          focusable={true}
           isTVSelectable={true}
           nativeBackgroundAndroid={
             Object {
@@ -316,6 +254,7 @@ exports[`Account renders correctly 1`] = `
               "type": "ThemeAttrAndroid",
             }
           }
+          onClick={[Function]}
           onResponderGrant={[Function]}
           onResponderMove={[Function]}
           onResponderRelease={[Function]}
@@ -384,6 +323,7 @@ exports[`Account renders correctly 1`] = `
         </View>
         <View
           accessible={true}
+          focusable={true}
           isTVSelectable={true}
           nativeBackgroundAndroid={
             Object {
@@ -391,6 +331,84 @@ exports[`Account renders correctly 1`] = `
               "type": "ThemeAttrAndroid",
             }
           }
+          onClick={[Function]}
+          onResponderGrant={[Function]}
+          onResponderMove={[Function]}
+          onResponderRelease={[Function]}
+          onResponderTerminate={[Function]}
+          onResponderTerminationRequest={[Function]}
+          onStartShouldSetResponder={[Function]}
+        >
+          <View
+            style={
+              Object {
+                "borderBottomWidth": 1,
+                "borderColor": "#EEEEEE",
+                "flexDirection": "row",
+                "justifyContent": "space-between",
+                "marginLeft": 15,
+                "padding": 20,
+              }
+            }
+          >
+            <View
+              style={
+                Array [
+                  Object {
+                    "justifyContent": "center",
+                  },
+                ]
+              }
+            >
+              <Text
+                style={
+                  Object {
+                    "color": "#2E3338",
+                    "fontFamily": "Hind-Regular",
+                    "fontSize": 16,
+                    "lineHeight": 24,
+                  }
+                }
+              >
+                editProfile
+              </Text>
+            </View>
+            <View
+              style={
+                Array [
+                  Object {
+                    "justifyContent": "center",
+                  },
+                ]
+              }
+            >
+              <svg
+                height={16}
+                style={Object {}}
+                viewBox="0 0 15 15"
+                width={16}
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  d="M8.70376 9.12461L2.12123 15.7071C1.73071 16.0976 1.09755 16.0976 0.707015 15.7071C0.316497 15.3166 0.316497 14.6834 0.707015 14.2929L6.58575 8.41419L0.707091 2.53553C0.316573 2.14501 0.316573 1.51185 0.707091 1.12131C1.09761 0.730797 1.73079 0.730797 2.12131 1.12131L8.70708 7.70708C9.0976 8.09762 9.0976 8.73078 8.70708 9.1213L8.70376 9.12461Z"
+                  fill="#42D689"
+                  style={Object {}}
+                />
+              </svg>
+            </View>
+          </View>
+        </View>
+        <View
+          accessible={true}
+          focusable={true}
+          isTVSelectable={true}
+          nativeBackgroundAndroid={
+            Object {
+              "attribute": "selectableItemBackground",
+              "type": "ThemeAttrAndroid",
+            }
+          }
+          onClick={[Function]}
           onResponderGrant={[Function]}
           onResponderMove={[Function]}
           onResponderRelease={[Function]}
@@ -459,6 +477,7 @@ exports[`Account renders correctly 1`] = `
         </View>
         <View
           accessible={true}
+          focusable={true}
           isTVSelectable={true}
           nativeBackgroundAndroid={
             Object {
@@ -466,6 +485,84 @@ exports[`Account renders correctly 1`] = `
               "type": "ThemeAttrAndroid",
             }
           }
+          onClick={[Function]}
+          onResponderGrant={[Function]}
+          onResponderMove={[Function]}
+          onResponderRelease={[Function]}
+          onResponderTerminate={[Function]}
+          onResponderTerminationRequest={[Function]}
+          onStartShouldSetResponder={[Function]}
+        >
+          <View
+            style={
+              Object {
+                "borderBottomWidth": 1,
+                "borderColor": "#EEEEEE",
+                "flexDirection": "row",
+                "justifyContent": "space-between",
+                "marginLeft": 15,
+                "padding": 20,
+              }
+            }
+          >
+            <View
+              style={
+                Array [
+                  Object {
+                    "justifyContent": "center",
+                  },
+                ]
+              }
+            >
+              <Text
+                style={
+                  Object {
+                    "color": "#2E3338",
+                    "fontFamily": "Hind-Regular",
+                    "fontSize": 16,
+                    "lineHeight": 24,
+                  }
+                }
+              >
+                celoLite
+              </Text>
+            </View>
+            <View
+              style={
+                Array [
+                  Object {
+                    "justifyContent": "center",
+                  },
+                ]
+              }
+            >
+              <svg
+                height={16}
+                style={Object {}}
+                viewBox="0 0 15 15"
+                width={16}
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  d="M8.70376 9.12461L2.12123 15.7071C1.73071 16.0976 1.09755 16.0976 0.707015 15.7071C0.316497 15.3166 0.316497 14.6834 0.707015 14.2929L6.58575 8.41419L0.707091 2.53553C0.316573 2.14501 0.316573 1.51185 0.707091 1.12131C1.09761 0.730797 1.73079 0.730797 2.12131 1.12131L8.70708 7.70708C9.0976 8.09762 9.0976 8.73078 8.70708 9.1213L8.70376 9.12461Z"
+                  fill="#42D689"
+                  style={Object {}}
+                />
+              </svg>
+            </View>
+          </View>
+        </View>
+        <View
+          accessible={true}
+          focusable={true}
+          isTVSelectable={true}
+          nativeBackgroundAndroid={
+            Object {
+              "attribute": "selectableItemBackground",
+              "type": "ThemeAttrAndroid",
+            }
+          }
+          onClick={[Function]}
           onResponderGrant={[Function]}
           onResponderMove={[Function]}
           onResponderRelease={[Function]}
@@ -534,6 +631,7 @@ exports[`Account renders correctly 1`] = `
         </View>
         <View
           accessible={true}
+          focusable={true}
           isTVSelectable={true}
           nativeBackgroundAndroid={
             Object {
@@ -541,6 +639,7 @@ exports[`Account renders correctly 1`] = `
               "type": "ThemeAttrAndroid",
             }
           }
+          onClick={[Function]}
           onResponderGrant={[Function]}
           onResponderMove={[Function]}
           onResponderRelease={[Function]}
@@ -609,6 +708,7 @@ exports[`Account renders correctly 1`] = `
         </View>
         <View
           accessible={true}
+          focusable={true}
           isTVSelectable={true}
           nativeBackgroundAndroid={
             Object {
@@ -616,6 +716,7 @@ exports[`Account renders correctly 1`] = `
               "type": "ThemeAttrAndroid",
             }
           }
+          onClick={[Function]}
           onResponderGrant={[Function]}
           onResponderMove={[Function]}
           onResponderRelease={[Function]}
@@ -684,6 +785,7 @@ exports[`Account renders correctly 1`] = `
         </View>
         <View
           accessible={true}
+          focusable={true}
           isTVSelectable={true}
           nativeBackgroundAndroid={
             Object {
@@ -691,6 +793,7 @@ exports[`Account renders correctly 1`] = `
               "type": "ThemeAttrAndroid",
             }
           }
+          onClick={[Function]}
           onResponderGrant={[Function]}
           onResponderMove={[Function]}
           onResponderRelease={[Function]}
@@ -785,22 +888,46 @@ exports[`Account renders correctly 1`] = `
               }
             }
           >
+            version 
+          </Text>
+        </View>
+        <View
+          style={
+            Object {
+              "flexDirection": "row",
+              "paddingBottom": 10,
+            }
+          }
+        >
+          <Text
+            style={
+              Object {
+                "color": "#2E3338",
+                "fontFamily": "Hind-Regular",
+                "fontSize": 14,
+                "lineHeight": 18,
+              }
+            }
+          >
             Test FAQ is 
           </Text>
           <View
             accessible={true}
+            focusable={true}
             isTVSelectable={true}
+            nativeBackgroundAndroid={
+              Object {
+                "attribute": "selectableItemBackgroundBorderless",
+                "type": "ThemeAttrAndroid",
+              }
+            }
+            onClick={[Function]}
             onResponderGrant={[Function]}
             onResponderMove={[Function]}
             onResponderRelease={[Function]}
             onResponderTerminate={[Function]}
             onResponderTerminationRequest={[Function]}
             onStartShouldSetResponder={[Function]}
-            style={
-              Object {
-                "opacity": 1,
-              }
-            }
           >
             <Text
               style={
@@ -858,18 +985,21 @@ exports[`Account renders correctly 1`] = `
           </Text>
           <View
             accessible={true}
+            focusable={true}
             isTVSelectable={true}
+            nativeBackgroundAndroid={
+              Object {
+                "attribute": "selectableItemBackgroundBorderless",
+                "type": "ThemeAttrAndroid",
+              }
+            }
+            onClick={[Function]}
             onResponderGrant={[Function]}
             onResponderMove={[Function]}
             onResponderRelease={[Function]}
             onResponderTerminate={[Function]}
             onResponderTerminationRequest={[Function]}
             onStartShouldSetResponder={[Function]}
-            style={
-              Object {
-                "opacity": 1,
-              }
-            }
           >
             <Text
               style={
@@ -911,7 +1041,7 @@ exports[`Account renders correctly 1`] = `
 </RCTScrollView>
 `;
 
-exports[`Account when dev mode active renders correctly 1`] = `
+exports[`Account renders correctly when dev mode active 1`] = `
 <RCTScrollView
   style={
     Object {
@@ -933,7 +1063,9 @@ exports[`Account when dev mode active renders correctly 1`] = `
       >
         <View
           accessible={true}
+          focusable={true}
           isTVSelectable={true}
+          onClick={[Function]}
           onResponderGrant={[Function]}
           onResponderMove={[Function]}
           onResponderRelease={[Function]}
@@ -989,7 +1121,7 @@ exports[`Account when dev mode active renders correctly 1`] = `
                 <Image
                   source={
                     Object {
-                      "testUri": "../../../src/images/unknown-user-icon.png",
+                      "testUri": "../../../packages/mobile/src/images/unknown-user-icon.png",
                     }
                   }
                   style={
@@ -1033,7 +1165,9 @@ exports[`Account when dev mode active renders correctly 1`] = `
         <View>
           <View
             accessible={true}
+            focusable={true}
             isTVSelectable={true}
+            onClick={[Function]}
             onResponderGrant={[Function]}
             onResponderMove={[Function]}
             onResponderRelease={[Function]}
@@ -1063,75 +1197,6 @@ exports[`Account when dev mode active renders correctly 1`] = `
             </Text>
           </View>
         </View>
-        <View
-          accessible={true}
-          hitSlop={
-            Object {
-              "bottom": 7,
-              "left": 7,
-              "right": 7,
-              "top": 7,
-            }
-          }
-          isTVSelectable={true}
-          nativeBackgroundAndroid={
-            Object {
-              "attribute": "selectableItemBackground",
-              "type": "ThemeAttrAndroid",
-            }
-          }
-          onResponderGrant={[Function]}
-          onResponderMove={[Function]}
-          onResponderRelease={[Function]}
-          onResponderTerminate={[Function]}
-          onResponderTerminationRequest={[Function]}
-          onStartShouldSetResponder={[Function]}
-          style={
-            Array [
-              Object {
-                "alignItems": "center",
-                "alignSelf": "flex-start",
-                "borderRadius": 2,
-                "minWidth": 160,
-                "paddingHorizontal": 16,
-                "paddingVertical": 6,
-                "textAlign": "center",
-              },
-              Object {
-                "backgroundColor": "transparent",
-                "borderColor": "#42D689",
-                "borderWidth": 2,
-              },
-              Object {
-                "alignSelf": "center",
-                "marginTop": 10,
-              },
-            ]
-          }
-          testID="editProfileButton"
-        >
-          <Text
-            style={
-              Array [
-                Object {
-                  "color": "#81868B",
-                  "fontFamily": "Hind-SemiBold",
-                  "fontSize": 13,
-                  "lineHeight": 17,
-                },
-                Object {
-                  "lineHeight": 20,
-                },
-                Object {
-                  "color": "#42D689",
-                },
-                undefined,
-              ]
-            }
-          >
-            editProfile
-          </Text>
-        </View>
       </View>
       <View
         style={
@@ -1145,6 +1210,7 @@ exports[`Account when dev mode active renders correctly 1`] = `
       >
         <View
           accessible={true}
+          focusable={true}
           isTVSelectable={true}
           nativeBackgroundAndroid={
             Object {
@@ -1152,6 +1218,7 @@ exports[`Account when dev mode active renders correctly 1`] = `
               "type": "ThemeAttrAndroid",
             }
           }
+          onClick={[Function]}
           onResponderGrant={[Function]}
           onResponderMove={[Function]}
           onResponderRelease={[Function]}
@@ -1190,7 +1257,7 @@ exports[`Account when dev mode active renders correctly 1`] = `
                   }
                 }
               >
-                backupKey
+                backupKeyFlow6:backupAndRecovery
               </Text>
             </View>
             <View
@@ -1220,6 +1287,7 @@ exports[`Account when dev mode active renders correctly 1`] = `
         </View>
         <View
           accessible={true}
+          focusable={true}
           isTVSelectable={true}
           nativeBackgroundAndroid={
             Object {
@@ -1227,6 +1295,7 @@ exports[`Account when dev mode active renders correctly 1`] = `
               "type": "ThemeAttrAndroid",
             }
           }
+          onClick={[Function]}
           onResponderGrant={[Function]}
           onResponderMove={[Function]}
           onResponderRelease={[Function]}
@@ -1295,6 +1364,7 @@ exports[`Account when dev mode active renders correctly 1`] = `
         </View>
         <View
           accessible={true}
+          focusable={true}
           isTVSelectable={true}
           nativeBackgroundAndroid={
             Object {
@@ -1302,6 +1372,84 @@ exports[`Account when dev mode active renders correctly 1`] = `
               "type": "ThemeAttrAndroid",
             }
           }
+          onClick={[Function]}
+          onResponderGrant={[Function]}
+          onResponderMove={[Function]}
+          onResponderRelease={[Function]}
+          onResponderTerminate={[Function]}
+          onResponderTerminationRequest={[Function]}
+          onStartShouldSetResponder={[Function]}
+        >
+          <View
+            style={
+              Object {
+                "borderBottomWidth": 1,
+                "borderColor": "#EEEEEE",
+                "flexDirection": "row",
+                "justifyContent": "space-between",
+                "marginLeft": 15,
+                "padding": 20,
+              }
+            }
+          >
+            <View
+              style={
+                Array [
+                  Object {
+                    "justifyContent": "center",
+                  },
+                ]
+              }
+            >
+              <Text
+                style={
+                  Object {
+                    "color": "#2E3338",
+                    "fontFamily": "Hind-Regular",
+                    "fontSize": 16,
+                    "lineHeight": 24,
+                  }
+                }
+              >
+                editProfile
+              </Text>
+            </View>
+            <View
+              style={
+                Array [
+                  Object {
+                    "justifyContent": "center",
+                  },
+                ]
+              }
+            >
+              <svg
+                height={16}
+                style={Object {}}
+                viewBox="0 0 15 15"
+                width={16}
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  d="M8.70376 9.12461L2.12123 15.7071C1.73071 16.0976 1.09755 16.0976 0.707015 15.7071C0.316497 15.3166 0.316497 14.6834 0.707015 14.2929L6.58575 8.41419L0.707091 2.53553C0.316573 2.14501 0.316573 1.51185 0.707091 1.12131C1.09761 0.730797 1.73079 0.730797 2.12131 1.12131L8.70708 7.70708C9.0976 8.09762 9.0976 8.73078 8.70708 9.1213L8.70376 9.12461Z"
+                  fill="#42D689"
+                  style={Object {}}
+                />
+              </svg>
+            </View>
+          </View>
+        </View>
+        <View
+          accessible={true}
+          focusable={true}
+          isTVSelectable={true}
+          nativeBackgroundAndroid={
+            Object {
+              "attribute": "selectableItemBackground",
+              "type": "ThemeAttrAndroid",
+            }
+          }
+          onClick={[Function]}
           onResponderGrant={[Function]}
           onResponderMove={[Function]}
           onResponderRelease={[Function]}
@@ -1370,6 +1518,7 @@ exports[`Account when dev mode active renders correctly 1`] = `
         </View>
         <View
           accessible={true}
+          focusable={true}
           isTVSelectable={true}
           nativeBackgroundAndroid={
             Object {
@@ -1377,6 +1526,84 @@ exports[`Account when dev mode active renders correctly 1`] = `
               "type": "ThemeAttrAndroid",
             }
           }
+          onClick={[Function]}
+          onResponderGrant={[Function]}
+          onResponderMove={[Function]}
+          onResponderRelease={[Function]}
+          onResponderTerminate={[Function]}
+          onResponderTerminationRequest={[Function]}
+          onStartShouldSetResponder={[Function]}
+        >
+          <View
+            style={
+              Object {
+                "borderBottomWidth": 1,
+                "borderColor": "#EEEEEE",
+                "flexDirection": "row",
+                "justifyContent": "space-between",
+                "marginLeft": 15,
+                "padding": 20,
+              }
+            }
+          >
+            <View
+              style={
+                Array [
+                  Object {
+                    "justifyContent": "center",
+                  },
+                ]
+              }
+            >
+              <Text
+                style={
+                  Object {
+                    "color": "#2E3338",
+                    "fontFamily": "Hind-Regular",
+                    "fontSize": 16,
+                    "lineHeight": 24,
+                  }
+                }
+              >
+                celoLite
+              </Text>
+            </View>
+            <View
+              style={
+                Array [
+                  Object {
+                    "justifyContent": "center",
+                  },
+                ]
+              }
+            >
+              <svg
+                height={16}
+                style={Object {}}
+                viewBox="0 0 15 15"
+                width={16}
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  d="M8.70376 9.12461L2.12123 15.7071C1.73071 16.0976 1.09755 16.0976 0.707015 15.7071C0.316497 15.3166 0.316497 14.6834 0.707015 14.2929L6.58575 8.41419L0.707091 2.53553C0.316573 2.14501 0.316573 1.51185 0.707091 1.12131C1.09761 0.730797 1.73079 0.730797 2.12131 1.12131L8.70708 7.70708C9.0976 8.09762 9.0976 8.73078 8.70708 9.1213L8.70376 9.12461Z"
+                  fill="#42D689"
+                  style={Object {}}
+                />
+              </svg>
+            </View>
+          </View>
+        </View>
+        <View
+          accessible={true}
+          focusable={true}
+          isTVSelectable={true}
+          nativeBackgroundAndroid={
+            Object {
+              "attribute": "selectableItemBackground",
+              "type": "ThemeAttrAndroid",
+            }
+          }
+          onClick={[Function]}
           onResponderGrant={[Function]}
           onResponderMove={[Function]}
           onResponderRelease={[Function]}
@@ -1445,6 +1672,7 @@ exports[`Account when dev mode active renders correctly 1`] = `
         </View>
         <View
           accessible={true}
+          focusable={true}
           isTVSelectable={true}
           nativeBackgroundAndroid={
             Object {
@@ -1452,6 +1680,7 @@ exports[`Account when dev mode active renders correctly 1`] = `
               "type": "ThemeAttrAndroid",
             }
           }
+          onClick={[Function]}
           onResponderGrant={[Function]}
           onResponderMove={[Function]}
           onResponderRelease={[Function]}
@@ -1520,6 +1749,7 @@ exports[`Account when dev mode active renders correctly 1`] = `
         </View>
         <View
           accessible={true}
+          focusable={true}
           isTVSelectable={true}
           nativeBackgroundAndroid={
             Object {
@@ -1527,6 +1757,7 @@ exports[`Account when dev mode active renders correctly 1`] = `
               "type": "ThemeAttrAndroid",
             }
           }
+          onClick={[Function]}
           onResponderGrant={[Function]}
           onResponderMove={[Function]}
           onResponderRelease={[Function]}
@@ -1595,6 +1826,7 @@ exports[`Account when dev mode active renders correctly 1`] = `
         </View>
         <View
           accessible={true}
+          focusable={true}
           isTVSelectable={true}
           nativeBackgroundAndroid={
             Object {
@@ -1602,6 +1834,7 @@ exports[`Account when dev mode active renders correctly 1`] = `
               "type": "ThemeAttrAndroid",
             }
           }
+          onClick={[Function]}
           onResponderGrant={[Function]}
           onResponderMove={[Function]}
           onResponderRelease={[Function]}
@@ -1705,7 +1938,9 @@ exports[`Account when dev mode active renders correctly 1`] = `
         >
           <View
             accessible={true}
+            focusable={true}
             isTVSelectable={true}
+            onClick={[Function]}
             onResponderGrant={[Function]}
             onResponderMove={[Function]}
             onResponderRelease={[Function]}
@@ -1733,7 +1968,9 @@ exports[`Account when dev mode active renders correctly 1`] = `
         >
           <View
             accessible={true}
+            focusable={true}
             isTVSelectable={true}
+            onClick={[Function]}
             onResponderGrant={[Function]}
             onResponderMove={[Function]}
             onResponderRelease={[Function]}
@@ -1761,7 +1998,39 @@ exports[`Account when dev mode active renders correctly 1`] = `
         >
           <View
             accessible={true}
+            focusable={true}
             isTVSelectable={true}
+            onClick={[Function]}
+            onResponderGrant={[Function]}
+            onResponderMove={[Function]}
+            onResponderRelease={[Function]}
+            onResponderTerminate={[Function]}
+            onResponderTerminationRequest={[Function]}
+            onStartShouldSetResponder={[Function]}
+            style={
+              Object {
+                "opacity": 1,
+              }
+            }
+          >
+            <Text>
+              Reset backup state
+            </Text>
+          </View>
+        </View>
+        <View
+          style={
+            Object {
+              "alignSelf": "stretch",
+              "margin": 4,
+            }
+          }
+        >
+          <View
+            accessible={true}
+            focusable={true}
+            isTVSelectable={true}
+            onClick={[Function]}
             onResponderGrant={[Function]}
             onResponderMove={[Function]}
             onResponderRelease={[Function]}
@@ -1789,7 +2058,9 @@ exports[`Account when dev mode active renders correctly 1`] = `
         >
           <View
             accessible={true}
+            focusable={false}
             isTVSelectable={true}
+            onClick={[Function]}
             onResponderGrant={[Function]}
             onResponderMove={[Function]}
             onResponderRelease={[Function]}
@@ -1835,22 +2106,46 @@ exports[`Account when dev mode active renders correctly 1`] = `
               }
             }
           >
+            version 
+          </Text>
+        </View>
+        <View
+          style={
+            Object {
+              "flexDirection": "row",
+              "paddingBottom": 10,
+            }
+          }
+        >
+          <Text
+            style={
+              Object {
+                "color": "#2E3338",
+                "fontFamily": "Hind-Regular",
+                "fontSize": 14,
+                "lineHeight": 18,
+              }
+            }
+          >
             Test FAQ is 
           </Text>
           <View
             accessible={true}
+            focusable={true}
             isTVSelectable={true}
+            nativeBackgroundAndroid={
+              Object {
+                "attribute": "selectableItemBackgroundBorderless",
+                "type": "ThemeAttrAndroid",
+              }
+            }
+            onClick={[Function]}
             onResponderGrant={[Function]}
             onResponderMove={[Function]}
             onResponderRelease={[Function]}
             onResponderTerminate={[Function]}
             onResponderTerminationRequest={[Function]}
             onStartShouldSetResponder={[Function]}
-            style={
-              Object {
-                "opacity": 1,
-              }
-            }
           >
             <Text
               style={
@@ -1908,18 +2203,21 @@ exports[`Account when dev mode active renders correctly 1`] = `
           </Text>
           <View
             accessible={true}
+            focusable={true}
             isTVSelectable={true}
+            nativeBackgroundAndroid={
+              Object {
+                "attribute": "selectableItemBackgroundBorderless",
+                "type": "ThemeAttrAndroid",
+              }
+            }
+            onClick={[Function]}
             onResponderGrant={[Function]}
             onResponderMove={[Function]}
             onResponderRelease={[Function]}
             onResponderTerminate={[Function]}
             onResponderTerminationRequest={[Function]}
             onStartShouldSetResponder={[Function]}
-            style={
-              Object {
-                "opacity": 1,
-              }
-            }
           >
             <Text
               style={

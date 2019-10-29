@@ -2,7 +2,6 @@ import {
   assertContractsRegistered,
   assertProxiesSet,
   assertRegistryAddressesSet,
-  assertStableTokenMinter,
   getReserveBalance,
 } from '@celo/protocol/lib/test-utils'
 import { getDeployedProxiedContract } from '@celo/protocol/lib/web3-utils'
@@ -50,12 +49,6 @@ contract('Migration', () => {
     it('should have given Reserve the right number of tokens', async () => {
       const balance: string = await getReserveBalance(web3, getContract)
       assert.equal(balance, expectedBalance)
-    })
-  })
-
-  describe('Checking StableToken minter', async () => {
-    it('should be set to the Reserve', async () => {
-      await assertStableTokenMinter(getContract)
     })
   })
 })

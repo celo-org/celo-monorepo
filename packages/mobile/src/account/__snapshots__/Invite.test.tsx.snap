@@ -117,20 +117,14 @@ exports[`Invite renders correctly with no recipients 1`] = `
             rejectResponderTermination={true}
             shouldShowClipboard={[Function]}
             style={
-              Array [
-                Object {
-                  "fontFamily": "Hind-Regular",
-                },
-                Object {
-                  "borderColor": "#D1D5D8",
-                  "borderRadius": 3,
-                  "padding": 8,
-                },
-                Object {
-                  "backgroundColor": "#FFFFFF",
-                  "flex": 1,
-                },
-              ]
+              Object {
+                "backgroundColor": "#FFFFFF",
+                "borderColor": "#D1D5D8",
+                "borderRadius": 3,
+                "flex": 1,
+                "fontFamily": "Hind-Regular",
+                "padding": 8,
+              }
             }
             underlineColorAndroid="transparent"
             value=""
@@ -355,20 +349,14 @@ exports[`Invite renders correctly with recipients 1`] = `
             rejectResponderTermination={true}
             shouldShowClipboard={[Function]}
             style={
-              Array [
-                Object {
-                  "fontFamily": "Hind-Regular",
-                },
-                Object {
-                  "borderColor": "#D1D5D8",
-                  "borderRadius": 3,
-                  "padding": 8,
-                },
-                Object {
-                  "backgroundColor": "#FFFFFF",
-                  "flex": 1,
-                },
-              ]
+              Object {
+                "backgroundColor": "#FFFFFF",
+                "borderColor": "#D1D5D8",
+                "borderRadius": 3,
+                "flex": 1,
+                "fontFamily": "Hind-Regular",
+                "padding": 8,
+              }
             }
             underlineColorAndroid="transparent"
             value=""
@@ -506,7 +494,9 @@ exports[`Invite renders correctly with recipients 1`] = `
         >
           <View
             accessible={true}
+            focusable={true}
             isTVSelectable={true}
+            onClick={[Function]}
             onResponderGrant={[Function]}
             onResponderMove={[Function]}
             onResponderRelease={[Function]}
@@ -560,7 +550,7 @@ exports[`Invite renders correctly with recipients 1`] = `
                   <Image
                     source={
                       Object {
-                        "testUri": "../../../src/images/unknown-user-icon.png",
+                        "testUri": "../../../packages/mobile/src/images/unknown-user-icon.png",
                       }
                     }
                     style={

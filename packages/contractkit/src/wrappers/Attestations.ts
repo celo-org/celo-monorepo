@@ -2,7 +2,7 @@ import { ECIES, PhoneNumberUtils, SignatureUtils } from '@celo/utils'
 import { zip3 } from '@celo/utils/lib/collections'
 import BigNumber from 'bignumber.js'
 import * as Web3Utils from 'web3-utils'
-import { Address, CeloToken } from '../base'
+import { Address, CeloContract } from '../base'
 import { Attestations } from '../generated/types/Attestations'
 import {
   BaseWrapper,
@@ -10,8 +10,8 @@ import {
   proxySend,
   toBigNumber,
   toNumber,
+  toTransactionObject,
   tupleParser,
-  wrapSend,
 } from './BaseWrapper'
 const parseSignature = SignatureUtils.parseSignature
 
@@ -128,25 +128,23 @@ export class AttestationsWrapper extends BaseWrapper<Attestations> {
   setWalletAddress = proxySend(this.kit, this.contract.methods.setWalletAddress)
 
   /**
-   * Calculates the amount of CeloToken to request Attestations
-   * @param token The token to pay for attestations for
-   * @param attestationsRequested The number of attestations to request
+   * Calculates the amount of StableToken required to request Attestations
+   * @param attestationsRequested  The number of attestations to request
    */
-  async approveAttestationFee(token: CeloToken, attestationsRequested: number) {
-    const tokenContract = await this.kit.contracts.getContract(token)
-    const fee = await this.attestationFeeRequired(token, attestationsRequested)
-    return tokenContract.approve(this.address, fee.toString())
+  async attestationFeeRequired(attestationsRequested: number) {
+    const tokenAddress = await this.kit.registry.addressFor(CeloContract.StableToken)
+    const attestationFee = await this.contract.methods.getAttestationRequestFee(tokenAddress).call()
+    return new BigNumber(attestationFee).times(attestationsRequested)
   }
 
   /**
-   * Approves the transfer of CeloToken to request Attestations
-   * @param token  The token to pay for attestations for
-   * @param attestationsRequested  The number of attestations to request
+   * Approves the necessary amount of StableToken to request Attestations
+   * @param attestationsRequested The number of attestations to request
    */
-  async attestationFeeRequired(token: CeloToken, attestationsRequested: number) {
-    const tokenAddress = await this.kit.registry.addressFor(token)
-    const attestationFee = await this.contract.methods.getAttestationRequestFee(tokenAddress).call()
-    return new BigNumber(attestationFee).times(attestationsRequested)
+  async approveAttestationFee(attestationsRequested: number) {
+    const tokenContract = await this.kit.contracts.getContract(CeloContract.StableToken)
+    const fee = await this.attestationFeeRequired(attestationsRequested)
+    return tokenContract.approve(this.address, fee.toString())
   }
 
   /**
@@ -206,7 +204,7 @@ export class AttestationsWrapper extends BaseWrapper<Attestations> {
     const phoneHash = PhoneNumberUtils.getPhoneHash(phoneNumber)
     const expectedSourceMessage = attestationMessageToSign(phoneHash, account)
     const { r, s, v } = parseSignature(expectedSourceMessage, code, issuer.toLowerCase())
-    return wrapSend(this.kit, this.contract.methods.complete(phoneHash, v, r, s))
+    return toTransactionObject(this.kit, this.contract.methods.complete(phoneHash, v, r, s))
   }
 
   /**
@@ -300,12 +298,11 @@ export class AttestationsWrapper extends BaseWrapper<Attestations> {
    * Requests attestations for a phone number
    * @param phoneNumber The phone number for which to request attestations for
    * @param attestationsRequested The number of attestations to request
-   * @param token The token with which to pay for the attestation fee
    */
-  async request(phoneNumber: string, attestationsRequested: number, token: CeloToken) {
+  async request(phoneNumber: string, attestationsRequested: number) {
     const phoneHash = PhoneNumberUtils.getPhoneHash(phoneNumber)
-    const tokenAddress = await this.kit.registry.addressFor(token)
-    return wrapSend(
+    const tokenAddress = await this.kit.registry.addressFor(CeloContract.StableToken)
+    return toTransactionObject(
       this.kit,
       this.contract.methods.request(phoneHash, attestationsRequested, tokenAddress)
     )
@@ -332,7 +329,7 @@ export class AttestationsWrapper extends BaseWrapper<Attestations> {
         Buffer.from(phoneNumber, 'utf8')
       ).toString('hex')
 
-    return wrapSend(
+    return toTransactionObject(
       this.kit,
       this.contract.methods.reveal(
         PhoneNumberUtils.getPhoneHash(phoneNumber),
