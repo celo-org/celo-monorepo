@@ -43,18 +43,18 @@ describe('governance tests', () => {
     it('properly orders validators randomly', async function(this: any) {
       this.timeout(160000 /* 160 seconds */)
 
-      const latestBlockNumber = (await contractKit.web3.eth.getBlock('latest')).number
+      const latestBlockNumber = (await web3.eth.getBlock('latest')).number
       const indexInEpoch = ((latestBlockNumber % EPOCH) + EPOCH - 1) % EPOCH
       const nextEpoch = latestBlockNumber + (EPOCH - indexInEpoch)
 
       // Wait for enough blocks.
-      while ((await contractKit.web3.eth.getBlock('latest')).number < nextEpoch + BLOCK_COUNT) {
+      while ((await web3.eth.getBlock('latest')).number < nextEpoch + BLOCK_COUNT) {
         await sleep(2)
       }
 
       // Fetch the validator for each block.
       const blocks = await Promise.all(
-        _.range(BLOCK_COUNT).map(async (i) => contractKit.web3.eth.getBlock(i + nextEpoch))
+        _.range(BLOCK_COUNT).map(async (i) => web3.eth.getBlock(i + nextEpoch))
       )
       const validators = blocks.map((block) => block.miner)
 
