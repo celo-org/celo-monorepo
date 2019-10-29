@@ -6,7 +6,7 @@ nodeSelector: {}
 
 ethstats:
   image:
-    repository: ethereumex/eth-stats-dashboard
-    tag: v0.0.1
+    repository: gcr.io/celo-testnet/ethstats
+    tag: latest
   service:
     type: NodePort
