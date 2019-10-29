@@ -12,7 +12,8 @@ reference:
     shell: /bin/bash --login -eo pipefail
     environment:
       TERM: dumb
-      JVM_OPTS: -Xmx3200m
+      _JAVA_OPTIONS: "-Xmx7g -XX:+UnlockExperimentalVMOptions -XX:+UseCGroupMemoryLimitForHeap"
+      GRADLE_OPTS: '-Dorg.gradle.daemon=false -Dorg.gradle.configureondemand=true -Dorg.gradle.jvmargs="-Xmx6g -XX:MaxPermSize=3g -XX:+HeapDumpOnOutOfMemoryError -Dfile.encoding=UTF-8"'
 
 defaults: &defaults
   working_directory: ~/app
@@ -25,10 +26,10 @@ defaults: &defaults
 android-defaults: &android-defaults
   <<: *defaults
   docker:
-    - image: circleci/android:api-28-node8-alpha
+    - image: circleci/android:api-28-node
   environment:
-    _JAVA_OPTIONS: "-XX:+UnlockExperimentalVMOptions -XX:+UseCGroupMemoryLimitForHeap"
-    GRADLE_OPTS: '-Dorg.gradle.daemon=false -Dorg.gradle.jvmargs="-Xmx1024m -XX:+HeapDumpOnOutOfMemoryError"'
+    _JAVA_OPTIONS: "-Xmx7g -XX:+UnlockExperimentalVMOptions -XX:+UseCGroupMemoryLimitForHeap"
+    GRADLE_OPTS: '-Dorg.gradle.daemon=false -Dorg.gradle.configureondemand=true -Dorg.gradle.jvmargs="-Xmx6g -XX:MaxPermSize=3g -XX:+HeapDumpOnOutOfMemoryError -Dfile.encoding=UTF-8"'
 
 e2e-defaults: &e2e-defaults
   <<: *defaults
@@ -144,7 +145,6 @@ jobs:
             echo 'export ANDROID_SDK_ROOT="/usr/local/share/android-sdk"' >> $BASH_ENV
             echo 'export QEMU_AUDIO_DRV=none' >> $BASH_ENV
             export PATH=$PATH:/usr/local/share/android-sdk/platform-tools/
-            export GRADLE_OPTS='-Dorg.gradle.daemon=true -Dorg.gradle.parallel=true -Dorg.gradle.jvmargs="-Xmx4096m -XX:+HeapDumpOnOutOfMemoryError"'
       - run:
           name: Install Android sdk
           command: |
@@ -187,7 +187,7 @@ jobs:
       # Currently not used
       # - run: npm install --global react-native-kill-packager
       - run:
-          # need to run this because it's another OS than install_dependecies job
+          # need to run this because it's another OS than install_dependencies job
           name: yarn
           command: |
             # TODO, Make cache work and figure out why this doesn't work
@@ -200,6 +200,7 @@ jobs:
             # fi
             yarn
             yarn build
+            yarn run jetify
       - save_cache:
           key: yarn-v4-macos-{{ .Branch }}-{{ checksum "yarn.lock" }}
           paths:
@@ -264,22 +265,17 @@ jobs:
             yarn run lerna --ignore @celo/contractkit --ignore @celo/mobile --ignore @celo/protocol --ignore @celo/celotool --ignore @celo/walletkit --ignore @celo/celocli run test
 
   mobile-test-build-app:
-    working_directory: ~/app
-    docker:
-      - image: circleci/android:api-28
+    <<: *android-defaults
+    resource_class: large
 
     steps:
       - attach_workspace:
           at: ~/app
-
-      - run:
-          name: Set GRADLE_OPTS to speed up gradle
-          command: |
-            export GRADLE_OPTS='-Dorg.gradle.daemon=true -Dorg.gradle.parallel=true -Dorg.gradle.jvmargs="-Xmx4096m -XX:+HeapDumpOnOutOfMemoryError"'
       - run:
           name: Build Android app (debug version)
           command: |
             set -euo pipefail
+            yarn run jetify
             cd packages/mobile/android
             ENVFILE=.env.test ./gradlew assembleDebug
             cd -

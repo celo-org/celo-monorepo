@@ -71,6 +71,7 @@ exports[`renders correctly with backup completed 1`] = `
             </Text>
             <View
               accessible={true}
+              focusable={true}
               isTVSelectable={true}
               nativeBackgroundAndroid={
                 Object {
@@ -78,6 +79,7 @@ exports[`renders correctly with backup completed 1`] = `
                   "type": "ThemeAttrAndroid",
                 }
               }
+              onClick={[Function]}
               onResponderGrant={[Function]}
               onResponderMove={[Function]}
               onResponderRelease={[Function]}
@@ -222,6 +224,7 @@ exports[`renders correctly with backup not completed 1`] = `
             </Text>
             <View
               accessible={true}
+              focusable={true}
               isTVSelectable={true}
               nativeBackgroundAndroid={
                 Object {
@@ -229,6 +232,7 @@ exports[`renders correctly with backup not completed 1`] = `
                   "type": "ThemeAttrAndroid",
                 }
               }
+              onClick={[Function]}
               onResponderGrant={[Function]}
               onResponderMove={[Function]}
               onResponderRelease={[Function]}
@@ -355,6 +359,7 @@ exports[`renders correctly with backup not completed 1`] = `
     >
       <View
         accessible={true}
+        focusable={false}
         isTVSelectable={true}
         nativeBackgroundAndroid={
           Object {
@@ -362,6 +367,7 @@ exports[`renders correctly with backup not completed 1`] = `
             "type": "ThemeAttrAndroid",
           }
         }
+        onClick={[Function]}
         onResponderGrant={[Function]}
         onResponderMove={[Function]}
         onResponderRelease={[Function]}
