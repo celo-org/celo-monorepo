@@ -49,7 +49,7 @@ describe('governance tests', () => {
     })
 
     it('properly orders validators randomly', async function(this: any) {
-      this.timeout(100000)
+      this.timeout(160000)
 
       const latestBlockNumber = (await contractKit.web3.eth.getBlock('latest')).number
       const indexInEpoch = ((latestBlockNumber % EPOCH) + EPOCH - 1) % EPOCH
