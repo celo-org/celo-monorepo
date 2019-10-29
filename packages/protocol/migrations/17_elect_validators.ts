@@ -166,12 +166,15 @@ module.exports = async (_deployer: any) => {
 
     console.info('  * Registering Validators ...')
     for (const key of groupKeys) {
+      const address = generateAccountAddressFromPrivateKey(key)
+      console.info(`    - Registering ${address} ...`)
       await registerValidator(lockedGold, validators, key, account.address)
     }
 
     console.info('  * Adding Validators to Validator Group ...')
     for (const [i, key] of groupKeys.entries()) {
-      const address = generateAccountAddressFromPrivateKey(key.slice(2))
+      const address = generateAccountAddressFromPrivateKey(key)
+      console.info(`    - Adding ${address} ...`)
       if (i === 0) {
         // @ts-ignore
         const addTx = validators.contract.methods.addFirstMember(
