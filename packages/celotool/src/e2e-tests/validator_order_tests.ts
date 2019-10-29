@@ -1,6 +1,6 @@
-import { ContractKit, newKit } from '@celo/contractkit'
 import { assert } from 'chai'
 import _ from 'lodash'
+import Web3 from 'web3'
 import { getContext, GethTestConfig, sleep } from './utils'
 
 const VALIDATORS = 10
@@ -24,7 +24,7 @@ describe('governance tests', () => {
   }
 
   const context: any = getContext(gethConfig)
-  let contractKit: ContractKit
+  let web3: Web3
 
   before(async function(this: any) {
     this.timeout(0)
@@ -33,23 +33,15 @@ describe('governance tests', () => {
 
   after(context.hooks.after)
 
-  const restart = async () => {
-    await context.hooks.restart()
-    contractKit = newKit('http://localhost:8545')
-    contractKit.defaultAccount = context.validators[0].address
-
-    // TODO(mcortesi): magic sleep. without it unlockAccount sometimes fails
-    await sleep(2)
-  }
-
   describe('Validator ordering', () => {
     before(async function() {
       this.timeout(0)
-      await restart()
+      web3 = new Web3('http://localhost:8545')
+      await context.hooks.restart()
     })
 
     it('properly orders validators randomly', async function(this: any) {
-      this.timeout(160000)
+      this.timeout(160000 /* 160 seconds */)
 
       const latestBlockNumber = (await contractKit.web3.eth.getBlock('latest')).number
       const indexInEpoch = ((latestBlockNumber % EPOCH) + EPOCH - 1) % EPOCH
