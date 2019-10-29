@@ -592,7 +592,7 @@ jobs:
           command: |
             set -e
             cd packages/celotool
-            ./ci_test_attestations.sh checkout master
+            ./ci_test_attestations.sh checkout kobigurk/proof_of_possesion_zexe_upgrade
 
   web:
     working_directory: ~/app
