@@ -688,7 +688,7 @@ workflows:
             - lint-checks
       - mobile-test-build-app:
           requires:
-            - install_dependencies
+            - mobile-test
       - verification-pool-api:
           requires:
             - lint-checks
