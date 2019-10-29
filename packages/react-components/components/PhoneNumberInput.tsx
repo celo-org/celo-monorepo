@@ -3,8 +3,8 @@ import ValidatedTextInput, {
   PhoneValidatorProps,
 } from '@celo/react-components/components/ValidatedTextInput'
 import colors from '@celo/react-components/styles/colors'
-import { Countries } from '@celo/utils/src/countries'
-import { ValidatorKind } from '@celo/utils/src/inputValidation'
+import { Countries } from '@celo/utils/lib/src/countries'
+import { ValidatorKind } from '@celo/utils/lib/src/inputValidation'
 import { getRegionCodeFromCountryCode, parsePhoneNumber } from '@celo/utils/src/phoneNumbers'
 import * as React from 'react'
 import { Platform, StyleSheet, Text, TouchableOpacity, View } from 'react-native'

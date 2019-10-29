@@ -12,7 +12,6 @@ reference:
     shell: /bin/bash --login -eo pipefail
     environment:
       TERM: dumb
-      JVM_OPTS: -Xmx3200m
 
 defaults: &defaults
   working_directory: ~/app

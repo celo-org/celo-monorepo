@@ -1,3 +1,5 @@
+import CountryData from 'country-data'
+
 export default {
   callingCountries: {
     all: [
@@ -5,4 +7,5 @@ export default {
       { name: 'UK', countryCallingCodes: ['33'], alpha2: 'GB' },
     ],
   },
+  lookup: CountryData.lookup,
 }

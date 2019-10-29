@@ -16,7 +16,7 @@ exports[`PhoneNumberInput when defaultCountry is falsy renders an AutoComplete a
     style={
       Array [
         Object {
-          "zIndex": 1,
+          "flex": 1,
         },
         undefined,
       ]
@@ -29,6 +29,7 @@ exports[`PhoneNumberInput when defaultCountry is falsy renders an AutoComplete a
             "borderColor": "#b9b9b9",
             "borderRadius": 1,
             "borderWidth": 1,
+            "marginBottom": 0,
           },
           Array [
             Object {
@@ -114,13 +115,9 @@ exports[`PhoneNumberInput when defaultCountry is falsy renders an AutoComplete a
                 "borderTopWidth": 1,
                 "borderWidth": 1,
                 "flex": 1,
-                "left": undefined,
-                "marginBottom": 6,
                 "marginHorizontal": 0,
                 "paddingHorizontal": 0,
                 "paddingVertical": 6,
-                "position": "relative",
-                "right": undefined,
               },
             ]
           }
@@ -264,43 +261,147 @@ exports[`when defaultCountry is truthy does not render an AutoComplete 1`] = `
     style={
       Array [
         Object {
-          "borderColor": "#D1D5D8",
-          "borderRadius": 3,
-          "borderWidth": 1,
+          "flex": 1,
         },
-        Object {
-          "height": 50,
-        },
-        Object {
-          "alignItems": "center",
-          "backgroundColor": "#EEEEEE",
-          "flexDirection": "row",
-          "paddingHorizontal": 16,
-          "paddingVertical": 11,
-        },
+        undefined,
       ]
     }
   >
-    <Text
+    <View
       style={
-        Object {
-          "color": "#FFFFFF",
-          "fontSize": 23,
-        }
+        Array [
+          Object {
+            "borderColor": "#b9b9b9",
+            "borderRadius": 1,
+            "borderWidth": 1,
+            "marginBottom": 0,
+          },
+          Array [
+            Object {
+              "borderColor": "#D1D5D8",
+              "borderRadius": 3,
+              "borderWidth": 1,
+            },
+            Object {
+              "height": 50,
+            },
+            Object {
+              "marginTop": 1,
+              "padding": 3,
+            },
+          ],
+        ]
       }
     >
-      🇨🇦
-    </Text>
-    <Text
+      <View
+        style={
+          Array [
+            Object {
+              "alignItems": "center",
+              "flex": 1,
+              "flexDirection": "row",
+              "justifyContent": "center",
+            },
+            Array [
+              Object {
+                "backgroundColor": "white",
+                "height": 40,
+                "paddingLeft": 3,
+              },
+              undefined,
+            ],
+          ]
+        }
+      >
+        <TextInput
+          allowFontScaling={true}
+          autoCapitalize="none"
+          autoCorrect={false}
+          data={Array []}
+          defaultValue="Canada"
+          flatListProps={Object {}}
+          inputContainerStyle={
+            Array [
+              Object {
+                "borderColor": "#D1D5D8",
+                "borderRadius": 3,
+                "borderWidth": 1,
+              },
+              Object {
+                "height": 50,
+              },
+              Object {
+                "marginTop": 1,
+                "padding": 3,
+              },
+            ]
+          }
+          keyExtractor={[Function]}
+          keyboardShouldPersistTaps="always"
+          listContainerStyle={
+            Object {
+              "flex": 1,
+              "padding": 0,
+              "position": "relative",
+              "top": 3,
+            }
+          }
+          listStyle={
+            Array [
+              Object {
+                "borderColor": "#D1D5D8",
+                "borderRadius": 3,
+                "borderWidth": 1,
+              },
+              Object {
+                "backgroundColor": "#FFFFFF",
+                "borderColor": "#D1D5D8",
+                "borderRadius": 3,
+                "borderTopWidth": 1,
+                "borderWidth": 1,
+                "flex": 1,
+                "marginHorizontal": 0,
+                "paddingHorizontal": 0,
+                "paddingVertical": 6,
+              },
+            ]
+          }
+          onBlur={[Function]}
+          onChangeText={[Function]}
+          onFocus={[Function]}
+          onStartShouldSetResponderCapture={[Function]}
+          placeholderTextColor="#D1D5D8"
+          rejectResponderTermination={true}
+          renderItem={[Function]}
+          renderSeparator={null}
+          renderTextInput={[Function]}
+          style={
+            Object {
+              "backgroundColor": "#FFFFFF",
+              "borderColor": "#D1D5D8",
+              "borderRadius": 3,
+              "flex": 1,
+              "fontFamily": "Hind-Regular",
+              "padding": 8,
+            }
+          }
+          testID="CountryNameField"
+          underlineColorAndroid="transparent"
+          value="Canada"
+        />
+      </View>
+    </View>
+    <View
+      onStartShouldSetResponderCapture={[Function]}
       style={
         Object {
-          "fontSize": 15,
-          "marginLeft": 30,
+          "flex": 1,
+          "padding": 0,
+          "position": "relative",
+          "top": 3,
         }
       }
-    >
-      Canada
-    </Text>
+    />
   </View>
   <View
     style={
@@ -327,9 +428,7 @@ exports[`when defaultCountry is truthy does not render an AutoComplete 1`] = `
           "width": 60,
         }
       }
-    >
-      +1
-    </Text>
+    />
     <View
       style={
         Object {
@@ -362,7 +461,6 @@ exports[`when defaultCountry is truthy does not render an AutoComplete 1`] = `
     >
       <TextInput
         allowFontScaling={true}
-        countryCallingCode="+1"
         keyboardType="phone-pad"
         onBlur={[Function]}
         onChangeText={[Function]}

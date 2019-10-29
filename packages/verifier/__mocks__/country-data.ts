@@ -1,3 +1,5 @@
+import CountryData from 'country-data'
+
 export default {
   callingCountries: {
     all: [
@@ -14,4 +16,5 @@ export default {
       },
     ],
   },
+  lookup: CountryData.lookup,
 }
