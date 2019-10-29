@@ -96,12 +96,14 @@ const styles = StyleSheet.create({
   },
 })
 
+const BASE_DELAY = 2000
+
 function accelerate(index: number, starting: number) {
   return starting + index * SPEED * 1.5 ** 2
 }
 
 function decelerate(index: number) {
-  return Math.round(SPEED * (index + 1) ** 1.33)
+  return BASE_DELAY + Math.round(SPEED * (index + 1) ** 1.33)
 }
 
 const PAYMENT_PATHS = [
