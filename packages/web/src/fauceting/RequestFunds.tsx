@@ -4,8 +4,6 @@ import ReCAPTCHA from 'react-google-recaptcha'
 import { StyleSheet, Text, View } from 'react-native'
 import { MobileOS, RequestRecord, RequestType } from 'src/fauceting/FaucetInterfaces'
 import { ButtonWithFeedback, ContextualInfo, HashingStatus } from 'src/fauceting/MicroComponents'
-// @ts-ignore
-const PhoneInput = dynamic(() => import('src/fauceting/PhoneInput'))
 import {
   getCaptchaKey,
   RequestState,
@@ -20,6 +18,8 @@ import Apple from 'src/icons/Apple'
 import { colors, fonts, standardStyles, textStyles } from 'src/styles'
 import { Radio } from 'src/table/table'
 import subscribeRequest from '../../server/FirebaseClient'
+// @ts-ignore
+const PhoneInput = dynamic(() => import('src/fauceting/PhoneInput'))
 
 interface State {
   beneficiary: string
@@ -94,7 +94,12 @@ class RequestFunds extends React.PureComponent<Props & I18nProps, State> {
 
   startRequest = () => {
     this.setState({ requestState: RequestState.Working })
-    return send(this.state.beneficiary, this.props.kind, this.getCaptchaToken())
+    return send(
+      this.state.beneficiary,
+      this.props.kind,
+      this.getCaptchaToken(),
+      this.state.mobileOS
+    )
   }
 
   subscribe = async (key: string) => {
