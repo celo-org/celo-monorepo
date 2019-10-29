@@ -11,7 +11,7 @@ import { Screens, Stacks } from 'src/navigator/Screens'
 import { PersistedRootState } from 'src/redux/reducers'
 import Logger from 'src/utils/Logger'
 import { clockInSync } from 'src/utils/time'
-import { setZeroSyncMode } from 'src/web3/actions'
+import { toggleZeroSyncMode } from 'src/web3/actions'
 import { isInitiallyZeroSyncMode } from 'src/web3/contracts'
 import { zeroSyncSelector } from 'src/web3/selectors'
 
@@ -67,7 +67,7 @@ export function* toggleToProperSyncMode() {
   yield take(REHYDRATE)
   const zeroSyncMode = yield select(zeroSyncSelector)
   if (zeroSyncMode !== isInitiallyZeroSyncMode()) {
-    yield put(setZeroSyncMode(zeroSyncMode))
+    yield put(toggleZeroSyncMode(zeroSyncMode))
   }
 }
 

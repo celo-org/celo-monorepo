@@ -25,6 +25,9 @@ function getIpcProvider() {
   const ipcProvider = new Web3.providers.IpcProvider(IPC_PATH, net)
   Logger.debug(tag, 'created IPCProvider')
 
+  Logger.debug('Ipc connection object is ' + Object.keys(ipcProvider))
+  Logger.debug('Connection details: ' + JSON.stringify(ipcProvider.connection))
+
   // More details on the IPC objects can be seen via this
   // console.debug("Ipc connection object is " + Object.keys(ipcProvider.connection));
   // console.debug("Ipc data handle is " + ipcProvider.connection._events['data']);
@@ -85,7 +88,7 @@ function getWeb3(): Web3 {
 }
 
 // Mutates web3 with new provider
-export async function switchWeb3ProviderForSyncMode(zeroSync: boolean) {
+export function switchWeb3ProviderForSyncMode(zeroSync: boolean) {
   if (zeroSync) {
     web3.setProvider(getWebSocketProvider(DEFAULT_FORNO_URL))
     Logger.info(`${tag}@switchWeb3ProviderForSyncMode`, `Set provider to ${DEFAULT_FORNO_URL}`)
@@ -93,8 +96,6 @@ export async function switchWeb3ProviderForSyncMode(zeroSync: boolean) {
     web3.setProvider(getIpcProvider())
     Logger.info(`${tag}@switchWeb3ProviderForSyncMode`, `Set provider to IPC provider`)
   }
-  const connected = await web3.eth.net.isListening()
-  Logger.info(`${tag}@switchWeb3ProviderForSyncMode`, `Connected: ${connected}`)
 }
 
 export function addLocalAccount(web3Instance: Web3, privateKey: string) {

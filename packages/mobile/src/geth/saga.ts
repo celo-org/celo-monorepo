@@ -41,12 +41,14 @@ export function* waitForGethConnectivity() {
   }
 }
 
-function* waitForGethInstance() {
+export function* waitForGethInstance() {
   const zeroSyncMode = yield select(zeroSyncSelector)
+  Logger.error(TAG, `zeroSync mode: ${zeroSyncMode}`)
   if (zeroSyncMode) {
     return GethInitOutcomes.SUCCESS
   }
   try {
+    Logger.error(TAG, `Getting geth instance...`)
     const gethInstance = yield call(getGeth)
     if (gethInstance == null) {
       throw new Error('geth instance is null')

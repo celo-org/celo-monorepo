@@ -14,7 +14,7 @@ import { ErrorMessages } from 'src/app/ErrorMessages'
 import { currentLanguageSelector } from 'src/app/reducers'
 import { getWordlist } from 'src/backup/utils'
 import { UNLOCK_DURATION } from 'src/geth/consts'
-import { deleteChainData, stopGethIfInitialized } from 'src/geth/geth'
+import { clearGethCache, deleteChainData, stopGethIfInitialized } from 'src/geth/geth'
 import { initGethSaga } from 'src/geth/saga'
 import { navigateToError } from 'src/navigator/NavigationService'
 import { waitWeb3LastBlock } from 'src/networkInfo/saga'
@@ -441,22 +441,25 @@ export function* ensureAccountInWeb3Keystore() {
 
 export function* switchToGethFromZeroSync() {
   try {
+    yield put(setZeroSyncMode(false))
     Logger.error(TAG + '@switchToGethFromZeroSync', 'About to initialize geth')
-    // yield call(getGeth)
+    yield call(clearGethCache)
     yield call(initGethSaga)
 
     Logger.error(TAG + '@switchToGethFromZeroSync', 'Called initGethSaga')
     switchWeb3ProviderForSyncMode(false)
-    yield put(setZeroSyncMode(false))
 
+    Logger.error(TAG + '@switchToGethFromZeroSync', 'Switched providers')
     // Ensure web3 is fully synced using new provider
     yield call(waitForWeb3Sync)
+
+    Logger.error(TAG + '@switchToGethFromZeroSync', 'Waited for web3 sync')
 
     // After switching off zeroSync mode, ensure key is stored in web3.personal
     // Note that this must happen after the sync mode is switched
     // as the web3.personal where the key is stored is not available in zeroSync mode
     yield call(ensureAccountInWeb3Keystore)
-    Logger.error(TAG + '@switchToGethFromZeroSync', 'Ensure keys in keystore')
+    Logger.error(TAG + '@switchToGethFromZeroSync', 'Ensured keys in keystore')
   } catch (e) {
     Logger.error(TAG + '@switchToGethFromZeroSync', 'Error switching to geth from zeroSync')
     yield put(showError(ErrorMessages.FAILED_TO_SWITCH_SYNC_MODES))
@@ -466,12 +469,14 @@ export function* switchToGethFromZeroSync() {
 export function* switchToZeroSyncFromGeth() {
   Logger.debug(TAG + 'Switching to zeroSync from geth..')
   try {
+    yield put(setZeroSyncMode(true))
     yield call(stopGethIfInitialized)
 
     switchWeb3ProviderForSyncMode(true)
-    yield put(setZeroSyncMode(true))
 
-    // Ensure web3 is fully synced using new provider
+    // Ensure web3 sync state is updated with new zeroSync state.
+    // This prevents a false positive "geth disconnected"
+    // when blocks stop syncing.
     yield call(waitForWeb3Sync)
   } catch (e) {
     Logger.error(TAG + '@switchToGethFromZeroSync', 'Error switching to zeroSync from geth')
