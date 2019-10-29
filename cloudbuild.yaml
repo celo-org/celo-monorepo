@@ -2,7 +2,7 @@
 # More details: https://github.com/GoogleContainerTools/kaniko
 
 steps:
-  
+
 - id: "docker:celotool"
   name: gcr.io/kaniko-project/executor:latest
   args: [
@@ -40,5 +40,8 @@ steps:
     "--destination=gcr.io/$PROJECT_ID/celo-monorepo:attestation-service-$COMMIT_SHA"
   ]
   waitFor: ['-']
+
+options:
+  machineType: 'N1_HIGHCPU_8'
 
 timeout: 3000s
