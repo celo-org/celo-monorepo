@@ -170,7 +170,7 @@ function messageText(inviteCode: string, request: RequestRecord) {
   )}`
 }
 
-const IOS_URL = ''
+const IOS_URL = 'https://apps.apple.com/us/app/celo-alfajores-wallet/id1482389446'
 const ANDROID_URL = 'https://play.google.com/store/apps/details?id=org.celo.mobile.alfajores'
 
 function downloadLink(mobileOS: MobileOS) {
