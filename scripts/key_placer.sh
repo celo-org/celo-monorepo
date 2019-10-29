@@ -16,6 +16,7 @@ files=(
   "packages/mobile/android/app/src/debug/google-services.json"
   "packages/mobile/android/app/src/pilot/google-services.json"
   "packages/mobile/android/sentry.properties"
+  "packages/mobile/ios/GoogleService-Info.plist"
   "packages/mobile/ios/sentry.properties"
   "packages/verifier/android/app/google-services.json"
   "packages/verifier/android/app/src/staging/google-services.json"
@@ -38,27 +39,40 @@ DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
 cd $DIR
 cd ..
 
+if [[ $1 != "encrypt" ]] && [[ $1 != "decrypt" ]]; then
+  echo "invalid action $1. Choose 'encrypt' or 'decrypt'"
+  exit 1
+fi
 
 command -v gcloud > /dev/null 2>&1
 
 if [[ $? -eq 1 ]]; then
-  echo "gcloud is not installed - skipping decryption"
+  echo "gcloud is not installed - skipping ${1}ion"
   exit 0
 fi
 
 for file_path in "${files[@]}"; do
-  file_path_without_extension=`echo "$file_path" | sed "s/.*\///"`
-  file_dir=$(dirname "${file_path}")
-  encrypted="$file_dir/$file_path_without_extension.enc"
+  encrypted_file_path="$file_path.enc"
 
-  if test -f "$encrypted"; then
-    gcloud kms $1 --ciphertext-file=$encrypted --plaintext-file=$file_path --key=github-key --keyring=celo-keyring --location=global --project celo-testnet > /dev/null 2>&1
-    if [[ $? -eq 1 ]]; then
-      echo "Only C Labs employees can decrypt keys - skipping decryption"
-      exit 0
-    fi
+  if [[ $1 == "decrypt" ]] && ! test -f "$encrypted_file_path"; then
+    echo "$encrypted_file_path does not exist, cannot decrypt - skipping file"
+    continue
+  elif [[ $1 == "encrypt" ]] && ! test -f "$file_path"; then
+    echo "$file_path does not exist, cannot encrypt - skipping file"
+    continue
+  fi
+
+  gcloud kms $1 --ciphertext-file=$encrypted_file_path --plaintext-file=$file_path --key=github-key --keyring=celo-keyring --location=global --project celo-testnet
+  if [[ $? -eq 1 ]]; then
+    echo "Only C Labs employees can $1 keys - skipping ${1}ion"
+    exit 0
   fi
 done
 
-echo "Encrypted files decrypted"
+if [[ $1 == "decrypt" ]]; then
+  echo "Encrypted files decrypted"
+elif [[ $1 == "encrypt" ]]; then
+  echo "Decrypted files encrypted"
+fi
+
 exit 0

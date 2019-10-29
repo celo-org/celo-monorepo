@@ -14,6 +14,7 @@
   "country": "País",
   "phoneNumber": "Número de teléfono",
   "invalidPhone": "Número de teléfono inválido",
+  "missingFullName": "Por favor ingresa tu nombre completo",
   "allowSmsPermissions": "Permitir que el Monedero Celo envíe y vea mensajes de texto (SMS)",
   "dontAsk": "No volver a preguntar",
   "deny": "Denegar",

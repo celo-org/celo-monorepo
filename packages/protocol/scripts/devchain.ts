@@ -42,11 +42,23 @@ yargs
     'generate <datadir>',
     'Create a new devchain directory from scratch',
     (args) =>
-      args.positional('datadir', { type: 'string', description: 'Data Dir' }).option('upto', {
-        type: 'number',
-        description: 'When reset, run upto given migration',
-      }),
-    (args) => exitOnError(generateDevChain(args.datadir, { upto: args.upto }))
+      args
+        .positional('datadir', { type: 'string', description: 'Data Dir' })
+        .option('upto', {
+          type: 'number',
+          description: 'When reset, run upto given migration',
+        })
+        .option('migration_override', {
+          type: 'string',
+          description: 'Path to JSON containing config values to use in migrations',
+        }),
+    (args) =>
+      exitOnError(
+        generateDevChain(args.datadir, {
+          upto: args.upto,
+          migrationOverride: args.migration_override,
+        })
+      )
   ).argv
 
 async function startGanache(datadir: string, opts: { verbose?: boolean }) {
@@ -137,29 +149,44 @@ function createDirIfMissing(dir: string) {
   }
 }
 
-function runMigrations(opts: { upto?: number } = {}) {
+function runMigrations(opts: { upto?: number; migrationOverride?: string } = {}) {
   const cmdArgs = ['truffle', 'migrate']
 
   if (opts.upto) {
     cmdArgs.push('--to')
     cmdArgs.push(opts.upto.toString())
   }
+
+  if (opts.migrationOverride) {
+    cmdArgs.push('--migration_override')
+    cmdArgs.push(fs.readFileSync(opts.migrationOverride).toString())
+  }
   return execCmd(`yarn`, cmdArgs, { cwd: ProtocolRoot })
 }
 
-async function runDevChain(datadir: string, opts: { reset?: boolean; upto?: number } = {}) {
+async function runDevChain(
+  datadir: string,
+  opts: { reset?: boolean; upto?: number; migrationOverride?: string } = {}
+) {
   if (opts.reset) {
     await resetDir(datadir)
   }
   createDirIfMissing(datadir)
   const stopGanache = await startGanache(datadir, { verbose: true })
   if (opts.reset) {
-    await runMigrations({ upto: opts.upto })
+    await runMigrations({ upto: opts.upto, migrationOverride: opts.migrationOverride })
   }
   return stopGanache
 }
 
-async function generateDevChain(datadir: string, opts: { upto?: number } = {}) {
-  const stopGanache = await runDevChain(datadir, { reset: true, upto: opts.upto })
+async function generateDevChain(
+  datadir: string,
+  opts: { upto?: number; migrationOverride?: string } = {}
+) {
+  const stopGanache = await runDevChain(datadir, {
+    reset: true,
+    upto: opts.upto,
+    migrationOverride: opts.migrationOverride,
+  })
   await stopGanache()
 }

@@ -31,6 +31,10 @@ export const menuItems = {
     name: 'Privacy Policy',
     link: '/privacy',
   },
+  TERMS: {
+    name: 'Terms',
+    link: '/terms',
+  },
   MEDIUM: {
     name: 'Medium',
     link: 'https://medium.com/@celo.org',

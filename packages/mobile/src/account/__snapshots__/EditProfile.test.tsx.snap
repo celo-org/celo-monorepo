@@ -50,20 +50,14 @@ exports[`renders the EditProfile Component 1`] = `
         placeholder="yourName"
         rejectResponderTermination={true}
         style={
-          Array [
-            Object {
-              "fontFamily": "Hind-Regular",
-            },
-            Object {
-              "borderColor": "#D1D5D8",
-              "borderRadius": 3,
-              "padding": 8,
-            },
-            Object {
-              "backgroundColor": "#FFFFFF",
-              "flex": 1,
-            },
-          ]
+          Object {
+            "backgroundColor": "#FFFFFF",
+            "borderColor": "#D1D5D8",
+            "borderRadius": 3,
+            "flex": 1,
+            "fontFamily": "Hind-Regular",
+            "padding": 8,
+          }
         }
         underlineColorAndroid="transparent"
         value="Test"
@@ -84,7 +78,9 @@ exports[`renders the EditProfile Component 1`] = `
       >
         <View
           accessible={true}
+          focusable={true}
           isTVSelectable={true}
+          onClick={[Function]}
           onResponderGrant={[Function]}
           onResponderMove={[Function]}
           onResponderRelease={[Function]}

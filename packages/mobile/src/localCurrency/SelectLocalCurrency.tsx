@@ -6,7 +6,7 @@ import i18n from 'src/i18n'
 import { selectPreferredCurrency } from 'src/localCurrency/actions'
 import { LOCAL_CURRENCY_CODES, LocalCurrencyCode } from 'src/localCurrency/consts'
 import { useLocalCurrencyCode } from 'src/localCurrency/hooks'
-import { headerWithCancelButton } from 'src/navigator/Headers'
+import { headerWithBackButton } from 'src/navigator/Headers'
 import { navigateBack } from 'src/navigator/NavigationService'
 
 const DEFAULT_CURRENCY_CODE = LocalCurrencyCode.USD
@@ -14,6 +14,7 @@ const DEFAULT_CURRENCY_CODE = LocalCurrencyCode.USD
 const keyExtractor = (item: LocalCurrencyCode) => item
 
 function SelectLocalCurrency() {
+  // tslint:disable-next-line: react-hooks-nesting
   const selectedCurrencyCode = useLocalCurrencyCode() || DEFAULT_CURRENCY_CODE
   const dispatch = useDispatch()
 
@@ -58,7 +59,7 @@ const styles = StyleSheet.create({
 })
 
 SelectLocalCurrency.navigationOptions = () => ({
-  ...headerWithCancelButton,
+  ...headerWithBackButton,
   headerTitle: i18n.t('global:localCurrencyTitle'),
 })
 

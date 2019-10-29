@@ -24,8 +24,14 @@ spec:
     spec:
       containers:
       - name: blockscout-indexer
-        image: {{ .Values.blockscout.image.repository }}:{{ .Values.blockscout.image.indexerTag }}
+        image: {{ .Values.blockscout.image.repository }}:{{ .Values.blockscout.image.tag }}
         imagePullPolicy: {{ .Values.imagePullPolicy }}
+        command:
+        - /bin/sh
+        - -c
+        args:
+        - |
+           mix cmd --app indexer iex -S mix
         ports:
         - name: http
           containerPort: 4000
