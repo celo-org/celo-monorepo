@@ -1,22 +1,22 @@
 apiVersion: extensions/v1beta1
 kind: Ingress
 metadata:
-  name: {{ .Release.Namespace }}-infura-ingress
+  name: {{ .Release.Namespace }}-forno-ingress
   labels:
-    app: infura
+    app: forno
     chart: testnet
     release: {{ .Release.Namespace }}
-    heritage: infura
-    component: infura-web-ingress
+    heritage: forno
+    component: forno-web-ingress
   annotations:
     kubernetes.io/tls-acme: "true"
 spec:
   tls:
   - hosts:
-    - {{ .Release.Namespace }}-infura.{{ .Values.domain.name }}.org
-    secretName: {{ .Release.Namespace }}-web-tls
+    - {{ .Release.Namespace }}-forno.{{ .Values.domain.name }}.org
+    secretName: {{ .Release.Namespace }}-forno-web-tls
   rules:
-  - host: {{ .Release.Namespace }}-infura.{{ .Values.domain.name }}.org
+  - host: {{ .Release.Namespace }}-forno.{{ .Values.domain.name }}.org
     http:
       paths:
       - path: /
