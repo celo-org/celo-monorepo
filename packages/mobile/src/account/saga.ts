@@ -12,7 +12,6 @@ import { ErrorMessages } from 'src/app/ErrorMessages'
 import { navigate } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
 import { getCachedPincode, setCachedPincode } from 'src/pincode/PincodeCache'
-// @ts-ignore TS doesn't understand the RN's platform specific file imports
 import { getPinFromKeystore, setPinInKeystore } from 'src/pincode/PincodeUtils'
 import Logger from 'src/utils/Logger'
 
@@ -22,7 +21,7 @@ export function* setPincode({ pincodeType, pin }: SetPincodeAction) {
   try {
     if (pincodeType === PincodeType.PhoneAuth) {
       Logger.debug(TAG + '@setPincode', 'Setting pincode with using system auth')
-      pin = randomBytes(10).toString('hex')
+      pin = randomBytes(10).toString('hex') as string
       yield call(setPinInKeystore, pin)
     } else if (pincodeType === PincodeType.CustomPin && pin) {
       Logger.debug(TAG + '@setPincode', 'Pincode set using user provided pin')

@@ -1,10 +1,9 @@
-const { mockNavigationServiceFor } = require('test/utils')
-const { navigate } = mockNavigationServiceFor('Profile')
 import * as React from 'react'
 import 'react-native'
 import { fireEvent, render } from 'react-native-testing-library'
 import { Provider } from 'react-redux'
 import Profile from 'src/account/Profile'
+import { navigate } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
 import { createMockStore } from 'test/utils'
 import { mockNavigation } from 'test/values'
@@ -26,7 +25,6 @@ describe('Profile', () => {
   describe('when SettingsItem pressed', () => {
     it('goes to Edit Profile Screen', () => {
       const { getByTestId } = render(profileFactory())
-
       fireEvent.press(getByTestId('ProfileEditName'))
       expect(navigate).toBeCalledWith(Screens.EditProfile)
     })

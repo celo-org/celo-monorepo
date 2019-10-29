@@ -1,13 +1,15 @@
+import * as Sentry from '@sentry/react-native'
+import DeviceInfo from 'react-native-device-info'
 import firebase, { Firebase } from 'react-native-firebase'
 import { RemoteMessage } from 'react-native-firebase/messaging'
 import { Notification, NotificationOpen } from 'react-native-firebase/notifications'
-import { Sentry } from 'react-native-sentry'
 import { eventChannel, EventChannel } from 'redux-saga'
 import { call, put, select, spawn, take } from 'redux-saga/effects'
-import { NotificationReceiveState, PaymentRequest } from 'src/account'
+import { NotificationReceiveState } from 'src/account'
 import { showError } from 'src/alert/actions'
 import { ErrorMessages } from 'src/app/ErrorMessages'
 import { currentLanguageSelector } from 'src/app/reducers'
+import { WritePaymentRequest } from 'src/firebase/actions'
 import { handleNotification } from 'src/firebase/notifications'
 import { navigate } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
@@ -129,9 +131,9 @@ export function* initializeCloudMessaging(app: Firebase, address: string) {
 
 export async function onBackgroundNotification(remoteMessage: RemoteMessage) {
   Logger.info(TAG, 'recieved Notification while app in Background')
-  Sentry.captureMessage(`Received Unknown RNFirebaseBackgroundMessage `, {
-    extra: remoteMessage,
-  })
+  Sentry.captureMessage(
+    `Received Unknown RNFirebaseBackgroundMessage ${JSON.stringify(remoteMessage)}`
+  )
   // https://facebook.github.io/react-native/docs/0.44/appregistry#registerheadlesstask
   return Promise.resolve() // need to return a resolved promise so native code releases the JS context
 }
@@ -149,7 +151,7 @@ export const registerTokenToDb = async (app: Firebase, address: string, fcmToken
   }
 }
 
-export function* writePaymentRequest(paymentInfo: PaymentRequest) {
+export function* paymentRequestWriter({ paymentInfo }: WritePaymentRequest) {
   try {
     Logger.info(TAG, `Writing pending request to database`)
     const pendingRequestRef = firebase.database().ref(`pendingRequests`)
@@ -162,7 +164,8 @@ export function* writePaymentRequest(paymentInfo: PaymentRequest) {
   }
 }
 
-export async function getVersionInfo(version: string) {
+export async function getVersionInfo() {
+  const version = DeviceInfo.getVersion()
   const versionFSPath = version.split('.').join('/')
   Logger.info(TAG, `Checking version info ${version}`)
   return (await firebase
