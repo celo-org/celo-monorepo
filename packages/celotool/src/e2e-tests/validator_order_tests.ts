@@ -69,11 +69,7 @@ describe('governance tests', () => {
       // Ensure each validator has an equal number of blocks.
       const expectedCount = BLOCK_COUNT / VALIDATORS
       for (const [validator, count] of Object.entries(_.countBy(validators))) {
-        assert.equal(
-          count,
-          expected_count,
-          `${validator} should have mined ${expectedCount} blocks`
-        )
+        assert.equal(count, expectedCount, `${validator} should have mined ${expectedCount} blocks`)
       }
 
       const orderings: string[][] = []
