@@ -1,3 +1,17 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: load-test
+  labels:
+    component: load-test
+spec:
+  ports:
+  - port: 80
+    name: web
+  clusterIP: None
+  selector:
+    component: load-test
+---
 apiVersion: apps/v1beta2
 kind: StatefulSet
 metadata:
@@ -10,6 +24,7 @@ metadata:
     component: load-test
 spec:
   podManagementPolicy: "Parallel"
+  serviceName: load-test
   replicas: {{ .Values.replicas }}
   selector:
     matchLabels:
