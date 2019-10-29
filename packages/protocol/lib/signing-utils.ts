@@ -1,6 +1,6 @@
 // Originally taken from https://github.com/ethereum/web3.js/blob/1.x/packages/web3-eth-accounts/src/index.js
 
-import { signMessageNatively } from "@celo/utils/lib/signatureUtils"
+import { parseSignature } from "@celo/utils/lib/signatureUtils"
 import { bytes, hash, nat, RLP } from 'eth-lib'
 import * as _ from 'underscore'
 import * as helpers from 'web3-core-helpers'
@@ -29,7 +29,8 @@ function makeEven(hex: string) {
 
 export const getParsedSignatureOfAddress = async (web3: Web3, address: string, signer: string) => {
   const addressHash = web3.utils.soliditySha3({ type: 'address', value: address })
-  return signMessageNatively(addressHash, signer, web3.eth.sign)
+  const signature = await web3.eth.sign(addressHash, signer)
+  return parseSignature(addressHash, signature, signer)
 }
 
 export async function signTransaction(web3: Web3, txn: any, privateKey: string) {

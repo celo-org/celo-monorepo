@@ -21,31 +21,18 @@ export function hashMessage(message: string) {
   return Web3Utils.soliditySha3({ type: 'string', value: message })
 }
 
-// Uses a native function to sign (as signFn), most commonly `web.eth.sign`
-export async function signMessageNatively(
-  message: string,
-  signer: string,
-  signFn: (message: string, signer: string) => Promise<string>
-) {
-  const signature = (await signFn(message, signer)).slice(2)
-  return {
-    r: `0x${signature.slice(0, 64)}`,
-    s: `0x${signature.slice(64, 128)}`,
-    v: Web3Utils.hexToNumber(signature.slice(128, 130)) + 27,
-  }
-}
-
 export interface Signer {
   sign: (message: string) => Promise<string>
 }
 
+// Uses a native function to sign (as signFn), most commonly `web.eth.sign`
 export function NativeSigner(
   signFn: (message: string, signer: string) => Promise<string>,
   signer: string
 ): Signer {
   return {
     sign: async (message: string) => {
-      return serializeSignature(await signMessageNatively(message, signer, signFn))
+      return signFn(message, signer)
     },
   }
 }
@@ -186,7 +173,6 @@ export const SignatureUtils = {
   NativeSigner,
   LocalSigner,
   signMessage,
-  signMessageNatively,
   signMessageNoPrefix,
   parseSignature,
   parseSignatureNoPrefix,
