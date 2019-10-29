@@ -12,6 +12,8 @@ reference:
     shell: /bin/bash --login -eo pipefail
     environment:
       TERM: dumb
+      _JAVA_OPTIONS: "-Xmx7g -XX:+UnlockExperimentalVMOptions -XX:+UseCGroupMemoryLimitForHeap"
+      GRADLE_OPTS: '-Dorg.gradle.daemon=false -Dorg.gradle.configureondemand=true -Dorg.gradle.jvmargs="-Xmx6g -XX:MaxPermSize=3g -XX:+HeapDumpOnOutOfMemoryError -Dfile.encoding=UTF-8"'
 
 defaults: &defaults
   working_directory: ~/app
@@ -21,7 +23,7 @@ defaults: &defaults
     # To avoid ENOMEM problem when running node
     NODE_OPTIONS: "--max-old-space-size=4096"
 
-android-defaults: &android-defaults
+defaults: &android-defaults
   <<: *defaults
   docker:
     - image: circleci/android:api-28-node
