@@ -23,7 +23,7 @@ defaults: &defaults
     # To avoid ENOMEM problem when running node
     NODE_OPTIONS: "--max-old-space-size=4096"
 
-defaults: &android-defaults
+android-defaults: &android-defaults
   <<: *defaults
   docker:
     - image: circleci/android:api-28-node
@@ -264,7 +264,7 @@ jobs:
             yarn run lerna --ignore @celo/contractkit --ignore @celo/mobile --ignore @celo/protocol --ignore @celo/celotool --ignore @celo/walletkit --ignore @celo/celocli run test
 
   mobile-test-build-app:
-    <<: *android_defaults
+    <<: *android-defaults
     resource_class: large
 
     steps:
