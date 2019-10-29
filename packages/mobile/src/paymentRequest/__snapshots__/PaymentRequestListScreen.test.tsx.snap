@@ -23,7 +23,7 @@ exports[`PaymentRequestListScreen renders correctly with no requests 1`] = `
       resizeMode="contain"
       source={
         Object {
-          "testUri": "../../../src/images/celo-account.png",
+          "testUri": "../../../packages/mobile/src/images/celo-account.png",
         }
       }
       style={
@@ -143,7 +143,7 @@ exports[`PaymentRequestListScreen renders correctly with requests 1`] = `
       resizeMode="contain"
       source={
         Object {
-          "testUri": "../../../src/images/celo-account.png",
+          "testUri": "../../../packages/mobile/src/images/celo-account.png",
         }
       }
       style={
@@ -238,7 +238,9 @@ exports[`PaymentRequestListScreen renders correctly with requests 1`] = `
         <View>
           <View
             accessible={true}
+            focusable={true}
             isTVSelectable={true}
+            onClick={[Function]}
             onResponderGrant={[Function]}
             onResponderMove={[Function]}
             onResponderRelease={[Function]}
@@ -395,6 +397,7 @@ exports[`PaymentRequestListScreen renders correctly with requests 1`] = `
                     >
                       <View
                         accessible={true}
+                        focusable={true}
                         isTVSelectable={true}
                         nativeBackgroundAndroid={
                           Object {
@@ -402,6 +405,7 @@ exports[`PaymentRequestListScreen renders correctly with requests 1`] = `
                             "type": "ThemeAttrAndroid",
                           }
                         }
+                        onClick={[Function]}
                         onResponderGrant={[Function]}
                         onResponderMove={[Function]}
                         onResponderRelease={[Function]}
@@ -435,6 +439,7 @@ exports[`PaymentRequestListScreen renders correctly with requests 1`] = `
                       </View>
                       <View
                         accessible={true}
+                        focusable={true}
                         isTVSelectable={true}
                         nativeBackgroundAndroid={
                           Object {
@@ -442,6 +447,7 @@ exports[`PaymentRequestListScreen renders correctly with requests 1`] = `
                             "type": "ThemeAttrAndroid",
                           }
                         }
+                        onClick={[Function]}
                         onResponderGrant={[Function]}
                         onResponderMove={[Function]}
                         onResponderRelease={[Function]}
@@ -519,7 +525,9 @@ exports[`PaymentRequestListScreen renders correctly with requests 1`] = `
         <View>
           <View
             accessible={true}
+            focusable={true}
             isTVSelectable={true}
+            onClick={[Function]}
             onResponderGrant={[Function]}
             onResponderMove={[Function]}
             onResponderRelease={[Function]}
@@ -676,6 +684,7 @@ exports[`PaymentRequestListScreen renders correctly with requests 1`] = `
                     >
                       <View
                         accessible={true}
+                        focusable={true}
                         isTVSelectable={true}
                         nativeBackgroundAndroid={
                           Object {
@@ -683,6 +692,7 @@ exports[`PaymentRequestListScreen renders correctly with requests 1`] = `
                             "type": "ThemeAttrAndroid",
                           }
                         }
+                        onClick={[Function]}
                         onResponderGrant={[Function]}
                         onResponderMove={[Function]}
                         onResponderRelease={[Function]}
@@ -716,6 +726,7 @@ exports[`PaymentRequestListScreen renders correctly with requests 1`] = `
                       </View>
                       <View
                         accessible={true}
+                        focusable={true}
                         isTVSelectable={true}
                         nativeBackgroundAndroid={
                           Object {
@@ -723,6 +734,7 @@ exports[`PaymentRequestListScreen renders correctly with requests 1`] = `
                             "type": "ThemeAttrAndroid",
                           }
                         }
+                        onClick={[Function]}
                         onResponderGrant={[Function]}
                         onResponderMove={[Function]}
                         onResponderRelease={[Function]}
@@ -800,7 +812,9 @@ exports[`PaymentRequestListScreen renders correctly with requests 1`] = `
         <View>
           <View
             accessible={true}
+            focusable={true}
             isTVSelectable={true}
+            onClick={[Function]}
             onResponderGrant={[Function]}
             onResponderMove={[Function]}
             onResponderRelease={[Function]}
@@ -957,6 +971,7 @@ exports[`PaymentRequestListScreen renders correctly with requests 1`] = `
                     >
                       <View
                         accessible={true}
+                        focusable={true}
                         isTVSelectable={true}
                         nativeBackgroundAndroid={
                           Object {
@@ -964,6 +979,7 @@ exports[`PaymentRequestListScreen renders correctly with requests 1`] = `
                             "type": "ThemeAttrAndroid",
                           }
                         }
+                        onClick={[Function]}
                         onResponderGrant={[Function]}
                         onResponderMove={[Function]}
                         onResponderRelease={[Function]}
@@ -997,6 +1013,7 @@ exports[`PaymentRequestListScreen renders correctly with requests 1`] = `
                       </View>
                       <View
                         accessible={true}
+                        focusable={true}
                         isTVSelectable={true}
                         nativeBackgroundAndroid={
                           Object {
@@ -1004,6 +1021,7 @@ exports[`PaymentRequestListScreen renders correctly with requests 1`] = `
                             "type": "ThemeAttrAndroid",
                           }
                         }
+                        onClick={[Function]}
                         onResponderGrant={[Function]}
                         onResponderMove={[Function]}
                         onResponderRelease={[Function]}

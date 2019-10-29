@@ -84,11 +84,19 @@ export function* handleNotification(
   }
   switch (notification.data.type) {
     case NotificationTypes.PAYMENT_REQUESTED:
-      yield call(handlePaymentRequested, notification.data, notificationState)
+      yield call(
+        handlePaymentRequested,
+        (notification.data as unknown) as PaymentRequest,
+        notificationState
+      )
       break
 
     case NotificationTypes.PAYMENT_RECEIVED:
-      yield call(handlePaymentReceived, notification.data, notificationState)
+      yield call(
+        handlePaymentReceived,
+        (notification.data as unknown) as TransferNotificationData,
+        notificationState
+      )
       break
 
     default:
