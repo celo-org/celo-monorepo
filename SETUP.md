@@ -205,7 +205,7 @@ Install the Android 28 system image and create an Android Virtual Device:
 
 ```bash
 sdkmanager "system-images;android-28;google_apis;x86"
-avdmanager create avd --force --name Nexus_5X_API_28 --device "Nexus 5X" -k "system-images;android-28;google_apis;x86" --abi "google_apis/x86"
+avdmanager create avd --force --name Nexus_5X_API_28_x86 --device "Nexus 5X" -k "system-images;android-28;google_apis;x86" --abi "google_apis/x86"
 ```
 
 Execute the following and add it to your `~/.bash_profile`:
