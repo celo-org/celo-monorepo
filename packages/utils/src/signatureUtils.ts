@@ -17,7 +17,7 @@ export function hashMessageWithPrefix(message: string) {
   return Web3Utils.soliditySha3(prefix, message)
 }
 
-export function hashMessage(message: string) {
+export function hashMessage(message: string): string {
   return Web3Utils.soliditySha3({ type: 'string', value: message })
 }
 
