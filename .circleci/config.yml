@@ -200,6 +200,7 @@ jobs:
             # fi
             yarn
             yarn build
+            yarn run jetify
       - save_cache:
           key: yarn-v4-macos-{{ .Branch }}-{{ checksum "yarn.lock" }}
           paths:
