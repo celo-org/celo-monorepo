@@ -45,14 +45,18 @@ async function getDB(): Promise<firebase.database.Database> {
 export async function sendRequest(
   beneficiary: Address | E164Number,
   type: RequestType,
-  mobileOS: MobileOS
+  mobileOS: MobileOS | null
 ) {
   const newRequest: RequestRecord = {
     beneficiary,
     status: RequestStatus.Pending,
-    mobileOS,
     type,
   }
+
+  if (mobileOS) {
+    newRequest.mobileOS = mobileOS
+  }
+
   try {
     const db = await getDB()
     const ref: firebase.database.Reference = await db.ref(`${NETWORK}/requests`).push(newRequest)
