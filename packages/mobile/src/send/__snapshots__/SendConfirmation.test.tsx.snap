@@ -134,7 +134,7 @@ exports[`SendConfirmation renders correctly for payment request confirmation 1`]
                   <Image
                     source={
                       Object {
-                        "testUri": "../../../src/images/unknown-user-icon.png",
+                        "testUri": "../../../packages/mobile/src/images/unknown-user-icon.png",
                       }
                     }
                     style={
@@ -399,6 +399,7 @@ exports[`SendConfirmation renders correctly for payment request confirmation 1`]
                     </Text>
                     <View
                       accessible={true}
+                      focusable={true}
                       hitSlop={
                         Object {
                           "bottom": 10,
@@ -414,6 +415,7 @@ exports[`SendConfirmation renders correctly for payment request confirmation 1`]
                           "type": "ThemeAttrAndroid",
                         }
                       }
+                      onClick={[Function]}
                       onResponderGrant={[Function]}
                       onResponderMove={[Function]}
                       onResponderRelease={[Function]}
@@ -431,7 +433,7 @@ exports[`SendConfirmation renders correctly for payment request confirmation 1`]
                       <Image
                         source={
                           Object {
-                            "testUri": "../../../src/images/info.png",
+                            "testUri": "../../../packages/mobile/src/images/info.png",
                           }
                         }
                         style={
@@ -513,16 +515,27 @@ exports[`SendConfirmation renders correctly for payment request confirmation 1`]
             hardwareAccelerated={false}
             hideModalContentWhileAnimating={true}
             onModalHide={[Function]}
+            onModalWillHide={[Function]}
+            onModalWillShow={[Function]}
             onRequestClose={[Function]}
+            scrollHorizontal={false}
             scrollOffset={0}
             scrollOffsetMax={0}
             scrollTo={null}
+            supportedOrientations={
+              Array [
+                "portrait",
+                "landscape",
+              ]
+            }
             swipeThreshold={100}
             transparent={true}
             visible={false}
           >
             <View
               accessible={true}
+              focusable={true}
+              onClick={[Function]}
               onResponderGrant={[Function]}
               onResponderMove={[Function]}
               onResponderRelease={[Function]}
@@ -546,7 +559,10 @@ exports[`SendConfirmation renders correctly for payment request confirmation 1`]
             <View
               hideModalContentWhileAnimating={true}
               onModalHide={[Function]}
+              onModalWillHide={[Function]}
+              onModalWillShow={[Function]}
               pointerEvents="box-none"
+              scrollHorizontal={false}
               scrollOffset={0}
               scrollOffsetMax={0}
               scrollTo={null}
@@ -561,6 +577,12 @@ exports[`SendConfirmation renders correctly for payment request confirmation 1`]
                     },
                   ],
                 }
+              }
+              supportedOrientations={
+                Array [
+                  "portrait",
+                  "landscape",
+                ]
               }
               swipeThreshold={100}
             >
@@ -612,6 +634,7 @@ exports[`SendConfirmation renders correctly for payment request confirmation 1`]
                   >
                     <View
                       accessible={true}
+                      focusable={true}
                       isTVSelectable={true}
                       nativeBackgroundAndroid={
                         Object {
@@ -619,6 +642,7 @@ exports[`SendConfirmation renders correctly for payment request confirmation 1`]
                           "type": "ThemeAttrAndroid",
                         }
                       }
+                      onClick={[Function]}
                       onResponderGrant={[Function]}
                       onResponderMove={[Function]}
                       onResponderRelease={[Function]}
@@ -658,7 +682,7 @@ exports[`SendConfirmation renders correctly for payment request confirmation 1`]
                           resizeMode="contain"
                           source={
                             Object {
-                              "testUri": "../../../src/images/sms-icon.png",
+                              "testUri": "../../../packages/mobile/src/images/sms-icon.png",
                             }
                           }
                           style={
@@ -717,6 +741,7 @@ exports[`SendConfirmation renders correctly for payment request confirmation 1`]
                   >
                     <View
                       accessible={true}
+                      focusable={true}
                       isTVSelectable={true}
                       nativeBackgroundAndroid={
                         Object {
@@ -724,6 +749,7 @@ exports[`SendConfirmation renders correctly for payment request confirmation 1`]
                           "type": "ThemeAttrAndroid",
                         }
                       }
+                      onClick={[Function]}
                       onResponderGrant={[Function]}
                       onResponderMove={[Function]}
                       onResponderRelease={[Function]}
@@ -763,7 +789,7 @@ exports[`SendConfirmation renders correctly for payment request confirmation 1`]
                           resizeMode="contain"
                           source={
                             Object {
-                              "testUri": "../../../src/images/whatsapp-logo.png",
+                              "testUri": "../../../packages/mobile/src/images/whatsapp-logo.png",
                             }
                           }
                           style={
@@ -822,6 +848,7 @@ exports[`SendConfirmation renders correctly for payment request confirmation 1`]
                   >
                     <View
                       accessible={true}
+                      focusable={true}
                       isTVSelectable={true}
                       nativeBackgroundAndroid={
                         Object {
@@ -829,6 +856,7 @@ exports[`SendConfirmation renders correctly for payment request confirmation 1`]
                           "type": "ThemeAttrAndroid",
                         }
                       }
+                      onClick={[Function]}
                       onResponderGrant={[Function]}
                       onResponderMove={[Function]}
                       onResponderRelease={[Function]}
@@ -931,6 +959,7 @@ exports[`SendConfirmation renders correctly for payment request confirmation 1`]
       >
         <View
           accessible={true}
+          focusable={false}
           isTVSelectable={true}
           nativeBackgroundAndroid={
             Object {
@@ -938,6 +967,7 @@ exports[`SendConfirmation renders correctly for payment request confirmation 1`]
               "type": "ThemeAttrAndroid",
             }
           }
+          onClick={[Function]}
           onResponderGrant={[Function]}
           onResponderMove={[Function]}
           onResponderRelease={[Function]}
@@ -1019,6 +1049,7 @@ exports[`SendConfirmation renders correctly for payment request confirmation 1`]
       >
         <View
           accessible={true}
+          focusable={true}
           isTVSelectable={true}
           nativeBackgroundAndroid={
             Object {
@@ -1026,6 +1057,7 @@ exports[`SendConfirmation renders correctly for payment request confirmation 1`]
               "type": "ThemeAttrAndroid",
             }
           }
+          onClick={[Function]}
           onResponderGrant={[Function]}
           onResponderMove={[Function]}
           onResponderRelease={[Function]}
@@ -1223,7 +1255,7 @@ exports[`SendConfirmation renders correctly for payment request confirmation whe
                   <Image
                     source={
                       Object {
-                        "testUri": "../../../src/images/unknown-user-icon.png",
+                        "testUri": "../../../packages/mobile/src/images/unknown-user-icon.png",
                       }
                     }
                     style={
@@ -1488,6 +1520,7 @@ exports[`SendConfirmation renders correctly for payment request confirmation whe
                     </Text>
                     <View
                       accessible={true}
+                      focusable={true}
                       hitSlop={
                         Object {
                           "bottom": 10,
@@ -1503,6 +1536,7 @@ exports[`SendConfirmation renders correctly for payment request confirmation whe
                           "type": "ThemeAttrAndroid",
                         }
                       }
+                      onClick={[Function]}
                       onResponderGrant={[Function]}
                       onResponderMove={[Function]}
                       onResponderRelease={[Function]}
@@ -1520,7 +1554,7 @@ exports[`SendConfirmation renders correctly for payment request confirmation whe
                       <Image
                         source={
                           Object {
-                            "testUri": "../../../src/images/info.png",
+                            "testUri": "../../../packages/mobile/src/images/info.png",
                           }
                         }
                         style={
@@ -1602,16 +1636,27 @@ exports[`SendConfirmation renders correctly for payment request confirmation whe
             hardwareAccelerated={false}
             hideModalContentWhileAnimating={true}
             onModalHide={[Function]}
+            onModalWillHide={[Function]}
+            onModalWillShow={[Function]}
             onRequestClose={[Function]}
+            scrollHorizontal={false}
             scrollOffset={0}
             scrollOffsetMax={0}
             scrollTo={null}
+            supportedOrientations={
+              Array [
+                "portrait",
+                "landscape",
+              ]
+            }
             swipeThreshold={100}
             transparent={true}
             visible={false}
           >
             <View
               accessible={true}
+              focusable={true}
+              onClick={[Function]}
               onResponderGrant={[Function]}
               onResponderMove={[Function]}
               onResponderRelease={[Function]}
@@ -1635,7 +1680,10 @@ exports[`SendConfirmation renders correctly for payment request confirmation whe
             <View
               hideModalContentWhileAnimating={true}
               onModalHide={[Function]}
+              onModalWillHide={[Function]}
+              onModalWillShow={[Function]}
               pointerEvents="box-none"
+              scrollHorizontal={false}
               scrollOffset={0}
               scrollOffsetMax={0}
               scrollTo={null}
@@ -1650,6 +1698,12 @@ exports[`SendConfirmation renders correctly for payment request confirmation whe
                     },
                   ],
                 }
+              }
+              supportedOrientations={
+                Array [
+                  "portrait",
+                  "landscape",
+                ]
               }
               swipeThreshold={100}
             >
@@ -1701,6 +1755,7 @@ exports[`SendConfirmation renders correctly for payment request confirmation whe
                   >
                     <View
                       accessible={true}
+                      focusable={true}
                       isTVSelectable={true}
                       nativeBackgroundAndroid={
                         Object {
@@ -1708,6 +1763,7 @@ exports[`SendConfirmation renders correctly for payment request confirmation whe
                           "type": "ThemeAttrAndroid",
                         }
                       }
+                      onClick={[Function]}
                       onResponderGrant={[Function]}
                       onResponderMove={[Function]}
                       onResponderRelease={[Function]}
@@ -1747,7 +1803,7 @@ exports[`SendConfirmation renders correctly for payment request confirmation whe
                           resizeMode="contain"
                           source={
                             Object {
-                              "testUri": "../../../src/images/sms-icon.png",
+                              "testUri": "../../../packages/mobile/src/images/sms-icon.png",
                             }
                           }
                           style={
@@ -1806,6 +1862,7 @@ exports[`SendConfirmation renders correctly for payment request confirmation whe
                   >
                     <View
                       accessible={true}
+                      focusable={true}
                       isTVSelectable={true}
                       nativeBackgroundAndroid={
                         Object {
@@ -1813,6 +1870,7 @@ exports[`SendConfirmation renders correctly for payment request confirmation whe
                           "type": "ThemeAttrAndroid",
                         }
                       }
+                      onClick={[Function]}
                       onResponderGrant={[Function]}
                       onResponderMove={[Function]}
                       onResponderRelease={[Function]}
@@ -1852,7 +1910,7 @@ exports[`SendConfirmation renders correctly for payment request confirmation whe
                           resizeMode="contain"
                           source={
                             Object {
-                              "testUri": "../../../src/images/whatsapp-logo.png",
+                              "testUri": "../../../packages/mobile/src/images/whatsapp-logo.png",
                             }
                           }
                           style={
@@ -1911,6 +1969,7 @@ exports[`SendConfirmation renders correctly for payment request confirmation whe
                   >
                     <View
                       accessible={true}
+                      focusable={true}
                       isTVSelectable={true}
                       nativeBackgroundAndroid={
                         Object {
@@ -1918,6 +1977,7 @@ exports[`SendConfirmation renders correctly for payment request confirmation whe
                           "type": "ThemeAttrAndroid",
                         }
                       }
+                      onClick={[Function]}
                       onResponderGrant={[Function]}
                       onResponderMove={[Function]}
                       onResponderRelease={[Function]}
@@ -2020,6 +2080,7 @@ exports[`SendConfirmation renders correctly for payment request confirmation whe
       >
         <View
           accessible={true}
+          focusable={false}
           isTVSelectable={true}
           nativeBackgroundAndroid={
             Object {
@@ -2027,6 +2088,7 @@ exports[`SendConfirmation renders correctly for payment request confirmation whe
               "type": "ThemeAttrAndroid",
             }
           }
+          onClick={[Function]}
           onResponderGrant={[Function]}
           onResponderMove={[Function]}
           onResponderRelease={[Function]}
@@ -2108,6 +2170,7 @@ exports[`SendConfirmation renders correctly for payment request confirmation whe
       >
         <View
           accessible={true}
+          focusable={true}
           isTVSelectable={true}
           nativeBackgroundAndroid={
             Object {
@@ -2115,6 +2178,7 @@ exports[`SendConfirmation renders correctly for payment request confirmation whe
               "type": "ThemeAttrAndroid",
             }
           }
+          onClick={[Function]}
           onResponderGrant={[Function]}
           onResponderMove={[Function]}
           onResponderRelease={[Function]}
@@ -2312,7 +2376,7 @@ exports[`SendConfirmation renders correctly for payment request confirmation whe
                   <Image
                     source={
                       Object {
-                        "testUri": "../../../src/images/unknown-user-icon.png",
+                        "testUri": "../../../packages/mobile/src/images/unknown-user-icon.png",
                       }
                     }
                     style={
@@ -2577,6 +2641,7 @@ exports[`SendConfirmation renders correctly for payment request confirmation whe
                     </Text>
                     <View
                       accessible={true}
+                      focusable={true}
                       hitSlop={
                         Object {
                           "bottom": 10,
@@ -2592,6 +2657,7 @@ exports[`SendConfirmation renders correctly for payment request confirmation whe
                           "type": "ThemeAttrAndroid",
                         }
                       }
+                      onClick={[Function]}
                       onResponderGrant={[Function]}
                       onResponderMove={[Function]}
                       onResponderRelease={[Function]}
@@ -2609,7 +2675,7 @@ exports[`SendConfirmation renders correctly for payment request confirmation whe
                       <Image
                         source={
                           Object {
-                            "testUri": "../../../src/images/info.png",
+                            "testUri": "../../../packages/mobile/src/images/info.png",
                           }
                         }
                         style={
@@ -2685,16 +2751,27 @@ exports[`SendConfirmation renders correctly for payment request confirmation whe
             hardwareAccelerated={false}
             hideModalContentWhileAnimating={true}
             onModalHide={[Function]}
+            onModalWillHide={[Function]}
+            onModalWillShow={[Function]}
             onRequestClose={[Function]}
+            scrollHorizontal={false}
             scrollOffset={0}
             scrollOffsetMax={0}
             scrollTo={null}
+            supportedOrientations={
+              Array [
+                "portrait",
+                "landscape",
+              ]
+            }
             swipeThreshold={100}
             transparent={true}
             visible={false}
           >
             <View
               accessible={true}
+              focusable={true}
+              onClick={[Function]}
               onResponderGrant={[Function]}
               onResponderMove={[Function]}
               onResponderRelease={[Function]}
@@ -2718,7 +2795,10 @@ exports[`SendConfirmation renders correctly for payment request confirmation whe
             <View
               hideModalContentWhileAnimating={true}
               onModalHide={[Function]}
+              onModalWillHide={[Function]}
+              onModalWillShow={[Function]}
               pointerEvents="box-none"
+              scrollHorizontal={false}
               scrollOffset={0}
               scrollOffsetMax={0}
               scrollTo={null}
@@ -2733,6 +2813,12 @@ exports[`SendConfirmation renders correctly for payment request confirmation whe
                     },
                   ],
                 }
+              }
+              supportedOrientations={
+                Array [
+                  "portrait",
+                  "landscape",
+                ]
               }
               swipeThreshold={100}
             >
@@ -2784,6 +2870,7 @@ exports[`SendConfirmation renders correctly for payment request confirmation whe
                   >
                     <View
                       accessible={true}
+                      focusable={true}
                       isTVSelectable={true}
                       nativeBackgroundAndroid={
                         Object {
@@ -2791,6 +2878,7 @@ exports[`SendConfirmation renders correctly for payment request confirmation whe
                           "type": "ThemeAttrAndroid",
                         }
                       }
+                      onClick={[Function]}
                       onResponderGrant={[Function]}
                       onResponderMove={[Function]}
                       onResponderRelease={[Function]}
@@ -2830,7 +2918,7 @@ exports[`SendConfirmation renders correctly for payment request confirmation whe
                           resizeMode="contain"
                           source={
                             Object {
-                              "testUri": "../../../src/images/sms-icon.png",
+                              "testUri": "../../../packages/mobile/src/images/sms-icon.png",
                             }
                           }
                           style={
@@ -2889,6 +2977,7 @@ exports[`SendConfirmation renders correctly for payment request confirmation whe
                   >
                     <View
                       accessible={true}
+                      focusable={true}
                       isTVSelectable={true}
                       nativeBackgroundAndroid={
                         Object {
@@ -2896,6 +2985,7 @@ exports[`SendConfirmation renders correctly for payment request confirmation whe
                           "type": "ThemeAttrAndroid",
                         }
                       }
+                      onClick={[Function]}
                       onResponderGrant={[Function]}
                       onResponderMove={[Function]}
                       onResponderRelease={[Function]}
@@ -2935,7 +3025,7 @@ exports[`SendConfirmation renders correctly for payment request confirmation whe
                           resizeMode="contain"
                           source={
                             Object {
-                              "testUri": "../../../src/images/whatsapp-logo.png",
+                              "testUri": "../../../packages/mobile/src/images/whatsapp-logo.png",
                             }
                           }
                           style={
@@ -2994,6 +3084,7 @@ exports[`SendConfirmation renders correctly for payment request confirmation whe
                   >
                     <View
                       accessible={true}
+                      focusable={true}
                       isTVSelectable={true}
                       nativeBackgroundAndroid={
                         Object {
@@ -3001,6 +3092,7 @@ exports[`SendConfirmation renders correctly for payment request confirmation whe
                           "type": "ThemeAttrAndroid",
                         }
                       }
+                      onClick={[Function]}
                       onResponderGrant={[Function]}
                       onResponderMove={[Function]}
                       onResponderRelease={[Function]}
@@ -3103,6 +3195,7 @@ exports[`SendConfirmation renders correctly for payment request confirmation whe
       >
         <View
           accessible={true}
+          focusable={false}
           isTVSelectable={true}
           nativeBackgroundAndroid={
             Object {
@@ -3110,6 +3203,7 @@ exports[`SendConfirmation renders correctly for payment request confirmation whe
               "type": "ThemeAttrAndroid",
             }
           }
+          onClick={[Function]}
           onResponderGrant={[Function]}
           onResponderMove={[Function]}
           onResponderRelease={[Function]}
@@ -3191,6 +3285,7 @@ exports[`SendConfirmation renders correctly for payment request confirmation whe
       >
         <View
           accessible={true}
+          focusable={true}
           isTVSelectable={true}
           nativeBackgroundAndroid={
             Object {
@@ -3198,6 +3293,7 @@ exports[`SendConfirmation renders correctly for payment request confirmation whe
               "type": "ThemeAttrAndroid",
             }
           }
+          onClick={[Function]}
           onResponderGrant={[Function]}
           onResponderMove={[Function]}
           onResponderRelease={[Function]}
@@ -3395,7 +3491,7 @@ exports[`SendConfirmation renders correctly for send payment confirmation 1`] = 
                   <Image
                     source={
                       Object {
-                        "testUri": "../../../src/images/unknown-user-icon.png",
+                        "testUri": "../../../packages/mobile/src/images/unknown-user-icon.png",
                       }
                     }
                     style={
@@ -3660,6 +3756,7 @@ exports[`SendConfirmation renders correctly for send payment confirmation 1`] = 
                     </Text>
                     <View
                       accessible={true}
+                      focusable={true}
                       hitSlop={
                         Object {
                           "bottom": 10,
@@ -3675,6 +3772,7 @@ exports[`SendConfirmation renders correctly for send payment confirmation 1`] = 
                           "type": "ThemeAttrAndroid",
                         }
                       }
+                      onClick={[Function]}
                       onResponderGrant={[Function]}
                       onResponderMove={[Function]}
                       onResponderRelease={[Function]}
@@ -3692,7 +3790,7 @@ exports[`SendConfirmation renders correctly for send payment confirmation 1`] = 
                       <Image
                         source={
                           Object {
-                            "testUri": "../../../src/images/info.png",
+                            "testUri": "../../../packages/mobile/src/images/info.png",
                           }
                         }
                         style={
@@ -3774,16 +3872,27 @@ exports[`SendConfirmation renders correctly for send payment confirmation 1`] = 
             hardwareAccelerated={false}
             hideModalContentWhileAnimating={true}
             onModalHide={[Function]}
+            onModalWillHide={[Function]}
+            onModalWillShow={[Function]}
             onRequestClose={[Function]}
+            scrollHorizontal={false}
             scrollOffset={0}
             scrollOffsetMax={0}
             scrollTo={null}
+            supportedOrientations={
+              Array [
+                "portrait",
+                "landscape",
+              ]
+            }
             swipeThreshold={100}
             transparent={true}
             visible={false}
           >
             <View
               accessible={true}
+              focusable={true}
+              onClick={[Function]}
               onResponderGrant={[Function]}
               onResponderMove={[Function]}
               onResponderRelease={[Function]}
@@ -3807,7 +3916,10 @@ exports[`SendConfirmation renders correctly for send payment confirmation 1`] = 
             <View
               hideModalContentWhileAnimating={true}
               onModalHide={[Function]}
+              onModalWillHide={[Function]}
+              onModalWillShow={[Function]}
               pointerEvents="box-none"
+              scrollHorizontal={false}
               scrollOffset={0}
               scrollOffsetMax={0}
               scrollTo={null}
@@ -3822,6 +3934,12 @@ exports[`SendConfirmation renders correctly for send payment confirmation 1`] = 
                     },
                   ],
                 }
+              }
+              supportedOrientations={
+                Array [
+                  "portrait",
+                  "landscape",
+                ]
               }
               swipeThreshold={100}
             >
@@ -3873,6 +3991,7 @@ exports[`SendConfirmation renders correctly for send payment confirmation 1`] = 
                   >
                     <View
                       accessible={true}
+                      focusable={true}
                       isTVSelectable={true}
                       nativeBackgroundAndroid={
                         Object {
@@ -3880,6 +3999,7 @@ exports[`SendConfirmation renders correctly for send payment confirmation 1`] = 
                           "type": "ThemeAttrAndroid",
                         }
                       }
+                      onClick={[Function]}
                       onResponderGrant={[Function]}
                       onResponderMove={[Function]}
                       onResponderRelease={[Function]}
@@ -3919,7 +4039,7 @@ exports[`SendConfirmation renders correctly for send payment confirmation 1`] = 
                           resizeMode="contain"
                           source={
                             Object {
-                              "testUri": "../../../src/images/sms-icon.png",
+                              "testUri": "../../../packages/mobile/src/images/sms-icon.png",
                             }
                           }
                           style={
@@ -3978,6 +4098,7 @@ exports[`SendConfirmation renders correctly for send payment confirmation 1`] = 
                   >
                     <View
                       accessible={true}
+                      focusable={true}
                       isTVSelectable={true}
                       nativeBackgroundAndroid={
                         Object {
@@ -3985,6 +4106,7 @@ exports[`SendConfirmation renders correctly for send payment confirmation 1`] = 
                           "type": "ThemeAttrAndroid",
                         }
                       }
+                      onClick={[Function]}
                       onResponderGrant={[Function]}
                       onResponderMove={[Function]}
                       onResponderRelease={[Function]}
@@ -4024,7 +4146,7 @@ exports[`SendConfirmation renders correctly for send payment confirmation 1`] = 
                           resizeMode="contain"
                           source={
                             Object {
-                              "testUri": "../../../src/images/whatsapp-logo.png",
+                              "testUri": "../../../packages/mobile/src/images/whatsapp-logo.png",
                             }
                           }
                           style={
@@ -4083,6 +4205,7 @@ exports[`SendConfirmation renders correctly for send payment confirmation 1`] = 
                   >
                     <View
                       accessible={true}
+                      focusable={true}
                       isTVSelectable={true}
                       nativeBackgroundAndroid={
                         Object {
@@ -4090,6 +4213,7 @@ exports[`SendConfirmation renders correctly for send payment confirmation 1`] = 
                           "type": "ThemeAttrAndroid",
                         }
                       }
+                      onClick={[Function]}
                       onResponderGrant={[Function]}
                       onResponderMove={[Function]}
                       onResponderRelease={[Function]}
@@ -4192,6 +4316,7 @@ exports[`SendConfirmation renders correctly for send payment confirmation 1`] = 
       >
         <View
           accessible={true}
+          focusable={false}
           isTVSelectable={true}
           nativeBackgroundAndroid={
             Object {
@@ -4199,6 +4324,7 @@ exports[`SendConfirmation renders correctly for send payment confirmation 1`] = 
               "type": "ThemeAttrAndroid",
             }
           }
+          onClick={[Function]}
           onResponderGrant={[Function]}
           onResponderMove={[Function]}
           onResponderRelease={[Function]}
@@ -4280,6 +4406,7 @@ exports[`SendConfirmation renders correctly for send payment confirmation 1`] = 
       >
         <View
           accessible={true}
+          focusable={true}
           isTVSelectable={true}
           nativeBackgroundAndroid={
             Object {
@@ -4287,6 +4414,7 @@ exports[`SendConfirmation renders correctly for send payment confirmation 1`] = 
               "type": "ThemeAttrAndroid",
             }
           }
+          onClick={[Function]}
           onResponderGrant={[Function]}
           onResponderMove={[Function]}
           onResponderRelease={[Function]}
@@ -4484,7 +4612,7 @@ exports[`SendConfirmation renders correctly for send payment confirmation when f
                   <Image
                     source={
                       Object {
-                        "testUri": "../../../src/images/unknown-user-icon.png",
+                        "testUri": "../../../packages/mobile/src/images/unknown-user-icon.png",
                       }
                     }
                     style={
@@ -4749,6 +4877,7 @@ exports[`SendConfirmation renders correctly for send payment confirmation when f
                     </Text>
                     <View
                       accessible={true}
+                      focusable={true}
                       hitSlop={
                         Object {
                           "bottom": 10,
@@ -4764,6 +4893,7 @@ exports[`SendConfirmation renders correctly for send payment confirmation when f
                           "type": "ThemeAttrAndroid",
                         }
                       }
+                      onClick={[Function]}
                       onResponderGrant={[Function]}
                       onResponderMove={[Function]}
                       onResponderRelease={[Function]}
@@ -4781,7 +4911,7 @@ exports[`SendConfirmation renders correctly for send payment confirmation when f
                       <Image
                         source={
                           Object {
-                            "testUri": "../../../src/images/info.png",
+                            "testUri": "../../../packages/mobile/src/images/info.png",
                           }
                         }
                         style={
@@ -4863,16 +4993,27 @@ exports[`SendConfirmation renders correctly for send payment confirmation when f
             hardwareAccelerated={false}
             hideModalContentWhileAnimating={true}
             onModalHide={[Function]}
+            onModalWillHide={[Function]}
+            onModalWillShow={[Function]}
             onRequestClose={[Function]}
+            scrollHorizontal={false}
             scrollOffset={0}
             scrollOffsetMax={0}
             scrollTo={null}
+            supportedOrientations={
+              Array [
+                "portrait",
+                "landscape",
+              ]
+            }
             swipeThreshold={100}
             transparent={true}
             visible={false}
           >
             <View
               accessible={true}
+              focusable={true}
+              onClick={[Function]}
               onResponderGrant={[Function]}
               onResponderMove={[Function]}
               onResponderRelease={[Function]}
@@ -4896,7 +5037,10 @@ exports[`SendConfirmation renders correctly for send payment confirmation when f
             <View
               hideModalContentWhileAnimating={true}
               onModalHide={[Function]}
+              onModalWillHide={[Function]}
+              onModalWillShow={[Function]}
               pointerEvents="box-none"
+              scrollHorizontal={false}
               scrollOffset={0}
               scrollOffsetMax={0}
               scrollTo={null}
@@ -4911,6 +5055,12 @@ exports[`SendConfirmation renders correctly for send payment confirmation when f
                     },
                   ],
                 }
+              }
+              supportedOrientations={
+                Array [
+                  "portrait",
+                  "landscape",
+                ]
               }
               swipeThreshold={100}
             >
@@ -4962,6 +5112,7 @@ exports[`SendConfirmation renders correctly for send payment confirmation when f
                   >
                     <View
                       accessible={true}
+                      focusable={true}
                       isTVSelectable={true}
                       nativeBackgroundAndroid={
                         Object {
@@ -4969,6 +5120,7 @@ exports[`SendConfirmation renders correctly for send payment confirmation when f
                           "type": "ThemeAttrAndroid",
                         }
                       }
+                      onClick={[Function]}
                       onResponderGrant={[Function]}
                       onResponderMove={[Function]}
                       onResponderRelease={[Function]}
@@ -5008,7 +5160,7 @@ exports[`SendConfirmation renders correctly for send payment confirmation when f
                           resizeMode="contain"
                           source={
                             Object {
-                              "testUri": "../../../src/images/sms-icon.png",
+                              "testUri": "../../../packages/mobile/src/images/sms-icon.png",
                             }
                           }
                           style={
@@ -5067,6 +5219,7 @@ exports[`SendConfirmation renders correctly for send payment confirmation when f
                   >
                     <View
                       accessible={true}
+                      focusable={true}
                       isTVSelectable={true}
                       nativeBackgroundAndroid={
                         Object {
@@ -5074,6 +5227,7 @@ exports[`SendConfirmation renders correctly for send payment confirmation when f
                           "type": "ThemeAttrAndroid",
                         }
                       }
+                      onClick={[Function]}
                       onResponderGrant={[Function]}
                       onResponderMove={[Function]}
                       onResponderRelease={[Function]}
@@ -5113,7 +5267,7 @@ exports[`SendConfirmation renders correctly for send payment confirmation when f
                           resizeMode="contain"
                           source={
                             Object {
-                              "testUri": "../../../src/images/whatsapp-logo.png",
+                              "testUri": "../../../packages/mobile/src/images/whatsapp-logo.png",
                             }
                           }
                           style={
@@ -5172,6 +5326,7 @@ exports[`SendConfirmation renders correctly for send payment confirmation when f
                   >
                     <View
                       accessible={true}
+                      focusable={true}
                       isTVSelectable={true}
                       nativeBackgroundAndroid={
                         Object {
@@ -5179,6 +5334,7 @@ exports[`SendConfirmation renders correctly for send payment confirmation when f
                           "type": "ThemeAttrAndroid",
                         }
                       }
+                      onClick={[Function]}
                       onResponderGrant={[Function]}
                       onResponderMove={[Function]}
                       onResponderRelease={[Function]}
@@ -5281,6 +5437,7 @@ exports[`SendConfirmation renders correctly for send payment confirmation when f
       >
         <View
           accessible={true}
+          focusable={false}
           isTVSelectable={true}
           nativeBackgroundAndroid={
             Object {
@@ -5288,6 +5445,7 @@ exports[`SendConfirmation renders correctly for send payment confirmation when f
               "type": "ThemeAttrAndroid",
             }
           }
+          onClick={[Function]}
           onResponderGrant={[Function]}
           onResponderMove={[Function]}
           onResponderRelease={[Function]}
@@ -5369,6 +5527,7 @@ exports[`SendConfirmation renders correctly for send payment confirmation when f
       >
         <View
           accessible={true}
+          focusable={true}
           isTVSelectable={true}
           nativeBackgroundAndroid={
             Object {
@@ -5376,6 +5535,7 @@ exports[`SendConfirmation renders correctly for send payment confirmation when f
               "type": "ThemeAttrAndroid",
             }
           }
+          onClick={[Function]}
           onResponderGrant={[Function]}
           onResponderMove={[Function]}
           onResponderRelease={[Function]}
@@ -5573,7 +5733,7 @@ exports[`SendConfirmation renders correctly for send payment confirmation when f
                   <Image
                     source={
                       Object {
-                        "testUri": "../../../src/images/unknown-user-icon.png",
+                        "testUri": "../../../packages/mobile/src/images/unknown-user-icon.png",
                       }
                     }
                     style={
@@ -5838,6 +5998,7 @@ exports[`SendConfirmation renders correctly for send payment confirmation when f
                     </Text>
                     <View
                       accessible={true}
+                      focusable={true}
                       hitSlop={
                         Object {
                           "bottom": 10,
@@ -5853,6 +6014,7 @@ exports[`SendConfirmation renders correctly for send payment confirmation when f
                           "type": "ThemeAttrAndroid",
                         }
                       }
+                      onClick={[Function]}
                       onResponderGrant={[Function]}
                       onResponderMove={[Function]}
                       onResponderRelease={[Function]}
@@ -5870,7 +6032,7 @@ exports[`SendConfirmation renders correctly for send payment confirmation when f
                       <Image
                         source={
                           Object {
-                            "testUri": "../../../src/images/info.png",
+                            "testUri": "../../../packages/mobile/src/images/info.png",
                           }
                         }
                         style={
@@ -5946,16 +6108,27 @@ exports[`SendConfirmation renders correctly for send payment confirmation when f
             hardwareAccelerated={false}
             hideModalContentWhileAnimating={true}
             onModalHide={[Function]}
+            onModalWillHide={[Function]}
+            onModalWillShow={[Function]}
             onRequestClose={[Function]}
+            scrollHorizontal={false}
             scrollOffset={0}
             scrollOffsetMax={0}
             scrollTo={null}
+            supportedOrientations={
+              Array [
+                "portrait",
+                "landscape",
+              ]
+            }
             swipeThreshold={100}
             transparent={true}
             visible={false}
           >
             <View
               accessible={true}
+              focusable={true}
+              onClick={[Function]}
               onResponderGrant={[Function]}
               onResponderMove={[Function]}
               onResponderRelease={[Function]}
@@ -5979,7 +6152,10 @@ exports[`SendConfirmation renders correctly for send payment confirmation when f
             <View
               hideModalContentWhileAnimating={true}
               onModalHide={[Function]}
+              onModalWillHide={[Function]}
+              onModalWillShow={[Function]}
               pointerEvents="box-none"
+              scrollHorizontal={false}
               scrollOffset={0}
               scrollOffsetMax={0}
               scrollTo={null}
@@ -5994,6 +6170,12 @@ exports[`SendConfirmation renders correctly for send payment confirmation when f
                     },
                   ],
                 }
+              }
+              supportedOrientations={
+                Array [
+                  "portrait",
+                  "landscape",
+                ]
               }
               swipeThreshold={100}
             >
@@ -6045,6 +6227,7 @@ exports[`SendConfirmation renders correctly for send payment confirmation when f
                   >
                     <View
                       accessible={true}
+                      focusable={true}
                       isTVSelectable={true}
                       nativeBackgroundAndroid={
                         Object {
@@ -6052,6 +6235,7 @@ exports[`SendConfirmation renders correctly for send payment confirmation when f
                           "type": "ThemeAttrAndroid",
                         }
                       }
+                      onClick={[Function]}
                       onResponderGrant={[Function]}
                       onResponderMove={[Function]}
                       onResponderRelease={[Function]}
@@ -6091,7 +6275,7 @@ exports[`SendConfirmation renders correctly for send payment confirmation when f
                           resizeMode="contain"
                           source={
                             Object {
-                              "testUri": "../../../src/images/sms-icon.png",
+                              "testUri": "../../../packages/mobile/src/images/sms-icon.png",
                             }
                           }
                           style={
@@ -6150,6 +6334,7 @@ exports[`SendConfirmation renders correctly for send payment confirmation when f
                   >
                     <View
                       accessible={true}
+                      focusable={true}
                       isTVSelectable={true}
                       nativeBackgroundAndroid={
                         Object {
@@ -6157,6 +6342,7 @@ exports[`SendConfirmation renders correctly for send payment confirmation when f
                           "type": "ThemeAttrAndroid",
                         }
                       }
+                      onClick={[Function]}
                       onResponderGrant={[Function]}
                       onResponderMove={[Function]}
                       onResponderRelease={[Function]}
@@ -6196,7 +6382,7 @@ exports[`SendConfirmation renders correctly for send payment confirmation when f
                           resizeMode="contain"
                           source={
                             Object {
-                              "testUri": "../../../src/images/whatsapp-logo.png",
+                              "testUri": "../../../packages/mobile/src/images/whatsapp-logo.png",
                             }
                           }
                           style={
@@ -6255,6 +6441,7 @@ exports[`SendConfirmation renders correctly for send payment confirmation when f
                   >
                     <View
                       accessible={true}
+                      focusable={true}
                       isTVSelectable={true}
                       nativeBackgroundAndroid={
                         Object {
@@ -6262,6 +6449,7 @@ exports[`SendConfirmation renders correctly for send payment confirmation when f
                           "type": "ThemeAttrAndroid",
                         }
                       }
+                      onClick={[Function]}
                       onResponderGrant={[Function]}
                       onResponderMove={[Function]}
                       onResponderRelease={[Function]}
@@ -6364,6 +6552,7 @@ exports[`SendConfirmation renders correctly for send payment confirmation when f
       >
         <View
           accessible={true}
+          focusable={false}
           isTVSelectable={true}
           nativeBackgroundAndroid={
             Object {
@@ -6371,6 +6560,7 @@ exports[`SendConfirmation renders correctly for send payment confirmation when f
               "type": "ThemeAttrAndroid",
             }
           }
+          onClick={[Function]}
           onResponderGrant={[Function]}
           onResponderMove={[Function]}
           onResponderRelease={[Function]}
@@ -6452,6 +6642,7 @@ exports[`SendConfirmation renders correctly for send payment confirmation when f
       >
         <View
           accessible={true}
+          focusable={true}
           isTVSelectable={true}
           nativeBackgroundAndroid={
             Object {
@@ -6459,6 +6650,7 @@ exports[`SendConfirmation renders correctly for send payment confirmation when f
               "type": "ThemeAttrAndroid",
             }
           }
+          onClick={[Function]}
           onResponderGrant={[Function]}
           onResponderMove={[Function]}
           onResponderRelease={[Function]}
