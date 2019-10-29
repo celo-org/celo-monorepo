@@ -14,7 +14,7 @@ exports[`renders exchange 1`] = `
     resizeMode="contain"
     source={
       Object {
-        "testUri": "../../../src/images/exchange.png",
+        "testUri": "../../../packages/mobile/src/images/exchange.png",
       }
     }
     style={
@@ -61,7 +61,7 @@ exports[`renders home 1`] = `
     resizeMode="contain"
     source={
       Object {
-        "testUri": "../../../src/images/shiny-dollar.png",
+        "testUri": "../../../packages/mobile/src/images/shiny-dollar.png",
       }
     }
     style={
@@ -93,6 +93,7 @@ exports[`renders home 1`] = `
   </Text>
   <View
     accessible={true}
+    focusable={true}
     hitSlop={
       Object {
         "bottom": 7,
@@ -108,6 +109,7 @@ exports[`renders home 1`] = `
         "type": "ThemeAttrAndroid",
       }
     }
+    onClick={[Function]}
     onResponderGrant={[Function]}
     onResponderMove={[Function]}
     onResponderRelease={[Function]}

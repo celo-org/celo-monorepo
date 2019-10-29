@@ -22,7 +22,7 @@ exports[`TransferConfirmationCard renders correctly for faucet drilldown 1`] = `
   <Image
     source={
       Object {
-        "testUri": "../../../src/images/coins-logo.png",
+        "testUri": "../../../packages/mobile/src/images/coins-logo.png",
       }
     }
     style={
@@ -163,7 +163,7 @@ exports[`TransferConfirmationCard renders correctly for received transaction dri
         <Image
           source={
             Object {
-              "testUri": "../../../src/images/unknown-user-icon.png",
+              "testUri": "../../../packages/mobile/src/images/unknown-user-icon.png",
             }
           }
           style={
@@ -361,7 +361,7 @@ exports[`TransferConfirmationCard renders correctly for sent transaction drilldo
         <Image
           source={
             Object {
-              "testUri": "../../../src/images/unknown-user-icon.png",
+              "testUri": "../../../packages/mobile/src/images/unknown-user-icon.png",
             }
           }
           style={
@@ -537,7 +537,7 @@ exports[`TransferConfirmationCard renders correctly for verification fee drilldo
   <Image
     source={
       Object {
-        "testUri": "../../../src/images/coins-logo.png",
+        "testUri": "../../../packages/mobile/src/images/coins-logo.png",
       }
     }
     style={

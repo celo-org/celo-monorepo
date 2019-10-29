@@ -1,18 +1,19 @@
-import { shallow } from 'enzyme'
 import * as React from 'react'
-import { View } from 'react-native'
+import { render } from 'react-native-testing-library'
 import ErrorBoundary from 'src/app/ErrorBoundary'
 
+const ErrorComponent = () => {
+  throw new Error('Snap!')
+}
+
 describe(ErrorBoundary, () => {
-  it('catchs the errors', () => {
-    const wrapper = shallow(
+  it('catches the errors', () => {
+    const wrapper = render(
       <ErrorBoundary>
-        <View />
+        <ErrorComponent />
       </ErrorBoundary>
-    ).dive()
-    const error = new Error('Snap!')
-    // @ts-ignore
-    wrapper.find(View).simulateError(error)
-    expect(wrapper.state()).toEqual({ childError: error })
+    )
+
+    expect(wrapper.getAllByText('oops')).toHaveLength(1)
   })
 })
