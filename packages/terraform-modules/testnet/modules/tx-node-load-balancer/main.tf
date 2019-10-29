@@ -190,17 +190,27 @@ resource "google_compute_instance" "external_ssl" {
     }
   }
 
-  metadata = {
-    user-data = templatefile(
-      format("%s/ssl-cloud-init.yaml.tmpl", path.module), {
-        cert_prefix : "${local.name_prefix}-forno-",
-        forno_host : var.forno_host,
-        gcloud_project : var.gcloud_project,
-        letsencrypt_email : "n@celo.org",
-        target_https_proxy_name : local.target_https_proxy_name
-      }
-    )
-  }
+  # metadata = {
+  #   user-data = templatefile(
+  #     format("%s/ssl-cloud-init.yaml.tmpl", path.module), {
+  #       cert_prefix : "${local.name_prefix}-forno-",
+  #       forno_host : var.forno_host,
+  #       gcloud_project : var.gcloud_project,
+  #       letsencrypt_email : "n@celo.org",
+  #       target_https_proxy_name : local.target_https_proxy_name
+  #     }
+  #   )
+  # }
+
+  metadata_startup_script = templatefile(
+    format("%s/ssl-startup.sh", path.module), {
+      cert_prefix : "${local.name_prefix}-forno-",
+      forno_host : var.forno_host,
+      gcloud_project : var.gcloud_project,
+      letsencrypt_email : "n@celo.org",
+      target_https_proxy_name : local.target_https_proxy_name
+    }
+  )
 
   service_account {
     email = var.gcloud_vm_service_account_email
