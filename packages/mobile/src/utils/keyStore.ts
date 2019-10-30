@@ -1,5 +1,5 @@
+import * as Sentry from '@sentry/react-native'
 import RNSecureKeyStore, { ACCESSIBLE } from 'react-native-secure-key-store'
-import { Sentry } from 'react-native-sentry'
 import Logger from 'src/utils/Logger'
 
 const TAG = 'utils/keystore'
