@@ -24,7 +24,7 @@ exports[`BackupIntroduction renders correctly when backup completed and social b
       <Image
         source={
           Object {
-            "testUri": "../../../src/images/backup-icon.png",
+            "testUri": "../../../packages/mobile/src/images/backup-icon.png",
           }
         }
         style={
@@ -137,6 +137,7 @@ exports[`BackupIntroduction renders correctly when backup completed and social b
     >
       <View
         accessible={true}
+        focusable={true}
         isTVSelectable={true}
         nativeBackgroundAndroid={
           Object {
@@ -144,6 +145,7 @@ exports[`BackupIntroduction renders correctly when backup completed and social b
             "type": "ThemeAttrAndroid",
           }
         }
+        onClick={[Function]}
         onResponderGrant={[Function]}
         onResponderMove={[Function]}
         onResponderRelease={[Function]}
@@ -220,6 +222,7 @@ exports[`BackupIntroduction renders correctly when backup completed and social b
     >
       <View
         accessible={true}
+        focusable={true}
         isTVSelectable={true}
         nativeBackgroundAndroid={
           Object {
@@ -227,6 +230,7 @@ exports[`BackupIntroduction renders correctly when backup completed and social b
             "type": "ThemeAttrAndroid",
           }
         }
+        onClick={[Function]}
         onResponderGrant={[Function]}
         onResponderMove={[Function]}
         onResponderRelease={[Function]}
@@ -312,7 +316,7 @@ exports[`BackupIntroduction renders correctly when backup completed and social b
       <Image
         source={
           Object {
-            "testUri": "../../../src/images/backup-icon.png",
+            "testUri": "../../../packages/mobile/src/images/backup-icon.png",
           }
         }
         style={
@@ -406,6 +410,7 @@ exports[`BackupIntroduction renders correctly when backup completed and social b
     >
       <View
         accessible={true}
+        focusable={true}
         isTVSelectable={true}
         nativeBackgroundAndroid={
           Object {
@@ -413,6 +418,7 @@ exports[`BackupIntroduction renders correctly when backup completed and social b
             "type": "ThemeAttrAndroid",
           }
         }
+        onClick={[Function]}
         onResponderGrant={[Function]}
         onResponderMove={[Function]}
         onResponderRelease={[Function]}
@@ -489,6 +495,7 @@ exports[`BackupIntroduction renders correctly when backup completed and social b
     >
       <View
         accessible={true}
+        focusable={true}
         isTVSelectable={true}
         nativeBackgroundAndroid={
           Object {
@@ -496,6 +503,7 @@ exports[`BackupIntroduction renders correctly when backup completed and social b
             "type": "ThemeAttrAndroid",
           }
         }
+        onClick={[Function]}
         onResponderGrant={[Function]}
         onResponderMove={[Function]}
         onResponderRelease={[Function]}
@@ -581,7 +589,7 @@ exports[`BackupIntroduction renders correctly when backup too late and delayed 1
       <Image
         source={
           Object {
-            "testUri": "../../../src/images/backup-icon.png",
+            "testUri": "../../../packages/mobile/src/images/backup-icon.png",
           }
         }
         style={
@@ -661,6 +669,7 @@ exports[`BackupIntroduction renders correctly when backup too late and delayed 1
     >
       <View
         accessible={true}
+        focusable={true}
         isTVSelectable={true}
         nativeBackgroundAndroid={
           Object {
@@ -668,6 +677,7 @@ exports[`BackupIntroduction renders correctly when backup too late and delayed 1
             "type": "ThemeAttrAndroid",
           }
         }
+        onClick={[Function]}
         onResponderGrant={[Function]}
         onResponderMove={[Function]}
         onResponderRelease={[Function]}
@@ -753,7 +763,7 @@ exports[`BackupIntroduction renders correctly when backup too late and no delay 
       <Image
         source={
           Object {
-            "testUri": "../../../src/images/backup-icon.png",
+            "testUri": "../../../packages/mobile/src/images/backup-icon.png",
           }
         }
         style={
@@ -833,6 +843,7 @@ exports[`BackupIntroduction renders correctly when backup too late and no delay 
     >
       <View
         accessible={true}
+        focusable={true}
         isTVSelectable={true}
         nativeBackgroundAndroid={
           Object {
@@ -840,6 +851,7 @@ exports[`BackupIntroduction renders correctly when backup too late and no delay 
             "type": "ThemeAttrAndroid",
           }
         }
+        onClick={[Function]}
         onResponderGrant={[Function]}
         onResponderMove={[Function]}
         onResponderRelease={[Function]}
@@ -925,7 +937,7 @@ exports[`BackupIntroduction renders correctly when neither backup nor social bac
       <Image
         source={
           Object {
-            "testUri": "../../../src/images/backup-icon.png",
+            "testUri": "../../../packages/mobile/src/images/backup-icon.png",
           }
         }
         style={
@@ -1005,6 +1017,7 @@ exports[`BackupIntroduction renders correctly when neither backup nor social bac
     >
       <View
         accessible={true}
+        focusable={true}
         isTVSelectable={true}
         nativeBackgroundAndroid={
           Object {
@@ -1012,6 +1025,7 @@ exports[`BackupIntroduction renders correctly when neither backup nor social bac
             "type": "ThemeAttrAndroid",
           }
         }
+        onClick={[Function]}
         onResponderGrant={[Function]}
         onResponderMove={[Function]}
         onResponderRelease={[Function]}

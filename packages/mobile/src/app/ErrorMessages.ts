@@ -13,6 +13,7 @@ export enum ErrorMessages {
   BACKUP_QUIZ_FAILED = 'backupKeyFlow6:backupQuizFailed',
   FAILED_FETCH_MNEMONIC = 'backupKeyFlow6:failedFetchMnemonic',
   INVALID_PHONE_NUMBER = 'nuxVerification2:invalidPhone',
+  MISSING_FULL_NAME = 'nuxVerification2:missingFullName',
   NOT_READY_FOR_CODE = 'nuxVerification2:notReadyForCode',
   EMPTY_ATTESTATION_CODE = 'nuxVerification2:emptyVerificationCode',
   INVALID_ATTESTATION_CODE = 'nuxVerification2:invalidVerificationCode',

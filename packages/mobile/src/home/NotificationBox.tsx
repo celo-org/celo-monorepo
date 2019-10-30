@@ -196,7 +196,7 @@ export class NotificationBox extends React.Component<Props, State> {
           return (
             <View
               key={i}
-              style={this.state.currentIndex === i ? activeDotStyle : passiveDotStyle}
+              style={this.state.currentIndex === i ? styles.circleActive : styles.circlePassive}
             />
           )
         })}
@@ -245,6 +245,12 @@ export class NotificationBox extends React.Component<Props, State> {
 const PROGRESS_CIRCLE_PASSIVE_SIZE = 6
 const PROGRESS_CIRCLE_ACTIVE_SIZE = 8
 
+const circle = {
+  flex: 0,
+  borderRadius: 8,
+  marginHorizontal: 5,
+}
+
 const styles = StyleSheet.create({
   body: {
     maxWidth: variables.width,
@@ -261,25 +267,20 @@ const styles = StyleSheet.create({
     paddingBottom: variables.contentPadding,
     alignItems: 'center',
   },
-  circle: {
-    flex: 0,
-    borderRadius: 8,
-    marginHorizontal: 5,
-  },
+  circle,
   circlePassive: {
+    ...circle,
     backgroundColor: colors.inactive,
     height: PROGRESS_CIRCLE_PASSIVE_SIZE,
     width: PROGRESS_CIRCLE_PASSIVE_SIZE,
   },
   circleActive: {
+    ...circle,
     backgroundColor: colors.celoGreen,
     height: PROGRESS_CIRCLE_ACTIVE_SIZE,
     width: PROGRESS_CIRCLE_ACTIVE_SIZE,
   },
 })
-
-const activeDotStyle = StyleSheet.flatten([styles.circle, styles.circleActive])
-const passiveDotStyle = StyleSheet.flatten([styles.circle, styles.circlePassive])
 
 export default componentWithAnalytics(
   connect<StateProps, DispatchProps, {}, RootState>(
