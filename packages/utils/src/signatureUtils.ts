@@ -28,7 +28,7 @@ export function serializeSignature(signature: Signature) {
   const serializedV = signature.v.toString(16)
   const serializedR = signature.r.slice(2)
   const serializedS = signature.s.slice(2)
-  return serializedV + serializedR + serializedS
+  return '0x' + serializedV + serializedR + serializedS
 }
 
 export function parseSignature(messageHash: string, signature: string, signer: string) {

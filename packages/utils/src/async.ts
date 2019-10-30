@@ -5,14 +5,14 @@ export function sleep(ms: number): Promise<void> {
   return new Promise<void>((resolve) => setTimeout(resolve, ms))
 }
 
-type InFunction = (...params: any) => Promise<any>
+type InFunction<T extends any[], U> = (...params: T) => Promise<U>
 
 // Retries an async function when it raises an exeption
 // if all the tries fail it raises the last thrown exeption
-export const retryAsync = async (
-  inFunction: InFunction,
+export const retryAsync = async <T extends any[], U>(
+  inFunction: InFunction<T, U>,
   tries: number,
-  params: any,
+  params: T,
   delay = 100
 ) => {
   let saveError
@@ -32,10 +32,10 @@ export const retryAsync = async (
 
 // Retries an async function when it raises an exeption
 // if all the tries fail it raises the last thrown exeption
-export const retryAsyncWithBackOff = async (
-  inFunction: InFunction,
+export const retryAsyncWithBackOff = async <T extends any[], U>(
+  inFunction: InFunction<T, U>,
   tries: number,
-  params: any,
+  params: T,
   delay = 100,
   factor = 1.5
 ) => {

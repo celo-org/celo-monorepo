@@ -1,6 +1,3 @@
-const { mockNavigationServiceFor } = require('test/utils')
-const { navigateBack } = mockNavigationServiceFor('Education')
-
 import * as React from 'react'
 import 'react-native'
 import { fireEvent, render } from 'react-native-testing-library'
@@ -8,6 +5,7 @@ import { Provider } from 'react-redux'
 import * as renderer from 'react-test-renderer'
 import Education from 'src/account/Education'
 import { CustomEventNames } from 'src/analytics/constants'
+import { navigateBack } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
 import { createMockStore } from 'test/utils'
 

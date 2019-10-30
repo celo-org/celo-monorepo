@@ -16,7 +16,7 @@ module.exports = deploymentForCoreContract<GoldTokenInstance>(
   CeloContractName.GoldToken,
   initializeArgs,
   async (goldToken: GoldTokenInstance) => {
-    console.log('Whitelisting GoldToken as a gas currency')
+    console.info('Whitelisting GoldToken as a gas currency')
     const gasCurrencyWhitelist: GasCurrencyWhitelistInstance = await getDeployedProxiedContract<
       GasCurrencyWhitelistInstance
     >('GasCurrencyWhitelist', artifacts)

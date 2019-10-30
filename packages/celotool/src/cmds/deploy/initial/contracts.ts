@@ -113,7 +113,12 @@ export const handler = async (argv: InitialArgv) => {
         validatorKeys,
       },
       stableToken: {
-        initialAccounts: getAddressesFor(AccountType.FAUCET, mnemonic, 2),
+        initialBalances: {
+          addresses: getAddressesFor(AccountType.FAUCET, mnemonic, 2),
+          values: getAddressesFor(AccountType.FAUCET, mnemonic, 2).map(
+            () => '60000000000000000000000'
+          ), // 60k Celo Dollars
+        },
       },
     })
 
