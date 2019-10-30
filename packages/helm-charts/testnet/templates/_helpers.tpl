@@ -198,18 +198,18 @@ spec:
           --mine \
           --rpc \
           --rpcaddr 0.0.0.0 \
-          --rpcapi=eth,net,web3,debug \
+          --rpcapi=eth,net,web3,debug,txpool \
           --rpccorsdomain='*' \
           --rpcvhosts=* \
           --ws \
           --wsaddr 0.0.0.0 \
           --wsorigins=* \
-          --wsapi=eth,net,web3,debug \
+          --wsapi=eth,net,web3,debug,txpool \
           --etherbase=${ACCOUNT_ADDRESS} \
           --networkid=${NETWORK_ID} \
           --miner.verificationpool=${VERIFICATION_POOL_URL} \
           --syncmode=full \
-          --ethstats=${HOSTNAME}:${ETHSTATS_SECRET}@${ETHSTATS_SVC} \
+          --ethstats=${ETHSTATS_SVC} \
           --consoleformat=json \
           --consoleoutput=stdout \
           --verbosity={{ .Values.geth.verbosity }} \
@@ -313,7 +313,7 @@ spec:
           --lightserv 90 \
           --lightpeers 250 \
           --networkid=${NETWORK_ID} \
-          --ethstats=${HOSTNAME}:${ETHSTATS_SECRET}@${ETHSTATS_SVC} \
+          --ethstats=${ETHSTATS_SVC} \
           --consoleformat=json \
           --consoleoutput=stdout \
           --verbosity={{ .Values.geth.verbosity }} \
@@ -321,13 +321,13 @@ spec:
           --targetgaslimit=${TARGET_GAS_LIMIT} \
           --rpc \
           --rpcaddr 0.0.0.0 \
-          --rpcapi=eth,net,web3,debug \
+          --rpcapi=eth,net,web3,debug,txpool \
           --rpccorsdomain='*' \
           --rpcvhosts=* \
           --ws \
           --wsaddr 0.0.0.0 \
           --wsorigins=* \
-          --wsapi=eth,net,web3,debug \
+          --wsapi=eth,net,web3,debug,txpool \
           --nodekey=/root/.celo/account/{{ .node_name }}NodeKey"
         ports:
         - name: discovery-udp
