@@ -216,7 +216,7 @@ Relevant code references:
 
 There are two major differencs in ZeroSync mode:
 
-1.  Geth won't run at all. The web3 would instead connect to <testnet>-infura.celo-testnet.org using an https provider, for example, [https://integration-infura.celo-testnet.org](https://integration-infura.celo-testnet.org).
+1.  Geth won't run at all. The web3 would instead connect to <testnet>-forno.celo-testnet.org using an https provider, for example, [https://integration-forno.celo-testnet.org](https://integration-forno.celo-testnet.org).
 2.  Changes to [sendTransactionAsyncWithWeb3Signing](https://github.com/celo-org/celo-monorepo/blob/8689634a1d10d74ba6d4f3b36b2484db60a95bdb/packages/walletkit/src/contract-utils.ts#L362) in walletkit to poll after sending a transaction for the transaction to succeed. This is needed because http provider, unliked web sockets and IPC provider, does not support subscriptions.
 
 #### Why http(s) provider?
