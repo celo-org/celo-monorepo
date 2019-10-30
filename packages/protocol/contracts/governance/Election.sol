@@ -88,7 +88,6 @@ contract Election is
   uint256 public maxNumGroupsVotedFor;
   // Groups must receive at least this fraction of the total votes in order to be considered in
   // elections.
-  // TODO(asa): Implement this constraint.
   FixidityLib.Fraction public electabilityThreshold;
 
   event ElectableValidatorsSet(

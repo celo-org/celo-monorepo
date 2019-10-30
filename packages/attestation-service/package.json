@@ -43,7 +43,6 @@
     "yargs": "13.3.0"
   },
   "devDependencies": {
-    "@celo/ganache-cli": "git+https://github.com/celo-org/ganache-cli.git#98ad2ba",
     "@celo/protocol": "1.0.0",
     "@types/dotenv": "4.0.3",
     "@types/debug": "^4.1.5",

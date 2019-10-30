@@ -577,6 +577,7 @@ contract Validators is
    * @param greater The address of the group that has received more votes than this group.
    * @return True upon success.
    * @dev Fails if `validator` has not set their affiliation to this account.
+   * @dev Fails if the group has > 0 members.
    */
   function _addMember(
     address group,

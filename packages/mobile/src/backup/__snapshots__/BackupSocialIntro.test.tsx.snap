@@ -24,7 +24,7 @@ exports[`BackupSocialIntro renders correctly 1`] = `
       <Image
         source={
           Object {
-            "testUri": "../../../src/images/backup-icon.png",
+            "testUri": "../../../packages/mobile/src/images/backup-icon.png",
           }
         }
         style={
@@ -103,6 +103,7 @@ exports[`BackupSocialIntro renders correctly 1`] = `
   >
     <View
       accessible={true}
+      focusable={true}
       isTVSelectable={true}
       nativeBackgroundAndroid={
         Object {
@@ -110,6 +111,7 @@ exports[`BackupSocialIntro renders correctly 1`] = `
           "type": "ThemeAttrAndroid",
         }
       }
+      onClick={[Function]}
       onResponderGrant={[Function]}
       onResponderMove={[Function]}
       onResponderRelease={[Function]}

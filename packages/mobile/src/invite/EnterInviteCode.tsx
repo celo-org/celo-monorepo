@@ -4,6 +4,7 @@ import InviteCodeIcon from '@celo/react-components/icons/InviteCodeIcon'
 import colors from '@celo/react-components/styles/colors'
 import fontStyles from '@celo/react-components/styles/fonts'
 import { componentStyles } from '@celo/react-components/styles/styles'
+import * as _ from 'lodash'
 import * as React from 'react'
 import { WithNamespaces, withNamespaces } from 'react-i18next'
 import {
@@ -24,7 +25,7 @@ import { hideAlert, showError } from 'src/alert/actions'
 import { componentWithAnalytics } from 'src/analytics/wrapper'
 import { ErrorMessages } from 'src/app/ErrorMessages'
 import DevSkipButton from 'src/components/DevSkipButton'
-import { CELO_FAUCET_LINK } from 'src/config'
+import { CELO_FAUCET_LINK, DEFAULT_TESTNET } from 'src/config'
 import { Namespaces } from 'src/i18n'
 import { redeemInvite } from 'src/invite/actions'
 import { extractValidInviteCode, getInviteCodeFromReferrerData } from 'src/invite/utils'
@@ -212,7 +213,7 @@ export class EnterInviteCode extends React.Component<Props, State> {
 
         <View>
           <Text style={[styles.body, styles.askInviteContainer]}>
-            {t('inviteCodeText.askForInvite.0')}
+            {t('inviteCodeText.askForInvite.0', { testnet: _.startCase(DEFAULT_TESTNET) })}
             <Text onPress={this.onPressGoToFaucet} style={styles.askInvite}>
               {t('inviteCodeText.askForInvite.1')}
             </Text>

@@ -17,16 +17,13 @@ import { navigate } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
 import NotAuthorizedView from 'src/qrcode/NotAuthorizedView'
 import { handleBarcodeDetected } from 'src/send/actions'
+import Logger from 'src/utils/Logger'
 
 interface DispatchProps {
   handleBarcodeDetected: typeof handleBarcodeDetected
 }
 
 type Props = DispatchProps & WithNamespaces & NavigationFocusInjectedProps
-
-const goToQrCodeScreen = () => {
-  navigate(Screens.QRCode)
-}
 
 class QRScanner extends React.Component<Props> {
   static navigationOptions = () => ({
@@ -36,16 +33,13 @@ class QRScanner extends React.Component<Props> {
 
   camera: RNCamera | null = null
 
-  state = {
-    qrSubmitted: false,
+  onBardCodeDetected = (rawData: any) => {
+    Logger.debug('QRScanner', 'Bar code detected')
+    this.props.handleBarcodeDetected(rawData)
   }
 
-  onBardCodeDetected = (rawData: any) => {
-    if (!this.state.qrSubmitted) {
-      this.setState({ qrSubmitted: true }, () => {
-        this.props.handleBarcodeDetected(rawData)
-      })
-    }
+  onPressShowYourCode = () => {
+    navigate(Screens.QRCode)
   }
 
   render() {
@@ -58,7 +52,6 @@ class QRScanner extends React.Component<Props> {
               ref={(ref) => {
                 this.camera = ref
               }}
-              // @ts-ignore
               style={styles.preview}
               type={RNCamera.Constants.Type.back}
               onBarCodeRead={this.onBardCodeDetected}
@@ -90,7 +83,7 @@ class QRScanner extends React.Component<Props> {
         </View>
         <View style={styles.footerContainer}>
           <Button
-            onPress={goToQrCodeScreen}
+            onPress={this.onPressShowYourCode}
             text={t('showYourQRCode')}
             standard={false}
             type={BtnTypes.SECONDARY}
