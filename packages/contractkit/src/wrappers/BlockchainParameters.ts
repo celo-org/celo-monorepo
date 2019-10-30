@@ -8,14 +8,8 @@ export class BlockchainParametersWrapper extends BaseWrapper<BlockchainParameter
   /**
    * Setting the extra intrinsic gas for transactions, where gas is paid using non-gold currency.
    */
-  // setGasForNonGoldCurrencies = proxySend(this.kit, this.contract.methods.setGasForNonGoldCurrencies)
-  setGasForCreditToTransactions = proxySend(
+  setIntrinsicGasForAlternativeGasCurrency = proxySend(
     this.kit,
-    this.contract.methods.setGasForCreditToTransactions
+    this.contract.methods.setIntrinsicGasForAlternativeGasCurrency
   )
-  setGasForDebitFromTransactions = proxySend(
-    this.kit,
-    this.contract.methods.setGasForDebitFromTransactions
-  )
-  setGasToReadErc20Balance = proxySend(this.kit, this.contract.methods.setGasToReadErc20Balance)
 }

@@ -79,10 +79,6 @@ const DefaultConfig = {
       minor: 8,
       patch: 23,
     },
-    gasForDebitFromTransactions: 23000,
-    gasForCreditToTransactions: 32000,
-    gasToReadErc20Balance: 15000,
-    gasToReadTobinTax: 50000,
     gasForNonGoldCurrencies: 134000,
   },
 }

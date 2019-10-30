@@ -9,10 +9,6 @@ const initializeArgs = async (_: string): Promise<any[]> => {
     version.major,
     version.minor,
     version.patch,
-    config.blockchainParameters.gasForDebitFromTransactions,
-    config.blockchainParameters.gasForCreditToTransactions,
-    config.blockchainParameters.gasToReadErc20Balance,
-    config.blockchainParameters.gasToReadTobinTax,
     config.blockchainParameters.gasForNonGoldCurrencies,
   ]
 }

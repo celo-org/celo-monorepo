@@ -1,4 +1,4 @@
-import { assertContainSubset, assertRevert } from '@celo/protocol/lib/test-utils'
+import { assertContainSubset, assertRevert, assertEqualBN } from '@celo/protocol/lib/test-utils'
 import { BlockchainParametersContract, BlockchainParametersInstance } from 'types'
 import { BigNumber } from 'bignumber.js'
 
@@ -15,10 +15,6 @@ contract('BlockchainParameters', (accounts: string[]) => {
     minor: 8,
     patch: 2,
   }
-  const gasForDebitFromTransactions = 10000
-  const gasForCreditToTransactions = 20000
-  const gasToReadErc20Balance = 30000
-  const gasToReadTobinTax = 40000
   const gasForNonGoldCurrencies = 50000
 
   beforeEach(async () => {
@@ -63,16 +59,42 @@ contract('BlockchainParameters', (accounts: string[]) => {
     })
   })
 
+  describe('#setIntrinsicGasForAlternativeGasCurrency()', () => {
+    it('should set the variable', async () => {
+      await blockchainParameters.setIntrinsicGasForAlternativeGasCurrency(gasForNonGoldCurrencies)
+      assertEqualBN(
+        gasForNonGoldCurrencies,
+        await blockchainParameters.intrinsicGasForAlternativeGasCurrency()
+      )
+    })
+    it('should emit the corresponding event', async () => {
+      const resp = await blockchainParameters.setIntrinsicGasForAlternativeGasCurrency(
+        gasForNonGoldCurrencies
+      )
+      assert.equal(resp.logs.length, 1)
+      const log = resp.logs[0]
+      assertContainSubset(log, {
+        event: 'IntrinsicGasForAlternativeGasCurrencySet',
+        args: {
+          gas: new BigNumber(gasForNonGoldCurrencies),
+        },
+      })
+    })
+    it('only owner should be able to set', async () => {
+      await assertRevert(
+        blockchainParameters.setIntrinsicGasForAlternativeGasCurrency(gasForNonGoldCurrencies, {
+          from: accounts[1],
+        })
+      )
+    })
+  })
+
   describe('#initialize()', () => {
     it('should set the variables', async () => {
       await blockchainParameters.initialize(
         version.major,
         version.minor,
         version.patch,
-        gasForDebitFromTransactions,
-        gasForCreditToTransactions,
-        gasToReadErc20Balance,
-        gasToReadTobinTax,
         gasForNonGoldCurrencies
       )
       const versionQueried = await blockchainParameters.getMinimumClientVersion()
@@ -85,13 +107,9 @@ contract('BlockchainParameters', (accounts: string[]) => {
         version.major,
         version.minor,
         version.patch,
-        gasForDebitFromTransactions,
-        gasForCreditToTransactions,
-        gasToReadErc20Balance,
-        gasToReadTobinTax,
         gasForNonGoldCurrencies
       )
-      assert.equal(resp.logs.length, 7)
+      assert.equal(resp.logs.length, 3)
       assertContainSubset(resp.logs[1], {
         event: 'MinimumClientVersionSet',
         args: {
