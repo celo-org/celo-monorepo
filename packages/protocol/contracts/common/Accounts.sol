@@ -14,14 +14,14 @@ contract Accounts is IAccounts, ReentrancyGuard, Initializable, UsingRegistry {
   using SafeMath for uint256;
 
   struct Signers {
-    // The address that is authorized to sign a vote on behalf of the account.
-    // The account can vote as well, whether or not an vote signing key has been specified.
+    //The address that is authorized to vote in governance and validator elections on behalf of the
+    // account. The account can vote as well, whether or not an vote signing key has been specified.
     address voting;
 
-    // The address that is authorized to sign consensus messages on behalf of the account.
-    // The account can manage the validator, whether or not an validation signing key has been
-    // specified. However if an validation signing key has been specified, only that key may
-    // actually participate in consensus.
+    // The address that is authorized to manage a validator or validator group and sign consensus
+    // messages on behalf of the account. The account can manage the validator, whether or not an
+    // validation signing key has been specified. However if an validation signing key has been
+    // specified, only that key may actually participate in consensus.
     address validating;
 
     // The address of the key with which this account wants to sign attestations on the Attestations
@@ -40,7 +40,7 @@ contract Accounts is IAccounts, ReentrancyGuard, Initializable, UsingRegistry {
     // account indicates that an address exchange should be initiated with the dataEncryptionKey
     address walletAddress;
 
-    // The name the account wishes to be addressed as
+    // An optional human readable identifier for the account
     string name;
 
     // The ECDSA public key used to encrypt and decrypt data for this account
@@ -200,7 +200,7 @@ contract Accounts is IAccounts, ReentrancyGuard, Initializable, UsingRegistry {
    * @dev Fails if the `accountOrVoteSigner` is not an account or previously authorized vote signer.
    * @return The associated account.
    */
-  function getAccountFromVoteSigner(address accountOrVoteSigner) external view returns (address) {
+  function voteSignerToAccount(address accountOrVoteSigner) external view returns (address) {
     address authorizingAccount = authorizedBy[accountOrVoteSigner];
     if (authorizingAccount != address(0)) {
       return authorizingAccount;
@@ -318,7 +318,7 @@ contract Accounts is IAccounts, ReentrancyGuard, Initializable, UsingRegistry {
    *      attestation signing key.
    * @return The associated account.
    */
-  function getAccountFromAttestationSigner(address accountOrAttestationSigner)
+  function attestationSignerToAccount(address accountOrAttestationSigner)
     public
     view
     returns (address)
@@ -360,7 +360,7 @@ contract Accounts is IAccounts, ReentrancyGuard, Initializable, UsingRegistry {
           validator.
    * @return The associated account.
    */
-  function getAccountFromValidationSigner(address accountOrValidationSigner)
+  function validationSignerToAccount(address accountOrValidationSigner)
     public
     view
     returns (address)
@@ -379,7 +379,7 @@ contract Accounts is IAccounts, ReentrancyGuard, Initializable, UsingRegistry {
    * @param account The address of the account.
    * @return The address with which the account can sign votes.
    */
-  function getVoteSignerFromAccount(address account) public view returns (address) {
+  function getVoteSigner(address account) public view returns (address) {
     require(isAccount(account));
     address voter = accounts[account].signers.voting;
     return voter == address(0) ? account : voter;
@@ -390,7 +390,7 @@ contract Accounts is IAccounts, ReentrancyGuard, Initializable, UsingRegistry {
    * @param account The address of the account.
    * @return The address with which the account can register a validator or group.
    */
-  function getValidationSignerFromAccount(address account) public view returns (address) {
+  function getValidationSigner(address account) public view returns (address) {
     require(isAccount(account));
     address validator = accounts[account].signers.validating;
     return validator == address(0) ? account : validator;
@@ -401,7 +401,7 @@ contract Accounts is IAccounts, ReentrancyGuard, Initializable, UsingRegistry {
    * @param account The address of the account.
    * @return The address with which the account can sign attestations.
    */
-  function getAttestationSignerFromAccount(address account) public view returns (address) {
+  function getAttestationSigner(address account) public view returns (address) {
     require(isAccount(account));
     address attestor = accounts[account].signers.attesting;
     return attestor == address(0) ? account : attestor;

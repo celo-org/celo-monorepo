@@ -1,4 +1,3 @@
-import { eqAddress } from '@celo/utils/lib/address'
 import { zip } from '@celo/utils/lib/collections'
 import BigNumber from 'bignumber.js'
 import { Address } from '../base'
@@ -25,10 +24,6 @@ interface AccountSummary {
   lockedGold: {
     total: BigNumber
     nonvoting: BigNumber
-  }
-  authorizations: {
-    voter: null | string
-    validator: null | string
   }
   pendingWithdrawals: PendingWithdrawal[]
 }
@@ -108,20 +103,13 @@ export class LockedGoldWrapper extends BaseWrapper<LockedGold> {
   }
 
   async getAccountSummary(account: string): Promise<AccountSummary> {
-    const accounts = await this.kit.contracts.getAccounts()
     const nonvoting = await this.getAccountNonvotingLockedGold(account)
     const total = await this.getAccountTotalLockedGold(account)
-    const voter = await accounts.getVoteSignerFromAccount(account)
-    const validator = await accounts.getValidationSignerFromAccount(account)
     const pendingWithdrawals = await this.getPendingWithdrawals(account)
     return {
       lockedGold: {
         total,
         nonvoting,
-      },
-      authorizations: {
-        voter: eqAddress(voter, account) ? null : voter,
-        validator: eqAddress(validator, account) ? null : validator,
       },
       pendingWithdrawals,
     }

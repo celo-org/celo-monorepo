@@ -443,7 +443,7 @@ contract Validators is
    * @return True upon success.
    */
   function _updateValidatorScore(address validator, uint256 uptime) internal {
-    address account = getAccounts().getAccountFromValidationSigner(validator);
+    address account = getAccounts().validationSignerToAccount(validator);
     require(isValidator(account), "isvalidator");
     require(uptime <= FixidityLib.fixed1().unwrap(), "uptime");
 
@@ -488,7 +488,7 @@ contract Validators is
    * @notice Distributes epoch payments to `validator` and its group.
    */
   function _distributeEpochPayment(address validator) internal {
-    address account = getAccounts().getAccountFromValidationSigner(validator);
+    address account = getAccounts().validationSignerToAccount(validator);
     require(isValidator(account));
     // The group that should be paid is the group that the validator was a member of at the
     // time it was elected.
@@ -814,7 +814,7 @@ contract Validators is
     address[] memory topAccounts = groups[account].members.headN(n);
     address[] memory topValidators = new address[](n);
     for (uint256 i = 0; i < n; i = i.add(1)) {
-      topValidators[i] = getAccounts().getValidationSignerFromAccount(topAccounts[i]);
+      topValidators[i] = getAccounts().getValidationSigner(topAccounts[i]);
     }
     return topValidators;
   }

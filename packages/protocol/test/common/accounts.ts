@@ -42,22 +42,22 @@ contract('Accounts', (accounts: string[]) => {
     authorizationTests.voting = {
       fn: accountsInstance.authorizeVoteSigner,
       eventName: 'VoteSignerAuthorized',
-      getAuthorizedFromAccount: accountsInstance.getVoteSignerFromAccount,
-      getAccountFromAuthorized: accountsInstance.getAccountFromVoteSigner,
+      getAuthorizedFromAccount: accountsInstance.getVoteSigner,
+      getAccountFromAuthorized: accountsInstance.voteSignerToAccount,
       getAccountFromActiveAuthorized: accountsInstance.getAccountFromActiveVoteSigner,
     }
     authorizationTests.validating = {
       fn: accountsInstance.authorizeValidationSigner,
       eventName: 'ValidationSignerAuthorized',
-      getAuthorizedFromAccount: accountsInstance.getValidationSignerFromAccount,
-      getAccountFromAuthorized: accountsInstance.getAccountFromValidationSigner,
+      getAuthorizedFromAccount: accountsInstance.getValidationSigner,
+      getAccountFromAuthorized: accountsInstance.validationSignerToAccount,
       getAccountFromActiveAuthorized: accountsInstance.getAccountFromActiveValidationSigner,
     }
     authorizationTests.attesting = {
       fn: accountsInstance.authorizeAttestationSigner,
       eventName: 'AttestationSignerAuthorized',
-      getAuthorizedFromAccount: accountsInstance.getAttestationSignerFromAccount,
-      getAccountFromAuthorized: accountsInstance.getAccountFromAttestationSigner,
+      getAuthorizedFromAccount: accountsInstance.getAttestationSigner,
+      getAccountFromAuthorized: accountsInstance.attestationSignerToAccount,
       getAccountFromActiveAuthorized: accountsInstance.getAccountFromActiveAttestationSigner,
     }
   })

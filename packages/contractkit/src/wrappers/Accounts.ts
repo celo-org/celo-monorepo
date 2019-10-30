@@ -28,24 +28,24 @@ export class AccountsWrapper extends BaseWrapper<Accounts> {
    * @param account The address of the account.
    * @return The address with which the account can vote.
    */
-  getAttestationSignerFromAccount: (account: string) => Promise<Address> = proxyCall(
-    this.contract.methods.getAttestationSignerFromAccount
+  getAttestationSigner: (account: string) => Promise<Address> = proxyCall(
+    this.contract.methods.getAttestationSigner
   )
   /**
    * Returns the vote signer for the specified account.
    * @param account The address of the account.
    * @return The address with which the account can vote.
    */
-  getVoteSignerFromAccount: (account: string) => Promise<Address> = proxyCall(
-    this.contract.methods.getVoteSignerFromAccount
+  getVoteSigner: (account: string) => Promise<Address> = proxyCall(
+    this.contract.methods.getVoteSigner
   )
   /**
    * Returns the validation signere for the specified account.
    * @param account The address of the account.
    * @return The address with which the account can register a validator or group.
    */
-  getValidationSignerFromAccount: (account: string) => Promise<Address> = proxyCall(
-    this.contract.methods.getValidationSignerFromAccount
+  getValidationSigner: (account: string) => Promise<Address> = proxyCall(
+    this.contract.methods.getValidationSigner
   )
 
   /**
