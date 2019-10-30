@@ -54,8 +54,10 @@ export const vNeg1Schema = {
     },
     latestBlockNumber: 0,
     account: '0x0000000000000000000000000000000000007E57',
+    accountInWeb3Keystore: '0x0000000000000000000000000000000000007E57',
     commentKey: '0x0000000000000000000000000000000000008F68',
     gasPriceLastUpdated: 0,
+    zeroSyncMode: false,
   },
   identity: {
     attestationCodes: [],
@@ -80,6 +82,7 @@ export const vNeg1Schema = {
     paymentRequests: [],
     showFakeData: false,
     backupCompleted: false,
+    socialBackupCompleted: false,
     backupDelayedTime: 0,
     dismissedEarnRewards: false,
     dismissedInviteFriends: false,
@@ -163,7 +166,6 @@ export const v3Schema = {
   },
   imports: {
     isImportingWallet: false,
-    isWalletEmpty: false,
   },
 }
 

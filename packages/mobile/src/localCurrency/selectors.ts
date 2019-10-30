@@ -1,5 +1,9 @@
 import * as RNLocalize from 'react-native-localize'
-import { LOCAL_CURRENCY_CODES, LocalCurrencyCode } from 'src/localCurrency/consts'
+import {
+  LOCAL_CURRENCY_CODES,
+  LocalCurrencyCode,
+  LocalCurrencySymbol,
+} from 'src/localCurrency/consts'
 import { RootState } from 'src/redux/reducers'
 
 const MIN_UPDATE_INTERVAL = 12 * 3600 * 1000 // 12 hours
@@ -29,6 +33,12 @@ export function getLocalCurrencyCode(state: RootState): LocalCurrencyCode | null
   }
 
   return currencyCode
+}
+
+export function getLocalCurrencySymbol(state: RootState): LocalCurrencySymbol | null {
+  const currencyCode = state.localCurrency.preferredCurrencyCode || DEVICE_BEST_CURRENCY_CODE
+
+  return currencyCode ? LocalCurrencySymbol[currencyCode] : null
 }
 
 export function getLocalCurrencyExchangeRate(state: RootState) {

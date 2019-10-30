@@ -12,6 +12,7 @@ import {
   getEnode,
   GethInstanceConfig,
   getHooks,
+  GethTestConfig,
   initAndStartGeth,
   killInstance,
   sleep,
@@ -170,9 +171,8 @@ describe('Transfer tests', function(this: any) {
   const FeeRecipientAddress = '0x4f5f8a3f45d179553e7b95119ce296010f50f6f1'
 
   const syncModes = ['full', 'fast', 'light', 'ultralight']
-  const gethConfig = {
+  const gethConfig: GethTestConfig = {
     migrateTo: 8,
-    migrateGovernance: false,
     instances: [
       { name: 'validator', validating: true, syncmode: 'full', port: 30303, rpcport: 8545 },
     ],
