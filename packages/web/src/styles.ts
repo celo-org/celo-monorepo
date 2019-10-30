@@ -2,6 +2,7 @@ import { StyleSheet } from 'react-native'
 
 export enum colors {
   white = '#FFFFFF',
+  offWhite = 'rgba(221,221,221,1.00)',
   light = '#E5E5E5',
   gray = '#DDDDDD',
   screenGray = '#545C64',
@@ -185,6 +186,9 @@ export const textStyles = StyleSheet.create({
   },
   invert: {
     color: colors.white,
+  },
+  readingOnDark: {
+    color: colors.offWhite,
   },
   caption: {
     paddingTop: 5,

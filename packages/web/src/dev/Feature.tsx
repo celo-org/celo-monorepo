@@ -21,7 +21,7 @@ const FeatureComponent = React.memo(function Feature({ title, graphic, text }: P
         )}
       </FadeIn>
       <Text style={[fonts.h5, textStyles.invert, textStyles.center, styles.title]}>{title}</Text>
-      <Text style={[fonts.mini, textStyles.center, textStyles.invert]}>{text}</Text>
+      <Text style={[fonts.mini, textStyles.center, textStyles.readingOnDark]}>{text}</Text>
     </View>
   )
 })
