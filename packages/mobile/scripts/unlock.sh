@@ -19,7 +19,11 @@ adb wait-for-device shell \
   'while [[ -z $(getprop sys.boot_completed) ]]; do sleep 1; done;'
 
 
+<<<<<<< HEAD
 echo "locksettings set-pin $SECRET_PIN" | adb shell
+=======
+echo "locksettings set-pin 123456" | adb shell || true
+>>>>>>> master
 
 sleep 1
 echo "Device is done booting"
