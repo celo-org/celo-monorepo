@@ -18,13 +18,11 @@ while getopts 'n:b:c:' flag; do
     *) error "Unexpected option ${flag}" ;;
   esac
 done
+echo "NETWORK: $NETWORK"
+echo "BLOCKSCOUT_URL: $BLOCKSCOUT_URL"
+echo "CONTRACT: $CONTRACT"
 [ -z "$NETWORK" ] && echo "Need to set the NETWORK via the -n flag" && exit 1;
 [ -z "$BLOCKSCOUT_URL" ] && echo "Need to set the BLOCKSCOUT_URL via the -b flag" && exit 1;
-
-if ! nc -z 127.0.0.1 8545 ; then
-  echo "Port 8545 not open"
-  exit 1
-fi
 
 if ! curl -sSf "$BLOCKSCOUT_URL" >/dev/null; then
   echo "Blockscout server $BLOCKSCOUT_URL is not accessible"
@@ -33,7 +31,7 @@ fi
 
 echo "Validating contracts in Blockscout $BLOCKSCOUT_URL"
 if [ -z "$CONTRACT" ]; then
-  yarn run truffle verify-blockscout all --network "$NETWORK"
+  yarn run truffle run verify-blockscout all --network "$NETWORK" --blockscout-url "$BLOCKSCOUT_URL"
 else
-  yarn run truffle verify-blockscout "$CONTRACT" --network "$NETWORK"
+  yarn run truffle run verify-blockscout "$CONTRACT" --network "$NETWORK" --blockscout-url "$BLOCKSCOUT_URL"
 fi

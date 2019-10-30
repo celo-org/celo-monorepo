@@ -68,7 +68,7 @@
     "truffle-artifactor": "^3.0.7",
     "truffle-resolver": "^4.0.4",
     "truffle-security": "^1.4.4",
-    "truffle-plugin-blockscout-verify": "git+https://github.com/celo-org/truffle-plugin-blockscout-verify.git",
+    "truffle-plugin-blockscout-verify": "git+https://github.com/jcortejoso/truffle-plugin-blockscout-verify#b561245",
     "twilio": "^3.23.2",
     "typechain": "git+https://github.com/celo-org/TypeChain.git#832e628",
     "weak-map": "^1.0.5",

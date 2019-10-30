@@ -1,13 +1,11 @@
 import * as yargs from 'yargs'
-import { CeloEnvArgv } from 'src/lib/env-utils'
+import { InitialArgv } from '../../deploy/initial'
 import { portForwardAnd } from 'src/lib/port_forward'
 import { switchToClusterFromEnv } from 'src/lib/cluster'
 import { getBlockscoutUrl } from 'src/lib/endpoints'
 import { execCmd } from 'src/lib/utils'
 
-interface ValidateArgv extends CeloEnvArgv {}
-
-export const command = 'contracts'
+export const command = 'verify-contracts'
 
 export const describe = 'verify the celo smart contracts in blockscout'
 
@@ -18,8 +16,9 @@ export const builder = (argv: yargs.Argv) => {
     default: false,
   })
 }
+type VerifyContractsInitialArgv = InitialArgv & { skipClusterSetup: boolean }
 
-export const handler = async (argv: ValidateArgv) => {
+export const handler = async (argv: VerifyContractsInitialArgv) => {
   await switchToClusterFromEnv()
   // Check if blockscout is deployed and online?
   const blockscoutUrl = getBlockscoutUrl(argv)
@@ -27,11 +26,7 @@ export const handler = async (argv: ValidateArgv) => {
   console.log(`Validating smart contracts from ${argv.celoEnv} in ${blockscoutUrl}`)
 
   const cb = async () => {
-    await execCmd(
-      `yarn --cwd ../protocol run verify all --network ${
-        argv.celoEnv
-      } --blockscout-url ${blockscoutUrl}`
-    )
+    await execCmd(`yarn --cwd ../protocol run verify -n ${argv.celoEnv} -b ${blockscoutUrl}`)
   }
 
   try {
