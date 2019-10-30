@@ -158,7 +158,7 @@ contract Accounts is IAccounts, ReentrancyGuard, Initializable, UsingRegistry {
           attestation signer.
    * @return The associated account.
    */
-  function getAccountFromActiveAttestationSigner(address accountOrAttestationSigner)
+  function activeAttesttationSignerToAccount(address accountOrAttestationSigner)
     external
     view
     returns (address)
@@ -179,7 +179,7 @@ contract Accounts is IAccounts, ReentrancyGuard, Initializable, UsingRegistry {
    * @dev Fails if the `accountOrVoteSigner` is not an account or active authorized vote signer.
    * @return The associated account.
    */
-  function getAccountFromActiveVoteSigner(address accountOrVoteSigner)
+  function activeVoteSignerToAccount(address accountOrVoteSigner)
     external
     view
     returns (address)
@@ -338,7 +338,7 @@ contract Accounts is IAccounts, ReentrancyGuard, Initializable, UsingRegistry {
    * @dev Fails if the `accountOrValidationSigner` is not an account or active authorized validator.
    * @return The associated account.
    */
-  function getAccountFromActiveValidationSigner(address accountOrValidationSigner)
+  function activeValidationSignerToAccount(address accountOrValidationSigner)
     public
     view
     returns (address)

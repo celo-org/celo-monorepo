@@ -354,7 +354,7 @@ contract Validators is
     // Use the proof of possession bytes
     require(checkProofOfPossession(publicKeysData.slice(64, 48 + 96)));
 
-    address account = getAccounts().getAccountFromActiveValidationSigner(msg.sender);
+    address account = getAccounts().activeValidationSignerToAccount(msg.sender);
     require(!isValidator(account) && !isValidatorGroup(account));
     require(meetsValidatorBalanceRequirements(account));
 
@@ -517,7 +517,7 @@ contract Validators is
    * @dev Fails if the account is not a validator.
    */
   function deregisterValidator(uint256 index) external nonReentrant returns (bool) {
-    address account = getAccounts().getAccountFromActiveValidationSigner(msg.sender);
+    address account = getAccounts().activeValidationSignerToAccount(msg.sender);
     require(isValidator(account));
     Validator storage validator = validators[account];
     if (validator.affiliation != address(0)) {
@@ -537,7 +537,7 @@ contract Validators is
    * @dev De-affiliates with the previously affiliated group if present.
    */
   function affiliate(address group) external nonReentrant returns (bool) {
-    address account = getAccounts().getAccountFromActiveValidationSigner(msg.sender);
+    address account = getAccounts().activeValidationSignerToAccount(msg.sender);
     require(isValidator(account) && isValidatorGroup(group));
     Validator storage validator = validators[account];
     if (validator.affiliation != address(0)) {
@@ -554,7 +554,7 @@ contract Validators is
    * @dev Fails if the account is not a validator with non-zero affiliation.
    */
   function deaffiliate() external nonReentrant returns (bool) {
-    address account = getAccounts().getAccountFromActiveValidationSigner(msg.sender);
+    address account = getAccounts().activeValidationSignerToAccount(msg.sender);
     require(isValidator(account));
     Validator storage validator = validators[account];
     require(validator.affiliation != address(0));
@@ -578,7 +578,7 @@ contract Validators is
     returns (bool)
   {
     require(commission <= FixidityLib.fixed1().unwrap(), "Commission can't be greater than 100%");
-    address account = getAccounts().getAccountFromActiveValidationSigner(msg.sender);
+    address account = getAccounts().activeValidationSignerToAccount(msg.sender);
     require(!isValidator(account) && !isValidatorGroup(account));
     require(meetsValidatorGroupBalanceRequirements(account));
 
@@ -597,7 +597,7 @@ contract Validators is
    * @dev Fails if the account is not a validator group with no members.
    */
   function deregisterValidatorGroup(uint256 index) external nonReentrant returns (bool) {
-    address account = getAccounts().getAccountFromActiveValidationSigner(msg.sender);
+    address account = getAccounts().activeValidationSignerToAccount(msg.sender);
     // Only empty Validator Groups can be deregistered.
     require(isValidatorGroup(account) && groups[account].members.numElements == 0);
     delete groups[account];
@@ -615,7 +615,7 @@ contract Validators is
    * @dev Fails if the group has zero members.
    */
   function addMember(address validator) external nonReentrant returns (bool) {
-    address account = getAccounts().getAccountFromActiveValidationSigner(msg.sender);
+    address account = getAccounts().activeValidationSignerToAccount(msg.sender);
     require(groups[account].members.numElements > 0);
     return _addMember(account, validator, address(0), address(0));
   }
@@ -638,7 +638,7 @@ contract Validators is
     nonReentrant
     returns (bool)
   {
-    address account = getAccounts().getAccountFromActiveValidationSigner(msg.sender);
+    address account = getAccounts().activeValidationSignerToAccount(msg.sender);
     require(groups[account].members.numElements == 0);
     return _addMember(account, validator, lesser, greater);
   }
@@ -681,7 +681,7 @@ contract Validators is
    * @dev Fails if `validator` is not a member of the account's group.
    */
   function removeMember(address validator) external nonReentrant returns (bool) {
-    address account = getAccounts().getAccountFromActiveValidationSigner(msg.sender);
+    address account = getAccounts().activeValidationSignerToAccount(msg.sender);
     require(isValidatorGroup(account) && isValidator(validator), "is not group and validator");
     return _removeMember(account, validator);
   }
@@ -705,7 +705,7 @@ contract Validators is
     nonReentrant
     returns (bool)
   {
-    address account = getAccounts().getAccountFromActiveValidationSigner(msg.sender);
+    address account = getAccounts().activeValidationSignerToAccount(msg.sender);
     require(isValidatorGroup(account) && isValidator(validator));
     ValidatorGroup storage group = groups[account];
     require(group.members.contains(validator));

@@ -44,21 +44,21 @@ contract('Accounts', (accounts: string[]) => {
       eventName: 'VoteSignerAuthorized',
       getAuthorizedFromAccount: accountsInstance.getVoteSigner,
       getAccountFromAuthorized: accountsInstance.voteSignerToAccount,
-      getAccountFromActiveAuthorized: accountsInstance.getAccountFromActiveVoteSigner,
+      getAccountFromActiveAuthorized: accountsInstance.activeVoteSignerToAccount,
     }
     authorizationTests.validating = {
       fn: accountsInstance.authorizeValidationSigner,
       eventName: 'ValidationSignerAuthorized',
       getAuthorizedFromAccount: accountsInstance.getValidationSigner,
       getAccountFromAuthorized: accountsInstance.validationSignerToAccount,
-      getAccountFromActiveAuthorized: accountsInstance.getAccountFromActiveValidationSigner,
+      getAccountFromActiveAuthorized: accountsInstance.activeValidationSignerToAccount,
     }
     authorizationTests.attesting = {
       fn: accountsInstance.authorizeAttestationSigner,
       eventName: 'AttestationSignerAuthorized',
       getAuthorizedFromAccount: accountsInstance.getAttestationSigner,
       getAccountFromAuthorized: accountsInstance.attestationSignerToAccount,
-      getAccountFromActiveAuthorized: accountsInstance.getAccountFromActiveAttestationSigner,
+      getAccountFromActiveAuthorized: accountsInstance.activeAttesttationSignerToAccount,
     }
   })
 

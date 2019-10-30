@@ -3,12 +3,12 @@ pragma solidity ^0.5.3;
 
 interface IAccounts {
   function isAccount(address) external view returns (bool);
-  function getAccountFromActiveVoteSigner(address) external view returns (address);
+  function activeVoteSignerToAccount(address) external view returns (address);
   function voteSignerToAccount(address) external view returns (address);
-  function getAccountFromActiveValidationSigner(address) external view returns (address);
+  function activeValidationSignerToAccount(address) external view returns (address);
   function validationSignerToAccount(address) external view returns (address);
   function getValidationSigner(address) external view returns (address);
-  function getAccountFromActiveAttestationSigner(address) external view returns (address);
+  function activeAttesttationSignerToAccount(address) external view returns (address);
   function attestationSignerToAccount(address) external view returns (address);
   function getAttestationSigner(address) external view returns (address);
 

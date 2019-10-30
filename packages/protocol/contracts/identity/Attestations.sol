@@ -482,7 +482,7 @@ contract Attestations is
   {
     bytes32 codehash = keccak256(abi.encodePacked(identifier, account));
     address signer = ecrecover(codehash, v, r, s);
-    address issuer = getAccounts().getAccountFromActiveAttestationSigner(signer);
+    address issuer = getAccounts().activeAttesttationSignerToAccount(signer);
 
     Attestation storage attestation =
       identifiers[identifier].attestations[account].issuedAttestations[issuer];
@@ -559,7 +559,7 @@ contract Attestations is
       seed = keccak256(abi.encodePacked(seed));
       validator = validatorAddressFromCurrentSet(uint256(seed) % numberValidators);
 
-      issuer = getAccounts().getAccountFromActiveValidationSigner(validator);
+      issuer = getAccounts().activeValidationSignerToAccount(validator);
       Attestation storage attestations =
         state.issuedAttestations[issuer];
 
