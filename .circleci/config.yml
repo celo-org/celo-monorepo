@@ -230,6 +230,10 @@ jobs:
           command: cd ~/src/packages/mobile && bash ./scripts/wait_for_emulator_to_connect.sh
       # TODO - run: unlock device
       - run:
+          name: Start pidcat logging
+          command: pidcat -t "GoLog" # React logs are on metro step since RN 61
+          background: true 
+      - run:
           name: Run yarn dev
           command: cd ~/src/packages/mobile && ENVFILE=".env.test" yarn dev
       - run:
