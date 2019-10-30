@@ -33,7 +33,7 @@ exports[`BackupComplete renders correctly when social backup is complete 1`] = `
         resizeMode="contain"
         source={
           Object {
-            "testUri": "../../../src/images/coins-logo.png",
+            "testUri": "../../../packages/mobile/src/images/coins-logo.png",
           }
         }
         style={
@@ -96,7 +96,7 @@ exports[`BackupComplete renders correctly when social backup is not complete 1`]
         resizeMode="contain"
         source={
           Object {
-            "testUri": "../../../src/images/coins-logo.png",
+            "testUri": "../../../packages/mobile/src/images/coins-logo.png",
           }
         }
         style={

@@ -1,6 +1,6 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`reducer  removes all messages and bannerTitles 1`] = `
+exports[`reducer clearMessage removes all messages and bannerTitles 1`] = `
 Object {
   "accountAddress": null,
   "bannerTitle": null,
@@ -21,7 +21,28 @@ Object {
 }
 `;
 
-exports[`reducer  sets a message 1`] = `
+exports[`reducer setName sets the name 1`] = `
+Object {
+  "accountAddress": null,
+  "bannerTitle": null,
+  "countryCode": null,
+  "dismissErrorAfter": null,
+  "dismissMessageAfter": null,
+  "e164Number": null,
+  "educationCompleted": false,
+  "error": null,
+  "isVerifying": false,
+  "language": null,
+  "message": null,
+  "messagePhoneMapping": Object {},
+  "name": "Jester",
+  "totalEarnings": 0,
+  "totalMessages": 0,
+  "verifyingOffAt": null,
+}
+`;
+
+exports[`reducer showMessage sets a message 1`] = `
 Object {
   "accountAddress": null,
   "bannerTitle": null,
@@ -42,7 +63,7 @@ Object {
 }
 `;
 
-exports[`reducer  sets a message with a title 1`] = `
+exports[`reducer showMessage sets a message with a title 1`] = `
 Object {
   "accountAddress": null,
   "bannerTitle": "Unit Test",
@@ -57,27 +78,6 @@ Object {
   "message": "The Thing is being Tested",
   "messagePhoneMapping": Object {},
   "name": null,
-  "totalEarnings": 0,
-  "totalMessages": 0,
-  "verifyingOffAt": null,
-}
-`;
-
-exports[`reducer  sets the name 1`] = `
-Object {
-  "accountAddress": null,
-  "bannerTitle": null,
-  "countryCode": null,
-  "dismissErrorAfter": null,
-  "dismissMessageAfter": null,
-  "e164Number": null,
-  "educationCompleted": false,
-  "error": null,
-  "isVerifying": false,
-  "language": null,
-  "message": null,
-  "messagePhoneMapping": Object {},
-  "name": "Jester",
   "totalEarnings": 0,
   "totalMessages": 0,
   "verifyingOffAt": null,
