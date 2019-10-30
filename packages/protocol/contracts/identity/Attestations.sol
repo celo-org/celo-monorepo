@@ -797,7 +797,9 @@ contract Attestations is
 
     IRandom random = IRandom(registry.getAddressForOrDie(RANDOM_REGISTRY_ID));
 
-    bytes32 seed = random.getBlockRandomness(unselectedRequest.blockNumber + selectIssuersWaitBlocks);
+    bytes32 seed = random.getBlockRandomness(
+      unselectedRequest.blockNumber + selectIssuersWaitBlocks
+    );
     uint256 numberValidators = numberValidatorsInCurrentSet();
 
     uint256 currentIndex = 0;
