@@ -142,6 +142,7 @@ const styles = StyleSheet.create({
   phone: {
     height: '33vh',
     minHeight: 250,
+    maxHeight: 400,
     marginTop: HEADER_HEIGHT,
   },
   gap: {

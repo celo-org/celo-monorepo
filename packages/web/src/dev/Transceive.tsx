@@ -67,7 +67,7 @@ export default React.memo(function Transceive() {
 })
 
 const SPEED = 100
-const OVERLAP_MULTLIER = 6
+const OVERLAP_MULTLIER = 8
 const DURATION = SPEED * OVERLAP_MULTLIER
 
 const styles = StyleSheet.create({
