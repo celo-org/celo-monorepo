@@ -795,9 +795,7 @@ contract Attestations is
     UnselectedRequest storage unselectedRequest =
       identifiers[identifier].unselectedRequests[msg.sender];
 
-    IRandom random = IRandom(registry.getAddressForOrDie(RANDOM_REGISTRY_ID));
-
-    bytes32 seed = random.getBlockRandomness(
+    bytes32 seed = getRandom().getBlockRandomness(
       unselectedRequest.blockNumber + selectIssuersWaitBlocks
     );
     uint256 numberValidators = numberValidatorsInCurrentSet();

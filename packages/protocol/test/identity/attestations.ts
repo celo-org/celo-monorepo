@@ -591,10 +591,7 @@ contract('Attestations', (accounts: string[]) => {
     let issuer: string
 
     beforeEach(async () => {
-      await attestations.request(phoneHash, attestationsRequested, mockStableToken.address)
-      const requestBlockNumber = await web3.eth.getBlockNumber()
-      await random.addTestRandomness(requestBlockNumber + selectIssuersWaitBlocks, '0x1')
-      await attestations.selectIssuers(phoneHash)
+      await requestAttestations()
       issuer = (await attestations.getAttestationIssuers(phoneHash, caller))[0]
     })
 
@@ -629,10 +626,7 @@ contract('Attestations', (accounts: string[]) => {
     let r: string, s: string
 
     beforeEach(async () => {
-      await attestations.request(phoneHash, attestationsRequested, mockStableToken.address)
-      const requestBlockNumber = await web3.eth.getBlockNumber()
-      await random.addTestRandomness(requestBlockNumber + selectIssuersWaitBlocks, '0x1')
-      await attestations.selectIssuers(phoneHash)
+      await requestAttestations()
       issuer = (await attestations.getAttestationIssuers(phoneHash, caller))[0]
       ;[v, r, s] = await getVerificationCodeSignature(caller, issuer)
     })
@@ -761,10 +755,7 @@ contract('Attestations', (accounts: string[]) => {
   describe('#withdraw()', () => {
     let issuer: string
     beforeEach(async () => {
-      await attestations.request(phoneHash, attestationsRequested, mockStableToken.address)
-      const requestBlockNumber = await web3.eth.getBlockNumber()
-      await random.addTestRandomness(requestBlockNumber + selectIssuersWaitBlocks, '0x1')
-      await attestations.selectIssuers(phoneHash)
+      await requestAttestations()
       issuer = (await attestations.getAttestationIssuers(phoneHash, caller))[0]
       const [v, r, s] = await getVerificationCodeSignature(caller, issuer)
       await attestations.complete(phoneHash, v, r, s)
