@@ -5,21 +5,16 @@ import { PincodeType } from 'src/account/reducer'
 import CeloAnalytics from 'src/analytics/CeloAnalytics'
 import { checkAppDeprecation, navigateToProperScreen, waitForRehydrate } from 'src/app/saga'
 import { waitForFirebaseAuth } from 'src/firebase/saga'
-import { NavActions } from 'src/navigator/NavigationService'
+import { NavActions, navigate } from 'src/navigator/NavigationService'
 import { Screens, Stacks } from 'src/navigator/Screens'
 jest.mock('src/utils/time', () => ({
   clockInSync: () => true,
-}))
-jest.mock('src/navigator/NavigationService', () => ({
-  ...jest.requireActual('src/navigator/NavigationService'),
-  navigate: jest.fn(),
 }))
 jest.mock('src/firebase/firebase', () => ({
   ...jest.requireActual('src/firebase/firebase'),
   getVersionInfo: jest.fn(async () => ({ deprecated: false })),
 }))
 
-const { navigate } = require('src/navigator/NavigationService')
 const { getVersionInfo } = require('src/firebase/firebase')
 
 const MockedAnalytics = CeloAnalytics as any
@@ -61,7 +56,6 @@ const numberVerified = {
 
 const navigationSagaTest = (testName: string, state: any, expectedScreen: any) => {
   test(testName, async () => {
-    navigate.mockClear()
     await expectSaga(navigateToProperScreen)
       .withState(state)
       .dispatch({ type: REHYDRATE })
