@@ -180,7 +180,7 @@ resource "google_compute_instance" "external_ssl" {
 
   boot_disk {
     initialize_params {
-      image = "cos-cloud/cos-stable-77-12371-89-0"
+      image = "debian-cloud/debian-9"
     }
   }
 
@@ -189,18 +189,6 @@ resource "google_compute_instance" "external_ssl" {
     access_config {
     }
   }
-
-  # metadata = {
-  #   user-data = templatefile(
-  #     format("%s/ssl-cloud-init.yaml.tmpl", path.module), {
-  #       cert_prefix : "${local.name_prefix}-forno-",
-  #       forno_host : var.forno_host,
-  #       gcloud_project : var.gcloud_project,
-  #       letsencrypt_email : "n@celo.org",
-  #       target_https_proxy_name : local.target_https_proxy_name
-  #     }
-  #   )
-  # }
 
   metadata_startup_script = templatefile(
     format("%s/ssl-startup.sh", path.module), {
@@ -242,25 +230,3 @@ resource "tls_self_signed_cert" "tmp" {
 resource "tls_private_key" "tmp" {
   algorithm = "RSA"
 }
-#
-# resource "acme_registration" "external" {
-#   account_key_pem = tls_private_key.acme.private_key_pem
-#   email_address   = "trevor@celo.org"
-# }
-#
-# resource "acme_certificate" "external" {
-#   account_key_pem = acme_registration.external.account_key_pem
-#   common_name     = var.forno_host
-#
-#   dns_challenge {
-#     provider = "gcloud"
-#
-#     config = {
-#       GCE_POLLING_INTERVAL     = "10"
-#       GCE_PROPAGATION_TIMEOUT  = "180"
-#       GCE_TTL                  = "60"
-#       GCE_PROJECT              = var.gcloud_project
-#       GCE_SERVICE_ACCOUNT_FILE = var.gcloud_credentials_path
-#     }
-#   }
-# }

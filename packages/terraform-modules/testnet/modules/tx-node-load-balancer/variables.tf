@@ -28,6 +28,11 @@ variable gcloud_vm_service_account_email {
   description = "The email of the service account to associate virtual machines with"
 }
 
+variable letsencrypt_email {
+  type        = string
+  description = "The email of the service account to associate virtual machines with"
+}
+
 variable network_name {
   type        = string
   description = "Name of the GCP network the tx-node load balancer is in"

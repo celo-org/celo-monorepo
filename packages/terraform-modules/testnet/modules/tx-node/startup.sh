@@ -50,7 +50,16 @@ IN_MEMORY_DISCOVERY_TABLE_FLAG=""
 
 echo "Starting geth..."
 # We need to override the entrypoint in the geth image (which is originally `geth`)
-docker run -v $DATA_DIR:$DATA_DIR -p 8545:8545/tcp -p 8546:8546/tcp --name geth --net=host --entrypoint /bin/sh -d $GETH_NODE_DOCKER_IMAGE -c "\
+docker run \
+  -v $DATA_DIR:$DATA_DIR \
+  -p 8545:8545/tcp \
+  -p 8546:8546/tcp \
+  --name geth \
+  --net=host \
+  --restart always \
+  --entrypoint /bin/sh \
+  -d \
+  $GETH_NODE_DOCKER_IMAGE -c "\
   set -euo pipefail && \
   mkdir -p $DATA_DIR/account /var/geth && \
   echo -n '${genesis_content_base64}' | base64 -d > /var/geth/genesis.json && \

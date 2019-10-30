@@ -76,7 +76,14 @@ echo "Starting geth..."
 # We need to override the entrypoint in the geth image (which is originally `geth`).
 # `geth account import` fails when the account has already been imported. In
 # this case, we do not want to pipefail
-docker run -v $DATA_DIR:$DATA_DIR --name geth --net=host --entrypoint /bin/sh -d $GETH_NODE_DOCKER_IMAGE -c "\
+docker run \
+  -v $DATA_DIR:$DATA_DIR \
+  --name geth \
+  --net=host \
+  --restart always \
+  --entrypoint /bin/sh \
+  -d \
+  $GETH_NODE_DOCKER_IMAGE -c "\
   (
     set -euo pipefail && \
     mkdir -p $DATA_DIR/account /var/geth && \
