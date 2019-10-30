@@ -198,8 +198,8 @@ jobs:
             #   echo "Cache found, just run post-script."
             #   yarn postinstall
             # fi
-            yarn
-            yarn build
+            yarn || yarn 
+            yarn build || yarn build
             yarn run jetify
       - save_cache:
           key: yarn-v4-macos-{{ .Branch }}-{{ checksum "yarn.lock" }}
@@ -238,7 +238,9 @@ jobs:
           command: cd ~/src/packages/mobile && ENVFILE=".env.test" yarn dev
       - run:
           name: Run test itself
-          command: cd ~/src/packages/mobile && ENVFILE=".env.test" yarn test:detox
+          command: cd ~/src/packages/mobile && 
+                  ENVFILE=".env.test" yarn test:detox || 
+                  echo "detox failed, retrying" ENVFILE=".env.test" yarn test:detox
       - run: cd ~/src
       - save_cache:
           key: yarn-v3-{{ arch }}-{{ .Branch }}-{{ checksum "packages/mobile/android/build.gradle" }}-{{ checksum "packages/mobile/android/settings.gradle" }}-{{ checksum "packages/mobile/android/app/build.gradle" }}-{{ checksum "packages/mobile/.env.test" }}
