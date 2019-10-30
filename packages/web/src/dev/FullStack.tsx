@@ -20,21 +20,27 @@ enum Levels {
   blockchains,
 }
 
+enum StickyMode {
+  'normal',
+  'attachToBottom',
+  'fixed',
+}
+
 interface State {
   selection: Levels
-  sticky: boolean
+  mode: StickyMode
 }
 
 const GLASS_CEILING = 160
 
 class FullStack extends React.PureComponent<I18nProps & ScreenProps, State> {
-  state = { selection: Levels.apps, sticky: false }
+  state = { selection: Levels.apps, mode: StickyMode.normal }
 
   ref = React.createRef<View>()
 
   handleScroll = throttle(() => {
     if (!(this.props.screen === ScreenSizes.DESKTOP)) {
-      this.setState({ sticky: false })
+      this.setState({ mode: StickyMode.normal })
       return
     }
 
@@ -64,9 +70,9 @@ class FullStack extends React.PureComponent<I18nProps & ScreenProps, State> {
         }
       })
 
-      this.setState({ sticky: true })
+      this.setState({ mode: StickyMode.fixed })
     } else {
-      this.setState({ sticky: false })
+      this.setState({ mode: StickyMode.normal })
     }
   }, 24)
 
@@ -108,6 +114,17 @@ class FullStack extends React.PureComponent<I18nProps & ScreenProps, State> {
     window.removeEventListener('scroll', this.handleScroll)
   }
 
+  modeStyle = () => {
+    switch (this.state.mode) {
+      case StickyMode.fixed:
+        return styles.sticky
+      case StickyMode.attachToBottom:
+        return styles.attachToBottom
+      default:
+        return {}
+    }
+  }
+
   render() {
     const { t, screen } = this.props
     const isDesktop = screen === ScreenSizes.DESKTOP
@@ -115,7 +132,7 @@ class FullStack extends React.PureComponent<I18nProps & ScreenProps, State> {
       <View style={standardStyles.darkBackground} ref={this.ref}>
         <GridRow tabletStyle={styles.tabletContainer} allStyle={styles.container}>
           <Cell span={Spans.half} tabletSpan={Spans.full}>
-            <View style={this.state.sticky && styles.sticky}>
+            <View style={this.modeStyle()}>
               <View style={styles.illoContainer}>
                 <H3 style={textStyles.invert}>{t('stackSubtitle')}</H3>
                 <H2 style={[textStyles.invert, standardStyles.elementalMargin]}>
@@ -207,6 +224,10 @@ const styles = StyleSheet.create({
     position: 'fixed',
     top: HEADER_HEIGHT,
     zIndex: 10,
+  },
+  attachToBottom: {
+    position: 'absolute',
+    bottom: 50,
   },
   illoContainer: { width: '100%', maxWidth: 400 },
   stackContainer: { paddingTop: GLASS_CEILING },
