@@ -18,9 +18,7 @@ while getopts 'n:b:c:' flag; do
     *) error "Unexpected option ${flag}" ;;
   esac
 done
-echo "NETWORK: $NETWORK"
-echo "BLOCKSCOUT_URL: $BLOCKSCOUT_URL"
-echo "CONTRACT: $CONTRACT"
+
 [ -z "$NETWORK" ] && echo "Need to set the NETWORK via the -n flag" && exit 1;
 [ -z "$BLOCKSCOUT_URL" ] && echo "Need to set the BLOCKSCOUT_URL via the -b flag" && exit 1;
 
