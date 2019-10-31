@@ -1,4 +1,5 @@
 import { ECIES, PhoneNumberUtils, SignatureUtils } from '@celo/utils'
+import { sleep } from '@celo/utils/lib/async'
 import { zip3 } from '@celo/utils/lib/collections'
 import BigNumber from 'bignumber.js'
 import * as Web3Utils from 'web3-utils'
@@ -29,7 +30,7 @@ export interface AttestationsToken {
 }
 
 export interface AttestationsConfig {
-  attestationExpirySeconds: number
+  attestationExpiryBlocks: number
   attestationRequestFees: AttestationsToken[]
 }
 
@@ -45,13 +46,13 @@ export enum AttestationState {
 export interface ActionableAttestation {
   issuer: Address
   attestationState: AttestationState
-  time: number
+  blockNumber: number
   publicKey: string
 }
 
 const parseAttestationInfo = (rawState: { 0: string; 1: string }) => ({
   attestationState: parseInt(rawState[0], 10),
-  time: parseInt(rawState[1], 10),
+  blockNumber: parseInt(rawState[1], 10),
 })
 
 function attestationMessageToSign(phoneHash: string, account: Address) {
@@ -67,8 +68,8 @@ export class AttestationsWrapper extends BaseWrapper<Attestations> {
   /**
    *  Returns the time an attestation can be completable before it is considered expired
    */
-  attestationExpirySeconds = proxyCall(
-    this.contract.methods.attestationExpirySeconds,
+  attestationExpiryBlocks = proxyCall(
+    this.contract.methods.attestationExpiryBlocks,
     undefined,
     toNumber
   )
@@ -84,6 +85,50 @@ export class AttestationsWrapper extends BaseWrapper<Attestations> {
     toBigNumber
   )
 
+  selectIssuersWaitBlocks = proxyCall(
+    this.contract.methods.selectIssuersWaitBlocks,
+    undefined,
+    toNumber
+  )
+
+  /**
+   * @notice Returns the unselected attestation request for an identifier/account pair, if any.
+   * @param identifier Hash of the identifier.
+   * @param account Address of the account.
+   */
+  getUnselectedRequest = proxyCall(
+    this.contract.methods.getUnselectedRequest,
+    tupleParser(PhoneNumberUtils.getPhoneHash, (x: string) => x),
+    (res) => ({
+      blockNumber: toNumber(res[0]),
+      attestationsRequested: toNumber(res[1]),
+      attestationRequestFeeToken: res[2],
+    })
+  )
+
+  waitForSelectingIssuers = async (
+    phoneNumber: string,
+    account: Address,
+    timeoutSeconds = 120,
+    pollDurationSeconds = 1
+  ) => {
+    const startTime = Date.now()
+    const unselectedRequest = await this.getUnselectedRequest(phoneNumber, account)
+    const waitBlocks = await this.selectIssuersWaitBlocks()
+
+    if (unselectedRequest.blockNumber === 0) {
+      throw new Error('No unselectedRequest to wait for')
+    }
+    // Technically should use subscriptions here but not all providers support it.
+    // TODO: Use subscription if provider supports
+    while (Date.now() - startTime < timeoutSeconds * 1000) {
+      const blockNumber = await this.kit.web3.eth.getBlockNumber()
+      if (blockNumber >= unselectedRequest.blockNumber + waitBlocks) {
+        return
+      }
+      await sleep(pollDurationSeconds * 1000)
+    }
+  }
   /**
    * Returns the attestation state of a phone number/account/issuer tuple
    * @param phoneNumber Phone Number
@@ -144,8 +189,8 @@ export class AttestationsWrapper extends BaseWrapper<Attestations> {
   ): Promise<ActionableAttestation[]> {
     const accounts = await this.kit.contracts.getAccounts()
     const phoneHash = PhoneNumberUtils.getPhoneHash(phoneNumber)
-    const expirySeconds = await this.attestationExpirySeconds()
-    const nowInUnixSeconds = Math.floor(new Date().getTime() / 1000)
+    const expiryBlocks = await this.attestationExpiryBlocks()
+    const currentBlockNumber = await this.kit.web3.eth.getBlockNumber()
 
     const issuers = await this.contract.methods.getAttestationIssuers(phoneHash, account).call()
     const issuerState = Promise.all(
@@ -163,14 +208,14 @@ export class AttestationsWrapper extends BaseWrapper<Attestations> {
     )
 
     const isIncomplete = (status: AttestationState) => status === AttestationState.Incomplete
-    const hasNotExpired = (time: number) => nowInUnixSeconds < time + expirySeconds
+    const hasNotExpired = (blockNumber: number) => currentBlockNumber < blockNumber + expiryBlocks
     const isValidKey = (key: string) => key !== null && key !== '0x0'
 
     return zip3(issuers, await issuerState, await publicKeys)
       .filter(
         ([_issuer, attestation, publicKey]) =>
           isIncomplete(attestation.attestationState) &&
-          hasNotExpired(attestation.time) &&
+          hasNotExpired(attestation.blockNumber) &&
           isValidKey(publicKey)
       )
       .map(([issuer, attestation, publicKey]) => ({
@@ -233,7 +278,7 @@ export class AttestationsWrapper extends BaseWrapper<Attestations> {
       })
     )
     return {
-      attestationExpirySeconds: await this.attestationExpirySeconds(),
+      attestationExpiryBlocks: await this.attestationExpiryBlocks(),
       attestationRequestFees: fees,
     }
   }
@@ -293,6 +338,16 @@ export class AttestationsWrapper extends BaseWrapper<Attestations> {
       this.kit,
       this.contract.methods.request(phoneHash, attestationsRequested, tokenAddress)
     )
+  }
+
+  /**
+   * Selects the issuers for previously requested attestations for a phone number
+   * @param phoneNumber The phone number for which to request attestations for
+   * @param token The token with which to pay for the attestation fee
+   */
+  async selectIssuers(phoneNumber: string) {
+    const phoneHash = PhoneNumberUtils.getPhoneHash(phoneNumber)
+    return toTransactionObject(this.kit, this.contract.methods.selectIssuers(phoneHash))
   }
 
   /**
