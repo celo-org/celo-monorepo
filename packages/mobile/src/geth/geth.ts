@@ -134,11 +134,7 @@ async function initGeth() {
     } catch (e) {
       const errorType = getGethErrorType(e)
       if (errorType === ErrorType.GethAlreadyRunning) {
-        // Geth is already running, this is most likely RN restart.
-        Logger.info('Geth@init/startInstance', 'Geth start reported geth already running')
-        // Note: Unfortunately, RN-Geth doesn't currently support connecting to the
-        // already running geth instance, which we would need to subscribe to head updates.
-        // In the meantime, we need to force an app reset. See #3227
+        Logger.error('Geth@init/startInstance', 'Geth start reported geth already running')
         throw new Error('Geth already running, need to restart app')
       } else if (errorType === ErrorType.CorruptChainData) {
         Logger.warn('Geth@init/startInstance', 'Geth start reported chain data error')

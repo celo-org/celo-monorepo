@@ -7,8 +7,6 @@
   "scripts": {
     "start": "react-native start",
     "start:bg": "react-native start &",
-    "start:android": "react-native run-android",
-    "start:ios": "react-native run-ios --simulator \"iPhone 11\"",
     "lint": "tslint -c tslint.json --project tsconfig.json",
     "build": "yarn run build:ts && yarn run build:metro",
     "build:sdk": "yarn --cwd ../walletkit build:for-env",
@@ -16,7 +14,8 @@
     "build:metro": "echo 'NOT WORKING RIGHT NOW'",
     "build:gen-graphql-types": "gql-gen --schema http://localhost:8080/graphql --template graphql-codegen-typescript-template --out ./typings/ 'src/**/*.tsx'",
     "predev": "./scripts/pre-dev.sh",
-    "dev": "react-native run-android --appIdSuffix \"debug\" --no-packager && yarn start || echo 'Could not start metro server' ",
+    "dev": "react-native run-android --appIdSuffix \"debug\" --no-packager && yarn start || echo 'Could not start metro server'",
+    "dev:ios": "react-native run-ios --simulator \"iPhone 11\"",
     "dev:show-menu": "adb devices | grep '\t' | awk '{print $1}' | sed 's/\\s//g' | xargs -I {} adb -s {} shell input keyevent 82",
     "dev:clear-data": "adb shell pm clear org.celo.mobile.debug",
     "dev:clean-android": "cd android && ./gradlew clean",
@@ -34,12 +33,9 @@
     "test:dry-run-e2e": "yarn dev:emulator && cd android && yarn test:build-e2e && yarn test:run-e2e",
     "test:detox": "CELO_TEST_CONFIG=e2e detox test -c android.emu.debug -a e2e/tmp/ --take-screenshots=failing --record-logs=failing --detectOpenHandles -l verbose",
     "test:unlock": "./scripts/unlock.sh",
+    "test:verify-locales": "./scripts/verify_locales.sh",
     "pre-deploy": "./scripts/pre-deploy.sh",
-    "prepare": "patch-package",
-    "postinstall": "sh scripts/fix_rn_version.sh; patch-package",
-    "update-disclaimer": "yarn licenses generate-disclaimer > android/app/src/main/assets/custom/LicenseDisclaimer.txt",
-    "test-licenses": "yarn licenses list --prod | grep '\\(─ GPL\\|─ (GPL-[1-9]\\.[0-9]\\+ OR GPL-[1-9]\\.[0-9]\\+)\\)' && echo 'Found GPL license(s). Use 'yarn licenses list --prod' to look up the offending package' || echo 'No GPL licenses found'",
-    "verify-locales": "./scripts/verify_locales.sh"
+    "deploy:update-disclaimer": "yarn licenses generate-disclaimer > android/app/src/main/assets/custom/LicenseDisclaimer.txt"
   },
   "rnpm": {
     "assets": [

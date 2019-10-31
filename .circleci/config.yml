@@ -116,6 +116,10 @@ jobs:
             yarn build --scope @celo/walletkit
             yarn build --ignore @celo/protocol --ignore docs --ignore @celo/walletkit
 
+      - run:
+          name: Check licenses
+          command: yarn check-licenses
+
       - persist_to_workspace:
           root: .
           paths:
@@ -301,7 +305,7 @@ jobs:
           name: Ensure translations are not missing
           command: |
             cd packages/mobile
-            ./scripts/verify_locales.sh
+            yarn --cwd packages/mobile test:verify-locales
 
       - run:
           name: jest tests
