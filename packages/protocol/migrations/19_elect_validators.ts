@@ -102,6 +102,7 @@ async function registerValidator(
   networkName: string
 ) {
   const validatorPrivateKeyHexStripped = validatorPrivateKey.slice(2)
+  const address = generateAccountAddressFromPrivateKey(validatorPrivateKey)
   const publicKey = generatePublicKeyFromPrivateKey(validatorPrivateKeyHexStripped)
   const blsValidatorPrivateKeyBytes = blsPrivateKeyToProcessedPrivateKey(
     validatorPrivateKeyHexStripped
