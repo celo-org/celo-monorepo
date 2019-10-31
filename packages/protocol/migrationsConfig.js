@@ -8,8 +8,9 @@ BigNumber.config({ EXPONENTIAL_AT: 1e9 })
 
 const DefaultConfig = {
   attestations: {
-    attestationExpirySeconds: 60 * 60, // 1 hour,
+    attestationExpiryBlocks: (60 * 60) / 5, // 1 hour,
     attestationRequestFeeInDollars: 0.05,
+    selectIssuersWaitBlocks: 4,
   },
   blockchainParameters: {
     minimumClientVersion: {
