@@ -109,7 +109,7 @@ exports[`ReclaimPaymentConfirmationScreen renders correctly 1`] = `
                 resizeMode="contain"
                 source={
                   Object {
-                    "testUri": "../../../src/images/coins-logo.png",
+                    "testUri": "../../../packages/mobile/src/images/coins-logo.png",
                   }
                 }
                 style={
@@ -349,6 +349,7 @@ exports[`ReclaimPaymentConfirmationScreen renders correctly 1`] = `
                   </Text>
                   <View
                     accessible={true}
+                    focusable={true}
                     hitSlop={
                       Object {
                         "bottom": 10,
@@ -364,6 +365,7 @@ exports[`ReclaimPaymentConfirmationScreen renders correctly 1`] = `
                         "type": "ThemeAttrAndroid",
                       }
                     }
+                    onClick={[Function]}
                     onResponderGrant={[Function]}
                     onResponderMove={[Function]}
                     onResponderRelease={[Function]}
@@ -381,7 +383,7 @@ exports[`ReclaimPaymentConfirmationScreen renders correctly 1`] = `
                     <Image
                       source={
                         Object {
-                          "testUri": "../../../src/images/info.png",
+                          "testUri": "../../../packages/mobile/src/images/info.png",
                         }
                       }
                       style={
@@ -490,6 +492,7 @@ exports[`ReclaimPaymentConfirmationScreen renders correctly 1`] = `
       >
         <View
           accessible={true}
+          focusable={false}
           isTVSelectable={true}
           nativeBackgroundAndroid={
             Object {
@@ -497,6 +500,7 @@ exports[`ReclaimPaymentConfirmationScreen renders correctly 1`] = `
               "type": "ThemeAttrAndroid",
             }
           }
+          onClick={[Function]}
           onResponderGrant={[Function]}
           onResponderMove={[Function]}
           onResponderRelease={[Function]}
@@ -578,6 +582,7 @@ exports[`ReclaimPaymentConfirmationScreen renders correctly 1`] = `
       >
         <View
           accessible={true}
+          focusable={true}
           isTVSelectable={true}
           nativeBackgroundAndroid={
             Object {
@@ -585,6 +590,7 @@ exports[`ReclaimPaymentConfirmationScreen renders correctly 1`] = `
               "type": "ThemeAttrAndroid",
             }
           }
+          onClick={[Function]}
           onResponderGrant={[Function]}
           onResponderMove={[Function]}
           onResponderRelease={[Function]}
@@ -757,7 +763,7 @@ exports[`ReclaimPaymentConfirmationScreen renders correctly when fee calculation
                 resizeMode="contain"
                 source={
                   Object {
-                    "testUri": "../../../src/images/coins-logo.png",
+                    "testUri": "../../../packages/mobile/src/images/coins-logo.png",
                   }
                 }
                 style={
@@ -997,6 +1003,7 @@ exports[`ReclaimPaymentConfirmationScreen renders correctly when fee calculation
                   </Text>
                   <View
                     accessible={true}
+                    focusable={true}
                     hitSlop={
                       Object {
                         "bottom": 10,
@@ -1012,6 +1019,7 @@ exports[`ReclaimPaymentConfirmationScreen renders correctly when fee calculation
                         "type": "ThemeAttrAndroid",
                       }
                     }
+                    onClick={[Function]}
                     onResponderGrant={[Function]}
                     onResponderMove={[Function]}
                     onResponderRelease={[Function]}
@@ -1029,7 +1037,7 @@ exports[`ReclaimPaymentConfirmationScreen renders correctly when fee calculation
                     <Image
                       source={
                         Object {
-                          "testUri": "../../../src/images/info.png",
+                          "testUri": "../../../packages/mobile/src/images/info.png",
                         }
                       }
                       style={
@@ -1138,6 +1146,7 @@ exports[`ReclaimPaymentConfirmationScreen renders correctly when fee calculation
       >
         <View
           accessible={true}
+          focusable={false}
           isTVSelectable={true}
           nativeBackgroundAndroid={
             Object {
@@ -1145,6 +1154,7 @@ exports[`ReclaimPaymentConfirmationScreen renders correctly when fee calculation
               "type": "ThemeAttrAndroid",
             }
           }
+          onClick={[Function]}
           onResponderGrant={[Function]}
           onResponderMove={[Function]}
           onResponderRelease={[Function]}
@@ -1226,6 +1236,7 @@ exports[`ReclaimPaymentConfirmationScreen renders correctly when fee calculation
       >
         <View
           accessible={true}
+          focusable={true}
           isTVSelectable={true}
           nativeBackgroundAndroid={
             Object {
@@ -1233,6 +1244,7 @@ exports[`ReclaimPaymentConfirmationScreen renders correctly when fee calculation
               "type": "ThemeAttrAndroid",
             }
           }
+          onClick={[Function]}
           onResponderGrant={[Function]}
           onResponderMove={[Function]}
           onResponderRelease={[Function]}
@@ -1405,7 +1417,7 @@ exports[`ReclaimPaymentConfirmationScreen renders correctly when fee calculation
                 resizeMode="contain"
                 source={
                   Object {
-                    "testUri": "../../../src/images/coins-logo.png",
+                    "testUri": "../../../packages/mobile/src/images/coins-logo.png",
                   }
                 }
                 style={
@@ -1645,6 +1657,7 @@ exports[`ReclaimPaymentConfirmationScreen renders correctly when fee calculation
                   </Text>
                   <View
                     accessible={true}
+                    focusable={true}
                     hitSlop={
                       Object {
                         "bottom": 10,
@@ -1660,6 +1673,7 @@ exports[`ReclaimPaymentConfirmationScreen renders correctly when fee calculation
                         "type": "ThemeAttrAndroid",
                       }
                     }
+                    onClick={[Function]}
                     onResponderGrant={[Function]}
                     onResponderMove={[Function]}
                     onResponderRelease={[Function]}
@@ -1677,7 +1691,7 @@ exports[`ReclaimPaymentConfirmationScreen renders correctly when fee calculation
                     <Image
                       source={
                         Object {
-                          "testUri": "../../../src/images/info.png",
+                          "testUri": "../../../packages/mobile/src/images/info.png",
                         }
                       }
                       style={
@@ -1780,6 +1794,7 @@ exports[`ReclaimPaymentConfirmationScreen renders correctly when fee calculation
       >
         <View
           accessible={true}
+          focusable={false}
           isTVSelectable={true}
           nativeBackgroundAndroid={
             Object {
@@ -1787,6 +1802,7 @@ exports[`ReclaimPaymentConfirmationScreen renders correctly when fee calculation
               "type": "ThemeAttrAndroid",
             }
           }
+          onClick={[Function]}
           onResponderGrant={[Function]}
           onResponderMove={[Function]}
           onResponderRelease={[Function]}
@@ -1868,6 +1884,7 @@ exports[`ReclaimPaymentConfirmationScreen renders correctly when fee calculation
       >
         <View
           accessible={true}
+          focusable={true}
           isTVSelectable={true}
           nativeBackgroundAndroid={
             Object {
@@ -1875,6 +1892,7 @@ exports[`ReclaimPaymentConfirmationScreen renders correctly when fee calculation
               "type": "ThemeAttrAndroid",
             }
           }
+          onClick={[Function]}
           onResponderGrant={[Function]}
           onResponderMove={[Function]}
           onResponderRelease={[Function]}

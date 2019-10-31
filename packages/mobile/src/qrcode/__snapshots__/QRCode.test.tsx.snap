@@ -62,7 +62,7 @@ exports[`QRCode renders correctly 1`] = `
           <Image
             source={
               Object {
-                "testUri": "../../../src/images/unknown-user-icon.png",
+                "testUri": "../../../packages/mobile/src/images/unknown-user-icon.png",
               }
             }
             style={
@@ -156,6 +156,7 @@ exports[`QRCode renders correctly 1`] = `
     >
       <View
         accessible={true}
+        focusable={true}
         isTVSelectable={true}
         nativeBackgroundAndroid={
           Object {
@@ -163,6 +164,7 @@ exports[`QRCode renders correctly 1`] = `
             "type": "ThemeAttrAndroid",
           }
         }
+        onClick={[Function]}
         onResponderGrant={[Function]}
         onResponderMove={[Function]}
         onResponderRelease={[Function]}
@@ -274,6 +276,7 @@ exports[`QRCode renders correctly 1`] = `
     >
       <View
         accessible={true}
+        focusable={true}
         isTVSelectable={true}
         nativeBackgroundAndroid={
           Object {
@@ -281,6 +284,7 @@ exports[`QRCode renders correctly 1`] = `
             "type": "ThemeAttrAndroid",
           }
         }
+        onClick={[Function]}
         onResponderGrant={[Function]}
         onResponderMove={[Function]}
         onResponderRelease={[Function]}
