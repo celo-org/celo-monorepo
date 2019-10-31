@@ -134,7 +134,7 @@ contract UsingPrecompiles {
     address sender,
     bytes memory proofOfPossessionBytes
   )
-    private
+    public
     returns (bool)
   {
     bool success;
