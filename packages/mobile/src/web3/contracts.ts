@@ -2,7 +2,7 @@ import { newKitFromWeb3 } from '@celo/contractkit'
 import { addLocalAccount as web3utilsAddLocalAccount } from '@celo/walletkit'
 import { Platform } from 'react-native'
 import * as net from 'react-native-tcp'
-import { DEFAULT_INFURA_URL, DEFAULT_TESTNET } from 'src/config'
+import { DEFAULT_FORNO_URL, DEFAULT_TESTNET } from 'src/config'
 import { IPC_PATH } from 'src/geth/geth'
 import networkConfig, { Testnets } from 'src/geth/networkConfig'
 import Logger from 'src/utils/Logger'
@@ -76,7 +76,7 @@ function getWeb3(): Web3 {
     throw new Error('Zero sync mode is currently not supported on iOS')
   } else if (isInitiallyZeroSyncMode()) {
     // Geth free mode
-    const url = DEFAULT_INFURA_URL
+    const url = DEFAULT_FORNO_URL
     Logger.debug('contracts@getWeb3', `Connecting to url ${url}`)
     return new Web3(getWebSocketProvider(url))
   } else {
@@ -87,8 +87,8 @@ function getWeb3(): Web3 {
 // Mutates web3 with new provider
 export function switchWeb3ProviderForSyncMode(zeroSync: boolean) {
   if (zeroSync) {
-    web3.setProvider(getWebSocketProvider(DEFAULT_INFURA_URL))
-    Logger.info(`${tag}@switchWeb3ProviderForSyncMode`, `Set provider to ${DEFAULT_INFURA_URL}`)
+    web3.setProvider(getWebSocketProvider(DEFAULT_FORNO_URL))
+    Logger.info(`${tag}@switchWeb3ProviderForSyncMode`, `Set provider to ${DEFAULT_FORNO_URL}`)
   } else {
     web3.setProvider(getIpcProvider(DEFAULT_TESTNET))
     Logger.info(`${tag}@switchWeb3ProviderForSyncMode`, `Set provider to IPC provider`)
