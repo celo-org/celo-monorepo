@@ -12,6 +12,7 @@ const initializeArgs = async (): Promise<any[]> => {
     toFixed(config.epochRewards.targetVotingYieldParameters.adjustmentFactor).toFixed(),
     toFixed(config.epochRewards.rewardsMultiplierAdjustmentFactors.underspend).toFixed(),
     toFixed(config.epochRewards.rewardsMultiplierAdjustmentFactors.overspend).toFixed(),
+    toFixed(config.epochRewards.targetVotingGoldFraction).toFixed(),
     config.epochRewards.maxValidatorEpochPayment,
   ]
 }

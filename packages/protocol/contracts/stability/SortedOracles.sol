@@ -8,7 +8,7 @@ import "../common/linkedlists/AddressSortedLinkedListWithMedian.sol";
 import "../common/linkedlists/SortedLinkedListWithMedian.sol";
 
 
-// TODO: don't treat timestamps as Fixidity values
+// TODO: Move SortedOracles to Fixidity
 /**
  * @title Maintains a sorted list of oracle exchange rates between Celo Gold and other currencies.
  */

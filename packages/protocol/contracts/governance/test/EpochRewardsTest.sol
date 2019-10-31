@@ -27,4 +27,8 @@ contract EpochRewardsTest is EpochRewards {
   function updateTargetVotingYield() external {
     _updateTargetVotingYield();
   }
+
+  function numberValidatorsInCurrentSet() public view returns (uint256) {
+    return 100;
+  }
 }

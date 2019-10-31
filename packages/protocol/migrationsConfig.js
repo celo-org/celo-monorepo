@@ -34,6 +34,7 @@ const DefaultConfig = {
       underspend: 1 / 2,
       overspend: 5,
     },
+    targetVotingGoldFraction: 2 / 3,
     maxValidatorEpochPayment: '1000000000000000000',
   },
   exchange: {
