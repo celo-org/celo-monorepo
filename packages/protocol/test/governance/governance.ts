@@ -1,6 +1,8 @@
 import BigNumber from 'bignumber.js'
 import { keccak256 } from 'ethereumjs-util'
 import {
+  AccountsContract,
+  AccountsInstance,
   GovernanceTestContract,
   GovernanceTestInstance,
   MockLockedGoldContract,
@@ -26,6 +28,7 @@ import {
 import { fixed1, multiply, toFixed } from '@celo/utils/lib/fixidity'
 
 const Governance: GovernanceTestContract = artifacts.require('GovernanceTest')
+const Accounts: AccountsContract = artifacts.require('Accounts')
 const MockLockedGold: MockLockedGoldContract = artifacts.require('MockLockedGold')
 const Registry: RegistryContract = artifacts.require('Registry')
 const TestTransactions: TestTransactionsContract = artifacts.require('TestTransactions')
@@ -70,7 +73,12 @@ const EPOCH = 100
 // TODO(asa): Test dequeueProposalsIfReady
 // TODO(asa): Dequeue explicitly to make the gas cost of operations more clear
 contract('Governance', (accounts: string[]) => {
+<<<<<<< HEAD
   let governance: GovernanceTestInstance
+=======
+  let accountsInstance: AccountsInstance
+  let governance: GovernanceInstance
+>>>>>>> 9c6495df442ec90691060acceab18a17d8363dbc
   let mockLockedGold: MockLockedGoldInstance
   let testTransactions: TestTransactionsInstance
   let registry: RegistryInstance
@@ -102,6 +110,7 @@ contract('Governance', (accounts: string[]) => {
   let proposalHash: Buffer
   let proposalHashStr: string
   beforeEach(async () => {
+    accountsInstance = await Accounts.new()
     governance = await Governance.new()
     mockLockedGold = await MockLockedGold.new()
     registry = await Registry.new()
@@ -121,7 +130,9 @@ contract('Governance', (accounts: string[]) => {
       baselineUpdateFactor,
       baselineQuorumFactor
     )
+    await registry.setAddressFor(CeloContractName.Accounts, accountsInstance.address)
     await registry.setAddressFor(CeloContractName.LockedGold, mockLockedGold.address)
+    await accountsInstance.createAccount()
     await mockLockedGold.setAccountTotalLockedGold(account, weight)
     await mockLockedGold.setTotalLockedGold(weight)
     transactionSuccess1 = {
@@ -1033,6 +1044,7 @@ contract('Governance', (accounts: string[]) => {
           { value: minDeposit }
         )
         const otherAccount = accounts[1]
+        await accountsInstance.createAccount({ from: otherAccount })
         await mockLockedGold.setAccountTotalLockedGold(otherAccount, weight)
         await governance.upvote(otherProposalId, proposalId, 0, { from: otherAccount })
         await timeTravel(queueExpiry, web3)
@@ -2200,6 +2212,7 @@ contract('Governance', (accounts: string[]) => {
     const proposalId = 1
     const index = 0
     beforeEach(async () => {
+      await accountsInstance.createAccount({ from: otherAccount })
       await governance.propose(
         [transactionSuccess1.value],
         [transactionSuccess1.destination],

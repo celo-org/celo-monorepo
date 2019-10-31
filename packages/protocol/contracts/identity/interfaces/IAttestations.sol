@@ -15,18 +15,7 @@ interface IAttestations {
 
   function setAttestationExpiryBlocks(uint256) external;
 
-  function setAccountDataEncryptionKey(bytes calldata) external;
-  function authorizeAttestor(address, uint8, bytes32, bytes32) external;
-  function setMetadataURL(string calldata) external;
-  function setWalletAddress(address) external;
-  function setAccount(bytes calldata, address) external;
 
-  function getAttestorFromAccount(address) external view returns (address);
-  function getAccountFromAttestor(address) external view returns (address);
-
-  function getDataEncryptionKey(address) external view returns (bytes memory);
-  function getWalletAddress(address) external view returns (address);
-  function getMetadataURL(address) external view returns (string memory);
 
   function getUnselectedRequest(bytes32, address) external view returns (uint32, uint32, address);
   function getAttestationRequestFee(address) external view returns (uint256);

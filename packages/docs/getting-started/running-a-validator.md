@@ -27,7 +27,7 @@ If you are starting up a validator, please consider leaving it running for a few
   Some users have reported issues using the most recent version of node. Use the LTS for greater reliability.
 
 {% hint style="info" %}
-A note about conventions:  
+A note about conventions:
 The code you'll see on this page is bash commands and their output.
 
 A $ signifies the bash prompt. Everything following it is the command you should run in a terminal. The $ isn't part of the command, so don't copy it.
@@ -119,8 +119,8 @@ $ celocli account:unlock --account $CELO_VALIDATOR_ADDRESS --password <YOUR_SECO
 In a new tab, make a locked Gold account for both of your addresses by running the Celo CLI. This will allow you to stake Celo Gold, which is required to register a validator and validator groups:
 
 ```
-$ celocli lockedgold:register --from $CELO_VALIDATOR_GROUP_ADDRESS
-$ celocli lockedgold:register --from $CELO_VALIDATOR_ADDRESS
+$ celocli account:register --from $CELO_VALIDATOR_GROUP_ADDRESS --name <GROUP_NAME_OF_YOUR_CHOICE>
+$ celocli account:register --from $CELO_VALIDATOR_ADDRESS --name <VALIDATOR_NAME_OF_YOUR_CHOICE>
 ```
 
 Make a locked Gold commitment for both accounts in order to secure the right to register a validator and validator group. The current requirement is 1 Celo Gold with a notice period of 60 days. If you choose to stake more gold, or a longer notice period, be sure to use those values below:
@@ -134,11 +134,11 @@ $ celocli lockedgold:lockup --from $CELO_VALIDATOR_ADDRESS --goldAmount 10000000
 
 Register your validator group:
 
-`$ celocli validatorgroup:register --id <GROUP_ID_OF_YOUR_CHOICE> --name <GROUP_NAME_OF_YOUR_CHOICE> --url <GROUP_URL_OF_YOUR_CHOICE> --from $CELO_VALIDATOR_GROUP_ADDRESS --noticePeriod 5184000`
+`$ celocli validatorgroup:register --id <GROUP_ID_OF_YOUR_CHOICE> --from $CELO_VALIDATOR_GROUP_ADDRESS --noticePeriod 5184000`
 
 Register your validator:
 
-`` $ celocli validator:register --id <VALIDATOR_ID_OF_YOUR_CHOICE> --name <VALIDATOR_NAME_OF_YOUR_CHOICE> --url <VALIDATOR_URL_OF_YOUR_CHOICE> --from $CELO_VALIDATOR_ADDRESS --noticePeriod 5184000 --publicKey 0x`openssl rand -hex 64`$CELO_VALIDATOR_POP ``
+`` $ celocli validator:register --id <VALIDATOR_ID_OF_YOUR_CHOICE> --from $CELO_VALIDATOR_ADDRESS --noticePeriod 5184000 --publicKey 0x`openssl rand -hex 64`$CELO_VALIDATOR_POP ``
 
 {% hint style="info" %}
 **Roadmap**: Note that the “publicKey” first part of the public key field is currently ignored, and thus can be set to any 128 character hex value. The rest is used for the BLS public key and proof-of-possession.

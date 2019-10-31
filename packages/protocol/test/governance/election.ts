@@ -9,6 +9,8 @@ import {
 import { toFixed } from '@celo/utils/lib/fixidity'
 import BigNumber from 'bignumber.js'
 import {
+  AccountsContract,
+  AccountsInstance,
   ElectionTestContract,
   ElectionTestInstance,
   MockLockedGoldContract,
@@ -21,6 +23,7 @@ import {
   RegistryInstance,
 } from 'types'
 
+const Accounts: AccountsContract = artifacts.require('Accounts')
 const ElectionTest: ElectionTestContract = artifacts.require('ElectionTest')
 const MockLockedGold: MockLockedGoldContract = artifacts.require('MockLockedGold')
 const MockValidators: MockValidatorsContract = artifacts.require('MockValidators')
@@ -35,6 +38,7 @@ ElectionTest.numberFormat = 'BigNumber'
 const EPOCH = 100
 
 contract('Election', (accounts: string[]) => {
+  let accountsInstance: AccountsInstance
   let election: ElectionTestInstance
   let registry: RegistryInstance
   let mockLockedGold: MockLockedGoldInstance
@@ -49,10 +53,13 @@ contract('Election', (accounts: string[]) => {
   const electabilityThreshold = toFixed(1 / 100)
 
   beforeEach(async () => {
+    accountsInstance = await Accounts.new()
+    await Promise.all(accounts.map((account) => accountsInstance.createAccount({ from: account })))
     election = await ElectionTest.new()
     mockLockedGold = await MockLockedGold.new()
     mockValidators = await MockValidators.new()
     registry = await Registry.new()
+    await registry.setAddressFor(CeloContractName.Accounts, accountsInstance.address)
     await registry.setAddressFor(CeloContractName.LockedGold, mockLockedGold.address)
     await registry.setAddressFor(CeloContractName.Validators, mockValidators.address)
     await election.initialize(
@@ -302,6 +309,7 @@ contract('Election', (accounts: string[]) => {
     const value = new BigNumber(1000)
     describe('when the group is eligible', () => {
       beforeEach(async () => {
+        await mockValidators.setMembers(group, [accounts[9]])
         await registry.setAddressFor(CeloContractName.Validators, accounts[0])
         await election.markGroupEligible(group, NULL_ADDRESS, NULL_ADDRESS)
         await registry.setAddressFor(CeloContractName.Validators, mockValidators.address)
@@ -380,6 +388,7 @@ contract('Election', (accounts: string[]) => {
             await mockLockedGold.incrementNonvotingAccountBalance(voter, value)
             for (let i = 0; i < maxNumGroupsVotedFor.toNumber(); i++) {
               newGroup = accounts[i + 2]
+              await mockValidators.setMembers(newGroup, [accounts[9]])
               await registry.setAddressFor(CeloContractName.Validators, accounts[0])
               await election.markGroupEligible(newGroup, group, NULL_ADDRESS)
               await registry.setAddressFor(CeloContractName.Validators, mockValidators.address)
@@ -421,6 +430,7 @@ contract('Election', (accounts: string[]) => {
     const group = accounts[1]
     const value = 1000
     beforeEach(async () => {
+      await mockValidators.setMembers(group, [accounts[9]])
       await registry.setAddressFor(CeloContractName.Validators, accounts[0])
       await election.markGroupEligible(group, NULL_ADDRESS, NULL_ADDRESS)
       await registry.setAddressFor(CeloContractName.Validators, mockValidators.address)
@@ -547,6 +557,7 @@ contract('Election', (accounts: string[]) => {
     const value = 1000
     describe('when the voter has pending votes', () => {
       beforeEach(async () => {
+        await mockValidators.setMembers(group, [accounts[9]])
         await registry.setAddressFor(CeloContractName.Validators, accounts[0])
         await election.markGroupEligible(group, NULL_ADDRESS, NULL_ADDRESS)
         await registry.setAddressFor(CeloContractName.Validators, mockValidators.address)
@@ -648,6 +659,7 @@ contract('Election', (accounts: string[]) => {
     const value = 1000
     describe('when the voter has active votes', () => {
       beforeEach(async () => {
+        await mockValidators.setMembers(group, [accounts[9]])
         await registry.setAddressFor(CeloContractName.Validators, accounts[0])
         await election.markGroupEligible(group, NULL_ADDRESS, NULL_ADDRESS)
         await registry.setAddressFor(CeloContractName.Validators, mockValidators.address)

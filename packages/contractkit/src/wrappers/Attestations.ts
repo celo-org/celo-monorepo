@@ -8,7 +8,6 @@ import { Attestations } from '../generated/types/Attestations'
 import {
   BaseWrapper,
   proxyCall,
-  proxySend,
   toBigNumber,
   toNumber,
   toTransactionObject,
@@ -131,20 +130,6 @@ export class AttestationsWrapper extends BaseWrapper<Attestations> {
     }
   }
   /**
-   * Returns the attestation stats of a phone number/account pair
-   * @param phoneNumber Phone Number
-   * @param account Account
-   */
-  getAttestationStat: (
-    phoneNumber: string,
-    account: Address
-  ) => Promise<AttestationStat> = proxyCall(
-    this.contract.methods.getAttestationStats,
-    tupleParser(PhoneNumberUtils.getPhoneHash, stringIdentity),
-    (stat) => ({ completed: toNumber(stat[0]), total: toNumber(stat[1]) })
-  )
-
-  /**
    * Returns the attestation state of a phone number/account/issuer tuple
    * @param phoneNumber Phone Number
    * @param account Account
@@ -160,37 +145,18 @@ export class AttestationsWrapper extends BaseWrapper<Attestations> {
   )
 
   /**
-   * Returns the set wallet address for the account
+   * Returns the attestation stats of a phone number/account pair
+   * @param phoneNumber Phone Number
    * @param account Account
    */
-  getWalletAddress = proxyCall(this.contract.methods.getWalletAddress)
-
-  /**
-   * Returns the metadataURL for the account
-   * @param account Account
-   */
-  getMetadataURL = proxyCall(this.contract.methods.getMetadataURL)
-
-  /**
-   * Sets the data encryption of the account
-   * @param encryptionKey The key to set
-   */
-  setAccountDataEncryptionKey = proxySend(
-    this.kit,
-    this.contract.methods.setAccountDataEncryptionKey
+  getAttestationStat: (
+    phoneNumber: string,
+    account: Address
+  ) => Promise<AttestationStat> = proxyCall(
+    this.contract.methods.getAttestationStats,
+    tupleParser(PhoneNumberUtils.getPhoneHash, stringIdentity),
+    (stat) => ({ completed: toNumber(stat[0]), total: toNumber(stat[1]) })
   )
-
-  /**
-   * Sets the metadataURL for the account
-   * @param url The url to set
-   */
-  setMetadataURL = proxySend(this.kit, this.contract.methods.setMetadataURL)
-
-  /**
-   * Sets the wallet address for the account
-   * @param address The address to set
-   */
-  setWalletAddress = proxySend(this.kit, this.contract.methods.setWalletAddress)
 
   /**
    * Calculates the amount of StableToken required to request Attestations
@@ -221,6 +187,7 @@ export class AttestationsWrapper extends BaseWrapper<Attestations> {
     phoneNumber: string,
     account: Address
   ): Promise<ActionableAttestation[]> {
+    const accounts = await this.kit.contracts.getAccounts()
     const phoneHash = PhoneNumberUtils.getPhoneHash(phoneNumber)
     const expiryBlocks = await this.attestationExpiryBlocks()
     const currentBlockNumber = await this.kit.web3.eth.getBlockNumber()
@@ -237,7 +204,7 @@ export class AttestationsWrapper extends BaseWrapper<Attestations> {
 
     // Typechain is not properly typing getDataEncryptionKey
     const publicKeys: Promise<string[]> = Promise.all(
-      issuers.map((issuer) => this.contract.methods.getDataEncryptionKey(issuer).call() as any)
+      issuers.map((issuer) => accounts.getDataEncryptionKey(issuer) as any)
     )
 
     const isIncomplete = (status: AttestationState) => status === AttestationState.Incomplete
@@ -389,9 +356,8 @@ export class AttestationsWrapper extends BaseWrapper<Attestations> {
    * @param issuer The address of issuer of the attestation
    */
   async reveal(phoneNumber: string, issuer: Address) {
-    const publicKey: string = (await this.contract.methods
-      .getDataEncryptionKey(issuer)
-      .call()) as any
+    const accounts = await this.kit.contracts.getAccounts()
+    const publicKey: string = (await accounts.getDataEncryptionKey(issuer)) as any
 
     if (!publicKey) {
       throw new Error('Issuer data encryption key is null')
