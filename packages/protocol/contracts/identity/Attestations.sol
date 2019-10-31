@@ -481,7 +481,7 @@ contract Attestations is
     returns (address)
   {
     bytes32 codehash = keccak256(abi.encodePacked(identifier, account));
-    address signer = ecrecover(codehash, v, r, s);
+    address signer = Signatures.getSignerOfMessageHash(codehash, v, r, s);
     address issuer = getAccounts().activeAttesttationSignerToAccount(signer);
 
     Attestation storage attestation =
