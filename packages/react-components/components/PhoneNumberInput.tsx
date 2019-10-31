@@ -97,7 +97,6 @@ export default class PhoneNumberInput extends React.Component<Props, State> {
 
   async triggerPhoneNumberRequest() {
     try {
-      await this.triggerPhoneNumberRequestAndroid()
       const baseOS = await DeviceInfo.getBaseOs()
       if (baseOS === 'Android') {
         await this.triggerPhoneNumberRequestAndroid()
