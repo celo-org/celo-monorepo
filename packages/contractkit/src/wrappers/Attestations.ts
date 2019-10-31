@@ -96,11 +96,6 @@ export class AttestationsWrapper extends BaseWrapper<Attestations> {
    * @notice Returns the unselected attestation request for an identifier/account pair, if any.
    * @param identifier Hash of the identifier.
    * @param account Address of the account.
-   * @return [
-   *           Block number at which was requested,
-   *           Number of unselected requests,
-   *           Address of the token with which this attestation request was paid for
-   *         ]
    */
   getUnselectedRequest = proxyCall(
     this.contract.methods.getUnselectedRequest,
@@ -129,7 +124,7 @@ export class AttestationsWrapper extends BaseWrapper<Attestations> {
     // TODO: Use subscription if provider supports
     while (Date.now() - startTime < timeoutSeconds * 1000) {
       const blockNumber = await this.kit.web3.eth.getBlockNumber()
-      if (blockNumber >= unselectedRequest.blockNumber + waitBlocks - 1) {
+      if (blockNumber >= unselectedRequest.blockNumber + waitBlocks) {
         return
       }
       await sleep(pollDurationSeconds * 1000)
