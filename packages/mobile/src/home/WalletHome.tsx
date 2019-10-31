@@ -5,6 +5,7 @@ import colors from '@celo/react-components/styles/colors'
 import fontStyles from '@celo/react-components/styles/fonts'
 import { componentStyles, TOP_BAR_HEIGHT } from '@celo/react-components/styles/styles'
 import variables from '@celo/react-components/styles/variables'
+import * as _ from 'lodash'
 import * as React from 'react'
 import { WithNamespaces, withNamespaces } from 'react-i18next'
 import {
@@ -22,7 +23,7 @@ import { connect } from 'react-redux'
 import { hideAlert, showMessage } from 'src/alert/actions'
 import componentWithAnalytics from 'src/analytics/wrapper'
 import { exitBackupFlow } from 'src/app/actions'
-import { ALERT_BANNER_DURATION, SHOW_TESTNET_BANNER } from 'src/config'
+import { ALERT_BANNER_DURATION, DEFAULT_TESTNET, SHOW_TESTNET_BANNER } from 'src/config'
 import { refreshAllBalances, setLoading } from 'src/home/actions'
 import CeloDollarsOverview from 'src/home/CeloDollarsOverview'
 import HeaderButton from 'src/home/HeaderButton'
@@ -156,7 +157,12 @@ export class WalletHome extends React.Component<Props> {
 
   showTestnetBanner = () => {
     const { t } = this.props
-    this.props.showMessage(t('testnetAlert.1'), ALERT_BANNER_DURATION, null, t('testnetAlert.0'))
+    this.props.showMessage(
+      t('testnetAlert.1', { testnet: _.startCase(DEFAULT_TESTNET) }),
+      ALERT_BANNER_DURATION,
+      null,
+      t('testnetAlert.0', { testnet: _.startCase(DEFAULT_TESTNET) })
+    )
   }
 
   importContactsIfNeeded = () => {

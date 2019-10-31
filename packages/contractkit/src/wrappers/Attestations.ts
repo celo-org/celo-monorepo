@@ -2,7 +2,7 @@ import { ECIES, PhoneNumberUtils, SignatureUtils } from '@celo/utils'
 import { zip3 } from '@celo/utils/lib/collections'
 import BigNumber from 'bignumber.js'
 import * as Web3Utils from 'web3-utils'
-import { Address, CeloContract } from '../base'
+import { Address, CeloContract, NULL_ADDRESS } from '../base'
 import { Attestations } from '../generated/types/Attestations'
 import {
   BaseWrapper,
@@ -17,6 +17,10 @@ const parseSignature = SignatureUtils.parseSignature
 export interface AttestationStat {
   completed: number
   total: number
+}
+
+export interface AttestationStateForIssuer {
+  attestationState: AttestationState
 }
 
 export interface AttestationsToken {
@@ -58,6 +62,7 @@ function attestationMessageToSign(phoneHash: string, account: Address) {
   return messageHash
 }
 
+const stringIdentity = (x: string) => x
 export class AttestationsWrapper extends BaseWrapper<Attestations> {
   /**
    *  Returns the time an attestation can be completable before it is considered expired
@@ -322,6 +327,9 @@ export class AttestationsWrapper extends BaseWrapper<Attestations> {
     const phoneHash = PhoneNumberUtils.getPhoneHash(phoneNumber)
     const expectedSourceMessage = attestationMessageToSign(phoneHash, account)
     const { r, s, v } = parseSignature(expectedSourceMessage, code, issuer.toLowerCase())
-    return this.contract.methods.validateAttestationCode(phoneHash, account, v, r, s).call()
+    const result = await this.contract.methods
+      .validateAttestationCode(phoneHash, account, v, r, s)
+      .call()
+    return result.toLowerCase() !== NULL_ADDRESS
   }
 }

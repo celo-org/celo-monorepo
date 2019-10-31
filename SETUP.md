@@ -101,7 +101,6 @@ Execute the following (and make sure the lines are in your `~/.bash_profile`):
 ```bash
 export ANDROID_HOME=/usr/local/share/android-sdk
 export ANDROID_NDK=/usr/local/share/android-ndk
-# Optional to speedup java builds
 export GRADLE_OPTS='-Dorg.gradle.daemon=true -Dorg.gradle.parallel=true -Dorg.gradle.jvmargs="-Xmx4096m -XX:+HeapDumpOnOutOfMemoryError"'
 ```
 
@@ -205,7 +204,7 @@ Install the Android 28 system image and create an Android Virtual Device:
 
 ```bash
 sdkmanager "system-images;android-28;google_apis;x86"
-avdmanager create avd --force --name Nexus_5X_API_28 --device "Nexus 5X" -k "system-images;android-28;google_apis;x86" --abi "google_apis/x86"
+avdmanager create avd --force --name Nexus_5X_API_28_x86 --device "Nexus 5X" -k "system-images;android-28;google_apis;x86" --abi "google_apis/x86"
 ```
 
 Execute the following and add it to your `~/.bash_profile`:

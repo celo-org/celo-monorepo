@@ -352,7 +352,7 @@ contract Validators is
       publicKeysData.length == (64 + 48 + 96)
     );
     // Use the proof of possession bytes
-    require(checkProofOfPossession(publicKeysData.slice(64, 48 + 96)));
+    require(checkProofOfPossession(msg.sender, publicKeysData.slice(64, 48 + 96)));
 
     address account = getAccounts().activeValidationSignerToAccount(msg.sender);
     require(!isValidator(account) && !isValidatorGroup(account));
@@ -370,9 +370,15 @@ contract Validators is
    * @param proofOfPossessionBytes The public key and signature of the proof of possession.
    * @return True upon success.
    */
-  function checkProofOfPossession(bytes memory proofOfPossessionBytes) private returns (bool) {
+  function checkProofOfPossession(
+    address sender, 
+    bytes memory proofOfPossessionBytes
+  ) private returns (bool) {
     bool success;
-    (success, ) = PROOF_OF_POSSESSION.call.value(0).gas(gasleft())(proofOfPossessionBytes);
+    (success, ) = PROOF_OF_POSSESSION
+      .call
+      .value(0)
+      .gas(gasleft())(abi.encodePacked(sender, proofOfPossessionBytes));
     return success;
   }
 
