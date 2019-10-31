@@ -1932,7 +1932,7 @@ contract('Governance', (accounts: string[]) => {
       assertLogMatches2(log, {
         event: 'HotfixApproved',
         args: {
-          hash: matchAny
+          hash: matchAny,
         },
       })
       assert.isTrue(Buffer.from(stripHexEncoding(log.args.hash), 'hex').equals(proposalHash))
