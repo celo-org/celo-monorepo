@@ -2,7 +2,7 @@ import { ECIES, PhoneNumberUtils, SignatureUtils } from '@celo/utils'
 import { zip3 } from '@celo/utils/lib/collections'
 import BigNumber from 'bignumber.js'
 import * as Web3Utils from 'web3-utils'
-import { Address, CeloContract } from '../base'
+import { Address, CeloContract, NULL_ADDRESS } from '../base'
 import { Attestations } from '../generated/types/Attestations'
 import {
   BaseWrapper,
@@ -18,6 +18,10 @@ const parseSignature = SignatureUtils.parseSignature
 export interface AttestationStat {
   completed: number
   total: number
+}
+
+export interface AttestationStateForIssuer {
+  attestationState: AttestationState
 }
 
 export interface AttestationsToken {
@@ -59,6 +63,7 @@ function attestationMessageToSign(phoneHash: string, account: Address) {
   return messageHash
 }
 
+const stringIdentity = (x: string) => x
 export class AttestationsWrapper extends BaseWrapper<Attestations> {
   /**
    *  Returns the time an attestation can be completable before it is considered expired
@@ -92,6 +97,21 @@ export class AttestationsWrapper extends BaseWrapper<Attestations> {
     this.contract.methods.getAttestationStats,
     tupleParser(PhoneNumberUtils.getPhoneHash, (x: string) => x),
     (stat) => ({ completed: toNumber(stat[0]), total: toNumber(stat[1]) })
+  )
+
+  /**
+   * Returns the attestation state of a phone number/account/issuer tuple
+   * @param phoneNumber Phone Number
+   * @param account Account
+   */
+  getAttestationState: (
+    phoneNumber: string,
+    account: Address,
+    issuer: Address
+  ) => Promise<AttestationStateForIssuer> = proxyCall(
+    this.contract.methods.getAttestationState,
+    tupleParser(PhoneNumberUtils.getPhoneHash, stringIdentity, stringIdentity),
+    (state) => ({ attestationState: parseInt(state[0], 10) })
   )
 
   /**
@@ -356,6 +376,9 @@ export class AttestationsWrapper extends BaseWrapper<Attestations> {
     const phoneHash = PhoneNumberUtils.getPhoneHash(phoneNumber)
     const expectedSourceMessage = attestationMessageToSign(phoneHash, account)
     const { r, s, v } = parseSignature(expectedSourceMessage, code, issuer.toLowerCase())
-    return this.contract.methods.validateAttestationCode(phoneHash, account, v, r, s).call()
+    const result = await this.contract.methods
+      .validateAttestationCode(phoneHash, account, v, r, s)
+      .call()
+    return result.toLowerCase() !== NULL_ADDRESS
   }
 }
