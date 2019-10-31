@@ -85,6 +85,21 @@ export class AttestationsWrapper extends BaseWrapper<Attestations> {
   )
 
   /**
+   * Returns the attestation state of a phone number/account/issuer tuple
+   * @param phoneNumber Phone Number
+   * @param account Account
+   */
+  getAttestationState: (
+    phoneNumber: string,
+    account: Address,
+    issuer: Address
+  ) => Promise<AttestationStateForIssuer> = proxyCall(
+    this.contract.methods.getAttestationState,
+    tupleParser(PhoneNumberUtils.getPhoneHash, stringIdentity, stringIdentity),
+    (state) => ({ attestationState: parseInt(state[0], 10) })
+  )
+
+  /**
    * Returns the attestation stats of a phone number/account pair
    * @param phoneNumber Phone Number
    * @param account Account
