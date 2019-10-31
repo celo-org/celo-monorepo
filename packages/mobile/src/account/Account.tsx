@@ -2,12 +2,12 @@ import Link from '@celo/react-components/components/Link'
 import colors from '@celo/react-components/styles/colors'
 import { fontStyles } from '@celo/react-components/styles/fonts'
 import { anonymizedPhone, isE164Number } from '@celo/utils/src/phoneNumbers'
+import * as Sentry from '@sentry/react-native'
 import * as React from 'react'
 import { Trans, WithNamespaces, withNamespaces } from 'react-i18next'
 import { Clipboard, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
 import DeviceInfo from 'react-native-device-info'
 import SafeAreaView from 'react-native-safe-area-view'
-import { Sentry } from 'react-native-sentry'
 import { connect } from 'react-redux'
 import { devModeTriggerClicked, resetBackupState } from 'src/account/actions'
 import SettingsItem from 'src/account/SettingsItem'
@@ -47,6 +47,7 @@ type Props = StateProps & DispatchProps & WithNamespaces
 
 interface State {
   verified: boolean | undefined
+  version: string
 }
 
 const mapStateToProps = (state: RootState): StateProps => {
@@ -72,12 +73,14 @@ export class Account extends React.Component<Props, State> {
 
   state: State = {
     verified: undefined,
+    version: '',
   }
 
   async componentDidMount() {
     const phoneNumber = this.props.e164PhoneNumber
     const verified = await isPhoneNumberVerified(phoneNumber)
     this.setState({ verified })
+    this.setState({ version: DeviceInfo.getVersion() })
   }
 
   goToProfile = () => {
@@ -250,13 +253,9 @@ export class Account extends React.Component<Props, State> {
           {this.getDevSettingsComp()}
 
           <View style={style.accountFooter}>
-            {DeviceInfo.getVersion() && (
-              <View style={style.accountFooterText}>
-                <Text style={fontStyles.bodySmall}>
-                  {t('version') + ' ' + DeviceInfo.getVersion()}
-                </Text>
-              </View>
-            )}
+            <View style={style.accountFooterText}>
+              <Text style={fontStyles.bodySmall}>{t('version') + ' ' + this.state.version}</Text>
+            </View>
             <View style={style.accountFooterText}>
               <Trans i18nKey="testFaqHere">
                 <Text style={fontStyles.bodySmall}>Test FAQ is </Text>

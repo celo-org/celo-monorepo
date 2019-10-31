@@ -147,7 +147,7 @@ async function verifyCode(
     matchingIssuer,
     code
   )
-  if (isValidRequest === NULL_ADDRESS) {
+  if (!isValidRequest) {
     console.warn('Code was not valid')
     return
   }

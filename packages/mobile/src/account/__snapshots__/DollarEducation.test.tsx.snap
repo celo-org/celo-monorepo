@@ -31,6 +31,7 @@ exports[`DollarEducation renders correctly 1`] = `
     >
       <View
         accessible={true}
+        focusable={true}
         isTVSelectable={true}
         nativeBackgroundAndroid={
           Object {
@@ -38,6 +39,7 @@ exports[`DollarEducation renders correctly 1`] = `
             "type": "ThemeAttrAndroid",
           }
         }
+        onClick={[Function]}
         onResponderGrant={[Function]}
         onResponderMove={[Function]}
         onResponderRelease={[Function]}
@@ -119,7 +121,7 @@ exports[`DollarEducation renders correctly 1`] = `
           resizeMode="contain"
           source={
             Object {
-              "testUri": "../../../src/images/stability-scale.png",
+              "testUri": "../../../packages/mobile/src/images/stability-scale.png",
             }
           }
           style={
@@ -164,7 +166,7 @@ exports[`DollarEducation renders correctly 1`] = `
           resizeMode="contain"
           source={
             Object {
-              "testUri": "../../../src/images/send-fee.png",
+              "testUri": "../../../packages/mobile/src/images/send-fee.png",
             }
           }
           style={
@@ -209,7 +211,7 @@ exports[`DollarEducation renders correctly 1`] = `
           resizeMode="contain"
           source={
             Object {
-              "testUri": "../../../src/images/send-between-phones.png",
+              "testUri": "../../../packages/mobile/src/images/send-between-phones.png",
             }
           }
           style={
