@@ -2177,18 +2177,6 @@
   resolved "https://registry.yarnpkg.com/@celo/client/-/client-0.0.173.tgz#30d8266f8f4897f1db5c9bf4ad344801e620326f"
   integrity sha512-pAzo3Oy+V/BEkKb7ZZe0l71s6mOdPLLJZfLNo2Ihm2bx37nx8g4LNkcfj+0vVtRQPtiLrGiQ42U8pby3LwmC4Q==
 
-"@celo/contractkit@0.1.1":
-  version "0.1.1"
-  resolved "https://registry.yarnpkg.com/@celo/contractkit/-/contractkit-0.1.1.tgz#bd85812d883b58fbc8d9897a59e2f7311cc0e2eb"
-  integrity sha512-GQbLuLUEgKtwy2I8ZVi4P0HBVhh9MlT5S90vIrGznb9eZ2vwGahfOxHapVKcxw2I4tbVBNTTWWpcjzOtJZCY7Q==
-  dependencies:
-    "@celo/utils" "^0.0.6-beta5"
-    "@types/debug" "^4.1.5"
-    bignumber.js "^7.2.0"
-    debug "^4.1.1"
-    web3 "1.0.0-beta.37"
-    web3-utils "1.0.0-beta.37"
-
 "@celo/contractkit@0.1.5":
   version "0.1.5"
   resolved "https://registry.yarnpkg.com/@celo/contractkit/-/contractkit-0.1.5.tgz#097052ac8f672f03480a1226f11f0c398c35c75e"
@@ -2235,10 +2223,6 @@
   version "1.0.3"
   resolved "git+https://github.com/celo-org/react-native-sms-retriever#b88e502fcd5bab2b6b9a22f59829c3eb40e27780"
 
-"@celo/react-native-sms-retriever@git+https://github.com/celo-org/react-native-sms-retriever#d3a2fdb":
-  version "1.0.3"
-  resolved "git+https://github.com/celo-org/react-native-sms-retriever#d3a2fdb148e3427c9a8c1c87acb61e79e2afcfee"
-
 "@celo/utils@0.1.0":
   version "0.1.0"
   resolved "https://registry.yarnpkg.com/@celo/utils/-/utils-0.1.0.tgz#081e0c9a7ea3e7b50cbc88e89b0f7ff8d5578499"
@@ -2256,23 +2240,6 @@
     futoin-hkdf "^1.0.3"
     google-libphonenumber "^3.2.4"
     keccak256 "^1.0.0"
-    lodash "^4.17.14"
-    web3-utils "1.0.0-beta.37"
-
-"@celo/utils@^0.0.6-beta5":
-  version "0.0.6-beta5"
-  resolved "https://registry.yarnpkg.com/@celo/utils/-/utils-0.0.6-beta5.tgz#a558cfc9dc68d9ec15888798c95cd6e5f1d3fe67"
-  integrity sha512-TGIDjr1aCcNRVv2Z3DZkjd71K/vNd6C18BPZw8VfKzSFyt0UcxkbN/X+loqvJSrwymtYgu/s6JdIQD3t14xiJA==
-  dependencies:
-    "@umpirsky/country-list" "git://github.com/umpirsky/country-list#05fda51"
-    bignumber.js "^7.2.0"
-    bn.js "4.11.8"
-    country-data "^0.0.31"
-    crypto-js "^3.1.9-1"
-    elliptic "^6.4.1"
-    ethereumjs-util "^5.2.0"
-    futoin-hkdf "^1.0.3"
-    google-libphonenumber "^3.2.1"
     lodash "^4.17.14"
     web3-utils "1.0.0-beta.37"
 
@@ -5683,11 +5650,6 @@
 "@umpirsky/country-list@git://github.com/umpirsky/country-list#05fda51":
   version "1.0.0"
   resolved "git://github.com/umpirsky/country-list#05fda51cd97b3294e8175ffed06104c44b3c71d7"
-
-"@umpirsky/country-list@git://github.com/umpirsky/country-list.git#05fda51":
-  version "1.0.0"
-  uid "05fda51cd97b3294e8175ffed06104c44b3c71d7"
-  resolved "git://github.com/umpirsky/country-list.git#05fda51cd97b3294e8175ffed06104c44b3c71d7"
 
 "@ungap/url-search-params@^0.1.2":
   version "0.1.2"
@@ -11942,6 +11904,11 @@ denodeify@^1.2.1:
   resolved "https://registry.yarnpkg.com/denodeify/-/denodeify-1.2.1.tgz#3a36287f5034e699e7577901052c2e6c94251631"
   integrity sha1-OjYof1A05pnnV3kBBSwubJQlFjE=
 
+denque@^1.4.1:
+  version "1.4.1"
+  resolved "https://registry.yarnpkg.com/denque/-/denque-1.4.1.tgz#6744ff7641c148c3f8a69c307e51235c1f4a37cf"
+  integrity sha512-OfzPuSZKGcgr96rf1oODnfjqBFmr1DVoc/TrItj3Ohe0Ah1C5WX5Baquw/9U9KovnQ88EqmJbD66rKYUQYN1tQ==
+
 depd@1.1.1:
   version "1.1.1"
   resolved "https://registry.yarnpkg.com/depd/-/depd-1.1.1.tgz#5783b4e1c459f06fa5ca27f991f3d06e7a310359"
@@ -15180,10 +15147,10 @@ forwarded@~0.1.2:
   resolved "https://registry.yarnpkg.com/forwarded/-/forwarded-0.1.2.tgz#98c23dab1175657b8c0573e8ceccd91b0ff18c84"
   integrity sha1-mMI9qxF1ZXuMBXPozszZGw/xjIQ=
 
-fp-ts@2.0.5:
-  version "2.0.5"
-  resolved "https://registry.yarnpkg.com/fp-ts/-/fp-ts-2.0.5.tgz#9560d8a6a4f53cbda9f9b31ed8d1458e41939e07"
-  integrity sha512-opI5r+rVlpZE7Rhk0YtqsrmxGkbIw0dRNqGca8FEAMMnjomXotG+R9QkLQg20onx7R8qhepAn4CCOP8usma/Xw==
+fp-ts@2.1.1:
+  version "2.1.1"
+  resolved "https://registry.yarnpkg.com/fp-ts/-/fp-ts-2.1.1.tgz#c910544499d7c959351bb4260ee7c44a544084c1"
+  integrity sha512-YcWhMdDCFCja0MmaDroTgNu+NWWrrnUEn92nvDgrtVy9Z71YFnhNVIghoHPt8gs82ijoMzFGeWKvArbyICiJgw==
 
 fraction.js@4.0.8:
   version "4.0.8"
@@ -15744,7 +15711,7 @@ generate-function@^1.0.1:
   resolved "https://registry.yarnpkg.com/generate-function/-/generate-function-1.1.0.tgz#54c21b080192b16d9877779c5bb81666e772365f"
   integrity sha1-VMIbCAGSsW2Yd3ecW7gWZudyNl8=
 
-generate-function@^2.0.0:
+generate-function@^2.0.0, generate-function@^2.3.1:
   version "2.3.1"
   resolved "https://registry.yarnpkg.com/generate-function/-/generate-function-2.3.1.tgz#f069617690c10c868e73b8465746764f97c3479f"
   integrity sha512-eeB5GfMNeevm/GRYq20ShmsaGcmI81kIX2K9XQx5miC8KdHaC6Jm0qQ8ZNeGOi7wYB8OsdxKs+Y2oVuTFuVwKQ==
@@ -16561,11 +16528,6 @@ google-gax@^1.0.0, google-gax@^1.1.2:
     retry-request "^4.0.0"
     semver "^6.0.0"
     walkdir "^0.4.0"
-
-google-libphonenumber@^3.2.1:
-  version "3.2.6"
-  resolved "https://registry.yarnpkg.com/google-libphonenumber/-/google-libphonenumber-3.2.6.tgz#3d725b48ff44706b80246e77f95f2c2fdc6fd729"
-  integrity sha512-6QCQAaKJlSd/1dUqvdQf7zzfb3uiZHsG8yhCfOdCVRfMuPZ/VDIEB47y5SYwjPQJPs7ebfW5jj6PeobB9JJ4JA==
 
 google-libphonenumber@^3.2.4:
   version "3.2.4"
@@ -17835,6 +17797,13 @@ iconv-lite@^0.4.17, iconv-lite@^0.4.4:
   integrity sha512-En5V9za5mBt2oUA03WGD3TwDv0MKAruqsuxstbMUZaj9W9k/m1CV/9py3l0L5kw9Bln8fdHQmzHSYtvpvTLpKw==
   dependencies:
     safer-buffer "^2.1.0"
+
+iconv-lite@^0.5.0:
+  version "0.5.0"
+  resolved "https://registry.yarnpkg.com/iconv-lite/-/iconv-lite-0.5.0.tgz#59cdde0a2a297cc2aeb0c6445a195ee89f127550"
+  integrity sha512-NnEhI9hIEKHOzJ4f697DMz9IQEXr/MMJ5w64vN2/4Ai+wRnvV7SBrL0KLoRlwaKVghOc7LQ5YkPLuX146b6Ydw==
+  dependencies:
+    safer-buffer ">= 2.1.2 < 3"
 
 icss-replace-symbols@1.1.0, icss-replace-symbols@^1.0.2, icss-replace-symbols@^1.1.0:
   version "1.1.0"
@@ -21217,6 +21186,14 @@ lru-cache@^4.1.1, lru-cache@^4.1.2:
     pseudomap "^1.0.2"
     yallist "^2.1.2"
 
+lru-cache@^4.1.3, lru-cache@^4.1.5, lru-cache@~4.1.1:
+  version "4.1.5"
+  resolved "https://registry.yarnpkg.com/lru-cache/-/lru-cache-4.1.5.tgz#8bbe50ea85bed59bc9e33dcab8235ee9bcf443cd"
+  integrity sha512-sWZlbEP2OsHNkXrMl5GYk/jKk70MBng6UU4YI/qGDYbgf6YbP4EvmqISbXCoJiRKs+1bSpFHVgQxvJ17F2li5g==
+  dependencies:
+    pseudomap "^1.0.2"
+    yallist "^2.1.2"
+
 lru-cache@^5.0.0, lru-cache@^5.1.1:
   version "5.1.1"
   resolved "https://registry.yarnpkg.com/lru-cache/-/lru-cache-5.1.1.tgz#1da27e6710271947695daf6848e847f01d84b920"
@@ -22475,6 +22452,21 @@ mv@~2:
     ncp "~2.0.0"
     rimraf "~2.4.0"
 
+mysql2@2.0.0-alpha1:
+  version "2.0.0-alpha1"
+  resolved "https://registry.yarnpkg.com/mysql2/-/mysql2-2.0.0-alpha1.tgz#cb76b874c4c24471334cfebb874ebed9a2a6afe5"
+  integrity sha512-E1S97AZ7uuDycWzjzmSsPlp6Lgxd83XKFGyi8AOurFBmjC70XmqvSNigJfnioOjkh4ghsEe1m8nobx/PANi/FQ==
+  dependencies:
+    cardinal "^2.1.1"
+    denque "^1.4.1"
+    generate-function "^2.3.1"
+    iconv-lite "^0.5.0"
+    long "^4.0.0"
+    lru-cache "^5.1.1"
+    named-placeholders "^1.1.2"
+    seq-queue "^0.0.5"
+    sqlstring "^2.3.1"
+
 mz@^2.6.0:
   version "2.7.0"
   resolved "https://registry.yarnpkg.com/mz/-/mz-2.7.0.tgz#95008057a56cafadc2bc63dde7f9ff6955948e32"
@@ -22483,6 +22475,13 @@ mz@^2.6.0:
     any-promise "^1.0.0"
     object-assign "^4.0.1"
     thenify-all "^1.0.0"
+
+named-placeholders@^1.1.2:
+  version "1.1.2"
+  resolved "https://registry.yarnpkg.com/named-placeholders/-/named-placeholders-1.1.2.tgz#ceb1fbff50b6b33492b5cf214ccf5e39cef3d0e8"
+  integrity sha512-wiFWqxoLL3PGVReSZpjLVxyJ1bRqe+KKJVbr4hGs1KWfTZTQyezHFBbuKj9hsizHyGV2ne7EMjHdxEGAybD5SA==
+  dependencies:
+    lru-cache "^4.1.3"
 
 nan@2.13.2:
   version "2.13.2"
@@ -28681,6 +28680,11 @@ sentence-case@^2.1.0:
     no-case "^2.2.0"
     upper-case-first "^1.1.2"
 
+seq-queue@^0.0.5:
+  version "0.0.5"
+  resolved "https://registry.yarnpkg.com/seq-queue/-/seq-queue-0.0.5.tgz#d56812e1c017a6e4e7c3e3a37a1da6d78dd3c93e"
+  integrity sha1-1WgS4cAXpuTnw+Ojeh2m143TyT4=
+
 sequelize-cli@5.5.0:
   version "5.5.0"
   resolved "https://registry.yarnpkg.com/sequelize-cli/-/sequelize-cli-5.5.0.tgz#b0570352f70eaa489a25dccf55cf316675d6ff06"
@@ -29783,6 +29787,11 @@ sqlite3@4.0.9:
     nan "^2.12.1"
     node-pre-gyp "^0.11.0"
     request "^2.87.0"
+
+sqlstring@^2.3.1:
+  version "2.3.1"
+  resolved "https://registry.yarnpkg.com/sqlstring/-/sqlstring-2.3.1.tgz#475393ff9e91479aea62dcaf0ca3d14983a7fb40"
+  integrity sha1-R1OT/56RR5rqYtyvDKPRSYOn+0A=
 
 sshpk@^1.7.0:
   version "1.14.1"
@@ -33930,6 +33939,7 @@ websocket@^1.0.28:
   dependencies:
     debug "^2.2.0"
     es5-ext "^0.10.50"
+    gulp "^4.0.2"
     nan "^2.14.0"
     typedarray-to-buffer "^3.1.5"
     yaeti "^0.0.6"
