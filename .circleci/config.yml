@@ -213,6 +213,9 @@ jobs:
       - restore_cache:
           key: yarn-v3-{{ arch }}-{{ .Branch }}-{{ checksum "packages/mobile/android/build.gradle" }}-{{ checksum "packages/mobile/android/settings.gradle" }}-{{ checksum "packages/mobile/android/app/build.gradle" }}-{{ checksum "packages/mobile/.env.test" }}
       - run:
+          name: Make sure there's only one adb # This is probably a brew bug
+          command: cp /usr/local/share/android-sdk/platform-tools/adb /usr/local/bin/adb
+      - run:
           name: Start emulator
           command: cd ~/src/packages/mobile && bash ./scripts/start_emulator.sh
           background: true
