@@ -1,4 +1,5 @@
 import { ECIES, PhoneNumberUtils, SignatureUtils } from '@celo/utils'
+import { sleep } from '@celo/utils/lib/async'
 import { zip3 } from '@celo/utils/lib/collections'
 import BigNumber from 'bignumber.js'
 import * as Web3Utils from 'web3-utils'
@@ -85,6 +86,55 @@ export class AttestationsWrapper extends BaseWrapper<Attestations> {
     toBigNumber
   )
 
+  selectIssuersWaitBlocks = proxyCall(
+    this.contract.methods.selectIssuersWaitBlocks,
+    undefined,
+    toNumber
+  )
+
+  /**
+   * @notice Returns the unselected attestation request for an identifier/account pair, if any.
+   * @param identifier Hash of the identifier.
+   * @param account Address of the account.
+   * @return [
+   *           Block number at which was requested,
+   *           Number of unselected requests,
+   *           Address of the token with which this attestation request was paid for
+   *         ]
+   */
+  getUnselectedRequest = proxyCall(
+    this.contract.methods.getUnselectedRequest,
+    tupleParser(PhoneNumberUtils.getPhoneHash, (x: string) => x),
+    (res) => ({
+      blockNumber: toNumber(res[0]),
+      attestationsRequested: toNumber(res[1]),
+      attestationRequestFeeToken: res[2],
+    })
+  )
+
+  waitForSelectingIssuers = async (
+    phoneNumber: string,
+    account: Address,
+    timeoutSeconds = 120,
+    pollDurationSeconds = 1
+  ) => {
+    const startTime = Date.now()
+    const unselectedRequest = await this.getUnselectedRequest(phoneNumber, account)
+    const waitBlocks = await this.selectIssuersWaitBlocks()
+
+    if (unselectedRequest.blockNumber === 0) {
+      throw new Error('No unselectedRequest to wait for')
+    }
+    // Technically should use subscriptions here but not all providers support it.
+    // TODO: Use subscription if provider supports
+    while (Date.now() - startTime < timeoutSeconds * 1000) {
+      const blockNumber = await this.kit.web3.eth.getBlockNumber()
+      if (blockNumber >= unselectedRequest.blockNumber + waitBlocks - 1) {
+        return
+      }
+      await sleep(pollDurationSeconds * 1000)
+    }
+  }
   /**
    * Returns the attestation stats of a phone number/account pair
    * @param phoneNumber Phone Number
@@ -95,7 +145,7 @@ export class AttestationsWrapper extends BaseWrapper<Attestations> {
     account: Address
   ) => Promise<AttestationStat> = proxyCall(
     this.contract.methods.getAttestationStats,
-    tupleParser(PhoneNumberUtils.getPhoneHash, (x: string) => x),
+    tupleParser(PhoneNumberUtils.getPhoneHash, stringIdentity),
     (stat) => ({ completed: toNumber(stat[0]), total: toNumber(stat[1]) })
   )
 

@@ -62,7 +62,8 @@ async function verifyCmd(argv: VerifyArgv) {
     await requestMoreAttestations(
       attestations,
       argv.phone,
-      argv.num - attestationsToComplete.length
+      argv.num - attestationsToComplete.length,
+      account
     )
   }
 
@@ -100,7 +101,8 @@ export async function printCurrentCompletedAttestations(
 async function requestMoreAttestations(
   attestations: AttestationsWrapper,
   phoneNumber: string,
-  attestationsRequested: number
+  attestationsRequested: number,
+  account: string
 ) {
   await attestations
     .approveAttestationFee(attestationsRequested)
@@ -108,6 +110,8 @@ async function requestMoreAttestations(
   await attestations
     .request(phoneNumber, attestationsRequested)
     .then((txo) => txo.sendAndWaitForReceipt())
+  await attestations.waitForSelectingIssuers(phoneNumber, account)
+  await attestations.selectIssuers(phoneNumber).then((txo) => txo.sendAndWaitForReceipt())
 }
 
 async function revealAttestations(
