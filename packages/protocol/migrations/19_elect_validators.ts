@@ -39,7 +39,8 @@ async function lockGold(lockedGold: LockedGoldInstance, value: BigNumber, privat
 async function registerValidatorGroup(
   lockedGold: LockedGoldInstance,
   validators: ValidatorsInstance,
-  privateKey: string
+  privateKey: string,
+  numMembers: number
 ) {
   // Validators can't also be validator groups, so we create a new account to register the
   // validator group with, and set the group identifier to the private key of this account
@@ -53,13 +54,18 @@ async function registerValidatorGroup(
   const encryptedPrivateKey = encryptionWeb3.eth.accounts.encrypt(account.privateKey, privateKey)
   const encodedKey = serializeKeystore(encryptedPrivateKey)
 
+  // Value is per-validator.
+  const lockedGoldValue = new BigNumber(config.validators.groupLockedGoldRequirements.value).times(
+    numMembers
+  )
+
   await web3.eth.sendTransaction({
     from: generateAccountAddressFromPrivateKey(privateKey.slice(0)),
     to: account.address,
-    value: config.validators.registrationRequirements.group * 2, // Add a premium to cover tx fees
+    value: lockedGoldValue.times(1.01).toFixed(), // Add a premium to cover tx fees
   })
 
-  await lockGold(lockedGold, config.validators.registrationRequirements.group, account.privateKey)
+  await lockGold(lockedGold, lockedGoldValue, account.privateKey)
 
   // @ts-ignore
   const tx = validators.contract.methods.registerValidatorGroup(
@@ -89,12 +95,15 @@ async function registerValidator(
   const blsPublicKey = bls12377js.BLS.privateToPublicBytes(blsValidatorPrivateKeyBytes).toString(
     'hex'
   )
-  const blsPoP = bls12377js.BLS.signPoP(blsValidatorPrivateKeyBytes).toString('hex')
+  const blsPoP = bls12377js.BLS.signPoP(
+    blsValidatorPrivateKeyBytes,
+    Buffer.from(address.slice(2), 'hex')
+  ).toString('hex')
   const publicKeysData = publicKey + blsPublicKey + blsPoP
 
   await lockGold(
     lockedGold,
-    config.validators.registrationRequirements.validator,
+    config.validators.validatorLockedGoldRequirements.value,
     validatorPrivateKey
   )
 
@@ -148,7 +157,12 @@ module.exports = async (_deployer: any) => {
 
   console.info('  Registering ValidatorGroup ...')
   const firstPrivateKey = valKeys[0]
-  const account = await registerValidatorGroup(lockedGold, validators, firstPrivateKey)
+  const account = await registerValidatorGroup(
+    lockedGold,
+    validators,
+    firstPrivateKey,
+    valKeys.length
+  )
 
   console.info('  Registering Validators ...')
   await Promise.all(
