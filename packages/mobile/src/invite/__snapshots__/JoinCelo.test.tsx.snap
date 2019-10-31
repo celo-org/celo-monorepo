@@ -26,6 +26,8 @@ exports[`JoinCeloScreen renders correctly 1`] = `
   >
     <Text
       accessible={true}
+      focusable={true}
+      onClick={[Function]}
       onResponderGrant={[Function]}
       onResponderMove={[Function]}
       onResponderRelease={[Function]}
@@ -61,7 +63,7 @@ exports[`JoinCeloScreen renders correctly 1`] = `
           resizeMode="contain"
           source={
             Object {
-              "testUri": "../../../src/images/coins-logo.png",
+              "testUri": "../../../packages/mobile/src/images/coins-logo.png",
             }
           }
           style={
@@ -440,6 +442,7 @@ exports[`JoinCeloScreen renders correctly 1`] = `
   >
     <View
       accessible={true}
+      focusable={true}
       isTVSelectable={true}
       nativeBackgroundAndroid={
         Object {
@@ -447,6 +450,7 @@ exports[`JoinCeloScreen renders correctly 1`] = `
           "type": "ThemeAttrAndroid",
         }
       }
+      onClick={[Function]}
       onResponderGrant={[Function]}
       onResponderMove={[Function]}
       onResponderRelease={[Function]}
@@ -534,6 +538,8 @@ exports[`JoinCeloScreen renders with an error 1`] = `
   >
     <Text
       accessible={true}
+      focusable={true}
+      onClick={[Function]}
       onResponderGrant={[Function]}
       onResponderMove={[Function]}
       onResponderRelease={[Function]}
@@ -569,7 +575,7 @@ exports[`JoinCeloScreen renders with an error 1`] = `
           resizeMode="contain"
           source={
             Object {
-              "testUri": "../../../src/images/coins-logo.png",
+              "testUri": "../../../packages/mobile/src/images/coins-logo.png",
             }
           }
           style={
@@ -948,6 +954,7 @@ exports[`JoinCeloScreen renders with an error 1`] = `
   >
     <View
       accessible={true}
+      focusable={true}
       isTVSelectable={true}
       nativeBackgroundAndroid={
         Object {
@@ -955,6 +962,7 @@ exports[`JoinCeloScreen renders with an error 1`] = `
           "type": "ThemeAttrAndroid",
         }
       }
+      onClick={[Function]}
       onResponderGrant={[Function]}
       onResponderMove={[Function]}
       onResponderRelease={[Function]}

@@ -65,7 +65,9 @@ exports[`LanguageSelectUI renders correctly with minimum props 1`] = `
       />
       <View
         accessible={true}
+        focusable={true}
         isTVSelectable={true}
+        onClick={[Function]}
         onResponderGrant={[Function]}
         onResponderMove={[Function]}
         onResponderRelease={[Function]}
@@ -137,7 +139,9 @@ exports[`LanguageSelectUI renders correctly with minimum props 1`] = `
       </View>
       <View
         accessible={true}
+        focusable={true}
         isTVSelectable={true}
+        onClick={[Function]}
         onResponderGrant={[Function]}
         onResponderMove={[Function]}
         onResponderRelease={[Function]}
@@ -228,7 +232,15 @@ exports[`LanguageSelectUI renders correctly with minimum props 1`] = `
   >
     <View
       accessible={true}
+      focusable={true}
       isTVSelectable={true}
+      nativeBackgroundAndroid={
+        Object {
+          "attribute": "selectableItemBackground",
+          "type": "ThemeAttrAndroid",
+        }
+      }
+      onClick={[Function]}
       onResponderGrant={[Function]}
       onResponderMove={[Function]}
       onResponderRelease={[Function]}
@@ -236,15 +248,22 @@ exports[`LanguageSelectUI renders correctly with minimum props 1`] = `
       onResponderTerminationRequest={[Function]}
       onStartShouldSetResponder={[Function]}
       style={
-        Object {
-          "alignItems": "center",
-          "backgroundColor": "#42D689",
-          "borderWidth": 0,
-          "flex": 1,
-          "height": 50,
-          "justifyContent": "center",
-          "opacity": 1,
-        }
+        Array [
+          Object {
+            "alignItems": "center",
+            "flex": 1,
+            "justifyContent": "center",
+          },
+          Object {
+            "backgroundColor": "#42D689",
+          },
+          Object {
+            "height": 50,
+          },
+          Object {
+            "borderWidth": 0,
+          },
+        ]
       }
       testID="ChooseLanguageButton"
     >
