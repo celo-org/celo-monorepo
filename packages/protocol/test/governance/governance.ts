@@ -64,7 +64,7 @@ interface Transaction {
   data: Buffer
 }
 
-// hard code in ganache
+// hard coded in ganache
 const EPOCH = 100
 
 // TODO(asa): Test dequeueProposalsIfReady
