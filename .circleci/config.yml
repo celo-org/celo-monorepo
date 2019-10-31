@@ -244,9 +244,8 @@ jobs:
           command: adb kill-server && adb start-server
       - run:
           name: Run test itself
-          command: cd ~/src/packages/mobile && 
-                  ENVFILE=".env.test" yarn test:detox || 
-                  echo "detox failed, retrying" && ENVFILE=".env.test" yarn test:detox
+          # TODO errors are currently not reported, until we figure out why detox can't find functions https://github.com/wix/Detox/issues/1723
+          command: cd ~/src/packages/mobile && ENVFILE=".env.test" yarn test:detox || ENVFILE=".env.test" yarn test:detox || echo "detox failed"
       - run: cd ~/src
       - save_cache:
           key: yarn-v3-{{ arch }}-{{ .Branch }}-{{ checksum "packages/mobile/android/build.gradle" }}-{{ checksum "packages/mobile/android/settings.gradle" }}-{{ checksum "packages/mobile/android/app/build.gradle" }}-{{ checksum "packages/mobile/.env.test" }}
@@ -693,108 +692,108 @@ workflows:
   version: 2
   celo-monorepo-build:
     jobs:
-      #- install_dependencies
-      - end-to-end-mobile-test #:
-  #         requires:
-  #           - install_dependencies
-  #           - mobile-test-build-app
-  #     - lint-checks:
-  #         requires:
-  #           - install_dependencies
-  #     - general-test:
-  #         requires:
-  #           - install_dependencies
-  #     - walletkit-test:
-  #         requires:
-  #           - install_dependencies
-  #     - cli-test:
-  #         requires:
-  #           - install_dependencies
-  #     - contractkit-test:
-  #         requires:
-  #           - install_dependencies
-  #     - mobile-test:
-  #         requires:
-  #           - lint-checks
-  #     - mobile-test-build-app:
-  #         requires:
-  #           - mobile-test
-  #     - verification-pool-api:
-  #         requires:
-  #           - lint-checks
-  #     - protocol-test:
-  #         requires:
-  #           - lint-checks
-  #           - walletkit-test
-  #     - typescript-test:
-  #         requires:
-  #           - install_dependencies
-  #     - utils-test:
-  #         requires:
-  #           - install_dependencies
-  #     - end-to-end-geth-transfer-test:
-  #         requires:
-  #           - lint-checks
-  #           - contractkit-test
-  #     - end-to-end-geth-exit-test:
-  #         requires:
-  #           - lint-checks
-  #           - contractkit-test
-  #     - end-to-end-geth-governance-test:
-  #         requires:
-  #           - lint-checks
-  #           - contractkit-test
-  #     - end-to-end-geth-sync-test:
-  #         requires:
-  #           - lint-checks
-  #           - contractkit-test
-  #     - end-to-end-geth-integration-sync-test:
-  #         requires:
-  #           - lint-checks
-  #           - contractkit-test
-  #     - end-to-end-geth-attestations-test:
-  #         requires:
-  #           - lint-checks
-  #           - contractkit-test
-  #     - end-to-end-geth-validator-order-test:
-  #         requires:
-  #           - lint-checks
-  #           - contractkit-test
-  # npm-install-testing-cron-workflow:
-  #   triggers:
-  #     - schedule:
-  #         # 7 PM in UTC = noon in PDT.
-  #         # Best for test to fail during SF afternoon, so that, someone can fix it during the day time.
-  #         cron: "0 19 * * *"
-  #         filters:
-  #           branches:
-  #             only:
-  #               - master
-  #   jobs:
-  #     - test-typescript-npm-package-install
-  #     - test-utils-npm-package-install
-  #     - test-walletkit-npm-package-install
-  #     - test-contractkit-npm-package-install
-  #     - test-celocli-npm-package-install
-  # protocol-testing-with-code-coverage-cron-workflow:
-  #   triggers:
-  #     - schedule:
-  #         # 1 PM in UTC = 6 AM in PDT.
-  #         # Best for this slow test (~3 hours) to run during SF early morning.
-  #         cron: "0 13 * * *"
-  #         filters:
-  #           branches:
-  #             only:
-  #               - master
-  #   jobs:
-  #     - install_dependencies
-  #     - lint-checks:
-  #         requires:
-  #           - install_dependencies
-  #     - walletkit-test:
-  #         requires:
-  #           - install_dependencies
-  #     - protocol-test-with-code-coverage:
-  #         requires:
-  #           - lint-checks
-  #           - walletkit-test
+      - install_dependencies
+      - end-to-end-mobile-test:
+          requires:
+            - install_dependencies
+            - mobile-test-build-app
+      - lint-checks:
+          requires:
+            - install_dependencies
+      - general-test:
+          requires:
+            - install_dependencies
+      - walletkit-test:
+          requires:
+            - install_dependencies
+      - cli-test:
+          requires:
+            - install_dependencies
+      - contractkit-test:
+          requires:
+            - install_dependencies
+      - mobile-test:
+          requires:
+            - lint-checks
+      - mobile-test-build-app:
+          requires:
+            - mobile-test
+      - verification-pool-api:
+          requires:
+            - lint-checks
+      - protocol-test:
+          requires:
+            - lint-checks
+            - walletkit-test
+      - typescript-test:
+          requires:
+            - install_dependencies
+      - utils-test:
+          requires:
+            - install_dependencies
+      - end-to-end-geth-transfer-test:
+          requires:
+            - lint-checks
+            - contractkit-test
+      - end-to-end-geth-exit-test:
+          requires:
+            - lint-checks
+            - contractkit-test
+      - end-to-end-geth-governance-test:
+          requires:
+            - lint-checks
+            - contractkit-test
+      - end-to-end-geth-sync-test:
+          requires:
+            - lint-checks
+            - contractkit-test
+      - end-to-end-geth-integration-sync-test:
+          requires:
+            - lint-checks
+            - contractkit-test
+      - end-to-end-geth-attestations-test:
+          requires:
+            - lint-checks
+            - contractkit-test
+      - end-to-end-geth-validator-order-test:
+          requires:
+            - lint-checks
+            - contractkit-test
+  npm-install-testing-cron-workflow:
+    triggers:
+      - schedule:
+          # 7 PM in UTC = noon in PDT.
+          # Best for test to fail during SF afternoon, so that, someone can fix it during the day time.
+          cron: "0 19 * * *"
+          filters:
+            branches:
+              only:
+                - master
+    jobs:
+      - test-typescript-npm-package-install
+      - test-utils-npm-package-install
+      - test-walletkit-npm-package-install
+      - test-contractkit-npm-package-install
+      - test-celocli-npm-package-install
+  protocol-testing-with-code-coverage-cron-workflow:
+    triggers:
+      - schedule:
+          # 1 PM in UTC = 6 AM in PDT.
+          # Best for this slow test (~3 hours) to run during SF early morning.
+          cron: "0 13 * * *"
+          filters:
+            branches:
+              only:
+                - master
+    jobs:
+      - install_dependencies
+      - lint-checks:
+          requires:
+            - install_dependencies
+      - walletkit-test:
+          requires:
+            - install_dependencies
+      - protocol-test-with-code-coverage:
+          requires:
+            - lint-checks
+            - walletkit-test
