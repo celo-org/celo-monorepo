@@ -39,6 +39,9 @@ export function* importBackupPhraseSaga({ phrase, useEmptyWallet }: ImportBackup
     }
 
     const privateKey = mnemonicToSeedHex(phrase)
+    if (!privateKey) {
+      throw new Error('Failed to convert mnemonic to hex')
+    }
 
     if (!useEmptyWallet) {
       Logger.debug(TAG + '@importBackupPhraseSaga', 'Checking account balance')
