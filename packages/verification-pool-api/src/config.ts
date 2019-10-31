@@ -22,7 +22,7 @@ export const smsAckTimeout = functionConfig[CELO_ENV]['sms-ack-timeout'] || 5000
 console.debug(`Config settings: app-signture:${appSignature}, networkId:${networkid}`)
 
 // @ts-ignore
-export const web3 = new Web3(`https://${CELO_ENV}-infura.celo-testnet.org`)
+export const web3 = new Web3(`https://${CELO_ENV}-forno.celo-testnet.org`)
 
 let twilioClient: any
 let nexmoClient: any

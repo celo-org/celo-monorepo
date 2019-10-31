@@ -89,7 +89,10 @@ async function registerValidator(
   const blsPublicKey = bls12377js.BLS.privateToPublicBytes(blsValidatorPrivateKeyBytes).toString(
     'hex'
   )
-  const blsPoP = bls12377js.BLS.signPoP(blsValidatorPrivateKeyBytes).toString('hex')
+  const blsPoP = bls12377js.BLS.signPoP(
+    blsValidatorPrivateKeyBytes,
+    Buffer.from(address.slice(2), 'hex')
+  ).toString('hex')
   const publicKeysData = publicKey + blsPublicKey + blsPoP
 
   await lockGold(
