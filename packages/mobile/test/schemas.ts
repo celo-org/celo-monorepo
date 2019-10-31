@@ -9,6 +9,7 @@ export const vNeg1Schema = {
     numberVerified: false,
     error: null,
     dismissErrorAfter: null,
+    doingPinVerification: false,
     language: 'es-AR',
     doingBackupFlow: false,
     message: null,
