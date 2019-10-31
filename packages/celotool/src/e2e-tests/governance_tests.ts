@@ -307,7 +307,7 @@ describe('governance tests', () => {
 
       const getExpectedTotalPayment = async (validator: string, blockNumber: number) => {
         const score = new BigNumber(
-          (await validators.methods.getValidator(validator).call({}, blockNumber))[3]
+          (await validators.methods.getValidator(validator).call({}, blockNumber))[2]
         )
         assert.isNotNaN(score)
         return validatorEpochPayment.times(fromFixed(score))
