@@ -271,7 +271,7 @@ contract Election is
     require(votes.total.eligible.contains(group));
     require(0 < value);
     require(canReceiveVotes(group, value));
-    address account = getLockedGold().getAccountFromActiveVoter(msg.sender);
+    address account = getAccounts().activeVoteSignerToAccount(msg.sender);
 
     // Add group to the groups voted for by the account.
     address[] storage groups = votes.groupsVotedFor[account];
@@ -295,7 +295,7 @@ contract Election is
    * @dev Pending votes cannot be activated until an election has been held.
    */
   function activate(address group) external nonReentrant returns (bool) {
-    address account = getLockedGold().getAccountFromActiveVoter(msg.sender);
+    address account = getAccounts().activeVoteSignerToAccount(msg.sender);
     PendingVote storage pendingVote = votes.pending.forGroup[group].byAccount[account];
     require(pendingVote.epoch < getEpochNumber());
     uint256 value = pendingVote.value;
@@ -329,7 +329,7 @@ contract Election is
     returns (bool)
   {
     require(group != address(0));
-    address account = getLockedGold().getAccountFromActiveVoter(msg.sender);
+    address account = getAccounts().activeVoteSignerToAccount(msg.sender);
     require(0 < value && value <= getPendingVotesForGroupByAccount(group, account));
     decrementPendingVotes(group, account, value);
     decrementTotalVotes(group, value, lesser, greater);
@@ -366,7 +366,7 @@ contract Election is
   {
     // TODO(asa): Dedup with revokePending.
     require(group != address(0));
-    address account = getLockedGold().getAccountFromActiveVoter(msg.sender);
+    address account = getAccounts().activeVoteSignerToAccount(msg.sender);
     require(0 < value && value <= getActiveVotesForGroupByAccount(group, account));
     decrementActiveVotes(group, account, value);
     decrementTotalVotes(group, value, lesser, greater);

@@ -7,6 +7,7 @@ import "openzeppelin-solidity/contracts/ownership/Ownable.sol";
 import "./interfaces/IAttestations.sol";
 import "./interfaces/IRandom.sol";
 import "../common/interfaces/IERC20Token.sol";
+import "../common/interfaces/IAccounts.sol";
 import "../governance/interfaces/IValidators.sol";
 
 import "../common/Initializable.sol";
@@ -48,20 +49,6 @@ contract Attestations is
     address attestationRequestFeeToken;
   }
 
-  struct Account {
-    // The address at which the account expects to receive transfers.
-    address walletAddress;
-
-    // The address of the key with which this account wants to sign attestations.
-    address authorizedAttestor;
-
-    // The ECDSA public key used to encrypt and decrypt data for this account.
-    bytes dataEncryptionKey;
-
-    // The URL under which an account adds metadata and claims.
-    string metadataURL;
-  }
-
   // Stores attestations state for a single (identifier, account address) pair.
   struct AttestedAddress {
     // Total number of requested attestations.
@@ -97,10 +84,6 @@ contract Attestations is
   }
 
   mapping(bytes32 => IdentifierState) identifiers;
-  mapping(address => Account) accounts;
-
-  // Maps attestation keys to the account that provided the authorization.
-  mapping(address => address) authorizedBy;
 
   // Address of the RequestAttestation precompiled contract.
   // solhint-disable-next-line state-visibility
@@ -141,7 +124,7 @@ contract Attestations is
 
   event Withdrawal( address indexed account, address indexed token, uint256 amount);
   event AttestationExpiryBlocksSet(uint256 value);
-  event AttestationRequestFeeSet(address indexed token,uint256 value);
+  event AttestationRequestFeeSet(address indexed token, uint256 value);
   event AttestorAuthorized(address indexed account, address attestor);
   event AccountDataEncryptionKeySet(address indexed account, bytes dataEncryptionKey);
   event AccountMetadataURLSet(address indexed account, string metadataURL);
@@ -365,21 +348,6 @@ contract Attestations is
   }
 
   /**
-   * @notice Setter for the dataEncryptionKey and wallet address for an account.
-   * @param dataEncryptionKey secp256k1 public key for data encryption. Preferably compressed.
-   * @param walletAddress The wallet address to set for the account.
-   */
-  function setAccount(
-    bytes calldata dataEncryptionKey,
-    address walletAddress
-  )
-    external
-  {
-    setAccountDataEncryptionKey(dataEncryptionKey);
-    setWalletAddress(walletAddress);
-  }
-
-  /**
    * @notice Returns the unselected attestation request for an identifier/account pair, if any.
    * @param identifier Hash of the identifier.
    * @param account Address of the account.
@@ -473,7 +441,7 @@ contract Attestations is
     for (uint256 i = 0; i < identifiersToLookup.length; i++) {
       address[] memory addrs = identifiers[identifiersToLookup[i]].accounts;
       for (uint256 matchIndex = 0; matchIndex < matches[i]; matchIndex++) {
-        addresses[currentIndex] = accounts[addrs[matchIndex]].walletAddress;
+        addresses[currentIndex] = getAccounts().getWalletAddress(addrs[matchIndex]);
         completed[currentIndex] =
           identifiers[identifiersToLookup[i]].attestations[addrs[matchIndex]].completed;
         total[currentIndex] =
@@ -559,155 +527,6 @@ contract Attestations is
   }
 
   /**
-   * @notice Setter for the metadata of an account.
-   * @param metadataURL The URL to access the metadata.
-   */
-  function setMetadataURL(string calldata metadataURL) external {
-    accounts[msg.sender].metadataURL = metadataURL;
-    emit AccountMetadataURLSet(msg.sender, metadataURL);
-  }
-
-  /**
-   * @notice Getter for the metadata of an account.
-   * @param account The address of the account to get the metadata for.
-   * @return metdataURL The URL to access the metadata.
-   */
-  function getMetadataURL(address account) external view returns (string memory) {
-    return accounts[account].metadataURL;
-  }
-
-    /**
-   * @notice Setter for the data encryption key and version.
-   * @param dataEncryptionKey secp256k1 public key for data encryption. Preferably compressed.
-   */
-  function setAccountDataEncryptionKey(bytes memory dataEncryptionKey) public {
-    require(dataEncryptionKey.length >= 33, "data encryption key length <= 32");
-    accounts[msg.sender].dataEncryptionKey = dataEncryptionKey;
-    emit AccountDataEncryptionKeySet(msg.sender, dataEncryptionKey);
-  }
-
-  /**
-   * @notice Getter for the data encryption key and version.
-   * @param account The address of the account to get the key for.
-   * @return dataEncryptionKey secp256k1 public key for data encryption. Preferably compressed.
-   */
-  function getDataEncryptionKey(address account) external view returns (bytes memory) {
-    return accounts[account].dataEncryptionKey;
-  }
-
-  /**
-   * @notice Authorizes attestation power of `msg.sender`'s account to another address.
-   * @param current The address to authorize.
-   * @param previous The previous authorized address.
-   * @param v The recovery id of the incoming ECDSA signature.
-   * @param r Output value r of the ECDSA signature.
-   * @param s Output value s of the ECDSA signature.
-   * @dev Fails if the address is already authorized or is an account.
-   * @dev v, r, s constitute `current`'s signature on `msg.sender`.
-   */
-  function authorize(
-    address current,
-    address previous,
-    uint8 v,
-    bytes32 r,
-    bytes32 s
-  )
-    private
-  {
-    require(isNotAuthorized(current));
-
-    address signer = Signatures.getSignerOfAddress(msg.sender, v, r, s);
-    require(signer == current);
-
-    authorizedBy[previous] = address(0);
-    authorizedBy[current] = msg.sender;
-  }
-
-  /**
-   * @notice Check if an address has been authorized by an account for attestation.
-   * @param account The possibly authorized address.
-   * @return Returns `true` if authorized. Returns `false` otherwise.
-   */
-  function isAuthorized(address account) external view returns (bool) {
-    return (authorizedBy[account] != address(0));
-  }
-
-  /**
-   * @notice Check if an address has been authorized by an account for attestation.
-   * @param account The possibly authorized address.
-   * @return Returns `false` if authorized. Returns `true` otherwise.
-   */
-  function isNotAuthorized(address account) internal view returns (bool) {
-    return (authorizedBy[account] == address(0));
-  }
-
-  /**
-   * @notice Authorizes an address to attest on behalf.
-   * @param attestor The address of the attestor to set for the account.
-   * @param v The recovery id of the incoming ECDSA signature.
-   * @param r Output value r of the ECDSA signature.
-   * @param s Output value s of the ECDSA signature.
-   * @dev v, r, s constitute `attestor`'s signature on `msg.sender`.
-   */
-  function authorizeAttestor(
-    address attestor,
-    uint8 v,
-    bytes32 r,
-    bytes32 s
-  )
-    public
-  {
-    Account storage account = accounts[msg.sender];
-    authorize(attestor, account.authorizedAttestor, v, r, s);
-    account.authorizedAttestor = attestor;
-    emit AttestorAuthorized(msg.sender, attestor);
-  }
-
-  /**
-   * @notice Returns the attestor for the specified account.
-   * @param account The address of the account.
-   * @return The address with which the account can attest.
-   */
-  function getAttestorFromAccount(address account) public view returns (address) {
-    address attestor = accounts[account].authorizedAttestor;
-    return attestor == address(0) ? account : attestor;
-  }
-
-  /**
-   * @notice Returns the account associated with `accountOrAttestor`.
-   * @param accountOrAttestor The address of the account or authorized attestor.
-   * @dev Fails if the `accountOrAttestor` is not an account or authorized attestor.
-   * @return The associated account.
-   */
-  function getAccountFromAttestor(address accountOrAttestor) public view returns (address) {
-    address authorizingAccount = authorizedBy[accountOrAttestor];
-    if (authorizingAccount != address(0)) {
-      require(accounts[authorizingAccount].authorizedAttestor == accountOrAttestor);
-      return authorizingAccount;
-    } else {
-      return accountOrAttestor;
-    }
-  }
-
-  /**
-   * @notice Setter for the wallet address for an account.
-   * @param walletAddress The wallet address to set for the account.
-   */
-  function setWalletAddress(address walletAddress) public {
-    accounts[msg.sender].walletAddress = walletAddress;
-    emit AccountWalletAddressSet(msg.sender, walletAddress);
-  }
-
-  /**
-   * @notice Getter for the wallet address for an account.
-   * @param account The address of the account to get the wallet address for.
-   * @return Wallet address.
-   */
-  function getWalletAddress(address account) external view returns (address) {
-    return accounts[account].walletAddress;
-  }
-
-  /**
    * @notice Validates the given attestation code.
    * @param identifier The hash of the identifier to be attested.
    * @param v The recovery id of the incoming ECDSA signature.
@@ -730,7 +549,7 @@ contract Attestations is
   {
     bytes32 codehash = keccak256(abi.encodePacked(identifier, account));
     address signer = Signatures.getSignerOfMessageHash(codehash, v, r, s);
-    address issuer = getAccountFromAttestor(signer);
+    address issuer = getAccounts().activeAttesttationSignerToAccount(signer);
 
     Attestation storage attestation =
       identifiers[identifier].attestations[account].issuedAttestations[issuer];
@@ -807,8 +626,7 @@ contract Attestations is
     while (currentIndex < unselectedRequest.attestationsRequested) {
       seed = keccak256(abi.encodePacked(seed));
       validator = validatorAddressFromCurrentSet(uint256(seed) % numberValidators);
-
-      issuer = getLockedGold().getAccountFromValidator(validator);
+      issuer = getAccounts().activeValidationSignerToAccount(validator);
       Attestation storage attestation = state.issuedAttestations[issuer];
 
       // Attestation issuers can only be added if they haven't been already.
