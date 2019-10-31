@@ -306,7 +306,7 @@ contract Validators is
       publicKeysData.length == (64 + 48 + 96)
     );
     // Use the proof of possession bytes
-    require(checkProofOfPossession(publicKeysData.slice(64, 48 + 96)));
+    require(checkProofOfPossession(msg.sender, publicKeysData.slice(64, 48 + 96)));
 
     address account = getLockedGold().getAccountFromActiveValidator(msg.sender);
     require(!isValidator(account) && !isValidatorGroup(account));
