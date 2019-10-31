@@ -231,7 +231,7 @@ jobs:
       # TODO - run: unlock device
       - run:
           name: Start pidcat logging
-          command: pidcat -t "GoLog" # React logs are on metro step since RN 61
+          command: pidcat -t "GoLog" -t "Go" # React logs are on metro step since RN 61
           background: true 
       - run:
           name: Run yarn dev
