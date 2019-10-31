@@ -7,8 +7,9 @@ const TAG = 'utils/keystore'
 export async function setKey(key: string, value: string) {
   try {
     Logger.debug(TAG, `Setting key ${key} in keystore`)
+    // TODO(Rossy + Jean): Revisit this accessible setting
     await RNSecureKeyStore.set(key, value, {
-      accessible: ACCESSIBLE.AFTER_FIRST_UNLOCK_THIS_DEVICE_ONLY,
+      accessible: ACCESSIBLE.WHEN_UNLOCKED,
     })
     Logger.debug(TAG, `Key ${key} set in keystore`)
   } catch (error) {
