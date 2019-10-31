@@ -98,9 +98,7 @@ export default class PhoneNumberInput extends React.Component<Props, State> {
   async triggerPhoneNumberRequest() {
     try {
       await this.triggerPhoneNumberRequestAndroid()
-      // TODO if `react-native-device-info` upgrades to >=3
-      // Next line should be: `DeviceInfo.getBaseOs()` (lowercased)
-      const baseOS = await DeviceInfo.getBaseOS()
+      const baseOS = await DeviceInfo.getBaseOs()
       if (baseOS === 'Android') {
         await this.triggerPhoneNumberRequestAndroid()
       } else {
@@ -310,6 +308,7 @@ const style = StyleSheet.create({
     padding: 3,
     marginTop: 1, // 6 vs 5 top vs bot space difference
   },
+  // @ts-ignore
   listAutocomplete: {
     paddingHorizontal: 0,
     paddingVertical: 6,
