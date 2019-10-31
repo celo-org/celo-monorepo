@@ -55,11 +55,15 @@ for file_path in "${files[@]}"; do
   encrypted_file_path="$file_path.enc"
 
   if [[ $1 == "decrypt" ]] && ! test -f "$encrypted_file_path"; then
-    echo "$encrypted_file_path does not exist, cannot decrypt - skipping file"
+    echo "$encrypted_file_path does not exist, cannot decrypt - skipping file" >&2
     continue
-  elif [[ $1 == "encrypt" ]] && ! test -f "$file_path"; then
-    echo "$file_path does not exist, cannot encrypt - skipping file"
-    continue
+  elif [[ $1 == "encrypt" ]]; then
+    if [[ -f "$encrypted_file_path" ]]; then
+        continue
+    elif [[ ! -f "$file_path" ]]; then
+        echo "$file_path does not exist, cannot encrypt - skipping file" >&2
+        continue
+    fi
   fi
 
   gcloud kms $1 --ciphertext-file=$encrypted_file_path --plaintext-file=$file_path --key=github-key --keyring=celo-keyring --location=global --project celo-testnet
