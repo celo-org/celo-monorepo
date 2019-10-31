@@ -2000,21 +2000,21 @@ contract('Governance', (accounts: string[]) => {
     })
 
     describe('when hotfix is passing', () => {
-      let currEpoch: BigNumber
       beforeEach(async () => {
         await mineBlocks(EPOCH, web3)
-        currEpoch = new BigNumber(await governance.getEpochNumber())
         await governance.whitelistHotfix(proposalHashStr, { from: accounts[2] })
       })
 
       it('should mark the hotfix record prepared epoch', async () => {
         await governance.prepareHotfix(proposalHashStr)
         const [, , preparedEpoch] = await governance.getHotfixRecord.call(proposalHashStr)
+        const currEpoch = new BigNumber(await governance.getEpochNumber())
         assertEqualBN(preparedEpoch, currEpoch)
       })
 
       it('should emit the HotfixPrepared event', async () => {
         const resp = await governance.prepareHotfix(proposalHashStr)
+        const currEpoch = new BigNumber(await governance.getEpochNumber())
         assert.equal(resp.logs.length, 1)
         const log = resp.logs[0]
         assertLogMatches2(log, {
