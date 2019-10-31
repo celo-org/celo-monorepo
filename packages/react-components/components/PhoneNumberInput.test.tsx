@@ -9,6 +9,12 @@ jest.mock('@celo/react-native-sms-retriever', () => {
   }
 })
 
+jest.mock('react-native-device-info', () => {
+  return {
+    getBaseOs: jest.fn(() => 'Android'),
+  }
+})
+
 describe('PhoneNumberInput', () => {
   describe('when defaultCountry is falsy', () => {
     it.skip('renders an AutoComplete and a country can be selected', () => {
@@ -48,12 +54,6 @@ describe('when defaultCountry is truthy', () => {
 
   describe('Native phone picker (Android)', () => {
     it('can read phone', async () => {
-      jest.mock('react-native-device-info', () => {
-        return {
-          getBaseOs: jest.fn(() => 'Android'),
-        }
-      })
-
       const wrapper = shallow<PhoneNumberInput>(
         <PhoneNumberInput
           setE164Number={jest.fn()}
