@@ -94,7 +94,7 @@ export class AttestationsWrapper extends BaseWrapper<Attestations> {
     account: Address
   ) => Promise<AttestationStat> = proxyCall(
     this.contract.methods.getAttestationStats,
-    tupleParser(PhoneNumberUtils.getPhoneHash, (x: string) => x),
+    tupleParser(PhoneNumberUtils.getPhoneHash, stringIdentity),
     (stat) => ({ completed: toNumber(stat[0]), total: toNumber(stat[1]) })
   )
 
