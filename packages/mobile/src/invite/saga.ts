@@ -4,6 +4,7 @@ import { getEscrowContract, getGoldTokenContract, getStableTokenContract } from 
 import BigNumber from 'bignumber.js'
 import { Linking, Platform } from 'react-native'
 import SendIntentAndroid from 'react-native-send-intent'
+import SendSMS from 'react-native-sms'
 import VersionCheck from 'react-native-version-check'
 import { call, delay, put, race, select, spawn, takeLeading } from 'redux-saga/effects'
 import { showError, showMessage } from 'src/alert/actions'
@@ -99,11 +100,24 @@ async function sendSms(toPhone: string, msg: string) {
     try {
       if (Platform.OS === 'android') {
         SendIntentAndroid.sendSms(toPhone, msg)
+        resolve()
       } else {
-        // TODO
-        throw new Error('Implement sendSms using MFMessageComposeViewController on iOS')
+        // react-native-sms types are incorrect
+        // tslint:disable-next-line: no-floating-promises
+        SendSMS.send(
+          {
+            body: msg,
+            recipients: [toPhone],
+          },
+          (completed, cancelled, error) => {
+            if (!completed) {
+              reject(new Error(`Couldn't send sms: isCancelled: ${cancelled} isError: ${error}`))
+            } else {
+              resolve()
+            }
+          }
+        )
       }
-      resolve()
     } catch (e) {
       reject(e)
     }
