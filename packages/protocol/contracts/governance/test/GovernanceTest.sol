@@ -4,13 +4,8 @@ import "../Governance.sol";
 
 contract GovernanceTest is Governance {
   address[] validatorSet;
-  uint256 epochSize;
 
   // Minimally override core functions from UsingPrecompiles
-  function getEpochSize() public view returns (uint256) {
-    return epochSize;
-  }
-
   function numberValidatorsInCurrentSet() public view returns (uint256) {
     return validatorSet.length;
   }
@@ -20,10 +15,6 @@ contract GovernanceTest is Governance {
   }
 
   // Expose test utilities
-  function setEpochSize(uint256 _epochSize) external {
-    epochSize = _epochSize;
-  }
-
   function addValidator(address validator) external {
     validatorSet.push(validator);
   }

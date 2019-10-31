@@ -121,7 +121,6 @@ contract('Governance', (accounts: string[]) => {
       baselineUpdateFactor,
       baselineQuorumFactor
     )
-    await governance.setEpochSize(EPOCH)
     await registry.setAddressFor(CeloContractName.LockedGold, mockLockedGold.address)
     await mockLockedGold.setAccountTotalLockedGold(account, weight)
     await mockLockedGold.setTotalLockedGold(weight)
@@ -1919,17 +1918,36 @@ contract('Governance', (accounts: string[]) => {
     })
   })
 
+  describe('#approveHotfix()', () => {
+    it('should mark the hotfix record approved when called by approver', async () => {
+      await governance.approveHotfix(proposalHashStr, { from: approver })
+      const [approved, ,] = await governance.getHotfixRecord.call(proposalHashStr)
+      assert.isTrue(approved)
+    })
+
+    it('should emit the HotfixApproved event', async () => {
+      const resp = await governance.approveHotfix(proposalHashStr, { from: approver })
+      assert.equal(resp.logs.length, 1)
+      const log = resp.logs[0]
+      assertLogMatches2(log, {
+        event: 'HotfixApproved',
+        args: {
+          hash: matchAny
+        },
+      })
+      assert.isTrue(Buffer.from(stripHexEncoding(log.args.hash), 'hex').equals(proposalHash))
+    })
+
+    it('should revert when called by non-approver', async () => {
+      await assertRevert(governance.approveHotfix(proposalHashStr, { from: accounts[2] }))
+    })
+  })
+
   describe('#whitelistHotfix()', () => {
     beforeEach(async () => {
       // from GovernanceTest
       await governance.addValidator(accounts[2])
       await governance.addValidator(accounts[3])
-    })
-
-    it('should mark the hotfix record approved when called by approver', async () => {
-      await governance.whitelistHotfix(proposalHashStr, { from: approver })
-      const [approved, ,] = await governance.getHotfixRecord.call(proposalHashStr)
-      assert.isTrue(approved)
     })
 
     it('should emit the HotfixWhitelist event', async () => {
@@ -1939,11 +1957,11 @@ contract('Governance', (accounts: string[]) => {
       assertLogMatches2(log, {
         event: 'HotfixWhitelisted',
         args: {
-          txHash: matchAny,
+          hash: matchAny,
           whitelister: accounts[3],
         },
       })
-      assert.isTrue(Buffer.from(stripHexEncoding(log.args.txHash), 'hex').equals(proposalHash))
+      assert.isTrue(Buffer.from(stripHexEncoding(log.args.hash), 'hex').equals(proposalHash))
     })
   })
 
@@ -2002,11 +2020,11 @@ contract('Governance', (accounts: string[]) => {
         assertLogMatches2(log, {
           event: 'HotfixPrepared',
           args: {
-            txHash: matchAny,
+            hash: matchAny,
             epoch: currEpoch,
           },
         })
-        assert.isTrue(Buffer.from(stripHexEncoding(log.args.txHash), 'hex').equals(proposalHash))
+        assert.isTrue(Buffer.from(stripHexEncoding(log.args.hash), 'hex').equals(proposalHash))
       })
 
       it('should revert when epoch == preparedEpoch', async () => {
@@ -2038,12 +2056,12 @@ contract('Governance', (accounts: string[]) => {
 
     it('should revert when hotfix not prepared for current epoch', async () => {
       await mineBlocks(EPOCH, web3)
-      await governance.whitelistHotfix(proposalHashStr, { from: approver })
+      await governance.approveHotfix(proposalHashStr, { from: approver })
       await assertRevert(executeHotfixTx())
     })
 
     it('should revert when hotfix prepared but not for current epoch', async () => {
-      await governance.whitelistHotfix(proposalHashStr, { from: approver })
+      await governance.approveHotfix(proposalHashStr, { from: approver })
       await governance.addValidator(accounts[2])
       await governance.whitelistHotfix(proposalHashStr, { from: accounts[2] })
       await governance.prepareHotfix(proposalHashStr, { from: accounts[2] })
@@ -2053,7 +2071,7 @@ contract('Governance', (accounts: string[]) => {
 
     describe('when hotfix is approved and prepared for current epoch', () => {
       beforeEach(async () => {
-        await governance.whitelistHotfix(proposalHashStr, { from: approver })
+        await governance.approveHotfix(proposalHashStr, { from: approver })
         await mineBlocks(EPOCH, web3)
         await governance.addValidator(accounts[2])
         await governance.whitelistHotfix(proposalHashStr, { from: accounts[2] })
@@ -2078,10 +2096,10 @@ contract('Governance', (accounts: string[]) => {
         assertLogMatches2(log, {
           event: 'HotfixExecuted',
           args: {
-            txHash: matchAny,
+            hash: matchAny,
           },
         })
-        assert.isTrue(Buffer.from(stripHexEncoding(log.args.txHash), 'hex').equals(proposalHash))
+        assert.isTrue(Buffer.from(stripHexEncoding(log.args.hash), 'hex').equals(proposalHash))
       })
 
       it('should not be executable again', async () => {

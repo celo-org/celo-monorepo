@@ -72,14 +72,15 @@ contract Governance is
 
   struct ContractConstitution {
     FixidityLib.Fraction defaultThreshold;
-    // Maps a function ID to a corresponding threshold function, overriding the default.
+    // Maps a function ID to a corresponding threshold, overriding the default.
     mapping(bytes4 => FixidityLib.Fraction) functionThresholds;
   }
 
   struct HotfixRecord {
-    mapping(address => bool) whitelisted;
-    uint256 preparedEpoch;
     bool executed;
+    bool approved;
+    uint256 preparedEpoch;
+    mapping(address => bool) whitelisted;
   }
 
   // The baseline is updated as
@@ -212,17 +213,21 @@ contract Governance is
   );
 
   event HotfixWhitelisted(
-    bytes32 txHash,
+    bytes32 indexed hash,
     address whitelister
   );
 
+  event HotfixApproved(
+    bytes32 indexed hash
+  );
+
   event HotfixPrepared(
-    bytes32 txHash,
-    uint256 epoch
+    bytes32 indexed hash,
+    uint256 indexed epoch
   );
 
   event HotfixExecuted(
-    bytes32 txHash
+    bytes32 indexed hash
   );
 
   function() external payable {} // solhint-disable no-empty-blocks
@@ -693,23 +698,33 @@ contract Governance is
 
   /**
    * @notice Whitelists the hash of a hotfix transaction(s).
-   * @param txHash The abi encoded keccak256 hash of the hotfix transaction(s) to be whitelisted.
+   * @param hash The abi encoded keccak256 hash of the hotfix transaction(s) to be whitelisted.
    */
-  function whitelistHotfix(bytes32 txHash) external {
-    hotfixes[txHash].whitelisted[msg.sender] = true;
-    emit HotfixWhitelisted(txHash, msg.sender);
+  function approveHotfix(bytes32 hash) external {
+    require(msg.sender == approver);
+    hotfixes[hash].approved = true;
+    emit HotfixApproved(hash);
+  }
+
+  /**
+   * @notice Whitelists the hash of a hotfix transaction(s).
+   * @param hash The abi encoded keccak256 hash of the hotfix transaction(s) to be whitelisted.
+   */
+  function whitelistHotfix(bytes32 hash) external {
+    hotfixes[hash].whitelisted[msg.sender] = true;
+    emit HotfixWhitelisted(hash, msg.sender);
   }
 
   /**
    * @notice Gives hotfix a prepared epoch for execution.
-   * @param txHash The hash of the hotfix to be prepared.
+   * @param hash The hash of the hotfix to be prepared.
    */
-  function prepareHotfix(bytes32 txHash) external {
-    require(isHotfixPassing(txHash), "hotfix not whitelisted by 2f+1 validators");
+  function prepareHotfix(bytes32 hash) external {
+    require(isHotfixPassing(hash), "hotfix not whitelisted by 2f+1 validators");
     uint256 epoch = getEpochNumber();
-    require(hotfixes[txHash].preparedEpoch < epoch, "hotfix already prepared for this epoch");
-    hotfixes[txHash].preparedEpoch = epoch;
-    emit HotfixPrepared(txHash, epoch);
+    require(hotfixes[hash].preparedEpoch < epoch, "hotfix already prepared for this epoch");
+    hotfixes[hash].preparedEpoch = epoch;
+    emit HotfixPrepared(hash, epoch);
   }
 
   /**
@@ -728,9 +743,9 @@ contract Governance is
   )
     external
   {
-    bytes32 txHash = keccak256(abi.encode(values, destinations, data, dataLengths));
+    bytes32 hash = keccak256(abi.encode(values, destinations, data, dataLengths));
 
-    (bool approved, bool executed, uint256 preparedEpoch) = getHotfixRecord(txHash);
+    (bool approved, bool executed, uint256 preparedEpoch) = getHotfixRecord(hash);
     require(!executed, "hotfix already executed");
     require(approved, "hotfix not approved");
     require(preparedEpoch == getEpochNumber(), "hotfix must be prepared for this epoch");
@@ -744,8 +759,8 @@ contract Governance is
       0
     ).executeMem();
     
-    hotfixes[txHash].executed = true;
-    emit HotfixExecuted(txHash);
+    hotfixes[hash].executed = true;
+    emit HotfixExecuted(hash);
   }
 
   /**
@@ -923,15 +938,15 @@ contract Governance is
 
   /**
    * @notice Checks if a byzantine quorum of validators has whitelisted the given hotfix.
-   * @param txHash The abi encoded keccak256 hash of the hotfix transaction.
+   * @param hash The abi encoded keccak256 hash of the hotfix transaction.
    * @return Whether validator whitelist tally >= validator byztanine quorum (2f+1)
    */
-  function isHotfixPassing(bytes32 txHash) public view returns (bool) {
+  function isHotfixPassing(bytes32 hash) public view returns (bool) {
     uint256 tally = 0;
     uint256 n = numberValidatorsInCurrentSet();
     for (uint256 idx = 0; idx < n; idx++) {
       address validator = validatorAddressFromCurrentSet(idx);
-      if (hotfixes[txHash].whitelisted[validator]) {
+      if (hotfixes[hash].whitelisted[validator]) {
         tally = tally.add(1);
       }
     }
@@ -949,14 +964,14 @@ contract Governance is
 
   /**
    * @notice Gets information about a hotfix.
-   * @param txHash The abi encoded keccak256 hash of the hotfix transaction.
+   * @param hash The abi encoded keccak256 hash of the hotfix transaction.
    * @return Hotfix tuple of (approved, executed, preparedEpoch)
    */
-  function getHotfixRecord(bytes32 txHash) public view returns (bool, bool, uint256) {
+  function getHotfixRecord(bytes32 hash) public view returns (bool, bool, uint256) {
     return (
-      hotfixes[txHash].whitelisted[approver],
-      hotfixes[txHash].executed,
-      hotfixes[txHash].preparedEpoch
+      hotfixes[hash].approved,
+      hotfixes[hash].executed,
+      hotfixes[hash].preparedEpoch
     );
   }
 
