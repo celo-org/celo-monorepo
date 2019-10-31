@@ -9,6 +9,6 @@ describe('signatures', () => {
     const message = Web3Utils.soliditySha3({ type: 'string', value: 'identifier' })
     const signature = signMessage(message, pKey, address)
     const serializedSig = serializeSignature(signature)
-    parseSignature(message, '0x' + serializedSig, address)
+    parseSignature(message, serializedSig, address)
   })
 })
