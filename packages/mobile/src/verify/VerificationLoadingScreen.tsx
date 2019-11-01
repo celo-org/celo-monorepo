@@ -12,7 +12,7 @@ export class VerificationLoadingScreen extends React.Component<WithNamespaces> {
   static navigationOptions = headerWithCancelButton
 
   render() {
-    const { t } = this.props
+    // const { t } = this.props
     const items: CarouselItem[] = [
       {
         text: 'Test 1',
