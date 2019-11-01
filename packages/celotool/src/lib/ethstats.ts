@@ -33,6 +33,8 @@ function helmParameters() {
     `--set ethstats.webSocketSecret="${fetchEnv(envVar.ETHSTATS_WEBSOCKETSECRET)}"`,
     `--set ethstats.image.repository=${fetchEnv(envVar.ETHSTATS_DOCKER_IMAGE_REPOSITORY)}`,
     `--set ethstats.image.tag=${fetchEnv(envVar.ETHSTATS_DOCKER_IMAGE_TAG)}`,
+    `--set ethstats.trusted_enodes='{${fetchEnv(envVar.ETHSTATS_TRUSTED_ENODES)}}'`,
+    `--set ethstats.banned_enodes='{${fetchEnv(envVar.ETHSTATS_BANNED_ENODES)}}'`,
   ]
 }
 

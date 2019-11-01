@@ -26,6 +26,33 @@ spec:
       - name: ethstats
         image: {{ .Values.ethstats.image.repository }}:{{ .Values.ethstats.image.tag }}
         imagePullPolicy: {{ .Values.imagePullPolicy }}
+        command:
+        - /bin/sh
+        - -c
+        args:
+        - |
+          cat <<'EOF' > /ethstats-server/lib/utils/config.js
+          var trusted = [
+            {{- range .Values.ethstats.trusted_enodes }}
+            {{- if . }}
+            "enode://{{ . }}",
+            {{- end }}
+            {{- end }}
+          ]
+          var banned = [
+            {{- range .Values.ethstats.banned_enodes }}
+            {{- if . }}
+            "enode://{{ . }}",
+            {{- end }}
+            {{- end }}
+          ]
+          module.exports = {
+            trusted:  trusted,
+            banned:   banned,
+            reserved: []
+          };
+          EOF
+          npm start
         ports:
         - name: http
           containerPort: 3000
