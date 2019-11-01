@@ -18,8 +18,8 @@ export default class GetMetadata extends BaseCommand {
   async run() {
     const { args } = this.parse(GetMetadata)
     const address = args.address
-    const attestations = await this.kit.contracts.getAttestations()
-    const metadataURL = await attestations.getMetadataURL(address)
+    const accounts = await this.kit.contracts.getAccounts()
+    const metadataURL = await accounts.getMetadataURL(address)
 
     if (!metadataURL) {
       console.info('No metadata set for address')

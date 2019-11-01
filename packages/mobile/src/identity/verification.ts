@@ -52,7 +52,6 @@ const TAG = 'identity/verification'
 
 export const NUM_ATTESTATIONS_REQUIRED = 3
 export const VERIFICATION_TIMEOUT = 5 * 60 * 1000 // 5 minutes
-export const ERROR_DURATION = 5000 // 5 seconds
 export const NULL_ADDRESS = '0x0000000000000000000000000000000000000000'
 // Gas estimation for concurrent pending transactions is currently not support for
 // light clients, so we have to statically specify the gas here. Furthermore, the
@@ -102,7 +101,7 @@ export function* startVerification() {
   } else if (timeout) {
     CeloAnalytics.track(CustomEventNames.verification_timed_out)
     Logger.debug(TAG, 'Verification timed out')
-    yield put(showError(ErrorMessages.VERIFICATION_TIMEOUT, ERROR_DURATION))
+    yield put(showError(ErrorMessages.VERIFICATION_TIMEOUT))
     yield put(endVerification(false))
     // TODO #1955: Add logic in this case to request more SMS messages
   }
@@ -183,9 +182,9 @@ export function* doVerificationFlow() {
   } catch (error) {
     Logger.error(TAG, 'Error occured during verification flow', error)
     if (error.message in ErrorMessages) {
-      yield put(showError(error.message, ERROR_DURATION))
+      yield put(showError(error.message))
     } else {
-      yield put(showError(ErrorMessages.VERIFICATION_FAILURE, ERROR_DURATION))
+      yield put(showError(ErrorMessages.VERIFICATION_FAILURE))
     }
     yield put(endVerification(false))
     return false
@@ -363,7 +362,7 @@ function attestationCodeReceiver(
       if (existingCode) {
         Logger.warn(TAG + '@attestationCodeReceiver', 'Code already exists store, skipping.')
         if (action.inputType === CodeInputType.MANUAL) {
-          yield put(showError(ErrorMessages.REPEAT_ATTESTATION_CODE, ERROR_DURATION))
+          yield put(showError(ErrorMessages.REPEAT_ATTESTATION_CODE))
         }
         return
       }
