@@ -20,7 +20,6 @@ DerivedData
 *.hmap
 *.ipa
 *.xcuserstate
-project.xcworkspace
 
 # Android/IntelliJ
 #
@@ -40,6 +39,7 @@ yarn-error.log
 buck-out/
 \.buckd/
 *.keystore
+!debug.keystore
 
 # fastlane
 #
@@ -75,14 +75,4 @@ e2e_run.log
 e2e_pidcat_run.log
 
 # keys
-android/app/google-services.json
-android/app/src/staging/google-services.json
-android/app/src/integration/google-services.json
-android/app/src/alfajores/google-services.json
-android/app/src/debug/google-services.json
-android/app/src/pilot/google-services.json
 secrets.json
-android/sentry.properties
-ios/**/GoogleService-Info*.plist
-ios/sentry.properties
-ios/Pods
