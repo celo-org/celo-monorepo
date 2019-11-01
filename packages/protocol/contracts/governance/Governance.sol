@@ -776,19 +776,6 @@ contract Governance is
   }
 
   /**
-   * @notice Returns the participation parameters.
-   * @return The participation parameters.
-   */
-  function getParticipationParameters() external view returns (uint256, uint256, uint256, uint256) {
-    return (
-      participationParameters.baseline.unwrap(),
-      participationParameters.baselineFloor.unwrap(),
-      participationParameters.baselineUpdateFactor.unwrap(),
-      participationParameters.baselineQuorumFactor.unwrap()
-    );
-  }
-
-  /**
    * @notice Returns whether or not a particular account is voting on proposals.
    * @param account The address of the account.
    * @return Whether or not the account is voting on proposals.
