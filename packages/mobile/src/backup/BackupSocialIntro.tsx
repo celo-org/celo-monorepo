@@ -14,7 +14,7 @@ import { exitBackupFlow, navigatePinProtected } from 'src/app/actions'
 import { Namespaces } from 'src/i18n'
 import backupIcon from 'src/images/backup-icon.png'
 import { headerWithBackButton } from 'src/navigator/Headers'
-import { navigateHome } from 'src/navigator/NavigationService'
+import { navigate, navigateHome } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
 import { RootState } from 'src/redux/reducers'
 
@@ -49,7 +49,10 @@ class BackupSocialIntro extends React.Component<Props> {
   }
 
   onPressContinue = () => {
-    this.props.navigatePinProtected(Screens.BackupSocial)
+    const navigateMethod = this.isIncomingFromBackupFlow()
+      ? navigate
+      : this.props.navigatePinProtected
+    navigateMethod(Screens.BackupSocial)
   }
 
   onPressSkip = () => {
