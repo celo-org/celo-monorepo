@@ -16,7 +16,7 @@ import { UNLOCK_DURATION } from 'src/geth/consts'
 import { NavActions, navigate } from 'src/navigator/NavigationService'
 import { Screens, Stacks } from 'src/navigator/Screens'
 import { web3 } from 'src/web3/contracts'
-import { getConnectedAccount } from 'src/web3/saga'
+import { getAccount } from 'src/web3/saga'
 import { zeroSyncSelector } from 'src/web3/selectors'
 
 jest.mock('src/utils/time', () => ({
@@ -122,7 +122,7 @@ describe('Upload Comment Key Saga', () => {
       .provide([
         [select(zeroSyncSelector), false],
         [call(getPincode, false), '123456'],
-        [call(getConnectedAccount), 'account'],
+        [call(getAccount), 'account'],
         [call(web3.eth.personal.unlockAccount, 'account', '123456', UNLOCK_DURATION), undefined],
       ])
       .put(startPinVerification())
