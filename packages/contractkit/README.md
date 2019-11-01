@@ -92,6 +92,7 @@ Apart from GoldToken and StableToken, there are many core contracts.
 
 For the moment, we have contract wrappers for:
 
+- Accounts
 - Exchange (Uniswap kind exchange between Gold and Stable tokens)
 - Validators
 - LockedGold
@@ -115,6 +116,7 @@ We expose native wrappers for all Celo core contracts.
 
 The complete list of Celo Core contracts is:
 
+- Accounts
 - Attestations
 - LockedGold
 - Escrow
