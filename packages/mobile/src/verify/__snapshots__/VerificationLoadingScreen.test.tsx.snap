@@ -10,14 +10,62 @@ exports[`VerificationLoadingScreen renders correctly 1`] = `
     }
   }
 >
+  <View
+    style={
+      Object {
+        "left": 0,
+        "position": "absolute",
+        "top": 5,
+        "zIndex": 10,
+      }
+    }
+  >
+    <View
+      accessible={true}
+      focusable={true}
+      isTVSelectable={true}
+      nativeBackgroundAndroid={
+        Object {
+          "attribute": "selectableItemBackgroundBorderless",
+          "type": "ThemeAttrAndroid",
+        }
+      }
+      onClick={[Function]}
+      onResponderGrant={[Function]}
+      onResponderMove={[Function]}
+      onResponderRelease={[Function]}
+      onResponderTerminate={[Function]}
+      onResponderTerminationRequest={[Function]}
+      onStartShouldSetResponder={[Function]}
+      style={
+        Object {
+          "paddingHorizontal": 20,
+          "paddingVertical": 10,
+        }
+      }
+      testID="CancelButton"
+    >
+      <Text
+        style={
+          Object {
+            "color": "#42D689",
+            "fontFamily": "Hind-SemiBold",
+            "fontSize": 14,
+            "lineHeight": 22,
+          }
+        }
+      >
+        cancel
+      </Text>
+    </View>
+  </View>
   <RCTScrollView
     contentContainerStyle={
       Object {
         "alignItems": "center",
         "flex": 1,
-        "justifyContent": "center",
-        "padding": 30,
-        "paddingTop": 0,
+        "justifyContent": "space-between",
+        "paddingTop": 60,
       }
     }
   >
@@ -53,14 +101,80 @@ exports[`VerificationLoadingScreen renders correctly 1`] = `
       <View
         style={
           Object {
-            "marginVertical": 30,
+            "alignItems": "center",
+            "justifyContent": "center",
+          }
+        }
+      >
+        <View
+          style={
+            Array [
+              Object {
+                "aspectRatio": 1,
+              },
+              undefined,
+              Object {
+                "width": 40,
+              },
+            ]
+          }
+        >
+          <View
+            autoPlay={true}
+            enableMergePathsAndroidForKitKatAndAbove={false}
+            loop={true}
+            onAnimationFinish={[Function]}
+            progress={0}
+            resizeMode="contain"
+            sourceJson="{\\"v\\":\\"5.4.4\\",\\"fr\\":60,\\"ip\\":0,\\"op\\":173,\\"w\\":600,\\"h\\":600,\\"nm\\":\\"WINNER green R\\",\\"ddd\\":0,\\"assets\\":[{\\"id\\":\\"comp_0\\",\\"layers\\":[{\\"ddd\\":0,\\"ind\\":1,\\"ty\\":3,\\"nm\\":\\"Null 5\\",\\"sr\\":1,\\"ks\\":{\\"o\\":{\\"a\\":0,\\"k\\":0,\\"ix\\":11},\\"r\\":{\\"a\\":0,\\"k\\":0,\\"ix\\":10},\\"p\\":{\\"a\\":0,\\"k\\":[300,300,0],\\"ix\\":2},\\"a\\":{\\"a\\":0,\\"k\\":[50,50,0],\\"ix\\":1},\\"s\\":{\\"a\\":0,\\"k\\":[388,388,100],\\"ix\\":6}},\\"ao\\":0,\\"ip\\":0,\\"op\\":173,\\"st\\":0,\\"bm\\":0},{\\"ddd\\":0,\\"ind\\":2,\\"ty\\":4,\\"nm\\":\\"green\\",\\"parent\\":1,\\"sr\\":1,\\"ks\\":{\\"o\\":{\\"a\\":0,\\"k\\":100,\\"ix\\":11},\\"r\\":{\\"a\\":1,\\"k\\":[{\\"i\\":{\\"x\\":[0.461],\\"y\\":[1]},\\"o\\":{\\"x\\":[0.074],\\"y\\":[0.125]},\\"t\\":0,\\"s\\":[268.63],\\"e\\":[90]},{\\"i\\":{\\"x\\":[0.64],\\"y\\":[1]},\\"o\\":{\\"x\\":[0.36],\\"y\\":[0]},\\"t\\":56,\\"s\\":[90],\\"e\\":[90]},{\\"i\\":{\\"x\\":[1],\\"y\\":[1]},\\"o\\":{\\"x\\":[0.6],\\"y\\":[0.265]},\\"t\\":101,\\"s\\":[90],\\"e\\":[-88.135]},{\\"t\\":172.000048877002}],\\"ix\\":10},\\"p\\":{\\"a\\":0,\\"k\\":[50,50,0],\\"ix\\":2},\\"a\\":{\\"a\\":0,\\"k\\":[103,-115,0],\\"ix\\":1},\\"s\\":{\\"a\\":0,\\"k\\":[18.343,18.343,100],\\"ix\\":6}},\\"ao\\":0,\\"shapes\\":[{\\"ty\\":\\"gr\\",\\"it\\":[{\\"ind\\":0,\\"ty\\":\\"sh\\",\\"ix\\":1,\\"ks\\":{\\"a\\":1,\\"k\\":[{\\"i\\":{\\"x\\":0.833,\\"y\\":0.833},\\"o\\":{\\"x\\":0.81,\\"y\\":0},\\"t\\":32.746,\\"s\\":[{\\"i\\":[[-206.701,0],[0,-206.701],[206.701,0],[0,206.701]],\\"o\\":[[206.701,0],[0,206.701],[-206.701,0],[0,-206.701]],\\"v\\":[[0,-374.266],[374.266,0],[0,374.266],[-374.266,0]],\\"c\\":true}],\\"e\\":[{\\"i\\":[[-206.701,0],[1.349,-4.634],[206.702,0],[0.205,6.376]],\\"o\\":[[206.701,0],[-2.223,7.633],[-206.701,0],[-0.25,-7.779]],\\"v\\":[[-2.095,0.013],[374.266,0],[-2.237,-0.013],[-374.266,0]],\\"c\\":true}]},{\\"i\\":{\\"x\\":0.02,\\"y\\":1},\\"o\\":{\\"x\\":0.167,\\"y\\":0.167},\\"t\\":56.221,\\"s\\":[{\\"i\\":[[-206.701,0],[1.349,-4.634],[206.702,0],[0.205,6.376]],\\"o\\":[[206.701,0],[-2.223,7.633],[-206.701,0],[-0.25,-7.779]],\\"v\\":[[-2.095,0.013],[374.266,0],[-2.237,-0.013],[-374.266,0]],\\"c\\":true}],\\"e\\":[{\\"i\\":[[-206.701,0],[0,-206.701],[206.701,0],[0,206.701]],\\"o\\":[[206.701,0],[0,206.701],[-206.701,0],[0,-206.701]],\\"v\\":[[0,-374.266],[374.266,0],[0,374.266],[-374.266,0]],\\"c\\":true}]},{\\"i\\":{\\"x\\":1,\\"y\\":1},\\"o\\":{\\"x\\":0.167,\\"y\\":0},\\"t\\":68.518,\\"s\\":[{\\"i\\":[[-206.701,0],[0,-206.701],[206.701,0],[0,206.701]],\\"o\\":[[206.701,0],[0,206.701],[-206.701,0],[0,-206.701]],\\"v\\":[[0,-374.266],[374.266,0],[0,374.266],[-374.266,0]],\\"c\\":true}],\\"e\\":[{\\"i\\":[[-206.701,0],[1.349,-4.634],[206.702,0],[0.205,6.376]],\\"o\\":[[206.701,0],[-2.223,7.633],[-206.701,0],[-0.25,-7.779]],\\"v\\":[[-2.095,0.013],[374.266,0],[-2.237,-0.013],[-374.266,0]],\\"c\\":true}]},{\\"i\\":{\\"x\\":0.07,\\"y\\":1},\\"o\\":{\\"x\\":0,\\"y\\":0},\\"t\\":80.815,\\"s\\":[{\\"i\\":[[-206.701,0],[1.349,-4.634],[206.702,0],[0.205,6.376]],\\"o\\":[[206.701,0],[-2.223,7.633],[-206.701,0],[-0.25,-7.779]],\\"v\\":[[-2.095,0.013],[374.266,0],[-2.237,-0.013],[-374.266,0]],\\"c\\":true}],\\"e\\":[{\\"i\\":[[-206.701,0],[0,-206.701],[206.701,0],[0,206.701]],\\"o\\":[[206.701,0],[0,206.701],[-206.701,0],[0,-206.701]],\\"v\\":[[0,-374.266],[374.266,0],[0,374.266],[-374.266,0]],\\"c\\":true}]},{\\"t\\":130.000048877002}],\\"ix\\":2},\\"nm\\":\\"Path 1\\",\\"mn\\":\\"ADBE Vector Shape - Group\\",\\"hd\\":false},{\\"ty\\":\\"st\\",\\"c\\":{\\"a\\":0,\\"k\\":[0.207843137255,0.81568627451,0.498039215686,1],\\"ix\\":3},\\"o\\":{\\"a\\":0,\\"k\\":100,\\"ix\\":4},\\"w\\":{\\"a\\":0,\\"k\\":118,\\"ix\\":5},\\"lc\\":2,\\"lj\\":2,\\"bm\\":0,\\"nm\\":\\"Stroke 1\\",\\"mn\\":\\"ADBE Vector Graphic - Stroke\\",\\"hd\\":false},{\\"ty\\":\\"tr\\",\\"p\\":{\\"a\\":0,\\"k\\":[103,-115],\\"ix\\":2},\\"a\\":{\\"a\\":0,\\"k\\":[0,0],\\"ix\\":1},\\"s\\":{\\"a\\":0,\\"k\\":[86.667,86.667],\\"ix\\":3},\\"r\\":{\\"a\\":0,\\"k\\":0,\\"ix\\":6},\\"o\\":{\\"a\\":0,\\"k\\":100,\\"ix\\":7},\\"sk\\":{\\"a\\":0,\\"k\\":0,\\"ix\\":4},\\"sa\\":{\\"a\\":0,\\"k\\":0,\\"ix\\":5},\\"nm\\":\\"Transform\\"}],\\"nm\\":\\"Ellipse 1\\",\\"np\\":3,\\"cix\\":2,\\"bm\\":0,\\"ix\\":1,\\"mn\\":\\"ADBE Vector Group\\",\\"hd\\":false},{\\"ty\\":\\"tm\\",\\"s\\":{\\"a\\":1,\\"k\\":[{\\"i\\":{\\"x\\":[0.833],\\"y\\":[0.833]},\\"o\\":{\\"x\\":[0],\\"y\\":[0]},\\"t\\":0,\\"s\\":[99],\\"e\\":[0]},{\\"t\\":38.000048877002}],\\"ix\\":1},\\"e\\":{\\"a\\":1,\\"k\\":[{\\"i\\":{\\"x\\":[1],\\"y\\":[1]},\\"o\\":{\\"x\\":[0.58],\\"y\\":[0]},\\"t\\":96,\\"s\\":[100],\\"e\\":[1]},{\\"t\\":172.000048877002}],\\"ix\\":2},\\"o\\":{\\"a\\":0,\\"k\\":0,\\"ix\\":3},\\"m\\":1,\\"ix\\":2,\\"nm\\":\\"Trim Paths 1\\",\\"mn\\":\\"ADBE Vector Filter - Trim\\",\\"hd\\":false}],\\"ip\\":0,\\"op\\":173,\\"st\\":-144.997997997998,\\"bm\\":0}]}],\\"layers\\":[{\\"ddd\\":0,\\"ind\\":1,\\"ty\\":0,\\"nm\\":\\"WINNER green\\",\\"refId\\":\\"comp_0\\",\\"sr\\":1,\\"ks\\":{\\"o\\":{\\"a\\":0,\\"k\\":100,\\"ix\\":11},\\"r\\":{\\"a\\":0,\\"k\\":0,\\"ix\\":10},\\"p\\":{\\"a\\":0,\\"k\\":[300,300,0],\\"ix\\":2},\\"a\\":{\\"a\\":0,\\"k\\":[300,300,0],\\"ix\\":1},\\"s\\":{\\"a\\":0,\\"k\\":[-100,100,100],\\"ix\\":6}},\\"ao\\":0,\\"w\\":600,\\"h\\":600,\\"ip\\":0,\\"op\\":173,\\"st\\":0,\\"bm\\":0}],\\"markers\\":[]}"
+            speed={1}
+            style={
+              Object {
+                "aspectRatio": 1,
+                "height": "100%",
+                "width": 40,
+              }
+            }
+          />
+        </View>
+        <Text
+          style={
+            Object {
+              "color": "#2E3338",
+              "fontFamily": "Hind-SemiBold",
+              "fontSize": 16,
+              "lineHeight": 24,
+              "marginTop": 20,
+            }
+          }
+        >
+          loading.verifyingNumber
+        </Text>
+        <Text
+          style={
+            Object {
+              "color": "#2E3338",
+              "fontFamily": "Hind-Regular",
+              "fontSize": 16,
+              "lineHeight": 24,
+              "marginTop": 5,
+            }
+          }
+        >
+          loading.keepOpen
+        </Text>
+      </View>
+      <View
+        style={
+          Object {
+            "marginVertical": 20,
           }
         }
       >
         <View
           style={
             Object {
-              "height": 250,
+              "height": 275,
             }
           }
         >
@@ -89,13 +203,25 @@ exports[`VerificationLoadingScreen renders correctly 1`] = `
             data={
               Array [
                 Object {
-                  "text": "Test 1",
+                  "icon": <NuxLogo
+                    height={35}
+                    style={Object {}}
+                  />,
+                  "text": "loading.card1",
                 },
                 Object {
-                  "text": "Test 2",
+                  "icon": <NuxLogo
+                    height={35}
+                    style={Object {}}
+                  />,
+                  "text": "loading.card2",
                 },
                 Object {
-                  "text": "Test 3",
+                  "icon": <NuxLogo
+                    height={35}
+                    style={Object {}}
+                  />,
+                  "text": "loading.card3",
                 },
               ]
             }
@@ -115,7 +241,7 @@ exports[`VerificationLoadingScreen renders correctly 1`] = `
             initialNumToRender={7}
             invertStickyHeaders={false}
             inverted={false}
-            itemHeight={250}
+            itemHeight={275}
             itemWidth={680}
             keyExtractor={[Function]}
             layout="default"
@@ -148,7 +274,7 @@ exports[`VerificationLoadingScreen renders correctly 1`] = `
             showsHorizontalScrollIndicator={false}
             showsVerticalScrollIndicator={false}
             slideStyle={Object {}}
-            sliderHeight={250}
+            sliderHeight={275}
             sliderWidth={750}
             stickyHeaderIndices={Array []}
             style={
@@ -201,7 +327,7 @@ exports[`VerificationLoadingScreen renders correctly 1`] = `
                       style={
                         Array [
                           Object {
-                            "height": 250,
+                            "height": 275,
                             "position": "relative",
                             "width": 680,
                           },
@@ -212,7 +338,7 @@ exports[`VerificationLoadingScreen renders correctly 1`] = `
                       }
                     >
                       <svg
-                        height={276}
+                        height={301}
                         style={
                           Object {
                             "left": -1,
@@ -233,7 +359,7 @@ exports[`VerificationLoadingScreen renders correctly 1`] = `
                             <stop
                               offset="0"
                               stopColor="#6b7b8b"
-                              stopOpacity={0.03}
+                              stopOpacity={0.02}
                             />
                             <stop
                               offset="1"
@@ -251,7 +377,7 @@ exports[`VerificationLoadingScreen renders correctly 1`] = `
                             <stop
                               offset="0"
                               stopColor="#6b7b8b"
-                              stopOpacity={0.03}
+                              stopOpacity={0.02}
                             />
                             <stop
                               offset="1"
@@ -269,7 +395,7 @@ exports[`VerificationLoadingScreen renders correctly 1`] = `
                             <stop
                               offset="0"
                               stopColor="#6b7b8b"
-                              stopOpacity={0.03}
+                              stopOpacity={0.02}
                             />
                             <stop
                               offset="1"
@@ -287,7 +413,7 @@ exports[`VerificationLoadingScreen renders correctly 1`] = `
                             <stop
                               offset="0"
                               stopColor="#6b7b8b"
-                              stopOpacity={0.03}
+                              stopOpacity={0.02}
                             />
                             <stop
                               offset="1"
@@ -306,12 +432,12 @@ exports[`VerificationLoadingScreen renders correctly 1`] = `
                             <stop
                               offset="0"
                               stopColor="#6b7b8b"
-                              stopOpacity={0.03}
+                              stopOpacity={0.02}
                             />
                             <stop
                               offset="0.9230769230769231"
                               stopColor="#6b7b8b"
-                              stopOpacity={0.03}
+                              stopOpacity={0.02}
                             />
                             <stop
                               offset="1"
@@ -330,12 +456,12 @@ exports[`VerificationLoadingScreen renders correctly 1`] = `
                             <stop
                               offset="0"
                               stopColor="#6b7b8b"
-                              stopOpacity={0.03}
+                              stopOpacity={0.02}
                             />
                             <stop
                               offset="0.9230769230769231"
                               stopColor="#6b7b8b"
-                              stopOpacity={0.03}
+                              stopOpacity={0.02}
                             />
                             <stop
                               offset="1"
@@ -354,12 +480,12 @@ exports[`VerificationLoadingScreen renders correctly 1`] = `
                             <stop
                               offset="0"
                               stopColor="#6b7b8b"
-                              stopOpacity={0.03}
+                              stopOpacity={0.02}
                             />
                             <stop
                               offset="0.9230769230769231"
                               stopColor="#6b7b8b"
-                              stopOpacity={0.03}
+                              stopOpacity={0.02}
                             />
                             <stop
                               offset="1"
@@ -378,12 +504,12 @@ exports[`VerificationLoadingScreen renders correctly 1`] = `
                             <stop
                               offset="0"
                               stopColor="#6b7b8b"
-                              stopOpacity={0.03}
+                              stopOpacity={0.02}
                             />
                             <stop
                               offset="0.9230769230769231"
                               stopColor="#6b7b8b"
-                              stopOpacity={0.03}
+                              stopOpacity={0.02}
                             />
                             <stop
                               offset="1"
@@ -401,11 +527,11 @@ exports[`VerificationLoadingScreen renders correctly 1`] = `
                           fill="url(#border-right-top)"
                         />
                         <path
-                          d="M 681 239,h 1,q 0 13 -13 13,v -1,q 12 0 12 -12,z"
+                          d="M 681 264,h 1,q 0 13 -13 13,v -1,q 12 0 12 -12,z"
                           fill="url(#border-right-bottom)"
                         />
                         <path
-                          d="M 0 239,q 0 13 13 13,v -1,q -12 0 -12 -12,h -1,z"
+                          d="M 0 264,q 0 13 13 13,v -1,q -12 0 -12 -12,h -1,z"
                           fill="url(#border-left-bottom)"
                         />
                         <rect
@@ -417,14 +543,14 @@ exports[`VerificationLoadingScreen renders correctly 1`] = `
                         />
                         <rect
                           fill="url(#left)"
-                          height={226}
+                          height={251}
                           width={1}
                           x="0"
                           y={13}
                         />
                         <rect
                           fill="url(#right)"
-                          height={226}
+                          height={251}
                           width={1}
                           x={681}
                           y={13}
@@ -434,11 +560,11 @@ exports[`VerificationLoadingScreen renders correctly 1`] = `
                           height={1}
                           width={656}
                           x={13}
-                          y={251}
+                          y={276}
                         />
                         <path
-                          d="M 13 1,h 656,q 12 0 12 12,v 226,q 0 12 -12 12,h -656,q -12 0 -12 -12,v -226,q 0 -12 12 -12"
-                          fill="rgba(107,123,139,0.03)"
+                          d="M 13 1,h 656,q 12 0 12 12,v 251,q 0 12 -12 12,h -656,q -12 0 -12 -12,v -251,q 0 -12 12 -12"
+                          fill="rgba(107,123,139,0.02)"
                         />
                       </svg>
                       <View
@@ -449,12 +575,40 @@ exports[`VerificationLoadingScreen renders correctly 1`] = `
                             "borderColor": "rgba(255, 255, 255, 0.5)",
                             "borderRadius": 12,
                             "borderWidth": 2,
-                            "height": 244,
+                            "elevation": 1,
+                            "height": 269,
                             "justifyContent": "center",
+                            "padding": 20,
                             "width": 674,
                           }
                         }
                       >
+                        <View
+                          style={
+                            Array [
+                              Object {
+                                "alignItems": "center",
+                                "marginBottom": 20,
+                              },
+                              Object {},
+                            ]
+                          }
+                        >
+                          <Image
+                            resizeMode="contain"
+                            source={
+                              Object {
+                                "testUri": "../../../packages/mobile/src/images/coins-logo.png",
+                              }
+                            }
+                            style={
+                              Object {
+                                "height": 35,
+                                "width": 35,
+                              }
+                            }
+                          />
+                        </View>
                         <Text
                           style={
                             Object {
@@ -462,10 +616,11 @@ exports[`VerificationLoadingScreen renders correctly 1`] = `
                               "fontFamily": "Hind-Regular",
                               "fontSize": 17,
                               "lineHeight": 26,
+                              "textAlign": "center",
                             }
                           }
                         >
-                          Test 1
+                          loading.card1
                         </Text>
                       </View>
                     </View>
@@ -507,7 +662,7 @@ exports[`VerificationLoadingScreen renders correctly 1`] = `
                       style={
                         Array [
                           Object {
-                            "height": 250,
+                            "height": 275,
                             "position": "relative",
                             "width": 680,
                           },
@@ -518,7 +673,7 @@ exports[`VerificationLoadingScreen renders correctly 1`] = `
                       }
                     >
                       <svg
-                        height={276}
+                        height={301}
                         style={
                           Object {
                             "left": -1,
@@ -539,7 +694,7 @@ exports[`VerificationLoadingScreen renders correctly 1`] = `
                             <stop
                               offset="0"
                               stopColor="#6b7b8b"
-                              stopOpacity={0.03}
+                              stopOpacity={0.02}
                             />
                             <stop
                               offset="1"
@@ -557,7 +712,7 @@ exports[`VerificationLoadingScreen renders correctly 1`] = `
                             <stop
                               offset="0"
                               stopColor="#6b7b8b"
-                              stopOpacity={0.03}
+                              stopOpacity={0.02}
                             />
                             <stop
                               offset="1"
@@ -575,7 +730,7 @@ exports[`VerificationLoadingScreen renders correctly 1`] = `
                             <stop
                               offset="0"
                               stopColor="#6b7b8b"
-                              stopOpacity={0.03}
+                              stopOpacity={0.02}
                             />
                             <stop
                               offset="1"
@@ -593,7 +748,7 @@ exports[`VerificationLoadingScreen renders correctly 1`] = `
                             <stop
                               offset="0"
                               stopColor="#6b7b8b"
-                              stopOpacity={0.03}
+                              stopOpacity={0.02}
                             />
                             <stop
                               offset="1"
@@ -612,12 +767,12 @@ exports[`VerificationLoadingScreen renders correctly 1`] = `
                             <stop
                               offset="0"
                               stopColor="#6b7b8b"
-                              stopOpacity={0.03}
+                              stopOpacity={0.02}
                             />
                             <stop
                               offset="0.9230769230769231"
                               stopColor="#6b7b8b"
-                              stopOpacity={0.03}
+                              stopOpacity={0.02}
                             />
                             <stop
                               offset="1"
@@ -636,12 +791,12 @@ exports[`VerificationLoadingScreen renders correctly 1`] = `
                             <stop
                               offset="0"
                               stopColor="#6b7b8b"
-                              stopOpacity={0.03}
+                              stopOpacity={0.02}
                             />
                             <stop
                               offset="0.9230769230769231"
                               stopColor="#6b7b8b"
-                              stopOpacity={0.03}
+                              stopOpacity={0.02}
                             />
                             <stop
                               offset="1"
@@ -660,12 +815,12 @@ exports[`VerificationLoadingScreen renders correctly 1`] = `
                             <stop
                               offset="0"
                               stopColor="#6b7b8b"
-                              stopOpacity={0.03}
+                              stopOpacity={0.02}
                             />
                             <stop
                               offset="0.9230769230769231"
                               stopColor="#6b7b8b"
-                              stopOpacity={0.03}
+                              stopOpacity={0.02}
                             />
                             <stop
                               offset="1"
@@ -684,12 +839,12 @@ exports[`VerificationLoadingScreen renders correctly 1`] = `
                             <stop
                               offset="0"
                               stopColor="#6b7b8b"
-                              stopOpacity={0.03}
+                              stopOpacity={0.02}
                             />
                             <stop
                               offset="0.9230769230769231"
                               stopColor="#6b7b8b"
-                              stopOpacity={0.03}
+                              stopOpacity={0.02}
                             />
                             <stop
                               offset="1"
@@ -707,11 +862,11 @@ exports[`VerificationLoadingScreen renders correctly 1`] = `
                           fill="url(#border-right-top)"
                         />
                         <path
-                          d="M 681 239,h 1,q 0 13 -13 13,v -1,q 12 0 12 -12,z"
+                          d="M 681 264,h 1,q 0 13 -13 13,v -1,q 12 0 12 -12,z"
                           fill="url(#border-right-bottom)"
                         />
                         <path
-                          d="M 0 239,q 0 13 13 13,v -1,q -12 0 -12 -12,h -1,z"
+                          d="M 0 264,q 0 13 13 13,v -1,q -12 0 -12 -12,h -1,z"
                           fill="url(#border-left-bottom)"
                         />
                         <rect
@@ -723,14 +878,14 @@ exports[`VerificationLoadingScreen renders correctly 1`] = `
                         />
                         <rect
                           fill="url(#left)"
-                          height={226}
+                          height={251}
                           width={1}
                           x="0"
                           y={13}
                         />
                         <rect
                           fill="url(#right)"
-                          height={226}
+                          height={251}
                           width={1}
                           x={681}
                           y={13}
@@ -740,11 +895,11 @@ exports[`VerificationLoadingScreen renders correctly 1`] = `
                           height={1}
                           width={656}
                           x={13}
-                          y={251}
+                          y={276}
                         />
                         <path
-                          d="M 13 1,h 656,q 12 0 12 12,v 226,q 0 12 -12 12,h -656,q -12 0 -12 -12,v -226,q 0 -12 12 -12"
-                          fill="rgba(107,123,139,0.03)"
+                          d="M 13 1,h 656,q 12 0 12 12,v 251,q 0 12 -12 12,h -656,q -12 0 -12 -12,v -251,q 0 -12 12 -12"
+                          fill="rgba(107,123,139,0.02)"
                         />
                       </svg>
                       <View
@@ -755,12 +910,40 @@ exports[`VerificationLoadingScreen renders correctly 1`] = `
                             "borderColor": "rgba(255, 255, 255, 0.5)",
                             "borderRadius": 12,
                             "borderWidth": 2,
-                            "height": 244,
+                            "elevation": 1,
+                            "height": 269,
                             "justifyContent": "center",
+                            "padding": 20,
                             "width": 674,
                           }
                         }
                       >
+                        <View
+                          style={
+                            Array [
+                              Object {
+                                "alignItems": "center",
+                                "marginBottom": 20,
+                              },
+                              Object {},
+                            ]
+                          }
+                        >
+                          <Image
+                            resizeMode="contain"
+                            source={
+                              Object {
+                                "testUri": "../../../packages/mobile/src/images/coins-logo.png",
+                              }
+                            }
+                            style={
+                              Object {
+                                "height": 35,
+                                "width": 35,
+                              }
+                            }
+                          />
+                        </View>
                         <Text
                           style={
                             Object {
@@ -768,10 +951,11 @@ exports[`VerificationLoadingScreen renders correctly 1`] = `
                               "fontFamily": "Hind-Regular",
                               "fontSize": 17,
                               "lineHeight": 26,
+                              "textAlign": "center",
                             }
                           }
                         >
-                          Test 2
+                          loading.card2
                         </Text>
                       </View>
                     </View>
@@ -813,7 +997,7 @@ exports[`VerificationLoadingScreen renders correctly 1`] = `
                       style={
                         Array [
                           Object {
-                            "height": 250,
+                            "height": 275,
                             "position": "relative",
                             "width": 680,
                           },
@@ -824,7 +1008,7 @@ exports[`VerificationLoadingScreen renders correctly 1`] = `
                       }
                     >
                       <svg
-                        height={276}
+                        height={301}
                         style={
                           Object {
                             "left": -1,
@@ -845,7 +1029,7 @@ exports[`VerificationLoadingScreen renders correctly 1`] = `
                             <stop
                               offset="0"
                               stopColor="#6b7b8b"
-                              stopOpacity={0.03}
+                              stopOpacity={0.02}
                             />
                             <stop
                               offset="1"
@@ -863,7 +1047,7 @@ exports[`VerificationLoadingScreen renders correctly 1`] = `
                             <stop
                               offset="0"
                               stopColor="#6b7b8b"
-                              stopOpacity={0.03}
+                              stopOpacity={0.02}
                             />
                             <stop
                               offset="1"
@@ -881,7 +1065,7 @@ exports[`VerificationLoadingScreen renders correctly 1`] = `
                             <stop
                               offset="0"
                               stopColor="#6b7b8b"
-                              stopOpacity={0.03}
+                              stopOpacity={0.02}
                             />
                             <stop
                               offset="1"
@@ -899,7 +1083,7 @@ exports[`VerificationLoadingScreen renders correctly 1`] = `
                             <stop
                               offset="0"
                               stopColor="#6b7b8b"
-                              stopOpacity={0.03}
+                              stopOpacity={0.02}
                             />
                             <stop
                               offset="1"
@@ -918,12 +1102,12 @@ exports[`VerificationLoadingScreen renders correctly 1`] = `
                             <stop
                               offset="0"
                               stopColor="#6b7b8b"
-                              stopOpacity={0.03}
+                              stopOpacity={0.02}
                             />
                             <stop
                               offset="0.9230769230769231"
                               stopColor="#6b7b8b"
-                              stopOpacity={0.03}
+                              stopOpacity={0.02}
                             />
                             <stop
                               offset="1"
@@ -942,12 +1126,12 @@ exports[`VerificationLoadingScreen renders correctly 1`] = `
                             <stop
                               offset="0"
                               stopColor="#6b7b8b"
-                              stopOpacity={0.03}
+                              stopOpacity={0.02}
                             />
                             <stop
                               offset="0.9230769230769231"
                               stopColor="#6b7b8b"
-                              stopOpacity={0.03}
+                              stopOpacity={0.02}
                             />
                             <stop
                               offset="1"
@@ -966,12 +1150,12 @@ exports[`VerificationLoadingScreen renders correctly 1`] = `
                             <stop
                               offset="0"
                               stopColor="#6b7b8b"
-                              stopOpacity={0.03}
+                              stopOpacity={0.02}
                             />
                             <stop
                               offset="0.9230769230769231"
                               stopColor="#6b7b8b"
-                              stopOpacity={0.03}
+                              stopOpacity={0.02}
                             />
                             <stop
                               offset="1"
@@ -990,12 +1174,12 @@ exports[`VerificationLoadingScreen renders correctly 1`] = `
                             <stop
                               offset="0"
                               stopColor="#6b7b8b"
-                              stopOpacity={0.03}
+                              stopOpacity={0.02}
                             />
                             <stop
                               offset="0.9230769230769231"
                               stopColor="#6b7b8b"
-                              stopOpacity={0.03}
+                              stopOpacity={0.02}
                             />
                             <stop
                               offset="1"
@@ -1013,11 +1197,11 @@ exports[`VerificationLoadingScreen renders correctly 1`] = `
                           fill="url(#border-right-top)"
                         />
                         <path
-                          d="M 681 239,h 1,q 0 13 -13 13,v -1,q 12 0 12 -12,z"
+                          d="M 681 264,h 1,q 0 13 -13 13,v -1,q 12 0 12 -12,z"
                           fill="url(#border-right-bottom)"
                         />
                         <path
-                          d="M 0 239,q 0 13 13 13,v -1,q -12 0 -12 -12,h -1,z"
+                          d="M 0 264,q 0 13 13 13,v -1,q -12 0 -12 -12,h -1,z"
                           fill="url(#border-left-bottom)"
                         />
                         <rect
@@ -1029,14 +1213,14 @@ exports[`VerificationLoadingScreen renders correctly 1`] = `
                         />
                         <rect
                           fill="url(#left)"
-                          height={226}
+                          height={251}
                           width={1}
                           x="0"
                           y={13}
                         />
                         <rect
                           fill="url(#right)"
-                          height={226}
+                          height={251}
                           width={1}
                           x={681}
                           y={13}
@@ -1046,11 +1230,11 @@ exports[`VerificationLoadingScreen renders correctly 1`] = `
                           height={1}
                           width={656}
                           x={13}
-                          y={251}
+                          y={276}
                         />
                         <path
-                          d="M 13 1,h 656,q 12 0 12 12,v 226,q 0 12 -12 12,h -656,q -12 0 -12 -12,v -226,q 0 -12 12 -12"
-                          fill="rgba(107,123,139,0.03)"
+                          d="M 13 1,h 656,q 12 0 12 12,v 251,q 0 12 -12 12,h -656,q -12 0 -12 -12,v -251,q 0 -12 12 -12"
+                          fill="rgba(107,123,139,0.02)"
                         />
                       </svg>
                       <View
@@ -1061,12 +1245,40 @@ exports[`VerificationLoadingScreen renders correctly 1`] = `
                             "borderColor": "rgba(255, 255, 255, 0.5)",
                             "borderRadius": 12,
                             "borderWidth": 2,
-                            "height": 244,
+                            "elevation": 1,
+                            "height": 269,
                             "justifyContent": "center",
+                            "padding": 20,
                             "width": 674,
                           }
                         }
                       >
+                        <View
+                          style={
+                            Array [
+                              Object {
+                                "alignItems": "center",
+                                "marginBottom": 20,
+                              },
+                              Object {},
+                            ]
+                          }
+                        >
+                          <Image
+                            resizeMode="contain"
+                            source={
+                              Object {
+                                "testUri": "../../../packages/mobile/src/images/coins-logo.png",
+                              }
+                            }
+                            style={
+                              Object {
+                                "height": 35,
+                                "width": 35,
+                              }
+                            }
+                          />
+                        </View>
                         <Text
                           style={
                             Object {
@@ -1074,10 +1286,11 @@ exports[`VerificationLoadingScreen renders correctly 1`] = `
                               "fontFamily": "Hind-Regular",
                               "fontSize": 17,
                               "lineHeight": 26,
+                              "textAlign": "center",
                             }
                           }
                         >
-                          Test 3
+                          loading.card3
                         </Text>
                       </View>
                     </View>
@@ -1102,7 +1315,7 @@ exports[`VerificationLoadingScreen renders correctly 1`] = `
                 "flexDirection": "row",
               },
               Object {
-                "marginVertical": 10,
+                "marginTop": 5,
               },
             ]
           }

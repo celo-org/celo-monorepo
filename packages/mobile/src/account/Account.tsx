@@ -81,10 +81,6 @@ export class Account extends React.Component<Props, State> {
     const verified = await isPhoneNumberVerified(phoneNumber)
     this.setState({ verified })
     this.setState({ version: DeviceInfo.getVersion() })
-    navigate(Screens.BackupQuiz, {
-      mnemonic:
-        'unveil nut flock win arrest glide beach proud trust maid income melt gauge frequent doll agree powder box unfold wedding culture finish turn subject',
-    })
   }
 
   goToProfile = () => {
