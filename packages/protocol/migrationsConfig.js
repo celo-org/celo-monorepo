@@ -28,7 +28,7 @@ const DefaultConfig = {
     targetVotingYieldParameters: {
       initial: 5 / 100,
       max: 2 / 10,
-      adjustmentFactor: 1,
+      adjustmentFactor: 1 / 365,
     },
     rewardsMultiplierAdjustmentFactors: {
       underspend: 1 / 2,

@@ -101,12 +101,14 @@ async function registerValidator(
   ).toString('hex')
   const publicKeysData = publicKey + blsPublicKey + blsPoP
 
+  console.log('locking gold for validator registration')
   await lockGold(
     lockedGold,
     config.validators.validatorLockedGoldRequirements.value,
     validatorPrivateKey
   )
 
+  console.log('registering validator')
   // @ts-ignore
   const registerTx = validators.contract.methods.registerValidator(address, add0x(publicKeysData))
 
@@ -114,12 +116,15 @@ async function registerValidator(
     to: validators.address,
   })
 
+  console.log('affiliating')
   // @ts-ignore
   const affiliateTx = validators.contract.methods.affiliate(groupAddress)
 
   await sendTransactionWithPrivateKey(web3, affiliateTx, validatorPrivateKey, {
     to: validators.address,
   })
+
+  console.log('done registering validator')
 
   return
 }

@@ -3,6 +3,7 @@ export type Address = string
 export enum CeloContract {
   Attestations = 'Attestations',
   Election = 'Election',
+  EpochRewards = 'EpochRewards',
   Escrow = 'Escrow',
   Exchange = 'Exchange',
   GasCurrencyWhitelist = 'GasCurrencyWhitelist',

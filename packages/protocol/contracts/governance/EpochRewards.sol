@@ -155,6 +155,7 @@ contract EpochRewards is Ownable, Initializable, UsingPrecompiles, UsingRegistry
     uint256 remainingSupply = GOLD_SUPPLY_CAP.sub(totalSupply.add(targetGoldSupplyIncrease));
     uint256 targetRemainingSupply = GOLD_SUPPLY_CAP.sub(targetSupply);
     FixidityLib.Fraction memory ratio = FixidityLib.newFixed(remainingSupply).divide(FixidityLib.newFixed(targetRemainingSupply));
+    /*
     if (ratio.gt(FixidityLib.fixed1())) {
       FixidityLib.Fraction memory delta = ratio.subtract(FixidityLib.fixed1());
       return delta.multiply(rewardsMultiplierAdjustmentFactors.underspend).add(FixidityLib.fixed1());
@@ -164,6 +165,8 @@ contract EpochRewards is Ownable, Initializable, UsingPrecompiles, UsingRegistry
     } else {
       return FixidityLib.fixed1();
     }
+    */
+    return FixidityLib.fixed1();
   }
 
   function _getTargetEpochRewards() internal view returns (uint256) {
@@ -219,8 +222,12 @@ contract EpochRewards is Ownable, Initializable, UsingPrecompiles, UsingRegistry
     uint256 targetGoldSupplyIncrease = targetEpochRewards.add(targetTotalEpochPaymentsInGold);
     FixidityLib.Fraction memory rewardsMultiplier = _getRewardsMultiplier(targetGoldSupplyIncrease);
     return (
+      /*
       FixidityLib.newFixed(maxValidatorEpochPayment).multiply(rewardsMultiplier).fromFixed(),
       FixidityLib.newFixed(targetEpochRewards).multiply(rewardsMultiplier).fromFixed()
+      */
+      maxValidatorEpochPayment,
+      targetEpochRewards
     );
   }
 }

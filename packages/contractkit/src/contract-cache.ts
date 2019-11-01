@@ -2,6 +2,7 @@ import { CeloContract } from './base'
 import { ContractKit } from './kit'
 import { AttestationsWrapper } from './wrappers/Attestations'
 import { ElectionWrapper } from './wrappers/Election'
+// import { EpochRewardsWrapper } from './wrappers/EpochRewards'
 import { ExchangeWrapper } from './wrappers/Exchange'
 import { GasPriceMinimumWrapper } from './wrappers/GasPriceMinimum'
 import { GoldTokenWrapper } from './wrappers/GoldTokenWrapper'
@@ -15,6 +16,7 @@ import { ValidatorsWrapper } from './wrappers/Validators'
 const WrapperFactories = {
   [CeloContract.Attestations]: AttestationsWrapper,
   [CeloContract.Election]: ElectionWrapper,
+  // [CeloContract.EpochRewards]?: EpochRewardsWrapper,
   // [CeloContract.Escrow]: EscrowWrapper,
   [CeloContract.Exchange]: ExchangeWrapper,
   // [CeloContract.GasCurrencyWhitelist]: GasCurrencyWhitelistWrapper,
@@ -37,6 +39,7 @@ export type ValidWrappers = keyof CFType
 interface WrapperCacheMap {
   [CeloContract.Attestations]?: AttestationsWrapper
   [CeloContract.Election]?: ElectionWrapper
+  // [CeloContract.EpochRewards]?: EpochRewardsWrapper
   // [CeloContract.Escrow]?: EscrowWrapper,
   [CeloContract.Exchange]?: ExchangeWrapper
   // [CeloContract.GasCurrencyWhitelist]?: GasCurrencyWhitelistWrapper,
@@ -70,6 +73,9 @@ export class WrapperCache {
   getElection() {
     return this.getContract(CeloContract.Election)
   }
+  // getEpochRewards() {
+  //   return this.getContract(CeloContract.EpochRewards)
+  // }
   // getEscrow() {
   //   return this.getWrapper(CeloContract.Escrow, newEscrow)
   // }

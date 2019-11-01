@@ -89,6 +89,7 @@ export class ContractKit {
       this.contracts.getReserve(),
       this.contracts.getStableToken(),
       this.contracts.getValidators(),
+      // this.contracts.getEpochRewards(),
     ])
     const res = await Promise.all([
       contracts[0].getConfig(),
@@ -101,6 +102,7 @@ export class ContractKit {
       contracts[7].getConfig(),
       contracts[8].getConfig(),
       contracts[9].getConfig(),
+      // contracts[10].getConfig(),
     ])
     return {
       exchange: res[0],
@@ -113,6 +115,7 @@ export class ContractKit {
       reserve: res[7],
       stableToken: res[8],
       validators: res[9],
+      // epochRewards: res[10],
     }
   }
 
