@@ -12,7 +12,7 @@ import { blsPrivateKeyToProcessedPrivateKey } from '@celo/utils/lib/bls'
 import { toFixed } from '@celo/utils/lib/fixidity'
 import { BigNumber } from 'bignumber.js'
 import * as bls12377js from 'bls12377js'
-import { ElectionInstance, LockedGoldInstance, ValidatorsInstance } from 'types'
+import { AccountsInstance, ElectionInstance, LockedGoldInstance, ValidatorsInstance } from 'types'
 
 const Web3 = require('web3')
 
@@ -20,11 +20,16 @@ function serializeKeystore(keystore: any) {
   return Buffer.from(JSON.stringify(keystore)).toString('base64')
 }
 
-async function lockGold(lockedGold: LockedGoldInstance, value: BigNumber, privateKey: string) {
+async function lockGold(
+  accounts: AccountsInstance,
+  lockedGold: LockedGoldInstance,
+  value: BigNumber,
+  privateKey: string
+) {
   // @ts-ignore
-  const createAccountTx = lockedGold.contract.methods.createAccount()
+  const createAccountTx = accounts.contract.methods.createAccount()
   await sendTransactionWithPrivateKey(web3, createAccountTx, privateKey, {
-    to: lockedGold.address,
+    to: accounts.address,
   })
 
   // @ts-ignore
@@ -37,12 +42,13 @@ async function lockGold(lockedGold: LockedGoldInstance, value: BigNumber, privat
 }
 
 async function registerValidatorGroup(
+  accounts: AccountsInstance,
   lockedGold: LockedGoldInstance,
   validators: ValidatorsInstance,
   privateKey: string
 ) {
   // Validators can't also be validator groups, so we create a new account to register the
-  // validator group with, and set the group identifier to the private key of this account
+  // validator group with, and set the name of the group account to the private key of this account
   // encrypted with the private key of the first validator, so that the group private key
   // can be recovered.
   const account = web3.eth.accounts.create()
@@ -59,11 +65,23 @@ async function registerValidatorGroup(
     value: config.validators.registrationRequirements.group * 2, // Add a premium to cover tx fees
   })
 
-  await lockGold(lockedGold, config.validators.registrationRequirements.group, account.privateKey)
+  await lockGold(
+    accounts,
+    lockedGold,
+    config.validators.registrationRequirements.group,
+    account.privateKey
+  )
+
+  // @ts-ignore
+  const setNameTx = accounts.contract.methods.setName(
+    `${config.validators.groupName} ${encodedKey}`
+  )
+  await sendTransactionWithPrivateKey(web3, setNameTx, account.privateKey, {
+    to: accounts.address,
+  })
 
   // @ts-ignore
   const tx = validators.contract.methods.registerValidatorGroup(
-    `${config.validators.groupName} ${encodedKey}`,
     toFixed(config.validators.commission).toString()
   )
 
@@ -75,13 +93,16 @@ async function registerValidatorGroup(
 }
 
 async function registerValidator(
+  accounts: AccountsInstance,
   lockedGold: LockedGoldInstance,
   validators: ValidatorsInstance,
   validatorPrivateKey: string,
-  groupAddress: string
+  groupAddress: string,
+  index: number,
+  networkName: string
 ) {
   const validatorPrivateKeyHexStripped = validatorPrivateKey.slice(2)
-  const address = generateAccountAddressFromPrivateKey(validatorPrivateKeyHexStripped)
+  const address = generateAccountAddressFromPrivateKey(validatorPrivateKey)
   const publicKey = generatePublicKeyFromPrivateKey(validatorPrivateKeyHexStripped)
   const blsValidatorPrivateKeyBytes = blsPrivateKeyToProcessedPrivateKey(
     validatorPrivateKeyHexStripped
@@ -89,17 +110,27 @@ async function registerValidator(
   const blsPublicKey = bls12377js.BLS.privateToPublicBytes(blsValidatorPrivateKeyBytes).toString(
     'hex'
   )
-  const blsPoP = bls12377js.BLS.signPoP(blsValidatorPrivateKeyBytes).toString('hex')
+  const blsPoP = bls12377js.BLS.signPoP(
+    blsValidatorPrivateKeyBytes,
+    Buffer.from(address.slice(2), 'hex')
+  ).toString('hex')
   const publicKeysData = publicKey + blsPublicKey + blsPoP
 
   await lockGold(
+    accounts,
     lockedGold,
     config.validators.registrationRequirements.validator,
     validatorPrivateKey
   )
 
   // @ts-ignore
-  const registerTx = validators.contract.methods.registerValidator(address, add0x(publicKeysData))
+  const setNameTx = accounts.contract.methods.setName(`CLabs Validator #${index} on ${networkName}`)
+  await sendTransactionWithPrivateKey(web3, setNameTx, validatorPrivateKey, {
+    to: accounts.address,
+  })
+
+  // @ts-ignore
+  const registerTx = validators.contract.methods.registerValidator(add0x(publicKeysData))
 
   await sendTransactionWithPrivateKey(web3, registerTx, validatorPrivateKey, {
     to: validators.address,
@@ -112,10 +143,28 @@ async function registerValidator(
     to: validators.address,
   })
 
+  // @ts-ignore
+  const registerDataEncryptionKeyTx = accounts.contract.methods.setAccountDataEncryptionKey(
+    add0x(publicKey)
+  )
+
+  await sendTransactionWithPrivateKey(web3, registerDataEncryptionKeyTx, validatorPrivateKey, {
+    to: accounts.address,
+  })
+
   return
 }
 
-module.exports = async (_deployer: any) => {
+module.exports = async (_deployer: any, networkName: string) => {
+  if (networkName === 'development') {
+    return
+  }
+
+  const accounts: AccountsInstance = await getDeployedProxiedContract<AccountsInstance>(
+    'Accounts',
+    artifacts
+  )
+
   const validators: ValidatorsInstance = await getDeployedProxiedContract<ValidatorsInstance>(
     'Validators',
     artifacts
@@ -148,11 +197,13 @@ module.exports = async (_deployer: any) => {
 
   console.info('  Registering ValidatorGroup ...')
   const firstPrivateKey = valKeys[0]
-  const account = await registerValidatorGroup(lockedGold, validators, firstPrivateKey)
+  const account = await registerValidatorGroup(accounts, lockedGold, validators, firstPrivateKey)
 
   console.info('  Registering Validators ...')
   await Promise.all(
-    valKeys.map((key) => registerValidator(lockedGold, validators, key, account.address))
+    valKeys.map((key, index) =>
+      registerValidator(accounts, lockedGold, validators, key, account.address, index, networkName)
+    )
   )
 
   console.info('  Adding Validators to Validator Group ...')
