@@ -1,10 +1,10 @@
 import * as React from 'react'
 import { StyleSheet, Text, View } from 'react-native'
 import { Ul } from 'src/fonts/Fonts'
-import { ScreenProps, withScreenSize, ScreenSizes } from 'src/layout/ScreenSize'
+import { ScreenProps, ScreenSizes, withScreenSize } from 'src/layout/ScreenSize'
 import Button, { BTN, SIZE } from 'src/shared/Button.3'
-import { fonts, standardStyles, textStyles, colors } from 'src/styles'
 import OvalCoin from 'src/shared/OvalCoin'
+import { colors, fonts, standardStyles, textStyles } from 'src/styles'
 
 interface BTNProps {
   title: string

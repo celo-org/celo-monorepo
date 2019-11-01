@@ -1,7 +1,8 @@
 import throttle from 'lodash.throttle'
+import dynamic from 'next/dynamic'
 import * as React from 'react'
 import { findNodeHandle, StyleSheet, Text, View } from 'react-native'
-import LayersIllo from 'src/dev/LayersIllo'
+import { Props as LayerIlloProps } from 'src/dev/LayersIllo'
 import StackSection from 'src/dev/StackSection'
 import { H2, H3, H4, Li } from 'src/fonts/Fonts'
 import { I18nProps, withNamespaces } from 'src/i18n'
@@ -13,11 +14,15 @@ import { CeloLinks, hashNav } from 'src/shared/menu-items'
 import { HEADER_HEIGHT } from 'src/shared/Styles'
 import { colors, fonts, standardStyles, textStyles } from 'src/styles'
 import { scrollTo } from 'src/utils/utils'
+const LayersIllo = dynamic((import('src/dev/LayersIllo') as unknown) as Promise<
+  React.ComponentType<LayerIlloProps>
+>)
 
 enum Levels {
   apps,
   contracts,
   blockchains,
+  code,
 }
 
 enum StickyMode {
@@ -37,6 +42,7 @@ class FullStack extends React.PureComponent<I18nProps & ScreenProps, State> {
   state = { selection: Levels.apps, mode: StickyMode.normal }
 
   ref = React.createRef<View>()
+  illoRef = React.createRef<View>()
 
   handleScroll = throttle(() => {
     if (!(this.props.screen === ScreenSizes.DESKTOP)) {
@@ -44,10 +50,12 @@ class FullStack extends React.PureComponent<I18nProps & ScreenProps, State> {
       return
     }
 
+    // Maybe just use measure method
     const element: any = findNodeHandle(this.ref.current)
     if (!element) {
       return
     }
+
     const clientRect: DOMRect = element.getBoundingClientRect()
     const currentOffset = clientRect.top
 
@@ -70,11 +78,18 @@ class FullStack extends React.PureComponent<I18nProps & ScreenProps, State> {
         }
       })
 
-      this.setState({ mode: StickyMode.fixed })
+      // When the distance from bottom of container is less than the height of the illo setMode attech Bottom
+      this.illoRef.current.measure((_x, _y, _w, height) => {
+        if (clientRect.bottom - height < 100) {
+          this.setState({ mode: StickyMode.attachToBottom })
+        } else {
+          this.setState({ mode: StickyMode.fixed })
+        }
+      })
     } else {
       this.setState({ mode: StickyMode.normal })
     }
-  }, 24)
+  }, 100)
 
   setL3 = () => {
     this.setState({ selection: Levels.apps })
@@ -86,6 +101,10 @@ class FullStack extends React.PureComponent<I18nProps & ScreenProps, State> {
 
   setL1 = () => {
     this.setState({ selection: Levels.blockchains })
+  }
+
+  setCode = () => {
+    this.setState({ selection: Levels.code })
   }
 
   setLevel = (level: Levels) => {
@@ -128,6 +147,7 @@ class FullStack extends React.PureComponent<I18nProps & ScreenProps, State> {
   render() {
     const { t, screen } = this.props
     const isDesktop = screen === ScreenSizes.DESKTOP
+    const isBrowseCodeFaded = isDesktop && !(this.state.selection === Levels.code)
     return (
       <View style={standardStyles.darkBackground} ref={this.ref}>
         <GridRow
@@ -137,7 +157,7 @@ class FullStack extends React.PureComponent<I18nProps & ScreenProps, State> {
           allStyle={styles.container}
         >
           <Cell span={Spans.half} tabletSpan={Spans.full}>
-            <View style={this.modeStyle()}>
+            <View style={this.modeStyle()} ref={this.illoRef}>
               <View style={styles.illoContainer}>
                 <H3 style={textStyles.invert}>{t('stackSubtitle')}</H3>
                 <H2 style={[textStyles.invert, standardStyles.elementalMargin]}>
@@ -197,7 +217,14 @@ class FullStack extends React.PureComponent<I18nProps & ScreenProps, State> {
               <Li style={textStyles.invert}>{t('proof.rewardsWeighted')}</Li>
               <Li style={textStyles.invert}>{t('proof.onChain')}</Li>
             </StackSection>
-            <View style={[standardStyles.centered, standardStyles.sectionMargin]}>
+            <View
+              style={[
+                standardStyles.centered,
+                standardStyles.sectionMargin,
+                isBrowseCodeFaded && styles.faded,
+                { paddingVertical: 100 },
+              ]}
+            >
               <H4 style={[textStyles.invert, textStyles.center]}>{t('stackBrowseTitle')}</H4>
               <Text
                 style={[standardStyles.elementalMarginBottom, textStyles.invert, textStyles.center]}
@@ -205,6 +232,7 @@ class FullStack extends React.PureComponent<I18nProps & ScreenProps, State> {
                 {t('stackBrowseCopy')}{' '}
               </Text>
               <Button
+                disabled={isBrowseCodeFaded}
                 kind={BTN.PRIMARY}
                 text={t('stackBrowseButton')}
                 target="_blank"
@@ -231,9 +259,13 @@ const styles = StyleSheet.create({
     zIndex: 10,
   },
   attachToBottom: {
+    bottom: 0,
+    paddingTop: HEADER_HEIGHT,
     position: 'absolute',
-    bottom: 50,
   },
   illoContainer: { width: '100%', maxWidth: 400 },
   stackContainer: { paddingTop: GLASS_CEILING },
+  faded: {
+    opacity: 0.6,
+  },
 })
