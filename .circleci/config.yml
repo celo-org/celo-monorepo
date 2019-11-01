@@ -183,7 +183,9 @@ jobs:
       - run: nvm install v10.16.3 && nvm use v10.16.3
       - run:
           name: install miscellaneous
-          command: HOMEBREW_NO_AUTO_UPDATE=1 brew install tree
+          command: |
+            HOMEBREW_NO_AUTO_UPDATE=1 brew install tree brew install coreutils
+            ln -s /usr/local/bin/gtimeout /usr/local/bin/timeout
       # Currently not used
       # - run: npm install --global react-native-kill-packager
       - run:
@@ -244,8 +246,14 @@ jobs:
           command: adb kill-server && adb start-server
       - run:
           name: Run test itself
-          # TODO errors are currently not reported, until we figure out why detox can't find functions https://github.com/wix/Detox/issues/1723
-          command: cd ~/src/packages/mobile && ENVFILE=".env.test" yarn test:detox || ENVFILE=".env.test" yarn test:detox || echo "detox failed"
+          
+          command: |
+            cd ~/src/packages/mobile 
+            # detox sometimes without releasing the terminal and thus making the CI timout
+            # 480s = 8 minutes
+            timeout 480 `ENVFILE=".env.test" yarn test:detox` || echo "failed, try again"
+            timeout 480 `ENVFILE=".env.test" yarn test:detox` || echo "detox failed, return 0 to prevent CI from failing"
+            # TODO errors are currently not reported, until we figure out why detox can't find functions https://github.com/wix/Detox/issues/1723
       - run: cd ~/src
       - save_cache:
           key: yarn-v3-{{ arch }}-{{ .Branch }}-{{ checksum "packages/mobile/android/build.gradle" }}-{{ checksum "packages/mobile/android/settings.gradle" }}-{{ checksum "packages/mobile/android/app/build.gradle" }}-{{ checksum "packages/mobile/.env.test" }}
