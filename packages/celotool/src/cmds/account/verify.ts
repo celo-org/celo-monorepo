@@ -1,8 +1,11 @@
 import { AccountArgv } from '@celo/celotool/src/cmds/account'
 import { portForwardAnd } from '@celo/celotool/src/lib/port_forward'
 import { newKit } from '@celo/contractkit'
-import { AttestationsWrapper } from '@celo/contractkit/lib/wrappers/Attestations'
-import { ActionableAttestation, decodeAttestationCode } from '@celo/walletkit'
+import {
+  ActionableAttestation,
+  AttestationsWrapper,
+} from '@celo/contractkit/lib/wrappers/Attestations'
+import { base64ToHex } from '@celo/utils/lib/attestations'
 import prompts from 'prompts'
 import { switchToClusterFromEnv } from 'src/lib/cluster'
 import * as yargs from 'yargs'
@@ -49,6 +52,7 @@ async function verifyCmd(argv: VerifyArgv) {
   kit.defaultAccount = account
 
   const attestations = await kit.contracts.getAttestations()
+  const accounts = await kit.contracts.getAccounts()
   await printCurrentCompletedAttestations(attestations, argv.phone, account)
 
   let attestationsToComplete = await attestations.getActionableAttestations(argv.phone, account)
@@ -59,15 +63,16 @@ async function verifyCmd(argv: VerifyArgv) {
     await requestMoreAttestations(
       attestations,
       argv.phone,
-      argv.num - attestationsToComplete.length
+      argv.num - attestationsToComplete.length,
+      account
     )
   }
 
   // Set the wallet address if not already appropriate
-  const currentWalletAddress = await attestations.getWalletAddress(account)
+  const currentWalletAddress = await accounts.getWalletAddress(account)
 
   if (currentWalletAddress !== account) {
-    const setWalletAddressTx = await attestations.setWalletAddress(account)
+    const setWalletAddressTx = await accounts.setWalletAddress(account)
     const result = await setWalletAddressTx.send()
     await result.waitReceipt()
   }
@@ -97,7 +102,8 @@ export async function printCurrentCompletedAttestations(
 async function requestMoreAttestations(
   attestations: AttestationsWrapper,
   phoneNumber: string,
-  attestationsRequested: number
+  attestationsRequested: number,
+  account: string
 ) {
   await attestations
     .approveAttestationFee(attestationsRequested)
@@ -105,6 +111,8 @@ async function requestMoreAttestations(
   await attestations
     .request(phoneNumber, attestationsRequested)
     .then((txo) => txo.sendAndWaitForReceipt())
+  await attestations.waitForSelectingIssuers(phoneNumber, account)
+  await attestations.selectIssuers(phoneNumber).then((txo) => txo.sendAndWaitForReceipt())
 }
 
 async function revealAttestations(
@@ -128,7 +136,7 @@ async function verifyCode(
   account: string,
   attestationsToComplete: ActionableAttestation[]
 ) {
-  const code = decodeAttestationCode(base64Code)
+  const code = base64ToHex(base64Code)
   const matchingIssuer = attestations.findMatchingIssuer(
     phoneNumber,
     account,
