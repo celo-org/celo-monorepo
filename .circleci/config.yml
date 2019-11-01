@@ -65,7 +65,7 @@ jobs:
             cd ~/app
             set -v
             # To get the "master" branch mapping
-            git checkout nambrot/accounts
+            git checkout master
             git checkout ${CIRCLE_BRANCH}
             # Verify that following commands work, they are later called in the incremental testing script
             # There output does not matter here, the fact that they finish successfully does.
@@ -504,7 +504,7 @@ jobs:
           command: |
             set -e
             cd packages/celotool
-            ./ci_test_transfers.sh checkout nambrot/accounts
+            ./ci_test_transfers.sh checkout master
 
   end-to-end-geth-exit-test:
     <<: *e2e-defaults
@@ -522,7 +522,7 @@ jobs:
           command: |
             set -e
             cd packages/celotool
-            ./ci_test_exit.sh checkout nambrot/accounts
+            ./ci_test_exit.sh checkout master
 
   end-to-end-geth-governance-test:
     <<: *e2e-defaults
@@ -542,7 +542,7 @@ jobs:
           command: |
             set -e
             cd packages/celotool
-            ./ci_test_governance.sh checkout nambrot/accounts
+            ./ci_test_governance.sh checkout master
 
   end-to-end-geth-sync-test:
     <<: *e2e-defaults
@@ -561,7 +561,7 @@ jobs:
           command: |
             set -e
             cd packages/celotool
-            ./ci_test_sync.sh checkout nambrot/accounts
+            ./ci_test_sync.sh checkout master
 
   end-to-end-geth-integration-sync-test:
     <<: *e2e-defaults
@@ -578,7 +578,7 @@ jobs:
           command: |
             set -e
             cd packages/celotool
-            ./ci_test_sync_with_network.sh checkout nambrot/accounts
+            ./ci_test_sync_with_network.sh checkout master
 
   end-to-end-geth-attestations-test:
     <<: *e2e-defaults
@@ -596,7 +596,7 @@ jobs:
           command: |
             set -e
             cd packages/celotool
-            ./ci_test_attestations.sh checkout nambrot/accounts
+            ./ci_test_attestations.sh checkout master
 
   end-to-end-geth-validator-order-test:
     <<: *e2e-defaults
@@ -614,7 +614,7 @@ jobs:
           command: |
             set -e
             cd packages/celotool
-            ./ci_test_validator_order.sh checkout nambrot/accounts
+            ./ci_test_validator_order.sh checkout master
 
   web:
     working_directory: ~/app
