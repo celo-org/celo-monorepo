@@ -15,8 +15,7 @@
     "build": "yarn run build:for-env integration",
     "prepublishOnly": "yarn run build",
     "test": "export TZ=UTC && jest --ci --silent --coverage --runInBand test/attestations.test.ts test/erc20-utils.test.ts test/google-storage-utils.test.ts test/start_geth.sh test/transaction-utils.test.ts",
-    "test:verbose": "export TZ=UTC && jest --ci --verbose --runInBand  test/attestations.test.ts test/erc20-utils.test.ts test/google-storage-utils.test.ts test/start_geth.sh test/transaction-utils.test.ts",
-    "test-licenses": "yarn licenses list --prod | grep '\\(─ GPL\\|─ (GPL-[1-9]\\.[0-9]\\+ OR GPL-[1-9]\\.[0-9]\\+)\\)' && echo 'Found GPL license(s). Use 'yarn licenses list --prod' to look up the offending package' || echo 'No GPL licenses found'"
+    "test:verbose": "export TZ=UTC && jest --ci --verbose --runInBand  test/attestations.test.ts test/erc20-utils.test.ts test/google-storage-utils.test.ts test/start_geth.sh test/transaction-utils.test.ts"
   },
   "bin": {
     "build-sdk": "./bin/build-sdk.js"

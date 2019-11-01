@@ -9,7 +9,7 @@ import {
 import { call, select } from 'redux-saga/effects'
 import CeloAnalytics from 'src/analytics/CeloAnalytics'
 import { CustomEventNames } from 'src/analytics/constants'
-import { DEFAULT_INFURA_URL } from 'src/config'
+import { DEFAULT_FORNO_URL } from 'src/config'
 import Logger from 'src/utils/Logger'
 import { web3 } from 'src/web3/contracts'
 import { zeroSyncSelector } from 'src/web3/selectors'
@@ -73,10 +73,10 @@ export function* sendTransactionPromises(
   const zeroSyncMode = yield select(zeroSyncSelector)
   if (zeroSyncMode) {
     // In dev mode, verify that we are actually able to connect to the network. This
-    // ensures that we get a more meaningful error if the infura server is down, which
+    // ensures that we get a more meaningful error if the forno server is down, which
     // can happen with networks without SLA guarantees like `integration`.
     if (__DEV__) {
-      yield call(verifyUrlWorksOrThrow, DEFAULT_INFURA_URL)
+      yield call(verifyUrlWorksOrThrow, DEFAULT_FORNO_URL)
     }
     Logger.debug(
       `${TAG}@sendTransactionPromises`,

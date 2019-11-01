@@ -1,5 +1,6 @@
 import debugFactory from 'debug'
 import { CeloContract } from './base'
+import { newAccounts } from './generated/Accounts'
 import { newAttestations } from './generated/Attestations'
 import { newElection } from './generated/Election'
 import { newEscrow } from './generated/Escrow'
@@ -20,6 +21,7 @@ import { ContractKit } from './kit'
 const debug = debugFactory('kit:web3-contract-cache')
 
 const ContractFactories = {
+  [CeloContract.Accounts]: newAccounts,
   [CeloContract.Attestations]: newAttestations,
   [CeloContract.Election]: newElection,
   [CeloContract.Escrow]: newEscrow,
@@ -52,7 +54,9 @@ export class Web3ContractCache {
   private cacheMap: ContractCacheMap = {}
 
   constructor(readonly kit: ContractKit) {}
-
+  getAccounts() {
+    return this.getContract(CeloContract.Accounts)
+  }
   getAttestations() {
     return this.getContract(CeloContract.Attestations)
   }

@@ -34,8 +34,7 @@
     "devchain": "ts-node scripts/devchain.ts",
     "weekly-faucet": "./scripts/bash/weekly_faucet.sh",
     "set-exchange-rate": "./scripts/bash/set_exchange_rate.sh",
-    "network-check": "./scripts/bash/network_check.sh",
-    "test-licenses": "yarn licenses list --prod | grep '\\(─ GPL\\|─ (GPL-[1-9]\\.[0-9]\\+ OR GPL-[1-9]\\.[0-9]\\+)\\)' && echo 'Found GPL license(s). Use 'yarn licenses list --prod' to look up the offending package' || echo 'No GPL licenses found'"
+    "network-check": "./scripts/bash/network_check.sh"
   },
   "dependencies": {
     "@0x/sol-compiler": "^3.1.11",
@@ -45,7 +44,7 @@
     "@0x/subproviders": "^5.0.0",
     "@celo/utils": "^0.1.0",
     "apollo-client": "^2.4.13",
-    "bls12377js": "https://github.com/celo-org/bls12377js#4f596cabb659c4f8969ae4b617f185f2bc74cbbb",
+    "bls12377js": "https://github.com/celo-org/bls12377js#cada1105f4a5e4c2ddd239c1874df3bf33144a10",
     "chai-subset": "^1.6.0",
     "csv-parser": "^2.0.0",
     "csv-stringify": "^4.3.1",
