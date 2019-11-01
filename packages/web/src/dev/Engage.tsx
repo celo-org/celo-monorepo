@@ -178,13 +178,15 @@ const Content = React.memo(function _Content(props: ContentProps) {
       </AspectRatio>
       <Text style={[fonts.p]}>{props.caption}</Text>
       <View style={[standardStyles.row, standardStyles.elementalMarginTop, styles.buttons]}>
-        <Button
-          size={props.screen === ScreenSizes.MOBILE ? SIZE.small : SIZE.normal}
-          kind={BTN.PRIMARY}
-          text={props.primaryAction.text}
-          href={props.primaryAction.href}
-        />
-        <View style={[styles.nakedButtonContainer]}>
+        <View style={styles.primaryButtonContainer}>
+          <Button
+            size={props.screen === ScreenSizes.MOBILE ? SIZE.small : SIZE.normal}
+            kind={BTN.PRIMARY}
+            text={props.primaryAction.text}
+            href={props.primaryAction.href}
+          />
+        </View>
+        <View style={styles.nakedButtonContainer}>
           <Button
             size={SIZE.normal}
             kind={BTN.NAKED}
@@ -244,6 +246,9 @@ const styles = StyleSheet.create({
   },
   nakedButtonContainer: {
     height: 'min-content',
+  },
+  primaryButtonContainer: {
+    marginEnd: 20,
   },
   buttons: {
     alignItems: 'center',
