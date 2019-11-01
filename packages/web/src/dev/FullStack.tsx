@@ -50,37 +50,19 @@ class FullStack extends React.PureComponent<I18nProps & ScreenProps, State> {
       return
     }
 
-    // Maybe just use measure method
     const element: any = findNodeHandle(this.ref.current)
     if (!element) {
       return
     }
 
     const clientRect: DOMRect = element.getBoundingClientRect()
-    const currentOffset = clientRect.top
 
-    if (currentOffset < HEADER_HEIGHT) {
-      requestAnimationFrame(() => {
-        const third = clientRect.height / 3
-
-        const amountPastGlassTop = clientRect.y - HEADER_HEIGHT
-        const hardTop = GLASS_CEILING
-
-        const highestOffScreen = hardTop + amountPastGlassTop < 0
-        const shouldTurnOnLevelOne = hardTop + third + amountPastGlassTop < 0
-
-        if (shouldTurnOnLevelOne) {
-          this.setL1()
-        } else if (highestOffScreen) {
-          this.setL2()
-        } else {
-          this.setL3()
-        }
-      })
-
+    if (clientRect.top < HEADER_HEIGHT - 100) {
       // When the distance from bottom of container is less than the height of the illo setMode attech Bottom
-      this.illoRef.current.measure((_x, _y, _w, height) => {
-        if (clientRect.bottom - height < 100) {
+      this.illoRef.current.measure((_x, _y, _w, illoHeight) => {
+        this.autoSetHighlight(clientRect, illoHeight)
+
+        if (clientRect.bottom - illoHeight < 100) {
           this.setState({ mode: StickyMode.attachToBottom })
         } else {
           this.setState({ mode: StickyMode.fixed })
@@ -125,6 +107,25 @@ class FullStack extends React.PureComponent<I18nProps & ScreenProps, State> {
     }
   }
 
+  autoSetHighlight(clientRect: DOMRect, illoHeight: number) {
+    requestAnimationFrame(() => {
+      const partial = clientRect.height / 4
+      const amountPastGlassTop = clientRect.y - HEADER_HEIGHT
+      const highestOffScreen = GLASS_CEILING + amountPastGlassTop < 0
+      const shouldTurnOnLevelOne = GLASS_CEILING + partial + amountPastGlassTop < 0
+
+      if (clientRect.bottom - illoHeight - partial + GLASS_CEILING < 0) {
+        this.setCode()
+      } else if (shouldTurnOnLevelOne) {
+        this.setL1()
+      } else if (highestOffScreen) {
+        this.setL2()
+      } else {
+        this.setL3()
+      }
+    })
+  }
+
   componentDidMount() {
     window.addEventListener('scroll', this.handleScroll)
   }
@@ -136,11 +137,11 @@ class FullStack extends React.PureComponent<I18nProps & ScreenProps, State> {
   modeStyle = () => {
     switch (this.state.mode) {
       case StickyMode.fixed:
-        return styles.sticky
+        return [styles.sticky, styles.base]
       case StickyMode.attachToBottom:
-        return styles.attachToBottom
+        return [styles.attachToBottom, styles.base]
       default:
-        return {}
+        return styles.base
     }
   }
 
@@ -222,7 +223,7 @@ class FullStack extends React.PureComponent<I18nProps & ScreenProps, State> {
                 standardStyles.centered,
                 standardStyles.sectionMargin,
                 isBrowseCodeFaded && styles.faded,
-                { paddingVertical: 100 },
+                styles.browseCodeArea,
               ]}
             >
               <H4 style={[textStyles.invert, textStyles.center]}>{t('stackBrowseTitle')}</H4>
@@ -267,5 +268,10 @@ const styles = StyleSheet.create({
   stackContainer: { paddingTop: GLASS_CEILING },
   faded: {
     opacity: 0.6,
+  },
+  browseCodeArea: {
+    paddingVertical: 100,
+    transitionProperty: 'opacity',
+    transitionDuration: '100ms',
   },
 })
