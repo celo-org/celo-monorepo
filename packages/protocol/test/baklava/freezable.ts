@@ -30,16 +30,6 @@ contract('Freezable', (accounts: string[]) => {
       })
     })
 
-    it('should allow freezable functions that throw to be called', async () => {
-      const resp = await freezableTest.freezableFunctionWithThrow()
-      assert.equal(resp.logs.length, 1)
-      const log = resp.logs[0]
-      assertLogMatches2(log, {
-        event: 'FunctionCalled',
-        args: {},
-      })
-    })
-
     it('should allow non-freezable functions to be called', async () => {
       const resp = await freezableTest.nonfreezableFunction()
       assert.equal(resp.logs.length, 1)
@@ -84,13 +74,8 @@ contract('Freezable', (accounts: string[]) => {
       await freezableTest.freeze()
     })
 
-    it('should not run a freezable function', async () => {
-      const resp = await freezableTest.freezableFunction()
-      assert.equal(resp.logs.length, 0)
-    })
-
-    it('should revert a freezable function that throws', async () => {
-      await assertRevert(freezableTest.freezableFunctionWithThrow())
+    it('should revert a freezable function', async () => {
+      await assertRevert(freezableTest.freezableFunction())
     })
 
     it('should not affect a non-freezable function', async () => {

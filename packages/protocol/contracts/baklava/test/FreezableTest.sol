@@ -14,10 +14,6 @@ contract FreezableTest is Freezable {
     emit FunctionCalled();
   }
 
-  function freezableFunctionWithThrow() external onlyWhenNotFrozenOrThrow {
-    emit FunctionCalled();
-  }
-
   function nonfreezableFunction() external {
     emit FunctionCalled();
   }

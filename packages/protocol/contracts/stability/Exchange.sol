@@ -127,7 +127,7 @@ contract Exchange is IExchange, Initializable, Ownable, UsingRegistry, Reentranc
     bool sellGold
   )
     external
-    onlyWhenNotFrozenOrThrow
+    onlyWhenNotFrozen
     updateBucketsIfNecessary
     nonReentrant
     returns (uint256)

@@ -11,17 +11,9 @@ contract Freezable {
     _;
   }
 
-  // onlyWhenNotFrozen functions can only be called when `frozen` is false, otherwise they are
-  // noops.
+  // onlyWhenNotFrozen functions can only be called when `frozen` is false, otherwise they will
+  // revert.
   modifier onlyWhenNotFrozen() {
-    if (!frozen) {
-      _;
-    }
-  }
-
-  // onlyWhenNotFrozenOrThrow functions can only be called when `frozen` is false, otherwise they
-  // will revert.
-  modifier onlyWhenNotFrozenOrThrow() {
     require(!frozen);
     _;
   }
