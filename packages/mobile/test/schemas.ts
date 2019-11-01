@@ -9,7 +9,6 @@ export const vNeg1Schema = {
     numberVerified: false,
     error: null,
     dismissErrorAfter: null,
-    doingPinVerification: false,
     language: 'es-AR',
     doingBackupFlow: false,
     message: null,
@@ -159,6 +158,10 @@ export const v2Schema = {
 
 export const v3Schema = {
   ...v2Schema,
+  app: {
+    ...v2Schema.app,
+    doingPinVerification: false,
+  },
   localCurrency: {
     ...v2Schema.localCurrency,
     preferredCurrencyCode: 'MXN',

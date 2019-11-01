@@ -127,10 +127,10 @@ export const navigatePinProtected = (
   params,
 })
 
-export const startPinVerification = () => ({
+export const startPinVerification = (): StartPinVerification => ({
   type: Actions.START_PIN_VERIFICATION,
 })
 
-export const finishPinVerification = () => ({
+export const finishPinVerification = (): FinishPinVerification => ({
   type: Actions.FINISH_PIN_VERIFICATION,
 })
