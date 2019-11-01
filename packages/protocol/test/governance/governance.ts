@@ -73,12 +73,8 @@ const EPOCH = 100
 // TODO(asa): Test dequeueProposalsIfReady
 // TODO(asa): Dequeue explicitly to make the gas cost of operations more clear
 contract('Governance', (accounts: string[]) => {
-<<<<<<< HEAD
   let governance: GovernanceTestInstance
-=======
   let accountsInstance: AccountsInstance
-  let governance: GovernanceInstance
->>>>>>> 9c6495df442ec90691060acceab18a17d8363dbc
   let mockLockedGold: MockLockedGoldInstance
   let testTransactions: TestTransactionsInstance
   let registry: RegistryInstance
