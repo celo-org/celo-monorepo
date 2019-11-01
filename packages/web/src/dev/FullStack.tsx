@@ -130,7 +130,12 @@ class FullStack extends React.PureComponent<I18nProps & ScreenProps, State> {
     const isDesktop = screen === ScreenSizes.DESKTOP
     return (
       <View style={standardStyles.darkBackground} ref={this.ref}>
-        <GridRow tabletStyle={styles.tabletContainer} allStyle={styles.container}>
+        <GridRow
+          desktopStyle={standardStyles.sectionMarginTop}
+          tabletStyle={[standardStyles.sectionMarginTopTablet, styles.tabletContainer]}
+          mobileStyle={standardStyles.sectionMarginTopMobile}
+          allStyle={styles.container}
+        >
           <Cell span={Spans.half} tabletSpan={Spans.full}>
             <View style={this.modeStyle()}>
               <View style={styles.illoContainer}>
@@ -192,7 +197,7 @@ class FullStack extends React.PureComponent<I18nProps & ScreenProps, State> {
               <Li style={textStyles.invert}>{t('proof.rewardsWeighted')}</Li>
               <Li style={textStyles.invert}>{t('proof.onChain')}</Li>
             </StackSection>
-            <View style={[standardStyles.centered, standardStyles.blockMarginBottom]}>
+            <View style={[standardStyles.centered, standardStyles.sectionMargin]}>
               <H4 style={[textStyles.invert, textStyles.center]}>{t('stackBrowseTitle')}</H4>
               <Text
                 style={[standardStyles.elementalMarginBottom, textStyles.invert, textStyles.center]}

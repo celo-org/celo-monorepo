@@ -140,6 +140,7 @@ const styles = StyleSheet.create({
     overflow: 'hidden',
   },
   phone: {
+    paddingHorizontal: 20,
     height: '33vh',
     minHeight: 250,
     maxHeight: 400,

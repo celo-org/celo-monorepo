@@ -1,12 +1,12 @@
 import * as React from 'react'
 import { View } from 'react-native'
 import Cover from 'src/dev/Cover'
+import Engage from 'src/dev/Engage'
 import Features from 'src/dev/Features'
-import ConnectionFooter from 'src/shared/ConnectionFooter'
-
 import FullStack from 'src/dev/FullStack'
 import OpenGraph from 'src/header/OpenGraph'
 import { I18nProps, withNamespaces } from 'src/i18n'
+import ConnectionFooter from 'src/shared/ConnectionFooter'
 import menuItems from 'src/shared/menu-items'
 
 class BuildPage extends React.PureComponent<I18nProps> {
@@ -30,6 +30,7 @@ class BuildPage extends React.PureComponent<I18nProps> {
           }
         />
         <Cover />
+        <Engage />
         <FullStack />
         <Features />
         <ConnectionFooter includeDividerLine={false} />
