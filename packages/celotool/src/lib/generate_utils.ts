@@ -45,6 +45,7 @@ export const MNEMONIC_ACCOUNT_TYPE_CHOICES = [
   'tx_node',
   'bootnode',
   'faucet',
+  'sentry',
 ]
 
 export const add0x = (str: string) => {

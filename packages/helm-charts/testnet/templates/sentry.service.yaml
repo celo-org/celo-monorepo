@@ -1,0 +1,33 @@
+{{ if not (eq (.Values.geth.validators | toString) "og") }}
+
+{{ range $index, $e := until (.Values.geth.proxiedValidators | int) }}
+
+
+{{ template "celo.node-service" (dict "Values" $.Values "Release" $.Release "Chart" $.Chart "index" $index "service_type" "ClusterIP" "node_type" "sentry-internal" "name_suffix" "" "component_label" "sentry" "load_balancer_ip" "" ) }}
+  ports:
+  - name: internal
+    port: 30503
+    protocol: TCP
+  - name: external
+    port: 30303
+    protocol: TCP
+---
+{{ if $.Values.geth.static_ips }}
+{{ $loadBalancerIP := index $.Values.geth (print "validators_" $index "IpAddress") }}
+{{ template "celo.node-service" (dict "Values" $.Values "Release" $.Release "Chart" $.Chart "index" $index "service_type" "LoadBalancer" "node_type" "sentry" "name_suffix" "" "component_label" "sentry" "load_balancer_ip" $loadBalancerIP ) }}
+  ports:
+  - name: discovery
+    port: 30303
+    protocol: UDP
+---
+{{ template "celo.validator-service" (dict "Values" $.Values "Release" $.Release "Chart" $.Chart "index" $index "service_type" "LoadBalancer" "node_type" "sentry" "name_suffix" "-tcp" "component_label" "sentry" "load_balancer_ip" $loadBalancerIP ) }}
+  ports:
+  - name: discovery
+    port: 30303
+    protocol: TCP
+---
+{{ end }}
+
+{{ end }}
+
+{{ end }}

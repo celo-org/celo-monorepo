@@ -47,7 +47,6 @@ geth:
       nodeId: bdfd59ddf34656cf8e0076367517281b68816b2a241f154f58c6178ce9d59e3031d294f406dd7799b9f3b5425e5ab592700a81f8a59918a5e209a8826204f40f
     gethblockscouttx:
       nodeKey: 30e1a9d386eb6e8bd78207e2b8231fc59c63b2fd15726957d3348462de2e3205
-  proxiedValidators: 1
 
 monorepo:
   image:
