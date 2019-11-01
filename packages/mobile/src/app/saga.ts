@@ -23,7 +23,7 @@ import Logger from 'src/utils/Logger'
 import { clockInSync } from 'src/utils/time'
 import { setZeroSyncMode } from 'src/web3/actions'
 import { isInitiallyZeroSyncMode, web3 } from 'src/web3/contracts'
-import { getConnectedAccount } from 'src/web3/saga'
+import { getAccount } from 'src/web3/saga'
 import { zeroSyncSelector } from 'src/web3/selectors'
 
 const TAG = 'app/saga'
@@ -147,7 +147,7 @@ export function* navigatePinProtected(action: NavigatePinProtected) {
     if (!zeroSyncMode) {
       const pincode = yield call(getPincode, false)
       yield put(startPinVerification())
-      const account = yield call(getConnectedAccount)
+      const account = yield call(getAccount)
       yield call(web3.eth.personal.unlockAccount, account, pincode, UNLOCK_DURATION)
       navigate(action.routeName, action.params)
       yield put(finishPinVerification())
