@@ -23,6 +23,10 @@ export function attestationMessageToSign(identifier: string, account: string) {
   return messageHash
 }
 
+export function base64ToHex(base64String: string) {
+  return '0x' + Buffer.from(base64String, 'base64').toString('hex')
+}
+
 export function attestToIdentifier(
   identifier: string,
   account: string,

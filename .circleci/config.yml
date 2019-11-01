@@ -116,6 +116,10 @@ jobs:
             yarn build --scope @celo/walletkit
             yarn build --ignore @celo/protocol --ignore docs --ignore @celo/walletkit
 
+      - run:
+          name: Check licenses
+          command: yarn check-licenses
+
       - persist_to_workspace:
           root: .
           paths:
@@ -184,8 +188,7 @@ jobs:
       - run:
           name: install miscellaneous
           command: |
-            HOMEBREW_NO_AUTO_UPDATE=1 brew install tree brew install coreutils
-            ln -s /usr/local/bin/gtimeout /usr/local/bin/timeout
+            HOMEBREW_NO_AUTO_UPDATE=1 brew install tree coreutils
       # Currently not used
       # - run: npm install --global react-native-kill-packager
       - run:
@@ -251,8 +254,8 @@ jobs:
             cd ~/src/packages/mobile 
             # detox sometimes without releasing the terminal and thus making the CI timout
             # 480s = 8 minutes
-            timeout 480 `ENVFILE=".env.test" yarn test:detox` || echo "failed, try again"
-            timeout 480 `ENVFILE=".env.test" yarn test:detox` || echo "detox failed, return 0 to prevent CI from failing"
+            timeout 480 yarn test:detox || echo "failed, try again"
+            timeout 480 yarn test:detox || echo "detox failed, return 0 to prevent CI from failing"
             # TODO errors are currently not reported, until we figure out why detox can't find functions https://github.com/wix/Detox/issues/1723
       - run: cd ~/src
       - save_cache:
@@ -309,7 +312,7 @@ jobs:
           name: Ensure translations are not missing
           command: |
             cd packages/mobile
-            ./scripts/verify_locales.sh
+            yarn --cwd packages/mobile test:verify-locales
 
       - run:
           name: jest tests

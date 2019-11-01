@@ -25,7 +25,7 @@ export const ProxyContracts = [
 ]
 export const CoreContracts = [
   // common
-
+  'Accounts',
   'GasPriceMinimum',
   'GasCurrencyWhitelist',
   'MultiSig',
