@@ -144,14 +144,8 @@ exports[`NotificationBox Backup too late test 1`] = `
                       style={
                         Array [
                           Object {
-                            "color": "#2E3338",
-                            "fontFamily": "Hind-Regular",
-                            "fontSize": 14,
-                            "lineHeight": 18,
-                          },
-                          Object {
                             "color": "#42D689",
-                            "fontFamily": "Hind-Medium",
+                            "fontFamily": "Hind-SemiBold",
                             "fontSize": 14,
                             "lineHeight": 18,
                           },
@@ -298,14 +292,8 @@ exports[`NotificationBox Backup too late test 1`] = `
                       style={
                         Array [
                           Object {
-                            "color": "#2E3338",
-                            "fontFamily": "Hind-Regular",
-                            "fontSize": 14,
-                            "lineHeight": 18,
-                          },
-                          Object {
                             "color": "#42D689",
-                            "fontFamily": "Hind-Medium",
+                            "fontFamily": "Hind-SemiBold",
                             "fontSize": 14,
                             "lineHeight": 18,
                           },
@@ -340,14 +328,8 @@ exports[`NotificationBox Backup too late test 1`] = `
                       style={
                         Array [
                           Object {
-                            "color": "#2E3338",
-                            "fontFamily": "Hind-Regular",
-                            "fontSize": 14,
-                            "lineHeight": 18,
-                          },
-                          Object {
                             "color": "#42D689",
-                            "fontFamily": "Hind-Medium",
+                            "fontFamily": "Hind-SemiBold",
                             "fontSize": 14,
                             "lineHeight": 18,
                           },
@@ -551,14 +533,8 @@ exports[`NotificationBox Educations not completed yet 1`] = `
                       style={
                         Array [
                           Object {
-                            "color": "#2E3338",
-                            "fontFamily": "Hind-Regular",
-                            "fontSize": 14,
-                            "lineHeight": 18,
-                          },
-                          Object {
                             "color": "#42D689",
-                            "fontFamily": "Hind-Medium",
+                            "fontFamily": "Hind-SemiBold",
                             "fontSize": 14,
                             "lineHeight": 18,
                           },
@@ -593,14 +569,8 @@ exports[`NotificationBox Educations not completed yet 1`] = `
                       style={
                         Array [
                           Object {
-                            "color": "#2E3338",
-                            "fontFamily": "Hind-Regular",
-                            "fontSize": 14,
-                            "lineHeight": 18,
-                          },
-                          Object {
                             "color": "#42D689",
-                            "fontFamily": "Hind-Medium",
+                            "fontFamily": "Hind-SemiBold",
                             "fontSize": 14,
                             "lineHeight": 18,
                           },
@@ -809,14 +779,8 @@ exports[`NotificationBox Payment Requests exist 1`] = `
                       style={
                         Array [
                           Object {
-                            "color": "#2E3338",
-                            "fontFamily": "Hind-Regular",
-                            "fontSize": 14,
-                            "lineHeight": 18,
-                          },
-                          Object {
                             "color": "#42D689",
-                            "fontFamily": "Hind-Medium",
+                            "fontFamily": "Hind-SemiBold",
                             "fontSize": 14,
                             "lineHeight": 18,
                           },
@@ -984,14 +948,8 @@ exports[`NotificationBox Simple test 1`] = `
                       style={
                         Array [
                           Object {
-                            "color": "#2E3338",
-                            "fontFamily": "Hind-Regular",
-                            "fontSize": 14,
-                            "lineHeight": 18,
-                          },
-                          Object {
                             "color": "#42D689",
-                            "fontFamily": "Hind-Medium",
+                            "fontFamily": "Hind-SemiBold",
                             "fontSize": 14,
                             "lineHeight": 18,
                           },
@@ -1138,14 +1096,8 @@ exports[`NotificationBox Simple test 1`] = `
                       style={
                         Array [
                           Object {
-                            "color": "#2E3338",
-                            "fontFamily": "Hind-Regular",
-                            "fontSize": 14,
-                            "lineHeight": 18,
-                          },
-                          Object {
                             "color": "#42D689",
-                            "fontFamily": "Hind-Medium",
+                            "fontFamily": "Hind-SemiBold",
                             "fontSize": 14,
                             "lineHeight": 18,
                           },
@@ -1180,14 +1132,8 @@ exports[`NotificationBox Simple test 1`] = `
                       style={
                         Array [
                           Object {
-                            "color": "#2E3338",
-                            "fontFamily": "Hind-Regular",
-                            "fontSize": 14,
-                            "lineHeight": 18,
-                          },
-                          Object {
                             "color": "#42D689",
-                            "fontFamily": "Hind-Medium",
+                            "fontFamily": "Hind-SemiBold",
                             "fontSize": 14,
                             "lineHeight": 18,
                           },

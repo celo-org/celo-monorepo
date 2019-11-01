@@ -4,7 +4,7 @@ import { fontStyles } from '@celo/react-components/styles/fonts'
 import { anonymizedPhone, isE164Number } from '@celo/utils/src/phoneNumbers'
 import * as Sentry from '@sentry/react-native'
 import * as React from 'react'
-import { Trans, WithNamespaces, withNamespaces } from 'react-i18next'
+import { WithNamespaces, withNamespaces } from 'react-i18next'
 import { Clipboard, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
 import DeviceInfo from 'react-native-device-info'
 import SafeAreaView from 'react-native-safe-area-view'
@@ -81,6 +81,10 @@ export class Account extends React.Component<Props, State> {
     const verified = await isPhoneNumberVerified(phoneNumber)
     this.setState({ verified })
     this.setState({ version: DeviceInfo.getVersion() })
+    navigate(Screens.BackupQuiz, {
+      mnemonic:
+        'unveil nut flock win arrest glide beach proud trust maid income melt gauge frequent doll agree powder box unfold wedding culture finish turn subject',
+    })
   }
 
   goToProfile = () => {
@@ -257,23 +261,10 @@ export class Account extends React.Component<Props, State> {
               <Text style={fontStyles.bodySmall}>{t('version') + ' ' + this.state.version}</Text>
             </View>
             <View style={style.accountFooterText}>
-              <Trans i18nKey="testFaqHere">
-                <Text style={fontStyles.bodySmall}>Test FAQ is </Text>
-                <Link style={[fontStyles.bodySmall, fontStyles.linkInline]} onPress={this.goToFAQ}>
-                  here
-                </Link>
-              </Trans>
+              <Link onPress={this.goToFAQ}>{t('testFaqLink')}</Link>
             </View>
             <View style={style.accountFooterText}>
-              <Trans i18nKey="termsOfServiceHere">
-                <Text style={fontStyles.bodySmall}>Terms of service are </Text>
-                <Link
-                  style={[fontStyles.bodySmall, fontStyles.linkInline]}
-                  onPress={this.goToTerms}
-                >
-                  here
-                </Link>
-              </Trans>
+              <Link onPress={this.goToTerms}>{t('termsOfServiceLink')}</Link>
             </View>
           </View>
         </SafeAreaView>

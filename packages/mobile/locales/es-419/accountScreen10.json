@@ -13,8 +13,8 @@
   "enableCeloLite": "Habilitar Celo Lite",
   "celoLiteDetail":
     "El modo Celo Lite te permite comunicarte con la Red Celo  a través de un nodo confiable. Puedes cambiar este modo en la configuración de la aplicación.",
-  "testFaqHere": "<1>Aquí</1><0> están las preguntas frecuentes del Monedero Celo. </0>",
-  "termsOfServiceHere": "<1>Aquí</1><0> están las Condiciones de servicio.</0>",
+  "testFaqLink": "Las Preguntas Frecuentes del Monedero Celo",
+  "termsOfServiceLink": "Las Condiciones de Servicio",
   "editProfile": "Editar perfil",
   "cancel": "Cancelar",
   "changeProfilePhoto": "Cambiar la foto de perfil",

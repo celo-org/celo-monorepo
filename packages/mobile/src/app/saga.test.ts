@@ -1,7 +1,6 @@
 import { REHYDRATE } from 'redux-persist/es/constants'
 import { expectSaga } from 'redux-saga-test-plan'
 import { call } from 'redux-saga/effects'
-import { PincodeType } from 'src/account/reducer'
 import CeloAnalytics from 'src/analytics/CeloAnalytics'
 import { checkAppDeprecation, navigateToProperScreen, waitForRehydrate } from 'src/app/saga'
 import { waitForFirebaseAuth } from 'src/firebase/saga'
@@ -28,30 +27,6 @@ const initialState = {
   account: {},
   invite: {},
   identity: {},
-}
-
-const numberVerified = {
-  app: {
-    language: 'EN',
-    numberVerified: false,
-  },
-  verify: {
-    e164PhoneNumber: '+1234',
-  },
-  web3: {
-    syncProgress: 101,
-  },
-  account: {
-    pincodeType: PincodeType.PhoneAuth,
-    e164PhoneNumber: '+1234',
-  },
-  invite: {
-    redeemComplete: true,
-  },
-  identity: {
-    startedVerification: false,
-    askedContactsPermission: true,
-  },
 }
 
 const navigationSagaTest = (testName: string, state: any, expectedScreen: any) => {
@@ -99,5 +74,3 @@ describe('Upload Comment Key Saga', () => {
 
 navigationSagaTest('Navigates to the nux stack with no state', null, Stacks.NuxStack)
 navigationSagaTest('Navigates to the nux stack with no language', initialState, Stacks.NuxStack)
-
-navigationSagaTest('Navigates to the verify screen', numberVerified, Screens.VerifyEducation)

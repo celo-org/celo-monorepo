@@ -13,7 +13,7 @@ import Logger from 'src/utils/Logger'
 // to improve the hot reloading experience when in DEV mode
 // https://reactnavigation.org/docs/en/state-persistence.html
 function getPersistenceFunctions() {
-  if (!__DEV__) {
+  if (!__DEV__ || true) {
     return undefined
   }
 
