@@ -110,12 +110,13 @@ const linkedLibraries = {
     'Exchange',
     'GasPriceMinimum',
     'Governance',
+    'GovernanceTest',
     'Proposals',
     'SortedOracles',
     'StableToken',
     'Validators',
   ],
-  Proposals: ['Governance', 'ProposalsTest'],
+  Proposals: ['Governance', 'GovernanceTest', 'ProposalsTest'],
   LinkedList: ['AddressLinkedList', 'SortedLinkedList', 'LinkedListTest'],
   SortedLinkedList: [
     'AddressSortedLinkedList',
@@ -125,7 +126,7 @@ const linkedLibraries = {
   SortedLinkedListWithMedian: ['AddressSortedLinkedListWithMedian'],
   AddressLinkedList: ['Validators', 'ValidatorsTest'],
   AddressSortedLinkedList: ['Election', 'ElectionTest'],
-  IntegerSortedLinkedList: ['Governance', 'IntegerSortedLinkedListTest'],
+  IntegerSortedLinkedList: ['Governance', 'GovernanceTest', 'IntegerSortedLinkedListTest'],
   AddressSortedLinkedListWithMedian: ['SortedOracles', 'AddressSortedLinkedListWithMedianTest'],
   Signatures: ['Accounts', 'TestAttestations', 'Attestations', 'LockedGold', 'Escrow'],
 }
