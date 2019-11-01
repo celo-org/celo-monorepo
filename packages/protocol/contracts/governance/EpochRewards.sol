@@ -49,7 +49,6 @@ contract EpochRewards is Ownable, Initializable, UsingPrecompiles, UsingRegistry
   event MaxValidatorEpochPaymentSet(uint256 payment);
   event TargetVotingYieldParametersSet(uint256 max, uint256 adjustmentFactor);
   event RewardsMultiplierParametersSet(uint256 max, uint256 underspendAdjustmentFactor, uint256 overspendAdjustmentFactor);
-  event Debug(uint256 value, string desc);
 
   /**
    * @param _maxValidatorEpochPayment The duration the above gold remains locked after deregistration.
@@ -208,20 +207,20 @@ contract EpochRewards is Ownable, Initializable, UsingPrecompiles, UsingRegistry
     return targetEpochPayment;
   }
 
-  function _updateTargetVotingYield() internal {
+  function getVotingGoldFraction() public view returns (uint256) {
     // TODO(asa): Ignore custodial accounts.
     address reserveAddress = registry.getAddressForOrDie(RESERVE_REGISTRY_ID);
     uint256 liquidGold = getGoldToken().totalSupply().sub(reserveAddress.balance);
     // TODO(asa): Should this be active votes?
     uint256 votingGold = getElection().getTotalVotes();
-    FixidityLib.Fraction memory votingGoldFraction = FixidityLib.newFixed(votingGold).divide(FixidityLib.newFixed(liquidGold));
-    emit Debug(votingGoldFraction.unwrap(), "voting gold fraction");
-    emit Debug(targetVotingGoldFraction.unwrap(), "target voting gold fraction");
+    return FixidityLib.newFixed(votingGold).divide(FixidityLib.newFixed(liquidGold)).unwrap();
+  }
+
+  function _updateTargetVotingYield() internal {
+    FixidityLib.Fraction memory votingGoldFraction = FixidityLib.wrap(getVotingGoldFraction());
     if (votingGoldFraction.gt(targetVotingGoldFraction)) {
       FixidityLib.Fraction memory votingGoldFractionDelta = votingGoldFraction.subtract(targetVotingGoldFraction);
-      emit Debug(votingGoldFractionDelta.unwrap(), "voting gold fraction delta");
       FixidityLib.Fraction memory targetVotingYieldDelta = votingGoldFractionDelta.multiply(targetVotingYieldParams.adjustmentFactor);
-      emit Debug(targetVotingYieldDelta.unwrap(), "target voting yield delta");
       if (targetVotingYieldDelta.gte(targetVotingYieldParams.target)) {
         targetVotingYieldParams.target = FixidityLib.newFixed(0);
       } else {
@@ -229,9 +228,7 @@ contract EpochRewards is Ownable, Initializable, UsingPrecompiles, UsingRegistry
       }
     } else if (votingGoldFraction.lt(targetVotingGoldFraction)) {
       FixidityLib.Fraction memory votingGoldFractionDelta = targetVotingGoldFraction.subtract(votingGoldFraction);
-      emit Debug(votingGoldFractionDelta.unwrap(), "voting gold fraction delta");
       FixidityLib.Fraction memory targetVotingYieldDelta = votingGoldFractionDelta.multiply(targetVotingYieldParams.adjustmentFactor);
-      emit Debug(targetVotingYieldDelta.unwrap(), "target voting yield delta");
       targetVotingYieldParams.target = targetVotingYieldParams.target.add(targetVotingYieldDelta);
       if (targetVotingYieldParams.target.gt(targetVotingYieldParams.max)) {
         targetVotingYieldParams.target = targetVotingYieldParams.max;
@@ -241,7 +238,7 @@ contract EpochRewards is Ownable, Initializable, UsingPrecompiles, UsingRegistry
 
   function updateTargetVotingYield() external {
     require(msg.sender == address(0));
-    // _updateTargetVotingYield();
+    _updateTargetVotingYield();
   }
 
   function calculateTargetEpochPaymentAndRewards() external view returns (uint256, uint256) {

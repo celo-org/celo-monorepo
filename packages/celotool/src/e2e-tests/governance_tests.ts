@@ -132,7 +132,12 @@ describe('governance tests', () => {
     if (expected.isZero()) {
       assert.equal(difference.toFixed(), expected.toFixed())
     } else {
-      assert.closeTo(difference.toNumber(), expected.toNumber(), delta.toNumber())
+      const isCloseTo =
+        difference.plus(delta).gte(expected) || difference.minus(delta).lte(expected)
+      assert(
+        isCloseTo,
+        `expected ${expected.toString()} to be close to ${difference.toString()} +/- ${delta.toString()}`
+      )
     }
   }
 
@@ -513,7 +518,17 @@ describe('governance tests', () => {
         const previousTarget = new BigNumber(
           (await epochRewards.methods.getTargetVotingYieldParameters().call({}, blockNumber - 1))[0]
         )
-        assert.equal(currentTarget.minus(previousTarget).toFixed(), expected.toFixed())
+        const difference = currentTarget.minus(previousTarget)
+
+        // Assert equal to 10 decimal places due to rounding errors.
+        assert.equal(
+          fromFixed(difference)
+            .dp(10)
+            .toFixed(),
+          fromFixed(expected)
+            .dp(10)
+            .toFixed()
+        )
       }
 
       const assertTargetVotingYieldUnchanged = async (blockNumber: number) => {
@@ -522,16 +537,21 @@ describe('governance tests', () => {
 
       for (const blockNumber of blockNumbers) {
         if (isLastBlockOfEpoch(blockNumber, epoch)) {
-          const actualVotingPercentage = toFixed(new BigNumber(1))
-          const targetVotingGoldPercentage = new BigNumber(
+          // We use the voting gold fraction from before the rewards are granted.
+          const votingGoldFraction = new BigNumber(
+            await epochRewards.methods.getVotingGoldFraction().call({}, blockNumber - 1)
+          )
+          const targetVotingGoldFraction = new BigNumber(
             await epochRewards.methods.getTargetVotingGoldFraction().call({}, blockNumber)
           )
-          const difference = actualVotingPercentage.minus(targetVotingGoldPercentage)
-          const adjustmentFactor = new BigNumber(
-            (await epochRewards.methods.getTargetVotingYieldParameters().call({}, blockNumber))[1]
+          const difference = targetVotingGoldFraction.minus(votingGoldFraction)
+          const adjustmentFactor = fromFixed(
+            new BigNumber(
+              (await epochRewards.methods.getTargetVotingYieldParameters().call({}, blockNumber))[2]
+            )
           )
           const delta = difference.times(adjustmentFactor)
-          await assertTargetVotingYieldChanged(blockNumber, fromFixed(delta))
+          await assertTargetVotingYieldChanged(blockNumber, delta)
         } else {
           await assertTargetVotingYieldUnchanged(blockNumber)
         }
