@@ -27,6 +27,17 @@ interface IGovernance {
   function revokeUpvote(uint256, uint256) external returns (bool);
   function approve(uint256, uint256) external returns (bool);
   function execute(uint256, uint256) external returns (bool);
+
+  function whitelistHotfix(bytes32) external;
+  function prepareHotfix(bytes32) external;
+  function executeHotfix(
+    uint256[] calldata,
+    address[] calldata,
+    bytes calldata,
+    uint256[] calldata
+  ) external;
+  function isHotfixPassing(bytes32) external view returns (bool);
+
   function withdraw() external returns (bool);
   function dequeueProposalsIfReady() external;
   function getParticipationParameters() external view returns (uint256, uint256, uint256, uint256);
