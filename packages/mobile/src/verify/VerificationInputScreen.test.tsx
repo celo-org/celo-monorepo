@@ -5,7 +5,7 @@ import * as renderer from 'react-test-renderer'
 import VerificationInputScreen from 'src/verify/VerificationInputScreen'
 import { createMockStore } from 'test/utils'
 
-describe(VerificationInputScreen, () => {
+describe('VerificationInputScreen', () => {
   const store = createMockStore({})
 
   it('renders correctly', () => {

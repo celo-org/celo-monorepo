@@ -6,6 +6,8 @@ import SafeAreaView from 'react-native-safe-area-view'
 import { Namespaces } from 'src/i18n'
 
 class VerificationInterstitialScreen extends React.Component<WithNamespaces> {
+  static navigationOptions = null
+
   render() {
     // const { t } = this.props
     return (

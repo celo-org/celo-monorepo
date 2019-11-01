@@ -5,7 +5,7 @@ import * as renderer from 'react-test-renderer'
 import VerificationInterstitialScreen from 'src/verify/VerificationInterstitialScreen'
 import { createMockStore } from 'test/utils'
 
-describe(VerificationInterstitialScreen, () => {
+describe('VerificationInterstitialScreen', () => {
   const store = createMockStore({})
 
   it('renders correctly', () => {
