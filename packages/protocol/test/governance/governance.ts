@@ -9,9 +9,11 @@ import {
   stripHexEncoding,
   timeTravel,
 } from '@celo/protocol/lib/test-utils'
-import { toFixed, multiply, fixed1 } from '@celo/utils/lib/fixidity'
+import { fixed1, multiply, toFixed } from '@celo/utils/lib/fixidity'
 import BigNumber from 'bignumber.js'
 import {
+  AccountsContract,
+  AccountsInstance,
   GovernanceContract,
   GovernanceInstance,
   MockLockedGoldContract,
@@ -22,6 +24,7 @@ import {
   TestTransactionsInstance,
 } from 'types'
 
+const Accounts: AccountsContract = artifacts.require('Accounts')
 const Governance: GovernanceContract = artifacts.require('Governance')
 const MockLockedGold: MockLockedGoldContract = artifacts.require('MockLockedGold')
 const Registry: RegistryContract = artifacts.require('Registry')
@@ -58,6 +61,7 @@ enum VoteValue {
 // TODO(asa): Test dequeueProposalsIfReady
 // TODO(asa): Dequeue explicitly to make the gas cost of operations more clear
 contract('Governance', (accounts: string[]) => {
+  let accountsInstance: AccountsInstance
   let governance: GovernanceInstance
   let mockLockedGold: MockLockedGoldInstance
   let testTransactions: TestTransactionsInstance
@@ -89,6 +93,7 @@ contract('Governance', (accounts: string[]) => {
   let transactionSuccess2
   let transactionFail
   beforeEach(async () => {
+    accountsInstance = await Accounts.new()
     governance = await Governance.new()
     mockLockedGold = await MockLockedGold.new()
     registry = await Registry.new()
@@ -108,7 +113,9 @@ contract('Governance', (accounts: string[]) => {
       baselineUpdateFactor,
       baselineQuorumFactor
     )
+    await registry.setAddressFor(CeloContractName.Accounts, accountsInstance.address)
     await registry.setAddressFor(CeloContractName.LockedGold, mockLockedGold.address)
+    await accountsInstance.createAccount()
     await mockLockedGold.setAccountTotalLockedGold(account, weight)
     await mockLockedGold.setTotalLockedGold(weight)
     transactionSuccess1 = {
@@ -1001,6 +1008,7 @@ contract('Governance', (accounts: string[]) => {
           { value: minDeposit }
         )
         const otherAccount = accounts[1]
+        await accountsInstance.createAccount({ from: otherAccount })
         await mockLockedGold.setAccountTotalLockedGold(otherAccount, weight)
         await governance.upvote(otherProposalId, proposalId, 0, { from: otherAccount })
         await timeTravel(queueExpiry, web3)
@@ -1959,6 +1967,7 @@ contract('Governance', (accounts: string[]) => {
     const proposalId = 1
     const index = 0
     beforeEach(async () => {
+      await accountsInstance.createAccount({ from: otherAccount })
       await governance.propose(
         [transactionSuccess1.value],
         [transactionSuccess1.destination],

@@ -8,8 +8,9 @@ BigNumber.config({ EXPONENTIAL_AT: 1e9 })
 
 const DefaultConfig = {
   attestations: {
-    attestationExpirySeconds: 60 * 60, // 1 hour,
+    attestationExpiryBlocks: (60 * 60) / 5, // 1 hour,
     attestationRequestFeeInDollars: 0.05,
+    selectIssuersWaitBlocks: 4,
   },
   blockchainParameters: {
     minimumClientVersion: {
@@ -126,7 +127,7 @@ const linkedLibraries = {
   AddressSortedLinkedList: ['Election', 'ElectionTest'],
   IntegerSortedLinkedList: ['Governance', 'IntegerSortedLinkedListTest'],
   AddressSortedLinkedListWithMedian: ['SortedOracles', 'AddressSortedLinkedListWithMedianTest'],
-  Signatures: ['TestAttestations', 'Attestations', 'LockedGold', 'Escrow'],
+  Signatures: ['Accounts', 'TestAttestations', 'Attestations', 'LockedGold', 'Escrow'],
 }
 
 const argv = minimist(process.argv.slice(2), {

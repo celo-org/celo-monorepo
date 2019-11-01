@@ -2,6 +2,7 @@ import BigNumber from 'bignumber.js'
 import Web3 from 'web3'
 import { newKitFromWeb3 } from '../kit'
 import { testWithGanache } from '../test-utils/ganache-test'
+import { AccountsWrapper } from './Accounts'
 import { LockedGoldWrapper } from './LockedGold'
 import { ValidatorsWrapper } from './Validators'
 
@@ -25,12 +26,13 @@ const publicKeysData = '0x' + publicKey + blsPublicKey + blsPoP
 testWithGanache('Validators Wrapper', (web3) => {
   const kit = newKitFromWeb3(web3)
   let accounts: string[] = []
+  let accountsInstance: AccountsWrapper
   let validators: ValidatorsWrapper
   let lockedGold: LockedGoldWrapper
 
   const registerAccountWithLockedGold = async (account: string) => {
-    if (!(await lockedGold.isAccount(account))) {
-      await lockedGold.createAccount().sendAndWaitForReceipt({ from: account })
+    if (!(await accountsInstance.isAccount(account))) {
+      await accountsInstance.createAccount().sendAndWaitForReceipt({ from: account })
     }
     await lockedGold.lock().sendAndWaitForReceipt({ from: account, value: minLockedGoldValue })
   }
@@ -39,14 +41,14 @@ testWithGanache('Validators Wrapper', (web3) => {
     accounts = await web3.eth.getAccounts()
     validators = await kit.contracts.getValidators()
     lockedGold = await kit.contracts.getLockedGold()
+    accountsInstance = await kit.contracts.getAccounts()
   })
 
   const setupGroup = async (groupAccount: string) => {
     await registerAccountWithLockedGold(groupAccount)
-    await (await validators.registerValidatorGroup(
-      'The Group',
-      new BigNumber(0.1)
-    )).sendAndWaitForReceipt({ from: groupAccount })
+    await (await validators.registerValidatorGroup(new BigNumber(0.1))).sendAndWaitForReceipt({
+      from: groupAccount,
+    })
   }
 
   const setupValidator = async (validatorAccount: string) => {
@@ -54,7 +56,6 @@ testWithGanache('Validators Wrapper', (web3) => {
     // set account1 as the validator
     await validators
       .registerValidator(
-        'Good old validator',
         // @ts-ignore
         publicKeysData
       )
