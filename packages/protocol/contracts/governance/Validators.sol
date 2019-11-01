@@ -68,7 +68,7 @@ contract Validators is
     address group;
   }
 
-  // Stores a the per-epoch membership history of a validator, used to determine which group
+  // Stores the per-epoch membership history of a validator, used to determine which group
   // commission should be paid to at the end of an epoch.
   // Stores a timestamp of the last time the validator was removed from a group, used to determine
   // whether or not a group can de-register.
