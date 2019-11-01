@@ -470,7 +470,7 @@ const baseStyles = StyleSheet.create({
   base: {
     justifyContent: 'center',
     flexGrow: 0,
-    width: 'max-content',
+    width: 'fit-content',
     opacity: 1,
   },
   verticallyAlign: {
