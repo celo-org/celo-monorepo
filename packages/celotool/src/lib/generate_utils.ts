@@ -27,7 +27,8 @@ export enum AccountType {
   TX_NODE = 2,
   BOOTNODE = 3,
   FAUCET = 4,
-  PRICE_ORACLE = 5,
+  ATTESTATION = 5,
+  PRICE_ORACLE = 6,
 }
 
 export enum ConsensusType {
@@ -46,6 +47,7 @@ export const MNEMONIC_ACCOUNT_TYPE_CHOICES = [
   'tx_node',
   'bootnode',
   'faucet',
+  'attestation',
   'price_oracle',
 ]
 

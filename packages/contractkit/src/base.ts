@@ -1,6 +1,7 @@
 export type Address = string
 
 export enum CeloContract {
+  Accounts = 'Accounts',
   Attestations = 'Attestations',
   Election = 'Election',
   Escrow = 'Escrow',

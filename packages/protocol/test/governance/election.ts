@@ -3,24 +3,27 @@ import {
   assertContainSubset,
   assertEqualBN,
   assertRevert,
-  NULL_ADDRESS,
   mineBlocks,
+  NULL_ADDRESS,
 } from '@celo/protocol/lib/test-utils'
 import { toFixed } from '@celo/utils/lib/fixidity'
 import BigNumber from 'bignumber.js'
 import {
-  MockLockedGoldContract,
-  MockLockedGoldInstance,
-  MockValidatorsContract,
-  MockValidatorsInstance,
-  MockRandomContract,
-  MockRandomInstance,
-  RegistryContract,
-  RegistryInstance,
+  AccountsContract,
+  AccountsInstance,
   ElectionTestContract,
   ElectionTestInstance,
+  MockLockedGoldContract,
+  MockLockedGoldInstance,
+  MockRandomContract,
+  MockRandomInstance,
+  MockValidatorsContract,
+  MockValidatorsInstance,
+  RegistryContract,
+  RegistryInstance,
 } from 'types'
 
+const Accounts: AccountsContract = artifacts.require('Accounts')
 const ElectionTest: ElectionTestContract = artifacts.require('ElectionTest')
 const MockLockedGold: MockLockedGoldContract = artifacts.require('MockLockedGold')
 const MockValidators: MockValidatorsContract = artifacts.require('MockValidators')
@@ -35,6 +38,7 @@ ElectionTest.numberFormat = 'BigNumber'
 const EPOCH = 100
 
 contract('Election', (accounts: string[]) => {
+  let accountsInstance: AccountsInstance
   let election: ElectionTestInstance
   let registry: RegistryInstance
   let mockLockedGold: MockLockedGoldInstance
@@ -49,10 +53,13 @@ contract('Election', (accounts: string[]) => {
   const electabilityThreshold = toFixed(1 / 100)
 
   beforeEach(async () => {
+    accountsInstance = await Accounts.new()
+    await Promise.all(accounts.map((account) => accountsInstance.createAccount({ from: account })))
     election = await ElectionTest.new()
     mockLockedGold = await MockLockedGold.new()
     mockValidators = await MockValidators.new()
     registry = await Registry.new()
+    await registry.setAddressFor(CeloContractName.Accounts, accountsInstance.address)
     await registry.setAddressFor(CeloContractName.LockedGold, mockLockedGold.address)
     await registry.setAddressFor(CeloContractName.Validators, mockValidators.address)
     await election.initialize(
@@ -302,6 +309,7 @@ contract('Election', (accounts: string[]) => {
     const value = new BigNumber(1000)
     describe('when the group is eligible', () => {
       beforeEach(async () => {
+        await mockValidators.setMembers(group, [accounts[9]])
         await registry.setAddressFor(CeloContractName.Validators, accounts[0])
         await election.markGroupEligible(group, NULL_ADDRESS, NULL_ADDRESS)
         await registry.setAddressFor(CeloContractName.Validators, mockValidators.address)
@@ -380,6 +388,7 @@ contract('Election', (accounts: string[]) => {
             await mockLockedGold.incrementNonvotingAccountBalance(voter, value)
             for (let i = 0; i < maxNumGroupsVotedFor.toNumber(); i++) {
               newGroup = accounts[i + 2]
+              await mockValidators.setMembers(newGroup, [accounts[9]])
               await registry.setAddressFor(CeloContractName.Validators, accounts[0])
               await election.markGroupEligible(newGroup, group, NULL_ADDRESS)
               await registry.setAddressFor(CeloContractName.Validators, mockValidators.address)
@@ -421,6 +430,7 @@ contract('Election', (accounts: string[]) => {
     const group = accounts[1]
     const value = 1000
     beforeEach(async () => {
+      await mockValidators.setMembers(group, [accounts[9]])
       await registry.setAddressFor(CeloContractName.Validators, accounts[0])
       await election.markGroupEligible(group, NULL_ADDRESS, NULL_ADDRESS)
       await registry.setAddressFor(CeloContractName.Validators, mockValidators.address)
@@ -547,6 +557,7 @@ contract('Election', (accounts: string[]) => {
     const value = 1000
     describe('when the voter has pending votes', () => {
       beforeEach(async () => {
+        await mockValidators.setMembers(group, [accounts[9]])
         await registry.setAddressFor(CeloContractName.Validators, accounts[0])
         await election.markGroupEligible(group, NULL_ADDRESS, NULL_ADDRESS)
         await registry.setAddressFor(CeloContractName.Validators, mockValidators.address)
@@ -648,6 +659,7 @@ contract('Election', (accounts: string[]) => {
     const value = 1000
     describe('when the voter has active votes', () => {
       beforeEach(async () => {
+        await mockValidators.setMembers(group, [accounts[9]])
         await registry.setAddressFor(CeloContractName.Validators, accounts[0])
         await election.markGroupEligible(group, NULL_ADDRESS, NULL_ADDRESS)
         await registry.setAddressFor(CeloContractName.Validators, mockValidators.address)
@@ -769,6 +781,9 @@ contract('Election', (accounts: string[]) => {
       assert.sameMembers(actual.map((x) => x.toLowerCase()), expected.map((x) => x.toLowerCase()))
     }
 
+    const setRandomness = async (hash: string) =>
+      random.addTestRandomness((await web3.eth.getBlockNumber()) + 1, hash)
+
     beforeEach(async () => {
       await mockValidators.setMembers(group1, [validator1, validator2, validator3, validator4])
       await mockValidators.setMembers(group2, [validator5, validator6])
@@ -788,7 +803,6 @@ contract('Election', (accounts: string[]) => {
 
       random = await MockRandom.new()
       await registry.setAddressFor(CeloContractName.Random, random.address)
-      await random.setRandom(hash1)
     })
 
     describe('when a single group has >= minElectableValidators as members and received votes', () => {
@@ -797,6 +811,7 @@ contract('Election', (accounts: string[]) => {
       })
 
       it("should return that group's member list", async () => {
+        await setRandomness(hash1)
         assertSameAddresses(await election.electValidators(), [
           validator1,
           validator2,
@@ -814,6 +829,7 @@ contract('Election', (accounts: string[]) => {
       })
 
       it('should return maxElectableValidators elected validators', async () => {
+        await setRandomness(hash1)
         assertSameAddresses(await election.electValidators(), [
           validator1,
           validator2,
@@ -833,9 +849,9 @@ contract('Election', (accounts: string[]) => {
       })
 
       it('should return different results', async () => {
-        await random.setRandom(hash1)
+        await setRandomness(hash1)
         const valsWithHash1 = (await election.electValidators()).map((x) => x.toLowerCase())
-        await random.setRandom(hash2)
+        await setRandomness(hash2)
         const valsWithHash2 = (await election.electValidators()).map((x) => x.toLowerCase())
         assert.sameMembers(valsWithHash1, valsWithHash2)
         assert.notDeepEqual(valsWithHash1, valsWithHash2)
@@ -855,6 +871,7 @@ contract('Election', (accounts: string[]) => {
       })
 
       it('should elect only n members from that group', async () => {
+        await setRandomness(hash1)
         assertSameAddresses(await election.electValidators(), [
           validator7,
           validator1,
@@ -876,6 +893,7 @@ contract('Election', (accounts: string[]) => {
       })
 
       it('should not elect any members from that group', async () => {
+        await setRandomness(hash1)
         assertSameAddresses(await election.electValidators(), [
           validator1,
           validator2,
@@ -894,6 +912,7 @@ contract('Election', (accounts: string[]) => {
       })
 
       it('should revert', async () => {
+        await setRandomness(hash1)
         await assertRevert(election.electValidators())
       })
     })
