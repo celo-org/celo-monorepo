@@ -8,18 +8,6 @@ import "../../common/FixidityLib.sol";
  */
 contract EpochRewardsTest is EpochRewards {
 
-  function getTargetGoldTotalSupply() external view returns (uint256) {
-    return _getTargetGoldTotalSupply();
-  }
-
-  function getTargetTotalEpochPaymentsInGold() external view returns (uint256) {
-    return _getTargetTotalEpochPaymentsInGold();
-  }
-
-  function getTargetEpochRewards() external view returns (uint256) {
-    return _getTargetEpochRewards();
-  }
-
   function getRewardsMultiplier(uint256 targetGoldTotalSupplyIncrease) external view returns (uint256) {
     return _getRewardsMultiplier(targetGoldTotalSupplyIncrease).unwrap();
   }

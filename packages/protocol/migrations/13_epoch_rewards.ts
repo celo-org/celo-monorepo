@@ -10,8 +10,9 @@ const initializeArgs = async (): Promise<any[]> => {
     toFixed(config.epochRewards.targetVotingYieldParameters.initial).toFixed(),
     toFixed(config.epochRewards.targetVotingYieldParameters.max).toFixed(),
     toFixed(config.epochRewards.targetVotingYieldParameters.adjustmentFactor).toFixed(),
-    toFixed(config.epochRewards.rewardsMultiplierAdjustmentFactors.underspend).toFixed(),
-    toFixed(config.epochRewards.rewardsMultiplierAdjustmentFactors.overspend).toFixed(),
+    toFixed(config.epochRewards.rewardsMultiplierParameters.max).toFixed(),
+    toFixed(config.epochRewards.rewardsMultiplierParameters.adjustmentFactors.underspend).toFixed(),
+    toFixed(config.epochRewards.rewardsMultiplierParameters.adjustmentFactors.overspend).toFixed(),
     toFixed(config.epochRewards.targetVotingGoldFraction).toFixed(),
     config.epochRewards.maxValidatorEpochPayment,
   ]

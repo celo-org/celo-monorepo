@@ -122,6 +122,20 @@ describe('governance tests', () => {
     return blockNumber % epochSize === 0
   }
 
+  const assertDifferenceCloseTo = (
+    current: BigNumber,
+    previous: BigNumber,
+    expected: BigNumber,
+    delta: BigNumber
+  ) => {
+    const difference = current.minus(previous)
+    if (expected.isZero()) {
+      assert.equal(difference.toFixed(), expected.toFixed())
+    } else {
+      assert.closeTo(difference.toNumber(), expected.toNumber(), delta.toNumber())
+    }
+  }
+
   describe.only('when the validator set is changing', () => {
     let epoch: number
     const blockNumbers: number[] = []
@@ -300,7 +314,12 @@ describe('governance tests', () => {
         )
         assert.isNotNaN(currentBalance)
         assert.isNotNaN(previousBalance)
-        assert.equal(currentBalance.minus(previousBalance).toFixed(), expected.toFixed())
+        assertDifferenceCloseTo(
+          currentBalance,
+          previousBalance,
+          expected,
+          new BigNumber(10).pow(12).times(5)
+        )
       }
 
       const assertBalanceUnchanged = async (validator: string, blockNumber: number) => {
@@ -312,7 +331,12 @@ describe('governance tests', () => {
           (await validators.methods.getValidator(validator).call({}, blockNumber))[3]
         )
         assert.isNotNaN(score)
-        return maxValidatorEpochPayment.times(fromFixed(score))
+        // We need to calculate the rewards multiplier for the previous block, before
+        // the rewards actually are awarded.
+        const rewardsMultiplier = new BigNumber(
+          await epochRewards.methods.getRewardsMultiplier().call({}, blockNumber - 1)
+        )
+        return maxValidatorEpochPayment.times(fromFixed(score)).times(fromFixed(rewardsMultiplier))
       }
 
       for (const blockNumber of blockNumbers) {
@@ -357,7 +381,12 @@ describe('governance tests', () => {
         const previousVotes = new BigNumber(
           await election.methods.getTotalVotesForGroup(group).call({}, blockNumber - 1)
         )
-        assert.equal(currentVotes.minus(previousVotes).toFixed(), expected.toFixed())
+        assertDifferenceCloseTo(
+          currentVotes,
+          previousVotes,
+          expected,
+          new BigNumber(10).pow(12).times(5)
+        )
       }
 
       const assertGoldTokenTotalSupplyChanged = async (
@@ -370,7 +399,12 @@ describe('governance tests', () => {
         const previousSupply = new BigNumber(
           await goldToken.methods.totalSupply().call({}, blockNumber - 1)
         )
-        assert.equal(currentSupply.minus(previousSupply).toFixed(), expected.toFixed())
+        assertDifferenceCloseTo(
+          currentSupply,
+          previousSupply,
+          expected,
+          new BigNumber(10).pow(12).times(5)
+        )
       }
 
       const assertBalanceChanged = async (
@@ -384,7 +418,12 @@ describe('governance tests', () => {
         const previousBalance = new BigNumber(
           await goldToken.methods.balanceOf(address).call({}, blockNumber - 1)
         )
-        assert.equal(currentBalance.minus(previousBalance).toFixed(), expected.toFixed())
+        assertDifferenceCloseTo(
+          currentBalance,
+          previousBalance,
+          expected,
+          new BigNumber(10).pow(12).times(5)
+        )
       }
 
       const assertLockedGoldBalanceChanged = async (blockNumber: number, expected: BigNumber) => {
@@ -439,7 +478,14 @@ describe('governance tests', () => {
           const targetVotingYield = new BigNumber(
             (await epochRewards.methods.getTargetVotingYieldParameters().call({}, blockNumber))[0]
           )
-          const expectedEpochReward = activeVotes.times(fromFixed(targetVotingYield))
+          // We need to calculate the rewards multiplier for the previous block, before
+          // the rewards actually are awarded.
+          const rewardsMultiplier = new BigNumber(
+            await epochRewards.methods.getRewardsMultiplier().call({}, blockNumber - 1)
+          )
+          const expectedEpochReward = activeVotes
+            .times(fromFixed(targetVotingYield))
+            .times(fromFixed(rewardsMultiplier))
           const expectedInfraReward = new BigNumber(10).pow(18)
           const stableTokenSupplyChange = await getStableTokenSupplyChange(blockNumber)
           const exchangeRate = await getStableTokenExchangeRate(blockNumber)

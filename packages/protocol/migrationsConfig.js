@@ -30,9 +30,12 @@ const DefaultConfig = {
       max: 2 / 10,
       adjustmentFactor: 1 / 365,
     },
-    rewardsMultiplierAdjustmentFactors: {
-      underspend: 1 / 2,
-      overspend: 5,
+    rewardsMultiplierParameters: {
+      max: 2,
+      adjustmentFactors: {
+        underspend: 1 / 2,
+        overspend: 5,
+      },
     },
     targetVotingGoldFraction: 2 / 3,
     maxValidatorEpochPayment: '1000000000000000000',

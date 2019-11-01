@@ -28,14 +28,19 @@ contract EpochRewards is Ownable, Initializable, UsingPrecompiles, UsingRegistry
     FixidityLib.Fraction overspend;
   }
 
+  struct RewardsMultiplierParameters {
+    RewardsMultiplierAdjustmentFactors adjustmentFactors; 
+    FixidityLib.Fraction max;
+  }
+
   struct TargetVotingYieldParameters {
     FixidityLib.Fraction target;
-    FixidityLib.Fraction max;
     FixidityLib.Fraction adjustmentFactor;
+    FixidityLib.Fraction max;
   }
 
   uint256 private startTime = 0;
-  RewardsMultiplierAdjustmentFactors private rewardsMultiplierAdjustmentFactors;
+  RewardsMultiplierParameters private rewardsMultiplierParams;
   TargetVotingYieldParameters private targetVotingYieldParams;
   FixidityLib.Fraction private targetVotingGoldFraction;
   uint256 public maxValidatorEpochPayment;
@@ -43,7 +48,7 @@ contract EpochRewards is Ownable, Initializable, UsingPrecompiles, UsingRegistry
   event TargetVotingGoldFractionSet(uint256 fraction);
   event MaxValidatorEpochPaymentSet(uint256 payment);
   event TargetVotingYieldParametersSet(uint256 max, uint256 adjustmentFactor);
-  event RewardsMultiplierAdjustmentFactorsSet(uint256 underspend, uint256 overspend);
+  event RewardsMultiplierParametersSet(uint256 max, uint256 underspendAdjustmentFactor, uint256 overspendAdjustmentFactor);
   event Debug(uint256 value, string desc);
 
   /**
@@ -54,6 +59,7 @@ contract EpochRewards is Ownable, Initializable, UsingPrecompiles, UsingRegistry
     uint256 targetVotingYieldInitial,
     uint256 targetVotingYieldMax,
     uint256 targetVotingYieldAdjustmentFactor,
+    uint256 rewardsMultiplierMax,
     uint256 rewardsMultiplierUnderspendAdjustmentFactor,
     uint256 rewardsMultiplierOverspendAdjustmentFactor,
     uint256 _targetVotingGoldFraction,
@@ -65,7 +71,8 @@ contract EpochRewards is Ownable, Initializable, UsingPrecompiles, UsingRegistry
     _transferOwnership(msg.sender);
     setRegistry(registryAddress);
     setTargetVotingYieldParameters(targetVotingYieldMax, targetVotingYieldAdjustmentFactor);
-    setRewardsMultiplierAdjustmentFactors(
+    setRewardsMultiplierParameters(
+      rewardsMultiplierMax,
       rewardsMultiplierUnderspendAdjustmentFactor,
       rewardsMultiplierOverspendAdjustmentFactor
     );
@@ -80,9 +87,9 @@ contract EpochRewards is Ownable, Initializable, UsingPrecompiles, UsingRegistry
     return (params.target.unwrap(), params.max.unwrap(), params.adjustmentFactor.unwrap());
   }
 
-  function getRewardsMultiplierAdjustmentFactors() external view returns (uint256, uint256) {
-    RewardsMultiplierAdjustmentFactors storage factors = rewardsMultiplierAdjustmentFactors;
-    return (factors.underspend.unwrap(), factors.overspend.unwrap());
+  function getRewardsMultiplierParameters() external view returns (uint256, uint256, uint256) {
+    RewardsMultiplierParameters storage params = rewardsMultiplierParams;
+    return (params.max.unwrap(), params.adjustmentFactors.underspend.unwrap(), params.adjustmentFactors.overspend.unwrap());
   }
 
   function setTargetVotingGoldFraction(uint256 value) public onlyOwner returns (bool) {
@@ -108,16 +115,20 @@ contract EpochRewards is Ownable, Initializable, UsingPrecompiles, UsingRegistry
     return true;
   }
 
-  function setRewardsMultiplierAdjustmentFactors(uint256 underspend, uint256 overspend) public onlyOwner returns (bool) {
+  function setRewardsMultiplierParameters(uint256 max, uint256 underspendAdjustmentFactor, uint256 overspendAdjustmentFactor) public onlyOwner returns (bool) {
     require(
-      underspend != rewardsMultiplierAdjustmentFactors.underspend.unwrap() ||
-      overspend != rewardsMultiplierAdjustmentFactors.overspend.unwrap()
+      max != rewardsMultiplierParams.max.unwrap() ||
+      underspendAdjustmentFactor != rewardsMultiplierParams.adjustmentFactors.underspend.unwrap() ||
+      overspendAdjustmentFactor != rewardsMultiplierParams.adjustmentFactors.overspend.unwrap()
     );
-    rewardsMultiplierAdjustmentFactors = RewardsMultiplierAdjustmentFactors(
-      FixidityLib.wrap(underspend),
-      FixidityLib.wrap(overspend)
+    rewardsMultiplierParams = RewardsMultiplierParameters(
+      RewardsMultiplierAdjustmentFactors(
+        FixidityLib.wrap(underspendAdjustmentFactor),
+        FixidityLib.wrap(overspendAdjustmentFactor)
+      ),
+      FixidityLib.wrap(max)
     );
-    emit RewardsMultiplierAdjustmentFactorsSet(underspend, overspend);
+    emit RewardsMultiplierParametersSet(max, underspendAdjustmentFactor, overspendAdjustmentFactor);
     return true;
   }
 
@@ -136,7 +147,7 @@ contract EpochRewards is Ownable, Initializable, UsingPrecompiles, UsingRegistry
     return true;
   }
 
-  function _getTargetGoldTotalSupply() internal view returns (uint256) {
+  function getTargetGoldTotalSupply() public view returns (uint256) {
     uint256 timeSinceInitialization = now.sub(startTime);
     if (timeSinceInitialization < SECONDS_LINEAR) {
       // Pay out half of all block rewards linearly.
@@ -150,30 +161,47 @@ contract EpochRewards is Ownable, Initializable, UsingPrecompiles, UsingRegistry
   }
 
   function _getRewardsMultiplier(uint256 targetGoldSupplyIncrease) internal view returns (FixidityLib.Fraction memory) {
-    uint256 targetSupply = _getTargetGoldTotalSupply();
+    uint256 targetSupply = getTargetGoldTotalSupply();
     uint256 totalSupply = getGoldToken().totalSupply();
     uint256 remainingSupply = GOLD_SUPPLY_CAP.sub(totalSupply.add(targetGoldSupplyIncrease));
     uint256 targetRemainingSupply = GOLD_SUPPLY_CAP.sub(targetSupply);
     FixidityLib.Fraction memory ratio = FixidityLib.newFixed(remainingSupply).divide(FixidityLib.newFixed(targetRemainingSupply));
-    /*
     if (ratio.gt(FixidityLib.fixed1())) {
-      FixidityLib.Fraction memory delta = ratio.subtract(FixidityLib.fixed1());
-      return delta.multiply(rewardsMultiplierAdjustmentFactors.underspend).add(FixidityLib.fixed1());
+      FixidityLib.Fraction memory delta = ratio.subtract(FixidityLib.fixed1()).multiply(
+        rewardsMultiplierParams.adjustmentFactors.underspend
+      );
+      FixidityLib.Fraction memory r = FixidityLib.fixed1().add(delta);
+      if (r.lt(rewardsMultiplierParams.max)) {
+        return r;
+      } else {
+        return rewardsMultiplierParams.max;
+      }
     } else if (ratio.lt(FixidityLib.fixed1())) {
-      FixidityLib.Fraction memory delta = FixidityLib.fixed1().subtract(ratio);
-      return FixidityLib.fixed1().subtract(delta.multiply(rewardsMultiplierAdjustmentFactors.overspend));
+      FixidityLib.Fraction memory delta = FixidityLib.fixed1().subtract(ratio).multiply(
+        rewardsMultiplierParams.adjustmentFactors.overspend
+      );
+      if (delta.lt(FixidityLib.fixed1())) {
+        return FixidityLib.fixed1().subtract(delta); 
+      } else {
+        return FixidityLib.wrap(0);
+      }
     } else {
       return FixidityLib.fixed1();
     }
-    */
-    return FixidityLib.fixed1();
   }
 
-  function _getTargetEpochRewards() internal view returns (uint256) {
+  function getRewardsMultiplier() external view returns (uint256) {
+    uint256 targetEpochRewards = getTargetEpochRewards();
+    uint256 targetTotalEpochPaymentsInGold = getTargetTotalEpochPaymentsInGold();
+    uint256 targetGoldSupplyIncrease = targetEpochRewards.add(targetTotalEpochPaymentsInGold);
+    return _getRewardsMultiplier(targetGoldSupplyIncrease).unwrap();
+  }
+
+  function getTargetEpochRewards() public view returns (uint256) {
     return FixidityLib.newFixed(getElection().getActiveVotes()).multiply(targetVotingYieldParams.target).fromFixed();
   }
 
-  function _getTargetTotalEpochPaymentsInGold() internal view returns (uint256) {
+  function getTargetTotalEpochPaymentsInGold() public view returns (uint256) {
     address stableTokenAddress = registry.getAddressForOrDie(STABLE_TOKEN_REGISTRY_ID);
     (uint256 numerator, uint256 denominator) = getSortedOracles().medianRate(stableTokenAddress);
     uint256 targetEpochPayment = numberValidatorsInCurrentSet().mul(maxValidatorEpochPayment).mul(denominator).div(numerator);
@@ -213,21 +241,17 @@ contract EpochRewards is Ownable, Initializable, UsingPrecompiles, UsingRegistry
 
   function updateTargetVotingYield() external {
     require(msg.sender == address(0));
-    _updateTargetVotingYield();
+    // _updateTargetVotingYield();
   }
 
   function calculateTargetEpochPaymentAndRewards() external view returns (uint256, uint256) {
-    uint256 targetEpochRewards = _getTargetEpochRewards();
-    uint256 targetTotalEpochPaymentsInGold = _getTargetTotalEpochPaymentsInGold();
+    uint256 targetEpochRewards = getTargetEpochRewards();
+    uint256 targetTotalEpochPaymentsInGold = getTargetTotalEpochPaymentsInGold();
     uint256 targetGoldSupplyIncrease = targetEpochRewards.add(targetTotalEpochPaymentsInGold);
     FixidityLib.Fraction memory rewardsMultiplier = _getRewardsMultiplier(targetGoldSupplyIncrease);
     return (
-      /*
       FixidityLib.newFixed(maxValidatorEpochPayment).multiply(rewardsMultiplier).fromFixed(),
       FixidityLib.newFixed(targetEpochRewards).multiply(rewardsMultiplier).fromFixed()
-      */
-      maxValidatorEpochPayment,
-      targetEpochRewards
     );
   }
 }
