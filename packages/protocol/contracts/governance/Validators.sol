@@ -59,7 +59,7 @@ contract Validators is
   }
 
   struct ValidatorGroup {
-    string name;
+    bool exists;
     LinkedList.List members;
     // TODO(asa): Add a function that allows groups to update their commission.
     FixidityLib.Fraction commission;
@@ -81,7 +81,6 @@ contract Validators is
   }
 
   struct Validator {
-    string name;
     bytes publicKeysData;
     address affiliation;
     FixidityLib.Fraction score;
@@ -133,7 +132,6 @@ contract Validators is
 
   event ValidatorRegistered(
     address indexed validator,
-    string name,
     bytes publicKeysData
   );
 
@@ -153,7 +151,6 @@ contract Validators is
 
   event ValidatorGroupRegistered(
     address indexed group,
-    string name,
     uint256 commission
   );
 
@@ -333,7 +330,6 @@ contract Validators is
 
   /**
    * @notice Registers a validator unaffiliated with any validator group.
-   * @param name A name for the validator.
    * @param publicKeysData Comprised of three tightly-packed elements:
    *    - publicKey - The public key that the validator is using for consensus, should match
    *      msg.sender. 64 bytes.
@@ -345,7 +341,6 @@ contract Validators is
    * @dev Fails if the account does not have sufficient weight.
    */
   function registerValidator(
-    string calldata name,
     bytes calldata publicKeysData
   )
     external
@@ -353,22 +348,20 @@ contract Validators is
     returns (bool)
   {
     require(
-      bytes(name).length > 0 &&
       // secp256k1 public key + BLS public key + BLS proof of possession
       publicKeysData.length == (64 + 48 + 96)
     );
     // Use the proof of possession bytes
     require(checkProofOfPossession(msg.sender, publicKeysData.slice(64, 48 + 96)));
 
-    address account = getLockedGold().getAccountFromActiveValidator(msg.sender);
+    address account = getAccounts().activeValidationSignerToAccount(msg.sender);
     require(!isValidator(account) && !isValidatorGroup(account));
     require(meetsValidatorBalanceRequirements(account));
 
-    validators[account].name = name;
     validators[account].publicKeysData = publicKeysData;
     _validators.push(account);
     updateMembershipHistory(account, address(0));
-    emit ValidatorRegistered(account, name, publicKeysData);
+    emit ValidatorRegistered(account, publicKeysData);
     return true;
   }
 
@@ -456,7 +449,7 @@ contract Validators is
    * @return True upon success.
    */
   function _updateValidatorScore(address validator, uint256 uptime) internal {
-    address account = getLockedGold().getAccountFromValidator(validator);
+    address account = getAccounts().validationSignerToAccount(validator);
     require(isValidator(account), "isvalidator");
     require(uptime <= FixidityLib.fixed1().unwrap(), "uptime");
 
@@ -501,7 +494,7 @@ contract Validators is
    * @notice Distributes epoch payments to `validator` and its group.
    */
   function _distributeEpochPayment(address validator) internal {
-    address account = getLockedGold().getAccountFromValidator(validator);
+    address account = getAccounts().validationSignerToAccount(validator);
     require(isValidator(account));
     // The group that should be paid is the group that the validator was a member of at the
     // time it was elected.
@@ -530,7 +523,7 @@ contract Validators is
    * @dev Fails if the account is not a validator.
    */
   function deregisterValidator(uint256 index) external nonReentrant returns (bool) {
-    address account = getLockedGold().getAccountFromActiveValidator(msg.sender);
+    address account = getAccounts().activeValidationSignerToAccount(msg.sender);
     require(isValidator(account));
     Validator storage validator = validators[account];
     if (validator.affiliation != address(0)) {
@@ -550,7 +543,7 @@ contract Validators is
    * @dev De-affiliates with the previously affiliated group if present.
    */
   function affiliate(address group) external nonReentrant returns (bool) {
-    address account = getLockedGold().getAccountFromActiveValidator(msg.sender);
+    address account = getAccounts().activeValidationSignerToAccount(msg.sender);
     require(isValidator(account) && isValidatorGroup(group));
     Validator storage validator = validators[account];
     if (validator.affiliation != address(0)) {
@@ -567,7 +560,7 @@ contract Validators is
    * @dev Fails if the account is not a validator with non-zero affiliation.
    */
   function deaffiliate() external nonReentrant returns (bool) {
-    address account = getLockedGold().getAccountFromActiveValidator(msg.sender);
+    address account = getAccounts().activeValidationSignerToAccount(msg.sender);
     require(isValidator(account));
     Validator storage validator = validators[account];
     require(validator.affiliation != address(0));
@@ -577,7 +570,6 @@ contract Validators is
 
   /**
    * @notice Registers a validator group with no member validators.
-   * @param name A name for the validator group.
    * @param commission Fixidity representation of the commission this group receives on epoch
    *   payments made to its members.
    * @return True upon success.
@@ -585,24 +577,22 @@ contract Validators is
    * @dev Fails if the account does not have sufficient weight.
    */
   function registerValidatorGroup(
-    string calldata name,
     uint256 commission
   )
     external
     nonReentrant
     returns (bool)
   {
-    require(bytes(name).length > 0);
     require(commission <= FixidityLib.fixed1().unwrap(), "Commission can't be greater than 100%");
-    address account = getLockedGold().getAccountFromActiveValidator(msg.sender);
+    address account = getAccounts().activeValidationSignerToAccount(msg.sender);
     require(!isValidator(account) && !isValidatorGroup(account));
     require(meetsValidatorGroupBalanceRequirements(account));
 
     ValidatorGroup storage group = groups[account];
-    group.name = name;
+    group.exists = true;
     group.commission = FixidityLib.wrap(commission);
     _groups.push(account);
-    emit ValidatorGroupRegistered(account, name, commission);
+    emit ValidatorGroupRegistered(account, commission);
     return true;
   }
 
@@ -613,7 +603,7 @@ contract Validators is
    * @dev Fails if the account is not a validator group with no members.
    */
   function deregisterValidatorGroup(uint256 index) external nonReentrant returns (bool) {
-    address account = getLockedGold().getAccountFromActiveValidator(msg.sender);
+    address account = getAccounts().activeValidationSignerToAccount(msg.sender);
     // Only empty Validator Groups can be deregistered.
     require(isValidatorGroup(account) && groups[account].members.numElements == 0);
     delete groups[account];
@@ -631,7 +621,7 @@ contract Validators is
    * @dev Fails if the group has zero members.
    */
   function addMember(address validator) external nonReentrant returns (bool) {
-    address account = getLockedGold().getAccountFromActiveValidator(msg.sender);
+    address account = getAccounts().activeValidationSignerToAccount(msg.sender);
     require(groups[account].members.numElements > 0);
     return _addMember(account, validator, address(0), address(0));
   }
@@ -654,7 +644,7 @@ contract Validators is
     nonReentrant
     returns (bool)
   {
-    address account = getLockedGold().getAccountFromActiveValidator(msg.sender);
+    address account = getAccounts().activeValidationSignerToAccount(msg.sender);
     require(groups[account].members.numElements == 0);
     return _addMember(account, validator, lesser, greater);
   }
@@ -697,7 +687,7 @@ contract Validators is
    * @dev Fails if `validator` is not a member of the account's group.
    */
   function removeMember(address validator) external nonReentrant returns (bool) {
-    address account = getLockedGold().getAccountFromActiveValidator(msg.sender);
+    address account = getAccounts().activeValidationSignerToAccount(msg.sender);
     require(isValidatorGroup(account) && isValidator(validator), "is not group and validator");
     return _removeMember(account, validator);
   }
@@ -721,7 +711,7 @@ contract Validators is
     nonReentrant
     returns (bool)
   {
-    address account = getLockedGold().getAccountFromActiveValidator(msg.sender);
+    address account = getAccounts().activeValidationSignerToAccount(msg.sender);
     require(isValidatorGroup(account) && isValidator(validator));
     ValidatorGroup storage group = groups[account];
     require(group.members.contains(validator));
@@ -772,7 +762,6 @@ contract Validators is
     external
     view
     returns (
-      string memory name,
       bytes memory publicKeysData,
       address affiliation,
       uint256 score
@@ -781,7 +770,6 @@ contract Validators is
     require(isValidator(account));
     Validator storage validator = validators[account];
     return (
-      validator.name,
       validator.publicKeysData,
       validator.affiliation,
       validator.score.unwrap()
@@ -798,11 +786,11 @@ contract Validators is
   )
     external
     view
-    returns (string memory, address[] memory, uint256)
+    returns (address[] memory, uint256)
   {
     require(isValidatorGroup(account));
     ValidatorGroup storage group = groups[account];
-    return (group.name, group.members.getKeys(), group.commission.unwrap());
+    return ( group.members.getKeys(), group.commission.unwrap());
   }
 
   /**
@@ -832,7 +820,7 @@ contract Validators is
     address[] memory topAccounts = groups[account].members.headN(n);
     address[] memory topValidators = new address[](n);
     for (uint256 i = 0; i < n; i = i.add(1)) {
-      topValidators[i] = getLockedGold().getValidatorFromAccount(topAccounts[i]);
+      topValidators[i] = getAccounts().getValidationSigner(topAccounts[i]);
     }
     return topValidators;
   }
@@ -902,7 +890,7 @@ contract Validators is
    * @return Whether a particular address is a registered validator group.
    */
   function isValidatorGroup(address account) public view returns (bool) {
-    return bytes(groups[account].name).length > 0;
+    return groups[account].exists;
   }
 
   /**
@@ -911,7 +899,7 @@ contract Validators is
    * @return Whether a particular address is a registered validator.
    */
   function isValidator(address account) public view returns (bool) {
-    return bytes(validators[account].name).length > 0;
+    return validators[account].publicKeysData.length > 0;
   }
 
   /**
