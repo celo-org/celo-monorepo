@@ -177,22 +177,6 @@ contract('Validators', (accounts: string[]) => {
       assertEqualBN(actual, membershipHistoryLength)
     })
 
-    it('should have set the validator score parameters', async () => {
-      const [exponent, adjustmentSpeed] = await validators.getValidatorScoreParameters()
-      assertEqualBN(exponent, validatorScoreParameters.exponent)
-      assertEqualBN(adjustmentSpeed, validatorScoreParameters.adjustmentSpeed)
-    })
-
-    it('should have set the validator epoch payment', async () => {
-      const actual = await validators.validatorEpochPayment()
-      assertEqualBN(actual, validatorEpochPayment)
-    })
-
-    it('should have set the membership history length', async () => {
-      const actual = await validators.membershipHistoryLength()
-      assertEqualBN(actual, membershipHistoryLength)
-    })
-
     it('should have set the max group size', async () => {
       const actualMaxGroupSize = await validators.getMaxGroupSize()
       assertEqualBN(actualMaxGroupSize, maxGroupSize)
@@ -478,69 +462,6 @@ contract('Validators', (accounts: string[]) => {
       })
 
       describe('when the lockups are the same', () => {
-        it('should revert', async () => {
-          await assertRevert(
-            validators.setValidatorScoreParameters(
-              validatorScoreParameters.exponent,
-              validatorScoreParameters.adjustmentSpeed
-            )
-          )
-        })
-      })
-    })
-  })
-
-  describe('#setValidatorScoreParameters()', () => {
-    describe('when the parameters are different', () => {
-      const newParameters = {
-        exponent: validatorScoreParameters.exponent.plus(1),
-        adjustmentSpeed: validatorScoreParameters.adjustmentSpeed.plus(1),
-      }
-
-      describe('when called by the owner', () => {
-        let resp: any
-
-        beforeEach(async () => {
-          resp = await validators.setValidatorScoreParameters(
-            newParameters.exponent,
-            newParameters.adjustmentSpeed
-          )
-        })
-
-        it('should set the exponent and adjustment speed', async () => {
-          const [exponent, adjustmentSpeed] = await validators.getValidatorScoreParameters()
-          assertEqualBN(exponent, newParameters.exponent)
-          assertEqualBN(adjustmentSpeed, newParameters.adjustmentSpeed)
-        })
-
-        it('should emit the ValidatorScoreParametersSet event', async () => {
-          assert.equal(resp.logs.length, 1)
-          const log = resp.logs[0]
-          assertContainSubset(log, {
-            event: 'ValidatorScoreParametersSet',
-            args: {
-              exponent: new BigNumber(newParameters.exponent),
-              adjustmentSpeed: new BigNumber(newParameters.adjustmentSpeed),
-            },
-          })
-        })
-
-        describe('when called by a non-owner', () => {
-          it('should revert', async () => {
-            await assertRevert(
-              validators.setValidatorScoreParameters(
-                newParameters.exponent,
-                newParameters.adjustmentSpeed,
-                {
-                  from: nonOwner,
-                }
-              )
-            )
-          })
-        })
-      })
-
-      describe('when the requirements are the same', () => {
         it('should revert', async () => {
           await assertRevert(
             validators.setValidatorScoreParameters(
