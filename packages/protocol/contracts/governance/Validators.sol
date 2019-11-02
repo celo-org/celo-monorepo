@@ -386,14 +386,27 @@ contract Validators is
   /**
    * @notice Distributes epoch payments to `validator` and its group.
    */
-  function distributeEpochPayment(address validator, uint256 maxPayment) external onlyVm() returns (uint256) {
+  function distributeEpochPayment(
+    address validator,
+    uint256 maxPayment
+  )
+    external
+    onlyVm()
+    returns (uint256)
+  {
     return _distributeEpochPayment(validator, maxPayment);
   }
 
   /**
    * @notice Distributes epoch payments to `validator` and its group.
    */
-  function _distributeEpochPayment(address validator, uint256 maxPayment) internal returns (uint256) {
+  function _distributeEpochPayment(
+    address validator,
+    uint256 maxPayment
+  )
+    internal
+    returns (uint256)
+  {
     address account = getAccounts().validationSignerToAccount(validator);
     require(isValidator(account));
     // The group that should be paid is the group that the validator was a member of at the

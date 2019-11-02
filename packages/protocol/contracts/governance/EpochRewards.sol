@@ -29,7 +29,7 @@ contract EpochRewards is Ownable, Initializable, UsingPrecompiles, UsingRegistry
   }
 
   struct RewardsMultiplierParameters {
-    RewardsMultiplierAdjustmentFactors adjustmentFactors; 
+    RewardsMultiplierAdjustmentFactors adjustmentFactors;
     FixidityLib.Fraction max;
   }
 
@@ -48,11 +48,12 @@ contract EpochRewards is Ownable, Initializable, UsingPrecompiles, UsingRegistry
   event TargetVotingGoldFractionSet(uint256 fraction);
   event MaxValidatorEpochPaymentSet(uint256 payment);
   event TargetVotingYieldParametersSet(uint256 max, uint256 adjustmentFactor);
-  event RewardsMultiplierParametersSet(uint256 max, uint256 underspendAdjustmentFactor, uint256 overspendAdjustmentFactor);
+  event RewardsMultiplierParametersSet(
+    uint256 max,
+    uint256 underspendAdjustmentFactor,
+    uint256 overspendAdjustmentFactor
+  );
 
-  /**
-   * @param _maxValidatorEpochPayment The duration the above gold remains locked after deregistration.
-   */
   function initialize(
     address registryAddress,
     uint256 targetVotingYieldInitial,
@@ -88,7 +89,11 @@ contract EpochRewards is Ownable, Initializable, UsingPrecompiles, UsingRegistry
 
   function getRewardsMultiplierParameters() external view returns (uint256, uint256, uint256) {
     RewardsMultiplierParameters storage params = rewardsMultiplierParams;
-    return (params.max.unwrap(), params.adjustmentFactors.underspend.unwrap(), params.adjustmentFactors.overspend.unwrap());
+    return (
+      params.max.unwrap(),
+      params.adjustmentFactors.underspend.unwrap(),
+      params.adjustmentFactors.overspend.unwrap()
+    );
   }
 
   function setTargetVotingGoldFraction(uint256 value) public onlyOwner returns (bool) {
@@ -114,11 +119,19 @@ contract EpochRewards is Ownable, Initializable, UsingPrecompiles, UsingRegistry
     return true;
   }
 
-  function setRewardsMultiplierParameters(uint256 max, uint256 underspendAdjustmentFactor, uint256 overspendAdjustmentFactor) public onlyOwner returns (bool) {
+  function setRewardsMultiplierParameters(
+    uint256 max,
+    uint256 underspendAdjustmentFactor,
+    uint256 overspendAdjustmentFactor
+  )
+    public
+    onlyOwner
+    returns (bool)
+  {
     require(
       max != rewardsMultiplierParams.max.unwrap() ||
-      underspendAdjustmentFactor != rewardsMultiplierParams.adjustmentFactors.underspend.unwrap() ||
-      overspendAdjustmentFactor != rewardsMultiplierParams.adjustmentFactors.overspend.unwrap()
+      overspendAdjustmentFactor != rewardsMultiplierParams.adjustmentFactors.overspend.unwrap() ||
+      underspendAdjustmentFactor != rewardsMultiplierParams.adjustmentFactors.underspend.unwrap()
     );
     rewardsMultiplierParams = RewardsMultiplierParameters(
       RewardsMultiplierAdjustmentFactors(
@@ -127,11 +140,22 @@ contract EpochRewards is Ownable, Initializable, UsingPrecompiles, UsingRegistry
       ),
       FixidityLib.wrap(max)
     );
-    emit RewardsMultiplierParametersSet(max, underspendAdjustmentFactor, overspendAdjustmentFactor);
+    emit RewardsMultiplierParametersSet(
+      max,
+      underspendAdjustmentFactor,
+      overspendAdjustmentFactor
+    );
     return true;
   }
 
-  function setTargetVotingYieldParameters(uint256 max, uint256 adjustmentFactor) public onlyOwner returns (bool) {
+  function setTargetVotingYieldParameters(
+    uint256 max,
+    uint256 adjustmentFactor
+  )
+    public
+    onlyOwner
+    returns (bool)
+  {
     require(
       max != targetVotingYieldParams.max.unwrap() ||
       adjustmentFactor != targetVotingYieldParams.adjustmentFactor.unwrap()
@@ -159,12 +183,20 @@ contract EpochRewards is Ownable, Initializable, UsingPrecompiles, UsingRegistry
     }
   }
 
-  function _getRewardsMultiplier(uint256 targetGoldSupplyIncrease) internal view returns (FixidityLib.Fraction memory) {
+  function _getRewardsMultiplier(
+    uint256 targetGoldSupplyIncrease
+  )
+    internal
+    view
+    returns (FixidityLib.Fraction memory)
+  {
     uint256 targetSupply = getTargetGoldTotalSupply();
     uint256 totalSupply = getGoldToken().totalSupply();
     uint256 remainingSupply = GOLD_SUPPLY_CAP.sub(totalSupply.add(targetGoldSupplyIncrease));
     uint256 targetRemainingSupply = GOLD_SUPPLY_CAP.sub(targetSupply);
-    FixidityLib.Fraction memory ratio = FixidityLib.newFixed(remainingSupply).divide(FixidityLib.newFixed(targetRemainingSupply));
+    FixidityLib.Fraction memory ratio = FixidityLib.newFixed(remainingSupply).divide(
+      FixidityLib.newFixed(targetRemainingSupply)
+    );
     if (ratio.gt(FixidityLib.fixed1())) {
       FixidityLib.Fraction memory delta = ratio.subtract(FixidityLib.fixed1()).multiply(
         rewardsMultiplierParams.adjustmentFactors.underspend
@@ -180,7 +212,7 @@ contract EpochRewards is Ownable, Initializable, UsingPrecompiles, UsingRegistry
         rewardsMultiplierParams.adjustmentFactors.overspend
       );
       if (delta.lt(FixidityLib.fixed1())) {
-        return FixidityLib.fixed1().subtract(delta); 
+        return FixidityLib.fixed1().subtract(delta);
       } else {
         return FixidityLib.wrap(0);
       }
@@ -197,14 +229,17 @@ contract EpochRewards is Ownable, Initializable, UsingPrecompiles, UsingRegistry
   }
 
   function getTargetEpochRewards() public view returns (uint256) {
-    return FixidityLib.newFixed(getElection().getActiveVotes()).multiply(targetVotingYieldParams.target).fromFixed();
+    return FixidityLib.newFixed(getElection().getActiveVotes()).multiply(
+      targetVotingYieldParams.target
+    ).fromFixed();
   }
 
   function getTargetTotalEpochPaymentsInGold() public view returns (uint256) {
     address stableTokenAddress = registry.getAddressForOrDie(STABLE_TOKEN_REGISTRY_ID);
     (uint256 numerator, uint256 denominator) = getSortedOracles().medianRate(stableTokenAddress);
-    uint256 targetEpochPayment = numberValidatorsInCurrentSet().mul(maxValidatorEpochPayment).mul(denominator).div(numerator);
-    return targetEpochPayment;
+    return numberValidatorsInCurrentSet().mul(maxValidatorEpochPayment).mul(denominator).div(
+      numerator
+    );
   }
 
   function getVotingGoldFraction() public view returns (uint256) {
@@ -219,16 +254,26 @@ contract EpochRewards is Ownable, Initializable, UsingPrecompiles, UsingRegistry
   function _updateTargetVotingYield() internal {
     FixidityLib.Fraction memory votingGoldFraction = FixidityLib.wrap(getVotingGoldFraction());
     if (votingGoldFraction.gt(targetVotingGoldFraction)) {
-      FixidityLib.Fraction memory votingGoldFractionDelta = votingGoldFraction.subtract(targetVotingGoldFraction);
-      FixidityLib.Fraction memory targetVotingYieldDelta = votingGoldFractionDelta.multiply(targetVotingYieldParams.adjustmentFactor);
+      FixidityLib.Fraction memory votingGoldFractionDelta = votingGoldFraction.subtract(
+        targetVotingGoldFraction
+      );
+      FixidityLib.Fraction memory targetVotingYieldDelta = votingGoldFractionDelta.multiply(
+        targetVotingYieldParams.adjustmentFactor
+      );
       if (targetVotingYieldDelta.gte(targetVotingYieldParams.target)) {
         targetVotingYieldParams.target = FixidityLib.newFixed(0);
       } else {
-        targetVotingYieldParams.target = targetVotingYieldParams.target.subtract(targetVotingYieldDelta);
+        targetVotingYieldParams.target = targetVotingYieldParams.target.subtract(
+          targetVotingYieldDelta
+        );
       }
     } else if (votingGoldFraction.lt(targetVotingGoldFraction)) {
-      FixidityLib.Fraction memory votingGoldFractionDelta = targetVotingGoldFraction.subtract(votingGoldFraction);
-      FixidityLib.Fraction memory targetVotingYieldDelta = votingGoldFractionDelta.multiply(targetVotingYieldParams.adjustmentFactor);
+      FixidityLib.Fraction memory votingGoldFractionDelta = targetVotingGoldFraction.subtract(
+        votingGoldFraction
+      );
+      FixidityLib.Fraction memory targetVotingYieldDelta = votingGoldFractionDelta.multiply(
+        targetVotingYieldParams.adjustmentFactor
+      );
       targetVotingYieldParams.target = targetVotingYieldParams.target.add(targetVotingYieldDelta);
       if (targetVotingYieldParams.target.gt(targetVotingYieldParams.max)) {
         targetVotingYieldParams.target = targetVotingYieldParams.max;
@@ -245,7 +290,9 @@ contract EpochRewards is Ownable, Initializable, UsingPrecompiles, UsingRegistry
     uint256 targetEpochRewards = getTargetEpochRewards();
     uint256 targetTotalEpochPaymentsInGold = getTargetTotalEpochPaymentsInGold();
     uint256 targetGoldSupplyIncrease = targetEpochRewards.add(targetTotalEpochPaymentsInGold);
-    FixidityLib.Fraction memory rewardsMultiplier = _getRewardsMultiplier(targetGoldSupplyIncrease);
+    FixidityLib.Fraction memory rewardsMultiplier = _getRewardsMultiplier(
+      targetGoldSupplyIncrease
+    );
     return (
       FixidityLib.newFixed(maxValidatorEpochPayment).multiply(rewardsMultiplier).fromFixed(),
       FixidityLib.newFixed(targetEpochRewards).multiply(rewardsMultiplier).fromFixed()
