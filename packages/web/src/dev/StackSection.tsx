@@ -28,11 +28,14 @@ const TRANS_DURATION = 500
 export default withScreenSize(
   React.memo(function StackSection(props: Props & ScreenProps) {
     const { title, text, buttonOne, buttonTwo, children, onPress, isSelected, screen } = props
+    const isMobile = props.screen === ScreenSizes.MOBILE
+    const containerStyle = isMobile ? styles.mobileContainer : styles.container
+
     return (
       <View
         nativeID={props.id}
-        // @ts-ignore
-        style={[styles.container, styles.fade, isSelected ? styles.bright : styles.dim]}
+        // @ts-ignore issue with transition* even though Stylesheet is fine with it
+        style={[containerStyle, styles.fade, isSelected ? styles.bright : styles.dim]}
       >
         <View style={styles.content}>
           <Text
@@ -50,7 +53,7 @@ export default withScreenSize(
           <Text style={[fonts.p, textStyles.invert]}>{text}</Text>
           <Ul style={styles.list}>{children}</Ul>
         </View>
-        <View style={styles.buttonArea}>
+        <View style={isMobile ? styles.mobileButtonArea : styles.buttonArea}>
           <Button
             text={buttonOne.title}
             kind={BTN.PRIMARY}
@@ -81,6 +84,9 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     marginVertical: 20,
   },
+  mobileContainer: {
+    marginBottom: 60,
+  },
   fade: {
     transitionDuration: '500ms',
     transitionProperty: 'opacity',
@@ -102,9 +108,10 @@ const styles = StyleSheet.create({
   list: {
     marginLeft: 10,
   },
-  buttonsMobile: {
+  mobileButtonArea: {
     flexDirection: 'row',
     justifyContent: 'space-evenly',
+    marginBottom: 10,
   },
   coin: {
     transitionProperty: 'opacity',

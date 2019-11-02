@@ -58,7 +58,6 @@ class FullStack extends React.PureComponent<I18nProps & ScreenProps, State> {
     const clientRect: DOMRect = element.getBoundingClientRect()
 
     if (clientRect.top < HEADER_HEIGHT - 100) {
-      // When the distance from bottom of container is less than the height of the illo setMode attech Bottom
       this.illoRef.current.measure((_x, _y, _w, illoHeight) => {
         this.autoSetHighlight(clientRect, illoHeight)
 
@@ -71,7 +70,7 @@ class FullStack extends React.PureComponent<I18nProps & ScreenProps, State> {
     } else {
       this.setState({ mode: StickyMode.normal })
     }
-  }, 100)
+  }, 24)
 
   setL3 = () => {
     this.setState({ selection: Levels.apps })
@@ -149,6 +148,9 @@ class FullStack extends React.PureComponent<I18nProps & ScreenProps, State> {
     const { t, screen } = this.props
     const isDesktop = screen === ScreenSizes.DESKTOP
     const isBrowseCodeFaded = isDesktop && !(this.state.selection === Levels.code)
+
+    const activeLayer = this.state.selection === Levels.code ? 'all' : this.state.selection
+
     return (
       <View style={standardStyles.darkBackground} ref={this.ref}>
         <GridRow
@@ -168,7 +170,7 @@ class FullStack extends React.PureComponent<I18nProps & ScreenProps, State> {
                   {t('stackDescription')}
                 </Text>
                 {isDesktop && (
-                  <LayersIllo activeLayer={this.state.selection} onSelectLayer={this.setLevel} />
+                  <LayersIllo activeLayer={activeLayer} onSelectLayer={this.setLevel} />
                 )}
               </View>
             </View>
@@ -221,7 +223,7 @@ class FullStack extends React.PureComponent<I18nProps & ScreenProps, State> {
             <View
               style={[
                 standardStyles.centered,
-                standardStyles.sectionMargin,
+                isDesktop ? standardStyles.sectionMargin : {},
                 isBrowseCodeFaded && styles.faded,
                 styles.browseCodeArea,
               ]}

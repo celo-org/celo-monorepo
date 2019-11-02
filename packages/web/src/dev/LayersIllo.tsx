@@ -11,7 +11,7 @@ const VECTORS = [
 ]
 
 export interface Props {
-  activeLayer: number
+  activeLayer: number | 'all'
   onSelectLayer: (index: number) => void
 }
 
@@ -25,7 +25,10 @@ export default React.memo<Props>(function LayersIllo({ activeLayer, onSelectLaye
             key={vector}
             d={vector}
             onPress={onPress}
-            style={[styles.clicky, activeLayer === index ? styles.active : styles.inactive]}
+            style={[
+              styles.clicky,
+              activeLayer === 'all' || activeLayer === index ? styles.active : styles.inactive,
+            ]}
             stroke={colors.white}
             fill={'transparent'}
           />
