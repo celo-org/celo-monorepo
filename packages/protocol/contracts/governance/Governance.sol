@@ -18,7 +18,7 @@ import "../common/UsingPrecompiles.sol";
 /**
  * @title A contract for making, passing, and executing on-chain governance proposals.
  */
-contract Governance is 
+contract Governance is
   IGovernance,
   Ownable,
   Initializable,
@@ -758,7 +758,7 @@ contract Governance is
       msg.sender,
       0
     ).executeMem();
-    
+
     hotfixes[hash].executed = true;
     emit HotfixExecuted(hash);
   }
@@ -773,6 +773,22 @@ contract Governance is
     refundedDeposits[msg.sender] = 0;
     msg.sender.transfer(value);
     return true;
+  }
+
+  /**
+   * @notice Returns whether or not a particular account is voting on proposals.
+   * @param account The address of the account.
+   * @return Whether or not the account is voting on proposals.
+   */
+  function isVoting(address account) external view returns (bool) {
+    Voter storage voter = voters[account];
+    uint256 upvotedProposal = voter.upvote.proposalId;
+    bool isVotingQueue = upvotedProposal != 0 && isQueued(upvotedProposal);
+    Proposals.Proposal storage proposal = proposals[voter.mostRecentReferendumProposal];
+    bool isVotingReferendum = (
+      proposal.getDequeuedStage(stageDurations) == Proposals.Stage.Referendum
+    );
+    return isVotingQueue || isVotingReferendum;
   }
 
   /**
