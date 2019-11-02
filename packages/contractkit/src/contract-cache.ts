@@ -1,5 +1,6 @@
 import { CeloContract } from './base'
 import { ContractKit } from './kit'
+import { AccountsWrapper } from './wrappers/Accounts'
 import { AttestationsWrapper } from './wrappers/Attestations'
 import { ElectionWrapper } from './wrappers/Election'
 // import { EpochRewardsWrapper } from './wrappers/EpochRewards'
@@ -14,6 +15,7 @@ import { StableTokenWrapper } from './wrappers/StableTokenWrapper'
 import { ValidatorsWrapper } from './wrappers/Validators'
 
 const WrapperFactories = {
+  [CeloContract.Accounts]: AccountsWrapper,
   [CeloContract.Attestations]: AttestationsWrapper,
   [CeloContract.Election]: ElectionWrapper,
   // [CeloContract.EpochRewards]?: EpochRewardsWrapper,
@@ -37,6 +39,7 @@ type CFType = typeof WrapperFactories
 export type ValidWrappers = keyof CFType
 
 interface WrapperCacheMap {
+  [CeloContract.Accounts]?: AccountsWrapper
   [CeloContract.Attestations]?: AttestationsWrapper
   [CeloContract.Election]?: ElectionWrapper
   // [CeloContract.EpochRewards]?: EpochRewardsWrapper
@@ -67,6 +70,9 @@ export class WrapperCache {
 
   constructor(readonly kit: ContractKit) {}
 
+  getAccounts() {
+    return this.getContract(CeloContract.Accounts)
+  }
   getAttestations() {
     return this.getContract(CeloContract.Attestations)
   }
