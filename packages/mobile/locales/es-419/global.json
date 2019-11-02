@@ -65,6 +65,7 @@
   "verifyFailed": "Falla durante la verificación",
   "canNotRequestFromUnverified": "No se puede solicitar a usuarios no verificados.",
   "restartApp": "Reiniciar la aplicación",
+  "quitApp": "Dejar",
   "loading": "Cargando…",
   "inviteFailed": "Falló el envío de la invitación",
   "importContactsFailed": "Error al importar contactos",
@@ -92,6 +93,7 @@
   "web3FailedToSync": "Fallo la sincronización, por favor verifica tu conexión",
   "errorDuringSync": "Ocurrió un error duranet la sincronización, por favor intente más tarde",
   "calculateFeeFailed": "No se pudo calcular la comisión",
+  "failedToSwitchSyncModes": "Error al cambiar de red modos",
   "gold": "Oro",
   "localCurrencyTitle": "Seleccione el tipo de moneda"
 }

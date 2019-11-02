@@ -24,8 +24,14 @@ spec:
     spec:
       containers:
       - name: blockscout-web
-        image: {{ .Values.blockscout.image.repository }}:{{ .Values.blockscout.image.webTag }}
+        image: {{ .Values.blockscout.image.repository }}:{{ .Values.blockscout.image.tag }}
         imagePullPolicy: {{ .Values.imagePullPolicy }}
+        command:
+        - /bin/sh
+        - -c
+        args:
+        - |
+           mix cmd --app block_scout_web mix phx.server
         ports:
         - name: http
           containerPort: 4000

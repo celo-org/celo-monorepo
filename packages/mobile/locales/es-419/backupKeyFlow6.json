@@ -1,71 +1,72 @@
 {
-  "getBackupKey": "Get Backup Key",
-  "getYourKey": "Get Your Key",
-  "viewBackupKey": "View Backup Key",
-  "setUpSocialBackup": "Set Up Safeguards",
-  "viewSafeguards": "View Safeguards",
-  "failedFetchMnemonic": "Failed to fetch your Backup Key",
-  "backupAndRecovery": "Backup and Recovery",
-  "backupKey": "Backup Key",
-  "yourBackupKey": "Your Backup Key",
-  "delayBackup": "Dismiss for an hour",
-  "backupKeyNotification": "Without a Backup Key, you may lose access to your wallet.",
+  "getBackupKey": "Obtener Clave de Respaldo",
+  "getYourKey": "Obtenga su clave",
+  "viewBackupKey": "Ver Clave de Respaldo",
+  "setUpSocialBackup": "Configurar Salvaguardas",
+  "viewSafeguards": "Ver Salvaguardas",
+  "failedFetchMnemonic": "No se pudo obtener su clave de respaldo",
+  "backupAndRecovery": "Respaldo y recuperación",
+  "backupKey": "Clave de respaldo",
+  "yourBackupKey": "Su clave de respaldo",
+  "delayBackup": "Descartar por una hora",
+  "backupKeyNotification": "Sin una clave de respaldo, puede perder el acceso a la billetera.",
   "backupKeyIntro": {
     "0":
-      "Your Backup Key is the one and only key to your Celo Wallet. With this key, you can access your funds anytime, anywhere.",
-    "1": "KEEP THIS KEY SAFE AND PRIVATE.",
-    "2": "Congrats, you’ve sucessfully retrieved your Backup Key! A reminder, ",
-    "3": "KEEP THIS KEY SAFE.",
-    "4": "For more security set up Safeguards for your wallet.",
+      "Su clave de respaldo es la única clave para la billetera Celo. Con esta clave, puede acceder a sus fondos en cualquier momento y en cualquier lugar.",
+    "1": "MANTENGA LA SEGURIDAD Y PRIVACIDAD DE ESTA CLAVE.",
+    "2": "¡Felicitaciones! Ha recuperado correctamente su clave de respaldo. Un recordatorio, ",
+    "3": "MANTENGA LA SEGURIDAD DE ESTA CLAVE.",
+    "4": "Para mayor seguridad, configure las Salvaguardas de su billetera.",
     "5":
-      "You’ve also set up Safeguards! You’ll be able to restore your account with the help of the two friends. ",
-    "6": "KEEP YOUR SAFEGUARDS SECRET"
+      "¡También ha configurado las salvaguardas! Podrá restaurar su cuenta con la ayuda de dos amigos. ",
+    "6": "MANTENGA EN SECRETO SUS SALVAGUARDAS"
   },
   "backupSkipText": {
-    "0": "Without a Backup Key, you can lose access to your wallet ",
-    "1": "forever."
+    "0": "Sin una clave de respaldo, puede perder el acceso a la billetera ",
+    "1": "para siempre."
   },
-  "backupRecovery": "Share your Backup Key with only one other person who you completely trust.",
-  "securityTip": "If you lose your backup key, you will lose access to your Celo Dollars and Gold.",
+  "backupRecovery":
+    "Comparta la clave de respaldo con una sola persona en la que confíe plenamente.",
+  "securityTip": "Si pierde su clave de respaldo, perderá el acceso a sus dólares y oro Celo.",
   "backupKeySummary":
-    "Please write down your Backup Key. If your phone is stolen or lost, you will need the Backup Key to access your Celo Wallet.",
+    "Escriba su clave de respaldo. Si se pierde o le roban su teléfono, necesitará su clave de respaldo para acceder a la billetera Celo.",
   "bothBackupsDone": {
-    "0": "Congratulations!",
+    "0": "¡Felicitaciones!",
     "1":
-      "You're all done! If you would like to review your recovery secrets, you can always return here later."
+      "¡Listo! Si desea revisar sus secretos para recuperación, siempre puede volver aquí más tarde."
   },
   "dontLoseIt":
-    "Please do not lose this key. It is critical that you maintain this in a safe place, as this is the only way to unlock your wallet should you lose your phone.",
+    "No pierda esta clave. Es de suma importancia que la mantenga en un lugar seguro, ya que es la única forma de desbloquear su billetera si pierde su celular.",
   "backupPrompt":
-    "For the security of your funds, your account is frozen until you get your Backup Key",
-  "copied": "Key copied to clipboard",
-  "savedConfirmation": "I have saved my Backup Key.",
-  "confirmBackupKey": "Confirm Your Backup Key",
+    "Para seguridad de sus fondos, su cuenta está bloqueada hasta que obtenga su clave de respaldo.",
+  "copied": "Clave copiada al portapapeles",
+  "savedConfirmation": "He guardado mi clave de respaldo",
+  "confirmBackupKey": "Confirme su clave de respaldo",
   "backupQuizInfo":
-    "Please verify your Backup Key by selecting the words below in the correct order.",
-  "backupQuizWordCount": "Word {{index}} of {{total}}",
-  "invalidBackupPhrase": "Invalid Backup Key",
-  "importBackupFailed": "Importing Wallet Failed",
-  "backupQuizFailed": "Incorrect Backup Key, please try again",
+    "Verifique su clave de respaldo seleccionando las palabras que aparecen debajo en el orden correcto.",
+  "backupQuizWordCount": "Palabra {{index}} de {{total}}",
+  "invalidBackupPhrase": "Clave de respaldo inválida",
+  "importBackupFailed": "No se pudo importar la billetera",
+  "backupQuizFailed": "Clave de respaldo incorrecta; vuelva a intentarlo",
   "backupComplete": {
-    "0": "Success!",
-    "1": "Next, you can set up Safeguards.",
-    "2": "You’re all set!"
+    "0": "¡Correcto!",
+    "1": "Ahora puede configurar las salvaguardas.",
+    "2": "¡Está todo configurado!"
   },
   "socialBackupIntro": {
-    "header": "Introducing Safeguards",
+    "header": "Cómo incluir salvaguardas",
     "body":
-      "Safeguards is an additional layer of protection for your account in case you lose your Backup Key. Once set up, you’ll be able to restore your account with the help of two friends or family members. ",
-    "warning": "NEVER TELL ANYONE YOUR SAFEGUARDS’ IDENTITIES.",
-    "skip": "Skip For Now"
+      "Las salvaguardas son una capa adicional de resguardo para su cuenta en el caso de que pierda la clave de respaldo. Una vez configuradas las salvaguardas, podrá restaurar su cuenta con la ayuda de dos amigos o miembros de su familia. ",
+    "warning": "NO DEBE REVELARLE A NADIE LAS IDENTIDADES DE SUS SALVAGUARDAS.",
+    "skip": "Omitir por ahora"
   },
-  "socialBackupPhraseHeader": "Safeguard Phrase {{index}}",
+  "socialBackupPhraseHeader": "Frase de protección {{index}}",
   "socialBackup": {
     "body":
-      "Share each phrase below with a friend. Be sure to send only one phrase to each person.",
-    "confirmation": "I have sent each Safeguard phrase to a trusted friend.",
-    "yourSafeguards": "Your Safeguards"
+      "Comparta cada frase que aparece a continuación con un amigo. Asegúrese de enviar solo una frase a cada persona.",
+    "confirmation": "He enviado cada una de las salvaguardas a un amigo de confianza.",
+    "yourSafeguards": "Sus salvaguardas"
   },
   "backupPhrasePlaceholder":
-    "horse leopard dog monkey shark tiger lemur whale squid wolf squirrel mouse lion elephant cat shrimp bear penguin deer turtle fox zebra goat giraffe"
+    "caballo leopardo perro mono tiburón tigre lémur ballena calamar lobo ardilla ratón león elefante gato langostino oso pingüino ciervo tortuga zorro cebra cabra jirafa"
 }

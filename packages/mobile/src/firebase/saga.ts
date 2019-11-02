@@ -14,11 +14,16 @@ import {
 } from 'redux-saga/effects'
 import { PaymentRequest, PaymentRequestStatus, updatePaymentRequests } from 'src/account'
 import { showError } from 'src/alert/actions'
-import { Actions as AppActions } from 'src/app/actions'
+import { Actions as AppActions, SetLanguage } from 'src/app/actions'
 import { ErrorMessages } from 'src/app/ErrorMessages'
 import { FIREBASE_ENABLED } from 'src/config'
 import { Actions, firebaseAuthorized, UpdatePaymentRequestStatusAction } from 'src/firebase/actions'
-import { initializeAuth, initializeCloudMessaging, setUserLanguage } from 'src/firebase/firebase'
+import {
+  initializeAuth,
+  initializeCloudMessaging,
+  paymentRequestWriter,
+  setUserLanguage,
+} from 'src/firebase/firebase'
 import Logger from 'src/utils/Logger'
 import { getAccount } from 'src/web3/saga'
 import { currentAccountSelector } from 'src/web3/selectors'
@@ -144,7 +149,7 @@ export function* watchPaymentRequestStatusUpdates() {
   yield takeLeading(Actions.PAYMENT_REQUEST_UPDATE_STATUS, updatePaymentRequestStatus)
 }
 
-export function* syncLanguageSelection({ language }: { language: string }) {
+export function* syncLanguageSelection({ language }: SetLanguage) {
   yield call(waitForFirebaseAuth)
   const address = yield select(currentAccountSelector)
   try {
@@ -158,9 +163,14 @@ export function* watchLanguage() {
   yield takeEvery(AppActions.SET_LANGUAGE, syncLanguageSelection)
 }
 
+export function* watchWritePaymentRequest() {
+  yield takeEvery(Actions.PAYMENT_REQUEST_WRITE, paymentRequestWriter)
+}
+
 export function* firebaseSaga() {
   yield spawn(initializeFirebase)
   yield spawn(watchLanguage)
   yield spawn(subscribeToPaymentRequests)
   yield spawn(watchPaymentRequestStatusUpdates)
+  yield spawn(watchWritePaymentRequest)
 }

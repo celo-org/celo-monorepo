@@ -1,18 +1,18 @@
 {
-  "title": "Restaurar tu Monedero Celo",
+  "title": "Restaurar el Monedero Celo",
   "userYourBackupKey":
-    "¿Ya tiene un Monedero Celo? Ingrese su Clave de Respaldo para restaurarla a este teléfono.",
+    "¿Ya tiene un Monedero Celo? Ingrese su Clave de Respaldo para restaurarla en este teléfono.",
   "backupKeyPrompt":
-    "caballo leopardo perro mono tiburón tigre lémur ballena calamar lobo ardilla ratón león elefante gato camarones oso pingüino...",
-  "tip": "Consejo: ",
-  "backupKeyTip": "Las Claves de Respaldo son de 24 palabras, separadas por un espacio.",
+    "caballo leopardo perro mono tiburón tigre lémur ballena calamar lobo ardilla ratón león elefante gato langostino oso pingüino ciervo tortuga zorro cebra cabra jirafa",
+  "tip": "Sugerencia: ",
+  "backupKeyTip": "Las Claves de Respaldo tienen 24 palabras, separadas por un espacio.",
   "restoreWallet": "Restaurar",
-  "emptyWalletWarning": "Este Monedero esta vacio",
-  "useEmptyAnyway": "¿Te gustaría usarlo de todos modos?",
-  "useEmptyWallet": "Usar Monedero Vacío",
-  "tryAnotherKey": "Probar con otra Clave de Respaldo",
-  "restoreSocial": "Restore with Safeguards",
+  "emptyWalletWarning": "Esta billetera está vacía.",
+  "useEmptyAnyway": "¿Le gustaría usarla de todas maneras?",
+  "useEmptyWallet": "Usar la billetera vacía",
+  "tryAnotherKey": "Pruebe otra Clave de Respaldo",
+  "restoreSocial": "Restaurar con Salvaguardas",
   "socialImportInfo":
-    "If you enabled Safeguards, you sent Safeguard Phrases to two friends. Please retrieve these phrases and enter them here (in any order) to regain access to your funds.",
-  "socialTip": "Phrases are lists of 13 words separated by spaces."
+    "Si activó las Salvaguardas, envió frases de protección a dos amigos. Recupere estas frases e ingréselas aquí (en cualquier orden) para volver a tener acceso a sus fondos.",
+  "socialTip": "Las frases son listas de 13 palabras separadas por espacios."
 }

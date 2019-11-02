@@ -1,10 +1,10 @@
 import { anonymizedPhone } from '@celo/utils/src/phoneNumbers'
+import * as Sentry from '@sentry/react-native'
 import DeviceInfo from 'react-native-device-info'
 import * as RNFS from 'react-native-fs'
-import { Sentry } from 'react-native-sentry'
+import { call, select } from 'redux-saga/effects'
 import { e164NumberSelector } from 'src/account/reducer'
 import { SENTRY_URL } from 'src/config'
-import { DispatchType, GetStateType } from 'src/redux/reducers'
 import Logger from 'src/utils/Logger'
 import { currentAccountSelector } from 'src/web3/selectors'
 
@@ -16,37 +16,29 @@ export async function installSentry() {
     Logger.info(TAG, 'installSentry', 'Sentry URL not found, skiping instalation')
     return
   }
-  await Sentry.config(SENTRY_URL).install()
-  Sentry.setTagsContext({
-    environment: DeviceInfo.getBundleId(),
-    react: true,
-  })
+  Sentry.init({ dsn: SENTRY_URL, environment: DeviceInfo.getBundleId() })
   await uploadNdkCrashesIfAny()
   Logger.info(TAG, 'installSentry', 'Sentry installation complete')
 }
 
 // This should not be called at cold start since it can slow down the cold start.
-export const initializeSentryUserContext = () => async (
-  dispatch: DispatchType,
-  getState: GetStateType
-) => {
-  const state = getState()
-  const account = currentAccountSelector(state)
+export function* initializeSentryUserContext() {
+  const account = yield select(currentAccountSelector)
+
   if (!account) {
     return
   }
-  const phoneNumber =
-    e164NumberSelector(state) || (await DeviceInfo.getPhoneNumber()) || 'unknownPhoneNumber'
+  const phoneNumber = yield select(e164NumberSelector) ||
+    (yield call([DeviceInfo, 'getPhoneNumber'])) ||
+    'unknownPhoneNumber'
   Logger.debug(
     TAG,
     'initializeSentryUserContext',
     `Setting Sentry user context to "${phoneNumber}" and "${account}"`
   )
-  Sentry.setUserContext({
+  Sentry.setUser({
     username: anonymizedPhone(phoneNumber.slice(0, -4)),
-    extra: {
-      Address: account,
-    },
+    Address: account,
   })
 }
 

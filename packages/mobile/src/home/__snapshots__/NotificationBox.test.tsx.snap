@@ -54,7 +54,7 @@ exports[`NotificationBox Backup too late test 1`] = `
               resizeMode="contain"
               source={
                 Object {
-                  "testUri": "../../../src/images/backup-icon.png",
+                  "testUri": "../../../packages/mobile/src/images/backup-icon.png",
                 }
               }
               style={
@@ -124,6 +124,7 @@ exports[`NotificationBox Backup too late test 1`] = `
                 >
                   <View
                     accessible={true}
+                    focusable={true}
                     isTVSelectable={true}
                     nativeBackgroundAndroid={
                       Object {
@@ -131,6 +132,7 @@ exports[`NotificationBox Backup too late test 1`] = `
                         "type": "ThemeAttrAndroid",
                       }
                     }
+                    onClick={[Function]}
                     onResponderGrant={[Function]}
                     onResponderMove={[Function]}
                     onResponderRelease={[Function]}
@@ -206,7 +208,7 @@ exports[`NotificationBox Backup too late test 1`] = `
               resizeMode="contain"
               source={
                 Object {
-                  "testUri": "../../../src/images/Invite-Friends.png",
+                  "testUri": "../../../packages/mobile/src/images/Invite-Friends.png",
                 }
               }
               style={
@@ -276,6 +278,7 @@ exports[`NotificationBox Backup too late test 1`] = `
                 >
                   <View
                     accessible={true}
+                    focusable={true}
                     isTVSelectable={true}
                     nativeBackgroundAndroid={
                       Object {
@@ -283,6 +286,7 @@ exports[`NotificationBox Backup too late test 1`] = `
                         "type": "ThemeAttrAndroid",
                       }
                     }
+                    onClick={[Function]}
                     onResponderGrant={[Function]}
                     onResponderMove={[Function]}
                     onResponderRelease={[Function]}
@@ -316,6 +320,7 @@ exports[`NotificationBox Backup too late test 1`] = `
                   </View>
                   <View
                     accessible={true}
+                    focusable={true}
                     isTVSelectable={true}
                     nativeBackgroundAndroid={
                       Object {
@@ -323,6 +328,7 @@ exports[`NotificationBox Backup too late test 1`] = `
                         "type": "ThemeAttrAndroid",
                       }
                     }
+                    onClick={[Function]}
                     onResponderGrant={[Function]}
                     onResponderMove={[Function]}
                     onResponderRelease={[Function]}
@@ -455,7 +461,7 @@ exports[`NotificationBox Educations not completed yet 1`] = `
               resizeMode="contain"
               source={
                 Object {
-                  "testUri": "../../../src/images/home-icon.png",
+                  "testUri": "../../../packages/mobile/src/images/home-icon.png",
                 }
               }
               style={
@@ -525,6 +531,7 @@ exports[`NotificationBox Educations not completed yet 1`] = `
                 >
                   <View
                     accessible={true}
+                    focusable={true}
                     isTVSelectable={true}
                     nativeBackgroundAndroid={
                       Object {
@@ -532,6 +539,7 @@ exports[`NotificationBox Educations not completed yet 1`] = `
                         "type": "ThemeAttrAndroid",
                       }
                     }
+                    onClick={[Function]}
                     onResponderGrant={[Function]}
                     onResponderMove={[Function]}
                     onResponderRelease={[Function]}
@@ -565,6 +573,7 @@ exports[`NotificationBox Educations not completed yet 1`] = `
                   </View>
                   <View
                     accessible={true}
+                    focusable={true}
                     isTVSelectable={true}
                     nativeBackgroundAndroid={
                       Object {
@@ -572,6 +581,7 @@ exports[`NotificationBox Educations not completed yet 1`] = `
                         "type": "ThemeAttrAndroid",
                       }
                     }
+                    onClick={[Function]}
                     onResponderGrant={[Function]}
                     onResponderMove={[Function]}
                     onResponderRelease={[Function]}
@@ -668,7 +678,7 @@ exports[`NotificationBox Payment Requests exist 1`] = `
               resizeMode="contain"
               source={
                 Object {
-                  "testUri": "../../../src/images/send-dollar.png",
+                  "testUri": "../../../packages/mobile/src/images/send-dollar.png",
                 }
               }
               style={
@@ -779,6 +789,7 @@ exports[`NotificationBox Payment Requests exist 1`] = `
                 >
                   <View
                     accessible={true}
+                    focusable={true}
                     isTVSelectable={true}
                     nativeBackgroundAndroid={
                       Object {
@@ -786,6 +797,7 @@ exports[`NotificationBox Payment Requests exist 1`] = `
                         "type": "ThemeAttrAndroid",
                       }
                     }
+                    onClick={[Function]}
                     onResponderGrant={[Function]}
                     onResponderMove={[Function]}
                     onResponderRelease={[Function]}
@@ -882,7 +894,7 @@ exports[`NotificationBox Simple test 1`] = `
               resizeMode="contain"
               source={
                 Object {
-                  "testUri": "../../../src/images/backup-icon.png",
+                  "testUri": "../../../packages/mobile/src/images/backup-icon.png",
                 }
               }
               style={
@@ -952,6 +964,7 @@ exports[`NotificationBox Simple test 1`] = `
                 >
                   <View
                     accessible={true}
+                    focusable={true}
                     isTVSelectable={true}
                     nativeBackgroundAndroid={
                       Object {
@@ -959,6 +972,7 @@ exports[`NotificationBox Simple test 1`] = `
                         "type": "ThemeAttrAndroid",
                       }
                     }
+                    onClick={[Function]}
                     onResponderGrant={[Function]}
                     onResponderMove={[Function]}
                     onResponderRelease={[Function]}
@@ -1034,7 +1048,7 @@ exports[`NotificationBox Simple test 1`] = `
               resizeMode="contain"
               source={
                 Object {
-                  "testUri": "../../../src/images/Invite-Friends.png",
+                  "testUri": "../../../packages/mobile/src/images/Invite-Friends.png",
                 }
               }
               style={
@@ -1104,6 +1118,7 @@ exports[`NotificationBox Simple test 1`] = `
                 >
                   <View
                     accessible={true}
+                    focusable={true}
                     isTVSelectable={true}
                     nativeBackgroundAndroid={
                       Object {
@@ -1111,6 +1126,7 @@ exports[`NotificationBox Simple test 1`] = `
                         "type": "ThemeAttrAndroid",
                       }
                     }
+                    onClick={[Function]}
                     onResponderGrant={[Function]}
                     onResponderMove={[Function]}
                     onResponderRelease={[Function]}
@@ -1144,6 +1160,7 @@ exports[`NotificationBox Simple test 1`] = `
                   </View>
                   <View
                     accessible={true}
+                    focusable={true}
                     isTVSelectable={true}
                     nativeBackgroundAndroid={
                       Object {
@@ -1151,6 +1168,7 @@ exports[`NotificationBox Simple test 1`] = `
                         "type": "ThemeAttrAndroid",
                       }
                     }
+                    onClick={[Function]}
                     onResponderGrant={[Function]}
                     onResponderMove={[Function]}
                     onResponderRelease={[Function]}

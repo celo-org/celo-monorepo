@@ -27,6 +27,7 @@ export enum AccountType {
   TX_NODE = 2,
   BOOTNODE = 3,
   FAUCET = 4,
+  ATTESTATION = 5,
 }
 
 export enum ConsensusType {
@@ -45,6 +46,7 @@ export const MNEMONIC_ACCOUNT_TYPE_CHOICES = [
   'tx_node',
   'bootnode',
   'faucet',
+  'attestation',
 ]
 
 export const add0x = (str: string) => {
@@ -212,7 +214,9 @@ export const generateGenesis = ({
     genesis.difficulty = '0x1'
     genesis.extraData = generateIstanbulExtraData(validators)
     genesis.config.istanbul = {
-      policy: 0,
+      // see github.com/celo-org/celo-blockchain/blob/master/consensus/istanbul/config.go#L21-L25
+      // 0 = RoundRobin, 1 = Sticky, 2 = ShuffledRoundRobin
+      policy: 2,
       period: blockTime,
       requesttimeout: requestTimeout,
       epoch,

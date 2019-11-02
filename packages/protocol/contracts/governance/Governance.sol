@@ -10,18 +10,24 @@ import "./Proposals.sol";
 import "../common/ExtractFunctionSignature.sol";
 import "../common/Initializable.sol";
 import "../common/FixidityLib.sol";
-import "../common/FractionUtil.sol";
 import "../common/linkedlists/IntegerSortedLinkedList.sol";
 import "../common/UsingRegistry.sol";
+import "../common/UsingPrecompiles.sol";
 
 // TODO(asa): Hardcode minimum times for queueExpiry, etc.
 /**
  * @title A contract for making, passing, and executing on-chain governance proposals.
  */
-contract Governance is IGovernance, Ownable, Initializable, ReentrancyGuard, UsingRegistry {
+contract Governance is 
+  IGovernance,
+  Ownable,
+  Initializable,
+  ReentrancyGuard,
+  UsingRegistry,
+  UsingPrecompiles
+{
   using Proposals for Proposals.Proposal;
   using FixidityLib for FixidityLib.Fraction;
-  using FractionUtil for FractionUtil.Fraction;
   using SafeMath for uint256;
   using IntegerSortedLinkedList for SortedLinkedList.List;
   using BytesLib for bytes;
@@ -66,9 +72,15 @@ contract Governance is IGovernance, Ownable, Initializable, ReentrancyGuard, Usi
 
   struct ContractConstitution {
     FixidityLib.Fraction defaultThreshold;
-    // Maps a function ID to a corresponding passing function, overriding the
-    // default.
+    // Maps a function ID to a corresponding threshold, overriding the default.
     mapping(bytes4 => FixidityLib.Fraction) functionThresholds;
+  }
+
+  struct HotfixRecord {
+    bool executed;
+    bool approved;
+    uint256 preparedEpoch;
+    mapping(address => bool) whitelisted;
   }
 
   // The baseline is updated as
@@ -96,6 +108,7 @@ contract Governance is IGovernance, Ownable, Initializable, ReentrancyGuard, Usi
   mapping(address => ContractConstitution) private constitution;
   mapping(uint256 => Proposals.Proposal) private proposals;
   mapping(address => Voter) private voters;
+  mapping(bytes32 => HotfixRecord) public hotfixes;
   SortedLinkedList.List private queue;
   uint256[] public dequeued;
   uint256[] public emptyIndices;
@@ -197,6 +210,24 @@ contract Governance is IGovernance, Ownable, Initializable, ReentrancyGuard, Usi
 
   event ParticipationBaselineQuorumFactorSet(
     uint256 baselineQuorumFactor
+  );
+
+  event HotfixWhitelisted(
+    bytes32 indexed hash,
+    address whitelister
+  );
+
+  event HotfixApproved(
+    bytes32 indexed hash
+  );
+
+  event HotfixPrepared(
+    bytes32 indexed hash,
+    uint256 indexed epoch
+  );
+
+  event HotfixExecuted(
+    bytes32 indexed hash
   );
 
   function() external payable {} // solhint-disable no-empty-blocks
@@ -485,7 +516,7 @@ contract Governance is IGovernance, Ownable, Initializable, ReentrancyGuard, Usi
     nonReentrant
     returns (bool)
   {
-    address account = getLockedGold().getAccountFromVoter(msg.sender);
+    address account = getAccounts().activeVoteSignerToAccount(msg.sender);
     // TODO(asa): When upvoting a proposal that will get dequeued, should we let the tx succeed
     // and return false?
     dequeueProposalsIfReady();
@@ -539,7 +570,7 @@ contract Governance is IGovernance, Ownable, Initializable, ReentrancyGuard, Usi
     returns (bool)
   {
     dequeueProposalsIfReady();
-    address account = getLockedGold().getAccountFromVoter(msg.sender);
+    address account = getAccounts().activeVoteSignerToAccount(msg.sender);
     Voter storage voter = voters[account];
     uint256 proposalId = voter.upvote.proposalId;
     Proposals.Proposal storage proposal = proposals[proposalId];
@@ -607,7 +638,7 @@ contract Governance is IGovernance, Ownable, Initializable, ReentrancyGuard, Usi
     nonReentrant
     returns (bool)
   {
-    address account = getLockedGold().getAccountFromVoter(msg.sender);
+    address account = getAccounts().activeVoteSignerToAccount(msg.sender);
     dequeueProposalsIfReady();
     Proposals.Proposal storage proposal = proposals[proposalId];
     require(isDequeuedProposal(proposal, proposalId, index));
@@ -666,7 +697,74 @@ contract Governance is IGovernance, Ownable, Initializable, ReentrancyGuard, Usi
   }
 
   /**
-   * @notice Withdraws refunded Celo Gold commitments.
+   * @notice Whitelists the hash of a hotfix transaction(s).
+   * @param hash The abi encoded keccak256 hash of the hotfix transaction(s) to be whitelisted.
+   */
+  function approveHotfix(bytes32 hash) external {
+    require(msg.sender == approver);
+    hotfixes[hash].approved = true;
+    emit HotfixApproved(hash);
+  }
+
+  /**
+   * @notice Whitelists the hash of a hotfix transaction(s).
+   * @param hash The abi encoded keccak256 hash of the hotfix transaction(s) to be whitelisted.
+   */
+  function whitelistHotfix(bytes32 hash) external {
+    hotfixes[hash].whitelisted[msg.sender] = true;
+    emit HotfixWhitelisted(hash, msg.sender);
+  }
+
+  /**
+   * @notice Gives hotfix a prepared epoch for execution.
+   * @param hash The hash of the hotfix to be prepared.
+   */
+  function prepareHotfix(bytes32 hash) external {
+    require(isHotfixPassing(hash), "hotfix not whitelisted by 2f+1 validators");
+    uint256 epoch = getEpochNumber();
+    require(hotfixes[hash].preparedEpoch < epoch, "hotfix already prepared for this epoch");
+    hotfixes[hash].preparedEpoch = epoch;
+    emit HotfixPrepared(hash, epoch);
+  }
+
+  /**
+   * @notice Executes a whitelisted proposal.
+   * @param values The values of Celo Gold to be sent in the proposed transactions.
+   * @param destinations The destination addresses of the proposed transactions.
+   * @param data The concatenated data to be included in the proposed transactions.
+   * @param dataLengths The lengths of each transaction's data.
+   * @dev Reverts if hotfix is already executed, not approved, or not prepared for current epoch.
+   */
+  function executeHotfix(
+    uint256[] calldata values,
+    address[] calldata destinations,
+    bytes calldata data,
+    uint256[] calldata dataLengths
+  )
+    external
+  {
+    bytes32 hash = keccak256(abi.encode(values, destinations, data, dataLengths));
+
+    (bool approved, bool executed, uint256 preparedEpoch) = getHotfixRecord(hash);
+    require(!executed, "hotfix already executed");
+    require(approved, "hotfix not approved");
+    require(preparedEpoch == getEpochNumber(), "hotfix must be prepared for this epoch");
+
+    Proposals.makeMem(
+      values,
+      destinations,
+      data,
+      dataLengths,
+      msg.sender,
+      0
+    ).executeMem();
+    
+    hotfixes[hash].executed = true;
+    emit HotfixExecuted(hash);
+  }
+
+  /**
+   * @notice Withdraws refunded Celo Gold deposits.
    * @return Whether or not the withdraw was successful.
    */
   function withdraw() external nonReentrant returns (bool) {
@@ -675,6 +773,30 @@ contract Governance is IGovernance, Ownable, Initializable, ReentrancyGuard, Usi
     refundedDeposits[msg.sender] = 0;
     msg.sender.transfer(value);
     return true;
+  }
+
+  /**
+   * @notice Returns the number of seconds proposals stay in approval stage.
+   * @return The number of seconds proposals stay in approval stage.
+   */
+  function getApprovalStageDuration() external view returns (uint256) {
+    return stageDurations.approval;
+  }
+
+  /**
+   * @notice Returns the number of seconds proposals stay in the referendum stage.
+   * @return The number of seconds proposals stay in the referendum stage.
+   */
+  function getReferendumStageDuration() external view returns (uint256) {
+    return stageDurations.referendum;
+  }
+
+  /**
+   * @notice Returns the number of seconds proposals stay in the execution stage.
+   * @return The number of seconds proposals stay in the execution stage.
+   */
+  function getExecutionStageDuration() external view returns (uint256) {
+    return stageDurations.execution;
   }
 
   /**
@@ -688,30 +810,6 @@ contract Governance is IGovernance, Ownable, Initializable, ReentrancyGuard, Usi
       participationParameters.baselineUpdateFactor.unwrap(),
       participationParameters.baselineQuorumFactor.unwrap()
     );
-  }
-
-  /**
-   * @notice Returns the number of seconds proposals stay in the approval stage.
-   * @return The number of seconds proposals stay in the execution stage.
-   */
-  function getApprovalStageDuration() external view returns (uint256) {
-    return stageDurations.approval;
-  }
-
-  /**
-   * @notice Returns the number of seconds proposals stay in the referendum stage.
-   * @return The number of seconds proposals stay in the execution stage.
-   */
-  function getReferendumStageDuration() external view returns (uint256) {
-    return stageDurations.referendum;
-  }
-
-  /**
-   * @notice Returns the number of seconds proposals stay in the execution stage.
-   * @return The number of seconds proposals stay in the execution stage.
-   */
-  function getExecutionStageDuration() external view returns (uint256) {
-    return stageDurations.execution;
   }
 
   /**
@@ -836,6 +934,45 @@ contract Governance is IGovernance, Ownable, Initializable, ReentrancyGuard, Usi
    */
   function getMostRecentReferendumProposal(address account) external view returns (uint256) {
     return voters[account].mostRecentReferendumProposal;
+  }
+
+  /**
+   * @notice Checks if a byzantine quorum of validators has whitelisted the given hotfix.
+   * @param hash The abi encoded keccak256 hash of the hotfix transaction.
+   * @return Whether validator whitelist tally >= validator byztanine quorum (2f+1)
+   */
+  function isHotfixPassing(bytes32 hash) public view returns (bool) {
+    uint256 tally = 0;
+    uint256 n = numberValidatorsInCurrentSet();
+    for (uint256 idx = 0; idx < n; idx++) {
+      address validator = validatorAddressFromCurrentSet(idx);
+      if (hotfixes[hash].whitelisted[validator]) {
+        tally = tally.add(1);
+      }
+    }
+
+    return tally >= byzantineQuorumValidatorsInCurrentSet();
+  }
+
+  /**
+   * @notice Computes byzantine quorum from current validator set size
+   * @return Byzantine quorum of validators.
+   */
+  function byzantineQuorumValidatorsInCurrentSet() public view returns (uint256) {
+    return numberValidatorsInCurrentSet().mul(2).div(3).add(1);
+  }
+
+  /**
+   * @notice Gets information about a hotfix.
+   * @param hash The abi encoded keccak256 hash of the hotfix transaction.
+   * @return Hotfix tuple of (approved, executed, preparedEpoch)
+   */
+  function getHotfixRecord(bytes32 hash) public view returns (bool, bool, uint256) {
+    return (
+      hotfixes[hash].approved,
+      hotfixes[hash].executed,
+      hotfixes[hash].preparedEpoch
+    );
   }
 
   /**

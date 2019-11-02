@@ -15,7 +15,9 @@ exports[`CircleButton renders correctly with minimum props 1`] = `
 >
   <View
     accessible={true}
+    focusable={true}
     isTVSelectable={true}
+    onClick={[Function]}
     onResponderGrant={[Function]}
     onResponderMove={[Function]}
     onResponderRelease={[Function]}
@@ -75,7 +77,9 @@ exports[`CircleButton when given optional props renders correctly 1`] = `
 >
   <View
     accessible={true}
+    focusable={true}
     isTVSelectable={true}
+    onClick={[Function]}
     onResponderGrant={[Function]}
     onResponderMove={[Function]}
     onResponderRelease={[Function]}
