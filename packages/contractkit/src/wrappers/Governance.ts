@@ -1,8 +1,15 @@
 import BigNumber from 'bignumber.js';
-import { keccak256 } from 'ethereumjs-util'
+import { keccak256 } from 'ethereumjs-util';
+import { identity } from 'fp-ts/lib/function';
+
+import { filterAsync, mapAsync, zip } from '@celo/utils/lib/collections';
+
 import { Address } from '../base';
 import { Governance } from '../generated/types/Governance';
-import { BaseWrapper, proxyCall, toBigNumber, toBuffer, toTransactionObject, CeloTransactionObject, proxySend, parseBuffer, tupleParser } from './BaseWrapper';
+import {
+    BaseWrapper, CeloTransactionObject, parseBuffer, parseNumber, proxyCall, proxySend, toBigNumber,
+    toBuffer, toTransactionObject, tupleParser
+} from './BaseWrapper';
 
 export interface StageDurations {
   approval: BigNumber // seconds
@@ -41,6 +48,11 @@ export interface ProposalMetadata {
 export interface Proposal {
   metadata: ProposalMetadata,
   transactions: Transaction[]
+}
+
+interface QueueProposal {
+  id: BigNumber,
+  upvotes: BigNumber
 }
 
 /**
@@ -126,9 +138,10 @@ export class GovernanceWrapper extends BaseWrapper<Governance> {
   async getProposal(proposalID: BigNumber): Promise<Proposal> {
     const metadata = await this.getProposalMetadata(proposalID)
     const txIndices = Array.from(Array(metadata.transactionCount).keys())
-    const transactions = await Promise.all(txIndices.map(
+    const transactions = await mapAsync(txIndices, 
       (txIndex) => this.getProposalTransaction(proposalID, txIndex)
-    ))
+    )
+
     return {
       metadata,
       transactions
@@ -168,7 +181,76 @@ export class GovernanceWrapper extends BaseWrapper<Governance> {
       { from: proposerAddress, value: deposit.toString() }
     )
   }
+
+  isQueued = proxyCall(
+    this.contract.methods.isQueued,
+    tupleParser(parseNumber),
+    identity
+  )
+
+  getUpvotes = proxyCall(
+    this.contract.methods.getUpvotes,
+    tupleParser(parseNumber),
+    toBigNumber
+  )
+
+  getQueue = proxyCall(
+    this.contract.methods.getQueue, 
+    undefined,
+    (arraysObject) => zip<string, string, QueueProposal>(
+      // tslint:disable-next-line: no-object-literal-type-assertion no-angle-bracket-type-assertion
+      (_id, _upvotes) => <QueueProposal>{
+        id: toBigNumber(_id), 
+        upvotes: toBigNumber(_upvotes)
+      }, arraysObject[0], arraysObject[1]
+    )
+  )
+
   
+  // TODO: merge with SortedOracles findLesserAndGreaterKeys
+  private async findLesserAndGreaterIDs(
+    proposalID: BigNumber,
+    upvoter: Address
+  ): Promise<{ lesserID: BigNumber, greaterID: BigNumber }> {
+    let lesserID = new BigNumber(-1)
+    let greaterID = new BigNumber(-1)
+
+    const proposalUpvotes = await this.getUpvotes(proposalID)
+    const lockedGoldContract = await this.kit.contracts.getLockedGold()
+    const weight = await lockedGoldContract.getAccountTotalLockedGold(upvoter)
+    const upvotesResult = proposalUpvotes.plus(weight)
+    
+    const queue = await this.getQueue()
+    const unexpiredQueue = await filterAsync(queue, (qp) => this.isQueued(qp.id))
+
+    // This leverages the fact that the currentRates are already sorted from
+    // greatest to lowest value
+    for (const queueProposal of unexpiredQueue) {
+      if (!queueProposal.id.eq(proposalID)) {
+        if (queueProposal.upvotes.isLessThanOrEqualTo(upvotesResult)) {
+          lesserID = queueProposal.id
+          break
+        }
+        greaterID = queueProposal.id
+      }
+    }
+
+    return { lesserID, greaterID }
+  }
+
+  async upvote(proposalID: BigNumber, upvoter: Address) {
+    const { lesserID, greaterID } = await this.findLesserAndGreaterIDs(proposalID, upvoter)
+    return toTransactionObject(
+      this.kit,
+      this.contract.methods.upvote(
+        proposalID.toString(),
+        lesserID.toString(),
+        greaterID.toString()
+      ),
+      { from: upvoter }
+    )
+  }
+
   whitelistHotfix: (hash: Buffer) => CeloTransactionObject<void> = proxySend(
     this.kit, 
     this.contract.methods.whitelistHotfix,
