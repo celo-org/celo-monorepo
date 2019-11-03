@@ -55,6 +55,8 @@ interface QueueProposal {
   upvotes: BigNumber
 }
 
+export enum VoteValue { Yes, No, Abstain };
+
 /**
  * Contract managing voting for governance proposals.
  */
@@ -248,6 +250,30 @@ export class GovernanceWrapper extends BaseWrapper<Governance> {
         greaterID.toString()
       ),
       { from: upvoter }
+    )
+  }
+
+  // TODO: replace with proxySend
+  approve(proposalID: BigNumber, proposalIndex: BigNumber) {
+    return toTransactionObject(
+      this.kit,
+      this.contract.methods.approve(proposalID.toString(), proposalIndex.toString())
+    )
+  }
+
+  // TODO: replace with proxySend
+  vote(proposalID: BigNumber, proposalIndex: BigNumber, vote: VoteValue) {
+    return toTransactionObject(
+      this.kit,
+      this.contract.methods.vote(proposalID.toString(), proposalIndex.toString(), vote)
+    )
+  }
+
+  // TODO: replace with proxySend
+  execute(proposalID: BigNumber, proposalIndex: BigNumber) {
+    return toTransactionObject(
+      this.kit,
+      this.contract.methods.execute(proposalID.toString(), proposalIndex.toString())
     )
   }
 
