@@ -114,6 +114,7 @@ export class GovernanceWrapper extends BaseWrapper<Governance> {
     }
   }
 
+  // TODO: replace with proxyCall
   async getProposalMetadata(proposalID: BigNumber): Promise<ProposalMetadata> {
     const res = await this.contract.methods.getProposal(proposalID.toString()).call()
     return {
@@ -124,6 +125,7 @@ export class GovernanceWrapper extends BaseWrapper<Governance> {
     }
   }
 
+  // TODO: replace with proxyCall
   async getProposalTransaction(proposalID: BigNumber, txIndex: number): Promise<Transaction> {
     const res = await this.contract.methods.getProposalTransaction(
       proposalID.toString(), 
@@ -150,7 +152,7 @@ export class GovernanceWrapper extends BaseWrapper<Governance> {
     }
   }
 
-  getTransactionsEncoded(transactions: Transaction[]): TransactionsEncoded {
+  private getTransactionsEncoded(transactions: Transaction[]): TransactionsEncoded {
     return {
       values: transactions.map((tx) => tx.value.toString()),
       destinations: transactions.map((tx) => tx.destination),
@@ -169,6 +171,7 @@ export class GovernanceWrapper extends BaseWrapper<Governance> {
     ) as Buffer
   }
 
+  // TODO: replace with proxySend
   propose(transactions: Transaction[], proposerAddress: Address, deposit: BigNumber) {
     const encoded = this.getTransactionsEncoded(transactions)
     return toTransactionObject(
@@ -240,6 +243,7 @@ export class GovernanceWrapper extends BaseWrapper<Governance> {
     return { lesserID, greaterID }
   }
 
+  // TODO: replace with proxySend
   async upvote(proposalID: BigNumber, upvoter: Address) {
     const { lesserID, greaterID } = await this.findLesserAndGreaterIDs(proposalID, upvoter)
     return toTransactionObject(
@@ -295,6 +299,7 @@ export class GovernanceWrapper extends BaseWrapper<Governance> {
     tupleParser(parseBuffer)
   )
   
+  // TODO: replace with proxySend
   executeHotfix(transactions: Transaction[]) {
     const encoded = this.getTransactionsEncoded(transactions)
     return toTransactionObject(
