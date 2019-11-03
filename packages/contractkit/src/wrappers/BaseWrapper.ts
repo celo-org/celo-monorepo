@@ -35,6 +35,10 @@ export function toBuffer(input: string) {
   return Buffer.from(trimLeading0x(input), 'hex')
 }
 
+export function parseBuffer(buf: Buffer) {
+  return '0x' + buf.toString('hex')
+}
+
 /** Parse string -> int */
 export function toNumber(input: string) {
   return parseInt(input, 10)

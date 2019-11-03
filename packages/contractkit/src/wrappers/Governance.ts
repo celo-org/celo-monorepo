@@ -2,7 +2,7 @@ import BigNumber from 'bignumber.js';
 import { keccak256 } from 'ethereumjs-util'
 import { Address } from '../base';
 import { Governance } from '../generated/types/Governance';
-import { BaseWrapper, proxyCall, toBigNumber, toBuffer, toTransactionObject } from './BaseWrapper';
+import { BaseWrapper, proxyCall, toBigNumber, toBuffer, toTransactionObject, CeloTransactionObject, proxySend, parseBuffer, tupleParser } from './BaseWrapper';
 
 export interface StageDurations {
   approval: BigNumber // seconds
@@ -166,6 +166,38 @@ export class GovernanceWrapper extends BaseWrapper<Governance> {
         encoded.dataLengths
       ),
       { from: proposerAddress, value: deposit.toString() }
+    )
+  }
+  
+  whitelistHotfix: (hash: Buffer) => CeloTransactionObject<void> = proxySend(
+    this.kit, 
+    this.contract.methods.whitelistHotfix,
+    tupleParser(parseBuffer)
+  )
+
+  approveHotfix: (hash: Buffer) => CeloTransactionObject<void> = proxySend(
+    this.kit, 
+    this.contract.methods.approveHotfix,
+    tupleParser(parseBuffer)
+  )
+
+  prepareHotfix: (hash: Buffer) => CeloTransactionObject<void> = proxySend(
+    this.kit, 
+    this.contract.methods.prepareHotfix,
+    tupleParser(parseBuffer)
+  )
+  
+  executeHotfix(transactions: Transaction[]) {
+    const encoded = this.getTransactionsEncoded(transactions)
+    return toTransactionObject(
+      this.kit,
+      this.contract.methods.executeHotfix(
+        encoded.values,
+        encoded.destinations,
+        // @ts-ignore bytes type
+        encoded.data,
+        encoded.dataLengths
+      )
     )
   }
 }
