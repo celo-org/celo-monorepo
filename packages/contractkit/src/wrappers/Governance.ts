@@ -1,6 +1,8 @@
-import BigNumber from 'bignumber.js'
-import { Governance } from '../generated/types/Governance'
-import { BaseWrapper, proxyCall, toBigNumber } from './BaseWrapper'
+import BigNumber from 'bignumber.js';
+import { keccak256 } from 'ethereumjs-util'
+import { Address } from '../base';
+import { Governance } from '../generated/types/Governance';
+import { BaseWrapper, proxyCall, toBigNumber, toBuffer } from './BaseWrapper';
 
 export interface StageDurations {
   approval: BigNumber // seconds
@@ -14,6 +16,31 @@ export interface GovernanceConfig {
   minDeposit: BigNumber
   queueExpiry: BigNumber // seconds
   stageDurations: StageDurations
+}
+
+export interface Transaction {
+  value: BigNumber
+  destination: Address
+  data: Buffer
+}
+
+interface TransactionsEncoded {
+  values: string[],
+  destinations:  string[],
+  data: Buffer,
+  dataLengths: number[]
+}
+
+export interface ProposalMetadata {
+    proposer: Address
+    deposit: BigNumber
+    timestamp: BigNumber
+    transactionCount: number
+}
+
+export interface Proposal {
+  metadata: ProposalMetadata,
+  transactions: Transaction[]
 }
 
 /**
@@ -71,5 +98,59 @@ export class GovernanceWrapper extends BaseWrapper<Governance> {
       queueExpiry: res[3],
       stageDurations: res[4],
     }
+  }
+
+  async getProposalMetadata(proposalID: BigNumber): Promise<ProposalMetadata> {
+    const res = await this.contract.methods.getProposal(proposalID.toString()).call()
+    return {
+      proposer: res[0],
+      deposit: toBigNumber(res[1]),
+      timestamp: toBigNumber(res[2]),
+      transactionCount: toBigNumber(res[3]).toNumber()
+    }
+  }
+
+  async getProposalTransaction(proposalID: BigNumber, txIndex: number): Promise<Transaction> {
+    const res = await this.contract.methods.getProposalTransaction(
+      proposalID.toString(), 
+      txIndex.toString()
+    ).call()
+    return {
+      value: toBigNumber(res[0]),
+      destination: res[1],
+      // @ts-ignore string[] bytes type
+      data: toBuffer(res[2])
+    }
+  }
+
+  async getProposal(proposalID: BigNumber): Promise<Proposal> {
+    const metadata = await this.getProposalMetadata(proposalID)
+    const txIndices = Array.from(Array(metadata.transactionCount).keys())
+    const transactions = await Promise.all(txIndices.map(
+      (txIndex) => this.getProposalTransaction(proposalID, txIndex)
+    ))
+    return {
+      metadata,
+      transactions
+    }
+  }
+
+  getTransactionsEncoded(transactions: Transaction[]): TransactionsEncoded {
+    return {
+      values: transactions.map((tx) => tx.value.toString()),
+      destinations: transactions.map((tx) => tx.destination),
+      data: Buffer.concat(transactions.map((tx) => tx.data)),
+      dataLengths: transactions.map((tx) => tx.data.length)
+    }
+  }
+
+  getTransactionsHash(transactions: Transaction[]): Buffer {
+    const encoded = this.getTransactionsEncoded(transactions)
+    return keccak256(
+      this.kit.web3.eth.abi.encodeParameters(
+        ['uint256[]', 'address[]', 'bytes', 'uint256[]'], 
+        [encoded.values, encoded.destinations, encoded.data, encoded.dataLengths]
+      )
+    ) as Buffer
   }
 }
