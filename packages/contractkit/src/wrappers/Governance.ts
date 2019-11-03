@@ -2,7 +2,7 @@ import BigNumber from 'bignumber.js';
 import { keccak256 } from 'ethereumjs-util'
 import { Address } from '../base';
 import { Governance } from '../generated/types/Governance';
-import { BaseWrapper, proxyCall, toBigNumber, toBuffer } from './BaseWrapper';
+import { BaseWrapper, proxyCall, toBigNumber, toBuffer, toTransactionObject } from './BaseWrapper';
 
 export interface StageDurations {
   approval: BigNumber // seconds
@@ -152,5 +152,20 @@ export class GovernanceWrapper extends BaseWrapper<Governance> {
         [encoded.values, encoded.destinations, encoded.data, encoded.dataLengths]
       )
     ) as Buffer
+  }
+
+  propose(transactions: Transaction[], proposerAddress: Address, deposit: BigNumber) {
+    const encoded = this.getTransactionsEncoded(transactions)
+    return toTransactionObject(
+      this.kit,
+      this.contract.methods.propose(
+        encoded.values,
+        encoded.destinations,
+        // @ts-ignore bytes type
+        encoded.data,
+        encoded.dataLengths
+      ),
+      { from: proposerAddress, value: deposit.toString() }
+    )
   }
 }
