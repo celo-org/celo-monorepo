@@ -27,6 +27,14 @@ export function toBigNumber(input: string) {
   return new BigNumber(input)
 }
 
+function trimLeading0x(input: string) {
+  return input.startsWith("0x") ? input.slice(2) : input
+}
+
+export function toBuffer(input: string) {
+  return Buffer.from(trimLeading0x(input), 'hex')
+}
+
 /** Parse string -> int */
 export function toNumber(input: string) {
   return parseInt(input, 10)
