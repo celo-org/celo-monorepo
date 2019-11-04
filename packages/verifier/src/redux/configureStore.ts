@@ -6,7 +6,7 @@ import rootReducer from 'src/redux/reducers'
 
 const persistConfig = {
   key: 'root',
-  AsyncStorage,
+  storage: AsyncStorage,
   stateReconciler: autoMergeLevel2,
 }
 

@@ -5,7 +5,6 @@ import android.content.Context;
 import com.facebook.react.PackageList;
 import org.celo.verifier.BuildConfig;
 import com.facebook.react.ReactApplication;
-import com.reactnativecommunity.asyncstorage.AsyncStoragePackage;
 import com.facebook.react.ReactNativeHost;
 import com.facebook.react.ReactPackage;
 // import com.facebook.react.shell.MainReactPackage;
@@ -39,7 +38,6 @@ public class MainApplication extends Application implements ReactApplication {
       packages.add(new RNFirebaseMessagingPackage());
       packages.add(new RNFirebaseNotificationsPackage());
       packages.add(new RNVerifierServicePackage());
-      packages.add(new AsyncStoragePackage());
       return packages;
     }
 
