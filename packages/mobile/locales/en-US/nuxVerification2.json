@@ -65,6 +65,17 @@
     "start": "Start Verification",
     "skip": "Skip For Now"
   },
+  "learnMore": {
+    "header": "Phone Number Verification",
+    "intro":
+      "Celo Phone number verification works by associating your Celo Wallet with your phone number.",
+    "section1Header": "Do I need to complete this?",
+    "section1Body":
+      "Verification is not required. However, if you do not verify, others on the Celo network cannot send value to you using your phone number. They must use QR codes or addresses.",
+    "section2Header": "Security and Privacy",
+    "section2Body":
+      "To protect your privacy, only an obfuscated version of your phone number is stored on the Celo blockchain."
+  },
   "loading": {
     "verifyingNumber": "Verifying {{number}}",
     "keepOpen": "Please keep the app open",
