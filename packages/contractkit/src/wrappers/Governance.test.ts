@@ -5,14 +5,8 @@ import { newKitFromWeb3 } from '../kit';
 import { testWithGanache } from '../test-utils/ganache-test';
 import migrationConfig from '../test-utils/migration-override.json';
 import { toBigNumber } from './BaseWrapper';
-import { GovernanceWrapper, Transaction } from './Governance';
+import { GovernanceWrapper, Transaction, VoteValue } from './Governance';
 
-  /*
-  TEST NOTES:
-  - In migrations: The only account that has cUSD is accounts[0]
-  */
-
-  
 const expConfig = migrationConfig.governance
 
 testWithGanache('Governance Wrapper', (web3) => {
@@ -59,6 +53,7 @@ testWithGanache('Governance Wrapper', (web3) => {
       
   describe('Proposals', () => {
     let proposalID = new BigNumber(0)
+    let proposalIndex = new BigNumber(0)
     
     it('#propose', async () => {
       const tx = governance.propose(transactions, accounts[0], toBigNumber(ONE_USD))
@@ -80,34 +75,35 @@ testWithGanache('Governance Wrapper', (web3) => {
     })
 
     it('#approve', async () => {
-
+      const tx = governance.approve(proposalID, proposalIndex)
     })
 
     it('#vote', async () => {
-
+      const tx = governance.vote(proposalID, proposalIndex, VoteValue.Yes)
     })
     
     it('#execute', async () => {
-
+      const tx = governance.execute(proposalID, proposalIndex)
     })
   })
   
   describe('Hotfixes', () => {
+    const hash = governance.getTransactionsHash(transactions)
 
     it('#whitelistHotfix', async () => {
-
+      const tx = governance.whitelistHotfix(hash)
     })
 
     it('#approveHotfix', async () => {
-      
+      const tx = governance.approveHotfix(hash)
     })
 
     it('#prepareHotfix', async () => {
-      
+      const tx = governance.prepareHotfix(hash)
     })
 
     it('#executeHotfix', async () => {
-      
+      const tx = governance.executeHotfix(transactions)
     })
   })
 })
