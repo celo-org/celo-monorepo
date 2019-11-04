@@ -53,13 +53,12 @@ contract LockedGold is ILockedGold, ReentrancyGuard, Initializable, UsingRegistr
 
   mapping(address => Account) private accounts;
   // Maps voting and validating keys to the account that provided the authorization.
-  mapping(address => address) public authorizedBy;
+  // Authorized addresses may not be reused.
+  mapping(address => address) private authorizedBy;
   uint256 public totalNonvoting;
   uint256 public unlockingPeriod;
 
   event UnlockingPeriodSet(uint256 period);
-  event VoterAuthorized(address indexed account, address voter);
-  event ValidatorAuthorized(address indexed account, address validator);
   event GoldLocked(address indexed account, uint256 value);
   event GoldUnlocked(address indexed account, uint256 value, uint256 available);
   event GoldWithdrawn(address indexed account, uint256 value);
@@ -68,63 +67,6 @@ contract LockedGold is ILockedGold, ReentrancyGuard, Initializable, UsingRegistr
     _transferOwnership(msg.sender);
     setRegistry(registryAddress);
     unlockingPeriod = _unlockingPeriod;
-  }
-
-  /**
-   * @notice Creates an account.
-   * @return True if account creation succeeded.
-   */
-  function createAccount() external returns (bool) {
-    require(isNotAccount(msg.sender) && isNotAuthorized(msg.sender));
-    Account storage account = accounts[msg.sender];
-    account.exists = true;
-    return true;
-  }
-
-  /**
-   * @notice Authorizes an address to vote on behalf of the account.
-   * @param voter The address to authorize.
-   * @param v The recovery id of the incoming ECDSA signature.
-   * @param r Output value r of the ECDSA signature.
-   * @param s Output value s of the ECDSA signature.
-   * @dev v, r, s constitute `voter`'s signature on `msg.sender`.
-   */
-  function authorizeVoter(
-    address voter,
-    uint8 v,
-    bytes32 r,
-    bytes32 s
-  )
-    external
-    nonReentrant
-  {
-    Account storage account = accounts[msg.sender];
-    authorize(voter, account.authorizations.voting, v, r, s);
-    account.authorizations.voting = voter;
-    emit VoterAuthorized(msg.sender, voter);
-  }
-
-  /**
-   * @notice Authorizes an address to validate on behalf of the account.
-   * @param validator The address to authorize.
-   * @param v The recovery id of the incoming ECDSA signature.
-   * @param r Output value r of the ECDSA signature.
-   * @param s Output value s of the ECDSA signature.
-   * @dev v, r, s constitute `validator`'s signature on `msg.sender`.
-   */
-  function authorizeValidator(
-    address validator,
-    uint8 v,
-    bytes32 r,
-    bytes32 s
-  )
-    external
-    nonReentrant
-  {
-    Account storage account = accounts[msg.sender];
-    authorize(validator, account.authorizations.validating, v, r, s);
-    account.authorizations.validating = validator;
-    emit ValidatorAuthorized(msg.sender, validator);
   }
 
   /**
@@ -141,7 +83,7 @@ contract LockedGold is ILockedGold, ReentrancyGuard, Initializable, UsingRegistr
    * @notice Locks gold to be used for voting.
    */
   function lock() external payable nonReentrant {
-    require(isAccount(msg.sender), "not account");
+    require(getAccounts().isAccount(msg.sender), "not account");
     require(msg.value > 0, "no value");
     _incrementNonvotingAccountBalance(msg.sender, msg.value);
     emit GoldLocked(msg.sender, msg.value);
@@ -204,9 +146,12 @@ contract LockedGold is ILockedGold, ReentrancyGuard, Initializable, UsingRegistr
    * @param value The amount of gold to unlock.
    */
   function unlock(uint256 value) external nonReentrant {
-    require(isAccount(msg.sender));
+    require(getAccounts().isAccount(msg.sender));
     Account storage account = accounts[msg.sender];
-    uint256 balanceRequirement = getValidators().getAccountBalanceRequirement(msg.sender);
+    // Prevent unlocking gold when voting on governance proposals so that the gold cannot be
+    // used to vote more than once.
+    require(!getGovernance().isVoting(msg.sender));
+    uint256 balanceRequirement = getValidators().getAccountLockedGoldRequirement(msg.sender);
     require(
       balanceRequirement == 0 ||
       balanceRequirement <= getAccountTotalLockedGold(msg.sender).sub(value)
@@ -223,7 +168,7 @@ contract LockedGold is ILockedGold, ReentrancyGuard, Initializable, UsingRegistr
    * @param index The index of the pending withdrawal to relock.
    */
   function relock(uint256 index) external nonReentrant {
-    require(isAccount(msg.sender));
+    require(getAccounts().isAccount(msg.sender));
     Account storage account = accounts[msg.sender];
     require(index < account.balances.pendingWithdrawals.length);
     uint256 value = account.balances.pendingWithdrawals[index].value;
@@ -237,7 +182,7 @@ contract LockedGold is ILockedGold, ReentrancyGuard, Initializable, UsingRegistr
    * @param index The index of the pending withdrawal to withdraw.
    */
   function withdraw(uint256 index) external nonReentrant {
-    require(isAccount(msg.sender));
+    require(getAccounts().isAccount(msg.sender));
     Account storage account = accounts[msg.sender];
     require(index < account.balances.pendingWithdrawals.length);
     PendingWithdrawal storage pendingWithdrawal = account.balances.pendingWithdrawals[index];
@@ -246,24 +191,6 @@ contract LockedGold is ILockedGold, ReentrancyGuard, Initializable, UsingRegistr
     deletePendingWithdrawal(account.balances.pendingWithdrawals, index);
     require(getGoldToken().transfer(msg.sender, value));
     emit GoldWithdrawn(msg.sender, value);
-  }
-
-  // TODO(asa): Dedup
-  /**
-   * @notice Returns the account associated with `accountOrVoter`.
-   * @param accountOrVoter The address of the account or authorized voter.
-   * @dev Fails if the `accountOrVoter` is not an account or authorized voter.
-   * @return The associated account.
-   */
-  function getAccountFromVoter(address accountOrVoter) external view returns (address) {
-    address authorizingAccount = authorizedBy[accountOrVoter];
-    if (authorizingAccount != address(0)) {
-      require(accounts[authorizingAccount].authorizations.voting == accountOrVoter);
-      return authorizingAccount;
-    } else {
-      require(isAccount(accountOrVoter));
-      return accountOrVoter;
-    }
   }
 
   /**
@@ -303,45 +230,6 @@ contract LockedGold is ILockedGold, ReentrancyGuard, Initializable, UsingRegistr
   }
 
   /**
-   * @notice Returns the account associated with `accountOrValidator`.
-   * @param accountOrValidator The address of the account or authorized validator.
-   * @dev Fails if the `accountOrValidator` is not an account or authorized validator.
-   * @return The associated account.
-   */
-  function getAccountFromValidator(address accountOrValidator) public view returns (address) {
-    address authorizingAccount = authorizedBy[accountOrValidator];
-    if (authorizingAccount != address(0)) {
-      require(accounts[authorizingAccount].authorizations.validating == accountOrValidator);
-      return authorizingAccount;
-    } else {
-      require(isAccount(accountOrValidator));
-      return accountOrValidator;
-    }
-  }
-
-  /**
-   * @notice Returns the voter for the specified account.
-   * @param account The address of the account.
-   * @return The address with which the account can vote.
-   */
-  function getVoterFromAccount(address account) public view returns (address) {
-    require(isAccount(account));
-    address voter = accounts[account].authorizations.voting;
-    return voter == address(0) ? account : voter;
-  }
-
-  /**
-   * @notice Returns the validator for the specified account.
-   * @param account The address of the account.
-   * @return The address with which the account can register a validator or group.
-   */
-  function getValidatorFromAccount(address account) public view returns (address) {
-    require(isAccount(account));
-    address validator = accounts[account].authorizations.validating;
-    return validator == address(0) ? account : validator;
-  }
-
-  /**
    * @notice Returns the pending withdrawals from unlocked gold for an account.
    * @param account The address of the account.
    * @return The value and timestamp for each pending withdrawal.
@@ -353,7 +241,7 @@ contract LockedGold is ILockedGold, ReentrancyGuard, Initializable, UsingRegistr
     view
     returns (uint256[] memory, uint256[] memory)
   {
-    require(isAccount(account));
+    require(getAccounts().isAccount(account));
     uint256 length = accounts[account].balances.pendingWithdrawals.length;
     uint256[] memory values = new uint256[](length);
     uint256[] memory timestamps = new uint256[](length);
@@ -365,70 +253,6 @@ contract LockedGold is ILockedGold, ReentrancyGuard, Initializable, UsingRegistr
       timestamps[i] = pendingWithdrawal.timestamp;
     }
     return (values, timestamps);
-  }
-
-  /**
-   * @notice Authorizes voting or validating power of `msg.sender`'s account to another address.
-   * @param current The address to authorize.
-   * @param previous The previous authorized address.
-   * @param v The recovery id of the incoming ECDSA signature.
-   * @param r Output value r of the ECDSA signature.
-   * @param s Output value s of the ECDSA signature.
-   * @dev Fails if the address is already authorized or is an account.
-   * @dev v, r, s constitute `current`'s signature on `msg.sender`.
-   */
-  function authorize(
-    address current,
-    address previous,
-    uint8 v,
-    bytes32 r,
-    bytes32 s
-  )
-    private
-  {
-    require(isAccount(msg.sender) && isNotAccount(current) && isNotAuthorized(current));
-
-    address signer = Signatures.getSignerOfAddress(msg.sender, v, r, s);
-    require(signer == current);
-
-    authorizedBy[previous] = address(0);
-    authorizedBy[current] = msg.sender;
-  }
-
-  /**
-   * @notice Check if an account already exists.
-   * @param account The address of the account
-   * @return Returns `true` if account exists. Returns `false` otherwise.
-   */
-  function isAccount(address account) public view returns (bool) {
-    return (accounts[account].exists);
-  }
-
-  /**
-   * @notice Check if an account already exists.
-   * @param account The address of the account
-   * @return Returns `false` if account exists. Returns `true` otherwise.
-   */
-  function isNotAccount(address account) internal view returns (bool) {
-    return (!accounts[account].exists);
-  }
-
-  /**
-   * @notice Check if an address has been authorized by an account for voting or validating.
-   * @param account The possibly authorized address.
-   * @return Returns `true` if authorized. Returns `false` otherwise.
-   */
-  function isAuthorized(address account) external view returns (bool) {
-    return (authorizedBy[account] != address(0));
-  }
-
-  /**
-   * @notice Check if an address has been authorized by an account for voting or validating.
-   * @param account The possibly authorized address.
-   * @return Returns `false` if authorized. Returns `true` otherwise.
-   */
-  function isNotAuthorized(address account) internal view returns (bool) {
-    return (authorizedBy[account] == address(0));
   }
 
   /**

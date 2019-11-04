@@ -3,6 +3,7 @@
 exports[`transfer feed item renders correctly for <0.000001 network fee 1`] = `
 <View
   accessible={true}
+  focusable={true}
   isTVSelectable={true}
   nativeBackgroundAndroid={
     Object {
@@ -10,6 +11,7 @@ exports[`transfer feed item renders correctly for <0.000001 network fee 1`] = `
       "type": "ThemeAttrAndroid",
     }
   }
+  onClick={[Function]}
   onResponderGrant={[Function]}
   onResponderMove={[Function]}
   onResponderRelease={[Function]}
@@ -38,7 +40,7 @@ exports[`transfer feed item renders correctly for <0.000001 network fee 1`] = `
       <Image
         source={
           Object {
-            "testUri": "../../../src/images/coins-logo.png",
+            "testUri": "../../../packages/mobile/src/images/coins-logo.png",
           }
         }
         style={
@@ -95,7 +97,9 @@ exports[`transfer feed item renders correctly for <0.000001 network fee 1`] = `
           }
         >
           
+          $
           &lt;0.001
+          MXN
         </Text>
       </View>
       <Text
@@ -123,29 +127,7 @@ exports[`transfer feed item renders correctly for <0.000001 network fee 1`] = `
             },
           ]
         }
-      >
-        <Text
-          style={
-            Array [
-              Object {
-                "color": "#2E3338",
-                "fontFamily": "Hind-Regular",
-                "fontSize": 14,
-                "lineHeight": 18,
-              },
-              Object {
-                "color": "#BDBDBD",
-                "fontSize": 14,
-                "lineHeight": 18,
-                "marginLeft": "auto",
-                "paddingLeft": 10,
-              },
-            ]
-          }
-        >
-          localCurrencyValue
-        </Text>
-      </View>
+      />
     </View>
   </View>
 </View>
@@ -154,6 +136,7 @@ exports[`transfer feed item renders correctly for <0.000001 network fee 1`] = `
 exports[`transfer feed item renders correctly for faucet 1`] = `
 <View
   accessible={true}
+  focusable={true}
   isTVSelectable={true}
   nativeBackgroundAndroid={
     Object {
@@ -161,6 +144,7 @@ exports[`transfer feed item renders correctly for faucet 1`] = `
       "type": "ThemeAttrAndroid",
     }
   }
+  onClick={[Function]}
   onResponderGrant={[Function]}
   onResponderMove={[Function]}
   onResponderRelease={[Function]}
@@ -189,7 +173,7 @@ exports[`transfer feed item renders correctly for faucet 1`] = `
       <Image
         source={
           Object {
-            "testUri": "../../../src/images/coins-logo.png",
+            "testUri": "../../../packages/mobile/src/images/coins-logo.png",
           }
         }
         style={
@@ -246,7 +230,9 @@ exports[`transfer feed item renders correctly for faucet 1`] = `
           }
         >
           
-          100.00
+          $
+          133.00
+          MXN
         </Text>
       </View>
       <Text
@@ -274,29 +260,7 @@ exports[`transfer feed item renders correctly for faucet 1`] = `
             },
           ]
         }
-      >
-        <Text
-          style={
-            Array [
-              Object {
-                "color": "#2E3338",
-                "fontFamily": "Hind-Regular",
-                "fontSize": 14,
-                "lineHeight": 18,
-              },
-              Object {
-                "color": "#BDBDBD",
-                "fontSize": 14,
-                "lineHeight": 18,
-                "marginLeft": "auto",
-                "paddingLeft": 10,
-              },
-            ]
-          }
-        >
-          localCurrencyValue
-        </Text>
-      </View>
+      />
     </View>
   </View>
 </View>
@@ -305,6 +269,7 @@ exports[`transfer feed item renders correctly for faucet 1`] = `
 exports[`transfer feed item renders correctly for known received 1`] = `
 <View
   accessible={true}
+  focusable={true}
   isTVSelectable={true}
   nativeBackgroundAndroid={
     Object {
@@ -312,6 +277,7 @@ exports[`transfer feed item renders correctly for known received 1`] = `
       "type": "ThemeAttrAndroid",
     }
   }
+  onClick={[Function]}
   onResponderGrant={[Function]}
   onResponderMove={[Function]}
   onResponderRelease={[Function]}
@@ -368,7 +334,7 @@ exports[`transfer feed item renders correctly for known received 1`] = `
           <Image
             source={
               Object {
-                "testUri": "../../../src/images/unknown-user-icon.png",
+                "testUri": "../../../packages/mobile/src/images/unknown-user-icon.png",
               }
             }
             style={
@@ -427,7 +393,9 @@ exports[`transfer feed item renders correctly for known received 1`] = `
           }
         >
           
-          100.00
+          $
+          133.00
+          MXN
         </Text>
       </View>
       <View
@@ -441,29 +409,7 @@ exports[`transfer feed item renders correctly for known received 1`] = `
             false,
           ]
         }
-      >
-        <Text
-          style={
-            Array [
-              Object {
-                "color": "#2E3338",
-                "fontFamily": "Hind-Regular",
-                "fontSize": 14,
-                "lineHeight": 18,
-              },
-              Object {
-                "color": "#BDBDBD",
-                "fontSize": 14,
-                "lineHeight": 18,
-                "marginLeft": "auto",
-                "paddingLeft": 10,
-              },
-            ]
-          }
-        >
-          localCurrencyValue
-        </Text>
-      </View>
+      />
     </View>
   </View>
 </View>
@@ -472,6 +418,7 @@ exports[`transfer feed item renders correctly for known received 1`] = `
 exports[`transfer feed item renders correctly for known sent 1`] = `
 <View
   accessible={true}
+  focusable={true}
   isTVSelectable={true}
   nativeBackgroundAndroid={
     Object {
@@ -479,6 +426,7 @@ exports[`transfer feed item renders correctly for known sent 1`] = `
       "type": "ThemeAttrAndroid",
     }
   }
+  onClick={[Function]}
   onResponderGrant={[Function]}
   onResponderMove={[Function]}
   onResponderRelease={[Function]}
@@ -535,7 +483,7 @@ exports[`transfer feed item renders correctly for known sent 1`] = `
           <Image
             source={
               Object {
-                "testUri": "../../../src/images/unknown-user-icon.png",
+                "testUri": "../../../packages/mobile/src/images/unknown-user-icon.png",
               }
             }
             style={
@@ -594,7 +542,9 @@ exports[`transfer feed item renders correctly for known sent 1`] = `
           }
         >
           -
-          100.00
+          $
+          133.00
+          MXN
         </Text>
       </View>
       <View
@@ -608,29 +558,7 @@ exports[`transfer feed item renders correctly for known sent 1`] = `
             false,
           ]
         }
-      >
-        <Text
-          style={
-            Array [
-              Object {
-                "color": "#2E3338",
-                "fontFamily": "Hind-Regular",
-                "fontSize": 14,
-                "lineHeight": 18,
-              },
-              Object {
-                "color": "#BDBDBD",
-                "fontSize": 14,
-                "lineHeight": 18,
-                "marginLeft": "auto",
-                "paddingLeft": 10,
-              },
-            ]
-          }
-        >
-          localCurrencyValue
-        </Text>
-      </View>
+      />
     </View>
   </View>
 </View>
@@ -639,6 +567,7 @@ exports[`transfer feed item renders correctly for known sent 1`] = `
 exports[`transfer feed item renders correctly for network fee 1`] = `
 <View
   accessible={true}
+  focusable={true}
   isTVSelectable={true}
   nativeBackgroundAndroid={
     Object {
@@ -646,6 +575,7 @@ exports[`transfer feed item renders correctly for network fee 1`] = `
       "type": "ThemeAttrAndroid",
     }
   }
+  onClick={[Function]}
   onResponderGrant={[Function]}
   onResponderMove={[Function]}
   onResponderRelease={[Function]}
@@ -674,7 +604,7 @@ exports[`transfer feed item renders correctly for network fee 1`] = `
       <Image
         source={
           Object {
-            "testUri": "../../../src/images/coins-logo.png",
+            "testUri": "../../../packages/mobile/src/images/coins-logo.png",
           }
         }
         style={
@@ -731,7 +661,9 @@ exports[`transfer feed item renders correctly for network fee 1`] = `
           }
         >
           
+          $
           0.002
+          MXN
         </Text>
       </View>
       <Text
@@ -759,29 +691,7 @@ exports[`transfer feed item renders correctly for network fee 1`] = `
             },
           ]
         }
-      >
-        <Text
-          style={
-            Array [
-              Object {
-                "color": "#2E3338",
-                "fontFamily": "Hind-Regular",
-                "fontSize": 14,
-                "lineHeight": 18,
-              },
-              Object {
-                "color": "#BDBDBD",
-                "fontSize": 14,
-                "lineHeight": 18,
-                "marginLeft": "auto",
-                "paddingLeft": 10,
-              },
-            ]
-          }
-        >
-          localCurrencyValue
-        </Text>
-      </View>
+      />
     </View>
   </View>
 </View>
@@ -790,6 +700,7 @@ exports[`transfer feed item renders correctly for network fee 1`] = `
 exports[`transfer feed item renders correctly for received 1`] = `
 <View
   accessible={true}
+  focusable={true}
   isTVSelectable={true}
   nativeBackgroundAndroid={
     Object {
@@ -797,6 +708,7 @@ exports[`transfer feed item renders correctly for received 1`] = `
       "type": "ThemeAttrAndroid",
     }
   }
+  onClick={[Function]}
   onResponderGrant={[Function]}
   onResponderMove={[Function]}
   onResponderRelease={[Function]}
@@ -853,7 +765,7 @@ exports[`transfer feed item renders correctly for received 1`] = `
           <Image
             source={
               Object {
-                "testUri": "../../../src/images/unknown-user-icon.png",
+                "testUri": "../../../packages/mobile/src/images/unknown-user-icon.png",
               }
             }
             style={
@@ -912,7 +824,9 @@ exports[`transfer feed item renders correctly for received 1`] = `
           }
         >
           
-          100.00
+          $
+          133.00
+          MXN
         </Text>
       </View>
       <View
@@ -926,29 +840,7 @@ exports[`transfer feed item renders correctly for received 1`] = `
             false,
           ]
         }
-      >
-        <Text
-          style={
-            Array [
-              Object {
-                "color": "#2E3338",
-                "fontFamily": "Hind-Regular",
-                "fontSize": 14,
-                "lineHeight": 18,
-              },
-              Object {
-                "color": "#BDBDBD",
-                "fontSize": 14,
-                "lineHeight": 18,
-                "marginLeft": "auto",
-                "paddingLeft": 10,
-              },
-            ]
-          }
-        >
-          localCurrencyValue
-        </Text>
-      </View>
+      />
     </View>
   </View>
 </View>
@@ -957,6 +849,7 @@ exports[`transfer feed item renders correctly for received 1`] = `
 exports[`transfer feed item renders correctly for received invite 1`] = `
 <View
   accessible={true}
+  focusable={true}
   isTVSelectable={true}
   nativeBackgroundAndroid={
     Object {
@@ -964,6 +857,7 @@ exports[`transfer feed item renders correctly for received invite 1`] = `
       "type": "ThemeAttrAndroid",
     }
   }
+  onClick={[Function]}
   onResponderGrant={[Function]}
   onResponderMove={[Function]}
   onResponderRelease={[Function]}
@@ -992,7 +886,7 @@ exports[`transfer feed item renders correctly for received invite 1`] = `
       <Image
         source={
           Object {
-            "testUri": "../../../src/images/coins-logo.png",
+            "testUri": "../../../packages/mobile/src/images/coins-logo.png",
           }
         }
         style={
@@ -1049,7 +943,9 @@ exports[`transfer feed item renders correctly for received invite 1`] = `
           }
         >
           
-          1.00
+          $
+          1.33
+          MXN
         </Text>
       </View>
       <Text
@@ -1077,29 +973,7 @@ exports[`transfer feed item renders correctly for received invite 1`] = `
             },
           ]
         }
-      >
-        <Text
-          style={
-            Array [
-              Object {
-                "color": "#2E3338",
-                "fontFamily": "Hind-Regular",
-                "fontSize": 14,
-                "lineHeight": 18,
-              },
-              Object {
-                "color": "#BDBDBD",
-                "fontSize": 14,
-                "lineHeight": 18,
-                "marginLeft": "auto",
-                "paddingLeft": 10,
-              },
-            ]
-          }
-        >
-          localCurrencyValue
-        </Text>
-      </View>
+      />
     </View>
   </View>
 </View>
@@ -1108,6 +982,7 @@ exports[`transfer feed item renders correctly for received invite 1`] = `
 exports[`transfer feed item renders correctly for received with encrypted comment 1`] = `
 <View
   accessible={true}
+  focusable={true}
   isTVSelectable={true}
   nativeBackgroundAndroid={
     Object {
@@ -1115,6 +990,7 @@ exports[`transfer feed item renders correctly for received with encrypted commen
       "type": "ThemeAttrAndroid",
     }
   }
+  onClick={[Function]}
   onResponderGrant={[Function]}
   onResponderMove={[Function]}
   onResponderRelease={[Function]}
@@ -1171,7 +1047,7 @@ exports[`transfer feed item renders correctly for received with encrypted commen
           <Image
             source={
               Object {
-                "testUri": "../../../src/images/unknown-user-icon.png",
+                "testUri": "../../../packages/mobile/src/images/unknown-user-icon.png",
               }
             }
             style={
@@ -1230,7 +1106,9 @@ exports[`transfer feed item renders correctly for received with encrypted commen
           }
         >
           
-          100.00
+          $
+          133.00
+          MXN
         </Text>
       </View>
       <Text
@@ -1258,29 +1136,7 @@ exports[`transfer feed item renders correctly for received with encrypted commen
             },
           ]
         }
-      >
-        <Text
-          style={
-            Array [
-              Object {
-                "color": "#2E3338",
-                "fontFamily": "Hind-Regular",
-                "fontSize": 14,
-                "lineHeight": 18,
-              },
-              Object {
-                "color": "#BDBDBD",
-                "fontSize": 14,
-                "lineHeight": 18,
-                "marginLeft": "auto",
-                "paddingLeft": 10,
-              },
-            ]
-          }
-        >
-          localCurrencyValue
-        </Text>
-      </View>
+      />
     </View>
   </View>
 </View>
@@ -1289,6 +1145,7 @@ exports[`transfer feed item renders correctly for received with encrypted commen
 exports[`transfer feed item renders correctly for sent 1`] = `
 <View
   accessible={true}
+  focusable={true}
   isTVSelectable={true}
   nativeBackgroundAndroid={
     Object {
@@ -1296,6 +1153,7 @@ exports[`transfer feed item renders correctly for sent 1`] = `
       "type": "ThemeAttrAndroid",
     }
   }
+  onClick={[Function]}
   onResponderGrant={[Function]}
   onResponderMove={[Function]}
   onResponderRelease={[Function]}
@@ -1352,7 +1210,7 @@ exports[`transfer feed item renders correctly for sent 1`] = `
           <Image
             source={
               Object {
-                "testUri": "../../../src/images/unknown-user-icon.png",
+                "testUri": "../../../packages/mobile/src/images/unknown-user-icon.png",
               }
             }
             style={
@@ -1411,7 +1269,9 @@ exports[`transfer feed item renders correctly for sent 1`] = `
           }
         >
           -
-          100.00
+          $
+          133.00
+          MXN
         </Text>
       </View>
       <View
@@ -1425,29 +1285,7 @@ exports[`transfer feed item renders correctly for sent 1`] = `
             false,
           ]
         }
-      >
-        <Text
-          style={
-            Array [
-              Object {
-                "color": "#2E3338",
-                "fontFamily": "Hind-Regular",
-                "fontSize": 14,
-                "lineHeight": 18,
-              },
-              Object {
-                "color": "#BDBDBD",
-                "fontSize": 14,
-                "lineHeight": 18,
-                "marginLeft": "auto",
-                "paddingLeft": 10,
-              },
-            ]
-          }
-        >
-          localCurrencyValue
-        </Text>
-      </View>
+      />
     </View>
   </View>
 </View>
@@ -1456,6 +1294,7 @@ exports[`transfer feed item renders correctly for sent 1`] = `
 exports[`transfer feed item renders correctly for sent invite 1`] = `
 <View
   accessible={true}
+  focusable={true}
   isTVSelectable={true}
   nativeBackgroundAndroid={
     Object {
@@ -1463,6 +1302,7 @@ exports[`transfer feed item renders correctly for sent invite 1`] = `
       "type": "ThemeAttrAndroid",
     }
   }
+  onClick={[Function]}
   onResponderGrant={[Function]}
   onResponderMove={[Function]}
   onResponderRelease={[Function]}
@@ -1491,7 +1331,7 @@ exports[`transfer feed item renders correctly for sent invite 1`] = `
       <Image
         source={
           Object {
-            "testUri": "../../../src/images/coins-logo.png",
+            "testUri": "../../../packages/mobile/src/images/coins-logo.png",
           }
         }
         style={
@@ -1548,7 +1388,9 @@ exports[`transfer feed item renders correctly for sent invite 1`] = `
           }
         >
           -
-          1.00
+          $
+          1.33
+          MXN
         </Text>
       </View>
       <Text
@@ -1576,29 +1418,7 @@ exports[`transfer feed item renders correctly for sent invite 1`] = `
             },
           ]
         }
-      >
-        <Text
-          style={
-            Array [
-              Object {
-                "color": "#2E3338",
-                "fontFamily": "Hind-Regular",
-                "fontSize": 14,
-                "lineHeight": 18,
-              },
-              Object {
-                "color": "#BDBDBD",
-                "fontSize": 14,
-                "lineHeight": 18,
-                "marginLeft": "auto",
-                "paddingLeft": 10,
-              },
-            ]
-          }
-        >
-          localCurrencyValue
-        </Text>
-      </View>
+      />
     </View>
   </View>
 </View>
@@ -1607,6 +1427,7 @@ exports[`transfer feed item renders correctly for sent invite 1`] = `
 exports[`transfer feed item renders correctly for sent transaction 1`] = `
 <View
   accessible={true}
+  focusable={true}
   isTVSelectable={true}
   nativeBackgroundAndroid={
     Object {
@@ -1614,6 +1435,7 @@ exports[`transfer feed item renders correctly for sent transaction 1`] = `
       "type": "ThemeAttrAndroid",
     }
   }
+  onClick={[Function]}
   onResponderGrant={[Function]}
   onResponderMove={[Function]}
   onResponderRelease={[Function]}
@@ -1670,7 +1492,7 @@ exports[`transfer feed item renders correctly for sent transaction 1`] = `
           <Image
             source={
               Object {
-                "testUri": "../../../src/images/unknown-user-icon.png",
+                "testUri": "../../../packages/mobile/src/images/unknown-user-icon.png",
               }
             }
             style={
@@ -1729,7 +1551,9 @@ exports[`transfer feed item renders correctly for sent transaction 1`] = `
           }
         >
           -
-          1.00
+          $
+          1.33
+          MXN
         </Text>
       </View>
       <Text
@@ -1757,29 +1581,7 @@ exports[`transfer feed item renders correctly for sent transaction 1`] = `
             },
           ]
         }
-      >
-        <Text
-          style={
-            Array [
-              Object {
-                "color": "#2E3338",
-                "fontFamily": "Hind-Regular",
-                "fontSize": 14,
-                "lineHeight": 18,
-              },
-              Object {
-                "color": "#BDBDBD",
-                "fontSize": 14,
-                "lineHeight": 18,
-                "marginLeft": "auto",
-                "paddingLeft": 10,
-              },
-            ]
-          }
-        >
-          localCurrencyValue
-        </Text>
-      </View>
+      />
     </View>
   </View>
 </View>
@@ -1788,6 +1590,7 @@ exports[`transfer feed item renders correctly for sent transaction 1`] = `
 exports[`transfer feed item renders correctly for sent with encrypted comment 1`] = `
 <View
   accessible={true}
+  focusable={true}
   isTVSelectable={true}
   nativeBackgroundAndroid={
     Object {
@@ -1795,6 +1598,7 @@ exports[`transfer feed item renders correctly for sent with encrypted comment 1`
       "type": "ThemeAttrAndroid",
     }
   }
+  onClick={[Function]}
   onResponderGrant={[Function]}
   onResponderMove={[Function]}
   onResponderRelease={[Function]}
@@ -1851,7 +1655,7 @@ exports[`transfer feed item renders correctly for sent with encrypted comment 1`
           <Image
             source={
               Object {
-                "testUri": "../../../src/images/unknown-user-icon.png",
+                "testUri": "../../../packages/mobile/src/images/unknown-user-icon.png",
               }
             }
             style={
@@ -1910,7 +1714,9 @@ exports[`transfer feed item renders correctly for sent with encrypted comment 1`
           }
         >
           -
-          1.00
+          $
+          1.33
+          MXN
         </Text>
       </View>
       <Text
@@ -1938,29 +1744,7 @@ exports[`transfer feed item renders correctly for sent with encrypted comment 1`
             },
           ]
         }
-      >
-        <Text
-          style={
-            Array [
-              Object {
-                "color": "#2E3338",
-                "fontFamily": "Hind-Regular",
-                "fontSize": 14,
-                "lineHeight": 18,
-              },
-              Object {
-                "color": "#BDBDBD",
-                "fontSize": 14,
-                "lineHeight": 18,
-                "marginLeft": "auto",
-                "paddingLeft": 10,
-              },
-            ]
-          }
-        >
-          localCurrencyValue
-        </Text>
-      </View>
+      />
     </View>
   </View>
 </View>
@@ -1969,6 +1753,7 @@ exports[`transfer feed item renders correctly for sent with encrypted comment 1`
 exports[`transfer feed item renders correctly for verification fee 1`] = `
 <View
   accessible={true}
+  focusable={true}
   isTVSelectable={true}
   nativeBackgroundAndroid={
     Object {
@@ -1976,6 +1761,7 @@ exports[`transfer feed item renders correctly for verification fee 1`] = `
       "type": "ThemeAttrAndroid",
     }
   }
+  onClick={[Function]}
   onResponderGrant={[Function]}
   onResponderMove={[Function]}
   onResponderRelease={[Function]}
@@ -2004,7 +1790,7 @@ exports[`transfer feed item renders correctly for verification fee 1`] = `
       <Image
         source={
           Object {
-            "testUri": "../../../src/images/coins-logo.png",
+            "testUri": "../../../packages/mobile/src/images/coins-logo.png",
           }
         }
         style={
@@ -2061,7 +1847,9 @@ exports[`transfer feed item renders correctly for verification fee 1`] = `
           }
         >
           -
-          0.33
+          $
+          0.43
+          MXN
         </Text>
       </View>
       <Text
@@ -2089,29 +1877,7 @@ exports[`transfer feed item renders correctly for verification fee 1`] = `
             },
           ]
         }
-      >
-        <Text
-          style={
-            Array [
-              Object {
-                "color": "#2E3338",
-                "fontFamily": "Hind-Regular",
-                "fontSize": 14,
-                "lineHeight": 18,
-              },
-              Object {
-                "color": "#BDBDBD",
-                "fontSize": 14,
-                "lineHeight": 18,
-                "marginLeft": "auto",
-                "paddingLeft": 10,
-              },
-            ]
-          }
-        >
-          localCurrencyValue
-        </Text>
-      </View>
+      />
     </View>
   </View>
 </View>
@@ -2120,6 +1886,7 @@ exports[`transfer feed item renders correctly for verification fee 1`] = `
 exports[`transfer feed item renders correctly for verification reward 1`] = `
 <View
   accessible={true}
+  focusable={true}
   isTVSelectable={true}
   nativeBackgroundAndroid={
     Object {
@@ -2127,6 +1894,7 @@ exports[`transfer feed item renders correctly for verification reward 1`] = `
       "type": "ThemeAttrAndroid",
     }
   }
+  onClick={[Function]}
   onResponderGrant={[Function]}
   onResponderMove={[Function]}
   onResponderRelease={[Function]}
@@ -2231,7 +1999,9 @@ exports[`transfer feed item renders correctly for verification reward 1`] = `
           }
         >
           
-          1.00
+          $
+          1.33
+          MXN
         </Text>
       </View>
       <Text
@@ -2259,29 +2029,7 @@ exports[`transfer feed item renders correctly for verification reward 1`] = `
             },
           ]
         }
-      >
-        <Text
-          style={
-            Array [
-              Object {
-                "color": "#2E3338",
-                "fontFamily": "Hind-Regular",
-                "fontSize": 14,
-                "lineHeight": 18,
-              },
-              Object {
-                "color": "#BDBDBD",
-                "fontSize": 14,
-                "lineHeight": 18,
-                "marginLeft": "auto",
-                "paddingLeft": 10,
-              },
-            ]
-          }
-        >
-          localCurrencyValue
-        </Text>
-      </View>
+      />
     </View>
   </View>
 </View>
