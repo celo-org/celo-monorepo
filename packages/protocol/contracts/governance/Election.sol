@@ -88,7 +88,6 @@ contract Election is
   uint256 public maxNumGroupsVotedFor;
   // Groups must receive at least this fraction of the total votes in order to be considered in
   // elections.
-  // TODO(asa): Implement this constraint.
   FixidityLib.Fraction public electabilityThreshold;
 
   event ElectableValidatorsSet(
@@ -151,9 +150,9 @@ contract Election is
   {
     _transferOwnership(msg.sender);
     setRegistry(registryAddress);
-    _setElectableValidators(minElectableValidators, maxElectableValidators);
-    _setMaxNumGroupsVotedFor(_maxNumGroupsVotedFor);
-    _setElectabilityThreshold(_electabilityThreshold);
+    setElectableValidators(minElectableValidators, maxElectableValidators);
+    setMaxNumGroupsVotedFor(_maxNumGroupsVotedFor);
+    setElectabilityThreshold(_electabilityThreshold);
   }
 
   /**
@@ -162,8 +161,12 @@ contract Election is
    * @param max The maximum number of validators that can be elected.
    * @return True upon success.
    */
-  function setElectableValidators(uint256 min, uint256 max) external onlyOwner returns (bool) {
-    return _setElectableValidators(min, max);
+  function setElectableValidators(uint256 min, uint256 max) public onlyOwner returns (bool) {
+    require(0 < min && min <= max);
+    require(min != electableValidators.min || max != electableValidators.max);
+    electableValidators = ElectableValidators(min, max);
+    emit ElectableValidatorsSet(min, max);
+    return true;
   }
 
   /**
@@ -175,20 +178,6 @@ contract Election is
   }
 
   /**
-   * @notice Updates the minimum and maximum number of validators that can be elected.
-   * @param min The minimum number of validators that can be elected.
-   * @param max The maximum number of validators that can be elected.
-   * @return True upon success.
-   */
-  function _setElectableValidators(uint256 min, uint256 max) private returns (bool) {
-    require(0 < min && min <= max);
-    require(min != electableValidators.min || max != electableValidators.max);
-    electableValidators = ElectableValidators(min, max);
-    emit ElectableValidatorsSet(min, max);
-    return true;
-  }
-
-  /**
    * @notice Updates the maximum number of groups an account can be voting for at once.
    * @param _maxNumGroupsVotedFor The maximum number of groups an account can vote for.
    * @return True upon success.
@@ -196,19 +185,10 @@ contract Election is
   function setMaxNumGroupsVotedFor(
     uint256 _maxNumGroupsVotedFor
   )
-    external
+    public
     onlyOwner
     returns (bool)
   {
-    return _setMaxNumGroupsVotedFor(_maxNumGroupsVotedFor);
-  }
-
-  /**
-   * @notice Updates the maximum number of groups an account can be voting for at once.
-   * @param _maxNumGroupsVotedFor The maximum number of groups an account can vote for.
-   * @return True upon success.
-   */
-  function _setMaxNumGroupsVotedFor(uint256 _maxNumGroupsVotedFor) private returns (bool) {
     require(_maxNumGroupsVotedFor != maxNumGroupsVotedFor);
     maxNumGroupsVotedFor = _maxNumGroupsVotedFor;
     emit MaxNumGroupsVotedForSet(_maxNumGroupsVotedFor);
@@ -221,15 +201,6 @@ contract Election is
    * @return True upon success.
    */
   function setElectabilityThreshold(uint256 threshold) public onlyOwner returns (bool) {
-    return _setElectabilityThreshold(threshold);
-  }
-
-  /**
-   * @notice Sets the electability threshold.
-   * @param threshold Electability threshold as unwrapped Fraction.
-   * @return True upon success.
-   */
-  function _setElectabilityThreshold(uint256 threshold) private returns (bool) {
     electabilityThreshold = FixidityLib.wrap(threshold);
     require(
       electabilityThreshold.lt(FixidityLib.fixed1()),
@@ -486,12 +457,7 @@ contract Election is
   {
     // The group must meet the balance requirements in order for their voters to receive epoch
     // rewards.
-    bool meetsBalanceRequirements = (
-      getLockedGold().getAccountTotalLockedGold(group) >=
-      getValidators().getAccountBalanceRequirement(group)
-    );
-
-    if (meetsBalanceRequirements && votes.active.total > 0) {
+    if (getValidators().meetsAccountLockedGoldRequirements(group) && votes.active.total > 0) {
       return totalEpochRewards.mul(votes.active.forGroup[group].total).div(votes.active.total);
     } else {
       return 0;
