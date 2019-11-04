@@ -1,3 +1,4 @@
+import { NavigationParams } from 'react-navigation'
 import i18n from 'src/i18n'
 import { navigate } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
@@ -14,6 +15,9 @@ export enum Actions {
   EXIT_BACKUP_FLOW = 'APP/EXIT_BACKUP_FLOW',
   SET_FEED_CACHE = 'APP/SET_FEED_CACHE',
   SET_ANALYTICS_ENABLED = 'APP/SET_ANALYTICS_ENABLED',
+  NAVIGATE_PIN_PROTECTED = 'APP/NAVIGATE_PIN_PROTECTED',
+  START_PIN_VERIFICATION = 'APP/START_PIN_VERIFICATION',
+  FINISH_PIN_VERIFICATION = 'APP/FINISH_PIN_VERIFICATION',
 }
 
 interface SetLoggedIn {
@@ -48,6 +52,20 @@ interface SetAnalyticsEnabled {
   enabled: boolean
 }
 
+export interface NavigatePinProtected {
+  type: Actions.NAVIGATE_PIN_PROTECTED
+  routeName: string
+  params?: NavigationParams
+}
+
+interface StartPinVerification {
+  type: Actions.START_PIN_VERIFICATION
+}
+
+interface FinishPinVerification {
+  type: Actions.FINISH_PIN_VERIFICATION
+}
+
 export type ActionTypes =
   | SetLoggedIn
   | SetNumberVerifiedAction
@@ -56,6 +74,9 @@ export type ActionTypes =
   | EnterBackupFlow
   | ExitBackupFlow
   | SetAnalyticsEnabled
+  | NavigatePinProtected
+  | StartPinVerification
+  | FinishPinVerification
 
 export const setLoggedIn = (loggedIn: boolean) => ({
   type: Actions.SET_LOGGED_IN,
@@ -95,4 +116,21 @@ export const exitBackupFlow = () => ({
 export const setAnalyticsEnabled = (enabled: boolean): SetAnalyticsEnabled => ({
   type: Actions.SET_ANALYTICS_ENABLED,
   enabled,
+})
+
+export const navigatePinProtected = (
+  routeName: string,
+  params?: NavigationParams
+): NavigatePinProtected => ({
+  type: Actions.NAVIGATE_PIN_PROTECTED,
+  routeName,
+  params,
+})
+
+export const startPinVerification = (): StartPinVerification => ({
+  type: Actions.START_PIN_VERIFICATION,
+})
+
+export const finishPinVerification = (): FinishPinVerification => ({
+  type: Actions.FINISH_PIN_VERIFICATION,
 })

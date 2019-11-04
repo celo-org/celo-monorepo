@@ -1,7 +1,5 @@
-import { eqAddress } from '@celo/utils/lib/address'
 import { zip } from '@celo/utils/lib/collections'
 import BigNumber from 'bignumber.js'
-import Web3 from 'web3'
 import { Address } from '../base'
 import { LockedGold } from '../generated/types/LockedGold'
 import {
@@ -12,7 +10,6 @@ import {
   proxyCall,
   proxySend,
   toBigNumber,
-  toTransactionObject,
   tupleParser,
 } from '../wrappers/BaseWrapper'
 
@@ -27,10 +24,6 @@ interface AccountSummary {
   lockedGold: {
     total: BigNumber
     nonvoting: BigNumber
-  }
-  authorizations: {
-    voter: null | string
-    validator: null | string
   }
   pendingWithdrawals: PendingWithdrawal[]
 }
@@ -57,10 +50,7 @@ export class LockedGoldWrapper extends BaseWrapper<LockedGold> {
     this.contract.methods.unlock,
     tupleParser(parseNumber)
   )
-  /**
-   * Creates an account.
-   */
-  createAccount = proxySend(this.kit, this.contract.methods.createAccount)
+
   /**
    * Withdraws a gold that has been unlocked after the unlocking period has passed.
    * @param index The index of the pending withdrawal to withdraw.
@@ -102,28 +92,7 @@ export class LockedGoldWrapper extends BaseWrapper<LockedGold> {
     undefined,
     toBigNumber
   )
-  /**
-   * Returns the voter for the specified account.
-   * @param account The address of the account.
-   * @return The address with which the account can vote.
-   */
-  getVoterFromAccount: (account: string) => Promise<Address> = proxyCall(
-    this.contract.methods.getVoterFromAccount
-  )
-  /**
-   * Returns the validator for the specified account.
-   * @param account The address of the account.
-   * @return The address with which the account can register a validator or group.
-   */
-  getValidatorFromAccount: (account: string) => Promise<Address> = proxyCall(
-    this.contract.methods.getValidatorFromAccount
-  )
-  /**
-   * Check if an account already exists.
-   * @param account The address of the account
-   * @return Returns `true` if account exists. Returns `false` otherwise.
-   */
-  isAccount: (account: string) => Promise<boolean> = proxyCall(this.contract.methods.isAccount)
+
   /**
    * Returns current configuration parameters.
    */
@@ -136,52 +105,14 @@ export class LockedGoldWrapper extends BaseWrapper<LockedGold> {
   async getAccountSummary(account: string): Promise<AccountSummary> {
     const nonvoting = await this.getAccountNonvotingLockedGold(account)
     const total = await this.getAccountTotalLockedGold(account)
-    const voter = await this.getVoterFromAccount(account)
-    const validator = await this.getValidatorFromAccount(account)
     const pendingWithdrawals = await this.getPendingWithdrawals(account)
     return {
       lockedGold: {
         total,
         nonvoting,
       },
-      authorizations: {
-        voter: eqAddress(voter, account) ? null : voter,
-        validator: eqAddress(validator, account) ? null : validator,
-      },
       pendingWithdrawals,
     }
-  }
-
-  /**
-   * Authorize voting on behalf of this account to another address.
-   * @param account Address of the active account.
-   * @param voter Address to be used for voting.
-   * @return A CeloTransactionObject
-   */
-  async authorizeVoter(account: Address, voter: Address): Promise<CeloTransactionObject<void>> {
-    const sig = await this.getParsedSignatureOfAddress(account, voter)
-    // TODO(asa): Pass default tx "from" argument.
-    return toTransactionObject(
-      this.kit,
-      this.contract.methods.authorizeVoter(voter, sig.v, sig.r, sig.s)
-    )
-  }
-
-  /**
-   * Authorize validating on behalf of this account to another address.
-   * @param account Address of the active account.
-   * @param voter Address to be used for validating.
-   * @return A CeloTransactionObject
-   */
-  async authorizeValidator(
-    account: Address,
-    validator: Address
-  ): Promise<CeloTransactionObject<void>> {
-    const sig = await this.getParsedSignatureOfAddress(account, validator)
-    return toTransactionObject(
-      this.kit,
-      this.contract.methods.authorizeValidator(validator, sig.v, sig.r, sig.s)
-    )
   }
 
   /**
@@ -198,15 +129,5 @@ export class LockedGoldWrapper extends BaseWrapper<LockedGold> {
       withdrawals[1],
       withdrawals[0]
     )
-  }
-
-  private async getParsedSignatureOfAddress(address: Address, signer: string) {
-    const hash = Web3.utils.soliditySha3({ type: 'address', value: address })
-    const signature = (await this.kit.web3.eth.sign(hash, signer)).slice(2)
-    return {
-      r: `0x${signature.slice(0, 64)}`,
-      s: `0x${signature.slice(64, 128)}`,
-      v: Web3.utils.hexToNumber(signature.slice(128, 130)) + 27,
-    }
   }
 }

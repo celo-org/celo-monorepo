@@ -43,7 +43,7 @@ Once you have the account address, you can make calls against your own smart con
   const address = dappkitResponse.address
   this.setState({ address, phoneNumber: dappkitResponse.phoneNumber, isLoadingBalance: true })
 
-  const kit = newKit('https://alfajores-infura.celo-testnet.org')
+  const kit = newKit('https://alfajores-forno.celo-testnet.org')
   kit.defaultAccount = address
 
   const stableToken = await kit.contracts.getStableToken()
