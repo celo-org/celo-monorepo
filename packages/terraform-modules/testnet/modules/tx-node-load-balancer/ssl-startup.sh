@@ -36,4 +36,4 @@ mkdir -p /home/lego
   --env DOMAINS_LIST="-d ${forno_host}" \
   --env CERT_ID_PREFIX=${cert_prefix} \
   --name=ssl-letsencrypt \
-  tkporter/letsencrypt-gcloud-balancer:v02-fix-1
+  bloomapi/letsencrypt-gcloud-balancer:v1.0.2
