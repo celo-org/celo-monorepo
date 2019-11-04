@@ -4,7 +4,6 @@ import android.util.Log;
 import android.os.Bundle;
 import android.content.Intent;
 import com.google.firebase.iid.FirebaseInstanceId;
-import org.devio.rn.splashscreen.SplashScreen;
 import com.facebook.react.ReactActivity;
 
 public class MainActivity extends ReactActivity {
@@ -13,7 +12,6 @@ public class MainActivity extends ReactActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        SplashScreen.show(this);
         super.onCreate(savedInstanceState);
 
         try {
