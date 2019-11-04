@@ -39,7 +39,7 @@ export function* setPincode({ pincodeType, pin }: SetPincodeAction) {
   }
 }
 
-export function* getPincode() {
+export function* getPincode(useCache = true) {
   const pincodeType = yield select(pincodeTypeSelector)
 
   if (pincodeType === PincodeType.Unset) {
@@ -58,9 +58,11 @@ export function* getPincode() {
 
   if (pincodeType === PincodeType.CustomPin) {
     Logger.debug(TAG + '@getPincode', 'Getting custom pin')
-    const cachedPin = getCachedPincode()
-    if (cachedPin) {
-      return cachedPin
+    if (useCache) {
+      const cachedPin = getCachedPincode()
+      if (cachedPin) {
+        return cachedPin
+      }
     }
 
     const pincodeEntered = new Promise((resolve, reject) => {
@@ -70,7 +72,9 @@ export function* getPincode() {
     if (!pin) {
       throw new Error('Pincode confirmation returned empty pin')
     }
-    setCachedPincode(pin)
+    if (useCache) {
+      setCachedPincode(pin)
+    }
     return pin
   }
 }

@@ -158,6 +158,10 @@ export const v2Schema = {
 
 export const v3Schema = {
   ...v2Schema,
+  app: {
+    ...v2Schema.app,
+    doingPinVerification: false,
+  },
   localCurrency: {
     ...v2Schema.localCurrency,
     preferredCurrencyCode: 'MXN',
