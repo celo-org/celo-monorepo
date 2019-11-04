@@ -491,7 +491,24 @@ spec:
             echo 'Generating address'
             celotooljs.sh generate account-address --private-key `cat /root/.celo/pkey` > /root/.celo/address
             echo -n "Generating IP address for tx node: "
-            echo $IP_ADDRESSES | cut -d '/' -f $((RID + 1)) > /root/.celo/ipAddress
+            if [ -z $IP_ADDRESSES ]; then
+              echo 'No IP_ADDRESSES'
+              # to use the IP address of a service from an env var that Kubernetes creates
+              SERVICE_ENV_VAR_PREFIX={{ .service_ip_env_var_prefix }}
+              if [ "$SERVICE_ENV_VAR_PREFIX" ]; then
+                echo 'Using SERVICE_ENV_VAR_PREFIX'
+                eval "echo \${${SERVICE_ENV_VAR_PREFIX}${RID}_SERVICE_HOST}"
+                echo ${SERVICE_ENV_VAR_PREFIX}${RID}_SERVICE_HOST
+                env
+                eval "echo \${${SERVICE_ENV_VAR_PREFIX}${RID}_SERVICE_HOST}" > /root/.celo/ipAddress
+              else
+                echo 'Using POD_IP'
+                echo $POD_IP > /root/.celo/ipAddress
+              fi
+            else
+              echo 'Using IP_ADDRESSES'
+              echo $IP_ADDRESSES | cut -d '/' -f $((RID + 1)) > /root/.celo/ipAddress
+            fi
             cat /root/.celo/ipAddress
             echo -n "Generating Bootnode enode address for tx node: "
             celotooljs.sh generate public-key --mnemonic "$MNEMONIC" --accountType load_testing --index 0 > /root/.celo/bootnodeEnodeAddress
@@ -528,13 +545,12 @@ spec:
         - |-
           set -euo pipefail
           ACCOUNT_ADDRESS=`cat /root/.celo/address`
-          NAT_FLAG=""
-          [[ "$STATIC_IPS_FOR_GETH_NODES" == "true" ]] && NAT_FLAG="--nat=extip:`cat /root/.celo/ipAddress`"
+          NAT_FLAG="--nat=extip:`cat /root/.celo/ipAddress`"
           PING_IP_FROM_PACKET_FLAG=""
           [[ "$PING_IP_FROM_PACKET" == "true" ]] && PING_IP_FROM_PACKET_FLAG="--ping-ip-from-packet"
           IN_MEMORY_DISCOVERY_TABLE_FLAG=""
           [[ "$IN_MEMORY_DISCOVERY_TABLE" == "true" ]] && IN_MEMORY_DISCOVERY_TABLE_FLAG="--use-in-memory-discovery-table"
-          ADDITIONAL_FLAGS="{{ .geth_flags }}"
+          ADDITIONAL_FLAGS='{{ .geth_flags | default "" }}'
           geth \
             --bootnodes=enode://`cat /root/.celo/bootnodeEnode` \
             --lightserv 90 \
@@ -591,6 +607,13 @@ spec:
           protocol: UDP
         - name: discovery-tcp
           containerPort: 30303
+        {{ if .sentry }}
+        - name: sentry-udp
+          containerPort: 30503
+          protocol: UDP
+        - name: sentry-tcp
+          containerPort: 30503
+        {{ end }}
         - name: rpc
           containerPort: 8545
         - name: ws
@@ -606,7 +629,7 @@ spec:
           mountPath: /root/.celo/account
           readOnly: true
 {{ include "celo.geth-exporter-container" .  | indent 6 }}
-{{ include "celo.prom-to-sd-container" (dict "Values" .Values "Release" .Release "Chart" .Chart "component" "geth" "metricsPort" "9200" "metricsPath" "filteredmetrics" "containerNameLabel" "tx-nodes" )  | indent 6 }}
+{{ include "celo.prom-to-sd-container" (dict "Values" .Values "Release" .Release "Chart" .Chart "component" "geth" "metricsPort" "9200" "metricsPath" "filteredmetrics" "containerNameLabel" .name )  | indent 6 }}
       volumes:
       - name: data
         emptyDir: {}

@@ -5,12 +5,18 @@
 
 {{ template "celo.node-service" (dict "Values" $.Values "Release" $.Release "Chart" $.Chart "index" $index "service_type" "ClusterIP" "node_type" "sentry-internal" "name_suffix" "" "component_label" "sentry" "load_balancer_ip" "" ) }}
   ports:
-  - name: internal
+  - name: internal-tcp
     port: 30503
     protocol: TCP
-  - name: external
+  - name: internal-udp
+    port: 30503
+    protocol: UDP
+  - name: external-tcp
     port: 30303
     protocol: TCP
+  - name: external-udp
+    port: 30303
+    protocol: UDP
 ---
 {{ if $.Values.geth.static_ips }}
 {{ $loadBalancerIP := index $.Values.geth (print "validators_" $index "IpAddress") }}
