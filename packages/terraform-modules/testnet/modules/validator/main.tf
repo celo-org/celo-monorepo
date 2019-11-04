@@ -31,8 +31,11 @@ resource "google_compute_instance" "validator" {
 
   network_interface {
     network = var.network_name
-    access_config {
-      nat_ip = google_compute_address.validator[count.index].address
+    dynamic "access_config" {
+      for_each = count.index < 0 ? [] : [count.index]
+      content {
+        nat_ip = google_compute_address.validator[count.index].address
+      }
     }
   }
 
