@@ -10,5 +10,14 @@
       "0x06cEf8E666768cC40Cc78CF93d9611019dDcB628",
       "0x7457d5E02197480Db681D3fdF256c7acA21bDc12"
     ]
+  },
+  "governance": {
+    "queueExpiry": 101,
+    "dequeueFrequency": 102,
+    "approvalStageDuration": 103,
+    "referendumStageDuration": 104,
+    "executionStageDuration": 105,
+    "concurrentProposals": 2,
+    "minDeposit": 1
   }
 }

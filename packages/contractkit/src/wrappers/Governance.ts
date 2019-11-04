@@ -1,6 +1,7 @@
 import BigNumber from 'bignumber.js'
 import { keccak256 } from 'ethereumjs-util'
 import { identity } from 'fp-ts/lib/function'
+import Contract from 'web3/eth/contract'
 
 import { filterAsync, mapAsync, zip } from '@celo/utils/lib/collections'
 
@@ -128,7 +129,7 @@ export class GovernanceWrapper extends BaseWrapper<Governance> {
 
   getProposalMetadata: (proposalID: BigNumber) => Promise<ProposalMetadata> = proxyCall(
     this.contract.methods.getProposal,
-    tupleParser(BigNumber.toString),
+    tupleParser(parseNumber),
     (res) => ({
       proposer: res[0],
       deposit: toBigNumber(res[1]),
@@ -142,7 +143,7 @@ export class GovernanceWrapper extends BaseWrapper<Governance> {
     txIndex: number
   ) => Promise<Transaction> = proxyCall(
     this.contract.methods.getProposalTransaction,
-    tupleParser(BigNumber.toString, BigNumber.toString),
+    tupleParser(parseNumber, parseNumber),
     (res) => ({
       value: toBigNumber(res[0]),
       destination: res[1],
@@ -164,7 +165,7 @@ export class GovernanceWrapper extends BaseWrapper<Governance> {
     }
   }
 
-  private getTransactionsEncoded(transactions: Transaction[]): TransactionsEncoded {
+  getTransactionsEncoded(transactions: Transaction[]): TransactionsEncoded {
     return {
       values: transactions.map((tx) => tx.value.toString()),
       destinations: transactions.map((tx) => tx.destination),
@@ -181,6 +182,14 @@ export class GovernanceWrapper extends BaseWrapper<Governance> {
         [encoded.values, encoded.destinations, encoded.data, encoded.dataLengths]
       )
     ) as Buffer
+  }
+
+  // TODO(yorke): re-type keeping in mind CLI (simple inputs: contract name, method name, and args)
+  toTransactionData<T extends Contract, K extends keyof T['methods'], M extends T['methods'][K]>(
+    contractMethod: M,
+    args: Parameters<M>
+  ) {
+    return toBuffer(contractMethod(...args).encodeABI())
   }
 
   propose(transactions: Transaction[], proposerAddress: Address, deposit: BigNumber) {
@@ -263,7 +272,7 @@ export class GovernanceWrapper extends BaseWrapper<Governance> {
   ) => CeloTransactionObject<boolean> = proxySend(
     this.kit,
     this.contract.methods.approve,
-    tupleParser(BigNumber.toString, BigNumber.toString)
+    tupleParser(parseNumber, parseNumber)
   )
 
   vote: (
@@ -273,7 +282,7 @@ export class GovernanceWrapper extends BaseWrapper<Governance> {
   ) => CeloTransactionObject<boolean> = proxySend(
     this.kit,
     this.contract.methods.vote,
-    tupleParser(BigNumber.toString, BigNumber.toString, identity)
+    tupleParser(parseNumber, parseNumber, identity)
   )
 
   execute: (
@@ -282,7 +291,7 @@ export class GovernanceWrapper extends BaseWrapper<Governance> {
   ) => CeloTransactionObject<boolean> = proxySend(
     this.kit,
     this.contract.methods.execute,
-    tupleParser(BigNumber.toString, BigNumber.toString)
+    tupleParser(parseNumber, parseNumber)
   )
 
   whitelistHotfix: (hash: Buffer) => CeloTransactionObject<void> = proxySend(
