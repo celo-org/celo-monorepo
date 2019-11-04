@@ -322,13 +322,14 @@ function getTestnetVars(celoEnv: string) {
     ...getEnvVarValues(testnetEnvVars),
     dns_zone_name: dnsZoneName(domainName),
     ethstats_host: `${celoEnv}-ethstats.${domainName}.org`,
+    forno_host: `${celoEnv}-forno.${domainName}.org`,
     gcloud_secrets_bucket: secretsBucketName,
     gcloud_secrets_base_path: secretsBasePath(celoEnv),
-    // only able to view objects (for accessing secrets)
+    // only able to view objects for accessing secrets & modify ssl certs for forno setup
     gcloud_vm_service_account_email: 'terraform-testnet@celo-testnet.iam.gserviceaccount.com',
     genesis_content_base64: genesisBuffer.toString('base64'),
     // forno is the name for our setup that has tx-nodes reachable via a domain name
-    forno_host: `${celoEnv}-forno.${domainName}.org`,
+    letsencrypt_email: 'n@celo.org',
     network_name: networkName(celoEnv),
   }
 }

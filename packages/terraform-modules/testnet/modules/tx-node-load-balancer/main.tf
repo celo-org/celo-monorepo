@@ -3,24 +3,15 @@ locals {
   target_https_proxy_name = "${var.celo_env}-tx-node-lb-external-http-proxy"
 }
 
-resource "google_compute_instance_group" "tx_node_lb" {
-  name = "${local.name_prefix}-group-${random_id.tx_node_lb.hex}"
+# We want to maintain websockets (which are not supposed by the HTTPS external
+# load balancer) & avoid unnecessary egress costs.
+# An internal & external load balancer cannot use the same instance group. To
+# get around this, we allocate 1 of the tx-nodes to be for internal load balancing.
+# It's still included in `static_nodes.json`, but not included in the forno
+# setup. In the future, consider moving this node to live in Kubernetes to be
+# along with the services that use it.
 
-  instances = slice(var.tx_node_self_links, 1, length(var.tx_node_self_links))
-
-  lifecycle {
-    create_before_destroy = true
-  }
-
-  named_port {
-    name = "http"
-    port = "8545"
-  }
-}
-
-resource "random_id" "tx_node_lb" {
-  byte_length = 8
-}
+# internal load balancer for metrics & blockscout:
 
 resource "google_compute_instance_group" "internal" {
   name = "${local.name_prefix}-internal-group-${random_id.internal.hex}"
@@ -35,16 +26,6 @@ resource "google_compute_instance_group" "internal" {
 resource "random_id" "internal" {
   byte_length = 8
 }
-
-# We want to maintain websockets (which are not supposed by the HTTPS external
-# load balancer) & avoid unnecessary egress costs.
-# An internal & external load balancer cannot use the same instance group. To
-# get around this, we allocate 1 of the tx-nodes to be for internal load balancing.
-# It's still included in `static_nodes.json`, but not included in the forno
-# setup. In the future, consider moving this node to live in Kubernetes to be
-# along with the services that use it.
-
-# internal load balancer for metrics & blockscout:
 
 resource "google_compute_address" "internal" {
   name         = "${local.name_prefix}-internal-address"
@@ -85,6 +66,26 @@ resource "google_compute_health_check" "internal" {
 }
 
 # external load balancer for forno setup
+
+
+resource "google_compute_instance_group" "external" {
+  name = "${local.name_prefix}-group-${random_id.external.hex}"
+
+  instances = slice(var.tx_node_self_links, 1, length(var.tx_node_self_links))
+
+  lifecycle {
+    create_before_destroy = true
+  }
+
+  named_port {
+    name = "http"
+    port = "8545"
+  }
+}
+
+resource "random_id" "external" {
+  byte_length = 8
+}
 
 resource "google_compute_global_address" "external" {
   name         = "${local.name_prefix}-external-address"
@@ -127,7 +128,7 @@ resource "google_compute_backend_service" "external" {
   protocol  = "HTTP"
 
   backend {
-    group = google_compute_instance_group.tx_node_lb.self_link
+    group = google_compute_instance_group.external.self_link
   }
 
   health_checks = [
@@ -140,17 +141,6 @@ resource "google_compute_health_check" "external" {
 
   http_health_check {
     port = 8545
-  }
-}
-
-resource "google_compute_ssl_certificate" "external" {
-  name_prefix = "${local.name_prefix}-ssl-cert"
-  private_key = tls_private_key.tmp.private_key_pem
-  # acme_certificate's `certificate_pem` does not include the issuer pem in the chain
-  certificate = tls_self_signed_cert.tmp.cert_pem
-
-  lifecycle {
-    create_before_destroy = true
   }
 }
 
@@ -195,7 +185,7 @@ resource "google_compute_instance" "external_ssl" {
       cert_prefix : "${local.name_prefix}-forno-",
       forno_host : var.forno_host,
       gcloud_project : var.gcloud_project,
-      letsencrypt_email : "n@celo.org",
+      letsencrypt_email : var.letsencrypt_email,
       target_https_proxy_name : local.target_https_proxy_name
     }
   )
@@ -208,6 +198,19 @@ resource "google_compute_instance" "external_ssl" {
       "https://www.googleapis.com/auth/logging.write",
       "https://www.googleapis.com/auth/ndev.clouddns.readwrite"
     ]
+  }
+}
+
+# temporary self-signed certificate that will be overwritten by
+# google_compute_instance.external_ssl
+
+resource "google_compute_ssl_certificate" "external" {
+  name_prefix = "${local.name_prefix}-ssl-cert"
+  private_key = tls_private_key.tmp.private_key_pem
+  certificate = tls_self_signed_cert.tmp.cert_pem
+
+  lifecycle {
+    create_before_destroy = true
   }
 }
 

@@ -98,6 +98,11 @@ variable istanbul_request_timeout_ms {
   description = "The number of ms for the istanbul request timeout"
 }
 
+variable letsencrypt_email {
+  type        = string
+  description = "The email to create letsencrypt certificates with"
+}
+
 variable network_id {
   type        = number
   description = "The network ID number"

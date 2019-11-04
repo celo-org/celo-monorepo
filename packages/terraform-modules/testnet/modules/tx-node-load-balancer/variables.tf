@@ -30,7 +30,7 @@ variable gcloud_vm_service_account_email {
 
 variable letsencrypt_email {
   type        = string
-  description = "The email of the service account to associate virtual machines with"
+  description = "The email to create letsencrypt certificates with"
 }
 
 variable network_name {
