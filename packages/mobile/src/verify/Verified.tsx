@@ -3,6 +3,7 @@ import { fontStyles } from '@celo/react-components/styles/fonts'
 import * as React from 'react'
 import { withNamespaces, WithNamespaces } from 'react-i18next'
 import { StyleSheet, Text, View } from 'react-native'
+import SafeAreaView from 'react-native-safe-area-view'
 import componentWithAnalytics from 'src/analytics/wrapper'
 import DevSkipButton from 'src/components/DevSkipButton'
 import NuxLogo from 'src/icons/NuxLogo'
@@ -22,11 +23,13 @@ export class Verified extends React.PureComponent<WithNamespaces> {
   render() {
     const { t } = this.props
     return (
-      <View style={style.container}>
-        <DevSkipButton nextScreen={Screens.WalletHome} />
-        <NuxLogo testID="VerifyLogo" />
-        <Text style={[fontStyles.h1, style.congrats]}>{t('congratsVerified')}</Text>
-      </View>
+      <SafeAreaView style={style.container}>
+        <View style={style.innerContainer}>
+          <DevSkipButton nextScreen={Screens.WalletHome} />
+          <NuxLogo testID="VerifyLogo" />
+          <Text style={[fontStyles.h1, style.congrats]}>{t('congratsVerified')}</Text>
+        </View>
+      </SafeAreaView>
     )
   }
 }
@@ -34,9 +37,12 @@ export class Verified extends React.PureComponent<WithNamespaces> {
 const style = StyleSheet.create({
   container: {
     flex: 1,
+    backgroundColor: colors.background,
+  },
+  innerContainer: {
+    flex: 1,
     paddingTop: 60,
     paddingHorizontal: 20,
-    backgroundColor: colors.background,
   },
   congrats: {
     marginVertical: 20,

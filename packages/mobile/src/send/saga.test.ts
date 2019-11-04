@@ -25,15 +25,6 @@ jest.mock('src/navigator/NavigationService', () => ({
   navigate: jest.fn(),
 }))
 
-jest.mock('src/web3/contracts', () => ({
-  web3: {
-    utils: {
-      fromWei: jest.fn((x: any) => x / 1e18),
-    },
-  },
-  isZeroSyncMode: jest.fn().mockReturnValueOnce(false),
-}))
-
 const { navigate } = require('src/navigator/NavigationService')
 
 describe(watchQrCodeDetections, () => {

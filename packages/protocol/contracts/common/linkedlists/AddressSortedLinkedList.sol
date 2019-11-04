@@ -1,5 +1,6 @@
 pragma solidity ^0.5.3;
 
+import "openzeppelin-solidity/contracts/math/Math.sol";
 import "openzeppelin-solidity/contracts/math/SafeMath.sol";
 import "./AddressLinkedList.sol";
 import "./SortedLinkedList.sol";
@@ -104,5 +105,60 @@ library AddressSortedLinkedList {
       values[i] = list.values[byteKeys[i]];
     }
     return (keys, values);
+  }
+
+  /**
+   * @notice Returns the minimum of `max` and the  number of elements in the list > threshold.
+   * @param threshold The number that the element must exceed to be included.
+   * @param max The maximum number returned by this function.
+   * @return The minimum of `max` and the  number of elements in the list > threshold.
+   */
+  function numElementsGreaterThan(
+    SortedLinkedList.List storage list,
+    uint256 threshold,
+    uint256 max
+  )
+    public
+    view
+    returns (uint256)
+  {
+    uint256 revisedMax = Math.min(max, list.list.numElements);
+    bytes32 key = list.list.head;
+    for (uint256 i = 0; i < revisedMax; i++) {
+      if (list.getValue(key) < threshold) {
+        return i;
+      }
+      key = list.list.elements[key].previousKey;
+    }
+    return revisedMax;
+  }
+
+  /**
+   * @notice Returns the N greatest elements of the list.
+   * @param n The number of elements to return.
+   * @return The keys of the greatest elements.
+   */
+  function headN(
+    SortedLinkedList.List storage list,
+    uint256 n
+  )
+    public
+    view
+    returns (address[] memory)
+  {
+    bytes32[] memory byteKeys = list.headN(n);
+    address[] memory keys = new address[](n);
+    for (uint256 i = 0; i < n; i++) {
+      keys[i] = toAddress(byteKeys[i]);
+    }
+    return keys;
+  }
+
+  /**
+   * @notice Gets all element keys from the doubly linked list.
+   * @return All element keys from head to tail.
+   */
+  function getKeys(SortedLinkedList.List storage list) public view returns (address[] memory) {
+    return headN(list, list.list.numElements);
   }
 }

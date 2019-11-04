@@ -54,7 +54,7 @@ exports[`NotificationBox Backup too late test 1`] = `
               resizeMode="contain"
               source={
                 Object {
-                  "testUri": "../../../src/images/backup-icon.png",
+                  "testUri": "../../../packages/mobile/src/images/backup-icon.png",
                 }
               }
               style={
@@ -83,7 +83,7 @@ exports[`NotificationBox Backup too late test 1`] = `
                 }
               }
             >
-              getBackupKey
+              backupKeyFlow6:yourBackupKey
             </Text>
             <View>
               <View
@@ -111,7 +111,7 @@ exports[`NotificationBox Backup too late test 1`] = `
                       }
                     }
                   >
-                    setBackupKey
+                    backupKeyFlow6:backupKeyNotification
                   </Text>
                 </View>
                 <View
@@ -124,18 +124,21 @@ exports[`NotificationBox Backup too late test 1`] = `
                 >
                   <View
                     accessible={true}
+                    focusable={true}
                     isTVSelectable={true}
+                    nativeBackgroundAndroid={
+                      Object {
+                        "attribute": "selectableItemBackgroundBorderless",
+                        "type": "ThemeAttrAndroid",
+                      }
+                    }
+                    onClick={[Function]}
                     onResponderGrant={[Function]}
                     onResponderMove={[Function]}
                     onResponderRelease={[Function]}
                     onResponderTerminate={[Function]}
                     onResponderTerminationRequest={[Function]}
                     onStartShouldSetResponder={[Function]}
-                    style={
-                      Object {
-                        "opacity": 1,
-                      }
-                    }
                   >
                     <Text
                       style={
@@ -158,7 +161,7 @@ exports[`NotificationBox Backup too late test 1`] = `
                         ]
                       }
                     >
-                      getBackupKey
+                      backupKeyFlow6:getBackupKey
                     </Text>
                   </View>
                 </View>
@@ -205,7 +208,7 @@ exports[`NotificationBox Backup too late test 1`] = `
               resizeMode="contain"
               source={
                 Object {
-                  "testUri": "../../../src/images/Invite-Friends.png",
+                  "testUri": "../../../packages/mobile/src/images/Invite-Friends.png",
                 }
               }
               style={
@@ -275,18 +278,21 @@ exports[`NotificationBox Backup too late test 1`] = `
                 >
                   <View
                     accessible={true}
+                    focusable={true}
                     isTVSelectable={true}
+                    nativeBackgroundAndroid={
+                      Object {
+                        "attribute": "selectableItemBackgroundBorderless",
+                        "type": "ThemeAttrAndroid",
+                      }
+                    }
+                    onClick={[Function]}
                     onResponderGrant={[Function]}
                     onResponderMove={[Function]}
                     onResponderRelease={[Function]}
                     onResponderTerminate={[Function]}
                     onResponderTerminationRequest={[Function]}
                     onStartShouldSetResponder={[Function]}
-                    style={
-                      Object {
-                        "opacity": 1,
-                      }
-                    }
                   >
                     <Text
                       style={
@@ -314,18 +320,21 @@ exports[`NotificationBox Backup too late test 1`] = `
                   </View>
                   <View
                     accessible={true}
+                    focusable={true}
                     isTVSelectable={true}
+                    nativeBackgroundAndroid={
+                      Object {
+                        "attribute": "selectableItemBackgroundBorderless",
+                        "type": "ThemeAttrAndroid",
+                      }
+                    }
+                    onClick={[Function]}
                     onResponderGrant={[Function]}
                     onResponderMove={[Function]}
                     onResponderRelease={[Function]}
                     onResponderTerminate={[Function]}
                     onResponderTerminationRequest={[Function]}
                     onStartShouldSetResponder={[Function]}
-                    style={
-                      Object {
-                        "opacity": 1,
-                      }
-                    }
                   >
                     <Text
                       style={
@@ -452,7 +461,7 @@ exports[`NotificationBox Educations not completed yet 1`] = `
               resizeMode="contain"
               source={
                 Object {
-                  "testUri": "../../../src/images/home-icon.png",
+                  "testUri": "../../../packages/mobile/src/images/home-icon.png",
                 }
               }
               style={
@@ -522,18 +531,21 @@ exports[`NotificationBox Educations not completed yet 1`] = `
                 >
                   <View
                     accessible={true}
+                    focusable={true}
                     isTVSelectable={true}
+                    nativeBackgroundAndroid={
+                      Object {
+                        "attribute": "selectableItemBackgroundBorderless",
+                        "type": "ThemeAttrAndroid",
+                      }
+                    }
+                    onClick={[Function]}
                     onResponderGrant={[Function]}
                     onResponderMove={[Function]}
                     onResponderRelease={[Function]}
                     onResponderTerminate={[Function]}
                     onResponderTerminationRequest={[Function]}
                     onStartShouldSetResponder={[Function]}
-                    style={
-                      Object {
-                        "opacity": 1,
-                      }
-                    }
                   >
                     <Text
                       style={
@@ -561,18 +573,21 @@ exports[`NotificationBox Educations not completed yet 1`] = `
                   </View>
                   <View
                     accessible={true}
+                    focusable={true}
                     isTVSelectable={true}
+                    nativeBackgroundAndroid={
+                      Object {
+                        "attribute": "selectableItemBackgroundBorderless",
+                        "type": "ThemeAttrAndroid",
+                      }
+                    }
+                    onClick={[Function]}
                     onResponderGrant={[Function]}
                     onResponderMove={[Function]}
                     onResponderRelease={[Function]}
                     onResponderTerminate={[Function]}
                     onResponderTerminationRequest={[Function]}
                     onStartShouldSetResponder={[Function]}
-                    style={
-                      Object {
-                        "opacity": 1,
-                      }
-                    }
                   >
                     <Text
                       style={
@@ -663,7 +678,7 @@ exports[`NotificationBox Payment Requests exist 1`] = `
               resizeMode="contain"
               source={
                 Object {
-                  "testUri": "../../../src/images/send-dollar.png",
+                  "testUri": "../../../packages/mobile/src/images/send-dollar.png",
                 }
               }
               style={
@@ -774,18 +789,21 @@ exports[`NotificationBox Payment Requests exist 1`] = `
                 >
                   <View
                     accessible={true}
+                    focusable={true}
                     isTVSelectable={true}
+                    nativeBackgroundAndroid={
+                      Object {
+                        "attribute": "selectableItemBackgroundBorderless",
+                        "type": "ThemeAttrAndroid",
+                      }
+                    }
+                    onClick={[Function]}
                     onResponderGrant={[Function]}
                     onResponderMove={[Function]}
                     onResponderRelease={[Function]}
                     onResponderTerminate={[Function]}
                     onResponderTerminationRequest={[Function]}
                     onStartShouldSetResponder={[Function]}
-                    style={
-                      Object {
-                        "opacity": 1,
-                      }
-                    }
                   >
                     <Text
                       style={
@@ -876,7 +894,7 @@ exports[`NotificationBox Simple test 1`] = `
               resizeMode="contain"
               source={
                 Object {
-                  "testUri": "../../../src/images/backup-icon.png",
+                  "testUri": "../../../packages/mobile/src/images/backup-icon.png",
                 }
               }
               style={
@@ -905,7 +923,7 @@ exports[`NotificationBox Simple test 1`] = `
                 }
               }
             >
-              getBackupKey
+              backupKeyFlow6:yourBackupKey
             </Text>
             <View>
               <View
@@ -933,7 +951,7 @@ exports[`NotificationBox Simple test 1`] = `
                       }
                     }
                   >
-                    setBackupKey
+                    backupKeyFlow6:backupKeyNotification
                   </Text>
                 </View>
                 <View
@@ -946,18 +964,21 @@ exports[`NotificationBox Simple test 1`] = `
                 >
                   <View
                     accessible={true}
+                    focusable={true}
                     isTVSelectable={true}
+                    nativeBackgroundAndroid={
+                      Object {
+                        "attribute": "selectableItemBackgroundBorderless",
+                        "type": "ThemeAttrAndroid",
+                      }
+                    }
+                    onClick={[Function]}
                     onResponderGrant={[Function]}
                     onResponderMove={[Function]}
                     onResponderRelease={[Function]}
                     onResponderTerminate={[Function]}
                     onResponderTerminationRequest={[Function]}
                     onStartShouldSetResponder={[Function]}
-                    style={
-                      Object {
-                        "opacity": 1,
-                      }
-                    }
                   >
                     <Text
                       style={
@@ -980,7 +1001,7 @@ exports[`NotificationBox Simple test 1`] = `
                         ]
                       }
                     >
-                      getBackupKey
+                      backupKeyFlow6:getBackupKey
                     </Text>
                   </View>
                 </View>
@@ -1027,7 +1048,7 @@ exports[`NotificationBox Simple test 1`] = `
               resizeMode="contain"
               source={
                 Object {
-                  "testUri": "../../../src/images/Invite-Friends.png",
+                  "testUri": "../../../packages/mobile/src/images/Invite-Friends.png",
                 }
               }
               style={
@@ -1097,18 +1118,21 @@ exports[`NotificationBox Simple test 1`] = `
                 >
                   <View
                     accessible={true}
+                    focusable={true}
                     isTVSelectable={true}
+                    nativeBackgroundAndroid={
+                      Object {
+                        "attribute": "selectableItemBackgroundBorderless",
+                        "type": "ThemeAttrAndroid",
+                      }
+                    }
+                    onClick={[Function]}
                     onResponderGrant={[Function]}
                     onResponderMove={[Function]}
                     onResponderRelease={[Function]}
                     onResponderTerminate={[Function]}
                     onResponderTerminationRequest={[Function]}
                     onStartShouldSetResponder={[Function]}
-                    style={
-                      Object {
-                        "opacity": 1,
-                      }
-                    }
                   >
                     <Text
                       style={
@@ -1136,18 +1160,21 @@ exports[`NotificationBox Simple test 1`] = `
                   </View>
                   <View
                     accessible={true}
+                    focusable={true}
                     isTVSelectable={true}
+                    nativeBackgroundAndroid={
+                      Object {
+                        "attribute": "selectableItemBackgroundBorderless",
+                        "type": "ThemeAttrAndroid",
+                      }
+                    }
+                    onClick={[Function]}
                     onResponderGrant={[Function]}
                     onResponderMove={[Function]}
                     onResponderRelease={[Function]}
                     onResponderTerminate={[Function]}
                     onResponderTerminationRequest={[Function]}
                     onStartShouldSetResponder={[Function]}
-                    style={
-                      Object {
-                        "opacity": 1,
-                      }
-                    }
                   >
                     <Text
                       style={

@@ -8,10 +8,6 @@ import { ErrorMessages } from 'src/app/ErrorMessages'
 import JoinCelo, { JoinCelo as JoinCeloClass } from 'src/invite/JoinCelo'
 import { createMockStore, getMockI18nProps } from 'test/utils'
 
-jest.mock('src/web3/contracts', () => ({
-  isZeroSyncMode: jest.fn().mockReturnValueOnce(false),
-}))
-
 describe('JoinCeloScreen', () => {
   it('renders correctly', () => {
     const store = createMockStore()
@@ -31,6 +27,30 @@ describe('JoinCeloScreen', () => {
       </Provider>
     )
     expect(tree).toMatchSnapshot()
+  })
+
+  it('show missing full name warning', () => {
+    const showErrorMock = jest.fn()
+    const store = createMockStore()
+    const wrapper = render(
+      <Provider store={store}>
+        <JoinCeloClass
+          showError={showErrorMock}
+          hideAlert={jest.fn()}
+          setPhoneNumber={jest.fn()}
+          setName={jest.fn()}
+          language={'en-us'}
+          cachedName={''}
+          cachedNumber={''}
+          cachedCountryCode={'+1'}
+          pincodeType={PincodeType.Unset}
+          {...getMockI18nProps()}
+        />
+      </Provider>
+    )
+    fireEvent.changeText(wrapper.getByTestId('PhoneNumberField'), '4155556666')
+    fireEvent.press(wrapper.getByTestId('JoinCeloContinueButton'))
+    expect(showErrorMock.mock.calls[0][0]).toBe(ErrorMessages.MISSING_FULL_NAME)
   })
 
   it('is disabled with no text', () => {

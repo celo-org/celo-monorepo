@@ -108,6 +108,7 @@ export const fonts = StyleSheet.create({
     textAlign: 'center',
     color: colors.dark,
     cursor: 'pointer',
+    fontWeight: '500',
     textRendering: 'geometricPrecision',
   },
   p: {

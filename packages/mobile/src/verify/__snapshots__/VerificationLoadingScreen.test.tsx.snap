@@ -1,0 +1,1226 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`VerificationLoadingScreen renders correctly 1`] = `
+<SafeAreaView
+  style={
+    Object {
+      "backgroundColor": "#FAFAFA",
+      "flex": 1,
+      "justifyContent": "space-between",
+    }
+  }
+>
+  <RCTScrollView
+    contentContainerStyle={
+      Object {
+        "alignItems": "center",
+        "flex": 1,
+        "justifyContent": "center",
+        "padding": 30,
+        "paddingTop": 0,
+      }
+    }
+  >
+    <View>
+      <View
+        style={
+          Object {
+            "height": 35,
+            "paddingRight": 10,
+            "paddingTop": 10,
+            "position": "absolute",
+            "right": 0,
+            "top": 0,
+            "width": 70,
+            "zIndex": 100,
+          }
+        }
+      >
+        <Text
+          accessible={true}
+          focusable={true}
+          onClick={[Function]}
+          onResponderGrant={[Function]}
+          onResponderMove={[Function]}
+          onResponderRelease={[Function]}
+          onResponderTerminate={[Function]}
+          onResponderTerminationRequest={[Function]}
+          onStartShouldSetResponder={[Function]}
+        >
+             
+        </Text>
+      </View>
+      <View
+        style={
+          Object {
+            "marginVertical": 30,
+          }
+        }
+      >
+        <View
+          style={
+            Object {
+              "height": 250,
+            }
+          }
+        >
+          <RCTScrollView
+            activeAnimationOptions={null}
+            activeAnimationType="timing"
+            activeSlideAlignment="center"
+            activeSlideOffset={20}
+            apparitionDelay={0}
+            automaticallyAdjustContentInsets={false}
+            autoplay={false}
+            autoplayDelay={1000}
+            autoplayInterval={3000}
+            callbackOffsetMargin={5}
+            containerCustomStyle={Object {}}
+            contentContainerCustomStyle={Object {}}
+            contentContainerStyle={
+              Array [
+                Object {
+                  "paddingLeft": 35,
+                  "paddingRight": 35,
+                },
+                Object {},
+              ]
+            }
+            data={
+              Array [
+                Object {
+                  "text": "Test 1",
+                },
+                Object {
+                  "text": "Test 2",
+                },
+                Object {
+                  "text": "Test 3",
+                },
+              ]
+            }
+            decelerationRate="fast"
+            directionalLockEnabled={true}
+            disableVirtualization={false}
+            enableMomentum={false}
+            enableSnap={true}
+            firstItem={0}
+            getItem={[Function]}
+            getItemCount={[Function]}
+            hasParallaxImages={false}
+            horizontal={true}
+            inactiveSlideOpacity={1}
+            inactiveSlideScale={0.9}
+            inactiveSlideShift={0}
+            initialNumToRender={7}
+            invertStickyHeaders={false}
+            inverted={false}
+            itemHeight={250}
+            itemWidth={680}
+            keyExtractor={[Function]}
+            layout="default"
+            lockScrollTimeoutDuration={1000}
+            lockScrollWhileSnapping={false}
+            loop={false}
+            loopClonesPerSide={3}
+            maxToRenderPerBatch={15}
+            numColumns={1}
+            onContentSizeChange={[Function]}
+            onEndReachedThreshold={2}
+            onLayout={[Function]}
+            onMomentumScrollEnd={[Function]}
+            onResponderRelease={[Function]}
+            onScroll={[Function]}
+            onScrollBeginDrag={[Function]}
+            onScrollEndDrag={[Function]}
+            onSnapToItem={[Function]}
+            onStartShouldSetResponderCapture={[Function]}
+            onTouchEnd={[Function]}
+            onTouchStart={[Function]}
+            overScrollMode="never"
+            pinchGestureEnabled={false}
+            removeClippedSubviews={true}
+            renderItem={[Function]}
+            scrollEnabled={true}
+            scrollEventThrottle={1}
+            scrollsToTop={false}
+            shouldOptimizeUpdates={true}
+            showsHorizontalScrollIndicator={false}
+            showsVerticalScrollIndicator={false}
+            slideStyle={Object {}}
+            sliderHeight={250}
+            sliderWidth={750}
+            stickyHeaderIndices={Array []}
+            style={
+              Object {
+                "flexDirection": "row",
+                "opacity": 0,
+                "width": 750,
+              }
+            }
+            swipeThreshold={20}
+            updateCellsBatchingPeriod={50}
+            useScrollView={false}
+            vertical={false}
+            viewabilityConfigCallbackPairs={Array []}
+            windowSize={15}
+          >
+            <View>
+              <View
+                onLayout={[Function]}
+                style={
+                  Array [
+                    Object {
+                      "flexDirection": "row",
+                    },
+                    null,
+                  ]
+                }
+              >
+                <View
+                  pointerEvents="box-none"
+                  style={
+                    Object {
+                      "transform": Array [
+                        Object {
+                          "scale": 1,
+                        },
+                      ],
+                      "width": 680,
+                    }
+                  }
+                >
+                  <View
+                    style={
+                      Object {
+                        "position": "relative",
+                      }
+                    }
+                  >
+                    <View
+                      style={
+                        Array [
+                          Object {
+                            "height": 250,
+                            "position": "relative",
+                            "width": 680,
+                          },
+                          Object {
+                            "padding": 3,
+                          },
+                        ]
+                      }
+                    >
+                      <svg
+                        height={276}
+                        style={
+                          Object {
+                            "left": -1,
+                            "position": "absolute",
+                            "top": -1,
+                          }
+                        }
+                        width={706}
+                      >
+                        <defs>
+                          <linearGradient
+                            id="top"
+                            x1="0%"
+                            x2="0%"
+                            y1="100%"
+                            y2="0%"
+                          >
+                            <stop
+                              offset="0"
+                              stopColor="#6b7b8b"
+                              stopOpacity={0.03}
+                            />
+                            <stop
+                              offset="1"
+                              stopColor="#6b7b8b"
+                              stopOpacity="0"
+                            />
+                          </linearGradient>
+                          <linearGradient
+                            id="bottom"
+                            x1="0%"
+                            x2="0%"
+                            y1="0%"
+                            y2="100%"
+                          >
+                            <stop
+                              offset="0"
+                              stopColor="#6b7b8b"
+                              stopOpacity={0.03}
+                            />
+                            <stop
+                              offset="1"
+                              stopColor="#6b7b8b"
+                              stopOpacity="0"
+                            />
+                          </linearGradient>
+                          <linearGradient
+                            id="left"
+                            x1="100%"
+                            x2="0%"
+                            y1="0%"
+                            y2="0%"
+                          >
+                            <stop
+                              offset="0"
+                              stopColor="#6b7b8b"
+                              stopOpacity={0.03}
+                            />
+                            <stop
+                              offset="1"
+                              stopColor="#6b7b8b"
+                              stopOpacity="0"
+                            />
+                          </linearGradient>
+                          <linearGradient
+                            id="right"
+                            x1="0%"
+                            x2="100%"
+                            y1="0%"
+                            y2="0%"
+                          >
+                            <stop
+                              offset="0"
+                              stopColor="#6b7b8b"
+                              stopOpacity={0.03}
+                            />
+                            <stop
+                              offset="1"
+                              stopColor="#6b7b8b"
+                              stopOpacity="0"
+                            />
+                          </linearGradient>
+                          <radialGradient
+                            cx="100%"
+                            cy="100%"
+                            fx="100%"
+                            fy="100%"
+                            id="border-left-top"
+                            r="100%"
+                          >
+                            <stop
+                              offset="0"
+                              stopColor="#6b7b8b"
+                              stopOpacity={0.03}
+                            />
+                            <stop
+                              offset="0.9230769230769231"
+                              stopColor="#6b7b8b"
+                              stopOpacity={0.03}
+                            />
+                            <stop
+                              offset="1"
+                              stopColor="#6b7b8b"
+                              stopOpacity="0"
+                            />
+                          </radialGradient>
+                          <radialGradient
+                            cx="100%"
+                            cy="0%"
+                            fx="100%"
+                            fy="0%"
+                            id="border-left-bottom"
+                            r="100%"
+                          >
+                            <stop
+                              offset="0"
+                              stopColor="#6b7b8b"
+                              stopOpacity={0.03}
+                            />
+                            <stop
+                              offset="0.9230769230769231"
+                              stopColor="#6b7b8b"
+                              stopOpacity={0.03}
+                            />
+                            <stop
+                              offset="1"
+                              stopColor="#6b7b8b"
+                              stopOpacity="0"
+                            />
+                          </radialGradient>
+                          <radialGradient
+                            cx="0%"
+                            cy="100%"
+                            fx="0%"
+                            fy="100%"
+                            id="border-right-top"
+                            r="100%"
+                          >
+                            <stop
+                              offset="0"
+                              stopColor="#6b7b8b"
+                              stopOpacity={0.03}
+                            />
+                            <stop
+                              offset="0.9230769230769231"
+                              stopColor="#6b7b8b"
+                              stopOpacity={0.03}
+                            />
+                            <stop
+                              offset="1"
+                              stopColor="#6b7b8b"
+                              stopOpacity="0"
+                            />
+                          </radialGradient>
+                          <radialGradient
+                            cx="0%"
+                            cy="0%"
+                            fx="0%"
+                            fy="0%"
+                            id="border-right-bottom"
+                            r="100%"
+                          >
+                            <stop
+                              offset="0"
+                              stopColor="#6b7b8b"
+                              stopOpacity={0.03}
+                            />
+                            <stop
+                              offset="0.9230769230769231"
+                              stopColor="#6b7b8b"
+                              stopOpacity={0.03}
+                            />
+                            <stop
+                              offset="1"
+                              stopColor="#6b7b8b"
+                              stopOpacity="0"
+                            />
+                          </radialGradient>
+                        </defs>
+                        <path
+                          d="M 0 13,Q 0 0 13 0,v 1,q -12 0 -12 12,h -1,z"
+                          fill="url(#border-left-top)"
+                        />
+                        <path
+                          d="M 669 0,q 13 0 13 13,h -1,q 0 -12 -12 -12,v -1,z"
+                          fill="url(#border-right-top)"
+                        />
+                        <path
+                          d="M 681 239,h 1,q 0 13 -13 13,v -1,q 12 0 12 -12,z"
+                          fill="url(#border-right-bottom)"
+                        />
+                        <path
+                          d="M 0 239,q 0 13 13 13,v -1,q -12 0 -12 -12,h -1,z"
+                          fill="url(#border-left-bottom)"
+                        />
+                        <rect
+                          fill="url(#top)"
+                          height={1}
+                          width={656}
+                          x={13}
+                          y="0"
+                        />
+                        <rect
+                          fill="url(#left)"
+                          height={226}
+                          width={1}
+                          x="0"
+                          y={13}
+                        />
+                        <rect
+                          fill="url(#right)"
+                          height={226}
+                          width={1}
+                          x={681}
+                          y={13}
+                        />
+                        <rect
+                          fill="url(#bottom)"
+                          height={1}
+                          width={656}
+                          x={13}
+                          y={251}
+                        />
+                        <path
+                          d="M 13 1,h 656,q 12 0 12 12,v 226,q 0 12 -12 12,h -656,q -12 0 -12 -12,v -226,q 0 -12 12 -12"
+                          fill="rgba(107,123,139,0.03)"
+                        />
+                      </svg>
+                      <View
+                        style={
+                          Object {
+                            "alignItems": "center",
+                            "backgroundColor": "#FFFFFF",
+                            "borderColor": "rgba(255, 255, 255, 0.5)",
+                            "borderRadius": 12,
+                            "borderWidth": 2,
+                            "height": 244,
+                            "justifyContent": "center",
+                            "width": 674,
+                          }
+                        }
+                      >
+                        <Text
+                          style={
+                            Object {
+                              "color": "#2E3338",
+                              "fontFamily": "Hind-Regular",
+                              "fontSize": 17,
+                              "lineHeight": 26,
+                            }
+                          }
+                        >
+                          Test 1
+                        </Text>
+                      </View>
+                    </View>
+                  </View>
+                </View>
+              </View>
+              <View
+                onLayout={[Function]}
+                style={
+                  Array [
+                    Object {
+                      "flexDirection": "row",
+                    },
+                    null,
+                  ]
+                }
+              >
+                <View
+                  pointerEvents="box-none"
+                  style={
+                    Object {
+                      "transform": Array [
+                        Object {
+                          "scale": 0.9,
+                        },
+                      ],
+                      "width": 680,
+                    }
+                  }
+                >
+                  <View
+                    style={
+                      Object {
+                        "position": "relative",
+                      }
+                    }
+                  >
+                    <View
+                      style={
+                        Array [
+                          Object {
+                            "height": 250,
+                            "position": "relative",
+                            "width": 680,
+                          },
+                          Object {
+                            "padding": 3,
+                          },
+                        ]
+                      }
+                    >
+                      <svg
+                        height={276}
+                        style={
+                          Object {
+                            "left": -1,
+                            "position": "absolute",
+                            "top": -1,
+                          }
+                        }
+                        width={706}
+                      >
+                        <defs>
+                          <linearGradient
+                            id="top"
+                            x1="0%"
+                            x2="0%"
+                            y1="100%"
+                            y2="0%"
+                          >
+                            <stop
+                              offset="0"
+                              stopColor="#6b7b8b"
+                              stopOpacity={0.03}
+                            />
+                            <stop
+                              offset="1"
+                              stopColor="#6b7b8b"
+                              stopOpacity="0"
+                            />
+                          </linearGradient>
+                          <linearGradient
+                            id="bottom"
+                            x1="0%"
+                            x2="0%"
+                            y1="0%"
+                            y2="100%"
+                          >
+                            <stop
+                              offset="0"
+                              stopColor="#6b7b8b"
+                              stopOpacity={0.03}
+                            />
+                            <stop
+                              offset="1"
+                              stopColor="#6b7b8b"
+                              stopOpacity="0"
+                            />
+                          </linearGradient>
+                          <linearGradient
+                            id="left"
+                            x1="100%"
+                            x2="0%"
+                            y1="0%"
+                            y2="0%"
+                          >
+                            <stop
+                              offset="0"
+                              stopColor="#6b7b8b"
+                              stopOpacity={0.03}
+                            />
+                            <stop
+                              offset="1"
+                              stopColor="#6b7b8b"
+                              stopOpacity="0"
+                            />
+                          </linearGradient>
+                          <linearGradient
+                            id="right"
+                            x1="0%"
+                            x2="100%"
+                            y1="0%"
+                            y2="0%"
+                          >
+                            <stop
+                              offset="0"
+                              stopColor="#6b7b8b"
+                              stopOpacity={0.03}
+                            />
+                            <stop
+                              offset="1"
+                              stopColor="#6b7b8b"
+                              stopOpacity="0"
+                            />
+                          </linearGradient>
+                          <radialGradient
+                            cx="100%"
+                            cy="100%"
+                            fx="100%"
+                            fy="100%"
+                            id="border-left-top"
+                            r="100%"
+                          >
+                            <stop
+                              offset="0"
+                              stopColor="#6b7b8b"
+                              stopOpacity={0.03}
+                            />
+                            <stop
+                              offset="0.9230769230769231"
+                              stopColor="#6b7b8b"
+                              stopOpacity={0.03}
+                            />
+                            <stop
+                              offset="1"
+                              stopColor="#6b7b8b"
+                              stopOpacity="0"
+                            />
+                          </radialGradient>
+                          <radialGradient
+                            cx="100%"
+                            cy="0%"
+                            fx="100%"
+                            fy="0%"
+                            id="border-left-bottom"
+                            r="100%"
+                          >
+                            <stop
+                              offset="0"
+                              stopColor="#6b7b8b"
+                              stopOpacity={0.03}
+                            />
+                            <stop
+                              offset="0.9230769230769231"
+                              stopColor="#6b7b8b"
+                              stopOpacity={0.03}
+                            />
+                            <stop
+                              offset="1"
+                              stopColor="#6b7b8b"
+                              stopOpacity="0"
+                            />
+                          </radialGradient>
+                          <radialGradient
+                            cx="0%"
+                            cy="100%"
+                            fx="0%"
+                            fy="100%"
+                            id="border-right-top"
+                            r="100%"
+                          >
+                            <stop
+                              offset="0"
+                              stopColor="#6b7b8b"
+                              stopOpacity={0.03}
+                            />
+                            <stop
+                              offset="0.9230769230769231"
+                              stopColor="#6b7b8b"
+                              stopOpacity={0.03}
+                            />
+                            <stop
+                              offset="1"
+                              stopColor="#6b7b8b"
+                              stopOpacity="0"
+                            />
+                          </radialGradient>
+                          <radialGradient
+                            cx="0%"
+                            cy="0%"
+                            fx="0%"
+                            fy="0%"
+                            id="border-right-bottom"
+                            r="100%"
+                          >
+                            <stop
+                              offset="0"
+                              stopColor="#6b7b8b"
+                              stopOpacity={0.03}
+                            />
+                            <stop
+                              offset="0.9230769230769231"
+                              stopColor="#6b7b8b"
+                              stopOpacity={0.03}
+                            />
+                            <stop
+                              offset="1"
+                              stopColor="#6b7b8b"
+                              stopOpacity="0"
+                            />
+                          </radialGradient>
+                        </defs>
+                        <path
+                          d="M 0 13,Q 0 0 13 0,v 1,q -12 0 -12 12,h -1,z"
+                          fill="url(#border-left-top)"
+                        />
+                        <path
+                          d="M 669 0,q 13 0 13 13,h -1,q 0 -12 -12 -12,v -1,z"
+                          fill="url(#border-right-top)"
+                        />
+                        <path
+                          d="M 681 239,h 1,q 0 13 -13 13,v -1,q 12 0 12 -12,z"
+                          fill="url(#border-right-bottom)"
+                        />
+                        <path
+                          d="M 0 239,q 0 13 13 13,v -1,q -12 0 -12 -12,h -1,z"
+                          fill="url(#border-left-bottom)"
+                        />
+                        <rect
+                          fill="url(#top)"
+                          height={1}
+                          width={656}
+                          x={13}
+                          y="0"
+                        />
+                        <rect
+                          fill="url(#left)"
+                          height={226}
+                          width={1}
+                          x="0"
+                          y={13}
+                        />
+                        <rect
+                          fill="url(#right)"
+                          height={226}
+                          width={1}
+                          x={681}
+                          y={13}
+                        />
+                        <rect
+                          fill="url(#bottom)"
+                          height={1}
+                          width={656}
+                          x={13}
+                          y={251}
+                        />
+                        <path
+                          d="M 13 1,h 656,q 12 0 12 12,v 226,q 0 12 -12 12,h -656,q -12 0 -12 -12,v -226,q 0 -12 12 -12"
+                          fill="rgba(107,123,139,0.03)"
+                        />
+                      </svg>
+                      <View
+                        style={
+                          Object {
+                            "alignItems": "center",
+                            "backgroundColor": "#FFFFFF",
+                            "borderColor": "rgba(255, 255, 255, 0.5)",
+                            "borderRadius": 12,
+                            "borderWidth": 2,
+                            "height": 244,
+                            "justifyContent": "center",
+                            "width": 674,
+                          }
+                        }
+                      >
+                        <Text
+                          style={
+                            Object {
+                              "color": "#2E3338",
+                              "fontFamily": "Hind-Regular",
+                              "fontSize": 17,
+                              "lineHeight": 26,
+                            }
+                          }
+                        >
+                          Test 2
+                        </Text>
+                      </View>
+                    </View>
+                  </View>
+                </View>
+              </View>
+              <View
+                onLayout={[Function]}
+                style={
+                  Array [
+                    Object {
+                      "flexDirection": "row",
+                    },
+                    null,
+                  ]
+                }
+              >
+                <View
+                  pointerEvents="box-none"
+                  style={
+                    Object {
+                      "transform": Array [
+                        Object {
+                          "scale": 0.9,
+                        },
+                      ],
+                      "width": 680,
+                    }
+                  }
+                >
+                  <View
+                    style={
+                      Object {
+                        "position": "relative",
+                      }
+                    }
+                  >
+                    <View
+                      style={
+                        Array [
+                          Object {
+                            "height": 250,
+                            "position": "relative",
+                            "width": 680,
+                          },
+                          Object {
+                            "padding": 3,
+                          },
+                        ]
+                      }
+                    >
+                      <svg
+                        height={276}
+                        style={
+                          Object {
+                            "left": -1,
+                            "position": "absolute",
+                            "top": -1,
+                          }
+                        }
+                        width={706}
+                      >
+                        <defs>
+                          <linearGradient
+                            id="top"
+                            x1="0%"
+                            x2="0%"
+                            y1="100%"
+                            y2="0%"
+                          >
+                            <stop
+                              offset="0"
+                              stopColor="#6b7b8b"
+                              stopOpacity={0.03}
+                            />
+                            <stop
+                              offset="1"
+                              stopColor="#6b7b8b"
+                              stopOpacity="0"
+                            />
+                          </linearGradient>
+                          <linearGradient
+                            id="bottom"
+                            x1="0%"
+                            x2="0%"
+                            y1="0%"
+                            y2="100%"
+                          >
+                            <stop
+                              offset="0"
+                              stopColor="#6b7b8b"
+                              stopOpacity={0.03}
+                            />
+                            <stop
+                              offset="1"
+                              stopColor="#6b7b8b"
+                              stopOpacity="0"
+                            />
+                          </linearGradient>
+                          <linearGradient
+                            id="left"
+                            x1="100%"
+                            x2="0%"
+                            y1="0%"
+                            y2="0%"
+                          >
+                            <stop
+                              offset="0"
+                              stopColor="#6b7b8b"
+                              stopOpacity={0.03}
+                            />
+                            <stop
+                              offset="1"
+                              stopColor="#6b7b8b"
+                              stopOpacity="0"
+                            />
+                          </linearGradient>
+                          <linearGradient
+                            id="right"
+                            x1="0%"
+                            x2="100%"
+                            y1="0%"
+                            y2="0%"
+                          >
+                            <stop
+                              offset="0"
+                              stopColor="#6b7b8b"
+                              stopOpacity={0.03}
+                            />
+                            <stop
+                              offset="1"
+                              stopColor="#6b7b8b"
+                              stopOpacity="0"
+                            />
+                          </linearGradient>
+                          <radialGradient
+                            cx="100%"
+                            cy="100%"
+                            fx="100%"
+                            fy="100%"
+                            id="border-left-top"
+                            r="100%"
+                          >
+                            <stop
+                              offset="0"
+                              stopColor="#6b7b8b"
+                              stopOpacity={0.03}
+                            />
+                            <stop
+                              offset="0.9230769230769231"
+                              stopColor="#6b7b8b"
+                              stopOpacity={0.03}
+                            />
+                            <stop
+                              offset="1"
+                              stopColor="#6b7b8b"
+                              stopOpacity="0"
+                            />
+                          </radialGradient>
+                          <radialGradient
+                            cx="100%"
+                            cy="0%"
+                            fx="100%"
+                            fy="0%"
+                            id="border-left-bottom"
+                            r="100%"
+                          >
+                            <stop
+                              offset="0"
+                              stopColor="#6b7b8b"
+                              stopOpacity={0.03}
+                            />
+                            <stop
+                              offset="0.9230769230769231"
+                              stopColor="#6b7b8b"
+                              stopOpacity={0.03}
+                            />
+                            <stop
+                              offset="1"
+                              stopColor="#6b7b8b"
+                              stopOpacity="0"
+                            />
+                          </radialGradient>
+                          <radialGradient
+                            cx="0%"
+                            cy="100%"
+                            fx="0%"
+                            fy="100%"
+                            id="border-right-top"
+                            r="100%"
+                          >
+                            <stop
+                              offset="0"
+                              stopColor="#6b7b8b"
+                              stopOpacity={0.03}
+                            />
+                            <stop
+                              offset="0.9230769230769231"
+                              stopColor="#6b7b8b"
+                              stopOpacity={0.03}
+                            />
+                            <stop
+                              offset="1"
+                              stopColor="#6b7b8b"
+                              stopOpacity="0"
+                            />
+                          </radialGradient>
+                          <radialGradient
+                            cx="0%"
+                            cy="0%"
+                            fx="0%"
+                            fy="0%"
+                            id="border-right-bottom"
+                            r="100%"
+                          >
+                            <stop
+                              offset="0"
+                              stopColor="#6b7b8b"
+                              stopOpacity={0.03}
+                            />
+                            <stop
+                              offset="0.9230769230769231"
+                              stopColor="#6b7b8b"
+                              stopOpacity={0.03}
+                            />
+                            <stop
+                              offset="1"
+                              stopColor="#6b7b8b"
+                              stopOpacity="0"
+                            />
+                          </radialGradient>
+                        </defs>
+                        <path
+                          d="M 0 13,Q 0 0 13 0,v 1,q -12 0 -12 12,h -1,z"
+                          fill="url(#border-left-top)"
+                        />
+                        <path
+                          d="M 669 0,q 13 0 13 13,h -1,q 0 -12 -12 -12,v -1,z"
+                          fill="url(#border-right-top)"
+                        />
+                        <path
+                          d="M 681 239,h 1,q 0 13 -13 13,v -1,q 12 0 12 -12,z"
+                          fill="url(#border-right-bottom)"
+                        />
+                        <path
+                          d="M 0 239,q 0 13 13 13,v -1,q -12 0 -12 -12,h -1,z"
+                          fill="url(#border-left-bottom)"
+                        />
+                        <rect
+                          fill="url(#top)"
+                          height={1}
+                          width={656}
+                          x={13}
+                          y="0"
+                        />
+                        <rect
+                          fill="url(#left)"
+                          height={226}
+                          width={1}
+                          x="0"
+                          y={13}
+                        />
+                        <rect
+                          fill="url(#right)"
+                          height={226}
+                          width={1}
+                          x={681}
+                          y={13}
+                        />
+                        <rect
+                          fill="url(#bottom)"
+                          height={1}
+                          width={656}
+                          x={13}
+                          y={251}
+                        />
+                        <path
+                          d="M 13 1,h 656,q 12 0 12 12,v 226,q 0 12 -12 12,h -656,q -12 0 -12 -12,v -226,q 0 -12 12 -12"
+                          fill="rgba(107,123,139,0.03)"
+                        />
+                      </svg>
+                      <View
+                        style={
+                          Object {
+                            "alignItems": "center",
+                            "backgroundColor": "#FFFFFF",
+                            "borderColor": "rgba(255, 255, 255, 0.5)",
+                            "borderRadius": 12,
+                            "borderWidth": 2,
+                            "height": 244,
+                            "justifyContent": "center",
+                            "width": 674,
+                          }
+                        }
+                      >
+                        <Text
+                          style={
+                            Object {
+                              "color": "#2E3338",
+                              "fontFamily": "Hind-Regular",
+                              "fontSize": 17,
+                              "lineHeight": 26,
+                            }
+                          }
+                        >
+                          Test 3
+                        </Text>
+                      </View>
+                    </View>
+                  </View>
+                </View>
+              </View>
+            </View>
+          </RCTScrollView>
+        </View>
+        <View
+          accessible={false}
+          pointerEvents="box-none"
+          style={
+            Array [
+              Object {
+                "alignItems": "center",
+                "justifyContent": "center",
+                "paddingHorizontal": 20,
+                "paddingVertical": 30,
+              },
+              Object {
+                "flexDirection": "row",
+              },
+              Object {
+                "marginVertical": 10,
+              },
+            ]
+          }
+        >
+          <View
+            accessible={false}
+            focusable={false}
+            isTVSelectable={true}
+            onClick={[Function]}
+            onResponderGrant={[Function]}
+            onResponderMove={[Function]}
+            onResponderRelease={[Function]}
+            onResponderTerminate={[Function]}
+            onResponderTerminationRequest={[Function]}
+            onStartShouldSetResponder={[Function]}
+            style={
+              Object {
+                "alignItems": "center",
+                "justifyContent": "center",
+                "marginHorizontal": 8,
+                "opacity": 1,
+              }
+            }
+          >
+            <View
+              style={
+                Object {
+                  "backgroundColor": "rgba(189, 189, 189, 1)",
+                  "borderRadius": 3.5,
+                  "height": 7,
+                  "opacity": 1,
+                  "transform": Array [
+                    Object {
+                      "scale": 0.8,
+                    },
+                  ],
+                  "width": 7,
+                }
+              }
+            />
+          </View>
+          <View
+            accessible={false}
+            focusable={false}
+            isTVSelectable={true}
+            onClick={[Function]}
+            onResponderGrant={[Function]}
+            onResponderMove={[Function]}
+            onResponderRelease={[Function]}
+            onResponderTerminate={[Function]}
+            onResponderTerminationRequest={[Function]}
+            onStartShouldSetResponder={[Function]}
+            style={
+              Object {
+                "alignItems": "center",
+                "justifyContent": "center",
+                "marginHorizontal": 8,
+                "opacity": 1,
+              }
+            }
+          >
+            <View
+              style={
+                Object {
+                  "backgroundColor": "rgba(189, 189, 189, 1)",
+                  "borderRadius": 3.5,
+                  "height": 7,
+                  "opacity": 1,
+                  "transform": Array [
+                    Object {
+                      "scale": 0.8,
+                    },
+                  ],
+                  "width": 7,
+                }
+              }
+            />
+          </View>
+          <View
+            accessible={false}
+            focusable={false}
+            isTVSelectable={true}
+            onClick={[Function]}
+            onResponderGrant={[Function]}
+            onResponderMove={[Function]}
+            onResponderRelease={[Function]}
+            onResponderTerminate={[Function]}
+            onResponderTerminationRequest={[Function]}
+            onStartShouldSetResponder={[Function]}
+            style={
+              Object {
+                "alignItems": "center",
+                "justifyContent": "center",
+                "marginHorizontal": 8,
+                "opacity": 1,
+              }
+            }
+          >
+            <View
+              style={
+                Object {
+                  "backgroundColor": "rgba(189, 189, 189, 1)",
+                  "borderRadius": 3.5,
+                  "height": 7,
+                  "opacity": 1,
+                  "transform": Array [
+                    Object {
+                      "scale": 0.8,
+                    },
+                  ],
+                  "width": 7,
+                }
+              }
+            />
+          </View>
+        </View>
+      </View>
+    </View>
+  </RCTScrollView>
+</SafeAreaView>
+`;

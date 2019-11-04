@@ -1,4 +1,5 @@
-import { getErc20Balance, getGoldTokenContract, getStableTokenContract } from '@celo/walletkit'
+import { retryAsync } from '@celo/utils/src/async'
+import { getGoldTokenContract, getStableTokenContract } from '@celo/walletkit'
 import BigNumber from 'bignumber.js'
 import { call, put, take, takeEvery } from 'redux-saga/effects'
 import { showError } from 'src/alert/actions'
@@ -10,29 +11,67 @@ import { addStandbyTransaction, removeStandbyTransaction } from 'src/transaction
 import { TransactionStatus, TransactionTypes } from 'src/transactions/reducer'
 import { sendAndMonitorTransaction } from 'src/transactions/saga'
 import Logger from 'src/utils/Logger'
-import { web3 } from 'src/web3/contracts'
-import { getConnectedAccount, getConnectedUnlockedAccount } from 'src/web3/saga'
+import { contractKit, web3 } from 'src/web3/contracts'
+import { getConnectedAccount, getConnectedUnlockedAccount, waitForWeb3Sync } from 'src/web3/saga'
 import * as utf8 from 'utf8'
+
+const TAG = 'tokens/saga'
+
+// The number of wei that represent one unit in a contract
+const contractWeiPerUnit: { [key in CURRENCY_ENUM]: BigNumber | null } = {
+  [CURRENCY_ENUM.GOLD]: null,
+  [CURRENCY_ENUM.DOLLAR]: null,
+}
+
+async function getWeiPerUnit(token: CURRENCY_ENUM) {
+  let weiPerUnit = contractWeiPerUnit[token]
+  if (!weiPerUnit) {
+    const contract = await getTokenContract(token)
+    const decimals = await contract.decimals()
+    weiPerUnit = new BigNumber(10).pow(decimals)
+    contractWeiPerUnit[token] = weiPerUnit
+  }
+  return weiPerUnit
+}
+
+export async function convertFromContractDecimals(value: BigNumber, token: CURRENCY_ENUM) {
+  const weiPerUnit = await getWeiPerUnit(token)
+  return value.dividedBy(weiPerUnit)
+}
+
+export async function convertToContractDecimals(value: BigNumber, token: CURRENCY_ENUM) {
+  const weiPerUnit = await getWeiPerUnit(token)
+  return value.times(weiPerUnit)
+}
+
+export async function getTokenContract(token: CURRENCY_ENUM) {
+  Logger.debug(TAG + '@getTokenContract', `Fetching contract for ${token}`)
+  await waitForWeb3Sync()
+  switch (token) {
+    case CURRENCY_ENUM.GOLD:
+      return contractKit.contracts.getGoldToken()
+    case CURRENCY_ENUM.DOLLAR:
+      return contractKit.contracts.getStableToken()
+    default:
+      throw new Error(`Could not fetch contract for unknown token ${token}`)
+  }
+}
 
 interface TokenFetchFactory {
   actionName: string
-  contractGetter: (web3: any) => any
+  token: CURRENCY_ENUM
   actionCreator: (balance: string) => any
   tag: string
 }
 
-export const tokenFetchFactory = ({
-  actionName,
-  contractGetter,
-  actionCreator,
-  tag,
-}: TokenFetchFactory) => {
+export function tokenFetchFactory({ actionName, token, actionCreator, tag }: TokenFetchFactory) {
   function* tokenFetch() {
     try {
       Logger.debug(tag, 'Fetching balance')
       const account = yield call(getConnectedAccount)
-      const tokenContract = yield call(contractGetter, web3)
-      const balance = yield call(getErc20Balance, tokenContract, account, web3)
+      const tokenContract = yield call(getTokenContract, token)
+      const balanceInWei: BigNumber = yield call([tokenContract, tokenContract.balanceOf], account)
+      const balance: BigNumber = yield call(convertFromContractDecimals, balanceInWei, token)
       CeloAnalytics.track(CustomEventNames.fetch_balance)
       yield put(actionCreator(balance.toString()))
     } catch (error) {
@@ -69,10 +108,10 @@ interface TokenTransferFactory {
 }
 
 // TODO(martinvol) this should go to the SDK
-export const createTransaction = async (
+export async function createTransaction(
   contractGetter: typeof getStableTokenContract | typeof getGoldTokenContract,
   transferAction: BasicTokenTransfer
-) => {
+) {
   const { recipientAddress, amount, comment } = transferAction
 
   // TODO(cmcewen): Use proper typing when there is a common interface
@@ -91,13 +130,22 @@ export const createTransaction = async (
   return tx
 }
 
-export const tokenTransferFactory = ({
+export async function fetchTokenBalanceInWeiWithRetry(token: CURRENCY_ENUM, account: string) {
+  Logger.debug(TAG + '@fetchTokenBalanceInWeiWithRetry', 'Checking account balance', account)
+  const tokenContract = await getTokenContract(token)
+  // Retry needed here because it's typically the app's first tx and seems to fail on occasion
+  const balanceInWei = await retryAsync(tokenContract.balanceOf, 3, [account])
+  Logger.debug(TAG + '@fetchTokenBalanceInWeiWithRetry', 'Account balance', balanceInWei.toString())
+  return balanceInWei
+}
+
+export function tokenTransferFactory({
   actionName,
   contractGetter,
   tag,
   currency,
   fetchAction,
-}: TokenTransferFactory) => {
+}: TokenTransferFactory) {
   return function*() {
     while (true) {
       const transferAction: TokenTransferAction = yield take(actionName)

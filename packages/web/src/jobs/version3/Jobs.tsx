@@ -151,40 +151,42 @@ class Jobs extends React.Component<Props, State> {
             mobileStyle={[standardStyles.sectionMarginBottomMobile]}
           >
             <Cell span={Spans.fourth}>
-              <View style={styles.controls}>
+              <View>
                 <Fade bottom={true} distance="40px" wait={200}>
-                  <Text style={[fonts.h3Mobile, textStyles.heading]}>
-                    {t('careerOpportunities')}
-                  </Text>
-                  <Text style={[fonts.h5, textStyles.heading]}>{t('filter')}</Text>
-                  <DropDownGroup
-                    data={[
-                      {
-                        onClear: this.clearLocations,
-                        name: t('allLocations'),
-                        onSelect: this.toggleFilter(Filters.LOCATION),
-                        list: this.toDropdownList(MAIN_LOCATIONS, Filters.LOCATION),
-                      },
-                      {
-                        onClear: this.clearDepartments,
-                        name: t('allDepartments'),
-                        onSelect: this.toggleFilter(Filters.DEPT),
-                        list: this.toDropdownList(
-                          getDepartments(this.props.positions),
-                          Filters.DEPT
-                        ),
-                      },
-                      {
-                        onClear: this.clearCommitments,
-                        name: t('allCommitments'),
-                        onSelect: this.toggleFilter(Filters.COMMITMENT),
-                        list: this.toDropdownList(
-                          getCommitments(this.props.positions),
-                          Filters.COMMITMENT
-                        ),
-                      },
-                    ]}
-                  />
+                  <View>
+                    <Text style={[fonts.h3Mobile, textStyles.heading]}>
+                      {t('careerOpportunities')}
+                    </Text>
+                    <Text style={[fonts.h5, styles.optionsLabel]}>{t('filter')}</Text>
+                    <DropDownGroup
+                      data={[
+                        {
+                          onClear: this.clearLocations,
+                          name: t('allLocations'),
+                          onSelect: this.toggleFilter(Filters.LOCATION),
+                          list: this.toDropdownList(MAIN_LOCATIONS, Filters.LOCATION),
+                        },
+                        {
+                          onClear: this.clearDepartments,
+                          name: t('allDepartments'),
+                          onSelect: this.toggleFilter(Filters.DEPT),
+                          list: this.toDropdownList(
+                            getDepartments(this.props.positions),
+                            Filters.DEPT
+                          ),
+                        },
+                        {
+                          onClear: this.clearCommitments,
+                          name: t('allCommitments'),
+                          onSelect: this.toggleFilter(Filters.COMMITMENT),
+                          list: this.toDropdownList(
+                            getCommitments(this.props.positions),
+                            Filters.COMMITMENT
+                          ),
+                        },
+                      ]}
+                    />
+                  </View>
                 </Fade>
               </View>
             </Cell>
@@ -209,7 +211,9 @@ const styles = StyleSheet.create({
   work: {
     justifyContent: 'center',
   },
-  controls: {},
+  optionsLabel: {
+    marginBottom: 5,
+  },
 })
 
 export default withNamespaces('jobs')(Jobs)

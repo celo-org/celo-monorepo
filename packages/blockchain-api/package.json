@@ -12,10 +12,12 @@
     "start": "node ./dist/index.js",
     "start:dev": "tsc-watch --onSuccess \"node ./dist/index.js\" ",
     "build": "tsc -p .",
+    "clean": "rm -rf dist coverage",
     "gcp-build": "npm run build",
     "deploy": "./deploy.sh"
   },
   "dependencies": {
+    "@celo/contractkit": "0.1.6",
     "apollo-datasource-rest": "^0.3.1",
     "apollo-server-express": "^2.4.2",
     "bignumber.js": "^7.2.0",

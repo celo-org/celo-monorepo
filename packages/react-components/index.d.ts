@@ -1,4 +1,3 @@
-declare module 'react-native-autocomplete-input'
 declare module 'svgs'
 declare module 'react-native-platform-touchable'
 declare module 'web3-utils'

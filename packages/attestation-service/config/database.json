@@ -1,11 +1,11 @@
 {
   "development": {
-    "use_env_variable": "DB_URL"
+    "use_env_variable": "DATABASE_URL"
   },
   "staging": {
-    "use_env_variable": "DB_URL"
+    "use_env_variable": "DATABASE_URL"
   },
   "production": {
-    "use_env_variable": "DB_URL"
+    "use_env_variable": "DATABASE_URL"
   }
 }

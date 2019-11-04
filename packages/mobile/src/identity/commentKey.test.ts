@@ -11,10 +11,6 @@ jest.mock('@celo/walletkit', () => ({
   sendTransaction: jest.fn(async () => null),
 }))
 
-jest.mock('src/web3/contracts', () => ({
-  isZeroSyncMode: jest.fn().mockReturnValueOnce(false),
-}))
-
 describe('Encrypt Comment', () => {
   it('Empty comment', async () => {
     expect(await encryptComment('', 'toAddr', 'fromAddr')).toBe('')

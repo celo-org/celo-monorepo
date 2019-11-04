@@ -28,6 +28,7 @@ export enum AccountType {
   BOOTNODE = 3,
   FAUCET = 4,
   SENTRY = 5,
+  ATTESTATION = 6,
 }
 
 export enum ConsensusType {
@@ -46,6 +47,7 @@ export const MNEMONIC_ACCOUNT_TYPE_CHOICES = [
   'tx_node',
   'bootnode',
   'faucet',
+  'attestation',
 ]
 
 export const add0x = (str: string) => {
@@ -102,6 +104,12 @@ export const getValidators = (mnemonic: string, n: number) => {
       blsPublicKey: bls12377js.BLS.privateToPublicBytes(blsKeyBytes).toString('hex'),
     }
   })
+}
+
+export const getAddressFromEnv = (accountType: AccountType, n: number) => {
+  const mnemonic = fetchEnv(envVar.MNEMONIC)
+  const privateKey = generatePrivateKey(mnemonic, accountType, n)
+  return privateKeyToAddress(privateKey)
 }
 
 export const generateGenesisFromEnv = (enablePetersburg: boolean = true) => {
@@ -207,7 +215,9 @@ export const generateGenesis = ({
     genesis.difficulty = '0x1'
     genesis.extraData = generateIstanbulExtraData(validators)
     genesis.config.istanbul = {
-      policy: 0,
+      // see github.com/celo-org/celo-blockchain/blob/master/consensus/istanbul/config.go#L21-L25
+      // 0 = RoundRobin, 1 = Sticky, 2 = ShuffledRoundRobin
+      policy: 2,
       period: blockTime,
       requesttimeout: requestTimeout,
       epoch,

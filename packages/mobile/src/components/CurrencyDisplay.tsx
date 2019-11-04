@@ -4,12 +4,14 @@ import BigNumber from 'bignumber.js'
 import * as React from 'react'
 import { StyleSheet, Text, View } from 'react-native'
 import { CURRENCIES, CURRENCY_ENUM } from 'src/geth/consts'
+import { LocalCurrencySymbol } from 'src/localCurrency/consts'
 import { getMoneyDisplayValue } from 'src/utils/formatting'
 
 interface Props {
   amount: BigNumber
   size: number
   type: CURRENCY_ENUM
+  currencySymbol?: LocalCurrencySymbol | null
 }
 
 const symbolRatio = 0.6
@@ -31,10 +33,10 @@ export default class CurrencyDisplay extends React.PureComponent<Props> {
   }
 
   render() {
-    const { size, type, amount } = this.props
+    const { size, type, amount, currencySymbol: symbol } = this.props
     const fontSize = size
     const dollarStyle = { fontSize, lineHeight: Math.round(fontSize * 1.3), color: this.color() }
-    const currencySymbol = CURRENCIES[type].symbol
+    const currencySymbol = type === CURRENCY_ENUM.GOLD ? CURRENCIES[type].symbol : symbol
     return (
       <View style={styles.container}>
         <Text numberOfLines={1} style={[fontStyles.regular, this.symbolStyle(fontSize)]}>

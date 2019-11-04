@@ -2,7 +2,6 @@ import * as React from 'react'
 import 'react-native'
 import { Provider } from 'react-redux'
 import * as renderer from 'react-test-renderer'
-import { Input } from 'src/verify/Input'
 import { Verified } from 'src/verify/Verified'
 import Verifying from 'src/verify/Verifying'
 import { VerifyPhoneEducation } from 'src/verify/VerifyPhoneEducation'
@@ -11,30 +10,10 @@ import { mockAttestationMessage } from 'test/values'
 
 const store = createMockStore({})
 
-jest.mock('src/web3/contracts', () => ({
-  isZeroSyncMode: jest.fn().mockReturnValueOnce(false),
-}))
-
 it('renders the Education step correctly', () => {
   const tree = renderer.create(
     <Provider store={store}>
       <VerifyPhoneEducation {...getMockI18nProps()} />
-    </Provider>
-  )
-  expect(tree).toMatchSnapshot()
-})
-
-it('renders the Input step correctly', () => {
-  const tree = renderer.create(
-    <Provider store={store}>
-      <Input
-        devModeActive={false}
-        showError={jest.fn()}
-        hideAlert={jest.fn()}
-        setPhoneNumber={jest.fn()}
-        startVerification={jest.fn()}
-        {...getMockI18nProps()}
-      />
     </Provider>
   )
   expect(tree).toMatchSnapshot()
