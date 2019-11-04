@@ -1,6 +1,8 @@
 pragma solidity ^0.5.3;
 
+// TODO(asa): Limit assembly usage by using X.staticcall instead.
 contract UsingPrecompiles {
+  address constant PROOF_OF_POSSESSION = address(0xff - 4);
 
   /**
    * @notice calculate a * b^x for fractions a, b to `decimals` precision
@@ -121,5 +123,25 @@ contract UsingPrecompiles {
     }
 
     return numberValidators;
+  }
+
+  /**
+   * @notice Checks a BLS proof of possession.
+   * @param proofOfPossessionBytes The public key and signature of the proof of possession.
+   * @return True upon success.
+   */
+  function checkProofOfPossession(
+    address sender,
+    bytes memory proofOfPossessionBytes
+  )
+    public
+    returns (bool)
+  {
+    bool success;
+    (success, ) = PROOF_OF_POSSESSION
+      .call
+      .value(0)
+      .gas(gasleft())(abi.encodePacked(sender, proofOfPossessionBytes));
+    return success;
   }
 }

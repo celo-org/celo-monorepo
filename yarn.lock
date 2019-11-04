@@ -5409,6 +5409,14 @@
   dependencies:
     "@types/react" "*"
 
+"@types/react-native-snap-carousel@^3.7.4":
+  version "3.7.4"
+  resolved "https://registry.yarnpkg.com/@types/react-native-snap-carousel/-/react-native-snap-carousel-3.7.4.tgz#1e1ad5b5314715d538f6785b4f3a6590a036a6bd"
+  integrity sha512-Egwj264i8lQtp4O8+TXse2yagW5im8oPzPcfWzIEYspKspPE0NikqWFtpVrecgbd/uwhwEjLXLY5kEXOvpiJjA==
+  dependencies:
+    "@types/react" "*"
+    "@types/react-native" "*"
+
 "@types/react-native@*":
   version "0.55.8"
   resolved "https://registry.yarnpkg.com/@types/react-native/-/react-native-0.55.8.tgz#31a6b42852088742e7464876742081a2c1ef3fe7"
@@ -26299,6 +26307,14 @@ rc@^1.1.7:
     minimist "^1.2.0"
     strip-json-comments "~2.0.1"
 
+react-addons-shallow-compare@15.6.2:
+  version "15.6.2"
+  resolved "https://registry.yarnpkg.com/react-addons-shallow-compare/-/react-addons-shallow-compare-15.6.2.tgz#198a00b91fc37623db64a28fd17b596ba362702f"
+  integrity sha1-GYoAuR/DdiPbZKKP0XtZa6NicC8=
+  dependencies:
+    fbjs "^0.8.4"
+    object-assign "^4.1.0"
+
 react-apollo@^2.4.1:
   version "2.4.1"
   resolved "https://registry.yarnpkg.com/react-apollo/-/react-apollo-2.4.1.tgz#89db63ebacf01c1603553bb476f089492aaeab2c"
@@ -26799,6 +26815,14 @@ react-native-share@^2.0.0:
   resolved "https://registry.yarnpkg.com/react-native-share/-/react-native-share-2.0.0.tgz#4543a746013e0d8fa9f765fb8937007cfbcffcf7"
   integrity sha512-J8Xl3mq0L9KDFtSYtKsQDAnZWw/niZIpAD1PRiNfZFHo44Rc+oS2bEIhskNnoQXKEgBNdPzCl/DenMXYAHXRYg==
 
+react-native-snap-carousel@^3.8.4:
+  version "3.8.4"
+  resolved "https://registry.yarnpkg.com/react-native-snap-carousel/-/react-native-snap-carousel-3.8.4.tgz#4c749c6a714d46ed82de527233850cb5da41bc62"
+  integrity sha512-KMxLl75Tyf12DzeTCtV7xU0KuPZQQs/2+2iM90cgxcm3lrg4+hLXff5/61ynasBkzzJ5v4bTRq5CEy/qGUJVQw==
+  dependencies:
+    prop-types "^15.6.1"
+    react-addons-shallow-compare "15.6.2"
+    
 react-native-sms@^1.9.0:
   version "1.9.0"
   resolved "https://registry.yarnpkg.com/react-native-sms/-/react-native-sms-1.9.0.tgz#362d94f75664d45144433d820155d9da66adf053"

@@ -65,8 +65,8 @@ export enum Screens {
   TransactionReview = 'TransactionReview',
   UpgradeScreen = 'UpgradeScreen',
   VerifyEducation = 'VerifyEducation',
-  VerifyInput = 'VerifyInput',
   VerifyVerified = 'VerifyVerified',
   VerifyVerifying = 'VerifyVerifying',
+  VerificationLoadingScreen = 'VerificationLoadingScreen',
   WalletHome = 'WalletHome',
 }
