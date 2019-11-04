@@ -78,9 +78,36 @@ testWithGanache('Governance Wrapper', (web3) => {
       const upvotes = await governance.getUpvotes(proposalID)
       console.log(upvotes)      
     })
+
+    it('#approve', async () => {
+
+    })
+
+    it('#vote', async () => {
+
+    })
+    
+    it('#execute', async () => {
+
+    })
   })
   
-  //   describe('Hotfixes', () => {
-  
-  //   })
+  describe('Hotfixes', () => {
+
+    it('#whitelistHotfix', async () => {
+
+    })
+
+    it('#approveHotfix', async () => {
+      
+    })
+
+    it('#prepareHotfix', async () => {
+      
+    })
+
+    it('#executeHotfix', async () => {
+      
+    })
+  })
 })
