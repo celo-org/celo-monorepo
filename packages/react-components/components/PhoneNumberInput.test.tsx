@@ -17,7 +17,7 @@ jest.mock('react-native-device-info', () => {
 
 describe('PhoneNumberInput', () => {
   describe('when defaultCountry is falsy', () => {
-    it.skip('renders an AutoComplete and a country can be selected', () => {
+    it('renders an AutoComplete and a country can be selected', () => {
       const mockSetCountryCode = jest.fn()
       const { getByTestId, toJSON } = render(
         <PhoneNumberInput
@@ -38,7 +38,7 @@ describe('PhoneNumberInput', () => {
 })
 
 describe('when defaultCountry is truthy', () => {
-  it.skip('does not render an AutoComplete', () => {
+  it('does not render an AutoComplete', () => {
     const { queryByTestId, toJSON } = render(
       <PhoneNumberInput
         defaultCountry={'Canada'}
