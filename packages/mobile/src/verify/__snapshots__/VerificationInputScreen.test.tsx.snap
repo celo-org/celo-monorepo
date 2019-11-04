@@ -1,0 +1,56 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`VerificationInputScreen renders correctly 1`] = `
+<SafeAreaView
+  style={
+    Object {
+      "backgroundColor": "#FFFFFF",
+      "flex": 1,
+      "justifyContent": "space-between",
+    }
+  }
+>
+  <RCTScrollView
+    contentContainerStyle={
+      Object {
+        "alignItems": "center",
+        "flex": 1,
+        "justifyContent": "center",
+        "padding": 30,
+        "paddingTop": 0,
+      }
+    }
+  >
+    <View>
+      <View
+        style={
+          Object {
+            "height": 35,
+            "paddingRight": 10,
+            "paddingTop": 10,
+            "position": "absolute",
+            "right": 0,
+            "top": 0,
+            "width": 70,
+            "zIndex": 100,
+          }
+        }
+      >
+        <Text
+          accessible={true}
+          focusable={true}
+          onClick={[Function]}
+          onResponderGrant={[Function]}
+          onResponderMove={[Function]}
+          onResponderRelease={[Function]}
+          onResponderTerminate={[Function]}
+          onResponderTerminationRequest={[Function]}
+          onStartShouldSetResponder={[Function]}
+        >
+             
+        </Text>
+      </View>
+    </View>
+  </RCTScrollView>
+</SafeAreaView>
+`;
