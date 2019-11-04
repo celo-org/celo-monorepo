@@ -9,7 +9,7 @@
     "lint:ts": "tslint -c tslint.json --project tsconfig.json",
     "lint:sol": "solhint './contracts/**/*.sol'",
     "lint": "yarn run lint:ts && yarn run lint:sol",
-    "clean": "rm -rf ./types/typechain && rm -rf build/* && rm -rf migrations/*.js* && rm -rf test/**/*.js* && rm -f lib/*.js*",
+    "clean": "rm -rf ./types/typechain && rm -rf build/* && rm -rf .0x-artifacts/* && rm -rf migrations/*.js* && rm -rf test/**/*.js* && rm -f lib/*.js*",
     "pretest": "yarn run build",
     "test": "node runTests.js",
     "test:coverage": "yarn run test --coverage",
@@ -33,8 +33,7 @@
     "devchain": "ts-node scripts/devchain.ts",
     "weekly-faucet": "./scripts/bash/weekly_faucet.sh",
     "set-exchange-rate": "./scripts/bash/set_exchange_rate.sh",
-    "network-check": "./scripts/bash/network_check.sh",
-    "test-licenses": "yarn licenses list --prod | grep '\\(─ GPL\\|─ (GPL-[1-9]\\.[0-9]\\+ OR GPL-[1-9]\\.[0-9]\\+)\\)' && echo 'Found GPL license(s). Use 'yarn licenses list --prod' to look up the offending package' || echo 'No GPL licenses found'"
+    "network-check": "./scripts/bash/network_check.sh"
   },
   "dependencies": {
     "@0x/sol-compiler": "^3.1.11",
@@ -44,7 +43,7 @@
     "@0x/subproviders": "^5.0.0",
     "@celo/utils": "^0.1.0",
     "apollo-client": "^2.4.13",
-    "bls12377js": "https://github.com/celo-org/bls12377js#4f596cabb659c4f8969ae4b617f185f2bc74cbbb",
+    "bls12377js": "https://github.com/celo-org/bls12377js#cada1105f4a5e4c2ddd239c1874df3bf33144a10",
     "chai-subset": "^1.6.0",
     "csv-parser": "^2.0.0",
     "csv-stringify": "^4.3.1",
@@ -74,7 +73,7 @@
     "web3-provider-engine": "^15.0.0"
   },
   "devDependencies": {
-    "@celo/ganache-cli": "git+https://github.com/celo-org/ganache-cli.git#816a475",
+    "@celo/ganache-cli": "git+https://github.com/celo-org/ganache-cli.git#9d77e02",
     "@celo/typescript": "0.0.1",
     "@types/bignumber.js": "^5.0.0",
     "@types/bn.js": "^4.11.0",

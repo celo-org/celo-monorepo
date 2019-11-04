@@ -31,6 +31,7 @@ exports[`PhotosEducation renders correctly 1`] = `
     >
       <View
         accessible={true}
+        focusable={true}
         isTVSelectable={true}
         nativeBackgroundAndroid={
           Object {
@@ -38,6 +39,7 @@ exports[`PhotosEducation renders correctly 1`] = `
             "type": "ThemeAttrAndroid",
           }
         }
+        onClick={[Function]}
         onResponderGrant={[Function]}
         onResponderMove={[Function]}
         onResponderRelease={[Function]}
@@ -119,7 +121,7 @@ exports[`PhotosEducation renders correctly 1`] = `
           resizeMode="contain"
           source={
             Object {
-              "testUri": "../../../src/images/address-book.png",
+              "testUri": "../../../packages/mobile/src/images/address-book.png",
             }
           }
           style={
@@ -164,7 +166,7 @@ exports[`PhotosEducation renders correctly 1`] = `
           resizeMode="contain"
           source={
             Object {
-              "testUri": "../../../src/images/camera-upload.png",
+              "testUri": "../../../packages/mobile/src/images/camera-upload.png",
             }
           }
           style={
@@ -209,7 +211,7 @@ exports[`PhotosEducation renders correctly 1`] = `
           resizeMode="contain"
           source={
             Object {
-              "testUri": "../../../src/images/big-phone-avatar.png",
+              "testUri": "../../../packages/mobile/src/images/big-phone-avatar.png",
             }
           }
           style={

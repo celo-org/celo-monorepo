@@ -51,7 +51,7 @@ export const FIREBASE_ENABLED = stringToBoolean(Config.FIREBASE_ENABLED || 'true
 // We need to fallback to `integration` for testing under jest where
 // react-native-config is undefined.
 export const DEFAULT_TESTNET = Config.DEFAULT_TESTNET || 'integration'
-export const DEFAULT_INFURA_URL = `https://${DEFAULT_TESTNET}-infura.celo-testnet.org/`
+export const DEFAULT_FORNO_URL = `https://${DEFAULT_TESTNET}-forno.celo-testnet.org/`
 
 export const SEGMENT_API_KEY = keyOrUndefined(secretsFile, Config.SECRETS_KEY, 'SEGMENT_API_KEY')
 export const FIREBASE_WEB_KEY = keyOrUndefined(secretsFile, Config.SECRETS_KEY, 'FIREBASE_WEB_KEY')
@@ -72,3 +72,7 @@ export const GOLD_TRANSACTION_MIN_AMOUNT = 0.001
 export const DEFAULT_SYNC_MODE: GethSyncMode = Config.DEFAULT_SYNC_MODE
   ? new BigNumber(Config.DEFAULT_SYNC_MODE).toNumber()
   : GethSyncMode.Ultralight
+
+export const ZERO_SYNC_ENABLED_INITIALLY = Config.ZERO_SYNC_ENABLED_INITIALLY
+  ? stringToBoolean(Config.ZERO_SYNC_ENABLED_INITIALLY)
+  : false

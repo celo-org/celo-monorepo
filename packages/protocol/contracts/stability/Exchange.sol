@@ -10,15 +10,15 @@ import "./interfaces/IStableToken.sol";
 import "../common/FractionUtil.sol";
 import "../common/Initializable.sol";
 import "../common/FixidityLib.sol";
+import "../baklava/Freezable.sol";
 import "../common/UsingRegistry.sol";
-import "../common/interfaces/IERC20Token.sol";
 
 
 /**
  * @title Contract that allows to exchange StableToken for GoldToken and vice versa
  * using a Constant Product Market Maker Model
  */
-contract Exchange is IExchange, Initializable, Ownable, UsingRegistry, ReentrancyGuard {
+contract Exchange is IExchange, Initializable, Ownable, UsingRegistry, ReentrancyGuard, Freezable {
   using SafeMath for uint256;
   using FractionUtil for FractionUtil.Fraction;
   using FixidityLib for FixidityLib.Fraction;
@@ -90,6 +90,7 @@ contract Exchange is IExchange, Initializable, Ownable, UsingRegistry, Reentranc
    */
   function initialize(
     address registryAddress,
+    address _freezer,
     address stableToken,
     uint256 _spread,
     uint256 _reserveFraction,
@@ -100,6 +101,7 @@ contract Exchange is IExchange, Initializable, Ownable, UsingRegistry, Reentranc
     initializer
   {
     _transferOwnership(msg.sender);
+    setFreezer(_freezer);
     setRegistry(registryAddress);
     setStableToken(stableToken);
     setSpread(_spread);
@@ -117,6 +119,7 @@ contract Exchange is IExchange, Initializable, Ownable, UsingRegistry, Reentranc
    * transaction to succeed
    * @param sellGold `true` if gold is the sell token
    * @return The amount of buyToken that was transfered
+   * @dev This function can be frozen using the Freezable interface.
    */
   function exchange(
     uint256 sellAmount,
@@ -124,6 +127,7 @@ contract Exchange is IExchange, Initializable, Ownable, UsingRegistry, Reentranc
     bool sellGold
   )
     external
+    onlyWhenNotFrozen
     updateBucketsIfNecessary
     nonReentrant
     returns (uint256)
@@ -138,7 +142,7 @@ contract Exchange is IExchange, Initializable, Ownable, UsingRegistry, Reentranc
       goldBucket = goldBucket.add(sellAmount);
       stableBucket = stableBucket.sub(buyAmount);
       require(
-        gold().transferFrom(msg.sender, address(reserve), sellAmount),
+        getGoldToken().transferFrom(msg.sender, address(reserve), sellAmount),
         "Transfer of sell token failed"
       );
       require(IStableToken(stable).mint(msg.sender, buyAmount), "Mint of stable token failed");
@@ -255,6 +259,10 @@ contract Exchange is IExchange, Initializable, Ownable, UsingRegistry, Reentranc
     emit MinimumReportsSet(newMininumReports);
   }
 
+  function setFreezer(address freezer) public onlyOwner {
+    _setFreezer(freezer);
+  }
+
   /**
     * @notice Allows owner to set the Stable Token address
     * @param newStableToken The new address for Stable Token
@@ -332,7 +340,9 @@ contract Exchange is IExchange, Initializable, Ownable, UsingRegistry, Reentranc
   }
 
   function getUpdatedGoldBucket() private view returns (uint256) {
-    uint256 reserveGoldBalance = gold().balanceOf(registry.getAddressForOrDie(RESERVE_REGISTRY_ID));
+    uint256 reserveGoldBalance = getGoldToken().balanceOf(
+      registry.getAddressForOrDie(RESERVE_REGISTRY_ID)
+    );
     return reserveFraction.multiply(FixidityLib.newFixed(reserveGoldBalance)).fromFixed();
   }
 
@@ -387,9 +397,5 @@ contract Exchange is IExchange, Initializable, Ownable, UsingRegistry, Reentranc
     (rateNumerator, rateDenominator) =
       ISortedOracles(registry.getAddressForOrDie(SORTED_ORACLES_REGISTRY_ID)).medianRate(stable);
     return FractionUtil.Fraction(rateNumerator, rateDenominator);
-  }
-
-  function gold() private view returns (IERC20Token) {
-    return IERC20Token(registry.getAddressForOrDie(GOLD_TOKEN_REGISTRY_ID));
   }
 }

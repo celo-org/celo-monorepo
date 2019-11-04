@@ -1,16 +1,27 @@
+import GenesisBlockUtils from '@celo/walletkit/lib/src/genesis-block-utils'
 import { equal, notEqual } from 'assert'
 import * as fs from 'fs'
 
 // These tests read logs from a client which was running in Ultralight sync mode and verifies that
 // only epoch headers are fetched till the height block and all headers are fetched afrerwards.
-describe('Ultralight tests', () => {
+describe('Ultralight client', () => {
+  let epoch: number
+
+  before(async () => {
+    const genesis = JSON.parse(await GenesisBlockUtils.getGenesisBlockAsync(argv.network))
+    if (genesis.config.istanbul.epoch) {
+      epoch = Number(genesis.config.istanbul.epoch)
+    } else {
+      throw Error('epoch not found in genesis block')
+    }
+  })
+
   beforeEach(function(this: any) {
     this.timeout(0)
   })
 
   const argv = require('minimist')(process.argv.slice(2))
   const logfile = argv.gethlogfile
-  const epoch = parseInt(argv.epoch, 10)
 
   let origin: number = -1
   let height: number = 0
@@ -51,15 +62,15 @@ describe('Ultralight tests', () => {
     insertedHeaderNumbers.push(headerNumber)
   })
 
-  it('Sync must start from 0', () => {
+  it('sync must start from 0', () => {
     equal(origin, 0, 'Start header is not zero, it is ' + origin)
   })
 
-  it('Latest known header must be non-zero', () => {
+  it('latest known header must be non-zero', () => {
     notEqual(height, 0, 'Latest known header is zero')
   })
 
-  it('Height header must be fetched', () => {
+  it('height header must be fetched', () => {
     let heightHeaderFetched: boolean = false
     for (const headerNumber of insertedHeaderNumbers) {
       if (headerNumber === height) {
@@ -70,7 +81,7 @@ describe('Ultralight tests', () => {
     equal(heightHeaderFetched, true, 'height header ' + height + ' not fetched')
   })
 
-  it('Must only download epoch blocks till height', () => {
+  it('must only download epoch blocks till height', () => {
     for (const headerNumber of insertedHeaderNumbers) {
       if (headerNumber < height) {
         equal(headerNumber % epoch, 0, 'Non-epoch header below height fetched')
@@ -78,7 +89,7 @@ describe('Ultralight tests', () => {
     }
   })
 
-  it('Must fetch all headers after height', () => {
+  it('must fetch all headers after height', () => {
     for (
       let i = insertedHeaderNumbers.length - 1;
       i >= 0 && insertedHeaderNumbers[i] > height;

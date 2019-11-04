@@ -86,30 +86,32 @@ export enum CustomEventNames {
 
   // Screen name: Backup_Phrase, Backup_Insist, Backup_Share, Backup_Set
   set_backup_phrase = 'set_backup_phrase', // (count # of taps on “Set Backup Phrase” in Backup_Phrase) [we should not track the actual value of this field, just whether the user filled it out]
+  set_social_backup = 'set_social_backup', // (count # of taps on "Set up Social Backup")
   delay_backup = 'delay_backup', // (Count # of taps on "Delay" button in Backup_Phrase)
   skip_backup = 'skip_backup', // (count # of taps on “Skip” button in Backup_Phrase)
+  view_backup_phrase = 'view_backup_phrase', // (count # of taps on "View Backup Phrase" after already backed up)
+  view_social_backup = 'view_social_backup', // (count # of taps on "View Social Backup" after already set up)
+  skip_social_backup = 'skip_social_backup', // (count # of taps on "Skip Social Backup" )
   backup_cancel = 'backup_cancel', // (count # of taps on "Cancel" button in Backup_Phrase)
   insist_backup_phrase = 'insist_backup_phrase', // (count # of taps on “Set Backup Phrase” in Backup_Insist)
   insist_skip_backup = 'insist_skip_backup', // (count # of taps on “Do Later” in Backup_Insist)
   whatsapp_backup = 'whatsapp_backup', // (count # of taps on “Send with Whatsapp” in Backup_Share)
-  share_backup_continue = 'share_backup_continue', // (count # of taps on “Continue” button in Backup_Share)
-  confirm_backup_phrase = 'confirm_backup_phrase', // (count # of taps on “Set Backup Phrase” button in Backup_Set)
+  backup_continue = 'backup_continue', // (count # of taps on “Continue” button in Backup_Phrase)
+  social_backup_continue = 'social_backup_continue', // (Count # of taps on "Backup with Friends" in Backup_Phrase)
 
-  // Screen name: Question_1, Question_2, Question_3, Question_4, Question_Incorrect, Backup_Confirmed
-  question_select1 = 'question_select1', // (track # of input selections on Question_1 screen)
-  question_select2 = 'question_select2', // (track # of input selections on Question_2 screen)
-  question_select3 = 'question_select3', // (track # of input selections on Question_3 screen)
-  question_select4 = 'question_select4', // (track # of input selections on Question_4 screen)
-  question_submit1 = 'question_submit1', // (track # of taps on “Submit” button for Question_1 screen)
-  question_submit2 = 'question_submit2', // (track # of taps on “Submit” button for Question_2 screen)
-  question_submit3 = 'question_submit3', // (track # of taps on “Submit” button for Question_3 screen)
-  question_submit4 = 'question_submit4', // (track # of taps on “Submit” button for Question_4 screen)
-  question_cancel1 = 'questions_cancel1', // (track # of taps on "Cancel" button on the Question_1 Screens)
-  question_cancel2 = 'questions_cancel2', // (track # of taps on "Cancel" button on the Question_2 Screens)
-  question_cancel3 = 'questions_cancel3', // (track # of taps on "Cancel" button on the Question_3 Screens)
-  question_cancel4 = 'questions_cancel4', // (track # of taps on "Cancel" button on the Question_4 Screens)
-  question_incorrect = 'question_incorrect', // (track # of taps on “See Backup Phrase” in Question_Incorrect)
-  questions_done = 'questions_done', // (track # of taps on “Done” button on the Backup_Confirmed screen)
+  // Screen name: Backup_Quiz, Question_Incorrect, Backup_Confirmed
+  question_select = 'question_select', // (track # of input selections on Backup_Verify screen)
+  question_submit = 'question_submit', // (track # of taps on “Submit” button for Backup_Quiz screen)
+  question_cancel = 'questions_cancel', // (track # of taps on "Cancel" button on the Backup_Quiz Screens)
+  question_incorrect = 'question_incorrect', // (track # of taps on “See Backup Phrase” in Backup_Quiz)
+  question_done = 'question_done', // (track # of taps on “Done” button on the Backup_Confirmed screen)
+
+  // Screen name: Backup_Verify
+  backup_paste = 'backup_paste', // (track # of pastes in input field for Backup_Verify screen)
+  backup_paste_submit = 'backup_paste_submit', // (track # of taps on "Submit" button for Backup_Verify screen)
+  backup_paste_cancel = 'backup_paste_cancel', // (track # of taps on "Cancel" button on the Backup_Verify screen)
+  backup_paste_incorrect = 'backup_paste_incorrect', // (track # of taps on "See Backup Phrase" in Backup_Verify screen)
+  backup_paste_done = 'backup_paste_done', // (track # of taps on "Done" button on the Backup_Verify screen)
 
   // Screens: Exchange_Tutorial, Exchange_Home, Exchange_Currency
   exchange_button = 'exchange_button', // count # of taps on the exchange button in Exchange_Home
@@ -227,6 +229,7 @@ export const PROPERTY_PATH_WHITELIST = [
   'testnet',
   'timeElapsed',
   'title',
+  'tti',
   'txId',
   'verificationIndex',
   'verificationsRemaining',
