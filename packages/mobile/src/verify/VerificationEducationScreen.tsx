@@ -33,7 +33,8 @@ class VerificationEducationScreen extends React.Component<WithNamespaces, State>
 
   onPressStart = () => {
     // TODO(Rossy) Use new verification screen when it's ready
-    navigate(Screens.VerificationLoadingScreen)
+    //TODO
+    navigate(Screens.VerificationInputScreen)
   }
 
   onPressSkip = () => {

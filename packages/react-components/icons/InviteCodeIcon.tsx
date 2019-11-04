@@ -1,11 +1,22 @@
 import * as React from 'react'
 import Svg, { Circle, Line, Path } from 'svgs'
-export default class InviteCodeIcon extends React.Component {
+
+interface Props {
+  height?: number
+  width?: number
+}
+
+export default class InviteCodeIcon extends React.PureComponent<Props> {
+  static defaultProps = {
+    height: 24,
+    width: 76,
+  }
+
   render() {
     return (
       <Svg
-        width="76"
-        height="24"
+        height={this.props.height}
+        width={this.props.width}
         viewBox="0 0 76 24"
         fill="none"
         xmlns="http://www.w3.org/2000/Svg"

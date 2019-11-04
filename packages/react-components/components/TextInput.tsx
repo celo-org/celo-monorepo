@@ -102,7 +102,6 @@ export type TextInputProps = Props
 
 const style = StyleSheet.create({
   container: {
-    flex: 1,
     flexDirection: 'row',
     justifyContent: 'center',
     alignItems: 'center',
