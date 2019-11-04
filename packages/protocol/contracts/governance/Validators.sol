@@ -158,7 +158,6 @@ contract Validators is
     setValidatorLockedGoldRequirements(validatorRequirementValue, validatorRequirementDuration);
     setValidatorScoreParameters(validatorScoreExponent, validatorScoreAdjustmentSpeed);
     setMaxGroupSize(_maxGroupSize);
-    setValidatorEpochPayment(_validatorEpochPayment);
     setMembershipHistoryLength(_membershipHistoryLength);
   }
 

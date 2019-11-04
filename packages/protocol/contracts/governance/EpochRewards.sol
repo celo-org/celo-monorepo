@@ -63,7 +63,7 @@ contract EpochRewards is Ownable, Initializable, UsingPrecompiles, UsingRegistry
    *   rewards when the protocol is running behind the target gold supply.
    * @param rewardsMultiplierOverspendAdjustmentFactor Adjusts the multiplier on target epoch
    *   rewards when the protocol is running ahead of the target gold supply.
-   * @param _targetVotingGoldFracion The percentage of floating gold voting to target.
+   * @param _targetVotingGoldFraction The percentage of floating gold voting to target.
    * @param _targetValidatorEpochPayment The target validator epoch payment.
    * @dev Should be called only once.
    */
