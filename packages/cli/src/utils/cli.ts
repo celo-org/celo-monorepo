@@ -59,3 +59,8 @@ export function failWith(msg: string): never {
   console.error(msg)
   return process.exit(1)
 }
+
+export async function binaryPrompt(promptMessage: string) {
+  const resp = await cli.prompt(promptMessage)
+  return ['y', 'yes'].includes(resp)
+}
