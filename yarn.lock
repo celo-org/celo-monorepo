@@ -26601,9 +26601,9 @@ react-native-gesture-handler@^1.4.1:
     invariant "^2.2.4"
     prop-types "^15.7.2"
 
-"react-native-geth@https://github.com/celo-org/react-native-geth#8ba5091":
+"react-native-geth@https://github.com/celo-org/react-native-geth#6f993d9":
   version "0.1.0-development"
-  resolved "https://github.com/celo-org/react-native-geth#8ba5091d232f58913026b2df1f2b834e2e0108d0"
+  resolved "https://github.com/celo-org/react-native-geth#6f993d958645cbe85db4d070d31947f52e6d5f89"
 
 "react-native-install-referrer@git://github.com/celo-org/react-native-install-referrer#343bf3d":
   version "2.0.0"
@@ -26778,6 +26778,11 @@ react-native-share@^2.0.0:
   version "2.0.0"
   resolved "https://registry.yarnpkg.com/react-native-share/-/react-native-share-2.0.0.tgz#4543a746013e0d8fa9f765fb8937007cfbcffcf7"
   integrity sha512-J8Xl3mq0L9KDFtSYtKsQDAnZWw/niZIpAD1PRiNfZFHo44Rc+oS2bEIhskNnoQXKEgBNdPzCl/DenMXYAHXRYg==
+
+react-native-sms@^1.9.0:
+  version "1.9.0"
+  resolved "https://registry.yarnpkg.com/react-native-sms/-/react-native-sms-1.9.0.tgz#362d94f75664d45144433d820155d9da66adf053"
+  integrity sha512-qq5v5rClCSMwTZL5TAK3P89SOQFrBwa6LyqCQV1Md0p78cS+DQWTX/wnb1H8gH32gDzr7barKTEXZPN7lZ5fCA==
 
 react-native-splash-screen@^3.2.0:
   version "3.2.0"
