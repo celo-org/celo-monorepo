@@ -485,6 +485,42 @@ contract Attestations is
   }
 
   /**
+    * @notice Returns the state of all attestations that are completable
+    * @param identifier Hash of the identifier.
+    * @param account Address of the account.
+    * @return ( blockNumbers[] - Block number of request/completion the attestation,
+    *           issuers[] - Address of the issuer
+    *         )
+    */
+  function getCompletableAttestationStates(bytes32 identifier, address account)
+    external
+    view
+    returns (uint32[] memory, address[] memory) {
+      address[] storage issuers = identifiers[identifier].attestations[account].selectedIssuers;
+
+      uint num = 0;
+      for (uint i = 0; i < issuers.length; i++) {
+        if (isAttestationCompletable(identifiers[identifier].attestations[account].issuedAttestations[issuers[i]])) {
+          num++;
+        }
+      }
+
+      uint32[] memory blockNumbers = new uint32[](num);
+      address[] memory completableIssuers = new address[](num);
+
+      uint pointer = 0;
+      for (uint i = 0; i < num; i++) {
+        if (isAttestationCompletable(identifiers[identifier].attestations[account].issuedAttestations[issuers[i]])) {
+          blockNumbers[pointer] = identifiers[identifier].attestations[account].issuedAttestations[issuers[i]].blockNumber;
+          completableIssuers[pointer] = issuers[i];
+          pointer++;
+        }
+      }
+
+      return (blockNumbers, completableIssuers);
+    }
+
+  /**
    * @notice Returns the fee set for a particular token.
    * @param token Address of the attestationRequestFeeToken.
    * @return The fee.
@@ -648,5 +684,9 @@ contract Attestations is
     returns (bool)
   {
     return block.number >= uint256(attestationRequestBlock).add(attestationExpiryBlocks);
+  }
+
+  function isAttestationCompletable(Attestation storage attestation) internal view returns (bool) {
+    return attestation.status == AttestationStatus.Incomplete && !isAttestationExpired(attestation.blockNumber);
   }
 }

@@ -13,7 +13,7 @@ import { attestToIdentifier } from '@celo/utils'
 import { privateKeyToAddress } from '@celo/utils/lib/address'
 import { getPhoneHash } from '@celo/utils/lib/phoneNumbers'
 import BigNumber from 'bignumber.js'
-import { uniq } from 'lodash'
+import { range, uniq } from 'lodash'
 import {
   AccountsContract,
   AccountsInstance,
@@ -414,6 +414,27 @@ contract('Attestations', (accounts: string[]) => {
           )
         })
 
+        it('should return the attestations in getCompletableAttestationStates', async () => {
+          await attestations.selectIssuers(phoneHash)
+          const [
+            attestationBlockNumbers,
+            attestationIssuers,
+          ] = await attestations.getCompletableAttestationStates(phoneHash, caller)
+
+          assert.lengthOf(attestationBlockNumbers, attestationsRequested)
+          await Promise.all(
+            range(0, attestationsRequested).map(async (i) => {
+              const [status, requestBlock] = await attestations.getAttestationState(
+                phoneHash,
+                caller,
+                attestationIssuers[i]!
+              )
+              assert.equal(status.toNumber(), 1)
+              assertEqualBN(requestBlock, attestationBlockNumbers[i])
+            })
+          )
+        })
+
         it('should delete the unselected request', async () => {
           await attestations.selectIssuers(phoneHash)
           const [
@@ -437,6 +458,22 @@ contract('Attestations', (accounts: string[]) => {
               attestationsRequested: new BigNumber(attestationsRequested),
               attestationRequestFeeToken: mockStableToken.address,
             },
+          })
+        })
+
+        describe('after attestationExpiryBlocks', () => {
+          beforeEach(async () => {
+            await attestations.selectIssuers(phoneHash)
+            await advanceBlockNum(attestationExpiryBlocks, web3)
+          })
+
+          it('should no longer list the attestations in getCompletableAttestationStates', async () => {
+            const [
+              attestationBlockNumbers,
+              _attestationIssuers,
+            ] = await attestations.getCompletableAttestationStates(phoneHash, caller)
+
+            assert.lengthOf(attestationBlockNumbers, 0)
           })
         })
       })
@@ -554,6 +591,15 @@ contract('Attestations', (accounts: string[]) => {
         issuer
       )
       assert.equal(pendingWithdrawals.toString(), attestationFee.toString())
+    })
+
+    it('should no longer list the attestation in getCompletableAttestationStats', async () => {
+      await attestations.complete(phoneHash, v, r, s)
+      const [
+        _attestationBlockNumbers,
+        attestationIssuers,
+      ] = await attestations.getCompletableAttestationStates(phoneHash, caller)
+      assert.equal(attestationIssuers.indexOf(issuer), -1)
     })
 
     it('should emit the AttestationCompleted event', async () => {

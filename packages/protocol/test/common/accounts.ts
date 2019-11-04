@@ -288,6 +288,28 @@ contract('Accounts', (accounts: string[]) => {
     })
   })
 
+  describe('#batchGetMetadataURL', () => {
+    it('returns multiple metadata URLs', async () => {
+      const randomStrings = accounts.map((_) => web3.utils.randomHex(20).slice(2))
+      await Promise.all(
+        accounts.map(async (account, i) => {
+          await accountsInstance.createAccount({ from: account })
+          await accountsInstance.setMetadataURL(randomStrings[i], { from: account })
+        })
+      )
+      const [stringLengths, data] = await accountsInstance.batchGetMetadataURL(accounts)
+
+      let offset = 0
+      // @ts-ignore
+      const rawData = Buffer.from(data.slice(2), 'hex')
+      for (let i = 0; i < accounts.length; i++) {
+        const string = rawData.toString('utf-8', offset, offset + stringLengths[i].toNumber())
+        offset += stringLengths[i].toNumber()
+        assert.equal(string, randomStrings[i])
+      }
+    })
+  })
+
   describe('#setName', async () => {
     describe('when the account has not been created', () => {
       it('should revert', async () => {
