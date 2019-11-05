@@ -341,34 +341,22 @@ exports[`renders for gold to dollar exchange properly 1`] = `
             >
               <Text
                 style={
-                  Array [
-                    Object {
-                      "color": "#2E3338",
-                      "fontFamily": "Hind-Regular",
-                      "fontSize": 14,
-                      "lineHeight": 18,
-                    },
-                    Object {
-                      "color": "#BDBDBD",
-                    },
-                  ]
+                  Object {
+                    "color": "#BDBDBD",
+                    "fontFamily": "Hind-Regular",
+                    "fontSize": 14,
+                    "lineHeight": 18,
+                  }
                 }
               >
                 <Text
                   style={
-                    Array [
-                      Object {
-                        "color": "#2E3338",
-                        "fontFamily": "Hind-Bold",
-                        "fontSize": 14,
-                        "lineHeight": 18,
-                      },
-                      Object {
-                        "color": "#42D689",
-                        "fontSize": 13,
-                        "lineHeight": 18,
-                      },
-                    ]
+                    Object {
+                      "color": "#42D689",
+                      "fontFamily": "Hind-Bold",
+                      "fontSize": 13,
+                      "lineHeight": 18,
+                    }
                   }
                 >
                   confirmingPayment
@@ -573,34 +561,22 @@ exports[`renders for gold to dollar exchange properly 1`] = `
             >
               <Text
                 style={
-                  Array [
-                    Object {
-                      "color": "#2E3338",
-                      "fontFamily": "Hind-Regular",
-                      "fontSize": 14,
-                      "lineHeight": 18,
-                    },
-                    Object {
-                      "color": "#BDBDBD",
-                    },
-                  ]
+                  Object {
+                    "color": "#BDBDBD",
+                    "fontFamily": "Hind-Regular",
+                    "fontSize": 14,
+                    "lineHeight": 18,
+                  }
                 }
               >
                 <Text
                   style={
-                    Array [
-                      Object {
-                        "color": "#2E3338",
-                        "fontFamily": "Hind-Bold",
-                        "fontSize": 14,
-                        "lineHeight": 18,
-                      },
-                      Object {
-                        "color": "#42D689",
-                        "fontSize": 13,
-                        "lineHeight": 18,
-                      },
-                    ]
+                    Object {
+                      "color": "#42D689",
+                      "fontFamily": "Hind-Bold",
+                      "fontSize": 13,
+                      "lineHeight": 18,
+                    }
                   }
                 >
                   confirmingExchange
@@ -754,34 +730,22 @@ exports[`renders for gold to dollar exchange properly 1`] = `
             >
               <Text
                 style={
-                  Array [
-                    Object {
-                      "color": "#2E3338",
-                      "fontFamily": "Hind-Regular",
-                      "fontSize": 14,
-                      "lineHeight": 18,
-                    },
-                    Object {
-                      "color": "#BDBDBD",
-                    },
-                  ]
+                  Object {
+                    "color": "#BDBDBD",
+                    "fontFamily": "Hind-Regular",
+                    "fontSize": 14,
+                    "lineHeight": 18,
+                  }
                 }
               >
                 <Text
                   style={
-                    Array [
-                      Object {
-                        "color": "#2E3338",
-                        "fontFamily": "Hind-Bold",
-                        "fontSize": 14,
-                        "lineHeight": 18,
-                      },
-                      Object {
-                        "color": "#42D689",
-                        "fontSize": 13,
-                        "lineHeight": 18,
-                      },
-                    ]
+                    Object {
+                      "color": "#42D689",
+                      "fontFamily": "Hind-Bold",
+                      "fontSize": 13,
+                      "lineHeight": 18,
+                    }
                   }
                 >
                   confirmingPayment
@@ -986,17 +950,12 @@ exports[`renders for gold to dollar exchange properly 1`] = `
             >
               <Text
                 style={
-                  Array [
-                    Object {
-                      "color": "#2E3338",
-                      "fontFamily": "Hind-Regular",
-                      "fontSize": 14,
-                      "lineHeight": 18,
-                    },
-                    Object {
-                      "color": "#BDBDBD",
-                    },
-                  ]
+                  Object {
+                    "color": "#BDBDBD",
+                    "fontFamily": "Hind-Regular",
+                    "fontSize": 14,
+                    "lineHeight": 18,
+                  }
                 }
               />
             </View>
@@ -1232,34 +1191,22 @@ exports[`renders for loading 1`] = `
             >
               <Text
                 style={
-                  Array [
-                    Object {
-                      "color": "#2E3338",
-                      "fontFamily": "Hind-Regular",
-                      "fontSize": 14,
-                      "lineHeight": 18,
-                    },
-                    Object {
-                      "color": "#BDBDBD",
-                    },
-                  ]
+                  Object {
+                    "color": "#BDBDBD",
+                    "fontFamily": "Hind-Regular",
+                    "fontSize": 14,
+                    "lineHeight": 18,
+                  }
                 }
               >
                 <Text
                   style={
-                    Array [
-                      Object {
-                        "color": "#2E3338",
-                        "fontFamily": "Hind-Bold",
-                        "fontSize": 14,
-                        "lineHeight": 18,
-                      },
-                      Object {
-                        "color": "#42D689",
-                        "fontSize": 13,
-                        "lineHeight": 18,
-                      },
-                    ]
+                    Object {
+                      "color": "#42D689",
+                      "fontFamily": "Hind-Bold",
+                      "fontSize": 13,
+                      "lineHeight": 18,
+                    }
                   }
                 >
                   confirmingPayment
@@ -1464,34 +1411,22 @@ exports[`renders for loading 1`] = `
             >
               <Text
                 style={
-                  Array [
-                    Object {
-                      "color": "#2E3338",
-                      "fontFamily": "Hind-Regular",
-                      "fontSize": 14,
-                      "lineHeight": 18,
-                    },
-                    Object {
-                      "color": "#BDBDBD",
-                    },
-                  ]
+                  Object {
+                    "color": "#BDBDBD",
+                    "fontFamily": "Hind-Regular",
+                    "fontSize": 14,
+                    "lineHeight": 18,
+                  }
                 }
               >
                 <Text
                   style={
-                    Array [
-                      Object {
-                        "color": "#2E3338",
-                        "fontFamily": "Hind-Bold",
-                        "fontSize": 14,
-                        "lineHeight": 18,
-                      },
-                      Object {
-                        "color": "#42D689",
-                        "fontSize": 13,
-                        "lineHeight": 18,
-                      },
-                    ]
+                    Object {
+                      "color": "#42D689",
+                      "fontFamily": "Hind-Bold",
+                      "fontSize": 13,
+                      "lineHeight": 18,
+                    }
                   }
                 >
                   confirmingExchange
@@ -1645,34 +1580,22 @@ exports[`renders for loading 1`] = `
             >
               <Text
                 style={
-                  Array [
-                    Object {
-                      "color": "#2E3338",
-                      "fontFamily": "Hind-Regular",
-                      "fontSize": 14,
-                      "lineHeight": 18,
-                    },
-                    Object {
-                      "color": "#BDBDBD",
-                    },
-                  ]
+                  Object {
+                    "color": "#BDBDBD",
+                    "fontFamily": "Hind-Regular",
+                    "fontSize": 14,
+                    "lineHeight": 18,
+                  }
                 }
               >
                 <Text
                   style={
-                    Array [
-                      Object {
-                        "color": "#2E3338",
-                        "fontFamily": "Hind-Bold",
-                        "fontSize": 14,
-                        "lineHeight": 18,
-                      },
-                      Object {
-                        "color": "#42D689",
-                        "fontSize": 13,
-                        "lineHeight": 18,
-                      },
-                    ]
+                    Object {
+                      "color": "#42D689",
+                      "fontFamily": "Hind-Bold",
+                      "fontSize": 13,
+                      "lineHeight": 18,
+                    }
                   }
                 >
                   confirmingPayment
@@ -1912,34 +1835,22 @@ exports[`renders for no transactions 1`] = `
             >
               <Text
                 style={
-                  Array [
-                    Object {
-                      "color": "#2E3338",
-                      "fontFamily": "Hind-Regular",
-                      "fontSize": 14,
-                      "lineHeight": 18,
-                    },
-                    Object {
-                      "color": "#BDBDBD",
-                    },
-                  ]
+                  Object {
+                    "color": "#BDBDBD",
+                    "fontFamily": "Hind-Regular",
+                    "fontSize": 14,
+                    "lineHeight": 18,
+                  }
                 }
               >
                 <Text
                   style={
-                    Array [
-                      Object {
-                        "color": "#2E3338",
-                        "fontFamily": "Hind-Bold",
-                        "fontSize": 14,
-                        "lineHeight": 18,
-                      },
-                      Object {
-                        "color": "#42D689",
-                        "fontSize": 13,
-                        "lineHeight": 18,
-                      },
-                    ]
+                    Object {
+                      "color": "#42D689",
+                      "fontFamily": "Hind-Bold",
+                      "fontSize": 13,
+                      "lineHeight": 18,
+                    }
                   }
                 >
                   confirmingPayment
@@ -2144,34 +2055,22 @@ exports[`renders for no transactions 1`] = `
             >
               <Text
                 style={
-                  Array [
-                    Object {
-                      "color": "#2E3338",
-                      "fontFamily": "Hind-Regular",
-                      "fontSize": 14,
-                      "lineHeight": 18,
-                    },
-                    Object {
-                      "color": "#BDBDBD",
-                    },
-                  ]
+                  Object {
+                    "color": "#BDBDBD",
+                    "fontFamily": "Hind-Regular",
+                    "fontSize": 14,
+                    "lineHeight": 18,
+                  }
                 }
               >
                 <Text
                   style={
-                    Array [
-                      Object {
-                        "color": "#2E3338",
-                        "fontFamily": "Hind-Bold",
-                        "fontSize": 14,
-                        "lineHeight": 18,
-                      },
-                      Object {
-                        "color": "#42D689",
-                        "fontSize": 13,
-                        "lineHeight": 18,
-                      },
-                    ]
+                    Object {
+                      "color": "#42D689",
+                      "fontFamily": "Hind-Bold",
+                      "fontSize": 13,
+                      "lineHeight": 18,
+                    }
                   }
                 >
                   confirmingExchange
@@ -2325,34 +2224,22 @@ exports[`renders for no transactions 1`] = `
             >
               <Text
                 style={
-                  Array [
-                    Object {
-                      "color": "#2E3338",
-                      "fontFamily": "Hind-Regular",
-                      "fontSize": 14,
-                      "lineHeight": 18,
-                    },
-                    Object {
-                      "color": "#BDBDBD",
-                    },
-                  ]
+                  Object {
+                    "color": "#BDBDBD",
+                    "fontFamily": "Hind-Regular",
+                    "fontSize": 14,
+                    "lineHeight": 18,
+                  }
                 }
               >
                 <Text
                   style={
-                    Array [
-                      Object {
-                        "color": "#2E3338",
-                        "fontFamily": "Hind-Bold",
-                        "fontSize": 14,
-                        "lineHeight": 18,
-                      },
-                      Object {
-                        "color": "#42D689",
-                        "fontSize": 13,
-                        "lineHeight": 18,
-                      },
-                    ]
+                    Object {
+                      "color": "#42D689",
+                      "fontFamily": "Hind-Bold",
+                      "fontSize": 13,
+                      "lineHeight": 18,
+                    }
                   }
                 >
                   confirmingPayment
@@ -2592,34 +2479,22 @@ exports[`renders for standbyTransactions 1`] = `
             >
               <Text
                 style={
-                  Array [
-                    Object {
-                      "color": "#2E3338",
-                      "fontFamily": "Hind-Regular",
-                      "fontSize": 14,
-                      "lineHeight": 18,
-                    },
-                    Object {
-                      "color": "#BDBDBD",
-                    },
-                  ]
+                  Object {
+                    "color": "#BDBDBD",
+                    "fontFamily": "Hind-Regular",
+                    "fontSize": 14,
+                    "lineHeight": 18,
+                  }
                 }
               >
                 <Text
                   style={
-                    Array [
-                      Object {
-                        "color": "#2E3338",
-                        "fontFamily": "Hind-Bold",
-                        "fontSize": 14,
-                        "lineHeight": 18,
-                      },
-                      Object {
-                        "color": "#42D689",
-                        "fontSize": 13,
-                        "lineHeight": 18,
-                      },
-                    ]
+                    Object {
+                      "color": "#42D689",
+                      "fontFamily": "Hind-Bold",
+                      "fontSize": 13,
+                      "lineHeight": 18,
+                    }
                   }
                 >
                   confirmingPayment
@@ -2824,34 +2699,22 @@ exports[`renders for standbyTransactions 1`] = `
             >
               <Text
                 style={
-                  Array [
-                    Object {
-                      "color": "#2E3338",
-                      "fontFamily": "Hind-Regular",
-                      "fontSize": 14,
-                      "lineHeight": 18,
-                    },
-                    Object {
-                      "color": "#BDBDBD",
-                    },
-                  ]
+                  Object {
+                    "color": "#BDBDBD",
+                    "fontFamily": "Hind-Regular",
+                    "fontSize": 14,
+                    "lineHeight": 18,
+                  }
                 }
               >
                 <Text
                   style={
-                    Array [
-                      Object {
-                        "color": "#2E3338",
-                        "fontFamily": "Hind-Bold",
-                        "fontSize": 14,
-                        "lineHeight": 18,
-                      },
-                      Object {
-                        "color": "#42D689",
-                        "fontSize": 13,
-                        "lineHeight": 18,
-                      },
-                    ]
+                    Object {
+                      "color": "#42D689",
+                      "fontFamily": "Hind-Bold",
+                      "fontSize": 13,
+                      "lineHeight": 18,
+                    }
                   }
                 >
                   confirmingExchange
@@ -3005,34 +2868,22 @@ exports[`renders for standbyTransactions 1`] = `
             >
               <Text
                 style={
-                  Array [
-                    Object {
-                      "color": "#2E3338",
-                      "fontFamily": "Hind-Regular",
-                      "fontSize": 14,
-                      "lineHeight": 18,
-                    },
-                    Object {
-                      "color": "#BDBDBD",
-                    },
-                  ]
+                  Object {
+                    "color": "#BDBDBD",
+                    "fontFamily": "Hind-Regular",
+                    "fontSize": 14,
+                    "lineHeight": 18,
+                  }
                 }
               >
                 <Text
                   style={
-                    Array [
-                      Object {
-                        "color": "#2E3338",
-                        "fontFamily": "Hind-Bold",
-                        "fontSize": 14,
-                        "lineHeight": 18,
-                      },
-                      Object {
-                        "color": "#42D689",
-                        "fontSize": 13,
-                        "lineHeight": 18,
-                      },
-                    ]
+                    Object {
+                      "color": "#42D689",
+                      "fontFamily": "Hind-Bold",
+                      "fontSize": 13,
+                      "lineHeight": 18,
+                    }
                   }
                 >
                   confirmingPayment

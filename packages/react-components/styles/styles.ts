@@ -56,9 +56,6 @@ export const componentStyles = StyleSheet.create({
     borderBottomWidth: 1,
     borderColor: colors.darkLightest,
   },
-  colorGreen: {
-    color: colors.celoGreen,
-  },
   roundedBorder: {
     borderColor: colors.darkLightest,
     borderRadius: 3,
