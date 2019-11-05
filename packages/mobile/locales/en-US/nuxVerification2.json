@@ -55,5 +55,14 @@
   "errorRedeemingCode": "Failed to redeem code.",
   "pleaseRetry": "Please retry verification.",
   "retryVerification": "Retry Verification",
-  "codeAccepted": "Accepted"
+  "codeAccepted": "Accepted",
+  "education": {
+    "header": "Verify Your Phone",
+    "body1": "Next, please verify your phone number.",
+    "body2":
+      "Verifying makes it easier to send and receive with friends. You can also skip this step and return to it later.",
+    "learnMore": "Learn more about phone verification",
+    "start": "Start Verification",
+    "skip": "Skip For Now"
+  }
 }
