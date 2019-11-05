@@ -244,9 +244,22 @@ export class GovernanceWrapper extends BaseWrapper<Governance> {
     )
   )
 
+  getDequeue = proxyCall(this.contract.methods.getDequeue, undefined, (arrayObject) =>
+    arrayObject.map(toBigNumber)
+  )
+
+  private async getDequeueIndex(proposalID: BigNumber) {
+    const dequeue = await this.getDequeue()
+    const index = dequeue.findIndex((d) => d.isEqualTo(proposalID))
+    if (index === -1) {
+      throw new Error(`Proposal ${proposalID.toString()} not in dequeue`)
+    }
+    return index
+  }
+
   // TODO: merge with SortedOracles/Election findLesserAndGreater
   // proposalID is zero for revokes
-  async findLesserAndGreaterAfterUpvote(proposalID: BigNumber, upvoter: Address) {
+  private async findLesserAndGreaterAfterUpvote(proposalID: BigNumber, upvoter: Address) {
     let queue = await this.getQueue()
     let searchID = ZERO_BN
 
@@ -266,11 +279,8 @@ export class GovernanceWrapper extends BaseWrapper<Governance> {
       const proposalIdx = queue.findIndex((qp) => qp.id.isEqualTo(proposalID))
       // is target proposal in queue?
       if (proposalIdx !== -1) {
-        const accountsContract = await this.kit.contracts.getAccounts()
-        const votingAccount = await accountsContract.getVoteSigner(upvoter)
         const lockedGoldContract = await this.kit.contracts.getLockedGold()
-        const weight = await lockedGoldContract.getAccountTotalLockedGold(votingAccount)
-        // const weight = 1
+        const weight = await lockedGoldContract.getAccountTotalLockedGold(upvoter)
         queue[proposalIdx].upvotes = queue[proposalIdx].upvotes.plus(weight)
         searchID = proposalID
       } else {
@@ -317,33 +327,29 @@ export class GovernanceWrapper extends BaseWrapper<Governance> {
     )
   }
 
-  approve: (
-    proposalID: BigNumber,
-    proposalIndex: BigNumber
-  ) => CeloTransactionObject<boolean> = proxySend(
-    this.kit,
-    this.contract.methods.approve,
-    tupleParser(parseNumber, parseNumber)
-  )
+  async approve(proposalID: BigNumber) {
+    const proposalIndex = await this.getDequeueIndex(proposalID)
+    return toTransactionObject(
+      this.kit,
+      this.contract.methods.approve(proposalID.toString(), proposalIndex)
+    )
+  }
 
-  vote: (
-    proposalID: BigNumber,
-    proposalIndex: BigNumber,
-    vote: VoteValue
-  ) => CeloTransactionObject<boolean> = proxySend(
-    this.kit,
-    this.contract.methods.vote,
-    tupleParser(parseNumber, parseNumber, identity)
-  )
+  async vote(proposalID: BigNumber, vote: VoteValue) {
+    const proposalIndex = await this.getDequeueIndex(proposalID)
+    return toTransactionObject(
+      this.kit,
+      this.contract.methods.vote(proposalID.toString(), proposalIndex, vote)
+    )
+  }
 
-  execute: (
-    proposalID: BigNumber,
-    proposalIndex: BigNumber
-  ) => CeloTransactionObject<boolean> = proxySend(
-    this.kit,
-    this.contract.methods.execute,
-    tupleParser(parseNumber, parseNumber)
-  )
+  async execute(proposalID: BigNumber) {
+    const proposalIndex = await this.getDequeueIndex(proposalID)
+    return toTransactionObject(
+      this.kit,
+      this.contract.methods.execute(proposalID.toString(), proposalIndex)
+    )
+  }
 
   whitelistHotfix: (hash: Buffer) => CeloTransactionObject<void> = proxySend(
     this.kit,
