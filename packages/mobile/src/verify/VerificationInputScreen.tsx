@@ -222,6 +222,7 @@ const styles = StyleSheet.create({
     marginTop: 20,
   },
   codeInput: {
+    flex: 0,
     borderColor: colors.inputBorder,
     borderRadius: 3,
     borderWidth: 1,
