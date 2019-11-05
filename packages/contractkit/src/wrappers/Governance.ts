@@ -3,7 +3,7 @@ import { keccak256 } from 'ethereumjs-util'
 import { identity } from 'fp-ts/lib/function'
 import Contract from 'web3/eth/contract'
 
-import { filterAsync, mapAsync, zip } from '@celo/utils/lib/collections'
+import { mapAsync, zip } from '@celo/utils/lib/collections'
 
 import { Address } from '../base'
 import { Governance } from '../generated/types/Governance'
@@ -41,10 +41,10 @@ export interface Transaction {
 }
 
 interface TransactionsEncoded {
-  values: string[]
-  destinations: string[]
-  data: Buffer
-  dataLengths: number[]
+  readonly values: string[]
+  readonly destinations: Address[]
+  readonly data: Buffer
+  readonly dataLengths: number[]
 }
 
 export interface ProposalMetadata {
@@ -64,12 +64,19 @@ interface QueueProposal {
   upvotes: BigNumber
 }
 
+interface UpvoteRecord {
+  id: BigNumber
+  weight: BigNumber
+}
+
 export enum VoteValue {
   None,
   Abstain,
   No,
   Yes,
 }
+
+const ZERO_BN = new BigNumber(0)
 
 /**
  * Contract managing voting for governance proposals.
@@ -207,6 +214,21 @@ export class GovernanceWrapper extends BaseWrapper<Governance> {
     )
   }
 
+  proposalExists: (proposalID: BigNumber) => Promise<boolean> = proxyCall(
+    this.contract.methods.proposalExists,
+    tupleParser(parseNumber),
+    identity
+  )
+
+  getUpvoteRecord: (upvoter: Address) => Promise<UpvoteRecord> = proxyCall(
+    this.contract.methods.getUpvoteRecord,
+    tupleParser(identity),
+    (o) => ({
+      id: toBigNumber(o[0]),
+      weight: toBigNumber(o[1]),
+    })
+  )
+
   isQueued = proxyCall(this.contract.methods.isQueued, tupleParser(parseNumber), identity)
 
   getUpvotes = proxyCall(this.contract.methods.getUpvotes, tupleParser(parseNumber), toBigNumber)
@@ -222,45 +244,55 @@ export class GovernanceWrapper extends BaseWrapper<Governance> {
     )
   )
 
-  // TODO: merge with SortedOracles findLesserAndGreaterKeys
-  private async findLesserAndGreaterIDs(
-    proposalID: BigNumber,
-    upvoter: Address,
-    recordWeight?: BigNumber // used for revocation
-  ): Promise<{ lesserID: BigNumber; greaterID: BigNumber }> {
-    const proposalUpvotes = await this.getUpvotes(proposalID)
+  // TODO: merge with SortedOracles/Election findLesserAndGreater
+  // proposalID is zero for revokes
+  async findLesserAndGreaterAfterUpvote(proposalID: BigNumber, upvoter: Address) {
+    let queue = await this.getQueue()
+    let searchID = ZERO_BN
 
-    let upvotesResult: BigNumber
-    if (recordWeight) {
-      upvotesResult = proposalUpvotes.minus(recordWeight)
-    } else {
-      const lockedGoldContract = await this.kit.contracts.getLockedGold()
-      const weight = await lockedGoldContract.getAccountTotalLockedGold(upvoter)
-      upvotesResult = proposalUpvotes.plus(weight)
-    }
-
-    const queue = await this.getQueue()
-    const unexpiredQueue = await filterAsync(queue, (qp) => this.isQueued(qp.id))
-
-    let lesserID = new BigNumber(-1)
-    let greaterID = new BigNumber(-1)
-    // This leverages the fact that the currentRates are already sorted from
-    // greatest to lowest value
-    for (const queueProposal of unexpiredQueue) {
-      if (!queueProposal.id.eq(proposalID)) {
-        if (queueProposal.upvotes.isLessThanOrEqualTo(upvotesResult)) {
-          lesserID = queueProposal.id
-          break
-        }
-        greaterID = queueProposal.id
+    const upvoteRecord = await this.getUpvoteRecord(upvoter)
+    // does upvoter have a previous upvote?
+    if (upvoteRecord.id.isGreaterThan(ZERO_BN)) {
+      const proposalIdx = queue.findIndex((qp) => qp.id.isEqualTo(upvoteRecord.id))
+      // is previous upvote in queue?
+      if (proposalIdx !== -1) {
+        queue[proposalIdx].upvotes = queue[proposalIdx].upvotes.minus(upvoteRecord.weight)
+        searchID = upvoteRecord.id
       }
     }
 
-    return { lesserID, greaterID }
+    // is upvoter targeting a valid proposal?
+    if (proposalID.isGreaterThan(ZERO_BN)) {
+      const proposalIdx = queue.findIndex((qp) => qp.id.isEqualTo(proposalID))
+      // is target proposal in queue?
+      if (proposalIdx !== -1) {
+        const accountsContract = await this.kit.contracts.getAccounts()
+        const votingAccount = await accountsContract.getVoteSigner(upvoter)
+        const lockedGoldContract = await this.kit.contracts.getLockedGold()
+        const weight = await lockedGoldContract.getAccountTotalLockedGold(votingAccount)
+        // const weight = 1
+        queue[proposalIdx].upvotes = queue[proposalIdx].upvotes.plus(weight)
+        searchID = proposalID
+      } else {
+        throw new Error(`Proposal ${proposalID.toString()} not in queue`)
+      }
+    }
+
+    queue = queue.sort((a, b) => a.upvotes.comparedTo(b.upvotes))
+    const newIdx = queue.findIndex((qp) => qp.id.isEqualTo(searchID))
+
+    return {
+      lesserID: newIdx === 0 ? ZERO_BN : queue[newIdx - 1].id,
+      greaterID: newIdx === queue.length - 1 ? ZERO_BN : queue[newIdx + 1].id,
+    }
   }
 
   async upvote(proposalID: BigNumber, upvoter: Address) {
-    const { lesserID, greaterID } = await this.findLesserAndGreaterIDs(proposalID, upvoter)
+    const exists = await this.proposalExists(proposalID)
+    if (!exists) {
+      throw new Error(`Proposal ${proposalID.toString()} does not exist`)
+    }
+    const { lesserID, greaterID } = await this.findLesserAndGreaterAfterUpvote(proposalID, upvoter)
     return toTransactionObject(
       this.kit,
       this.contract.methods.upvote(
@@ -273,20 +305,14 @@ export class GovernanceWrapper extends BaseWrapper<Governance> {
   }
 
   async revokeUpvote(upvoter: Address) {
-    const { 0: proposalID, 1: weight } = await this.contract.methods.getUpvoteRecord(upvoter).call()
-    const { lesserID, greaterID } = await this.findLesserAndGreaterIDs(
-      toBigNumber(proposalID),
-      upvoter,
-      toBigNumber(weight)
-    )
-
+    const { id } = await this.getUpvoteRecord(upvoter)
+    if (!id.isGreaterThan(ZERO_BN)) {
+      throw new Error(`Voter ${upvoter} has no upvote to revoke`)
+    }
+    const { lesserID, greaterID } = await this.findLesserAndGreaterAfterUpvote(ZERO_BN, upvoter)
     return toTransactionObject(
       this.kit,
-      this.contract.methods.upvote(
-        proposalID.toString(),
-        lesserID.toString(),
-        greaterID.toString()
-      ),
+      this.contract.methods.revokeUpvote(lesserID.toString(), greaterID.toString()),
       { from: upvoter }
     )
   }

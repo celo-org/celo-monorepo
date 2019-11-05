@@ -1,40 +1,43 @@
 import BigNumber from 'bignumber.js'
 
-import { CeloContract } from '../base'
+import { Address, CeloContract } from '../base'
 import { Registry } from '../generated/types/Registry'
 import { newKitFromWeb3 } from '../kit'
-import { testWithGanache } from '../test-utils/ganache-test'
-import migrationConfig from '../test-utils/migration-override.json'
+import { NetworkConfig, testWithGanache } from '../test-utils/ganache-test'
 import { GovernanceWrapper, Transaction, VoteValue } from './Governance'
 
-const expConfig = migrationConfig.governance
+const expConfig = NetworkConfig.governance
 
 testWithGanache('Governance Wrapper', (web3) => {
-  const ONE_USD = web3.utils.toWei('1', 'ether')
   const kit = newKitFromWeb3(web3)
+  const minDeposit = web3.utils.toWei(expConfig.minDeposit.toString(), 'ether')
 
   let accounts: string[] = []
   let governance: GovernanceWrapper
-  let transactions: Transaction[]
-
-  const buildTransactions = (results: string[][], registry: Registry) =>
-    results.map((repoint) => ({
-      value: new BigNumber(0),
-      destination: registry._address,
-      data: governance.toTransactionData(registry.methods.setAddressFor, [repoint[0], repoint[1]]),
-    }))
+  let registry: Registry
 
   beforeAll(async () => {
     accounts = await web3.eth.getAccounts()
     kit.defaultAccount = accounts[0]
     governance = await kit.contracts.getGovernance()
+    registry = await kit._web3Contracts.getRegistry()
   })
+
+  const buildRegistryRepointTransactions = (
+    repoints: Array<[Address, Address]>,
+    _registry: Registry
+  ) =>
+    repoints.map<Transaction>((repoint) => ({
+      value: new BigNumber(0),
+      destination: _registry._address,
+      data: governance.toTransactionData(_registry.methods.setAddressFor, [repoint[0], repoint[1]]),
+    }))
 
   it('SBAT get config', async () => {
     const config = await governance.getConfig()
     expect(config.concurrentProposals).toEqBigNumber(expConfig.concurrentProposals)
     expect(config.dequeueFrequency).toEqBigNumber(expConfig.dequeueFrequency)
-    expect(config.minDeposit).toEqBigNumber(ONE_USD)
+    expect(config.minDeposit).toEqBigNumber(minDeposit)
     expect(config.queueExpiry).toEqBigNumber(expConfig.queueExpiry)
     expect(config.stageDurations.approval).toEqBigNumber(expConfig.approvalStageDuration)
     expect(config.stageDurations.referendum).toEqBigNumber(expConfig.referendumStageDuration)
@@ -42,37 +45,50 @@ testWithGanache('Governance Wrapper', (web3) => {
   })
 
   describe('Proposals', () => {
-    const proposalTransactionResults = [
-      [CeloContract.Attestations, '0xproposal00000000000000000000000000000001'],
-      [CeloContract.Escrow, '0xproposal00000000000000000000000000000002'],
-      [CeloContract.Random, '0xproposal00000000000000000000000000000003'],
-    ]
+    let proposalTransactions: Transaction[]
+    let proposeFn: () => Promise<any>
 
-    beforeAll(async () => {
-      const registry = await kit._web3Contracts.getRegistry()
-      transactions = buildTransactions(proposalTransactionResults, registry)
+    beforeAll(() => {
+      proposalTransactions = buildRegistryRepointTransactions([
+        [CeloContract.Random, '0x0000000000000000000000000000000000000004'],
+        [CeloContract.Attestations, '0x0000000000000000000000000000000000000005'],
+        [CeloContract.Escrow, '0x0000000000000000000000000000000000000006'],
+      ], registry)
+      proposeFn = () => governance
+        .propose(proposalTransactions)
+        .sendAndWaitForReceipt({ from: accounts[0], value: minDeposit })
     })
 
-    let proposalID = new BigNumber(0)
-    let proposalIndex = new BigNumber(0)
+    const proposalID = new BigNumber(1)
+    const proposalIndex = new BigNumber(0)
 
-    it('#propose', async () => {
-      const tx = governance.propose(transactions)
-      await tx.sendAndWaitForReceipt({ from: accounts[0], value: ONE_USD })
-      proposalID = proposalID.plus(1)
+    it.only('#propose', async () => {
+      await proposeFn()
 
       const proposal = await governance.getProposal(proposalID)
       expect(proposal.metadata.proposer).toBe(accounts[0])
-      expect(proposal.metadata.transactionCount).toBe(transactions.length)
-      expect(proposal.transactions).toStrictEqual(transactions)
+      expect(proposal.metadata.transactionCount).toBe(proposalTransactions.length)
+      expect(proposal.transactions).toStrictEqual(proposalTransactions)
     })
 
-    it('#upvote', async () => {
-      const tx = await governance.upvote(proposalID, accounts[0])
-      await tx.sendAndWaitForReceipt()
+    it.only('#upvote', async () => {
+      await proposeFn()
 
-      const upvotes = await governance.getUpvotes(proposalID)
-      console.log(upvotes)
+      const queue = await governance.getQueue()
+      console.log("queue[0]", queue[0].id.toString(), queue[0].upvotes.toString())
+
+      const upvoteRecord = await governance.getUpvoteRecord(accounts[0])
+      console.log("upvoteRecord", upvoteRecord.id.toString(), upvoteRecord.weight.toString())
+
+
+      const o = await governance.findLesserAndGreaterAfterUpvote(proposalID, accounts[0])
+      console.log("lesser", o.lesserID.toString(), "greater", o.greaterID.toString())
+
+      // const tx = await governance.upvote(proposalID, accounts[0])
+      // await tx.sendAndWaitForReceipt()
+
+      // const upvotes = await governance.getUpvotes(proposalID)
+      // console.log(upvotes)
     })
 
     it('#approve', async () => {
@@ -92,19 +108,12 @@ testWithGanache('Governance Wrapper', (web3) => {
   })
 
   describe('Hotfixes', () => {
-    const hotfixTransactionResults = [
-      [CeloContract.Attestations, '0xhotfix0000000000000000000000000000000001'],
-      [CeloContract.Escrow, '0xhotfix0000000000000000000000000000000002'],
-      [CeloContract.Random, '0xhotfix0000000000000000000000000000000003'],
-    ]
-
-    let hash: Buffer
-
-    beforeAll(async () => {
-      const registry = await kit._web3Contracts.getRegistry()
-      transactions = buildTransactions(hotfixTransactionResults, registry)
-      hash = governance.getTransactionsHash(transactions)
-    })
+    const hotfixTransactions = buildRegistryRepointTransactions([
+      [CeloContract.Random, '0x0000000000000000000000000000000000000004'],
+      [CeloContract.Attestations, '0x0000000000000000000000000000000000000005'],
+      [CeloContract.Escrow, '0x0000000000000000000000000000000000000006'],
+    ], registry)
+    const hash = governance.getTransactionsHash(hotfixTransactions)
 
     it('#whitelistHotfix', async () => {
       const tx = governance.whitelistHotfix(hash)
@@ -122,7 +131,7 @@ testWithGanache('Governance Wrapper', (web3) => {
     })
 
     it('#executeHotfix', async () => {
-      const tx = governance.executeHotfix(transactions)
+      const tx = governance.executeHotfix(hotfixTransactions)
       await tx.sendAndWaitForReceipt()
     })
   })
