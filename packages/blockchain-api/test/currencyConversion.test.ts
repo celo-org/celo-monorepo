@@ -1,3 +1,4 @@
+import { InMemoryLRUCache } from 'apollo-server-caching'
 import { FetchMock } from 'jest-fetch-mock'
 import { CurrencyConversionAPI } from '../src/currencyConversion'
 
@@ -20,18 +21,12 @@ mockFetch.mockResponse(SUCCESS_RESULT, {
   },
 })
 
-const mockHttpCache = {
-  get: jest.fn(),
-  set: jest.fn(),
-  delete: jest.fn(),
-}
-
 describe('Currency Conversion', () => {
   let currencyConversionAPI: CurrencyConversionAPI
 
   beforeEach(() => {
     currencyConversionAPI = new CurrencyConversionAPI()
-    currencyConversionAPI.initialize({ context: {}, cache: mockHttpCache })
+    currencyConversionAPI.initialize({ context: {}, cache: new InMemoryLRUCache() })
     jest.clearAllMocks()
   })
 
@@ -41,19 +36,104 @@ describe('Currency Conversion', () => {
     expect(fetchMock.mock.calls.length).toEqual(1)
   })
 
-  it('should retrieve exchange rates from cache', async () => {
-    // mockHttpCache.get.mockImplementation(() =>
-    //   JSON.stringify({
-    //     policy: CachePolicy(),
-    //     ttlOverride: 0,
-    //     body: SUCCESS_RESULT,
-    //   })
-    // )
-    const result1 = await currencyConversionAPI.getExchangeRate({ currencyCode: 'MXN' })
-    expect(result1).toMatchObject({ rate: 20 })
-    expect(fetchMock.mock.calls.length).toEqual(1)
-    const result2 = await currencyConversionAPI.getExchangeRate({ currencyCode: 'MXN' })
-    expect(result2).toMatchObject({ rate: 20 })
-    expect(fetchMock.mock.calls.length).toEqual(1)
+  describe('caching', () => {
+    const originalNow = Date.now
+
+    beforeEach(() => {
+      const now = Date.now()
+      Date.now = jest.fn(() => now)
+    })
+
+    afterEach(() => {
+      Date.now = originalNow
+    })
+
+    it('should cache rates for the current day for 12 hours', async () => {
+      const cache = new InMemoryLRUCache()
+      const now = Date.now()
+
+      currencyConversionAPI = new CurrencyConversionAPI()
+      currencyConversionAPI.initialize({ context: {}, cache })
+      const result1 = await currencyConversionAPI.getExchangeRate({
+        currencyCode: 'MXN',
+        timestamp: now,
+      })
+      expect(result1).toMatchObject({ rate: 20 })
+      expect(fetchMock).toHaveBeenCalledTimes(1)
+
+      // Advance date to +12 hours - 1 millisecond
+      Date.now = jest.fn(() => now + (12 * 3600 * 1000 - 1))
+
+      currencyConversionAPI = new CurrencyConversionAPI()
+      currencyConversionAPI.initialize({ context: {}, cache })
+      const result2 = await currencyConversionAPI.getExchangeRate({
+        currencyCode: 'MXN',
+        timestamp: now,
+      })
+      expect(result2).toMatchObject({ rate: 20 })
+      expect(fetchMock).toHaveBeenCalledTimes(1)
+
+      // Advance date to +12 hours + 1 millisecond
+      Date.now = jest.fn(() => now + (12 * 3600 * 1000 + 1))
+
+      currencyConversionAPI = new CurrencyConversionAPI()
+      currencyConversionAPI.initialize({ context: {}, cache })
+      const result3 = await currencyConversionAPI.getExchangeRate({
+        currencyCode: 'MXN',
+        timestamp: now,
+      })
+      expect(result3).toMatchObject({ rate: 20 })
+      expect(fetchMock).toHaveBeenCalledTimes(2)
+    })
+
+    it('should cache rates for previous days indefinitely', async () => {
+      const cache = new InMemoryLRUCache()
+      const now = Date.now() - 24 * 3600 * 1000
+
+      currencyConversionAPI = new CurrencyConversionAPI()
+      currencyConversionAPI.initialize({ context: {}, cache })
+      const result1 = await currencyConversionAPI.getExchangeRate({
+        currencyCode: 'MXN',
+        timestamp: now,
+      })
+      expect(result1).toMatchObject({ rate: 20 })
+      expect(fetchMock).toHaveBeenCalledTimes(1)
+
+      // Advance date to +12 hours - 1 millisecond
+      Date.now = jest.fn(() => now + (12 * 3600 * 1000 - 1))
+
+      currencyConversionAPI = new CurrencyConversionAPI()
+      currencyConversionAPI.initialize({ context: {}, cache })
+      const result2 = await currencyConversionAPI.getExchangeRate({
+        currencyCode: 'MXN',
+        timestamp: now,
+      })
+      expect(result2).toMatchObject({ rate: 20 })
+      expect(fetchMock).toHaveBeenCalledTimes(1)
+
+      // Advance date to +12 hours + 1 millisecond
+      Date.now = jest.fn(() => now + (12 * 3600 * 1000 + 1))
+
+      currencyConversionAPI = new CurrencyConversionAPI()
+      currencyConversionAPI.initialize({ context: {}, cache })
+      const result3 = await currencyConversionAPI.getExchangeRate({
+        currencyCode: 'MXN',
+        timestamp: now,
+      })
+      expect(result3).toMatchObject({ rate: 20 })
+      expect(fetchMock).toHaveBeenCalledTimes(1)
+
+      // Advance date to +10 years
+      Date.now = jest.fn(() => now + 10 * 365 * 24 * 3600 * 1000)
+
+      currencyConversionAPI = new CurrencyConversionAPI()
+      currencyConversionAPI.initialize({ context: {}, cache })
+      const result4 = await currencyConversionAPI.getExchangeRate({
+        currencyCode: 'MXN',
+        timestamp: now,
+      })
+      expect(result4).toMatchObject({ rate: 20 })
+      expect(fetchMock).toHaveBeenCalledTimes(1)
+    })
   })
 })

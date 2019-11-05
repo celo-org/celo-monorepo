@@ -10,7 +10,8 @@ interface ExchangeRateApiResult {
   date: string
 }
 
-const MIN_UPDATE_INTERVAL = 12 * 3600 * 1000 // 12 hours
+// TTL in seconds!
+const MIN_TTL = 12 * 3600 // 12 hours
 
 export class CurrencyConversionAPI extends RESTDataSource {
   constructor() {
@@ -48,7 +49,7 @@ export class CurrencyConversionAPI extends RESTDataSource {
       date: formatDateString(date),
     }
     const result = await this.get<ExchangeRateApiResult>(path, params, {
-      cacheOptions: { ttl: MIN_UPDATE_INTERVAL },
+      cacheOptions: { ttl: this.getCacheTtl(date) },
     })
     if (result.success !== true) {
       throw new Error(`Invalid response result: ${JSON.stringify(result)}`)
@@ -56,5 +57,15 @@ export class CurrencyConversionAPI extends RESTDataSource {
     const rate = result.quotes[`USD${currencyCode}`]
     console.debug('Retrieved rate', currencyCode, rate)
     return rate
+  }
+
+  // Returns ttl (in seconds)
+  private getCacheTtl(date: Date) {
+    if (Date.now() - date.getTime() >= 24 * 3600 * 1000) {
+      // Cache indefinitely if requesting a date prior to the last 24 hours
+      return Number.MAX_SAFE_INTEGER
+    } else {
+      return MIN_TTL
+    }
   }
 }
