@@ -66,6 +66,10 @@ describe('when defaultCountry is truthy', () => {
       await wrapper.instance().triggerPhoneNumberRequest()
 
       // expect(wrapper.find(ValidatedTextInput).props().value).toEqual('030 111111')
+
+      expect(
+        wrapper.findWhere((node) => node.prop('testID') === 'PhoneNumberField').props().value
+      ).toBe('030 111111')
       expect(wrapper.instance().state.countryCallingCode).toEqual('+49')
 
       expect(
