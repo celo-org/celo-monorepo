@@ -56,11 +56,6 @@ volumes:
   value: /images/celo_logo.svg
 {{- end -}}
 
-{{- define "celo.blockscout-env-vars-web" -}}
-- name: DISABLE_INDEXER
-  value: "true"
-{{- end -}}
-
 {{- define "celo.prom-to-sd-container" -}}
 - name: prom-to-sd
   image: "{{ .Values.promtosd.image.repository }}:{{ .Values.promtosd.image.tag }}"
