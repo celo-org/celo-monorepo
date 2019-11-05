@@ -62,6 +62,7 @@ import SendAmount from 'src/send/SendAmount'
 import SendConfirmation from 'src/send/SendConfirmation'
 import SetClock from 'src/set-clock/SetClock'
 import TransactionReviewScreen from 'src/transactions/TransactionReviewScreen'
+import VerificationEducationScreen from 'src/verify/VerificationEducationScreen'
 import VerificationInputScreen from 'src/verify/VerificationInputScreen'
 import VerificationInterstitialScreen from 'src/verify/VerificationInterstitialScreen'
 import VerificationLearnMoreScreen from 'src/verify/VerificationLearnMoreScreen'
@@ -119,7 +120,7 @@ const NuxStack = createStackNavigator(
     [Screens.VerifyEducation]: { screen: VerifyEducation },
     [Screens.VerifyVerifying]: { screen: VerifyVerifying },
     [Screens.VerifyVerified]: { screen: VerifyVerified },
-    [Screens.VerificationEducationScreen]: { screen: VerificationLoadingScreen },
+    [Screens.VerificationEducationScreen]: { screen: VerificationEducationScreen },
     [Screens.VerificationLearnMoreScreen]: { screen: VerificationLearnMoreScreen },
     [Screens.VerificationLoadingScreen]: { screen: VerificationLoadingScreen },
     [Screens.VerificationInterstitialScreen]: { screen: VerificationInterstitialScreen },
