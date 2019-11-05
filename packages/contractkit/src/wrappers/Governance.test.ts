@@ -21,6 +21,7 @@ testWithGanache('Governance Wrapper', (web3) => {
   let accounts: string[] = []
   let governance: GovernanceWrapper
   let transactions: Transaction[]
+  let hash: Buffer
   
   beforeAll(async () => {
     accounts = await web3.eth.getAccounts()
@@ -38,6 +39,7 @@ testWithGanache('Governance Wrapper', (web3) => {
         )
       })
     )
+    hash = governance.getTransactionsHash(transactions)
   })
 
   it('SBAT get config', async () => {
@@ -75,35 +77,33 @@ testWithGanache('Governance Wrapper', (web3) => {
     })
 
     it('#approve', async () => {
-      const tx = governance.approve(proposalID, proposalIndex)
+      governance.approve(proposalID, proposalIndex)
     })
 
     it('#vote', async () => {
-      const tx = governance.vote(proposalID, proposalIndex, VoteValue.Yes)
+      governance.vote(proposalID, proposalIndex, VoteValue.Yes)
     })
     
     it('#execute', async () => {
-      const tx = governance.execute(proposalID, proposalIndex)
+      governance.execute(proposalID, proposalIndex)
     })
   })
   
   describe('Hotfixes', () => {
-    const hash = governance.getTransactionsHash(transactions)
-
     it('#whitelistHotfix', async () => {
-      const tx = governance.whitelistHotfix(hash)
+      governance.whitelistHotfix(hash)
     })
 
     it('#approveHotfix', async () => {
-      const tx = governance.approveHotfix(hash)
+      governance.approveHotfix(hash)
     })
 
     it('#prepareHotfix', async () => {
-      const tx = governance.prepareHotfix(hash)
+      governance.prepareHotfix(hash)
     })
 
     it('#executeHotfix', async () => {
-      const tx = governance.executeHotfix(transactions)
+      governance.executeHotfix(transactions)
     })
   })
 })
