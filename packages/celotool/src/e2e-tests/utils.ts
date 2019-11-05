@@ -172,7 +172,7 @@ async function checkoutGethRepo(branch: string, path: string) {
 }
 
 async function buildGeth(path: string) {
-  await execCmdWithExitOnFailure('make', ['geth'], { cwd: path })
+  await execCmdWithExitOnFailure('make', ['all'], { cwd: path })
 }
 
 async function setupTestDir(testDir: string) {
@@ -337,13 +337,13 @@ export async function startGeth(gethBinaryPath: string, instance: GethInstanceCo
     gethArgs.push('--mine', '--minerthreads=10', `--nodekeyhex=${privateKey}`)
 
     if (isProxied) {
-      gethArgs.push('--proxied')
+      gethArgs.push('--istanbul.proxied')
     }
   } else if (isSentry) {
     gethArgs.push('--sentry')
     if (sentryport) {
-      gethArgs.push('--proxyport')
-      gethArgs.push(sentryport.toString())
+      gethArgs.push('--proxiedvalidatorendpoint')
+      gethArgs.push('127.0.0.1:' + sentryport.toString())
     }
     gethArgs.push(`--nodekeyhex=${privateKey}`)
   }
@@ -360,9 +360,9 @@ export async function startGeth(gethBinaryPath: string, instance: GethInstanceCo
   // Give some time for geth to come up
   const waitForPort = wsport ? wsport : rpcport
   if (waitForPort) {
-    const isOpen = await waitForPortOpen('localhost', waitForPort, 10)
+    const isOpen = await waitForPortOpen('localhost', waitForPort, 30)
     if (!isOpen) {
-      console.error(`geth:${instance.name}: jsonRPC didn't open after 5 seconds`)
+      console.error(`geth:${instance.name}: jsonRPC didn't open after 30 seconds`)
       process.exit(1)
     } else {
       console.info(`geth:${instance.name}: jsonRPC port open ${waitForPort}`)
