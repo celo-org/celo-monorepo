@@ -12,7 +12,6 @@ import { ErrorMessages } from 'src/app/ErrorMessages'
 import { navigate } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
 import { getCachedPincode, setCachedPincode } from 'src/pincode/PincodeCache'
-// @ts-ignore TS doesn't understand the RN's platform specific file imports
 import { getPinFromKeystore, setPinInKeystore } from 'src/pincode/PincodeUtils'
 import Logger from 'src/utils/Logger'
 
@@ -22,7 +21,7 @@ export function* setPincode({ pincodeType, pin }: SetPincodeAction) {
   try {
     if (pincodeType === PincodeType.PhoneAuth) {
       Logger.debug(TAG + '@setPincode', 'Setting pincode with using system auth')
-      pin = randomBytes(10).toString('hex')
+      pin = randomBytes(10).toString('hex') as string
       yield call(setPinInKeystore, pin)
     } else if (pincodeType === PincodeType.CustomPin && pin) {
       Logger.debug(TAG + '@setPincode', 'Pincode set using user provided pin')
@@ -40,7 +39,7 @@ export function* setPincode({ pincodeType, pin }: SetPincodeAction) {
   }
 }
 
-export function* getPincode() {
+export function* getPincode(useCache = true) {
   const pincodeType = yield select(pincodeTypeSelector)
 
   if (pincodeType === PincodeType.Unset) {
@@ -59,9 +58,11 @@ export function* getPincode() {
 
   if (pincodeType === PincodeType.CustomPin) {
     Logger.debug(TAG + '@getPincode', 'Getting custom pin')
-    const cachedPin = getCachedPincode()
-    if (cachedPin) {
-      return cachedPin
+    if (useCache) {
+      const cachedPin = getCachedPincode()
+      if (cachedPin) {
+        return cachedPin
+      }
     }
 
     const pincodeEntered = new Promise((resolve, reject) => {
@@ -71,7 +72,9 @@ export function* getPincode() {
     if (!pin) {
       throw new Error('Pincode confirmation returned empty pin')
     }
-    setCachedPincode(pin)
+    if (useCache) {
+      setCachedPincode(pin)
+    }
     return pin
   }
 }

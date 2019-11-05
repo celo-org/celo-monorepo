@@ -3,14 +3,14 @@ import colors from '@celo/react-components/styles/colors'
 import { fontStyles } from '@celo/react-components/styles/fonts'
 import * as React from 'react'
 import { WithNamespaces, withNamespaces } from 'react-i18next'
-import { Image, ScrollView, StyleSheet, Text, View } from 'react-native'
+import { ActivityIndicator, Image, ScrollView, StyleSheet, Text, View } from 'react-native'
 import SafeAreaView from 'react-native-safe-area-view'
 import { connect } from 'react-redux'
 import { setBackupDelayed } from 'src/account/actions'
 import CeloAnalytics from 'src/analytics/CeloAnalytics'
 import { CustomEventNames } from 'src/analytics/constants'
 import componentWithAnalytics from 'src/analytics/wrapper'
-import { enterBackupFlow, exitBackupFlow } from 'src/app/actions'
+import { enterBackupFlow, exitBackupFlow, navigatePinProtected } from 'src/app/actions'
 import { Namespaces } from 'src/i18n'
 import backupIcon from 'src/images/backup-icon.png'
 import { headerWithBackButton } from 'src/navigator/Headers'
@@ -24,12 +24,14 @@ interface StateProps {
   socialBackupCompleted: boolean
   backupTooLate: boolean
   backupDelayedTime: number
+  doingPinVerification: boolean
 }
 
 interface DispatchProps {
   setBackupDelayed: typeof setBackupDelayed
   enterBackupFlow: typeof enterBackupFlow
   exitBackupFlow: typeof exitBackupFlow
+  navigatePinProtected: typeof navigatePinProtected
 }
 
 type Props = WithNamespaces & StateProps & DispatchProps
@@ -40,6 +42,7 @@ const mapStateToProps = (state: RootState): StateProps => {
     socialBackupCompleted: state.account.socialBackupCompleted,
     backupTooLate: isBackupTooLate(state),
     backupDelayedTime: state.account.backupDelayedTime,
+    doingPinVerification: state.app.doingPinVerification,
   }
 }
 
@@ -58,12 +61,12 @@ class BackupIntroduction extends React.Component<Props> {
 
   onPressViewBackupKey = () => {
     CeloAnalytics.track(CustomEventNames.view_backup_phrase)
-    navigate(Screens.BackupPhrase)
+    this.props.navigatePinProtected(Screens.BackupPhrase)
   }
 
   onPressBackup = () => {
     CeloAnalytics.track(CustomEventNames.set_backup_phrase)
-    navigate(Screens.BackupPhrase)
+    this.props.navigatePinProtected(Screens.BackupPhrase)
   }
 
   onPressSetupSocialBackup = () => {
@@ -73,7 +76,7 @@ class BackupIntroduction extends React.Component<Props> {
 
   onPressViewSocialBackup = () => {
     CeloAnalytics.track(CustomEventNames.view_social_backup)
-    navigate(Screens.BackupSocial)
+    this.props.navigatePinProtected(Screens.BackupSocial)
   }
 
   onPressDelay = () => {
@@ -89,6 +92,7 @@ class BackupIntroduction extends React.Component<Props> {
       backupTooLate,
       backupCompleted,
       socialBackupCompleted,
+      doingPinVerification,
     } = this.props
     return (
       <SafeAreaView style={styles.container}>
@@ -125,6 +129,9 @@ class BackupIntroduction extends React.Component<Props> {
               </>
             )}
         </ScrollView>
+        {doingPinVerification && (
+          <ActivityIndicator size="large" color={colors.celoGreen} style={styles.loader} />
+        )}
         <View>
           {!backupCompleted && (
             <>
@@ -213,6 +220,9 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     paddingBottom: 15,
   },
+  loader: {
+    marginBottom: 20,
+  },
 })
 
 export default componentWithAnalytics(
@@ -222,6 +232,7 @@ export default componentWithAnalytics(
       setBackupDelayed,
       enterBackupFlow,
       exitBackupFlow,
+      navigatePinProtected,
     }
   )(withNamespaces(Namespaces.backupKeyFlow6)(BackupIntroduction))
 )

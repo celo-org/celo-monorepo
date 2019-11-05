@@ -95,8 +95,8 @@ export async function registerMetadata(testnet: string, privateKey: string, inde
   kit.addAccount(privateKey)
   kit.defaultAccount = address
 
-  const attestations = await kit.contracts.getAttestations()
-  return attestations
+  const accounts = await kit.contracts.getAccounts()
+  return accounts
     .setMetadataURL(metadataURLForCLabsValidator(testnet, address))
     .sendAndWaitForReceipt()
 }
@@ -113,7 +113,12 @@ export const handler = async (argv: InitialArgv) => {
         validatorKeys,
       },
       stableToken: {
-        initialAccounts: getAddressesFor(AccountType.FAUCET, mnemonic, 2),
+        initialBalances: {
+          addresses: getAddressesFor(AccountType.FAUCET, mnemonic, 2),
+          values: getAddressesFor(AccountType.FAUCET, mnemonic, 2).map(
+            () => '60000000000000000000000'
+          ), // 60k Celo Dollars
+        },
       },
     })
 

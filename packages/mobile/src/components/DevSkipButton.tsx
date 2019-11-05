@@ -24,7 +24,7 @@ const mapStateToProps = (state: RootState): StateProps => {
   }
 }
 
-export class DevSkipButton extends React.Component<Props> {
+class DevSkipButton extends React.Component<Props> {
   skip = () => {
     if (this.props.onSkip) {
       this.props.onSkip()
