@@ -141,7 +141,7 @@ describe('Transfer tests', function(this: any) {
   const FromAddress = '0x5409ed021d9299bf6814279a6a1411a7e866a631'
 
   // Arbitrary addresses.
-  const governanceAddress = '0x00000000000000000000000000000000deadbeef'
+  const governanceAddress = '0x00000000000000000000000000000000DeaDBeef'
   const ToAddress = '0xbBae99F0E1EE565404465638d40827b54D343638'
   const FeeRecipientAddress = '0x4f5f8a3f45d179553e7b95119ce296010f50f6f1'
 
