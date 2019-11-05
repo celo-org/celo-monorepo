@@ -7,11 +7,11 @@ import CeloAnalytics from 'src/analytics/CeloAnalytics'
 import { CustomEventNames } from 'src/analytics/constants'
 import { componentWithAnalytics } from 'src/analytics/wrapper'
 import { EscrowedPayment } from 'src/escrow/actions'
-import EscrowedPaymentLineItem from 'src/escrow/EscrowedPaymentLineItem'
 import { Namespaces } from 'src/i18n'
 import { inviteFriendsIcon } from 'src/images/Images'
 import { navigate } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
+import NotificationAmount from 'src/paymentRequest/NotificationAmount'
 import { navigateToURI } from 'src/utils/linking'
 import Logger from 'src/utils/Logger'
 
@@ -21,41 +21,45 @@ interface OwnProps {
 
 type Props = OwnProps & WithNamespaces
 
-export class EscrowedPaymentReminderNotification extends React.PureComponent<Props> {
-  getCTA = () => {
+export class EscrowedPaymentListItem extends React.PureComponent<Props> {
+  onSendMessage = () => {
     const { payment, t } = this.props
     const recipientPhoneNumber = payment.recipientPhone
+    CeloAnalytics.track(CustomEventNames.clicked_escrowed_payment_send_message)
+    // TODO: open up whatsapp/text message slider with pre populated message
+    try {
+      if (Platform.OS === 'android') {
+        SendIntentAndroid.sendSms(recipientPhoneNumber, t('escrowedPaymentReminderSms'))
+      } else {
+        // TODO look into using MFMessageComposeViewController to prefill the body for iOS
+        navigateToURI(`sms:${recipientPhoneNumber}`)
+      }
+    } catch {
+      Logger.showError(t('SMSError'))
+      Logger.error(
+        'EscrowedPaymentListItem/',
+        t('SMSErrorDetails', {
+          recipientNumber: recipientPhoneNumber,
+        })
+      )
+    }
+  }
+  onReclaimPayment = () => {
+    const { payment } = this.props
+    const reclaimPaymentInput = payment
+    CeloAnalytics.track(CustomEventNames.clicked_escrowed_payment_notification)
+    navigate(Screens.ReclaimPaymentConfirmationScreen, { reclaimPaymentInput })
+  }
+  getCTA = () => {
+    const { t } = this.props
     return [
       {
         text: t('sendMessage'),
-        onPress: () => {
-          CeloAnalytics.track(CustomEventNames.clicked_escrowed_payment_send_message)
-          // TODO: open up whatsapp/text message slider with pre populated message
-          try {
-            if (Platform.OS === 'android') {
-              SendIntentAndroid.sendSms(recipientPhoneNumber, t('escrowedPaymentReminderSms'))
-            } else {
-              // TODO look into using MFMessageComposeViewController to prefill the body for iOS
-              navigateToURI(`sms:${recipientPhoneNumber}`)
-            }
-          } catch {
-            Logger.showError(t('SMSError'))
-            Logger.error(
-              'EscrowedPaymentReminderNotification/',
-              t('SMSErrorDetails', {
-                recipientNumber: recipientPhoneNumber,
-              })
-            )
-          }
-        },
+        onPress: this.onSendMessage,
       },
       {
-        text: this.props.t('reclaimPayment'),
-        onPress: () => {
-          const reclaimPaymentInput = payment
-          CeloAnalytics.track(CustomEventNames.clicked_escrowed_payment_notification)
-          navigate(Screens.ReclaimPaymentConfirmationScreen, { reclaimPaymentInput })
-        },
+        text: t('reclaimPayment'),
+        onPress: this.onReclaimPayment,
       },
     ]
   }
@@ -65,7 +69,7 @@ export class EscrowedPaymentReminderNotification extends React.PureComponent<Pro
     const displayName = payment.recipientContact
       ? payment.recipientContact.displayName
       : payment.recipientPhone
-    return t('escrowedPaymentReminder', { mobile: displayName })
+    return t('escrowedPaymentReminderListItemTitle', { mobile: displayName })
   }
 
   render() {
@@ -76,13 +80,10 @@ export class EscrowedPaymentReminderNotification extends React.PureComponent<Pro
         title={this.getTitle()}
         icon={<Image source={inviteFriendsIcon} style={styles.image} resizeMode="contain" />}
         ctas={this.getCTA()}
-        roundedBorders={true}
+        roundedBorders={false}
+        callout={<NotificationAmount amount={payment.amount} />}
       >
-        <View style={styles.body}>
-          <View style={styles.payment}>
-            <EscrowedPaymentLineItem payment={payment} />
-          </View>
-        </View>
+        <View style={styles.body} />
       </BaseNotification>
     )
   }
@@ -103,5 +104,5 @@ const styles = StyleSheet.create({
 })
 
 export default componentWithAnalytics(
-  withNamespaces(Namespaces.walletFlow5)(EscrowedPaymentReminderNotification)
+  withNamespaces(Namespaces.walletFlow5)(EscrowedPaymentListItem)
 )

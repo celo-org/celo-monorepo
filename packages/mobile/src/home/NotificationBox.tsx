@@ -11,13 +11,14 @@ import { CustomEventNames } from 'src/analytics/constants'
 import { componentWithAnalytics } from 'src/analytics/wrapper'
 import { PROMOTE_REWARDS_APP } from 'src/config'
 import { EscrowedPayment } from 'src/escrow/actions'
+import EscrowedPaymentListItem from 'src/escrow/EscrowedPaymentListItem'
 import { getReclaimableEscrowPayments } from 'src/escrow/saga'
 import { setEducationCompleted as setGoldEducationCompleted } from 'src/goldToken/actions'
 import i18n, { Namespaces } from 'src/i18n'
 import { backupIcon, homeIcon, inviteFriendsIcon, rewardsAppIcon } from 'src/images/Images'
 import { navigate } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
-import EscrowedPaymentReminderNotification from 'src/notifications/EscrowedPaymentReminderNotification'
+import EscrowedPaymentReminderSummaryNotification from 'src/notifications/EscrowedPaymentReminderSummaryNotification'
 import PaymentRequestSummaryNotification from 'src/notifications/PaymentRequestSummaryNotification'
 import SimpleNotification from 'src/notifications/SimpleNotification'
 import { RootState } from 'src/redux/reducers'
@@ -68,9 +69,11 @@ export class NotificationBox extends React.Component<Props, State> {
   }
 
   escrowedPaymentReminderNotification = () => {
-    return getReclaimableEscrowPayments(this.props.sentEscrowPayments).map((payment) => (
-      <EscrowedPaymentReminderNotification key={payment.paymentID} payment={payment} />
-    ))
+    const escrowPayments = getReclaimableEscrowPayments(this.props.sentEscrowPayments)
+    if (escrowPayments && escrowPayments.length) {
+      return [<EscrowedPaymentReminderSummaryNotification key={1} payments={escrowPayments} />]
+    }
+    return []
   }
 
   paymentRequestsNotification = (): Array<React.ReactElement<any>> => {

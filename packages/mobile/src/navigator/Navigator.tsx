@@ -35,6 +35,7 @@ import BackupSocialIntro from 'src/backup/BackupSocialIntro'
 import DappKitAccountScreen from 'src/dappkit/DappKitAccountScreen'
 import DappKitSignTxScreen from 'src/dappkit/DappKitSignTxScreen'
 import DappKitTxDataScreen from 'src/dappkit/DappKitTxDataScreen'
+import EscrowedPaymentListScreen from 'src/escrow/EscrowedPaymentListScreen'
 import ReclaimPaymentConfirmationScreen from 'src/escrow/ReclaimPaymentConfirmationScreen'
 import ExchangeReview from 'src/exchange/ExchangeReview'
 import ExchangeTradeScreen from 'src/exchange/ExchangeTradeScreen'
@@ -198,6 +199,22 @@ const RequestStack = createStackNavigator(
   }
 )
 
+const EscrowStack = createStackNavigator(
+  {
+    [Screens.EscrowedPaymentListScreen]: { screen: EscrowedPaymentListScreen },
+    [Screens.ReclaimPaymentConfirmationScreen]: {
+      screen: ReclaimPaymentConfirmationScreen,
+    },
+  },
+  {
+    navigationOptions: {
+      header: null,
+    },
+    ...headerArea,
+    initialRouteName: Screens.EscrowedPaymentListScreen,
+  }
+)
+
 const BackupStack = createStackNavigator(
   {
     [Screens.BackupIntroduction]: { screen: BackupIntroduction },
@@ -247,6 +264,7 @@ const AppStack = createStackNavigator(
     [Stacks.QRSendStack]: { screen: QRSendStack },
     [Stacks.ExchangeStack]: { screen: ExchangeStack },
     [Stacks.RequestStack]: { screen: RequestStack },
+    [Stacks.EscrowStack]: { screen: EscrowStack },
     [Stacks.SettingsStack]: { screen: SettingsStack },
     [Screens.SetClock]: { screen: SetClock },
     [Screens.DollarEducation]: { screen: DollarEducation },
@@ -254,9 +272,6 @@ const AppStack = createStackNavigator(
     [Screens.PhotosEducation]: { screen: PhotosEducation },
     [Screens.GoldEducation]: { screen: GoldEducation },
     [Screens.PaymentRequestListScreen]: { screen: PaymentRequestListScreen },
-    [Screens.ReclaimPaymentConfirmationScreen]: {
-      screen: ReclaimPaymentConfirmationScreen,
-    },
     [Screens.FeeEducation]: { screen: FeeEducation },
     ...commonScreens,
   },

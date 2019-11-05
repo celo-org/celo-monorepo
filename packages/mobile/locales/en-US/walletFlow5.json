@@ -55,7 +55,9 @@
   "refreshBalances": "Refresh Balances",
   "reclaimPayment": "Reclaim Payment",
   "sendMessage": "Send Message",
-  "escrowedPaymentReminder": "Remind {{mobile}} to Accept Payment",
+  "escrowedPaymentReminderListItemTitle": "Remind {{mobile}} to Accept Payment",
+  "escrowedPaymentReminder": "Remind recipient to Accept Payment",
+  "escrowedPaymentReminderWithCount_plural": "Remind {{count}} recipients to Accept Payment",
   "escrowedPaymentReminderSms":
     "A friendly reminder that you haven't yet redeemed your Celo Dollars!",
   "testnetAlert": {
