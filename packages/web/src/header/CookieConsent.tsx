@@ -5,34 +5,41 @@ import Link from 'src/shared/Link'
 import Responsive from 'src/shared/Responsive'
 import { CONSENT_HEIGHT } from 'src/shared/Styles'
 import { colors, fonts } from 'src/styles'
-import { agree, disagree, hasUserGivenCookiesAgreement } from '../analytics/analytics'
-
-const isInEU = require('@segment/in-eu')
+import { initSentry } from '../../fullstack/sentry'
+import { agree, disagree, showVisitorCookieConsent } from '../analytics/analytics'
 
 interface State {
   showConsent: boolean
 }
 
-export class CookieConsent extends React.Component<I18nProps, State> {
+export class CookieConsent extends React.PureComponent<I18nProps, State> {
   state = {
     showConsent: false,
   }
 
   componentDidMount() {
     this.setState({
-      showConsent: isInEU() && !hasUserGivenCookiesAgreement(),
+      showConsent: showVisitorCookieConsent(),
+    })
+  }
+
+  onAgree = () => {
+    agree()
+    this.setState({
+      showConsent: false,
+    })
+    initSentry()
+  }
+
+  onDisagree = () => {
+    disagree()
+    this.setState({
+      showConsent: false,
     })
   }
 
   render() {
     const { t } = this.props
-
-    const onClickAgree = () => {
-      agree()
-      this.setState({
-        showConsent: false,
-      })
-    }
 
     if (!this.state.showConsent) {
       return null
@@ -57,7 +64,7 @@ export class CookieConsent extends React.Component<I18nProps, State> {
               medium={[styles.buttonMedium, styles.disagreeButton]}
               large={[styles.button, styles.disagreeButton]}
             >
-              <View style={[styles.buttonMedium, styles.disagreeButton]} onClick={disagree}>
+              <View style={[styles.buttonMedium, styles.disagreeButton]} onClick={this.onDisagree}>
                 <Text style={[fonts.navigation, styles.buttonText]}>
                   {t('cookiesDisagree')
                     .toString()
@@ -69,7 +76,7 @@ export class CookieConsent extends React.Component<I18nProps, State> {
               medium={[styles.buttonMedium, styles.agreeButton]}
               large={[styles.button, styles.agreeButton]}
             >
-              <View style={[styles.buttonMedium, styles.agreeButton]} onClick={onClickAgree}>
+              <View style={[styles.buttonMedium, styles.agreeButton]} onClick={this.onAgree}>
                 <Text style={[fonts.navigation, styles.buttonText]}>
                   {t('cookiesAgree')
                     .toString()
