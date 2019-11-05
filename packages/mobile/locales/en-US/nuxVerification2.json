@@ -107,6 +107,8 @@
   "missingCodesModal": {
     "header": "Missing Codes?",
     "body":
-      "If you haven’t received all your codes yet after 60 seconds, you can skip verification and try again later."
+      "If you haven’t received all your codes yet after 60 seconds, you can skip verification and try again later.",
+    "wait": "Wait for codes",
+    "skip": "Skip for now"
   }
 }

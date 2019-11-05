@@ -5,7 +5,6 @@ import withTextInputPasteAware from '@celo/react-components/components/WithTextI
 import SmsCeloSwap from '@celo/react-components/icons/SmsCeloSwap'
 import colors from '@celo/react-components/styles/colors'
 import fontStyles from '@celo/react-components/styles/fonts'
-import { stripHexLeader } from '@celo/utils/src/signatureUtils'
 import { extractAttestationCodeFromMessage } from '@celo/walletkit'
 import dotProp from 'dot-prop-immutable'
 import * as React from 'react'
@@ -19,37 +18,20 @@ import { errorSelector } from 'src/alert/reducer'
 import componentWithAnalytics from 'src/analytics/wrapper'
 import { ErrorMessages } from 'src/app/ErrorMessages'
 import DevSkipButton from 'src/components/DevSkipButton'
-import i18n, { Namespaces } from 'src/i18n'
+import { Namespaces } from 'src/i18n'
+import LoadingSpinner from 'src/icons/LoadingSpinner'
 import {
   cancelVerification,
   receiveAttestationMessage,
   startVerification,
 } from 'src/identity/actions'
-import { ATTESTATION_CODE_PLACEHOLDER } from 'src/identity/reducer'
 import { AttestationCode } from 'src/identity/verification'
+import { navigate } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
 import { RootState } from 'src/redux/reducers'
-import Logger from 'src/utils/Logger'
 import { currentAccountSelector } from 'src/web3/selectors'
 
 const CodeInput = withTextInputPasteAware(TextInput)
-
-function getRecodedVerificationText(attestationCode: AttestationCode, t: i18n.TranslationFunction) {
-  try {
-    if (!attestationCode || !attestationCode.code) {
-      return '---'
-    }
-
-    if (attestationCode.code === ATTESTATION_CODE_PLACEHOLDER) {
-      return t('codeAccepted')
-    }
-
-    return Buffer.from(stripHexLeader(attestationCode.code), 'hex').toString('base64')
-  } catch (error) {
-    Logger.warn('VerificationInputScreen', 'Could not recode verification code to base64')
-    return null
-  }
-}
 
 interface StateProps {
   numberVerified: boolean
@@ -118,19 +100,18 @@ class VerificationInputScreen extends React.Component<Props, State> {
     this.setState({ isModalVisible: false })
   }
 
+  onPressSkip = () => {
+    // TODO cancel verification here
+    navigate(Screens.WalletHome)
+  }
+
   shouldShowClipboard = (value: string) => {
     return !!extractAttestationCodeFromMessage(value)
   }
 
   render() {
     const { codeInputValues, isModalVisible } = this.state
-    const {
-      attestationCodes,
-      numCompleteAttestations,
-      verificationFailed,
-      e164Number,
-      t,
-    } = this.props
+    const { t } = this.props
 
     return (
       <SafeAreaView style={styles.container}>
@@ -179,17 +160,18 @@ class VerificationInputScreen extends React.Component<Props, State> {
         </ScrollView>
         <Modal isVisible={isModalVisible}>
           <View style={styles.modalContainer}>
-            <Text style={fontStyles.h1}>{t('missingCodesModal.header')}</Text>
-            <Text style={fontStyles.body}>{t('missingCodesModal.body')}</Text>
-            <View style={styles.modalButtonsContainer}>
+            <View style={styles.modalTimerContainer}>
+              <LoadingSpinner />
               <Text style={fontStyles.body}>{'0:49'}</Text>
             </View>
+            <Text style={styles.modalHeader}>{t('missingCodesModal.header')}</Text>
+            <Text style={fontStyles.body}>{t('missingCodesModal.body')}</Text>
             <View style={styles.modalButtonsContainer}>
               <TextButton onPress={this.onPressWaitForCodes} style={styles.modalCancelText}>
-                {t('global:cancel')}
+                {t('missingCodesModal.wait')}
               </TextButton>
-              <TextButton onPress={this.onPressWaitForCodes} style={styles.modalSkipText}>
-                {t('global:skip')}
+              <TextButton onPress={this.onPressSkip} style={styles.modalSkipText}>
+                {t('missingCodesModal.skip')}
               </TextButton>
             </View>
           </View>
@@ -237,7 +219,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
     textAlign: 'center',
     paddingVertical: 10,
-    marginVertical: 15,
+    marginVertical: 20,
   },
   modalContainer: {
     backgroundColor: colors.background,
@@ -245,8 +227,16 @@ const styles = StyleSheet.create({
     marginHorizontal: 10,
     borderRadius: 4,
   },
+  modalHeader: {
+    ...fontStyles.h2,
+    ...fontStyles.bold,
+    marginVertical: 15,
+  },
+  modalTimerContainer: {
+    alignItems: 'center',
+  },
   modalButtonsContainer: {
-    marginTop: 20,
+    marginTop: 25,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-evenly',

@@ -80,7 +80,7 @@ class VerificationEducationScreen extends React.Component<WithNamespaces, State>
         </>
         <Modal isVisible={this.state.isModalVisible}>
           <View style={styles.modalContainer}>
-            <Text style={fontStyles.h1}>{t('skipModal.header')}</Text>
+            <Text style={styles.modalHeader}>{t('skipModal.header')}</Text>
             <Text style={fontStyles.body}>{t('skipModal.body1')}</Text>
             <Text style={[fontStyles.body, componentStyles.marginTop10]}>
               {t('skipModal.body2')}
@@ -128,8 +128,13 @@ const styles = StyleSheet.create({
     marginHorizontal: 10,
     borderRadius: 4,
   },
+  modalHeader: {
+    ...fontStyles.h2,
+    ...fontStyles.bold,
+    marginVertical: 15,
+  },
   modalButtonsContainer: {
-    marginTop: 20,
+    marginTop: 25,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-evenly',
