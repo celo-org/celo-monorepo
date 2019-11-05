@@ -21,7 +21,7 @@ Because Celo network is based in Proof of Stake, the hardware requirements are n
 - Memory: 8 GB RAM
 - CPU: Quad core 3GHz (64-bit)
 - Disk: 256 GB of SSD storage
-- Network: 1 GB input/output dual Ethernet
+- Network: At least 1 GB input/output dual Ethernet
 
 It is recommended to run the validator node in an environment that facilitates a 24/7 execution. Deployments in a top-tier datacenter facilitates the security and better uptimes.
 
