@@ -100,7 +100,7 @@ resource "google_compute_subnetwork" "validator" {
 # sentries
 
 module "sentry" {
-  source = "../tx-node"
+  source = "../full-node"
   # variable
   additional_geth_flags             = "--sentry"
   block_time                        = var.block_time
@@ -119,6 +119,6 @@ module "sentry" {
   network_id                        = var.network_id
   network_name                      = var.network_name
   # NOTE this assumes only one sentry will be used
-  tx_node_count                     = var.proxied_validator_count
+  node_count                        = var.proxied_validator_count
   verification_pool_url             = var.verification_pool_url
 }

@@ -83,7 +83,7 @@ docker run -p 8545:8545/tcp -p 8546:8546/tcp --name geth --net=host --entrypoint
     --consoleformat=json \
     --consoleoutput=stdout \
     --verbosity=${geth_verbosity} \
-    --ethstats=${tx_node_name}:$ETHSTATS_WEBSOCKETSECRET@${ethstats_host} \
+    --ethstats=${node_name}:$ETHSTATS_WEBSOCKETSECRET@${ethstats_host} \
     --nat=extip:${ip_address} \
     --metrics \
     $IN_MEMORY_DISCOVERY_TABLE_FLAG \

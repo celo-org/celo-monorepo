@@ -83,7 +83,7 @@ module "bootnode" {
 }
 
 module "tx_node" {
-  source = "./modules/tx-node"
+  source = "./modules/full-node"
   # variables
   block_time                        = var.block_time
   bootnode_ip_address               = module.bootnode.ip_address
@@ -97,9 +97,10 @@ module "tx_node" {
   geth_node_docker_image_tag        = var.geth_node_docker_image_tag
   geth_verbosity                    = var.geth_verbosity
   in_memory_discovery_table         = var.in_memory_discovery_table
+  name                              = "tx-node"
   network_id                        = var.network_id
   network_name                      = data.google_compute_network.network.name
-  tx_node_count                     = var.tx_node_count
+  node_count                        = var.tx_node_count
   verification_pool_url             = var.verification_pool_url
 }
 

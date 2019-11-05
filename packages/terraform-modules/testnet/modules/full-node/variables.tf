@@ -56,7 +56,7 @@ variable geth_node_docker_image_tag {
 
 variable geth_verbosity {
   type        = number
-  description = "Verbosity of the tx-nodes"
+  description = "Verbosity of the nodes"
 }
 
 variable in_memory_discovery_table {
@@ -67,7 +67,6 @@ variable in_memory_discovery_table {
 variable name {
   type        = string
   description = "Name of the nodes"
-  default     = "tx-node"
 }
 
 variable network_id {
@@ -77,12 +76,12 @@ variable network_id {
 
 variable network_name {
   type        = string
-  description = "Name of the GCP network the tx-node VM is in"
+  description = "Name of the GCP network the node VM is in"
 }
 
-variable tx_node_count {
+variable node_count {
   type        = number
-  description = "Number of tx-nodes to create"
+  description = "Number of nodes to create"
 }
 
 variable verification_pool_url {

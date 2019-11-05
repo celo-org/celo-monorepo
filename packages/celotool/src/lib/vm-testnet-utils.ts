@@ -11,7 +11,6 @@ import {
   applyTerraformModule,
   destroyTerraformModule,
   getTerraformModuleOutputs,
-  getTerraformModuleResourceNames,
   initTerraformModule,
   planTerraformModule,
   showTerraformModulePlan,
@@ -67,6 +66,24 @@ const testnetNetworkEnvVars: TerraformVars = {
   gcloud_credentials_path: envVar.GOOGLE_APPLICATION_CREDENTIALS,
   gcloud_project: envVar.TESTNET_PROJECT_NAME,
 }
+
+// Resources that are tainted when upgrade-resetting
+const testnetResourcesToReset = [
+  // bootnode
+  'module.bootnode.google_compute_instance.bootnode',
+  // validators
+  'module.validator.google_compute_instance.validator.*',
+  'module.validator.google_compute_disk.validator.*',
+  // validator sentries
+  'module.validator.module.sentry.random_id.full_node.*',
+  'module.validator.module.sentry.google_compute_instance.full_node.*',
+  // tx-nodes
+  'module.tx_node.random_id.full_node.*',
+  'module.tx_node.google_compute_instance.full_node.*',
+  // tx-node load balancer instance group
+  'module.tx_node_lb.random_id.tx_node_lb',
+  'module.tx_node_lb.google_compute_instance_group.tx_node_lb',
+]
 
 export async function deploy(celoEnv: string, onConfirmFailed?: () => Promise<void>) {
   // If we are not using the default network, we want to create/upgrade our network
@@ -171,73 +188,10 @@ export async function taintTestnet(celoEnv: string) {
   )
   await initTerraformModule(testnetTerraformModule, vars, backendConfigVars)
 
-  // bootnode
-  console.info('Tainting bootnode...')
-  await taintTerraformModuleResource(
-    testnetTerraformModule,
-    `module.bootnode.google_compute_instance.bootnode`
-  )
-
-  // validators
-  console.info('Tainting validators...')
-  await taintEveryResourceWithPrefix(
-    testnetTerraformModule,
-    `module.validator.google_compute_instance.validator`
-  )
-  // validator disks
-  console.info('Tainting validator disks...')
-  await taintEveryResourceWithPrefix(
-    testnetTerraformModule,
-    `module.validator.google_compute_disk.validator`
-  )
-
-  // sentry random id
-  console.info('Tainting sentry random ids...')
-  await taintEveryResourceWithPrefix(
-    testnetTerraformModule,
-    `module.validator.module.sentry.random_id.tx_node`
-  )
-  // sentry addresses
-  console.info('Tainting sentry addresses...')
-  await taintEveryResourceWithPrefix(
-    testnetTerraformModule,
-    `module.validator.module.sentry.google_compute_address.tx_node`
-  )
-  // sentries
-  console.info('Tainting sentries...')
-  await taintEveryResourceWithPrefix(
-    testnetTerraformModule,
-    `module.validator.module.sentry.google_compute_instance.tx_node`
-  )
-
-  // tx-node random id
-  console.info('Tainting tx-node random ids...')
-  await taintEveryResourceWithPrefix(testnetTerraformModule, `module.tx_node.random_id.tx_node`)
-  // tx-node addresses
-  console.info('Tainting tx-node addresses...')
-  await taintEveryResourceWithPrefix(
-    testnetTerraformModule,
-    `module.tx_node.google_compute_address.tx_node`
-  )
-  // tx-nodes
-  console.info('Tainting tx-nodes...')
-  await taintEveryResourceWithPrefix(
-    testnetTerraformModule,
-    `module.tx_node.google_compute_instance.tx_node`
-  )
-
-  // tx-node instance group random id
-  console.info('Tainting tx-node instance group random id...')
-  await taintTerraformModuleResource(
-    testnetTerraformModule,
-    `module.tx_node_lb.random_id.tx_node_lb`
-  )
-  // tx-node instance group
-  console.info('Tainting tx-node instance group...')
-  await taintTerraformModuleResource(
-    testnetTerraformModule,
-    `module.tx_node_lb.google_compute_instance_group.tx_node_lb`
-  )
+  for (const resource of testnetResourcesToReset) {
+    console.info(`Tainting ${resource}`)
+    await taintTerraformModuleResource(testnetTerraformModule, resource)
+  }
 }
 
 export async function untaintTestnet(celoEnv: string) {
@@ -249,92 +203,10 @@ export async function untaintTestnet(celoEnv: string) {
   )
   await initTerraformModule(testnetTerraformModule, vars, backendConfigVars)
 
-  // bootnode
-  console.info('Untainting bootnode...')
-  await untaintTerraformModuleResource(
-    testnetTerraformModule,
-    `module.bootnode.google_compute_instance.bootnode`
-  )
-
-  // validators
-  console.info('Untainting validators...')
-  await untaintEveryResourceWithPrefix(
-    testnetTerraformModule,
-    `module.validator.google_compute_instance.validator`
-  )
-  // validator disks
-  console.info('Untainting validator disks...')
-  await untaintEveryResourceWithPrefix(
-    testnetTerraformModule,
-    `module.validator.google_compute_disk.validator`
-  )
-
-  // sentry random id
-  console.info('Untainting sentry random ids...')
-  await untaintEveryResourceWithPrefix(
-    testnetTerraformModule,
-    `module.validator.module.sentry.random_id.tx_node`
-  )
-  // sentry addresses
-  console.info('Untainting sentry addresses...')
-  await untaintEveryResourceWithPrefix(
-    testnetTerraformModule,
-    `module.validator.module.sentry.google_compute_address.tx_node`
-  )
-  // sentries
-  console.info('Untainting sentries...')
-  await untaintEveryResourceWithPrefix(
-    testnetTerraformModule,
-    `module.validator.module.sentry.google_compute_instance.tx_node`
-  )
-
-  // tx-node random id
-  console.info('Untainting tx-node random ids...')
-  await untaintEveryResourceWithPrefix(testnetTerraformModule, `module.tx_node.random_id.tx_node`)
-  // tx-node addresses
-  console.info('Untainting tx-node addresses...')
-  await untaintEveryResourceWithPrefix(
-    testnetTerraformModule,
-    `module.tx_node.google_compute_address.tx_node`
-  )
-  // tx-nodes
-  console.info('Untainting tx-nodes...')
-  await untaintEveryResourceWithPrefix(
-    testnetTerraformModule,
-    `module.tx_node.google_compute_instance.tx_node`
-  )
-
-  // tx-node instance group random id
-  console.info('Untainting tx-node instance group random id...')
-  await untaintTerraformModuleResource(
-    testnetTerraformModule,
-    `module.tx_node_lb.random_id.tx_node_lb`
-  )
-  // tx-node instance group
-  console.info('Untainting tx-node instance group...')
-  await untaintTerraformModuleResource(
-    testnetTerraformModule,
-    `module.tx_node_lb.google_compute_instance_group.tx_node_lb`
-  )
-}
-
-async function taintEveryResourceWithPrefix(moduleName: string, resourceName: string) {
-  const matches = await getEveryResourceWithPrefix(moduleName, resourceName)
-  for (const match of matches) {
-    await taintTerraformModuleResource(moduleName, match)
+  for (const resource of testnetResourcesToReset) {
+    console.info(`Untainting ${resource}`)
+    await untaintTerraformModuleResource(testnetTerraformModule, resource)
   }
-}
-
-async function untaintEveryResourceWithPrefix(moduleName: string, resourceName: string) {
-  const matches = await getEveryResourceWithPrefix(moduleName, resourceName)
-  for (const match of matches) {
-    await untaintTerraformModuleResource(moduleName, match)
-  }
-}
-
-async function getEveryResourceWithPrefix(moduleName: string, resourcePrefix: string) {
-  const resources = await getTerraformModuleResourceNames(moduleName)
-  return resources.filter((resource: string) => resource.startsWith(resourcePrefix))
 }
 
 export async function getTestnetOutputs(celoEnv: string) {
