@@ -39,6 +39,7 @@ export interface GethTestConfig {
   migrateTo?: number
   instances: GethInstanceConfig[]
   useBootnode?: boolean
+  genesisConfig?: any
 }
 
 const TEST_DIR = '/tmp/e2e'
@@ -180,13 +181,14 @@ async function setupTestDir(testDir: string) {
   await execCmd('mkdir', [testDir])
 }
 
-function writeGenesis(validators: Validator[], path: string) {
+function writeGenesis(validators: Validator[], path: string, configOverrides: any = {}) {
   const genesis = generateGenesis({
     validators,
     blockTime: 0,
     epoch: 10,
     requestTimeout: 3000,
     chainId: NetworkId,
+    ...configOverrides,
   })
   fs.writeFileSync(path, genesis)
 }
@@ -240,7 +242,7 @@ export async function addSentryPeer(gethBinaryPath: string, instance: GethInstan
       getDatadir(instance),
       'attach',
       '--exec',
-      `admin.addSentry('${instance.sentries[0]!}', '${instance.sentries[1]!}')`,
+      `istanbul.addSentry('${instance.sentries[0]!}', '${instance.sentries[1]!}')`,
     ])
   }
 }
@@ -310,7 +312,7 @@ export async function startGeth(gethBinaryPath: string, instance: GethInstanceCo
       '--rpc',
       '--rpcport',
       rpcport.toString(),
-      '--rpcapi=eth,net,web3,debug,admin,personal'
+      '--rpcapi=eth,net,web3,debug,admin,personal,istanbul'
     )
   }
 
@@ -343,7 +345,7 @@ export async function startGeth(gethBinaryPath: string, instance: GethInstanceCo
     gethArgs.push('--sentry')
     if (sentryport) {
       gethArgs.push('--proxiedvalidatorendpoint')
-      gethArgs.push('127.0.0.1:' + sentryport.toString())
+      gethArgs.push(`127.0.0.1:${sentryport.toString()}`)
     }
     gethArgs.push(`--nodekeyhex=${privateKey}`)
   }
@@ -372,13 +374,27 @@ export async function startGeth(gethBinaryPath: string, instance: GethInstanceCo
   if (isProxied) {
     addSentryPeer(gethBinaryPath, instance)
   }
+
+  return instance
 }
 
-export async function migrateContracts(validatorPrivateKeys: string[], to: number = 1000) {
+export async function migrateContracts(
+  validatorPrivateKeys: string[],
+  validators: string[],
+  to: number = 1000
+) {
   const migrationOverrides = {
     validators: {
-      minElectableValidators: '1',
       validatorKeys: validatorPrivateKeys.map(ensure0x),
+    },
+    election: {
+      minElectableValidators: '1',
+    },
+    stableToken: {
+      initialBalances: {
+        addresses: validators.map(ensure0x),
+        values: validators.map(() => '10000000000000000000000'),
+      },
     },
   }
   const args = [
@@ -486,13 +502,12 @@ export function getContext(gethConfig: GethTestConfig) {
     }
     await buildGeth(gethRepoPath)
     await setupTestDir(TEST_DIR)
-    await writeGenesis(validators, GENESIS_PATH)
+    await writeGenesis(validators, GENESIS_PATH, gethConfig.genesisConfig)
 
     let bootnodeEnode: string = ''
     if (gethConfig.useBootnode) {
       bootnodeEnode = await startBootnode(bootnodeBinaryPath, mnemonic)
     }
-
     let validatorIndex = 0
     let sentryIndex = 0
     for (const instance of gethConfig.instances) {
@@ -525,10 +540,15 @@ export function getContext(gethConfig: GethTestConfig) {
       await initAndStartGeth(gethBinaryPath, instance)
     }
 
-    await sleep(600)
+    // Give validators time to connect to each other
+    await sleep(60)
 
     if (gethConfig.migrate || gethConfig.migrateTo) {
-      await migrateContracts(validatorPrivateKeys, gethConfig.migrateTo)
+      await migrateContracts(
+        validatorPrivateKeys,
+        validators.map((x) => x.address),
+        gethConfig.migrateTo
+      )
     }
     await killGeth()
     await sleep(2)

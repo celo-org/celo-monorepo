@@ -2,10 +2,6 @@ import { expectSaga } from 'redux-saga-test-plan'
 import { withTimeout } from 'src/redux/sagas-helpers'
 import { sleep } from 'test/utils'
 
-jest.mock('src/web3/contracts', () => ({
-  isZeroSyncMode: jest.fn().mockReturnValueOnce(false),
-}))
-
 describe('withTimeout Saga', () => {
   test('returns the fn results if no timeout', () =>
     expectSaga(withTimeout(50000, async () => ({ hello: 'world' })))

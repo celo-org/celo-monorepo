@@ -6,13 +6,13 @@ import { StyleSheet, Text, View } from 'react-native'
 import { MinimalContact } from 'react-native-contacts'
 
 export interface Props {
+  name: string
+  iconSize: number
+  defaultCountryCode: string
   contact?: MinimalContact
-  name?: string
   address?: string
   e164Number?: string
   thumbnailPath?: string
-  defaultCountryCode: string
-  iconSize: number
 }
 
 export class Avatar extends React.PureComponent<Props> {

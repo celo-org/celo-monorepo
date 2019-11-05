@@ -31,7 +31,7 @@ exports[`EscrowedPaymentReminderNotification renders correctly 1`] = `
       resizeMode="contain"
       source={
         Object {
-          "testUri": "../../../src/images/Invite-Friends.png",
+          "testUri": "../../../packages/mobile/src/images/Invite-Friends.png",
         }
       }
       style={
@@ -142,18 +142,21 @@ exports[`EscrowedPaymentReminderNotification renders correctly 1`] = `
         >
           <View
             accessible={true}
+            focusable={true}
             isTVSelectable={true}
+            nativeBackgroundAndroid={
+              Object {
+                "attribute": "selectableItemBackgroundBorderless",
+                "type": "ThemeAttrAndroid",
+              }
+            }
+            onClick={[Function]}
             onResponderGrant={[Function]}
             onResponderMove={[Function]}
             onResponderRelease={[Function]}
             onResponderTerminate={[Function]}
             onResponderTerminationRequest={[Function]}
             onStartShouldSetResponder={[Function]}
-            style={
-              Object {
-                "opacity": 1,
-              }
-            }
           >
             <Text
               style={
@@ -181,18 +184,21 @@ exports[`EscrowedPaymentReminderNotification renders correctly 1`] = `
           </View>
           <View
             accessible={true}
+            focusable={true}
             isTVSelectable={true}
+            nativeBackgroundAndroid={
+              Object {
+                "attribute": "selectableItemBackgroundBorderless",
+                "type": "ThemeAttrAndroid",
+              }
+            }
+            onClick={[Function]}
             onResponderGrant={[Function]}
             onResponderMove={[Function]}
             onResponderRelease={[Function]}
             onResponderTerminate={[Function]}
             onResponderTerminationRequest={[Function]}
             onStartShouldSetResponder={[Function]}
-            style={
-              Object {
-                "opacity": 1,
-              }
-            }
           >
             <Text
               style={

@@ -1,6 +1,8 @@
 import debugFactory from 'debug'
 import { CeloContract } from './base'
+import { newAccounts } from './generated/Accounts'
 import { newAttestations } from './generated/Attestations'
+import { newElection } from './generated/Election'
 import { newEscrow } from './generated/Escrow'
 import { newExchange } from './generated/Exchange'
 import { newGasCurrencyWhitelist } from './generated/GasCurrencyWhitelist'
@@ -19,14 +21,16 @@ import { ContractKit } from './kit'
 const debug = debugFactory('kit:web3-contract-cache')
 
 const ContractFactories = {
+  [CeloContract.Accounts]: newAccounts,
   [CeloContract.Attestations]: newAttestations,
-  [CeloContract.LockedGold]: newLockedGold,
+  [CeloContract.Election]: newElection,
   [CeloContract.Escrow]: newEscrow,
   [CeloContract.Exchange]: newExchange,
   [CeloContract.GasCurrencyWhitelist]: newGasCurrencyWhitelist,
   [CeloContract.GasPriceMinimum]: newGasPriceMinimum,
   [CeloContract.GoldToken]: newGoldToken,
   [CeloContract.Governance]: newGovernance,
+  [CeloContract.LockedGold]: newLockedGold,
   [CeloContract.Random]: newRandom,
   [CeloContract.Registry]: newRegistry,
   [CeloContract.Reserve]: newReserve,
@@ -50,12 +54,17 @@ export class Web3ContractCache {
   private cacheMap: ContractCacheMap = {}
 
   constructor(readonly kit: ContractKit) {}
-
+  getAccounts() {
+    return this.getContract(CeloContract.Accounts)
+  }
   getAttestations() {
     return this.getContract(CeloContract.Attestations)
   }
   getLockedGold() {
     return this.getContract(CeloContract.LockedGold)
+  }
+  getElection() {
+    return this.getContract(CeloContract.Election)
   }
   getEscrow() {
     return this.getContract(CeloContract.Escrow)

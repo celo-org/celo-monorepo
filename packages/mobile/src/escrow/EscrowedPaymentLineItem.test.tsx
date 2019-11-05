@@ -4,10 +4,6 @@ import * as renderer from 'react-test-renderer'
 import PaymentRequestNotificationInner from 'src/paymentRequest/PaymentRequestNotificationInner'
 import { mockRecipientWithPhoneNumber } from 'test/values'
 
-jest.mock('src/web3/contracts', () => ({
-  isZeroSyncMode: jest.fn().mockReturnValueOnce(false),
-}))
-
 it('renders correctly', () => {
   const tree = renderer.create(
     <PaymentRequestNotificationInner

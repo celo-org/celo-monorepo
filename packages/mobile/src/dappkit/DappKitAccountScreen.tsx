@@ -5,6 +5,7 @@ import { AccountAuthRequest } from '@celo/utils/src/dappkit'
 import * as React from 'react'
 import { withNamespaces, WithNamespaces } from 'react-i18next'
 import { ScrollView, StyleSheet, Text, View } from 'react-native'
+import SafeAreaView from 'react-native-safe-area-view'
 import { NavigationParams, NavigationScreenProp } from 'react-navigation'
 import { connect } from 'react-redux'
 import { e164NumberSelector } from 'src/account/reducer'
@@ -98,7 +99,7 @@ class DappKitAccountAuthScreen extends React.Component<Props, State> {
   render() {
     const { t, account } = this.props
     return (
-      <View style={styles.container}>
+      <SafeAreaView style={styles.container}>
         <ScrollView contentContainerStyle={styles.scrollContainer}>
           <View style={styles.logo}>
             <DappkitExchangeIcon />
@@ -129,7 +130,7 @@ class DappKitAccountAuthScreen extends React.Component<Props, State> {
             type={BtnTypes.SECONDARY}
           />
         </View>
-      </View>
+      </SafeAreaView>
     )
   }
 }
