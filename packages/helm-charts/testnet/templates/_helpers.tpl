@@ -408,7 +408,7 @@ spec:
 kind: Service
 apiVersion: v1
 metadata:
-  name: {{ template "ethereum.fullname" $ }}-{{ .node_type }}-{{ .index }}{{ .name_suffix }}
+  name: {{ template "ethereum.fullname" $ }}-{{ .svc_name | default .node_name }}-{{ .index }}{{ .name_suffix }}
   labels:
     app: {{ template "ethereum.name" $ }}
     chart: {{ template "ethereum.chart" $ }}
@@ -420,7 +420,7 @@ spec:
     app: {{ template "ethereum.name" $ }}
     release: {{ $.Release.Name }}
     component: {{ .component_label }}
-    statefulset.kubernetes.io/pod-name: {{ template "ethereum.fullname" $ }}-{{ .node_type }}-{{ .index }}
+    statefulset.kubernetes.io/pod-name: {{ template "ethereum.fullname" $ }}-{{ .node_name }}-{{ .index }}
   type: {{ .service_type }}
   {{ if (eq .service_type "LoadBalancer") }}
   loadBalancerIP: {{ .load_balancer_ip }}
@@ -502,7 +502,7 @@ spec:
                 env
                 eval "echo \${${SERVICE_ENV_VAR_PREFIX}${RID}_SERVICE_HOST}" > /root/.celo/ipAddress
               else
-                echo 'Using POD_IP'
+                echo 'Using POD_IP' $POD_IP
                 echo $POD_IP > /root/.celo/ipAddress
               fi
             else
@@ -519,6 +519,11 @@ spec:
             echo -n "Generating Bootnode enode for tx node: "
             cat /root/.celo/bootnodeEnode
         env:
+        - name: POD_IP
+          valueFrom:
+            fieldRef:
+              apiVersion: v1
+              fieldPath: status.podIP
         - name: BOOTNODE_IP_ADDRESS
           value: {{ default "none" .Values.geth.bootnodeIpAddress  }}
         - name: REPLICA_NAME

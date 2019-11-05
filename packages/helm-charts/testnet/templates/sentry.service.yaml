@@ -3,7 +3,7 @@
 {{ range $index, $e := until (.Values.geth.proxiedValidators | int) }}
 
 
-{{ template "celo.node-service" (dict "Values" $.Values "Release" $.Release "Chart" $.Chart "index" $index "service_type" "ClusterIP" "node_type" "sentry-internal" "name_suffix" "" "component_label" "sentry" "load_balancer_ip" "" ) }}
+{{ template "celo.node-service" (dict "Values" $.Values "Release" $.Release "Chart" $.Chart "index" $index "service_type" "ClusterIP" "svc_name" "sentry-internal" "node_name" "sentry" "name_suffix" "" "component_label" "sentry" "load_balancer_ip" "" ) }}
   ports:
   - name: internal-tcp
     port: 30503
@@ -20,13 +20,13 @@
 ---
 {{ if $.Values.geth.static_ips }}
 {{ $loadBalancerIP := index $.Values.geth (print "validators_" $index "IpAddress") }}
-{{ template "celo.node-service" (dict "Values" $.Values "Release" $.Release "Chart" $.Chart "index" $index "service_type" "LoadBalancer" "node_type" "sentry" "name_suffix" "" "component_label" "sentry" "load_balancer_ip" $loadBalancerIP ) }}
+{{ template "celo.node-service" (dict "Values" $.Values "Release" $.Release "Chart" $.Chart "index" $index "service_type" "LoadBalancer" "node_name" "sentry" "name_suffix" "" "component_label" "sentry" "load_balancer_ip" $loadBalancerIP ) }}
   ports:
   - name: discovery
     port: 30303
     protocol: UDP
 ---
-{{ template "celo.validator-service" (dict "Values" $.Values "Release" $.Release "Chart" $.Chart "index" $index "service_type" "LoadBalancer" "node_type" "sentry" "name_suffix" "-tcp" "component_label" "sentry" "load_balancer_ip" $loadBalancerIP ) }}
+{{ template "celo.node-service" (dict "Values" $.Values "Release" $.Release "Chart" $.Chart "index" $index "service_type" "LoadBalancer" "node_name" "sentry" "name_suffix" "-tcp" "component_label" "sentry" "load_balancer_ip" $loadBalancerIP ) }}
   ports:
   - name: discovery
     port: 30303
