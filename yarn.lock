@@ -12066,10 +12066,10 @@ detect-node@^2.0.4:
   resolved "https://registry.yarnpkg.com/detect-node/-/detect-node-2.0.4.tgz#014ee8f8f669c5c58023da64b8179c083a28c46c"
   integrity sha512-ZIzRpLJrOj7jjP2miAtgqIfmzbxa4ZOr5jJc601zklsfEx9oTzmmj2nVpIPRpNlRTIh8lc1kyViIY7BWSGNmKw==
 
-detox@^14.5.0:
-  version "14.5.0"
-  resolved "https://registry.yarnpkg.com/detox/-/detox-14.5.0.tgz#cc96b41a2b76a029ef26be861fb04f69fe70c965"
-  integrity sha512-6LH/Aw/0pnf5llCY5rZICxVK1uoAmV+OZzGPQogpE3ZqxPkViFkg/SHsQqOn1M1Iswia7SzfSgu2KfKMNFXvRA==
+detox@14.6.0:
+  version "14.6.0"
+  resolved "https://registry.yarnpkg.com/detox/-/detox-14.6.0.tgz#1cdd1e790992b664946f67ca4b408b0cb7bdee07"
+  integrity sha512-Pk36LMb7xv5QyovC42BDW8+v8YCNb2ky+qPdtY6VrJ5pGGmJHSjU8mp9XvDmi1UKoTUXD2UHmComcqYj/Pw1iA==
   dependencies:
     "@babel/core" "^7.4.5"
     bunyan "^1.8.12"
@@ -26795,6 +26795,11 @@ react-native-share@^2.0.0:
   resolved "https://registry.yarnpkg.com/react-native-share/-/react-native-share-2.0.0.tgz#4543a746013e0d8fa9f765fb8937007cfbcffcf7"
   integrity sha512-J8Xl3mq0L9KDFtSYtKsQDAnZWw/niZIpAD1PRiNfZFHo44Rc+oS2bEIhskNnoQXKEgBNdPzCl/DenMXYAHXRYg==
 
+react-native-sms@^1.9.0:
+  version "1.9.0"
+  resolved "https://registry.yarnpkg.com/react-native-sms/-/react-native-sms-1.9.0.tgz#362d94f75664d45144433d820155d9da66adf053"
+  integrity sha512-qq5v5rClCSMwTZL5TAK3P89SOQFrBwa6LyqCQV1Md0p78cS+DQWTX/wnb1H8gH32gDzr7barKTEXZPN7lZ5fCA==
+
 react-native-snap-carousel@^3.8.4:
   version "3.8.4"
   resolved "https://registry.yarnpkg.com/react-native-snap-carousel/-/react-native-snap-carousel-3.8.4.tgz#4c749c6a714d46ed82de527233850cb5da41bc62"
@@ -26802,11 +26807,6 @@ react-native-snap-carousel@^3.8.4:
   dependencies:
     prop-types "^15.6.1"
     react-addons-shallow-compare "15.6.2"
-    
-react-native-sms@^1.9.0:
-  version "1.9.0"
-  resolved "https://registry.yarnpkg.com/react-native-sms/-/react-native-sms-1.9.0.tgz#362d94f75664d45144433d820155d9da66adf053"
-  integrity sha512-qq5v5rClCSMwTZL5TAK3P89SOQFrBwa6LyqCQV1Md0p78cS+DQWTX/wnb1H8gH32gDzr7barKTEXZPN7lZ5fCA==
 
 react-native-splash-screen@^3.2.0:
   version "3.2.0"

@@ -158,7 +158,7 @@
     "@types/utf8": "^2.1.6",
     "@types/web3": "^1.0.18",
     "babel-core": "7.0.0-bridge.0",
-    "detox": "^14.5.0",
+    "detox": "14.6.0",
     "enzyme": "^3.9.0",
     "enzyme-adapter-react-16": "^1.11.2",
     "enzyme-to-json": "^3.3.5",
