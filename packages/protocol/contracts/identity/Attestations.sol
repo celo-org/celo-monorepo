@@ -125,10 +125,6 @@ contract Attestations is
   event Withdrawal( address indexed account, address indexed token, uint256 amount);
   event AttestationExpiryBlocksSet(uint256 value);
   event AttestationRequestFeeSet(address indexed token, uint256 value);
-  event AttestorAuthorized(address indexed account, address attestor);
-  event AccountDataEncryptionKeySet(address indexed account, bytes dataEncryptionKey);
-  event AccountMetadataURLSet(address indexed account, string metadataURL);
-  event AccountWalletAddressSet(address indexed account, address walletAddress);
   event SelectIssuersWaitBlocksSet(uint256 value);
 
   function initialize(
@@ -497,7 +493,7 @@ contract Attestations is
     view
     returns (uint32[] memory, address[] memory)
   {
-    AttestedAddress storage state = identifiers[identifier].attestations[account]
+    AttestedAddress storage state = identifiers[identifier].attestations[account];
     address[] storage issuers = state.selectedIssuers;
 
     uint num = 0;
