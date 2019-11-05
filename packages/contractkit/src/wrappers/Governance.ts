@@ -65,9 +65,10 @@ interface QueueProposal {
 }
 
 export enum VoteValue {
-  Yes,
-  No,
+  None,
   Abstain,
+  No,
+  Yes,
 }
 
 /**
@@ -165,7 +166,7 @@ export class GovernanceWrapper extends BaseWrapper<Governance> {
     }
   }
 
-  getTransactionsEncoded(transactions: Transaction[]): TransactionsEncoded {
+  private getTransactionsEncoded(transactions: Transaction[]): TransactionsEncoded {
     return {
       values: transactions.map((tx) => tx.value.toString()),
       destinations: transactions.map((tx) => tx.destination),
@@ -192,7 +193,7 @@ export class GovernanceWrapper extends BaseWrapper<Governance> {
     return toBuffer(contractMethod(...args).encodeABI())
   }
 
-  propose(transactions: Transaction[], proposerAddress: Address, deposit: BigNumber) {
+  propose(transactions: Transaction[]) {
     const encoded = this.getTransactionsEncoded(transactions)
     return toTransactionObject(
       this.kit,
@@ -202,8 +203,7 @@ export class GovernanceWrapper extends BaseWrapper<Governance> {
         // @ts-ignore bytes type
         encoded.data,
         encoded.dataLengths
-      ),
-      { from: proposerAddress, value: deposit.toString() }
+      )
     )
   }
 
@@ -225,19 +225,25 @@ export class GovernanceWrapper extends BaseWrapper<Governance> {
   // TODO: merge with SortedOracles findLesserAndGreaterKeys
   private async findLesserAndGreaterIDs(
     proposalID: BigNumber,
-    upvoter: Address
+    upvoter: Address,
+    recordWeight?: BigNumber // used for revocation
   ): Promise<{ lesserID: BigNumber; greaterID: BigNumber }> {
-    let lesserID = new BigNumber(-1)
-    let greaterID = new BigNumber(-1)
-
     const proposalUpvotes = await this.getUpvotes(proposalID)
-    const lockedGoldContract = await this.kit.contracts.getLockedGold()
-    const weight = await lockedGoldContract.getAccountTotalLockedGold(upvoter)
-    const upvotesResult = proposalUpvotes.plus(weight)
+
+    let upvotesResult: BigNumber
+    if (recordWeight) {
+      upvotesResult = proposalUpvotes.minus(recordWeight)
+    } else {
+      const lockedGoldContract = await this.kit.contracts.getLockedGold()
+      const weight = await lockedGoldContract.getAccountTotalLockedGold(upvoter)
+      upvotesResult = proposalUpvotes.plus(weight)
+    }
 
     const queue = await this.getQueue()
     const unexpiredQueue = await filterAsync(queue, (qp) => this.isQueued(qp.id))
 
+    let lesserID = new BigNumber(-1)
+    let greaterID = new BigNumber(-1)
     // This leverages the fact that the currentRates are already sorted from
     // greatest to lowest value
     for (const queueProposal of unexpiredQueue) {
@@ -255,6 +261,25 @@ export class GovernanceWrapper extends BaseWrapper<Governance> {
 
   async upvote(proposalID: BigNumber, upvoter: Address) {
     const { lesserID, greaterID } = await this.findLesserAndGreaterIDs(proposalID, upvoter)
+    return toTransactionObject(
+      this.kit,
+      this.contract.methods.upvote(
+        proposalID.toString(),
+        lesserID.toString(),
+        greaterID.toString()
+      ),
+      { from: upvoter }
+    )
+  }
+
+  async revokeUpvote(upvoter: Address) {
+    const { 0: proposalID, 1: weight } = await this.contract.methods.getUpvoteRecord(upvoter).call()
+    const { lesserID, greaterID } = await this.findLesserAndGreaterIDs(
+      toBigNumber(proposalID),
+      upvoter,
+      toBigNumber(weight)
+    )
+
     return toTransactionObject(
       this.kit,
       this.contract.methods.upvote(
