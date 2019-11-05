@@ -495,30 +495,32 @@ contract Attestations is
   function getCompletableAttestationStates(bytes32 identifier, address account)
     external
     view
-    returns (uint32[] memory, address[] memory) {
-      address[] storage issuers = identifiers[identifier].attestations[account].selectedIssuers;
+    returns (uint32[] memory, address[] memory)
+  {
+    AttestedAddress storage state = identifiers[identifier].attestations[account]
+    address[] storage issuers = state.selectedIssuers;
 
-      uint num = 0;
-      for (uint i = 0; i < issuers.length; i++) {
-        if (isAttestationCompletable(identifiers[identifier].attestations[account].issuedAttestations[issuers[i]])) {
-          num++;
-        }
+    uint num = 0;
+    for (uint i = 0; i < issuers.length; i++) {
+      if (isAttestationCompletable(state.issuedAttestations[issuers[i]])) {
+        num++;
       }
-
-      uint32[] memory blockNumbers = new uint32[](num);
-      address[] memory completableIssuers = new address[](num);
-
-      uint pointer = 0;
-      for (uint i = 0; i < num; i++) {
-        if (isAttestationCompletable(identifiers[identifier].attestations[account].issuedAttestations[issuers[i]])) {
-          blockNumbers[pointer] = identifiers[identifier].attestations[account].issuedAttestations[issuers[i]].blockNumber;
-          completableIssuers[pointer] = issuers[i];
-          pointer++;
-        }
-      }
-
-      return (blockNumbers, completableIssuers);
     }
+
+    uint32[] memory blockNumbers = new uint32[](num);
+    address[] memory completableIssuers = new address[](num);
+
+    uint pointer = 0;
+    for (uint i = 0; i < num; i++) {
+      if (isAttestationCompletable(state.issuedAttestations[issuers[i]])) {
+        blockNumbers[pointer] = state.issuedAttestations[issuers[i]].blockNumber;
+        completableIssuers[pointer] = issuers[i];
+        pointer++;
+      }
+    }
+
+    return (blockNumbers, completableIssuers);
+  }
 
   /**
    * @notice Returns the fee set for a particular token.
@@ -687,6 +689,9 @@ contract Attestations is
   }
 
   function isAttestationCompletable(Attestation storage attestation) internal view returns (bool) {
-    return attestation.status == AttestationStatus.Incomplete && !isAttestationExpired(attestation.blockNumber);
+    return (
+      attestation.status == AttestationStatus.Incomplete &&
+        !isAttestationExpired(attestation.blockNumber)
+    );
   }
 }

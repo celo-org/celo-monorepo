@@ -235,7 +235,11 @@ contract Accounts is IAccounts, ReentrancyGuard, Initializable, UsingRegistry {
               data - all strings concatenated
              )
    */
-  function batchGetMetadataURL(address[] calldata accountsToQuery) external view returns (uint[] memory, bytes memory) {
+  function batchGetMetadataURL(address[] calldata accountsToQuery)
+    external
+    view
+    returns (uint[] memory, bytes memory)
+  {
     uint totalSize = 0;
     uint[] memory sizes = new uint[](accountsToQuery.length);
     for (uint i = 0; i < accountsToQuery.length; i++) {
