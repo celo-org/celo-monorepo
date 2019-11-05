@@ -1,4 +1,5 @@
 import HorizontalLine from '@celo/react-components/components/HorizontalLine'
+import Link from '@celo/react-components/components/Link'
 import { MoneyAmount } from '@celo/react-components/components/MoneyAmount'
 import colors from '@celo/react-components/styles/colors'
 import { fontStyles } from '@celo/react-components/styles/fonts'
@@ -119,9 +120,7 @@ const renderBottomSection = (props: Props) => {
       <View>
         <Text style={style.pSmall}>
           {t('walletFlow5:networkFeeExplanation.0')}
-          <Text onPress={onPressGoToFaq} style={fontStyles.link}>
-            {t('walletFlow5:networkFeeExplanation.1')}
-          </Text>
+          <Link onPress={onPressGoToFaq}>{t('walletFlow5:networkFeeExplanation.1')}</Link>
         </Text>
       </View>
     )

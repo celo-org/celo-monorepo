@@ -57,17 +57,12 @@ exports[`PaymentRequestListScreen renders correctly with no requests 1`] = `
       </Text>
       <Text
         style={
-          Array [
-            Object {
-              "color": "#2E3338",
-              "fontFamily": "Hind-SemiBold",
-              "fontSize": 14,
-              "lineHeight": 18,
-            },
-            Object {
-              "color": "#42D689",
-            },
-          ]
+          Object {
+            "color": "#42D689",
+            "fontFamily": "Hind-SemiBold",
+            "fontSize": 14,
+            "lineHeight": 18,
+          }
         }
       >
         $120
@@ -177,17 +172,12 @@ exports[`PaymentRequestListScreen renders correctly with requests 1`] = `
       </Text>
       <Text
         style={
-          Array [
-            Object {
-              "color": "#2E3338",
-              "fontFamily": "Hind-SemiBold",
-              "fontSize": 14,
-              "lineHeight": 18,
-            },
-            Object {
-              "color": "#42D689",
-            },
-          ]
+          Object {
+            "color": "#42D689",
+            "fontFamily": "Hind-SemiBold",
+            "fontSize": 14,
+            "lineHeight": 18,
+          }
         }
       >
         $120
@@ -417,14 +407,8 @@ exports[`PaymentRequestListScreen renders correctly with requests 1`] = `
                           style={
                             Array [
                               Object {
-                                "color": "#2E3338",
-                                "fontFamily": "Hind-Regular",
-                                "fontSize": 14,
-                                "lineHeight": 18,
-                              },
-                              Object {
                                 "color": "#42D689",
-                                "fontFamily": "Hind-Medium",
+                                "fontFamily": "Hind-SemiBold",
                                 "fontSize": 14,
                                 "lineHeight": 18,
                               },
@@ -459,14 +443,8 @@ exports[`PaymentRequestListScreen renders correctly with requests 1`] = `
                           style={
                             Array [
                               Object {
-                                "color": "#2E3338",
-                                "fontFamily": "Hind-Regular",
-                                "fontSize": 14,
-                                "lineHeight": 18,
-                              },
-                              Object {
                                 "color": "#42D689",
-                                "fontFamily": "Hind-Medium",
+                                "fontFamily": "Hind-SemiBold",
                                 "fontSize": 14,
                                 "lineHeight": 18,
                               },
@@ -704,14 +682,8 @@ exports[`PaymentRequestListScreen renders correctly with requests 1`] = `
                           style={
                             Array [
                               Object {
-                                "color": "#2E3338",
-                                "fontFamily": "Hind-Regular",
-                                "fontSize": 14,
-                                "lineHeight": 18,
-                              },
-                              Object {
                                 "color": "#42D689",
-                                "fontFamily": "Hind-Medium",
+                                "fontFamily": "Hind-SemiBold",
                                 "fontSize": 14,
                                 "lineHeight": 18,
                               },
@@ -746,14 +718,8 @@ exports[`PaymentRequestListScreen renders correctly with requests 1`] = `
                           style={
                             Array [
                               Object {
-                                "color": "#2E3338",
-                                "fontFamily": "Hind-Regular",
-                                "fontSize": 14,
-                                "lineHeight": 18,
-                              },
-                              Object {
                                 "color": "#42D689",
-                                "fontFamily": "Hind-Medium",
+                                "fontFamily": "Hind-SemiBold",
                                 "fontSize": 14,
                                 "lineHeight": 18,
                               },
@@ -991,14 +957,8 @@ exports[`PaymentRequestListScreen renders correctly with requests 1`] = `
                           style={
                             Array [
                               Object {
-                                "color": "#2E3338",
-                                "fontFamily": "Hind-Regular",
-                                "fontSize": 14,
-                                "lineHeight": 18,
-                              },
-                              Object {
                                 "color": "#42D689",
-                                "fontFamily": "Hind-Medium",
+                                "fontFamily": "Hind-SemiBold",
                                 "fontSize": 14,
                                 "lineHeight": 18,
                               },
@@ -1033,14 +993,8 @@ exports[`PaymentRequestListScreen renders correctly with requests 1`] = `
                           style={
                             Array [
                               Object {
-                                "color": "#2E3338",
-                                "fontFamily": "Hind-Regular",
-                                "fontSize": 14,
-                                "lineHeight": 18,
-                              },
-                              Object {
                                 "color": "#42D689",
-                                "fontFamily": "Hind-Medium",
+                                "fontFamily": "Hind-SemiBold",
                                 "fontSize": 14,
                                 "lineHeight": 18,
                               },
