@@ -11,7 +11,7 @@ import { BoxShadow } from 'react-native-shadow'
 import RNCarousel, { Pagination } from 'react-native-snap-carousel'
 
 const ITEM_WIDTH = variables.width - 70
-const ITEM_HEIGHT = 275
+const ITEM_HEIGHT = 300
 
 interface OwnProps {
   containerStyle: ViewStyle
@@ -103,6 +103,7 @@ const styles = StyleSheet.create({
   itemText: {
     ...fontStyles.bodyLarge,
     ...fontStyles.center,
+    marginTop: 20,
   },
   paginationContainer: {
     marginTop: 5,

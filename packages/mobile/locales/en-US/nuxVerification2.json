@@ -90,6 +90,7 @@
       "Without verification, you can still receive payments but only using Celo addresses or QR codes."
   },
   "input": {
+    "header": "Submit Codes",
     "body1": "Copy and Paste ",
     "body2": "the verification codes from your Messages (SMS) app.",
     "codeHeader1": "First Code",

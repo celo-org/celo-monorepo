@@ -2,10 +2,11 @@ import Link from '@celo/react-components/components/Link'
 import TextButton from '@celo/react-components/components/TextButton'
 import TextInput from '@celo/react-components/components/TextInput'
 import withTextInputPasteAware from '@celo/react-components/components/WithTextInputPasteAware'
-import InviteCodeIcon from '@celo/react-components/icons/InviteCodeIcon'
+import SmsCeloSwap from '@celo/react-components/icons/SmsCeloSwap'
 import colors from '@celo/react-components/styles/colors'
 import fontStyles from '@celo/react-components/styles/fonts'
 import { stripHexLeader } from '@celo/utils/src/signatureUtils'
+import { extractAttestationCodeFromMessage } from '@celo/walletkit'
 import dotProp from 'dot-prop-immutable'
 import * as React from 'react'
 import { withNamespaces, WithNamespaces } from 'react-i18next'
@@ -117,6 +118,10 @@ class VerificationInputScreen extends React.Component<Props, State> {
     this.setState({ isModalVisible: false })
   }
 
+  shouldShowClipboard = (value: string) => {
+    return !!extractAttestationCodeFromMessage(value)
+  }
+
   render() {
     const { codeInputValues, isModalVisible } = this.state
     const {
@@ -132,8 +137,11 @@ class VerificationInputScreen extends React.Component<Props, State> {
         <ScrollView contentContainerStyle={styles.scrollContainer}>
           <DevSkipButton nextScreen={Screens.WalletHome} />
           <View style={styles.iconContainer}>
-            <InviteCodeIcon width={152} height={48} />
+            <SmsCeloSwap width={152} height={48} />
           </View>
+          <Text style={fontStyles.h1} testID="VerificationInputHeader">
+            {t('input.header')}
+          </Text>
           <Text style={fontStyles.body}>
             <Text style={fontStyles.bold}>{t('input.body1')}</Text>
             {t('input.body2')}
@@ -142,7 +150,7 @@ class VerificationInputScreen extends React.Component<Props, State> {
           <CodeInput
             value={codeInputValues[0]}
             placeholder={'<#> m9oASm/3g7aZ...'}
-            shouldShowClipboard={() => true}
+            shouldShowClipboard={this.shouldShowClipboard}
             onChangeText={this.onChangeInputCode(0)}
             style={styles.codeInput}
           />
@@ -150,7 +158,7 @@ class VerificationInputScreen extends React.Component<Props, State> {
           <CodeInput
             value={codeInputValues[1]}
             placeholder={'<#> m9oASm/3g7aZ...'}
-            shouldShowClipboard={() => true}
+            shouldShowClipboard={this.shouldShowClipboard}
             onChangeText={this.onChangeInputCode(1)}
             style={styles.codeInput}
           />
@@ -158,14 +166,14 @@ class VerificationInputScreen extends React.Component<Props, State> {
           <CodeInput
             value={codeInputValues[2]}
             placeholder={'<#> m9oASm/3g7aZ...'}
-            shouldShowClipboard={() => true}
+            shouldShowClipboard={this.shouldShowClipboard}
             onChangeText={this.onChangeInputCode(2)}
             style={styles.codeInput}
           />
+          <Link style={styles.missingCodesLink} onPress={this.onPressCodesNotReceived}>
+            {t('input.codesMissing')}
+          </Link>
         </ScrollView>
-        <Link style={styles.missingCodesLink} onPress={this.onPressCodesNotReceived}>
-          {t('input.codesMissing')}
-        </Link>
         <Modal isVisible={isModalVisible}>
           <View style={styles.modalContainer}>
             <Text style={fontStyles.h1}>{t('missingCodesModal.header')}</Text>
@@ -201,7 +209,8 @@ const styles = StyleSheet.create({
   },
   iconContainer: {
     alignItems: 'center',
-    marginVertical: 35,
+    marginTop: 30,
+    marginBottom: 20,
   },
   bodyBold: {
     ...fontStyles.body,
@@ -223,11 +232,13 @@ const styles = StyleSheet.create({
   missingCodesLink: {
     fontSize: 16,
     textAlign: 'center',
-    paddingVertical: 20,
+    paddingVertical: 10,
+    marginVertical: 15,
   },
   modalContainer: {
     backgroundColor: colors.background,
     padding: 20,
+    marginHorizontal: 10,
     borderRadius: 4,
   },
   modalButtonsContainer: {
