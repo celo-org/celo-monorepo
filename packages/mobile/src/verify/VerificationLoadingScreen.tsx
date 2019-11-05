@@ -99,7 +99,7 @@ class VerificationLoadingScreen extends React.Component<Props> {
           </View>
         )}
         <ScrollView contentContainerStyle={styles.scrollContainer}>
-          <DevSkipButton nextScreen={Screens.WalletHome} />
+          <DevSkipButton nextScreen={Screens.VerificationInterstitialScreen} />
           <View style={styles.statusContainer}>
             <LoadingSpinner />
             <Text style={styles.textPhoneNumber}>

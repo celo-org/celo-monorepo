@@ -51,7 +51,6 @@ export class CTextInput extends React.Component<Props, State> {
   }
 
   onClear = () => {
-    console.log('here on clear')
     this.props.onChangeText('')
   }
 
@@ -103,10 +102,10 @@ export type TextInputProps = Props
 
 const style = StyleSheet.create({
   container: {
+    flex: 1,
     flexDirection: 'row',
     justifyContent: 'center',
     alignItems: 'center',
-    flex: 1,
   },
   borderedText: {
     ...fontStyles.regular,
@@ -118,5 +117,6 @@ const style = StyleSheet.create({
   },
   iconStyle: {
     marginRight: 8,
+    zIndex: 100,
   },
 })

@@ -134,7 +134,10 @@ class VerificationInputScreen extends React.Component<Props, State> {
 
     return (
       <SafeAreaView style={styles.container}>
-        <ScrollView contentContainerStyle={styles.scrollContainer}>
+        <ScrollView
+          contentContainerStyle={styles.scrollContainer}
+          keyboardShouldPersistTaps={'always'}
+        >
           <DevSkipButton nextScreen={Screens.WalletHome} />
           <View style={styles.iconContainer}>
             <SmsCeloSwap width={152} height={48} />

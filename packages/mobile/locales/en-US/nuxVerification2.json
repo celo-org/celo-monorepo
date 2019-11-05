@@ -89,6 +89,12 @@
     "body2":
       "Without verification, you can still receive payments but only using Celo addresses or QR codes."
   },
+  "interstitial": {
+    "header": "Almost Done",
+    "body1":
+      "Your text messages are on the way! Please enter your three codes as you receive them.",
+    "body2": "This may take a minute."
+  },
   "input": {
     "header": "Submit Codes",
     "body1": "Copy and Paste ",
