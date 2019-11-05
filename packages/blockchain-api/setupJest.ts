@@ -2,7 +2,6 @@ import * as fetch from 'jest-fetch-mock'
 
 jest.setMock('node-fetch', fetch)
 
-const customGlobal = global
+const customGlobal = global as fetch.GlobalWithFetchMock
 customGlobal.fetch = require('jest-fetch-mock')
-// @ts-ignore
-customGlobal.fetchMock = customGlobal.fetch
+customGlobal.fetchMock = global.fetch
