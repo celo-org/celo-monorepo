@@ -1,5 +1,5 @@
 locals {
-  name_prefix = "${var.celo_env}-tx-node"
+  name_prefix = "${var.celo_env}-${var.name}"
 }
 
 resource "google_compute_address" "tx_node" {
@@ -40,6 +40,7 @@ resource "google_compute_instance" "tx_node" {
 
   metadata_startup_script = templatefile(
     format("%s/startup.sh", path.module), {
+      additional_geth_flags : var.additional_geth_flags,
       block_time : var.block_time,
       bootnode_ip_address : var.bootnode_ip_address,
       ethstats_host : var.ethstats_host,
@@ -52,6 +53,7 @@ resource "google_compute_instance" "tx_node" {
       in_memory_discovery_table : var.in_memory_discovery_table,
       ip_address : google_compute_address.tx_node[count.index].address,
       max_peers : var.tx_node_count * 2,
+      name : var.name,
       network_id : var.network_id,
       rid : count.index,
       tx_node_name : "${var.celo_env}-tx-node-${count.index}",

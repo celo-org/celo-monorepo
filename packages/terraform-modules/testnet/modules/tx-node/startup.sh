@@ -30,7 +30,7 @@ GETH_NODE_DOCKER_IMAGE=${geth_node_docker_image_repository}:${geth_node_docker_i
 # download & apply secrets pulled from Cloud Storage as environment vars
 echo "Downloading secrets from Google Cloud Storage..."
 SECRETS_ENV_PATH=/var/.env.celo.secrets
-gsutil cp gs://${gcloud_secrets_bucket}/${gcloud_secrets_base_path}/.env.tx-node-${rid} $SECRETS_ENV_PATH
+gsutil cp gs://${gcloud_secrets_bucket}/${gcloud_secrets_base_path}/.env.${name}-${rid} $SECRETS_ENV_PATH
 # Apply the .env file
 . $SECRETS_ENV_PATH
 
@@ -86,4 +86,5 @@ docker run -p 8545:8545/tcp -p 8546:8546/tcp --name geth --net=host --entrypoint
     --ethstats=${tx_node_name}:$ETHSTATS_WEBSOCKETSECRET@${ethstats_host} \
     --nat=extip:${ip_address} \
     --metrics \
-    $IN_MEMORY_DISCOVERY_TABLE_FLAG"
+    $IN_MEMORY_DISCOVERY_TABLE_FLAG \
+    ${additional_geth_flags}"

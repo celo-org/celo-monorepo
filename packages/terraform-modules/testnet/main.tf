@@ -40,12 +40,12 @@ resource "google_compute_firewall" "geth_firewall" {
 
   allow {
     protocol = "tcp"
-    ports    = ["30303"]
+    ports    = ["30303", "30503"]
   }
 
   allow {
     protocol = "udp"
-    ports    = ["30303"]
+    ports    = ["30303", "30503"]
   }
 }
 
@@ -130,6 +130,7 @@ module "validator" {
   istanbul_request_timeout_ms       = var.istanbul_request_timeout_ms
   network_id                        = var.network_id
   network_name                      = data.google_compute_network.network.name
+  proxied_validator_count           = var.proxied_validator_count
   tx_node_count                     = var.tx_node_count
   validator_count                   = var.validator_count
   verification_pool_url             = var.verification_pool_url

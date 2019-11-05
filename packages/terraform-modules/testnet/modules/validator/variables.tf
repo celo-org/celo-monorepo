@@ -73,6 +73,11 @@ variable network_name {
   description = "Name of the GCP network the validator VM is in"
 }
 
+variable proxied_validator_count {
+  type        = number
+  description = "Number of validator_count validators that are hidden behind proxies"
+}
+
 variable tx_node_count {
   type        = number
   description = "Number of tx-nodes that are created"

@@ -4,8 +4,8 @@ import {
   AccountType,
   generateGenesisFromEnv,
   generatePrivateKey,
+  generatePublicKey,
   privateKeyToAddress,
-  privateKeyToPublicKey,
 } from './generate_utils'
 import {
   applyTerraformModule,
@@ -31,6 +31,16 @@ const secretsBucketName = 'celo-testnet-secrets'
 const testnetTerraformModule = 'testnet'
 const testnetNetworkTerraformModule = 'testnet-network'
 
+interface NodeSecrets {
+  ACCOUNT_ADDRESS: string
+  BOOTNODE_ENODE_ADDRESS: string
+  PRIVATE_KEY: string
+  SENTRY_ENODE_ADDRESS?: string
+  [envVar.GETH_ACCOUNT_SECRET]: string
+  [envVar.ETHSTATS_WEBSOCKETSECRET]: string
+  [envVar.MNEMONIC]: string
+}
+
 // The keys correspond to the variable names that Terraform expects and
 // the values correspond to the names of the appropriate env variables
 const testnetEnvVars: TerraformVars = {
@@ -46,6 +56,7 @@ const testnetEnvVars: TerraformVars = {
   in_memory_discovery_table: envVar.IN_MEMORY_DISCOVERY_TABLE,
   istanbul_request_timeout_ms: envVar.ISTANBUL_REQUEST_TIMEOUT_MS,
   network_id: envVar.NETWORK_ID,
+  proxied_validator_count: envVar.PROXIED_VALIDATORS,
   tx_node_count: envVar.TX_NODES,
   validator_count: envVar.VALIDATORS,
   verification_pool_url: envVar.VERIFICATION_POOL_URL,
@@ -166,6 +177,7 @@ export async function taintTestnet(celoEnv: string) {
     testnetTerraformModule,
     `module.bootnode.google_compute_instance.bootnode`
   )
+
   // validators
   console.info('Tainting validators...')
   await taintEveryResourceWithPrefix(
@@ -178,6 +190,26 @@ export async function taintTestnet(celoEnv: string) {
     testnetTerraformModule,
     `module.validator.google_compute_disk.validator`
   )
+
+  // sentry random id
+  console.info('Tainting sentry random ids...')
+  await taintEveryResourceWithPrefix(
+    testnetTerraformModule,
+    `module.validator.module.sentry.random_id.tx_node`
+  )
+  // sentry addresses
+  console.info('Tainting sentry addresses...')
+  await taintEveryResourceWithPrefix(
+    testnetTerraformModule,
+    `module.validator.module.sentry.google_compute_address.tx_node`
+  )
+  // sentries
+  console.info('Tainting sentries...')
+  await taintEveryResourceWithPrefix(
+    testnetTerraformModule,
+    `module.validator.module.sentry.google_compute_instance.tx_node`
+  )
+
   // tx-node random id
   console.info('Tainting tx-node random ids...')
   await taintEveryResourceWithPrefix(testnetTerraformModule, `module.tx_node.random_id.tx_node`)
@@ -193,6 +225,7 @@ export async function taintTestnet(celoEnv: string) {
     testnetTerraformModule,
     `module.tx_node.google_compute_instance.tx_node`
   )
+
   // tx-node instance group random id
   console.info('Tainting tx-node instance group random id...')
   await taintTerraformModuleResource(
@@ -222,6 +255,7 @@ export async function untaintTestnet(celoEnv: string) {
     testnetTerraformModule,
     `module.bootnode.google_compute_instance.bootnode`
   )
+
   // validators
   console.info('Untainting validators...')
   await untaintEveryResourceWithPrefix(
@@ -234,6 +268,26 @@ export async function untaintTestnet(celoEnv: string) {
     testnetTerraformModule,
     `module.validator.google_compute_disk.validator`
   )
+
+  // sentry random id
+  console.info('Untainting sentry random ids...')
+  await untaintEveryResourceWithPrefix(
+    testnetTerraformModule,
+    `module.validator.module.sentry.random_id.tx_node`
+  )
+  // sentry addresses
+  console.info('Untainting sentry addresses...')
+  await untaintEveryResourceWithPrefix(
+    testnetTerraformModule,
+    `module.validator.module.sentry.google_compute_address.tx_node`
+  )
+  // sentries
+  console.info('Untainting sentries...')
+  await untaintEveryResourceWithPrefix(
+    testnetTerraformModule,
+    `module.validator.module.sentry.google_compute_instance.tx_node`
+  )
+
   // tx-node random id
   console.info('Untainting tx-node random ids...')
   await untaintEveryResourceWithPrefix(testnetTerraformModule, `module.tx_node.random_id.tx_node`)
@@ -249,6 +303,7 @@ export async function untaintTestnet(celoEnv: string) {
     testnetTerraformModule,
     `module.tx_node.google_compute_instance.tx_node`
   )
+
   // tx-node instance group random id
   console.info('Untainting tx-node instance group random id...')
   await untaintTerraformModuleResource(
@@ -339,14 +394,21 @@ export async function generateAndUploadSecrets(celoEnv: string) {
   // Tx Nodes
   const txNodeCount = parseInt(fetchEnv(envVar.TX_NODES), 10)
   for (let i = 0; i < txNodeCount; i++) {
-    const secrets = generateValidatorSecretEnvVars(AccountType.TX_NODE, i)
+    const secrets = generateNodeSecretEnvVars(AccountType.TX_NODE, i)
     await uploadSecrets(celoEnv, secrets, `tx-node-${i}`)
   }
   // Validators
   const validatorCount = parseInt(fetchEnv(envVar.VALIDATORS), 10)
   for (let i = 0; i < validatorCount; i++) {
-    const secrets = generateValidatorSecretEnvVars(AccountType.VALIDATOR, i)
+    const secrets = generateNodeSecretEnvVars(AccountType.VALIDATOR, i)
     await uploadSecrets(celoEnv, secrets, `validator-${i}`)
+  }
+  // Sentries
+  // Assumes only 1 sentry per validator
+  const sentryCount = parseInt(fetchEnvOrFallback(envVar.PROXIED_VALIDATORS, '0'), 10)
+  for (let i = 0; i < sentryCount; i++) {
+    const secrets = generateNodeSecretEnvVars(AccountType.SENTRY, i)
+    await uploadSecrets(celoEnv, secrets, `sentry-${i}`)
   }
 }
 
@@ -370,24 +432,29 @@ function generateBootnodeSecretEnvVars() {
   })
 }
 
-function generateValidatorSecretEnvVars(accountType: AccountType, index: number) {
+function generateNodeSecretEnvVars(accountType: AccountType, index: number) {
   const mnemonic = fetchEnv(envVar.MNEMONIC)
   const privateKey = generatePrivateKey(mnemonic, accountType, index)
-  const secrets = {
+  const secrets: NodeSecrets = {
     ACCOUNT_ADDRESS: privateKeyToAddress(privateKey),
-    BOOTNODE_ENODE_ADDRESS: privateKeyToPublicKey(
-      generatePrivateKey(mnemonic, AccountType.LOAD_TESTING_ACCOUNT, 0)
-    ),
+    BOOTNODE_ENODE_ADDRESS: generatePublicKey(mnemonic, AccountType.LOAD_TESTING_ACCOUNT, 0),
     PRIVATE_KEY: privateKey,
     [envVar.GETH_ACCOUNT_SECRET]: fetchEnv(envVar.GETH_ACCOUNT_SECRET),
     [envVar.ETHSTATS_WEBSOCKETSECRET]: fetchEnv(envVar.ETHSTATS_WEBSOCKETSECRET),
     [envVar.MNEMONIC]: mnemonic,
   }
+  // If this is meant to be a proxied validator, also generate the enode of its proxy
+  if (accountType === AccountType.VALIDATOR) {
+    const proxiedValidators = parseInt(fetchEnvOrFallback(envVar.PROXIED_VALIDATORS, '0'), 10)
+    if (index < proxiedValidators) {
+      secrets.SENTRY_ENODE_ADDRESS = generatePublicKey(mnemonic, AccountType.SENTRY, 0)
+    }
+  }
   return formatEnvVars(secrets)
 }
 
 // Formats an object into a multi-line string with each line as KEY=VALUE
-function formatEnvVars(envVars: { [key: string]: string | number | boolean }) {
+function formatEnvVars(envVars: { [key: string]: any }) {
   return Object.keys(envVars)
     .map((key) => `${key}='${envVars[key]}'`)
     .join('\n')

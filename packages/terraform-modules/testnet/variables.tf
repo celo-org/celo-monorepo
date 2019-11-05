@@ -88,6 +88,11 @@ variable network_name {
   description = "The name of the network to use"
 }
 
+variable proxied_validator_count {
+  type        = number
+  description = "Number of validator_count validators that are hidden behind proxies"
+}
+
 variable tx_node_count {
   type        = number
   description = "Number of tx-nodes to create"

@@ -69,6 +69,24 @@ echo "Bootnode enode: $BOOTNODE_ENODE"
 echo "Pulling geth..."
 docker pull $GETH_NODE_DOCKER_IMAGE
 
+PROXIED_FLAGS=""
+SENTRY_ENODE=""
+if [[ ${proxied} == "true" ]]; then
+  PROXIED_FLAGS="--istanbul.proxied --nodiscover"
+  SENTRY_ENODE_NO_PORT=$SENTRY_ENODE_ADDRESS@${sentry_ip_address}
+  echo "Sentry enode without port: $SENTRY_ENODE_NO_PORT"
+
+  # if this validator is proxied, cut it off from the external internet after
+  # we've downloaded everything
+  echo "Deleting access config"
+  GCLOUD_ZONE=`gcloud compute instances list --filter="name=('${validator_name}')" --format 'value(zone)'`
+  # The command hangs but still succeeds, give it some time
+  # This is likely because when the access config is actually deleted, this
+  # instance cannot reach the external internet so the success ack from the server
+  # is never received
+  timeout 20 gcloud compute instances delete-access-config ${validator_name} --zone=$GCLOUD_ZONE
+fi
+
 IN_MEMORY_DISCOVERY_TABLE_FLAG=""
 [[ ${in_memory_discovery_table} == "true" ]] && IN_MEMORY_DISCOVERY_TABLE_FLAG="--use-in-memory-discovery-table"
 
@@ -120,4 +138,5 @@ docker run -v $DATA_DIR:$DATA_DIR --name geth --net=host --entrypoint /bin/sh -d
       --nat=extip:${ip_address} \
       --metrics \
       $IN_MEMORY_DISCOVERY_TABLE_FLAG \
+      $PROXIED_FLAGS \
   )"

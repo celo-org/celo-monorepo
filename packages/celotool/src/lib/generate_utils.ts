@@ -28,6 +28,7 @@ export enum AccountType {
   BOOTNODE = 3,
   FAUCET = 4,
   ATTESTATION = 5,
+  SENTRY = 6,
 }
 
 export enum ConsensusType {
@@ -68,6 +69,10 @@ export const generatePrivateKey = (mnemonic: string, accountType: AccountType, i
   const newNode = node.derive(accountType).derive(index)
 
   return newNode.privateKey.toString('hex')
+}
+
+export const generatePublicKey = (mnemonic: string, accountType: AccountType, index: number) => {
+  return privateKeyToPublicKey(generatePrivateKey(mnemonic, accountType, index))
 }
 
 export const privateKeyToPublicKey = (privateKey: string) => {

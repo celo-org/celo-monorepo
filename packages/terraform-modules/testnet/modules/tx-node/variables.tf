@@ -1,3 +1,9 @@
+variable additional_geth_flags {
+  type        = string
+  description = "Additional flags to be passed when running geth"
+  default     = ""
+}
+
 variable block_time {
   type        = number
   description = "Number of seconds between each block"
@@ -56,6 +62,12 @@ variable geth_verbosity {
 variable in_memory_discovery_table {
   type        = bool
   description = "Specifies whether to use an in memory discovery table"
+}
+
+variable name {
+  type        = string
+  description = "Name of the nodes"
+  default     = "tx-node"
 }
 
 variable network_id {
