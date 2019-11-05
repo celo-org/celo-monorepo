@@ -1,0 +1,31 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`VerificationInterstitialScreen renders correctly 1`] = `
+<SafeAreaView
+  style={
+    Object {
+      "backgroundColor": "#FFFFFF",
+      "flex": 1,
+      "justifyContent": "space-between",
+    }
+  }
+>
+  <RCTScrollView
+    contentContainerStyle={
+      Object {
+        "alignItems": "center",
+        "flex": 1,
+        "justifyContent": "center",
+        "padding": 30,
+        "paddingTop": 0,
+      }
+    }
+  >
+    <View>
+      <Text>
+        Almost Done
+      </Text>
+    </View>
+  </RCTScrollView>
+</SafeAreaView>
+`;
