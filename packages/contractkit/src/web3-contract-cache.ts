@@ -115,6 +115,7 @@ export class Web3ContractCache {
     if (this.cacheMap[contract] == null) {
       debug('Initiating contract %s', contract)
       const createFn = ContractFactories[contract] as CFType[C]
+      // @ts-ignore: Too compplex union type
       this.cacheMap[contract] = createFn(
         this.kit.web3,
         await this.kit.registry.addressFor(contract)

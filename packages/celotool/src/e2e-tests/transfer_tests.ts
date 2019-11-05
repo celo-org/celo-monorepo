@@ -185,7 +185,7 @@ describe('Transfer tests', function(this: any) {
 
   const syncModes = ['full', 'fast', 'light', 'ultralight']
   const gethConfig: GethTestConfig = {
-    migrateTo: 15,
+    migrateTo: 17,
     instances: [
       { name: 'validator', validating: true, syncmode: 'full', port: 30303, rpcport: 8545 },
     ],

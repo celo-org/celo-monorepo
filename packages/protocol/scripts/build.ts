@@ -8,6 +8,7 @@ const BUILD_DIR = path.join(ROOT_DIR, 'build')
 const CONTRACTKIT_GEN_DIR = path.normalize(path.join(ROOT_DIR, '../contractkit/src/generated'))
 
 export const ProxyContracts = [
+  'AccountsProxy',
   'AttestationsProxy',
   'ElectionProxy',
   'EscrowProxy',
