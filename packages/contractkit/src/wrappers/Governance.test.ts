@@ -49,14 +49,18 @@ testWithGanache('Governance Wrapper', (web3) => {
     let proposeFn: () => Promise<any>
 
     beforeAll(() => {
-      proposalTransactions = buildRegistryRepointTransactions([
-        [CeloContract.Random, '0x0000000000000000000000000000000000000004'],
-        [CeloContract.Attestations, '0x0000000000000000000000000000000000000005'],
-        [CeloContract.Escrow, '0x0000000000000000000000000000000000000006'],
-      ], registry)
-      proposeFn = () => governance
-        .propose(proposalTransactions)
-        .sendAndWaitForReceipt({ from: accounts[0], value: minDeposit })
+      proposalTransactions = buildRegistryRepointTransactions(
+        [
+          [CeloContract.Random, '0x0000000000000000000000000000000000000004'],
+          [CeloContract.Attestations, '0x0000000000000000000000000000000000000005'],
+          [CeloContract.Escrow, '0x0000000000000000000000000000000000000006'],
+        ],
+        registry
+      )
+      proposeFn = () =>
+        governance
+          .propose(proposalTransactions)
+          .sendAndWaitForReceipt({ from: accounts[0], value: minDeposit })
     })
 
     const proposalID = new BigNumber(1)
@@ -75,14 +79,13 @@ testWithGanache('Governance Wrapper', (web3) => {
       await proposeFn()
 
       const queue = await governance.getQueue()
-      console.log("queue[0]", queue[0].id.toString(), queue[0].upvotes.toString())
+      console.log('queue[0]', queue[0].id.toString(), queue[0].upvotes.toString())
 
       const upvoteRecord = await governance.getUpvoteRecord(accounts[0])
-      console.log("upvoteRecord", upvoteRecord.id.toString(), upvoteRecord.weight.toString())
-
+      console.log('upvoteRecord', upvoteRecord.id.toString(), upvoteRecord.weight.toString())
 
       const o = await governance.findLesserAndGreaterAfterUpvote(proposalID, accounts[0])
-      console.log("lesser", o.lesserID.toString(), "greater", o.greaterID.toString())
+      console.log('lesser', o.lesserID.toString(), 'greater', o.greaterID.toString())
 
       // const tx = await governance.upvote(proposalID, accounts[0])
       // await tx.sendAndWaitForReceipt()
@@ -108,11 +111,14 @@ testWithGanache('Governance Wrapper', (web3) => {
   })
 
   describe('Hotfixes', () => {
-    const hotfixTransactions = buildRegistryRepointTransactions([
-      [CeloContract.Random, '0x0000000000000000000000000000000000000004'],
-      [CeloContract.Attestations, '0x0000000000000000000000000000000000000005'],
-      [CeloContract.Escrow, '0x0000000000000000000000000000000000000006'],
-    ], registry)
+    const hotfixTransactions = buildRegistryRepointTransactions(
+      [
+        [CeloContract.Random, '0x0000000000000000000000000000000000000004'],
+        [CeloContract.Attestations, '0x0000000000000000000000000000000000000005'],
+        [CeloContract.Escrow, '0x0000000000000000000000000000000000000006'],
+      ],
+      registry
+    )
     const hash = governance.getTransactionsHash(hotfixTransactions)
 
     it('#whitelistHotfix', async () => {
