@@ -64,7 +64,6 @@ testWithGanache('Governance Wrapper', (web3) => {
     })
 
     const proposalID = new BigNumber(1)
-    const proposalIndex = new BigNumber(0)
 
     it.only('#propose', async () => {
       await proposeFn()
@@ -78,34 +77,25 @@ testWithGanache('Governance Wrapper', (web3) => {
     it.only('#upvote', async () => {
       await proposeFn()
 
-      const queue = await governance.getQueue()
-      console.log('queue[0]', queue[0].id.toString(), queue[0].upvotes.toString())
+      const tx = await governance.upvote(proposalID, accounts[0])
+      await tx.sendAndWaitForReceipt()
 
-      const upvoteRecord = await governance.getUpvoteRecord(accounts[0])
-      console.log('upvoteRecord', upvoteRecord.id.toString(), upvoteRecord.weight.toString())
-
-      const o = await governance.findLesserAndGreaterAfterUpvote(proposalID, accounts[0])
-      console.log('lesser', o.lesserID.toString(), 'greater', o.greaterID.toString())
-
-      // const tx = await governance.upvote(proposalID, accounts[0])
-      // await tx.sendAndWaitForReceipt()
-
-      // const upvotes = await governance.getUpvotes(proposalID)
-      // console.log(upvotes)
+    //   const upvotes = await governance.getUpvotes(proposalID)
+    //   console.log("upvotes", upvotes)
     })
 
     it('#approve', async () => {
-      const tx = governance.approve(proposalID, proposalIndex)
+      const tx = await governance.approve(proposalID)
       await tx.sendAndWaitForReceipt()
     })
 
     it('#vote', async () => {
-      const tx = governance.vote(proposalID, proposalIndex, VoteValue.Yes)
+      const tx = await governance.vote(proposalID, VoteValue.Yes)
       await tx.sendAndWaitForReceipt()
     })
 
     it('#execute', async () => {
-      const tx = governance.execute(proposalID, proposalIndex)
+      const tx = await governance.execute(proposalID)
       await tx.sendAndWaitForReceipt()
     })
   })
