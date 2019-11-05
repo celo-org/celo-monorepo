@@ -87,13 +87,8 @@ class InflationManager {
   }
 }
 
-const setGasParameters = async (
-  validatorUri: string,
-  validatorAddress: string,
-  gasCost: number
-) => {
+const setIntrinsicGas = async (validatorUri: string, validatorAddress: string, gasCost: number) => {
   const kit = newKit(validatorUri)
-  kit.defaultAccount = validatorAddress
   const parameters = await kit.contracts.getBlockchainParameters()
   await parameters
     .setIntrinsicGasForAlternativeGasCurrency(gasCost.toString())
@@ -446,7 +441,7 @@ describe('Transfer tests', function(this: any) {
       )
     })
   }
-  /*
+
   describe('Normal Transfer >', () => {
     before(restartWithCleanNodes)
 
@@ -578,8 +573,10 @@ describe('Transfer tests', function(this: any) {
       })
     }
   })
-*/
-  describe('Transfer with changed cost >', () => {
+
+  describe('Transfer with changed intrinsic gas cost >', () => {
+    const intrinsicGasForAlternativeGasCurrency = 34000
+
     before(restartWithCleanNodes)
 
     for (const syncMode of syncModes) {
@@ -587,7 +584,7 @@ describe('Transfer tests', function(this: any) {
         before(`start geth on sync: ${syncMode}`, async () => {
           try {
             await startSyncNode(syncMode)
-            await setGasParameters('http://localhost:8545', validatorAddress, 34000)
+            await setIntrinsicGas('http://localhost:8545', validatorAddress, 34000)
           } catch (err) {
             console.debug('some error', err)
           }
@@ -595,7 +592,7 @@ describe('Transfer tests', function(this: any) {
 
         describe('Transfer CeloGold >', () => {
           describe('gasCurrency = CeloDollars >', () => {
-            const intrinsicGas = 55000
+            const intrinsicGas = intrinsicGasForAlternativeGasCurrency + 21000
             describe('when there is no demurrage', () => {
               describe('when setting a gas amount greater than the amount of gas necessary', () =>
                 testTransferToken({
