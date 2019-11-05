@@ -19,9 +19,9 @@ function getDefaultComponent() {
   }
 }
 
-function getPortForwardCmd(celoEnv: string, component?: string, ports = defaultPortsString) {
+async function getPortForwardCmd(celoEnv: string, component?: string, ports = defaultPortsString) {
   if (isVmBased()) {
-    return getVmPortForwardCmd(celoEnv, ports)
+    return Promise.resolve(getVmPortForwardCmd(celoEnv, ports))
   } else {
     return getKubernetesPortForwardCmd(celoEnv, component, ports)
   }
@@ -35,7 +35,7 @@ function getVmPortForwardCmd(celoEnv: string, ports = defaultPortsString) {
   return `gcloud compute ssh --zone ${zone} ${celoEnv}-validator-0 -- -N ${portsWithFlags}`
 }
 
-function getKubernetesPortForwardCmd(
+async function getKubernetesPortForwardCmd(
   celoEnv: string,
   component?: string,
   ports = defaultPortsString
@@ -44,7 +44,8 @@ function getKubernetesPortForwardCmd(
     component = getDefaultComponent()
   }
   console.log(`Port-forwarding to ${celoEnv} ${component} ${ports}`)
-  return `kubectl port-forward --namespace ${celoEnv} $(kubectl get pods --namespace ${celoEnv} -l "app=ethereum, component=${component}, release=${celoEnv}" --field-selector=status.phase=Running -o jsonpath="{.items[0].metadata.name}") ${ports}`
+  const portForwardArgs = await getPortForwardArgs(celoEnv, component, ports)
+  return `kubectl ${portForwardArgs.join(' ')}`
 }
 
 async function getPortForwardArgs(celoEnv: string, component?: string, ports = defaultPortsString) {
@@ -60,7 +61,11 @@ async function getPortForwardArgs(celoEnv: string, component?: string, ports = d
 
 export async function portForward(celoEnv: string, component?: string, ports?: string) {
   try {
-    await spawnSync('kubectl', await getPortForwardArgs(celoEnv, component, ports), {
+    const portForwardCmd = await getPortForwardCmd(celoEnv, component, ports)
+    const splitCmd = portForwardCmd.split(' ')
+    console.log(`Port-forwarding to celoEnv ${celoEnv} ports ${ports}`)
+    console.log(`\t$ ${portForwardCmd}`)
+    await spawnSync(splitCmd[0], splitCmd.slice(1), {
       stdio: 'inherit',
     })
   } catch (error) {
@@ -79,7 +84,7 @@ export async function portForwardAnd(
   let childProcess: ChildProcess
 
   try {
-    childProcess = execBackgroundCmd(getPortForwardCmd(celoEnv, component, ports))
+    childProcess = execBackgroundCmd(await getPortForwardCmd(celoEnv, component, ports))
   } catch (error) {
     console.error(error)
     process.exit(1)

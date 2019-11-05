@@ -49,5 +49,6 @@ docker run -p 30301:30301/udp --name bootnode --net=host -d $GETH_BOOTNODE_DOCKE
   echo $NODE_KEY > /etc/bootnode/node.key && \
   /usr/local/bin/bootnode \
     --nat=extip:${ip_address} \
+    --networkid=${network_id} \
     --nodekey=/etc/bootnode/node.key \
     --verbosity=$BOOTNODE_VERBOSITY"

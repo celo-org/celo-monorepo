@@ -45,6 +45,7 @@
   "sentPayment": "Sent Payment",
   "mobileNumber": "Mobile #",
   "walletAddress": "Wallet Address",
+  "unknown": "Unknown",
   "inviteSMS":
     "Hi{{name}}! I would like to invite you to join the Celo payments network. Your invite code is: {{code}} You can install the Celo application from the following link: {{link}}",
   "inviteSent": "Invite code sent!",
@@ -55,8 +56,11 @@
   "scanCode": "Scan Code",
   "writeStorageNeededForQrDownload":
     "Storage write permission is needed for downloading the QR code",
-  "ScanCodeByPlacingItInTheBox": "Scan code by placing it in the box",
-  "needCameraPermissionToScan": "App needs camera permission to scan QR codes",
+  "cameraScanInfo": "Scan code by placing it in the box",
+  "cameraNotAuthorizedTitle": "Enable Camera",
+  "cameraNotAuthorizedDescription":
+    "Please enable the Camera in your phone’s Settings. You’ll need it to scan QR codes.",
+  "cameraSettings": "Settings",
   "showYourQRCode": "Show your QR code",
   "toSentOrRequestPayment": "to send or request payment",
   "requestSent": "Request Sent",

@@ -12,6 +12,7 @@
     "start": "node ./dist/index.js",
     "start:dev": "tsc-watch --onSuccess \"node ./dist/index.js\" ",
     "build": "tsc -p .",
+    "clean": "rm -rf dist coverage",
     "gcp-build": "npm run build",
     "deploy": "./deploy.sh"
   },

@@ -1,7 +1,9 @@
 import debugFactory from 'debug'
 import { CeloContract } from './base'
+import { newAccounts } from './generated/Accounts'
 import { newAttestations } from './generated/Attestations'
 import { newBlockchainParameters } from './generated/BlockchainParameters'
+import { newElection } from './generated/Election'
 import { newEscrow } from './generated/Escrow'
 import { newExchange } from './generated/Exchange'
 import { newGasCurrencyWhitelist } from './generated/GasCurrencyWhitelist'
@@ -20,8 +22,10 @@ import { ContractKit } from './kit'
 const debug = debugFactory('kit:web3-contract-cache')
 
 const ContractFactories = {
+  [CeloContract.Accounts]: newAccounts,
   [CeloContract.Attestations]: newAttestations,
   [CeloContract.BlockchainParameters]: newBlockchainParameters,
+  [CeloContract.Election]: newElection,
   [CeloContract.Escrow]: newEscrow,
   [CeloContract.Exchange]: newExchange,
   [CeloContract.GasCurrencyWhitelist]: newGasCurrencyWhitelist,
@@ -52,12 +56,17 @@ export class Web3ContractCache {
   private cacheMap: ContractCacheMap = {}
 
   constructor(readonly kit: ContractKit) {}
-
+  getAccounts() {
+    return this.getContract(CeloContract.Accounts)
+  }
   getAttestations() {
     return this.getContract(CeloContract.Attestations)
   }
   getBlockchainParameters() {
     return this.getContract(CeloContract.BlockchainParameters)
+  }
+  getElection() {
+    return this.getContract(CeloContract.Election)
   }
   getEscrow() {
     return this.getContract(CeloContract.Escrow)

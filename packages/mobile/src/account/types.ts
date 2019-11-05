@@ -5,7 +5,7 @@ export enum NotificationTypes {
   PAYMENT_REQUESTED = 'PAYMENT_REQUESTED',
 }
 
-export enum PaymentRequestStatuses {
+export enum PaymentRequestStatus {
   REQUESTED = 'REQUESTED',
   COMPLETED = 'COMPLETED',
   DECLINED = 'DECLINED',
@@ -21,7 +21,7 @@ export interface PaymentRequest {
   requesteeAddress: string
   currency: SHORT_CURRENCIES
   comment: string
-  status: PaymentRequestStatuses
+  status: PaymentRequestStatus
   notified: boolean
   type?: NotificationTypes.PAYMENT_REQUESTED
 }

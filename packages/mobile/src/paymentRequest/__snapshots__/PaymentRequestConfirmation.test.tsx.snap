@@ -1,7 +1,7 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`PaymentRequestConfirmation renders correctly for request payment confirmation 1`] = `
-<View
+<SafeAreaView
   style={
     Object {
       "backgroundColor": "#FFFFFF",
@@ -134,7 +134,7 @@ exports[`PaymentRequestConfirmation renders correctly for request payment confir
                   <Image
                     source={
                       Object {
-                        "testUri": "../../../src/images/unknown-user-icon.png",
+                        "testUri": "../../../packages/mobile/src/images/unknown-user-icon.png",
                       }
                     }
                     style={
@@ -462,6 +462,7 @@ exports[`PaymentRequestConfirmation renders correctly for request payment confir
       >
         <View
           accessible={true}
+          focusable={true}
           isTVSelectable={true}
           nativeBackgroundAndroid={
             Object {
@@ -469,6 +470,7 @@ exports[`PaymentRequestConfirmation renders correctly for request payment confir
               "type": "ThemeAttrAndroid",
             }
           }
+          onClick={[Function]}
           onResponderGrant={[Function]}
           onResponderMove={[Function]}
           onResponderRelease={[Function]}
@@ -550,6 +552,7 @@ exports[`PaymentRequestConfirmation renders correctly for request payment confir
       >
         <View
           accessible={true}
+          focusable={true}
           isTVSelectable={true}
           nativeBackgroundAndroid={
             Object {
@@ -557,6 +560,7 @@ exports[`PaymentRequestConfirmation renders correctly for request payment confir
               "type": "ThemeAttrAndroid",
             }
           }
+          onClick={[Function]}
           onResponderGrant={[Function]}
           onResponderMove={[Function]}
           onResponderRelease={[Function]}
@@ -617,5 +621,5 @@ exports[`PaymentRequestConfirmation renders correctly for request payment confir
       </View>
     </View>
   </View>
-</View>
+</SafeAreaView>
 `;

@@ -57,9 +57,8 @@ export async function getSendFee(
 
 export function* watchQrCodeDetections() {
   while (true) {
-    // TODO(Rossy) this gets called taken multiple times before a user can press the send button
-    // Add de-bouncing logic
     const action = yield take(Actions.BARCODE_DETECTED)
+    Logger.debug(TAG, 'Bar bar detected in watcher')
     const addressToE164Number = yield select(addressToE164NumberSelector)
     const recipientCache = yield select(recipientCacheSelector)
     try {

@@ -2,6 +2,8 @@ import ReviewFrame from '@celo/react-components/components/ReviewFrame'
 import ReviewHeader from '@celo/react-components/components/ReviewHeader'
 import * as React from 'react'
 import { withNamespaces, WithNamespaces } from 'react-i18next'
+import { StyleSheet } from 'react-native'
+import SafeAreaView from 'react-native-safe-area-view'
 import { NavigationInjectedProps } from 'react-navigation'
 import ExchangeConfirmationCard from 'src/exchange/ExchangeConfirmationCard'
 import { navigate, navigateBack } from 'src/navigator/NavigationService'
@@ -75,11 +77,19 @@ class TransactionReviewScreen extends React.PureComponent<Props> {
     const confirmationProps = this.getConfirmationProps()
 
     return (
-      <ReviewFrame HeaderComponent={this.renderHeader} navigateBack={navigateBack}>
-        {this.renderCard(type, confirmationProps)}
-      </ReviewFrame>
+      <SafeAreaView style={styles.container}>
+        <ReviewFrame HeaderComponent={this.renderHeader} navigateBack={navigateBack}>
+          {this.renderCard(type, confirmationProps)}
+        </ReviewFrame>
+      </SafeAreaView>
     )
   }
 }
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+  },
+})
 
 export default withNamespaces()(TransactionReviewScreen)

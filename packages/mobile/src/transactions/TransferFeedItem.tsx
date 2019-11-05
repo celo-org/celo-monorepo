@@ -11,7 +11,11 @@ import { CURRENCIES, CURRENCY_ENUM, resolveCurrency } from 'src/geth/consts'
 import { Namespaces } from 'src/i18n'
 import { AddressToE164NumberType } from 'src/identity/reducer'
 import { Invitees } from 'src/invite/actions'
-import { useDollarsToLocalAmount, useLocalCurrencyCode } from 'src/localCurrency/hooks'
+import {
+  useDollarsToLocalAmount,
+  useLocalCurrencyCode,
+  useLocalCurrencySymbol,
+} from 'src/localCurrency/hooks'
 import { getRecipientFromAddress, NumberToRecipient } from 'src/recipients/recipient'
 import { navigateToPaymentTransferReview } from 'src/transactions/actions'
 import { TransactionStatus, TransactionTypes, TransferStandby } from 'src/transactions/reducer'
@@ -140,12 +144,19 @@ export function TransferFeedItem(props: Props) {
   } = props
 
   const localCurrencyCode = useLocalCurrencyCode()
+  const localCurrencySymbol = useLocalCurrencySymbol()
   const localValue = useDollarsToLocalAmount(value)
   const timeFormatted = formatFeedTime(timestamp, i18n)
   const dateTimeFormatted = getDatetimeDisplayString(timestamp, t, i18n)
   const currency = resolveCurrency(symbol)
   const currencyStyle = getCurrencyStyles(currency, type)
   const isPending = status === TransactionStatus.Pending
+  const transactionValue =
+    type === TransactionTypes.NETWORK_FEE
+      ? getNetworkFeeDisplayValue(props.value)
+      : showLocalCurrency && localCurrencyCode
+        ? getMoneyDisplayValue(localValue || 0)
+        : getMoneyDisplayValue(props.value)
 
   const { title, info, recipient } = getTransferFeedParams(
     type,
@@ -179,42 +190,28 @@ export function TransferFeedItem(props: Props) {
               ]}
             >
               {currencyStyle.direction}
-              {type === TransactionTypes.NETWORK_FEE
-                ? getNetworkFeeDisplayValue(props.value)
-                : getMoneyDisplayValue(props.value)}
+              {showLocalCurrency && localCurrencySymbol}
+              {transactionValue}
+              {showLocalCurrency && localCurrencyCode}
             </Text>
           </View>
           {!!info && <Text style={styles.info}>{info}</Text>}
           <View style={[styles.statusContainer, !!info && styles.statusContainerUnderComment]}>
             {isPending && (
-              <Text style={[fontStyles.bodySmall, styles.transactionStatus]}>
-                <Text style={[fontStyles.bodySmallBold, styles.textPending]}>
-                  {t('confirmingPayment')}
-                </Text>
+              <Text style={styles.transactionStatus}>
+                <Text style={styles.textPending}>{t('confirmingPayment')}</Text>
                 {' ' + timeFormatted}
               </Text>
             )}
             {status === TransactionStatus.Complete && (
-              <Text style={[fontStyles.bodySmall, styles.transactionStatus]}>
-                {dateTimeFormatted}
-              </Text>
+              <Text style={styles.transactionStatus}>{dateTimeFormatted}</Text>
             )}
             {status === TransactionStatus.Failed && (
-              <Text style={[fontStyles.bodySmall, styles.transactionStatus]}>
-                <Text style={fontStyles.linkSmall}>{t('paymentFailed')}</Text>
+              <Text style={styles.transactionStatus}>
+                <Text style={styles.textStatusFailed}>{t('paymentFailed')}</Text>
                 {' ' + timeFormatted}
               </Text>
             )}
-            {showLocalCurrency &&
-              !!localCurrencyCode &&
-              localValue && (
-                <Text style={[fontStyles.bodySmall, styles.localAmount]}>
-                  {t('localCurrencyValue', {
-                    localValue: `${currencyStyle.direction}${getMoneyDisplayValue(localValue)}`,
-                    localCurrencyCode,
-                  })}
-                </Text>
-              )}
           </View>
         </View>
       </View>
@@ -263,12 +260,20 @@ const styles = StyleSheet.create({
     marginTop: 8,
   },
   textPending: {
+    ...fontStyles.bodySmallBold,
     fontSize: 13,
     lineHeight: 18,
     color: colors.celoGreen,
   },
   transactionStatus: {
+    ...fontStyles.bodySmall,
     color: colors.lightGray,
+  },
+  textStatusFailed: {
+    ...fontStyles.semiBold,
+    fontSize: 13,
+    lineHeight: 17,
+    color: colors.darkSecondary,
   },
   localAmount: {
     marginLeft: 'auto',

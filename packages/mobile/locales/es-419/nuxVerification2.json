@@ -14,6 +14,7 @@
   "country": "País",
   "phoneNumber": "Número de teléfono",
   "invalidPhone": "Número de teléfono inválido",
+  "missingFullName": "Por favor ingresa tu nombre completo",
   "allowSmsPermissions": "Permitir que el Monedero Celo envíe y vea mensajes de texto (SMS)",
   "dontAsk": "No volver a preguntar",
   "deny": "Denegar",
@@ -55,5 +56,14 @@
   "errorRedeemingCode": "Error al canjear el código.",
   "pleaseRetry": "Por favor reinicie la verificación.",
   "retryVerification": "Reintentar la verificación",
-  "codeAccepted": "Aceptado"
+  "codeAccepted": "Aceptado",
+  "education": {
+    "header": "~~Verify Your Phone",
+    "body1": "~~Next, please verify your phone number.",
+    "body2":
+      "~~Verifying makes it easier to send and receive with friends. You can also skip this step and return to it later.",
+    "learnMore": "~~Learn more about phone verification",
+    "start": "~~Start Verification",
+    "skip": "~~Skip For Now"
+  }
 }
