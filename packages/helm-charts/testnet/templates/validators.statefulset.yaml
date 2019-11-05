@@ -61,20 +61,56 @@ spec:
             celotooljs.sh generate bip32 --mnemonic "$MNEMONIC" --accountType validator --index $RID > /root/.celo/pkey
             echo 'Generating address'
             celotooljs.sh generate account-address --private-key `cat /root/.celo/pkey` > /root/.celo/address
-            if [ -z $IP_ADDRESSES || "$RID" -lt "{{ .Values.geth.proxiedValidators }}" ]; then
+            echo -n $IP_ADDRESSES | cut -d '/' -f $((RID + 1)) > /root/.celo/externalIpAddress
+
+            if [[ -z $IP_ADDRESSES || "$RID" -lt "{{ .Values.geth.proxiedValidators }}" ]]; then
               echo $POD_IP > /root/.celo/ipAddress
             else
-              echo $IP_ADDRESSES | cut -d '/' -f $((RID + 1)) > /root/.celo/ipAddress
+              cat /root/.celo/externalIpAddress > /root/.celo/ipAddress
             fi
             echo -n "Generating IP address for validator: "
             cat /root/.celo/ipAddress
+
             celotooljs.sh generate public-key --mnemonic "$MNEMONIC" --accountType load_testing --index 0 > /root/.celo/bootnodeEnodeAddress
             echo -n "Generating Bootnode enode address for the validator: "
             cat /root/.celo/bootnodeEnodeAddress
+
             [[ "$BOOTNODE_IP_ADDRESS" == 'none' ]] && BOOTNODE_IP_ADDRESS=${{ .Release.Namespace | upper }}_BOOTNODE_SERVICE_HOST
             echo `cat /root/.celo/bootnodeEnodeAddress`@$BOOTNODE_IP_ADDRESS:30301 > /root/.celo/bootnodeEnode
             echo -n "Generating Bootnode enode for the validator: "
             cat /root/.celo/bootnodeEnode
+
+            if [ "$RID" -lt "{{ .Values.geth.proxiedValidators }}" ]; then
+              SENTRY_INTERNAL_IP_ENV_VAR={{ .Release.Namespace | upper }}_SENTRY_INTERNAL_${RID}_SERVICE_HOST
+              echo "SENTRY_INTERNAL_IP_ENV_VAR=$SENTRY_INTERNAL_IP_ENV_VAR"
+              SENTRY_INTERNAL_IP=`eval "echo \\${${SENTRY_INTERNAL_IP_ENV_VAR}}"`
+
+              # we can't get the external IP of a service from an environment variable,
+              # so we use the IP address that was allocated for this validator that is
+              # being used by the sentry found in /root/.celo/externalIpAddress
+              if [ -s /root/.celo/externalIpAddress ]; then
+                echo -n "Sentry external IP from /root/.celo/externalIpAddress: "
+                SENTRY_EXTERNAL_IP=`cat /root/.celo/externalIpAddress`
+                echo $SENTRY_EXTERNAL_IP
+              else
+                SENTRY_EXTERNAL_IP_ENV_VAR={{ .Release.Namespace | upper }}_SENTRY{{ ternary "" "_INTERNAL" .Values.geth.static_ips }}_${RID}_SERVICE_HOST
+                echo "SENTRY_EXTERNAL_IP_ENV_VAR=$SENTRY_EXTERNAL_IP_ENV_VAR"
+                SENTRY_EXTERNAL_IP=`eval "echo \\${${SENTRY_EXTERNAL_IP_ENV_VAR}}"`
+              fi
+
+              echo "Sentry internal IP: $SENTRY_INTERNAL_IP_ENV_VAR=$SENTRY_INTERNAL_IP"
+              echo "Sentry external IP: $SENTRY_EXTERNAL_IP_ENV_VAR=$SENTRY_EXTERNAL_IP"
+
+              SENTRY_ENODE_ADDRESS=`celotooljs.sh generate public-key --mnemonic "$MNEMONIC" --accountType sentry --index $RID`
+              SENTRY_INTERNAL_ENODE=enode://${SENTRY_ENODE_ADDRESS}@${SENTRY_INTERNAL_IP}:30503
+              SENTRY_EXTERNAL_ENODE=enode://${SENTRY_ENODE_ADDRESS}@${SENTRY_EXTERNAL_IP}:30303
+
+              echo "Sentry internal enode: $SENTRY_INTERNAL_ENODE"
+              echo "Sentry external enode: $SENTRY_EXTERNAL_ENODE"
+
+              echo $SENTRY_INTERNAL_ENODE > /root/.celo/sentryInternalEnode
+              echo $SENTRY_EXTERNAL_ENODE > /root/.celo/sentryExternalEnode
+            fi
         env:
         - name: POD_IP
           valueFrom:
@@ -125,7 +161,8 @@ spec:
 
           FAULTY_NODE_FLAGS=`if [ "$RID" -lt "$FAULTY_NODES" ]; then echo -n "--istanbul.faultymode $FAULTY_NODE_TYPE"; fi`
 
-          PROXIED_FLAGS=`if [ "$RID" -lt "{{ .Values.geth.proxiedValidators }}" ]; then echo -ne "--istanbul.proxied\n--nodiscover"; fi`
+          PROXIED_FLAGS=""
+          [ "$RID" -lt "{{ .Values.geth.proxiedValidators }}" ] && PROXIED_FLAGS="--istanbul.proxied --istanbul.sentries=`cat /root/.celo/sentryInternalEnode`;`cat /root/.celo/sentryInternalEnode` --nodiscover"
 
           PING_IP_FROM_PACKET_FLAG=""
           [[ "$PING_IP_FROM_PACKET" == "true" ]] && PING_IP_FROM_PACKET_FLAG="--ping-ip-from-packet"

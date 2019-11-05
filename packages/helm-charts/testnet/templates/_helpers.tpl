@@ -109,6 +109,7 @@ release: {{ .Release.Name }}
           fieldPath: metadata.namespace
 {{- end -}}
 
+{{- /* This template does not define ports that will be exposed */ -}}
 {{- define "celo.node-service" -}}
 kind: Service
 apiVersion: v1
@@ -203,8 +204,9 @@ spec:
               SERVICE_ENV_VAR_PREFIX={{ .service_ip_env_var_prefix }}
               if [ "$SERVICE_ENV_VAR_PREFIX" ]; then
                 echo "Using ${SERVICE_ENV_VAR_PREFIX}${RID}_SERVICE_HOST:"
-                eval "echo \${${SERVICE_ENV_VAR_PREFIX}${RID}_SERVICE_HOST}"
-                eval "echo \${${SERVICE_ENV_VAR_PREFIX}${RID}_SERVICE_HOST}" > /root/.celo/ipAddress
+                IP_ADDR=`eval "echo \${${SERVICE_ENV_VAR_PREFIX}${RID}_SERVICE_HOST}"`
+                echo $IP_ADDR
+                echo "$IP_ADDR" > /root/.celo/ipAddress
               else
                 echo 'Using POD_IP' $POD_IP
                 echo $POD_IP > /root/.celo/ipAddress
@@ -218,7 +220,7 @@ spec:
 
             echo -n "Generating Bootnode enode address for node: "
             celotooljs.sh generate public-key --mnemonic "$MNEMONIC" --accountType load_testing --index 0 > /root/.celo/bootnodeEnodeAddress
-            
+
             cat /root/.celo/bootnodeEnodeAddress
             [[ "$BOOTNODE_IP_ADDRESS" == 'none' ]] && BOOTNODE_IP_ADDRESS=${{ .Release.Namespace | upper }}_BOOTNODE_SERVICE_HOST
 
