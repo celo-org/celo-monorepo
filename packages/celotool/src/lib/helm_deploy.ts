@@ -566,8 +566,7 @@ async function helmParameters(celoEnv: string) {
       'IN_MEMORY_DISCOVERY_TABLE',
       'false'
     )}`,
-    `--set geth.proxiedValidators=1`,
-    `--set geth.sentries=1`,
+    `--set geth.proxiedValidators=${fetchEnvOrFallback(envVar.PROXIED_VALIDATORS, '0')}`,
     ...productionTagOverrides,
     ...(await helmIPParameters(celoEnv)),
     ...gethAccountParameters,

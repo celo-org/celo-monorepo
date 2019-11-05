@@ -47,14 +47,12 @@ spec:
         volumeMounts:
         - name: data
           mountPath: /etc/bootnode
-        - name: artifacts
-          mountPath: /etc/artifacts
         ports:
         - name: discovery
           containerPort: 30301
           protocol: UDP
       initContainers:
-      - name: genkey
+      - name: generate-node-key
         image: {{ .Values.celotool.image.repository }}:{{ .Values.celotool.image.tag }}
         imagePullPolicy: {{ .Values.imagePullPolicy }}
         command: ["/bin/sh"]
@@ -73,9 +71,6 @@ spec:
       volumes:
       - name: data
         emptyDir: {}
-      - name: artifacts
-        persistentVolumeClaim:
-          claimName: {{ template "ethereum.fullname" . }}-artifacts-pvc
     {{- with .Values.nodeSelector }}
       nodeSelector:
 {{ toYaml . | indent 8 }}

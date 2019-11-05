@@ -61,7 +61,7 @@ spec:
             celotooljs.sh generate bip32 --mnemonic "$MNEMONIC" --accountType validator --index $RID > /root/.celo/pkey
             echo 'Generating address'
             celotooljs.sh generate account-address --private-key `cat /root/.celo/pkey` > /root/.celo/address
-            if [ -z $IP_ADDRESSES ]; then
+            if [ -z $IP_ADDRESSES || "$RID" -lt "{{ .Values.geth.proxiedValidators }}" ]; then
               echo $POD_IP > /root/.celo/ipAddress
             else
               echo $IP_ADDRESSES | cut -d '/' -f $((RID + 1)) > /root/.celo/ipAddress

@@ -1,6 +1,8 @@
-{{ if and (not (eq (.Values.geth.validators | toString) "og")) .Values.geth.static_ips }}
+{{ if .Values.geth.static_ips }}
 
 {{ range $index, $e := until (.Values.geth.validators | int) }}
+
+{{ if (ge $index ($.Values.geth.proxiedValidators | int)) }}
 
 {{ $loadBalancerIP := index $.Values.geth (print "validators_" $index "IpAddress") }}
 
@@ -17,5 +19,5 @@
     protocol: TCP
 ---
 {{ end }}
-
+{{ end }}
 {{ end }}

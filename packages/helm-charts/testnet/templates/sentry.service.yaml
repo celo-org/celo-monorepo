@@ -11,12 +11,14 @@
   - name: internal-udp
     port: 30503
     protocol: UDP
+{{ if not $.Values.geth.static_ips }}
   - name: external-tcp
     port: 30303
     protocol: TCP
   - name: external-udp
     port: 30303
     protocol: UDP
+{{ end }}
 ---
 {{ if $.Values.geth.static_ips }}
 {{ $loadBalancerIP := index $.Values.geth (print "validators_" $index "IpAddress") }}
