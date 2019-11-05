@@ -10,7 +10,7 @@ interface ExchangeRateApiResult {
   date: string
 }
 
-// TTL in seconds!
+// ttl in seconds!
 const MIN_TTL = 12 * 3600 // 12 hours
 
 export class CurrencyConversionAPI extends RESTDataSource {
@@ -43,8 +43,6 @@ export class CurrencyConversionAPI extends RESTDataSource {
     console.debug('Querying exchange rate', currencyCode, date)
     const path = `/historical`
     const params = {
-      // base: 'USD',
-      // symbols: currencyCode,
       access_key: EXCHANGE_RATES_API_ACCESS_KEY,
       date: formatDateString(date),
     }
