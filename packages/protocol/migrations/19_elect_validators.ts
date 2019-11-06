@@ -131,6 +131,14 @@ async function registerValidator(
   })
 
   // @ts-ignore
+  const setMetadataURLTx = accounts.contract.methods.setMetadataURL(
+    'http://localhost/metadata.json'
+  )
+  await sendTransactionWithPrivateKey(web3, setMetadataURLTx, validatorPrivateKey, {
+    to: accounts.address,
+  })
+
+  // @ts-ignore
   const registerTx = validators.contract.methods.registerValidator(add0x(publicKeysData))
 
   await sendTransactionWithPrivateKey(web3, registerTx, validatorPrivateKey, {

@@ -5325,6 +5325,19 @@
   resolved "https://registry.yarnpkg.com/@types/p-defer/-/p-defer-1.0.3.tgz#786ce79c86f779fcd9e9bec4f1fbd1167aeac064"
   integrity sha512-0CK39nXek0mSZL/lnGYjhcR1QLAxg9N0/5S1BvU+MQwjlP4Jd2ebbEkJ/bEUqYMAvKLMZcGd4sJE13dnUKlDnQ==
 
+"@types/pg-types@*":
+  version "1.11.5"
+  resolved "https://registry.yarnpkg.com/@types/pg-types/-/pg-types-1.11.5.tgz#1eebbe62b6772fcc75c18957a90f933d155e005b"
+  integrity sha512-L8ogeT6vDzT1vxlW3KITTCt+BVXXVkLXfZ/XNm6UqbcJgxf+KPO7yjWx7dQQE8RW07KopL10x2gNMs41+IkMGQ==
+
+"@types/pg@^7.12.1":
+  version "7.11.2"
+  resolved "https://registry.yarnpkg.com/@types/pg/-/pg-7.11.2.tgz#199dec09426c9359574dedede37313805ba3fca2"
+  integrity sha512-4+rj7fnidA77jFURNanuPPc1HrQv+RkhI6s+K18G9zOKbOUUpChA/rbNMqFukNuZ89LoIt/I9dAlxf329TjCNw==
+  dependencies:
+    "@types/node" "*"
+    "@types/pg-types" "*"
+
 "@types/prettier@1.15.2":
   version "1.15.2"
   resolved "https://registry.yarnpkg.com/@types/prettier/-/prettier-1.15.2.tgz#91594ea7cb6f3b1f7ea69f32621246654c7cc231"
@@ -15659,6 +15672,16 @@ gaxios@^1.0.2, gaxios@^1.0.4, gaxios@^1.2.1:
     https-proxy-agent "^2.2.1"
     node-fetch "^2.2.0"
 
+gaxios@^1.2.2:
+  version "1.8.4"
+  resolved "https://registry.yarnpkg.com/gaxios/-/gaxios-1.8.4.tgz#e08c34fe93c0a9b67a52b7b9e7a64e6435f9a339"
+  integrity sha512-BoENMnu1Gav18HcpV9IleMPZ9exM+AvUjrAOV4Mzs/vfz2Lu/ABv451iEXByKiMPn2M140uul1txXCg83sAENw==
+  dependencies:
+    abort-controller "^3.0.0"
+    extend "^3.0.2"
+    https-proxy-agent "^2.2.1"
+    node-fetch "^2.3.0"
+
 gaxios@^1.5.0:
   version "1.8.2"
   resolved "https://registry.yarnpkg.com/gaxios/-/gaxios-1.8.2.tgz#8bc29dab0f5e296cada2c9d3ebbd0857410df15f"
@@ -16632,6 +16655,26 @@ google-proto-files@^0.20.0:
     "@google-cloud/promisify" "^0.4.0"
     protobufjs "^6.8.0"
     walkdir "^0.3.0"
+
+googleapis-common@^0.7.0:
+  version "0.7.2"
+  resolved "https://registry.yarnpkg.com/googleapis-common/-/googleapis-common-0.7.2.tgz#a694f55d979cb7c2eac21a0e0439af12f9b418ba"
+  integrity sha512-9DEJIiO4nS7nw0VE1YVkEfXEj8x8MxsuB+yZIpOBULFSN9OIKcUU8UuKgSZFU4lJmRioMfngktrbkMwWJcUhQg==
+  dependencies:
+    gaxios "^1.2.2"
+    google-auth-library "^3.0.0"
+    pify "^4.0.0"
+    qs "^6.5.2"
+    url-template "^2.0.8"
+    uuid "^3.2.1"
+
+googleapis@^39.2.0:
+  version "39.2.0"
+  resolved "https://registry.yarnpkg.com/googleapis/-/googleapis-39.2.0.tgz#5c81f721e9da2e80cb0b25821ed60d3bc200c3da"
+  integrity sha512-66X8TG1B33zAt177sG1CoKoYHPP/B66tEpnnSANGCqotMuY5gqSQO8G/0gqHZR2jRgc5CHSSNOJCnpI0SuDxMQ==
+  dependencies:
+    google-auth-library "^3.0.0"
+    googleapis-common "^0.7.0"
 
 got@7.1.0, got@^7.1.0:
   version "7.1.0"
@@ -25066,7 +25109,7 @@ pg-types@^2.1.0:
     postgres-date "~1.0.4"
     postgres-interval "^1.1.0"
 
-pg@7.12.1:
+pg@7.12.1, pg@^7.12.1:
   version "7.12.1"
   resolved "https://registry.yarnpkg.com/pg/-/pg-7.12.1.tgz#880636d46d2efbe0968e64e9fe0eeece8ef72a7e"
   integrity sha512-l1UuyfEvoswYfcUe6k+JaxiN+5vkOgYcVSbSuw3FvdLqDbaoa2RJo1zfJKfPsSYPFVERd4GHvX3s2PjG1asSDA==
@@ -26115,6 +26158,11 @@ qs@6.7.0, qs@^6.5.0:
   resolved "https://registry.yarnpkg.com/qs/-/qs-6.7.0.tgz#41dc1a015e3d581f1621776be31afb2876a9b1bc"
   integrity sha512-VCdBRNFTX1fyE7Nb6FYoURo/SPe62QCaAyzJvUjwRaIsc+NePBEniHlvxFmmX56+HZphIGtV0XeCirBtpDrTyQ==
 
+qs@^6.5.2:
+  version "6.9.0"
+  resolved "https://registry.yarnpkg.com/qs/-/qs-6.9.0.tgz#d1297e2a049c53119cb49cca366adbbacc80b409"
+  integrity sha512-27RP4UotQORTpmNQDX8BHPukOnBP3p1uUJY5UnDhaJB+rMt9iMsok724XL+UHU23bEFOHRMQ2ZhI99qOWUMGFA==
+
 qs@~6.2.0:
   version "6.2.3"
   resolved "https://registry.yarnpkg.com/qs/-/qs-6.2.3.tgz#1cfcb25c10a9b2b483053ff39f5dfc9233908cfe"
@@ -26795,6 +26843,11 @@ react-native-share@^2.0.0:
   resolved "https://registry.yarnpkg.com/react-native-share/-/react-native-share-2.0.0.tgz#4543a746013e0d8fa9f765fb8937007cfbcffcf7"
   integrity sha512-J8Xl3mq0L9KDFtSYtKsQDAnZWw/niZIpAD1PRiNfZFHo44Rc+oS2bEIhskNnoQXKEgBNdPzCl/DenMXYAHXRYg==
 
+react-native-sms@^1.9.0:
+  version "1.9.0"
+  resolved "https://registry.yarnpkg.com/react-native-sms/-/react-native-sms-1.9.0.tgz#362d94f75664d45144433d820155d9da66adf053"
+  integrity sha512-qq5v5rClCSMwTZL5TAK3P89SOQFrBwa6LyqCQV1Md0p78cS+DQWTX/wnb1H8gH32gDzr7barKTEXZPN7lZ5fCA==
+
 react-native-snap-carousel@^3.8.4:
   version "3.8.4"
   resolved "https://registry.yarnpkg.com/react-native-snap-carousel/-/react-native-snap-carousel-3.8.4.tgz#4c749c6a714d46ed82de527233850cb5da41bc62"
@@ -26802,11 +26855,6 @@ react-native-snap-carousel@^3.8.4:
   dependencies:
     prop-types "^15.6.1"
     react-addons-shallow-compare "15.6.2"
-    
-react-native-sms@^1.9.0:
-  version "1.9.0"
-  resolved "https://registry.yarnpkg.com/react-native-sms/-/react-native-sms-1.9.0.tgz#362d94f75664d45144433d820155d9da66adf053"
-  integrity sha512-qq5v5rClCSMwTZL5TAK3P89SOQFrBwa6LyqCQV1Md0p78cS+DQWTX/wnb1H8gH32gDzr7barKTEXZPN7lZ5fCA==
 
 react-native-splash-screen@^3.2.0:
   version "3.2.0"
