@@ -7,7 +7,7 @@ function getSecrets(deployEnv: string) {
   try {
     return require('./secrets.json')[deployEnv]
   } catch {
-    // Secrets are only available on trusted environments
+    // Secrets are only available in trusted environments
   }
 
   return {}
