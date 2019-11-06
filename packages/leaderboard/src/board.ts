@@ -32,15 +32,15 @@ CREATE TABLE exchange_rates (
   rate REAL
 );
 
-CREATE type json_type AS (address bytea, multiplier real);
-CREATE type json_assoc AS (address bytea, claim_address bytea);
+CREATE type json_type AS (address char(40), multiplier real);
+CREATE type json_assoc AS (address char(40), claim_address char(40));
 CREATE type json_rate AS (token bytea, rate real);
 
 */
 
 function addressToBinary(a: string) {
   try {
-    if (a.substr(0, 2) == '0x') return Buffer.from(a.substr(2), 'hex')
+    if (a.substr(0, 2) == '0x') return a.substr(2)
     else return a
   } catch (_err) {
     return a
@@ -51,7 +51,8 @@ async function updateDB(lst: any[][]) {
   const client = new Client({ database: 'blockscout' })
   await client.connect()
   const res = await client.query(
-    'INSERT INTO competitors (address, multiplier) SELECT m.* FROM json_populate_recordset(null::json_type, $1) AS m' +
+    'INSERT INTO competitors (address, multiplier)' +
+      " SELECT decode(m.address, 'hex') AS address, m.multiplier FROM json_populate_recordset(null::json_type, $1) AS m" +
       ' ON CONFLICT ON CONSTRAINT competitors_pkey DO UPDATE SET multiplier = EXCLUDED.multiplier RETURNING *',
     [
       JSON.stringify(
@@ -90,7 +91,8 @@ async function processClaims(address: string, data: string) {
     const client = new Client({ database: 'blockscout' })
     await client.connect()
     const res = await client.query(
-      'INSERT INTO claims (address, claim_address) SELECT m.* FROM json_populate_recordset(null::json_assoc, $1) AS m' +
+      'INSERT INTO claims (address, claim_address)' +
+        " SELECT decode(m.address,'hex'), decode(m.claim_address,'hex') FROM json_populate_recordset(null::json_assoc, $1) AS m" +
         ' ON CONFLICT ON CONSTRAINT claims_assoc DO NOTHING RETURNING *',
       [
         JSON.stringify(
