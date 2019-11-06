@@ -2,6 +2,7 @@ import * as yargs from 'yargs'
 import { InitialArgv } from '../../deploy/initial'
 import { switchToClusterFromEnv } from 'src/lib/cluster'
 import { getBlockscoutUrl } from 'src/lib/endpoints'
+import { portForwardAnd } from 'src/lib/port_forward'
 import { execCmd } from 'src/lib/utils'
 
 export const command = 'verify-contracts'
@@ -34,10 +35,12 @@ export const handler = async (argv: VerifyContractsInitialArgv) => {
 
   console.log(`Validating smart contracts from ${argv.celoEnv} in ${blockscoutUrl}`)
 
+  const cb = async () => {
+    await execCmd(`yarn --cwd ../protocol run verify -n ${argv.celoEnv} -b ${blockscoutUrl}`)
+  }
+
   try {
-    await execCmd(
-      `yarn --cwd ../protocol run verify -n ${argv.celoEnv} -b ${blockscoutUrl} -c ${argv.contract}`
-    )
+    await portForwardAnd(argv.celoEnv, cb)
     process.exit(0)
   } catch (error) {
     console.error(`Unable to verify contracts from ${argv.celoEnv} in ${blockscoutUrl}`)
