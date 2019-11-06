@@ -6,7 +6,6 @@ import { Image, StyleSheet, View } from 'react-native'
 import { connect } from 'react-redux'
 import CeloAnalytics from 'src/analytics/CeloAnalytics'
 import { CustomEventNames } from 'src/analytics/constants'
-import { componentWithAnalytics } from 'src/analytics/wrapper'
 import { EscrowedPayment } from 'src/escrow/actions'
 import EscrowedPaymentLineItem from 'src/escrow/EscrowedPaymentLineItem'
 import { Namespaces } from 'src/i18n'
@@ -19,14 +18,7 @@ interface OwnProps {
   payments: EscrowedPayment[]
 }
 
-interface StateProps {
-  test: boolean
-}
-const mapStateToProps = (state: RootState): StateProps => ({
-  test: false,
-})
-
-type Props = OwnProps & WithNamespaces & StateProps
+type Props = OwnProps & WithNamespaces
 
 const PREVIEW_SIZE = 2
 
@@ -91,8 +83,6 @@ const styles = StyleSheet.create({
   },
 })
 
-export default componentWithAnalytics(
-  connect<StateProps, {}, {}, RootState>(mapStateToProps)(
-    withNamespaces(Namespaces.walletFlow5)(EscrowedPaymentReminderSummaryNotification)
-  )
+export default connect<{}, {}, {}, RootState>(null)(
+  withNamespaces(Namespaces.walletFlow5)(EscrowedPaymentReminderSummaryNotification)
 )

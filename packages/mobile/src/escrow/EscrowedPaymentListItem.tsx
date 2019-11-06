@@ -6,6 +6,7 @@ import SendIntentAndroid from 'react-native-send-intent'
 import CeloAnalytics from 'src/analytics/CeloAnalytics'
 import { CustomEventNames } from 'src/analytics/constants'
 import { componentWithAnalytics } from 'src/analytics/wrapper'
+import { ErrorMessages } from 'src/app/ErrorMessages'
 import { EscrowedPayment } from 'src/escrow/actions'
 import { Namespaces } from 'src/i18n'
 import { inviteFriendsIcon } from 'src/images/Images'
@@ -21,6 +22,8 @@ interface OwnProps {
 
 type Props = OwnProps & WithNamespaces
 
+const TAG = 'EscrowedPaymentListItem'
+
 export class EscrowedPaymentListItem extends React.PureComponent<Props> {
   onSendMessage = () => {
     const { payment, t } = this.props
@@ -34,14 +37,9 @@ export class EscrowedPaymentListItem extends React.PureComponent<Props> {
         // TODO look into using MFMessageComposeViewController to prefill the body for iOS
         navigateToURI(`sms:${recipientPhoneNumber}`)
       }
-    } catch {
-      Logger.showError(t('SMSError'))
-      Logger.error(
-        'EscrowedPaymentListItem/',
-        t('SMSErrorDetails', {
-          recipientNumber: recipientPhoneNumber,
-        })
-      )
+    } catch (error) {
+      Logger.showError(ErrorMessages.SMS_ERROR)
+      Logger.error(TAG, `Error sending SMS to ${recipientPhoneNumber}`, error)
     }
   }
   onReclaimPayment = () => {

@@ -26,7 +26,7 @@ const { contentPadding } = variables
 
 interface StateProps {
   dollarBalance: string | null
-  sentEscrowPayments: EscrowedPayment[]
+  sentEscrowedPayments: EscrowedPayment[]
   e164PhoneNumberAddressMapping: E164NumberToAddressType
   recipientCache: NumberToRecipient
 }
@@ -38,7 +38,7 @@ interface DispatchProps {
 
 const mapStateToProps = (state: RootState): StateProps => ({
   dollarBalance: state.stableToken.balance,
-  sentEscrowPayments: getReclaimableEscrowPayments(state.escrow.sentEscrowedPayments),
+  sentEscrowedPayments: getReclaimableEscrowPayments(state.escrow.sentEscrowedPayments),
   e164PhoneNumberAddressMapping: e164NumberToAddressSelector(state),
   recipientCache: recipientCacheSelector(state),
 })
@@ -66,10 +66,10 @@ export class EscrowedPaymentListScreen extends React.Component<Props> {
         <DisconnectBanner />
         <PaymentRequestBalance dollarBalance={this.props.dollarBalance} />
         <SectionHeader text={this.props.t('payments')} />
-        {this.props.sentEscrowPayments.length > 0 ? (
+        {this.props.sentEscrowedPayments.length > 0 ? (
           <ScrollView>
             <View style={[componentStyles.roundedBorder, styles.scrollArea]}>
-              {this.props.sentEscrowPayments.map(this.renderRequest)}
+              {this.props.sentEscrowedPayments.map(this.renderRequest)}
             </View>
           </ScrollView>
         ) : (
