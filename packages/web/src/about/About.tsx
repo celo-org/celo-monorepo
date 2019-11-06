@@ -15,6 +15,7 @@ import { ScreenProps, ScreenSizes, withScreenSize } from 'src/layout/ScreenSize'
 import LogoLightBg from 'src/logos/LogoLightBg'
 import menuItems from 'src/shared/menu-items'
 import { fonts, standardStyles, textStyles } from 'src/styles'
+import Button, { BTN } from 'src/shared/Button.3'
 
 interface Props {
   randomSeed: number
@@ -66,10 +67,7 @@ export class About extends React.Component<Props & I18nProps> {
             </H1>
             <Text style={[fonts.p, standardStyles.elementalMargin]}>{t('MeaningCopy')}</Text>
           </BookLayout>
-          <BeautifulQuote />
-          <BookLayout label={t('SacredEconTitle')} startBlock={true}>
-            <H1>{t('SacredEconText')}</H1>
-          </BookLayout>
+          <Image source={team} style={styles.teamImage} resizeMode={'cover'} />
           <BookLayout label={t('ValuesTitle')}>
             <H1>{t('ValuesText')}</H1>
             <Text style={[fonts.p, standardStyles.elementalMargin]}>
@@ -77,7 +75,28 @@ export class About extends React.Component<Props & I18nProps> {
             </Text>
           </BookLayout>
           <CeloValues />
-          <Image source={team} style={styles.teamImage} resizeMode={'cover'} />
+          <BeautifulQuote />
+          <BookLayout label={t('SacredEconTitle')} startBlock={true}>
+            <Text style={[fonts.p, standardStyles.blockMarginBottomTablet]}>
+              {t('SacredEconText')}
+            </Text>
+            <Button
+              kind={BTN.PRIMARY}
+              href="http://sacred-economics.com/film/"
+              text={t('learnMore')}
+            />
+          </BookLayout>
+          <BookLayout label={t('theoryOfChangeTitle')} startBlock={true}>
+            <Text style={[fonts.p, standardStyles.blockMarginBottomTablet]}>
+              {t('theoryOfChangeText')}
+            </Text>
+            <Button
+              kind={BTN.PRIMARY}
+              href="https://medium.com/celohq/celos-theory-of-change-b916de44945d"
+              text={t('learnMore')}
+            />
+          </BookLayout>
+
           <Team randomSeed={randomSeed} />
           <Backers />
           <PressMedia />

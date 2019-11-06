@@ -34,7 +34,7 @@ function Values({ t, screen }: I18nProps & ScreenProps) {
       >
         <Cell span={Spans.half}>
           <View style={isMobile ? styles.circleMobile : styles.circleDesktop}>
-            <FullCircle lightBackground={true} />
+            <FullCircle lightBackground={true} stillMode={true} />
           </View>
         </Cell>
         <Cell span={Spans.half} style={{ justifyContent: 'center' }}>
