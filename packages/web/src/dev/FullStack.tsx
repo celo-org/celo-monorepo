@@ -72,7 +72,7 @@ class FullStack extends React.PureComponent<I18nProps & ScreenProps, State> {
     }
   }, 24)
 
-  setL3 = () => {
+  setL1 = () => {
     this.setState({ selection: Levels.apps })
   }
 
@@ -80,7 +80,7 @@ class FullStack extends React.PureComponent<I18nProps & ScreenProps, State> {
     this.setState({ selection: Levels.contracts })
   }
 
-  setL1 = () => {
+  setL3 = () => {
     this.setState({ selection: Levels.blockchains })
   }
 
@@ -116,11 +116,11 @@ class FullStack extends React.PureComponent<I18nProps & ScreenProps, State> {
       if (clientRect.bottom - illoHeight - partial + GLASS_CEILING < 0) {
         this.setCode()
       } else if (shouldTurnOnLevelOne) {
-        this.setL1()
+        this.setL3()
       } else if (highestOffScreen) {
         this.setL2()
       } else {
-        this.setL3()
+        this.setL1()
       }
     })
   }

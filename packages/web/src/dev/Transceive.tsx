@@ -74,7 +74,7 @@ const styles = StyleSheet.create({
   animate: {
     animationDuration: `${DURATION}ms`,
     animationFillMode: 'both',
-    animationIterationCount: '1',
+    animationIterationCount: 1,
     animationTimingFunction: 'linear',
   },
   solidify: {

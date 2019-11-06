@@ -1,5 +1,6 @@
 import { I18nProps } from 'next-i18next'
 import * as React from 'react'
+import Fade from 'react-reveal/Fade'
 import { Image, ImageSourcePropType, StyleSheet, Text, View } from 'react-native'
 import { H2, H3, H4 } from 'src/fonts/Fonts'
 import { NameSpaces, withNamespaces } from 'src/i18n'
@@ -110,13 +111,15 @@ const Engage = React.memo(function _Engage({ t, screen }: I18nProps & ScreenProp
               screen === ScreenSizes.MOBILE && standardStyles.blockMarginMobile,
             ]}
           >
-            <AspectRatio ratio={248 / 286} style={styles.cakeContainer}>
-              <Image
-                source={require('src/dev/cakeProtector.png')}
-                style={styles.graphic}
-                resizeMode="contain"
-              />
-            </AspectRatio>
+            <Fade fraction={0.5} bottom={true} distance={'10px'}>
+              <AspectRatio ratio={248 / 286} style={styles.cakeContainer}>
+                <Image
+                  source={require('src/dev/cakeProtector.png')}
+                  style={styles.graphic}
+                  resizeMode="contain"
+                />
+              </AspectRatio>
+            </Fade>
             <H4 style={standardStyles.elementalMarginTop}>{t('engage.secure.title')}</H4>
             <Text style={[fonts.p, standardStyles.elementalMarginBottom]}>
               {t('engage.secure.copy')}
@@ -132,13 +135,17 @@ const Engage = React.memo(function _Engage({ t, screen }: I18nProps & ScreenProp
               screen === ScreenSizes.MOBILE && standardStyles.blockMarginMobile,
             ]}
           >
-            <AspectRatio ratio={248 / 286} style={styles.cakeContainer}>
-              <Image
-                source={require('src/dev/cakeProtector.png')}
-                style={styles.graphic}
-                resizeMode="contain"
-              />
-            </AspectRatio>
+            <Fade fraction={0.5} bottom={true} distance={'10px'}>
+              <AspectRatio ratio={248 / 286} style={styles.cakeContainer}>
+                <Image
+                  source={require('src/dev/cakeProtector.png')}
+                  style={styles.graphic}
+                  resizeMode="contain"
+                />
+              </AspectRatio>
+              ) }}
+            </Fade>
+
             <H4 style={standardStyles.elementalMarginTop}>{t('engage.improve.title')}</H4>
             <Text style={[fonts.p, standardStyles.elementalMarginBottom]}>
               {t('engage.improve.copy')}
@@ -169,13 +176,15 @@ const Content = React.memo(function _Content(props: ContentProps) {
       <H3 style={standardStyles.elementalMarginBottom}>{props.noun}</H3>
       <H4 style={standardStyles.elementalMarginBottom}>{props.verb}</H4>
       <Text style={fonts.h5}>{props.network}</Text>
-      <AspectRatio style={styles.graphicContainer} ratio={290 / 225}>
-        <Image
-          style={styles.graphic}
-          source={require('src/dev/cakeLayering.jpg')}
-          resizeMode="contain"
-        />
-      </AspectRatio>
+      <Fade fraction={0.5} bottom={true} distance={'10px'}>
+        <AspectRatio style={styles.graphicContainer} ratio={290 / 225}>
+          <Image
+            style={styles.graphic}
+            source={require('src/dev/cakeLayering.jpg')}
+            resizeMode="contain"
+          />
+        </AspectRatio>
+      </Fade>
       <Text style={[fonts.p]}>{props.caption}</Text>
       <View style={[standardStyles.row, standardStyles.elementalMarginTop, styles.buttons]}>
         <View style={styles.primaryButtonContainer}>
@@ -227,9 +236,11 @@ const Aside = React.memo(function _Aside({
       ]}
     >
       <View style={styles.asideFrame}>
-        <AspectRatio style={styles.asideGraphic} ratio={1}>
-          <Image source={image} style={styles.graphic} />
-        </AspectRatio>
+        <Fade fraction={0.5} bottom={true} distance={'10px'}>
+          <AspectRatio style={styles.asideGraphic} ratio={1}>
+            <Image source={image} style={styles.graphic} />
+          </AspectRatio>
+        </Fade>
       </View>
       <View style={[styles.asideContent, isMobile && styles.asideContentMobile]}>
         <Text style={fonts.h5}>{title}</Text>

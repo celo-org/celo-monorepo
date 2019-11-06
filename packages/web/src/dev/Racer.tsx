@@ -87,7 +87,7 @@ const styles = StyleSheet.create({
   animatable: {
     animationDuration: '2s',
     animationDelay: '100ms',
-    animationIterationCount: '1',
+    animationIterationCount: 1,
     // animationTimingFunction: 'ease-in',
     animationFillMode: 'both',
   },
