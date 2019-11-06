@@ -31,6 +31,7 @@ export const parseSolidityStringArray = (stringLengths: number[], data: string) 
   let offset = 0
   // @ts-ignore
   const rawData = Buffer.from(data.slice(2), 'hex')
+  // tslint:disable-next-line:prefer-for-of
   for (let i = 0; i < stringLengths.length; i++) {
     const string = rawData.toString('utf-8', offset, offset + stringLengths[i])
     offset += stringLengths[i]

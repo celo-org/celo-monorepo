@@ -20,8 +20,7 @@ export function zip3<A, B, C>(as: A[], bs: B[], cs: C[]) {
 
 export function compact<A>(as: Array<A | null>): A[] {
   const res: A[] = []
-  for (let i = 0; i < as.length; i++) {
-    const elem = as[i]
+  for (const elem of as) {
     if (elem !== null) {
       res.push(elem)
     }
