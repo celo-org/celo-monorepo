@@ -1,4 +1,4 @@
-import { ContractKit, newKitFromWeb3 } from '@celo/contractkit'
+import { ContractKit, newKitFromWeb3, CeloContract } from '@celo/contractkit'
 import { AccountsWrapper } from '@celo/contractkit/lib/wrappers/Accounts'
 import Web3 from 'web3'
 import http from 'http'
@@ -24,14 +24,28 @@ CREATE TABLE competitors (
 CREATE TABLE claims (
   address BYTEA,
   claim_address BYTEA,
-  CONSTRAINT assoc PRIMARY KEY(address, claim_address)
-)
+  CONSTRAINT claims_assoc PRIMARY KEY(address, claim_address)
+);
+
+CREATE TABLE exchange_rates (
+  token BYTEA PRIMARY KEY,
+  rate REAL
+);
 
 CREATE type json_type AS (address bytea, multiplier real);
-
 CREATE type json_assoc AS (address bytea, claim_address bytea);
+CREATE type json_rate AS (token bytea, rate real);
 
 */
+
+function addressToBinary(a: string) {
+  try {
+    if (a.substr(0, 2) == '0x') return Buffer.from(a.substr(2), 'hex')
+    else return a
+  } catch (_err) {
+    return a
+  }
+}
 
 async function updateDB(lst: any[][]) {
   const client = new Client({ database: 'blockscout' })
@@ -42,7 +56,7 @@ async function updateDB(lst: any[][]) {
     [
       JSON.stringify(
         lst.map((a) => {
-          return { address: a[0], multiplier: a[1] }
+          return { address: addressToBinary(a[0]), multiplier: a[1] }
         })
       ),
     ]
@@ -52,22 +66,47 @@ async function updateDB(lst: any[][]) {
   await readAssoc(lst.map((a) => a[0].toString()))
 }
 
-async function processClaims(address: string, lst: string[]) {
+async function updateRate(kit: ContractKit) {
   const client = new Client({ database: 'blockscout' })
   await client.connect()
+  const token = await kit.contracts.getStableToken()
+  const oracle = await kit.contracts.getSortedOracles()
+  const rate = await oracle.medianRate(CeloContract.StableToken)
+
+  console.log(token.address)
+
   const res = await client.query(
-    'INSERT INTO claims (address, claim_address) SELECT m.* FROM json_populate_recordset(null::json_type, $1) AS m' +
-      ' ON CONFLICT ON CONSTRAINT claims_assoc DO NOTHING RETURNING *',
-    [
-      JSON.stringify(
-        lst.map((a) => {
-          return { address, claim_address: a }
-        })
-      ),
-    ]
+    'INSERT INTO exchange_rates (token, rate) VALUES ($1, $2)' +
+      ' ON CONFLICT ON CONSTRAINT exchange_rates_pkey DO UPDATE SET rate = EXCLUDED.rate RETURNING *',
+    [Buffer.from(token.address.substr(2), 'hex'), rate.rate.toNumber()]
   )
   console.log(res.rows)
   await client.end()
+}
+
+async function processClaims(address: string, data: string) {
+  try {
+    const lst: string[] = JSON.parse(data).claims
+    const client = new Client({ database: 'blockscout' })
+    await client.connect()
+    const res = await client.query(
+      'INSERT INTO claims (address, claim_address) SELECT m.* FROM json_populate_recordset(null::json_assoc, $1) AS m' +
+        ' ON CONFLICT ON CONSTRAINT claims_assoc DO NOTHING RETURNING *',
+      [
+        JSON.stringify(
+          lst.map((a) => {
+            const res = { address: addressToBinary(address), claim_address: addressToBinary(a) }
+            console.log(res)
+            return res
+          })
+        ),
+      ]
+    )
+    console.log(res.rows)
+    await client.end()
+  } catch (err) {
+    console.error('Cannot process claims', err)
+  }
 }
 
 readSheet()
@@ -154,18 +193,23 @@ function getInfo(auth: any) {
 async function readAssoc(lst: string[]) {
   const web3 = new Web3('http://localhost:8545')
   const kit: ContractKit = newKitFromWeb3(web3)
+  updateRate(kit)
   const accounts: AccountsWrapper = await kit.contracts.getAccounts()
-  async function getFromUrl(a: string, url: string) {
+  function getFromUrl(a: string, url: string) {
     http
       .get(url, (resp) => {
         let data = ''
         resp.on('data', (chunk) => (data += chunk))
-        resp.on('end', () => processClaims(a, JSON.parse(data).claims))
+        resp.on('end', () => processClaims(a, data))
       })
       .on('error', (err) => console.log('Error: ' + err.message))
   }
   lst.forEach(async (a) => {
-    const url = await accounts.getMetadataURL(a)
-    getFromUrl(a, url)
+    try {
+      const url = await accounts.getMetadataURL(a)
+      getFromUrl(a, url)
+    } catch (err) {
+      console.error('Bad address', a, err.toString())
+    }
   })
 }
