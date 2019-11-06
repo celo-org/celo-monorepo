@@ -13,77 +13,77 @@ import { ScrollView, StyleSheet, Text, View } from 'react-native'
 import Modal from 'react-native-modal'
 import SafeAreaView from 'react-native-safe-area-view'
 import { connect } from 'react-redux'
-import { hideAlert, showError } from 'src/alert/actions'
-import { errorSelector } from 'src/alert/reducer'
 import componentWithAnalytics from 'src/analytics/wrapper'
-import { ErrorMessages } from 'src/app/ErrorMessages'
 import DevSkipButton from 'src/components/DevSkipButton'
 import { Namespaces } from 'src/i18n'
 import LoadingSpinner from 'src/icons/LoadingSpinner'
-import {
-  cancelVerification,
-  receiveAttestationMessage,
-  startVerification,
-} from 'src/identity/actions'
-import { AttestationCode } from 'src/identity/verification'
+import { cancelVerification, receiveAttestationMessage } from 'src/identity/actions'
+import { AttestationCode, VerificationStatus } from 'src/identity/verification'
 import { navigate } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
 import { RootState } from 'src/redux/reducers'
-import { currentAccountSelector } from 'src/web3/selectors'
 
 const CodeInput = withTextInputPasteAware(TextInput)
 
 interface StateProps {
-  numberVerified: boolean
   e164Number: string
-  account: string | null
   attestationCodes: AttestationCode[]
   numCompleteAttestations: number
-  verificationFailed: boolean
-  underlyingError: ErrorMessages | null | undefined
+  verificationStatus: VerificationStatus
 }
 
 interface DispatchProps {
-  startVerification: typeof startVerification
   cancelVerification: typeof cancelVerification
-  receiveVerificationMessage: typeof receiveAttestationMessage
-  showError: typeof showError
-  hideAlert: typeof hideAlert
+  receiveAttestationMessage: typeof receiveAttestationMessage
 }
 
 type Props = StateProps & DispatchProps & WithNamespaces
 
 interface State {
+  timer: number
   codeInputValues: string[]
   isModalVisible: boolean
 }
 
 const mapDispatchToProps = {
-  startVerification,
   cancelVerification,
-  receiveVerificationMessage: receiveAttestationMessage,
-  showError,
-  hideAlert,
+  receiveAttestationMessage,
 }
 
 const mapStateToProps = (state: RootState): StateProps => {
   return {
-    numberVerified: state.app.numberVerified,
     e164Number: state.account.e164PhoneNumber,
     attestationCodes: state.identity.attestationCodes,
     numCompleteAttestations: state.identity.numCompleteAttestations,
-    verificationFailed: state.identity.verificationFailed,
-    account: currentAccountSelector(state),
-    underlyingError: errorSelector(state),
+    verificationStatus: state.identity.verificationStatus,
   }
 }
 
 class VerificationInputScreen extends React.Component<Props, State> {
   static navigationOptions = { header: null }
 
+  //TODO handle back buttons
+
+  interval: number | undefined
+
   state: State = {
+    timer: 60,
     codeInputValues: [],
     isModalVisible: false,
+  }
+
+  componentDidMount() {
+    this.interval = setInterval(() => {
+      const timer = this.state.timer
+      if (timer === 1) {
+        clearInterval(this.interval)
+      }
+      this.setState({ timer: timer - 1 })
+    }, 1000)
+  }
+
+  componentWillUnmount() {
+    clearInterval(this.interval)
   }
 
   onChangeInputCode = (index: number) => {
@@ -101,7 +101,7 @@ class VerificationInputScreen extends React.Component<Props, State> {
   }
 
   onPressSkip = () => {
-    // TODO cancel verification here
+    this.props.cancelVerification()
     navigate(Screens.WalletHome)
   }
 
@@ -110,7 +110,7 @@ class VerificationInputScreen extends React.Component<Props, State> {
   }
 
   render() {
-    const { codeInputValues, isModalVisible } = this.state
+    const { codeInputValues, isModalVisible, timer } = this.state
     const { t } = this.props
 
     return (
@@ -121,7 +121,7 @@ class VerificationInputScreen extends React.Component<Props, State> {
         >
           <DevSkipButton nextScreen={Screens.WalletHome} />
           <View style={styles.iconContainer}>
-            <SmsCeloSwap width={152} height={48} />
+            <SmsCeloSwap width={102} height={32} />
           </View>
           <Text style={fontStyles.h1} testID="VerificationInputHeader">
             {t('input.header')}
@@ -162,7 +162,7 @@ class VerificationInputScreen extends React.Component<Props, State> {
           <View style={styles.modalContainer}>
             <View style={styles.modalTimerContainer}>
               <LoadingSpinner />
-              <Text style={fontStyles.body}>{'0:49'}</Text>
+              <Text style={fontStyles.body}>{'0:' + timer}</Text>
             </View>
             <Text style={styles.modalHeader}>{t('missingCodesModal.header')}</Text>
             <Text style={fontStyles.body}>{t('missingCodesModal.body')}</Text>
@@ -170,7 +170,11 @@ class VerificationInputScreen extends React.Component<Props, State> {
               <TextButton onPress={this.onPressWaitForCodes} style={styles.modalCancelText}>
                 {t('missingCodesModal.wait')}
               </TextButton>
-              <TextButton onPress={this.onPressSkip} style={styles.modalSkipText}>
+              <TextButton
+                onPress={this.onPressSkip}
+                style={styles.modalSkipText}
+                disabled={timer > 0}
+              >
                 {t('missingCodesModal.skip')}
               </TextButton>
             </View>

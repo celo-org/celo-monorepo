@@ -103,7 +103,8 @@
     "codeHeader1": "~~First Code",
     "codeHeader2": "~~Second Code",
     "codeHeader3": "~~Third Code",
-    "codesMissing": "~~I didn’t receive three codes"
+    "codesMissing": "~~I didn’t receive three codes",
+    "tip": "~~Typing? Try copying and pasting the code."
   },
   "missingCodesModal": {
     "header": "~~Missing Codes?",

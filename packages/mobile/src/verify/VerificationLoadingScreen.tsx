@@ -8,41 +8,26 @@ import { withNamespaces, WithNamespaces } from 'react-i18next'
 import { ScrollView, StyleSheet, Text, View } from 'react-native'
 import SafeAreaView from 'react-native-safe-area-view'
 import { connect } from 'react-redux'
-import { hideAlert, showError } from 'src/alert/actions'
-import { errorSelector } from 'src/alert/reducer'
 import componentWithAnalytics from 'src/analytics/wrapper'
-import { ErrorMessages } from 'src/app/ErrorMessages'
 import CancelButton from 'src/components/CancelButton'
 import Carousel, { CarouselItem } from 'src/components/Carousel'
 import DevSkipButton from 'src/components/DevSkipButton'
 import { Namespaces } from 'src/i18n'
 import LoadingSpinner from 'src/icons/LoadingSpinner'
-import {
-  cancelVerification,
-  receiveAttestationMessage,
-  startVerification,
-} from 'src/identity/actions'
-import { AttestationCode } from 'src/identity/verification'
+import { cancelVerification, startVerification } from 'src/identity/actions'
+import { VerificationStatus } from 'src/identity/verification'
+import { navigate, navigateBack } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
 import { RootState } from 'src/redux/reducers'
-import { currentAccountSelector } from 'src/web3/selectors'
 
 interface StateProps {
-  numberVerified: boolean
   e164Number: string
-  account: string | null
-  attestationCodes: AttestationCode[]
-  numCompleteAttestations: number
-  verificationFailed: boolean
-  underlyingError: ErrorMessages | null | undefined
+  verificationStatus: VerificationStatus
 }
 
 interface DispatchProps {
   startVerification: typeof startVerification
   cancelVerification: typeof cancelVerification
-  receiveVerificationMessage: typeof receiveAttestationMessage
-  showError: typeof showError
-  hideAlert: typeof hideAlert
 }
 
 type Props = StateProps & DispatchProps & WithNamespaces
@@ -50,32 +35,38 @@ type Props = StateProps & DispatchProps & WithNamespaces
 const mapDispatchToProps = {
   startVerification,
   cancelVerification,
-  receiveVerificationMessage: receiveAttestationMessage,
-  showError,
-  hideAlert,
 }
 
 const mapStateToProps = (state: RootState): StateProps => {
   return {
-    numberVerified: state.app.numberVerified,
     e164Number: state.account.e164PhoneNumber,
-    attestationCodes: state.identity.attestationCodes,
-    numCompleteAttestations: state.identity.numCompleteAttestations,
-    verificationFailed: state.identity.verificationFailed,
-    account: currentAccountSelector(state),
-    underlyingError: errorSelector(state),
+    verificationStatus: state.identity.verificationStatus,
   }
 }
 
 class VerificationLoadingScreen extends React.Component<Props> {
   static navigationOptions = { header: null }
 
+  //TODO handle back buttons
+
+  componentDidMount() {
+    this.props.startVerification()
+  }
+
+  componentDidUpdate() {
+    // TODO handle failure case
+    if (this.props.verificationStatus === VerificationStatus.RevealingNumber) {
+      navigate(Screens.VerificationInterstitialScreen)
+    }
+  }
+
   onCancel = () => {
-    // TODO
+    this.props.cancelVerification()
+    navigateBack()
   }
 
   render() {
-    const { verificationFailed, e164Number, t } = this.props
+    const { e164Number, t } = this.props
 
     const items: CarouselItem[] = [
       {
@@ -93,11 +84,9 @@ class VerificationLoadingScreen extends React.Component<Props> {
     ]
     return (
       <SafeAreaView style={styles.container}>
-        {!verificationFailed && (
-          <View style={styles.buttonCancelContainer}>
-            <CancelButton onCancel={this.onCancel} />
-          </View>
-        )}
+        <View style={styles.buttonCancelContainer}>
+          <CancelButton onCancel={this.onCancel} />
+        </View>
         <ScrollView contentContainerStyle={styles.scrollContainer}>
           <DevSkipButton nextScreen={Screens.VerificationInterstitialScreen} />
           <View style={styles.statusContainer}>
@@ -128,8 +117,8 @@ const styles = StyleSheet.create({
   },
   buttonCancelContainer: {
     position: 'absolute',
-    top: 5,
-    left: 0,
+    top: 10,
+    left: 5,
     zIndex: 10,
   },
   statusContainer: {
@@ -145,7 +134,6 @@ const styles = StyleSheet.create({
     ...fontStyles.body,
     marginTop: 5,
   },
-
   carouselContainer: {
     marginVertical: 20,
   },

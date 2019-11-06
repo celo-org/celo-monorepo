@@ -33,15 +33,14 @@ import { refreshAllBalances } from 'src/home/actions'
 import {
   Actions,
   completeAttestationCode,
-  endVerification,
   inputAttestationCode,
   InputAttestationCodeAction,
   ReceiveAttestationMessageAction,
   resetVerification,
+  setVerificationStatus,
 } from 'src/identity/actions'
 import { attestationCodesSelector } from 'src/identity/reducer'
 import { startAutoSmsRetrieval } from 'src/identity/smsRetrieval'
-import { RootState } from 'src/redux/reducers'
 import { sendTransaction, sendTransactionPromises } from 'src/transactions/send'
 import Logger from 'src/utils/Logger'
 import { web3 } from 'src/web3/contracts'
@@ -59,6 +58,17 @@ export const NULL_ADDRESS = '0x0000000000000000000000000000000000000000'
 // expensive. When https://github.com/celo-org/celo-monorepo-old/issues/3818 gets
 // merged we should significantly reduce this number
 export const REQUEST_TX_GAS = 7000000
+
+export enum VerificationStatus {
+  Failed = -1,
+  Stopped = 0,
+  Prepping = 1,
+  GettingStatus = 2,
+  RequestingAttestations = 3,
+  RevealingNumber = 4,
+  Done = 5,
+}
+
 export enum CodeInputType {
   AUTOMATIC = 'automatic',
   MANUAL = 'manual',
@@ -67,14 +77,6 @@ export enum CodeInputType {
 export interface AttestationCode {
   code: string
   issuer: string
-}
-
-export function* waitForUserVerified() {
-  const isVerified = yield select((state: RootState) => state.app.numberVerified)
-  if (isVerified) {
-    return
-  }
-  yield take(Actions.END_VERIFICATION)
 }
 
 export function* startVerification() {
@@ -102,8 +104,7 @@ export function* startVerification() {
     CeloAnalytics.track(CustomEventNames.verification_timed_out)
     Logger.debug(TAG, 'Verification timed out')
     yield put(showError(ErrorMessages.VERIFICATION_TIMEOUT))
-    yield put(endVerification(false))
-    // TODO #1955: Add logic in this case to request more SMS messages
+    yield put(setVerificationStatus(VerificationStatus.Failed))
   }
   Logger.debug(TAG, 'Done verification')
 
@@ -112,6 +113,7 @@ export function* startVerification() {
 
 export function* doVerificationFlow() {
   try {
+    yield put(setVerificationStatus(VerificationStatus.Prepping))
     const account: string = yield call(getConnectedUnlockedAccount)
     const privDataKey = yield select(privateCommentKeySelector)
     const dataKey = compressedPubKey(Buffer.from(privDataKey, 'hex'))
@@ -123,6 +125,7 @@ export function* doVerificationFlow() {
     CeloAnalytics.track(CustomEventNames.verification_setup)
 
     // Get all relevant info about the account's verification status
+    yield put(setVerificationStatus(VerificationStatus.GettingStatus))
     const status: AttestationsStatus = yield call(
       getAttestationsStatus,
       attestationsContract,
@@ -133,7 +136,7 @@ export function* doVerificationFlow() {
     CeloAnalytics.track(CustomEventNames.verification_get_status)
 
     if (status.isVerified) {
-      yield put(endVerification())
+      yield put(setVerificationStatus(VerificationStatus.Done))
       yield put(setNumberVerified(true))
       return true
     }
@@ -141,6 +144,7 @@ export function* doVerificationFlow() {
     // Mark codes completed in previous attempts
     yield put(completeAttestationCode(NUM_ATTESTATIONS_REQUIRED - status.numAttestationsRemaining))
 
+    yield put(setVerificationStatus(VerificationStatus.RequestingAttestations))
     const attestations: ActionableAttestation[] = yield call(
       requestAndRetrieveAttestations,
       attestationsContract,
@@ -159,6 +163,7 @@ export function* doVerificationFlow() {
     )
     const autoRetrievalTask: Task = yield fork(startAutoSmsRetrieval)
 
+    yield put(setVerificationStatus(VerificationStatus.RevealingNumber))
     yield all([
       // Set acccount and data encryption key in contract
       call(setAccount, attestationsContract, account, dataKey),
@@ -176,7 +181,7 @@ export function* doVerificationFlow() {
     receiveMessageTask.cancel()
     autoRetrievalTask.cancel()
 
-    yield put(endVerification())
+    yield put(setVerificationStatus(VerificationStatus.Done))
     yield put(setNumberVerified(true))
     return true
   } catch (error) {
@@ -186,7 +191,7 @@ export function* doVerificationFlow() {
     } else {
       yield put(showError(ErrorMessages.VERIFICATION_FAILURE))
     }
-    yield put(endVerification(false))
+    yield put(setVerificationStatus(VerificationStatus.Failed))
     return false
   }
 }

@@ -20,6 +20,7 @@ const AnimatedCircle = () => (
 
 class VerificationInterstitialScreen extends React.Component<WithNamespaces> {
   static navigationOptions = null
+  //TODO handle back buttons
 
   componentDidMount() {
     setTimeout(() => {
