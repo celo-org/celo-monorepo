@@ -1,5 +1,5 @@
-TESTNET INFORMATION & PRIVACY STATEMENT
-This application connects to ‘Alfajores’, a test network running the Celo Protocol. Any balance amounts on this network are not redeemable for real value. The Alfajores Network stores phone number hashes to allow for payments to a phone number. By verifying your phone number, you consent to having your hashed phone number stored on the Celo Blockchain.
+NETWORK INFORMATION & PRIVACY STATEMENT
+This application connects to ‘Alfajores’, a development network running the Celo Protocol. Any balance amounts on this network are not redeemable for real value. The Alfajores Network stores phone number hashes to allow for payments to a phone number. By verifying your phone number, you consent to having your hashed phone number stored on the Celo Blockchain.
 
 To learn more, please read our <a href="https://docs.celo.org/community/code-of-conduct">Code of Conduct</a> and <a href="http://celo.org/terms">Terms</a>
 

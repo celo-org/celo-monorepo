@@ -67,7 +67,7 @@ spec:
         - name: DB_URL
           value: sqlite://db/dev.db
         - name: CELO_PROVIDER
-          value: https://{{ .Release.Namespace }}-infura.{{ .Values.domain.name }}.org
+          value: https://{{ .Release.Namespace }}-forno.{{ .Values.domain.name }}.org
         - name: APP_SIGNATURE
           value: {{ .Values.attestation_service.sms_retriever_hash_code }}}
         - name: NEXMO_KEY

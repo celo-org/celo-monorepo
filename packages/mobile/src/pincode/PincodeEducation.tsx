@@ -75,17 +75,11 @@ class PincodeEducation extends React.Component<Props> {
         <ScrollView contentContainerStyle={style.scrollContainer}>
           <View>
             <BackupIcon style={style.pincodeLogo} />
-            <Text style={[fontStyles.h1, style.h1]} testID="SystemAuthTitle">
+            <Text style={style.h1} testID="SystemAuthTitle">
               {t('pincodeEducation.title')}
             </Text>
-            <Text style={[fontStyles.bodyLarge, style.explanation]}>
-              {t('pincodeEducation.intro')}
-            </Text>
-            {phoneAuth && (
-              <Text style={[fontStyles.bodyLarge, style.explanation]}>
-                {t('pincodeEducation.summary')}
-              </Text>
-            )}
+            <Text style={style.body}>{t('pincodeEducation.intro')}</Text>
+            {phoneAuth && <Text style={style.body}>{t('pincodeEducation.summary')}</Text>}
           </View>
         </ScrollView>
         <View>
@@ -141,12 +135,14 @@ const style = StyleSheet.create({
   pincodeLogo: {
     alignSelf: 'center',
   },
-  explanation: {
+  body: {
+    ...fontStyles.bodyLarge,
     textAlign: 'center',
     paddingHorizontal: 15,
     marginBottom: 20,
   },
   h1: {
+    ...fontStyles.h1,
     marginTop: 20,
   },
 })

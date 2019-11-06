@@ -71,6 +71,7 @@ exports[`BackupSocialIntro renders correctly when social backup is complete 1`] 
             </Text>
             <View
               accessible={true}
+              focusable={true}
               isTVSelectable={true}
               nativeBackgroundAndroid={
                 Object {
@@ -78,6 +79,7 @@ exports[`BackupSocialIntro renders correctly when social backup is complete 1`] 
                   "type": "ThemeAttrAndroid",
                 }
               }
+              onClick={[Function]}
               onResponderGrant={[Function]}
               onResponderMove={[Function]}
               onResponderRelease={[Function]}
@@ -142,6 +144,7 @@ exports[`BackupSocialIntro renders correctly when social backup is complete 1`] 
             </Text>
             <View
               accessible={true}
+              focusable={true}
               isTVSelectable={true}
               nativeBackgroundAndroid={
                 Object {
@@ -149,6 +152,7 @@ exports[`BackupSocialIntro renders correctly when social backup is complete 1`] 
                   "type": "ThemeAttrAndroid",
                 }
               }
+              onClick={[Function]}
               onResponderGrant={[Function]}
               onResponderMove={[Function]}
               onResponderRelease={[Function]}
@@ -260,6 +264,7 @@ exports[`BackupSocialIntro renders correctly when social backup is not complete 
             </Text>
             <View
               accessible={true}
+              focusable={true}
               isTVSelectable={true}
               nativeBackgroundAndroid={
                 Object {
@@ -267,6 +272,7 @@ exports[`BackupSocialIntro renders correctly when social backup is not complete 
                   "type": "ThemeAttrAndroid",
                 }
               }
+              onClick={[Function]}
               onResponderGrant={[Function]}
               onResponderMove={[Function]}
               onResponderRelease={[Function]}
@@ -331,6 +337,7 @@ exports[`BackupSocialIntro renders correctly when social backup is not complete 
             </Text>
             <View
               accessible={true}
+              focusable={true}
               isTVSelectable={true}
               nativeBackgroundAndroid={
                 Object {
@@ -338,6 +345,7 @@ exports[`BackupSocialIntro renders correctly when social backup is not complete 
                   "type": "ThemeAttrAndroid",
                 }
               }
+              onClick={[Function]}
               onResponderGrant={[Function]}
               onResponderMove={[Function]}
               onResponderRelease={[Function]}
@@ -430,6 +438,7 @@ exports[`BackupSocialIntro renders correctly when social backup is not complete 
   >
     <View
       accessible={true}
+      focusable={false}
       isTVSelectable={true}
       nativeBackgroundAndroid={
         Object {
@@ -437,6 +446,7 @@ exports[`BackupSocialIntro renders correctly when social backup is not complete 
           "type": "ThemeAttrAndroid",
         }
       }
+      onClick={[Function]}
       onResponderGrant={[Function]}
       onResponderMove={[Function]}
       onResponderRelease={[Function]}

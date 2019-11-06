@@ -1,28 +1,23 @@
 package org.celo.verifier;
 
 import android.app.Application;
+import android.content.Context;
+import com.facebook.react.PackageList;
 import org.celo.verifier.BuildConfig;
 import com.facebook.react.ReactApplication;
-import com.reactnativecommunity.netinfo.NetInfoPackage;
-import com.swmansion.gesturehandler.react.RNGestureHandlerPackage;
-import com.segment.analytics.reactnative.integration.firebase.RNAnalyticsIntegration_FirebasePackage;
-import com.segment.analytics.reactnative.core.RNAnalyticsPackage;
-import io.invertase.firebase.RNFirebasePackage;
-import io.invertase.firebase.auth.RNFirebaseAuthPackage;
-import io.invertase.firebase.database.RNFirebaseDatabasePackage;
-import com.reactcommunity.rnlanguages.RNLanguagesPackage;
 import com.facebook.react.ReactNativeHost;
 import com.facebook.react.ReactPackage;
-import com.facebook.react.shell.MainReactPackage;
 import com.facebook.soloader.SoLoader;
-import com.lugg.ReactNativeConfig.ReactNativeConfigPackage;
-import com.horcrux.svg.SvgPackage;
-import com.rnfs.RNFSPackage;
-import com.rnrestartandroid.RNRestartAndroidPackage;
-import com.learnium.RNDeviceInfo.RNDeviceInfo;
+
 import java.util.Arrays;
 import java.util.List;
-import org.devio.rn.splashscreen.SplashScreenReactPackage;
+import java.lang.reflect.InvocationTargetException;
+
+import io.invertase.firebase.auth.RNFirebaseAuthPackage;
+import io.invertase.firebase.database.RNFirebaseDatabasePackage;
+import io.invertase.firebase.storage.RNFirebaseStoragePackage;
+import io.invertase.firebase.messaging.RNFirebaseMessagingPackage;
+import io.invertase.firebase.notifications.RNFirebaseNotificationsPackage;
 
 public class MainApplication extends Application implements ReactApplication {
 
@@ -34,25 +29,19 @@ public class MainApplication extends Application implements ReactApplication {
 
     @Override
     protected List<ReactPackage> getPackages() {
-      return Arrays.<ReactPackage>asList(
-              new MainReactPackage(),
-              new NetInfoPackage(),
-              new RNGestureHandlerPackage(),
-              new RNAnalyticsIntegration_FirebasePackage(),
-              new RNAnalyticsPackage(),
-              new RNFirebasePackage(),
-              new RNFirebaseAuthPackage(),
-              new RNFirebaseDatabasePackage(),
-              new RNFSPackage(),
-              new ReactNativeConfigPackage(),
-              new SvgPackage(),
-              new RNVerifierServicePackage(),
-              new RNLanguagesPackage(),
-              new SplashScreenReactPackage(),
-              new RNRestartAndroidPackage(),
-              new RNDeviceInfo()
-      );
+      @SuppressWarnings("UnnecessaryLocalVariable")
+      List<ReactPackage> packages = new PackageList(this).getPackages();
+      // Packages that cannot be autolinked yet can be added manually here, for example:
+      // packages.add(new MyReactNativePackage());
+      packages.add(new RNFirebaseAuthPackage());
+      packages.add(new RNFirebaseDatabasePackage());
+      packages.add(new RNFirebaseStoragePackage());
+      packages.add(new RNFirebaseMessagingPackage());
+      packages.add(new RNFirebaseNotificationsPackage());
+      packages.add(new RNVerifierServicePackage());
+      return packages;
     }
+
 
     @Override
     protected String getJSMainModuleName() {
@@ -69,5 +58,32 @@ public class MainApplication extends Application implements ReactApplication {
   public void onCreate() {
     super.onCreate();
     SoLoader.init(this, /* native exopackage */ false);
+    initializeFlipper(this); // Remove this line if you don't want Flipper enabled
+  }
+
+  /*
+   * Loads Flipper in React Native templates.
+   *
+   * @param context
+   */
+  private static void initializeFlipper(Context context) {
+    if (BuildConfig.DEBUG) {
+      try {
+        /*
+         * We use reflection here to pick up the class that initializes Flipper, since
+         * Flipper library is not available in release mode
+         */
+        Class<?> aClass = Class.forName("com.facebook.flipper.ReactNativeFlipper");
+        aClass.getMethod("initializeFlipper", Context.class).invoke(null, context);
+      } catch (ClassNotFoundException e) {
+        e.printStackTrace();
+      } catch (NoSuchMethodException e) {
+        e.printStackTrace();
+      } catch (IllegalAccessException e) {
+        e.printStackTrace();
+      } catch (InvocationTargetException e) {
+        e.printStackTrace();
+      }
+    }
   }
 }

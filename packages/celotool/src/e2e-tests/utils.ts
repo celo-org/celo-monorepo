@@ -32,6 +32,7 @@ export interface GethTestConfig {
   migrate?: boolean
   migrateTo?: number
   instances: GethInstanceConfig[]
+  genesisConfig?: any
 }
 
 const TEST_DIR = '/tmp/e2e'
@@ -171,13 +172,14 @@ async function setupTestDir(testDir: string) {
   await execCmd('mkdir', [testDir])
 }
 
-function writeGenesis(validators: Validator[], path: string) {
+function writeGenesis(validators: Validator[], path: string, configOverrides: any = {}) {
   const genesis = generateGenesis({
     validators,
     blockTime: 0,
     epoch: 10,
     requestTimeout: 3000,
     chainId: NetworkId,
+    ...configOverrides,
   })
   fs.writeFileSync(path, genesis)
 }
@@ -420,7 +422,7 @@ export function getContext(gethConfig: GethTestConfig) {
     }
     await buildGeth(gethRepoPath)
     await setupTestDir(TEST_DIR)
-    await writeGenesis(validators, GENESIS_PATH)
+    await writeGenesis(validators, GENESIS_PATH, gethConfig.genesisConfig)
     let validatorIndex = 0
     for (const instance of gethConfig.instances) {
       if (instance.validating) {
