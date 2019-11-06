@@ -60,6 +60,23 @@ function attestationMessageToSign(phoneHash: string, account: Address) {
   return messageHash
 }
 
+interface GetCompletableAttestationsResponse {
+  0: string[]
+  1: string[]
+  2: string[]
+  3: string[]
+}
+function parseGetCompletableAttestations(response: GetCompletableAttestationsResponse) {
+  const metadataURLs = parseSolidityStringArray(
+    response[2].map(toNumber),
+    (response[3] as unknown) as string
+  )
+
+  return zip3(response[0].map(toNumber), response[1], metadataURLs).map(
+    ([blockNumber, issuer, metadataURL]) => ({ blockNumber, issuer, metadataURL })
+  )
+}
+
 const stringIdentity = (x: string) => x
 export class AttestationsWrapper extends BaseWrapper<Attestations> {
   /**
@@ -187,7 +204,8 @@ export class AttestationsWrapper extends BaseWrapper<Attestations> {
   }
 
   /**
-   * Returns an array of attestations that can be completed, along with the issuers attestation service url
+   * Returns an array of attestations that can be completed, along with the issuers' attestation
+   * service urls
    * @param phoneNumber
    * @param account
    */
@@ -199,15 +217,10 @@ export class AttestationsWrapper extends BaseWrapper<Attestations> {
 
     const result = await this.contract.methods.getCompletableAttestations(phoneHash, account).call()
 
-    const metadataURLs = parseSolidityStringArray(
-      result[2].map(toNumber),
-      (result[3] as unknown) as string
-    )
-
     const withAttestationServiceURLs = await concurrentMap(
       5,
-      zip3(result[0].map(toNumber), result[1], metadataURLs),
-      async ([blockNumber, issuer, metadataURL]) => {
+      parseGetCompletableAttestations(result),
+      async ({ blockNumber, issuer, metadataURL }) => {
         try {
           const metadata = await IdentityMetadataWrapper.fetchFromURL(metadataURL)
           const attestationServiceURLClaim = metadata.findClaim(ClaimTypes.ATTESTATION_SERVICE_URL)

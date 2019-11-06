@@ -455,9 +455,9 @@ contract Attestations is
     address[] storage issuers = state.selectedIssuers;
 
     uint256 num = 0;
-    for (uint256 i = 0; i < issuers.length; i++) {
+    for (uint256 i = 0; i < issuers.length; i = i.add(1)) {
       if (isAttestationCompletable(state.issuedAttestations[issuers[i]])) {
-        num++;
+        num = num.add(1);
       }
     }
 
@@ -465,11 +465,11 @@ contract Attestations is
     address[] memory completableIssuers = new address[](num);
 
     uint256 pointer = 0;
-    for (uint256 i = 0; i < issuers.length; i++) {
+    for (uint256 i = 0; i < issuers.length; i = i.add(1)) {
       if (isAttestationCompletable(state.issuedAttestations[issuers[i]])) {
         blockNumbers[pointer] = state.issuedAttestations[issuers[i]].blockNumber;
         completableIssuers[pointer] = issuers[i];
-        pointer++;
+        pointer = pointer.add(1);
       }
     }
 
@@ -610,7 +610,7 @@ contract Attestations is
       identifiers[identifier].unselectedRequests[msg.sender];
 
     bytes32 seed = getRandom().getBlockRandomness(
-      unselectedRequest.blockNumber + selectIssuersWaitBlocks
+      unselectedRequest.blockNumber.add(selectIssuersWaitBlocks);
     );
     uint256 numberValidators = numberValidatorsInCurrentSet();
 
@@ -629,7 +629,7 @@ contract Attestations is
         continue;
       }
 
-      currentIndex++;
+      currentIndex = currentIndex.add(1);
       attestation.status = AttestationStatus.Incomplete;
       attestation.blockNumber = unselectedRequest.blockNumber;
       attestation.attestationRequestFeeToken = unselectedRequest.attestationRequestFeeToken;
