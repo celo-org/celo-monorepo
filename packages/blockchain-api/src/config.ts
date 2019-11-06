@@ -1,16 +1,17 @@
 import dotenv from 'dotenv'
+import secrets from './secrets.json'
 
 // Load environment variables from .env file
 dotenv.config()
 
 function getSecrets(deployEnv: string) {
-  try {
-    return require('./secrets.json')[deployEnv]
-  } catch {
-    // Secrets are only available in trusted environments
+  const envSecrets = (secrets as any)[deployEnv]
+  if (!envSecrets) {
+    console.warn(`No secrets found for deploy env ${deployEnv}`)
+    return {}
   }
 
-  return {}
+  return envSecrets
 }
 
 export const DEPLOY_ENV = (process.env.DEPLOY_ENV as string).toLowerCase()
