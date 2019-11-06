@@ -80,7 +80,7 @@ async function verifyCmd(argv: VerifyArgv) {
   }
 
   attestationsToComplete = await attestations.getActionableAttestations(argv.phone, account)
-  // Find attestations we can reveal/verify
+  // Find attestations we can verify
   console.info(`Requesting ${attestationsToComplete.length} attestations from issuers`)
   await requestAttestationsFromIssuers(attestationsToComplete, attestations, argv.phone, account)
 

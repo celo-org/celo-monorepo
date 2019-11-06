@@ -1,4 +1,4 @@
-import { ECIES, PhoneNumberUtils, SignatureUtils } from '@celo/utils'
+import { PhoneNumberUtils, SignatureUtils } from '@celo/utils'
 import { concurrentMap, sleep } from '@celo/utils/lib/async'
 import { compact, zip3 } from '@celo/utils/lib/collections'
 import { parseSolidityStringArray } from '@celo/utils/lib/parsing'
@@ -347,37 +347,6 @@ export class AttestationsWrapper extends BaseWrapper<Attestations> {
   async selectIssuers(phoneNumber: string) {
     const phoneHash = PhoneNumberUtils.getPhoneHash(phoneNumber)
     return toTransactionObject(this.kit, this.contract.methods.selectIssuers(phoneHash))
-  }
-
-  /**
-   * Reveals the phone number to the issuer of the attestation on-chain
-   * @param phoneNumber The phone number which requested attestation
-   * @param issuer The address of issuer of the attestation
-   */
-  async reveal(phoneNumber: string, issuer: Address) {
-    const accounts = await this.kit.contracts.getAccounts()
-    const publicKey: string = (await accounts.getDataEncryptionKey(issuer)) as any
-
-    if (!publicKey) {
-      throw new Error('Issuer data encryption key is null')
-    }
-
-    const encryptedPhone: any =
-      '0x' +
-      ECIES.Encrypt(
-        Buffer.from(publicKey.slice(2), 'hex'),
-        Buffer.from(phoneNumber, 'utf8')
-      ).toString('hex')
-
-    return toTransactionObject(
-      this.kit,
-      this.contract.methods.reveal(
-        PhoneNumberUtils.getPhoneHash(phoneNumber),
-        encryptedPhone,
-        issuer,
-        true
-      )
-    )
   }
 
   async requestAttestationFromIssuer(

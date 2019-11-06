@@ -8,7 +8,6 @@ interface IAttestations {
   function setAttestationRequestFee(address, uint256) external;
   function request(bytes32, uint256, address) external;
   function selectIssuers(bytes32) external;
-  function reveal(bytes32, bytes calldata, address, bool) external;
   function complete(bytes32, uint8, bytes32, bytes32) external;
   function revoke(bytes32, uint256) external;
   function withdraw(address) external;

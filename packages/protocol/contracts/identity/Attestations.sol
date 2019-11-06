@@ -85,10 +85,6 @@ contract Attestations is
 
   mapping(bytes32 => IdentifierState) identifiers;
 
-  // Address of the RequestAttestation precompiled contract.
-  // solhint-disable-next-line state-visibility
-  address constant REQUEST_ATTESTATION = address(0xff);
-
   // The duration in blocks in which an attestation can be completed from the block in which the
   // attestation was requested.
   uint256 public attestationExpiryBlocks;
@@ -232,46 +228,6 @@ contract Attestations is
     );
 
     delete state.unselectedRequests[msg.sender];
-  }
-
-  /**
-   * @notice Reveal the encrypted phone number to the issuer.
-   * @param identifier The hash of the identifier to be attested.
-   * @param encryptedPhone The number ECIES encrypted with the issuer's public key.
-   * @param issuer The issuer of the attestation.
-   * @param sendSms Whether or not to send an SMS. For testing purposes.
-   */
-  function reveal(
-    bytes32 identifier,
-    bytes calldata encryptedPhone,
-    address issuer,
-    bool sendSms
-  )
-    external
-  {
-    Attestation storage attestation =
-      identifiers[identifier].attestations[msg.sender].issuedAttestations[issuer];
-
-    require(attestation.status == AttestationStatus.Incomplete, "Attestation is not incomplete");
-
-    // solhint-disable-next-line not-rely-on-time
-    require(!isAttestationExpired(attestation.blockNumber), "Attestation timed out");
-
-    // Generate the yet-to-be-signed attestation code that will be signed and sent to the
-    // encrypted phone number via SMS via the 'RequestAttestation' precompiled contract.
-    if (sendSms) {
-      bool success;
-        // solhint-disable-next-line avoid-call-value
-      (success, ) = REQUEST_ATTESTATION.call.value(0).gas(gasleft())(abi.encode(
-        identifier,
-        keccak256(abi.encodePacked(identifier, msg.sender)),
-        msg.sender,
-        issuer,
-        encryptedPhone
-      ));
-
-      require(success, "sending SMS failed");
-    }
   }
 
   /**

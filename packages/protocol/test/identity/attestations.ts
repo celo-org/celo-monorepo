@@ -341,7 +341,7 @@ contract('Attestations', (accounts: string[]) => {
         await attestations.request(phoneHash, attestationsRequested, mockStableToken.address)
       })
 
-      describe('when the issuers have not yet been revealed', () => {
+      describe('when the issuers have not yet been selected', () => {
         it('should revert requesting more attestations', async () => {
           await assertRevert(attestations.request(phoneHash, 1, mockStableToken.address))
         })
@@ -354,7 +354,7 @@ contract('Attestations', (accounts: string[]) => {
         })
       })
 
-      describe('when the issuers have been revealed', async () => {
+      describe('when the issuers have been selected', async () => {
         beforeEach(async () => {
           const requestBlockNumber = await web3.eth.getBlockNumber()
           await random.addTestRandomness(requestBlockNumber + selectIssuersWaitBlocks, '0x1')
@@ -500,42 +500,9 @@ contract('Attestations', (accounts: string[]) => {
     })
 
     describe('without requesting attestations before', () => {
-      it('should revert when revealing issuers', async () => {
+      it('should revert when selecting issuers', async () => {
         await assertRevert(attestations.selectIssuers(phoneHash))
       })
-    })
-  })
-
-  describe('#reveal()', () => {
-    let issuer: string
-
-    beforeEach(async () => {
-      await requestAttestations()
-      issuer = (await attestations.getAttestationIssuers(phoneHash, caller))[0]
-    })
-
-    it('should allow a reveal', async () => {
-      // @ts-ignore
-      await attestations.reveal(phoneHash, phoneHash, issuer, false)
-    })
-
-    it('should revert if users reveal a non-existent attestation request', async () => {
-      // @ts-ignore
-      await assertRevert(attestations.reveal(phoneHash, phoneHash, await getNonIssuer(), false))
-    })
-
-    it('should revert if a user reveals a request that has been completed', async () => {
-      const [v, r, s] = await getVerificationCodeSignature(caller, issuer)
-      await attestations.complete(phoneHash, v, r, s)
-
-      // @ts-ignore
-      await assertRevert(attestations.reveal(phoneHash, phoneHash, issuer, false))
-    })
-
-    it('should revert if the request as expired', async () => {
-      await advanceBlockNum(attestationExpiryBlocks, web3)
-      // @ts-ignore
-      await assertRevert(attestations.reveal(phoneHash, phoneHash, issuer, false))
     })
   })
 
