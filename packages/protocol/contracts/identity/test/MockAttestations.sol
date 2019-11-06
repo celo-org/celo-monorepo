@@ -1,17 +1,12 @@
 pragma solidity ^0.5.3;
 
-import "openzeppelin-solidity/contracts/math/SafeMath.sol";
+import 'openzeppelin-solidity/contracts/math/SafeMath.sol';
 
 /**
  * @title A mock Attestations for testing.
  */
 contract MockAttestations {
-
-  enum AttestationStatus {
-    None,
-    Incomplete,
-    Complete
-  }
+  enum AttestationStatus { None, Incomplete, Complete }
 
   struct Attestation {
     AttestationStatus status;
@@ -35,10 +30,7 @@ contract MockAttestations {
     identifiers[identifier].attestations[msg.sender].completed++;
   }
 
-  function getAttestationStats(
-    bytes32 identifier,
-    address account
-  )
+  function getAttestationStats(bytes32 identifier, address account)
     external
     view
     returns (uint64, uint64)

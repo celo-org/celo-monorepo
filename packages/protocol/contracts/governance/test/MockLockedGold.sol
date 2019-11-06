@@ -1,15 +1,13 @@
 pragma solidity ^0.5.3;
 
-import "openzeppelin-solidity/contracts/math/SafeMath.sol";
+import 'openzeppelin-solidity/contracts/math/SafeMath.sol';
 
-import "../interfaces/ILockedGold.sol";
+import '../interfaces/ILockedGold.sol';
 
-
- /**
+/**
  * @title A mock LockedGold for testing.
  */
 contract MockLockedGold is ILockedGold {
-
   using SafeMath for uint256;
 
   struct Authorizations {

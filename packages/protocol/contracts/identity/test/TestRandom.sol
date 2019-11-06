@@ -1,6 +1,6 @@
 pragma solidity ^0.5.3;
 
-import "../Random.sol";
+import '../Random.sol';
 
 contract TestRandom is Random {
   function addTestRandomness(uint256 blockNumber, bytes32 randomness) external {
@@ -10,4 +10,3 @@ contract TestRandom is Random {
     return _getBlockRandomness(blockNumber, cur);
   }
 }
-

@@ -1,6 +1,6 @@
 pragma solidity ^0.5.3;
 
-import "../interfaces/IGovernance.sol";
+import '../interfaces/IGovernance.sol';
 
 /**
  * @title A mock Governance for testing.

@@ -1,6 +1,6 @@
 pragma solidity ^0.5.8;
 
-import "../linkedlists/LinkedList.sol";
+import '../linkedlists/LinkedList.sol';
 
 contract LinkedListTest {
   using LinkedList for LinkedList.List;
@@ -27,13 +27,7 @@ contract LinkedListTest {
     return list.numElements;
   }
 
-  function getKeys()
-    external
-    view
-    returns (
-        bytes32[] memory
-    )
-  {
+  function getKeys() external view returns (bytes32[] memory) {
     return list.getKeys();
   }
 

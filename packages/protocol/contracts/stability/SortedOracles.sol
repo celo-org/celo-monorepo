@@ -1,12 +1,11 @@
 pragma solidity ^0.5.3;
 
-import "openzeppelin-solidity/contracts/math/SafeMath.sol";
-import "openzeppelin-solidity/contracts/ownership/Ownable.sol";
-import "./interfaces/ISortedOracles.sol";
-import "../common/Initializable.sol";
-import "../common/linkedlists/AddressSortedLinkedListWithMedian.sol";
-import "../common/linkedlists/SortedLinkedListWithMedian.sol";
-
+import 'openzeppelin-solidity/contracts/math/SafeMath.sol';
+import 'openzeppelin-solidity/contracts/ownership/Ownable.sol';
+import './interfaces/ISortedOracles.sol';
+import '../common/Initializable.sol';
+import '../common/linkedlists/AddressSortedLinkedListWithMedian.sol';
+import '../common/linkedlists/SortedLinkedListWithMedian.sol';
 
 // TODO: don't treat timestamps as Fixidity values
 /**
@@ -27,15 +26,9 @@ contract SortedOracles is ISortedOracles, Ownable, Initializable {
 
   uint256 public reportExpirySeconds;
 
-  event OracleAdded(
-    address indexed token,
-    address indexed oracleAddress
-  );
+  event OracleAdded(address indexed token, address indexed oracleAddress);
 
-  event OracleRemoved(
-    address indexed token,
-    address indexed oracleAddress
-  );
+  event OracleRemoved(address indexed token, address indexed oracleAddress);
 
   event OracleReported(
     address token,
@@ -45,23 +38,14 @@ contract SortedOracles is ISortedOracles, Ownable, Initializable {
     uint256 denominator
   );
 
-  event OracleReportRemoved(
-    address indexed token,
-    address indexed oracle
-  );
+  event OracleReportRemoved(address indexed token, address indexed oracle);
 
-  event MedianUpdated(
-    address token,
-    uint256 numerator,
-    uint256 denominator
-  );
+  event MedianUpdated(address token, uint256 numerator, uint256 denominator);
 
-  event ReportExpirySet(
-    uint256 reportExpiry
-  );
+  event ReportExpirySet(uint256 reportExpiry);
 
   modifier onlyOracle(address token) {
-    require(isOracle[token][msg.sender], "sender was not an oracle for token addr");
+    require(isOracle[token][msg.sender], 'sender was not an oracle for token addr');
     _;
   }
 
@@ -87,7 +71,7 @@ contract SortedOracles is ISortedOracles, Ownable, Initializable {
   function addOracle(address token, address oracleAddress) external onlyOwner {
     require(
       token != address(0) && oracleAddress != address(0) && !isOracle[token][oracleAddress],
-      "token addr was null or oracle addr was null or oracle addr is not an oracle for token addr"
+      'token addr was null or oracle addr was null or oracle addr is not an oracle for token addr'
     );
     isOracle[token][oracleAddress] = true;
     oracles[token].push(oracleAddress);
@@ -101,10 +85,10 @@ contract SortedOracles is ISortedOracles, Ownable, Initializable {
   function removeOracle(address token, address oracleAddress, uint256 index) external onlyOwner {
     require(
       token != address(0) &&
-      oracleAddress != address(0) &&
-      oracles[token].length > index &&
-      oracles[token][index] == oracleAddress,
-      "token addr null or oracle addr null or index of token oracle not mapped to oracle addr"
+        oracleAddress != address(0) &&
+        oracles[token].length > index &&
+        oracles[token][index] == oracleAddress,
+      'token addr null or oracle addr null or index of token oracle not mapped to oracle addr'
     );
     isOracle[token][oracleAddress] = false;
     oracles[token][index] = oracles[token][oracles[token].length.sub(1)];
@@ -148,10 +132,7 @@ contract SortedOracles is ISortedOracles, Ownable, Initializable {
     uint256 denominator,
     address lesserKey,
     address greaterKey
-  )
-    external
-    onlyOracle(token)
-  {
+  ) external onlyOracle(token) {
     uint256 originalMedian = rates[token].getMedianValue();
     uint256 value = numerator.mul(DENOMINATOR).div(denominator);
     if (rates[token].contains(msg.sender)) {
@@ -208,16 +189,10 @@ contract SortedOracles is ISortedOracles, Ownable, Initializable {
    * @param token The address of the token for which the Celo Gold exchange rate is being reported.
    * @return An unpacked list of elements from largest to smallest.
    */
-  function getRates(
-    address token
-  )
+  function getRates(address token)
     external
     view
-    returns (
-        address[] memory,
-        uint256[] memory,
-        SortedLinkedListWithMedian.MedianRelation[] memory
-    )
+    returns (address[] memory, uint256[] memory, SortedLinkedListWithMedian.MedianRelation[] memory)
   {
     return rates[token].getElements();
   }
@@ -245,16 +220,10 @@ contract SortedOracles is ISortedOracles, Ownable, Initializable {
    * @param token The address of the token for which the Celo Gold exchange rate is being reported.
    * @return An unpacked list of elements from largest to smallest.
    */
-  function getTimestamps(
-    address token
-  )
+  function getTimestamps(address token)
     external
     view
-    returns (
-        address[] memory,
-        uint256[] memory,
-        SortedLinkedListWithMedian.MedianRelation[] memory
-    )
+    returns (address[] memory, uint256[] memory, SortedLinkedListWithMedian.MedianRelation[] memory)
   {
     return timestamps[token].getElements();
   }

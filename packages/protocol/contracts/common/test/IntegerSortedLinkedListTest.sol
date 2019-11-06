@@ -1,7 +1,6 @@
 pragma solidity ^0.5.3;
 
-import "../linkedlists/IntegerSortedLinkedList.sol";
-
+import '../linkedlists/IntegerSortedLinkedList.sol';
 
 contract IntegerSortedLinkedListTest {
   using IntegerSortedLinkedList for SortedLinkedList.List;

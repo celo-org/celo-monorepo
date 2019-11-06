@@ -1,7 +1,7 @@
 pragma solidity ^0.5.8;
 
-import "../Proposals.sol";
-import "../../common/FixidityLib.sol";
+import '../Proposals.sol';
+import '../../common/FixidityLib.sol';
 
 contract ProposalsTest {
   using Proposals for Proposals.Proposal;
@@ -19,8 +19,7 @@ contract ProposalsTest {
   }
 
   function getSupportWithQuorumPadding(uint256 criticalBaseline) external view returns (uint256) {
-    return FixidityLib.unwrap(
-        proposal.getSupportWithQuorumPadding(FixidityLib.wrap(criticalBaseline))
-    );
+    return
+      FixidityLib.unwrap(proposal.getSupportWithQuorumPadding(FixidityLib.wrap(criticalBaseline)));
   }
 }

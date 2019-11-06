@@ -1,7 +1,6 @@
 pragma solidity ^0.5.3;
 
-import "../Attestations.sol";
-
+import '../Attestations.sol';
 
 /*
  * We need a test contract that behaves like the actual Attestations contract,

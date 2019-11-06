@@ -1,12 +1,11 @@
 pragma solidity ^0.5.3;
 
-import "../interfaces/IElection.sol";
+import '../interfaces/IElection.sol';
 
 /**
  * @title Holds a list of addresses of validators
  */
 contract MockElection is IElection {
-
   mapping(address => bool) public isIneligible;
   mapping(address => bool) public isEligible;
   address[] public electedValidators;

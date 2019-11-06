@@ -1,6 +1,6 @@
 pragma solidity ^0.5.3;
 
-import "../Governance.sol";
+import '../Governance.sol';
 
 contract GovernanceTest is Governance {
   address[] validatorSet;

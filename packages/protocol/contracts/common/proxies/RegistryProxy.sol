@@ -1,8 +1,6 @@
 pragma solidity ^0.5.3;
 
-import "../Proxy.sol";
-
+import '../Proxy.sol';
 
 /* solhint-disable no-empty-blocks */
-contract RegistryProxy is Proxy {
-}
+contract RegistryProxy is Proxy {}

@@ -1,17 +1,16 @@
 pragma solidity ^0.5.3;
 
-import "openzeppelin-solidity/contracts/utils/ReentrancyGuard.sol";
-import "openzeppelin-solidity/contracts/math/SafeMath.sol";
-import "openzeppelin-solidity/contracts/ownership/Ownable.sol";
+import 'openzeppelin-solidity/contracts/utils/ReentrancyGuard.sol';
+import 'openzeppelin-solidity/contracts/math/SafeMath.sol';
+import 'openzeppelin-solidity/contracts/ownership/Ownable.sol';
 
-import "./interfaces/ILockedGold.sol";
+import './interfaces/ILockedGold.sol';
 
-import "../common/Initializable.sol";
-import "../common/Signatures.sol";
-import "../common/UsingRegistry.sol";
+import '../common/Initializable.sol';
+import '../common/Signatures.sol';
+import '../common/UsingRegistry.sol';
 
 contract LockedGold is ILockedGold, ReentrancyGuard, Initializable, UsingRegistry {
-
   using SafeMath for uint256;
 
   struct Authorizations {
@@ -83,8 +82,8 @@ contract LockedGold is ILockedGold, ReentrancyGuard, Initializable, UsingRegistr
    * @notice Locks gold to be used for voting.
    */
   function lock() external payable nonReentrant {
-    require(getAccounts().isAccount(msg.sender), "not account");
-    require(msg.value > 0, "no value");
+    require(getAccounts().isAccount(msg.sender), 'not account');
+    require(msg.value > 0, 'no value');
     _incrementNonvotingAccountBalance(msg.sender, msg.value);
     emit GoldLocked(msg.sender, msg.value);
   }
@@ -95,10 +94,7 @@ contract LockedGold is ILockedGold, ReentrancyGuard, Initializable, UsingRegistr
    * @param value The amount by which to increment.
    * @dev Can only be called by the registered Election smart contract.
    */
-  function incrementNonvotingAccountBalance(
-    address account,
-    uint256 value
-  )
+  function incrementNonvotingAccountBalance(address account, uint256 value)
     external
     onlyRegisteredContract(ELECTION_REGISTRY_ID)
   {
@@ -111,10 +107,7 @@ contract LockedGold is ILockedGold, ReentrancyGuard, Initializable, UsingRegistr
    * @param value The amount by which to decrement.
    * @dev Can only be called by the registered "Election" smart contract.
    */
-  function decrementNonvotingAccountBalance(
-    address account,
-    uint256 value
-  )
+  function decrementNonvotingAccountBalance(address account, uint256 value)
     external
     onlyRegisteredContract(ELECTION_REGISTRY_ID)
   {
@@ -154,7 +147,7 @@ contract LockedGold is ILockedGold, ReentrancyGuard, Initializable, UsingRegistr
     uint256 balanceRequirement = getValidators().getAccountLockedGoldRequirement(msg.sender);
     require(
       balanceRequirement == 0 ||
-      balanceRequirement <= getAccountTotalLockedGold(msg.sender).sub(value)
+        balanceRequirement <= getAccountTotalLockedGold(msg.sender).sub(value)
     );
     _decrementNonvotingAccountBalance(msg.sender, value);
     uint256 available = now.add(unlockingPeriod);
@@ -234,9 +227,7 @@ contract LockedGold is ILockedGold, ReentrancyGuard, Initializable, UsingRegistr
    * @param account The address of the account.
    * @return The value and timestamp for each pending withdrawal.
    */
-  function getPendingWithdrawals(
-    address account
-  )
+  function getPendingWithdrawals(address account)
     external
     view
     returns (uint256[] memory, uint256[] memory)

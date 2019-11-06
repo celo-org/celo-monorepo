@@ -1,14 +1,12 @@
 pragma solidity ^0.5.3;
 
-import "openzeppelin-solidity/contracts/math/SafeMath.sol";
-
+import 'openzeppelin-solidity/contracts/math/SafeMath.sol';
 
 /**
  * @title Maintains a doubly linked list keyed by bytes32.
  * @dev Following the `next` pointers will lead you to the head, rather than the tail.
  */
 library LinkedList {
-
   using SafeMath for uint256;
 
   struct Element {
@@ -30,19 +28,12 @@ library LinkedList {
    * @param previousKey The key of the element that comes before the element to insert.
    * @param nextKey The key of the element that comes after the element to insert.
    */
-  function insert(
-    List storage list,
-    bytes32 key,
-    bytes32 previousKey,
-    bytes32 nextKey
-  )
-    public
-  {
-    require(key != bytes32(0), "Key must be defined");
+  function insert(List storage list, bytes32 key, bytes32 previousKey, bytes32 nextKey) public {
+    require(key != bytes32(0), 'Key must be defined');
     require(!contains(list, key), "Can't insert an existing element");
     require(
       previousKey != key && nextKey != key,
-      "Key cannot be the same as previousKey or nextKey"
+      'Key cannot be the same as previousKey or nextKey'
     );
 
     Element storage element = list.elements[key];
@@ -54,7 +45,7 @@ library LinkedList {
     } else {
       require(
         previousKey != bytes32(0) || nextKey != bytes32(0),
-        "Either previousKey or nextKey must be defined"
+        'Either previousKey or nextKey must be defined'
       );
 
       element.previousKey = previousKey;
@@ -63,22 +54,19 @@ library LinkedList {
       if (previousKey != bytes32(0)) {
         require(
           contains(list, previousKey),
-          "If previousKey is defined, it must exist in the list"
+          'If previousKey is defined, it must exist in the list'
         );
         Element storage previousElement = list.elements[previousKey];
-        require(
-          previousElement.nextKey == nextKey,
-          "previousKey must be adjacent to nextKey"
-        );
+        require(previousElement.nextKey == nextKey, 'previousKey must be adjacent to nextKey');
         previousElement.nextKey = key;
       } else {
         list.tail = key;
       }
 
       if (nextKey != bytes32(0)) {
-        require(contains(list, nextKey), "If nextKey is defined, it must exist in the list");
+        require(contains(list, nextKey), 'If nextKey is defined, it must exist in the list');
         Element storage nextElement = list.elements[nextKey];
-        require(nextElement.previousKey == previousKey, "previousKey must be adjacent to nextKey");
+        require(nextElement.previousKey == previousKey, 'previousKey must be adjacent to nextKey');
         nextElement.previousKey = key;
       } else {
         list.head = key;
@@ -127,14 +115,7 @@ library LinkedList {
    * @param previousKey The key of the element that comes before the updated element.
    * @param nextKey The key of the element that comes after the updated element.
    */
-  function update(
-    List storage list,
-    bytes32 key,
-    bytes32 previousKey,
-    bytes32 nextKey
-  )
-    public
-  {
+  function update(List storage list, bytes32 key, bytes32 previousKey, bytes32 nextKey) public {
     require(key != bytes32(0) && key != previousKey && key != nextKey && contains(list, key));
     remove(list, key);
     insert(list, key, previousKey, nextKey);

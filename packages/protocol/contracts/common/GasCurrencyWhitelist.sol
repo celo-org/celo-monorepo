@@ -1,17 +1,15 @@
 pragma solidity ^0.5.3;
 
-import "openzeppelin-solidity/contracts/ownership/Ownable.sol";
+import 'openzeppelin-solidity/contracts/ownership/Ownable.sol';
 
-import "./interfaces/IGasCurrencyWhitelist.sol";
+import './interfaces/IGasCurrencyWhitelist.sol';
 
-import "../common/Initializable.sol";
-
+import '../common/Initializable.sol';
 
 /**
  * @title Holds a whitelist of the ERC20+ tokens that can be used to pay for gas
  */
 contract GasCurrencyWhitelist is IGasCurrencyWhitelist, Ownable, Initializable {
-
   address[] public whitelist;
 
   function initialize() external initializer {

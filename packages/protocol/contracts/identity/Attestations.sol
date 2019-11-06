@@ -1,21 +1,20 @@
 pragma solidity ^0.5.3;
 
-import "openzeppelin-solidity/contracts/utils/ReentrancyGuard.sol";
-import "openzeppelin-solidity/contracts/math/SafeMath.sol";
-import "openzeppelin-solidity/contracts/ownership/Ownable.sol";
+import 'openzeppelin-solidity/contracts/utils/ReentrancyGuard.sol';
+import 'openzeppelin-solidity/contracts/math/SafeMath.sol';
+import 'openzeppelin-solidity/contracts/ownership/Ownable.sol';
 
-import "./interfaces/IAttestations.sol";
-import "./interfaces/IRandom.sol";
-import "../common/interfaces/IERC20Token.sol";
-import "../common/interfaces/IAccounts.sol";
-import "../governance/interfaces/IValidators.sol";
+import './interfaces/IAttestations.sol';
+import './interfaces/IRandom.sol';
+import '../common/interfaces/IERC20Token.sol';
+import '../common/interfaces/IAccounts.sol';
+import '../governance/interfaces/IValidators.sol';
 
-import "../common/Initializable.sol";
-import "../common/UsingRegistry.sol";
-import "../common/Signatures.sol";
-import "../common/SafeCast.sol";
-import "../common/UsingPrecompiles.sol";
-
+import '../common/Initializable.sol';
+import '../common/UsingRegistry.sol';
+import '../common/Signatures.sol';
+import '../common/SafeCast.sol';
+import '../common/UsingPrecompiles.sol';
 
 /**
  * @title Contract mapping identifiers to accounts
@@ -28,23 +27,16 @@ contract Attestations is
   ReentrancyGuard,
   UsingPrecompiles
 {
-
   using SafeMath for uint256;
   using SafeCast for uint256;
 
-  enum AttestationStatus {
-    None,
-    Incomplete,
-    Complete
-  }
+  enum AttestationStatus { None, Incomplete, Complete }
 
   struct Attestation {
     AttestationStatus status;
-
     // For outstanding attestations, this is the block number of the request.
     // For completed attestations, this is the block number of the attestation completion.
     uint32 blockNumber;
-
     // The token with which attestation request fees were paid.
     address attestationRequestFeeToken;
   }
@@ -66,10 +58,8 @@ contract Attestations is
   struct UnselectedRequest {
     // The block at which the attestations were requested.
     uint32 blockNumber;
-
     // The number of attestations that were requested.
     uint32 attestationsRequested;
-
     // The token with which attestation request fees were paid in this request.
     address attestationRequestFeeToken;
   }
@@ -122,7 +112,7 @@ contract Attestations is
     address indexed issuer
   );
 
-  event Withdrawal( address indexed account, address indexed token, uint256 amount);
+  event Withdrawal(address indexed account, address indexed token, uint256 amount);
   event AttestationExpiryBlocksSet(uint256 value);
   event AttestationRequestFeeSet(address indexed token, uint256 value);
   event AttestorAuthorized(address indexed account, address attestor);
@@ -137,10 +127,7 @@ contract Attestations is
     uint256 _selectIssuersWaitBlocks,
     address[] calldata attestationRequestFeeTokens,
     uint256[] calldata attestationRequestFeeValues
-  )
-    external
-    initializer
-  {
+  ) external initializer {
     _transferOwnership(msg.sender);
     setRegistry(registryAddress);
     setAttestationExpiryBlocks(_attestationExpiryBlocks);
@@ -148,8 +135,8 @@ contract Attestations is
 
     require(
       attestationRequestFeeTokens.length > 0 &&
-      attestationRequestFeeTokens.length == attestationRequestFeeValues.length,
-      "attestationRequestFeeTokens specification was invalid"
+        attestationRequestFeeTokens.length == attestationRequestFeeValues.length,
+      'attestationRequestFeeTokens specification was invalid'
     );
     for (uint256 i = 0; i < attestationRequestFeeTokens.length; i = i.add(1)) {
       setAttestationRequestFee(attestationRequestFeeTokens[i], attestationRequestFeeValues[i]);
@@ -167,13 +154,10 @@ contract Attestations is
     bytes32 identifier,
     uint256 attestationsRequested,
     address attestationRequestFeeToken
-  )
-    external
-    nonReentrant
-  {
+  ) external nonReentrant {
     require(
       attestationRequestFees[attestationRequestFeeToken] > 0,
-      "Invalid attestationRequestFeeToken"
+      'Invalid attestationRequestFeeToken'
     );
     require(
       IERC20Token(attestationRequestFeeToken).transferFrom(
@@ -181,26 +165,26 @@ contract Attestations is
         address(this),
         attestationRequestFees[attestationRequestFeeToken].mul(attestationsRequested)
       ),
-      "Transfer of attestation request fees failed"
+      'Transfer of attestation request fees failed'
     );
 
-    require(attestationsRequested > 0, "You have to request at least 1 attestation");
+    require(attestationsRequested > 0, 'You have to request at least 1 attestation');
 
     IdentifierState storage state = identifiers[identifier];
 
     require(
       state.unselectedRequests[msg.sender].blockNumber == 0 ||
         isAttestationExpired(state.unselectedRequests[msg.sender].blockNumber),
-      "There exists an unexpired, unselected attestation request"
+      'There exists an unexpired, unselected attestation request'
     );
 
     state.unselectedRequests[msg.sender].blockNumber = block.number.toUint32();
     state.unselectedRequests[msg.sender].attestationsRequested = attestationsRequested.toUint32();
     state.unselectedRequests[msg.sender].attestationRequestFeeToken = attestationRequestFeeToken;
 
-    state.attestations[msg.sender].requested = uint256(
-      state.attestations[msg.sender].requested
-    ).add(attestationsRequested).toUint32();
+    state.attestations[msg.sender].requested = uint256(state.attestations[msg.sender].requested)
+      .add(attestationsRequested)
+      .toUint32();
 
     emit AttestationsRequested(
       identifier,
@@ -219,12 +203,12 @@ contract Attestations is
 
     require(
       state.unselectedRequests[msg.sender].blockNumber > 0,
-      "No unselected attestation request to select issuers for"
+      'No unselected attestation request to select issuers for'
     );
 
     require(
       !isAttestationExpired(state.unselectedRequests[msg.sender].blockNumber),
-      "The attestation request has expired"
+      'The attestation request has expired'
     );
 
     addIncompleteAttestations(identifier);
@@ -245,36 +229,33 @@ contract Attestations is
    * @param issuer The issuer of the attestation.
    * @param sendSms Whether or not to send an SMS. For testing purposes.
    */
-  function reveal(
-    bytes32 identifier,
-    bytes calldata encryptedPhone,
-    address issuer,
-    bool sendSms
-  )
+  function reveal(bytes32 identifier, bytes calldata encryptedPhone, address issuer, bool sendSms)
     external
   {
-    Attestation storage attestation =
-      identifiers[identifier].attestations[msg.sender].issuedAttestations[issuer];
+    Attestation storage attestation = identifiers[identifier].attestations[msg.sender]
+      .issuedAttestations[issuer];
 
-    require(attestation.status == AttestationStatus.Incomplete, "Attestation is not incomplete");
+    require(attestation.status == AttestationStatus.Incomplete, 'Attestation is not incomplete');
 
     // solhint-disable-next-line not-rely-on-time
-    require(!isAttestationExpired(attestation.blockNumber), "Attestation timed out");
+    require(!isAttestationExpired(attestation.blockNumber), 'Attestation timed out');
 
     // Generate the yet-to-be-signed attestation code that will be signed and sent to the
     // encrypted phone number via SMS via the 'RequestAttestation' precompiled contract.
     if (sendSms) {
       bool success;
-        // solhint-disable-next-line avoid-call-value
-      (success, ) = REQUEST_ATTESTATION.call.value(0).gas(gasleft())(abi.encode(
-        identifier,
-        keccak256(abi.encodePacked(identifier, msg.sender)),
-        msg.sender,
-        issuer,
-        encryptedPhone
-      ));
+      // solhint-disable-next-line avoid-call-value
+      (success, ) = REQUEST_ATTESTATION.call.value(0).gas(gasleft())(
+        abi.encode(
+          identifier,
+          keccak256(abi.encodePacked(identifier, msg.sender)),
+          msg.sender,
+          issuer,
+          encryptedPhone
+        )
+      );
 
-      require(success, "sending SMS failed");
+      require(success, 'sending SMS failed');
     }
   }
 
@@ -290,8 +271,8 @@ contract Attestations is
   function complete(bytes32 identifier, uint8 v, bytes32 r, bytes32 s) external {
     address issuer = validateAttestationCode(identifier, msg.sender, v, r, s);
 
-    Attestation storage attestation =
-      identifiers[identifier].attestations[msg.sender].issuedAttestations[issuer];
+    Attestation storage attestation = identifiers[identifier].attestations[msg.sender]
+      .issuedAttestations[issuer];
 
     address token = attestation.attestationRequestFeeToken;
 
@@ -320,10 +301,10 @@ contract Attestations is
    */
   function revoke(bytes32 identifier, uint256 index) external {
     uint256 numAccounts = identifiers[identifier].accounts.length;
-    require(index < numAccounts, "Index is invalid");
+    require(index < numAccounts, 'Index is invalid');
     require(
       msg.sender == identifiers[identifier].accounts[index],
-      "Index does not match msg.sender"
+      'Index does not match msg.sender'
     );
 
     uint256 newNumAccounts = numAccounts.sub(1);
@@ -341,9 +322,9 @@ contract Attestations is
    */
   function withdraw(address token) external {
     uint256 value = pendingWithdrawals[token][msg.sender];
-    require(value > 0, "value was negative/zero");
+    require(value > 0, 'value was negative/zero');
     pendingWithdrawals[token][msg.sender] = 0;
-    require(IERC20Token(token).transfer(msg.sender, value), "token transfer failed");
+    require(IERC20Token(token).transfer(msg.sender, value), 'token transfer failed');
     emit Withdrawal(msg.sender, token, value);
   }
 
@@ -357,10 +338,7 @@ contract Attestations is
    *           Address of the token with which this attestation request was paid for
    *         ]
    */
-  function getUnselectedRequest(
-    bytes32 identifier,
-    address account
-  )
+  function getUnselectedRequest(bytes32 identifier, address account)
     external
     view
     returns (uint32, uint32, address)
@@ -378,10 +356,7 @@ contract Attestations is
    * @param account Address of the account.
    * @return Addresses of the selected attestation issuers.
    */
-  function getAttestationIssuers(
-    bytes32 identifier,
-    address account
-  )
+  function getAttestationIssuers(bytes32 identifier, address account)
     external
     view
     returns (address[] memory)
@@ -395,10 +370,7 @@ contract Attestations is
    * @param account Address of the account.
    * @return [Number of completed attestations, Number of total requested attestations]
    */
-  function getAttestationStats(
-    bytes32 identifier,
-    address account
-  )
+  function getAttestationStats(bytes32 identifier, address account)
     external
     view
     returns (uint32, uint32)
@@ -418,21 +390,17 @@ contract Attestations is
    * @return [3] Array of sum([0]) numbers indicating the total number of requested
                  attestations for each account.
    */
-  function batchGetAttestationStats(
-    bytes32[] calldata identifiersToLookup
-  )
+  function batchGetAttestationStats(bytes32[] calldata identifiersToLookup)
     external
     view
     returns (uint256[] memory, address[] memory, uint64[] memory, uint64[] memory)
   {
-    require(identifiersToLookup.length > 0, "You have to pass at least one identifier");
+    require(identifiersToLookup.length > 0, 'You have to pass at least one identifier');
 
     uint256[] memory matches;
     address[] memory addresses;
 
-    (matches, addresses) = batchlookupAccountsForIdentifier(
-      identifiersToLookup
-    );
+    (matches, addresses) = batchlookupAccountsForIdentifier(identifiersToLookup);
 
     uint64[] memory completed = new uint64[](addresses.length);
     uint64[] memory total = new uint64[](addresses.length);
@@ -442,10 +410,11 @@ contract Attestations is
       address[] memory addrs = identifiers[identifiersToLookup[i]].accounts;
       for (uint256 matchIndex = 0; matchIndex < matches[i]; matchIndex++) {
         addresses[currentIndex] = getAccounts().getWalletAddress(addrs[matchIndex]);
-        completed[currentIndex] =
-          identifiers[identifiersToLookup[i]].attestations[addrs[matchIndex]].completed;
-        total[currentIndex] =
-          identifiers[identifiersToLookup[i]].attestations[addrs[matchIndex]].requested;
+        completed[currentIndex] = identifiers[identifiersToLookup[i]]
+          .attestations[addrs[matchIndex]]
+          .completed;
+        total[currentIndex] = identifiers[identifiersToLookup[i]].attestations[addrs[matchIndex]]
+          .requested;
 
         currentIndex++;
       }
@@ -465,17 +434,13 @@ contract Attestations is
    *           Address of the token with which this attestation request was paid for
    *         ]
    */
-  function getAttestationState(
-    bytes32 identifier,
-    address account,
-    address issuer
-  )
+  function getAttestationState(bytes32 identifier, address account, address issuer)
     external
     view
     returns (uint8, uint32, address)
   {
-    Attestation storage attestation =
-      identifiers[identifier].attestations[account].issuedAttestations[issuer];
+    Attestation storage attestation = identifiers[identifier].attestations[account]
+      .issuedAttestations[issuer];
     return (
       uint8(attestation.status),
       attestation.blockNumber,
@@ -499,7 +464,7 @@ contract Attestations is
    * @param fee The fee in 'token' that is required for each attestation.
    */
   function setAttestationRequestFee(address token, uint256 fee) public onlyOwner {
-    require(fee > 0, "You have to specify a fee greater than 0");
+    require(fee > 0, 'You have to specify a fee greater than 0');
     attestationRequestFees[token] = fee;
     emit AttestationRequestFeeSet(token, fee);
   }
@@ -510,18 +475,18 @@ contract Attestations is
    * an attestation and completing it.
    */
   function setAttestationExpiryBlocks(uint256 _attestationExpiryBlocks) public onlyOwner {
-    require(_attestationExpiryBlocks > 0, "attestationExpiryBlocks has to be greater than 0");
+    require(_attestationExpiryBlocks > 0, 'attestationExpiryBlocks has to be greater than 0');
     attestationExpiryBlocks = _attestationExpiryBlocks;
     emit AttestationExpiryBlocksSet(_attestationExpiryBlocks);
   }
 
-    /**
+  /**
    * @notice Updates 'selectIssuersWaitBlocks'.
    * @param _selectIssuersWaitBlocks The wait period in blocks to call selectIssuers on attestation
    *                                 requests.
    */
   function setSelectIssuersWaitBlocks(uint256 _selectIssuersWaitBlocks) public onlyOwner {
-    require(_selectIssuersWaitBlocks > 0, "selectIssuersWaitBlocks has to be greater than 0");
+    require(_selectIssuersWaitBlocks > 0, 'selectIssuersWaitBlocks has to be greater than 0');
     selectIssuersWaitBlocks = _selectIssuersWaitBlocks;
     emit SelectIssuersWaitBlocksSet(_selectIssuersWaitBlocks);
   }
@@ -542,30 +507,24 @@ contract Attestations is
     uint8 v,
     bytes32 r,
     bytes32 s
-  )
-    public
-    view
-    returns (address)
-  {
+  ) public view returns (address) {
     bytes32 codehash = keccak256(abi.encodePacked(identifier, account));
     address signer = Signatures.getSignerOfMessageHash(codehash, v, r, s);
     address issuer = getAccounts().activeAttesttationSignerToAccount(signer);
 
-    Attestation storage attestation =
-      identifiers[identifier].attestations[account].issuedAttestations[issuer];
+    Attestation storage attestation = identifiers[identifier].attestations[account]
+      .issuedAttestations[issuer];
 
     require(
       attestation.status == AttestationStatus.Incomplete,
-      "Attestation code does not match any outstanding attestation"
+      'Attestation code does not match any outstanding attestation'
     );
-    require(!isAttestationExpired(attestation.blockNumber), "Attestation timed out");
+    require(!isAttestationExpired(attestation.blockNumber), 'Attestation timed out');
 
     return issuer;
   }
 
-  function lookupAccountsForIdentifier(
-    bytes32 identifier
-  )
+  function lookupAccountsForIdentifier(bytes32 identifier)
     external
     view
     returns (address[] memory)
@@ -580,14 +539,12 @@ contract Attestations is
    * @return Array of n numbers that indicate the number of matching addresses per identifier
    *         and array of addresses preallocated for total number of matches.
    */
-  function batchlookupAccountsForIdentifier(
-    bytes32[] memory identifiersToLookup
-  )
+  function batchlookupAccountsForIdentifier(bytes32[] memory identifiersToLookup)
     internal
     view
     returns (uint256[] memory, address[] memory)
   {
-    require(identifiersToLookup.length > 0, "You have to pass at least one identifier");
+    require(identifiersToLookup.length > 0, 'You have to pass at least one identifier');
     uint256 totalAddresses = 0;
     uint256[] memory matches = new uint256[](identifiersToLookup.length);
 
@@ -605,14 +562,10 @@ contract Attestations is
    * @notice Adds additional attestations given the current randomness.
    * @param identifier The hash of the identifier to be attested.
    */
-  function addIncompleteAttestations(
-    bytes32 identifier
-  )
-    internal
-  {
+  function addIncompleteAttestations(bytes32 identifier) internal {
     AttestedAddress storage state = identifiers[identifier].attestations[msg.sender];
-    UnselectedRequest storage unselectedRequest =
-      identifiers[identifier].unselectedRequests[msg.sender];
+    UnselectedRequest storage unselectedRequest = identifiers[identifier].unselectedRequests[msg
+      .sender];
 
     bytes32 seed = getRandom().getBlockRandomness(
       unselectedRequest.blockNumber + selectIssuersWaitBlocks
@@ -642,11 +595,7 @@ contract Attestations is
     }
   }
 
-  function isAttestationExpired(uint128 attestationRequestBlock)
-    internal
-    view
-    returns (bool)
-  {
+  function isAttestationExpired(uint128 attestationRequestBlock) internal view returns (bool) {
     return block.number >= uint256(attestationRequestBlock).add(attestationExpiryBlocks);
   }
 }

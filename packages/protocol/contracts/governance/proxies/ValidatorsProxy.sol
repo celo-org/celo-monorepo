@@ -1,8 +1,6 @@
 pragma solidity ^0.5.3;
 
-import "../../common/Proxy.sol";
-
+import '../../common/Proxy.sol';
 
 /* solhint-disable no-empty-blocks */
-contract ValidatorsProxy is Proxy {
-}
+contract ValidatorsProxy is Proxy {}

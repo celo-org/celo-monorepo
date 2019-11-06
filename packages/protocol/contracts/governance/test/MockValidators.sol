@@ -1,12 +1,11 @@
 pragma solidity ^0.5.3;
 
-import "../interfaces/IValidators.sol";
+import '../interfaces/IValidators.sol';
 
 /**
  * @title Holds a list of addresses of validators
  */
 contract MockValidators is IValidators {
-
   mapping(address => bool) private _isValidating;
   mapping(address => bool) private _isVoting;
   mapping(address => uint256) private numGroupMembers;
@@ -63,10 +62,7 @@ contract MockValidators is IValidators {
     return lockedGoldRequirements[account];
   }
 
-  function getTopGroupValidators(
-    address group,
-    uint256 n
-  )
+  function getTopGroupValidators(address group, uint256 n)
     external
     view
     returns (address[] memory)

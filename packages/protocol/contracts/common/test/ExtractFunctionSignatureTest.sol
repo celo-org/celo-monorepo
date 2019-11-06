@@ -1,6 +1,6 @@
 pragma solidity ^0.5.3;
 
-import "../ExtractFunctionSignature.sol";
+import '../ExtractFunctionSignature.sol';
 
 contract ExtractFunctionSignatureTest {
   // using ExtractFunctionSignature;

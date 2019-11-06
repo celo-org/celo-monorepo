@@ -1,23 +1,17 @@
 pragma solidity ^0.5.3;
 
-import "openzeppelin-solidity/contracts/ownership/Ownable.sol";
+import 'openzeppelin-solidity/contracts/ownership/Ownable.sol';
 
-import "./interfaces/IRegistry.sol";
-import "./Initializable.sol";
-
+import './interfaces/IRegistry.sol';
+import './Initializable.sol';
 
 /**
  * @title Routes identifiers to addresses.
  */
 contract Registry is IRegistry, Ownable, Initializable {
+  mapping(bytes32 => address) public registry;
 
-  mapping (bytes32 => address) public registry;
-
-  event RegistryUpdated(
-    string identifier,
-    bytes32 indexed identifierHash,
-    address addr
-  );
+  event RegistryUpdated(string identifier, bytes32 indexed identifierHash, address addr);
 
   function initialize() external initializer {
     _transferOwnership(msg.sender);
@@ -40,7 +34,7 @@ contract Registry is IRegistry, Ownable, Initializable {
    * @dev Throws if address not set.
    */
   function getAddressForOrDie(bytes32 identifierHash) external view returns (address) {
-    require(registry[identifierHash] != address(0), "identifier has no registry entry");
+    require(registry[identifierHash] != address(0), 'identifier has no registry entry');
     return registry[identifierHash];
   }
 
@@ -59,7 +53,7 @@ contract Registry is IRegistry, Ownable, Initializable {
    */
   function getAddressForStringOrDie(string calldata identifier) external view returns (address) {
     bytes32 identifierHash = keccak256(abi.encodePacked(identifier));
-    require(registry[identifierHash] != address(0), "identifier has no registry entry");
+    require(registry[identifierHash] != address(0), 'identifier has no registry entry');
     return registry[identifierHash];
   }
 
