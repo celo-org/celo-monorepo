@@ -3,7 +3,7 @@ service: alfajores
 env_variables:
   NODE_ENV: "production"
   DEPLOY_ENV: "alfajores"
-  EXCHANGE_RATES_API: "https://api.exchangeratesapi.io"
+  EXCHANGE_RATES_API: "https://apilayer.net/api"
   BLOCKSCOUT_API: "https://alfajores-blockscout.celo-testnet.org/api"
   # TODO Pull addresses from the build artifacts of the network in protocol/build
   FAUCET_ADDRESS: "0xCEa3eF8e187490A9d85A1849D98412E5D27D1Bb3"
