@@ -44,6 +44,12 @@ export class ValidatorsWrapper extends BaseWrapper<Validators> {
   deaffiliate = proxySend(this.kit, this.contract.methods.deaffiliate)
   removeMember = proxySend(this.kit, this.contract.methods.removeMember)
   registerValidator = proxySend(this.kit, this.contract.methods.registerValidator)
+  async updateCommission(commission: BigNumber): Promise<CeloTransactionObject<boolean>> {
+    return toTransactionObject(
+      this.kit,
+      this.contract.methods.updateCommission(toFixed(commission).toFixed())
+    )
+  }
   async registerValidatorGroup(commission: BigNumber): Promise<CeloTransactionObject<boolean>> {
     return toTransactionObject(
       this.kit,

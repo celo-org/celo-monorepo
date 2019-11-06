@@ -652,6 +652,20 @@ contract Validators is
   }
 
   /**
+   * @notice Updates a validator group's commission.
+   * @param commission Fixidity representation of the commission this group receives on epoch
+   *   payments made to its members.
+   * @return True upon success.
+   */
+  function updateCommission(uint256 commission) external returns (bool) {
+    address account = getAccounts().activeValidationSignerToAccount(msg.sender);
+    require(isValidatorGroup(account));
+    require(commission <= FixidityLib.fixed1().unwrap(), "Commission can't be greater than 100%");
+    group.commission = FixidityLib.wrap(commission);
+    return true;
+  }
+
+  /**
    * @notice Returns the locked gold balance requirement for the supplied account.
    * @param account The account that may have to meet locked gold balance requirements.
    * @return The locked gold balance requirement for the supplied account.
