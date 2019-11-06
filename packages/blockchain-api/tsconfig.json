@@ -11,6 +11,7 @@
     "paths": {
       "*": ["node_modules/*", "src/types/*"]
     },
+    "resolveJsonModule": true,
     "skipLibCheck": true,
     "sourceMap": true,
     "strict": true,
