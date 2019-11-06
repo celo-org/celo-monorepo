@@ -19,8 +19,10 @@
   "fee": "Comisión",
   "securityFee": "Comisión de seguridad",
   "inviteAndSecurityFee": "Comisión de Invitación",
+  "amountInCelloDollars": "Cantidad en Celo dólares",
+  "localValueHint": "@ {{localValue}} {{localCurrencyCode}}",
   "feeEducation":
-    "~Sending payments and making exchanges include a small fee for service security and maintenance.",
+    "Enviar pagos y hacer cambios incluye una pequeña comisión de seguridad y mantenimiento.",
   "learnMore": "Saber más",
   "inviteMoneyEscrow": "Mantendremos este dinero seguro hasta que tu amigo cree una cuenta en Celo",
   "reviewPayment": "Revisar pago",
@@ -43,6 +45,7 @@
   "sentPayment": "Enviar pago",
   "mobileNumber": "Número de teléfono",
   "walletAddress": "Dirección del Monedero",
+  "unknown": "Desconocido",
   "inviteSMS":
     "Hola{{name}}! Me gustaría invitarte a que te unas a la red de pagos de Celo. Tu código de invitación es: {{code}} Podés instalarte la aplicación Celo desde el siguiente vínculo: {{link}}",
   "inviteSent": "Código de invitación enviado!",
@@ -53,9 +56,11 @@
   "scanCode": "Escanear código",
   "writeStorageNeededForQrDownload":
     "Se necesita permiso de escritura de almacenamiento para descargar el código QR",
-  "ScanCodeByPlacingItInTheBox": "Escanee el código colocándolo en la caja",
-  "needCameraPermissionToScan":
-    "La aplicación necesita permiso de la cámara para escanear códigos QR",
+  "cameraScanInfo": "Escanee el código colocándolo en la caja",
+  "cameraNotAuthorizedTitle": "Habilitar Cámara",
+  "cameraNotAuthorizedDescription":
+    "Habilite la cámara en la configuración de su teléfono. Lo necesitará para escanear códigos QR.",
+  "cameraSettings": "Configuraciones",
   "showYourQRCode": "Muestra tu código QR",
   "toSentOrRequestPayment": "enviar o solicitar pago",
   "requestSent": "Solicitud Enviada",

@@ -1,7 +1,7 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`JoinCeloScreen renders correctly 1`] = `
-<View
+<SafeAreaView
   style={
     Object {
       "backgroundColor": "#FFFFFF",
@@ -26,6 +26,8 @@ exports[`JoinCeloScreen renders correctly 1`] = `
   >
     <Text
       accessible={true}
+      focusable={true}
+      onClick={[Function]}
       onResponderGrant={[Function]}
       onResponderMove={[Function]}
       onResponderRelease={[Function]}
@@ -61,7 +63,7 @@ exports[`JoinCeloScreen renders correctly 1`] = `
           resizeMode="contain"
           source={
             Object {
-              "testUri": "../../../src/images/coins-logo.png",
+              "testUri": "../../../packages/mobile/src/images/coins-logo.png",
             }
           }
           style={
@@ -127,25 +129,18 @@ exports[`JoinCeloScreen renders correctly 1`] = `
           onBlur={[Function]}
           onChangeText={[Function]}
           onFocus={[Function]}
-          onSubmitEditing={[Function]}
           placeholder="fullName"
           placeholderTextColor="#D1D5D8"
           rejectResponderTermination={true}
           style={
-            Array [
-              Object {
-                "fontFamily": "Hind-Regular",
-              },
-              Object {
-                "borderColor": "#D1D5D8",
-                "borderRadius": 3,
-                "padding": 8,
-              },
-              Object {
-                "backgroundColor": "#FFFFFF",
-                "flex": 1,
-              },
-            ]
+            Object {
+              "backgroundColor": "#FFFFFF",
+              "borderColor": "#D1D5D8",
+              "borderRadius": 3,
+              "flex": 1,
+              "fontFamily": "Hind-Regular",
+              "padding": 8,
+            }
           }
           testID="NameEntry"
           underlineColorAndroid="transparent"
@@ -167,7 +162,7 @@ exports[`JoinCeloScreen renders correctly 1`] = `
           style={
             Array [
               Object {
-                "zIndex": 1,
+                "flex": 1,
               },
               undefined,
             ]
@@ -180,6 +175,7 @@ exports[`JoinCeloScreen renders correctly 1`] = `
                   "borderColor": "#b9b9b9",
                   "borderRadius": 1,
                   "borderWidth": 1,
+                  "marginBottom": 0,
                 },
                 Array [
                   Object {
@@ -223,7 +219,8 @@ exports[`JoinCeloScreen renders correctly 1`] = `
                 autoCapitalize="none"
                 autoCorrect={false}
                 data={Array []}
-                defaultValue=""
+                defaultValue="Canadá"
+                flatListProps={Object {}}
                 inputContainerStyle={
                   Array [
                     Object {
@@ -240,6 +237,7 @@ exports[`JoinCeloScreen renders correctly 1`] = `
                     },
                   ]
                 }
+                keyExtractor={[Function]}
                 keyboardShouldPersistTaps="always"
                 listContainerStyle={
                   Object {
@@ -279,26 +277,19 @@ exports[`JoinCeloScreen renders correctly 1`] = `
                 renderItem={[Function]}
                 renderSeparator={null}
                 renderTextInput={[Function]}
-                rowHasChanged={[Function]}
                 style={
-                  Array [
-                    Object {
-                      "fontFamily": "Hind-Regular",
-                    },
-                    Object {
-                      "borderColor": "#D1D5D8",
-                      "borderRadius": 3,
-                      "padding": 8,
-                    },
-                    Object {
-                      "backgroundColor": "#FFFFFF",
-                      "flex": 1,
-                    },
-                  ]
+                  Object {
+                    "backgroundColor": "#FFFFFF",
+                    "borderColor": "#D1D5D8",
+                    "borderRadius": 3,
+                    "flex": 1,
+                    "fontFamily": "Hind-Regular",
+                    "padding": 8,
+                  }
                 }
                 testID="CountryNameField"
                 underlineColorAndroid="transparent"
-                value=""
+                value="Canadá"
               />
             </View>
           </View>
@@ -339,7 +330,10 @@ exports[`JoinCeloScreen renders correctly 1`] = `
                 "width": 60,
               }
             }
-          />
+            testID="contryCodeText"
+          >
+            +1
+          </Text>
           <View
             style={
               Object {
@@ -372,6 +366,7 @@ exports[`JoinCeloScreen renders correctly 1`] = `
           >
             <TextInput
               allowFontScaling={true}
+              countryCallingCode="+1"
               keyboardType="phone-pad"
               onBlur={[Function]}
               onChangeText={[Function]}
@@ -380,20 +375,14 @@ exports[`JoinCeloScreen renders correctly 1`] = `
               placeholderTextColor="#D1D5D8"
               rejectResponderTermination={true}
               style={
-                Array [
-                  Object {
-                    "fontFamily": "Hind-Regular",
-                  },
-                  Object {
-                    "borderColor": "#D1D5D8",
-                    "borderRadius": 3,
-                    "padding": 8,
-                  },
-                  Object {
-                    "backgroundColor": "#FFFFFF",
-                    "flex": 1,
-                  },
-                ]
+                Object {
+                  "backgroundColor": "#FFFFFF",
+                  "borderColor": "#D1D5D8",
+                  "borderRadius": 3,
+                  "flex": 1,
+                  "fontFamily": "Hind-Regular",
+                  "padding": 8,
+                }
               }
               testID="PhoneNumberField"
               underlineColorAndroid="transparent"
@@ -405,17 +394,13 @@ exports[`JoinCeloScreen renders correctly 1`] = `
       </View>
       <Text
         style={
-          Array [
-            Object {
-              "color": "#2E3338",
-              "fontFamily": "Hind-Regular",
-              "fontSize": 12,
-              "lineHeight": 16,
-            },
-            Object {
-              "marginTop": 25,
-            },
-          ]
+          Object {
+            "color": "#2E3338",
+            "fontFamily": "Hind-Regular",
+            "fontSize": 12,
+            "lineHeight": 16,
+            "marginTop": 25,
+          }
         }
       >
         joinText.1
@@ -423,10 +408,11 @@ exports[`JoinCeloScreen renders correctly 1`] = `
           onPress={[Function]}
           style={
             Object {
-              "color": "#42D689",
-              "fontFamily": "Hind-Medium",
-              "fontSize": 14,
-              "lineHeight": 18,
+              "color": "#2E3338",
+              "fontFamily": "Hind-Regular",
+              "fontSize": 12,
+              "lineHeight": 16,
+              "textDecorationLine": "underline",
             }
           }
         >
@@ -447,14 +433,22 @@ exports[`JoinCeloScreen renders correctly 1`] = `
         null,
         undefined,
         Object {
-          "backgroundColor": "#A3EBC6",
+          "backgroundColor": "#42D689",
         },
       ]
     }
   >
     <View
       accessible={true}
+      focusable={true}
       isTVSelectable={true}
+      nativeBackgroundAndroid={
+        Object {
+          "attribute": "selectableItemBackground",
+          "type": "ThemeAttrAndroid",
+        }
+      }
+      onClick={[Function]}
       onResponderGrant={[Function]}
       onResponderMove={[Function]}
       onResponderRelease={[Function]}
@@ -462,15 +456,22 @@ exports[`JoinCeloScreen renders correctly 1`] = `
       onResponderTerminationRequest={[Function]}
       onStartShouldSetResponder={[Function]}
       style={
-        Object {
-          "alignItems": "center",
-          "backgroundColor": "#A3EBC6",
-          "borderWidth": 0,
-          "flex": 1,
-          "height": 50,
-          "justifyContent": "center",
-          "opacity": 1,
-        }
+        Array [
+          Object {
+            "alignItems": "center",
+            "flex": 1,
+            "justifyContent": "center",
+          },
+          Object {
+            "backgroundColor": "#42D689",
+          },
+          Object {
+            "height": 50,
+          },
+          Object {
+            "borderWidth": 0,
+          },
+        ]
       }
       testID="JoinCeloContinueButton"
     >
@@ -506,11 +507,11 @@ exports[`JoinCeloScreen renders correctly 1`] = `
       </View>
     </View>
   </View>
-</View>
+</SafeAreaView>
 `;
 
 exports[`JoinCeloScreen renders with an error 1`] = `
-<View
+<SafeAreaView
   style={
     Object {
       "backgroundColor": "#FFFFFF",
@@ -535,6 +536,8 @@ exports[`JoinCeloScreen renders with an error 1`] = `
   >
     <Text
       accessible={true}
+      focusable={true}
+      onClick={[Function]}
       onResponderGrant={[Function]}
       onResponderMove={[Function]}
       onResponderRelease={[Function]}
@@ -570,7 +573,7 @@ exports[`JoinCeloScreen renders with an error 1`] = `
           resizeMode="contain"
           source={
             Object {
-              "testUri": "../../../src/images/coins-logo.png",
+              "testUri": "../../../packages/mobile/src/images/coins-logo.png",
             }
           }
           style={
@@ -636,25 +639,18 @@ exports[`JoinCeloScreen renders with an error 1`] = `
           onBlur={[Function]}
           onChangeText={[Function]}
           onFocus={[Function]}
-          onSubmitEditing={[Function]}
           placeholder="fullName"
           placeholderTextColor="#D1D5D8"
           rejectResponderTermination={true}
           style={
-            Array [
-              Object {
-                "fontFamily": "Hind-Regular",
-              },
-              Object {
-                "borderColor": "#D1D5D8",
-                "borderRadius": 3,
-                "padding": 8,
-              },
-              Object {
-                "backgroundColor": "#FFFFFF",
-                "flex": 1,
-              },
-            ]
+            Object {
+              "backgroundColor": "#FFFFFF",
+              "borderColor": "#D1D5D8",
+              "borderRadius": 3,
+              "flex": 1,
+              "fontFamily": "Hind-Regular",
+              "padding": 8,
+            }
           }
           testID="NameEntry"
           underlineColorAndroid="transparent"
@@ -676,7 +672,7 @@ exports[`JoinCeloScreen renders with an error 1`] = `
           style={
             Array [
               Object {
-                "zIndex": 1,
+                "flex": 1,
               },
               undefined,
             ]
@@ -689,6 +685,7 @@ exports[`JoinCeloScreen renders with an error 1`] = `
                   "borderColor": "#b9b9b9",
                   "borderRadius": 1,
                   "borderWidth": 1,
+                  "marginBottom": 0,
                 },
                 Array [
                   Object {
@@ -732,7 +729,8 @@ exports[`JoinCeloScreen renders with an error 1`] = `
                 autoCapitalize="none"
                 autoCorrect={false}
                 data={Array []}
-                defaultValue=""
+                defaultValue="Canadá"
+                flatListProps={Object {}}
                 inputContainerStyle={
                   Array [
                     Object {
@@ -749,6 +747,7 @@ exports[`JoinCeloScreen renders with an error 1`] = `
                     },
                   ]
                 }
+                keyExtractor={[Function]}
                 keyboardShouldPersistTaps="always"
                 listContainerStyle={
                   Object {
@@ -788,26 +787,19 @@ exports[`JoinCeloScreen renders with an error 1`] = `
                 renderItem={[Function]}
                 renderSeparator={null}
                 renderTextInput={[Function]}
-                rowHasChanged={[Function]}
                 style={
-                  Array [
-                    Object {
-                      "fontFamily": "Hind-Regular",
-                    },
-                    Object {
-                      "borderColor": "#D1D5D8",
-                      "borderRadius": 3,
-                      "padding": 8,
-                    },
-                    Object {
-                      "backgroundColor": "#FFFFFF",
-                      "flex": 1,
-                    },
-                  ]
+                  Object {
+                    "backgroundColor": "#FFFFFF",
+                    "borderColor": "#D1D5D8",
+                    "borderRadius": 3,
+                    "flex": 1,
+                    "fontFamily": "Hind-Regular",
+                    "padding": 8,
+                  }
                 }
                 testID="CountryNameField"
                 underlineColorAndroid="transparent"
-                value=""
+                value="Canadá"
               />
             </View>
           </View>
@@ -848,7 +840,10 @@ exports[`JoinCeloScreen renders with an error 1`] = `
                 "width": 60,
               }
             }
-          />
+            testID="contryCodeText"
+          >
+            +1
+          </Text>
           <View
             style={
               Object {
@@ -881,6 +876,7 @@ exports[`JoinCeloScreen renders with an error 1`] = `
           >
             <TextInput
               allowFontScaling={true}
+              countryCallingCode="+1"
               keyboardType="phone-pad"
               onBlur={[Function]}
               onChangeText={[Function]}
@@ -889,20 +885,14 @@ exports[`JoinCeloScreen renders with an error 1`] = `
               placeholderTextColor="#D1D5D8"
               rejectResponderTermination={true}
               style={
-                Array [
-                  Object {
-                    "fontFamily": "Hind-Regular",
-                  },
-                  Object {
-                    "borderColor": "#D1D5D8",
-                    "borderRadius": 3,
-                    "padding": 8,
-                  },
-                  Object {
-                    "backgroundColor": "#FFFFFF",
-                    "flex": 1,
-                  },
-                ]
+                Object {
+                  "backgroundColor": "#FFFFFF",
+                  "borderColor": "#D1D5D8",
+                  "borderRadius": 3,
+                  "flex": 1,
+                  "fontFamily": "Hind-Regular",
+                  "padding": 8,
+                }
               }
               testID="PhoneNumberField"
               underlineColorAndroid="transparent"
@@ -914,17 +904,13 @@ exports[`JoinCeloScreen renders with an error 1`] = `
       </View>
       <Text
         style={
-          Array [
-            Object {
-              "color": "#2E3338",
-              "fontFamily": "Hind-Regular",
-              "fontSize": 12,
-              "lineHeight": 16,
-            },
-            Object {
-              "marginTop": 25,
-            },
-          ]
+          Object {
+            "color": "#2E3338",
+            "fontFamily": "Hind-Regular",
+            "fontSize": 12,
+            "lineHeight": 16,
+            "marginTop": 25,
+          }
         }
       >
         joinText.1
@@ -932,10 +918,11 @@ exports[`JoinCeloScreen renders with an error 1`] = `
           onPress={[Function]}
           style={
             Object {
-              "color": "#42D689",
-              "fontFamily": "Hind-Medium",
-              "fontSize": 14,
-              "lineHeight": 18,
+              "color": "#2E3338",
+              "fontFamily": "Hind-Regular",
+              "fontSize": 12,
+              "lineHeight": 16,
+              "textDecorationLine": "underline",
             }
           }
         >
@@ -956,14 +943,22 @@ exports[`JoinCeloScreen renders with an error 1`] = `
         null,
         undefined,
         Object {
-          "backgroundColor": "#A3EBC6",
+          "backgroundColor": "#42D689",
         },
       ]
     }
   >
     <View
       accessible={true}
+      focusable={true}
       isTVSelectable={true}
+      nativeBackgroundAndroid={
+        Object {
+          "attribute": "selectableItemBackground",
+          "type": "ThemeAttrAndroid",
+        }
+      }
+      onClick={[Function]}
       onResponderGrant={[Function]}
       onResponderMove={[Function]}
       onResponderRelease={[Function]}
@@ -971,15 +966,22 @@ exports[`JoinCeloScreen renders with an error 1`] = `
       onResponderTerminationRequest={[Function]}
       onStartShouldSetResponder={[Function]}
       style={
-        Object {
-          "alignItems": "center",
-          "backgroundColor": "#A3EBC6",
-          "borderWidth": 0,
-          "flex": 1,
-          "height": 50,
-          "justifyContent": "center",
-          "opacity": 1,
-        }
+        Array [
+          Object {
+            "alignItems": "center",
+            "flex": 1,
+            "justifyContent": "center",
+          },
+          Object {
+            "backgroundColor": "#42D689",
+          },
+          Object {
+            "height": 50,
+          },
+          Object {
+            "borderWidth": 0,
+          },
+        ]
       }
       testID="JoinCeloContinueButton"
     >
@@ -1015,5 +1017,5 @@ exports[`JoinCeloScreen renders with an error 1`] = `
       </View>
     </View>
   </View>
-</View>
+</SafeAreaView>
 `;

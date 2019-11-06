@@ -60,9 +60,9 @@ A similar job runs in the `celo-testnet-production` project.
 
 The Client Logs Exporter takes a stream of [Google Cloud Storage notifications](https://cloud.google.com/storage/docs/pubsub-notifications) published to a pub-sub topic (in `celo-testnet` project) about newly-uploaded [client logs](https://console.cloud.google.com/storage/browser/celo-org-mobile.appspot.com/logs/?project=celo-org-mobile&organizationId=54829595577) (in `celo-mobile-app` project). It processes those notifications and emits the contents of those files to StackDriver (to the log named by `--output`.)
 
-The job expects client logs to be located at a path `logs/$BUNDLEID/$ENV/$TIMESTAMP_$PHONE_$SUFFIX.txt`.
+The job expects client logs to be located at a path `logs/$DATE/$BUNDLEID/$ENV/$TIMESTAMP_$PHONE_$SUFFIX.txt`.
 
-Each instance of the job filters on the `$ENV` path component to match the value passed by `--env`. In this way, one Dataflow job needs to be run per environment.
+Each instance of the job filters on the `$ENV` path component to match the value passed by `--env`. In this way, one Dataflow job needs to be run per environment. If no value is passed all environments are matched.
 
 The notification was created as follows:
 
@@ -82,10 +82,8 @@ The currently deployed job was deployed with:
 
 ```bash
 python client_log_exporter.py \
-    --env integration \
     --input projects/celo-testnet/topics/clientlogs \
     --bucket celo-org-mobile.appspot.com \
-    --output client-logs-integration \
     --streaming \
     --runner=DataflowRunner \
     --project celo-testnet \

@@ -14,6 +14,8 @@ export default class Set extends BaseCommand {
     }),
   }
 
+  requireSynced = false
+
   async run() {
     const res = this.parse(Set)
     const config: CeloConfig = {

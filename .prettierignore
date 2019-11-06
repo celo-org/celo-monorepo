@@ -5,37 +5,26 @@ package.json
 **/privacy/*
 .git/
 
-packages/blockchain-api/dist
+packages/*/dist
+packages/*/lib
 
-packages/cli/lib
 
-packages/contractkit/lib/
-
-packages/walletkit/lib/
 packages/walletkit/.artifacts/
 packages/walletkit/contracts/
 packages/walletkit/types/
-packages/dappkit/lib/
+
 packages/docs/_book
-packages/faucet/dist/
 packages/mobile/src/geth/*.json
-packages/notification-service/dist/
 
 packages/protocol/build/
 packages/protocol/types/
-packages/protocol/lib/**/*.js
+!packages/protocol/lib/**/*.ts
 packages/protocol/scripts/**/*.js
 packages/protocol/migrations/**/*.js
 packages/protocol/tests/**/*.js
 
-packages/transaction-metrics-exporter/src/contracts/*.ts
-packages/dappkit/lib/
-packages/utils/lib/
-
-packages/verification-pool-api/lib/
 packages/verification-pool-api/contracts/*.ts
 
-packages/web/dist
 packages/web/.next
 
 # prettier eats Latex underscore escapting and doesn't seem to have an option to disable

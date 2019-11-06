@@ -1,6 +1,7 @@
 import { switchToClusterFromEnv } from 'src/lib/cluster'
 import { resetAndUpgradeHelmChart, upgradeHelmChart, upgradeStaticIPs } from 'src/lib/helm_deploy'
 import {
+  uploadEnvFileToGoogleStorage,
   uploadGenesisBlockToGoogleStorage,
   uploadStaticNodesToGoogleStorage,
 } from 'src/lib/testnet-utils'
@@ -29,9 +30,10 @@ export const handler = async (argv: TestnetArgv) => {
 
   if (argv.reset) {
     await resetAndUpgradeHelmChart(argv.celoEnv)
+    await uploadGenesisBlockToGoogleStorage(argv.celoEnv)
   } else {
     await upgradeHelmChart(argv.celoEnv)
   }
-  await uploadGenesisBlockToGoogleStorage(argv.celoEnv)
   await uploadStaticNodesToGoogleStorage(argv.celoEnv)
+  await uploadEnvFileToGoogleStorage(argv.celoEnv)
 }

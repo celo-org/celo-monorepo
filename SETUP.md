@@ -55,11 +55,14 @@ Install `nvm` (allows you to manage multiple versions of Node), Node 8 and `yarn
 
 ```bash
 brew install nvm
+
 # follow the instructions from the command above to edit your .bash_profile
 # then restart the terminal
 nvm install 8
-nvm alias default 8
+nvm install 10
+nvm alias default 10
 brew install yarn
+npm install -g typescript
 ```
 
 #### Java
@@ -98,6 +101,7 @@ Execute the following (and make sure the lines are in your `~/.bash_profile`):
 ```bash
 export ANDROID_HOME=/usr/local/share/android-sdk
 export ANDROID_NDK=/usr/local/share/android-ndk
+export GRADLE_OPTS='-Dorg.gradle.daemon=true -Dorg.gradle.parallel=true -Dorg.gradle.jvmargs="-Xmx4096m -XX:+HeapDumpOnOutOfMemoryError"'
 ```
 
 Then install the Android 28 platform:
@@ -112,7 +116,7 @@ sdkmanager 'platforms;android-28'
 
 We use Yarn to build all of the [celo-monorepo] repo.
 
-Install `nvm` (allows you to manage multiple versions of Node), Node 8 and `yarn`:
+Install `nvm` (allows you to manage multiple versions of Node), Node 8, Node 10 and `yarn`:
 
 ```bash
 # Installing Node
@@ -125,12 +129,16 @@ source ~/.bashrc
 
 # Setting up the right version of Nvm
 nvm install 8
-nvm alias default 8
+nvm install 10
+nvm alias default 10
 
 # Installing Yarn - https://yarnpkg.com/en/docs/install#debian-stable
 curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | sudo apt-key add -
 echo "deb https://dl.yarnpkg.com/debian/ stable main" | sudo tee /etc/apt/sources.list.d/yarn.list
 sudo apt-get update && sudo apt-get install yarn
+
+# Install typescript
+npm install -g typescript
 ```
 
 #### Installing OpenJDK 8
@@ -196,7 +204,7 @@ Install the Android 28 system image and create an Android Virtual Device:
 
 ```bash
 sdkmanager "system-images;android-28;google_apis;x86"
-avdmanager create avd --force --name Nexus_5X_API_28 --device "Nexus 5X" -k "system-images;android-28;google_apis;x86" --abi "google_apis/x86"
+avdmanager create avd --force --name Nexus_5X_API_28_x86 --device "Nexus 5X" -k "system-images;android-28;google_apis;x86" --abi "google_apis/x86"
 ```
 
 Execute the following and add it to your `~/.bash_profile`:
@@ -211,9 +219,9 @@ Run the emulator with:
 emulator -avd Nexus_5X_API_28
 ```
 
-#### Optional: Genymotion
+#### Optional: Install Genymotion Emulator Manager
 
-Optionally, as alternative to other emulators you can install Genymotion, a nice emulator manager:
+Optionally, as alternative to other emulators you can install Genymotion
 
 ##### MacOS
 
@@ -254,7 +262,8 @@ Then install packages:
 
 ```bash
 cd celo-monorepo
-yarn
+yarn # install dependencies and run post-install script
+yarn build # build all packages
 ```
 
 > Note that if you do your checkouts with a different method, Yarn will fail if
@@ -296,8 +305,6 @@ To deploy the app to your connected Android device:
 
 ```bash
 cd packages/mobile
-# install packages
-yarn
 # install app and start dev server
 yarn dev
 ```

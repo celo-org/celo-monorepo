@@ -1,17 +1,16 @@
 import { GenesisBlockUtils, StaticNodeUtils } from '@celo/walletkit'
 import BigNumber from 'bignumber.js'
+import { Platform } from 'react-native'
 import DeviceInfo from 'react-native-device-info'
 import * as RNFS from 'react-native-fs'
 import RNGeth from 'react-native-geth'
-import config from 'src/geth/network-config'
+import { DEFAULT_TESTNET } from 'src/config'
+import networkConfig from 'src/geth/networkConfig'
 import Logger from 'src/utils/Logger'
 import FirebaseLogUploader from 'src/utils/LogUploader'
-import { DEFAULT_TESTNET } from 'src/web3/testnets'
 
 let gethLock = false
 let gethInstance: typeof RNGeth | null = null
-const currentNetworkName = DEFAULT_TESTNET
-const currentConfig: any = config[currentNetworkName]
 
 export const FailedToFetchStaticNodesError = new Error(
   'Failed to fetch static nodes from Google storage'
@@ -46,9 +45,37 @@ enum ErrorType {
   CorruptChainData,
 }
 
+// Must match `clientIdentifier`
+// see https://github.com/celo-org/celo-blockchain/blob/d4b48f3e79b01e8cb7dcf8606b0ed1f666a37a2f/mobile/geth.go#L143
+// and https://github.com/celo-org/celo-blockchain/blob/d4b48f3e79b01e8cb7dcf8606b0ed1f666a37a2f/mobile/geth_android.go
+const INSTANCE_FOLDER = Platform.select({
+  ios: 'iGeth',
+  android: 'GethDroid',
+  default: 'GethMobile',
+})
+
+// Use relative path on iOS to workaround the 104 chars path limit for unix domain socket.
+// On iOS the default path would be something like
+// `/var/mobile/Containers/Data/Application/2E684E03-9EFA-492A-B19A-4759DD32BE67/Documents/.alfajores/geth.ipc`
+// which is too long.
+// So on iOS, `react-native-geth` changes the current directory to `${DocumentDirectoryPath}/.${DEFAULT_TESTNET}`
+// for the relative path workaround to work.
+export const IPC_PATH =
+  Platform.OS === 'ios'
+    ? './geth.ipc'
+    : `${RNFS.DocumentDirectoryPath}/.${DEFAULT_TESTNET}/geth.ipc`
+
+function getNodeInstancePath(nodeDir: string) {
+  return `${RNFS.DocumentDirectoryPath}/${nodeDir}/${INSTANCE_FOLDER}`
+}
+
+function getFolder(filePath: string) {
+  return filePath.substr(0, filePath.lastIndexOf('/'))
+}
+
 async function createNewGeth(): Promise<typeof RNGeth> {
   Logger.debug('Geth@newGeth', 'Configure and create new Geth')
-  const { nodeDir, syncMode } = currentConfig
+  const { nodeDir, syncMode } = networkConfig
   const genesis: string = await readGenesisBlockFile(nodeDir)
   const networkID: number = GenesisBlockUtils.getChainIdFromGenesis(genesis)
 
@@ -60,6 +87,7 @@ async function createNewGeth(): Promise<typeof RNGeth> {
     genesis,
     syncMode,
     useLightweightKDF: true,
+    ipcPath: IPC_PATH,
   }
 
   // Setup Logging
@@ -106,15 +134,11 @@ async function initGeth() {
     } catch (e) {
       const errorType = getGethErrorType(e)
       if (errorType === ErrorType.GethAlreadyRunning) {
-        // Geth is already running, this is most likely RN restart.
-        Logger.info('Geth@init/startInstance', 'Geth start reported geth already running')
-        // Note: Unfortunately, RN-Geth doesn't currently support connecting to the
-        // already running geth instance, which we would need to subscribe to head updates.
-        // In the meantime, we need to force an app reset. See #3227
+        Logger.error('Geth@init/startInstance', 'Geth start reported geth already running')
         throw new Error('Geth already running, need to restart app')
       } else if (errorType === ErrorType.CorruptChainData) {
         Logger.warn('Geth@init/startInstance', 'Geth start reported chain data error')
-        attemptGethCorruptionFix(geth)
+        await attemptGethCorruptionFix(geth)
       } else {
         Logger.error('Geth@init/startInstance', 'Unexpected error starting geth', e)
         throw e
@@ -134,7 +158,7 @@ export async function getGeth(): Promise<typeof gethInstance> {
 }
 
 async function ensureStaticNodesInitialized(): Promise<boolean> {
-  const { nodeDir } = currentConfig
+  const { nodeDir } = networkConfig
   if (await staticNodesAlreadyInitialized(nodeDir)) {
     Logger.debug('Geth@maybeInitStaticNodes', 'static nodes already initialized')
     return true
@@ -142,10 +166,10 @@ async function ensureStaticNodesInitialized(): Promise<boolean> {
     Logger.debug('Geth@maybeInitStaticNodes', 'initializing static nodes')
     let enodes: string | null = null
     try {
-      enodes = await StaticNodeUtils.getStaticNodesAsync(currentNetworkName)
+      enodes = await StaticNodeUtils.getStaticNodesAsync(DEFAULT_TESTNET)
     } catch (error) {
       Logger.error(
-        `Failed to get static nodes for network ${currentNetworkName},` +
+        `Failed to get static nodes for network ${DEFAULT_TESTNET},` +
           `the node will not be able to sync with the network till restart`,
         error
       )
@@ -156,6 +180,12 @@ async function ensureStaticNodesInitialized(): Promise<boolean> {
       return true
     }
     return false
+  }
+}
+
+export async function stopGethIfInitialized() {
+  if (gethInstance) {
+    await stop()
   }
 }
 
@@ -171,7 +201,7 @@ async function stop() {
 }
 
 async function ensureGenesisBlockWritten(): Promise<boolean> {
-  const { nodeDir } = currentConfig
+  const { nodeDir } = networkConfig
   if (await genesisBlockAlreadyWritten(nodeDir)) {
     Logger.debug('Geth@ensureGenesisBlockWritten', 'genesis block already written')
     return true
@@ -179,9 +209,9 @@ async function ensureGenesisBlockWritten(): Promise<boolean> {
     Logger.debug('Geth@ensureGenesisBlockWritten', 'writing genesis block')
     let genesisBlock: string | null = null
     try {
-      genesisBlock = await GenesisBlockUtils.getGenesisBlockAsync(currentNetworkName)
+      genesisBlock = await GenesisBlockUtils.getGenesisBlockAsync(DEFAULT_TESTNET)
     } catch (error) {
-      Logger.error(`Failed to get the genesis block for network ${currentNetworkName}.`, error)
+      Logger.error(`Failed to get the genesis block for network ${DEFAULT_TESTNET}.`, error)
       return false
     }
     if (genesisBlock != null) {
@@ -192,8 +222,12 @@ async function ensureGenesisBlockWritten(): Promise<boolean> {
   }
 }
 
+function getGenesisBlockFile(nodeDir: string) {
+  return `${getNodeInstancePath(nodeDir)}/genesis.json`
+}
+
 async function genesisBlockAlreadyWritten(nodeDir: string): Promise<boolean> {
-  const genesisBlockFile = `${RNFS.DocumentDirectoryPath}/${nodeDir}/GethDroid/genesis.json`
+  const genesisBlockFile = getGenesisBlockFile(nodeDir)
   if (!(await RNFS.exists(genesisBlockFile))) {
     return false
   }
@@ -202,15 +236,19 @@ async function genesisBlockAlreadyWritten(nodeDir: string): Promise<boolean> {
 }
 
 async function readGenesisBlockFile(nodeDir: string): Promise<string> {
-  const genesisBlockFile = `${RNFS.DocumentDirectoryPath}/${nodeDir}/GethDroid/genesis.json`
+  const genesisBlockFile = getGenesisBlockFile(nodeDir)
   return RNFS.readFile(genesisBlockFile, { encoding: 'utf8' })
 }
 
 async function writeGenesisBlock(nodeDir: string, genesisBlock: string) {
   Logger.debug(`writeGenesisBlock genesis block is: "${genesisBlock}"`)
-  const genesisBlockFile = `${RNFS.DocumentDirectoryPath}/${nodeDir}/GethDroid/genesis.json`
-  await RNFS.mkdir(`${RNFS.DocumentDirectoryPath}/${nodeDir}/GethDroid`)
+  const genesisBlockFile = getGenesisBlockFile(nodeDir)
+  await RNFS.mkdir(getFolder(genesisBlockFile))
   await RNFS.writeFile(genesisBlockFile, genesisBlock, 'utf8')
+}
+
+function getStaticNodesFile(nodeDir: string) {
+  return `${getNodeInstancePath(nodeDir)}/static-nodes.json`
 }
 
 /**
@@ -218,7 +256,7 @@ async function writeGenesisBlock(nodeDir: string, genesisBlock: string) {
  * @param nodeDir Geth data dir
  */
 async function staticNodesAlreadyInitialized(nodeDir: string): Promise<boolean> {
-  const staticNodesFile = `${RNFS.DocumentDirectoryPath}/${nodeDir}/GethDroid/static-nodes.json`
+  const staticNodesFile = getStaticNodesFile(nodeDir)
   if (!(await RNFS.exists(staticNodesFile))) {
     return false
   }
@@ -228,8 +266,8 @@ async function staticNodesAlreadyInitialized(nodeDir: string): Promise<boolean> 
 
 async function writeStaticNodes(nodeDir: string, enodes: string) {
   console.info(`writeStaticNodes enodes are "${enodes}"`)
-  const staticNodesFile = `${RNFS.DocumentDirectoryPath}/${nodeDir}/GethDroid/static-nodes.json`
-  await RNFS.mkdir(`${RNFS.DocumentDirectoryPath}/${nodeDir}/GethDroid/`)
+  const staticNodesFile = getStaticNodesFile(nodeDir)
+  await RNFS.mkdir(getFolder(staticNodesFile))
   await RNFS.writeFile(staticNodesFile, enodes, 'utf8')
 }
 
@@ -254,16 +292,16 @@ export async function deleteChainData() {
 }
 
 async function deleteSingleChainData(syncMode: SyncMode) {
-  const { nodeDir } = currentConfig
-  const chainDataDir = `${RNFS.DocumentDirectoryPath}/${nodeDir}/GethDroid/${syncMode}chaindata`
+  const { nodeDir } = networkConfig
+  const chainDataDir = `${getNodeInstancePath(nodeDir)}/${syncMode}chaindata`
   Logger.debug('Geth@deleteSingleChainData', `Going to delete ${chainDataDir}`)
   return deleteFileIfExists(chainDataDir)
 }
 
 async function deleteGethLockFile() {
   // Delete the .ipc file or the Geth will think that some other Geth node is using this datadir.
-  const { nodeDir } = currentConfig
-  const gethLockFile = `${RNFS.DocumentDirectoryPath}/${nodeDir}/GethDroid/LOCK`
+  const { nodeDir } = networkConfig
+  const gethLockFile = `${getNodeInstancePath(nodeDir)}/LOCK`
   Logger.info('Geth@deleteGethLockFile', `Deleting ${gethLockFile} for nodeDir ${nodeDir}`)
   return deleteFileIfExists(gethLockFile)
 }
@@ -296,7 +334,7 @@ async function uploadLogs(gethLogFilePath: string, reactNativeLogFilePath: strin
     // Phone number might not be verified here but that does not matter for logging.
     const phoneNumber = (await DeviceInfo.getPhoneNumber()) || 'unknown'
     const timestamp = new Date().getTime()
-    const deviceId = DeviceInfo.getUniqueID()
+    const deviceId = DeviceInfo.getUniqueId()
     const uploadId = `${timestamp}_${deviceId}`
     const gethUploadFileName = `${phoneNumber}_${uploadId}_geth.txt`
     const reactNativeUploadFileName = `${phoneNumber}_${uploadId}_rn.txt`

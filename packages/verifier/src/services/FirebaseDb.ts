@@ -52,29 +52,29 @@ const getUserUID = () => {
   return user.uid
 }
 
-export const setVerifier = (newVerifier: Verifier) => {
+export const setVerifier = async (newVerifier: Verifier) => {
   try {
     const uid = getUserUID()
     const verifierRef = getVerifierRef(uid)
     logger.info(tag, 'Updating verifier in Firebase')
-    verifierRef.set(newVerifier)
+    await verifierRef.set(newVerifier)
   } catch (error) {
     logger.error(tag, 'Failed to save verifier data to FirebaseDb', error)
   }
 }
 
-export const setIsVerifying = (isVerifying: boolean) => {
+export const setIsVerifying = async (isVerifying: boolean) => {
   if (!verifier) {
     return
   }
-  setVerifier({ ...verifier, isVerifying })
+  await setVerifier({ ...verifier, isVerifying })
 }
 
-export const setFcmToken = (fcmToken: string) => {
+export const setFcmToken = async (fcmToken: string) => {
   if (!verifier) {
     return
   }
-  setVerifier({ ...verifier, fcmToken })
+  await setVerifier({ ...verifier, fcmToken })
 }
 
 const getVerifierRef = (uid: string) => {

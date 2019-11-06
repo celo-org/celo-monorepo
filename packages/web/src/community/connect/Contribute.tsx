@@ -1,26 +1,19 @@
-import getConfig from 'next/config'
 import { StyleSheet, View } from 'react-native'
 import QuarterCircle from 'src/community/connect/QuarterCircle'
 import { H2 } from 'src/fonts/Fonts'
 import { I18nProps, NameSpaces, withNamespaces } from 'src/i18n'
 import { Cell, GridRow, Spans } from 'src/layout/GridRow'
 import Button, { BTN, SIZE } from 'src/shared/Button.3'
-import { hashNav } from 'src/shared/menu-items'
 import { colors, standardStyles, textStyles } from 'src/styles'
 
 function Contribute({ t }: I18nProps) {
   return (
-    <View
-      nativeID={hashNav.connect.fellowship}
-      style={[styles.darkBackground, styles.keepOnScreen]}
-    >
+    <View style={[styles.darkBackground, styles.keepOnScreen]}>
       <GridRow mobileStyle={[styles.proposalArea, standardStyles.blockMarginBottomTablet]}>
         <Cell span={Spans.half} style={styles.verticalCenter}>
           <View style={styles.proposalText}>
             <H2 style={[textStyles.invert, standardStyles.elementalMarginBottom]}>
-              {t(
-                `contribute.${getConfig().publicRuntimeConfig.FLAGS.ECOFUND ? 'title' : 'oldTitle'}`
-              )}
+              {t(`contribute.title`)}
             </H2>
             <Button
               kind={BTN.NAKED}

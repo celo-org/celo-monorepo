@@ -16,12 +16,14 @@
     "reset-yarn": "yarn cache clean",
     "test": "yarn run lerna run test",
     "build": "yarn run lerna run build",
+    "check-licenses": "yarn licenses list --prod | grep '\\(─ GPL\\|─ (GPL-[1-9]\\.[0-9]\\+ OR GPL-[1-9]\\.[0-9]\\+)\\)' && echo 'Found GPL license(s). Use 'yarn licenses list --prod' to look up the offending package' || echo 'No GPL licenses found'",
     "report-coverage": "yarn run lerna run test-coverage",
     "test:watch": "node node_modules/jest/bin/jest.js --watch",
-    "postinstall": "yarn run lerna run postinstall && patch-package && sh scripts/custom_patch_packages.sh && yarn keys:decrypt",
+    "postinstall": "yarn run lerna run postinstall && patch-package && yarn keys:decrypt",
     "preinstall": "bash scripts/create_key_templates.sh",
     "keys:decrypt": "bash scripts/key_placer.sh decrypt",
-    "keys:encrypt": "bash scripts/key_placer.sh encrypt"
+    "keys:encrypt": "bash scripts/key_placer.sh encrypt",
+    "check:packages": "node ./scripts/check-packages.js"
   },
   "husky": {
     "hooks": {
@@ -34,9 +36,6 @@
       "packages/*"
     ],
     "nohoist": [
-      "@celo/verifier/react-native",
-      "@celo/mobile/react-native",
-      "@celo/react-components/react-native",
       "@celo/web/@timkendrick/monaco-editor",
       "@celo/web/@types/react-i18next",
       "@celo/web/next-i18next",
@@ -44,16 +43,21 @@
     ]
   },
   "devDependencies": {
-    "@types/jest": "^24.0.17",
+    "@babel/core": "^7.6.2",
+    "@babel/runtime": "^7.6.2",
+    "@types/jest": "^24.0.18",
+    "babel-jest": "^24.9.0",
     "husky": "^3.0.0",
     "lerna": "^3.16.0",
     "patch-package": "^5.1.1",
     "prettier": "1.13.5",
     "pretty-quick": "^1.11.1",
     "solc": "0.5.8",
-    "tslint": "^5.12.1",
-    "jest": "^24.8.0",
-    "ts-jest": "^24.0.2",
+    "tslint": "^5.20.0",
+    "jest": "^24.9.0",
+    "jest-junit": "^8.0.0",
+    "jest-snapshot": "^24.9.0",
+    "ts-jest": "^24.1.0",
     "typescript-tslint-plugin": "^0.5.4",
     "tsconfig-paths": "^3.8.0",
     "ts-node": "^8.3.0",
@@ -66,8 +70,10 @@
     "node-gyp": "5.0.1",
     "tar": "4.4.10",
     "lodash": "4.17.15",
+    "react-native-ntp-client": "^1.0.0",
     "**/codecov/**/js-yaml": "^3.13.1",
     "**/deep-extend": "^0.5.1",
-    "**/extend": "^3.0.2"
+    "**/extend": "^3.0.2",
+    "sha3": "1.2.3"
   }
 } 

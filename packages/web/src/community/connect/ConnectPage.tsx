@@ -1,4 +1,3 @@
-import getConfig from 'next/config'
 import * as React from 'react'
 import { Image, StyleSheet, Text, View } from 'react-native'
 import Fade from 'react-reveal/Fade'
@@ -73,7 +72,7 @@ export class ConnectPage extends React.Component<Props> {
           <EventData />
           <ArticleData />
           <Contribute />
-          {getConfig().publicRuntimeConfig.FLAGS.ECOFUND && <EcoFund />}
+          <EcoFund />
           <FellowSection />
           <View style={styles.darkBackground} nativeID={hashNav.connect.newsletter}>
             <GridRow

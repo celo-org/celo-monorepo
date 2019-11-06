@@ -10,7 +10,6 @@ import "./interfaces/IStableToken.sol";
 
 import "../common/Initializable.sol";
 import "../common/UsingRegistry.sol";
-import "../common/interfaces/IERC20Token.sol";
 
 
 /**
@@ -132,16 +131,6 @@ contract Reserve is IReserve, Ownable, Initializable, UsingRegistry, ReentrancyG
   }
 
   /**
-   * @notice Burns all tokens held by the Reserve.
-   * @param token The address of the token to burn.
-   */
-  function burnToken(address token) external isStableToken(token) returns (bool) {
-    IStableToken stableToken = IStableToken(token);
-    require(stableToken.burn(stableToken.balanceOf(address(this))), "reserve token burn failed");
-    return true;
-  }
-
-  /**
    * @notice Transfer gold.
    * @param to The address that will receive the gold.
    * @param value The amount of gold to transfer.
@@ -154,8 +143,7 @@ contract Reserve is IReserve, Ownable, Initializable, UsingRegistry, ReentrancyG
     returns (bool)
   {
     require(isSpender[msg.sender], "sender not allowed to transfer Reserve funds");
-    IERC20Token goldToken = IERC20Token(registry.getAddressForOrDie(GOLD_TOKEN_REGISTRY_ID));
-    require(goldToken.transfer(to, value), "transfer of gold token failed");
+    require(getGoldToken().transfer(to, value), "transfer of gold token failed");
     return true;
   }
 

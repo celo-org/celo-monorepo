@@ -34,7 +34,13 @@ class FeaturedVideo extends React.PureComponent<I18nProps> {
           desktopStyle={standardStyles.sectionMarginBottom}
         >
           <Cell span={Spans.full}>
-            {<VideoModal previewImage={image} videoID={'F5SnS1v9fNo'} />}
+            {
+              <VideoModal
+                previewImage={image}
+                videoID={'F5SnS1v9fNo'}
+                ariaDescription="Video on working on Celo"
+              />
+            }
           </Cell>
         </GridRow>
       </View>

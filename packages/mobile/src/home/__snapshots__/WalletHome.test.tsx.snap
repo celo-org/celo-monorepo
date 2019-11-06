@@ -1,7 +1,7 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`Testnet banner Shows testnet banner for 5 seconds 1`] = `
-<View
+<SafeAreaView
   style={
     Object {
       "backgroundColor": "#FFFFFF",
@@ -317,6 +317,7 @@ exports[`Testnet banner Shows testnet banner for 5 seconds 1`] = `
     >
       <View
         accessible={true}
+        focusable={true}
         hitSlop={
           Object {
             "bottom": 15,
@@ -326,6 +327,13 @@ exports[`Testnet banner Shows testnet banner for 5 seconds 1`] = `
           }
         }
         isTVSelectable={true}
+        nativeBackgroundAndroid={
+          Object {
+            "attribute": "selectableItemBackgroundBorderless",
+            "type": "ThemeAttrAndroid",
+          }
+        }
+        onClick={[Function]}
         onResponderGrant={[Function]}
         onResponderMove={[Function]}
         onResponderRelease={[Function]}
@@ -336,7 +344,6 @@ exports[`Testnet banner Shows testnet banner for 5 seconds 1`] = `
           Object {
             "justifyContent": "flex-end",
             "margin": 12,
-            "opacity": 1,
           }
         }
       >
@@ -420,6 +427,7 @@ exports[`Testnet banner Shows testnet banner for 5 seconds 1`] = `
       </View>
       <View
         accessible={true}
+        focusable={true}
         hitSlop={
           Object {
             "bottom": 15,
@@ -429,6 +437,13 @@ exports[`Testnet banner Shows testnet banner for 5 seconds 1`] = `
           }
         }
         isTVSelectable={true}
+        nativeBackgroundAndroid={
+          Object {
+            "attribute": "selectableItemBackgroundBorderless",
+            "type": "ThemeAttrAndroid",
+          }
+        }
+        onClick={[Function]}
         onResponderGrant={[Function]}
         onResponderMove={[Function]}
         onResponderRelease={[Function]}
@@ -439,7 +454,6 @@ exports[`Testnet banner Shows testnet banner for 5 seconds 1`] = `
           Object {
             "justifyContent": "flex-end",
             "margin": 12,
-            "opacity": 1,
           }
         }
       >
@@ -549,35 +563,42 @@ exports[`Testnet banner Shows testnet banner for 5 seconds 1`] = `
         >
           <Text
             style={
-              Array [
-                Object {
-                  "fontFamily": "Hind-SemiBold",
-                },
-                Object {
-                  "color": "#2E3338",
-                  "fontSize": 18,
-                },
-              ]
+              Object {
+                "color": "#2E3338",
+                "fontSize": 44,
+                "height": 48,
+                "lineHeight": 62,
+              }
             }
           >
-            global:celoDollars
-          </Text>
-          <Text
-            style={
-              Array [
+            <Text
+              style={
                 Object {
                   "fontFamily": "Hind-SemiBold",
-                },
+                }
+              }
+            >
+              $
+            </Text>
+            <Text
+              style={
                 Object {
-                  "color": "#2E3338",
-                  "fontSize": 44,
-                  "height": 48,
-                  "lineHeight": 62,
-                },
-              ]
-            }
-          >
-            0.00
+                  "fontFamily": "Hind-SemiBold",
+                }
+              }
+            >
+              0.00
+            </Text>
+            <Text
+              style={
+                Object {
+                  "fontSize": 22,
+                }
+              }
+            >
+               
+              
+            </Text>
           </Text>
           <Text
             style={
@@ -592,18 +613,12 @@ exports[`Testnet banner Shows testnet banner for 5 seconds 1`] = `
               ]
             }
           >
-            Equal to
-             
-            <Text
-              style={
-                Object {
-                  "fontFamily": "Hind-SemiBold",
-                }
-              }
-            >
+            <Text>
               0.00
                
-              MXN
+            </Text>
+            <Text>
+              global:celoDollars
             </Text>
           </Text>
         </View>
@@ -655,5 +670,5 @@ exports[`Testnet banner Shows testnet banner for 5 seconds 1`] = `
       />
     </View>
   </RCTScrollView>
-</View>
+</SafeAreaView>
 `;

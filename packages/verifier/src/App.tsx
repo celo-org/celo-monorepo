@@ -2,8 +2,10 @@ import { navigate, setTopLevelNavigator } from '@celo/react-components/services/
 import * as React from 'react'
 import { ApolloProvider } from 'react-apollo'
 import { StyleSheet, View, YellowBox } from 'react-native'
+import { SafeAreaProvider } from 'react-native-safe-area-context'
 import SplashScreen from 'react-native-splash-screen'
-import { createAppContainer, createStackNavigator, createSwitchNavigator } from 'react-navigation'
+import { createAppContainer, createSwitchNavigator } from 'react-navigation'
+import { createStackNavigator } from 'react-navigation-stack'
 import { connect, Provider } from 'react-redux'
 import { PersistGate } from 'redux-persist/integration/react'
 import { setLanguage } from 'src/app/actions'
@@ -135,7 +137,9 @@ const WrappedNavigator = connect<NavigatorStateProps, DispatchProps>(
 
 class App extends React.Component<{}, {}> {
   componentDidMount() {
-    initializeFirebase()
+    initializeFirebase().catch((err) => {
+      console.error('Failed to initialize firebase', err)
+    })
   }
 
   hideSplashScreen() {
@@ -147,11 +151,13 @@ class App extends React.Component<{}, {}> {
       // @ts-ignore Apollo doesn't like the typings
       <ApolloProvider client={apolloClient}>
         <Provider store={store}>
-          <PersistGate loading={null} onBeforeLift={this.hideSplashScreen} persistor={persistor}>
-            <ErrorBoundary>
-              <WrappedNavigator />
-            </ErrorBoundary>
-          </PersistGate>
+          <SafeAreaProvider>
+            <PersistGate loading={null} onBeforeLift={this.hideSplashScreen} persistor={persistor}>
+              <ErrorBoundary>
+                <WrappedNavigator />
+              </ErrorBoundary>
+            </PersistGate>
+          </SafeAreaProvider>
         </Provider>
       </ApolloProvider>
     )

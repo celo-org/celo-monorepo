@@ -4,20 +4,35 @@ exports[`BackupPrompt renders correctly 1`] = `
 <View
   style={
     Object {
-      "backgroundColor": "#3C9BF4",
-      "height": 93,
+      "overflow": "hidden",
     }
   }
+  testID="infoBanner"
 >
   <View
+    accessible={true}
+    focusable={true}
+    onClick={[Function]}
+    onResponderGrant={[Function]}
+    onResponderMove={[Function]}
+    onResponderRelease={[Function]}
+    onResponderTerminate={[Function]}
+    onResponderTerminationRequest={[Function]}
+    onStartShouldSetResponder={[Function]}
     style={
       Object {
         "alignItems": "center",
-        "flex": 1,
+        "backgroundColor": "#3C9BF4",
         "flexDirection": "column",
         "justifyContent": "center",
-        "opacity": 1,
+        "paddingBottom": 10,
         "paddingHorizontal": 25,
+        "paddingTop": 10,
+        "transform": Array [
+          Object {
+            "translateY": -500,
+          },
+        ],
       }
     }
   >
@@ -32,9 +47,10 @@ exports[`BackupPrompt renders correctly 1`] = `
           },
           Object {
             "color": "white",
-            "marginBottom": 10,
+            "lineHeight": undefined,
             "textAlign": "center",
           },
+          false,
         ]
       }
     >
@@ -42,6 +58,7 @@ exports[`BackupPrompt renders correctly 1`] = `
     </Text>
     <View
       accessible={true}
+      focusable={true}
       hitSlop={
         Object {
           "bottom": 7,
@@ -51,6 +68,13 @@ exports[`BackupPrompt renders correctly 1`] = `
         }
       }
       isTVSelectable={true}
+      nativeBackgroundAndroid={
+        Object {
+          "attribute": "selectableItemBackground",
+          "type": "ThemeAttrAndroid",
+        }
+      }
+      onClick={[Function]}
       onResponderGrant={[Function]}
       onResponderMove={[Function]}
       onResponderRelease={[Function]}
@@ -58,20 +82,28 @@ exports[`BackupPrompt renders correctly 1`] = `
       onResponderTerminationRequest={[Function]}
       onStartShouldSetResponder={[Function]}
       style={
-        Object {
-          "alignItems": "center",
-          "alignSelf": "center",
-          "backgroundColor": "transparent",
-          "borderColor": "#FFFFFF",
-          "borderRadius": 2,
-          "borderWidth": 2,
-          "minWidth": 160,
-          "opacity": 1,
-          "paddingHorizontal": 16,
-          "paddingVertical": 6,
-          "textAlign": "center",
-        }
+        Array [
+          Object {
+            "alignItems": "center",
+            "alignSelf": "flex-start",
+            "borderRadius": 2,
+            "flexDirection": "row",
+            "paddingHorizontal": 16,
+            "paddingVertical": 6,
+          },
+          Object {
+            "backgroundColor": "transparent",
+            "borderColor": "#42D689",
+            "borderWidth": 2,
+          },
+          Object {
+            "alignSelf": "center",
+            "borderColor": "#FFFFFF",
+            "marginTop": 8,
+          },
+        ]
       }
+      testID="SmartTopAlertButton"
     >
       <Text
         style={
@@ -80,14 +112,13 @@ exports[`BackupPrompt renders correctly 1`] = `
               "color": "#81868B",
               "fontFamily": "Hind-SemiBold",
               "fontSize": 13,
-              "lineHeight": 17,
-            },
-            Object {
               "lineHeight": 20,
+              "textAlign": "center",
             },
             Object {
               "color": "#42D689",
             },
+            null,
             Object {
               "color": "#FFFFFF",
             },

@@ -9,11 +9,12 @@ const numeral = require('numeral')
 export const getMoneyDisplayValue = (
   value: BigNumber.Value,
   currency: CURRENCY_ENUM = CURRENCY_ENUM.DOLLAR,
-  includeSymbol: boolean = false
+  includeSymbol: boolean = false,
+  roundingTolerance: number = 1
 ): string => {
   const decimals = CURRENCIES[currency].displayDecimals
   const symbol = CURRENCIES[currency].symbol
-  const formattedValue = numeral(roundDown(value, decimals).toNumber()).format(
+  const formattedValue = numeral(roundDown(value, decimals, roundingTolerance).toNumber()).format(
     '0,0.' + '0'.repeat(decimals)
   )
   return includeSymbol ? symbol + formattedValue : formattedValue
@@ -32,16 +33,56 @@ export const getFeeDisplayValue = (value: BigNumber.Value | null | undefined): s
   return value ? numeral(BigNumber.max(value, 0.001).toNumber()).format('0[.][0000]') : ''
 }
 
+/**
+ * More precise getFeeDisplayValue with built in rounding
+ * Used for small Network Fees
+ * @param value fee amount
+ * @param precise true if additional precision to 6 digits for <0.001 needed
+ */
+export const getNetworkFeeDisplayValue = (
+  value: BigNumber.Value,
+  precise: boolean = false
+): string => {
+  const roundedNumber = new BigNumber(value)
+  if (precise && roundedNumber.isLessThan(0.000001)) {
+    return '<0.000001'
+  } else if (roundedNumber.isLessThan(0.001)) {
+    return precise ? numeral(roundUp(value, 6).toNumber()).format('0[.][000000]') : '<0.001'
+  } else {
+    return numeral(roundUp(value, 3).toNumber()).format('0[.][000]')
+  }
+}
+
 export const divideByWei = (value: BigNumber.Value, decimals?: number) => {
   const bn = new BigNumber(value).div(WEI_PER_CELO)
   return decimals ? bn.decimalPlaces(decimals) : bn
 }
 
-export function roundDown(value: BigNumber.Value, decimals: number = 2) {
+export function roundDown(
+  value: BigNumber.Value,
+  decimals: number = 2,
+  roundingTolerance: number = 0
+): BigNumber {
+  if (roundingTolerance) {
+    value = new BigNumber(value).decimalPlaces(
+      decimals + roundingTolerance,
+      BigNumber.ROUND_HALF_DOWN
+    )
+  }
   return new BigNumber(value).decimalPlaces(decimals, BigNumber.ROUND_DOWN)
 }
 
-export function roundUp(value: BigNumber.Value, decimals: number = 2) {
+export function roundUp(
+  value: BigNumber.Value,
+  decimals: number = 2,
+  roundingTolerance: number = 0
+): BigNumber {
+  if (roundingTolerance) {
+    value = new BigNumber(value).decimalPlaces(
+      decimals + roundingTolerance,
+      BigNumber.ROUND_HALF_DOWN
+    )
+  }
   return new BigNumber(value).decimalPlaces(decimals, BigNumber.ROUND_UP)
 }
 

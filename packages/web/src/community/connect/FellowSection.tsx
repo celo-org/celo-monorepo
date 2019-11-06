@@ -6,6 +6,7 @@ import FellowViewer from 'src/community/connect/FellowViewer'
 import { H2 } from 'src/fonts/Fonts'
 import { I18nProps, withNamespaces } from 'src/i18n'
 import { Cell, GridRow, Spans } from 'src/layout/GridRow'
+import { hashNav } from 'src/shared/menu-items'
 
 import { standardStyles, textStyles } from 'src/styles'
 
@@ -17,6 +18,7 @@ class FellowSection extends React.PureComponent<I18nProps> {
         <FellowViewer />
         <GridRow
           allStyle={standardStyles.centered}
+          nativeID={hashNav.connect.fellowship}
           desktopStyle={[standardStyles.sectionMarginTop, standardStyles.blockMarginBottom]}
           tabletStyle={[standardStyles.sectionMarginTablet, standardStyles.blockMarginBottomTablet]}
           mobileStyle={[standardStyles.sectionMarginMobile, standardStyles.blockMarginBottomMobile]}

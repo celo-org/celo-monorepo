@@ -1,7 +1,12 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`SendAmount renders correctly for request payment confirmation 1`] = `
-<View
+<SafeAreaView
+  forceInset={
+    Object {
+      "bottom": "always",
+    }
+  }
   style={
     Object {
       "backgroundColor": "white",
@@ -12,33 +17,7 @@ exports[`SendAmount renders correctly for request payment confirmation 1`] = `
   }
 >
   <RCTScrollView
-    automaticallyAdjustContentInsets={false}
-    contentInset={
-      Object {
-        "bottom": 0,
-      }
-    }
-    enableAutomaticScroll={true}
-    enableResetScrollToCoords={true}
-    extraHeight={75}
-    extraScrollHeight={0}
-    getScrollResponder={[Function]}
-    handleOnScroll={[Function]}
-    keyboardDismissMode="interactive"
-    keyboardOpeningTime={250}
     keyboardShouldPersistTaps="always"
-    keyboardSpace={0}
-    onScroll={[Function]}
-    resetKeyboardSpace={[Function]}
-    scrollEventThrottle={1}
-    scrollForExtraHeightOnAndroid={[Function]}
-    scrollIntoView={[Function]}
-    scrollToEnd={[Function]}
-    scrollToFocusedInput={[Function]}
-    scrollToPosition={[Function]}
-    showsVerticalScrollIndicator={true}
-    update={[Function]}
-    viewIsInsideTabBar={false}
   >
     <View>
       <View
@@ -84,7 +63,7 @@ exports[`SendAmount renders correctly for request payment confirmation 1`] = `
             <Image
               source={
                 Object {
-                  "testUri": "../../../src/images/unknown-user-icon.png",
+                  "testUri": "../../../packages/mobile/src/images/unknown-user-icon.png",
                 }
               }
               style={
@@ -154,7 +133,7 @@ exports[`SendAmount renders correctly for request payment confirmation 1`] = `
               ]
             }
           >
-             +1
+            🇺🇸 +1
           </Text>
           <Text
             style={
@@ -238,7 +217,7 @@ exports[`SendAmount renders correctly for request payment confirmation 1`] = `
               ]
             }
           >
-            $
+            MXN
           </Text>
         </View>
         <View
@@ -263,18 +242,14 @@ exports[`SendAmount renders correctly for request payment confirmation 1`] = `
                 "flexDirection": "row",
                 "justifyContent": "center",
               },
-              Object {
-                "flex": 1,
-                "height": 54,
-                "marginHorizontal": 8,
-              },
+              undefined,
             ]
           }
         >
           <TextInput
             allowFontScaling={true}
+            autoCorrect={false}
             autoFocus={true}
-            autocorrect={false}
             keyboardType="numeric"
             labelStyle={
               Object {
@@ -289,22 +264,16 @@ exports[`SendAmount renders correctly for request payment confirmation 1`] = `
             placeholderTextColor="#A3EBC6"
             rejectResponderTermination={true}
             style={
-              Array [
-                Object {
-                  "fontFamily": "Hind-Regular",
-                },
-                Object {
-                  "borderColor": "#D1D5D8",
-                  "borderRadius": 3,
-                  "padding": 8,
-                },
-                Object {
-                  "backgroundColor": "#FFFFFF",
-                  "flex": 1,
-                },
-              ]
+              Object {
+                "backgroundColor": "#FFFFFF",
+                "borderColor": "#D1D5D8",
+                "borderRadius": 3,
+                "flex": 1,
+                "fontFamily": "Hind-Regular",
+                "padding": 8,
+              }
             }
-            title="$"
+            title="MXN"
             underlineColorAndroid="transparent"
             validator="decimal"
             value=""
@@ -383,17 +352,12 @@ exports[`SendAmount renders correctly for request payment confirmation 1`] = `
                 "flexDirection": "row",
                 "justifyContent": "center",
               },
-              Object {
-                "flex": 1,
-                "height": 54,
-                "marginHorizontal": 8,
-              },
+              undefined,
             ]
           }
         >
           <TextInput
             allowFontScaling={true}
-            keyboardType="default"
             maxLength={70}
             onBlur={[Function]}
             onChangeText={[Function]}
@@ -402,20 +366,14 @@ exports[`SendAmount renders correctly for request payment confirmation 1`] = `
             placeholderTextColor="rgba(0, 0, 0, .4)"
             rejectResponderTermination={true}
             style={
-              Array [
-                Object {
-                  "fontFamily": "Hind-Regular",
-                },
-                Object {
-                  "borderColor": "#D1D5D8",
-                  "borderRadius": 3,
-                  "padding": 8,
-                },
-                Object {
-                  "backgroundColor": "#FFFFFF",
-                  "flex": 1,
-                },
-              ]
+              Object {
+                "backgroundColor": "#FFFFFF",
+                "borderColor": "#D1D5D8",
+                "borderRadius": 3,
+                "flex": 1,
+                "fontFamily": "Hind-Regular",
+                "padding": 8,
+              }
             }
             title="for"
             underlineColorAndroid="transparent"
@@ -521,6 +479,8 @@ exports[`SendAmount renders correctly for request payment confirmation 1`] = `
   </RCTScrollView>
   <View
     accessible={true}
+    focusable={true}
+    onClick={[Function]}
     onResponderGrant={[Function]}
     onResponderMove={[Function]}
     onResponderRelease={[Function]}
@@ -566,7 +526,15 @@ exports[`SendAmount renders correctly for request payment confirmation 1`] = `
       >
         <View
           accessible={true}
+          focusable={false}
           isTVSelectable={true}
+          nativeBackgroundAndroid={
+            Object {
+              "attribute": "selectableItemBackground",
+              "type": "ThemeAttrAndroid",
+            }
+          }
+          onClick={[Function]}
           onResponderGrant={[Function]}
           onResponderMove={[Function]}
           onResponderRelease={[Function]}
@@ -574,15 +542,22 @@ exports[`SendAmount renders correctly for request payment confirmation 1`] = `
           onResponderTerminationRequest={[Function]}
           onStartShouldSetResponder={[Function]}
           style={
-            Object {
-              "alignItems": "center",
-              "backgroundColor": "#A3EBC6",
-              "borderWidth": 0,
-              "flex": 1,
-              "height": 50,
-              "justifyContent": "center",
-              "opacity": 1,
-            }
+            Array [
+              Object {
+                "alignItems": "center",
+                "flex": 1,
+                "justifyContent": "center",
+              },
+              Object {
+                "backgroundColor": "#A3EBC6",
+              },
+              Object {
+                "height": 50,
+              },
+              Object {
+                "borderWidth": 0,
+              },
+            ]
           }
         >
           <View
@@ -674,7 +649,15 @@ exports[`SendAmount renders correctly for request payment confirmation 1`] = `
       >
         <View
           accessible={true}
+          focusable={false}
           isTVSelectable={true}
+          nativeBackgroundAndroid={
+            Object {
+              "attribute": "selectableItemBackground",
+              "type": "ThemeAttrAndroid",
+            }
+          }
+          onClick={[Function]}
           onResponderGrant={[Function]}
           onResponderMove={[Function]}
           onResponderRelease={[Function]}
@@ -682,15 +665,22 @@ exports[`SendAmount renders correctly for request payment confirmation 1`] = `
           onResponderTerminationRequest={[Function]}
           onStartShouldSetResponder={[Function]}
           style={
-            Object {
-              "alignItems": "center",
-              "backgroundColor": "#A3EBC6",
-              "borderWidth": 0,
-              "flex": 1,
-              "height": 50,
-              "justifyContent": "center",
-              "opacity": 1,
-            }
+            Array [
+              Object {
+                "alignItems": "center",
+                "flex": 1,
+                "justifyContent": "center",
+              },
+              Object {
+                "backgroundColor": "#A3EBC6",
+              },
+              Object {
+                "height": 50,
+              },
+              Object {
+                "borderWidth": 0,
+              },
+            ]
           }
         >
           <View
@@ -728,5 +718,5 @@ exports[`SendAmount renders correctly for request payment confirmation 1`] = `
       </View>
     </View>
   </View>
-</View>
+</SafeAreaView>
 `;

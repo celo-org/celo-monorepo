@@ -9,11 +9,12 @@ set -euo pipefail
 
 NETWORK=""
 PHONE=""
-
-while getopts 'n:p:' flag; do
+FAST=""
+while getopts 'n:p:f:' flag; do
   case "${flag}" in
     n) NETWORK="$OPTARG" ;;
     p) PHONE="$OPTARG" ;;
+    f) FAST="$OPTARG" ;;
     *) error "Unexpected option ${flag}" ;;
   esac
 done
@@ -26,10 +27,15 @@ if ! nc -z 127.0.0.1 8545 ; then
   exit 1
 fi
 
-yarn run build && \
-gcloud config set project celo-testnet
-gcloud kms decrypt --ciphertext-file=twilio-config.enc --plaintext-file=twilio-config.js \
-  --key=github-key --keyring=celo-keyring --location=global && \
+if [ "$FAST" == true ] ; then
+  echo "Fast mode is on, protocol won't be rebuilt and twilio config won't be decrypted with KMS."
+else
+  yarn run build
+  gcloud config set project celo-testnet
+  gcloud kms decrypt --ciphertext-file=twilio-config.enc --plaintext-file=twilio-config.js \
+    --key=github-key --keyring=celo-keyring --location=global
+fi
+
 yarn run truffle exec ./scripts/truffle/invite.js \
   --network $NETWORK --stableValue 5 --goldValue 5 \
   --build_directory $PWD/build/$NETWORK --phone $PHONE

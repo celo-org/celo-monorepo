@@ -94,6 +94,12 @@ async function getBranchCommits(): Promise<string[]> {
     }
 
     const url = `https://api.github.com/repos/${owner}/${repo}/pulls/${prNumber}/commits`
+    const commits = await getAllCommits(url)
+    logMessage(`Found ${commits.length} commits in PR ${prNumber}: ${commits}`)
+    return commits
+  }
+
+  async function getAllCommits(url: string): Promise<string[]> {
     const response: any = await fetch(url, {
       headers: {
         Accept: 'application/vnd.github.v3+json',
@@ -114,10 +120,44 @@ async function getBranchCommits(): Promise<string[]> {
       )
     }
     // logMessage(`Commit objects are ${JSON.stringify(commitObjects)}`)
-    const commits = commitObjects.map((commitObject: any) => commitObject.sha)
-    logMessage(`Commits corresponding to ${prNumber} are ${commits}`)
+    let commits = commitObjects.map((commitObject: any) => commitObject.sha)
+
+    const nextPageLink: string | null = getNextPageLink(response)
+    if (nextPageLink) {
+      logMessage(`Getting commits from the next page: ${nextPageLink}`)
+      commits = commits.concat(await getAllCommits(nextPageLink))
+    }
     return commits
   }
+}
+
+// Reference: https://www.w3.org/wiki/LinkHeader
+// linkHeaderValue value would look similar to this
+// <https://api.github.com/repositories/197642503/pulls/1152/commits?page=2>; rel="next", <https://api.github.com/repositories/197642503/pulls/1152/commits?page=2>; rel="last"
+function getNextPageLink(response: Response): string | null {
+  const linkHeaderValue: string | null = response.headers.get('link')
+  if (!linkHeaderValue) {
+    logMessage(`Link header not found in ${response.url}`)
+    return null
+  }
+  logMessage(`Link header value is \"${linkHeaderValue}\"`)
+  const linkEntries = linkHeaderValue.split(',')
+  for (let i = 0; i < linkEntries.length; i++) {
+    if (linkEntries[i].endsWith('rel="next"')) {
+      const lastSemiColon = linkEntries[i].lastIndexOf(';')
+      let nextPageLink = linkEntries[i].substring(0, lastSemiColon)
+      nextPageLink = nextPageLink.trim()
+      if (nextPageLink.startsWith('<')) {
+        nextPageLink = nextPageLink.substring(1)
+      }
+      if (nextPageLink.endsWith('>')) {
+        nextPageLink = nextPageLink.substring(0, nextPageLink.length - 1)
+      }
+      return nextPageLink
+    }
+  }
+  logMessage(`next page link not found in "${linkHeaderValue}"`)
+  return null
 }
 
 async function getChangeCommit(file: string): Promise<string> {

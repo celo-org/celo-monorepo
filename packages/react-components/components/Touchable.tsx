@@ -27,11 +27,10 @@ export default class TouchableDefault extends React.PureComponent<Props> {
       : Touchable.SelectableBackground()
   }
   render() {
-    const props = { ...this.props }
-    delete props.onPress
+    const { onPress, children, ...passThroughProps } = this.props
     return (
-      <Touchable {...props} onPress={this.delayedOnPress} background={this.effect()}>
-        {this.props.children}
+      <Touchable {...passThroughProps} onPress={this.delayedOnPress} background={this.effect()}>
+        {children}
       </Touchable>
     )
   }

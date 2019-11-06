@@ -1,6 +1,7 @@
 import { AnyAction } from 'redux'
 import { call, select, spawn, takeEvery } from 'redux-saga/effects'
 import { devModeSelector } from 'src/account/reducer'
+import { accountSaga } from 'src/account/saga'
 import { appSaga, waitForRehydrate } from 'src/app/saga'
 import { dappKitSaga } from 'src/dappkit/dappkit'
 import { escrowSaga } from 'src/escrow/saga'
@@ -16,14 +17,17 @@ import { inviteSaga } from 'src/invite/saga'
 import { localCurrencySaga } from 'src/localCurrency/saga'
 import { networkInfoSaga } from 'src/networkInfo/saga'
 import { sendSaga } from 'src/send/saga'
+import { sentrySaga } from 'src/sentry/saga'
 import { stableTokenSaga } from 'src/stableToken/saga'
 import Logger from 'src/utils/Logger'
+import { web3Saga } from 'src/web3/saga'
 
 const loggerBlacklist = [
   'persist/REHYDRATE',
   'GETH_NEW_BLOCK',
   'APP/SET_GETH_CONNECTED',
   'ACCOUNT/SET_PHONE_NUMBER',
+  'ACCOUNT/SET_PINCODE',
   'SEND/SET_RECIPIENT_CACHE',
   'IMPORT/IMPORT_BACKUP_PHRASE',
   'WEB3/SET_COMMENT_KEY',
@@ -41,6 +45,9 @@ function* loggerSaga() {
 
   yield takeEvery('*', (action: AnyAction) => {
     if (action && action.type && loggerBlacklist.includes(action.type)) {
+      // Log only action type, but not the payload as it can have
+      // sensitive information.
+      Logger.debug('redux/saga@logger', `${action.type} (payload not logged)`)
       return
     }
     try {
@@ -56,6 +63,7 @@ export function* rootSaga() {
   yield spawn(appSaga)
   yield spawn(networkInfoSaga)
   yield spawn(gethSaga)
+  yield spawn(accountSaga)
   yield spawn(identitySaga)
   yield spawn(goldTokenSaga)
   yield spawn(stableTokenSaga)
@@ -69,4 +77,6 @@ export function* rootSaga() {
   yield spawn(dappKitSaga)
   yield spawn(feesSaga)
   yield spawn(localCurrencySaga)
+  yield spawn(web3Saga)
+  yield spawn(sentrySaga)
 }

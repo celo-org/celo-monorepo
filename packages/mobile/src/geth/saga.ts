@@ -1,4 +1,4 @@
-import { AppState, DeviceEventEmitter } from 'react-native'
+import { AppState, NativeEventEmitter, NativeModules } from 'react-native'
 import { eventChannel } from 'redux-saga'
 import { call, cancelled, delay, fork, put, race, select, take } from 'redux-saga/effects'
 import { Actions, setGethConnected, setInitState } from 'src/geth/actions'
@@ -11,6 +11,9 @@ import { InitializationState, isGethConnectedSelector } from 'src/geth/reducer'
 import { navigateToError } from 'src/navigator/NavigationService'
 import { restartApp } from 'src/utils/AppRestart'
 import Logger from 'src/utils/Logger'
+import { zeroSyncSelector } from 'src/web3/selectors'
+
+const gethEmitter = new NativeEventEmitter(NativeModules.RNGeth)
 
 const TAG = 'geth/saga'
 const INIT_GETH_TIMEOUT = 15000
@@ -39,6 +42,10 @@ export function* waitForGethConnectivity() {
 }
 
 function* waitForGethInstance() {
+  const zeroSyncMode = yield select(zeroSyncSelector)
+  if (zeroSyncMode) {
+    return GethInitOutcomes.SUCCESS
+  }
   try {
     const gethInstance = yield call(getGeth)
     if (gethInstance == null) {
@@ -59,7 +66,7 @@ function* waitForGethInstance() {
   }
 }
 
-function* initGethSaga() {
+export function* initGethSaga() {
   Logger.debug(TAG, 'Initializing Geth')
   yield put(setInitState(InitializationState.INITIALIZING))
 
@@ -119,13 +126,20 @@ function* initGethSaga() {
 
 function createNewBlockChannel() {
   return eventChannel((emit: any) => {
-    const eventSubscription = DeviceEventEmitter.addListener('GethNewHead', emit)
+    const eventSubscription = gethEmitter.addListener('GethNewHead', emit)
     return eventSubscription.remove
   })
 }
 
 function* monitorGeth() {
   const newBlockChannel = yield createNewBlockChannel()
+
+  const zeroSyncMode = yield select(zeroSyncSelector)
+  if (zeroSyncMode) {
+    yield put(setGethConnected(true))
+    yield delay(GETH_MONITOR_DELAY)
+    return
+  }
 
   while (true) {
     try {

@@ -1,3 +1,4 @@
+import { CURRENCY_ENUM } from '@celo/utils'
 import * as admin from 'firebase-admin'
 import i18next from 'i18next'
 import { Currencies } from './blockscout/transfers'
@@ -7,6 +8,7 @@ let database: admin.database.Database
 let registrationsRef: admin.database.Reference
 let lastBlockRef: admin.database.Reference
 let pendingRequestsRef: admin.database.Reference
+let exchangeRatesRef: admin.database.Reference
 
 export interface Registrations {
   [address: string]:
@@ -41,6 +43,12 @@ interface PendingRequests {
   [uid: string]: PaymentRequest
 }
 
+interface ExchangeRateObject {
+  makerToken: CURRENCY_ENUM
+  exchangeRate: string
+  timestamp: string
+}
+
 let registrations: Registrations = {}
 let lastBlockNotified: number = -1
 let pendingRequests: PendingRequests = {}
@@ -68,6 +76,7 @@ export function initializeDb() {
   registrationsRef = database.ref('/registrations')
   lastBlockRef = database.ref('/lastBlockNotified')
   pendingRequestsRef = database.ref('/pendingRequests')
+  exchangeRatesRef = database.ref('/exchangeRates')
 
   // Attach to the registration ref to keep local registrations mapping up to date
   registrationsRef.on(
@@ -137,6 +146,16 @@ export function getPendingRequests() {
 
 export function setPaymentRequestNotified(uid: string): Promise<void> {
   return database.ref(`/pendingRequests/${uid}`).update({ notified: true })
+}
+
+export function writeExchangeRatePair(
+  makerToken: CURRENCY_ENUM,
+  exchangeRate: string,
+  timestamp: string
+) {
+  const exchangeRateRecord: ExchangeRateObject = { makerToken, exchangeRate, timestamp }
+  exchangeRatesRef.push(exchangeRateRecord)
+  console.debug('Recorded exchange rate ', exchangeRateRecord)
 }
 
 export function setLastBlockNotified(newBlock: number): Promise<void> | undefined {

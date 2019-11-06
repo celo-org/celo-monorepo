@@ -8,7 +8,7 @@ import {
 } from '@celo/protocol/lib/web3-utils'
 import { config } from '@celo/protocol/migrationsConfig'
 import { RegistryInstance, ReserveInstance } from 'types'
-const truffle = require('@celo/protocol/truffle.js')
+const truffle = require('@celo/protocol/truffle-config.js')
 
 const initializeArgs = async (): Promise<[string, number]> => {
   const registry: RegistryInstance = await getDeployedProxiedContract<RegistryInstance>(
@@ -25,7 +25,7 @@ module.exports = deploymentForCoreContract<ReserveInstance>(
   initializeArgs,
   async (reserve: ReserveInstance, web3: Web3, networkName: string) => {
     const network: any = truffle.networks[networkName]
-    console.log('Sending the reserve an initial gold balance')
+    console.info('Sending the reserve an initial gold balance')
     await web3.eth.sendTransaction({
       from: network.from,
       to: reserve.address,

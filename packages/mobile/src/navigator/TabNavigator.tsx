@@ -4,7 +4,7 @@ import fontStyles from '@celo/react-components/styles/fonts'
 import * as React from 'react'
 import { withNamespaces, WithNamespaces } from 'react-i18next'
 import { StyleSheet, Text, View } from 'react-native'
-import { createBottomTabNavigator } from 'react-navigation'
+import { createBottomTabNavigator } from 'react-navigation-tabs'
 import { connect } from 'react-redux'
 import ExchangeHomeScreen from 'src/exchange/ExchangeHomeScreen'
 import WalletHome from 'src/home/WalletHome'
@@ -17,6 +17,7 @@ import { Screens, Stacks } from 'src/navigator/Screens'
 import TabBar from 'src/navigator/TabBar'
 import { RootState } from 'src/redux/reducers'
 import { getTabBarActiveNotification } from 'src/redux/selectors'
+import Send from 'src/send/Send'
 
 interface LabelProps {
   tintColor: string
@@ -82,8 +83,6 @@ const SmartWalletIcon = connect<StateProps, {}, {}, RootState>(mapStateToProps)(
   WalletIconWithCircle
 )
 
-const SendStack = () => <View />
-
 export const TabNavigator = createBottomTabNavigator(
   {
     [Screens.WalletHome]: {
@@ -97,7 +96,7 @@ export const TabNavigator = createBottomTabNavigator(
       },
     },
     [Screens.Send]: {
-      screen: SendStack,
+      screen: Send,
       navigationOptions: {
         tabBarButtonComponent: TabBarButtonComponent,
         tabBarIcon: (props: any) => (
@@ -107,6 +106,9 @@ export const TabNavigator = createBottomTabNavigator(
         ),
         tabBarLabel: () => null,
         tabBarOnPress: () => {
+          navigate(Stacks.SendStack)
+        },
+        tabBarOnLongPress: () => {
           navigate(Stacks.SendStack)
         },
       },

@@ -12,11 +12,42 @@ import {
   tupleParser,
 } from './BaseWrapper'
 
+export interface ExchangeConfig {
+  spread: BigNumber
+  reserveFraction: BigNumber
+  updateFrequency: BigNumber
+  minimumReports: BigNumber
+}
+
 /**
  * Contract that allows to exchange StableToken for GoldToken and vice versa
  * using a Constant Product Market Maker Model
  */
 export class ExchangeWrapper extends BaseWrapper<Exchange> {
+  /**
+   * Query spread parameter
+   * @returns Current spread charged on exchanges
+   */
+  spread = proxyCall(this.contract.methods.spread, undefined, toBigNumber)
+  /**
+   * Query reserve fraction parameter
+   * @returns Current fraction to commit to the gold bucket
+   */
+  reserveFraction = proxyCall(this.contract.methods.reserveFraction, undefined, toBigNumber)
+  /**
+   * Query update frequency parameter
+   * @returns The time period that needs to elapse between bucket
+   * updates
+   */
+  updateFrequency = proxyCall(this.contract.methods.updateFrequency, undefined, toBigNumber)
+  /**
+   * Query minimum reports parameter
+   * @returns The minimum number of fresh reports that need to be
+   * present in the oracle to update buckets
+   * commit to the gold bucket
+   */
+  minimumReports = proxyCall(this.contract.methods.minimumReports, undefined, toBigNumber)
+
   /**
    * @dev Returns the amount of buyToken a user would get for sellAmount of sellToken
    * @param sellAmount The amount of sellToken the user is selling to the exchange
@@ -123,4 +154,47 @@ export class ExchangeWrapper extends BaseWrapper<Exchange> {
    * @return The corresponding cUsd amount.
    */
   quoteGoldBuy = (buyAmount: NumberLike) => this.getSellTokenAmount(buyAmount, true)
+
+  /**
+   * @dev Returns the current configuration of the exchange contract
+   * @return ExchangeConfig object
+   */
+  async getConfig(): Promise<ExchangeConfig> {
+    const res = await Promise.all([
+      this.spread(),
+      this.reserveFraction(),
+      this.updateFrequency(),
+      this.minimumReports(),
+    ])
+    return {
+      spread: res[0],
+      reserveFraction: res[1],
+      updateFrequency: res[2],
+      minimumReports: res[3],
+    }
+  }
+  /**
+   * Returns the exchange rate estimated at buyAmount.
+   * @param buyAmount The amount of buyToken in wei to estimate the exchange rate at
+   * @param sellGold `true` if gold is the sell token
+   * @return The exchange rate (number of sellTokens received for one buyToken).
+   */
+  async getExchangeRate(buyAmount: NumberLike, sellGold: boolean): Promise<BigNumber> {
+    const takerAmount = await this.getBuyTokenAmount(buyAmount, sellGold)
+    return new BigNumber(buyAmount).dividedBy(takerAmount) // Number of sellTokens received for one buyToken
+  }
+
+  /**
+   * Returns the exchange rate for cUsd estimated at the buyAmount
+   * @param buyAmount The amount of cUsd in wei to estimate the exchange rate at
+   * @return The exchange rate (number of cGold received for one cUsd)
+   */
+  getUsdExchangeRate = (buyAmount: NumberLike) => this.getExchangeRate(buyAmount, false)
+
+  /**
+   * Returns the exchange rate for cGold estimated at the buyAmount
+   * @param buyAmount The amount of cGold in wei to estimate the exchange rate at
+   * @return The exchange rate (number of cUsd received for one cGold)
+   */
+  getGoldExchangeRate = (buyAmount: NumberLike) => this.getExchangeRate(buyAmount, true)
 }

@@ -11,3 +11,21 @@ export default function airtableInit(baseID: string) {
   }
   return airTableSingleton.base(baseID)
 }
+
+export interface AirRecord<Fields> {
+  id: string
+  fields: Fields
+  save: () => unknown
+  patchUpdate: () => unknown
+  putUpdate: () => unknown
+  destroy: () => unknown
+  fetch: () => unknown
+  updateFields: () => unknown
+  replaceFields: () => unknown
+  _rawJson: {
+    id: string
+    fields: Fields
+    createdTime: string
+  }
+  _table: AirtableAPI.Table<AirtableAPI.FieldSet>
+}

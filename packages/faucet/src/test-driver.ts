@@ -50,7 +50,7 @@ async function populatePool(pool: fbHelper.AccountPool) {
 function fakeAction(pool: fbHelper.AccountPool) {
   return pool.doWithAccount(async (account) => {
     console.log('GOT Accounts', account)
-    wait(5000)
+    await wait(5000)
   })
 }
 
@@ -137,8 +137,10 @@ async function main() {
     console.error('Failed')
     console.error(err)
   } finally {
-    admin.app().delete()
+    await admin.app().delete()
   }
 }
 
-main()
+main().catch((err) => {
+  console.log(err)
+})

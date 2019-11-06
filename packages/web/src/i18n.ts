@@ -1,6 +1,6 @@
 import NextI18Next, { I18nProps as i18nProps } from 'next-i18next'
 
-const options = { defaultLanguage: 'en', otherLanguages: ['de', 'es', 'zh'], saveMissing: false }
+const options = { defaultLanguage: 'en', otherLanguages: ['en'], saveMissing: false }
 const NextI18NextInstance = new NextI18Next(options)
 
 export const Trans = NextI18NextInstance.Trans

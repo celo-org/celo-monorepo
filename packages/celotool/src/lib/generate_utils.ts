@@ -1,16 +1,17 @@
+import { blsPrivateKeyToProcessedPrivateKey } from '@celo/utils/lib/bls'
 import * as bls12377js from 'bls12377js'
 import { ec as EC } from 'elliptic'
+import fs from 'fs'
 import { range, repeat } from 'lodash'
+import path from 'path'
 import rlp from 'rlp'
 import Web3 from 'web3'
-import { blsPrivateKeyToProcessedPrivateKey } from './bls_utils'
-import { envVar, fetchEnv, fetchEnvOrFallback } from './env-utils'
+import { envVar, fetchEnv, fetchEnvOrFallback, monorepoRoot } from './env-utils'
 import {
   CONTRACT_OWNER_STORAGE_LOCATION,
   GETH_CONFIG_OLD,
   ISTANBUL_MIX_HASH,
   OG_ACCOUNTS,
-  PROXY_CONTRACT_CODE,
   REGISTRY_ADDRESS,
   TEMPLATE,
 } from './genesis_constants'
@@ -26,6 +27,7 @@ export enum AccountType {
   TX_NODE = 2,
   BOOTNODE = 3,
   FAUCET = 4,
+  ATTESTATION = 5,
 }
 
 export enum ConsensusType {
@@ -44,6 +46,7 @@ export const MNEMONIC_ACCOUNT_TYPE_CHOICES = [
   'tx_node',
   'bootnode',
   'faucet',
+  'attestation',
 ]
 
 export const add0x = (str: string) => {
@@ -102,6 +105,12 @@ export const getValidators = (mnemonic: string, n: number) => {
   })
 }
 
+export const getAddressFromEnv = (accountType: AccountType, n: number) => {
+  const mnemonic = fetchEnv(envVar.MNEMONIC)
+  const privateKey = generatePrivateKey(mnemonic, accountType, n)
+  return privateKeyToAddress(privateKey)
+}
+
 export const generateGenesisFromEnv = (enablePetersburg: boolean = true) => {
   const mnemonic = fetchEnv(envVar.MNEMONIC)
   const validatorEnv = fetchEnv(envVar.VALIDATORS)
@@ -124,6 +133,10 @@ export const generateGenesisFromEnv = (enablePetersburg: boolean = true) => {
   }
 
   const blockTime = parseInt(fetchEnv(envVar.BLOCK_TIME), 10)
+  const requestTimeout = parseInt(
+    fetchEnvOrFallback(envVar.ISTANBUL_REQUEST_TIMEOUT_MS, '3000'),
+    10
+  )
   const epoch = parseInt(fetchEnvOrFallback(envVar.EPOCH, '30000'), 10)
   const chainId = parseInt(fetchEnv(envVar.NETWORK_ID), 10)
 
@@ -137,6 +150,7 @@ export const generateGenesisFromEnv = (enablePetersburg: boolean = true) => {
     initialAccounts: faucetAddresses,
     epoch,
     chainId,
+    requestTimeout,
     enablePetersburg,
   })
 }
@@ -170,6 +184,7 @@ export const generateGenesis = ({
   blockTime,
   epoch,
   chainId,
+  requestTimeout,
   enablePetersburg = true,
 }: {
   validators: Validator[]
@@ -178,6 +193,7 @@ export const generateGenesis = ({
   blockTime: number
   epoch: number
   chainId: number
+  requestTimeout: number
   enablePetersburg?: boolean
 }) => {
   const genesis: any = { ...TEMPLATE }
@@ -198,7 +214,11 @@ export const generateGenesis = ({
     genesis.difficulty = '0x1'
     genesis.extraData = generateIstanbulExtraData(validators)
     genesis.config.istanbul = {
-      policy: 0,
+      // see github.com/celo-org/celo-blockchain/blob/master/consensus/istanbul/config.go#L21-L25
+      // 0 = RoundRobin, 1 = Sticky, 2 = ShuffledRoundRobin
+      policy: 2,
+      period: blockTime,
+      requesttimeout: requestTimeout,
       epoch,
     }
   }
@@ -216,9 +236,13 @@ export const generateGenesis = ({
   }
 
   const contracts = [REGISTRY_ADDRESS]
+  const contractBuildPath = path.resolve(
+    monorepoRoot,
+    'packages/protocol/build/contracts/Proxy.json'
+  )
   for (const contract of contracts) {
     genesis.alloc[contract] = {
-      code: PROXY_CONTRACT_CODE,
+      code: JSON.parse(fs.readFileSync(contractBuildPath).toString()).deployedBytecode,
       storage: {
         [CONTRACT_OWNER_STORAGE_LOCATION]: validators[0].address,
       },

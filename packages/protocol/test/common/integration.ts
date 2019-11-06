@@ -1,8 +1,14 @@
-import { assertEqualBN, stripHexEncoding, timeTravel } from '@celo/protocol/lib/test-utils'
+import {
+  assertEqualBN,
+  isSameAddress,
+  stripHexEncoding,
+  timeTravel,
+} from '@celo/protocol/lib/test-utils'
 import { getDeployedProxiedContract } from '@celo/protocol/lib/web3-utils'
 import { config } from '@celo/protocol/migrationsConfig'
 import BigNumber from 'bignumber.js'
 import {
+  AccountsInstance,
   ExchangeInstance,
   GoldTokenInstance,
   GovernanceInstance,
@@ -22,23 +28,21 @@ enum VoteValue {
 contract('Integration: Governance', (accounts: string[]) => {
   const proposalId = 1
   const dequeuedIndex = 0
+  let accountsInstance: AccountsInstance
   let lockedGold: LockedGoldInstance
   let governance: GovernanceInstance
   let registry: RegistryInstance
   let proposalTransactions: any
-  let weight: BigNumber
+  const value = new BigNumber('1000000000000000000')
 
   before(async () => {
+    accountsInstance = await getDeployedProxiedContract('Accounts', artifacts)
     lockedGold = await getDeployedProxiedContract('LockedGold', artifacts)
     governance = await getDeployedProxiedContract('Governance', artifacts)
     registry = await getDeployedProxiedContract('Registry', artifacts)
-    // Set up a LockedGold account with which we can vote.
-    await lockedGold.createAccount()
-    const noticePeriod = 60 * 60 * 24 // 1 day
-    const value = new BigNumber('1000000000000000000')
+    await accountsInstance.createAccount()
     // @ts-ignore
-    await lockedGold.newCommitment(noticePeriod, { value })
-    weight = await lockedGold.getAccountWeight(accounts[0])
+    await lockedGold.lock({ value })
     proposalTransactions = [
       {
         value: 0,
@@ -89,7 +93,7 @@ contract('Integration: Governance', (accounts: string[]) => {
     })
 
     it('should increase the number of upvotes for the proposal', async () => {
-      assertEqualBN(await governance.getUpvotes(proposalId), weight)
+      assertEqualBN(await governance.getUpvotes(proposalId), value)
     })
   })
 
@@ -112,13 +116,13 @@ contract('Integration: Governance', (accounts: string[]) => {
 
     it('should increment the vote totals', async () => {
       const [yes, ,] = await governance.getVoteTotals(proposalId)
-      assertEqualBN(yes, weight)
+      assertEqualBN(yes, value)
     })
   })
 
   describe('When executing that proposal', async () => {
     before(async () => {
-      await timeTravel(config.governance.executionStageDuration, web3)
+      await timeTravel(config.governance.referendumStageDuration, web3)
       await governance.execute(proposalId, dequeuedIndex)
     })
 
@@ -139,6 +143,8 @@ contract('Integration: Exchange', (accounts: string[]) => {
   let originalStable
   let originalGold
   let originalReserve
+
+  const decimals = 18
 
   before(async () => {
     exchange = await getDeployedProxiedContract('Exchange', artifacts)
@@ -166,7 +172,13 @@ contract('Integration: Exchange', (accounts: string[]) => {
       await exchange.exchange(sellAmount, minBuyAmount, true)
       const finalGold = await goldToken.balanceOf(accounts[0])
 
-      assert.isTrue(finalGold.lt(originalGold))
+      const block = await web3.eth.getBlock('latest')
+      if (isSameAddress(block.miner, accounts[0])) {
+        const blockReward = new BigNumber(2).times(new BigNumber(10).pow(decimals))
+        assert.isTrue(finalGold.lt(originalGold.plus(blockReward)))
+      } else {
+        assert.isTrue(finalGold.lt(originalGold))
+      }
     })
 
     it(`should increase Reserve's gold`, async () => {

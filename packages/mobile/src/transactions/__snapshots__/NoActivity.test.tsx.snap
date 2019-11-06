@@ -14,7 +14,7 @@ exports[`renders exchange 1`] = `
     resizeMode="contain"
     source={
       Object {
-        "testUri": "../../../src/images/exchange.png",
+        "testUri": "../../../packages/mobile/src/images/exchange.png",
       }
     }
     style={
@@ -61,7 +61,7 @@ exports[`renders home 1`] = `
     resizeMode="contain"
     source={
       Object {
-        "testUri": "../../../src/images/shiny-dollar.png",
+        "testUri": "../../../packages/mobile/src/images/shiny-dollar.png",
       }
     }
     style={
@@ -93,6 +93,7 @@ exports[`renders home 1`] = `
   </Text>
   <View
     accessible={true}
+    focusable={true}
     hitSlop={
       Object {
         "bottom": 7,
@@ -102,6 +103,13 @@ exports[`renders home 1`] = `
       }
     }
     isTVSelectable={true}
+    nativeBackgroundAndroid={
+      Object {
+        "attribute": "selectableItemBackground",
+        "type": "ThemeAttrAndroid",
+      }
+    }
+    onClick={[Function]}
     onResponderGrant={[Function]}
     onResponderMove={[Function]}
     onResponderRelease={[Function]}
@@ -109,18 +117,25 @@ exports[`renders home 1`] = `
     onResponderTerminationRequest={[Function]}
     onStartShouldSetResponder={[Function]}
     style={
-      Object {
-        "alignItems": "center",
-        "alignSelf": "center",
-        "backgroundColor": "#42D689",
-        "borderRadius": 2,
-        "marginTop": 20,
-        "minWidth": 160,
-        "opacity": 1,
-        "paddingHorizontal": 18,
-        "paddingVertical": 8,
-        "textAlign": "center",
-      }
+      Array [
+        Object {
+          "alignItems": "center",
+          "alignSelf": "flex-start",
+          "borderRadius": 2,
+          "flexDirection": "row",
+          "paddingHorizontal": 16,
+          "paddingVertical": 6,
+        },
+        Object {
+          "backgroundColor": "#42D689",
+          "paddingHorizontal": 18,
+          "paddingVertical": 8,
+        },
+        Object {
+          "alignSelf": "center",
+          "marginTop": 20,
+        },
+      ]
     }
   >
     <Text
@@ -130,14 +145,13 @@ exports[`renders home 1`] = `
             "color": "#81868B",
             "fontFamily": "Hind-SemiBold",
             "fontSize": 13,
-            "lineHeight": 17,
-          },
-          Object {
             "lineHeight": 20,
+            "textAlign": "center",
           },
           Object {
             "color": "#FFFFFF",
           },
+          null,
           undefined,
         ]
       }

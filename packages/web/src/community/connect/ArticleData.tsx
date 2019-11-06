@@ -21,10 +21,7 @@ export default class ArticleData extends React.PureComponent {
   }
 
   render() {
-    const state = this.state
-    if (!state.loaded) {
-      return null
-    }
-    return <ArticlesSection articles={state.articles} />
+    const { articles, loaded } = this.state
+    return <ArticlesSection articles={articles} loading={!loaded} />
   }
 }

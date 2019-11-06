@@ -1,15 +1,17 @@
 export type Address = string
 
 export enum CeloContract {
+  Accounts = 'Accounts',
   Attestations = 'Attestations',
-  LockedGold = 'LockedGold',
+  BlockchainParameters = 'BlockchainParameters',
+  Election = 'Election',
   Escrow = 'Escrow',
   Exchange = 'Exchange',
   GasCurrencyWhitelist = 'GasCurrencyWhitelist',
   GasPriceMinimum = 'GasPriceMinimum',
   GoldToken = 'GoldToken',
   Governance = 'Governance',
-  MultiSig = 'MultiSig',
+  LockedGold = 'LockedGold',
   Random = 'Random',
   Registry = 'Registry',
   Reserve = 'Reserve',
@@ -21,7 +23,7 @@ export enum CeloContract {
 export type CeloToken = CeloContract.GoldToken | CeloContract.StableToken
 
 export const AllContracts = Object.keys(CeloContract).map(
-  (k) => CeloContract[k as any]
+  (k) => (CeloContract as any)[k as any]
 ) as CeloContract[]
 
 export const NULL_ADDRESS = '0x0000000000000000000000000000000000000000' as Address

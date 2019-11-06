@@ -1,7 +1,8 @@
+import { PincodeType } from 'src/account/reducer'
 import { RootState } from 'src/redux/reducers'
 
 // Default (version -1 schema)
-const vNeg1Schema = {
+export const vNeg1Schema = {
   app: {
     inviteCodeEntered: false,
     loggedIn: false,
@@ -53,8 +54,10 @@ const vNeg1Schema = {
     },
     latestBlockNumber: 0,
     account: '0x0000000000000000000000000000000000007E57',
+    accountInWeb3Keystore: '0x0000000000000000000000000000000000007E57',
     commentKey: '0x0000000000000000000000000000000000008F68',
     gasPriceLastUpdated: 0,
+    zeroSyncMode: false,
   },
   identity: {
     attestationCodes: [],
@@ -79,6 +82,7 @@ const vNeg1Schema = {
     paymentRequests: [],
     showFakeData: false,
     backupCompleted: false,
+    socialBackupCompleted: false,
     backupDelayedTime: 0,
     dismissedEarnRewards: false,
     dismissedInviteFriends: false,
@@ -131,7 +135,7 @@ export const v0Schema = {
   },
 }
 
-const v1Schema = {
+export const v1Schema = {
   ...v0Schema,
   app: {
     ...v0Schema.app,
@@ -139,6 +143,36 @@ const v1Schema = {
   },
 }
 
+export const v2Schema = {
+  ...v1Schema,
+  account: {
+    ...v1Schema.account,
+    pincodeType: PincodeType.Unset,
+    isSettingPin: false,
+  },
+  invite: {
+    ...v1Schema.invite,
+    isRedeemingInvite: false,
+  },
+}
+
+export const v3Schema = {
+  ...v2Schema,
+  app: {
+    ...v2Schema.app,
+    doingPinVerification: false,
+  },
+  localCurrency: {
+    ...v2Schema.localCurrency,
+    preferredCurrencyCode: 'MXN',
+    fetchedCurrencyCode: 'MXN',
+    symbol: undefined,
+  },
+  imports: {
+    isImportingWallet: false,
+  },
+}
+
 export function getLatestSchema(): Partial<RootState> {
-  return v1Schema as Partial<RootState>
+  return v3Schema as Partial<RootState>
 }
