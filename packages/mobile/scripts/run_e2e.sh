@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+set -euo pipefail
 
 #####
 # This file launches the emulator and fires the tests
@@ -35,7 +36,9 @@ echo "Emulator unlocked!"
 bash ./scripts/unlock.sh
 
 # Just to be safe kill any process that listens on the port 'yarn start' is going to use
-lsof -t -i :8081 | xargs kill -9
+echo "Killing previous metro server (if any)"
+react-native-kill-packager || echo 'Failed to kill for some reason'
+echo "Start metro server"
 yarn start:bg
 
 

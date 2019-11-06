@@ -1,3 +1,4 @@
+import { retryAsyncWithBackOff } from '@celo/utils/lib/async'
 import { messaging } from 'firebase-admin'
 import { PhoneNumberUtil } from 'google-libphonenumber'
 import sleep from 'sleep-promise'
@@ -90,7 +91,12 @@ async function sendViaTextProvider(phoneNumber: string, messageText: string) {
       })
       console.info('Message sent via Twilio')
     } else {
-      await sendSmsWithNexmo(countryCode, phoneNumber, messageText)
+      await retryAsyncWithBackOff(
+        sendSmsWithNexmo,
+        10,
+        [countryCode, phoneNumber, messageText],
+        1000
+      )
       console.info('Message sent via Nexmo')
     }
   } catch (e) {

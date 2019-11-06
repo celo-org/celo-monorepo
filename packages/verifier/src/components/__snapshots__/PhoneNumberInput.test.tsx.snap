@@ -79,6 +79,7 @@ exports[`PhoneNumberInput when defaultCountry renders defaults 1`] = `
           "width": 60,
         }
       }
+      testID="contryCodeText"
     >
       +54
     </Text>
@@ -122,20 +123,14 @@ exports[`PhoneNumberInput when defaultCountry renders defaults 1`] = `
         placeholderTextColor="#D1D5D8"
         rejectResponderTermination={true}
         style={
-          Array [
-            Object {
-              "fontFamily": "Hind-Regular",
-            },
-            Object {
-              "borderColor": "#D1D5D8",
-              "borderRadius": 3,
-              "padding": 8,
-            },
-            Object {
-              "backgroundColor": "#FFFFFF",
-              "flex": 1,
-            },
-          ]
+          Object {
+            "backgroundColor": "#FFFFFF",
+            "borderColor": "#D1D5D8",
+            "borderRadius": 3,
+            "flex": 1,
+            "fontFamily": "Hind-Regular",
+            "padding": 8,
+          }
         }
         testID="PhoneNumberField"
         underlineColorAndroid="transparent"
@@ -163,7 +158,7 @@ exports[`PhoneNumberInput when no defaultCountry renders AutoComplete 1`] = `
     style={
       Array [
         Object {
-          "zIndex": 1,
+          "flex": 1,
         },
         undefined,
       ]
@@ -176,6 +171,7 @@ exports[`PhoneNumberInput when no defaultCountry renders AutoComplete 1`] = `
             "borderColor": "#b9b9b9",
             "borderRadius": 1,
             "borderWidth": 1,
+            "marginBottom": 0,
           },
           Array [
             Object {
@@ -220,6 +216,7 @@ exports[`PhoneNumberInput when no defaultCountry renders AutoComplete 1`] = `
           autoCorrect={false}
           data={Array []}
           defaultValue=""
+          flatListProps={Object {}}
           inputContainerStyle={
             Array [
               Object {
@@ -236,6 +233,7 @@ exports[`PhoneNumberInput when no defaultCountry renders AutoComplete 1`] = `
               },
             ]
           }
+          keyExtractor={[Function]}
           keyboardShouldPersistTaps="always"
           listContainerStyle={
             Object {
@@ -274,22 +272,15 @@ exports[`PhoneNumberInput when no defaultCountry renders AutoComplete 1`] = `
           renderItem={[Function]}
           renderSeparator={null}
           renderTextInput={[Function]}
-          rowHasChanged={[Function]}
           style={
-            Array [
-              Object {
-                "fontFamily": "Hind-Regular",
-              },
-              Object {
-                "borderColor": "#D1D5D8",
-                "borderRadius": 3,
-                "padding": 8,
-              },
-              Object {
-                "backgroundColor": "#FFFFFF",
-                "flex": 1,
-              },
-            ]
+            Object {
+              "backgroundColor": "#FFFFFF",
+              "borderColor": "#D1D5D8",
+              "borderRadius": 3,
+              "flex": 1,
+              "fontFamily": "Hind-Regular",
+              "padding": 8,
+            }
           }
           testID="CountryNameField"
           underlineColorAndroid="transparent"
@@ -334,6 +325,7 @@ exports[`PhoneNumberInput when no defaultCountry renders AutoComplete 1`] = `
           "width": 60,
         }
       }
+      testID="contryCodeText"
     >
       
     </Text>
@@ -377,20 +369,14 @@ exports[`PhoneNumberInput when no defaultCountry renders AutoComplete 1`] = `
         placeholderTextColor="#D1D5D8"
         rejectResponderTermination={true}
         style={
-          Array [
-            Object {
-              "fontFamily": "Hind-Regular",
-            },
-            Object {
-              "borderColor": "#D1D5D8",
-              "borderRadius": 3,
-              "padding": 8,
-            },
-            Object {
-              "backgroundColor": "#FFFFFF",
-              "flex": 1,
-            },
-          ]
+          Object {
+            "backgroundColor": "#FFFFFF",
+            "borderColor": "#D1D5D8",
+            "borderRadius": 3,
+            "flex": 1,
+            "fontFamily": "Hind-Regular",
+            "padding": 8,
+          }
         }
         testID="PhoneNumberField"
         underlineColorAndroid="transparent"

@@ -1,23 +1,15 @@
-pragma solidity ^0.5.8;
+pragma solidity ^0.5.3;
 
-import "../interfaces/IRandom.sol";
+import "../Random.sol";
 
-/**
- * @title Returns a fixed value to test 'random' things
- */
-contract MockRandom is IRandom {
+contract MockRandom is Random {
+  mapping (uint256 => bytes32) private history;
 
-  bytes32 public _r;
-
-  function revealAndCommit(
-    bytes32 randomness,
-    bytes32 newCommitment,
-    address proposer
-  ) external {
-    _r = randomness;
+  function addTestRandomness(uint256 blockNumber, bytes32 randomness) external {
+    history[blockNumber] = randomness;
   }
-  
-  function random() external view returns (bytes32) {
-    return _r;
+  function getBlockRandomness(uint256 blockNumber) external view returns (bytes32) {
+    require(history[blockNumber] != 0x0, "No randomness found");
+    return history[blockNumber];
   }
 }

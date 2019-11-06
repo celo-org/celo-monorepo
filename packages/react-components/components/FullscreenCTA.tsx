@@ -4,6 +4,7 @@ import fontStyles from '@celo/react-components/styles/fonts'
 import variables from '@celo/react-components/styles/variables'
 import * as React from 'react'
 import { StyleSheet, Text, View } from 'react-native'
+import SafeAreaView from 'react-native-safe-area-view'
 
 export interface Props {
   title: string
@@ -17,7 +18,7 @@ class FullscreenCTA extends React.PureComponent<Props> {
     const { title, subtitle, CTAText, CTAHandler } = this.props
 
     return (
-      <View style={style.container}>
+      <SafeAreaView style={style.container}>
         <View style={style.header}>
           <Text style={fontStyles.h1}>{title}</Text>
           <Text style={fontStyles.h2}>{subtitle}</Text>
@@ -32,7 +33,7 @@ class FullscreenCTA extends React.PureComponent<Props> {
             testID="ErrorContinueButton"
           />
         </View>
-      </View>
+      </SafeAreaView>
     )
   }
 }

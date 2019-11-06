@@ -39,7 +39,8 @@ function getDisplayName({ name, recipient, e164Number, address, t }: Props) {
   if (address) {
     return t('walletAddress')
   }
-  throw new Error('Invalid avatar props, cannot determine display name')
+  // Rare but possible, such as when a user skips onboarding flow (in dev mode) and then views their own avatar
+  return t('unknown')
 }
 
 export function Avatar(props: Props) {

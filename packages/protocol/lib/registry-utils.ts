@@ -1,6 +1,8 @@
 export enum CeloContractName {
+  Accounts = 'Accounts',
   Attestations = 'Attestations',
   BlockchainParameters = 'BlockchainParameters',
+  Election = 'Election',
   Escrow = 'Escrow',
   Exchange = 'Exchange',
   GasCurrencyWhitelist = 'GasCurrencyWhitelist',
@@ -24,8 +26,10 @@ export const usesRegistry = [
 
 // TODO(amy): Find another way to create this list
 export const hasEntryInRegistry: string[] = [
+  CeloContractName.Accounts,
   CeloContractName.Attestations,
   CeloContractName.BlockchainParameters,
+  CeloContractName.Election,
   CeloContractName.Escrow,
   CeloContractName.Exchange,
   CeloContractName.GasCurrencyWhitelist,

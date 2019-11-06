@@ -25,8 +25,8 @@ import android.Manifest.permission;
 import android.util.Log;
 import android.telephony.SmsManager;
 import android.telephony.TelephonyManager;
-import android.support.v4.content.LocalBroadcastManager;
-import android.support.v4.content.ContextCompat;
+import androidx.localbroadcastmanager.content.LocalBroadcastManager;
+import androidx.core.content.ContextCompat;
 
 import java.io.Writer;
 import java.io.PrintWriter;

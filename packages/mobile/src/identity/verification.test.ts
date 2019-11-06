@@ -14,7 +14,6 @@ import { attestationCodesSelector } from 'src/identity/reducer'
 import {
   AttestationCode,
   doVerificationFlow,
-  ERROR_DURATION,
   requestAndRetrieveAttestations,
   startVerification,
   VERIFICATION_TIMEOUT,
@@ -208,7 +207,7 @@ describe('Do Verification Saga', () => {
         [select(e164NumberSelector), mockE164Number],
         [matchers.call.fn(requestAndRetrieveAttestations), throwError(new Error('fake error'))],
       ])
-      .put(showError(ErrorMessages.VERIFICATION_FAILURE, ERROR_DURATION))
+      .put(showError(ErrorMessages.VERIFICATION_FAILURE))
       .put(endVerification(false))
       .returns(false)
       .run()

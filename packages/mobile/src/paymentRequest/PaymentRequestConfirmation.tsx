@@ -5,21 +5,19 @@ import { CURRENCY_ENUM } from '@celo/utils/src/currencies'
 import BigNumber from 'bignumber.js'
 import * as React from 'react'
 import { withNamespaces, WithNamespaces } from 'react-i18next'
-import { StyleSheet, View } from 'react-native'
+import { StyleSheet } from 'react-native'
+import SafeAreaView from 'react-native-safe-area-view'
 import { NavigationInjectedProps } from 'react-navigation'
 import { connect } from 'react-redux'
-import { bindActionCreators } from 'redux'
-import { PaymentRequestStatuses } from 'src/account'
+import { PaymentRequestStatus } from 'src/account'
 import { showError } from 'src/alert/actions'
 import CeloAnalytics from 'src/analytics/CeloAnalytics'
 import { CustomEventNames } from 'src/analytics/constants'
 import componentWithAnalytics from 'src/analytics/wrapper'
-import { ErrorMessages } from 'src/app/ErrorMessages'
-import { writePaymentRequest } from 'src/firebase/firebase'
+import { writePaymentRequest } from 'src/firebase/actions'
 import { currencyToShortMap } from 'src/geth/consts'
 import { Namespaces } from 'src/i18n'
-import { navigate, navigateBack } from 'src/navigator/NavigationService'
-import { Screens } from 'src/navigator/Screens'
+import { navigateBack } from 'src/navigator/NavigationService'
 import PaymentRequestReviewCard from 'src/paymentRequest/PaymentRequestReviewCard'
 import { Recipient } from 'src/recipients/recipient'
 import { RootState } from 'src/redux/reducers'
@@ -27,6 +25,7 @@ import DisconnectBanner from 'src/shared/DisconnectBanner'
 import Logger from 'src/utils/Logger'
 import { currentAccountSelector } from 'src/web3/selectors'
 
+// @ts-ignore
 const TAG = 'paymentRequest/confirmation'
 
 export interface ConfirmationInput {
@@ -42,20 +41,11 @@ interface StateProps {
 }
 
 interface DispatchProps {
-  writePaymentRequest: typeof writePaymentRequest
   showError: typeof showError
+  writePaymentRequest: typeof writePaymentRequest
 }
 
-// Use bindActionCreators to workaround a typescript error with the shorthand syntax with redux-thunk actions
-// see https://github.com/DefinitelyTyped/DefinitelyTyped/issues/37369
-const mapDispatchToProps = (dispatch: any) =>
-  bindActionCreators(
-    {
-      writePaymentRequest,
-      showError,
-    },
-    dispatch
-  )
+const mapDispatchToProps = { showError, writePaymentRequest }
 
 const mapStateToProps = (state: RootState): StateProps => {
   return {
@@ -109,19 +99,11 @@ class PaymentRequestConfirmation extends React.Component<Props> {
       requesteeAddress,
       currency: currencyToShortMap[CURRENCY_ENUM.DOLLAR],
       comment: reason,
-      status: PaymentRequestStatuses.REQUESTED,
+      status: PaymentRequestStatus.REQUESTED,
       notified: false,
     }
 
-    try {
-      this.props.writePaymentRequest(paymentInfo)
-    } catch (error) {
-      Logger.error(TAG, 'Payment request failed, show error message', error)
-      this.props.showError(ErrorMessages.PAYMENT_REQUEST_FAILED)
-      return
-    }
-
-    navigate(Screens.WalletHome)
+    this.props.writePaymentRequest(paymentInfo)
     Logger.showMessage(t('requestSent'))
   }
 
@@ -142,7 +124,7 @@ class PaymentRequestConfirmation extends React.Component<Props> {
     } = this.getConfirmationInput()
 
     return (
-      <View style={styles.container}>
+      <SafeAreaView style={styles.container}>
         <DisconnectBanner />
         <ReviewFrame
           HeaderComponent={this.renderHeader}
@@ -162,7 +144,7 @@ class PaymentRequestConfirmation extends React.Component<Props> {
             currency={CURRENCY_ENUM.DOLLAR} // User can only request in Dollars
           />
         </ReviewFrame>
-      </View>
+      </SafeAreaView>
     )
   }
 }

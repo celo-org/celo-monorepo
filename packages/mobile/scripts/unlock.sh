@@ -18,7 +18,14 @@ done
 adb wait-for-device shell \
   'while [[ -z $(getprop sys.boot_completed) ]]; do sleep 1; done;'
 
+
+echo "locksettings set-pin $SECRET_PIN" | adb shell || echo "Failed to change pin, probably already set"
+
+
+sleep 1
 echo "Device is done booting"
+sleep 10
+
 
 # back to ensure the screen is turned on
 adb shell input keyevent 4		# Back
@@ -35,3 +42,5 @@ sleep 2
 adb shell input text $SECRET_PIN		# Input Pin
 sleep 1
 adb shell input keyevent 66		# Enter
+
+echo "Done this unlock"

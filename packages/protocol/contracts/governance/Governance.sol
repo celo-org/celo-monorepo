@@ -7,21 +7,27 @@ import "openzeppelin-solidity/contracts/math/SafeMath.sol";
 
 import "./interfaces/IGovernance.sol";
 import "./Proposals.sol";
-import "./UsingLockedGold.sol";
+import "../common/ExtractFunctionSignature.sol";
 import "../common/Initializable.sol";
 import "../common/FixidityLib.sol";
-import "../common/FractionUtil.sol";
 import "../common/linkedlists/IntegerSortedLinkedList.sol";
-import "../common/ExtractFunctionSignature.sol";
+import "../common/UsingRegistry.sol";
+import "../common/UsingPrecompiles.sol";
 
 // TODO(asa): Hardcode minimum times for queueExpiry, etc.
 /**
  * @title A contract for making, passing, and executing on-chain governance proposals.
  */
-contract Governance is IGovernance, Ownable, Initializable, UsingLockedGold, ReentrancyGuard {
+contract Governance is
+  IGovernance,
+  Ownable,
+  Initializable,
+  ReentrancyGuard,
+  UsingRegistry,
+  UsingPrecompiles
+{
   using Proposals for Proposals.Proposal;
   using FixidityLib for FixidityLib.Fraction;
-  using FractionUtil for FractionUtil.Fraction;
   using SafeMath for uint256;
   using IntegerSortedLinkedList for SortedLinkedList.List;
   using BytesLib for bytes;
@@ -45,14 +51,20 @@ contract Governance is IGovernance, Ownable, Initializable, UsingLockedGold, Ree
     Yes
   }
 
+  struct UpvoteRecord {
+    uint256 proposalId;
+    uint256 weight;
+  }
+
   struct VoteRecord {
     Proposals.VoteValue value;
     uint256 proposalId;
+    uint256 weight;
   }
 
   struct Voter {
     // Key of the proposal voted for in the proposal queue
-    uint256 upvotedProposal;
+    UpvoteRecord upvote;
     uint256 mostRecentReferendumProposal;
     // Maps a `dequeued` index to a voter's vote record.
     mapping(uint256 => VoteRecord) referendumVotes;
@@ -60,9 +72,15 @@ contract Governance is IGovernance, Ownable, Initializable, UsingLockedGold, Ree
 
   struct ContractConstitution {
     FixidityLib.Fraction defaultThreshold;
-    // Maps a function ID to a corresponding passing function, overriding the
-    // default.
+    // Maps a function ID to a corresponding threshold, overriding the default.
     mapping(bytes4 => FixidityLib.Fraction) functionThresholds;
+  }
+
+  struct HotfixRecord {
+    bool executed;
+    bool approved;
+    uint256 preparedEpoch;
+    mapping(address => bool) whitelisted;
   }
 
   // The baseline is updated as
@@ -89,7 +107,8 @@ contract Governance is IGovernance, Ownable, Initializable, UsingLockedGold, Ree
   mapping(address => uint256) public refundedDeposits;
   mapping(address => ContractConstitution) private constitution;
   mapping(uint256 => Proposals.Proposal) private proposals;
-  mapping(address => Voter) public voters;
+  mapping(address => Voter) private voters;
+  mapping(bytes32 => HotfixRecord) public hotfixes;
   SortedLinkedList.List private queue;
   uint256[] public dequeued;
   uint256[] public emptyIndices;
@@ -191,6 +210,24 @@ contract Governance is IGovernance, Ownable, Initializable, UsingLockedGold, Ree
 
   event ParticipationBaselineQuorumFactorSet(
     uint256 baselineQuorumFactor
+  );
+
+  event HotfixWhitelisted(
+    bytes32 indexed hash,
+    address whitelister
+  );
+
+  event HotfixApproved(
+    bytes32 indexed hash
+  );
+
+  event HotfixPrepared(
+    bytes32 indexed hash,
+    uint256 indexed epoch
+  );
+
+  event HotfixExecuted(
+    bytes32 indexed hash
   );
 
   function() external payable {} // solhint-disable no-empty-blocks
@@ -479,8 +516,7 @@ contract Governance is IGovernance, Ownable, Initializable, UsingLockedGold, Ree
     nonReentrant
     returns (bool)
   {
-    address account = getAccountFromVoter(msg.sender);
-    require(!isVotingFrozen(account));
+    address account = getAccounts().activeVoteSignerToAccount(msg.sender);
     // TODO(asa): When upvoting a proposal that will get dequeued, should we let the tx succeed
     // and return false?
     dequeueProposalsIfReady();
@@ -492,16 +528,26 @@ contract Governance is IGovernance, Ownable, Initializable, UsingLockedGold, Ree
       return false;
     }
     Voter storage voter = voters[account];
+    // If the previously upvoted proposal is still in the queue but has expired, expire the
+    // proposal from the queue.
+    if (
+      queue.contains(voter.upvote.proposalId) &&
+      now >= proposals[voter.upvote.proposalId].timestamp.add(queueExpiry)
+    ) {
+      queue.remove(voter.upvote.proposalId);
+      emit ProposalExpired(voter.upvote.proposalId);
+    }
     // We can upvote a proposal in the queue if we're not already upvoting a proposal in the queue.
-    uint256 weight = getAccountWeight(account);
+    uint256 weight = getLockedGold().getAccountTotalLockedGold(account);
+    require(weight > 0, "cannot upvote without locking gold");
+    require(isQueued(proposalId), "cannot upvote a proposal not in the queue");
     require(
-      isQueued(proposalId) &&
-      (voter.upvotedProposal == 0 || !queue.contains(voter.upvotedProposal)) &&
-      weight > 0
+      voter.upvote.proposalId == 0 || !queue.contains(voter.upvote.proposalId),
+      "cannot upvote more than one queued proposal"
     );
-    uint256 upvotes = queue.getValue(proposalId).add(uint256(weight));
+    uint256 upvotes = queue.getValue(proposalId).add(weight);
     queue.update(proposalId, upvotes, lesser, greater);
-    voter.upvotedProposal = proposalId;
+    voter.upvote = UpvoteRecord(proposalId, weight);
     emit ProposalUpvoted(proposalId, account, weight);
     return true;
   }
@@ -524,9 +570,9 @@ contract Governance is IGovernance, Ownable, Initializable, UsingLockedGold, Ree
     returns (bool)
   {
     dequeueProposalsIfReady();
-    address account = getAccountFromVoter(msg.sender);
+    address account = getAccounts().activeVoteSignerToAccount(msg.sender);
     Voter storage voter = voters[account];
-    uint256 proposalId = voter.upvotedProposal;
+    uint256 proposalId = voter.upvote.proposalId;
     Proposals.Proposal storage proposal = proposals[proposalId];
     require(proposal.exists());
     // If acting on an expired proposal, expire the proposal.
@@ -537,13 +583,16 @@ contract Governance is IGovernance, Ownable, Initializable, UsingLockedGold, Ree
         queue.remove(proposalId);
         emit ProposalExpired(proposalId);
       } else {
-        uint256 weight = getAccountWeight(account);
-        require(weight > 0);
-        queue.update(proposalId, queue.getValue(proposalId).sub(weight), lesser, greater);
-        emit ProposalUpvoteRevoked(proposalId, account, weight);
+        queue.update(
+          proposalId,
+          queue.getValue(proposalId).sub(voter.upvote.weight),
+          lesser,
+          greater
+        );
+        emit ProposalUpvoteRevoked(proposalId, account, voter.upvote.weight);
       }
     }
-    voter.upvotedProposal = 0;
+    voter.upvote = UpvoteRecord(0, 0);
     return true;
   }
 
@@ -567,7 +616,7 @@ contract Governance is IGovernance, Ownable, Initializable, UsingLockedGold, Ree
     require(msg.sender == approver && !proposal.isApproved() && stage == Proposals.Stage.Approval);
     proposal.approved = true;
     // Ensures networkWeight is set by the end of the Referendum stage, even if 0 votes are cast.
-    proposal.networkWeight = getTotalWeight();
+    proposal.networkWeight = getLockedGold().getTotalLockedGold();
     emit ProposalApproved(proposalId);
     return true;
   }
@@ -589,8 +638,7 @@ contract Governance is IGovernance, Ownable, Initializable, UsingLockedGold, Ree
     nonReentrant
     returns (bool)
   {
-    address account = getAccountFromVoter(msg.sender);
-    require(!isVotingFrozen(account));
+    address account = getAccounts().activeVoteSignerToAccount(msg.sender);
     dequeueProposalsIfReady();
     Proposals.Proposal storage proposal = proposals[proposalId];
     require(isDequeuedProposal(proposal, proposalId, index));
@@ -600,7 +648,7 @@ contract Governance is IGovernance, Ownable, Initializable, UsingLockedGold, Ree
       return false;
     }
     Voter storage voter = voters[account];
-    uint256 weight = getAccountWeight(account);
+    uint256 weight = getLockedGold().getAccountTotalLockedGold(account);
     require(
       proposal.isApproved() &&
       stage == Proposals.Stage.Referendum &&
@@ -609,13 +657,13 @@ contract Governance is IGovernance, Ownable, Initializable, UsingLockedGold, Ree
     );
     VoteRecord storage voteRecord = voter.referendumVotes[index];
     proposal.updateVote(
+      voteRecord.weight,
       weight,
       (voteRecord.proposalId == proposalId) ? voteRecord.value : Proposals.VoteValue.None,
       value
     );
-    proposal.networkWeight = getTotalWeight();
-    voteRecord.proposalId = proposalId;
-    voteRecord.value = value;
+    proposal.networkWeight = getLockedGold().getTotalLockedGold();
+    voter.referendumVotes[index] = VoteRecord(value, proposalId, weight);
     if (proposal.timestamp > voter.mostRecentReferendumProposal) {
       voter.mostRecentReferendumProposal = proposalId;
     }
@@ -649,7 +697,74 @@ contract Governance is IGovernance, Ownable, Initializable, UsingLockedGold, Ree
   }
 
   /**
-   * @notice Withdraws refunded Celo Gold commitments.
+   * @notice Whitelists the hash of a hotfix transaction(s).
+   * @param hash The abi encoded keccak256 hash of the hotfix transaction(s) to be whitelisted.
+   */
+  function approveHotfix(bytes32 hash) external {
+    require(msg.sender == approver);
+    hotfixes[hash].approved = true;
+    emit HotfixApproved(hash);
+  }
+
+  /**
+   * @notice Whitelists the hash of a hotfix transaction(s).
+   * @param hash The abi encoded keccak256 hash of the hotfix transaction(s) to be whitelisted.
+   */
+  function whitelistHotfix(bytes32 hash) external {
+    hotfixes[hash].whitelisted[msg.sender] = true;
+    emit HotfixWhitelisted(hash, msg.sender);
+  }
+
+  /**
+   * @notice Gives hotfix a prepared epoch for execution.
+   * @param hash The hash of the hotfix to be prepared.
+   */
+  function prepareHotfix(bytes32 hash) external {
+    require(isHotfixPassing(hash), "hotfix not whitelisted by 2f+1 validators");
+    uint256 epoch = getEpochNumber();
+    require(hotfixes[hash].preparedEpoch < epoch, "hotfix already prepared for this epoch");
+    hotfixes[hash].preparedEpoch = epoch;
+    emit HotfixPrepared(hash, epoch);
+  }
+
+  /**
+   * @notice Executes a whitelisted proposal.
+   * @param values The values of Celo Gold to be sent in the proposed transactions.
+   * @param destinations The destination addresses of the proposed transactions.
+   * @param data The concatenated data to be included in the proposed transactions.
+   * @param dataLengths The lengths of each transaction's data.
+   * @dev Reverts if hotfix is already executed, not approved, or not prepared for current epoch.
+   */
+  function executeHotfix(
+    uint256[] calldata values,
+    address[] calldata destinations,
+    bytes calldata data,
+    uint256[] calldata dataLengths
+  )
+    external
+  {
+    bytes32 hash = keccak256(abi.encode(values, destinations, data, dataLengths));
+
+    (bool approved, bool executed, uint256 preparedEpoch) = getHotfixRecord(hash);
+    require(!executed, "hotfix already executed");
+    require(approved, "hotfix not approved");
+    require(preparedEpoch == getEpochNumber(), "hotfix must be prepared for this epoch");
+
+    Proposals.makeMem(
+      values,
+      destinations,
+      data,
+      dataLengths,
+      msg.sender,
+      0
+    ).executeMem();
+
+    hotfixes[hash].executed = true;
+    emit HotfixExecuted(hash);
+  }
+
+  /**
+   * @notice Withdraws refunded Celo Gold deposits.
    * @return Whether or not the withdraw was successful.
    */
   function withdraw() external nonReentrant returns (bool) {
@@ -658,6 +773,46 @@ contract Governance is IGovernance, Ownable, Initializable, UsingLockedGold, Ree
     refundedDeposits[msg.sender] = 0;
     msg.sender.transfer(value);
     return true;
+  }
+
+  /**
+   * @notice Returns whether or not a particular account is voting on proposals.
+   * @param account The address of the account.
+   * @return Whether or not the account is voting on proposals.
+   */
+  function isVoting(address account) external view returns (bool) {
+    Voter storage voter = voters[account];
+    uint256 upvotedProposal = voter.upvote.proposalId;
+    bool isVotingQueue = upvotedProposal != 0 && isQueued(upvotedProposal);
+    Proposals.Proposal storage proposal = proposals[voter.mostRecentReferendumProposal];
+    bool isVotingReferendum = (
+      proposal.getDequeuedStage(stageDurations) == Proposals.Stage.Referendum
+    );
+    return isVotingQueue || isVotingReferendum;
+  }
+
+  /**
+   * @notice Returns the number of seconds proposals stay in approval stage.
+   * @return The number of seconds proposals stay in approval stage.
+   */
+  function getApprovalStageDuration() external view returns (uint256) {
+    return stageDurations.approval;
+  }
+
+  /**
+   * @notice Returns the number of seconds proposals stay in the referendum stage.
+   * @return The number of seconds proposals stay in the referendum stage.
+   */
+  function getReferendumStageDuration() external view returns (uint256) {
+    return stageDurations.referendum;
+  }
+
+  /**
+   * @notice Returns the number of seconds proposals stay in the execution stage.
+   * @return The number of seconds proposals stay in the execution stage.
+   */
+  function getExecutionStageDuration() external view returns (uint256) {
+    return stageDurations.execution;
   }
 
   /**
@@ -671,30 +826,6 @@ contract Governance is IGovernance, Ownable, Initializable, UsingLockedGold, Ree
       participationParameters.baselineUpdateFactor.unwrap(),
       participationParameters.baselineQuorumFactor.unwrap()
     );
-  }
-
-  /**
-   * @notice Returns the number of seconds proposals stay in the approval stage.
-   * @return The number of seconds proposals stay in the execution stage.
-   */
-  function getApprovalStageDuration() external view returns (uint256) {
-    return stageDurations.approval;
-  }
-
-  /**
-   * @notice Returns the number of seconds proposals stay in the referendum stage.
-   * @return The number of seconds proposals stay in the execution stage.
-   */
-  function getReferendumStageDuration() external view returns (uint256) {
-    return stageDurations.referendum;
-  }
-
-  /**
-   * @notice Returns the number of seconds proposals stay in the execution stage.
-   * @return The number of seconds proposals stay in the execution stage.
-   */
-  function getExecutionStageDuration() external view returns (uint256) {
-    return stageDurations.execution;
   }
 
   /**
@@ -803,12 +934,13 @@ contract Governance is IGovernance, Ownable, Initializable, UsingLockedGold, Ree
   }
 
   /**
-   * @notice Returns the ID of the proposal upvoted by `account`.
+   * @notice Returns the ID of the proposal upvoted by `account` and the weight of that upvote.
    * @param account The address of the account.
-   * @return The ID of the proposal upvoted by `account`.
+   * @return The ID of the proposal upvoted by `account` and the weight of that upvote.
    */
-  function getUpvotedProposal(address account) external view returns (uint256) {
-    return voters[account].upvotedProposal;
+  function getUpvoteRecord(address account) external view returns (uint256, uint256) {
+    UpvoteRecord memory upvoteRecord = voters[account].upvote;
+    return (upvoteRecord.proposalId, upvoteRecord.weight);
   }
 
   /**
@@ -821,18 +953,42 @@ contract Governance is IGovernance, Ownable, Initializable, UsingLockedGold, Ree
   }
 
   /**
-   * @notice Returns whether or not a particular account is voting on proposals.
-   * @param account The address of the account.
-   * @return Whether or not the account is voting on proposals.
+   * @notice Checks if a byzantine quorum of validators has whitelisted the given hotfix.
+   * @param hash The abi encoded keccak256 hash of the hotfix transaction.
+   * @return Whether validator whitelist tally >= validator byztanine quorum (2f+1)
    */
-  function isVoting(address account) external view returns (bool) {
-    Voter storage voter = voters[account];
-    bool isVotingQueue = voter.upvotedProposal != 0 && isQueued(voter.upvotedProposal);
-    Proposals.Proposal storage proposal = proposals[voter.mostRecentReferendumProposal];
-    bool isVotingReferendum = (
-      proposal.getDequeuedStage(stageDurations) == Proposals.Stage.Referendum
+  function isHotfixPassing(bytes32 hash) public view returns (bool) {
+    uint256 tally = 0;
+    uint256 n = numberValidatorsInCurrentSet();
+    for (uint256 idx = 0; idx < n; idx++) {
+      address validator = validatorAddressFromCurrentSet(idx);
+      if (hotfixes[hash].whitelisted[validator]) {
+        tally = tally.add(1);
+      }
+    }
+
+    return tally >= byzantineQuorumValidatorsInCurrentSet();
+  }
+
+  /**
+   * @notice Computes byzantine quorum from current validator set size
+   * @return Byzantine quorum of validators.
+   */
+  function byzantineQuorumValidatorsInCurrentSet() public view returns (uint256) {
+    return numberValidatorsInCurrentSet().mul(2).div(3).add(1);
+  }
+
+  /**
+   * @notice Gets information about a hotfix.
+   * @param hash The abi encoded keccak256 hash of the hotfix transaction.
+   * @return Hotfix tuple of (approved, executed, preparedEpoch)
+   */
+  function getHotfixRecord(bytes32 hash) public view returns (bool, bool, uint256) {
+    return (
+      hotfixes[hash].approved,
+      hotfixes[hash].executed,
+      hotfixes[hash].preparedEpoch
     );
-    return isVotingQueue || isVotingReferendum;
   }
 
   /**

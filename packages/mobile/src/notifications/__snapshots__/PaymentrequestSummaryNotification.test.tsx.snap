@@ -31,7 +31,7 @@ exports[`PaymentRequestSummaryNotification renders correctly 1`] = `
       resizeMode="contain"
       source={
         Object {
-          "testUri": "../../../src/images/send-dollar.png",
+          "testUri": "../../../packages/mobile/src/images/send-dollar.png",
         }
       }
       style={
@@ -185,17 +185,12 @@ exports[`PaymentRequestSummaryNotification renders correctly 1`] = `
           >
             <Text
               style={
-                Array [
-                  Object {
-                    "color": "#81868B",
-                    "fontFamily": "Hind-SemiBold",
-                    "fontSize": 13,
-                    "lineHeight": 17,
-                  },
-                  Object {
-                    "color": "#42D689",
-                  },
-                ]
+                Object {
+                  "color": "#42D689",
+                  "fontFamily": "Hind-SemiBold",
+                  "fontSize": 13,
+                  "lineHeight": 17,
+                }
               }
             >
               +
@@ -213,31 +208,28 @@ exports[`PaymentRequestSummaryNotification renders correctly 1`] = `
         >
           <View
             accessible={true}
+            focusable={true}
             isTVSelectable={true}
+            nativeBackgroundAndroid={
+              Object {
+                "attribute": "selectableItemBackgroundBorderless",
+                "type": "ThemeAttrAndroid",
+              }
+            }
+            onClick={[Function]}
             onResponderGrant={[Function]}
             onResponderMove={[Function]}
             onResponderRelease={[Function]}
             onResponderTerminate={[Function]}
             onResponderTerminationRequest={[Function]}
             onStartShouldSetResponder={[Function]}
-            style={
-              Object {
-                "opacity": 1,
-              }
-            }
           >
             <Text
               style={
                 Array [
                   Object {
-                    "color": "#2E3338",
-                    "fontFamily": "Hind-Regular",
-                    "fontSize": 14,
-                    "lineHeight": 18,
-                  },
-                  Object {
                     "color": "#42D689",
-                    "fontFamily": "Hind-Medium",
+                    "fontFamily": "Hind-SemiBold",
                     "fontSize": 14,
                     "lineHeight": 18,
                   },
@@ -288,7 +280,7 @@ exports[`PaymentRequestSummaryNotification when more 1 requests renders just it 
       resizeMode="contain"
       source={
         Object {
-          "testUri": "../../../src/images/send-dollar.png",
+          "testUri": "../../../packages/mobile/src/images/send-dollar.png",
         }
       }
       style={
@@ -399,31 +391,28 @@ exports[`PaymentRequestSummaryNotification when more 1 requests renders just it 
         >
           <View
             accessible={true}
+            focusable={true}
             isTVSelectable={true}
+            nativeBackgroundAndroid={
+              Object {
+                "attribute": "selectableItemBackgroundBorderless",
+                "type": "ThemeAttrAndroid",
+              }
+            }
+            onClick={[Function]}
             onResponderGrant={[Function]}
             onResponderMove={[Function]}
             onResponderRelease={[Function]}
             onResponderTerminate={[Function]}
             onResponderTerminationRequest={[Function]}
             onStartShouldSetResponder={[Function]}
-            style={
-              Object {
-                "opacity": 1,
-              }
-            }
           >
             <Text
               style={
                 Array [
                   Object {
-                    "color": "#2E3338",
-                    "fontFamily": "Hind-Regular",
-                    "fontSize": 14,
-                    "lineHeight": 18,
-                  },
-                  Object {
                     "color": "#42D689",
-                    "fontFamily": "Hind-Medium",
+                    "fontFamily": "Hind-SemiBold",
                     "fontSize": 14,
                     "lineHeight": 18,
                   },
@@ -474,7 +463,7 @@ exports[`PaymentRequestSummaryNotification when more than 2 requests renders jus
       resizeMode="contain"
       source={
         Object {
-          "testUri": "../../../src/images/send-dollar.png",
+          "testUri": "../../../packages/mobile/src/images/send-dollar.png",
         }
       }
       style={
@@ -628,17 +617,12 @@ exports[`PaymentRequestSummaryNotification when more than 2 requests renders jus
           >
             <Text
               style={
-                Array [
-                  Object {
-                    "color": "#81868B",
-                    "fontFamily": "Hind-SemiBold",
-                    "fontSize": 13,
-                    "lineHeight": 17,
-                  },
-                  Object {
-                    "color": "#42D689",
-                  },
-                ]
+                Object {
+                  "color": "#42D689",
+                  "fontFamily": "Hind-SemiBold",
+                  "fontSize": 13,
+                  "lineHeight": 17,
+                }
               }
             >
               +
@@ -656,31 +640,28 @@ exports[`PaymentRequestSummaryNotification when more than 2 requests renders jus
         >
           <View
             accessible={true}
+            focusable={true}
             isTVSelectable={true}
+            nativeBackgroundAndroid={
+              Object {
+                "attribute": "selectableItemBackgroundBorderless",
+                "type": "ThemeAttrAndroid",
+              }
+            }
+            onClick={[Function]}
             onResponderGrant={[Function]}
             onResponderMove={[Function]}
             onResponderRelease={[Function]}
             onResponderTerminate={[Function]}
             onResponderTerminationRequest={[Function]}
             onStartShouldSetResponder={[Function]}
-            style={
-              Object {
-                "opacity": 1,
-              }
-            }
           >
             <Text
               style={
                 Array [
                   Object {
-                    "color": "#2E3338",
-                    "fontFamily": "Hind-Regular",
-                    "fontSize": 14,
-                    "lineHeight": 18,
-                  },
-                  Object {
                     "color": "#42D689",
-                    "fontFamily": "Hind-Medium",
+                    "fontFamily": "Hind-SemiBold",
                     "fontSize": 14,
                     "lineHeight": 18,
                   },

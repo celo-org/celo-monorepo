@@ -14,6 +14,7 @@ import { I18nProps, withNamespaces } from 'src/i18n'
 import { Cell, GridRow, Spans } from 'src/layout/GridRow'
 import { ScreenProps, ScreenSizes, withScreenSize } from 'src/layout/ScreenSize'
 import Button, { BTN, SIZE } from 'src/shared/Button.3'
+import Spinner from 'src/shared/Spinner'
 import { colors, fonts, standardStyles, textStyles } from 'src/styles'
 export class FellowshipForm extends React.Component<I18nProps & ScreenProps> {
   render() {
@@ -116,12 +117,15 @@ export class FellowshipForm extends React.Component<I18nProps & ScreenProps> {
             >
               <Cell span={Spans.half} style={standardStyles.centered}>
                 <Button
-                  text={t('submit')}
+                  iconLeft={formState.isLoading && <Spinner size={'small'} color={colors.white} />}
+                  text={!formState.isLoading && t('submit')}
                   kind={BTN.PRIMARY}
                   onPress={onAltSubmit}
                   size={SIZE.big}
+                  disabled={formState.isLoading}
                   align={'center'}
                 />
+
                 {formState.isComplete && (
                   <Text style={[textStyles.center, fonts.p, standardStyles.elementalMarginTop]}>
                     {t('form.fellowshipSubmitted')}

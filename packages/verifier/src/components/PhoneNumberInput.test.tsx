@@ -3,6 +3,18 @@ import * as React from 'react'
 import 'react-native'
 import * as renderer from 'react-test-renderer'
 
+jest.mock('@celo/react-native-sms-retriever', () => {
+  return {
+    requestPhoneNumber: jest.fn(() => '+49030111111'),
+  }
+})
+
+jest.mock('react-native-device-info', () => {
+  return {
+    getBaseOs: jest.fn(() => 'Android'),
+  }
+})
+
 describe('PhoneNumberInput', () => {
   const baseProps = {
     defaultCountry: null,

@@ -1,5 +1,5 @@
 import { getPaymentRequests } from 'src/account/selectors'
-import { PaymentRequestStatuses } from 'src/account/types'
+import { PaymentRequestStatus } from 'src/account/types'
 import { paymentRequestDouble } from 'src/paymentRequest/__mocks__'
 
 describe('selectors', () => {
@@ -8,8 +8,8 @@ describe('selectors', () => {
       const state: any = {
         account: {
           paymentRequests: [
-            paymentRequestDouble({ status: PaymentRequestStatuses.DECLINED }),
-            paymentRequestDouble({ status: PaymentRequestStatuses.COMPLETED }),
+            paymentRequestDouble({ status: PaymentRequestStatus.DECLINED }),
+            paymentRequestDouble({ status: PaymentRequestStatus.COMPLETED }),
           ],
         },
       }
@@ -17,13 +17,13 @@ describe('selectors', () => {
     })
 
     it('returns requested payments', () => {
-      const goodRequest = paymentRequestDouble({ status: PaymentRequestStatuses.REQUESTED })
+      const goodRequest = paymentRequestDouble({ status: PaymentRequestStatus.REQUESTED })
 
       const state: any = {
         account: {
           paymentRequests: [
             paymentRequestDouble({
-              status: PaymentRequestStatuses.COMPLETED,
+              status: PaymentRequestStatus.COMPLETED,
             }),
             goodRequest,
           ],

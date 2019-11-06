@@ -28,6 +28,11 @@ variable geth_bootnode_docker_image_tag {
   description = "Tag of the geth bootnode docker image"
 }
 
+variable network_id {
+  type        = number
+  description = "The network ID number"
+}
+
 variable network_name {
   type        = string
   description = "Name of the GCP network"

@@ -1,5 +1,5 @@
+import colors from '@celo/react-components/styles/colors'
 import fontStyles from '@celo/react-components/styles/fonts'
-import { componentStyles } from '@celo/react-components/styles/styles'
 import variables from '@celo/react-components/styles/variables'
 import BigNumber from 'bignumber.js'
 import * as React from 'react'
@@ -23,7 +23,7 @@ class PaymentRequestBalance extends React.PureComponent<Props & WithNamespaces> 
         <CeloAccountIcon />
         <View style={styles.balance}>
           <Text style={fontStyles.bodySmallSemiBold}>{this.props.t('celoDollarBalance')}</Text>
-          <Text style={[fontStyles.bodySmallSemiBold, componentStyles.colorGreen]}>
+          <Text style={styles.balanceText}>
             {CURRENCIES[CURRENCY_ENUM.DOLLAR].symbol +
               getCentAwareMoneyDisplay(this.props.dollarBalance || 0)}
           </Text>
@@ -45,6 +45,10 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     flex: 1,
+  },
+  balanceText: {
+    ...fontStyles.bodySmallSemiBold,
+    color: colors.celoGreen,
   },
 })
 export default withNamespaces(Namespaces.paymentRequestFlow)(PaymentRequestBalance)
