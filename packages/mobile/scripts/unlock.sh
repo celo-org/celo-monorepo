@@ -18,7 +18,14 @@ done
 adb wait-for-device shell \
   'while [[ -z $(getprop sys.boot_completed) ]]; do sleep 1; done;'
 
+
+echo "locksettings set-pin $SECRET_PIN" | adb shell || echo "Failed to change pin, probably already set"
+
+
+sleep 1
 echo "Device is done booting"
+sleep 10
+
 
 # back to ensure the screen is turned on
 adb shell input keyevent 4		# Back
@@ -36,9 +43,4 @@ adb shell input text $SECRET_PIN		# Input Pin
 sleep 1
 adb shell input keyevent 66		# Enter
 
-
-echo "waiting for device to connect to Wifi, this is a good proxy the device is ready"
-until adb shell dumpsys wifi | grep "mNetworkInfo" |grep "state: CONNECTED"
-do
-  sleep 10
-done
+echo "Done this unlock"

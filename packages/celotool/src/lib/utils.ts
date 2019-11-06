@@ -2,8 +2,9 @@ import { exec } from 'child_process'
 // import prompts from 'prompts'
 import yargs from 'yargs'
 import { switchToClusterFromEnv } from './cluster'
-import { envVar, fetchEnv } from './env-utils'
+import { envVar, fetchEnv, isVmBased } from './env-utils'
 import { retrieveIPAddress } from './helm_deploy'
+import { getTestnetOutputs } from './vm-testnet-utils'
 
 // Returns a Promise which resolves to [stdout, stderr] array
 export function execCmd(
@@ -99,10 +100,19 @@ export function getVerificationPoolRewardsURL(celoEnv: string) {
   return `https://us-central1-celo-testnet.cloudfunctions.net/handleVerificationRequest${celoEnv}/v0.1/rewards/`
 }
 
+export async function retrieveTxNodeIpAddress(celoEnv: string, txNodeIndex: number) {
+  if (isVmBased()) {
+    const outputs = await getTestnetOutputs(celoEnv)
+    return outputs.tx_node_ip_addresses.value[txNodeIndex]
+  } else {
+    return retrieveIPAddress(`${celoEnv}-tx-nodes-${txNodeIndex}`)
+  }
+}
+
 export async function getVerificationPoolConfig(celoEnv: string) {
   await switchToClusterFromEnv()
 
-  const ip = await retrieveIPAddress(`${celoEnv}-tx-nodes-0`)
+  const ip = await retrieveTxNodeIpAddress(celoEnv, 0)
 
   return {
     testnetId: fetchEnv('NETWORK_ID'),

@@ -24,7 +24,7 @@ export const componentStyles = StyleSheet.create({
     flexDirection: 'row',
     marginVertical: 5,
     alignItems: 'center',
-    backgroundColor: 'white',
+    backgroundColor: colors.background,
     height: 60,
   },
   input: {
@@ -55,9 +55,6 @@ export const componentStyles = StyleSheet.create({
     height: 5,
     borderBottomWidth: 1,
     borderColor: colors.darkLightest,
-  },
-  colorGreen: {
-    color: colors.celoGreen,
   },
   roundedBorder: {
     borderColor: colors.darkLightest,

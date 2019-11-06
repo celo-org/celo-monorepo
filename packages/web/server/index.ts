@@ -6,6 +6,7 @@ import * as expressEnforcesSsl from 'express-enforces-ssl'
 import * as helmet from 'helmet'
 import * as next from 'next'
 import nextI18NextMiddleware from 'next-i18next/middleware'
+import { Tables } from '../fullstack/EcoFundFields'
 import Sentry, { initSentry } from '../fullstack/sentry'
 import addToCRM from '../server/addToCRM'
 import ecoFundSubmission from '../server/EcoFundApp'
@@ -57,9 +58,10 @@ function wwwRedirect(req, res, nextAction) {
       res.redirect('/about-us')
     })
   })
-
-  server.get('/connect', (_, res) => {
-    res.redirect('/community')
+  ;['/arg_tos', '/arg_privacy', '/argentina'].forEach((path) => {
+    server.get(path, (_, res) => {
+      res.redirect('/terms')
+    })
   })
   ;['/applications', '/technology', '/dev', '/developer'].forEach((path) => {
     server.get(path, (_, res) => {
@@ -72,6 +74,9 @@ function wwwRedirect(req, res, nextAction) {
     })
   })
 
+  server.get('/connect', (_, res) => {
+    res.redirect('/community')
+  })
   server.get('/tos', (_, res) => {
     res.redirect('/user-agreement')
   })
@@ -83,7 +88,7 @@ function wwwRedirect(req, res, nextAction) {
     const { ideas, email, name, bio, deliverables, resume } = req.body
 
     try {
-      await submitFellowApp({
+      const fellow = await submitFellowApp({
         name,
         email,
         ideas,
@@ -91,7 +96,7 @@ function wwwRedirect(req, res, nextAction) {
         deliverables,
         resume,
       })
-      res.status(204)
+      res.status(204).json({ id: fellow.id })
     } catch (e) {
       Sentry.withScope((scope) => {
         scope.setTag('Service', 'Airtable')
@@ -103,7 +108,7 @@ function wwwRedirect(req, res, nextAction) {
 
   server.post('/ecosystem/:table', async (req, res) => {
     try {
-      const record = await ecoFundSubmission(req.body, req.params.table)
+      const record = await ecoFundSubmission(req.body, req.params.table as Tables)
       res.status(204).json({ id: record.id })
     } catch (e) {
       Sentry.withScope((scope) => {

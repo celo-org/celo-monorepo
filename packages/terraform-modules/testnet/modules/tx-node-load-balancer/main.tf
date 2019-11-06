@@ -40,7 +40,15 @@ resource "google_compute_health_check" "tx_node_lb" {
 }
 
 resource "google_compute_instance_group" "tx_node_lb" {
-  name = "${local.name_prefix}-group"
+  name = "${local.name_prefix}-group-${random_id.tx_node_lb.hex}"
 
   instances = var.tx_node_self_links
+
+  lifecycle {
+    create_before_destroy = true
+  }
+}
+
+resource "random_id" "tx_node_lb" {
+  byte_length = 8
 }

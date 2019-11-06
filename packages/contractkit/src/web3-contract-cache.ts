@@ -1,6 +1,9 @@
 import debugFactory from 'debug'
 import { CeloContract } from './base'
+import { newAccounts } from './generated/Accounts'
 import { newAttestations } from './generated/Attestations'
+import { newBlockchainParameters } from './generated/BlockchainParameters'
+import { newElection } from './generated/Election'
 import { newEscrow } from './generated/Escrow'
 import { newExchange } from './generated/Exchange'
 import { newGasCurrencyWhitelist } from './generated/GasCurrencyWhitelist'
@@ -19,14 +22,17 @@ import { ContractKit } from './kit'
 const debug = debugFactory('kit:web3-contract-cache')
 
 const ContractFactories = {
+  [CeloContract.Accounts]: newAccounts,
   [CeloContract.Attestations]: newAttestations,
-  [CeloContract.LockedGold]: newLockedGold,
+  [CeloContract.BlockchainParameters]: newBlockchainParameters,
+  [CeloContract.Election]: newElection,
   [CeloContract.Escrow]: newEscrow,
   [CeloContract.Exchange]: newExchange,
   [CeloContract.GasCurrencyWhitelist]: newGasCurrencyWhitelist,
   [CeloContract.GasPriceMinimum]: newGasPriceMinimum,
   [CeloContract.GoldToken]: newGoldToken,
   [CeloContract.Governance]: newGovernance,
+  [CeloContract.LockedGold]: newLockedGold,
   [CeloContract.Random]: newRandom,
   [CeloContract.Registry]: newRegistry,
   [CeloContract.Reserve]: newReserve,
@@ -38,16 +44,29 @@ const ContractFactories = {
 type CFType = typeof ContractFactories
 type ContractCacheMap = { [K in keyof CFType]?: ReturnType<CFType[K]> }
 
+/**
+ * Native Web3 contracts factory and cache.
+ *
+ * Exposes accessors to all `CeloContract` web3 contracts.
+ *
+ * Mostly a private cache, kit users would normally use
+ * a contract wrapper
+ */
 export class Web3ContractCache {
   private cacheMap: ContractCacheMap = {}
 
   constructor(readonly kit: ContractKit) {}
-
+  getAccounts() {
+    return this.getContract(CeloContract.Accounts)
+  }
   getAttestations() {
     return this.getContract(CeloContract.Attestations)
   }
-  getLockedGold() {
-    return this.getContract(CeloContract.LockedGold)
+  getBlockchainParameters() {
+    return this.getContract(CeloContract.BlockchainParameters)
+  }
+  getElection() {
+    return this.getContract(CeloContract.Election)
   }
   getEscrow() {
     return this.getContract(CeloContract.Escrow)
@@ -66,6 +85,9 @@ export class Web3ContractCache {
   }
   getGovernance() {
     return this.getContract(CeloContract.Governance)
+  }
+  getLockedGold() {
+    return this.getContract(CeloContract.LockedGold)
   }
   getRandom() {
     return this.getContract(CeloContract.Random)
@@ -86,10 +108,14 @@ export class Web3ContractCache {
     return this.getContract(CeloContract.Validators)
   }
 
+  /**
+   * Get native web3 contract wrapper
+   */
   async getContract<C extends keyof typeof ContractFactories>(contract: C) {
     if (this.cacheMap[contract] == null) {
       debug('Initiating contract %s', contract)
       const createFn = ContractFactories[contract] as CFType[C]
+      // @ts-ignore: Too compplex union type
       this.cacheMap[contract] = createFn(
         this.kit.web3,
         await this.kit.registry.addressFor(contract)

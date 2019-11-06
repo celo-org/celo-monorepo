@@ -17,11 +17,11 @@ import {
 import { QrCode, storeLatestInRecents, SVG } from 'src/send/actions'
 import Logger from 'src/utils/Logger'
 
-const TAG = 'QR/utils'
-
 export enum BarcodeTypes {
   QR_CODE = 'QR_CODE',
 }
+
+const TAG = 'QR/utils'
 
 const QRFileName = '/celo-qr.png'
 
@@ -50,17 +50,12 @@ export function* handleBarcode(
   addressToE164Number: AddressToE164NumberType,
   recipientCache: NumberToRecipient
 ) {
-  if (barcode.type !== BarcodeTypes.QR_CODE) {
-    return
-  }
-
   let data: { address: string; e164PhoneNumber: string; displayName: string } | undefined
   try {
     data = JSON.parse(barcode.data)
   } catch (e) {
     Logger.warn(TAG, 'QR code read failed with ' + e)
   }
-
   if (typeof data !== 'object' || isEmpty(data.address)) {
     yield put(showError(ErrorMessages.QR_FAILED_NO_ADDRESS))
     return
@@ -77,7 +72,6 @@ export function* handleBarcode(
     // Default for invalid displayName
     data.displayName = ''
   }
-
   const cachedRecipient = getRecipientFromAddress(data.address, addressToE164Number, recipientCache)
 
   const recipient: Recipient = cachedRecipient
@@ -94,7 +88,6 @@ export function* handleBarcode(
         kind: RecipientKind.QrCode,
         displayId: data.e164PhoneNumber,
       }
-
   yield put(storeLatestInRecents(recipient))
 
   navigate(Screens.SendAmount, { recipient })

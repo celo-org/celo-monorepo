@@ -76,9 +76,14 @@ export async function saveMessage(
     messageState: MessageState.DISPATCHING,
   }
   console.info('Saving new message to db')
-  return (await database()
+  const result = await database()
     .ref(`/${CELO_ENV}/messages`)
-    .push(message)).key
+    .push(message)
+  if (result.key) {
+    return result.key
+  } else {
+    throw new Error('Unable to save message')
+  }
 }
 
 export function deleteMessage(id: string) {

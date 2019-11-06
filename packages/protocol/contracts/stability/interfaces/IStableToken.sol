@@ -6,18 +6,6 @@ pragma solidity ^0.5.3;
  * absence of interface inheritance is intended as a companion to IERC20.sol and ICeloToken.sol.
  */
 interface IStableToken {
-
-  function initialize(
-    string calldata,
-    string calldata,
-    uint8,
-    address,
-    uint256,
-    uint256
-  ) external;
-
-  function setMinter(address) external;
-
   function mint(address, uint256) external returns (bool);
   function burn(uint256) external returns (bool);
   function debitFrom(address, uint256) external;

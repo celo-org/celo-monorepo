@@ -1,5 +1,5 @@
 import BaseListItem from '@celo/react-components/components/BaseListItem'
-import Link from '@celo/react-components/components/Link'
+import TextButton from '@celo/react-components/components/TextButton'
 import * as React from 'react'
 import { StyleSheet, View } from 'react-native'
 
@@ -26,9 +26,9 @@ export default function BaseNotification(props: Props) {
         <View style={styles.ctas}>
           {props.ctas.map((cta, j) => {
             return (
-              <Link key={j} style={styles.action} onPress={cta.onPress}>
+              <TextButton key={j} style={styles.action} onPress={cta.onPress}>
                 {cta.text}
-              </Link>
+              </TextButton>
             )
           })}
         </View>
