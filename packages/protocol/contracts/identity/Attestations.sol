@@ -442,19 +442,20 @@ contract Attestations is
     * @param account Address of the account.
     * @return ( blockNumbers[] - Block number of request/completion the attestation,
     *           issuers[] - Address of the issuer,
-    *
+    *           stringLengths[] - The length of each metadataURL string for each issuer,
+    *           stringData - All strings concatenated
     *         )
     */
   function getCompletableAttestations(bytes32 identifier, address account)
     external
     view
-    returns (uint32[] memory, address[] memory, uint[] memory, bytes memory)
+    returns (uint32[] memory, address[] memory, uint256[] memory, bytes memory)
   {
     AttestedAddress storage state = identifiers[identifier].attestations[account];
     address[] storage issuers = state.selectedIssuers;
 
-    uint num = 0;
-    for (uint i = 0; i < issuers.length; i++) {
+    uint256 num = 0;
+    for (uint256 i = 0; i < issuers.length; i++) {
       if (isAttestationCompletable(state.issuedAttestations[issuers[i]])) {
         num++;
       }
@@ -463,8 +464,8 @@ contract Attestations is
     uint32[] memory blockNumbers = new uint32[](num);
     address[] memory completableIssuers = new address[](num);
 
-    uint pointer = 0;
-    for (uint i = 0; i < issuers.length; i++) {
+    uint256 pointer = 0;
+    for (uint256 i = 0; i < issuers.length; i++) {
       if (isAttestationCompletable(state.issuedAttestations[issuers[i]])) {
         blockNumbers[pointer] = state.issuedAttestations[issuers[i]].blockNumber;
         completableIssuers[pointer] = issuers[i];
@@ -472,7 +473,7 @@ contract Attestations is
       }
     }
 
-    uint[] memory stringLengths;
+    uint256[] memory stringLengths;
     bytes memory stringData;
     (stringLengths, stringData) = getAccounts().batchGetMetadataURL(completableIssuers);
     return (blockNumbers, completableIssuers, stringLengths, stringData);

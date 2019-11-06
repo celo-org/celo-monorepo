@@ -1,6 +1,6 @@
 import { PhoneNumberUtils, SignatureUtils } from '@celo/utils'
 import { concurrentMap, sleep } from '@celo/utils/lib/async'
-import { compact, zip3 } from '@celo/utils/lib/collections'
+import { notEmpty, zip3 } from '@celo/utils/lib/collections'
 import { parseSolidityStringArray } from '@celo/utils/lib/parsing'
 import BigNumber from 'bignumber.js'
 import fetch from 'cross-fetch'
@@ -219,7 +219,7 @@ export class AttestationsWrapper extends BaseWrapper<Attestations> {
       }
     )
 
-    return compact(withAttestationServiceURLs)
+    return withAttestationServiceURLs.filter(notEmpty)
   }
 
   /**

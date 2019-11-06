@@ -232,25 +232,25 @@ contract Accounts is IAccounts, ReentrancyGuard, Initializable, UsingRegistry {
    * @notice Getter for the metadata of multiple accounts.
    * @param accountsToQuery The addresses of the accounts to get the metadata for.
    * @return (stringLengths[] - the length of each string in bytes
-              data - all strings concatenated
-             )
+   *          data - all strings concatenated
+   *         )
    */
   function batchGetMetadataURL(address[] calldata accountsToQuery)
     external
     view
-    returns (uint[] memory, bytes memory)
+    returns (uint256[] memory, bytes memory)
   {
-    uint totalSize = 0;
-    uint[] memory sizes = new uint[](accountsToQuery.length);
-    for (uint i = 0; i < accountsToQuery.length; i++) {
+    uint256 totalSize = 0;
+    uint256[] memory sizes = new uint256[](accountsToQuery.length);
+    for (uint256 i = 0; i < accountsToQuery.length; i++) {
       sizes[i] = bytes(accounts[accountsToQuery[i]].metadataURL).length;
       totalSize += sizes[i];
     }
 
     bytes memory data = new bytes(totalSize);
-    uint pointer = 0;
-    for (uint i = 0; i < accountsToQuery.length; i++) {
-      for (uint j = 0; j < sizes[i]; j++) {
+    uint256 pointer = 0;
+    for (uint256 i = 0; i < accountsToQuery.length; i++) {
+      for (uint256 j = 0; j < sizes[i]; j++) {
         data[pointer] = bytes(accounts[accountsToQuery[i]].metadataURL)[j];
         pointer++;
       }

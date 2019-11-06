@@ -24,6 +24,6 @@ interface IAccounts {
   function batchGetMetadataURL(address[] calldata)
     external
     view
-    returns (uint[] memory, bytes memory);
+    returns (uint256[] memory, bytes memory);
   function getName(address) external view returns (string memory);
 }

@@ -39,5 +39,5 @@ interface IAttestations {
     returns (uint8, uint32, address);
   function getCompletableAttestations(bytes32, address)
     external view
-    returns (uint32[] memory, address[] memory, uint[] memory, bytes memory);
+    returns (uint32[] memory, address[] memory, uint256[] memory, bytes memory);
 }
