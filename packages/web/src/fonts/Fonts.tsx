@@ -127,7 +127,6 @@ const styles = StyleSheet.create({
   reset: {
     textTransform: 'none',
   },
-  // @ts-ignore
   alpha: {
     listStyle: 'lower-alpha',
     display: 'list-item',
