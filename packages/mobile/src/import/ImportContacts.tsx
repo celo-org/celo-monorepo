@@ -74,7 +74,7 @@ class ImportContacts extends React.Component<Props, State> {
   }
 
   nextScreen = () => {
-    navigate(Screens.VerifyEducation)
+    navigate(Screens.VerificationEducationScreen)
   }
 
   onPressEnable = async () => {
