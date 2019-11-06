@@ -11,6 +11,7 @@ import {
 } from '@celo/protocol/lib/test-utils'
 import { attestToIdentifier } from '@celo/utils'
 import { privateKeyToAddress } from '@celo/utils/lib/address'
+import { parseSolidityStringArray } from '@celo/utils/lib/parsing'
 import { getPhoneHash } from '@celo/utils/lib/phoneNumbers'
 import BigNumber from 'bignumber.js'
 import { range, uniq } from 'lodash'
@@ -415,11 +416,23 @@ contract('Attestations', (accounts: string[]) => {
         })
 
         it('should return the attestations in getCompletableAttestationStates', async () => {
+          await Promise.all(
+            accounts.map((account) =>
+              accountsInstance.setMetadataURL(`https://test.com/${account}`, { from: account })
+            )
+          )
           await attestations.selectIssuers(phoneHash)
           const [
             attestationBlockNumbers,
             attestationIssuers,
+            stringLengths,
+            stringData,
           ] = await attestations.getCompletableAttestationStates(phoneHash, caller)
+
+          const urls = parseSolidityStringArray(
+            stringLengths.map((x) => x.toNumber()),
+            (stringData as unknown) as string
+          )
 
           assert.lengthOf(attestationBlockNumbers, attestationsRequested)
           await Promise.all(
@@ -431,6 +444,7 @@ contract('Attestations', (accounts: string[]) => {
               )
               assert.equal(status.toNumber(), 1)
               assertEqualBN(requestBlock, attestationBlockNumbers[i])
+              assert.equal(`https://test.com/${attestationIssuers[i]}`, urls[i])
             })
           )
         })

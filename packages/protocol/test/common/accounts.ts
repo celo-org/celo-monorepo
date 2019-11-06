@@ -1,3 +1,4 @@
+import { parseSolidityStringArray } from '@celo/utils/lib/parsing'
 import { upperFirst } from 'lodash'
 import { AccountsInstance } from 'types'
 import { getParsedSignatureOfAddress } from '../../lib/signing-utils'
@@ -298,14 +299,12 @@ contract('Accounts', (accounts: string[]) => {
         })
       )
       const [stringLengths, data] = await accountsInstance.batchGetMetadataURL(accounts)
-
-      let offset = 0
-      // @ts-ignore
-      const rawData = Buffer.from(data.slice(2), 'hex')
+      const strings = parseSolidityStringArray(
+        stringLengths.map((x) => x.toNumber()),
+        (data as unknown) as string
+      )
       for (let i = 0; i < accounts.length; i++) {
-        const string = rawData.toString('utf-8', offset, offset + stringLengths[i].toNumber())
-        offset += stringLengths[i].toNumber()
-        assert.equal(string, randomStrings[i])
+        assert.equal(strings[i], randomStrings[i])
       }
     })
   })

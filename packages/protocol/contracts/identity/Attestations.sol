@@ -485,13 +485,14 @@ contract Attestations is
     * @param identifier Hash of the identifier.
     * @param account Address of the account.
     * @return ( blockNumbers[] - Block number of request/completion the attestation,
-    *           issuers[] - Address of the issuer
+    *           issuers[] - Address of the issuer,
+    *
     *         )
     */
   function getCompletableAttestationStates(bytes32 identifier, address account)
     external
     view
-    returns (uint32[] memory, address[] memory)
+    returns (uint32[] memory, address[] memory, uint[] memory, bytes memory)
   {
     AttestedAddress storage state = identifiers[identifier].attestations[account];
     address[] storage issuers = state.selectedIssuers;
@@ -507,7 +508,7 @@ contract Attestations is
     address[] memory completableIssuers = new address[](num);
 
     uint pointer = 0;
-    for (uint i = 0; i < num; i++) {
+    for (uint i = 0; i < issuers.length; i++) {
       if (isAttestationCompletable(state.issuedAttestations[issuers[i]])) {
         blockNumbers[pointer] = state.issuedAttestations[issuers[i]].blockNumber;
         completableIssuers[pointer] = issuers[i];
@@ -515,7 +516,10 @@ contract Attestations is
       }
     }
 
-    return (blockNumbers, completableIssuers);
+    uint[] memory stringLengths;
+    bytes memory stringData;
+    (stringLengths, stringData) = getAccounts().batchGetMetadataURL(completableIssuers);
+    return (blockNumbers, completableIssuers, stringLengths, stringData);
   }
 
   /**

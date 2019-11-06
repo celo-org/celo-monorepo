@@ -18,6 +18,17 @@ export function zip3<A, B, C>(as: A[], bs: B[], cs: C[]) {
   return res
 }
 
+export function compact<A>(as: Array<A | null>): A[] {
+  const res: A[] = []
+  for (let i = 0; i < as.length; i++) {
+    const elem = as[i]
+    if (elem !== null) {
+      res.push(elem)
+    }
+  }
+  return res
+}
+
 // https://stackoverflow.com/questions/43118692/typescript-filter-out-nulls-from-an-array
 export function notEmpty<TValue>(value: TValue | null | undefined): value is TValue {
   return value !== null && value !== undefined
