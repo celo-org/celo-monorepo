@@ -2,12 +2,20 @@ import * as React from 'react'
 import { StyleSheet, Text, View } from 'react-native'
 import Fade from 'react-reveal/Fade'
 import EmailForm from 'src/forms/EmailForm'
-import HomeAnimation from 'src/home/HomeAnimation'
-import TextAnimation from 'src/home/TextAnimation'
+import dynamic from 'next/dynamic'
+// const HomeAnimation = dynamic((import('src/home/HomeAnimation') as unknown) as Promise<
+//   React.ComponentType<any>
+// >)
+// TODO import props rather than any
+const TextAnimation = dynamic((import('src/home/TextAnimation') as unknown) as Promise<
+  React.ComponentType<any>
+>)
+import { H1 } from 'src/fonts/Fonts'
 import { I18nProps, withNamespaces } from 'src/i18n'
 import Responsive from 'src/shared/Responsive'
 import { HEADER_HEIGHT, MENU_MAX_WIDTH } from 'src/shared/Styles'
 import { colors, fonts, standardStyles, textStyles } from 'src/styles'
+import HomeOracle from 'src/home/HomeOracle'
 
 type Props = I18nProps
 
@@ -39,7 +47,8 @@ class HomeCover extends React.PureComponent<Props> {
           <View style={styles.animationBackground}>
             <Responsive large={[styles.animationWrapper, styles.animationWrapperLargeAug]}>
               <View style={styles.animationWrapper}>
-                <HomeAnimation onLoaded={this.onLoaded} onFinished={this.onFinished} />
+                <HomeOracle />
+                {/* <HomeAnimation onLoaded={this.onLoaded} onFinished={this.onFinished} /> */}
               </View>
             </Responsive>
           </View>
@@ -47,7 +56,14 @@ class HomeCover extends React.PureComponent<Props> {
             <Responsive large={[styles.textWrapper, styles.largeTextWrapper]}>
               <View style={styles.textWrapper}>
                 <Fade bottom={true} distance="20px">
-                  <TextAnimation playing={this.state.playing} />
+                  <H1
+                    ariaLevel={'2'}
+                    accessibilityRole={'heading'}
+                    style={[styles.white, styles.stillText]}
+                  >
+                    Money that serves everyone
+                  </H1>
+                  {/* <TextAnimation playing={this.state.playing} /> */}
                 </Fade>
                 <Responsive
                   large={styles.content}
@@ -79,6 +95,9 @@ class HomeCover extends React.PureComponent<Props> {
 export default withNamespaces('home')(HomeCover)
 
 const styles = StyleSheet.create({
+  oracleGraphic: {
+    marginTop: HEADER_HEIGHT,
+  },
   animationWrapper: {
     flex: 1,
     maxWidth: MENU_MAX_WIDTH,
@@ -86,6 +105,9 @@ const styles = StyleSheet.create({
   },
   animationWrapperLargeAug: {
     justifyContent: 'flex-start',
+  },
+  stillText: {
+    marginLeft: 25,
   },
   smallCover: {
     minHeight: 600,
