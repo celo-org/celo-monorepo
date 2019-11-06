@@ -37,7 +37,7 @@ const KEY_CONVERSION = Object.freeze({
 })
 
 export interface RawAirTableEvent {
-  Title: string
+  'Event Title': string
   'Notes / Run Of Show': string
   Photos: object
   Process: 'Complete' | 'Scheduled' | 'In conversation' | 'To organize'
