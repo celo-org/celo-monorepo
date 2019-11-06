@@ -368,7 +368,7 @@ describe('governance tests', () => {
       }
 
       // Returns the gas fee base for a given block, which is distributed to the governance contract.
-      const gasFeeBase = async (blockNumber: number): Promise<BigNumber> => {
+      const blockBaseGasFee = async (blockNumber: number): Promise<BigNumber> => {
         const gas = (await web3.eth.getBlock(blockNumber)).gasUsed
         const gpm = await gasPriceMinimum.methods.gasPriceMinimum().call({}, blockNumber)
         return new BigNumber(gpm).times(new BigNumber(gas))
@@ -414,13 +414,13 @@ describe('governance tests', () => {
           await assertLockedGoldBalanceChanged(blockNumber, epochReward)
           await assertGovernanceBalanceChanged(
             blockNumber,
-            infraReward.plus(await gasFeeBase(blockNumber))
+            infraReward.plus(await blockBaseGasFee(blockNumber))
           )
         } else {
           await assertVotesUnchanged(blockNumber)
           await assertGoldTokenTotalSupplyUnchanged(blockNumber)
           await assertLockedGoldBalanceUnchanged(blockNumber)
-          await assertGovernanceBalanceChanged(blockNumber, await gasFeeBase(blockNumber))
+          await assertGovernanceBalanceChanged(blockNumber, await blockBaseGasFee(blockNumber))
         }
       }
     })

@@ -183,7 +183,7 @@ describe('Transfer tests', function(this: any) {
     await initAndStartGeth(hooks.gethBinaryPath, fullInstance)
 
     // Install an arbitrary address as the goverance address to act as the infrastructure fund.
-    // This is chosen instead of full migration for spead and to avoid the need for a governance
+    // This is chosen instead of full migration for speed and to avoid the need for a governance
     // proposal, as all contracts are owned by governance once the migration is complete.
     const registry = await kit._web3Contracts.getRegistry()
     const tx = registry.methods.setAddressFor(CeloContract.Governance, governanceAddress)
@@ -543,7 +543,7 @@ describe('Transfer tests', function(this: any) {
         describe('Transfer CeloDollars', () => {
           describe('gasCurrency = CeloDollars >', () => {
             testTransferToken({
-              // TODO(nategraf): Initializing a stable token account costs 5k additional gas.
+              // TODO(nategraf): Initializing a stable token account costs 15k additional gas.
               // The first time this transfer is done, which is for the full node, this will be seen.
               expectedGas: syncMode === 'full' ? 190303 : 175303,
               transferToken: CeloContract.StableToken,
