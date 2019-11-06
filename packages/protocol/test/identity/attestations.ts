@@ -415,7 +415,7 @@ contract('Attestations', (accounts: string[]) => {
           )
         })
 
-        it('should return the attestations in getCompletableAttestationStates', async () => {
+        it('should return the attestations in getCompletableAttestations', async () => {
           await Promise.all(
             accounts.map((account) =>
               accountsInstance.setMetadataURL(`https://test.com/${account}`, { from: account })
@@ -427,7 +427,7 @@ contract('Attestations', (accounts: string[]) => {
             attestationIssuers,
             stringLengths,
             stringData,
-          ] = await attestations.getCompletableAttestationStates(phoneHash, caller)
+          ] = await attestations.getCompletableAttestations(phoneHash, caller)
 
           const urls = parseSolidityStringArray(
             stringLengths.map((x) => x.toNumber()),
@@ -481,11 +481,11 @@ contract('Attestations', (accounts: string[]) => {
             await advanceBlockNum(attestationExpiryBlocks, web3)
           })
 
-          it('should no longer list the attestations in getCompletableAttestationStates', async () => {
+          it('should no longer list the attestations in getCompletableAttestations', async () => {
             const [
               attestationBlockNumbers,
               _attestationIssuers,
-            ] = await attestations.getCompletableAttestationStates(phoneHash, caller)
+            ] = await attestations.getCompletableAttestations(phoneHash, caller)
 
             assert.lengthOf(attestationBlockNumbers, 0)
           })
@@ -579,7 +579,7 @@ contract('Attestations', (accounts: string[]) => {
       const [
         _attestationBlockNumbers,
         attestationIssuers,
-      ] = await attestations.getCompletableAttestationStates(phoneHash, caller)
+      ] = await attestations.getCompletableAttestations(phoneHash, caller)
       assert.equal(attestationIssuers.indexOf(issuer), -1)
     })
 

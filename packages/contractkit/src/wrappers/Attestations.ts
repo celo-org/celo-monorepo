@@ -186,9 +186,7 @@ export class AttestationsWrapper extends BaseWrapper<Attestations> {
   ): Promise<ActionableAttestation[]> {
     const phoneHash = PhoneNumberUtils.getPhoneHash(phoneNumber)
 
-    const result = await this.contract.methods
-      .getCompletableAttestationStates(phoneHash, account)
-      .call()
+    const result = await this.contract.methods.getCompletableAttestations(phoneHash, account).call()
 
     const metadataURLs = parseSolidityStringArray(
       result[2].map(toNumber),

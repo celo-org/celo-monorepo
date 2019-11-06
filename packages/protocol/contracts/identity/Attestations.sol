@@ -445,7 +445,7 @@ contract Attestations is
     *
     *         )
     */
-  function getCompletableAttestationStates(bytes32 identifier, address account)
+  function getCompletableAttestations(bytes32 identifier, address account)
     external
     view
     returns (uint32[] memory, address[] memory, uint[] memory, bytes memory)
