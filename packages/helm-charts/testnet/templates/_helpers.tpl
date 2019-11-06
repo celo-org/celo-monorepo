@@ -203,12 +203,12 @@ spec:
               # to use the IP address of a service from an env var that Kubernetes creates
               SERVICE_ENV_VAR_PREFIX={{ .service_ip_env_var_prefix }}
               if [ "$SERVICE_ENV_VAR_PREFIX" ]; then
-                echo "Using ${SERVICE_ENV_VAR_PREFIX}${RID}_SERVICE_HOST:"
-                IP_ADDR=`eval "echo \${${SERVICE_ENV_VAR_PREFIX}${RID}_SERVICE_HOST}"`
-                echo $IP_ADDR
-                echo "$IP_ADDR" > /root/.celo/ipAddress
+                echo -n "Using ${SERVICE_ENV_VAR_PREFIX}${RID}_SERVICE_HOST:"
+                SERVICE_IP_ADDR=`eval "echo \\${${SERVICE_ENV_VAR_PREFIX}${RID}_SERVICE_HOST}"`
+                echo $SERVICE_IP_ADDR
+                echo "$SERVICE_IP_ADDR" > /root/.celo/ipAddress
               else
-                echo 'Using POD_IP' $POD_IP
+                echo 'Using POD_IP'
                 echo $POD_IP > /root/.celo/ipAddress
               fi
             else
