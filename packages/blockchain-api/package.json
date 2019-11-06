@@ -14,7 +14,8 @@
     "build": "tsc -p .",
     "clean": "rm -rf dist coverage",
     "gcp-build": "npm run build",
-    "deploy": "./deploy.sh"
+    "deploy": "./deploy.sh",
+    "postinstall": "test -f src/secrets.json || echo \"{}\" > src/secrets.json"
   },
   "dependencies": {
     "@celo/contractkit": "0.1.6",
