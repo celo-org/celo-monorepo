@@ -4,26 +4,6 @@ description: View and manage locked Celo Gold
 
 ## Commands
 
-### Authorize
-
-Authorize validating or voting address for a Locked Gold account
-
-```
-USAGE
-  $ celocli lockedgold:authorize
-
-OPTIONS
-  -r, --role=voter|validator                         Role to delegate
-  --from=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) Account Address
-  --to=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d    (required) Account Address
-
-EXAMPLE
-  authorize --from 0x5409ED021D9299bf6814279A6A1411A7e866A631 --role voter --to
-  0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d
-```
-
-_See code: [packages/cli/src/commands/lockedgold/authorize.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/lockedgold/authorize.ts)_
-
 ### Lock
 
 Locks Celo Gold to be used in governance and validator elections.
@@ -41,23 +21,6 @@ EXAMPLE
 ```
 
 _See code: [packages/cli/src/commands/lockedgold/lock.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/lockedgold/lock.ts)_
-
-### Register
-
-Register an account for Locked Gold
-
-```
-USAGE
-  $ celocli lockedgold:register
-
-OPTIONS
-  --from=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) Account Address
-
-EXAMPLE
-  register
-```
-
-_See code: [packages/cli/src/commands/lockedgold/register.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/lockedgold/register.ts)_
 
 ### Show
 
