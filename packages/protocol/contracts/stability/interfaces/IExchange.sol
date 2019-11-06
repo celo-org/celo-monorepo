@@ -6,6 +6,7 @@ interface IExchange {
   function initialize(
     address,
     address,
+    address,
     uint256,
     uint256,
     uint256,

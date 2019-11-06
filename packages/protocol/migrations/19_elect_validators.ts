@@ -45,7 +45,8 @@ async function registerValidatorGroup(
   accounts: AccountsInstance,
   lockedGold: LockedGoldInstance,
   validators: ValidatorsInstance,
-  privateKey: string
+  privateKey: string,
+  numMembers: number
 ) {
   // Validators can't also be validator groups, so we create a new account to register the
   // validator group with, and set the name of the group account to the private key of this account
@@ -59,18 +60,18 @@ async function registerValidatorGroup(
   const encryptedPrivateKey = encryptionWeb3.eth.accounts.encrypt(account.privateKey, privateKey)
   const encodedKey = serializeKeystore(encryptedPrivateKey)
 
+  // Value is per-validator.
+  const lockedGoldValue = new BigNumber(config.validators.groupLockedGoldRequirements.value).times(
+    numMembers
+  )
+
   await web3.eth.sendTransaction({
     from: generateAccountAddressFromPrivateKey(privateKey.slice(0)),
     to: account.address,
-    value: config.validators.registrationRequirements.group * 2, // Add a premium to cover tx fees
+    value: lockedGoldValue.times(1.01).toFixed(), // Add a premium to cover tx fees
   })
 
-  await lockGold(
-    accounts,
-    lockedGold,
-    config.validators.registrationRequirements.group,
-    account.privateKey
-  )
+  await lockGold(accounts, lockedGold, lockedGoldValue, account.privateKey)
 
   // @ts-ignore
   const setNameTx = accounts.contract.methods.setName(
@@ -119,7 +120,7 @@ async function registerValidator(
   await lockGold(
     accounts,
     lockedGold,
-    config.validators.registrationRequirements.validator,
+    config.validators.validatorLockedGoldRequirements.value,
     validatorPrivateKey
   )
 
@@ -197,7 +198,13 @@ module.exports = async (_deployer: any, networkName: string) => {
 
   console.info('  Registering ValidatorGroup ...')
   const firstPrivateKey = valKeys[0]
-  const account = await registerValidatorGroup(accounts, lockedGold, validators, firstPrivateKey)
+  const account = await registerValidatorGroup(
+    accounts,
+    lockedGold,
+    validators,
+    firstPrivateKey,
+    valKeys.length
+  )
 
   console.info('  Registering Validators ...')
   await Promise.all(
