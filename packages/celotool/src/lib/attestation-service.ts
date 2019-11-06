@@ -31,7 +31,7 @@ function helmParameters() {
     `--set domain.name=${fetchEnv(envVar.CLUSTER_DOMAIN_NAME)}`,
     `--set celotool.image.repository=${fetchEnv('CELOTOOL_DOCKER_IMAGE_REPOSITORY')}`,
     `--set celotool.image.tag=${fetchEnv('CELOTOOL_DOCKER_IMAGE_TAG')}`,
-    `--set mnemonic="${fetchEnv('MNEMONIC')}"`,
+    `--set mnemonic="${fetchEnv(envVar.MNEMONIC)}"`,
     `--set attestation_service.image.repository=${fetchEnv(
       envVar.ATTESTATION_SERVICE_DOCKER_IMAGE_REPOSITORY
     )}`,
