@@ -191,6 +191,9 @@ function handleSpecialCasesForDisplay(parsedNumber: PhoneNumber, countryCode?: n
         .format(parsedNumber, PhoneNumberFormat.INTERNATIONAL)
         .replace(/\+54(\s)?/, '')
 
+    case 231:
+      return phoneUtil.format(parsedNumber, PhoneNumberFormat.NATIONAL).slice(1)
+
     default:
       return phoneUtil.format(parsedNumber, PhoneNumberFormat.NATIONAL)
   }
