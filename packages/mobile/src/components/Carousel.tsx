@@ -20,7 +20,7 @@ interface OwnProps {
 
 export interface CarouselItem {
   text: string
-  icon?: any
+  icon?: React.ReactElement
 }
 
 function renderItem({ item, index }: { item: CarouselItem; index: number }) {
