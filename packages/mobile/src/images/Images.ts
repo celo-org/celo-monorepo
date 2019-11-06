@@ -1,4 +1,3 @@
-export const profile = require('src/images/profile.jpg')
 export const defaultAvatar = require('src/images/default-avatar.png')
 
 export const welcomeRocketIcon = require('src/images/welcome-rocket-icon.png')

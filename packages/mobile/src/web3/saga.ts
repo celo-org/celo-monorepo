@@ -440,7 +440,9 @@ export function* ensureAccountInWeb3Keystore() {
 }
 
 export function* switchToGethFromZeroSync() {
+  Logger.error(TAG + '@switchToGethFromZeroSync', 'Called')
   try {
+    Logger.error(TAG + '@switchToGethFromZeroSync', 'Trying to set zeroSync mode to false')
     yield put(setZeroSyncMode(false))
     Logger.error(TAG + '@switchToGethFromZeroSync', 'About to initialize geth')
     yield call(clearGethCache)
@@ -452,8 +454,10 @@ export function* switchToGethFromZeroSync() {
     Logger.error(TAG + '@switchToGethFromZeroSync', 'Switched providers')
     // Ensure web3 is fully synced using new provider
     yield call(waitForWeb3Sync)
-
-    Logger.error(TAG + '@switchToGethFromZeroSync', 'Waited for web3 sync')
+    const txCount = yield call(web3.eth.getTransactionCount, '0xFAfD7d820bf9294d344393')
+    Logger.debug(`${TAG}@switchToGethFromZeroSync`, `Transaction count: ${txCount}`)
+    const blockNumber = yield call(web3.eth.getBlockNumber)
+    Logger.error(TAG + '@switchToGethFromZeroSync', `Block number: ${blockNumber}`)
 
     // After switching off zeroSync mode, ensure key is stored in web3.personal
     // Note that this must happen after the sync mode is switched

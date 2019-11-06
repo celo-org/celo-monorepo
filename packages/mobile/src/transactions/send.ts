@@ -71,6 +71,8 @@ export function* sendTransactionPromises(
   const stableToken = yield call(getStableTokenContract, web3)
   // This if-else case is temprary and will disappear once we move from `walletkit` to `contractkit`.
   const zeroSyncMode = yield select(zeroSyncSelector)
+  const txCount = yield call(web3.eth.getTransactionCount, account)
+  Logger.debug(`${TAG}@sendTransactionPromises`, `Transaction count: ${txCount}`)
   if (zeroSyncMode) {
     // In dev mode, verify that we are actually able to connect to the network. This
     // ensures that we get a more meaningful error if the forno server is down, which

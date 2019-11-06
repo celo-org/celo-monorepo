@@ -26,7 +26,7 @@ function getIpcProvider() {
   Logger.debug(tag, 'created IPCProvider')
 
   Logger.debug('Ipc connection object is ' + Object.keys(ipcProvider))
-  Logger.debug('Connection details: ' + JSON.stringify(ipcProvider.connection))
+  // Logger.debug('Connection details: ' + JSON.stringify(ipcProvider.connection))
 
   // More details on the IPC objects can be seen via this
   // console.debug("Ipc connection object is " + Object.keys(ipcProvider.connection));
@@ -56,6 +56,7 @@ function getIpcProvider() {
   // ipcProvider.on("error", () => {
   //   Logger.showError("Error occurred");
   // })
+  Logger.debug('About to return IPC provider')
   return ipcProvider
 }
 
