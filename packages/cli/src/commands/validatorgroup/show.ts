@@ -9,17 +9,11 @@ export default class ValidatorGroupShow extends BaseCommand {
 
   static flags = {
     ...BaseCommand.flags,
-    affiliates: flags.boolean({
-      description: 'Show a list of all validators that have set their affiliation to this group.',
-    }),
   }
 
   static args: IArg[] = [Args.address('groupAddress', { description: "ValidatorGroup's address" })]
 
-  static examples = [
-    'show 0x97f7333c51897469E8D98E7af8653aAb468050a3',
-    'show 0x97f7333c51897469E8D98E7af8653aAb468050a3 --affiliates',
-  ]
+  static examples = ['show 0x97f7333c51897469E8D98E7af8653aAb468050a3']
 
   async run() {
     const res = this.parse(ValidatorGroupShow)
@@ -27,11 +21,9 @@ export default class ValidatorGroupShow extends BaseCommand {
     const validatorGroup: Array<
       ValidatorGroup & { affiliates?: Address[] }
     > = await validators.getValidatorGroup(res.args.groupAddress)
-    if (res.flags.affiliates) {
-      const registered = await validators.getRegisteredValidators()
-      const affiliated = registered.filter((v) => v.affiliation == args.groupAddress)
-      validatorGroup.affiliates = affiliated.map((v) => v.address)
-    }
+    const registered = await validators.getRegisteredValidators()
+    const affiliated = registered.filter((v) => v.affiliation == args.groupAddress)
+    validatorGroup.affiliates = affiliated.map((v) => v.address)
     printValueMap(validatorGroup)
   }
 }
