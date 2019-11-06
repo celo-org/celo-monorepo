@@ -5,7 +5,7 @@ import Contract from 'web3/eth/contract'
 
 import { mapAsync, zip } from '@celo/utils/lib/collections'
 
-import { Address } from '../base'
+import { Address, CeloContract } from '../base'
 import { Governance } from '../generated/types/Governance'
 import {
   BaseWrapper,
@@ -38,6 +38,13 @@ export interface Transaction {
   value: BigNumber
   destination: Address
   data: Buffer
+}
+
+export interface JSONTransaction {
+  value: string
+  celoContractName: CeloContract
+  methodName: string
+  args: string[]
 }
 
 interface TransactionsEncoded {
@@ -192,8 +199,18 @@ export class GovernanceWrapper extends BaseWrapper<Governance> {
     ) as Buffer
   }
 
-  // TODO(yorke): re-type keeping in mind CLI (simple inputs: contract name, method name, and args)
-  toTransactionData<T extends Contract, K extends keyof T['methods'], M extends T['methods'][K]>(
+  buildTransactionsFromJSON = (jsonTransactions: JSONTransaction[]) =>
+    mapAsync<JSONTransaction, Transaction>(jsonTransactions, async (jsonTx: JSONTransaction) => {
+      const contract = await this.kit._web3Contracts.getContract(jsonTx.celoContractName)
+      const method = (contract.methods as Contract['methods'])[jsonTx.methodName]
+      return {
+        value: toBigNumber(jsonTx.value),
+        destination: contract._address,
+        data: this.toTransactionData(method, jsonTx.args)
+      }
+    })
+
+  toTransactionData<M extends Contract['methods'][keyof Contract['methods']]>(
     contractMethod: M,
     args: Parameters<M>
   ) {
@@ -248,6 +265,11 @@ export class GovernanceWrapper extends BaseWrapper<Governance> {
     arrayObject.map(toBigNumber)
   )
 
+  async getVoteWeight(voter: Address) {
+    const lockedGoldContract = await this.kit.contracts.getLockedGold()
+    return lockedGoldContract.getAccountTotalLockedGold(voter)
+  }
+
   private async getDequeueIndex(proposalID: BigNumber) {
     const dequeue = await this.getDequeue()
     const index = dequeue.findIndex((d) => d.isEqualTo(proposalID))
@@ -279,8 +301,7 @@ export class GovernanceWrapper extends BaseWrapper<Governance> {
       const proposalIdx = queue.findIndex((qp) => qp.id.isEqualTo(proposalID))
       // is target proposal in queue?
       if (proposalIdx !== -1) {
-        const lockedGoldContract = await this.kit.contracts.getLockedGold()
-        const weight = await lockedGoldContract.getAccountTotalLockedGold(upvoter)
+        const weight = await this.getVoteWeight(upvoter)
         queue[proposalIdx].upvotes = queue[proposalIdx].upvotes.plus(weight)
         searchID = proposalID
       } else {

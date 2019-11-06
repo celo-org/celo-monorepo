@@ -1,10 +1,11 @@
 import BigNumber from 'bignumber.js'
 
-import { Address, CeloContract } from '../base'
+import { Address, CeloContract, NULL_ADDRESS } from '../base'
 import { Registry } from '../generated/types/Registry'
 import { newKitFromWeb3 } from '../kit'
 import { NetworkConfig, testWithGanache } from '../test-utils/ganache-test'
-import { GovernanceWrapper, Transaction, VoteValue } from './Governance'
+// import { parseBuffer } from './BaseWrapper'
+import { GovernanceWrapper, JSONTransaction, Transaction, VoteValue } from './Governance'
 
 const expConfig = NetworkConfig.governance
 
@@ -12,7 +13,7 @@ testWithGanache('Governance Wrapper', (web3) => {
   const kit = newKitFromWeb3(web3)
   const minDeposit = web3.utils.toWei(expConfig.minDeposit.toString(), 'ether')
 
-  let accounts: string[] = []
+  let accounts: Address[] = []
   let governance: GovernanceWrapper
   let registry: Registry
 
@@ -44,6 +45,23 @@ testWithGanache('Governance Wrapper', (web3) => {
     expect(config.stageDurations.execution).toEqBigNumber(expConfig.executionStageDuration)
   })
 
+  it.only('#buildTransactionsFromJSON', async () => {
+    const jsonTransactions: JSONTransaction[] = JSON.parse(`[{
+      "value": 0,
+      "celoContractName": "StableToken",
+      "methodName": "balanceOf(address)",
+      "args": ["${NULL_ADDRESS}"]
+    }]`)
+    const transactions = await governance.buildTransactionsFromJSON(jsonTransactions)
+    const stableToken = await kit._web3Contracts.getStableToken()
+    const constructedTransactions = [{
+      value: new BigNumber(0),
+      destination: stableToken._address,
+      data: governance.toTransactionData(stableToken.methods.balanceOf, [NULL_ADDRESS]),
+    }]
+    expect(transactions).toStrictEqual(constructedTransactions)
+  })
+
   describe('Proposals', () => {
     let proposalTransactions: Transaction[]
     let proposeFn: () => Promise<any>
@@ -65,7 +83,7 @@ testWithGanache('Governance Wrapper', (web3) => {
 
     const proposalID = new BigNumber(1)
 
-    it.only('#propose', async () => {
+    it('#propose', async () => {
       await proposeFn()
 
       const proposal = await governance.getProposal(proposalID)
@@ -74,14 +92,15 @@ testWithGanache('Governance Wrapper', (web3) => {
       expect(proposal.transactions).toStrictEqual(proposalTransactions)
     })
 
-    it.only('#upvote', async () => {
+    it('#upvote', async () => {
       await proposeFn()
 
       const tx = await governance.upvote(proposalID, accounts[0])
       await tx.sendAndWaitForReceipt()
 
-    //   const upvotes = await governance.getUpvotes(proposalID)
-    //   console.log("upvotes", upvotes)
+      const voteWeight = await governance.getVoteWeight(accounts[0])
+      const upvotes = await governance.getUpvotes(proposalID)
+      expect(upvotes).toEqBigNumber(voteWeight)
     })
 
     it('#approve', async () => {
