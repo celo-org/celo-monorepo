@@ -58,6 +58,7 @@ function decodeTransferLog(log: Log): Transfer | null {
    * Including this unknown param in the input list or decoding won't work
    */
   try {
+    // @ts-ignore
     const decodedLog: any = Web3EthAbi.default.decodeLog(
       [
         {

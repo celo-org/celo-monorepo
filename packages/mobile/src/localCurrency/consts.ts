@@ -7,4 +7,12 @@ export enum LocalCurrencyCode {
   PHP = 'PHP',
 }
 
+export enum LocalCurrencySymbol {
+  USD = '$',
+  CAD = '$',
+  EUR = '€',
+  MXN = '$',
+  PHP = '₱',
+}
+
 export const LOCAL_CURRENCY_CODES = Object.values(LocalCurrencyCode)

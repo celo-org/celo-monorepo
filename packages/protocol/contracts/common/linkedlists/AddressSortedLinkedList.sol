@@ -1,5 +1,6 @@
 pragma solidity ^0.5.3;
 
+import "openzeppelin-solidity/contracts/math/Math.sol";
 import "openzeppelin-solidity/contracts/math/SafeMath.sol";
 import "./AddressLinkedList.sol";
 import "./SortedLinkedList.sol";
@@ -104,6 +105,32 @@ library AddressSortedLinkedList {
       values[i] = list.values[byteKeys[i]];
     }
     return (keys, values);
+  }
+
+  /**
+   * @notice Returns the minimum of `max` and the  number of elements in the list > threshold.
+   * @param threshold The number that the element must exceed to be included.
+   * @param max The maximum number returned by this function.
+   * @return The minimum of `max` and the  number of elements in the list > threshold.
+   */
+  function numElementsGreaterThan(
+    SortedLinkedList.List storage list,
+    uint256 threshold,
+    uint256 max
+  )
+    public
+    view
+    returns (uint256)
+  {
+    uint256 revisedMax = Math.min(max, list.list.numElements);
+    bytes32 key = list.list.head;
+    for (uint256 i = 0; i < revisedMax; i++) {
+      if (list.getValue(key) < threshold) {
+        return i;
+      }
+      key = list.list.elements[key].previousKey;
+    }
+    return revisedMax;
   }
 
   /**

@@ -4,6 +4,8 @@ export enum Stacks {
   HomeStack = 'HomeStack',
   NuxStack = 'NuxStack',
   SendStack = 'SendStack',
+  QRSendStack = 'QRSendStack',
+  SettingsStack = 'SettingsStack',
   RequestStack = 'RequestStack',
   BackupStack = 'BackupStack',
 }
@@ -62,9 +64,15 @@ export enum Screens {
   TabNavigator = 'TabNavigator',
   TransactionReview = 'TransactionReview',
   UpgradeScreen = 'UpgradeScreen',
+  // TODO(Rossy) Remove these next 3
   VerifyEducation = 'VerifyEducation',
-  VerifyInput = 'VerifyInput',
   VerifyVerified = 'VerifyVerified',
   VerifyVerifying = 'VerifyVerifying',
+  VerificationEducationScreen = 'VerificationEducationScreen',
+  VerificationLearnMoreScreen = 'VerificationLearnMoreScreen',
+  VerificationLoadingScreen = 'VerificationLoadingScreen',
+  VerificationInterstitialScreen = 'VerificationInterstitialScreen',
+  VerificationInputScreen = 'VerificationInputScreen',
+  VerificationSuccessScreen = 'VerificationSuccessScreen',
   WalletHome = 'WalletHome',
 }
