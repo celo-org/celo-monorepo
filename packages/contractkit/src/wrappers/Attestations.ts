@@ -126,6 +126,17 @@ export class AttestationsWrapper extends BaseWrapper<Attestations> {
       await sleep(pollDurationSeconds * 1000)
     }
   }
+
+  /**
+   * Returns the issuers of attestations for a phoneNumber/account combo
+   * @param phoneNumber Phone Number
+   * @param account Account
+   */
+  getAttestationIssuers = proxyCall(
+    this.contract.methods.getAttestationIssuers,
+    tupleParser(PhoneNumberUtils.getPhoneHash, (x: string) => x)
+  )
+
   /**
    * Returns the attestation state of a phone number/account/issuer tuple
    * @param phoneNumber Phone Number
