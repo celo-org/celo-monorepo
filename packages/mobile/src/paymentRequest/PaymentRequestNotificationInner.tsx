@@ -1,5 +1,4 @@
 import fontStyles from '@celo/react-components/styles/fonts'
-import BigNumber from 'bignumber.js'
 import * as React from 'react'
 import { StyleSheet, Text } from 'react-native'
 import { CURRENCIES, CURRENCY_ENUM } from 'src/geth/consts'

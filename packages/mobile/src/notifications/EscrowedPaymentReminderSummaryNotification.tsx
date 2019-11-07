@@ -3,7 +3,6 @@ import variables from '@celo/react-components/styles/variables'
 import * as React from 'react'
 import { WithNamespaces, withNamespaces } from 'react-i18next'
 import { Image, StyleSheet, View } from 'react-native'
-import { connect } from 'react-redux'
 import CeloAnalytics from 'src/analytics/CeloAnalytics'
 import { CustomEventNames } from 'src/analytics/constants'
 import { EscrowedPayment } from 'src/escrow/actions'
@@ -12,7 +11,6 @@ import { Namespaces } from 'src/i18n'
 import { inviteFriendsIcon } from 'src/images/Images'
 import { navigate } from 'src/navigator/NavigationService'
 import { Stacks } from 'src/navigator/Screens'
-import { RootState } from 'src/redux/reducers'
 
 interface OwnProps {
   payments: EscrowedPayment[]
