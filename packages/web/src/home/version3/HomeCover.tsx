@@ -10,7 +10,7 @@ import { I18nProps, withNamespaces } from 'src/i18n'
 import Responsive from 'src/shared/Responsive'
 import { BANNER_HEIGHT, HEADER_HEIGHT } from 'src/shared/Styles'
 import { colors, fonts, standardStyles, textStyles } from 'src/styles'
-import { hasGoodConnection } from 'src/utils/utils'
+import { hasGoodConnection, getDeviceMemory } from 'src/utils/utils'
 type Props = I18nProps
 
 const ANIMATION_DURATION = 5
@@ -36,7 +36,7 @@ class HomeCover extends React.PureComponent<Props, State> {
 
   componentDidMount = async () => {
     const goodConnection = await hasGoodConnection()
-    this.setState({ mode: goodConnection ? Mode.video : Mode.graphic })
+    this.setState({ mode: goodConnection && getDeviceMemory() >= 2 ? Mode.video : Mode.graphic })
   }
 
   render() {

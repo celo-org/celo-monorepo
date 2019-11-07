@@ -73,3 +73,11 @@ async function abort(): Promise<boolean> {
     }, MAX_TIME_MS)
   })
 }
+
+type MemoryGB = 0.25 | 0.5 | 1 | 2 | 4 | 8
+
+export function getDeviceMemory(): MemoryGB {
+  // only available on chrome / android browser assume 4 if we dont know
+  // @ts-ignore
+  return navigator.deviceMemory || 4
+}
