@@ -57,7 +57,7 @@ class InflationManager {
 
   setInflationRateForNextTransfer = async (rate: BigNumber) => {
     // Possibly update the inflation factor and ensure it won't update again.
-    await this.setInflationParameters(new BigNumber(1), 1000000)
+    await this.setInflationParameters(new BigNumber(1), Number.MAX_SAFE_INTEGER)
 
     const updateRate = await this.getNextUpdateRate()
     await this.setInflationParameters(rate, updateRate)
@@ -660,7 +660,7 @@ describe('Transfer tests', function(this: any) {
     }
   })
 
-  describe('Transfer with Demurrage >', () => {
+  describe.only('Transfer with Demurrage >', () => {
     let inflationManager: InflationManager
 
     before(async () => {
