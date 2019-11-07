@@ -83,6 +83,4 @@ const styles = StyleSheet.create({
   },
 })
 
-export default connect<{}, {}, {}, RootState>(null)(
-  withNamespaces(Namespaces.walletFlow5)(EscrowedPaymentReminderSummaryNotification)
-)
+export default withNamespaces(Namespaces.walletFlow5)(EscrowedPaymentReminderSummaryNotification)

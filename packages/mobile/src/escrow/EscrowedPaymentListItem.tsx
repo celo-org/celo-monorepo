@@ -38,6 +38,7 @@ export class EscrowedPaymentListItem extends React.PureComponent<Props> {
         navigateToURI(`sms:${recipientPhoneNumber}`)
       }
     } catch (error) {
+      // TODO: use the showError saga instead of the Logger.showError, which is a hacky temp thing we used for a while that doesn't actually work on iOS
       Logger.showError(ErrorMessages.SMS_ERROR)
       Logger.error(TAG, `Error sending SMS to ${recipientPhoneNumber}`, error)
     }

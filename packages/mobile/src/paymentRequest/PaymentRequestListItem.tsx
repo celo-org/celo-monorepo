@@ -100,7 +100,7 @@ export class PaymentRequestListItem extends React.Component<Props> {
           title={requester.displayName}
           ctas={this.getCTA()}
           roundedBorders={false}
-          callout={<NotificationAmount amount={multiplyByWei(new BigNumber(this.props.amount))} />}
+          callout={<NotificationAmount amount={multiplyByWei(this.props.amount)} />}
         >
           <View style={styles.body}>
             {this.isDisplayingNumber() && (
