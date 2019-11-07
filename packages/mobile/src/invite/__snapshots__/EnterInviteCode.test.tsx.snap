@@ -246,9 +246,6 @@ exports[`EnterInviteCode Screen renders correctly 1`] = `
                     "color": "#81868B",
                     "fontFamily": "Hind-SemiBold",
                     "fontSize": 13,
-                    "lineHeight": 17,
-                  },
-                  Object {
                     "lineHeight": 20,
                     "textAlign": "center",
                   },
@@ -270,20 +267,16 @@ exports[`EnterInviteCode Screen renders correctly 1`] = `
   <View>
     <Text
       style={
-        Array [
-          Object {
-            "alignSelf": "center",
-            "color": "#2E3338",
-            "fontFamily": "Hind-Regular",
-            "fontSize": 14,
-            "lineHeight": 18,
-            "textAlign": "center",
-          },
-          Object {
-            "marginHorizontal": 20,
-            "marginVertical": 10,
-          },
-        ]
+        Object {
+          "alignSelf": "center",
+          "color": "#2E3338",
+          "fontFamily": "Hind-Regular",
+          "fontSize": 14,
+          "lineHeight": 18,
+          "marginHorizontal": 20,
+          "marginVertical": 10,
+          "textAlign": "center",
+        }
       }
     >
       inviteCodeText.askForInvite.0
@@ -291,11 +284,11 @@ exports[`EnterInviteCode Screen renders correctly 1`] = `
         onPress={[Function]}
         style={
           Object {
-            "color": "#42D689",
-            "fontFamily": "Hind-SemiBold",
-            "fontSize": 12,
-            "fontWeight": "300",
+            "color": "#2E3338",
+            "fontFamily": "Hind-Regular",
+            "fontSize": 14,
             "lineHeight": 18,
+            "textDecorationLine": "underline",
           }
         }
       >
@@ -728,9 +721,6 @@ exports[`EnterInviteCode Screen renders with an error 1`] = `
                     "color": "#81868B",
                     "fontFamily": "Hind-SemiBold",
                     "fontSize": 13,
-                    "lineHeight": 17,
-                  },
-                  Object {
                     "lineHeight": 20,
                     "textAlign": "center",
                   },
@@ -752,20 +742,16 @@ exports[`EnterInviteCode Screen renders with an error 1`] = `
   <View>
     <Text
       style={
-        Array [
-          Object {
-            "alignSelf": "center",
-            "color": "#2E3338",
-            "fontFamily": "Hind-Regular",
-            "fontSize": 14,
-            "lineHeight": 18,
-            "textAlign": "center",
-          },
-          Object {
-            "marginHorizontal": 20,
-            "marginVertical": 10,
-          },
-        ]
+        Object {
+          "alignSelf": "center",
+          "color": "#2E3338",
+          "fontFamily": "Hind-Regular",
+          "fontSize": 14,
+          "lineHeight": 18,
+          "marginHorizontal": 20,
+          "marginVertical": 10,
+          "textAlign": "center",
+        }
       }
     >
       inviteCodeText.askForInvite.0
@@ -773,11 +759,11 @@ exports[`EnterInviteCode Screen renders with an error 1`] = `
         onPress={[Function]}
         style={
           Object {
-            "color": "#42D689",
-            "fontFamily": "Hind-SemiBold",
-            "fontSize": 12,
-            "fontWeight": "300",
+            "color": "#2E3338",
+            "fontFamily": "Hind-Regular",
+            "fontSize": 14,
             "lineHeight": 18,
+            "textDecorationLine": "underline",
           }
         }
       >
