@@ -8,7 +8,7 @@ testWithGanache('account:register cmd', (web3: Web3) => {
   test('can register account', async () => {
     const accounts = await web3.eth.getAccounts()
 
-    await Register.run(['--from', accounts[0]])
+    await Register.run(['--from', accounts[0], '--name', 'Chapulin Colorado'])
   })
 
   test('fails if from is missing', async () => {

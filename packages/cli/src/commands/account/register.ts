@@ -26,6 +26,6 @@ export default class Register extends BaseCommand {
       .isNotAccount(res.flags.from)
       .runChecks()
     await displaySendTx('register', accounts.createAccount())
-    await displaySendTx('setName', accounts.setName(name))
+    await displaySendTx('setName', accounts.setName(res.flags.name))
   }
 }
