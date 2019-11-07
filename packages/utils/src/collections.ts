@@ -22,17 +22,3 @@ export function zip3<A, B, C>(as: A[], bs: B[], cs: C[]) {
 export function notEmpty<TValue>(value: TValue | null | undefined): value is TValue {
   return value !== null && value !== undefined
 }
-
-// https://stackoverflow.com/questions/33355528/filtering-an-array-with-a-function-that-returns-a-promise
-export function mapAsync<T, U>(
-  array: T[], callbackfn: (value: T, index: number, array: T[]) => Promise<U>
-): Promise<U[]> {
-  return Promise.all(array.map(callbackfn));
-}
- 
-export async function filterAsync<T>(
-  array: T[], callbackfn: (value: T, index: number, array: T[]) => Promise<boolean>
-): Promise<T[]> {
-  const filterMap = await mapAsync(array, callbackfn);
-  return array.filter((_, index) => filterMap[index]);
-}

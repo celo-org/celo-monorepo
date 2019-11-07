@@ -1,23 +1,27 @@
 import BigNumber from 'bignumber.js'
 import { keccak256 } from 'ethereumjs-util'
-import { identity } from 'fp-ts/lib/function'
 import Contract from 'web3/eth/contract'
 
-import { mapAsync, zip } from '@celo/utils/lib/collections'
+import { concurrentMap } from '@celo/utils/lib/async'
+import { zip } from '@celo/utils/lib/collections'
 
 import { Address, CeloContract } from '../base'
 import { Governance } from '../generated/types/Governance'
 import {
   BaseWrapper,
   CeloTransactionObject,
+  identity,
+  NumberLike,
   parseBuffer,
   parseNumber,
   proxyCall,
   proxySend,
   toBigNumber,
   toBuffer,
+  toNumber,
   toTransactionObject,
   tupleParser,
+  parseBytes,
 } from './BaseWrapper'
 
 export interface StageDurations {
@@ -35,22 +39,22 @@ export interface GovernanceConfig {
 }
 
 export interface Transaction {
-  value: BigNumber
+  value: NumberLike
   destination: Address
   data: Buffer
 }
 
 export interface JSONTransaction {
-  value: string
+  value: NumberLike
   celoContractName: CeloContract
   methodName: string
-  args: string[]
+  args: any[]
 }
 
 interface TransactionsEncoded {
   readonly values: string[]
   readonly destinations: Address[]
-  readonly data: Buffer
+  readonly data: Array<string | number[]>
   readonly dataLengths: number[]
 }
 
@@ -64,11 +68,6 @@ export interface ProposalMetadata {
 export interface Proposal {
   metadata: ProposalMetadata
   transactions: Transaction[]
-}
-
-interface QueueProposal {
-  id: BigNumber
-  upvotes: BigNumber
 }
 
 export enum VoteValue {
@@ -137,19 +136,19 @@ export class GovernanceWrapper extends BaseWrapper<Governance> {
     }
   }
 
-  getProposalMetadata: (proposalID: BigNumber) => Promise<ProposalMetadata> = proxyCall(
+  getProposalMetadata: (proposalID: NumberLike) => Promise<ProposalMetadata> = proxyCall(
     this.contract.methods.getProposal,
     tupleParser(parseNumber),
     (res) => ({
       proposer: res[0],
       deposit: toBigNumber(res[1]),
       timestamp: toBigNumber(res[2]),
-      transactionCount: toBigNumber(res[3]).toNumber(),
+      transactionCount: toNumber(res[3]),
     })
   )
 
   getProposalTransaction: (
-    proposalID: BigNumber,
+    proposalID: NumberLike,
     txIndex: number
   ) => Promise<Transaction> = proxyCall(
     this.contract.methods.getProposalTransaction,
@@ -157,23 +156,21 @@ export class GovernanceWrapper extends BaseWrapper<Governance> {
     (res) => ({
       value: toBigNumber(res[0]),
       destination: res[1],
-      // @ts-ignore string[] bytes type
       data: toBuffer(res[2]),
     })
   )
 
-  isApproved: (proposalID: BigNumber) => Promise<boolean> = proxyCall(
-    this.contract.methods.isApproved, 
-    tupleParser(parseNumber), 
-    identity
+  isApproved: (proposalID: NumberLike) => Promise<boolean> = proxyCall(
+    this.contract.methods.isApproved,
+    tupleParser(parseNumber)
   )
 
-  getApprover = proxyCall(this.contract.methods.approver, undefined, identity)
+  getApprover = proxyCall(this.contract.methods.approver)
 
-  async getProposal(proposalID: BigNumber): Promise<Proposal> {
+  async getProposal(proposalID: NumberLike): Promise<Proposal> {
     const metadata = await this.getProposalMetadata(proposalID)
     const txIndices = Array.from(Array(metadata.transactionCount).keys())
-    const transactions = await mapAsync(txIndices, (txIndex) =>
+    const transactions = await concurrentMap(metadata.transactionCount, txIndices, (txIndex) =>
       this.getProposalTransaction(proposalID, txIndex)
     )
 
@@ -185,9 +182,9 @@ export class GovernanceWrapper extends BaseWrapper<Governance> {
 
   private getTransactionsEncoded(transactions: Transaction[]): TransactionsEncoded {
     return {
-      values: transactions.map((tx) => tx.value.toString()),
+      values: transactions.map((tx) => parseNumber(tx.value)),
       destinations: transactions.map((tx) => tx.destination),
-      data: Buffer.concat(transactions.map((tx) => tx.data)),
+      data: parseBytes(Buffer.concat(transactions.map((tx) => tx.data))),
       dataLengths: transactions.map((tx) => tx.data.length),
     }
   }
@@ -203,13 +200,13 @@ export class GovernanceWrapper extends BaseWrapper<Governance> {
   }
 
   buildTransactionsFromJSON = (jsonTransactions: JSONTransaction[]) =>
-    mapAsync<JSONTransaction, Transaction>(jsonTransactions, async (jsonTx: JSONTransaction) => {
+    concurrentMap(jsonTransactions.length, jsonTransactions, async (jsonTx: JSONTransaction) => {
       const contract = await this.kit._web3Contracts.getContract(jsonTx.celoContractName)
       const method = (contract.methods as Contract['methods'])[jsonTx.methodName]
       return {
-        value: toBigNumber(jsonTx.value),
+        value: jsonTx.value,
         destination: contract._address,
-        data: this.toTransactionData(method, jsonTx.args)
+        data: this.toTransactionData(method, jsonTx.args),
       }
     })
 
@@ -221,26 +218,19 @@ export class GovernanceWrapper extends BaseWrapper<Governance> {
   }
 
   propose(transactions: Transaction[]) {
-    const encoded = this.getTransactionsEncoded(transactions)
+    const enc = this.getTransactionsEncoded(transactions)
     return toTransactionObject(
       this.kit,
-      this.contract.methods.propose(
-        encoded.values,
-        encoded.destinations,
-        // @ts-ignore bytes type
-        encoded.data,
-        encoded.dataLengths
-      )
+      this.contract.methods.propose(enc.values, enc.destinations, enc.data, enc.dataLengths)
     )
   }
 
-  proposalExists: (proposalID: BigNumber) => Promise<boolean> = proxyCall(
+  proposalExists: (proposalID: NumberLike) => Promise<boolean> = proxyCall(
     this.contract.methods.proposalExists,
-    tupleParser(parseNumber),
-    identity
+    tupleParser(parseNumber)
   )
 
-  getUpvoteRecord: (upvoter: Address) => Promise<{id:BigNumber, weight:BigNumber}> = proxyCall(
+  getUpvoteRecord: (upvoter: Address) => Promise<{ id: BigNumber; weight: BigNumber }> = proxyCall(
     this.contract.methods.getUpvoteRecord,
     tupleParser(identity),
     (o) => ({
@@ -253,18 +243,14 @@ export class GovernanceWrapper extends BaseWrapper<Governance> {
 
   getUpvotes = proxyCall(this.contract.methods.getUpvotes, tupleParser(parseNumber), toBigNumber)
 
-  getVotes = proxyCall(
-    this.contract.methods.getVoteTotals, 
-    tupleParser(parseNumber), 
-    o => ({
-      yes: toBigNumber(o[0]),
-      no: toBigNumber(o[1]),
-      abstain: toBigNumber(o[2])
-    })
-  )
+  getVotes = proxyCall(this.contract.methods.getVoteTotals, tupleParser(parseNumber), (o) => ({
+    yes: toBigNumber(o[0]),
+    no: toBigNumber(o[1]),
+    abstain: toBigNumber(o[2]),
+  }))
 
   getQueue = proxyCall(this.contract.methods.getQueue, undefined, (arraysObject) =>
-    zip<string, string, QueueProposal>(
+    zip<string, string, { id: BigNumber, upvotes: BigNumber }>(
       (_id, _upvotes) => ({
         id: toBigNumber(_id),
         upvotes: toBigNumber(_upvotes),
@@ -278,25 +264,27 @@ export class GovernanceWrapper extends BaseWrapper<Governance> {
     arrayObject.map(toBigNumber)
   )
 
+  dequeueProposalsIfReady = proxySend(this.kit, this.contract.methods.dequeueProposalsIfReady)
+
   async getVoteWeight(voter: Address) {
     const lockedGoldContract = await this.kit.contracts.getLockedGold()
     return lockedGoldContract.getAccountTotalLockedGold(voter)
   }
 
-  private async getDequeueIndex(proposalID: BigNumber) {
+  private async getDequeueIndex(proposalID: NumberLike) {
     const dequeue = await this.getDequeue()
     const index = dequeue.findIndex((d) => d.isEqualTo(proposalID))
     if (index === -1) {
-      throw new Error(`Proposal ${proposalID.toString()} not in dequeue`)
+      throw new Error(`Proposal ${parseNumber(proposalID)} not in dequeue`)
     }
     return index
   }
 
   // TODO: merge with SortedOracles/Election findLesserAndGreater
   // proposalID is zero for revokes
-  private async findLesserAndGreaterAfterUpvote(proposalID: BigNumber, upvoter: Address) {
+  private async findLesserAndGreaterAfterUpvote(proposalID: NumberLike, upvoter: Address) {
     let queue = await this.getQueue()
-    let searchID = ZERO_BN
+    let searchID: NumberLike = ZERO_BN
 
     const upvoteRecord = await this.getUpvoteRecord(upvoter)
     // does upvoter have a previous upvote?
@@ -310,7 +298,7 @@ export class GovernanceWrapper extends BaseWrapper<Governance> {
     }
 
     // is upvoter targeting a valid proposal?
-    if (proposalID.isGreaterThan(ZERO_BN)) {
+    if (ZERO_BN.isLessThan(proposalID)) {
       const proposalIdx = queue.findIndex((qp) => qp.id.isEqualTo(proposalID))
       // is target proposal in queue?
       if (proposalIdx !== -1) {
@@ -318,7 +306,7 @@ export class GovernanceWrapper extends BaseWrapper<Governance> {
         queue[proposalIdx].upvotes = queue[proposalIdx].upvotes.plus(weight)
         searchID = proposalID
       } else {
-        throw new Error(`Proposal ${proposalID.toString()} not in queue`)
+        throw new Error(`Proposal ${parseNumber(proposalID)} not in queue`)
       }
     }
 
@@ -331,72 +319,71 @@ export class GovernanceWrapper extends BaseWrapper<Governance> {
     }
   }
 
-  async upvote(proposalID: BigNumber, upvoter: Address) {
+  async upvote(proposalID: NumberLike, upvoter: Address) {
     const exists = await this.proposalExists(proposalID)
     if (!exists) {
-      throw new Error(`Proposal ${proposalID.toString()} does not exist`)
+      throw new Error(`Proposal ${parseNumber(proposalID)} does not exist`)
     }
     const { lesserID, greaterID } = await this.findLesserAndGreaterAfterUpvote(proposalID, upvoter)
     return toTransactionObject(
       this.kit,
       this.contract.methods.upvote(
-        proposalID.toString(),
-        lesserID.toString(),
-        greaterID.toString()
+        parseNumber(proposalID),
+        parseNumber(lesserID),
+        parseNumber(greaterID)
       )
     )
   }
 
   async revokeUpvote(upvoter: Address) {
     const { id } = await this.getUpvoteRecord(upvoter)
-    if (!id.isGreaterThan(ZERO_BN)) {
+    if (ZERO_BN.isEqualTo(id)) {
       throw new Error(`Voter ${upvoter} has no upvote to revoke`)
     }
     const { lesserID, greaterID } = await this.findLesserAndGreaterAfterUpvote(ZERO_BN, upvoter)
     return toTransactionObject(
       this.kit,
-      this.contract.methods.revokeUpvote(lesserID.toString(), greaterID.toString())
+      this.contract.methods.revokeUpvote(parseNumber(lesserID), parseNumber(greaterID))
     )
   }
 
-  async approve(proposalID: BigNumber) {
+  async approve(proposalID: NumberLike) {
     const proposalIndex = await this.getDequeueIndex(proposalID)
     return toTransactionObject(
       this.kit,
-      this.contract.methods.approve(proposalID.toString(), proposalIndex)
+      this.contract.methods.approve(parseNumber(proposalID), proposalIndex)
     )
   }
 
-  async vote(proposalID: BigNumber, vote: VoteValue) {
+  async vote(proposalID: NumberLike, vote: VoteValue) {
     const proposalIndex = await this.getDequeueIndex(proposalID)
     return toTransactionObject(
       this.kit,
-      this.contract.methods.vote(proposalID.toString(), proposalIndex, vote)
+      this.contract.methods.vote(parseNumber(proposalID), proposalIndex, vote)
     )
   }
 
-  async execute(proposalID: BigNumber) {
+  async execute(proposalID: NumberLike) {
     const proposalIndex = await this.getDequeueIndex(proposalID)
     return toTransactionObject(
       this.kit,
-      this.contract.methods.execute(proposalID.toString(), proposalIndex)
+      this.contract.methods.execute(parseNumber(proposalID), proposalIndex)
     )
   }
 
   getHotfixRecord = proxyCall(
     this.contract.methods.getHotfixRecord,
     tupleParser(parseBuffer),
-    o => ({
+    (o) => ({
       approved: o[0],
       executed: o[1],
-      preparedEpoch: toBigNumber(o[2])
+      preparedEpoch: toBigNumber(o[2]),
     })
   )
 
   isHotfixWhitelistedBy = proxyCall(
     this.contract.methods.isHotfixWhitelistedBy,
-    tupleParser(parseBuffer, (s: Address) => identity<Address>(s)),
-    identity
+    tupleParser(parseBuffer, (s: Address) => identity<Address>(s))
   )
 
   whitelistHotfix: (hash: Buffer) => CeloTransactionObject<void> = proxySend(
@@ -418,16 +405,10 @@ export class GovernanceWrapper extends BaseWrapper<Governance> {
   )
 
   executeHotfix(transactions: Transaction[]) {
-    const encoded = this.getTransactionsEncoded(transactions)
+    const enc = this.getTransactionsEncoded(transactions)
     return toTransactionObject(
       this.kit,
-      this.contract.methods.executeHotfix(
-        encoded.values,
-        encoded.destinations,
-        // @ts-ignore bytes type
-        encoded.data,
-        encoded.dataLengths
-      )
+      this.contract.methods.executeHotfix(enc.values, enc.destinations, enc.data, enc.dataLengths)
     )
   }
 }

@@ -22,7 +22,7 @@
     ]
   },
   "governance": {
-    "dequeueFrequency": 50,
+    "dequeueFrequency": 30,
     "queueExpiry": 101,
     "approvalStageDuration": 103,
     "referendumStageDuration": 104,

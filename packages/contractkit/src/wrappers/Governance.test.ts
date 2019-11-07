@@ -1,12 +1,11 @@
 import BigNumber from 'bignumber.js'
 
-import { timeTravel } from '@celo/protocol/lib/test-utils'
-import { mapAsync } from '@celo/utils/lib/collections'
+import { concurrentMap } from '@celo/utils/lib/async'
 
 import { Address, CeloContract, NULL_ADDRESS } from '../base'
 import { Registry } from '../generated/types/Registry'
 import { newKitFromWeb3 } from '../kit'
-import { NetworkConfig, testWithGanache } from '../test-utils/ganache-test'
+import { NetworkConfig, testWithGanache, timeTravel } from '../test-utils/ganache-test'
 import { AccountsWrapper } from './Accounts'
 import { GovernanceWrapper, JSONTransaction, Transaction, VoteValue } from './Governance'
 import { LockedGoldWrapper } from './LockedGold'
@@ -31,8 +30,8 @@ testWithGanache('Governance Wrapper', (web3) => {
     registry = await kit._web3Contracts.getRegistry()
     lockedGold = await kit.contracts.getLockedGold()
     accountWrapper = await kit.contracts.getAccounts()
-    
-    await mapAsync(accounts, async (account) => {
+
+    await concurrentMap(4, accounts.slice(0, 4), async (account) => {
       await accountWrapper.createAccount().sendAndWaitForReceipt({ from: account })
       await lockedGold.lock().sendAndWaitForReceipt({ from: account, value: ONE_USD })
     })
@@ -98,6 +97,7 @@ testWithGanache('Governance Wrapper', (web3) => {
       await tx.sendAndWaitForReceipt({ from: upvoter })
       if (shouldTimeTravel) {
         await timeTravel(expConfig.dequeueFrequency, web3)
+        await governance.dequeueProposalsIfReady().send()
       }
     }
 
@@ -114,7 +114,7 @@ testWithGanache('Governance Wrapper', (web3) => {
       await timeTravel(expConfig.referendumStageDuration, web3)
     }
 
-    it('#propose', async () => {
+    it.only('#propose', async () => {
       await proposeFn(accounts[0])
 
       const proposal = await governance.getProposal(proposalID)
@@ -135,7 +135,7 @@ testWithGanache('Governance Wrapper', (web3) => {
     it('#revokeUpvote', async () => {
       await proposeFn(accounts[0])
       // shouldTimeTravel is false so revoke isn't on dequeued proposal
-      await upvoteFn(accounts[1], false) 
+      await upvoteFn(accounts[1], false)
 
       const before = await governance.getUpvotes(proposalID)
       const upvoteRecord = await governance.getUpvoteRecord(accounts[1])
@@ -176,7 +176,7 @@ testWithGanache('Governance Wrapper', (web3) => {
       const tx = await governance.execute(proposalID)
       await tx.sendAndWaitForReceipt()
 
-      await mapAsync(repoints, async (repoint) =>
+      await concurrentMap(repoints.length, repoints, async (repoint) =>
         expect(repoint[1]).toBe(await kit.registry.addressFor(repoint[0]))
       )
     })
@@ -197,27 +197,39 @@ testWithGanache('Governance Wrapper', (web3) => {
       hash = governance.getTransactionsHash(hotfixTransactions)
     })
 
-    it('#whitelistHotfix', async () => {
-      const whitelister = accounts[1]
+    const whitelistFn = async (whitelister: Address) => {
       const tx = governance.whitelistHotfix(hash)
       await tx.sendAndWaitForReceipt({ from: whitelister })
+    }
 
-      const whitelisted = await governance.isHotfixWhitelistedBy(hash, whitelister)
+    // protocol/truffle-config defines approver address as accounts[0]
+    const approveFn = async () => {
+      const tx = governance.approveHotfix(hash)
+      await tx.sendAndWaitForReceipt({ from: accounts[0] })
+    }
+
+    const prepareFn = async () => {
+      const tx = governance.prepareHotfix(hash)
+      await tx.sendAndWaitForReceipt()
+    }
+
+    it('#whitelistHotfix', async () => {
+      await whitelistFn(accounts[1])
+
+      const whitelisted = await governance.isHotfixWhitelistedBy(hash, accounts[1])
       expect(whitelisted).toBeTruthy()
     })
 
     it('#approveHotfix', async () => {
-      const approver = accounts[2]
-      const tx = governance.approveHotfix(hash)
-      await tx.sendAndWaitForReceipt({ from: approver })
+      await approveFn()
 
       const record = await governance.getHotfixRecord(hash)
       expect(record.approved).toBeTruthy()
     })
 
     it('#prepareHotfix', async () => {
-      const tx = governance.prepareHotfix(hash)
-      await tx.sendAndWaitForReceipt()
+      await whitelistFn(accounts[1])
+      await prepareFn()
 
       const validators = await kit.contracts.getValidators()
       const record = await governance.getHotfixRecord(hash)
@@ -225,11 +237,19 @@ testWithGanache('Governance Wrapper', (web3) => {
     })
 
     it('#executeHotfix', async () => {
+      await whitelistFn(accounts[1])
+      await prepareFn()
+      await approveFn()
+
       const tx = governance.executeHotfix(hotfixTransactions)
       await tx.sendAndWaitForReceipt()
 
       const record = await governance.getHotfixRecord(hash)
       expect(record.executed).toBeTruthy()
+
+      await concurrentMap(repoints.length, repoints, async (repoint) =>
+        expect(repoint[1]).toBe(await kit.registry.addressFor(repoint[0]))
+      )
     })
   })
 })

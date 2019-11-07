@@ -1,8 +1,11 @@
-import { zip } from '@celo/utils/lib/collections'
 import BigNumber from 'bignumber.js'
 import Contract from 'web3/eth/contract'
 import { TransactionObject, Tx } from 'web3/eth/types'
 import { TransactionReceipt } from 'web3/types'
+
+import { trimLeading0x } from '@celo/utils/lib/address'
+import { zip } from '@celo/utils/lib/collections'
+
 import { ContractKit } from '../kit'
 import { TransactionResult } from '../utils/tx-result'
 
@@ -27,16 +30,16 @@ export function toBigNumber(input: string) {
   return new BigNumber(input)
 }
 
-function trimLeading0x(input: string) {
-  return input.startsWith("0x") ? input.slice(2) : input
-}
-
-export function toBuffer(input: string) {
-  return Buffer.from(trimLeading0x(input), 'hex')
+export function toBuffer(input: string | string[]) {
+  return Buffer.from(trimLeading0x(input as string), 'hex')
 }
 
 export function parseBuffer(buf: Buffer) {
   return '0x' + buf.toString('hex')
+}
+
+export function parseBytes(input: Buffer): Array<string | number[]> {
+  return input as any
 }
 
 /** Parse string -> int */
@@ -45,7 +48,7 @@ export function toNumber(input: string) {
 }
 
 export function parseNumber(input: NumberLike) {
-  return new BigNumber(input).toString(10)
+  return new BigNumber(input).toFixed()
 }
 
 type Parser<A, B> = (input: A) => B
