@@ -114,7 +114,7 @@ release: {{ .Release.Name }}
 kind: Service
 apiVersion: v1
 metadata:
-  name: {{ template "ethereum.fullname" $ }}-{{ .svc_name | default .node_name }}-{{ .index }}{{ .name_suffix }}
+  name: {{ template "ethereum.fullname" $ }}-{{ .svc_name | default .node_name }}-{{ .index }}{{ .svc_name_suffix | default "" }}
   labels:
     app: {{ template "ethereum.name" $ }}
     chart: {{ template "ethereum.chart" $ }}

@@ -89,12 +89,12 @@ spec:
               # so we use the IP address that was allocated for this validator that is
               # being used by the sentry found in /root/.celo/externalIpAddress
               if [ -s /root/.celo/externalIpAddress ]; then
-                echo -n "Sentry external IP from /root/.celo/externalIpAddress: "
+                echo "Sentry external IP from /root/.celo/externalIpAddress: "
                 SENTRY_EXTERNAL_IP=`cat /root/.celo/externalIpAddress`
-                echo $SENTRY_EXTERNAL_IP
               else
-                SENTRY_EXTERNAL_IP_ENV_VAR={{ .Release.Namespace | upper }}_SENTRY{{ ternary "" "_INTERNAL" .Values.geth.static_ips }}_${RID}_SERVICE_HOST
-                echo "SENTRY_EXTERNAL_IP_ENV_VAR=$SENTRY_EXTERNAL_IP_ENV_VAR"
+                # otherwise use the internal sentry service IP address
+                SENTRY_EXTERNAL_IP_ENV_VAR={{ .Release.Namespace | upper }}_SENTRY_INTERNAL_${RID}_SERVICE_HOST
+                echo "Sentry external IP from SENTRY_EXTERNAL_IP_ENV_VAR=$SENTRY_EXTERNAL_IP_ENV_VAR"
                 SENTRY_EXTERNAL_IP=`eval "echo \\${${SENTRY_EXTERNAL_IP_ENV_VAR}}"`
               fi
 
@@ -197,7 +197,7 @@ spec:
             ${FAULTY_NODE_FLAGS} \
             --istanbul.blockperiod={{ .Values.geth.blocktime }} \
             --istanbul.requesttimeout={{ .Values.geth.istanbulrequesttimeout }} \
-            --maxpeers={{ mul 2 (add .Values.geth.validators .Values.geth.tx_nodes) }} \
+            --maxpeers=125 \
             --nat=extip:`cat /root/.celo/ipAddress` \
             --metrics \
             ${PING_IP_FROM_PACKET_FLAG} \

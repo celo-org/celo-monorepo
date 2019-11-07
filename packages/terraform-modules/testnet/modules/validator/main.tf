@@ -1,3 +1,7 @@
+# This module creates var.validator_count validators. The first
+# var.proxied_validator_count validators are hidden behind externally facing
+# sentries, and the rest are exposed to the external internet.
+
 locals {
   attached_disk_name = "celo-data"
   name_prefix        = "${var.celo_env}-validator"
@@ -33,17 +37,13 @@ resource "google_compute_instance" "validator" {
   network_interface {
     network = var.network_name
     subnetwork = google_compute_subnetwork.validator.name
-    # We want to make sure the first proxied_validator_count validators
-    # are not reachable externally
-    access_config {
-      nat_ip = count.index < var.proxied_validator_count ? null : google_compute_address.validator[count.index].address
-    }
-    # dynamic "access_config" {
-    #   for_each = count.index < var.proxied_validator_count ? [0] : [0]
-    #   content {
-    #     nat_ip = google_compute_address.validator[count.index].address
-    #   }
-    # }
+    # We only want an access config for validators that will not be proxied
+    dynamic "access_config" {
+       for_each = count.index < var.proxied_validator_count ? [] : [0]
+       content {
+         nat_ip = google_compute_address.validator[count.index].address
+       }
+     }
   }
 
   metadata_startup_script = templatefile(
@@ -61,7 +61,7 @@ resource "google_compute_instance" "validator" {
       in_memory_discovery_table : var.in_memory_discovery_table,
       ip_address : count.index < var.proxied_validator_count ? "" : google_compute_address.validator[var.proxied_validator_count - count.index].address,
       istanbul_request_timeout_ms : var.istanbul_request_timeout_ms,
-      max_peers : (var.validator_count + var.tx_node_count) * 2,
+      max_peers : 125,
       network_id : var.network_id,
       proxied : count.index < var.proxied_validator_count,
       rid : count.index,
@@ -126,4 +126,46 @@ module "sentry" {
   # NOTE this assumes only one sentry will be used
   node_count                        = var.proxied_validator_count
   verification_pool_url             = var.verification_pool_url
+}
+
+# if there are no proxied validators, we don't have to worry about
+
+resource "google_compute_firewall" "sentry_internal_ingress" {
+  count   = var.proxied_validator_count > 0 ? 1 : 0
+
+  name    = "${local.name_prefix}-sentry-internal-ingress"
+  network = var.network_name
+
+  direction     = "INGRESS"
+  source_ranges = ["10.0.0.0/8"]
+
+  allow {
+    protocol = "tcp"
+    ports    = ["30503"]
+  }
+
+  allow {
+    protocol = "udp"
+    ports    = ["30503"]
+  }
+}
+
+resource "google_compute_firewall" "sentry_internal_egress" {
+  count   = var.proxied_validator_count > 0 ? 1 : 0
+
+  name    = "${local.name_prefix}-sentry-internal-egress"
+  network = var.network_name
+
+  direction     = "EGRESS"
+  destination_ranges = ["10.0.0.0/8"]
+
+  allow {
+    protocol = "tcp"
+    ports    = ["30503"]
+  }
+
+  allow {
+    protocol = "udp"
+    ports    = ["30503"]
+  }
 }

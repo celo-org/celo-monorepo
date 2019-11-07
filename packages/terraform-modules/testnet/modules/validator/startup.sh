@@ -1,5 +1,13 @@
 #! /bin/bash
 
+GCLOUD_ZONE=`gcloud compute instances list --filter="name=('${validator_name}')" --format 'value(zone)'`
+
+# If this validator is proxied, it won't have an access config. We need to
+# create one for the initial 1 time setup so we can reach the external internet
+if [[ ${proxied} == "true" ]]; then
+  gcloud compute instances add-access-config ${validator_name} --zone=$GCLOUD_ZONE
+fi
+
 # ---- Set Up Logging ----
 
 curl -sSO https://dl.google.com/cloudagents/install-logging-agent.sh
@@ -85,7 +93,6 @@ if [[ ${proxied} == "true" ]]; then
   # if this validator is proxied, cut it off from the external internet after
   # we've downloaded everything
   echo "Deleting access config"
-  GCLOUD_ZONE=`gcloud compute instances list --filter="name=('${validator_name}')" --format 'value(zone)'`
   # The command hangs but still succeeds, give it some time
   # This is likely because when the access config is actually deleted, this
   # instance cannot reach the external internet so the success ack from the server
@@ -96,55 +103,55 @@ fi
 IN_MEMORY_DISCOVERY_TABLE_FLAG=""
 [[ ${in_memory_discovery_table} == "true" ]] && IN_MEMORY_DISCOVERY_TABLE_FLAG="--use-in-memory-discovery-table"
 
+mkdir -p $DATA_DIR/account
+echo -n "${genesis_content_base64}" | base64 -d > $DATA_DIR/genesis.json
+echo -n "${rid}" > $DATA_DIR/replica_id
+echo -n "$PRIVATE_KEY" > $DATA_DIR/pkey
+echo -n "$ACCOUNT_ADDRESS" > $DATA_DIR/address
+echo -n "$BOOTNODE_ENODE_ADDRESS" > $DATA_DIR/bootnodeEnodeAddress
+echo -n "$BOOTNODE_ENODE" > $DATA_DIR/bootnodeEnode
+echo -n "$GETH_ACCOUNT_SECRET" > $DATA_DIR/account/accountSecret
+if [ "${ip_address}" ]; then
+  echo -n "${ip_address}" > $DATA_DIR/ipAddress
+  NAT_FLAG="--nat=extip:${ip_address}"
+fi
+
 echo "Starting geth..."
 # We need to override the entrypoint in the geth image (which is originally `geth`).
 # `geth account import` fails when the account has already been imported. In
 # this case, we do not want to pipefail
-docker run -v $DATA_DIR:$DATA_DIR --name geth --net=host --entrypoint /bin/sh -d $GETH_NODE_DOCKER_IMAGE -c "\
+docker run -v $DATA_DIR:$DATA_DIR --name geth --net=host --restart=always --entrypoint /bin/sh -d $GETH_NODE_DOCKER_IMAGE -c "\
   (
-    set -euo pipefail && \
-    mkdir -p $DATA_DIR/account /var/geth && \
-    echo -n '${genesis_content_base64}' | base64 -d > /var/geth/genesis.json && \
-    echo -n '${rid}' > $DATA_DIR/replica_id && \
-    if [ '${ip_address}' ]; then \
-      echo -n '${ip_address}' > $DATA_DIR/ipAddress
-      NAT_FLAG='--nat=extip:${ip_address}'
-    fi && \
-    echo -n '$PRIVATE_KEY' > $DATA_DIR/pkey && \
-    echo -n '$ACCOUNT_ADDRESS' > $DATA_DIR/address && \
-    echo -n '$BOOTNODE_ENODE_ADDRESS' > $DATA_DIR/bootnodeEnodeAddress && \
-    echo -n '$BOOTNODE_ENODE' > $DATA_DIR/bootnodeEnode && \
-    echo -n '$GETH_ACCOUNT_SECRET' > $DATA_DIR/account/accountSecret && \
-    geth init /var/geth/genesis.json
-  ) && ( \
-    geth account import --password $DATA_DIR/account/accountSecret $DATA_DIR/pkey ; \
-    geth \
-      --bootnodes=enode://$BOOTNODE_ENODE \
-      --password=$DATA_DIR/account/accountSecret \
-      --unlock=$ACCOUNT_ADDRESS \
-      --mine \
-      --rpc \
-      --rpcaddr 0.0.0.0 \
-      --rpcapi=eth,net,web3 \
-      --rpccorsdomain='*' \
-      --rpcvhosts=* \
-      --ws \
-      --wsaddr 0.0.0.0 \
-      --wsorigins=* \
-      --wsapi=eth,net,web3 \
-      --nodekey=$DATA_DIR/pkey \
-      --etherbase=$ACCOUNT_ADDRESS \
-      --networkid=${network_id} \
-      --syncmode=full \
-      --miner.verificationpool=${verification_pool_url} \
-      --consoleformat=json \
-      --consoleoutput=stdout \
-      --verbosity=${geth_verbosity} \
-      --ethstats=${validator_name}:$ETHSTATS_WEBSOCKETSECRET@${ethstats_host} \
-      --istanbul.blockperiod=${block_time} \
-      --istanbul.requesttimeout=${istanbul_request_timeout_ms} \
-      --maxpeers=${max_peers} \
-      --metrics \
-      $IN_MEMORY_DISCOVERY_TABLE_FLAG \
-      $PROXIED_FLAGS \
-  )"
+    set -euo pipefail ; \
+    geth init $DATA_DIR/genesis.json \
+  ) ; \
+  geth account import --password $DATA_DIR/account/accountSecret $DATA_DIR/pkey ; \
+  geth \
+    --bootnodes=enode://$BOOTNODE_ENODE \
+    --password=$DATA_DIR/account/accountSecret \
+    --unlock=$ACCOUNT_ADDRESS \
+    --mine \
+    --rpc \
+    --rpcaddr 0.0.0.0 \
+    --rpcapi=eth,net,web3 \
+    --rpccorsdomain='*' \
+    --rpcvhosts=* \
+    --ws \
+    --wsaddr 0.0.0.0 \
+    --wsorigins=* \
+    --wsapi=eth,net,web3 \
+    --nodekey=$DATA_DIR/pkey \
+    --etherbase=$ACCOUNT_ADDRESS \
+    --networkid=${network_id} \
+    --syncmode=full \
+    --miner.verificationpool=${verification_pool_url} \
+    --consoleformat=json \
+    --consoleoutput=stdout \
+    --verbosity=${geth_verbosity} \
+    --ethstats=${validator_name}:$ETHSTATS_WEBSOCKETSECRET@${ethstats_host} \
+    --istanbul.blockperiod=${block_time} \
+    --istanbul.requesttimeout=${istanbul_request_timeout_ms} \
+    --maxpeers=${max_peers} \
+    --metrics \
+    $IN_MEMORY_DISCOVERY_TABLE_FLAG \
+    $PROXIED_FLAGS"

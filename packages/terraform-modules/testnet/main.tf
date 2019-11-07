@@ -40,12 +40,12 @@ resource "google_compute_firewall" "geth_firewall" {
 
   allow {
     protocol = "tcp"
-    ports    = ["30303", "30503"]
+    ports    = ["30303"]
   }
 
   allow {
     protocol = "udp"
-    ports    = ["30303", "30503"]
+    ports    = ["30303"]
   }
 }
 
