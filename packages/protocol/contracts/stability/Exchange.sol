@@ -345,7 +345,8 @@ contract Exchange is IExchange, Initializable, Ownable, UsingRegistry, Reentranc
     // solhint-disable-next-line not-rely-on-time
     bool timePassed = now >= lastBucketUpdate.add(updateFrequency);
     bool enoughReports = sortedOracles.numRates(stable) >= minimumReports;
-    bool medianReportRecent = sortedOracles.medianTimestamp(stable) > now.sub(updateFrequency); // solhint-disable-next-line not-rely-on-time
+    // solhint-disable-next-line not-rely-on-time
+    bool medianReportRecent = sortedOracles.medianTimestamp(stable) > now.sub(updateFrequency);
     return timePassed && enoughReports && medianReportRecent;
   }
 
