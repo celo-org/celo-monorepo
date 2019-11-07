@@ -36,7 +36,6 @@ export function* waitForRehydrate() {
 interface PersistedStateProps {
   language: string | null
   e164Number: string
-  numberVerified: boolean
   pincodeType: PincodeType
   redeemComplete: boolean
   account: string | null
@@ -51,7 +50,6 @@ const mapStateToProps = (state: PersistedRootState): PersistedStateProps | null 
   return {
     language: state.app.language,
     e164Number: state.account.e164PhoneNumber,
-    numberVerified: state.app.numberVerified,
     pincodeType: state.account.pincodeType,
     redeemComplete: state.invite.redeemComplete,
     account: state.web3.account,
@@ -97,7 +95,6 @@ export function* navigateToProperScreen() {
   const {
     language,
     e164Number,
-    numberVerified,
     pincodeType,
     redeemComplete,
     account,
@@ -127,9 +124,7 @@ export function* navigateToProperScreen() {
   } else if (!askedContactsPermission) {
     navigate(Screens.ImportContacts)
   } else if (!startedVerification) {
-    navigate(Screens.VerifyEducation)
-  } else if (!numberVerified) {
-    navigate(Screens.VerifyVerifying)
+    navigate(Screens.VerificationEducationScreen)
   } else {
     navigate(Stacks.AppStack)
   }

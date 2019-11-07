@@ -13,8 +13,8 @@
   "enableCeloLite": "Enable Celo Lite",
   "celoLiteDetail":
     "Celo Lite mode allows you to communicate with the Celo Network through a trusted node. You can always change this mode in app settings.",
-  "testFaqHere": "<0>Celo Wallet FAQ is </0><1>here</1>",
-  "termsOfServiceHere": "<0>Terms of service are </0><1>here</1>",
+  "testFaqLink": "Celo Wallet FAQ",
+  "termsOfServiceLink": "Terms of service",
   "editProfile": "Edit Profile",
   "cancel": "Cancel",
   "changeProfilePhoto": "Change Profile Photo",
