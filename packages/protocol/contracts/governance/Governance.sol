@@ -706,6 +706,10 @@ contract Governance is
     emit HotfixApproved(hash);
   }
 
+  function isHotfixWhitelistedBy(bytes32 hash, address whitelister) public view returns (bool) {
+    return hotfixes[hash].whitelisted[whitelister];
+  }
+
   /**
    * @notice Whitelists the hash of a hotfix transaction(s).
    * @param hash The abi encoded keccak256 hash of the hotfix transaction(s) to be whitelisted.
@@ -952,22 +956,25 @@ contract Governance is
     return voters[account].mostRecentReferendumProposal;
   }
 
+  function hotfixWhitelistValidatorTally(bytes32 hash) public view returns (uint256) {
+    uint256 tally = 0;
+    uint256 n = numberValidatorsInCurrentSet();
+    for (uint256 idx = 0; idx < n; idx++) {
+      address validator = validatorAddressFromCurrentSet(idx);
+      if (isHotfixWhitelistedBy(hash, validator)) {
+        tally = tally.add(1);
+      }
+    }
+    return tally;
+  }
+
   /**
    * @notice Checks if a byzantine quorum of validators has whitelisted the given hotfix.
    * @param hash The abi encoded keccak256 hash of the hotfix transaction.
    * @return Whether validator whitelist tally >= validator byztanine quorum (2f+1)
    */
   function isHotfixPassing(bytes32 hash) public view returns (bool) {
-    uint256 tally = 0;
-    uint256 n = numberValidatorsInCurrentSet();
-    for (uint256 idx = 0; idx < n; idx++) {
-      address validator = validatorAddressFromCurrentSet(idx);
-      if (hotfixes[hash].whitelisted[validator]) {
-        tally = tally.add(1);
-      }
-    }
-
-    return tally >= byzantineQuorumValidatorsInCurrentSet();
+    return hotfixWhitelistValidatorTally(hash) >= byzantineQuorumValidatorsInCurrentSet();
   }
 
   /**

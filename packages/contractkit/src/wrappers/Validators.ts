@@ -142,6 +142,10 @@ export class ValidatorsWrapper extends BaseWrapper<Validators> {
    */
   isValidatorGroup = proxyCall(this.contract.methods.isValidatorGroup)
 
+  getEpochNumber = proxyCall(this.contract.methods.getEpochNumber, undefined, toBigNumber)
+
+  getEpochSize = proxyCall(this.contract.methods.getEpochSize, undefined, toBigNumber)
+
   async reorderMember(groupAddr: Address, validator: Address, newIndex: number) {
     const group = await this.getValidatorGroup(groupAddr)
 

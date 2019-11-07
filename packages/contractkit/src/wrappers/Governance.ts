@@ -71,11 +71,6 @@ interface QueueProposal {
   upvotes: BigNumber
 }
 
-interface UpvoteRecord {
-  id: BigNumber
-  weight: BigNumber
-}
-
 export enum VoteValue {
   None,
   Abstain,
@@ -167,6 +162,14 @@ export class GovernanceWrapper extends BaseWrapper<Governance> {
     })
   )
 
+  isApproved: (proposalID: BigNumber) => Promise<boolean> = proxyCall(
+    this.contract.methods.isApproved, 
+    tupleParser(parseNumber), 
+    identity
+  )
+
+  getApprover = proxyCall(this.contract.methods.approver, undefined, identity)
+
   async getProposal(proposalID: BigNumber): Promise<Proposal> {
     const metadata = await this.getProposalMetadata(proposalID)
     const txIndices = Array.from(Array(metadata.transactionCount).keys())
@@ -237,7 +240,7 @@ export class GovernanceWrapper extends BaseWrapper<Governance> {
     identity
   )
 
-  getUpvoteRecord: (upvoter: Address) => Promise<UpvoteRecord> = proxyCall(
+  getUpvoteRecord: (upvoter: Address) => Promise<{id:BigNumber, weight:BigNumber}> = proxyCall(
     this.contract.methods.getUpvoteRecord,
     tupleParser(identity),
     (o) => ({
@@ -249,6 +252,16 @@ export class GovernanceWrapper extends BaseWrapper<Governance> {
   isQueued = proxyCall(this.contract.methods.isQueued, tupleParser(parseNumber), identity)
 
   getUpvotes = proxyCall(this.contract.methods.getUpvotes, tupleParser(parseNumber), toBigNumber)
+
+  getVotes = proxyCall(
+    this.contract.methods.getVoteTotals, 
+    tupleParser(parseNumber), 
+    o => ({
+      yes: toBigNumber(o[0]),
+      no: toBigNumber(o[1]),
+      abstain: toBigNumber(o[2])
+    })
+  )
 
   getQueue = proxyCall(this.contract.methods.getQueue, undefined, (arraysObject) =>
     zip<string, string, QueueProposal>(
@@ -330,8 +343,7 @@ export class GovernanceWrapper extends BaseWrapper<Governance> {
         proposalID.toString(),
         lesserID.toString(),
         greaterID.toString()
-      ),
-      { from: upvoter }
+      )
     )
   }
 
@@ -343,8 +355,7 @@ export class GovernanceWrapper extends BaseWrapper<Governance> {
     const { lesserID, greaterID } = await this.findLesserAndGreaterAfterUpvote(ZERO_BN, upvoter)
     return toTransactionObject(
       this.kit,
-      this.contract.methods.revokeUpvote(lesserID.toString(), greaterID.toString()),
-      { from: upvoter }
+      this.contract.methods.revokeUpvote(lesserID.toString(), greaterID.toString())
     )
   }
 
@@ -371,6 +382,22 @@ export class GovernanceWrapper extends BaseWrapper<Governance> {
       this.contract.methods.execute(proposalID.toString(), proposalIndex)
     )
   }
+
+  getHotfixRecord = proxyCall(
+    this.contract.methods.getHotfixRecord,
+    tupleParser(parseBuffer),
+    o => ({
+      approved: o[0],
+      executed: o[1],
+      preparedEpoch: toBigNumber(o[2])
+    })
+  )
+
+  isHotfixWhitelistedBy = proxyCall(
+    this.contract.methods.isHotfixWhitelistedBy,
+    tupleParser(parseBuffer, (s: Address) => identity<Address>(s)),
+    identity
+  )
 
   whitelistHotfix: (hash: Buffer) => CeloTransactionObject<void> = proxySend(
     this.kit,
