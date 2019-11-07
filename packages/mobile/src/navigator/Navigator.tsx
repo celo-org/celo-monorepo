@@ -129,6 +129,9 @@ const NuxStack = createStackNavigator(
     ...commonScreens,
   },
   {
+    navigationOptions: {
+      header: null,
+    },
     ...headerArea,
     initialRouteName: Screens.Language,
   }
