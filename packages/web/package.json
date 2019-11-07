@@ -15,8 +15,7 @@
     "deploy:prod": "gcloud config set project celo-testnet-production; NODE_ENV=production DEPLOY_ENV=production MANIFEST=production.yaml yarn run deploy",
     "lint": "tslint -c tslint.json --project tsconfig.json",
     "kill-dev": "kill -9 $(lsof -ti :3000)",
-    "test": "jest --runInBand",
-    "test-licenses": "yarn licenses list --prod | grep '\\(─ GPL\\|─ (GPL-[1-9]\\.[0-9]\\+ OR GPL-[1-9]\\.[0-9]\\+)\\)' && echo 'Found GPL license(s). Use 'yarn licenses list --prod' to look up the offending package' || echo 'No GPL licenses found'"
+    "test": "jest --runInBand"
   },
   "dependencies": {
     "@celo/utils": "^0.1.0",

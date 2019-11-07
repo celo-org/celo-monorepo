@@ -1,5 +1,6 @@
 import debounce from 'debounce'
 import throttle from 'lodash.throttle'
+import dynamic from 'next/dynamic'
 import { SingletonRouter as Router, withRouter } from 'next/router'
 import * as React from 'react'
 import { WithNamespaces, withNamespaces } from 'react-i18next'
@@ -18,7 +19,9 @@ import OvalCoin from 'src/shared/OvalCoin'
 import Responsive from 'src/shared/Responsive'
 import { DESKTOP_BREAKPOINT, HEADER_HEIGHT } from 'src/shared/Styles'
 import { colors } from 'src/styles'
-import CookieConsent from './CookieConsent'
+const CookieConsent = dynamic((import('src/header/CookieConsent') as unknown) as Promise<
+  React.ComponentType
+>)
 
 const menuItems = [menu.ABOUT_US, menu.JOBS, menu.BUILD, menu.COMMUNITY]
 const DARK_PAGES = new Set([
@@ -56,7 +59,7 @@ function menuHidePoint() {
 
 const HAMBURGER_INNER = cssStyles['hamburger-inner']
 
-export class Header extends React.Component<Props, State> {
+export class Header extends React.PureComponent<Props, State> {
   lastScrollOffset: number
 
   handleScroll = throttle(() => {
@@ -215,7 +218,6 @@ export class Header extends React.Component<Props, State> {
             ]}
           />
         )}
-
         <CookieConsent />
         <Responsive large={[styles.menuContainer, styles.largeMenuContainer]}>
           <View style={styles.menuContainer}>

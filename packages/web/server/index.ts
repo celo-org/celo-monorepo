@@ -58,9 +58,10 @@ function wwwRedirect(req, res, nextAction) {
       res.redirect('/about-us')
     })
   })
-
-  server.get('/connect', (_, res) => {
-    res.redirect('/community')
+  ;['/arg_tos', '/arg_privacy', '/argentina'].forEach((path) => {
+    server.get(path, (_, res) => {
+      res.redirect('/terms')
+    })
   })
   ;['/applications', '/technology', '/dev', '/developer'].forEach((path) => {
     server.get(path, (_, res) => {
@@ -73,6 +74,9 @@ function wwwRedirect(req, res, nextAction) {
     })
   })
 
+  server.get('/connect', (_, res) => {
+    res.redirect('/community')
+  })
   server.get('/tos', (_, res) => {
     res.redirect('/user-agreement')
   })

@@ -87,7 +87,7 @@ class HomeScreen extends React.Component<Props, State> {
 
   async componentDidMount() {
     try {
-      NetInfo.addEventListener('connectionChange', this.handleNetworkStatusChange)
+      NetInfo.addEventListener(this.handleNetworkStatusChange)
       if (!this.props.isVerifying && isVerifyingDisabledLongTime(this.props.verifyingOffAt)) {
         setTimeout(() => this.showVerifyingOffLongMessage(), 2000)
       }
