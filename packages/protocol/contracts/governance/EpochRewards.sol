@@ -17,7 +17,7 @@ contract EpochRewards is Ownable, Initializable, UsingPrecompiles, UsingRegistry
   using SafeMath for uint256;
 
   uint256 constant GENESIS_GOLD_SUPPLY = 600000000000000000000000000; // 600 million Gold
-  uint256 constant GOLD_SUPPLY_CAP = 1000000000000000000000000000;
+  uint256 constant GOLD_SUPPLY_CAP = 1000000000000000000000000000; // 1 billion Gold
   uint256 constant YEARS_LINEAR = 15;
   uint256 constant SECONDS_LINEAR = YEARS_LINEAR * 365 * 1 days;
 
