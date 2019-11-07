@@ -156,22 +156,6 @@ export const fontStyles = StyleSheet.create({
     color: colors.dark,
     textAlignVertical: 'center',
   },
-  link: {
-    color: colors.celoGreen,
-    fontSize: 14,
-    lineHeight: 18,
-    fontFamily: HindSilguri.Medium,
-  },
-  linkSmall: {
-    fontSize: 13,
-    lineHeight: 17,
-    fontFamily: HindSilguri.SemiBold,
-    color: colors.darkSecondary,
-  },
-  linkInline: {
-    color: colors.celoGreen,
-    fontFamily: HindSilguri.SemiBold,
-  },
   headerTitle: {
     fontSize: 14,
     fontFamily: HindSilguri.Medium,
