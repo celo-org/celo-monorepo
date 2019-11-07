@@ -32,7 +32,7 @@ class VerificationInterstitialScreen extends React.Component<WithNamespaces> {
     BackHandler.removeEventListener('hardwareBackPress', this.handleBackButton)
   }
 
-  handleBackButton() {
+  handleBackButton = () => {
     // Prevent back button navigation for this screen
     return true
   }

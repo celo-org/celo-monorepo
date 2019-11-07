@@ -19,6 +19,10 @@ import { VerificationStatus } from 'src/identity/verification'
 import { navigate, navigateBack } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
 import { RootState } from 'src/redux/reducers'
+import Logger from 'src/utils/Logger'
+import VerificationFailedModal from 'src/verify/VerificationFailedModal'
+
+const TAG = 'VerificationLoadingScreen'
 
 interface StateProps {
   e164Number: string
@@ -49,11 +53,12 @@ class VerificationLoadingScreen extends React.Component<Props> {
 
   componentDidMount() {
     BackHandler.addEventListener('hardwareBackPress', this.handleBackButton)
-    this.props.startVerification()
+    //TODO restore this
+    // this.props.startVerification()
   }
 
   componentDidUpdate() {
-    // TODO handle failure case
+    //TODO handle failure case
     if (this.props.verificationStatus === VerificationStatus.Done) {
       navigate(Screens.VerificationSuccessScreen)
     } else if (this.props.verificationStatus === VerificationStatus.RevealingNumber) {
@@ -65,19 +70,20 @@ class VerificationLoadingScreen extends React.Component<Props> {
     BackHandler.removeEventListener('hardwareBackPress', this.handleBackButton)
   }
 
-  handleBackButton() {
+  handleBackButton = () => {
     // Cancel verification when user presses back button on this screen
     this.onCancel()
     return true
   }
 
   onCancel = () => {
+    Logger.debug(TAG + '@onCancel', 'Cancelled, going back to education screen')
     this.props.cancelVerification()
     navigateBack()
   }
 
   render() {
-    const { e164Number, t } = this.props
+    const { e164Number, t, verificationStatus } = this.props
 
     const items: CarouselItem[] = [
       {
@@ -109,6 +115,7 @@ class VerificationLoadingScreen extends React.Component<Props> {
           </View>
           <Carousel containerStyle={styles.carouselContainer} items={items} />
         </ScrollView>
+        <VerificationFailedModal isVisible={verificationStatus === VerificationStatus.Failed} />
       </SafeAreaView>
     )
   }

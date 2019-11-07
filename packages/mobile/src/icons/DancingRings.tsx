@@ -1,3 +1,4 @@
+import variables from '@celo/react-components/styles/variables'
 import LottieView from 'lottie-react-native'
 import React from 'react'
 
@@ -16,7 +17,7 @@ export default class DancingRings extends React.PureComponent<Props> {
         source={require('./dancingRings.json')}
         autoPlay={true}
         loop={false}
-        // style={{ width: this.props.width }}
+        style={{ width: variables.width, height: variables.height * 1.25, zIndex: 0 }}
       />
     )
   }

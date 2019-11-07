@@ -35,7 +35,7 @@ type Props = {
 
 export class BackupPhraseContainer extends React.Component<Props> {
   async componentDidMount() {
-    if (Platform.OS === 'android') {
+    if (Platform.OS === 'android' && false) {
       FlagSecure.activate()
     } else if (Platform.OS === 'ios') {
       // TODO add iOS support
@@ -43,7 +43,7 @@ export class BackupPhraseContainer extends React.Component<Props> {
   }
 
   componentWillUnmount() {
-    if (Platform.OS === 'android') {
+    if (Platform.OS === 'android' && false) {
       FlagSecure.deactivate()
     } else if (Platform.OS === 'ios') {
       // TODO add iOS support

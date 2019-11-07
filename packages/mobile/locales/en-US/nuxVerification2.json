@@ -42,7 +42,6 @@
   "garnetVerification": "Garnet verification code:",
   "markRead": "Mark As Read",
   "reply": "Reply",
-  "congratsVerified": "Congratulations you are now verified!",
   "copyPaste": "Copy & Paste ",
   "entireSmsMessage": "Entire message from your SMS",
   "pasteCode": "Paste Verification Code {{codeNumber}}",
@@ -103,7 +102,8 @@
     "codeHeader2": "Second Code",
     "codeHeader3": "Third Code",
     "codesMissing": "I didn’t receive three codes",
-    "tip": "Typing? Try copying and pasting the code."
+    "tip": "Typing? Try copying and pasting the code.",
+    "codeAccepted": "Accepted"
   },
   "missingCodesModal": {
     "header": "Missing Codes?",
@@ -111,5 +111,12 @@
       "If you haven’t received all your codes yet after 60 seconds, you can skip verification and try again later.",
     "wait": "Wait for codes",
     "skip": "Skip for now"
-  }
+  },
+  "failModal": {
+    "header": "Verificaiton has failed :(",
+    "body1":
+      "Unfortunately an issue has occured during the verification process. Sorry for the inconvinience!",
+    "body2": "You can skip verification for now and try again later."
+  },
+  "congratsVerified": "Congratulations you are now verified!"
 }

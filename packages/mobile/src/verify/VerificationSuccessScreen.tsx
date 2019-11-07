@@ -2,21 +2,35 @@ import colors from '@celo/react-components/styles/colors'
 import fontStyles from '@celo/react-components/styles/fonts'
 import * as React from 'react'
 import { withNamespaces, WithNamespaces } from 'react-i18next'
-import { StyleSheet, Text } from 'react-native'
-import SafeAreaView from 'react-native-safe-area-view'
+import { StyleSheet, Text, View } from 'react-native'
 import { Namespaces } from 'src/i18n'
 import DancingRings from 'src/icons/DancingRings'
+import { navigate } from 'src/navigator/NavigationService'
+import { Stacks } from 'src/navigator/Screens'
 
 class VerificationSuccessScreen extends React.Component<WithNamespaces> {
   static navigationOptions = { header: null }
 
+  state = {
+    isTextWhite: false,
+  }
+
+  componentDidMount() {
+    setTimeout(() => {
+      navigate(Stacks.AppStack)
+    }, 7800)
+    setTimeout(() => this.setState({ isTextWhite: true }), 2000)
+  }
+
   render() {
-    // const { t } = this.props
+    const { t } = this.props
     return (
-      <SafeAreaView style={styles.container}>
-        <Text style={styles.header}>Success!</Text>
+      <View style={styles.container}>
+        <Text style={[styles.header, this.state.isTextWhite ? styles.whiteText : undefined]}>
+          {t('congratsVerified')}
+        </Text>
         <DancingRings />
-      </SafeAreaView>
+      </View>
     )
   }
 }
@@ -30,7 +44,13 @@ const styles = StyleSheet.create({
   },
   header: {
     ...fontStyles.h1,
+    position: 'absolute',
+    top: '45%',
     zIndex: 100,
+    paddingHorizontal: 50,
+  },
+  whiteText: {
+    color: '#FFF',
   },
 })
 

@@ -21,6 +21,7 @@ import {
 import { Attestations as AttestationsType } from '@celo/walletkit/types/Attestations'
 import { StableToken as StableTokenType } from '@celo/walletkit/types/StableToken'
 import BigNumber from 'bignumber.js'
+import { Platform } from 'react-native'
 import { Task } from 'redux-saga'
 import { all, call, delay, fork, put, race, select, take, takeEvery } from 'redux-saga/effects'
 import { e164NumberSelector } from 'src/account/reducer'
@@ -161,7 +162,11 @@ export function* doVerificationFlow() {
       Actions.RECEIVE_ATTESTATION_MESSAGE,
       attestationCodeReceiver(attestationsContract, e164NumberHash, account, issuers)
     )
-    const autoRetrievalTask: Task = yield fork(startAutoSmsRetrieval)
+
+    let autoRetrievalTask: Task | undefined
+    if (Platform.OS === 'android') {
+      autoRetrievalTask = yield fork(startAutoSmsRetrieval)
+    }
 
     yield put(setVerificationStatus(VerificationStatus.RevealingNumber))
     yield all([
@@ -179,7 +184,9 @@ export function* doVerificationFlow() {
     ])
 
     receiveMessageTask.cancel()
-    autoRetrievalTask.cancel()
+    if (Platform.OS === 'android' && autoRetrievalTask) {
+      autoRetrievalTask.cancel()
+    }
 
     yield put(setVerificationStatus(VerificationStatus.Done))
     yield put(setNumberVerified(true))
@@ -365,7 +372,7 @@ function attestationCodeReceiver(
 
       const existingCode = yield call(getCodeForIssuer, issuer)
       if (existingCode) {
-        Logger.warn(TAG + '@attestationCodeReceiver', 'Code already exists store, skipping.')
+        Logger.warn(TAG + '@attestationCodeReceiver', 'Code already exists in store, skipping.')
         if (action.inputType === CodeInputType.MANUAL) {
           yield put(showError(ErrorMessages.REPEAT_ATTESTATION_CODE))
         }
