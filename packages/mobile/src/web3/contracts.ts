@@ -72,9 +72,7 @@ function getWeb3(): Web3 {
     `Initializing web3, platform: ${Platform.OS}, geth free mode: ${isInitiallyZeroSyncMode()}`
   )
 
-  if (isInitiallyZeroSyncMode() && Platform.OS === 'ios') {
-    throw new Error('Zero sync mode is currently not supported on iOS')
-  } else if (isInitiallyZeroSyncMode()) {
+  if (isInitiallyZeroSyncMode()) {
     // Geth free mode
     const url = DEFAULT_FORNO_URL
     Logger.debug('contracts@getWeb3', `Connecting to url ${url}`)
