@@ -1,13 +1,14 @@
 import * as React from 'react'
 import { StyleSheet, Text, View } from 'react-native'
 import Fade from 'react-reveal/Fade'
+import { H1 } from 'src/fonts/Fonts'
 import EmailForm from 'src/forms/EmailForm'
 import HomeAnimation, { Mode, styles as animationStyles } from 'src/home/HomeAnimation'
+import HomeOracle from 'src/home/HomeOracle'
 import TextAnimation from 'src/home/TextAnimation'
 import { I18nProps, withNamespaces } from 'src/i18n'
 import Responsive from 'src/shared/Responsive'
-
-import { BANNER_HEIGHT, HEADER_HEIGHT, MENU_MAX_WIDTH } from 'src/shared/Styles'
+import { BANNER_HEIGHT, HEADER_HEIGHT } from 'src/shared/Styles'
 import { colors, fonts, standardStyles, textStyles } from 'src/styles'
 import { hasGoodConnection } from 'src/utils/utils'
 type Props = I18nProps
@@ -35,7 +36,7 @@ class HomeCover extends React.PureComponent<Props, State> {
 
   componentDidMount = async () => {
     const goodConnection = await hasGoodConnection()
-    this.setState({ mode: Mode.graphic })
+    this.setState({ mode: goodConnection ? Mode.video : Mode.graphic })
   }
 
   render() {
@@ -46,7 +47,11 @@ class HomeCover extends React.PureComponent<Props, State> {
             <Responsive large={[styles.animationWrapper, styles.animationWrapperLargeAug]}>
               <View style={styles.animationWrapper}>
                 {this.state.mode === Mode.wait ? (
-                  <View style={animationStyles.video} />
+                  <View style={animationStyles.still}>
+                    <noscript>
+                      <HomeOracle />
+                    </noscript>
+                  </View>
                 ) : (
                   <HomeAnimation
                     onLoaded={this.onLoaded}
@@ -63,7 +68,15 @@ class HomeCover extends React.PureComponent<Props, State> {
                 <View style={styles.textWrapper}>
                   <Fade bottom={true} distance="20px">
                     {this.state.mode === Mode.wait ? (
-                      <View />
+                      <noscript>
+                        <H1
+                          ariaLevel={'2'}
+                          accessibilityRole={'heading'}
+                          style={[styles.white, styles.letsMake]}
+                        >
+                          Money that serves everyone
+                        </H1>
+                      </noscript>
                     ) : (
                       <Fade>
                         <TextAnimation

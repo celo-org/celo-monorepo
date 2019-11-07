@@ -79,13 +79,14 @@ class HomeAnimation extends React.Component<Props & ScreenProps> {
         // @ts-ignore */}
         <Video
           ref={this.videoRef}
-          style={styles.videoMedium}
+          style={styles.videoSmall}
           preload={'auto'}
           muted={true}
           playsInline={true}
         >
           <Source src={this.source()} type="video/mp4" />
         </Video>
+        {/* <canvas> */}
       </Responsive>
     )
   }
@@ -100,15 +101,17 @@ export const styles = StyleSheet.create({
   stillMobile: {
     height: '100%',
     marginTop: HEADER_HEIGHT,
+    paddingTop: 50,
     justifyContent: 'flex-start',
   },
   video: {
-    height: '80vh',
+    height: '75vh',
     width: '100vw',
     objectFit: 'contain',
   },
-  videoMedium: {
+  videoSmall: {
     width: '100vw',
     objectFit: 'contain',
+    marginTop: 50,
   },
 })
