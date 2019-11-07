@@ -28,8 +28,8 @@ contract SortedOracles is ISortedOracles, Ownable, Initializable {
   mapping(address => SortedLinkedListWithMedian.List) private timestamps;
   mapping(address => mapping(address => bool)) public isOracle;
   mapping(address => address[]) public oracles;
-  mapping(address => uint) private limitedMedianRate;
-  mapping(address => uint) private limitedMedianRateTimestamp;
+  mapping(address => uint256) private limitedMedianRate;
+  mapping(address => uint256) private limitedMedianRateTimestamp;
 
   uint256 public reportExpirySeconds;
   FixidityLib.Fraction public maxMedianChangeRatePerDay;
@@ -92,19 +92,10 @@ contract SortedOracles is ISortedOracles, Ownable, Initializable {
 
   /**
    * @notice Sets the maximum change rate for median.
-   * @param rate Maximum median chaneg rate as unwrapped Fraction.
+   * @param rate Maximum median change rate as unwrapped Fraction.
    * @return True upon success.
    */
   function setMaxMedianChangeRatePerDay(uint256 rate) public onlyOwner returns (bool) {
-    return _setMaxMedianChangeRatePerDay(rate);
-  }
-
-  /**
-   * @notice Sets the maximum change rate for median.
-   * @param rate Maximum median chaneg rate as unwrapped Fraction.
-   * @return True upon success.
-   */
-  function _setMaxMedianChangeRatePerDay(uint256 rate) private returns (bool) {
     maxMedianChangeRatePerDay = FixidityLib.wrap(rate);
     emit MaxMedianChangeRatePerDaySet(rate);
     return true;
