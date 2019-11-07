@@ -33,7 +33,7 @@ export class TransactionBuilder {
     ) as Buffer
   }
 
-  append(tx: CeloTransactionObject<any>) {
+  appendCeloTx(tx: CeloTransactionObject<any>) {
     if (tx.defaultParams === undefined) {
       throw new Error('Default params not defined on CeloTransactionObject')
     } else if (tx.defaultParams.to === undefined) {
@@ -49,7 +49,7 @@ export class TransactionBuilder {
     })
   }
 
-  appendWeb3<M extends Web3Method>(
+  appendWeb3Tx<M extends Web3Method>(
     value: NumberLike,
     destination: Address,
     method: M,
@@ -62,7 +62,7 @@ export class TransactionBuilder {
     })
   }
 
-  appendJson(jsonTx: JSONTransaction) {
+  appendCeloJsonTx(jsonTx: JSONTransaction) {
     this.kit._web3Contracts.getContract(jsonTx.celoContractName).then(
       (contract) => {
         const method = (contract.methods as Contract['methods'])[jsonTx.methodName]
@@ -81,7 +81,19 @@ export class TransactionBuilder {
     )
   }
 
-  private toTransactionData(contractMethod: Web3Method, args: Parameters<Web3Method>) {
+  private toTransactionData<M extends Web3Method>(contractMethod: M, args: Parameters<M>) {
     return toBuffer(contractMethod(...args).encodeABI())
+  }
+
+  static fromCeloTransactions(kit: ContractKit, transactions: Array<CeloTransactionObject<any>>) {
+    const txBuilder = new TransactionBuilder(kit)
+    transactions.map((tx) => txBuilder.appendCeloTx(tx))
+    return txBuilder.transactions
+  }
+
+  static fromCeloJsonTransactions(kit: ContractKit, transactions: JSONTransaction[]) {
+    const txBuilder = new TransactionBuilder(kit)
+    transactions.map((tx) => txBuilder.appendCeloJsonTx(tx))
+    return txBuilder.transactions
   }
 }
