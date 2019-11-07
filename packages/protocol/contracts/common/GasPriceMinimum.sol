@@ -14,13 +14,9 @@ contract GasPriceMinimum is Ownable, Initializable, UsingRegistry {
   using FixidityLib for FixidityLib.Fraction;
   using SafeMath for uint256;
 
-  event TargetDensitySet(
-    uint256 targetDensity
-  );
+  event TargetDensitySet(uint256 targetDensity);
 
-  event AdjustmentSpeedSet(
-    uint256 adjustmentSpeed
-  );
+  event AdjustmentSpeedSet(uint256 adjustmentSpeed);
 
   uint256 public gasPriceMinimum;
 
@@ -39,11 +35,8 @@ contract GasPriceMinimum is Ownable, Initializable, UsingRegistry {
     address _registryAddress,
     uint256 initialGas,
     uint256 _targetDensity,
-    uint256 _adjustmentSpeed
-  )
-    external
-    initializer
-  {
+    uint256 _adjustmentSpeed,
+  ) external initializer {
     _transferOwnership(msg.sender);
     setRegistry(_registryAddress);
     gasPriceMinimum = initialGas;
@@ -83,7 +76,6 @@ contract GasPriceMinimum is Ownable, Initializable, UsingRegistry {
     ) {
       return gasPriceMinimum;
     } else {
-
       ISortedOracles sortedOracles = ISortedOracles(
         registry.getAddressForOrDie(SORTED_ORACLES_REGISTRY_ID)
       );
@@ -101,10 +93,7 @@ contract GasPriceMinimum is Ownable, Initializable, UsingRegistry {
    * @param blockGasLimit The maxBlockGasLimit of the past block.
    * @return result of the calculation (new gas price minimum)
    */
-  function updateGasPriceMinimum(
-    uint256 blockGasTotal,
-    uint256 blockGasLimit
-  )
+  function updateGasPriceMinimum(uint256 blockGasTotal, uint256 blockGasLimit)
     external
     onlyVm
     returns (uint256)
@@ -122,28 +111,27 @@ contract GasPriceMinimum is Ownable, Initializable, UsingRegistry {
    * @dev Calculate using the following formula:
    * oldGasPriceMinimum * (1 + (adjustmentSpeed * (blockDensity - targetDensity))) + 1.
    */
-  function getUpdatedGasPriceMinimum(
-    uint256 blockGasTotal,
-    uint256 blockGasLimit
-  )
+  function getUpdatedGasPriceMinimum(uint256 blockGasTotal, uint256 blockGasLimit)
     public
     view
     returns (uint256)
   {
     FixidityLib.Fraction memory blockDensity = FixidityLib.newFixedFraction(
-      blockGasTotal, blockGasLimit
+      blockGasTotal,
+      blockGasLimit
     );
     bool densityGreaterThanTarget = blockDensity.gt(targetDensity);
-    FixidityLib.Fraction memory densityDelta = densityGreaterThanTarget ?
-      blockDensity.subtract(targetDensity) :
-      targetDensity.subtract(blockDensity);
-    FixidityLib.Fraction memory adjustment = densityGreaterThanTarget ?
-      FixidityLib.fixed1().add(adjustmentSpeed.multiply(densityDelta)) :
-      FixidityLib.fixed1().subtract(adjustmentSpeed.multiply(densityDelta));
+    FixidityLib.Fraction memory densityDelta = densityGreaterThanTarget
+      ? blockDensity.subtract(targetDensity)
+      : targetDensity.subtract(blockDensity);
+    FixidityLib.Fraction memory adjustment = densityGreaterThanTarget
+      ? FixidityLib.fixed1().add(adjustmentSpeed.multiply(densityDelta))
+      : FixidityLib.fixed1().subtract(adjustmentSpeed.multiply(densityDelta));
 
-    return adjustment
-      .multiply(FixidityLib.newFixed(gasPriceMinimum))
-      .add(FixidityLib.fixed1())
-      .fromFixed();
+    return
+      adjustment
+        .multiply(FixidityLib.newFixed(gasPriceMinimum))
+        .add(FixidityLib.fixed1())
+        .fromFixed();
   }
 }
