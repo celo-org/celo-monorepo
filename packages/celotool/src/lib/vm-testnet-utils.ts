@@ -319,7 +319,7 @@ function generateNodeSecretEnvVars(accountType: AccountType, index: number) {
   if (accountType === AccountType.VALIDATOR) {
     const proxiedValidators = parseInt(fetchEnvOrFallback(envVar.PROXIED_VALIDATORS, '0'), 10)
     if (index < proxiedValidators) {
-      secrets.SENTRY_ENODE_ADDRESS = generatePublicKey(mnemonic, AccountType.SENTRY, 0)
+      secrets.SENTRY_ENODE_ADDRESS = generatePublicKey(mnemonic, AccountType.SENTRY, index)
     }
   }
   return formatEnvVars(secrets)

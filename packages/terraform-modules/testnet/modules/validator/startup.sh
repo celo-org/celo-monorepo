@@ -72,9 +72,15 @@ docker pull $GETH_NODE_DOCKER_IMAGE
 PROXIED_FLAGS=""
 SENTRY_ENODE=""
 if [[ ${proxied} == "true" ]]; then
-  PROXIED_FLAGS="--istanbul.proxied --nodiscover"
-  SENTRY_ENODE_NO_PORT=$SENTRY_ENODE_ADDRESS@${sentry_ip_address}
-  echo "Sentry enode without port: $SENTRY_ENODE_NO_PORT"
+  # $SENTRY_ENODE_ADDRESS is from the secrets pulled from google cloud
+  SENTRY_INTERNAL_ENODE="enode://$SENTRY_ENODE_ADDRESS@${sentry_internal_ip_address}:30503"
+  SENTRY_EXTERNAL_ENODE="enode://$SENTRY_ENODE_ADDRESS@${sentry_external_ip_address}:30303"
+
+  echo "Sentry internal enode: $SENTRY_INTERNAL_ENODE"
+  echo "Sentry external enode: $SENTRY_EXTERNAL_ENODE"
+
+  PROXIED_FLAGS="--istanbul.proxied --nodiscover --istanbul.sentries=\"$SENTRY_INTERNAL_ENODE;$SENTRY_EXTERNAL_ENODE\""
+
 
   # if this validator is proxied, cut it off from the external internet after
   # we've downloaded everything
@@ -100,7 +106,10 @@ docker run -v $DATA_DIR:$DATA_DIR --name geth --net=host --entrypoint /bin/sh -d
     mkdir -p $DATA_DIR/account /var/geth && \
     echo -n '${genesis_content_base64}' | base64 -d > /var/geth/genesis.json && \
     echo -n '${rid}' > $DATA_DIR/replica_id && \
-    echo -n '${ip_address}' > $DATA_DIR/ipAddress && \
+    if [ '${ip_address}' ]; then \
+      echo -n '${ip_address}' > $DATA_DIR/ipAddress
+      NAT_FLAG='--nat=extip:${ip_address}'
+    fi && \
     echo -n '$PRIVATE_KEY' > $DATA_DIR/pkey && \
     echo -n '$ACCOUNT_ADDRESS' > $DATA_DIR/address && \
     echo -n '$BOOTNODE_ENODE_ADDRESS' > $DATA_DIR/bootnodeEnodeAddress && \
@@ -135,7 +144,6 @@ docker run -v $DATA_DIR:$DATA_DIR --name geth --net=host --entrypoint /bin/sh -d
       --istanbul.blockperiod=${block_time} \
       --istanbul.requesttimeout=${istanbul_request_timeout_ms} \
       --maxpeers=${max_peers} \
-      --nat=extip:${ip_address} \
       --metrics \
       $IN_MEMORY_DISCOVERY_TABLE_FLAG \
       $PROXIED_FLAGS \

@@ -7,7 +7,8 @@ resource "google_compute_address" "validator" {
   name         = "${local.name_prefix}-address-${count.index}"
   address_type = "EXTERNAL"
 
-  count = var.validator_count
+  # only create external addresses for validators that are not proxied
+  count = var.validator_count - var.proxied_validator_count
 }
 
 resource "google_compute_instance" "validator" {
@@ -34,12 +35,15 @@ resource "google_compute_instance" "validator" {
     subnetwork = google_compute_subnetwork.validator.name
     # We want to make sure the first proxied_validator_count validators
     # are not reachable externally
-    dynamic "access_config" {
-      for_each = count.index < var.proxied_validator_count ? [0] : [0]
-      content {
-        nat_ip = google_compute_address.validator[count.index].address
-      }
+    access_config {
+      nat_ip = count.index < var.proxied_validator_count ? null : google_compute_address.validator[count.index].address
     }
+    # dynamic "access_config" {
+    #   for_each = count.index < var.proxied_validator_count ? [0] : [0]
+    #   content {
+    #     nat_ip = google_compute_address.validator[count.index].address
+    #   }
+    # }
   }
 
   metadata_startup_script = templatefile(
@@ -55,13 +59,14 @@ resource "google_compute_instance" "validator" {
       geth_node_docker_image_tag : var.geth_node_docker_image_tag,
       geth_verbosity : var.geth_verbosity,
       in_memory_discovery_table : var.in_memory_discovery_table,
-      ip_address : google_compute_address.validator[count.index].address,
+      ip_address : count.index < var.proxied_validator_count ? "" : google_compute_address.validator[var.proxied_validator_count - count.index].address,
       istanbul_request_timeout_ms : var.istanbul_request_timeout_ms,
       max_peers : (var.validator_count + var.tx_node_count) * 2,
       network_id : var.network_id,
       proxied : count.index < var.proxied_validator_count,
       rid : count.index,
-      sentry_ip_address : count.index < var.proxied_validator_count ? module.sentry.ip_addresses[count.index] : ""
+      sentry_internal_ip_address : count.index < var.proxied_validator_count ? module.sentry.internal_ip_addresses[count.index] : "",
+      sentry_external_ip_address : count.index < var.proxied_validator_count ? module.sentry.ip_addresses[count.index] : "",
       validator_name : "${local.name_prefix}-${count.index}",
       verification_pool_url : var.verification_pool_url
     }
