@@ -610,7 +610,7 @@ contract Attestations is
       identifiers[identifier].unselectedRequests[msg.sender];
 
     bytes32 seed = getRandom().getBlockRandomness(
-      unselectedRequest.blockNumber.add(selectIssuersWaitBlocks);
+      unselectedRequest.blockNumber.add(selectIssuersWaitBlocks)
     );
     uint256 numberValidators = numberValidatorsInCurrentSet();
 
