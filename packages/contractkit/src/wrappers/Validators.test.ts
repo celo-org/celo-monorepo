@@ -93,7 +93,7 @@ testWithGanache('Validators Wrapper', (web3) => {
       from: groupAccount,
     })
     const commission = (await validators.getValidatorGroup(groupAccount)).commission
-    expect(commission.toFixed()).to.equal('0.2')
+    expect(commission.toFixed()).toEqual('0.2')
   })
 
   describe('SBAT reorderMember', () => {

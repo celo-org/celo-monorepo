@@ -1660,7 +1660,7 @@ contract('Validators', (accounts: string[]) => {
           assert.equal(resp.logs.length, 1)
           const log = resp.logs[0]
           assertContainSubset(log, {
-            event: 'ValidatorGroupCommissionUpdated ',
+            event: 'ValidatorGroupCommissionUpdated',
             args: {
               group,
               commission: newCommission,
