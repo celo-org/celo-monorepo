@@ -6,6 +6,8 @@ import { assert } from 'chai'
 import Web3 from 'web3'
 import { getContext, getEnode, importGenesis, initAndStartGeth, sleep } from './utils'
 
+const ONE_YEAR = 60 * 60 * 24 * 365 // seconds
+
 describe('governance tests', () => {
   const gethConfig = {
     migrate: true,
@@ -48,7 +50,7 @@ describe('governance tests', () => {
 
   const unlockAccount = async (address: string, theWeb3: any) => {
     // Assuming empty password
-    await theWeb3.eth.personal.unlockAccount(address, '', Number.MAX_SAFE_INTEGER)
+    await theWeb3.eth.personal.unlockAccount(address, '', ONE_YEAR)
   }
 
   const getValidatorGroupMembers = async (blockNumber?: number) => {
