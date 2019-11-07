@@ -1,4 +1,3 @@
-import { flags } from '@oclif/command'
 import { IArg } from '@oclif/parser/lib/args'
 import { BaseCommand } from '../../base'
 import { printValueMap } from '../../utils/cli'
@@ -17,13 +16,7 @@ export default class ValidatorGroupShow extends BaseCommand {
 
   async run() {
     const res = this.parse(ValidatorGroupShow)
-    const validators = await this.kit.contracts.getValidators()
-    const validatorGroup: Array<
-      ValidatorGroup & { affiliates?: Address[] }
-    > = await validators.getValidatorGroup(res.args.groupAddress)
-    const registered = await validators.getRegisteredValidators()
-    const affiliated = registered.filter((v) => v.affiliation == args.groupAddress)
-    validatorGroup.affiliates = affiliated.map((v) => v.address)
+    const validatorGroup = await validators.getValidatorGroup(res.args.groupAddress)
     printValueMap(validatorGroup)
   }
 }
