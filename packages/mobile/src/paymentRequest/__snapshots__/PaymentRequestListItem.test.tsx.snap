@@ -3,7 +3,9 @@
 exports[`PaymentRequestListItem renders correctly 1`] = `
 <View
   accessible={true}
+  focusable={true}
   isTVSelectable={true}
+  onClick={[Function]}
   onResponderGrant={[Function]}
   onResponderMove={[Function]}
   onResponderRelease={[Function]}
@@ -145,6 +147,7 @@ exports[`PaymentRequestListItem renders correctly 1`] = `
           >
             <View
               accessible={true}
+              focusable={true}
               isTVSelectable={true}
               nativeBackgroundAndroid={
                 Object {
@@ -152,6 +155,7 @@ exports[`PaymentRequestListItem renders correctly 1`] = `
                   "type": "ThemeAttrAndroid",
                 }
               }
+              onClick={[Function]}
               onResponderGrant={[Function]}
               onResponderMove={[Function]}
               onResponderRelease={[Function]}
@@ -163,14 +167,8 @@ exports[`PaymentRequestListItem renders correctly 1`] = `
                 style={
                   Array [
                     Object {
-                      "color": "#2E3338",
-                      "fontFamily": "Hind-Regular",
-                      "fontSize": 14,
-                      "lineHeight": 18,
-                    },
-                    Object {
                       "color": "#42D689",
-                      "fontFamily": "Hind-Medium",
+                      "fontFamily": "Hind-SemiBold",
                       "fontSize": 14,
                       "lineHeight": 18,
                     },
@@ -185,6 +183,7 @@ exports[`PaymentRequestListItem renders correctly 1`] = `
             </View>
             <View
               accessible={true}
+              focusable={true}
               isTVSelectable={true}
               nativeBackgroundAndroid={
                 Object {
@@ -192,6 +191,7 @@ exports[`PaymentRequestListItem renders correctly 1`] = `
                   "type": "ThemeAttrAndroid",
                 }
               }
+              onClick={[Function]}
               onResponderGrant={[Function]}
               onResponderMove={[Function]}
               onResponderRelease={[Function]}
@@ -203,14 +203,8 @@ exports[`PaymentRequestListItem renders correctly 1`] = `
                 style={
                   Array [
                     Object {
-                      "color": "#2E3338",
-                      "fontFamily": "Hind-Regular",
-                      "fontSize": 14,
-                      "lineHeight": 18,
-                    },
-                    Object {
                       "color": "#42D689",
-                      "fontFamily": "Hind-Medium",
+                      "fontFamily": "Hind-SemiBold",
                       "fontSize": 14,
                       "lineHeight": 18,
                     },
