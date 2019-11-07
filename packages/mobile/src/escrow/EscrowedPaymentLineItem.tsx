@@ -2,7 +2,7 @@ import fontStyles from '@celo/react-components/styles/fonts'
 import * as React from 'react'
 import { StyleSheet, Text } from 'react-native'
 import { EscrowedPayment } from 'src/escrow/actions'
-import { divideByWei, getMoneyDisplayValue } from 'src/utils/formatting'
+import { divideByWei, getCentAwareMoneyDisplay } from 'src/utils/formatting'
 
 interface Props {
   payment: EscrowedPayment
@@ -17,7 +17,7 @@ export default function EscrowedPaymentLineItem(props: Props) {
       </Text>
       <Text style={[fontStyles.subSmall, fontStyles.semiBold]}>
         {' '}
-        ${getMoneyDisplayValue(divideByWei(amount.toString()))}
+        ${getCentAwareMoneyDisplay(divideByWei(amount.toString()))}
       </Text>
     </Text>
   )

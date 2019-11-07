@@ -5,19 +5,13 @@ import "openzeppelin-solidity/contracts/ownership/Ownable.sol";
 import "./interfaces/IRegistry.sol";
 import "./Initializable.sol";
 
-
 /**
  * @title Routes identifiers to addresses.
  */
 contract Registry is IRegistry, Ownable, Initializable {
+  mapping(bytes32 => address) public registry;
 
-  mapping (bytes32 => address) public registry;
-
-  event RegistryUpdated(
-    string identifier,
-    bytes32 indexed identifierHash,
-    address addr
-  );
+  event RegistryUpdated(string identifier, bytes32 indexed identifierHash, address addr);
 
   function initialize() external initializer {
     _transferOwnership(msg.sender);

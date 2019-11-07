@@ -10,26 +10,13 @@ import "../common/libraries/AddressesHelper.sol";
  * @title A library operating on Celo Governance proposals.
  */
 library Proposals {
-
   using FixidityLib for FixidityLib.Fraction;
   using SafeMath for uint256;
   using BytesLib for bytes;
 
-  enum Stage {
-    None,
-    Queued,
-    Approval,
-    Referendum,
-    Execution,
-    Expiration
-  }
+  enum Stage { None, Queued, Approval, Referendum, Execution, Expiration }
 
-  enum VoteValue {
-    None,
-    Abstain,
-    No,
-    Yes
-  }
+  enum VoteValue { None, Abstain, No, Yes }
 
   struct StageDurations {
     uint256 approval;
@@ -78,9 +65,7 @@ library Proposals {
     uint256[] memory dataLengths,
     address proposer,
     uint256 deposit
-  )
-    public
-  {
+  ) public {
     require(values.length == destinations.length && destinations.length == dataLengths.length);
     uint256 transactionCount = values.length;
 
@@ -92,16 +77,14 @@ library Proposals {
     uint256 dataPosition = 0;
     delete proposal.transactions;
     for (uint256 i = 0; i < transactionCount; i = i.add(1)) {
-      proposal.transactions.push(Transaction(
-        values[i],
-        destinations[i],
-        data.slice(dataPosition, dataLengths[i])
-      ));
+      proposal.transactions.push(
+        Transaction(values[i], destinations[i], data.slice(dataPosition, dataLengths[i]))
+      );
       dataPosition = dataPosition.add(dataLengths[i]);
     }
   }
 
-    /**
+  /**
    * @notice Constructs a proposal for use in memory.
    * @param values The values of Celo Gold to be sent in the proposed transactions.
    * @param destinations The destination addresses of the proposed transactions.
@@ -117,13 +100,11 @@ library Proposals {
     uint256[] memory dataLengths,
     address proposer,
     uint256 deposit
-  )
-    internal view returns (Proposal memory)
-  {
+  ) internal view returns (Proposal memory) {
     require(values.length == destinations.length && destinations.length == dataLengths.length);
     uint256 transactionCount = values.length;
 
-    Proposal memory proposal; 
+    Proposal memory proposal;
     proposal.proposer = proposer;
     proposal.deposit = deposit;
     // solhint-disable-next-line not-rely-on-time
@@ -156,9 +137,7 @@ library Proposals {
     uint256 currentWeight,
     VoteValue previousVote,
     VoteValue currentVote
-  )
-    public
-  {
+  ) public {
     // Subtract previous vote.
     if (previousVote == VoteValue.Abstain) {
       proposal.votes.abstain = proposal.votes.abstain.sub(previousWeight);
@@ -221,20 +200,16 @@ library Proposals {
   function getSupportWithQuorumPadding(
     Proposal storage proposal,
     FixidityLib.Fraction memory quorum
-  )
-    internal
-    view
-    returns (FixidityLib.Fraction memory)
-  {
+  ) internal view returns (FixidityLib.Fraction memory) {
     uint256 yesVotes = proposal.votes.yes;
     if (yesVotes == 0) {
       return FixidityLib.newFixed(0);
     }
     uint256 noVotes = proposal.votes.no;
     uint256 totalVotes = yesVotes.add(noVotes).add(proposal.votes.abstain);
-    uint256 requiredVotes = quorum.multiply(
-        FixidityLib.newFixed(proposal.networkWeight)
-    ).fromFixed();
+    uint256 requiredVotes = quorum
+      .multiply(FixidityLib.newFixed(proposal.networkWeight))
+      .fromFixed();
     if (requiredVotes > totalVotes) {
       noVotes = noVotes.add(requiredVotes.sub(totalVotes));
     }
@@ -248,17 +223,16 @@ library Proposals {
    * @return The stage of the dequeued proposal.
    * @dev Must be called on a dequeued proposal.
    */
-  function getDequeuedStage(
-    Proposal storage proposal,
-    StageDurations storage stageDurations
-  )
+  function getDequeuedStage(Proposal storage proposal, StageDurations storage stageDurations)
     internal
     view
     returns (Stage)
   {
-    uint256 stageStartTime = proposal.timestamp.add(stageDurations.approval).add(
-      stageDurations.referendum
-    ).add(stageDurations.execution);
+    uint256 stageStartTime = proposal
+      .timestamp
+      .add(stageDurations.approval)
+      .add(stageDurations.referendum)
+      .add(stageDurations.execution);
     // solhint-disable-next-line not-rely-on-time
     if (now >= stageStartTime) {
       return Stage.Expiration;
@@ -282,12 +256,10 @@ library Proposals {
    * @param proposal The proposal struct.
    * @return The participation of the proposal.
    */
-  function getParticipation(
-    Proposal storage proposal
-  ) 
-    internal 
-    view 
-    returns (FixidityLib.Fraction memory) 
+  function getParticipation(Proposal storage proposal)
+    internal
+    view
+    returns (FixidityLib.Fraction memory)
   {
     uint256 totalVotes = proposal.votes.yes.add(proposal.votes.no).add(proposal.votes.abstain);
     return FixidityLib.newFixedFraction(totalVotes, proposal.networkWeight);
@@ -299,10 +271,7 @@ library Proposals {
    * @param index The index of the specified transaction in the proposal's transaction list.
    * @return The specified transaction.
    */
-  function getTransaction(
-    Proposal storage proposal,
-    uint256 index
-  )
+  function getTransaction(Proposal storage proposal, uint256 index)
     public
     view
     returns (uint256, address, bytes memory)
@@ -317,19 +286,12 @@ library Proposals {
    * @param proposal The proposal struct.
    * @return The unpacked proposal with its transaction count.
    */
-  function unpack(
-    Proposal storage proposal
-  )
+  function unpack(Proposal storage proposal)
     internal
     view
     returns (address, uint256, uint256, uint256)
   {
-    return (
-      proposal.proposer,
-      proposal.deposit,
-      proposal.timestamp,
-      proposal.transactions.length
-    );
+    return (proposal.proposer, proposal.deposit, proposal.timestamp, proposal.transactions.length);
   }
 
   /**
@@ -337,9 +299,7 @@ library Proposals {
    * @param proposal The proposal struct.
    * @return The yes, no, and abstain vote totals.
    */
-  function getVoteTotals(
-    Proposal storage proposal
-  )
+  function getVoteTotals(Proposal storage proposal)
     internal
     view
     returns (uint256, uint256, uint256)
@@ -374,12 +334,7 @@ library Proposals {
    * @param dataLength The length of the data to be included in the function call.
    * @param data The data to be included in the function call.
    */
-  function externalCall(
-    address destination,
-    uint value,
-    uint dataLength,
-    bytes memory data
-  )
+  function externalCall(address destination, uint256 value, uint256 dataLength, bytes memory data)
     private
     returns (bool)
   {
@@ -391,18 +346,18 @@ library Proposals {
     /* solhint-disable no-inline-assembly */
     assembly {
       /* solhint-disable max-line-length */
-      let x := mload(0x40)   // "Allocate" memory for output (0x40 is where "free memory" pointer is stored by convention)
+      let x := mload(0x40) // "Allocate" memory for output (0x40 is where "free memory" pointer is stored by convention)
       let d := add(data, 32) // First 32 bytes are the padded length of data, so exclude that
       result := call(
-        sub(gas, 34710),   // 34710 is the value that solidity is currently emitting
-                           // It includes callGas (700) + callVeryLow (3, to pay for SUB) + callValueTransferGas (9000) +
-                           // callNewAccountGas (25000, in case the destination address does not exist and needs creating)
+        sub(gas, 34710), // 34710 is the value that solidity is currently emitting
+        // It includes callGas (700) + callVeryLow (3, to pay for SUB) + callValueTransferGas (9000) +
+        // callNewAccountGas (25000, in case the destination address does not exist and needs creating)
         destination,
         value,
         d,
-        dataLength,        // Size of the input (in bytes) - this is what fixes the padding problem
+        dataLength, // Size of the input (in bytes) - this is what fixes the padding problem
         x,
-        0                  // Output is ignored, therefore the output size is zero
+        0 // Output is ignored, therefore the output size is zero
       )
       /* solhint-enable max-line-length */
     }
