@@ -86,6 +86,16 @@ testWithGanache('Validators Wrapper', (web3) => {
     expect(members).toContain(validatorAccount)
   })
 
+  test('SBAT updateCommission', async () => {
+    const groupAccount = accounts[0]
+    await setupGroup(groupAccount)
+    await (await validators.updateCommission(new BigNumber(0.2))).sendAndWaitForReceipt({
+      from: groupAccount,
+    })
+    const commission = (await validators.getValidatorGroup(groupAccount)).commission
+    expect(commission.toFixed()).to.equal('0.2')
+  })
+
   describe('SBAT reorderMember', () => {
     let groupAccount: string, validator1: string, validator2: string
 

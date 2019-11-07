@@ -120,6 +120,7 @@ contract Validators is
   event ValidatorGroupMemberAdded(address indexed group, address indexed validator);
   event ValidatorGroupMemberRemoved(address indexed group, address indexed validator);
   event ValidatorGroupMemberReordered(address indexed group, address indexed validator);
+  event ValidatorGroupCommissionUpdated(address indexed group, uint256 commission);
 
   modifier onlyVm() {
     require(msg.sender == address(0));
@@ -661,7 +662,9 @@ contract Validators is
     address account = getAccounts().activeValidationSignerToAccount(msg.sender);
     require(isValidatorGroup(account));
     require(commission <= FixidityLib.fixed1().unwrap(), "Commission can't be greater than 100%");
+    require(commission != group.commission.unwrap(), "Commission must be different");
     group.commission = FixidityLib.wrap(commission);
+    emit ValidatorGroupCommissionUpdated(account, commission);
     return true;
   }
 
