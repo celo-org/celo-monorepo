@@ -26,6 +26,8 @@ exports[`BackupQuiz renders correctly 1`] = `
   >
     <Text
       accessible={true}
+      focusable={true}
+      onClick={[Function]}
       onResponderGrant={[Function]}
       onResponderMove={[Function]}
       onResponderRelease={[Function]}
@@ -686,6 +688,7 @@ exports[`BackupQuiz renders correctly 1`] = `
       >
         <View
           accessible={true}
+          focusable={true}
           hitSlop={
             Object {
               "bottom": 7,
@@ -701,6 +704,7 @@ exports[`BackupQuiz renders correctly 1`] = `
               "type": "ThemeAttrAndroid",
             }
           }
+          onClick={[Function]}
           onResponderGrant={[Function]}
           onResponderMove={[Function]}
           onResponderRelease={[Function]}
@@ -738,9 +742,6 @@ exports[`BackupQuiz renders correctly 1`] = `
                   "color": "#81868B",
                   "fontFamily": "Hind-SemiBold",
                   "fontSize": 13,
-                  "lineHeight": 17,
-                },
-                Object {
                   "lineHeight": 20,
                   "textAlign": "center",
                 },
@@ -757,6 +758,7 @@ exports[`BackupQuiz renders correctly 1`] = `
         </View>
         <View
           accessible={true}
+          focusable={true}
           hitSlop={
             Object {
               "bottom": 7,
@@ -772,6 +774,7 @@ exports[`BackupQuiz renders correctly 1`] = `
               "type": "ThemeAttrAndroid",
             }
           }
+          onClick={[Function]}
           onResponderGrant={[Function]}
           onResponderMove={[Function]}
           onResponderRelease={[Function]}
@@ -809,9 +812,6 @@ exports[`BackupQuiz renders correctly 1`] = `
                   "color": "#81868B",
                   "fontFamily": "Hind-SemiBold",
                   "fontSize": 13,
-                  "lineHeight": 17,
-                },
-                Object {
                   "lineHeight": 20,
                   "textAlign": "center",
                 },
@@ -828,6 +828,7 @@ exports[`BackupQuiz renders correctly 1`] = `
         </View>
         <View
           accessible={true}
+          focusable={true}
           hitSlop={
             Object {
               "bottom": 7,
@@ -843,6 +844,7 @@ exports[`BackupQuiz renders correctly 1`] = `
               "type": "ThemeAttrAndroid",
             }
           }
+          onClick={[Function]}
           onResponderGrant={[Function]}
           onResponderMove={[Function]}
           onResponderRelease={[Function]}
@@ -880,9 +882,6 @@ exports[`BackupQuiz renders correctly 1`] = `
                   "color": "#81868B",
                   "fontFamily": "Hind-SemiBold",
                   "fontSize": 13,
-                  "lineHeight": 17,
-                },
-                Object {
                   "lineHeight": 20,
                   "textAlign": "center",
                 },
@@ -899,6 +898,7 @@ exports[`BackupQuiz renders correctly 1`] = `
         </View>
         <View
           accessible={true}
+          focusable={true}
           hitSlop={
             Object {
               "bottom": 7,
@@ -914,6 +914,7 @@ exports[`BackupQuiz renders correctly 1`] = `
               "type": "ThemeAttrAndroid",
             }
           }
+          onClick={[Function]}
           onResponderGrant={[Function]}
           onResponderMove={[Function]}
           onResponderRelease={[Function]}
@@ -951,9 +952,6 @@ exports[`BackupQuiz renders correctly 1`] = `
                   "color": "#81868B",
                   "fontFamily": "Hind-SemiBold",
                   "fontSize": 13,
-                  "lineHeight": 17,
-                },
-                Object {
                   "lineHeight": 20,
                   "textAlign": "center",
                 },
@@ -970,6 +968,7 @@ exports[`BackupQuiz renders correctly 1`] = `
         </View>
         <View
           accessible={true}
+          focusable={true}
           hitSlop={
             Object {
               "bottom": 7,
@@ -985,6 +984,7 @@ exports[`BackupQuiz renders correctly 1`] = `
               "type": "ThemeAttrAndroid",
             }
           }
+          onClick={[Function]}
           onResponderGrant={[Function]}
           onResponderMove={[Function]}
           onResponderRelease={[Function]}
@@ -1022,9 +1022,6 @@ exports[`BackupQuiz renders correctly 1`] = `
                   "color": "#81868B",
                   "fontFamily": "Hind-SemiBold",
                   "fontSize": 13,
-                  "lineHeight": 17,
-                },
-                Object {
                   "lineHeight": 20,
                   "textAlign": "center",
                 },
@@ -1041,6 +1038,7 @@ exports[`BackupQuiz renders correctly 1`] = `
         </View>
         <View
           accessible={true}
+          focusable={true}
           hitSlop={
             Object {
               "bottom": 7,
@@ -1056,6 +1054,7 @@ exports[`BackupQuiz renders correctly 1`] = `
               "type": "ThemeAttrAndroid",
             }
           }
+          onClick={[Function]}
           onResponderGrant={[Function]}
           onResponderMove={[Function]}
           onResponderRelease={[Function]}
@@ -1093,9 +1092,6 @@ exports[`BackupQuiz renders correctly 1`] = `
                   "color": "#81868B",
                   "fontFamily": "Hind-SemiBold",
                   "fontSize": 13,
-                  "lineHeight": 17,
-                },
-                Object {
                   "lineHeight": 20,
                   "textAlign": "center",
                 },

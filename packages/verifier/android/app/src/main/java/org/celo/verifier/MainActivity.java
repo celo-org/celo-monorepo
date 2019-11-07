@@ -4,7 +4,7 @@ import android.util.Log;
 import android.os.Bundle;
 import android.content.Intent;
 import com.google.firebase.iid.FirebaseInstanceId;
-import org.devio.rn.splashscreen.SplashScreen;
+import org.devio.rn.splashscreen.SplashScreen;	
 import com.facebook.react.ReactActivity;
 
 public class MainActivity extends ReactActivity {

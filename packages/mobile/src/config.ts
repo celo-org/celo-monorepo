@@ -23,7 +23,7 @@ export const AVAILABLE_LANGUAGES = [
 export const isE2EEnv = Config.IS_E2E || false
 export const CELO_VERIFIER_DOWNLOAD_LINK = 'https://celo.org/rewards'
 export const CELO_VERIFIER_START_MINING_LINK = 'celo://verifier/start'
-export const CELO_FAUCET_LINK = 'https://celo.org/build/wallet'
+export const CELO_FAUCET_LINK = 'https://celo.org/app'
 export const CELO_TERMS_LINK = 'https://celo.org/terms'
 
 export const DEFAULT_COUNTRY = Config.DEFAULT_COUNTRY || null
@@ -51,7 +51,7 @@ export const FIREBASE_ENABLED = stringToBoolean(Config.FIREBASE_ENABLED || 'true
 // We need to fallback to `integration` for testing under jest where
 // react-native-config is undefined.
 export const DEFAULT_TESTNET = Config.DEFAULT_TESTNET || 'integration'
-export const DEFAULT_INFURA_URL = `https://${DEFAULT_TESTNET}-infura.celo-testnet.org/`
+export const DEFAULT_FORNO_URL = `https://${DEFAULT_TESTNET}-forno.celo-testnet.org/`
 
 export const SEGMENT_API_KEY = keyOrUndefined(secretsFile, Config.SECRETS_KEY, 'SEGMENT_API_KEY')
 export const FIREBASE_WEB_KEY = keyOrUndefined(secretsFile, Config.SECRETS_KEY, 'FIREBASE_WEB_KEY')

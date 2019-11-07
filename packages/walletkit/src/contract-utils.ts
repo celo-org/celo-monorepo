@@ -347,8 +347,7 @@ export async function sendTransactionAsync<T>(
  * sendTransactionAsyncWithWeb3Signing is same as sendTransactionAsync except it fills
  * in the missing fields and locally signs the transaction. It will fail if the `from`
  * is not one of the account whose local signing keys are available. This method
- * should only be used in Zero sync (infura-like) mode where Geth is running
- * remotely.
+ * should only be used in forno mode where Geth is running remotely.
  *
  * This separate function is temporary and contractkit uses a unified function
  * for both web3 (local) and remote (geth) siging.
@@ -506,7 +505,7 @@ export async function sendTransactionAsyncWithWeb3Signing<T>(
         resolvers.transactionHash(recievedTxHash)
       }
     }
-    // This code is required for infura-like setup.
+    // This code is required for forno setup.
     // When mobile client directly connects to the remote full node then
     // it gets `receipt` but not other notifications.
     let sleepTimeInSecs = 1

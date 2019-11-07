@@ -4,6 +4,7 @@ import { getEscrowContract, getGoldTokenContract, getStableTokenContract } from 
 import BigNumber from 'bignumber.js'
 import { Linking, Platform } from 'react-native'
 import SendIntentAndroid from 'react-native-send-intent'
+import SendSMS from 'react-native-sms'
 import VersionCheck from 'react-native-version-check'
 import { call, delay, put, race, select, spawn, takeLeading } from 'redux-saga/effects'
 import { showError, showMessage } from 'src/alert/actions'
@@ -32,7 +33,7 @@ import { Screens } from 'src/navigator/Screens'
 import { waitWeb3LastBlock } from 'src/networkInfo/saga'
 import { getSendTxGas } from 'src/send/saga'
 import { fetchDollarBalance, transferStableToken } from 'src/stableToken/actions'
-import { createTransaction, fetchTokenBalanceWithRetry } from 'src/tokens/saga'
+import { createTransaction, fetchTokenBalanceInWeiWithRetry } from 'src/tokens/saga'
 import { generateStandbyTransactionId } from 'src/transactions/actions'
 import { waitForTransactionWithId } from 'src/transactions/saga'
 import { sendTransaction } from 'src/transactions/send'
@@ -99,11 +100,24 @@ async function sendSms(toPhone: string, msg: string) {
     try {
       if (Platform.OS === 'android') {
         SendIntentAndroid.sendSms(toPhone, msg)
+        resolve()
       } else {
-        // TODO
-        throw new Error('Implement sendSms using MFMessageComposeViewController on iOS')
+        // react-native-sms types are incorrect
+        // tslint:disable-next-line: no-floating-promises
+        SendSMS.send(
+          {
+            body: msg,
+            recipients: [toPhone],
+          },
+          (completed, cancelled, error) => {
+            if (!completed) {
+              reject(new Error(`Couldn't send sms: isCancelled: ${cancelled} isError: ${error}`))
+            } else {
+              resolve()
+            }
+          }
+        )
       }
-      resolve()
     } catch (e) {
       reject(e)
     }
@@ -220,8 +234,8 @@ export function* doRedeemInvite(inviteCode: string) {
     const tempAccount = web3.eth.accounts.privateKeyToAccount(inviteCode).address
     Logger.debug(`TAG@doRedeemInvite`, 'Invite code contains temp account', tempAccount)
     const tempAccountBalanceWei: BigNumber = yield call(
-      fetchTokenBalanceWithRetry,
-      getStableTokenContract,
+      fetchTokenBalanceInWeiWithRetry,
+      CURRENCY_ENUM.DOLLAR,
       tempAccount
     )
     if (tempAccountBalanceWei.isLessThanOrEqualTo(0)) {
@@ -230,17 +244,17 @@ export function* doRedeemInvite(inviteCode: string) {
     }
 
     const newAccount = yield call(getOrCreateAccount)
-    if (!newAccount) {
-      throw Error('Unable to create your account')
-    }
-
     yield call(addTempAccountToWallet, inviteCode)
     yield call(withdrawFundsFromTempAccount, tempAccount, tempAccountBalanceWei, newAccount)
     yield put(fetchDollarBalance())
     return true
   } catch (e) {
     Logger.error(TAG, 'Failed to redeem invite', e)
-    yield put(showError(ErrorMessages.REDEEM_INVITE_FAILED))
+    if (e.message in ErrorMessages) {
+      yield put(showError(e.message))
+    } else {
+      yield put(showError(ErrorMessages.REDEEM_INVITE_FAILED))
+    }
     return false
   }
 }
