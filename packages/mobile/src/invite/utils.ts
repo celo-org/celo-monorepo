@@ -52,7 +52,7 @@ interface ReferrerDataError {
   message: string
 }
 
-export const getInviteCodeFromReferrerData = async () => {
+export const getValidInviteCodeFromReferrerData = async () => {
   const referrerData: ReferrerData | ReferrerDataError = await RNInstallReferrer.getReferrer()
   Logger.info(
     'invite/utils/getInviteCodeFromReferrerData',
