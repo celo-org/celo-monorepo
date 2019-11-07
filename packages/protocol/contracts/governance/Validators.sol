@@ -385,6 +385,10 @@ contract Validators is
 
   /**
    * @notice Distributes epoch payments to `validator` and its group.
+   * @param validator The validator to distribute the epoch payment to.
+   * @param maxPayment The maximum payment to the validator. Actual payment is based on score and
+   *   group commission.
+   * @return The total payment paid to the validator and their group.
    */
   function distributeEpochPayment(
     address validator,
@@ -399,6 +403,10 @@ contract Validators is
 
   /**
    * @notice Distributes epoch payments to `validator` and its group.
+   * @param validator The validator to distribute the epoch payment to.
+   * @param maxPayment The maximum payment to the validator. Actual payment is based on score and
+   *   group commission.
+   * @return The total payment paid to the validator and their group.
    */
   function _distributeEpochPayment(
     address validator,
@@ -423,8 +431,9 @@ contract Validators is
       getStableToken().mint(group, groupPayment);
       getStableToken().mint(account, validatorPayment);
       return totalPayment.fromFixed();
+    } else {
+      return 0;
     }
-    return 0;
   }
 
   /**

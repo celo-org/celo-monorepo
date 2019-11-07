@@ -125,13 +125,11 @@ describe('governance tests', () => {
     return blockNumber % epochSize === 0
   }
 
-  const assertDifferenceCloseTo = (
-    current: BigNumber,
-    previous: BigNumber,
+  const assertAlmostEqual = (
+    actual: BigNumber,
     expected: BigNumber,
-    delta: BigNumber
+    delta: BigNumber = new BigNumber(10).pow(12).times(5)
   ) => {
-    const difference = current.minus(previous)
     if (expected.isZero()) {
       assert.equal(difference.toFixed(), expected.toFixed())
     } else {
@@ -139,7 +137,7 @@ describe('governance tests', () => {
         difference.plus(delta).gte(expected) || difference.minus(delta).lte(expected)
       assert(
         isCloseTo,
-        `expected ${expected.toString()} to be close to ${difference.toString()} +/- ${delta.toString()}`
+        `expected ${expected.toString()} to almost equal ${difference.toString()} +/- ${delta.toString()}`
       )
     }
   }
@@ -322,12 +320,7 @@ describe('governance tests', () => {
         )
         assert.isNotNaN(currentBalance)
         assert.isNotNaN(previousBalance)
-        assertDifferenceCloseTo(
-          currentBalance,
-          previousBalance,
-          expected,
-          new BigNumber(10).pow(12).times(5)
-        )
+        assertAlmostEqual(currentBalance.minus(previousBalance), expected)
       }
 
       const assertBalanceUnchanged = async (validator: string, blockNumber: number) => {
@@ -389,12 +382,7 @@ describe('governance tests', () => {
         const previousVotes = new BigNumber(
           await election.methods.getTotalVotesForGroup(group).call({}, blockNumber - 1)
         )
-        assertDifferenceCloseTo(
-          currentVotes,
-          previousVotes,
-          expected,
-          new BigNumber(10).pow(12).times(5)
-        )
+        assertAlmostEqual(currentVotes.minus(previousVotes), expected)
       }
 
       const assertGoldTokenTotalSupplyChanged = async (
@@ -407,12 +395,7 @@ describe('governance tests', () => {
         const previousSupply = new BigNumber(
           await goldToken.methods.totalSupply().call({}, blockNumber - 1)
         )
-        assertDifferenceCloseTo(
-          currentSupply,
-          previousSupply,
-          expected,
-          new BigNumber(10).pow(12).times(5)
-        )
+        assertAlmostEqual(currentSupply.minus(previousSupply), expected)
       }
 
       const assertBalanceChanged = async (
@@ -426,12 +409,7 @@ describe('governance tests', () => {
         const previousBalance = new BigNumber(
           await goldToken.methods.balanceOf(address).call({}, blockNumber - 1)
         )
-        assertDifferenceCloseTo(
-          currentBalance,
-          previousBalance,
-          expected,
-          new BigNumber(10).pow(12).times(5)
-        )
+        assertAlmostEqual(currentBalance.minus(previousBalance), expected)
       }
 
       const assertLockedGoldBalanceChanged = async (blockNumber: number, expected: BigNumber) => {

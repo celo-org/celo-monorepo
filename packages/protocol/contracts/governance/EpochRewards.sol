@@ -21,19 +21,33 @@ contract EpochRewards is Ownable, Initializable, UsingPrecompiles, UsingRegistry
   uint256 constant YEARS_LINEAR = 15;
   uint256 constant SECONDS_LINEAR = YEARS_LINEAR * 365 * 1 days;
 
+  // This struct governs how the rewards multiplier should deviate from 1.0 based on the ratio of
+  // supply remaining to target supply remaining.
   struct RewardsMultiplierAdjustmentFactors {
     FixidityLib.Fraction underspend;
     FixidityLib.Fraction overspend;
   }
 
+  // This struct governs the multiplier on the target rewards to give out in a given epoch due to
+  // potential deviations in the actual Gold total supply from the target total supply.
+  // In the case where the actual exceeds the target (i.e. the protocol has "overspent" with
+  // respect to epoch rewards and payments) the multiplier will be less than one.
+  // In the case where the actual is less than the target (i.e. the protocol has "underspent" with
+  // respect to epoch rewards and payments) the multiplier will be greater than one.
   struct RewardsMultiplierParameters {
     RewardsMultiplierAdjustmentFactors adjustmentFactors;
+    // The maximum rewards multiplier.
     FixidityLib.Fraction max;
   }
 
+  // This struct governs the target yield awarded to voters in validator elections.
   struct TargetVotingYieldParameters {
+    // The target yield awarded to users voting in validator elections.
     FixidityLib.Fraction target;
+    // Governs the adjustment of the target yield based on the deviation of the percentage of
+    // Gold voting in validator elections from the `targetVotingGoldFraction`.
     FixidityLib.Fraction adjustmentFactor;
+    // The maximum target yield awarded to users voting in validator elections.
     FixidityLib.Fraction max;
   }
 
@@ -228,6 +242,7 @@ contract EpochRewards is Ownable, Initializable, UsingPrecompiles, UsingRegistry
       return targetRewards.add(GENESIS_GOLD_SUPPLY);
     } else {
       // TODO(asa): Implement block reward calculation for years 15-30.
+      require(false);
       return 0;
     }
   }
