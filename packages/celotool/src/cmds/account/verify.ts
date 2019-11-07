@@ -125,7 +125,7 @@ async function requestAttestationsFromIssuers(
 ) {
   return concurrentMap(5, attestationsToReveal, async (attestation) => {
     try {
-      const response = await attestations.requestAttestationFromIssuer(
+      const response = await attestations.revealPhoneNumberToIssuer(
         phoneNumber,
         account,
         attestation.issuer,

@@ -371,7 +371,7 @@ export class AttestationsWrapper extends BaseWrapper<Attestations> {
     return toTransactionObject(this.kit, this.contract.methods.selectIssuers(phoneHash))
   }
 
-  async requestAttestationFromIssuer(
+  async revealPhoneNumberToIssuer(
     phoneNumber: string,
     account: Address,
     issuer: Address,
