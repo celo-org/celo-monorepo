@@ -661,6 +661,7 @@ contract Validators is
   function updateCommission(uint256 commission) external returns (bool) {
     address account = getAccounts().activeValidationSignerToAccount(msg.sender);
     require(isValidatorGroup(account));
+    ValidatorGroup storage group = groups[account];
     require(commission <= FixidityLib.fixed1().unwrap(), "Commission can't be greater than 100%");
     require(commission != group.commission.unwrap(), "Commission must be different");
     group.commission = FixidityLib.wrap(commission);
