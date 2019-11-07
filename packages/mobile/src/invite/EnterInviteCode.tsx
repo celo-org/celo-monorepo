@@ -212,9 +212,9 @@ export class EnterInviteCode extends React.Component<Props, State> {
         </ScrollView>
 
         <View>
-          <Text style={[styles.body, styles.askInviteContainer]}>
+          <Text style={styles.askInviteText}>
             {t('inviteCodeText.askForInvite.0', { testnet: _.startCase(DEFAULT_TESTNET) })}
-            <Text onPress={this.onPressGoToFaucet} style={styles.askInvite}>
+            <Text onPress={this.onPressGoToFaucet} style={styles.askInviteLink}>
               {t('inviteCodeText.askForInvite.1')}
             </Text>
           </Text>
@@ -270,15 +270,16 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     alignSelf: 'center',
   },
-  askInviteContainer: {
+  askInviteText: {
+    ...fontStyles.bodySmall,
+    textAlign: 'center',
+    alignSelf: 'center',
     marginVertical: 10,
     marginHorizontal: 20,
   },
-  askInvite: {
-    ...fontStyles.bodySmallBold,
-    ...fontStyles.linkInline,
-    fontSize: 12,
-    fontWeight: '300',
+  askInviteLink: {
+    ...fontStyles.bodySmall,
+    textDecorationLine: 'underline',
   },
   hint: {
     ...fontStyles.bodyXSmall,

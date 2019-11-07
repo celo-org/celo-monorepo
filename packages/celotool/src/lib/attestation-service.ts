@@ -31,6 +31,7 @@ function helmParameters() {
     `--set domain.name=${fetchEnv(envVar.CLUSTER_DOMAIN_NAME)}`,
     `--set celotool.image.repository=${fetchEnv('CELOTOOL_DOCKER_IMAGE_REPOSITORY')}`,
     `--set celotool.image.tag=${fetchEnv('CELOTOOL_DOCKER_IMAGE_TAG')}`,
+    `--set mnemonic="${fetchEnv(envVar.MNEMONIC)}"`,
     `--set attestation_service.image.repository=${fetchEnv(
       envVar.ATTESTATION_SERVICE_DOCKER_IMAGE_REPOSITORY
     )}`,
@@ -43,6 +44,10 @@ function helmParameters() {
     )}"`,
     `--set geth.validators="${fetchEnv(envVar.VALIDATORS)}"`,
     `--set domain.name=${fetchEnv(envVar.CLUSTER_DOMAIN_NAME)}`,
+    `--set global.postgresql.postgresqlDatabase=AttestationService`,
+    // TODO(nambrot): Hardcode for now, couldn't figure out how to make it work dynamically
+    // DB is exposed as ClusterIP service only
+    `--set global.postgresql.postgresqlPassword=password`,
   ]
 }
 
