@@ -1,21 +1,25 @@
-import { CeloContract, CeloToken } from '@celo/contractkit'
+import { CeloContract } from '@celo/contractkit'
 import { flags } from '@oclif/command'
 import BigNumber from 'bignumber.js'
 import { BaseCommand } from '../../base'
-import { displaySendTx, failWith } from '../../utils/cli'
+import { displaySendTx } from '../../utils/cli'
 import { Flags } from '../../utils/command'
 
 export default class ReportPrice extends BaseCommand {
   static description =
     'Report the price of Celo Gold in a specified token (currently just Celo Dollar, aka: "StableToken")'
 
+  static args = [
+    {
+      name: 'token',
+      required: true,
+      description: 'Token to report on',
+      options: [CeloContract.StableToken],
+    },
+  ]
   static flags = {
     ...BaseCommand.flags,
     from: Flags.address({ required: true, description: 'Address of the oracle account' }),
-    token: flags.string({
-      required: true,
-      description: 'The token to report on',
-    }),
     numerator: flags.string({
       required: true,
       description: 'Amount of the specified token equal to the amount of cGLD in the denominator',
@@ -33,13 +37,6 @@ export default class ReportPrice extends BaseCommand {
 
   async run() {
     const res = this.parse(ReportPrice)
-    let token: CeloToken
-    if (res.flags.token === CeloContract.StableToken) {
-      token = CeloContract.StableToken
-    } else {
-      return failWith(`${res.flags.token} is not a valid token to report on`)
-    }
-
     const sortedOracles = await this.kit.contracts.getSortedOracles()
     let numerator = new BigNumber(res.flags.numerator)
     let denominator = new BigNumber(res.flags.denominator || 1)
@@ -48,19 +45,20 @@ export default class ReportPrice extends BaseCommand {
       numerator = numerator.multipliedBy(multiplier)
       denominator = denominator.multipliedBy(multiplier)
     }
-    // const numerator = price.multipliedBy(denominator).toNumber()
 
     await displaySendTx(
       'sortedOracles.report',
       await sortedOracles.report(
-        token,
+        res.args.token,
         numerator.toNumber(),
         denominator.toNumber(),
         res.flags.from
       )
     )
     this.log(
-      `Reported oracle value of ${numerator.div(denominator).toNumber()} ${token} for 1 CeloGold`
+      `Reported oracle value of ${numerator.div(denominator).toNumber()} ${
+        res.args.token
+      } for 1 CeloGold`
     )
   }
 }

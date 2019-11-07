@@ -1,6 +1,6 @@
-import { CeloContract, CeloToken } from '@celo/contractkit'
+import { CeloContract } from '@celo/contractkit'
+import { cli } from 'cli-ux'
 import { BaseCommand } from '../../base'
-import { failWith } from '../../utils/cli'
 
 export default class GetRates extends BaseCommand {
   static description = 'Get the current set oracle-reported rates for the given token'
@@ -9,26 +9,25 @@ export default class GetRates extends BaseCommand {
     ...BaseCommand.flags,
   }
 
-  static args = [{ name: 'token', required: true, description: 'Token to get the rates for' }]
+  static args = [
+    {
+      name: 'token',
+      required: true,
+      description: 'Token to get the rates for',
+      options: [CeloContract.StableToken],
+    },
+  ]
 
   static example = ['rates StableToken']
 
   async run() {
-    const supportedTokens: CeloToken[] = [CeloContract.StableToken]
     const res = this.parse(GetRates)
-    if (!supportedTokens.includes(res.args.token)) {
-      return failWith(`${res.args.token} is not in the set of supported tokens: ${supportedTokens}`)
-    }
     const sortedOracles = await this.kit.contracts.getSortedOracles()
 
     const rates = await sortedOracles.getRates(res.args.token)
-    console.log(
-      rates.map((r) => {
-        return {
-          address: r.address,
-          rate: r.rate.toNumber(),
-        }
-      })
-    )
+    cli.table(rates, {
+      address: {},
+      rate: { get: (r) => r.rate.toNumber() },
+    })
   }
 }
