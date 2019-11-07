@@ -4,7 +4,7 @@ import { StyleSheet, View, ViewStyle } from 'react-native'
 import { H1 } from 'src/fonts/Fonts'
 import Responsive from 'src/shared/Responsive'
 import { colors, textStyles } from 'src/styles'
-
+import Fade from 'react-reveal/Fade'
 const words = ['universal', 'move', 'sustainable', 'connected', 'accessible']
 
 const textTransitionTime = 800
@@ -213,6 +213,7 @@ const styles = StyleSheet.create({
   textContainer: {
     flexDirection: 'column',
     alignItems: 'center',
+    paddingHorizontal: 20,
   },
   textContainerLarge: {
     flexDirection: 'row',

@@ -6,6 +6,7 @@ import { ScreenProps, ScreenSizes, withScreenSize } from 'src/layout/ScreenSize'
 import Responsive from 'src/shared/Responsive'
 import { HEADER_HEIGHT } from 'src/shared/Styles'
 import { standardStyles } from 'src/styles'
+import Fade from 'react-reveal/Fade'
 
 const Video = React.forwardRef((props, ref) => createElement('video', { ...props, ref }))
 const Source = (props) => createElement('source', props)
@@ -63,7 +64,7 @@ class HomeAnimation extends React.Component<Props & ScreenProps> {
   }
 
   render() {
-    if (this.props.mode === Mode.graphic) {
+    if (this.props.mode === Mode.graphic || this.props.mode === Mode.wait) {
       return (
         <Responsive large={[styles.still, standardStyles.centered]}>
           <View style={[styles.stillMobile]}>
@@ -97,12 +98,12 @@ export default withScreenSize(HomeAnimation)
 export const styles = StyleSheet.create({
   still: {
     height: 'calc(100% - 250px)',
+    justifyContent: 'center',
   },
   stillMobile: {
     height: '100%',
-    marginTop: HEADER_HEIGHT,
     paddingTop: 50,
-    justifyContent: 'flex-start',
+    justifyContent: 'center',
   },
   video: {
     height: '75vh',

@@ -11,7 +11,6 @@ interface Props {
   getRealHeight: (n: number) => void
 }
 
-// TODO get height dynamically
 export class BlueBanner extends React.PureComponent<Props> {
   ref = React.createRef<View>()
   componentDidUpdate = () => {
@@ -56,8 +55,8 @@ export const styles = StyleSheet.create({
     flex: 1,
   },
   slideDown: {
-    transitionProperty: 'height, top',
-    transitionDuration: '150ms',
+    transitionProperty: 'top',
+    transitionDuration: '300ms',
   },
   isVisible: {
     minHeight: BANNER_HEIGHT,

@@ -1,10 +1,7 @@
 import * as React from 'react'
 import { StyleSheet, Text, View } from 'react-native'
-import Fade from 'react-reveal/Fade'
-import { H1 } from 'src/fonts/Fonts'
 import EmailForm from 'src/forms/EmailForm'
 import HomeAnimation, { Mode, styles as animationStyles } from 'src/home/HomeAnimation'
-import HomeOracle from 'src/home/HomeOracle'
 import TextAnimation from 'src/home/TextAnimation'
 import { I18nProps, withNamespaces } from 'src/i18n'
 import Responsive from 'src/shared/Responsive'
@@ -41,51 +38,27 @@ class HomeCover extends React.PureComponent<Props, State> {
 
   render() {
     return (
-      <Responsive medium={styles.mediumCover}>
+      <Responsive large={styles.largeCover} medium={styles.mediumCover}>
         <View style={styles.smallCover}>
           <View style={styles.animationBackground}>
             <Responsive large={[styles.animationWrapper, styles.animationWrapperLargeAug]}>
               <View style={styles.animationWrapper}>
-                {this.state.mode === Mode.wait ? (
-                  <View style={animationStyles.still}>
-                    <noscript>
-                      <HomeOracle />
-                    </noscript>
-                  </View>
-                ) : (
-                  <HomeAnimation
-                    onLoaded={this.onLoaded}
-                    onFinished={this.onFinished}
-                    mode={this.state.mode}
-                  />
-                )}
+                <HomeAnimation
+                  onLoaded={this.onLoaded}
+                  onFinished={this.onFinished}
+                  mode={this.state.mode}
+                />
               </View>
             </Responsive>
           </View>
-          <Responsive medium={styles.largeTextHolder}>
+          <Responsive large={styles.largeTextHolder}>
             <View style={styles.textHolder}>
               <Responsive large={[styles.textWrapper, styles.largeTextWrapper]}>
                 <View style={styles.textWrapper}>
-                  <Fade bottom={true} distance="20px">
-                    {this.state.mode === Mode.wait ? (
-                      <noscript>
-                        <H1
-                          ariaLevel={'2'}
-                          accessibilityRole={'heading'}
-                          style={[styles.white, styles.letsMake]}
-                        >
-                          Money that serves everyone
-                        </H1>
-                      </noscript>
-                    ) : (
-                      <Fade>
-                        <TextAnimation
-                          playing={this.state.playing}
-                          stillMode={this.state.mode === Mode.graphic}
-                        />
-                      </Fade>
-                    )}
-                  </Fade>
+                  <TextAnimation
+                    playing={this.state.playing}
+                    stillMode={this.state.mode === Mode.graphic || this.state.mode === Mode.wait}
+                  />
                   <Responsive
                     large={styles.content}
                     medium={[styles.contentTablet, standardStyles.sectionMarginBottomTablet]}
@@ -136,6 +109,7 @@ const styles = StyleSheet.create({
   },
   smallCover: {
     minHeight: 600,
+    marginTop: HEADER_HEIGHT,
     height: '100vh',
     maxHeight: 800,
     flex: 1,
@@ -143,6 +117,15 @@ const styles = StyleSheet.create({
     backgroundColor: colors.dark,
   },
   mediumCover: {
+    minHeight: 600,
+    paddingTop: BANNER_HEIGHT,
+    marginTop: HEADER_HEIGHT,
+    height: 'max-contents',
+    maxHeight: '100vh',
+    justifyContent: 'flex-end',
+    backgroundColor: colors.dark,
+  },
+  largeCover: {
     paddingTop: HEADER_HEIGHT + BANNER_HEIGHT,
     minHeight: '100vh',
     height: '100vh',
@@ -182,13 +165,8 @@ const styles = StyleSheet.create({
     color: colors.white,
   },
   textHolder: {
-    // position: 'absolute',
-    // top: 0,
-    // left: 0,
-    // right: 0,
-    // bottom: 0,
-    // justifyContent: 'flex-end',
-    // flexDirection: 'column',
+    flex: 1,
+    height: 'contents',
   },
   textWrapper: {
     flexDirection: 'column',
@@ -223,7 +201,6 @@ const styles = StyleSheet.create({
   },
   animationBackground: {
     flex: 1,
-    marginTop: HEADER_HEIGHT,
     flexDirection: 'column',
     alignItems: 'stretch',
     justifyContent: 'center',

@@ -76,8 +76,8 @@ export default React.memo(function HomeOracle() {
       />
       <defs>
         <linearGradient id="i" x1="553" x2="553" y1="9" y2="93" gradientUnits="userSpaceOnUse">
-          <stop stop-color="#D8C0FF" offset="0" />
-          <stop stop-color="#D8C0FF" stop-opacity="0" offset="1" />
+          <stop stopColor="#D8C0FF" offset="0" />
+          <stop stopColor="#D8C0FF" stopOpacity="0" offset="1" />
         </linearGradient>
         <linearGradient
           id="h"
@@ -87,9 +87,9 @@ export default React.memo(function HomeOracle() {
           y2="176.62"
           gradientUnits="userSpaceOnUse"
         >
-          <stop stop-color="#D8C0FF" stop-opacity="0" offset=".23204" />
-          <stop stop-color="#AE7CFF" offset=".54696" />
-          <stop stop-color="#D8C0FF" stop-opacity="0" offset=".85083" />
+          <stop stopColor="#D8C0FF" stopOpacity="0" offset=".23204" />
+          <stop stopColor="#AE7CFF" offset=".54696" />
+          <stop stopColor="#D8C0FF" stopOpacity="0" offset=".85083" />
         </linearGradient>
         <radialGradient
           id="g"
@@ -99,13 +99,13 @@ export default React.memo(function HomeOracle() {
           gradientTransform="translate(552.95 177.62) rotate(89.947) scale(51.383 744.22)"
           gradientUnits="userSpaceOnUse"
         >
-          <stop stop-color="#FFBC6F" offset=".23958" />
-          <stop stop-color="#FFBC6F" stop-opacity="0" offset=".65104" />
+          <stop stopColor="#FFBC6F" offset=".23958" />
+          <stop stopColor="#FFBC6F" stopOpacity="0" offset=".65104" />
         </radialGradient>
         <linearGradient id="f" x1="1103" x2="3" y1="229" y2="229" gradientUnits="userSpaceOnUse">
-          <stop stop-color="#FFBC6F" stop-opacity="0" offset=".088398" />
-          <stop stop-color="#FFBC6F" offset=".51381" />
-          <stop stop-color="#FFBC6F" stop-opacity="0" offset=".87293" />
+          <stop stopColor="#FFBC6F" stopOpacity="0" offset=".088398" />
+          <stop stopColor="#FFBC6F" offset=".51381" />
+          <stop stopColor="#FFBC6F" stopOpacity="0" offset=".87293" />
         </linearGradient>
         <radialGradient
           id="e"
@@ -115,8 +115,8 @@ export default React.memo(function HomeOracle() {
           gradientTransform="translate(553 176.62) rotate(90) scale(96.907 550)"
           gradientUnits="userSpaceOnUse"
         >
-          <stop stop-color="#FF9082" offset="0" />
-          <stop stop-color="#FF9082" stop-opacity="0" offset="1" />
+          <stop stopColor="#FF9082" offset="0" />
+          <stop stopColor="#FF9082" stopOpacity="0" offset="1" />
         </radialGradient>
         <linearGradient
           id="d"
@@ -126,9 +126,9 @@ export default React.memo(function HomeOracle() {
           y2="273.52"
           gradientUnits="userSpaceOnUse"
         >
-          <stop stop-color="#FF9082" stop-opacity="0" offset=".18784" />
-          <stop stop-color="#FF9082" offset=".58011" />
-          <stop stop-color="#FF9082" stop-opacity="0" offset=".87845" />
+          <stop stopColor="#FF9082" stopOpacity="0" offset=".18784" />
+          <stop stopColor="#FF9082" offset=".58011" />
+          <stop stopColor="#FF9082" stopOpacity="0" offset=".87845" />
         </linearGradient>
         <radialGradient
           id="c"
@@ -138,8 +138,8 @@ export default React.memo(function HomeOracle() {
           gradientTransform="translate(551 176.62) rotate(90) scale(96.907)"
           gradientUnits="userSpaceOnUse"
         >
-          <stop stop-color="#89E2FF" offset="0" />
-          <stop stop-color="#89E2FF" stop-opacity="0" offset="1" />
+          <stop stopColor="#89E2FF" offset="0" />
+          <stop stopColor="#89E2FF" stopOpacity="0" offset="1" />
         </radialGradient>
         <linearGradient
           id="b"
@@ -149,9 +149,9 @@ export default React.memo(function HomeOracle() {
           y2="273.52"
           gradientUnits="userSpaceOnUse"
         >
-          <stop stop-color="#89E2FF" stop-opacity="0" offset=".18784" />
-          <stop stop-color="#89E2FF" offset=".49883" />
-          <stop stop-color="#89E2FF" stop-opacity="0" offset=".87845" />
+          <stop stopColor="#89E2FF" stopOpacity="0" offset=".18784" />
+          <stop stopColor="#89E2FF" offset=".49883" />
+          <stop stopColor="#89E2FF" stopOpacity="0" offset=".87845" />
         </linearGradient>
         <linearGradient
           id="a"
@@ -161,9 +161,9 @@ export default React.memo(function HomeOracle() {
           y2="176.62"
           gradientUnits="userSpaceOnUse"
         >
-          <stop stop-color="#35D07F" stop-opacity="0" offset=".14917" />
-          <stop stop-color="#35D07F" offset=".70312" />
-          <stop stop-color="#35D07F" stop-opacity="0" offset=".84896" />
+          <stop stopColor="#35D07F" stopOpacity="0" offset=".14917" />
+          <stop stopColor="#35D07F" offset=".70312" />
+          <stop stopColor="#35D07F" stopOpacity="0" offset=".84896" />
         </linearGradient>
       </defs>
     </Svg>
