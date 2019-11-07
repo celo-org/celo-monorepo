@@ -104,6 +104,7 @@ Object.keys(timings).forEach((key) => {
 
 interface Props {
   playing: boolean
+  stillMode: boolean
 }
 
 interface State {
@@ -120,7 +121,7 @@ class TextAnimation extends React.PureComponent<Props, State> {
   timeout: number
 
   componentDidUpdate(prevProps: Props) {
-    if (!prevProps.playing && this.props.playing) {
+    if (!prevProps.playing && this.props.playing && !this.props.stillMode) {
       this.startAnimation()
     }
   }
@@ -162,25 +163,41 @@ class TextAnimation extends React.PureComponent<Props, State> {
     return (
       <Responsive large={[styles.textContainer, styles.textContainerLarge]}>
         <View style={styles.textContainer}>
-          <H1 ariaLevel={'2'} accessibilityRole={'heading'} style={[styles.white, styles.letsMake]}>
-            Let's make money{' '}
-          </H1>
-          <View>
-            <>
-              <View style={[styles.mask, fadeOut]} key={`${this.state.currentWord}-mask1`} />
-              {!this.state.initial && (
-                <View style={[styles.mask2, fadeIn]} key={`${this.state.currentWord}-mask2`} />
-              )}
-            </>
-
+          {this.props.stillMode ? (
             <H1
               ariaLevel={'2'}
               accessibilityRole={'heading'}
-              style={[styles.white, textStyles.heavy, textStyles.center]}
+              style={[styles.white, styles.letsMake]}
             >
-              {words[this.state.currentWord]}
+              Money that serves everyone
             </H1>
-          </View>
+          ) : (
+            <>
+              <H1
+                ariaLevel={'2'}
+                accessibilityRole={'heading'}
+                style={[styles.white, styles.letsMake]}
+              >
+                Let's make money{' '}
+              </H1>
+              <View>
+                <>
+                  <View style={[styles.mask, fadeOut]} key={`${this.state.currentWord}-mask1`} />
+                  {!this.state.initial && (
+                    <View style={[styles.mask2, fadeIn]} key={`${this.state.currentWord}-mask2`} />
+                  )}
+                </>
+
+                <H1
+                  ariaLevel={'2'}
+                  accessibilityRole={'heading'}
+                  style={[styles.white, textStyles.heavy, textStyles.center]}
+                >
+                  {words[this.state.currentWord]}
+                </H1>
+              </View>
+            </>
+          )}
         </View>
       </Responsive>
     )

@@ -2,34 +2,27 @@ import * as React from 'react'
 import { StyleSheet, Text, View } from 'react-native'
 import Fade from 'react-reveal/Fade'
 import EmailForm from 'src/forms/EmailForm'
-import dynamic from 'next/dynamic'
-// const HomeAnimation = dynamic((import('src/home/HomeAnimation') as unknown) as Promise<
-//   React.ComponentType<any>
-// >)
-// TODO import props rather than any
-const TextAnimation = dynamic((import('src/home/TextAnimation') as unknown) as Promise<
-  React.ComponentType<any>
->)
-import { H1 } from 'src/fonts/Fonts'
+import HomeAnimation, { Mode, styles as animationStyles } from 'src/home/HomeAnimation'
+import TextAnimation from 'src/home/TextAnimation'
 import { I18nProps, withNamespaces } from 'src/i18n'
 import Responsive from 'src/shared/Responsive'
-import { HEADER_HEIGHT, MENU_MAX_WIDTH } from 'src/shared/Styles'
-import { colors, fonts, standardStyles, textStyles } from 'src/styles'
-import HomeOracle from 'src/home/HomeOracle'
 
+import { BANNER_HEIGHT, HEADER_HEIGHT, MENU_MAX_WIDTH } from 'src/shared/Styles'
+import { colors, fonts, standardStyles, textStyles } from 'src/styles'
+import { hasGoodConnection } from 'src/utils/utils'
 type Props = I18nProps
 
 const ANIMATION_DURATION = 5
 
-function After({ t }) {
-  return (
-    <Text style={[fonts.h5, textStyles.center, styles.foreground]}>{t('stayConnectedThanks')}</Text>
-  )
+interface State {
+  playing: boolean
+  mode: Mode
 }
 
-class HomeCover extends React.PureComponent<Props> {
+class HomeCover extends React.PureComponent<Props, State> {
   state = {
     playing: false,
+    mode: Mode.wait,
   }
 
   onLoaded = () => {
@@ -40,6 +33,11 @@ class HomeCover extends React.PureComponent<Props> {
     this.setState({ playing: false })
   }
 
+  componentDidMount = async () => {
+    const goodConnection = await hasGoodConnection()
+    this.setState({ mode: Mode.graphic })
+  }
+
   render() {
     return (
       <Responsive medium={styles.mediumCover}>
@@ -47,45 +45,56 @@ class HomeCover extends React.PureComponent<Props> {
           <View style={styles.animationBackground}>
             <Responsive large={[styles.animationWrapper, styles.animationWrapperLargeAug]}>
               <View style={styles.animationWrapper}>
-                <HomeOracle />
-                {/* <HomeAnimation onLoaded={this.onLoaded} onFinished={this.onFinished} /> */}
+                {this.state.mode === Mode.wait ? (
+                  <View style={animationStyles.video} />
+                ) : (
+                  <HomeAnimation
+                    onLoaded={this.onLoaded}
+                    onFinished={this.onFinished}
+                    mode={this.state.mode}
+                  />
+                )}
               </View>
             </Responsive>
           </View>
-          <View style={styles.textHolder}>
-            <Responsive large={[styles.textWrapper, styles.largeTextWrapper]}>
-              <View style={styles.textWrapper}>
-                <Fade bottom={true} distance="20px">
-                  <H1
-                    ariaLevel={'2'}
-                    accessibilityRole={'heading'}
-                    style={[styles.white, styles.stillText]}
+          <Responsive medium={styles.largeTextHolder}>
+            <View style={styles.textHolder}>
+              <Responsive large={[styles.textWrapper, styles.largeTextWrapper]}>
+                <View style={styles.textWrapper}>
+                  <Fade bottom={true} distance="20px">
+                    {this.state.mode === Mode.wait ? (
+                      <View />
+                    ) : (
+                      <Fade>
+                        <TextAnimation
+                          playing={this.state.playing}
+                          stillMode={this.state.mode === Mode.graphic}
+                        />
+                      </Fade>
+                    )}
+                  </Fade>
+                  <Responsive
+                    large={styles.content}
+                    medium={[styles.contentTablet, standardStyles.sectionMarginBottomTablet]}
                   >
-                    Money that serves everyone
-                  </H1>
-                  {/* <TextAnimation playing={this.state.playing} /> */}
-                </Fade>
-                <Responsive
-                  large={styles.content}
-                  medium={[styles.contentTablet, standardStyles.sectionMarginBottomTablet]}
-                >
-                  <View style={styles.contentMobile}>
-                    <View style={styles.form}>
-                      <Text style={[fonts.navigation, styles.foreground]}>
-                        {this.props.t('stayConnected')}
-                      </Text>
-                      <EmailForm
-                        submitText={'Sign Up'}
-                        route={'/contacts'}
-                        whenComplete={<After t={this.props.t} />}
-                        isDarkMode={true}
-                      />
+                    <View style={styles.contentMobile}>
+                      <View style={styles.form}>
+                        <Text style={[fonts.navigation, styles.foreground]}>
+                          {this.props.t('stayConnected')}
+                        </Text>
+                        <EmailForm
+                          submitText={'Sign Up'}
+                          route={'/contacts'}
+                          whenComplete={<After t={this.props.t} />}
+                          isDarkMode={true}
+                        />
+                      </View>
                     </View>
-                  </View>
-                </Responsive>
-              </View>
-            </Responsive>
-          </View>
+                  </Responsive>
+                </View>
+              </Responsive>
+            </View>
+          </Responsive>
         </View>
       </Responsive>
     )
@@ -94,13 +103,16 @@ class HomeCover extends React.PureComponent<Props> {
 
 export default withNamespaces('home')(HomeCover)
 
+function After({ t }) {
+  return (
+    <Text style={[fonts.h5, textStyles.center, styles.foreground]}>{t('stayConnectedThanks')}</Text>
+  )
+}
+
 const styles = StyleSheet.create({
-  oracleGraphic: {
-    marginTop: HEADER_HEIGHT,
-  },
   animationWrapper: {
     flex: 1,
-    maxWidth: MENU_MAX_WIDTH,
+    height: '100%',
     justifyContent: 'center',
   },
   animationWrapperLargeAug: {
@@ -112,13 +124,16 @@ const styles = StyleSheet.create({
   smallCover: {
     minHeight: 600,
     height: '100vh',
-    maxHeight: 700,
+    maxHeight: 800,
     flex: 1,
     justifyContent: 'flex-end',
     backgroundColor: colors.dark,
   },
   mediumCover: {
+    paddingTop: HEADER_HEIGHT + BANNER_HEIGHT,
+    minHeight: '100vh',
     height: '100vh',
+    maxHeight: '100vh',
     flex: 1,
     justifyContent: 'flex-end',
     backgroundColor: colors.dark,
@@ -154,13 +169,13 @@ const styles = StyleSheet.create({
     color: colors.white,
   },
   textHolder: {
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    right: 0,
-    bottom: 0,
-    justifyContent: 'flex-end',
-    flexDirection: 'column',
+    // position: 'absolute',
+    // top: 0,
+    // left: 0,
+    // right: 0,
+    // bottom: 0,
+    // justifyContent: 'flex-end',
+    // flexDirection: 'column',
   },
   textWrapper: {
     flexDirection: 'column',

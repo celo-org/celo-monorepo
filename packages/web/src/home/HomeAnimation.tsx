@@ -1,15 +1,23 @@
 import * as React from 'react'
-import { StyleSheet } from 'react-native'
+import { StyleSheet, View } from 'react-native'
 import { createElement } from 'react-native-web'
+import HomeOracle from 'src/home/HomeOracle'
 import { ScreenProps, ScreenSizes, withScreenSize } from 'src/layout/ScreenSize'
 import Responsive from 'src/shared/Responsive'
 import { HEADER_HEIGHT } from 'src/shared/Styles'
+import { standardStyles } from 'src/styles'
+
 const Video = React.forwardRef((props, ref) => createElement('video', { ...props, ref }))
 const Source = (props) => createElement('source', props)
-
-interface Props {
+export interface Props {
+  mode: Mode
   onLoaded: () => void
   onFinished: () => void
+}
+export enum Mode {
+  'wait',
+  'video',
+  'graphic',
 }
 
 class HomeAnimation extends React.Component<Props & ScreenProps> {
@@ -55,6 +63,16 @@ class HomeAnimation extends React.Component<Props & ScreenProps> {
   }
 
   render() {
+    if (this.props.mode === Mode.graphic) {
+      return (
+        <Responsive large={[styles.still, standardStyles.centered]}>
+          <View style={[styles.stillMobile]}>
+            <HomeOracle />
+          </View>
+        </Responsive>
+      )
+    }
+
     return (
       <Responsive large={styles.video}>
         {/*
@@ -75,7 +93,15 @@ class HomeAnimation extends React.Component<Props & ScreenProps> {
 
 export default withScreenSize(HomeAnimation)
 
-const styles = StyleSheet.create({
+export const styles = StyleSheet.create({
+  still: {
+    height: 'calc(100% - 250px)',
+  },
+  stillMobile: {
+    height: '100%',
+    marginTop: HEADER_HEIGHT,
+    justifyContent: 'flex-start',
+  },
   video: {
     height: '80vh',
     width: '100vw',
@@ -84,7 +110,5 @@ const styles = StyleSheet.create({
   videoMedium: {
     width: '100vw',
     objectFit: 'contain',
-    marginBottom: 400,
-    marginTop: HEADER_HEIGHT,
   },
 })

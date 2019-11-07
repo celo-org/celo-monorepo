@@ -1,6 +1,7 @@
 import * as React from 'react'
 import Svg from 'svgs'
 import { Path, G } from 'src/shared/svg'
+
 export default React.memo(function HomeOracle() {
   return (
     <Svg fill="none" viewBox="0 0 1104 275">
@@ -14,7 +15,7 @@ export default React.memo(function HomeOracle() {
           <Path
             d="m3 176.62s129.42-167.62 550-167.62 550 167.62 550 167.62"
             stroke="url(#h)"
-            stroke-miterlimit="10"
+            strokeMiterlimit="10"
           />
         </G>
         <G style={{ mixedBlendMode: 'screen' }}>
@@ -26,7 +27,7 @@ export default React.memo(function HomeOracle() {
           <Path
             d="m3 177.62s57.029-51.554 181.85-51.554c124.82 0 240.25 103.11 363.84 103.11s270.07-103.11 394.89-103.11c59.495 0 109.7 26.419 159.34 50.937"
             stroke="url(#f)"
-            stroke-miterlimit="10"
+            strokeMiterlimit="10"
           />
         </G>
         <Path
@@ -37,7 +38,7 @@ export default React.memo(function HomeOracle() {
         <Path
           d="m3 176.62s79.689 96.908 275 96.908c195.31 0 358.72-193.81 550-193.81 191.28 0 275 96.907 275 96.907"
           stroke="url(#d)"
-          stroke-miterlimit="10"
+          strokeMiterlimit="10"
           strokeOpacity=".9"
         />
         <Path
@@ -48,10 +49,10 @@ export default React.memo(function HomeOracle() {
         <Path
           d="m1101 176.62s-79.69 96.908-275 96.908c-195.31 0-358.72-193.81-550-193.81-191.28 0-275 96.907-275 96.907"
           stroke="url(#b)"
-          stroke-miterlimit="10"
+          strokeMiterlimit="10"
           strokeOpacity=".9"
         />
-        <Path d="m3 176.62h1100" stroke="url(#a)" stroke-miterlimit="10" strokeOpacity=".4" />
+        <Path d="m3 176.62h1100" stroke="url(#a)" strokeMiterlimit="10" strokeOpacity=".4" />
       </G>
       <Path
         d="m835.3 177.14c0.581-2.856 1.888-5.47 3.535-7.455 1.646-1.985 3.632-3.34 5.665-3.631 0.194-0.048 0.388-0.048 0.533-0.048 1.743-0.097 3.341 0.532 4.504 1.839 1.694 1.84 2.324 4.793 1.743 8.085-0.969 5.664-4.988 10.408-9.298 11.135-1.937 0.29-3.728-0.291-5.036-1.646-1.743-1.937-2.373-4.938-1.646-8.279z"

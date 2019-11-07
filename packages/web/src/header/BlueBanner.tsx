@@ -10,6 +10,7 @@ interface Props {
   isVisible: boolean
 }
 
+// TODO get height dynamically
 export class BlueBanner extends React.PureComponent<Props> {
   render() {
     return (
