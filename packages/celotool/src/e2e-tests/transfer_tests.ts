@@ -660,7 +660,7 @@ describe('Transfer tests', function(this: any) {
     }
   })
 
-  describe.only('Transfer with Demurrage >', () => {
+  describe('Transfer with Demurrage >', () => {
     let inflationManager: InflationManager
 
     before(async () => {
