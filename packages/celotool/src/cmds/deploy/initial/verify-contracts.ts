@@ -10,21 +10,14 @@ export const command = 'verify-contracts'
 export const describe = 'verify the celo smart contracts in blockscout'
 
 export const builder = (argv: yargs.Argv) => {
-  return argv
-    .option('skipClusterSetup', {
-      type: 'boolean',
-      description: 'If you know that you can skip the cluster setup',
-      default: false,
-    })
-    .option('contract', {
-      type: 'string',
-      description: 'Contract name if only one contract want to be verified',
-      default: 'all',
-    })
+  return argv.option('contract', {
+    type: 'string',
+    description: 'Contract name if only one contract want to be verified',
+    default: 'all',
+  })
 }
 
 interface VerifyContractsInitialArgv extends InitialArgv {
-  skipClusterSetup: boolean
   contract: string
 }
 
