@@ -13,8 +13,7 @@ import SafeAreaView from 'react-native-safe-area-view'
 import { connect } from 'react-redux'
 import componentWithAnalytics from 'src/analytics/wrapper'
 import { Namespaces } from 'src/i18n'
-import { setHasSeenVerificationNux } from 'src/identity/actions'
-import { startVerification } from 'src/identity/verification'
+import { setHasSeenVerificationNux, startVerification } from 'src/identity/actions'
 import { nuxNavigationOptions } from 'src/navigator/Headers'
 import { navigate } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
@@ -31,7 +30,7 @@ interface State {
 }
 
 const mapDispatchToProps = {
-  startVerification,
+  startVerification, //TODO remove
   setHasSeenVerificationNux,
 }
 
@@ -48,7 +47,6 @@ class VerificationEducationScreen extends React.Component<Props, State> {
 
   onPressStart = () => {
     this.props.setHasSeenVerificationNux(true)
-    this.props.startVerification()
     navigate(Screens.VerificationLoadingScreen)
   }
 

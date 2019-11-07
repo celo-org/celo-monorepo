@@ -9,16 +9,17 @@ import { extractAttestationCodeFromMessage } from '@celo/walletkit'
 import dotProp from 'dot-prop-immutable'
 import * as React from 'react'
 import { withNamespaces, WithNamespaces } from 'react-i18next'
-import { ScrollView, StyleSheet, Text, View } from 'react-native'
+import { BackHandler, ScrollView, StyleSheet, Text, View } from 'react-native'
 import Modal from 'react-native-modal'
 import SafeAreaView from 'react-native-safe-area-view'
 import { connect } from 'react-redux'
 import componentWithAnalytics from 'src/analytics/wrapper'
+import CancelButton from 'src/components/CancelButton'
 import DevSkipButton from 'src/components/DevSkipButton'
 import { Namespaces } from 'src/i18n'
 import LoadingSpinner from 'src/icons/LoadingSpinner'
 import { cancelVerification, receiveAttestationMessage } from 'src/identity/actions'
-import { AttestationCode, VerificationStatus } from 'src/identity/verification'
+import { AttestationCode, CodeInputType, VerificationStatus } from 'src/identity/verification'
 import { navigate } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
 import { RootState } from 'src/redux/reducers'
@@ -62,8 +63,6 @@ const mapStateToProps = (state: RootState): StateProps => {
 class VerificationInputScreen extends React.Component<Props, State> {
   static navigationOptions = { header: null }
 
-  //TODO handle back buttons
-
   interval: number | undefined
 
   state: State = {
@@ -83,12 +82,28 @@ class VerificationInputScreen extends React.Component<Props, State> {
   }
 
   componentWillUnmount() {
+    BackHandler.removeEventListener('hardwareBackPress', this.handleBackButton)
     clearInterval(this.interval)
+  }
+
+  handleBackButton() {
+    // Cancel verification when user presses back button on this screen
+    this.onCancel()
+    return true
+  }
+
+  onCancel = () => {
+    this.props.cancelVerification()
+    navigate(Screens.VerificationEducationScreen)
   }
 
   onChangeInputCode = (index: number) => {
     return (value: string) => {
+      //TODO test this with typing codes
       this.setState(dotProp.set(this.state, `codeInputValues.${index}`, value))
+      if (extractAttestationCodeFromMessage(value)) {
+        this.props.receiveAttestationMessage(value, CodeInputType.MANUAL)
+      }
     }
   }
 
@@ -111,10 +126,13 @@ class VerificationInputScreen extends React.Component<Props, State> {
 
   render() {
     const { codeInputValues, isModalVisible, timer } = this.state
-    const { t } = this.props
+    const { t, attestationCodes, numCompleteAttestations } = this.props
 
     return (
       <SafeAreaView style={styles.container}>
+        <View style={styles.buttonCancelContainer}>
+          <CancelButton onCancel={this.onCancel} />
+        </View>
         <ScrollView
           contentContainerStyle={styles.scrollContainer}
           keyboardShouldPersistTaps={'always'}
@@ -131,29 +149,47 @@ class VerificationInputScreen extends React.Component<Props, State> {
             {t('input.body2')}
           </Text>
           <Text style={styles.codeHeader}>{t('input.codeHeader1')}</Text>
-          <CodeInput
-            value={codeInputValues[0]}
-            placeholder={'<#> m9oASm/3g7aZ...'}
-            shouldShowClipboard={this.shouldShowClipboard}
-            onChangeText={this.onChangeInputCode(0)}
-            style={styles.codeInput}
-          />
+          {attestationCodes[0] ? (
+            <CodeInput
+              value={codeInputValues[0]}
+              placeholder={'<#> m9oASm/3g7aZ...'}
+              shouldShowClipboard={this.shouldShowClipboard}
+              onChangeText={this.onChangeInputCode(0)}
+              style={styles.codeInput}
+            />
+          ) : (
+            <View>
+              <Text>{attestationCodes[0]}</Text>
+            </View>
+          )}
           <Text style={styles.codeHeader}>{t('input.codeHeader2')}</Text>
-          <CodeInput
-            value={codeInputValues[1]}
-            placeholder={'<#> m9oASm/3g7aZ...'}
-            shouldShowClipboard={this.shouldShowClipboard}
-            onChangeText={this.onChangeInputCode(1)}
-            style={styles.codeInput}
-          />
+          {attestationCodes[1] ? (
+            <CodeInput
+              value={codeInputValues[1]}
+              placeholder={'<#> m9oASm/3g7aZ...'}
+              shouldShowClipboard={this.shouldShowClipboard}
+              onChangeText={this.onChangeInputCode(1)}
+              style={styles.codeInput}
+            />
+          ) : (
+            <View>
+              <Text>{attestationCodes[1]}</Text>
+            </View>
+          )}
           <Text style={styles.codeHeader}>{t('input.codeHeader3')}</Text>
-          <CodeInput
-            value={codeInputValues[2]}
-            placeholder={'<#> m9oASm/3g7aZ...'}
-            shouldShowClipboard={this.shouldShowClipboard}
-            onChangeText={this.onChangeInputCode(2)}
-            style={styles.codeInput}
-          />
+          {attestationCodes[2] ? (
+            <CodeInput
+              value={codeInputValues[2]}
+              placeholder={'<#> m9oASm/3g7aZ...'}
+              shouldShowClipboard={this.shouldShowClipboard}
+              onChangeText={this.onChangeInputCode(2)}
+              style={styles.codeInput}
+            />
+          ) : (
+            <View>
+              <Text>{attestationCodes[2]}</Text>
+            </View>
+          )}
           <Link style={styles.missingCodesLink} onPress={this.onPressCodesNotReceived}>
             {t('input.codesMissing')}
           </Link>
@@ -195,6 +231,12 @@ const styles = StyleSheet.create({
     flex: 1,
     padding: 30,
     paddingTop: 0,
+  },
+  buttonCancelContainer: {
+    position: 'absolute',
+    top: 10,
+    left: 5,
+    zIndex: 10,
   },
   iconContainer: {
     alignItems: 'center',

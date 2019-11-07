@@ -3,7 +3,7 @@ import colors from '@celo/react-components/styles/colors'
 import fontStyles from '@celo/react-components/styles/fonts'
 import * as React from 'react'
 import { withNamespaces, WithNamespaces } from 'react-i18next'
-import { ScrollView, StyleSheet, Text, View } from 'react-native'
+import { BackHandler, ScrollView, StyleSheet, Text, View } from 'react-native'
 import SafeAreaView from 'react-native-safe-area-view'
 import { isE2EEnv } from 'src/config'
 import { Namespaces } from 'src/i18n'
@@ -20,12 +20,21 @@ const AnimatedCircle = () => (
 
 class VerificationInterstitialScreen extends React.Component<WithNamespaces> {
   static navigationOptions = null
-  //TODO handle back buttons
 
   componentDidMount() {
+    BackHandler.addEventListener('hardwareBackPress', this.handleBackButton)
     setTimeout(() => {
       navigate(Screens.VerificationInputScreen)
     }, SCREEN_DUARTION)
+  }
+
+  componentWillUnmount() {
+    BackHandler.removeEventListener('hardwareBackPress', this.handleBackButton)
+  }
+
+  handleBackButton() {
+    // Prevent back button navigation for this screen
+    return true
   }
 
   render() {
