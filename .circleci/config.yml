@@ -448,10 +448,12 @@ jobs:
       - attach_workspace:
           at: ~/app
       - run:
-          name: Test
+          name: Generate DevChain
           command: |
-            set -euo pipefail
-            yarn --cwd=packages/cli test
+            (cd packages/cli && yarn test:reset)          
+      - run:
+          name: Run Tests
+          command: yarn --cwd=packages/cli test
       - run:
           name: Fail if someone forgot to commit CLI docs
           command: |
