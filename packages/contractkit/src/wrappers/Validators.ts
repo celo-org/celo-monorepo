@@ -183,12 +183,12 @@ export class ValidatorsWrapper extends BaseWrapper<Validators> {
     const validators = await this.getRegisteredValidators()
     const affiliates = validators
       .filter((v) => v.affiliation == address)
-      .filter((v) => !res[0].includes(v))
+      .filter((v) => !res[0].includes(v.address))
     return {
       address,
       members: res[0],
       commission: fromFixed(new BigNumber(res[1])),
-      affiliates,
+      affiliates: affiliates.map((v) => v.address),
     }
   }
 }
