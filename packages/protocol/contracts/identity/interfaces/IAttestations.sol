@@ -1,8 +1,6 @@
 pragma solidity ^0.5.3;
 
-
 interface IAttestations {
-
   function initialize(address, uint256, uint256, address[] calldata, uint256[] calldata) external;
 
   function setAttestationRequestFee(address, uint256) external;
@@ -14,30 +12,19 @@ interface IAttestations {
 
   function setAttestationExpiryBlocks(uint256) external;
 
-
-
   function getUnselectedRequest(bytes32, address) external view returns (uint32, uint32, address);
   function getAttestationRequestFee(address) external view returns (uint256);
 
   function lookupAccountsForIdentifier(bytes32) external view returns (address[] memory);
 
-  function getAttestationStats(
-    bytes32,
-    address
-  )
-    external
-    view
-    returns (uint32, uint32);
+  function getAttestationStats(bytes32, address) external view returns (uint32, uint32);
 
-  function getAttestationState(
-    bytes32,
-    address,
-    address
-  )
+  function getAttestationState(bytes32, address, address)
     external
     view
     returns (uint8, uint32, address);
   function getCompletableAttestations(bytes32, address)
-    external view
+    external
+    view
     returns (uint32[] memory, address[] memory, uint256[] memory, bytes memory);
 }

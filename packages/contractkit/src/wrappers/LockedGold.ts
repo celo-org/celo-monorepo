@@ -42,6 +42,21 @@ export interface LockedGoldConfig {
  */
 export class LockedGoldWrapper extends BaseWrapper<LockedGold> {
   /**
+   * Withdraws a gold that has been unlocked after the unlocking period has passed.
+   * @param index The index of the pending withdrawal to withdraw.
+   */
+  withdraw: (index: number) => CeloTransactionObject<void> = proxySend(
+    this.kit,
+    this.contract.methods.withdraw
+  )
+
+  /**
+   * Locks gold to be used for voting.
+   * The gold to be locked, must be specified as the `tx.value`
+   */
+  lock = proxySend(this.kit, this.contract.methods.lock)
+
+  /**
    * Unlocks gold that becomes withdrawable after the unlocking period.
    * @param value The amount of gold to unlock.
    */
@@ -51,18 +66,6 @@ export class LockedGoldWrapper extends BaseWrapper<LockedGold> {
     tupleParser(parseNumber)
   )
 
-  /**
-   * Withdraws a gold that has been unlocked after the unlocking period has passed.
-   * @param index The index of the pending withdrawal to withdraw.
-   */
-  withdraw: (index: number) => CeloTransactionObject<void> = proxySend(
-    this.kit,
-    this.contract.methods.withdraw
-  )
-  /**
-   * @notice Locks gold to be used for voting.
-   */
-  lock = proxySend(this.kit, this.contract.methods.lock)
   /**
    * Relocks gold that has been unlocked but not withdrawn.
    * @param index The index of the pending withdrawal to relock.
@@ -82,6 +85,7 @@ export class LockedGoldWrapper extends BaseWrapper<LockedGold> {
     undefined,
     toBigNumber
   )
+
   /**
    * Returns the total amount of non-voting locked gold for an account.
    * @param account The account.

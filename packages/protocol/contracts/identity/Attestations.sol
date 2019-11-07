@@ -16,7 +16,6 @@ import "../common/Signatures.sol";
 import "../common/SafeCast.sol";
 import "../common/UsingPrecompiles.sol";
 
-
 /**
  * @title Contract mapping identifiers to accounts
  */
@@ -28,23 +27,16 @@ contract Attestations is
   ReentrancyGuard,
   UsingPrecompiles
 {
-
   using SafeMath for uint256;
   using SafeCast for uint256;
 
-  enum AttestationStatus {
-    None,
-    Incomplete,
-    Complete
-  }
+  enum AttestationStatus { None, Incomplete, Complete }
 
   struct Attestation {
     AttestationStatus status;
-
     // For outstanding attestations, this is the block number of the request.
     // For completed attestations, this is the block number of the attestation completion.
     uint32 blockNumber;
-
     // The token with which attestation request fees were paid.
     address attestationRequestFeeToken;
   }
@@ -66,10 +58,8 @@ contract Attestations is
   struct UnselectedRequest {
     // The block at which the attestations were requested.
     uint32 blockNumber;
-
     // The number of attestations that were requested.
     uint32 attestationsRequested;
-
     // The token with which attestation request fees were paid in this request.
     address attestationRequestFeeToken;
   }
@@ -118,7 +108,7 @@ contract Attestations is
     address indexed issuer
   );
 
-  event Withdrawal( address indexed account, address indexed token, uint256 amount);
+  event Withdrawal(address indexed account, address indexed token, uint256 amount);
   event AttestationExpiryBlocksSet(uint256 value);
   event AttestationRequestFeeSet(address indexed token, uint256 value);
   event SelectIssuersWaitBlocksSet(uint256 value);
@@ -129,10 +119,7 @@ contract Attestations is
     uint256 _selectIssuersWaitBlocks,
     address[] calldata attestationRequestFeeTokens,
     uint256[] calldata attestationRequestFeeValues
-  )
-    external
-    initializer
-  {
+  ) external initializer {
     _transferOwnership(msg.sender);
     setRegistry(registryAddress);
     setAttestationExpiryBlocks(_attestationExpiryBlocks);
@@ -140,7 +127,7 @@ contract Attestations is
 
     require(
       attestationRequestFeeTokens.length > 0 &&
-      attestationRequestFeeTokens.length == attestationRequestFeeValues.length,
+        attestationRequestFeeTokens.length == attestationRequestFeeValues.length,
       "attestationRequestFeeTokens specification was invalid"
     );
     for (uint256 i = 0; i < attestationRequestFeeTokens.length; i = i.add(1)) {
@@ -159,10 +146,7 @@ contract Attestations is
     bytes32 identifier,
     uint256 attestationsRequested,
     address attestationRequestFeeToken
-  )
-    external
-    nonReentrant
-  {
+  ) external nonReentrant {
     require(
       attestationRequestFees[attestationRequestFeeToken] > 0,
       "Invalid attestationRequestFeeToken"
@@ -190,9 +174,9 @@ contract Attestations is
     state.unselectedRequests[msg.sender].attestationsRequested = attestationsRequested.toUint32();
     state.unselectedRequests[msg.sender].attestationRequestFeeToken = attestationRequestFeeToken;
 
-    state.attestations[msg.sender].requested = uint256(
-      state.attestations[msg.sender].requested
-    ).add(attestationsRequested).toUint32();
+    state.attestations[msg.sender].requested = uint256(state.attestations[msg.sender].requested)
+      .add(attestationsRequested)
+      .toUint32();
 
     emit AttestationsRequested(
       identifier,
@@ -242,8 +226,8 @@ contract Attestations is
   function complete(bytes32 identifier, uint8 v, bytes32 r, bytes32 s) external {
     address issuer = validateAttestationCode(identifier, msg.sender, v, r, s);
 
-    Attestation storage attestation =
-      identifiers[identifier].attestations[msg.sender].issuedAttestations[issuer];
+    Attestation storage attestation = identifiers[identifier].attestations[msg.sender]
+      .issuedAttestations[issuer];
 
     address token = attestation.attestationRequestFeeToken;
 
@@ -309,10 +293,7 @@ contract Attestations is
    *           Address of the token with which this attestation request was paid for
    *         ]
    */
-  function getUnselectedRequest(
-    bytes32 identifier,
-    address account
-  )
+  function getUnselectedRequest(bytes32 identifier, address account)
     external
     view
     returns (uint32, uint32, address)
@@ -330,10 +311,7 @@ contract Attestations is
    * @param account Address of the account.
    * @return Addresses of the selected attestation issuers.
    */
-  function getAttestationIssuers(
-    bytes32 identifier,
-    address account
-  )
+  function getAttestationIssuers(bytes32 identifier, address account)
     external
     view
     returns (address[] memory)
@@ -347,10 +325,7 @@ contract Attestations is
    * @param account Address of the account.
    * @return [Number of completed attestations, Number of total requested attestations]
    */
-  function getAttestationStats(
-    bytes32 identifier,
-    address account
-  )
+  function getAttestationStats(bytes32 identifier, address account)
     external
     view
     returns (uint32, uint32)
@@ -370,9 +345,7 @@ contract Attestations is
    * @return [3] Array of sum([0]) numbers indicating the total number of requested
                  attestations for each account.
    */
-  function batchGetAttestationStats(
-    bytes32[] calldata identifiersToLookup
-  )
+  function batchGetAttestationStats(bytes32[] calldata identifiersToLookup)
     external
     view
     returns (uint256[] memory, address[] memory, uint64[] memory, uint64[] memory)
@@ -382,9 +355,7 @@ contract Attestations is
     uint256[] memory matches;
     address[] memory addresses;
 
-    (matches, addresses) = batchlookupAccountsForIdentifier(
-      identifiersToLookup
-    );
+    (matches, addresses) = batchlookupAccountsForIdentifier(identifiersToLookup);
 
     uint64[] memory completed = new uint64[](addresses.length);
     uint64[] memory total = new uint64[](addresses.length);
@@ -394,10 +365,11 @@ contract Attestations is
       address[] memory addrs = identifiers[identifiersToLookup[i]].accounts;
       for (uint256 matchIndex = 0; matchIndex < matches[i]; matchIndex++) {
         addresses[currentIndex] = getAccounts().getWalletAddress(addrs[matchIndex]);
-        completed[currentIndex] =
-          identifiers[identifiersToLookup[i]].attestations[addrs[matchIndex]].completed;
-        total[currentIndex] =
-          identifiers[identifiersToLookup[i]].attestations[addrs[matchIndex]].requested;
+        completed[currentIndex] = identifiers[identifiersToLookup[i]]
+          .attestations[addrs[matchIndex]]
+          .completed;
+        total[currentIndex] = identifiers[identifiersToLookup[i]].attestations[addrs[matchIndex]]
+          .requested;
 
         currentIndex++;
       }
@@ -417,17 +389,13 @@ contract Attestations is
    *           Address of the token with which this attestation request was paid for
    *         ]
    */
-  function getAttestationState(
-    bytes32 identifier,
-    address account,
-    address issuer
-  )
+  function getAttestationState(bytes32 identifier, address account, address issuer)
     external
     view
     returns (uint8, uint32, address)
   {
-    Attestation storage attestation =
-      identifiers[identifier].attestations[account].issuedAttestations[issuer];
+    Attestation storage attestation = identifiers[identifier].attestations[account]
+      .issuedAttestations[issuer];
     return (
       uint8(attestation.status),
       attestation.blockNumber,
@@ -510,7 +478,7 @@ contract Attestations is
     emit AttestationExpiryBlocksSet(_attestationExpiryBlocks);
   }
 
-    /**
+  /**
    * @notice Updates 'selectIssuersWaitBlocks'.
    * @param _selectIssuersWaitBlocks The wait period in blocks to call selectIssuers on attestation
    *                                 requests.
@@ -537,17 +505,13 @@ contract Attestations is
     uint8 v,
     bytes32 r,
     bytes32 s
-  )
-    public
-    view
-    returns (address)
-  {
+  ) public view returns (address) {
     bytes32 codehash = keccak256(abi.encodePacked(identifier, account));
     address signer = Signatures.getSignerOfMessageHash(codehash, v, r, s);
     address issuer = getAccounts().activeAttesttationSignerToAccount(signer);
 
-    Attestation storage attestation =
-      identifiers[identifier].attestations[account].issuedAttestations[issuer];
+    Attestation storage attestation = identifiers[identifier].attestations[account]
+      .issuedAttestations[issuer];
 
     require(
       attestation.status == AttestationStatus.Incomplete,
@@ -558,9 +522,7 @@ contract Attestations is
     return issuer;
   }
 
-  function lookupAccountsForIdentifier(
-    bytes32 identifier
-  )
+  function lookupAccountsForIdentifier(bytes32 identifier)
     external
     view
     returns (address[] memory)
@@ -575,9 +537,7 @@ contract Attestations is
    * @return Array of n numbers that indicate the number of matching addresses per identifier
    *         and array of addresses preallocated for total number of matches.
    */
-  function batchlookupAccountsForIdentifier(
-    bytes32[] memory identifiersToLookup
-  )
+  function batchlookupAccountsForIdentifier(bytes32[] memory identifiersToLookup)
     internal
     view
     returns (uint256[] memory, address[] memory)
@@ -600,14 +560,10 @@ contract Attestations is
    * @notice Adds additional attestations given the current randomness.
    * @param identifier The hash of the identifier to be attested.
    */
-  function addIncompleteAttestations(
-    bytes32 identifier
-  )
-    internal
-  {
+  function addIncompleteAttestations(bytes32 identifier) internal {
     AttestedAddress storage state = identifiers[identifier].attestations[msg.sender];
-    UnselectedRequest storage unselectedRequest =
-      identifiers[identifier].unselectedRequests[msg.sender];
+    UnselectedRequest storage unselectedRequest = identifiers[identifier].unselectedRequests[msg
+      .sender];
 
     bytes32 seed = getRandom().getBlockRandomness(
       uint256(unselectedRequest.blockNumber).add(selectIssuersWaitBlocks)
@@ -637,18 +593,12 @@ contract Attestations is
     }
   }
 
-  function isAttestationExpired(uint128 attestationRequestBlock)
-    internal
-    view
-    returns (bool)
-  {
+  function isAttestationExpired(uint128 attestationRequestBlock) internal view returns (bool) {
     return block.number >= uint256(attestationRequestBlock).add(attestationExpiryBlocks);
   }
 
   function isAttestationCompletable(Attestation storage attestation) internal view returns (bool) {
-    return (
-      attestation.status == AttestationStatus.Incomplete &&
-        !isAttestationExpired(attestation.blockNumber)
-    );
+    return (attestation.status == AttestationStatus.Incomplete &&
+      !isAttestationExpired(attestation.blockNumber));
   }
 }
