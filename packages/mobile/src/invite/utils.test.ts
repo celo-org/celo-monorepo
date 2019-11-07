@@ -13,6 +13,19 @@ export const PARTIAL_INVITE =
   'Hi! I would like to invite you to join the Celo payments network. Your invite code is: ndoILWBXFR1+C59M3QKcEA7rWP7+2u5XQKC1gTemXBo= You can install the C'
 export const PARTIAL_INVITE_KEY =
   '0x9dda082d6057151d7e0b9f4cdd029c100eeb58fefedaee5740a0b58137a65c1a'
+export const VALID_REFERRER_INVITE = {
+  clickTimestamp: '1573135549',
+  installReferrer: 'invite-code=p9f1XCB7kRAgIbLvHhiGvx2Ps9HlWMkyEF9ywkj9xT8=',
+  installTimestamp: '1573135556',
+}
+export const VALID_REFERRER_INVITE_KEY =
+  '0xa7d7f55c207b91102021b2ef1e1886bf1d8fb3d1e558c932105f72c248fdc53f'
+export const INVALID_REFERRER_INVITE = {
+  clickTimestamp: '1573135549',
+  installReferrer: 'invite-code=abc',
+  installTimestamp: '1573135556',
+}
+
 describe(extractValidInviteCode, () => {
   it('extracts invite code correctly', () => {
     expect(extractValidInviteCode('nothing')).toBeNull()
@@ -126,7 +139,10 @@ describe(getInviteCodeFromReferrerData, () => {
       installReferrer: 'invite-code%3D0ZdSckCiUkiUy5cQMuEv7DucMR%2BEewMx7fmyDd3rm4U%3D',
     })
     expect(await getInviteCodeFromReferrerData()).toBe(
-      '0ZdSckCiUkiUy5cQMuEv7DucMR+EewMx7fmyDd3rm4U='
+      '0xd197527240a2524894cb971032e12fec3b9c311f847b0331edf9b20dddeb9b85'
     )
+
+    RNInstallReferrer.getReferrer.mockResolvedValue(VALID_REFERRER_INVITE)
+    expect(await getInviteCodeFromReferrerData()).toBe(VALID_REFERRER_INVITE_KEY)
   })
 })
