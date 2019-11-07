@@ -1,6 +1,5 @@
 pragma solidity ^0.5.3;
 
-
 contract GetSetV1 {
   uint256 public x;
   string public y;

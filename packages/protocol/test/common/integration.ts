@@ -8,6 +8,7 @@ import { getDeployedProxiedContract } from '@celo/protocol/lib/web3-utils'
 import { config } from '@celo/protocol/migrationsConfig'
 import BigNumber from 'bignumber.js'
 import {
+  AccountsInstance,
   ExchangeInstance,
   GoldTokenInstance,
   GovernanceInstance,
@@ -27,6 +28,7 @@ enum VoteValue {
 contract('Integration: Governance', (accounts: string[]) => {
   const proposalId = 1
   const dequeuedIndex = 0
+  let accountsInstance: AccountsInstance
   let lockedGold: LockedGoldInstance
   let governance: GovernanceInstance
   let registry: RegistryInstance
@@ -34,11 +36,11 @@ contract('Integration: Governance', (accounts: string[]) => {
   const value = new BigNumber('1000000000000000000')
 
   before(async () => {
+    accountsInstance = await getDeployedProxiedContract('Accounts', artifacts)
     lockedGold = await getDeployedProxiedContract('LockedGold', artifacts)
     governance = await getDeployedProxiedContract('Governance', artifacts)
     registry = await getDeployedProxiedContract('Registry', artifacts)
-    // Set up a LockedGold account with which we can vote.
-    await lockedGold.createAccount()
+    await accountsInstance.createAccount()
     // @ts-ignore
     await lockedGold.lock({ value })
     proposalTransactions = [

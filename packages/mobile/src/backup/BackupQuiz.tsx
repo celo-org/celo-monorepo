@@ -1,6 +1,6 @@
 import Button, { BtnTypes } from '@celo/react-components/components/Button'
-import Link from '@celo/react-components/components/Link'
 import SmallButton from '@celo/react-components/components/SmallButton'
+import TextButton from '@celo/react-components/components/TextButton'
 import Backspace from '@celo/react-components/icons/Backspace'
 import colors from '@celo/react-components/styles/colors'
 import fontStyles from '@celo/react-components/styles/fonts'
@@ -184,15 +184,15 @@ export class BackupQuiz extends React.Component<Props, State> {
                 solid={false}
                 text={this.props.t('global:goBack')}
                 style={styles.backButton}
-                textStyle={fontStyles.link}
+                textStyle={styles.backButtonText}
               >
                 <Backspace color={colors.celoGreen} />
               </SmallButton>
             )}
             {isQuizComplete && (
-              <Link onPress={this.onPressReset} style={styles.resetButton}>
+              <TextButton onPress={this.onPressReset} style={styles.resetButton}>
                 {t('global:reset')}
-              </Link>
+              </TextButton>
             )}
           </View>
         </ScrollView>
@@ -286,8 +286,13 @@ const styles = StyleSheet.create({
     borderWidth: 0,
     minWidth: 60,
   },
+  backButtonText: {
+    ...fontStyles.medium,
+    color: colors.celoGreen,
+    fontSize: 14,
+    lineHeight: 18,
+  },
   resetButton: {
-    ...fontStyles.link,
     paddingTop: 8,
     paddingLeft: 35,
     paddingRight: 20,

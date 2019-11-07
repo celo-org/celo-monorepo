@@ -27,13 +27,7 @@ contract LinkedListTest {
     return list.numElements;
   }
 
-  function getKeys()
-    external
-    view
-    returns (
-        bytes32[] memory
-    )
-  {
+  function getKeys() external view returns (bytes32[] memory) {
     return list.getKeys();
   }
 
