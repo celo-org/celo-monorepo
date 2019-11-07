@@ -237,8 +237,8 @@ contract('SortedOracles', (accounts: string[]) => {
 
       it('should reset the median rate', async () => {
         await sortedOracles.removeOracle(aToken, anOracle, 0)
-        const [_, actualDenumerator] = await sortedOracles.medianRate(aToken)
-        assert.equal(actualDenumerator.toNumber(), 0)
+        const res = await sortedOracles.medianRate(aToken)
+        assert.equal(res[1].toNumber(), 0)
       })
 
       it('should decrease the number of timestamps', async () => {
