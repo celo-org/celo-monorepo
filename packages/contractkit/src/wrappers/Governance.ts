@@ -119,6 +119,10 @@ export class GovernanceWrapper extends BaseWrapper<Governance> {
     }
   }
 
+  /**
+   * Returns the metadata associated with a given proposal.
+   * @param proposalID Governance proposal UUID
+   */
   getProposalMetadata: (proposalID: NumberLike) => Promise<ProposalMetadata> = proxyCall(
     this.contract.methods.getProposal,
     tupleParser(parseNumber),
@@ -130,6 +134,11 @@ export class GovernanceWrapper extends BaseWrapper<Governance> {
     })
   )
 
+  /**
+   * Returns the transaction at the given index associated with a given proposal.
+   * @param proposalID Governance proposal UUID
+   * @param txIndex Transaction index
+   */
   getProposalTransaction: (
     proposalID: NumberLike,
     txIndex: number
@@ -143,13 +152,24 @@ export class GovernanceWrapper extends BaseWrapper<Governance> {
     })
   )
 
+  /**
+   * Returns whether a given proposal is approved.
+   * @param proposalID Governance proposal UUID
+   */
   isApproved: (proposalID: NumberLike) => Promise<boolean> = proxyCall(
     this.contract.methods.isApproved,
     tupleParser(parseNumber)
   )
 
+  /**
+   * Returns the approver address for proposals and hotfixes.
+   */
   getApprover = proxyCall(this.contract.methods.approver)
 
+  /**
+   * Returns the metadata and transactions associated with a given proposal.
+   * @param proposalID Governance proposal UUID
+   */
   async getProposal(proposalID: NumberLike): Promise<Proposal> {
     const metadata = await this.getProposalMetadata(proposalID)
     const txIndices = Array.from(Array(metadata.transactionCount).keys())
@@ -163,6 +183,16 @@ export class GovernanceWrapper extends BaseWrapper<Governance> {
     }
   }
 
+  /**
+   * Returns whether a given proposal is passing relative to the constitution's threshold.
+   * @param proposalID Governance proposal UUID
+   */
+  isProposalPassing = proxyCall(this.contract.methods.isProposalPassing, tupleParser(parseNumber))
+
+  /**
+   * Submits a new governance proposal.
+   * @param transactions Sequence of transactions
+   */
   propose(transactions: Transaction[]) {
     const enc = encodedTransactions(transactions)
     return toTransactionObject(
@@ -171,11 +201,19 @@ export class GovernanceWrapper extends BaseWrapper<Governance> {
     )
   }
 
+  /**
+   * Returns whether a governance proposal exists with the given ID. 
+   * @param proposalID Governance proposal UUID
+   */
   proposalExists: (proposalID: NumberLike) => Promise<boolean> = proxyCall(
     this.contract.methods.proposalExists,
     tupleParser(parseNumber)
   )
 
+  /**
+   * Returns the current upvoted governance proposal ID and applied vote weight (zeroes if none).
+   * @param upvoter Address of upvoter
+   */
   getUpvoteRecord: (upvoter: Address) => Promise<{ id: BigNumber; weight: BigNumber }> = proxyCall(
     this.contract.methods.getUpvoteRecord,
     tupleParser(identity),
@@ -185,16 +223,31 @@ export class GovernanceWrapper extends BaseWrapper<Governance> {
     })
   )
 
-  isQueued = proxyCall(this.contract.methods.isQueued, tupleParser(parseNumber), identity)
+  /**
+   * Returns whether a given proposal is queued.
+   * @param proposalID Governance proposal UUID
+   */
+  isQueued = proxyCall(this.contract.methods.isQueued, tupleParser(parseNumber))
 
+  /**
+   * Returns the upvotes applied to a given proposal.
+   * @param proposalID Governance proposal UUID
+   */
   getUpvotes = proxyCall(this.contract.methods.getUpvotes, tupleParser(parseNumber), toBigNumber)
 
+  /**
+   * Returns the yes, no, and abstain votes applied to a given proposal.
+   * @param proposalID Governance proposal UUID
+   */
   getVotes = proxyCall(this.contract.methods.getVoteTotals, tupleParser(parseNumber), (o) => ({
     yes: toBigNumber(o[0]),
     no: toBigNumber(o[1]),
     abstain: toBigNumber(o[2]),
   }))
 
+  /**
+   * Returns the proposal queue as IDs and applied upvotes.
+   */
   getQueue = proxyCall(this.contract.methods.getQueue, undefined, (arraysObject) =>
     zip<string, string, { id: BigNumber; upvotes: BigNumber }>(
       (_id, _upvotes) => ({
@@ -206,12 +259,22 @@ export class GovernanceWrapper extends BaseWrapper<Governance> {
     )
   )
 
+  /**
+   * Returns the proposal dequeue as IDs
+   */
   getDequeue = proxyCall(this.contract.methods.getDequeue, undefined, (arrayObject) =>
     arrayObject.map(toBigNumber)
   )
 
+  /**
+   * Dequeues any queued proposals if `dequeueFrequency` seconds have elapsed since the last dequeue   
+   */
   dequeueProposalsIfReady = proxySend(this.kit, this.contract.methods.dequeueProposalsIfReady)
 
+  /**
+   * Returns the number of votes that will be applied to a proposal for a given voter.
+   * @param voter Address of voter
+   */
   async getVoteWeight(voter: Address) {
     const lockedGoldContract = await this.kit.contracts.getLockedGold()
     return lockedGoldContract.getAccountTotalLockedGold(voter)
@@ -265,6 +328,11 @@ export class GovernanceWrapper extends BaseWrapper<Governance> {
     }
   }
 
+  /**
+   * Applies provided upvoter's upvote to given proposal.
+   * @param proposalID Governance proposal UUID
+   * @param upvoter Address of upvoter
+   */
   async upvote(proposalID: NumberLike, upvoter: Address) {
     const exists = await this.proposalExists(proposalID)
     if (!exists) {
@@ -281,6 +349,10 @@ export class GovernanceWrapper extends BaseWrapper<Governance> {
     )
   }
 
+  /**
+   * Revokes provided upvoter's upvote.
+   * @param upvoter Address of upvoter
+   */
   async revokeUpvote(upvoter: Address) {
     const { id } = await this.getUpvoteRecord(upvoter)
     if (ZERO_BN.isEqualTo(id)) {
@@ -293,6 +365,11 @@ export class GovernanceWrapper extends BaseWrapper<Governance> {
     )
   }
 
+  /**
+   * Approves given proposal, allowing it to later move to `referendum`.
+   * @param proposalID Governance proposal UUID
+   * @notice Only the `approver` address will succeed in sending this transaction 
+   */
   async approve(proposalID: NumberLike) {
     const proposalIndex = await this.getDequeueIndex(proposalID)
     return toTransactionObject(
@@ -301,6 +378,11 @@ export class GovernanceWrapper extends BaseWrapper<Governance> {
     )
   }
 
+  /**
+   * Applies `sender`'s vote choice to a given proposal.
+   * @param proposalID Governance proposal UUID
+   * @param vote Choice to apply (yes, no, abstain)
+   */
   async vote(proposalID: NumberLike, vote: VoteValue) {
     const proposalIndex = await this.getDequeueIndex(proposalID)
     return toTransactionObject(
@@ -309,6 +391,10 @@ export class GovernanceWrapper extends BaseWrapper<Governance> {
     )
   }
 
+  /**
+   * Executes a given proposal's associated transactions.
+   * @param proposalID Governance proposal UUID
+   */
   async execute(proposalID: NumberLike) {
     const proposalIndex = await this.getDequeueIndex(proposalID)
     return toTransactionObject(
@@ -317,6 +403,10 @@ export class GovernanceWrapper extends BaseWrapper<Governance> {
     )
   }
 
+  /**
+   * Returns approved, executed, and prepared status associated with a given hotfix.
+   * @param hash keccak256 hash of hotfix's associated abi encoded transactions
+   */
   getHotfixRecord = proxyCall(
     this.contract.methods.getHotfixRecord,
     tupleParser(parseBuffer),
@@ -327,29 +417,52 @@ export class GovernanceWrapper extends BaseWrapper<Governance> {
     })
   )
 
+  /**
+   * Returns whether a given hotfix has been whitelisted by a given address.
+   * @param hash keccak256 hash of hotfix's associated abi encoded transactions
+   * @param whitelister address of whitelister
+   */
   isHotfixWhitelistedBy = proxyCall(
     this.contract.methods.isHotfixWhitelistedBy,
     tupleParser(parseBuffer, (s: Address) => identity<Address>(s))
   )
 
+  /**
+   * Marks the given hotfix whitelisted by `sender`.
+   * @param hash keccak256 hash of hotfix's associated abi encoded transactions
+   */
   whitelistHotfix: (hash: Buffer) => CeloTransactionObject<void> = proxySend(
     this.kit,
     this.contract.methods.whitelistHotfix,
     tupleParser(parseBuffer)
   )
 
+  /**
+   * Marks the given hotfix approved by `sender`.
+   * @param hash keccak256 hash of hotfix's associated abi encoded transactions
+   * @notice Only the `approver` address will succeed in sending this transaction
+   */
   approveHotfix: (hash: Buffer) => CeloTransactionObject<void> = proxySend(
     this.kit,
     this.contract.methods.approveHotfix,
     tupleParser(parseBuffer)
   )
 
+  /**
+   * Marks the given hotfix prepared for current epoch if quorum of validators have whitelisted it.
+   * @param hash keccak256 hash of hotfix's associated abi encoded transactions
+   */
   prepareHotfix: (hash: Buffer) => CeloTransactionObject<void> = proxySend(
     this.kit,
     this.contract.methods.prepareHotfix,
     tupleParser(parseBuffer)
   )
 
+  /**
+   * Executes a given sequence of transactions if the corresponding hash is prepared and approved.
+   * @param transactions Sequence of transactions
+   * @notice keccak256 hash of abi encoded transactions computed on-chain
+   */
   executeHotfix(transactions: Transaction[]) {
     const enc = encodedTransactions(transactions)
     return toTransactionObject(
