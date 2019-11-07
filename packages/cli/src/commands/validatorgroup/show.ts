@@ -16,6 +16,7 @@ export default class ValidatorGroupShow extends BaseCommand {
 
   async run() {
     const res = this.parse(ValidatorGroupShow)
+    const validators = await this.kit.contracts.getValidators()
     const validatorGroup = await validators.getValidatorGroup(res.args.groupAddress)
     printValueMap(validatorGroup)
   }
