@@ -10,7 +10,7 @@ import { I18nProps, withNamespaces } from 'src/i18n'
 import Responsive from 'src/shared/Responsive'
 import { BANNER_HEIGHT, HEADER_HEIGHT } from 'src/shared/Styles'
 import { colors, fonts, standardStyles, textStyles } from 'src/styles'
-import { hasGoodConnection, getDeviceMemory } from 'src/utils/utils'
+import { getDeviceMemory, hasGoodConnection } from 'src/utils/utils'
 type Props = I18nProps
 
 const ANIMATION_DURATION = 5

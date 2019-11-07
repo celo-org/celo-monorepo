@@ -21,15 +21,15 @@ interface Speeds {
   bps: string
 }
 
-async function getNetworkDownloadSpeed() {
+export async function getNetworkDownloadSpeed() {
   const testNetworkSpeed = new NetworkSpeed()
-  const baseUrl = 'http://httpbin.org/bytes/10000000'
-  const fileSize = 100000
+  const baseUrl = 'http://eu.httpbin.org/stream-bytes/50000000'
+  const fileSize = 500000
   const speed: Speeds = await testNetworkSpeed.checkDownloadSpeed(baseUrl, fileSize)
-  return isFast(Number(speed.mbps))
+  return speed
 }
 
-const MIN_MB_FOR_FAST = 3
+const MIN_MB_FOR_FAST = 5
 
 async function isFast(speed: number | EffectiveTypes) {
   if (speed === EffectiveTypes['4g']) {
@@ -61,10 +61,24 @@ export async function hasGoodConnection() {
     return isFast(chromesBuiltInMethod)
   }
 
-  return Promise.race([getNetworkDownloadSpeed(), abort()])
+  return Promise.race([multiPartCheck(), abort()])
 }
 
-const MAX_TIME_MS = 3000
+async function multiPartCheck() {
+  const multiPart = await Promise.all([
+    getNetworkDownloadSpeed(),
+    getNetworkDownloadSpeed(),
+    getNetworkDownloadSpeed(),
+  ])
+  const averageSped =
+    multiPart.map((speeds) => speeds.mbps).reduce((previous, current) => {
+      return Number(previous) + Number(current)
+    }, 0) / 3
+
+  return isFast(averageSped)
+}
+
+const MAX_TIME_MS = 1000
 
 async function abort(): Promise<boolean> {
   return new Promise((resolve) => {
