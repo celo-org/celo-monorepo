@@ -43,7 +43,7 @@ testWithGanache('Governance Wrapper', (web3) => {
   const registryRepointTransactionBuilder = (repoints: Repoint[], _registry: Registry) => {
     const txBuilder = new TransactionBuilder(kit)
     repoints.map((repoint) =>
-      txBuilder.appendWeb3(new BigNumber(0), _registry._address, registry.methods.setAddressFor, [
+      txBuilder.appendWeb3Tx(new BigNumber(0), _registry._address, registry.methods.setAddressFor, [
         repoint[0],
         repoint[1],
       ])
@@ -101,7 +101,7 @@ testWithGanache('Governance Wrapper', (web3) => {
       await timeTravel(expConfig.referendumStageDuration, web3)
     }
 
-    it.only('#propose', async () => {
+    it('#propose', async () => {
       await proposeFn(accounts[0])
 
       const proposal = await governance.getProposal(proposalID)
@@ -164,7 +164,7 @@ testWithGanache('Governance Wrapper', (web3) => {
       await tx.sendAndWaitForReceipt()
 
       await concurrentMap(repoints.length, repoints, async (repoint) =>
-        expect(repoint[1]).toBe(await kit.registry.addressFor(repoint[0]))
+        expect(await kit.registry.addressFor(repoint[0])).toBe(repoint[1])
       )
     })
   })
