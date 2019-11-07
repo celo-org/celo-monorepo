@@ -5,11 +5,12 @@ import { ScrollView, StyleSheet } from 'react-native'
 import SafeAreaView from 'react-native-safe-area-view'
 import componentWithAnalytics from 'src/analytics/wrapper'
 import Carousel, { CarouselItem } from 'src/components/Carousel'
+import DevSkipButton from 'src/components/DevSkipButton'
 import { Namespaces } from 'src/i18n'
-import { headerWithCancelButton } from 'src/navigator/Headers'
+import { Screens } from 'src/navigator/Screens'
 
-export class VerificationLoadingScreen extends React.Component<WithNamespaces> {
-  static navigationOptions = headerWithCancelButton
+class VerificationLoadingScreen extends React.Component<WithNamespaces> {
+  static navigationOptions = null
 
   render() {
     // const { t } = this.props
@@ -27,7 +28,7 @@ export class VerificationLoadingScreen extends React.Component<WithNamespaces> {
     return (
       <SafeAreaView style={styles.container}>
         <ScrollView contentContainerStyle={styles.scrollContainer}>
-          {/* <DevSkipButton nextScreen={Screens.WalletHome} /> */}
+          <DevSkipButton nextScreen={Screens.WalletHome} />
           <Carousel containerStyle={styles.carouselContainer} items={items} />
         </ScrollView>
       </SafeAreaView>
