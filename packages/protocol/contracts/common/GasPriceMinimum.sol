@@ -35,7 +35,7 @@ contract GasPriceMinimum is Ownable, Initializable, UsingRegistry {
     address _registryAddress,
     uint256 initialGas,
     uint256 _targetDensity,
-    uint256 _adjustmentSpeed,
+    uint256 _adjustmentSpeed
   ) external initializer {
     _transferOwnership(msg.sender);
     setRegistry(_registryAddress);

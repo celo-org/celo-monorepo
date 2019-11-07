@@ -18,8 +18,6 @@ import {
   sleep,
 } from './utils'
 
-const nowSeconds = () => Math.floor(Date.now() / 1000)
-
 /**
  * Helper Class to change StableToken Inflation in tests
  */
@@ -32,21 +30,24 @@ class InflationManager {
     this.kit.defaultAccount = validatorAddress
   }
 
+  now = async (): Promise<number> => {
+    return (await this.kit.web3.eth.getBlock('pending')).timestamp
+  }
+
   getNextUpdateRate = async (): Promise<number> => {
     const stableToken = await this.kit.contracts.getStableToken()
     // Compute necessary `updateRate` so inflationFactor adjusment takes place on next operation
     const { factorLastUpdated } = await stableToken.getInflationParameters()
-    const timeSinceLastUpdated = nowSeconds() - factorLastUpdated.toNumber()
 
-    if (timeSinceLastUpdated < this.minUpdateDelay) {
-      const delay = this.minUpdateDelay - timeSinceLastUpdated
-      // tslint:disable-next-line: no-console
-      console.log(`Last inflation change too close, waiting ${delay} seconds before doing it again`)
-      await sleep(delay)
-      return this.getNextUpdateRate()
-    } else {
-      return timeSinceLastUpdated
+    // Wait until until the minimum update delay has passed so we can set a rate that gives us some
+    // buffer time to make the transaction in the next availiable update window.
+    let timeSinceLastUpdated = (await this.now()) - factorLastUpdated.toNumber()
+    while (timeSinceLastUpdated < this.minUpdateDelay) {
+      await sleep(this.minUpdateDelay - timeSinceLastUpdated)
+      timeSinceLastUpdated = (await this.now()) - factorLastUpdated.toNumber()
     }
+
+    return timeSinceLastUpdated
   }
 
   getParameters = async () => {
@@ -55,6 +56,9 @@ class InflationManager {
   }
 
   setInflationRateForNextTransfer = async (rate: BigNumber) => {
+    // Possibly update the inflation factor and ensure it won't update again.
+    await this.setInflationParameters(new BigNumber(1), 1000000)
+
     const updateRate = await this.getNextUpdateRate()
     await this.setInflationParameters(rate, updateRate)
   }
@@ -224,7 +228,7 @@ describe('Transfer tests', function(this: any) {
     kit.web3.currentProvider = new kit.web3.providers.HttpProvider('http://localhost:8549')
 
     // Give the node time to sync the latest block.
-    const upstream = await new Web3('http://localhost:8547').eth.getBlock('latest')
+    const upstream = await new Web3('http://localhost:8545').eth.getBlock('latest')
     while ((await kit.web3.eth.getBlock('latest')).number < upstream.number) {
       await sleep(0.5)
     }
@@ -599,7 +603,7 @@ describe('Transfer tests', function(this: any) {
             describe('when there is no demurrage', () => {
               describe('when setting a gas amount greater than the amount of gas necessary', () =>
                 testTransferToken({
-                  expectedGas: 63180,
+                  expectedGas: 64005,
                   transferToken: CeloContract.GoldToken,
                   feeToken: CeloContract.StableToken,
                   txOptions: {
@@ -643,7 +647,7 @@ describe('Transfer tests', function(this: any) {
         describe('Transfer CeloDollars', () => {
           describe('gasCurrency = CeloDollars >', () => {
             testTransferToken({
-              expectedGas: 89456,
+              expectedGas: syncMode === 'full' ? 90303 : 75303,
               transferToken: CeloContract.StableToken,
               feeToken: CeloContract.StableToken,
               txOptions: {
@@ -656,7 +660,7 @@ describe('Transfer tests', function(this: any) {
     }
   })
 
-  describe('Transfer with Demurrage >', () => {
+  describe.only('Transfer with Demurrage >', () => {
     let inflationManager: InflationManager
 
     before(async () => {
