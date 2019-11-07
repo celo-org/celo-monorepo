@@ -1,11 +1,9 @@
 import BigNumber from 'bignumber.js'
-import { keccak256 } from 'ethereumjs-util'
-import Contract from 'web3/eth/contract'
 
 import { concurrentMap } from '@celo/utils/lib/async'
 import { zip } from '@celo/utils/lib/collections'
 
-import { Address, CeloContract } from '../base'
+import { Address } from '../base'
 import { Governance } from '../generated/types/Governance'
 import {
   BaseWrapper,
@@ -13,6 +11,7 @@ import {
   identity,
   NumberLike,
   parseBuffer,
+  parseBytes,
   parseNumber,
   proxyCall,
   proxySend,
@@ -21,8 +20,13 @@ import {
   toNumber,
   toTransactionObject,
   tupleParser,
-  parseBytes,
 } from './BaseWrapper'
+
+export interface Transaction {
+  value: NumberLike
+  destination: Address
+  data: Buffer
+}
 
 export interface StageDurations {
   approval: BigNumber // seconds
@@ -38,26 +42,6 @@ export interface GovernanceConfig {
   stageDurations: StageDurations
 }
 
-export interface Transaction {
-  value: NumberLike
-  destination: Address
-  data: Buffer
-}
-
-export interface JSONTransaction {
-  value: NumberLike
-  celoContractName: CeloContract
-  methodName: string
-  args: any[]
-}
-
-interface TransactionsEncoded {
-  readonly values: string[]
-  readonly destinations: Address[]
-  readonly data: Array<string | number[]>
-  readonly dataLengths: number[]
-}
-
 export interface ProposalMetadata {
   proposer: Address
   deposit: BigNumber
@@ -69,7 +53,6 @@ export interface Proposal {
   metadata: ProposalMetadata
   transactions: Transaction[]
 }
-
 export enum VoteValue {
   None,
   Abstain,
@@ -180,45 +163,8 @@ export class GovernanceWrapper extends BaseWrapper<Governance> {
     }
   }
 
-  private getTransactionsEncoded(transactions: Transaction[]): TransactionsEncoded {
-    return {
-      values: transactions.map((tx) => parseNumber(tx.value)),
-      destinations: transactions.map((tx) => tx.destination),
-      data: parseBytes(Buffer.concat(transactions.map((tx) => tx.data))),
-      dataLengths: transactions.map((tx) => tx.data.length),
-    }
-  }
-
-  getTransactionsHash(transactions: Transaction[]): Buffer {
-    const encoded = this.getTransactionsEncoded(transactions)
-    return keccak256(
-      this.kit.web3.eth.abi.encodeParameters(
-        ['uint256[]', 'address[]', 'bytes', 'uint256[]'],
-        [encoded.values, encoded.destinations, encoded.data, encoded.dataLengths]
-      )
-    ) as Buffer
-  }
-
-  buildTransactionsFromJSON = (jsonTransactions: JSONTransaction[]) =>
-    concurrentMap(jsonTransactions.length, jsonTransactions, async (jsonTx: JSONTransaction) => {
-      const contract = await this.kit._web3Contracts.getContract(jsonTx.celoContractName)
-      const method = (contract.methods as Contract['methods'])[jsonTx.methodName]
-      return {
-        value: jsonTx.value,
-        destination: contract._address,
-        data: this.toTransactionData(method, jsonTx.args),
-      }
-    })
-
-  toTransactionData<M extends Contract['methods'][keyof Contract['methods']]>(
-    contractMethod: M,
-    args: Parameters<M>
-  ) {
-    return toBuffer(contractMethod(...args).encodeABI())
-  }
-
   propose(transactions: Transaction[]) {
-    const enc = this.getTransactionsEncoded(transactions)
+    const enc = encodedTransactions(transactions)
     return toTransactionObject(
       this.kit,
       this.contract.methods.propose(enc.values, enc.destinations, enc.data, enc.dataLengths)
@@ -250,7 +196,7 @@ export class GovernanceWrapper extends BaseWrapper<Governance> {
   }))
 
   getQueue = proxyCall(this.contract.methods.getQueue, undefined, (arraysObject) =>
-    zip<string, string, { id: BigNumber, upvotes: BigNumber }>(
+    zip<string, string, { id: BigNumber; upvotes: BigNumber }>(
       (_id, _upvotes) => ({
         id: toBigNumber(_id),
         upvotes: toBigNumber(_upvotes),
@@ -405,10 +351,22 @@ export class GovernanceWrapper extends BaseWrapper<Governance> {
   )
 
   executeHotfix(transactions: Transaction[]) {
-    const enc = this.getTransactionsEncoded(transactions)
+    const enc = encodedTransactions(transactions)
     return toTransactionObject(
       this.kit,
       this.contract.methods.executeHotfix(enc.values, enc.destinations, enc.data, enc.dataLengths)
     )
+  }
+}
+
+export function encodedTransactions(transactions: Transaction[]) {
+  if (transactions.length === 0) {
+    throw new Error(`No transactions provided`)
+  }
+  return {
+    values: transactions.map((tx) => parseNumber(tx.value)),
+    destinations: transactions.map((tx) => tx.destination),
+    data: parseBytes(Buffer.concat(transactions.map((tx) => tx.data))),
+    dataLengths: transactions.map((tx) => tx.data.length),
   }
 }

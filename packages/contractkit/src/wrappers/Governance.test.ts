@@ -2,13 +2,14 @@ import BigNumber from 'bignumber.js'
 
 import { concurrentMap } from '@celo/utils/lib/async'
 
-import { Address, CeloContract, NULL_ADDRESS } from '../base'
+import { Address, CeloContract } from '../base'
 import { Registry } from '../generated/types/Registry'
 import { newKitFromWeb3 } from '../kit'
 import { NetworkConfig, testWithGanache, timeTravel } from '../test-utils/ganache-test'
 import { AccountsWrapper } from './Accounts'
-import { GovernanceWrapper, JSONTransaction, Transaction, VoteValue } from './Governance'
+import { GovernanceWrapper, Transaction, VoteValue } from './Governance'
 import { LockedGoldWrapper } from './LockedGold'
+import { TransactionBuilder } from './TransactionBuilder'
 
 const expConfig = NetworkConfig.governance
 
@@ -39,12 +40,16 @@ testWithGanache('Governance Wrapper', (web3) => {
 
   type Repoint = [CeloContract, Address]
 
-  const buildRegistryRepointTransactions = (repoints: Repoint[], _registry: Registry) =>
-    repoints.map<Transaction>((repoint) => ({
-      value: new BigNumber(0),
-      destination: _registry._address,
-      data: governance.toTransactionData(_registry.methods.setAddressFor, [repoint[0], repoint[1]]),
-    }))
+  const registryRepointTransactionBuilder = (repoints: Repoint[], _registry: Registry) => {
+    const txBuilder = new TransactionBuilder(kit)
+    repoints.map((repoint) =>
+      txBuilder.appendWeb3(new BigNumber(0), _registry._address, registry.methods.setAddressFor, [
+        repoint[0],
+        repoint[1],
+      ])
+    )
+    return txBuilder
+  }
 
   it('#getConfig', async () => {
     const config = await governance.getConfig()
@@ -57,25 +62,6 @@ testWithGanache('Governance Wrapper', (web3) => {
     expect(config.stageDurations.execution).toEqBigNumber(expConfig.executionStageDuration)
   })
 
-  it('#buildTransactionsFromJSON', async () => {
-    const jsonTransactions: JSONTransaction[] = JSON.parse(`[{
-      "value": 0,
-      "celoContractName": "StableToken",
-      "methodName": "balanceOf(address)",
-      "args": ["${NULL_ADDRESS}"]
-    }]`)
-    const transactions = await governance.buildTransactionsFromJSON(jsonTransactions)
-    const stableToken = await kit._web3Contracts.getStableToken()
-    const constructedTransactions: Transaction[] = [
-      {
-        value: new BigNumber(0),
-        destination: stableToken._address,
-        data: governance.toTransactionData(stableToken.methods.balanceOf, [NULL_ADDRESS]),
-      },
-    ]
-    expect(transactions).toStrictEqual(constructedTransactions)
-  })
-
   describe.only('Proposals', () => {
     const repoints: Repoint[] = [
       [CeloContract.Random, '0x0000000000000000000000000000000000000001'],
@@ -85,7 +71,8 @@ testWithGanache('Governance Wrapper', (web3) => {
     const proposalID = new BigNumber(1)
 
     let proposalTransactions: Transaction[]
-    beforeAll(() => (proposalTransactions = buildRegistryRepointTransactions(repoints, registry)))
+    beforeAll(() =>
+      (proposalTransactions = registryRepointTransactionBuilder(repoints, registry).transactions))
 
     const proposeFn = async (proposer: Address) => {
       const tx = governance.propose(proposalTransactions)
@@ -193,8 +180,9 @@ testWithGanache('Governance Wrapper', (web3) => {
     let hash: Buffer
 
     beforeAll(() => {
-      hotfixTransactions = buildRegistryRepointTransactions(repoints, registry)
-      hash = governance.getTransactionsHash(hotfixTransactions)
+      const txBuilder = registryRepointTransactionBuilder(repoints, registry)
+      hotfixTransactions = txBuilder.transactions
+      hash = txBuilder.hash
     })
 
     const whitelistFn = async (whitelister: Address) => {
