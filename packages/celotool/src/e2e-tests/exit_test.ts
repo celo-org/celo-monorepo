@@ -72,7 +72,7 @@ describe('exit tests', function(this: any) {
       await restartGeth()
       const current = await web3.eth.getBlockNumber()
       const block = await web3.eth.getBlock(current)
-      assert.equal(block.gasLimit, 8000000)
+      assert.equal(block.gasLimit, 12000000)
     })
     it('should exit when minimum version is updated', async () => {
       this.timeout(0)
