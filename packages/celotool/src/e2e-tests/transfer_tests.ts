@@ -383,6 +383,11 @@ describe('Transfer tests', function(this: any) {
         gasCurrency,
       })
 
+      // Writing to an empty storage location (e.g. an uninitialized ERC20 account) costs 15k extra gas.
+      if (transferToken === CeloContract.StableToken && balances.initial(ToAddress).eq(0)) {
+        expectedGas += 15000
+      }
+
       txRes = await runTestTransaction(txResult, expectedGas, gasCurrency)
 
       await balances.update()
@@ -555,9 +560,7 @@ describe('Transfer tests', function(this: any) {
         describe('Transfer CeloDollars', () => {
           describe('gasCurrency = CeloDollars >', () => {
             testTransferToken({
-              // TODO(nategraf): Initializing a stable token account costs 15k additional gas.
-              // The first time this transfer is done, which is for the full node, this will be seen.
-              expectedGas: syncMode === 'full' ? 190303 : 175303,
+              expectedGas: 175303,
               transferToken: CeloContract.StableToken,
               feeToken: CeloContract.StableToken,
               txOptions: {
@@ -647,7 +650,7 @@ describe('Transfer tests', function(this: any) {
         describe('Transfer CeloDollars', () => {
           describe('gasCurrency = CeloDollars >', () => {
             testTransferToken({
-              expectedGas: syncMode === 'full' ? 90303 : 75303,
+              expectedGas: 75303,
               transferToken: CeloContract.StableToken,
               feeToken: CeloContract.StableToken,
               txOptions: {
