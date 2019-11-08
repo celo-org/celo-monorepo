@@ -6,7 +6,7 @@ import { BlockchainParametersWrapper } from '@celo/contractkit/lib/wrappers/Bloc
 import { assert } from 'chai'
 import { getHooks, GethTestConfig, sleep } from './utils'
 
-describe('exit tests', function(this: any) {
+describe('Blockchain parameters tests', function(this: any) {
   this.timeout(0)
 
   let kit: ContractKit
