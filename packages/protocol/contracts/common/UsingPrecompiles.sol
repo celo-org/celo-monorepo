@@ -4,7 +4,6 @@ import "../common/FixidityLib.sol";
 
 // TODO(asa): Limit assembly usage by using X.staticcall instead.
 contract UsingPrecompiles {
-
   using FixidityLib for FixidityLib.Fraction;
 
   address constant PROOF_OF_POSSESSION = address(0xff - 4);
@@ -82,18 +81,14 @@ contract UsingPrecompiles {
     uint256 bNumerator,
     uint256 bDenominator,
     uint256 exponent
-  )
-    public
-    pure
-    returns (uint256, uint256)
-  {
+  ) public pure returns (uint256, uint256) {
     // calculate some kind of approximation
     uint256 exp = exponent;
     FixidityLib.Fraction memory a = FixidityLib.newFixedFraction(aNumerator, aDenominator);
     FixidityLib.Fraction memory acc = FixidityLib.newFixedFraction(bNumerator, bDenominator);
     FixidityLib.Fraction memory res = FixidityLib.newFixed(0);
     // just use the simple algorithm
-    for (uint i = 0; i < 32; i++) {
+    for (uint256 i = 0; i < 32; i++) {
       if (exp & 0x01 == 1) {
         res = res.add(acc);
       }
@@ -105,7 +100,6 @@ contract UsingPrecompiles {
     uint256 returnDenominator = FixidityLib.fixed1().unwrap();
     return (returnNumerator, returnDenominator);
   }
-
 
   /**
    * @notice Returns the current epoch size in blocks.

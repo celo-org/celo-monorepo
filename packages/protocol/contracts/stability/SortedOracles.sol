@@ -53,9 +53,7 @@ contract SortedOracles is ISortedOracles, Ownable, Initializable, UsingPrecompil
 
   event ReportExpirySet(uint256 reportExpiry);
 
-  event MaxMedianChangeRatePerSecondSet(
-    uint256 rate
-  );
+  event MaxMedianChangeRatePerSecondSet(uint256 rate);
 
   modifier onlyOracle(address token) {
     require(isOracle[token][msg.sender], "sender was not an oracle for token addr");
@@ -194,11 +192,11 @@ contract SortedOracles is ISortedOracles, Ownable, Initializable, UsingPrecompil
     recomputeRate(token);
   }
 
-  function fracMulExp(
-    FixidityLib.Fraction memory a,
-    FixidityLib.Fraction memory b,
-    uint256 exp
-  ) internal view returns (FixidityLib.Fraction memory) {
+  function fracMulExp(FixidityLib.Fraction memory a, FixidityLib.Fraction memory b, uint256 exp)
+    internal
+    view
+    returns (FixidityLib.Fraction memory)
+  {
     uint256 numerator;
     uint256 denominator;
     (numerator, denominator) = fractionMulExp(
@@ -221,13 +219,16 @@ contract SortedOracles is ISortedOracles, Ownable, Initializable, UsingPrecompil
       uint256 maxChange = fracMulExp(
         FixidityLib.fixed1(),
         maxMedianChangeRatePerSecond.add(FixidityLib.fixed1()),
-        td).subtract(FixidityLib.fixed1()).multiply(FixidityLib.wrap(originalMedian)).unwrap();
+        td
+      )
+        .subtract(FixidityLib.fixed1())
+        .multiply(FixidityLib.wrap(originalMedian))
+        .unwrap();
       if (newMedian > originalMedian) {
         if (maxChange < newMedian.sub(originalMedian)) {
           newMedian = originalMedian.add(maxChange);
         }
-      }
-      else {
+      } else {
         if (maxChange < originalMedian.sub(newMedian)) {
           newMedian = originalMedian.sub(maxChange);
         }
