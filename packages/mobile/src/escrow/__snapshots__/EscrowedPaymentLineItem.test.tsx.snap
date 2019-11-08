@@ -22,9 +22,9 @@ exports[`renders correctly 1`] = `
       ]
     }
   >
-    John Doe
+    +491522345678
      - 
-    You owe me for coffee!
+    test message
   </Text>
   <Text
     style={
@@ -42,7 +42,8 @@ exports[`renders correctly 1`] = `
     }
   >
      
-    5
+    $
+    7
   </Text>
 </Text>
 `;

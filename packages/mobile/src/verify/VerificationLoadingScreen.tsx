@@ -1,3 +1,6 @@
+import PhoneAndUsers from '@celo/react-components/icons/PhoneAndUsers'
+import SearchUser from '@celo/react-components/icons/SearchUser'
+import VerificationTexts from '@celo/react-components/icons/VerificationTexts'
 import colors from '@celo/react-components/styles/colors'
 import { fontStyles } from '@celo/react-components/styles/fonts'
 import * as React from 'react'
@@ -14,7 +17,6 @@ import Carousel, { CarouselItem } from 'src/components/Carousel'
 import DevSkipButton from 'src/components/DevSkipButton'
 import { Namespaces } from 'src/i18n'
 import LoadingSpinner from 'src/icons/LoadingSpinner'
-import NuxLogo from 'src/icons/NuxLogo'
 import {
   cancelVerification,
   receiveAttestationMessage,
@@ -77,15 +79,15 @@ class VerificationLoadingScreen extends React.Component<Props> {
 
     const items: CarouselItem[] = [
       {
-        icon: <NuxLogo />,
+        icon: <SearchUser />,
         text: t('loading.card1'),
       },
       {
-        icon: <NuxLogo />,
+        icon: <PhoneAndUsers />,
         text: t('loading.card2'),
       },
       {
-        icon: <NuxLogo />,
+        icon: <VerificationTexts />,
         text: t('loading.card3'),
       },
     ]
@@ -97,7 +99,7 @@ class VerificationLoadingScreen extends React.Component<Props> {
           </View>
         )}
         <ScrollView contentContainerStyle={styles.scrollContainer}>
-          <DevSkipButton nextScreen={Screens.WalletHome} />
+          <DevSkipButton nextScreen={Screens.VerificationInterstitialScreen} />
           <View style={styles.statusContainer}>
             <LoadingSpinner />
             <Text style={styles.textPhoneNumber}>
