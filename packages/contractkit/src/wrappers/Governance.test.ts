@@ -84,7 +84,7 @@ testWithGanache('Governance Wrapper', (web3) => {
       await tx.sendAndWaitForReceipt({ from: upvoter })
       if (shouldTimeTravel) {
         await timeTravel(expConfig.dequeueFrequency, web3)
-        await governance.dequeueProposalsIfReady().send()
+        await governance.dequeueProposalsIfReady().sendAndWaitForReceipt()
       }
     }
 
@@ -112,7 +112,8 @@ testWithGanache('Governance Wrapper', (web3) => {
 
     it('#upvote', async () => {
       await proposeFn(accounts[0])
-      await upvoteFn(accounts[1])
+      // shouldTimeTravel is false so getUpvotes isn't on dequeued proposal
+      await upvoteFn(accounts[1], false)
 
       const voteWeight = await governance.getVoteWeight(accounts[1])
       const upvotes = await governance.getUpvotes(proposalID)
@@ -218,6 +219,7 @@ testWithGanache('Governance Wrapper', (web3) => {
     it('#prepareHotfix', async () => {
       // reach quorum
       await concurrentMap(1, accounts.slice(1, 4), whitelistFn)
+      await approveFn()
       await prepareFn()
 
       const validators = await kit.contracts.getValidators()
@@ -227,9 +229,8 @@ testWithGanache('Governance Wrapper', (web3) => {
 
     it('#executeHotfix', async () => {
       await concurrentMap(1, accounts.slice(1, 4), whitelistFn)
-      await prepareFn()
-      await prepareFn()
       await approveFn()
+      await prepareFn()
 
       const tx = governance.executeHotfix(hotfixTransactions)
       await tx.sendAndWaitForReceipt()

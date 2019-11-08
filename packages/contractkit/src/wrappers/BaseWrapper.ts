@@ -38,7 +38,7 @@ export function parseBuffer(buf: Buffer) {
   return '0x' + buf.toString('hex')
 }
 
-export function parseBytes(input: Buffer): Array<string | number[]> {
+export function parseBytes(input: Buffer | string): Array<string | number[]> {
   return input as any
 }
 
@@ -49,10 +49,6 @@ export function toNumber(input: string) {
 
 export function parseNumber(input: NumberLike) {
   return new BigNumber(input).toFixed()
-}
-
-export function parseBytes(input: string): Array<string | number[]> {
-  return input as any
 }
 
 type Parser<A, B> = (input: A) => B
