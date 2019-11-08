@@ -107,7 +107,7 @@ contract('BlockchainParameters', (accounts: string[]) => {
     })
     it('only owner should be able to set', async () => {
       await assertRevert(
-        blockchainParameters.setBlockGasLimit(gasLimit, {
+        blockchainParameters.setIntrinsicGasForAlternativeGasCurrency(gasLimit, {
           from: accounts[1],
         })
       )

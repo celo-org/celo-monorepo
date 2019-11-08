@@ -40,16 +40,17 @@ describe('Blockchain parameters tests', function(this: any) {
   }
 
   describe('when running a node', () => {
+    before(async () => {
+      await restartGeth()
+    })
     it('block limit should have been set using governance', async () => {
       this.timeout(0)
-      await restartGeth()
       const current = await kit.web3.eth.getBlockNumber()
       const block = await kit.web3.eth.getBlock(current)
       assert.equal(block.gasLimit, 20000000)
     })
     it('changing the block gas limit', async () => {
       this.timeout(0)
-      await restartGeth()
       await parameters.setBlockGasLimit(23000000).send({ from: validatorAddress })
       await sleep(5)
       const current = await kit.web3.eth.getBlockNumber()
@@ -58,7 +59,6 @@ describe('Blockchain parameters tests', function(this: any) {
     })
     it('should exit when minimum version is updated', async () => {
       this.timeout(0)
-      await restartGeth()
       await setMinimumClientVersion(1, 8, 99)
       await sleep(120)
       try {
