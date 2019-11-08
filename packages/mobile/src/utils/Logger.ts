@@ -74,7 +74,7 @@ class Logger extends ReactNativeLogger {
     const deviceInfo = {
       version: DeviceInfo.getVersion(),
       buildNumber: DeviceInfo.getBuildNumber(),
-      apiLevel: DeviceInfo.getAPILevel(),
+      apiLevel: DeviceInfo.getApiLevel(),
       deviceId: DeviceInfo.getDeviceId(),
     }
 

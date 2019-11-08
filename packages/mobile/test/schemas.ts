@@ -54,6 +54,7 @@ export const vNeg1Schema = {
     },
     latestBlockNumber: 0,
     account: '0x0000000000000000000000000000000000007E57',
+    accountInWeb3Keystore: '0x0000000000000000000000000000000000007E57',
     commentKey: '0x0000000000000000000000000000000000008F68',
     gasPriceLastUpdated: 0,
     zeroSyncMode: false,
@@ -157,6 +158,10 @@ export const v2Schema = {
 
 export const v3Schema = {
   ...v2Schema,
+  app: {
+    ...v2Schema.app,
+    doingPinVerification: false,
+  },
   localCurrency: {
     ...v2Schema.localCurrency,
     preferredCurrencyCode: 'MXN',

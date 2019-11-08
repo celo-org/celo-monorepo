@@ -192,28 +192,28 @@ spec:
         args:
         - "-c"
         - "geth --bootnodes=`cat /root/.celo/bootnodes` \
-          --password=/root/.celo/account/accountSecret \
-          --nodekey=/root/.celo/account/{{ .Node.name}}PrivateKey \
-          --unlock=${ACCOUNT_ADDRESS} \
-          --mine \
-          --rpc \
-          --rpcaddr 0.0.0.0 \
-          --rpcapi=eth,net,web3,debug \
-          --rpccorsdomain='*' \
-          --rpcvhosts=* \
-          --ws \
-          --wsaddr 0.0.0.0 \
-          --wsorigins=* \
-          --wsapi=eth,net,web3,debug \
-          --etherbase=${ACCOUNT_ADDRESS} \
-          --networkid=${NETWORK_ID} \
-          --miner.verificationpool=${VERIFICATION_POOL_URL} \
-          --syncmode=full \
-          --ethstats=${HOSTNAME}:${ETHSTATS_SECRET}@${ETHSTATS_SVC} \
           --consoleformat=json \
           --consoleoutput=stdout \
+          --etherbase=${ACCOUNT_ADDRESS} \
+          --ethstats=${HOSTNAME}:${ETHSTATS_SECRET}@${ETHSTATS_SVC} \
+          --metrics \
+          --mine \
+          --miner.verificationpool=${VERIFICATION_POOL_URL} \
+          --networkid=${NETWORK_ID} \
+          --nodekey=/root/.celo/account/{{ .Node.name}}PrivateKey \
+          --password=/root/.celo/account/accountSecret \
+          --rpc \
+          --rpcaddr 0.0.0.0 \
+          --rpcapi=eth,net,web3,debug,txpool \
+          --rpccorsdomain=* \
+          --rpcvhosts=* \
+          --syncmode=full \
+          --unlock=${ACCOUNT_ADDRESS} \
           --verbosity={{ .Values.geth.verbosity }} \
-          --metrics"
+          --ws \
+          --wsaddr 0.0.0.0 \
+          --wsapi=eth,net,web3,debug,txpool \
+          --wsorigins=*"
         ports:
         - name: discovery-udp
           containerPort: 30303
@@ -310,25 +310,25 @@ spec:
         args:
         - "-c"
         - "geth --bootnodes=`cat /root/.celo/bootnodes` \
-          --lightserv 90 \
-          --lightpeers 250 \
-          --networkid=${NETWORK_ID} \
-          --ethstats=${HOSTNAME}:${ETHSTATS_SECRET}@${ETHSTATS_SVC} \
           --consoleformat=json \
           --consoleoutput=stdout \
-          --verbosity={{ .Values.geth.verbosity }} \
+          --ethstats=${HOSTNAME}:${ETHSTATS_SECRET}@${ETHSTATS_SVC} \
+          --lightpeers 250 \
+          --lightserv 90 \
           --metrics \
-          --targetgaslimit=${TARGET_GAS_LIMIT} \
+          --networkid=${NETWORK_ID} \
+          --nodekey=/root/.celo/account/{{ .node_name }}NodeKey \
           --rpc \
           --rpcaddr 0.0.0.0 \
-          --rpcapi=eth,net,web3,debug \
-          --rpccorsdomain='*' \
+          --rpcapi=eth,net,web3,debug,txpool \
+          --rpccorsdomain=* \
           --rpcvhosts=* \
+          --targetgaslimit=${TARGET_GAS_LIMIT} \
+          --verbosity={{ .Values.geth.verbosity }} \
           --ws \
           --wsaddr 0.0.0.0 \
-          --wsorigins=* \
-          --wsapi=eth,net,web3,debug \
-          --nodekey=/root/.celo/account/{{ .node_name }}NodeKey"
+          --wsapi=eth,net,web3,debug,txpool \
+          --wsorigins=*"
         ports:
         - name: discovery-udp
           containerPort: 30303

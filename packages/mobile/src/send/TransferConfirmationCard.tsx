@@ -1,4 +1,5 @@
 import HorizontalLine from '@celo/react-components/components/HorizontalLine'
+import Link from '@celo/react-components/components/Link'
 import { MoneyAmount } from '@celo/react-components/components/MoneyAmount'
 import colors from '@celo/react-components/styles/colors'
 import { fontStyles } from '@celo/react-components/styles/fonts'
@@ -67,10 +68,13 @@ const renderTopSection = (props: Props) => {
 const renderAmountSection = (props: Props) => {
   const { currency, type, value } = props
 
+  // tslint:disable react-hooks-nesting
   const localCurrencyCode = useLocalCurrencyCode()
   const localCurrencySymbol = useLocalCurrencySymbol()
+  const localValue = useDollarsToLocalAmount(value) || 0
+  // tslint:enable react-hooks-nesting
   const transactionValue = getMoneyDisplayValue(
-    localCurrencyCode ? useDollarsToLocalAmount(value) || 0 : value
+    currency === CURRENCY_ENUM.DOLLAR && localCurrencyCode ? localValue : value
   )
 
   switch (type) {
@@ -87,7 +91,10 @@ const renderAmountSection = (props: Props) => {
     default:
       return (
         <MoneyAmount
-          symbol={localCurrencySymbol || CURRENCIES[currency].symbol}
+          symbol={
+            (currency === CURRENCY_ENUM.DOLLAR && localCurrencySymbol) ||
+            CURRENCIES[currency].symbol
+          }
           amount={transactionValue}
         />
       )
@@ -113,9 +120,7 @@ const renderBottomSection = (props: Props) => {
       <View>
         <Text style={style.pSmall}>
           {t('walletFlow5:networkFeeExplanation.0')}
-          <Text onPress={onPressGoToFaq} style={fontStyles.link}>
-            {t('walletFlow5:networkFeeExplanation.1')}
-          </Text>
+          <Link onPress={onPressGoToFaq}>{t('walletFlow5:networkFeeExplanation.1')}</Link>
         </Text>
       </View>
     )
