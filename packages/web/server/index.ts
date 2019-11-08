@@ -10,12 +10,12 @@ import { Tables } from '../fullstack/EcoFundFields'
 import Sentry, { initSentry } from '../fullstack/sentry'
 import addToCRM from '../server/addToCRM'
 import ecoFundSubmission from '../server/EcoFundApp'
+import { RequestType } from '../src/fauceting/FaucetInterfaces'
 import nextI18next from '../src/i18n'
 import latestAnnouncements from './Announcement'
 import { faucetOrInviteController } from './controllers'
 import getFormattedEvents from './EventHelpers'
 import { submitFellowApp } from './FellowshipApp'
-import { RequestType } from './FirebaseClient'
 import mailer from './mailer'
 import { getFormattedMediumArticles } from './mediumAPI'
 const port = parseInt(process.env.PORT, 10) || 3000
@@ -58,9 +58,10 @@ function wwwRedirect(req, res, nextAction) {
       res.redirect('/about-us')
     })
   })
-
-  server.get('/connect', (_, res) => {
-    res.redirect('/community')
+  ;['/arg_tos', '/arg_privacy', '/argentina'].forEach((path) => {
+    server.get(path, (_, res) => {
+      res.redirect('/terms')
+    })
   })
   ;['/applications', '/technology', '/dev', '/developer'].forEach((path) => {
     server.get(path, (_, res) => {
@@ -73,6 +74,9 @@ function wwwRedirect(req, res, nextAction) {
     })
   })
 
+  server.get('/connect', (_, res) => {
+    res.redirect('/community')
+  })
   server.get('/tos', (_, res) => {
     res.redirect('/user-agreement')
   })

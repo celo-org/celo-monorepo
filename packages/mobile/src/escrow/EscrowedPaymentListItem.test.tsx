@@ -2,7 +2,7 @@ import * as React from 'react'
 import 'react-native'
 import { Provider } from 'react-redux'
 import * as renderer from 'react-test-renderer'
-import EscrowedPaymentReminderNotification from 'src/notifications/EscrowedPaymentReminderNotification'
+import EscrowedPaymentListItem from 'src/escrow/EscrowedPaymentListItem'
 import { createMockStore } from 'test/utils'
 import { mockEscrowedPayment } from 'test/values'
 
@@ -12,7 +12,7 @@ describe('EscrowedPaymentReminderNotification', () => {
   it('renders correctly', () => {
     const tree = renderer.create(
       <Provider store={store}>
-        <EscrowedPaymentReminderNotification payment={mockEscrowedPayment} />
+        <EscrowedPaymentListItem payment={mockEscrowedPayment} />
       </Provider>
     )
     expect(tree).toMatchSnapshot()

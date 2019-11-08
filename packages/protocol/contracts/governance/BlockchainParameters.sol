@@ -7,7 +7,6 @@ import "../common/Initializable.sol";
  * @title Contract for storing blockchain parameters that can be set by governance.
  */
 contract BlockchainParameters is Ownable, Initializable {
-
   struct ClientVersion {
     uint256 major;
     uint256 minor;
@@ -15,10 +14,11 @@ contract BlockchainParameters is Ownable, Initializable {
   }
 
   ClientVersion private minimumClientVersion;
-
   uint256 public blockGasLimit;
+  uint256 public intrinsicGasForAlternativeGasCurrency;
 
   event MinimumClientVersionSet(uint256 major, uint256 minor, uint256 patch);
+  event IntrinsicGasForAlternativeGasCurrencySet(uint256 gas);
   event BlockGasLimitSet(uint limit);
 
   /**
@@ -29,11 +29,14 @@ contract BlockchainParameters is Ownable, Initializable {
    * minor version.
    * @param patch Minimum client version that can be used in the chain,
    * patch level.
+   * @param _gasForNonGoldCurrencies Intrinsic gas for non-gold gas currencies.
+   * @param gasLimit Block gas limit.
    */
   function initialize(
     uint256 major,
     uint256 minor,
     uint256 patch,
+    uint256 _gasForNonGoldCurrencies,
     uint256 gasLimit
   )
     external
@@ -42,6 +45,7 @@ contract BlockchainParameters is Ownable, Initializable {
     _transferOwnership(msg.sender);
     setMinimumClientVersion(major, minor, patch);
     setBlockGasLimit(gasLimit);
+    setIntrinsicGasForAlternativeGasCurrency(_gasForNonGoldCurrencies);
   }
 
   /**
@@ -68,7 +72,17 @@ contract BlockchainParameters is Ownable, Initializable {
     emit BlockGasLimitSet(gasLimit);
   }
 
-  /** @notice Query minimum client version.
+  /**
+   * @notice Sets the intrinsic gas for non-gold gas currencies.
+   * @param gas Intrinsic gas for non-gold gas currencies.
+   */
+  function setIntrinsicGasForAlternativeGasCurrency(uint256 gas) public onlyOwner {
+    intrinsicGasForAlternativeGasCurrency = gas;
+    emit IntrinsicGasForAlternativeGasCurrencySet(gas);
+  }
+
+  /**
+   * @notice Query minimum client version.
    * @return Returns major, minor, and patch version numbers.
    */
   function getMinimumClientVersion()

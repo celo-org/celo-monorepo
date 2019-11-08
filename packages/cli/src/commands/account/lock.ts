@@ -2,7 +2,8 @@ import { Address } from '@celo/utils/lib/address'
 import { flags } from '@oclif/command'
 import BigNumber from 'bignumber.js'
 import { BaseCommand } from '../../base'
-import { displaySendTx, failWith } from '../../utils/cli'
+import { newCheckBuilder } from '../../utils/checks'
+import { displaySendTx } from '../../utils/cli'
 import { Flags } from '../../utils/command'
 import { LockedGoldArgs } from '../../utils/lockedgold'
 
@@ -26,14 +27,15 @@ export default class Lock extends BaseCommand {
     const address: Address = res.flags.from
 
     this.kit.defaultAccount = address
-    const lockedGold = await this.kit.contracts.getLockedGold()
-
     const value = new BigNumber(res.flags.value)
 
-    if (!value.gt(new BigNumber(0))) {
-      failWith(`Provided value must be greater than zero => [${value.toString()}]`)
-    }
+    await newCheckBuilder(this)
+      .addCheck(`Value [${value.toString()}] is >= 0`, () => value.gt(0))
+      .isAccount(address)
+      .hasEnoughGold(address, value)
+      .runChecks()
 
+    const lockedGold = await this.kit.contracts.getLockedGold()
     const tx = lockedGold.lock()
     await displaySendTx('lock', tx, { value: value.toString() })
   }

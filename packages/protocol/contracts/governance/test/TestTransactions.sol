@@ -1,11 +1,9 @@
 pragma solidity ^0.5.3;
 
-
 /**
  * @title A contract for transaction testing.
  */
 contract TestTransactions {
-
   mapping(uint256 => uint256) public values;
 
   function getValue(uint256 key) external view returns (uint256) {
