@@ -125,7 +125,7 @@ library FixidityLib {
     pure
     returns (Fraction memory)
   {
-    require(x <= maxNewFixed());
+    require(x <= maxNewFixed(), "newFixed overflow");
     return Fraction(x * FIXED1_UINT);
   }
 
@@ -161,9 +161,9 @@ library FixidityLib {
     pure
     returns (Fraction memory)
   {
-    require(numerator <= maxNewFixed());
-    require(denominator <= maxNewFixed());
-    require(denominator != 0);
+    require(numerator <= maxNewFixed(), "numerator too large");
+    require(denominator <= maxNewFixed(), "denominator too large");
+    require(denominator != 0, "denominator zero");
     Fraction memory convertedNumerator = newFixed(numerator);
     Fraction memory convertedDenominator = newFixed(denominator);
     return divide(convertedNumerator, convertedDenominator);
@@ -202,7 +202,7 @@ library FixidityLib {
    */
   function add(Fraction memory x, Fraction memory y) internal pure returns (Fraction memory) {
     uint256 z = x.value + y.value;
-    require(z >= x.value);
+    require(z >= x.value, "addition overflow");
     return Fraction(z);
   }
 
@@ -212,7 +212,7 @@ library FixidityLib {
    * Test subtract(6, 10) fails
    */
   function subtract(Fraction memory x, Fraction memory y) internal pure returns (Fraction memory) {
-    require(x.value >= y.value);
+    require(x.value >= y.value, "subtract");
     return Fraction(x.value - y.value);
   }
 
@@ -241,24 +241,24 @@ library FixidityLib {
 
     // (x1 + x2) * (y1 + y2) = (x1 * y1) + (x1 * y2) + (x2 * y1) + (x2 * y2)
     uint256 x1y1 = x1 * y1;
-    if (x1 != 0) require(x1y1 / x1 == y1); // Overflow x1y1
+    if (x1 != 0) require(x1y1 / x1 == y1, "Overflow x1y1");
 
     // x1y1 needs to be multiplied back by fixed1
     // solium-disable-next-line mixedcase
     uint256 fixed_x1y1 = x1y1 * FIXED1_UINT;
-    if (x1y1 != 0) require(fixed_x1y1 / x1y1 == FIXED1_UINT); // Overflow x1y1 * fixed1
+    if (x1y1 != 0) require(fixed_x1y1 / x1y1 == FIXED1_UINT, "Overflow x1y1 * fixed1");
     x1y1 = fixed_x1y1;
 
     uint256 x2y1 = x2 * y1;
-    if (x2 != 0) require(x2y1 / x2 == y1); // Overflow x2y1
+    if (x2 != 0) require(x2y1 / x2 == y1, "Overflow x2y1");
 
     uint256 x1y2 = x1 * y2;
-    if (x1 != 0) require(x1y2 / x1 == y2); // Overflow x1y2
+    if (x1 != 0) require(x1y2 / x1 == y2, "Overflow x1y2");
 
     x2 = x2 / mulPrecision();
     y2 = y2 / mulPrecision();
     uint256 x2y2 = x2 * y2;
-    if (x2 != 0) require(x2y2 / x2 == y2); // Overflow x2y2
+    if (x2 != 0) require(x2y2 / x2 == y2, "Overflow x2y2");
 
     // result = fixed1() * x1 * y1 + x1 * y2 + x2 * y1 + x2 * y2 / fixed1();
     Fraction memory result = Fraction(x1y1);
@@ -277,7 +277,7 @@ library FixidityLib {
    * Test reciprocal(1+fixed1()*fixed1()) returns 0 // Testing how the fractional is truncated
    */
   function reciprocal(Fraction memory x) internal pure returns (Fraction memory) {
-    require(x.value != 0);
+    require(x.value != 0, "reciprocal of zero");
     return Fraction((FIXED1_UINT*FIXED1_UINT) / x.value); // Can't overflow
   }
 
@@ -290,9 +290,9 @@ library FixidityLib {
    * Test divide(maxFixedDividend()+1,1) throws
    */
   function divide(Fraction memory x, Fraction memory y) internal pure returns (Fraction memory) {
-    require(y.value != 0);
+    require(y.value != 0, "division by zero");
     uint256 X = x.value * FIXED1_UINT;
-    require(X / FIXED1_UINT == x.value);
+    require(X / FIXED1_UINT == x.value, "division overflow");
     return Fraction(X / y.value);
   }
 

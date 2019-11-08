@@ -1,7 +1,12 @@
 pragma solidity ^0.5.3;
 
+import "../common/FixidityLib.sol";
+
 // TODO(asa): Limit assembly usage by using X.staticcall instead.
 contract UsingPrecompiles {
+
+  using FixidityLib for FixidityLib.Fraction;
+
   address constant PROOF_OF_POSSESSION = address(0xff - 4);
 
   /**
@@ -29,6 +34,7 @@ contract UsingPrecompiles {
     require(aDenominator != 0 && bDenominator != 0);
     uint256 returnNumerator;
     uint256 returnDenominator;
+    uint256 error = 0;
     // solhint-disable-next-line no-inline-assembly
     assembly {
       let newCallDataPosition := mload(0x40)
@@ -58,12 +64,52 @@ contract UsingPrecompiles {
         revert(returnDataPosition, returnDataSize)
       }
       default {
-        returnNumerator := mload(returnDataPosition)
-        returnDenominator := mload(add(returnDataPosition, 32))
+        switch returnDataSize
+        case 0 {
+          error := 1
+        }
+        default {
+          returnNumerator := mload(returnDataPosition)
+          returnDenominator := mload(add(returnDataPosition, 32))
+        }
       }
+    }
+    if (error == 1) {
+      return fractionMulExpFallback(aNumerator, aDenominator, bNumerator, bDenominator, exponent);
     }
     return (returnNumerator, returnDenominator);
   }
+
+  function fractionMulExpFallback(
+    uint256 aNumerator,
+    uint256 aDenominator,
+    uint256 bNumerator,
+    uint256 bDenominator,
+    uint256 exponent
+  )
+    public
+    pure
+    returns (uint256, uint256)
+  {
+    // calculate some kind of approximation
+    uint256 exp = exponent;
+    FixidityLib.Fraction memory a = FixidityLib.newFixedFraction(aNumerator, aDenominator);
+    FixidityLib.Fraction memory acc = FixidityLib.newFixedFraction(bNumerator, bDenominator);
+    FixidityLib.Fraction memory res = FixidityLib.newFixed(0);
+    // just use the simple algorithm
+    for (uint i = 0; i < 32; i++) {
+      if (exp & 0x01 == 1) {
+        res = res.add(acc);
+      }
+      acc = acc.multiply(acc);
+      exp = exp >> 1;
+    }
+    res = res.multiply(a);
+    uint256 returnNumerator = res.unwrap();
+    uint256 returnDenominator = FixidityLib.fixed1().unwrap();
+    return (returnNumerator, returnDenominator);
+  }
+
 
   /**
    * @notice Returns the current epoch size in blocks.

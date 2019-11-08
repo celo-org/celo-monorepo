@@ -8,12 +8,13 @@ import "../common/linkedlists/AddressSortedLinkedListWithMedian.sol";
 import "../common/linkedlists/SortedLinkedListWithMedian.sol";
 import "../common/FractionUtil.sol";
 import "../common/FixidityLib.sol";
+import "../common/UsingPrecompiles.sol";
 
 // TODO: don't treat timestamps as Fixidity values
 /**
  * @title Maintains a sorted list of oracle exchange rates between Celo Gold and other currencies.
  */
-contract SortedOracles is ISortedOracles, Ownable, Initializable {
+contract SortedOracles is ISortedOracles, Ownable, Initializable, UsingPrecompiles {
   using SafeMath for uint256;
   using AddressSortedLinkedListWithMedian for SortedLinkedListWithMedian.List;
   using FractionUtil for FractionUtil.Fraction;
@@ -32,7 +33,7 @@ contract SortedOracles is ISortedOracles, Ownable, Initializable {
   mapping(address => uint256) private limitedMedianRateTimestamp;
 
   uint256 public reportExpirySeconds;
-  FixidityLib.Fraction public maxMedianChangeRatePerDay;
+  FixidityLib.Fraction public maxMedianChangeRatePerSecond;
 
   event OracleAdded(
     address indexed token,
@@ -67,7 +68,7 @@ contract SortedOracles is ISortedOracles, Ownable, Initializable {
     uint256 reportExpiry
   );
 
-  event MaxMedianChangeRatePerDaySet(
+  event MaxMedianChangeRatePerSecondSet(
     uint256 rate
   );
 
@@ -95,9 +96,9 @@ contract SortedOracles is ISortedOracles, Ownable, Initializable {
    * @param rate Maximum median change rate as unwrapped Fraction.
    * @return True upon success.
    */
-  function setMaxMedianChangeRatePerDay(uint256 rate) public onlyOwner returns (bool) {
-    maxMedianChangeRatePerDay = FixidityLib.wrap(rate);
-    emit MaxMedianChangeRatePerDaySet(rate);
+  function setMaxMedianChangeRatePerSecond(uint256 rate) public onlyOwner returns (bool) {
+    maxMedianChangeRatePerSecond = FixidityLib.wrap(rate);
+    emit MaxMedianChangeRatePerSecondSet(rate);
     return true;
   }
 
@@ -105,8 +106,8 @@ contract SortedOracles is ISortedOracles, Ownable, Initializable {
    * @notice Get maximum median change rate.
    * @return Max median change rate as unwrapped fraction.
    */
-  function getMaxMedianChangeRatePerDay() public view returns (uint256) {
-    return maxMedianChangeRatePerDay.unwrap();
+  function getMaxMedianChangeRatePerSecond() public view returns (uint256) {
+    return maxMedianChangeRatePerSecond.unwrap();
   }
 
   /**
@@ -211,15 +212,34 @@ contract SortedOracles is ISortedOracles, Ownable, Initializable {
     recomputeRate(token);
   }
 
+  function fracMulExp(
+    FixidityLib.Fraction memory a,
+    FixidityLib.Fraction memory b,
+    uint256 exp
+  ) internal view returns (FixidityLib.Fraction memory) {
+    uint256 numerator;
+    uint256 denominator;
+    (numerator, denominator) = fractionMulExp(
+      a.unwrap(),
+      FixidityLib.fixed1().unwrap(),
+      b.unwrap(),
+      FixidityLib.fixed1().unwrap(),
+      exp,
+      18
+    );
+    return FixidityLib.newFixedFraction(numerator, denominator);
+  }
+
   function recomputeRate(address token) internal {
     uint256 originalMedian = limitedMedianRate[token];
     uint256 newMedian = rates[token].getMedianValue();
-    if (limitedMedianRateTimestamp[token] != 0 && maxMedianChangeRatePerDay.unwrap() != 0) {
+    if (limitedMedianRateTimestamp[token] != 0 && maxMedianChangeRatePerSecond.unwrap() != 0) {
       uint256 td = now.sub(limitedMedianRateTimestamp[token]);
       if (td > 1 days) td = 1 days;
-      FixidityLib.Fraction memory timeFraction = FixidityLib.newFixedFraction(td, 1 days);
-      FixidityLib.Fraction memory maxChangeRate = timeFraction.multiply(maxMedianChangeRatePerDay);
-      uint256 maxChange = FixidityLib.newFixed(originalMedian).multiply(maxChangeRate).fromFixed();
+      uint256 maxChange = fracMulExp(
+        FixidityLib.fixed1(),
+        maxMedianChangeRatePerSecond.add(FixidityLib.fixed1()),
+        td).subtract(FixidityLib.fixed1()).multiply(FixidityLib.wrap(originalMedian)).unwrap();
       if (newMedian > originalMedian) {
         if (maxChange < newMedian.sub(originalMedian)) {
           newMedian = originalMedian.add(maxChange);
