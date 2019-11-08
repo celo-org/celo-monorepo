@@ -24,13 +24,17 @@ export class TransactionBuilder {
   }
 
   get hash(): Buffer {
-    const encoded = encodedTransactions(this.transactions)
+    const encoded = this.encoded
     return keccak256(
       this.kit.web3.eth.abi.encodeParameters(
         ['uint256[]', 'address[]', 'bytes', 'uint256[]'],
         [encoded.values, encoded.destinations, encoded.data, encoded.dataLengths]
       )
     ) as Buffer
+  }
+
+  get encoded() {
+    return encodedTransactions(this.transactions)
   }
 
   appendCeloTx(tx: CeloTransactionObject<any>) {
