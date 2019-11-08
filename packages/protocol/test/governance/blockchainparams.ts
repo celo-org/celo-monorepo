@@ -137,13 +137,19 @@ contract('BlockchainParameters', (accounts: string[]) => {
         gasForNonGoldCurrencies,
         gasLimit
       )
-      assert.equal(resp.logs.length, 3)
+      assert.equal(resp.logs.length, 4)
       assertContainSubset(resp.logs[1], {
         event: 'MinimumClientVersionSet',
         args: {
           major: new BigNumber(version.major),
           minor: new BigNumber(version.minor),
           patch: new BigNumber(version.patch),
+        },
+      })
+      assertContainSubset(resp.logs[3], {
+        event: 'IntrinsicGasForAlternativeGasCurrencySet',
+        args: {
+          gas: new BigNumber(gasForNonGoldCurrencies),
         },
       })
       assertContainSubset(resp.logs[2], {
