@@ -1,10 +1,10 @@
 // tslint:disable-next-line: no-reference (Required to make this work w/ ts-node)
 /// <reference path="../../../contractkit/types/web3.d.ts" />
 
-import { assert } from 'chai'
-import { getHooks, GethTestConfig, sleep } from './utils'
 import { ContractKit, newKit } from '@celo/contractkit'
 import { BlockchainParametersWrapper } from '@celo/contractkit/lib/wrappers/BlockchainParameters'
+import { assert } from 'chai'
+import { getHooks, GethTestConfig, sleep } from './utils'
 
 describe('exit tests', function(this: any) {
   this.timeout(0)
