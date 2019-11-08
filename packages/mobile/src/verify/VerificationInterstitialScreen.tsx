@@ -10,7 +10,7 @@ import { Namespaces } from 'src/i18n'
 import { navigate } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
 
-const SCREEN_DUARTION = 5000 // 5s
+const SCREEN_DURATION = 6000 // 6s
 
 const AnimatedCircle = () => (
   <View style={styles.iconContainer}>
@@ -21,10 +21,16 @@ const AnimatedCircle = () => (
 class VerificationInterstitialScreen extends React.Component<WithNamespaces> {
   static navigationOptions = null
 
+  timeout: number | undefined
+
   componentDidMount() {
-    setTimeout(() => {
+    this.timeout = setTimeout(() => {
       navigate(Screens.VerificationInputScreen)
-    }, SCREEN_DUARTION)
+    }, SCREEN_DURATION)
+  }
+
+  componentWillUnmount() {
+    clearTimeout(this.timeout)
   }
 
   render() {
