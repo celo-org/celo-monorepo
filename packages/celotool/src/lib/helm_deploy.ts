@@ -666,7 +666,7 @@ export async function resetAndUpgradeHelmChart(celoEnv: string) {
   const numValdiators = parseInt(fetchEnv(envVar.VALIDATORS), 10)
   const numTxNodes = parseInt(fetchEnv(envVar.TX_NODES), 10)
   // assumes 1 sentry per proxied validator
-  const numSentries = parseInt(fetchEnv(envVar.PROXIED_VALIDATORS), 10)
+  const numSentries = parseInt(fetchEnvOrFallback(envVar.PROXIED_VALIDATORS, '0'), 10)
 
   // Note(trevor): helm upgrade only compares the current chart to the
   // previously deployed chart when deciding what needs changing, so we need
