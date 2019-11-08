@@ -7,6 +7,7 @@ export enum Stacks {
   QRSendStack = 'QRSendStack',
   SettingsStack = 'SettingsStack',
   RequestStack = 'RequestStack',
+  EscrowStack = 'EscrowStack',
   BackupStack = 'BackupStack',
 }
 
@@ -44,6 +45,7 @@ export enum Screens {
   Language = 'Language',
   Licenses = 'Licenses',
   PaymentRequestListScreen = 'PaymentRequestListScreen',
+  EscrowedPaymentListScreen = 'EscrowedPaymentListScreen',
   PhotosEducation = 'PhotosEducation',
   PhotosNUX = 'PhotosNUX',
   PincodeEducation = 'PincodeEducation',

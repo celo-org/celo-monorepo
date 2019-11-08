@@ -4,12 +4,10 @@ import "openzeppelin-solidity/contracts/math/SafeMath.sol";
 import "./LinkedList.sol";
 import "./SortedLinkedList.sol";
 
-
 /**
  * @title Maintains a sorted list of unsigned ints keyed by uint256.
  */
 library IntegerSortedLinkedList {
-
   using SortedLinkedList for SortedLinkedList.List;
 
   /**
@@ -25,9 +23,7 @@ library IntegerSortedLinkedList {
     uint256 value,
     uint256 lesserKey,
     uint256 greaterKey
-  )
-    public
-  {
+  ) public {
     list.insert(bytes32(key), value, bytes32(lesserKey), bytes32(greaterKey));
   }
 
@@ -53,9 +49,7 @@ library IntegerSortedLinkedList {
     uint256 value,
     uint256 lesserKey,
     uint256 greaterKey
-  )
-    public
-  {
+  ) public {
     list.update(bytes32(key), value, bytes32(lesserKey), bytes32(greaterKey));
   }
 
@@ -103,9 +97,7 @@ library IntegerSortedLinkedList {
    * @notice Gets all elements from the doubly linked list.
    * @return An unpacked list of elements from largest to smallest.
    */
-  function getElements(
-    SortedLinkedList.List storage list
-  )
+  function getElements(SortedLinkedList.List storage list)
     public
     view
     returns (uint256[] memory, uint256[] memory)
