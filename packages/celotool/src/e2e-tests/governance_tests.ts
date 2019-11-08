@@ -187,17 +187,21 @@ describe('governance tests', () => {
         await sleep(0.5)
       }
 
+      console.log(`activating ${allValidators[0]}`)
       await activate(allValidators[0])
+      console.log(`activated ${allValidators[0]}`)
       validators = await groupKit._web3Contracts.getValidators()
       const membersToSwap = [allValidators[0], allValidators[1]]
       let includedMemberIndex = 1
+      console.log(`removing ${membersToSwap[0]}`)
       await removeMember(groupWeb3, groupAddress, membersToSwap[0])
+      console.log(`removed ${membersToSwap[0]}`)
 
       const changeValidatorSet = async (header: any) => {
         blockNumbers.push(header.number)
         // At the start of epoch N, swap members so the validator set is different for epoch N + 1.
-        // NOTE: It is not gaurenteed that this function is executed with mutual exclusion to other invocations.
         if (header.number % epoch === 1) {
+          console.log(`Changing validator at block ${header.number}`)
           const memberToRemove = membersToSwap[includedMemberIndex]
           const memberToAdd = membersToSwap[(includedMemberIndex + 1) % 2]
           await removeMember(groupWeb3, groupAddress, memberToRemove)
@@ -206,6 +210,7 @@ describe('governance tests', () => {
           const newMembers = await getValidatorGroupMembers()
           assert.include(newMembers, memberToAdd)
           assert.notInclude(newMembers, memberToRemove)
+          console.log(`Done changing validator at block ${header.number}`)
         }
       }
 
