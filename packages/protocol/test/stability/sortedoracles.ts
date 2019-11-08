@@ -43,7 +43,7 @@ contract('SortedOracles', (accounts: string[]) => {
     })
   })
 
-  describe('#setMaxMedianChangeRatePerDay', () => {
+  describe('#setMaxMedianChangeRatePerSecond', () => {
     const newMaxMedianChangeRatePerSecond = toFixed(0.000001)
     const denominator = new BigNumber(2).pow(64)
     const smallChange = new BigNumber(2).pow(64).plus(1)
@@ -54,7 +54,7 @@ contract('SortedOracles', (accounts: string[]) => {
         from: anOracle,
       })
     })
-    it('should update maxMedianChangeRatePerDay', async () => {
+    it('should update maxMedianChangeRatePerSecond', async () => {
       await sortedOracles.setMaxMedianChangeRatePerSecond(newMaxMedianChangeRatePerSecond)
       assertEqualBN(
         await sortedOracles.getMaxMedianChangeRatePerSecond(),
@@ -68,7 +68,7 @@ contract('SortedOracles', (accounts: string[]) => {
         })
       )
     })
-    it('should emit the MaxMedianChangeRatePerDaySet event', async () => {
+    it('should emit the MaxMedianChangeRatePerSecondSet event', async () => {
       const resp = await sortedOracles.setMaxMedianChangeRatePerSecond(
         newMaxMedianChangeRatePerSecond
       )

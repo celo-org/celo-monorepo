@@ -215,7 +215,6 @@ contract SortedOracles is ISortedOracles, Ownable, Initializable, UsingPrecompil
     uint256 newMedian = rates[token].getMedianValue();
     if (limitedMedianRateTimestamp[token] != 0 && maxMedianChangeRatePerSecond.unwrap() != 0) {
       uint256 td = now.sub(limitedMedianRateTimestamp[token]);
-      if (td > 1 days) td = 1 days;
       uint256 maxChange = fracMulExp(
         FixidityLib.fixed1(),
         maxMedianChangeRatePerSecond.add(FixidityLib.fixed1()),

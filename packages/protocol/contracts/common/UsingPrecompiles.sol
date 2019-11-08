@@ -29,7 +29,6 @@ contract UsingPrecompiles {
     require(aDenominator != 0 && bDenominator != 0);
     uint256 returnNumerator;
     uint256 returnDenominator;
-    uint256 error = 0;
     // solhint-disable-next-line no-inline-assembly
     assembly {
       let newCallDataPosition := mload(0x40)
@@ -59,45 +58,10 @@ contract UsingPrecompiles {
           revert(returnDataPosition, returnDataSize)
         }
         default {
-          switch returnDataSize
-            case 0 {
-              error := 1
-            }
-            default {
-              returnNumerator := mload(returnDataPosition)
-              returnDenominator := mload(add(returnDataPosition, 32))
-            }
+          returnNumerator := mload(returnDataPosition)
+          returnDenominator := mload(add(returnDataPosition, 32))
         }
     }
-    if (error == 1) {
-      return fractionMulExpFallback(aNumerator, aDenominator, bNumerator, bDenominator, exponent);
-    }
-    return (returnNumerator, returnDenominator);
-  }
-
-  function fractionMulExpFallback(
-    uint256 aNumerator,
-    uint256 aDenominator,
-    uint256 bNumerator,
-    uint256 bDenominator,
-    uint256 exponent
-  ) public pure returns (uint256, uint256) {
-    // calculate some kind of approximation
-    uint256 exp = exponent;
-    FixidityLib.Fraction memory a = FixidityLib.newFixedFraction(aNumerator, aDenominator);
-    FixidityLib.Fraction memory acc = FixidityLib.newFixedFraction(bNumerator, bDenominator);
-    FixidityLib.Fraction memory res = FixidityLib.newFixed(0);
-    // just use the simple algorithm
-    for (uint256 i = 0; i < 32; i++) {
-      if (exp & 0x01 == 1) {
-        res = res.add(acc);
-      }
-      acc = acc.multiply(acc);
-      exp = exp >> 1;
-    }
-    res = res.multiply(a);
-    uint256 returnNumerator = res.unwrap();
-    uint256 returnDenominator = FixidityLib.fixed1().unwrap();
     return (returnNumerator, returnDenominator);
   }
 
