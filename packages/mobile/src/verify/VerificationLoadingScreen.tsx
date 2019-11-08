@@ -53,12 +53,10 @@ class VerificationLoadingScreen extends React.Component<Props> {
 
   componentDidMount() {
     BackHandler.addEventListener('hardwareBackPress', this.handleBackButton)
-    //TODO restore this
-    // this.props.startVerification()
+    this.props.startVerification()
   }
 
   componentDidUpdate() {
-    //TODO handle failure case
     if (this.props.verificationStatus === VerificationStatus.Done) {
       navigate(Screens.VerificationSuccessScreen)
     } else if (this.props.verificationStatus === VerificationStatus.RevealingNumber) {

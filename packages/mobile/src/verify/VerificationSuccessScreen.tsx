@@ -8,7 +8,7 @@ import DancingRings from 'src/icons/DancingRings'
 import { navigate } from 'src/navigator/NavigationService'
 import { Stacks } from 'src/navigator/Screens'
 
-class VerificationSuccessScreen extends React.Component<WithNamespaces> {
+export class VerificationSuccessScreen extends React.Component<WithNamespaces> {
   static navigationOptions = { header: null }
 
   state = {

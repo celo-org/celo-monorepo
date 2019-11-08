@@ -50,6 +50,7 @@ const styles = StyleSheet.create({
     ...fontStyles.h2,
     ...fontStyles.bold,
     marginVertical: 15,
+    color: colors.errorRed,
   },
   modalButtonsContainer: {
     marginTop: 25,
@@ -57,16 +58,10 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'space-evenly',
   },
-  modalCancelText: {
-    ...fontStyles.body,
-    ...fontStyles.semiBold,
-    paddingRight: 20,
-  },
   modalSkipText: {
     ...fontStyles.body,
     ...fontStyles.semiBold,
     color: colors.celoGreen,
-    paddingLeft: 20,
   },
 })
 

@@ -24,14 +24,13 @@ export interface State {
   isLoadingImportContacts: boolean
 }
 
-const initialState = {
+const initialState: State = {
   attestationCodes: [],
   numCompleteAttestations: 0,
-  verificationStatus: VerificationStatus.Stopped,
+  verificationStatus: 0,
   hasSeenVerificationNux: false,
   addressToE164Number: {},
   e164NumberToAddress: {},
-  startedVerification: false,
   askedContactsPermission: false,
   isLoadingImportContacts: false,
 }
@@ -45,17 +44,6 @@ export const reducer = (state: State | undefined = initialState, action: ActionT
         numCompleteAttestations: 0,
         verificationStatus: VerificationStatus.Stopped,
       }
-    // case Actions.END_VERIFICATION:
-    //   return action.success
-    //     ? {
-    //         ...state,
-    //         ...completeCodeReducer(state, NUM_ATTESTATIONS_REQUIRED),
-    //       }
-    //     : {
-    //         ...state,
-    //         verificationFailed: true,
-    //         startedVerification: false,
-    //       }
     case Actions.SET_VERIFICATION_STATUS:
       return {
         ...state,
@@ -106,7 +94,6 @@ export const reducer = (state: State | undefined = initialState, action: ActionT
   }
 }
 
-//TODO
 const completeCodeReducer = (state: State, numCompleteAttestations: number) => {
   const { attestationCodes } = state
   // Ensure numCompleteAttestations many codes are filled

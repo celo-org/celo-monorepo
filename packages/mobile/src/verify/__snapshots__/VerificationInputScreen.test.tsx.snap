@@ -10,6 +10,55 @@ exports[`VerificationInputScreen renders correctly 1`] = `
     }
   }
 >
+  <View
+    style={
+      Object {
+        "left": 5,
+        "position": "absolute",
+        "top": 10,
+        "zIndex": 10,
+      }
+    }
+  >
+    <View
+      accessible={true}
+      focusable={true}
+      isTVSelectable={true}
+      nativeBackgroundAndroid={
+        Object {
+          "attribute": "selectableItemBackgroundBorderless",
+          "type": "ThemeAttrAndroid",
+        }
+      }
+      onClick={[Function]}
+      onResponderGrant={[Function]}
+      onResponderMove={[Function]}
+      onResponderRelease={[Function]}
+      onResponderTerminate={[Function]}
+      onResponderTerminationRequest={[Function]}
+      onStartShouldSetResponder={[Function]}
+      style={
+        Object {
+          "paddingHorizontal": 20,
+          "paddingVertical": 10,
+        }
+      }
+      testID="CancelButton"
+    >
+      <Text
+        style={
+          Object {
+            "color": "#42D689",
+            "fontFamily": "Hind-SemiBold",
+            "fontSize": 14,
+            "lineHeight": 22,
+          }
+        }
+      >
+        cancel
+      </Text>
+    </View>
+  </View>
   <RCTScrollView
     contentContainerStyle={
       Object {
@@ -60,10 +109,10 @@ exports[`VerificationInputScreen renders correctly 1`] = `
       >
         <svg
           fill="none"
-          height={48}
+          height={32}
           style={Object {}}
           viewBox="0 0 173 56"
-          width={152}
+          width={102}
           xmlns="http://www.w3.org/2000/Svg"
         >
           <circle
@@ -188,46 +237,54 @@ exports[`VerificationInputScreen renders correctly 1`] = `
       >
         <View
           style={
-            Array [
-              Object {
-                "alignItems": "center",
-                "flex": 1,
-                "flexDirection": "row",
-                "justifyContent": "center",
-              },
-              Object {
-                "borderColor": "#D1D5D8",
-                "borderRadius": 3,
-                "borderWidth": 1,
-                "flex": 0,
-                "height": 50,
-                "marginVertical": 5,
-                "paddingHorizontal": 4,
-              },
-            ]
+            Object {
+              "position": "relative",
+            }
           }
         >
-          <TextInput
-            allowFontScaling={true}
-            onBlur={[Function]}
-            onChangeText={[Function]}
-            onFocus={[Function]}
-            placeholder="<#> m9oASm/3g7aZ..."
-            rejectResponderTermination={true}
-            shouldShowClipboard={[Function]}
+          <View
             style={
-              Object {
-                "backgroundColor": "#FFFFFF",
-                "borderColor": "#D1D5D8",
-                "borderRadius": 3,
-                "flex": 1,
-                "fontFamily": "Hind-Regular",
-                "padding": 8,
-              }
+              Array [
+                Object {
+                  "alignItems": "center",
+                  "flex": 1,
+                  "flexDirection": "row",
+                  "justifyContent": "center",
+                },
+                Object {
+                  "backgroundColor": "#FFF",
+                  "borderColor": "#D1D5D8",
+                  "borderRadius": 3,
+                  "borderWidth": 1,
+                  "flex": 0,
+                  "height": 50,
+                  "marginVertical": 5,
+                },
+              ]
             }
-            underlineColorAndroid="transparent"
-            value=""
-          />
+          >
+            <TextInput
+              allowFontScaling={true}
+              onBlur={[Function]}
+              onChangeText={[Function]}
+              onFocus={[Function]}
+              placeholder="<#> m9oASm/3g7aZ..."
+              rejectResponderTermination={true}
+              shouldShowClipboard={[Function]}
+              style={
+                Object {
+                  "backgroundColor": "#FFFFFF",
+                  "borderColor": "#D1D5D8",
+                  "borderRadius": 3,
+                  "flex": 1,
+                  "fontFamily": "Hind-Regular",
+                  "padding": 8,
+                }
+              }
+              underlineColorAndroid="transparent"
+              value=""
+            />
+          </View>
         </View>
       </View>
       <Text
@@ -246,53 +303,29 @@ exports[`VerificationInputScreen renders correctly 1`] = `
       <View
         style={
           Object {
-            "position": "relative",
+            "backgroundColor": "#F0F0F0",
+            "borderColor": "#D1D5D8",
+            "borderRadius": 3,
+            "borderWidth": 1,
+            "height": 50,
+            "justifyContent": "center",
+            "marginVertical": 5,
+            "paddingHorizontal": 10,
           }
         }
       >
-        <View
+        <Text
           style={
-            Array [
-              Object {
-                "alignItems": "center",
-                "flex": 1,
-                "flexDirection": "row",
-                "justifyContent": "center",
-              },
-              Object {
-                "borderColor": "#D1D5D8",
-                "borderRadius": 3,
-                "borderWidth": 1,
-                "flex": 0,
-                "height": 50,
-                "marginVertical": 5,
-                "paddingHorizontal": 4,
-              },
-            ]
+            Object {
+              "color": "#81868B",
+              "fontFamily": "Hind-Regular",
+              "fontSize": 15,
+              "lineHeight": 24,
+            }
           }
         >
-          <TextInput
-            allowFontScaling={true}
-            onBlur={[Function]}
-            onChangeText={[Function]}
-            onFocus={[Function]}
-            placeholder="<#> m9oASm/3g7aZ..."
-            rejectResponderTermination={true}
-            shouldShowClipboard={[Function]}
-            style={
-              Object {
-                "backgroundColor": "#FFFFFF",
-                "borderColor": "#D1D5D8",
-                "borderRadius": 3,
-                "flex": 1,
-                "fontFamily": "Hind-Regular",
-                "padding": 8,
-              }
-            }
-            underlineColorAndroid="transparent"
-            value=""
-          />
-        </View>
+          &lt;#&gt; m9oASm/3g7aZ...
+        </Text>
       </View>
       <Text
         style={
@@ -310,53 +343,29 @@ exports[`VerificationInputScreen renders correctly 1`] = `
       <View
         style={
           Object {
-            "position": "relative",
+            "backgroundColor": "#F0F0F0",
+            "borderColor": "#D1D5D8",
+            "borderRadius": 3,
+            "borderWidth": 1,
+            "height": 50,
+            "justifyContent": "center",
+            "marginVertical": 5,
+            "paddingHorizontal": 10,
           }
         }
       >
-        <View
+        <Text
           style={
-            Array [
-              Object {
-                "alignItems": "center",
-                "flex": 1,
-                "flexDirection": "row",
-                "justifyContent": "center",
-              },
-              Object {
-                "borderColor": "#D1D5D8",
-                "borderRadius": 3,
-                "borderWidth": 1,
-                "flex": 0,
-                "height": 50,
-                "marginVertical": 5,
-                "paddingHorizontal": 4,
-              },
-            ]
+            Object {
+              "color": "#81868B",
+              "fontFamily": "Hind-Regular",
+              "fontSize": 15,
+              "lineHeight": 24,
+            }
           }
         >
-          <TextInput
-            allowFontScaling={true}
-            onBlur={[Function]}
-            onChangeText={[Function]}
-            onFocus={[Function]}
-            placeholder="<#> m9oASm/3g7aZ..."
-            rejectResponderTermination={true}
-            shouldShowClipboard={[Function]}
-            style={
-              Object {
-                "backgroundColor": "#FFFFFF",
-                "borderColor": "#D1D5D8",
-                "borderRadius": 3,
-                "flex": 1,
-                "fontFamily": "Hind-Regular",
-                "padding": 8,
-              }
-            }
-            underlineColorAndroid="transparent"
-            value=""
-          />
-        </View>
+          &lt;#&gt; m9oASm/3g7aZ...
+        </Text>
       </View>
       <View
         accessible={true}
@@ -534,7 +543,7 @@ exports[`VerificationInputScreen renders correctly 1`] = `
               }
             }
           >
-            0:49
+            0:60
           </Text>
         </View>
         <Text
@@ -614,7 +623,7 @@ exports[`VerificationInputScreen renders correctly 1`] = `
           </View>
           <View
             accessible={true}
-            focusable={true}
+            focusable={false}
             isTVSelectable={true}
             nativeBackgroundAndroid={
               Object {
@@ -639,13 +648,18 @@ exports[`VerificationInputScreen renders correctly 1`] = `
                     "fontSize": 14,
                     "lineHeight": 18,
                   },
-                  Object {
-                    "color": "#42D689",
-                    "fontFamily": "Hind-SemiBold",
-                    "fontSize": 16,
-                    "lineHeight": 24,
-                    "paddingLeft": 20,
-                  },
+                  Array [
+                    Object {
+                      "color": "#42D689",
+                      "fontFamily": "Hind-SemiBold",
+                      "fontSize": 16,
+                      "lineHeight": 24,
+                      "paddingLeft": 20,
+                    },
+                    Object {
+                      "color": "#A3EBC6",
+                    },
+                  ],
                 ]
               }
             >

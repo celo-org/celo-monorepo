@@ -6,6 +6,7 @@ import Checkmark from '@celo/react-components/icons/Checkmark'
 import SmsCeloSwap from '@celo/react-components/icons/SmsCeloSwap'
 import colors from '@celo/react-components/styles/colors'
 import fontStyles from '@celo/react-components/styles/fonts'
+import { stripHexLeader } from '@celo/utils/src/signatureUtils'
 import { extractAttestationCodeFromMessage } from '@celo/walletkit'
 import dotProp from 'dot-prop-immutable'
 import { padStart } from 'lodash'
@@ -24,6 +25,7 @@ import DevSkipButton from 'src/components/DevSkipButton'
 import i18n, { Namespaces } from 'src/i18n'
 import LoadingSpinner from 'src/icons/LoadingSpinner'
 import { cancelVerification, receiveAttestationMessage } from 'src/identity/actions'
+import { ATTESTATION_CODE_PLACEHOLDER } from 'src/identity/reducer'
 import {
   AttestationCode,
   CodeInputType,
@@ -34,27 +36,44 @@ import { navigate } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
 import { RootState } from 'src/redux/reducers'
 import Logger from 'src/utils/Logger'
-import VerificationFailedModal from 'src/verify/VerificationFailedModal'
 
 const TAG = 'VerificationInputScreen'
 
 const CodeInput = withTextInputPasteAware(TextInput)
 
+function getRecodedAttestationValue(attestationCode: AttestationCode, t: i18n.TranslationFunction) {
+  try {
+    if (!attestationCode.code || attestationCode.code === ATTESTATION_CODE_PLACEHOLDER) {
+      return t('codeAccepted')
+    }
+    return Buffer.from(stripHexLeader(attestationCode.code), 'hex').toString('base64')
+  } catch (error) {
+    Logger.warn(TAG, 'Could not recode verification code to base64')
+    return t('codeAccepted')
+  }
+}
+
 function CodeRow(
-  attestationCode: AttestationCode,
-  isInputEnabled: boolean,
-  inputValue: string,
+  index: number, // index of code in attestationCodes array
+  attestationCodes: AttestationCode[], // The codes in the redux store
+  isInputEnabled: boolean, // input disabled until previous code is in
+  inputValue: string, // the raw code inputed by the user
   onInputChange: (value: string) => void,
-  isCodeSubmitting: boolean,
+  isCodeSubmitting: boolean, // is the inputted code being processed
+  isCodeAccepted: boolean, // has the code been accepted and completed
   t: i18n.TranslationFunction
 ) {
-  if (attestationCode) {
+  if (attestationCodes[index]) {
     return (
       <View style={styles.codeContainer}>
         <Text style={styles.codeValue} numberOfLines={1} ellipsizeMode={'tail'}>
-          {attestationCode.code || t('input.codeAccepted')}
+          {getRecodedAttestationValue(attestationCodes[index], t)}
         </Text>
-        <Checkmark height={20} width={20} />
+        {isCodeAccepted && (
+          <View style={styles.checkmarkContainer}>
+            <Checkmark height={20} width={20} />
+          </View>
+        )}
       </View>
     )
   }
@@ -72,7 +91,7 @@ function CodeRow(
       <CodeInput
         value={inputValue}
         placeholder={'<#> m9oASm/3g7aZ...'}
-        shouldShowClipboard={shouldShowClipboard}
+        shouldShowClipboard={shouldShowClipboard(attestationCodes)}
         onChangeText={onInputChange}
         style={styles.codeInput}
       />
@@ -83,8 +102,11 @@ function CodeRow(
   )
 }
 
-function shouldShowClipboard(value: string) {
-  return !!extractAttestationCodeFromMessage(value)
+function shouldShowClipboard(attestationCodes: AttestationCode[]) {
+  return (value: string) => {
+    const extractedCode = extractAttestationCodeFromMessage(value)
+    return !!extractedCode && !attestationCodes.find((c) => c.code === extractedCode)
+  }
 }
 
 interface StateProps {
@@ -221,7 +243,7 @@ class VerificationInputScreen extends React.Component<Props, State> {
 
   render() {
     const { codeInputValues, isCodeSubmitting, isModalVisible, timer } = this.state
-    const { t, attestationCodes, numCompleteAttestations, verificationStatus } = this.props
+    const { t, attestationCodes, numCompleteAttestations } = this.props
 
     const numCodesAccepted = attestationCodes.length
 
@@ -247,29 +269,35 @@ class VerificationInputScreen extends React.Component<Props, State> {
           </Text>
           <Text style={styles.codeHeader}>{t('input.codeHeader1')}</Text>
           {CodeRow(
-            attestationCodes[0],
+            0,
+            attestationCodes,
             numCodesAccepted >= 0,
             codeInputValues[0],
             this.onChangeInputCode(0),
             isCodeSubmitting[0],
+            numCompleteAttestations > 0,
             t
           )}
           <Text style={styles.codeHeader}>{t('input.codeHeader2')}</Text>
           {CodeRow(
-            attestationCodes[1],
+            1,
+            attestationCodes,
             numCodesAccepted >= 1,
             codeInputValues[1],
             this.onChangeInputCode(1),
             isCodeSubmitting[1],
+            numCompleteAttestations > 1,
             t
           )}
           <Text style={styles.codeHeader}>{t('input.codeHeader3')}</Text>
           {CodeRow(
-            attestationCodes[2],
+            2,
+            attestationCodes,
             numCodesAccepted >= 2,
             codeInputValues[2],
             this.onChangeInputCode(2),
             isCodeSubmitting[2],
+            numCompleteAttestations > 2,
             t
           )}
           <Link style={styles.missingCodesLink} onPress={this.onPressCodesNotReceived}>
@@ -298,7 +326,6 @@ class VerificationInputScreen extends React.Component<Props, State> {
             </View>
           </View>
         </Modal>
-        <VerificationFailedModal isVisible={verificationStatus === VerificationStatus.Failed} />
       </SafeAreaView>
     )
   }
@@ -336,20 +363,26 @@ const styles = StyleSheet.create({
     marginTop: 20,
   },
   codeContainer: {
-    flexDirection: 'row',
+    justifyContent: 'center',
     marginVertical: 5,
     paddingHorizontal: 10,
     backgroundColor: colors.darkLightest,
     borderRadius: 3,
     height: 50,
-    alignItems: 'center',
-    justifyContent: 'space-between',
+  },
+  checkmarkContainer: {
+    backgroundColor: colors.darkLightest,
+    position: 'absolute',
+    top: 3,
+    right: 3,
+    padding: 10,
   },
   codeInputContainer: {
     position: 'relative',
   },
   codeInput: {
     flex: 0,
+    backgroundColor: '#FFF',
     borderColor: colors.inputBorder,
     borderRadius: 3,
     borderWidth: 1,

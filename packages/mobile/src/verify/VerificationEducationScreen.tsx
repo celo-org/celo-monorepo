@@ -13,13 +13,12 @@ import SafeAreaView from 'react-native-safe-area-view'
 import { connect } from 'react-redux'
 import componentWithAnalytics from 'src/analytics/wrapper'
 import { Namespaces } from 'src/i18n'
-import { setHasSeenVerificationNux, startVerification } from 'src/identity/actions'
+import { setHasSeenVerificationNux } from 'src/identity/actions'
 import { nuxNavigationOptions } from 'src/navigator/Headers'
 import { navigate } from 'src/navigator/NavigationService'
 import { Screens, Stacks } from 'src/navigator/Screens'
 
 interface DispatchProps {
-  startVerification: typeof startVerification
   setHasSeenVerificationNux: typeof setHasSeenVerificationNux
 }
 
@@ -30,7 +29,6 @@ interface State {
 }
 
 const mapDispatchToProps = {
-  startVerification, //TODO remove
   setHasSeenVerificationNux,
 }
 
