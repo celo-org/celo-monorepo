@@ -227,7 +227,7 @@ contract SortedOracles is ISortedOracles, Ownable, Initializable, UsingPrecompil
           newMedian = originalMedian.add(maxChange);
         }
       }
-      else /* if (newMedian <= originalMedian) */ {
+      else {
         if (maxChange < originalMedian.sub(newMedian)) {
           newMedian = originalMedian.sub(maxChange);
         }
