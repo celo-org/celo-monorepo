@@ -1,6 +1,6 @@
 import Button, { BtnTypes } from '@celo/react-components/components/Button'
 import SmallButton from '@celo/react-components/components/SmallButton'
-import InviteCodeIcon from '@celo/react-components/icons/InviteCodeIcon'
+import SmsCeloSwap from '@celo/react-components/icons/SmsCeloSwap'
 import colors from '@celo/react-components/styles/colors'
 import fontStyles from '@celo/react-components/styles/fonts'
 import { componentStyles } from '@celo/react-components/styles/styles'
@@ -152,7 +152,7 @@ export class EnterInviteCode extends React.Component<Props, State> {
       <SafeAreaView style={styles.container}>
         <ScrollView contentContainerStyle={styles.scrollContainer}>
           <DevSkipButton nextScreen={Screens.ImportContacts} />
-          <InviteCodeIcon />
+          <SmsCeloSwap />
           <Text style={styles.h1} testID={'InviteCodeTitle'}>
             {t('inviteCodeText.title')}
           </Text>

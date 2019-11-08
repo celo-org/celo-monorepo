@@ -1,6 +1,7 @@
 import Button, { BtnTypes } from '@celo/react-components/components/Button'
 import Link from '@celo/react-components/components/Link'
 import TextButton from '@celo/react-components/components/TextButton'
+import VerifyPhone from '@celo/react-components/icons/VerifyPhone'
 import colors from '@celo/react-components/styles/colors'
 import fontStyles from '@celo/react-components/styles/fonts'
 import { componentStyles } from '@celo/react-components/styles/styles'
@@ -11,7 +12,6 @@ import Modal from 'react-native-modal'
 import SafeAreaView from 'react-native-safe-area-view'
 import componentWithAnalytics from 'src/analytics/wrapper'
 import { Namespaces } from 'src/i18n'
-import NuxLogo from 'src/icons/NuxLogo'
 import { nuxNavigationOptions } from 'src/navigator/Headers'
 import { navigate } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
@@ -32,7 +32,6 @@ class VerificationEducationScreen extends React.Component<WithNamespaces, State>
   }
 
   onPressStart = () => {
-    // TODO(Rossy) Use new verification screen when it's ready
     navigate(Screens.VerificationLoadingScreen)
   }
 
@@ -55,8 +54,7 @@ class VerificationEducationScreen extends React.Component<WithNamespaces, State>
     return (
       <SafeAreaView style={styles.container}>
         <ScrollView contentContainerStyle={styles.scrollContainer}>
-          {/** TODO use new icon when it's ready */}
-          <NuxLogo testID="VerificationEducationIcon" />
+          <VerifyPhone />
           <Text style={styles.h1} testID="VerificationEducationHeader">
             {t('education.header')}
           </Text>
@@ -82,7 +80,7 @@ class VerificationEducationScreen extends React.Component<WithNamespaces, State>
         </>
         <Modal isVisible={this.state.isModalVisible}>
           <View style={styles.modalContainer}>
-            <Text style={fontStyles.h1}>{t('skipModal.header')}</Text>
+            <Text style={styles.modalHeader}>{t('skipModal.header')}</Text>
             <Text style={fontStyles.body}>{t('skipModal.body1')}</Text>
             <Text style={[fontStyles.body, componentStyles.marginTop10]}>
               {t('skipModal.body2')}
@@ -127,10 +125,16 @@ const styles = StyleSheet.create({
   modalContainer: {
     backgroundColor: colors.background,
     padding: 20,
+    marginHorizontal: 10,
     borderRadius: 4,
   },
+  modalHeader: {
+    ...fontStyles.h2,
+    ...fontStyles.bold,
+    marginVertical: 15,
+  },
   modalButtonsContainer: {
-    marginTop: 20,
+    marginTop: 25,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-evenly',

@@ -182,12 +182,12 @@ export function messageContainsAttestationCode(message: string) {
 
 export function extractAttestationCodeFromMessage(message: string) {
   if (!message) {
-    throw new Error('Empty message')
+    return null
   }
 
   const sanitizedMessage = sanitizeBase64(message)
   if (!messageContainsAttestationCode(sanitizedMessage)) {
-    throw new Error('Message did not contain verification code')
+    return null
   }
 
   const matches = sanitizedMessage.match(attestationCodeRegex)

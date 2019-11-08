@@ -174,7 +174,7 @@ exports[`VerificationLoadingScreen renders correctly 1`] = `
         <View
           style={
             Object {
-              "height": 275,
+              "height": 300,
             }
           }
         />
