@@ -5,3 +5,6 @@ dist/
 
 # Exclude dependencies
 node_modules/
+
+# keys
+src/secrets.json

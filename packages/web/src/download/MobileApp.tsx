@@ -27,6 +27,7 @@ export default class MobileApp extends React.PureComponent {
           <CoverActions />
         </View>
         <AppStores />
+        {/* TODO add <ConnectiveFooter/> once its in master  */}
       </>
     )
   }

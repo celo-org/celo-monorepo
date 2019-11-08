@@ -6,11 +6,12 @@ import Sentry from '../fullstack/sentry'
 import {
   Address,
   E164Number,
+  MobileOS,
   NETWORK,
   RequestRecord,
   RequestStatus,
   RequestType,
-} from './FirebaseClient'
+} from '../src/fauceting/FaucetInterfaces'
 
 async function getFirebase() {
   if (!firebase.apps.length) {
@@ -41,12 +42,21 @@ async function getDB(): Promise<firebase.database.Database> {
   return (await getFirebase()).database()
 }
 
-export async function sendRequest(beneficiary: Address | E164Number, type: RequestType) {
+export async function sendRequest(
+  beneficiary: Address | E164Number,
+  type: RequestType,
+  mobileOS: MobileOS | null
+) {
   const newRequest: RequestRecord = {
     beneficiary,
     status: RequestStatus.Pending,
     type,
   }
+
+  if (mobileOS) {
+    newRequest.mobileOS = mobileOS
+  }
+
   try {
     const db = await getDB()
     const ref: firebase.database.Reference = await db.ref(`${NETWORK}/requests`).push(newRequest)

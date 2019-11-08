@@ -19,8 +19,7 @@ contract ProposalsTest {
   }
 
   function getSupportWithQuorumPadding(uint256 criticalBaseline) external view returns (uint256) {
-    return FixidityLib.unwrap(
-        proposal.getSupportWithQuorumPadding(FixidityLib.wrap(criticalBaseline))
-    );
+    return
+      FixidityLib.unwrap(proposal.getSupportWithQuorumPadding(FixidityLib.wrap(criticalBaseline)));
   }
 }

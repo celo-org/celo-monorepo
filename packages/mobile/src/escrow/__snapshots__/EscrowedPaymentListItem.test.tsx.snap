@@ -10,11 +10,7 @@ exports[`EscrowedPaymentReminderNotification renders correctly 1`] = `
         "padding": 16,
         "width": "100%",
       },
-      Object {
-        "borderColor": "#EEEEEE",
-        "borderRadius": 3,
-        "borderWidth": 1,
-      },
+      false,
     ]
   }
 >
@@ -60,7 +56,7 @@ exports[`EscrowedPaymentReminderNotification renders correctly 1`] = `
         }
       }
     >
-      escrowedPaymentReminder
+      escrowedPaymentReminderListItemTitle
     </Text>
     <View>
       <View
@@ -78,60 +74,7 @@ exports[`EscrowedPaymentReminderNotification renders correctly 1`] = `
               "marginTop": 5,
             }
           }
-        >
-          <View
-            style={
-              Object {
-                "flex": 1,
-              }
-            }
-          >
-            <Text
-              ellipsizeMode="middle"
-              numberOfLines={1}
-              style={
-                Object {
-                  "flexDirection": "row",
-                }
-              }
-            >
-              <Text
-                style={
-                  Array [
-                    Object {
-                      "color": "#81868B",
-                      "fontFamily": "Hind-Regular",
-                      "fontSize": 14,
-                      "lineHeight": 20,
-                    },
-                  ]
-                }
-              >
-                +14155550000
-                 - 
-              </Text>
-              <Text
-                style={
-                  Array [
-                    Object {
-                      "color": "#81868B",
-                      "fontFamily": "Hind-Regular",
-                      "fontSize": 14,
-                      "lineHeight": 20,
-                    },
-                    Object {
-                      "fontFamily": "Hind-SemiBold",
-                    },
-                  ]
-                }
-              >
-                 
-                $
-                0.00
-              </Text>
-            </Text>
-          </View>
-        </View>
+        />
         <View
           style={
             Object {
@@ -162,14 +105,8 @@ exports[`EscrowedPaymentReminderNotification renders correctly 1`] = `
               style={
                 Array [
                   Object {
-                    "color": "#2E3338",
-                    "fontFamily": "Hind-Regular",
-                    "fontSize": 14,
-                    "lineHeight": 18,
-                  },
-                  Object {
                     "color": "#42D689",
-                    "fontFamily": "Hind-Medium",
+                    "fontFamily": "Hind-SemiBold",
                     "fontSize": 14,
                     "lineHeight": 18,
                   },
@@ -204,14 +141,8 @@ exports[`EscrowedPaymentReminderNotification renders correctly 1`] = `
               style={
                 Array [
                   Object {
-                    "color": "#2E3338",
-                    "fontFamily": "Hind-Regular",
-                    "fontSize": 14,
-                    "lineHeight": 18,
-                  },
-                  Object {
                     "color": "#42D689",
-                    "fontFamily": "Hind-Medium",
+                    "fontFamily": "Hind-SemiBold",
                     "fontSize": 14,
                     "lineHeight": 18,
                   },
@@ -226,6 +157,33 @@ exports[`EscrowedPaymentReminderNotification renders correctly 1`] = `
           </View>
         </View>
       </View>
+    </View>
+  </View>
+  <View
+    style={
+      Object {
+        "paddingLeft": 16,
+      }
+    }
+  >
+    <View>
+      <Text
+        style={
+          Array [
+            Object {
+              "color": "#2E3338",
+              "fontFamily": "Hind-SemiBold",
+              "fontSize": 14,
+              "lineHeight": 18,
+            },
+            Object {
+              "color": "#81868B",
+            },
+          ]
+        }
+      >
+        $0
+      </Text>
     </View>
   </View>
 </View>

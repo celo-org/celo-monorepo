@@ -126,8 +126,7 @@ exports[`PaymentRequestSummaryNotification renders correctly 1`] = `
                   ]
                 }
               >
-                 
-                200,000.00
+                $200,000
               </Text>
             </Text>
             <Text
@@ -170,8 +169,7 @@ exports[`PaymentRequestSummaryNotification renders correctly 1`] = `
                   ]
                 }
               >
-                 
-                180.89
+                $180.89
               </Text>
             </Text>
           </View>
@@ -185,17 +183,12 @@ exports[`PaymentRequestSummaryNotification renders correctly 1`] = `
           >
             <Text
               style={
-                Array [
-                  Object {
-                    "color": "#81868B",
-                    "fontFamily": "Hind-SemiBold",
-                    "fontSize": 13,
-                    "lineHeight": 17,
-                  },
-                  Object {
-                    "color": "#42D689",
-                  },
-                ]
+                Object {
+                  "color": "#42D689",
+                  "fontFamily": "Hind-SemiBold",
+                  "fontSize": 13,
+                  "lineHeight": 17,
+                }
               }
             >
               +
@@ -233,14 +226,8 @@ exports[`PaymentRequestSummaryNotification renders correctly 1`] = `
               style={
                 Array [
                   Object {
-                    "color": "#2E3338",
-                    "fontFamily": "Hind-Regular",
-                    "fontSize": 14,
-                    "lineHeight": 18,
-                  },
-                  Object {
                     "color": "#42D689",
-                    "fontFamily": "Hind-Medium",
+                    "fontFamily": "Hind-SemiBold",
                     "fontSize": 14,
                     "lineHeight": 18,
                   },
@@ -386,8 +373,7 @@ exports[`PaymentRequestSummaryNotification when more 1 requests renders just it 
                   ]
                 }
               >
-                 
-                200,000.00
+                $200,000
               </Text>
             </Text>
           </View>
@@ -422,14 +408,8 @@ exports[`PaymentRequestSummaryNotification when more 1 requests renders just it 
               style={
                 Array [
                   Object {
-                    "color": "#2E3338",
-                    "fontFamily": "Hind-Regular",
-                    "fontSize": 14,
-                    "lineHeight": 18,
-                  },
-                  Object {
                     "color": "#42D689",
-                    "fontFamily": "Hind-Medium",
+                    "fontFamily": "Hind-SemiBold",
                     "fontSize": 14,
                     "lineHeight": 18,
                   },
@@ -575,8 +555,7 @@ exports[`PaymentRequestSummaryNotification when more than 2 requests renders jus
                   ]
                 }
               >
-                 
-                200,000.00
+                $200,000
               </Text>
             </Text>
             <Text
@@ -619,8 +598,7 @@ exports[`PaymentRequestSummaryNotification when more than 2 requests renders jus
                   ]
                 }
               >
-                 
-                180.89
+                $180.89
               </Text>
             </Text>
           </View>
@@ -634,17 +612,12 @@ exports[`PaymentRequestSummaryNotification when more than 2 requests renders jus
           >
             <Text
               style={
-                Array [
-                  Object {
-                    "color": "#81868B",
-                    "fontFamily": "Hind-SemiBold",
-                    "fontSize": 13,
-                    "lineHeight": 17,
-                  },
-                  Object {
-                    "color": "#42D689",
-                  },
-                ]
+                Object {
+                  "color": "#42D689",
+                  "fontFamily": "Hind-SemiBold",
+                  "fontSize": 13,
+                  "lineHeight": 17,
+                }
               }
             >
               +
@@ -682,14 +655,8 @@ exports[`PaymentRequestSummaryNotification when more than 2 requests renders jus
               style={
                 Array [
                   Object {
-                    "color": "#2E3338",
-                    "fontFamily": "Hind-Regular",
-                    "fontSize": 14,
-                    "lineHeight": 18,
-                  },
-                  Object {
                     "color": "#42D689",
-                    "fontFamily": "Hind-Medium",
+                    "fontFamily": "Hind-SemiBold",
                     "fontSize": 14,
                     "lineHeight": 18,
                   },
