@@ -361,14 +361,10 @@ function attestationCodeReceiver(
 
     try {
       const code = extractAttestationCodeFromMessage(action.message)
-      console.log('===code', code)
       if (!code) {
         throw new Error('No code extracted from message')
       }
 
-      console.log('===issuers', allIssuers)
-      console.log('===account', account)
-      console.log('===hash', e164NumberHash)
       const issuer = findMatchingIssuer(e164NumberHash, account, code, allIssuers)
       if (!issuer) {
         throw new Error('No issuer found for attestion code')

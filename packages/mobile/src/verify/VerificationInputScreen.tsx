@@ -219,7 +219,7 @@ class VerificationInputScreen extends React.Component<Props, State> {
 
   onChangeInputCode = (index: number) => {
     return (value: string) => {
-      //TODO test this with typing codes
+      // TODO(Rossy) Add test this of typing codes gradually
       this.setState(dotProp.set(this.state, `codeInputValues.${index}`, value))
       if (extractAttestationCodeFromMessage(value)) {
         this.setState(dotProp.set(this.state, `isCodeSubmitting.${index}`, true))
