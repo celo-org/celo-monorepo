@@ -8,9 +8,9 @@ import "./libraries/AddressesHelper.sol";
  */
 contract Proxy {
   // Used to store the address of the owner.
-  bytes32 constant private OWNER_POSITION = keccak256("org.celo.owner");
+  bytes32 private constant OWNER_POSITION = keccak256("org.celo.owner");
   // Used to store the address of the implementation contract.
-  bytes32 constant private IMPLEMENTATION_POSITION = keccak256("org.celo.implementation");
+  bytes32 private constant IMPLEMENTATION_POSITION = keccak256("org.celo.implementation");
 
   event OwnerSet(address indexed owner);
   event ImplementationSet(address indexed implementation);
@@ -30,7 +30,7 @@ contract Proxy {
   /**
    * @notice Delegates calls to the implementation contract.
    */
-  function () external payable {
+  function() external payable {
     bytes32 implementationPosition = IMPLEMENTATION_POSITION;
 
     address implementationAddress;
@@ -39,10 +39,10 @@ contract Proxy {
       implementationAddress := sload(implementationPosition)
     }
 
-    // Avoid checking if address is a contract or executing delegated call when 
+    // Avoid checking if address is a contract or executing delegated call when
     // implementation address is 0x0
     if (implementationAddress == address(0)) return;
-    
+
     require(AddressesHelper.isContract(implementationAddress), "Invalid contract address");
 
     assembly {
@@ -66,12 +66,12 @@ contract Proxy {
       returndatacopy(returnDataPosition, 0, returnDataSize)
 
       switch delegatecallSuccess
-      case 0 {
-        revert(returnDataPosition, returnDataSize)
-      }
-      default {
-        return(returnDataPosition, returnDataSize)
-      }
+        case 0 {
+          revert(returnDataPosition, returnDataSize)
+        }
+        default {
+          return(returnDataPosition, returnDataSize)
+        }
     }
   }
 
@@ -92,10 +92,7 @@ contract Proxy {
    * @dev If the target contract does not need initialization, use
    * setImplementation instead.
    */
-  function _setAndInitializeImplementation(
-    address implementation,
-    bytes calldata callbackData
-  )
+  function _setAndInitializeImplementation(address implementation, bytes calldata callbackData)
     external
     payable
     onlyOwner

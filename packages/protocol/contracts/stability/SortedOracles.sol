@@ -35,15 +35,9 @@ contract SortedOracles is ISortedOracles, Ownable, Initializable, UsingPrecompil
   uint256 public reportExpirySeconds;
   FixidityLib.Fraction public maxMedianChangeRatePerSecond;
 
-  event OracleAdded(
-    address indexed token,
-    address indexed oracleAddress
-  );
+  event OracleAdded(address indexed token, address indexed oracleAddress);
 
-  event OracleRemoved(
-    address indexed token,
-    address indexed oracleAddress
-  );
+  event OracleRemoved(address indexed token, address indexed oracleAddress);
 
   event OracleReported(
     address token,
@@ -53,20 +47,11 @@ contract SortedOracles is ISortedOracles, Ownable, Initializable, UsingPrecompil
     uint256 denominator
   );
 
-  event OracleReportRemoved(
-    address indexed token,
-    address indexed oracle
-  );
+  event OracleReportRemoved(address indexed token, address indexed oracle);
 
-  event MedianUpdated(
-    address token,
-    uint256 numerator,
-    uint256 denominator
-  );
+  event MedianUpdated(address token, uint256 numerator, uint256 denominator);
 
-  event ReportExpirySet(
-    uint256 reportExpiry
-  );
+  event ReportExpirySet(uint256 reportExpiry);
 
   event MaxMedianChangeRatePerSecondSet(
     uint256 rate
@@ -132,9 +117,9 @@ contract SortedOracles is ISortedOracles, Ownable, Initializable, UsingPrecompil
   function removeOracle(address token, address oracleAddress, uint256 index) external onlyOwner {
     require(
       token != address(0) &&
-      oracleAddress != address(0) &&
-      oracles[token].length > index &&
-      oracles[token][index] == oracleAddress,
+        oracleAddress != address(0) &&
+        oracles[token].length > index &&
+        oracles[token][index] == oracleAddress,
       "token addr null or oracle addr null or index of token oracle not mapped to oracle addr"
     );
     isOracle[token][oracleAddress] = false;
@@ -179,10 +164,7 @@ contract SortedOracles is ISortedOracles, Ownable, Initializable, UsingPrecompil
     uint256 denominator,
     address lesserKey,
     address greaterKey
-  )
-    external
-    onlyOracle(token)
-  {
+  ) external onlyOracle(token) {
     uint256 value = numerator.mul(DENOMINATOR).div(denominator);
     if (rates[token].contains(msg.sender)) {
       rates[token].update(msg.sender, value, lesserKey, greaterKey);
@@ -281,16 +263,10 @@ contract SortedOracles is ISortedOracles, Ownable, Initializable, UsingPrecompil
    * @param token The address of the token for which the Celo Gold exchange rate is being reported.
    * @return An unpacked list of elements from largest to smallest.
    */
-  function getRates(
-    address token
-  )
+  function getRates(address token)
     external
     view
-    returns (
-        address[] memory,
-        uint256[] memory,
-        SortedLinkedListWithMedian.MedianRelation[] memory
-    )
+    returns (address[] memory, uint256[] memory, SortedLinkedListWithMedian.MedianRelation[] memory)
   {
     return rates[token].getElements();
   }
@@ -318,16 +294,10 @@ contract SortedOracles is ISortedOracles, Ownable, Initializable, UsingPrecompil
    * @param token The address of the token for which the Celo Gold exchange rate is being reported.
    * @return An unpacked list of elements from largest to smallest.
    */
-  function getTimestamps(
-    address token
-  )
+  function getTimestamps(address token)
     external
     view
-    returns (
-        address[] memory,
-        uint256[] memory,
-        SortedLinkedListWithMedian.MedianRelation[] memory
-    )
+    returns (address[] memory, uint256[] memory, SortedLinkedListWithMedian.MedianRelation[] memory)
   {
     return timestamps[token].getElements();
   }
