@@ -1,21 +1,15 @@
 pragma solidity ^0.5.3;
 
-
 /**
  * @title A mock SortedOracles for testing.
  */
 contract MockSortedOracles {
-
   mapping(address => uint128) public numerators;
   mapping(address => uint128) public denominators;
   mapping(address => uint128) public medianTimestamp;
   mapping(address => uint128) public numRates;
 
-  function setMedianRate(
-    address token,
-    uint128 numerator,
-    uint128 denominator
-  )
+  function setMedianRate(address token, uint128 numerator, uint128 denominator)
     external
     returns (bool)
   {

@@ -56,5 +56,27 @@
   "errorRedeemingCode": "Error al canjear el código.",
   "pleaseRetry": "Por favor reinicie la verificación.",
   "retryVerification": "Reintentar la verificación",
-  "codeAccepted": "Aceptado"
+  "codeAccepted": "Aceptado",
+  "education": {
+    "header": "~~Verify Your Phone",
+    "body1": "~~Next, please verify your phone number.",
+    "body2":
+      "~~Verifying makes it easier to send and receive with friends. You can also skip this step and return to it later.",
+    "learnMore": "~~Learn more about phone verification",
+    "start": "~~Start Verification",
+    "skip": "~~Skip For Now"
+  },
+  "loading": {
+    "verifyingNumber": "~~Verifying {{number}}",
+    "keepOpen": "~~Please keep the app open",
+    "card1": "~~Verifying your phone number helps your friends find you on the Celo Network.",
+    "card2": "~~On Celo, you can send money to your anyone using just their phone number.",
+    "card3": "~~Verification requires three text messages sent to your phone number."
+  },
+  "skipModal": {
+    "header": "~~Skip Verification?",
+    "body1": "~~Verifying allows others to send value to your phone number.",
+    "body2":
+      "~~Without verification, you can still receive payments but only using Celo addresses or QR codes."
+  }
 }

@@ -6,8 +6,8 @@ import "./interfaces/IERC20Token.sol";
 import "./interfaces/IRegistry.sol";
 import "./interfaces/IAccounts.sol";
 
-
 import "../governance/interfaces/IElection.sol";
+import "../governance/interfaces/IGovernance.sol";
 import "../governance/interfaces/ILockedGold.sol";
 import "../governance/interfaces/IValidators.sol";
 
@@ -21,7 +21,6 @@ import "../stability/interfaces/IStableToken.sol";
 // TODO(amy): Fix this when the TypeChain issue resolves.
 
 contract UsingRegistry is Ownable {
-
   event RegistrySet(address indexed registryAddress);
 
   // solhint-disable state-visibility
@@ -68,6 +67,10 @@ contract UsingRegistry is Ownable {
 
   function getGoldToken() internal view returns (IERC20Token) {
     return IERC20Token(registry.getAddressForOrDie(GOLD_TOKEN_REGISTRY_ID));
+  }
+
+  function getGovernance() internal view returns (IGovernance) {
+    return IGovernance(registry.getAddressForOrDie(GOVERNANCE_REGISTRY_ID));
   }
 
   function getLockedGold() internal view returns (ILockedGold) {
