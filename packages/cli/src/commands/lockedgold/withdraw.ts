@@ -1,4 +1,5 @@
 import { BaseCommand } from '../../base'
+import { newCheckBuilder } from '../../utils/checks'
 import { displaySendTx } from '../../utils/cli'
 import { Flags } from '../../utils/command'
 
@@ -17,8 +18,12 @@ export default class Withdraw extends BaseCommand {
     const { flags } = this.parse(Withdraw)
     this.kit.defaultAccount = flags.from
     const lockedgold = await this.kit.contracts.getLockedGold()
-    const currentTime = Math.round(new Date().getTime() / 1000)
 
+    await newCheckBuilder(this)
+      .isAccount(flags.from)
+      .runChecks()
+
+    const currentTime = Math.round(new Date().getTime() / 1000)
     while (true) {
       let madeWithdrawal = false
       const pendingWithdrawals = await lockedgold.getPendingWithdrawals(flags.from)
