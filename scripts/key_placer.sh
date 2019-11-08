@@ -40,16 +40,28 @@ elif [[ $1 != "encrypt" ]] && [[ $1 != "decrypt" ]]; then
   exit 1
 fi
 
+# this is to allow the script to be called from anywhere
+DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
+cd $DIR
+cd ..
+
+# place templates to be used (if they exist) in case the environment
+# doesn't have access to decryption keys
+if [[ $1 == "decrypt" ]]; then
+  for file_path in "${files[@]}"; do
+    template_file_path="$file_path.template"
+
+    if test -f "$template_file_path" && ! test -f "$file_path"; then
+      cp "$template_file_path" "$file_path"
+    fi
+  done
+fi
+
 command -v gcloud > /dev/null 2>&1
 if [[ $? -eq 1 ]]; then
   echo "gcloud is not installed - skipping ${1}ion"
   exit 0
 fi
-
-# this is to allow the script to be called from anywhere
-DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
-cd $DIR
-cd ..
 
 for file_path in "${files[@]}"; do
   encrypted_file_path="$file_path.enc"
