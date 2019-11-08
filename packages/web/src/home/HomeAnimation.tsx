@@ -4,9 +4,7 @@ import { createElement } from 'react-native-web'
 import HomeOracle from 'src/home/HomeOracle'
 import { ScreenProps, ScreenSizes, withScreenSize } from 'src/layout/ScreenSize'
 import Responsive from 'src/shared/Responsive'
-import { HEADER_HEIGHT } from 'src/shared/Styles'
 import { standardStyles } from 'src/styles'
-import Fade from 'react-reveal/Fade'
 
 const Video = React.forwardRef((props, ref) => createElement('video', { ...props, ref }))
 const Source = (props) => createElement('source', props)

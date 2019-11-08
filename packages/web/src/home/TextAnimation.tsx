@@ -4,7 +4,6 @@ import { StyleSheet, View, ViewStyle } from 'react-native'
 import { H1 } from 'src/fonts/Fonts'
 import Responsive from 'src/shared/Responsive'
 import { colors, textStyles } from 'src/styles'
-import Fade from 'react-reveal/Fade'
 const words = ['universal', 'move', 'sustainable', 'connected', 'accessible']
 
 const textTransitionTime = 800
@@ -144,6 +143,7 @@ class TextAnimation extends React.PureComponent<Props, State> {
 
   render() {
     const word = words[this.state.currentWord]
+
     const fadeOut: ViewStyle = this.props.playing
       ? {
           // @ts-ignore
@@ -163,41 +163,36 @@ class TextAnimation extends React.PureComponent<Props, State> {
     return (
       <Responsive large={[styles.textContainer, styles.textContainerLarge]}>
         <View style={styles.textContainer}>
-          {this.props.stillMode ? (
+          <>
             <H1
               ariaLevel={'2'}
               accessibilityRole={'heading'}
               style={[styles.white, styles.letsMake]}
             >
-              Money that serves everyone
+              Let's make money{' '}
             </H1>
-          ) : (
-            <>
+            <View>
+              {this.props.stillMode ? (
+                <View
+                  style={[styles.mask, { height: 60 }, styles.stillOut]}
+                  key={`stillmode-mask1`}
+                />
+              ) : (
+                <>
+                  <View style={[styles.mask, fadeOut]} key={`${this.state.currentWord}-mask1`} />
+
+                  <View style={[styles.mask2, fadeIn]} key={`${this.state.currentWord}-mask2`} />
+                </>
+              )}
               <H1
                 ariaLevel={'2'}
                 accessibilityRole={'heading'}
-                style={[styles.white, styles.letsMake]}
+                style={[styles.white, textStyles.heavy, textStyles.center]}
               >
-                Let's make money{' '}
+                {this.props.stillMode ? 'serve everyone' : words[this.state.currentWord]}
               </H1>
-              <View>
-                <>
-                  <View style={[styles.mask, fadeOut]} key={`${this.state.currentWord}-mask1`} />
-                  {!this.state.initial && (
-                    <View style={[styles.mask2, fadeIn]} key={`${this.state.currentWord}-mask2`} />
-                  )}
-                </>
-
-                <H1
-                  ariaLevel={'2'}
-                  accessibilityRole={'heading'}
-                  style={[styles.white, textStyles.heavy, textStyles.center]}
-                >
-                  {words[this.state.currentWord]}
-                </H1>
-              </View>
-            </>
-          )}
+            </View>
+          </>
         </View>
       </Responsive>
     )
@@ -210,6 +205,43 @@ const gradientOpaque = hexRgba(colors.dark, 100)
 const gradientTransparent = hexRgba(colors.dark, 0)
 
 const styles = StyleSheet.create({
+  stillOut: {
+    animationFillMode: 'both',
+    animationDelay: '3s',
+    animationDuration: '1000ms',
+    animationKeyframes: [
+      {
+        '0%': {
+          transform: [
+            {
+              translateX: '-100%',
+            },
+          ],
+        },
+        // [`${fadeOut * 100}%`]: {
+        //   transform: [
+        //     {
+        //       translateX: '-100%',
+        //     },
+        //   ],
+        // },
+        // [`${fadeOutStop * 100}%`]: {
+        //   transform: [
+        //     {
+        //       translateX: 0,
+        //     },
+        //   ],
+        // },
+        '100%': {
+          transform: [
+            {
+              translateX: 0,
+            },
+          ],
+        },
+      },
+    ],
+  },
   textContainer: {
     flexDirection: 'column',
     alignItems: 'center',
@@ -221,9 +253,6 @@ const styles = StyleSheet.create({
   },
   white: {
     color: colors.white,
-  },
-  word: {
-    width: 220,
   },
   letsMake: {
     textAlign: 'center',

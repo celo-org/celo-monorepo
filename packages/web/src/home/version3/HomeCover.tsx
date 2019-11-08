@@ -1,7 +1,7 @@
 import * as React from 'react'
 import { StyleSheet, Text, View } from 'react-native'
 import EmailForm from 'src/forms/EmailForm'
-import HomeAnimation, { Mode, styles as animationStyles } from 'src/home/HomeAnimation'
+import HomeAnimation, { Mode } from 'src/home/HomeAnimation'
 import TextAnimation from 'src/home/TextAnimation'
 import { I18nProps, withNamespaces } from 'src/i18n'
 import Responsive from 'src/shared/Responsive'
@@ -9,8 +9,6 @@ import { BANNER_HEIGHT, HEADER_HEIGHT } from 'src/shared/Styles'
 import { colors, fonts, standardStyles, textStyles } from 'src/styles'
 import { getDeviceMemory, hasGoodConnection } from 'src/utils/utils'
 type Props = I18nProps
-
-const ANIMATION_DURATION = 5
 
 interface State {
   playing: boolean
@@ -33,7 +31,9 @@ class HomeCover extends React.PureComponent<Props, State> {
 
   componentDidMount = async () => {
     const goodConnection = await hasGoodConnection()
-    this.setState({ mode: goodConnection && getDeviceMemory() >= 2 ? Mode.video : Mode.graphic })
+    setTimeout(() => {
+      this.setState({ mode: goodConnection && getDeviceMemory() >= 2 ? Mode.video : Mode.graphic })
+    }, 4000)
   }
 
   render() {
@@ -57,7 +57,7 @@ class HomeCover extends React.PureComponent<Props, State> {
                 <View style={styles.textWrapper}>
                   <TextAnimation
                     playing={this.state.playing}
-                    stillMode={this.state.mode === Mode.graphic || this.state.mode === Mode.wait}
+                    stillMode={this.state.mode === Mode.wait}
                   />
                   <Responsive
                     large={styles.content}
@@ -193,98 +193,11 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     marginLeft: 25,
   },
-  white: {
-    color: colors.white,
-  },
-  word: {
-    width: 220,
-  },
   animationBackground: {
     flex: 1,
     flexDirection: 'column',
     alignItems: 'stretch',
     justifyContent: 'center',
     maxWidth: '100vw',
-  },
-  letsMake: {
-    textAlign: 'center',
-    zIndex: 1,
-  },
-  mask: {
-    bottom: 0,
-    left: 0,
-    right: -30,
-    top: 0,
-    backgroundImage: `linear-gradient(90deg, rgba(46,51,56,1) 0%, rgba(46,51,56,1) 90%, rgba(46,51,56,0) 100%)`,
-    position: 'absolute',
-    animationDuration: `${ANIMATION_DURATION}s`,
-    animationIterationCount: 1,
-    animationKeyframes: [
-      {
-        '0%': {
-          transform: [
-            {
-              translateX: '-100%',
-            },
-          ],
-        },
-        '80%': {
-          transform: [
-            {
-              translateX: '-100%',
-            },
-          ],
-        },
-        '90%': {
-          transform: [
-            {
-              translateX: 0,
-            },
-          ],
-        },
-        '100%': {
-          transform: [
-            {
-              translateX: 0,
-            },
-          ],
-        },
-      },
-    ],
-  },
-  mask2: {
-    bottom: 0,
-    left: -20,
-    right: 0,
-    top: 0,
-    backgroundImage: `linear-gradient(90deg, rgba(46,51,56,0) 0%, rgba(46,51,56,1) 10%, rgba(46,51,56,1) 100%)`,
-    position: 'absolute',
-    animationDuration: `${ANIMATION_DURATION}s`,
-    animationIterationCount: 1,
-    animationKeyframes: [
-      {
-        '0%': {
-          transform: [
-            {
-              translateX: 0,
-            },
-          ],
-        },
-        '12%': {
-          transform: [
-            {
-              translateX: '100%',
-            },
-          ],
-        },
-        '100%': {
-          transform: [
-            {
-              translateX: '100%',
-            },
-          ],
-        },
-      },
-    ],
   },
 })
