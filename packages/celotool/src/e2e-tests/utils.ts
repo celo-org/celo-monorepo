@@ -28,6 +28,7 @@ export interface GethInstanceConfig {
   etherbase?: string
   peers?: string[]
   pid?: number
+  ethstats?: string
 }
 
 export interface GethTestConfig {
@@ -198,7 +199,7 @@ async function setupTestDir(testDir: string) {
   await execCmd('mkdir', [testDir])
 }
 
-function writeGenesis(validators: Validator[], path: string, configOverrides: any = {}) {
+export function writeGenesis(validators: Validator[], path: string, configOverrides: any = {}) {
   const genesis = generateGenesis({
     validators,
     blockTime: 0,
@@ -218,7 +219,7 @@ export function importGenesis() {
 export async function init(gethBinaryPath: string, datadir: string, genesisPath: string) {
   await execCmdWithExitOnFailure('rm', ['-rf', datadir], { silent: true })
   await execCmdWithExitOnFailure(gethBinaryPath, ['--datadir', datadir, 'init', genesisPath], {
-    silent: true,
+    silent: false,
   })
 }
 
@@ -274,7 +275,7 @@ export async function getEnode(port: number, ws: boolean = false) {
 
 export async function startGeth(gethBinaryPath: string, instance: GethInstanceConfig) {
   const datadir = getDatadir(instance)
-  const { syncmode, port, rpcport, wsport, validating } = instance
+  const { syncmode, port, rpcport, wsport, validating, ethstats } = instance
   const privateKey = instance.privateKey || ''
   const lightserv = instance.lightserv || false
   const etherbase = instance.etherbase || ''
@@ -291,7 +292,7 @@ export async function startGeth(gethBinaryPath: string, instance: GethInstanceCo
     '--networkid',
     NetworkId.toString(),
     '--verbosity',
-    '4',
+    '3',
     '--consoleoutput=stdout', // Send all logs to stdout
     '--consoleformat=term',
     '--nat',
@@ -303,7 +304,8 @@ export async function startGeth(gethBinaryPath: string, instance: GethInstanceCo
       '--rpc',
       '--rpcport',
       rpcport.toString(),
-      '--rpcapi=eth,net,web3,debug,admin,personal'
+      '--rpccorsdomain=*',
+      '--rpcapi=eth,net,web3,debug,admin,personal,txpool'
     )
   }
 
@@ -333,6 +335,10 @@ export async function startGeth(gethBinaryPath: string, instance: GethInstanceCo
     gethArgs.push('--password=/dev/null', `--unlock=0`)
   }
 
+
+  if (!!ethstats) {
+    gethArgs.push(`--ethstats=${instance.name}:secret@${ethstats}`)
+  }
   const gethProcess = spawnWithLog(gethBinaryPath, gethArgs, `${datadir}/logs.txt`)
   instance.pid = gethProcess.pid
 
