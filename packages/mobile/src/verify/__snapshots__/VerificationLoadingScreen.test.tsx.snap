@@ -10,14 +10,62 @@ exports[`VerificationLoadingScreen renders correctly 1`] = `
     }
   }
 >
+  <View
+    style={
+      Object {
+        "left": 0,
+        "position": "absolute",
+        "top": 5,
+        "zIndex": 10,
+      }
+    }
+  >
+    <View
+      accessible={true}
+      focusable={true}
+      isTVSelectable={true}
+      nativeBackgroundAndroid={
+        Object {
+          "attribute": "selectableItemBackgroundBorderless",
+          "type": "ThemeAttrAndroid",
+        }
+      }
+      onClick={[Function]}
+      onResponderGrant={[Function]}
+      onResponderMove={[Function]}
+      onResponderRelease={[Function]}
+      onResponderTerminate={[Function]}
+      onResponderTerminationRequest={[Function]}
+      onStartShouldSetResponder={[Function]}
+      style={
+        Object {
+          "paddingHorizontal": 20,
+          "paddingVertical": 10,
+        }
+      }
+      testID="CancelButton"
+    >
+      <Text
+        style={
+          Object {
+            "color": "#42D689",
+            "fontFamily": "Hind-SemiBold",
+            "fontSize": 14,
+            "lineHeight": 22,
+          }
+        }
+      >
+        cancel
+      </Text>
+    </View>
+  </View>
   <RCTScrollView
     contentContainerStyle={
       Object {
         "alignItems": "center",
         "flex": 1,
-        "justifyContent": "center",
-        "padding": 30,
-        "paddingTop": 0,
+        "justifyContent": "space-between",
+        "paddingTop": 60,
       }
     }
   >
@@ -53,1172 +101,83 @@ exports[`VerificationLoadingScreen renders correctly 1`] = `
       <View
         style={
           Object {
-            "marginVertical": 30,
+            "alignItems": "center",
+            "justifyContent": "center",
+          }
+        }
+      >
+        <View
+          style={
+            Array [
+              Object {
+                "aspectRatio": 1,
+              },
+              undefined,
+              Object {
+                "width": 40,
+              },
+            ]
+          }
+        >
+          <View
+            autoPlay={true}
+            enableMergePathsAndroidForKitKatAndAbove={false}
+            loop={true}
+            onAnimationFinish={[Function]}
+            progress={0}
+            resizeMode="contain"
+            sourceJson="{\\"v\\":\\"5.4.4\\",\\"fr\\":60,\\"ip\\":0,\\"op\\":173,\\"w\\":600,\\"h\\":600,\\"nm\\":\\"WINNER green R\\",\\"ddd\\":0,\\"assets\\":[{\\"id\\":\\"comp_0\\",\\"layers\\":[{\\"ddd\\":0,\\"ind\\":1,\\"ty\\":3,\\"nm\\":\\"Null 5\\",\\"sr\\":1,\\"ks\\":{\\"o\\":{\\"a\\":0,\\"k\\":0,\\"ix\\":11},\\"r\\":{\\"a\\":0,\\"k\\":0,\\"ix\\":10},\\"p\\":{\\"a\\":0,\\"k\\":[300,300,0],\\"ix\\":2},\\"a\\":{\\"a\\":0,\\"k\\":[50,50,0],\\"ix\\":1},\\"s\\":{\\"a\\":0,\\"k\\":[388,388,100],\\"ix\\":6}},\\"ao\\":0,\\"ip\\":0,\\"op\\":173,\\"st\\":0,\\"bm\\":0},{\\"ddd\\":0,\\"ind\\":2,\\"ty\\":4,\\"nm\\":\\"green\\",\\"parent\\":1,\\"sr\\":1,\\"ks\\":{\\"o\\":{\\"a\\":0,\\"k\\":100,\\"ix\\":11},\\"r\\":{\\"a\\":1,\\"k\\":[{\\"i\\":{\\"x\\":[0.461],\\"y\\":[1]},\\"o\\":{\\"x\\":[0.074],\\"y\\":[0.125]},\\"t\\":0,\\"s\\":[268.63],\\"e\\":[90]},{\\"i\\":{\\"x\\":[0.64],\\"y\\":[1]},\\"o\\":{\\"x\\":[0.36],\\"y\\":[0]},\\"t\\":56,\\"s\\":[90],\\"e\\":[90]},{\\"i\\":{\\"x\\":[1],\\"y\\":[1]},\\"o\\":{\\"x\\":[0.6],\\"y\\":[0.265]},\\"t\\":101,\\"s\\":[90],\\"e\\":[-88.135]},{\\"t\\":172.000048877002}],\\"ix\\":10},\\"p\\":{\\"a\\":0,\\"k\\":[50,50,0],\\"ix\\":2},\\"a\\":{\\"a\\":0,\\"k\\":[103,-115,0],\\"ix\\":1},\\"s\\":{\\"a\\":0,\\"k\\":[18.343,18.343,100],\\"ix\\":6}},\\"ao\\":0,\\"shapes\\":[{\\"ty\\":\\"gr\\",\\"it\\":[{\\"ind\\":0,\\"ty\\":\\"sh\\",\\"ix\\":1,\\"ks\\":{\\"a\\":1,\\"k\\":[{\\"i\\":{\\"x\\":0.833,\\"y\\":0.833},\\"o\\":{\\"x\\":0.81,\\"y\\":0},\\"t\\":32.746,\\"s\\":[{\\"i\\":[[-206.701,0],[0,-206.701],[206.701,0],[0,206.701]],\\"o\\":[[206.701,0],[0,206.701],[-206.701,0],[0,-206.701]],\\"v\\":[[0,-374.266],[374.266,0],[0,374.266],[-374.266,0]],\\"c\\":true}],\\"e\\":[{\\"i\\":[[-206.701,0],[1.349,-4.634],[206.702,0],[0.205,6.376]],\\"o\\":[[206.701,0],[-2.223,7.633],[-206.701,0],[-0.25,-7.779]],\\"v\\":[[-2.095,0.013],[374.266,0],[-2.237,-0.013],[-374.266,0]],\\"c\\":true}]},{\\"i\\":{\\"x\\":0.02,\\"y\\":1},\\"o\\":{\\"x\\":0.167,\\"y\\":0.167},\\"t\\":56.221,\\"s\\":[{\\"i\\":[[-206.701,0],[1.349,-4.634],[206.702,0],[0.205,6.376]],\\"o\\":[[206.701,0],[-2.223,7.633],[-206.701,0],[-0.25,-7.779]],\\"v\\":[[-2.095,0.013],[374.266,0],[-2.237,-0.013],[-374.266,0]],\\"c\\":true}],\\"e\\":[{\\"i\\":[[-206.701,0],[0,-206.701],[206.701,0],[0,206.701]],\\"o\\":[[206.701,0],[0,206.701],[-206.701,0],[0,-206.701]],\\"v\\":[[0,-374.266],[374.266,0],[0,374.266],[-374.266,0]],\\"c\\":true}]},{\\"i\\":{\\"x\\":1,\\"y\\":1},\\"o\\":{\\"x\\":0.167,\\"y\\":0},\\"t\\":68.518,\\"s\\":[{\\"i\\":[[-206.701,0],[0,-206.701],[206.701,0],[0,206.701]],\\"o\\":[[206.701,0],[0,206.701],[-206.701,0],[0,-206.701]],\\"v\\":[[0,-374.266],[374.266,0],[0,374.266],[-374.266,0]],\\"c\\":true}],\\"e\\":[{\\"i\\":[[-206.701,0],[1.349,-4.634],[206.702,0],[0.205,6.376]],\\"o\\":[[206.701,0],[-2.223,7.633],[-206.701,0],[-0.25,-7.779]],\\"v\\":[[-2.095,0.013],[374.266,0],[-2.237,-0.013],[-374.266,0]],\\"c\\":true}]},{\\"i\\":{\\"x\\":0.07,\\"y\\":1},\\"o\\":{\\"x\\":0,\\"y\\":0},\\"t\\":80.815,\\"s\\":[{\\"i\\":[[-206.701,0],[1.349,-4.634],[206.702,0],[0.205,6.376]],\\"o\\":[[206.701,0],[-2.223,7.633],[-206.701,0],[-0.25,-7.779]],\\"v\\":[[-2.095,0.013],[374.266,0],[-2.237,-0.013],[-374.266,0]],\\"c\\":true}],\\"e\\":[{\\"i\\":[[-206.701,0],[0,-206.701],[206.701,0],[0,206.701]],\\"o\\":[[206.701,0],[0,206.701],[-206.701,0],[0,-206.701]],\\"v\\":[[0,-374.266],[374.266,0],[0,374.266],[-374.266,0]],\\"c\\":true}]},{\\"t\\":130.000048877002}],\\"ix\\":2},\\"nm\\":\\"Path 1\\",\\"mn\\":\\"ADBE Vector Shape - Group\\",\\"hd\\":false},{\\"ty\\":\\"st\\",\\"c\\":{\\"a\\":0,\\"k\\":[0.207843137255,0.81568627451,0.498039215686,1],\\"ix\\":3},\\"o\\":{\\"a\\":0,\\"k\\":100,\\"ix\\":4},\\"w\\":{\\"a\\":0,\\"k\\":118,\\"ix\\":5},\\"lc\\":2,\\"lj\\":2,\\"bm\\":0,\\"nm\\":\\"Stroke 1\\",\\"mn\\":\\"ADBE Vector Graphic - Stroke\\",\\"hd\\":false},{\\"ty\\":\\"tr\\",\\"p\\":{\\"a\\":0,\\"k\\":[103,-115],\\"ix\\":2},\\"a\\":{\\"a\\":0,\\"k\\":[0,0],\\"ix\\":1},\\"s\\":{\\"a\\":0,\\"k\\":[86.667,86.667],\\"ix\\":3},\\"r\\":{\\"a\\":0,\\"k\\":0,\\"ix\\":6},\\"o\\":{\\"a\\":0,\\"k\\":100,\\"ix\\":7},\\"sk\\":{\\"a\\":0,\\"k\\":0,\\"ix\\":4},\\"sa\\":{\\"a\\":0,\\"k\\":0,\\"ix\\":5},\\"nm\\":\\"Transform\\"}],\\"nm\\":\\"Ellipse 1\\",\\"np\\":3,\\"cix\\":2,\\"bm\\":0,\\"ix\\":1,\\"mn\\":\\"ADBE Vector Group\\",\\"hd\\":false},{\\"ty\\":\\"tm\\",\\"s\\":{\\"a\\":1,\\"k\\":[{\\"i\\":{\\"x\\":[0.833],\\"y\\":[0.833]},\\"o\\":{\\"x\\":[0],\\"y\\":[0]},\\"t\\":0,\\"s\\":[99],\\"e\\":[0]},{\\"t\\":38.000048877002}],\\"ix\\":1},\\"e\\":{\\"a\\":1,\\"k\\":[{\\"i\\":{\\"x\\":[1],\\"y\\":[1]},\\"o\\":{\\"x\\":[0.58],\\"y\\":[0]},\\"t\\":96,\\"s\\":[100],\\"e\\":[1]},{\\"t\\":172.000048877002}],\\"ix\\":2},\\"o\\":{\\"a\\":0,\\"k\\":0,\\"ix\\":3},\\"m\\":1,\\"ix\\":2,\\"nm\\":\\"Trim Paths 1\\",\\"mn\\":\\"ADBE Vector Filter - Trim\\",\\"hd\\":false}],\\"ip\\":0,\\"op\\":173,\\"st\\":-144.997997997998,\\"bm\\":0}]}],\\"layers\\":[{\\"ddd\\":0,\\"ind\\":1,\\"ty\\":0,\\"nm\\":\\"WINNER green\\",\\"refId\\":\\"comp_0\\",\\"sr\\":1,\\"ks\\":{\\"o\\":{\\"a\\":0,\\"k\\":100,\\"ix\\":11},\\"r\\":{\\"a\\":0,\\"k\\":0,\\"ix\\":10},\\"p\\":{\\"a\\":0,\\"k\\":[300,300,0],\\"ix\\":2},\\"a\\":{\\"a\\":0,\\"k\\":[300,300,0],\\"ix\\":1},\\"s\\":{\\"a\\":0,\\"k\\":[-100,100,100],\\"ix\\":6}},\\"ao\\":0,\\"w\\":600,\\"h\\":600,\\"ip\\":0,\\"op\\":173,\\"st\\":0,\\"bm\\":0}],\\"markers\\":[]}"
+            speed={1}
+            style={
+              Object {
+                "aspectRatio": 1,
+                "height": "100%",
+                "width": 40,
+              }
+            }
+          />
+        </View>
+        <Text
+          style={
+            Object {
+              "color": "#2E3338",
+              "fontFamily": "Hind-SemiBold",
+              "fontSize": 16,
+              "lineHeight": 24,
+              "marginTop": 20,
+            }
+          }
+        >
+          loading.verifyingNumber
+        </Text>
+        <Text
+          style={
+            Object {
+              "color": "#2E3338",
+              "fontFamily": "Hind-Regular",
+              "fontSize": 16,
+              "lineHeight": 24,
+              "marginTop": 5,
+            }
+          }
+        >
+          loading.keepOpen
+        </Text>
+      </View>
+      <View
+        style={
+          Object {
+            "marginVertical": 20,
           }
         }
       >
         <View
           style={
             Object {
-              "height": 250,
+              "height": 275,
             }
           }
-        >
-          <RCTScrollView
-            activeAnimationOptions={null}
-            activeAnimationType="timing"
-            activeSlideAlignment="center"
-            activeSlideOffset={20}
-            apparitionDelay={0}
-            automaticallyAdjustContentInsets={false}
-            autoplay={false}
-            autoplayDelay={1000}
-            autoplayInterval={3000}
-            callbackOffsetMargin={5}
-            containerCustomStyle={Object {}}
-            contentContainerCustomStyle={Object {}}
-            contentContainerStyle={
-              Array [
-                Object {
-                  "paddingLeft": 35,
-                  "paddingRight": 35,
-                },
-                Object {},
-              ]
-            }
-            data={
-              Array [
-                Object {
-                  "text": "Test 1",
-                },
-                Object {
-                  "text": "Test 2",
-                },
-                Object {
-                  "text": "Test 3",
-                },
-              ]
-            }
-            decelerationRate="fast"
-            directionalLockEnabled={true}
-            disableVirtualization={false}
-            enableMomentum={false}
-            enableSnap={true}
-            firstItem={0}
-            getItem={[Function]}
-            getItemCount={[Function]}
-            hasParallaxImages={false}
-            horizontal={true}
-            inactiveSlideOpacity={1}
-            inactiveSlideScale={0.9}
-            inactiveSlideShift={0}
-            initialNumToRender={7}
-            invertStickyHeaders={false}
-            inverted={false}
-            itemHeight={250}
-            itemWidth={680}
-            keyExtractor={[Function]}
-            layout="default"
-            lockScrollTimeoutDuration={1000}
-            lockScrollWhileSnapping={false}
-            loop={false}
-            loopClonesPerSide={3}
-            maxToRenderPerBatch={15}
-            numColumns={1}
-            onContentSizeChange={[Function]}
-            onEndReachedThreshold={2}
-            onLayout={[Function]}
-            onMomentumScrollEnd={[Function]}
-            onResponderRelease={[Function]}
-            onScroll={[Function]}
-            onScrollBeginDrag={[Function]}
-            onScrollEndDrag={[Function]}
-            onSnapToItem={[Function]}
-            onStartShouldSetResponderCapture={[Function]}
-            onTouchEnd={[Function]}
-            onTouchStart={[Function]}
-            overScrollMode="never"
-            pinchGestureEnabled={false}
-            removeClippedSubviews={true}
-            renderItem={[Function]}
-            scrollEnabled={true}
-            scrollEventThrottle={1}
-            scrollsToTop={false}
-            shouldOptimizeUpdates={true}
-            showsHorizontalScrollIndicator={false}
-            showsVerticalScrollIndicator={false}
-            slideStyle={Object {}}
-            sliderHeight={250}
-            sliderWidth={750}
-            stickyHeaderIndices={Array []}
-            style={
-              Object {
-                "flexDirection": "row",
-                "opacity": 0,
-                "width": 750,
-              }
-            }
-            swipeThreshold={20}
-            updateCellsBatchingPeriod={50}
-            useScrollView={false}
-            vertical={false}
-            viewabilityConfigCallbackPairs={Array []}
-            windowSize={15}
-          >
-            <View>
-              <View
-                onLayout={[Function]}
-                style={
-                  Array [
-                    Object {
-                      "flexDirection": "row",
-                    },
-                    null,
-                  ]
-                }
-              >
-                <View
-                  pointerEvents="box-none"
-                  style={
-                    Object {
-                      "transform": Array [
-                        Object {
-                          "scale": 1,
-                        },
-                      ],
-                      "width": 680,
-                    }
-                  }
-                >
-                  <View
-                    style={
-                      Object {
-                        "position": "relative",
-                      }
-                    }
-                  >
-                    <View
-                      style={
-                        Array [
-                          Object {
-                            "height": 250,
-                            "position": "relative",
-                            "width": 680,
-                          },
-                          Object {
-                            "padding": 3,
-                          },
-                        ]
-                      }
-                    >
-                      <svg
-                        height={276}
-                        style={
-                          Object {
-                            "left": -1,
-                            "position": "absolute",
-                            "top": -1,
-                          }
-                        }
-                        width={706}
-                      >
-                        <defs>
-                          <linearGradient
-                            id="top"
-                            x1="0%"
-                            x2="0%"
-                            y1="100%"
-                            y2="0%"
-                          >
-                            <stop
-                              offset="0"
-                              stopColor="#6b7b8b"
-                              stopOpacity={0.03}
-                            />
-                            <stop
-                              offset="1"
-                              stopColor="#6b7b8b"
-                              stopOpacity="0"
-                            />
-                          </linearGradient>
-                          <linearGradient
-                            id="bottom"
-                            x1="0%"
-                            x2="0%"
-                            y1="0%"
-                            y2="100%"
-                          >
-                            <stop
-                              offset="0"
-                              stopColor="#6b7b8b"
-                              stopOpacity={0.03}
-                            />
-                            <stop
-                              offset="1"
-                              stopColor="#6b7b8b"
-                              stopOpacity="0"
-                            />
-                          </linearGradient>
-                          <linearGradient
-                            id="left"
-                            x1="100%"
-                            x2="0%"
-                            y1="0%"
-                            y2="0%"
-                          >
-                            <stop
-                              offset="0"
-                              stopColor="#6b7b8b"
-                              stopOpacity={0.03}
-                            />
-                            <stop
-                              offset="1"
-                              stopColor="#6b7b8b"
-                              stopOpacity="0"
-                            />
-                          </linearGradient>
-                          <linearGradient
-                            id="right"
-                            x1="0%"
-                            x2="100%"
-                            y1="0%"
-                            y2="0%"
-                          >
-                            <stop
-                              offset="0"
-                              stopColor="#6b7b8b"
-                              stopOpacity={0.03}
-                            />
-                            <stop
-                              offset="1"
-                              stopColor="#6b7b8b"
-                              stopOpacity="0"
-                            />
-                          </linearGradient>
-                          <radialGradient
-                            cx="100%"
-                            cy="100%"
-                            fx="100%"
-                            fy="100%"
-                            id="border-left-top"
-                            r="100%"
-                          >
-                            <stop
-                              offset="0"
-                              stopColor="#6b7b8b"
-                              stopOpacity={0.03}
-                            />
-                            <stop
-                              offset="0.9230769230769231"
-                              stopColor="#6b7b8b"
-                              stopOpacity={0.03}
-                            />
-                            <stop
-                              offset="1"
-                              stopColor="#6b7b8b"
-                              stopOpacity="0"
-                            />
-                          </radialGradient>
-                          <radialGradient
-                            cx="100%"
-                            cy="0%"
-                            fx="100%"
-                            fy="0%"
-                            id="border-left-bottom"
-                            r="100%"
-                          >
-                            <stop
-                              offset="0"
-                              stopColor="#6b7b8b"
-                              stopOpacity={0.03}
-                            />
-                            <stop
-                              offset="0.9230769230769231"
-                              stopColor="#6b7b8b"
-                              stopOpacity={0.03}
-                            />
-                            <stop
-                              offset="1"
-                              stopColor="#6b7b8b"
-                              stopOpacity="0"
-                            />
-                          </radialGradient>
-                          <radialGradient
-                            cx="0%"
-                            cy="100%"
-                            fx="0%"
-                            fy="100%"
-                            id="border-right-top"
-                            r="100%"
-                          >
-                            <stop
-                              offset="0"
-                              stopColor="#6b7b8b"
-                              stopOpacity={0.03}
-                            />
-                            <stop
-                              offset="0.9230769230769231"
-                              stopColor="#6b7b8b"
-                              stopOpacity={0.03}
-                            />
-                            <stop
-                              offset="1"
-                              stopColor="#6b7b8b"
-                              stopOpacity="0"
-                            />
-                          </radialGradient>
-                          <radialGradient
-                            cx="0%"
-                            cy="0%"
-                            fx="0%"
-                            fy="0%"
-                            id="border-right-bottom"
-                            r="100%"
-                          >
-                            <stop
-                              offset="0"
-                              stopColor="#6b7b8b"
-                              stopOpacity={0.03}
-                            />
-                            <stop
-                              offset="0.9230769230769231"
-                              stopColor="#6b7b8b"
-                              stopOpacity={0.03}
-                            />
-                            <stop
-                              offset="1"
-                              stopColor="#6b7b8b"
-                              stopOpacity="0"
-                            />
-                          </radialGradient>
-                        </defs>
-                        <path
-                          d="M 0 13,Q 0 0 13 0,v 1,q -12 0 -12 12,h -1,z"
-                          fill="url(#border-left-top)"
-                        />
-                        <path
-                          d="M 669 0,q 13 0 13 13,h -1,q 0 -12 -12 -12,v -1,z"
-                          fill="url(#border-right-top)"
-                        />
-                        <path
-                          d="M 681 239,h 1,q 0 13 -13 13,v -1,q 12 0 12 -12,z"
-                          fill="url(#border-right-bottom)"
-                        />
-                        <path
-                          d="M 0 239,q 0 13 13 13,v -1,q -12 0 -12 -12,h -1,z"
-                          fill="url(#border-left-bottom)"
-                        />
-                        <rect
-                          fill="url(#top)"
-                          height={1}
-                          width={656}
-                          x={13}
-                          y="0"
-                        />
-                        <rect
-                          fill="url(#left)"
-                          height={226}
-                          width={1}
-                          x="0"
-                          y={13}
-                        />
-                        <rect
-                          fill="url(#right)"
-                          height={226}
-                          width={1}
-                          x={681}
-                          y={13}
-                        />
-                        <rect
-                          fill="url(#bottom)"
-                          height={1}
-                          width={656}
-                          x={13}
-                          y={251}
-                        />
-                        <path
-                          d="M 13 1,h 656,q 12 0 12 12,v 226,q 0 12 -12 12,h -656,q -12 0 -12 -12,v -226,q 0 -12 12 -12"
-                          fill="rgba(107,123,139,0.03)"
-                        />
-                      </svg>
-                      <View
-                        style={
-                          Object {
-                            "alignItems": "center",
-                            "backgroundColor": "#FFFFFF",
-                            "borderColor": "rgba(255, 255, 255, 0.5)",
-                            "borderRadius": 12,
-                            "borderWidth": 2,
-                            "height": 244,
-                            "justifyContent": "center",
-                            "width": 674,
-                          }
-                        }
-                      >
-                        <Text
-                          style={
-                            Object {
-                              "color": "#2E3338",
-                              "fontFamily": "Hind-Regular",
-                              "fontSize": 17,
-                              "lineHeight": 26,
-                            }
-                          }
-                        >
-                          Test 1
-                        </Text>
-                      </View>
-                    </View>
-                  </View>
-                </View>
-              </View>
-              <View
-                onLayout={[Function]}
-                style={
-                  Array [
-                    Object {
-                      "flexDirection": "row",
-                    },
-                    null,
-                  ]
-                }
-              >
-                <View
-                  pointerEvents="box-none"
-                  style={
-                    Object {
-                      "transform": Array [
-                        Object {
-                          "scale": 0.9,
-                        },
-                      ],
-                      "width": 680,
-                    }
-                  }
-                >
-                  <View
-                    style={
-                      Object {
-                        "position": "relative",
-                      }
-                    }
-                  >
-                    <View
-                      style={
-                        Array [
-                          Object {
-                            "height": 250,
-                            "position": "relative",
-                            "width": 680,
-                          },
-                          Object {
-                            "padding": 3,
-                          },
-                        ]
-                      }
-                    >
-                      <svg
-                        height={276}
-                        style={
-                          Object {
-                            "left": -1,
-                            "position": "absolute",
-                            "top": -1,
-                          }
-                        }
-                        width={706}
-                      >
-                        <defs>
-                          <linearGradient
-                            id="top"
-                            x1="0%"
-                            x2="0%"
-                            y1="100%"
-                            y2="0%"
-                          >
-                            <stop
-                              offset="0"
-                              stopColor="#6b7b8b"
-                              stopOpacity={0.03}
-                            />
-                            <stop
-                              offset="1"
-                              stopColor="#6b7b8b"
-                              stopOpacity="0"
-                            />
-                          </linearGradient>
-                          <linearGradient
-                            id="bottom"
-                            x1="0%"
-                            x2="0%"
-                            y1="0%"
-                            y2="100%"
-                          >
-                            <stop
-                              offset="0"
-                              stopColor="#6b7b8b"
-                              stopOpacity={0.03}
-                            />
-                            <stop
-                              offset="1"
-                              stopColor="#6b7b8b"
-                              stopOpacity="0"
-                            />
-                          </linearGradient>
-                          <linearGradient
-                            id="left"
-                            x1="100%"
-                            x2="0%"
-                            y1="0%"
-                            y2="0%"
-                          >
-                            <stop
-                              offset="0"
-                              stopColor="#6b7b8b"
-                              stopOpacity={0.03}
-                            />
-                            <stop
-                              offset="1"
-                              stopColor="#6b7b8b"
-                              stopOpacity="0"
-                            />
-                          </linearGradient>
-                          <linearGradient
-                            id="right"
-                            x1="0%"
-                            x2="100%"
-                            y1="0%"
-                            y2="0%"
-                          >
-                            <stop
-                              offset="0"
-                              stopColor="#6b7b8b"
-                              stopOpacity={0.03}
-                            />
-                            <stop
-                              offset="1"
-                              stopColor="#6b7b8b"
-                              stopOpacity="0"
-                            />
-                          </linearGradient>
-                          <radialGradient
-                            cx="100%"
-                            cy="100%"
-                            fx="100%"
-                            fy="100%"
-                            id="border-left-top"
-                            r="100%"
-                          >
-                            <stop
-                              offset="0"
-                              stopColor="#6b7b8b"
-                              stopOpacity={0.03}
-                            />
-                            <stop
-                              offset="0.9230769230769231"
-                              stopColor="#6b7b8b"
-                              stopOpacity={0.03}
-                            />
-                            <stop
-                              offset="1"
-                              stopColor="#6b7b8b"
-                              stopOpacity="0"
-                            />
-                          </radialGradient>
-                          <radialGradient
-                            cx="100%"
-                            cy="0%"
-                            fx="100%"
-                            fy="0%"
-                            id="border-left-bottom"
-                            r="100%"
-                          >
-                            <stop
-                              offset="0"
-                              stopColor="#6b7b8b"
-                              stopOpacity={0.03}
-                            />
-                            <stop
-                              offset="0.9230769230769231"
-                              stopColor="#6b7b8b"
-                              stopOpacity={0.03}
-                            />
-                            <stop
-                              offset="1"
-                              stopColor="#6b7b8b"
-                              stopOpacity="0"
-                            />
-                          </radialGradient>
-                          <radialGradient
-                            cx="0%"
-                            cy="100%"
-                            fx="0%"
-                            fy="100%"
-                            id="border-right-top"
-                            r="100%"
-                          >
-                            <stop
-                              offset="0"
-                              stopColor="#6b7b8b"
-                              stopOpacity={0.03}
-                            />
-                            <stop
-                              offset="0.9230769230769231"
-                              stopColor="#6b7b8b"
-                              stopOpacity={0.03}
-                            />
-                            <stop
-                              offset="1"
-                              stopColor="#6b7b8b"
-                              stopOpacity="0"
-                            />
-                          </radialGradient>
-                          <radialGradient
-                            cx="0%"
-                            cy="0%"
-                            fx="0%"
-                            fy="0%"
-                            id="border-right-bottom"
-                            r="100%"
-                          >
-                            <stop
-                              offset="0"
-                              stopColor="#6b7b8b"
-                              stopOpacity={0.03}
-                            />
-                            <stop
-                              offset="0.9230769230769231"
-                              stopColor="#6b7b8b"
-                              stopOpacity={0.03}
-                            />
-                            <stop
-                              offset="1"
-                              stopColor="#6b7b8b"
-                              stopOpacity="0"
-                            />
-                          </radialGradient>
-                        </defs>
-                        <path
-                          d="M 0 13,Q 0 0 13 0,v 1,q -12 0 -12 12,h -1,z"
-                          fill="url(#border-left-top)"
-                        />
-                        <path
-                          d="M 669 0,q 13 0 13 13,h -1,q 0 -12 -12 -12,v -1,z"
-                          fill="url(#border-right-top)"
-                        />
-                        <path
-                          d="M 681 239,h 1,q 0 13 -13 13,v -1,q 12 0 12 -12,z"
-                          fill="url(#border-right-bottom)"
-                        />
-                        <path
-                          d="M 0 239,q 0 13 13 13,v -1,q -12 0 -12 -12,h -1,z"
-                          fill="url(#border-left-bottom)"
-                        />
-                        <rect
-                          fill="url(#top)"
-                          height={1}
-                          width={656}
-                          x={13}
-                          y="0"
-                        />
-                        <rect
-                          fill="url(#left)"
-                          height={226}
-                          width={1}
-                          x="0"
-                          y={13}
-                        />
-                        <rect
-                          fill="url(#right)"
-                          height={226}
-                          width={1}
-                          x={681}
-                          y={13}
-                        />
-                        <rect
-                          fill="url(#bottom)"
-                          height={1}
-                          width={656}
-                          x={13}
-                          y={251}
-                        />
-                        <path
-                          d="M 13 1,h 656,q 12 0 12 12,v 226,q 0 12 -12 12,h -656,q -12 0 -12 -12,v -226,q 0 -12 12 -12"
-                          fill="rgba(107,123,139,0.03)"
-                        />
-                      </svg>
-                      <View
-                        style={
-                          Object {
-                            "alignItems": "center",
-                            "backgroundColor": "#FFFFFF",
-                            "borderColor": "rgba(255, 255, 255, 0.5)",
-                            "borderRadius": 12,
-                            "borderWidth": 2,
-                            "height": 244,
-                            "justifyContent": "center",
-                            "width": 674,
-                          }
-                        }
-                      >
-                        <Text
-                          style={
-                            Object {
-                              "color": "#2E3338",
-                              "fontFamily": "Hind-Regular",
-                              "fontSize": 17,
-                              "lineHeight": 26,
-                            }
-                          }
-                        >
-                          Test 2
-                        </Text>
-                      </View>
-                    </View>
-                  </View>
-                </View>
-              </View>
-              <View
-                onLayout={[Function]}
-                style={
-                  Array [
-                    Object {
-                      "flexDirection": "row",
-                    },
-                    null,
-                  ]
-                }
-              >
-                <View
-                  pointerEvents="box-none"
-                  style={
-                    Object {
-                      "transform": Array [
-                        Object {
-                          "scale": 0.9,
-                        },
-                      ],
-                      "width": 680,
-                    }
-                  }
-                >
-                  <View
-                    style={
-                      Object {
-                        "position": "relative",
-                      }
-                    }
-                  >
-                    <View
-                      style={
-                        Array [
-                          Object {
-                            "height": 250,
-                            "position": "relative",
-                            "width": 680,
-                          },
-                          Object {
-                            "padding": 3,
-                          },
-                        ]
-                      }
-                    >
-                      <svg
-                        height={276}
-                        style={
-                          Object {
-                            "left": -1,
-                            "position": "absolute",
-                            "top": -1,
-                          }
-                        }
-                        width={706}
-                      >
-                        <defs>
-                          <linearGradient
-                            id="top"
-                            x1="0%"
-                            x2="0%"
-                            y1="100%"
-                            y2="0%"
-                          >
-                            <stop
-                              offset="0"
-                              stopColor="#6b7b8b"
-                              stopOpacity={0.03}
-                            />
-                            <stop
-                              offset="1"
-                              stopColor="#6b7b8b"
-                              stopOpacity="0"
-                            />
-                          </linearGradient>
-                          <linearGradient
-                            id="bottom"
-                            x1="0%"
-                            x2="0%"
-                            y1="0%"
-                            y2="100%"
-                          >
-                            <stop
-                              offset="0"
-                              stopColor="#6b7b8b"
-                              stopOpacity={0.03}
-                            />
-                            <stop
-                              offset="1"
-                              stopColor="#6b7b8b"
-                              stopOpacity="0"
-                            />
-                          </linearGradient>
-                          <linearGradient
-                            id="left"
-                            x1="100%"
-                            x2="0%"
-                            y1="0%"
-                            y2="0%"
-                          >
-                            <stop
-                              offset="0"
-                              stopColor="#6b7b8b"
-                              stopOpacity={0.03}
-                            />
-                            <stop
-                              offset="1"
-                              stopColor="#6b7b8b"
-                              stopOpacity="0"
-                            />
-                          </linearGradient>
-                          <linearGradient
-                            id="right"
-                            x1="0%"
-                            x2="100%"
-                            y1="0%"
-                            y2="0%"
-                          >
-                            <stop
-                              offset="0"
-                              stopColor="#6b7b8b"
-                              stopOpacity={0.03}
-                            />
-                            <stop
-                              offset="1"
-                              stopColor="#6b7b8b"
-                              stopOpacity="0"
-                            />
-                          </linearGradient>
-                          <radialGradient
-                            cx="100%"
-                            cy="100%"
-                            fx="100%"
-                            fy="100%"
-                            id="border-left-top"
-                            r="100%"
-                          >
-                            <stop
-                              offset="0"
-                              stopColor="#6b7b8b"
-                              stopOpacity={0.03}
-                            />
-                            <stop
-                              offset="0.9230769230769231"
-                              stopColor="#6b7b8b"
-                              stopOpacity={0.03}
-                            />
-                            <stop
-                              offset="1"
-                              stopColor="#6b7b8b"
-                              stopOpacity="0"
-                            />
-                          </radialGradient>
-                          <radialGradient
-                            cx="100%"
-                            cy="0%"
-                            fx="100%"
-                            fy="0%"
-                            id="border-left-bottom"
-                            r="100%"
-                          >
-                            <stop
-                              offset="0"
-                              stopColor="#6b7b8b"
-                              stopOpacity={0.03}
-                            />
-                            <stop
-                              offset="0.9230769230769231"
-                              stopColor="#6b7b8b"
-                              stopOpacity={0.03}
-                            />
-                            <stop
-                              offset="1"
-                              stopColor="#6b7b8b"
-                              stopOpacity="0"
-                            />
-                          </radialGradient>
-                          <radialGradient
-                            cx="0%"
-                            cy="100%"
-                            fx="0%"
-                            fy="100%"
-                            id="border-right-top"
-                            r="100%"
-                          >
-                            <stop
-                              offset="0"
-                              stopColor="#6b7b8b"
-                              stopOpacity={0.03}
-                            />
-                            <stop
-                              offset="0.9230769230769231"
-                              stopColor="#6b7b8b"
-                              stopOpacity={0.03}
-                            />
-                            <stop
-                              offset="1"
-                              stopColor="#6b7b8b"
-                              stopOpacity="0"
-                            />
-                          </radialGradient>
-                          <radialGradient
-                            cx="0%"
-                            cy="0%"
-                            fx="0%"
-                            fy="0%"
-                            id="border-right-bottom"
-                            r="100%"
-                          >
-                            <stop
-                              offset="0"
-                              stopColor="#6b7b8b"
-                              stopOpacity={0.03}
-                            />
-                            <stop
-                              offset="0.9230769230769231"
-                              stopColor="#6b7b8b"
-                              stopOpacity={0.03}
-                            />
-                            <stop
-                              offset="1"
-                              stopColor="#6b7b8b"
-                              stopOpacity="0"
-                            />
-                          </radialGradient>
-                        </defs>
-                        <path
-                          d="M 0 13,Q 0 0 13 0,v 1,q -12 0 -12 12,h -1,z"
-                          fill="url(#border-left-top)"
-                        />
-                        <path
-                          d="M 669 0,q 13 0 13 13,h -1,q 0 -12 -12 -12,v -1,z"
-                          fill="url(#border-right-top)"
-                        />
-                        <path
-                          d="M 681 239,h 1,q 0 13 -13 13,v -1,q 12 0 12 -12,z"
-                          fill="url(#border-right-bottom)"
-                        />
-                        <path
-                          d="M 0 239,q 0 13 13 13,v -1,q -12 0 -12 -12,h -1,z"
-                          fill="url(#border-left-bottom)"
-                        />
-                        <rect
-                          fill="url(#top)"
-                          height={1}
-                          width={656}
-                          x={13}
-                          y="0"
-                        />
-                        <rect
-                          fill="url(#left)"
-                          height={226}
-                          width={1}
-                          x="0"
-                          y={13}
-                        />
-                        <rect
-                          fill="url(#right)"
-                          height={226}
-                          width={1}
-                          x={681}
-                          y={13}
-                        />
-                        <rect
-                          fill="url(#bottom)"
-                          height={1}
-                          width={656}
-                          x={13}
-                          y={251}
-                        />
-                        <path
-                          d="M 13 1,h 656,q 12 0 12 12,v 226,q 0 12 -12 12,h -656,q -12 0 -12 -12,v -226,q 0 -12 12 -12"
-                          fill="rgba(107,123,139,0.03)"
-                        />
-                      </svg>
-                      <View
-                        style={
-                          Object {
-                            "alignItems": "center",
-                            "backgroundColor": "#FFFFFF",
-                            "borderColor": "rgba(255, 255, 255, 0.5)",
-                            "borderRadius": 12,
-                            "borderWidth": 2,
-                            "height": 244,
-                            "justifyContent": "center",
-                            "width": 674,
-                          }
-                        }
-                      >
-                        <Text
-                          style={
-                            Object {
-                              "color": "#2E3338",
-                              "fontFamily": "Hind-Regular",
-                              "fontSize": 17,
-                              "lineHeight": 26,
-                            }
-                          }
-                        >
-                          Test 3
-                        </Text>
-                      </View>
-                    </View>
-                  </View>
-                </View>
-              </View>
-            </View>
-          </RCTScrollView>
-        </View>
-        <View
-          accessible={false}
-          pointerEvents="box-none"
-          style={
-            Array [
-              Object {
-                "alignItems": "center",
-                "justifyContent": "center",
-                "paddingHorizontal": 20,
-                "paddingVertical": 30,
-              },
-              Object {
-                "flexDirection": "row",
-              },
-              Object {
-                "marginVertical": 10,
-              },
-            ]
-          }
-        >
-          <View
-            accessible={false}
-            focusable={false}
-            isTVSelectable={true}
-            onClick={[Function]}
-            onResponderGrant={[Function]}
-            onResponderMove={[Function]}
-            onResponderRelease={[Function]}
-            onResponderTerminate={[Function]}
-            onResponderTerminationRequest={[Function]}
-            onStartShouldSetResponder={[Function]}
-            style={
-              Object {
-                "alignItems": "center",
-                "justifyContent": "center",
-                "marginHorizontal": 8,
-                "opacity": 1,
-              }
-            }
-          >
-            <View
-              style={
-                Object {
-                  "backgroundColor": "rgba(189, 189, 189, 1)",
-                  "borderRadius": 3.5,
-                  "height": 7,
-                  "opacity": 1,
-                  "transform": Array [
-                    Object {
-                      "scale": 0.8,
-                    },
-                  ],
-                  "width": 7,
-                }
-              }
-            />
-          </View>
-          <View
-            accessible={false}
-            focusable={false}
-            isTVSelectable={true}
-            onClick={[Function]}
-            onResponderGrant={[Function]}
-            onResponderMove={[Function]}
-            onResponderRelease={[Function]}
-            onResponderTerminate={[Function]}
-            onResponderTerminationRequest={[Function]}
-            onStartShouldSetResponder={[Function]}
-            style={
-              Object {
-                "alignItems": "center",
-                "justifyContent": "center",
-                "marginHorizontal": 8,
-                "opacity": 1,
-              }
-            }
-          >
-            <View
-              style={
-                Object {
-                  "backgroundColor": "rgba(189, 189, 189, 1)",
-                  "borderRadius": 3.5,
-                  "height": 7,
-                  "opacity": 1,
-                  "transform": Array [
-                    Object {
-                      "scale": 0.8,
-                    },
-                  ],
-                  "width": 7,
-                }
-              }
-            />
-          </View>
-          <View
-            accessible={false}
-            focusable={false}
-            isTVSelectable={true}
-            onClick={[Function]}
-            onResponderGrant={[Function]}
-            onResponderMove={[Function]}
-            onResponderRelease={[Function]}
-            onResponderTerminate={[Function]}
-            onResponderTerminationRequest={[Function]}
-            onStartShouldSetResponder={[Function]}
-            style={
-              Object {
-                "alignItems": "center",
-                "justifyContent": "center",
-                "marginHorizontal": 8,
-                "opacity": 1,
-              }
-            }
-          >
-            <View
-              style={
-                Object {
-                  "backgroundColor": "rgba(189, 189, 189, 1)",
-                  "borderRadius": 3.5,
-                  "height": 7,
-                  "opacity": 1,
-                  "transform": Array [
-                    Object {
-                      "scale": 0.8,
-                    },
-                  ],
-                  "width": 7,
-                }
-              }
-            />
-          </View>
-        </View>
+        />
       </View>
     </View>
   </RCTScrollView>
