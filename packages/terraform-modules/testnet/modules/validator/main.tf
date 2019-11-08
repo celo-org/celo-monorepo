@@ -35,15 +35,15 @@ resource "google_compute_instance" "validator" {
   }
 
   network_interface {
-    network = var.network_name
+    network    = var.network_name
     subnetwork = google_compute_subnetwork.validator.name
     # We only want an access config for validators that will not be proxied
     dynamic "access_config" {
-       for_each = count.index < var.proxied_validator_count ? [] : [0]
-       content {
-         nat_ip = google_compute_address.validator[count.index].address
-       }
-     }
+      for_each = count.index < var.proxied_validator_count ? [] : [0]
+      content {
+        nat_ip = google_compute_address.validator[count.index].address
+      }
+    }
   }
 
   metadata_startup_script = templatefile(
@@ -93,8 +93,8 @@ resource "google_compute_disk" "validator" {
 }
 
 resource "google_compute_subnetwork" "validator" {
-  name          = "${local.name_prefix}-subnet"
-  network       = var.network_name
+  name    = "${local.name_prefix}-subnet"
+  network = var.network_name
   # Arbitrary IP range. This cannot overlap with existing subnetwork IP ranges
   # in the same network, so there can only be at most 1 VM testnet on a VPC network
   ip_cidr_range = "10.25.0.0/24"
@@ -124,14 +124,14 @@ module "sentry" {
   network_id                        = var.network_id
   network_name                      = var.network_name
   # NOTE this assumes only one sentry will be used
-  node_count                        = var.proxied_validator_count
-  verification_pool_url             = var.verification_pool_url
+  node_count            = var.proxied_validator_count
+  verification_pool_url = var.verification_pool_url
 }
 
 # if there are no proxied validators, we don't have to worry about
 
 resource "google_compute_firewall" "sentry_internal_ingress" {
-  count   = var.proxied_validator_count > 0 ? 1 : 0
+  count = var.proxied_validator_count > 0 ? 1 : 0
 
   name    = "${local.name_prefix}-sentry-internal-ingress"
   network = var.network_name
@@ -151,12 +151,12 @@ resource "google_compute_firewall" "sentry_internal_ingress" {
 }
 
 resource "google_compute_firewall" "sentry_internal_egress" {
-  count   = var.proxied_validator_count > 0 ? 1 : 0
+  count = var.proxied_validator_count > 0 ? 1 : 0
 
   name    = "${local.name_prefix}-sentry-internal-egress"
   network = var.network_name
 
-  direction     = "EGRESS"
+  direction          = "EGRESS"
   destination_ranges = ["10.0.0.0/8"]
 
   allow {
