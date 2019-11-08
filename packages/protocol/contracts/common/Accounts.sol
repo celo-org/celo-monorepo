@@ -8,8 +8,9 @@ import "./interfaces/IAccounts.sol";
 import "../common/Initializable.sol";
 import "../common/Signatures.sol";
 import "../common/UsingRegistry.sol";
+import "../common/UsingPrecompiles.sol";
 
-contract Accounts is IAccounts, ReentrancyGuard, Initializable, UsingRegistry {
+contract Accounts is IAccounts, ReentrancyGuard, Initializable, UsingRegistry, UsingPrecompiles {
 
   using SafeMath for uint256;
 
@@ -113,7 +114,7 @@ contract Accounts is IAccounts, ReentrancyGuard, Initializable, UsingRegistry {
     nonReentrant
   {
     Account storage account = accounts[msg.sender];
-    authorize(voter, account.signers.voting, v, r, s);
+    authorize(voter, v, r, s);
     account.signers.voting = voter;
     emit VoteSignerAuthorized(msg.sender, voter);
   }
@@ -136,7 +137,7 @@ contract Accounts is IAccounts, ReentrancyGuard, Initializable, UsingRegistry {
     nonReentrant
   {
     Account storage account = accounts[msg.sender];
-    authorize(validator, account.signers.validating, v, r, s);
+    authorize(validator, v, r, s);
     account.signers.validating = validator;
     emit ValidationSignerAuthorized(msg.sender, validator);
   }
@@ -305,7 +306,7 @@ contract Accounts is IAccounts, ReentrancyGuard, Initializable, UsingRegistry {
     public
   {
     Account storage account = accounts[msg.sender];
-    authorize(attestor, account.signers.attesting, v, r, s);
+    authorize(attestor, v, r, s);
     account.signers.attesting = attestor;
     emit AttestationSignerAuthorized(msg.sender, attestor);
   }
@@ -435,9 +436,8 @@ contract Accounts is IAccounts, ReentrancyGuard, Initializable, UsingRegistry {
   }
 
   /**
-   * @notice Authorizes voting or validating power of `msg.sender`'s account to another address.
-   * @param current The address to authorize.
-   * @param previous The previous authorized address.
+   * @notice Authorizes some role of of `msg.sender`'s account to another address.
+   * @param authorized The address to authorize.
    * @param v The recovery id of the incoming ECDSA signature.
    * @param r Output value r of the ECDSA signature.
    * @param s Output value s of the ECDSA signature.
@@ -445,20 +445,18 @@ contract Accounts is IAccounts, ReentrancyGuard, Initializable, UsingRegistry {
    * @dev v, r, s constitute `current`'s signature on `msg.sender`.
    */
   function authorize(
-    address current,
-    address previous,
+    address authorized,
     uint8 v,
     bytes32 r,
     bytes32 s
   )
     private
   {
-    require(isAccount(msg.sender) && isNotAccount(current) && isNotAuthorized(current));
+    require(isAccount(msg.sender) && isNotAccount(authorized) && isNotAuthorized(authorized));
 
     address signer = Signatures.getSignerOfAddress(msg.sender, v, r, s);
-    require(signer == current);
+    require(signer == authorized);
 
-    authorizedBy[previous] = address(0);
-    authorizedBy[current] = msg.sender;
+    authorizedBy[authorized] = msg.sender;
   }
 }

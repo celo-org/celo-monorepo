@@ -394,8 +394,8 @@ contract('Accounts', (accounts: string[]) => {
             )
           })
 
-          it('should reset the previous authorization', async () => {
-            assert.equal(await accountsInstance.authorizedBy(authorized), NULL_ADDRESS)
+          it('should preserve the previous authorization', async () => {
+            assert.equal(await accountsInstance.authorizedBy(authorized), account)
           })
         })
       })

@@ -5,7 +5,7 @@ import { newAttestations } from './generated/Attestations'
 import { newBlockchainParameters } from './generated/BlockchainParameters'
 import { newElection } from './generated/Election'
 import { newEpochRewards } from './generated/EpochRewards'
-import { newEscrow } from './generated/Escrow'
+// import { newEscrow } from './generated/Escrow'
 import { newExchange } from './generated/Exchange'
 import { newGasCurrencyWhitelist } from './generated/GasCurrencyWhitelist'
 import { newGasPriceMinimum } from './generated/GasPriceMinimum'
@@ -28,7 +28,7 @@ const ContractFactories = {
   [CeloContract.BlockchainParameters]: newBlockchainParameters,
   [CeloContract.Election]: newElection,
   [CeloContract.EpochRewards]: newEpochRewards,
-  [CeloContract.Escrow]: newEscrow,
+  // [CeloContract.Escrow]: newEscrow,
   [CeloContract.Exchange]: newExchange,
   [CeloContract.GasCurrencyWhitelist]: newGasCurrencyWhitelist,
   [CeloContract.GasPriceMinimum]: newGasPriceMinimum,
@@ -73,9 +73,11 @@ export class Web3ContractCache {
   getEpochRewards() {
     return this.getContract(CeloContract.EpochRewards)
   }
+  /*
   getEscrow() {
     return this.getContract(CeloContract.Escrow)
   }
+  */
   getExchange() {
     return this.getContract(CeloContract.Exchange)
   }

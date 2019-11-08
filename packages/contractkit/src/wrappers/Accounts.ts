@@ -1,4 +1,5 @@
 import Web3 from 'web3'
+import { parseSignature } from '@celo/utils/lib/signatureUtils'
 import { Address } from '../base'
 import { Accounts } from '../generated/types/Accounts'
 import {
@@ -14,6 +15,13 @@ enum SignerRole {
   Validation,
   Vote,
 }
+
+export interface Signature {
+  r: string
+  s: string
+  v: number
+}
+
 /**
  * Contract for handling deposits needed for voting.
  */
@@ -57,40 +65,52 @@ export class AccountsWrapper extends BaseWrapper<Accounts> {
 
   /**
    * Authorize an attestation signing key on behalf of this account to another address.
-   * @param account Address of the active account.
    * @param attestationSigner The address of the signing key to authorize.
+   * @param proofOfSigningKeyPossession The account address signed by the signer address.
    * @return A CeloTransactionObject
    */
   async authorizeAttestationSigner(
-    account: Address,
-    attestationSigner: Address
+    attestationSigner: Address,
+    proofOfSigningKeyPossession: Signature
   ): Promise<CeloTransactionObject<void>> {
-    return this.authorizeSigner(SignerRole.Attestation, account, attestationSigner)
+    return this.authorizeSigner(
+      SignerRole.Attestation,
+      attestationSigner,
+      proofOfSigningKeyPossession
+    )
   }
   /**
    * Authorizes an address to sign votes on behalf of the account.
-   * @param account Address of the active account.
    * @param voteSigner The address of the vote signing key to authorize.
+   * @param proofOfSigningKeyPossession The account address signed by the signer address.
    * @return A CeloTransactionObject
    */
   async authorizeVoteSigner(
-    account: Address,
-    voteSigner: Address
+    voteSigner: Address,
+    proofOfSigningKeyPossession: Signature
   ): Promise<CeloTransactionObject<void>> {
-    return this.authorizeSigner(SignerRole.Vote, account, voteSigner)
+    return this.authorizeSigner(SignerRole.Vote, voteSigner, proofOfSigningKeyPossession)
   }
 
   /**
    * Authorizes an address to sign consensus messages on behalf of the account.
-   * @param account Address of the active account.
    * @param validationSigner The address of the signing key to authorize.
+   * @param proofOfSigningKeyPossession The account address signed by the signer address.
    * @return A CeloTransactionObject
    */
   async authorizeValidationSigner(
-    account: Address,
-    validationSigner: Address
+    validationSigner: Address,
+    proofOfSigningKeyPossession: Signature
   ): Promise<CeloTransactionObject<void>> {
-    return this.authorizeSigner(SignerRole.Validation, account, validationSigner)
+    return this.authorizeSigner(
+      SignerRole.Validation,
+      validationSigner,
+      proofOfSigningKeyPossession
+    )
+  }
+
+  async generateProofOfSigningKeyPossession(account: Address, signer: Address) {
+    return this.getParsedSignatureOfAddress(account, signer)
   }
 
   /**
@@ -158,19 +178,13 @@ export class AccountsWrapper extends BaseWrapper<Accounts> {
     [SignerRole.Vote]: this.contract.methods.authorizeVoteSigner,
   }
 
-  private async authorizeSigner(role: SignerRole, account: Address, signer: Address) {
-    const sig = await this.getParsedSignatureOfAddress(account, signer)
-    // TODO(asa): Pass default tx "from" argument.
+  private async authorizeSigner(role: SignerRole, signer: Address, sig: Signature) {
     return toTransactionObject(this.kit, this.authorizeFns[role](signer, sig.v, sig.r, sig.s))
   }
 
   private async getParsedSignatureOfAddress(address: Address, signer: string) {
     const hash = Web3.utils.soliditySha3({ type: 'address', value: address })
-    const signature = (await this.kit.web3.eth.sign(hash, signer)).slice(2)
-    return {
-      r: `0x${signature.slice(0, 64)}`,
-      s: `0x${signature.slice(64, 128)}`,
-      v: Web3.utils.hexToNumber(signature.slice(128, 130)) + 27,
-    }
+    const signature = await this.kit.web3.eth.sign(hash, signer)
+    return parseSignature(hash, signature, signer)
   }
 }

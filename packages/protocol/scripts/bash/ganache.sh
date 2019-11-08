@@ -5,7 +5,7 @@ set -euo pipefail
 
 yarn run ganache-cli \
   --deterministic \
-  --mnemonic 'concert load couple harbor equip island argue ramp clarify fence smart topic' \
+  --mnemonic 'concert load couple harbor equip island argue ramp clarify fence smart blah' \
   --gasPrice 0 \
   --networkId 1101 \
   --gasLimit 10000000 \

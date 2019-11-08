@@ -349,9 +349,13 @@ contract Validators is
    * @return True upon success.
    */
   function _updateValidatorScore(address validator, uint256 uptime) internal {
+    uint256 epochNumber = getEpochNumber();
     address account = getAccounts().validationSignerToAccount(validator);
+    epochNumber = getEpochNumber();
     require(isValidator(account));
+    epochNumber = getEpochNumber();
     require(uptime <= FixidityLib.fixed1().unwrap());
+    epochNumber = getEpochNumber();
 
     uint256 numerator;
     uint256 denominator;
@@ -695,11 +699,11 @@ contract Validators is
 
   /**
    * @notice Returns validator information.
-   * @param account The account that registered the validator.
+   * @param validator The account that registered the validator or its authorized signing address.
    * @return The unpacked validator struct.
    */
   function getValidator(
-    address account
+    address validator
   )
     external
     view
@@ -709,12 +713,13 @@ contract Validators is
       uint256 score
     )
   {
+    address account = getAccounts().validationSignerToAccount(validator);
     require(isValidator(account));
-    Validator storage validator = validators[account];
+    Validator storage _validator = validators[account];
     return (
-      validator.publicKeysData,
-      validator.affiliation,
-      validator.score.unwrap()
+      _validator.publicKeysData,
+      _validator.affiliation,
+      _validator.score.unwrap()
     );
   }
 
