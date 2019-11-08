@@ -1505,7 +1505,7 @@ contract('Validators', (accounts: string[]) => {
     })
   })
 
-  describe('#updateValidatorScore', () => {
+  describe('#updateValidatorScoreFromSigner', () => {
     const validator = accounts[0]
     beforeEach(async () => {
       await registerValidator(validator)
@@ -1517,7 +1517,7 @@ contract('Validators', (accounts: string[]) => {
       const epochScore = uptime.pow(validatorScoreParameters.exponent)
       const adjustmentSpeed = fromFixed(validatorScoreParameters.adjustmentSpeed)
       beforeEach(async () => {
-        await validators.updateValidatorScore(validator, toFixed(uptime))
+        await validators.updateValidatorScoreFromSigner(validator, toFixed(uptime))
       })
 
       it('should update the validator score', async () => {
@@ -1528,7 +1528,7 @@ contract('Validators', (accounts: string[]) => {
 
       describe('when the validator already has a non-zero score', () => {
         beforeEach(async () => {
-          await validators.updateValidatorScore(validator, toFixed(uptime))
+          await validators.updateValidatorScoreFromSigner(validator, toFixed(uptime))
         })
 
         it('should update the validator score', async () => {
@@ -1546,7 +1546,7 @@ contract('Validators', (accounts: string[]) => {
     describe('when uptime > 1.0', () => {
       const uptime = 1.01
       it('should revert', async () => {
-        await assertRevert(validators.updateValidatorScore(validator, toFixed(uptime)))
+        await assertRevert(validators.updateValidatorScoreFromSigner(validator, toFixed(uptime)))
       })
     })
   })
@@ -1738,7 +1738,7 @@ contract('Validators', (accounts: string[]) => {
     })
   })
 
-  describe('#distributeEpochPayment', () => {
+  describe('#distributeEpochPaymentsFromSigner', () => {
     const validator = accounts[0]
     const group = accounts[1]
     const maxPayment = new BigNumber(20122394876)
@@ -1755,19 +1755,19 @@ contract('Validators', (accounts: string[]) => {
       const adjustmentSpeed = fromFixed(validatorScoreParameters.adjustmentSpeed)
       // @ts-ignore
       const expectedScore = adjustmentSpeed.times(uptime.pow(validatorScoreParameters.exponent))
-      const expectedTotalPayment = expectedScore.times(validatorEpochPayment)
+      const expectedTotalPayment = expectedScore.times(maxPayment).dp(0, BigNumber.ROUND_FLOOR)
       const expectedGroupPayment = expectedTotalPayment
         .times(fromFixed(commission))
         .dp(0, BigNumber.ROUND_FLOOR)
       const expectedValidatorPayment = expectedTotalPayment.minus(expectedGroupPayment)
       beforeEach(async () => {
-        await validators.updateValidatorScore(validator, toFixed(uptime))
+        await validators.updateValidatorScoreFromSigner(validator, toFixed(uptime))
       })
 
       describe('when the validator and group meet the balance requirements', () => {
         beforeEach(async () => {
-          ret = await validators.distributeEpochPayment(validator, maxPayment).call()
-          await validators.distributeEpochPayment(validator, maxPayment)
+          ret = await validators.distributeEpochPaymentsFromSigner.call(validator, maxPayment)
+          await validators.distributeEpochPaymentsFromSigner(validator, maxPayment)
         })
 
         it('should pay the validator', async () => {
@@ -1789,8 +1789,8 @@ contract('Validators', (accounts: string[]) => {
             validator,
             validatorLockedGoldRequirements.value.minus(1)
           )
-          ret = await validators.distributeEpochPayment(validator, maxPayment).call()
-          await validators.distributeEpochPayment(validator, maxPayment)
+          ret = await validators.distributeEpochPaymentsFromSigner.call(validator, maxPayment)
+          await validators.distributeEpochPaymentsFromSigner(validator, maxPayment)
         })
 
         it('should not pay the validator', async () => {
@@ -1812,8 +1812,8 @@ contract('Validators', (accounts: string[]) => {
             group,
             groupLockedGoldRequirements.value.minus(1)
           )
-          ret = await validators.distributeEpochPayment(validator, maxPayment).call()
-          await validators.distributeEpochPayment(validator, maxPayment)
+          ret = await validators.distributeEpochPaymentsFromSigner.call(validator, maxPayment)
+          await validators.distributeEpochPaymentsFromSigner(validator, maxPayment)
         })
 
         it('should not pay the validator', async () => {

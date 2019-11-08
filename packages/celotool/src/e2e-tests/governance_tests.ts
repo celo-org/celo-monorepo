@@ -33,7 +33,7 @@ describe('governance tests', () => {
 
   before(async function(this: any) {
     this.timeout(0)
-    // await context.hooks.before()
+    await context.hooks.before()
   })
 
   after(context.hooks.after)
@@ -73,11 +73,11 @@ describe('governance tests', () => {
     }
   }
 
-  const getValidationSigner = async (address: string, blockNumber?: number) => {
+  const getValidatorSigner = async (address: string, blockNumber?: number) => {
     if (blockNumber) {
-      return await accounts.methods.getValidationSigner(address).call({}, blockNumber)
+      return await accounts.methods.getValidatorSigner(address).call({}, blockNumber)
     } else {
-      return await accounts.methods.getValidationSigner(address).call()
+      return await accounts.methods.getValidatorSigner(address).call()
     }
   }
 
@@ -127,7 +127,7 @@ describe('governance tests', () => {
     return tx.send({ from: group, ...txOptions, gas })
   }
 
-  const authorizeValidationSigner = async (
+  const authorizeValidatorSigner = async (
     validatorWeb3: any,
     signerWeb3: any,
     txOptions: any = {}
@@ -141,7 +141,7 @@ describe('governance tests', () => {
     ).contracts.getAccounts()).generateProofOfSigningKeyPossession(validator, signer)
     const validatorKit = newKitFromWeb3(validatorWeb3)
     const validatorAccounts = await validatorKit._web3Contracts.getAccounts()
-    const tx = validatorAccounts.methods.authorizeValidationSigner(signer, pop.v, pop.r, pop.s)
+    const tx = validatorAccounts.methods.authorizeValidatorSigner(signer, pop.v, pop.r, pop.s)
     let gas = txOptions.gas
     if (!gas) {
       gas = await tx.estimateGas({ ...txOptions })
@@ -264,11 +264,11 @@ describe('governance tests', () => {
             // 2. Rotate keys for validator 2 by authorizing a new validating key.
             if (!doneAuthorizing) {
               console.log('authorizing')
-              await authorizeValidationSigner(validatorWeb3, authorizedWeb3s[index])
+              await authorizeValidatorSigner(validatorWeb3, authorizedWeb3s[index])
             }
             doneAuthorizing = doneAuthorizing || index === 1
             const signingKeys = await Promise.all(
-              newMembers.map((v: string) => getValidationSigner(v))
+              newMembers.map((v: string) => getValidatorSigner(v))
             )
             // Confirm that authorizing signing keys worked.
             // @ts-ignore Type does not include `notSameMembers`
@@ -291,7 +291,7 @@ describe('governance tests', () => {
       assert.equal(errorWhileChangingValidatorSet, '')
     })
 
-    const getValidatorSetSigningKeysAtBlock = async (blockNumber: number) => {
+    const getValidatorSetSignersAtBlock = async (blockNumber: number) => {
       const validatorSetSize = await election.methods
         .numberValidatorsInCurrentSet()
         .call({}, blockNumber)
@@ -305,10 +305,10 @@ describe('governance tests', () => {
     }
 
     const getValidatorSetAccountKeysAtBlock = async (blockNumber: number) => {
-      const signingKeys = await getValidatorSetSigningKeysAtBlock(blockNumber)
+      const signingKeys = await getValidatorSetSignersAtBlock(blockNumber)
       return await Promise.all(
         signingKeys.map((address: string) =>
-          accounts.methods.validationSignerToAccount(address).call({}, blockNumber)
+          accounts.methods.validatorSignerToAccount(address).call({}, blockNumber)
         )
       )
     }
@@ -333,12 +333,12 @@ describe('governance tests', () => {
       for (const blockNumber of blockNumbers) {
         const lastEpochBlock = getLastEpochBlock(blockNumber)
         const memberAccounts = await getValidatorGroupMembers(lastEpochBlock)
-        const memberSigningKeys = await Promise.all(
-          memberAccounts.map((v: string) => getValidationSigner(v, lastEpochBlock))
+        const memberSigners = await Promise.all(
+          memberAccounts.map((v: string) => getValidatorSigner(v, lastEpochBlock))
         )
-        const validatorSetSigningKeys = await getValidatorSetSigningKeysAtBlock(blockNumber)
+        const validatorSetSigners = await getValidatorSetSignersAtBlock(blockNumber)
         const validatorSetAccounts = await getValidatorSetAccountKeysAtBlock(blockNumber)
-        assert.sameMembers(memberSigningKeys, validatorSetSigningKeys)
+        assert.sameMembers(memberSigners, validatorSetSigners)
         assert.sameMembers(memberAccounts, validatorSetAccounts)
       }
     })
@@ -351,7 +351,7 @@ describe('governance tests', () => {
         const lastEpochBlock = getLastEpochBlock(blockNumber)
         // Fetch the round robin order if it hasn't already been set for this epoch.
         if (roundRobinOrder.length == 0 || blockNumber == lastEpochBlock + 1) {
-          const validatorSet = await getValidatorSetSigningKeysAtBlock(blockNumber)
+          const validatorSet = await getValidatorSetSignersAtBlock(blockNumber)
           roundRobinOrder = await Promise.all(
             validatorSet.map(
               async (_, i) => (await web3.eth.getBlock(lastEpochBlock + i + 1)).miner

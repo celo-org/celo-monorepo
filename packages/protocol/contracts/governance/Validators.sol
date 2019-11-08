@@ -288,7 +288,7 @@ contract Validators is
     // Use the proof of possession bytes
     require(checkProofOfPossession(msg.sender, publicKeysData.slice(64, 48 + 96)));
 
-    address account = getAccounts().activeValidationSignerToAccount(msg.sender);
+    address account = getAccounts().activeValidatorSignerToAccount(msg.sender);
     require(!isValidator(account) && !isValidatorGroup(account));
     uint256 lockedGoldBalance = getLockedGold().getAccountTotalLockedGold(account);
     require(lockedGoldBalance >= validatorLockedGoldRequirements.value);
@@ -333,29 +333,25 @@ contract Validators is
 
   /**
    * @notice Updates a validator's score based on its uptime for the epoch.
-   * @param validator The address of the validator.
+   * @param signer The validator signer of the validator account whose score needs updating.
    * @param uptime The Fixidity representation of the validator's uptime, between 0 and 1.
    * @return True upon success.
    */
-  function updateValidatorScore(address validator, uint256 uptime) external onlyVm() {
-    _updateValidatorScore(validator, uptime);
+  function updateValidatorScoreFromSigner(address signer, uint256 uptime) external onlyVm() {
+    _updateValidatorScoreFromSigner(signer, uptime);
   }
 
   /**
    * @notice Updates a validator's score based on its uptime for the epoch.
-   * @param validator The address of the validator.
+   * @param signer The validator signer of the validator whose score needs updating.
    * @param uptime The Fixidity representation of the validator's uptime, between 0 and 1.
    * @dev new_score = uptime ** exponent * adjustmentSpeed + old_score * (1 - adjustmentSpeed)
    * @return True upon success.
    */
-  function _updateValidatorScore(address validator, uint256 uptime) internal {
-    uint256 epochNumber = getEpochNumber();
-    address account = getAccounts().validationSignerToAccount(validator);
-    epochNumber = getEpochNumber();
+  function _updateValidatorScoreFromSigner(address signer, uint256 uptime) internal {
+    address account = getAccounts().validatorSignerToAccount(signer);
     require(isValidator(account));
-    epochNumber = getEpochNumber();
     require(uptime <= FixidityLib.fixed1().unwrap());
-    epochNumber = getEpochNumber();
 
     uint256 numerator;
     uint256 denominator;
@@ -388,38 +384,38 @@ contract Validators is
   }
 
   /**
-   * @notice Distributes epoch payments to `validator` and its group.
-   * @param validator The validator to distribute the epoch payment to.
+   * @notice Distributes epoch payments to the account associated with `signer` and its group.
+   * @param signer The validator signer of the account to distribute the epoch payment to.
    * @param maxPayment The maximum payment to the validator. Actual payment is based on score and
    *   group commission.
    * @return The total payment paid to the validator and their group.
    */
-  function distributeEpochPayment(
-    address validator,
+  function distributeEpochPaymentsFromSigner(
+    address signer,
     uint256 maxPayment
   )
     external
     onlyVm()
     returns (uint256)
   {
-    return _distributeEpochPayment(validator, maxPayment);
+    return _distributeEpochPaymentsFromSigner(signer, maxPayment);
   }
 
   /**
-   * @notice Distributes epoch payments to `validator` and its group.
-   * @param validator The validator to distribute the epoch payment to.
+   * @notice Distributes epoch payments to the account associated with `signer` and its group.
+   * @param signer The validator signer of the validator to distribute the epoch payment to.
    * @param maxPayment The maximum payment to the validator. Actual payment is based on score and
    *   group commission.
    * @return The total payment paid to the validator and their group.
    */
-  function _distributeEpochPayment(
-    address validator,
+  function _distributeEpochPaymentsFromSigner(
+    address signer,
     uint256 maxPayment
   )
     internal
     returns (uint256)
   {
-    address account = getAccounts().validationSignerToAccount(validator);
+    address account = getAccounts().validatorSignerToAccount(signer);
     require(isValidator(account));
     // The group that should be paid is the group that the validator was a member of at the
     // time it was elected.
@@ -447,7 +443,7 @@ contract Validators is
    * @dev Fails if the account is not a validator.
    */
   function deregisterValidator(uint256 index) external nonReentrant returns (bool) {
-    address account = getAccounts().activeValidationSignerToAccount(msg.sender);
+    address account = getAccounts().activeValidatorSignerToAccount(msg.sender);
     require(isValidator(account));
 
     // Require that the validator has not been a member of a validator group for
@@ -475,7 +471,7 @@ contract Validators is
    * @dev De-affiliates with the previously affiliated group if present.
    */
   function affiliate(address group) external nonReentrant returns (bool) {
-    address account = getAccounts().activeValidationSignerToAccount(msg.sender);
+    address account = getAccounts().activeValidatorSignerToAccount(msg.sender);
     require(isValidator(account) && isValidatorGroup(group));
     require(meetsAccountLockedGoldRequirements(account));
     require(meetsAccountLockedGoldRequirements(group));
@@ -494,7 +490,7 @@ contract Validators is
    * @dev Fails if the account is not a validator with non-zero affiliation.
    */
   function deaffiliate() external nonReentrant returns (bool) {
-    address account = getAccounts().activeValidationSignerToAccount(msg.sender);
+    address account = getAccounts().activeValidatorSignerToAccount(msg.sender);
     require(isValidator(account));
     Validator storage validator = validators[account];
     require(validator.affiliation != address(0));
@@ -518,7 +514,7 @@ contract Validators is
     returns (bool)
   {
     require(commission <= FixidityLib.fixed1().unwrap(), "Commission can't be greater than 100%");
-    address account = getAccounts().activeValidationSignerToAccount(msg.sender);
+    address account = getAccounts().activeValidatorSignerToAccount(msg.sender);
     require(!isValidator(account) && !isValidatorGroup(account));
     uint256 lockedGoldBalance = getLockedGold().getAccountTotalLockedGold(account);
     require(lockedGoldBalance >= groupLockedGoldRequirements.value);
@@ -537,7 +533,7 @@ contract Validators is
    * @dev Fails if the account is not a validator group with no members.
    */
   function deregisterValidatorGroup(uint256 index) external nonReentrant returns (bool) {
-    address account = getAccounts().activeValidationSignerToAccount(msg.sender);
+    address account = getAccounts().activeValidatorSignerToAccount(msg.sender);
     // Only Validator Groups that have never had members or have been empty for at least
     // `groupLockedGoldRequirements.duration` seconds can be deregistered.
     require(isValidatorGroup(account) && groups[account].members.numElements == 0);
@@ -559,7 +555,7 @@ contract Validators is
    * @dev Fails if the group has zero members.
    */
   function addMember(address validator) external nonReentrant returns (bool) {
-    address account = getAccounts().activeValidationSignerToAccount(msg.sender);
+    address account = getAccounts().activeValidatorSignerToAccount(msg.sender);
     require(groups[account].members.numElements > 0);
     return _addMember(account, validator, address(0), address(0));
   }
@@ -582,7 +578,7 @@ contract Validators is
     nonReentrant
     returns (bool)
   {
-    address account = getAccounts().activeValidationSignerToAccount(msg.sender);
+    address account = getAccounts().activeValidatorSignerToAccount(msg.sender);
     require(groups[account].members.numElements == 0);
     return _addMember(account, validator, lesser, greater);
   }
@@ -630,7 +626,7 @@ contract Validators is
    * @dev Fails if `validator` is not a member of the account's group.
    */
   function removeMember(address validator) external nonReentrant returns (bool) {
-    address account = getAccounts().activeValidationSignerToAccount(msg.sender);
+    address account = getAccounts().activeValidatorSignerToAccount(msg.sender);
     require(isValidatorGroup(account) && isValidator(validator), "is not group and validator");
     return _removeMember(account, validator);
   }
@@ -654,7 +650,7 @@ contract Validators is
     nonReentrant
     returns (bool)
   {
-    address account = getAccounts().activeValidationSignerToAccount(msg.sender);
+    address account = getAccounts().activeValidatorSignerToAccount(msg.sender);
     require(isValidatorGroup(account) && isValidator(validator));
     ValidatorGroup storage group = groups[account];
     require(group.members.contains(validator));
@@ -699,11 +695,11 @@ contract Validators is
 
   /**
    * @notice Returns validator information.
-   * @param validator The account that registered the validator or its authorized signing address.
+   * @param signer The account that registered the validator or its authorized signing address.
    * @return The unpacked validator struct.
    */
-  function getValidator(
-    address validator
+  function getValidatorFromSigner(
+    address signer
   )
     external
     view
@@ -713,13 +709,32 @@ contract Validators is
       uint256 score
     )
   {
-    address account = getAccounts().validationSignerToAccount(validator);
+    address account = getAccounts().validatorSignerToAccount(signer);
+    return getValidator(account);
+  }
+
+  /**
+   * @notice Returns validator information.
+   * @param account The account that registered the validator.
+   * @return The unpacked validator struct.
+   */
+  function getValidator(
+    address account
+  )
+    public
+    view
+    returns (
+      bytes memory publicKeysData,
+      address affiliation,
+      uint256 score
+    )
+  {
     require(isValidator(account));
-    Validator storage _validator = validators[account];
+    Validator storage validator = validators[account];
     return (
-      _validator.publicKeysData,
-      _validator.affiliation,
-      _validator.score.unwrap()
+      validator.publicKeysData,
+      validator.affiliation,
+      validator.score.unwrap()
     );
   }
 
@@ -771,7 +786,7 @@ contract Validators is
     address[] memory topAccounts = groups[account].members.headN(n);
     address[] memory topValidators = new address[](n);
     for (uint256 i = 0; i < n; i = i.add(1)) {
-      topValidators[i] = getAccounts().getValidationSigner(topAccounts[i]);
+      topValidators[i] = getAccounts().getValidatorSigner(topAccounts[i]);
     }
     return topValidators;
   }
@@ -825,6 +840,19 @@ contract Validators is
    */
   function getRegisteredValidators() external view returns (address[] memory) {
     return registeredValidators;
+  }
+
+  /**
+   * @notice Returns the list of signers for the registered validator accounts.
+   * @return The list of signers for registered validator accounts.
+   */
+  function getRegisteredValidatorSigners() external view returns (address[] memory) {
+    IAccounts accounts = getAccounts();
+    address[] memory signers = new address[](registeredValidators.length);
+    for (uint256 i = 0; i < signers.length; i = i.add(1)) {
+      signers[i] = accounts.getValidatorSigner(registeredValidators[i]);
+    }
+    return signers;
   }
 
   /**
@@ -934,6 +962,12 @@ contract Validators is
     return true;
   }
 
+  /**
+   * @notice Updates the size history of a validator group.
+   * @param group The account whose group size has changed.
+   * @param size The new size of the group.
+   * @dev Used to determine how much gold an account needs to keep locked.
+   */
   function updateSizeHistory(address group, uint256 size) private {
     uint256[] storage sizeHistory = groups[group].sizeHistory;
     if (size == sizeHistory.length) {
@@ -943,6 +977,17 @@ contract Validators is
     } else {
       require(false, "Unable to update size history");
     }
+  }
+
+  /**
+   * @notice Returns the group that `account` was a member of at the end of the last epoch.
+   * @param signer The signer of the account whose group membership should be returned.
+   * @return The group that `account` was a member of at the end of the last epoch.
+   */
+  function getMembershipInLastEpochFromSigner(address signer) external view returns (address) {
+    address account = getAccounts().validatorSignerToAccount(signer);
+    require(isValidator(account));
+    return getMembershipInLastEpoch(account);
   }
 
   /**

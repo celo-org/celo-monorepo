@@ -626,7 +626,7 @@ contract Attestations is
     while (currentIndex < unselectedRequest.attestationsRequested) {
       seed = keccak256(abi.encodePacked(seed));
       validator = validatorAddressFromCurrentSet(uint256(seed) % numberValidators);
-      issuer = getAccounts().activeValidationSignerToAccount(validator);
+      issuer = getAccounts().activeValidatorSignerToAccount(validator);
       Attestation storage attestation = state.issuedAttestations[issuer];
 
       // Attestation issuers can only be added if they haven't been already.

@@ -15,8 +15,8 @@ const authorizationTestDescriptions = {
     subject: 'voteSigner',
   },
   validating: {
-    me: 'validation signing key',
-    subject: 'validationSigner',
+    me: 'validator signing key',
+    subject: 'validatorSigner',
   },
   attesting: {
     me: 'attestation signing key',
@@ -47,11 +47,11 @@ contract('Accounts', (accounts: string[]) => {
       getAccountFromActiveAuthorized: accountsInstance.activeVoteSignerToAccount,
     }
     authorizationTests.validating = {
-      fn: accountsInstance.authorizeValidationSigner,
-      eventName: 'ValidationSignerAuthorized',
-      getAuthorizedFromAccount: accountsInstance.getValidationSigner,
-      getAccountFromAuthorized: accountsInstance.validationSignerToAccount,
-      getAccountFromActiveAuthorized: accountsInstance.activeValidationSignerToAccount,
+      fn: accountsInstance.authorizeValidatorSigner,
+      eventName: 'ValidatorSignerAuthorized',
+      getAuthorizedFromAccount: accountsInstance.getValidatorSigner,
+      getAccountFromAuthorized: accountsInstance.validatorSignerToAccount,
+      getAccountFromActiveAuthorized: accountsInstance.activeValidatorSignerToAccount,
     }
     authorizationTests.attesting = {
       fn: accountsInstance.authorizeAttestationSigner,

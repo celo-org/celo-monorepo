@@ -140,7 +140,7 @@ contract('Attestations', (accounts: string[]) => {
         await accountsInstance.createAccount({ from: account })
         await unlockAndAuthorizeKey(
           KeyOffsets.VALIDATING_KEY_OFFSET,
-          accountsInstance.authorizeValidationSigner,
+          accountsInstance.authorizeValidatorSigner,
           account
         )
       })

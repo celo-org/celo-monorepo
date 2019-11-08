@@ -12,7 +12,7 @@ import {
 
 enum SignerRole {
   Attestation,
-  Validation,
+  Validator,
   Vote,
 }
 
@@ -48,12 +48,12 @@ export class AccountsWrapper extends BaseWrapper<Accounts> {
     this.contract.methods.getVoteSigner
   )
   /**
-   * Returns the validation signere for the specified account.
+   * Returns the validator signere for the specified account.
    * @param account The address of the account.
    * @return The address with which the account can register a validator or group.
    */
-  getValidationSigner: (account: string) => Promise<Address> = proxyCall(
-    this.contract.methods.getValidationSigner
+  getValidatorSigner: (account: string) => Promise<Address> = proxyCall(
+    this.contract.methods.getValidatorSigner
   )
 
   /**
@@ -65,48 +65,40 @@ export class AccountsWrapper extends BaseWrapper<Accounts> {
 
   /**
    * Authorize an attestation signing key on behalf of this account to another address.
-   * @param attestationSigner The address of the signing key to authorize.
+   * @param signer The address of the signing key to authorize.
    * @param proofOfSigningKeyPossession The account address signed by the signer address.
    * @return A CeloTransactionObject
    */
   async authorizeAttestationSigner(
-    attestationSigner: Address,
+    signer: Address,
     proofOfSigningKeyPossession: Signature
   ): Promise<CeloTransactionObject<void>> {
-    return this.authorizeSigner(
-      SignerRole.Attestation,
-      attestationSigner,
-      proofOfSigningKeyPossession
-    )
+    return this.authorizeSigner(SignerRole.Attestation, signer, proofOfSigningKeyPossession)
   }
   /**
    * Authorizes an address to sign votes on behalf of the account.
-   * @param voteSigner The address of the vote signing key to authorize.
+   * @param signer The address of the vote signing key to authorize.
    * @param proofOfSigningKeyPossession The account address signed by the signer address.
    * @return A CeloTransactionObject
    */
   async authorizeVoteSigner(
-    voteSigner: Address,
+    signer: Address,
     proofOfSigningKeyPossession: Signature
   ): Promise<CeloTransactionObject<void>> {
-    return this.authorizeSigner(SignerRole.Vote, voteSigner, proofOfSigningKeyPossession)
+    return this.authorizeSigner(SignerRole.Vote, signer, proofOfSigningKeyPossession)
   }
 
   /**
    * Authorizes an address to sign consensus messages on behalf of the account.
-   * @param validationSigner The address of the signing key to authorize.
+   * @param signer The address of the signing key to authorize.
    * @param proofOfSigningKeyPossession The account address signed by the signer address.
    * @return A CeloTransactionObject
    */
-  async authorizeValidationSigner(
-    validationSigner: Address,
+  async authorizeValidatorSigner(
+    signer: Address,
     proofOfSigningKeyPossession: Signature
   ): Promise<CeloTransactionObject<void>> {
-    return this.authorizeSigner(
-      SignerRole.Validation,
-      validationSigner,
-      proofOfSigningKeyPossession
-    )
+    return this.authorizeSigner(SignerRole.Validator, signer, proofOfSigningKeyPossession)
   }
 
   async generateProofOfSigningKeyPossession(account: Address, signer: Address) {
@@ -174,7 +166,7 @@ export class AccountsWrapper extends BaseWrapper<Accounts> {
 
   private authorizeFns = {
     [SignerRole.Attestation]: this.contract.methods.authorizeAttestationSigner,
-    [SignerRole.Validation]: this.contract.methods.authorizeValidationSigner,
+    [SignerRole.Validator]: this.contract.methods.authorizeValidatorSigner,
     [SignerRole.Vote]: this.contract.methods.authorizeVoteSigner,
   }
 
