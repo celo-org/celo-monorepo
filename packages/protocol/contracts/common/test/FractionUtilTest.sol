@@ -2,10 +2,8 @@ pragma solidity ^0.5.3;
 
 import "../FractionUtil.sol";
 
-
 // TODO(asa) Actually test this
 contract FractionUtilTest {
-
   using FractionUtil for FractionUtil.Fraction;
 
   function reduce(uint256 numerator, uint256 denominator) external pure returns (uint256, uint256) {
@@ -19,22 +17,13 @@ contract FractionUtilTest {
     uint256 denominatorA,
     uint256 numeratorB,
     uint256 denominatorB
-  )
-    external
-    pure
-    returns (bool)
-  {
+  ) external pure returns (bool) {
     FractionUtil.Fraction memory fractionA = FractionUtil.Fraction(numeratorA, denominatorA);
     FractionUtil.Fraction memory fractionB = FractionUtil.Fraction(numeratorB, denominatorB);
     return fractionA.equals(fractionB);
   }
 
-  function add(
-    uint256 numeratorA,
-    uint256 denominatorA,
-    uint256 numeratorB,
-    uint256 denominatorB
-  )
+  function add(uint256 numeratorA, uint256 denominatorA, uint256 numeratorB, uint256 denominatorB)
     external
     pure
     returns (uint256, uint256)
@@ -45,12 +34,7 @@ contract FractionUtilTest {
     return (fraction.numerator, fraction.denominator);
   }
 
-  function sub(
-    uint256 numeratorA,
-    uint256 denominatorA,
-    uint256 numeratorB,
-    uint256 denominatorB
-  )
+  function sub(uint256 numeratorA, uint256 denominatorA, uint256 numeratorB, uint256 denominatorB)
     external
     pure
     returns (uint256, uint256)
@@ -71,11 +55,7 @@ contract FractionUtilTest {
     uint256 denominatorA,
     uint256 numeratorB,
     uint256 denominatorB
-  )
-    external
-    pure
-    returns (bool)
-  {
+  ) external pure returns (bool) {
     FractionUtil.Fraction memory fractionA = FractionUtil.Fraction(numeratorA, denominatorA);
     FractionUtil.Fraction memory fractionB = FractionUtil.Fraction(numeratorB, denominatorB);
     return fractionA.isGreaterThan(fractionB);
@@ -86,11 +66,7 @@ contract FractionUtilTest {
     uint256 denominatorA,
     uint256 numeratorB,
     uint256 denominatorB
-  )
-    external
-    pure
-    returns (bool)
-  {
+  ) external pure returns (bool) {
     FractionUtil.Fraction memory fractionA = FractionUtil.Fraction(numeratorA, denominatorA);
     FractionUtil.Fraction memory fractionB = FractionUtil.Fraction(numeratorB, denominatorB);
     return fractionA.isGreaterThanOrEqualTo(fractionB);
@@ -101,11 +77,7 @@ contract FractionUtilTest {
     uint256 denominatorA,
     uint256 numeratorB,
     uint256 denominatorB
-  )
-    external
-    pure
-    returns (bool)
-  {
+  ) external pure returns (bool) {
     FractionUtil.Fraction memory fractionA = FractionUtil.Fraction(numeratorA, denominatorA);
     FractionUtil.Fraction memory fractionB = FractionUtil.Fraction(numeratorB, denominatorB);
     return fractionA.isLessThan(fractionB);
@@ -116,11 +88,7 @@ contract FractionUtilTest {
     uint256 denominatorA,
     uint256 numeratorB,
     uint256 denominatorB
-  )
-    external
-    pure
-    returns (bool)
-  {
+  ) external pure returns (bool) {
     FractionUtil.Fraction memory fractionA = FractionUtil.Fraction(numeratorA, denominatorA);
     FractionUtil.Fraction memory fractionB = FractionUtil.Fraction(numeratorB, denominatorB);
     return fractionA.isLessThanOrEqualTo(fractionB);

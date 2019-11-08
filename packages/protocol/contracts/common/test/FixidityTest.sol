@@ -2,7 +2,6 @@ pragma solidity ^0.5.8;
 
 import "../FixidityLib.sol";
 
-
 contract FixidityTest {
   using FixidityLib for FixidityLib.Fraction;
 

@@ -5,12 +5,10 @@ import "openzeppelin-solidity/contracts/math/SafeMath.sol";
 import "./AddressLinkedList.sol";
 import "./SortedLinkedList.sol";
 
-
 /**
  * @title Maintains a sorted list of unsigned ints keyed by address.
  */
 library AddressSortedLinkedList {
-
   using SortedLinkedList for SortedLinkedList.List;
 
   function toBytes(address a) public pure returns (bytes32) {
@@ -34,9 +32,7 @@ library AddressSortedLinkedList {
     uint256 value,
     address lesserKey,
     address greaterKey
-  )
-    public
-  {
+  ) public {
     list.insert(toBytes(key), value, toBytes(lesserKey), toBytes(greaterKey));
   }
 
@@ -62,9 +58,7 @@ library AddressSortedLinkedList {
     uint256 value,
     address lesserKey,
     address greaterKey
-  )
-    public
-  {
+  ) public {
     list.update(toBytes(key), value, toBytes(lesserKey), toBytes(greaterKey));
   }
 
@@ -90,9 +84,7 @@ library AddressSortedLinkedList {
    * @notice Gets all elements from the doubly linked list.
    * @return An unpacked list of elements from largest to smallest.
    */
-  function getElements(
-    SortedLinkedList.List storage list
-  )
+  function getElements(SortedLinkedList.List storage list)
     public
     view
     returns (address[] memory, uint256[] memory)
@@ -117,11 +109,7 @@ library AddressSortedLinkedList {
     SortedLinkedList.List storage list,
     uint256 threshold,
     uint256 max
-  )
-    public
-    view
-    returns (uint256)
-  {
+  ) public view returns (uint256) {
     uint256 revisedMax = Math.min(max, list.list.numElements);
     bytes32 key = list.list.head;
     for (uint256 i = 0; i < revisedMax; i++) {
@@ -138,10 +126,7 @@ library AddressSortedLinkedList {
    * @param n The number of elements to return.
    * @return The keys of the greatest elements.
    */
-  function headN(
-    SortedLinkedList.List storage list,
-    uint256 n
-  )
+  function headN(SortedLinkedList.List storage list, uint256 n)
     public
     view
     returns (address[] memory)
