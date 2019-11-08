@@ -62,7 +62,7 @@ testWithGanache('Governance Wrapper', (web3) => {
     expect(config.stageDurations.execution).toEqBigNumber(expConfig.executionStageDuration)
   })
 
-  describe.only('Proposals', () => {
+  describe('Proposals', () => {
     const repoints: Repoint[] = [
       [CeloContract.Random, '0x0000000000000000000000000000000000000001'],
       [CeloContract.Attestations, '0x0000000000000000000000000000000000000002'],
@@ -216,7 +216,8 @@ testWithGanache('Governance Wrapper', (web3) => {
     })
 
     it('#prepareHotfix', async () => {
-      await whitelistFn(accounts[1])
+      // reach quorum
+      await concurrentMap(1, accounts.slice(1, 4), whitelistFn)
       await prepareFn()
 
       const validators = await kit.contracts.getValidators()
@@ -225,7 +226,8 @@ testWithGanache('Governance Wrapper', (web3) => {
     })
 
     it('#executeHotfix', async () => {
-      await whitelistFn(accounts[1])
+      await concurrentMap(1, accounts.slice(1, 4), whitelistFn)
+      await prepareFn()
       await prepareFn()
       await approveFn()
 
