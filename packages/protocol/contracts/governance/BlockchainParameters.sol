@@ -19,7 +19,7 @@ contract BlockchainParameters is Ownable, Initializable {
 
   event MinimumClientVersionSet(uint256 major, uint256 minor, uint256 patch);
   event IntrinsicGasForAlternativeGasCurrencySet(uint256 gas);
-  event BlockGasLimitSet(uint limit);
+  event BlockGasLimitSet(uint256 limit);
 
   /**
    * @notice Initializes critical variables.
@@ -38,10 +38,7 @@ contract BlockchainParameters is Ownable, Initializable {
     uint256 patch,
     uint256 _gasForNonGoldCurrencies,
     uint256 gasLimit
-  )
-    external
-    initializer
-  {
+  ) external initializer {
     _transferOwnership(msg.sender);
     setMinimumClientVersion(major, minor, patch);
     setBlockGasLimit(gasLimit);
