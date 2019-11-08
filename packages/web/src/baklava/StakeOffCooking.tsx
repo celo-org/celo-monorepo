@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { Path, G } from 'src/shared/svg'
+import { G, Path } from 'src/shared/svg'
 import Svg from 'svgs'
 
 function StakeOffCooking() {

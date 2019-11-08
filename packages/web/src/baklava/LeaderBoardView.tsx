@@ -1,9 +1,9 @@
 import * as React from 'react'
-import { StyleSheet, View, Text } from 'react-native'
+import { StyleSheet, Text, View } from 'react-native'
 import { I18nProps, NameSpaces, withNamespaces } from 'src/i18n'
-import { colors, standardStyles } from 'src/styles'
-import OvalCoin from 'src/shared/OvalCoin'
 import Button, { BTN, SIZE } from 'src/shared/Button.3'
+import OvalCoin from 'src/shared/OvalCoin'
+import { colors, standardStyles } from 'src/styles'
 
 interface State {
   page: number

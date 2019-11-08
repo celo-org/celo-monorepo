@@ -1,8 +1,8 @@
 import * as React from 'react'
 import { StyleSheet, View } from 'react-native'
 import { I18nProps, NameSpaces, withNamespaces } from 'src/i18n'
-import { colors } from 'src/styles'
 import Spinner from 'src/shared/Spinner'
+import { colors } from 'src/styles'
 
 class LeaderBoardLoading extends React.PureComponent<I18nProps> {
   render() {

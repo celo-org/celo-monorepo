@@ -1,8 +1,8 @@
 import * as React from 'react'
-import { StyleSheet, View, Text } from 'react-native'
+import { StyleSheet, Text, View } from 'react-native'
+import { H3 } from 'src/fonts/Fonts'
 import { I18nProps, NameSpaces, withNamespaces } from 'src/i18n'
 import { colors } from 'src/styles'
-import { H3 } from 'src/fonts/Fonts'
 
 interface Props {
   error: any
