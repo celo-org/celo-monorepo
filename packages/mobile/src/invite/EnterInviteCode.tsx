@@ -28,7 +28,7 @@ import DevSkipButton from 'src/components/DevSkipButton'
 import { CELO_FAUCET_LINK, DEFAULT_TESTNET } from 'src/config'
 import { Namespaces } from 'src/i18n'
 import { redeemInvite } from 'src/invite/actions'
-import { extractValidInviteCode, getInviteCodeFromReferrerData } from 'src/invite/utils'
+import { extractValidInviteCode, getValidInviteCodeFromReferrerData } from 'src/invite/utils'
 import { nuxNavigationOptionsNoBackButton } from 'src/navigator/Headers'
 import { navigate } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
@@ -89,7 +89,7 @@ export class EnterInviteCode extends React.Component<Props, State> {
   }
 
   checkForReferrerCode = async () => {
-    const validCode = await getInviteCodeFromReferrerData()
+    const validCode = await getValidInviteCodeFromReferrerData()
     if (validCode) {
       this.setState({ validCode })
     }
