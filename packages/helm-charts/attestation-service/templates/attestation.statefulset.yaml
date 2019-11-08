@@ -9,6 +9,7 @@ metadata:
     heritage: {{ .Release.Service }}
     component: attestation-service
 spec:
+  serviceName: attestation-service
   podManagementPolicy: Parallel
   updateStrategy:
     type: RollingUpdate
@@ -40,6 +41,11 @@ spec:
             echo "Generating private key for rid=$RID"
             celotooljs.sh generate bip32 --mnemonic "$MNEMONIC" --accountType validator --index $RID > /root/.celo/pkey
         env:
+        - name: MNEMONIC
+          valueFrom:
+            secretKeyRef:
+              name: {{ .Release.Name }}
+              key: MNEMONIC
         - name: REPLICA_NAME
           valueFrom:
             fieldRef:
@@ -54,8 +60,9 @@ spec:
         command: ["/bin/sh"]
         args:
         - "-c"
-        - |-
-          ATTESTATION_KEY=0x`cat /root/.celo/pkey` node lib/server.js
+        - |
+          yarn db:migrate
+          ATTESTATION_KEY=0x`cat /root/.celo/pkey` yarn start
         ports:
         - name: http
           containerPort: 3000
@@ -64,8 +71,10 @@ spec:
             cpu: 50m
             memory: 150Mi
         env:
-        - name: DB_URL
-          value: sqlite://db/dev.db
+        - name: DATABASE_URL
+          value: postgres://postgres:password@{{ .Release.Namespace }}-attestation-service-postgresql:5432/AttestationService
+        - name: NODE_ENV
+          value: production
         - name: CELO_PROVIDER
           value: https://{{ .Release.Namespace }}-forno.{{ .Values.domain.name }}.org
         - name: APP_SIGNATURE

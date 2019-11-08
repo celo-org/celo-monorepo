@@ -45,4 +45,5 @@ export enum ErrorMessages {
   CORRUPTED_CHAIN_DELETED = 'corruptedChainDeleted',
   CALCULATE_FEE_FAILED = 'calculateFeeFailed',
   FAILED_TO_SWITCH_SYNC_MODES = 'failedToSwitchSyncModes',
+  SMS_ERROR = 'walletFlow5:SMSError',
 }
