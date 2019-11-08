@@ -45,7 +45,7 @@ describe('exit tests', function(this: any) {
       await restartGeth()
       const current = await kit.web3.eth.getBlockNumber()
       const block = await kit.web3.eth.getBlock(current)
-      assert.equal(block.gasLimit, 12000000)
+      assert.equal(block.gasLimit, 20000000)
     })
     it('changing the block gas limit', async () => {
       this.timeout(0)

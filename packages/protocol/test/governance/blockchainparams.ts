@@ -65,7 +65,7 @@ contract('BlockchainParameters', (accounts: string[]) => {
       await blockchainParameters.setBlockGasLimit(gasLimit)
       assert.equal((await blockchainParameters.blockGasLimit()).toNumber(), gasLimit)
     })
-    it('should emit the MinimumClientVersionSet event', async () => {
+    it('should emit the corresponding event', async () => {
       const resp = await blockchainParameters.setBlockGasLimit(gasLimit)
       assert.equal(resp.logs.length, 1)
       const log = resp.logs[0]

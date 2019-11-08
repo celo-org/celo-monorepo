@@ -19,7 +19,7 @@ const DefaultConfig = {
       minor: 8,
       patch: 23,
     },
-    blockGasLimit: 12000000,
+    blockGasLimit: 20000000,
   },
   election: {
     minElectableValidators: '22',
