@@ -1,6 +1,5 @@
 pragma solidity ^0.5.3;
 
-
 interface ILockedGold {
   function incrementNonvotingAccountBalance(address, uint256) external;
   function decrementNonvotingAccountBalance(address, uint256) external;

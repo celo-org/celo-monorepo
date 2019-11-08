@@ -1,25 +1,31 @@
 import Cookies from 'js-cookie'
 import getConfig from 'next/config'
+const isInEU = require('@segment/in-eu')
 
-let analytics
+let analytics: {
+  track: (key: string, properties: object, options: object) => void
+}
 const ALLOW_ANALYTICS_COOKIE_NAME = '__allow__analytics__cookie__'
-const DISALLOW_COOKIES_REDIRECT_LOCATION = 'https://google.com'
+const RESPONDED_TO_CONSENT = '__responded_to_consent__'
 
 declare var process: any
 
-export const hasUserGivenCookiesAgreement = () => {
-  return !!Cookies.get(ALLOW_ANALYTICS_COOKIE_NAME)
+export function canTrack(): boolean {
+  return !!Cookies.get(ALLOW_ANALYTICS_COOKIE_NAME) || !isInEU()
+}
+
+export function showVisitorCookieConsent(): boolean {
+  return isInEU() && !Cookies.get(RESPONDED_TO_CONSENT)
 }
 
 const initializeAnalytics = () => {
-  if (hasUserGivenCookiesAgreement() && process.browser) {
+  if (process.browser && canTrack()) {
     const Segment = require('load-segment')
     const { publicRuntimeConfig } = getConfig()
     analytics = Segment({ key: publicRuntimeConfig.__SEGMENT_KEY__ })
   } else {
     analytics = {
-      // tslint:disable-next-line
-      track: () => {},
+      track: () => null,
     }
   }
 }
@@ -27,12 +33,16 @@ const initializeAnalytics = () => {
 initializeAnalytics()
 
 export const agree = () => {
-  Cookies.set(ALLOW_ANALYTICS_COOKIE_NAME, true)
+  Cookies.set(ALLOW_ANALYTICS_COOKIE_NAME, true, { expires: OPTIN_EXPIRE_DAYS })
+  Cookies.set(RESPONDED_TO_CONSENT, true, { expires: OPTIN_EXPIRE_DAYS })
   initializeAnalytics()
 }
 
 export const disagree = () => {
-  location.href = DISALLOW_COOKIES_REDIRECT_LOCATION
+  Cookies.set(RESPONDED_TO_CONSENT, true, { expires: OPTOUT_EXPIRE_DAYS })
 }
+
+const OPTIN_EXPIRE_DAYS = 365
+const OPTOUT_EXPIRE_DAYS = 1
 
 export default analytics
