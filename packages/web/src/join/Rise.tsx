@@ -23,6 +23,7 @@ const COLORS = [
 interface State {
   width: number
   height: number
+  willAnimate: boolean
 }
 
 interface RisingCoinProps {
@@ -32,6 +33,7 @@ interface RisingCoinProps {
   duration: number
   delay: number
   willFall?: boolean
+  willAnimate: boolean
 }
 
 interface StateVectors {
@@ -94,8 +96,15 @@ export default class Rise extends React.PureComponent<Props, State> {
   state = {
     width: 0,
     height: 0,
+    willAnimate: false,
   }
+
   componentDidMount() {
+    // deviceMemory is only supported by chrome / android + opera
+    if (!window.navigator.deviceMemory || window.navigator.deviceMemory > 2) {
+      this.setState({ willAnimate: true })
+    }
+
     this.windowResize({ window: Dimensions.get('window') })
     Dimensions.addEventListener('change', this.windowResize)
   }
@@ -134,6 +143,7 @@ export default class Rise extends React.PureComponent<Props, State> {
         return (
           <RisingCoin
             key={i}
+            willAnimate={this.state.willAnimate}
             willFall={this.props.willFall}
             windowHeight={height}
             windowWidth={width}
@@ -179,6 +189,14 @@ class RisingCoin extends React.PureComponent<RisingCoinProps, StateVectors> {
   }
 
   getStyleAndPosition = () => {
+    if (!this.props.willAnimate) {
+      return {
+        opacity: 0.7,
+        animationPlaystate: 'paused',
+        transform: this.getTransformStart({ x: this.state.x, y: this.state.y }),
+      }
+    }
+
     const secondXPosition =
       getPosition(this.state.radius, this.props.windowWidth * BIAS_START_DOWN_RATIO) -
       HORIZONTAL_DISTANCE_MIN
@@ -212,6 +230,7 @@ class RisingCoin extends React.PureComponent<RisingCoinProps, StateVectors> {
       ],
     }
   }
+
   keyframes = (firstCoord: Coord, secondCoord: Coord, thirdCoord: Coord) => {
     return this.props.willFall
       ? this.fallFrames(firstCoord)

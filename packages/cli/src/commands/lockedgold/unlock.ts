@@ -1,5 +1,6 @@
 import { flags } from '@oclif/command'
 import { BaseCommand } from '../../base'
+import { newCheckBuilder } from '../../utils/checks'
 import { displaySendTx } from '../../utils/cli'
 import { Flags } from '../../utils/command'
 import { LockedGoldArgs } from '../../utils/lockedgold'
@@ -21,6 +22,11 @@ export default class Unlock extends BaseCommand {
     const res = this.parse(Unlock)
     this.kit.defaultAccount = res.flags.from
     const lockedgold = await this.kit.contracts.getLockedGold()
+
+    await newCheckBuilder(this)
+      .isAccount(res.flags.from)
+      .runChecks()
+
     await displaySendTx('unlock', lockedgold.unlock(res.flags.value))
   }
 }

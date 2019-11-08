@@ -5,7 +5,6 @@ import CoverActions from 'src/dev/CoverActions'
 import Phone from 'src/dev/Phone'
 import { H1, H4 } from 'src/fonts/Fonts'
 import { I18nProps, withNamespaces } from 'src/i18n'
-import Android from 'src/icons/Android'
 import { Cell, GridRow, Spans } from 'src/layout/GridRow'
 import Button, { BTN, SIZE } from 'src/shared/Button.3'
 import { CeloLinks } from 'src/shared/menu-items'
@@ -48,7 +47,6 @@ const CoverComponent = React.memo(function Cover({ t }: I18nProps) {
             <View style={styles.buttons}>
               <View style={[standardStyles.elementalMargin, styles.button]}>
                 <Button
-                  iconRight={<Android size={18} />}
                   text={t('getStarted')}
                   kind={BTN.PRIMARY}
                   size={SIZE.big}
