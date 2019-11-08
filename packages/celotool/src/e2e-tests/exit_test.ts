@@ -1,34 +1,16 @@
-import { assert } from 'chai'
-import Web3 from 'web3'
-import { getContractAddress, getHooks, GethTestConfig, sleep } from './utils'
+// tslint:disable-next-line: no-reference (Required to make this work w/ ts-node)
+/// <reference path="../../../contractkit/types/web3.d.ts" />
 
-const blockchainParametersAbi = [
-  {
-    constant: false,
-    inputs: [
-      {
-        name: 'major',
-        type: 'uint256',
-      },
-      {
-        name: 'minor',
-        type: 'uint256',
-      },
-      {
-        name: 'patch',
-        type: 'uint256',
-      },
-    ],
-    name: 'setMinimumClientVersion',
-    outputs: [],
-    payable: false,
-    stateMutability: 'nonpayable',
-    type: 'function',
-  },
-]
+import { assert } from 'chai'
+import { getHooks, GethTestConfig, sleep } from './utils'
+import { ContractKit, newKit } from '@celo/contractkit'
+import { BlockchainParametersWrapper } from '@celo/contractkit/lib/wrappers/BlockchainParameters'
 
 describe('exit tests', function(this: any) {
   this.timeout(0)
+
+  let kit: ContractKit
+  let parameters: BlockchainParametersWrapper
 
   const gethConfig: GethTestConfig = {
     migrateTo: 17,
@@ -40,9 +22,7 @@ describe('exit tests', function(this: any) {
   before(hooks.before)
   after(hooks.after)
 
-  let web3: Web3
-  let blockchainParametersAddress: string
-  const validatorAddress = '0x47e172f6cfb6c7d01c1574fa3e2be7cc73269d95'
+  const validatorAddress: string = '0x47e172f6cfb6c7d01c1574fa3e2be7cc73269d95'
 
   const restartGeth = async () => {
     // Restart the validator node
@@ -50,29 +30,31 @@ describe('exit tests', function(this: any) {
 
     // TODO(mcortesi): magic sleep. without it unlockAccount sometimes fails
     await sleep(2)
-    web3 = new Web3('http://localhost:8545')
-    await web3.eth.personal.unlockAccount(validatorAddress, '', 1000)
-
-    blockchainParametersAddress = await getContractAddress('BlockchainParametersProxy')
+    kit = newKit('http://localhost:8545')
+    await kit.web3.eth.personal.unlockAccount(validatorAddress, '', 1000)
+    parameters = await kit.contracts.getBlockchainParameters()
   }
 
   const setMinimumClientVersion = async (major: number, minor: number, patch: number) => {
-    // We need to run this operation from the validator account as it is the owner of the
-    // contract.
-    const _web3 = new Web3('http://localhost:8545')
-    const _parameters = new _web3.eth.Contract(blockchainParametersAbi, blockchainParametersAddress)
-    const tx = _parameters.methods.setMinimumClientVersion(major, minor, patch)
-    const gas = await tx.estimateGas({ from: validatorAddress })
-    return tx.send({ from: validatorAddress, gas })
+    await parameters.setMinimumClientVersion(major, minor, patch).send({ from: validatorAddress })
   }
 
   describe('when running a node', () => {
     it('block limit should have been set using governance', async () => {
       this.timeout(0)
       await restartGeth()
-      const current = await web3.eth.getBlockNumber()
-      const block = await web3.eth.getBlock(current)
+      const current = await kit.web3.eth.getBlockNumber()
+      const block = await kit.web3.eth.getBlock(current)
       assert.equal(block.gasLimit, 12000000)
+    })
+    it('changing the block gas limit', async () => {
+      this.timeout(0)
+      await restartGeth()
+      await parameters.setBlockGasLimit(23000000).send({ from: validatorAddress })
+      await sleep(5)
+      const current = await kit.web3.eth.getBlockNumber()
+      const block = await kit.web3.eth.getBlock(current)
+      assert.equal(block.gasLimit, 23000000)
     })
     it('should exit when minimum version is updated', async () => {
       this.timeout(0)
@@ -81,7 +63,7 @@ describe('exit tests', function(this: any) {
       await sleep(120)
       try {
         // It should have exited by now, call RPC to trigger error
-        await web3.eth.getBlockNumber()
+        await kit.web3.eth.getBlockNumber()
       } catch (_) {
         return
       }
