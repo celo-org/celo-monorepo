@@ -173,7 +173,8 @@ export class GovernanceWrapper extends BaseWrapper<Governance> {
   async getProposal(proposalID: NumberLike): Promise<Proposal> {
     const metadata = await this.getProposalMetadata(proposalID)
     const txIndices = Array.from(Array(metadata.transactionCount).keys())
-    const transactions = await concurrentMap(metadata.transactionCount, txIndices, (txIndex) =>
+    const concurrency = Math.min(metadata.transactionCount, 4)
+    const transactions = await concurrentMap(concurrency, txIndices, (txIndex) =>
       this.getProposalTransaction(proposalID, txIndex)
     )
 

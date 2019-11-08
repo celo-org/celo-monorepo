@@ -32,7 +32,7 @@ testWithGanache('Governance Wrapper', (web3) => {
     lockedGold = await kit.contracts.getLockedGold()
     accountWrapper = await kit.contracts.getAccounts()
 
-    await concurrentMap(4, accounts.slice(0, 4), async (account) => {
+    await concurrentMap(1, accounts.slice(0, 4), async (account) => {
       await accountWrapper.createAccount().sendAndWaitForReceipt({ from: account })
       await lockedGold.lock().sendAndWaitForReceipt({ from: account, value: ONE_USD })
     })
@@ -163,7 +163,7 @@ testWithGanache('Governance Wrapper', (web3) => {
       const tx = await governance.execute(proposalID)
       await tx.sendAndWaitForReceipt()
 
-      await concurrentMap(repoints.length, repoints, async (repoint) =>
+      await concurrentMap(1, repoints, async (repoint) =>
         expect(await kit.registry.addressFor(repoint[0])).toBe(repoint[1])
       )
     })
@@ -237,7 +237,7 @@ testWithGanache('Governance Wrapper', (web3) => {
       const record = await governance.getHotfixRecord(hash)
       expect(record.executed).toBeTruthy()
 
-      await concurrentMap(repoints.length, repoints, async (repoint) =>
+      await concurrentMap(1, repoints, async (repoint) =>
         expect(repoint[1]).toBe(await kit.registry.addressFor(repoint[0]))
       )
     })
