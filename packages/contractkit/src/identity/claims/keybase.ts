@@ -17,7 +17,12 @@ export const proofFileName = (address: Address) => `verify-${address}.json`
 export const targetURL = (username: string, address: Address) =>
   `https://${username}.keybase.pub/${keybaseFilePathToProof}${proofFileName(address)}`
 
-export async function verifyKeybaseClaim(claim: KeybaseClaim, signer: Address) {
+// If verification encounters an error, returns the error message as a string
+// otherwise returns undefined when successful
+export async function verifyKeybaseClaim(
+  claim: KeybaseClaim,
+  signer: Address
+): Promise<string | undefined> {
   try {
     const resp = await fetch(targetURL(claim.username, signer))
     if (!resp.ok) {

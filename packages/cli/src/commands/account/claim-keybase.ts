@@ -12,6 +12,7 @@ import { flags } from '@oclif/command'
 import { cli } from 'cli-ux'
 import { toChecksumAddress } from 'ethereumjs-util'
 import { writeFileSync } from 'fs'
+import { tmpdir } from 'os'
 import { binaryPrompt } from '../../utils/cli'
 import { commandExists, execCmdWithError, execWith0Exit } from '../../utils/exec'
 import { ClaimCommand } from '../../utils/identity'
@@ -61,7 +62,7 @@ export default class ClaimKeybase extends ClaimCommand {
       const publicFolderPrefix = `/keybase/public/${username}/`
       await this.ensureKeybaseFilePathToProof(publicFolderPrefix)
       const fileName = proofFileName(address)
-      const tmpPath = `/tmp/${fileName}`
+      const tmpPath = `${tmpdir()}/${fileName}`
       writeFileSync(tmpPath, JSON.stringify(signedClaim))
       await execCmdWithError(
         'keybase',
@@ -90,7 +91,7 @@ export default class ClaimKeybase extends ClaimCommand {
       if (
         (await commandExists('keybase')) &&
         (await binaryPrompt(
-          `Found keybase CLI. Do you want me to attempt to publish the claim onto the keybase fs? (y/es)/(n/o)`
+          `Found keybase CLI. Do you want me to attempt to publish the claim onto the keybase fs?`
         ))
       ) {
         await this.attemptAutomaticProofUpload(claim, signature, username, address)

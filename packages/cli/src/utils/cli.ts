@@ -61,6 +61,6 @@ export function failWith(msg: string): never {
 }
 
 export async function binaryPrompt(promptMessage: string) {
-  const resp = await cli.prompt(promptMessage)
+  const resp = await cli.prompt(promptMessage + ' [y/yes, n/no]')
   return ['y', 'yes'].includes(resp)
 }
