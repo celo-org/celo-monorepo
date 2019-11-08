@@ -1,14 +1,9 @@
-import { readFileSync } from 'fs-extra'
-
-import {
-  JSONTransaction,
-  TransactionBuilder,
-} from '@celo/contractkit/lib/wrappers/TransactionBuilder'
 import { flags } from '@oclif/command'
 
 import { BaseCommand } from '../../base'
 import { displaySendTx } from '../../utils/cli'
 import { Flags } from '../../utils/command'
+import { buildTransactionsFromJsonFile } from '../../utils/governance'
 
 export default class Propose extends BaseCommand {
   static description = 'Submit a governance proposal'
@@ -27,10 +22,7 @@ export default class Propose extends BaseCommand {
 
     const governance = await this.kit.contracts.getGovernance()
 
-    const jsonString = readFileSync(res.flags.jsonTransactions).toString()
-    const jsonTransactions: JSONTransaction[] = JSON.parse(jsonString)
-    const transactions = TransactionBuilder.fromCeloJsonTransactions(this.kit, jsonTransactions)
-
+    const transactions = buildTransactionsFromJsonFile(this.kit, res.flags.jsonTransactions)
     const tx = governance.propose(transactions)
     await displaySendTx('proposeTx', tx, { from: res.flags.from, value: res.flags.deposit })
     const proposalID = await tx.txo.call()
