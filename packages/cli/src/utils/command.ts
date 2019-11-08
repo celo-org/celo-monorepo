@@ -1,22 +1,22 @@
 import { flags } from '@oclif/command'
+import { CLIError } from '@oclif/errors'
 import { IArg, ParseFn } from '@oclif/parser/lib/args'
 import { pathExistsSync } from 'fs-extra'
 import Web3 from 'web3'
-import { failWith } from './cli'
 
 const parsePublicKey: ParseFn<string> = (input) => {
   // Check that the string starts with 0x and has byte length of ecdsa pub key (64 bytes) + bls pub key (48 bytes) + proof of pos (96 bytes)
   if (Web3.utils.isHex(input) && input.length === 418 && input.startsWith('0x')) {
     return input
   } else {
-    return failWith(`${input} is not a public key`)
+    throw new CLIError(`${input} is not a public key`)
   }
 }
 const parseAddress: ParseFn<string> = (input) => {
   if (Web3.utils.isAddress(input)) {
     return input
   } else {
-    return failWith(`${input} is not a valid address`)
+    throw new CLIError(`${input} is not a valid address`)
   }
 }
 
@@ -24,7 +24,7 @@ const parsePath: ParseFn<string> = (input) => {
   if (pathExistsSync(input)) {
     return input
   } else {
-    return failWith(`File at "${input}" does not exist`)
+    throw new CLIError(`File at "${input}" does not exist`)
   }
 }
 
@@ -37,7 +37,7 @@ const parseUrl: ParseFn<string> = (input) => {
   if (URL_REGEX.test(input)) {
     return input
   } else {
-    return failWith(`"${input}" is not a valid URL`)
+    throw new CLIError(`"${input}" is not a valid URL`)
   }
 }
 

@@ -51,6 +51,10 @@ export function parseNumber(input: NumberLike) {
   return new BigNumber(input).toFixed()
 }
 
+export function parseBytes(input: string): Array<string | number[]> {
+  return input as any
+}
+
 type Parser<A, B> = (input: A) => B
 
 /** Identity Parser */
