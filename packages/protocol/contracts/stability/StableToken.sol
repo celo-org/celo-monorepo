@@ -3,7 +3,6 @@ pragma solidity ^0.5.3;
 import "openzeppelin-solidity/contracts/ownership/Ownable.sol";
 import "openzeppelin-solidity/contracts/math/SafeMath.sol";
 
-
 import "./interfaces/IStableToken.sol";
 import "../common/interfaces/IERC20Token.sol";
 import "../common/interfaces/ICeloToken.sol";
@@ -12,36 +11,29 @@ import "../common/FixidityLib.sol";
 import "../common/UsingRegistry.sol";
 import "../common/UsingPrecompiles.sol";
 
-
 /**
  * @title An ERC20 compliant token with adjustable supply.
  */
 // solhint-disable-next-line max-line-length
-contract StableToken is IStableToken, IERC20Token, ICeloToken, Ownable,
-  Initializable, UsingRegistry, UsingPrecompiles {
+contract StableToken is
+  IStableToken,
+  IERC20Token,
+  ICeloToken,
+  Ownable,
+  Initializable,
+  UsingRegistry,
+  UsingPrecompiles
+{
   using FixidityLib for FixidityLib.Fraction;
   using SafeMath for uint256;
 
-  event InflationFactorUpdated(
-    uint256 factor,
-    uint256 lastUpdated
-  );
+  event InflationFactorUpdated(uint256 factor, uint256 lastUpdated);
 
-  event InflationParametersUpdated(
-    uint256 rate,
-    uint256 updatePeriod,
-    uint256 lastUpdated
-  );
+  event InflationParametersUpdated(uint256 rate, uint256 updatePeriod, uint256 lastUpdated);
 
-  event Transfer(
-    address indexed from,
-    address indexed to,
-    uint256 value
-  );
+  event Transfer(address indexed from, address indexed to, uint256 value);
 
-  event TransferComment(
-    string comment
-  );
+  event TransferComment(string comment);
 
   string internal name_;
   string internal symbol_;
@@ -52,7 +44,7 @@ contract StableToken is IStableToken, IERC20Token, ICeloToken, Ownable,
   uint256 internal totalSupply_;
 
   // Stored as values. Units can be found using valueToUnits().
-  mapping(address => mapping (address => uint256)) internal allowed;
+  mapping(address => mapping(address => uint256)) internal allowed;
 
   // STABILITY FEE PARAMETERS
 
@@ -91,10 +83,7 @@ contract StableToken is IStableToken, IERC20Token, ICeloToken, Ownable,
     if (lastUpdated != inflationState.factorLastUpdated) {
       inflationState.factor = updatedInflationFactor;
       inflationState.factorLastUpdated = lastUpdated;
-      emit InflationFactorUpdated(
-        inflationState.factor.unwrap(),
-        inflationState.factorLastUpdated
-      );
+      emit InflationFactorUpdated(inflationState.factor.unwrap(), inflationState.factorLastUpdated);
     }
     _;
   }
@@ -116,10 +105,7 @@ contract StableToken is IStableToken, IERC20Token, ICeloToken, Ownable,
     uint256 inflationFactorUpdatePeriod,
     address[] calldata initialBalanceAddresses,
     uint256[] calldata initialBalanceValues
-  )
-    external
-    initializer
-  {
+  ) external initializer {
     require(inflationRate != 0, "Must provide a non-zero inflation rate.");
 
     _transferOwnership(msg.sender);
@@ -146,10 +132,7 @@ contract StableToken is IStableToken, IERC20Token, ICeloToken, Ownable,
    * @param rate new rate.
    * @param updatePeriod how often inflationFactor is updated.
    */
-  function setInflationParameters(
-    uint256 rate,
-    uint256 updatePeriod
-  )
+  function setInflationParameters(uint256 rate, uint256 updatePeriod)
     external
     onlyOwner
     updateInflationFactor
@@ -172,10 +155,7 @@ contract StableToken is IStableToken, IERC20Token, ICeloToken, Ownable,
    * @param value The increment of the amount of StableToken approved to the spender.
    * @return True if the transaction succeeds.
    */
-  function increaseAllowance(
-    address spender,
-    uint256 value
-  )
+  function increaseAllowance(address spender, uint256 value)
     external
     updateInflationFactor
     returns (bool)
@@ -193,10 +173,7 @@ contract StableToken is IStableToken, IERC20Token, ICeloToken, Ownable,
    * @param value The decrement of the amount of StableToken approved to the spender.
    * @return True if the transaction succeeds.
    */
-  function decreaseAllowance(
-    address spender,
-    uint256 value
-  )
+  function decreaseAllowance(address spender, uint256 value)
     external
     updateInflationFactor
     returns (bool)
@@ -214,14 +191,7 @@ contract StableToken is IStableToken, IERC20Token, ICeloToken, Ownable,
    * @param value The amount of StableToken approved to the spender.
    * @return True if the transaction succeeds.
    */
-  function approve(
-    address spender,
-    uint256 value
-  )
-    external
-    updateInflationFactor
-    returns (bool)
-  {
+  function approve(address spender, uint256 value) external updateInflationFactor returns (bool) {
     allowed[msg.sender][spender] = value;
     emit Approval(msg.sender, spender, value);
     return true;
@@ -232,18 +202,11 @@ contract StableToken is IStableToken, IERC20Token, ICeloToken, Ownable,
    * @param to The account for which to mint tokens.
    * @param value The amount of StableToken to mint.
    */
-  function mint(
-    address to,
-    uint256 value
-  )
-    external
-    updateInflationFactor
-    returns (bool)
-  {
+  function mint(address to, uint256 value) external updateInflationFactor returns (bool) {
     // Only the Exchange and Validators contracts are authorized to mint.
     require(
       msg.sender == registry.getAddressFor(EXCHANGE_REGISTRY_ID) ||
-      msg.sender == registry.getAddressFor(VALIDATORS_REGISTRY_ID)
+        msg.sender == registry.getAddressFor(VALIDATORS_REGISTRY_ID)
     );
     return _mint(to, value);
   }
@@ -253,14 +216,7 @@ contract StableToken is IStableToken, IERC20Token, ICeloToken, Ownable,
    * @param to The account for which to mint tokens.
    * @param value The amount of StableToken to mint.
    */
-  function _mint(
-    address to,
-    uint256 value
-  )
-    private
-    updateInflationFactor
-    returns (bool)
-  {
+  function _mint(address to, uint256 value) private updateInflationFactor returns (bool) {
     uint256 units = _valueToUnits(inflationState.factor, value);
     totalSupply_ = totalSupply_.add(units);
     balances[to] = balances[to].add(units);
@@ -275,11 +231,7 @@ contract StableToken is IStableToken, IERC20Token, ICeloToken, Ownable,
    * @param comment The transfer comment.
    * @return True if the transaction succeeds.
    */
-  function transferWithComment(
-    address to,
-    uint256 value,
-    string calldata comment
-  )
+  function transferWithComment(address to, uint256 value, string calldata comment)
     external
     updateInflationFactor
     returns (bool)
@@ -293,9 +245,7 @@ contract StableToken is IStableToken, IERC20Token, ICeloToken, Ownable,
    * @notice Burns StableToken from the balance of msg.sender.
    * @param value The amount of StableToken to burn.
    */
-  function burn(
-    uint256 value
-  )
+  function burn(uint256 value)
     external
     onlyRegisteredContract(EXCHANGE_REGISTRY_ID)
     updateInflationFactor
@@ -315,11 +265,7 @@ contract StableToken is IStableToken, IERC20Token, ICeloToken, Ownable,
    * @param value The amount of StableToken to transfer.
    * @return True if the transaction succeeds.
    */
-  function transferFrom(
-    address from,
-    address to,
-    uint256 value
-  )
+  function transferFrom(address from, address to, uint256 value)
     external
     updateInflationFactor
     returns (bool)
@@ -394,11 +340,7 @@ contract StableToken is IStableToken, IERC20Token, ICeloToken, Ownable,
    * @return updatePeriod
    * @return factorLastUpdated
    */
-  function getInflationParameters()
-    external
-    view
-    returns (uint256, uint256, uint256, uint256)
-  {
+  function getInflationParameters() external view returns (uint256, uint256, uint256, uint256) {
     return (
       inflationState.rate.unwrap(),
       inflationState.factor.unwrap(),
@@ -446,10 +388,7 @@ contract StableToken is IStableToken, IERC20Token, ICeloToken, Ownable,
    * @return The units corresponding to `value` given the current inflation factor.
    * @dev we assume any function calling this will have updated the inflation factor.
    */
-  function _valueToUnits(
-    FixidityLib.Fraction memory inflationFactor,
-    uint256 value
-  )
+  function _valueToUnits(FixidityLib.Fraction memory inflationFactor, uint256 value)
     private
     pure
     returns (uint256)
@@ -462,11 +401,7 @@ contract StableToken is IStableToken, IERC20Token, ICeloToken, Ownable,
    * @return current inflation factor.
    * @return lastUpdated time when the returned inflation factor went into effect.
    */
-  function getUpdatedInflationFactor()
-    private
-    view
-    returns (FixidityLib.Fraction memory, uint256)
-  {
+  function getUpdatedInflationFactor() private view returns (FixidityLib.Fraction memory, uint256) {
     /* solhint-disable not-rely-on-time */
     if (now < inflationState.factorLastUpdated.add(inflationState.updatePeriod)) {
       return (inflationState.factor, inflationState.factorLastUpdated);
@@ -496,8 +431,9 @@ contract StableToken is IStableToken, IERC20Token, ICeloToken, Ownable,
       return (inflationState.factor, inflationState.factorLastUpdated);
     }
 
-    FixidityLib.Fraction memory currentInflationFactor =
-      FixidityLib.wrap(numerator).divide(FixidityLib.wrap(denominator));
+    FixidityLib.Fraction memory currentInflationFactor = FixidityLib.wrap(numerator).divide(
+      FixidityLib.wrap(denominator)
+    );
     uint256 lastUpdated = inflationState.factorLastUpdated.add(
       inflationState.updatePeriod.mul(timesToApplyInflation)
     );
@@ -511,7 +447,7 @@ contract StableToken is IStableToken, IERC20Token, ICeloToken, Ownable,
    * @param to The address to transfer to.
    * @param value The amount to be transferred.
    */
-   // solhint-disable-next-line no-simple-event-func-name
+  // solhint-disable-next-line no-simple-event-func-name
   function transfer(address to, uint256 value) public updateInflationFactor returns (bool) {
     return _transfer(to, value);
   }

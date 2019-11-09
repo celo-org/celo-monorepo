@@ -49,7 +49,7 @@ export function HashingStatus({
       style={isFaucet ? [std.row, styles.statusesContainerTicker] : styles.statusesContainerLog}
     >
       {[
-        goldTxHash && t('cGLDsent'),
+        goldTxHash && isFaucet && t('cGLDsent'),
         dollarTxHash && t('cUSDsent'),
         escrowTxHash && t('walletBuilt'),
       ]
@@ -97,6 +97,7 @@ export function ButtonWithFeedback({
       kind={isNotStarted ? BTN.PRIMARY : BTN.SECONDARY}
       text={buttonText({ requestState, t, isFaucet })}
       onPress={onSubmit}
+      onDarkBackground={!isFaucet}
       iconLeft={icon}
       align={'flex-start'}
       style={!isFaucet && isEnded && [textStyles.invert, styles.message]}

@@ -2,13 +2,13 @@ import * as React from 'react'
 import { StyleSheet, View } from 'react-native'
 import AppLogo from 'src/download/AppLogo'
 import PhoneIllo from 'src/download/PhoneIllo'
+import { RequestType } from 'src/fauceting/FaucetInterfaces'
 import RequestFunds from 'src/fauceting/RequestFunds'
 import { H1, H4 } from 'src/fonts/Fonts'
 import { I18nProps, NameSpaces, withNamespaces } from 'src/i18n'
 import { Cell, GridRow, Spans } from 'src/layout/GridRow'
 import { ScreenProps, ScreenSizes, withScreenSize } from 'src/layout/ScreenSize'
 import { standardStyles, textStyles } from 'src/styles'
-import { RequestType } from '../../server/FirebaseClient'
 
 export default withScreenSize(
   withNamespaces(NameSpaces.download)(function DownloadCover({
