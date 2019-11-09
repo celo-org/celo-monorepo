@@ -5,8 +5,8 @@ import { newCheckBuilder } from '../../utils/checks'
 import { displaySendTx } from '../../utils/cli'
 import { Flags } from '../../utils/command'
 
-export default class ValidatorGroupRegister extends BaseCommand {
-  static description = 'Register a new Validator Group'
+export default class ValidatorGroupCommission extends BaseCommand {
+  static description = 'Update the commission for an existing validator group'
 
   static flags = {
     ...BaseCommand.flags,
@@ -14,10 +14,12 @@ export default class ValidatorGroupRegister extends BaseCommand {
     commission: flags.string({ required: true }),
   }
 
-  static examples = ['register --from 0x47e172F6CfB6c7D01C1574fa3E2Be7CC73269D95 --commission 0.1']
+  static examples = [
+    'commission --from 0x47e172F6CfB6c7D01C1574fa3E2Be7CC73269D95 --commission 0.1',
+  ]
 
   async run() {
-    const res = this.parse(ValidatorGroupRegister)
+    const res = this.parse(ValidatorGroupCommission)
 
     this.kit.defaultAccount = res.flags.from
     const validators = await this.kit.contracts.getValidators()
@@ -27,10 +29,9 @@ export default class ValidatorGroupRegister extends BaseCommand {
       .addCheck('Commission is in range [0,1]', () => commission.gte(0) && commission.lte(1))
       .isSignerOrAccount()
       .canSignValidatorTxs()
-      .signerMeetsValidatorGroupBalanceRequirements()
       .runChecks()
 
-    const tx = await validators.registerValidatorGroup(commission)
-    await displaySendTx('registerValidatorGroup', tx)
+    const tx = await validators.updateCommission(commission)
+    await displaySendTx('updateCommission', tx)
   }
 }
