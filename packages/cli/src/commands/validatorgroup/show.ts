@@ -20,7 +20,7 @@ export default class ValidatorGroupShow extends BaseCommand {
     const validators = await this.kit.contracts.getValidators()
 
     await newCheckBuilder(this)
-      .isValidatorGroup(args.groupAddress)
+      .isValidatorGroup(res.args.groupAddress)
       .runChecks()
 
     const validatorGroup = await validators.getValidatorGroup(res.args.groupAddress)
