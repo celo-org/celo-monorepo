@@ -83,7 +83,7 @@ export const handler = async (argv: InviteArgv) => {
     const expirySeconds = 60 * 60 * 24 * 5 // 5 days
 
     console.log(
-      `Transferring ${goldAmount} Gold, ${stableTokenInviteAmount} StableToken, and escrowing ${stableTokenEscrowAmount}`
+      `Transferring ${goldAmount} Gold, ${stableTokenInviteAmount} StableToken, and escrowing ${stableTokenEscrowAmount} StableToken`
     )
     await Promise.all([
       // TODO: remove if no one is paying for gas with gold
