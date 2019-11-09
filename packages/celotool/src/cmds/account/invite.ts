@@ -3,6 +3,8 @@ import { newKit } from '@celo/contractkit'
 import { StableTokenWrapper } from '@celo/contractkit/lib/wrappers/StableTokenWrapper'
 import { BigNumber } from 'bignumber.js'
 import { portForwardAnd } from 'src/lib/port_forward'
+import { execCmd } from 'src/lib/utils'
+import twilio from 'twilio'
 import { Argv } from 'yargs'
 import { AccountArgv } from '../account'
 
@@ -12,7 +14,6 @@ export const describe = 'command for sending an invite code to a phone number'
 
 interface InviteArgv extends AccountArgv {
   phone: string
-  fast: boolean
 }
 
 export const builder = (yargs: Argv) => {
@@ -36,6 +37,11 @@ export const handler = async (argv: InviteArgv) => {
   const phone = argv.phone
 
   console.log(`Sending invitation code to ${phone}`)
+  await execCmd('gcloud config set project celo-testnet')
+  await execCmd(
+    'gcloud kms decrypt --ciphertext-file=twilio-config.enc --plaintext-file=twilio-config.js \
+    --key=github-key --keyring=celo-keyring --location=global'
+  )
   const cb = async () => {
     const kit = newKit('http://localhost:8545')
     const account = (await kit.web3.eth.getAccounts())[0]
@@ -93,6 +99,15 @@ export const handler = async (argv: InviteArgv) => {
     ])
     console.log(`Temp address: ${temporaryAddress}`)
     console.log(`Invite code: ${inviteCode}`)
+    const messageText = `Hi! I would like to invite you to join the Celo payments network. Your invite code is: ${inviteCode}`
+    console.log('Sending SMS...')
+    const twilioConfig = require('twilio-config')
+    const twilioClient = twilio(twilioConfig.sid, twilioConfig.authToken)
+    await twilioClient.messages.create({
+      body: messageText,
+      from: twilioConfig.phoneNumber,
+      to: argv.phone,
+    })
   }
   try {
     await portForwardAnd(argv.celoEnv, cb)
