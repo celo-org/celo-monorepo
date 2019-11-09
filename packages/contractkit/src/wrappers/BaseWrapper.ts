@@ -38,7 +38,8 @@ export function parseBuffer(buf: Buffer) {
   return '0x' + buf.toString('hex')
 }
 
-export function parseBytes(input: Buffer | string): Array<string | number[]> {
+type bytes = Array<string | number[]>
+export function parseBytes(input: Buffer | string): bytes {
   return input as any
 }
 

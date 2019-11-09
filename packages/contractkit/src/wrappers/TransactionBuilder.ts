@@ -1,5 +1,6 @@
 import { keccak256 } from 'ethereumjs-util'
 import Contract from 'web3/eth/contract'
+import { Tx } from 'web3/eth/types'
 
 import { Address, CeloContract } from '../base'
 import { ContractKit } from '../kit'
@@ -13,16 +14,13 @@ export interface JSONTransaction {
   args: any[]
 }
 
+type TxParams = Pick<Tx, 'to' | 'value'>
 type Web3Method = Contract['methods'][keyof Contract['methods']]
 export class TransactionBuilder {
-  public transactions: Transaction[]
-  private kit: ContractKit
-
-  constructor(_kit: ContractKit, _transactions: Transaction[] = []) {
-    this.transactions = _transactions
-    this.kit = _kit
-  }
-
+  constructor(
+    private readonly kit: ContractKit,
+    public readonly transactions: Transaction[] = []
+  ) {}
   get hash(): Buffer {
     const encoded = this.encoded
     return keccak256(
@@ -37,20 +35,38 @@ export class TransactionBuilder {
     return encodedTransactions(this.transactions)
   }
 
-  appendCeloTx(tx: CeloTransactionObject<any>) {
-    if (tx.defaultParams === undefined) {
-      throw new Error('Default params not defined on CeloTransactionObject')
-    } else if (tx.defaultParams.to === undefined) {
-      throw new Error('Destination not defined on CeloTransactionObject')
-    } else if (tx.defaultParams.value === undefined) {
-      throw new Error('Value not defined on CeloTransactionObject')
-    }
+  async json(): Promise<JSONTransaction[]> {
+    const addresses = await this.kit.registry.allAddresses()
+    const names = Object.keys(CeloContract) as CeloContract[]
+    const addressToNameMap = new Map(names.map((name) => [addresses[name], name]))
 
-    this.transactions.push({
-      value: tx.defaultParams.value,
-      destination: tx.defaultParams.to,
-      data: toBuffer(tx.txo.encodeABI()),
+    return this.transactions.map((tx) => {
+      const contract = addressToNameMap.get(tx.destination)
+      if (contract === undefined) {
+        throw new Error(`Transaction destination ${tx.destination} not found in registry`)
+      }
+      // TODO: figure out how to decode tx.data using web3contract
+      // const web3contract = await this.kit._web3Contracts.getContract(contract)
+      return {
+        value: tx.value,
+        celoContractName: contract,
+        methodName: '',
+        args: [],
+      }
     })
+  }
+
+  appendCeloTx(tx: CeloTransactionObject<any>, params?: TxParams) {
+    const mergedParams: TxParams = { ...tx.defaultParams, ...params }
+    if (mergedParams.to && mergedParams.value) {
+      this.transactions.push({
+        value: mergedParams.value,
+        destination: mergedParams.to,
+        data: toBuffer(tx.txo.encodeABI()),
+      })
+    } else {
+      throw new Error("Parameters 'to' and/or 'value' not provided")
+    }
   }
 
   appendWeb3Tx<M extends Web3Method>(
