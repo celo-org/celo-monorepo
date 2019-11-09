@@ -5,13 +5,12 @@ import { zip } from '@celo/utils/lib/collections'
 
 import { Address } from '../base'
 import { Governance } from '../generated/types/Governance'
+import { Proposal } from '../governance/proposals'
 import {
   BaseWrapper,
-  CeloTransactionObject,
   identity,
   NumberLike,
   parseBuffer,
-  parseBytes,
   parseNumber,
   proxyCall,
   proxySend,
@@ -22,7 +21,7 @@ import {
   tupleParser,
 } from './BaseWrapper'
 
-export interface Transaction {
+export interface ProposalTransaction {
   value: NumberLike
   destination: Address
   data: Buffer
@@ -49,9 +48,9 @@ export interface ProposalMetadata {
   transactionCount: number
 }
 
-export interface Proposal {
+export interface ProposalRecord {
   metadata: ProposalMetadata
-  transactions: Transaction[]
+  transactions: ProposalTransaction[]
 }
 export enum VoteValue {
   None,
@@ -61,6 +60,9 @@ export enum VoteValue {
 }
 
 const ZERO_BN = new BigNumber(0)
+
+type Web3GovernanceContract = InstanceType<typeof GovernanceWrapper>['contract']
+export type ProposalEncoded = Parameters<Web3GovernanceContract['methods']['propose']>
 
 /**
  * Contract managing voting for governance proposals.
@@ -142,7 +144,7 @@ export class GovernanceWrapper extends BaseWrapper<Governance> {
   getProposalTransaction: (
     proposalID: NumberLike,
     txIndex: number
-  ) => Promise<Transaction> = proxyCall(
+  ) => Promise<ProposalTransaction> = proxyCall(
     this.contract.methods.getProposalTransaction,
     tupleParser(parseNumber, parseNumber),
     (res) => ({
@@ -170,11 +172,10 @@ export class GovernanceWrapper extends BaseWrapper<Governance> {
    * Returns the metadata and transactions associated with a given proposal.
    * @param proposalID Governance proposal UUID
    */
-  async getProposal(proposalID: NumberLike): Promise<Proposal> {
+  async getProposalRecord(proposalID: NumberLike): Promise<ProposalRecord> {
     const metadata = await this.getProposalMetadata(proposalID)
     const txIndices = Array.from(Array(metadata.transactionCount).keys())
-    const concurrency = Math.min(metadata.transactionCount, 4)
-    const transactions = await concurrentMap(concurrency, txIndices, (txIndex) =>
+    const transactions = await concurrentMap(1, txIndices, (txIndex) =>
       this.getProposalTransaction(proposalID, txIndex)
     )
 
@@ -192,18 +193,16 @@ export class GovernanceWrapper extends BaseWrapper<Governance> {
 
   /**
    * Submits a new governance proposal.
-   * @param transactions Sequence of transactions
+   * @param proposal Governance proposal
    */
-  propose(transactions: Transaction[]) {
-    const enc = encodedTransactions(transactions)
-    return toTransactionObject(
-      this.kit,
-      this.contract.methods.propose(enc.values, enc.destinations, enc.data, enc.dataLengths)
-    )
-  }
+  propose = proxySend(
+    this.kit,
+    this.contract.methods.propose,
+    (proposal: Proposal) => proposal.encoded
+  )
 
   /**
-   * Returns whether a governance proposal exists with the given ID. 
+   * Returns whether a governance proposal exists with the given ID.
    * @param proposalID Governance proposal UUID
    */
   proposalExists: (proposalID: NumberLike) => Promise<boolean> = proxyCall(
@@ -268,7 +267,7 @@ export class GovernanceWrapper extends BaseWrapper<Governance> {
   )
 
   /**
-   * Dequeues any queued proposals if `dequeueFrequency` seconds have elapsed since the last dequeue   
+   * Dequeues any queued proposals if `dequeueFrequency` seconds have elapsed since the last dequeue
    */
   dequeueProposalsIfReady = proxySend(this.kit, this.contract.methods.dequeueProposalsIfReady)
 
@@ -369,7 +368,7 @@ export class GovernanceWrapper extends BaseWrapper<Governance> {
   /**
    * Approves given proposal, allowing it to later move to `referendum`.
    * @param proposalID Governance proposal UUID
-   * @notice Only the `approver` address will succeed in sending this transaction 
+   * @notice Only the `approver` address will succeed in sending this transaction
    */
   async approve(proposalID: NumberLike) {
     const proposalIndex = await this.getDequeueIndex(proposalID)
@@ -432,7 +431,7 @@ export class GovernanceWrapper extends BaseWrapper<Governance> {
    * Marks the given hotfix whitelisted by `sender`.
    * @param hash keccak256 hash of hotfix's associated abi encoded transactions
    */
-  whitelistHotfix: (hash: Buffer) => CeloTransactionObject<void> = proxySend(
+  whitelistHotfix = proxySend(
     this.kit,
     this.contract.methods.whitelistHotfix,
     tupleParser(parseBuffer)
@@ -443,44 +442,22 @@ export class GovernanceWrapper extends BaseWrapper<Governance> {
    * @param hash keccak256 hash of hotfix's associated abi encoded transactions
    * @notice Only the `approver` address will succeed in sending this transaction
    */
-  approveHotfix: (hash: Buffer) => CeloTransactionObject<void> = proxySend(
-    this.kit,
-    this.contract.methods.approveHotfix,
-    tupleParser(parseBuffer)
-  )
+  approveHotfix = proxySend(this.kit, this.contract.methods.approveHotfix, tupleParser(parseBuffer))
 
   /**
    * Marks the given hotfix prepared for current epoch if quorum of validators have whitelisted it.
    * @param hash keccak256 hash of hotfix's associated abi encoded transactions
    */
-  prepareHotfix: (hash: Buffer) => CeloTransactionObject<void> = proxySend(
-    this.kit,
-    this.contract.methods.prepareHotfix,
-    tupleParser(parseBuffer)
-  )
+  prepareHotfix = proxySend(this.kit, this.contract.methods.prepareHotfix, tupleParser(parseBuffer))
 
   /**
    * Executes a given sequence of transactions if the corresponding hash is prepared and approved.
-   * @param transactions Sequence of transactions
+   * @param hotfix Governance hotfix
    * @notice keccak256 hash of abi encoded transactions computed on-chain
    */
-  executeHotfix(transactions: Transaction[]) {
-    const enc = encodedTransactions(transactions)
-    return toTransactionObject(
-      this.kit,
-      this.contract.methods.executeHotfix(enc.values, enc.destinations, enc.data, enc.dataLengths)
-    )
-  }
-}
-
-export function encodedTransactions(transactions: Transaction[]) {
-  if (transactions.length === 0) {
-    throw new Error(`No transactions provided`)
-  }
-  return {
-    values: transactions.map((tx) => parseNumber(tx.value)),
-    destinations: transactions.map((tx) => tx.destination),
-    data: parseBytes(Buffer.concat(transactions.map((tx) => tx.data))),
-    dataLengths: transactions.map((tx) => tx.data.length),
-  }
+  executeHotfix = proxySend(
+    this.kit,
+    this.contract.methods.executeHotfix,
+    (hotfix: Proposal) => hotfix.encoded
+  )
 }
