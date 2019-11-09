@@ -1,28 +1,32 @@
 pragma solidity ^0.5.3;
 
-import "openzeppelin-solidity/contracts/math/Math.sol";
-import "openzeppelin-solidity/contracts/math/SafeMath.sol";
-import "openzeppelin-solidity/contracts/ownership/Ownable.sol";
-import "openzeppelin-solidity/contracts/utils/ReentrancyGuard.sol";
-import "solidity-bytes-utils/contracts/BytesLib.sol";
+import 'openzeppelin-solidity/contracts/math/Math.sol';
+import 'openzeppelin-solidity/contracts/math/SafeMath.sol';
+import 'openzeppelin-solidity/contracts/ownership/Ownable.sol';
+import 'openzeppelin-solidity/contracts/utils/ReentrancyGuard.sol';
+import 'solidity-bytes-utils/contracts/BytesLib.sol';
 
-import "./interfaces/IValidators.sol";
+import './interfaces/IValidators.sol';
 
-import "../identity/interfaces/IRandom.sol";
+import '../identity/interfaces/IRandom.sol';
 
-import "../common/Initializable.sol";
-import "../common/FixidityLib.sol";
-import "../common/linkedlists/AddressLinkedList.sol";
-import "../common/UsingRegistry.sol";
-import "../common/UsingPrecompiles.sol";
-
+import '../common/Initializable.sol';
+import '../common/FixidityLib.sol';
+import '../common/linkedlists/AddressLinkedList.sol';
+import '../common/UsingRegistry.sol';
+import '../common/UsingPrecompiles.sol';
 
 /**
  * @title A contract for registering and electing Validator Groups and Validators.
  */
 contract Validators is
-  IValidators, Ownable, ReentrancyGuard, Initializable, UsingRegistry, UsingPrecompiles {
-
+  IValidators,
+  Ownable,
+  ReentrancyGuard,
+  Initializable,
+  UsingRegistry,
+  UsingPrecompiles
+{
   using FixidityLib for FixidityLib.Fraction;
   using AddressLinkedList for LinkedList.List;
   using SafeMath for uint256;
@@ -48,10 +52,6 @@ contract Validators is
     // In seconds.
     uint256 duration;
   }
-
-  // If we knew what time the validator was last in a group, we could enforce that to deregister a
-  // group, you need to have had 0 members for `duration`, and to deregister a validator, you need
-  // to have been out of a group for `duration`...
 
   struct ValidatorGroup {
     bool exists;
@@ -148,10 +148,7 @@ contract Validators is
     uint256 validatorScoreAdjustmentSpeed,
     uint256 _membershipHistoryLength,
     uint256 _maxGroupSize
-  )
-    external
-    initializer
-  {
+  ) external initializer {
     _transferOwnership(msg.sender);
     setRegistry(registryAddress);
     setGroupLockedGoldRequirements(groupRequirementValue, groupRequirementDuration);
@@ -191,10 +188,7 @@ contract Validators is
    * @param adjustmentSpeed The speed at which the score is adjusted.
    * @return True upon success.
    */
-  function setValidatorScoreParameters(
-    uint256 exponent,
-    uint256 adjustmentSpeed
-  )
+  function setValidatorScoreParameters(uint256 exponent, uint256 adjustmentSpeed)
     public
     onlyOwner
     returns (bool)
@@ -202,7 +196,7 @@ contract Validators is
     require(adjustmentSpeed <= FixidityLib.fixed1().unwrap());
     require(
       exponent != validatorScoreParameters.exponent ||
-      !FixidityLib.wrap(adjustmentSpeed).equals(validatorScoreParameters.adjustmentSpeed)
+        !FixidityLib.wrap(adjustmentSpeed).equals(validatorScoreParameters.adjustmentSpeed)
     );
     validatorScoreParameters = ValidatorScoreParameters(
       exponent,
@@ -226,10 +220,7 @@ contract Validators is
    * @param duration The time (in seconds) that these requirements persist for.
    * @return True upon success.
    */
-  function setGroupLockedGoldRequirements(
-    uint256 value,
-    uint256 duration
-  )
+  function setGroupLockedGoldRequirements(uint256 value, uint256 duration)
     public
     onlyOwner
     returns (bool)
@@ -247,10 +238,7 @@ contract Validators is
    * @param duration The time (in seconds) that these requirements persist for.
    * @return True upon success.
    */
-  function setValidatorLockedGoldRequirements(
-    uint256 value,
-    uint256 duration
-  )
+  function setValidatorLockedGoldRequirements(uint256 value, uint256 duration)
     public
     onlyOwner
     returns (bool)
@@ -274,13 +262,7 @@ contract Validators is
    * @dev Fails if the account is already a validator or validator group.
    * @dev Fails if the account does not have sufficient Locked Gold.
    */
-  function registerValidator(
-    bytes calldata publicKeysData
-  )
-    external
-    nonReentrant
-    returns (bool)
-  {
+  function registerValidator(bytes calldata publicKeysData) external nonReentrant returns (bool) {
     require(
       // secp256k1 public key + BLS public key + BLS proof of possession
       publicKeysData.length == (64 + 48 + 96)
@@ -313,9 +295,7 @@ contract Validators is
    * @param account The validator whose membership history to return.
    * @return The group membership history of a validator.
    */
-  function getMembershipHistory(
-    address account
-  )
+  function getMembershipHistory(address account)
     external
     view
     returns (uint256[] memory, address[] memory, uint256)
@@ -376,10 +356,7 @@ contract Validators is
     );
     currentComponent = currentComponent.multiply(validators[account].score);
     validators[account].score = FixidityLib.wrap(
-      Math.min(
-        epochScore.unwrap(),
-        newComponent.add(currentComponent).unwrap()
-      )
+      Math.min(epochScore.unwrap(), newComponent.add(currentComponent).unwrap())
     );
   }
 
@@ -390,10 +367,7 @@ contract Validators is
    *   group commission.
    * @return The total payment paid to the validator and their group.
    */
-  function distributeEpochPaymentsFromSigner(
-    address signer,
-    uint256 maxPayment
-  )
+  function distributeEpochPaymentsFromSigner(address signer, uint256 maxPayment)
     external
     onlyVm()
     returns (uint256)
@@ -408,10 +382,7 @@ contract Validators is
    *   group commission.
    * @return The total payment paid to the validator and their group.
    */
-  function _distributeEpochPaymentsFromSigner(
-    address signer,
-    uint256 maxPayment
-  )
+  function _distributeEpochPaymentsFromSigner(address signer, uint256 maxPayment)
     internal
     returns (uint256)
   {
@@ -506,13 +477,7 @@ contract Validators is
    * @dev Fails if the account is already a validator or validator group.
    * @dev Fails if the account does not have sufficient weight.
    */
-  function registerValidatorGroup(
-    uint256 commission
-  )
-    external
-    nonReentrant
-    returns (bool)
-  {
+  function registerValidatorGroup(uint256 commission) external nonReentrant returns (bool) {
     require(commission <= FixidityLib.fixed1().unwrap(), "Commission can't be greater than 100%");
     address account = getAccounts().activeValidatorSignerToAccount(msg.sender);
     require(!isValidator(account) && !isValidatorGroup(account));
@@ -569,11 +534,7 @@ contract Validators is
    * @dev Fails if `validator` has not set their affiliation to this account.
    * @dev Fails if the group has > 0 members.
    */
-  function addFirstMember(
-    address validator,
-    address lesser,
-    address greater
-  )
+  function addFirstMember(address validator, address lesser, address greater)
     external
     nonReentrant
     returns (bool)
@@ -593,18 +554,13 @@ contract Validators is
    * @dev Fails if `validator` has not set their affiliation to this account.
    * @dev Fails if the group has > 0 members.
    */
-  function _addMember(
-    address group,
-    address validator,
-    address lesser,
-    address greater
-  )
+  function _addMember(address group, address validator, address lesser, address greater)
     private
     returns (bool)
   {
     require(isValidatorGroup(group) && isValidator(validator));
     ValidatorGroup storage _group = groups[group];
-    require(_group.members.numElements < maxGroupSize, "group would exceed maximum size");
+    require(_group.members.numElements < maxGroupSize, 'group would exceed maximum size');
     require(validators[validator].affiliation == group && !_group.members.contains(validator));
     uint256 numMembers = _group.members.numElements.add(1);
     require(meetsAccountLockedGoldRequirements(group));
@@ -627,7 +583,7 @@ contract Validators is
    */
   function removeMember(address validator) external nonReentrant returns (bool) {
     address account = getAccounts().activeValidatorSignerToAccount(msg.sender);
-    require(isValidatorGroup(account) && isValidator(validator), "is not group and validator");
+    require(isValidatorGroup(account) && isValidator(validator), 'is not group and validator');
     return _removeMember(account, validator);
   }
 
@@ -641,11 +597,7 @@ contract Validators is
    * @return True upon success.
    * @dev Fails if `validator` is not a member of the account's validator group.
    */
-  function reorderMember(
-    address validator,
-    address lesserMember,
-    address greaterMember
-  )
+  function reorderMember(address validator, address lesserMember, address greaterMember)
     external
     nonReentrant
     returns (bool)
@@ -698,16 +650,10 @@ contract Validators is
    * @param signer The account that registered the validator or its authorized signing address.
    * @return The unpacked validator struct.
    */
-  function getValidatorFromSigner(
-    address signer
-  )
+  function getValidatorFromSigner(address signer)
     external
     view
-    returns (
-      bytes memory publicKeysData,
-      address affiliation,
-      uint256 score
-    )
+    returns (bytes memory publicKeysData, address affiliation, uint256 score)
   {
     address account = getAccounts().validatorSignerToAccount(signer);
     return getValidator(account);
@@ -718,24 +664,14 @@ contract Validators is
    * @param account The account that registered the validator.
    * @return The unpacked validator struct.
    */
-  function getValidator(
-    address account
-  )
+  function getValidator(address account)
     public
     view
-    returns (
-      bytes memory publicKeysData,
-      address affiliation,
-      uint256 score
-    )
+    returns (bytes memory publicKeysData, address affiliation, uint256 score)
   {
     require(isValidator(account));
     Validator storage validator = validators[account];
-    return (
-      validator.publicKeysData,
-      validator.affiliation,
-      validator.score.unwrap()
-    );
+    return (validator.publicKeysData, validator.affiliation, validator.score.unwrap());
   }
 
   /**
@@ -743,20 +679,14 @@ contract Validators is
    * @param account The account that registered the validator group.
    * @return The unpacked validator group struct.
    */
-  function getValidatorGroup(
-    address account
-  )
+  function getValidatorGroup(address account)
     external
     view
     returns (address[] memory, uint256, uint256[] memory)
   {
     require(isValidatorGroup(account));
     ValidatorGroup storage group = groups[account];
-    return (
-      group.members.getKeys(),
-      group.commission.unwrap(),
-      group.sizeHistory
-    );
+    return (group.members.getKeys(), group.commission.unwrap(), group.sizeHistory);
   }
 
   /**
@@ -775,10 +705,7 @@ contract Validators is
    * @param n The number of members to return.
    * @return The top n group members for a particular group.
    */
-  function getTopGroupValidators(
-    address account,
-    uint256 n
-  )
+  function getTopGroupValidators(address account, uint256 n)
     external
     view
     returns (address[] memory)
@@ -796,9 +723,7 @@ contract Validators is
    * @param accounts The addresses of the validator groups.
    * @return The number of members in the provided validator groups.
    */
-  function getGroupsNumMembers(
-    address[] calldata accounts
-  )
+  function getGroupsNumMembers(address[] calldata accounts)
     external
     view
     returns (uint256[] memory)
@@ -975,7 +900,7 @@ contract Validators is
     } else if (size < sizeHistory.length) {
       sizeHistory[size] = now;
     } else {
-      require(false, "Unable to update size history");
+      require(false, 'Unable to update size history');
     }
   }
 
@@ -1015,10 +940,7 @@ contract Validators is
    * @param validatorAccount The LockedGold account of the validator.
    * @return True upon success.
    */
-  function _deaffiliate(
-    Validator storage validator,
-    address validatorAccount
-  )
+  function _deaffiliate(Validator storage validator, address validatorAccount)
     private
     returns (bool)
   {
