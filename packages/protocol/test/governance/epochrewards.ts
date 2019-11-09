@@ -211,10 +211,10 @@ contract('EpochRewards', (accounts: string[]) => {
   })
 
   describe('#setRewardsMultiplierAdjustmentFactors()', () => {
-    describe('when the factors are different', () => {
+    describe('when one of the factors is different', () => {
       const newFactors = {
         underspend: rewardsMultiplierAdjustments.underspend.plus(1),
-        overspend: rewardsMultiplierAdjustments.overspend.plus(1),
+        overspend: rewardsMultiplierAdjustments.overspend,
       }
 
       describe('when called by the owner', () => {
@@ -443,6 +443,7 @@ contract('EpochRewards', (accounts: string[]) => {
 
   describe.only('#updateTargetVotingYield()', () => {
     const randomAddress = web3.utils.randomHex(20)
+    // Arbitrary numbers
     const totalSupply = new BigNumber(129762987346298761037469283746)
     const reserveBalance = new BigNumber(2397846127684712867321)
     const floatingSupply = totalSupply.minus(reserveBalance)

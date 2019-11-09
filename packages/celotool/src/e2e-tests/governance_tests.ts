@@ -4,7 +4,14 @@ import { fromFixed, toFixed } from '@celo/utils/lib/fixidity'
 import BigNumber from 'bignumber.js'
 import { assert } from 'chai'
 import Web3 from 'web3'
-import { getContext, getEnode, importGenesis, initAndStartGeth, sleep } from './utils'
+import {
+  assertAlmostEqual,
+  getContext,
+  getEnode,
+  importGenesis,
+  initAndStartGeth,
+  sleep,
+} from './utils'
 
 describe('governance tests', () => {
   const gethConfig = {
@@ -123,23 +130,6 @@ describe('governance tests', () => {
 
   const isLastBlockOfEpoch = (blockNumber: number, epochSize: number) => {
     return blockNumber % epochSize === 0
-  }
-
-  const assertAlmostEqual = (
-    actual: BigNumber,
-    expected: BigNumber,
-    delta: BigNumber = new BigNumber(10).pow(12).times(5)
-  ) => {
-    if (expected.isZero()) {
-      assert.equal(difference.toFixed(), expected.toFixed())
-    } else {
-      const isCloseTo =
-        difference.plus(delta).gte(expected) || difference.minus(delta).lte(expected)
-      assert(
-        isCloseTo,
-        `expected ${expected.toString()} to almost equal ${difference.toString()} +/- ${delta.toString()}`
-      )
-    }
   }
 
   describe('when the validator set is changing', () => {

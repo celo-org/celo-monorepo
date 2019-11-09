@@ -4,7 +4,6 @@ pragma solidity ^0.5.3;
  * @title A mock SortedOracles for testing.
  */
 contract MockSortedOracles {
-
   uint256 public constant DENOMINATOR = 0x10000000000000000;
   mapping(address => uint256) public numerators;
   mapping(address => uint256) public medianTimestamp;

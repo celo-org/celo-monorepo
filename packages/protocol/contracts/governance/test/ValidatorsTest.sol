@@ -11,10 +11,7 @@ contract ValidatorsTest is Validators {
     return _updateValidatorScore(validator, uptime);
   }
 
-  function distributeEpochPayment(
-    address validator,
-    uint256 maxPayment
-  )
+  function distributeEpochPayment(address validator, uint256 maxPayment)
     external
     returns (uint256)
   {

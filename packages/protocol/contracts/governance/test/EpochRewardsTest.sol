@@ -7,10 +7,7 @@ import "../../common/FixidityLib.sol";
  * @title A wrapper around EpochRewards that exposes internal functions for testing.
  */
 contract EpochRewardsTest is EpochRewards {
-
-  function getRewardsMultiplier(
-    uint256 targetGoldTotalSupplyIncrease
-  )
+  function getRewardsMultiplier(uint256 targetGoldTotalSupplyIncrease)
     external
     view
     returns (uint256)

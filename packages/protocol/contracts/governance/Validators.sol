@@ -371,10 +371,7 @@ contract Validators is
    *   group commission.
    * @return The total payment paid to the validator and their group.
    */
-  function distributeEpochPayment(
-    address validator,
-    uint256 maxPayment
-  )
+  function distributeEpochPayment(address validator, uint256 maxPayment)
     external
     onlyVm()
     returns (uint256)
@@ -389,10 +386,7 @@ contract Validators is
    *   group commission.
    * @return The total payment paid to the validator and their group.
    */
-  function _distributeEpochPayment(
-    address validator,
-    uint256 maxPayment
-  )
+  function _distributeEpochPayment(address validator, uint256 maxPayment)
     internal
     returns (uint256)
   {
@@ -404,9 +398,9 @@ contract Validators is
     // Both the validator and the group must maintain the minimum locked gold balance in order to
     // receive epoch payments.
     if (meetsAccountLockedGoldRequirements(account) && meetsAccountLockedGoldRequirements(group)) {
-      FixidityLib.Fraction memory totalPayment = FixidityLib
-        .newFixed(maxPayment)
-        .multiply(validators[account].score);
+      FixidityLib.Fraction memory totalPayment = FixidityLib.newFixed(maxPayment).multiply(
+        validators[account].score
+      );
       uint256 groupPayment = totalPayment.multiply(groups[group].commission).fromFixed();
       uint256 validatorPayment = totalPayment.fromFixed().sub(groupPayment);
       getStableToken().mint(group, groupPayment);

@@ -41,7 +41,7 @@ const DefaultConfig = {
       },
     },
     targetVotingGoldFraction: 2 / 3,
-    maxValidatorEpochPayment: '1000000000000000000',
+    maxValidatorEpochPayment: '205479452054794520547', // (75,000 / 365) * 10 ^ 18
   },
   exchange: {
     spread: 5 / 1000,
