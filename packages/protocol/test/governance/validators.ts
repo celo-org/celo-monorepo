@@ -1149,6 +1149,58 @@ contract('Validators', (accounts: string[]) => {
     })
   })
 
+  describe('#updatePublicKeysData()', () => {
+    const newPublicKey = web3.utils.randomHex(64).slice(2)
+    const newBlsPublicKey = web3.utils.randomHex(48).slice(2)
+    const newBlsPoP = web3.utils.randomHex(96).slice(2)
+    const newPublicKeysData = '0x' + newPublicKey + newBlsPublicKey + newBlsPoP
+    describe('when called by a registered validator', () => {
+      const validator = accounts[0]
+      beforeEach(async () => {
+        await registerValidator(validator)
+      })
+
+      describe('when the public keys data is the right length', () => {
+        let resp: any
+        beforeEach(async () => {
+          // @ts-ignore Broken typechain typing for bytes
+          resp = await validators.updatePublicKeysData(newPublicKeysData)
+        })
+
+        it('should set the validator public keys data', async () => {
+          const parsedValidator = parseValidatorParams(await validators.getValidator(validator))
+          assert.equal(parsedValidator.publicKeysData, newPublicKeysData)
+        })
+
+        it('should emit the ValidatorPublicKeysDataUpdated event', async () => {
+          assert.equal(resp.logs.length, 1)
+          const log = resp.logs[0]
+          assertContainSubset(log, {
+            event: 'ValidatorPublicKeysDataUpdated',
+            args: {
+              validator,
+              publicKeysData: newPublicKeysData,
+            },
+          })
+        })
+      })
+
+      describe('when the public keys data is too long', () => {
+        it('should revert', async () => {
+          // @ts-ignore Broken typechain typing for bytes
+          await assertRevert(validators.updatePublicKeysData(newPublicKeysData + '00'))
+        })
+      })
+
+      describe('when the public keys data is too short', () => {
+        it('should revert', async () => {
+          // @ts-ignore Broken typechain typing for bytes
+          await assertRevert(validators.updatePublicKeysData(newPublicKeysData.slice(0, -2)))
+        })
+      })
+    })
+  })
+
   describe('#registerValidatorGroup', () => {
     const group = accounts[0]
     let resp: any

@@ -57,6 +57,7 @@ export class ValidatorsWrapper extends BaseWrapper<Validators> {
       this.contract.methods.updateCommission(toFixed(commission).toFixed())
     )
   }
+  updatePublicKeysData = proxySend(this.kit, this.contract.methods.updatePublicKeysData)
   /**
    * Returns the Locked Gold requirements for validators.
    * @returns The Locked Gold requirements for validators.
