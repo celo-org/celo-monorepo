@@ -58,6 +58,11 @@ export const divideByWei = (value: BigNumber.Value, decimals?: number) => {
   return decimals ? bn.decimalPlaces(decimals) : bn
 }
 
+export const multiplyByWei = (value: BigNumber.Value, decimals?: number) => {
+  const bn = new BigNumber(value).times(WEI_PER_CELO)
+  return decimals ? bn.decimalPlaces(decimals) : bn
+}
+
 export function roundDown(
   value: BigNumber.Value,
   decimals: number = 2,

@@ -4,7 +4,7 @@ describe('normalizeEvents', () => {
   it('blah', () => {
     const input: RawAirTableEvent[] = [
       {
-        Title: 'Testing events',
+        'Event Title': 'Testing events',
         'Notes / Run Of Show': 'SomeNotes',
         Photos: {},
         Process: 'Complete' as 'Complete',

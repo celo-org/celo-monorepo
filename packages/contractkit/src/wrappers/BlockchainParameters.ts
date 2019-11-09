@@ -12,4 +12,12 @@ export class BlockchainParametersWrapper extends BaseWrapper<BlockchainParameter
     this.kit,
     this.contract.methods.setIntrinsicGasForAlternativeGasCurrency
   )
+  /**
+   * Setting the block gas limit.
+   */
+  setBlockGasLimit = proxySend(this.kit, this.contract.methods.setBlockGasLimit)
+  /**
+   * Set minimum client version.
+   */
+  setMinimumClientVersion = proxySend(this.kit, this.contract.methods.setMinimumClientVersion)
 }

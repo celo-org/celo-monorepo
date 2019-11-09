@@ -1,6 +1,5 @@
 pragma solidity ^0.5.3;
 
-
 /**
  * @title A mock SortedOracles for testing.
  */

@@ -41,8 +41,7 @@ exports[`renders correctly 1`] = `
       ]
     }
   >
-     
-    24
+    $24
   </Text>
 </Text>
 `;

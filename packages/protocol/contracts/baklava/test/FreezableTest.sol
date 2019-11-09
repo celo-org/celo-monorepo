@@ -2,7 +2,6 @@ pragma solidity ^0.5.8;
 
 import "../Freezable.sol";
 
-
 contract FreezableTest is Freezable {
   event FunctionCalled();
 
