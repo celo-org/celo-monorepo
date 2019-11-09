@@ -25,8 +25,12 @@ export interface CeloProposalTransactionJSON {
 }
 
 export class ProposalFactory {
-  static from(txs: ProposalTransaction[]): Proposal {
-    return new Proposal(txs)
+  static from(txs: ProposalTransaction[] | Proposal): Proposal {
+  if (typeof txs === typeof Proposal) {
+      return txs as Proposal
+  } else {
+      return new Proposal(txs)
+    }
   }
 
   static async fromAsync(txs: Array<Promise<ProposalTransaction>>, concurrency = 1) {

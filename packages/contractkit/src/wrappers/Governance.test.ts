@@ -8,7 +8,7 @@ import { Proposal, ProposalFactory, ProposalTransactionFactory } from '../govern
 import { newKitFromWeb3 } from '../kit'
 import { NetworkConfig, testWithGanache, timeTravel } from '../test-utils/ganache-test'
 import { AccountsWrapper } from './Accounts'
-import { GovernanceWrapper, VoteValue, ProposalStage } from './Governance'
+import { GovernanceWrapper, VoteValue } from './Governance'
 import { LockedGoldWrapper } from './LockedGold'
 
 const expConfig = NetworkConfig.governance
@@ -55,14 +55,14 @@ testWithGanache('Governance Wrapper', (web3) => {
     expect(config.concurrentProposals).toEqBigNumber(expConfig.concurrentProposals)
     expect(config.dequeueFrequency).toEqBigNumber(expConfig.dequeueFrequency)
     expect(config.minDeposit).toEqBigNumber(minDeposit)
-    expect(config.stageDurations[ProposalStage.Queued]).toEqBigNumber(expConfig.queueExpiry)
-    expect(config.stageDurations[ProposalStage.Approval]).toEqBigNumber(
+    expect(config.stageDurations.Queued).toEqBigNumber(expConfig.queueExpiry)
+    expect(config.stageDurations.Approval).toEqBigNumber(
       expConfig.approvalStageDuration
     )
-    expect(config.stageDurations[ProposalStage.Referendum]).toEqBigNumber(
+    expect(config.stageDurations.Referendum).toEqBigNumber(
       expConfig.referendumStageDuration
     )
-    expect(config.stageDurations[ProposalStage.Execution]).toEqBigNumber(
+    expect(config.stageDurations.Execution).toEqBigNumber(
       expConfig.executionStageDuration
     )
   })

@@ -21,12 +21,12 @@ import {
 } from './BaseWrapper'
 
 export enum ProposalStage {
-  None = 0,
-  Queued,
-  Approval,
-  Referendum,
-  Execution,
-  Expiration,
+  None = "None",
+  Queued = "Queued",
+  Approval = "Approval",
+  Referendum = "Referendum",
+  Execution = "Execution",
+  Expiration = "Expiration",
 }
 
 export interface ProposalStageDurations {
@@ -70,10 +70,10 @@ export interface UpvoteRecord {
 }
 
 export enum VoteValue {
-  None = 0,
-  Abstain,
-  No,
-  Yes,
+  None = "None",
+  Abstain = "Abstain",
+  No = "No",
+  Yes = "Yes",
 }
 export interface Votes {
   [VoteValue.Yes]: BigNumber
@@ -198,7 +198,7 @@ export class GovernanceWrapper extends BaseWrapper<Governance> {
   getProposalStage = proxyCall(
     this.contract.methods.getProposalStage,
     tupleParser(parseNumber),
-    (res) => toNumber(res) as ProposalStage
+    (res) => Object.keys(ProposalStage)[toNumber(res)] as ProposalStage
   )
 
   /**
@@ -243,7 +243,7 @@ export class GovernanceWrapper extends BaseWrapper<Governance> {
   propose = proxySend(
     this.kit,
     this.contract.methods.propose,
-    (proposal: Proposal) => proposal.encoded
+    (proposal: ProposalTransaction[] | Proposal) => ProposalFactory.from(proposal).encoded
   )
 
   /**
@@ -448,7 +448,7 @@ export class GovernanceWrapper extends BaseWrapper<Governance> {
   async getVoteValue(proposalID: NumberLike, voter: Address) {
     const proposalIndex = await this.getDequeueIndex(proposalID)
     const res = await this.contract.methods.getVoteRecord(voter, proposalIndex).call()
-    return toNumber(res[1]) as VoteValue
+    return Object.keys(VoteValue)[toNumber(res[1])] as VoteValue
   }
 
   /**
@@ -518,6 +518,6 @@ export class GovernanceWrapper extends BaseWrapper<Governance> {
   executeHotfix = proxySend(
     this.kit,
     this.contract.methods.executeHotfix,
-    (hotfix: Proposal) => hotfix.encoded
+    (hotfix: ProposalTransaction[] | Proposal) => ProposalFactory.from(hotfix).encoded
   )
 }
