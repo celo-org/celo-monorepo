@@ -7,8 +7,8 @@
   "scripts": {
     "install-pkg": "yarn install --link-duplicates",
     "lint": "yarn lerna run lint",
-    "prettify": "yarn run prettier --config .prettierrc.js --write '**/*.+(ts|tsx|js|jsx)'",
-    "prettify:diff": "yarn run prettier --config .prettierrc.js --list-different '**/*.+(ts|tsx|js|jsx)'",
+    "prettify": "yarn run prettier --config .prettierrc.js --write '**/*.+(ts|tsx|js|jsx|sol)'",
+    "prettify:diff": "yarn run prettier --config .prettierrc.js --list-different '**/*.+(ts|tsx|js|jsx|sol)'",
     "reset": "yarn reset-modules && yarn reset-cache",
     "reset-cache": "yarn reset-yarn && yarn reset-rn",
     "reset-modules": "rm -rf node_modules/ packages/*/node_modules",
@@ -20,7 +20,6 @@
     "report-coverage": "yarn run lerna run test-coverage",
     "test:watch": "node node_modules/jest/bin/jest.js --watch",
     "postinstall": "yarn run lerna run postinstall && patch-package && yarn keys:decrypt",
-    "preinstall": "bash scripts/create_key_templates.sh",
     "keys:decrypt": "bash scripts/key_placer.sh decrypt",
     "keys:encrypt": "bash scripts/key_placer.sh encrypt",
     "check:packages": "node ./scripts/check-packages.js"
@@ -48,20 +47,21 @@
     "@types/jest": "^24.0.18",
     "babel-jest": "^24.9.0",
     "husky": "^3.0.0",
-    "lerna": "^3.16.0",
-    "patch-package": "^5.1.1",
-    "prettier": "1.13.5",
-    "pretty-quick": "^1.11.1",
-    "solc": "0.5.8",
-    "tslint": "^5.20.0",
     "jest": "^24.9.0",
     "jest-junit": "^8.0.0",
     "jest-snapshot": "^24.9.0",
+    "lerna": "^3.16.0",
+    "patch-package": "^5.1.1",
+    "prettier": "1.13.5",
+    "prettier-plugin-solidity": "1.0.0-alpha.34",
+    "pretty-quick": "^1.11.1",
+    "solc": "0.5.8",
     "ts-jest": "^24.1.0",
-    "typescript-tslint-plugin": "^0.5.4",
-    "tsconfig-paths": "^3.8.0",
     "ts-node": "^8.3.0",
-    "typescript": "^3.5.3"
+    "tsconfig-paths": "^3.8.0",
+    "tslint": "^5.20.0",
+    "typescript": "^3.5.3",
+    "typescript-tslint-plugin": "^0.5.4"
   },
   "dependencies": {
     "codecov": "^3.1.0"
@@ -76,4 +76,4 @@
     "**/extend": "^3.0.2",
     "sha3": "1.2.3"
   }
-} 
+}

@@ -1,8 +1,9 @@
+import dynamic from 'next/dynamic'
 import * as React from 'react'
 import ReCAPTCHA from 'react-google-recaptcha'
-import { StyleSheet, View } from 'react-native'
+import { StyleSheet, Text, View } from 'react-native'
+import { MobileOS, RequestRecord, RequestType } from 'src/fauceting/FaucetInterfaces'
 import { ButtonWithFeedback, ContextualInfo, HashingStatus } from 'src/fauceting/MicroComponents'
-import PhoneInput from 'src/fauceting/PhoneInput'
 import {
   getCaptchaKey,
   RequestState,
@@ -12,8 +13,13 @@ import {
 import { postForm } from 'src/forms/Form'
 import { TextInput } from 'src/forms/FormComponents'
 import { I18nProps, NameSpaces, withNamespaces } from 'src/i18n'
-import { colors, standardStyles } from 'src/styles'
-import { RequestRecord, RequestType, subscribeRequest } from '../../server/FirebaseClient'
+import Android from 'src/icons/Android'
+import Apple from 'src/icons/Apple'
+import { colors, fonts, standardStyles, textStyles } from 'src/styles'
+import { Radio } from 'src/table/table'
+import subscribeRequest from '../../server/FirebaseClient'
+// @ts-ignore
+const PhoneInput = dynamic(() => import('src/fauceting/PhoneInput'))
 
 interface State {
   beneficiary: string
@@ -22,6 +28,7 @@ interface State {
   dollarTxHash?: string | null
   goldTxHash?: string | null
   escrowTxHash?: string | null
+  mobileOS: MobileOS | null
 }
 
 interface Props {
@@ -33,6 +40,7 @@ class RequestFunds extends React.PureComponent<Props & I18nProps, State> {
     beneficiary: '',
     requestState: RequestState.Initial,
     captchaOK: false,
+    mobileOS: null,
   }
 
   recaptchaRef = React.createRef<ReCAPTCHA>()
@@ -46,6 +54,10 @@ class RequestFunds extends React.PureComponent<Props & I18nProps, State> {
           ? RequestState.Initial
           : this.state.requestState,
     })
+  }
+
+  selectOS = (os: MobileOS) => {
+    this.setState({ mobileOS: os })
   }
 
   setNumber = (number: string) => {
@@ -82,7 +94,12 @@ class RequestFunds extends React.PureComponent<Props & I18nProps, State> {
 
   startRequest = () => {
     this.setState({ requestState: RequestState.Working })
-    return send(this.state.beneficiary, this.props.kind, this.getCaptchaToken())
+    return send(
+      this.state.beneficiary,
+      this.props.kind,
+      this.getCaptchaToken(),
+      this.state.mobileOS
+    )
   }
 
   subscribe = async (key: string) => {
@@ -114,14 +131,15 @@ class RequestFunds extends React.PureComponent<Props & I18nProps, State> {
     return this.props.kind === RequestType.Faucet
   }
 
+  inviteAndBlankOS = () => {
+    return !this.isFaucet() ? !this.state.mobileOS : false
+  }
+
   render() {
     const { requestState, dollarTxHash, goldTxHash, escrowTxHash } = this.state
     const isInvalid = requestState === RequestState.Invalid
     return (
       <View style={standardStyles.elementalMargin}>
-        <View style={standardStyles.elementalMarginBottom}>
-          <ReCAPTCHA sitekey={getCaptchaKey()} onChange={this.onCaptcha} ref={this.recaptchaRef} />
-        </View>
         {this.isFaucet() ? (
           <TextInput
             type={'text'}
@@ -138,19 +156,28 @@ class RequestFunds extends React.PureComponent<Props & I18nProps, State> {
         ) : (
           <PhoneInput onChangeNumber={this.setNumber} />
         )}
-
         <ContextualInfo
           requestState={this.state.requestState}
           t={this.props.t}
           isFaucet={this.isFaucet()}
         />
-        <View style={[this.isFaucet() && standardStyles.row, standardStyles.elementalMarginTop]}>
+        {!this.isFaucet() && (
+          <MobileSelect
+            t={this.props.t}
+            onSelect={this.selectOS}
+            selectedOS={this.state.mobileOS}
+          />
+        )}
+        <View style={[styles.recaptcha, standardStyles.elementalMargin]}>
+          <ReCAPTCHA sitekey={getCaptchaKey()} onChange={this.onCaptcha} ref={this.recaptchaRef} />
+        </View>
+        <View style={[this.isFaucet() && standardStyles.row]}>
           <ButtonWithFeedback
             requestState={requestState}
             isFaucet={this.isFaucet()}
             captchaOK={this.state.captchaOK}
             onSubmit={this.onSubmit}
-            disabled={this.state.beneficiary.length === 0}
+            disabled={this.state.beneficiary.length === 0 || this.inviteAndBlankOS()}
             t={this.props.t}
           />
           <View>
@@ -169,15 +196,57 @@ class RequestFunds extends React.PureComponent<Props & I18nProps, State> {
   }
 }
 
-function send(beneficiary: string, kind: RequestType, captchaToken: string) {
+function MobileSelect({ selectedOS, onSelect, t }) {
+  const isandroid = selectedOS === MobileOS.android
+  const isIOS = selectedOS === MobileOS.ios
+  const iOSColor = isIOS ? colors.white : colors.placeholderDarkMode
+  const androidColor = isandroid ? colors.white : colors.placeholderDarkMode
+  return (
+    <>
+      <Text style={[fonts.h5, textStyles.invert, standardStyles.elementalMarginTop]}>
+        {t('chooseMobileOS')}
+      </Text>
+      <View style={standardStyles.row}>
+        <Radio
+          colorWhenSelected={colors.primary}
+          label="Android"
+          labelColor={androidColor}
+          icon={<Android size={18} color={androidColor} />}
+          selected={isandroid}
+          onValueSelected={onSelect}
+          value={MobileOS.android}
+        />
+        <View style={styles.radios}>
+          <Radio
+            colorWhenSelected={colors.primary}
+            label="iOS"
+            labelColor={iOSColor}
+            icon={<Apple size={18} color={iOSColor} />}
+            selected={isIOS}
+            onValueSelected={onSelect}
+            value={MobileOS.ios}
+          />
+        </View>
+      </View>
+    </>
+  )
+}
+
+function send(beneficiary: string, kind: RequestType, captchaToken: string, os?: MobileOS) {
   const route = kind === RequestType.Invite ? '/invite' : '/faucet'
-  return postForm(route, { captchaToken, beneficiary })
+  return postForm(route, { captchaToken, beneficiary, mobileOS: os })
 }
 
 const styles = StyleSheet.create({
   error: {
     borderColor: colors.error,
     borderWidth: 1,
+  },
+  radios: {
+    marginStart: 20,
+  },
+  recaptcha: {
+    height: 80,
   },
 })
 

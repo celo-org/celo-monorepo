@@ -1,8 +1,6 @@
 pragma solidity ^0.5.3;
 
-
 interface ISortedOracles {
-
   function addOracle(address, address) external;
   function removeOracle(address, address, uint256) external;
   function report(address, uint256, uint256, address, address) external;

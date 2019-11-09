@@ -9,7 +9,6 @@ import { connect } from 'react-redux'
 import { PaymentRequest } from 'src/account'
 import CeloAnalytics from 'src/analytics/CeloAnalytics'
 import { CustomEventNames } from 'src/analytics/constants'
-import { componentWithAnalytics } from 'src/analytics/wrapper'
 import { Namespaces } from 'src/i18n'
 import {
   addressToE164NumberSelector,
@@ -143,8 +142,6 @@ const styles = StyleSheet.create({
   },
 })
 
-export default componentWithAnalytics(
-  connect<StateProps, {}, {}, RootState>(mapStateToProps)(
-    withNamespaces(Namespaces.walletFlow5)(PaymentRequestSummaryNotification)
-  )
+export default connect<StateProps, {}, {}, RootState>(mapStateToProps)(
+  withNamespaces(Namespaces.walletFlow5)(PaymentRequestSummaryNotification)
 )
