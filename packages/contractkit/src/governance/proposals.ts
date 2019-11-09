@@ -1,13 +1,21 @@
+import { BigNumber } from 'bignumber.js'
 import { keccak256 } from 'ethereumjs-util'
+import Web3 from 'web3'
 import Contract from 'web3/eth/contract'
 import { TransactionObject, Tx } from 'web3/eth/types'
 
+import { concurrentMap } from '@celo/utils/lib/async'
+
 import { CeloContract } from '../base'
 import { ContractKit } from '../kit'
-import { CeloTransactionObject, parseNumber, toBuffer } from '../wrappers/BaseWrapper'
+import {
+  CeloTransactionObject,
+  identity,
+  parseBytes,
+  parseNumber,
+  toBuffer,
+} from '../wrappers/BaseWrapper'
 import { ProposalEncoded, ProposalTransaction } from '../wrappers/Governance'
-
-import Web3 = require('web3')
 
 export interface CeloProposalTransactionJSON {
   value: string
@@ -17,9 +25,13 @@ export interface CeloProposalTransactionJSON {
 }
 
 export class ProposalFactory {
-    static from(txs: ProposalTransaction[]): Proposal {
-        return new Proposal(txs)
-    }
+  static from(txs: ProposalTransaction[]): Proposal {
+    return new Proposal(txs)
+  }
+
+  static async fromAsync(txs: Array<Promise<ProposalTransaction>>, concurrency = 1) {
+    return this.from(await concurrentMap(concurrency, txs, identity))
+  }
 }
 
 export class Proposal extends Array<ProposalTransaction> {
@@ -40,7 +52,7 @@ export class Proposal extends Array<ProposalTransaction> {
     return [
       this.map((tx) => parseNumber(tx.value)),
       this.map((tx) => tx.destination),
-      Buffer.concat(this.map((tx) => tx.data)) as any,
+      parseBytes(Buffer.concat(this.map((tx) => tx.data))),
       this.map((tx) => tx.data.length),
     ]
   }
@@ -50,24 +62,25 @@ export class Proposal extends Array<ProposalTransaction> {
     const names = Object.keys(CeloContract) as CeloContract[]
     const addressToNameMap = new Map(names.map((name) => [addresses[name], name]))
 
-    return this.map((tx): CeloProposalTransactionJSON => {
-      const contract = addressToNameMap.get(tx.destination)
-      if (contract === undefined) {
-        throw new Error(`Transaction destination ${tx.destination} not found in registry`)
+    return this.map(
+      (tx): CeloProposalTransactionJSON => {
+        const contract = addressToNameMap.get(tx.destination)
+        if (contract === undefined) {
+          throw new Error(`Transaction destination ${tx.destination} not found in registry`)
+        }
+        return {
+          value: parseNumber(tx.value),
+          celoContractName: contract,
+          // TODO: figure out how to decode tx.data using web3contract to get method and args
+          methodName: '',
+          args: [],
+        }
       }
-      return {
-        value: parseNumber(tx.value),
-        celoContractName: contract,
-        // TODO: figure out how to decode tx.data using web3contract to get method and args
-        methodName: '',
-        args: [],
-      }
-    })
+    )
   }
 }
 
-type TxObjParams = Omit<Tx, 'data'>
-type TxParams = Pick<TxObjParams, 'to' | 'value'>
+type TxParams = Pick<Tx, 'to' | 'value'>
 export class ProposalTransactionFactory {
   static async fromCeloJsonTxAndKit(jsonTx: CeloProposalTransactionJSON, kit: ContractKit) {
     const contract = await kit._web3Contracts.getContract(jsonTx.celoContractName)
@@ -82,20 +95,18 @@ export class ProposalTransactionFactory {
     return this.fromWeb3Tx(txo, { to: contract._address, value: jsonTx.value })
   }
 
-  static fromCeloTx(tx: CeloTransactionObject<any>) {
-    if (tx.defaultParams && tx.defaultParams.to && tx.defaultParams.value) {
-      return this.fromWeb3Tx(tx.txo, tx.defaultParams as Required<TxParams>)
+  static fromCeloTx(tx: CeloTransactionObject<any>, params?: TxParams) {
+    const mergedParams: TxParams = { ...tx.defaultParams, ...params }
+    if (mergedParams.to && mergedParams.value) {
+      return this.fromWeb3Tx(tx.txo, mergedParams as Required<TxParams>)
     } else {
-      throw new Error("Parameters 'to' and/or 'value' not provided as default parameters")
+      throw new Error("Transaction parameters 'to' and/or 'value' not provided")
     }
   }
 
-  static fromWeb3Tx(
-    tx: TransactionObject<any>,
-    params: Required<TxParams>
-  ): ProposalTransaction {
+  static fromWeb3Tx(tx: TransactionObject<any>, params: Required<TxParams>): ProposalTransaction {
     return {
-      value: params.value,
+      value: new BigNumber(params.value),
       destination: params.to,
       data: toBuffer(tx.encodeABI()),
     }

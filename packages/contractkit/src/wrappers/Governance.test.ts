@@ -8,7 +8,7 @@ import { Proposal, ProposalFactory, ProposalTransactionFactory } from '../govern
 import { newKitFromWeb3 } from '../kit'
 import { NetworkConfig, testWithGanache, timeTravel } from '../test-utils/ganache-test'
 import { AccountsWrapper } from './Accounts'
-import { GovernanceWrapper, VoteValue } from './Governance'
+import { GovernanceWrapper, VoteValue, ProposalStage } from './Governance'
 import { LockedGoldWrapper } from './LockedGold'
 
 const expConfig = NetworkConfig.governance
@@ -55,10 +55,16 @@ testWithGanache('Governance Wrapper', (web3) => {
     expect(config.concurrentProposals).toEqBigNumber(expConfig.concurrentProposals)
     expect(config.dequeueFrequency).toEqBigNumber(expConfig.dequeueFrequency)
     expect(config.minDeposit).toEqBigNumber(minDeposit)
-    expect(config.queueExpiry).toEqBigNumber(expConfig.queueExpiry)
-    expect(config.stageDurations.approval).toEqBigNumber(expConfig.approvalStageDuration)
-    expect(config.stageDurations.referendum).toEqBigNumber(expConfig.referendumStageDuration)
-    expect(config.stageDurations.execution).toEqBigNumber(expConfig.executionStageDuration)
+    expect(config.stageDurations[ProposalStage.Queued]).toEqBigNumber(expConfig.queueExpiry)
+    expect(config.stageDurations[ProposalStage.Approval]).toEqBigNumber(
+      expConfig.approvalStageDuration
+    )
+    expect(config.stageDurations[ProposalStage.Referendum]).toEqBigNumber(
+      expConfig.referendumStageDuration
+    )
+    expect(config.stageDurations[ProposalStage.Execution]).toEqBigNumber(
+      expConfig.executionStageDuration
+    )
   })
 
   describe('Proposals', () => {
@@ -99,13 +105,13 @@ testWithGanache('Governance Wrapper', (web3) => {
       await timeTravel(expConfig.referendumStageDuration, web3)
     }
 
-    it('#propose', async () => {
+    it.only('#propose', async () => {
       await proposeFn(accounts[0])
 
       const proposalRecord = await governance.getProposalRecord(proposalID)
       expect(proposalRecord.metadata.proposer).toBe(accounts[0])
       expect(proposalRecord.metadata.transactionCount).toBe(proposal.length)
-      expect(ProposalFactory.from(proposalRecord.transactions)).toStrictEqual(proposal)
+      expect(proposalRecord.proposal).toStrictEqual(proposal)
     })
 
     it('#upvote', async () => {
@@ -130,7 +136,7 @@ testWithGanache('Governance Wrapper', (web3) => {
       await tx.sendAndWaitForReceipt({ from: accounts[1] })
 
       const after = await governance.getUpvotes(proposalID)
-      expect(after).toEqBigNumber(before.minus(upvoteRecord.weight))
+      expect(after).toEqBigNumber(before.minus(upvoteRecord.upvotes))
     })
 
     it('#approve', async () => {
@@ -149,7 +155,7 @@ testWithGanache('Governance Wrapper', (web3) => {
       await voteFn(accounts[2])
 
       const voteWeight = await governance.getVoteWeight(accounts[2])
-      const yesVotes = (await governance.getVotes(proposalID)).yes
+      const yesVotes = (await governance.getVotes(proposalID))[VoteValue.Yes]
       expect(yesVotes).toEqBigNumber(voteWeight)
     })
 
