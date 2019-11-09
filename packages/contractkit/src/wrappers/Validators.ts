@@ -51,6 +51,7 @@ export interface GroupMembership {
  */
 // TODO(asa): Support authorized validators
 export class ValidatorsWrapper extends BaseWrapper<Validators> {
+  updatePublicKeysData = proxySend(this.kit, this.contract.methods.updatePublicKeysData)
   /**
    * Returns the Locked Gold requirements for validators.
    * @returns The Locked Gold requirements for validators.
