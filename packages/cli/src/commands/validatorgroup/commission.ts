@@ -1,6 +1,7 @@
 import { flags } from '@oclif/command'
 import BigNumber from 'bignumber.js'
 import { BaseCommand } from '../../base'
+import { newCheckBuilder } from '../../utils/checks'
 import { displaySendTx } from '../../utils/cli'
 import { Flags } from '../../utils/command'
 
@@ -22,6 +23,7 @@ export default class ValidatorGroupCommission extends BaseCommand {
 
     this.kit.defaultAccount = res.flags.from
     const validators = await this.kit.contracts.getValidators()
+    const commission = new BigNumber(res.flags.commission)
 
     await newCheckBuilder(this, res.flags.from)
       .addCheck('Commission is in range [0,1]', () => commission.gte(0) && commission.lte(1))
@@ -29,7 +31,7 @@ export default class ValidatorGroupCommission extends BaseCommand {
       .canSignValidatorTxs()
       .runChecks()
 
-    const tx = await validators.updateCommission(new BigNumber(res.flags.commission))
+    const tx = await validators.updateCommission(commission)
     await displaySendTx('updateCommission', tx)
   }
 }
