@@ -37,6 +37,8 @@ export const handler = async (argv: InviteArgv) => {
   const phone = argv.phone
 
   console.log(`Sending invitation code to ${phone}`)
+
+  // This key is only present in celo-testnet
   await execCmd('gcloud config set project celo-testnet')
   await execCmd(
     'gcloud kms decrypt --ciphertext-file=twilio-config.enc --plaintext-file=twilio-config.js \
@@ -49,7 +51,7 @@ export const handler = async (argv: InviteArgv) => {
     kit.defaultAccount = account
 
     // TODO(asa): This number was made up
-    const verificationGasAmount = new BigNumber(10000000)
+    const attestationGasAmount = new BigNumber(10000000)
     // TODO: this default gas price might not be accurate
     const gasPrice = 100000000000
 
@@ -65,11 +67,11 @@ export const handler = async (argv: InviteArgv) => {
       kit.contracts.getAttestations(),
       kit.contracts.getEscrow(),
     ])
-    const verificationFee = new BigNumber(
+    const attestationFee = new BigNumber(
       await attestations.attestationRequestFees(stableToken.address)
     )
-    const goldAmount = verificationGasAmount.times(gasPrice).toString()
-    const stableTokenInviteAmount = verificationFee.times(10).toString()
+    const goldAmount = attestationGasAmount.times(gasPrice).toString()
+    const stableTokenInviteAmount = attestationFee.times(10).toString()
     const stableTokenEscrowAmount = (await convertToContractDecimals(5, stableToken)).toString()
 
     const phoneHash: string = kit.web3.utils.soliditySha3({
@@ -84,6 +86,7 @@ export const handler = async (argv: InviteArgv) => {
       `Transferring ${goldAmount} Gold, ${stableTokenInviteAmount} StableToken, and escrowing ${stableTokenEscrowAmount}`
     )
     await Promise.all([
+      // TODO: remove if no one is paying for gas with gold
       goldToken.transfer(temporaryAddress, goldAmount).sendAndWaitForReceipt(),
       stableToken.transfer(temporaryAddress, stableTokenInviteAmount).sendAndWaitForReceipt(),
       escrow
