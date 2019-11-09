@@ -1,4 +1,5 @@
 import { BaseCommand } from '../../base'
+import { newCheckBuilder } from '../../utils/checks'
 import { displaySendTx } from '../../utils/cli'
 import { Flags } from '../../utils/command'
 import { getPubKeyFromAddrAndWeb3 } from '../../utils/helpers'
