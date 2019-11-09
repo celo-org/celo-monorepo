@@ -10,7 +10,6 @@ import {
   RegistryContract,
   RegistryInstance,
 } from 'types'
-import { getParsedSignatureOfAddress } from '../../lib/signing-utils'
 
 // For reference:
 //    accounts[0] = owner
@@ -105,6 +104,17 @@ contract('Escrow', (accounts: string[]) => {
     const aValue: number = 10
     const receiver: string = accounts[2]
     const sender: string = accounts[1]
+
+    const getParsedSignatureOfAddress = async (address: string, signer: string) => {
+      // @ts-ignore
+      const hash = web3.utils.soliditySha3({ type: 'address', value: address })
+      const signature = (await web3.eth.sign(hash, signer)).slice(2)
+      return {
+        r: `0x${signature.slice(0, 64)}`,
+        s: `0x${signature.slice(64, 128)}`,
+        v: web3.utils.hexToNumber(signature.slice(128, 130)) + 27,
+      }
+    }
 
     // @ts-ignore
     const aPhoneHash: string = web3.utils.soliditySha3({ t: 'string', v: '+18005555555' })
@@ -245,8 +255,8 @@ contract('Escrow', (accounts: string[]) => {
       let parsedSig2: any
 
       beforeEach(async () => {
-        parsedSig1 = await getParsedSignatureOfAddress(web3, accounts[2], accounts[5])
-        parsedSig2 = await getParsedSignatureOfAddress(web3, accounts[2], accounts[6])
+        parsedSig1 = await getParsedSignatureOfAddress(accounts[2], accounts[5])
+        parsedSig2 = await getParsedSignatureOfAddress(accounts[2], accounts[6])
         await doubleTransfer()
         uniquePaymentIDWithdraw = withdrawKeyAddress
       })
@@ -374,7 +384,7 @@ contract('Escrow', (accounts: string[]) => {
       beforeEach(async () => {
         await doubleTransfer()
         uniquePaymentIDRevoke = withdrawKeyAddress
-        parsedSig1 = await getParsedSignatureOfAddress(web3, accounts[2], accounts[5])
+        parsedSig1 = await getParsedSignatureOfAddress(accounts[2], accounts[5])
       })
 
       it('should allow sender to redeem payment after payment has expired', async () => {

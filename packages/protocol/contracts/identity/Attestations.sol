@@ -509,8 +509,8 @@ contract Attestations is
     bytes32 s
   ) public view returns (address) {
     bytes32 codehash = keccak256(abi.encodePacked(identifier, account));
-    address signer = Signatures.getSignerOfMessageHash(codehash, v, r, s);
-    address issuer = getAccounts().activeAttesttationSignerToAccount(signer);
+    address signer = ecrecover(codehash, v, r, s);
+    address issuer = getAccountFromAttestor(signer);
 
     Attestation storage attestation = identifiers[identifier].attestations[account]
       .issuedAttestations[issuer];

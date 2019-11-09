@@ -1,55 +1,6 @@
 const ethjsutil = require('ethereumjs-util')
 
-import * as Web3Utils from 'web3-utils'
-import { privateKeyToAddress } from './address'
-
-// If messages is a hex, the length of it should be the number of bytes
-function messageLength(message: string) {
-  if (Web3Utils.isHexStrict(message)) {
-    return (message.length - 2) / 2
-  }
-  return message.length
-}
-// Ethereum has a special signature format that requires a prefix
-// https://github.com/ethereum/wiki/wiki/JSON-RPC#eth_sign
-export function hashMessageWithPrefix(message: string) {
-  const prefix = '\x19Ethereum Signed Message:\n' + messageLength(message)
-  return Web3Utils.soliditySha3(prefix, message)
-}
-
-export function hashMessage(message: string): string {
-  return Web3Utils.soliditySha3({ type: 'string', value: message })
-}
-
-export interface Signer {
-  sign: (message: string) => Promise<string>
-}
-
-// Uses a native function to sign (as signFn), most commonly `web.eth.sign`
-export function NativeSigner(
-  signFn: (message: string, signer: string) => Promise<string>,
-  signer: string
-): Signer {
-  return {
-    sign: async (message: string) => {
-      return signFn(message, signer)
-    },
-  }
-}
-export function LocalSigner(privateKey: string): Signer {
-  return {
-    sign: async (message: string) =>
-      Promise.resolve(
-        serializeSignature(signMessage(message, privateKey, privateKeyToAddress(privateKey)))
-      ),
-  }
-}
-
-export function signMessage(message: string, privateKey: string, address: string) {
-  return signMessageWithoutPrefix(hashMessageWithPrefix(message), privateKey, address)
-}
-
-export function signMessageWithoutPrefix(messageHash: string, privateKey: string, address: string) {
+export function signMessage(messageHash: string, privateKey: string, address: string) {
   const publicKey = ethjsutil.privateToPublic(ethjsutil.toBuffer(privateKey))
   const derivedAddress: string = ethjsutil.bufferToHex(ethjsutil.pubToAddress(publicKey))
   if (derivedAddress.toLowerCase() !== address.toLowerCase()) {
@@ -80,15 +31,7 @@ export function serializeSignature(signature: Signature) {
   return '0x' + serializedV + serializedR + serializedS
 }
 
-export function parseSignature(message: string, signature: string, signer: string) {
-  return parseSignatureWithoutPrefix(hashMessageWithPrefix(message), signature, signer)
-}
-
-export function parseSignatureWithoutPrefix(
-  messageHash: string,
-  signature: string,
-  signer: string
-) {
+export function parseSignature(messageHash: string, signature: string, signer: string) {
   let { r, s, v } = parseSignatureAsRsv(signature.slice(2))
   if (isValidSignature(signer, messageHash, v, r, s)) {
     return { v, r, s }
@@ -174,12 +117,8 @@ export function areAddressesEqual(address1: string | null, address2: string | nu
 }
 
 export const SignatureUtils = {
-  NativeSigner,
-  LocalSigner,
   signMessage,
-  signMessageWithoutPrefix,
   parseSignature,
-  parseSignatureWithoutPrefix,
   stripHexLeader,
   ensureHexLeader,
   serializeSignature,
