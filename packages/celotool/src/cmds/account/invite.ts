@@ -1,7 +1,7 @@
 /* tslint:disable no-console */
 import { newKit } from '@celo/contractkit'
-import { StableTokenWrapper } from '@celo/contractkit/lib/wrappers/StableTokenWrapper'
 import { BigNumber } from 'bignumber.js'
+import { convertToContractDecimals } from 'src/lib/contract-utils'
 import { portForwardAnd } from 'src/lib/port_forward'
 import { execCmd } from 'src/lib/utils'
 import twilio from 'twilio'
@@ -22,15 +22,6 @@ export const builder = (yargs: Argv) => {
     description: 'Phone number to send invite code,',
     demand: 'Please specify phone number to send invite code',
   })
-}
-
-export async function convertToContractDecimals(
-  value: number | BigNumber,
-  contract: StableTokenWrapper
-) {
-  const decimals = new BigNumber(await contract.decimals())
-  const one = new BigNumber(10).pow(decimals.toNumber())
-  return one.times(value)
 }
 
 export const handler = async (argv: InviteArgv) => {
