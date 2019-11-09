@@ -26,6 +26,7 @@ export interface Validator {
 export interface ValidatorGroup {
   address: Address
   members: Address[]
+  affiliates: Address[]
   commission: BigNumber
 }
 
@@ -148,10 +149,15 @@ export class ValidatorsWrapper extends BaseWrapper<Validators> {
   /** Get ValidatorGroup information */
   async getValidatorGroup(address: Address): Promise<ValidatorGroup> {
     const res = await this.contract.methods.getValidatorGroup(address).call()
+    const validators = await this.getRegisteredValidators()
+    const affiliates = validators
+      .filter((v) => v.affiliation === address)
+      .filter((v) => !res[0].includes(v.address))
     return {
       address,
       members: res[0],
       commission: fromFixed(new BigNumber(res[1])),
+      affiliates: affiliates.map((v) => v.address),
     }
   }
 

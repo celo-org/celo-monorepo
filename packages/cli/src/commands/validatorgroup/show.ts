@@ -16,14 +16,14 @@ export default class ValidatorGroupShow extends BaseCommand {
   static examples = ['show 0x97f7333c51897469E8D98E7af8653aAb468050a3']
 
   async run() {
-    const { args } = this.parse(ValidatorGroupShow)
+    const res = this.parse(ValidatorGroupShow)
     const validators = await this.kit.contracts.getValidators()
 
     await newCheckBuilder(this)
-      .isValidatorGroup(args.groupAddress)
+      .isValidatorGroup(res.args.groupAddress)
       .runChecks()
 
-    const validatorGroup = await validators.getValidatorGroup(args.groupAddress)
+    const validatorGroup = await validators.getValidatorGroup(res.args.groupAddress)
     printValueMap(validatorGroup)
   }
 }
