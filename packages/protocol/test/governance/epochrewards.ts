@@ -54,9 +54,12 @@ contract('EpochRewards', (accounts: string[]) => {
     max: toFixed(new BigNumber(1 / 5)),
     adjustmentFactor: toFixed(new BigNumber(1 / 365)),
   }
-  const rewardsMultiplierAdjustments = {
-    underspend: toFixed(new BigNumber(1 / 2)),
-    overspend: toFixed(new BigNumber(5)),
+  const rewardsMultiplier = {
+    max: toFixed(new BigNumber(2)),
+    adjustments: {
+      underspend: toFixed(new BigNumber(1 / 2)),
+      overspend: toFixed(new BigNumber(5)),
+    },
   }
   const targetVotingGoldFraction = toFixed(new BigNumber(2 / 3))
   const maxValidatorEpochPayment = new BigNumber(10000000000000)
@@ -74,8 +77,9 @@ contract('EpochRewards', (accounts: string[]) => {
       targetVotingYieldParams.initial,
       targetVotingYieldParams.max,
       targetVotingYieldParams.adjustmentFactor,
-      rewardsMultiplierAdjustments.underspend,
-      rewardsMultiplierAdjustments.overspend,
+      rewardsMultiplier.max,
+      rewardsMultiplier.adjustments.underspend,
+      rewardsMultiplier.adjustments.overspend,
       targetVotingGoldFraction,
       maxValidatorEpochPayment
     )
@@ -111,8 +115,9 @@ contract('EpochRewards', (accounts: string[]) => {
           targetVotingYieldParams.initial,
           targetVotingYieldParams.max,
           targetVotingYieldParams.adjustmentFactor,
-          rewardsMultiplierAdjustments.underspend,
-          rewardsMultiplierAdjustments.overspend,
+          rewardsMultiplier.max,
+          rewardsMultiplier.adjustments.underspend,
+          rewardsMultiplier.adjustments.overspend,
           targetVotingGoldFraction,
           maxValidatorEpochPayment
         )
