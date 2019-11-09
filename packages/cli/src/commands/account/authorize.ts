@@ -1,5 +1,6 @@
 import { flags } from '@oclif/command'
 import { BaseCommand } from '../../base'
+import { newCheckBuilder } from '../../utils/checks'
 import { displaySendTx } from '../../utils/cli'
 import { Flags } from '../../utils/command'
 
@@ -38,6 +39,11 @@ export default class Authorize extends BaseCommand {
 
     this.kit.defaultAccount = res.flags.from
     const accounts = await this.kit.contracts.getAccounts()
+
+    await newCheckBuilder(this)
+      .isAccount(res.flags.from)
+      .runChecks()
+
     let tx: any
     if (res.flags.role === 'vote') {
       tx = await accounts.authorizeVoteSigner(res.flags.from, res.flags.to)

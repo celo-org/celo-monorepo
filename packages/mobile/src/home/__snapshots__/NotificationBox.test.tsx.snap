@@ -743,8 +743,7 @@ exports[`NotificationBox Payment Requests exist 1`] = `
                           ]
                         }
                       >
-                         
-                        12.34
+                        $12.34
                       </Text>
                     </Text>
                   </View>

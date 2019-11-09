@@ -6,7 +6,6 @@ import "./interfaces/IERC20Token.sol";
 import "./interfaces/IRegistry.sol";
 import "./interfaces/IAccounts.sol";
 
-
 import "../governance/interfaces/IElection.sol";
 import "../governance/interfaces/IGovernance.sol";
 import "../governance/interfaces/ILockedGold.sol";
@@ -22,7 +21,6 @@ import "../stability/interfaces/IStableToken.sol";
 // TODO(amy): Fix this when the TypeChain issue resolves.
 
 contract UsingRegistry is Ownable {
-
   event RegistrySet(address indexed registryAddress);
 
   // solhint-disable state-visibility

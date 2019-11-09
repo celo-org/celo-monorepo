@@ -1,5 +1,6 @@
 import { IArg } from '@oclif/parser/lib/args'
 import { BaseCommand } from '../../base'
+import { newCheckBuilder } from '../../utils/checks'
 import { printValueMap } from '../../utils/cli'
 import { Args } from '../../utils/command'
 
@@ -17,6 +18,11 @@ export default class ValidatorGroupShow extends BaseCommand {
   async run() {
     const res = this.parse(ValidatorGroupShow)
     const validators = await this.kit.contracts.getValidators()
+
+    await newCheckBuilder(this)
+      .isValidatorGroup(args.groupAddress)
+      .runChecks()
+
     const validatorGroup = await validators.getValidatorGroup(res.args.groupAddress)
     printValueMap(validatorGroup)
   }

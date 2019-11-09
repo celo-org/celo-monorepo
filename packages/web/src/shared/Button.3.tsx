@@ -39,6 +39,7 @@ type NakedProps = {
 } & AllButtonProps
 
 type PrimaryProps = {
+  onDarkBackground?: boolean
   size?: SIZE
   kind: BTN.PRIMARY | BTN.SECONDARY | BTN.TERTIARY
 } & AllButtonProps
@@ -158,10 +159,11 @@ interface Props {
   style?: TextStyle
   href?: string
   target?: string
+  onDarkBackground?: boolean
 }
 
 function ButtonPrimary(props: Props) {
-  const { children, status, size, style, href, target } = props
+  const { children, status, size, style, href, target, onDarkBackground } = props
   return (
     <Text
       href={href}
@@ -174,7 +176,9 @@ function ButtonPrimary(props: Props) {
         sizeStyle(size),
         primaryStyles[status],
         textStyles.medium,
-        primaryStyles.text,
+        status === BTNStates.disabled && onDarkBackground
+          ? primaryStyles.darkText
+          : primaryStyles.text,
         style,
         status === BTNStates.disabled && baseStyles.notAllowed,
       ]}
@@ -389,6 +393,9 @@ const primaryStyles = StyleSheet.create({
     borderRadius,
     borderWidth,
   },
+  darkText: {
+    color: colors.dark,
+  },
   text: {
     color: colors.white,
   },
@@ -398,14 +405,12 @@ const secondaryStyles = StyleSheet.create({
   normal: {
     backgroundColor: 'transparent',
     borderColor: colors.gray,
-    color: colors.primary,
     borderRadius,
     borderWidth,
   },
   hover: {
     backgroundColor: 'transparent',
     borderColor: colors.primaryHover,
-    color: colors.primaryHover,
     borderRadius,
     borderWidth,
   },
@@ -413,14 +418,12 @@ const secondaryStyles = StyleSheet.create({
     backgroundColor: 'transparent',
     borderColor: colors.primaryPress,
     outlineColor: colors.primaryPress,
-    color: colors.primaryPress,
     borderRadius,
     borderWidth,
   },
   disabled: {
     backgroundColor: 'transparent',
     borderColor: colors.gray,
-    color: colors.inactive,
     cursor: 'not-allowed',
     borderRadius,
     borderWidth,
