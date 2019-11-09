@@ -91,11 +91,12 @@ testWithGanache('Validators Wrapper', (web3) => {
   test('SBAT updateCommission', async () => {
     const groupAccount = accounts[0]
     await setupGroup(groupAccount)
+    expect(commission).toEqBigNumber('0.1')
     await (await validators.updateCommission(new BigNumber(0.2))).sendAndWaitForReceipt({
       from: groupAccount,
     })
     const commission = (await validators.getValidatorGroup(groupAccount)).commission
-    expect(commission.toFixed()).toEqual('0.2')
+    expect(commission).toEqBigNumber('0.2')
   })
 
   describe('SBAT reorderMember', () => {

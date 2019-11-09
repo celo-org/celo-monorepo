@@ -617,7 +617,7 @@ contract Validators is
   /**
    * @notice Updates a validator group's commission.
    * @param commission Fixidity representation of the commission this group receives on epoch
-   *   payments made to its members.
+   *   payments made to its members. Must be in the range [0, 1.0].
    * @return True upon success.
    */
   function updateCommission(uint256 commission) external returns (bool) {
