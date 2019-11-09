@@ -1,6 +1,5 @@
 pragma solidity ^0.5.3;
 
-
 contract Freezable {
   bool public frozen;
   address public freezer;

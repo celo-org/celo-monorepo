@@ -22,6 +22,23 @@ EXAMPLE
 
 _See code: [packages/cli/src/commands/validatorgroup/commission.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/validatorgroup/commission.ts)_
 
+### Deregister
+
+Deregister a ValidatorGroup
+
+```
+USAGE
+  $ celocli validatorgroup:deregister
+
+OPTIONS
+  --from=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) Signer or ValidatorGroup's address
+
+EXAMPLE
+  deregister --from 0x47e172f6cfb6c7d01c1574fa3e2be7cc73269d95
+```
+
+_See code: [packages/cli/src/commands/validatorgroup/deregister.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/validatorgroup/deregister.ts)_
+
 ### List
 
 List existing Validator Groups

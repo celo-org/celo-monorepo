@@ -10,7 +10,6 @@ import "../common/Initializable.sol";
  * @title Provides randomness for verifier selection
  */
 contract Random is IRandom, Ownable, Initializable {
-
   using SafeMath for uint256;
 
   /* Stores most recent commitment per address */
@@ -18,7 +17,7 @@ contract Random is IRandom, Ownable, Initializable {
 
   uint256 public randomnessBlockRetentionWindow = 256;
 
-  mapping (uint256 => bytes32) private history;
+  mapping(uint256 => bytes32) private history;
   uint256 private historyFirst;
   uint256 private historySize;
 
@@ -54,11 +53,7 @@ contract Random is IRandom, Ownable, Initializable {
    * `randomness` and `newCommitment`. Before running regular transactions, this function should be
    * called.
    */
-  function revealAndCommit(
-    bytes32 randomness,
-    bytes32 newCommitment,
-    address proposer
-  ) external {
+  function revealAndCommit(bytes32 randomness, bytes32 newCommitment, address proposer) external {
     require(msg.sender == address(0), "only VM can call");
     _revealAndCommit(randomness, newCommitment, proposer);
   }
@@ -69,11 +64,7 @@ contract Random is IRandom, Ownable, Initializable {
    * @param newCommitment The hash of randomness that will be revealed in the future.
    * @param proposer Address of the block proposer.
    */
-  function _revealAndCommit(
-    bytes32 randomness,
-    bytes32 newCommitment,
-    address proposer
-  ) internal {
+  function _revealAndCommit(bytes32 randomness, bytes32 newCommitment, address proposer) internal {
     // ensure revealed randomness matches previous commitment
     if (commitments[proposer] != 0) {
       require(randomness != 0, "randomness cannot be zero if there is a previous commitment");
@@ -107,13 +98,14 @@ contract Random is IRandom, Ownable, Initializable {
       historySize = 1;
     } else if (historySize > randomnessBlockRetentionWindow) {
       delete history[historyFirst];
-      delete history[historyFirst+1];
+      delete history[historyFirst + 1];
       historyFirst += 2;
       historySize--;
     } else if (historySize == randomnessBlockRetentionWindow) {
       delete history[historyFirst];
       historyFirst++;
-    } else /* historySize < randomnessBlockRetentionWindow */ {
+    } else {
+      // historySize < randomnessBlockRetentionWindow
       historySize++;
     }
   }
@@ -154,9 +146,10 @@ contract Random is IRandom, Ownable, Initializable {
     require(blockNumber <= cur, "Cannot query randomness of future blocks");
     require(
       blockNumber > cur.sub(historySize) &&
-      (randomnessBlockRetentionWindow >= cur ||
-      blockNumber > cur.sub(randomnessBlockRetentionWindow)),
-      "Cannot query randomness older than the stored history");
+        (randomnessBlockRetentionWindow >= cur ||
+          blockNumber > cur.sub(randomnessBlockRetentionWindow)),
+      "Cannot query randomness older than the stored history"
+    );
     return history[blockNumber];
   }
 }

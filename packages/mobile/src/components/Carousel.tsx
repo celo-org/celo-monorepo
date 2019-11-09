@@ -11,7 +11,7 @@ import { BoxShadow } from 'react-native-shadow'
 import RNCarousel, { Pagination } from 'react-native-snap-carousel'
 
 const ITEM_WIDTH = variables.width - 70
-const ITEM_HEIGHT = 250
+const ITEM_HEIGHT = 300
 
 interface OwnProps {
   containerStyle: ViewStyle
@@ -20,7 +20,7 @@ interface OwnProps {
 
 export interface CarouselItem {
   text: string
-  icon?: React.ComponentType
+  icon?: React.ReactElement
 }
 
 function renderItem({ item, index }: { item: CarouselItem; index: number }) {
@@ -36,7 +36,7 @@ function renderItem({ item, index }: { item: CarouselItem; index: number }) {
   )
 }
 
-export function Carousel(props: OwnProps) {
+function Carousel(props: OwnProps) {
   const ref = React.useRef(null)
   const [activeItem, setActiveItem] = React.useState(0)
 
@@ -63,7 +63,6 @@ export function Carousel(props: OwnProps) {
         containerStyle={styles.paginationContainer}
         dotColor={colors.dark}
         inactiveDotColor={colors.lightGray}
-        dotStyle={styles.paginationDot}
         inactiveDotOpacity={1}
         inactiveDotScale={0.8}
         carouselRef={ref as any}
@@ -77,7 +76,7 @@ const shadowOpt = {
   width: ITEM_WIDTH,
   height: ITEM_HEIGHT,
   color: '#6b7b8b',
-  opacity: 0.03,
+  opacity: 0.02,
   border: 1,
   radius: 12,
   x: 0,
@@ -89,6 +88,7 @@ const shadowOpt = {
 
 const styles = StyleSheet.create({
   itemContainer: {
+    padding: 20,
     backgroundColor: '#FFFFFF',
     borderWidth: 2,
     borderColor: 'rgba(255, 255, 255, 0.5)',
@@ -97,14 +97,17 @@ const styles = StyleSheet.create({
     height: ITEM_HEIGHT - 6,
     alignItems: 'center',
     justifyContent: 'center',
+    // TODO style shadow right on iOS
+    elevation: 1,
   },
   itemText: {
     ...fontStyles.bodyLarge,
+    ...fontStyles.center,
+    marginTop: 20,
   },
   paginationContainer: {
-    marginVertical: 10,
+    marginTop: 5,
   },
-  paginationDot: {},
 })
 
 export default React.memo(Carousel)
