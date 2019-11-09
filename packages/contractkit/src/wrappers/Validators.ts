@@ -151,7 +151,7 @@ export class ValidatorsWrapper extends BaseWrapper<Validators> {
     const res = await this.contract.methods.getValidatorGroup(address).call()
     const validators = await this.getRegisteredValidators()
     const affiliates = validators
-      .filter((v) => v.affiliation == address)
+      .filter((v) => v.affiliation === address)
       .filter((v) => !res[0].includes(v.address))
     return {
       address,
