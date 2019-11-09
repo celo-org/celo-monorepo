@@ -496,7 +496,7 @@ contract Validators is
    *    - blsPoP - The BLS public key proof of possession. 96 bytes.
    * @return True upon success.
    */
-  function _updatePublicKeysData(Validator storage validator, bytes calldata publicKeysData)
+  function _updatePublicKeysData(Validator storage validator, bytes memory publicKeysData)
     private
     returns (bool)
   {
