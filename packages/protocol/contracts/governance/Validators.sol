@@ -284,18 +284,12 @@ contract Validators is
    * @dev Fails if the account does not have sufficient Locked Gold.
    */
   function registerValidator(bytes calldata publicKeysData) external nonReentrant returns (bool) {
-    require(
-      // secp256k1 public key + BLS public key + BLS proof of possession
-      publicKeysData.length == (64 + 48 + 96)
-    );
-    // Use the proof of possession bytes
-    require(checkProofOfPossession(msg.sender, publicKeysData.slice(64, 48 + 96)));
-
     address account = getAccounts().activeValidationSignerToAccount(msg.sender);
     require(!isValidator(account) && !isValidatorGroup(account));
     uint256 lockedGoldBalance = getLockedGold().getAccountTotalLockedGold(account);
     require(lockedGoldBalance >= validatorLockedGoldRequirements.value);
     Validator storage validator = validators[account];
+    _updatePublicKeysData(validator, publicKeysData);
     validator.publicKeysData = publicKeysData;
     registeredValidators.push(account);
     updateMembershipHistory(account, address(0));
@@ -486,6 +480,26 @@ contract Validators is
     address account = getAccounts().activeValidationSignerToAccount(msg.sender);
     require(isValidator(account));
     Validator storage validator = validators[account];
+    _updatePublicKeysData(validator, publicKeysData);
+    emit ValidatorPublicKeysDataUpdated(account, publicKeysData);
+    return true;
+  }
+
+  /**
+   * @notice Updates a validator's public keys data.
+   * @param validator The validator whose public keys data should be updated.
+   * @param publicKeysData Comprised of three tightly-packed elements:
+   *    - publicKey - The public key that the validator is using for consensus, should match
+   *      msg.sender. 64 bytes.
+   *    - blsPublicKey - The BLS public key that the validator is using for consensus, should pass
+   *      proof of possession. 48 bytes.
+   *    - blsPoP - The BLS public key proof of possession. 96 bytes.
+   * @return True upon success.
+   */
+  function _updatePublicKeysData(Validator storage validator, bytes calldata publicKeysData)
+    private
+    returns (bool)
+  {
     require(
       // secp256k1 public key + BLS public key + BLS proof of possession
       publicKeysData.length == (64 + 48 + 96)
@@ -493,7 +507,6 @@ contract Validators is
     // Use the proof of possession bytes
     require(checkProofOfPossession(msg.sender, publicKeysData.slice(64, 48 + 96)));
     validator.publicKeysData = publicKeysData;
-    emit ValidatorPublicKeysDataUpdated(account, publicKeysData);
     return true;
   }
 

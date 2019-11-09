@@ -20,6 +20,13 @@ export default class ValidatorPublicKey extends BaseCommand {
     this.kit.defaultAccount = res.flags.from
     const validators = await this.kit.contracts.getValidators()
     const accounts = await this.kit.contracts.getAccounts()
+
+    await newCheckBuilder(this, res.flags.from)
+      .isSignerOrAccount()
+      .canSignValidatorTxs()
+      .signerAccountIsValidator()
+      .runChecks()
+
     await displaySendTx(
       'updatePublicKeysData',
       validators.updatePublicKeysData(res.flags.publicKey as any)
