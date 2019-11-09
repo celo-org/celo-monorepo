@@ -22,7 +22,7 @@
     "bignumber.js": "^7.2.0",
     "dotenv": "^6.0.0",
     "express": "^4.16.4",
-    "firebase-admin": "^7.0.0",
+    "firebase-admin": "^8.6.1",
     "i18next": "^12.1.0",
     "node-fetch": "^2.2.0",
     "utf8": "^3.0.0",

@@ -13,11 +13,13 @@ const DefaultConfig = {
     selectIssuersWaitBlocks: 4,
   },
   blockchainParameters: {
+    gasForNonGoldCurrencies: 134000,
     minimumClientVersion: {
       major: 1,
       minor: 8,
       patch: 23,
     },
+    blockGasLimit: 20000000,
   },
   election: {
     minElectableValidators: '22',
