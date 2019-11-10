@@ -1,7 +1,6 @@
 import Web3 from 'web3'
 import { testWithGanache } from '../../test-utils/ganache-test'
 import Authorize from './authorize'
-import Register from './register'
 
 process.env.NO_SYNCCHECK = 'true'
 
