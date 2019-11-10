@@ -81,11 +81,11 @@ describe('governance tests', () => {
     }
   }
 
-  const getValidatorSigner = async (address: string, blockNumber?: number) => {
+  const getValidatorSigner = (address: string, blockNumber?: number) => {
     if (blockNumber) {
-      return await accounts.methods.getValidatorSigner(address).call({}, blockNumber)
+      return accounts.methods.getValidatorSigner(address).call({}, blockNumber)
     } else {
-      return await accounts.methods.getValidatorSigner(address).call()
+      return accounts.methods.getValidatorSigner(address).call()
     }
   }
 
@@ -193,8 +193,8 @@ describe('governance tests', () => {
         },
       ]
       await Promise.all(
-        additionalNodes.map(
-          async (nodeConfig) => await initAndStartGeth(context.hooks.gethBinaryPath, nodeConfig)
+        additionalNodes.map((nodeConfig) =>
+          initAndStartGeth(context.hooks.gethBinaryPath, nodeConfig)
         )
       )
       // Connect the validating nodes to the non-validating nodes, to test that announce messages
@@ -222,8 +222,8 @@ describe('governance tests', () => {
         },
       ]
       await Promise.all(
-        additionalValidatingNodes.map(
-          async (nodeConfig) => await initAndStartGeth(context.hooks.gethBinaryPath, nodeConfig)
+        additionalValidatingNodes.map((nodeConfig) =>
+          initAndStartGeth(context.hooks.gethBinaryPath, nodeConfig)
         )
       )
 
@@ -237,7 +237,7 @@ describe('governance tests', () => {
       do {
         blockNumber = await web3.eth.getBlockNumber()
         await sleep(0.1)
-      } while (blockNumber % epoch != 1)
+      } while (blockNumber % epoch !== 1)
 
       await activate(validatorAccounts[0])
 
@@ -322,7 +322,7 @@ describe('governance tests', () => {
 
     const getValidatorSetAccountsAtBlock = async (blockNumber: number) => {
       const signingKeys = await getValidatorSetSignersAtBlock(blockNumber)
-      return await Promise.all(
+      return Promise.all(
         signingKeys.map((address: string) =>
           accounts.methods.validatorSignerToAccount(address).call({}, blockNumber)
         )
@@ -365,7 +365,7 @@ describe('governance tests', () => {
       for (const blockNumber of blockNumbers) {
         const lastEpochBlock = getLastEpochBlock(blockNumber)
         // Fetch the round robin order if it hasn't already been set for this epoch.
-        if (roundRobinOrder.length == 0 || blockNumber == lastEpochBlock + 1) {
+        if (roundRobinOrder.length === 0 || blockNumber === lastEpochBlock + 1) {
           const validatorSet = await getValidatorSetSignersAtBlock(blockNumber)
           roundRobinOrder = await Promise.all(
             validatorSet.map(

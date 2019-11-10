@@ -1,7 +1,7 @@
+import { serializeSignature } from '@celo/utils/lib/signatureUtils'
 import { BaseCommand } from '../../base'
 import { printValueMap } from '../../utils/cli'
 import { Flags } from '../../utils/command'
-import { serializeSignature } from '@celo/utils/lib/signatureUtils'
 
 export default class ProofOfPossession extends BaseCommand {
   static description = 'Generate proof-of-possession to be used to authorize a signer'
