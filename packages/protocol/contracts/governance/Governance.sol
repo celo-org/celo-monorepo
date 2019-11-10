@@ -478,12 +478,10 @@ contract Governance is
   function getProposalStage(uint256 proposalId) external view returns (Proposals.Stage) {
     if (proposalId == 0 || proposalId > proposalCount) {
       return Proposals.Stage.None;
-    } else if (queue.contains(proposalId)) {
+    } else if (isQueued(proposalId)) {
       return Proposals.Stage.Queued;
-    } else if (proposals[proposalId].exists()) {
-      return proposals[proposalId].getDequeuedStage(stageDurations);
     } else {
-      return Proposals.Stage.Expiration;
+      return proposals[proposalId].getDequeuedStage(stageDurations);
     }
   }
 

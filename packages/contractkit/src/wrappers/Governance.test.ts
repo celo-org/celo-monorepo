@@ -4,11 +4,11 @@ import { concurrentMap } from '@celo/utils/lib/async'
 
 import { Address, CeloContract } from '../base'
 import { Registry } from '../generated/types/Registry'
-import { Proposal, ProposalFactory, ProposalTransactionFactory } from '../governance/proposals'
+import { PTXOProposal } from '../governance/proposals'
 import { newKitFromWeb3 } from '../kit'
 import { NetworkConfig, testWithGanache, timeTravel } from '../test-utils/ganache-test'
 import { AccountsWrapper } from './Accounts'
-import { GovernanceWrapper, VoteValue } from './Governance'
+import { GovernanceWrapper, Proposal, VoteValue } from './Governance'
 import { LockedGoldWrapper } from './LockedGold'
 
 const expConfig = NetworkConfig.governance
@@ -41,13 +41,14 @@ testWithGanache('Governance Wrapper', (web3) => {
   type Repoint = [CeloContract, Address]
 
   const registryRepointProposal = (repoints: Repoint[], _registry: Registry) =>
-    ProposalFactory.from(
-      repoints.map((r) =>
-        ProposalTransactionFactory.fromWeb3Tx(registry.methods.setAddressFor(...r), {
+    new PTXOProposal(
+      repoints.map((r) => ({
+        txo: registry.methods.setAddressFor(...r),
+        params: {
           to: _registry._address,
           value: '0',
-        })
-      )
+        },
+      }))
     )
 
   it('#getConfig', async () => {
@@ -56,15 +57,9 @@ testWithGanache('Governance Wrapper', (web3) => {
     expect(config.dequeueFrequency).toEqBigNumber(expConfig.dequeueFrequency)
     expect(config.minDeposit).toEqBigNumber(minDeposit)
     expect(config.stageDurations.Queued).toEqBigNumber(expConfig.queueExpiry)
-    expect(config.stageDurations.Approval).toEqBigNumber(
-      expConfig.approvalStageDuration
-    )
-    expect(config.stageDurations.Referendum).toEqBigNumber(
-      expConfig.referendumStageDuration
-    )
-    expect(config.stageDurations.Execution).toEqBigNumber(
-      expConfig.executionStageDuration
-    )
+    expect(config.stageDurations.Approval).toEqBigNumber(expConfig.approvalStageDuration)
+    expect(config.stageDurations.Referendum).toEqBigNumber(expConfig.referendumStageDuration)
+    expect(config.stageDurations.Execution).toEqBigNumber(expConfig.executionStageDuration)
   })
 
   describe('Proposals', () => {
@@ -105,12 +100,12 @@ testWithGanache('Governance Wrapper', (web3) => {
       await timeTravel(expConfig.referendumStageDuration, web3)
     }
 
-    it.only('#propose', async () => {
+    it('#propose', async () => {
       await proposeFn(accounts[0])
 
       const proposalRecord = await governance.getProposalRecord(proposalID)
       expect(proposalRecord.metadata.proposer).toBe(accounts[0])
-      expect(proposalRecord.metadata.transactionCount).toBe(proposal.length)
+      expect(proposalRecord.metadata.transactionCount).toBe(proposal.transactions.length)
       expect(proposalRecord.proposal).toStrictEqual(proposal)
     })
 
@@ -181,7 +176,7 @@ testWithGanache('Governance Wrapper', (web3) => {
       [CeloContract.Escrow, '0x0000000000000000000000000000000000000006'],
     ]
 
-    let hotfix: Proposal
+    let hotfix: PTXOProposal
     beforeAll(() => {
       hotfix = registryRepointProposal(repoints, registry)
     })

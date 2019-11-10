@@ -1,15 +1,16 @@
 import BigNumber from 'bignumber.js'
 
+import { concurrentMap } from '@celo/utils/lib/async'
 import { zip } from '@celo/utils/lib/collections'
 
 import { Address } from '../base'
 import { Governance } from '../generated/types/Governance'
-import { Proposal, ProposalFactory } from '../governance/proposals'
 import {
   BaseWrapper,
   identity,
   NumberLike,
   parseBuffer,
+  parseBytes,
   parseNumber,
   proxyCall,
   proxySend,
@@ -21,12 +22,12 @@ import {
 } from './BaseWrapper'
 
 export enum ProposalStage {
-  None = "None",
-  Queued = "Queued",
-  Approval = "Approval",
-  Referendum = "Referendum",
-  Execution = "Execution",
-  Expiration = "Expiration",
+  None = 'None',
+  Queued = 'Queued',
+  Approval = 'Approval',
+  Referendum = 'Referendum',
+  Execution = 'Execution',
+  Expiration = 'Expiration',
 }
 
 export interface ProposalStageDurations {
@@ -56,6 +57,19 @@ export interface ProposalTransaction {
   data: Buffer
 }
 
+type ProposalParams = Parameters<Governance['methods']['propose']>
+export class Proposal {
+  constructor(public readonly transactions: ProposalTransaction[]) {}
+  get params(): ProposalParams {
+    return [
+      this.transactions.map((tx) => parseNumber(tx.value)),
+      this.transactions.map((tx) => tx.destination),
+      parseBytes(Buffer.concat(this.transactions.map((tx) => tx.data))),
+      this.transactions.map((tx) => tx.data.length),
+    ]
+  }
+}
+
 export interface ProposalRecord {
   stage: ProposalStage
   metadata: ProposalMetadata
@@ -70,10 +84,10 @@ export interface UpvoteRecord {
 }
 
 export enum VoteValue {
-  None = "None",
-  Abstain = "Abstain",
-  No = "No",
-  Yes = "Yes",
+  None = 'None',
+  Abstain = 'Abstain',
+  No = 'No',
+  Yes = 'Yes',
 }
 export interface Votes {
   [VoteValue.Yes]: BigNumber
@@ -87,8 +101,6 @@ export interface HotfixRecord {
   executed: boolean
   preparedEpoch: BigNumber
 }
-
-export type ProposalEncoded = Parameters<Governance['methods']['propose']>
 
 const ZERO_BN = new BigNumber(0)
 
@@ -206,20 +218,22 @@ export class GovernanceWrapper extends BaseWrapper<Governance> {
    * @param proposalID Governance proposal UUID
    */
   async getProposalRecord(proposalID: NumberLike): Promise<ProposalRecord> {
-    const stage = await this.getProposalStage(proposalID)
-
-    const upvotes = stage === ProposalStage.Queued ? await this.getUpvotes(proposalID) : ZERO_BN
-
-    const votes =
-      stage >= ProposalStage.Referendum && stage < ProposalStage.Expiration
-        ? await this.getVotes(proposalID)
-        : { [VoteValue.Yes]: ZERO_BN, [VoteValue.No]: ZERO_BN, [VoteValue.Abstain]: ZERO_BN }
-
     const metadata = await this.getProposalMetadata(proposalID)
     const txIndices = Array.from(Array(metadata.transactionCount).keys())
-    const proposal = await ProposalFactory.fromAsync(
-      txIndices.map((idx) => this.getProposalTransaction(proposalID, idx))
+    const transactions = await concurrentMap(1, txIndices, (idx) =>
+      this.getProposalTransaction(proposalID, idx)
     )
+    const proposal = new Proposal(transactions)
+
+    let upvotes = ZERO_BN
+    let votes = { [VoteValue.Yes]: ZERO_BN, [VoteValue.No]: ZERO_BN, [VoteValue.Abstain]: ZERO_BN }
+    
+    const stage = await this.getProposalStage(proposalID)
+    if (stage === ProposalStage.Queued) {
+      upvotes = await this.getUpvotes(proposalID)
+    } else if (stage >= ProposalStage.Referendum && stage < ProposalStage.Expiration) {
+      votes = await this.getVotes(proposalID)
+    }
 
     return {
       metadata,
@@ -243,7 +257,7 @@ export class GovernanceWrapper extends BaseWrapper<Governance> {
   propose = proxySend(
     this.kit,
     this.contract.methods.propose,
-    (proposal: ProposalTransaction[] | Proposal) => ProposalFactory.from(proposal).encoded
+    (proposal: Proposal) => proposal.params
   )
 
   /**
@@ -252,7 +266,7 @@ export class GovernanceWrapper extends BaseWrapper<Governance> {
    */
   proposalExists: (proposalID: NumberLike) => Promise<boolean> = proxyCall(
     this.contract.methods.proposalExists,
-    tupleParser(parseNumber),
+    tupleParser(parseNumber)
   )
 
   /**
@@ -518,6 +532,6 @@ export class GovernanceWrapper extends BaseWrapper<Governance> {
   executeHotfix = proxySend(
     this.kit,
     this.contract.methods.executeHotfix,
-    (hotfix: ProposalTransaction[] | Proposal) => ProposalFactory.from(hotfix).encoded
+    (hotfix: Proposal) => hotfix.params
   )
 }
