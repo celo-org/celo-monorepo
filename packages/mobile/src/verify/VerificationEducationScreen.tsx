@@ -10,17 +10,29 @@ import { withNamespaces, WithNamespaces } from 'react-i18next'
 import { ScrollView, StyleSheet, Text, View } from 'react-native'
 import Modal from 'react-native-modal'
 import SafeAreaView from 'react-native-safe-area-view'
+import { connect } from 'react-redux'
 import componentWithAnalytics from 'src/analytics/wrapper'
 import { Namespaces } from 'src/i18n'
+import { setHasSeenVerificationNux } from 'src/identity/actions'
 import { nuxNavigationOptions } from 'src/navigator/Headers'
 import { navigate } from 'src/navigator/NavigationService'
-import { Screens } from 'src/navigator/Screens'
+import { Screens, Stacks } from 'src/navigator/Screens'
+
+interface DispatchProps {
+  setHasSeenVerificationNux: typeof setHasSeenVerificationNux
+}
+
+type Props = WithNamespaces & DispatchProps
 
 interface State {
   isModalVisible: boolean
 }
 
-class VerificationEducationScreen extends React.Component<WithNamespaces, State> {
+const mapDispatchToProps = {
+  setHasSeenVerificationNux,
+}
+
+class VerificationEducationScreen extends React.Component<Props, State> {
   static navigationOptions = nuxNavigationOptions
 
   state: State = {
@@ -32,6 +44,7 @@ class VerificationEducationScreen extends React.Component<WithNamespaces, State>
   }
 
   onPressStart = () => {
+    this.props.setHasSeenVerificationNux(true)
     navigate(Screens.VerificationLoadingScreen)
   }
 
@@ -44,9 +57,8 @@ class VerificationEducationScreen extends React.Component<WithNamespaces, State>
   }
 
   onPressSkipConfirm = () => {
-    // TODO(Rossy) mark verificaiton as skipped so app doesn't come back to this screen
-    // navigateReset?
-    navigate(Screens.WalletHome)
+    this.props.setHasSeenVerificationNux(true)
+    navigate(Stacks.AppStack)
   }
 
   render() {
@@ -153,5 +165,8 @@ const styles = StyleSheet.create({
 })
 
 export default componentWithAnalytics(
-  withNamespaces(Namespaces.nuxVerification2)(VerificationEducationScreen)
+  connect<{}, DispatchProps>(
+    null,
+    mapDispatchToProps
+  )(withNamespaces(Namespaces.nuxVerification2)(VerificationEducationScreen))
 )
