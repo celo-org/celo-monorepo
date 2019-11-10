@@ -41,7 +41,6 @@ contract('Accounts', (accounts: string[]) => {
 
   const name = 'Account'
   const metadataURL = 'https://www.celo.org'
-  const publicKeysData = '0x02f2f48ee19680706196e2e339e5da3491186e0c4c5030670656b0e01611111111'
   const dataEncryptionKey = '0x02f2f48ee19680706196e2e339e5da3491186e0c4c5030670656b0e01611111111'
   const longDataEncryptionKey =
     '0x04f2f48ee19680706196e2e339e5da3491186e0c4c5030670656b0e01611111111' +
@@ -337,6 +336,8 @@ contract('Accounts', (accounts: string[]) => {
   // This block tests those deviations.
   describe('#authorizeValidatorSigner', async () => {
     const authorized = accounts[1]
+    // Arbitrary hex string as MockValidators does not verify this info.
+    const publicKeysData = '0x02f2f48ee19680706196e2e339e5da3491186e0c4c5030670656b0e01611111111'
     let sig
 
     beforeEach(async () => {

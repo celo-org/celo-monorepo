@@ -1,20 +1,20 @@
 pragma solidity ^0.5.3;
 
-import 'openzeppelin-solidity/contracts/math/Math.sol';
-import 'openzeppelin-solidity/contracts/math/SafeMath.sol';
-import 'openzeppelin-solidity/contracts/ownership/Ownable.sol';
-import 'openzeppelin-solidity/contracts/utils/ReentrancyGuard.sol';
-import 'solidity-bytes-utils/contracts/BytesLib.sol';
+import "openzeppelin-solidity/contracts/math/Math.sol";
+import "openzeppelin-solidity/contracts/math/SafeMath.sol";
+import "openzeppelin-solidity/contracts/ownership/Ownable.sol";
+import "openzeppelin-solidity/contracts/utils/ReentrancyGuard.sol";
+import "solidity-bytes-utils/contracts/BytesLib.sol";
 
-import './interfaces/IValidators.sol';
+import "./interfaces/IValidators.sol";
 
-import '../identity/interfaces/IRandom.sol';
+import "../identity/interfaces/IRandom.sol";
 
-import '../common/Initializable.sol';
-import '../common/FixidityLib.sol';
-import '../common/linkedlists/AddressLinkedList.sol';
-import '../common/UsingRegistry.sol';
-import '../common/UsingPrecompiles.sol';
+import "../common/Initializable.sol";
+import "../common/FixidityLib.sol";
+import "../common/linkedlists/AddressLinkedList.sol";
+import "../common/UsingRegistry.sol";
+import "../common/UsingPrecompiles.sol";
 
 /**
  * @title A contract for registering and electing Validator Groups and Validators.
@@ -271,7 +271,7 @@ contract Validators is
     require(lockedGoldBalance >= validatorLockedGoldRequirements.value);
     Validator storage validator = validators[account];
     address signer = getAccounts().getValidatorSigner(account);
-		_updatePublicKeysData(validator, signer, publicKeysData);
+    _updatePublicKeysData(validator, signer, publicKeysData);
     registeredValidators.push(account);
     updateMembershipHistory(account, address(0));
     emit ValidatorRegistered(account, publicKeysData);
@@ -390,9 +390,9 @@ contract Validators is
     // Both the validator and the group must maintain the minimum locked gold balance in order to
     // receive epoch payments.
     if (meetsAccountLockedGoldRequirements(account) && meetsAccountLockedGoldRequirements(group)) {
-      FixidityLib.Fraction memory totalPayment = FixidityLib
-        .newFixed(maxPayment)
-        .multiply(validators[account].score);
+      FixidityLib.Fraction memory totalPayment = FixidityLib.newFixed(maxPayment).multiply(
+        validators[account].score
+      );
       uint256 groupPayment = totalPayment.multiply(groups[group].commission).fromFixed();
       uint256 validatorPayment = totalPayment.fromFixed().sub(groupPayment);
       getStableToken().mint(group, groupPayment);
@@ -465,7 +465,24 @@ contract Validators is
     return true;
   }
 
-  function updatePublicKeysData(address account, address signer, bytes calldata publicKeysData) external onlyRegisteredContract(ACCOUNTS_REGISTRY_ID) returns (bool) {
+  /**
+   * @notice Updates a validator's public keys data.
+   * @param validator The validator whose public keys data should be updated.
+   * @param signer The address used to sign consensus message. Coupled to the BLS key.
+   * @param publicKeysData Comprised of three tightly-packed elements:
+   *    - publicKey - The public key that the validator is using for consensus, should match
+   *      `signer`. 64 bytes.
+   *    - blsPublicKey - The BLS public key that the validator is using for consensus, should pass
+   *      proof of possession. 48 bytes.
+   *    - blsPoP - The BLS public key proof of possession. 96 bytes.
+   * @dev Called by the registered `Accounts` contract when a validator signer is authorized.
+   * @return True upon success.
+   */
+  function updatePublicKeysData(address account, address signer, bytes calldata publicKeysData)
+    external
+    onlyRegisteredContract(ACCOUNTS_REGISTRY_ID)
+    returns (bool)
+  {
     require(isValidator(account));
     Validator storage validator = validators[account];
     _updatePublicKeysData(validator, signer, publicKeysData);
@@ -485,10 +502,11 @@ contract Validators is
    *    - blsPoP - The BLS public key proof of possession. 96 bytes.
    * @return True upon success.
    */
-  function _updatePublicKeysData(Validator storage validator, address signer, bytes memory publicKeysData)
-    private
-    returns (bool)
-  {
+  function _updatePublicKeysData(
+    Validator storage validator,
+    address signer,
+    bytes memory publicKeysData
+  ) private returns (bool) {
     // secp256k1 public key + BLS public key + BLS proof of possession
     require(publicKeysData.length == (64 + 48 + 96));
     // Use the proof of possession bytes
@@ -632,7 +650,7 @@ contract Validators is
   {
     require(isValidatorGroup(group) && isValidator(validator));
     ValidatorGroup storage _group = groups[group];
-    require(_group.members.numElements < maxGroupSize, 'group would exceed maximum size');
+    require(_group.members.numElements < maxGroupSize, "group would exceed maximum size");
     require(validators[validator].affiliation == group && !_group.members.contains(validator));
     uint256 numMembers = _group.members.numElements.add(1);
     require(meetsAccountLockedGoldRequirements(group));
@@ -655,7 +673,7 @@ contract Validators is
    */
   function removeMember(address validator) external nonReentrant returns (bool) {
     address account = getAccounts().activeValidatorSignerToAccount(msg.sender);
-    require(isValidatorGroup(account) && isValidator(validator), 'is not group and validator');
+    require(isValidatorGroup(account) && isValidator(validator), "is not group and validator");
     return _removeMember(account, validator);
   }
 
@@ -989,7 +1007,7 @@ contract Validators is
     } else if (size < sizeHistory.length) {
       sizeHistory[size] = now;
     } else {
-      require(false, 'Unable to update size history');
+      require(false, "Unable to update size history");
     }
   }
 

@@ -6,7 +6,6 @@ import "../interfaces/IValidators.sol";
  * @title Holds a list of addresses of validators
  */
 contract MockValidators is IValidators {
-
   mapping(address => bool) public isValidator;
   mapping(address => uint256) private numGroupMembers;
   mapping(address => uint256) private lockedGoldRequirements;
@@ -15,7 +14,10 @@ contract MockValidators is IValidators {
   uint256 private numRegisteredValidators;
   mapping(address => bytes) public publicKeysData;
 
-  function updatePublicKeysData(address account, address, bytes calldata data) external returns (bool) {
+  function updatePublicKeysData(address account, address, bytes calldata data)
+    external
+    returns (bool)
+  {
     require(isValidator[account]);
     publicKeysData[account] = data;
     return true;
