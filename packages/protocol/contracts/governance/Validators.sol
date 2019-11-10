@@ -467,7 +467,7 @@ contract Validators is
 
   /**
    * @notice Updates a validator's public keys data.
-   * @param validator The validator whose public keys data should be updated.
+   * @param account The validator whose public keys data should be updated.
    * @param signer The address used to sign consensus message. Coupled to the BLS key.
    * @param publicKeysData Comprised of three tightly-packed elements:
    *    - publicKey - The public key that the validator is using for consensus, should match
