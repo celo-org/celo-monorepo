@@ -9,7 +9,7 @@ import * as React from 'react'
 import { StyleSheet, Text, TextStyle } from 'react-native'
 
 type Props = TouchableProps & {
-  style?: TextStyle | TextStyle[]
+  style?: TextStyle | Array<TextStyle | undefined | false>
   testID?: string
 }
 

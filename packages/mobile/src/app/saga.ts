@@ -39,7 +39,7 @@ interface PersistedStateProps {
   pincodeType: PincodeType
   redeemComplete: boolean
   account: string | null
-  startedVerification: boolean
+  hasSeenVerificationNux: boolean
   askedContactsPermission: boolean
 }
 
@@ -53,7 +53,7 @@ const mapStateToProps = (state: PersistedRootState): PersistedStateProps | null 
     pincodeType: state.account.pincodeType,
     redeemComplete: state.invite.redeemComplete,
     account: state.web3.account,
-    startedVerification: state.identity.startedVerification,
+    hasSeenVerificationNux: state.identity.hasSeenVerificationNux,
     askedContactsPermission: state.identity.askedContactsPermission,
   }
 }
@@ -85,7 +85,7 @@ export function* navigateToProperScreen() {
 
   const deepLink = yield call(Linking.getInitialURL)
   const inSync = yield call(clockInSync)
-  const mappedState = yield select(mapStateToProps)
+  const mappedState: PersistedStateProps = yield select(mapStateToProps)
 
   if (!mappedState) {
     navigate(Stacks.NuxStack)
@@ -98,7 +98,7 @@ export function* navigateToProperScreen() {
     pincodeType,
     redeemComplete,
     account,
-    startedVerification,
+    hasSeenVerificationNux,
     askedContactsPermission,
   } = mappedState
 
@@ -123,7 +123,7 @@ export function* navigateToProperScreen() {
     navigate(Screens.EnterInviteCode)
   } else if (!askedContactsPermission) {
     navigate(Screens.ImportContacts)
-  } else if (!startedVerification) {
+  } else if (!hasSeenVerificationNux) {
     navigate(Screens.VerificationEducationScreen)
   } else {
     navigate(Stacks.AppStack)
