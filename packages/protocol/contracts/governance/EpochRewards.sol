@@ -12,12 +12,11 @@ import "../common/UsingPrecompiles.sol";
  * @title Contract for calculating epoch rewards.
  */
 contract EpochRewards is Ownable, Initializable, UsingPrecompiles, UsingRegistry {
-
   using FixidityLib for FixidityLib.Fraction;
   using SafeMath for uint256;
 
-  uint256 constant GENESIS_GOLD_SUPPLY = 600000000000000000000000000; // 600 million Gold
-  uint256 constant GOLD_SUPPLY_CAP = 1000000000000000000000000000; // 1 billion Gold
+  uint256 constant GENESIS_GOLD_SUPPLY = 600000000 ether; // 600 million Gold
+  uint256 constant GOLD_SUPPLY_CAP = 1000000000 ether; // 1 billion Gold
   uint256 constant YEARS_LINEAR = 15;
   uint256 constant SECONDS_LINEAR = YEARS_LINEAR * 365 * 1 days;
 
@@ -74,10 +73,10 @@ contract EpochRewards is Ownable, Initializable, UsingPrecompiles, UsingRegistry
    * @param targetVotingYieldAdjustmentFactor The target block reward adjustment factor for voters.
    * @param rewardsMultiplierMax The max multiplier on target epoch rewards.
    * @param rewardsMultiplierUnderspendAdjustmentFactor Adjusts the multiplier on target epoch
-   *   rewards when the protocol is running behind the target gold supply.
+   *   rewards when the protocol is running behind the target Gold supply.
    * @param rewardsMultiplierOverspendAdjustmentFactor Adjusts the multiplier on target epoch
-   *   rewards when the protocol is running ahead of the target gold supply.
-   * @param _targetVotingGoldFraction The percentage of floating gold voting to target.
+   *   rewards when the protocol is running ahead of the target Gold supply.
+   * @param _targetVotingGoldFraction The percentage of floating Gold voting to target.
    * @param _targetValidatorEpochPayment The target validator epoch payment.
    * @dev Should be called only once.
    */
@@ -91,10 +90,7 @@ contract EpochRewards is Ownable, Initializable, UsingPrecompiles, UsingRegistry
     uint256 rewardsMultiplierOverspendAdjustmentFactor,
     uint256 _targetVotingGoldFraction,
     uint256 _targetValidatorEpochPayment
-  )
-    external
-    initializer
-  {
+  ) external initializer {
     _transferOwnership(msg.sender);
     setRegistry(registryAddress);
     setTargetVotingYieldParameters(targetVotingYieldMax, targetVotingYieldAdjustmentFactor);
@@ -132,8 +128,8 @@ contract EpochRewards is Ownable, Initializable, UsingPrecompiles, UsingRegistry
   }
 
   /**
-   * @notice Sets the target voting gold fraction.
-   * @param value The percentage of floating gold voting to target.
+   * @notice Sets the target voting Gold fraction.
+   * @param value The percentage of floating Gold voting to target.
    * @return True upon success.
    */
   function setTargetVotingGoldFraction(uint256 value) public onlyOwner returns (bool) {
@@ -144,8 +140,8 @@ contract EpochRewards is Ownable, Initializable, UsingPrecompiles, UsingRegistry
   }
 
   /**
-   * @notice Returns the target voting gold fraction.
-   * @return The percentage of floating gold voting to target.
+   * @notice Returns the target voting Gold fraction.
+   * @return The percentage of floating Gold voting to target.
    */
   function getTargetVotingGoldFraction() external view returns (uint256) {
     return targetVotingGoldFraction.unwrap();
@@ -167,24 +163,20 @@ contract EpochRewards is Ownable, Initializable, UsingPrecompiles, UsingRegistry
    * @notice Sets the rewards multiplier parameters.
    * @param max The max multiplier on target epoch rewards.
    * @param underspendAdjustmentFactor Adjusts the multiplier on target epoch rewards when the
-   *   protocol is running behind the target gold supply.
+   *   protocol is running behind the target Gold supply.
    * @param overspendAdjustmentFactor Adjusts the multiplier on target epoch rewards when the
-   *   protocol is running ahead of the target gold supply.
+   *   protocol is running ahead of the target Gold supply.
    * @return True upon success.
    */
   function setRewardsMultiplierParameters(
     uint256 max,
     uint256 underspendAdjustmentFactor,
     uint256 overspendAdjustmentFactor
-  )
-    public
-    onlyOwner
-    returns (bool)
-  {
+  ) public onlyOwner returns (bool) {
     require(
       max != rewardsMultiplierParams.max.unwrap() ||
-      overspendAdjustmentFactor != rewardsMultiplierParams.adjustmentFactors.overspend.unwrap() ||
-      underspendAdjustmentFactor != rewardsMultiplierParams.adjustmentFactors.underspend.unwrap()
+        overspendAdjustmentFactor != rewardsMultiplierParams.adjustmentFactors.overspend.unwrap() ||
+        underspendAdjustmentFactor != rewardsMultiplierParams.adjustmentFactors.underspend.unwrap()
     );
     rewardsMultiplierParams = RewardsMultiplierParameters(
       RewardsMultiplierAdjustmentFactors(
@@ -193,11 +185,7 @@ contract EpochRewards is Ownable, Initializable, UsingPrecompiles, UsingRegistry
       ),
       FixidityLib.wrap(max)
     );
-    emit RewardsMultiplierParametersSet(
-      max,
-      underspendAdjustmentFactor,
-      overspendAdjustmentFactor
-    );
+    emit RewardsMultiplierParametersSet(max, underspendAdjustmentFactor, overspendAdjustmentFactor);
     return true;
   }
 
@@ -207,17 +195,14 @@ contract EpochRewards is Ownable, Initializable, UsingPrecompiles, UsingRegistry
    * @param adjustmentFactor The target block reward adjustment factor for voters.
    * @return True upon success.
    */
-  function setTargetVotingYieldParameters(
-    uint256 max,
-    uint256 adjustmentFactor
-  )
+  function setTargetVotingYieldParameters(uint256 max, uint256 adjustmentFactor)
     public
     onlyOwner
     returns (bool)
   {
     require(
       max != targetVotingYieldParams.max.unwrap() ||
-      adjustmentFactor != targetVotingYieldParams.adjustmentFactor.unwrap()
+        adjustmentFactor != targetVotingYieldParams.adjustmentFactor.unwrap()
     );
     targetVotingYieldParams.max = FixidityLib.wrap(max);
     targetVotingYieldParams.adjustmentFactor = FixidityLib.wrap(adjustmentFactor);
@@ -230,8 +215,8 @@ contract EpochRewards is Ownable, Initializable, UsingPrecompiles, UsingRegistry
   }
 
   /**
-   * @notice Returns the target gold supply according to the epoch rewards target schedule.
-   * @return The target gold supply according to the epoch rewards target schedule.
+   * @notice Returns the target Gold supply according to the epoch rewards target schedule.
+   * @return The target Gold supply according to the epoch rewards target schedule.
    */
   function getTargetGoldTotalSupply() public view returns (uint256) {
     uint256 timeSinceInitialization = now.sub(startTime);
@@ -248,13 +233,11 @@ contract EpochRewards is Ownable, Initializable, UsingPrecompiles, UsingRegistry
   }
 
   /**
-   * @notice Returns the rewards multiplier based on the current and target gold supplies.
-   * @param targetGoldSupplyIncrease The target increase in current gold supply.
-   * @return The rewards multiplier based on the current and target gold supplies.
+   * @notice Returns the rewards multiplier based on the current and target Gold supplies.
+   * @param targetGoldSupplyIncrease The target increase in current Gold supply.
+   * @return The rewards multiplier based on the current and target Gold supplies.
    */
-  function _getRewardsMultiplier(
-    uint256 targetGoldSupplyIncrease
-  )
+  function _getRewardsMultiplier(uint256 targetGoldSupplyIncrease)
     internal
     view
     returns (FixidityLib.Fraction memory)
@@ -263,23 +246,24 @@ contract EpochRewards is Ownable, Initializable, UsingPrecompiles, UsingRegistry
     uint256 totalSupply = getGoldToken().totalSupply();
     uint256 remainingSupply = GOLD_SUPPLY_CAP.sub(totalSupply.add(targetGoldSupplyIncrease));
     uint256 targetRemainingSupply = GOLD_SUPPLY_CAP.sub(targetSupply);
-    FixidityLib.Fraction memory ratio = FixidityLib.newFixed(remainingSupply).divide(
-      FixidityLib.newFixed(targetRemainingSupply)
-    );
-    if (ratio.gt(FixidityLib.fixed1())) {
-      FixidityLib.Fraction memory delta = ratio.subtract(FixidityLib.fixed1()).multiply(
-        rewardsMultiplierParams.adjustmentFactors.underspend
-      );
-      FixidityLib.Fraction memory r = FixidityLib.fixed1().add(delta);
-      if (r.lt(rewardsMultiplierParams.max)) {
-        return r;
+    FixidityLib.Fraction memory remainingToTargetRatio = FixidityLib
+      .newFixed(remainingSupply)
+      .divide(FixidityLib.newFixed(targetRemainingSupply));
+    if (remainingToTargetRatio.gt(FixidityLib.fixed1())) {
+      FixidityLib.Fraction memory delta = remainingToTargetRatio
+        .subtract(FixidityLib.fixed1())
+        .multiply(rewardsMultiplierParams.adjustmentFactors.underspend);
+      FixidityLib.Fraction memory multiplier = FixidityLib.fixed1().add(delta);
+      if (multiplier.lt(rewardsMultiplierParams.max)) {
+        return multiplier;
       } else {
         return rewardsMultiplierParams.max;
       }
-    } else if (ratio.lt(FixidityLib.fixed1())) {
-      FixidityLib.Fraction memory delta = FixidityLib.fixed1().subtract(ratio).multiply(
-        rewardsMultiplierParams.adjustmentFactors.overspend
-      );
+    } else if (remainingToTargetRatio.lt(FixidityLib.fixed1())) {
+      FixidityLib.Fraction memory delta = FixidityLib
+        .fixed1()
+        .subtract(remainingToTargetRatio)
+        .multiply(rewardsMultiplierParams.adjustmentFactors.overspend);
       if (delta.lt(FixidityLib.fixed1())) {
         return FixidityLib.fixed1().subtract(delta);
       } else {
@@ -291,8 +275,8 @@ contract EpochRewards is Ownable, Initializable, UsingPrecompiles, UsingRegistry
   }
 
   /**
-   * @notice Returns the rewards multiplier based on the current and target gold supplies.
-   * @return The rewards multiplier based on the current and target gold supplies.
+   * @notice Returns the rewards multiplier based on the current and target Gold supplies.
+   * @return The rewards multiplier based on the current and target Gold supplies.
    */
   function getRewardsMultiplier() external view returns (uint256) {
     uint256 targetEpochRewards = getTargetEpochRewards();
@@ -306,26 +290,29 @@ contract EpochRewards is Ownable, Initializable, UsingPrecompiles, UsingRegistry
    * @return the total target epoch rewards for voters.
    */
   function getTargetEpochRewards() public view returns (uint256) {
-    return FixidityLib.newFixed(getElection().getActiveVotes()).multiply(
-      targetVotingYieldParams.target
-    ).fromFixed();
+    return
+      FixidityLib
+        .newFixed(getElection().getActiveVotes())
+        .multiply(targetVotingYieldParams.target)
+        .fromFixed();
   }
 
   /**
-   * @notice Returns the total target epoch payments to validators, converted to gold.
-   * @return The total target epoch payments to validators, converted to gold.
+   * @notice Returns the total target epoch payments to validators, converted to Gold.
+   * @return The total target epoch payments to validators, converted to Gold.
    */
   function getTargetTotalEpochPaymentsInGold() public view returns (uint256) {
     address stableTokenAddress = registry.getAddressForOrDie(STABLE_TOKEN_REGISTRY_ID);
     (uint256 numerator, uint256 denominator) = getSortedOracles().medianRate(stableTokenAddress);
-    return numberValidatorsInCurrentSet().mul(targetValidatorEpochPayment).mul(denominator).div(
-      numerator
-    );
+    return
+      numberValidatorsInCurrentSet().mul(targetValidatorEpochPayment).mul(denominator).div(
+        numerator
+      );
   }
 
   /**
-   * @notice Returns the fraction of floating gold being used for voting in validator elections.
-   * @return The fraction of floating gold being used for voting in validator elections.
+   * @notice Returns the fraction of floating Gold being used for voting in validator elections.
+   * @return The fraction of floating Gold being used for voting in validator elections.
    */
   function getVotingGoldFraction() public view returns (uint256) {
     // TODO(asa): Ignore custodial accounts.
@@ -338,7 +325,7 @@ contract EpochRewards is Ownable, Initializable, UsingPrecompiles, UsingRegistry
 
   /**
    * @notice Updates the target voting yield based on the difference between the target and current
-   *   voting gold fraction.
+   *   voting Gold fraction.
    */
   function _updateTargetVotingYield() internal {
     FixidityLib.Fraction memory votingGoldFraction = FixidityLib.wrap(getVotingGoldFraction());
@@ -372,7 +359,7 @@ contract EpochRewards is Ownable, Initializable, UsingPrecompiles, UsingRegistry
 
   /**
    * @notice Updates the target voting yield based on the difference between the target and current
-   *   voting gold fraction.
+   *   voting Gold fraction.
    * @dev Only called directly by the protocol.
    */
   function updateTargetVotingYield() external {
@@ -388,9 +375,7 @@ contract EpochRewards is Ownable, Initializable, UsingPrecompiles, UsingRegistry
     uint256 targetEpochRewards = getTargetEpochRewards();
     uint256 targetTotalEpochPaymentsInGold = getTargetTotalEpochPaymentsInGold();
     uint256 targetGoldSupplyIncrease = targetEpochRewards.add(targetTotalEpochPaymentsInGold);
-    FixidityLib.Fraction memory rewardsMultiplier = _getRewardsMultiplier(
-      targetGoldSupplyIncrease
-    );
+    FixidityLib.Fraction memory rewardsMultiplier = _getRewardsMultiplier(targetGoldSupplyIncrease);
     return (
       FixidityLib.newFixed(targetValidatorEpochPayment).multiply(rewardsMultiplier).fromFixed(),
       FixidityLib.newFixed(targetEpochRewards).multiply(rewardsMultiplier).fromFixed()

@@ -54,12 +54,18 @@ contract('EpochRewards', (accounts: string[]) => {
     max: toFixed(new BigNumber(1 / 5)),
     adjustmentFactor: toFixed(new BigNumber(1 / 365)),
   }
-  const rewardsMultiplierAdjustments = {
-    underspend: toFixed(new BigNumber(1 / 2)),
-    overspend: toFixed(new BigNumber(5)),
+  const rewardsMultiplier = {
+    max: toFixed(new BigNumber(2)),
+    adjustments: {
+      underspend: toFixed(new BigNumber(1 / 2)),
+      overspend: toFixed(new BigNumber(5)),
+    },
   }
   const targetVotingGoldFraction = toFixed(new BigNumber(2 / 3))
-  const maxValidatorEpochPayment = new BigNumber(10000000000000)
+  const targetValidatorEpochPayment = new BigNumber(10000000000000)
+  const exchangeRate = 7
+  const randomAddress = web3.utils.randomHex(20)
+  const sortedOraclesDenominator = new BigNumber('0x10000000000000000')
   beforeEach(async () => {
     epochRewards = await EpochRewards.new()
     mockElection = await MockElection.new()
@@ -69,15 +75,22 @@ contract('EpochRewards', (accounts: string[]) => {
     await registry.setAddressFor(CeloContractName.Election, mockElection.address)
     await registry.setAddressFor(CeloContractName.GoldToken, mockGoldToken.address)
     await registry.setAddressFor(CeloContractName.SortedOracles, mockSortedOracles.address)
+    await registry.setAddressFor(CeloContractName.StableToken, randomAddress)
+    await mockSortedOracles.setMedianRate(
+      randomAddress,
+      sortedOraclesDenominator.times(exchangeRate)
+    )
+
     await epochRewards.initialize(
       registry.address,
       targetVotingYieldParams.initial,
       targetVotingYieldParams.max,
       targetVotingYieldParams.adjustmentFactor,
-      rewardsMultiplierAdjustments.underspend,
-      rewardsMultiplierAdjustments.overspend,
+      rewardsMultiplier.max,
+      rewardsMultiplier.adjustments.underspend,
+      rewardsMultiplier.adjustments.overspend,
       targetVotingGoldFraction,
-      maxValidatorEpochPayment
+      targetValidatorEpochPayment
     )
   })
 
@@ -87,8 +100,8 @@ contract('EpochRewards', (accounts: string[]) => {
       assert.equal(owner, accounts[0])
     })
 
-    it('should have set the max validator epoch payment', async () => {
-      assertEqualBN(await epochRewards.maxValidatorEpochPayment(), maxValidatorEpochPayment)
+    it('should have set the target validator epoch payment', async () => {
+      assertEqualBN(await epochRewards.targetValidatorEpochPayment(), targetValidatorEpochPayment)
     })
 
     it('should have set the target voting yield parameters', async () => {
@@ -98,10 +111,11 @@ contract('EpochRewards', (accounts: string[]) => {
       assertEqualBN(adjustmentFactor, targetVotingYieldParams.adjustmentFactor)
     })
 
-    it('should have set the rewards multiplier adjustment factors', async () => {
-      const [underspend, overspend] = await epochRewards.getRewardsMultiplierAdjustmentFactors()
-      assertEqualBN(underspend, rewardsMultiplierAdjustments.underspend)
-      assertEqualBN(overspend, rewardsMultiplierAdjustments.overspend)
+    it('should have set the rewards multiplier parameters', async () => {
+      const [max, underspend, overspend] = await epochRewards.getRewardsMultiplierParameters()
+      assertEqualBN(max, rewardsMultiplier.max)
+      assertEqualBN(underspend, rewardsMultiplier.adjustments.underspend)
+      assertEqualBN(overspend, rewardsMultiplier.adjustments.overspend)
     })
 
     it('should not be callable again', async () => {
@@ -111,10 +125,11 @@ contract('EpochRewards', (accounts: string[]) => {
           targetVotingYieldParams.initial,
           targetVotingYieldParams.max,
           targetVotingYieldParams.adjustmentFactor,
-          rewardsMultiplierAdjustments.underspend,
-          rewardsMultiplierAdjustments.overspend,
+          rewardsMultiplier.max,
+          rewardsMultiplier.adjustments.underspend,
+          rewardsMultiplier.adjustments.overspend,
           targetVotingGoldFraction,
-          maxValidatorEpochPayment
+          targetValidatorEpochPayment
         )
       )
     })
@@ -165,26 +180,26 @@ contract('EpochRewards', (accounts: string[]) => {
     })
   })
 
-  describe('#setMaxValidatorEpochPayment()', () => {
+  describe('#setTargetValidatorEpochPayment()', () => {
     describe('when the payment is different', () => {
-      const newPayment = maxValidatorEpochPayment.plus(1)
+      const newPayment = targetValidatorEpochPayment.plus(1)
 
       describe('when called by the owner', () => {
         let resp: any
 
         beforeEach(async () => {
-          resp = await epochRewards.setMaxValidatorEpochPayment(newPayment)
+          resp = await epochRewards.setTargetValidatorEpochPayment(newPayment)
         })
 
-        it('should set the max validator epoch payment', async () => {
-          assertEqualBN(await epochRewards.maxValidatorEpochPayment(), newPayment)
+        it('should set the target validator epoch payment', async () => {
+          assertEqualBN(await epochRewards.targetValidatorEpochPayment(), newPayment)
         })
 
-        it('should emit the MaxValidatorEpochPaymentSet event', async () => {
+        it('should emit the TargetValidatorEpochPaymentSet event', async () => {
           assert.equal(resp.logs.length, 1)
           const log = resp.logs[0]
           assertContainSubset(log, {
-            event: 'MaxValidatorEpochPaymentSet',
+            event: 'TargetValidatorEpochPaymentSet',
             args: {
               payment: newPayment,
             },
@@ -194,7 +209,7 @@ contract('EpochRewards', (accounts: string[]) => {
         describe('when called by a non-owner', () => {
           it('should revert', async () => {
             await assertRevert(
-              epochRewards.setMaxValidatorEpochPayment(newPayment, {
+              epochRewards.setTargetValidatorEpochPayment(newPayment, {
                 from: nonOwner,
               })
             )
@@ -204,43 +219,49 @@ contract('EpochRewards', (accounts: string[]) => {
 
       describe('when the payment is the same', () => {
         it('should revert', async () => {
-          await assertRevert(epochRewards.setMaxValidatorEpochPayment(maxValidatorEpochPayment))
+          await assertRevert(
+            epochRewards.setTargetValidatorEpochPayment(targetValidatorEpochPayment)
+          )
         })
       })
     })
   })
 
-  describe('#setRewardsMultiplierAdjustmentFactors()', () => {
-    describe('when the factors are different', () => {
-      const newFactors = {
-        underspend: rewardsMultiplierAdjustments.underspend.plus(1),
-        overspend: rewardsMultiplierAdjustments.overspend.plus(1),
+  describe('#setRewardsMultiplierParameters()', () => {
+    describe('when one of the parameters is different', () => {
+      const newParams = {
+        max: rewardsMultiplier.max,
+        underspend: rewardsMultiplier.adjustments.underspend.plus(1),
+        overspend: rewardsMultiplier.adjustments.overspend,
       }
 
       describe('when called by the owner', () => {
         let resp: any
 
         beforeEach(async () => {
-          resp = await epochRewards.setRewardsMultiplierAdjustmentFactors(
-            newFactors.underspend,
-            newFactors.overspend
+          resp = await epochRewards.setRewardsMultiplierParameters(
+            newParams.max,
+            newParams.underspend,
+            newParams.overspend
           )
         })
 
-        it('should set the new rewards multiplier adjustment factors', async () => {
-          const [underspend, overspend] = await epochRewards.getRewardsMultiplierAdjustmentFactors()
-          assertEqualBN(underspend, newFactors.underspend)
-          assertEqualBN(overspend, newFactors.overspend)
+        it('should set the new rewards multiplier adjustment params', async () => {
+          const [max, underspend, overspend] = await epochRewards.getRewardsMultiplierParameters()
+          assertEqualBN(max, newParams.max)
+          assertEqualBN(underspend, newParams.underspend)
+          assertEqualBN(overspend, newParams.overspend)
         })
 
-        it('should emit the RewardsMultiplierAdjustmentFactorsSet event', async () => {
+        it('should emit the RewardsMultiplierParametersSet event', async () => {
           assert.equal(resp.logs.length, 1)
           const log = resp.logs[0]
           assertContainSubset(log, {
-            event: 'RewardsMultiplierAdjustmentFactorsSet',
+            event: 'RewardsMultiplierParametersSet',
             args: {
-              underspend: newFactors.underspend,
-              overspend: newFactors.overspend,
+              max: newParams.max,
+              underspendAdjustmentFactor: newParams.underspend,
+              overspendAdjustmentFactor: newParams.overspend,
             },
           })
         })
@@ -248,9 +269,10 @@ contract('EpochRewards', (accounts: string[]) => {
         describe('when called by a non-owner', () => {
           it('should revert', async () => {
             await assertRevert(
-              epochRewards.setRewardsMultiplierAdjustmentFactors(
-                newFactors.underspend,
-                newFactors.overspend,
+              epochRewards.setRewardsMultiplierParameters(
+                newParams.max,
+                newParams.underspend,
+                newParams.overspend,
                 {
                   from: nonOwner,
                 }
@@ -263,9 +285,10 @@ contract('EpochRewards', (accounts: string[]) => {
       describe('when the parameters are the same', () => {
         it('should revert', async () => {
           await assertRevert(
-            epochRewards.setRewardsMultiplierAdjustmentFactors(
-              rewardsMultiplierAdjustments.underspend,
-              rewardsMultiplierAdjustments.overspend
+            epochRewards.setRewardsMultiplierParameters(
+              rewardsMultiplier.max,
+              rewardsMultiplier.adjustments.underspend,
+              rewardsMultiplier.adjustments.overspend
             )
           )
         })
@@ -357,24 +380,12 @@ contract('EpochRewards', (accounts: string[]) => {
     })
   })
 
-  describe.only('#getTargetTotalEpochPaymentsInGold()', () => {
+  describe('#getTargetTotalEpochPaymentsInGold()', () => {
     describe('when a StableToken exchange rate is set', () => {
-      // 7 StableToken to one Celo Gold
-      const exchangeRate = 7
-      const sortedOraclesDenominator = new BigNumber('0x10000000000000000')
-      const randomAddress = web3.utils.randomHex(20)
       // Hard coded in EpochRewardsTest.sol
       const numValidators = 100
-      beforeEach(async () => {
-        await registry.setAddressFor(CeloContractName.StableToken, randomAddress)
-        await mockSortedOracles.setMedianRate(
-          randomAddress,
-          sortedOraclesDenominator.times(exchangeRate)
-        )
-      })
-
       it('should return the number of validators times the max payment divided by the exchange rate', async () => {
-        const expected = maxValidatorEpochPayment
+        const expected = targetValidatorEpochPayment
           .times(numValidators)
           .div(exchangeRate)
           .integerValue(BigNumber.ROUND_FLOOR)
@@ -383,13 +394,17 @@ contract('EpochRewards', (accounts: string[]) => {
     })
   })
 
-  describe.only('#getRewardsMultiplier()', () => {
+  describe('#getRewardsMultiplier()', () => {
     const timeDelta = YEAR.times(10)
     const expectedTargetTotalSupply = getExpectedTargetTotalSupply(timeDelta)
     const expectedTargetRemainingSupply = SUPPLY_CAP.minus(expectedTargetTotalSupply)
-    const targetEpochReward = new BigNumber(120397694238746)
+    let targetEpochReward: BigNumber
     beforeEach(async () => {
       await timeTravel(timeDelta.toNumber(), web3)
+      targetEpochReward = await epochRewards.getTargetEpochRewards()
+      targetEpochReward = targetEpochReward.plus(
+        await epochRewards.getTargetTotalEpochPaymentsInGold()
+      )
     })
 
     describe('when the target supply is equal to the actual supply after rewards', () => {
@@ -398,7 +413,7 @@ contract('EpochRewards', (accounts: string[]) => {
       })
 
       it('should return one', async () => {
-        assertEqualBN(await epochRewards.getRewardsMultiplier(targetEpochReward), toFixed(1))
+        assertEqualBN(await epochRewards.getRewardsMultiplier(), toFixed(1))
       })
     })
 
@@ -412,12 +427,12 @@ contract('EpochRewards', (accounts: string[]) => {
       })
 
       it('should return one plus 10% times the underspend adjustment', async () => {
-        const actual = fromFixed(await epochRewards.getRewardsMultiplier(targetEpochReward))
+        const actual = fromFixed(await epochRewards.getRewardsMultiplier())
         const expected = new BigNumber(1).plus(
-          fromFixed(rewardsMultiplierAdjustments.underspend).times(0.1)
+          fromFixed(rewardsMultiplier.adjustments.underspend).times(0.1)
         )
-        // Assert equal to 9 decimal places due to fixidity imprecision.
-        assert.equal(expected.dp(9).toFixed(), actual.dp(9).toFixed())
+        // Assert equal to 7 decimal places due to fixidity imprecision.
+        assert.equal(expected.dp(7).toFixed(), actual.dp(7).toFixed())
       })
     })
 
@@ -431,18 +446,19 @@ contract('EpochRewards', (accounts: string[]) => {
       })
 
       it('should return one minus 10% times the underspend adjustment', async () => {
-        const actual = fromFixed(await epochRewards.getRewardsMultiplier(targetEpochReward))
+        const actual = fromFixed(await epochRewards.getRewardsMultiplier())
         const expected = new BigNumber(1).minus(
-          fromFixed(rewardsMultiplierAdjustments.overspend).times(0.1)
+          fromFixed(rewardsMultiplier.adjustments.overspend).times(0.1)
         )
-        // Assert equal to 9 decimal places due to fixidity imprecision.
-        assert.equal(expected.dp(9).toFixed(), actual.dp(9).toFixed())
+        // Assert equal to 7 decimal places due to fixidity imprecision.
+        assert.equal(expected.dp(7).toFixed(), actual.dp(7).toFixed())
       })
     })
   })
 
-  describe.only('#updateTargetVotingYield()', () => {
+  describe('#updateTargetVotingYield()', () => {
     const randomAddress = web3.utils.randomHex(20)
+    // Arbitrary numbers
     const totalSupply = new BigNumber(129762987346298761037469283746)
     const reserveBalance = new BigNumber(2397846127684712867321)
     const floatingSupply = totalSupply.minus(reserveBalance)
@@ -512,26 +528,17 @@ contract('EpochRewards', (accounts: string[]) => {
     })
   })
 
-  describe.only('#calculateTargetEpochPaymentAndRewards()', () => {
+  describe('#calculateTargetEpochPaymentAndRewards()', () => {
     describe('when there are active votes, a stable token exchange rate is set and the actual remaining supply is 10% more than the target remaining supply after rewards', () => {
       const activeVotes = 1000000
-      const sortedOraclesDenominator = new BigNumber('0x10000000000000000')
-      const randomAddress = web3.utils.randomHex(20)
       const timeDelta = YEAR.times(10)
-      // 7 StableToken to one Celo Gold
-      const exchangeRate = 7
       // Hard coded in EpochRewardsTest.sol
       const numValidators = 100
       let expectedMultiplier: BigNumber
       beforeEach(async () => {
         await mockElection.setActiveVotes(activeVotes)
-        await registry.setAddressFor(CeloContractName.StableToken, randomAddress)
-        await mockSortedOracles.setMedianRate(
-          randomAddress,
-          sortedOraclesDenominator.times(exchangeRate)
-        )
         await timeTravel(timeDelta.toNumber(), web3)
-        const expectedTargetTotalEpochPaymentsInGold = maxValidatorEpochPayment
+        const expectedTargetTotalEpochPaymentsInGold = targetValidatorEpochPayment
           .times(numValidators)
           .div(exchangeRate)
           .integerValue(BigNumber.ROUND_FLOOR)
@@ -549,12 +556,12 @@ contract('EpochRewards', (accounts: string[]) => {
           .integerValue(BigNumber.ROUND_FLOOR)
         await mockGoldToken.setTotalSupply(totalSupply)
         expectedMultiplier = new BigNumber(1).plus(
-          fromFixed(rewardsMultiplierAdjustments.underspend).times(0.1)
+          fromFixed(rewardsMultiplier.adjustments.underspend).times(0.1)
         )
       })
 
-      it('should return the max validator epoch payment times the rewards multiplier', async () => {
-        const expected = maxValidatorEpochPayment.times(expectedMultiplier)
+      it('should return the target validator epoch payment times the rewards multiplier', async () => {
+        const expected = targetValidatorEpochPayment.times(expectedMultiplier)
         assertEqualBN((await epochRewards.calculateTargetEpochPaymentAndRewards())[0], expected)
       })
 
