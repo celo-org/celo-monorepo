@@ -1,7 +1,8 @@
 pragma solidity ^0.5.3;
 
-import "openzeppelin-solidity/contracts/utils/ReentrancyGuard.sol";
 import "openzeppelin-solidity/contracts/math/SafeMath.sol";
+import 'openzeppelin-solidity/contracts/ownership/Ownable.sol';
+import "openzeppelin-solidity/contracts/utils/ReentrancyGuard.sol";
 
 import "./interfaces/IAccounts.sol";
 
@@ -10,7 +11,7 @@ import "../common/Signatures.sol";
 import "../common/UsingRegistry.sol";
 import "../common/UsingPrecompiles.sol";
 
-contract Accounts is IAccounts, ReentrancyGuard, Initializable, UsingRegistry, UsingPrecompiles {
+contract Accounts is IAccounts, Ownable, ReentrancyGuard, Initializable, UsingRegistry, UsingPrecompiles {
 
   using SafeMath for uint256;
 
@@ -64,6 +65,11 @@ contract Accounts is IAccounts, ReentrancyGuard, Initializable, UsingRegistry, U
   event AccountMetadataURLSet(address indexed account, string metadataURL);
   event AccountWalletAddressSet(address indexed account, address walletAddress);
   event AccountCreated(address indexed account);
+
+  function initialize(address registryAddress) external initializer {
+    _transferOwnership(msg.sender);
+    setRegistry(registryAddress);
+  }
 
   /**
    * @notice Convenience Setter for the dataEncryptionKey and wallet address for an account
@@ -181,6 +187,39 @@ contract Accounts is IAccounts, ReentrancyGuard, Initializable, UsingRegistry, U
     Account storage account = accounts[msg.sender];
     authorize(signer, v, r, s);
     account.signers.validator = signer;
+    // Registered validators must update their BLS public key data when updating their validator
+    // signer.
+    require(!getValidators().isValidator(msg.sender));
+    emit ValidatorSignerAuthorized(msg.sender, signer);
+  }
+  /**
+   * @notice Authorizes an address to sign consensus messages on behalf of the account.
+   * @param signer The address of the signing key to authorize.
+   * @param publicKeysData Comprised of three tightly-packed elements:
+   *    - publicKey - The public key that the validator is using for consensus, should match
+   *      `signer`. 64 bytes.
+   *    - blsPublicKey - The BLS public key that the validator is using for consensus, should pass
+   *      proof of possession. 48 bytes.
+   *    - blsPoP - The BLS public key proof of possession. 96 bytes.
+   * @param v The recovery id of the incoming ECDSA signature.
+   * @param r Output value r of the ECDSA signature.
+   * @param s Output value s of the ECDSA signature.
+   * @dev v, r, s constitute `signer`'s signature on `msg.sender`.
+   */
+  function authorizeValidatorSigner(
+    address signer,
+    bytes calldata publicKeysData,
+    uint8 v,
+    bytes32 r,
+    bytes32 s
+  )
+    external
+    nonReentrant
+  {
+    Account storage account = accounts[msg.sender];
+    authorize(signer, v, r, s);
+    account.signers.validator = signer;
+    require(getValidators().updatePublicKeysData(msg.sender, signer, publicKeysData));
     emit ValidatorSignerAuthorized(msg.sender, signer);
   }
 

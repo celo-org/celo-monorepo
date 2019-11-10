@@ -7,13 +7,19 @@ import "../interfaces/IValidators.sol";
  */
 contract MockValidators is IValidators {
 
-  mapping(address => bool) private _isValidating;
-  mapping(address => bool) private _isVoting;
+  mapping(address => bool) public isValidator;
   mapping(address => uint256) private numGroupMembers;
   mapping(address => uint256) private lockedGoldRequirements;
   mapping(address => bool) private doesNotMeetAccountLockedGoldRequirements;
   mapping(address => address[]) private members;
   uint256 private numRegisteredValidators;
+  mapping(address => bytes) public publicKeysData;
+
+  function updatePublicKeysData(address account, address, bytes calldata data) external returns (bool) {
+    require(isValidator[account]);
+    publicKeysData[account] = data;
+    return true;
+  }
 
   function setDoesNotMeetAccountLockedGoldRequirements(address account) external {
     doesNotMeetAccountLockedGoldRequirements[account] = true;
@@ -23,24 +29,12 @@ contract MockValidators is IValidators {
     return !doesNotMeetAccountLockedGoldRequirements[account];
   }
 
-  function isValidating(address account) external view returns (bool) {
-    return _isValidating[account];
-  }
-
-  function isVoting(address account) external view returns (bool) {
-    return _isVoting[account];
-  }
-
   function getGroupNumMembers(address group) public view returns (uint256) {
     return members[group].length;
   }
 
-  function setValidating(address account) external {
-    _isValidating[account] = true;
-  }
-
-  function setVoting(address account) external {
-    _isVoting[account] = true;
+  function setValidator(address account) external {
+    isValidator[account] = true;
   }
 
   function setNumRegisteredValidators(uint256 value) external {

@@ -10,12 +10,6 @@ import {
   toTransactionObject,
 } from '../wrappers/BaseWrapper'
 
-enum SignerRole {
-  Attestation,
-  Validator,
-  Vote,
-}
-
 export interface Signature {
   r: string
   s: string
@@ -73,7 +67,15 @@ export class AccountsWrapper extends BaseWrapper<Accounts> {
     signer: Address,
     proofOfSigningKeyPossession: Signature
   ): Promise<CeloTransactionObject<void>> {
-    return this.authorizeSigner(SignerRole.Attestation, signer, proofOfSigningKeyPossession)
+    return toTransactionObject(
+      this.kit,
+      this.contract.methods.authorizeAttestationSigner(
+        signer,
+        proofOfSigningKeyPossession.v,
+        proofOfSigningKeyPossession.r,
+        proofOfSigningKeyPossession.s
+      )
+    )
   }
   /**
    * Authorizes an address to sign votes on behalf of the account.
@@ -85,20 +87,52 @@ export class AccountsWrapper extends BaseWrapper<Accounts> {
     signer: Address,
     proofOfSigningKeyPossession: Signature
   ): Promise<CeloTransactionObject<void>> {
-    return this.authorizeSigner(SignerRole.Vote, signer, proofOfSigningKeyPossession)
+    return toTransactionObject(
+      this.kit,
+      this.contract.methods.authorizeVoteSigner(
+        signer,
+        proofOfSigningKeyPossession.v,
+        proofOfSigningKeyPossession.r,
+        proofOfSigningKeyPossession.s
+      )
+    )
   }
 
   /**
    * Authorizes an address to sign consensus messages on behalf of the account.
    * @param signer The address of the signing key to authorize.
    * @param proofOfSigningKeyPossession The account address signed by the signer address.
+   * @param proofOfBlsKeyPossession Proof-of-possession generated for the corresponding BLS key. Only needed if a validator has been registered.
    * @return A CeloTransactionObject
    */
   async authorizeValidatorSigner(
     signer: Address,
-    proofOfSigningKeyPossession: Signature
+    proofOfSigningKeyPossession: Signature,
+    proofOfBlsKeyPossession?: string
   ): Promise<CeloTransactionObject<void>> {
-    return this.authorizeSigner(SignerRole.Validator, signer, proofOfSigningKeyPossession)
+    if (proofOfBlsKeyPossession) {
+      return toTransactionObject(
+        this.kit,
+        this.contract.methods.authorizeValidatorSigner(
+          signer,
+          proofOfSigningKeyPossession.v,
+          proofOfSigningKeyPossession.r,
+          proofOfSigningKeyPossession.s
+        )
+      )
+    } else {
+      // @ts-ignore Typechain doesn't handle function overloading.
+      return toTransactionObject(
+        this.kit,
+        this.contract.methods.authorizeValidatorSigner(
+          signer,
+          proofOfBlsKeyPossession,
+          proofOfSigningKeyPossession.v,
+          proofOfSigningKeyPossession.r,
+          proofOfSigningKeyPossession.s
+        )
+      )
+    }
   }
 
   async generateProofOfSigningKeyPossession(account: Address, signer: Address) {
@@ -164,14 +198,9 @@ export class AccountsWrapper extends BaseWrapper<Accounts> {
    */
   setWalletAddress = proxySend(this.kit, this.contract.methods.setWalletAddress)
 
-  private authorizeFns = {
-    [SignerRole.Attestation]: this.contract.methods.authorizeAttestationSigner,
-    [SignerRole.Validator]: this.contract.methods.authorizeValidatorSigner,
-    [SignerRole.Vote]: this.contract.methods.authorizeVoteSigner,
-  }
-
-  private async authorizeSigner(role: SignerRole, signer: Address, sig: Signature) {
-    return toTransactionObject(this.kit, this.authorizeFns[role](signer, sig.v, sig.r, sig.s))
+  parseSignatureOfAddress(address: Address, signer: string, signature: string) {
+    const hash = Web3.utils.soliditySha3({ type: 'address', value: address })
+    return parseSignature(hash, signature, signer)
   }
 
   private async getParsedSignatureOfAddress(address: Address, signer: string) {

@@ -1,4 +1,5 @@
 import { ContractKit, newKitFromWeb3 } from '@celo/contractkit'
+import { getPublicKeysData } from '@celo/utils/lib/bls'
 import { fromFixed, toFixed } from '@celo/utils/lib/fixidity'
 import BigNumber from 'bignumber.js'
 import { assert } from 'chai'
@@ -130,6 +131,7 @@ describe('governance tests', () => {
   const authorizeValidatorSigner = async (
     validatorWeb3: any,
     signerWeb3: any,
+    publicKeysData: string,
     txOptions: any = {}
   ) => {
     const validator = (await validatorWeb3.eth.getAccounts())[0]
@@ -141,7 +143,13 @@ describe('governance tests', () => {
     ).contracts.getAccounts()).generateProofOfSigningKeyPossession(validator, signer)
     const validatorKit = newKitFromWeb3(validatorWeb3)
     const validatorAccounts = await validatorKit._web3Contracts.getAccounts()
-    const tx = validatorAccounts.methods.authorizeValidatorSigner(signer, pop.v, pop.r, pop.s)
+    const tx = validatorAccounts.methods.authorizeValidatorSigner(
+      signer,
+      publicKeysData,
+      pop.v,
+      pop.r,
+      pop.s
+    )
     let gas = txOptions.gas
     if (!gas) {
       gas = await tx.estimateGas({ ...txOptions })
@@ -177,6 +185,10 @@ describe('governance tests', () => {
       this.timeout(0) // Disable test timeout
       await restart()
       const groupPrivateKey = await getValidatorGroupPrivateKey()
+      const rotation0PrivateKey =
+        '0xa42ac9c99f6ab2c96ee6cae1b40d36187f65cd878737f6623cd363fb94ba7087'
+      const rotation1PrivateKey =
+        '0x4519cae145fb9499358be484ca60c80d8f5b7f9c13ff82c88ec9e13283e9de1a'
       const additionalNodes: any[] = [
         {
           name: 'validatorGroup',
@@ -194,7 +206,7 @@ describe('governance tests', () => {
           lightserv: false,
           port: 30315,
           wsport: 8557,
-          privateKey: 'a42ac9c99f6ab2c96ee6cae1b40d36187f65cd878737f6623cd363fb94ba7087',
+          privateKey: rotation0PrivateKey.slice(2),
           peers: [await getEnode(8545)],
         },
         {
@@ -204,7 +216,7 @@ describe('governance tests', () => {
           lightserv: false,
           port: 30317,
           wsport: 8559,
-          privateKey: '4519cae145fb9499358be484ca60c80d8f5b7f9c13ff82c88ec9e13283e9de1a',
+          privateKey: rotation1PrivateKey.slice(2),
           peers: [await getEnode(8545)],
         },
       ]
@@ -226,21 +238,22 @@ describe('governance tests', () => {
         await sleep(0.1)
       } while (blockNumber % epoch != 1)
 
-      console.log('activating')
       await activate(validatorAccounts[0])
-      console.log('activated')
 
       // Prepare for member swapping.
       const groupWeb3 = new Web3('ws://localhost:8555')
       const groupKit = newKitFromWeb3(groupWeb3)
       validators = await groupKit._web3Contracts.getValidators()
       const membersToSwap = [validatorAccounts[0], validatorAccounts[1]]
-      console.log('removing')
       await removeMember(groupWeb3, membersToSwap[1])
 
       // Prepare for key rotation.
       const validatorWeb3 = new Web3('http://localhost:8549')
       const authorizedWeb3s = [new Web3('ws://localhost:8557'), new Web3('ws://localhost:8559')]
+      const authorizedPublicKeysData = [
+        getPublicKeysData(rotation0PrivateKey),
+        getPublicKeysData(rotation1PrivateKey),
+      ]
 
       let index = 0
       let errorWhileChangingValidatorSet = ''
@@ -255,7 +268,6 @@ describe('governance tests', () => {
             // 1. Swap validator0 and validator1 so one is a member of the group and the other is not.
             const memberToRemove = membersToSwap[index]
             const memberToAdd = membersToSwap[(index + 1) % 2]
-            console.log('swapping')
             await removeMember(groupWeb3, memberToRemove)
             await addMember(groupWeb3, memberToAdd)
             const newMembers = await getValidatorGroupMembers()
@@ -263,8 +275,11 @@ describe('governance tests', () => {
             assert.notInclude(newMembers, memberToRemove)
             // 2. Rotate keys for validator 2 by authorizing a new validating key.
             if (!doneAuthorizing) {
-              console.log('authorizing')
-              await authorizeValidatorSigner(validatorWeb3, authorizedWeb3s[index])
+              await authorizeValidatorSigner(
+                validatorWeb3,
+                authorizedWeb3s[index],
+                authorizedPublicKeysData[index]
+              )
             }
             doneAuthorizing = doneAuthorizing || index === 1
             const signingKeys = await Promise.all(
@@ -329,7 +344,8 @@ describe('governance tests', () => {
       }
     })
 
-    it('should always return a validator set equal to the signing keys of the group members at the end of the last epoch', async () => {
+    it('should always return a validator set equal to the signing keys of the group members at the end of the last epoch', async function(this: any) {
+      this.timeout(0)
       for (const blockNumber of blockNumbers) {
         const lastEpochBlock = getLastEpochBlock(blockNumber)
         const memberAccounts = await getValidatorGroupMembers(lastEpochBlock)
@@ -343,8 +359,6 @@ describe('governance tests', () => {
       }
     })
 
-    // This appears to be failing for real, the first time we authorize an address it doesn't
-    // wind up proposing a block (announce issues?).
     it('should block propose in a round robin manner', async () => {
       let roundRobinOrder: string[] = []
       for (const blockNumber of blockNumbers) {
@@ -357,7 +371,6 @@ describe('governance tests', () => {
               async (_, i) => (await web3.eth.getBlock(lastEpochBlock + i + 1)).miner
             )
           )
-          console.log(roundRobinOrder, validatorSet)
           assert.sameMembers(validatorSet, roundRobinOrder)
         }
         const indexInEpoch = blockNumber - lastEpochBlock - 1

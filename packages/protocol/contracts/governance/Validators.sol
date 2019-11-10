@@ -114,6 +114,7 @@ contract Validators is
   event ValidatorDeregistered(address indexed validator);
   event ValidatorAffiliated(address indexed validator, address indexed group);
   event ValidatorDeaffiliated(address indexed validator, address indexed group);
+  event ValidatorPublicKeysDataUpdated(address indexed validator, bytes publicKeysData);
   event ValidatorGroupRegistered(address indexed group, uint256 commission);
   event ValidatorGroupDeregistered(address indexed group);
   event ValidatorGroupMemberAdded(address indexed group, address indexed validator);
@@ -263,19 +264,13 @@ contract Validators is
    * @dev Fails if the account does not have sufficient Locked Gold.
    */
   function registerValidator(bytes calldata publicKeysData) external nonReentrant returns (bool) {
-    require(
-      // secp256k1 public key + BLS public key + BLS proof of possession
-      publicKeysData.length == (64 + 48 + 96)
-    );
-    // Use the proof of possession bytes
-    require(checkProofOfPossession(msg.sender, publicKeysData.slice(64, 48 + 96)));
-
     address account = getAccounts().activeValidatorSignerToAccount(msg.sender);
     require(!isValidator(account) && !isValidatorGroup(account));
     uint256 lockedGoldBalance = getLockedGold().getAccountTotalLockedGold(account);
     require(lockedGoldBalance >= validatorLockedGoldRequirements.value);
     Validator storage validator = validators[account];
-    validator.publicKeysData = publicKeysData;
+    address signer = getAccounts().getValidatorSigner(account);
+		_updatePublicKeysData(validator, signer, publicKeysData);
     registeredValidators.push(account);
     updateMembershipHistory(account, address(0));
     emit ValidatorRegistered(account, publicKeysData);
@@ -466,6 +461,38 @@ contract Validators is
     Validator storage validator = validators[account];
     require(validator.affiliation != address(0));
     _deaffiliate(validator, account);
+    return true;
+  }
+
+  function updatePublicKeysData(address account, address signer, bytes calldata publicKeysData) external onlyRegisteredContract(ACCOUNTS_REGISTRY_ID) returns (bool) {
+    require(isValidator(account));
+    Validator storage validator = validators[account];
+    _updatePublicKeysData(validator, signer, publicKeysData);
+    emit ValidatorPublicKeysDataUpdated(account, publicKeysData);
+    return true;
+  }
+
+  /**
+   * @notice Updates a validator's public keys data.
+   * @param validator The validator whose public keys data should be updated.
+   * @param signer The address used to sign consensus message. Coupled to the BLS key.
+   * @param publicKeysData Comprised of three tightly-packed elements:
+   *    - publicKey - The public key that the validator is using for consensus, should match
+   *      `signer`. 64 bytes.
+   *    - blsPublicKey - The BLS public key that the validator is using for consensus, should pass
+   *      proof of possession. 48 bytes.
+   *    - blsPoP - The BLS public key proof of possession. 96 bytes.
+   * @return True upon success.
+   */
+  function _updatePublicKeysData(Validator storage validator, address signer, bytes memory publicKeysData)
+    private
+    returns (bool)
+  {
+    // secp256k1 public key + BLS public key + BLS proof of possession
+    require(publicKeysData.length == (64 + 48 + 96));
+    // Use the proof of possession bytes
+    require(checkProofOfPossession(signer, publicKeysData.slice(64, 48 + 96)));
+    validator.publicKeysData = publicKeysData;
     return true;
   }
 

@@ -1,4 +1,5 @@
 import { CeloContractName } from '@celo/protocol/lib/registry-utils'
+import { getParsedSignatureOfAddress } from '@celo/protocol/lib/signing-utils'
 import {
   assertContainSubset,
   assertEqualBN,
@@ -25,8 +26,8 @@ import {
   ValidatorsTestContract,
   ValidatorsTestInstance,
 } from 'types'
-const Accounts: AccountsContract = artifacts.require('Accounts')
 
+const Accounts: AccountsContract = artifacts.require('Accounts')
 const Validators: ValidatorsTestContract = artifacts.require('ValidatorsTest')
 const MockElection: MockElectionContract = artifacts.require('MockElection')
 const MockLockedGold: MockLockedGoldContract = artifacts.require('MockLockedGold')
@@ -100,14 +101,19 @@ contract('Validators', (accounts: string[]) => {
   const commission = toFixed(1 / 100)
   beforeEach(async () => {
     accountsInstance = await Accounts.new()
-    await Promise.all(accounts.map((account) => accountsInstance.createAccount({ from: account })))
+    // Do not register an account for the last address so it can be used as an authorized validator signer.
+    await Promise.all(
+      accounts.slice(0, -1).map((account) => accountsInstance.createAccount({ from: account }))
+    )
     mockElection = await MockElection.new()
     mockLockedGold = await MockLockedGold.new()
     registry = await Registry.new()
     validators = await Validators.new()
+    await accountsInstance.initialize(registry.address)
     await registry.setAddressFor(CeloContractName.Accounts, accountsInstance.address)
     await registry.setAddressFor(CeloContractName.Election, mockElection.address)
     await registry.setAddressFor(CeloContractName.LockedGold, mockLockedGold.address)
+    await registry.setAddressFor(CeloContractName.Validators, validators.address)
     await validators.initialize(
       registry.address,
       groupLockedGoldRequirements.value,
@@ -519,59 +525,67 @@ contract('Validators', (accounts: string[]) => {
     const validator = accounts[0]
     let resp: any
     describe('when the account is not a registered validator', () => {
-      let validatorRegistrationEpochNumber: number
       beforeEach(async () => {
         await mockLockedGold.setAccountTotalLockedGold(
           validator,
           validatorLockedGoldRequirements.value
         )
-        resp = await validators.registerValidator(
-          // @ts-ignore bytes type
-          publicKeysData
-        )
-        const blockNumber = (await web3.eth.getBlock('latest')).number
-        validatorRegistrationEpochNumber = Math.floor(blockNumber / EPOCH)
       })
 
-      it('should mark the account as a validator', async () => {
-        assert.isTrue(await validators.isValidator(validator))
-      })
+      describe('when the account has authorized a validator signer', () => {
+        let validatorRegistrationEpochNumber: number
+        beforeEach(async () => {
+          const signer = accounts[9]
+          const sig = await getParsedSignatureOfAddress(web3, validator, signer)
+          await accountsInstance.authorizeValidatorSigner(signer, sig.v, sig.r, sig.s)
+          resp = await validators.registerValidator(
+            // @ts-ignore bytes type
+            publicKeysData
+          )
+          const blockNumber = (await web3.eth.getBlock('latest')).number
+          validatorRegistrationEpochNumber = Math.floor(blockNumber / EPOCH)
+        })
 
-      it('should add the account to the list of validators', async () => {
-        assert.deepEqual(await validators.getRegisteredValidators(), [validator])
-      })
+        it('should mark the account as a validator', async () => {
+          assert.isTrue(await validators.isValidator(validator))
+        })
 
-      it('should set the validator public key', async () => {
-        const parsedValidator = parseValidatorParams(await validators.getValidator(validator))
-        assert.equal(parsedValidator.publicKeysData, publicKeysData)
-      })
+        it('should add the account to the list of validators', async () => {
+          assert.deepEqual(await validators.getRegisteredValidators(), [validator])
+        })
 
-      it('should set account locked gold requirements', async () => {
-        const requirement = await validators.getAccountLockedGoldRequirement(validator)
-        assertEqualBN(requirement, validatorLockedGoldRequirements.value)
-      })
+        it('should set the validator public key', async () => {
+          const parsedValidator = parseValidatorParams(await validators.getValidator(validator))
+          assert.equal(parsedValidator.publicKeysData, publicKeysData)
+        })
 
-      it('should set the validator membership history', async () => {
-        const membershipHistory = await validators.getMembershipHistory(validator)
-        assertEqualBNArray(membershipHistory[0], [validatorRegistrationEpochNumber])
-        assert.deepEqual(membershipHistory[1], [NULL_ADDRESS])
-      })
+        it('should set account locked gold requirements', async () => {
+          const requirement = await validators.getAccountLockedGoldRequirement(validator)
+          assertEqualBN(requirement, validatorLockedGoldRequirements.value)
+        })
 
-      it('should set the validator membership history', async () => {
-        const membershipHistory = await validators.getMembershipHistory(validator)
-        assertEqualBNArray(membershipHistory[0], [validatorRegistrationEpochNumber])
-        assert.deepEqual(membershipHistory[1], [NULL_ADDRESS])
-      })
+        it('should set the validator membership history', async () => {
+          const membershipHistory = await validators.getMembershipHistory(validator)
+          assertEqualBNArray(membershipHistory[0], [validatorRegistrationEpochNumber])
+          assert.deepEqual(membershipHistory[1], [NULL_ADDRESS])
+        })
 
-      it('should emit the ValidatorRegistered event', async () => {
-        assert.equal(resp.logs.length, 1)
-        const log = resp.logs[0]
-        assertContainSubset(log, {
-          event: 'ValidatorRegistered',
-          args: {
-            validator,
-            publicKeysData,
-          },
+        it('should set the validator membership history', async () => {
+          const membershipHistory = await validators.getMembershipHistory(validator)
+          assertEqualBNArray(membershipHistory[0], [validatorRegistrationEpochNumber])
+          assert.deepEqual(membershipHistory[1], [NULL_ADDRESS])
+        })
+
+        it('should emit the ValidatorRegistered event', async () => {
+          assert.equal(resp.logs.length, 1)
+          const log = resp.logs[0]
+          assertContainSubset(log, {
+            event: 'ValidatorRegistered',
+            args: {
+              validator,
+              publicKeysData,
+            },
+          })
         })
       })
     })
@@ -1553,7 +1567,7 @@ contract('Validators', (accounts: string[]) => {
 
   describe('#updateMembershipHistory', () => {
     const validator = accounts[0]
-    const groups = accounts.slice(1)
+    const groups = accounts.slice(1, -1)
     let validatorRegistrationEpochNumber: number
     beforeEach(async () => {
       await registerValidator(validator)
@@ -1635,7 +1649,7 @@ contract('Validators', (accounts: string[]) => {
 
   describe('#getMembershipInLastEpoch', () => {
     const validator = accounts[0]
-    const groups = accounts.slice(1)
+    const groups = accounts.slice(1, -1)
     beforeEach(async () => {
       await registerValidator(validator)
       for (const group of groups) {

@@ -1,13 +1,22 @@
 import { upperFirst } from 'lodash'
-import { AccountsInstance } from 'types'
-import { getParsedSignatureOfAddress } from '../../lib/signing-utils'
+import { CeloContractName } from '@celo/protocol/lib/registry-utils'
+import { getParsedSignatureOfAddress } from '@celo/protocol/lib/signing-utils'
 import {
   assertLogMatches,
   assertLogMatches2,
   assertRevert,
   NULL_ADDRESS,
-} from '../../lib/test-utils'
-const Accounts: Truffle.Contract<AccountsInstance> = artifacts.require('Accounts')
+} from '@celo/protocol/lib/test-utils'
+import {
+  AccountsContract,
+  AccountsInstance,
+  MockValidatorsContract,
+  MockValidatorsInstance,
+  RegistryContract,
+} from 'types'
+const Accounts: AccountsContract = artifacts.require('Accounts')
+const Registry: RegistryContract = artifacts.require('Registry')
+const MockValidators: MockValidatorsContract = artifacts.require('MockValidators')
 const authorizationTests: any = {}
 const authorizationTestDescriptions = {
   voting: {
@@ -26,11 +35,13 @@ const authorizationTestDescriptions = {
 
 contract('Accounts', (accounts: string[]) => {
   let accountsInstance: AccountsInstance
+  let mockValidators: MockValidatorsInstance
   const account = accounts[0]
   const caller = accounts[0]
 
   const name = 'Account'
   const metadataURL = 'https://www.celo.org'
+  const publicKeysData = '0x02f2f48ee19680706196e2e339e5da3491186e0c4c5030670656b0e01611111111'
   const dataEncryptionKey = '0x02f2f48ee19680706196e2e339e5da3491186e0c4c5030670656b0e01611111111'
   const longDataEncryptionKey =
     '0x04f2f48ee19680706196e2e339e5da3491186e0c4c5030670656b0e01611111111' +
@@ -38,6 +49,10 @@ contract('Accounts', (accounts: string[]) => {
 
   beforeEach(async () => {
     accountsInstance = await Accounts.new({ from: account })
+    mockValidators = await MockValidators.new()
+    const registry = await Registry.new()
+    await registry.setAddressFor(CeloContractName.Validators, mockValidators.address)
+    await accountsInstance.initialize(registry.address)
 
     authorizationTests.voting = {
       fn: accountsInstance.authorizeVoteSigner,
@@ -314,6 +329,54 @@ contract('Accounts', (accounts: string[]) => {
           event: 'AccountNameSet',
           args: { account: caller, name },
         })
+      })
+    })
+  })
+
+  // authorizeValidatoSigner deviates slightly from the other authorize*Signer functions.
+  // This block tests those deviations.
+  describe('#authorizeValidatorSigner', async () => {
+    const authorized = accounts[1]
+    let sig
+
+    beforeEach(async () => {
+      await accountsInstance.createAccount()
+      sig = await getParsedSignatureOfAddress(web3, account, authorized)
+    })
+
+    describe('when a validator has not been registered', () => {
+      it('should succeed when no public keys data is passed', async () => {
+        await accountsInstance.authorizeValidatorSigner(authorized, sig.v, sig.r, sig.s)
+      })
+
+      it('should revert when public keys data is passed', async () => {
+        await assertRevert(
+          accountsInstance.authorizeValidatorSigner(authorized, publicKeysData, sig.v, sig.r, sig.s)
+        )
+      })
+    })
+
+    describe('when a validator has been registered', () => {
+      beforeEach(async () => {
+        await mockValidators.setValidator(account)
+      })
+
+      it('should revert when no public keys data is passed', async () => {
+        await assertRevert(
+          accountsInstance.authorizeValidatorSigner(authorized, sig.v, sig.r, sig.s)
+        )
+      })
+
+      it('should succeed when public keys data is passed', async () => {
+        await accountsInstance.authorizeValidatorSigner(
+          authorized,
+          publicKeysData,
+          sig.v,
+          sig.r,
+          sig.s
+        )
+        // @ts-ignore Typechain can't handle 'bytes' type.
+        assert.equal(await mockValidators.publicKeysData(account), publicKeysData)
       })
     })
   })
