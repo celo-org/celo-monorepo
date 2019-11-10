@@ -1852,7 +1852,7 @@ contract('Validators', (accounts: string[]) => {
       const adjustmentSpeed = fromFixed(validatorScoreParameters.adjustmentSpeed)
       // @ts-ignore
       const expectedScore = adjustmentSpeed.times(uptime.pow(validatorScoreParameters.exponent))
-      const expectedTotalPayment = expectedScore.times(validatorEpochPayment)
+      const expectedTotalPayment = expectedScore.times(maxPayment)
       const expectedGroupPayment = expectedTotalPayment
         .times(fromFixed(commission))
         .dp(0, BigNumber.ROUND_FLOOR)
@@ -1863,7 +1863,7 @@ contract('Validators', (accounts: string[]) => {
 
       describe('when the validator and group meet the balance requirements', () => {
         beforeEach(async () => {
-          ret = await validators.distributeEpochPayment(validator, maxPayment).call()
+          ret = await validators.distributeEpochPayment.call(validator, maxPayment)
           await validators.distributeEpochPayment(validator, maxPayment)
         })
 
@@ -1886,7 +1886,7 @@ contract('Validators', (accounts: string[]) => {
             validator,
             validatorLockedGoldRequirements.value.minus(1)
           )
-          ret = await validators.distributeEpochPayment(validator, maxPayment).call()
+          ret = await validators.distributeEpochPayment.call(validator, maxPayment)
           await validators.distributeEpochPayment(validator, maxPayment)
         })
 
@@ -1909,7 +1909,7 @@ contract('Validators', (accounts: string[]) => {
             group,
             groupLockedGoldRequirements.value.minus(1)
           )
-          ret = await validators.distributeEpochPayment(validator, maxPayment).call()
+          ret = await validators.distributeEpochPayment.call(validator, maxPayment)
           await validators.distributeEpochPayment(validator, maxPayment)
         })
 
