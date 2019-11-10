@@ -49,8 +49,15 @@ export interface GroupMembership {
 /**
  * Contract for voting for validators and managing validator groups.
  */
-// TODO(asa): Support authorized validators
+// TODO(asa): Support validator signers
 export class ValidatorsWrapper extends BaseWrapper<Validators> {
+  async updateCommission(commission: BigNumber): Promise<CeloTransactionObject<boolean>> {
+    return toTransactionObject(
+      this.kit,
+      this.contract.methods.updateCommission(toFixed(commission).toFixed())
+    )
+  }
+  updatePublicKeysData = proxySend(this.kit, this.contract.methods.updatePublicKeysData)
   /**
    * Returns the Locked Gold requirements for validators.
    * @returns The Locked Gold requirements for validators.
