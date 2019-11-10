@@ -347,7 +347,7 @@ exports[`VerificationLoadingScreen renders correctly 1`] = `
                     "lineHeight": 18,
                   },
                   Object {
-                    "color": "#42D689",
+                    "color": "#2E3338",
                     "fontFamily": "Hind-SemiBold",
                     "fontSize": 16,
                     "lineHeight": 24,
@@ -712,7 +712,7 @@ exports[`VerificationLoadingScreen renders correctly with fail modal 1`] = `
                     "lineHeight": 18,
                   },
                   Object {
-                    "color": "#42D689",
+                    "color": "#2E3338",
                     "fontFamily": "Hind-SemiBold",
                     "fontSize": 16,
                     "lineHeight": 24,
