@@ -292,8 +292,8 @@ describe('governance tests', () => {
 
     it('should distribute epoch payments at the end of each epoch', async () => {
       const commission = 0.1
-      const maxValidatorEpochPayment = new BigNumber(
-        await epochRewards.methods.maxValidatorEpochPayment().call()
+      const targetValidatorEpochPayment = new BigNumber(
+        await epochRewards.methods.targetValidatorEpochPayment().call()
       )
       const [group] = await validators.methods.getRegisteredValidatorGroups().call()
 
@@ -327,7 +327,9 @@ describe('governance tests', () => {
         const rewardsMultiplier = new BigNumber(
           await epochRewards.methods.getRewardsMultiplier().call({}, blockNumber - 1)
         )
-        return maxValidatorEpochPayment.times(fromFixed(score)).times(fromFixed(rewardsMultiplier))
+        return targetValidatorEpochPayment
+          .times(fromFixed(score))
+          .times(fromFixed(rewardsMultiplier))
       }
 
       for (const blockNumber of blockNumbers) {
