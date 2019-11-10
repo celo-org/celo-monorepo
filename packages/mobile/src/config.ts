@@ -26,8 +26,6 @@ export const CELO_VERIFIER_START_MINING_LINK = 'celo://verifier/start'
 export const CELO_FAUCET_LINK = 'https://celo.org/app'
 export const CELO_TERMS_LINK = 'https://celo.org/terms'
 
-export const DEFAULT_COUNTRY = Config.DEFAULT_COUNTRY || null
-
 export const TOS_LINK = 'https://celo.org/user-agreement'
 export const FAQ_LINK = 'https://celo.org/faq'
 
