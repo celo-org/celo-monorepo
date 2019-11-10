@@ -4,6 +4,7 @@ import React from 'react'
 
 interface Props {
   width?: number
+  onAnimationFinish?: () => void
 }
 
 export default class DancingRings extends React.PureComponent<Props> {
@@ -17,8 +18,11 @@ export default class DancingRings extends React.PureComponent<Props> {
         source={require('./dancingRings.json')}
         autoPlay={true}
         loop={false}
-        style={{ width: variables.width, height: variables.height * 1.25, zIndex: 0 }}
+        style={style}
+        onAnimationFinish={this.props.onAnimationFinish}
       />
     )
   }
 }
+
+const style = { width: variables.width, height: variables.height * 1.25, zIndex: 0 }

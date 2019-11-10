@@ -12,7 +12,7 @@ import dotProp from 'dot-prop-immutable'
 import { padStart } from 'lodash'
 import * as React from 'react'
 import { withNamespaces, WithNamespaces } from 'react-i18next'
-import { ActivityIndicator, BackHandler, ScrollView, StyleSheet, Text, View } from 'react-native'
+import { ActivityIndicator, ScrollView, StyleSheet, Text, View } from 'react-native'
 import Modal from 'react-native-modal'
 import SafeAreaView from 'react-native-safe-area-view'
 import { connect } from 'react-redux'
@@ -128,7 +128,7 @@ type Props = StateProps & DispatchProps & WithNamespaces
 interface State {
   timer: number
   codeInputValues: string[]
-  isCodeSubmitting: boolean[]
+  codeSubmittingStatuses: boolean[]
   isModalVisible: boolean
 }
 
@@ -156,7 +156,7 @@ class VerificationInputScreen extends React.Component<Props, State> {
   state: State = {
     timer: 60,
     codeInputValues: [],
-    isCodeSubmitting: [],
+    codeSubmittingStatuses: [],
     isModalVisible: false,
   }
 
@@ -170,24 +170,17 @@ class VerificationInputScreen extends React.Component<Props, State> {
     }, 1000)
   }
 
-  componentDidUpdate(prevProps: Props) {
+  componentDidUpdate() {
     if (this.isVerificationComplete()) {
       return this.finishVerification()
     }
     if (this.isCodeRejected() && this.isAnyCodeSubmitting()) {
-      this.setState({ isCodeSubmitting: [false, false, false] })
+      this.setState({ codeSubmittingStatuses: [false, false, false] })
     }
   }
 
   componentWillUnmount() {
-    BackHandler.removeEventListener('hardwareBackPress', this.handleBackButton)
     clearInterval(this.interval)
-  }
-
-  handleBackButton = () => {
-    // Cancel verification when user presses back button on this screen
-    this.onCancel()
-    return true
   }
 
   isVerificationComplete = () => {
@@ -202,7 +195,7 @@ class VerificationInputScreen extends React.Component<Props, State> {
   }
 
   isAnyCodeSubmitting = () => {
-    return this.state.isCodeSubmitting.filter((c) => c).length > 0
+    return this.state.codeSubmittingStatuses.filter((c) => c).length > 0
   }
 
   finishVerification = () => {
@@ -222,7 +215,7 @@ class VerificationInputScreen extends React.Component<Props, State> {
       // TODO(Rossy) Add test this of typing codes gradually
       this.setState(dotProp.set(this.state, `codeInputValues.${index}`, value))
       if (extractAttestationCodeFromMessage(value)) {
-        this.setState(dotProp.set(this.state, `isCodeSubmitting.${index}`, true))
+        this.setState(dotProp.set(this.state, `codeSubmittingStatuses.${index}`, true))
         this.props.receiveAttestationMessage(value, CodeInputType.MANUAL)
       }
     }
@@ -242,7 +235,7 @@ class VerificationInputScreen extends React.Component<Props, State> {
   }
 
   render() {
-    const { codeInputValues, isCodeSubmitting, isModalVisible, timer } = this.state
+    const { codeInputValues, codeSubmittingStatuses, isModalVisible, timer } = this.state
     const { t, attestationCodes, numCompleteAttestations } = this.props
 
     const numCodesAccepted = attestationCodes.length
@@ -274,7 +267,7 @@ class VerificationInputScreen extends React.Component<Props, State> {
             numCodesAccepted >= 0,
             codeInputValues[0],
             this.onChangeInputCode(0),
-            isCodeSubmitting[0],
+            codeSubmittingStatuses[0],
             numCompleteAttestations > 0,
             t
           )}
@@ -285,7 +278,7 @@ class VerificationInputScreen extends React.Component<Props, State> {
             numCodesAccepted >= 1,
             codeInputValues[1],
             this.onChangeInputCode(1),
-            isCodeSubmitting[1],
+            codeSubmittingStatuses[1],
             numCompleteAttestations > 1,
             t
           )}
@@ -296,7 +289,7 @@ class VerificationInputScreen extends React.Component<Props, State> {
             numCodesAccepted >= 2,
             codeInputValues[2],
             this.onChangeInputCode(2),
-            isCodeSubmitting[2],
+            codeSubmittingStatuses[2],
             numCompleteAttestations > 2,
             t
           )}

@@ -61,7 +61,6 @@ const styles = StyleSheet.create({
   modalSkipText: {
     ...fontStyles.body,
     ...fontStyles.semiBold,
-    color: colors.celoGreen,
   },
 })
 

@@ -3,7 +3,7 @@ import colors from '@celo/react-components/styles/colors'
 import fontStyles from '@celo/react-components/styles/fonts'
 import * as React from 'react'
 import { withNamespaces, WithNamespaces } from 'react-i18next'
-import { BackHandler, ScrollView, StyleSheet, Text, View } from 'react-native'
+import { ScrollView, StyleSheet, Text, View } from 'react-native'
 import SafeAreaView from 'react-native-safe-area-view'
 import { isE2EEnv } from 'src/config'
 import { Namespaces } from 'src/i18n'
@@ -24,7 +24,6 @@ class VerificationInterstitialScreen extends React.Component<WithNamespaces> {
   timeout: number | undefined
 
   componentDidMount() {
-    BackHandler.addEventListener('hardwareBackPress', this.handleBackButton)
     this.timeout = setTimeout(() => {
       navigate(Screens.VerificationInputScreen)
     }, SCREEN_DURATION)
@@ -32,12 +31,6 @@ class VerificationInterstitialScreen extends React.Component<WithNamespaces> {
 
   componentWillUnmount() {
     clearTimeout(this.timeout)
-    BackHandler.removeEventListener('hardwareBackPress', this.handleBackButton)
-  }
-
-  handleBackButton = () => {
-    // Prevent back button navigation for this screen
-    return true
   }
 
   render() {

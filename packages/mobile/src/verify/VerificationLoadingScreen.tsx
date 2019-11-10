@@ -16,7 +16,7 @@ import { Namespaces } from 'src/i18n'
 import LoadingSpinner from 'src/icons/LoadingSpinner'
 import { cancelVerification, startVerification } from 'src/identity/actions'
 import { VerificationStatus } from 'src/identity/verification'
-import { navigate, navigateBack } from 'src/navigator/NavigationService'
+import { navigate } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
 import { RootState } from 'src/redux/reducers'
 import Logger from 'src/utils/Logger'
@@ -77,7 +77,7 @@ class VerificationLoadingScreen extends React.Component<Props> {
   onCancel = () => {
     Logger.debug(TAG + '@onCancel', 'Cancelled, going back to education screen')
     this.props.cancelVerification()
-    navigateBack()
+    navigate(Screens.VerificationEducationScreen)
   }
 
   render() {

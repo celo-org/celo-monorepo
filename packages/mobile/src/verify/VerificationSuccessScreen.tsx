@@ -16,10 +16,11 @@ export class VerificationSuccessScreen extends React.Component<WithNamespaces> {
   }
 
   componentDidMount() {
-    setTimeout(() => {
-      navigate(Stacks.AppStack)
-    }, 7800)
     setTimeout(() => this.setState({ isTextWhite: true }), 2000)
+  }
+
+  onAnimationFinish = () => {
+    navigate(Stacks.AppStack)
   }
 
   render() {
@@ -29,7 +30,7 @@ export class VerificationSuccessScreen extends React.Component<WithNamespaces> {
         <Text style={[styles.header, this.state.isTextWhite ? styles.whiteText : undefined]}>
           {t('congratsVerified')}
         </Text>
-        <DancingRings />
+        <DancingRings onAnimationFinish={this.onAnimationFinish} />
       </View>
     )
   }
