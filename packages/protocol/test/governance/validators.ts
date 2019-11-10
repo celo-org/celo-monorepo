@@ -9,7 +9,7 @@ import {
   NULL_ADDRESS,
   timeTravel,
 } from '@celo/protocol/lib/test-utils'
-import { fromFixed, toFixed } from '@celo/utils/lib/fixidity'
+import { fixed1, fromFixed, toFixed } from '@celo/utils/lib/fixidity'
 import BigNumber from 'bignumber.js'
 import {
   AccountsContract,
@@ -1686,6 +1686,51 @@ contract('Validators', (accounts: string[]) => {
 
       it('should revert', async () => {
         await assertRevert(validators.reorderMember(validator2, validator1, NULL_ADDRESS))
+      })
+    })
+  })
+
+  describe('#updateCommission()', () => {
+    describe('when the commission is different', () => {
+      const newCommission = commission.plus(1)
+      const group = accounts[0]
+
+      describe('when called by a registered validator group', () => {
+        let resp: any
+
+        beforeEach(async () => {
+          await registerValidatorGroup(group)
+          resp = await validators.updateCommission(newCommission)
+        })
+
+        it('should set the validator group commission', async () => {
+          const parsedGroup = parseValidatorGroupParams(await validators.getValidatorGroup(group))
+          assertEqualBN(parsedGroup.commission, newCommission)
+        })
+
+        it('should emit the ValidatorGroupCommissionUpdated event', async () => {
+          assert.equal(resp.logs.length, 1)
+          const log = resp.logs[0]
+          assertContainSubset(log, {
+            event: 'ValidatorGroupCommissionUpdated',
+            args: {
+              group,
+              commission: newCommission,
+            },
+          })
+        })
+      })
+
+      describe('when the commission is the same', () => {
+        it('should revert', async () => {
+          await assertRevert(validators.updateCommission(commission))
+        })
+      })
+
+      describe('when the commission is greater than one', () => {
+        it('should revert', async () => {
+          await assertRevert(validators.updateCommission(fixed1.plus(1)))
+        })
       })
     })
   })
