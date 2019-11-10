@@ -57,10 +57,7 @@ contract MockValidators is IValidators {
     return lockedGoldRequirements[account];
   }
 
-  function getTopGroupValidators(
-    address group,
-    uint256 n
-  )
+  function getTopGroupValidators(address group, uint256 n)
     external
     view
     returns (address[] memory)

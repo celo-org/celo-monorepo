@@ -1,5 +1,5 @@
 import getConfig from 'next/config'
-import { RequestStatus, RequestType } from '../../server/FirebaseClient'
+import { RequestStatus, RequestType } from 'src/fauceting/FaucetInterfaces'
 
 export function getCaptchaKey() {
   return getConfig().publicRuntimeConfig.RECAPTCHA

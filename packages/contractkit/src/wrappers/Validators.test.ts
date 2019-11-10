@@ -80,10 +80,34 @@ testWithGanache('Validators Wrapper', (web3) => {
     await setupGroup(groupAccount)
     await setupValidator(validatorAccount)
     await validators.affiliate(groupAccount).sendAndWaitForReceipt({ from: validatorAccount })
-    await (await validators.addMember(groupAccount, validatorAccount)).sendAndWaitForReceipt()
+    await (await validators.addMember(groupAccount, validatorAccount)).sendAndWaitForReceipt({
+      from: groupAccount,
+    })
 
     const members = await validators.getValidatorGroup(groupAccount).then((group) => group.members)
     expect(members).toContain(validatorAccount)
+  })
+
+  test('SBAT updateCommission', async () => {
+    const groupAccount = accounts[0]
+    await setupGroup(groupAccount)
+    let commission = (await validators.getValidatorGroup(groupAccount)).commission
+    expect(commission).toEqBigNumber('0.1')
+    await (await validators.updateCommission(new BigNumber(0.2))).sendAndWaitForReceipt({
+      from: groupAccount,
+    })
+    commission = (await validators.getValidatorGroup(groupAccount)).commission
+    expect(commission).toEqBigNumber('0.2')
+  })
+
+  test('SBAT get group affiliates', async () => {
+    const groupAccount = accounts[0]
+    const validatorAccount = accounts[1]
+    await setupGroup(groupAccount)
+    await setupValidator(validatorAccount)
+    await validators.affiliate(groupAccount).sendAndWaitForReceipt({ from: validatorAccount })
+    const group = await validators.getValidatorGroup(groupAccount)
+    expect(group.affiliates).toContain(validatorAccount)
   })
 
   describe('SBAT reorderMember', () => {
@@ -99,7 +123,9 @@ testWithGanache('Validators Wrapper', (web3) => {
       for (const validator of [validator1, validator2]) {
         await setupValidator(validator)
         await validators.affiliate(groupAccount).sendAndWaitForReceipt({ from: validator })
-        await (await validators.addMember(groupAccount, validator)).sendAndWaitForReceipt()
+        await (await validators.addMember(groupAccount, validator)).sendAndWaitForReceipt({
+          from: groupAccount,
+        })
       }
 
       const members = await validators
@@ -111,7 +137,7 @@ testWithGanache('Validators Wrapper', (web3) => {
     test('move last to first', async () => {
       await validators
         .reorderMember(groupAccount, validator2, 0)
-        .then((x) => x.sendAndWaitForReceipt())
+        .then((x) => x.sendAndWaitForReceipt({ from: groupAccount }))
 
       const membersAfter = await validators
         .getValidatorGroup(groupAccount)
@@ -122,7 +148,7 @@ testWithGanache('Validators Wrapper', (web3) => {
     test('move first to last', async () => {
       await validators
         .reorderMember(groupAccount, validator1, 1)
-        .then((x) => x.sendAndWaitForReceipt())
+        .then((x) => x.sendAndWaitForReceipt({ from: groupAccount }))
 
       const membersAfter = await validators
         .getValidatorGroup(groupAccount)

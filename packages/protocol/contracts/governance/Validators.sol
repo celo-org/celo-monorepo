@@ -120,6 +120,7 @@ contract Validators is
   event ValidatorGroupMemberAdded(address indexed group, address indexed validator);
   event ValidatorGroupMemberRemoved(address indexed group, address indexed validator);
   event ValidatorGroupMemberReordered(address indexed group, address indexed validator);
+  event ValidatorGroupCommissionUpdated(address indexed group, uint256 commission);
 
   modifier onlyVm() {
     require(msg.sender == address(0));
@@ -264,13 +265,22 @@ contract Validators is
    * @dev Fails if the account does not have sufficient Locked Gold.
    */
   function registerValidator(bytes calldata publicKeysData) external nonReentrant returns (bool) {
+<<<<<<< HEAD
     address account = getAccounts().activeValidatorSignerToAccount(msg.sender);
+=======
+    address account = getAccounts().activeValidationSignerToAccount(msg.sender);
+>>>>>>> master
     require(!isValidator(account) && !isValidatorGroup(account));
     uint256 lockedGoldBalance = getLockedGold().getAccountTotalLockedGold(account);
     require(lockedGoldBalance >= validatorLockedGoldRequirements.value);
     Validator storage validator = validators[account];
+<<<<<<< HEAD
     address signer = getAccounts().getValidatorSigner(account);
 		_updatePublicKeysData(validator, signer, publicKeysData);
+=======
+    _updatePublicKeysData(validator, publicKeysData);
+    validator.publicKeysData = publicKeysData;
+>>>>>>> master
     registeredValidators.push(account);
     updateMembershipHistory(account, address(0));
     emit ValidatorRegistered(account, publicKeysData);
@@ -389,9 +399,15 @@ contract Validators is
     // Both the validator and the group must maintain the minimum locked gold balance in order to
     // receive epoch payments.
     if (meetsAccountLockedGoldRequirements(account) && meetsAccountLockedGoldRequirements(group)) {
+<<<<<<< HEAD
       FixidityLib.Fraction memory totalPayment = FixidityLib.newFixed(maxPayment).multiply(
         validators[account].score
       );
+=======
+      FixidityLib.Fraction memory totalPayment = FixidityLib
+        .newFixed(validatorEpochPayment)
+        .multiply(validators[account].score);
+>>>>>>> master
       uint256 groupPayment = totalPayment.multiply(groups[group].commission).fromFixed();
       uint256 validatorPayment = totalPayment.fromFixed().sub(groupPayment);
       getStableToken().mint(group, groupPayment);
@@ -492,6 +508,50 @@ contract Validators is
     require(publicKeysData.length == (64 + 48 + 96));
     // Use the proof of possession bytes
     require(checkProofOfPossession(signer, publicKeysData.slice(64, 48 + 96)));
+    validator.publicKeysData = publicKeysData;
+    return true;
+  }
+
+  /**
+   * @notice Updates a validator's public keys data.
+   * @param publicKeysData Comprised of three tightly-packed elements:
+   *    - publicKey - The public key that the validator is using for consensus, should match
+   *      msg.sender. 64 bytes.
+   *    - blsPublicKey - The BLS public key that the validator is using for consensus, should pass
+   *      proof of possession. 48 bytes.
+   *    - blsPoP - The BLS public key proof of possession. 96 bytes.
+   * @return True upon success.
+   */
+  function updatePublicKeysData(bytes calldata publicKeysData) external returns (bool) {
+    address account = getAccounts().activeValidationSignerToAccount(msg.sender);
+    require(isValidator(account));
+    Validator storage validator = validators[account];
+    _updatePublicKeysData(validator, publicKeysData);
+    emit ValidatorPublicKeysDataUpdated(account, publicKeysData);
+    return true;
+  }
+
+  /**
+   * @notice Updates a validator's public keys data.
+   * @param validator The validator whose public keys data should be updated.
+   * @param publicKeysData Comprised of three tightly-packed elements:
+   *    - publicKey - The public key that the validator is using for consensus, should match
+   *      msg.sender. 64 bytes.
+   *    - blsPublicKey - The BLS public key that the validator is using for consensus, should pass
+   *      proof of possession. 48 bytes.
+   *    - blsPoP - The BLS public key proof of possession. 96 bytes.
+   * @return True upon success.
+   */
+  function _updatePublicKeysData(Validator storage validator, bytes memory publicKeysData)
+    private
+    returns (bool)
+  {
+    require(
+      // secp256k1 public key + BLS public key + BLS proof of possession
+      publicKeysData.length == (64 + 48 + 96)
+    );
+    // Use the proof of possession bytes
+    require(checkProofOfPossession(msg.sender, publicKeysData.slice(64, 48 + 96)));
     validator.publicKeysData = publicKeysData;
     return true;
   }
@@ -639,6 +699,23 @@ contract Validators is
   }
 
   /**
+   * @notice Updates a validator group's commission.
+   * @param commission Fixidity representation of the commission this group receives on epoch
+   *   payments made to its members. Must be in the range [0, 1.0].
+   * @return True upon success.
+   */
+  function updateCommission(uint256 commission) external returns (bool) {
+    address account = getAccounts().activeValidationSignerToAccount(msg.sender);
+    require(isValidatorGroup(account));
+    ValidatorGroup storage group = groups[account];
+    require(commission <= FixidityLib.fixed1().unwrap(), "Commission can't be greater than 100%");
+    require(commission != group.commission.unwrap(), "Commission must be different");
+    group.commission = FixidityLib.wrap(commission);
+    emit ValidatorGroupCommissionUpdated(account, commission);
+    return true;
+  }
+
+  /**
    * @notice Returns the locked gold balance requirement for the supplied account.
    * @param account The account that may have to meet locked gold balance requirements.
    * @return The locked gold balance requirement for the supplied account.
@@ -677,6 +754,7 @@ contract Validators is
    * @param signer The account that registered the validator or its authorized signing address.
    * @return The unpacked validator struct.
    */
+<<<<<<< HEAD
   function getValidatorFromSigner(address signer)
     external
     view
@@ -695,6 +773,12 @@ contract Validators is
     public
     view
     returns (bytes memory publicKeysData, address affiliation, uint256 score)
+=======
+  function getValidator(address account)
+    external
+    view
+    returns (bytes memory publicKeysData, address affiliation, uint256 score)
+>>>>>>> master
   {
     require(isValidator(account));
     Validator storage validator = validators[account];

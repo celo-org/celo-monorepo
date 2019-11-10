@@ -37,17 +37,13 @@ contract Accounts is IAccounts, Ownable, ReentrancyGuard, Initializable, UsingRe
     // These keys may not be keys of other accounts, and may not be authorized by any other
     // account for any purpose.
     Signers signers;
-
     // The address at which the account expects to receive transfers. If it's empty/0x0, the
     // account indicates that an address exchange should be initiated with the dataEncryptionKey
     address walletAddress;
-
     // An optional human readable identifier for the account
     string name;
-
     // The ECDSA public key used to encrypt and decrypt data for this account
     bytes dataEncryptionKey;
-
     // The URL under which an account adds metadata and claims
     string metadataURL;
   }
@@ -55,7 +51,6 @@ contract Accounts is IAccounts, Ownable, ReentrancyGuard, Initializable, UsingRe
   mapping(address => Account) private accounts;
   // Maps authorized signers to the account that provided the authorization.
   mapping(address => address) public authorizedBy;
-
 
   event AttestationSignerAuthorized(address indexed account, address signer);
   event VoteSignerAuthorized(address indexed account, address signer);
@@ -77,14 +72,10 @@ contract Accounts is IAccounts, Ownable, ReentrancyGuard, Initializable, UsingRe
    * @param dataEncryptionKey secp256k1 public key for data encryption. Preferably compressed.
    * @param walletAddress The wallet address to set for the account
    */
-  function setAccount(
-    string calldata name,
-    bytes calldata dataEncryptionKey,
-    address walletAddress
-  )
+  function setAccount(string calldata name, bytes calldata dataEncryptionKey, address walletAddress)
     external
   {
-    if(!isAccount(msg.sender)) {
+    if (!isAccount(msg.sender)) {
       createAccount();
     }
     setName(name);

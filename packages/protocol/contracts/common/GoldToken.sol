@@ -6,9 +6,7 @@ import "./Initializable.sol";
 import "./interfaces/IERC20Token.sol";
 import "./interfaces/ICeloToken.sol";
 
-
 contract GoldToken is Initializable, IERC20Token, ICeloToken {
-
   using SafeMath for uint256;
 
   // Address of the TRANSFER precompiled contract.
@@ -20,23 +18,13 @@ contract GoldToken is Initializable, IERC20Token, ICeloToken {
   uint256 internal totalSupply_;
   // solhint-enable state-visibility
 
-  mapping (address => mapping (address => uint256)) internal allowed;
+  mapping(address => mapping(address => uint256)) internal allowed;
 
-  event Transfer(
-    address indexed from,
-    address indexed to,
-    uint256 value
-  );
+  event Transfer(address indexed from, address indexed to, uint256 value);
 
-  event TransferComment(
-    string comment
-  );
+  event TransferComment(string comment);
 
-  event Approval(
-    address indexed owner,
-    address indexed spender,
-    uint256 value
-  );
+  event Approval(address indexed owner, address indexed spender, uint256 value);
 
   /**
    * Only VM would be able to set the caller address to 0x0 unless someone
@@ -73,11 +61,7 @@ contract GoldToken is Initializable, IERC20Token, ICeloToken {
    * @param comment The transfer comment
    * @return True if the transaction succeeds.
    */
-  function transferWithComment(
-    address to,
-    uint256 value,
-    string calldata comment
-  )
+  function transferWithComment(address to, uint256 value, string calldata comment)
     external
     returns (bool)
   {
@@ -104,10 +88,7 @@ contract GoldToken is Initializable, IERC20Token, ICeloToken {
    * @param value The increment of the amount of Celo Gold approved to the spender.
    * @return True if the transaction succeeds.
    */
-  function increaseAllowance(address spender, uint256 value)
-    external
-    returns (bool)
-  {
+  function increaseAllowance(address spender, uint256 value) external returns (bool) {
     uint256 oldValue = allowed[msg.sender][spender];
     uint256 newValue = oldValue.add(value);
     allowed[msg.sender][spender] = newValue;
@@ -121,13 +102,7 @@ contract GoldToken is Initializable, IERC20Token, ICeloToken {
    * @param value The decrement of the amount of Celo Gold approved to the spender.
    * @return True if the transaction succeeds.
    */
-  function decreaseAllowance(
-    address spender,
-    uint256 value
-  )
-    external
-    returns (bool)
-  {
+  function decreaseAllowance(address spender, uint256 value) external returns (bool) {
     uint256 oldValue = allowed[msg.sender][spender];
     uint256 newValue = oldValue.sub(value);
     allowed[msg.sender][spender] = newValue;
@@ -151,7 +126,7 @@ contract GoldToken is Initializable, IERC20Token, ICeloToken {
     );
 
     bool success;
-    (success,) = TRANSFER.call.value(0).gas(gasleft())(abi.encode(from, to, value));
+    (success, ) = TRANSFER.call.value(0).gas(gasleft())(abi.encode(from, to, value));
     require(success, "Celo Gold transfer failed");
 
     allowed[from][msg.sender] = allowed[from][msg.sender].sub(value);
@@ -224,9 +199,8 @@ contract GoldToken is Initializable, IERC20Token, ICeloToken {
     require(to != address(0), "transfer attempted to reserved address 0x0");
     require(value <= balanceOf(msg.sender), "transfer value exceeded balance of sender");
 
-
     bool success;
-    (success,) = TRANSFER.call.value(0).gas(gasleft())(abi.encode(msg.sender, to, value));
+    (success, ) = TRANSFER.call.value(0).gas(gasleft())(abi.encode(msg.sender, to, value));
     require(success, "Celo Gold transfer failed");
     emit Transfer(msg.sender, to, value);
     return true;

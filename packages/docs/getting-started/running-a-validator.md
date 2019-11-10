@@ -14,6 +14,19 @@ If you are starting up a validator, please consider leaving it running for a few
 
 ## **Prerequisites**
 
+### Hardware requirements
+
+Because Celo network is based in Proof of Stake, the hardware requirements are not very high. Proof of Stake consensus is not so CPU intensive as Proof of Work but has a higher requirements of network connectivity and lantency. Here you have a list of the standard requirements for running a validator node:
+
+- Memory: 8 GB RAM
+- CPU: Quad core 3GHz (64-bit)
+- Disk: 256 GB of SSD storage
+- Network: At least 1 GB input/output dual Ethernet
+
+It is recommended to run the validator node in an environment that facilitates a 24/7 execution. Deployments in a top-tier datacenter facilitates the security and better uptimes.
+
+### Software requirements
+
 - **You have Docker installed.**
 
   If you don’t have it already, follow the instructions here: [Get Started with Docker](https://www.docker.com/get-started). It will involve creating or signing in with a Docker account, downloading a desktop app, and then launching the app to be able to use the Docker CLI. If you are running on a Linux server, follow the instructions for your distro [here](https://docs.docker.com/install/#server). You may be required to run Docker with sudo depending on your installation environment.

@@ -1,6 +1,5 @@
 pragma solidity ^0.5.3;
 
-
 interface IElection {
   function getTotalVotes() external view returns (uint256);
   function getActiveVotes() external view returns (uint256);
