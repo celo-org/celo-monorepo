@@ -1852,7 +1852,7 @@ contract('Validators', (accounts: string[]) => {
       const adjustmentSpeed = fromFixed(validatorScoreParameters.adjustmentSpeed)
       // @ts-ignore
       const expectedScore = adjustmentSpeed.times(uptime.pow(validatorScoreParameters.exponent))
-      const expectedTotalPayment = expectedScore.times(maxPayment)
+      const expectedTotalPayment = expectedScore.times(maxPayment).dp(0, BigNumber.ROUND_FLOOR)
       const expectedGroupPayment = expectedTotalPayment
         .times(fromFixed(commission))
         .dp(0, BigNumber.ROUND_FLOOR)
