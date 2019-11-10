@@ -1,6 +1,6 @@
 import { BaseCommand } from '../../base'
 import { printValueMap } from '../../utils/cli'
-import { Args, Flags } from '../../utils/command'
+import { Flags } from '../../utils/command'
 import { serializeSignature } from '@celo/utils/lib/signatureUtils'
 
 export default class ProofOfPossession extends BaseCommand {

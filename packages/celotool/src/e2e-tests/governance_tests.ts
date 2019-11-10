@@ -187,18 +187,28 @@ describe('governance tests', () => {
           syncmode: 'full',
           port: 30313,
           wsport: 8555,
+          rpcport: 8557,
           privateKey: groupPrivateKey.slice(2),
           peers: [await getEnode(8545)],
         },
+      ]
+      await Promise.all(
+        additionalNodes.map(
+          async (nodeConfig) => await initAndStartGeth(context.hooks.gethBinaryPath, nodeConfig)
+        )
+      )
+      // Connect the validating nodes to the non-validating nodes, to test that announce messages
+      // are properly gossiped.
+      const additionalValidatingNodes = [
         {
           name: 'validator2KeyRotation0',
           validating: true,
           syncmode: 'full',
           lightserv: false,
           port: 30315,
-          wsport: 8557,
+          wsport: 8559,
           privateKey: rotation0PrivateKey.slice(2),
-          peers: [await getEnode(8545)],
+          peers: [await getEnode(8557)],
         },
         {
           name: 'validator2KeyRotation1',
@@ -206,14 +216,14 @@ describe('governance tests', () => {
           syncmode: 'full',
           lightserv: false,
           port: 30317,
-          wsport: 8559,
+          wsport: 8561,
           privateKey: rotation1PrivateKey.slice(2),
-          peers: [await getEnode(8545)],
+          peers: [await getEnode(8557)],
         },
       ]
       await Promise.all(
-        additionalNodes.map((nodeConfig) =>
-          initAndStartGeth(context.hooks.gethBinaryPath, nodeConfig)
+        additionalValidatingNodes.map(
+          async (nodeConfig) => await initAndStartGeth(context.hooks.gethBinaryPath, nodeConfig)
         )
       )
 
@@ -240,7 +250,7 @@ describe('governance tests', () => {
 
       // Prepare for key rotation.
       const validatorWeb3 = new Web3('http://localhost:8549')
-      const authorizedWeb3s = [new Web3('ws://localhost:8557'), new Web3('ws://localhost:8559')]
+      const authorizedWeb3s = [new Web3('ws://localhost:8559'), new Web3('ws://localhost:8561')]
       const authorizedPublicKeysData = [
         getPublicKeysData(rotation0PrivateKey),
         getPublicKeysData(rotation1PrivateKey),
