@@ -73,7 +73,7 @@ class CheckBuilder {
       'Signer can sign Validator Txs',
       this.withAccounts((lg) =>
         lg
-          .activeValidationSignerToAccount(this.signer!)
+          .activeValidatorSignerToAccount(this.signer!)
           .then(() => true)
           .catch(() => false)
       )

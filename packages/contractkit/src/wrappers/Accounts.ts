@@ -42,7 +42,7 @@ export class AccountsWrapper extends BaseWrapper<Accounts> {
     this.contract.methods.getVoteSigner
   )
   /**
-   * Returns the validator signere for the specified account.
+   * Returns the validator signer for the specified account.
    * @param account The address of the account.
    * @return The address with which the account can register a validator or group.
    */
@@ -55,8 +55,8 @@ export class AccountsWrapper extends BaseWrapper<Accounts> {
    * @param signer Address that is authorized to sign the tx as validator
    * @return The Account address
    */
-  activeValidationSignerToAccount: (signer: Address) => Promise<Address> = proxyCall(
-    this.contract.methods.activeValidationSignerToAccount
+  activeValidatorSignerToAccount: (signer: Address) => Promise<Address> = proxyCall(
+    this.contract.methods.activeValidatorSignerToAccount
   )
 
   /**
@@ -71,7 +71,9 @@ export class AccountsWrapper extends BaseWrapper<Accounts> {
    * @param address The address of the account
    * @return Returns `true` if account exists. Returns `false` otherwise.
    */
-  isSigner: (address: string) => Promise<boolean> = proxyCall(this.contract.methods.isAuthorized)
+  isSigner: (address: string) => Promise<boolean> = proxyCall(
+    this.contract.methods.isAuthorizedSigner
+  )
 
   /**
    * Authorize an attestation signing key on behalf of this account to another address.
@@ -137,7 +139,6 @@ export class AccountsWrapper extends BaseWrapper<Accounts> {
         )
       )
     } else {
-      // @ts-ignore Typechain doesn't handle function overloading.
       return toTransactionObject(
         this.kit,
         this.contract.methods.authorizeValidatorSigner(
@@ -145,6 +146,7 @@ export class AccountsWrapper extends BaseWrapper<Accounts> {
           proofOfBlsKeyPossession,
           proofOfSigningKeyPossession.v,
           proofOfSigningKeyPossession.r,
+          // @ts-ignore Typechain doesn't handle function overloading.
           proofOfSigningKeyPossession.s
         )
       )

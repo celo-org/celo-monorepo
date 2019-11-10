@@ -319,7 +319,7 @@ describe('governance tests', () => {
       return validatorSet
     }
 
-    const getValidatorSetAccountKeysAtBlock = async (blockNumber: number) => {
+    const getValidatorSetAccountsAtBlock = async (blockNumber: number) => {
       const signingKeys = await getValidatorSetSignersAtBlock(blockNumber)
       return await Promise.all(
         signingKeys.map((address: string) =>
@@ -353,13 +353,13 @@ describe('governance tests', () => {
           memberAccounts.map((v: string) => getValidatorSigner(v, lastEpochBlock))
         )
         const validatorSetSigners = await getValidatorSetSignersAtBlock(blockNumber)
-        const validatorSetAccounts = await getValidatorSetAccountKeysAtBlock(blockNumber)
+        const validatorSetAccounts = await getValidatorSetAccountsAtBlock(blockNumber)
         assert.sameMembers(memberSigners, validatorSetSigners)
         assert.sameMembers(memberAccounts, validatorSetAccounts)
       }
     })
 
-    it('should block propose in a round robin manner', async () => {
+    it('should block propose in a round robin fashion', async () => {
       let roundRobinOrder: string[] = []
       for (const blockNumber of blockNumbers) {
         const lastEpochBlock = getLastEpochBlock(blockNumber)
@@ -417,7 +417,7 @@ describe('governance tests', () => {
         let expectUnchangedScores: string[]
         let expectChangedScores: string[]
         if (isLastBlockOfEpoch(blockNumber, epoch)) {
-          expectChangedScores = await getValidatorSetAccountKeysAtBlock(blockNumber)
+          expectChangedScores = await getValidatorSetAccountsAtBlock(blockNumber)
           expectUnchangedScores = validatorAccounts.filter((x) => !expectChangedScores.includes(x))
         } else {
           expectUnchangedScores = validatorAccounts
@@ -480,7 +480,7 @@ describe('governance tests', () => {
         let expectUnchangedBalances: string[]
         let expectChangedBalances: string[]
         if (isLastBlockOfEpoch(blockNumber, epoch)) {
-          expectChangedBalances = await getValidatorSetAccountKeysAtBlock(blockNumber)
+          expectChangedBalances = await getValidatorSetAccountsAtBlock(blockNumber)
           expectUnchangedBalances = validatorAccounts.filter(
             (x) => !expectChangedBalances.includes(x)
           )

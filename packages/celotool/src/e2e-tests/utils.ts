@@ -265,7 +265,7 @@ export async function startGeth(gethBinaryPath: string, instance: GethInstanceCo
     '--networkid',
     NetworkId.toString(),
     '--verbosity',
-    '5',
+    '4',
     '--consoleoutput=stdout', // Send all logs to stdout
     '--consoleformat=term',
     '--nat',

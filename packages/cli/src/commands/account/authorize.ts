@@ -6,7 +6,7 @@ import { Flags } from '../../utils/command'
 
 // TODO: Support authorizing a validator signer when a validator is registered.
 export default class Authorize extends BaseCommand {
-  static description = 'Authorize an attestation, validator or vote signing key'
+  static description = 'Authorize an attestation, validator, or vote signer'
 
   static flags = {
     ...BaseCommand.flags,
@@ -27,7 +27,7 @@ export default class Authorize extends BaseCommand {
   static args = []
 
   static examples = [
-    'authorize --from 0x5409ED021D9299bf6814279A6A1411A7e866A631 --role vote --signer 0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d --pop 0xTODO',
+    'authorize --from 0x5409ED021D9299bf6814279A6A1411A7e866A631 --role vote --signer 0x6ecbe1db9ef729cbe972c83fb886247691fb6beb --pop 0x1b9fca4bbb5bfb1dbe69ef1cddbd9b4202dcb6b134c5170611e1e36ecfa468d7b46c85328d504934fce6c2a1571603a50ae224d2b32685e84d4d1a1eebad8452eb',
   ]
 
   async run() {

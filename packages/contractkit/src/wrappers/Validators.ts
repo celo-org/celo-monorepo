@@ -57,7 +57,6 @@ export class ValidatorsWrapper extends BaseWrapper<Validators> {
       this.contract.methods.updateCommission(toFixed(commission).toFixed())
     )
   }
-  updatePublicKeysData = proxySend(this.kit, this.contract.methods.updatePublicKeysData)
   /**
    * Returns the Locked Gold requirements for validators.
    * @returns The Locked Gold requirements for validators.
@@ -100,7 +99,7 @@ export class ValidatorsWrapper extends BaseWrapper<Validators> {
 
   async signerToAccount(signerAddress: Address) {
     const accounts = await this.kit.contracts.getAccounts()
-    return accounts.activeValidationSignerToAccount(signerAddress)
+    return accounts.activeValidatorSignerToAccount(signerAddress)
   }
 
   /**

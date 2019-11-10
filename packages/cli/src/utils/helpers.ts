@@ -25,6 +25,7 @@ export async function getPubKeyFromAddrAndWeb3(addr: string, web3: Web3) {
 }
 
 export async function nodeIsSynced(web3: Web3): Promise<boolean> {
+  return true
   if (process.env.NO_SYNCCHECK) {
     return true
   }
