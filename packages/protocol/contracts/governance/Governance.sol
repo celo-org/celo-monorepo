@@ -329,7 +329,10 @@ contract Governance is
    */
   function setParticipationBaseline(uint256 participationBaseline) public onlyOwner {
     FixidityLib.Fraction memory participationBaselineFrac = FixidityLib.wrap(participationBaseline);
-    require(FixidityLib.isProperFraction(participationBaselineFrac), "Improper fraction");
+    require(
+      FixidityLib.isProperFraction(participationBaselineFrac),
+      "Participation baseline greater than one"
+    );
     require(
       !participationBaselineFrac.equals(participationParameters.baseline),
       "Participation baseline unchanged"
@@ -344,7 +347,10 @@ contract Governance is
    */
   function setParticipationFloor(uint256 participationFloor) public onlyOwner {
     FixidityLib.Fraction memory participationFloorFrac = FixidityLib.wrap(participationFloor);
-    require(FixidityLib.isProperFraction(participationFloorFrac), "Improper fraction");
+    require(
+      FixidityLib.isProperFraction(participationFloorFrac),
+      "Participation floor greater than one"
+    );
     require(
       !participationFloorFrac.equals(participationParameters.baselineFloor),
       "Participation baseline floor unchanged"
@@ -359,7 +365,10 @@ contract Governance is
    */
   function setBaselineUpdateFactor(uint256 baselineUpdateFactor) public onlyOwner {
     FixidityLib.Fraction memory baselineUpdateFactorFrac = FixidityLib.wrap(baselineUpdateFactor);
-    require(FixidityLib.isProperFraction(baselineUpdateFactorFrac), "Improper fraction");
+    require(
+      FixidityLib.isProperFraction(baselineUpdateFactorFrac),
+      "Baseline update factor greater than one"
+    );
     require(
       !baselineUpdateFactorFrac.equals(participationParameters.baselineUpdateFactor),
       "Baseline update factor unchanged"
@@ -374,7 +383,10 @@ contract Governance is
    */
   function setBaselineQuorumFactor(uint256 baselineQuorumFactor) public onlyOwner {
     FixidityLib.Fraction memory baselineQuorumFactorFrac = FixidityLib.wrap(baselineQuorumFactor);
-    require(FixidityLib.isProperFraction(baselineQuorumFactorFrac), "Improper fraction");
+    require(
+      FixidityLib.isProperFraction(baselineQuorumFactorFrac),
+      "Baseline quorum factor greater than one"
+    );
     require(
       !baselineQuorumFactorFrac.equals(participationParameters.baselineQuorumFactor),
       "Baseline quorum factor unchanged"
@@ -616,7 +628,7 @@ contract Governance is
       // TODO(asa): Think through the effects of changing the passing function
       require(
         stage == Proposals.Stage.Execution && _isProposalPassing(proposal),
-        "Proposal not in execution stage"
+        "Proposal not in execution stage or not passing"
       );
       proposal.execute();
       emit ProposalExecuted(proposalId);

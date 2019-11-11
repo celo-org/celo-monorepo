@@ -671,9 +671,10 @@ contract Validators is
     returns (bool)
   {
     address account = getAccounts().activeValidationSignerToAccount(msg.sender);
-    require(isValidatorGroup(account) && isValidator(validator), "Invalid validator or group");
+    require(isValidatorGroup(account), "Not a group");
+    require(isValidator(validator), "Not a validator");
     ValidatorGroup storage group = groups[account];
-    require(group.members.contains(validator), "Not contained in the group");
+    require(group.members.contains(validator), "Not a member of the group");
     group.members.update(validator, lesserMember, greaterMember);
     emit ValidatorGroupMemberReordered(account, validator);
     return true;
@@ -687,7 +688,7 @@ contract Validators is
    */
   function updateCommission(uint256 commission) external returns (bool) {
     address account = getAccounts().activeValidationSignerToAccount(msg.sender);
-    require(isValidatorGroup(account), "Invalida validator group");
+    require(isValidatorGroup(account), "Not a validator group");
     ValidatorGroup storage group = groups[account];
     require(commission <= FixidityLib.fixed1().unwrap(), "Commission can't be greater than 100%");
     require(commission != group.commission.unwrap(), "Commission must be different");
@@ -889,7 +890,7 @@ contract Validators is
   function _removeMember(address group, address validator) private returns (bool) {
     ValidatorGroup storage _group = groups[group];
     require(validators[validator].affiliation == group, "Not affiliated to group");
-    require(_group.members.contains(validator), "Not contained in the group");
+    require(_group.members.contains(validator), "Not a member of the group");
     _group.members.remove(validator);
     uint256 numMembers = _group.members.numElements;
     // Empty validator groups are not electable.

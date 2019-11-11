@@ -180,7 +180,7 @@ contract LockedGold is ILockedGold, ReentrancyGuard, Initializable, UsingRegistr
     Account storage account = accounts[msg.sender];
     require(index < account.balances.pendingWithdrawals.length, "Bad pending withdrawal index");
     PendingWithdrawal storage pendingWithdrawal = account.balances.pendingWithdrawals[index];
-    require(now >= pendingWithdrawal.timestamp, "Trying to withdraw too early");
+    require(now >= pendingWithdrawal.timestamp, "Pending withdrawal not available");
     uint256 value = pendingWithdrawal.value;
     deletePendingWithdrawal(account.balances.pendingWithdrawals, index);
     require(getGoldToken().transfer(msg.sender, value), "Transfer failed");
