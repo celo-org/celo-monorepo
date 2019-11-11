@@ -43,18 +43,18 @@ export class ProposalUtility extends Proposal {
 
     return concurrentMap(1, this.transactions, async (transaction) => {
       // lookup CeloContract name from transaction destination address
-      const contractName = addressToNameMap.get(transaction.destination)
-      if (!contractName) {
+      const celoContractName = addressToNameMap.get(transaction.destination)
+      if (!celoContractName) {
         throw new Error(`Transaction destination ${transaction.destination} not found in registry`)
       }
 
       // lookup CeloContractMethod name from transaction data
-      const contract = await this.kit._web3Contracts.getContract(contractName)
+      const contract = await this.kit._web3Contracts.getContract(celoContractName)
       const selectors = Object.keys(contract.methods)
       const funcSelector = parseBuffer(transaction.data.slice(0, 4)) // func sig is first 4 bytes
       const idx = selectors.findIndex((selector) => selector === funcSelector)
       if (idx === -1) {
-        throw new Error(`No method matching ${transaction} found on ${contractName}`)
+        throw new Error(`No method matching ${transaction} found on ${celoContractName}`)
       }
       const methodName = selectors[idx + 1] // pretty name 1 index after
 
@@ -66,7 +66,7 @@ export class ProposalUtility extends Proposal {
 
       return {
         value: transaction.value.toFixed(),
-        celoContractName: contractName,
+        celoContractName,
         methodName,
         args,
       }
