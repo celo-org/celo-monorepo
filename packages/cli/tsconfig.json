@@ -3,8 +3,9 @@
   "compilerOptions": {
     "rootDir": "src",
     "outDir": "lib",
-    "esModuleInterop": true
+    "esModuleInterop": true,
+    "target": "es6"
   },
-  "include": ["src"],
-  "references": [{ "path": "../utils" }]
+  "include": ["src", "../contractkit/types"],
+  "references": [{ "path": "../utils" }, { "path": "../contractkit" }]
 }

@@ -34,11 +34,14 @@
   "testnetForum": "Alfajores Testnet Forum",
   "testnetAddress": "Testnet Address",
   "getStarted": "Get Started",
-  "done": "Done. SMS arriving \n in 1 – 2 Minutes",
+  "inviteDone": "Done. SMS arriving\nin 1 – 2 Minutes",
+  "faucetDone": "Done",
   "inviteError": "Unable to complete",
   "cUSDsent": "cUSD Sent",
   "cGLDsent": "cGLD Sent",
   "walletBuilt": "Wallet Built",
-  "countryPlaceholder": "Country or Overseas Territory",
-  "phonePlaceholder": "Phone Number"
+  "countryPlaceholder": "Country or Territory",
+  "phonePlaceholder": "Phone Number",
+  "chooseMobileOS": "Choose Mobile OS",
+  "downloadDirect": "Available for Android and iOS"
 }

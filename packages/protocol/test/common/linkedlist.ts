@@ -1,12 +1,7 @@
 import { assertRevert } from '@celo/protocol/lib/test-utils'
-// import BigNumber from 'bignumber.js'
 import { LinkedListTestContract, LinkedListTestInstance } from 'types'
 
 const LinkedListTest: LinkedListTestContract = artifacts.require('LinkedListTest')
-
-// @ts-ignore
-// TODO(mcortesi): Use BN
-LinkedListTest.numberFormat = 'BigNumber'
 
 contract('LinkedListTest', () => {
   let linkedListTest: LinkedListTestInstance

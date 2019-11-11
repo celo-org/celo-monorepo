@@ -11,6 +11,7 @@ import { InitializationState, isGethConnectedSelector } from 'src/geth/reducer'
 import { navigateToError } from 'src/navigator/NavigationService'
 import { restartApp } from 'src/utils/AppRestart'
 import Logger from 'src/utils/Logger'
+import { zeroSyncSelector } from 'src/web3/selectors'
 
 const gethEmitter = new NativeEventEmitter(NativeModules.RNGeth)
 
@@ -41,6 +42,10 @@ export function* waitForGethConnectivity() {
 }
 
 function* waitForGethInstance() {
+  const zeroSyncMode = yield select(zeroSyncSelector)
+  if (zeroSyncMode) {
+    return GethInitOutcomes.SUCCESS
+  }
   try {
     const gethInstance = yield call(getGeth)
     if (gethInstance == null) {
@@ -61,7 +66,7 @@ function* waitForGethInstance() {
   }
 }
 
-function* initGethSaga() {
+export function* initGethSaga() {
   Logger.debug(TAG, 'Initializing Geth')
   yield put(setInitState(InitializationState.INITIALIZING))
 
@@ -128,6 +133,13 @@ function createNewBlockChannel() {
 
 function* monitorGeth() {
   const newBlockChannel = yield createNewBlockChannel()
+
+  const zeroSyncMode = yield select(zeroSyncSelector)
+  if (zeroSyncMode) {
+    yield put(setGethConnected(true))
+    yield delay(GETH_MONITOR_DELAY)
+    return
+  }
 
   while (true) {
     try {

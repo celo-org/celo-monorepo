@@ -1,6 +1,11 @@
 #! /bin/bash
 
-# --- Set Up Persistent Disk ----
+# ---- Set Up Logging ----
+
+curl -sSO https://dl.google.com/cloudagents/install-logging-agent.sh
+bash install-logging-agent.sh
+
+# ---- Set Up Persistent Disk ----
 
 # gives a path similar to `/dev/sdb`
 DISK_PATH=`readlink -f /dev/disk/by-id/google-${attached_disk_name}`
@@ -26,21 +31,25 @@ mkdir -p $DATA_DIR
 echo "Mounting $DISK_PATH onto $DATA_DIR"
 mount -o discard,defaults $DISK_PATH $DATA_DIR
 
-# --- Install Docker ----
+# ---- Install Docker ----
 
 echo "Installing Docker..."
 apt update && apt upgrade
 apt install -y apt-transport-https ca-certificates curl software-properties-common gnupg2
 curl -fsSL https://download.docker.com/linux/debian/gpg | apt-key add -
 add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/debian $(lsb_release -cs) stable"
-apt update
+apt update && apt upgrade
 apt install -y docker-ce
 systemctl start docker
 
 echo "Configuring Docker..."
 gcloud auth configure-docker
 
-# --- Set Up and Run Geth ----
+# use GCP logging for Docker containers
+echo '{"log-driver":"gcplogs"}' > /etc/docker/daemon.json
+systemctl restart docker
+
+# ---- Set Up and Run Geth ----
 
 GETH_NODE_DOCKER_IMAGE=${geth_node_docker_image_repository}:${geth_node_docker_image_tag}
 
@@ -60,11 +69,14 @@ echo "Bootnode enode: $BOOTNODE_ENODE"
 echo "Pulling geth..."
 docker pull $GETH_NODE_DOCKER_IMAGE
 
+IN_MEMORY_DISCOVERY_TABLE_FLAG=""
+[[ ${in_memory_discovery_table} == "true" ]] && IN_MEMORY_DISCOVERY_TABLE_FLAG="--use-in-memory-discovery-table"
+
 echo "Starting geth..."
 # We need to override the entrypoint in the geth image (which is originally `geth`).
 # `geth account import` fails when the account has already been imported. In
 # this case, we do not want to pipefail
-docker run -v $DATA_DIR:$DATA_DIR --net=host --entrypoint /bin/sh -d $GETH_NODE_DOCKER_IMAGE -c "\
+docker run -v $DATA_DIR:$DATA_DIR --name geth --net=host --entrypoint /bin/sh -d $GETH_NODE_DOCKER_IMAGE -c "\
   (
     set -euo pipefail && \
     mkdir -p $DATA_DIR/account /var/geth && \
@@ -103,7 +115,9 @@ docker run -v $DATA_DIR:$DATA_DIR --net=host --entrypoint /bin/sh -d $GETH_NODE_
       --verbosity=${geth_verbosity} \
       --ethstats=${validator_name}:$ETHSTATS_WEBSOCKETSECRET@${ethstats_host} \
       --istanbul.blockperiod=${block_time} \
+      --istanbul.requesttimeout=${istanbul_request_timeout_ms} \
       --maxpeers=${max_peers} \
       --nat=extip:${ip_address} \
-      --ping-ip-from-packet \
+      --metrics \
+      $IN_MEMORY_DISCOVERY_TABLE_FLAG \
   )"

@@ -1,5 +1,13 @@
 import Button, { BtnTypes } from '@celo/react-components/components/Button'
+import KeyboardAwareScrollView from '@celo/react-components/components/KeyboardAwareScrollView'
+import KeyboardSpacer from '@celo/react-components/components/KeyboardSpacer'
 import LoadingLabel from '@celo/react-components/components/LoadingLabel'
+import TextInput, { TextInputProps } from '@celo/react-components/components/TextInput'
+import ValidatedTextInput, {
+  DecimalValidatorProps,
+  ValidatedTextInputProps,
+} from '@celo/react-components/components/ValidatedTextInput'
+import withTextInputLabeling from '@celo/react-components/components/WithTextInputLabeling'
 import colors from '@celo/react-components/styles/colors'
 import { fontStyles } from '@celo/react-components/styles/fonts'
 import { componentStyles } from '@celo/react-components/styles/styles'
@@ -9,7 +17,7 @@ import BigNumber from 'bignumber.js'
 import * as React from 'react'
 import { withNamespaces, WithNamespaces } from 'react-i18next'
 import { StyleSheet, Text, TextStyle, TouchableWithoutFeedback, View } from 'react-native'
-import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'
+import SafeAreaView from 'react-native-safe-area-view'
 import { NavigationInjectedProps } from 'react-navigation'
 import { connect } from 'react-redux'
 import { hideAlert, showError, showMessage } from 'src/alert/actions'
@@ -29,7 +37,7 @@ import { getFeeEstimateDollars } from 'src/fees/selectors'
 import { CURRENCIES, CURRENCY_ENUM } from 'src/geth/consts'
 import i18n, { Namespaces } from 'src/i18n'
 import { fetchPhoneAddresses } from 'src/identity/actions'
-import { VerificationStatus } from 'src/identity/contactMapping'
+import { RecipientVerificationStatus } from 'src/identity/contactMapping'
 import { E164NumberToAddressType } from 'src/identity/reducer'
 import { LocalCurrencyCode } from 'src/localCurrency/consts'
 import {
@@ -47,12 +55,16 @@ import {
   RecipientKind,
 } from 'src/recipients/recipient'
 import { RootState } from 'src/redux/reducers'
-import LabeledTextInput from 'src/send/LabeledTextInput'
 import { ConfirmationInput } from 'src/send/SendConfirmation'
 import DisconnectBanner from 'src/shared/DisconnectBanner'
 import { fetchDollarBalance } from 'src/stableToken/actions'
 import { TransactionTypes } from 'src/transactions/reducer'
 import { getBalanceColor, getFeeDisplayValue, getMoneyDisplayValue } from 'src/utils/formatting'
+
+const AmountInput = withTextInputLabeling<ValidatedTextInputProps<DecimalValidatorProps>>(
+  ValidatedTextInput
+)
+const CommentInput = withTextInputLabeling<TextInputProps>(TextInput)
 
 interface State {
   amount: string
@@ -108,11 +120,11 @@ function getFeeType(
   const verificationStatus = getVerificationStatus(navigation, e164NumberToAddress)
 
   switch (verificationStatus) {
-    case VerificationStatus.UNKNOWN:
+    case RecipientVerificationStatus.UNKNOWN:
       return null
-    case VerificationStatus.UNVERIFIED:
+    case RecipientVerificationStatus.UNVERIFIED:
       return FeeType.INVITE
-    case VerificationStatus.VERIFIED:
+    case RecipientVerificationStatus.VERIFIED:
       return FeeType.SEND
   }
 }
@@ -188,12 +200,13 @@ export class SendAmount extends React.Component<Props, State> {
   }
 
   isAmountValid = () => {
-    const isAmountValid = parseInputAmount(this.state.amount).isGreaterThan(
+    const isAmountValid = parseInputAmount(this.state.amount).isGreaterThanOrEqualTo(
       DOLLAR_TRANSACTION_MIN_AMOUNT
     )
     return {
       isAmountValid,
-      isDollarBalanceSufficient: isAmountValid && this.getNewAccountBalance().isGreaterThan(0),
+      isDollarBalanceSufficient:
+        isAmountValid && this.getNewAccountBalance().isGreaterThanOrEqualTo(0),
     }
   }
 
@@ -241,7 +254,7 @@ export class SendAmount extends React.Component<Props, State> {
     const verificationStatus = this.getVerificationStatus()
     let confirmationInput: ConfirmationInput
 
-    if (verificationStatus === VerificationStatus.VERIFIED) {
+    if (verificationStatus === RecipientVerificationStatus.VERIFIED) {
       confirmationInput = this.getConfirmationInput(TransactionTypes.SENT)
       CeloAnalytics.track(CustomEventNames.transaction_details, {
         recipientAddress: confirmationInput.recipientAddress,
@@ -268,12 +281,14 @@ export class SendAmount extends React.Component<Props, State> {
     const verificationStatus = this.getVerificationStatus()
 
     const requestDisabled =
-      !isAmountValid || verificationStatus !== VerificationStatus.VERIFIED || characterLimitExceeded
+      !isAmountValid ||
+      verificationStatus !== RecipientVerificationStatus.VERIFIED ||
+      characterLimitExceeded
     const sendDisabled =
       !isAmountValid ||
       !isDollarBalanceSufficient ||
       characterLimitExceeded ||
-      verificationStatus === VerificationStatus.UNKNOWN
+      verificationStatus === RecipientVerificationStatus.UNKNOWN
 
     const separatorContainerStyle =
       sendDisabled && requestDisabled
@@ -284,7 +299,7 @@ export class SendAmount extends React.Component<Props, State> {
 
     return (
       <View style={[componentStyles.bottomContainer, style.buttonContainer]}>
-        {verificationStatus !== VerificationStatus.UNVERIFIED && (
+        {verificationStatus !== RecipientVerificationStatus.UNVERIFIED && (
           <View style={style.button}>
             <Button
               onPress={this.onRequest}
@@ -302,7 +317,9 @@ export class SendAmount extends React.Component<Props, State> {
         <View style={style.button}>
           <Button
             onPress={this.onSend}
-            text={verificationStatus === VerificationStatus.VERIFIED ? t('send') : t('invite')}
+            text={
+              verificationStatus === RecipientVerificationStatus.VERIFIED ? t('send') : t('invite')
+            }
             accessibilityLabel={t('send')}
             standard={false}
             type={BtnTypes.PRIMARY}
@@ -345,7 +362,12 @@ export class SendAmount extends React.Component<Props, State> {
     const verificationStatus = this.getVerificationStatus()
 
     return (
-      <View style={style.body}>
+      <SafeAreaView
+        // Force inset as this screen uses auto focus and KeyboardSpacer padding is initially
+        // incorrect because of that
+        forceInset={{ bottom: 'always' }}
+        style={style.body}
+      >
         {feeType && <EstimateFee feeType={feeType} />}
         <KeyboardAwareScrollView keyboardShouldPersistTaps="always">
           <DisconnectBanner />
@@ -357,23 +379,23 @@ export class SendAmount extends React.Component<Props, State> {
           />
           <View style={style.inviteDescription}>
             <LoadingLabel
-              isLoading={verificationStatus === VerificationStatus.UNKNOWN}
+              isLoading={verificationStatus === RecipientVerificationStatus.UNKNOWN}
               loadingLabelText={t('loadingVerificationStatus')}
               labelText={
-                verificationStatus === VerificationStatus.UNVERIFIED
+                verificationStatus === RecipientVerificationStatus.UNVERIFIED
                   ? t('inviteMoneyEscrow')
                   : undefined
               }
               labelTextStyle={fontStyles.center}
             />
           </View>
-          <LabeledTextInput
+          <AmountInput
             keyboardType="numeric"
             title={localCurrencyCode ? localCurrencyCode : CURRENCIES[CURRENCY_ENUM.DOLLAR].symbol}
             placeholder={t('amount')}
             labelStyle={style.amountLabel as TextStyle}
             placeholderTextColor={colors.celoGreenInactive}
-            autocorrect={false}
+            autoCorrect={false}
             value={this.state.amount}
             onChangeText={this.onAmountChanged}
             autoFocus={true}
@@ -381,8 +403,7 @@ export class SendAmount extends React.Component<Props, State> {
             validator={ValidatorKind.Decimal}
             lng={this.props.lng}
           />
-          <LabeledTextInput
-            keyboardType="default"
+          <CommentInput
             title={t('for')}
             placeholder={t('groceriesRent')}
             value={this.state.reason}
@@ -412,7 +433,8 @@ export class SendAmount extends React.Component<Props, State> {
           </View>
         </KeyboardAwareScrollView>
         {this.renderBottomContainer()}
-      </View>
+        <KeyboardSpacer />
+      </SafeAreaView>
     )
   }
 }

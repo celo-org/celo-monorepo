@@ -10,7 +10,7 @@ import * as twilio from 'twilio'
 import { AttestationsInstance, EscrowInstance, GoldTokenInstance, StableTokenInstance } from 'types'
 import Web3 = require('web3')
 
-const truffle = require('@celo/protocol/truffle')
+const truffle = require('@celo/protocol/truffle-config.js')
 const twilioConfig = require('@celo/protocol/twilio-config')
 
 const start = Date.now()

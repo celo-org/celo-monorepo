@@ -1,10 +1,10 @@
 import 'node-libs-react-native/globals'
-import 'src/btoa'
+import 'src/missingGlobals'
 import { AppRegistry } from 'react-native'
 import Logger from 'src/utils/Logger'
 import App from 'src/app/App'
 import { installSentry } from 'src/sentry/Sentry'
-import { Sentry } from 'react-native-sentry'
+import * as Sentry from '@sentry/react-native'
 import { onBackgroundNotification } from 'src/firebase/firebase'
 
 // Set this to true, if you are modifying Sentry and want to test your changes

@@ -1,11 +1,12 @@
 import { AddressToE164NumberType, E164NumberToAddressType } from 'src/identity/reducer'
-import { AttestationCode, CodeInputType } from 'src/identity/verification'
+import { AttestationCode, CodeInputType, VerificationStatus } from 'src/identity/verification'
 
 export enum Actions {
   START_VERIFICATION = 'IDENTITY/START_VERIFICATION',
-  END_VERIFICATION = 'IDENTITY/END_VERIFICATION',
   CANCEL_VERIFICATION = 'IDENTITY/CANCEL_VERIFICATION',
   RESET_VERIFICATION = 'IDENTITY/RESET_VERIFICATION',
+  SET_VERIFICATION_STATUS = 'IDENTITY/SET_VERIFICATION_STATUS',
+  SET_SEEN_VERIFICATION_NUX = 'IDENTITY/SET_SEEN_VERIFICATION_NUX',
   REVOKE_VERIFICATION = 'IDENTITY/REVOKE_VERIFICATION',
   RECEIVE_ATTESTATION_MESSAGE = 'IDENTITY/RECEIVE_ATTESTATION_MESSAGE',
   INPUT_ATTESTATION_CODE = 'IDENTITY/INPUT_ATTESTATION_CODE',
@@ -21,9 +22,14 @@ export interface StartVerificationAction {
   type: Actions.START_VERIFICATION
 }
 
-export interface EndVerificationAction {
-  type: Actions.END_VERIFICATION
-  success: boolean
+export interface SetVerificationStatusAction {
+  type: Actions.SET_VERIFICATION_STATUS
+  status: VerificationStatus
+}
+
+export interface SetHasSeenVerificationNux {
+  type: Actions.SET_SEEN_VERIFICATION_NUX
+  status: boolean
 }
 
 export interface CancelVerificationAction {
@@ -80,9 +86,10 @@ export interface DenyImportContactsAction {
 
 export type ActionTypes =
   | StartVerificationAction
-  | EndVerificationAction
   | CancelVerificationAction
   | ResetVerificationAction
+  | SetVerificationStatusAction
+  | SetHasSeenVerificationNux
   | ReceiveAttestationMessageAction
   | InputAttestationCodeAction
   | CompleteAttestationCodeAction
@@ -95,17 +102,22 @@ export const startVerification = (): StartVerificationAction => ({
   type: Actions.START_VERIFICATION,
 })
 
-export const endVerification = (success: boolean = true): EndVerificationAction => ({
-  type: Actions.END_VERIFICATION,
-  success,
-})
-
 export const cancelVerification = (): CancelVerificationAction => ({
   type: Actions.CANCEL_VERIFICATION,
 })
 
 export const resetVerification = (): ResetVerificationAction => ({
   type: Actions.RESET_VERIFICATION,
+})
+
+export const setVerificationStatus = (status: VerificationStatus): SetVerificationStatusAction => ({
+  type: Actions.SET_VERIFICATION_STATUS,
+  status,
+})
+
+export const setHasSeenVerificationNux = (status: boolean): SetHasSeenVerificationNux => ({
+  type: Actions.SET_SEEN_VERIFICATION_NUX,
+  status,
 })
 
 export const revokeVerification = (): RevokeVerificationAction => ({

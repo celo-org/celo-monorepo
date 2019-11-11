@@ -46,7 +46,7 @@ function getMatchingNumber(countryCode: string) {
   return nexmoNumbers[0].phoneNumber
 }
 
-export async function sendSms(phoneNumber: string, message: string) {
+export async function sendSms(phoneNumber: string, message: string): Promise<void> {
   const countryCode = phoneUtil.getRegionCodeForNumber(phoneUtil.parse(phoneNumber))
 
   if (!countryCode) {

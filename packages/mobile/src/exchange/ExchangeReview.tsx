@@ -4,7 +4,8 @@ import colors from '@celo/react-components/styles/colors'
 import BigNumber from 'bignumber.js'
 import * as React from 'react'
 import { withNamespaces, WithNamespaces } from 'react-i18next'
-import { StyleSheet, View } from 'react-native'
+import { StyleSheet } from 'react-native'
+import SafeAreaView from 'react-native-safe-area-view'
 import { NavigationInjectedProps } from 'react-navigation'
 import { connect } from 'react-redux'
 import CeloAnalytics from 'src/analytics/CeloAnalytics'
@@ -106,7 +107,7 @@ class ExchangeReview extends React.Component<Props> {
     )
 
     return (
-      <View style={styles.container}>
+      <SafeAreaView style={styles.container}>
         <DisconnectBanner />
         <ReviewFrame
           HeaderComponent={this.renderHeader}
@@ -127,7 +128,7 @@ class ExchangeReview extends React.Component<Props> {
             fee={fee}
           />
         </ReviewFrame>
-      </View>
+      </SafeAreaView>
     )
   }
 }

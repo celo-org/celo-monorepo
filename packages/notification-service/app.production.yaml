@@ -1,6 +1,0 @@
-runtime: nodejs
-env: flex 
-service: production
-instance_class: B4
-manual_scaling:
-  instances: 1

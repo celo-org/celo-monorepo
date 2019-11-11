@@ -1,8 +1,15 @@
-import { PartialTxParams, PrivateKeyWalletSubprovider } from '@0x/subproviders'
+import {
+  Callback,
+  ErrorCallback,
+  JSONRPCRequestPayload,
+  PartialTxParams,
+  PrivateKeyWalletSubprovider,
+} from '@0x/subproviders'
 import { BigNumber } from 'bignumber.js'
 import Web3 from 'web3'
 import { Tx } from 'web3/eth/types'
 import { Logger } from './logger'
+import { getAccountAddressFromPrivateKey } from './new-web3-utils'
 import { signTransaction } from './signing-utils'
 
 export interface CeloTransaction extends Tx {
@@ -21,6 +28,7 @@ export class CeloProvider extends PrivateKeyWalletSubprovider {
   }
 
   private readonly _celoPrivateKey: string // Always 0x prefixed
+  private readonly accountAddress: string // hex-encoded, lower case alphabets
   private _chainId: number | null = null
 
   constructor(privateKey: string) {
@@ -28,6 +36,42 @@ export class CeloProvider extends PrivateKeyWalletSubprovider {
     super(CeloProvider.getPrivateKeyWithout0xPrefix(privateKey))
     // Prefix 0x here or else the signed transaction produces dramatically different signer!!!
     this._celoPrivateKey = '0x' + CeloProvider.getPrivateKeyWithout0xPrefix(privateKey)
+    this.accountAddress = getAccountAddressFromPrivateKey(this._celoPrivateKey).toLowerCase()
+    Logger.debug('CeloProvider@construct', `CeloProvider Account address: ${this.accountAddress}`)
+  }
+
+  public getAccounts(): string[] {
+    return [this.accountAddress]
+  }
+
+  public async handleRequest(
+    payload: JSONRPCRequestPayload,
+    next: Callback,
+    end: ErrorCallback
+  ): Promise<void> {
+    let signingRequired = false
+    switch (payload.method) {
+      case 'eth_sendTransaction': // fallthrough
+      case 'eth_signTransaction': // fallthrough
+      case 'eth_sign': // fallthrough
+      case 'personal_sign': // fallthrough
+      case 'eth_signTypedData':
+        signingRequired = true
+    }
+    // Either
+    // signing is not required or
+    // signing is required and this class is the correct one to sign
+    const shouldPassToSuperClassForHandling =
+      !signingRequired ||
+      (payload.params[0].from !== undefined &&
+        payload.params[0].from !== null &&
+        payload.params[0].from.toLowerCase() === this.accountAddress)
+    if (shouldPassToSuperClassForHandling) {
+      return super.handleRequest(payload, next, end)
+    } else {
+      // Pass it to the next handler to sign
+      next()
+    }
   }
 
   public async signTransactionAsync(txParams: CeloPartialTxParams): Promise<string> {

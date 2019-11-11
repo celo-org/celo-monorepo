@@ -5,6 +5,8 @@ import { navigateToError } from 'src/navigator/NavigationService'
 import { setLatestBlockNumber, updateWeb3SyncProgress } from 'src/web3/actions'
 import {
   checkWeb3SyncProgress,
+  getDecryptedData,
+  getEncryptedData,
   getOrCreateAccount,
   SYNC_TIMEOUT,
   waitForWeb3Sync,
@@ -31,9 +33,10 @@ jest.mock('src/web3/contracts', () => ({
         .fn()
         .mockReturnValueOnce({ startingBlock: 0, currentBlock: 10, highestBlock: 100 })
         .mockReturnValueOnce(false),
-      getBlock: jest.fn(() => ({ number: LAST_BLOCK_NUMBER })),
+      getBlock: jest.fn(() => ({ number: 1000 })),
     },
   },
+  isZeroSyncMode: jest.fn().mockReturnValueOnce(false),
 }))
 
 const state = createMockStore({ web3: { account: mockAccount } }).getState()
@@ -56,7 +59,7 @@ describe(getOrCreateAccount, () => {
       .withState(state)
       .provide([[select(currentAccountSelector), null]])
       .provide([[select(pincodeTypeSelector), '123']])
-      .returns('0x0000000000000000000000000000000000007E57')
+      .returns('0x0000000000000000000000000000000000007e57')
       .run()
   })
 })
@@ -94,5 +97,17 @@ describe(checkWeb3SyncProgress, () => {
       .put(setLatestBlockNumber(LAST_BLOCK_NUMBER)) // finished syncing the second time
       .returns(true)
       .run()
+  })
+})
+
+describe(getEncryptedData, () => {
+  it('encrypts and decrypts correctly', () => {
+    const data = 'testing data'
+    const password = 'a random password'
+    const encryptedBuffer: Buffer = getEncryptedData(data, password)
+    console.debug(`Encrypted data is ${encryptedBuffer.toString('hex')}`)
+    const decryptedData: string = getDecryptedData(encryptedBuffer, password)
+    console.debug(`Decrypted data is \"${decryptedData}\"`)
+    expect(decryptedData).toBe(data)
   })
 })

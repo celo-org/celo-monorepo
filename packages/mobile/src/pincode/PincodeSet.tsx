@@ -7,6 +7,7 @@ import { componentStyles } from '@celo/react-components/styles/styles'
 import * as React from 'react'
 import { WithNamespaces, withNamespaces } from 'react-i18next'
 import { ScrollView, StyleSheet, Text, View } from 'react-native'
+import SafeAreaView from 'react-native-safe-area-view'
 import { connect } from 'react-redux'
 import { setPincode } from 'src/account/actions'
 import { PincodeType } from 'src/account/reducer'
@@ -115,7 +116,7 @@ export class PincodeSet extends React.Component<Props, State> {
     const { isPin1Inputted, pin1, pin2 } = this.state
 
     return (
-      <View style={style.container}>
+      <SafeAreaView style={style.container}>
         <DevSkipButton nextScreen={Screens.EnterInviteCode} />
         <ScrollView contentContainerStyle={style.scrollContainer}>
           <View>
@@ -144,7 +145,7 @@ export class PincodeSet extends React.Component<Props, State> {
           <Button
             testID="Pincode-Enter"
             text={t('global:continue')}
-            standard={true}
+            standard={false}
             type={BtnTypes.PRIMARY}
             onPress={this.onPressPin1Continue}
             disabled={!this.isPin1Valid()}
@@ -154,13 +155,13 @@ export class PincodeSet extends React.Component<Props, State> {
           <Button
             testID="Pincode-ReEnter"
             text={t('global:save')}
-            standard={true}
+            standard={false}
             type={BtnTypes.PRIMARY}
             onPress={this.onPressPin2Continue}
             disabled={!this.isPin2Valid()}
           />
         )}
-      </View>
+      </SafeAreaView>
     )
   }
 }

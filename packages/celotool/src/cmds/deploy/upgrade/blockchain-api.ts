@@ -1,31 +1,13 @@
-import { switchToClusterFromEnv } from 'src/lib/cluster'
-import { envVar, fetchEnv } from 'src/lib/env-utils'
-import { execCmd } from 'src/lib/utils'
-import * as yargs from 'yargs'
+import { handler as deployInitialBlockchainApiHandler } from '../../deploy/initial/blockchain-api'
 import { UpgradeArgv } from '../../deploy/upgrade'
+
 export const command = 'blockchain-api'
 
 export const describe = 'command for upgrading blockchain-api'
 
 // Can't extend because yargs.Argv already has a `config` property
-type BlockchainApiArgv = UpgradeArgv & {
-  config: string
-}
-
-export const builder = (argv: yargs.Argv) => {
-  return argv.option('config', {
-    type: 'string',
-    description: 'filename of config file to deploy',
-    demand: 'Please specify config file to deploy',
-  })
-}
+type BlockchainApiArgv = UpgradeArgv
 
 export const handler = async (argv: BlockchainApiArgv) => {
-  await switchToClusterFromEnv()
-  const testnetProjectName = fetchEnv(envVar.TESTNET_PROJECT_NAME)
-  console.info(`deploying blockchain-api for env ${argv.config} to ${testnetProjectName}`)
-  await execCmd(
-    `yarn --cwd ../blockchain-api run deploy --project ${testnetProjectName} ${argv.config} --quiet`
-  )
-  console.info(`blockchain-api deploy complete`)
+  await deployInitialBlockchainApiHandler(argv)
 }

@@ -4,7 +4,7 @@ import { MinimalContact } from 'react-native-contacts'
 import {
   getAddressFromPhoneNumber,
   getVerificationStatusFromPhoneNumber,
-  VerificationStatus,
+  RecipientVerificationStatus,
 } from 'src/identity/contactMapping'
 import { AddressToE164NumberType, E164NumberToAddressType } from 'src/identity/reducer'
 import Logger from 'src/utils/Logger'
@@ -174,9 +174,9 @@ export function getRecipientFromAddress(
 export function getRecipientVerificationStatus(
   recipient: Recipient,
   e164NumberToAddress: E164NumberToAddressType
-): VerificationStatus {
+): RecipientVerificationStatus {
   if (recipient.kind === RecipientKind.QrCode || recipient.kind === RecipientKind.Address) {
-    return VerificationStatus.VERIFIED
+    return RecipientVerificationStatus.VERIFIED
   }
 
   if (!recipient.e164PhoneNumber) {

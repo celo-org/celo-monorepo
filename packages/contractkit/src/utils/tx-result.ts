@@ -5,10 +5,20 @@ import { TransactionReceipt } from 'web3/types'
 
 const debug = debugFactory('kit:tx:result')
 
+/**
+ * Transforms a `PromiEvent` to a `TransactionResult`.
+ *
+ * PromiEvents are returned by web3 when we do a `contract.method.xxx.send()`
+ */
 export function toTxResult(pe: PromiEvent<any>) {
   return new TransactionResult(pe)
 }
 
+/**
+ * Replacement interface for web3's `PromiEvent`. Instead of emiting events
+ * to signal different stages, eveything is exposed as a promise. Which ends
+ * up being nicer when doing promise/async based programming.
+ */
 export class TransactionResult {
   private hashFuture = new Future<string>()
   private receiptFuture = new Future<TransactionReceipt>()
@@ -34,11 +44,23 @@ export class TransactionResult {
       }) as any)
   }
 
+  /** Get (& wait for) transaction hash */
   getHash() {
-    return this.hashFuture.wait()
+    return this.hashFuture.wait().catch((err) => {
+      // if hashFuture fails => receiptFuture also fails
+      // we wait for it here; so not UnhandlePromise error occurrs
+      this.receiptFuture.wait().catch(() => {
+        // ignore
+      })
+      throw err
+    })
   }
 
-  waitReceipt() {
+  /** Get (& wait for) transaction receipt */
+  async waitReceipt() {
+    // Make sure `getHash()` promise is consumed
+    await this.getHash()
+
     return this.receiptFuture.wait()
   }
 }

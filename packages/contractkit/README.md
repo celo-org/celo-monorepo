@@ -30,15 +30,13 @@ To start working with contractkit you need a `kit` instance:
 ```ts
 import { newKit } from '@celo/contractkit'
 
-const kit = newKit('https://alfajores-infura.celo-testnet.org:8545')
+const kit = newKit('https://alfajores-forno.celo-testnet.org:8545')
 ```
 
 To access web3:
 
 ```ts
-const web3 = kit.web3
-
-web3.eth.getBalance(someAddress)
+await kit.web3.eth.getBalance(someAddress)
 ```
 
 ### Setting Default Tx Options
@@ -46,12 +44,17 @@ web3.eth.getBalance(someAddress)
 `kit` allows you to set default transaction options:
 
 ```ts
-import { CeloContract } from '@celo/contractkit'
+import { newKit, CeloContract } from '@celo/contractkit'
 
-// default from
-kit.defaultAccount = myAddress
-// paid gas in celo dollars
-await kit.setGasCurrency(CeloContract.StableToken)
+async function getKit(myAddress: string) {
+  const kit = newKit('https://alfajores-forno.celo-testnet.org:8545')
+
+  // default from
+  kit.defaultAccount = myAddress
+  // paid gas in celo dollars
+  await kit.setGasCurrency(CeloContract.StableToken)
+  return kit
+}
 ```
 
 ### Interacting with cGold & cDollar
@@ -60,7 +63,7 @@ celo-blockchain has two initial coins: cGold and cDollar (stableToken).
 Both implement the ERC20 standard, and to interact with them is as simple as:
 
 ```ts
-const goldtoken = await kit.contract.getGoldToken()
+const goldtoken = await kit.contracts.getGoldToken()
 
 const balance = await goldtoken.balanceOf(someAddress)
 ```
@@ -80,7 +83,7 @@ const receipt = await tx.waitReceipt()
 To interact with cDollar, is the same but with a different contract:
 
 ```ts
-const stabletoken = await kit.contract.getStableToken()
+const stabletoken = await kit.contracts.getStableToken()
 ```
 
 ### Interacting with Other Contracts
@@ -89,9 +92,13 @@ Apart from GoldToken and StableToken, there are many core contracts.
 
 For the moment, we have contract wrappers for:
 
+- Accounts
 - Exchange (Uniswap kind exchange between Gold and Stable tokens)
 - Validators
 - LockedGold
+- GoldToken
+- StableToken
+- Attestations
 
 In the following weeks will add wrapper for all other contracts
 
@@ -106,6 +113,25 @@ const web3Exchange = await kit._web3Contracts.getExchange()
 ```
 
 We expose native wrappers for all Celo core contracts.
+
+The complete list of Celo Core contracts is:
+
+- Accounts
+- Attestations
+- LockedGold
+- Escrow
+- Exchange
+- GasCurrencyWhitelist
+- GasPriceMinimum
+- GoldToken
+- Governance
+- MultiSig
+- Random
+- Registry
+- Reserve
+- SortedOracles
+- StableToken
+- Validators
 
 ## A Note About Contract Addresses
 

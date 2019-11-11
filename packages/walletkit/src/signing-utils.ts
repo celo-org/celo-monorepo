@@ -1,11 +1,18 @@
 import { account as Account, bytes as Bytes, hash as Hash, nat as Nat, RLP } from 'eth-lib'
 import { extend, isNull, isUndefined } from 'lodash'
+import * as util from 'util'
 import * as helpers from 'web3-core-helpers'
 import * as utils from 'web3-utils'
 import { Logger } from './logger'
+import { getAccountAddressFromPrivateKey } from './new-web3-utils'
+import { CeloPartialTxParams } from './transaction-utils'
 
 // Original code taken from
 // https://github.com/ethereum/web3.js/blob/1.x/packages/web3-eth-accounts/src/index.js
+
+// Debug-mode only: Turn this on to verify that the signing key matches the sender
+// before signing as well as the recovered signer matches the original signer.
+const DEBUG_MODE_CHECK_SIGNER = false
 
 function isNot(value: any) {
   return isUndefined(value) || isNull(value)
@@ -25,19 +32,58 @@ function makeEven(hex: string) {
   return hex
 }
 
-export async function signTransaction(txn: any, privateKey: string) {
+function ensureCorrectSigner(sender: string, privateKey: string) {
+  if (DEBUG_MODE_CHECK_SIGNER) {
+    Logger.debug(
+      'signing-utils@ensureCorrectSigner',
+      `Checking that sender (${sender}) and ${privateKey} match...`
+    )
+    const generatedAddress = getAccountAddressFromPrivateKey(privateKey)
+    if (sender.toLowerCase() !== generatedAddress.toLowerCase()) {
+      throw new Error(
+        `Address from private key: ${generatedAddress}, ` + `address of sender ${sender}`
+      )
+    }
+    Logger.debug('signing-utils@ensureCorrectSigner', 'sender and private key match')
+  }
+}
+
+export async function signTransaction(txn: CeloPartialTxParams, privateKey: string) {
+  ensureCorrectSigner(txn.from, privateKey)
+
   let result: any
 
+  Logger.debug('SigningUtils@signTransaction', `Received ${util.inspect(txn)}`)
   if (!txn) {
     throw new Error('No transaction object given!')
   }
 
-  const signed = (tx: any) => {
+  const signed = (tx: any): any => {
+    if (isNot(tx.gasCurrency)) {
+      Logger.info(
+        'SigningUtils@signTransaction',
+        `Invalid transaction: Gas currency is \"${tx.gasCurrency}\"`
+      )
+      throw new Error(`Invalid transaction: Gas currency is \"${tx.gasCurrency}\"`)
+    }
+    if (isNot(tx.gasFeeRecipient)) {
+      Logger.info(
+        'SigningUtils@signTransaction',
+        `Invalid transaction: Gas fee recipient is \"${tx.gasFeeRecipient}\"`
+      )
+      throw new Error(`Invalid transaction: Gas fee recipient is \"${tx.gasFeeRecipient}\"`)
+    }
+
     if (!tx.gas && !tx.gasLimit) {
+      Logger.info(
+        'SigningUtils@signTransaction',
+        `Invalid transaction: Gas is \"${tx.gas}\" and gas limit is \"${tx.gasLimit}\"`
+      )
       throw new Error('"gas" is missing')
     }
 
     if (tx.nonce < 0 || tx.gas < 0 || tx.gasPrice < 0 || tx.chainId < 0) {
+      Logger.info('SigningUtils@signTransaction', 'Gas, gasPrice, nonce or chainId is lower than 0')
       throw new Error('Gas, gasPrice, nonce or chainId is lower than 0')
     }
 
@@ -49,8 +95,6 @@ export async function signTransaction(txn: any, privateKey: string) {
       transaction.data = tx.data || '0x'
       transaction.value = tx.value || '0x'
       transaction.chainId = utils.numberToHex(tx.chainId)
-      transaction.gasCurrency = tx.gasCurrency || '0x'
-      transaction.gasFeeRecipient = tx.gasFeeRecipient || '0x'
 
       const rlpEncoded = RLP.encode([
         Bytes.fromNat(transaction.nonce),
@@ -93,6 +137,26 @@ export async function signTransaction(txn: any, privateKey: string) {
       }
     } catch (e) {
       throw e
+    }
+
+    if (DEBUG_MODE_CHECK_SIGNER) {
+      Logger.debug(
+        'transaction-utils@getRawTransaction@Signing',
+        `Signed result of \"${util.inspect(tx)}\" is \"${util.inspect(result)}\"`
+      )
+      const recoveredSigner = recoverTransaction(result.rawTransaction).toLowerCase()
+      if (recoveredSigner !== txn.from) {
+        throw new Error(
+          `transaction-utils@getRawTransaction@Signing: Signer mismatch ${recoveredSigner} != ${
+            txn.from
+          }, retrying...`
+        )
+      } else {
+        Logger.debug(
+          'transaction-utils@getRawTransaction@Signing',
+          `Recovered signer is same as sender, code is working correctly: ${txn.from}`
+        )
+      }
     }
 
     return result
