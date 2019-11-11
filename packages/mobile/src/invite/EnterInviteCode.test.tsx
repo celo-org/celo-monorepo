@@ -16,6 +16,13 @@ import EnterInviteCode, {
 } from 'src/invite/EnterInviteCode'
 import { createMockStore, getMockI18nProps } from 'test/utils'
 
+jest.mock('src/config', () => {
+  return {
+    ...jest.requireActual('src/config'),
+    SHOW_GET_INVITE_LINK: true,
+  }
+})
+
 const VALID_INVITE =
   'Something something pFCr5NAAf/vUcWypJiQFnF6DHI+6vCGxMhhShki07ow= another thing else'
 const VALID_INVITE_KEY = '0xa450abe4d0007ffbd4716ca92624059c5e831c8fbabc21b13218528648b4ee8c'

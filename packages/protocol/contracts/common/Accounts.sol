@@ -200,6 +200,36 @@ contract Accounts is IAccounts, ReentrancyGuard, Initializable, UsingRegistry {
   }
 
   /**
+   * @notice Getter for the metadata of multiple accounts.
+   * @param accountsToQuery The addresses of the accounts to get the metadata for.
+   * @return (stringLengths[] - the length of each string in bytes
+   *          data - all strings concatenated
+   *         )
+   */
+  function batchGetMetadataURL(address[] calldata accountsToQuery)
+    external
+    view
+    returns (uint256[] memory, bytes memory)
+  {
+    uint256 totalSize = 0;
+    uint256[] memory sizes = new uint256[](accountsToQuery.length);
+    for (uint256 i = 0; i < accountsToQuery.length; i = i.add(1)) {
+      sizes[i] = bytes(accounts[accountsToQuery[i]].metadataURL).length;
+      totalSize = totalSize.add(sizes[i]);
+    }
+
+    bytes memory data = new bytes(totalSize);
+    uint256 pointer = 0;
+    for (uint256 i = 0; i < accountsToQuery.length; i = i.add(1)) {
+      for (uint256 j = 0; j < sizes[i]; j = j.add(1)) {
+        data[pointer] = bytes(accounts[accountsToQuery[i]].metadataURL)[j];
+        pointer = pointer.add(1);
+      }
+    }
+    return (sizes, data);
+  }
+
+  /**
    * @notice Getter for the data encryption key and version.
    * @param account The address of the account to get the key for
    * @return dataEncryptionKey secp256k1 public key for data encryption. Preferably compressed.

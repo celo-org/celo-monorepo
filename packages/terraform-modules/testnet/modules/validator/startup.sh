@@ -121,3 +121,15 @@ docker run -v $DATA_DIR:$DATA_DIR --name geth --net=host --entrypoint /bin/sh -d
       --metrics \
       $IN_MEMORY_DISCOVERY_TABLE_FLAG \
   )"
+
+# ---- Set Up and Run Geth Exporter ----
+
+GETH_EXPORTER_DOCKER_IMAGE=${geth_exporter_docker_image_repository}:${geth_exporter_docker_image_tag}
+
+echo "Pulling geth exporter..."
+docker pull $GETH_EXPORTER_DOCKER_IMAGE
+
+docker run -v $DATA_DIR:$DATA_DIR --name geth-exporter --net=host -d $GETH_EXPORTER_DOCKER_IMAGE \
+  /usr/local/bin/geth_exporter \
+    -ipc $DATA_DIR/geth.ipc \
+    -filter "(.*overall|percentiles_95)"
