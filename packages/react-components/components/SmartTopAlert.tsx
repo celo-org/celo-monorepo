@@ -12,6 +12,7 @@ export enum NotificationTypes {
 }
 
 interface Props {
+  timestamp: number
   title?: string | null
   text: string | null
   onPress: () => void
@@ -48,7 +49,15 @@ function SmartTopAlert(props: Props) {
         return null
       }
     },
-    [props.type, props.title, props.text, props.buttonMessage, props.dismissAfter, props.onPress]
+    [
+      props.timestamp,
+      props.type,
+      props.title,
+      props.text,
+      props.buttonMessage,
+      props.dismissAfter,
+      props.onPress,
+    ]
   )
 
   function hide() {
