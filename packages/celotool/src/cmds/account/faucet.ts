@@ -1,7 +1,8 @@
-import { downloadArtifacts } from 'src/lib/artifacts'
-import { switchToClusterFromEnv } from 'src/lib/cluster'
+/* tslint:disable no-console */
+import { newKit } from '@celo/contractkit'
+import { convertToContractDecimals } from 'src/lib/contract-utils'
 import { portForwardAnd } from 'src/lib/port_forward'
-import { execCmd, validateAccountAddress } from 'src/lib/utils'
+import { validateAccountAddress } from 'src/lib/utils'
 import * as yargs from 'yargs'
 import { AccountArgv } from '../account'
 
@@ -28,18 +29,29 @@ export const builder = (argv: yargs.Argv) => {
 }
 
 export const handler = async (argv: FaucetArgv) => {
-  await switchToClusterFromEnv()
+  const address = argv.account
 
   const cb = async () => {
-    await execCmd(
-      // TODO(yerdua): reimplement the protocol transfer script here, using
-      //  the SDK + Web3 when the SDK can be built for multiple environments
-      `yarn --cwd ../protocol run transfer -n ${argv.celoEnv} -a ${argv.account} -d 10 -g 10`
-    )
+    const kit = newKit('http://localhost:8545')
+    const account = (await kit.web3.eth.getAccounts())[0]
+    console.log(`Using account: ${account}`)
+    kit.defaultAccount = account
+
+    const [goldToken, stableToken] = await Promise.all([
+      kit.contracts.getGoldToken(),
+      kit.contracts.getStableToken(),
+    ])
+    const goldAmount = (await convertToContractDecimals(1, goldToken)).toString()
+    const stableTokenAmount = (await convertToContractDecimals(10, stableToken)).toString()
+
+    console.log(`Fauceting ${goldAmount} Gold and ${stableTokenAmount} StableToken to ${address}`)
+    await Promise.all([
+      goldToken.transfer(address, goldAmount).sendAndWaitForReceipt(),
+      stableToken.transfer(address, stableTokenAmount).sendAndWaitForReceipt(),
+    ])
   }
 
   try {
-    await downloadArtifacts(argv.celoEnv)
     await portForwardAnd(argv.celoEnv, cb)
   } catch (error) {
     console.error(`Unable to faucet ${argv.account} on ${argv.celoEnv}`)

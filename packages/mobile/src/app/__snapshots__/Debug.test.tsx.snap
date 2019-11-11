@@ -53,7 +53,7 @@ exports[`Debug renders correctly 1`] = `
       }
     }
   >
-    Address: 0x0000000000000000000000000000000000007E57
+    Address: 0x0000000000000000000000000000000000007e57
   </Text>
   <Text
     style={

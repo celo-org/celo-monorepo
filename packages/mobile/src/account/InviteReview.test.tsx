@@ -12,10 +12,6 @@ jest.mock('src/geth/GethAwareButton', () => {
   return mockButton
 })
 
-jest.mock('src/identity/verification', () => {
-  return { isPhoneVerified: jest.fn(() => true) }
-})
-
 describe('InviteReview', () => {
   beforeAll(() => {
     jest.useFakeTimers()

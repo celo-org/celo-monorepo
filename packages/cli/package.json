@@ -45,7 +45,7 @@
     "elliptic": "^6.4.1",
     "ethereumjs-util": "^5.2.0",
     "events": "^3.0.0",
-    "firebase": "^6.2.4",
+    "firebase": "^7.2.2",
     "fs-extra": "^8.1.0",
     "moment": "2.24.0",
     "path": "^0.12.7",

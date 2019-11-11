@@ -10,11 +10,21 @@ resource "google_compute_address" "validator" {
   count = var.validator_count
 }
 
+resource "google_compute_address" "validator_internal" {
+  name         = "${local.name_prefix}-internal-address-${count.index}"
+  address_type = "INTERNAL"
+  purpose      = "GCE_ENDPOINT"
+
+  count = var.validator_count
+}
+
 resource "google_compute_instance" "validator" {
   name         = "${local.name_prefix}-${count.index}"
   machine_type = "n1-standard-1"
 
   count = var.validator_count
+
+  tags = ["${var.celo_env}-node"]
 
   allow_stopping_for_update = true
 
@@ -31,6 +41,7 @@ resource "google_compute_instance" "validator" {
 
   network_interface {
     network = var.network_name
+    network_ip = google_compute_address.validator_internal[count.index].address
     access_config {
       nat_ip = google_compute_address.validator[count.index].address
     }
@@ -45,6 +56,8 @@ resource "google_compute_instance" "validator" {
       gcloud_secrets_base_path : var.gcloud_secrets_base_path,
       gcloud_secrets_bucket : var.gcloud_secrets_bucket,
       genesis_content_base64 : var.genesis_content_base64,
+      geth_exporter_docker_image_repository : var.geth_exporter_docker_image_repository,
+      geth_exporter_docker_image_tag : var.geth_exporter_docker_image_tag,
       geth_node_docker_image_repository : var.geth_node_docker_image_repository,
       geth_node_docker_image_tag : var.geth_node_docker_image_tag,
       geth_verbosity : var.geth_verbosity,
