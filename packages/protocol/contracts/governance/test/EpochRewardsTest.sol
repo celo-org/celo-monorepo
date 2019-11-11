@@ -1,12 +1,12 @@
 pragma solidity ^0.5.8;
 
 import "../EpochRewards.sol";
-import "../../common/FixidityLib.sol";
 
 /**
  * @title A wrapper around EpochRewards that exposes internal functions for testing.
  */
 contract EpochRewardsTest is EpochRewards {
+  uint256 public numValidatorsInCurrentSet;
   function getRewardsMultiplier(uint256 targetGoldTotalSupplyIncrease)
     external
     view
@@ -19,7 +19,7 @@ contract EpochRewardsTest is EpochRewards {
     _updateTargetVotingYield();
   }
 
-  function numberValidatorsInCurrentSet() public view returns (uint256) {
-    return 100;
+  function setNumberValidatorsInCurrentSet(uint256 value) external {
+    numValidatorsInCurrentSet = value;
   }
 }
