@@ -1,13 +1,13 @@
 pragma solidity ^0.5.3;
 
-import 'openzeppelin-solidity/contracts/utils/ReentrancyGuard.sol';
-import 'openzeppelin-solidity/contracts/math/SafeMath.sol';
+import "openzeppelin-solidity/contracts/utils/ReentrancyGuard.sol";
+import "openzeppelin-solidity/contracts/math/SafeMath.sol";
 
-import './interfaces/IAccounts.sol';
+import "./interfaces/IAccounts.sol";
 
-import '../common/Initializable.sol';
-import '../common/Signatures.sol';
-import '../common/UsingRegistry.sol';
+import "../common/Initializable.sol";
+import "../common/Signatures.sol";
+import "../common/UsingRegistry.sol";
 
 contract Accounts is IAccounts, ReentrancyGuard, Initializable, UsingRegistry {
   using SafeMath for uint256;
@@ -284,7 +284,7 @@ contract Accounts is IAccounts, ReentrancyGuard, Initializable, UsingRegistry {
    * @param dataEncryptionKey secp256k1 public key for data encryption. Preferably compressed.
    */
   function setAccountDataEncryptionKey(bytes memory dataEncryptionKey) public {
-    require(dataEncryptionKey.length >= 33, 'data encryption key length <= 32');
+    require(dataEncryptionKey.length >= 33, "data encryption key length <= 32");
     accounts[msg.sender].dataEncryptionKey = dataEncryptionKey;
     emit AccountDataEncryptionKeySet(msg.sender, dataEncryptionKey);
   }
