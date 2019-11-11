@@ -375,14 +375,14 @@ contract('EpochRewards', (accounts: string[]) => {
 
   describe('#getTargetTotalEpochPaymentsInGold()', () => {
     describe('when a StableToken exchange rate is set', () => {
-      const numValidators = 100
+      const numberValidators = 100
       beforeEach(async () => {
-        await epochRewards.setNumValidatorsInCurrentSet(numValidators)
+        await epochRewards.setNumValidatorsInCurrentSet(numberValidators)
       })
 
       it('should return the number of validators times the max payment divided by the exchange rate', async () => {
         const expected = targetValidatorEpochPayment
-          .times(numValidators)
+          .times(numberValidators)
           .div(exchangeRate)
           .integerValue(BigNumber.ROUND_FLOOR)
         assertEqualBN(await epochRewards.getTargetTotalEpochPaymentsInGold(), expected)
@@ -528,14 +528,14 @@ contract('EpochRewards', (accounts: string[]) => {
     describe('when there are active votes, a stable token exchange rate is set and the actual remaining supply is 10% more than the target remaining supply after rewards', () => {
       const activeVotes = 1000000
       const timeDelta = YEAR.times(10)
-      // Hard coded in EpochRewardsTest.sol
-      const numValidators = 100
+      const numberValidators = 100
       let expectedMultiplier: BigNumber
       beforeEach(async () => {
+        await epochRewards.setNumberValidatorsInCurrentSet(numberValidators)
         await mockElection.setActiveVotes(activeVotes)
         await timeTravel(timeDelta.toNumber(), web3)
         const expectedTargetTotalEpochPaymentsInGold = targetValidatorEpochPayment
-          .times(numValidators)
+          .times(numberValidators)
           .div(exchangeRate)
           .integerValue(BigNumber.ROUND_FLOOR)
         const expectedTargetEpochRewards = fromFixed(targetVotingYieldParams.initial).times(
