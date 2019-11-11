@@ -4,9 +4,7 @@ import { readFileSync, writeFileSync } from 'fs'
 import { tmpdir } from 'os'
 import Web3 from 'web3'
 import { testWithGanache } from '../../test-utils/ganache-test'
-import { commandExists } from '../../utils/exec'
 import ClaimDomain from './claim-domain'
-import ClaimKeybase from './claim-keybase'
 import ClaimName from './claim-name'
 import CreateMetadata from './create-metadata'
 import RegisterMetadata from './register-metadata'
@@ -55,22 +53,6 @@ testWithGanache('account:authorize cmd', (web3: Web3) => {
       const claim = metadata.findClaim(ClaimTypes.DOMAIN)
       expect(claim).toBeDefined()
       expect(claim!.domain).toEqual(domain)
-    })
-
-    test('account:claim-keybase cmd', async () => {
-      if (await commandExists('keybase')) {
-        console.info(
-          'Skipping test due to interactive nature of the command when keybase CLI being present'
-        )
-        return
-      }
-      generateEmptyMetadataFile()
-      const username = 'nambrot'
-      await ClaimKeybase.run(['--from', account, '--username', username, emptyFilePath])
-      const metadata = readFile()
-      const claim = metadata.findClaim(ClaimTypes.KEYBASE)
-      expect(claim).toBeDefined()
-      expect(claim!.username).toEqual(username)
     })
   })
 
