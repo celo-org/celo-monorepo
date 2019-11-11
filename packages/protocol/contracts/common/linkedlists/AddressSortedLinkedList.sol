@@ -1,15 +1,14 @@
 pragma solidity ^0.5.3;
 
+import "openzeppelin-solidity/contracts/math/Math.sol";
 import "openzeppelin-solidity/contracts/math/SafeMath.sol";
 import "./AddressLinkedList.sol";
 import "./SortedLinkedList.sol";
-
 
 /**
  * @title Maintains a sorted list of unsigned ints keyed by address.
  */
 library AddressSortedLinkedList {
-
   using SortedLinkedList for SortedLinkedList.List;
 
   function toBytes(address a) public pure returns (bytes32) {
@@ -33,9 +32,7 @@ library AddressSortedLinkedList {
     uint256 value,
     address lesserKey,
     address greaterKey
-  )
-    public
-  {
+  ) public {
     list.insert(toBytes(key), value, toBytes(lesserKey), toBytes(greaterKey));
   }
 
@@ -61,9 +58,7 @@ library AddressSortedLinkedList {
     uint256 value,
     address lesserKey,
     address greaterKey
-  )
-    public
-  {
+  ) public {
     list.update(toBytes(key), value, toBytes(lesserKey), toBytes(greaterKey));
   }
 
@@ -89,9 +84,7 @@ library AddressSortedLinkedList {
    * @notice Gets all elements from the doubly linked list.
    * @return An unpacked list of elements from largest to smallest.
    */
-  function getElements(
-    SortedLinkedList.List storage list
-  )
+  function getElements(SortedLinkedList.List storage list)
     public
     view
     returns (address[] memory, uint256[] memory)
@@ -104,5 +97,53 @@ library AddressSortedLinkedList {
       values[i] = list.values[byteKeys[i]];
     }
     return (keys, values);
+  }
+
+  /**
+   * @notice Returns the minimum of `max` and the  number of elements in the list > threshold.
+   * @param threshold The number that the element must exceed to be included.
+   * @param max The maximum number returned by this function.
+   * @return The minimum of `max` and the  number of elements in the list > threshold.
+   */
+  function numElementsGreaterThan(
+    SortedLinkedList.List storage list,
+    uint256 threshold,
+    uint256 max
+  ) public view returns (uint256) {
+    uint256 revisedMax = Math.min(max, list.list.numElements);
+    bytes32 key = list.list.head;
+    for (uint256 i = 0; i < revisedMax; i++) {
+      if (list.getValue(key) < threshold) {
+        return i;
+      }
+      key = list.list.elements[key].previousKey;
+    }
+    return revisedMax;
+  }
+
+  /**
+   * @notice Returns the N greatest elements of the list.
+   * @param n The number of elements to return.
+   * @return The keys of the greatest elements.
+   */
+  function headN(SortedLinkedList.List storage list, uint256 n)
+    public
+    view
+    returns (address[] memory)
+  {
+    bytes32[] memory byteKeys = list.headN(n);
+    address[] memory keys = new address[](n);
+    for (uint256 i = 0; i < n; i++) {
+      keys[i] = toAddress(byteKeys[i]);
+    }
+    return keys;
+  }
+
+  /**
+   * @notice Gets all element keys from the doubly linked list.
+   * @return All element keys from head to tail.
+   */
+  function getKeys(SortedLinkedList.List storage list) public view returns (address[] memory) {
+    return headN(list, list.list.numElements);
   }
 }

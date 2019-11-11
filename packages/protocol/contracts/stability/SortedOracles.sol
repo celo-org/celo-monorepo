@@ -7,7 +7,6 @@ import "../common/Initializable.sol";
 import "../common/linkedlists/AddressSortedLinkedListWithMedian.sol";
 import "../common/linkedlists/SortedLinkedListWithMedian.sol";
 
-
 // TODO: don't treat timestamps as Fixidity values
 /**
  * @title Maintains a sorted list of oracle exchange rates between Celo Gold and other currencies.
@@ -27,15 +26,9 @@ contract SortedOracles is ISortedOracles, Ownable, Initializable {
 
   uint256 public reportExpirySeconds;
 
-  event OracleAdded(
-    address indexed token,
-    address indexed oracleAddress
-  );
+  event OracleAdded(address indexed token, address indexed oracleAddress);
 
-  event OracleRemoved(
-    address indexed token,
-    address indexed oracleAddress
-  );
+  event OracleRemoved(address indexed token, address indexed oracleAddress);
 
   event OracleReported(
     address token,
@@ -45,20 +38,11 @@ contract SortedOracles is ISortedOracles, Ownable, Initializable {
     uint256 denominator
   );
 
-  event OracleReportRemoved(
-    address indexed token,
-    address indexed oracle
-  );
+  event OracleReportRemoved(address indexed token, address indexed oracle);
 
-  event MedianUpdated(
-    address token,
-    uint256 numerator,
-    uint256 denominator
-  );
+  event MedianUpdated(address token, uint256 numerator, uint256 denominator);
 
-  event ReportExpirySet(
-    uint256 reportExpiry
-  );
+  event ReportExpirySet(uint256 reportExpiry);
 
   modifier onlyOracle(address token) {
     require(isOracle[token][msg.sender], "sender was not an oracle for token addr");
@@ -101,9 +85,9 @@ contract SortedOracles is ISortedOracles, Ownable, Initializable {
   function removeOracle(address token, address oracleAddress, uint256 index) external onlyOwner {
     require(
       token != address(0) &&
-      oracleAddress != address(0) &&
-      oracles[token].length > index &&
-      oracles[token][index] == oracleAddress,
+        oracleAddress != address(0) &&
+        oracles[token].length > index &&
+        oracles[token][index] == oracleAddress,
       "token addr null or oracle addr null or index of token oracle not mapped to oracle addr"
     );
     isOracle[token][oracleAddress] = false;
@@ -148,31 +132,33 @@ contract SortedOracles is ISortedOracles, Ownable, Initializable {
     uint256 denominator,
     address lesserKey,
     address greaterKey
-  )
-    external
-    onlyOracle(token)
-  {
+  ) external onlyOracle(token) {
     uint256 originalMedian = rates[token].getMedianValue();
     uint256 value = numerator.mul(DENOMINATOR).div(denominator);
     if (rates[token].contains(msg.sender)) {
       rates[token].update(msg.sender, value, lesserKey, greaterKey);
-      timestamps[token].update(
-        msg.sender,
-        // solhint-disable-next-line not-rely-on-time
-        now,
-        timestamps[token].getHead(),
-        address(0)
-      );
+
+      // Rather than update the timestamp, we remove it and re-add it at the
+      // head of the list later. The reason for this is that we need to handle
+      // a few different cases:
+      //   1. This oracle is the only one to report so far. lesserKey = address(0)
+      //   2. Other oracles have reported since this one's last report. lesserKey = getHead()
+      //   3. Other oracles have reported, but the most recent is this one.
+      //      lesserKey = key immediately after getHead()
+      //
+      // However, if we just remove this timestamp, timestamps[token].getHead()
+      // does the right thing in all cases.
+      timestamps[token].remove(msg.sender);
     } else {
       rates[token].insert(msg.sender, value, lesserKey, greaterKey);
-      timestamps[token].insert(
-        msg.sender,
-        // solhint-disable-next-line not-rely-on-time
-        now,
-        timestamps[token].getHead(),
-        address(0)
-      );
     }
+    timestamps[token].insert(
+      msg.sender,
+      // solhint-disable-next-line not-rely-on-time
+      now,
+      timestamps[token].getHead(),
+      address(0)
+    );
     emit OracleReported(token, msg.sender, now, value, DENOMINATOR);
     uint256 newMedian = rates[token].getMedianValue();
     if (newMedian != originalMedian) {
@@ -203,16 +189,10 @@ contract SortedOracles is ISortedOracles, Ownable, Initializable {
    * @param token The address of the token for which the Celo Gold exchange rate is being reported.
    * @return An unpacked list of elements from largest to smallest.
    */
-  function getRates(
-    address token
-  )
+  function getRates(address token)
     external
     view
-    returns (
-        address[] memory,
-        uint256[] memory,
-        SortedLinkedListWithMedian.MedianRelation[] memory
-    )
+    returns (address[] memory, uint256[] memory, SortedLinkedListWithMedian.MedianRelation[] memory)
   {
     return rates[token].getElements();
   }
@@ -240,16 +220,10 @@ contract SortedOracles is ISortedOracles, Ownable, Initializable {
    * @param token The address of the token for which the Celo Gold exchange rate is being reported.
    * @return An unpacked list of elements from largest to smallest.
    */
-  function getTimestamps(
-    address token
-  )
+  function getTimestamps(address token)
     external
     view
-    returns (
-        address[] memory,
-        uint256[] memory,
-        SortedLinkedListWithMedian.MedianRelation[] memory
-    )
+    returns (address[] memory, uint256[] memory, SortedLinkedListWithMedian.MedianRelation[] memory)
   {
     return timestamps[token].getElements();
   }

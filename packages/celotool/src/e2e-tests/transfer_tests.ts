@@ -1,3 +1,6 @@
+// tslint:disable-next-line: no-reference (Required to make this work w/ ts-node)
+/// <reference path="../../../contractkit/types/web3.d.ts" />
+
 import { CeloContract, CeloToken, ContractKit, newKit, newKitFromWeb3 } from '@celo/contractkit'
 import { TransactionResult } from '@celo/contractkit/lib/utils/tx-result'
 import { toFixed } from '@celo/utils/lib/fixidity'
@@ -9,6 +12,7 @@ import {
   getEnode,
   GethInstanceConfig,
   getHooks,
+  GethTestConfig,
   initAndStartGeth,
   killInstance,
   sleep,
@@ -81,6 +85,14 @@ class InflationManager {
     const parametersPost = await this.getParameters()
     assertEqualBN(parametersPost.factor, ONE)
   }
+}
+
+const setIntrinsicGas = async (validatorUri: string, validatorAddress: string, gasCost: number) => {
+  const kit = newKit(validatorUri)
+  const parameters = await kit.contracts.getBlockchainParameters()
+  await parameters
+    .setIntrinsicGasForAlternativeGasCurrency(gasCost.toString())
+    .sendAndWaitForReceipt({ from: validatorAddress })
 }
 
 /** Helper to watch balance changes over accounts */
@@ -167,9 +179,8 @@ describe('Transfer tests', function(this: any) {
   const FeeRecipientAddress = '0x4f5f8a3f45d179553e7b95119ce296010f50f6f1'
 
   const syncModes = ['full', 'fast', 'light', 'ultralight']
-  const gethConfig = {
-    migrateTo: 8,
-    migrateGovernance: false,
+  const gethConfig: GethTestConfig = {
+    migrateTo: 17,
     instances: [
       { name: 'validator', validating: true, syncmode: 'full', port: 30303, rpcport: 8545 },
     ],
@@ -553,6 +564,85 @@ describe('Transfer tests', function(this: any) {
               expectedGas: 40456,
               transferToken: CeloContract.StableToken,
               feeToken: CeloContract.GoldToken,
+              txOptions: {
+                gasFeeRecipient: FeeRecipientAddress,
+              },
+            })
+          })
+        })
+      })
+    }
+  })
+
+  describe('Transfer with changed intrinsic gas cost >', () => {
+    const intrinsicGasForAlternativeGasCurrency = 34000
+
+    before(restartWithCleanNodes)
+
+    for (const syncMode of syncModes) {
+      describe(`${syncMode} Node >`, () => {
+        before(`start geth on sync: ${syncMode}`, async () => {
+          try {
+            await startSyncNode(syncMode)
+            await setIntrinsicGas('http://localhost:8545', validatorAddress, 34000)
+          } catch (err) {
+            console.debug('some error', err)
+          }
+        })
+
+        describe('Transfer CeloGold >', () => {
+          describe('gasCurrency = CeloDollars >', () => {
+            const intrinsicGas = intrinsicGasForAlternativeGasCurrency + 21000
+            describe('when there is no demurrage', () => {
+              describe('when setting a gas amount greater than the amount of gas necessary', () =>
+                testTransferToken({
+                  expectedGas: 63180,
+                  transferToken: CeloContract.GoldToken,
+                  feeToken: CeloContract.StableToken,
+                  txOptions: {
+                    gasFeeRecipient: FeeRecipientAddress,
+                  },
+                }))
+
+              describe('when setting a gas amount less than the amount of gas necessary but more than the intrinsic gas amount', () => {
+                const gas = intrinsicGas + 1000
+                testTransferToken({
+                  expectedGas: gas,
+                  transferToken: CeloContract.GoldToken,
+                  feeToken: CeloContract.StableToken,
+                  expectSuccess: false,
+                  txOptions: {
+                    gas,
+                    gasFeeRecipient: FeeRecipientAddress,
+                  },
+                })
+              })
+
+              describe('when setting a gas amount less than the intrinsic gas amount', () => {
+                it('should not add the transaction to the pool', async () => {
+                  const gas = intrinsicGas - 1
+                  const gasCurrency = await kit.registry.addressFor(CeloContract.StableToken)
+                  try {
+                    const res = await transferCeloGold(FromAddress, ToAddress, TransferAmount, {
+                      gas,
+                      gasCurrency,
+                    })
+                    await res.getHash()
+                  } catch (error) {
+                    assert.include(error.toString(), 'Returned error: intrinsic gas too low')
+                  }
+                })
+              })
+            })
+          })
+        })
+
+        describe('Transfer CeloDollars', () => {
+          describe('gasCurrency = CeloDollars >', () => {
+            testTransferToken({
+              expectedGas: 89456,
+              transferToken: CeloContract.StableToken,
+              feeToken: CeloContract.StableToken,
               txOptions: {
                 gasFeeRecipient: FeeRecipientAddress,
               },
