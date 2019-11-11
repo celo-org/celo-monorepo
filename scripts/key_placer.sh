@@ -74,9 +74,7 @@ for file_path in "${files[@]}"; do
 
   # When encrypting ensure the plaintext file exists and the encrypted file does not.
   if [[ $1 == "encrypt" ]]; then
-    if [[ -f "$encrypted_file_path" ]]; then
-        continue
-    elif [[ ! -f "$file_path" ]]; then
+    if [[ ! -f "$file_path" ]]; then
         echo "$file_path does not exist, cannot encrypt - skipping file" >&2
         continue
     fi
