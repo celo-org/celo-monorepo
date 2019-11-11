@@ -654,7 +654,8 @@ export async function resetAndUpgradeHelmChart(celoEnv: string) {
   // scale down nodes
   await scaleResource(celoEnv, 'StatefulSet', txNodesSetName, 0)
   await scaleResource(celoEnv, 'StatefulSet', validatorsSetName, 0)
-  await scaleResource(celoEnv, 'StatefulSet', sentryName, 0)
+  // allow to fail for the cases where a testnet does not include the sentry statefulset yet
+  await scaleResource(celoEnv, 'StatefulSet', sentryName, 0, true)
   await scaleResource(celoEnv, 'Deployment', bootnodeName, 0)
 
   await deletePersistentVolumeClaims(celoEnv)
