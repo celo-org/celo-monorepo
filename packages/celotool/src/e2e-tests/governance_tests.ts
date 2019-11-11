@@ -6,8 +6,6 @@ import { assert } from 'chai'
 import Web3 from 'web3'
 import { getContext, getEnode, importGenesis, initAndStartGeth, sleep } from './utils'
 
-const ONE_YEAR = 60 * 60 * 24 * 365 // seconds
-
 describe('governance tests', () => {
   const gethConfig = {
     migrate: true,
@@ -21,7 +19,6 @@ describe('governance tests', () => {
   }
 
   const context: any = getContext(gethConfig)
-  let epoch: number
   let web3: any
   let election: any
   let validators: any
@@ -50,7 +47,7 @@ describe('governance tests', () => {
 
   const unlockAccount = async (address: string, theWeb3: any) => {
     // Assuming empty password
-    await theWeb3.eth.personal.unlockAccount(address, '', ONE_YEAR)
+    await theWeb3.eth.personal.unlockAccount(address, '', 1000)
   }
 
   const getValidatorGroupMembers = async (blockNumber?: number) => {
@@ -122,18 +119,6 @@ describe('governance tests', () => {
     return blockNumber % epochSize === 0
   }
 
-  const getLastEpochBlock = (blockNumber: number) => {
-    const epochNumber = Math.floor((blockNumber - 1) / epoch)
-    return epochNumber * epoch
-  }
-
-  const blocksLeftInEpoch = (blockNumber: number): number => {
-    if (blockNumber % epoch === 0) {
-      return 0
-    }
-    return epoch - (blockNumber % epoch)
-  }
-
   const assertBalanceChanged = async (
     address: string,
     blockNumber: number,
@@ -156,6 +141,7 @@ describe('governance tests', () => {
   }
 
   describe('when the validator set is changing', () => {
+    let epoch: number
     const blockNumbers: number[] = []
     let allValidators: string[]
     before(async function(this: any) {
@@ -178,35 +164,20 @@ describe('governance tests', () => {
       epoch = new BigNumber(await validators.methods.getEpochSize().call()).toNumber()
       assert.equal(epoch, 10)
 
+      // Give the node time to sync, and time for an epoch transition so we can activate our vote.
+      await sleep(20)
+      await activate(allValidators[0])
       const groupWeb3 = new Web3('ws://localhost:8567')
       const groupKit = newKitFromWeb3(groupWeb3)
-
-      const isSyncing = async (node: ContractKit, upstream: ContractKit): Promise<boolean> => {
-        const nodeLatest = await node.web3.eth.getBlock('latest')
-        const upstreamLatest = await upstream.web3.eth.getBlock('latest')
-        return nodeLatest.number !== upstreamLatest.number
-      }
-
-      // Give the node time to sync, and time for an epoch transition so we can activate our vote.
-      while (await isSyncing(groupKit, kit)) {
-        await sleep(0.5)
-      }
-
-      console.log(`activating ${allValidators[0]}`)
-      await activate(allValidators[0])
-      console.log(`activated ${allValidators[0]}`)
       validators = await groupKit._web3Contracts.getValidators()
       const membersToSwap = [allValidators[0], allValidators[1]]
       let includedMemberIndex = 1
-      console.log(`removing ${membersToSwap[0]}`)
       await removeMember(groupWeb3, groupAddress, membersToSwap[0])
-      console.log(`removed ${membersToSwap[0]}`)
 
       const changeValidatorSet = async (header: any) => {
         blockNumbers.push(header.number)
         // At the start of epoch N, swap members so the validator set is different for epoch N + 1.
         if (header.number % epoch === 1) {
-          console.log(`Changing validator at block ${header.number}`)
           const memberToRemove = membersToSwap[includedMemberIndex]
           const memberToAdd = membersToSwap[(includedMemberIndex + 1) % 2]
           await removeMember(groupWeb3, groupAddress, memberToRemove)
@@ -215,25 +186,16 @@ describe('governance tests', () => {
           const newMembers = await getValidatorGroupMembers()
           assert.include(newMembers, memberToAdd)
           assert.notInclude(newMembers, memberToRemove)
-          console.log(`Done changing validator at block ${header.number}`)
         }
       }
 
       const subscription = await groupWeb3.eth.subscribe('newBlockHeaders')
       subscription.on('data', changeValidatorSet)
-
       // Wait for a few epochs while changing the validator set.
-      const latest = await groupWeb3.eth.getBlock('latest')
-      const targetBlockNumber = latest.number + epoch * 4 + blocksLeftInEpoch(latest.number)
-      while ((await groupWeb3.eth.getBlock('latest')).number < targetBlockNumber) {
-        await sleep(1)
-      }
+      await sleep(epoch * 4)
       ;(subscription as any).unsubscribe()
-
       // Wait for the current epoch to complete.
-      while ((await groupWeb3.eth.getBlock('latest')).number < targetBlockNumber + epoch) {
-        await sleep(1)
-      }
+      await sleep(epoch)
     })
 
     const getValidatorSetAtBlock = async (blockNumber: number) => {
@@ -247,6 +209,11 @@ describe('governance tests', () => {
         )
       }
       return validatorSet
+    }
+
+    const getLastEpochBlock = (blockNumber: number) => {
+      const epochNumber = Math.floor((blockNumber - 1) / epoch)
+      return epochNumber * epoch
     }
 
     it('should always return a validator set size equal to the number of group members at the end of the last epoch', async () => {
