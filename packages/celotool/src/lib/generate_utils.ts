@@ -157,7 +157,8 @@ export const generateGenesisFromEnv = (enablePetersburg: boolean = true) => {
 
 const generateIstanbulExtraData = (validators: Validator[]) => {
   const istanbulVanity = 32
-  const blsSignatureVanity = 192
+  const blsSignatureVanity = 96
+  const ecdsaSignatureVanity = 65
 
   return (
     '0x' +
@@ -168,7 +169,7 @@ const generateIstanbulExtraData = (validators: Validator[]) => {
         validators.map((validator) => Buffer.from(validator.address, 'hex')),
         validators.map((validator) => Buffer.from(validator.blsPublicKey, 'hex')),
         new Buffer(0),
-        Buffer.from(repeat('0', blsSignatureVanity * 2), 'hex'),
+        Buffer.from(repeat('0', ecdsaSignatureVanity * 2), 'hex'),
         new Buffer(0),
         Buffer.from(repeat('0', blsSignatureVanity * 2), 'hex'),
         new Buffer(0),
