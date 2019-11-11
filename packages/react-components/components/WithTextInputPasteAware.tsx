@@ -2,6 +2,7 @@
 
 import TouchableDefault from '@celo/react-components/components/Touchable'
 import Paste from '@celo/react-components/icons/Paste'
+import { iconHitslop } from '@celo/react-components/styles/variables'
 import * as React from 'react'
 import { AppState, Clipboard, StyleSheet, TextInputProps, View, ViewStyle } from 'react-native'
 
@@ -62,6 +63,7 @@ export default function withTextInputPasteAware<P extends TextInputProps>(
             <TouchableDefault
               style={[style.pasteIconContainer, pasteIconContainerStyle]}
               onPress={this.onPressPate}
+              hitSlop={iconHitslop}
             >
               <Paste />
             </TouchableDefault>

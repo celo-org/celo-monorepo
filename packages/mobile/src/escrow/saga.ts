@@ -2,7 +2,7 @@ import { getEscrowContract, getStableTokenContract } from '@celo/walletkit'
 import { Escrow } from '@celo/walletkit/lib/types/Escrow'
 import { StableToken } from '@celo/walletkit/types/StableToken'
 import BigNumber from 'bignumber.js'
-import { all, call, put, select, spawn, takeLeading } from 'redux-saga/effects'
+import { all, call, put, select, spawn, take, takeLeading } from 'redux-saga/effects'
 import { showError } from 'src/alert/actions'
 import { ErrorMessages } from 'src/app/ErrorMessages'
 import { ESCROW_PAYMENT_EXPIRY_SECONDS } from 'src/config'
@@ -19,8 +19,8 @@ import {
 import { calculateFee } from 'src/fees/saga'
 import { CURRENCY_ENUM, SHORT_CURRENCIES } from 'src/geth/consts'
 import i18n from 'src/i18n'
-import { Actions as IdentityActions, EndVerificationAction } from 'src/identity/actions'
-import { NUM_ATTESTATIONS_REQUIRED } from 'src/identity/verification'
+import { Actions as IdentityActions, SetVerificationStatusAction } from 'src/identity/actions'
+import { NUM_ATTESTATIONS_REQUIRED, VerificationStatus } from 'src/identity/verification'
 import { Invitees } from 'src/invite/actions'
 import { inviteesSelector } from 'src/invite/reducer'
 import { TEMP_PW } from 'src/invite/saga'
@@ -95,12 +95,7 @@ function* registerStandbyTransaction(id: string, value: string, address: string)
   )
 }
 
-function* withdrawFromEscrow(action: EndVerificationAction) {
-  if (!action.success) {
-    Logger.debug(TAG + '@withdrawFromEscrow', 'Skipping withdrawal because verification failed')
-    return
-  }
-
+function* withdrawFromEscrow() {
   try {
     Logger.debug(TAG + '@withdrawFromEscrow', 'Withdrawing escrowed payment')
 
@@ -299,7 +294,12 @@ export function* watchFetchSentPayments() {
 }
 
 export function* watchVerificationEnd() {
-  yield takeLeading(IdentityActions.END_VERIFICATION, withdrawFromEscrow)
+  while (true) {
+    const update: SetVerificationStatusAction = yield take(IdentityActions.SET_VERIFICATION_STATUS)
+    if (update.status === VerificationStatus.Done) {
+      yield call(withdrawFromEscrow)
+    }
+  }
 }
 
 export function* escrowSaga() {

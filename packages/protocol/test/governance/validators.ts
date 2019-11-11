@@ -9,7 +9,7 @@ import {
   NULL_ADDRESS,
   timeTravel,
 } from '@celo/protocol/lib/test-utils'
-import { fromFixed, toFixed } from '@celo/utils/lib/fixidity'
+import { fixed1, fromFixed, toFixed } from '@celo/utils/lib/fixidity'
 import BigNumber from 'bignumber.js'
 import {
   AccountsContract,
@@ -1149,6 +1149,58 @@ contract('Validators', (accounts: string[]) => {
     })
   })
 
+  describe('#updatePublicKeysData()', () => {
+    const newPublicKey = web3.utils.randomHex(64).slice(2)
+    const newBlsPublicKey = web3.utils.randomHex(48).slice(2)
+    const newBlsPoP = web3.utils.randomHex(96).slice(2)
+    const newPublicKeysData = '0x' + newPublicKey + newBlsPublicKey + newBlsPoP
+    describe('when called by a registered validator', () => {
+      const validator = accounts[0]
+      beforeEach(async () => {
+        await registerValidator(validator)
+      })
+
+      describe('when the public keys data is the right length', () => {
+        let resp: any
+        beforeEach(async () => {
+          // @ts-ignore Broken typechain typing for bytes
+          resp = await validators.updatePublicKeysData(newPublicKeysData)
+        })
+
+        it('should set the validator public keys data', async () => {
+          const parsedValidator = parseValidatorParams(await validators.getValidator(validator))
+          assert.equal(parsedValidator.publicKeysData, newPublicKeysData)
+        })
+
+        it('should emit the ValidatorPublicKeysDataUpdated event', async () => {
+          assert.equal(resp.logs.length, 1)
+          const log = resp.logs[0]
+          assertContainSubset(log, {
+            event: 'ValidatorPublicKeysDataUpdated',
+            args: {
+              validator,
+              publicKeysData: newPublicKeysData,
+            },
+          })
+        })
+      })
+
+      describe('when the public keys data is too long', () => {
+        it('should revert', async () => {
+          // @ts-ignore Broken typechain typing for bytes
+          await assertRevert(validators.updatePublicKeysData(newPublicKeysData + '00'))
+        })
+      })
+
+      describe('when the public keys data is too short', () => {
+        it('should revert', async () => {
+          // @ts-ignore Broken typechain typing for bytes
+          await assertRevert(validators.updatePublicKeysData(newPublicKeysData.slice(0, -2)))
+        })
+      })
+    })
+  })
+
   describe('#registerValidatorGroup', () => {
     const group = accounts[0]
     let resp: any
@@ -1634,6 +1686,51 @@ contract('Validators', (accounts: string[]) => {
 
       it('should revert', async () => {
         await assertRevert(validators.reorderMember(validator2, validator1, NULL_ADDRESS))
+      })
+    })
+  })
+
+  describe('#updateCommission()', () => {
+    describe('when the commission is different', () => {
+      const newCommission = commission.plus(1)
+      const group = accounts[0]
+
+      describe('when called by a registered validator group', () => {
+        let resp: any
+
+        beforeEach(async () => {
+          await registerValidatorGroup(group)
+          resp = await validators.updateCommission(newCommission)
+        })
+
+        it('should set the validator group commission', async () => {
+          const parsedGroup = parseValidatorGroupParams(await validators.getValidatorGroup(group))
+          assertEqualBN(parsedGroup.commission, newCommission)
+        })
+
+        it('should emit the ValidatorGroupCommissionUpdated event', async () => {
+          assert.equal(resp.logs.length, 1)
+          const log = resp.logs[0]
+          assertContainSubset(log, {
+            event: 'ValidatorGroupCommissionUpdated',
+            args: {
+              group,
+              commission: newCommission,
+            },
+          })
+        })
+      })
+
+      describe('when the commission is the same', () => {
+        it('should revert', async () => {
+          await assertRevert(validators.updateCommission(commission))
+        })
+      })
+
+      describe('when the commission is greater than one', () => {
+        it('should revert', async () => {
+          await assertRevert(validators.updateCommission(fixed1.plus(1)))
+        })
       })
     })
   })
