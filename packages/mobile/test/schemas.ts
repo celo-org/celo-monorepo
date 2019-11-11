@@ -173,6 +173,15 @@ export const v3Schema = {
   },
 }
 
+export const v4Schema = {
+  ...v3Schema,
+  identity: {
+    ...v3Schema.identity,
+    verificationStatus: 0,
+    hasSeenVerificationNux: false,
+  },
+}
+
 export function getLatestSchema(): Partial<RootState> {
-  return v3Schema as Partial<RootState>
+  return v4Schema as Partial<RootState>
 }
