@@ -3,14 +3,14 @@ import colors from '@celo/react-components/styles/colors'
 import { fontStyles } from '@celo/react-components/styles/fonts'
 import * as React from 'react'
 import { WithNamespaces, withNamespaces } from 'react-i18next'
-import { Image, ScrollView, StyleSheet, Text } from 'react-native'
+import { ActivityIndicator, Image, ScrollView, StyleSheet, Text } from 'react-native'
 import SafeAreaView from 'react-native-safe-area-view'
 import { NavigationInjectedProps } from 'react-navigation'
 import { connect } from 'react-redux'
 import CeloAnalytics from 'src/analytics/CeloAnalytics'
 import { CustomEventNames } from 'src/analytics/constants'
 import componentWithAnalytics from 'src/analytics/wrapper'
-import { exitBackupFlow } from 'src/app/actions'
+import { exitBackupFlow, navigatePinProtected } from 'src/app/actions'
 import { Namespaces } from 'src/i18n'
 import backupIcon from 'src/images/backup-icon.png'
 import { headerWithBackButton } from 'src/navigator/Headers'
@@ -18,15 +18,26 @@ import { navigate, navigateHome } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
 import { RootState } from 'src/redux/reducers'
 
+interface StateProps {
+  doingPinVerification: boolean
+}
+
 interface DispatchProps {
   exitBackupFlow: typeof exitBackupFlow
+  navigatePinProtected: typeof navigatePinProtected
 }
 
 interface NavigationProps {
   incomingFromBackupFlow: boolean
 }
 
-type Props = WithNamespaces & DispatchProps & NavigationInjectedProps<NavigationProps>
+type Props = WithNamespaces & StateProps & DispatchProps & NavigationInjectedProps<NavigationProps>
+
+const mapStateToProps = (state: RootState): StateProps => {
+  return {
+    doingPinVerification: state.app.doingPinVerification,
+  }
+}
 
 class BackupSocialIntro extends React.Component<Props> {
   static navigationOptions = () => ({
@@ -38,7 +49,10 @@ class BackupSocialIntro extends React.Component<Props> {
   }
 
   onPressContinue = () => {
-    navigate(Screens.BackupSocial)
+    const navigateMethod = this.isIncomingFromBackupFlow()
+      ? navigate
+      : this.props.navigatePinProtected
+    navigateMethod(Screens.BackupSocial)
   }
 
   onPressSkip = () => {
@@ -48,7 +62,7 @@ class BackupSocialIntro extends React.Component<Props> {
   }
 
   render() {
-    const { t } = this.props
+    const { t, doingPinVerification } = this.props
     return (
       <SafeAreaView style={styles.container}>
         <ScrollView contentContainerStyle={styles.scrollContainer}>
@@ -57,6 +71,9 @@ class BackupSocialIntro extends React.Component<Props> {
           <Text style={styles.body}>{t('socialBackupIntro.body')}</Text>
           <Text style={[styles.body, fontStyles.bold]}>{t('socialBackupIntro.warning')}</Text>
         </ScrollView>
+        {doingPinVerification && (
+          <ActivityIndicator size="large" color={colors.celoGreen} style={styles.loader} />
+        )}
         <>
           <Button
             onPress={this.onPressContinue}
@@ -104,13 +121,17 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     paddingBottom: 15,
   },
+  loader: {
+    marginBottom: 20,
+  },
 })
 
 export default componentWithAnalytics(
   connect<{}, DispatchProps, {}, RootState>(
-    null,
+    mapStateToProps,
     {
       exitBackupFlow,
+      navigatePinProtected,
     }
   )(withNamespaces(Namespaces.backupKeyFlow6)(BackupSocialIntro))
 )

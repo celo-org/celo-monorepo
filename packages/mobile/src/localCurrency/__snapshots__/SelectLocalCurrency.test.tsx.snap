@@ -9,6 +9,7 @@ exports[`SelectLocalCurrency renders correctly 1`] = `
       "EUR",
       "MXN",
       "PHP",
+      "LRD",
     ]
   }
   disableVirtualization={false}
@@ -43,7 +44,9 @@ exports[`SelectLocalCurrency renders correctly 1`] = `
     >
       <View
         accessible={true}
+        focusable={true}
         isTVSelectable={true}
+        onClick={[Function]}
         onResponderGrant={[Function]}
         onResponderMove={[Function]}
         onResponderRelease={[Function]}
@@ -119,7 +122,9 @@ exports[`SelectLocalCurrency renders correctly 1`] = `
     >
       <View
         accessible={true}
+        focusable={true}
         isTVSelectable={true}
+        onClick={[Function]}
         onResponderGrant={[Function]}
         onResponderMove={[Function]}
         onResponderRelease={[Function]}
@@ -195,7 +200,9 @@ exports[`SelectLocalCurrency renders correctly 1`] = `
     >
       <View
         accessible={true}
+        focusable={true}
         isTVSelectable={true}
+        onClick={[Function]}
         onResponderGrant={[Function]}
         onResponderMove={[Function]}
         onResponderRelease={[Function]}
@@ -271,7 +278,9 @@ exports[`SelectLocalCurrency renders correctly 1`] = `
     >
       <View
         accessible={true}
+        focusable={true}
         isTVSelectable={true}
+        onClick={[Function]}
         onResponderGrant={[Function]}
         onResponderMove={[Function]}
         onResponderRelease={[Function]}
@@ -359,7 +368,9 @@ exports[`SelectLocalCurrency renders correctly 1`] = `
     >
       <View
         accessible={true}
+        focusable={true}
         isTVSelectable={true}
+        onClick={[Function]}
         onResponderGrant={[Function]}
         onResponderMove={[Function]}
         onResponderRelease={[Function]}
@@ -424,6 +435,84 @@ exports[`SelectLocalCurrency renders correctly 1`] = `
               }
             >
               PHP
+            </Text>
+          </View>
+        </View>
+      </View>
+    </View>
+    <View
+      onLayout={[Function]}
+      style={null}
+    >
+      <View
+        accessible={true}
+        focusable={true}
+        isTVSelectable={true}
+        onClick={[Function]}
+        onResponderGrant={[Function]}
+        onResponderMove={[Function]}
+        onResponderRelease={[Function]}
+        onResponderTerminate={[Function]}
+        onResponderTerminationRequest={[Function]}
+        onStartShouldSetResponder={[Function]}
+        style={
+          Object {
+            "opacity": 1,
+          }
+        }
+      >
+        <View
+          style={
+            Array [
+              Object {
+                "alignItems": "center",
+                "flexDirection": "row",
+                "height": 60,
+              },
+              false,
+            ]
+          }
+        >
+          <View
+            style={
+              Object {
+                "marginHorizontal": 12,
+              }
+            }
+          >
+            <View
+              style={
+                Object {
+                  "borderColor": "#D1D5D8",
+                  "borderRadius": 12,
+                  "borderWidth": 2,
+                  "height": 24,
+                  "paddingTop": 2,
+                  "width": 24,
+                }
+              }
+            />
+          </View>
+          <View
+            style={
+              Object {
+                "borderBottomWidth": 1,
+                "borderColor": "#EEEEEE",
+                "height": 60,
+                "justifyContent": "center",
+                "width": 702,
+              }
+            }
+          >
+            <Text
+              style={
+                Object {
+                  "color": "#2E3338",
+                  "fontSize": 16,
+                }
+              }
+            >
+              LRD
             </Text>
           </View>
         </View>

@@ -30,7 +30,7 @@ To start working with contractkit you need a `kit` instance:
 ```ts
 import { newKit } from '@celo/contractkit'
 
-const kit = newKit('https://alfajores-infura.celo-testnet.org:8545')
+const kit = newKit('https://alfajores-forno.celo-testnet.org:8545')
 ```
 
 To access web3:
@@ -47,7 +47,7 @@ await kit.web3.eth.getBalance(someAddress)
 import { newKit, CeloContract } from '@celo/contractkit'
 
 async function getKit(myAddress: string) {
-  const kit = newKit('https://alfajores-infura.celo-testnet.org:8545')
+  const kit = newKit('https://alfajores-forno.celo-testnet.org:8545')
 
   // default from
   kit.defaultAccount = myAddress
@@ -92,6 +92,7 @@ Apart from GoldToken and StableToken, there are many core contracts.
 
 For the moment, we have contract wrappers for:
 
+- Accounts
 - Exchange (Uniswap kind exchange between Gold and Stable tokens)
 - Validators
 - LockedGold
@@ -115,6 +116,7 @@ We expose native wrappers for all Celo core contracts.
 
 The complete list of Celo Core contracts is:
 
+- Accounts
 - Attestations
 - LockedGold
 - Escrow

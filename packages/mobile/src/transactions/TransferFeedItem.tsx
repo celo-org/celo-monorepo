@@ -140,6 +140,7 @@ export function TransferFeedItem(props: Props) {
     invitees,
     addressToE164Number,
     recipientCache,
+    showLocalCurrency,
   } = props
 
   const localCurrencyCode = useLocalCurrencyCode()
@@ -153,7 +154,7 @@ export function TransferFeedItem(props: Props) {
   const transactionValue =
     type === TransactionTypes.NETWORK_FEE
       ? getNetworkFeeDisplayValue(props.value)
-      : localCurrencyCode
+      : showLocalCurrency && localCurrencyCode
         ? getMoneyDisplayValue(localValue || 0)
         : getMoneyDisplayValue(props.value)
 
@@ -189,29 +190,25 @@ export function TransferFeedItem(props: Props) {
               ]}
             >
               {currencyStyle.direction}
-              {localCurrencySymbol}
+              {showLocalCurrency && localCurrencySymbol}
               {transactionValue}
-              {localCurrencyCode}
+              {showLocalCurrency && localCurrencyCode}
             </Text>
           </View>
           {!!info && <Text style={styles.info}>{info}</Text>}
           <View style={[styles.statusContainer, !!info && styles.statusContainerUnderComment]}>
             {isPending && (
-              <Text style={[fontStyles.bodySmall, styles.transactionStatus]}>
-                <Text style={[fontStyles.bodySmallBold, styles.textPending]}>
-                  {t('confirmingPayment')}
-                </Text>
+              <Text style={styles.transactionStatus}>
+                <Text style={styles.textPending}>{t('confirmingPayment')}</Text>
                 {' ' + timeFormatted}
               </Text>
             )}
             {status === TransactionStatus.Complete && (
-              <Text style={[fontStyles.bodySmall, styles.transactionStatus]}>
-                {dateTimeFormatted}
-              </Text>
+              <Text style={styles.transactionStatus}>{dateTimeFormatted}</Text>
             )}
             {status === TransactionStatus.Failed && (
-              <Text style={[fontStyles.bodySmall, styles.transactionStatus]}>
-                <Text style={fontStyles.linkSmall}>{t('paymentFailed')}</Text>
+              <Text style={styles.transactionStatus}>
+                <Text style={styles.textStatusFailed}>{t('paymentFailed')}</Text>
                 {' ' + timeFormatted}
               </Text>
             )}
@@ -263,12 +260,20 @@ const styles = StyleSheet.create({
     marginTop: 8,
   },
   textPending: {
+    ...fontStyles.bodySmallBold,
     fontSize: 13,
     lineHeight: 18,
     color: colors.celoGreen,
   },
   transactionStatus: {
+    ...fontStyles.bodySmall,
     color: colors.lightGray,
+  },
+  textStatusFailed: {
+    ...fontStyles.semiBold,
+    fontSize: 13,
+    lineHeight: 17,
+    color: colors.darkSecondary,
   },
   localAmount: {
     marginLeft: 'auto',

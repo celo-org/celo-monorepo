@@ -26,6 +26,8 @@ exports[`ImportContacts Screen renders correctly 1`] = `
   >
     <Text
       accessible={true}
+      focusable={true}
+      onClick={[Function]}
       onResponderGrant={[Function]}
       onResponderMove={[Function]}
       onResponderRelease={[Function]}
@@ -60,7 +62,7 @@ exports[`ImportContacts Screen renders correctly 1`] = `
         <Image
           source={
             Object {
-              "testUri": "../../../src/images/verify-address-book.png",
+              "testUri": "../../../packages/mobile/src/images/verify-address-book.png",
             }
           }
           style={
@@ -164,6 +166,7 @@ exports[`ImportContacts Screen renders correctly 1`] = `
     >
       <View
         accessible={true}
+        focusable={true}
         isTVSelectable={true}
         nativeBackgroundAndroid={
           Object {
@@ -171,6 +174,7 @@ exports[`ImportContacts Screen renders correctly 1`] = `
             "type": "ThemeAttrAndroid",
           }
         }
+        onClick={[Function]}
         onResponderGrant={[Function]}
         onResponderMove={[Function]}
         onResponderRelease={[Function]}
@@ -248,6 +252,7 @@ exports[`ImportContacts Screen renders correctly 1`] = `
     >
       <View
         accessible={true}
+        focusable={true}
         isTVSelectable={true}
         nativeBackgroundAndroid={
           Object {
@@ -255,6 +260,7 @@ exports[`ImportContacts Screen renders correctly 1`] = `
             "type": "ThemeAttrAndroid",
           }
         }
+        onClick={[Function]}
         onResponderGrant={[Function]}
         onResponderMove={[Function]}
         onResponderRelease={[Function]}

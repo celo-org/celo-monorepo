@@ -3,11 +3,12 @@
 - [Celo Engineering Setup](#celo-engineering-setup)
   - [Getting Everything Installed](#getting-everything-installed)
     - [MacOS](#macos)
-      - [XCode](#xcode)
+      - [Xcode](#xcode)
       - [Homebrew](#homebrew)
       - [Install Node, Yarn and friends](#install-node-yarn-and-friends)
       - [Java](#java)
       - [Install Android Dev Tools](#install-android-dev-tools)
+      - [Install iOS Dev Tools](#install-ios-dev-tools)
     - [Linux](#linux)
       - [Install Node, Yarn and friends](#install-node-yarn-and-friends-1)
       - [Installing OpenJDK 8](#installing-openjdk-8)
@@ -31,9 +32,9 @@ build the celo-monorepo codebase.
 
 ### MacOS
 
-#### XCode
+#### Xcode
 
-Install XCode and its command line tools:
+Install Xcode and its command line tools:
 
 ```bash
 xcode-select --install
@@ -101,7 +102,6 @@ Execute the following (and make sure the lines are in your `~/.bash_profile`):
 ```bash
 export ANDROID_HOME=/usr/local/share/android-sdk
 export ANDROID_NDK=/usr/local/share/android-ndk
-# Optional to speedup java builds
 export GRADLE_OPTS='-Dorg.gradle.daemon=true -Dorg.gradle.parallel=true -Dorg.gradle.jvmargs="-Xmx4096m -XX:+HeapDumpOnOutOfMemoryError"'
 ```
 
@@ -110,6 +110,14 @@ Then install the Android 28 platform:
 ```bash
 sdkmanager 'platforms;android-28'
 ```
+
+#### Install iOS Dev Tools
+
+Install [Xcode 10.3](https://download.developer.apple.com/Developer_Tools/Xcode_10.3/Xcode_10.3.xip) (an Apple Developer Account is needed to access this link).
+
+We do not recommend installing Xcode through the App Store as it can auto update and become incompatible with our projects (until we decide to upgrade).
+
+Note that using the method above, you can have multiple versions of Xcode installed in parallel by using different app names. For instance `Xcode10.3.app` and `Xcode11.app` inside the `/Applications` folder.
 
 ### Linux
 
@@ -205,7 +213,7 @@ Install the Android 28 system image and create an Android Virtual Device:
 
 ```bash
 sdkmanager "system-images;android-28;google_apis;x86"
-avdmanager create avd --force --name Nexus_5X_API_28 --device "Nexus 5X" -k "system-images;android-28;google_apis;x86" --abi "google_apis/x86"
+avdmanager create avd --force --name Nexus_5X_API_28_x86 --device "Nexus 5X" -k "system-images;android-28;google_apis;x86" --abi "google_apis/x86"
 ```
 
 Execute the following and add it to your `~/.bash_profile`:

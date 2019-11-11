@@ -54,7 +54,7 @@ exports[`NotificationBox Backup too late test 1`] = `
               resizeMode="contain"
               source={
                 Object {
-                  "testUri": "../../../src/images/backup-icon.png",
+                  "testUri": "../../../packages/mobile/src/images/backup-icon.png",
                 }
               }
               style={
@@ -124,6 +124,7 @@ exports[`NotificationBox Backup too late test 1`] = `
                 >
                   <View
                     accessible={true}
+                    focusable={true}
                     isTVSelectable={true}
                     nativeBackgroundAndroid={
                       Object {
@@ -131,6 +132,7 @@ exports[`NotificationBox Backup too late test 1`] = `
                         "type": "ThemeAttrAndroid",
                       }
                     }
+                    onClick={[Function]}
                     onResponderGrant={[Function]}
                     onResponderMove={[Function]}
                     onResponderRelease={[Function]}
@@ -142,14 +144,8 @@ exports[`NotificationBox Backup too late test 1`] = `
                       style={
                         Array [
                           Object {
-                            "color": "#2E3338",
-                            "fontFamily": "Hind-Regular",
-                            "fontSize": 14,
-                            "lineHeight": 18,
-                          },
-                          Object {
                             "color": "#42D689",
-                            "fontFamily": "Hind-Medium",
+                            "fontFamily": "Hind-SemiBold",
                             "fontSize": 14,
                             "lineHeight": 18,
                           },
@@ -206,7 +202,7 @@ exports[`NotificationBox Backup too late test 1`] = `
               resizeMode="contain"
               source={
                 Object {
-                  "testUri": "../../../src/images/Invite-Friends.png",
+                  "testUri": "../../../packages/mobile/src/images/Invite-Friends.png",
                 }
               }
               style={
@@ -276,6 +272,7 @@ exports[`NotificationBox Backup too late test 1`] = `
                 >
                   <View
                     accessible={true}
+                    focusable={true}
                     isTVSelectable={true}
                     nativeBackgroundAndroid={
                       Object {
@@ -283,6 +280,7 @@ exports[`NotificationBox Backup too late test 1`] = `
                         "type": "ThemeAttrAndroid",
                       }
                     }
+                    onClick={[Function]}
                     onResponderGrant={[Function]}
                     onResponderMove={[Function]}
                     onResponderRelease={[Function]}
@@ -294,14 +292,8 @@ exports[`NotificationBox Backup too late test 1`] = `
                       style={
                         Array [
                           Object {
-                            "color": "#2E3338",
-                            "fontFamily": "Hind-Regular",
-                            "fontSize": 14,
-                            "lineHeight": 18,
-                          },
-                          Object {
                             "color": "#42D689",
-                            "fontFamily": "Hind-Medium",
+                            "fontFamily": "Hind-SemiBold",
                             "fontSize": 14,
                             "lineHeight": 18,
                           },
@@ -316,6 +308,7 @@ exports[`NotificationBox Backup too late test 1`] = `
                   </View>
                   <View
                     accessible={true}
+                    focusable={true}
                     isTVSelectable={true}
                     nativeBackgroundAndroid={
                       Object {
@@ -323,6 +316,7 @@ exports[`NotificationBox Backup too late test 1`] = `
                         "type": "ThemeAttrAndroid",
                       }
                     }
+                    onClick={[Function]}
                     onResponderGrant={[Function]}
                     onResponderMove={[Function]}
                     onResponderRelease={[Function]}
@@ -334,14 +328,8 @@ exports[`NotificationBox Backup too late test 1`] = `
                       style={
                         Array [
                           Object {
-                            "color": "#2E3338",
-                            "fontFamily": "Hind-Regular",
-                            "fontSize": 14,
-                            "lineHeight": 18,
-                          },
-                          Object {
                             "color": "#42D689",
-                            "fontFamily": "Hind-Medium",
+                            "fontFamily": "Hind-SemiBold",
                             "fontSize": 14,
                             "lineHeight": 18,
                           },
@@ -455,7 +443,7 @@ exports[`NotificationBox Educations not completed yet 1`] = `
               resizeMode="contain"
               source={
                 Object {
-                  "testUri": "../../../src/images/home-icon.png",
+                  "testUri": "../../../packages/mobile/src/images/home-icon.png",
                 }
               }
               style={
@@ -525,6 +513,7 @@ exports[`NotificationBox Educations not completed yet 1`] = `
                 >
                   <View
                     accessible={true}
+                    focusable={true}
                     isTVSelectable={true}
                     nativeBackgroundAndroid={
                       Object {
@@ -532,6 +521,7 @@ exports[`NotificationBox Educations not completed yet 1`] = `
                         "type": "ThemeAttrAndroid",
                       }
                     }
+                    onClick={[Function]}
                     onResponderGrant={[Function]}
                     onResponderMove={[Function]}
                     onResponderRelease={[Function]}
@@ -543,14 +533,8 @@ exports[`NotificationBox Educations not completed yet 1`] = `
                       style={
                         Array [
                           Object {
-                            "color": "#2E3338",
-                            "fontFamily": "Hind-Regular",
-                            "fontSize": 14,
-                            "lineHeight": 18,
-                          },
-                          Object {
                             "color": "#42D689",
-                            "fontFamily": "Hind-Medium",
+                            "fontFamily": "Hind-SemiBold",
                             "fontSize": 14,
                             "lineHeight": 18,
                           },
@@ -565,6 +549,7 @@ exports[`NotificationBox Educations not completed yet 1`] = `
                   </View>
                   <View
                     accessible={true}
+                    focusable={true}
                     isTVSelectable={true}
                     nativeBackgroundAndroid={
                       Object {
@@ -572,6 +557,7 @@ exports[`NotificationBox Educations not completed yet 1`] = `
                         "type": "ThemeAttrAndroid",
                       }
                     }
+                    onClick={[Function]}
                     onResponderGrant={[Function]}
                     onResponderMove={[Function]}
                     onResponderRelease={[Function]}
@@ -583,14 +569,8 @@ exports[`NotificationBox Educations not completed yet 1`] = `
                       style={
                         Array [
                           Object {
-                            "color": "#2E3338",
-                            "fontFamily": "Hind-Regular",
-                            "fontSize": 14,
-                            "lineHeight": 18,
-                          },
-                          Object {
                             "color": "#42D689",
-                            "fontFamily": "Hind-Medium",
+                            "fontFamily": "Hind-SemiBold",
                             "fontSize": 14,
                             "lineHeight": 18,
                           },
@@ -668,7 +648,7 @@ exports[`NotificationBox Payment Requests exist 1`] = `
               resizeMode="contain"
               source={
                 Object {
-                  "testUri": "../../../src/images/send-dollar.png",
+                  "testUri": "../../../packages/mobile/src/images/send-dollar.png",
                 }
               }
               style={
@@ -763,8 +743,7 @@ exports[`NotificationBox Payment Requests exist 1`] = `
                           ]
                         }
                       >
-                         
-                        12.34
+                        $12.34
                       </Text>
                     </Text>
                   </View>
@@ -779,6 +758,7 @@ exports[`NotificationBox Payment Requests exist 1`] = `
                 >
                   <View
                     accessible={true}
+                    focusable={true}
                     isTVSelectable={true}
                     nativeBackgroundAndroid={
                       Object {
@@ -786,6 +766,7 @@ exports[`NotificationBox Payment Requests exist 1`] = `
                         "type": "ThemeAttrAndroid",
                       }
                     }
+                    onClick={[Function]}
                     onResponderGrant={[Function]}
                     onResponderMove={[Function]}
                     onResponderRelease={[Function]}
@@ -797,14 +778,8 @@ exports[`NotificationBox Payment Requests exist 1`] = `
                       style={
                         Array [
                           Object {
-                            "color": "#2E3338",
-                            "fontFamily": "Hind-Regular",
-                            "fontSize": 14,
-                            "lineHeight": 18,
-                          },
-                          Object {
                             "color": "#42D689",
-                            "fontFamily": "Hind-Medium",
+                            "fontFamily": "Hind-SemiBold",
                             "fontSize": 14,
                             "lineHeight": 18,
                           },
@@ -882,7 +857,7 @@ exports[`NotificationBox Simple test 1`] = `
               resizeMode="contain"
               source={
                 Object {
-                  "testUri": "../../../src/images/backup-icon.png",
+                  "testUri": "../../../packages/mobile/src/images/backup-icon.png",
                 }
               }
               style={
@@ -952,6 +927,7 @@ exports[`NotificationBox Simple test 1`] = `
                 >
                   <View
                     accessible={true}
+                    focusable={true}
                     isTVSelectable={true}
                     nativeBackgroundAndroid={
                       Object {
@@ -959,6 +935,7 @@ exports[`NotificationBox Simple test 1`] = `
                         "type": "ThemeAttrAndroid",
                       }
                     }
+                    onClick={[Function]}
                     onResponderGrant={[Function]}
                     onResponderMove={[Function]}
                     onResponderRelease={[Function]}
@@ -970,14 +947,8 @@ exports[`NotificationBox Simple test 1`] = `
                       style={
                         Array [
                           Object {
-                            "color": "#2E3338",
-                            "fontFamily": "Hind-Regular",
-                            "fontSize": 14,
-                            "lineHeight": 18,
-                          },
-                          Object {
                             "color": "#42D689",
-                            "fontFamily": "Hind-Medium",
+                            "fontFamily": "Hind-SemiBold",
                             "fontSize": 14,
                             "lineHeight": 18,
                           },
@@ -1034,7 +1005,7 @@ exports[`NotificationBox Simple test 1`] = `
               resizeMode="contain"
               source={
                 Object {
-                  "testUri": "../../../src/images/Invite-Friends.png",
+                  "testUri": "../../../packages/mobile/src/images/Invite-Friends.png",
                 }
               }
               style={
@@ -1104,6 +1075,7 @@ exports[`NotificationBox Simple test 1`] = `
                 >
                   <View
                     accessible={true}
+                    focusable={true}
                     isTVSelectable={true}
                     nativeBackgroundAndroid={
                       Object {
@@ -1111,6 +1083,7 @@ exports[`NotificationBox Simple test 1`] = `
                         "type": "ThemeAttrAndroid",
                       }
                     }
+                    onClick={[Function]}
                     onResponderGrant={[Function]}
                     onResponderMove={[Function]}
                     onResponderRelease={[Function]}
@@ -1122,14 +1095,8 @@ exports[`NotificationBox Simple test 1`] = `
                       style={
                         Array [
                           Object {
-                            "color": "#2E3338",
-                            "fontFamily": "Hind-Regular",
-                            "fontSize": 14,
-                            "lineHeight": 18,
-                          },
-                          Object {
                             "color": "#42D689",
-                            "fontFamily": "Hind-Medium",
+                            "fontFamily": "Hind-SemiBold",
                             "fontSize": 14,
                             "lineHeight": 18,
                           },
@@ -1144,6 +1111,7 @@ exports[`NotificationBox Simple test 1`] = `
                   </View>
                   <View
                     accessible={true}
+                    focusable={true}
                     isTVSelectable={true}
                     nativeBackgroundAndroid={
                       Object {
@@ -1151,6 +1119,7 @@ exports[`NotificationBox Simple test 1`] = `
                         "type": "ThemeAttrAndroid",
                       }
                     }
+                    onClick={[Function]}
                     onResponderGrant={[Function]}
                     onResponderMove={[Function]}
                     onResponderRelease={[Function]}
@@ -1162,14 +1131,8 @@ exports[`NotificationBox Simple test 1`] = `
                       style={
                         Array [
                           Object {
-                            "color": "#2E3338",
-                            "fontFamily": "Hind-Regular",
-                            "fontSize": 14,
-                            "lineHeight": 18,
-                          },
-                          Object {
                             "color": "#42D689",
-                            "fontFamily": "Hind-Medium",
+                            "fontFamily": "Hind-SemiBold",
                             "fontSize": 14,
                             "lineHeight": 18,
                           },

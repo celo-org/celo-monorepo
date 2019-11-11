@@ -1,4 +1,5 @@
 import { CeloTransactionObject } from '@celo/contractkit'
+import { CLIError } from '@oclif/errors'
 import BigNumber from 'bignumber.js'
 import chalk from 'chalk'
 import Table from 'cli-table'
@@ -36,8 +37,8 @@ export function printValueMapRecursive(valueMap: Record<string, any>) {
 
 function toStringValueMapRecursive(valueMap: Record<string, any>, prefix: string): string {
   const printValue = (v: any): string => {
-    if (typeof v === 'object') {
-      if (v instanceof BigNumber) return v.toString(10)
+    if (typeof v === 'object' && v != null) {
+      if (v instanceof BigNumber) return v.toFixed()
       return '\n' + toStringValueMapRecursive(v, prefix + '  ')
     }
     return chalk`${v}`
@@ -56,6 +57,10 @@ export function printVTable(valueMap: Record<string, any>) {
 }
 
 export function failWith(msg: string): never {
-  console.error(msg)
-  return process.exit(1)
+  throw new CLIError(msg)
+}
+
+export async function binaryPrompt(promptMessage: string) {
+  const resp = await cli.prompt(promptMessage + ' [y/yes, n/no]')
+  return ['y', 'yes'].includes(resp)
 }

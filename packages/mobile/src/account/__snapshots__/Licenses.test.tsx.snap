@@ -3,10 +3,13 @@
 exports[`Licenses renders correctly 1`] = `
 <View
   style={
-    Object {
-      "flex": 1,
-      "overflow": "hidden",
-    }
+    Array [
+      Object {
+        "flex": 1,
+        "overflow": "hidden",
+      },
+      undefined,
+    ]
   }
 >
   <RNCWebView
@@ -16,6 +19,7 @@ exports[`Licenses renders correctly 1`] = `
     cacheEnabled={true}
     javaScriptEnabled={true}
     messagingEnabled={false}
+    onHttpError={[Function]}
     onLoadingError={[Function]}
     onLoadingFinish={[Function]}
     onLoadingProgress={[Function]}
