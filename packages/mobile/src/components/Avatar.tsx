@@ -33,7 +33,7 @@ function getDisplayName({ name, recipient, e164Number, address, t }: Props) {
   if (recipient && recipient.displayName) {
     return recipient.displayName
   }
-  if (e164Number) {
+  if (e164Number || (recipient && recipient.e164PhoneNumber)) {
     return t('mobileNumber')
   }
   if (address) {
@@ -52,7 +52,7 @@ export function Avatar(props: Props) {
       {...props}
       defaultCountryCode={defaultCountryCode}
       name={getDisplayName(props)}
-      e164Number={e164Number}
+      e164Number={e164Number || (recipient && recipient.e164PhoneNumber)}
       iconSize={iconSize}
       thumbnailPath={getRecipientThumbnail(recipient)}
     >
