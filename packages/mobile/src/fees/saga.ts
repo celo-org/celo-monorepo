@@ -30,8 +30,15 @@ export function* estimateFeeSaga({ feeType }: EstimateFeeAction) {
   Logger.debug(`${TAG}/estimateFeeSaga`, `updating for ${feeType}`)
 
   const balance = yield select(stableTokenBalanceSelector)
+
+  if (!balance) {
+    Logger.warn(`${TAG}/estimateFeeSaga`, 'Balance is null or empty string')
+    yield put(feeEstimated(feeType, '0'))
+    return
+  }
+
   if (balance === '0') {
-    Logger.warn(`${TAG}/estimateFeeSaga`, 'Error estimating fee')
+    Logger.warn(`${TAG}/estimateFeeSaga`, "Can't estimate fee with zero balance")
     yield put(feeEstimated(feeType, '0'))
     return
   }
