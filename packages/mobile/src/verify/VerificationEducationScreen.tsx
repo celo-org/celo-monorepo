@@ -15,8 +15,8 @@ import componentWithAnalytics from 'src/analytics/wrapper'
 import { Namespaces } from 'src/i18n'
 import { setHasSeenVerificationNux } from 'src/identity/actions'
 import { nuxNavigationOptions } from 'src/navigator/Headers'
-import { navigate } from 'src/navigator/NavigationService'
-import { Screens, Stacks } from 'src/navigator/Screens'
+import { navigate, navigateHome } from 'src/navigator/NavigationService'
+import { Screens } from 'src/navigator/Screens'
 
 interface DispatchProps {
   setHasSeenVerificationNux: typeof setHasSeenVerificationNux
@@ -58,7 +58,7 @@ class VerificationEducationScreen extends React.Component<Props, State> {
 
   onPressSkipConfirm = () => {
     this.props.setHasSeenVerificationNux(true)
-    navigate(Stacks.AppStack)
+    navigateHome()
   }
 
   render() {
