@@ -1,4 +1,10 @@
 {
+  "notReadyForCode": "Not yet ready for code entry",
+  "emptyVerificationCode": "No Verification Code in Clipboard",
+  "invalidVerificationCode": "Invalid Verification Code",
+  "repeatVerificationCode": "Repeated Verification Code",
+  "verificationFailure": "Verification Failed",
+  "verificationTimeout": "Verification Timed Out",
   "errorRequestCode": "Failed to request codes.",
   "errorRedeemingCode": "Failed to redeem code.",
   "pleaseRetry": "Please retry verification.",
