@@ -1,5 +1,6 @@
 import { IArg } from '@oclif/parser/lib/args'
 import { BaseCommand } from '../../base'
+import { newCheckBuilder } from '../../utils/checks'
 import { printValueMap } from '../../utils/cli'
 import { Args } from '../../utils/command'
 
@@ -18,6 +19,11 @@ export default class ValidatorShow extends BaseCommand {
     const { args } = this.parse(ValidatorShow)
     const address = args.validatorAddress
     const validators = await this.kit.contracts.getValidators()
+
+    await newCheckBuilder(this)
+      .isValidator(address)
+      .runChecks()
+
     const validator = await validators.getValidator(address)
     printValueMap(validator)
   }

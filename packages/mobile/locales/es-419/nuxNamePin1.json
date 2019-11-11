@@ -39,9 +39,8 @@
     "validating": "Genial! Validando el código de invitación copiado",
     "inviteAccepted": "🎉 Invitación aceptada!",
     "askForInvite": {
-      "0":
-        "Solicite una invitación de alguien con Celo Monedero o regístrese en red {{testnet}} en ",
-      "1": "celo.org/build/wallet"
+      "0": "Solicite una invitación de un amigo en Celo o regístrese en la red {{testnet}} en ",
+      "1": "celo.org/app"
     }
   },
   "enterFullName": "Ingresa tu nombre y apellido",

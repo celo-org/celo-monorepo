@@ -12,7 +12,6 @@ import "../common/UsingRegistry.sol";
 import "../common/Signatures.sol";
 
 contract Escrow is IEscrow, ReentrancyGuard, Ownable, Initializable, UsingRegistry {
-
   using SafeMath for uint256;
 
   event Transfer(
@@ -67,7 +66,7 @@ contract Escrow is IEscrow, ReentrancyGuard, Ownable, Initializable, UsingRegist
     setRegistry(registryAddress);
   }
 
-/**
+  /**
   * @notice Transfer tokens to a specific user. Supports both identity with privacy (an empty
   *         identifier and 0 minAttestations) and without (with identifier and minAttestations).
   * @param identifier The hashed identifier of a user to transfer to.
@@ -89,11 +88,7 @@ contract Escrow is IEscrow, ReentrancyGuard, Ownable, Initializable, UsingRegist
     uint256 expirySeconds,
     address paymentId,
     uint256 minAttestations
-  )
-    external
-    nonReentrant
-    returns (bool)
-  {
+  ) external nonReentrant returns (bool) {
     require(token != address(0) && value > 0 && expirySeconds > 0, "Invalid transfer inputs.");
     require(
       !(identifier.length <= 0 && !(minAttestations == 0)),
@@ -120,7 +115,7 @@ contract Escrow is IEscrow, ReentrancyGuard, Ownable, Initializable, UsingRegist
     return true;
   }
 
-/**
+  /**
   * @notice Withdraws tokens for a verified user.
   * @param paymentId The ID for the EscrowedPayment struct that contains all relevant information.
   * @param v The recovery id of the incoming ECDSA signature.
@@ -129,30 +124,21 @@ contract Escrow is IEscrow, ReentrancyGuard, Ownable, Initializable, UsingRegist
   * @dev Throws if 'token' or 'value' is 0.
   * @dev Throws if msg.sender does not prove ownership of the withdraw key.
   */
-  function withdraw (
-    address paymentId,
-    uint8 v,
-    bytes32 r,
-    bytes32 s
-  )
+  function withdraw(address paymentId, uint8 v, bytes32 r, bytes32 s)
     external
     nonReentrant
     returns (bool)
   {
     address signer = Signatures.getSignerOfAddress(msg.sender, v, r, s);
-    require(
-      signer == paymentId,
-      "Failed to prove ownership of the withdraw key"
-    );
+    require(signer == paymentId, "Failed to prove ownership of the withdraw key");
     EscrowedPayment memory payment = escrowedPayments[paymentId];
     require(payment.token != address(0) && payment.value > 0, "Invalid withdraw value.");
 
     if (payment.recipientIdentifier.length > 0) {
-      IAttestations attestations = IAttestations(
-        registry.getAddressFor(ATTESTATIONS_REGISTRY_ID)
-      );
+      IAttestations attestations = IAttestations(registry.getAddressFor(ATTESTATIONS_REGISTRY_ID));
       (uint64 completedAttestations, ) = attestations.getAttestationStats(
-        payment.recipientIdentifier, msg.sender
+        payment.recipientIdentifier,
+        msg.sender
       );
       require(
         uint256(completedAttestations) >= payment.minAttestations,
@@ -182,13 +168,7 @@ contract Escrow is IEscrow, ReentrancyGuard, Ownable, Initializable, UsingRegist
   * @dev Throws if msg.sender is not the sender of payment.
   * @dev Throws if redeem time hasn't been reached yet.
   */
-  function revoke(
-    address paymentId
-  )
-    external
-    nonReentrant
-    returns (bool)
-  {
+  function revoke(address paymentId) external nonReentrant returns (bool) {
     EscrowedPayment memory payment = escrowedPayments[paymentId];
     require(payment.sender == msg.sender, "Only sender of payment can attempt to revoke payment.");
     require(
@@ -213,7 +193,7 @@ contract Escrow is IEscrow, ReentrancyGuard, Ownable, Initializable, UsingRegist
 
   }
 
-/**
+  /**
   * @notice Gets array of all Escrowed Payments received by identifier.
   * @param identifier The hash of an identifier of the receiver of the escrowed payment.
   * @return An array containing all the IDs of the Escrowed Payments that were received
@@ -223,7 +203,7 @@ contract Escrow is IEscrow, ReentrancyGuard, Ownable, Initializable, UsingRegist
     return receivedPaymentIds[identifier];
   }
 
-/**
+  /**
   * @notice Gets array of all Escrowed Payment IDs sent by sender.
   * @param sender The address of the sender of the escrowed payments.
   * @return An array containing all the IDs of the Escrowed Payments that were sent by the
