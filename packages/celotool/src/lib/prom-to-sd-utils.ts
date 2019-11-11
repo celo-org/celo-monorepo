@@ -1,9 +1,9 @@
+import sleep from 'sleep-promise'
 import { envVar, fetchEnv } from 'src/lib/env-utils'
 import { installGenericHelmChart, removeGenericHelmChart } from 'src/lib/helm_deploy'
 import { getStatefulSetReplicas, scaleResource } from 'src/lib/kubernetes'
 import { execCmdWithExitOnFailure } from 'src/lib/utils'
 import { getInternalTxNodeIPs, getInternalValidatorIPs } from 'src/lib/vm-testnet-utils'
-import sleep from 'sleep-promise'
 
 const helmChartPath = '../helm-charts/prometheus-to-sd'
 

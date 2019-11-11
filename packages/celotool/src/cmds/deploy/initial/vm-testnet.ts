@@ -1,4 +1,4 @@
-import { createClusterIfNotExists, switchToClusterFromEnv, setupCluster } from 'src/lib/cluster'
+import { createClusterIfNotExists, setupCluster, switchToClusterFromEnv } from 'src/lib/cluster'
 import { installHelmChart } from 'src/lib/prom-to-sd-utils'
 import { deploy } from 'src/lib/vm-testnet-utils'
 import { InitialArgv } from '../../deploy/initial'
