@@ -26,6 +26,8 @@ exports[`JoinCeloScreen renders correctly 1`] = `
   >
     <Text
       accessible={true}
+      focusable={true}
+      onClick={[Function]}
       onResponderGrant={[Function]}
       onResponderMove={[Function]}
       onResponderRelease={[Function]}
@@ -61,7 +63,7 @@ exports[`JoinCeloScreen renders correctly 1`] = `
           resizeMode="contain"
           source={
             Object {
-              "testUri": "../../../src/images/coins-logo.png",
+              "testUri": "../../../packages/mobile/src/images/coins-logo.png",
             }
           }
           style={
@@ -328,6 +330,7 @@ exports[`JoinCeloScreen renders correctly 1`] = `
                 "width": 60,
               }
             }
+            testID="contryCodeText"
           >
             +1
           </Text>
@@ -391,17 +394,13 @@ exports[`JoinCeloScreen renders correctly 1`] = `
       </View>
       <Text
         style={
-          Array [
-            Object {
-              "color": "#2E3338",
-              "fontFamily": "Hind-Regular",
-              "fontSize": 12,
-              "lineHeight": 16,
-            },
-            Object {
-              "marginTop": 25,
-            },
-          ]
+          Object {
+            "color": "#2E3338",
+            "fontFamily": "Hind-Regular",
+            "fontSize": 12,
+            "lineHeight": 16,
+            "marginTop": 25,
+          }
         }
       >
         joinText.1
@@ -409,10 +408,11 @@ exports[`JoinCeloScreen renders correctly 1`] = `
           onPress={[Function]}
           style={
             Object {
-              "color": "#42D689",
-              "fontFamily": "Hind-Medium",
-              "fontSize": 14,
-              "lineHeight": 18,
+              "color": "#2E3338",
+              "fontFamily": "Hind-Regular",
+              "fontSize": 12,
+              "lineHeight": 16,
+              "textDecorationLine": "underline",
             }
           }
         >
@@ -440,6 +440,7 @@ exports[`JoinCeloScreen renders correctly 1`] = `
   >
     <View
       accessible={true}
+      focusable={true}
       isTVSelectable={true}
       nativeBackgroundAndroid={
         Object {
@@ -447,6 +448,7 @@ exports[`JoinCeloScreen renders correctly 1`] = `
           "type": "ThemeAttrAndroid",
         }
       }
+      onClick={[Function]}
       onResponderGrant={[Function]}
       onResponderMove={[Function]}
       onResponderRelease={[Function]}
@@ -534,6 +536,8 @@ exports[`JoinCeloScreen renders with an error 1`] = `
   >
     <Text
       accessible={true}
+      focusable={true}
+      onClick={[Function]}
       onResponderGrant={[Function]}
       onResponderMove={[Function]}
       onResponderRelease={[Function]}
@@ -569,7 +573,7 @@ exports[`JoinCeloScreen renders with an error 1`] = `
           resizeMode="contain"
           source={
             Object {
-              "testUri": "../../../src/images/coins-logo.png",
+              "testUri": "../../../packages/mobile/src/images/coins-logo.png",
             }
           }
           style={
@@ -836,6 +840,7 @@ exports[`JoinCeloScreen renders with an error 1`] = `
                 "width": 60,
               }
             }
+            testID="contryCodeText"
           >
             +1
           </Text>
@@ -899,17 +904,13 @@ exports[`JoinCeloScreen renders with an error 1`] = `
       </View>
       <Text
         style={
-          Array [
-            Object {
-              "color": "#2E3338",
-              "fontFamily": "Hind-Regular",
-              "fontSize": 12,
-              "lineHeight": 16,
-            },
-            Object {
-              "marginTop": 25,
-            },
-          ]
+          Object {
+            "color": "#2E3338",
+            "fontFamily": "Hind-Regular",
+            "fontSize": 12,
+            "lineHeight": 16,
+            "marginTop": 25,
+          }
         }
       >
         joinText.1
@@ -917,10 +918,11 @@ exports[`JoinCeloScreen renders with an error 1`] = `
           onPress={[Function]}
           style={
             Object {
-              "color": "#42D689",
-              "fontFamily": "Hind-Medium",
-              "fontSize": 14,
-              "lineHeight": 18,
+              "color": "#2E3338",
+              "fontFamily": "Hind-Regular",
+              "fontSize": 12,
+              "lineHeight": 16,
+              "textDecorationLine": "underline",
             }
           }
         >
@@ -948,6 +950,7 @@ exports[`JoinCeloScreen renders with an error 1`] = `
   >
     <View
       accessible={true}
+      focusable={true}
       isTVSelectable={true}
       nativeBackgroundAndroid={
         Object {
@@ -955,6 +958,7 @@ exports[`JoinCeloScreen renders with an error 1`] = `
           "type": "ThemeAttrAndroid",
         }
       }
+      onClick={[Function]}
       onResponderGrant={[Function]}
       onResponderMove={[Function]}
       onResponderRelease={[Function]}

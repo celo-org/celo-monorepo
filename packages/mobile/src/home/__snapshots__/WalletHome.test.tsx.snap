@@ -317,6 +317,7 @@ exports[`Testnet banner Shows testnet banner for 5 seconds 1`] = `
     >
       <View
         accessible={true}
+        focusable={true}
         hitSlop={
           Object {
             "bottom": 15,
@@ -332,6 +333,7 @@ exports[`Testnet banner Shows testnet banner for 5 seconds 1`] = `
             "type": "ThemeAttrAndroid",
           }
         }
+        onClick={[Function]}
         onResponderGrant={[Function]}
         onResponderMove={[Function]}
         onResponderRelease={[Function]}
@@ -425,6 +427,7 @@ exports[`Testnet banner Shows testnet banner for 5 seconds 1`] = `
       </View>
       <View
         accessible={true}
+        focusable={true}
         hitSlop={
           Object {
             "bottom": 15,
@@ -440,6 +443,7 @@ exports[`Testnet banner Shows testnet banner for 5 seconds 1`] = `
             "type": "ThemeAttrAndroid",
           }
         }
+        onClick={[Function]}
         onResponderGrant={[Function]}
         onResponderMove={[Function]}
         onResponderRelease={[Function]}

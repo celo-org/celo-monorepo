@@ -3,7 +3,6 @@ import QRCode from '@celo/react-components/icons/QRCode'
 import colors from '@celo/react-components/styles/colors'
 import { fontStyles } from '@celo/react-components/styles/fonts'
 import variables from '@celo/react-components/styles/variables'
-import * as _ from 'lodash'
 import * as React from 'react'
 import { WithNamespaces, withNamespaces } from 'react-i18next'
 import { Platform, StyleSheet, Text, View } from 'react-native'
@@ -34,10 +33,10 @@ class QRScanner extends React.Component<Props> {
 
   camera: RNCamera | null = null
 
-  onBardCodeDetected = _.debounce((rawData: any) => {
+  onBardCodeDetected = (rawData: any) => {
     Logger.debug('QRScanner', 'Bar code detected')
     this.props.handleBarcodeDetected(rawData)
-  }, 1000)
+  }
 
   onPressShowYourCode = () => {
     navigate(Screens.QRCode)

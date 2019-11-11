@@ -52,7 +52,7 @@ interface ReferrerDataError {
   message: string
 }
 
-export const getInviteCodeFromReferrerData = async () => {
+export const getValidInviteCodeFromReferrerData = async () => {
   const referrerData: ReferrerData | ReferrerDataError = await RNInstallReferrer.getReferrer()
   Logger.info(
     'invite/utils/getInviteCodeFromReferrerData',
@@ -64,7 +64,12 @@ export const getInviteCodeFromReferrerData = async () => {
     )
     const inviteCode = params.get('invite-code')
     if (inviteCode) {
-      return inviteCode.replace(' ', '+')
+      const sanitizedCode = inviteCode.replace(' ', '+')
+      // Accept invite codes which are either base64 encoded or direct hex keys
+      if (isValidPrivateKey(sanitizedCode)) {
+        return sanitizedCode
+      }
+      return extractValidInviteCode(sanitizedCode)
     }
   }
   return null

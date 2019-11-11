@@ -14,6 +14,7 @@ exports[`InviteReview renders correctly 1`] = `
         Object {
           "backgroundColor": "#FFFFFF",
           "flex": 1,
+          "justifyContent": "space-between",
         },
         undefined,
       ]
@@ -22,8 +23,9 @@ exports[`InviteReview renders correctly 1`] = `
     <RCTScrollView
       contentContainerStyle={
         Object {
-          "flex": 1,
-          "justifyContent": "space-between",
+          "alignItems": "center",
+          "justifyContent": "flex-start",
+          "paddingVertical": 10,
         }
       }
     >
@@ -31,61 +33,49 @@ exports[`InviteReview renders correctly 1`] = `
         <View
           style={
             Object {
-              "backgroundColor": "#FFFFFF",
+              "alignItems": "center",
               "flex": 1,
+              "justifyContent": "center",
+              "marginTop": 10,
             }
           }
         >
-          <View
+          <Text
             style={
-              Object {
-                "alignItems": "center",
-                "flex": 1,
-                "justifyContent": "center",
-                "marginTop": 10,
-              }
+              Array [
+                Object {
+                  "color": "#2E3338",
+                  "fontFamily": "Hind-Light",
+                  "fontSize": 22,
+                  "paddingBottom": 20,
+                  "textAlign": "center",
+                },
+                Object {
+                  "alignSelf": "center",
+                  "color": "#2E3338",
+                  "padding": 10,
+                  "paddingBottom": 10,
+                },
+              ]
             }
           >
-            <Text
-              style={
-                Array [
-                  Object {
-                    "color": "#2E3338",
-                    "fontFamily": "Hind-Light",
-                    "fontSize": 22,
-                    "paddingBottom": 20,
-                    "textAlign": "center",
-                  },
-                  Object {
-                    "alignSelf": "center",
-                    "color": "#2E3338",
-                    "padding": 10,
-                    "paddingBottom": 10,
-                  },
-                ]
-              }
-            >
-              reviewInvite
-            </Text>
-          </View>
+            reviewInvite
+          </Text>
         </View>
         <View
           style={
             Object {
-              "flex": 4,
-              "marginHorizontal": 20,
-              "marginVertical": 10,
+              "margin": 20,
             }
           }
         >
           <View
             style={
               Object {
-                "flex": 1,
-                "flexDirection": "column",
+                "flexGrow": 1,
                 "justifyContent": "flex-start",
                 "paddingBottom": 25,
-                "paddingHorizontal": 40,
+                "paddingHorizontal": 20,
               }
             }
           >
@@ -132,7 +122,7 @@ exports[`InviteReview renders correctly 1`] = `
                   <Image
                     source={
                       Object {
-                        "testUri": "../../../src/images/unknown-user-icon.png",
+                        "testUri": "../../../packages/mobile/src/images/unknown-user-icon.png",
                       }
                     }
                     style={
@@ -422,6 +412,7 @@ exports[`InviteReview renders correctly 1`] = `
                     </Text>
                     <View
                       accessible={true}
+                      focusable={true}
                       hitSlop={
                         Object {
                           "bottom": 10,
@@ -437,6 +428,7 @@ exports[`InviteReview renders correctly 1`] = `
                           "type": "ThemeAttrAndroid",
                         }
                       }
+                      onClick={[Function]}
                       onResponderGrant={[Function]}
                       onResponderMove={[Function]}
                       onResponderRelease={[Function]}
@@ -454,7 +446,7 @@ exports[`InviteReview renders correctly 1`] = `
                       <Image
                         source={
                           Object {
-                            "testUri": "../../../src/images/info.png",
+                            "testUri": "../../../packages/mobile/src/images/info.png",
                           }
                         }
                         style={
@@ -548,6 +540,7 @@ exports[`InviteReview renders correctly 1`] = `
       >
         <View
           accessible={true}
+          focusable={true}
           isTVSelectable={true}
           nativeBackgroundAndroid={
             Object {
@@ -555,6 +548,7 @@ exports[`InviteReview renders correctly 1`] = `
               "type": "ThemeAttrAndroid",
             }
           }
+          onClick={[Function]}
           onResponderGrant={[Function]}
           onResponderMove={[Function]}
           onResponderRelease={[Function]}
@@ -594,7 +588,7 @@ exports[`InviteReview renders correctly 1`] = `
               resizeMode="contain"
               source={
                 Object {
-                  "testUri": "../../../src/images/invite-send-receive.png",
+                  "testUri": "../../../packages/mobile/src/images/invite-send-receive.png",
                 }
               }
               style={
@@ -646,6 +640,7 @@ exports[`InviteReview renders correctly 1`] = `
       >
         <View
           accessible={true}
+          focusable={true}
           isTVSelectable={true}
           nativeBackgroundAndroid={
             Object {
@@ -653,6 +648,7 @@ exports[`InviteReview renders correctly 1`] = `
               "type": "ThemeAttrAndroid",
             }
           }
+          onClick={[Function]}
           onResponderGrant={[Function]}
           onResponderMove={[Function]}
           onResponderRelease={[Function]}
@@ -693,7 +689,7 @@ exports[`InviteReview renders correctly 1`] = `
               resizeMode="contain"
               source={
                 Object {
-                  "testUri": "../../../src/images/whatsapp-logo.png",
+                  "testUri": "../../../packages/mobile/src/images/whatsapp-logo.png",
                 }
               }
               style={
@@ -745,6 +741,7 @@ exports[`InviteReview renders correctly 1`] = `
       >
         <View
           accessible={true}
+          focusable={true}
           isTVSelectable={true}
           nativeBackgroundAndroid={
             Object {
@@ -752,6 +749,7 @@ exports[`InviteReview renders correctly 1`] = `
               "type": "ThemeAttrAndroid",
             }
           }
+          onClick={[Function]}
           onResponderGrant={[Function]}
           onResponderMove={[Function]}
           onResponderRelease={[Function]}

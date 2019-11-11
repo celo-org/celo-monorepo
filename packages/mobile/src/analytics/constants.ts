@@ -150,6 +150,7 @@ export enum CustomEventNames {
   request_payment_review = 'request_payment_review',
 
   // Escrowed payments
+  escrowed_payment_review = 'escrowed_payment_review',
   escrowed_payment_reclaimed_by_sender = 'escrowed_payment_reclaimed_by_sender',
   escrowed_payment_reclaimEdit_by_sender = 'escrowed_payment_reclaimEdit_by_sender',
   escrowed_payment_withdrawn_by_receiver = 'escrowed_payment_withdrawn_by_receiver',
@@ -229,6 +230,7 @@ export const PROPERTY_PATH_WHITELIST = [
   'testnet',
   'timeElapsed',
   'title',
+  'tti',
   'txId',
   'verificationIndex',
   'verificationsRemaining',

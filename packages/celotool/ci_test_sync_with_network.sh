@@ -35,10 +35,8 @@ test_ultralight_sync () {
     echo "Testing ultralight sync with '${NETWORK_NAME}' network"
     # Run the sync in ultralight mode
     geth_tests/network_sync_test.sh ${NETWORK_NAME} ultralight
-    # Get the epoch size by sourcing this file
-    source ${CELO_MONOREPO_DIR}/.env.${NETWORK_NAME}
     # Verify what happened by reading the logs.
-    ${CELO_MONOREPO_DIR}/node_modules/.bin/mocha -r ts-node/register ${CELO_MONOREPO_DIR}/packages/celotool/src/e2e-tests/verify_ultralight_geth_logs.ts --gethlogfile ${GETH_LOG_FILE} --epoch ${EPOCH}
+    ${CELO_MONOREPO_DIR}/node_modules/.bin/mocha -r ts-node/register ${CELO_MONOREPO_DIR}/packages/celotool/src/e2e-tests/verify_ultralight_geth_logs.ts --network "${NETWORK_NAME}" --gethlogfile ${GETH_LOG_FILE}
 }
 
 # Some code in celotool requires this file to contain the MNEMONOIC.

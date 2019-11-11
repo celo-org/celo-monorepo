@@ -1,8 +1,8 @@
+import { newKitFromWeb3 } from '@celo/contractkit'
 import { addLocalAccount as web3utilsAddLocalAccount } from '@celo/walletkit'
 import { Platform } from 'react-native'
 import * as net from 'react-native-tcp'
-import { DEFAULT_INFURA_URL, DEFAULT_TESTNET } from 'src/config'
-import { GethSyncMode } from 'src/geth/consts'
+import { DEFAULT_FORNO_URL, DEFAULT_TESTNET } from 'src/config'
 import { IPC_PATH } from 'src/geth/geth'
 import networkConfig, { Testnets } from 'src/geth/networkConfig'
 import Logger from 'src/utils/Logger'
@@ -13,9 +13,10 @@ import { Provider } from 'web3/providers'
 const tag = 'web3/contracts'
 
 export const web3: Web3 = getWeb3()
+export const contractKit = newKitFromWeb3(web3)
 
-export function isZeroSyncMode(): boolean {
-  return networkConfig.syncMode === GethSyncMode.ZeroSync
+export function isInitiallyZeroSyncMode() {
+  return networkConfig.initiallyZeroSync
 }
 
 function getIpcProvider(testnet: Testnets) {
@@ -67,24 +68,33 @@ function getWebSocketProvider(url: string): Provider {
 }
 
 function getWeb3(): Web3 {
-  Logger.info(`Initializing web3, platform: ${Platform.OS}, geth free mode: ${isZeroSyncMode()}`)
+  Logger.info(
+    `${tag}@getWeb3`,
+    `Initializing web3, platform: ${Platform.OS}, geth free mode: ${isInitiallyZeroSyncMode()}`
+  )
 
-  if (isZeroSyncMode() && Platform.OS === 'ios') {
-    throw new Error('Zero sync mode is currently not supported on iOS')
-  } else if (isZeroSyncMode()) {
+  if (isInitiallyZeroSyncMode()) {
     // Geth free mode
-    const url = DEFAULT_INFURA_URL
-    Logger.debug('contracts@getWeb3', `Connecting to url ${url}`)
+    const url = DEFAULT_FORNO_URL
+    Logger.debug(`${tag}@getWeb3`, `Connecting to url ${url}`)
     return new Web3(getWebSocketProvider(url))
   } else {
     return new Web3(getIpcProvider(DEFAULT_TESTNET))
   }
 }
 
-export function addLocalAccount(web3Instance: Web3, privateKey: string) {
-  if (!isZeroSyncMode()) {
-    throw new Error('addLocalAccount can only be called in Zero sync mode')
+// Mutates web3 with new provider
+export function switchWeb3ProviderForSyncMode(zeroSync: boolean) {
+  if (zeroSync) {
+    web3.setProvider(getWebSocketProvider(DEFAULT_FORNO_URL))
+    Logger.info(`${tag}@switchWeb3ProviderForSyncMode`, `Set provider to ${DEFAULT_FORNO_URL}`)
+  } else {
+    web3.setProvider(getIpcProvider(DEFAULT_TESTNET))
+    Logger.info(`${tag}@switchWeb3ProviderForSyncMode`, `Set provider to IPC provider`)
   }
+}
+
+export function addLocalAccount(web3Instance: Web3, privateKey: string) {
   if (!web3Instance) {
     throw new Error(`web3 instance is ${web3Instance}`)
   }

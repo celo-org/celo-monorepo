@@ -1,7 +1,7 @@
 import * as firebase from 'firebase/app'
 import 'firebase/database'
 import getConfig from 'next/config'
-
+import { NETWORK, RequestRecord, RequestStatus } from '../src/fauceting/FaucetInterfaces'
 // Code in this file is sent to the browser.
 // Code in FirebaseServerSide.ts is not sent to the browser.
 
@@ -21,33 +21,10 @@ async function getDB(): Promise<firebase.database.Database> {
 // Don't do this. It hangs next.js build process: https://github.com/zeit/next.js/issues/6824
 // const db = firebase.database()
 
-export const NETWORK = 'alfajores'
-
-export type Address = string
-export type E164Number = string
-
-export enum RequestStatus {
-  Pending = 'Pending',
-  Working = 'Working',
-  Done = 'Done',
-  Failed = 'Failed',
-}
-
-export enum RequestType {
-  Faucet = 'Faucet',
-  Invite = 'Invite',
-}
-
-export interface RequestRecord {
-  beneficiary: Address | E164Number
-  status: RequestStatus
-  type: RequestType
-  dollarTxHash?: string
-  goldTxHash?: string
-  escrowTxHash?: string // only on Invites
-}
-
-export async function subscribeRequest(key: string, onChange: (record: RequestRecord) => void) {
+export default async function subscribeRequest(
+  key: string,
+  onChange: (record: RequestRecord) => void
+) {
   const ref: firebase.database.Reference = (await getDB()).ref(`${NETWORK}/requests/${key}`)
 
   const listener = ref.on('value', (snap) => {
