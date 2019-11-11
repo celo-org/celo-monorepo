@@ -17,7 +17,6 @@ export interface CeloProposalTransactionJSON {
   args: Array<string | number>
 }
 
-
 export class Hotfix extends Proposal {
   constructor(transactions: ProposalTransaction[], private readonly kit: ContractKit) {
     super(transactions)
@@ -31,7 +30,6 @@ export class Hotfix extends Proposal {
     return keccak256(paramsEncoded) as Buffer
   }
 }
-
 
 export class ProposalUtility extends Proposal {
   constructor(transactions: ProposalTransaction[], private readonly kit: ContractKit) {
@@ -75,7 +73,6 @@ export class ProposalUtility extends Proposal {
     })
   }
 }
-
 
 type TxParams = Pick<Tx, 'to' | 'value'>
 export class ProposalTransactionFactory {

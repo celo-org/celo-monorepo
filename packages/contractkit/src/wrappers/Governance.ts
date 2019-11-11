@@ -90,8 +90,8 @@ export enum VoteValue {
   Yes,
 }
 export interface Votes {
-  [VoteValue.Yes]: BigNumber,
-  [VoteValue.No]: BigNumber,
+  [VoteValue.Yes]: BigNumber
+  [VoteValue.No]: BigNumber
   [VoteValue.Abstain]: BigNumber
 }
 
@@ -157,7 +157,7 @@ export class GovernanceWrapper extends BaseWrapper<Governance> {
       dequeueFrequency: res[1],
       minDeposit: res[2],
       queueExpiry: res[3],
-      stageDurations: res[4]
+      stageDurations: res[4],
     }
   }
 
@@ -228,7 +228,7 @@ export class GovernanceWrapper extends BaseWrapper<Governance> {
 
     let upvotes = ZERO_BN
     let votes = { [VoteValue.Yes]: ZERO_BN, [VoteValue.No]: ZERO_BN, [VoteValue.Abstain]: ZERO_BN }
-    
+
     const stage = await this.getProposalStage(proposalID)
     if (stage === ProposalStage.Queued) {
       upvotes = await this.getUpvotes(proposalID)

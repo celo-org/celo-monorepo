@@ -75,7 +75,7 @@ testWithGanache('Governance Wrapper', (web3) => {
     const proposalID = new BigNumber(1)
 
     let proposal: Proposal
-    beforeAll(() => proposal = registryRepointProposal(repoints))
+    beforeAll(() => (proposal = registryRepointProposal(repoints)))
 
     const proposeFn = async (proposer: Address) => {
       const tx = governance.propose(proposal)
