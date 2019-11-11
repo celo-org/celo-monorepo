@@ -13,7 +13,7 @@ import {
 } from 'src/app/actions'
 import { ErrorMessages } from 'src/app/ErrorMessages'
 import { handleDappkitDeepLink } from 'src/dappkit/dappkit'
-import { getVersionInfo } from 'src/firebase/firebase'
+import { isAppVersionDeprecated } from 'src/firebase/firebase'
 import { UNLOCK_DURATION } from 'src/geth/consts'
 import { NavActions, navigate } from 'src/navigator/NavigationService'
 import { Screens, Stacks } from 'src/navigator/Screens'
@@ -59,11 +59,12 @@ const mapStateToProps = (state: PersistedRootState): PersistedStateProps | null 
 
 export function* checkAppDeprecation() {
   yield call(waitForRehydrate)
-  const versionInfo = yield getVersionInfo()
-  Logger.info(TAG, 'Version Info', JSON.stringify(versionInfo))
-  if (versionInfo && versionInfo.deprecated) {
-    Logger.info(TAG, 'this version is deprecated')
+  const isDeprecated: boolean = yield call(isAppVersionDeprecated)
+  if (isDeprecated) {
+    Logger.warn(TAG, 'App version is deprecated')
     navigate(Screens.UpgradeScreen)
+  } else {
+    Logger.debug(TAG, 'App version is valid')
   }
 }
 
@@ -155,9 +156,13 @@ export function* navigatePinProtected(action: NavigatePinProtected) {
   }
 }
 
+export function* watchNavigatePinProtected() {
+  yield takeLatest(Actions.NAVIGATE_PIN_PROTECTED, navigatePinProtected)
+}
+
 export function* appSaga() {
-  yield spawn(checkAppDeprecation)
   yield spawn(navigateToProperScreen)
   yield spawn(toggleToProperSyncMode)
-  yield takeLatest(Actions.NAVIGATE_PIN_PROTECTED, navigatePinProtected)
+  yield spawn(checkAppDeprecation)
+  yield spawn(watchNavigatePinProtected)
 }

@@ -4,7 +4,7 @@ import { call, select } from 'redux-saga/effects'
 import { currentLanguageSelector } from 'src/app/reducers'
 import {
   initializeCloudMessaging,
-  isDeprecatedVersion,
+  isVersionBelowMinimum,
   registerTokenToDb,
   setUserLanguage,
 } from 'src/firebase/firebase'
@@ -87,13 +87,13 @@ describe(initializeCloudMessaging, () => {
 
 describe('Firebase version check', () => {
   it('Correctly check if version is deprecated', () => {
-    let isDeprecated: boolean = isDeprecatedVersion('1.5.0', '1.4.0')
+    let isDeprecated: boolean = isVersionBelowMinimum('1.5.0', '1.4.0')
     expect(isDeprecated).toBe(false)
-    isDeprecated = isDeprecatedVersion('1.4.0', '1.5.0')
+    isDeprecated = isVersionBelowMinimum('1.4.0', '1.5.0')
     expect(isDeprecated).toBe(true)
-    isDeprecated = isDeprecatedVersion('1.4.0', '1.4.0')
+    isDeprecated = isVersionBelowMinimum('1.4.0', '1.4.0')
     expect(isDeprecated).toBe(false)
-    isDeprecated = isDeprecatedVersion('1.4.0', '1.4.0.1')
+    isDeprecated = isVersionBelowMinimum('1.4.0', '1.4.0.1')
     expect(isDeprecated).toBe(true)
   })
 })

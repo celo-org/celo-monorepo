@@ -1,4 +1,5 @@
 import * as Sentry from '@sentry/react-native'
+import DeviceInfo from 'react-native-device-info'
 import firebase, { Firebase } from 'react-native-firebase'
 import { RemoteMessage } from 'react-native-firebase/messaging'
 import { Notification, NotificationOpen } from 'react-native-firebase/notifications'
@@ -164,7 +165,7 @@ export function* paymentRequestWriter({ paymentInfo }: WritePaymentRequest) {
   }
 }
 
-export function isDeprecatedVersion(version: string, minVersion: string): boolean {
+export function isVersionBelowMinimum(version: string, minVersion: string): boolean {
   const minVersionArray = minVersion.split('.')
   const versionArray = version.split('.')
   const minVersionLength = Math.min(minVersionArray.length, version.length)
@@ -183,29 +184,26 @@ export function isDeprecatedVersion(version: string, minVersion: string): boolea
 
 /*
 Get the Version deprecation information.
-@param version: string The version to check for deprecation
-@return: object { version: <VERSION>, deprecated: <BOOLEAN> }
 Firebase DB Format: 
   (New) Add minVersion child to versions category with a string of the mininum version as string
 */
-export async function getVersionInfo(
-  version: string
-): Promise<{ deprecated: boolean; version: string }> {
-  let deprecated: boolean = false
-  Logger.info(TAG, `Checking version info ${version}`)
+export async function isAppVersionDeprecated() {
   if (!FIREBASE_ENABLED) {
-    return { deprecated, version }
+    return false
   }
+
+  Logger.info(TAG, 'Checking version info')
+  const version = DeviceInfo.getVersion()
+
   const versionsInfo = (await firebase
     .database()
     .ref('versions')
     .once('value')).val()
   if (!versionsInfo || !versionsInfo.minVersion) {
-    return { deprecated, version }
+    return false
   }
   const minVersion: string = versionsInfo.minVersion
-  deprecated = isDeprecatedVersion(version, minVersion)
-  return { version, deprecated }
+  return isVersionBelowMinimum(version, minVersion)
 }
 
 export async function setUserLanguage(address: string, language: string) {
