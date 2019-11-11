@@ -4,7 +4,7 @@ import { concurrentMap } from '@celo/utils/lib/async'
 
 import { Address, CeloContract } from '../base'
 import { Registry } from '../generated/types/Registry'
-import { PTXOProposal } from '../governance/proposals'
+import { Hotfix, ProposalTransactionFactory } from '../governance/proposals'
 import { newKitFromWeb3 } from '../kit'
 import { NetworkConfig, testWithGanache, timeTravel } from '../test-utils/ganache-test'
 import { AccountsWrapper } from './Accounts'
@@ -41,18 +41,16 @@ testWithGanache('Governance Wrapper', (web3) => {
   type Repoint = [CeloContract, Address]
 
   const registryRepointProposal = (repoints: Repoint[]) =>
-    new PTXOProposal(
-      repoints.map((r) => ({
-        txo: registry.methods.setAddressFor(...r),
-        params: {
+    new Proposal(
+      repoints.map((r) =>
+        ProposalTransactionFactory.fromWeb3Txo(registry.methods.setAddressFor(...r), {
           to: registry._address,
           value: '0',
-        },
-      })),
-      kit
+        })
+      )
     )
 
-  const verifyRepointResult = (repoints: Repoint[]) => 
+  const verifyRepointResult = (repoints: Repoint[]) =>
     concurrentMap(1, repoints, async (repoint) => {
       const newAddress = await registry.methods.getAddressForStringOrDie(repoint[0]).call()
       expect(newAddress).toBe(repoint[1])
@@ -77,7 +75,7 @@ testWithGanache('Governance Wrapper', (web3) => {
     const proposalID = new BigNumber(1)
 
     let proposal: Proposal
-    beforeAll(() => (proposal = registryRepointProposal(repoints)))
+    beforeAll(() => proposal = registryRepointProposal(repoints))
 
     const proposeFn = async (proposer: Address) => {
       const tx = governance.propose(proposal)
@@ -184,15 +182,18 @@ testWithGanache('Governance Wrapper', (web3) => {
       [CeloContract.Escrow, '0x0000000000000000000000000000000000000004'],
     ]
 
-    let hotfix: PTXOProposal
-    beforeAll(() => hotfix = registryRepointProposal(repoints))
+    let hotfix: Hotfix
+    beforeAll(() => {
+      const proposal = registryRepointProposal(repoints)
+      hotfix = new Hotfix(proposal.transactions, kit)
+    })
 
     const whitelistFn = async (whitelister: Address) => {
       const tx = governance.whitelistHotfix(hotfix.hash)
       await tx.sendAndWaitForReceipt({ from: whitelister })
     }
 
-    // const whitelistQuorumFn = () => concurrentMap(1, accounts.slice(1, 4), whitelistFn)
+    const whitelistQuorumFn = () => concurrentMap(1, accounts.slice(1, 4), whitelistFn)
 
     // protocol/truffle-config defines approver address as accounts[0]
     const approveFn = async () => {
@@ -200,10 +201,10 @@ testWithGanache('Governance Wrapper', (web3) => {
       await tx.sendAndWaitForReceipt({ from: accounts[0] })
     }
 
-    // const prepareFn = async () => {
-    //   const tx = governance.prepareHotfix(hotfix.hash)
-    //   await tx.sendAndWaitForReceipt()
-    // }
+    const prepareFn = async () => {
+      const tx = governance.prepareHotfix(hotfix.hash)
+      await tx.sendAndWaitForReceipt()
+    }
 
     it('#whitelistHotfix', async () => {
       await whitelistFn(accounts[1])
@@ -219,28 +220,28 @@ testWithGanache('Governance Wrapper', (web3) => {
       expect(record.approved).toBeTruthy()
     })
 
-    // it('#prepareHotfix', async () => {
-    //   await whitelistQuorumFn()
-    //   await approveFn()
-    //   await prepareFn()
+    it('#prepareHotfix', async () => {
+      await whitelistQuorumFn()
+      await approveFn()
+      await prepareFn()
 
-    //   const validators = await kit.contracts.getValidators()
-    //   const record = await governance.getHotfixRecord(hotfix.hash)
-    //   expect(record.preparedEpoch).toBe(await validators.getEpochNumber())
-    // })
+      const validators = await kit.contracts.getValidators()
+      const record = await governance.getHotfixRecord(hotfix.hash)
+      expect(record.preparedEpoch).toBe(await validators.getEpochNumber())
+    })
 
-    // it('#executeHotfix', async () => {
-    //   await whitelistQuorumFn()
-    //   await approveFn()
-    //   await prepareFn()
+    it('#executeHotfix', async () => {
+      await whitelistQuorumFn()
+      await approveFn()
+      await prepareFn()
 
-    //   const tx = governance.executeHotfix(hotfix)
-    //   await tx.sendAndWaitForReceipt()
+      const tx = governance.executeHotfix(hotfix)
+      await tx.sendAndWaitForReceipt()
 
-    //   const record = await governance.getHotfixRecord(hotfix.hash)
-    //   expect(record.executed).toBeTruthy()
+      const record = await governance.getHotfixRecord(hotfix.hash)
+      expect(record.executed).toBeTruthy()
 
-    //   await verifyRepointResult(repoints)
-    // })
+      await verifyRepointResult(repoints)
+    })
   })
 })

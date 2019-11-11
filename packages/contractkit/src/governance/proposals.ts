@@ -1,5 +1,4 @@
-import { BigNumber } from 'bignumber.js'
-import debugFactory from 'debug'
+import BigNumber from 'bignumber.js'
 import { keccak256 } from 'ethereumjs-util'
 import Contract from 'web3/eth/contract'
 import { TransactionObject, Tx } from 'web3/eth/types'
@@ -9,29 +8,98 @@ import { concurrentMap } from '@celo/utils/lib/async'
 import { CeloContract } from '../base'
 import { ContractKit } from '../kit'
 import { CeloTransactionObject, parseBuffer, toBuffer } from '../wrappers/BaseWrapper'
-import { Proposal } from '../wrappers/Governance'
-
-const debug = debugFactory('kit:proposals')
+import { Proposal, ProposalTransaction } from '../wrappers/Governance'
 
 export interface CeloProposalTransactionJSON {
   value: string
   celoContractName: CeloContract
   methodName: string
-  args: string[]
+  args: Array<string | number>
 }
+
+
+export class Hotfix extends Proposal {
+  constructor(transactions: ProposalTransaction[], private readonly kit: ContractKit) {
+    super(transactions)
+  }
+
+  get hash(): Buffer {
+    const paramsEncoded = this.kit.web3.eth.abi.encodeParameters(
+      ['uint256[]', 'address[]', 'bytes', 'uint256[]'],
+      this.params
+    )
+    return keccak256(paramsEncoded) as Buffer
+  }
+}
+
+
+export class ProposalUtility extends Proposal {
+  constructor(transactions: ProposalTransaction[], private readonly kit: ContractKit) {
+    super(transactions)
+  }
+
+  async json(): Promise<CeloProposalTransactionJSON[]> {
+    const addresses = await this.kit.registry.allAddresses()
+    const names = Object.keys(CeloContract) as CeloContract[]
+    const addressToNameMap = new Map(names.map((name) => [addresses[name], name]))
+
+    return concurrentMap(1, this.transactions, async (transaction) => {
+      // lookup CeloContract name from transaction destination address
+      const contractName = addressToNameMap.get(transaction.destination)
+      if (!contractName) {
+        throw new Error(`Transaction destination ${transaction.destination} not found in registry`)
+      }
+
+      // lookup CeloContractMethod name from transaction data
+      const contract = await this.kit._web3Contracts.getContract(contractName)
+      const selectors = Object.keys(contract.methods)
+      const funcSelector = parseBuffer(transaction.data.slice(0, 4)) // func sig is first 4 bytes
+      const idx = selectors.findIndex((selector) => selector === funcSelector)
+      if (idx === -1) {
+        throw new Error(`No method matching ${transaction} found on ${contractName}`)
+      }
+      const methodName = selectors[idx + 1] // pretty name 1 index after
+
+      // lookup CeloContractMethod args from CeloContractMethod types and transaction data
+      const methodParamTypes = methodName.slice(methodName.indexOf('(') + 1, -1).split(',')
+      const encodedParams = parseBuffer(transaction.data.slice(4))
+      const paramObject = this.kit.web3.eth.abi.decodeParameters(methodParamTypes, encodedParams)
+      const args = Array.from(Array(methodParamTypes.length).keys()).map((i) => paramObject[i])
+
+      return {
+        value: transaction.value.toFixed(),
+        celoContractName: contractName,
+        methodName,
+        args,
+      }
+    })
+  }
+}
+
 
 type TxParams = Pick<Tx, 'to' | 'value'>
+export class ProposalTransactionFactory {
+  static fromWeb3Txo(tx: TransactionObject<any>, params: Required<TxParams>): ProposalTransaction {
+    return {
+      value: new BigNumber(params.value),
+      destination: params.to,
+      data: toBuffer(tx.encodeABI()),
+    }
+  }
 
-interface ParameterizedTXO {
-  txo: TransactionObject<any>
-  params: Required<TxParams>
-}
+  static fromCeloTxo(tx: CeloTransactionObject<any>, params: TxParams = {}): ProposalTransaction {
+    const to = tx.defaultParams ? tx.defaultParams.to : params.to
+    const value = tx.defaultParams ? tx.defaultParams.value : params.value
+    if (!to || !value) {
+      throw new Error("Transaction parameters 'to' and/or 'value' not provided")
+    }
+    return this.fromWeb3Txo(tx.txo, { to, value })
+  }
 
-export class PTXOFactory {
   static async fromCeloJsonTxAndKit(
     jsonTx: CeloProposalTransactionJSON,
     kit: ContractKit
-  ): Promise<ParameterizedTXO> {
+  ): Promise<ProposalTransaction> {
     const contract = await kit._web3Contracts.getContract(jsonTx.celoContractName)
     const method = (contract.methods as Contract['methods'])[jsonTx.methodName]
     if (!method) {
@@ -41,82 +109,6 @@ export class PTXOFactory {
     if (!txo) {
       throw new Error(`Method ${jsonTx.methodName} did not match arguments ${jsonTx.args}`)
     }
-    return {
-      txo,
-      params: { to: contract._address, value: jsonTx.value },
-    }
-  }
-
-  static fromCeloTxo(tx: CeloTransactionObject<any>, params: TxParams = {}): ParameterizedTXO {
-    const to = tx.defaultParams ? tx.defaultParams.to : params.to
-    const value = tx.defaultParams ? tx.defaultParams.value : params.value
-    if (to && value) {
-      return {
-        txo: tx.txo,
-        params: { to, value },
-      }
-    } else {
-      throw new Error("Transaction parameters 'to' and/or 'value' not provided")
-    }
-  }
-}
-
-const toData = (ptxo: ParameterizedTXO) => toBuffer(ptxo.txo.encodeABI())
-
-export class PTXOProposal extends Proposal {
-  public constructor(
-    private readonly paramTXOs: ParameterizedTXO[],
-    private readonly kit: ContractKit
-  ) {
-    super(
-      paramTXOs.map((ptxo) => ({
-        value: new BigNumber(ptxo.params.value),
-        destination: ptxo.params.to,
-        data: toData(ptxo),
-      }))
-    )
-  }
-
-  get paramsEncoded() {
-    // TODO(yorke): consider fetching params signature from ABI
-    return this.kit.web3.eth.abi.encodeParameters(
-      ['uint256[]', 'address[]', 'bytes', 'uint256[]'],
-      this.params
-    )
-  }
-
-  get hash(): Buffer {
-    return keccak256(this.paramsEncoded) as Buffer
-  }
-
-  // TODO(yorke): investigate celoJsonWithKit from ProposalTransaction[]
-  async json(): Promise<CeloProposalTransactionJSON[]> {
-    const addresses = await this.kit.registry.allAddresses()
-    const names = Object.keys(CeloContract) as CeloContract[]
-    const addressToNameMap = new Map(names.map((name) => [addresses[name], name]))
-
-    return concurrentMap(1, this.paramTXOs, async (ptxo) => {
-      const contractName = addressToNameMap.get(ptxo.params.to)
-      if (!contractName) {
-        throw new Error(`Transaction destination ${ptxo.params.to} not found in registry`)
-      }
-
-      const contract = await this.kit._web3Contracts.getContract(contractName)
-      const signatures = Object.keys(contract.methods)
-
-      const funcSig = parseBuffer(toData(ptxo).slice(0, 4)) // func sig is first 4 bytes
-      const idx = signatures.findIndex((sig) => sig === funcSig)
-      if (idx === -1) {
-        throw new Error(`No method matching ${ptxo.txo} found on ${contractName}`)
-      }
-      const methodName = signatures[idx + 1] // pretty name 1 index after selector
-
-      return {
-        value: ptxo.params.value.toString(),
-        celoContractName: contractName,
-        methodName,
-        args: ptxo.txo.arguments,
-      }
-    })
+    return this.fromWeb3Txo(txo, { to: contract._address, value: jsonTx.value })
   }
 }
