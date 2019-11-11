@@ -1,3 +1,4 @@
+import { AddressType } from '@celo/utils/lib/io'
 import { Signer } from '@celo/utils/lib/signatureUtils'
 import fetch from 'cross-fetch'
 import { isLeft } from 'fp-ts/lib/Either'
@@ -15,7 +16,7 @@ import {
   SignedClaimType,
   verifySignature,
 } from './claims/claim'
-import { AddressType, ClaimTypes } from './claims/types'
+import { ClaimTypes } from './claims/types'
 export { ClaimTypes } from './claims/types'
 
 const MetaType = t.type({
@@ -112,6 +113,16 @@ export class IdentityMetadataWrapper {
   }
 
   async addClaim(claim: Claim, signer: Signer) {
+    switch (claim.type) {
+      case ClaimTypes.ACCOUNT:
+        if (claim.address === this.data.meta.address) {
+          throw new Error("Can't claim self")
+        }
+        break
+
+      default:
+        break
+    }
     const signedClaim = await this.signClaim(claim, signer)
     this.data.claims.push(signedClaim)
     return signedClaim
