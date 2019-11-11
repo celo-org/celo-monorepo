@@ -25,7 +25,7 @@ import { hideAlert, showError } from 'src/alert/actions'
 import { componentWithAnalytics } from 'src/analytics/wrapper'
 import { ErrorMessages } from 'src/app/ErrorMessages'
 import DevSkipButton from 'src/components/DevSkipButton'
-import { CELO_FAUCET_LINK, DEFAULT_TESTNET } from 'src/config'
+import { CELO_FAUCET_LINK, DEFAULT_TESTNET, SHOW_GET_INVITE_LINK } from 'src/config'
 import { Namespaces } from 'src/i18n'
 import { redeemInvite } from 'src/invite/actions'
 import { extractValidInviteCode, getValidInviteCodeFromReferrerData } from 'src/invite/utils'
@@ -212,12 +212,14 @@ export class EnterInviteCode extends React.Component<Props, State> {
         </ScrollView>
 
         <View>
-          <Text style={styles.askInviteText}>
-            {t('inviteCodeText.askForInvite.0', { testnet: _.startCase(DEFAULT_TESTNET) })}
-            <Text onPress={this.onPressGoToFaucet} style={styles.askInviteLink}>
-              {t('inviteCodeText.askForInvite.1')}
+          {SHOW_GET_INVITE_LINK && (
+            <Text style={styles.askInviteText}>
+              {t('inviteCodeText.askForInvite.0', { testnet: _.startCase(DEFAULT_TESTNET) })}
+              <Text onPress={this.onPressGoToFaucet} style={styles.askInviteLink}>
+                {t('inviteCodeText.askForInvite.1')}
+              </Text>
             </Text>
-          </Text>
+          )}
           <Button
             onPress={this.onPressContinue}
             disabled={isRedeemingInvite || !redeemComplete || !account}
