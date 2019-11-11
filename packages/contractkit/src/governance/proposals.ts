@@ -1,6 +1,6 @@
 import { BigNumber } from 'bignumber.js'
+import debugFactory from 'debug'
 import { keccak256 } from 'ethereumjs-util'
-import Web3 from 'web3'
 import Contract from 'web3/eth/contract'
 import { TransactionObject, Tx } from 'web3/eth/types'
 
@@ -8,8 +8,10 @@ import { concurrentMap } from '@celo/utils/lib/async'
 
 import { CeloContract } from '../base'
 import { ContractKit } from '../kit'
-import { CeloTransactionObject, toBuffer } from '../wrappers/BaseWrapper'
+import { CeloTransactionObject, parseBuffer, toBuffer } from '../wrappers/BaseWrapper'
 import { Proposal } from '../wrappers/Governance'
+
+const debug = debugFactory('kit:proposals')
 
 export interface CeloProposalTransactionJSON {
   value: string
@@ -20,7 +22,7 @@ export interface CeloProposalTransactionJSON {
 
 type TxParams = Pick<Tx, 'to' | 'value'>
 
-export interface ParameterizedTXO {
+interface ParameterizedTXO {
   txo: TransactionObject<any>
   params: Required<TxParams>
 }
@@ -45,7 +47,7 @@ export class PTXOFactory {
     }
   }
 
-  static fromCeloTx(tx: CeloTransactionObject<any>, params: TxParams = {}): ParameterizedTXO {
+  static fromCeloTxo(tx: CeloTransactionObject<any>, params: TxParams = {}): ParameterizedTXO {
     const to = tx.defaultParams ? tx.defaultParams.to : params.to
     const value = tx.defaultParams ? tx.defaultParams.value : params.value
     if (to && value) {
@@ -59,45 +61,61 @@ export class PTXOFactory {
   }
 }
 
+const toData = (ptxo: ParameterizedTXO) => toBuffer(ptxo.txo.encodeABI())
+
 export class PTXOProposal extends Proposal {
-  public constructor(private readonly paramTXOs: ParameterizedTXO[]) {
+  public constructor(
+    private readonly paramTXOs: ParameterizedTXO[],
+    private readonly kit: ContractKit
+  ) {
     super(
       paramTXOs.map((ptxo) => ({
         value: new BigNumber(ptxo.params.value),
         destination: ptxo.params.to,
-        data: toBuffer(ptxo.txo.encodeABI())
+        data: toData(ptxo),
       }))
     )
   }
 
-  private static paramTypes = ['']
   get paramsEncoded() {
-    const encoder = new Web3().eth.abi.encodeParameters
-    return encoder(PTXOProposal.paramTypes, this.params)
+    // TODO(yorke): consider fetching params signature from ABI
+    return this.kit.web3.eth.abi.encodeParameters(
+      ['uint256[]', 'address[]', 'bytes', 'uint256[]'],
+      this.params
+    )
   }
 
   get hash(): Buffer {
     return keccak256(this.paramsEncoded) as Buffer
   }
 
-  async celoJsonWithKit(kit: ContractKit): Promise<CeloProposalTransactionJSON[]> {
-    const addresses = await kit.registry.allAddresses()
+  // TODO(yorke): investigate celoJsonWithKit from ProposalTransaction[]
+  async json(): Promise<CeloProposalTransactionJSON[]> {
+    const addresses = await this.kit.registry.allAddresses()
     const names = Object.keys(CeloContract) as CeloContract[]
     const addressToNameMap = new Map(names.map((name) => [addresses[name], name]))
 
     return concurrentMap(1, this.paramTXOs, async (ptxo) => {
-      const contract = addressToNameMap.get(ptxo.params.to)
-      if (!contract) {
+      const contractName = addressToNameMap.get(ptxo.params.to)
+      if (!contractName) {
         throw new Error(`Transaction destination ${ptxo.params.to} not found in registry`)
       }
-      const encodedTx = ptxo.txo.encodeABI()
-      console.log("encodedTx", encodedTx)
+
+      const contract = await this.kit._web3Contracts.getContract(contractName)
+      const signatures = Object.keys(contract.methods)
+
+      const funcSig = parseBuffer(toData(ptxo).slice(0, 4)) // func sig is first 4 bytes
+      const idx = signatures.findIndex((sig) => sig === funcSig)
+      if (idx === -1) {
+        throw new Error(`No method matching ${ptxo.txo} found on ${contractName}`)
+      }
+      const methodName = signatures[idx + 1] // pretty name 1 index after selector
 
       return {
         value: ptxo.params.value.toString(),
-        celoContractName: contract,
-        methodName: 'PLACEHOLDER_METHOD_NAME',
-        args: ptxo.txo.arguments.map(toString),
+        celoContractName: contractName,
+        methodName,
+        args: ptxo.txo.arguments,
       }
     })
   }

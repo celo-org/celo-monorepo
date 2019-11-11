@@ -31,7 +31,6 @@ export enum ProposalStage {
 }
 
 export interface ProposalStageDurations {
-  [ProposalStage.Queued]: BigNumber // seconds
   [ProposalStage.Approval]: BigNumber // seconds
   [ProposalStage.Referendum]: BigNumber // seconds
   [ProposalStage.Execution]: BigNumber // seconds
@@ -41,6 +40,7 @@ export interface GovernanceConfig {
   concurrentProposals: BigNumber
   dequeueFrequency: BigNumber // seconds
   minDeposit: BigNumber
+  queueExpiry: BigNumber
   stageDurations: ProposalStageDurations
 }
 
@@ -84,14 +84,14 @@ export interface UpvoteRecord {
 }
 
 export enum VoteValue {
-  None = 'None',
-  Abstain = 'Abstain',
-  No = 'No',
-  Yes = 'Yes',
+  None = 0,
+  Abstain,
+  No,
+  Yes,
 }
 export interface Votes {
-  [VoteValue.Yes]: BigNumber
-  [VoteValue.No]: BigNumber
+  [VoteValue.Yes]: BigNumber,
+  [VoteValue.No]: BigNumber,
   [VoteValue.Abstain]: BigNumber
 }
 
@@ -135,7 +135,6 @@ export class GovernanceWrapper extends BaseWrapper<Governance> {
   async stageDurations(): Promise<ProposalStageDurations> {
     const res = await this.contract.methods.stageDurations().call()
     return {
-      [ProposalStage.Queued]: await this.queueExpiry(),
       [ProposalStage.Approval]: toBigNumber(res[0]),
       [ProposalStage.Referendum]: toBigNumber(res[1]),
       [ProposalStage.Execution]: toBigNumber(res[2]),
@@ -150,13 +149,15 @@ export class GovernanceWrapper extends BaseWrapper<Governance> {
       this.concurrentProposals(),
       this.dequeueFrequency(),
       this.minDeposit(),
+      this.queueExpiry(),
       this.stageDurations(),
     ])
     return {
       concurrentProposals: res[0],
       dequeueFrequency: res[1],
       minDeposit: res[2],
-      stageDurations: res[3],
+      queueExpiry: res[3],
+      stageDurations: res[4]
     }
   }
 
@@ -462,7 +463,7 @@ export class GovernanceWrapper extends BaseWrapper<Governance> {
   async getVoteValue(proposalID: NumberLike, voter: Address) {
     const proposalIndex = await this.getDequeueIndex(proposalID)
     const res = await this.contract.methods.getVoteRecord(voter, proposalIndex).call()
-    return Object.keys(VoteValue)[toNumber(res[1])] as VoteValue
+    return toNumber(res[1]) as VoteValue
   }
 
   /**
