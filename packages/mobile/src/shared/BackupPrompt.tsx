@@ -42,6 +42,7 @@ export class BackupPrompt extends React.Component<Props> {
 
     return (
       <SmartTopAlert
+        timestamp={Date.now()}
         text={isVisible && t('backupPrompt')}
         onPress={this.goToBackup}
         type={NotificationTypes.MESSAGE}
