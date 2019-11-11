@@ -1,11 +1,7 @@
 pragma solidity ^0.5.3;
 
-import "../common/FixidityLib.sol";
-
 // TODO(asa): Limit assembly usage by using X.staticcall instead.
 contract UsingPrecompiles {
-  using FixidityLib for FixidityLib.Fraction;
-
   address constant PROOF_OF_POSSESSION = address(0xff - 4);
 
   /**
