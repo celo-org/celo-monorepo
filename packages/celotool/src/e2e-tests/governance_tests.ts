@@ -184,7 +184,7 @@ describe('governance tests', () => {
       const isSyncing = async (node: ContractKit, upstream: ContractKit): Promise<boolean> => {
         const nodeLatest = await node.web3.eth.getBlock('latest')
         const upstreamLatest = await upstream.web3.eth.getBlock('latest')
-        return nodeLatest.number < upstreamLatest.number
+        return nodeLatest.number !== upstreamLatest.number
       }
 
       // Give the node time to sync, and time for an epoch transition so we can activate our vote.
