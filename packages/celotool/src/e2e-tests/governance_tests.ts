@@ -181,9 +181,14 @@ describe('governance tests', () => {
       const groupWeb3 = new Web3('ws://localhost:8567')
       const groupKit = newKitFromWeb3(groupWeb3)
 
+      const isSyncing = async (node: ContractKit, upstream: ContractKit): Promise<boolean> => {
+        const nodeLatest = await node.web3.eth.getBlock('latest')
+        const upstreamLatest = await upstream.web3.eth.getBlock('latest')
+        return nodeLatest.number < upstreamLatest.number
+      }
+
       // Give the node time to sync, and time for an epoch transition so we can activate our vote.
-      const upstream = await kit.web3.eth.getBlock('latest')
-      while ((await groupKit.web3.eth.getBlock('latest')).number < upstream.number) {
+      while (await isSyncing(groupKit, kit)) {
         await sleep(0.5)
       }
 

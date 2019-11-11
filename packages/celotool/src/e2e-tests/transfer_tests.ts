@@ -384,7 +384,10 @@ describe('Transfer tests', function(this: any) {
       })
 
       // Writing to an empty storage location (e.g. an uninitialized ERC20 account) costs 15k extra gas.
-      if (transferToken === CeloContract.StableToken && balances.initial(ToAddress).eq(0)) {
+      if (
+        transferToken === CeloContract.StableToken &&
+        balances.initial(ToAddress, transferToken).eq(0)
+      ) {
         expectedGas += 15000
       }
 
