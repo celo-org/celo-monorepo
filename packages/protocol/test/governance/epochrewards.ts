@@ -2,6 +2,7 @@ import { CeloContractName } from '@celo/protocol/lib/registry-utils'
 import {
   assertContainSubset,
   assertEqualBN,
+  assertEqualDpBN,
   assertRevert,
   timeTravel,
 } from '@celo/protocol/lib/test-utils'
@@ -64,7 +65,7 @@ contract('EpochRewards', (accounts: string[]) => {
   const targetVotingGoldFraction = toFixed(new BigNumber(2 / 3))
   const targetValidatorEpochPayment = new BigNumber(10000000000000)
   const exchangeRate = 7
-  const randomAddress = web3.utils.randomHex(20)
+  const mockStableTokenAddress = web3.utils.randomHex(20)
   const sortedOraclesDenominator = new BigNumber('0x10000000000000000')
   beforeEach(async () => {
     epochRewards = await EpochRewards.new()
@@ -75,9 +76,9 @@ contract('EpochRewards', (accounts: string[]) => {
     await registry.setAddressFor(CeloContractName.Election, mockElection.address)
     await registry.setAddressFor(CeloContractName.GoldToken, mockGoldToken.address)
     await registry.setAddressFor(CeloContractName.SortedOracles, mockSortedOracles.address)
-    await registry.setAddressFor(CeloContractName.StableToken, randomAddress)
+    await registry.setAddressFor(CeloContractName.StableToken, mockStableTokenAddress)
     await mockSortedOracles.setMedianRate(
-      randomAddress,
+      mockStableTokenAddress,
       sortedOraclesDenominator.times(exchangeRate)
     )
 
@@ -140,17 +141,13 @@ contract('EpochRewards', (accounts: string[]) => {
       const newFraction = targetVotingGoldFraction.plus(1)
 
       describe('when called by the owner', () => {
-        let resp: any
-
-        beforeEach(async () => {
-          resp = await epochRewards.setTargetVotingGoldFraction(newFraction)
-        })
-
         it('should set the target voting gold fraction', async () => {
+          await epochRewards.setTargetVotingGoldFraction(newFraction)
           assertEqualBN(await epochRewards.getTargetVotingGoldFraction(), newFraction)
         })
 
         it('should emit the TargetVotingGoldFractionSet event', async () => {
+          const resp = await epochRewards.setTargetVotingGoldFraction(newFraction)
           assert.equal(resp.logs.length, 1)
           const log = resp.logs[0]
           assertContainSubset(log, {
@@ -185,17 +182,13 @@ contract('EpochRewards', (accounts: string[]) => {
       const newPayment = targetValidatorEpochPayment.plus(1)
 
       describe('when called by the owner', () => {
-        let resp: any
-
-        beforeEach(async () => {
-          resp = await epochRewards.setTargetValidatorEpochPayment(newPayment)
-        })
-
         it('should set the target validator epoch payment', async () => {
+          await epochRewards.setTargetValidatorEpochPayment(newPayment)
           assertEqualBN(await epochRewards.targetValidatorEpochPayment(), newPayment)
         })
 
         it('should emit the TargetValidatorEpochPaymentSet event', async () => {
+          const resp = await epochRewards.setTargetValidatorEpochPayment(newPayment)
           assert.equal(resp.logs.length, 1)
           const log = resp.logs[0]
           assertContainSubset(log, {
@@ -206,21 +199,21 @@ contract('EpochRewards', (accounts: string[]) => {
           })
         })
 
-        describe('when called by a non-owner', () => {
+        describe('when the payment is the same', () => {
           it('should revert', async () => {
             await assertRevert(
-              epochRewards.setTargetValidatorEpochPayment(newPayment, {
-                from: nonOwner,
-              })
+              epochRewards.setTargetValidatorEpochPayment(targetValidatorEpochPayment)
             )
           })
         })
       })
 
-      describe('when the payment is the same', () => {
+      describe('when called by a non-owner', () => {
         it('should revert', async () => {
           await assertRevert(
-            epochRewards.setTargetValidatorEpochPayment(targetValidatorEpochPayment)
+            epochRewards.setTargetValidatorEpochPayment(newPayment, {
+              from: nonOwner,
+            })
           )
         })
       })
@@ -382,11 +375,14 @@ contract('EpochRewards', (accounts: string[]) => {
 
   describe('#getTargetTotalEpochPaymentsInGold()', () => {
     describe('when a StableToken exchange rate is set', () => {
-      // Hard coded in EpochRewardsTest.sol
-      const numValidators = 100
+      const numberValidators = 100
+      beforeEach(async () => {
+        await epochRewards.setNumberValidatorsInCurrentSet(numberValidators)
+      })
+
       it('should return the number of validators times the max payment divided by the exchange rate', async () => {
         const expected = targetValidatorEpochPayment
-          .times(numValidators)
+          .times(numberValidators)
           .div(exchangeRate)
           .integerValue(BigNumber.ROUND_FLOOR)
         assertEqualBN(await epochRewards.getTargetTotalEpochPaymentsInGold(), expected)
@@ -432,7 +428,7 @@ contract('EpochRewards', (accounts: string[]) => {
           fromFixed(rewardsMultiplier.adjustments.underspend).times(0.1)
         )
         // Assert equal to 7 decimal places due to fixidity imprecision.
-        assert.equal(expected.dp(7).toFixed(), actual.dp(7).toFixed())
+        assertEqualDpBN(actual, expected, 7)
       })
     })
 
@@ -451,25 +447,25 @@ contract('EpochRewards', (accounts: string[]) => {
           fromFixed(rewardsMultiplier.adjustments.overspend).times(0.1)
         )
         // Assert equal to 7 decimal places due to fixidity imprecision.
-        assert.equal(expected.dp(7).toFixed(), actual.dp(7).toFixed())
+        assertEqualDpBN(actual, expected, 7)
       })
     })
   })
 
   describe('#updateTargetVotingYield()', () => {
-    const randomAddress = web3.utils.randomHex(20)
     // Arbitrary numbers
     const totalSupply = new BigNumber(129762987346298761037469283746)
     const reserveBalance = new BigNumber(2397846127684712867321)
     const floatingSupply = totalSupply.minus(reserveBalance)
+    const mockReserveAddress = web3.utils.randomHex(20)
     beforeEach(async () => {
       await mockGoldToken.setTotalSupply(totalSupply)
       await web3.eth.sendTransaction({
         from: accounts[9],
-        to: randomAddress,
+        to: mockReserveAddress,
         value: reserveBalance.toString(),
       })
-      await registry.setAddressFor(CeloContractName.Reserve, randomAddress)
+      await registry.setAddressFor(CeloContractName.Reserve, mockReserveAddress)
     })
 
     describe('when the percentage of voting gold is equal to the target', () => {
@@ -532,14 +528,14 @@ contract('EpochRewards', (accounts: string[]) => {
     describe('when there are active votes, a stable token exchange rate is set and the actual remaining supply is 10% more than the target remaining supply after rewards', () => {
       const activeVotes = 1000000
       const timeDelta = YEAR.times(10)
-      // Hard coded in EpochRewardsTest.sol
-      const numValidators = 100
+      const numberValidators = 100
       let expectedMultiplier: BigNumber
       beforeEach(async () => {
+        await epochRewards.setNumberValidatorsInCurrentSet(numberValidators)
         await mockElection.setActiveVotes(activeVotes)
         await timeTravel(timeDelta.toNumber(), web3)
         const expectedTargetTotalEpochPaymentsInGold = targetValidatorEpochPayment
-          .times(numValidators)
+          .times(numberValidators)
           .div(exchangeRate)
           .integerValue(BigNumber.ROUND_FLOOR)
         const expectedTargetEpochRewards = fromFixed(targetVotingYieldParams.initial).times(

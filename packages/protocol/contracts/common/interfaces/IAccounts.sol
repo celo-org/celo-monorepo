@@ -20,5 +20,9 @@ interface IAccounts {
   function getDataEncryptionKey(address) external view returns (bytes memory);
   function getWalletAddress(address) external view returns (address);
   function getMetadataURL(address) external view returns (string memory);
+  function batchGetMetadataURL(address[] calldata)
+    external
+    view
+    returns (uint256[] memory, bytes memory);
   function getName(address) external view returns (string memory);
 }

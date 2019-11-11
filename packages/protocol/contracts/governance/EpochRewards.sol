@@ -30,9 +30,9 @@ contract EpochRewards is Ownable, Initializable, UsingPrecompiles, UsingRegistry
   // This struct governs the multiplier on the target rewards to give out in a given epoch due to
   // potential deviations in the actual Gold total supply from the target total supply.
   // In the case where the actual exceeds the target (i.e. the protocol has "overspent" with
-  // respect to epoch rewards and payments) the multiplier will be less than one.
+  // respect to epoch rewards and payments) the rewards multiplier will be less than one.
   // In the case where the actual is less than the target (i.e. the protocol has "underspent" with
-  // respect to epoch rewards and payments) the multiplier will be greater than one.
+  // respect to epoch rewards and payments) the rewards multiplier will be greater than one.
   struct RewardsMultiplierParameters {
     RewardsMultiplierAdjustmentFactors adjustmentFactors;
     // The maximum rewards multiplier.

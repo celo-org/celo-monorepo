@@ -101,6 +101,52 @@ exports[`QRCode renders correctly 1`] = `
       >
         John Doe
       </Text>
+      <View
+        style={
+          Object {
+            "alignItems": "center",
+            "alignSelf": "center",
+            "flexDirection": "row",
+            "justifyContent": "center",
+          }
+        }
+      >
+        <Text
+          style={
+            Array [
+              Object {
+                "color": "#2E3338",
+                "fontFamily": "Hind-Light",
+                "fontSize": 14,
+                "textAlignVertical": "center",
+              },
+              Object {
+                "alignItems": "center",
+                "backgroundColor": "#EEEEEE",
+                "borderRadius": 3,
+                "justifyContent": "center",
+                "marginRight": 5,
+                "paddingLeft": 6,
+                "paddingRight": 3,
+              },
+            ]
+          }
+        >
+          🇺🇸 +1
+        </Text>
+        <Text
+          style={
+            Object {
+              "color": "#2E3338",
+              "fontFamily": "Hind-Light",
+              "fontSize": 14,
+              "textAlignVertical": "center",
+            }
+          }
+        >
+          (415) 555-6666
+        </Text>
+      </View>
     </View>
   </View>
   <svg

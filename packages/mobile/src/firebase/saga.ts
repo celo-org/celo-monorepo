@@ -105,7 +105,7 @@ function createPaymentRequestChannel(address: string) {
 }
 
 const compareTimestamps = (a: PaymentRequest, b: PaymentRequest) => {
-  return new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime()
+  return new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime()
 }
 
 const onlyRequested = (pr: PaymentRequest) => pr.status === PaymentRequestStatus.REQUESTED

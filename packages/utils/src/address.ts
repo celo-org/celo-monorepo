@@ -17,3 +17,4 @@ export const privateKeyToPublicKey = (privateKey: string) => {
     '0x' + privateToPublic(Buffer.from(privateKey.slice(2), 'hex')).toString('hex')
   )
 }
+export { toChecksumAddress } from 'ethereumjs-util'

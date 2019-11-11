@@ -101,7 +101,6 @@ async function registerValidator(
 ) {
   const publicKeysData = getPublicKeysData(validatorPrivateKey)
 
-  console.log('locking gold for validator registration')
   await lockGold(
     accounts,
     lockedGold,
@@ -109,7 +108,6 @@ async function registerValidator(
     validatorPrivateKey
   )
 
-  console.log('registering validator')
   // @ts-ignore
   const setNameTx = accounts.contract.methods.setName(`CLabs Validator #${index} on ${networkName}`)
   await sendTransactionWithPrivateKey(web3, setNameTx, validatorPrivateKey, {
@@ -123,7 +121,6 @@ async function registerValidator(
     to: validators.address,
   })
 
-  console.log('affiliating')
   // @ts-ignore
   const affiliateTx = validators.contract.methods.affiliate(groupAddress)
 
