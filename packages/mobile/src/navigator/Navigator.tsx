@@ -243,6 +243,12 @@ const SettingsStack = createStackNavigator(
     [Screens.InviteReview]: { screen: InviteReview },
     [Screens.SelectLocalCurrency]: { screen: SelectLocalCurrency },
     [Screens.Licenses]: { screen: Licenses },
+    [Screens.VerificationEducationScreen]: { screen: VerificationEducationScreen },
+    [Screens.VerificationLearnMoreScreen]: { screen: VerificationLearnMoreScreen },
+    [Screens.VerificationLoadingScreen]: { screen: VerificationLoadingScreen },
+    [Screens.VerificationInterstitialScreen]: { screen: VerificationInterstitialScreen },
+    [Screens.VerificationInputScreen]: { screen: VerificationInputScreen },
+    [Screens.VerificationSuccessScreen]: { screen: VerificationSuccessScreen },
   },
   {
     navigationOptions: {

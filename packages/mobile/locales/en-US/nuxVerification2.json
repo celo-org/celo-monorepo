@@ -1,4 +1,5 @@
 {
+  "getVerified": "Verify Phone Number",
   "notReadyForCode": "Not yet ready for code entry",
   "emptyVerificationCode": "No Verification Code in Clipboard",
   "invalidVerificationCode": "Invalid Verification Code",
