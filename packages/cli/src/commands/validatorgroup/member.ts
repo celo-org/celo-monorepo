@@ -1,6 +1,7 @@
 import { flags } from '@oclif/command'
 import { IArg } from '@oclif/parser/lib/args'
 import { BaseCommand } from '../../base'
+import { newCheckBuilder } from '../../utils/checks'
 import { displaySendTx } from '../../utils/cli'
 import { Args, Flags } from '../../utils/command'
 
@@ -42,22 +43,24 @@ export default class ValidatorGroupMembers extends BaseCommand {
 
     this.kit.defaultAccount = res.flags.from
     const validators = await this.kit.contracts.getValidators()
+
+    await newCheckBuilder(this, res.flags.from)
+      .isSignerOrAccount()
+      .canSignValidatorTxs()
+      .signerAccountIsValidatorGroup()
+      .isValidator(res.args.validatorAddress)
+      .runChecks()
+
+    const validatorGroup = await validators.signerToAccount(res.flags.from)
     if (res.flags.accept) {
-      const tx = await validators.addMember(res.flags.from, (res.args as any).validatorAddress)
+      const tx = await validators.addMember(validatorGroup, res.args.validatorAddress)
       await displaySendTx('addMember', tx)
     } else if (res.flags.remove) {
-      await displaySendTx(
-        'removeMember',
-        validators.removeMember((res.args as any).validatorAddress)
-      )
+      await displaySendTx('removeMember', validators.removeMember(res.args.validatorAddress))
     } else if (res.flags.reorder != null) {
       await displaySendTx(
         'reorderMember',
-        await validators.reorderMember(
-          res.flags.from,
-          (res.args as any).validatorAddress,
-          res.flags.reorder
-        )
+        await validators.reorderMember(validatorGroup, res.args.validatorAddress, res.flags.reorder)
       )
     }
   }

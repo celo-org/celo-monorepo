@@ -9,15 +9,19 @@ import CeloAnalytics from 'src/analytics/CeloAnalytics'
 import { CustomEventNames, DefaultEventNames } from 'src/analytics/constants'
 import { setNumberVerified } from 'src/app/actions'
 import { ErrorMessages } from 'src/app/ErrorMessages'
-import { cancelVerification, completeAttestationCode, endVerification } from 'src/identity/actions'
+import {
+  cancelVerification,
+  completeAttestationCode,
+  setVerificationStatus,
+} from 'src/identity/actions'
 import { attestationCodesSelector } from 'src/identity/reducer'
 import {
   AttestationCode,
   doVerificationFlow,
-  ERROR_DURATION,
   requestAndRetrieveAttestations,
   startVerification,
   VERIFICATION_TIMEOUT,
+  VerificationStatus,
 } from 'src/identity/verification'
 import { web3 } from 'src/web3/contracts'
 import { getConnectedAccount, getConnectedUnlockedAccount } from 'src/web3/saga'
@@ -44,11 +48,14 @@ jest.mock('@celo/react-native-sms-retriever', () => ({
   removeSmsListener: jest.fn(),
 }))
 
-jest.mock('@celo/utils', () => ({
-  ...jest.requireActual('@celo/utils'),
-  ECIES: { Encrypt: jest.fn(() => Buffer.from('0', 'hex')) },
-  SignatureUtils: { parseSignature: jest.fn(() => ({ r: 'r', s: 's', v: 'v' })) },
-}))
+jest.mock('@celo/utils', () => {
+  const mockParseSig = jest.fn(() => ({ r: 'r', s: 's', v: 'v' }))
+  return {
+    ...jest.requireActual('@celo/utils'),
+    ECIES: { Encrypt: jest.fn(() => Buffer.from('0', 'hex')) },
+    SignatureUtils: { parseSignature: mockParseSig, parseSignatureWithoutPrefix: mockParseSig },
+  }
+})
 
 const attestationCode0: AttestationCode = {
   code:
@@ -157,7 +164,7 @@ describe('Do Verification Saga', () => {
       .put(completeAttestationCode())
       .put(completeAttestationCode())
       .put(completeAttestationCode())
-      .put(endVerification())
+      .put(setVerificationStatus(VerificationStatus.Done))
       .put(setNumberVerified(true))
       .returns(true)
       .run()
@@ -175,7 +182,7 @@ describe('Do Verification Saga', () => {
         [select(attestationCodesSelector), attestationCodes],
       ])
       .put(completeAttestationCode())
-      .put(endVerification())
+      .put(setVerificationStatus(VerificationStatus.Done))
       .put(setNumberVerified(true))
       .returns(true)
       .run()
@@ -191,7 +198,7 @@ describe('Do Verification Saga', () => {
         [call(getStableTokenContract, web3), createMockContract({})],
         [select(e164NumberSelector), mockE164Number],
       ])
-      .put(endVerification())
+      .put(setVerificationStatus(VerificationStatus.Done))
       .put(setNumberVerified(true))
       .returns(true)
       .run()
@@ -208,8 +215,8 @@ describe('Do Verification Saga', () => {
         [select(e164NumberSelector), mockE164Number],
         [matchers.call.fn(requestAndRetrieveAttestations), throwError(new Error('fake error'))],
       ])
-      .put(showError(ErrorMessages.VERIFICATION_FAILURE, ERROR_DURATION))
-      .put(endVerification(false))
+      .put(showError(ErrorMessages.VERIFICATION_FAILURE))
+      .put(setVerificationStatus(VerificationStatus.Failed))
       .returns(false)
       .run()
   })

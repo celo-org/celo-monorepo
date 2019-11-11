@@ -1,11 +1,11 @@
 // Todo make the casing consistent with these
 export default {
   background: '#FFFFFF',
+  backgroundDarker: '#FAFAFA',
   loadingBarGrey: '#DBDBDB',
   darkGrey: '#3D3D3D',
   gray: 'rgba(0, 0, 0, .4)',
   lightGray: '#BDBDBD',
-  BEIGE: '#FFF5E7',
   listBorderColor: 'rgba(0, 0, 0, .5)',
   inputLabelColor: 'rgba(0, 0, 0, 0.3)',
 

@@ -13,6 +13,7 @@ const COUNTRY_CODES = {
   DE: '+49',
   AR: '+54',
   MX: '+52',
+  LR: '+231',
 }
 
 const TEST_PHONE_NUMBERS = {
@@ -30,10 +31,13 @@ const TEST_PHONE_NUMBERS = {
   VALID_MX_1: '33 1234-5678',
   VALID_MX_2: '1 33 1234-5678',
   VALID_MX_3: '+52 1 33 1234-5678',
+  VALID_LR: '881551952',
   FORMATTED_AR: '+5491126431111',
   FORMATTED_MX: '+523312345678',
+  FORMATTED_LR: '+231881551952',
   DISPLAY_AR: '9 11 2643-1111',
   DISPLAY_MX: '33 1234 5678',
+  DISPLAY_LR: '88 155 1952',
   INVALID_EMPTY: '',
   TOO_SHORT: '123',
 }
@@ -96,6 +100,12 @@ describe('Phone number formatting and utilities', () => {
     it('Format MX phone with country code', () => {
       expect(getE164Number(TEST_PHONE_NUMBERS.VALID_MX_3, COUNTRY_CODES.MX)).toBe(
         TEST_PHONE_NUMBERS.FORMATTED_MX
+      )
+    })
+
+    it('Format LR phone with country code', () => {
+      expect(getE164Number(TEST_PHONE_NUMBERS.VALID_LR, COUNTRY_CODES.LR)).toBe(
+        TEST_PHONE_NUMBERS.FORMATTED_LR
       )
     })
   })
@@ -168,6 +178,12 @@ describe('Phone number formatting and utilities', () => {
     it('Format MX phone with country code', () => {
       expect(getDisplayPhoneNumber(TEST_PHONE_NUMBERS.VALID_MX_3, COUNTRY_CODES.MX)).toBe(
         TEST_PHONE_NUMBERS.DISPLAY_MX
+      )
+    })
+
+    it('Format LR phone with no country code', () => {
+      expect(getDisplayPhoneNumber(TEST_PHONE_NUMBERS.VALID_LR, COUNTRY_CODES.LR)).toBe(
+        TEST_PHONE_NUMBERS.DISPLAY_LR
       )
     })
   })
