@@ -6,7 +6,7 @@ import "../EpochRewards.sol";
  * @title A wrapper around EpochRewards that exposes internal functions for testing.
  */
 contract EpochRewardsTest is EpochRewards {
-  uint256 public numberValidatorsInCurrentSet;
+  uint256 private numValidatorsInCurrentSet;
   function getRewardsMultiplier(uint256 targetGoldTotalSupplyIncrease)
     external
     view
@@ -19,7 +19,11 @@ contract EpochRewardsTest is EpochRewards {
     _updateTargetVotingYield();
   }
 
+  function numberValidatorsInCurrentSet() public view returns (uint256) {
+    return numValidatorsInCurrentSet;
+  }
+
   function setNumberValidatorsInCurrentSet(uint256 value) external {
-    numberValidatorsInCurrentSet = value;
+    numValidatorsInCurrentSet = value;
   }
 }

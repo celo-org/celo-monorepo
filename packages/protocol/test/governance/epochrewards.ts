@@ -377,7 +377,7 @@ contract('EpochRewards', (accounts: string[]) => {
     describe('when a StableToken exchange rate is set', () => {
       const numberValidators = 100
       beforeEach(async () => {
-        await epochRewards.setNumValidatorsInCurrentSet(numberValidators)
+        await epochRewards.setNumberValidatorsInCurrentSet(numberValidators)
       })
 
       it('should return the number of validators times the max payment divided by the exchange rate', async () => {
