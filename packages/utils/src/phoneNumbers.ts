@@ -191,6 +191,10 @@ function handleSpecialCasesForDisplay(parsedNumber: PhoneNumber, countryCode?: n
         .format(parsedNumber, PhoneNumberFormat.INTERNATIONAL)
         .replace(/\+54(\s)?/, '')
 
+    case 231:
+      const formatted = phoneUtil.format(parsedNumber, PhoneNumberFormat.NATIONAL)
+      return formatted && formatted[0] === '0' ? formatted.slice(1) : formatted
+
     default:
       return phoneUtil.format(parsedNumber, PhoneNumberFormat.NATIONAL)
   }

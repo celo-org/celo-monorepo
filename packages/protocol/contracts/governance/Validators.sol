@@ -119,11 +119,13 @@ contract Validators is
   event ValidatorDeregistered(address indexed validator);
   event ValidatorAffiliated(address indexed validator, address indexed group);
   event ValidatorDeaffiliated(address indexed validator, address indexed group);
+  event ValidatorPublicKeysDataUpdated(address indexed validator, bytes publicKeysData);
   event ValidatorGroupRegistered(address indexed group, uint256 commission);
   event ValidatorGroupDeregistered(address indexed group);
   event ValidatorGroupMemberAdded(address indexed group, address indexed validator);
   event ValidatorGroupMemberRemoved(address indexed group, address indexed validator);
   event ValidatorGroupMemberReordered(address indexed group, address indexed validator);
+  event ValidatorGroupCommissionUpdated(address indexed group, uint256 commission);
 
   modifier onlyVm() {
     require(msg.sender == address(0));
@@ -283,18 +285,12 @@ contract Validators is
    * @dev Fails if the account does not have sufficient Locked Gold.
    */
   function registerValidator(bytes calldata publicKeysData) external nonReentrant returns (bool) {
-    require(
-      // secp256k1 public key + BLS public key + BLS proof of possession
-      publicKeysData.length == (64 + 48 + 96)
-    );
-    // Use the proof of possession bytes
-    require(checkProofOfPossession(msg.sender, publicKeysData.slice(64, 48 + 96)));
-
     address account = getAccounts().activeValidationSignerToAccount(msg.sender);
     require(!isValidator(account) && !isValidatorGroup(account));
     uint256 lockedGoldBalance = getLockedGold().getAccountTotalLockedGold(account);
     require(lockedGoldBalance >= validatorLockedGoldRequirements.value);
     Validator storage validator = validators[account];
+    _updatePublicKeysData(validator, publicKeysData);
     validator.publicKeysData = publicKeysData;
     registeredValidators.push(account);
     updateMembershipHistory(account, address(0));
@@ -472,6 +468,50 @@ contract Validators is
   }
 
   /**
+   * @notice Updates a validator's public keys data.
+   * @param publicKeysData Comprised of three tightly-packed elements:
+   *    - publicKey - The public key that the validator is using for consensus, should match
+   *      msg.sender. 64 bytes.
+   *    - blsPublicKey - The BLS public key that the validator is using for consensus, should pass
+   *      proof of possession. 48 bytes.
+   *    - blsPoP - The BLS public key proof of possession. 96 bytes.
+   * @return True upon success.
+   */
+  function updatePublicKeysData(bytes calldata publicKeysData) external returns (bool) {
+    address account = getAccounts().activeValidationSignerToAccount(msg.sender);
+    require(isValidator(account));
+    Validator storage validator = validators[account];
+    _updatePublicKeysData(validator, publicKeysData);
+    emit ValidatorPublicKeysDataUpdated(account, publicKeysData);
+    return true;
+  }
+
+  /**
+   * @notice Updates a validator's public keys data.
+   * @param validator The validator whose public keys data should be updated.
+   * @param publicKeysData Comprised of three tightly-packed elements:
+   *    - publicKey - The public key that the validator is using for consensus, should match
+   *      msg.sender. 64 bytes.
+   *    - blsPublicKey - The BLS public key that the validator is using for consensus, should pass
+   *      proof of possession. 48 bytes.
+   *    - blsPoP - The BLS public key proof of possession. 96 bytes.
+   * @return True upon success.
+   */
+  function _updatePublicKeysData(Validator storage validator, bytes memory publicKeysData)
+    private
+    returns (bool)
+  {
+    require(
+      // secp256k1 public key + BLS public key + BLS proof of possession
+      publicKeysData.length == (64 + 48 + 96)
+    );
+    // Use the proof of possession bytes
+    require(checkProofOfPossession(msg.sender, publicKeysData.slice(64, 48 + 96)));
+    validator.publicKeysData = publicKeysData;
+    return true;
+  }
+
+  /**
    * @notice Registers a validator group with no member validators.
    * @param commission Fixidity representation of the commission this group receives on epoch
    *   payments made to its members.
@@ -610,6 +650,23 @@ contract Validators is
     require(group.members.contains(validator));
     group.members.update(validator, lesserMember, greaterMember);
     emit ValidatorGroupMemberReordered(account, validator);
+    return true;
+  }
+
+  /**
+   * @notice Updates a validator group's commission.
+   * @param commission Fixidity representation of the commission this group receives on epoch
+   *   payments made to its members. Must be in the range [0, 1.0].
+   * @return True upon success.
+   */
+  function updateCommission(uint256 commission) external returns (bool) {
+    address account = getAccounts().activeValidationSignerToAccount(msg.sender);
+    require(isValidatorGroup(account));
+    ValidatorGroup storage group = groups[account];
+    require(commission <= FixidityLib.fixed1().unwrap(), "Commission can't be greater than 100%");
+    require(commission != group.commission.unwrap(), "Commission must be different");
+    group.commission = FixidityLib.wrap(commission);
+    emit ValidatorGroupCommissionUpdated(account, commission);
     return true;
   }
 

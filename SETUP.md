@@ -3,11 +3,12 @@
 - [Celo Engineering Setup](#celo-engineering-setup)
   - [Getting Everything Installed](#getting-everything-installed)
     - [MacOS](#macos)
-      - [XCode](#xcode)
+      - [Xcode](#xcode)
       - [Homebrew](#homebrew)
       - [Install Node, Yarn and friends](#install-node-yarn-and-friends)
       - [Java](#java)
       - [Install Android Dev Tools](#install-android-dev-tools)
+      - [Install iOS Dev Tools](#install-ios-dev-tools)
     - [Linux](#linux)
       - [Install Node, Yarn and friends](#install-node-yarn-and-friends-1)
       - [Installing OpenJDK 8](#installing-openjdk-8)
@@ -31,9 +32,9 @@ build the celo-monorepo codebase.
 
 ### MacOS
 
-#### XCode
+#### Xcode
 
-Install XCode and its command line tools:
+Install Xcode and its command line tools:
 
 ```bash
 xcode-select --install
@@ -109,6 +110,14 @@ Then install the Android 28 platform:
 ```bash
 sdkmanager 'platforms;android-28'
 ```
+
+#### Install iOS Dev Tools
+
+Install [Xcode 10.3](https://download.developer.apple.com/Developer_Tools/Xcode_10.3/Xcode_10.3.xip) (an Apple Developer Account is needed to access this link).
+
+We do not recommend installing Xcode through the App Store as it can auto update and become incompatible with our projects (until we decide to upgrade).
+
+Note that using the method above, you can have multiple versions of Xcode installed in parallel by using different app names. For instance `Xcode10.3.app` and `Xcode11.app` inside the `/Applications` folder.
 
 ### Linux
 

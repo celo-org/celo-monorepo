@@ -69,9 +69,6 @@ import VerificationInterstitialScreen from 'src/verify/VerificationInterstitialS
 import VerificationLearnMoreScreen from 'src/verify/VerificationLearnMoreScreen'
 import VerificationLoadingScreen from 'src/verify/VerificationLoadingScreen'
 import VerificationSuccessScreen from 'src/verify/VerificationSuccessScreen'
-import VerifyVerified from 'src/verify/Verified'
-import VerifyVerifying from 'src/verify/Verifying'
-import VerifyEducation from 'src/verify/VerifyPhoneEducation'
 
 export const headerArea: CreateNavigatorConfig<
   NavigationStackConfig,
@@ -118,9 +115,6 @@ const NuxStack = createStackNavigator(
     [Screens.ImportWalletSocial]: { screen: ImportWalletSocial },
     [Screens.ImportWalletEmpty]: { screen: ImportWalletEmpty },
     [Screens.ImportContacts]: { screen: ImportContacts },
-    [Screens.VerifyEducation]: { screen: VerifyEducation },
-    [Screens.VerifyVerifying]: { screen: VerifyVerifying },
-    [Screens.VerifyVerified]: { screen: VerifyVerified },
     [Screens.VerificationEducationScreen]: { screen: VerificationEducationScreen },
     [Screens.VerificationLearnMoreScreen]: { screen: VerificationLearnMoreScreen },
     [Screens.VerificationLoadingScreen]: { screen: VerificationLoadingScreen },

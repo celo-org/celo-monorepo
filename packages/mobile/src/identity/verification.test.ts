@@ -9,7 +9,11 @@ import CeloAnalytics from 'src/analytics/CeloAnalytics'
 import { CustomEventNames, DefaultEventNames } from 'src/analytics/constants'
 import { setNumberVerified } from 'src/app/actions'
 import { ErrorMessages } from 'src/app/ErrorMessages'
-import { cancelVerification, completeAttestationCode, endVerification } from 'src/identity/actions'
+import {
+  cancelVerification,
+  completeAttestationCode,
+  setVerificationStatus,
+} from 'src/identity/actions'
 import { attestationCodesSelector } from 'src/identity/reducer'
 import {
   AttestationCode,
@@ -17,6 +21,7 @@ import {
   requestAndRetrieveAttestations,
   startVerification,
   VERIFICATION_TIMEOUT,
+  VerificationStatus,
 } from 'src/identity/verification'
 import { web3 } from 'src/web3/contracts'
 import { getConnectedAccount, getConnectedUnlockedAccount } from 'src/web3/saga'
@@ -156,7 +161,7 @@ describe('Do Verification Saga', () => {
       .put(completeAttestationCode())
       .put(completeAttestationCode())
       .put(completeAttestationCode())
-      .put(endVerification())
+      .put(setVerificationStatus(VerificationStatus.Done))
       .put(setNumberVerified(true))
       .returns(true)
       .run()
@@ -174,7 +179,7 @@ describe('Do Verification Saga', () => {
         [select(attestationCodesSelector), attestationCodes],
       ])
       .put(completeAttestationCode())
-      .put(endVerification())
+      .put(setVerificationStatus(VerificationStatus.Done))
       .put(setNumberVerified(true))
       .returns(true)
       .run()
@@ -190,7 +195,7 @@ describe('Do Verification Saga', () => {
         [call(getStableTokenContract, web3), createMockContract({})],
         [select(e164NumberSelector), mockE164Number],
       ])
-      .put(endVerification())
+      .put(setVerificationStatus(VerificationStatus.Done))
       .put(setNumberVerified(true))
       .returns(true)
       .run()
@@ -208,7 +213,7 @@ describe('Do Verification Saga', () => {
         [matchers.call.fn(requestAndRetrieveAttestations), throwError(new Error('fake error'))],
       ])
       .put(showError(ErrorMessages.VERIFICATION_FAILURE))
-      .put(endVerification(false))
+      .put(setVerificationStatus(VerificationStatus.Failed))
       .returns(false)
       .run()
   })

@@ -69,15 +69,14 @@ function getWebSocketProvider(url: string): Provider {
 
 function getWeb3(): Web3 {
   Logger.info(
+    `${tag}@getWeb3`,
     `Initializing web3, platform: ${Platform.OS}, geth free mode: ${isInitiallyZeroSyncMode()}`
   )
 
-  if (isInitiallyZeroSyncMode() && Platform.OS === 'ios') {
-    throw new Error('Zero sync mode is currently not supported on iOS')
-  } else if (isInitiallyZeroSyncMode()) {
+  if (isInitiallyZeroSyncMode()) {
     // Geth free mode
     const url = DEFAULT_FORNO_URL
-    Logger.debug('contracts@getWeb3', `Connecting to url ${url}`)
+    Logger.debug(`${tag}@getWeb3`, `Connecting to url ${url}`)
     return new Web3(getWebSocketProvider(url))
   } else {
     return new Web3(getIpcProvider(DEFAULT_TESTNET))
