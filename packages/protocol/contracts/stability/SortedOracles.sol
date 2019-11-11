@@ -81,6 +81,7 @@ contract SortedOracles is ISortedOracles, Ownable, Initializable, UsingPrecompil
    */
   function setMaxMedianChangeRatePerSecond(uint256 rate) public onlyOwner returns (bool) {
     maxMedianChangeRatePerSecond = FixidityLib.wrap(rate);
+    require(rate < 5000000000000000000, "Rate must be smaller than 0.000005");
     emit MaxMedianChangeRatePerSecondSet(rate);
     return true;
   }
@@ -192,7 +193,10 @@ contract SortedOracles is ISortedOracles, Ownable, Initializable, UsingPrecompil
     recomputeRate(token);
   }
 
-  function fracMulExp(FixidityLib.Fraction memory a, FixidityLib.Fraction memory b, uint256 exp)
+  /**
+   * @notice a * b^exp
+   */
+  function fractionMulExp(FixidityLib.Fraction memory a, FixidityLib.Fraction memory b, uint256 exp)
     internal
     view
     returns (FixidityLib.Fraction memory)
@@ -215,24 +219,32 @@ contract SortedOracles is ISortedOracles, Ownable, Initializable, UsingPrecompil
     uint256 newMedian = rates[token].getMedianValue();
     if (limitedMedianRateTimestamp[token] != 0 && maxMedianChangeRatePerSecond.unwrap() != 0) {
       uint256 td = now.sub(limitedMedianRateTimestamp[token]);
-      uint256 maxChange = fracMulExp(
+      if (td > 365 days) td = 365 days;
+      FixidityLib.Fraction memory maxChangeRate = fractionMulExp(
         FixidityLib.fixed1(),
         maxMedianChangeRatePerSecond.add(FixidityLib.fixed1()),
         td
       )
-        .subtract(FixidityLib.fixed1())
-        .multiply(FixidityLib.wrap(originalMedian))
-        .unwrap();
-      if (newMedian > originalMedian) {
-        if (maxChange < newMedian.sub(originalMedian)) {
-          newMedian = originalMedian.add(maxChange);
-        }
-      } else {
-        if (maxChange < originalMedian.sub(newMedian)) {
-          newMedian = originalMedian.sub(maxChange);
+        .subtract(FixidityLib.fixed1());
+      // Check if it is safe to multiply
+      if (maxChangeRate.unwrap() < FixidityLib.maxFixedMul() * FixidityLib.fixed1().unwrap()) {
+        uint256 maxChange = maxChangeRate.multiply(FixidityLib.wrap(originalMedian)).unwrap();
+        if (newMedian > originalMedian) {
+          if (maxChange < newMedian.sub(originalMedian)) {
+            newMedian = originalMedian.add(maxChange);
+          }
+        } else {
+          if (maxChange < originalMedian.sub(newMedian)) {
+            newMedian = originalMedian.sub(maxChange);
+          }
         }
       }
     }
+    // Cannot become too large, or might overflow multiplications
+    require(
+      newMedian < FixidityLib.maxFixedMul() * FixidityLib.fixed1().unwrap(),
+      "Median rate exceeds limit"
+    );
     limitedMedianRateTimestamp[token] = now;
     limitedMedianRate[token] = newMedian;
     if (newMedian != originalMedian) {
