@@ -1,15 +1,17 @@
-import { zip } from '@celo/utils/lib/collections'
 import BigNumber from 'bignumber.js'
+
+import { zip } from '@celo/utils/lib/collections'
+
 import { Address } from '../base'
 import { LockedGold } from '../generated/types/LockedGold'
 import {
   BaseWrapper,
   CeloTransactionObject,
   NumberLike,
-  parseNumber,
+  numberLikeToBigNumber,
+  numberLikeToString,
   proxyCall,
   proxySend,
-  toBigNumber,
   tupleParser,
 } from '../wrappers/BaseWrapper'
 
@@ -63,7 +65,7 @@ export class LockedGoldWrapper extends BaseWrapper<LockedGold> {
   unlock: (value: NumberLike) => CeloTransactionObject<void> = proxySend(
     this.kit,
     this.contract.methods.unlock,
-    tupleParser(parseNumber)
+    tupleParser(numberLikeToString)
   )
 
   /**
@@ -83,7 +85,7 @@ export class LockedGoldWrapper extends BaseWrapper<LockedGold> {
   getAccountTotalLockedGold = proxyCall(
     this.contract.methods.getAccountTotalLockedGold,
     undefined,
-    toBigNumber
+    numberLikeToBigNumber
   )
 
   /**
@@ -94,7 +96,7 @@ export class LockedGoldWrapper extends BaseWrapper<LockedGold> {
   getAccountNonvotingLockedGold = proxyCall(
     this.contract.methods.getAccountNonvotingLockedGold,
     undefined,
-    toBigNumber
+    numberLikeToBigNumber
   )
 
   /**
@@ -102,7 +104,7 @@ export class LockedGoldWrapper extends BaseWrapper<LockedGold> {
    */
   async getConfig(): Promise<LockedGoldConfig> {
     return {
-      unlockingPeriod: toBigNumber(await this.contract.methods.unlockingPeriod().call()),
+      unlockingPeriod: numberLikeToBigNumber(await this.contract.methods.unlockingPeriod().call()),
     }
   }
 
@@ -129,7 +131,10 @@ export class LockedGoldWrapper extends BaseWrapper<LockedGold> {
     return zip(
       (time, value) =>
         // tslint:disable-next-line: no-object-literal-type-assertion
-        ({ time: toBigNumber(time), value: toBigNumber(value) } as PendingWithdrawal),
+        ({
+          time: numberLikeToBigNumber(time),
+          value: numberLikeToBigNumber(value),
+        } as PendingWithdrawal),
       withdrawals[1],
       withdrawals[0]
     )

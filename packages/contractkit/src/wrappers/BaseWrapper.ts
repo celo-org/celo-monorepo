@@ -3,7 +3,7 @@ import Contract from 'web3/eth/contract'
 import { TransactionObject, Tx } from 'web3/eth/types'
 import { TransactionReceipt } from 'web3/types'
 
-import { trimLeading0x } from '@celo/utils/lib/address'
+import { prependLeading0x, trimLeading0x } from '@celo/utils/lib/address'
 import { zip } from '@celo/utils/lib/collections'
 
 import { ContractKit } from '../kit'
@@ -25,31 +25,31 @@ export abstract class BaseWrapper<T extends Contract> {
   }
 }
 
-/** Parse string -> BigNumber */
-export function toBigNumber(input: string) {
+export function numberLikeToBigNumber(input: NumberLike) {
   return new BigNumber(input)
 }
 
-export function toBuffer(input: string | string[]) {
+export function numberLikeToString(input: NumberLike) {
+  return numberLikeToBigNumber(input).toFixed()
+}
+
+export function numberLikeToInt(input: NumberLike) {
+  return numberLikeToBigNumber(input)
+    .integerValue()
+    .toNumber()
+}
+
+export function stringToBuffer(input: string | string[]) {
   return Buffer.from(trimLeading0x(input as string), 'hex')
 }
 
-export function parseBuffer(buf: Buffer) {
-  return '0x' + buf.toString('hex')
+export function bufferToString(buf: Buffer) {
+  return prependLeading0x(buf.toString('hex'))
 }
 
-type bytes = Array<string | number[]>
-export function parseBytes(input: Buffer | string): bytes {
-  return input as any
-}
-
-/** Parse string -> int */
-export function toNumber(input: string) {
-  return parseInt(input, 10)
-}
-
-export function parseNumber(input: NumberLike) {
-  return new BigNumber(input).toFixed()
+type SolBytes = Array<string | number[]>
+export function toSolidityBytes(input: Buffer | string): SolBytes {
+    return input as any
 }
 
 type Parser<A, B> = (input: A) => B

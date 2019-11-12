@@ -7,16 +7,16 @@ import { Address } from '../base'
 import { Governance } from '../generated/types/Governance'
 import {
   BaseWrapper,
+  bufferToString,
   identity,
   NumberLike,
-  parseBuffer,
-  parseBytes,
-  parseNumber,
+  numberLikeToBigNumber,
+  numberLikeToInt,
+  numberLikeToString,
   proxyCall,
   proxySend,
-  toBigNumber,
-  toBuffer,
-  toNumber,
+  stringToBuffer,
+  toSolidityBytes,
   toTransactionObject,
   tupleParser,
 } from './BaseWrapper'
@@ -62,9 +62,9 @@ export class Proposal {
   constructor(public readonly transactions: ProposalTransaction[]) {}
   get params(): ProposalParams {
     return [
-      this.transactions.map((tx) => parseNumber(tx.value)),
+      this.transactions.map((tx) => numberLikeToString(tx.value)),
       this.transactions.map((tx) => tx.destination),
-      parseBytes(Buffer.concat(this.transactions.map((tx) => tx.data))),
+      toSolidityBytes(Buffer.concat(this.transactions.map((tx) => tx.data))),
       this.transactions.map((tx) => tx.data.length),
     ]
   }
@@ -112,22 +112,30 @@ export class GovernanceWrapper extends BaseWrapper<Governance> {
    * Querying number of possible concurrent proposals.
    * @returns Current number of possible concurrent proposals.
    */
-  concurrentProposals = proxyCall(this.contract.methods.concurrentProposals, undefined, toBigNumber)
+  concurrentProposals = proxyCall(
+    this.contract.methods.concurrentProposals,
+    undefined,
+    numberLikeToBigNumber
+  )
   /**
    * Query proposal dequeue frequency.
    * @returns Current proposal dequeue frequency in seconds.
    */
-  dequeueFrequency = proxyCall(this.contract.methods.dequeueFrequency, undefined, toBigNumber)
+  dequeueFrequency = proxyCall(
+    this.contract.methods.dequeueFrequency,
+    undefined,
+    numberLikeToBigNumber
+  )
   /**
    * Query minimum deposit required to make a proposal.
    * @returns Current minimum deposit.
    */
-  minDeposit = proxyCall(this.contract.methods.minDeposit, undefined, toBigNumber)
+  minDeposit = proxyCall(this.contract.methods.minDeposit, undefined, numberLikeToBigNumber)
   /**
    * Query queue expiry parameter.
    * @return The number of seconds a proposal can stay in the queue before expiring.
    */
-  queueExpiry = proxyCall(this.contract.methods.queueExpiry, undefined, toBigNumber)
+  queueExpiry = proxyCall(this.contract.methods.queueExpiry, undefined, numberLikeToBigNumber)
   /**
    * Query durations of different stages in proposal lifecycle.
    * @returns Durations for approval, referendum and execution stages in seconds.
@@ -135,9 +143,9 @@ export class GovernanceWrapper extends BaseWrapper<Governance> {
   async stageDurations(): Promise<ProposalStageDurations> {
     const res = await this.contract.methods.stageDurations().call()
     return {
-      [ProposalStage.Approval]: toBigNumber(res[0]),
-      [ProposalStage.Referendum]: toBigNumber(res[1]),
-      [ProposalStage.Execution]: toBigNumber(res[2]),
+      [ProposalStage.Approval]: numberLikeToBigNumber(res[0]),
+      [ProposalStage.Referendum]: numberLikeToBigNumber(res[1]),
+      [ProposalStage.Execution]: numberLikeToBigNumber(res[2]),
     }
   }
 
@@ -167,12 +175,12 @@ export class GovernanceWrapper extends BaseWrapper<Governance> {
    */
   getProposalMetadata: (proposalID: NumberLike) => Promise<ProposalMetadata> = proxyCall(
     this.contract.methods.getProposal,
-    tupleParser(parseNumber),
+    tupleParser(numberLikeToString),
     (res) => ({
       proposer: res[0],
-      deposit: toBigNumber(res[1]),
-      timestamp: toBigNumber(res[2]),
-      transactionCount: toNumber(res[3]),
+      deposit: numberLikeToBigNumber(res[1]),
+      timestamp: numberLikeToBigNumber(res[2]),
+      transactionCount: numberLikeToInt(res[3]),
     })
   )
 
@@ -186,11 +194,11 @@ export class GovernanceWrapper extends BaseWrapper<Governance> {
     txIndex: number
   ) => Promise<ProposalTransaction> = proxyCall(
     this.contract.methods.getProposalTransaction,
-    tupleParser(parseNumber, parseNumber),
+    tupleParser(numberLikeToString, numberLikeToString),
     (res) => ({
-      value: toBigNumber(res[0]),
+      value: numberLikeToBigNumber(res[0]),
       destination: res[1],
-      data: toBuffer(res[2]),
+      data: stringToBuffer(res[2]),
     })
   )
 
@@ -200,7 +208,7 @@ export class GovernanceWrapper extends BaseWrapper<Governance> {
    */
   isApproved: (proposalID: NumberLike) => Promise<boolean> = proxyCall(
     this.contract.methods.isApproved,
-    tupleParser(parseNumber)
+    tupleParser(numberLikeToString)
   )
 
   /**
@@ -210,8 +218,8 @@ export class GovernanceWrapper extends BaseWrapper<Governance> {
 
   getProposalStage = proxyCall(
     this.contract.methods.getProposalStage,
-    tupleParser(parseNumber),
-    (res) => Object.keys(ProposalStage)[toNumber(res)] as ProposalStage
+    tupleParser(numberLikeToString),
+    (res) => Object.keys(ProposalStage)[numberLikeToInt(res)] as ProposalStage
   )
 
   /**
@@ -257,7 +265,10 @@ export class GovernanceWrapper extends BaseWrapper<Governance> {
    * Returns whether a given proposal is passing relative to the constitution's threshold.
    * @param proposalID Governance proposal UUID
    */
-  isProposalPassing = proxyCall(this.contract.methods.isProposalPassing, tupleParser(parseNumber))
+  isProposalPassing = proxyCall(
+    this.contract.methods.isProposalPassing,
+    tupleParser(numberLikeToString)
+  )
 
   /**
    * Submits a new governance proposal.
@@ -275,7 +286,7 @@ export class GovernanceWrapper extends BaseWrapper<Governance> {
    */
   proposalExists: (proposalID: NumberLike) => Promise<boolean> = proxyCall(
     this.contract.methods.proposalExists,
-    tupleParser(parseNumber)
+    tupleParser(numberLikeToString)
   )
 
   /**
@@ -286,8 +297,8 @@ export class GovernanceWrapper extends BaseWrapper<Governance> {
     this.contract.methods.getUpvoteRecord,
     tupleParser(identity),
     (o) => ({
-      proposalID: toBigNumber(o[0]),
-      upvotes: toBigNumber(o[1]),
+      proposalID: numberLikeToBigNumber(o[0]),
+      upvotes: numberLikeToBigNumber(o[1]),
     })
   )
 
@@ -295,13 +306,17 @@ export class GovernanceWrapper extends BaseWrapper<Governance> {
    * Returns whether a given proposal is queued.
    * @param proposalID Governance proposal UUID
    */
-  isQueued = proxyCall(this.contract.methods.isQueued, tupleParser(parseNumber))
+  isQueued = proxyCall(this.contract.methods.isQueued, tupleParser(numberLikeToString))
 
   /**
    * Returns the upvotes applied to a given proposal.
    * @param proposalID Governance proposal UUID
    */
-  getUpvotes = proxyCall(this.contract.methods.getUpvotes, tupleParser(parseNumber), toBigNumber)
+  getUpvotes = proxyCall(
+    this.contract.methods.getUpvotes,
+    tupleParser(numberLikeToString),
+    numberLikeToBigNumber
+  )
 
   /**
    * Returns the yes, no, and abstain votes applied to a given proposal.
@@ -309,11 +324,11 @@ export class GovernanceWrapper extends BaseWrapper<Governance> {
    */
   getVotes = proxyCall(
     this.contract.methods.getVoteTotals,
-    tupleParser(parseNumber),
+    tupleParser(numberLikeToString),
     (res): Votes => ({
-      [VoteValue.Yes]: toBigNumber(res[0]),
-      [VoteValue.No]: toBigNumber(res[1]),
-      [VoteValue.Abstain]: toBigNumber(res[2]),
+      [VoteValue.Yes]: numberLikeToBigNumber(res[0]),
+      [VoteValue.No]: numberLikeToBigNumber(res[1]),
+      [VoteValue.Abstain]: numberLikeToBigNumber(res[2]),
     })
   )
 
@@ -323,8 +338,8 @@ export class GovernanceWrapper extends BaseWrapper<Governance> {
   getQueue = proxyCall(this.contract.methods.getQueue, undefined, (arraysObject) =>
     zip<string, string, UpvoteRecord>(
       (_id, _upvotes) => ({
-        proposalID: toBigNumber(_id),
-        upvotes: toBigNumber(_upvotes),
+        proposalID: numberLikeToBigNumber(_id),
+        upvotes: numberLikeToBigNumber(_upvotes),
       }),
       arraysObject[0],
       arraysObject[1]
@@ -335,7 +350,7 @@ export class GovernanceWrapper extends BaseWrapper<Governance> {
    * Returns the proposal dequeue as list of proposal IDs.
    */
   getDequeue = proxyCall(this.contract.methods.getDequeue, undefined, (arrayObject) =>
-    arrayObject.map(toBigNumber)
+    arrayObject.map(numberLikeToBigNumber)
   )
 
   /**
@@ -414,9 +429,9 @@ export class GovernanceWrapper extends BaseWrapper<Governance> {
     return toTransactionObject(
       this.kit,
       this.contract.methods.upvote(
-        parseNumber(proposalID),
-        parseNumber(lesserID),
-        parseNumber(greaterID)
+        numberLikeToString(proposalID),
+        numberLikeToString(lesserID),
+        numberLikeToString(greaterID)
       )
     )
   }
@@ -433,7 +448,10 @@ export class GovernanceWrapper extends BaseWrapper<Governance> {
     const { lesserID, greaterID } = await this.findLesserAndGreaterAfterUpvote(ZERO_BN, upvoter)
     return toTransactionObject(
       this.kit,
-      this.contract.methods.revokeUpvote(parseNumber(lesserID), parseNumber(greaterID))
+      this.contract.methods.revokeUpvote(
+        numberLikeToString(lesserID),
+        numberLikeToString(greaterID)
+      )
     )
   }
 
@@ -446,7 +464,7 @@ export class GovernanceWrapper extends BaseWrapper<Governance> {
     const proposalIndex = await this.getDequeueIndex(proposalID)
     return toTransactionObject(
       this.kit,
-      this.contract.methods.approve(parseNumber(proposalID), proposalIndex)
+      this.contract.methods.approve(numberLikeToString(proposalID), proposalIndex)
     )
   }
 
@@ -459,7 +477,7 @@ export class GovernanceWrapper extends BaseWrapper<Governance> {
     const proposalIndex = await this.getDequeueIndex(proposalID)
     return toTransactionObject(
       this.kit,
-      this.contract.methods.vote(parseNumber(proposalID), proposalIndex, vote)
+      this.contract.methods.vote(numberLikeToString(proposalID), proposalIndex, vote)
     )
   }
 
@@ -471,7 +489,7 @@ export class GovernanceWrapper extends BaseWrapper<Governance> {
   async getVoteValue(proposalID: NumberLike, voter: Address) {
     const proposalIndex = await this.getDequeueIndex(proposalID)
     const res = await this.contract.methods.getVoteRecord(voter, proposalIndex).call()
-    return toNumber(res[1]) as VoteValue
+    return numberLikeToInt(res[1]) as VoteValue
   }
 
   /**
@@ -482,7 +500,7 @@ export class GovernanceWrapper extends BaseWrapper<Governance> {
     const proposalIndex = await this.getDequeueIndex(proposalID)
     return toTransactionObject(
       this.kit,
-      this.contract.methods.execute(parseNumber(proposalID), proposalIndex)
+      this.contract.methods.execute(numberLikeToString(proposalID), proposalIndex)
     )
   }
 
@@ -491,12 +509,12 @@ export class GovernanceWrapper extends BaseWrapper<Governance> {
    * @param hash keccak256 hash of hotfix's associated abi encoded transactions
    */
   async getHotfixRecord(hash: Buffer): Promise<HotfixRecord> {
-    const res = await this.contract.methods.getHotfixRecord(parseBuffer(hash)).call()
+    const res = await this.contract.methods.getHotfixRecord(bufferToString(hash)).call()
     return {
       hash,
       approved: res[0],
       executed: res[1],
-      preparedEpoch: toBigNumber(res[2]),
+      preparedEpoch: numberLikeToBigNumber(res[2]),
     }
   }
 
@@ -507,7 +525,7 @@ export class GovernanceWrapper extends BaseWrapper<Governance> {
    */
   isHotfixWhitelistedBy = proxyCall(
     this.contract.methods.isHotfixWhitelistedBy,
-    tupleParser(parseBuffer, (s: Address) => identity<Address>(s))
+    tupleParser(bufferToString, (s: Address) => identity<Address>(s))
   )
 
   /**
@@ -517,7 +535,7 @@ export class GovernanceWrapper extends BaseWrapper<Governance> {
   whitelistHotfix = proxySend(
     this.kit,
     this.contract.methods.whitelistHotfix,
-    tupleParser(parseBuffer)
+    tupleParser(bufferToString)
   )
 
   /**
@@ -525,13 +543,21 @@ export class GovernanceWrapper extends BaseWrapper<Governance> {
    * @param hash keccak256 hash of hotfix's associated abi encoded transactions
    * @notice Only the `approver` address will succeed in sending this transaction
    */
-  approveHotfix = proxySend(this.kit, this.contract.methods.approveHotfix, tupleParser(parseBuffer))
+  approveHotfix = proxySend(
+    this.kit,
+    this.contract.methods.approveHotfix,
+    tupleParser(bufferToString)
+  )
 
   /**
    * Marks the given hotfix prepared for current epoch if quorum of validators have whitelisted it.
    * @param hash keccak256 hash of hotfix's associated abi encoded transactions
    */
-  prepareHotfix = proxySend(this.kit, this.contract.methods.prepareHotfix, tupleParser(parseBuffer))
+  prepareHotfix = proxySend(
+    this.kit,
+    this.contract.methods.prepareHotfix,
+    tupleParser(bufferToString)
+  )
 
   /**
    * Executes a given sequence of transactions if the corresponding hash is prepared and approved.

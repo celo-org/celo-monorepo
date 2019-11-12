@@ -1,12 +1,15 @@
-import { eqAddress } from '@celo/utils/lib/address'
 import BigNumber from 'bignumber.js'
+
+import { eqAddress } from '@celo/utils/lib/address'
+
 import { Address, CeloContract, CeloToken, NULL_ADDRESS } from '../base'
 import { SortedOracles } from '../generated/types/SortedOracles'
 import {
   BaseWrapper,
   CeloTransactionObject,
+  numberLikeToBigNumber,
+  numberLikeToInt,
   proxyCall,
-  toBigNumber,
   toTransactionObject,
 } from './BaseWrapper'
 
@@ -43,7 +46,7 @@ export class SortedOraclesWrapper extends BaseWrapper<SortedOracles> {
   async numRates(token: CeloToken): Promise<number> {
     const tokenAddress = await this.kit.registry.addressFor(token)
     const response = await this.contract.methods.numRates(tokenAddress).call()
-    return toBigNumber(response).toNumber()
+    return numberLikeToInt(response)
   }
 
   /**
@@ -56,7 +59,7 @@ export class SortedOraclesWrapper extends BaseWrapper<SortedOracles> {
     const tokenAddress = await this.kit.registry.addressFor(token)
     const response = await this.contract.methods.medianRate(tokenAddress).call()
     return {
-      rate: toBigNumber(response[0]).div(toBigNumber(response[1])),
+      rate: numberLikeToBigNumber(response[0]).div(numberLikeToBigNumber(response[1])),
     }
   }
 
@@ -75,7 +78,11 @@ export class SortedOraclesWrapper extends BaseWrapper<SortedOracles> {
    * Returns the report expiry parameter.
    * @returns Current report expiry.
    */
-  reportExpirySeconds = proxyCall(this.contract.methods.reportExpirySeconds, undefined, toBigNumber)
+  reportExpirySeconds = proxyCall(
+    this.contract.methods.reportExpirySeconds,
+    undefined,
+    numberLikeToBigNumber
+  )
 
   /**
    * Updates an oracle value and the median.
@@ -150,7 +157,7 @@ export class SortedOraclesWrapper extends BaseWrapper<SortedOracles> {
       const medRelIndex = parseInt(response[2][i], 10)
       rates.push({
         address: response[0][i],
-        rate: toBigNumber(response[1][i]).div(denominator),
+        rate: numberLikeToBigNumber(response[1][i]).div(denominator),
         medianRelation: medRelIndex,
       })
     }
@@ -158,7 +165,7 @@ export class SortedOraclesWrapper extends BaseWrapper<SortedOracles> {
   }
 
   private async getInternalDenominator(): Promise<BigNumber> {
-    return toBigNumber(await this.contract.methods.DENOMINATOR().call())
+    return numberLikeToBigNumber(await this.contract.methods.DENOMINATOR().call())
   }
 
   private async findLesserAndGreaterKeys(
@@ -172,7 +179,9 @@ export class SortedOraclesWrapper extends BaseWrapper<SortedOracles> {
     // This is how the contract calculates the rate from the numerator and denominator.
     // To figure out where this new report goes in the list, we need to compare this
     // value with the other rates
-    const value = toBigNumber(numerator.toString()).div(toBigNumber(denominator.toString()))
+    const value = numberLikeToBigNumber(numerator.toString()).div(
+      numberLikeToBigNumber(denominator.toString())
+    )
 
     let greaterKey = NULL_ADDRESS
     let lesserKey = NULL_ADDRESS
