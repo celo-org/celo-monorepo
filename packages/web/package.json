@@ -15,8 +15,7 @@
     "deploy:prod": "gcloud config set project celo-testnet-production; NODE_ENV=production DEPLOY_ENV=production MANIFEST=production.yaml yarn run deploy",
     "lint": "tslint -c tslint.json --project tsconfig.json",
     "kill-dev": "kill -9 $(lsof -ti :3000)",
-    "test": "jest --runInBand",
-    "test-licenses": "yarn licenses list --prod | grep '\\(─ GPL\\|─ (GPL-[1-9]\\.[0-9]\\+ OR GPL-[1-9]\\.[0-9]\\+)\\)' && echo 'Found GPL license(s). Use 'yarn licenses list --prod' to look up the offending package' || echo 'No GPL licenses found'"
+    "test": "jest --runInBand"
   },
   "dependencies": {
     "@celo/utils": "^0.1.0",
@@ -36,7 +35,7 @@
     "express-enforces-ssl": "^1.1.0",
     "fast-xml-parser": "^3.12.16",
     "fecha": "^3.0.2",
-    "firebase": "^6.2.4",
+    "firebase": "^7.2.2",
     "glob": "^7.1.3",
     "hamburgers": "^0.9.3",
     "helmet": "^3.16.0",
@@ -74,7 +73,7 @@
     "tls": "^0.0.1"
   },
   "devDependencies": {
-    "@firebase/app-types": "^0.3.7",
+    "@firebase/app-types": "^0.4.6",
     "@sentry/types": "^5.6.1",
     "@types/airtable": "^0.5.6",
     "@types/i18next": "^12.1.0",

@@ -1,30 +1,20 @@
 pragma solidity ^0.5.3;
 
-
 /**
  * @title A mock SortedOracles for testing.
  */
 contract MockSortedOracles {
+  uint256 public constant DENOMINATOR = 0x10000000000000000;
+  mapping(address => uint256) public numerators;
+  mapping(address => uint256) public medianTimestamp;
+  mapping(address => uint256) public numRates;
 
-  mapping(address => uint128) public numerators;
-  mapping(address => uint128) public denominators;
-  mapping(address => uint128) public medianTimestamp;
-  mapping(address => uint128) public numRates;
-
-  function setMedianRate(
-    address token,
-    uint128 numerator,
-    uint128 denominator
-  )
-    external
-    returns (bool)
-  {
+  function setMedianRate(address token, uint256 numerator) external returns (bool) {
     numerators[token] = numerator;
-    denominators[token] = denominator;
     return true;
   }
 
-  function setMedianTimestamp(address token, uint128 timestamp) external {
+  function setMedianTimestamp(address token, uint256 timestamp) external {
     medianTimestamp[token] = timestamp;
   }
 
@@ -33,11 +23,11 @@ contract MockSortedOracles {
     medianTimestamp[token] = uint128(now);
   }
 
-  function setNumRates(address token, uint128 rate) external {
+  function setNumRates(address token, uint256 rate) external {
     numRates[token] = rate;
   }
 
-  function medianRate(address token) external view returns (uint128, uint128) {
-    return (numerators[token], denominators[token]);
+  function medianRate(address token) external view returns (uint256, uint256) {
+    return (numerators[token], DENOMINATOR);
   }
 }

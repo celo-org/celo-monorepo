@@ -226,7 +226,7 @@ export function* fetchPhoneAddresses(action: FetchPhoneAddressesAction) {
   yield call(fetchAndStoreAddressMappings, attestationsContract, e164Numbers)
 }
 
-export enum VerificationStatus {
+export enum RecipientVerificationStatus {
   UNVERIFIED = 0,
   VERIFIED = 1,
   UNKNOWN = 2,
@@ -246,19 +246,19 @@ export function getAddressFromPhoneNumber(
 export function getVerificationStatusFromPhoneNumber(
   e164Number: string,
   e164NumberToAddress: E164NumberToAddressType
-): VerificationStatus {
+): RecipientVerificationStatus {
   const address = getAddressFromPhoneNumber(e164Number, e164NumberToAddress)
 
   // Undefined means the mapping has no entry for that number
   // or the entry has been cleared
   if (address === undefined) {
-    return VerificationStatus.UNKNOWN
+    return RecipientVerificationStatus.UNKNOWN
   }
   // null means we have checked and found that number to be unverified
   if (address === null) {
-    return VerificationStatus.UNVERIFIED
+    return RecipientVerificationStatus.UNVERIFIED
   }
 
   // Otherwise, verified
-  return VerificationStatus.VERIFIED
+  return RecipientVerificationStatus.VERIFIED
 }

@@ -4,13 +4,16 @@ import "openzeppelin-solidity/contracts/ownership/Ownable.sol";
 
 import "./interfaces/IERC20Token.sol";
 import "./interfaces/IRegistry.sol";
+import "./interfaces/IAccounts.sol";
 
 import "../governance/interfaces/IElection.sol";
+import "../governance/interfaces/IGovernance.sol";
 import "../governance/interfaces/ILockedGold.sol";
 import "../governance/interfaces/IValidators.sol";
 
 import "../identity/interfaces/IRandom.sol";
 
+import "../stability/interfaces/ISortedOracles.sol";
 import "../stability/interfaces/IStableToken.sol";
 
 // Ideally, UsingRegistry should inherit from Initializable and implement initialize() which calls
@@ -19,10 +22,10 @@ import "../stability/interfaces/IStableToken.sol";
 // TODO(amy): Fix this when the TypeChain issue resolves.
 
 contract UsingRegistry is Ownable {
-
   event RegistrySet(address indexed registryAddress);
 
   // solhint-disable state-visibility
+  bytes32 constant ACCOUNTS_REGISTRY_ID = keccak256(abi.encodePacked("Accounts"));
   bytes32 constant ATTESTATIONS_REGISTRY_ID = keccak256(abi.encodePacked("Attestations"));
   bytes32 constant ELECTION_REGISTRY_ID = keccak256(abi.encodePacked("Election"));
   bytes32 constant EXCHANGE_REGISTRY_ID = keccak256(abi.encodePacked("Exchange"));
@@ -55,6 +58,10 @@ contract UsingRegistry is Ownable {
     emit RegistrySet(registryAddress);
   }
 
+  function getAccounts() internal view returns (IAccounts) {
+    return IAccounts(registry.getAddressForOrDie(ACCOUNTS_REGISTRY_ID));
+  }
+
   function getElection() internal view returns (IElection) {
     return IElection(registry.getAddressForOrDie(ELECTION_REGISTRY_ID));
   }
@@ -63,12 +70,20 @@ contract UsingRegistry is Ownable {
     return IERC20Token(registry.getAddressForOrDie(GOLD_TOKEN_REGISTRY_ID));
   }
 
+  function getGovernance() internal view returns (IGovernance) {
+    return IGovernance(registry.getAddressForOrDie(GOVERNANCE_REGISTRY_ID));
+  }
+
   function getLockedGold() internal view returns (ILockedGold) {
     return ILockedGold(registry.getAddressForOrDie(LOCKED_GOLD_REGISTRY_ID));
   }
 
   function getRandom() internal view returns (IRandom) {
     return IRandom(registry.getAddressForOrDie(RANDOM_REGISTRY_ID));
+  }
+
+  function getSortedOracles() internal view returns (ISortedOracles) {
+    return ISortedOracles(registry.getAddressForOrDie(SORTED_ORACLES_REGISTRY_ID));
   }
 
   function getStableToken() internal view returns (IStableToken) {

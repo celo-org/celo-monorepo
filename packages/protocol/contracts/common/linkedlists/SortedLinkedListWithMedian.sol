@@ -4,27 +4,16 @@ import "openzeppelin-solidity/contracts/math/SafeMath.sol";
 import "./LinkedList.sol";
 import "./SortedLinkedList.sol";
 
-
 /**
  * @title Maintains a sorted list of unsigned ints keyed by bytes32.
  */
 library SortedLinkedListWithMedian {
-
   using SafeMath for uint256;
   using SortedLinkedList for SortedLinkedList.List;
 
-  enum MedianAction {
-    None,
-    Lesser,
-    Greater
-  }
+  enum MedianAction { None, Lesser, Greater }
 
-  enum MedianRelation {
-    Undefined,
-    Lesser,
-    Greater,
-    Equal
-  }
+  enum MedianRelation { Undefined, Lesser, Greater, Equal }
 
   struct List {
     SortedLinkedList.List list;
@@ -45,9 +34,7 @@ library SortedLinkedListWithMedian {
     uint256 value,
     bytes32 lesserKey,
     bytes32 greaterKey
-  )
-    public
-  {
+  ) public {
     list.list.insert(key, value, lesserKey, greaterKey);
     LinkedList.Element storage element = list.list.list.elements[key];
 
@@ -73,8 +60,7 @@ library SortedLinkedListWithMedian {
       // the previous median, we need to slide the median up one element, since we always select
       // the greater of the two middle elements.
       if (
-        element.nextKey == bytes32(0) ||
-        list.relation[element.nextKey] == MedianRelation.Greater
+        element.nextKey == bytes32(0) || list.relation[element.nextKey] == MedianRelation.Greater
       ) {
         action = MedianAction.Greater;
         list.relation[key] = MedianRelation.Greater;
@@ -98,8 +84,7 @@ library SortedLinkedListWithMedian {
       // Thus, if the element we're removing is greaterKey than or equal to the median we need to
       // slide the median left by one.
       if (
-        list.relation[key] == MedianRelation.Greater ||
-        list.relation[key] == MedianRelation.Equal
+        list.relation[key] == MedianRelation.Greater || list.relation[key] == MedianRelation.Equal
       ) {
         action = MedianAction.Lesser;
       }
@@ -108,8 +93,7 @@ library SortedLinkedListWithMedian {
       // Thus, if the element we're removing is less than or equal to the median, we need to slide
       // median right by one.
       if (
-        list.relation[key] == MedianRelation.Lesser ||
-        list.relation[key] == MedianRelation.Equal
+        list.relation[key] == MedianRelation.Lesser || list.relation[key] == MedianRelation.Equal
       ) {
         action = MedianAction.Greater;
       }
@@ -133,9 +117,7 @@ library SortedLinkedListWithMedian {
     uint256 value,
     bytes32 lesserKey,
     bytes32 greaterKey
-  )
-    public
-  {
+  ) public {
     // TODO(asa): Optimize by not making any changes other than value if lesserKey and greaterKey
     // don't change.
     // TODO(asa): Optimize by not updating lesserKey/greaterKey for key
@@ -229,9 +211,7 @@ library SortedLinkedListWithMedian {
    * @notice Gets all elements from the doubly linked list.
    * @return An unpacked list of elements from largest to smallest.
    */
-  function getElements(
-    List storage list
-  )
+  function getElements(List storage list)
     public
     view
     returns (bytes32[] memory, uint256[] memory, MedianRelation[] memory)
@@ -262,7 +242,7 @@ library SortedLinkedListWithMedian {
     LinkedList.Element storage previousMedian = list.list.list.elements[list.median];
     if (action == MedianAction.Lesser) {
       list.relation[list.median] = MedianRelation.Greater;
-      list.median  = previousMedian.previousKey;
+      list.median = previousMedian.previousKey;
     } else if (action == MedianAction.Greater) {
       list.relation[list.median] = MedianRelation.Lesser;
       list.median = previousMedian.nextKey;

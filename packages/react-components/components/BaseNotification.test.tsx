@@ -30,7 +30,7 @@ describe(BaseNotification, () => {
         </BaseNotification>
       )
       wrapper
-        .find('Link')
+        .find('TextButton')
         .first()
         .simulate('press')
 

@@ -49,15 +49,21 @@ describe('governance tests', () => {
 
     it('requests an attestation', async function(this: any) {
       this.timeout(10000)
+
       const approve = await Attestations.approveAttestationFee(2)
       await approve.sendAndWaitForReceipt()
       const request = await Attestations.request(phoneNumber, 2)
       await request.sendAndWaitForReceipt()
 
+      await Attestations.waitForSelectingIssuers(phoneNumber, validatorAddress)
+      const selectIssuers = await Attestations.selectIssuers(phoneNumber)
+      await selectIssuers.sendAndWaitForReceipt()
+
       const stats = await Attestations.getAttestationStat(phoneNumber, validatorAddress)
       assert.equal(stats.total, 2)
-      const actionable = await Attestations.getActionableAttestations(phoneNumber, validatorAddress)
-      assert.lengthOf(actionable, 2)
+
+      const issuers = await Attestations.getAttestationIssuers(phoneNumber, validatorAddress)
+      assert.lengthOf(issuers, 2)
     })
   })
 })

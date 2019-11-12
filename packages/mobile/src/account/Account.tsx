@@ -4,7 +4,7 @@ import { fontStyles } from '@celo/react-components/styles/fonts'
 import { anonymizedPhone, isE164Number } from '@celo/utils/src/phoneNumbers'
 import * as Sentry from '@sentry/react-native'
 import * as React from 'react'
-import { Trans, WithNamespaces, withNamespaces } from 'react-i18next'
+import { WithNamespaces, withNamespaces } from 'react-i18next'
 import { Clipboard, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
 import DeviceInfo from 'react-native-device-info'
 import SafeAreaView from 'react-native-safe-area-view'
@@ -19,7 +19,6 @@ import { FAQ_LINK, TOS_LINK } from 'src/config'
 import { features } from 'src/flags'
 import { Namespaces } from 'src/i18n'
 import { revokeVerification } from 'src/identity/actions'
-import { isPhoneNumberVerified } from 'src/identity/verification'
 import { headerWithBackButton } from 'src/navigator/Headers'
 import { navigate } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
@@ -41,12 +40,12 @@ interface StateProps {
   e164PhoneNumber: string
   devModeActive: boolean
   analyticsEnabled: boolean
+  numberVerified: boolean
 }
 
 type Props = StateProps & DispatchProps & WithNamespaces
 
 interface State {
-  verified: boolean | undefined
   version: string
 }
 
@@ -56,6 +55,7 @@ const mapStateToProps = (state: RootState): StateProps => {
     devModeActive: state.account.devModeActive || false,
     e164PhoneNumber: state.account.e164PhoneNumber,
     analyticsEnabled: state.app.analyticsEnabled,
+    numberVerified: state.app.numberVerified,
   }
 }
 
@@ -72,14 +72,10 @@ export class Account extends React.Component<Props, State> {
   static navigationOptions = headerWithBackButton
 
   state: State = {
-    verified: undefined,
     version: '',
   }
 
   async componentDidMount() {
-    const phoneNumber = this.props.e164PhoneNumber
-    const verified = await isPhoneNumberVerified(phoneNumber)
-    this.setState({ verified })
     this.setState({ version: DeviceInfo.getVersion() })
   }
 
@@ -88,8 +84,12 @@ export class Account extends React.Component<Props, State> {
     navigate(Screens.Profile)
   }
 
-  backupScreen() {
+  goToBackupScreen() {
     navigate(Screens.BackupIntroduction)
+  }
+
+  goToVerification() {
+    navigate(Screens.VerificationEducationScreen)
   }
 
   goToInvite() {
@@ -167,21 +167,12 @@ export class Account extends React.Component<Props, State> {
 
   getDevSettingsComp() {
     const { devModeActive } = this.props
-    const { verified } = this.state
 
     if (!devModeActive) {
       return null
     } else {
       return (
         <View style={style.devSettings}>
-          <View style={style.devSettingsItem}>
-            <Text>Dev Settings</Text>
-            <View>
-              {verified === undefined && <Text>Checking Verification</Text>}
-              {verified === true && <Text>Verified</Text>}
-              {verified === false && <Text>Not Verified</Text>}
-            </View>
-          </View>
           <View style={style.devSettingsItem}>
             <TouchableOpacity onPress={this.revokeNumberVerification}>
               <Text>Revoke Number Verification</Text>
@@ -213,7 +204,7 @@ export class Account extends React.Component<Props, State> {
   }
 
   render() {
-    const { t, account } = this.props
+    const { t, account, numberVerified } = this.props
 
     return (
       <ScrollView style={style.scrollView}>
@@ -233,8 +224,14 @@ export class Account extends React.Component<Props, State> {
           <View style={style.containerList}>
             <SettingsItem
               title={t('backupKeyFlow6:backupAndRecovery')}
-              onPress={this.backupScreen}
+              onPress={this.goToBackupScreen}
             />
+            {!numberVerified && (
+              <SettingsItem
+                title={t('nuxVerification2:getVerified')}
+                onPress={this.goToVerification}
+              />
+            )}
             <SettingsItem title={t('invite')} onPress={this.goToInvite} />
             <SettingsItem title={t('editProfile')} onPress={this.goToProfile} />
             {features.SHOW_SHOW_REWARDS_APP_LINK && (
@@ -257,23 +254,10 @@ export class Account extends React.Component<Props, State> {
               <Text style={fontStyles.bodySmall}>{t('version') + ' ' + this.state.version}</Text>
             </View>
             <View style={style.accountFooterText}>
-              <Trans i18nKey="testFaqHere">
-                <Text style={fontStyles.bodySmall}>Test FAQ is </Text>
-                <Link style={[fontStyles.bodySmall, fontStyles.linkInline]} onPress={this.goToFAQ}>
-                  here
-                </Link>
-              </Trans>
+              <Link onPress={this.goToFAQ}>{t('testFaqLink')}</Link>
             </View>
             <View style={style.accountFooterText}>
-              <Trans i18nKey="termsOfServiceHere">
-                <Text style={fontStyles.bodySmall}>Terms of service are </Text>
-                <Link
-                  style={[fontStyles.bodySmall, fontStyles.linkInline]}
-                  onPress={this.goToTerms}
-                >
-                  here
-                </Link>
-              </Trans>
+              <Link onPress={this.goToTerms}>{t('termsOfServiceLink')}</Link>
             </View>
           </View>
         </SafeAreaView>
