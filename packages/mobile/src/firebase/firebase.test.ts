@@ -2,7 +2,12 @@ import { expectSaga } from 'redux-saga-test-plan'
 import { throwError } from 'redux-saga-test-plan/providers'
 import { call, select } from 'redux-saga/effects'
 import { currentLanguageSelector } from 'src/app/reducers'
-import { initializeCloudMessaging, registerTokenToDb, setUserLanguage } from 'src/firebase/firebase'
+import {
+  initializeCloudMessaging,
+  isVersionBelowMinimum,
+  registerTokenToDb,
+  setUserLanguage,
+} from 'src/firebase/firebase'
 import { mockAccount2 } from 'test/values'
 
 const hasPermissionMock = jest.fn(() => null)
@@ -77,5 +82,14 @@ describe(initializeCloudMessaging, () => {
       .call(registerTokenToDb, app, address, mockFcmToken)
       .call(setUserLanguage, address, mockLanguage)
       .run()
+  })
+})
+
+describe('Firebase version check', () => {
+  it('Correctly check if version is deprecated', () => {
+    expect(isVersionBelowMinimum('1.5.0', '1.4.0')).toBe(false)
+    expect(isVersionBelowMinimum('1.4.0', '1.5.0')).toBe(true)
+    expect(isVersionBelowMinimum('1.4.0', '1.4.0')).toBe(false)
+    expect(isVersionBelowMinimum('1.4.0', '1.4.0.1')).toBe(true)
   })
 })
