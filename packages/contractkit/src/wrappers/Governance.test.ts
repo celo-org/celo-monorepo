@@ -15,6 +15,8 @@ const expConfig = NetworkConfig.governance
 
 testWithGanache('Governance Wrapper', (web3) => {
   const ONE_USD = web3.utils.toWei('1', 'ether')
+  const ONE_SEC = 1000
+  const EXTENDED_TIMEOUT = 10 * ONE_SEC
   const kit = newKitFromWeb3(web3)
   const minDeposit = web3.utils.toWei(expConfig.minDeposit.toString(), 'ether')
 
@@ -174,7 +176,7 @@ testWithGanache('Governance Wrapper', (web3) => {
       expect(exists).toBeFalsy()
 
       await verifyRepointResult(repoints)
-    })
+    }, EXTENDED_TIMEOUT)
   })
 
   describe('Hotfixes', () => {
@@ -226,7 +228,7 @@ testWithGanache('Governance Wrapper', (web3) => {
       const validators = await kit.contracts.getValidators()
       const record = await governance.getHotfixRecord(hotfix.hash)
       expect(record.preparedEpoch).toBe(await validators.getEpochNumber())
-    })
+    }, EXTENDED_TIMEOUT)
 
     it('#executeHotfix', async () => {
       await whitelistQuorumFn()
@@ -240,6 +242,6 @@ testWithGanache('Governance Wrapper', (web3) => {
       expect(record.executed).toBeTruthy()
 
       await verifyRepointResult(repoints)
-    })
+    }, EXTENDED_TIMEOUT)
   })
 })

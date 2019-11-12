@@ -21,7 +21,7 @@ export class ProposalUtility extends Proposal {
     super(transactions)
   }
 
-  static from(proposal: Proposal, kit: ContractKit) {
+  static fromProposalAndKit(proposal: Proposal, kit: ContractKit) {
     return new ProposalUtility(proposal.transactions, kit)
   }
 
