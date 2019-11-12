@@ -1,11 +1,12 @@
 /* tslint:disable no-console */
 import { newKit } from '@celo/contractkit'
+import { IdentityMetadataWrapper } from '@celo/contractkit/lib/identity'
 import {
   createAttestationServiceURLClaim,
   createNameClaim,
-  IdentityMetadataWrapper,
-} from '@celo/contractkit/lib/identity'
+} from '@celo/contractkit/lib/identity/claims/claim'
 import { concurrentMap } from '@celo/utils/lib/async'
+import { LocalSigner } from '@celo/utils/lib/signatureUtils'
 import { writeFileSync } from 'fs'
 import { uploadArtifacts } from 'src/lib/artifacts'
 import { switchToClusterFromEnv } from 'src/lib/cluster'
@@ -63,7 +64,7 @@ function metadataURLForCLabsValidator(testnet: string, address: string) {
   return `https://storage.googleapis.com/${CLABS_VALIDATOR_METADATA_BUCKET}/${testnet}/validator-${testnet}-${address}-metadata.json`
 }
 
-async function makeMetadata(testnet: string, address: string, index: number) {
+async function makeMetadata(testnet: string, address: string, index: number, privateKey: string) {
   const attestationServiceClaim = createAttestationServiceURLClaim(
     getAttestationServiceUrl(testnet, index)
   )
@@ -73,9 +74,9 @@ async function makeMetadata(testnet: string, address: string, index: number) {
   const fileName = `validator-${testnet}-${address}-metadata.json`
   const filePath = `/tmp/${fileName}`
 
-  const metadata = IdentityMetadataWrapper.fromEmpty()
-  metadata.addClaim(nameClaim)
-  metadata.addClaim(attestationServiceClaim)
+  const metadata = IdentityMetadataWrapper.fromEmpty(address)
+  await metadata.addClaim(nameClaim, LocalSigner(privateKey))
+  await metadata.addClaim(attestationServiceClaim, LocalSigner(privateKey))
   writeFileSync(filePath, metadata.toString())
 
   await uploadFileToGoogleStorage(
@@ -89,7 +90,7 @@ async function makeMetadata(testnet: string, address: string, index: number) {
 
 export async function registerMetadata(testnet: string, privateKey: string, index: number) {
   const address = privateKeyToAddress(privateKey)
-  await makeMetadata(testnet, address, index)
+  await makeMetadata(testnet, address, index, privateKey)
 
   const kit = newKit('http://localhost:8545')
   kit.addAccount(privateKey)
