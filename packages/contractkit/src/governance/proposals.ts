@@ -7,7 +7,7 @@ import { concurrentMap } from '@celo/utils/lib/async'
 
 import { CeloContract } from '../base'
 import { ContractKit } from '../kit'
-import { CeloTransactionObject, parseBuffer, toBuffer } from '../wrappers/BaseWrapper'
+import { bufferToString, CeloTransactionObject, stringToBuffer } from '../wrappers/BaseWrapper'
 import { Proposal, ProposalTransaction } from '../wrappers/Governance'
 
 export interface CeloProposalTransactionJSON {
@@ -45,7 +45,7 @@ export class ProposalUtility extends Proposal {
       // lookup CeloContractMethod name from transaction data
       const contract = await this.kit._web3Contracts.getContract(celoContractName)
       const selectors = Object.keys(contract.methods)
-      const funcSelector = parseBuffer(transaction.data.slice(0, 4)) // func sig is first 4 bytes
+      const funcSelector = bufferToString(transaction.data.slice(0, 4)) // func sig is first 4 bytes
       const idx = selectors.findIndex((selector) => selector === funcSelector)
       if (idx === -1) {
         throw new Error(`No method matching ${transaction} found on ${celoContractName}`)
@@ -54,7 +54,7 @@ export class ProposalUtility extends Proposal {
 
       // lookup CeloContractMethod args from CeloContractMethod types and transaction data
       const methodParamTypes = methodName.slice(methodName.indexOf('(') + 1, -1).split(',')
-      const encodedParams = parseBuffer(transaction.data.slice(4))
+      const encodedParams = bufferToString(transaction.data.slice(4))
       const paramObject = this.kit.web3.eth.abi.decodeParameters(methodParamTypes, encodedParams)
       const args = Array.from(Array(methodParamTypes.length).keys()).map((i) => paramObject[i])
 
@@ -74,7 +74,7 @@ export class ProposalTransactionFactory {
     return {
       value: new BigNumber(params.value),
       destination: params.to,
-      data: toBuffer(tx.encodeABI()),
+      data: stringToBuffer(tx.encodeABI()),
     }
   }
 

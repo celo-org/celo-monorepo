@@ -25,39 +25,27 @@ export abstract class BaseWrapper<T extends Contract> {
   }
 }
 
-export function numberLikeToBigNumber(input: NumberLike) {
-  return new BigNumber(input)
-}
+export const numberLikeToBigNumber = (input: NumberLike) => new BigNumber(input)
 
-export function numberLikeToString(input: NumberLike) {
-  return numberLikeToBigNumber(input).toFixed()
-}
+export const numberLikeToString = (input: NumberLike) => numberLikeToBigNumber(input).toFixed()
 
-export function numberLikeToInt(input: NumberLike) {
-  return numberLikeToBigNumber(input)
+export const numberLikeToInt = (input: NumberLike) =>
+  numberLikeToBigNumber(input)
     .integerValue()
     .toNumber()
-}
 
-export function stringToBuffer(input: string | string[]) {
-  return Buffer.from(trimLeading0x(input as string), 'hex')
-}
+export const stringToBuffer = (input: string | string[]) =>
+  Buffer.from(trimLeading0x(input as string), 'hex')
 
-export function bufferToString(buf: Buffer) {
-  return prependLeading0x(buf.toString('hex'))
-}
+export const bufferToString = (buf: Buffer) => prependLeading0x(buf.toString('hex'))
 
 type SolBytes = Array<string | number[]>
-export function toSolidityBytes(input: Buffer | string): SolBytes {
-    return input as any
-}
+export const toSolidityBytes = (input: Buffer | string): SolBytes => input as any
 
 type Parser<A, B> = (input: A) => B
 
 /** Identity Parser */
-export function identity<A>(a: A) {
-  return a
-}
+export const identity = <A>(a: A) => a
 
 /**
  * Tuple parser
