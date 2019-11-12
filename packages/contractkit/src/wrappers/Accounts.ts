@@ -125,32 +125,17 @@ export class AccountsWrapper extends BaseWrapper<Accounts> {
    */
   async authorizeValidatorSigner(
     signer: Address,
-    proofOfSigningKeyPossession: Signature,
-    proofOfBlsKeyPossession?: string
+    proofOfSigningKeyPossession: Signature
   ): Promise<CeloTransactionObject<void>> {
-    if (proofOfBlsKeyPossession) {
-      return toTransactionObject(
-        this.kit,
-        this.contract.methods.authorizeValidatorSigner(
-          signer,
-          proofOfSigningKeyPossession.v,
-          proofOfSigningKeyPossession.r,
-          proofOfSigningKeyPossession.s
-        )
+    return toTransactionObject(
+      this.kit,
+      this.contract.methods.authorizeValidatorSigner(
+        signer,
+        proofOfSigningKeyPossession.v,
+        proofOfSigningKeyPossession.r,
+        proofOfSigningKeyPossession.s
       )
-    } else {
-      return toTransactionObject(
-        this.kit,
-        this.contract.methods.authorizeValidatorSigner(
-          signer,
-          proofOfBlsKeyPossession,
-          proofOfSigningKeyPossession.v,
-          proofOfSigningKeyPossession.r,
-          // @ts-ignore Typechain doesn't handle function overloading.
-          proofOfSigningKeyPossession.s
-        )
-      )
-    }
+    )
   }
 
   async generateProofOfSigningKeyPossession(account: Address, signer: Address) {

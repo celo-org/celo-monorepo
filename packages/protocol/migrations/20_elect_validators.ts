@@ -6,7 +6,7 @@ import {
 } from '@celo/protocol/lib/web3-utils'
 import { config } from '@celo/protocol/migrationsConfig'
 import { privateKeyToAddress, privateKeyToPublicKey } from '@celo/utils/lib/address'
-import { getPublicKeysData } from '@celo/utils/lib/bls'
+import { getBlsPublicKey, getBlsPoP } from '@celo/utils/lib/bls'
 import { toFixed } from '@celo/utils/lib/fixidity'
 import { BigNumber } from 'bignumber.js'
 import { AccountsInstance, ElectionInstance, LockedGoldInstance, ValidatorsInstance } from 'types'
@@ -99,8 +99,6 @@ async function registerValidator(
   index: number,
   networkName: string
 ) {
-  const publicKeysData = getPublicKeysData(validatorPrivateKey)
-
   await lockGold(
     accounts,
     lockedGold,
@@ -114,8 +112,12 @@ async function registerValidator(
     to: accounts.address,
   })
 
+  const publicKey = privateKeyToPublicKey(validatorPrivateKey)
+  const blsPublicKey = getBlsPublicKey(validatorPrivateKey)
+  const blsPoP = getBlsPoP(validatorPrivateKey)
+
   // @ts-ignore
-  const registerTx = validators.contract.methods.registerValidator(publicKeysData)
+  const registerTx = validators.contract.methods.registerValidator(publicKey, blsPublicKey, blsPoP)
 
   await sendTransactionWithPrivateKey(web3, registerTx, validatorPrivateKey, {
     to: validators.address,

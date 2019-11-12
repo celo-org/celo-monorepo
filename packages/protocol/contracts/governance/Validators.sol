@@ -81,8 +81,13 @@ contract Validators is
     uint256 lastRemovedFromGroupTimestamp;
   }
 
+  struct PublicKeys {
+    bytes ecdsa;
+    bytes bls;
+  }
+
   struct Validator {
-    bytes publicKeysData;
+    PublicKeys keys;
     address affiliation;
     FixidityLib.Fraction score;
     MembershipHistory membershipHistory;
@@ -110,11 +115,12 @@ contract Validators is
   event GroupLockedGoldRequirementsSet(uint256 value, uint256 duration);
   event ValidatorLockedGoldRequirementsSet(uint256 value, uint256 duration);
   event MembershipHistoryLengthSet(uint256 length);
-  event ValidatorRegistered(address indexed validator, bytes publicKeysData);
+  event ValidatorRegistered(address indexed validator, bytes ecdsaKey, bytes blsKey);
   event ValidatorDeregistered(address indexed validator);
   event ValidatorAffiliated(address indexed validator, address indexed group);
   event ValidatorDeaffiliated(address indexed validator, address indexed group);
-  event ValidatorPublicKeysDataUpdated(address indexed validator, bytes publicKeysData);
+  event ValidatorEcdsaKeyUpdated(address indexed validator, bytes ecdsaKey);
+  event ValidatorBlsKeyUpdated(address indexed validator, bytes blsKey);
   event ValidatorGroupRegistered(address indexed group, uint256 commission);
   event ValidatorGroupDeregistered(address indexed group);
   event ValidatorGroupMemberAdded(address indexed group, address indexed validator);
@@ -254,27 +260,32 @@ contract Validators is
 
   /**
    * @notice Registers a validator unaffiliated with any validator group.
-   * @param publicKeysData Comprised of three tightly-packed elements:
-   *    - publicKey - The public key that the validator is using for consensus, should match
-   *      msg.sender. 64 bytes.
-   *    - blsPublicKey - The BLS public key that the validator is using for consensus, should pass
-   *      proof of possession. 48 bytes.
-   *    - blsPoP - The BLS public key proof of possession. 96 bytes.
+   * @param ecdsaKey The ECDSA public key that the validator is using for consensus, should match
+   *   the validator signer. 64 bytes.
+   * @param blsKey The BLS public key that the validator is using for consensus, should pass proof
+   *   of possession. 48 bytes.
+   * @param blsPop The BLS public key proof-of-possession, which consists of a signature on the
+   *   account address. 96 bytes.
    * @return True upon success.
    * @dev Fails if the account is already a validator or validator group.
    * @dev Fails if the account does not have sufficient Locked Gold.
    */
-  function registerValidator(bytes calldata publicKeysData) external nonReentrant returns (bool) {
+  function registerValidator(bytes calldata ecdsaKey, bytes calldata blsKey, bytes calldata blsPop)
+    external
+    nonReentrant
+    returns (bool)
+  {
     address account = getAccounts().activeValidatorSignerToAccount(msg.sender);
     require(!isValidator(account) && !isValidatorGroup(account));
     uint256 lockedGoldBalance = getLockedGold().getAccountTotalLockedGold(account);
     require(lockedGoldBalance >= validatorLockedGoldRequirements.value);
     Validator storage validator = validators[account];
     address signer = getAccounts().getValidatorSigner(account);
-    _updatePublicKeysData(validator, signer, publicKeysData);
+    _updateEcdsaKey(validator, signer, ecdsaKey);
+    _updateBlsKey(validator, account, blsKey, blsPop);
     registeredValidators.push(account);
     updateMembershipHistory(account, address(0));
-    emit ValidatorRegistered(account, publicKeysData);
+    emit ValidatorRegistered(account, ecdsaKey, blsKey);
     return true;
   }
 
@@ -466,96 +477,90 @@ contract Validators is
   }
 
   /**
-   * @notice Updates a validator's public keys data.
-   * @param account The validator whose public keys data should be updated.
-   * @param signer The address used to sign consensus message. Coupled to the BLS key.
-   * @param publicKeysData Comprised of three tightly-packed elements:
-   *    - publicKey - The public key that the validator is using for consensus, should match
-   *      `signer`. 64 bytes.
-   *    - blsPublicKey - The BLS public key that the validator is using for consensus, should pass
-   *      proof of possession. 48 bytes.
-   *    - blsPoP - The BLS public key proof of possession. 96 bytes.
-   * @dev Called by the registered `Accounts` contract when a validator signer is authorized.
+   * @notice Updates a validator's BLS key.
+   * @param blsKey The BLS public key that the validator is using for consensus, should pass proof
+   *   of possession. 48 bytes.
+   * @param blsPop The BLS public key proof-of-possession, which consists of a signature on the
+   *   account address. 96 bytes.
    * @return True upon success.
    */
-  function updatePublicKeysData(address account, address signer, bytes calldata publicKeysData)
+  function updateBlsKey(bytes calldata blsKey, bytes calldata blsPop) external returns (bool) {
+    address account = getAccounts().activeValidatorSignerToAccount(msg.sender);
+    require(isValidator(account));
+    Validator storage validator = validators[account];
+    _updateBlsKey(validator, account, blsKey, blsPop);
+    emit ValidatorBlsKeyUpdated(account, blsKey);
+    return true;
+  }
+
+  /**
+   * @notice Updates a validator's BLS key.
+   * @param validator The validator whose public keys data should be updated.
+   * @param account The address under which the validator is registered.
+   * @param blsKey The BLS public key that the validator is using for consensus, should pass proof
+   *   of possession. 48 bytes.
+   * @param blsPop The BLS public key proof-of-possession, which consists of a signature on the
+   *   account address. 96 bytes.
+   * @return True upon success.
+   */
+  function _updateBlsKey(
+    Validator storage validator,
+    address account,
+    bytes memory blsKey,
+    bytes memory blsPop
+  ) private returns (bool) {
+    require(blsKey.length == 48);
+    require(blsPop.length == 96);
+    // Use the proof of possession bytes
+    // TODO: Should this be the `account` or `signer` key here?
+    require(checkProofOfPossession(account, blsKey, blsPop));
+    validator.keys.bls = blsKey;
+    return true;
+  }
+
+  /**
+   * @notice Updates a validator's ECDSA key.
+   * @param account The address under which the validator is registered.
+   * @param v The recovery id of the incoming ECDSA signature.
+   * @param r Output value r of the ECDSA signature.
+   * @param s Output value s of the ECDSA signature.
+   * @dev v, r, s constitute the ECDSA key's signature on `account`.
+   * @return True upon success.
+   */
+  function updateEcdsaKey(address account, address signer, uint8 v, bytes32 r, bytes32 s)
     external
     onlyRegisteredContract(ACCOUNTS_REGISTRY_ID)
     returns (bool)
   {
     require(isValidator(account));
     Validator storage validator = validators[account];
-    _updatePublicKeysData(validator, signer, publicKeysData);
-    emit ValidatorPublicKeysDataUpdated(account, publicKeysData);
+    bytes32 addressHash = keccak256(abi.encodePacked(account));
+    bytes memory prefix = "\x19Ethereum Signed Message:\n32";
+    bytes32 prefixedHash = keccak256(abi.encodePacked(prefix, addressHash));
+    bytes memory ecdsaKey = ecrecoverPublicKey(prefixedHash, v, r, s);
+    require(_updateEcdsaKey(validator, signer, ecdsaKey));
+    emit ValidatorEcdsaKeyUpdated(account, ecdsaKey);
     return true;
   }
 
   /**
-   * @notice Updates a validator's public keys data.
+   * @notice Updates a validator's ECDSA key.
    * @param validator The validator whose public keys data should be updated.
-   * @param signer The address used to sign consensus message. Coupled to the BLS key.
-   * @param publicKeysData Comprised of three tightly-packed elements:
-   *    - publicKey - The public key that the validator is using for consensus, should match
-   *      `signer`. 64 bytes.
-   *    - blsPublicKey - The BLS public key that the validator is using for consensus, should pass
-   *      proof of possession. 48 bytes.
-   *    - blsPoP - The BLS public key proof of possession. 96 bytes.
+   * @param signer The address with which the validator is signing consensus messages.
+   * @param ecdsaKey The ECDSA public key that the validator is using for consensus. Should match
+   *   `signer`. 64 bytes.
    * @return True upon success.
    */
-  function _updatePublicKeysData(
-    Validator storage validator,
-    address signer,
-    bytes memory publicKeysData
-  ) private returns (bool) {
-    // secp256k1 public key + BLS public key + BLS proof of possession
-    require(publicKeysData.length == (64 + 48 + 96));
-    // Use the proof of possession bytes
-    require(checkProofOfPossession(signer, publicKeysData.slice(64, 48 + 96)));
-    validator.publicKeysData = publicKeysData;
-    return true;
-  }
-
-  /**
-   * @notice Updates a validator's public keys data.
-   * @param publicKeysData Comprised of three tightly-packed elements:
-   *    - publicKey - The public key that the validator is using for consensus, should match
-   *      msg.sender. 64 bytes.
-   *    - blsPublicKey - The BLS public key that the validator is using for consensus, should pass
-   *      proof of possession. 48 bytes.
-   *    - blsPoP - The BLS public key proof of possession. 96 bytes.
-   * @return True upon success.
-   */
-  function updatePublicKeysData(bytes calldata publicKeysData) external returns (bool) {
-    address account = getAccounts().activeValidatorSignerToAccount(msg.sender);
-    require(isValidator(account));
-    Validator storage validator = validators[account];
-    _updatePublicKeysData(validator, publicKeysData);
-    emit ValidatorPublicKeysDataUpdated(account, publicKeysData);
-    return true;
-  }
-
-  /**
-   * @notice Updates a validator's public keys data.
-   * @param validator The validator whose public keys data should be updated.
-   * @param publicKeysData Comprised of three tightly-packed elements:
-   *    - publicKey - The public key that the validator is using for consensus, should match
-   *      msg.sender. 64 bytes.
-   *    - blsPublicKey - The BLS public key that the validator is using for consensus, should pass
-   *      proof of possession. 48 bytes.
-   *    - blsPoP - The BLS public key proof of possession. 96 bytes.
-   * @return True upon success.
-   */
-  function _updatePublicKeysData(Validator storage validator, bytes memory publicKeysData)
+  function _updateEcdsaKey(Validator storage validator, address signer, bytes memory ecdsaKey)
     private
     returns (bool)
   {
+    require(ecdsaKey.length == 64);
     require(
-      // secp256k1 public key + BLS public key + BLS proof of possession
-      publicKeysData.length == (64 + 48 + 96)
+      address(uint256(keccak256(ecdsaKey)) >> 96) == signer,
+      "ECDSA key does not match signer"
     );
-    // Use the proof of possession bytes
-    require(checkProofOfPossession(msg.sender, publicKeysData.slice(64, 48 + 96)));
-    validator.publicKeysData = publicKeysData;
+    validator.keys.ecdsa = ecdsaKey;
     return true;
   }
 
@@ -760,7 +765,7 @@ contract Validators is
   function getValidatorFromSigner(address signer)
     external
     view
-    returns (bytes memory publicKeysData, address affiliation, uint256 score)
+    returns (bytes memory ecdsaKey, bytes memory blsKey, address affiliation, uint256 score)
   {
     address account = getAccounts().validatorSignerToAccount(signer);
     return getValidator(account);
@@ -774,11 +779,16 @@ contract Validators is
   function getValidator(address account)
     public
     view
-    returns (bytes memory publicKeysData, address affiliation, uint256 score)
+    returns (bytes memory ecdsaKey, bytes memory blsKey, address affiliation, uint256 score)
   {
     require(isValidator(account));
     Validator storage validator = validators[account];
-    return (validator.publicKeysData, validator.affiliation, validator.score.unwrap());
+    return (
+      validator.keys.ecdsa,
+      validator.keys.bls,
+      validator.affiliation,
+      validator.score.unwrap()
+    );
   }
 
   /**
@@ -910,7 +920,7 @@ contract Validators is
    * @return Whether a particular address is a registered validator.
    */
   function isValidator(address account) public view returns (bool) {
-    return validators[account].publicKeysData.length > 0;
+    return validators[account].keys.bls.length > 0;
   }
 
   /**

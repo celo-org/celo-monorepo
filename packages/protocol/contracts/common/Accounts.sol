@@ -9,16 +9,8 @@ import "./interfaces/IAccounts.sol";
 import "../common/Initializable.sol";
 import "../common/Signatures.sol";
 import "../common/UsingRegistry.sol";
-import "../common/UsingPrecompiles.sol";
 
-contract Accounts is
-  IAccounts,
-  Ownable,
-  ReentrancyGuard,
-  Initializable,
-  UsingRegistry,
-  UsingPrecompiles
-{
+contract Accounts is IAccounts, Ownable, ReentrancyGuard, Initializable, UsingRegistry {
   using SafeMath for uint256;
 
   struct Signers {
@@ -172,36 +164,10 @@ contract Accounts is
     Account storage account = accounts[msg.sender];
     authorize(signer, v, r, s);
     account.signers.validator = signer;
-    // Registered validators must update their BLS public key data when updating their validator
-    // signer.
-    require(!getValidators().isValidator(msg.sender));
-    emit ValidatorSignerAuthorized(msg.sender, signer);
-  }
-  /**
-   * @notice Authorizes an address to sign consensus messages on behalf of the account.
-   * @param signer The address of the signing key to authorize.
-   * @param publicKeysData Comprised of three tightly-packed elements:
-   *    - publicKey - The public key that the validator is using for consensus, should match
-   *      `signer`. 64 bytes.
-   *    - blsPublicKey - The BLS public key that the validator is using for consensus, should pass
-   *      proof of possession. 48 bytes.
-   *    - blsPoP - The BLS public key proof of possession. 96 bytes.
-   * @param v The recovery id of the incoming ECDSA signature.
-   * @param r Output value r of the ECDSA signature.
-   * @param s Output value s of the ECDSA signature.
-   * @dev v, r, s constitute `signer`'s signature on `msg.sender`.
-   */
-  function authorizeValidatorSigner(
-    address signer,
-    bytes calldata publicKeysData,
-    uint8 v,
-    bytes32 r,
-    bytes32 s
-  ) external nonReentrant {
-    Account storage account = accounts[msg.sender];
-    authorize(signer, v, r, s);
-    account.signers.validator = signer;
-    require(getValidators().updatePublicKeysData(msg.sender, signer, publicKeysData));
+    IValidators validators = getValidators();
+    if (validators.isValidator(msg.sender)) {
+      require(getValidators().updateEcdsaKey(msg.sender, signer, v, r, s));
+    }
     emit ValidatorSignerAuthorized(msg.sender, signer);
   }
 

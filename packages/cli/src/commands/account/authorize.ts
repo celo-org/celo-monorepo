@@ -4,7 +4,6 @@ import { newCheckBuilder } from '../../utils/checks'
 import { displaySendTx } from '../../utils/cli'
 import { Flags } from '../../utils/command'
 
-// TODO: Support authorizing a validator signer when a validator is registered.
 export default class Authorize extends BaseCommand {
   static description = 'Authorize an attestation, validator, or vote signer'
 

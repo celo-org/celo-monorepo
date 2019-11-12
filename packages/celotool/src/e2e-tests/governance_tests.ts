@@ -1,5 +1,5 @@
 import { ContractKit, newKitFromWeb3 } from '@celo/contractkit'
-import { getPublicKeysData } from '@celo/utils/lib/bls'
+import { getBlsPublicKey, getBlsPoP } from '@celo/utils/lib/bls'
 import { fromFixed, toFixed } from '@celo/utils/lib/fixidity'
 import BigNumber from 'bignumber.js'
 import { assert } from 'chai'
@@ -138,7 +138,6 @@ describe('governance tests', () => {
   const authorizeValidatorSigner = async (
     validatorWeb3: any,
     signerWeb3: any,
-    publicKeysData: string,
     txOptions: any = {}
   ) => {
     const validator = (await validatorWeb3.eth.getAccounts())[0]
@@ -150,18 +149,33 @@ describe('governance tests', () => {
     ).contracts.getAccounts()).generateProofOfSigningKeyPossession(validator, signer)
     const validatorKit = newKitFromWeb3(validatorWeb3)
     const validatorAccounts = await validatorKit._web3Contracts.getAccounts()
-    const tx = validatorAccounts.methods.authorizeValidatorSigner(
-      signer,
-      publicKeysData,
-      pop.v,
-      pop.r,
-      pop.s
-    )
+    const tx = validatorAccounts.methods.authorizeValidatorSigner(signer, pop.v, pop.r, pop.s)
     let gas = txOptions.gas
     if (!gas) {
       gas = await tx.estimateGas({ ...txOptions })
     }
-    return tx.send({ from: validator, ...txOptions, gas })
+    await tx.send({ from: validator, ...txOptions, gas })
+  }
+
+  const updateValidatorBlsKey = async (
+    validatorWeb3: any,
+    signerWeb3: any,
+    signerPrivateKey: string,
+    txOptions: any = {}
+  ) => {
+    const validator = (await validatorWeb3.eth.getAccounts())[0]
+    const signer = (await signerWeb3.eth.getAccounts())[0]
+    await unlockAccount(signer, signerWeb3)
+    const blsPublicKey = getBlsPublicKey(signerPrivateKey)
+    const blsPop = getBlsPop(validator, signerPrivateKey)
+    const signerKit = newKitFromWeb3(signerWeb3)
+    const signerValidators = await validatorKit._web3Contracts.getValidators()
+    const tx = signerValidators.methods.updateBlsKey(blsPublicKey, blsPop)
+    let gas = txOptions.gas
+    if (!gas) {
+      gas = await tx.estimateGas({ ...txOptions })
+    }
+    await tx.send({ from: signer, ...txOptions, gas })
   }
 
   const isLastBlockOfEpoch = (blockNumber: number, epochSize: number) => {
@@ -251,10 +265,7 @@ describe('governance tests', () => {
       // Prepare for key rotation.
       const validatorWeb3 = new Web3('http://localhost:8549')
       const authorizedWeb3s = [new Web3('ws://localhost:8559'), new Web3('ws://localhost:8561')]
-      const authorizedPublicKeysData = [
-        getPublicKeysData(rotation0PrivateKey),
-        getPublicKeysData(rotation1PrivateKey),
-      ]
+      const authorizedPrivateKeys = [rotation0PrivateKey, rotation1PrivateKey]
 
       let index = 0
       let errorWhileChangingValidatorSet = ''
@@ -276,10 +287,11 @@ describe('governance tests', () => {
             assert.notInclude(newMembers, memberToRemove)
             // 2. Rotate keys for validator 2 by authorizing a new validating key.
             if (!doneAuthorizing) {
-              await authorizeValidatorSigner(
+              await authorizeValidatorSigner(validatorWeb3, authorizedWeb3s[index])
+              await updateValidatorBlsKey(
                 validatorWeb3,
                 authorizedWeb3s[index],
-                authorizedPublicKeysData[index]
+                authorizedPrivateKeys[index]
               )
             }
             doneAuthorizing = doneAuthorizing || index === 1

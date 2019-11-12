@@ -11,6 +11,7 @@ import {
   timeTravel,
 } from '@celo/protocol/lib/test-utils'
 import { fixed1, fromFixed, toFixed } from '@celo/utils/lib/fixidity'
+import { addressToPublicKey } from '@celo/utils/lib/address'
 import BigNumber from 'bignumber.js'
 import {
   AccountsContract,
@@ -40,9 +41,10 @@ Validators.numberFormat = 'BigNumber'
 
 const parseValidatorParams = (validatorParams: any) => {
   return {
-    publicKeysData: validatorParams[0],
-    affiliation: validatorParams[1],
-    score: validatorParams[2],
+    ecdsaKey: validatorParams[0],
+    blsKey: validatorParams[1],
+    affiliation: validatorParams[2],
+    score: validatorParams[3],
   }
 }
 
@@ -91,13 +93,10 @@ contract('Validators', (accounts: string[]) => {
   const maxGroupSize = new BigNumber(5)
 
   // A random 64 byte hex string.
-  const publicKey =
-    'ea0733ad275e2b9e05541341a97ee82678c58932464fad26164657a111a7e37a9fa0300266fb90e2135a1f1512350cb4e985488a88809b14e3cbe415e76e82b2'
   const blsPublicKey =
-    '4d23d8cd06f30b1fa7cf368e2f5399ab04bb6846c682f493a98a607d3dfb7e53a712bb79b475c57b0ac2785460f91301'
+    '0x4d23d8cd06f30b1fa7cf368e2f5399ab04bb6846c682f493a98a607d3dfb7e53a712bb79b475c57b0ac2785460f91301'
   const blsPoP =
-    '9d3e1d8f49f6b0d8e9a03d80ca07b1d24cf1cc0557bdcc04f5e17a46e35d02d0d411d956dbd5d2d2464eebd7b74ae30005d223780d785d2abc5644fac7ac29fb0e302bdc80c81a5d45018b68b1045068a4b3a4861c93037685fd0d252d740501'
-  const publicKeysData = '0x' + publicKey + blsPublicKey + blsPoP
+    '0x9d3e1d8f49f6b0d8e9a03d80ca07b1d24cf1cc0557bdcc04f5e17a46e35d02d0d411d956dbd5d2d2464eebd7b74ae30005d223780d785d2abc5644fac7ac29fb0e302bdc80c81a5d45018b68b1045068a4b3a4861c93037685fd0d252d740501'
   const commission = toFixed(1 / 100)
   beforeEach(async () => {
     accountsInstance = await Accounts.new()
@@ -129,9 +128,14 @@ contract('Validators', (accounts: string[]) => {
 
   const registerValidator = async (validator: string) => {
     await mockLockedGold.setAccountTotalLockedGold(validator, validatorLockedGoldRequirements.value)
+    const publicKey = await addressToPublicKey(validator, web3)
     await validators.registerValidator(
       // @ts-ignore bytes type
-      publicKeysData,
+      publicKey,
+      // @ts-ignore bytes type
+      blsPublicKey,
+      // @ts-ignore bytes type
+      blsPoP,
       { from: validator }
     )
   }
@@ -521,9 +525,10 @@ contract('Validators', (accounts: string[]) => {
     })
   })
 
-  describe('#registerValidator', () => {
+  describe.only('#registerValidator', () => {
     const validator = accounts[0]
     let resp: any
+    let publicKey: string
     describe('when the account is not a registered validator', () => {
       beforeEach(async () => {
         await mockLockedGold.setAccountTotalLockedGold(
@@ -538,9 +543,14 @@ contract('Validators', (accounts: string[]) => {
           const signer = accounts[9]
           const sig = await getParsedSignatureOfAddress(web3, validator, signer)
           await accountsInstance.authorizeValidatorSigner(signer, sig.v, sig.r, sig.s)
+          publicKey = await addressToPublicKey(validator, web3)
           resp = await validators.registerValidator(
             // @ts-ignore bytes type
-            publicKeysData
+            publicKey,
+            // @ts-ignore bytes type
+            blsPublicKey,
+            // @ts-ignore bytes type
+            blsPoP
           )
           const blockNumber = (await web3.eth.getBlock('latest')).number
           validatorRegistrationEpochNumber = Math.floor(blockNumber / EPOCH)
@@ -554,9 +564,14 @@ contract('Validators', (accounts: string[]) => {
           assert.deepEqual(await validators.getRegisteredValidators(), [validator])
         })
 
-        it('should set the validator public key', async () => {
+        it('should set the validator ecdsa public key', async () => {
           const parsedValidator = parseValidatorParams(await validators.getValidator(validator))
-          assert.equal(parsedValidator.publicKeysData, publicKeysData)
+          assert.equal(parsedValidator.ecdsaKey, publicKey)
+        })
+
+        it('should set the validator bls public key', async () => {
+          const parsedValidator = parseValidatorParams(await validators.getValidator(validator))
+          assert.equal(parsedValidator.blsKey, blsPublicKey)
         })
 
         it('should set account locked gold requirements', async () => {
@@ -583,7 +598,8 @@ contract('Validators', (accounts: string[]) => {
             event: 'ValidatorRegistered',
             args: {
               validator,
-              publicKeysData,
+              ecdsaKey: publicKey,
+              blsKey: blsPublicKey,
             },
           })
         })
@@ -597,14 +613,25 @@ contract('Validators', (accounts: string[]) => {
           validatorLockedGoldRequirements.value
         )
         // @ts-ignore bytes type
-        await validators.registerValidator(publicKeysData)
+        await validators.registerValidator(
+          // @ts-ignore bytes type
+          publicKey,
+          // @ts-ignore bytes type
+          blsPublicKey,
+          // @ts-ignore bytes type
+          blsPoP
+        )
       })
 
       it('should revert', async () => {
         await assertRevert(
           validators.registerValidator(
             // @ts-ignore bytes type
-            publicKeysData
+            publicKey,
+            // @ts-ignore bytes type
+            blsPublicKey,
+            // @ts-ignore bytes type
+            blsPoP
           )
         )
       })
@@ -620,7 +647,11 @@ contract('Validators', (accounts: string[]) => {
         await assertRevert(
           validators.registerValidator(
             // @ts-ignore bytes type
-            publicKeysData
+            publicKey,
+            // @ts-ignore bytes type
+            blsPublicKey,
+            // @ts-ignore bytes type
+            blsPoP
           )
         )
       })
@@ -638,7 +669,11 @@ contract('Validators', (accounts: string[]) => {
         await assertRevert(
           validators.registerValidator(
             // @ts-ignore bytes type
-            publicKeysData
+            publicKey,
+            // @ts-ignore bytes type
+            blsPublicKey,
+            // @ts-ignore bytes type
+            blsPoP
           )
         )
       })
@@ -1030,53 +1065,51 @@ contract('Validators', (accounts: string[]) => {
     })
   })
 
-  describe('#updatePublicKeysData()', () => {
-    const newPublicKey = web3.utils.randomHex(64).slice(2)
-    const newBlsPublicKey = web3.utils.randomHex(48).slice(2)
-    const newBlsPoP = web3.utils.randomHex(96).slice(2)
-    const newPublicKeysData = '0x' + newPublicKey + newBlsPublicKey + newBlsPoP
+  describe('#updateBlsKey()', () => {
+    const newBlsPublicKey = web3.utils.randomHex(48)
+    const newBlsPoP = web3.utils.randomHex(96)
     describe('when called by a registered validator', () => {
       const validator = accounts[0]
       beforeEach(async () => {
         await registerValidator(validator)
       })
 
-      describe('when the public keys data is the right length', () => {
+      describe('when the keys are the right length', () => {
         let resp: any
         beforeEach(async () => {
           // @ts-ignore Broken typechain typing for bytes
-          resp = await validators.updatePublicKeysData(newPublicKeysData)
+          resp = await validators.updateBlsKey(newBlsPublicKey, newBlsPoP)
         })
 
-        it('should set the validator public keys data', async () => {
+        it('should set the validator bls public key', async () => {
           const parsedValidator = parseValidatorParams(await validators.getValidator(validator))
-          assert.equal(parsedValidator.publicKeysData, newPublicKeysData)
+          assert.equal(parsedValidator.blsKey, newBlsPublicKey)
         })
 
-        it('should emit the ValidatorPublicKeysDataUpdated event', async () => {
+        it('should emit the ValidatorBlsKeyUpdated event', async () => {
           assert.equal(resp.logs.length, 1)
           const log = resp.logs[0]
           assertContainSubset(log, {
-            event: 'ValidatorPublicKeysDataUpdated',
+            event: 'ValidatorBlsKeyUpdated',
             args: {
               validator,
-              publicKeysData: newPublicKeysData,
+              blsKey: newBlsPublicKey,
             },
           })
         })
       })
 
-      describe('when the public keys data is too long', () => {
+      describe('when the public key is not 48 bytes', () => {
         it('should revert', async () => {
           // @ts-ignore Broken typechain typing for bytes
-          await assertRevert(validators.updatePublicKeysData(newPublicKeysData + '00'))
+          await assertRevert(validators.updateBlsKey(newBlsPublicKey + '01', newBlsPoP))
         })
       })
 
-      describe('when the public keys data is too short', () => {
+      describe('when the proof of possession is not 96 bytes', () => {
         it('should revert', async () => {
           // @ts-ignore Broken typechain typing for bytes
-          await assertRevert(validators.updatePublicKeysData(newPublicKeysData.slice(0, -2)))
+          await assertRevert(validators.updateBlsKey(newBlsPublicKey, newBlsPoP + '01'))
         })
       })
     })

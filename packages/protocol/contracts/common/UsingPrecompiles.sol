@@ -62,6 +62,62 @@ contract UsingPrecompiles {
   }
 
   /**
+   * @notice Recover the public key of a signed message.
+   * @param messageHash The hash of a message.
+   * @param v The recovery id of the incoming ECDSA signature.
+   * @param r Output value r of the ECDSA signature.
+   * @param s Output value s of the ECDSA signature.
+   * @return numerator/denominator of the computed quantity (not reduced).
+   */
+  function ecrecoverPublicKey(bytes32 messageHash, uint8 v, bytes32 r, bytes32 s)
+    public
+    returns (bytes memory)
+  {
+    /*
+    bytes publicKey;
+    // solhint-disable-next-line no-inline-assembly
+    assembly {
+      let newCallDataPosition := mload(0x40)
+      mstore(0x40, add(newCallDataPosition, calldatasize))
+      mstore(newCallDataPosition, messageHash)
+      mstore(add(newCallDataPosition, 1), v)
+      mstore(add(newCallDataPosition, 33), r)
+      mstore(add(newCallDataPosition, 65), s)
+      let success := staticcall(
+        3000, // estimated gas cost for this function
+        0xfe,
+        newCallDataPosition,
+        0x61, // input size, 3 * 32 + 1 = 97 bytes
+        0,
+        0
+      )
+
+      let returnDataSize := returndatasize
+      let returnDataPosition := mload(0x40)
+      mstore(0x40, add(returnDataPosition, returnDataSize))
+      returndatacopy(returnDataPosition, 0, returnDataSize)
+
+      switch success
+        case 0 {
+          revert(returnDataPosition, returnDataSize)
+        }
+        default {
+          returnNumerator := mload(returnDataPosition)
+          returnDenominator := mload(add(returnDataPosition, 32))
+        }
+    }
+    return (returnNumerator, returnDenominator);
+    */
+    bool success;
+    bytes memory publicKey;
+    (success, publicKey) = address(0xfe).call.gas(gasleft())(
+      abi.encodePacked(messageHash, v, r, s)
+    );
+    require(success);
+    return publicKey;
+  }
+
+  /**
    * @notice Returns the current epoch size in blocks.
    * @return The current epoch size in blocks.
    */
@@ -123,16 +179,19 @@ contract UsingPrecompiles {
 
   /**
    * @notice Checks a BLS proof of possession.
-   * @param proofOfPossessionBytes The public key and signature of the proof of possession.
+   * @param blsKey The BLS public key that the validator is using for consensus, should pass proof
+   *   of possession. 48 bytes.
+   * @param blsPop The BLS public key proof-of-possession, which consists of a signature on the
+   *   account address. 96 bytes.
    * @return True upon success.
    */
-  function checkProofOfPossession(address sender, bytes memory proofOfPossessionBytes)
+  function checkProofOfPossession(address sender, bytes memory blsKey, bytes memory blsPop)
     public
     returns (bool)
   {
     bool success;
     (success, ) = PROOF_OF_POSSESSION.call.value(0).gas(gasleft())(
-      abi.encodePacked(sender, proofOfPossessionBytes)
+      abi.encodePacked(sender, blsKey, blsPop)
     );
     return success;
   }

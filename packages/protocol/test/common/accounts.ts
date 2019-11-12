@@ -353,56 +353,6 @@ contract('Accounts', (accounts: string[]) => {
     })
   })
 
-  // authorizeValidatoSigner deviates slightly from the other authorize*Signer functions.
-  // This block tests those deviations.
-  describe('#authorizeValidatorSigner', async () => {
-    const authorized = accounts[1]
-    // Arbitrary hex string as MockValidators does not verify this info.
-    const publicKeysData = '0x02f2f48ee19680706196e2e339e5da3491186e0c4c5030670656b0e01611111111'
-    let sig
-
-    beforeEach(async () => {
-      await accountsInstance.createAccount()
-      sig = await getParsedSignatureOfAddress(web3, account, authorized)
-    })
-
-    describe('when a validator has not been registered', () => {
-      it('should succeed when no public keys data is passed', async () => {
-        await accountsInstance.authorizeValidatorSigner(authorized, sig.v, sig.r, sig.s)
-      })
-
-      it('should revert when public keys data is passed', async () => {
-        await assertRevert(
-          accountsInstance.authorizeValidatorSigner(authorized, publicKeysData, sig.v, sig.r, sig.s)
-        )
-      })
-    })
-
-    describe('when a validator has been registered', () => {
-      beforeEach(async () => {
-        await mockValidators.setValidator(account)
-      })
-
-      it('should revert when no public keys data is passed', async () => {
-        await assertRevert(
-          accountsInstance.authorizeValidatorSigner(authorized, sig.v, sig.r, sig.s)
-        )
-      })
-
-      it('should succeed when public keys data is passed', async () => {
-        await accountsInstance.authorizeValidatorSigner(
-          authorized,
-          publicKeysData,
-          sig.v,
-          sig.r,
-          sig.s
-        )
-        // @ts-ignore Typechain can't handle 'bytes' type.
-        assert.equal(await mockValidators.publicKeysData(account), publicKeysData)
-      })
-    })
-  })
-
   Object.keys(authorizationTestDescriptions).forEach((key) => {
     describe('authorization tests:', () => {
       let authorizationTest: any
