@@ -673,6 +673,14 @@ contract Election is
   }
 
   /**
+   * @notice Returns the active votes received across all groups.
+   * @return The active votes received across all groups.
+   */
+  function getActiveVotes() public view returns (uint256) {
+    return votes.active.total;
+  }
+
+  /**
    * @notice Returns the list of validator groups eligible to elect validators.
    * @return The list of validator groups eligible to elect validators.
    */
