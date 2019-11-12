@@ -521,23 +521,17 @@ contract Validators is
   /**
    * @notice Updates a validator's ECDSA key.
    * @param account The address under which the validator is registered.
-   * @param v The recovery id of the incoming ECDSA signature.
-   * @param r Output value r of the ECDSA signature.
-   * @param s Output value s of the ECDSA signature.
-   * @dev v, r, s constitute the ECDSA key's signature on `account`.
+   * @param signer The address which the validator is using to sign consensus messages.
+   * @param ecdsaKey The ECDSA public key corresponding to `signer`.
    * @return True upon success.
    */
-  function updateEcdsaKey(address account, address signer, uint8 v, bytes32 r, bytes32 s)
+  function updateEcdsaKey(address account, address signer, bytes calldata ecdsaKey)
     external
     onlyRegisteredContract(ACCOUNTS_REGISTRY_ID)
     returns (bool)
   {
     require(isValidator(account));
     Validator storage validator = validators[account];
-    bytes32 addressHash = keccak256(abi.encodePacked(account));
-    bytes memory prefix = "\x19Ethereum Signed Message:\n32";
-    bytes32 prefixedHash = keccak256(abi.encodePacked(prefix, addressHash));
-    bytes memory ecdsaKey = ecrecoverPublicKey(prefixedHash, v, r, s);
     require(_updateEcdsaKey(validator, signer, ecdsaKey));
     emit ValidatorEcdsaKeyUpdated(account, ecdsaKey);
     return true;

@@ -1,4 +1,8 @@
-import { parseSignature } from '@celo/utils/lib/signatureUtils'
+import {
+  hashMessageWithPrefix,
+  parseSignature,
+  signedMessageToPublicKey,
+} from '@celo/utils/lib/signatureUtils'
 import Web3 from 'web3'
 import { Address } from '../base'
 import { Accounts } from '../generated/types/Accounts'
@@ -120,22 +124,45 @@ export class AccountsWrapper extends BaseWrapper<Accounts> {
    * Authorizes an address to sign consensus messages on behalf of the account.
    * @param signer The address of the signing key to authorize.
    * @param proofOfSigningKeyPossession The account address signed by the signer address.
-   * @param proofOfBlsKeyPossession Proof-of-possession generated for the corresponding BLS key. Only needed if a validator has been registered.
    * @return A CeloTransactionObject
    */
   async authorizeValidatorSigner(
     signer: Address,
     proofOfSigningKeyPossession: Signature
   ): Promise<CeloTransactionObject<void>> {
-    return toTransactionObject(
-      this.kit,
-      this.contract.methods.authorizeValidatorSigner(
-        signer,
+    const validators = await this.kit.contracts.getValidators()
+    const account = this.kit.defaultAccount || (await this.kit.web3.eth.getAccounts())[0]
+    if (await validators.isValidator(account)) {
+      const message = this.kit.web3.utils.soliditySha3({ type: 'address', value: account })
+      const prefixedMsg = hashMessageWithPrefix(message)
+      const pubKey = signedMessageToPublicKey(
+        prefixedMsg,
         proofOfSigningKeyPossession.v,
         proofOfSigningKeyPossession.r,
         proofOfSigningKeyPossession.s
       )
-    )
+      return toTransactionObject(
+        this.kit,
+        this.contract.methods.authorizeValidatorSigner(
+          signer,
+          pubKey,
+          proofOfSigningKeyPossession.v,
+          proofOfSigningKeyPossession.r,
+          // @ts-ignore Typescript does not support overloading.
+          proofOfSigningKeyPossession.s
+        )
+      )
+    } else {
+      return toTransactionObject(
+        this.kit,
+        this.contract.methods.authorizeValidatorSigner(
+          signer,
+          proofOfSigningKeyPossession.v,
+          proofOfSigningKeyPossession.r,
+          proofOfSigningKeyPossession.s
+        )
+      )
+    }
   }
 
   async generateProofOfSigningKeyPossession(account: Address, signer: Address) {

@@ -10,7 +10,7 @@ import CreateMetadata from './create-metadata'
 import RegisterMetadata from './register-metadata'
 process.env.NO_SYNCCHECK = 'true'
 
-testWithGanache('account:authorize cmd', (web3: Web3) => {
+testWithGanache('account metadata cmds', (web3: Web3) => {
   let account: string
 
   beforeEach(async () => {

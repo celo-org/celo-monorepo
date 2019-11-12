@@ -1,14 +1,14 @@
+import assert = require('assert')
 import {
   ecrecover,
   fromRpcSig,
-  pubToAddress,
   privateToAddress,
   privateToPublic,
+  pubToAddress,
   sha3,
   toChecksumAddress,
 } from 'ethereumjs-util'
 import Web3 from 'web3'
-import assert = require('assert')
 
 export type Address = string
 

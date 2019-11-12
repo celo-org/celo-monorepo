@@ -1,6 +1,5 @@
 import { ContractKit, newKitFromWeb3 } from '@celo/contractkit'
 import { getBlsPublicKey, getBlsPoP } from '@celo/utils/lib/bls'
-import { privateKeyToPublicKey } from '@celo/utils/lib/address'
 import { fromFixed, toFixed } from '@celo/utils/lib/fixidity'
 import BigNumber from 'bignumber.js'
 import { assert } from 'chai'
@@ -185,7 +184,7 @@ describe('governance tests', () => {
     return blockNumber % epochSize === 0
   }
 
-  describe.only('when the validator set is changing', () => {
+  describe('when the validator set is changing', () => {
     let epoch: number
     const blockNumbers: number[] = []
     let validatorAccounts: string[]

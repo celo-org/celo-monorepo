@@ -1,4 +1,4 @@
-import { addressToPublicKey } from '@celo/lib/address'
+import { addressToPublicKey } from '@celo/utils/lib/address'
 import { BaseCommand } from '../../base'
 import { newCheckBuilder } from '../../utils/checks'
 import { displaySendTx } from '../../utils/cli'

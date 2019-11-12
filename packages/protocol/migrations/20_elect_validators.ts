@@ -6,7 +6,7 @@ import {
 } from '@celo/protocol/lib/web3-utils'
 import { config } from '@celo/protocol/migrationsConfig'
 import { privateKeyToAddress, privateKeyToPublicKey } from '@celo/utils/lib/address'
-import { getBlsPublicKey, getBlsPoP } from '@celo/utils/lib/bls'
+import { getBlsPoP, getBlsPublicKey } from '@celo/utils/lib/bls'
 import { toFixed } from '@celo/utils/lib/fixidity'
 import { BigNumber } from 'bignumber.js'
 import { AccountsInstance, ElectionInstance, LockedGoldInstance, ValidatorsInstance } from 'types'

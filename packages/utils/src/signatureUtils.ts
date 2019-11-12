@@ -45,6 +45,16 @@ export function LocalSigner(privateKey: string): Signer {
   }
 }
 
+export function signedMessageToPublicKey(message: string, v: number, r: string, s: string) {
+  const pubKeyBuf = ethjsutil.ecrecover(
+    Buffer.from(message.slice(2), 'hex'),
+    v,
+    Buffer.from(r.slice(2), 'hex'),
+    Buffer.from(s.slice(2), 'hex')
+  )
+  return '0x' + pubKeyBuf.toString('hex')
+}
+
 export function signMessage(message: string, privateKey: string, address: string) {
   return signMessageWithoutPrefix(hashMessageWithPrefix(message), privateKey, address)
 }

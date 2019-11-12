@@ -4,7 +4,7 @@ import { IArg, ParseFn } from '@oclif/parser/lib/args'
 import { pathExistsSync } from 'fs-extra'
 import Web3 from 'web3'
 
-const parseBytes = (input, length, msg) => {
+const parseBytes = (input: string, length: number, msg: string) => {
   // Check that the string starts with 0x and has byte length of `length`.
   if (Web3.utils.isHex(input) && input.length === length && input.startsWith('0x')) {
     return input
@@ -14,13 +14,13 @@ const parseBytes = (input, length, msg) => {
 }
 
 const parseEcdsaPublicKey: ParseFn<string> = (input) => {
-  parseBytes(input, 64, `${input} is not an ECDSA public key`)
+  return parseBytes(input, 64, `${input} is not an ECDSA public key`)
 }
 const parseBlsPublicKey: ParseFn<string> = (input) => {
-  parseBytes(input, 48, `${input} is not a BLS public key`)
+  return parseBytes(input, 48, `${input} is not a BLS public key`)
 }
 const parseBlsProofOfPossession: ParseFn<string> = (input) => {
-  parseBytes(input, 96, `${input} is not a BLS proof-of-possession`)
+  return parseBytes(input, 96, `${input} is not a BLS proof-of-possession`)
 }
 const parseAddress: ParseFn<string> = (input) => {
   if (Web3.utils.isAddress(input)) {

@@ -6,15 +6,19 @@ import "../interfaces/IValidators.sol";
  * @title Holds a list of addresses of validators
  */
 contract MockValidators is IValidators {
+  mapping(address => bool) public isValidator;
   mapping(address => uint256) private numGroupMembers;
   mapping(address => uint256) private lockedGoldRequirements;
   mapping(address => bool) private doesNotMeetAccountLockedGoldRequirements;
   mapping(address => address[]) private members;
   uint256 private numRegisteredValidators;
-  mapping(address => bytes) public publicKeysData;
 
-  function updateEcdsaKey(address, address, uint8, bytes32, bytes32) external returns (bool) {
+  function updateEcdsaKey(address, address, bytes calldata) external returns (bool) {
     return true;
+  }
+
+  function setValidator(address account) external {
+    isValidator[account] = true;
   }
 
   function setDoesNotMeetAccountLockedGoldRequirements(address account) external {

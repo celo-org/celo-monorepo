@@ -20,8 +20,6 @@ export default class ValidatorUpdateBlsKey extends BaseCommand {
     const res = this.parse(ValidatorUpdateBlsKey)
     this.kit.defaultAccount = res.flags.from
     const validators = await this.kit.contracts.getValidators()
-    const accounts = await this.kit.contracts.getAccounts()
-
     await newCheckBuilder(this, res.flags.from)
       .isSignerOrAccount()
       .canSignValidatorTxs()

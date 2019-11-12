@@ -1,4 +1,3 @@
-import { eqAddress } from '@celo/utils/lib/address'
 import Web3 from 'web3'
 import { Block } from 'web3/eth/types'
 import { failWith } from './cli'

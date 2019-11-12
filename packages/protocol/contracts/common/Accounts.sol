@@ -164,10 +164,30 @@ contract Accounts is IAccounts, Ownable, ReentrancyGuard, Initializable, UsingRe
     Account storage account = accounts[msg.sender];
     authorize(signer, v, r, s);
     account.signers.validator = signer;
-    IValidators validators = getValidators();
-    if (validators.isValidator(msg.sender)) {
-      require(getValidators().updateEcdsaKey(msg.sender, signer, v, r, s));
-    }
+    require(!getValidators().isValidator(msg.sender));
+    emit ValidatorSignerAuthorized(msg.sender, signer);
+  }
+
+  /**
+   * @notice Authorizes an address to sign consensus messages on behalf of the account.
+   * @param signer The address of the signing key to authorize.
+   * @param ecdsaKey The ECDSA key corresponding to `signer`.
+   * @param v The recovery id of the incoming ECDSA signature.
+   * @param r Output value r of the ECDSA signature.
+   * @param s Output value s of the ECDSA signature.
+   * @dev v, r, s constitute `signer`'s signature on `msg.sender`.
+   */
+  function authorizeValidatorSigner(
+    address signer,
+    bytes calldata ecdsaKey,
+    uint8 v,
+    bytes32 r,
+    bytes32 s
+  ) external nonReentrant {
+    Account storage account = accounts[msg.sender];
+    authorize(signer, v, r, s);
+    account.signers.validator = signer;
+    require(getValidators().updateEcdsaKey(msg.sender, signer, ecdsaKey));
     emit ValidatorSignerAuthorized(msg.sender, signer);
   }
 
