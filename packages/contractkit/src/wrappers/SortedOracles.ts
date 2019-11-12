@@ -7,8 +7,8 @@ import { SortedOracles } from '../generated/types/SortedOracles'
 import {
   BaseWrapper,
   CeloTransactionObject,
-  numberLikeToFrac,
   numberLikeToBigNumber,
+  numberLikeToFrac,
   numberLikeToInt,
   proxyCall,
   toTransactionObject,
