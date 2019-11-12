@@ -12,6 +12,7 @@ interface ReportOracleValueArgv extends CeloEnvArgv {
   token: string
   price: number
   // oracleAccount: string
+  runWithPortForward: boolean
 }
 
 export const builder = (argv: yargs.Argv) => {
@@ -26,18 +27,34 @@ export const builder = (argv: yargs.Argv) => {
       description: 'The price of 1 Celo Gold in the specified token (float values allowed)',
       demand: 'Please specify the price of 1 Celo Gold',
     })
+    .option('runWithPortForward', {
+      type: 'boolean',
+      description:
+        'Specify whether this command should be run port-forwarded, or is running within the cluster. Default is true',
+      default: true,
+    })
 }
 
 export const handler = async (argv: ReportOracleValueArgv) => {
-  await switchToClusterFromEnv(false)
+  if (argv.runWithPortForward) {
+    await switchToClusterFromEnv(false)
 
-  try {
-    await portForwardAnd(argv.celoEnv, reportCmd.bind(null, argv))
-    console.info('finished with the portforwarding???')
-  } catch (error) {
-    console.error(`Unable to report value of ${argv.token}`)
-    console.error(error.error)
-    process.exit(1)
+    try {
+      await portForwardAnd(argv.celoEnv, reportCmd.bind(null, argv))
+      console.info('finished with the portforwarding???')
+    } catch (error) {
+      console.error(`Unable to report value of ${argv.token}`)
+      console.error(error.error)
+      process.exit(1)
+    }
+  } else {
+    try {
+      await reportCmd(argv)
+    } catch (error) {
+      console.error(`Unable to report value of ${argv.token}`)
+      console.error(error.error)
+      process.exit(1)
+    }
   }
   process.exit()
 }
@@ -60,7 +77,7 @@ async function reportCmd(argv: ReportOracleValueArgv) {
     numerator = numerator.multipliedBy(denominator)
   }
 
-  const kit = newKit('http://localhost:8545')
+  const kit = newKit('http://35.197.1.183:8545')
   const mnemonic = fetchEnv(envVar.MNEMONIC)
   // TODO: switch this to the right account type after deploying testnet
   // Or, don't hardcode this at all.
@@ -74,7 +91,6 @@ async function reportCmd(argv: ReportOracleValueArgv) {
     numerator.toNumber(),
     denominator.toNumber(),
     oracleAddress
-    // '0xF4314cb9046bECe6AA54bb9533155434d0c76909'
   )
 
   await tx.sendAndWaitForReceipt()
