@@ -8,6 +8,7 @@ import BigNumber from 'bignumber.js'
 import { assert } from 'chai'
 import Web3 from 'web3'
 import { TransactionReceipt } from 'web3/types'
+import { transferCeloGold, transferCeloDollars } from '../lib/geth'
 import {
   getEnode,
   GethInstanceConfig,
@@ -217,8 +218,8 @@ describe('Transfer tests', function(this: any) {
 
     // Give the account we will send transfers as sufficient gold and dollars.
     const startBalance = TransferAmount.times(500)
-    const resDollars = await transferCeloDollars(validatorAddress, FromAddress, startBalance)
-    const resGold = await transferCeloGold(validatorAddress, FromAddress, startBalance)
+    const resDollars = await transferCeloDollars(kit, validatorAddress, FromAddress, startBalance)
+    const resGold = await transferCeloGold(kit, validatorAddress, FromAddress, startBalance)
     await Promise.all([resDollars.waitReceipt(), resGold.waitReceipt()])
   }
 
@@ -246,46 +247,6 @@ describe('Transfer tests', function(this: any) {
 
     // Unlock Node account
     await kit.web3.eth.personal.unlockAccount(FromAddress, '', 1000000)
-  }
-
-  const transferCeloGold = async (
-    fromAddress: string,
-    toAddress: string,
-    amount: BigNumber,
-    txOptions: {
-      gas?: number
-      gasPrice?: string
-      gasCurrency?: string
-      gasFeeRecipient?: string
-    } = {}
-  ) => {
-    const res = await kit.sendTransaction({
-      from: fromAddress,
-      to: toAddress,
-      value: amount.toString(),
-      ...txOptions,
-    })
-    return res
-  }
-
-  const transferCeloDollars = async (
-    fromAddress: string,
-    toAddress: string,
-    amount: BigNumber,
-    txOptions: {
-      gas?: number
-      gasPrice?: string
-      gasCurrency?: string
-      gasFeeRecipient?: string
-    } = {}
-  ) => {
-    const kitStableToken = await kit.contracts.getStableToken()
-    const res = await kitStableToken.transfer(toAddress, amount.toString()).send({
-      from: fromAddress,
-      ...txOptions,
-    })
-
-    return res
   }
 
   const getGasPriceMinimum = async (gasCurrency: string | undefined) => {
@@ -380,7 +341,7 @@ describe('Transfer tests', function(this: any) {
 
       const transferFn =
         transferToken === CeloContract.StableToken ? transferCeloDollars : transferCeloGold
-      const txResult = await transferFn(FromAddress, ToAddress, TransferAmount, {
+      const txResult = await transferFn(kit, FromAddress, ToAddress, TransferAmount, {
         ...txOptions,
         gasCurrency,
       })
@@ -475,9 +436,15 @@ describe('Transfer tests', function(this: any) {
                   describe('when setting to an arbitrary address', () => {
                     it('should get rejected by the sending node before being added to the tx pool', async () => {
                       try {
-                        const res = await transferCeloGold(FromAddress, ToAddress, TransferAmount, {
-                          gasFeeRecipient: kit.web3.utils.randomHex(20),
-                        })
+                        const res = await transferCeloGold(
+                          kit,
+                          FromAddress,
+                          ToAddress,
+                          TransferAmount,
+                          {
+                            gasFeeRecipient: kit.web3.utils.randomHex(20),
+                          }
+                        )
                         await res.waitReceipt()
                       } catch (error) {
                         assert.include(
@@ -533,10 +500,16 @@ describe('Transfer tests', function(this: any) {
                   const gas = intrinsicGas - 1
                   const gasCurrency = await kit.registry.addressFor(CeloContract.StableToken)
                   try {
-                    const res = await transferCeloGold(FromAddress, ToAddress, TransferAmount, {
-                      gas,
-                      gasCurrency,
-                    })
+                    const res = await transferCeloGold(
+                      kit,
+                      FromAddress,
+                      ToAddress,
+                      TransferAmount,
+                      {
+                        gas,
+                        gasCurrency,
+                      }
+                    )
                     await res.getHash()
                   } catch (error) {
                     assert.include(error.toString(), 'Returned error: intrinsic gas too low')
@@ -623,10 +596,16 @@ describe('Transfer tests', function(this: any) {
                   const gas = intrinsicGas - 1
                   const gasCurrency = await kit.registry.addressFor(CeloContract.StableToken)
                   try {
-                    const res = await transferCeloGold(FromAddress, ToAddress, TransferAmount, {
-                      gas,
-                      gasCurrency,
-                    })
+                    const res = await transferCeloGold(
+                      kit,
+                      FromAddress,
+                      ToAddress,
+                      TransferAmount,
+                      {
+                        gas,
+                        gasCurrency,
+                      }
+                    )
                     await res.getHash()
                   } catch (error) {
                     assert.include(error.toString(), 'Returned error: intrinsic gas too low')
@@ -682,7 +661,7 @@ describe('Transfer tests', function(this: any) {
               const stableTokenAddress = await kit.registry.addressFor(CeloContract.StableToken)
               const expectedGasUsed = 163180
               const txRes = await runTestTransaction(
-                await transferCeloGold(FromAddress, ToAddress, TransferAmount, {
+                await transferCeloGold(kit, FromAddress, ToAddress, TransferAmount, {
                   gasCurrency: stableTokenAddress,
                   gasFeeRecipient: FeeRecipientAddress,
                 }),
@@ -755,7 +734,7 @@ describe('Transfer tests', function(this: any) {
               const intrinsicGas = 155000
               const gas = intrinsicGas + 1000
               const txRes = await runTestTransaction(
-                await transferCeloGold(FromAddress, ToAddress, TransferAmount, {
+                await transferCeloGold(kit, FromAddress, ToAddress, TransferAmount, {
                   gas,
                   gasCurrency: await kit.registry.addressFor(CeloContract.StableToken),
                   gasFeeRecipient: FeeRecipientAddress,

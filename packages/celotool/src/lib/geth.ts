@@ -1,5 +1,9 @@
 /* tslint:disable: no-console */
 import {
+  /* CeloContract, CeloToken, */ ContractKit,
+  newKit /*, newKitFromWeb3 */,
+} from '@celo/contractkit'
+import {
   convertToContractDecimals,
   GoldToken,
   sendTransaction,
@@ -193,7 +197,7 @@ export const getRandomInt = (from: number, to: number) => {
   return Math.floor(Math.random() * (to - from)) + from
 }
 
-const getRandomlyChoseToken = (goldToken: GoldTokenType, stableToken: StableTokenType) => {
+const getRandomToken = (goldToken: GoldTokenType, stableToken: StableTokenType) => {
   const tokenType = getRandomInt(0, 2)
   if (tokenType === 0) {
     return goldToken
@@ -317,8 +321,8 @@ const transferAndTrace = async (
 ) => {
   console.info('Transfer')
 
-  const token = getRandomlyChoseToken(goldToken, stableToken)
-  const gasCurrencyToken = getRandomlyChoseToken(goldToken, stableToken)
+  const token = getRandomToken(goldToken, stableToken)
+  const gasCurrencyToken = getRandomToken(goldToken, stableToken)
 
   const [tokenName, gasCurrencySymbol] = await Promise.all([
     token.methods.symbol().call(),
@@ -468,6 +472,75 @@ const measureBlockscout = async (
   }
 }
 
+export const simulateClientContractKit = async (
+  senderAddress: string,
+  recipientAddress: string,
+  gasFeeRecipientAddress: string,
+  txPeriodMs: number // time between each transaction in ms
+) => {
+  while (true) {
+    // todo change this url
+    const kit = newKit('http://localhost:8545')
+    console.log('transferring 400 celo gold...')
+    console.log('kit.web3.eth.blockNumber', await kit.web3.eth.getBlockNumber())
+
+    // randomly choose to transfer gold or dollars
+    const transferFn = Math.round(Math.random()) ? transferCeloGold : transferCeloDollars
+
+    const gas
+
+    const txResult = await transferFn(kit, senderAddress, recipientAddress, new BigNumber(400), {
+      gasFeeRecipient: gasFeeRecipientAddress,
+    })
+    const txReceipt = await txResult.waitReceipt()
+    console.log('receipt', txReceipt)
+
+    sleep(txPeriodMs)
+  }
+}
+
+export const transferCeloGold = async (
+  kit: ContractKit,
+  fromAddress: string,
+  toAddress: string,
+  amount: BigNumber,
+  txOptions: {
+    gas?: number
+    gasPrice?: string
+    gasCurrency?: string
+    gasFeeRecipient?: string
+  } = {}
+) => {
+  const res = await kit.sendTransaction({
+    from: fromAddress,
+    to: toAddress,
+    value: amount.toString(),
+    ...txOptions,
+  })
+  return res
+}
+
+export const transferCeloDollars = async (
+  kit: ContractKit,
+  fromAddress: string,
+  toAddress: string,
+  amount: BigNumber,
+  txOptions: {
+    gas?: number
+    gasPrice?: string
+    gasCurrency?: string
+    gasFeeRecipient?: string
+  } = {}
+) => {
+  const kitStableToken = await kit.contracts.getStableToken()
+  const res = await kitStableToken.transfer(toAddress, amount.toString()).send({
+    from: fromAddress,
+    ...txOptions,
+  })
+
+  return res
+}
+
 export const simulateClient = async (
   web3: Web3Type,
   goldToken: GoldTokenType,
@@ -489,8 +562,8 @@ export const simulateClient = async (
     }
 
     try {
-      const token = getRandomlyChoseToken(goldToken, stableToken)
-      const gasCurrencyToken = getRandomlyChoseToken(goldToken, stableToken)
+      const token = getRandomToken(goldToken, stableToken)
+      const gasCurrencyToken = getRandomToken(goldToken, stableToken)
 
       const [tokenSymbol] = await Promise.all([
         token.methods.symbol().call(),
