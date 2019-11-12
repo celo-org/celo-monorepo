@@ -43,7 +43,13 @@ export const stringToBuffer = (input: string | string[]) =>
 export const bufferToString = (buf: Buffer) => prependLeading0x(buf.toString('hex'))
 
 type SolBytes = Array<string | number[]>
-export const toSolidityBytes = (input: Buffer | string): SolBytes => input as any
+export function toSolidityBytes(input: Buffer | string): SolBytes {
+  const result =
+    typeof input === typeof Buffer
+      ? bufferToString(input as Buffer)
+      : prependLeading0x(input as string)
+  return result as any
+}
 
 type Parser<A, B> = (input: A) => B
 
