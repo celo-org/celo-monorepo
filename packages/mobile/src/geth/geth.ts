@@ -150,6 +150,8 @@ async function initGeth() {
 }
 
 export async function clearGethCache() {
+  await deleteChainData()
+  await deleteGethLockFile()
   gethInstance = null
 }
 
