@@ -33,7 +33,7 @@ function getDisplayName({ name, recipient, e164Number, address, t }: Props) {
   if (recipient && recipient.displayName) {
     return recipient.displayName
   }
-  if (e164Number) {
+  if (getE164Number(e164Number, recipient)) {
     return t('mobileNumber')
   }
   if (address) {
@@ -41,6 +41,10 @@ function getDisplayName({ name, recipient, e164Number, address, t }: Props) {
   }
   // Rare but possible, such as when a user skips onboarding flow (in dev mode) and then views their own avatar
   return t('unknown')
+}
+
+function getE164Number(e164Number?: string, recipient?: Recipient) {
+  return e164Number || (recipient && recipient.e164PhoneNumber)
 }
 
 export function Avatar(props: Props) {
@@ -52,7 +56,7 @@ export function Avatar(props: Props) {
       {...props}
       defaultCountryCode={defaultCountryCode}
       name={getDisplayName(props)}
-      e164Number={e164Number}
+      e164Number={getE164Number(e164Number, recipient)}
       iconSize={iconSize}
       thumbnailPath={getRecipientThumbnail(recipient)}
     >

@@ -16,6 +16,7 @@ exports[`PaymentRequestConfirmation renders correctly for request payment confir
         Object {
           "backgroundColor": "#FFFFFF",
           "flex": 1,
+          "justifyContent": "space-between",
         },
         undefined,
       ]
@@ -24,8 +25,9 @@ exports[`PaymentRequestConfirmation renders correctly for request payment confir
     <RCTScrollView
       contentContainerStyle={
         Object {
-          "flex": 1,
-          "justifyContent": "space-between",
+          "alignItems": "center",
+          "justifyContent": "flex-start",
+          "paddingVertical": 10,
         }
       }
     >
@@ -33,50 +35,39 @@ exports[`PaymentRequestConfirmation renders correctly for request payment confir
         <View
           style={
             Object {
-              "backgroundColor": "#FFFFFF",
+              "alignItems": "center",
               "flex": 1,
+              "justifyContent": "center",
+              "marginTop": 10,
             }
           }
         >
-          <View
+          <Text
             style={
-              Object {
-                "alignItems": "center",
-                "flex": 1,
-                "justifyContent": "center",
-                "marginTop": 10,
-              }
+              Array [
+                Object {
+                  "color": "#2E3338",
+                  "fontFamily": "Hind-Light",
+                  "fontSize": 22,
+                  "paddingBottom": 20,
+                  "textAlign": "center",
+                },
+                Object {
+                  "alignSelf": "center",
+                  "color": "#2E3338",
+                  "padding": 10,
+                  "paddingBottom": 10,
+                },
+              ]
             }
           >
-            <Text
-              style={
-                Array [
-                  Object {
-                    "color": "#2E3338",
-                    "fontFamily": "Hind-Light",
-                    "fontSize": 22,
-                    "paddingBottom": 20,
-                    "textAlign": "center",
-                  },
-                  Object {
-                    "alignSelf": "center",
-                    "color": "#2E3338",
-                    "padding": 10,
-                    "paddingBottom": 10,
-                  },
-                ]
-              }
-            >
-              requestPayment
-            </Text>
-          </View>
+            requestPayment
+          </Text>
         </View>
         <View
           style={
             Object {
-              "flex": 4,
-              "marginHorizontal": 20,
-              "marginVertical": 10,
+              "margin": 20,
             }
           }
         >

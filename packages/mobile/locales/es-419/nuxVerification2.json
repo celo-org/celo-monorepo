@@ -1,4 +1,11 @@
 {
+  "getVerified": "~~Verify Phone Number",
+  "notReadyForCode": "Aún no está listo para ingresar el código",
+  "emptyVerificationCode": "Sin Código en el Portapapeles",
+  "invalidVerificationCode": "Código de Verification Inválido",
+  "repeatVerificationCode": "Código de Verificación Repetido",
+  "verificationFailure": "Fallo en la Verificación",
+  "verificationTimeout": "Verificación no pudo ser verificada a tiempo",
   "errorRequestCode": "Error al solicitar los códigos.",
   "errorRedeemingCode": "Error al canjear el código.",
   "pleaseRetry": "Por favor reinicie la verificación.",
@@ -51,7 +58,8 @@
     "codeHeader3": "~~Third Code",
     "codesMissing": "~~I didn’t receive three codes",
     "tip": "~~Typing? Try copying and pasting the code.",
-    "codeAccepted": "Aceptado"
+    "codeAccepted": "Aceptado",
+    "sendingCodes": "~~Sending verification codes..."
   },
   "missingCodesModal": {
     "header": "~~Missing Codes?",

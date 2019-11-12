@@ -1,3 +1,4 @@
+import { parseSolidityStringArray } from '@celo/utils/lib/parsing'
 import { upperFirst } from 'lodash'
 import { AccountsInstance } from 'types'
 import { getParsedSignatureOfAddress } from '../../lib/signing-utils'
@@ -285,6 +286,26 @@ contract('Accounts', (accounts: string[]) => {
           args: { account: caller, metadataURL },
         })
       })
+    })
+  })
+
+  describe('#batchGetMetadataURL', () => {
+    it('returns multiple metadata URLs', async () => {
+      const randomStrings = accounts.map((_) => web3.utils.randomHex(20).slice(2))
+      await Promise.all(
+        accounts.map(async (account, i) => {
+          await accountsInstance.createAccount({ from: account })
+          await accountsInstance.setMetadataURL(randomStrings[i], { from: account })
+        })
+      )
+      const [stringLengths, data] = await accountsInstance.batchGetMetadataURL(accounts)
+      const strings = parseSolidityStringArray(
+        stringLengths.map((x) => x.toNumber()),
+        (data as unknown) as string
+      )
+      for (let i = 0; i < accounts.length; i++) {
+        assert.equal(strings[i], randomStrings[i])
+      }
     })
   })
 
