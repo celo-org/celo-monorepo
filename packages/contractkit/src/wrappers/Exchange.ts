@@ -6,6 +6,7 @@ import {
   CeloTransactionObject,
   identity,
   NumberLike,
+  numberLikeToFrac,
   numberLikeToBigNumber,
   numberLikeToString,
   proxyCall,
@@ -193,7 +194,7 @@ export class ExchangeWrapper extends BaseWrapper<Exchange> {
    */
   async getExchangeRate(buyAmount: NumberLike, sellGold: boolean): Promise<BigNumber> {
     const takerAmount = await this.getBuyTokenAmount(buyAmount, sellGold)
-    return new BigNumber(buyAmount).dividedBy(takerAmount) // Number of sellTokens received for one buyToken
+    return numberLikeToFrac(buyAmount, takerAmount) // Number of sellTokens received for one buyToken
   }
 
   /**

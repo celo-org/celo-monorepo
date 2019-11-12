@@ -34,6 +34,9 @@ export const numberLikeToInt = (input: NumberLike) =>
     .integerValue()
     .toNumber()
 
+export const numberLikeToFrac = (numerator: NumberLike, denominator: NumberLike) =>
+  numberLikeToBigNumber(numerator).div(numberLikeToBigNumber(denominator))
+
 export const stringToBuffer = (input: string | string[]) =>
   Buffer.from(trimLeading0x(input as string), 'hex')
 

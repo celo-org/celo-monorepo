@@ -7,6 +7,7 @@ import { SortedOracles } from '../generated/types/SortedOracles'
 import {
   BaseWrapper,
   CeloTransactionObject,
+  numberLikeToFrac,
   numberLikeToBigNumber,
   numberLikeToInt,
   proxyCall,
@@ -59,7 +60,7 @@ export class SortedOraclesWrapper extends BaseWrapper<SortedOracles> {
     const tokenAddress = await this.kit.registry.addressFor(token)
     const response = await this.contract.methods.medianRate(tokenAddress).call()
     return {
-      rate: numberLikeToBigNumber(response[0]).div(numberLikeToBigNumber(response[1])),
+      rate: numberLikeToFrac(response[0], response[1]),
     }
   }
 
@@ -157,7 +158,7 @@ export class SortedOraclesWrapper extends BaseWrapper<SortedOracles> {
       const medRelIndex = parseInt(response[2][i], 10)
       rates.push({
         address: response[0][i],
-        rate: numberLikeToBigNumber(response[1][i]).div(denominator),
+        rate: numberLikeToFrac(response[1][i], denominator),
         medianRelation: medRelIndex,
       })
     }
@@ -179,9 +180,7 @@ export class SortedOraclesWrapper extends BaseWrapper<SortedOracles> {
     // This is how the contract calculates the rate from the numerator and denominator.
     // To figure out where this new report goes in the list, we need to compare this
     // value with the other rates
-    const value = numberLikeToBigNumber(numerator.toString()).div(
-      numberLikeToBigNumber(denominator.toString())
-    )
+    const value = numberLikeToFrac(numerator, denominator)
 
     let greaterKey = NULL_ADDRESS
     let lesserKey = NULL_ADDRESS
