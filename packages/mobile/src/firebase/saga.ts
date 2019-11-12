@@ -45,7 +45,6 @@ export function* waitForFirebaseAuth() {
 
 function* initializeFirebase() {
   const address = yield call(getAccount)
-
   if (!FIREBASE_ENABLED) {
     Logger.info(TAG, 'Firebase disabled')
     yield put(showError(ErrorMessages.FIREBASE_DISABLED))
