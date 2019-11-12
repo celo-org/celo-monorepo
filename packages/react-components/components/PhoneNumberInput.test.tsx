@@ -9,10 +9,10 @@ jest.mock('@celo/react-native-sms-retriever', () => {
   }
 })
 
-jest.mock('react-native-device-info', () => {
-  return {
-    getBaseOs: jest.fn(() => 'Android'),
-  }
+jest.mock('Platform', () => {
+  const Platform = require.requireActual('Platform')
+  Platform.OS = 'android'
+  return Platform
 })
 
 describe('PhoneNumberInput', () => {
