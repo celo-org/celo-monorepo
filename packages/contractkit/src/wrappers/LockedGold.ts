@@ -129,12 +129,10 @@ export class LockedGoldWrapper extends BaseWrapper<LockedGold> {
   async getPendingWithdrawals(account: string) {
     const withdrawals = await this.contract.methods.getPendingWithdrawals(account).call()
     return zip(
-      (time, value) =>
-        // tslint:disable-next-line: no-object-literal-type-assertion
-        ({
-          time: numberLikeToBigNumber(time),
-          value: numberLikeToBigNumber(value),
-        } as PendingWithdrawal),
+      (time, value): PendingWithdrawal => ({
+        time: numberLikeToBigNumber(time),
+        value: numberLikeToBigNumber(value),
+      }),
       withdrawals[1],
       withdrawals[0]
     )
