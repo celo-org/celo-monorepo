@@ -110,9 +110,7 @@ contract UsingPrecompiles {
     */
     bool success;
     bytes memory publicKey;
-    (success, publicKey) = address(0xfe).call.gas(gasleft())(
-      abi.encodePacked(messageHash, v, r, s)
-    );
+    (success, publicKey) = address(0xfe).call.gas(gasleft())(abi.encode(messageHash, v, r, s));
     require(success);
     return publicKey;
   }
@@ -179,6 +177,7 @@ contract UsingPrecompiles {
 
   /**
    * @notice Checks a BLS proof of possession.
+   * @param sender The address signed by the BLS key to generate the proof of possession.
    * @param blsKey The BLS public key that the validator is using for consensus, should pass proof
    *   of possession. 48 bytes.
    * @param blsPop The BLS public key proof-of-possession, which consists of a signature on the

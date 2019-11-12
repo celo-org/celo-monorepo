@@ -1,5 +1,6 @@
 import { ContractKit, newKitFromWeb3 } from '@celo/contractkit'
 import { getBlsPublicKey, getBlsPoP } from '@celo/utils/lib/bls'
+import { privateKeyToPublicKey } from '@celo/utils/lib/address'
 import { fromFixed, toFixed } from '@celo/utils/lib/fixidity'
 import BigNumber from 'bignumber.js'
 import { assert } from 'chai'
@@ -13,6 +14,7 @@ import {
   sleep,
 } from './utils'
 
+// TODO(asa): Test independent rotation of ecdsa, bls keys.
 describe('governance tests', () => {
   const gethConfig = {
     migrate: true,
@@ -154,7 +156,7 @@ describe('governance tests', () => {
     if (!gas) {
       gas = await tx.estimateGas({ ...txOptions })
     }
-    await tx.send({ from: validator, ...txOptions, gas })
+    return tx.send({ from: validator, ...txOptions, gas })
   }
 
   const updateValidatorBlsKey = async (
@@ -168,21 +170,22 @@ describe('governance tests', () => {
     await unlockAccount(signer, signerWeb3)
     const blsPublicKey = getBlsPublicKey(signerPrivateKey)
     const blsPop = getBlsPoP(validator, signerPrivateKey)
-    const signerKit = newKitFromWeb3(signerWeb3)
-    const signerValidators = await signerKit._web3Contracts.getValidators()
-    const tx = signerValidators.methods.updateBlsKey(blsPublicKey, blsPop)
+    // TODO(asa): Send this from the signer instead.
+    const validatorKit = newKitFromWeb3(validatorWeb3)
+    const validatorValidators = await validatorKit._web3Contracts.getValidators()
+    const tx = validatorValidators.methods.updateBlsKey(blsPublicKey, blsPop)
     let gas = txOptions.gas
     if (!gas) {
       gas = await tx.estimateGas({ ...txOptions })
     }
-    await tx.send({ from: signer, ...txOptions, gas })
+    return tx.send({ from: validator, ...txOptions, gas })
   }
 
   const isLastBlockOfEpoch = (blockNumber: number, epochSize: number) => {
     return blockNumber % epochSize === 0
   }
 
-  describe('when the validator set is changing', () => {
+  describe.only('when the validator set is changing', () => {
     let epoch: number
     const blockNumbers: number[] = []
     let validatorAccounts: string[]
@@ -266,6 +269,8 @@ describe('governance tests', () => {
       const validatorWeb3 = new Web3('http://localhost:8549')
       const authorizedWeb3s = [new Web3('ws://localhost:8559'), new Web3('ws://localhost:8561')]
       const authorizedPrivateKeys = [rotation0PrivateKey, rotation1PrivateKey]
+      console.log('pubKey0', privateKeyToPublicKey(rotation0PrivateKey))
+      console.log('pubKey1', privateKeyToPublicKey(rotation1PrivateKey))
 
       let index = 0
       let errorWhileChangingValidatorSet = ''
@@ -280,14 +285,18 @@ describe('governance tests', () => {
             // 1. Swap validator0 and validator1 so one is a member of the group and the other is not.
             const memberToRemove = membersToSwap[index]
             const memberToAdd = membersToSwap[(index + 1) % 2]
+            console.log('removing member')
             await removeMember(groupWeb3, memberToRemove)
+            console.log('adding member')
             await addMember(groupWeb3, memberToAdd)
             const newMembers = await getValidatorGroupMembers()
             assert.include(newMembers, memberToAdd)
             assert.notInclude(newMembers, memberToRemove)
             // 2. Rotate keys for validator 2 by authorizing a new validating key.
             if (!doneAuthorizing) {
+              console.log('authorizing signer')
               await authorizeValidatorSigner(validatorWeb3, authorizedWeb3s[index])
+              console.log('updating bls key')
               await updateValidatorBlsKey(
                 validatorWeb3,
                 authorizedWeb3s[index],

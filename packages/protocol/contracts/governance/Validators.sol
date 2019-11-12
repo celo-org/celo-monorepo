@@ -758,17 +758,18 @@ contract Validators is
   }
 
   /**
-   * @notice Returns validator information.
+   * @notice Returns the validator BLS key.
    * @param signer The account that registered the validator or its authorized signing address.
-   * @return The unpacked validator struct.
+   * @return The validator BLS key.
    */
-  function getValidatorFromSigner(address signer)
+  function getValidatorBlsKeyFromSigner(address signer)
     external
     view
-    returns (bytes memory ecdsaKey, bytes memory blsKey, address affiliation, uint256 score)
+    returns (bytes memory blsKey)
   {
     address account = getAccounts().validatorSignerToAccount(signer);
-    return getValidator(account);
+    require(isValidator(account));
+    return validators[account].keys.bls;
   }
 
   /**

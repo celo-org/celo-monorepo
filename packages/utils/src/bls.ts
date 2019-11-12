@@ -44,12 +44,13 @@ const getBlsPrivateKey = (privateKeyHex: string) => {
 
 export const getBlsPublicKey = (privateKeyHex: string) => {
   const blsPrivateKeyBytes = getBlsPrivateKey(privateKeyHex)
-  return bls12377js.BLS.privateToPublicBytes(blsPrivateKeyBytes).toString('hex')
+  return '0x' + bls12377js.BLS.privateToPublicBytes(blsPrivateKeyBytes).toString('hex')
 }
 
 export const getBlsPoP = (address: string, privateKeyHex: string) => {
   const blsPrivateKeyBytes = getBlsPrivateKey(privateKeyHex)
-  return bls12377js.BLS.signPoP(blsPrivateKeyBytes, Buffer.from(address.slice(2), 'hex')).toString(
-    'hex'
+  return (
+    '0x' +
+    bls12377js.BLS.signPoP(blsPrivateKeyBytes, Buffer.from(address.slice(2), 'hex')).toString('hex')
   )
 }
