@@ -4,7 +4,7 @@ import { concurrentMap } from '@celo/utils/lib/async'
 
 import { Address, CeloContract } from '../base'
 import { Registry } from '../generated/types/Registry'
-import { Hotfix, ProposalTransactionFactory } from '../governance/proposals'
+import { ProposalTransactionFactory, ProposalUtility } from '../governance/proposals'
 import { newKitFromWeb3 } from '../kit'
 import { NetworkConfig, testWithGanache, timeTravel } from '../test-utils/ganache-test'
 import { AccountsWrapper } from './Accounts'
@@ -41,13 +41,14 @@ testWithGanache('Governance Wrapper', (web3) => {
   type Repoint = [CeloContract, Address]
 
   const registryRepointProposal = (repoints: Repoint[]) =>
-    new Proposal(
+    new ProposalUtility(
       repoints.map((r) =>
         ProposalTransactionFactory.fromWeb3Txo(registry.methods.setAddressFor(...r), {
           to: registry._address,
           value: '0',
         })
-      )
+      ),
+      kit
     )
 
   const verifyRepointResult = (repoints: Repoint[]) =>
@@ -182,11 +183,8 @@ testWithGanache('Governance Wrapper', (web3) => {
       [CeloContract.Escrow, '0x0000000000000000000000000000000000000004'],
     ]
 
-    let hotfix: Hotfix
-    beforeAll(() => {
-      const proposal = registryRepointProposal(repoints)
-      hotfix = new Hotfix(proposal.transactions, kit)
-    })
+    let hotfix: ProposalUtility
+    beforeAll(() => (hotfix = registryRepointProposal(repoints)))
 
     const whitelistFn = async (whitelister: Address) => {
       const tx = governance.whitelistHotfix(hotfix.hash)

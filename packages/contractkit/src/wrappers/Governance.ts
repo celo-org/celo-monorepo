@@ -215,21 +215,29 @@ export class GovernanceWrapper extends BaseWrapper<Governance> {
   )
 
   /**
-   * Returns the stage, metadata, upvotes, votes, and transactions associated with a given proposal.
+   * Returns the proposal associated with a given id.
    * @param proposalID Governance proposal UUID
    */
-  async getProposalRecord(proposalID: NumberLike): Promise<ProposalRecord> {
+  async getProposal(proposalID: NumberLike): Promise<Proposal> {
     const metadata = await this.getProposalMetadata(proposalID)
     const txIndices = Array.from(Array(metadata.transactionCount).keys())
     const transactions = await concurrentMap(1, txIndices, (idx) =>
       this.getProposalTransaction(proposalID, idx)
     )
-    const proposal = new Proposal(transactions)
+    return new Proposal(transactions)
+  }
+
+  /**
+   * Returns the stage, metadata, upvotes, votes, and transactions associated with a given proposal.
+   * @param proposalID Governance proposal UUID
+   */
+  async getProposalRecord(proposalID: NumberLike): Promise<ProposalRecord> {
+    const metadata = await this.getProposalMetadata(proposalID)
+    const proposal = await this.getProposal(proposalID)
+    const stage = await this.getProposalStage(proposalID)
 
     let upvotes = ZERO_BN
     let votes = { [VoteValue.Yes]: ZERO_BN, [VoteValue.No]: ZERO_BN, [VoteValue.Abstain]: ZERO_BN }
-
-    const stage = await this.getProposalStage(proposalID)
     if (stage === ProposalStage.Queued) {
       upvotes = await this.getUpvotes(proposalID)
     } else if (stage >= ProposalStage.Referendum && stage < ProposalStage.Expiration) {
@@ -237,11 +245,11 @@ export class GovernanceWrapper extends BaseWrapper<Governance> {
     }
 
     return {
+      proposal,
       metadata,
       stage,
       upvotes,
       votes,
-      proposal,
     }
   }
 
