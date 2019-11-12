@@ -156,8 +156,13 @@ describe('governance tests', () => {
       epoch = new BigNumber(await validators.methods.getEpochSize().call()).toNumber()
       assert.equal(epoch, 10)
 
-      // Give the node time to sync, and time for an epoch transition so we can activate our vote.
-      await sleep(20)
+      // Give the nodes time to sync, and time for an epoch transition so we can activate our vote.
+      let blockNumber: number
+      do {
+        blockNumber = await web3.eth.getBlockNumber()
+        await sleep(0.1)
+      } while (blockNumber % epoch !== 1)
+
       await activate(allValidators[0])
       const groupWeb3 = new Web3('ws://localhost:8567')
       const groupKit = newKitFromWeb3(groupWeb3)
