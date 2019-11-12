@@ -1,25 +1,3 @@
-import { compressedPubKey } from '@celo/utils/src/commentEncryption'
-import { getPhoneHash, isE164Number } from '@celo/utils/src/phoneNumbers'
-import { areAddressesEqual } from '@celo/utils/src/signatureUtils'
-import {
-  ActionableAttestation,
-  extractAttestationCodeFromMessage,
-  findMatchingIssuer,
-  getActionableAttestations,
-  getAttestationsContract,
-  getDataEncryptionKey,
-  getStableTokenContract,
-  getWalletAddress,
-  lookupPhoneNumbers,
-  makeApproveAttestationFeeTx,
-  makeCompleteTx,
-  makeRequestTx,
-  makeRevealTx,
-  makeSetAccountTx,
-  validateAttestationCode,
-} from '@celo/walletkit'
-import { Attestations as AttestationsType } from '@celo/walletkit/types/Attestations'
-import { StableToken as StableTokenType } from '@celo/walletkit/types/StableToken'
 import BigNumber from 'bignumber.js'
 import { Task } from 'redux-saga'
 import { all, call, delay, fork, put, race, select, take, takeEvery } from 'redux-saga/effects'
@@ -47,6 +25,29 @@ import Logger from 'src/utils/Logger'
 import { web3 } from 'src/web3/contracts'
 import { getConnectedAccount, getConnectedUnlockedAccount } from 'src/web3/saga'
 import { privateCommentKeySelector } from 'src/web3/selectors'
+
+import { eqAddress } from '@celo/utils/src/address'
+import { compressedPubKey } from '@celo/utils/src/commentEncryption'
+import { getPhoneHash, isE164Number } from '@celo/utils/src/phoneNumbers'
+import {
+  ActionableAttestation,
+  extractAttestationCodeFromMessage,
+  findMatchingIssuer,
+  getActionableAttestations,
+  getAttestationsContract,
+  getDataEncryptionKey,
+  getStableTokenContract,
+  getWalletAddress,
+  lookupPhoneNumbers,
+  makeApproveAttestationFeeTx,
+  makeCompleteTx,
+  makeRequestTx,
+  makeRevealTx,
+  makeSetAccountTx,
+  validateAttestationCode,
+} from '@celo/walletkit'
+import { Attestations as AttestationsType } from '@celo/walletkit/types/Attestations'
+import { StableToken as StableTokenType } from '@celo/walletkit/types/StableToken'
 
 const TAG = 'identity/verification'
 
@@ -475,10 +476,7 @@ function* setAccount(attestationsContract: AttestationsType, address: string, da
   Logger.debug(TAG, 'Setting wallet address and public data encryption key')
   const currentWalletAddress = yield call(getWalletAddress, attestationsContract, address)
   const currentWalletDEK = yield call(getDataEncryptionKey, attestationsContract, address)
-  if (
-    !areAddressesEqual(currentWalletAddress, address) ||
-    !areAddressesEqual(currentWalletDEK, dataKey)
-  ) {
+  if (!eqAddress(currentWalletAddress, address) || !eqAddress(currentWalletDEK, dataKey)) {
     const setAccountTx = makeSetAccountTx(attestationsContract, address, dataKey)
     yield call(sendTransaction, setAccountTx, address, TAG, `Set Wallet Address & DEK`)
     CeloAnalytics.track(CustomEventNames.verification_set_account)
