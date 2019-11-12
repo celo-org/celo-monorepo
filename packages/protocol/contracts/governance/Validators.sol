@@ -278,8 +278,8 @@ contract Validators is
    *    - publicKey - The public key that the validator is using for consensus, should match
    *      msg.sender. 64 bytes.
    *    - blsPublicKey - The BLS public key that the validator is using for consensus, should pass
-   *      proof of possession. 48 bytes.
-   *    - blsPoP - The BLS public key proof of possession. 96 bytes.
+   *      proof of possession. 96 bytes.
+   *    - blsPoP - The BLS public key proof of possession. 48 bytes.
    * @return True upon success.
    * @dev Fails if the account is already a validator or validator group.
    * @dev Fails if the account does not have sufficient Locked Gold.
