@@ -7,8 +7,13 @@ export function eqAddress(a: Address, b: Address) {
 }
 
 export function trimLeading0x(input: string) {
-  return input.startsWith("0x") ? input.slice(2) : input
+  return input.startsWith('0x') ? input.slice(2) : input
 }
+
+export function prependLeading0x(input: string) {
+  return input.startsWith('0x') ? input : `0x${input}`
+}
+
 export const privateKeyToAddress = (privateKey: string) => {
   return toChecksumAddress(
     '0x' + privateToAddress(Buffer.from(trimLeading0x(privateKey), 'hex')).toString('hex')

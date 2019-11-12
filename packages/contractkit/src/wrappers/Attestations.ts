@@ -1,18 +1,21 @@
+import BigNumber from 'bignumber.js'
+import * as Web3Utils from 'web3-utils'
+
 import { ECIES, PhoneNumberUtils, SignatureUtils } from '@celo/utils'
 import { sleep } from '@celo/utils/lib/async'
 import { zip3 } from '@celo/utils/lib/collections'
-import BigNumber from 'bignumber.js'
-import * as Web3Utils from 'web3-utils'
+
 import { Address, CeloContract, NULL_ADDRESS } from '../base'
 import { Attestations } from '../generated/types/Attestations'
 import {
   BaseWrapper,
+  numberLikeToBigNumber,
+  numberLikeToInt,
   proxyCall,
-  toBigNumber,
-  toNumber,
   toTransactionObject,
   tupleParser,
 } from './BaseWrapper'
+
 const parseSignature = SignatureUtils.parseSignature
 
 export interface AttestationStat {
@@ -71,7 +74,7 @@ export class AttestationsWrapper extends BaseWrapper<Attestations> {
   attestationExpiryBlocks = proxyCall(
     this.contract.methods.attestationExpiryBlocks,
     undefined,
-    toNumber
+    numberLikeToInt
   )
 
   /**
@@ -82,13 +85,13 @@ export class AttestationsWrapper extends BaseWrapper<Attestations> {
   attestationRequestFees = proxyCall(
     this.contract.methods.attestationRequestFees,
     undefined,
-    toBigNumber
+    numberLikeToBigNumber
   )
 
   selectIssuersWaitBlocks = proxyCall(
     this.contract.methods.selectIssuersWaitBlocks,
     undefined,
-    toNumber
+    numberLikeToInt
   )
 
   /**
@@ -100,8 +103,8 @@ export class AttestationsWrapper extends BaseWrapper<Attestations> {
     this.contract.methods.getUnselectedRequest,
     tupleParser(PhoneNumberUtils.getPhoneHash, (x: string) => x),
     (res) => ({
-      blockNumber: toNumber(res[0]),
-      attestationsRequested: toNumber(res[1]),
+      blockNumber: numberLikeToInt(res[0]),
+      attestationsRequested: numberLikeToInt(res[1]),
       attestationRequestFeeToken: res[2],
     })
   )
@@ -155,7 +158,7 @@ export class AttestationsWrapper extends BaseWrapper<Attestations> {
   ) => Promise<AttestationStat> = proxyCall(
     this.contract.methods.getAttestationStats,
     tupleParser(PhoneNumberUtils.getPhoneHash, stringIdentity),
-    (stat) => ({ completed: toNumber(stat[0]), total: toNumber(stat[1]) })
+    (stat) => ({ completed: numberLikeToInt(stat[0]), total: numberLikeToInt(stat[1]) })
   )
 
   /**
@@ -293,11 +296,10 @@ export class AttestationsWrapper extends BaseWrapper<Attestations> {
     // Unfortunately can't be destructured
     const stats = await this.contract.methods.batchGetAttestationStats(phoneNumberHashes).call()
 
-    const toNum = (n: string) => new BigNumber(n).toNumber()
-    const matches = stats[0].map(toNum)
+    const matches = stats[0].map(numberLikeToInt)
     const addresses = stats[1]
-    const completed = stats[2].map(toNum)
-    const total = stats[3].map(toNum)
+    const completed = stats[2].map(numberLikeToInt)
+    const total = stats[3].map(numberLikeToInt)
     // Map of phone hash -> (Map of address -> AttestationStat)
     const result: Record<string, Record<string, AttestationStat>> = {}
 

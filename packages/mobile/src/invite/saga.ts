@@ -1,6 +1,3 @@
-import { getPhoneHash } from '@celo/utils/src/phoneNumbers'
-import { stripHexLeader } from '@celo/utils/src/signatureUtils'
-import { getEscrowContract, getGoldTokenContract, getStableTokenContract } from '@celo/walletkit'
 import BigNumber from 'bignumber.js'
 import { Linking, Platform } from 'react-native'
 import SendIntentAndroid from 'react-native-send-intent'
@@ -42,6 +39,10 @@ import Logger from 'src/utils/Logger'
 import { addLocalAccount, web3 } from 'src/web3/contracts'
 import { getConnectedUnlockedAccount, getOrCreateAccount } from 'src/web3/saga'
 import { zeroSyncSelector } from 'src/web3/selectors'
+
+import { trimLeading0x } from '@celo/utils/src/address'
+import { getPhoneHash } from '@celo/utils/src/phoneNumbers'
+import { getEscrowContract, getGoldTokenContract, getStableTokenContract } from '@celo/walletkit'
 
 const TAG = 'invite/saga'
 export const TEMP_PW = 'ce10'
@@ -275,7 +276,7 @@ function* addTempAccountToWallet(inviteCode: string) {
     } else {
       // Import account into the local geth node
       // @ts-ignore
-      tempAccount = yield call(web3.eth.personal.importRawKey, stripHexLeader(inviteCode), TEMP_PW)
+      tempAccount = yield call(web3.eth.personal.importRawKey, trimLeading0x(inviteCode), TEMP_PW)
     }
     Logger.debug(TAG + '@addTempAccountToWallet', 'Account added', tempAccount!)
   } catch (e) {

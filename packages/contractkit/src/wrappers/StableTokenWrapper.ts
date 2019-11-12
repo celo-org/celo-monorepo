@@ -1,15 +1,17 @@
-import { fromFixed } from '@celo/utils/lib/fixidity'
 import BigNumber from 'bignumber.js'
+
+import { fromFixed } from '@celo/utils/lib/fixidity'
+
 import { StableToken } from '../generated/types/StableToken'
 import {
   BaseWrapper,
   CeloTransactionObject,
   NumberLike,
-  parseNumber,
+  numberLikeToBigNumber,
+  numberLikeToInt,
+  numberLikeToString,
   proxyCall,
   proxySend,
-  toBigNumber,
-  toNumber,
   tupleParser,
 } from './BaseWrapper'
 
@@ -37,7 +39,7 @@ export class StableTokenWrapper extends BaseWrapper<StableToken> {
    * @param spender The spender of the StableToken.
    * @return The amount of StableToken owner is allowing spender to spend.
    */
-  allowance = proxyCall(this.contract.methods.allowance, undefined, toBigNumber)
+  allowance = proxyCall(this.contract.methods.allowance, undefined, numberLikeToBigNumber)
 
   /**
    * @return The name of the stable token.
@@ -52,13 +54,13 @@ export class StableTokenWrapper extends BaseWrapper<StableToken> {
   /**
    * @return The number of decimal places to which StableToken is divisible.
    */
-  decimals = proxyCall(this.contract.methods.decimals, undefined, toNumber)
+  decimals = proxyCall(this.contract.methods.decimals, undefined, numberLikeToInt)
 
   /**
    * Returns the total supply of the token, that is, the amount of tokens currently minted.
    * @returns Total supply.
    */
-  totalSupply = proxyCall(this.contract.methods.totalSupply, undefined, toBigNumber)
+  totalSupply = proxyCall(this.contract.methods.totalSupply, undefined, numberLikeToBigNumber)
 
   /**
    * Gets the balance of the specified address using the presently stored inflation factor.
@@ -68,7 +70,7 @@ export class StableTokenWrapper extends BaseWrapper<StableToken> {
   balanceOf: (owner: string) => Promise<BigNumber> = proxyCall(
     this.contract.methods.balanceOf,
     undefined,
-    toBigNumber
+    numberLikeToBigNumber
   )
 
   owner = proxyCall(this.contract.methods.owner)
@@ -82,8 +84,8 @@ export class StableTokenWrapper extends BaseWrapper<StableToken> {
    */
   valueToUnits: (value: NumberLike) => Promise<BigNumber> = proxyCall(
     this.contract.methods.valueToUnits,
-    tupleParser(parseNumber),
-    toBigNumber
+    tupleParser(numberLikeToString),
+    numberLikeToBigNumber
   )
 
   /**
@@ -93,8 +95,8 @@ export class StableTokenWrapper extends BaseWrapper<StableToken> {
    */
   unitsToValue: (units: NumberLike) => Promise<BigNumber> = proxyCall(
     this.contract.methods.unitsToValue,
-    tupleParser(parseNumber),
-    toBigNumber
+    tupleParser(numberLikeToString),
+    numberLikeToBigNumber
   )
 
   /**
@@ -123,10 +125,10 @@ export class StableTokenWrapper extends BaseWrapper<StableToken> {
   async getInflationParameters(): Promise<InflationParameters> {
     const res = await this.contract.methods.getInflationParameters().call()
     return {
-      rate: fromFixed(toBigNumber(res[0])),
-      factor: fromFixed(toBigNumber(res[1])),
-      updatePeriod: toBigNumber(res[2]),
-      factorLastUpdated: toBigNumber(res[3]),
+      rate: fromFixed(numberLikeToBigNumber(res[0])),
+      factor: fromFixed(numberLikeToBigNumber(res[1])),
+      updatePeriod: numberLikeToBigNumber(res[2]),
+      factorLastUpdated: numberLikeToBigNumber(res[3]),
     }
   }
 

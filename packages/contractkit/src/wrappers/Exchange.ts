@@ -1,14 +1,16 @@
 import BigNumber from 'bignumber.js'
+
 import { Exchange } from '../generated/types/Exchange'
 import {
   BaseWrapper,
   CeloTransactionObject,
   identity,
   NumberLike,
-  parseNumber,
+  numberLikeToBigNumber,
+  numberLikeToFrac,
+  numberLikeToString,
   proxyCall,
   proxySend,
-  toBigNumber,
   tupleParser,
 } from './BaseWrapper'
 
@@ -28,25 +30,33 @@ export class ExchangeWrapper extends BaseWrapper<Exchange> {
    * Query spread parameter
    * @returns Current spread charged on exchanges
    */
-  spread = proxyCall(this.contract.methods.spread, undefined, toBigNumber)
+  spread = proxyCall(this.contract.methods.spread, undefined, numberLikeToBigNumber)
   /**
    * Query reserve fraction parameter
    * @returns Current fraction to commit to the gold bucket
    */
-  reserveFraction = proxyCall(this.contract.methods.reserveFraction, undefined, toBigNumber)
+  reserveFraction = proxyCall(
+    this.contract.methods.reserveFraction,
+    undefined,
+    numberLikeToBigNumber
+  )
   /**
    * Query update frequency parameter
    * @returns The time period that needs to elapse between bucket
    * updates
    */
-  updateFrequency = proxyCall(this.contract.methods.updateFrequency, undefined, toBigNumber)
+  updateFrequency = proxyCall(
+    this.contract.methods.updateFrequency,
+    undefined,
+    numberLikeToBigNumber
+  )
   /**
    * Query minimum reports parameter
    * @returns The minimum number of fresh reports that need to be
    * present in the oracle to update buckets
    * commit to the gold bucket
    */
-  minimumReports = proxyCall(this.contract.methods.minimumReports, undefined, toBigNumber)
+  minimumReports = proxyCall(this.contract.methods.minimumReports, undefined, numberLikeToBigNumber)
 
   /**
    * @dev Returns the amount of buyToken a user would get for sellAmount of sellToken
@@ -56,8 +66,8 @@ export class ExchangeWrapper extends BaseWrapper<Exchange> {
    */
   getBuyTokenAmount: (sellAmount: NumberLike, sellGold: boolean) => Promise<BigNumber> = proxyCall(
     this.contract.methods.getBuyTokenAmount,
-    tupleParser(parseNumber, identity),
-    toBigNumber
+    tupleParser(numberLikeToString, identity),
+    numberLikeToBigNumber
   )
 
   /**
@@ -69,8 +79,8 @@ export class ExchangeWrapper extends BaseWrapper<Exchange> {
    */
   getSellTokenAmount: (buyAmount: NumberLike, sellGold: boolean) => Promise<BigNumber> = proxyCall(
     this.contract.methods.getSellTokenAmount,
-    tupleParser(parseNumber, identity),
-    toBigNumber
+    tupleParser(numberLikeToString, identity),
+    numberLikeToBigNumber
   )
 
   /**
@@ -83,7 +93,10 @@ export class ExchangeWrapper extends BaseWrapper<Exchange> {
     this.contract.methods.getBuyAndSellBuckets,
     undefined,
     (callRes: { 0: string; 1: string }) =>
-      [toBigNumber(callRes[0]), toBigNumber(callRes[1])] as [BigNumber, BigNumber]
+      [numberLikeToBigNumber(callRes[0]), numberLikeToBigNumber(callRes[1])] as [
+        BigNumber,
+        BigNumber
+      ]
   )
 
   /**
@@ -102,7 +115,7 @@ export class ExchangeWrapper extends BaseWrapper<Exchange> {
   ) => CeloTransactionObject<string> = proxySend(
     this.kit,
     this.contract.methods.exchange,
-    tupleParser(parseNumber, parseNumber, identity)
+    tupleParser(numberLikeToString, numberLikeToString, identity)
   )
 
   /**
@@ -181,7 +194,7 @@ export class ExchangeWrapper extends BaseWrapper<Exchange> {
    */
   async getExchangeRate(buyAmount: NumberLike, sellGold: boolean): Promise<BigNumber> {
     const takerAmount = await this.getBuyTokenAmount(buyAmount, sellGold)
-    return new BigNumber(buyAmount).dividedBy(takerAmount) // Number of sellTokens received for one buyToken
+    return numberLikeToFrac(buyAmount, takerAmount) // Number of sellTokens received for one buyToken
   }
 
   /**

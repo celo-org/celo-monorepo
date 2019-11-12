@@ -3,7 +3,7 @@ import CopyIcon from '@celo/react-components/icons/Copy'
 import colors from '@celo/react-components/styles/colors'
 import { fontStyles } from '@celo/react-components/styles/fonts'
 import { componentStyles } from '@celo/react-components/styles/styles'
-import { stripHexLeader } from '@celo/utils/src/signatureUtils'
+import { trimLeading0x } from '@celo/utils/src/address'
 import * as React from 'react'
 import { withNamespaces, WithNamespaces } from 'react-i18next'
 import { Clipboard, ScrollView, StyleSheet, Text, View } from 'react-native'
@@ -69,7 +69,7 @@ function getRecodedVerificationText(attestationCode: AttestationCode, t: i18n.Tr
       return t('codeAccepted')
     }
 
-    return Buffer.from(stripHexLeader(attestationCode.code), 'hex').toString('base64')
+    return Buffer.from(trimLeading0x(attestationCode.code), 'hex').toString('base64')
   } catch (error) {
     Logger.warn(TAG, 'Could not recode verification code to base64')
     return null

@@ -1,7 +1,8 @@
-import { encryptComment as encryptCommentRaw } from '@celo/utils/src/commentEncryption'
-import { stripHexLeader } from '@celo/utils/src/signatureUtils'
-import { getAttestationsContract, getDataEncryptionKey } from '@celo/walletkit'
 import { web3 } from 'src/web3/contracts'
+
+import { trimLeading0x } from '@celo/utils/src/address'
+import { encryptComment as encryptCommentRaw } from '@celo/utils/src/commentEncryption'
+import { getAttestationsContract, getDataEncryptionKey } from '@celo/walletkit'
 
 export async function getCommentKey(address: string): Promise<Buffer | null> {
   const attestations = await getAttestationsContract(web3)
@@ -11,7 +12,7 @@ export async function getCommentKey(address: string): Promise<Buffer | null> {
     return null
   }
   // Buffer.from will create an empty buffer if the input string has '0x' prepended
-  return Buffer.from(stripHexLeader(hexString), 'hex')
+  return Buffer.from(trimLeading0x(hexString), 'hex')
 }
 
 export async function encryptComment(

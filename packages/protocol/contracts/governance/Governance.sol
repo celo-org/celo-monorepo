@@ -34,9 +34,6 @@ contract Governance is
 
   uint256 private constant FIXED_HALF = 500000000000000000000000;
 
-  // TODO(asa): Consider a delay stage.
-  enum ProposalStage { None, Queued, Approval, Referendum, Execution, Expiration }
-
   enum VoteValue { None, Abstain, No, Yes }
 
   struct UpvoteRecord {
@@ -471,6 +468,21 @@ contract Governance is
     voter.upvote = UpvoteRecord(proposalId, weight);
     emit ProposalUpvoted(proposalId, account, weight);
     return true;
+  }
+
+  /**
+   * @notice Returns stage of governance process given proposal is in
+   * @param proposalId The ID of the proposal to query.
+   * @return proposal stage
+   */
+  function getProposalStage(uint256 proposalId) external view returns (Proposals.Stage) {
+    if (proposalId == 0 || proposalId > proposalCount) {
+      return Proposals.Stage.None;
+    } else if (isQueued(proposalId)) {
+      return Proposals.Stage.Queued;
+    } else {
+      return proposals[proposalId].getDequeuedStage(stageDurations);
+    }
   }
 
   /**
