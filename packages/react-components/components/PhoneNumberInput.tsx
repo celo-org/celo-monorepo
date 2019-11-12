@@ -10,7 +10,6 @@ import { getRegionCodeFromCountryCode, parsePhoneNumber } from '@celo/utils/src/
 import * as React from 'react'
 import { Platform, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
 import Autocomplete from 'react-native-autocomplete-input'
-import DeviceInfo from 'react-native-device-info'
 
 const TAG = 'PhoneNumberInput'
 
@@ -97,8 +96,7 @@ export default class PhoneNumberInput extends React.Component<Props, State> {
 
   async triggerPhoneNumberRequest() {
     try {
-      const baseOS = await DeviceInfo.getBaseOs()
-      if (baseOS === 'Android') {
+      if (Platform.OS === 'android') {
         await this.triggerPhoneNumberRequestAndroid()
       } else {
         console.info(`${TAG}/triggerPhoneNumberRequest`, 'Not implemented in this platform')
