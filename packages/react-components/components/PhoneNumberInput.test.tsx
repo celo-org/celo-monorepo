@@ -1,18 +1,13 @@
 import PhoneNumberInput from '@celo/react-components/components/PhoneNumberInput'
 import { shallow } from 'enzyme'
 import * as React from 'react'
+import { Platform } from 'react-native'
 import { fireEvent, render } from 'react-native-testing-library'
 
 jest.mock('@celo/react-native-sms-retriever', () => {
   return {
     requestPhoneNumber: jest.fn(() => '+49030111111'),
   }
-})
-
-jest.mock('Platform', () => {
-  const Platform = require.requireActual('Platform')
-  Platform.OS = 'android'
-  return Platform
 })
 
 describe('PhoneNumberInput', () => {
@@ -54,6 +49,9 @@ describe('when defaultCountry is truthy', () => {
 
   describe('Native phone picker (Android)', () => {
     it('can read phone', async () => {
+      // mock
+      Platform.OS = 'android'
+
       const wrapper = shallow<PhoneNumberInput>(
         <PhoneNumberInput
           setE164Number={jest.fn()}
