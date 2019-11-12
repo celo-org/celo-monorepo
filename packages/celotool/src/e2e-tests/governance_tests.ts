@@ -1,4 +1,5 @@
 import { ContractKit, newKitFromWeb3 } from '@celo/contractkit'
+import { addressToPublicKey } from '@celo/utils/lib/address'
 import { getBlsPoP, getBlsPublicKey } from '@celo/utils/lib/bls'
 import { fromFixed, toFixed } from '@celo/utils/lib/fixidity'
 import BigNumber from 'bignumber.js'
@@ -150,7 +151,14 @@ describe('governance tests', () => {
     ).contracts.getAccounts()).generateProofOfSigningKeyPossession(validator, signer)
     const validatorKit = newKitFromWeb3(validatorWeb3)
     const validatorAccounts = await validatorKit._web3Contracts.getAccounts()
-    const tx = validatorAccounts.methods.authorizeValidatorSigner(signer, pop.v, pop.r, pop.s)
+    const publicKey = await addressToPublicKey(signer, signerWeb3)
+    const tx = validatorAccounts.methods.authorizeValidatorSigner(
+      signer,
+      publicKey,
+      pop.v,
+      pop.r,
+      pop.s
+    )
     let gas = txOptions.gas
     if (!gas) {
       gas = await tx.estimateGas({ ...txOptions })
