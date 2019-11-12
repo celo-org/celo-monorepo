@@ -87,13 +87,9 @@ describe(initializeCloudMessaging, () => {
 
 describe('Firebase version check', () => {
   it('Correctly check if version is deprecated', () => {
-    let isDeprecated: boolean = isVersionBelowMinimum('1.5.0', '1.4.0')
-    expect(isDeprecated).toBe(false)
-    isDeprecated = isVersionBelowMinimum('1.4.0', '1.5.0')
-    expect(isDeprecated).toBe(true)
-    isDeprecated = isVersionBelowMinimum('1.4.0', '1.4.0')
-    expect(isDeprecated).toBe(false)
-    isDeprecated = isVersionBelowMinimum('1.4.0', '1.4.0.1')
-    expect(isDeprecated).toBe(true)
+    expect(isVersionBelowMinimum('1.5.0', '1.4.0')).toBe(false)
+    expect(isVersionBelowMinimum('1.4.0', '1.5.0')).toBe(true)
+    expect(isVersionBelowMinimum('1.4.0', '1.4.0')).toBe(false)
+    expect(isVersionBelowMinimum('1.4.0', '1.4.0.1')).toBe(true)
   })
 })
