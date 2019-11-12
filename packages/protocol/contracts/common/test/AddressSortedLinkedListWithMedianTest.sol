@@ -3,7 +3,6 @@ pragma solidity ^0.5.3;
 import "../linkedlists/AddressSortedLinkedListWithMedian.sol";
 import "../linkedlists/SortedLinkedListWithMedian.sol";
 
-
 contract AddressSortedLinkedListWithMedianTest {
   using AddressSortedLinkedListWithMedian for SortedLinkedListWithMedian.List;
 
@@ -32,11 +31,7 @@ contract AddressSortedLinkedListWithMedianTest {
   function getElements()
     external
     view
-    returns (
-        address[] memory,
-        uint256[] memory,
-        SortedLinkedListWithMedian.MedianRelation[] memory
-    )
+    returns (address[] memory, uint256[] memory, SortedLinkedListWithMedian.MedianRelation[] memory)
   {
     return list.getElements();
   }

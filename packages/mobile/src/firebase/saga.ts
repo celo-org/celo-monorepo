@@ -105,7 +105,7 @@ function createPaymentRequestChannel(address: string) {
 }
 
 const compareTimestamps = (a: PaymentRequest, b: PaymentRequest) => {
-  return new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime()
+  return new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime()
 }
 
 const onlyRequested = (pr: PaymentRequest) => pr.status === PaymentRequestStatus.REQUESTED
@@ -138,7 +138,12 @@ function* subscribeToPaymentRequests() {
 function* updatePaymentRequestStatus({ id, status }: UpdatePaymentRequestStatusAction) {
   try {
     Logger.debug(TAG, 'Updating payment request', id, status)
-    yield call(firebase.database().ref(`${REQUEST_DB}/${id}`).update, { status })
+    yield call(() =>
+      firebase
+        .database()
+        .ref(`${REQUEST_DB}/${id}`)
+        .update({ status })
+    )
     Logger.debug(TAG, 'Payment request status updated', id)
   } catch (error) {
     Logger.error(TAG, `Error while updating payment request ${id} status`, error)

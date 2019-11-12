@@ -13,7 +13,6 @@ import "../common/FixidityLib.sol";
 import "../baklava/Freezable.sol";
 import "../common/UsingRegistry.sol";
 
-
 /**
  * @title Contract that allows to exchange StableToken for GoldToken and vice versa
  * using a Constant Product Market Maker Model
@@ -23,32 +22,17 @@ contract Exchange is IExchange, Initializable, Ownable, UsingRegistry, Reentranc
   using FractionUtil for FractionUtil.Fraction;
   using FixidityLib for FixidityLib.Fraction;
 
-  event Exchanged(
-    address indexed exchanger,
-    uint256 sellAmount,
-    uint256 buyAmount,
-    bool soldGold
-  );
+  event Exchanged(address indexed exchanger, uint256 sellAmount, uint256 buyAmount, bool soldGold);
 
-  event UpdateFrequencySet(
-    uint256 updateFrequency
-  );
+  event UpdateFrequencySet(uint256 updateFrequency);
 
-  event MinimumReportsSet(
-    uint256 minimumReports
-  );
+  event MinimumReportsSet(uint256 minimumReports);
 
-  event StableTokenSet(
-    address stable
-  );
+  event StableTokenSet(address stable);
 
-  event SpreadSet(
-    uint256 spread
-  );
+  event SpreadSet(uint256 spread);
 
-  event ReserveFractionSet(
-    uint256 reserveFraction
-  );
+  event ReserveFractionSet(uint256 reserveFraction);
 
   FixidityLib.Fraction public spread;
 
@@ -96,10 +80,7 @@ contract Exchange is IExchange, Initializable, Ownable, UsingRegistry, Reentranc
     uint256 _reserveFraction,
     uint256 _updateFrequency,
     uint256 _minimumReports
-  )
-    external
-    initializer
-  {
+  ) external initializer {
     _transferOwnership(msg.sender);
     setFreezer(_freezer);
     setRegistry(registryAddress);
@@ -121,11 +102,7 @@ contract Exchange is IExchange, Initializable, Ownable, UsingRegistry, Reentranc
    * @return The amount of buyToken that was transfered
    * @dev This function can be frozen using the Freezable interface.
    */
-  function exchange(
-    uint256 sellAmount,
-    uint256 minBuyAmount,
-    bool sellGold
-  )
+  function exchange(uint256 sellAmount, uint256 minBuyAmount, bool sellGold)
     external
     onlyWhenNotFrozen
     updateBucketsIfNecessary
@@ -168,23 +145,18 @@ contract Exchange is IExchange, Initializable, Ownable, UsingRegistry, Reentranc
    * @param sellGold `true` if gold is the sell token
    * @return The corresponding buyToken amount.
    */
-  function getBuyTokenAmount(
-    uint256 sellAmount,
-    bool sellGold
-  )
-    external
-    view
-    returns (uint256)
-  {
+  function getBuyTokenAmount(uint256 sellAmount, bool sellGold) external view returns (uint256) {
     uint256 sellTokenBucket;
     uint256 buyTokenBucket;
     (buyTokenBucket, sellTokenBucket) = getBuyAndSellBuckets(sellGold);
 
     FixidityLib.Fraction memory reducedSellAmount = getReducedSellAmount(sellAmount);
-    FixidityLib.Fraction memory numerator =
-      reducedSellAmount.multiply(FixidityLib.newFixed(buyTokenBucket));
-    FixidityLib.Fraction memory denominator =
-      FixidityLib.newFixed(sellTokenBucket).add(reducedSellAmount);
+    FixidityLib.Fraction memory numerator = reducedSellAmount.multiply(
+      FixidityLib.newFixed(buyTokenBucket)
+    );
+    FixidityLib.Fraction memory denominator = FixidityLib.newFixed(sellTokenBucket).add(
+      reducedSellAmount
+    );
 
     // Can't use FixidityLib.divide because denominator can easily be greater
     // than maxFixedDivisor.
@@ -200,20 +172,14 @@ contract Exchange is IExchange, Initializable, Ownable, UsingRegistry, Reentranc
    * @param sellGold `true` if gold is the sell token
    * @return The corresponding sellToken amount.
    */
-  function getSellTokenAmount(
-    uint256 buyAmount,
-    bool sellGold
-  )
-    external
-    view
-    returns (uint256)
-  {
+  function getSellTokenAmount(uint256 buyAmount, bool sellGold) external view returns (uint256) {
     uint256 sellTokenBucket;
     uint256 buyTokenBucket;
     (buyTokenBucket, sellTokenBucket) = getBuyAndSellBuckets(sellGold);
 
     FixidityLib.Fraction memory numerator = FixidityLib.newFixed(buyAmount.mul(sellTokenBucket));
-    FixidityLib.Fraction memory denominator = FixidityLib.newFixed(buyTokenBucket.sub(buyAmount))
+    FixidityLib.Fraction memory denominator = FixidityLib
+      .newFixed(buyTokenBucket.sub(buyAmount))
       .multiply(FixidityLib.fixed1().subtract(spread));
 
     // See comment in getBuyTokenAmount
@@ -310,23 +276,18 @@ contract Exchange is IExchange, Initializable, Ownable, UsingRegistry, Reentranc
    * @param sellGold `true` if gold is the sell token
    * @return The corresponding buyToken amount.
    */
-  function _getBuyTokenAmount(
-    uint256 sellAmount,
-    bool sellGold
-  )
-    private
-    view
-    returns (uint256)
-  {
+  function _getBuyTokenAmount(uint256 sellAmount, bool sellGold) private view returns (uint256) {
     uint256 sellTokenBucket;
     uint256 buyTokenBucket;
     (buyTokenBucket, sellTokenBucket) = _getBuyAndSellBuckets(sellGold);
 
     FixidityLib.Fraction memory reducedSellAmount = getReducedSellAmount(sellAmount);
-    FixidityLib.Fraction memory numerator =
-      reducedSellAmount.multiply(FixidityLib.newFixed(buyTokenBucket));
-    FixidityLib.Fraction memory denominator =
-      FixidityLib.newFixed(sellTokenBucket).add(reducedSellAmount);
+    FixidityLib.Fraction memory numerator = reducedSellAmount.multiply(
+      FixidityLib.newFixed(buyTokenBucket)
+    );
+    FixidityLib.Fraction memory denominator = FixidityLib.newFixed(sellTokenBucket).add(
+      reducedSellAmount
+    );
 
     // See comment in getBuyTokenAmount
     return numerator.unwrap() / denominator.unwrap();
@@ -369,9 +330,7 @@ contract Exchange is IExchange, Initializable, Ownable, UsingRegistry, Reentranc
     view
     returns (FixidityLib.Fraction memory)
   {
-    return FixidityLib.fixed1()
-      .subtract(spread)
-      .multiply(FixidityLib.newFixed(sellAmount));
+    return FixidityLib.fixed1().subtract(spread).multiply(FixidityLib.newFixed(sellAmount));
   }
 
   /*
@@ -380,22 +339,24 @@ contract Exchange is IExchange, Initializable, Ownable, UsingRegistry, Reentranc
    * TODO: check the oldest report isn't expired
    */
   function shouldUpdateBuckets() private view returns (bool) {
-    ISortedOracles sortedOracles =
-      ISortedOracles(registry.getAddressForOrDie(SORTED_ORACLES_REGISTRY_ID));
+    ISortedOracles sortedOracles = ISortedOracles(
+      registry.getAddressForOrDie(SORTED_ORACLES_REGISTRY_ID)
+    );
     // solhint-disable-next-line not-rely-on-time
     bool timePassed = now >= lastBucketUpdate.add(updateFrequency);
     bool enoughReports = sortedOracles.numRates(stable) >= minimumReports;
-    bool medianReportRecent =
     // solhint-disable-next-line not-rely-on-time
-      sortedOracles.medianTimestamp(stable) > now.sub(updateFrequency);
+    bool medianReportRecent = sortedOracles.medianTimestamp(stable) > now.sub(updateFrequency);
     return timePassed && enoughReports && medianReportRecent;
   }
 
   function getOracleExchangeRate() private view returns (FractionUtil.Fraction memory) {
     uint256 rateNumerator;
     uint256 rateDenominator;
-    (rateNumerator, rateDenominator) =
-      ISortedOracles(registry.getAddressForOrDie(SORTED_ORACLES_REGISTRY_ID)).medianRate(stable);
+    (rateNumerator, rateDenominator) = ISortedOracles(
+      registry.getAddressForOrDie(SORTED_ORACLES_REGISTRY_ID)
+    )
+      .medianRate(stable);
     return FractionUtil.Fraction(rateNumerator, rateDenominator);
   }
 }

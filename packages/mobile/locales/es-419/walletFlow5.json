@@ -3,7 +3,6 @@
   "paymentRequest": "Solicitud de pago",
   "paymentRequestWithCount_plural": "{{count}} solicitudes de pago",
   "SMSError": "Error al enviar SMS",
-  "SMSErrorDetails": "Error al enviar SMS a {{recipientNumber}}: {{errMsg}}`",
   "notifications": "Notificaciones",
   "getBackupKey": "Obtener clave de respaldo",
   "setBackupKey":
@@ -56,7 +55,9 @@
   "refreshBalances": "Actualizar saldos",
   "reclaimPayment": "Reclamar el Pago",
   "sendMessage": "Enviar Mensaje",
-  "escrowedPaymentReminder": "Recuérdele a {{mobile #}} que acepte el pago",
+  "escrowedPaymentReminderListItemTitle": "Recuérdele a {{mobile #}} que acepte el pago",
+  "escrowedPaymentReminder": "Reacuerda al receptor aceptar el pago",
+  "escrowedPaymentReminderWithCount_plural": "Recordar {{count}} receptores to aceptar el pago",
   "escrowedPaymentReminderSms":
     "¡Un recordatorio amistoso de que aún no ha canjeado sus dólares de celo!",
   "testnetAlert": {

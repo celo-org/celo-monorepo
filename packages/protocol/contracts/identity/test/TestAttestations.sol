@@ -2,7 +2,6 @@ pragma solidity ^0.5.3;
 
 import "../Attestations.sol";
 
-
 /*
  * We need a test contract that behaves like the actual Attestations contract,
  * but mocks the implementations of the validator set getters. Otherwise we

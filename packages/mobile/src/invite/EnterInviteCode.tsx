@@ -1,6 +1,6 @@
 import Button, { BtnTypes } from '@celo/react-components/components/Button'
 import SmallButton from '@celo/react-components/components/SmallButton'
-import InviteCodeIcon from '@celo/react-components/icons/InviteCodeIcon'
+import SmsCeloSwap from '@celo/react-components/icons/SmsCeloSwap'
 import colors from '@celo/react-components/styles/colors'
 import fontStyles from '@celo/react-components/styles/fonts'
 import { componentStyles } from '@celo/react-components/styles/styles'
@@ -25,10 +25,10 @@ import { hideAlert, showError } from 'src/alert/actions'
 import { componentWithAnalytics } from 'src/analytics/wrapper'
 import { ErrorMessages } from 'src/app/ErrorMessages'
 import DevSkipButton from 'src/components/DevSkipButton'
-import { CELO_FAUCET_LINK, DEFAULT_TESTNET } from 'src/config'
+import { CELO_FAUCET_LINK, DEFAULT_TESTNET, SHOW_GET_INVITE_LINK } from 'src/config'
 import { Namespaces } from 'src/i18n'
 import { redeemInvite } from 'src/invite/actions'
-import { extractValidInviteCode, getInviteCodeFromReferrerData } from 'src/invite/utils'
+import { extractValidInviteCode, getValidInviteCodeFromReferrerData } from 'src/invite/utils'
 import { nuxNavigationOptionsNoBackButton } from 'src/navigator/Headers'
 import { navigate } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
@@ -89,7 +89,7 @@ export class EnterInviteCode extends React.Component<Props, State> {
   }
 
   checkForReferrerCode = async () => {
-    const validCode = await getInviteCodeFromReferrerData()
+    const validCode = await getValidInviteCodeFromReferrerData()
     if (validCode) {
       this.setState({ validCode })
     }
@@ -152,7 +152,7 @@ export class EnterInviteCode extends React.Component<Props, State> {
       <SafeAreaView style={styles.container}>
         <ScrollView contentContainerStyle={styles.scrollContainer}>
           <DevSkipButton nextScreen={Screens.ImportContacts} />
-          <InviteCodeIcon />
+          <SmsCeloSwap />
           <Text style={styles.h1} testID={'InviteCodeTitle'}>
             {t('inviteCodeText.title')}
           </Text>
@@ -212,12 +212,14 @@ export class EnterInviteCode extends React.Component<Props, State> {
         </ScrollView>
 
         <View>
-          <Text style={styles.askInviteText}>
-            {t('inviteCodeText.askForInvite.0', { testnet: _.startCase(DEFAULT_TESTNET) })}
-            <Text onPress={this.onPressGoToFaucet} style={styles.askInviteLink}>
-              {t('inviteCodeText.askForInvite.1')}
+          {SHOW_GET_INVITE_LINK && (
+            <Text style={styles.askInviteText}>
+              {t('inviteCodeText.askForInvite.0', { testnet: _.startCase(DEFAULT_TESTNET) })}
+              <Text onPress={this.onPressGoToFaucet} style={styles.askInviteLink}>
+                {t('inviteCodeText.askForInvite.1')}
+              </Text>
             </Text>
-          </Text>
+          )}
           <Button
             onPress={this.onPressContinue}
             disabled={isRedeemingInvite || !redeemComplete || !account}
