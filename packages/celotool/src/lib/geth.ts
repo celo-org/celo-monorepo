@@ -1,6 +1,7 @@
 /* tslint:disable: no-console */
 import {
-  /* CeloContract, CeloToken, */ ContractKit,
+  CeloContract,
+  /* CeloToken, */ ContractKit,
   newKit /*, newKitFromWeb3 */,
 } from '@celo/contractkit'
 import {
@@ -478,18 +479,24 @@ export const simulateClientContractKit = async (
   gasFeeRecipientAddress: string,
   txPeriodMs: number // time between each transaction in ms
 ) => {
+  console.log('simulateClientContractKit')
   while (true) {
     // todo change this url
     const kit = newKit('http://localhost:8545')
-    console.log('transferring 400 celo gold...')
     console.log('kit.web3.eth.blockNumber', await kit.web3.eth.getBlockNumber())
 
     // randomly choose to transfer gold or dollars
     const transferFn = Math.round(Math.random()) ? transferCeloGold : transferCeloDollars
+    // randomly choose which gas currency to use
+    const gasCurrencyContractName = Math.round(Math.random())
+      ? CeloContract.GoldToken
+      : CeloContract.StableToken
+    console.log('gas currency doe', gasCurrencyContractName)
+    const gasCurrency = await kit.registry.addressFor(gasCurrencyContractName)
 
-    const gas
-
+    console.log(`Transferring 400 ${gasCurrencyContractName}...`)
     const txResult = await transferFn(kit, senderAddress, recipientAddress, new BigNumber(400), {
+      gasCurrency,
       gasFeeRecipient: gasFeeRecipientAddress,
     })
     const txReceipt = await txResult.waitReceipt()
