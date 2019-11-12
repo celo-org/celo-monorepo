@@ -167,9 +167,9 @@ describe('governance tests', () => {
     const signer = (await signerWeb3.eth.getAccounts())[0]
     await unlockAccount(signer, signerWeb3)
     const blsPublicKey = getBlsPublicKey(signerPrivateKey)
-    const blsPop = getBlsPop(validator, signerPrivateKey)
+    const blsPop = getBlsPoP(validator, signerPrivateKey)
     const signerKit = newKitFromWeb3(signerWeb3)
-    const signerValidators = await validatorKit._web3Contracts.getValidators()
+    const signerValidators = await signerKit._web3Contracts.getValidators()
     const tx = signerValidators.methods.updateBlsKey(blsPublicKey, blsPop)
     let gas = txOptions.gas
     if (!gas) {

@@ -525,10 +525,9 @@ contract('Validators', (accounts: string[]) => {
     })
   })
 
-  describe.only('#registerValidator', () => {
+  describe('#registerValidator', () => {
     const validator = accounts[0]
     let resp: any
-    let publicKey: string
     describe('when the account is not a registered validator', () => {
       beforeEach(async () => {
         await mockLockedGold.setAccountTotalLockedGold(
@@ -539,11 +538,12 @@ contract('Validators', (accounts: string[]) => {
 
       describe('when the account has authorized a validator signer', () => {
         let validatorRegistrationEpochNumber: number
+        let publicKey: string
         beforeEach(async () => {
           const signer = accounts[9]
           const sig = await getParsedSignatureOfAddress(web3, validator, signer)
           await accountsInstance.authorizeValidatorSigner(signer, sig.v, sig.r, sig.s)
-          publicKey = await addressToPublicKey(validator, web3)
+          publicKey = await addressToPublicKey(signer, web3)
           resp = await validators.registerValidator(
             // @ts-ignore bytes type
             publicKey,
@@ -607,12 +607,16 @@ contract('Validators', (accounts: string[]) => {
     })
 
     describe('when the account is already a registered validator ', () => {
+      let publicKey: string
       beforeEach(async () => {
         await mockLockedGold.setAccountTotalLockedGold(
           validator,
           validatorLockedGoldRequirements.value
         )
-        // @ts-ignore bytes type
+      })
+
+      it('should revert', async () => {
+        publicKey = await addressToPublicKey(validator, web3)
         await validators.registerValidator(
           // @ts-ignore bytes type
           publicKey,
@@ -621,9 +625,6 @@ contract('Validators', (accounts: string[]) => {
           // @ts-ignore bytes type
           blsPoP
         )
-      })
-
-      it('should revert', async () => {
         await assertRevert(
           validators.registerValidator(
             // @ts-ignore bytes type
@@ -644,6 +645,7 @@ contract('Validators', (accounts: string[]) => {
       })
 
       it('should revert', async () => {
+        const publicKey = await addressToPublicKey(validator, web3)
         await assertRevert(
           validators.registerValidator(
             // @ts-ignore bytes type
@@ -666,6 +668,7 @@ contract('Validators', (accounts: string[]) => {
       })
 
       it('should revert', async () => {
+        const publicKey = await addressToPublicKey(validator, web3)
         await assertRevert(
           validators.registerValidator(
             // @ts-ignore bytes type
@@ -1064,6 +1067,54 @@ contract('Validators', (accounts: string[]) => {
       await assertRevert(validators.deaffiliate())
     })
   })
+
+  /*
+  TODO(asa): Restore once ganache supports this precompile.
+  describe('#updateEcdsaKey()', () => {
+    let sig: any
+    let newPublicKey: string
+    describe('when called by a registered validator', () => {
+      const validator = accounts[0]
+      const signer = accounts[9]
+      beforeEach(async () => {
+        await registerValidator(validator)
+        newPublicKey = await addressToPublicKey(signer, web3)
+      })
+
+      describe('when called by the registered `Accounts` contract', () => {
+        beforeEach(async () => {
+          await registry.setAddressFor(CeloContractName.Accounts, accounts[0])
+        })
+
+        describe('when the signature matches the `signer`', () => {
+          let resp: any
+          beforeEach(async () => {
+            const sig = await getParsedSignatureOfAddress(web3, validator, signer)
+            // @ts-ignore Broken typechain typing for bytes
+            resp = await validators.updateEcdsaKey(validator, signer, sig.v, sig.r, sig.s)
+          })
+
+          it('should set the validator ecdsa public key', async () => {
+            const parsedValidator = parseValidatorParams(await validators.getValidator(validator))
+            assert.equal(parsedValidator.ecdsaKey, newPublicKey)
+          })
+
+          it('should emit the ValidatorEcdsaKeyUpdated event', async () => {
+            assert.equal(resp.logs.length, 1)
+            const log = resp.logs[0]
+            assertContainSubset(log, {
+              event: 'ValidatorEcdsaKeyUpdated',
+              args: {
+                validator,
+                ecdsaKey: newPublicKey,
+              },
+            })
+          })
+        })
+      })
+    })
+  })
+  */
 
   describe('#updateBlsKey()', () => {
     const newBlsPublicKey = web3.utils.randomHex(48)

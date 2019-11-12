@@ -557,7 +557,7 @@ contract Validators is
   {
     require(ecdsaKey.length == 64);
     require(
-      address(uint256(keccak256(ecdsaKey)) >> 96) == signer,
+      address(uint160(uint256(keccak256(ecdsaKey)))) == signer,
       "ECDSA key does not match signer"
     );
     validator.keys.ecdsa = ecdsaKey;

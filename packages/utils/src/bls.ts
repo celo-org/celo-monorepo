@@ -3,7 +3,6 @@ const keccak256 = require('keccak256')
 const BigInteger = require('bigi')
 const reverse = require('buffer-reverse')
 import * as bls12377js from 'bls12377js'
-import { privateKeyToAddress } from './address'
 
 const n = BigInteger.fromHex('12ab655e9a2ca55660b44d1e5c37b00159aa76fed00000010a11800000000001', 16)
 
@@ -48,9 +47,8 @@ export const getBlsPublicKey = (privateKeyHex: string) => {
   return bls12377js.BLS.privateToPublicBytes(blsPrivateKeyBytes).toString('hex')
 }
 
-export const getBlsPoP = (privateKeyHex: string) => {
+export const getBlsPoP = (address: string, privateKeyHex: string) => {
   const blsPrivateKeyBytes = getBlsPrivateKey(privateKeyHex)
-  const address = privateKeyToAddress(privateKeyHex)
   return bls12377js.BLS.signPoP(blsPrivateKeyBytes, Buffer.from(address.slice(2), 'hex')).toString(
     'hex'
   )

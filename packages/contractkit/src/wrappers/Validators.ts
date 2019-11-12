@@ -114,7 +114,7 @@ export class ValidatorsWrapper extends BaseWrapper<Validators> {
   updateBlsKey: (blsKey: string, blsPop: string) => CeloTransactionObject<boolean> = proxySend(
     this.kit,
     this.contract.methods.updateBlsKey,
-    tupleParser(parseBytes)
+    tupleParser(parseBytes, parseBytes)
   )
 
   /**
@@ -245,7 +245,7 @@ export class ValidatorsWrapper extends BaseWrapper<Validators> {
   ) => CeloTransactionObject<boolean> = proxySend(
     this.kit,
     this.contract.methods.registerValidator,
-    tupleParser(parseBytes)
+    tupleParser(parseBytes, parseBytes, parseBytes)
   )
 
   /**

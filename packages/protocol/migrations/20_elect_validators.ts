@@ -114,7 +114,7 @@ async function registerValidator(
 
   const publicKey = privateKeyToPublicKey(validatorPrivateKey)
   const blsPublicKey = getBlsPublicKey(validatorPrivateKey)
-  const blsPoP = getBlsPoP(validatorPrivateKey)
+  const blsPoP = getBlsPoP(privateKeyToAddress(validatorPrivateKey), validatorPrivateKey)
 
   // @ts-ignore
   const registerTx = validators.contract.methods.registerValidator(publicKey, blsPublicKey, blsPoP)
