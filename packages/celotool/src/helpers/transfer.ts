@@ -87,8 +87,10 @@ const transferCeloGold = async (
 }
 
 const web3 = new Web3('http://localhost:8545')
-const from: string = strip0xFromAddress(process.env.CELO_ACCOUNT_ADDRESS || '0x0')
-const NUM_TX = 40
+const from: string = strip0xFromAddress(process.env.FROM || '0x0')
+const to: string = strip0xFromAddress(process.env.TO || '0x0')
+const NUM_TX = process.env.NUM_TX || 40
+const AMOUNT = new BigNumber(process.env.AMOUNT || 0)
 
 const randomItem = (list: string[]) => {
   return list[Math.floor(Math.random() * list.length)]
@@ -96,15 +98,10 @@ const randomItem = (list: string[]) => {
 ;(async () => {
   const stableTokenAddress = await getContractAddress('StableTokenProxy')
   const stableToken = new web3.eth.Contract(stableTokenAbi, stableTokenAddress)
-  // const LockedGoldContract = await LockedGold(web3)
-  // const LockedGoldAddress = await getContractAddress('LockedGold')
-  // console.log(LockedGoldAddress)
-  // console.log(await LockedGoldContract.methods.getTotalLockedGold().call())
   const getBalance = async (address: string) => {
     const balance: any = {}
     const goldBalance = new BigNumber(await web3.eth.getBalance(address))
     const dollarBalance = new BigNumber(await stableToken.methods.balanceOf(address).call())
-    // const dollarBalance = 0
     balance[CURRENCY_ENUM.GOLD] = goldBalance
     balance[CURRENCY_ENUM.DOLLAR] = dollarBalance
     return balance
@@ -113,12 +110,14 @@ const randomItem = (list: string[]) => {
   const accounts = await web3.eth.getAccounts()
 
   for (let k = 0; k < NUM_TX; k++) {
-    const to = strip0xFromAddress(randomItem(accounts))
+    const toAddress = to === '0x0' ? strip0xFromAddress(randomItem(accounts)) : to
     const feeRecipientAddress = randomItem(accounts)
     const balance = await getBalance(from)
-    let amount = new BigNumber(Math.floor((Math.random() * balance[CURRENCY_ENUM.GOLD]) / 10000))
+    let amount = AMOUNT
+      ? AMOUNT
+      : new BigNumber(Math.floor((Math.random() * balance[CURRENCY_ENUM.GOLD]) / 10000))
 
-    await transferCeloGold(from, to, amount, {
+    await transferCeloGold(from, toAddress, amount, {
       gasCurrency: stableTokenAddress,
       gasFeeRecipient: feeRecipientAddress,
     })
