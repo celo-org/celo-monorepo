@@ -35,6 +35,8 @@ class QRScanner extends React.Component<Props, State> {
     headerTitle: i18n.t('sendFlow7:scanCode'),
   })
 
+  timeout: undefined | number = undefined
+
   state = {
     isScanningEnabled: true,
   }
@@ -45,10 +47,11 @@ class QRScanner extends React.Component<Props, State> {
   // QR code, so we need to catch only the first one
   onBardCodeDetected = (rawData: any) => {
     if (this.state.isScanningEnabled) {
-      this.setState({ isScanningEnabled: false })
-      Logger.debug('QRScanner', 'Bar code detected')
-      this.props.handleBarcodeDetected(rawData)
-      setTimeout(() => {
+      this.setState({ isScanningEnabled: false }, () => {
+        Logger.debug('QRScanner', 'Bar code detected')
+        this.props.handleBarcodeDetected(rawData)
+      })
+      this.timeout = setTimeout(() => {
         this.setState({ isScanningEnabled: true })
       }, 1000)
     }
@@ -56,6 +59,12 @@ class QRScanner extends React.Component<Props, State> {
 
   onPressShowYourCode = () => {
     navigate(Screens.QRCode)
+  }
+
+  componentWillUnmount() {
+    if (this.timeout) {
+      clearTimeout(this.timeout)
+    }
   }
 
   render() {
