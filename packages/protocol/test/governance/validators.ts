@@ -1068,7 +1068,7 @@ contract('Validators', (accounts: string[]) => {
     })
   })
 
-  describe.only('#updateEcdsaKey()', () => {
+  describe('#updateEcdsaKey()', () => {
     describe('when called by a registered validator', () => {
       const validator = accounts[0]
       beforeEach(async () => {
