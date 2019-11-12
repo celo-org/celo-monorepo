@@ -10,11 +10,10 @@ exports[`TransferConfirmationCard renders correctly for faucet drilldown 1`] = `
         "borderWidth": 1,
       },
       Object {
-        "flex": 1,
-        "flexDirection": "column",
-        "justifyContent": "flex-start",
-        "paddingHorizontal": 40,
-        "paddingVertical": 25,
+        "marginVertical": 20,
+        "minWidth": 562.5,
+        "paddingHorizontal": 20,
+        "paddingVertical": 40,
       },
     ]
   }
@@ -29,8 +28,7 @@ exports[`TransferConfirmationCard renders correctly for faucet drilldown 1`] = `
       Object {
         "alignSelf": "center",
         "height": 40,
-        "marginBottom": 40,
-        "marginTop": 25,
+        "marginVertical": 20,
         "width": 40,
       }
     }
@@ -111,11 +109,10 @@ exports[`TransferConfirmationCard renders correctly for received transaction dri
         "borderWidth": 1,
       },
       Object {
-        "flex": 1,
-        "flexDirection": "column",
-        "justifyContent": "flex-start",
-        "paddingHorizontal": 40,
-        "paddingVertical": 25,
+        "marginVertical": 20,
+        "minWidth": 562.5,
+        "paddingHorizontal": 20,
+        "paddingVertical": 40,
       },
     ]
   }
@@ -309,11 +306,10 @@ exports[`TransferConfirmationCard renders correctly for sent transaction drilldo
         "borderWidth": 1,
       },
       Object {
-        "flex": 1,
-        "flexDirection": "column",
-        "justifyContent": "flex-start",
-        "paddingHorizontal": 40,
-        "paddingVertical": 25,
+        "marginVertical": 20,
+        "minWidth": 562.5,
+        "paddingHorizontal": 20,
+        "paddingVertical": 40,
       },
     ]
   }
@@ -525,11 +521,10 @@ exports[`TransferConfirmationCard renders correctly for verification fee drilldo
         "borderWidth": 1,
       },
       Object {
-        "flex": 1,
-        "flexDirection": "column",
-        "justifyContent": "flex-start",
-        "paddingHorizontal": 40,
-        "paddingVertical": 25,
+        "marginVertical": 20,
+        "minWidth": 562.5,
+        "paddingHorizontal": 20,
+        "paddingVertical": 40,
       },
     ]
   }
@@ -544,8 +539,7 @@ exports[`TransferConfirmationCard renders correctly for verification fee drilldo
       Object {
         "alignSelf": "center",
         "height": 40,
-        "marginBottom": 40,
-        "marginTop": 25,
+        "marginVertical": 20,
         "width": 40,
       }
     }

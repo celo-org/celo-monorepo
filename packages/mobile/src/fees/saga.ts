@@ -1,6 +1,6 @@
 import { getStableTokenContract } from '@celo/walletkit'
 import BigNumber from 'bignumber.js'
-import { call, CallEffect, put, takeLatest } from 'redux-saga/effects'
+import { call, CallEffect, put, select, takeLatest } from 'redux-saga/effects'
 import { showError } from 'src/alert/actions'
 import { ErrorMessages } from 'src/app/ErrorMessages'
 import { getReclaimEscrowGas } from 'src/escrow/saga'
@@ -8,6 +8,7 @@ import { Actions, EstimateFeeAction, feeEstimated, FeeType } from 'src/fees/acti
 import { getInvitationVerificationFeeInWei, getInviteTxGas } from 'src/invite/saga'
 import { getSendTxGas } from 'src/send/saga'
 import { CeloDefaultRecipient } from 'src/send/Send'
+import { stableTokenBalanceSelector } from 'src/stableToken/reducer'
 import { BasicTokenTransfer } from 'src/tokens/saga'
 import Logger from 'src/utils/Logger'
 import { web3 } from 'src/web3/contracts'
@@ -27,6 +28,23 @@ const placeholderSendTx: BasicTokenTransfer = {
 
 export function* estimateFeeSaga({ feeType }: EstimateFeeAction) {
   Logger.debug(`${TAG}/estimateFeeSaga`, `updating for ${feeType}`)
+
+  const balance = yield select(stableTokenBalanceSelector)
+
+  if (!balance) {
+    Logger.warn(`${TAG}/estimateFeeSaga`, 'Balance is null or empty string')
+    yield put(feeEstimated(feeType, '0'))
+    return
+  }
+
+  if (balance === '0') {
+    Logger.warn(`${TAG}/estimateFeeSaga`, "Can't estimate fee with zero balance")
+    yield put(feeEstimated(feeType, '0'))
+    return
+  }
+
+  Logger.debug(`${TAG}/estimateFeeSaga`, `balance is ${balance}`)
+
   try {
     const account = yield call(getConnectedAccount)
 
