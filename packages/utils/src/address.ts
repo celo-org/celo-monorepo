@@ -10,7 +10,7 @@ export function trimLeading0x(input: string) {
   return input.startsWith('0x') ? input.slice(2) : input
 }
 
-export function prependLeading0x(input: string) {
+export function ensureLeading0x(input: string) {
   return input.startsWith('0x') ? input : `0x${input}`
 }
 

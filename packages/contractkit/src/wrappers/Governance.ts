@@ -1,4 +1,5 @@
 import BigNumber from 'bignumber.js'
+import { Transaction } from 'web3/eth/types'
 
 import { concurrentMap } from '@celo/utils/lib/async'
 import { zip } from '@celo/utils/lib/collections'
@@ -8,6 +9,7 @@ import { Governance } from '../generated/types/Governance'
 import {
   BaseWrapper,
   bufferToString,
+  fromSolidityBytes,
   identity,
   NumberLike,
   numberLikeToBigNumber,
@@ -51,21 +53,16 @@ export interface ProposalMetadata {
   transactionCount: number
 }
 
-export interface ProposalTransaction {
-  value: BigNumber
-  destination: Address
-  data: Buffer
-}
-
-type ProposalParams = Parameters<Governance['methods']['propose']>
+export type ProposalTransaction = Pick<Transaction, 'to' | 'input' | 'value'>
+export type ProposalParams = Parameters<Governance['methods']['propose']>
 export class Proposal {
   constructor(public readonly transactions: ProposalTransaction[]) {}
   get params(): ProposalParams {
     return [
-      this.transactions.map((tx) => numberLikeToString(tx.value)),
-      this.transactions.map((tx) => tx.destination),
-      toSolidityBytes(Buffer.concat(this.transactions.map((tx) => tx.data))),
-      this.transactions.map((tx) => tx.data.length),
+      this.transactions.map((tx) => tx.value),
+      this.transactions.map((tx) => tx.to),
+      toSolidityBytes(Buffer.concat(this.transactions.map((tx) => stringToBuffer(tx.input)))),
+      this.transactions.map((tx) => tx.input.length),
     ]
   }
 }
@@ -196,9 +193,9 @@ export class GovernanceWrapper extends BaseWrapper<Governance> {
     this.contract.methods.getProposalTransaction,
     tupleParser(numberLikeToString, numberLikeToString),
     (res) => ({
-      value: numberLikeToBigNumber(res[0]),
-      destination: res[1],
-      data: stringToBuffer(res[2]),
+      value: res[0],
+      to: res[1],
+      input: fromSolidityBytes(res[2]),
     })
   )
 

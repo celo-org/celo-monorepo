@@ -8,6 +8,7 @@ export interface CallDetails {
   contract: string
   function: string
   parameters: Record<string, any>
+  args: any[]
 }
 
 export interface ParsedTx {
@@ -93,23 +94,26 @@ export class BlockExplorer {
       return null
     }
 
-    const parameters: Record<string, any> = abi.decodeParameters(
+    const parameters = abi.decodeParameters(
       matchedAbi.inputs!,
       encodedParameters
     )
 
-    // remove number & number keys
+    // build args from number keys
+    // remove number keys from parameters
+    const argKeys = Array.from(Array(parameters.__length__).keys())
     delete parameters.__length__
-    Object.keys(parameters).forEach((key) => {
-      if (Number.parseInt(key, 10) >= 0) {
-        delete parameters[key]
-      }
+    const args = argKeys.map((argKey) => {
+        const arg = parameters[argKey]
+        delete parameters[argKey]
+        return arg
     })
 
     const callDetails: CallDetails = {
       contract: contractMapping.details.name,
       function: matchedAbi.name!,
       parameters,
+      args
     }
 
     return {
