@@ -27,7 +27,7 @@ export default class ValidatorRegister extends BaseCommand {
 
     await newCheckBuilder(this, res.flags.from)
       .isSignerOrAccount()
-      .canSignValidatorTxs()
+      // .canSignValidatorTxs()
       .signerMeetsValidatorBalanceRequirements()
       .runChecks()
     const tx = await validators.registerValidator(
@@ -42,6 +42,7 @@ export default class ValidatorRegister extends BaseCommand {
     // TODO: Use a different key data encryption
     const pubKey = await addressToPublicKey(res.flags.from, this.web3.eth.sign)
     // TODO fix typing
+    console.log(pubKey)
     const setKeyTx = accounts.setAccountDataEncryptionKey(pubKey as any)
     await displaySendTx('Set encryption key', setKeyTx)
   }
