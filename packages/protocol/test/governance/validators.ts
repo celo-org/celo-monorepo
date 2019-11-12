@@ -1068,17 +1068,11 @@ contract('Validators', (accounts: string[]) => {
     })
   })
 
-  /*
-  TODO(asa): Restore once ganache supports this precompile.
-  describe('#updateEcdsaKey()', () => {
-    let sig: any
-    let newPublicKey: string
+  describe.only('#updateEcdsaKey()', () => {
     describe('when called by a registered validator', () => {
       const validator = accounts[0]
-      const signer = accounts[9]
       beforeEach(async () => {
         await registerValidator(validator)
-        newPublicKey = await addressToPublicKey(signer, web3)
       })
 
       describe('when called by the registered `Accounts` contract', () => {
@@ -1086,12 +1080,14 @@ contract('Validators', (accounts: string[]) => {
           await registry.setAddressFor(CeloContractName.Accounts, accounts[0])
         })
 
-        describe('when the signature matches the `signer`', () => {
+        describe('when the public key matches the signer', () => {
           let resp: any
+          let newPublicKey: string
+          const signer = accounts[9]
           beforeEach(async () => {
-            const sig = await getParsedSignatureOfAddress(web3, validator, signer)
+            newPublicKey = await addressToPublicKey(signer, web3)
             // @ts-ignore Broken typechain typing for bytes
-            resp = await validators.updateEcdsaKey(validator, signer, sig.v, sig.r, sig.s)
+            resp = await validators.updateEcdsaKey(validator, signer, newPublicKey)
           })
 
           it('should set the validator ecdsa public key', async () => {
@@ -1111,10 +1107,31 @@ contract('Validators', (accounts: string[]) => {
             })
           })
         })
+
+        describe('when the public key does not match the signer', () => {
+          let newPublicKey: string
+          const signer = accounts[9]
+          it('should revert', async () => {
+            newPublicKey = await addressToPublicKey(accounts[8], web3)
+            // @ts-ignore Broken typechain typing for bytes
+            await assertRevert(validators.updateEcdsaKey(validator, signer, newPublicKey))
+          })
+        })
+      })
+
+      describe('when not called by the registered `Accounts` contract', () => {
+        describe('when the public key matches the signer', () => {
+          let newPublicKey: string
+          const signer = accounts[9]
+          it('should revert', async () => {
+            newPublicKey = await addressToPublicKey(signer, web3)
+            // @ts-ignore Broken typechain typing for bytes
+            await assertRevert(validators.updateEcdsaKey(validator, signer, newPublicKey))
+          })
+        })
       })
     })
   })
-  */
 
   describe('#updateBlsKey()', () => {
     const newBlsPublicKey = web3.utils.randomHex(48)

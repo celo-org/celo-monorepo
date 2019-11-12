@@ -511,8 +511,6 @@ contract Validators is
   ) private returns (bool) {
     require(blsKey.length == 48);
     require(blsPop.length == 96);
-    // Use the proof of possession bytes
-    // TODO: Should this be the `account` or `signer` key here?
     require(checkProofOfPossession(account, blsKey, blsPop));
     validator.keys.bls = blsKey;
     return true;
