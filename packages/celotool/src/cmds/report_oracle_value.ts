@@ -77,7 +77,8 @@ async function reportCmd(argv: ReportOracleValueArgv) {
     numerator = numerator.multipliedBy(denominator)
   }
 
-  const kit = newKit('http://35.197.1.183:8545')
+  const hostEnvVar = `${argv.celoEnv.toUpperCase()}_SERVICE_0_TCP_SERVICE_HOST`
+  const kit = newKit(`http://${fetchEnv(hostEnvVar)}:8545`)
   const mnemonic = fetchEnv(envVar.MNEMONIC)
   // TODO: switch this to the right account type after deploying testnet
   // Or, don't hardcode this at all.
