@@ -1,9 +1,9 @@
-import { JSONStringType } from '@celo/utils/lib/io'
+import { JSONStringType, UrlType } from '@celo/utils/lib/io'
 import { hashMessage, parseSignature } from '@celo/utils/lib/signatureUtils'
 import * as t from 'io-ts'
-import { AccountClaim, AccountClaimType } from './account'
+import { AccountClaim, AccountClaimType, MetadataURLGetter, verifyAccountClaim } from './account'
 import { KeybaseClaim, KeybaseClaimType, verifyKeybaseClaim } from './keybase'
-import { ClaimTypes, now, SignatureType, TimestampType, UrlType } from './types'
+import { ClaimTypes, now, SignatureType, TimestampType } from './types'
 
 const AttestationServiceURLClaimType = t.type({
   type: t.literal(ClaimTypes.ATTESTATION_SERVICE_URL),
@@ -75,10 +75,24 @@ export function verifySignature(serializedPayload: string, signature: string, si
   }
 }
 
-export async function verifyClaim(claim: SignedClaim, address: string) {
+/**
+ * Verifies a claim made by an account
+ * @param claim The claim to verify
+ * @param address The address that is making the claim
+ * @param metadataURLGetter A function that can retrieve the metadata URL for a given account address,
+ *                          should be Accounts.getMetadataURL()
+ * @returns If valid, returns undefined. If invalid or unable to verify, returns a string with the error
+ */
+export async function verifyClaim(
+  claim: SignedClaim,
+  address: string,
+  metadataURLGetter: MetadataURLGetter
+) {
   switch (claim.payload.type) {
     case ClaimTypes.KEYBASE:
       return verifyKeybaseClaim(claim.payload, address)
+    case ClaimTypes.ACCOUNT:
+      return verifyAccountClaim(claim.payload, address, metadataURLGetter)
     default:
       break
   }

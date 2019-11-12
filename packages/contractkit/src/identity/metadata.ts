@@ -132,6 +132,10 @@ export class IdentityMetadataWrapper {
     return this.data.claims.map((x) => x.payload).find(isOfType(type))
   }
 
+  filterClaims<K extends ClaimTypes>(type: K): Array<ClaimPayload<K>> {
+    return this.data.claims.map((x) => x.payload).filter(isOfType(type))
+  }
+
   private signClaim = async (claim: Claim, signer: Signer): Promise<SignedClaim> => {
     const messageHash = hashOfClaim(claim)
     const signature = await signer.sign(messageHash)

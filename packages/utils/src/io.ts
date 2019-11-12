@@ -4,6 +4,27 @@ import * as t from 'io-ts'
 import { isE164NumberStrict } from './phoneNumbers'
 import { isValidAddress } from './signatureUtils'
 
+// from http://urlregex.com/
+export const URL_REGEX = new RegExp(
+  /((([A-Za-z]{3,9}:(?:\/\/)?)(?:[\-;:&=\+\$,\w]+@)?[A-Za-z0-9\.\-]+|(?:www\.|[\-;:&=\+\$,\w]+@)[A-Za-z0-9\.\-]+)((?:\/[\+~%\/\.\w\-_]*)?\??(?:[\-\+=&;%@\.\w_]*)#?(?:[\.\!\/\\\w]*))?)/
+)
+
+export const isValidUrl = (url: string) => URL_REGEX.test(url)
+
+export const UrlType = new t.Type<string, string, unknown>(
+  'Url',
+  t.string.is,
+  (input, context) =>
+    either.chain(
+      t.string.validate(input, context),
+      (stringValue) =>
+        URL_REGEX.test(stringValue)
+          ? t.success(stringValue)
+          : t.failure(stringValue, context, 'is not a valid url')
+    ),
+  String
+)
+
 export const JSONStringType = new t.Type<string, string, unknown>(
   'JSONString',
   t.string.is,

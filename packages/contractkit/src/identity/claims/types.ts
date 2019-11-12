@@ -1,6 +1,5 @@
 import * as t from 'io-ts'
 
-export const UrlType = t.string
 export const SignatureType = t.string
 export const TimestampType = t.number
 

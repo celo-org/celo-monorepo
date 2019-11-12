@@ -31,7 +31,7 @@ export default class GetMetadata extends BaseCommand {
       console.info('Metadata contains the following claims: \n')
       await displayMetadata(metadata)
     } catch (error) {
-      console.error('Metadata could not be retrieved from ', metadataURL)
+      console.error(`Metadata could not be retrieved from ${metadataURL}: ${error.toString()}`)
     }
   }
 }
