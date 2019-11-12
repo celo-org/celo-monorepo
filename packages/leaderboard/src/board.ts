@@ -36,6 +36,45 @@ CREATE type json_type AS (address char(40), multiplier real);
 CREATE type json_assoc AS (address char(40), claim_address char(40));
 CREATE type json_rate AS (token bytea, rate real);
 
+SELECT competitors.address, SUM(rate*value+fetched_coin_balance+locked_gold)*multiplier AS score
+FROM addresses, exchange_rates, competitors, claims, celo_account, address_current_token_balances
+WHERE token_contract_address_hash='\x88f24de331525cf6cfd7455eb96a9e4d49b7f292'
+ AND address_current_token_balances.address_hash=addresses.hash
+ AND token='\x88f24de331525cf6cfd7455eb96a9e4d49b7f292'
+ AND claims.claim_address = addresses.hash
+ AND celo_account.address = addresses.hash
+ AND claims.address = competitors.address
+GROUP BY competitors.address
+ORDER BY score;
+
+SELECT rate*value+fetched_coin_balance+locked_gold AS score
+FROM addresses, exchange_rates, celo_account,
+ (SELECT '\x48b5d84d283bfcbfcf9cec22fe8e5b271f5a1c85' AS address, COALESCE(SUM(value),0) AS value
+  FROM address_current_token_balances
+  WHERE address_hash='\x48b5d84d283bfcbfcf9cec22fe8e5b271f5a1c85'
+  AND token_contract_address_hash='\x88f24de331525cf6cfd7455eb96a9e4d49b7f292') AS get
+WHERE token='\x88f24de331525cf6cfd7455eb96a9e4d49b7f292'
+ AND addresses.hash='\x48b5d84d283bfcbfcf9cec22fe8e5b271f5a1c85'
+ AND celo_account.address = addresses.hash
+
+SELECT fetched_coin_balance, fetched_coin_balance_block_number, hash
+FROM addresses;
+
+SELECT competitors.address, SUM(rate*value+fetched_coin_balance+locked_gold)*multiplier AS score
+FROM addresses, exchange_rates, competitors, claims, celo_account,
+ (SELECT claims.claim_address AS address, COALESCE(SUM(value),0) AS value
+  FROM address_current_token_balances, claims
+  WHERE address_hash=claims.claim_address
+  AND token_contract_address_hash='\x88f24de331525cf6cfd7455eb96a9e4d49b7f292'
+  GROUP BY claims.claim_address) AS get
+WHERE  token='\x88f24de331525cf6cfd7455eb96a9e4d49b7f292'
+ AND claims.claim_address = get.address
+ AND celo_account.address = addresses.hash
+ AND claims.address = competitors.address
+GROUP BY competitors.address
+ORDER BY score;
+
+
 */
 
 function addressToBinary(a: string) {
@@ -88,6 +127,7 @@ async function updateRate(kit: ContractKit) {
 async function processClaims(address: string, data: string) {
   try {
     const lst: string[] = JSON.parse(data).claims
+    lst.push(address)
     const client = new Client({ database: 'blockscout' })
     await client.connect()
     const res = await client.query(
