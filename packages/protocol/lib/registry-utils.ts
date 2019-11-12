@@ -3,6 +3,7 @@ export enum CeloContractName {
   Attestations = 'Attestations',
   BlockchainParameters = 'BlockchainParameters',
   Election = 'Election',
+  EpochRewards = 'EpochRewards',
   Escrow = 'Escrow',
   Exchange = 'Exchange',
   GasCurrencyWhitelist = 'GasCurrencyWhitelist',

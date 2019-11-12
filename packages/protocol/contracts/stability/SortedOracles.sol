@@ -7,7 +7,7 @@ import "../common/Initializable.sol";
 import "../common/linkedlists/AddressSortedLinkedListWithMedian.sol";
 import "../common/linkedlists/SortedLinkedListWithMedian.sol";
 
-// TODO: don't treat timestamps as Fixidity values
+// TODO: Move SortedOracles to Fixidity
 /**
  * @title Maintains a sorted list of oracle exchange rates between Celo Gold and other currencies.
  */
@@ -122,6 +122,7 @@ contract SortedOracles is ISortedOracles, Ownable, Initializable {
    * @notice Updates an oracle value and the median.
    * @param token The address of the token for which the Celo Gold exchange rate is being reported.
    * @param numerator The amount of tokens equal to `denominator` Celo Gold.
+   * @param denominator The amount of Celo Gold equal to `numerator` tokens.
    * @param lesserKey The element which should be just left of the new oracle value.
    * @param greaterKey The element which should be just right of the new oracle value.
    * @dev Note that only one of `lesserKey` or `greaterKey` needs to be correct to reduce friction.

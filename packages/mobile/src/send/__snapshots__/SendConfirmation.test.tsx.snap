@@ -16,6 +16,7 @@ exports[`SendConfirmation renders correctly for payment request confirmation 1`]
         Object {
           "backgroundColor": "#FFFFFF",
           "flex": 1,
+          "justifyContent": "space-between",
         },
         undefined,
       ]
@@ -24,8 +25,9 @@ exports[`SendConfirmation renders correctly for payment request confirmation 1`]
     <RCTScrollView
       contentContainerStyle={
         Object {
-          "flex": 1,
-          "justifyContent": "space-between",
+          "alignItems": "center",
+          "justifyContent": "flex-start",
+          "paddingVertical": 10,
         }
       }
     >
@@ -33,61 +35,49 @@ exports[`SendConfirmation renders correctly for payment request confirmation 1`]
         <View
           style={
             Object {
-              "backgroundColor": "#FFFFFF",
+              "alignItems": "center",
               "flex": 1,
+              "justifyContent": "center",
+              "marginTop": 10,
             }
           }
         >
-          <View
+          <Text
             style={
-              Object {
-                "alignItems": "center",
-                "flex": 1,
-                "justifyContent": "center",
-                "marginTop": 10,
-              }
+              Array [
+                Object {
+                  "color": "#2E3338",
+                  "fontFamily": "Hind-Light",
+                  "fontSize": 22,
+                  "paddingBottom": 20,
+                  "textAlign": "center",
+                },
+                Object {
+                  "alignSelf": "center",
+                  "color": "#2E3338",
+                  "padding": 10,
+                  "paddingBottom": 10,
+                },
+              ]
             }
           >
-            <Text
-              style={
-                Array [
-                  Object {
-                    "color": "#2E3338",
-                    "fontFamily": "Hind-Light",
-                    "fontSize": 22,
-                    "paddingBottom": 20,
-                    "textAlign": "center",
-                  },
-                  Object {
-                    "alignSelf": "center",
-                    "color": "#2E3338",
-                    "padding": 10,
-                    "paddingBottom": 10,
-                  },
-                ]
-              }
-            >
-              reviewPayment
-            </Text>
-          </View>
+            reviewPayment
+          </Text>
         </View>
         <View
           style={
             Object {
-              "flex": 4,
-              "marginHorizontal": 20,
-              "marginVertical": 10,
+              "margin": 20,
             }
           }
         >
           <View
             style={
               Object {
-                "flex": 1,
-                "flexDirection": "column",
+                "flexGrow": 1,
                 "justifyContent": "flex-start",
                 "paddingBottom": 25,
-                "paddingHorizontal": 40,
+                "paddingHorizontal": 20,
               }
             }
           >
@@ -1137,6 +1127,7 @@ exports[`SendConfirmation renders correctly for payment request confirmation whe
         Object {
           "backgroundColor": "#FFFFFF",
           "flex": 1,
+          "justifyContent": "space-between",
         },
         undefined,
       ]
@@ -1145,8 +1136,9 @@ exports[`SendConfirmation renders correctly for payment request confirmation whe
     <RCTScrollView
       contentContainerStyle={
         Object {
-          "flex": 1,
-          "justifyContent": "space-between",
+          "alignItems": "center",
+          "justifyContent": "flex-start",
+          "paddingVertical": 10,
         }
       }
     >
@@ -1154,61 +1146,49 @@ exports[`SendConfirmation renders correctly for payment request confirmation whe
         <View
           style={
             Object {
-              "backgroundColor": "#FFFFFF",
+              "alignItems": "center",
               "flex": 1,
+              "justifyContent": "center",
+              "marginTop": 10,
             }
           }
         >
-          <View
+          <Text
             style={
-              Object {
-                "alignItems": "center",
-                "flex": 1,
-                "justifyContent": "center",
-                "marginTop": 10,
-              }
+              Array [
+                Object {
+                  "color": "#2E3338",
+                  "fontFamily": "Hind-Light",
+                  "fontSize": 22,
+                  "paddingBottom": 20,
+                  "textAlign": "center",
+                },
+                Object {
+                  "alignSelf": "center",
+                  "color": "#2E3338",
+                  "padding": 10,
+                  "paddingBottom": 10,
+                },
+              ]
             }
           >
-            <Text
-              style={
-                Array [
-                  Object {
-                    "color": "#2E3338",
-                    "fontFamily": "Hind-Light",
-                    "fontSize": 22,
-                    "paddingBottom": 20,
-                    "textAlign": "center",
-                  },
-                  Object {
-                    "alignSelf": "center",
-                    "color": "#2E3338",
-                    "padding": 10,
-                    "paddingBottom": 10,
-                  },
-                ]
-              }
-            >
-              reviewPayment
-            </Text>
-          </View>
+            reviewPayment
+          </Text>
         </View>
         <View
           style={
             Object {
-              "flex": 4,
-              "marginHorizontal": 20,
-              "marginVertical": 10,
+              "margin": 20,
             }
           }
         >
           <View
             style={
               Object {
-                "flex": 1,
-                "flexDirection": "column",
+                "flexGrow": 1,
                 "justifyContent": "flex-start",
                 "paddingBottom": 25,
-                "paddingHorizontal": 40,
+                "paddingHorizontal": 20,
               }
             }
           >
@@ -2258,6 +2238,7 @@ exports[`SendConfirmation renders correctly for payment request confirmation whe
         Object {
           "backgroundColor": "#FFFFFF",
           "flex": 1,
+          "justifyContent": "space-between",
         },
         undefined,
       ]
@@ -2266,8 +2247,9 @@ exports[`SendConfirmation renders correctly for payment request confirmation whe
     <RCTScrollView
       contentContainerStyle={
         Object {
-          "flex": 1,
-          "justifyContent": "space-between",
+          "alignItems": "center",
+          "justifyContent": "flex-start",
+          "paddingVertical": 10,
         }
       }
     >
@@ -2275,61 +2257,49 @@ exports[`SendConfirmation renders correctly for payment request confirmation whe
         <View
           style={
             Object {
-              "backgroundColor": "#FFFFFF",
+              "alignItems": "center",
               "flex": 1,
+              "justifyContent": "center",
+              "marginTop": 10,
             }
           }
         >
-          <View
+          <Text
             style={
-              Object {
-                "alignItems": "center",
-                "flex": 1,
-                "justifyContent": "center",
-                "marginTop": 10,
-              }
+              Array [
+                Object {
+                  "color": "#2E3338",
+                  "fontFamily": "Hind-Light",
+                  "fontSize": 22,
+                  "paddingBottom": 20,
+                  "textAlign": "center",
+                },
+                Object {
+                  "alignSelf": "center",
+                  "color": "#2E3338",
+                  "padding": 10,
+                  "paddingBottom": 10,
+                },
+              ]
             }
           >
-            <Text
-              style={
-                Array [
-                  Object {
-                    "color": "#2E3338",
-                    "fontFamily": "Hind-Light",
-                    "fontSize": 22,
-                    "paddingBottom": 20,
-                    "textAlign": "center",
-                  },
-                  Object {
-                    "alignSelf": "center",
-                    "color": "#2E3338",
-                    "padding": 10,
-                    "paddingBottom": 10,
-                  },
-                ]
-              }
-            >
-              reviewPayment
-            </Text>
-          </View>
+            reviewPayment
+          </Text>
         </View>
         <View
           style={
             Object {
-              "flex": 4,
-              "marginHorizontal": 20,
-              "marginVertical": 10,
+              "margin": 20,
             }
           }
         >
           <View
             style={
               Object {
-                "flex": 1,
-                "flexDirection": "column",
+                "flexGrow": 1,
                 "justifyContent": "flex-start",
                 "paddingBottom": 25,
-                "paddingHorizontal": 40,
+                "paddingHorizontal": 20,
               }
             }
           >
@@ -3373,6 +3343,7 @@ exports[`SendConfirmation renders correctly for send payment confirmation 1`] = 
         Object {
           "backgroundColor": "#FFFFFF",
           "flex": 1,
+          "justifyContent": "space-between",
         },
         undefined,
       ]
@@ -3381,8 +3352,9 @@ exports[`SendConfirmation renders correctly for send payment confirmation 1`] = 
     <RCTScrollView
       contentContainerStyle={
         Object {
-          "flex": 1,
-          "justifyContent": "space-between",
+          "alignItems": "center",
+          "justifyContent": "flex-start",
+          "paddingVertical": 10,
         }
       }
     >
@@ -3390,61 +3362,49 @@ exports[`SendConfirmation renders correctly for send payment confirmation 1`] = 
         <View
           style={
             Object {
-              "backgroundColor": "#FFFFFF",
+              "alignItems": "center",
               "flex": 1,
+              "justifyContent": "center",
+              "marginTop": 10,
             }
           }
         >
-          <View
+          <Text
             style={
-              Object {
-                "alignItems": "center",
-                "flex": 1,
-                "justifyContent": "center",
-                "marginTop": 10,
-              }
+              Array [
+                Object {
+                  "color": "#2E3338",
+                  "fontFamily": "Hind-Light",
+                  "fontSize": 22,
+                  "paddingBottom": 20,
+                  "textAlign": "center",
+                },
+                Object {
+                  "alignSelf": "center",
+                  "color": "#2E3338",
+                  "padding": 10,
+                  "paddingBottom": 10,
+                },
+              ]
             }
           >
-            <Text
-              style={
-                Array [
-                  Object {
-                    "color": "#2E3338",
-                    "fontFamily": "Hind-Light",
-                    "fontSize": 22,
-                    "paddingBottom": 20,
-                    "textAlign": "center",
-                  },
-                  Object {
-                    "alignSelf": "center",
-                    "color": "#2E3338",
-                    "padding": 10,
-                    "paddingBottom": 10,
-                  },
-                ]
-              }
-            >
-              reviewPayment
-            </Text>
-          </View>
+            reviewPayment
+          </Text>
         </View>
         <View
           style={
             Object {
-              "flex": 4,
-              "marginHorizontal": 20,
-              "marginVertical": 10,
+              "margin": 20,
             }
           }
         >
           <View
             style={
               Object {
-                "flex": 1,
-                "flexDirection": "column",
+                "flexGrow": 1,
                 "justifyContent": "flex-start",
                 "paddingBottom": 25,
-                "paddingHorizontal": 40,
+                "paddingHorizontal": 20,
               }
             }
           >
@@ -4494,6 +4454,7 @@ exports[`SendConfirmation renders correctly for send payment confirmation when f
         Object {
           "backgroundColor": "#FFFFFF",
           "flex": 1,
+          "justifyContent": "space-between",
         },
         undefined,
       ]
@@ -4502,8 +4463,9 @@ exports[`SendConfirmation renders correctly for send payment confirmation when f
     <RCTScrollView
       contentContainerStyle={
         Object {
-          "flex": 1,
-          "justifyContent": "space-between",
+          "alignItems": "center",
+          "justifyContent": "flex-start",
+          "paddingVertical": 10,
         }
       }
     >
@@ -4511,61 +4473,49 @@ exports[`SendConfirmation renders correctly for send payment confirmation when f
         <View
           style={
             Object {
-              "backgroundColor": "#FFFFFF",
+              "alignItems": "center",
               "flex": 1,
+              "justifyContent": "center",
+              "marginTop": 10,
             }
           }
         >
-          <View
+          <Text
             style={
-              Object {
-                "alignItems": "center",
-                "flex": 1,
-                "justifyContent": "center",
-                "marginTop": 10,
-              }
+              Array [
+                Object {
+                  "color": "#2E3338",
+                  "fontFamily": "Hind-Light",
+                  "fontSize": 22,
+                  "paddingBottom": 20,
+                  "textAlign": "center",
+                },
+                Object {
+                  "alignSelf": "center",
+                  "color": "#2E3338",
+                  "padding": 10,
+                  "paddingBottom": 10,
+                },
+              ]
             }
           >
-            <Text
-              style={
-                Array [
-                  Object {
-                    "color": "#2E3338",
-                    "fontFamily": "Hind-Light",
-                    "fontSize": 22,
-                    "paddingBottom": 20,
-                    "textAlign": "center",
-                  },
-                  Object {
-                    "alignSelf": "center",
-                    "color": "#2E3338",
-                    "padding": 10,
-                    "paddingBottom": 10,
-                  },
-                ]
-              }
-            >
-              reviewPayment
-            </Text>
-          </View>
+            reviewPayment
+          </Text>
         </View>
         <View
           style={
             Object {
-              "flex": 4,
-              "marginHorizontal": 20,
-              "marginVertical": 10,
+              "margin": 20,
             }
           }
         >
           <View
             style={
               Object {
-                "flex": 1,
-                "flexDirection": "column",
+                "flexGrow": 1,
                 "justifyContent": "flex-start",
                 "paddingBottom": 25,
-                "paddingHorizontal": 40,
+                "paddingHorizontal": 20,
               }
             }
           >
@@ -5615,6 +5565,7 @@ exports[`SendConfirmation renders correctly for send payment confirmation when f
         Object {
           "backgroundColor": "#FFFFFF",
           "flex": 1,
+          "justifyContent": "space-between",
         },
         undefined,
       ]
@@ -5623,8 +5574,9 @@ exports[`SendConfirmation renders correctly for send payment confirmation when f
     <RCTScrollView
       contentContainerStyle={
         Object {
-          "flex": 1,
-          "justifyContent": "space-between",
+          "alignItems": "center",
+          "justifyContent": "flex-start",
+          "paddingVertical": 10,
         }
       }
     >
@@ -5632,61 +5584,49 @@ exports[`SendConfirmation renders correctly for send payment confirmation when f
         <View
           style={
             Object {
-              "backgroundColor": "#FFFFFF",
+              "alignItems": "center",
               "flex": 1,
+              "justifyContent": "center",
+              "marginTop": 10,
             }
           }
         >
-          <View
+          <Text
             style={
-              Object {
-                "alignItems": "center",
-                "flex": 1,
-                "justifyContent": "center",
-                "marginTop": 10,
-              }
+              Array [
+                Object {
+                  "color": "#2E3338",
+                  "fontFamily": "Hind-Light",
+                  "fontSize": 22,
+                  "paddingBottom": 20,
+                  "textAlign": "center",
+                },
+                Object {
+                  "alignSelf": "center",
+                  "color": "#2E3338",
+                  "padding": 10,
+                  "paddingBottom": 10,
+                },
+              ]
             }
           >
-            <Text
-              style={
-                Array [
-                  Object {
-                    "color": "#2E3338",
-                    "fontFamily": "Hind-Light",
-                    "fontSize": 22,
-                    "paddingBottom": 20,
-                    "textAlign": "center",
-                  },
-                  Object {
-                    "alignSelf": "center",
-                    "color": "#2E3338",
-                    "padding": 10,
-                    "paddingBottom": 10,
-                  },
-                ]
-              }
-            >
-              reviewPayment
-            </Text>
-          </View>
+            reviewPayment
+          </Text>
         </View>
         <View
           style={
             Object {
-              "flex": 4,
-              "marginHorizontal": 20,
-              "marginVertical": 10,
+              "margin": 20,
             }
           }
         >
           <View
             style={
               Object {
-                "flex": 1,
-                "flexDirection": "column",
+                "flexGrow": 1,
                 "justifyContent": "flex-start",
                 "paddingBottom": 25,
-                "paddingHorizontal": 40,
+                "paddingHorizontal": 20,
               }
             }
           >
