@@ -269,8 +269,6 @@ describe('governance tests', () => {
       const validatorWeb3 = new Web3('http://localhost:8549')
       const authorizedWeb3s = [new Web3('ws://localhost:8559'), new Web3('ws://localhost:8561')]
       const authorizedPrivateKeys = [rotation0PrivateKey, rotation1PrivateKey]
-      console.log('pubKey0', privateKeyToPublicKey(rotation0PrivateKey))
-      console.log('pubKey1', privateKeyToPublicKey(rotation1PrivateKey))
 
       let index = 0
       let errorWhileChangingValidatorSet = ''
@@ -285,18 +283,14 @@ describe('governance tests', () => {
             // 1. Swap validator0 and validator1 so one is a member of the group and the other is not.
             const memberToRemove = membersToSwap[index]
             const memberToAdd = membersToSwap[(index + 1) % 2]
-            console.log('removing member')
             await removeMember(groupWeb3, memberToRemove)
-            console.log('adding member')
             await addMember(groupWeb3, memberToAdd)
             const newMembers = await getValidatorGroupMembers()
             assert.include(newMembers, memberToAdd)
             assert.notInclude(newMembers, memberToRemove)
             // 2. Rotate keys for validator 2 by authorizing a new validating key.
             if (!doneAuthorizing) {
-              console.log('authorizing signer')
               await authorizeValidatorSigner(validatorWeb3, authorizedWeb3s[index])
-              console.log('updating bls key')
               await updateValidatorBlsKey(
                 validatorWeb3,
                 authorizedWeb3s[index],
@@ -410,22 +404,22 @@ describe('governance tests', () => {
 
       const assertScoreUnchanged = async (validator: string, blockNumber: number) => {
         const score = new BigNumber(
-          (await validators.methods.getValidator(validator).call({}, blockNumber))[3]
+          (await validators.methods.getValidator(validator).call({}, blockNumber)).score
         )
         const previousScore = new BigNumber(
-          (await validators.methods.getValidator(validator).call({}, blockNumber - 1))[3]
+          (await validators.methods.getValidator(validator).call({}, blockNumber - 1)).score
         )
-        assert.isNotNaN(score)
-        assert.isNotNaN(previousScore)
+        assert.isFalse(score.isNaN())
+        assert.isFalse(previousScore.isNaN())
         assert.equal(score.toFixed(), previousScore.toFixed())
       }
 
       const assertScoreChanged = async (validator: string, blockNumber: number) => {
         const score = new BigNumber(
-          (await validators.methods.getValidator(validator).call({}, blockNumber))[2]
+          (await validators.methods.getValidator(validator).call({}, blockNumber)).score
         )
         const previousScore = new BigNumber(
-          (await validators.methods.getValidator(validator).call({}, blockNumber - 1))[2]
+          (await validators.methods.getValidator(validator).call({}, blockNumber - 1)).score
         )
         const expectedScore = adjustmentSpeed
           .times(uptime)
@@ -474,8 +468,8 @@ describe('governance tests', () => {
         const previousBalance = new BigNumber(
           await stableToken.methods.balanceOf(validator).call({}, blockNumber - 1)
         )
-        assert.isNotNaN(currentBalance)
-        assert.isNotNaN(previousBalance)
+        assert.isFalse(currentBalance.isNaN())
+        assert.isFalse(previousBalance.isNaN())
         assertAlmostEqual(currentBalance.minus(previousBalance), expected)
       }
 
@@ -485,9 +479,9 @@ describe('governance tests', () => {
 
       const getExpectedTotalPayment = async (validator: string, blockNumber: number) => {
         const score = new BigNumber(
-          (await validators.methods.getValidator(validator).call({}, blockNumber))[2]
+          (await validators.methods.getValidator(validator).call({}, blockNumber)).score
         )
-        assert.isNotNaN(score)
+        assert.isFalse(score.isNaN())
         // We need to calculate the rewards multiplier for the previous block, before
         // the rewards actually are awarded.
         const rewardsMultiplier = new BigNumber(
