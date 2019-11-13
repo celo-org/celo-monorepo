@@ -60,7 +60,7 @@ class CoverArea extends React.PureComponent<Props> {
                 >
                   {t('cover.title')}
                 </H1>
-                <Text style={[fonts.p, textStyles.invert, styles.formName]}>
+                <Text style={[fonts.p, textStyles.readingOnDark, styles.formName]}>
                   {t('cover.joinMovement')}
                 </Text>
                 <EmailForm
