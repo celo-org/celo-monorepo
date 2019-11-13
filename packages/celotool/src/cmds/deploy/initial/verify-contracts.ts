@@ -26,10 +26,14 @@ export const handler = async (argv: VerifyContractsInitialArgv) => {
   // Check if blockscout is deployed and online?
   const blockscoutUrl = getBlockscoutUrl(argv)
 
-  console.log(`Validating smart contracts from ${argv.celoEnv} in ${blockscoutUrl}`)
+  console.log(
+    `Validating smart contracts ${argv.contract} in ${argv.celoEnv} for ulr ${blockscoutUrl}`
+  )
 
   const cb = async () => {
-    await execCmd(`yarn --cwd ../protocol run verify -n ${argv.celoEnv} -b ${blockscoutUrl}`)
+    await execCmd(
+      `yarn --cwd ../protocol run verify -c ${argv.contract} -n ${argv.celoEnv} -b ${blockscoutUrl}`
+    )
   }
 
   try {
