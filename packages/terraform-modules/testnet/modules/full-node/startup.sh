@@ -57,6 +57,9 @@ echo -n "$ACCOUNT_ADDRESS" > $DATA_DIR/address
 echo -n "$BOOTNODE_ENODE_ADDRESS" > $DATA_DIR/bootnodeEnodeAddress
 echo -n "$BOOTNODE_ENODE" > $DATA_DIR/bootnodeEnode
 echo -n "$GETH_ACCOUNT_SECRET" > $DATA_DIR/account/accountSecret
+if [ ${name} == "proxy" ]; then
+  echo -n "$VALIDATOR_ADDRESS" > $DATA_DIR/validator_address
+fi
 
 echo "Starting geth..."
 # We need to override the entrypoint in the geth image (which is originally `geth`)

@@ -8,7 +8,7 @@ export const describe =
   'Generates a command to ssh into a vm-testnet node. To execute the ssh command, run `eval $(<this cmd>)`'
 
 interface SshVmNodeArgv extends CeloEnvArgv {
-  nodeType: 'validator' | 'tx-node' | 'bootnode' | 'sentry'
+  nodeType: 'validator' | 'tx-node' | 'bootnode' | 'proxy'
   nodeIndex?: number
 }
 
@@ -16,7 +16,7 @@ export const builder = (argv: yargs.Argv) => {
   return addCeloEnvMiddleware(argv)
     .positional('nodeType', {
       describe: 'Type of node',
-      choices: ['validator', 'tx-node', 'bootnode', 'sentry'],
+      choices: ['validator', 'tx-node', 'bootnode', 'proxy'],
       type: 'string',
     })
     .positional('nodeIndex', {
@@ -35,7 +35,7 @@ export const builder = (argv: yargs.Argv) => {
 export const handler = async (argv: SshVmNodeArgv) => {
   const project = fetchEnv(envVar.TESTNET_PROJECT_NAME)
   const zone = fetchEnv(envVar.KUBERNETES_CLUSTER_ZONE)
-  const nodeTypesWithRandomSuffixes = ['tx-node', 'sentry']
+  const nodeTypesWithRandomSuffixes = ['tx-node', 'proxy']
 
   let instanceName
   if (nodeTypesWithRandomSuffixes.includes(argv.nodeType)) {

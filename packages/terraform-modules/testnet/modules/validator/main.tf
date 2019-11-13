@@ -1,6 +1,6 @@
 # This module creates var.validator_count validators. The first
 # var.proxied_validator_count validators are hidden behind externally facing
-# sentries, and the rest are exposed to the external internet.
+# proxies, and the rest are exposed to the external internet.
 
 locals {
   attached_disk_name = "celo-data"
@@ -65,8 +65,8 @@ resource "google_compute_instance" "validator" {
       network_id : var.network_id,
       proxied : count.index < var.proxied_validator_count,
       rid : count.index,
-      sentry_internal_ip_address : count.index < var.proxied_validator_count ? module.sentry.internal_ip_addresses[count.index] : "",
-      sentry_external_ip_address : count.index < var.proxied_validator_count ? module.sentry.ip_addresses[count.index] : "",
+      proxy_internal_ip_address : count.index < var.proxied_validator_count ? module.proxy.internal_ip_addresses[count.index] : "",
+      proxy_external_ip_address : count.index < var.proxied_validator_count ? module.proxy.ip_addresses[count.index] : "",
       validator_name : "${local.name_prefix}-${count.index}",
       verification_pool_url : var.verification_pool_url
     }
@@ -102,12 +102,12 @@ resource "google_compute_subnetwork" "validator" {
   private_ip_google_access = true
 }
 
-# sentries
+# proxies
 
-module "sentry" {
+module "proxy" {
   source = "../full-node"
   # variable
-  additional_geth_flags             = "--sentry"
+  additional_geth_flags             = "--proxy.proxy --proxy.internalendpoint :30503 --proxy.proxiedvalidatoraddress $VALIDATOR_ADDRESS"
   block_time                        = var.block_time
   bootnode_ip_address               = var.bootnode_ip_address
   celo_env                          = var.celo_env
@@ -120,20 +120,20 @@ module "sentry" {
   geth_node_docker_image_tag        = var.geth_node_docker_image_tag
   geth_verbosity                    = var.geth_verbosity
   in_memory_discovery_table         = var.in_memory_discovery_table
-  name                              = "sentry"
+  name                              = "proxy"
   network_id                        = var.network_id
   network_name                      = var.network_name
-  # NOTE this assumes only one sentry will be used
+  # NOTE this assumes only one proxy will be used
   node_count            = var.proxied_validator_count
   verification_pool_url = var.verification_pool_url
 }
 
 # if there are no proxied validators, we don't have to worry about
 
-resource "google_compute_firewall" "sentry_internal_ingress" {
+resource "google_compute_firewall" "proxy_internal_ingress" {
   count = var.proxied_validator_count > 0 ? 1 : 0
 
-  name    = "${local.name_prefix}-sentry-internal-ingress"
+  name    = "${local.name_prefix}-proxy-internal-ingress"
   network = var.network_name
 
   direction     = "INGRESS"
@@ -150,10 +150,10 @@ resource "google_compute_firewall" "sentry_internal_ingress" {
   }
 }
 
-resource "google_compute_firewall" "sentry_internal_egress" {
+resource "google_compute_firewall" "proxy_internal_egress" {
   count = var.proxied_validator_count > 0 ? 1 : 0
 
-  name    = "${local.name_prefix}-sentry-internal-egress"
+  name    = "${local.name_prefix}-proxy-internal-egress"
   network = var.network_name
 
   direction          = "EGRESS"

@@ -78,16 +78,16 @@ echo "Pulling geth..."
 docker pull $GETH_NODE_DOCKER_IMAGE
 
 PROXIED_FLAGS=""
-SENTRY_ENODE=""
+PROXY_ENODE=""
 if [[ ${proxied} == "true" ]]; then
-  # $SENTRY_ENODE_ADDRESS is from the secrets pulled from google cloud
-  SENTRY_INTERNAL_ENODE="enode://$SENTRY_ENODE_ADDRESS@${sentry_internal_ip_address}:30503"
-  SENTRY_EXTERNAL_ENODE="enode://$SENTRY_ENODE_ADDRESS@${sentry_external_ip_address}:30303"
+  # $PROXY_ENODE_ADDRESS is from the secrets pulled from google cloud
+  PROXY_INTERNAL_ENODE="enode://$PROXY_ENODE_ADDRESS@${proxy_internal_ip_address}:30503"
+  PROXY_EXTERNAL_ENODE="enode://$PROXY_ENODE_ADDRESS@${proxy_external_ip_address}:30303"
 
-  echo "Sentry internal enode: $SENTRY_INTERNAL_ENODE"
-  echo "Sentry external enode: $SENTRY_EXTERNAL_ENODE"
+  echo "Proxy internal enode: $PROXY_INTERNAL_ENODE"
+  echo "Proxy external enode: $PROXY_EXTERNAL_ENODE"
 
-  PROXIED_FLAGS="--istanbul.proxied --nodiscover --istanbul.sentries=\"$SENTRY_INTERNAL_ENODE;$SENTRY_EXTERNAL_ENODE\""
+  PROXIED_FLAGS="--proxy.proxied --nodiscover --proxy.proxyenodeurlpair=\"$PROXY_INTERNAL_ENODE;$PROXY_EXTERNAL_ENODE\""
 
 
   # if this validator is proxied, cut it off from the external internet after
