@@ -3,7 +3,7 @@ pragma solidity ^0.5.3;
 import "../Random.sol";
 
 contract MockRandom is Random {
-  mapping (uint256 => bytes32) private history;
+  mapping(uint256 => bytes32) private history;
 
   function addTestRandomness(uint256 blockNumber, bytes32 randomness) external {
     history[blockNumber] = randomness;

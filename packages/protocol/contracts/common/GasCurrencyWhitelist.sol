@@ -6,12 +6,10 @@ import "./interfaces/IGasCurrencyWhitelist.sol";
 
 import "../common/Initializable.sol";
 
-
 /**
  * @title Holds a whitelist of the ERC20+ tokens that can be used to pay for gas
  */
 contract GasCurrencyWhitelist is IGasCurrencyWhitelist, Ownable, Initializable {
-
   address[] public whitelist;
 
   function initialize() external initializer {

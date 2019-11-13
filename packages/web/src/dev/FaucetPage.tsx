@@ -1,5 +1,6 @@
 import * as React from 'react'
 import { StyleSheet, Text, View } from 'react-native'
+import { RequestType } from 'src/fauceting/FaucetInterfaces'
 import RequestFunds from 'src/fauceting/RequestFunds'
 import { RequestState } from 'src/fauceting/utils'
 import { H1 } from 'src/fonts/Fonts'
@@ -10,7 +11,6 @@ import Button, { BTN, SIZE } from 'src/shared/Button.3'
 import { CeloLinks } from 'src/shared/menu-items'
 import { HEADER_HEIGHT } from 'src/shared/Styles'
 import { colors, fonts, standardStyles, textStyles } from 'src/styles'
-import { RequestType } from '../../server/FirebaseClient'
 interface State {
   address: string
   requestState: RequestState

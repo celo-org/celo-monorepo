@@ -6,7 +6,6 @@ import "./interfaces/IERC20Token.sol";
 import "./interfaces/IRegistry.sol";
 import "./interfaces/IAccounts.sol";
 
-
 import "../governance/interfaces/IElection.sol";
 import "../governance/interfaces/IGovernance.sol";
 import "../governance/interfaces/ILockedGold.sol";
@@ -14,6 +13,7 @@ import "../governance/interfaces/IValidators.sol";
 
 import "../identity/interfaces/IRandom.sol";
 
+import "../stability/interfaces/ISortedOracles.sol";
 import "../stability/interfaces/IStableToken.sol";
 
 // Ideally, UsingRegistry should inherit from Initializable and implement initialize() which calls
@@ -22,7 +22,6 @@ import "../stability/interfaces/IStableToken.sol";
 // TODO(amy): Fix this when the TypeChain issue resolves.
 
 contract UsingRegistry is Ownable {
-
   event RegistrySet(address indexed registryAddress);
 
   // solhint-disable state-visibility
@@ -81,6 +80,10 @@ contract UsingRegistry is Ownable {
 
   function getRandom() internal view returns (IRandom) {
     return IRandom(registry.getAddressForOrDie(RANDOM_REGISTRY_ID));
+  }
+
+  function getSortedOracles() internal view returns (ISortedOracles) {
+    return ISortedOracles(registry.getAddressForOrDie(SORTED_ORACLES_REGISTRY_ID));
   }
 
   function getStableToken() internal view returns (IStableToken) {

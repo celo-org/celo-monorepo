@@ -1,21 +1,36 @@
 import colors from '@celo/react-components/styles/colors'
+import fontStyles from '@celo/react-components/styles/fonts'
 import * as React from 'react'
 import { withNamespaces, WithNamespaces } from 'react-i18next'
-import { ScrollView, StyleSheet, Text } from 'react-native'
-import SafeAreaView from 'react-native-safe-area-view'
+import { StyleSheet, Text, View } from 'react-native'
 import { Namespaces } from 'src/i18n'
+import DancingRings from 'src/icons/DancingRings'
+import { navigateHome } from 'src/navigator/NavigationService'
 
-class VerificationSuccessScreen extends React.Component<WithNamespaces> {
-  static navigationOptions = null
+export class VerificationSuccessScreen extends React.Component<WithNamespaces> {
+  static navigationOptions = { header: null }
+
+  state = {
+    isTextWhite: false,
+  }
+
+  componentDidMount() {
+    setTimeout(() => this.setState({ isTextWhite: true }), 2000)
+  }
+
+  onAnimationFinish = () => {
+    navigateHome()
+  }
 
   render() {
-    // const { t } = this.props
+    const { t } = this.props
     return (
-      <SafeAreaView style={styles.container}>
-        <ScrollView contentContainerStyle={styles.scrollContainer}>
-          <Text>Success!</Text>
-        </ScrollView>
-      </SafeAreaView>
+      <View style={styles.container}>
+        <Text style={[styles.header, this.state.isTextWhite ? styles.whiteText : undefined]}>
+          {t('congratsVerified')}
+        </Text>
+        <DancingRings onAnimationFinish={this.onAnimationFinish} />
+      </View>
     )
   }
 }
@@ -23,15 +38,19 @@ class VerificationSuccessScreen extends React.Component<WithNamespaces> {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    justifyContent: 'space-between',
-    backgroundColor: colors.celoGreen,
-  },
-  scrollContainer: {
-    flex: 1,
-    padding: 30,
-    paddingTop: 0,
+    backgroundColor: colors.background,
     alignItems: 'center',
     justifyContent: 'center',
+  },
+  header: {
+    ...fontStyles.h1,
+    position: 'absolute',
+    top: '45%',
+    zIndex: 100,
+    paddingHorizontal: 50,
+  },
+  whiteText: {
+    color: '#FFF',
   },
 })
 
