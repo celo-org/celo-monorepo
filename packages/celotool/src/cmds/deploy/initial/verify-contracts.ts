@@ -26,7 +26,7 @@ export const handler = async (argv: VerifyContractsInitialArgv) => {
   // Check if blockscout is deployed and online?
   const blockscoutUrl = getBlockscoutUrl(argv)
 
-  console.log(
+  console.debug(
     `Validating smart contracts ${argv.contract} in ${argv.celoEnv} for ulr ${blockscoutUrl}`
   )
 
