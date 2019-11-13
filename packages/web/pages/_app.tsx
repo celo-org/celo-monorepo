@@ -11,6 +11,12 @@ import { scrollTo } from 'src/utils/utils'
 import Sentry, { initSentry } from '../fullstack/sentry'
 import { appWithTranslation } from '../src/i18n'
 
+import dynamic from 'next/dynamic'
+
+const BrandLayout = dynamic((import('src/brandkit/Page') as unknown) as Promise<
+  React.ComponentType
+>)
+
 config({ ssrReveal: true })
 class MyApp extends App {
   componentDidMount() {
@@ -29,13 +35,14 @@ class MyApp extends App {
     }
   }
 
-  // there are a few pages we dont want the header on for artist reasons
-  // currently this is just the animation demo pages
+  // there are a few pages we dont want the header on
+  // currently this is just the animation demo pages and brand kit
   skipHeader() {
-    return (
-      this.props.router.asPath.startsWith('/animation') ||
-      this.props.router.asPath.startsWith('/brand')
-    )
+    return this.props.router.asPath.startsWith('/animation') || this.isBrand()
+  }
+
+  isBrand = () => {
+    return this.props.router.asPath.startsWith('/brand')
   }
 
   componentDidCatch = (error: Error, info: object) => {
@@ -51,7 +58,14 @@ class MyApp extends App {
       <Container>
         <ScreenSizeProvider>
           {this.skipHeader() || <Header />}
-          <Component {...pageProps} />
+          {this.isBrand() ? (
+            <BrandLayout>
+              <Component {...pageProps} />
+            </BrandLayout>
+          ) : (
+            <Component {...pageProps} />
+          )}
+
           {this.skipHeader() || (
             <View>
               <Footer />

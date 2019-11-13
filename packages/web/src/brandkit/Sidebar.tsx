@@ -8,22 +8,27 @@ import { withScreenSize, ScreenProps, ScreenSizes } from 'src/layout/ScreenSize'
 interface Section {
   title: string
   href: string
-  active: boolean
 }
 
 export interface Page {
   title: string
   href: string
-  active: boolean
   sections: Section[]
 }
 
 interface Props {
   pages: Page[]
+  currentPathName: string
+  routeHash: string
 }
 
-export default withScreenSize(
-  React.memo<Props>(function Sidebar({ pages, screen }: Props & ScreenProps) {
+export default withScreenSize<Props>(
+  React.memo<Props>(function Sidebar({
+    pages,
+    screen,
+    currentPathName,
+    routeHash,
+  }: Props & ScreenProps) {
     return (
       <View style={screen === ScreenSizes.MOBILE ? styles.mobileContainer : styles.container}>
         {pages.map((page) => {
@@ -34,9 +39,15 @@ export default withScreenSize(
                 kind={Kind.page}
                 href={page.href}
                 title={page.title}
-                active={page.active}
+                active={isActive(page.href, currentPathName)}
               />
-              {page.sections && <SectionNav sections={page.sections} active={page.active} />}
+              {!!page.sections.length && (
+                <SectionNav
+                  sections={page.sections}
+                  active={isActive(page.href, currentPathName)}
+                  routeHash={routeHash}
+                />
+              )}
             </>
           )
         })}
@@ -48,9 +59,11 @@ export default withScreenSize(
 const SectionNav = React.memo(function SectionNav_({
   sections,
   active,
+  routeHash,
 }: {
   sections: Section[]
   active: boolean
+  routeHash: string
 }) {
   return (
     <View style={[styles.section, active && styles.activeSection]}>
@@ -63,7 +76,7 @@ const SectionNav = React.memo(function SectionNav_({
                 kind={Kind.section}
                 href={section.href}
                 title={section.title}
-                active={section.active}
+                active={isActiveSection(section.href, routeHash)}
               />
             </>
           )
@@ -79,6 +92,7 @@ enum Kind {
 
 interface LinkProps {
   kind: Kind
+  active: boolean
 }
 
 const COIN_SIZE = 12
@@ -107,6 +121,19 @@ function color(kind: Kind) {
   return kind === Kind.page ? colors.primary : colors.gold
 }
 
+// TODO handle more situations like # etc
+function isActive(path: string, currentPath: string) {
+  if (path === currentPath) {
+    return true
+  }
+
+  return false
+}
+
+function isActiveSection(path: string, routeHash: string) {
+  return routeHash.length ? path.endsWith(routeHash) : path.endsWith('overview')
+}
+
 const styles = StyleSheet.create({
   mobileContainer: {
     width: '100%',
@@ -126,8 +153,8 @@ const styles = StyleSheet.create({
     transformOrigin: 'top',
     transform: [{ scaleY: 0 }],
     marginLeft: 20,
-    transitionProperty: 'transform',
-    transitionDuration: '100ms',
+    transitionProperty: 'transform,',
+    transitionDuration: '500ms',
   },
   activeSection: {
     transform: [{ scaleY: 1 }],

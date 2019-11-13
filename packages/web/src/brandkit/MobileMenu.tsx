@@ -7,6 +7,7 @@ import Triangle, { Direction } from 'src/shared/Triangle'
 interface Props {
   pages: Page[]
   pathname: string
+  routeHash: string
 }
 
 interface State {
@@ -43,7 +44,7 @@ export default class MobileMenu extends React.PureComponent<Props, State> {
             }}
           >
             <View style={{ padding: 15 }}>
-              <Sidebar pages={pages} />
+              <Sidebar pages={pages} currentPathName={pathname} routeHash={this.props.routeHash} />
             </View>
           </View>
         </View>

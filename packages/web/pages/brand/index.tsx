@@ -1,3 +1,3 @@
-import Page from 'src/brandkit/Page'
+import Intro from 'src/brandkit/Index'
 
-export default Page
+export default Intro

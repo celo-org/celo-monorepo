@@ -3,41 +3,45 @@ export const menuItems = {
     name: 'Home',
     link: '/',
   },
+  APPLICATIONS: {
+    name: 'Applications',
+    link: '/applications',
+  },
   ABOUT_US: {
     name: 'About Us',
     link: '/about-us',
-  },
-  JOBS: {
-    name: 'Join',
-    link: '/jobs',
-  },
-  TECH: {
-    name: 'Technology',
-    link: '/technology',
   },
   BUILD: {
     name: 'Build',
     link: '/build',
   },
-  APPLICATIONS: {
-    name: 'Applications',
-    link: '/applications',
+  BRAND: {
+    name: 'Brand Kit',
+    link: '/brand',
   },
   COMMUNITY: {
     name: 'Connect',
     link: '/community',
   },
-  PRIVACY: {
-    name: 'Privacy Policy',
-    link: '/privacy',
-  },
-  TERMS: {
-    name: 'Terms',
-    link: '/terms',
+  JOBS: {
+    name: 'Join',
+    link: '/jobs',
   },
   MEDIUM: {
     name: 'Medium',
     link: 'https://medium.com/@celo.org',
+  },
+  PRIVACY: {
+    name: 'Privacy Policy',
+    link: '/privacy',
+  },
+  TECH: {
+    name: 'Technology',
+    link: '/technology',
+  },
+  TERMS: {
+    name: 'Terms',
+    link: '/terms',
   },
   TWITTER: {
     name: 'Twitter',

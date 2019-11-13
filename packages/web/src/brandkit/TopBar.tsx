@@ -3,7 +3,7 @@ import { I18nProps, NameSpaces, withNamespaces } from 'src/i18n'
 import Octocat from 'src/icons/Octocat'
 import LogoLightBg from 'src/logos/LogoLightBg'
 import Button, { BTN } from 'src/shared/Button.3'
-import menu, { CeloLinks } from 'src/shared/menu-items'
+import { CeloLinks } from 'src/shared/menu-items'
 import { colors, fonts, standardStyles } from 'src/styles'
 
 export default withNamespaces(NameSpaces.common)(function TopBar({ t }: I18nProps) {
@@ -29,6 +29,7 @@ const styles = StyleSheet.create({
     marginLeft: 20,
   },
   container: {
+    backgroundColor: colors.white,
     borderBottomColor: colors.gray,
     borderBottomWidth: 1,
     justifyContent: 'space-between',
