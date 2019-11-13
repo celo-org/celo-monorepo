@@ -274,7 +274,7 @@ spec:
           [[ "$IN_MEMORY_DISCOVERY_TABLE" == "true" ]] && IN_MEMORY_DISCOVERY_TABLE_FLAG="--use-in-memory-discovery-table"
           {{ if .proxy }}
           VALIDATOR_HEX_ADDRESS=`cat /root/.celo/validator_address`
-          ADDITIONAL_FLAGS="--proxy.proxiedvalidatoraddress $VALIDATOR_HEX_ADDRESS {{ .geth_flags | default '' }}"
+          ADDITIONAL_FLAGS="--proxy.proxiedvalidatoraddress $VALIDATOR_HEX_ADDRESS {{ .geth_flags | default "" }}"
           {{ else }}
           ADDITIONAL_FLAGS='{{ .geth_flags | default "" }}'
           {{ end }}
