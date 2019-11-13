@@ -197,6 +197,14 @@ spec:
             echo 'Generating address'
             celotooljs.sh generate account-address --private-key `cat /root/.celo/pkey` > /root/.celo/address
 
+            {{ if .proxy }}
+            # Generating the account address of the validator
+            echo "Generating the account address of the validator $RID"
+            celotooljs.sh generate bip32 --mnemonic "$MNEMONIC" --accountType validator --index $RID > /root/.celo/validator_pkey
+            celotooljs.sh generate account-address --private-key `cat /root/.celo/validator_pkey` > /root/.celo/validator_address
+            rm -f /root/.celo/validator_pkey
+            {{ end }}
+
             echo -n "Generating IP address for node: "
             if [ -z $IP_ADDRESSES ]; then
               echo 'No $IP_ADDRESSES'
@@ -264,7 +272,12 @@ spec:
           [[ "$PING_IP_FROM_PACKET" == "true" ]] && PING_IP_FROM_PACKET_FLAG="--ping-ip-from-packet"
           IN_MEMORY_DISCOVERY_TABLE_FLAG=""
           [[ "$IN_MEMORY_DISCOVERY_TABLE" == "true" ]] && IN_MEMORY_DISCOVERY_TABLE_FLAG="--use-in-memory-discovery-table"
+          {{ if .proxy }}
+          VALIDATOR_HEX_ADDRESS=`cat /root/.celo/validator_address`
+          ADDITIONAL_FLAGS="--proxy.proxiedvalidatoraddress $VALIDATOR_HEX_ADDRESS {{ .geth_flags | default '' }}"
+          {{ else }}
           ADDITIONAL_FLAGS='{{ .geth_flags | default "" }}'
+          {{ end }}
           geth \
             --bootnodes=enode://`cat /root/.celo/bootnodeEnode` \
             --lightserv 90 \
@@ -321,11 +334,11 @@ spec:
           protocol: UDP
         - name: discovery-tcp
           containerPort: 30303
-        {{ if .sentry }}
-        - name: sentry-udp
+        {{ if .proxy }}
+        - name: proxy-udp
           containerPort: 30503
           protocol: UDP
-        - name: sentry-tcp
+        - name: proxy-tcp
           containerPort: 30503
         {{ end }}
         - name: rpc

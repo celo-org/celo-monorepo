@@ -34,7 +34,7 @@ interface NodeSecrets {
   ACCOUNT_ADDRESS: string
   BOOTNODE_ENODE_ADDRESS: string
   PRIVATE_KEY: string
-  SENTRY_ENODE_ADDRESS?: string
+  PROXY_ENODE_ADDRESS?: string
   [envVar.GETH_ACCOUNT_SECRET]: string
   [envVar.ETHSTATS_WEBSOCKETSECRET]: string
   [envVar.MNEMONIC]: string
@@ -74,9 +74,9 @@ const testnetResourcesToReset = [
   // validators
   'module.validator.google_compute_instance.validator.*',
   'module.validator.google_compute_disk.validator.*',
-  // validator sentries
-  'module.validator.module.sentry.random_id.full_node.*',
-  'module.validator.module.sentry.google_compute_instance.full_node.*',
+  // validator proxies
+  'module.validator.module.proxy.random_id.full_node.*',
+  'module.validator.module.proxy.google_compute_instance.full_node.*',
   // tx-nodes
   'module.tx_node.random_id.full_node.*',
   'module.tx_node.google_compute_instance.full_node.*',
@@ -275,12 +275,12 @@ export async function generateAndUploadSecrets(celoEnv: string) {
     const secrets = generateNodeSecretEnvVars(AccountType.VALIDATOR, i)
     await uploadSecrets(celoEnv, secrets, `validator-${i}`)
   }
-  // Sentries
-  // Assumes only 1 sentry per validator
-  const sentryCount = parseInt(fetchEnvOrFallback(envVar.PROXIED_VALIDATORS, '0'), 10)
-  for (let i = 0; i < sentryCount; i++) {
-    const secrets = generateNodeSecretEnvVars(AccountType.SENTRY, i)
-    await uploadSecrets(celoEnv, secrets, `sentry-${i}`)
+  // Proxies
+  // Assumes only 1 proxy per validator
+  const proxyCount = parseInt(fetchEnvOrFallback(envVar.PROXIED_VALIDATORS, '0'), 10)
+  for (let i = 0; i < proxyCount; i++) {
+    const secrets = generateNodeSecretEnvVars(AccountType.PROXY, i)
+    await uploadSecrets(celoEnv, secrets, `proxy-${i}`)
   }
 }
 
@@ -319,7 +319,7 @@ function generateNodeSecretEnvVars(accountType: AccountType, index: number) {
   if (accountType === AccountType.VALIDATOR) {
     const proxiedValidators = parseInt(fetchEnvOrFallback(envVar.PROXIED_VALIDATORS, '0'), 10)
     if (index < proxiedValidators) {
-      secrets.SENTRY_ENODE_ADDRESS = generatePublicKey(mnemonic, AccountType.SENTRY, index)
+      secrets.PROXY_ENODE_ADDRESS = generatePublicKey(mnemonic, AccountType.PROXY, index)
     }
   }
   return formatEnvVars(secrets)

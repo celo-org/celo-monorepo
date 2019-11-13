@@ -28,7 +28,7 @@ export enum AccountType {
   BOOTNODE = 3,
   FAUCET = 4,
   ATTESTATION = 5,
-  SENTRY = 6,
+  PROXY = 6,
 }
 
 export enum ConsensusType {
@@ -48,7 +48,7 @@ export const MNEMONIC_ACCOUNT_TYPE_CHOICES = [
   'bootnode',
   'faucet',
   'attestation',
-  'sentry',
+  'proxy',
 ]
 
 export const add0x = (str: string) => {
