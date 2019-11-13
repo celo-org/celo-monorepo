@@ -550,7 +550,7 @@ describe('Transfer tests', function(this: any) {
         describe('Transfer CeloDollars', () => {
           describe('gasCurrency = CeloDollars >', () => {
             testTransferToken({
-              expectedGas: 190281,
+              expectedGas: 175303, // 190303
               transferToken: CeloContract.StableToken,
               feeToken: CeloContract.StableToken,
               txOptions: {
@@ -561,7 +561,7 @@ describe('Transfer tests', function(this: any) {
 
           describe('gasCurrency = CeloGold >', () => {
             testTransferToken({
-              expectedGas: 41281,
+              expectedGas: 41303,
               transferToken: CeloContract.StableToken,
               feeToken: CeloContract.GoldToken,
               txOptions: {
@@ -596,27 +596,13 @@ describe('Transfer tests', function(this: any) {
             describe('when there is no demurrage', () => {
               describe('when setting a gas amount greater than the amount of gas necessary', () =>
                 testTransferToken({
-                  expectedGas: 63180,
+                  expectedGas: 55000,
                   transferToken: CeloContract.GoldToken,
                   feeToken: CeloContract.StableToken,
                   txOptions: {
                     gasFeeRecipient: FeeRecipientAddress,
                   },
                 }))
-
-              describe('when setting a gas amount less than the amount of gas necessary but more than the intrinsic gas amount', () => {
-                const gas = intrinsicGas + 1000
-                testTransferToken({
-                  expectedGas: gas,
-                  transferToken: CeloContract.GoldToken,
-                  feeToken: CeloContract.StableToken,
-                  expectSuccess: false,
-                  txOptions: {
-                    gas,
-                    gasFeeRecipient: FeeRecipientAddress,
-                  },
-                })
-              })
 
               describe('when setting a gas amount less than the intrinsic gas amount', () => {
                 it('should not add the transaction to the pool', async () => {
@@ -640,7 +626,7 @@ describe('Transfer tests', function(this: any) {
         describe('Transfer CeloDollars', () => {
           describe('gasCurrency = CeloDollars >', () => {
             testTransferToken({
-              expectedGas: 89456,
+              expectedGas: 75303,
               transferToken: CeloContract.StableToken,
               feeToken: CeloContract.StableToken,
               txOptions: {
