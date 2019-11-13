@@ -1,18 +1,15 @@
-import BigNumber from 'bignumber.js'
-
 import { zip } from '@celo/utils/lib/collections'
-
+import BigNumber from 'bignumber.js'
 import { Address } from '../base'
 import { LockedGold } from '../generated/types/LockedGold'
 import {
   BaseWrapper,
   CeloTransactionObject,
-  NumberLike,
-  numberLikeToBigNumber,
-  numberLikeToString,
   proxyCall,
   proxySend,
   tupleParser,
+  valueToBigNumber,
+  valueToString,
 } from '../wrappers/BaseWrapper'
 
 export interface VotingDetails {
@@ -62,10 +59,10 @@ export class LockedGoldWrapper extends BaseWrapper<LockedGold> {
    * Unlocks gold that becomes withdrawable after the unlocking period.
    * @param value The amount of gold to unlock.
    */
-  unlock: (value: NumberLike) => CeloTransactionObject<void> = proxySend(
+  unlock: (value: BigNumber.Value) => CeloTransactionObject<void> = proxySend(
     this.kit,
     this.contract.methods.unlock,
-    tupleParser(numberLikeToString)
+    tupleParser(valueToString)
   )
 
   /**
@@ -85,7 +82,7 @@ export class LockedGoldWrapper extends BaseWrapper<LockedGold> {
   getAccountTotalLockedGold = proxyCall(
     this.contract.methods.getAccountTotalLockedGold,
     undefined,
-    numberLikeToBigNumber
+    valueToBigNumber
   )
 
   /**
@@ -96,7 +93,7 @@ export class LockedGoldWrapper extends BaseWrapper<LockedGold> {
   getAccountNonvotingLockedGold = proxyCall(
     this.contract.methods.getAccountNonvotingLockedGold,
     undefined,
-    numberLikeToBigNumber
+    valueToBigNumber
   )
 
   /**
@@ -104,7 +101,7 @@ export class LockedGoldWrapper extends BaseWrapper<LockedGold> {
    */
   async getConfig(): Promise<LockedGoldConfig> {
     return {
-      unlockingPeriod: numberLikeToBigNumber(await this.contract.methods.unlockingPeriod().call()),
+      unlockingPeriod: valueToBigNumber(await this.contract.methods.unlockingPeriod().call()),
     }
   }
 
@@ -130,8 +127,8 @@ export class LockedGoldWrapper extends BaseWrapper<LockedGold> {
     const withdrawals = await this.contract.methods.getPendingWithdrawals(account).call()
     return zip(
       (time, value): PendingWithdrawal => ({
-        time: numberLikeToBigNumber(time),
-        value: numberLikeToBigNumber(value),
+        time: valueToBigNumber(time),
+        value: valueToBigNumber(value),
       }),
       withdrawals[1],
       withdrawals[0]

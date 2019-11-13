@@ -1,21 +1,19 @@
-import BigNumber from 'bignumber.js'
-
 import { eqAddress } from '@celo/utils/lib/address'
 import { zip } from '@celo/utils/lib/collections'
 import { fromFixed, toFixed } from '@celo/utils/lib/fixidity'
-
+import BigNumber from 'bignumber.js'
 import { Address, NULL_ADDRESS } from '../base'
 import { Validators } from '../generated/types/Validators'
 import {
   BaseWrapper,
   CeloTransactionObject,
-  numberLikeToBigNumber,
-  numberLikeToInt,
   proxyCall,
   proxySend,
   toSolidityBytes,
   toTransactionObject,
   tupleParser,
+  valueToBigNumber,
+  valueToInt,
 } from './BaseWrapper'
 
 export interface Validator {
@@ -67,8 +65,8 @@ export class ValidatorsWrapper extends BaseWrapper<Validators> {
   async getValidatorLockedGoldRequirements(): Promise<LockedGoldRequirements> {
     const res = await this.contract.methods.getValidatorLockedGoldRequirements().call()
     return {
-      value: numberLikeToBigNumber(res[0]),
-      duration: numberLikeToBigNumber(res[1]),
+      value: valueToBigNumber(res[0]),
+      duration: valueToBigNumber(res[1]),
     }
   }
 
@@ -79,8 +77,8 @@ export class ValidatorsWrapper extends BaseWrapper<Validators> {
   async getGroupLockedGoldRequirements(): Promise<LockedGoldRequirements> {
     const res = await this.contract.methods.getGroupLockedGoldRequirements().call()
     return {
-      value: numberLikeToBigNumber(res[0]),
-      duration: numberLikeToBigNumber(res[1]),
+      value: valueToBigNumber(res[0]),
+      duration: valueToBigNumber(res[1]),
     }
   }
 
@@ -96,7 +94,7 @@ export class ValidatorsWrapper extends BaseWrapper<Validators> {
     return {
       validatorLockedGoldRequirements: res[0],
       groupLockedGoldRequirements: res[1],
-      maxGroupSize: numberLikeToBigNumber(res[2]),
+      maxGroupSize: valueToBigNumber(res[2]),
     }
   }
 
@@ -179,18 +177,14 @@ export class ValidatorsWrapper extends BaseWrapper<Validators> {
     this.contract.methods.getMembershipHistory,
     undefined,
     (res) =>
-      zip(
-        (epoch, group): GroupMembership => ({ epoch: numberLikeToInt(epoch), group }),
-        res[0],
-        res[1]
-      )
+      zip((epoch, group): GroupMembership => ({ epoch: valueToInt(epoch), group }), res[0], res[1])
   )
 
   /** Get the size (amount of members) of a ValidatorGroup */
   getValidatorGroupSize: (group: Address) => Promise<number> = proxyCall(
     this.contract.methods.getGroupNumMembers,
     undefined,
-    numberLikeToInt
+    valueToInt
   )
 
   /** Get list of registered validator addresses */
@@ -229,9 +223,9 @@ export class ValidatorsWrapper extends BaseWrapper<Validators> {
    *    - blsPoP - The BLS public key proof of possession. 96 bytes.
    */
 
-  getEpochNumber = proxyCall(this.contract.methods.getEpochNumber, undefined, numberLikeToBigNumber)
+  getEpochNumber = proxyCall(this.contract.methods.getEpochNumber, undefined, valueToBigNumber)
 
-  getEpochSize = proxyCall(this.contract.methods.getEpochSize, undefined, numberLikeToBigNumber)
+  getEpochSize = proxyCall(this.contract.methods.getEpochSize, undefined, valueToBigNumber)
 
   registerValidator: (publicKeysData: string) => CeloTransactionObject<boolean> = proxySend(
     this.kit,

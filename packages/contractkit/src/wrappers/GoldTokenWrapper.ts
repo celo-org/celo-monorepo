@@ -5,13 +5,7 @@ import _ from 'bignumber.js'
 
 import { Address } from '../base'
 import { GoldToken } from '../generated/types/GoldToken'
-import {
-  BaseWrapper,
-  numberLikeToBigNumber,
-  numberLikeToInt,
-  proxyCall,
-  proxySend,
-} from './BaseWrapper'
+import { BaseWrapper, proxyCall, proxySend, valueToBigNumber, valueToInt } from './BaseWrapper'
 
 /**
  * ERC-20 contract for Celo native currency.
@@ -23,7 +17,7 @@ export class GoldTokenWrapper extends BaseWrapper<GoldToken> {
    * @param to Address of account to whom the allowance was given.
    * @returns Amount of allowance.
    */
-  allowance = proxyCall(this.contract.methods.allowance, undefined, numberLikeToBigNumber)
+  allowance = proxyCall(this.contract.methods.allowance, undefined, valueToBigNumber)
 
   /**
    * Returns the name of the token.
@@ -40,13 +34,13 @@ export class GoldTokenWrapper extends BaseWrapper<GoldToken> {
    * Returns the number of decimals used in the token.
    * @returns Number of decimals.
    */
-  decimals = proxyCall(this.contract.methods.decimals, undefined, numberLikeToInt)
+  decimals = proxyCall(this.contract.methods.decimals, undefined, valueToInt)
 
   /**
    * Returns the total supply of the token, that is, the amount of tokens currently minted.
    * @returns Total supply.
    */
-  totalSupply = proxyCall(this.contract.methods.totalSupply, undefined, numberLikeToBigNumber)
+  totalSupply = proxyCall(this.contract.methods.totalSupply, undefined, valueToBigNumber)
 
   /**
    * Approve a user to transfer Celo Gold on behalf of another user.
@@ -101,6 +95,5 @@ export class GoldTokenWrapper extends BaseWrapper<GoldToken> {
    * @param owner The address to query the balance of.
    * @return The balance of the specified address.
    */
-  balanceOf = (account: Address) =>
-    this.kit.web3.eth.getBalance(account).then(numberLikeToBigNumber)
+  balanceOf = (account: Address) => this.kit.web3.eth.getBalance(account).then(valueToBigNumber)
 }

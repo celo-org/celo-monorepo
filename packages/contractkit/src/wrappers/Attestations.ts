@@ -10,11 +10,11 @@ import { Attestations } from '../generated/types/Attestations'
 import { ClaimTypes, IdentityMetadataWrapper } from '../identity'
 import {
   BaseWrapper,
-  numberLikeToBigNumber,
-  numberLikeToInt,
   proxyCall,
   toTransactionObject,
   tupleParser,
+  valueToBigNumber,
+  valueToInt,
 } from './BaseWrapper'
 
 const parseSignature = SignatureUtils.parseSignature
@@ -69,11 +69,11 @@ interface GetCompletableAttestationsResponse {
 }
 function parseGetCompletableAttestations(response: GetCompletableAttestationsResponse) {
   const metadataURLs = parseSolidityStringArray(
-    response[2].map(numberLikeToInt),
+    response[2].map(valueToInt),
     (response[3] as unknown) as string
   )
 
-  return zip3(response[0].map(numberLikeToInt), response[1], metadataURLs).map(
+  return zip3(response[0].map(valueToInt), response[1], metadataURLs).map(
     ([blockNumber, issuer, metadataURL]) => ({ blockNumber, issuer, metadataURL })
   )
 }
@@ -86,7 +86,7 @@ export class AttestationsWrapper extends BaseWrapper<Attestations> {
   attestationExpiryBlocks = proxyCall(
     this.contract.methods.attestationExpiryBlocks,
     undefined,
-    numberLikeToInt
+    valueToInt
   )
 
   /**
@@ -97,13 +97,13 @@ export class AttestationsWrapper extends BaseWrapper<Attestations> {
   attestationRequestFees = proxyCall(
     this.contract.methods.attestationRequestFees,
     undefined,
-    numberLikeToBigNumber
+    valueToBigNumber
   )
 
   selectIssuersWaitBlocks = proxyCall(
     this.contract.methods.selectIssuersWaitBlocks,
     undefined,
-    numberLikeToInt
+    valueToInt
   )
 
   /**
@@ -115,8 +115,8 @@ export class AttestationsWrapper extends BaseWrapper<Attestations> {
     this.contract.methods.getUnselectedRequest,
     tupleParser(PhoneNumberUtils.getPhoneHash, (x: string) => x),
     (res) => ({
-      blockNumber: numberLikeToInt(res[0]),
-      attestationsRequested: numberLikeToInt(res[1]),
+      blockNumber: valueToInt(res[0]),
+      attestationsRequested: valueToInt(res[1]),
       attestationRequestFeeToken: res[2],
     })
   )
@@ -181,7 +181,7 @@ export class AttestationsWrapper extends BaseWrapper<Attestations> {
   ) => Promise<AttestationStat> = proxyCall(
     this.contract.methods.getAttestationStats,
     tupleParser(PhoneNumberUtils.getPhoneHash, stringIdentity),
-    (stat) => ({ completed: numberLikeToInt(stat[0]), total: numberLikeToInt(stat[1]) })
+    (stat) => ({ completed: valueToInt(stat[0]), total: valueToInt(stat[1]) })
   )
 
   /**
@@ -315,10 +315,10 @@ export class AttestationsWrapper extends BaseWrapper<Attestations> {
     // Unfortunately can't be destructured
     const stats = await this.contract.methods.batchGetAttestationStats(phoneNumberHashes).call()
 
-    const matches = stats[0].map(numberLikeToInt)
+    const matches = stats[0].map(valueToInt)
     const addresses = stats[1]
-    const completed = stats[2].map(numberLikeToInt)
-    const total = stats[3].map(numberLikeToInt)
+    const completed = stats[2].map(valueToInt)
+    const total = stats[3].map(valueToInt)
     // Map of phone hash -> (Map of address -> AttestationStat)
     const result: Record<string, Record<string, AttestationStat>> = {}
 

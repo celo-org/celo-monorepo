@@ -1,9 +1,7 @@
-import BigNumber from 'bignumber.js'
-import { Transaction } from 'web3/eth/types'
-
 import { concurrentMap } from '@celo/utils/lib/async'
 import { zip } from '@celo/utils/lib/collections'
-
+import BigNumber from 'bignumber.js'
+import { Transaction } from 'web3/eth/types'
 import { Address } from '../base'
 import { Governance } from '../generated/types/Governance'
 import {
@@ -11,16 +9,15 @@ import {
   bufferToString,
   fromSolidityBytes,
   identity,
-  NumberLike,
-  numberLikeToBigNumber,
-  numberLikeToInt,
-  numberLikeToString,
   proxyCall,
   proxySend,
   stringToBuffer,
   toSolidityBytes,
   toTransactionObject,
   tupleParser,
+  valueToBigNumber,
+  valueToInt,
+  valueToString,
 } from './BaseWrapper'
 
 export enum ProposalStage {
@@ -112,27 +109,23 @@ export class GovernanceWrapper extends BaseWrapper<Governance> {
   concurrentProposals = proxyCall(
     this.contract.methods.concurrentProposals,
     undefined,
-    numberLikeToBigNumber
+    valueToBigNumber
   )
   /**
    * Query proposal dequeue frequency.
    * @returns Current proposal dequeue frequency in seconds.
    */
-  dequeueFrequency = proxyCall(
-    this.contract.methods.dequeueFrequency,
-    undefined,
-    numberLikeToBigNumber
-  )
+  dequeueFrequency = proxyCall(this.contract.methods.dequeueFrequency, undefined, valueToBigNumber)
   /**
    * Query minimum deposit required to make a proposal.
    * @returns Current minimum deposit.
    */
-  minDeposit = proxyCall(this.contract.methods.minDeposit, undefined, numberLikeToBigNumber)
+  minDeposit = proxyCall(this.contract.methods.minDeposit, undefined, valueToBigNumber)
   /**
    * Query queue expiry parameter.
    * @return The number of seconds a proposal can stay in the queue before expiring.
    */
-  queueExpiry = proxyCall(this.contract.methods.queueExpiry, undefined, numberLikeToBigNumber)
+  queueExpiry = proxyCall(this.contract.methods.queueExpiry, undefined, valueToBigNumber)
   /**
    * Query durations of different stages in proposal lifecycle.
    * @returns Durations for approval, referendum and execution stages in seconds.
@@ -140,9 +133,9 @@ export class GovernanceWrapper extends BaseWrapper<Governance> {
   async stageDurations(): Promise<ProposalStageDurations> {
     const res = await this.contract.methods.stageDurations().call()
     return {
-      [ProposalStage.Approval]: numberLikeToBigNumber(res[0]),
-      [ProposalStage.Referendum]: numberLikeToBigNumber(res[1]),
-      [ProposalStage.Execution]: numberLikeToBigNumber(res[2]),
+      [ProposalStage.Approval]: valueToBigNumber(res[0]),
+      [ProposalStage.Referendum]: valueToBigNumber(res[1]),
+      [ProposalStage.Execution]: valueToBigNumber(res[2]),
     }
   }
 
@@ -170,14 +163,14 @@ export class GovernanceWrapper extends BaseWrapper<Governance> {
    * Returns the metadata associated with a given proposal.
    * @param proposalID Governance proposal UUID
    */
-  getProposalMetadata: (proposalID: NumberLike) => Promise<ProposalMetadata> = proxyCall(
+  getProposalMetadata: (proposalID: BigNumber.Value) => Promise<ProposalMetadata> = proxyCall(
     this.contract.methods.getProposal,
-    tupleParser(numberLikeToString),
+    tupleParser(valueToString),
     (res) => ({
       proposer: res[0],
-      deposit: numberLikeToBigNumber(res[1]),
-      timestamp: numberLikeToBigNumber(res[2]),
-      transactionCount: numberLikeToInt(res[3]),
+      deposit: valueToBigNumber(res[1]),
+      timestamp: valueToBigNumber(res[2]),
+      transactionCount: valueToInt(res[3]),
     })
   )
 
@@ -187,11 +180,11 @@ export class GovernanceWrapper extends BaseWrapper<Governance> {
    * @param txIndex Transaction index
    */
   getProposalTransaction: (
-    proposalID: NumberLike,
+    proposalID: BigNumber.Value,
     txIndex: number
   ) => Promise<ProposalTransaction> = proxyCall(
     this.contract.methods.getProposalTransaction,
-    tupleParser(numberLikeToString, numberLikeToString),
+    tupleParser(valueToString, valueToString),
     (res) => ({
       value: res[0],
       to: res[1],
@@ -203,9 +196,9 @@ export class GovernanceWrapper extends BaseWrapper<Governance> {
    * Returns whether a given proposal is approved.
    * @param proposalID Governance proposal UUID
    */
-  isApproved: (proposalID: NumberLike) => Promise<boolean> = proxyCall(
+  isApproved: (proposalID: BigNumber.Value) => Promise<boolean> = proxyCall(
     this.contract.methods.isApproved,
-    tupleParser(numberLikeToString)
+    tupleParser(valueToString)
   )
 
   /**
@@ -215,15 +208,15 @@ export class GovernanceWrapper extends BaseWrapper<Governance> {
 
   getProposalStage = proxyCall(
     this.contract.methods.getProposalStage,
-    tupleParser(numberLikeToString),
-    (res) => Object.keys(ProposalStage)[numberLikeToInt(res)] as ProposalStage
+    tupleParser(valueToString),
+    (res) => Object.keys(ProposalStage)[valueToInt(res)] as ProposalStage
   )
 
   /**
    * Returns the proposal associated with a given id.
    * @param proposalID Governance proposal UUID
    */
-  async getProposal(proposalID: NumberLike): Promise<Proposal> {
+  async getProposal(proposalID: BigNumber.Value): Promise<Proposal> {
     const metadata = await this.getProposalMetadata(proposalID)
     const txIndices = Array.from(Array(metadata.transactionCount).keys())
     const transactions = await concurrentMap(1, txIndices, (idx) =>
@@ -236,7 +229,7 @@ export class GovernanceWrapper extends BaseWrapper<Governance> {
    * Returns the stage, metadata, upvotes, votes, and transactions associated with a given proposal.
    * @param proposalID Governance proposal UUID
    */
-  async getProposalRecord(proposalID: NumberLike): Promise<ProposalRecord> {
+  async getProposalRecord(proposalID: BigNumber.Value): Promise<ProposalRecord> {
     const metadata = await this.getProposalMetadata(proposalID)
     const proposal = await this.getProposal(proposalID)
     const stage = await this.getProposalStage(proposalID)
@@ -262,10 +255,7 @@ export class GovernanceWrapper extends BaseWrapper<Governance> {
    * Returns whether a given proposal is passing relative to the constitution's threshold.
    * @param proposalID Governance proposal UUID
    */
-  isProposalPassing = proxyCall(
-    this.contract.methods.isProposalPassing,
-    tupleParser(numberLikeToString)
-  )
+  isProposalPassing = proxyCall(this.contract.methods.isProposalPassing, tupleParser(valueToString))
 
   /**
    * Submits a new governance proposal.
@@ -281,9 +271,9 @@ export class GovernanceWrapper extends BaseWrapper<Governance> {
    * Returns whether a governance proposal exists with the given ID.
    * @param proposalID Governance proposal UUID
    */
-  proposalExists: (proposalID: NumberLike) => Promise<boolean> = proxyCall(
+  proposalExists: (proposalID: BigNumber.Value) => Promise<boolean> = proxyCall(
     this.contract.methods.proposalExists,
-    tupleParser(numberLikeToString)
+    tupleParser(valueToString)
   )
 
   /**
@@ -294,8 +284,8 @@ export class GovernanceWrapper extends BaseWrapper<Governance> {
     this.contract.methods.getUpvoteRecord,
     tupleParser(identity),
     (o) => ({
-      proposalID: numberLikeToBigNumber(o[0]),
-      upvotes: numberLikeToBigNumber(o[1]),
+      proposalID: valueToBigNumber(o[0]),
+      upvotes: valueToBigNumber(o[1]),
     })
   )
 
@@ -303,7 +293,7 @@ export class GovernanceWrapper extends BaseWrapper<Governance> {
    * Returns whether a given proposal is queued.
    * @param proposalID Governance proposal UUID
    */
-  isQueued = proxyCall(this.contract.methods.isQueued, tupleParser(numberLikeToString))
+  isQueued = proxyCall(this.contract.methods.isQueued, tupleParser(valueToString))
 
   /**
    * Returns the upvotes applied to a given proposal.
@@ -311,8 +301,8 @@ export class GovernanceWrapper extends BaseWrapper<Governance> {
    */
   getUpvotes = proxyCall(
     this.contract.methods.getUpvotes,
-    tupleParser(numberLikeToString),
-    numberLikeToBigNumber
+    tupleParser(valueToString),
+    valueToBigNumber
   )
 
   /**
@@ -321,11 +311,11 @@ export class GovernanceWrapper extends BaseWrapper<Governance> {
    */
   getVotes = proxyCall(
     this.contract.methods.getVoteTotals,
-    tupleParser(numberLikeToString),
+    tupleParser(valueToString),
     (res): Votes => ({
-      [VoteValue.Yes]: numberLikeToBigNumber(res[0]),
-      [VoteValue.No]: numberLikeToBigNumber(res[1]),
-      [VoteValue.Abstain]: numberLikeToBigNumber(res[2]),
+      [VoteValue.Yes]: valueToBigNumber(res[0]),
+      [VoteValue.No]: valueToBigNumber(res[1]),
+      [VoteValue.Abstain]: valueToBigNumber(res[2]),
     })
   )
 
@@ -335,8 +325,8 @@ export class GovernanceWrapper extends BaseWrapper<Governance> {
   getQueue = proxyCall(this.contract.methods.getQueue, undefined, (arraysObject) =>
     zip<string, string, UpvoteRecord>(
       (_id, _upvotes) => ({
-        proposalID: numberLikeToBigNumber(_id),
-        upvotes: numberLikeToBigNumber(_upvotes),
+        proposalID: valueToBigNumber(_id),
+        upvotes: valueToBigNumber(_upvotes),
       }),
       arraysObject[0],
       arraysObject[1]
@@ -347,7 +337,7 @@ export class GovernanceWrapper extends BaseWrapper<Governance> {
    * Returns the proposal dequeue as list of proposal IDs.
    */
   getDequeue = proxyCall(this.contract.methods.getDequeue, undefined, (arrayObject) =>
-    arrayObject.map(numberLikeToBigNumber)
+    arrayObject.map(valueToBigNumber)
   )
 
   /**
@@ -364,7 +354,7 @@ export class GovernanceWrapper extends BaseWrapper<Governance> {
     return lockedGoldContract.getAccountTotalLockedGold(voter)
   }
 
-  private async getDequeueIndex(proposalID: NumberLike) {
+  private async getDequeueIndex(proposalID: BigNumber.Value) {
     const dequeue = await this.getDequeue()
     const index = dequeue.findIndex((d) => d.isEqualTo(proposalID))
     if (index === -1) {
@@ -375,9 +365,9 @@ export class GovernanceWrapper extends BaseWrapper<Governance> {
 
   // TODO: merge with SortedOracles/Election findLesserAndGreater
   // proposalID is zero for revokes
-  private async findLesserAndGreaterAfterUpvote(proposalID: NumberLike, upvoter: Address) {
+  private async findLesserAndGreaterAfterUpvote(proposalID: BigNumber.Value, upvoter: Address) {
     let queue = await this.getQueue()
-    let searchID: NumberLike = ZERO_BN
+    let searchID: BigNumber.Value = ZERO_BN
 
     const upvoteRecord = await this.getUpvoteRecord(upvoter)
     // does upvoter have a previous upvote?
@@ -417,7 +407,7 @@ export class GovernanceWrapper extends BaseWrapper<Governance> {
    * @param proposalID Governance proposal UUID
    * @param upvoter Address of upvoter
    */
-  async upvote(proposalID: NumberLike, upvoter: Address) {
+  async upvote(proposalID: BigNumber.Value, upvoter: Address) {
     const exists = await this.proposalExists(proposalID)
     if (!exists) {
       throw new Error(`Proposal ${proposalID} does not exist`)
@@ -426,9 +416,9 @@ export class GovernanceWrapper extends BaseWrapper<Governance> {
     return toTransactionObject(
       this.kit,
       this.contract.methods.upvote(
-        numberLikeToString(proposalID),
-        numberLikeToString(lesserID),
-        numberLikeToString(greaterID)
+        valueToString(proposalID),
+        valueToString(lesserID),
+        valueToString(greaterID)
       )
     )
   }
@@ -445,10 +435,7 @@ export class GovernanceWrapper extends BaseWrapper<Governance> {
     const { lesserID, greaterID } = await this.findLesserAndGreaterAfterUpvote(ZERO_BN, upvoter)
     return toTransactionObject(
       this.kit,
-      this.contract.methods.revokeUpvote(
-        numberLikeToString(lesserID),
-        numberLikeToString(greaterID)
-      )
+      this.contract.methods.revokeUpvote(valueToString(lesserID), valueToString(greaterID))
     )
   }
 
@@ -457,11 +444,11 @@ export class GovernanceWrapper extends BaseWrapper<Governance> {
    * @param proposalID Governance proposal UUID
    * @notice Only the `approver` address will succeed in sending this transaction
    */
-  async approve(proposalID: NumberLike) {
+  async approve(proposalID: BigNumber.Value) {
     const proposalIndex = await this.getDequeueIndex(proposalID)
     return toTransactionObject(
       this.kit,
-      this.contract.methods.approve(numberLikeToString(proposalID), proposalIndex)
+      this.contract.methods.approve(valueToString(proposalID), proposalIndex)
     )
   }
 
@@ -470,11 +457,11 @@ export class GovernanceWrapper extends BaseWrapper<Governance> {
    * @param proposalID Governance proposal UUID
    * @param vote Choice to apply (yes, no, abstain)
    */
-  async vote(proposalID: NumberLike, vote: VoteValue) {
+  async vote(proposalID: BigNumber.Value, vote: VoteValue) {
     const proposalIndex = await this.getDequeueIndex(proposalID)
     return toTransactionObject(
       this.kit,
-      this.contract.methods.vote(numberLikeToString(proposalID), proposalIndex, vote)
+      this.contract.methods.vote(valueToString(proposalID), proposalIndex, vote)
     )
   }
 
@@ -483,21 +470,21 @@ export class GovernanceWrapper extends BaseWrapper<Governance> {
    * @param proposalID Governance proposal UUID
    * @param voter Address of voter
    */
-  async getVoteValue(proposalID: NumberLike, voter: Address) {
+  async getVoteValue(proposalID: BigNumber.Value, voter: Address) {
     const proposalIndex = await this.getDequeueIndex(proposalID)
     const res = await this.contract.methods.getVoteRecord(voter, proposalIndex).call()
-    return numberLikeToInt(res[1]) as VoteValue
+    return valueToInt(res[1]) as VoteValue
   }
 
   /**
    * Executes a given proposal's associated transactions.
    * @param proposalID Governance proposal UUID
    */
-  async execute(proposalID: NumberLike) {
+  async execute(proposalID: BigNumber.Value) {
     const proposalIndex = await this.getDequeueIndex(proposalID)
     return toTransactionObject(
       this.kit,
-      this.contract.methods.execute(numberLikeToString(proposalID), proposalIndex)
+      this.contract.methods.execute(valueToString(proposalID), proposalIndex)
     )
   }
 
@@ -511,7 +498,7 @@ export class GovernanceWrapper extends BaseWrapper<Governance> {
       hash,
       approved: res[0],
       executed: res[1],
-      preparedEpoch: numberLikeToBigNumber(res[2]),
+      preparedEpoch: valueToBigNumber(res[2]),
     }
   }
 

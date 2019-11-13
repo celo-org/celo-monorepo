@@ -1,14 +1,12 @@
+import { concurrentMap } from '@celo/utils/lib/async'
 import { keccak256 } from 'ethereumjs-util'
 import Contract from 'web3/eth/contract'
 import { Transaction, TransactionObject } from 'web3/eth/types'
-
-import { concurrentMap } from '@celo/utils/lib/async'
-
 import { AllContracts, CeloContract } from '../base'
 import { obtainKitContractDetails } from '../explorer/base'
 import { BlockExplorer } from '../explorer/block-explorer'
 import { ContractKit } from '../kit'
-import { CeloTransactionObject, numberLikeToString } from '../wrappers/BaseWrapper'
+import { CeloTransactionObject, valueToString } from '../wrappers/BaseWrapper'
 import { Proposal, ProposalTransaction } from '../wrappers/Governance'
 
 export interface ProposalTransactionJSON {
@@ -75,7 +73,7 @@ export function proposalTxFromCeloTxo(
   if (!to || !value) {
     throw new Error("Transaction parameters 'to' and/or 'value' not provided")
   }
-  return proposalTxFromWeb3Txo(tx.txo, { to, value: numberLikeToString(value) })
+  return proposalTxFromWeb3Txo(tx.txo, { to, value: valueToString(value) })
 }
 
 export async function proposalTxFromJSONAndKit(tx: ProposalTransactionJSON, kit: ContractKit) {
