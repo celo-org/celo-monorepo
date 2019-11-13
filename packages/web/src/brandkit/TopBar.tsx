@@ -9,10 +9,12 @@ import { colors, fonts, standardStyles } from 'src/styles'
 export default withNamespaces(NameSpaces.common)(function TopBar({ t }: I18nProps) {
   return (
     <View style={[standardStyles.row, styles.container]}>
-      <TouchableOpacity style={standardStyles.row}>
-        <LogoLightBg height={30} />
-        <Text style={[fonts.h3, styles.title]}>Brand Kit</Text>
-      </TouchableOpacity>
+      <a href="/brand">
+        <TouchableOpacity style={standardStyles.row}>
+          <LogoLightBg height={30} />
+          <Text style={[fonts.h3, styles.title]}>Brand Kit</Text>
+        </TouchableOpacity>
+      </a>
       <Button
         kind={BTN.NAV}
         href={CeloLinks.gitHub}

@@ -1,3 +1,3 @@
-import Intro from 'src/brandkit/Index'
+import Intro from 'src/brandkit/Intro'
 
 export default Intro

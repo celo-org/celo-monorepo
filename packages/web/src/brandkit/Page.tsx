@@ -6,7 +6,7 @@ import { Cell, GridRow, Spans } from 'src/layout/GridRow'
 import Topbar from 'src/brandkit/TopBar'
 import { SingletonRouter, withRouter } from 'next/router'
 import { withScreenSize, ScreenProps, ScreenSizes } from 'src/layout/ScreenSize'
-import { colors } from 'src/styles'
+import { colors, standardStyles } from 'src/styles'
 
 import MobileMenu from 'src/brandkit/MobileMenu'
 import { HEADER_HEIGHT } from 'src/shared/Styles'
@@ -80,21 +80,17 @@ class Page extends React.Component<Props & ScreenProps, State> {
     const isMobile = screen === ScreenSizes.MOBILE
     return (
       <View style={styles.conatiner}>
-        <View
-          style={{
-            position: 'fixed',
-            width: '100%',
-            borderBottomColor: colors.gray,
-            zIndex: 10,
-          }}
-        >
+        <View style={styles.topbar}>
           <Topbar />
         </View>
         <View style={{ marginTop: 70 }} />
         {isMobile && (
           <MobileMenu pages={PAGES} pathname={router.pathname} routeHash={this.state.routeHash} />
         )}
-        <GridRow mobileStyle={styles.mobileMain}>
+        <GridRow
+          mobileStyle={styles.mobileMain}
+          desktopStyle={[styles.desktopMain, standardStyles.sectionMarginTop]}
+        >
           <Cell span={Spans.fourth}>
             {!isMobile && (
               <Sidebar
@@ -123,8 +119,15 @@ const styles = StyleSheet.create({
   // @ts-ignore creates a stacking context
   conatiner: { isolation: 'isolate' },
   mobileMain: { zIndex: -5 },
+  desktopMain: {},
+  topbar: {
+    position: 'fixed',
+    width: '100%',
+    borderBottomColor: colors.gray,
+    zIndex: 10,
+  },
   footer: { zIndex: -10 },
-  childrenArea: { minHeight: `calc(100vh - ${HEADER_HEIGHT + 100}px)` },
+  childrenArea: { minHeight: `calc(100vh - ${HEADER_HEIGHT + 70}px)` },
 })
 
 export default withScreenSize(withRouter(Page))
