@@ -48,9 +48,96 @@ A $ signifies the bash prompt. Everything following it is the command you should
 When you see text in angle brackets &lt;&gt;, replace them and the text inside with your own value of what it refers to. Don't include the &lt;&gt; in the command.
 {% endhint %}
 
-## **Pull the Celo Docker image**
+## Celo Networks
 
-We're going to use a Docker image containing the Celo node software in this tutorial.
+Celo provides different networks for different purposes. In this tutorial we are going to show how to run a validator in `Baklava` and `Alfajores` networks.
+
+In this documentation page we're going to use a Docker image containing the Celo node software.
+
+### Baklava
+
+If you are re-running these instructions, the Celo Docker image may have been updated, and it's important to get the latest version.
+
+Run:
+
+```
+$ export CELO_NETWORK=baklava
+$ export CELO_IMAGE=celo-node
+$ export NETWORK_ID=1101
+$ export URL_VERIFICATION_POOL=https://us-central1-celo-testnet-production.cloudfunctions.net/handleVerificationRequestbaklava/v0.1/sms/
+$ docker pull us.gcr.io/celo-testnet/$CELO_IMAGE:$CELO_NETWORK
+```
+
+#### **Create accounts**
+
+Create and cd into the directory where you want to store the data and any other files needed to run your node. You can name this whatever you’d like, but here’s a default you can use:
+
+```
+$ mkdir celo-data-dir
+$ cd celo-data-dir
+```
+
+Create two accounts, one for the Validator and one for Validator Group, and get their addresses if you don’t already have them. If you already have your accounts, you can skip this step.
+
+To create the accounts needed, run this command 3 times:
+
+`` $ docker run -v `pwd`:/root/.celo --entrypoint /bin/sh -it us.gcr.io/celo-testnet/$CELO_IMAGE:$CELO_NETWORK -c "geth account new" ``
+
+It will prompt you for a passphrase, ask you to confirm it, and then will output your account address: `Address: {<YOUR-ACCOUNT-ADDRESS>}`
+
+Let's save these addresses to environment variables, so that you can reference it later (don't include the braces):
+
+```
+$ export CELO_VALIDATOR_GROUP_ADDRESS=<YOUR-VALIDATOR-GROUP-ADDRESS>
+$ export CELO_VALIDATOR_ADDRESS=<YOUR-VALIDATOR-ADDRESS>
+$ export CELO_PROXY_ADDRESS=<YOUR-PROXY-ADDRESS>
+```
+
+In order to register the validator later on, generate a "proof of possession" - a signature proving you know your validator's BLS private key. Run this command:
+
+`` $ docker run -v `pwd`:/root/.celo --entrypoint /bin/sh -it us.gcr.io/celo-testnet/$CELO_IMAGE:$CELO_NETWORK -c "geth account proof-of-possession $CELO_VALIDATOR_ADDRESS" ``
+
+It will prompt you for the passphrase you've chosen for the validator account. Let's save the resulting proof-of-possession to an environment variable:
+
+```
+$ export CELO_VALIDATOR_POP=<YOUR-VALIDATOR-PROOF-OF-POSSESSION>
+```
+
+#### Deploy the validator node
+
+Initialize the docker container, building from an image for the network and initializing Celo with the genesis block:
+
+`` $ docker run -v `pwd`:/root/.celo us.gcr.io/celo-testnet/$CELO_IMAGE:$CELO_NETWORK init /celo/genesis.json ``
+
+To participate in consensus, we need to set up our nodekey for our account. We can do so via the following command \(it will prompt you for your passphrase\):
+
+`` $ docker run -v `pwd`:/root/.celo --entrypoint /bin/sh -it us.gcr.io/celo-testnet/$CELO_IMAGE:$CELO_NETWORK -c "geth account set-node-key $CELO_VALIDATOR_ADDRESS" ``
+
+In order to allow the node to sync with the network, give it the address of existing nodes in the network:
+
+`` $ docker run -v `pwd`:/root/.celo --entrypoint cp us.gcr.io/celo-testnet/$CELO_IMAGE:$CELO_NETWORK /celo/static-nodes.json /root/.celo/ ``
+
+Start up the proxy:
+
+`` docker run --name celo-proxy -p 8545:8545 -p 8546:8546 -p 30303:30303 -p 30303:30303/udp -p 30503:30503 -p 30503:30503/udp -v `pwd`:/root/.celo us.gcr.io/celo-testnet/$CELO_IMAGE:$CELO_NETWORK --verbosity 3 --networkid $NETWORK_ID --syncmode full --rpc --rpcaddr 0.0.0.0 --rpcapi eth,net,web3,debug --maxpeers 1100 --etherbase=$CELO_PROXY_ADDRESS --miner.verificationpool=$URL_VERIFICATION_POOL --proxy.proxiedvalidatoraddress $CELO_VALIDATOR_ADDRESS --proxy.proxy --proxy.internalendpoint :30503 `
+
+`export PROXY_ENODE=$(docker exec celo-proxy geth --exec "admin.nodeInfo['enode'].split('//')[1].split('@')[0]" attach | tr -d '"')`
+
+Start up the validator node:
+
+`` $ docker run --name celo-validator -p 127.0.0.1:8547:8545 -p 127.0.0.1:8548:8546 -p 30304:30303 -p 30304:30303/udp -v `pwd`:/root/.celo us.gcr.io/celo-testnet/$CELO_IMAGE:$CELO_NETWORK --verbosity 3 --networkid $NETWORK_ID --syncmode full --rpc --rpcaddr 0.0.0.0 --rpcapi eth,net,web3,debug --maxpeers 125 --mine --miner.verificationpool=$URL_VERIFICATION_POOL --istanbul.blockperiod=1 --istanbul.requesttimeout=3000 --nodiscover --etherbase $CELO_VALIDATOR_ADDRESS --proxy.proxied --proxy.proxyenodeurlpair=enode://$PROXY_ENODE@172.17.0.1:30303 ``
+
+{% hint style="danger" %}
+**Security**: The command line above includes the parameter `--rpcaddr 0.0.0.0` which makes the Celo Blockchain software listen for incoming RPC requests on all network adaptors. Exercise extreme caution in doing this when running outside Docker, as it means that any unlocked accounts and their funds may be accessed from other machines on the Internet. In the context of running a Docker container on your local machine, this together with the `docker -p` flags allows you to make RPC calls from outside the container, i.e from your local host, but not from outside your machine. Read more about [Docker Networking](https://docs.docker.com/network/network-tutorial-standalone/#use-user-defined-bridge-networks) here.
+{% endhint %}
+
+The `mine` flag does not mean the node starts mining blocks, but rather starts trying to participate in the BFT consensus protocol. It cannot do this until it gets elected -- so next we need to stand for election.
+
+The `networkid` parameter value of `44785` indicates we are connecting the Baklaba Beta network.
+
+### Alfajores
+
+#### **Pull the Celo Docker image**
 
 If you are re-running these instructions, the Celo Docker image may have been updated, and it's important to get the latest version.
 
@@ -58,7 +145,7 @@ Run:
 
 `$ docker pull us.gcr.io/celo-testnet/celo-node:alfajores`
 
-## **Create accounts**
+#### **Create accounts**
 
 Create and cd into the directory where you want to store the data and any other files needed to run your node. You can name this whatever you’d like, but here’s a default you can use:
 
@@ -92,7 +179,7 @@ It will prompt you for the passphrase you've chosen for the validator account. L
 $ export CELO_VALIDATOR_POP=<YOUR-VALIDATOR-PROOF-OF-POSSESSION>
 ```
 
-## Deploy the validator node
+#### Deploy the validator node
 
 Initialize the docker container, building from an image for the network and initializing Celo with the genesis block:
 
@@ -118,7 +205,7 @@ The `mine` flag does not mean the node starts mining blocks, but rather starts t
 
 The `networkid` parameter value of `44785` indicates we are connecting the Alfajores Testnet.
 
-## Obtain and lock up some Celo Gold for staking
+### Obtain and lock up some Celo Gold for staking
 
 Visit the [Alfajores Faucet](https://celo.org/build/faucet) to send **both** of your accounts some funds.
 
@@ -143,7 +230,7 @@ $ celocli lockedgold:lockup --from $CELO_VALIDATOR_GROUP_ADDRESS --goldAmount 10
 $ celocli lockedgold:lockup --from $CELO_VALIDATOR_ADDRESS --goldAmount 1000000000000000000 --noticePeriod 5184000
 ```
 
-## Run for election
+### Run for election
 
 Register your validator group:
 
