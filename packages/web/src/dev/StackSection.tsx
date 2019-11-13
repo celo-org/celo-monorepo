@@ -38,7 +38,7 @@ export default withScreenSize(
             </Cell>
             <Cell span={Spans.half} style={styles.content}>
               <H3 style={[standardStyles.elementalMarginBottom, textStyles.invert]}>{title}</H3>
-              <Text style={[fonts.p, textStyles.invert]}>{text}</Text>
+              <Text style={[fonts.p, textStyles.readingOnDark]}>{text}</Text>
               <Ul style={styles.list}>{children}</Ul>
             </Cell>
             <Cell
