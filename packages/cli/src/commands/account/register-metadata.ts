@@ -1,4 +1,5 @@
 import { BaseCommand } from '../../base'
+import { newCheckBuilder } from '../../utils/checks'
 import { displaySendTx } from '../../utils/cli'
 import { Flags } from '../../utils/command'
 
@@ -22,6 +23,11 @@ export default class RegisterMetadata extends BaseCommand {
   async run() {
     const { flags } = this.parse(RegisterMetadata)
     this.kit.defaultAccount = flags.from
+
+    await newCheckBuilder(this)
+      .isAccount(flags.from)
+      .runChecks()
+
     const accounts = await this.kit.contracts.getAccounts()
     await displaySendTx('registerMetadata', accounts.setMetadataURL(flags.url))
   }

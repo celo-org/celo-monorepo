@@ -10,6 +10,7 @@ const initializeArgs = async (_: string): Promise<any[]> => {
     version.minor,
     version.patch,
     config.blockchainParameters.gasForNonGoldCurrencies,
+    config.blockchainParameters.blockGasLimit,
   ]
 }
 

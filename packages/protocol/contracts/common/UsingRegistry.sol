@@ -13,6 +13,7 @@ import "../governance/interfaces/IValidators.sol";
 
 import "../identity/interfaces/IRandom.sol";
 
+import "../stability/interfaces/ISortedOracles.sol";
 import "../stability/interfaces/IStableToken.sol";
 
 // Ideally, UsingRegistry should inherit from Initializable and implement initialize() which calls
@@ -79,6 +80,10 @@ contract UsingRegistry is Ownable {
 
   function getRandom() internal view returns (IRandom) {
     return IRandom(registry.getAddressForOrDie(RANDOM_REGISTRY_ID));
+  }
+
+  function getSortedOracles() internal view returns (ISortedOracles) {
+    return ISortedOracles(registry.getAddressForOrDie(SORTED_ORACLES_REGISTRY_ID));
   }
 
   function getStableToken() internal view returns (IStableToken) {

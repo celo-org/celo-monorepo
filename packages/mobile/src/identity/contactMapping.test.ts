@@ -9,7 +9,6 @@ import { ErrorMessages } from 'src/app/ErrorMessages'
 import { updateE164PhoneNumberAddresses } from 'src/identity/actions'
 import { doImportContacts } from 'src/identity/contactMapping'
 import { e164NumberToAddressSelector } from 'src/identity/reducer'
-import { waitForUserVerified } from 'src/identity/verification'
 import { setRecipientCache } from 'src/recipients/actions'
 import { contactsToRecipients } from 'src/recipients/recipient'
 import { getAllContacts } from 'src/utils/contacts'
@@ -39,7 +38,6 @@ describe('Import Contacts Saga', () => {
     await expectSaga(doImportContacts)
       .provide([
         [call(getConnectedAccount), null],
-        [call(waitForUserVerified), true],
         [call(getAllContacts), mockContactList],
         [select(defaultCountryCodeSelector), '+1'],
         [select(e164NumberToAddressSelector), {}],
@@ -74,7 +72,6 @@ describe('Import Contacts Saga', () => {
     await expectSaga(doImportContacts)
       .provide([
         [call(getConnectedAccount), null],
-        [call(waitForUserVerified), true],
         [call(getAllContacts), mockContactList],
         [select(defaultCountryCodeSelector), '+1'],
         [select(e164NumberToAddressSelector), {}],

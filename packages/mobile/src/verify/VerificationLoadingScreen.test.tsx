@@ -2,6 +2,7 @@ import * as React from 'react'
 import 'react-native'
 import { Provider } from 'react-redux'
 import * as renderer from 'react-test-renderer'
+import { VerificationStatus } from 'src/identity/verification'
 import VerificationLoadingScreen from 'src/verify/VerificationLoadingScreen'
 import { createMockStore } from 'test/utils'
 
@@ -9,18 +10,26 @@ import { createMockStore } from 'test/utils'
 jest.mock('react-native-snap-carousel')
 
 describe('VerificationLoadingScreen', () => {
-  const store = createMockStore({})
-
   it('renders correctly', () => {
     const tree = renderer.create(
-      <Provider store={store}>
+      <Provider store={createMockStore()}>
         <VerificationLoadingScreen />
       </Provider>
     )
     expect(tree).toMatchSnapshot()
   })
 
-  it('updates progress bar', () => {
-    // TODO
+  it('renders correctly with fail modal', () => {
+    const store = createMockStore({
+      identity: {
+        verificationStatus: VerificationStatus.Failed,
+      },
+    })
+    const tree = renderer.create(
+      <Provider store={store}>
+        <VerificationLoadingScreen />
+      </Provider>
+    )
+    expect(tree).toMatchSnapshot()
   })
 })

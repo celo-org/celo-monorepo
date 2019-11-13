@@ -26,6 +26,7 @@ export interface Validator {
 export interface ValidatorGroup {
   address: Address
   members: Address[]
+  affiliates: Address[]
   commission: BigNumber
 }
 
@@ -48,8 +49,15 @@ export interface GroupMembership {
 /**
  * Contract for voting for validators and managing validator groups.
  */
-// TODO(asa): Support authorized validators
+// TODO(asa): Support validator signers
 export class ValidatorsWrapper extends BaseWrapper<Validators> {
+  async updateCommission(commission: BigNumber): Promise<CeloTransactionObject<boolean>> {
+    return toTransactionObject(
+      this.kit,
+      this.contract.methods.updateCommission(toFixed(commission).toFixed())
+    )
+  }
+  updatePublicKeysData = proxySend(this.kit, this.contract.methods.updatePublicKeysData)
   /**
    * Returns the Locked Gold requirements for validators.
    * @returns The Locked Gold requirements for validators.
@@ -148,10 +156,15 @@ export class ValidatorsWrapper extends BaseWrapper<Validators> {
   /** Get ValidatorGroup information */
   async getValidatorGroup(address: Address): Promise<ValidatorGroup> {
     const res = await this.contract.methods.getValidatorGroup(address).call()
+    const validators = await this.getRegisteredValidators()
+    const affiliates = validators
+      .filter((v) => v.affiliation === address)
+      .filter((v) => !res[0].includes(v.address))
     return {
       address,
       members: res[0],
       commission: fromFixed(new BigNumber(res[1])),
+      affiliates: affiliates.map((v) => v.address),
     }
   }
 

@@ -9,6 +9,7 @@ import { NotificationReceiveState } from 'src/account'
 import { showError } from 'src/alert/actions'
 import { ErrorMessages } from 'src/app/ErrorMessages'
 import { currentLanguageSelector } from 'src/app/reducers'
+import { FIREBASE_ENABLED } from 'src/config'
 import { WritePaymentRequest } from 'src/firebase/actions'
 import { handleNotification } from 'src/firebase/notifications'
 import { navigate } from 'src/navigator/NavigationService'
@@ -164,14 +165,45 @@ export function* paymentRequestWriter({ paymentInfo }: WritePaymentRequest) {
   }
 }
 
-export async function getVersionInfo() {
+export function isVersionBelowMinimum(version: string, minVersion: string): boolean {
+  const minVersionArray = minVersion.split('.')
+  const versionArray = version.split('.')
+  const minVersionLength = Math.min(minVersionArray.length, version.length)
+  for (let i = 0; i < minVersionLength; i++) {
+    if (minVersionArray[i] > versionArray[i]) {
+      return true
+    } else if (minVersionArray[i] < versionArray[i]) {
+      return false
+    }
+  }
+  if (minVersionArray.length > versionArray.length) {
+    return true
+  }
+  return false
+}
+
+/*
+Get the Version deprecation information.
+Firebase DB Format: 
+  (New) Add minVersion child to versions category with a string of the mininum version as string
+*/
+export async function isAppVersionDeprecated() {
+  if (!FIREBASE_ENABLED) {
+    return false
+  }
+
+  Logger.info(TAG, 'Checking version info')
   const version = DeviceInfo.getVersion()
-  const versionFSPath = version.split('.').join('/')
-  Logger.info(TAG, `Checking version info ${version}`)
-  return (await firebase
+
+  const versionsInfo = (await firebase
     .database()
-    .ref(`versions/${versionFSPath}`)
+    .ref('versions')
     .once('value')).val()
+  if (!versionsInfo || !versionsInfo.minVersion) {
+    return false
+  }
+  const minVersion: string = versionsInfo.minVersion
+  return isVersionBelowMinimum(version, minVersion)
 }
 
 export async function setUserLanguage(address: string, language: string) {
