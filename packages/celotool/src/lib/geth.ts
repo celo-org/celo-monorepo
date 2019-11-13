@@ -486,13 +486,14 @@ export const simulateClientContractKit = async (
     console.log('kit.web3.eth.blockNumber', await kit.web3.eth.getBlockNumber())
 
     // randomly choose to transfer gold or dollars
-    const transferFn = Math.round(Math.random()) ? transferCeloGold : transferCeloDollars
+    // Math.round(Math.random())
+    const transferFn = true ? transferCeloGold : transferCeloDollars
     // randomly choose which gas currency to use
-    const gasCurrencyContractName = Math.round(Math.random())
+    const gasCurrencyContractName = true // Math.round(Math.random())
       ? CeloContract.GoldToken
       : CeloContract.StableToken
     console.log('gas currency doe', gasCurrencyContractName)
-    const gasCurrency = await kit.registry.addressFor(gasCurrencyContractName)
+    // const gasCurrency = await kit.registry.addressFor(gasCurrencyContractName)
 
     console.log(`Transferring 400 ${gasCurrencyContractName}...`)
     const txResult = await transferFn(kit, senderAddress, recipientAddress, new BigNumber(400), {
