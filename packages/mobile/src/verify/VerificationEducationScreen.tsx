@@ -1,34 +1,64 @@
 import Button, { BtnTypes } from '@celo/react-components/components/Button'
 import Link from '@celo/react-components/components/Link'
+import TextButton from '@celo/react-components/components/TextButton'
+import VerifyPhone from '@celo/react-components/icons/VerifyPhone'
 import colors from '@celo/react-components/styles/colors'
 import fontStyles from '@celo/react-components/styles/fonts'
+import { componentStyles } from '@celo/react-components/styles/styles'
 import * as React from 'react'
 import { withNamespaces, WithNamespaces } from 'react-i18next'
-import { ScrollView, StyleSheet, Text } from 'react-native'
+import { ScrollView, StyleSheet, Text, View } from 'react-native'
+import Modal from 'react-native-modal'
 import SafeAreaView from 'react-native-safe-area-view'
+import { connect } from 'react-redux'
 import componentWithAnalytics from 'src/analytics/wrapper'
 import { Namespaces } from 'src/i18n'
-import NuxLogo from 'src/icons/NuxLogo'
+import { setHasSeenVerificationNux } from 'src/identity/actions'
 import { nuxNavigationOptions } from 'src/navigator/Headers'
-import { navigate } from 'src/navigator/NavigationService'
+import { navigate, navigateHome } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
 
-class VerificationEducationScreen extends React.Component<WithNamespaces> {
+interface DispatchProps {
+  setHasSeenVerificationNux: typeof setHasSeenVerificationNux
+}
+
+type Props = WithNamespaces & DispatchProps
+
+interface State {
+  isModalVisible: boolean
+}
+
+const mapDispatchToProps = {
+  setHasSeenVerificationNux,
+}
+
+class VerificationEducationScreen extends React.Component<Props, State> {
   static navigationOptions = nuxNavigationOptions
+
+  state: State = {
+    isModalVisible: false,
+  }
 
   onPressLearnMore = () => {
     navigate(Screens.VerificationLearnMoreScreen)
   }
 
   onPressStart = () => {
-    // TODO(Rossy) Use new verification screen when it's ready
-    navigate(Screens.VerifyVerifying)
+    this.props.setHasSeenVerificationNux(true)
+    navigate(Screens.VerificationLoadingScreen)
   }
 
   onPressSkip = () => {
-    // TODO(Rossy) mark verificaiton as skipped so app doesn't come back to this screen
-    // navigateReset?
-    navigate(Screens.WalletHome)
+    this.setState({ isModalVisible: true })
+  }
+
+  onPressSkipCancel = () => {
+    this.setState({ isModalVisible: false })
+  }
+
+  onPressSkipConfirm = () => {
+    this.props.setHasSeenVerificationNux(true)
+    navigateHome()
   }
 
   render() {
@@ -36,8 +66,7 @@ class VerificationEducationScreen extends React.Component<WithNamespaces> {
     return (
       <SafeAreaView style={styles.container}>
         <ScrollView contentContainerStyle={styles.scrollContainer}>
-          {/** TODO use new icon when it's ready */}
-          <NuxLogo testID="VerificationEducationIcon" />
+          <VerifyPhone />
           <Text style={styles.h1} testID="VerificationEducationHeader">
             {t('education.header')}
           </Text>
@@ -61,6 +90,23 @@ class VerificationEducationScreen extends React.Component<WithNamespaces> {
             testID="VerificationEducationSkip"
           />
         </>
+        <Modal isVisible={this.state.isModalVisible}>
+          <View style={styles.modalContainer}>
+            <Text style={styles.modalHeader}>{t('skipModal.header')}</Text>
+            <Text style={fontStyles.body}>{t('skipModal.body1')}</Text>
+            <Text style={[fontStyles.body, componentStyles.marginTop10]}>
+              {t('skipModal.body2')}
+            </Text>
+            <View style={styles.modalButtonsContainer}>
+              <TextButton onPress={this.onPressSkipCancel} style={styles.modalCancelText}>
+                {t('global:cancel')}
+              </TextButton>
+              <TextButton onPress={this.onPressSkipConfirm} style={styles.modalSkipText}>
+                {t('global:skip')}
+              </TextButton>
+            </View>
+          </View>
+        </Modal>
       </SafeAreaView>
     )
   }
@@ -88,8 +134,39 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     marginBottom: 20,
   },
+  modalContainer: {
+    backgroundColor: colors.background,
+    padding: 20,
+    marginHorizontal: 10,
+    borderRadius: 4,
+  },
+  modalHeader: {
+    ...fontStyles.h2,
+    ...fontStyles.bold,
+    marginVertical: 15,
+  },
+  modalButtonsContainer: {
+    marginTop: 25,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-evenly',
+  },
+  modalCancelText: {
+    ...fontStyles.body,
+    ...fontStyles.semiBold,
+    paddingRight: 20,
+  },
+  modalSkipText: {
+    ...fontStyles.body,
+    ...fontStyles.semiBold,
+    color: colors.celoGreen,
+    paddingLeft: 20,
+  },
 })
 
 export default componentWithAnalytics(
-  withNamespaces(Namespaces.nuxVerification2)(VerificationEducationScreen)
+  connect<{}, DispatchProps>(
+    null,
+    mapDispatchToProps
+  )(withNamespaces(Namespaces.nuxVerification2)(VerificationEducationScreen))
 )

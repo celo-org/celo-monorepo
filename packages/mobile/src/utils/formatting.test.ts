@@ -1,8 +1,11 @@
+import BigNumber from 'bignumber.js'
 import { CURRENCY_ENUM } from 'src/geth/consts'
 import {
+  divideByWei,
   getCentAwareMoneyDisplay,
   getMoneyDisplayValue,
   getNetworkFeeDisplayValue,
+  multiplyByWei,
   roundDown,
   roundUp,
 } from 'src/utils/formatting'
@@ -90,6 +93,17 @@ describe('utils->formatting', () => {
     it('rounds down', () => {
       expect(roundDown('0.50001', 4).toString()).toBe('0.5')
       expect(roundDown('0.599', 2).toString()).toBe('0.59')
+    })
+  })
+
+  describe('with wei', () => {
+    it('multiply by wei', () => {
+      expect(multiplyByWei(new BigNumber(0.123))).toStrictEqual(new BigNumber(123000000000000000))
+    })
+
+    it('divide by wei', () => {
+      expect(divideByWei(new BigNumber(123000000000000000))).toStrictEqual(new BigNumber(0.123))
+      expect(divideByWei(new BigNumber(129000000000000000), 2)).toStrictEqual(new BigNumber(0.13))
     })
   })
 })

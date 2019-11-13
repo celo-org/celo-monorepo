@@ -44,4 +44,15 @@ export const migrations = {
       },
     }
   },
+  4: (state: any) => {
+    return {
+      ...state,
+      identity: {
+        ...state.identity,
+        hasSeenVerificationNux:
+          state.identity.startedVerification || state.app.numberVerified || false,
+        startedVerification: undefined,
+      },
+    }
+  },
 }

@@ -115,11 +115,10 @@ function TransferReviewCard({
 
 const style = StyleSheet.create({
   container: {
-    flex: 1,
+    flexGrow: 1,
     justifyContent: 'flex-start',
-    flexDirection: 'column',
     paddingBottom: 25,
-    paddingHorizontal: 40,
+    paddingHorizontal: 20,
   },
   bottomContainer: {
     marginTop: 5,

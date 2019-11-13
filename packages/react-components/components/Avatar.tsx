@@ -60,7 +60,7 @@ export class Avatar extends React.PureComponent<Props> {
             numberOfLines={1}
             ellipsizeMode="tail"
           >
-            {'#' + address.substring(2, 17) + '...'}
+            {'#' + address}
           </Text>
         ) : null}
       </View>
