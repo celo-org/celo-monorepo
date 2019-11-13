@@ -49,7 +49,7 @@ export async function sendTransactionWithPrivateKey<T>(
       ...txArgs,
       data: encodedTxData,
       from: address,
-      gas: estimatedGas * 2,
+      gas: estimatedGas * 10,
     },
     privateKey
   )

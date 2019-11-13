@@ -11,6 +11,7 @@ export const ProxyContracts = [
   'AccountsProxy',
   'AttestationsProxy',
   'ElectionProxy',
+  'EpochRewardsProxy',
   'EscrowProxy',
   'ExchangeProxy',
   'GasCurrencyWhitelistProxy',
@@ -30,11 +31,13 @@ export const CoreContracts = [
   'Accounts',
   'GasPriceMinimum',
   'GasCurrencyWhitelist',
+  'GoldToken',
   'MultiSig',
   'Registry',
 
   // governance
   'Election',
+  'EpochRewards',
   'Governance',
   'BlockchainParameters',
   'LockedGold',
@@ -47,7 +50,6 @@ export const CoreContracts = [
 
   // stability
   'Exchange',
-  'GoldToken',
   'Reserve',
   'StableToken',
   'SortedOracles',
