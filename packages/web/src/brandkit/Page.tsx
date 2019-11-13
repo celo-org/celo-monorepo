@@ -1,8 +1,13 @@
 import * as React from 'react'
-import { View } from 'react-native'
+import { Text, View } from 'react-native'
 import Sidebar from 'src/brandkit/Sidebar'
 import { Cell, GridRow, Spans } from 'src/layout/GridRow'
-import { standardStyles, colors } from 'src/styles'
+import { colors, standardStyles } from 'src/styles'
+import Topbar from 'src/brandkit/TopBar'
+import { SingletonRouter, withRouter } from 'next/router'
+import { withScreenSize, ScreenProps, ScreenSizes } from 'src/layout/ScreenSize'
+
+import MobileMenu from 'src/brandkit/MobileMenu'
 
 const PAGES = [
   {
@@ -42,19 +47,28 @@ const PAGES = [
   },
 ]
 
-export default React.memo(function Page() {
-  return (
-    <View>
-      <GridRow allStyle={standardStyles.sectionMarginTop}>
-        <Cell span={Spans.fourth}>
-          <Sidebar pages={PAGES} />
-        </Cell>
-        <Cell span={Spans.three4th}>
-          <View style={{ backgroundColor: colors.lightBlue, minHeight: 'calc(100vh - 500px)' }}>
-            {}
-          </View>
-        </Cell>
-      </GridRow>
-    </View>
+interface Props {
+  router: SingletonRouter
+}
+
+export default withScreenSize(
+  withRouter(
+    React.memo(function Page({ router, screen }: Props & ScreenProps) {
+      const isMobile = screen === ScreenSizes.MOBILE
+      return (
+        <View style={{ isolation: 'isolate' }}>
+          <Topbar />
+          {isMobile && <MobileMenu pages={PAGES} pathname={router.pathname} />}
+          <GridRow mobileStyle={{ zIndex: -5 }}>
+            <Cell span={Spans.fourth}>{!isMobile && <Sidebar pages={PAGES} />}</Cell>
+            <Cell span={Spans.three4th}>
+              <View style={{ minHeight: 'calc(100vh - 500px)' }}>
+                <Text>{router.pathname}</Text>
+              </View>
+            </Cell>
+          </GridRow>
+        </View>
+      )
+    })
   )
-})
+)

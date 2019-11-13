@@ -32,7 +32,10 @@ class MyApp extends App {
   // there are a few pages we dont want the header on for artist reasons
   // currently this is just the animation demo pages
   skipHeader() {
-    return this.props.router.asPath.startsWith('/animation')
+    return (
+      this.props.router.asPath.startsWith('/animation') ||
+      this.props.router.asPath.startsWith('/brand')
+    )
   }
 
   componentDidCatch = (error: Error, info: object) => {
