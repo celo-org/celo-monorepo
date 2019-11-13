@@ -157,10 +157,12 @@ export class EnterInviteCode extends React.Component<Props, State> {
             {t('inviteCodeText.title')}
           </Text>
           <View style={styles.inviteActionContainer}>
-            <Text style={styles.body}>
-              <Text>{t('inviteCodeText.copyInvite.0')}</Text>
-              {t('inviteCodeText.copyInvite.1')}
-            </Text>
+            {!redeemComplete && (
+              <Text style={styles.body}>
+                <Text>{t('inviteCodeText.copyInvite.0')}</Text>
+                {t('inviteCodeText.copyInvite.1')}
+              </Text>
+            )}
 
             {redeemComplete ? (
               <Text style={[styles.body, componentStyles.marginTop10]}>
