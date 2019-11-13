@@ -41,10 +41,10 @@ class BuildPage extends React.PureComponent<I18nProps> {
             buttonOne={{ title: t('installWallet'), href: CeloLinks.walletApp }}
             buttonTwo={{ title: t('seeCode'), href: CeloLinks.monorepo }}
           >
-            <Li style={textStyles.invert}>{t('mobile.nonCustodial')}</Li>
-            <Li style={textStyles.invert}>{t('mobile.mobileUltra')}</Li>
-            <Li style={textStyles.invert}>{t('mobile.exchange')}</Li>
-            <Li style={textStyles.invert}>{t('mobile.qr')}</Li>
+            <Li style={textStyles.readingOnDark}>{t('mobile.nonCustodial')}</Li>
+            <Li style={textStyles.readingOnDark}>{t('mobile.mobileUltra')}</Li>
+            <Li style={textStyles.readingOnDark}>{t('mobile.exchange')}</Li>
+            <Li style={textStyles.readingOnDark}>{t('mobile.qr')}</Li>
           </StackSection>
           <StackSection
             label="2"
@@ -54,9 +54,9 @@ class BuildPage extends React.PureComponent<I18nProps> {
             buttonOne={{ title: t('readMore'), href: CeloLinks.docsOverview }}
             buttonTwo={{ title: t('seeCode'), href: CeloLinks.monorepo }}
           >
-            <Li style={textStyles.invert}>{t('protocol.algoReserve')}</Li>
-            <Li style={textStyles.invert}>{t('protocol.cryptoCollat')}</Li>
-            <Li style={textStyles.invert}>{t('protocol.native')}</Li>
+            <Li style={textStyles.readingOnDark}>{t('protocol.algoReserve')}</Li>
+            <Li style={textStyles.readingOnDark}>{t('protocol.cryptoCollat')}</Li>
+            <Li style={textStyles.readingOnDark}>{t('protocol.native')}</Li>
           </StackSection>
           <StackSection
             label="3"
@@ -66,9 +66,9 @@ class BuildPage extends React.PureComponent<I18nProps> {
             buttonOne={{ title: t('readMore'), href: CeloLinks.docsOverview }}
             buttonTwo={{ title: t('seeCode'), href: CeloLinks.blockChainRepo }}
           >
-            <Li style={textStyles.invert}>{t('proof.permissionless')}</Li>
-            <Li style={textStyles.invert}>{t('proof.rewardsWeighted')}</Li>
-            <Li style={textStyles.invert}>{t('proof.onChain')}</Li>
+            <Li style={textStyles.readingOnDark}>{t('proof.permissionless')}</Li>
+            <Li style={textStyles.readingOnDark}>{t('proof.rewardsWeighted')}</Li>
+            <Li style={textStyles.readingOnDark}>{t('proof.onChain')}</Li>
           </StackSection>
         </View>
         <DeveloperUpdates />
