@@ -48,11 +48,14 @@ jest.mock('@celo/react-native-sms-retriever', () => ({
   removeSmsListener: jest.fn(),
 }))
 
-jest.mock('@celo/utils', () => ({
-  ...jest.requireActual('@celo/utils'),
-  ECIES: { Encrypt: jest.fn(() => Buffer.from('0', 'hex')) },
-  SignatureUtils: { parseSignature: jest.fn(() => ({ r: 'r', s: 's', v: 'v' })) },
-}))
+jest.mock('@celo/utils', () => {
+  const mockParseSig = jest.fn(() => ({ r: 'r', s: 's', v: 'v' }))
+  return {
+    ...jest.requireActual('@celo/utils'),
+    ECIES: { Encrypt: jest.fn(() => Buffer.from('0', 'hex')) },
+    SignatureUtils: { parseSignature: mockParseSig, parseSignatureWithoutPrefix: mockParseSig },
+  }
+})
 
 const attestationCode0: AttestationCode = {
   code:

@@ -10,7 +10,7 @@ import {
   navigateToProperScreen,
   waitForRehydrate,
 } from 'src/app/saga'
-import { waitForFirebaseAuth } from 'src/firebase/saga'
+import { isAppVersionDeprecated } from 'src/firebase/firebase'
 import { UNLOCK_DURATION } from 'src/geth/consts'
 import { NavActions, navigate } from 'src/navigator/NavigationService'
 import { Screens, Stacks } from 'src/navigator/Screens'
@@ -21,12 +21,6 @@ import { zeroSyncSelector } from 'src/web3/selectors'
 jest.mock('src/utils/time', () => ({
   clockInSync: () => true,
 }))
-jest.mock('src/firebase/firebase', () => ({
-  ...jest.requireActual('src/firebase/firebase'),
-  getVersionInfo: jest.fn(async () => ({ deprecated: false })),
-}))
-
-const { getVersionInfo } = require('src/firebase/firebase')
 
 const MockedAnalytics = CeloAnalytics as any
 
@@ -52,7 +46,7 @@ const navigationSagaTest = (testName: string, state: any, expectedScreen: any) =
   })
 }
 
-describe('Upload Comment Key Saga', () => {
+describe('App saga', () => {
   beforeEach(() => {
     MockedAnalytics.track = jest.fn()
   })
@@ -61,24 +55,15 @@ describe('Upload Comment Key Saga', () => {
   })
 
   it('Version Deprecated', async () => {
-    getVersionInfo.mockImplementationOnce(async () => ({ deprecated: true }))
     await expectSaga(checkAppDeprecation)
-      .provide([[call(waitForRehydrate), null], [call(waitForFirebaseAuth), null]])
+      .provide([[call(waitForRehydrate), null], [call(isAppVersionDeprecated), true]])
       .run()
     expect(navigate).toHaveBeenCalledWith(Screens.UpgradeScreen)
   })
 
   it('Version Not Deprecated', async () => {
     await expectSaga(checkAppDeprecation)
-      .provide([[call(waitForRehydrate), null], [call(waitForFirebaseAuth), null]])
-      .run()
-    expect(navigate).not.toHaveBeenCalled()
-  })
-
-  it('Version info is not set', async () => {
-    getVersionInfo.mockImplementationOnce(async () => null)
-    await expectSaga(checkAppDeprecation)
-      .provide([[call(waitForRehydrate), null], [call(waitForFirebaseAuth), null]])
+      .provide([[call(waitForRehydrate), null], [call(isAppVersionDeprecated), false]])
       .run()
     expect(navigate).not.toHaveBeenCalled()
   })
