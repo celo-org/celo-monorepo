@@ -6,13 +6,15 @@ import { concurrentMap } from '@celo/utils/lib/async'
 
 import { AllContracts, CeloContract } from '../base'
 import { obtainKitContractDetails } from '../explorer/base'
-import { BlockExplorer, CallDetails } from '../explorer/block-explorer'
+import { BlockExplorer } from '../explorer/block-explorer'
 import { ContractKit } from '../kit'
 import { CeloTransactionObject, numberLikeToString } from '../wrappers/BaseWrapper'
 import { Proposal, ProposalTransaction } from '../wrappers/Governance'
 
 export interface ProposalTransactionJSON {
-  callDetails: Pick<CallDetails, 'contract' | 'function' | 'args'>
+  contract: CeloContract
+  function: string
+  args: any[]
   value: string
 }
 
@@ -42,46 +44,55 @@ export class ProposalUtility extends Proposal {
       if (parsedTx == null) {
         throw new Error(`Unable to parse ${transaction} with block explorer`)
       }
-      return { callDetails: parsedTx.callDetails, value: parsedTx.tx.value }
+      return {
+        contract: parsedTx.callDetails.contract as CeloContract,
+        function: parsedTx.callDetails.function,
+        args: parsedTx.callDetails.args,
+        value: parsedTx.tx.value,
+      }
     })
   }
 }
 
-type TxParams = Pick<ProposalTransaction, 'to' | 'value'>
-export class ProposalTransactionFactory {
-  static fromWeb3Txo(tx: TransactionObject<any>, params: Required<TxParams>): ProposalTransaction {
-    return {
-      value: params.value,
-      to: params.to,
-      input: tx.encodeABI(),
-    }
+type ProposalTxParams = Pick<ProposalTransaction, 'to' | 'value'>
+export function proposalTxFromWeb3Txo(
+  tx: TransactionObject<any>,
+  params: Required<ProposalTxParams>
+): ProposalTransaction {
+  return {
+    value: params.value,
+    to: params.to,
+    input: tx.encodeABI(),
+  }
+}
+
+export function proposalTxFromCeloTxo(
+  tx: CeloTransactionObject<any>,
+  params: Partial<ProposalTxParams> = {}
+) {
+  const to = tx.defaultParams && tx.defaultParams.to ? tx.defaultParams.to : params.to
+  const value = tx.defaultParams && tx.defaultParams.value ? tx.defaultParams.value : params.value
+  if (!to || !value) {
+    throw new Error("Transaction parameters 'to' and/or 'value' not provided")
+  }
+  return proposalTxFromWeb3Txo(tx.txo, { to, value: numberLikeToString(value) })
+}
+
+export async function proposalTxFromJSONAndKit(tx: ProposalTransactionJSON, kit: ContractKit) {
+  const contractName = tx.contract
+  if (!AllContracts.includes(contractName)) {
+    throw new Error(`Contract ${contractName} not found`)
   }
 
-  static fromCeloTxo(tx: CeloTransactionObject<any>, params: Partial<TxParams> = {}) {
-    const to = tx.defaultParams && tx.defaultParams.to ? tx.defaultParams.to : params.to
-    const value = tx.defaultParams && tx.defaultParams.value ? tx.defaultParams.value : params.value
-    if (!to || !value) {
-      throw new Error("Transaction parameters 'to' and/or 'value' not provided")
-    }
-    return this.fromWeb3Txo(tx.txo, { to, value: numberLikeToString(value) })
+  const contract = await kit._web3Contracts.getContract(contractName)
+  const methodName = tx.function
+  const method = (contract.methods as Contract['methods'])[methodName]
+  if (!method) {
+    throw new Error(`Method ${methodName} not found on ${contractName}`)
   }
-
-  static async fromJSONAndKit(tx: ProposalTransactionJSON, kit: ContractKit) {
-    const contractName = tx.callDetails.contract as CeloContract
-    if (!AllContracts.includes(contractName)) {
-      throw new Error(`Contract ${contractName} not found`)
-    }
-
-    const contract = await kit._web3Contracts.getContract(contractName)
-    const methodName = tx.callDetails.function
-    const method = (contract.methods as Contract['methods'])[methodName]
-    if (!method) {
-      throw new Error(`Method ${methodName} not found on ${contractName}`)
-    }
-    const txo = method(tx.callDetails.args)
-    if (!txo) {
-      throw new Error(`Arguments ${tx.callDetails.args} did not match ${methodName} signature`)
-    }
-    return this.fromWeb3Txo(txo, { to: contract._address, value: tx.value })
+  const txo = method(tx.args)
+  if (!txo) {
+    throw new Error(`Arguments ${tx.args} did not match ${methodName} signature`)
   }
+  return proposalTxFromWeb3Txo(txo, { to: contract._address, value: tx.value })
 }
