@@ -10,10 +10,8 @@
       }
     },
     "versions": {
-      "$verion_string": {
-        ".read": true,
-        ".write": false
-      }
+      ".read": true,
+      ".write": false
     },
     "lastBlockNotified": {
       ".read": false,

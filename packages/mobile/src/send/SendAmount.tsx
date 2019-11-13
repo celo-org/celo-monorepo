@@ -37,7 +37,7 @@ import { getFeeEstimateDollars } from 'src/fees/selectors'
 import { CURRENCIES, CURRENCY_ENUM } from 'src/geth/consts'
 import i18n, { Namespaces } from 'src/i18n'
 import { fetchPhoneAddresses } from 'src/identity/actions'
-import { VerificationStatus } from 'src/identity/contactMapping'
+import { RecipientVerificationStatus } from 'src/identity/contactMapping'
 import { E164NumberToAddressType } from 'src/identity/reducer'
 import { LocalCurrencyCode } from 'src/localCurrency/consts'
 import {
@@ -120,11 +120,11 @@ function getFeeType(
   const verificationStatus = getVerificationStatus(navigation, e164NumberToAddress)
 
   switch (verificationStatus) {
-    case VerificationStatus.UNKNOWN:
+    case RecipientVerificationStatus.UNKNOWN:
       return null
-    case VerificationStatus.UNVERIFIED:
+    case RecipientVerificationStatus.UNVERIFIED:
       return FeeType.INVITE
-    case VerificationStatus.VERIFIED:
+    case RecipientVerificationStatus.VERIFIED:
       return FeeType.SEND
   }
 }
@@ -254,7 +254,7 @@ export class SendAmount extends React.Component<Props, State> {
     const verificationStatus = this.getVerificationStatus()
     let confirmationInput: ConfirmationInput
 
-    if (verificationStatus === VerificationStatus.VERIFIED) {
+    if (verificationStatus === RecipientVerificationStatus.VERIFIED) {
       confirmationInput = this.getConfirmationInput(TransactionTypes.SENT)
       CeloAnalytics.track(CustomEventNames.transaction_details, {
         recipientAddress: confirmationInput.recipientAddress,
@@ -281,12 +281,14 @@ export class SendAmount extends React.Component<Props, State> {
     const verificationStatus = this.getVerificationStatus()
 
     const requestDisabled =
-      !isAmountValid || verificationStatus !== VerificationStatus.VERIFIED || characterLimitExceeded
+      !isAmountValid ||
+      verificationStatus !== RecipientVerificationStatus.VERIFIED ||
+      characterLimitExceeded
     const sendDisabled =
       !isAmountValid ||
       !isDollarBalanceSufficient ||
       characterLimitExceeded ||
-      verificationStatus === VerificationStatus.UNKNOWN
+      verificationStatus === RecipientVerificationStatus.UNKNOWN
 
     const separatorContainerStyle =
       sendDisabled && requestDisabled
@@ -297,7 +299,7 @@ export class SendAmount extends React.Component<Props, State> {
 
     return (
       <View style={[componentStyles.bottomContainer, style.buttonContainer]}>
-        {verificationStatus !== VerificationStatus.UNVERIFIED && (
+        {verificationStatus !== RecipientVerificationStatus.UNVERIFIED && (
           <View style={style.button}>
             <Button
               onPress={this.onRequest}
@@ -315,7 +317,9 @@ export class SendAmount extends React.Component<Props, State> {
         <View style={style.button}>
           <Button
             onPress={this.onSend}
-            text={verificationStatus === VerificationStatus.VERIFIED ? t('send') : t('invite')}
+            text={
+              verificationStatus === RecipientVerificationStatus.VERIFIED ? t('send') : t('invite')
+            }
             accessibilityLabel={t('send')}
             standard={false}
             type={BtnTypes.PRIMARY}
@@ -375,10 +379,10 @@ export class SendAmount extends React.Component<Props, State> {
           />
           <View style={style.inviteDescription}>
             <LoadingLabel
-              isLoading={verificationStatus === VerificationStatus.UNKNOWN}
+              isLoading={verificationStatus === RecipientVerificationStatus.UNKNOWN}
               loadingLabelText={t('loadingVerificationStatus')}
               labelText={
-                verificationStatus === VerificationStatus.UNVERIFIED
+                verificationStatus === RecipientVerificationStatus.UNVERIFIED
                   ? t('inviteMoneyEscrow')
                   : undefined
               }

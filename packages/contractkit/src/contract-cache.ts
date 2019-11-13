@@ -4,6 +4,8 @@ import { AccountsWrapper } from './wrappers/Accounts'
 import { AttestationsWrapper } from './wrappers/Attestations'
 import { BlockchainParametersWrapper } from './wrappers/BlockchainParameters'
 import { ElectionWrapper } from './wrappers/Election'
+// import { EpochRewardsWrapper } from './wrappers/EpochRewards'
+import { EscrowWrapper } from './wrappers/Escrow'
 import { ExchangeWrapper } from './wrappers/Exchange'
 import { GasPriceMinimumWrapper } from './wrappers/GasPriceMinimum'
 import { GoldTokenWrapper } from './wrappers/GoldTokenWrapper'
@@ -19,7 +21,8 @@ const WrapperFactories = {
   [CeloContract.Attestations]: AttestationsWrapper,
   [CeloContract.BlockchainParameters]: BlockchainParametersWrapper,
   [CeloContract.Election]: ElectionWrapper,
-  // [CeloContract.Escrow]: EscrowWrapper,
+  // [CeloContract.EpochRewards]?: EpochRewardsWrapper,
+  [CeloContract.Escrow]: EscrowWrapper,
   [CeloContract.Exchange]: ExchangeWrapper,
   // [CeloContract.GasCurrencyWhitelist]: GasCurrencyWhitelistWrapper,
   [CeloContract.GasPriceMinimum]: GasPriceMinimumWrapper,
@@ -43,7 +46,8 @@ interface WrapperCacheMap {
   [CeloContract.Attestations]?: AttestationsWrapper
   [CeloContract.BlockchainParameters]?: BlockchainParametersWrapper
   [CeloContract.Election]?: ElectionWrapper
-  // [CeloContract.Escrow]?: EscrowWrapper,
+  // [CeloContract.EpochRewards]?: EpochRewardsWrapper
+  [CeloContract.Escrow]?: EscrowWrapper
   [CeloContract.Exchange]?: ExchangeWrapper
   // [CeloContract.GasCurrencyWhitelist]?: GasCurrencyWhitelistWrapper,
   [CeloContract.GasPriceMinimum]?: GasPriceMinimumWrapper
@@ -82,9 +86,12 @@ export class WrapperCache {
   getElection() {
     return this.getContract(CeloContract.Election)
   }
-  // getEscrow() {
-  //   return this.getWrapper(CeloContract.Escrow, newEscrow)
+  // getEpochRewards() {
+  //   return this.getContract(CeloContract.EpochRewards)
   // }
+  getEscrow() {
+    return this.getContract(CeloContract.Escrow)
+  }
   getExchange() {
     return this.getContract(CeloContract.Exchange)
   }

@@ -31,6 +31,7 @@ export class AlertBanner extends React.Component<Props> {
 
     return (
       <SmartTopAlert
+        timestamp={Date.now()}
         text={alert && alert.message}
         onPress={hideAlertAction}
         type={alert && alert.type === 'error' ? NotificationTypes.ERROR : NotificationTypes.MESSAGE}
