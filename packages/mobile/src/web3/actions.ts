@@ -63,7 +63,7 @@ export const setAccount = (address: string): SetAccountAction => {
   CeloAnalytics.track(DefaultEventNames.accountSet)
   return {
     type: Actions.SET_ACCOUNT,
-    address,
+    address: address.toLowerCase(),
   }
 }
 

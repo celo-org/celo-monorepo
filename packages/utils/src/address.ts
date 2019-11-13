@@ -19,3 +19,5 @@ export const privateKeyToAddress = (privateKey: string) => {
     '0x' + privateToAddress(Buffer.from(trimLeading0x(privateKey), 'hex')).toString('hex')
   )
 }
+
+export { toChecksumAddress } from 'ethereumjs-util'

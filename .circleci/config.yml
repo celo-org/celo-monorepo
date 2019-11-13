@@ -526,7 +526,7 @@ jobs:
             cd packages/celotool
             ./ci_test_transfers.sh checkout master
 
-  end-to-end-geth-exit-test:
+  end-to-end-geth-blockchain-parameters-test:
     <<: *e2e-defaults
     steps:
       - attach_workspace:
@@ -542,7 +542,7 @@ jobs:
           command: |
             set -e
             cd packages/celotool
-            ./ci_test_exit.sh checkout master
+            ./ci_test_blockchain_parameters.sh checkout master
 
   end-to-end-geth-governance-test:
     <<: *e2e-defaults
@@ -748,7 +748,7 @@ workflows:
           requires:
             - lint-checks
             - contractkit-test
-      - end-to-end-geth-exit-test:
+      - end-to-end-geth-blockchain-parameters-test:
           requires:
             - lint-checks
             - contractkit-test
