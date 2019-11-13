@@ -11,6 +11,8 @@ import i18n, { Namespaces } from 'src/i18n'
 import { headerWithBackButton } from 'src/navigator/Headers'
 import { RootState } from 'src/redux/reducers'
 import { toggleZeroSyncMode } from 'src/web3/actions'
+import TextButton from '@celo/react-components/components/TextButton'
+import { componentStyles } from '@celo/react-components/styles/styles'
 
 interface StateProps {
   zeroSyncEnabled: boolean
@@ -34,7 +36,6 @@ const mapStateToProps = (state: RootState): StateProps => {
 
 interface State {
   modalVisible: boolean
-  buttonReset: boolean
 }
 
 export class CeloLite extends React.Component<Props, State> {
@@ -45,7 +46,6 @@ export class CeloLite extends React.Component<Props, State> {
 
   state = {
     modalVisible: false,
-    buttonReset: false,
   }
 
   showModal = () => {
@@ -56,21 +56,18 @@ export class CeloLite extends React.Component<Props, State> {
     this.setState({ modalVisible: false })
   }
 
-  cancelModal = () => {
-    this.setState({ modalVisible: false, buttonReset: true }, () => {
-      this.setState({ buttonReset: false })
-    })
-  }
-
-  sendSMS = () => {
+  onPressRestartModal = () => {
+    this.props.toggleZeroSyncMode(false)
     this.hideModal()
     // TODO restart app
   }
 
   handleZeroSyncToggle = (zeroSyncMode: boolean) => {
-    this.props.toggleZeroSyncMode(zeroSyncMode)
-    if (!zeroSyncMode) {
+    if (zeroSyncMode) {
+      this.props.toggleZeroSyncMode(true)
+    } else {
       // Starting geth, so show modal to restart app
+      // zeroSyncMode will be updated if selected in modal
       this.showModal()
     }
   }
@@ -78,7 +75,7 @@ export class CeloLite extends React.Component<Props, State> {
   render() {
     const { zeroSyncEnabled, t } = this.props
     return (
-      <ScrollView style={style.scrollView} keyboardShouldPersistTaps="handled">
+      <ScrollView style={styles.scrollView} keyboardShouldPersistTaps="handled">
         <SettingsSwitchItem
           switchValue={zeroSyncEnabled}
           onSwitchChange={this.handleZeroSyncToggle}
@@ -86,22 +83,21 @@ export class CeloLite extends React.Component<Props, State> {
         >
           <Text style={fontStyles.body}>{t('enableCeloLite')}</Text>
         </SettingsSwitchItem>
-        <Modal
-          isVisible={this.state.modalVisible}
-          style={style.modal}
-          useNativeDriver={true}
-          hideModalContentWhileAnimating={true}
-          onBackButtonPress={this.cancelModal}
-        >
-          <View style={style.modalContainer}>
-            <CeloLiteModal
-              onSMS={this.sendSMS}
-              onCancel={this.cancelModal}
-              cancelText={t('cancel')}
-              SMSText={t('inviteFlow11:inviteWithSMS')}
-              whatsAppText={t('inviteFlow11:inviteWithWhatsapp')}
-              margin={15}
-            />
+        <Modal isVisible={this.state.modalVisible}>
+          <View style={styles.modalContainer}>
+            <Text style={styles.modalHeader}>{t('skipModal.header')}</Text>
+            <Text style={fontStyles.body}>{t('skipModal.body1')}</Text>
+            <Text style={[fontStyles.body, componentStyles.marginTop10]}>
+              {t('skipModal.body2')}
+            </Text>
+            <View style={styles.modalButtonsContainer}>
+              <TextButton onPress={this.hideModal} style={styles.modalCancelText}>
+                {t('global:cancel')}
+              </TextButton>
+              <TextButton onPress={this.onPressRestartModal} style={styles.modalSkipText}>
+                {t('global:skip')}
+              </TextButton>
+            </View>
           </View>
         </Modal>
       </ScrollView>
@@ -109,19 +105,38 @@ export class CeloLite extends React.Component<Props, State> {
   }
 }
 
-const style = StyleSheet.create({
+const styles = StyleSheet.create({
   scrollView: {
     flex: 1,
     backgroundColor: colors.background,
   },
-  modal: {
-    flex: 1,
-    margin: 0,
-  },
   modalContainer: {
-    justifyContent: 'flex-end',
-    alignItems: 'stretch',
-    flex: 1,
+    backgroundColor: colors.background,
+    padding: 20,
+    marginHorizontal: 10,
+    borderRadius: 4,
+  },
+  modalHeader: {
+    ...fontStyles.h2,
+    ...fontStyles.bold,
+    marginVertical: 15,
+  },
+  modalButtonsContainer: {
+    marginTop: 25,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-evenly',
+  },
+  modalCancelText: {
+    ...fontStyles.body,
+    ...fontStyles.semiBold,
+    paddingRight: 20,
+  },
+  modalSkipText: {
+    ...fontStyles.body,
+    ...fontStyles.semiBold,
+    color: colors.celoGreen,
+    paddingLeft: 20,
   },
 })
 

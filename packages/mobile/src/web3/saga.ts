@@ -461,6 +461,11 @@ export function* switchToGethFromZeroSync() {
   } catch (e) {
     Logger.error(TAG + '@switchToGethFromZeroSync', 'Error switching to geth from zeroSync')
     yield put(showError(ErrorMessages.FAILED_TO_SWITCH_SYNC_MODES))
+
+    // Go back to zeroSync mode since switch couldn't be completed
+    yield put(setZeroSyncMode(true))
+    switchWeb3ProviderForSyncMode(true)
+    // TODO(anna) undo other things
   }
 }
 
@@ -479,6 +484,11 @@ export function* switchToZeroSyncFromGeth() {
   } catch (e) {
     Logger.error(TAG + '@switchToGethFromZeroSync', 'Error switching to zeroSync from geth')
     yield put(showError(ErrorMessages.FAILED_TO_SWITCH_SYNC_MODES))
+
+    // Go back to geth mode if error thrown
+    yield put(setZeroSyncMode(false))
+    switchWeb3ProviderForSyncMode(false)
+    // TODO(anna) undo other things
   }
 }
 
