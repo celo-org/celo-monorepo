@@ -71,9 +71,19 @@ export default class PhoneNumberInput extends React.Component<Props, State> {
 
   async triggerPhoneNumberRequestAndroid() {
     try {
-      const phone = await SmsRetriever.requestPhoneNumber()
-      const phoneNumber = parsePhoneNumber(phone, '')
+      let phone
+      try {
+        phone = await SmsRetriever.requestPhoneNumber()
+      } catch (error) {
+        console.info(
+          `${TAG}/triggerPhoneNumberRequestAndroid`,
+          'Could not request phone. This might be thrown if the user dismissed the modal',
+          error
+        )
+        return
+      }
 
+      const phoneNumber = parsePhoneNumber(phone, '')
       if (!phoneNumber) {
         return
       }
@@ -95,6 +105,10 @@ export default class PhoneNumberInput extends React.Component<Props, State> {
   }
 
   async triggerPhoneNumberRequest() {
+    if (this.state.phoneNumber || this.state.countryQuery) {
+      return
+    }
+
     try {
       if (Platform.OS === 'android') {
         await this.triggerPhoneNumberRequestAndroid()
