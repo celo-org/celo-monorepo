@@ -743,10 +743,6 @@ workflows:
           requires:
             - lint-checks
             - contractkit-test
-      - end-to-end-geth-integration-sync-test:
-          requires:
-            - lint-checks
-            - contractkit-test
       - end-to-end-geth-attestations-test:
           requires:
             - lint-checks
