@@ -157,9 +157,9 @@ async function registerValidator(
 }
 
 module.exports = async (_deployer: any, networkName: string) => {
-  if (networkName === 'development') {
-    return
-  }
+  // if (networkName === 'development') {
+  //   return
+  // }
 
   const accounts: AccountsInstance = await getDeployedProxiedContract<AccountsInstance>(
     'Accounts',

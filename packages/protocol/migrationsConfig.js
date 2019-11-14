@@ -1,6 +1,7 @@
 const BigNumber = require('bignumber.js')
 const minimist = require('minimist')
 const path = require('path')
+const lodash = require('lodash')
 
 // Almost never use exponential notation in toString
 // http://mikemcl.github.io/bignumber.js/#exponential-at
@@ -158,9 +159,8 @@ const argv = minimist(process.argv.slice(2), {
 const migrationOverride = argv.migration_override ? JSON.parse(argv.migration_override) : {}
 const config = {}
 
-for (const key of Object.keys(DefaultConfig)) {
-  config[key] = { ...DefaultConfig[key], ...migrationOverride[key] }
-}
+// use lodash merge to deeply override defaults
+lodash.merge(config, [DefaultConfig, migrationOverride])
 
 module.exports = {
   build_directory: argv.build_directory,
