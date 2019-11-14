@@ -7,11 +7,12 @@
   - [Celo Networks](#celo-networks)
     - [Baklava](#baklava)
       - [Create accounts](#create-accounts)
-      - [Deploy the validator node](#deploy-the-validator-node)
+      - [Deploy the validator and proxy nodes](#deploy-the-validator-and-proxy-nodes)
+      - [Deploy the attestation service](#deploy-the-attestation-service)
     - [Alfajores](#alfajores)
       - [Pull the Celo Docker image](#pull-the-celo-docker-image)
       - [Create accounts](#create-accounts-1)
-      - [Deploy the validator node](#deploy-the-validator-node-1)
+      - [Deploy the validator node](#deploy-the-validator-node)
     - [Obtain and lock up some Celo Gold for staking](#obtain-and-lock-up-some-celo-gold-for-staking)
     - [Run for election](#run-for-election)
 
@@ -137,7 +138,7 @@ It will prompt you for the passphrase you've chosen for the validator account. L
 $ export CELO_VALIDATOR_POP=<YOUR-VALIDATOR-PROOF-OF-POSSESSION>
 ```
 
-#### Deploy the validator node
+#### Deploy the validator and proxy nodes
 
 We initialize the docker containers for the validator and the proxy, building from an image for the network and initializing Celo with the genesis block:
 
@@ -186,6 +187,52 @@ $ docker run --name celo-validator -p 127.0.0.1:8547:8545 -p 127.0.0.1:8548:8546
 The `mine` flag does not mean the node starts mining blocks, but rather starts trying to participate in the BFT consensus protocol. It cannot do this until it gets elected -- so next we need to stand for election.
 
 The `networkid` parameter value of `44785` indicates we are connecting the Baklava Beta network.
+
+#### Deploy the attestation service
+
+As part of the [lightweight identity protocol](/celo-codebase/protocol/identity), validators are expected to run an attestation service to provide attestations that allow users to map their phone number to an account on Celo. The attestation service is a simple Node.js application that can be run with a docker image:
+
+First we need to create an account. Run:
+
+```bash
+$ celocli account:new
+```
+
+We copy the account details and assign the Private Key to the `ATTESTATION_SERVICE` environment variable:
+
+```bash
+$ export ATTESTATION_KEY=<Private Key>
+```
+
+```bash
+$ docker run -e ATTESTATION_KEY=$ATTESTATION_KEY -p 3000:80 us.gcr.io/celo-testnet/attestation-service:$CELO_NETWORK
+```
+
+In order for users to request attestations from your service, you need to register the endpoint under which your service is reachable in your [metadata](/celo-codebase/protocol/identity/metadata).
+
+```bash
+$ celocli identity:create-metadata ./metadata.json
+```
+
+Add your URL:
+
+```bash
+$ celocli identity:change-attestation-service-url ./metadata.json --url ATTESTATION_SERVICE_URL
+```
+
+And then host your metadata somewhere reachable via HTTP. You can register your metadata URL with:
+
+```bash
+$ celocli identity:register-metadata --url <METADATA_URL> --from $CELO_VALIDATOR_ADDRESS
+```
+
+If everything goes well users should see that you are ready for attestations by running:
+
+```bash
+$ celocli identity:get-metadata $CELO_VALIDATOR_ADDRESS
+```
+
+You’re all set! Note that elections are finalized at the end of each epoch, roughly once an hour in the Baklava Testnet. After that hour, if you get elected, your node will start participating BFT consensus and validating blocks. Users requesting attestations will hit your registered attestation service.
 
 ### Alfajores
 
