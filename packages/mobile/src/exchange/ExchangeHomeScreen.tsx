@@ -1,7 +1,6 @@
 import Button, { BtnTypes } from '@celo/react-components/components/Button'
 import ScrollContainer from '@celo/react-components/components/ScrollContainer'
 import SectionHeadNew from '@celo/react-components/components/SectionHeadNew'
-import SmallButton from '@celo/react-components/components/SmallButton'
 import BigNumber from 'bignumber.js'
 import * as React from 'react'
 import { withNamespaces, WithNamespaces } from 'react-i18next'
@@ -22,6 +21,7 @@ import { Stacks } from 'src/navigator/Screens'
 import { RootState } from 'src/redux/reducers'
 import DisconnectBanner from 'src/shared/DisconnectBanner'
 import { getRateForMakerToken } from 'src/utils/currencyExchange'
+import { NavigationInjectedProps } from 'react-navigation'
 
 interface StateProps {
   exchangeRate: BigNumber
@@ -39,7 +39,7 @@ const mapStateToProps = (state: RootState): StateProps => ({
 
 function goToTrade() {
   CeloAnalytics.track(CustomEventNames.exchange_button)
-  navigate(Stacks.ExchangeStack)
+  navigate(Stacks.ExchangeStack, { makerToken: Token.DOLLAR, makerTokenBalance: '50' })
 }
 
 export class ExchangeHomeScreen extends React.Component<Props> {

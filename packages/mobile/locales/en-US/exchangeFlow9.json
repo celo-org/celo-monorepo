@@ -9,6 +9,7 @@
   "exchange": "Exchange",
   "buy": "Buy",
   "sell": "Sell",
+  "buyGold": "Buy Gold",
   "cancel": "Cancel",
   "includeExchangeFee": "*includes exchange fee",
   "available": "Available",
