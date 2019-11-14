@@ -64,10 +64,12 @@ class InflationManager {
   }
 
   setInflationParameters = async (rate: BigNumber, updatePeriod: number) => {
+    console.log('setting inflation rate', rate.toFixed(), updatePeriod)
     const stableToken = await this.kit.contracts.getStableToken()
     await stableToken
       .setInflationParameters(toFixed(rate).toString(), updatePeriod)
       .sendAndWaitForReceipt({ from: this.validatorAddress })
+    console.log('set inflation rate')
   }
 }
 
@@ -157,7 +159,8 @@ describe('Transfer tests', function(this: any) {
   const ToAddress = '0xbBae99F0E1EE565404465638d40827b54D343638'
   const FeeRecipientAddress = '0x4f5f8a3f45d179553e7b95119ce296010f50f6f1'
 
-  const syncModes = ['full', 'fast', 'light', 'ultralight']
+  // const syncModes = ['full', 'fast', 'light', 'ultralight']
+  const syncModes = ['light']
   const gethConfig: GethTestConfig = {
     migrateTo: 18,
     instances: [
@@ -693,7 +696,9 @@ describe('Transfer tests', function(this: any) {
                 governanceAddress,
               ])
 
+              console.log('setting inflation rate for next transfer')
               await inflationManager.setInflationRateForNextTransfer(new BigNumber(2))
+              console.log('set inflation rate for next transfer')
               const stableTokenAddress = await kit.registry.addressFor(CeloContract.StableToken)
               const expectedGasUsed = 164005
               txRes = await runTestTransaction(
