@@ -148,10 +148,9 @@ describe('governance tests', () => {
       signerWeb3
     ).contracts.getAccounts()).generateProofOfSigningKeyPossession(validator, signer)
     const accountsWrapper = await newKitFromWeb3(validatorWeb3).contracts.getAccounts()
-    return await (await accountsWrapper.authorizeValidatorSigner(
-      signer,
-      pop
-    )).sendAndWaitForReceipt({ from: validator })
+    return (await accountsWrapper.authorizeValidatorSigner(signer, pop)).sendAndWaitForReceipt({
+      from: validator,
+    })
   }
 
   const updateValidatorBlsKey = async (
@@ -166,7 +165,7 @@ describe('governance tests', () => {
     const blsPop = getBlsPoP(validator, signerPrivateKey)
     // TODO(asa): Send this from the signer instead.
     const validatorsWrapper = await newKitFromWeb3(validatorWeb3).contracts.getValidators()
-    return await validatorsWrapper
+    return validatorsWrapper
       .updateBlsPublicKey(blsPublicKey, blsPop)
       .sendAndWaitForReceipt({ from: validator })
   }
