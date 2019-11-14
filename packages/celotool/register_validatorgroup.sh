@@ -13,7 +13,7 @@ ACCOUNT_NOZEROX=`echo ${VALIDATOR} | cut -c 3-`
 export KEYSTORE_V=`find ${DATA_DIR} -type f -iname "*${ACCOUNT_NOZEROX}"`
 echo ${KEYSTORE_V}
 
-FROM=${FAUCET} TO=${VALIDATOR} AMOUNT=3e22 NUM_TX=1 ts-node src/helpers/transfer.ts
+FROM=${FAUCET} TO=${VALIDATOR} AMOUNT=3e22 ts-node src/helpers/transfer.ts
 
 export VALIDATORGROUP=`./bin/celotooljs.sh geth create-account -e local --data-dir ${DATA_DIR} --geth-dir ${GETH_DIR} --password "" | grep 0x | cut -f4 -d' '`
 echo ${VALIDATORGROUP}
@@ -21,7 +21,7 @@ ACCOUNT_NOZEROX=`echo ${VALIDATORGROUP} | cut -c 3-`
 export KEYSTORE_VG=`find ${DATA_DIR} -type f -iname "*${ACCOUNT_NOZEROX}"`
 echo ${KEYSTORE_VG}
 
-FROM=${FAUCET} TO=${VALIDATORGROUP} AMOUNT=3e22 NUM_TX=1 ts-node src/helpers/transfer.ts
+FROM=${FAUCET} TO=${VALIDATORGROUP} AMOUNT=3e22 ts-node src/helpers/transfer.ts
 
 KEYSTORE=${KEYSTORE_V} ts-node src/helpers/account_register.ts
 KEYSTORE=${KEYSTORE_VG} ts-node src/helpers/account_register.ts
