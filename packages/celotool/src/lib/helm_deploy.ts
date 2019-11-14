@@ -10,7 +10,6 @@ import {
   execCmd,
   execCmdWithExitOnFailure,
   getVerificationPoolRewardsURL,
-  getVerificationPoolSMSURL,
   outputIncludes,
   switchToProjectFromEnv,
 } from './utils'
@@ -522,10 +521,6 @@ async function helmParameters(celoEnv: string) {
 
   return [
     `--set domain.name=${fetchEnv('CLUSTER_DOMAIN_NAME')}`,
-    `--set geth.miner.verificationpool=${fetchEnvOrFallback(
-      'VERIFICATION_POOL_URL',
-      getVerificationPoolSMSURL(celoEnv)
-    )}`,
     `--set geth.verbosity=${fetchEnvOrFallback('GETH_VERBOSITY', '4')}`,
     `--set geth.node.cpu_request=${fetchEnv('GETH_NODE_CPU_REQUEST')}`,
     `--set geth.node.memory_request=${fetchEnv('GETH_NODE_MEMORY_REQUEST')}`,
