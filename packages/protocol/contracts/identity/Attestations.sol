@@ -95,7 +95,7 @@ contract Attestations is
     address attestationRequestFeeToken
   );
 
-  event AttestationIssuersSelected(
+  event AttestationIssuerSelected(
     bytes32 indexed identifier,
     address indexed account,
     address indexed issuer,
@@ -584,7 +584,7 @@ contract Attestations is
       attestation.attestationRequestFeeToken = unselectedRequest.attestationRequestFeeToken;
       state.selectedIssuers.push(issuer);
 
-      emit AttestationIssuersSelected(
+      emit AttestationIssuerSelected(
         identifier,
         msg.sender,
         issuer,

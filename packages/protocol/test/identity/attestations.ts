@@ -466,7 +466,7 @@ contract('Attestations', (accounts: string[]) => {
 
           issuers.forEach((issuer, index) => {
             assertLogMatches2(response.logs[index], {
-              event: 'AttestationIssuersSelected',
+              event: 'AttestationIssuerSelected',
               args: {
                 identifier: phoneHash,
                 account: caller,
