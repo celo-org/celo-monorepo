@@ -448,10 +448,12 @@ jobs:
       - attach_workspace:
           at: ~/app
       - run:
-          name: Test
+          name: Generate DevChain
           command: |
-            set -euo pipefail
-            yarn --cwd=packages/cli test
+            (cd packages/cli && yarn test:reset)          
+      - run:
+          name: Run Tests
+          command: yarn --cwd=packages/cli test
       - run:
           name: Fail if someone forgot to commit CLI docs
           command: |
@@ -524,7 +526,7 @@ jobs:
             cd packages/celotool
             ./ci_test_transfers.sh checkout master
 
-  end-to-end-geth-exit-test:
+  end-to-end-geth-blockchain-parameters-test:
     <<: *e2e-defaults
     steps:
       - attach_workspace:
@@ -540,7 +542,7 @@ jobs:
           command: |
             set -e
             cd packages/celotool
-            ./ci_test_exit.sh checkout master
+            ./ci_test_blockchain_parameters.sh checkout master
 
   end-to-end-geth-governance-test:
     <<: *e2e-defaults
@@ -580,23 +582,6 @@ jobs:
             set -e
             cd packages/celotool
             ./ci_test_sync.sh checkout master
-
-  end-to-end-geth-integration-sync-test:
-    <<: *e2e-defaults
-    steps:
-      - attach_workspace:
-          at: ~/app
-      - run:
-          name: Check if the test should run
-          command: |
-            FILES_TO_CHECK="${PWD}/packages/celotool,${PWD}/packages/protocol,${PWD}/.circleci/config.yml"
-            ./scripts/ci_check_if_test_should_run_v2.sh ${FILES_TO_CHECK}
-      - run:
-          name: Run test
-          command: |
-            set -e
-            cd packages/celotool
-            ./ci_test_sync_with_network.sh checkout master
 
   end-to-end-geth-attestations-test:
     <<: *e2e-defaults
@@ -746,7 +731,7 @@ workflows:
           requires:
             - lint-checks
             - contractkit-test
-      - end-to-end-geth-exit-test:
+      - end-to-end-geth-blockchain-parameters-test:
           requires:
             - lint-checks
             - contractkit-test

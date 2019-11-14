@@ -10,20 +10,17 @@ import "../common/Signatures.sol";
 import "../common/UsingRegistry.sol";
 
 contract Accounts is IAccounts, ReentrancyGuard, Initializable, UsingRegistry {
-
   using SafeMath for uint256;
 
   struct Signers {
     //The address that is authorized to vote in governance and validator elections on behalf of the
     // account. The account can vote as well, whether or not an vote signing key has been specified.
     address voting;
-
     // The address that is authorized to manage a validator or validator group and sign consensus
     // messages on behalf of the account. The account can manage the validator, whether or not an
     // validation signing key has been specified. However if an validation signing key has been
     // specified, only that key may actually participate in consensus.
     address validating;
-
     // The address of the key with which this account wants to sign attestations on the Attestations
     // contract
     address attesting;
@@ -35,17 +32,13 @@ contract Accounts is IAccounts, ReentrancyGuard, Initializable, UsingRegistry {
     // These keys may not be keys of other accounts, and may not be authorized by any other
     // account for any purpose.
     Signers signers;
-
     // The address at which the account expects to receive transfers. If it's empty/0x0, the
     // account indicates that an address exchange should be initiated with the dataEncryptionKey
     address walletAddress;
-
     // An optional human readable identifier for the account
     string name;
-
     // The ECDSA public key used to encrypt and decrypt data for this account
     bytes dataEncryptionKey;
-
     // The URL under which an account adds metadata and claims
     string metadataURL;
   }
@@ -53,7 +46,6 @@ contract Accounts is IAccounts, ReentrancyGuard, Initializable, UsingRegistry {
   mapping(address => Account) private accounts;
   // Maps voting and validating keys to the account that provided the authorization.
   mapping(address => address) public authorizedBy;
-
 
   event AttestationSignerAuthorized(address indexed account, address signer);
   event VoteSignerAuthorized(address indexed account, address signer);
@@ -70,14 +62,10 @@ contract Accounts is IAccounts, ReentrancyGuard, Initializable, UsingRegistry {
    * @param dataEncryptionKey secp256k1 public key for data encryption. Preferably compressed.
    * @param walletAddress The wallet address to set for the account
    */
-  function setAccount(
-    string calldata name,
-    bytes calldata dataEncryptionKey,
-    address walletAddress
-  )
+  function setAccount(string calldata name, bytes calldata dataEncryptionKey, address walletAddress)
     external
   {
-    if(!isAccount(msg.sender)) {
+    if (!isAccount(msg.sender)) {
       createAccount();
     }
     setName(name);
@@ -103,15 +91,7 @@ contract Accounts is IAccounts, ReentrancyGuard, Initializable, UsingRegistry {
    * @param s Output value s of the ECDSA signature.
    * @dev v, r, s constitute `voter`'s signature on `msg.sender`.
    */
-  function authorizeVoteSigner(
-    address voter,
-    uint8 v,
-    bytes32 r,
-    bytes32 s
-  )
-    external
-    nonReentrant
-  {
+  function authorizeVoteSigner(address voter, uint8 v, bytes32 r, bytes32 s) external nonReentrant {
     Account storage account = accounts[msg.sender];
     authorize(voter, account.signers.voting, v, r, s);
     account.signers.voting = voter;
@@ -126,12 +106,7 @@ contract Accounts is IAccounts, ReentrancyGuard, Initializable, UsingRegistry {
    * @param s Output value s of the ECDSA signature.
    * @dev v, r, s constitute `validator`'s signature on `msg.sender`.
    */
-  function authorizeValidationSigner(
-    address validator,
-    uint8 v,
-    bytes32 r,
-    bytes32 s
-  )
+  function authorizeValidationSigner(address validator, uint8 v, bytes32 r, bytes32 s)
     external
     nonReentrant
   {
@@ -179,11 +154,7 @@ contract Accounts is IAccounts, ReentrancyGuard, Initializable, UsingRegistry {
    * @dev Fails if the `accountOrVoteSigner` is not an account or active authorized vote signer.
    * @return The associated account.
    */
-  function activeVoteSignerToAccount(address accountOrVoteSigner)
-    external
-    view
-    returns (address)
-  {
+  function activeVoteSignerToAccount(address accountOrVoteSigner) external view returns (address) {
     address authorizingAccount = authorizedBy[accountOrVoteSigner];
     if (authorizingAccount != address(0)) {
       require(accounts[authorizingAccount].signers.voting == accountOrVoteSigner);
@@ -228,7 +199,37 @@ contract Accounts is IAccounts, ReentrancyGuard, Initializable, UsingRegistry {
     return accounts[account].metadataURL;
   }
 
-    /**
+  /**
+   * @notice Getter for the metadata of multiple accounts.
+   * @param accountsToQuery The addresses of the accounts to get the metadata for.
+   * @return (stringLengths[] - the length of each string in bytes
+   *          data - all strings concatenated
+   *         )
+   */
+  function batchGetMetadataURL(address[] calldata accountsToQuery)
+    external
+    view
+    returns (uint256[] memory, bytes memory)
+  {
+    uint256 totalSize = 0;
+    uint256[] memory sizes = new uint256[](accountsToQuery.length);
+    for (uint256 i = 0; i < accountsToQuery.length; i = i.add(1)) {
+      sizes[i] = bytes(accounts[accountsToQuery[i]].metadataURL).length;
+      totalSize = totalSize.add(sizes[i]);
+    }
+
+    bytes memory data = new bytes(totalSize);
+    uint256 pointer = 0;
+    for (uint256 i = 0; i < accountsToQuery.length; i = i.add(1)) {
+      for (uint256 j = 0; j < sizes[i]; j = j.add(1)) {
+        data[pointer] = bytes(accounts[accountsToQuery[i]].metadataURL)[j];
+        pointer = pointer.add(1);
+      }
+    }
+    return (sizes, data);
+  }
+
+  /**
    * @notice Getter for the data encryption key and version.
    * @param account The address of the account to get the key for
    * @return dataEncryptionKey secp256k1 public key for data encryption. Preferably compressed.
@@ -296,14 +297,7 @@ contract Accounts is IAccounts, ReentrancyGuard, Initializable, UsingRegistry {
    * @param s Output value s of the ECDSA signature.
    * @dev v, r, s constitute `attestor`'s signature on `msg.sender`.
    */
-  function authorizeAttestationSigner(
-    address attestor,
-    uint8 v,
-    bytes32 r,
-    bytes32 s
-  )
-    public
-  {
+  function authorizeAttestationSigner(address attestor, uint8 v, bytes32 r, bytes32 s) public {
     Account storage account = accounts[msg.sender];
     authorize(attestor, account.signers.attesting, v, r, s);
     account.signers.attesting = attestor;
@@ -444,15 +438,7 @@ contract Accounts is IAccounts, ReentrancyGuard, Initializable, UsingRegistry {
    * @dev Fails if the address is already authorized or is an account.
    * @dev v, r, s constitute `current`'s signature on `msg.sender`.
    */
-  function authorize(
-    address current,
-    address previous,
-    uint8 v,
-    bytes32 r,
-    bytes32 s
-  )
-    private
-  {
+  function authorize(address current, address previous, uint8 v, bytes32 r, bytes32 s) private {
     require(isAccount(msg.sender) && isNotAccount(current) && isNotAuthorized(current));
 
     address signer = Signatures.getSignerOfAddress(msg.sender, v, r, s);

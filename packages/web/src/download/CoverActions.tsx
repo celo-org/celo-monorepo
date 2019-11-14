@@ -29,6 +29,7 @@ export default withNamespaces(NameSpaces.download)(
             isMobile={screen === ScreenSizes.MOBILE}
             title={t('coverAction.faucet.title')}
             text={t('coverAction.faucet.text')}
+            style={styles.actionStyle}
             link={{ text: t('coverAction.faucet.link'), href: CeloLinks.faucet }}
           />
 
@@ -55,6 +56,11 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     flexDirection: 'row',
     alignItems: 'flex-start',
+    flexWrap: 'wrap',
+    maxWidth: '100%',
   },
-  mainMobile: { justifyContent: 'space-around' },
+  mainMobile: { justifyContent: 'space-around', flexDirection: 'column', maxWidth: '100%' },
+  actionStyle: {
+    justifyContent: 'flex-start',
+  },
 })

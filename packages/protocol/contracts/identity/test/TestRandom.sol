@@ -10,4 +10,3 @@ contract TestRandom is Random {
     return _getBlockRandomness(blockNumber, cur);
   }
 }
-

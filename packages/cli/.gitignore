@@ -7,3 +7,4 @@
 node_modules
 oclif.manifest.json
 src/generated
+.devchain/

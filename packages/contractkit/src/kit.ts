@@ -144,7 +144,7 @@ export class ContractKit {
     return this.web3.eth.defaultAccount
   }
 
-  set gasInflactionFactor(factor: number) {
+  set gasInflationFactor(factor: number) {
     this.config.gasInflationFactor = factor
   }
 

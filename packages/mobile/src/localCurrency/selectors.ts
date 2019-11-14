@@ -1,4 +1,7 @@
-import * as RNLocalize from 'react-native-localize'
+import { getRegionCode } from '@celo/utils/src/phoneNumbers'
+import CountryData from 'country-data'
+import { createSelector } from 'reselect'
+import { e164NumberSelector } from 'src/account/reducer'
 import {
   LOCAL_CURRENCY_CODES,
   LocalCurrencyCode,
@@ -8,25 +11,37 @@ import { RootState } from 'src/redux/reducers'
 
 const MIN_UPDATE_INTERVAL = 12 * 3600 * 1000 // 12 hours
 
-// Returns the best currency possible (it respects the user preferred currencies list order).
-function findBestAvailableCurrency(supportedCurrencyCodes: LocalCurrencyCode[]) {
-  const deviceCurrencies = RNLocalize.getCurrencies()
-  const supportedCurrenciesSet = new Set(supportedCurrencyCodes)
+function getCountryCurrencies(e164PhoneNumber: string) {
+  const regionCode = getRegionCode(e164PhoneNumber)
+  const countries = CountryData.lookup.countries({ alpha2: regionCode })
+  const country = countries.length > 0 ? countries[0] : undefined
 
-  for (const deviceCurrency of deviceCurrencies) {
-    if (supportedCurrenciesSet.has(deviceCurrency as LocalCurrencyCode)) {
-      return deviceCurrency as LocalCurrencyCode
-    }
-  }
-
-  return null
+  return country ? country.currencies : []
 }
 
-// TODO(jean): listen to locale changes so this stays accurate when changed while the app is running
-const DEVICE_BEST_CURRENCY_CODE = findBestAvailableCurrency(LOCAL_CURRENCY_CODES)
+const getDefaultLocalCurrencyCode = createSelector(
+  e164NumberSelector,
+  (e164PhoneNumber): LocalCurrencyCode | null => {
+    // Note: we initially tried using the device locale for getting the currencies (`RNLocalize.getCurrencies()`)
+    // but the problem is some Android versions don't make it possible to select the appropriate language/country
+    // from the device settings.
+    // So here we use the country of the phone number
+    const countryCurrencies = getCountryCurrencies(e164PhoneNumber)
+    const supportedCurrenciesSet = new Set(LOCAL_CURRENCY_CODES)
+
+    for (const countryCurrency of countryCurrencies) {
+      if (supportedCurrenciesSet.has(countryCurrency as LocalCurrencyCode)) {
+        return countryCurrency as LocalCurrencyCode
+      }
+    }
+
+    return LocalCurrencyCode.USD
+  }
+)
 
 export function getLocalCurrencyCode(state: RootState): LocalCurrencyCode | null {
-  const currencyCode = state.localCurrency.preferredCurrencyCode || DEVICE_BEST_CURRENCY_CODE
+  const currencyCode =
+    state.localCurrency.preferredCurrencyCode || getDefaultLocalCurrencyCode(state)
   if (!currencyCode || currencyCode === LocalCurrencyCode.USD) {
     // This disables local currency display
     return null
@@ -36,7 +51,8 @@ export function getLocalCurrencyCode(state: RootState): LocalCurrencyCode | null
 }
 
 export function getLocalCurrencySymbol(state: RootState): LocalCurrencySymbol | null {
-  const currencyCode = state.localCurrency.preferredCurrencyCode || DEVICE_BEST_CURRENCY_CODE
+  const currencyCode =
+    state.localCurrency.preferredCurrencyCode || getDefaultLocalCurrencyCode(state)
 
   return currencyCode ? LocalCurrencySymbol[currencyCode] : null
 }
