@@ -29,8 +29,6 @@ export async function upgradeHelmChart(celoEnv: string) {
 function helmParameters() {
   return [
     `--set domain.name=${fetchEnv(envVar.CLUSTER_DOMAIN_NAME)}`,
-    `--set ethstats.createSecret=${isVmBased()}`,
-    `--set ethstats.webSocketSecret="${fetchEnv(envVar.ETHSTATS_WEBSOCKETSECRET)}"`,
     `--set ethstats.image.repository=${fetchEnv(envVar.ETHSTATS_DOCKER_IMAGE_REPOSITORY)}`,
     `--set ethstats.image.tag=${fetchEnv(envVar.ETHSTATS_DOCKER_IMAGE_TAG)}`,
     `--set ethstats.trusted_enodes='{${fetchEnv(envVar.ETHSTATS_TRUSTED_ENODES)}}'`,
