@@ -180,9 +180,7 @@ describe('governance tests', () => {
         await sleep(0.1)
       } while (blockNumber % epoch !== 1)
 
-      console.log('activating')
       await activate(allValidators[0])
-      console.log('activated')
       const groupWeb3 = new Web3('ws://localhost:8567')
       const groupKit = newKitFromWeb3(groupWeb3)
       validators = await groupKit._web3Contracts.getValidators()
@@ -196,11 +194,8 @@ describe('governance tests', () => {
         if (header.number % epoch === 1) {
           const memberToRemove = membersToSwap[includedMemberIndex]
           const memberToAdd = membersToSwap[(includedMemberIndex + 1) % 2]
-          console.log('removing member')
           await removeMember(groupWeb3, groupAddress, memberToRemove)
-          console.log('adding member')
           await addMember(groupWeb3, groupAddress, memberToAdd)
-          console.log('done swapping member')
           includedMemberIndex = (includedMemberIndex + 1) % 2
           const newMembers = await getValidatorGroupMembers()
           assert.include(newMembers, memberToAdd)
@@ -270,9 +265,6 @@ describe('governance tests', () => {
       const uptime = 1
 
       const assertScoreUnchanged = async (validator: string, blockNumber: number) => {
-        console.log('asserting score unchanged', blockNumber, blockNumber - 1, validator)
-        console.log(await validators.methods.getValidator(validator).call({}, blockNumber))
-        console.log(await validators.methods.getValidator(validator).call({}, blockNumber - 1))
         const score = new BigNumber(
           (await validators.methods.getValidator(validator).call({}, blockNumber))[2]
         )
@@ -281,12 +273,10 @@ describe('governance tests', () => {
         )
         assert.isFalse(score.isNaN())
         assert.isFalse(previousScore.isNaN())
-        console.log('got scores')
         assert.equal(score.toFixed(), previousScore.toFixed())
       }
 
       const assertScoreChanged = async (validator: string, blockNumber: number) => {
-        console.log('asserting score changed')
         const score = new BigNumber(
           (await validators.methods.getValidator(validator).call({}, blockNumber))[2]
         )
@@ -295,7 +285,6 @@ describe('governance tests', () => {
         )
         assert.isFalse(score.isNaN())
         assert.isFalse(previousScore.isNaN())
-        console.log('got scores')
         const expectedScore = adjustmentSpeed
           .times(uptime)
           .plus(new BigNumber(1).minus(adjustmentSpeed).times(fromFixed(previousScore)))
