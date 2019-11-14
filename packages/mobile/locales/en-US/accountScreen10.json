@@ -16,7 +16,7 @@
   "restartModal": {
     "header": "Restart To Switch Off Celo Lite",
     "body": "To switch Celo Lite on and off repeatedly, you will need to restart the app.",
-    "restart": "Switch and Restart"
+    "restart": "Restart to Switch"
   },
   "testFaqLink": "Celo Wallet FAQ",
   "termsOfServiceLink": "Terms of service",

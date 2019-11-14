@@ -16,7 +16,7 @@
   "restartModal": {
     "header": "Reiniciar para apagar Celo Lite",
     "body": "Para encender y apagar Celo Lite repetidamente, deberá reiniciar la aplicación.",
-    "restart": "Alternar y reiniciar"
+    "restart": "Reiniciar para alternar"
   },
   "testFaqLink": "Las Preguntas Frecuentes del Monedero Celo",
   "termsOfServiceLink": "Las Condiciones de Servicio",
