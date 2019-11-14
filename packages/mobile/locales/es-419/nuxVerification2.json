@@ -1,60 +1,79 @@
 {
-  "verifyPhone": "Verificar teléfono",
-  "otherCeloUsersFindYou":
-    "Otros usuarios de Celo pueden utilizar tu número de teléfono para encontrarte",
-  "findOtherCeloUsers": "Aproveche tus contactos para encontrar otros usuarios de Celo verificados",
-  "verificationCodes": "Recibirás 3 códigos de verificación en poco tiempo",
-  "continue": "Continuar",
-  "enterPhoneToVerify": "Ingrese el número de teléfono y comience la verificación",
-  "smsPermissionsLabel": "Importante ",
-  "smsPermissions":
-    "Celo le pedirá autorización para ver sus mensajes de texto con el fin de leer los códigos de verificación de manera automática. Quizás corran cargos de tu compañía de telefonía celular.",
-  "enterManually": "Ingresar manualmente",
-  "startVerification": "Empezar a verificar",
-  "country": "País",
-  "phoneNumber": "Número de teléfono",
-  "invalidPhone": "Número de teléfono inválido",
-  "missingFullName": "Por favor ingresa tu nombre completo",
-  "allowSmsPermissions": "Permitir que el Monedero Celo envíe y vea mensajes de texto (SMS)",
-  "dontAsk": "No volver a preguntar",
-  "deny": "Denegar",
-  "allow": "Permitir",
-  "mustDoManualLabel": "Nota: ",
-  "mustDoManual": "¿Su teléfono no lee los mensajes de texto? Ingrésalos manualmente.",
-  "waitingForSms": "Solicitud de verificación enviada. Esperando SMS.",
-  "getting1": "Recibiendo código de verificación 1",
-  "getting2": "Recibiendo código de verificación 2",
-  "getting3": "Recibiendo código de verificación 3",
-  "allReceived": "Todos los códigos recibidos",
-  "verifying": "Verificando ",
-  "enterSmsCode": "Ingresar el código recibido por SMS",
-  "code1": "Código de verificación 1",
-  "code2": "Código de verificación 2",
-  "code3": "Código de verificación 3",
-  "notReadyForCode": "Aún no está listo para la código",
+  "getVerified": "~~Verify Phone Number",
+  "notReadyForCode": "Aún no está listo para ingresar el código",
   "emptyVerificationCode": "Sin Código en el Portapapeles",
   "invalidVerificationCode": "Código de Verification Inválido",
   "repeatVerificationCode": "Código de Verificación Repetido",
   "verificationFailure": "Fallo en la Verificación",
   "verificationTimeout": "Verificación no pudo ser verificada a tiempo",
-  "submit": "Enviar",
-  "messages": "Mensajes",
-  "now": "ahora",
-  "garnetVerification": "Código de verificación de Garnet:",
-  "markRead": "Marcar como leído",
-  "reply": "Responder",
-  "congratsVerified": "¡Felicitaciones se ha verificado tu suario!",
-  "copyPaste": "Copiar y Pegar ",
-  "entireSmsMessage": "Mensaje completo desde tu SMS",
-  "pasteCode": "Pegar código de verificación {{codeNumber}}",
-  "startingVerification": "Verificando tu número de teléfono",
-  "nextCode": "Recibiendo el Siguiente Código",
-  "verificationComplete": "Verificación completa",
-  "leaveOpen": "Por favor deja la aplicación abierta",
-  "thisWillTakeTime": "Este proceso llevará unos minutos",
   "errorRequestCode": "Error al solicitar los códigos.",
   "errorRedeemingCode": "Error al canjear el código.",
   "pleaseRetry": "Por favor reinicie la verificación.",
   "retryVerification": "Reintentar la verificación",
-  "codeAccepted": "Aceptado"
+  "education": {
+    "header": "Verificar el teléfono",
+    "body1": "Le solicitamos que verifique su número telefónico.",
+    "body2":
+      "Esto facilita el envío y la recepción de valores entre amigos. Puede omitir este paso ahora y hacerlo después.",
+    "learnMore": "Más información sobre la verificación telefónica",
+    "start": "Comenzar la verificación",
+    "skip": "Omitir por ahora"
+  },
+  "learnMore": {
+    "header": "Verificación del teléfono",
+    "intro":
+      "La verificación del número telefónico de Celo consiste en asociar su billetera de Celo con su teléfono.",
+    "section1Header": "¿Tengo que completar este paso?",
+    "section1Body":
+      "La verificación no es obligatoria. Cuando la completa, las personas de la red de Celo le podrán enviar valores usando su número telefónico. De lo contrario, deberán usar códigos QR o direcciones.",
+    "section2Header": "Seguridad y privacidad",
+    "section2Body":
+      "Para proteger su privacidad, solo se guarda una versión oculta de su teléfono en la cadena de bloques de Celo."
+  },
+  "loading": {
+    "verifyingNumber": "Verificando {{number}}",
+    "keepOpen": "Deje abierta la aplicación",
+    "card1":
+      "Verificar su número telefónico permite que sus amigos lo encuentren en la red de Celo.",
+    "card2": "Con Celo, puede enviar dinero a cualquier persona con tan solo el número telefónico.",
+    "card3":
+      "Celo ahora envía tres mensajes de texto para confirmar que es dueño de su propia línea telefónica."
+  },
+  "skipModal": {
+    "header": "¿Omitir la verificación?",
+    "body1": "La verificación permite que otras personas le envíen valores a su número telefónico.",
+    "body2":
+      "Sin la verificación, igual podrá recibir pagos, pero solo mediante las direcciones de Celo o códigos QR."
+  },
+  "interstitial": {
+    "header": "Ya casi estamos",
+    "body1":
+      "¡Estamos enviando sus mensajes de texto! Ingrese los tres códigos a medida que los reciba.",
+    "body2": "Esto puede tardar un poco."
+  },
+  "input": {
+    "header": "Enviar códigos",
+    "body1": "Copiar y pegar ",
+    "body2": "los códigos de verificación de su aplicación de mensajes de texto (SMS).",
+    "codeHeader1": "Primer código",
+    "codeHeader2": "Segundo código",
+    "codeHeader3": "Tercer código",
+    "codesMissing": "No recibí tres códigos",
+    "tip": "¿Está escribiendo el código? ¿Por qué no lo copia y pega?",
+    "codeAccepted": "Aceptado",
+    "sendingCodes": "Envío de códigos de verificación..."
+  },
+  "missingCodesModal": {
+    "header": "¿Falta algún código?",
+    "body":
+      "Si no recibe todos los códigos después de 60 segundos, puede saltar la verificación y volver a intentarlo más tarde.",
+    "wait": "Esperar los códigos.",
+    "skip": "Omitir por ahora"
+  },
+  "failModal": {
+    "header": "No se pudo verificar",
+    "body1": "Se produjo un problema al verificar su número de teléfono.",
+    "body2": "Puede saltar la verificación y volver a intentarlo más tarde."
+  },
+  "congratsVerified": "¡Felicitaciones se ha verificado tu suario!"
 }

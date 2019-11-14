@@ -244,17 +244,17 @@ export function* doRedeemInvite(inviteCode: string) {
     }
 
     const newAccount = yield call(getOrCreateAccount)
-    if (!newAccount) {
-      throw Error('Unable to create your account')
-    }
-
     yield call(addTempAccountToWallet, inviteCode)
     yield call(withdrawFundsFromTempAccount, tempAccount, tempAccountBalanceWei, newAccount)
     yield put(fetchDollarBalance())
     return true
   } catch (e) {
     Logger.error(TAG, 'Failed to redeem invite', e)
-    yield put(showError(ErrorMessages.REDEEM_INVITE_FAILED))
+    if (e.message in ErrorMessages) {
+      yield put(showError(e.message))
+    } else {
+      yield put(showError(ErrorMessages.REDEEM_INVITE_FAILED))
+    }
     return false
   }
 }

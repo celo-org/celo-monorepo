@@ -1,3 +1,4 @@
+import BigNumber from 'bignumber.js'
 import { assert } from 'chai'
 import { spawn, SpawnOptions } from 'child_process'
 import fs from 'fs'
@@ -39,6 +40,22 @@ const TEST_DIR = '/tmp/e2e'
 const GENESIS_PATH = `${TEST_DIR}/genesis.json`
 const NetworkId = 1101
 const MonorepoRoot = resolvePath(joinPath(__dirname, '../..', '../..'))
+
+export function assertAlmostEqual(
+  actual: BigNumber,
+  expected: BigNumber,
+  delta: BigNumber = new BigNumber(10).pow(12).times(5)
+) {
+  if (expected.isZero()) {
+    assert.equal(actual.toFixed(), expected.toFixed())
+  } else {
+    const isCloseTo = actual.plus(delta).gte(expected) || actual.minus(delta).lte(expected)
+    assert(
+      isCloseTo,
+      `expected ${actual.toString()} to almost equal ${expected.toString()} +/- ${delta.toString()}`
+    )
+  }
+}
 
 export function spawnWithLog(cmd: string, args: string[], logsFilepath: string) {
   try {
@@ -226,13 +243,12 @@ async function isPortOpen(host: string, port: number) {
 }
 
 async function waitForPortOpen(host: string, port: number, seconds: number) {
-  while (seconds > 0) {
+  const deadline = Date.now() + seconds * 1000
+  do {
     if (await isPortOpen(host, port)) {
       return true
     }
-    seconds -= 1
-    await sleep(1)
-  }
+  } while (Date.now() < deadline)
   return false
 }
 

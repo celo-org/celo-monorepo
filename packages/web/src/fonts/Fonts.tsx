@@ -1,7 +1,9 @@
 import * as React from 'react'
 import { StyleSheet, Text, TextProps, View, ViewProps } from 'react-native'
 import Responsive from 'src/shared/Responsive'
+import { TextStyles } from 'src/shared/Styles'
 import { fonts, standardStyles } from 'src/styles'
+
 interface Props {
   style?: any
   children?: any
@@ -9,6 +11,27 @@ interface Props {
   id?: string
   ariaLevel?: '1' | '2' | '3' | '4' | '5'
   accessibilityRole?: 'button' | 'label' | 'link' | 'heading' | 'listitem'
+}
+
+interface TableProps {
+  style?: any
+  children?: any
+}
+
+export const TABLE = ({ style, children }: TableProps) => {
+  return <View style={[TextStyles.table, style]}>{children}</View>
+}
+
+export const TR = ({ style, children }: TableProps) => {
+  return <View style={[TextStyles.tr, style]}>{children}</View>
+}
+
+export const TH = ({ style, children }: TableProps) => {
+  return <Text style={[fonts.legal, TextStyles.th, style]}>{children}</Text>
+}
+
+export const TD = ({ style, children }: TableProps) => {
+  return <Text style={[fonts.legal, TextStyles.td, style]}>{children}</Text>
 }
 
 export const H1 = ({ style, children, tabIndex, accessibilityRole, id, ariaLevel }: Props) => {

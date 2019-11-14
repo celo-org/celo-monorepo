@@ -16,7 +16,7 @@ const date = new Date('Tue Mar 05 2019 13:44:06 GMT-0800 (Pacific Standard Time)
 
 const fakeRequests = [
   {
-    amount: '200,000.00',
+    amount: '200000.00',
     uid: 'FAKE_ID_1',
     timestamp: date,
     comment: 'Dinner for me and the gals, PIZZAA!',

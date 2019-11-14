@@ -198,21 +198,17 @@ export function ExchangeFeedItem(props: Props) {
           </View>
           <View style={styles.statusContainer}>
             {isPending && (
-              <Text style={[fontStyles.bodySmall, styles.transactionStatus]}>
-                <Text style={[fontStyles.bodySmallBold, styles.textPending]}>
-                  {t('confirmingExchange')}
-                </Text>
+              <Text style={styles.transactionStatus}>
+                <Text style={styles.textPending}>{t('confirmingExchange')}</Text>
                 {' ' + timeFormatted}
               </Text>
             )}
             {status === TransactionStatus.Complete && (
-              <Text style={[fontStyles.bodySmall, styles.transactionStatus]}>
-                {dateTimeFormatted}
-              </Text>
+              <Text style={styles.transactionStatus}>{dateTimeFormatted}</Text>
             )}
             {status === TransactionStatus.Failed && (
-              <Text style={[fontStyles.bodySmall, styles.transactionStatus]}>
-                <Text style={fontStyles.linkSmall}>{t('exchangeFailed')}</Text>
+              <Text style={styles.transactionStatus}>
+                <Text style={styles.textStatusFailed}>{t('exchangeFailed')}</Text>
                 {' ' + timeFormatted}
               </Text>
             )}
@@ -269,12 +265,20 @@ const styles = StyleSheet.create({
     marginTop: 8,
   },
   textPending: {
+    ...fontStyles.bodySmallBold,
     fontSize: 13,
     lineHeight: 18,
     color: colors.celoGreen,
   },
   transactionStatus: {
+    ...fontStyles.bodySmall,
     color: colors.lightGray,
+  },
+  textStatusFailed: {
+    ...fontStyles.semiBold,
+    fontSize: 13,
+    lineHeight: 17,
+    color: colors.darkSecondary,
   },
   localAmount: {
     marginLeft: 'auto',

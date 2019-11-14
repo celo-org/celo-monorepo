@@ -33,8 +33,7 @@
     "devchain": "ts-node scripts/devchain.ts",
     "weekly-faucet": "./scripts/bash/weekly_faucet.sh",
     "set-exchange-rate": "./scripts/bash/set_exchange_rate.sh",
-    "network-check": "./scripts/bash/network_check.sh",
-    "test-licenses": "yarn licenses list --prod | grep '\\(─ GPL\\|─ (GPL-[1-9]\\.[0-9]\\+ OR GPL-[1-9]\\.[0-9]\\+)\\)' && echo 'Found GPL license(s). Use 'yarn licenses list --prod' to look up the offending package' || echo 'No GPL licenses found'"
+    "network-check": "./scripts/bash/network_check.sh"
   },
   "dependencies": {
     "@0x/sol-compiler": "^3.1.11",

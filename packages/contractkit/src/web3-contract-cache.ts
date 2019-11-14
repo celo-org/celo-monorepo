@@ -1,7 +1,10 @@
 import debugFactory from 'debug'
 import { CeloContract } from './base'
+import { newAccounts } from './generated/Accounts'
 import { newAttestations } from './generated/Attestations'
+import { newBlockchainParameters } from './generated/BlockchainParameters'
 import { newElection } from './generated/Election'
+import { newEpochRewards } from './generated/EpochRewards'
 import { newEscrow } from './generated/Escrow'
 import { newExchange } from './generated/Exchange'
 import { newGasCurrencyWhitelist } from './generated/GasCurrencyWhitelist'
@@ -20,8 +23,11 @@ import { ContractKit } from './kit'
 const debug = debugFactory('kit:web3-contract-cache')
 
 const ContractFactories = {
+  [CeloContract.Accounts]: newAccounts,
   [CeloContract.Attestations]: newAttestations,
+  [CeloContract.BlockchainParameters]: newBlockchainParameters,
   [CeloContract.Election]: newElection,
+  [CeloContract.EpochRewards]: newEpochRewards,
   [CeloContract.Escrow]: newEscrow,
   [CeloContract.Exchange]: newExchange,
   [CeloContract.GasCurrencyWhitelist]: newGasCurrencyWhitelist,
@@ -52,15 +58,20 @@ export class Web3ContractCache {
   private cacheMap: ContractCacheMap = {}
 
   constructor(readonly kit: ContractKit) {}
-
+  getAccounts() {
+    return this.getContract(CeloContract.Accounts)
+  }
   getAttestations() {
     return this.getContract(CeloContract.Attestations)
   }
-  getLockedGold() {
-    return this.getContract(CeloContract.LockedGold)
+  getBlockchainParameters() {
+    return this.getContract(CeloContract.BlockchainParameters)
   }
   getElection() {
     return this.getContract(CeloContract.Election)
+  }
+  getEpochRewards() {
+    return this.getContract(CeloContract.EpochRewards)
   }
   getEscrow() {
     return this.getContract(CeloContract.Escrow)
@@ -79,6 +90,9 @@ export class Web3ContractCache {
   }
   getGovernance() {
     return this.getContract(CeloContract.Governance)
+  }
+  getLockedGold() {
+    return this.getContract(CeloContract.LockedGold)
   }
   getRandom() {
     return this.getContract(CeloContract.Random)
@@ -106,6 +120,7 @@ export class Web3ContractCache {
     if (this.cacheMap[contract] == null) {
       debug('Initiating contract %s', contract)
       const createFn = ContractFactories[contract] as CFType[C]
+      // @ts-ignore: Too compplex union type
       this.cacheMap[contract] = createFn(
         this.kit.web3,
         await this.kit.registry.addressFor(contract)

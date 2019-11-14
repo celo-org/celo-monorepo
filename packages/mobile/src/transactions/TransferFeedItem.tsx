@@ -192,27 +192,22 @@ export function TransferFeedItem(props: Props) {
               {currencyStyle.direction}
               {showLocalCurrency && localCurrencySymbol}
               {transactionValue}
-              {showLocalCurrency && localCurrencyCode}
             </Text>
           </View>
           {!!info && <Text style={styles.info}>{info}</Text>}
           <View style={[styles.statusContainer, !!info && styles.statusContainerUnderComment]}>
             {isPending && (
-              <Text style={[fontStyles.bodySmall, styles.transactionStatus]}>
-                <Text style={[fontStyles.bodySmallBold, styles.textPending]}>
-                  {t('confirmingPayment')}
-                </Text>
+              <Text style={styles.transactionStatus}>
+                <Text style={styles.textPending}>{t('confirmingPayment')}</Text>
                 {' ' + timeFormatted}
               </Text>
             )}
             {status === TransactionStatus.Complete && (
-              <Text style={[fontStyles.bodySmall, styles.transactionStatus]}>
-                {dateTimeFormatted}
-              </Text>
+              <Text style={styles.transactionStatus}>{dateTimeFormatted}</Text>
             )}
             {status === TransactionStatus.Failed && (
-              <Text style={[fontStyles.bodySmall, styles.transactionStatus]}>
-                <Text style={fontStyles.linkSmall}>{t('paymentFailed')}</Text>
+              <Text style={styles.transactionStatus}>
+                <Text style={styles.textStatusFailed}>{t('paymentFailed')}</Text>
                 {' ' + timeFormatted}
               </Text>
             )}
@@ -264,12 +259,20 @@ const styles = StyleSheet.create({
     marginTop: 8,
   },
   textPending: {
+    ...fontStyles.bodySmallBold,
     fontSize: 13,
     lineHeight: 18,
     color: colors.celoGreen,
   },
   transactionStatus: {
+    ...fontStyles.bodySmall,
     color: colors.lightGray,
+  },
+  textStatusFailed: {
+    ...fontStyles.semiBold,
+    fontSize: 13,
+    lineHeight: 17,
+    color: colors.darkSecondary,
   },
   localAmount: {
     marginLeft: 'auto',

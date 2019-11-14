@@ -7,8 +7,7 @@ import "../common/Initializable.sol";
 import "../common/linkedlists/AddressSortedLinkedListWithMedian.sol";
 import "../common/linkedlists/SortedLinkedListWithMedian.sol";
 
-
-// TODO: don't treat timestamps as Fixidity values
+// TODO: Move SortedOracles to Fixidity
 /**
  * @title Maintains a sorted list of oracle exchange rates between Celo Gold and other currencies.
  */
@@ -27,15 +26,9 @@ contract SortedOracles is ISortedOracles, Ownable, Initializable {
 
   uint256 public reportExpirySeconds;
 
-  event OracleAdded(
-    address indexed token,
-    address indexed oracleAddress
-  );
+  event OracleAdded(address indexed token, address indexed oracleAddress);
 
-  event OracleRemoved(
-    address indexed token,
-    address indexed oracleAddress
-  );
+  event OracleRemoved(address indexed token, address indexed oracleAddress);
 
   event OracleReported(
     address token,
@@ -45,20 +38,11 @@ contract SortedOracles is ISortedOracles, Ownable, Initializable {
     uint256 denominator
   );
 
-  event OracleReportRemoved(
-    address indexed token,
-    address indexed oracle
-  );
+  event OracleReportRemoved(address indexed token, address indexed oracle);
 
-  event MedianUpdated(
-    address token,
-    uint256 numerator,
-    uint256 denominator
-  );
+  event MedianUpdated(address token, uint256 numerator, uint256 denominator);
 
-  event ReportExpirySet(
-    uint256 reportExpiry
-  );
+  event ReportExpirySet(uint256 reportExpiry);
 
   modifier onlyOracle(address token) {
     require(isOracle[token][msg.sender], "sender was not an oracle for token addr");
@@ -101,9 +85,9 @@ contract SortedOracles is ISortedOracles, Ownable, Initializable {
   function removeOracle(address token, address oracleAddress, uint256 index) external onlyOwner {
     require(
       token != address(0) &&
-      oracleAddress != address(0) &&
-      oracles[token].length > index &&
-      oracles[token][index] == oracleAddress,
+        oracleAddress != address(0) &&
+        oracles[token].length > index &&
+        oracles[token][index] == oracleAddress,
       "token addr null or oracle addr null or index of token oracle not mapped to oracle addr"
     );
     isOracle[token][oracleAddress] = false;
@@ -138,6 +122,7 @@ contract SortedOracles is ISortedOracles, Ownable, Initializable {
    * @notice Updates an oracle value and the median.
    * @param token The address of the token for which the Celo Gold exchange rate is being reported.
    * @param numerator The amount of tokens equal to `denominator` Celo Gold.
+   * @param denominator The amount of Celo Gold equal to `numerator` tokens.
    * @param lesserKey The element which should be just left of the new oracle value.
    * @param greaterKey The element which should be just right of the new oracle value.
    * @dev Note that only one of `lesserKey` or `greaterKey` needs to be correct to reduce friction.
@@ -148,10 +133,7 @@ contract SortedOracles is ISortedOracles, Ownable, Initializable {
     uint256 denominator,
     address lesserKey,
     address greaterKey
-  )
-    external
-    onlyOracle(token)
-  {
+  ) external onlyOracle(token) {
     uint256 originalMedian = rates[token].getMedianValue();
     uint256 value = numerator.mul(DENOMINATOR).div(denominator);
     if (rates[token].contains(msg.sender)) {
@@ -208,16 +190,10 @@ contract SortedOracles is ISortedOracles, Ownable, Initializable {
    * @param token The address of the token for which the Celo Gold exchange rate is being reported.
    * @return An unpacked list of elements from largest to smallest.
    */
-  function getRates(
-    address token
-  )
+  function getRates(address token)
     external
     view
-    returns (
-        address[] memory,
-        uint256[] memory,
-        SortedLinkedListWithMedian.MedianRelation[] memory
-    )
+    returns (address[] memory, uint256[] memory, SortedLinkedListWithMedian.MedianRelation[] memory)
   {
     return rates[token].getElements();
   }
@@ -245,16 +221,10 @@ contract SortedOracles is ISortedOracles, Ownable, Initializable {
    * @param token The address of the token for which the Celo Gold exchange rate is being reported.
    * @return An unpacked list of elements from largest to smallest.
    */
-  function getTimestamps(
-    address token
-  )
+  function getTimestamps(address token)
     external
     view
-    returns (
-        address[] memory,
-        uint256[] memory,
-        SortedLinkedListWithMedian.MedianRelation[] memory
-    )
+    returns (address[] memory, uint256[] memory, SortedLinkedListWithMedian.MedianRelation[] memory)
   {
     return timestamps[token].getElements();
   }

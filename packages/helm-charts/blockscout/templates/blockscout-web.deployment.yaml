@@ -42,6 +42,8 @@ spec:
         env:
           - name: PORT
             value: "4000"
+          - name: DISABLE_INDEXER
+            value: "true"
 {{ include "celo.blockscout-env-vars" .  | indent 10 }}
 {{ include "celo.prom-to-sd-container" (dict "Values" .Values "Release" .Release "Chart" .Chart "component" "blockscout" "metricsPort" "4000" "containerNameLabel" "blockscout-web") | indent 6 }}
 {{ include "celo.blockscout-db-sidecar" .  | indent 6 }}
