@@ -68,7 +68,7 @@ class InflationManager {
     const stableToken = await this.kit.contracts.getStableToken()
     await stableToken
       .setInflationParameters(toFixed(rate).toString(), updatePeriod)
-      .sendAndWaitForReceipt({ from: this.validatorAddress })
+      .sendAndWaitForReceipt({ from: this.validatorAddress, gas: '3000000'})
     console.log('set inflation rate')
   }
 }
