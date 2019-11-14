@@ -58,6 +58,7 @@ export class CeloLite extends React.Component<Props, State> {
 
   onPressToggleWithRestartModal = () => {
     this.props.toggleZeroSyncMode(false)
+    this.hideModal()
   }
 
   handleZeroSyncToggle = (zeroSyncMode: boolean) => {
