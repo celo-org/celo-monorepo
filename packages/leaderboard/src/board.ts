@@ -229,7 +229,7 @@ async function readAssoc(lst: string[]) {
   lst.forEach(async (a) => {
     try {
       const url = await accounts.getMetadataURL(a)
-      if (url == '') console.log('Empty URL', a)
+      if (url == '') processClaims(a, '{"claims": []}')
       else getFromUrl(a, url)
     } catch (err) {
       console.error('Bad address', a, err.toString())
