@@ -1,5 +1,4 @@
 import { ContractKit, newKitFromWeb3 } from '@celo/contractkit'
-import { addressToPublicKey } from '@celo/utils/lib/address'
 import { getBlsPoP, getBlsPublicKey } from '@celo/utils/lib/bls'
 import { fromFixed, toFixed } from '@celo/utils/lib/fixidity'
 import BigNumber from 'bignumber.js'
@@ -9,6 +8,7 @@ import {
   assertAlmostEqual,
   getContext,
   getEnode,
+  GethInstanceConfig,
   importGenesis,
   initAndStartGeth,
   sleep,
@@ -137,11 +137,7 @@ describe('governance tests', () => {
     return tx.send({ from: group, ...txOptions, gas })
   }
 
-  const authorizeValidatorSigner = async (
-    validatorWeb3: any,
-    signerWeb3: any,
-    txOptions: any = {}
-  ) => {
+  const authorizeValidatorSigner = async (validatorWeb3: any, signerWeb3: any) => {
     const validator = (await validatorWeb3.eth.getAccounts())[0]
     const signer = (await signerWeb3.eth.getAccounts())[0]
     await unlockAccount(validator, validatorWeb3)
@@ -149,28 +145,14 @@ describe('governance tests', () => {
     const pop = await (await newKitFromWeb3(
       signerWeb3
     ).contracts.getAccounts()).generateProofOfSigningKeyPossession(validator, signer)
-    const validatorKit = newKitFromWeb3(validatorWeb3)
-    const validatorAccounts = await validatorKit._web3Contracts.getAccounts()
-    const publicKey = await addressToPublicKey(signer, signerWeb3)
-    const tx = validatorAccounts.methods.authorizeValidatorSigner(
-      signer,
-      publicKey,
-      pop.v,
-      pop.r,
-      pop.s
-    )
-    let gas = txOptions.gas
-    if (!gas) {
-      gas = await tx.estimateGas({ ...txOptions })
-    }
-    return tx.send({ from: validator, ...txOptions, gas })
+    const accountsWrapper = await newKitFromWeb3(validatorWeb3).contracts.getAccounts()
+    await accountsWrapper.authorizeValidatorSigner(signer, pop)
   }
 
   const updateValidatorBlsKey = async (
     validatorWeb3: any,
     signerWeb3: any,
-    signerPrivateKey: string,
-    txOptions: any = {}
+    signerPrivateKey: string
   ) => {
     const validator = (await validatorWeb3.eth.getAccounts())[0]
     const signer = (await signerWeb3.eth.getAccounts())[0]
@@ -178,14 +160,8 @@ describe('governance tests', () => {
     const blsPublicKey = getBlsPublicKey(signerPrivateKey)
     const blsPop = getBlsPoP(validator, signerPrivateKey)
     // TODO(asa): Send this from the signer instead.
-    const validatorKit = newKitFromWeb3(validatorWeb3)
-    const validatorValidators = await validatorKit._web3Contracts.getValidators()
-    const tx = validatorValidators.methods.updateBlsKey(blsPublicKey, blsPop)
-    let gas = txOptions.gas
-    if (!gas) {
-      gas = await tx.estimateGas({ ...txOptions })
-    }
-    return tx.send({ from: validator, ...txOptions, gas })
+    const validatorsWrapper = await newKitFromWeb3(validatorWeb3).contracts.getValidators()
+    await validatorsWrapper.updateBlsPublicKey(blsPublicKey, blsPop)
   }
 
   const isLastBlockOfEpoch = (blockNumber: number, epochSize: number) => {
@@ -204,8 +180,8 @@ describe('governance tests', () => {
     const previousBalance = new BigNumber(
       await token.methods.balanceOf(address).call({}, blockNumber - 1)
     )
-    assert.isNotNaN(currentBalance)
-    assert.isNotNaN(previousBalance)
+    assert.isFalse(currentBalance.isNaN())
+    assert.isFalse(previousBalance.isNaN())
     assertAlmostEqual(currentBalance.minus(previousBalance), expected)
   }
 
@@ -221,7 +197,7 @@ describe('governance tests', () => {
         '0xa42ac9c99f6ab2c96ee6cae1b40d36187f65cd878737f6623cd363fb94ba7087'
       const rotation1PrivateKey =
         '0x4519cae145fb9499358be484ca60c80d8f5b7f9c13ff82c88ec9e13283e9de1a'
-      const additionalNodes: any[] = [
+      const additionalNodes: GethInstanceConfig[] = [
         {
           name: 'validatorGroup',
           validating: false,
@@ -481,22 +457,6 @@ describe('governance tests', () => {
       )
       const [group] = await validators.methods.getRegisteredValidatorGroups().call()
 
-      const assertBalanceChanged = async (
-        validator: string,
-        blockNumber: number,
-        expected: BigNumber
-      ) => {
-        const currentBalance = new BigNumber(
-          await stableToken.methods.balanceOf(validator).call({}, blockNumber)
-        )
-        const previousBalance = new BigNumber(
-          await stableToken.methods.balanceOf(validator).call({}, blockNumber - 1)
-        )
-        assert.isFalse(currentBalance.isNaN())
-        assert.isFalse(previousBalance.isNaN())
-        assertAlmostEqual(currentBalance.minus(previousBalance), expected)
-      }
-
       const assertBalanceUnchanged = async (validator: string, blockNumber: number) => {
         await assertBalanceChanged(validator, blockNumber, new BigNumber(0), stableToken)
       }
@@ -673,7 +633,7 @@ describe('governance tests', () => {
         )
         const difference = currentTarget.minus(previousTarget)
 
-        // Assert equal to 10 decimal places due to rounding errors.
+        // Assert equal to 9 decimal places due to rounding errors.
         assert.equal(
           fromFixed(difference)
             .dp(9)

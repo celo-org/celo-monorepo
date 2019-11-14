@@ -1,6 +1,7 @@
 import {
   hashMessageWithPrefix,
   parseSignature,
+  Signature,
   signedMessageToPublicKey,
 } from '@celo/utils/lib/signatureUtils'
 import Web3 from 'web3'
@@ -13,12 +14,6 @@ import {
   proxySend,
   toTransactionObject,
 } from '../wrappers/BaseWrapper'
-
-export interface Signature {
-  r: string
-  s: string
-  v: number
-}
 
 /**
  * Contract for handling deposits needed for voting.
@@ -59,8 +54,8 @@ export class AccountsWrapper extends BaseWrapper<Accounts> {
    * @param signer Address that is authorized to sign the tx as validator
    * @return The Account address
    */
-  activeValidatorSignerToAccount: (signer: Address) => Promise<Address> = proxyCall(
-    this.contract.methods.activeValidatorSignerToAccount
+  validatorSignerToAccount: (signer: Address) => Promise<Address> = proxyCall(
+    this.contract.methods.validatorSignerToAccount
   )
 
   /**

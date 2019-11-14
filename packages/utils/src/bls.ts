@@ -3,10 +3,13 @@ const keccak256 = require('keccak256')
 const BigInteger = require('bigi')
 const reverse = require('buffer-reverse')
 import * as bls12377js from 'bls12377js'
+import { isValidAddress } from './address'
 
 const n = BigInteger.fromHex('12ab655e9a2ca55660b44d1e5c37b00159aa76fed00000010a11800000000001', 16)
 
 const MODULUSMASK = 31
+export const BLS_PUBLIC_KEY_SIZE = 48
+export const BLS_POP_SIZE = 96
 
 export const blsPrivateKeyToProcessedPrivateKey = (privateKeyHex: string) => {
   for (let i = 0; i < 256; i++) {
@@ -48,6 +51,9 @@ export const getBlsPublicKey = (privateKeyHex: string) => {
 }
 
 export const getBlsPoP = (address: string, privateKeyHex: string) => {
+  if (!isValidAddress(address)) {
+    throw new Error('Invalid checksum address for generating BLS proof-of-possession')
+  }
   const blsPrivateKeyBytes = getBlsPrivateKey(privateKeyHex)
   return (
     '0x' +

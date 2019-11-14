@@ -58,22 +58,19 @@ contract('Accounts', (accounts: string[]) => {
       fn: accountsInstance.authorizeVoteSigner,
       eventName: 'VoteSignerAuthorized',
       getAuthorizedFromAccount: accountsInstance.getVoteSigner,
-      getAccountFromAuthorized: accountsInstance.voteSignerToAccount,
-      getAccountFromActiveAuthorized: accountsInstance.activeVoteSignerToAccount,
+      authorizedSignerToAccount: accountsInstance.voteSignerToAccount,
     }
     authorizationTests.validating = {
       fn: accountsInstance.authorizeValidatorSigner,
       eventName: 'ValidatorSignerAuthorized',
       getAuthorizedFromAccount: accountsInstance.getValidatorSigner,
-      getAccountFromAuthorized: accountsInstance.validatorSignerToAccount,
-      getAccountFromActiveAuthorized: accountsInstance.activeValidatorSignerToAccount,
+      authorizedSignerToAccount: accountsInstance.validatorSignerToAccount,
     }
     authorizationTests.attesting = {
       fn: accountsInstance.authorizeAttestationSigner,
       eventName: 'AttestationSignerAuthorized',
       getAuthorizedFromAccount: accountsInstance.getAttestationSigner,
-      getAccountFromAuthorized: accountsInstance.attestationSignerToAccount,
-      getAccountFromActiveAuthorized: accountsInstance.activeAttesttationSignerToAccount,
+      authorizedSignerToAccount: accountsInstance.attesttationSignerToAccount,
     }
   })
 
@@ -373,7 +370,7 @@ contract('Accounts', (accounts: string[]) => {
           await authorizationTest.fn(authorized, sig.v, sig.r, sig.s)
           assert.equal(await accountsInstance.authorizedBy(authorized), account)
           assert.equal(await authorizationTest.getAuthorizedFromAccount(account), authorized)
-          assert.equal(await authorizationTest.getAccountFromActiveAuthorized(authorized), account)
+          assert.equal(await authorizationTest.authorizedSignerToAccount(authorized), account)
         })
 
         it(`should emit the right event`, async () => {
@@ -423,10 +420,7 @@ contract('Accounts', (accounts: string[]) => {
           it(`should set the new authorized ${authorizationTestDescriptions[key].me}`, async () => {
             assert.equal(await accountsInstance.authorizedBy(newAuthorized), account)
             assert.equal(await authorizationTest.getAuthorizedFromAccount(account), newAuthorized)
-            assert.equal(
-              await authorizationTest.getAccountFromActiveAuthorized(newAuthorized),
-              account
-            )
+            assert.equal(await authorizationTest.authorizedSignerToAccount(newAuthorized), account)
           })
 
           it('should preserve the previous authorization', async () => {
@@ -440,11 +434,11 @@ contract('Accounts', (accounts: string[]) => {
           authorizationTestDescriptions[key].me
         }`, () => {
           it('should return the account when passed the account', async () => {
-            assert.equal(await authorizationTest.getAccountFromActiveAuthorized(account), account)
+            assert.equal(await authorizationTest.authorizedSignerToAccount(account), account)
           })
 
           it('should revert when passed an address that is not an account', async () => {
-            await assertRevert(authorizationTest.getAccountFromActiveAuthorized(accounts[1]))
+            await assertRevert(authorizationTest.authorizedSignerToAccount(accounts[1]))
           })
         })
 
@@ -458,16 +452,13 @@ contract('Accounts', (accounts: string[]) => {
           })
 
           it('should return the account when passed the account', async () => {
-            assert.equal(await authorizationTest.getAccountFromActiveAuthorized(account), account)
+            assert.equal(await authorizationTest.authorizedSignerToAccount(account), account)
           })
 
           it(`should return the account when passed the ${
             authorizationTestDescriptions[key].me
           }`, async () => {
-            assert.equal(
-              await authorizationTest.getAccountFromActiveAuthorized(authorized),
-              account
-            )
+            assert.equal(await authorizationTest.authorizedSignerToAccount(authorized), account)
           })
         })
       })

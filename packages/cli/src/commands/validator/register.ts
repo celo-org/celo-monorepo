@@ -1,4 +1,4 @@
-import { addressToPublicKey } from '@celo/utils/lib/address'
+import { addressToPublicKey } from '@celo/utils/lib/signatureUtils'
 import { BaseCommand } from '../../base'
 import { newCheckBuilder } from '../../utils/checks'
 import { displaySendTx } from '../../utils/cli'
@@ -43,7 +43,7 @@ export default class ValidatorRegister extends BaseCommand {
 
     // register encryption key on accounts contract
     // TODO: Use a different key data encryption
-    const pubKey = await addressToPublicKey(res.flags.from, this.web3)
+    const pubKey = await addressToPublicKey(res.flags.from, this.web3.eth.sign)
     // TODO fix typing
     const setKeyTx = accounts.setAccountDataEncryptionKey(pubKey as any)
     await displaySendTx('Set encryption key', setKeyTx)

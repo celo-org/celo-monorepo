@@ -18,8 +18,8 @@ import {
 
 export interface Validator {
   address: Address
-  ecdsaKey: string
-  blsKey: string
+  ecdsaPublicKey: string
+  blsPublicKey: string
   affiliation: string | null
   score: BigNumber
 }
@@ -100,20 +100,23 @@ export class ValidatorsWrapper extends BaseWrapper<Validators> {
 
   async signerToAccount(signerAddress: Address) {
     const accounts = await this.kit.contracts.getAccounts()
-    return accounts.activeValidatorSignerToAccount(signerAddress)
+    return accounts.validatorSignerToAccount(signerAddress)
   }
 
   /**
    * Updates a validator's BLS key.
-   * @param blsKey The BLS public key that the validator is using for consensus, should pass proof
+   * @param blsPublicKey The BLS public key that the validator is using for consensus, should pass proof
    *   of possession. 48 bytes.
    * @param blsPop The BLS public key proof-of-possession, which consists of a signature on the
    *   account address. 96 bytes.
    * @return True upon success.
    */
-  updateBlsKey: (blsKey: string, blsPop: string) => CeloTransactionObject<boolean> = proxySend(
+  updateBlsPublicKey: (
+    blsPublicKey: string,
+    blsPop: string
+  ) => CeloTransactionObject<boolean> = proxySend(
     this.kit,
-    this.contract.methods.updateBlsKey,
+    this.contract.methods.updateBlsPublicKey,
     tupleParser(parseBytes, parseBytes)
   )
 
@@ -161,8 +164,8 @@ export class ValidatorsWrapper extends BaseWrapper<Validators> {
     const res = await this.contract.methods.getValidator(address).call()
     return {
       address,
-      ecdsaKey: res[0] as any,
-      blsKey: res[1] as any,
+      ecdsaPublicKey: res[0] as any,
+      blsPublicKey: res[1] as any,
       affiliation: res[2],
       score: fromFixed(new BigNumber(res[3])),
     }
@@ -230,17 +233,17 @@ export class ValidatorsWrapper extends BaseWrapper<Validators> {
    *
    * Fails if the account is already a validator or validator group.
    *
-   * @param ecdsaKey The ECDSA public key that the validator is using for consensus, should match
+   * @param ecdsaPublicKey The ECDSA public key that the validator is using for consensus, should match
    *   the validator signer. 64 bytes.
-   * @param blsKey The BLS public key that the validator is using for consensus, should pass proof
+   * @param blsPublicKey The BLS public key that the validator is using for consensus, should pass proof
    *   of possession. 48 bytes.
    * @param blsPop The BLS public key proof-of-possession, which consists of a signature on the
    *   account address. 96 bytes.
    */
 
   registerValidator: (
-    ecdsaKey: string,
-    blsKey: string,
+    ecdsaPublicKey: string,
+    blsPublicKey: string,
     blsPop: string
   ) => CeloTransactionObject<boolean> = proxySend(
     this.kit,

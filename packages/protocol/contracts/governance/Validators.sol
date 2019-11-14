@@ -87,7 +87,7 @@ contract Validators is
   }
 
   struct Validator {
-    PublicKeys keys;
+    PublicKeys publicKeys;
     address affiliation;
     FixidityLib.Fraction score;
     MembershipHistory membershipHistory;
@@ -115,12 +115,12 @@ contract Validators is
   event GroupLockedGoldRequirementsSet(uint256 value, uint256 duration);
   event ValidatorLockedGoldRequirementsSet(uint256 value, uint256 duration);
   event MembershipHistoryLengthSet(uint256 length);
-  event ValidatorRegistered(address indexed validator, bytes ecdsaKey, bytes blsKey);
+  event ValidatorRegistered(address indexed validator, bytes ecdsaPublicKey, bytes blsPublicKey);
   event ValidatorDeregistered(address indexed validator);
   event ValidatorAffiliated(address indexed validator, address indexed group);
   event ValidatorDeaffiliated(address indexed validator, address indexed group);
-  event ValidatorEcdsaKeyUpdated(address indexed validator, bytes ecdsaKey);
-  event ValidatorBlsKeyUpdated(address indexed validator, bytes blsKey);
+  event ValidatorEcdsaPublicKeyUpdated(address indexed validator, bytes ecdsaPublicKey);
+  event ValidatorBlsPublicKeyUpdated(address indexed validator, bytes blsPublicKey);
   event ValidatorGroupRegistered(address indexed group, uint256 commission);
   event ValidatorGroupDeregistered(address indexed group);
   event ValidatorGroupMemberAdded(address indexed group, address indexed validator);
@@ -260,32 +260,32 @@ contract Validators is
 
   /**
    * @notice Registers a validator unaffiliated with any validator group.
-   * @param ecdsaKey The ECDSA public key that the validator is using for consensus, should match
-   *   the validator signer. 64 bytes.
-   * @param blsKey The BLS public key that the validator is using for consensus, should pass proof
-   *   of possession. 48 bytes.
+   * @param ecdsaPublicKey The ECDSA public key that the validator is using for consensus, should
+   *   match the validator signer. 64 bytes.
+   * @param blsPublicKey The BLS public key that the validator is using for consensus, should pass
+   *   proof of possession. 48 bytes.
    * @param blsPop The BLS public key proof-of-possession, which consists of a signature on the
    *   account address. 96 bytes.
    * @return True upon success.
    * @dev Fails if the account is already a validator or validator group.
    * @dev Fails if the account does not have sufficient Locked Gold.
    */
-  function registerValidator(bytes calldata ecdsaKey, bytes calldata blsKey, bytes calldata blsPop)
-    external
-    nonReentrant
-    returns (bool)
-  {
-    address account = getAccounts().activeValidatorSignerToAccount(msg.sender);
+  function registerValidator(
+    bytes calldata ecdsaPublicKey,
+    bytes calldata blsPublicKey,
+    bytes calldata blsPop
+  ) external nonReentrant returns (bool) {
+    address account = getAccounts().signerToAccount(msg.sender);
     require(!isValidator(account) && !isValidatorGroup(account));
     uint256 lockedGoldBalance = getLockedGold().getAccountTotalLockedGold(account);
     require(lockedGoldBalance >= validatorLockedGoldRequirements.value);
     Validator storage validator = validators[account];
     address signer = getAccounts().getValidatorSigner(account);
-    _updateEcdsaKey(validator, signer, ecdsaKey);
-    _updateBlsKey(validator, account, blsKey, blsPop);
+    _updateEcdsaPublicKey(validator, signer, ecdsaPublicKey);
+    _updateBlsPublicKey(validator, account, blsPublicKey, blsPop);
     registeredValidators.push(account);
     updateMembershipHistory(account, address(0));
-    emit ValidatorRegistered(account, ecdsaKey, blsKey);
+    emit ValidatorRegistered(account, ecdsaPublicKey, blsPublicKey);
     return true;
   }
 
@@ -336,7 +336,7 @@ contract Validators is
    * @return True upon success.
    */
   function _updateValidatorScoreFromSigner(address signer, uint256 uptime) internal {
-    address account = getAccounts().validatorSignerToAccount(signer);
+    address account = getAccounts().signerToAccount(signer);
     require(isValidator(account));
     require(uptime <= FixidityLib.fixed1().unwrap());
 
@@ -393,7 +393,7 @@ contract Validators is
     internal
     returns (uint256)
   {
-    address account = getAccounts().validatorSignerToAccount(signer);
+    address account = getAccounts().signerToAccount(signer);
     require(isValidator(account));
     // The group that should be paid is the group that the validator was a member of at the
     // time it was elected.
@@ -421,7 +421,7 @@ contract Validators is
    * @dev Fails if the account is not a validator.
    */
   function deregisterValidator(uint256 index) external nonReentrant returns (bool) {
-    address account = getAccounts().activeValidatorSignerToAccount(msg.sender);
+    address account = getAccounts().signerToAccount(msg.sender);
     require(isValidator(account));
 
     // Require that the validator has not been a member of a validator group for
@@ -449,7 +449,7 @@ contract Validators is
    * @dev De-affiliates with the previously affiliated group if present.
    */
   function affiliate(address group) external nonReentrant returns (bool) {
-    address account = getAccounts().activeValidatorSignerToAccount(msg.sender);
+    address account = getAccounts().signerToAccount(msg.sender);
     require(isValidator(account) && isValidatorGroup(group));
     require(meetsAccountLockedGoldRequirements(account));
     require(meetsAccountLockedGoldRequirements(group));
@@ -468,7 +468,7 @@ contract Validators is
    * @dev Fails if the account is not a validator with non-zero affiliation.
    */
   function deaffiliate() external nonReentrant returns (bool) {
-    address account = getAccounts().activeValidatorSignerToAccount(msg.sender);
+    address account = getAccounts().signerToAccount(msg.sender);
     require(isValidator(account));
     Validator storage validator = validators[account];
     require(validator.affiliation != address(0));
@@ -478,41 +478,44 @@ contract Validators is
 
   /**
    * @notice Updates a validator's BLS key.
-   * @param blsKey The BLS public key that the validator is using for consensus, should pass proof
-   *   of possession. 48 bytes.
+   * @param blsPublicKey The BLS public key that the validator is using for consensus, should pass
+   *   proof of possession. 48 bytes.
    * @param blsPop The BLS public key proof-of-possession, which consists of a signature on the
    *   account address. 96 bytes.
    * @return True upon success.
    */
-  function updateBlsKey(bytes calldata blsKey, bytes calldata blsPop) external returns (bool) {
-    address account = getAccounts().activeValidatorSignerToAccount(msg.sender);
+  function updateBlsPublicKey(bytes calldata blsPublicKey, bytes calldata blsPop)
+    external
+    returns (bool)
+  {
+    address account = getAccounts().signerToAccount(msg.sender);
     require(isValidator(account));
     Validator storage validator = validators[account];
-    _updateBlsKey(validator, account, blsKey, blsPop);
-    emit ValidatorBlsKeyUpdated(account, blsKey);
+    _updateBlsPublicKey(validator, account, blsPublicKey, blsPop);
+    emit ValidatorBlsPublicKeyUpdated(account, blsPublicKey);
     return true;
   }
 
   /**
    * @notice Updates a validator's BLS key.
-   * @param validator The validator whose public keys data should be updated.
+   * @param validator The validator whose BLS public key should be updated.
    * @param account The address under which the validator is registered.
-   * @param blsKey The BLS public key that the validator is using for consensus, should pass proof
-   *   of possession. 48 bytes.
+   * @param blsPublicKey The BLS public key that the validator is using for consensus, should pass
+   *   proof of possession. 48 bytes.
    * @param blsPop The BLS public key proof-of-possession, which consists of a signature on the
    *   account address. 96 bytes.
    * @return True upon success.
    */
-  function _updateBlsKey(
+  function _updateBlsPublicKey(
     Validator storage validator,
     address account,
-    bytes memory blsKey,
+    bytes memory blsPublicKey,
     bytes memory blsPop
   ) private returns (bool) {
-    require(blsKey.length == 48);
+    require(blsPublicKey.length == 48);
     require(blsPop.length == 96);
-    require(checkProofOfPossession(account, blsKey, blsPop));
-    validator.keys.bls = blsKey;
+    require(checkProofOfPossession(account, blsPublicKey, blsPop));
+    validator.publicKeys.bls = blsPublicKey;
     return true;
   }
 
@@ -520,39 +523,40 @@ contract Validators is
    * @notice Updates a validator's ECDSA key.
    * @param account The address under which the validator is registered.
    * @param signer The address which the validator is using to sign consensus messages.
-   * @param ecdsaKey The ECDSA public key corresponding to `signer`.
+   * @param ecdsaPublicKey The ECDSA public key corresponding to `signer`.
    * @return True upon success.
    */
-  function updateEcdsaKey(address account, address signer, bytes calldata ecdsaKey)
+  function updateEcdsaPublicKey(address account, address signer, bytes calldata ecdsaPublicKey)
     external
     onlyRegisteredContract(ACCOUNTS_REGISTRY_ID)
     returns (bool)
   {
     require(isValidator(account));
     Validator storage validator = validators[account];
-    require(_updateEcdsaKey(validator, signer, ecdsaKey));
-    emit ValidatorEcdsaKeyUpdated(account, ecdsaKey);
+    require(_updateEcdsaPublicKey(validator, signer, ecdsaPublicKey));
+    emit ValidatorEcdsaPublicKeyUpdated(account, ecdsaPublicKey);
     return true;
   }
 
   /**
    * @notice Updates a validator's ECDSA key.
-   * @param validator The validator whose public keys data should be updated.
+   * @param validator The validator whose ECDSA public key should be updated.
    * @param signer The address with which the validator is signing consensus messages.
-   * @param ecdsaKey The ECDSA public key that the validator is using for consensus. Should match
-   *   `signer`. 64 bytes.
+   * @param ecdsaPublicKey The ECDSA public key that the validator is using for consensus. Should
+   *   match `signer`. 64 bytes.
    * @return True upon success.
    */
-  function _updateEcdsaKey(Validator storage validator, address signer, bytes memory ecdsaKey)
-    private
-    returns (bool)
-  {
-    require(ecdsaKey.length == 64);
+  function _updateEcdsaPublicKey(
+    Validator storage validator,
+    address signer,
+    bytes memory ecdsaPublicKey
+  ) private returns (bool) {
+    require(ecdsaPublicKey.length == 64);
     require(
-      address(uint160(uint256(keccak256(ecdsaKey)))) == signer,
+      address(uint160(uint256(keccak256(ecdsaPublicKey)))) == signer,
       "ECDSA key does not match signer"
     );
-    validator.keys.ecdsa = ecdsaKey;
+    validator.publicKeys.ecdsa = ecdsaPublicKey;
     return true;
   }
 
@@ -566,7 +570,7 @@ contract Validators is
    */
   function registerValidatorGroup(uint256 commission) external nonReentrant returns (bool) {
     require(commission <= FixidityLib.fixed1().unwrap(), "Commission can't be greater than 100%");
-    address account = getAccounts().activeValidatorSignerToAccount(msg.sender);
+    address account = getAccounts().signerToAccount(msg.sender);
     require(!isValidator(account) && !isValidatorGroup(account));
     uint256 lockedGoldBalance = getLockedGold().getAccountTotalLockedGold(account);
     require(lockedGoldBalance >= groupLockedGoldRequirements.value);
@@ -585,7 +589,7 @@ contract Validators is
    * @dev Fails if the account is not a validator group with no members.
    */
   function deregisterValidatorGroup(uint256 index) external nonReentrant returns (bool) {
-    address account = getAccounts().activeValidatorSignerToAccount(msg.sender);
+    address account = getAccounts().signerToAccount(msg.sender);
     // Only Validator Groups that have never had members or have been empty for at least
     // `groupLockedGoldRequirements.duration` seconds can be deregistered.
     require(isValidatorGroup(account) && groups[account].members.numElements == 0);
@@ -607,7 +611,7 @@ contract Validators is
    * @dev Fails if the group has zero members.
    */
   function addMember(address validator) external nonReentrant returns (bool) {
-    address account = getAccounts().activeValidatorSignerToAccount(msg.sender);
+    address account = getAccounts().signerToAccount(msg.sender);
     require(groups[account].members.numElements > 0);
     return _addMember(account, validator, address(0), address(0));
   }
@@ -626,7 +630,7 @@ contract Validators is
     nonReentrant
     returns (bool)
   {
-    address account = getAccounts().activeValidatorSignerToAccount(msg.sender);
+    address account = getAccounts().signerToAccount(msg.sender);
     require(groups[account].members.numElements == 0);
     return _addMember(account, validator, lesser, greater);
   }
@@ -669,7 +673,7 @@ contract Validators is
    * @dev Fails if `validator` is not a member of the account's group.
    */
   function removeMember(address validator) external nonReentrant returns (bool) {
-    address account = getAccounts().activeValidatorSignerToAccount(msg.sender);
+    address account = getAccounts().signerToAccount(msg.sender);
     require(isValidatorGroup(account) && isValidator(validator), "is not group and validator");
     return _removeMember(account, validator);
   }
@@ -689,7 +693,7 @@ contract Validators is
     nonReentrant
     returns (bool)
   {
-    address account = getAccounts().activeValidatorSignerToAccount(msg.sender);
+    address account = getAccounts().signerToAccount(msg.sender);
     require(isValidatorGroup(account) && isValidator(validator));
     ValidatorGroup storage group = groups[account];
     require(group.members.contains(validator));
@@ -705,7 +709,7 @@ contract Validators is
    * @return True upon success.
    */
   function updateCommission(uint256 commission) external returns (bool) {
-    address account = getAccounts().activeValidatorSignerToAccount(msg.sender);
+    address account = getAccounts().signerToAccount(msg.sender);
     require(isValidatorGroup(account));
     ValidatorGroup storage group = groups[account];
     require(commission <= FixidityLib.fixed1().unwrap(), "Commission can't be greater than 100%");
@@ -754,14 +758,14 @@ contract Validators is
    * @param signer The account that registered the validator or its authorized signing address.
    * @return The validator BLS key.
    */
-  function getValidatorBlsKeyFromSigner(address signer)
+  function getValidatorBlsPublicKeyFromSigner(address signer)
     external
     view
-    returns (bytes memory blsKey)
+    returns (bytes memory blsPublicKey)
   {
-    address account = getAccounts().validatorSignerToAccount(signer);
+    address account = getAccounts().signerToAccount(signer);
     require(isValidator(account));
-    return validators[account].keys.bls;
+    return validators[account].publicKeys.bls;
   }
 
   /**
@@ -772,13 +776,18 @@ contract Validators is
   function getValidator(address account)
     public
     view
-    returns (bytes memory ecdsaKey, bytes memory blsKey, address affiliation, uint256 score)
+    returns (
+      bytes memory ecdsaPublicKey,
+      bytes memory blsPublicKey,
+      address affiliation,
+      uint256 score
+    )
   {
     require(isValidator(account));
     Validator storage validator = validators[account];
     return (
-      validator.keys.ecdsa,
-      validator.keys.bls,
+      validator.publicKeys.ecdsa,
+      validator.publicKeys.bls,
       validator.affiliation,
       validator.score.unwrap()
     );
@@ -913,7 +922,7 @@ contract Validators is
    * @return Whether a particular address is a registered validator.
    */
   function isValidator(address account) public view returns (bool) {
-    return validators[account].keys.bls.length > 0;
+    return validators[account].publicKeys.bls.length > 0;
   }
 
   /**
@@ -1020,7 +1029,7 @@ contract Validators is
    * @return The group that `account` was a member of at the end of the last epoch.
    */
   function getMembershipInLastEpochFromSigner(address signer) external view returns (address) {
-    address account = getAccounts().validatorSignerToAccount(signer);
+    address account = getAccounts().signerToAccount(signer);
     require(isValidator(account));
     return getMembershipInLastEpoch(account);
   }

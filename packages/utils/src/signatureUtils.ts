@@ -1,7 +1,9 @@
+import assert = require('assert')
+
 const ethjsutil = require('ethereumjs-util')
 
 import * as Web3Utils from 'web3-utils'
-import { privateKeyToAddress } from './address'
+import { Address, privateKeyToAddress } from './address'
 
 // If messages is a hex, the length of it should be the number of bytes
 function messageLength(message: string) {
@@ -23,6 +25,29 @@ export function hashMessage(message: string): string {
 
 export interface Signer {
   sign: (message: string) => Promise<string>
+}
+
+export async function addressToPublicKey(
+  signer: string,
+  signFn: (message: string, signer: string) => Promise<string>
+) {
+  const msg = new Buffer('dummy_msg_data')
+  const data = '0x' + msg.toString('hex')
+  // Note: Eth.sign typing displays incorrect parameter order
+  const sig = await signFn(data, signer)
+
+  const rawsig = ethjsutil.fromRpcSig(sig)
+  const prefixedMsg = hashMessageWithPrefix(data)
+  const pubKey = ethjsutil.ecrecover(prefixedMsg, rawsig.v, rawsig.r, rawsig.s)
+
+  const computedAddr = ethjsutil.pubToAddress(pubKey).toString('hex')
+  assert(eqAddress(computedAddr, signer), 'computed address !== signer')
+
+  return '0x' + pubKey.toString('hex')
+}
+
+export function eqAddress(a: Address, b: Address) {
+  return a.replace('0x', '').toLowerCase() === b.replace('0x', '').toLowerCase()
 }
 
 // Uses a native function to sign (as signFn), most commonly `web.eth.sign`

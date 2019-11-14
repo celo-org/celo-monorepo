@@ -508,7 +508,7 @@ contract Attestations is
   ) public view returns (address) {
     bytes32 codehash = keccak256(abi.encodePacked(identifier, account));
     address signer = Signatures.getSignerOfMessageHash(codehash, v, r, s);
-    address issuer = getAccounts().activeAttesttationSignerToAccount(signer);
+    address issuer = getAccounts().attestationSignerToAccount(signer);
 
     Attestation storage attestation = identifiers[identifier].attestations[account]
       .issuedAttestations[issuer];
@@ -577,7 +577,7 @@ contract Attestations is
     while (currentIndex < unselectedRequest.attestationsRequested) {
       seed = keccak256(abi.encodePacked(seed));
       validator = validatorAddressFromCurrentSet(uint256(seed) % numberValidators);
-      issuer = getAccounts().activeValidatorSignerToAccount(validator);
+      issuer = getAccounts().validatorSignerToAccount(validator);
       Attestation storage attestation = state.issuedAttestations[issuer];
 
       // Attestation issuers can only be added if they haven't been already.

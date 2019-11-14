@@ -171,7 +171,7 @@ contract Accounts is IAccounts, Ownable, ReentrancyGuard, Initializable, UsingRe
   /**
    * @notice Authorizes an address to sign consensus messages on behalf of the account.
    * @param signer The address of the signing key to authorize.
-   * @param ecdsaKey The ECDSA key corresponding to `signer`.
+   * @param ecdsaPublicKey The ECDSA public key corresponding to `signer`.
    * @param v The recovery id of the incoming ECDSA signature.
    * @param r Output value r of the ECDSA signature.
    * @param s Output value s of the ECDSA signature.
@@ -179,7 +179,7 @@ contract Accounts is IAccounts, Ownable, ReentrancyGuard, Initializable, UsingRe
    */
   function authorizeValidatorSigner(
     address signer,
-    bytes calldata ecdsaKey,
+    bytes calldata ecdsaPublicKey,
     uint8 v,
     bytes32 r,
     bytes32 s
@@ -187,7 +187,7 @@ contract Accounts is IAccounts, Ownable, ReentrancyGuard, Initializable, UsingRe
     Account storage account = accounts[msg.sender];
     authorize(signer, v, r, s);
     account.signers.validator = signer;
-    require(getValidators().updateEcdsaKey(msg.sender, signer, ecdsaKey));
+    require(getValidators().updateEcdsaPublicKey(msg.sender, signer, ecdsaPublicKey));
     emit ValidatorSignerAuthorized(msg.sender, signer);
   }
 
@@ -212,7 +212,7 @@ contract Accounts is IAccounts, Ownable, ReentrancyGuard, Initializable, UsingRe
    * @dev Fails if the `signer` is not an account or currently authorized attestation signer.
    * @return The associated account.
    */
-  function activeAttesttationSignerToAccount(address signer) external view returns (address) {
+  function attestationSignerToAccount(address signer) external view returns (address) {
     address authorizingAccount = authorizedBy[signer];
     if (authorizingAccount != address(0)) {
       require(accounts[authorizingAccount].signers.attestation == signer);
@@ -226,10 +226,10 @@ contract Accounts is IAccounts, Ownable, ReentrancyGuard, Initializable, UsingRe
   /**
    * @notice Returns the account associated with `signer`.
    * @param signer The address of an account or currently authorized validator signer.
-   * @dev Fails if the `signer` is not an account or active authorized validator.
+   * @dev Fails if the `signer` is not an account or currently authorized validator.
    * @return The associated account.
    */
-  function activeValidatorSignerToAccount(address signer) public view returns (address) {
+  function validatorSignerToAccount(address signer) public view returns (address) {
     address authorizingAccount = authorizedBy[signer];
     if (authorizingAccount != address(0)) {
       require(accounts[authorizingAccount].signers.validator == signer);
@@ -246,7 +246,7 @@ contract Accounts is IAccounts, Ownable, ReentrancyGuard, Initializable, UsingRe
    * @dev Fails if the `signer` is not an account or currently authorized vote signer.
    * @return The associated account.
    */
-  function activeVoteSignerToAccount(address signer) external view returns (address) {
+  function voteSignerToAccount(address signer) external view returns (address) {
     address authorizingAccount = authorizedBy[signer];
     if (authorizingAccount != address(0)) {
       require(accounts[authorizingAccount].signers.vote == signer);
@@ -259,43 +259,11 @@ contract Accounts is IAccounts, Ownable, ReentrancyGuard, Initializable, UsingRe
 
   /**
    * @notice Returns the account associated with `signer`.
-   * @param signer The address of the account or previously authorized vote signer.
-   * @dev Fails if the `signer` is not an account or previously authorized vote signer.
+   * @param signer The address of the account or previously authorized signer.
+   * @dev Fails if the `signer` is not an account or previously authorized signer.
    * @return The associated account.
    */
-  function voteSignerToAccount(address signer) external view returns (address) {
-    address authorizingAccount = authorizedBy[signer];
-    if (authorizingAccount != address(0)) {
-      return authorizingAccount;
-    } else {
-      require(isAccount(signer));
-      return signer;
-    }
-  }
-
-  /**
-   * @notice Returns the account associated with `signer`.
-   * @param signer The address of an account or previously authorized attestation signer.
-   * @dev Fails if the `signer` is not an account or previously authorized attestation signer.
-   * @return The associated account.
-   */
-  function attestationSignerToAccount(address signer) public view returns (address) {
-    address authorizingAccount = authorizedBy[signer];
-    if (authorizingAccount != address(0)) {
-      return authorizingAccount;
-    } else {
-      require(isAccount(signer));
-      return signer;
-    }
-  }
-
-  /**
-   * @notice Returns the account associated with `signer`.
-   * @param signer The address of an account or previously authorized validator signer.
-   * @dev Fails if `signer` is not an account or previously authorized validator signer.
-   * @return The associated account.
-   */
-  function validatorSignerToAccount(address signer) public view returns (address) {
+  function signerToAccount(address signer) external view returns (address) {
     address authorizingAccount = authorizedBy[signer];
     if (authorizingAccount != address(0)) {
       return authorizingAccount;
@@ -447,6 +415,7 @@ contract Accounts is IAccounts, Ownable, ReentrancyGuard, Initializable, UsingRe
    * @param r Output value r of the ECDSA signature.
    * @param s Output value s of the ECDSA signature.
    * @dev Fails if the address is already authorized or is an account.
+   * @dev Note that once an address is authorized, it may never be authorized again.
    * @dev v, r, s constitute `current`'s signature on `msg.sender`.
    */
   function authorize(address authorized, uint8 v, bytes32 r, bytes32 s) private {

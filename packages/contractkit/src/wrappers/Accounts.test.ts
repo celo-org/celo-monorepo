@@ -1,5 +1,4 @@
-import { addressToPublicKey } from '@celo/utils/lib/address'
-import { parseSignature } from '@celo/utils/lib/signatureUtils'
+import { addressToPublicKey, parseSignature } from '@celo/utils/lib/signatureUtils'
 import Web3 from 'web3'
 import { newKitFromWeb3 } from '../kit'
 import { testWithGanache } from '../test-utils/ganache-test'
@@ -36,8 +35,6 @@ testWithGanache('Accounts Wrapper', (web3) => {
 
   const getParsedSignatureOfAddress = async (address: string, signer: string) => {
     const addressHash = web3.utils.soliditySha3({ type: 'address', value: address })
-    console.log('account', address)
-    console.log('addressHash', addressHash)
     const signature = await web3.eth.sign(addressHash, signer)
     return parseSignature(addressHash, signature, signer)
   }
@@ -50,17 +47,11 @@ testWithGanache('Accounts Wrapper', (web3) => {
   })
 
   const setupValidator = async (validatorAccount: string) => {
-    const publicKey = await addressToPublicKey(validatorAccount, web3)
+    const publicKey = await addressToPublicKey(validatorAccount, web3.eth.sign)
     await registerAccountWithLockedGold(validatorAccount)
     await validators
-      .registerValidator(
-        // @ts-ignore
-        publicKey,
-        // @ts-ignore
-        blsPublicKey,
-        // @ts-ignore
-        blsPoP
-      )
+      // @ts-ignore
+      .registerValidator(publicKey, blsPublicKey, blsPoP)
       .sendAndWaitForReceipt({ from: validatorAccount })
   }
 

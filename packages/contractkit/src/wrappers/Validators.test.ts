@@ -1,4 +1,4 @@
-import { addressToPublicKey } from '@celo/utils/lib/address'
+import { addressToPublicKey } from '@celo/utils/lib/signatureUtils'
 import BigNumber from 'bignumber.js'
 import Web3 from 'web3'
 import { newKitFromWeb3 } from '../kit'
@@ -48,18 +48,12 @@ testWithGanache('Validators Wrapper', (web3) => {
   }
 
   const setupValidator = async (validatorAccount: string) => {
-    const publicKey = await addressToPublicKey(validatorAccount, web3)
+    const publicKey = await addressToPublicKey(validatorAccount, web3.eth.sign)
     await registerAccountWithLockedGold(validatorAccount)
     // set account1 as the validator
     await validators
-      .registerValidator(
-        // @ts-ignore
-        publicKey,
-        // @ts-ignore
-        blsPublicKey,
-        // @ts-ignore
-        blsPoP
-      )
+      // @ts-ignore
+      .registerValidator(publicKey, blsPublicKey, blsPoP)
       .sendAndWaitForReceipt({ from: validatorAccount })
   }
 

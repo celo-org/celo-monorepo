@@ -1,3 +1,4 @@
+import { BLS_POP_SIZE, BLS_PUBLIC_KEY_SIZE } from '@celo/utils/lib/bls'
 import { flags } from '@oclif/command'
 import { CLIError } from '@oclif/errors'
 import { IArg, ParseFn } from '@oclif/parser/lib/args'
@@ -17,10 +18,10 @@ const parseEcdsaPublicKey: ParseFn<string> = (input) => {
   return parseBytes(input, 64, `${input} is not an ECDSA public key`)
 }
 const parseBlsPublicKey: ParseFn<string> = (input) => {
-  return parseBytes(input, 48, `${input} is not a BLS public key`)
+  return parseBytes(input, BLS_PUBLIC_KEY_SIZE, `${input} is not a BLS public key`)
 }
 const parseBlsProofOfPossession: ParseFn<string> = (input) => {
-  return parseBytes(input, 96, `${input} is not a BLS proof-of-possession`)
+  return parseBytes(input, BLS_POP_SIZE, `${input} is not a BLS proof-of-possession`)
 }
 const parseAddress: ParseFn<string> = (input) => {
   if (Web3.utils.isAddress(input)) {
