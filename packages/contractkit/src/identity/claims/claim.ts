@@ -1,7 +1,9 @@
+import { JSONStringType, UrlType } from '@celo/utils/lib/io'
 import { hashMessage, parseSignature } from '@celo/utils/lib/signatureUtils'
 import * as t from 'io-ts'
+import { AccountClaim, AccountClaimType, MetadataURLGetter, verifyAccountClaim } from './account'
 import { KeybaseClaim, KeybaseClaimType, verifyKeybaseClaim } from './keybase'
-import { ClaimTypes, JSONStringType, now, SignatureType, TimestampType, UrlType } from './types'
+import { ClaimTypes, now, SignatureType, TimestampType } from './types'
 
 const AttestationServiceURLClaimType = t.type({
   type: t.literal(ClaimTypes.ATTESTATION_SERVICE_URL),
@@ -23,6 +25,7 @@ const NameClaimType = t.type({
 
 export const ClaimType = t.union([
   AttestationServiceURLClaimType,
+  AccountClaimType,
   DomainClaimType,
   KeybaseClaimType,
   NameClaimType,
@@ -41,13 +44,22 @@ export type SignedClaim = t.TypeOf<typeof SignedClaimType>
 export type AttestationServiceURLClaim = t.TypeOf<typeof AttestationServiceURLClaimType>
 export type DomainClaim = t.TypeOf<typeof DomainClaimType>
 export type NameClaim = t.TypeOf<typeof NameClaimType>
-export type Claim = AttestationServiceURLClaim | DomainClaim | KeybaseClaim | NameClaim
+export type Claim =
+  | AttestationServiceURLClaim
+  | DomainClaim
+  | KeybaseClaim
+  | NameClaim
+  | AccountClaim
 
 export type ClaimPayload<K extends ClaimTypes> = K extends typeof ClaimTypes.DOMAIN
   ? DomainClaim
   : K extends typeof ClaimTypes.NAME
     ? NameClaim
-    : K extends typeof ClaimTypes.KEYBASE ? KeybaseClaim : AttestationServiceURLClaim
+    : K extends typeof ClaimTypes.KEYBASE
+      ? KeybaseClaim
+      : K extends typeof ClaimTypes.ATTESTATION_SERVICE_URL
+        ? AttestationServiceURLClaim
+        : AccountClaim
 
 export const isOfType = <K extends ClaimTypes>(type: K) => (
   data: SignedClaim['payload']
@@ -63,10 +75,24 @@ export function verifySignature(serializedPayload: string, signature: string, si
   }
 }
 
-export async function verifyClaim(claim: SignedClaim, address: string) {
+/**
+ * Verifies a claim made by an account
+ * @param claim The claim to verify
+ * @param address The address that is making the claim
+ * @param metadataURLGetter A function that can retrieve the metadata URL for a given account address,
+ *                          should be Accounts.getMetadataURL()
+ * @returns If valid, returns undefined. If invalid or unable to verify, returns a string with the error
+ */
+export async function verifyClaim(
+  claim: SignedClaim,
+  address: string,
+  metadataURLGetter: MetadataURLGetter
+) {
   switch (claim.payload.type) {
     case ClaimTypes.KEYBASE:
       return verifyKeybaseClaim(claim.payload, address)
+    case ClaimTypes.ACCOUNT:
+      return verifyAccountClaim(claim.payload, address, metadataURLGetter)
     default:
       break
   }

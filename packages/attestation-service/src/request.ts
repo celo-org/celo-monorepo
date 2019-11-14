@@ -1,7 +1,5 @@
-import { isE164NumberStrict } from '@celo/utils/lib/phoneNumbers'
-import { isValidAddress } from '@celo/utils/lib/signatureUtils'
 import express from 'express'
-import { either, isLeft } from 'fp-ts/lib/Either'
+import { isLeft } from 'fp-ts/lib/Either'
 import * as t from 'io-ts'
 
 export function createValidatedHandler<T>(
@@ -26,37 +24,6 @@ export function createValidatedHandler<T>(
     }
   }
 }
-
-export const E164PhoneNumberType = new t.Type<string, string, unknown>(
-  'E164Number',
-  t.string.is,
-  (input, context) =>
-    either.chain(
-      t.string.validate(input, context),
-      (stringValue) =>
-        isE164NumberStrict(stringValue)
-          ? t.success(stringValue)
-          : t.failure(stringValue, context, 'is not a valid e164 number')
-    ),
-  String
-)
-
-export const AddressType = new t.Type<string, string, unknown>(
-  'Address',
-  t.string.is,
-  (input, context) =>
-    either.chain(
-      t.string.validate(input, context),
-      (stringValue) =>
-        isValidAddress(stringValue)
-          ? t.success(stringValue)
-          : t.failure(stringValue, context, 'is not a valid address')
-    ),
-  String
-)
-
-export type Address = t.TypeOf<typeof AddressType>
-export type E164Number = t.TypeOf<typeof E164PhoneNumberType>
 
 function serializeErrors(errors: t.Errors) {
   let serializedErrors: any = {}
