@@ -98,7 +98,7 @@ contract Attestations is
   event AttestationIssuersSelected(
     bytes32 indexed identifier,
     address indexed account,
-    uint256 attestationsRequested,
+    address indexed issuer,
     address attestationRequestFeeToken
   );
 
@@ -204,13 +204,6 @@ contract Attestations is
     );
 
     addIncompleteAttestations(identifier);
-    emit AttestationIssuersSelected(
-      identifier,
-      msg.sender,
-      state.unselectedRequests[msg.sender].attestationsRequested,
-      state.unselectedRequests[msg.sender].attestationRequestFeeToken
-    );
-
     delete state.unselectedRequests[msg.sender];
   }
 
@@ -590,6 +583,13 @@ contract Attestations is
       attestation.blockNumber = unselectedRequest.blockNumber;
       attestation.attestationRequestFeeToken = unselectedRequest.attestationRequestFeeToken;
       state.selectedIssuers.push(issuer);
+
+      emit AttestationIssuersSelected(
+        identifier,
+        msg.sender,
+        issuer,
+        unselectedRequest.attestationRequestFeeToken
+      );
     }
   }
 

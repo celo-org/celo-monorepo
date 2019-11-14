@@ -459,19 +459,21 @@ contract('Attestations', (accounts: string[]) => {
           assertEqualBN(actualAttestationsRequested, 0)
         })
 
-        it('should emit the AttestationIssuersSelected event', async () => {
+        it('should emit the AttestationIssuerSelected event', async () => {
           const response = await attestations.selectIssuers(phoneHash)
+          const issuers = await attestations.getAttestationIssuers(phoneHash, caller)
+          assert.lengthOf(response.logs, 3)
 
-          assert.lengthOf(response.logs, 1)
-          const event = response.logs[0]
-          assertLogMatches2(event, {
-            event: 'AttestationIssuersSelected',
-            args: {
-              identifier: phoneHash,
-              account: caller,
-              attestationsRequested: new BigNumber(attestationsRequested),
-              attestationRequestFeeToken: mockStableToken.address,
-            },
+          issuers.forEach((issuer, index) => {
+            assertLogMatches2(response.logs[index], {
+              event: 'AttestationIssuersSelected',
+              args: {
+                identifier: phoneHash,
+                account: caller,
+                issuer,
+                attestationRequestFeeToken: mockStableToken.address,
+              },
+            })
           })
         })
 
