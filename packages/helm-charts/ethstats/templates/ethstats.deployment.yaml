@@ -33,16 +33,16 @@ spec:
         - |
           cat <<'EOF' > /celostats-server/lib/utils/config.js
           var trusted = [
-            {{- range .Values.ethstats.trusted_enodes }}
+            {{- range .Values.ethstats.trusted_addresses }}
             {{- if . }}
-            "enode://{{ . }}",
+            "{{ . }}",
             {{- end }}
             {{- end }}
           ]
           var banned = [
-            {{- range .Values.ethstats.banned_enodes }}
+            {{- range .Values.ethstats.banned_addresses }}
             {{- if . }}
-            "enode://{{ . }}",
+            "{{ . }}",
             {{- end }}
             {{- end }}
           ]

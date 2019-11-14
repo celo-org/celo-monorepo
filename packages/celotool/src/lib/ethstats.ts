@@ -32,8 +32,8 @@ function helmParameters() {
     `--set domain.name=${fetchEnv(envVar.CLUSTER_DOMAIN_NAME)}`,
     `--set ethstats.image.repository=${fetchEnv(envVar.ETHSTATS_DOCKER_IMAGE_REPOSITORY)}`,
     `--set ethstats.image.tag=${fetchEnv(envVar.ETHSTATS_DOCKER_IMAGE_TAG)}`,
-    `--set ethstats.trusted_enodes='{${generateAuthorizedAddresses()}}'`,
-    `--set ethstats.banned_enodes='{${fetchEnv(envVar.ETHSTATS_BANNED_ENODES)}}'`,
+    `--set ethstats.trusted_addresses='{${generateAuthorizedAddresses()}}'`,
+    `--set ethstats.banned_addresses='{${fetchEnv(envVar.ETHSTATS_BANNED_ADDRESSES)}}'`,
   ]
 }
 
@@ -50,6 +50,6 @@ function generateAuthorizedAddresses() {
   publicKeys.push(getAddressesFor(AccountType.TX_NODE, mnemonic, txNodes))
   publicKeys.push(getAddressesFor(AccountType.VALIDATOR, mnemonic, validatorNodes))
 
-  publicKeys.push(fetchEnv(envVar.ETHSTATS_TRUSTED_ENODES).split(','))
+  publicKeys.push(fetchEnv(envVar.ETHSTATS_TRUSTED_ADDRESSES).split(','))
   return publicKeys.reduce((accumulator, value) => accumulator.concat(value), [])
 }
