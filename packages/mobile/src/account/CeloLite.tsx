@@ -1,21 +1,21 @@
 import SettingsSwitchItem from '@celo/react-components/components/SettingsSwitchItem'
+import TextButton from '@celo/react-components/components/TextButton'
 import colors from '@celo/react-components/styles/colors'
 import fontStyles from '@celo/react-components/styles/fonts'
+import { componentStyles } from '@celo/react-components/styles/styles'
 import * as React from 'react'
 import { WithNamespaces, withNamespaces } from 'react-i18next'
 import { ScrollView, StyleSheet, Text, View } from 'react-native'
 import Modal from 'react-native-modal'
 import { connect } from 'react-redux'
-import CeloLiteModal from 'src/account/CeloLiteModal'
 import i18n, { Namespaces } from 'src/i18n'
 import { headerWithBackButton } from 'src/navigator/Headers'
 import { RootState } from 'src/redux/reducers'
 import { toggleZeroSyncMode } from 'src/web3/actions'
-import TextButton from '@celo/react-components/components/TextButton'
-import { componentStyles } from '@celo/react-components/styles/styles'
 
 interface StateProps {
   zeroSyncEnabled: boolean
+  gethStartedThisSession: boolean
 }
 
 interface DispatchProps {
@@ -31,6 +31,7 @@ const mapDispatchToProps = {
 const mapStateToProps = (state: RootState): StateProps => {
   return {
     zeroSyncEnabled: state.web3.zeroSyncMode,
+    gethStartedThisSession: state.web3.gethStartedThisSession,
   }
 }
 
@@ -59,16 +60,15 @@ export class CeloLite extends React.Component<Props, State> {
   onPressRestartModal = () => {
     this.props.toggleZeroSyncMode(false)
     this.hideModal()
-    // TODO restart app
   }
 
   handleZeroSyncToggle = (zeroSyncMode: boolean) => {
-    if (zeroSyncMode) {
-      this.props.toggleZeroSyncMode(true)
-    } else {
-      // Starting geth, so show modal to restart app
-      // zeroSyncMode will be updated if selected in modal
+    if (!zeroSyncMode && this.props.gethStartedThisSession) {
+      // Starting geth a second time this app session which will
+      // require an app restart, so show restart modal
       this.showModal()
+    } else {
+      this.props.toggleZeroSyncMode(zeroSyncMode)
     }
   }
 
@@ -85,17 +85,14 @@ export class CeloLite extends React.Component<Props, State> {
         </SettingsSwitchItem>
         <Modal isVisible={this.state.modalVisible}>
           <View style={styles.modalContainer}>
-            <Text style={styles.modalHeader}>{t('skipModal.header')}</Text>
-            <Text style={fontStyles.body}>{t('skipModal.body1')}</Text>
-            <Text style={[fontStyles.body, componentStyles.marginTop10]}>
-              {t('skipModal.body2')}
-            </Text>
+            <Text style={styles.modalHeader}>{t('restartModal.header')}</Text>
+            <Text style={fontStyles.body}>{t('restartModal.body')}</Text>
             <View style={styles.modalButtonsContainer}>
               <TextButton onPress={this.hideModal} style={styles.modalCancelText}>
                 {t('global:cancel')}
               </TextButton>
               <TextButton onPress={this.onPressRestartModal} style={styles.modalSkipText}>
-                {t('global:skip')}
+                {t('restartModal.restart')}
               </TextButton>
             </View>
           </View>

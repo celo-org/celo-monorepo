@@ -9,7 +9,7 @@ import {
 } from 'src/geth/geth'
 import { InitializationState, isGethConnectedSelector } from 'src/geth/reducer'
 import { navigateToError } from 'src/navigator/NavigationService'
-import { restartApp } from 'src/utils/AppRestart'
+import { deleteChainDataAndRestartApp } from 'src/utils/AppRestart'
 import Logger from 'src/utils/Logger'
 import { zeroSyncSelector } from 'src/web3/selectors'
 
@@ -124,7 +124,7 @@ export function* initGethSaga() {
 
   if (restartAppAutomatically) {
     Logger.error(TAG, 'Geth initialization failed, restarting the app.')
-    restartApp()
+    deleteChainDataAndRestartApp()
   } else {
     navigateToError('networkConnectionFailed')
   }

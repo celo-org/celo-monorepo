@@ -149,12 +149,6 @@ async function initGeth() {
   }
 }
 
-export async function clearGethCache() {
-  await deleteChainData()
-  await deleteGethLockFile()
-  gethInstance = null
-}
-
 export async function getGeth(): Promise<typeof gethInstance> {
   Logger.debug('Geth@getGeth', 'Getting Geth Instance')
   if (!gethInstance) {

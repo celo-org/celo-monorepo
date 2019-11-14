@@ -15,11 +15,12 @@ import { ErrorMessages } from 'src/app/ErrorMessages'
 import { currentLanguageSelector } from 'src/app/reducers'
 import { getWordlist } from 'src/backup/utils'
 import { UNLOCK_DURATION } from 'src/geth/consts'
-import { clearGethCache, deleteChainData, stopGethIfInitialized } from 'src/geth/geth'
+import { deleteChainData, stopGethIfInitialized } from 'src/geth/geth'
 import { initGethSaga } from 'src/geth/saga'
 import { navigateToError } from 'src/navigator/NavigationService'
 import { waitWeb3LastBlock } from 'src/networkInfo/saga'
 import { setCachedPincode } from 'src/pincode/PincodeCache'
+import { restartApp } from 'src/utils/AppRestart'
 import { setKey } from 'src/utils/keyStore'
 import Logger from 'src/utils/Logger'
 import {
@@ -37,6 +38,7 @@ import { addLocalAccount, switchWeb3ProviderForSyncMode, web3 } from 'src/web3/c
 import {
   currentAccountInWeb3KeystoreSelector,
   currentAccountSelector,
+  gethStartedThisSessionSelector,
   zeroSyncSelector,
 } from 'src/web3/selectors'
 import { Block } from 'web3/eth/types'
@@ -434,38 +436,29 @@ export function* ensureAccountInWeb3Keystore() {
 }
 
 export function* switchToGethFromZeroSync() {
-  Logger.error(TAG + '@switchToGethFromZeroSync', 'Called')
+  Logger.debug(TAG + 'Switching to geth from zeroSync..')
   try {
-    Logger.error(TAG + '@switchToGethFromZeroSync', 'Trying to set zeroSync mode to false')
+    const gethAlreadyStartedThisSession = yield select(gethStartedThisSessionSelector)
     yield put(setZeroSyncMode(false))
-    Logger.error(TAG + '@switchToGethFromZeroSync', 'About to initialize geth')
-    yield call(clearGethCache)
     yield call(initGethSaga)
 
-    Logger.error(TAG + '@switchToGethFromZeroSync', 'Called initGethSaga')
     switchWeb3ProviderForSyncMode(false)
-
-    Logger.error(TAG + '@switchToGethFromZeroSync', 'Switched providers')
     // Ensure web3 is fully synced using new provider
     yield call(waitForWeb3Sync)
-    const txCount = yield call(web3.eth.getTransactionCount, '0xFAfD7d820bf9294d344393')
-    Logger.debug(`${TAG}@switchToGethFromZeroSync`, `Transaction count: ${txCount}`)
-    const blockNumber = yield call(web3.eth.getBlockNumber)
-    Logger.error(TAG + '@switchToGethFromZeroSync', `Block number: ${blockNumber}`)
 
     // After switching off zeroSync mode, ensure key is stored in web3.personal
     // Note that this must happen after the sync mode is switched
     // as the web3.personal where the key is stored is not available in zeroSync mode
     yield call(ensureAccountInWeb3Keystore)
-    Logger.error(TAG + '@switchToGethFromZeroSync', 'Ensured keys in keystore')
+
+    if (gethAlreadyStartedThisSession) {
+      // For now, app must be restarted if geth has already been started.
+      // For example, if the user started running geth, turned zeroSync mode on, then turned geth back on
+      restartApp()
+    }
   } catch (e) {
     Logger.error(TAG + '@switchToGethFromZeroSync', 'Error switching to geth from zeroSync')
     yield put(showError(ErrorMessages.FAILED_TO_SWITCH_SYNC_MODES))
-
-    // Go back to zeroSync mode since switch couldn't be completed
-    yield put(setZeroSyncMode(true))
-    switchWeb3ProviderForSyncMode(true)
-    // TODO(anna) undo other things
   }
 }
 
@@ -484,11 +477,6 @@ export function* switchToZeroSyncFromGeth() {
   } catch (e) {
     Logger.error(TAG + '@switchToGethFromZeroSync', 'Error switching to zeroSync from geth')
     yield put(showError(ErrorMessages.FAILED_TO_SWITCH_SYNC_MODES))
-
-    // Go back to geth mode if error thrown
-    yield put(setZeroSyncMode(false))
-    switchWeb3ProviderForSyncMode(false)
-    // TODO(anna) undo other things
   }
 }
 
