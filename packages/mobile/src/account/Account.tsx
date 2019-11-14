@@ -226,13 +226,12 @@ export class Account extends React.Component<Props, State> {
               title={t('backupKeyFlow6:backupAndRecovery')}
               onPress={this.goToBackupScreen}
             />
-            {!numberVerified ||
-              (true && (
-                <SettingsItem
-                  title={t('nuxVerification2:getVerified')}
-                  onPress={this.goToVerification}
-                />
-              ))}
+            {!numberVerified && (
+              <SettingsItem
+                title={t('nuxVerification2:getVerified')}
+                onPress={this.goToVerification}
+              />
+            )}
             <SettingsItem title={t('invite')} onPress={this.goToInvite} />
             <SettingsItem title={t('editProfile')} onPress={this.goToProfile} />
             {features.SHOW_SHOW_REWARDS_APP_LINK && (

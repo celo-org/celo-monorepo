@@ -68,9 +68,9 @@ exports[`CeloLite renders correctly 1`] = `
             onResponderTerminationRequest={[Function]}
             onStartShouldSetResponder={[Function]}
             thumbTintColor="#FFFFFF"
-            trackColorForFalse="#E3E3E5"
+            trackColorForFalse="#D1D5D8"
             trackColorForTrue="#42D689"
-            trackTintColor="#E3E3E5"
+            trackTintColor="#D1D5D8"
           />
         </View>
       </View>

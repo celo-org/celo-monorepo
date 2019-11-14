@@ -53,7 +53,7 @@ class VerificationLoadingScreen extends React.Component<Props> {
 
   componentDidMount() {
     BackHandler.addEventListener('hardwareBackPress', this.handleBackButton)
-    // this.props.startVerification()
+    this.props.startVerification()
   }
 
   componentDidUpdate() {
