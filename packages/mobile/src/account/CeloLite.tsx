@@ -2,7 +2,6 @@ import SettingsSwitchItem from '@celo/react-components/components/SettingsSwitch
 import TextButton from '@celo/react-components/components/TextButton'
 import colors from '@celo/react-components/styles/colors'
 import fontStyles from '@celo/react-components/styles/fonts'
-import { componentStyles } from '@celo/react-components/styles/styles'
 import * as React from 'react'
 import { WithNamespaces, withNamespaces } from 'react-i18next'
 import { ScrollView, StyleSheet, Text, View } from 'react-native'
