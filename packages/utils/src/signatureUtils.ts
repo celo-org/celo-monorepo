@@ -38,7 +38,12 @@ export async function addressToPublicKey(
 
   const rawsig = ethjsutil.fromRpcSig(sig)
   const prefixedMsg = hashMessageWithPrefix(data)
-  const pubKey = ethjsutil.ecrecover(prefixedMsg, rawsig.v, rawsig.r, rawsig.s)
+  const pubKey = ethjsutil.ecrecover(
+    Buffer.from(prefixedMsg.slice(2), 'hex'),
+    rawsig.v,
+    rawsig.r,
+    rawsig.s
+  )
 
   const computedAddr = ethjsutil.pubToAddress(pubKey).toString('hex')
   assert(eqAddress(computedAddr, signer), 'computed address !== signer')

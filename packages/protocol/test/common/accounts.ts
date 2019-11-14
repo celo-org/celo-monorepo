@@ -70,7 +70,7 @@ contract('Accounts', (accounts: string[]) => {
       fn: accountsInstance.authorizeAttestationSigner,
       eventName: 'AttestationSignerAuthorized',
       getAuthorizedFromAccount: accountsInstance.getAttestationSigner,
-      authorizedSignerToAccount: accountsInstance.attesttationSignerToAccount,
+      authorizedSignerToAccount: accountsInstance.attestationSignerToAccount,
     }
   })
 

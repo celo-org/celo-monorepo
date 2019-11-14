@@ -128,13 +128,13 @@ EXAMPLE
 
 _See code: [packages/cli/src/commands/validator/show.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/validator/show.ts)_
 
-### Update-bls-key
+### Update-bls-public-key
 
 Update BLS key for a validator
 
 ```
 USAGE
-  $ celocli validator:update-bls-key
+  $ celocli validator:update-bls-public-key
 
 OPTIONS
   --blsKey=0x                                        (required) BLS Public Key
@@ -148,4 +148,4 @@ EXAMPLE
   dabf64485a1d96bad27bb1c0fd6080a75b0ec9f75b50298a2a8e04b02b2688c8104fca61fb00
 ```
 
-_See code: [packages/cli/src/commands/validator/update-bls-key.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/validator/update-bls-key.ts)_
+_See code: [packages/cli/src/commands/validator/update-bls-public-key.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/validator/update-bls-public-key.ts)_
