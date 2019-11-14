@@ -396,7 +396,7 @@ exports[`BackupSocialIntro renders correctly when social backup is not complete 
           onChange={[Function]}
           onResponderTerminationRequest={[Function]}
           onStartShouldSetResponder={[Function]}
-          thumbTintColor="#42D689"
+          thumbTintColor="#FFFFFF"
           trackColorForFalse="#D1D5D8"
           trackColorForTrue="#42D689"
           trackTintColor="#D1D5D8"
