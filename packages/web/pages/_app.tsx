@@ -11,12 +11,6 @@ import { scrollTo } from 'src/utils/utils'
 import Sentry, { initSentry } from '../fullstack/sentry'
 import { appWithTranslation } from '../src/i18n'
 
-import dynamic from 'next/dynamic'
-
-const BrandLayout = dynamic((import('src/brandkit/Page') as unknown) as Promise<
-  React.ComponentType
->)
-
 config({ ssrReveal: true })
 class MyApp extends App {
   componentDidMount() {
@@ -58,14 +52,7 @@ class MyApp extends App {
       <Container>
         <ScreenSizeProvider>
           {this.skipHeader() || <Header />}
-          {this.isBrand() ? (
-            <BrandLayout>
-              <Component {...pageProps} />
-            </BrandLayout>
-          ) : (
-            <Component {...pageProps} />
-          )}
-
+          <Component {...pageProps} />
           {this.skipHeader() || (
             <View>
               <Footer />

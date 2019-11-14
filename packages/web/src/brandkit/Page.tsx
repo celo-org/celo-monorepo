@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { StyleSheet, Text, View } from 'react-native'
+import { StyleSheet, Text, View, findNodeHandle } from 'react-native'
 import Sidebar from 'src/brandkit/Sidebar'
 import Footer from 'src/shared/Footer.3'
 import { Cell, GridRow, Spans } from 'src/layout/GridRow'
@@ -48,9 +48,14 @@ const PAGES = [
   },
 ]
 
+interface Section {
+  id: string
+  children: React.ReactNode
+}
+
 interface Props {
   router: SingletonRouter
-  children: React.ReactNode
+  sections: Section[]
 }
 
 interface State {
@@ -62,24 +67,81 @@ class Page extends React.Component<Props & ScreenProps, State> {
     routeHash: '',
   }
 
+  ratios: Record<string, { id: string; ratio: number; top: number }> = {}
+
+  observer: IntersectionObserver
+
+  pageRef = React.createRef<View>()
+
+  sectionRefs = this.props.sections.reduce((acc, section) => {
+    acc[section.id] = React.createRef<View>()
+    return acc
+  }, {})
+
   onChangeHash = () => {
     this.setState({ routeHash: window.location.hash })
   }
 
+  onIntersection = (entries: IntersectionObserverEntry[]) => {
+    this.ratios = entries
+      .map((entry) => ({
+        id: entry.target.id,
+        ratio: entry.intersectionRatio,
+        top: entry.boundingClientRect.top,
+      }))
+      .reduce((acc, currentValue) => {
+        acc[currentValue.id] = currentValue
+        return acc
+      }, this.ratios)
+
+    const top = Object.keys(this.ratios)
+      .map((key) => this.ratios[key])
+      .reduce(
+        (acc, current) => {
+          if (current.ratio > acc.ratio) {
+            return current
+          }
+          return acc
+        },
+        { ratio: 0, id: this.state.routeHash }
+      )
+
+    if (this.state.routeHash !== top.id) {
+      location.hash = top.id
+    }
+  }
+
+  observation = () => {
+    this.observer = new IntersectionObserver(this.onIntersection, {
+      // root: findNodeHandle(this.pageRef.current) as any,
+      // rootMargin: `200px`,
+      threshold: [0.1, 0.5, 0.9, 1],
+    })
+
+    Object.keys(this.sectionRefs).forEach((id) => {
+      const value = this.sectionRefs[id]
+      // findNodeHandle is typed to return a number but returns an Element
+      const element = (findNodeHandle(value.current) as unknown) as Element
+      this.observer.observe(element)
+    })
+  }
+
   componentDidMount = () => {
-    this.onChangeHash()
+    this.observation()
+
     window.addEventListener('hashchange', this.onChangeHash, false)
   }
 
   componentWillUnmount = () => {
+    this.observer.disconnect()
     window.removeEventListener('hashchange', this.onChangeHash)
   }
 
   render() {
-    const { screen, children, router } = this.props
+    const { screen, sections, router } = this.props
     const isMobile = screen === ScreenSizes.MOBILE
     return (
-      <View style={styles.conatiner}>
+      <View style={styles.conatiner} ref={this.pageRef}>
         <View style={styles.topbar}>
           <Topbar />
         </View>
@@ -101,9 +163,20 @@ class Page extends React.Component<Props & ScreenProps, State> {
             )}
           </Cell>
           <Cell span={Spans.three4th}>
-            <View style={styles.childrenArea}>
+            <View style={styles.childrenArea} ref={this.pageRef}>
               <Text>{this.state.routeHash}</Text>
-              {children}
+              {sections.map(({ id, children }) => {
+                return (
+                  <View
+                    key={id}
+                    nativeID={id}
+                    ref={this.sectionRefs[id]}
+                    style={standardStyles.blockMargin}
+                  >
+                    {children}
+                  </View>
+                )
+              })}
             </View>
           </Cell>
         </GridRow>
