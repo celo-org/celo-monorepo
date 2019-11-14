@@ -99,7 +99,6 @@ exports[`transfer feed item renders correctly for <0.000001 network fee 1`] = `
           
           $
           &lt;0.001
-          MXN
         </Text>
       </View>
       <Text
@@ -232,7 +231,6 @@ exports[`transfer feed item renders correctly for faucet 1`] = `
           
           $
           133.00
-          MXN
         </Text>
       </View>
       <Text
@@ -395,7 +393,6 @@ exports[`transfer feed item renders correctly for known received 1`] = `
           
           $
           133.00
-          MXN
         </Text>
       </View>
       <View
@@ -544,7 +541,6 @@ exports[`transfer feed item renders correctly for known sent 1`] = `
           -
           $
           133.00
-          MXN
         </Text>
       </View>
       <View
@@ -663,7 +659,6 @@ exports[`transfer feed item renders correctly for network fee 1`] = `
           
           $
           0.002
-          MXN
         </Text>
       </View>
       <Text
@@ -826,7 +821,6 @@ exports[`transfer feed item renders correctly for received 1`] = `
           
           $
           133.00
-          MXN
         </Text>
       </View>
       <View
@@ -945,7 +939,6 @@ exports[`transfer feed item renders correctly for received invite 1`] = `
           
           $
           1.33
-          MXN
         </Text>
       </View>
       <Text
@@ -1108,7 +1101,6 @@ exports[`transfer feed item renders correctly for received with encrypted commen
           
           $
           133.00
-          MXN
         </Text>
       </View>
       <Text
@@ -1271,7 +1263,6 @@ exports[`transfer feed item renders correctly for sent 1`] = `
           -
           $
           133.00
-          MXN
         </Text>
       </View>
       <View
@@ -1390,7 +1381,6 @@ exports[`transfer feed item renders correctly for sent invite 1`] = `
           -
           $
           1.33
-          MXN
         </Text>
       </View>
       <Text
@@ -1553,7 +1543,6 @@ exports[`transfer feed item renders correctly for sent transaction 1`] = `
           -
           $
           1.33
-          MXN
         </Text>
       </View>
       <Text
@@ -1716,7 +1705,6 @@ exports[`transfer feed item renders correctly for sent with encrypted comment 1`
           -
           $
           1.33
-          MXN
         </Text>
       </View>
       <Text
@@ -1849,7 +1837,6 @@ exports[`transfer feed item renders correctly for verification fee 1`] = `
           -
           $
           0.43
-          MXN
         </Text>
       </View>
       <Text
@@ -2001,7 +1988,6 @@ exports[`transfer feed item renders correctly for verification reward 1`] = `
           
           $
           1.33
-          MXN
         </Text>
       </View>
       <Text
