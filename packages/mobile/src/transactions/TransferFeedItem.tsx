@@ -192,7 +192,6 @@ export function TransferFeedItem(props: Props) {
               {currencyStyle.direction}
               {showLocalCurrency && localCurrencySymbol}
               {transactionValue}
-              {showLocalCurrency && localCurrencyCode}
             </Text>
           </View>
           {!!info && <Text style={styles.info}>{info}</Text>}
