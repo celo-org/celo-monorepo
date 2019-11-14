@@ -11,7 +11,7 @@ import {
   timeTravel,
 } from '@celo/protocol/lib/test-utils'
 import { fixed1, fromFixed, toFixed } from '@celo/utils/lib/fixidity'
-import { addressToPublicKey } from '@celo/utils/lib/address'
+import { addressToPublicKey } from '@celo/utils/lib/signatureUtils'
 import BigNumber from 'bignumber.js'
 import {
   AccountsContract,
@@ -128,7 +128,7 @@ contract('Validators', (accounts: string[]) => {
 
   const registerValidator = async (validator: string) => {
     await mockLockedGold.setAccountTotalLockedGold(validator, validatorLockedGoldRequirements.value)
-    const publicKey = await addressToPublicKey(validator, web3)
+    const publicKey = await addressToPublicKey(validator, web3.eth.sign)
     await validators.registerValidator(
       // @ts-ignore bytes type
       publicKey,
@@ -543,7 +543,7 @@ contract('Validators', (accounts: string[]) => {
           const signer = accounts[9]
           const sig = await getParsedSignatureOfAddress(web3, validator, signer)
           await accountsInstance.authorizeValidatorSigner(signer, sig.v, sig.r, sig.s)
-          publicKey = await addressToPublicKey(signer, web3)
+          publicKey = await addressToPublicKey(signer, web3.eth.sign)
           resp = await validators.registerValidator(
             // @ts-ignore bytes type
             publicKey,
@@ -616,7 +616,7 @@ contract('Validators', (accounts: string[]) => {
       })
 
       it('should revert', async () => {
-        publicKey = await addressToPublicKey(validator, web3)
+        publicKey = await addressToPublicKey(validator, web3.eth.sign)
         await validators.registerValidator(
           // @ts-ignore bytes type
           publicKey,
@@ -645,7 +645,7 @@ contract('Validators', (accounts: string[]) => {
       })
 
       it('should revert', async () => {
-        const publicKey = await addressToPublicKey(validator, web3)
+        const publicKey = await addressToPublicKey(validator, web3.eth.sign)
         await assertRevert(
           validators.registerValidator(
             // @ts-ignore bytes type
@@ -668,7 +668,7 @@ contract('Validators', (accounts: string[]) => {
       })
 
       it('should revert', async () => {
-        const publicKey = await addressToPublicKey(validator, web3)
+        const publicKey = await addressToPublicKey(validator, web3.eth.sign)
         await assertRevert(
           validators.registerValidator(
             // @ts-ignore bytes type
@@ -1085,7 +1085,7 @@ contract('Validators', (accounts: string[]) => {
           let newPublicKey: string
           const signer = accounts[9]
           beforeEach(async () => {
-            newPublicKey = await addressToPublicKey(signer, web3)
+            newPublicKey = await addressToPublicKey(signer, web3.eth.sign)
             // @ts-ignore Broken typechain typing for bytes
             resp = await validators.updateEcdsaPublicKey(validator, signer, newPublicKey)
           })
@@ -1112,7 +1112,7 @@ contract('Validators', (accounts: string[]) => {
           let newPublicKey: string
           const signer = accounts[9]
           it('should revert', async () => {
-            newPublicKey = await addressToPublicKey(accounts[8], web3)
+            newPublicKey = await addressToPublicKey(accounts[8], web3.eth.sign)
             // @ts-ignore Broken typechain typing for bytes
             await assertRevert(validators.updateEcdsaPublicKey(validator, signer, newPublicKey))
           })
@@ -1124,7 +1124,7 @@ contract('Validators', (accounts: string[]) => {
           let newPublicKey: string
           const signer = accounts[9]
           it('should revert', async () => {
-            newPublicKey = await addressToPublicKey(signer, web3)
+            newPublicKey = await addressToPublicKey(signer, web3.eth.sign)
             // @ts-ignore Broken typechain typing for bytes
             await assertRevert(validators.updateEcdsaPublicKey(validator, signer, newPublicKey))
           })
