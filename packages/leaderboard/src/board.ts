@@ -16,26 +16,6 @@ const TOKEN_PATH = 'token.json'
 
 /*
 
-CREATE TABLE competitors (
-  address BYTEA PRIMARY KEY,
-  multiplier REAL
-);
-
-CREATE TABLE claims (
-  address BYTEA,
-  claim_address BYTEA,
-  CONSTRAINT claims_assoc PRIMARY KEY(address, claim_address)
-);
-
-CREATE TABLE exchange_rates (
-  token BYTEA PRIMARY KEY,
-  rate REAL
-);
-
-CREATE type json_type AS (address char(40), multiplier real);
-CREATE type json_assoc AS (address char(40), claim_address char(40));
-CREATE type json_rate AS (token bytea, rate real);
-
 SELECT competitors.address, SUM(rate*value+fetched_coin_balance+locked_gold)*multiplier AS score
 FROM addresses, exchange_rates, competitors, claims, celo_account, address_current_token_balances
 WHERE token_contract_address_hash='\x88f24de331525cf6cfd7455eb96a9e4d49b7f292'
@@ -92,7 +72,7 @@ async function updateDB(lst: any[][]) {
   const res = await client.query(
     'INSERT INTO competitors (address, multiplier)' +
       " SELECT decode(m.address, 'hex') AS address, m.multiplier FROM json_populate_recordset(null::json_type, $1) AS m" +
-      ' ON CONFLICT ON CONSTRAINT competitors_pkey DO UPDATE SET multiplier = EXCLUDED.multiplier RETURNING *',
+      ' ON CONFLICT (address) DO UPDATE SET multiplier = EXCLUDED.multiplier RETURNING *',
     [
       JSON.stringify(
         lst.map((a) => {
@@ -117,7 +97,7 @@ async function updateRate(kit: ContractKit) {
 
   const res = await client.query(
     'INSERT INTO exchange_rates (token, rate) VALUES ($1, $2)' +
-      ' ON CONFLICT ON CONSTRAINT exchange_rates_pkey DO UPDATE SET rate = EXCLUDED.rate RETURNING *',
+      ' ON CONFLICT (token) DO UPDATE SET rate = EXCLUDED.rate RETURNING *',
     [Buffer.from(token.address.substr(2), 'hex'), rate.rate.toNumber()]
   )
   console.log(res.rows)
@@ -131,13 +111,13 @@ async function processClaims(address: string, data: string) {
     const client = new Client({ database: 'blockscout' })
     await client.connect()
     const res = await client.query(
-      'INSERT INTO claims (address, claim_address)' +
-        " SELECT decode(m.address,'hex'), decode(m.claim_address,'hex') FROM json_populate_recordset(null::json_assoc, $1) AS m" +
-        ' ON CONFLICT ON CONSTRAINT claims_assoc DO NOTHING RETURNING *',
+      'INSERT INTO claims (address, claimed_address)' +
+        " SELECT decode(m.address,'hex'), decode(m.claimed_address,'hex') FROM json_populate_recordset(null::json_assoc, $1) AS m" +
+        ' ON CONFLICT (address, claimed_address) DO NOTHING RETURNING *',
       [
         JSON.stringify(
           lst.map((a) => {
-            const res = { address: addressToBinary(address), claim_address: addressToBinary(a) }
+            const res = { address: addressToBinary(address), claimed_address: addressToBinary(a) }
             console.log(res)
             return res
           })
@@ -249,7 +229,8 @@ async function readAssoc(lst: string[]) {
   lst.forEach(async (a) => {
     try {
       const url = await accounts.getMetadataURL(a)
-      getFromUrl(a, url)
+      if (url == '') console.log('Empty URL', a)
+      else getFromUrl(a, url)
     } catch (err) {
       console.error('Bad address', a, err.toString())
     }
