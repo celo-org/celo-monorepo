@@ -20,6 +20,7 @@ import { initGethSaga } from 'src/geth/saga'
 import { navigateToError } from 'src/navigator/NavigationService'
 import { waitWeb3LastBlock } from 'src/networkInfo/saga'
 import { setCachedPincode } from 'src/pincode/PincodeCache'
+import { restartApp } from 'src/utils/AppRestart'
 import { setKey } from 'src/utils/keyStore'
 import Logger from 'src/utils/Logger'
 import {
@@ -421,6 +422,7 @@ export function* ensureAccountInWeb3Keystore() {
 export function* switchToGethFromZeroSync() {
   Logger.debug(TAG, 'Switching to geth from zeroSync..')
   try {
+    const gethAlreadyStartedThisSession = yield select(gethStartedThisSessionSelector)
     yield put(setZeroSyncMode(false))
     yield call(initGethSaga)
 
@@ -432,6 +434,13 @@ export function* switchToGethFromZeroSync() {
     // Note that this must happen after the sync mode is switched
     // as the web3.personal where the key is stored is not available in zeroSync mode
     yield call(ensureAccountInWeb3Keystore)
+
+    if (gethAlreadyStartedThisSession) {
+      // If geth is started twice within the same session,
+      // there is an issue where it cannot find deployed contracts.
+      // Restarting the app fixes this issue.
+      restartApp()
+    }
   } catch (e) {
     Logger.error(TAG + '@switchToGethFromZeroSync', 'Error switching to geth from zeroSync')
     yield put(showError(ErrorMessages.FAILED_TO_SWITCH_SYNC_MODES))
