@@ -62,7 +62,10 @@ class HomeCover extends React.PureComponent<Props, State> {
                 <View style={styles.textWrapper}>
                   <TextAnimation
                     playing={this.state.playing}
-                    stillMode={mode === Mode.wait || mode === Mode.transition}
+                    willTransition={mode === Mode.transition}
+                    stillMode={
+                      mode === Mode.wait || mode === Mode.transition || mode === Mode.graphic
+                    }
                   />
                   <Responsive
                     large={styles.content}

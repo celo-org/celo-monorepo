@@ -104,6 +104,7 @@ Object.keys(timings).forEach((key) => {
 interface Props {
   playing: boolean
   stillMode: boolean
+  willTransition: boolean
 }
 
 interface State {
@@ -174,7 +175,7 @@ class TextAnimation extends React.PureComponent<Props, State> {
             <View>
               {this.props.stillMode ? (
                 <View
-                  style={[styles.mask, { height: 60 }, styles.stillOut]}
+                  style={this.props.willTransition && [styles.mask, styles.stillOut]}
                   key={`stillmode-mask1`}
                 />
               ) : (
@@ -218,20 +219,6 @@ const styles = StyleSheet.create({
             },
           ],
         },
-        // [`${fadeOut * 100}%`]: {
-        //   transform: [
-        //     {
-        //       translateX: '-100%',
-        //     },
-        //   ],
-        // },
-        // [`${fadeOutStop * 100}%`]: {
-        //   transform: [
-        //     {
-        //       translateX: 0,
-        //     },
-        //   ],
-        // },
         '100%': {
           transform: [
             {
@@ -259,6 +246,7 @@ const styles = StyleSheet.create({
     zIndex: 1,
   },
   mask: {
+    height: 60,
     bottom: 0,
     left: 0,
     right: -30,
