@@ -5,7 +5,7 @@ import { withNamespaces, WithNamespaces } from 'react-i18next'
 import { StyleSheet, View } from 'react-native'
 import SafeAreaView from 'react-native-safe-area-view'
 import { Namespaces } from 'src/i18n'
-import { RESTART_APP_I18N_KEY, restartApp } from 'src/utils/AppRestart'
+import { deleteChainDataAndRestartApp, RESTART_APP_I18N_KEY } from 'src/utils/AppRestart'
 
 const SHOW_RESTART_BUTTON_TIMEOUT = 10000
 
@@ -46,7 +46,7 @@ export class AppLoading extends React.Component<Props, State> {
         <View style={styles.button}>
           {this.state.showRestartButton && (
             <Button
-              onPress={restartApp}
+              onPress={deleteChainDataAndRestartApp}
               text={t(RESTART_APP_I18N_KEY)}
               standard={false}
               type={BtnTypes.PRIMARY}

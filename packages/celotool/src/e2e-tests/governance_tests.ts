@@ -421,11 +421,11 @@ describe('governance tests', () => {
         const previousScore = new BigNumber(
           (await validators.methods.getValidator(validator).call({}, blockNumber - 1)).score
         )
+        assert.isFalse(score.isNaN())
+        assert.isFalse(previousScore.isNaN())
         const expectedScore = adjustmentSpeed
           .times(uptime)
           .plus(new BigNumber(1).minus(adjustmentSpeed).times(fromFixed(previousScore)))
-        assert.isFalse(score.isNaN())
-        assert.isFalse(previousScore.isNaN())
         assert.equal(score.toFixed(), toFixed(expectedScore).toFixed())
       }
 
