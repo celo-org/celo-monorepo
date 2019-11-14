@@ -13,6 +13,7 @@ const DefaultConfig = {
     selectIssuersWaitBlocks: 4,
   },
   blockchainParameters: {
+    gasForNonGoldCurrencies: 134000,
     minimumClientVersion: {
       major: 1,
       minor: 8,
@@ -81,13 +82,13 @@ const DefaultConfig = {
     oracles: [],
   },
   validators: {
-    registrationRequirements: {
-      group: '1000000000000000000', // 1 gold
-      validator: '1000000000000000000', // 1 gold
+    groupLockedGoldRequirements: {
+      value: '1000000000000000000', // 1 gold
+      duration: 60 * 24 * 60 * 60, // 60 days
     },
-    deregistrationLockups: {
-      group: 60 * 24 * 60 * 60, // 60 days
-      validator: 60 * 24 * 60 * 60, // 60 days
+    validatorLockedGoldRequirements: {
+      value: '1000000000000000000', // 1 gold
+      duration: 60 * 24 * 60 * 60, // 60 days
     },
     validatorScoreParameters: {
       exponent: 1,

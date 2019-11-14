@@ -7,7 +7,6 @@ import "../common/Initializable.sol";
  * @title Contract for storing blockchain parameters that can be set by governance.
  */
 contract BlockchainParameters is Ownable, Initializable {
-
   struct ClientVersion {
     uint256 major;
     uint256 minor;
@@ -16,7 +15,10 @@ contract BlockchainParameters is Ownable, Initializable {
 
   ClientVersion private minimumClientVersion;
 
+  uint256 public intrinsicGasForAlternativeGasCurrency;
+
   event MinimumClientVersionSet(uint256 major, uint256 minor, uint256 patch);
+  event IntrinsicGasForAlternativeGasCurrencySet(uint256 gas);
 
   /**
    * @notice Initializes critical variables.
@@ -27,16 +29,13 @@ contract BlockchainParameters is Ownable, Initializable {
    * @param patch Minimum client version that can be used in the chain,
    * patch level.
    */
-  function initialize(
-    uint256 major,
-    uint256 minor,
-    uint256 patch
-  )
+  function initialize(uint256 major, uint256 minor, uint256 patch, uint256 _gasForNonGoldCurrencies)
     external
     initializer
   {
     _transferOwnership(msg.sender);
     setMinimumClientVersion(major, minor, patch);
+    setIntrinsicGasForAlternativeGasCurrency(_gasForNonGoldCurrencies);
   }
 
   /**
@@ -52,6 +51,11 @@ contract BlockchainParameters is Ownable, Initializable {
     minimumClientVersion.minor = minor;
     minimumClientVersion.patch = patch;
     emit MinimumClientVersionSet(major, minor, patch);
+  }
+
+  function setIntrinsicGasForAlternativeGasCurrency(uint256 gas) public onlyOwner {
+    intrinsicGasForAlternativeGasCurrency = gas;
+    emit IntrinsicGasForAlternativeGasCurrencySet(gas);
   }
 
   /** @notice Query minimum client version.

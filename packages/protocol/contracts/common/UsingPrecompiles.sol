@@ -1,6 +1,8 @@
 pragma solidity ^0.5.3;
 
+// TODO(asa): Limit assembly usage by using X.staticcall instead.
 contract UsingPrecompiles {
+  address constant PROOF_OF_POSSESSION = address(0xff - 4);
 
   /**
    * @notice calculate a * b^x for fractions a, b to `decimals` precision
@@ -19,11 +21,7 @@ contract UsingPrecompiles {
     uint256 bDenominator,
     uint256 exponent,
     uint256 _decimals
-  )
-    public
-    view
-    returns (uint256, uint256)
-  {
+  ) public view returns (uint256, uint256) {
     require(aDenominator != 0 && bDenominator != 0);
     uint256 returnNumerator;
     uint256 returnDenominator;
@@ -38,10 +36,10 @@ contract UsingPrecompiles {
       mstore(add(newCallDataPosition, 128), exponent)
       mstore(add(newCallDataPosition, 160), _decimals)
       let success := staticcall(
-        1050,                 // estimated gas cost for this function
+        1050, // estimated gas cost for this function
         0xfc,
         newCallDataPosition,
-        0xc4,                 // input size, 6 * 32 = 192 bytes
+        0xc4, // input size, 6 * 32 = 192 bytes
         0,
         0
       )
@@ -52,13 +50,13 @@ contract UsingPrecompiles {
       returndatacopy(returnDataPosition, 0, returnDataSize)
 
       switch success
-      case 0 {
-        revert(returnDataPosition, returnDataSize)
-      }
-      default {
-        returnNumerator := mload(returnDataPosition)
-        returnDenominator := mload(add(returnDataPosition, 32))
-      }
+        case 0 {
+          revert(returnDataPosition, returnDataSize)
+        }
+        default {
+          returnNumerator := mload(returnDataPosition)
+          returnDenominator := mload(add(returnDataPosition, 32))
+        }
     }
     return (returnNumerator, returnDenominator);
   }
@@ -121,5 +119,21 @@ contract UsingPrecompiles {
     }
 
     return numberValidators;
+  }
+
+  /**
+   * @notice Checks a BLS proof of possession.
+   * @param proofOfPossessionBytes The public key and signature of the proof of possession.
+   * @return True upon success.
+   */
+  function checkProofOfPossession(address sender, bytes memory proofOfPossessionBytes)
+    public
+    returns (bool)
+  {
+    bool success;
+    (success, ) = PROOF_OF_POSSESSION.call.value(0).gas(gasleft())(
+      abi.encodePacked(sender, proofOfPossessionBytes)
+    );
+    return success;
   }
 }

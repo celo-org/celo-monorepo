@@ -742,9 +742,6 @@ exports[`BackupQuiz renders correctly 1`] = `
                   "color": "#81868B",
                   "fontFamily": "Hind-SemiBold",
                   "fontSize": 13,
-                  "lineHeight": 17,
-                },
-                Object {
                   "lineHeight": 20,
                   "textAlign": "center",
                 },
@@ -815,9 +812,6 @@ exports[`BackupQuiz renders correctly 1`] = `
                   "color": "#81868B",
                   "fontFamily": "Hind-SemiBold",
                   "fontSize": 13,
-                  "lineHeight": 17,
-                },
-                Object {
                   "lineHeight": 20,
                   "textAlign": "center",
                 },
@@ -888,9 +882,6 @@ exports[`BackupQuiz renders correctly 1`] = `
                   "color": "#81868B",
                   "fontFamily": "Hind-SemiBold",
                   "fontSize": 13,
-                  "lineHeight": 17,
-                },
-                Object {
                   "lineHeight": 20,
                   "textAlign": "center",
                 },
@@ -961,9 +952,6 @@ exports[`BackupQuiz renders correctly 1`] = `
                   "color": "#81868B",
                   "fontFamily": "Hind-SemiBold",
                   "fontSize": 13,
-                  "lineHeight": 17,
-                },
-                Object {
                   "lineHeight": 20,
                   "textAlign": "center",
                 },
@@ -1034,9 +1022,6 @@ exports[`BackupQuiz renders correctly 1`] = `
                   "color": "#81868B",
                   "fontFamily": "Hind-SemiBold",
                   "fontSize": 13,
-                  "lineHeight": 17,
-                },
-                Object {
                   "lineHeight": 20,
                   "textAlign": "center",
                 },
@@ -1107,9 +1092,6 @@ exports[`BackupQuiz renders correctly 1`] = `
                   "color": "#81868B",
                   "fontFamily": "Hind-SemiBold",
                   "fontSize": 13,
-                  "lineHeight": 17,
-                },
-                Object {
                   "lineHeight": 20,
                   "textAlign": "center",
                 },
