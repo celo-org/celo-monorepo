@@ -132,6 +132,23 @@ describe('governance tests', () => {
     return blockNumber % epochSize === 0
   }
 
+  const assertBalanceChanged = async (
+    address: string,
+    blockNumber: number,
+    expected: BigNumber,
+    token: any
+  ) => {
+    const currentBalance = new BigNumber(
+      await token.methods.balanceOf(address).call({}, blockNumber)
+    )
+    const previousBalance = new BigNumber(
+      await token.methods.balanceOf(address).call({}, blockNumber - 1)
+    )
+    assert.isNotNaN(currentBalance)
+    assert.isNotNaN(previousBalance)
+    assertAlmostEqual(currentBalance.minus(previousBalance), expected)
+  }
+
   describe('when the validator set is changing', () => {
     let epoch: number
     const blockNumbers: number[] = []
@@ -249,28 +266,28 @@ describe('governance tests', () => {
 
       const assertScoreUnchanged = async (validator: string, blockNumber: number) => {
         const score = new BigNumber(
-          (await validators.methods.getValidator(validator).call({}, blockNumber))[3]
+          (await validators.methods.getValidator(validator).call({}, blockNumber))[2]
         )
         const previousScore = new BigNumber(
-          (await validators.methods.getValidator(validator).call({}, blockNumber - 1))[3]
+          (await validators.methods.getValidator(validator).call({}, blockNumber - 1))[2]
         )
-        assert.isNotNaN(score)
-        assert.isNotNaN(previousScore)
+        assert.isFalse(score.isNaN())
+        assert.isFalse(previousScore.isNaN())
         assert.equal(score.toFixed(), previousScore.toFixed())
       }
 
       const assertScoreChanged = async (validator: string, blockNumber: number) => {
         const score = new BigNumber(
-          (await validators.methods.getValidator(validator).call({}, blockNumber))[3]
+          (await validators.methods.getValidator(validator).call({}, blockNumber))[2]
         )
         const previousScore = new BigNumber(
-          (await validators.methods.getValidator(validator).call({}, blockNumber - 1))[3]
+          (await validators.methods.getValidator(validator).call({}, blockNumber - 1))[2]
         )
+        assert.isFalse(score.isNaN())
+        assert.isFalse(previousScore.isNaN())
         const expectedScore = adjustmentSpeed
           .times(uptime)
           .plus(new BigNumber(1).minus(adjustmentSpeed).times(fromFixed(previousScore)))
-        assert.isNotNaN(score)
-        assert.isNotNaN(previousScore)
         assert.equal(score.toFixed(), toFixed(expectedScore).toFixed())
       }
 
@@ -302,24 +319,8 @@ describe('governance tests', () => {
       )
       const [group] = await validators.methods.getRegisteredValidatorGroups().call()
 
-      const assertBalanceChanged = async (
-        validator: string,
-        blockNumber: number,
-        expected: BigNumber
-      ) => {
-        const currentBalance = new BigNumber(
-          await stableToken.methods.balanceOf(validator).call({}, blockNumber)
-        )
-        const previousBalance = new BigNumber(
-          await stableToken.methods.balanceOf(validator).call({}, blockNumber - 1)
-        )
-        assert.isNotNaN(currentBalance)
-        assert.isNotNaN(previousBalance)
-        assertAlmostEqual(currentBalance.minus(previousBalance), expected)
-      }
-
       const assertBalanceUnchanged = async (validator: string, blockNumber: number) => {
-        await assertBalanceChanged(validator, blockNumber, new BigNumber(0))
+        await assertBalanceChanged(validator, blockNumber, new BigNumber(0), stableToken)
       }
 
       const getExpectedTotalPayment = async (validator: string, blockNumber: number) => {
@@ -359,17 +360,19 @@ describe('governance tests', () => {
           await assertBalanceChanged(
             validator,
             blockNumber,
-            expectedTotalPayment.minus(groupPayment)
+            expectedTotalPayment.minus(groupPayment),
+            stableToken
           )
           expectedGroupPayment = expectedGroupPayment.plus(groupPayment)
         }
-        await assertBalanceChanged(group, blockNumber, expectedGroupPayment)
+        await assertBalanceChanged(group, blockNumber, expectedGroupPayment, stableToken)
       }
     })
 
     it('should distribute epoch rewards at the end of each epoch', async () => {
       const lockedGold = await kit._web3Contracts.getLockedGold()
       const governance = await kit._web3Contracts.getGovernance()
+      const gasPriceMinimum = await kit._web3Contracts.getGasPriceMinimum()
       const [group] = await validators.methods.getRegisteredValidatorGroups().call()
 
       const assertVotesChanged = async (blockNumber: number, expected: BigNumber) => {
@@ -380,6 +383,13 @@ describe('governance tests', () => {
           await election.methods.getTotalVotesForGroup(group).call({}, blockNumber - 1)
         )
         assertAlmostEqual(currentVotes.minus(previousVotes), expected)
+      }
+
+      // Returns the gas fee base for a given block, which is distributed to the governance contract.
+      const blockBaseGasFee = async (blockNumber: number): Promise<BigNumber> => {
+        const gas = (await web3.eth.getBlock(blockNumber)).gasUsed
+        const gpm = await gasPriceMinimum.methods.gasPriceMinimum().call({}, blockNumber)
+        return new BigNumber(gpm).times(new BigNumber(gas))
       }
 
       const assertGoldTokenTotalSupplyChanged = async (
@@ -395,26 +405,12 @@ describe('governance tests', () => {
         assertAlmostEqual(currentSupply.minus(previousSupply), expected)
       }
 
-      const assertBalanceChanged = async (
-        address: string,
-        blockNumber: number,
-        expected: BigNumber
-      ) => {
-        const currentBalance = new BigNumber(
-          await goldToken.methods.balanceOf(address).call({}, blockNumber)
-        )
-        const previousBalance = new BigNumber(
-          await goldToken.methods.balanceOf(address).call({}, blockNumber - 1)
-        )
-        assertAlmostEqual(currentBalance.minus(previousBalance), expected)
-      }
-
       const assertLockedGoldBalanceChanged = async (blockNumber: number, expected: BigNumber) => {
-        await assertBalanceChanged(lockedGold.options.address, blockNumber, expected)
+        await assertBalanceChanged(lockedGold.options.address, blockNumber, expected, goldToken)
       }
 
       const assertGovernanceBalanceChanged = async (blockNumber: number, expected: BigNumber) => {
-        await assertBalanceChanged(governance.options.address, blockNumber, expected)
+        await assertBalanceChanged(governance.options.address, blockNumber, expected, goldToken)
       }
 
       const assertVotesUnchanged = async (blockNumber: number) => {
@@ -427,10 +423,6 @@ describe('governance tests', () => {
 
       const assertLockedGoldBalanceUnchanged = async (blockNumber: number) => {
         await assertLockedGoldBalanceChanged(blockNumber, new BigNumber(0))
-      }
-
-      const assertGovernanceBalanceUnchanged = async (blockNumber: number) => {
-        await assertGovernanceBalanceChanged(blockNumber, new BigNumber(0))
       }
 
       const getStableTokenSupplyChange = async (blockNumber: number) => {
@@ -477,13 +469,16 @@ describe('governance tests', () => {
             .plus(stableTokenSupplyChange.div(exchangeRate))
           await assertVotesChanged(blockNumber, expectedEpochReward)
           await assertLockedGoldBalanceChanged(blockNumber, expectedEpochReward)
-          await assertGovernanceBalanceChanged(blockNumber, expectedInfraReward)
+          await assertGovernanceBalanceChanged(
+            blockNumber,
+            expectedInfraReward.plus(await blockBaseGasFee(blockNumber))
+          )
           await assertGoldTokenTotalSupplyChanged(blockNumber, expectedGoldTotalSupplyChange)
         } else {
           await assertVotesUnchanged(blockNumber)
           await assertGoldTokenTotalSupplyUnchanged(blockNumber)
           await assertLockedGoldBalanceUnchanged(blockNumber)
-          await assertGovernanceBalanceUnchanged(blockNumber)
+          await assertGovernanceBalanceChanged(blockNumber, await blockBaseGasFee(blockNumber))
         }
       }
     })
