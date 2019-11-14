@@ -13,7 +13,7 @@ contract MockValidators is IValidators {
   mapping(address => address[]) private members;
   uint256 private numRegisteredValidators;
 
-  function updateEcdsaKey(address, address, bytes calldata) external returns (bool) {
+  function updateEcdsaKey(address, address, bytes calldata) external pure returns (bool) {
     return true;
   }
 

@@ -1,3 +1,5 @@
+// tslint:disable-next-line: no-reference (Required to make this work w/ ts-node)
+/// <reference path="../../../contractkit/types/web3.d.ts" />
 import { ContractKit, newKitFromWeb3 } from '@celo/contractkit'
 import { getBlsPoP, getBlsPublicKey } from '@celo/utils/lib/bls'
 import { fromFixed, toFixed } from '@celo/utils/lib/fixidity'
@@ -138,15 +140,18 @@ describe('governance tests', () => {
   }
 
   const authorizeValidatorSigner = async (validatorWeb3: any, signerWeb3: any) => {
-    const validator = (await validatorWeb3.eth.getAccounts())[0]
-    const signer = (await signerWeb3.eth.getAccounts())[0]
+    const validator: string = (await validatorWeb3.eth.getAccounts())[0]
+    const signer: string = (await signerWeb3.eth.getAccounts())[0]
     await unlockAccount(validator, validatorWeb3)
     await unlockAccount(signer, signerWeb3)
     const pop = await (await newKitFromWeb3(
       signerWeb3
     ).contracts.getAccounts()).generateProofOfSigningKeyPossession(validator, signer)
     const accountsWrapper = await newKitFromWeb3(validatorWeb3).contracts.getAccounts()
-    await accountsWrapper.authorizeValidatorSigner(signer, pop)
+    return await (await accountsWrapper.authorizeValidatorSigner(
+      signer,
+      pop
+    )).sendAndWaitForReceipt({ from: validator })
   }
 
   const updateValidatorBlsKey = async (
@@ -154,14 +159,16 @@ describe('governance tests', () => {
     signerWeb3: any,
     signerPrivateKey: string
   ) => {
-    const validator = (await validatorWeb3.eth.getAccounts())[0]
-    const signer = (await signerWeb3.eth.getAccounts())[0]
+    const validator: string = (await validatorWeb3.eth.getAccounts())[0]
+    const signer: string = (await signerWeb3.eth.getAccounts())[0]
     await unlockAccount(signer, signerWeb3)
     const blsPublicKey = getBlsPublicKey(signerPrivateKey)
     const blsPop = getBlsPoP(validator, signerPrivateKey)
     // TODO(asa): Send this from the signer instead.
     const validatorsWrapper = await newKitFromWeb3(validatorWeb3).contracts.getValidators()
-    await validatorsWrapper.updateBlsPublicKey(blsPublicKey, blsPop)
+    return await validatorsWrapper
+      .updateBlsPublicKey(blsPublicKey, blsPop)
+      .sendAndWaitForReceipt({ from: validator })
   }
 
   const isLastBlockOfEpoch = (blockNumber: number, epochSize: number) => {
@@ -339,7 +346,7 @@ describe('governance tests', () => {
       const signingKeys = await getValidatorSetSignersAtBlock(blockNumber)
       return Promise.all(
         signingKeys.map((address: string) =>
-          accounts.methods.validatorSignerToAccount(address).call({}, blockNumber)
+          accounts.methods.signerToAccount(address).call({}, blockNumber)
         )
       )
     }
@@ -387,7 +394,7 @@ describe('governance tests', () => {
               async (_, i) => (await web3.eth.getBlock(lastEpochBlock + i + 1)).miner
             )
           )
-          assert.sameMembers(validatorSet, roundRobinOrder)
+          assert.sameMembers(roundRobinOrder, validatorSet)
         }
         const indexInEpoch = blockNumber - lastEpochBlock - 1
         const expectedProposer = roundRobinOrder[indexInEpoch % roundRobinOrder.length]
