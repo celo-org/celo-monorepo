@@ -9,12 +9,14 @@ import {
 } from '@celo/protocol/lib/web3-utils'
 import { blsPrivateKeyToProcessedPrivateKey } from '@celo/utils/lib/bls'
 import { add0x } from '../lib/generate_utils'
+import BigNumber from 'bignumber.js'
 
 export async function importAndUnlockAccount(
   web3: Web3,
   keystorePath: string,
   password: string = ''
 ) {
+  console.log(keystorePath)
   const keystore = fs.readFileSync(keystorePath, 'utf8')
   // @ts-ignore
   const account = web3.eth.accounts.decrypt(keystore, password)
@@ -40,7 +42,7 @@ export function getPublicKeysData(validatorPrivateKey: string) {
 }
 
 export async function lockGoldIfNeeded(web3: Web3, from: string) {
-  const minLockedGold = 20000000000000000000000
+  const minLockedGold = new BigNumber(20000000000000000000000)
   const kit = newKitFromWeb3(web3)
   const lockedGoldContract = await kit.contracts.getLockedGold()
   const nonvotingGold = await lockedGoldContract.getAccountNonvotingLockedGold(from)
@@ -51,4 +53,8 @@ export async function lockGoldIfNeeded(web3: Web3, from: string) {
       value: minLockedGold.toString(),
     })
   }
+}
+
+export function delay(ms: number) {
+  return new Promise((resolve) => setTimeout(resolve, ms))
 }
