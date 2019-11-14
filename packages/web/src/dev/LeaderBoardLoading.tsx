@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { StyleSheet, View } from 'react-native'
-import { I18nProps, NameSpaces, withNamespaces } from 'src/i18n'
+import { I18nProps, withNamespaces } from 'src/i18n'
 import Spinner from 'src/shared/Spinner'
 import { colors } from 'src/styles'
 
@@ -21,4 +21,4 @@ const styles = StyleSheet.create({
   },
 })
 
-export default withNamespaces(NameSpaces.baklava)(LeaderBoardLoading)
+export default withNamespaces('dev')(LeaderBoardLoading)

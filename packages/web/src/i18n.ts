@@ -26,5 +26,4 @@ export enum NameSpaces {
   jobs = 'jobs',
   terms = 'terms',
   technology = 'technology',
-  baklava = 'baklava',
 }

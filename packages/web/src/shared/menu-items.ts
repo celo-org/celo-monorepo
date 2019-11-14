@@ -19,10 +19,6 @@ export const menuItems = {
     name: 'Build',
     link: '/build',
   },
-  MAKE: {
-    name: 'Make',
-    link: '/baklava',
-  },
   APPLICATIONS: {
     name: 'Applications',
     link: '/applications',
