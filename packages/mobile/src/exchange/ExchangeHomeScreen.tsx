@@ -1,3 +1,4 @@
+import Button, { BtnTypes } from '@celo/react-components/components/Button'
 import ScrollContainer from '@celo/react-components/components/ScrollContainer'
 import SectionHeadNew from '@celo/react-components/components/SectionHeadNew'
 import SmallButton from '@celo/react-components/components/SmallButton'
@@ -61,11 +62,22 @@ export class ExchangeHomeScreen extends React.Component<Props> {
             <AccountOverview testID="ExchangeAccountOverview" />
             <View style={styles.lowerTop}>
               <ExchangeRate rate={exchangeRate} makerToken={Token.DOLLAR} />
-              <SmallButton
-                text={t('exchange')}
-                solid={true}
+            </View>
+            <View style={styles.buttonContainer}>
+              <Button
+                text={t('buy')}
                 onPress={goToTrade}
                 style={styles.button}
+                standard={true}
+                type={BtnTypes.PRIMARY}
+              />
+              <View style={styles.buttonDivider} />
+              <Button
+                text={t('sell')}
+                onPress={goToTrade}
+                style={styles.button}
+                standard={true}
+                type={BtnTypes.PRIMARY}
               />
             </View>
           </View>
@@ -110,7 +122,17 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingBottom: 20,
   },
+  buttonContainer: {
+    flexDirection: 'row',
+    marginHorizontal: 16,
+  },
   button: {
-    alignSelf: 'center',
+    alignItems: 'center',
+    justifyContent: 'space-around',
+    paddingHorizontal: 20,
+    flex: 1,
+  },
+  buttonDivider: {
+    marginLeft: 16,
   },
 })

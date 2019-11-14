@@ -7,6 +7,8 @@
   "exchangeRate": "Estimated Exchange Rate",
   "history": "History",
   "exchange": "Exchange",
+  "buy": "Buy",
+  "sell": "Sell",
   "cancel": "Cancel",
   "includeExchangeFee": "*includes exchange fee",
   "available": "Available",

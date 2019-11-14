@@ -7,6 +7,8 @@
   "exchangeRate": "Estimada tasa de cambio",
   "history": "Historial",
   "exchange": "Cambio",
+  "buy": "Comprar",
+  "sell": "Vender",
   "cancel": "Cancelar",
   "includeExchangeFee": "* incluye la comisión de cambio",
   "available": "Disponible",
