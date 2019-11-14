@@ -24,8 +24,17 @@ const LEADERS = [
 /* tslint:disable-next-line */
 console.log(LEADERS)
 
-const graphqlURI = getConfig().publicRuntimeConfig.LEADERBOARD_URI
+const graphqlURI = getConfig().publicRuntimeConfig.LEADERBOARD.uri
 
+const createApolloClient = () => {
+  return new ApolloClient({
+    uri: graphqlURI,
+    cache: new InMemoryCache(),
+    fetch,
+  })
+}
+
+// TODO (@diminator): change once leaderboard endpoint is ready
 const query = gql`
   query AddresessOrderedByBalance {
     addresses(
@@ -37,14 +46,6 @@ const query = gql`
     }
   }
 `
-
-const createApolloClient = () => {
-  return new ApolloClient({
-    uri: graphqlURI,
-    cache: new InMemoryCache(),
-    fetch,
-  })
-}
 
 class LeaderBoardApp extends React.PureComponent<I18nProps> {
   render() {
@@ -58,6 +59,7 @@ class LeaderBoardApp extends React.PureComponent<I18nProps> {
             if (error) {
               return <LeaderBoardError error={error} />
             }
+            // TODO (@diminator): change once leaderboard endpoint is ready
             const LEADERS = data.addresses.map((account) => {
               return {
                 identity: account.hash,
