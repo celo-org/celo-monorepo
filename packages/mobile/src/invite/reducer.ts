@@ -30,6 +30,7 @@ export const inviteReducer = (
         ...state,
         ...getRehydratePayload(action, 'invite'),
         isSendingInvite: false,
+        isRedeemingInvite: false,
       }
     }
     case Actions.SEND_INVITE:
