@@ -90,7 +90,7 @@ export default class PhoneNumberInput extends React.Component<Props, State> {
         this.onChangeCountryQuery(displayName)
       }
     } catch (error) {
-      console.error(`${TAG}/triggerPhoneNumberRequestAndroid`, 'Could not request phone', error)
+      console.info(`${TAG}/triggerPhoneNumberRequestAndroid`, 'Could not request phone', error)
     }
   }
 
@@ -102,7 +102,7 @@ export default class PhoneNumberInput extends React.Component<Props, State> {
         console.info(`${TAG}/triggerPhoneNumberRequest`, 'Not implemented in this platform')
       }
     } catch (error) {
-      console.error(`${TAG}/triggerPhoneNumberRequest`, 'Could not request phone', error)
+      console.info(`${TAG}/triggerPhoneNumberRequest`, 'Could not request phone', error)
     }
   }
 
