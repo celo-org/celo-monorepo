@@ -4,6 +4,8 @@ import * as React from 'react'
 import { Platform } from 'react-native'
 import { fireEvent, render } from 'react-native-testing-library'
 
+const testNumber = '123'
+
 jest.mock('@celo/react-native-sms-retriever', () => {
   return {
     requestPhoneNumber: jest.fn(() => '+49030111111'),
@@ -77,5 +79,33 @@ describe('when defaultCountry is truthy', () => {
         wrapper.findWhere((node) => node.prop('testID') === 'CountryNameField').props().defaultValue
       ).toBe('Germany')
     })
+  })
+
+  it("Don't trigger Native phone picker if there's data in the form", async () => {
+    // mock
+    Platform.OS = 'android'
+
+    const wrapper = shallow<PhoneNumberInput>(
+      <PhoneNumberInput
+        setE164Number={jest.fn()}
+        setCountryCode={jest.fn()}
+        setIsValidNumber={jest.fn()}
+      />
+    )
+
+    wrapper.instance().setState({ phoneNumber: testNumber })
+    await wrapper.instance().triggerPhoneNumberRequest()
+
+    expect(
+      wrapper.findWhere((node) => node.prop('testID') === 'PhoneNumberField').props().value
+    ).toBe(testNumber)
+    expect(wrapper.instance().state.countryCallingCode).toEqual('')
+
+    expect(
+      wrapper.findWhere((node) => node.prop('testID') === 'contryCodeText').props().children
+    ).toBe('')
+    expect(
+      wrapper.findWhere((node) => node.prop('testID') === 'CountryNameField').props().defaultValue
+    ).toBe('')
   })
 })
