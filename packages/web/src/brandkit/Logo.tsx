@@ -6,7 +6,7 @@ import { colors } from 'src/styles'
 import Page from 'src/brandkit/Page'
 
 export default withNamespaces()(
-  React.memo(function Color() {
+  React.memo(function Logo() {
     return (
       <Page
         sections={[
