@@ -73,7 +73,7 @@ class HomeAnimation extends React.Component<Props & ScreenProps> {
             mode === Mode.transition && styles.fadeOut,
           ]}
         >
-          <View style={[styles.stillMobile]}>
+          <View style={[styles.stillMobile, mode === Mode.transition && styles.fadeOut]}>
             <HomeOracle />
           </View>
         </Responsive>
@@ -93,7 +93,6 @@ class HomeAnimation extends React.Component<Props & ScreenProps> {
         >
           <Source src={this.source()} type="video/mp4" />
         </Video>
-        {/* <canvas> */}
       </Responsive>
     )
   }
