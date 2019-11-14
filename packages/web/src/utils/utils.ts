@@ -23,8 +23,9 @@ interface Speeds {
 
 export async function getNetworkDownloadSpeed() {
   const testNetworkSpeed = new NetworkSpeed()
-  const baseUrl = 'http://eu.httpbin.org/stream-bytes/50000000'
-  const fileSize = 500000
+  const fileSize = 5000000
+  const baseUrl = `http://eu.httpbin.org/stream-bytes/${fileSize}`
+
   const speed: Speeds = await testNetworkSpeed.checkDownloadSpeed(baseUrl, fileSize)
   return speed
 }
