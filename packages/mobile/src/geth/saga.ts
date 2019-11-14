@@ -43,7 +43,6 @@ export function* waitForGethConnectivity() {
 
 function* waitForGethInstance() {
   const zeroSyncMode = yield select(zeroSyncSelector)
-  Logger.error(TAG, `zeroSync mode: ${zeroSyncMode}`)
   if (zeroSyncMode) {
     return GethInitOutcomes.SUCCESS
   }

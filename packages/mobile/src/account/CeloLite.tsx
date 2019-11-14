@@ -10,6 +10,7 @@ import { connect } from 'react-redux'
 import i18n, { Namespaces } from 'src/i18n'
 import { headerWithBackButton } from 'src/navigator/Headers'
 import { RootState } from 'src/redux/reducers'
+import { restartApp } from 'src/utils/AppRestart'
 import { toggleZeroSyncMode } from 'src/web3/actions'
 
 interface StateProps {
@@ -56,9 +57,10 @@ export class CeloLite extends React.Component<Props, State> {
     this.setState({ modalVisible: false })
   }
 
-  onPressRestartModal = () => {
+  onPressToggleAndRestartModal = () => {
     this.props.toggleZeroSyncMode(false)
     this.hideModal()
+    restartApp()
   }
 
   handleZeroSyncToggle = (zeroSyncMode: boolean) => {
@@ -90,7 +92,7 @@ export class CeloLite extends React.Component<Props, State> {
               <TextButton onPress={this.hideModal} style={styles.modalCancelText}>
                 {t('global:cancel')}
               </TextButton>
-              <TextButton onPress={this.onPressRestartModal} style={styles.modalSkipText}>
+              <TextButton onPress={this.onPressToggleAndRestartModal} style={styles.modalSkipText}>
                 {t('restartModal.restart')}
               </TextButton>
             </View>
