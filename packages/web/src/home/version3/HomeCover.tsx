@@ -15,6 +15,8 @@ interface State {
   mode: Mode
 }
 
+const DURATION = 3000
+
 class HomeCover extends React.PureComponent<Props, State> {
   state = {
     playing: false,
@@ -31,23 +33,26 @@ class HomeCover extends React.PureComponent<Props, State> {
 
   componentDidMount = async () => {
     const goodConnection = await hasGoodConnection()
-    setTimeout(() => {
-      this.setState({ mode: goodConnection && getDeviceMemory() >= 2 ? Mode.video : Mode.graphic })
-    }, 4000)
+
+    if (!goodConnection || getDeviceMemory() <= 2) {
+      this.setState({ mode: Mode.graphic })
+    } else {
+      this.setState({ mode: Mode.transition })
+      setTimeout(() => {
+        this.setState({ mode: Mode.video })
+      }, DURATION)
+    }
   }
 
   render() {
+    const { mode } = this.state
     return (
       <Responsive large={styles.largeCover} medium={styles.mediumCover}>
         <View style={styles.smallCover}>
           <View style={styles.animationBackground}>
             <Responsive large={[styles.animationWrapper, styles.animationWrapperLargeAug]}>
               <View style={styles.animationWrapper}>
-                <HomeAnimation
-                  onLoaded={this.onLoaded}
-                  onFinished={this.onFinished}
-                  mode={this.state.mode}
-                />
+                <HomeAnimation onLoaded={this.onLoaded} onFinished={this.onFinished} mode={mode} />
               </View>
             </Responsive>
           </View>
@@ -57,7 +62,7 @@ class HomeCover extends React.PureComponent<Props, State> {
                 <View style={styles.textWrapper}>
                   <TextAnimation
                     playing={this.state.playing}
-                    stillMode={this.state.mode === Mode.wait}
+                    stillMode={mode === Mode.wait || mode === Mode.transition}
                   />
                   <Responsive
                     large={styles.content}

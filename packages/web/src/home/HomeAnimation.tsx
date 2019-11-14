@@ -15,6 +15,7 @@ export interface Props {
 }
 export enum Mode {
   'wait',
+  'transition',
   'video',
   'graphic',
 }
@@ -62,9 +63,16 @@ class HomeAnimation extends React.Component<Props & ScreenProps> {
   }
 
   render() {
-    if (this.props.mode === Mode.graphic || this.props.mode === Mode.wait) {
+    const { mode } = this.props
+    if (mode === Mode.graphic || mode === Mode.wait || mode === Mode.transition) {
       return (
-        <Responsive large={[styles.still, standardStyles.centered]}>
+        <Responsive
+          large={[
+            styles.still,
+            standardStyles.centered,
+            mode === Mode.transition && styles.fadeOut,
+          ]}
+        >
           <View style={[styles.stillMobile]}>
             <HomeOracle />
           </View>
@@ -94,6 +102,21 @@ class HomeAnimation extends React.Component<Props & ScreenProps> {
 export default withScreenSize(HomeAnimation)
 
 export const styles = StyleSheet.create({
+  fadeOut: {
+    animationFillMode: 'both',
+    animationDelay: '2700ms',
+    animationDuration: '300ms',
+    animationKeyframes: [
+      {
+        from: {
+          opacity: 1,
+        },
+        to: {
+          opacity: 0.1,
+        },
+      },
+    ],
+  },
   still: {
     height: 'calc(100% - 250px)',
     justifyContent: 'center',
