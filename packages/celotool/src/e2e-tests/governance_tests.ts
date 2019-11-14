@@ -258,7 +258,7 @@ describe('governance tests', () => {
       }
     })
 
-    it.only('should update the validator scores at the end of each epoch', async () => {
+    it('should update the validator scores at the end of each epoch', async () => {
       const adjustmentSpeed = fromFixed(
         new BigNumber((await validators.methods.getValidatorScoreParameters().call())[1])
       )
