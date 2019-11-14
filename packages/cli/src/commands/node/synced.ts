@@ -9,7 +9,6 @@ export default class NodeSynced extends BaseCommand {
     ...BaseCommand.flags,
     verbose: flags.boolean({
       description: 'output the full status if syncing',
-      char: 'v',
     }),
   }
 
