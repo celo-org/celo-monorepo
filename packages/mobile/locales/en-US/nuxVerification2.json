@@ -69,8 +69,8 @@
     "skip": "Skip for now"
   },
   "failModal": {
-    "header": "Verification has failed :(",
-    "body1": "An issue has occured while verifying your phone number. Sorry for the inconvenience!",
+    "header": "Verification failed",
+    "body1": "An issue has occured while verifying your phone number.",
     "body2": "You can skip verification for now and try again later."
   },
   "congratsVerified": "Congratulations you are now verified!"
