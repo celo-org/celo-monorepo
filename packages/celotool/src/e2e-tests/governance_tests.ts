@@ -39,7 +39,7 @@ describe('governance tests', () => {
 
   before(async function(this: any) {
     this.timeout(0)
-    await context.hooks.before()
+    // await context.hooks.before()
   })
 
   after(context.hooks.after)
@@ -149,7 +149,7 @@ describe('governance tests', () => {
     assertAlmostEqual(currentBalance.minus(previousBalance), expected)
   }
 
-  describe('when the validator set is changing', () => {
+  describe.only('when the validator set is changing', () => {
     let epoch: number
     const blockNumbers: number[] = []
     let allValidators: string[]
@@ -180,7 +180,9 @@ describe('governance tests', () => {
         await sleep(0.1)
       } while (blockNumber % epoch !== 1)
 
+      console.log('activating')
       await activate(allValidators[0])
+      console.log('activated')
       const groupWeb3 = new Web3('ws://localhost:8567')
       const groupKit = newKitFromWeb3(groupWeb3)
       validators = await groupKit._web3Contracts.getValidators()
@@ -194,8 +196,11 @@ describe('governance tests', () => {
         if (header.number % epoch === 1) {
           const memberToRemove = membersToSwap[includedMemberIndex]
           const memberToAdd = membersToSwap[(includedMemberIndex + 1) % 2]
+          console.log('removing member')
           await removeMember(groupWeb3, groupAddress, memberToRemove)
+          console.log('adding member')
           await addMember(groupWeb3, groupAddress, memberToAdd)
+          console.log('done swapping member')
           includedMemberIndex = (includedMemberIndex + 1) % 2
           const newMembers = await getValidatorGroupMembers()
           assert.include(newMembers, memberToAdd)
@@ -258,36 +263,42 @@ describe('governance tests', () => {
       }
     })
 
-    it('should update the validator scores at the end of each epoch', async () => {
+    it.only('should update the validator scores at the end of each epoch', async () => {
       const adjustmentSpeed = fromFixed(
         new BigNumber((await validators.methods.getValidatorScoreParameters().call())[1])
       )
       const uptime = 1
 
       const assertScoreUnchanged = async (validator: string, blockNumber: number) => {
+        console.log('asserting score unchanged', blockNumber, blockNumber - 1, validator)
+        console.log(await validators.methods.getValidator(validator).call({}, blockNumber))
+        console.log(await validators.methods.getValidator(validator).call({}, blockNumber - 1))
         const score = new BigNumber(
-          (await validators.methods.getValidator(validator).call({}, blockNumber))[3]
+          (await validators.methods.getValidator(validator).call({}, blockNumber))[2]
         )
         const previousScore = new BigNumber(
-          (await validators.methods.getValidator(validator).call({}, blockNumber - 1))[3]
+          (await validators.methods.getValidator(validator).call({}, blockNumber - 1))[2]
         )
-        assert.isNotNaN(score)
-        assert.isNotNaN(previousScore)
+        assert.isFalse(score.isNaN())
+        assert.isFalse(previousScore.isNaN())
+        console.log('got scores')
         assert.equal(score.toFixed(), previousScore.toFixed())
       }
 
       const assertScoreChanged = async (validator: string, blockNumber: number) => {
+        console.log('asserting score changed')
         const score = new BigNumber(
-          (await validators.methods.getValidator(validator).call({}, blockNumber))[3]
+          (await validators.methods.getValidator(validator).call({}, blockNumber))[2]
         )
         const previousScore = new BigNumber(
-          (await validators.methods.getValidator(validator).call({}, blockNumber - 1))[3]
+          (await validators.methods.getValidator(validator).call({}, blockNumber - 1))[2]
         )
+        assert.isFalse(score.isNaN())
+        assert.isFalse(previousScore.isNaN())
+        console.log('got scores')
         const expectedScore = adjustmentSpeed
           .times(uptime)
           .plus(new BigNumber(1).minus(adjustmentSpeed).times(fromFixed(previousScore)))
-        assert.isNotNaN(score)
-        assert.isNotNaN(previousScore)
         assert.equal(score.toFixed(), toFixed(expectedScore).toFixed())
       }
 
