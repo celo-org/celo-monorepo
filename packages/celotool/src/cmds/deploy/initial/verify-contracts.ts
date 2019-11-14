@@ -1,9 +1,9 @@
-import * as yargs from 'yargs'
-import { InitialArgv } from '../../deploy/initial'
 import { switchToClusterFromEnv } from 'src/lib/cluster'
 import { getBlockscoutUrl } from 'src/lib/endpoints'
 import { portForwardAnd } from 'src/lib/port_forward'
 import { execCmd } from 'src/lib/utils'
+import yargs from 'yargs'
+import { InitialArgv } from '../../deploy/initial'
 
 export const command = 'verify-contracts'
 
@@ -27,7 +27,7 @@ export const handler = async (argv: VerifyContractsInitialArgv) => {
   const blockscoutUrl = getBlockscoutUrl(argv)
 
   console.debug(
-    `Validating smart contracts ${argv.contract} in ${argv.celoEnv} for ulr ${blockscoutUrl}`
+    `Validating smart contracts ${argv.contract} in ${argv.celoEnv} for URL ${blockscoutUrl}`
   )
 
   const cb = async () => {
