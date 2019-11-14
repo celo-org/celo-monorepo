@@ -697,8 +697,7 @@ workflows:
             - install_dependencies
       - end-to-end-geth-transfer-test:
           requires:
-            - lint-checks
-            - contractkit-test
+            - install_dependencies
   npm-install-testing-cron-workflow:
     triggers:
       - schedule:
