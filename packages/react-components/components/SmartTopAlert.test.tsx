@@ -10,6 +10,7 @@ describe('SmartTopAlert', () => {
   it('renders correctly', async () => {
     const { toJSON } = render(
       <SmartTopAlert
+        timestamp={Date.now()}
         dismissAfter={5}
         title={'Smart Top Alert'}
         text="dont get funny"

@@ -1,24 +1,61 @@
 import * as React from 'react'
 import { Clipboard } from 'react-native'
+import RNInstallReferrer from 'react-native-install-referrer'
 import SendIntentAndroid from 'react-native-send-intent'
-import { fireEvent, render } from 'react-native-testing-library'
+import {
+  fireEvent,
+  flushMicrotasksQueue,
+  render,
+  waitForElement,
+} from 'react-native-testing-library'
 import { Provider } from 'react-redux'
 import * as renderer from 'react-test-renderer'
 import { ErrorMessages } from 'src/app/ErrorMessages'
 import EnterInviteCode, {
   EnterInviteCode as EnterInviteCodeClass,
 } from 'src/invite/EnterInviteCode'
-import {
-  PARTIAL_INVITE,
-  PARTIAL_INVITE_KEY,
-  VALID_INVITE,
-  VALID_INVITE_KEY,
-} from 'src/invite/utils.test'
 import { createMockStore, getMockI18nProps } from 'test/utils'
+
+jest.mock('src/config', () => {
+  return {
+    ...jest.requireActual('src/config'),
+    SHOW_GET_INVITE_LINK: true,
+  }
+})
+
+const VALID_INVITE =
+  'Something something pFCr5NAAf/vUcWypJiQFnF6DHI+6vCGxMhhShki07ow= another thing else'
+const VALID_INVITE_KEY = '0xa450abe4d0007ffbd4716ca92624059c5e831c8fbabc21b13218528648b4ee8c'
+const PARTIAL_INVITE =
+  'Hi! I would like to invite you to join the Celo payments network. Your invite code is: ndoILWBXFR1+C59M3QKcEA7rWP7+2u5XQKC1gTemXBo= You can install the C'
+const PARTIAL_INVITE_KEY = '0x9dda082d6057151d7e0b9f4cdd029c100eeb58fefedaee5740a0b58137a65c1a'
+const VALID_REFERRER_INVITE = {
+  clickTimestamp: '1573135549',
+  installReferrer: 'invite-code=p9f1XCB7kRAgIbLvHhiGvx2Ps9HlWMkyEF9ywkj9xT8=',
+  installTimestamp: '1573135556',
+}
+const VALID_REFERRER_INVITE_KEY =
+  '0xa7d7f55c207b91102021b2ef1e1886bf1d8fb3d1e558c932105f72c248fdc53f'
+const INVALID_REFERRER_INVITE = {
+  clickTimestamp: '1573135549',
+  installReferrer: 'invite-code=abc',
+  installTimestamp: '1573135556',
+}
 
 SendIntentAndroid.openSMSApp = jest.fn()
 
+const clipboardGetStringMock = (Clipboard.getString = jest.fn())
+const getReferrerMock = RNInstallReferrer.getReferrer as jest.Mock
+
 describe('EnterInviteCode Screen', () => {
+  beforeAll(() => {
+    jest.useRealTimers()
+  })
+
+  beforeEach(() => {
+    jest.clearAllMocks()
+  })
+
   it('renders correctly', () => {
     const store = createMockStore()
     const tree = renderer.create(
@@ -42,7 +79,7 @@ describe('EnterInviteCode Screen', () => {
   it('works with partial invite text in clipboard', async () => {
     const store = createMockStore()
     const redeem = jest.fn()
-    Clipboard.getString = jest.fn(() => Promise.resolve(PARTIAL_INVITE))
+    clipboardGetStringMock.mockResolvedValue(PARTIAL_INVITE)
     const wrapper = render(
       <Provider store={store}>
         <EnterInviteCodeClass
@@ -56,16 +93,16 @@ describe('EnterInviteCode Screen', () => {
         />
       </Provider>
     )
-    await Clipboard.getString()
-    expect(wrapper.queryByTestId('pasteMessageButton')).not.toBeNull()
-    fireEvent.press(wrapper.getByTestId('pasteMessageButton'))
-    await Clipboard.getString()
+
+    const button = await waitForElement(() => wrapper.getByTestId('pasteMessageButton'))
+    fireEvent.press(button)
+    await flushMicrotasksQueue()
     expect(redeem).toHaveBeenCalledWith(PARTIAL_INVITE_KEY)
   })
 
   it('calls redeem invite with valid invite key in clipboard', async () => {
     const redeem = jest.fn()
-    Clipboard.getString = jest.fn(() => Promise.resolve(VALID_INVITE))
+    clipboardGetStringMock.mockResolvedValue(VALID_INVITE)
     const wrapper = render(
       <Provider store={createMockStore()}>
         <EnterInviteCodeClass
@@ -80,15 +117,15 @@ describe('EnterInviteCode Screen', () => {
       </Provider>
     )
 
-    await Clipboard.getString()
-    fireEvent.press(wrapper.getByTestId('pasteMessageButton'))
-    await Clipboard.getString()
+    const button = await waitForElement(() => wrapper.getByTestId('pasteMessageButton'))
+    fireEvent.press(button)
+    await flushMicrotasksQueue()
     expect(redeem).toHaveBeenCalledWith(VALID_INVITE_KEY)
   })
 
   it('does not proceed with an invalid invite key in clipboard', async () => {
     const redeem = jest.fn()
-    Clipboard.getString = jest.fn(() => Promise.resolve('abc'))
+    clipboardGetStringMock.mockResolvedValue('abc')
     const wrapper = render(
       <Provider store={createMockStore()}>
         <EnterInviteCodeClass
@@ -104,8 +141,53 @@ describe('EnterInviteCode Screen', () => {
     )
 
     fireEvent.press(wrapper.getByTestId('openMessageButton'))
-    await Clipboard.getString()
+    await flushMicrotasksQueue()
     expect(wrapper.queryByTestId('pasteMessageButton')).toBeNull()
-    expect(redeem).not.toHaveBeenCalledWith(VALID_INVITE_KEY)
+    expect(redeem).not.toHaveBeenCalled()
+  })
+
+  it('calls redeem invite with valid invite key in install referrer data', async () => {
+    const redeem = jest.fn()
+    getReferrerMock.mockResolvedValue(VALID_REFERRER_INVITE)
+    const wrapper = render(
+      <Provider store={createMockStore()}>
+        <EnterInviteCodeClass
+          redeemInvite={redeem}
+          showError={jest.fn()}
+          hideAlert={jest.fn()}
+          redeemComplete={false}
+          isRedeemingInvite={false}
+          account={null}
+          {...getMockI18nProps()}
+        />
+      </Provider>
+    )
+
+    const button = await waitForElement(() => wrapper.getByTestId('pasteMessageButton'))
+    fireEvent.press(button)
+    expect(redeem).toHaveBeenCalledWith(VALID_REFERRER_INVITE_KEY)
+  })
+
+  it('does not proceed with an invalid invite key in install referrer data', async () => {
+    const redeem = jest.fn()
+    getReferrerMock.mockResolvedValue(INVALID_REFERRER_INVITE)
+    const wrapper = render(
+      <Provider store={createMockStore()}>
+        <EnterInviteCodeClass
+          redeemInvite={redeem}
+          showError={jest.fn()}
+          hideAlert={jest.fn()}
+          redeemComplete={false}
+          isRedeemingInvite={false}
+          account={null}
+          {...getMockI18nProps()}
+        />
+      </Provider>
+    )
+
+    fireEvent.press(wrapper.getByTestId('openMessageButton'))
+    await flushMicrotasksQueue()
+    expect(wrapper.queryByTestId('pasteMessageButton')).toBeNull()
+    expect(redeem).not.toHaveBeenCalled()
   })
 })

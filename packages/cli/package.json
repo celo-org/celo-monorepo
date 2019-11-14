@@ -1,7 +1,7 @@
 {
   "name": "@celo/celocli",
   "description": "CLI Tool for transacting with the Celo protocol",
-  "version": "0.0.27",
+  "version": "0.0.29",
   "author": "Celo",
   "license": "Apache-2.0",
   "repository": "celo-org/celo-monorepo",
@@ -26,10 +26,12 @@
     "docs": "yarn oclif-dev readme --multi --dir=../docs/command-line-interface && yarn prettier ../docs/command-line-interface/*.md --write",
     "lint": "tslint -c tslint.json --project tsconfig.json",
     "prepack": "yarn run build && oclif-dev manifest && oclif-dev readme",
-    "test": "TZ=UTC jest"
+    "test:reset": "yarn --cwd ../protocol devchain generate .devchain",
+    "test:livechain": "yarn --cwd ../protocol devchain run .devchain",
+    "test": "TZ=UTC jest --runInBand"
   },
   "dependencies": {
-    "@celo/contractkit": "^0.1.6",
+    "@celo/contractkit": "0.1.6",
     "@celo/utils": "^0.1.0",
     "@oclif/command": "^1",
     "@oclif/config": "^1",
@@ -43,7 +45,7 @@
     "elliptic": "^6.4.1",
     "ethereumjs-util": "^5.2.0",
     "events": "^3.0.0",
-    "firebase": "^6.2.4",
+    "firebase": "^7.2.2",
     "fs-extra": "^8.1.0",
     "moment": "2.24.0",
     "path": "^0.12.7",

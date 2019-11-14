@@ -1,59 +1,77 @@
 {
-  "verifyPhone": "Verify Phone",
-  "otherCeloUsersFindYou": "Other Celo users can use your phone number to find you",
-  "findOtherCeloUsers": "Use your address book to find other verified Celo users",
-  "verificationCodes": "You will receive 3 verification codes in a few minutes",
-  "continue": "Continue",
-  "enterPhoneToVerify": "Enter Phone Number and Start Verification",
-  "smsPermissionsLabel": "Important ",
-  "smsPermissions":
-    "Celo will ask for permission to read your text messages so that we can read verification codes automatically. Carrier fees may apply.",
-  "enterManually": "Enter Manually",
-  "startVerification": "Start Verifying",
-  "country": "Country",
-  "phoneNumber": "Phone Number",
-  "invalidPhone": "Invalid Phone Number",
-  "missingFullName": "Please enter full name",
-  "allowSmsPermissions": "Allow Celo Wallet to send and view SMS messages",
-  "dontAsk": "Don't ask again",
-  "deny": "Deny",
-  "allow": "Allow",
-  "mustDoManualLabel": "Note ",
-  "mustDoManual": "Is your phone not reading your text messages? Enter them manually.",
-  "waitingForSms": "Sent verification request. Waiting for SMS.",
-  "getting1": "Getting Verification Code 1",
-  "getting2": "Getting Verification Code 2",
-  "getting3": "Getting Verification Code 3",
-  "allReceived": "All codes received",
-  "verifying": "Verifying ",
-  "enterSmsCode": "Enter Code from SMS",
-  "code1": "Verification Code #1",
-  "code2": "Verification Code #2",
-  "code3": "Verification Code #3",
+  "getVerified": "Verify Phone Number",
   "notReadyForCode": "Not yet ready for code entry",
   "emptyVerificationCode": "No Verification Code in Clipboard",
   "invalidVerificationCode": "Invalid Verification Code",
   "repeatVerificationCode": "Repeated Verification Code",
   "verificationFailure": "Verification Failed",
   "verificationTimeout": "Verification Timed Out",
-  "submit": "Submit",
-  "messages": "Messages",
-  "now": "now",
-  "garnetVerification": "Garnet verification code:",
-  "markRead": "Mark As Read",
-  "reply": "Reply",
-  "congratsVerified": "Congratulations you are now verified!",
-  "copyPaste": "Copy & Paste ",
-  "entireSmsMessage": "Entire message from your SMS",
-  "pasteCode": "Paste Verification Code {{codeNumber}}",
-  "startingVerification": "Verifying Your Phone Number",
-  "nextCode": "Receiving Next Code",
-  "verificationComplete": "Verification Complete",
-  "leaveOpen": "Please leave this app open",
-  "thisWillTakeTime": "This process will take a few minutes",
   "errorRequestCode": "Failed to request codes.",
   "errorRedeemingCode": "Failed to redeem code.",
   "pleaseRetry": "Please retry verification.",
   "retryVerification": "Retry Verification",
-  "codeAccepted": "Accepted"
+  "education": {
+    "header": "Verify Your Phone",
+    "body1": "Next, please verify your phone number.",
+    "body2":
+      "Verifying makes it easier to send and receive with friends. You can also skip this step and return to it later.",
+    "learnMore": "Learn more about phone verification",
+    "start": "Start Verification",
+    "skip": "Skip For Now"
+  },
+  "learnMore": {
+    "header": "Phone Number Verification",
+    "intro":
+      "Celo Phone number verification works by associating your Celo Wallet with your phone number.",
+    "section1Header": "Do I need to complete this?",
+    "section1Body":
+      "Verification is not required. However, if you do not verify, others on the Celo network cannot send value to you using your phone number. They must use QR codes or addresses.",
+    "section2Header": "Security and Privacy",
+    "section2Body":
+      "To protect your privacy, only an obfuscated version of your phone number is stored on the Celo blockchain."
+  },
+  "loading": {
+    "verifyingNumber": "Verifying {{number}}",
+    "keepOpen": "Please keep the app open",
+    "card1": "Verifying your phone number helps your friends find you on the Celo Network.",
+    "card2": "On Celo, you can send money to your anyone using just their phone number.",
+    "card3": "Celo is now requesting three text messages to confirm you own your phone number."
+  },
+  "skipModal": {
+    "header": "Skip Verification?",
+    "body1": "Verifying allows others to send value to your phone number.",
+    "body2":
+      "Without verification, you can still receive payments but only using Celo addresses or QR codes."
+  },
+  "interstitial": {
+    "header": "Almost Done",
+    "body1":
+      "Your text messages are on the way! Please enter your three codes as you receive them.",
+    "body2": "This may take a minute."
+  },
+  "input": {
+    "header": "Submit Codes",
+    "body1": "Copy and Paste ",
+    "body2": "the verification codes from your Messages (SMS) app.",
+    "codeHeader1": "First Code",
+    "codeHeader2": "Second Code",
+    "codeHeader3": "Third Code",
+    "codesMissing": "I didn’t receive three codes",
+    "tip": "Typing? Try copying and pasting the code.",
+    "codeAccepted": "Accepted",
+    "sendingCodes": "Sending verification codes..."
+  },
+  "missingCodesModal": {
+    "header": "Missing Codes?",
+    "body":
+      "If you haven’t received all your codes yet after 60 seconds, you can skip verification and try again later.",
+    "wait": "Wait for codes",
+    "skip": "Skip for now"
+  },
+  "failModal": {
+    "header": "Verification has failed :(",
+    "body1": "An issue has occured while verifying your phone number. Sorry for the inconvenience!",
+    "body2": "You can skip verification for now and try again later."
+  },
+  "congratsVerified": "Congratulations you are now verified!"
 }

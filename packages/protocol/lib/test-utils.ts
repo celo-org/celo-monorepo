@@ -239,6 +239,21 @@ export function assertEqualBN(
   )
 }
 
+export function assertEqualDpBN(
+  value: number | BN | BigNumber,
+  expected: number | BN | BigNumber,
+  decimals: number,
+  msg?: string
+) {
+  const valueDp = new BigNumber(value.toString()).dp(decimals)
+  const expectedDp = new BigNumber(expected.toString()).dp(decimals)
+  assert(
+    valueDp.isEqualTo(expectedDp),
+    `expected ${expectedDp.toString()} and got ${valueDp.toString()}. ${msg || ''}`
+  )
+}
+
+
 export function assertEqualBNArray(value: number[] | BN[] | BigNumber[], expected: number[] | BN[] | BigNumber[], msg?: string) {
   assert.equal(value.length, expected.length, msg)
   value.forEach((x, i) => assertEqualBN(x, expected[i]))

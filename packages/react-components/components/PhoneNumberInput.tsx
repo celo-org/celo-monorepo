@@ -3,12 +3,15 @@ import ValidatedTextInput, {
   PhoneValidatorProps,
 } from '@celo/react-components/components/ValidatedTextInput'
 import colors from '@celo/react-components/styles/colors'
+import SmsRetriever from '@celo/react-native-sms-retriever'
 import { Countries } from '@celo/utils/src/countries'
 import { ValidatorKind } from '@celo/utils/src/inputValidation'
 import { getRegionCodeFromCountryCode, parsePhoneNumber } from '@celo/utils/src/phoneNumbers'
 import * as React from 'react'
 import { Platform, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
 import Autocomplete from 'react-native-autocomplete-input'
+
+const TAG = 'PhoneNumberInput'
 
 interface Props {
   style?: any
@@ -35,6 +38,7 @@ interface State {
   regionCode: string
   phoneNumber: string
   countries: Countries
+  country?: string
 }
 
 export default class PhoneNumberInput extends React.Component<Props, State> {
@@ -63,6 +67,50 @@ export default class PhoneNumberInput extends React.Component<Props, State> {
     if (this.props.defaultPhoneNumber) {
       this.onChangePhoneNumber(this.props.defaultPhoneNumber)
     }
+  }
+
+  async triggerPhoneNumberRequestAndroid() {
+    try {
+      const phone = await SmsRetriever.requestPhoneNumber()
+      const phoneNumber = parsePhoneNumber(phone, '')
+
+      if (!phoneNumber) {
+        return
+      }
+
+      this.setState({ phoneNumber: phoneNumber.displayNumber.toString() })
+
+      if (phoneNumber.countryCode) {
+        // TODO known issue, the country code is not enough to
+        // get a country, e.g. +1 could be USA or Canada
+        const displayName = this.state.countries.getCountryByPhoneCountryCode(
+          '+' + phoneNumber.countryCode.toString()
+        ).displayName
+
+        this.onChangeCountryQuery(displayName)
+      }
+    } catch (error) {
+      console.error(`${TAG}/triggerPhoneNumberRequestAndroid`, 'Could not request phone', error)
+    }
+  }
+
+  async triggerPhoneNumberRequest() {
+    try {
+      if (Platform.OS === 'android') {
+        await this.triggerPhoneNumberRequestAndroid()
+      } else {
+        console.info(`${TAG}/triggerPhoneNumberRequest`, 'Not implemented in this platform')
+      }
+    } catch (error) {
+      console.error(`${TAG}/triggerPhoneNumberRequest`, 'Could not request phone', error)
+    }
+  }
+
+  onCountryFocus = async () => {
+    if (this.props.onInputFocus) {
+      await this.props.onInputFocus()
+    }
+    await this.triggerPhoneNumberRequest()
   }
 
   onChangeCountryQuery = (countryQuery: string) => {
@@ -156,7 +204,7 @@ export default class PhoneNumberInput extends React.Component<Props, State> {
       {...props}
       value={this.state.countryQuery}
       underlineColorAndroid="transparent"
-      onFocus={this.props.onInputFocus}
+      onFocus={this.onCountryFocus}
       placeholderTextColor={colors.inactive}
     />
   )
@@ -197,7 +245,9 @@ export default class PhoneNumberInput extends React.Component<Props, State> {
           </View>
         )}
         <View style={[style.phoneNumberContainer, style.borderedBox]}>
-          <Text style={style.phoneCountryCode}>{countryCallingCode}</Text>
+          <Text style={style.phoneCountryCode} testID={'contryCodeText'}>
+            {countryCallingCode}
+          </Text>
           <View style={style.line} />
           <ValidatedTextInput<PhoneValidatorProps>
             style={[style.inputBox, style.phoneNumberInput]}

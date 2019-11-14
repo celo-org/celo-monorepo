@@ -7,13 +7,12 @@ import { ValidatorsInstance } from 'types'
 const initializeArgs = async (): Promise<any[]> => {
   return [
     config.registry.predeployedProxyAddress,
-    config.validators.registrationRequirements.group,
-    config.validators.registrationRequirements.validator,
-    config.validators.deregistrationLockups.group,
-    config.validators.deregistrationLockups.validator,
+    config.validators.groupLockedGoldRequirements.value,
+    config.validators.groupLockedGoldRequirements.duration,
+    config.validators.validatorLockedGoldRequirements.value,
+    config.validators.validatorLockedGoldRequirements.duration,
     config.validators.validatorScoreParameters.exponent,
     toFixed(config.validators.validatorScoreParameters.adjustmentSpeed).toFixed(),
-    config.validators.validatorEpochPayment,
     config.validators.membershipHistoryLength,
     config.validators.maxGroupSize,
   ]

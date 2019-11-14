@@ -4,7 +4,14 @@ import { fromFixed, toFixed } from '@celo/utils/lib/fixidity'
 import BigNumber from 'bignumber.js'
 import { assert } from 'chai'
 import Web3 from 'web3'
-import { getContext, getEnode, importGenesis, initAndStartGeth, sleep } from './utils'
+import {
+  assertAlmostEqual,
+  getContext,
+  getEnode,
+  importGenesis,
+  initAndStartGeth,
+  sleep,
+} from './utils'
 
 describe('governance tests', () => {
   const gethConfig = {
@@ -21,9 +28,12 @@ describe('governance tests', () => {
   const context: any = getContext(gethConfig)
   let web3: any
   let election: any
-  let validators: any
+  let stableToken: any
+  let sortedOracles: any
+  let epochRewards: any
   let goldToken: any
   let registry: any
+  let validators: any
   let accounts: AccountsWrapper
   let kit: ContractKit
 
@@ -39,9 +49,12 @@ describe('governance tests', () => {
     web3 = new Web3('http://localhost:8545')
     kit = newKitFromWeb3(web3)
     goldToken = await kit._web3Contracts.getGoldToken()
+    stableToken = await kit._web3Contracts.getStableToken()
+    sortedOracles = await kit._web3Contracts.getSortedOracles()
     validators = await kit._web3Contracts.getValidators()
     registry = await kit._web3Contracts.getRegistry()
     election = await kit._web3Contracts.getElection()
+    epochRewards = await kit._web3Contracts.getEpochRewards()
     accounts = await kit.contracts.getAccounts()
   }
 
@@ -119,6 +132,23 @@ describe('governance tests', () => {
     return blockNumber % epochSize === 0
   }
 
+  const assertBalanceChanged = async (
+    address: string,
+    blockNumber: number,
+    expected: BigNumber,
+    token: any
+  ) => {
+    const currentBalance = new BigNumber(
+      await token.methods.balanceOf(address).call({}, blockNumber)
+    )
+    const previousBalance = new BigNumber(
+      await token.methods.balanceOf(address).call({}, blockNumber - 1)
+    )
+    assert.isNotNaN(currentBalance)
+    assert.isNotNaN(previousBalance)
+    assertAlmostEqual(currentBalance.minus(previousBalance), expected)
+  }
+
   describe('when the validator set is changing', () => {
     let epoch: number
     const blockNumbers: number[] = []
@@ -143,8 +173,13 @@ describe('governance tests', () => {
       epoch = new BigNumber(await validators.methods.getEpochSize().call()).toNumber()
       assert.equal(epoch, 10)
 
-      // Give the node time to sync, and time for an epoch transition so we can activate our vote.
-      await sleep(20)
+      // Give the nodes time to sync, and time for an epoch transition so we can activate our vote.
+      let blockNumber: number
+      do {
+        blockNumber = await web3.eth.getBlockNumber()
+        await sleep(0.1)
+      } while (blockNumber % epoch !== 1)
+
       await activate(allValidators[0])
       const groupWeb3 = new Web3('ws://localhost:8567')
       const groupKit = newKitFromWeb3(groupWeb3)
@@ -278,31 +313,14 @@ describe('governance tests', () => {
     })
 
     it('should distribute epoch payments at the end of each epoch', async () => {
-      const stableToken = await kit._web3Contracts.getStableToken()
       const commission = 0.1
-      const validatorEpochPayment = new BigNumber(
-        await validators.methods.validatorEpochPayment().call()
+      const targetValidatorEpochPayment = new BigNumber(
+        await epochRewards.methods.targetValidatorEpochPayment().call()
       )
       const [group] = await validators.methods.getRegisteredValidatorGroups().call()
 
-      const assertBalanceChanged = async (
-        validator: string,
-        blockNumber: number,
-        expected: BigNumber
-      ) => {
-        const currentBalance = new BigNumber(
-          await stableToken.methods.balanceOf(validator).call({}, blockNumber)
-        )
-        const previousBalance = new BigNumber(
-          await stableToken.methods.balanceOf(validator).call({}, blockNumber - 1)
-        )
-        assert.isNotNaN(currentBalance)
-        assert.isNotNaN(previousBalance)
-        assert.equal(expected.toFixed(), currentBalance.minus(previousBalance).toFixed())
-      }
-
       const assertBalanceUnchanged = async (validator: string, blockNumber: number) => {
-        await assertBalanceChanged(validator, blockNumber, new BigNumber(0))
+        await assertBalanceChanged(validator, blockNumber, new BigNumber(0), stableToken)
       }
 
       const getExpectedTotalPayment = async (validator: string, blockNumber: number) => {
@@ -310,7 +328,14 @@ describe('governance tests', () => {
           (await validators.methods.getValidator(validator).call({}, blockNumber))[2]
         )
         assert.isNotNaN(score)
-        return validatorEpochPayment.times(fromFixed(score))
+        // We need to calculate the rewards multiplier for the previous block, before
+        // the rewards actually are awarded.
+        const rewardsMultiplier = new BigNumber(
+          await epochRewards.methods.getRewardsMultiplier().call({}, blockNumber - 1)
+        )
+        return targetValidatorEpochPayment
+          .times(fromFixed(score))
+          .times(fromFixed(rewardsMultiplier))
       }
 
       for (const blockNumber of blockNumbers) {
@@ -335,19 +360,19 @@ describe('governance tests', () => {
           await assertBalanceChanged(
             validator,
             blockNumber,
-            expectedTotalPayment.minus(groupPayment)
+            expectedTotalPayment.minus(groupPayment),
+            stableToken
           )
           expectedGroupPayment = expectedGroupPayment.plus(groupPayment)
         }
-        await assertBalanceChanged(group, blockNumber, expectedGroupPayment)
+        await assertBalanceChanged(group, blockNumber, expectedGroupPayment, stableToken)
       }
     })
 
     it('should distribute epoch rewards at the end of each epoch', async () => {
       const lockedGold = await kit._web3Contracts.getLockedGold()
       const governance = await kit._web3Contracts.getGovernance()
-      const epochReward = new BigNumber(10).pow(18)
-      const infraReward = new BigNumber(10).pow(18)
+      const gasPriceMinimum = await kit._web3Contracts.getGasPriceMinimum()
       const [group] = await validators.methods.getRegisteredValidatorGroups().call()
 
       const assertVotesChanged = async (blockNumber: number, expected: BigNumber) => {
@@ -357,7 +382,14 @@ describe('governance tests', () => {
         const previousVotes = new BigNumber(
           await election.methods.getTotalVotesForGroup(group).call({}, blockNumber - 1)
         )
-        assert.equal(expected.toFixed(), currentVotes.minus(previousVotes).toFixed())
+        assertAlmostEqual(currentVotes.minus(previousVotes), expected)
+      }
+
+      // Returns the gas fee base for a given block, which is distributed to the governance contract.
+      const blockBaseGasFee = async (blockNumber: number): Promise<BigNumber> => {
+        const gas = (await web3.eth.getBlock(blockNumber)).gasUsed
+        const gpm = await gasPriceMinimum.methods.gasPriceMinimum().call({}, blockNumber)
+        return new BigNumber(gpm).times(new BigNumber(gas))
       }
 
       const assertGoldTokenTotalSupplyChanged = async (
@@ -370,29 +402,15 @@ describe('governance tests', () => {
         const previousSupply = new BigNumber(
           await goldToken.methods.totalSupply().call({}, blockNumber - 1)
         )
-        assert.equal(expected.toFixed(), currentSupply.minus(previousSupply).toFixed())
-      }
-
-      const assertBalanceChanged = async (
-        address: string,
-        blockNumber: number,
-        expected: BigNumber
-      ) => {
-        const currentBalance = new BigNumber(
-          await goldToken.methods.balanceOf(address).call({}, blockNumber)
-        )
-        const previousBalance = new BigNumber(
-          await goldToken.methods.balanceOf(address).call({}, blockNumber - 1)
-        )
-        assert.equal(expected.toFixed(), currentBalance.minus(previousBalance).toFixed())
+        assertAlmostEqual(currentSupply.minus(previousSupply), expected)
       }
 
       const assertLockedGoldBalanceChanged = async (blockNumber: number, expected: BigNumber) => {
-        await assertBalanceChanged(lockedGold.options.address, blockNumber, expected)
+        await assertBalanceChanged(lockedGold.options.address, blockNumber, expected, goldToken)
       }
 
       const assertGovernanceBalanceChanged = async (blockNumber: number, expected: BigNumber) => {
-        await assertBalanceChanged(governance.options.address, blockNumber, expected)
+        await assertBalanceChanged(governance.options.address, blockNumber, expected, goldToken)
       }
 
       const assertVotesUnchanged = async (blockNumber: number) => {
@@ -407,21 +425,108 @@ describe('governance tests', () => {
         await assertLockedGoldBalanceChanged(blockNumber, new BigNumber(0))
       }
 
-      const assertGovernanceBalanceUnchanged = async (blockNumber: number) => {
-        await assertGovernanceBalanceChanged(blockNumber, new BigNumber(0))
+      const getStableTokenSupplyChange = async (blockNumber: number) => {
+        const currentSupply = new BigNumber(
+          await stableToken.methods.totalSupply().call({}, blockNumber)
+        )
+        const previousSupply = new BigNumber(
+          await stableToken.methods.totalSupply().call({}, blockNumber - 1)
+        )
+        return currentSupply.minus(previousSupply)
+      }
+
+      const getStableTokenExchangeRate = async (blockNumber: number) => {
+        const rate = await sortedOracles.methods
+          .medianRate(stableToken.options.address)
+          .call({}, blockNumber)
+        return new BigNumber(rate[0]).div(rate[1])
       }
 
       for (const blockNumber of blockNumbers) {
         if (isLastBlockOfEpoch(blockNumber, epoch)) {
-          await assertVotesChanged(blockNumber, epochReward)
-          await assertGoldTokenTotalSupplyChanged(blockNumber, epochReward.plus(infraReward))
-          await assertLockedGoldBalanceChanged(blockNumber, epochReward)
-          await assertGovernanceBalanceChanged(blockNumber, infraReward)
+          // We use the number of active votes from the previous block to calculate the expected
+          // epoch reward as the number of active votes for the current block will include the
+          // epoch reward.
+          const activeVotes = new BigNumber(
+            await election.methods.getActiveVotes().call({}, blockNumber - 1)
+          )
+          const targetVotingYield = new BigNumber(
+            (await epochRewards.methods.getTargetVotingYieldParameters().call({}, blockNumber))[0]
+          )
+          // We need to calculate the rewards multiplier for the previous block, before
+          // the rewards actually are awarded.
+          const rewardsMultiplier = new BigNumber(
+            await epochRewards.methods.getRewardsMultiplier().call({}, blockNumber - 1)
+          )
+          const expectedEpochReward = activeVotes
+            .times(fromFixed(targetVotingYield))
+            .times(fromFixed(rewardsMultiplier))
+          const expectedInfraReward = new BigNumber(10).pow(18)
+          const stableTokenSupplyChange = await getStableTokenSupplyChange(blockNumber)
+          const exchangeRate = await getStableTokenExchangeRate(blockNumber)
+          const expectedGoldTotalSupplyChange = expectedInfraReward
+            .plus(expectedEpochReward)
+            .plus(stableTokenSupplyChange.div(exchangeRate))
+          await assertVotesChanged(blockNumber, expectedEpochReward)
+          await assertLockedGoldBalanceChanged(blockNumber, expectedEpochReward)
+          await assertGovernanceBalanceChanged(
+            blockNumber,
+            expectedInfraReward.plus(await blockBaseGasFee(blockNumber))
+          )
+          await assertGoldTokenTotalSupplyChanged(blockNumber, expectedGoldTotalSupplyChange)
         } else {
           await assertVotesUnchanged(blockNumber)
           await assertGoldTokenTotalSupplyUnchanged(blockNumber)
           await assertLockedGoldBalanceUnchanged(blockNumber)
-          await assertGovernanceBalanceUnchanged(blockNumber)
+          await assertGovernanceBalanceChanged(blockNumber, await blockBaseGasFee(blockNumber))
+        }
+      }
+    })
+
+    it('should update the target voting yield', async () => {
+      const assertTargetVotingYieldChanged = async (blockNumber: number, expected: BigNumber) => {
+        const currentTarget = new BigNumber(
+          (await epochRewards.methods.getTargetVotingYieldParameters().call({}, blockNumber))[0]
+        )
+        const previousTarget = new BigNumber(
+          (await epochRewards.methods.getTargetVotingYieldParameters().call({}, blockNumber - 1))[0]
+        )
+        const difference = currentTarget.minus(previousTarget)
+
+        // Assert equal to 10 decimal places due to rounding errors.
+        assert.equal(
+          fromFixed(difference)
+            .dp(10)
+            .toFixed(),
+          fromFixed(expected)
+            .dp(10)
+            .toFixed()
+        )
+      }
+
+      const assertTargetVotingYieldUnchanged = async (blockNumber: number) => {
+        await assertTargetVotingYieldChanged(blockNumber, new BigNumber(0))
+      }
+
+      for (const blockNumber of blockNumbers) {
+        if (isLastBlockOfEpoch(blockNumber, epoch)) {
+          // We use the voting gold fraction from before the rewards are granted.
+          const votingGoldFraction = new BigNumber(
+            await epochRewards.methods.getVotingGoldFraction().call({}, blockNumber - 1)
+          )
+          const targetVotingGoldFraction = new BigNumber(
+            await epochRewards.methods.getTargetVotingGoldFraction().call({}, blockNumber)
+          )
+          const difference = targetVotingGoldFraction.minus(votingGoldFraction)
+          const adjustmentFactor = fromFixed(
+            new BigNumber(
+              (await epochRewards.methods.getTargetVotingYieldParameters().call({}, blockNumber))[2]
+            )
+          )
+          const delta = difference.times(adjustmentFactor)
+          await assertTargetVotingYieldChanged(blockNumber, delta)
+        } else {
+          await assertTargetVotingYieldUnchanged(blockNumber)
         }
       }
     })

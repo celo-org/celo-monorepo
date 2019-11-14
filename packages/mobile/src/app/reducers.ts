@@ -1,4 +1,5 @@
 import { Actions, ActionTypes } from 'src/app/actions'
+import { getRehydratePayload, REHYDRATE, RehydrateAction } from 'src/redux/persist-helper'
 import { RootState } from 'src/redux/reducers'
 
 export interface State {
@@ -6,6 +7,7 @@ export interface State {
   numberVerified: boolean
   language: string | null
   doingBackupFlow: boolean
+  doingPinVerification: boolean
   analyticsEnabled: boolean
 }
 
@@ -15,13 +17,25 @@ const initialState = {
   numberVerified: false,
   language: null,
   doingBackupFlow: false,
+  doingPinVerification: false,
   analyticsEnabled: true,
 }
 
 export const currentLanguageSelector = (state: RootState) => state.app.language
 
-export const appReducer = (state: State | undefined = initialState, action: ActionTypes): State => {
+export const appReducer = (
+  state: State | undefined = initialState,
+  action: ActionTypes | RehydrateAction
+): State => {
   switch (action.type) {
+    case REHYDRATE: {
+      // Ignore some persisted properties
+      return {
+        ...state,
+        ...getRehydratePayload(action, 'app'),
+        doingPinVerification: false,
+      }
+    }
     case Actions.SET_LOGGED_IN:
       return {
         ...state,
@@ -58,6 +72,16 @@ export const appReducer = (state: State | undefined = initialState, action: Acti
       return {
         ...state,
         analyticsEnabled: action.enabled,
+      }
+    case Actions.START_PIN_VERIFICATION:
+      return {
+        ...state,
+        doingPinVerification: true,
+      }
+    case Actions.FINISH_PIN_VERIFICATION:
+      return {
+        ...state,
+        doingPinVerification: false,
       }
     default:
       return state

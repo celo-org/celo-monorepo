@@ -14,17 +14,9 @@ contract GasPriceMinimum is Ownable, Initializable, UsingRegistry {
   using FixidityLib for FixidityLib.Fraction;
   using SafeMath for uint256;
 
-  event TargetDensitySet(
-    uint256 targetDensity
-  );
+  event TargetDensitySet(uint256 targetDensity);
 
-  event AdjustmentSpeedSet(
-    uint256 adjustmentSpeed
-  );
-
-  event ProposerFractionSet(
-    uint256 proposerFraction
-  );
+  event AdjustmentSpeedSet(uint256 adjustmentSpeed);
 
   uint256 public gasPriceMinimum;
 
@@ -33,13 +25,6 @@ contract GasPriceMinimum is Ownable, Initializable, UsingRegistry {
 
   // Speed of gas price minimum adjustment due to congestion.
   FixidityLib.Fraction public adjustmentSpeed;
-
-  // FixidityLib.Fraction of the gas price minimum allocated to the infrastructure fund.
-  FixidityLib.Fraction public proposerFraction;
-
-  function proposerFraction_() external view returns (uint256, uint256) {
-    return (proposerFraction.unwrap(), FixidityLib.fixed1().unwrap());
-  }
 
   modifier onlyVm() {
     assert(msg.sender == address(0x0));
@@ -50,18 +35,13 @@ contract GasPriceMinimum is Ownable, Initializable, UsingRegistry {
     address _registryAddress,
     uint256 initialGas,
     uint256 _targetDensity,
-    uint256 _adjustmentSpeed,
-    uint256 _proposerFraction
-  )
-    external
-    initializer
-  {
+    uint256 _adjustmentSpeed
+  ) external initializer {
     _transferOwnership(msg.sender);
     setRegistry(_registryAddress);
     gasPriceMinimum = initialGas;
     setTargetDensity(_targetDensity);
     setAdjustmentSpeed(_adjustmentSpeed);
-    setProposerFraction(_proposerFraction);
   }
 
   /**
@@ -85,17 +65,6 @@ contract GasPriceMinimum is Ownable, Initializable, UsingRegistry {
   }
 
   /**
-   * @notice Set the fraction of the gas price minimum which is sent to
-   * the infrastructure fund.
-   * @dev Value is expected to be < 1.
-   */
-  function setProposerFraction(uint256 _proposerFraction) public onlyOwner {
-    proposerFraction = FixidityLib.wrap(_proposerFraction);
-    require(proposerFraction.lt(FixidityLib.fixed1()));
-    emit ProposerFractionSet(_proposerFraction);
-  }
-
-  /**
    * @notice Retrieve the current gas price minimum for a currency.
    * @param tokenAddress The currency the gas price should be in (defaults to gold).
    * @return current gas price minimum in the requested currency
@@ -107,7 +76,6 @@ contract GasPriceMinimum is Ownable, Initializable, UsingRegistry {
     ) {
       return gasPriceMinimum;
     } else {
-
       ISortedOracles sortedOracles = ISortedOracles(
         registry.getAddressForOrDie(SORTED_ORACLES_REGISTRY_ID)
       );
@@ -125,10 +93,7 @@ contract GasPriceMinimum is Ownable, Initializable, UsingRegistry {
    * @param blockGasLimit The maxBlockGasLimit of the past block.
    * @return result of the calculation (new gas price minimum)
    */
-  function updateGasPriceMinimum(
-    uint256 blockGasTotal,
-    uint256 blockGasLimit
-  )
+  function updateGasPriceMinimum(uint256 blockGasTotal, uint256 blockGasLimit)
     external
     onlyVm
     returns (uint256)
@@ -146,28 +111,27 @@ contract GasPriceMinimum is Ownable, Initializable, UsingRegistry {
    * @dev Calculate using the following formula:
    * oldGasPriceMinimum * (1 + (adjustmentSpeed * (blockDensity - targetDensity))) + 1.
    */
-  function getUpdatedGasPriceMinimum(
-    uint256 blockGasTotal,
-    uint256 blockGasLimit
-  )
+  function getUpdatedGasPriceMinimum(uint256 blockGasTotal, uint256 blockGasLimit)
     public
     view
     returns (uint256)
   {
     FixidityLib.Fraction memory blockDensity = FixidityLib.newFixedFraction(
-      blockGasTotal, blockGasLimit
+      blockGasTotal,
+      blockGasLimit
     );
     bool densityGreaterThanTarget = blockDensity.gt(targetDensity);
-    FixidityLib.Fraction memory densityDelta = densityGreaterThanTarget ?
-      blockDensity.subtract(targetDensity) :
-      targetDensity.subtract(blockDensity);
-    FixidityLib.Fraction memory adjustment = densityGreaterThanTarget ?
-      FixidityLib.fixed1().add(adjustmentSpeed.multiply(densityDelta)) :
-      FixidityLib.fixed1().subtract(adjustmentSpeed.multiply(densityDelta));
+    FixidityLib.Fraction memory densityDelta = densityGreaterThanTarget
+      ? blockDensity.subtract(targetDensity)
+      : targetDensity.subtract(blockDensity);
+    FixidityLib.Fraction memory adjustment = densityGreaterThanTarget
+      ? FixidityLib.fixed1().add(adjustmentSpeed.multiply(densityDelta))
+      : FixidityLib.fixed1().subtract(adjustmentSpeed.multiply(densityDelta));
 
-    return adjustment
-      .multiply(FixidityLib.newFixed(gasPriceMinimum))
-      .add(FixidityLib.fixed1())
-      .fromFixed();
+    return
+      adjustment
+        .multiply(FixidityLib.newFixed(gasPriceMinimum))
+        .add(FixidityLib.fixed1())
+        .fromFixed();
   }
 }
