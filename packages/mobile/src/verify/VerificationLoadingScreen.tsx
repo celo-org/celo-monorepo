@@ -53,7 +53,7 @@ class VerificationLoadingScreen extends React.Component<Props> {
 
   componentDidMount() {
     BackHandler.addEventListener('hardwareBackPress', this.handleBackButton)
-    this.props.startVerification()
+    // this.props.startVerification()
   }
 
   componentDidUpdate() {
@@ -133,7 +133,7 @@ const styles = StyleSheet.create({
   },
   buttonCancelContainer: {
     position: 'absolute',
-    top: 10,
+    top: 20,
     left: 5,
     zIndex: 10,
   },
