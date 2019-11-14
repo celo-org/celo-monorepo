@@ -150,17 +150,17 @@ const linkedLibraries = {
 }
 
 const argv = minimist(process.argv.slice(2), {
-  string: ['migration_override', 'build_directory'],
   default: {
     build_directory: path.join(__dirname, 'build'),
   },
+  string: ['migration_override', 'build_directory'],
 })
 
-const migrationOverride = argv.migration_override ? JSON.parse(argv.migration_override) : {}
-const config = {}
+const config = DefaultConfig
 
+const migrationOverride = argv.migration_override ? JSON.parse(argv.migration_override) : {}
 // use lodash merge to deeply override defaults
-lodash.merge(config, [DefaultConfig, migrationOverride])
+lodash.merge(config, migrationOverride)
 
 module.exports = {
   build_directory: argv.build_directory,
