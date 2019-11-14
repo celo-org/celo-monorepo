@@ -4,6 +4,7 @@ import Web3 from 'web3'
 import { getNodeUrl } from './utils/config'
 import { injectDebugProvider } from './utils/eth-debug-provider'
 import { requireNodeIsSynced } from './utils/helpers'
+import { addKeysToKit } from './utils/local_accounts'
 
 export abstract class BaseCommand extends Command {
   static flags = {
@@ -46,6 +47,7 @@ export abstract class BaseCommand extends Command {
     if (this.requireSynced) {
       await requireNodeIsSynced(this.web3)
     }
+    addKeysToKit(this.kit, this.config.configDir)
   }
 
   // TODO(yorke): implement log(msg) switch on logLevel with chalk colored output
