@@ -62,7 +62,7 @@ Run:
 
 ```
 $ export CELO_NETWORK=baklava
-$ export CELO_IMAGE=celo-node
+$ export CELO_IMAGE=us.gcr.io/celo-testnet/celo-node
 $ export NETWORK_ID=1101
 $ export URL_VERIFICATION_POOL=https://us-central1-celo-testnet-production.cloudfunctions.net/handleVerificationRequestbaklava/v0.1/sms/
 $ docker pull us.gcr.io/celo-testnet/$CELO_IMAGE:$CELO_NETWORK
@@ -73,7 +73,7 @@ $ docker pull us.gcr.io/celo-testnet/$CELO_IMAGE:$CELO_NETWORK
 Create and cd into the directory where you want to store the data and any other files needed to run your node. You can name this whatever you’d like, but here’s a default you can use:
 
 ```
-$ mkdir celo-data-dir
+$ mkdir -p celo-data-dir/proxy celo-data-dir/validator
 $ cd celo-data-dir
 ```
 
@@ -82,7 +82,9 @@ Create two accounts, one for the Validator and one for Validator Group, and get 
 To create the accounts needed, run this command 3 times:
 
 ```
-$ docker run -v `pwd`:/root/.celo --entrypoint /bin/sh -it us.gcr.io/celo-testnet/$CELO_IMAGE:$CELO_NETWORK -c "geth account new"
+$ docker run -v `pwd`/validator:/root/.celo --entrypoint /bin/sh -it $CELO_IMAGE:$CELO_NETWORK -c "geth account new"
+$ docker run -v `pwd`/validator:/root/.celo --entrypoint /bin/sh -it $CELO_IMAGE:$CELO_NETWORK -c "geth account new"
+$ docker run -v `pwd`/proxy:/root/.celo --entrypoint /bin/sh -it $CELO_IMAGE:$CELO_NETWORK -c "geth account new"
 ```
 
 It will prompt you for a passphrase, ask you to confirm it, and then will output your account address: `Address: {<YOUR-ACCOUNT-ADDRESS>}`
@@ -98,7 +100,7 @@ $ export CELO_PROXY_ADDRESS=<YOUR-PROXY-ADDRESS>
 In order to register the validator later on, generate a "proof of possession" - a signature proving you know your validator's BLS private key. Run this command:
 
 ```
-$ docker run -v `pwd`:/root/.celo --entrypoint /bin/sh -it us.gcr.io/celo-testnet/$CELO_IMAGE:$CELO_NETWORK -c "geth account proof-of-possession $CELO_VALIDATOR_ADDRESS"
+$ docker run -v `pwd`/validator:/root/.celo --entrypoint /bin/sh -it $CELO_IMAGE:$CELO_NETWORK -c "geth account proof-of-possession $CELO_VALIDATOR_ADDRESS"
 ```
 
 It will prompt you for the passphrase you've chosen for the validator account. Let's save the resulting proof-of-possession to an environment variable:
@@ -112,34 +114,37 @@ $ export CELO_VALIDATOR_POP=<YOUR-VALIDATOR-PROOF-OF-POSSESSION>
 Initialize the docker container, building from an image for the network and initializing Celo with the genesis block:
 
 ```
-$ docker run -v `pwd`:/root/.celo us.gcr.io/celo-testnet/$CELO_IMAGE:$CELO_NETWORK init /celo/genesis.json
+$ docker run -v `pwd`/proxy:/root/.celo $CELO_IMAGE:$CELO_NETWORK init /celo/genesis.json
+$ docker run -v `pwd`/validator:/root/.celo $CELO_IMAGE:$CELO_NETWORK init /celo/genesis.json
 ```
 
 To participate in consensus, we need to set up our nodekey for our account. We can do so via the following command \(it will prompt you for your passphrase\):
 
 ```
-$ docker run -v `pwd`:/root/.celo --entrypoint /bin/sh -it us.gcr.io/celo-testnet/$CELO_IMAGE:$CELO_NETWORK -c "geth account set-node-key $CELO_VALIDATOR_ADDRESS"
+$ docker run -v `pwd`/proxy:/root/.celo --entrypoint /bin/sh -it $CELO_IMAGE:$CELO_NETWORK -c "geth account set-node-key $CELO_PROXY_ADDRESS"
+$ docker run -v `pwd`/validator:/root/.celo --entrypoint /bin/sh -it $CELO_IMAGE:$CELO_NETWORK -c "geth account set-node-key $CELO_VALIDATOR_ADDRESS"
 ```
 
 In order to allow the node to sync with the network, give it the address of existing nodes in the network:
 
 ```
-$ docker run -v `pwd`:/root/.celo --entrypoint cp us.gcr.io/celo-testnet/$CELO_IMAGE:$CELO_NETWORK /celo/static-nodes.json /root/.celo/
+$ docker run -v `pwd`/proxy:/root/.celo --entrypoint cp $CELO_IMAGE:$CELO_NETWORK /celo/static-nodes.json /root/.celo/
+$ docker run -v `pwd`/validator:/root/.celo --entrypoint cp $CELO_IMAGE:$CELO_NETWORK /celo/static-nodes.json /root/.celo/
 ```
 
 Start up the proxy:
 
 ```
-docker run --name celo-proxy -p 8545:8545 -p 8546:8546 -p 30303:30303 -p 30303:30303/udp -p 30503:30503 -p 30503:30503/udp -v `pwd`:/root/.celo us.gcr.io/celo-testnet/$CELO_IMAGE:$CELO_NETWORK --verbosity 3 --networkid $NETWORK_ID --syncmode full --rpc --rpcaddr 0.0.0.0 --rpcapi eth,net,web3,debug --maxpeers 1100 --etherbase=$CELO_PROXY_ADDRESS --miner.verificationpool=$URL_VERIFICATION_POOL --proxy.proxiedvalidatoraddress $CELO_VALIDATOR_ADDRE --proxy.internalendpoint :30503
+$ docker run --name celo-proxy -p 8545:8545 -p 8546:8546 -p 30303:30303 -p 30303:30303/udp -p 30503:30503 -p 30503:30503/udp -v `pwd`/proxy:/root/.celo $CELO_IMAGE:$CELO_NETWORK --verbosity 3 --networkid $NETWORK_ID --syncmode full --rpc --rpcaddr 0.0.0.0 --rpcapi eth,net,web3,debug --maxpeers 1100 --etherbase=$CELO_PROXY_ADDRESS --miner.verificationpool=$URL_VERIFICATION_POOL --proxy.proxiedvalidatoraddress $CELO_VALIDATOR_ADDRESS --proxy.internalendpoint :30503
 
-export PROXY_ENODE=$(docker exec celo-proxy geth --exec "admin.nodeInfo['enode'].split('//')[1].split('@')[0]" attach | tr -d '"')
-EXPORT PROXY_IP=$(docker inspect -f '{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' celo-proxy)
+$ export PROXY_ENODE=$(docker exec celo-proxy geth --exec "admin.nodeInfo['enode'].split('//')[1].split('@')[0]" attach | tr -d '"')
+$ export PROXY_IP=$(docker inspect -f '{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' celo-proxy)
 ```
 
 Start up the validator node:
 
 ```
-$ docker run --name celo-validator -p 127.0.0.1:8547:8545 -p 127.0.0.1:8548:8546 -p 30304:30303 -p 30304:30303/udp -v `pwd`:/root/.celo us.gcr.io/celo-testnet/$CELO_IMAGE:$CELO_NETWORK --verbosity 3 --networkid $NETWORK_ID --syncmode full --rpc --rpcaddr 0.0.0.0 --rpcapi eth,net,web3,debug --maxpeers 125 --mine --miner.verificationpool=$URL_VERIFICATION_POOL --istanbul.blockperiod=1 --istanbul.requesttimeout=3000 --etherbase $CELO_VALIDATOR_ADDRESS --nodiscover --proxy.proxied --proxy.proxyenodeurlpair=enode://$PROXY_ENODE@$PROXY_IP:30503;enode://$PROXY_ENODE@$PROXY_IP:30503
+$ docker run --name celo-validator -p 127.0.0.1:8547:8545 -p 127.0.0.1:8548:8546 -p 30304:30303 -p 30304:30303/udp -v `pwd`/validator:/root/.celo $CELO_IMAGE:$CELO_NETWORK --verbosity 3 --networkid $NETWORK_ID --syncmode full --rpc --rpcaddr 0.0.0.0 --rpcapi eth,net,web3,debug --maxpeers 125 --mine --miner.verificationpool=$URL_VERIFICATION_POOL --istanbul.blockperiod=1 --istanbul.requesttimeout=3000 --etherbase $CELO_VALIDATOR_ADDRESS --nodiscover --proxy.proxied --proxy.proxyenodeurlpair=enode://$PROXY_ENODE@$PROXY_IP:30503\;enode://$PROXY_ENODE@$PROXY_IP:30503
 ```
 
 {% hint style="danger" %}
