@@ -1,4 +1,4 @@
-import { ContractKit, newKitFromWeb3 } from '@celo/contractkit'
+import { CeloProvider, ContractKit, newKitFromWeb3 } from '@celo/contractkit'
 import { Command, flags } from '@oclif/command'
 import Web3 from 'web3'
 import { getNodeUrl } from './utils/config'
@@ -59,8 +59,16 @@ export abstract class BaseCommand extends Command {
 
   finally(arg: Error | undefined): Promise<any> {
     try {
-      // Close the web3 connection or the CLI hangs forever.
+      // If local-signing accounts are added, the debug wrapper is itself wrapped
+      // with a CeloProvider. This class has a stop() function that handles closing
+      // the connection for underlying providers
+      if (this.web3.currentProvider instanceof CeloProvider) {
+        const celoProvider = this.web3.currentProvider as CeloProvider
+        celoProvider.stop()
+      }
+
       if (this._originalProvider && this._originalProvider.hasOwnProperty('connection')) {
+        // Close the web3 connection or the CLI hangs forever.
         const connection = this._originalProvider.connection
         if (connection.hasOwnProperty('_connection')) {
           connection._connection.close()
