@@ -13,7 +13,7 @@ USAGE
   $ celocli oracle:rates TOKEN
 
 ARGUMENTS
-  TOKEN  Token to get the rates for
+  TOKEN  (StableToken) Token to get the rates for
 
 EXAMPLE
   rates StableToken
@@ -27,7 +27,10 @@ Report the price of Celo Gold in a specified token (currently just Celo Dollar, 
 
 ```
 USAGE
-  $ celocli oracle:report
+  $ celocli oracle:report TOKEN
+
+ARGUMENTS
+  TOKEN  (StableToken) Token to report on
 
 OPTIONS
   --denominator=denominator                          Amount of cGLD equal to the numerator. Defaults to 1 if left blank
@@ -35,8 +38,6 @@ OPTIONS
 
   --numerator=numerator                              (required) Amount of the specified token equal to the amount of
                                                      cGLD in the denominator
-
-  --token=token                                      (required) The token to report on
 
 EXAMPLES
   report --token StableToken --numerator 1.02 --from 0x8c349AAc7065a35B7166f2659d6C35D75A3893C1
