@@ -2193,6 +2193,25 @@
     web3-eth-abi "1.0.0-beta.37"
     web3-utils "1.0.0-beta.37"
 
+"@celo/contractkit@0.1.6", "@celo/contractkit@^0.1.1", "@celo/contractkit@^0.1.5":
+  version "0.1.6"
+  resolved "https://registry.yarnpkg.com/@celo/contractkit/-/contractkit-0.1.6.tgz#c4f6d5003694cc28853f7331b5c0597a208a389d"
+  integrity sha512-3mEmfOVaqOjyAT5mHWAESYdcKTvZPDDCkkh7GVDDpq7sPhnZ5dGX5oT26XzMLhe8TfdTQMzp6B22EDaPjOLx8A==
+  dependencies:
+    "@0x/subproviders" "^5.0.0"
+    "@celo/utils" "^0.1.0"
+    "@types/debug" "^4.1.5"
+    bignumber.js "^7.2.0"
+    cross-fetch "3.0.4"
+    debug "^4.1.1"
+    eth-lib "^0.2.8"
+    fp-ts "2.0.5"
+    io-ts "2.0.1"
+    web3 "1.0.0-beta.37"
+    web3-core-helpers "1.0.0-beta.37"
+    web3-eth-abi "1.0.0-beta.37"
+    web3-utils "1.0.0-beta.37"
+
 "@celo/dev-cli@^2.0.3":
   version "2.0.3"
   resolved "https://registry.yarnpkg.com/@celo/dev-cli/-/dev-cli-2.0.3.tgz#67f61dfee373ad8b412925e386cf122aabada5f5"
@@ -15069,6 +15088,11 @@ forwarded@~0.1.2:
   version "0.1.2"
   resolved "https://registry.yarnpkg.com/forwarded/-/forwarded-0.1.2.tgz#98c23dab1175657b8c0573e8ceccd91b0ff18c84"
   integrity sha1-mMI9qxF1ZXuMBXPozszZGw/xjIQ=
+
+fp-ts@2.0.5:
+  version "2.0.5"
+  resolved "https://registry.yarnpkg.com/fp-ts/-/fp-ts-2.0.5.tgz#9560d8a6a4f53cbda9f9b31ed8d1458e41939e07"
+  integrity sha512-opI5r+rVlpZE7Rhk0YtqsrmxGkbIw0dRNqGca8FEAMMnjomXotG+R9QkLQg20onx7R8qhepAn4CCOP8usma/Xw==
 
 fp-ts@2.1.1:
   version "2.1.1"
@@ -33965,7 +33989,6 @@ websocket@^1.0.28:
   dependencies:
     debug "^2.2.0"
     es5-ext "^0.10.50"
-    gulp "^4.0.2"
     nan "^2.14.0"
     typedarray-to-buffer "^3.1.5"
     yaeti "^0.0.6"
