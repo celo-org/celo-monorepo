@@ -1,7 +1,6 @@
 import networkConfig from 'src/geth/networkConfig'
 import { getRehydratePayload, REHYDRATE, RehydrateAction } from 'src/redux/persist-helper'
 import { Actions, ActionTypes } from 'src/web3/actions'
-import { statement } from '@babel/template'
 
 export interface State {
   syncProgress: {
@@ -47,7 +46,7 @@ export const reducer = (
           highestBlock: 0,
         },
         latestBlockNumber: 0,
-        gethStartedThisSession: !state.zeroSyncMode, // Upon app reload, reset whether geth started this session
+        gethStartedThisSession: !state.zeroSyncMode,
       }
     }
     case Actions.SET_ACCOUNT:

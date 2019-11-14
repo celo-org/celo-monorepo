@@ -54,11 +54,6 @@ const BLOCK_CHAIN_CORRUPTION_ERROR = "Error: CONNECTION ERROR: Couldn't connect 
 // checks if web3 claims it is currently syncing and attempts to wait for it to complete
 export function* checkWeb3SyncProgress() {
   const zeroSyncMode = yield select(zeroSyncSelector)
-  Logger.debug(
-    TAG,
-    'checkWeb3SyncProgress',
-    `Checking sync progress, zeroSync mode is: ${zeroSyncMode}`
-  )
   if (zeroSyncMode) {
     // In this mode, the check seems to fail with
     // web3/saga/checking web3 sync progress: Error: Invalid JSON RPC response: "":
@@ -88,7 +83,6 @@ export function* checkWeb3SyncProgress() {
 
       yield delay(100) // wait 100ms while web3 syncs
     } catch (error) {
-      Logger.error(TAG, 'checkWeb3SyncProgress error: ', error)
       if (error.toString().toLowerCase() === BLOCK_CHAIN_CORRUPTION_ERROR.toLowerCase()) {
         CeloAnalytics.track(CustomEventNames.blockChainCorruption, {}, true)
         const deleted = yield call(deleteChainData)
@@ -317,17 +311,12 @@ export function* unlockAccount(account: string) {
   Logger.debug(TAG + '@unlockAccount', `Unlocking account: ${account}`)
   try {
     const isAccountLocked = yield call(isLocked, account)
-    Logger.debug(TAG + '@unlockAccount', `Account is locked: ${isAccountLocked}`)
     if (!isAccountLocked) {
-      Logger.debug(TAG + '@unlockAccount', `Account already unlocked`)
       return true
     }
 
-    Logger.debug(TAG + '@unlockAccount', `About to request pincode`)
     const pincode = yield call(getPincode)
-    Logger.debug(TAG + '@unlockAccount', `Got pincode: ${pincode}`)
     const zeroSyncMode = yield select(zeroSyncSelector)
-    Logger.debug(TAG + '@unlockAccount', `ZeroSync mode: ${zeroSyncMode}`)
     if (zeroSyncMode) {
       if (accountAlreadyAddedInZeroSyncMode) {
         Logger.info(TAG + 'unlockAccount', `Account ${account} already added to web3 for signing`)
@@ -339,10 +328,6 @@ export function* unlockAccount(account: string) {
       }
       return true
     } else {
-      Logger.debug(TAG + '@unlockAccount', `Unlocking account...`)
-      const connected = yield call(web3.eth.net.isListening)
-      Logger.debug(TAG + '@unlockAccount', `Connected: ${connected}`)
-
       yield call(web3.eth.personal.unlockAccount, account, pincode, UNLOCK_DURATION)
       Logger.debug(TAG + '@unlockAccount', `Account unlocked: ${account}`)
       return true
@@ -364,7 +349,6 @@ export function* getConnectedAccount() {
 // Wait for geth to be connected, geth ready, and get unlocked account
 export function* getConnectedUnlockedAccount() {
   const account: string = yield call(getConnectedAccount)
-  Logger.debug(TAG + '@getConnectedUnlockedAccount', `Got account ${account}`)
   const success: boolean = yield call(unlockAccount, account)
   if (success) {
     return account
@@ -452,8 +436,9 @@ export function* switchToGethFromZeroSync() {
     yield call(ensureAccountInWeb3Keystore)
 
     if (gethAlreadyStartedThisSession) {
-      // For now, app must be restarted if geth has already been started.
-      // For example, if the user started running geth, turned zeroSync mode on, then turned geth back on
+      // If geth is started twice within the same session,
+      // there is an issue where it cannot find deployed contracts.
+      // Restarting the app fixes this issue.
       restartApp()
     }
   } catch (e) {

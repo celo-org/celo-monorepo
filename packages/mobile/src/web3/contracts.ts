@@ -25,9 +25,6 @@ function getIpcProvider() {
   const ipcProvider = new Web3.providers.IpcProvider(IPC_PATH, net)
   Logger.debug(tag, 'created IPCProvider')
 
-  Logger.debug('Ipc connection object is ' + Object.keys(ipcProvider))
-  // Logger.debug('Connection details: ' + JSON.stringify(ipcProvider.connection))
-
   // More details on the IPC objects can be seen via this
   // console.debug("Ipc connection object is " + Object.keys(ipcProvider.connection));
   // console.debug("Ipc data handle is " + ipcProvider.connection._events['data']);
@@ -56,7 +53,6 @@ function getIpcProvider() {
   // ipcProvider.on("error", () => {
   //   Logger.showError("Error occurred");
   // })
-  Logger.debug('About to return IPC provider')
   return ipcProvider
 }
 

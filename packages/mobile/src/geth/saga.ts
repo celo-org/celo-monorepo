@@ -41,14 +41,13 @@ export function* waitForGethConnectivity() {
   }
 }
 
-export function* waitForGethInstance() {
+function* waitForGethInstance() {
   const zeroSyncMode = yield select(zeroSyncSelector)
   Logger.error(TAG, `zeroSync mode: ${zeroSyncMode}`)
   if (zeroSyncMode) {
     return GethInitOutcomes.SUCCESS
   }
   try {
-    Logger.error(TAG, `Getting geth instance...`)
     const gethInstance = yield call(getGeth)
     if (gethInstance == null) {
       throw new Error('geth instance is null')
@@ -72,14 +71,10 @@ export function* initGethSaga() {
   Logger.debug(TAG, 'Initializing Geth')
   yield put(setInitState(InitializationState.INITIALIZING))
 
-  Logger.error(TAG + '@initGethSaga', 'About to wait for geth instance')
-
   const { result } = yield race({
     result: call(waitForGethInstance),
     timeout: delay(INIT_GETH_TIMEOUT),
   })
-
-  Logger.error(TAG + '@initGethSaga', `Got result: ${result}`)
 
   let restartAppAutomatically: boolean = false
   switch (result) {
@@ -158,7 +153,7 @@ function* monitorGeth() {
         yield put(setGethConnected(true))
         yield delay(GETH_MONITOR_DELAY)
       } else {
-        // Check whether reason for now new blocks is zeroSync mode
+        // Check whether reason for no new blocks is switch to zeroSync mode
         const switchedToZeroSync = yield select(zeroSyncSelector)
         if (switchedToZeroSync) {
           yield put(setGethConnected(true))
