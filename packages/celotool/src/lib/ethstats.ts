@@ -1,6 +1,7 @@
 import { installGenericHelmChart, removeGenericHelmChart } from 'src/lib/helm_deploy'
 import { execCmdWithExitOnFailure } from 'src/lib/utils'
 import { envVar, fetchEnv } from './env-utils'
+import { AccountType, getAddressesFor } from './generate_utils'
 
 const helmChartPath = '../helm-charts/ethstats'
 
@@ -31,11 +32,24 @@ function helmParameters() {
     `--set domain.name=${fetchEnv(envVar.CLUSTER_DOMAIN_NAME)}`,
     `--set ethstats.image.repository=${fetchEnv(envVar.ETHSTATS_DOCKER_IMAGE_REPOSITORY)}`,
     `--set ethstats.image.tag=${fetchEnv(envVar.ETHSTATS_DOCKER_IMAGE_TAG)}`,
-    `--set ethstats.trusted_enodes='{${fetchEnv(envVar.ETHSTATS_TRUSTED_ENODES)}}'`,
+    `--set ethstats.trusted_enodes='{${generateAuthorizedAddresses()}}'`,
     `--set ethstats.banned_enodes='{${fetchEnv(envVar.ETHSTATS_BANNED_ENODES)}}'`,
   ]
 }
 
 function releaseName(celoEnv: string) {
   return `${celoEnv}-ethstats`
+}
+
+function generateAuthorizedAddresses() {
+  // TODO: Add the Proxy eth addresses when available
+  const mnemonic = fetchEnv(envVar.MNEMONIC)
+  const publicKeys = []
+  const txNodes = parseInt(fetchEnv(envVar.TX_NODES), 0)
+  const validatorNodes = parseInt(fetchEnv(envVar.VALIDATORS), 0)
+  publicKeys.push(getAddressesFor(AccountType.TX_NODE, mnemonic, txNodes))
+  publicKeys.push(getAddressesFor(AccountType.VALIDATOR, mnemonic, validatorNodes))
+
+  publicKeys.push(fetchEnv(envVar.ETHSTATS_TRUSTED_ENODES).split(','))
+  return publicKeys.reduce((accumulator, value) => accumulator.concat(value), [])
 }
