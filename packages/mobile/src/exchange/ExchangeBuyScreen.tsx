@@ -33,7 +33,6 @@ interface State {
   makerToken: CURRENCY_ENUM
   makerTokenAvailableBalance: string
   goldAmount: string
-  dollarAmount: string
 }
 
 interface StateProps {
@@ -76,7 +75,6 @@ export class ExchangeBuyScreen extends React.Component<Props, State> {
     makerToken: CURRENCY_ENUM.DOLLAR,
     makerTokenAvailableBalance: '',
     goldAmount: '',
-    dollarAmount: '',
   }
 
   getMakerTokenPropertiesFromNavProps(): {
@@ -169,14 +167,13 @@ export class ExchangeBuyScreen extends React.Component<Props, State> {
   }
 
   render() {
-    const { makerToken, goldAmount } = this.state
+    const { makerToken } = this.state
     const { t, exchangeRatePair } = this.props
 
     const makerSymbol = CURRENCIES[makerToken].symbol
     const exchangeRateDisplay = getRateForMakerToken(exchangeRatePair, CURRENCY_ENUM.DOLLAR) // Always show rate in dollars
 
-    const exchangeRate = getRateForMakerToken(exchangeRatePair, CURRENCY_ENUM.GOLD)
-    const subtotal = getTakerAmount(parseInputAmount(goldAmount), exchangeRate)
+    const subtotal = this.getDollarAmount()
 
     return (
       <SafeAreaView
@@ -185,36 +182,55 @@ export class ExchangeBuyScreen extends React.Component<Props, State> {
         forceInset={{ top: 'never', bottom: 'always' }}
         style={styles.container}
       >
-        <DisconnectBanner />
-        <View style={{ flex: 1, alignItems: 'center' }}>
-          <Text style={fontStyles.subSmall}>
-            {makerSymbol + this.state.makerTokenAvailableBalance + ' ' + t('lowerCaseAvailable')}
-          </Text>
-        </View>
-        <KeyboardAwareScrollView keyboardShouldPersistTaps={'always'}>
-          <View style={{ flexDirection: 'column', padding: 16, justifyContent: 'flex-start' }}>
-            {/* Row 1 */}
-            <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
-              <Text style={[fontStyles.body]}>{CURRENCY_ENUM.GOLD}</Text>
-              <TextInput
-                autoFocus={true}
-                keyboardType={'decimal-pad'}
-                onChangeText={this.onChangeExchangeAmount}
-                value={this.getInputValue()}
-                placeholderTextColor={'#BDBDBD'}
-                placeholder={'0'}
-              />
-            </View>
-            <View style={styles.line} />
-            {/* Row 2*/}
-            <View style={{ flexDirection: 'row', flex: 1, justifyContent: 'space-between' }}>
-              <Text style={fontStyles.body}>{`Subtotal (@ $${exchangeRateDisplay})`}</Text>
-              <Text style={fontStyles.regular}>
-                {getMoneyDisplayValue(subtotal, CURRENCY_ENUM.DOLLAR, true)}
-              </Text>
-            </View>
+        <View
+          style={{
+            paddingHorizontal: 16,
+          }}
+        >
+          <DisconnectBanner />
+          <View style={{ flex: 1, alignItems: 'center' }}>
+            <Text style={fontStyles.subSmall}>
+              {makerSymbol + this.state.makerTokenAvailableBalance + ' ' + t('lowerCaseAvailable')}
+            </Text>
           </View>
-        </KeyboardAwareScrollView>
+          <KeyboardAwareScrollView keyboardShouldPersistTaps={'always'}>
+            <View
+              style={{
+                flexDirection: 'column',
+                justifyContent: 'flex-start',
+              }}
+            >
+              {/* Row 1 */}
+              <View
+                style={{
+                  flex: 1,
+                  flexDirection: 'row',
+                  justifyContent: 'space-between',
+                  marginTop: 38,
+                }}
+              >
+                <Text style={[fontStyles.body]}>{CURRENCY_ENUM.GOLD}</Text>
+                <TextInput
+                  autoFocus={true}
+                  keyboardType={'decimal-pad'}
+                  onChangeText={this.onChangeExchangeAmount}
+                  value={this.getInputValue()}
+                  placeholderTextColor={'#BDBDBD'}
+                  placeholder={'0'}
+                />
+              </View>
+              <View style={styles.line} />
+              {/* Row 2*/}
+              <View style={{ flexDirection: 'row', flex: 1, justifyContent: 'space-between' }}>
+                <Text style={fontStyles.body}>{`Subtotal (@ $${exchangeRateDisplay})`}</Text>
+                <Text style={fontStyles.regular}>
+                  {getMoneyDisplayValue(subtotal, CURRENCY_ENUM.DOLLAR, true)}
+                </Text>
+              </View>
+            </View>
+          </KeyboardAwareScrollView>
+        </View>
+
         <View style={componentStyles.bottomContainer}>
           <Button
             onPress={this.goToReview}
@@ -246,12 +262,13 @@ const styles = StyleSheet.create({
   line: {
     borderBottomColor: colors.darkLightest,
     borderBottomWidth: 1,
-    margin: 10,
+    marginBottom: 16,
   },
 
   container: {
-    backgroundColor: colors.background,
+    // backgroundColor: colors.background,
     flex: 1,
+    flexDirection: 'column',
     justifyContent: 'space-between',
   },
   transferArea: {
