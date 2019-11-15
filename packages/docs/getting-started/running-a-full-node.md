@@ -52,7 +52,9 @@ If you are re-running these instructions, the Celo Docker image may have been up
 
 Run:
 
-`$ docker pull us.gcr.io/celo-testnet/celo-node:alfajores`
+```bash
+$ docker pull $CELO_IMAGE:$CELO_NETWORK
+```
 
 ## **Set up a data directory**
 
