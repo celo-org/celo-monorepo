@@ -24,10 +24,6 @@ export const publicKeyToAddress = (publicKey: string) => {
   )
 }
 
-export const privateKeyToPublicKey = (privateKey: string) => {
-  return '0x' + privateToPublic(Buffer.from(privateKey.slice(2), 'hex')).toString('hex')
-}
-
 export { toChecksumAddress } from 'ethereumjs-util'
 export { isValidAddress } from 'ethereumjs-util'
 export { isValidChecksumAddress } from 'ethereumjs-util'
