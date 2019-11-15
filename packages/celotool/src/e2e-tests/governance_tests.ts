@@ -328,17 +328,8 @@ describe('governance tests', () => {
       assert.equal(errorWhileChangingValidatorSet, '')
     })
 
-    const getValidatorSetSignersAtBlock = async (blockNumber: number) => {
-      const validatorSetSize = await election.methods
-        .numberValidatorsInCurrentSet()
-        .call({}, blockNumber)
-      const validatorSet = []
-      for (let i = 0; i < validatorSetSize; i++) {
-        validatorSet.push(
-          await election.methods.validatorAddressFromCurrentSet(i).call({}, blockNumber)
-        )
-      }
-      return validatorSet
+    const getValidatorSetSignersAtBlock = async (blockNumber: number): Promise<string[]> => {
+      return election.methods.currentValidators().call({}, blockNumber)
     }
 
     const getValidatorSetAccountsAtBlock = async (blockNumber: number) => {

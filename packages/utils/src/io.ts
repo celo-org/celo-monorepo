@@ -2,7 +2,7 @@ import { isValidPublic, toChecksumAddress } from 'ethereumjs-util'
 import { either } from 'fp-ts/lib/Either'
 import * as t from 'io-ts'
 import { isE164NumberStrict } from './phoneNumbers'
-import { isValidAddress } from './signatureUtils'
+import { isValidAddress } from './address'
 
 // from http://urlregex.com/
 export const URL_REGEX = new RegExp(

@@ -1,4 +1,4 @@
-import { ensureHexLeader } from '@celo/utils/src/signatureUtils'
+import { ensureHexLeader } from '@celo/utils/src/address'
 import BigNumber from 'bignumber.js'
 import { validateMnemonic } from 'bip39'
 import { mnemonicToSeedHex } from 'react-native-bip39'
