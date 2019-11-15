@@ -83,18 +83,23 @@ export class ExchangeBuyScreen extends React.Component<Props, State> {
 
   getMakerTokenPropertiesFromNavProps(): {
     makerToken: CURRENCY_ENUM
+    makerTokenAvailableBalance: string
   } {
     const makerToken = this.props.navigation.getParam('makerToken')
-    if (!makerToken) {
-      throw new Error('Maker tokn missing form nav props')
+    const makerTokenAvailableBalance = this.props.navigation.getParam('makerTokenBalance')
+    if (!makerToken || !makerTokenAvailableBalance) {
+      throw new Error('Mnemonic missing form nav props')
     }
-    return makerToken
+    return { makerToken, makerTokenAvailableBalance }
   }
 
   componentDidMount() {
     this.props.fetchExchangeRate()
-    const makerToken = this.getMakerTokenPropertiesFromNavProps()
-    this.setState(makerToken)
+    const { makerToken, makerTokenAvailableBalance } = this.getMakerTokenPropertiesFromNavProps()
+    this.setState({
+      makerToken,
+      makerTokenAvailableBalance,
+    })
   }
 
   onChangeExchangeAmount = (amount: string) => {
@@ -102,9 +107,7 @@ export class ExchangeBuyScreen extends React.Component<Props, State> {
     const currencySymbol = new RegExp('\\' + CURRENCIES[CURRENCY_ENUM.DOLLAR].symbol, 'g')
     amount = amount.replace(currencySymbol, '')
 
-    this.setState({ makerTokenAmount: amount }, () => {
-      this.updateError(amount)
-    })
+    this.setState({ makerTokenAmount: amount })
   }
 
   updateError(amount: string) {

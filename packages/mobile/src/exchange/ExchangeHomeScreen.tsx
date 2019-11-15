@@ -16,11 +16,10 @@ import ExchangeRate from 'src/exchange/ExchangeRate'
 import { CURRENCY_ENUM as Token } from 'src/geth/consts'
 import { Namespaces } from 'src/i18n'
 import { navigate } from 'src/navigator/NavigationService'
-import { Screens, Stacks } from 'src/navigator/Screens'
+import { Stacks } from 'src/navigator/Screens'
 import { RootState } from 'src/redux/reducers'
 import DisconnectBanner from 'src/shared/DisconnectBanner'
 import { getRateForMakerToken } from 'src/utils/currencyExchange'
-import Logger from 'src/utils/Logger'
 
 interface StateProps {
   exchangeRate: BigNumber
@@ -50,21 +49,17 @@ export class ExchangeHomeScreen extends React.Component<Props, State> {
     this.props.fetchExchangeRate()
   }
 
-  goToBuyGold() {
-    Logger.debug('ExchangeHomeScreen', 'about to read balance')
-    const balance = this.state.goldBalance
-    Logger.debug('ExchangeHomeScreen', `read balance of ${balance}`)
+  goToBuyGold = () => {
     navigate(Stacks.ExchangeStack, {
       makerToken: Token.GOLD,
-      makerTokenBalance: balance,
+      makerTokenBalance: this.props.goldBalance,
     })
   }
 
-  goToBuyDollars() {
-    const balance = this.state.goldBalance
-    navigate(Screens.ExchangeBuyScreen, {
-      makerToken: Token.GOLD,
-      makerTokenBalance: balance,
+  goToBuyDollars = () => {
+    navigate(Stacks.ExchangeStack, {
+      makerToken: Token.DOLLAR,
+      makerTokenBalance: this.props.dollarBalance,
     })
   }
 
