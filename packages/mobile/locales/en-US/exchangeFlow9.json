@@ -13,6 +13,7 @@
   "cancel": "Cancel",
   "includeExchangeFee": "*includes exchange fee",
   "available": "Available",
+  "lowerCaseAvailable": "available",
   "newBalance": "New Balance",
   "continue": "Continue",
   "reviewExchange": "Review Exchange",

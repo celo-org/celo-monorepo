@@ -51,15 +51,15 @@ export class ExchangeHomeScreen extends React.Component<Props, State> {
 
   goToBuyGold = () => {
     navigate(Stacks.ExchangeStack, {
-      makerToken: Token.GOLD,
-      makerTokenBalance: this.props.goldBalance,
+      makerToken: Token.DOLLAR,
+      makerTokenBalance: this.props.dollarBalance,
     })
   }
 
   goToBuyDollars = () => {
     navigate(Stacks.ExchangeStack, {
-      makerToken: Token.DOLLAR,
-      makerTokenBalance: this.props.dollarBalance,
+      makerToken: Token.GOLD,
+      makerTokenBalance: this.props.goldBalance,
     })
   }
 
