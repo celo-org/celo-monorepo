@@ -23,23 +23,48 @@ interface DispatchProps {
   handleBarcodeDetected: typeof handleBarcodeDetected
 }
 
+interface State {
+  isScanningEnabled: boolean
+}
+
 type Props = DispatchProps & WithNamespaces & NavigationFocusInjectedProps
 
-class QRScanner extends React.Component<Props> {
+class QRScanner extends React.Component<Props, State> {
   static navigationOptions = () => ({
     ...headerWithBackButton,
     headerTitle: i18n.t('sendFlow7:scanCode'),
   })
 
+  timeout: undefined | number = undefined
+
+  state = {
+    isScanningEnabled: true,
+  }
+
   camera: RNCamera | null = null
 
+  // This method would be called multiple times with the same
+  // QR code, so we need to catch only the first one
   onBardCodeDetected = (rawData: any) => {
-    Logger.debug('QRScanner', 'Bar code detected')
-    this.props.handleBarcodeDetected(rawData)
+    if (this.state.isScanningEnabled) {
+      this.setState({ isScanningEnabled: false }, () => {
+        Logger.debug('QRScanner', 'Bar code detected')
+        this.props.handleBarcodeDetected(rawData)
+      })
+      this.timeout = setTimeout(() => {
+        this.setState({ isScanningEnabled: true })
+      }, 1000)
+    }
   }
 
   onPressShowYourCode = () => {
     navigate(Screens.QRCode)
+  }
+
+  componentWillUnmount() {
+    if (this.timeout) {
+      clearTimeout(this.timeout)
+    }
   }
 
   render() {

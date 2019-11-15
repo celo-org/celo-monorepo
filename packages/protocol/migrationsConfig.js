@@ -54,7 +54,6 @@ const DefaultConfig = {
     initialMinimum: 10000,
     targetDensity: 1 / 2,
     adjustmentSpeed: 1 / 2,
-    proposerFraction: 1 / 2,
   },
   governance: {
     approvalStageDuration: 15 * 60, // 15 minutes

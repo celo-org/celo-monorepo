@@ -1,3 +1,4 @@
+import { ContractKit } from '@celo/contractkit'
 import { ClaimTypes, IdentityMetadataWrapper } from '@celo/contractkit/lib/identity'
 import { Claim, hashOfClaim, verifyClaim } from '@celo/contractkit/lib/identity/claims/claim'
 import { VERIFIABLE_CLAIM_TYPES } from '@celo/contractkit/lib/identity/claims/types'
@@ -78,10 +79,11 @@ export const claimFlags = {
 
 export const claimArgs = [Args.file('file', { description: 'Path of the metadata file' })]
 
-export const displayMetadata = async (metadata: IdentityMetadataWrapper) => {
+export const displayMetadata = async (metadata: IdentityMetadataWrapper, kit: ContractKit) => {
+  const accounts = await kit.contracts.getAccounts()
   const data = await concurrentMap(5, metadata.claims, async (claim) => {
     const verifiable = VERIFIABLE_CLAIM_TYPES.includes(claim.payload.type)
-    const status = await verifyClaim(claim, metadata.data.meta.address)
+    const status = await verifyClaim(claim, metadata.data.meta.address, accounts.getMetadataURL)
     let extra = ''
     switch (claim.payload.type) {
       case ClaimTypes.ATTESTATION_SERVICE_URL:
@@ -104,7 +106,7 @@ export const displayMetadata = async (metadata: IdentityMetadataWrapper) => {
       type: claim.payload.type,
       extra,
       verifiable: verifiable ? 'Yes' : 'No',
-      status: verifiable ? (status ? `Invalid: ${status}` : 'Valid!') : '',
+      status: verifiable ? (status ? `Invalid: ${status}` : 'Valid!') : 'N/A',
       createdAt: moment.unix(claim.payload.timestamp).fromNow(),
       hash: hashOfClaim(claim.payload),
     }

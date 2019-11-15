@@ -2,10 +2,10 @@ import { AttestationState } from '@celo/contractkit/lib/wrappers/Attestations'
 import { attestToIdentifier, SignatureUtils } from '@celo/utils'
 import { privateKeyToAddress } from '@celo/utils/lib/address'
 import { retryAsyncWithBackOff } from '@celo/utils/lib/async'
+import { Address, AddressType, E164Number, E164PhoneNumberType } from '@celo/utils/lib/io'
 import express from 'express'
 import * as t from 'io-ts'
 import { existingAttestationRequest, kit, persistAttestationRequest } from './db'
-import { Address, AddressType, E164Number, E164PhoneNumberType } from './request'
 import { sendSms } from './sms'
 
 export const AttestationRequestType = t.type({
