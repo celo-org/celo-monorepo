@@ -212,17 +212,8 @@ describe('governance tests', () => {
       await sleep(epoch)
     })
 
-    const getValidatorSetAtBlock = async (blockNumber: number) => {
-      const validatorSetSize = await election.methods
-        .numberValidatorsInCurrentSet()
-        .call({}, blockNumber)
-      const validatorSet = []
-      for (let i = 0; i < validatorSetSize; i++) {
-        validatorSet.push(
-          await election.methods.validatorAddressFromCurrentSet(i).call({}, blockNumber)
-        )
-      }
-      return validatorSet
+    const getValidatorSetAtBlock = async (blockNumber: number): Promise<string[]> => {
+      return election.methods.currentValidators().call({}, blockNumber)
     }
 
     const getLastEpochBlock = (blockNumber: number) => {
@@ -266,28 +257,28 @@ describe('governance tests', () => {
 
       const assertScoreUnchanged = async (validator: string, blockNumber: number) => {
         const score = new BigNumber(
-          (await validators.methods.getValidator(validator).call({}, blockNumber))[3]
+          (await validators.methods.getValidator(validator).call({}, blockNumber))[2]
         )
         const previousScore = new BigNumber(
-          (await validators.methods.getValidator(validator).call({}, blockNumber - 1))[3]
+          (await validators.methods.getValidator(validator).call({}, blockNumber - 1))[2]
         )
-        assert.isNotNaN(score)
-        assert.isNotNaN(previousScore)
+        assert.isFalse(score.isNaN())
+        assert.isFalse(previousScore.isNaN())
         assert.equal(score.toFixed(), previousScore.toFixed())
       }
 
       const assertScoreChanged = async (validator: string, blockNumber: number) => {
         const score = new BigNumber(
-          (await validators.methods.getValidator(validator).call({}, blockNumber))[3]
+          (await validators.methods.getValidator(validator).call({}, blockNumber))[2]
         )
         const previousScore = new BigNumber(
-          (await validators.methods.getValidator(validator).call({}, blockNumber - 1))[3]
+          (await validators.methods.getValidator(validator).call({}, blockNumber - 1))[2]
         )
+        assert.isFalse(score.isNaN())
+        assert.isFalse(previousScore.isNaN())
         const expectedScore = adjustmentSpeed
           .times(uptime)
           .plus(new BigNumber(1).minus(adjustmentSpeed).times(fromFixed(previousScore)))
-        assert.isNotNaN(score)
-        assert.isNotNaN(previousScore)
         assert.equal(score.toFixed(), toFixed(expectedScore).toFixed())
       }
 
