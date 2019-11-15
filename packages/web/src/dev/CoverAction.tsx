@@ -33,7 +33,7 @@ export default function CoverAction({ title, text, graphic, link, isMobile, styl
         <Text
           style={[
             fonts.p,
-            textStyles.invert,
+            textStyles.readingOnDark,
             standardStyles.elementalMarginBottom,
             isMobile && textStyles.center,
           ]}

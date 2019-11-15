@@ -93,7 +93,7 @@ describe('sync tests', function(this: any) {
       const instance: GethInstanceConfig = gethConfig.instances[0]
       await killInstance(instance)
       await initAndStartGeth(hooks.gethBinaryPath, instance)
-      await sleep(60) // wait for round change / resync
+      await sleep(120) // wait for round change / resync
       const address = (await web3.eth.getAccounts())[0]
       const currentBlock = await web3.eth.getBlock('latest')
       for (let i = 0; i < gethConfig.instances.length; i++) {
