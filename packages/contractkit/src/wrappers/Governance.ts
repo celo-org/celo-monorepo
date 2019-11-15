@@ -50,19 +50,9 @@ export interface ProposalMetadata {
   transactionCount: number
 }
 
-export type ProposalTransaction = Pick<Transaction, 'to' | 'input' | 'value'>
 export type ProposalParams = Parameters<Governance['methods']['propose']>
-export class Proposal {
-  constructor(public readonly transactions: ProposalTransaction[]) {}
-  get params(): ProposalParams {
-    return [
-      this.transactions.map((tx) => tx.value),
-      this.transactions.map((tx) => tx.to),
-      toSolidityBytes(Buffer.concat(this.transactions.map((tx) => stringToBuffer(tx.input)))),
-      this.transactions.map((tx) => tx.input.length),
-    ]
-  }
-}
+export type ProposalTransaction = Pick<Transaction, 'to' | 'input' | 'value'>
+export type Proposal = ProposalTransaction[]
 
 export interface ProposalRecord {
   stage: ProposalStage
@@ -192,6 +182,13 @@ export class GovernanceWrapper extends BaseWrapper<Governance> {
     })
   )
 
+  static toParams = (proposal: Proposal): ProposalParams => [
+    proposal.map((tx) => tx.value),
+    proposal.map((tx) => tx.to),
+    toSolidityBytes(Buffer.concat(proposal.map((tx) => stringToBuffer(tx.input)))),
+    proposal.map((tx) => tx.input.length),
+  ]
+
   /**
    * Returns whether a given proposal is approved.
    * @param proposalID Governance proposal UUID
@@ -219,10 +216,7 @@ export class GovernanceWrapper extends BaseWrapper<Governance> {
   async getProposal(proposalID: BigNumber.Value): Promise<Proposal> {
     const metadata = await this.getProposalMetadata(proposalID)
     const txIndices = Array.from(Array(metadata.transactionCount).keys())
-    const transactions = await concurrentMap(1, txIndices, (idx) =>
-      this.getProposalTransaction(proposalID, idx)
-    )
-    return new Proposal(transactions)
+    return concurrentMap(1, txIndices, (idx) => this.getProposalTransaction(proposalID, idx))
   }
 
   /**
@@ -261,11 +255,7 @@ export class GovernanceWrapper extends BaseWrapper<Governance> {
    * Submits a new governance proposal.
    * @param proposal Governance proposal
    */
-  propose = proxySend(
-    this.kit,
-    this.contract.methods.propose,
-    (proposal: Proposal) => proposal.params
-  )
+  propose = proxySend(this.kit, this.contract.methods.propose, GovernanceWrapper.toParams)
 
   /**
    * Returns whether a governance proposal exists with the given ID.
@@ -551,6 +541,6 @@ export class GovernanceWrapper extends BaseWrapper<Governance> {
   executeHotfix = proxySend(
     this.kit,
     this.contract.methods.executeHotfix,
-    (hotfix: Proposal) => hotfix.params
+    GovernanceWrapper.toParams
   )
 }

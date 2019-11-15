@@ -2,7 +2,7 @@ import { concurrentMap } from '@celo/utils/lib/async'
 import BigNumber from 'bignumber.js'
 import { Address, CeloContract } from '../base'
 import { Registry } from '../generated/types/Registry'
-import { proposalTxFromWeb3Txo, ProposalUtility } from '../governance/proposals'
+import { ProposalBuilder, ProposalUtility } from '../governance/proposals'
 import { newKitFromWeb3 } from '../kit'
 import { NetworkConfig, testWithGanache, timeTravel } from '../test-utils/ganache-test'
 import { GovernanceWrapper, Proposal, ProposalStage, VoteValue } from './Governance'
@@ -27,16 +27,16 @@ testWithGanache('Governance Wrapper', (web3) => {
 
   type Repoint = [CeloContract, Address]
 
-  const registryRepointProposal = (repoints: Repoint[]) =>
-    new ProposalUtility(
-      repoints.map((r) =>
-        proposalTxFromWeb3Txo(registry.methods.setAddressFor(...r), {
-          to: registry._address,
-          value: '0',
-        })
-      ),
-      kit
+  const registryRepointProposal = (repoints: Repoint[]) => {
+    const builder = new ProposalBuilder(kit)
+    repoints.forEach((r) =>
+      builder.addWeb3Tx(registry.methods.setAddressFor(...r), {
+        to: registry._address,
+        value: '0',
+      })
     )
+    return new ProposalUtility(kit, builder.proposal)
+  }
 
   const verifyRepointResult = (repoints: Repoint[]) =>
     concurrentMap(1, repoints, async (repoint) => {
@@ -55,7 +55,7 @@ testWithGanache('Governance Wrapper', (web3) => {
     expect(config.stageDurations.Execution).toEqBigNumber(expConfig.executionStageDuration)
   })
 
-  describe.only('Proposals', () => {
+  describe('Proposals', () => {
     const repoints: Repoint[] = [
       [CeloContract.Random, '0x0000000000000000000000000000000000000001'],
       [CeloContract.Escrow, '0x0000000000000000000000000000000000000002'],
@@ -63,7 +63,7 @@ testWithGanache('Governance Wrapper', (web3) => {
     const proposalID = new BigNumber(1)
 
     let proposal: Proposal
-    beforeAll(() => (proposal = registryRepointProposal(repoints)))
+    beforeAll(() => (proposal = registryRepointProposal(repoints).proposal))
 
     const proposeFn = async (proposer: Address) => {
       const tx = governance.propose(proposal)
@@ -97,9 +97,8 @@ testWithGanache('Governance Wrapper', (web3) => {
 
       const proposalRecord = await governance.getProposalRecord(proposalID)
       expect(proposalRecord.metadata.proposer).toBe(accounts[0])
-      expect(proposalRecord.metadata.transactionCount).toBe(proposal.transactions.length)
-      expect(proposalRecord.proposal.transactions).toStrictEqual(proposal.transactions)
-      expect(proposalRecord.proposal.params).toStrictEqual(proposal.params)
+      expect(proposalRecord.metadata.transactionCount).toBe(proposal.length)
+      expect(proposalRecord.proposal).toStrictEqual(proposal)
       expect(proposalRecord.stage).toBe(ProposalStage.Queued)
     })
 
@@ -171,78 +170,80 @@ testWithGanache('Governance Wrapper', (web3) => {
     )
   })
 
-  describe('Hotfixes', () => {
-    const repoints: Repoint[] = [
-      [CeloContract.Random, '0x0000000000000000000000000000000000000003'],
-      [CeloContract.Escrow, '0x0000000000000000000000000000000000000004'],
-    ]
+  // NOTE: disabled while validators are not accessible from ganache
 
-    let hotfix: ProposalUtility
-    beforeAll(() => (hotfix = registryRepointProposal(repoints)))
+  // describe('Hotfixes', () => {
+  //   const repoints: Repoint[] = [
+  //     [CeloContract.Random, '0x0000000000000000000000000000000000000003'],
+  //     [CeloContract.Escrow, '0x0000000000000000000000000000000000000004'],
+  //   ]
 
-    const whitelistFn = async (whitelister: Address) => {
-      const tx = governance.whitelistHotfix(hotfix.hash)
-      await tx.sendAndWaitForReceipt({ from: whitelister })
-    }
+  //   let hotfix: ProposalUtility
+  //   beforeAll(() => (hotfix = registryRepointProposal(repoints)))
 
-    // validator keys correspond to accounts 6-9
-    const whitelistQuorumFn = () => concurrentMap(1, accounts.slice(6, 10), whitelistFn)
+  //   const whitelistFn = async (whitelister: Address) => {
+  //     const tx = governance.whitelistHotfix(hotfix.hash)
+  //     await tx.sendAndWaitForReceipt({ from: whitelister })
+  //   }
 
-    // protocol/truffle-config defines approver address as accounts[0]
-    const approveFn = async () => {
-      const tx = governance.approveHotfix(hotfix.hash)
-      await tx.sendAndWaitForReceipt({ from: accounts[0] })
-    }
+  //   // validator keys correspond to accounts 6-9
+  //   const whitelistQuorumFn = () => concurrentMap(1, accounts.slice(6, 10), whitelistFn)
 
-    const prepareFn = async () => {
-      const tx = governance.prepareHotfix(hotfix.hash)
-      await tx.sendAndWaitForReceipt()
-    }
+  //   // protocol/truffle-config defines approver address as accounts[0]
+  //   const approveFn = async () => {
+  //     const tx = governance.approveHotfix(hotfix.hash)
+  //     await tx.sendAndWaitForReceipt({ from: accounts[0] })
+  //   }
 
-    it('#whitelistHotfix', async () => {
-      await whitelistFn(accounts[9])
+  //   const prepareFn = async () => {
+  //     const tx = governance.prepareHotfix(hotfix.hash)
+  //     await tx.sendAndWaitForReceipt()
+  //   }
 
-      const whitelisted = await governance.isHotfixWhitelistedBy(hotfix.hash, accounts[9])
-      expect(whitelisted).toBeTruthy()
-    })
+  //   it('#whitelistHotfix', async () => {
+  //     await whitelistFn(accounts[9])
 
-    it('#approveHotfix', async () => {
-      await approveFn()
+  //     const whitelisted = await governance.isHotfixWhitelistedBy(hotfix.hash, accounts[9])
+  //     expect(whitelisted).toBeTruthy()
+  //   })
 
-      const record = await governance.getHotfixRecord(hotfix.hash)
-      expect(record.approved).toBeTruthy()
-    })
+  //   it('#approveHotfix', async () => {
+  //     await approveFn()
 
-    it(
-      '#prepareHotfix',
-      async () => {
-        await whitelistQuorumFn()
-        await approveFn()
-        await prepareFn()
+  //     const record = await governance.getHotfixRecord(hotfix.hash)
+  //     expect(record.approved).toBeTruthy()
+  //   })
 
-        const validators = await kit.contracts.getValidators()
-        const record = await governance.getHotfixRecord(hotfix.hash)
-        expect(record.preparedEpoch).toBe(await validators.getEpochNumber())
-      },
-      EXTENDED_TIMEOUT
-    )
+  //   it(
+  //     '#prepareHotfix',
+  //     async () => {
+  //       await whitelistQuorumFn()
+  //       await approveFn()
+  //       await prepareFn()
 
-    it(
-      '#executeHotfix',
-      async () => {
-        await whitelistQuorumFn()
-        await approveFn()
-        await prepareFn()
+  //       const validators = await kit.contracts.getValidators()
+  //       const record = await governance.getHotfixRecord(hotfix.hash)
+  //       expect(record.preparedEpoch).toBe(await validators.getEpochNumber())
+  //     },
+  //     EXTENDED_TIMEOUT
+  //   )
 
-        const tx = governance.executeHotfix(hotfix)
-        await tx.sendAndWaitForReceipt()
+  //   it(
+  //     '#executeHotfix',
+  //     async () => {
+  //       await whitelistQuorumFn()
+  //       await approveFn()
+  //       await prepareFn()
 
-        const record = await governance.getHotfixRecord(hotfix.hash)
-        expect(record.executed).toBeTruthy()
+  //       const tx = governance.executeHotfix(hotfix.proposal)
+  //       await tx.sendAndWaitForReceipt()
 
-        await verifyRepointResult(repoints)
-      },
-      EXTENDED_TIMEOUT
-    )
-  })
+  //       const record = await governance.getHotfixRecord(hotfix.hash)
+  //       expect(record.executed).toBeTruthy()
+
+  //       await verifyRepointResult(repoints)
+  //     },
+  //     EXTENDED_TIMEOUT
+  //   )
+  // })
 })
