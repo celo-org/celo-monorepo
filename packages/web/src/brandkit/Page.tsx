@@ -7,44 +7,68 @@ import Topbar from 'src/brandkit/TopBar'
 import { SingletonRouter, withRouter } from 'next/router'
 import { withScreenSize, ScreenProps, ScreenSizes } from 'src/layout/ScreenSize'
 import { colors, standardStyles } from 'src/styles'
-
+import menu, { hashNav } from 'src/shared/menu-items'
 import MobileMenu from 'src/brandkit/MobileMenu'
 import { HEADER_HEIGHT } from 'src/shared/Styles'
+
+const ROOT = menu.BRAND.link
+
+const LOGO_PATH = `${ROOT}/logo`
+
+const COLOR_PATH = `${ROOT}/color`
+
+const TYPE_PATH = `${ROOT}/typography`
+
+const IMAGERY_PATH = `${ROOT}/key-imagery`
 
 const PAGES = [
   {
     title: 'Introduction',
-    href: '/brand',
+    href: ROOT,
     sections: [],
   },
   {
     title: 'Logo',
-    href: '/brand/logo',
+    href: LOGO_PATH,
 
     sections: [
-      { title: 'Overview', href: '/brand/logo#overview' },
-      { title: 'Glyph', href: '/brand/logo#glyph' },
-      { title: 'Wordmark', href: '/brand/logo#wordmark' },
-      { title: 'Guidlines', href: '/brand/logo#guidelines' },
+      { title: 'Overview', href: `${LOGO_PATH}#${hashNav.brandLogo.overview}` },
+      { title: 'Glyph', href: `${LOGO_PATH}#${hashNav.brandLogo.glyph}` },
+      { title: 'Clearspace', href: `${LOGO_PATH}#${hashNav.brandLogo.clearspace}` },
+      { title: 'Size', href: `${LOGO_PATH}#${hashNav.brandLogo.size}` },
+      { title: 'Backgrounds', href: `${LOGO_PATH}#${hashNav.brandLogo.backgrounds}` },
     ],
   },
   {
     title: 'Color',
-    href: '/brand/color',
+    href: COLOR_PATH,
 
-    sections: [{ title: 'Overview', href: '/brand/color#overview' }],
+    sections: [
+      { title: 'Overview', href: `${COLOR_PATH}#${hashNav.brandColor.overview}` },
+      { title: 'Color System', href: `${COLOR_PATH}#${hashNav.brandColor.system}` },
+      { title: 'Guideline', href: `${COLOR_PATH}#${hashNav.brandColor.guideline}` },
+    ],
   },
   {
     title: 'Typography',
-    href: '/brand/typography',
+    href: TYPE_PATH,
 
-    sections: [{ title: 'Overview', href: '/brand/typography#overview' }],
+    sections: [
+      { title: 'Overview', href: `${TYPE_PATH}#${hashNav.brandTypography.overview}` },
+      { title: 'Color System', href: `${TYPE_PATH}#${hashNav.brandTypography.system}` },
+      { title: 'Guideline', href: `${TYPE_PATH}#${hashNav.brandTypography.guideline}` },
+    ],
   },
   {
     title: 'Key Imagery',
-    href: '/brand/key-imagery',
+    href: IMAGERY_PATH,
 
-    sections: [],
+    sections: [
+      { title: 'Overview', href: `${IMAGERY_PATH}#${hashNav.brandImagery.overview}` },
+      { title: 'Icons', href: `${IMAGERY_PATH}#${hashNav.brandImagery.icons}` },
+      { title: 'Illustrations', href: `${IMAGERY_PATH}#${hashNav.brandImagery.illustrations}` },
+      { title: 'Abstract Graphics', href: `${IMAGERY_PATH}#${hashNav.brandImagery.graphics}` },
+    ],
   },
 ]
 

@@ -18,30 +18,6 @@ export default withNamespaces()(
               </View>
             ),
           },
-          {
-            id: 'glyph',
-            children: (
-              <View style={[styles.container, { minHeight: 400, backgroundColor: colors.primary }]}>
-                <Text>glyph</Text>
-              </View>
-            ),
-          },
-          {
-            id: 'wordmark',
-            children: (
-              <View style={[styles.container, { height: 2000, backgroundColor: colors.purple }]}>
-                <Text>wordmark</Text>
-              </View>
-            ),
-          },
-          {
-            id: 'guidelines',
-            children: (
-              <View style={[styles.container, { height: 500, backgroundColor: colors.deepBlue }]}>
-                <Text>guidelines</Text>
-              </View>
-            ),
-          },
         ]}
       />
     )

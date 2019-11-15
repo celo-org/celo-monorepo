@@ -121,7 +121,6 @@ function color(kind: Kind) {
   return kind === Kind.page ? colors.primary : colors.gold
 }
 
-// TODO handle more situations like # etc
 function isActive(path: string, currentPath: string) {
   if (path === currentPath) {
     return true

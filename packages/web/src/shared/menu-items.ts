@@ -86,9 +86,7 @@ export const languageOptions = {
 }
 
 export const hashNav = {
-  about: {
-    backers: 'backers',
-  },
+  about: { backers: 'backers' },
   build: {
     features: 'features',
     stack: 'stack',
@@ -106,11 +104,26 @@ export const hashNav = {
     fund: 'fund',
     newsletter: 'newsletter',
   },
-  join: {
-    roles: 'roles',
+  join: { roles: 'roles' },
+  home: { partnerships: 'partnerships' },
+  brandLogo: {
+    overview: 'overview',
+    glyph: 'glyph',
+    clearspace: 'clearspace',
+    size: 'size',
+    backgrounds: 'backgrounds',
   },
-  home: {
-    partnerships: 'partnerships',
+  brandColor: {
+    overview: 'overview',
+    system: 'color-system',
+    guideline: 'guideline',
+  },
+  brandTypography: { overview: 'overview', system: 'type-system', guideline: 'guideline' },
+  brandImagery: {
+    overview: 'overview',
+    icons: 'icons',
+    illustrations: 'illustrations',
+    graphics: 'abstract-graphics',
   },
 }
 
