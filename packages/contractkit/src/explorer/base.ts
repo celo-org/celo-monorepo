@@ -1,7 +1,6 @@
 import { Address } from '@celo/utils/lib/address'
 import { concurrentMap } from '@celo/utils/lib/async'
 import { ABIDefinition } from 'web3/eth/abi'
-import { Block, Transaction } from 'web3/eth/types'
 import { AllContracts } from '../base'
 import { ContractKit } from '../kit'
 
@@ -9,23 +8,6 @@ export interface ContractDetails {
   name: string
   address: Address
   jsonInterface: ABIDefinition[]
-}
-
-export interface CallDetails {
-  contract: string
-  function: string
-  parameters: Record<string, any>
-  args: any[]
-}
-
-export interface ParsedTx {
-  callDetails: CallDetails
-  tx: Transaction
-}
-
-export interface ParsedBlock {
-  block: Block
-  parsedTx: ParsedTx[]
 }
 
 export async function obtainKitContractDetails(kit: ContractKit) {
