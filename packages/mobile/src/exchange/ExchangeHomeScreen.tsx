@@ -16,10 +16,11 @@ import ExchangeRate from 'src/exchange/ExchangeRate'
 import { CURRENCY_ENUM as Token } from 'src/geth/consts'
 import { Namespaces } from 'src/i18n'
 import { navigate } from 'src/navigator/NavigationService'
-import { Stacks } from 'src/navigator/Screens'
+import { Screens, Stacks } from 'src/navigator/Screens'
 import { RootState } from 'src/redux/reducers'
 import DisconnectBanner from 'src/shared/DisconnectBanner'
 import { getRateForMakerToken } from 'src/utils/currencyExchange'
+import Logger from 'src/utils/Logger'
 
 interface StateProps {
   exchangeRate: BigNumber
@@ -49,22 +50,26 @@ export class ExchangeHomeScreen extends React.Component<Props, State> {
     this.props.fetchExchangeRate()
   }
 
-  goToBuyGold(goldBalance: string) {
+  goToBuyGold() {
+    Logger.debug('ExchangeHomeScreen', 'about to read balance')
+    const balance = this.state.goldBalance
+    Logger.debug('ExchangeHomeScreen', `read balance of ${balance}`)
     navigate(Stacks.ExchangeStack, {
-      makerToken: Token.DOLLAR,
-      makerTokenBalance: goldBalance,
+      makerToken: Token.GOLD,
+      makerTokenBalance: balance,
     })
   }
 
   goToBuyDollars() {
-    navigate(Stacks.ExchangeStack, {
+    const balance = this.state.goldBalance
+    navigate(Screens.ExchangeBuyScreen, {
       makerToken: Token.GOLD,
-      makerTokenBalance: this.state.goldBalance,
+      makerTokenBalance: balance,
     })
   }
 
   render() {
-    const { t, exchangeRate, dollarBalance, goldBalance } = this.props
+    const { t, exchangeRate } = this.props
 
     return (
       <SafeAreaView style={styles.background}>
@@ -82,9 +87,7 @@ export class ExchangeHomeScreen extends React.Component<Props, State> {
             <View style={styles.buttonContainer}>
               <Button
                 text={t('buy')}
-                onPress={() => {
-                  this.goToBuyGold(goldBalance)
-                }}
+                onPress={this.goToBuyGold}
                 style={styles.button}
                 standard={true}
                 type={BtnTypes.PRIMARY}

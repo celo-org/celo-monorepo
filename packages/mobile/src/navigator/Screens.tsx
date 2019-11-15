@@ -31,6 +31,7 @@ export enum Screens {
   ErrorScreen = 'ErrorScreen',
   ExchangeHomeScreen = 'ExchangeHomeScreen',
   ExchangeReview = 'ExchangeReview',
+  ExchangeBuyScreen = 'ExchangeBuyScreen',
   ExchangeTradeScreen = 'ExchangeTradeScreen',
   FeeEducation = 'FeeEducation',
   FeeExchangeEducation = 'FeeExchangeEducation',
