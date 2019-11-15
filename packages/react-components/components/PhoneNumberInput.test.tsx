@@ -65,8 +65,6 @@ describe('when defaultCountry is truthy', () => {
       wrapper.instance().setState({})
       await wrapper.instance().triggerPhoneNumberRequest()
 
-      // expect(wrapper.find(ValidatedTextInput).props().value).toEqual('030 111111')
-
       expect(
         wrapper.findWhere((node) => node.prop('testID') === 'PhoneNumberField').props().value
       ).toBe('030 111111')
@@ -107,5 +105,61 @@ describe('when defaultCountry is truthy', () => {
     expect(
       wrapper.findWhere((node) => node.prop('testID') === 'CountryNameField').props().defaultValue
     ).toBe('')
+  })
+
+  it('can read Canada phone', async () => {
+    // mock
+    Platform.OS = 'android'
+    const wrapper = shallow<PhoneNumberInput>(
+      <PhoneNumberInput
+        setE164Number={jest.fn()}
+        setCountryCode={jest.fn()}
+        setIsValidNumber={jest.fn()}
+      />
+    )
+
+    wrapper.instance().getPhoneNumberFromNativePicker = jest.fn(async () => '+1 416-868-0000')
+
+    wrapper.instance().setState({})
+    await wrapper.instance().triggerPhoneNumberRequest()
+
+    expect(
+      wrapper.findWhere((node) => node.prop('testID') === 'PhoneNumberField').props().value
+    ).toBe('(416) 868-0000')
+    expect(wrapper.instance().state.countryCallingCode).toEqual('+1')
+    expect(
+      wrapper.findWhere((node) => node.prop('testID') === 'contryCodeText').props().children
+    ).toBe('+1')
+    expect(
+      wrapper.findWhere((node) => node.prop('testID') === 'CountryNameField').props().defaultValue
+    ).toBe('Canada')
+  })
+
+  it('can read US phone', async () => {
+    // mock
+    Platform.OS = 'android'
+    const wrapper = shallow<PhoneNumberInput>(
+      <PhoneNumberInput
+        setE164Number={jest.fn()}
+        setCountryCode={jest.fn()}
+        setIsValidNumber={jest.fn()}
+      />
+    )
+
+    wrapper.instance().getPhoneNumberFromNativePicker = jest.fn(async () => '+1 415-426-5200')
+
+    wrapper.instance().setState({})
+    await wrapper.instance().triggerPhoneNumberRequest()
+
+    expect(
+      wrapper.findWhere((node) => node.prop('testID') === 'PhoneNumberField').props().value
+    ).toBe('(415) 426-5200')
+    expect(wrapper.instance().state.countryCallingCode).toEqual('+1')
+    expect(
+      wrapper.findWhere((node) => node.prop('testID') === 'contryCodeText').props().children
+    ).toBe('+1')
+    expect(
+      wrapper.findWhere((node) => node.prop('testID') === 'CountryNameField').props().defaultValue
+    ).toBe('USA')
   })
 })

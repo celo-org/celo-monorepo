@@ -69,11 +69,17 @@ export default class PhoneNumberInput extends React.Component<Props, State> {
     }
   }
 
+  async getPhoneNumberFromNativePicker() {
+    // linter doesn't allow following code without splitting this code in two lines
+    const number = await SmsRetriever.requestPhoneNumber()
+    return number
+  }
+
   async triggerPhoneNumberRequestAndroid() {
     try {
       let phone
       try {
-        phone = await SmsRetriever.requestPhoneNumber()
+        phone = await this.getPhoneNumberFromNativePicker()
       } catch (error) {
         console.info(
           `${TAG}/triggerPhoneNumberRequestAndroid`,
@@ -87,16 +93,12 @@ export default class PhoneNumberInput extends React.Component<Props, State> {
       if (!phoneNumber) {
         return
       }
-
       this.setState({ phoneNumber: phoneNumber.displayNumber.toString() })
 
-      if (phoneNumber.countryCode) {
-        // TODO known issue, the country code is not enough to
-        // get a country, e.g. +1 could be USA or Canada
-        const displayName = this.state.countries.getCountryByPhoneCountryCode(
-          '+' + phoneNumber.countryCode.toString()
-        ).displayName
+      const regionCode = phoneNumber.regionCode
 
+      if (regionCode) {
+        const displayName = this.state.countries.getCountryByCode(regionCode).displayName
         this.onChangeCountryQuery(displayName)
       }
     } catch (error) {
