@@ -5,13 +5,11 @@ import colors from '@celo/react-components/styles/colors'
 import { fontStyles } from '@celo/react-components/styles/fonts'
 import { componentStyles } from '@celo/react-components/styles/styles'
 import { parseInputAmount } from '@celo/utils/src/parsing'
-import BigNumber from 'bignumber.js'
 import * as React from 'react'
 import { withNamespaces, WithNamespaces } from 'react-i18next'
 import { StyleSheet, Text, TextInput, View } from 'react-native'
 import SafeAreaView from 'react-native-safe-area-view'
 import { NavigationInjectedProps } from 'react-navigation'
-
 import { connect } from 'react-redux'
 import { hideAlert, showError } from 'src/alert/actions'
 import { errorSelector } from 'src/alert/reducer'
@@ -19,9 +17,7 @@ import CeloAnalytics from 'src/analytics/CeloAnalytics'
 import { CustomEventNames } from 'src/analytics/constants'
 import componentWithAnalytics from 'src/analytics/wrapper'
 import { ErrorMessages } from 'src/app/ErrorMessages'
-import { DOLLAR_TRANSACTION_MIN_AMOUNT, GOLD_TRANSACTION_MIN_AMOUNT } from 'src/config'
 import { fetchExchangeRate } from 'src/exchange/actions'
-import ExchangeRate from 'src/exchange/ExchangeRate'
 import { ExchangeRatePair } from 'src/exchange/reducer'
 import { CURRENCIES, CURRENCY_ENUM } from 'src/geth/consts'
 import i18n, { Namespaces } from 'src/i18n'
@@ -30,11 +26,7 @@ import { navigate, navigateBack } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
 import { RootState } from 'src/redux/reducers'
 import DisconnectBanner from 'src/shared/DisconnectBanner'
-import {
-  getNewTakerBalance,
-  getRateForMakerToken,
-  getTakerAmount,
-} from 'src/utils/currencyExchange'
+import { getRateForMakerToken, getTakerAmount } from 'src/utils/currencyExchange'
 import { getMoneyDisplayValue } from 'src/utils/formatting'
 
 interface State {
@@ -91,23 +83,18 @@ export class ExchangeBuyScreen extends React.Component<Props, State> {
 
   getMakerTokenPropertiesFromNavProps(): {
     makerToken: CURRENCY_ENUM
-    makerTokenAvailableBalance: string
   } {
     const makerToken = this.props.navigation.getParam('makerToken')
-    const makerTokenAvailableBalance = this.props.navigation.getParam('makerTokenBalance')
-    if (!makerToken || !makerTokenAvailableBalance) {
-      throw new Error('Mnemonic missing form nav props')
+    if (!makerToken) {
+      throw new Error('Maker tokn missing form nav props')
     }
-    return { makerToken, makerTokenAvailableBalance }
+    return makerToken
   }
 
   componentDidMount() {
     this.props.fetchExchangeRate()
-    const { makerToken, makerTokenAvailableBalance } = this.getMakerTokenPropertiesFromNavProps()
-    this.setState({
-      makerToken,
-      makerTokenAvailableBalance,
-    })
+    const makerToken = this.getMakerTokenPropertiesFromNavProps()
+    this.setState(makerToken)
   }
 
   onChangeExchangeAmount = (amount: string) => {
@@ -121,6 +108,7 @@ export class ExchangeBuyScreen extends React.Component<Props, State> {
   }
 
   updateError(amount: string) {
+    /*
     if (this.getMakerBalance().isLessThan(amount)) {
       this.props.showError(
         this.isDollarToGold() ? ErrorMessages.NSF_DOLLARS : ErrorMessages.NSF_GOLD
@@ -128,6 +116,7 @@ export class ExchangeBuyScreen extends React.Component<Props, State> {
     } else {
       this.props.hideAlert()
     }
+    */
   }
 
   goBack = () => {
@@ -141,13 +130,6 @@ export class ExchangeBuyScreen extends React.Component<Props, State> {
     navigate(Screens.ExchangeReview, {
       confirmationInput: { makerToken, makerAmount: parseInputAmount(makerTokenAmount) },
     })
-  }
-
-  getNewTakerBalance = (takerTokenAmount: BigNumber) => {
-    const { dollarBalance, goldBalance } = this.props
-    return this.isDollarToGold()
-      ? getNewTakerBalance(goldBalance, takerTokenAmount)
-      : getNewTakerBalance(dollarBalance, takerTokenAmount)
   }
 
   hasError = () => {
@@ -177,12 +159,6 @@ export class ExchangeBuyScreen extends React.Component<Props, State> {
     return false
   }
 
-  getMakerBalance = () => {
-    return new BigNumber(
-      (this.isDollarToGold() ? this.props.dollarBalance : this.props.goldBalance) || 0
-    )
-  }
-
   isDollarToGold = () => {
     return this.state.makerToken === CURRENCY_ENUM.DOLLAR
   }
@@ -205,7 +181,6 @@ export class ExchangeBuyScreen extends React.Component<Props, State> {
 
     const exchangeRate = getRateForMakerToken(this.props.exchangeRatePair, makerToken)
     const takerTokenAmount = getTakerAmount(parseInputAmount(makerTokenAmount), exchangeRate)
-    const newTakerBalance = this.getNewTakerBalance(takerTokenAmount)
 
     return (
       <SafeAreaView

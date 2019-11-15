@@ -8,8 +8,6 @@ import { StyleSheet, View } from 'react-native'
 import SafeAreaView from 'react-native-safe-area-view'
 import { NavigationInjectedProps } from 'react-navigation'
 import { connect } from 'react-redux'
-import CeloAnalytics from 'src/analytics/CeloAnalytics'
-import { CustomEventNames } from 'src/analytics/constants'
 import componentWithAnalytics from 'src/analytics/wrapper'
 import AccountOverview from 'src/components/AccountOverview'
 import { fetchExchangeRate } from 'src/exchange/actions'
@@ -25,6 +23,11 @@ import { getRateForMakerToken } from 'src/utils/currencyExchange'
 
 interface StateProps {
   exchangeRate: BigNumber
+  goldBalance: string | null
+  dollarBalance: string | null
+}
+
+interface State {
   goldBalance: string
   dollarBalance: string
 }
@@ -37,31 +40,31 @@ type Props = StateProps & DispatchProps & NavigationInjectedProps & WithNamespac
 
 const mapStateToProps = (state: RootState): StateProps => ({
   exchangeRate: getRateForMakerToken(state.exchange.exchangeRatePair, Token.DOLLAR),
-  goldBalance: state.goldToken.balance || '0',
-  dollarBalance: state.stableToken.balance || '0',
+  goldBalance: state.goldToken.balance,
+  dollarBalance: state.stableToken.balance,
 })
 
-export class ExchangeHomeScreen extends React.Component<Props> {
+export class ExchangeHomeScreen extends React.Component<Props, State> {
   componentDidMount() {
     this.props.fetchExchangeRate()
   }
 
-  goToBuyGold() {
+  goToBuyGold(goldBalance: string) {
     navigate(Stacks.ExchangeStack, {
       makerToken: Token.DOLLAR,
-      makerTokenBalance: this.props.dollarBalance,
+      makerTokenBalance: goldBalance,
     })
   }
 
   goToBuyDollars() {
     navigate(Stacks.ExchangeStack, {
       makerToken: Token.GOLD,
-      makerTokenBalance: this.props.goldBalance,
+      makerTokenBalance: this.state.goldBalance,
     })
   }
 
   render() {
-    const { t, exchangeRate } = this.props
+    const { t, exchangeRate, dollarBalance, goldBalance } = this.props
 
     return (
       <SafeAreaView style={styles.background}>
@@ -79,7 +82,9 @@ export class ExchangeHomeScreen extends React.Component<Props> {
             <View style={styles.buttonContainer}>
               <Button
                 text={t('buy')}
-                onPress={this.goToBuyGold}
+                onPress={() => {
+                  this.goToBuyGold(goldBalance)
+                }}
                 style={styles.button}
                 standard={true}
                 type={BtnTypes.PRIMARY}
