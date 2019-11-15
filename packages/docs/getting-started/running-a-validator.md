@@ -72,6 +72,24 @@ In this documentation page we're going to use a Docker image containing the Celo
 
 ### Baklava
 
+### Environment variables
+
+| Variable                     | Explanation                                                                   | Default Value |
+| ---------------------------- | ----------------------------------------------------------------------------- | ------------- |
+| CELO_IMAGE                   | The docker image used for the validator and proxy containers                  |               |
+| CELO_NETWORK                 | The Celo network to connect with. This variable is also used as the image tag |               |
+| NETWORK_ID                   | The celo network chain id                                                     |               |
+| URL_VERIFICATION_POOL        | URL for the Verification pool for the attestation process                     |               |
+| CELO_VALIDATOR_GROUP_ADDRESS | The etherbase public address for the validation group                         |               |
+| CELO_VALIDATOR_ADDRESS       | The etherbase public address for the validator instance                       |               |
+| CELO_PROXY_ADDRESS           | The etherbase public address for the proxy instance                           |               |
+| CELO_VALIDATOR_POP           |                                                                               |               |
+| PROXY_ENODE                  | The ethereum node address for the validator                                   |               |
+| PROXY_IP                     | The proxy container internal IP address from docker pool address              |               |
+| ATTESTATION_KEY              | The etherbase private key for the account used in the attestation service     |               |
+| ATTESTATION_SERVICE_URL      | The URL to access the attestation service deployed                            |               |
+| METADATA_URL                 | The URL to access the metadata file for your attestation service              |               |
+
 If you are re-running these instructions, the Celo Docker image may have been updated, and it's important to get the latest version.
 
 To run a complete validator it's necessary to execute the following components:
