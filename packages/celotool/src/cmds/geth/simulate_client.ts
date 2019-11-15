@@ -64,7 +64,7 @@ export const handler = async (argv: CeloEnvArgv /*SimulateClientArgv*/) => {
     '0xf4314cb9046bece6aa54bb9533155434d0c76909',
     '0xce7dfca4db4cf970b4bd8fdba33754e09c51cc98',
     '0x1ac48f235c205f79ce1cff12463ca04e8e0ca2a1',
-    100
+    5000
   )
 
   // const dataDir = argv.dataDir

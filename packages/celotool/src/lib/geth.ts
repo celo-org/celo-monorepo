@@ -31,6 +31,7 @@ type HandleErrorCallback = (isError: boolean, data: { location: string; error: s
 const Web3 = require('web3')
 
 const DEFAULT_TRANSFER_AMOUNT = new BigNumber('0.00000000000001')
+const LOAD_TEST_TRANSFER_WEI = new BigNumber(100)
 
 const GETH_IPC = 'geth.ipc'
 const DISCOVERY_PORT = 30303
@@ -480,31 +481,46 @@ export const simulateClientContractKit = async (
   txPeriodMs: number // time between each transaction in ms
 ) => {
   console.log('simulateClientContractKit')
+  // todo change this url
+  const kit = newKit('http://localhost:8545')
   while (true) {
-    // todo change this url
-    const kit = newKit('http://localhost:8545')
     console.log('kit.web3.eth.blockNumber', await kit.web3.eth.getBlockNumber())
-
-    // randomly choose to transfer gold or dollars
-    // Math.round(Math.random())
-    const transferFn = true ? transferCeloGold : transferCeloDollars
-    // randomly choose which gas currency to use
-    const gasCurrencyContractName = true // Math.round(Math.random())
-      ? CeloContract.GoldToken
-      : CeloContract.StableToken
-    console.log('gas currency doe', gasCurrencyContractName)
-    // const gasCurrency = await kit.registry.addressFor(gasCurrencyContractName)
-
-    console.log(`Transferring 400 ${gasCurrencyContractName}...`)
-    const txResult = await transferFn(kit, senderAddress, recipientAddress, new BigNumber(400), {
-      gasCurrency,
-      gasFeeRecipient: gasFeeRecipientAddress,
-    })
-    const txReceipt = await txResult.waitReceipt()
-    console.log('receipt', txReceipt)
-
-    sleep(txPeriodMs)
+    // Purposely don't use await syntax for this so we send a transaction every txPeriodMs
+    // rather than txPeriodMs after the previous transaction receipt is received
+    sendLoadTestTx(kit, senderAddress, recipientAddress, gasFeeRecipientAddress)
+      .then((txReceipt: TransactionReceipt) => {
+        console.info('Successully sent load test transaction with txReceipt:', txReceipt)
+      })
+      .catch((error) => {
+        console.error('Load test transaction failed with error:', error)
+      })
+    await sleep(txPeriodMs)
   }
+}
+
+const sendLoadTestTx = async (
+  kit: ContractKit,
+  senderAddress: string,
+  recipientAddress: string,
+  gasFeeRecipientAddress: string
+) => {
+  // randomly choose to transfer gold or dollars
+  const transferGold = Boolean(Math.round(Math.random()))
+  const transferFn = false ? transferCeloGold : transferCeloDollars
+  // randomly choose which gas currency to use
+  const gasCurrency = false //Math.round(Math.random())
+    ? undefined
+    : await kit.registry.addressFor(CeloContract.StableToken)
+  console.info(
+    `Transferring ${LOAD_TEST_TRANSFER_WEI} ${
+      transferGold ? 'cGLD' : 'cUSD'
+    } with gasCurrency ${gasCurrency}`
+  )
+  const txResult = await transferFn(kit, senderAddress, recipientAddress, LOAD_TEST_TRANSFER_WEI, {
+    gasCurrency,
+    gasFeeRecipient: gasFeeRecipientAddress,
+  })
+  return txResult.waitReceipt()
 }
 
 export const transferCeloGold = async (
