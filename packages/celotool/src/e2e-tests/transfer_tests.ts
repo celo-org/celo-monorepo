@@ -39,7 +39,7 @@ class InflationManager {
     // Compute necessary `updateRate` so inflationFactor adjusment takes place on next operation
     const { factorLastUpdated } = await stableToken.getInflationParameters()
 
-    // Wait until until the minimum update delay has passed so we can set a rate that gives us some
+    // Wait until the minimum update delay has passed so we can set a rate that gives us some
     // buffer time to make the transaction in the next availiable update window.
     let timeSinceLastUpdated = (await this.now()) - factorLastUpdated.toNumber()
     while (timeSinceLastUpdated < this.minUpdateDelay) {
@@ -667,16 +667,14 @@ describe('Transfer tests', function(this: any) {
   })
 
   describe('Transfer with Demurrage >', () => {
-    let inflationManager: InflationManager
-
-    before(async () => {
-      await restartWithCleanNodes()
-      inflationManager = new InflationManager('http://localhost:8545', validatorAddress)
-    })
-
     for (const syncMode of syncModes) {
       describe(`${syncMode} Node >`, () => {
-        before(`start geth on sync: ${syncMode}`, () => startSyncNode(syncMode))
+        let inflationManager: InflationManager
+        before(`start geth on sync: ${syncMode}`, async () => {
+          await restartWithCleanNodes()
+          inflationManager = new InflationManager('http://localhost:8545', validatorAddress)
+          await startSyncNode(syncMode)
+        })
 
         describe('when there is demurrage of 50% applied', () => {
           describe('when setting a gas amount greater than the amount of gas necessary', () => {
