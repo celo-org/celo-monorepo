@@ -52,7 +52,7 @@ Save this address to an environment variables, so that you can reference it belo
 
 `$ export CELO_ACCOUNT_ADDRESS=<YOUR-ACCOUNT-ADDRESS>`
 
-_Note: this environment variable will only persist while you have this terminal window open. If you want this environment variable to be available in the future, you can add it to your `~/.bash_profile_`
+_Note: this environment variable will only persist while you have this terminal window open. If you want this environment variable to be available in the future, you can add it to your `~/.bash_profile_
 
 ## **Configure the node**
 
