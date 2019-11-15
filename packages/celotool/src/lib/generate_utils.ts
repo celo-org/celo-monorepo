@@ -158,22 +158,37 @@ export const generateGenesisFromEnv = (enablePetersburg: boolean = true) => {
 const generateIstanbulExtraData = (validators: Validator[]) => {
   const istanbulVanity = 32
   const blsSignatureVanity = 192
-
   return (
     '0x' +
     repeat('0', istanbulVanity * 2) +
     rlp
       // @ts-ignore
       .encode([
+        // Added validators
         validators.map((validator) => Buffer.from(validator.address, 'hex')),
         validators.map((validator) => Buffer.from(validator.blsPublicKey, 'hex')),
+        // Removed validators
         new Buffer(0),
+        // ProposerSignature
         Buffer.from(repeat('0', blsSignatureVanity * 2), 'hex'),
+        [
+          // AggregatedSignature.Bitmap
+          new Buffer(0),
+          // AggregatedSignature.Signature
+          Buffer.from(repeat('0', blsSignatureVanity * 2), 'hex'),
+          // AggregatedSignature.Round
+          new Buffer(0),
+        ],
+        [
+          // AggregatedSignature.Bitmap
+          new Buffer(0),
+          // AggregatedSignature.Signature
+          Buffer.from(repeat('0', blsSignatureVanity * 2), 'hex'),
+          // AggregatedSignature.Round
+          new Buffer(0),
+        ],
+        // EpochData
         new Buffer(0),
-        Buffer.from(repeat('0', blsSignatureVanity * 2), 'hex'),
-        new Buffer(0),
-        new Buffer(0),
-        Buffer.from(repeat('0', blsSignatureVanity * 2), 'hex'),
       ])
       .toString('hex')
   )
