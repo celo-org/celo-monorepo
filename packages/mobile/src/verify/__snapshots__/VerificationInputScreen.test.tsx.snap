@@ -15,7 +15,7 @@ exports[`VerificationInputScreen renders correctly 1`] = `
       Object {
         "left": 5,
         "position": "absolute",
-        "top": 10,
+        "top": 20,
         "zIndex": 10,
       }
     }

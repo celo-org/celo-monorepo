@@ -6,7 +6,7 @@ import { getContext, GethTestConfig, sleep } from './utils'
 const validatorAddress = '0x47e172f6cfb6c7d01c1574fa3e2be7cc73269d95'
 const phoneNumber = '+15555555555'
 
-describe('governance tests', () => {
+describe('attestations tests', () => {
   const gethConfig: GethTestConfig = {
     migrate: true,
     instances: [
