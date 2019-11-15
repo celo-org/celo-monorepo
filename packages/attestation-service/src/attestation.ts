@@ -119,48 +119,56 @@ function createAttestationTextMessage(attestationCode: string) {
   return `<#> ${toBase64(attestationCode)} ${process.env.APP_SIGNATURE}`
 }
 
+async function ensureLockedRecord(
+  attestationRequest: AttestationRequest,
+  transaction: Transaction
+) {
+  const AttestationTable = await getAttestationTable()
+  await AttestationTable.findOrCreate({
+    where: {
+      phoneNumber: attestationRequest.phoneNumber,
+      account: attestationRequest.account,
+      issuer: attestationRequest.issuer,
+    },
+    defaults: {
+      smsProvider: SmsProviderType.UNKNOWN,
+      status: AttestationStatus.DISPATCHING,
+    },
+    transaction,
+  })
+
+  // Query to lock the record
+  const attestationRecord = await existingAttestationRequestRecord(
+    attestationRequest.phoneNumber,
+    attestationRequest.account,
+    attestationRequest.issuer,
+    { transaction, lock: Transaction.LOCK.UPDATE }
+  )
+
+  if (!attestationRecord) {
+    // This should never happen
+    throw new Error(`Somehow we did not get an attestation record`)
+  }
+
+  if (!attestationRecord.canSendSms()) {
+    // Another transaction has locked on the record before we did
+    throw new Error(`Another process has already sent the sms`)
+  }
+
+  return attestationRecord
+}
+
 async function sendSmsAndPersistAttestation(
   attestationRequest: AttestationRequest,
   attestationCode: string
 ) {
   const textMessage = createAttestationTextMessage(attestationCode)
   let attestationRecord: AttestationModel | null = null
-  const AttestationTable = await getAttestationTable()
 
   const transaction = await sequelize!.transaction()
 
   try {
-    await AttestationTable.findOrCreate({
-      where: {
-        phoneNumber: attestationRequest.phoneNumber,
-        account: attestationRequest.account,
-        issuer: attestationRequest.issuer,
-      },
-      defaults: {
-        smsProvider: SmsProviderType.UNKNOWN,
-        status: AttestationStatus.DISPATCHING,
-      },
-      transaction,
-    })
-
-    // Query to lock the record
-    attestationRecord = await existingAttestationRequestRecord(
-      attestationRequest.phoneNumber,
-      attestationRequest.account,
-      attestationRequest.issuer,
-      { transaction, lock: Transaction.LOCK.UPDATE }
-    )
-
-    if (!attestationRecord) {
-      // This should never happen
-      throw new Error(`Somehow we did not get an attestation record`)
-    }
-
-    if (!attestationRecord.canSendSms()) {
-      // Another transaction has locked on the record before we did
-      throw new Error(`Another process has already sent the sms`)
-    }
-
+    attestationRecord = await ensureLockedRecord(attestationRequest, transaction)
     const provider = smsProviderFor(attestationRequest.phoneNumber)
 
     if (!provider) {

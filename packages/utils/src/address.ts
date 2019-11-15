@@ -26,6 +26,6 @@ export const privateKeyToPublicKey = (privateKey: string) => {
   return '0x' + privateToPublic(Buffer.from(privateKey.slice(2), 'hex')).toString('hex')
 }
 export const isValidPrivateKey = (privateKey: string) =>
-  isValidPrivate(Buffer.from(privateKey.slice(2), 'hex'))
+  privateKey.startsWith('0x') && isValidPrivate(Buffer.from(privateKey.slice(2), 'hex'))
 
 export { toChecksumAddress } from 'ethereumjs-util'

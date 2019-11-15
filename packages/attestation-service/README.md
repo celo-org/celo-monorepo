@@ -1,6 +1,6 @@
 # Attestation Service
 
-This is the attestation service that validators run on the Celo network to provide attestations of phone numbers to accounts.
+A service run by validators on the Celo network to send SMS messages, enabling attestations of user phone numbers and their accounts on the Celo network.
 
 ### Configuration
 
@@ -19,7 +19,7 @@ You can use the following environment variables to configure the attestation ser
 - `NEXMO_SECRET` - The API secret to the Nexmo API
 - `NEXMO_BLACKLIST` - A comma-sperated list of country codes you do not want to serve
 
-### Contributing
+### Running locally
 
 After checking out the source, you should create a local sqlite database by running:
 
