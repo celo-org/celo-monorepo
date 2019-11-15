@@ -86,7 +86,6 @@ First we are going to setup the main environment variables related with the `Bak
 $ export CELO_NETWORK=baklava
 $ export CELO_IMAGE=us.gcr.io/celo-testnet/celo-node
 $ export NETWORK_ID=1101
-$ export URL_VERIFICATION_POOL=https://us-central1-celo-testnet-production.cloudfunctions.net/handleVerificationRequestbaklava/v0.1/sms/
 ```
 
 In all the commands we are going to see the `CELO_IMAGE` and `CELO_NETWORK` variables to refer to the right Docker image and network to use. Now we can get the Docker image:
@@ -164,7 +163,7 @@ $ docker run -v `pwd`/validator:/root/.celo --entrypoint cp $CELO_IMAGE:$CELO_NE
 At this point we are ready to start up the proxy:
 
 ```bash
-$ docker run --name celo-proxy -p 8545:8545 -p 8546:8546 -p 30303:30303 -p 30303:30303/udp -p 30503:30503 -p 30503:30503/udp -v `pwd`/proxy:/root/.celo $CELO_IMAGE:$CELO_NETWORK --verbosity 3 --networkid $NETWORK_ID --syncmode full --rpc --rpcaddr 0.0.0.0 --rpcapi eth,net,web3,debug --maxpeers 1100 --etherbase=$CELO_PROXY_ADDRESS --miner.verificationpool=$URL_VERIFICATION_POOL --proxy.proxy --proxy.proxiedvalidatoraddress $CELO_VALIDATOR_ADDRESS --proxy.internalendpoint :30503
+$ docker run --name celo-proxy -p 8545:8545 -p 8546:8546 -p 30303:30303 -p 30303:30303/udp -p 30503:30503 -p 30503:30503/udp -v `pwd`/proxy:/root/.celo $CELO_IMAGE:$CELO_NETWORK --verbosity 3 --networkid $NETWORK_ID --syncmode full --rpc --rpcaddr 0.0.0.0 --rpcapi eth,net,web3,debug --maxpeers 1100 --etherbase=$CELO_PROXY_ADDRESS --proxy.proxy --proxy.proxiedvalidatoraddress $CELO_VALIDATOR_ADDRESS --proxy.internalendpoint :30503
 ```
 
 Now we need to obtain the Proxy enode and ip addresses, running the following commands:
@@ -177,7 +176,7 @@ $ export PROXY_IP=$(docker inspect -f '{{range .NetworkSettings.Networks}}{{.IPA
 Now we can start up the validator node:
 
 ```bash
-$ docker run --name celo-validator -p 127.0.0.1:8547:8545 -p 127.0.0.1:8548:8546 -p 30304:30303 -p 30304:30303/udp -v `pwd`/validator:/root/.celo $CELO_IMAGE:$CELO_NETWORK --verbosity 3 --networkid $NETWORK_ID --syncmode full --rpc --rpcaddr 0.0.0.0 --rpcapi eth,net,web3,debug --maxpeers 125 --mine --miner.verificationpool=$URL_VERIFICATION_POOL --istanbul.blockperiod=1 --istanbul.requesttimeout=3000 --etherbase $CELO_VALIDATOR_ADDRESS --nodiscover --proxy.proxied --proxy.proxyenodeurlpair=enode://$PROXY_ENODE@$PROXY_IP:30503\;enode://$PROXY_ENODE@$PROXY_IP:30503
+$ docker run --name celo-validator -p 127.0.0.1:8547:8545 -p 127.0.0.1:8548:8546 -p 30304:30303 -p 30304:30303/udp -v `pwd`/validator:/root/.celo $CELO_IMAGE:$CELO_NETWORK --verbosity 3 --networkid $NETWORK_ID --syncmode full --rpc --rpcaddr 0.0.0.0 --rpcapi eth,net,web3,debug --maxpeers 125 --mine --istanbul.blockperiod=1 --istanbul.requesttimeout=3000 --etherbase $CELO_VALIDATOR_ADDRESS --nodiscover --proxy.proxied --proxy.proxyenodeurlpair=enode://$PROXY_ENODE@$PROXY_IP:30503\;enode://$PROXY_ENODE@$PROXY_IP:30503
 ```
 
 {% hint style="danger" %}
