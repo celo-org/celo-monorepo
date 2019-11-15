@@ -18,8 +18,6 @@ contract GasPriceMinimum is Ownable, Initializable, UsingRegistry {
 
   event AdjustmentSpeedSet(uint256 adjustmentSpeed);
 
-  event ProposerFractionSet(uint256 proposerFraction);
-
   uint256 public gasPriceMinimum;
 
   // Block congestion level targeted by the gas price minimum calculation.
@@ -27,13 +25,6 @@ contract GasPriceMinimum is Ownable, Initializable, UsingRegistry {
 
   // Speed of gas price minimum adjustment due to congestion.
   FixidityLib.Fraction public adjustmentSpeed;
-
-  // FixidityLib.Fraction of the gas price minimum allocated to the infrastructure fund.
-  FixidityLib.Fraction public proposerFraction;
-
-  function proposerFraction_() external view returns (uint256, uint256) {
-    return (proposerFraction.unwrap(), FixidityLib.fixed1().unwrap());
-  }
 
   modifier onlyVm() {
     assert(msg.sender == address(0x0));
@@ -44,15 +35,13 @@ contract GasPriceMinimum is Ownable, Initializable, UsingRegistry {
     address _registryAddress,
     uint256 initialGas,
     uint256 _targetDensity,
-    uint256 _adjustmentSpeed,
-    uint256 _proposerFraction
+    uint256 _adjustmentSpeed
   ) external initializer {
     _transferOwnership(msg.sender);
     setRegistry(_registryAddress);
     gasPriceMinimum = initialGas;
     setTargetDensity(_targetDensity);
     setAdjustmentSpeed(_adjustmentSpeed);
-    setProposerFraction(_proposerFraction);
   }
 
   /**
@@ -73,17 +62,6 @@ contract GasPriceMinimum is Ownable, Initializable, UsingRegistry {
     targetDensity = FixidityLib.wrap(_targetDensity);
     require(targetDensity.lt(FixidityLib.fixed1()));
     emit TargetDensitySet(_targetDensity);
-  }
-
-  /**
-   * @notice Set the fraction of the gas price minimum which is sent to
-   * the infrastructure fund.
-   * @dev Value is expected to be < 1.
-   */
-  function setProposerFraction(uint256 _proposerFraction) public onlyOwner {
-    proposerFraction = FixidityLib.wrap(_proposerFraction);
-    require(proposerFraction.lt(FixidityLib.fixed1()));
-    emit ProposerFractionSet(_proposerFraction);
   }
 
   /**

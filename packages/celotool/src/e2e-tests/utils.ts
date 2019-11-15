@@ -243,13 +243,12 @@ async function isPortOpen(host: string, port: number) {
 }
 
 async function waitForPortOpen(host: string, port: number, seconds: number) {
-  while (seconds > 0) {
+  const deadline = Date.now() + seconds * 1000
+  do {
     if (await isPortOpen(host, port)) {
       return true
     }
-    seconds -= 1
-    await sleep(1)
-  }
+  } while (Date.now() < deadline)
   return false
 }
 
