@@ -7,7 +7,9 @@ library ExtractFunctionSignature {
    * @return The first four bytes of `input`.
    */
   function extractFunctionSignature(bytes memory input) internal pure returns (bytes4) {
-    return (bytes4(input[0]) | bytes4(input[1])>>8 | bytes4(input[2])>>16 | bytes4(input[3])>>24);
+    return (bytes4(input[0]) |
+      (bytes4(input[1]) >> 8) |
+      (bytes4(input[2]) >> 16) |
+      (bytes4(input[3]) >> 24));
   }
 }
-

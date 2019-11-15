@@ -1,7 +1,8 @@
+import Switch from '@celo/react-components/components/Switch'
 import colors from '@celo/react-components/styles/colors'
 import fontStyles from '@celo/react-components/styles/fonts'
 import * as React from 'react'
-import { StyleSheet, Switch, Text, View } from 'react-native'
+import { StyleSheet, Text, View } from 'react-native'
 
 export interface Props {
   title?: string
@@ -21,12 +22,7 @@ class SettingsSwitchItem extends React.PureComponent<Props> {
             {children ? children : <Text style={fontStyles.body}>{title}</Text>}
           </View>
           <View style={[style.cta]}>
-            <Switch
-              value={switchValue}
-              onValueChange={onSwitchChange}
-              trackColor={{ true: colors.celoGreen, false: colors.inactiveLabelBar }}
-              thumbColor={colors.white}
-            />
+            <Switch value={switchValue} onValueChange={onSwitchChange} />
           </View>
         </View>
         {details && (

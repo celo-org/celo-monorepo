@@ -13,17 +13,35 @@ const DefaultConfig = {
     selectIssuersWaitBlocks: 4,
   },
   blockchainParameters: {
+    gasForNonGoldCurrencies: 134000,
     minimumClientVersion: {
       major: 1,
       minor: 8,
       patch: 23,
     },
+    blockGasLimit: 20000000,
   },
   election: {
     minElectableValidators: '22',
     maxElectableValidators: '100',
     maxVotesPerAccount: 3,
     electabilityThreshold: 1 / 100,
+  },
+  epochRewards: {
+    targetVotingYieldParameters: {
+      initial: 5 / 100,
+      max: 2 / 10,
+      adjustmentFactor: 1 / 365,
+    },
+    rewardsMultiplierParameters: {
+      max: 2,
+      adjustmentFactors: {
+        underspend: 1 / 2,
+        overspend: 5,
+      },
+    },
+    targetVotingGoldFraction: 2 / 3,
+    maxValidatorEpochPayment: '205479452054794520547', // (75,000 / 365) * 10 ^ 18
   },
   exchange: {
     spread: 5 / 1000,
@@ -35,7 +53,6 @@ const DefaultConfig = {
     initialMinimum: 10000,
     targetDensity: 1 / 2,
     adjustmentSpeed: 1 / 2,
-    proposerFraction: 1 / 2,
   },
   governance: {
     approvalStageDuration: 15 * 60, // 15 minutes
@@ -81,19 +98,18 @@ const DefaultConfig = {
     oracles: [],
   },
   validators: {
-    registrationRequirements: {
-      group: '1000000000000000000', // 1 gold
-      validator: '1000000000000000000', // 1 gold
+    groupLockedGoldRequirements: {
+      value: '1000000000000000000', // 1 gold
+      duration: 60 * 24 * 60 * 60, // 60 days
     },
-    deregistrationLockups: {
-      group: 60 * 24 * 60 * 60, // 60 days
-      validator: 60 * 24 * 60 * 60, // 60 days
+    validatorLockedGoldRequirements: {
+      value: '1000000000000000000', // 1 gold
+      duration: 60 * 24 * 60 * 60, // 60 days
     },
     validatorScoreParameters: {
       exponent: 1,
       adjustmentSpeed: 0.1,
     },
-    validatorEpochPayment: '1000000000000000000',
     membershipHistoryLength: 60,
     maxGroupSize: '70',
 

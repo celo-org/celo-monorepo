@@ -4,6 +4,7 @@ import * as React from 'react'
 import { View } from 'react-native'
 import config from 'react-reveal/globals'
 import scrollIntoView from 'scroll-into-view'
+import { canTrack } from 'src/analytics/analytics'
 import Header from 'src/header/Header.3'
 import { ScreenSizeProvider } from 'src/layout/ScreenSize'
 import Footer from 'src/shared/Footer.3'
@@ -14,7 +15,10 @@ import { appWithTranslation } from '../src/i18n'
 config({ ssrReveal: true })
 class MyApp extends App {
   componentDidMount() {
-    initSentry()
+    if (canTrack()) {
+      initSentry()
+    }
+
     if (window.location.hash) {
       hashScroller(window.location.hash)
     }

@@ -4,6 +4,7 @@ echo "Processing encrypted files"
 
 # Set list of secret files to encrypt and decrypt.
 files=(
+  "packages/blockchain-api/src/secrets.json"
   "packages/mobile/android/app/google-services.json"
   "packages/mobile/android/app/src/staging/google-services.json"
   "packages/mobile/android/app/src/integration/google-services.json"
@@ -39,16 +40,28 @@ elif [[ $1 != "encrypt" ]] && [[ $1 != "decrypt" ]]; then
   exit 1
 fi
 
+# this is to allow the script to be called from anywhere
+DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
+cd $DIR
+cd ..
+
+# place templates to be used (if they exist) in case the environment
+# doesn't have access to decryption keys
+if [[ $1 == "decrypt" ]]; then
+  for file_path in "${files[@]}"; do
+    template_file_path="$file_path.template"
+
+    if test -f "$template_file_path" && ! test -f "$file_path"; then
+      cp "$template_file_path" "$file_path"
+    fi
+  done
+fi
+
 command -v gcloud > /dev/null 2>&1
 if [[ $? -eq 1 ]]; then
   echo "gcloud is not installed - skipping ${1}ion"
   exit 0
 fi
-
-# this is to allow the script to be called from anywhere
-DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
-cd $DIR
-cd ..
 
 for file_path in "${files[@]}"; do
   encrypted_file_path="$file_path.enc"
@@ -59,11 +72,9 @@ for file_path in "${files[@]}"; do
     continue
   fi
 
-  # When encrypting ensure the plaintext file exists and the encrypted file does not.
+  # When encrypting ensure the plaintext file exists.
   if [[ $1 == "encrypt" ]]; then
-    if [[ -f "$encrypted_file_path" ]]; then
-        continue
-    elif [[ ! -f "$file_path" ]]; then
+    if [[ ! -f "$file_path" ]]; then
         echo "$file_path does not exist, cannot encrypt - skipping file" >&2
         continue
     fi

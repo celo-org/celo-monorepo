@@ -79,7 +79,6 @@ const styles = StyleSheet.create({
   main: {
     justifyContent: 'space-between',
     flexDirection: 'row',
-    alignItems: 'flex-start',
     transform: [{ translateX: 20 }],
   },
   mainMobile: { justifyContent: 'space-around' },
