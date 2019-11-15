@@ -35,14 +35,14 @@ spec:
           var trusted = [
             {{- range .Values.ethstats.trusted_addresses }}
             {{- if . }}
-            "{{ . }}",
+            "{{lower . }}",
             {{- end }}
             {{- end }}
           ]
           var banned = [
             {{- range .Values.ethstats.banned_addresses }}
             {{- if . }}
-            "{{ . }}",
+            "{{lower . }}",
             {{- end }}
             {{- end }}
           ]
