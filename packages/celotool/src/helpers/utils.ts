@@ -3,13 +3,26 @@ import fs from 'fs'
 import * as bls12377js from 'bls12377js'
 import { displaySendTx } from '@celo/celocli/lib/utils/cli'
 import { newKitFromWeb3 } from '@celo/contractkit'
-import {
-  generateAccountAddressFromPrivateKey,
-  generatePublicKeyFromPrivateKey,
-} from '@celo/protocol/lib/web3-utils'
 import { blsPrivateKeyToProcessedPrivateKey } from '@celo/utils/lib/bls'
 import { add0x } from '../lib/generate_utils'
 import BigNumber from 'bignumber.js'
+import { ec as EC } from 'elliptic'
+
+const ec = new EC('secp256k1')
+
+export function generatePublicKeyFromPrivateKey(privateKey: string) {
+  const ecPrivateKey = ec.keyFromPrivate(Buffer.from(privateKey, 'hex'))
+  const ecPublicKey: string = ecPrivateKey.getPublic('hex')
+  return ecPublicKey.slice(2)
+}
+
+export function generateAccountAddressFromPrivateKey(privateKey: string) {
+  if (!privateKey.startsWith('0x')) {
+    privateKey = '0x' + privateKey
+  }
+  // @ts-ignore-next-line
+  return cachedWeb3.eth.accounts.privateKeyToAccount(privateKey).address
+}
 
 export async function importAndUnlockAccount(
   web3: Web3,
