@@ -396,16 +396,23 @@ contract('EpochRewards', (accounts: string[]) => {
     const expectedTargetRemainingSupply = SUPPLY_CAP.minus(expectedTargetTotalSupply)
     let targetEpochReward: BigNumber
     beforeEach(async () => {
-      await timeTravel(timeDelta.toNumber(), web3)
       targetEpochReward = await epochRewards.getTargetEpochRewards()
       targetEpochReward = targetEpochReward.plus(
         await epochRewards.getTargetTotalEpochPaymentsInGold()
       )
     })
 
+    const timeTravelToDelta = async () => {
+      const currentTime = new BigNumber((await web3.eth.getBlock('latest')).timestamp)
+      const startTime = await epochRewards.startTime()
+      const desiredTime = startTime.plus(timeDelta)
+      await timeTravel(desiredTime.minus(currentTime).toNumber(), web3)
+    }
+
     describe('when the target supply is equal to the actual supply after rewards', () => {
       beforeEach(async () => {
         await mockGoldToken.setTotalSupply(expectedTargetTotalSupply.minus(targetEpochReward))
+        await timeTravelToDelta()
       })
 
       it('should return one', async () => {
@@ -420,6 +427,7 @@ contract('EpochRewards', (accounts: string[]) => {
           .minus(targetEpochReward)
           .integerValue(BigNumber.ROUND_FLOOR)
         await mockGoldToken.setTotalSupply(totalSupply)
+        await timeTravelToDelta()
       })
 
       it('should return one plus 10% times the underspend adjustment', async () => {
@@ -427,8 +435,8 @@ contract('EpochRewards', (accounts: string[]) => {
         const expected = new BigNumber(1).plus(
           fromFixed(rewardsMultiplier.adjustments.underspend).times(0.1)
         )
-        // Assert equal to 7 decimal places due to fixidity imprecision.
-        assertEqualDpBN(actual, expected, 7)
+        // Assert equal to 10 decimal places due to fixidity imprecision.
+        assertEqualDpBN(actual, expected, 10)
       })
     })
 
@@ -439,6 +447,7 @@ contract('EpochRewards', (accounts: string[]) => {
           .minus(targetEpochReward)
           .integerValue(BigNumber.ROUND_FLOOR)
         await mockGoldToken.setTotalSupply(totalSupply)
+        await timeTravelToDelta()
       })
 
       it('should return one minus 10% times the underspend adjustment', async () => {
@@ -446,8 +455,8 @@ contract('EpochRewards', (accounts: string[]) => {
         const expected = new BigNumber(1).minus(
           fromFixed(rewardsMultiplier.adjustments.overspend).times(0.1)
         )
-        // Assert equal to 7 decimal places due to fixidity imprecision.
-        assertEqualDpBN(actual, expected, 7)
+        // Assert equal to 10 decimal places due to fixidity imprecision.
+        assertEqualDpBN(actual, expected, 10)
       })
     })
   })
