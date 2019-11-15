@@ -72,6 +72,11 @@ const PAGES = [
   },
 ]
 
+export const ROUTE_TO_TITLE = PAGES.reduce((mapping, page) => {
+  mapping[page.href] = page.title
+  return mapping
+}, {})
+
 interface Section {
   id: string
   children: React.ReactNode

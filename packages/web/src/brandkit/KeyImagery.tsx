@@ -4,10 +4,11 @@ import * as React from 'react'
 import { colors } from 'src/styles'
 import { hashNav } from 'src/shared/menu-items'
 import Page from 'src/brandkit/Page'
+import ImageryFetcher from 'src/brandkit/ImageryFetcher'
 
 const { brandImagery } = hashNav
 
-export default withNamespaces()(
+const KeyImageryWrapped = withNamespaces()(
   React.memo(function KeyImagery() {
     return (
       <Page
@@ -17,6 +18,7 @@ export default withNamespaces()(
             children: (
               <View style={[styles.container, { height: 900, backgroundColor: colors.gold }]}>
                 <Text>overview</Text>
+                <ImageryFetcher />
               </View>
             ),
           },
@@ -49,6 +51,8 @@ export default withNamespaces()(
     )
   })
 )
+
+export default KeyImageryWrapped
 
 const styles = StyleSheet.create({
   container: { padding: 10 },

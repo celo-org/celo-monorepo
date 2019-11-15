@@ -1,8 +1,10 @@
 import * as React from 'react'
 import { Text, View, StyleSheet, TouchableOpacity, TouchableWithoutFeedback } from 'react-native'
 import Sidebar, { Page } from 'src/brandkit/Sidebar'
-import { standardStyles, colors } from 'src/styles'
+import { standardStyles, colors, fonts } from 'src/styles'
 import Triangle, { Direction } from 'src/shared/Triangle'
+
+import { ROUTE_TO_TITLE } from 'src/brandkit/Page'
 
 interface Props {
   pages: Page[]
@@ -39,23 +41,13 @@ export default class MobileMenu extends React.PureComponent<Props, State> {
       <View style={styles.container}>
         <TouchableOpacity onPress={this.toggleMenu}>
           <View style={[standardStyles.row, styles.bar]}>
-            <Text>{pageTitleFromRoute(pathname)}</Text>
-            <Triangle direction={Direction.up} />
+            <Text style={fonts.h5}>{pageTitleFromRoute(pathname)}</Text>
+            <Triangle direction={this.state.isOpen ? Direction.up : Direction.down} />
           </View>
         </TouchableOpacity>
         <View style={[styles.menu, this.state.isOpen && styles.open]}>
-          <View
-            style={{
-              zIndex: 10,
-              position: 'absolute',
-              backgroundColor: `${colors.light}`,
-              height: 'calc(100vh - 130px)',
-              width: '100%',
-            }}
-          >
-            <View style={{ padding: 15 }}>
-              <Sidebar pages={pages} currentPathName={pathname} routeHash={this.props.routeHash} />
-            </View>
+          <View style={styles.sideBar}>
+            <Sidebar pages={pages} currentPathName={pathname} routeHash={this.props.routeHash} />
           </View>
         </View>
       </View>
@@ -65,17 +57,23 @@ export default class MobileMenu extends React.PureComponent<Props, State> {
 
 // TODO something better props a hash map
 function pageTitleFromRoute(route: string) {
-  return route.toUpperCase()
+  return ROUTE_TO_TITLE[route]
 }
 
 const styles = StyleSheet.create({
+  sideBar: {
+    zIndex: 10,
+    position: 'absolute',
+    backgroundColor: `${colors.light}`,
+    height: 'calc(100vh - 130px)',
+    width: '100%',
+    padding: 15,
+  },
   container: {
     position: 'fixed',
     width: '100%',
     top: 70,
-    // height: '100vh',
     backgroundColor: colors.white,
-    // transform: [{ translateZ: 0, height: '100%' }],
   },
   bar: {
     padding: 20,

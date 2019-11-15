@@ -13,6 +13,7 @@ import ecoFundSubmission from '../server/EcoFundApp'
 import { RequestType } from '../src/fauceting/FaucetInterfaces'
 import nextI18next from '../src/i18n'
 import latestAnnouncements from './Announcement'
+import getAssets from './Assetbase'
 import { faucetOrInviteController } from './controllers'
 import getFormattedEvents from './EventHelpers'
 import { submitFellowApp } from './FellowshipApp'
@@ -136,6 +137,15 @@ function wwwRedirect(req, res, nextAction) {
     try {
       const annoucements = await latestAnnouncements()
       res.json(annoucements)
+    } catch (e) {
+      res.status(e.statusCode || 500).json({ message: e.message || 'unknownError' })
+    }
+  })
+
+  server.get('/brand/api/assets/:asset', async (req, res) => {
+    try {
+      const assets = await getAssets(req.params.asset)
+      res.json(assets)
     } catch (e) {
       res.status(e.statusCode || 500).json({ message: e.message || 'unknownError' })
     }
