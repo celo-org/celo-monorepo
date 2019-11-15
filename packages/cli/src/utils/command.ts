@@ -1,3 +1,4 @@
+import { URL_REGEX } from '@celo/utils/lib/io'
 import { flags } from '@oclif/command'
 import { CLIError } from '@oclif/errors'
 import { IArg, ParseFn } from '@oclif/parser/lib/args'
@@ -27,11 +28,6 @@ const parsePath: ParseFn<string> = (input) => {
     throw new CLIError(`File at "${input}" does not exist`)
   }
 }
-
-// from http://urlregex.com/
-const URL_REGEX = new RegExp(
-  /((([A-Za-z]{3,9}:(?:\/\/)?)(?:[\-;:&=\+\$,\w]+@)?[A-Za-z0-9\.\-]+|(?:www\.|[\-;:&=\+\$,\w]+@)[A-Za-z0-9\.\-]+)((?:\/[\+~%\/\.\w\-_]*)?\??(?:[\-\+=&;%@\.\w_]*)#?(?:[\.\!\/\\\w]*))?)/
-)
 
 const parseUrl: ParseFn<string> = (input) => {
   if (URL_REGEX.test(input)) {

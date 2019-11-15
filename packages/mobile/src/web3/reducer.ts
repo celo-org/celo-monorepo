@@ -13,6 +13,7 @@ export interface State {
   accountInWeb3Keystore: string | null
   commentKey: string | null
   zeroSyncMode: boolean
+  gethStartedThisSession: boolean
 }
 
 const initialState: State = {
@@ -26,6 +27,7 @@ const initialState: State = {
   accountInWeb3Keystore: null,
   commentKey: null,
   zeroSyncMode: networkConfig.initiallyZeroSync,
+  gethStartedThisSession: !networkConfig.initiallyZeroSync,
 }
 
 export const reducer = (
@@ -44,6 +46,7 @@ export const reducer = (
           highestBlock: 0,
         },
         latestBlockNumber: 0,
+        gethStartedThisSession: !state.zeroSyncMode,
       }
     }
     case Actions.SET_ACCOUNT:
@@ -60,6 +63,8 @@ export const reducer = (
       return {
         ...state,
         zeroSyncMode: action.zeroSyncMode,
+        // If switching to geth, then geth has been started this session
+        gethStartedThisSession: !action.zeroSyncMode ? true : state.gethStartedThisSession,
       }
     case Actions.SET_COMMENT_KEY:
       return {

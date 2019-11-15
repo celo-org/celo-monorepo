@@ -20,6 +20,7 @@ import { initGethSaga } from 'src/geth/saga'
 import { navigateToError } from 'src/navigator/NavigationService'
 import { waitWeb3LastBlock } from 'src/networkInfo/saga'
 import { setCachedPincode } from 'src/pincode/PincodeCache'
+import { restartApp } from 'src/utils/AppRestart'
 import { setKey } from 'src/utils/keyStore'
 import Logger from 'src/utils/Logger'
 import {
@@ -30,12 +31,14 @@ import {
   SetIsZeroSyncAction,
   setLatestBlockNumber,
   setPrivateCommentKey,
+  setZeroSyncMode,
   updateWeb3SyncProgress,
 } from 'src/web3/actions'
 import { addLocalAccount, switchWeb3ProviderForSyncMode, web3 } from 'src/web3/contracts'
 import {
   currentAccountInWeb3KeystoreSelector,
   currentAccountSelector,
+  gethStartedThisSessionSelector,
   zeroSyncSelector,
 } from 'src/web3/selectors'
 import { Block } from 'web3/eth/types'
@@ -372,7 +375,7 @@ export function* addAccountToWeb3Keystore(key: string, currentAccount: string, p
     )
     yield put(setAccountInWeb3Keystore(account))
   } catch (e) {
-    Logger.debug(TAG + '@addAccountToWeb3Keystore', 'Failed to import raw key')
+    Logger.error(TAG + '@addAccountToWeb3Keystore', 'Failed to import raw key', e)
     if (e.toString().includes('account already exists')) {
       account = currentAccount
       Logger.debug(TAG + '@addAccountToWeb3Keystore', 'Importing same account as current one')
@@ -417,17 +420,27 @@ export function* ensureAccountInWeb3Keystore() {
 }
 
 export function* switchToGethFromZeroSync() {
+  Logger.debug(TAG, 'Switching to geth from zeroSync..')
   try {
+    const gethAlreadyStartedThisSession = yield select(gethStartedThisSessionSelector)
+    yield put(setZeroSyncMode(false))
     yield call(initGethSaga)
+
     switchWeb3ProviderForSyncMode(false)
+    // Ensure web3 is fully synced using new provider
+    yield call(waitForWeb3Sync)
 
     // After switching off zeroSync mode, ensure key is stored in web3.personal
     // Note that this must happen after the sync mode is switched
     // as the web3.personal where the key is stored is not available in zeroSync mode
     yield call(ensureAccountInWeb3Keystore)
 
-    // Ensure web3 is fully synced using new provider
-    yield call(waitForWeb3Sync)
+    if (gethAlreadyStartedThisSession) {
+      // If geth is started twice within the same session,
+      // there is an issue where it cannot find deployed contracts.
+      // Restarting the app fixes this issue.
+      restartApp()
+    }
   } catch (e) {
     Logger.error(TAG + '@switchToGethFromZeroSync', 'Error switching to geth from zeroSync')
     yield put(showError(ErrorMessages.FAILED_TO_SWITCH_SYNC_MODES))
@@ -435,10 +448,17 @@ export function* switchToGethFromZeroSync() {
 }
 
 export function* switchToZeroSyncFromGeth() {
-  Logger.debug(TAG + 'Switching to zeroSync from geth..')
+  Logger.debug(TAG, 'Switching to zeroSync from geth..')
   try {
+    yield put(setZeroSyncMode(true))
     yield call(stopGethIfInitialized)
+
     switchWeb3ProviderForSyncMode(true)
+
+    // Ensure web3 sync state is updated with new zeroSync state.
+    // This prevents a false positive "geth disconnected"
+    // when blocks stop syncing.
+    yield call(waitForWeb3Sync)
   } catch (e) {
     Logger.error(TAG + '@switchToGethFromZeroSync', 'Error switching to zeroSync from geth')
     yield put(showError(ErrorMessages.FAILED_TO_SWITCH_SYNC_MODES))
@@ -460,7 +480,7 @@ export function* toggleZeroSyncMode(action: SetIsZeroSyncAction) {
   )
 }
 export function* watchZeroSyncMode() {
-  yield takeLatest(Actions.SET_IS_ZERO_SYNC, toggleZeroSyncMode)
+  yield takeLatest(Actions.TOGGLE_IS_ZERO_SYNC, toggleZeroSyncMode)
 }
 
 export function* web3Saga() {
