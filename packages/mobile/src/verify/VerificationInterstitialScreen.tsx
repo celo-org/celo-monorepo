@@ -19,7 +19,7 @@ const AnimatedCircle = () => (
 )
 
 class VerificationInterstitialScreen extends React.Component<WithNamespaces> {
-  static navigationOptions = null
+  static navigationOptions = { header: null }
 
   timeout: number | undefined
 
@@ -60,7 +60,7 @@ const styles = StyleSheet.create({
   },
   scrollContainer: {
     flex: 1,
-    padding: 30,
+    padding: 35,
     paddingTop: 0,
     alignItems: 'center',
     justifyContent: 'center',
