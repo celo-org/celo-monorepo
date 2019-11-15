@@ -81,5 +81,5 @@ function checkH1Count() {
 function hashScroller(id: string) {
   const element = document.getElementById(id.replace('#', ''))
 
-  scrollIntoView(element, { time: 200, align: { top: 0.2, topOffset: HEADER_HEIGHT } })
+  scrollIntoView(element, { time: 100, align: { top: 0, topOffset: HEADER_HEIGHT + 100 } })
 }

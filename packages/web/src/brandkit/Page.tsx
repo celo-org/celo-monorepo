@@ -107,7 +107,8 @@ class Page extends React.Component<Props & ScreenProps, State> {
       )
 
     if (this.state.routeHash !== top.id) {
-      location.hash = top.id
+      this.setState({ routeHash: top.id })
+      window.history.replaceState({}, top.id, `${location.pathname}#${top.id}`)
     }
   }
 
