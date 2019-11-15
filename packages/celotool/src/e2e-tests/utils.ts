@@ -336,7 +336,7 @@ export async function startGeth(gethBinaryPath: string, instance: GethInstanceCo
 
 
   if (!!ethstats) {
-    gethArgs.push(`--ethstats=${instance.name}:secret@${ethstats}`)
+    gethArgs.push(`--ethstats=${instance.name}@${ethstats}`)
   }
   const gethProcess = spawnWithLog(gethBinaryPath, gethArgs, `${datadir}/logs.txt`)
   instance.pid = gethProcess.pid
