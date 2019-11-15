@@ -6,6 +6,7 @@ import fs from 'fs'
 import readline from 'readline'
 import { google } from 'googleapis'
 import { Client } from 'pg'
+import { verifyClaim } from '@celo/contractkit/lib/identity/claims/claim'
 
 // If modifying these scopes, delete token.json.
 const SCOPES = ['https://www.googleapis.com/auth/spreadsheets.readonly']
@@ -13,49 +14,6 @@ const SCOPES = ['https://www.googleapis.com/auth/spreadsheets.readonly']
 // created automatically when the authorization flow completes for the first
 // time.
 const TOKEN_PATH = 'token.json'
-
-/*
-
-SELECT competitors.address, SUM(rate*value+fetched_coin_balance+locked_gold)*multiplier AS score
-FROM addresses, exchange_rates, competitors, claims, celo_account, address_current_token_balances
-WHERE token_contract_address_hash='\x88f24de331525cf6cfd7455eb96a9e4d49b7f292'
- AND address_current_token_balances.address_hash=addresses.hash
- AND token='\x88f24de331525cf6cfd7455eb96a9e4d49b7f292'
- AND claims.claim_address = addresses.hash
- AND celo_account.address = addresses.hash
- AND claims.address = competitors.address
-GROUP BY competitors.address
-ORDER BY score;
-
-SELECT rate*value+fetched_coin_balance+locked_gold AS score
-FROM addresses, exchange_rates, celo_account,
- (SELECT '\x48b5d84d283bfcbfcf9cec22fe8e5b271f5a1c85' AS address, COALESCE(SUM(value),0) AS value
-  FROM address_current_token_balances
-  WHERE address_hash='\x48b5d84d283bfcbfcf9cec22fe8e5b271f5a1c85'
-  AND token_contract_address_hash='\x88f24de331525cf6cfd7455eb96a9e4d49b7f292') AS get
-WHERE token='\x88f24de331525cf6cfd7455eb96a9e4d49b7f292'
- AND addresses.hash='\x48b5d84d283bfcbfcf9cec22fe8e5b271f5a1c85'
- AND celo_account.address = addresses.hash
-
-SELECT fetched_coin_balance, fetched_coin_balance_block_number, hash
-FROM addresses;
-
-SELECT competitors.address, SUM(rate*value+fetched_coin_balance+locked_gold)*multiplier AS score
-FROM addresses, exchange_rates, competitors, claims, celo_account,
- (SELECT claims.claim_address AS address, COALESCE(SUM(value),0) AS value
-  FROM address_current_token_balances, claims
-  WHERE address_hash=claims.claim_address
-  AND token_contract_address_hash='\x88f24de331525cf6cfd7455eb96a9e4d49b7f292'
-  GROUP BY claims.claim_address) AS get
-WHERE  token='\x88f24de331525cf6cfd7455eb96a9e4d49b7f292'
- AND claims.claim_address = get.address
- AND celo_account.address = addresses.hash
- AND claims.address = competitors.address
-GROUP BY competitors.address
-ORDER BY score;
-
-
-*/
 
 function addressToBinary(a: string) {
   try {
@@ -104,9 +62,19 @@ async function updateRate(kit: ContractKit) {
   await client.end()
 }
 
-async function processClaims(address: string, data: string) {
+async function processClaims(kit: ContractKit, address: string, data: string) {
   try {
-    const lst: string[] = JSON.parse(data).claims
+    const orig_lst: any[] = JSON.parse(data).claims
+    const lst: string[] = []
+    const accounts = await kit.contracts.getAccounts()
+    for (let i = 0; i < orig_lst.length; i++) {
+      if (!orig_lst[i].payload) continue
+      let payload = JSON.parse(orig_lst[i].payload)
+      let claim = { signature: orig_lst[i].signature, payload }
+      const status = await verifyClaim(claim, address, accounts.getMetadataURL)
+      if (status) console.log(status)
+      else lst.push(payload.address)
+    }
     lst.push(address)
     const client = new Client({ database: 'blockscout' })
     await client.connect()
@@ -222,14 +190,14 @@ async function readAssoc(lst: string[]) {
       .get(url, (resp) => {
         let data = ''
         resp.on('data', (chunk) => (data += chunk))
-        resp.on('end', () => processClaims(a, data))
+        resp.on('end', () => processClaims(kit, a, data))
       })
       .on('error', (err) => console.log('Error: ' + err.message))
   }
   lst.forEach(async (a) => {
     try {
       const url = await accounts.getMetadataURL(a)
-      if (url == '') processClaims(a, '{"claims": []}')
+      if (url == '') processClaims(kit, a, '{"claims": []}')
       else getFromUrl(a, url)
     } catch (err) {
       console.error('Bad address', a, err.toString())
