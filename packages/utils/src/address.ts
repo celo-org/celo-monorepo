@@ -1,4 +1,4 @@
-import { privateToAddress, privateToPublic, toChecksumAddress } from 'ethereumjs-util'
+import { privateToAddress, privateToPublic, pubToAddress, toChecksumAddress } from 'ethereumjs-util'
 
 export type Address = string
 
@@ -17,5 +17,17 @@ export const privateKeyToPublicKey = (privateKey: string) => {
     '0x' + privateToPublic(Buffer.from(privateKey.slice(2), 'hex')).toString('hex')
   )
 }
+
+export const publicKeyToAddress = (publicKey: string) => {
+  return toChecksumAddress(
+    '0x' + pubToAddress(Buffer.from(publicKey.slice(2), 'hex')).toString('hex')
+  )
+}
+
+export const privateKeyToPublicKey = (privateKey: string) => {
+  return '0x' + privateToPublic(Buffer.from(privateKey.slice(2), 'hex')).toString('hex')
+}
+
+export { toChecksumAddress } from 'ethereumjs-util'
 export { isValidAddress } from 'ethereumjs-util'
 export { isValidChecksumAddress } from 'ethereumjs-util'
