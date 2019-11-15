@@ -212,17 +212,8 @@ describe('governance tests', () => {
       await sleep(epoch)
     })
 
-    const getValidatorSetAtBlock = async (blockNumber: number) => {
-      const validatorSetSize = await election.methods
-        .numberValidatorsInCurrentSet()
-        .call({}, blockNumber)
-      const validatorSet = []
-      for (let i = 0; i < validatorSetSize; i++) {
-        validatorSet.push(
-          await election.methods.validatorAddressFromCurrentSet(i).call({}, blockNumber)
-        )
-      }
-      return validatorSet
+    const getValidatorSetAtBlock = async (blockNumber: number): Promise<string[]> => {
+      return election.methods.currentValidators().call({}, blockNumber)
     }
 
     const getLastEpochBlock = (blockNumber: number) => {
