@@ -25,7 +25,7 @@
     "express": "^4.16.4",
     "graphql": "^14.1.1",
     "utf8": "^3.0.0",
-    "web3-eth-abi": "1.0.0-beta.37"
+    "web3-eth-abi": "1.2.4"
   },
   "devDependencies": {
     "@google-cloud/nodejs-repo-tools": "^2.3.3",

@@ -14,7 +14,9 @@
     "test:verbose": "jest --verbose",
     "lint": "tslint -c tslint.json --project ."
   },
-  "files": ["lib/**/*"],
+  "files": [
+    "lib/**/*"
+  ],
   "dependencies": {
     "@umpirsky/country-list": "git://github.com/umpirsky/country-list#05fda51",
     "bignumber.js": "^7.2.0",
@@ -27,7 +29,7 @@
     "google-libphonenumber": "^3.2.4",
     "lodash": "^4.17.14",
     "numeral": "^2.0.6",
-    "web3-utils": "1.0.0-beta.37",
+    "web3-utils": "1.2.4",
     "keccak256": "^1.0.0",
     "buffer-reverse": "^1.0.1",
     "bigi": "^1.1.0"
