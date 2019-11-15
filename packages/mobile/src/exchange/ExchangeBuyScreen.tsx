@@ -155,6 +155,7 @@ export class ExchangeBuyScreen extends React.Component<Props, State> {
   }
 
   isExchangeInvalid = () => {
+    /*
     const makerBalance = this.getMakerBalance()
     const amount = parseInputAmount(this.state.makerTokenAmount)
     const amountIsInvalid =
@@ -172,6 +173,8 @@ export class ExchangeBuyScreen extends React.Component<Props, State> {
     ).isLessThanOrEqualTo(0)
 
     return amountIsInvalid || exchangeRateIsInvalid || takerAmountIsInvalid || this.hasError()
+    */
+    return false
   }
 
   getMakerBalance = () => {
@@ -197,7 +200,8 @@ export class ExchangeBuyScreen extends React.Component<Props, State> {
     const { t } = this.props
 
     const makerSymbol = makerToken === CURRENCY_ENUM.DOLLAR ? '$' : ''
-    const takerSymbol = makerToken === CURRENCY_ENUM.DOLLAR ? '' : '$'
+    const takerToken =
+      makerToken === CURRENCY_ENUM.DOLLAR ? CURRENCY_ENUM.GOLD : CURRENCY_ENUM.DOLLAR
 
     const exchangeRate = getRateForMakerToken(this.props.exchangeRatePair, makerToken)
     const takerTokenAmount = getTakerAmount(parseInputAmount(makerTokenAmount), exchangeRate)
@@ -233,7 +237,7 @@ export class ExchangeBuyScreen extends React.Component<Props, State> {
             <View style={{ flexDirection: 'row', flex: 1, justifyContent: 'space-between' }}>
               <Text style={fontStyles.body}>{`Subtotal (@ $${exchangeRate})`}</Text>
               <Text style={[fontStyles.regular]}>
-                {getMoneyDisplayValue(takerTokenAmount, takerSymbol, true)}
+                {getMoneyDisplayValue(takerTokenAmount, takerToken, true)}
               </Text>
             </View>
           </View>

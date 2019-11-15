@@ -6,6 +6,7 @@ import * as React from 'react'
 import { withNamespaces, WithNamespaces } from 'react-i18next'
 import { StyleSheet, View } from 'react-native'
 import SafeAreaView from 'react-native-safe-area-view'
+import { NavigationInjectedProps } from 'react-navigation'
 import { connect } from 'react-redux'
 import CeloAnalytics from 'src/analytics/CeloAnalytics'
 import { CustomEventNames } from 'src/analytics/constants'
@@ -21,30 +22,42 @@ import { Stacks } from 'src/navigator/Screens'
 import { RootState } from 'src/redux/reducers'
 import DisconnectBanner from 'src/shared/DisconnectBanner'
 import { getRateForMakerToken } from 'src/utils/currencyExchange'
-import { NavigationInjectedProps } from 'react-navigation'
 
 interface StateProps {
   exchangeRate: BigNumber
+  goldBalance: string
+  dollarBalance: string
 }
 
 interface DispatchProps {
   fetchExchangeRate: typeof fetchExchangeRate
 }
 
-type Props = StateProps & DispatchProps & WithNamespaces
+type Props = StateProps & DispatchProps & NavigationInjectedProps & WithNamespaces
 
 const mapStateToProps = (state: RootState): StateProps => ({
   exchangeRate: getRateForMakerToken(state.exchange.exchangeRatePair, Token.DOLLAR),
+  goldBalance: state.goldToken.balance || '0',
+  dollarBalance: state.stableToken.balance || '0',
 })
-
-function goToTrade() {
-  CeloAnalytics.track(CustomEventNames.exchange_button)
-  navigate(Stacks.ExchangeStack, { makerToken: Token.DOLLAR, makerTokenBalance: '50' })
-}
 
 export class ExchangeHomeScreen extends React.Component<Props> {
   componentDidMount() {
     this.props.fetchExchangeRate()
+  }
+
+  goToBuyGold() {
+    navigate(Stacks.ExchangeStack, {
+      makerToken: Token.DOLLAR,
+      makerTokenBalance: this.props.dollarBalance,
+    })
+  }
+
+  goToBuyDollars() {
+    navigate(Stacks.ExchangeStack, {
+      makerToken: Token.GOLD,
+      makerTokenBalance: this.props.goldBalance,
+    })
   }
 
   render() {
@@ -66,7 +79,7 @@ export class ExchangeHomeScreen extends React.Component<Props> {
             <View style={styles.buttonContainer}>
               <Button
                 text={t('buy')}
-                onPress={goToTrade}
+                onPress={this.goToBuyGold}
                 style={styles.button}
                 standard={true}
                 type={BtnTypes.PRIMARY}
@@ -74,7 +87,7 @@ export class ExchangeHomeScreen extends React.Component<Props> {
               <View style={styles.buttonDivider} />
               <Button
                 text={t('sell')}
-                onPress={goToTrade}
+                onPress={this.goToBuyDollars}
                 style={styles.button}
                 standard={true}
                 type={BtnTypes.PRIMARY}
