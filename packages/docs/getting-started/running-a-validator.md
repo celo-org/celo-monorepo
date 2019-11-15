@@ -99,7 +99,7 @@ $ docker pull $CELO_IMAGE:$CELO_NETWORK
 
 At this point we need to create the accounts that will be used by the Validator and the Proxy. We create and cd into the directory where you want to store the data and any other files needed to run your node. You can name this whatever you’d like, but here’s a default you can use:
 
-```
+```bash
 $ mkdir -p celo-data-dir/proxy celo-data-dir/validator
 $ cd celo-data-dir
 ```
@@ -120,7 +120,7 @@ Those commands will prompt you for a passphrase, ask you to confirm it, and then
 
 Let's save these addresses to environment variables, so that you can reference it later (don't include the braces):
 
-```
+```bash
 $ export CELO_VALIDATOR_GROUP_ADDRESS=<YOUR-VALIDATOR-GROUP-ADDRESS>
 $ export CELO_VALIDATOR_ADDRESS=<YOUR-VALIDATOR-ADDRESS>
 $ export CELO_PROXY_ADDRESS=<YOUR-PROXY-ADDRESS>
@@ -164,17 +164,17 @@ $ docker run -v `pwd`/validator:/root/.celo --entrypoint cp $CELO_IMAGE:$CELO_NE
 At this point we are ready to start up the proxy:
 
 ```bash
-$ docker run --name celo-proxy -p 8545:8545 -p 8546:8546 -p 30303:30303 -p 30303:30303/udp -p 30503:30503 -p 30503:30503/udp -v `pwd`/proxy:/root/.celo $CELO_IMAGE:$CELO_NETWORK --verbosity 3 --networkid $NETWORK_ID --syncmode full --rpc --rpcaddr 0.0.0.0 --rpcapi eth,net,web3,debug --maxpeers 1100 --etherbase=$CELO_PROXY_ADDRESS --miner.verificationpool=$URL_VERIFICATION_POOL --proxy.proxiedvalidatoraddress $CELO_VALIDATOR_ADDRESS --proxy.internalendpoint :30503
+$ docker run --name celo-proxy -p 8545:8545 -p 8546:8546 -p 30303:30303 -p 30303:30303/udp -p 30503:30503 -p 30503:30503/udp -v `pwd`/proxy:/root/.celo $CELO_IMAGE:$CELO_NETWORK --verbosity 3 --networkid $NETWORK_ID --syncmode full --rpc --rpcaddr 0.0.0.0 --rpcapi eth,net,web3,debug --maxpeers 1100 --etherbase=$CELO_PROXY_ADDRESS --miner.verificationpool=$URL_VERIFICATION_POOL --proxy.proxy --proxy.proxiedvalidatoraddress $CELO_VALIDATOR_ADDRESS --proxy.internalendpoint :30503
 ```
 
-Now we need to obtain the Proxy enode and ip address. For doing that we can run the following commands:
+Now we need to obtain the Proxy enode and ip addresses, running the following commands:
 
 ```bash
 $ export PROXY_ENODE=$(docker exec celo-proxy geth --exec "admin.nodeInfo['enode'].split('//')[1].split('@')[0]" attach | tr -d '"')
 $ export PROXY_IP=$(docker inspect -f '{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' celo-proxy)
 ```
 
-Start up the validator node:
+Now we can start up the validator node:
 
 ```bash
 $ docker run --name celo-validator -p 127.0.0.1:8547:8545 -p 127.0.0.1:8548:8546 -p 30304:30303 -p 30304:30303/udp -v `pwd`/validator:/root/.celo $CELO_IMAGE:$CELO_NETWORK --verbosity 3 --networkid $NETWORK_ID --syncmode full --rpc --rpcaddr 0.0.0.0 --rpcapi eth,net,web3,debug --maxpeers 125 --mine --miner.verificationpool=$URL_VERIFICATION_POOL --istanbul.blockperiod=1 --istanbul.requesttimeout=3000 --etherbase $CELO_VALIDATOR_ADDRESS --nodiscover --proxy.proxied --proxy.proxyenodeurlpair=enode://$PROXY_ENODE@$PROXY_IP:30503\;enode://$PROXY_ENODE@$PROXY_IP:30503
@@ -274,7 +274,7 @@ It will prompt you for a passphrase, ask you to confirm it, and then will output
 
 Let's save these addresses to environment variables, so that you can reference it later (don't include the braces):
 
-```
+```bash
 $ export CELO_VALIDATOR_GROUP_ADDRESS=<YOUR-VALIDATOR-GROUP-ADDRESS>
 $ export CELO_VALIDATOR_ADDRESS=<YOUR-VALIDATOR-ADDRESS>
 ```
@@ -331,21 +331,21 @@ Visit the [Celo Faucet](https://celo.org/build/faucet) to send **both** of your 
 
 In a new tab, unlock your accounts so that you can send transactions. This only unlocks the accounts for the lifetime of the validator that's running, so be sure to unlock `$CELO_VALIDATOR_ADDRESS` again if your node gets restarted:
 
-```
+```bash
 $ celocli account:unlock --account $CELO_VALIDATOR_GROUP_ADDRESS --password <YOUR_FIRST_PASSWORD>
 $ celocli account:unlock --account $CELO_VALIDATOR_ADDRESS --password <YOUR_SECOND_PASSWORD>
 ```
 
 In a new tab, make a locked Gold account for both of your addresses by running the Celo CLI. This will allow you to stake Celo Gold, which is required to register a validator and validator groups:
 
-```
+```bash
 $ celocli account:register --from $CELO_VALIDATOR_GROUP_ADDRESS --name <GROUP_NAME_OF_YOUR_CHOICE>
 $ celocli account:register --from $CELO_VALIDATOR_ADDRESS --name <VALIDATOR_NAME_OF_YOUR_CHOICE>
 ```
 
 Make a locked Gold commitment for both accounts in order to secure the right to register a validator and validator group. The current requirement is 1 Celo Gold with a notice period of 60 days. If you choose to stake more gold, or a longer notice period, be sure to use those values below:
 
-```
+```bash
 $ celocli lockedgold:lockup --from $CELO_VALIDATOR_GROUP_ADDRESS --goldAmount 1000000000000000000 --noticePeriod 5184000
 $ celocli lockedgold:lockup --from $CELO_VALIDATOR_ADDRESS --goldAmount 1000000000000000000 --noticePeriod 5184000
 ```
