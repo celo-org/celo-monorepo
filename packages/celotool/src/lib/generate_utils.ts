@@ -169,22 +169,22 @@ const generateIstanbulExtraData = (validators: Validator[]) => {
         validators.map((validator) => Buffer.from(validator.blsPublicKey, 'hex')),
         // Removed validators
         new Buffer(0),
-        // ProposerSignature
+        // Seal
         Buffer.from(repeat('0', blsSignatureVanity * 2), 'hex'),
         [
-          // AggregatedSignature.Bitmap
+          // AggregatedSeal.Bitmap
           new Buffer(0),
-          // AggregatedSignature.Signature
+          // AggregatedSeal.Signature
           Buffer.from(repeat('0', blsSignatureVanity * 2), 'hex'),
-          // AggregatedSignature.Round
+          // AggregatedSeal.Round
           new Buffer(0),
         ],
         [
-          // AggregatedSignature.Bitmap
+          // ParentAggregatedSeal.Bitmap
           new Buffer(0),
-          // AggregatedSignature.Signature
+          // ParentAggregatedSeal.Signature
           Buffer.from(repeat('0', blsSignatureVanity * 2), 'hex'),
-          // AggregatedSignature.Round
+          // ParentAggregatedSeal.Round
           new Buffer(0),
         ],
         // EpochData
