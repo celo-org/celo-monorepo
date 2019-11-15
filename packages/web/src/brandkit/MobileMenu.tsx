@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { Text, View, StyleSheet, TouchableOpacity } from 'react-native'
+import { Text, View, StyleSheet, TouchableOpacity, TouchableWithoutFeedback } from 'react-native'
 import Sidebar, { Page } from 'src/brandkit/Sidebar'
 import { standardStyles, colors } from 'src/styles'
 import Triangle, { Direction } from 'src/shared/Triangle'
@@ -15,8 +15,18 @@ interface State {
 }
 
 export default class MobileMenu extends React.PureComponent<Props, State> {
-  state = {
-    isOpen: false,
+  state = { isOpen: false }
+
+  componentDidMount = () => {
+    window.addEventListener('hashchange', this.closeMenu, false)
+  }
+
+  closeMenu = () => {
+    this.setState({ isOpen: false })
+  }
+
+  componentWillUnmount = () => {
+    window.removeEventListener('hashchange', this.closeMenu)
   }
 
   toggleMenu = () => {
@@ -55,13 +65,16 @@ export default class MobileMenu extends React.PureComponent<Props, State> {
 
 // TODO something better props a hash map
 function pageTitleFromRoute(route: string) {
-  return route.toUpperCase().replace('/', ' ')
+  return route.toUpperCase()
 }
 
 const styles = StyleSheet.create({
   container: {
+    position: 'fixed',
+    width: '100%',
+    top: 70,
     // height: '100vh',
-    // backgroundColor: colors.red,
+    backgroundColor: colors.white,
     // transform: [{ translateZ: 0, height: '100%' }],
   },
   bar: {

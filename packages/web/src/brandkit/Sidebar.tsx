@@ -33,7 +33,7 @@ export default withScreenSize<Props>(
       <View style={screen === ScreenSizes.MOBILE ? styles.mobileContainer : styles.container}>
         {pages.map((page) => {
           return (
-            <>
+            <React.Fragment key={page.href}>
               <Link
                 key={page.title}
                 kind={Kind.page}
@@ -48,7 +48,7 @@ export default withScreenSize<Props>(
                   routeHash={routeHash}
                 />
               )}
-            </>
+            </React.Fragment>
           )
         })}
       </View>
@@ -70,15 +70,13 @@ const SectionNav = React.memo(function SectionNav_({
       {active &&
         sections.map((section) => {
           return (
-            <>
-              <Link
-                key={section.title}
-                kind={Kind.section}
-                href={section.href}
-                title={section.title}
-                active={isActiveSection(section.href, routeHash)}
-              />
-            </>
+            <Link
+              key={section.title}
+              kind={Kind.section}
+              href={section.href}
+              title={section.title}
+              active={isActiveSection(section.href, routeHash)}
+            />
           )
         })}
     </View>
