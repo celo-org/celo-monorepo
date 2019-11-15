@@ -90,12 +90,12 @@ function shouldShowClipboard(attestationCodes: AttestationCode[]) {
 function getRecodedAttestationValue(attestationCode: AttestationCode, t: i18n.TranslationFunction) {
   try {
     if (!attestationCode.code || attestationCode.code === ATTESTATION_CODE_PLACEHOLDER) {
-      return t('input.codeAccepted')
+      return t('global:accepted')
     }
     return Buffer.from(stripHexLeader(attestationCode.code), 'hex').toString('base64')
   } catch (error) {
     Logger.warn(TAG, 'Could not recode verification code to base64')
-    return t('input.codeAccepted')
+    return t('global:accepted')
   }
 }
 
