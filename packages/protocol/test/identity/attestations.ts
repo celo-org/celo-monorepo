@@ -26,6 +26,7 @@ import {
   MockRandomInstance,
   MockStableTokenContract,
   MockStableTokenInstance,
+  MockValidatorsContract,
   RegistryContract,
   RegistryInstance,
   TestAttestationsContract,
@@ -43,6 +44,7 @@ const Attestations: TestAttestationsContract = artifacts.require('TestAttestatio
 const MockStableToken: MockStableTokenContract = artifacts.require('MockStableToken')
 const MockElection: MockElectionContract = artifacts.require('MockElection')
 const MockLockedGold: MockLockedGoldContract = artifacts.require('MockLockedGold')
+const MockValidators: MockValidatorsContract = artifacts.require('MockValidators')
 const Random: MockRandomContract = artifacts.require('MockRandom')
 const Registry: RegistryContract = artifacts.require('Registry')
 
@@ -131,10 +133,14 @@ contract('Attestations', (accounts: string[]) => {
     accountsInstance = await Accounts.new()
     mockStableToken = await MockStableToken.new()
     otherMockStableToken = await MockStableToken.new()
+    const mockValidators = await MockValidators.new()
     attestations = await Attestations.new()
     random = await Random.new()
     random.addTestRandomness(0, '0x00')
     mockLockedGold = await MockLockedGold.new()
+    registry = await Registry.new()
+    await accountsInstance.initialize(registry.address)
+    await registry.setAddressFor(CeloContractName.Validators, mockValidators.address)
 
     await Promise.all(
       accounts.map(async (account) => {
@@ -153,7 +159,6 @@ contract('Attestations', (accounts: string[]) => {
         privateKeyToAddress(getDerivedKey(KeyOffsets.VALIDATING_KEY_OFFSET, account))
       )
     )
-    registry = await Registry.new()
     await registry.setAddressFor(CeloContractName.Accounts, accountsInstance.address)
     await registry.setAddressFor(CeloContractName.Random, random.address)
     await registry.setAddressFor(CeloContractName.Election, mockElection.address)
