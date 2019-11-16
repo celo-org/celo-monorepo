@@ -170,11 +170,7 @@ export class ExchangeBuyScreen extends React.Component<Props, State> {
     const { makerToken } = this.state
     const { t, exchangeRatePair } = this.props
 
-    const makerSymbol = CURRENCIES[makerToken].symbol
-    const takerToken =
-      this.state.makerToken === CURRENCY_ENUM.DOLLAR ? CURRENCY_ENUM.GOLD : CURRENCY_ENUM.DOLLAR
     const exchangeRateDisplay = getRateForMakerToken(exchangeRatePair, CURRENCY_ENUM.DOLLAR) // Always show rate in dollars
-
     const subtotal = this.getDollarAmount()
 
     return (
@@ -279,69 +275,8 @@ const styles = StyleSheet.create({
   exchangeBodyText: { fontSize: 15, lineHeight: 20 },
   currencyInputText: { fontSize: 24, lineHeight: 39, height: 54 }, // setting height manually b.c. of bug causing text to jump
   container: {
-    // backgroundColor: colors.background,
     flex: 1,
     flexDirection: 'column',
     justifyContent: 'space-between',
   },
-  transferArea: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'flex-start',
-    paddingHorizontal: 20,
-    paddingTop: 20,
-    marginBottom: 15,
-  },
-  transferInfo: {
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    flex: 1,
-    flexDirection: 'column',
-  },
-  transferMeta: {
-    alignItems: 'center',
-  },
-  currencyLabel: {
-    color: colors.darkSecondary,
-  },
-  exchangeButtonBackground: {
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginHorizontal: 15,
-    marginVertical: 15 + 18,
-  },
-  amountText: {
-    fontSize: 22,
-  },
-  ioBox: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    textAlign: 'center',
-    width: '100%',
-    marginHorizontal: 15,
-    marginVertical: 10,
-    paddingHorizontal: 15,
-    paddingTop: 10,
-    paddingBottom: 22,
-  },
-  inputBox: {
-    borderWidth: 1,
-    borderRadius: 3,
-    paddingTop: 15,
-    paddingBottom: 10,
-    height: 54, // setting height manually b.c. of bug causing text to jump
-  },
-  outputText: {
-    paddingTop: 2,
-    flexDirection: 'row',
-    alignItems: 'flex-start',
-    height: 22,
-  },
-  superscript: {
-    fontSize: 12,
-    lineHeight: 16,
-  },
-  green: { color: colors.celoGreen },
-  gold: { color: colors.celoGold },
 })
