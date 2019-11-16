@@ -78,7 +78,7 @@ export class LockedGoldWrapper extends BaseWrapper<LockedGold> {
    * Relocks gold that has been unlocked but not withdrawn.
    * @param value The value to relock from pending withdrawals.
    */
-  async relock(account: Address, value: NumberLike): Promise<CeloTransactionObject<void>[]> {
+  async relock(account: Address, value: NumberLike): Promise<Array<CeloTransactionObject<void>>> {
     const pendingWithdrawals = await this.getPendingWithdrawals(account)
     // Ensure there are enough pending withdrawals to relock.
     const totalValue = await this.getPendingWithdrawalsTotalValue(account)
@@ -95,7 +95,11 @@ export class LockedGoldWrapper extends BaseWrapper<LockedGold> {
     pendingWithdrawals.forEach(throwIfNotSorted)
 
     let remainingToRelock = new BigNumber(value)
-    const relockPw = (acc: CeloTransactionObject<void>[], pw: PendingWithdrawal, i: number) => {
+    const relockPw = (
+      acc: Array<CeloTransactionObject<void>>,
+      pw: PendingWithdrawal,
+      i: number
+    ) => {
       const valueToRelock = BigNumber.minimum(pw.value, remainingToRelock)
       if (valueToRelock.isZero()) {
         remainingToRelock = remainingToRelock.minus(valueToRelock)
@@ -103,9 +107,9 @@ export class LockedGoldWrapper extends BaseWrapper<LockedGold> {
       }
       return acc
     }
-    return Promise.all(pendingWithdrawals.reduceRight(relockPw, []) as CeloTransactionObject<
-      void
-    >[])
+    return Promise.all(pendingWithdrawals.reduceRight(relockPw, []) as Array<
+      CeloTransactionObject<void>
+    >)
   }
 
   /**
@@ -118,8 +122,6 @@ export class LockedGoldWrapper extends BaseWrapper<LockedGold> {
     this.contract.methods.relock,
     tupleParser(parseNumber, parseNumber)
   )
-
-  /**
 
   /**
    * Returns the total amount of locked gold for an account.
