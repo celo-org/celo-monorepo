@@ -213,7 +213,7 @@ export async function init(gethBinaryPath: string, datadir: string, genesisPath:
 }
 
 export async function importPrivateKey(gethBinaryPath: string, instance: GethInstanceConfig) {
-  const keyFile = '/tmp/key.txt'
+  const keyFile = `/${getDatadir(instance)}/key.txt`
   fs.writeFileSync(keyFile, instance.privateKey)
   console.info(`geth:${instance.name}: import account`)
   await execCmdWithExitOnFailure(
