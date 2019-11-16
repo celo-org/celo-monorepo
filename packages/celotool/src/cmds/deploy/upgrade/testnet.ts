@@ -30,10 +30,10 @@ export const handler = async (argv: TestnetArgv) => {
 
   if (argv.reset) {
     await resetAndUpgradeHelmChart(argv.celoEnv)
+    await uploadGenesisBlockToGoogleStorage(argv.celoEnv)
   } else {
     await upgradeHelmChart(argv.celoEnv)
   }
-  await uploadGenesisBlockToGoogleStorage(argv.celoEnv)
   await uploadStaticNodesToGoogleStorage(argv.celoEnv)
   await uploadEnvFileToGoogleStorage(argv.celoEnv)
 }

@@ -28,7 +28,7 @@ const mapStateToProps = (state: RootState): StateProps => {
 
 export class BackupPrompt extends React.Component<Props> {
   goToBackup = () => {
-    navigate(Screens.Backup)
+    navigate(Screens.BackupIntroduction)
   }
 
   isVisible = () => {
@@ -42,6 +42,7 @@ export class BackupPrompt extends React.Component<Props> {
 
     return (
       <SmartTopAlert
+        timestamp={Date.now()}
         text={isVisible && t('backupPrompt')}
         onPress={this.goToBackup}
         type={NotificationTypes.MESSAGE}

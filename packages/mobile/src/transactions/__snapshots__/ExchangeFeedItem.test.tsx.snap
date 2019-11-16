@@ -3,6 +3,7 @@
 exports[`ExchangeFeedItem renders correctly 1`] = `
 <View
   accessible={true}
+  focusable={true}
   isTVSelectable={true}
   nativeBackgroundAndroid={
     Object {
@@ -10,6 +11,7 @@ exports[`ExchangeFeedItem renders correctly 1`] = `
       "type": "ThemeAttrAndroid",
     }
   }
+  onClick={[Function]}
   onResponderGrant={[Function]}
   onResponderMove={[Function]}
   onResponderRelease={[Function]}
@@ -42,7 +44,7 @@ exports[`ExchangeFeedItem renders correctly 1`] = `
         resizeMode="contain"
         source={
           Object {
-            "testUri": "../../../src/transactions/ExchangeGreenGold.png",
+            "testUri": "../../../packages/mobile/src/transactions/ExchangeGreenGold.png",
           }
         }
         style={
@@ -96,7 +98,6 @@ exports[`ExchangeFeedItem renders correctly 1`] = `
             ]
           }
         >
-          
           10.00
         </Text>
       </View>
@@ -123,7 +124,7 @@ exports[`ExchangeFeedItem renders correctly 1`] = `
             ]
           }
         >
-          1.00
+          1.33
         </Text>
         <View
           style={
@@ -180,17 +181,12 @@ exports[`ExchangeFeedItem renders correctly 1`] = `
       >
         <Text
           style={
-            Array [
-              Object {
-                "color": "#2E3338",
-                "fontFamily": "Hind-Regular",
-                "fontSize": 14,
-                "lineHeight": 18,
-              },
-              Object {
-                "color": "#BDBDBD",
-              },
-            ]
+            Object {
+              "color": "#BDBDBD",
+              "fontFamily": "Hind-Regular",
+              "fontSize": 14,
+              "lineHeight": 18,
+            }
           }
         >
           Dec 31 at 5:00 PM

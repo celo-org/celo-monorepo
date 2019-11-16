@@ -3,12 +3,10 @@ pragma solidity ^0.5.3;
 import "openzeppelin-solidity/contracts/math/SafeMath.sol";
 import "./LinkedList.sol";
 
-
 /**
  * @title Maintains a sorted list of unsigned ints keyed by bytes32.
  */
 library SortedLinkedList {
-
   using SafeMath for uint256;
   using LinkedList for LinkedList.List;
 
@@ -30,9 +28,7 @@ library SortedLinkedList {
     uint256 value,
     bytes32 lesserKey,
     bytes32 greaterKey
-  )
-    public
-  {
+  ) public {
     require(key != bytes32(0) && key != lesserKey && key != greaterKey && !contains(list, key));
     require((lesserKey != bytes32(0) || greaterKey != bytes32(0)) || list.list.numElements == 0);
     require(contains(list, lesserKey) || lesserKey == bytes32(0));
@@ -65,9 +61,7 @@ library SortedLinkedList {
     uint256 value,
     bytes32 lesserKey,
     bytes32 greaterKey
-  )
-    public
-  {
+  ) public {
     // TODO(asa): Optimize by not making any changes other than value if lesserKey and greaterKey
     // don't change.
     // TODO(asa): Optimize by not updating lesserKey/greaterKey for key
@@ -121,13 +115,7 @@ library SortedLinkedList {
    * @notice Gets all elements from the doubly linked list.
    * @return An unpacked list of elements from largest to smallest.
    */
-  function getElements(
-    List storage list
-  )
-    public
-    view
-    returns (bytes32[] memory, uint256[] memory)
-  {
+  function getElements(List storage list) public view returns (bytes32[] memory, uint256[] memory) {
     bytes32[] memory keys = getKeys(list);
     uint256[] memory values = new uint256[](keys.length);
     for (uint256 i = 0; i < keys.length; i = i.add(1)) {
@@ -144,6 +132,16 @@ library SortedLinkedList {
     return list.list.getKeys();
   }
 
+  /**
+   * @notice Returns first N greatest elements of the list.
+   * @param n The number of elements to return.
+   * @return The keys of the first n elements.
+   * @dev Reverts if n is greater than the number of elements in the list.
+   */
+  function headN(List storage list, uint256 n) public view returns (bytes32[] memory) {
+    return list.list.headN(n);
+  }
+
   // TODO(asa): Gas optimizations by passing in elements to isValueBetween
   /**
    * @notice Returns the keys of the elements greaterKey than and less than the provided value.
@@ -157,11 +155,7 @@ library SortedLinkedList {
     uint256 value,
     bytes32 lesserKey,
     bytes32 greaterKey
-  )
-    private
-    view
-    returns (bytes32, bytes32)
-  {
+  ) private view returns (bytes32, bytes32) {
     // Check for one of the following conditions and fail if none are met:
     //   1. The value is less than the current lowest value
     //   2. The value is greater than the current greatest value
@@ -173,9 +167,13 @@ library SortedLinkedList {
       greaterKey == bytes32(0) && isValueBetween(list, value, list.list.head, greaterKey)
     ) {
       return (list.list.head, greaterKey);
-    } else if (isValueBetween(list, value, lesserKey, list.list.elements[lesserKey].nextKey)) {
+    } else if (
+      lesserKey != bytes32(0) &&
+      isValueBetween(list, value, lesserKey, list.list.elements[lesserKey].nextKey)
+    ) {
       return (lesserKey, list.list.elements[lesserKey].nextKey);
     } else if (
+      greaterKey != bytes32(0) &&
       isValueBetween(list, value, list.list.elements[greaterKey].previousKey, greaterKey)
     ) {
       return (list.list.elements[greaterKey].previousKey, greaterKey);
@@ -191,12 +189,7 @@ library SortedLinkedList {
    * @param greaterKey The key of the element whose value should be greaterKey.
    * @return True if the given element is between the two other elements.
    */
-  function isValueBetween(
-    List storage list,
-    uint256 value,
-    bytes32 lesserKey,
-    bytes32 greaterKey
-  )
+  function isValueBetween(List storage list, uint256 value, bytes32 lesserKey, bytes32 greaterKey)
     private
     view
     returns (bool)

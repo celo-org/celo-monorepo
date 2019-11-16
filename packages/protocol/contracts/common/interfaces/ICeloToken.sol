@@ -1,6 +1,5 @@
 pragma solidity ^0.5.3;
 
-
 /**
  * @title This interface describes the non- ERC20 shared interface for all Celo Tokens, and
  * in the absence of interface inheritance is intended as a companion to IERC20.sol.

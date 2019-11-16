@@ -15,7 +15,7 @@ exports[`renders correctly 1`] = `
     resizeMode="contain"
     source={
       Object {
-        "testUri": "../../../src/images/send-fee.png",
+        "testUri": "../../../packages/mobile/src/images/send-fee.png",
       }
     }
     style={
@@ -75,7 +75,17 @@ exports[`renders correctly 1`] = `
     >
       <View
         accessible={true}
+        focusable={true}
+        hitSlop={
+          Object {
+            "bottom": 10,
+            "left": 10,
+            "right": 10,
+            "top": 10,
+          }
+        }
         isTVSelectable={true}
+        onClick={[Function]}
         onResponderGrant={[Function]}
         onResponderMove={[Function]}
         onResponderRelease={[Function]}

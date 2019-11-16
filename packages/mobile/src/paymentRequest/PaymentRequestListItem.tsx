@@ -18,6 +18,7 @@ import { Screens } from 'src/navigator/Screens'
 import NotificationAmount from 'src/paymentRequest/NotificationAmount'
 import { getRecipientThumbnail, Recipient } from 'src/recipients/recipient'
 import { TransactionTypes } from 'src/transactions/reducer'
+import { multiplyByWei } from 'src/utils/formatting'
 import Logger from 'src/utils/Logger'
 
 interface OwnProps {
@@ -99,7 +100,7 @@ export class PaymentRequestListItem extends React.Component<Props> {
           title={requester.displayName}
           ctas={this.getCTA()}
           roundedBorders={false}
-          callout={<NotificationAmount amount={this.props.amount} />}
+          callout={<NotificationAmount amount={multiplyByWei(this.props.amount)} />}
         >
           <View style={styles.body}>
             {this.isDisplayingNumber() && (

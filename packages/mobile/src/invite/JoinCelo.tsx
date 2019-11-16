@@ -126,8 +126,13 @@ export class JoinCelo extends React.Component<Props, State> {
       return
     }
 
-    if (!name || !e164Number || !isValidNumber || !countryCode) {
+    if (!e164Number || !isValidNumber || !countryCode) {
       this.props.showError(ErrorMessages.INVALID_PHONE_NUMBER)
+      return
+    }
+
+    if (!name) {
+      this.props.showError(ErrorMessages.MISSING_FULL_NAME)
       return
     }
 
@@ -178,9 +183,9 @@ export class JoinCelo extends React.Component<Props, State> {
               this.props.cachedNumber !== '' ? this.props.cachedNumber : undefined
             }
           />
-          <Text style={[fontStyles.bodyXSmall, styles.disclaimer]}>
+          <Text style={styles.disclaimer}>
             {t('joinText.1')}
-            <Text onPress={this.onPressGoToTerms} style={fontStyles.link}>
+            <Text onPress={this.onPressGoToTerms} style={styles.disclamerLink}>
               {t('joinText.2')}
             </Text>
           </Text>
@@ -221,7 +226,12 @@ const styles = StyleSheet.create({
     height: 50,
   },
   disclaimer: {
+    ...fontStyles.bodyXSmall,
     marginTop: 25,
+  },
+  disclamerLink: {
+    ...fontStyles.bodyXSmall,
+    textDecorationLine: 'underline',
   },
 })
 

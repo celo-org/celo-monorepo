@@ -11,7 +11,7 @@ export enum NotificationTypes {
   ERROR = 'error',
 }
 
-interface Props {
+interface AlertProps {
   title?: string | null
   text: string | null
   onPress: () => void
@@ -20,9 +20,13 @@ interface Props {
   buttonMessage?: string | null
 }
 
+interface Props extends AlertProps {
+  timestamp: number
+}
+
 // This component needs to be always mounted for the hide animation to be visible
 function SmartTopAlert(props: Props) {
-  const [visibleAlertState, setVisibleAlertState] = useState<Props | null>(null)
+  const [visibleAlertState, setVisibleAlertState] = useState<AlertProps | null>(null)
   const insets = useSafeArea()
   const yOffset = useRef(new Animated.Value(-500))
   const containerRef = useRef<View>()
@@ -48,7 +52,15 @@ function SmartTopAlert(props: Props) {
         return null
       }
     },
-    [props.type, props.title, props.text, props.buttonMessage, props.dismissAfter, props.onPress]
+    [
+      props.timestamp,
+      props.type,
+      props.title,
+      props.text,
+      props.buttonMessage,
+      props.dismissAfter,
+      props.onPress,
+    ]
   )
 
   function hide() {

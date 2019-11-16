@@ -4,11 +4,10 @@ exports[`TransferReviewCard renders correctly for invite review 1`] = `
 <View
   style={
     Object {
-      "flex": 1,
-      "flexDirection": "column",
+      "flexGrow": 1,
       "justifyContent": "flex-start",
       "paddingBottom": 25,
-      "paddingHorizontal": 40,
+      "paddingHorizontal": 20,
     }
   }
 >
@@ -55,7 +54,7 @@ exports[`TransferReviewCard renders correctly for invite review 1`] = `
         <Image
           source={
             Object {
-              "testUri": "../../../src/images/unknown-user-icon.png",
+              "testUri": "../../../packages/mobile/src/images/unknown-user-icon.png",
             }
           }
           style={
@@ -116,7 +115,7 @@ exports[`TransferReviewCard renders correctly for invite review 1`] = `
         ]
       }
     >
-      #000000000000000...
+      #0x0000000000000000000000000000000000007E57
     </Text>
   </View>
   <View
@@ -323,6 +322,7 @@ exports[`TransferReviewCard renders correctly for invite review 1`] = `
           </Text>
           <View
             accessible={true}
+            focusable={true}
             hitSlop={
               Object {
                 "bottom": 10,
@@ -338,6 +338,7 @@ exports[`TransferReviewCard renders correctly for invite review 1`] = `
                 "type": "ThemeAttrAndroid",
               }
             }
+            onClick={[Function]}
             onResponderGrant={[Function]}
             onResponderMove={[Function]}
             onResponderRelease={[Function]}
@@ -355,7 +356,7 @@ exports[`TransferReviewCard renders correctly for invite review 1`] = `
             <Image
               source={
                 Object {
-                  "testUri": "../../../src/images/info.png",
+                  "testUri": "../../../packages/mobile/src/images/info.png",
                 }
               }
               style={
@@ -420,11 +421,10 @@ exports[`TransferReviewCard renders correctly for pay request review 1`] = `
 <View
   style={
     Object {
-      "flex": 1,
-      "flexDirection": "column",
+      "flexGrow": 1,
       "justifyContent": "flex-start",
       "paddingBottom": 25,
-      "paddingHorizontal": 40,
+      "paddingHorizontal": 20,
     }
   }
 >
@@ -471,7 +471,7 @@ exports[`TransferReviewCard renders correctly for pay request review 1`] = `
         <Image
           source={
             Object {
-              "testUri": "../../../src/images/unknown-user-icon.png",
+              "testUri": "../../../packages/mobile/src/images/unknown-user-icon.png",
             }
           }
           style={
@@ -718,6 +718,7 @@ exports[`TransferReviewCard renders correctly for pay request review 1`] = `
           </Text>
           <View
             accessible={true}
+            focusable={true}
             hitSlop={
               Object {
                 "bottom": 10,
@@ -733,6 +734,7 @@ exports[`TransferReviewCard renders correctly for pay request review 1`] = `
                 "type": "ThemeAttrAndroid",
               }
             }
+            onClick={[Function]}
             onResponderGrant={[Function]}
             onResponderMove={[Function]}
             onResponderRelease={[Function]}
@@ -750,7 +752,7 @@ exports[`TransferReviewCard renders correctly for pay request review 1`] = `
             <Image
               source={
                 Object {
-                  "testUri": "../../../src/images/info.png",
+                  "testUri": "../../../packages/mobile/src/images/info.png",
                 }
               }
               style={
@@ -815,11 +817,10 @@ exports[`TransferReviewCard renders correctly for send review 1`] = `
 <View
   style={
     Object {
-      "flex": 1,
-      "flexDirection": "column",
+      "flexGrow": 1,
       "justifyContent": "flex-start",
       "paddingBottom": 25,
-      "paddingHorizontal": 40,
+      "paddingHorizontal": 20,
     }
   }
 >
@@ -866,7 +867,7 @@ exports[`TransferReviewCard renders correctly for send review 1`] = `
         <Image
           source={
             Object {
-              "testUri": "../../../src/images/unknown-user-icon.png",
+              "testUri": "../../../packages/mobile/src/images/unknown-user-icon.png",
             }
           }
           style={
@@ -927,7 +928,7 @@ exports[`TransferReviewCard renders correctly for send review 1`] = `
         ]
       }
     >
-      #000000000000000...
+      #0x0000000000000000000000000000000000007E57
     </Text>
   </View>
   <View
@@ -1091,6 +1092,7 @@ exports[`TransferReviewCard renders correctly for send review 1`] = `
           </Text>
           <View
             accessible={true}
+            focusable={true}
             hitSlop={
               Object {
                 "bottom": 10,
@@ -1106,6 +1108,7 @@ exports[`TransferReviewCard renders correctly for send review 1`] = `
                 "type": "ThemeAttrAndroid",
               }
             }
+            onClick={[Function]}
             onResponderGrant={[Function]}
             onResponderMove={[Function]}
             onResponderRelease={[Function]}
@@ -1123,7 +1126,7 @@ exports[`TransferReviewCard renders correctly for send review 1`] = `
             <Image
               source={
                 Object {
-                  "testUri": "../../../src/images/info.png",
+                  "testUri": "../../../packages/mobile/src/images/info.png",
                 }
               }
               style={

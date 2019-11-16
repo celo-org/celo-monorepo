@@ -17,7 +17,7 @@ import i18n, { Namespaces } from 'src/i18n'
 import { backupIcon, homeIcon, inviteFriendsIcon, rewardsAppIcon } from 'src/images/Images'
 import { navigate } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
-import EscrowedPaymentReminderNotification from 'src/notifications/EscrowedPaymentReminderNotification'
+import EscrowedPaymentReminderSummaryNotification from 'src/notifications/EscrowedPaymentReminderSummaryNotification'
 import PaymentRequestSummaryNotification from 'src/notifications/PaymentRequestSummaryNotification'
 import SimpleNotification from 'src/notifications/SimpleNotification'
 import { RootState } from 'src/redux/reducers'
@@ -68,9 +68,11 @@ export class NotificationBox extends React.Component<Props, State> {
   }
 
   escrowedPaymentReminderNotification = () => {
-    return getReclaimableEscrowPayments(this.props.sentEscrowPayments).map((payment) => (
-      <EscrowedPaymentReminderNotification key={payment.paymentID} payment={payment} />
-    ))
+    const escrowPayments = getReclaimableEscrowPayments(this.props.sentEscrowPayments)
+    if (escrowPayments && escrowPayments.length) {
+      return [<EscrowedPaymentReminderSummaryNotification key={1} payments={escrowPayments} />]
+    }
+    return []
   }
 
   paymentRequestsNotification = (): Array<React.ReactElement<any>> => {
@@ -93,15 +95,15 @@ export class NotificationBox extends React.Component<Props, State> {
 
     if (!backupCompleted) {
       actions.push({
-        title: t('getBackupKey'),
-        text: t('setBackupKey'),
+        title: t('backupKeyFlow6:yourBackupKey'),
+        text: t('backupKeyFlow6:backupKeyNotification'),
         image: backupIcon,
         ctaList: [
           {
-            text: t('getBackupKey'),
+            text: t('backupKeyFlow6:getBackupKey'),
             onPress: () => {
               CeloAnalytics.track(CustomEventNames.get_backup_key)
-              navigate(Screens.Backup)
+              navigate(Screens.BackupIntroduction)
             },
           },
         ],
@@ -196,7 +198,7 @@ export class NotificationBox extends React.Component<Props, State> {
           return (
             <View
               key={i}
-              style={this.state.currentIndex === i ? activeDotStyle : passiveDotStyle}
+              style={this.state.currentIndex === i ? styles.circleActive : styles.circlePassive}
             />
           )
         })}
@@ -245,6 +247,12 @@ export class NotificationBox extends React.Component<Props, State> {
 const PROGRESS_CIRCLE_PASSIVE_SIZE = 6
 const PROGRESS_CIRCLE_ACTIVE_SIZE = 8
 
+const circle = {
+  flex: 0,
+  borderRadius: 8,
+  marginHorizontal: 5,
+}
+
 const styles = StyleSheet.create({
   body: {
     maxWidth: variables.width,
@@ -261,25 +269,20 @@ const styles = StyleSheet.create({
     paddingBottom: variables.contentPadding,
     alignItems: 'center',
   },
-  circle: {
-    flex: 0,
-    borderRadius: 8,
-    marginHorizontal: 5,
-  },
+  circle,
   circlePassive: {
+    ...circle,
     backgroundColor: colors.inactive,
     height: PROGRESS_CIRCLE_PASSIVE_SIZE,
     width: PROGRESS_CIRCLE_PASSIVE_SIZE,
   },
   circleActive: {
+    ...circle,
     backgroundColor: colors.celoGreen,
     height: PROGRESS_CIRCLE_ACTIVE_SIZE,
     width: PROGRESS_CIRCLE_ACTIVE_SIZE,
   },
 })
-
-const activeDotStyle = StyleSheet.flatten([styles.circle, styles.circleActive])
-const passiveDotStyle = StyleSheet.flatten([styles.circle, styles.circlePassive])
 
 export default componentWithAnalytics(
   connect<StateProps, DispatchProps, {}, RootState>(

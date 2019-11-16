@@ -1,0 +1,29 @@
+#!/bin/bash
+if [ -d migrations.bak ]; then
+  echo Replacing migrations
+  rm -rf migrations
+  mv migrations.bak migrations
+else
+  echo Backing up migrations
+  mv migrations migrations.bak
+  mkdir migrations
+
+  cp migrations.bak/00_initial_migration.ts migrations/
+  # performance optimization: uncomment if needed for e2e test dev
+  cp migrations.bak/01_libraries.ts migrations/
+  # cp migrations.bak/02_registry.ts migrations/
+  # cp migrations.bak/03_whitelist.ts migrations/
+  # cp migrations.bak/04_goldtoken.ts migrations/
+  # cp migrations.bak/05_sortedoracles.ts migrations/
+  # cp migrations.bak/07_reserve.ts migrations/
+  # cp migrations.bak/08_stabletoken.ts migrations/
+  # cp migrations.bak/09_exchange.ts migrations/
+  # cp migrations.bak/10_bondeddeposits.ts migrations/
+  # cp migrations.bak/11_validators.ts migrations/
+  # cp migrations.bak/12_random.ts migrations/
+  # cp migrations.bak/13_attestations.ts migrations/
+  # cp migrations.bak/14_escrow.ts migrations/
+  # cp migrations.bak/15_governance.ts migrations/
+  # cp migrations.bak/16_elect_validators.ts migrations/
+  # cp migrations.bak/17_validatortest.ts migrations/
+fi

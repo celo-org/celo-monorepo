@@ -7,7 +7,7 @@
   "license": "Apache-2.0",
   "private": true,
   "dependencies": {
-    "@celo/contractkit": "^0.1.1",
+    "@celo/contractkit": "0.1.6",
     "@celo/utils": "^0.1.0",    
     "express": "4.16.4",
     "prom-client": "11.2.0"

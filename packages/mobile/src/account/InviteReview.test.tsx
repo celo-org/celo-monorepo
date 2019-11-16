@@ -1,6 +1,4 @@
-jest.useFakeTimers()
-
-import Button from '@celo/react-components/components/Button'
+import mockButton from '@celo/react-components/components/Button'
 import * as React from 'react'
 import 'react-native'
 import { fireEvent, render } from 'react-native-testing-library'
@@ -11,14 +9,18 @@ import { createMockStore, getMockI18nProps } from 'test/utils'
 import { mockCountryCode, mockNavigation } from 'test/values'
 
 jest.mock('src/geth/GethAwareButton', () => {
-  return Button
-})
-
-jest.mock('src/identity/verification', () => {
-  return { isPhoneVerified: jest.fn(() => true) }
+  return mockButton
 })
 
 describe('InviteReview', () => {
+  beforeAll(() => {
+    jest.useFakeTimers()
+  })
+
+  afterAll(() => {
+    jest.useRealTimers()
+  })
+
   it('renders correctly', () => {
     const tree = renderer.create(
       <Provider store={createMockStore()}>

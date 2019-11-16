@@ -54,6 +54,17 @@ const INSTANCE_FOLDER = Platform.select({
   default: 'GethMobile',
 })
 
+// Use relative path on iOS to workaround the 104 chars path limit for unix domain socket.
+// On iOS the default path would be something like
+// `/var/mobile/Containers/Data/Application/2E684E03-9EFA-492A-B19A-4759DD32BE67/Documents/.alfajores/geth.ipc`
+// which is too long.
+// So on iOS, `react-native-geth` changes the current directory to `${DocumentDirectoryPath}/.${DEFAULT_TESTNET}`
+// for the relative path workaround to work.
+export const IPC_PATH =
+  Platform.OS === 'ios'
+    ? './geth.ipc'
+    : `${RNFS.DocumentDirectoryPath}/.${DEFAULT_TESTNET}/geth.ipc`
+
 function getNodeInstancePath(nodeDir: string) {
   return `${RNFS.DocumentDirectoryPath}/${nodeDir}/${INSTANCE_FOLDER}`
 }
@@ -76,6 +87,7 @@ async function createNewGeth(): Promise<typeof RNGeth> {
     genesis,
     syncMode,
     useLightweightKDF: true,
+    ipcPath: IPC_PATH,
   }
 
   // Setup Logging
@@ -122,11 +134,7 @@ async function initGeth() {
     } catch (e) {
       const errorType = getGethErrorType(e)
       if (errorType === ErrorType.GethAlreadyRunning) {
-        // Geth is already running, this is most likely RN restart.
-        Logger.info('Geth@init/startInstance', 'Geth start reported geth already running')
-        // Note: Unfortunately, RN-Geth doesn't currently support connecting to the
-        // already running geth instance, which we would need to subscribe to head updates.
-        // In the meantime, we need to force an app reset. See #3227
+        Logger.error('Geth@init/startInstance', 'Geth start reported geth already running')
         throw new Error('Geth already running, need to restart app')
       } else if (errorType === ErrorType.CorruptChainData) {
         Logger.warn('Geth@init/startInstance', 'Geth start reported chain data error')
@@ -172,6 +180,12 @@ async function ensureStaticNodesInitialized(): Promise<boolean> {
       return true
     }
     return false
+  }
+}
+
+export async function stopGethIfInitialized() {
+  if (gethInstance) {
+    await stop()
   }
 }
 
@@ -320,7 +334,7 @@ async function uploadLogs(gethLogFilePath: string, reactNativeLogFilePath: strin
     // Phone number might not be verified here but that does not matter for logging.
     const phoneNumber = (await DeviceInfo.getPhoneNumber()) || 'unknown'
     const timestamp = new Date().getTime()
-    const deviceId = DeviceInfo.getUniqueID()
+    const deviceId = DeviceInfo.getUniqueId()
     const uploadId = `${timestamp}_${deviceId}`
     const gethUploadFileName = `${phoneNumber}_${uploadId}_geth.txt`
     const reactNativeUploadFileName = `${phoneNumber}_${uploadId}_rn.txt`
