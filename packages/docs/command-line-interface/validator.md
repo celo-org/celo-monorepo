@@ -60,7 +60,7 @@ _See code: [packages/cli/src/commands/validator/deregister.ts](https://github.co
 
 ### List
 
-List existing Validators
+List registered Validators
 
 ```
 USAGE

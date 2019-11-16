@@ -98,9 +98,14 @@ export class ValidatorsWrapper extends BaseWrapper<Validators> {
     }
   }
 
-  async signerToAccount(signerAddress: Address) {
+  async validatorSignerToAccount(signerAddress: Address) {
     const accounts = await this.kit.contracts.getAccounts()
     return accounts.validatorSignerToAccount(signerAddress)
+  }
+
+  async signerToAccount(signerAddress: Address) {
+    const accounts = await this.kit.contracts.getAccounts()
+    return accounts.signerToAccount(signerAddress)
   }
 
   /**
@@ -164,11 +169,18 @@ export class ValidatorsWrapper extends BaseWrapper<Validators> {
     const res = await this.contract.methods.getValidator(address).call()
     return {
       address,
-      ecdsaPublicKey: res[0] as any,
-      blsPublicKey: res[1] as any,
-      affiliation: res[2],
-      score: fromFixed(new BigNumber(res[3])),
+      // @ts-ignore incorrect typing for bytes
+      ecdsaPublicKey: res.ecdsaPublicKey,
+      // @ts-ignore incorrect typing for bytes
+      blsPublicKey: res.blsPublicKey,
+      affiliation: res.affiliation,
+      score: fromFixed(new BigNumber(res.score)),
     }
+  }
+
+  async getValidatorFromSigner(address: Address): Promise<Validator> {
+    const account = await this.signerToAccount(address)
+    return this.getValidator(account)
   }
 
   /** Get ValidatorGroup information */

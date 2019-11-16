@@ -4,20 +4,6 @@ description: View and manage validator elections
 
 ## Commands
 
-### Validatorset
-
-Outputs the current validator set
-
-```
-USAGE
-  $ celocli election:validatorset
-
-EXAMPLE
-  validatorset
-```
-
-_See code: [packages/cli/src/commands/election/validatorset.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/election/validatorset.ts)_
-
 ### Vote
 
 Vote for a Validator Group in validator elections.

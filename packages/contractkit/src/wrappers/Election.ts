@@ -15,24 +15,10 @@ import {
   tupleParser,
 } from './BaseWrapper'
 
-export interface Validator {
-  address: Address
-  name: string
-  url: string
-  publicKey: string
-  affiliation: Address | null
-}
-
-export interface ValidatorGroup {
-  address: Address
-  name: string
-  url: string
-  members: Address[]
-}
-
 export interface ValidatorGroupVote {
   address: Address
   votes: BigNumber
+  capacity: BigNumber
   eligible: boolean
 }
 
@@ -80,6 +66,9 @@ export class ElectionWrapper extends BaseWrapper<Election> {
     toNumber
   )
 
+  getCurrentValidatorSigners = proxyCall(this.contract.methods.getCurrentValidatorSigners)
+  electValidatorSigners = proxyCall(this.contract.methods.electValidatorSigners)
+
   /**
    * Returns the total votes for `group` made by `account`.
    * @param group The address of the validator group.
@@ -117,48 +106,24 @@ export class ElectionWrapper extends BaseWrapper<Election> {
     }
   }
 
-  /**
-   * Returns the addresses in the current validator set.
-   */
-  async getValidatorSetAddresses(): Promise<string[]> {
-    const numberValidators = await this.numberValidatorsInCurrentSet()
-
-    const validatorAddressPromises = []
-
-    for (let i = 0; i < numberValidators; i++) {
-      validatorAddressPromises.push(this.validatorAddressFromCurrentSet(i))
+  async getValidatorGroupVotes(address: Address): Promise<ValidatorGroupVote> {
+    const votes = await this.contract.methods.getTotalVotesForGroup(address).call()
+    const eligible = await this.contract.methods.getGroupEligibility(address).call()
+    const numVotesReceivable = await this.contract.methods.getNumVotesReceivable(address).call()
+    return {
+      address,
+      votes: toBigNumber(votes),
+      capacity: toBigNumber(numVotesReceivable).minus(votes),
+      eligible,
     }
-
-    return Promise.all(validatorAddressPromises)
   }
-
   /**
    * Returns the current registered validator groups and their total votes and eligibility.
    */
   async getValidatorGroupsVotes(): Promise<ValidatorGroupVote[]> {
     const validators = await this.kit.contracts.getValidators()
-    const validatorGroupAddresses = (await validators.getRegisteredValidatorGroups()).map(
-      (g) => g.address
-    )
-    const validatorGroupVotes = await Promise.all(
-      validatorGroupAddresses.map((g) => this.contract.methods.getTotalVotesForGroup(g).call())
-    )
-    const validatorGroupEligible = await Promise.all(
-      validatorGroupAddresses.map((g) => this.contract.methods.getGroupEligibility(g).call())
-    )
-    return validatorGroupAddresses.map((a, i) => ({
-      address: a,
-      votes: toBigNumber(validatorGroupVotes[i]),
-      eligible: validatorGroupEligible[i],
-    }))
-  }
-
-  /**
-   * Returns the current eligible validator groups and their total votes.
-   */
-  async getEligibleValidatorGroupsVotes(): Promise<ValidatorGroupVote[]> {
-    const res = await this.contract.methods.getTotalVotesForEligibleValidatorGroups().call()
-    return zip((a, b) => ({ address: a, votes: new BigNumber(b), eligible: true }), res[0], res[1])
+    const groups = (await validators.getRegisteredValidatorGroups()).map((g) => g.address)
+    return Promise.all(groups.map((g) => this.getValidatorGroupVotes(g)))
   }
 
   /**
@@ -179,6 +144,23 @@ export class ElectionWrapper extends BaseWrapper<Election> {
     )
   }
 
+  /**
+   * Returns the current eligible validator groups and their total votes.
+   */
+  private async getEligibleValidatorGroupsVotes(): Promise<ValidatorGroupVote[]> {
+    const res = await this.contract.methods.getTotalVotesForEligibleValidatorGroups().call()
+    return zip(
+      (a, b) => ({
+        address: a,
+        votes: new BigNumber(b),
+        capacity: new BigNumber(0),
+        eligible: true,
+      }),
+      res[0],
+      res[1]
+    )
+  }
+
   async findLesserAndGreaterAfterVote(
     votedGroup: Address,
     voteWeight: BigNumber
@@ -194,6 +176,7 @@ export class ElectionWrapper extends BaseWrapper<Election> {
       currentVotes.push({
         address: votedGroup,
         votes: voteWeight,
+        capacity: voteWeight,
         eligible: true,
       })
     }
