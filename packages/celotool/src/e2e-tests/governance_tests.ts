@@ -286,7 +286,7 @@ describe('governance tests', () => {
           blockNumbers.push(header.number)
           // At the start of epoch N, perform actions so the validator set is different for epoch N + 1.
           // Note that all of these actions MUST complete within the epoch.
-          if (header.number % epoch === 0 && errorWhileChangingValidatorSet == '') {
+          if (header.number % epoch === 0 && errorWhileChangingValidatorSet === '') {
             // 1. Swap validator0 and validator1 so one is a member of the group and the other is not.
             const memberToRemove = membersToSwap[index]
             const memberToAdd = membersToSwap[(index + 1) % 2]
