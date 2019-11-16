@@ -45,7 +45,7 @@ describe('governance tests', () => {
 
   before(async function(this: any) {
     this.timeout(0)
-    await context.hooks.before()
+    // await context.hooks.before()
   })
 
   after(context.hooks.after)
@@ -85,7 +85,7 @@ describe('governance tests', () => {
     }
   }
 
-  const getValidatorSigner = (address: string, blockNumber?: number) => {
+  const getValidatorSigner = async (address: string, blockNumber?: number) => {
     if (blockNumber) {
       return accounts.methods.getValidatorSigner(address).call({}, blockNumber)
     } else {
@@ -112,7 +112,7 @@ describe('governance tests', () => {
     const tx = election.methods.activate(group)
     let gas = txOptions.gas
     if (!gas) {
-      gas = await tx.estimateGas({ ...txOptions })
+      gas = (await tx.estimateGas({ ...txOptions })) * 2
     }
     return tx.send({ from: account, ...txOptions, gas })
   }
@@ -123,7 +123,7 @@ describe('governance tests', () => {
     const tx = validators.methods.removeMember(member)
     let gas = txOptions.gas
     if (!gas) {
-      gas = await tx.estimateGas({ ...txOptions })
+      gas = (await tx.estimateGas({ ...txOptions })) * 2
     }
     return tx.send({ from: group, ...txOptions, gas })
   }
@@ -134,7 +134,7 @@ describe('governance tests', () => {
     const tx = validators.methods.addMember(member)
     let gas = txOptions.gas
     if (!gas) {
-      gas = await tx.estimateGas({ ...txOptions })
+      gas = (await tx.estimateGas({ ...txOptions })) * 2
     }
     return tx.send({ from: group, ...txOptions, gas })
   }
@@ -191,7 +191,7 @@ describe('governance tests', () => {
     assertAlmostEqual(currentBalance.minus(previousBalance), expected)
   }
 
-  describe('when the validator set is changing', () => {
+  describe.only('when the validator set is changing', () => {
     let epoch: number
     const blockNumbers: number[] = []
     let validatorAccounts: string[]
@@ -285,7 +285,8 @@ describe('governance tests', () => {
         try {
           blockNumbers.push(header.number)
           // At the start of epoch N, perform actions so the validator set is different for epoch N + 1.
-          if (header.number % epoch === 1) {
+          // Note that all of these actions MUST complete within the epoch.
+          if (header.number % epoch === 0 && errorWhileChangingValidatorSet == '') {
             // 1. Swap validator0 and validator1 so one is a member of the group and the other is not.
             const memberToRemove = membersToSwap[index]
             const memberToAdd = membersToSwap[(index + 1) % 2]
@@ -393,7 +394,8 @@ describe('governance tests', () => {
       }
     })
 
-    it('should update the validator scores at the end of each epoch', async () => {
+    it('should update the validator scores at the end of each epoch', async function(this: any) {
+      this.timeout(0)
       const adjustmentSpeed = fromFixed(
         new BigNumber((await validators.methods.getValidatorScoreParameters().call())[1])
       )
@@ -447,7 +449,8 @@ describe('governance tests', () => {
       }
     })
 
-    it('should distribute epoch payments at the end of each epoch', async () => {
+    it('should distribute epoch payments at the end of each epoch', async function(this: any) {
+      this.timeout(0)
       const commission = 0.1
       const targetValidatorEpochPayment = new BigNumber(
         await epochRewards.methods.targetValidatorEpochPayment().call()
@@ -506,7 +509,8 @@ describe('governance tests', () => {
       }
     })
 
-    it('should distribute epoch rewards at the end of each epoch', async () => {
+    it('should distribute epoch rewards at the end of each epoch', async function(this: any) {
+      this.timeout(0)
       const lockedGold = await kit._web3Contracts.getLockedGold()
       const governance = await kit._web3Contracts.getGovernance()
       const gasPriceMinimum = await kit._web3Contracts.getGasPriceMinimum()
