@@ -171,6 +171,8 @@ export class ExchangeBuyScreen extends React.Component<Props, State> {
     const { t, exchangeRatePair } = this.props
 
     const makerSymbol = CURRENCIES[makerToken].symbol
+    const takerToken =
+      this.state.makerToken === CURRENCY_ENUM.DOLLAR ? CURRENCY_ENUM.GOLD : CURRENCY_ENUM.DOLLAR
     const exchangeRateDisplay = getRateForMakerToken(exchangeRatePair, CURRENCY_ENUM.DOLLAR) // Always show rate in dollars
 
     const subtotal = this.getDollarAmount()
@@ -190,7 +192,9 @@ export class ExchangeBuyScreen extends React.Component<Props, State> {
           <DisconnectBanner />
           <View style={{ flex: 1, alignItems: 'center' }}>
             <Text style={fontStyles.subSmall}>
-              {makerSymbol + this.state.makerTokenAvailableBalance + ' ' + t('lowerCaseAvailable')}
+              {getMoneyDisplayValue(this.state.makerTokenAvailableBalance, makerToken, true) +
+                ' ' +
+                t('lowerCaseAvailable')}
             </Text>
           </View>
           <KeyboardAwareScrollView keyboardShouldPersistTaps={'always'}>
@@ -207,9 +211,10 @@ export class ExchangeBuyScreen extends React.Component<Props, State> {
                   flexDirection: 'row',
                   justifyContent: 'space-between',
                   marginTop: 38,
+                  alignItems: 'center',
                 }}
               >
-                <Text style={[fontStyles.body]}>{CURRENCY_ENUM.GOLD}</Text>
+                <Text style={[fontStyles.body, styles.exchangeBodyText]}>{CURRENCY_ENUM.GOLD}</Text>
                 <TextInput
                   autoFocus={true}
                   keyboardType={'decimal-pad'}
@@ -217,12 +222,19 @@ export class ExchangeBuyScreen extends React.Component<Props, State> {
                   value={this.getInputValue()}
                   placeholderTextColor={'#BDBDBD'}
                   placeholder={'0'}
+                  style={[fontStyles.body, styles.currencyInputText]}
                 />
               </View>
               <View style={styles.line} />
               {/* Row 2*/}
               <View style={{ flexDirection: 'row', flex: 1, justifyContent: 'space-between' }}>
-                <Text style={fontStyles.body}>{`Subtotal (@ $${exchangeRateDisplay})`}</Text>
+                <Text style={[fontStyles.body, styles.exchangeBodyText]}>
+                  {`Subtotal (@ ${getMoneyDisplayValue(
+                    exchangeRateDisplay,
+                    CURRENCY_ENUM.DOLLAR,
+                    true
+                  )})`}
+                </Text>
                 <Text style={fontStyles.regular}>
                   {getMoneyDisplayValue(subtotal, CURRENCY_ENUM.DOLLAR, true)}
                 </Text>
@@ -264,7 +276,8 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
     marginBottom: 16,
   },
-
+  exchangeBodyText: { fontSize: 15, lineHeight: 20 },
+  currencyInputText: { fontSize: 24, lineHeight: 39, height: 54 }, // setting height manually b.c. of bug causing text to jump
   container: {
     // backgroundColor: colors.background,
     flex: 1,
