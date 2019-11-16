@@ -155,7 +155,6 @@ contract LockedGold is ILockedGold, ReentrancyGuard, Initializable, UsingRegistr
     emit GoldUnlocked(msg.sender, value, available);
   }
 
-  // TODO(asa): Allow partial relock
   /**
    * @notice Relocks gold that has been unlocked but not withdrawn.
    * @param index The index of the pending withdrawal to relock from.

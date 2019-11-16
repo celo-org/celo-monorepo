@@ -49,7 +49,6 @@ module.exports = deploymentForCoreContract<StableTokenInstance>(
       await sortedOracles.addOracle(stableToken.address, oracle)
     }
 
-    console.info('Setting GoldToken/USD exchange rate')
     // We need to seed the exchange rate, and that must be done with an account
     // that's accessible to the migrations. It's in an if statement in case this
     // account happened to be included in config.stableToken.oracles
