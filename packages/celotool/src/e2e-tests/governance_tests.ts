@@ -283,6 +283,7 @@ describe('governance tests', () => {
 
       const changeValidatorSet = async (header: any) => {
         try {
+          console.log('got new header', header.number)
           blockNumbers.push(header.number)
           // At the start of epoch N, perform actions so the validator set is different for epoch N + 1.
           // Note that all of these actions MUST complete within the epoch.
@@ -290,18 +291,24 @@ describe('governance tests', () => {
             // 1. Swap validator0 and validator1 so one is a member of the group and the other is not.
             const memberToRemove = membersToSwap[index]
             const memberToAdd = membersToSwap[(index + 1) % 2]
-            await removeMember(groupWeb3, memberToRemove)
-            await addMember(groupWeb3, memberToAdd)
+            console.log('removing member', memberToRemove)
+            console.log(await removeMember(groupWeb3, memberToRemove))
+            console.log('adding member', memberToAdd)
+            console.log(await addMember(groupWeb3, memberToAdd))
             const newMembers = await getValidatorGroupMembers()
             assert.include(newMembers, memberToAdd)
             assert.notInclude(newMembers, memberToRemove)
             // 2. Rotate keys for validator 2 by authorizing a new validating key.
             if (!doneAuthorizing) {
-              await authorizeValidatorSigner(validatorWeb3, authorizedWeb3s[index])
-              await updateValidatorBlsKey(
-                validatorWeb3,
-                authorizedWeb3s[index],
-                authorizedPrivateKeys[index]
+              console.log('authorizing signer')
+              console.log(await authorizeValidatorSigner(validatorWeb3, authorizedWeb3s[index]))
+              console.log('updating bls key')
+              console.log(
+                await updateValidatorBlsKey(
+                  validatorWeb3,
+                  authorizedWeb3s[index],
+                  authorizedPrivateKeys[index]
+                )
               )
             }
             doneAuthorizing = doneAuthorizing || index === 1
