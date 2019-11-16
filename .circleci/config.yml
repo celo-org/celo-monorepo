@@ -672,64 +672,9 @@ workflows:
   celo-monorepo-build:
     jobs:
       - install_dependencies
-      - end-to-end-mobile-test:
-          requires:
-            - install_dependencies
-            - mobile-test-build-app
-      - lint-checks:
-          requires:
-            - install_dependencies
-      - general-test:
-          requires:
-            - install_dependencies
-      - walletkit-test:
-          requires:
-            - install_dependencies
-      - cli-test:
-          requires:
-            - install_dependencies
-      - contractkit-test:
-          requires:
-            - install_dependencies
-      - mobile-test:
-          requires:
-            - lint-checks
-      - mobile-test-build-app:
-          requires:
-            - mobile-test
-      - verification-pool-api:
-          requires:
-            - lint-checks
-      - protocol-test:
-          requires:
-            - lint-checks
-            - walletkit-test
-      - typescript-test:
-          requires:
-            - install_dependencies
-      - utils-test:
-          requires:
-            - install_dependencies
-      - end-to-end-geth-transfer-test:
-          requires:
-            - lint-checks
-            - contractkit-test
-      - end-to-end-geth-blockchain-parameters-test:
-          requires:
-            - lint-checks
-            - contractkit-test
       - end-to-end-geth-governance-test:
           requires:
-            - lint-checks
-            - contractkit-test
-      - end-to-end-geth-sync-test:
-          requires:
-            - lint-checks
-            - contractkit-test
-      - end-to-end-geth-validator-order-test:
-          requires:
-            - lint-checks
-            - contractkit-test
+            - install_dependencies
   npm-install-testing-cron-workflow:
     triggers:
       - schedule:
