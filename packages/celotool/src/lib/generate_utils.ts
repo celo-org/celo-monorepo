@@ -27,6 +27,7 @@ export enum AccountType {
   TX_NODE = 2,
   BOOTNODE = 3,
   FAUCET = 4,
+  ATTESTATION = 5,
 }
 
 export enum ConsensusType {
@@ -45,6 +46,7 @@ export const MNEMONIC_ACCOUNT_TYPE_CHOICES = [
   'tx_node',
   'bootnode',
   'faucet',
+  'attestation',
 ]
 
 export const add0x = (str: string) => {
@@ -156,19 +158,36 @@ export const generateGenesisFromEnv = (enablePetersburg: boolean = true) => {
 const generateIstanbulExtraData = (validators: Validator[]) => {
   const istanbulVanity = 32
   const blsSignatureVanity = 192
-
   return (
     '0x' +
     repeat('0', istanbulVanity * 2) +
     rlp
       // @ts-ignore
       .encode([
+        // Added validators
         validators.map((validator) => Buffer.from(validator.address, 'hex')),
         validators.map((validator) => Buffer.from(validator.blsPublicKey, 'hex')),
+        // Removed validators
         new Buffer(0),
+        // Seal
         Buffer.from(repeat('0', blsSignatureVanity * 2), 'hex'),
-        new Buffer(0),
-        Buffer.from(repeat('0', blsSignatureVanity * 2), 'hex'),
+        [
+          // AggregatedSeal.Bitmap
+          new Buffer(0),
+          // AggregatedSeal.Signature
+          Buffer.from(repeat('0', blsSignatureVanity * 2), 'hex'),
+          // AggregatedSeal.Round
+          new Buffer(0),
+        ],
+        [
+          // ParentAggregatedSeal.Bitmap
+          new Buffer(0),
+          // ParentAggregatedSeal.Signature
+          Buffer.from(repeat('0', blsSignatureVanity * 2), 'hex'),
+          // ParentAggregatedSeal.Round
+          new Buffer(0),
+        ],
+        // EpochData
         new Buffer(0),
       ])
       .toString('hex')
@@ -212,7 +231,9 @@ export const generateGenesis = ({
     genesis.difficulty = '0x1'
     genesis.extraData = generateIstanbulExtraData(validators)
     genesis.config.istanbul = {
-      policy: 0,
+      // see github.com/celo-org/celo-blockchain/blob/master/consensus/istanbul/config.go#L21-L25
+      // 0 = RoundRobin, 1 = Sticky, 2 = ShuffledRoundRobin
+      policy: 2,
       period: blockTime,
       requesttimeout: requestTimeout,
       epoch,

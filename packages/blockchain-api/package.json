@@ -17,7 +17,7 @@
     "deploy": "./deploy.sh"
   },
   "dependencies": {
-    "@celo/contractkit": "0.1.6",
+    "@celo/contractkit": "0.2.0",
     "apollo-datasource-rest": "^0.3.1",
     "apollo-server-express": "^2.4.2",
     "bignumber.js": "^7.2.0",
@@ -33,7 +33,11 @@
     "@types/express": "^4.16.1",
     "@types/utf8": "^2.1.6",
     "@types/web3": "^1.0.18",
+    "jest-fetch-mock": "^2.1.2",
     "tsc-watch": "^1.0.31",
     "typescript": "^3.5.3"
+  },
+  "resolutions": {
+    "**/cross-fetch": "3.0.4"
   }
 }

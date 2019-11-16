@@ -4,12 +4,10 @@ import "openzeppelin-solidity/contracts/math/SafeMath.sol";
 import "./AddressLinkedList.sol";
 import "./SortedLinkedListWithMedian.sol";
 
-
 /**
  * @title Maintains a sorted list of unsigned ints keyed by address.
  */
 library AddressSortedLinkedListWithMedian {
-
   using SortedLinkedListWithMedian for SortedLinkedListWithMedian.List;
 
   function toBytes(address a) public pure returns (bytes32) {
@@ -33,9 +31,7 @@ library AddressSortedLinkedListWithMedian {
     uint256 value,
     address lesserKey,
     address greaterKey
-  )
-    public
-  {
+  ) public {
     list.insert(toBytes(key), value, toBytes(lesserKey), toBytes(greaterKey));
   }
 
@@ -61,9 +57,7 @@ library AddressSortedLinkedListWithMedian {
     uint256 value,
     address lesserKey,
     address greaterKey
-  )
-    public
-  {
+  ) public {
     list.update(toBytes(key), value, toBytes(lesserKey), toBytes(greaterKey));
   }
 
@@ -72,10 +66,7 @@ library AddressSortedLinkedListWithMedian {
    * @param key The element key.
    * @return Whether or not the key is in the sorted list.
    */
-  function contains(
-    SortedLinkedListWithMedian.List storage list,
-    address key
-  )
+  function contains(SortedLinkedListWithMedian.List storage list, address key)
     public
     view
     returns (bool)
@@ -88,10 +79,7 @@ library AddressSortedLinkedListWithMedian {
    * @param key The element key.
    * @return The element value.
    */
-  function getValue(
-    SortedLinkedListWithMedian.List storage list,
-    address key
-  )
+  function getValue(SortedLinkedListWithMedian.List storage list, address key)
     public
     view
     returns (uint256)
@@ -103,9 +91,7 @@ library AddressSortedLinkedListWithMedian {
    * @notice Returns the median value of the sorted list.
    * @return The median value.
    */
-  function getMedianValue(
-    SortedLinkedListWithMedian.List storage list
-  )
+  function getMedianValue(SortedLinkedListWithMedian.List storage list)
     public
     view
     returns (uint256)
@@ -141,9 +127,7 @@ library AddressSortedLinkedListWithMedian {
    * @notice Returns the number of elements in the list.
    * @return The number of elements in the list.
    */
-  function getNumElements(
-    SortedLinkedListWithMedian.List storage list
-  )
+  function getNumElements(SortedLinkedListWithMedian.List storage list)
     external
     view
     returns (uint256)
@@ -155,9 +139,7 @@ library AddressSortedLinkedListWithMedian {
    * @notice Gets all elements from the doubly linked list.
    * @return An unpacked list of elements from largest to smallest.
    */
-  function getElements(
-    SortedLinkedListWithMedian.List storage list
-  )
+  function getElements(SortedLinkedListWithMedian.List storage list)
     public
     view
     returns (address[] memory, uint256[] memory, SortedLinkedListWithMedian.MedianRelation[] memory)
@@ -165,6 +147,7 @@ library AddressSortedLinkedListWithMedian {
     bytes32[] memory byteKeys = list.getKeys();
     address[] memory keys = new address[](byteKeys.length);
     uint256[] memory values = new uint256[](byteKeys.length);
+    // prettier-ignore
     SortedLinkedListWithMedian.MedianRelation[] memory relations =
       new SortedLinkedListWithMedian.MedianRelation[](keys.length);
     for (uint256 i = 0; i < byteKeys.length; i++) {

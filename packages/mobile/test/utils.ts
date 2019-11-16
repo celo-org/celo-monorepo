@@ -1,6 +1,7 @@
 /* Utilities to facilitate testing */
+import BigNumber from 'bignumber.js'
+import { NavigationScreenProp } from 'react-navigation'
 import configureMockStore from 'redux-mock-store'
-import thunk from 'redux-thunk'
 import { InitializationState } from 'src/geth/reducer'
 import i18n from 'src/i18n'
 import { RootState } from 'src/redux/reducers'
@@ -15,6 +16,13 @@ import {
 // Sleep for a number of ms
 export const sleep = (time: number) =>
   new Promise((resolve) => setTimeout(() => resolve(true), time))
+
+// ContractKit test utils
+export const mockContractKitBalance = jest.fn(() => new BigNumber(10))
+export const mockContractKitContract = {
+  balanceOf: mockContractKitBalance,
+  decimals: jest.fn(async () => '10'),
+}
 
 interface MockContract {
   methods: {
@@ -62,7 +70,7 @@ function createSendMethod(): SendMethod {
   }))
 }
 
-export function createMockNavigationProp(params: any) {
+export function createMockNavigationProp(params: any): NavigationScreenProp<any> {
   return {
     ...mockNavigation,
     state: {
@@ -73,21 +81,7 @@ export function createMockNavigationProp(params: any) {
   }
 }
 
-export function mockNavigationServiceFor(test: string, navigateMock = jest.fn()) {
-  const navigate = navigateMock
-  const navigateBack = jest.fn()
-  const navigateReset = jest.fn()
-  navigate.mockName(`${test}@navigate`)
-  navigateBack.mockName(`${test}@navigateBack`)
-  navigateReset.mockName(`${test}@navigateReset`)
-  jest.mock('src/navigator/NavigationService', () => {
-    return { navigate, navigateBack, navigateReset }
-  })
-  return { navigate, navigateBack, navigateReset }
-}
-
-const middlewares = [thunk]
-const mockStore = configureMockStore(middlewares)
+const mockStore = configureMockStore()
 
 /* Create a mock store with some reasonable default values */
 type RecursivePartial<T> = { [P in keyof T]?: RecursivePartial<T[P]> }

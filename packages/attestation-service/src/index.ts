@@ -1,7 +1,8 @@
 import * as dotenv from 'dotenv'
 import express from 'express'
-import { handleAttestationRequest } from './attestation'
+import { AttestationRequestType, handleAttestationRequest } from './attestation'
 import { initializeDB, initializeKit } from './db'
+import { createValidatedHandler } from './request'
 import { initializeSmsProviders } from './sms'
 
 async function init() {
@@ -18,7 +19,10 @@ async function init() {
   const port = process.env.PORT || 3000
   app.listen(port, () => console.log(`Server running on ${port}!`))
 
-  app.post('/attestations', handleAttestationRequest)
+  app.post(
+    '/attestations',
+    createValidatedHandler(AttestationRequestType, handleAttestationRequest)
+  )
 }
 
 init().catch((err) => {

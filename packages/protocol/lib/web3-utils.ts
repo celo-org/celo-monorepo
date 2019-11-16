@@ -5,16 +5,7 @@ import { CeloContractName } from '@celo/protocol/lib/registry-utils'
 import { signTransaction } from '@celo/protocol/lib/signing-utils'
 import { BigNumber } from 'bignumber.js'
 import { ec as EC } from 'elliptic'
-import {
-  EscrowInstance,
-  GoldTokenInstance,
-  MultiSigInstance,
-  OwnableInstance,
-  ProxyContract,
-  ProxyInstance,
-  RegistryInstance,
-  StableTokenInstance,
-} from 'types'
+import { EscrowInstance, GoldTokenInstance, MultiSigInstance, OwnableInstance, ProxyContract, ProxyInstance, RegistryInstance, StableTokenInstance } from 'types'
 import { TransactionObject } from 'web3/eth/types'
 
 import Web3 = require('web3')
@@ -58,7 +49,7 @@ export async function sendTransactionWithPrivateKey<T>(
       ...txArgs,
       data: encodedTxData,
       from: address,
-      gas: estimatedGas * 2,
+      gas: estimatedGas * 10,
     },
     privateKey
   )
@@ -172,11 +163,14 @@ export async function setInitialProxyImplementation<
     (abi: any) => abi.type === 'function' && abi.name === 'initialize'
   )
 
-  // TODO(Martin): check types, not just argument number
-  checkFunctionArgsLength(args, initializerAbi)
-
-  console.log(`  Setting initial ${Contract.contractName} implementation on proxy`)
-  await setAndInitializeImplementation(web3, proxy, implementation.address, initializerAbi, ...args)
+  if (initializerAbi) {
+    // TODO(Martin): check types, not just argument number
+    checkFunctionArgsLength(args, initializerAbi)
+    console.log(`  Setting initial ${Contract.contractName} implementation on proxy`)
+    await setAndInitializeImplementation(web3, proxy, implementation.address, initializerAbi, ...args)
+  } else {
+    await proxy._setImplementation(implementation.address)
+  }
 
   return Contract.at(proxy.address) as ContractInstance
 }

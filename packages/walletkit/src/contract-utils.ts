@@ -1,7 +1,6 @@
 import BigNumber from 'bignumber.js'
 import { values } from 'lodash'
 import sleep from 'sleep-promise'
-import * as util from 'util'
 import Web3 from 'web3'
 import Contract from 'web3/eth/contract'
 import { TransactionObject } from 'web3/eth/types'
@@ -347,8 +346,7 @@ export async function sendTransactionAsync<T>(
  * sendTransactionAsyncWithWeb3Signing is same as sendTransactionAsync except it fills
  * in the missing fields and locally signs the transaction. It will fail if the `from`
  * is not one of the account whose local signing keys are available. This method
- * should only be used in Zero sync (infura-like) mode where Geth is running
- * remotely.
+ * should only be used in forno mode where Geth is running remotely.
  *
  * This separate function is temporary and contractkit uses a unified function
  * for both web3 (local) and remote (geth) siging.
@@ -471,8 +469,7 @@ export async function sendTransactionAsyncWithWeb3Signing<T>(
     try {
       await tx.send(celoTx)
     } catch (e) {
-      Logger.debug(tag, `Ignoring error: ${util.inspect(e)}`)
-      Logger.debug(tag, `error message: ${e.message}`)
+      Logger.debug(tag, `Ignoring error with message: ${e.message}`)
       // Ideally, I want to only ignore error whose messsage contains
       // "Failed to subscribe to new newBlockHeaders" but seems like another wrapped
       // error (listed below) gets thrown and there is no way to catch that.
@@ -496,7 +493,7 @@ export async function sendTransactionAsyncWithWeb3Signing<T>(
         // Ignore this error
         Logger.warn(tag, `Expected error ignored: ${JSON.stringify(e)}`)
       } else {
-        Logger.debug(tag, `Unexpected error ignored: ${util.inspect(e)}`)
+        Logger.debug(tag, `Unexpected error ignored: ${e.message}`)
       }
       const signedTxn = await web3.eth.signTransaction(celoTx)
       recievedTxHash = web3.utils.sha3(signedTxn.raw)
@@ -506,7 +503,7 @@ export async function sendTransactionAsyncWithWeb3Signing<T>(
         resolvers.transactionHash(recievedTxHash)
       }
     }
-    // This code is required for infura-like setup.
+    // This code is required for forno setup.
     // When mobile client directly connects to the remote full node then
     // it gets `receipt` but not other notifications.
     let sleepTimeInSecs = 1
@@ -529,7 +526,7 @@ export async function sendTransactionAsyncWithWeb3Signing<T>(
       }
     }
   } catch (error) {
-    Logger.warn(tag, `Transaction failed with error "${util.inspect(error)}"`)
+    Logger.warn(tag, `Transaction failed with error "${error.name + ' ' + error.message}"`)
     logger(Exception(error))
     rejectAll(error)
   }

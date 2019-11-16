@@ -1,33 +1,46 @@
 import { deriveCEK } from '@celo/utils/src/commentEncryption'
 import { getAccountAddressFromPrivateKey } from '@celo/walletkit'
+import * as Sentry from '@sentry/react-native'
 import * as Crypto from 'crypto'
 import { generateMnemonic, mnemonicToSeedHex } from 'react-native-bip39'
 import * as RNFS from 'react-native-fs'
 import { REHYDRATE } from 'redux-persist/es/constants'
-import { call, delay, put, race, select, take } from 'redux-saga/effects'
+import { call, delay, put, race, select, spawn, take, takeLatest } from 'redux-saga/effects'
 import { setAccountCreationTime } from 'src/account/actions'
 import { getPincode } from 'src/account/saga'
+import { showError } from 'src/alert/actions'
 import CeloAnalytics from 'src/analytics/CeloAnalytics'
 import { CustomEventNames } from 'src/analytics/constants'
 import { ErrorMessages } from 'src/app/ErrorMessages'
 import { currentLanguageSelector } from 'src/app/reducers'
 import { getWordlist } from 'src/backup/utils'
 import { UNLOCK_DURATION } from 'src/geth/consts'
-import { deleteChainData } from 'src/geth/geth'
+import { deleteChainData, stopGethIfInitialized } from 'src/geth/geth'
+import { initGethSaga } from 'src/geth/saga'
 import { navigateToError } from 'src/navigator/NavigationService'
 import { waitWeb3LastBlock } from 'src/networkInfo/saga'
+import { setCachedPincode } from 'src/pincode/PincodeCache'
+import { restartApp } from 'src/utils/AppRestart'
 import { setKey } from 'src/utils/keyStore'
 import Logger from 'src/utils/Logger'
 import {
   Actions,
   getLatestBlock,
   setAccount,
+  setAccountInWeb3Keystore,
+  SetIsZeroSyncAction,
   setLatestBlockNumber,
   setPrivateCommentKey,
+  setZeroSyncMode,
   updateWeb3SyncProgress,
 } from 'src/web3/actions'
-import { addLocalAccount, isZeroSyncMode, web3 } from 'src/web3/contracts'
-import { currentAccountSelector } from 'src/web3/selectors'
+import { addLocalAccount, switchWeb3ProviderForSyncMode, web3 } from 'src/web3/contracts'
+import {
+  currentAccountInWeb3KeystoreSelector,
+  currentAccountSelector,
+  gethStartedThisSessionSelector,
+  zeroSyncSelector,
+} from 'src/web3/selectors'
 import { Block } from 'web3/eth/types'
 
 const ETH_PRIVATE_KEY_LENGTH = 64
@@ -40,7 +53,8 @@ const BLOCK_CHAIN_CORRUPTION_ERROR = "Error: CONNECTION ERROR: Couldn't connect 
 
 // checks if web3 claims it is currently syncing and attempts to wait for it to complete
 export function* checkWeb3SyncProgress() {
-  if (isZeroSyncMode()) {
+  const zeroSyncMode = yield select(zeroSyncSelector)
+  if (zeroSyncMode) {
     // In this mode, the check seems to fail with
     // web3/saga/checking web3 sync progress: Error: Invalid JSON RPC response: "":
     return true
@@ -113,27 +127,38 @@ export function* getOrCreateAccount() {
     )
     return account
   }
-  Logger.debug(TAG + '@getOrCreateAccount', 'Creating a new account')
-  const wordlist = getWordlist(yield select(currentLanguageSelector))
-  const mnemonic = String(yield call(generateMnemonic, MNEMONIC_BIT_LENGTH, null, wordlist))
-  const privateKey = yield call(mnemonicToSeedHex, mnemonic)
-  const accountAddress = yield call(assignAccountFromPrivateKey, privateKey)
 
-  if (accountAddress) {
-    try {
-      yield call(setKey, 'mnemonic', mnemonic)
-    } catch (e) {
-      Logger.error(TAG + '@getOrCreateAccount', 'Failed to set mnemonic', e)
+  try {
+    Logger.debug(TAG + '@getOrCreateAccount', 'Creating a new account')
+
+    const wordlist = getWordlist(yield select(currentLanguageSelector))
+    const mnemonic = yield call(generateMnemonic, MNEMONIC_BIT_LENGTH, null, wordlist)
+    if (!mnemonic) {
+      throw new Error('Failed to generate mnemonic')
     }
+
+    const privateKey = mnemonicToSeedHex(mnemonic)
+    if (!privateKey) {
+      throw new Error('Failed to convert mnemonic to hex')
+    }
+
+    const accountAddress = yield call(assignAccountFromPrivateKey, privateKey)
+    if (!accountAddress) {
+      throw new Error('Failed to assign account from private key')
+    }
+
+    yield call(setKey, 'mnemonic', mnemonic)
+
     return accountAddress
-  } else {
-    return null
+  } catch (error) {
+    // Capturing error in sentry for now as we debug backup key issue
+    Sentry.captureException(error)
+    Logger.error(TAG + '@getOrCreateAccount', 'Error creating account', error)
+    throw new Error(ErrorMessages.ACCOUNT_SETUP_FAILED)
   }
 }
 
-export function* assignAccountFromPrivateKey(key: string) {
-  const currentAccount = yield select(currentAccountSelector)
-
+export function* assignAccountFromPrivateKey(privateKey: string) {
   try {
     const pincode = yield call(getPincode)
     if (!pincode) {
@@ -141,65 +166,50 @@ export function* assignAccountFromPrivateKey(key: string) {
       throw Error('Cannot create account without having the pin set')
     }
 
-    let account: string
-    if (isZeroSyncMode()) {
-      const privateKey = String(key)
+    // Save the account to a local file on the disk.
+    // This is done for all sync modes, to allow users to switch into zeroSync mode.
+    // Note that if geth is running it saves the key using web3.personal.
+    const account = getAccountAddressFromPrivateKey(privateKey)
+    yield call(savePrivateKeyToLocalDisk, account, privateKey, pincode)
+
+    const zeroSyncMode = yield select(zeroSyncSelector)
+    if (zeroSyncMode) {
       Logger.debug(TAG + '@assignAccountFromPrivateKey', 'Init web3 with private key')
       addLocalAccount(web3, privateKey)
-      // Save the account to a local file on the disk.
-      // This is only required in Geth free mode because if geth is running
-      // it has its own mechanism to save the encrypted key in its keystore.
-      account = getAccountAddressFromPrivateKey(privateKey)
-      yield savePrivateKeyToLocalDisk(account, privateKey, pincode)
     } else {
       try {
         // @ts-ignore
-        account = yield call(web3.eth.personal.importRawKey, String(key), pincode)
+        yield call(web3.eth.personal.importRawKey, privateKey, pincode)
       } catch (e) {
         if (e.toString().includes('account already exists')) {
-          account = currentAccount
-          Logger.debug(
-            TAG + '@assignAccountFromPrivateKey',
-            'Importing same account as current one'
-          )
+          Logger.warn(TAG + '@assignAccountFromPrivateKey', 'Attempted to import same account')
         } else {
           Logger.error(TAG + '@assignAccountFromPrivateKey', 'Error importing raw key')
           throw e
         }
       }
       yield call(web3.eth.personal.unlockAccount, account, pincode, UNLOCK_DURATION)
-    }
-
-    Logger.debug(
-      TAG + '@assignAccountFromPrivateKey',
-      `Created account from mnemonic and added to wallet: ${account}`
-    )
-
-    yield put(setAccount(account))
-    yield put(setAccountCreationTime())
-    yield call(assignDataKeyFromPrivateKey, key)
-
-    if (!isZeroSyncMode()) {
       web3.eth.defaultAccount = account
     }
+
+    Logger.debug(TAG + '@assignAccountFromPrivateKey', `Added to wallet: ${account}`)
+    yield put(setAccount(account))
+    yield put(setAccountCreationTime())
+    yield call(assignDataKeyFromPrivateKey, privateKey)
     return account
   } catch (e) {
-    Logger.error(
-      TAG + '@assignAccountFromPrivateKey',
-      'Error assigning account from private key',
-      e
-    )
-    return null
+    Logger.error(TAG + '@assignAccountFromPrivateKey', 'Error assigning account', e)
+    throw e
   }
 }
 
-function* assignDataKeyFromPrivateKey(key: string) {
-  const privateCEK = deriveCEK(key).toString('hex')
+function* assignDataKeyFromPrivateKey(privateKey: string) {
+  const privateCEK = deriveCEK(privateKey).toString('hex')
   yield put(setPrivateCommentKey(privateCEK))
 }
 
 function getPrivateKeyFilePath(account: string): string {
-  return `${RNFS.DocumentDirectoryPath}/private_key_for_${account}.txt`
+  return `${RNFS.DocumentDirectoryPath}/private_key_for_${account.toLowerCase()}.txt`
 }
 
 function ensureAddressAndKeyMatch(address: string, privateKey: string) {
@@ -215,7 +225,7 @@ function ensureAddressAndKeyMatch(address: string, privateKey: string) {
   Logger.debug(TAG + '@ensureAddressAndKeyMatch', `Sender and private key match`)
 }
 
-async function savePrivateKeyToLocalDisk(
+function savePrivateKeyToLocalDisk(
   account: string,
   privateKey: string,
   encryptionPassword: string
@@ -225,7 +235,7 @@ async function savePrivateKeyToLocalDisk(
   const plainTextData = privateKey
   const encryptedData: Buffer = getEncryptedData(plainTextData, encryptionPassword)
   Logger.debug('savePrivateKeyToLocalDisk', `Writing encrypted private key to ${filePath}`)
-  await RNFS.writeFile(getPrivateKeyFilePath(account), encryptedData.toString('hex'))
+  return RNFS.writeFile(getPrivateKeyFilePath(account), encryptedData.toString('hex'))
 }
 
 // Reads and returns unencrypted private key
@@ -306,7 +316,8 @@ export function* unlockAccount(account: string) {
     }
 
     const pincode = yield call(getPincode)
-    if (isZeroSyncMode()) {
+    const zeroSyncMode = yield select(zeroSyncSelector)
+    if (zeroSyncMode) {
       if (accountAlreadyAddedInZeroSyncMode) {
         Logger.info(TAG + 'unlockAccount', `Account ${account} already added to web3 for signing`)
       } else {
@@ -322,6 +333,7 @@ export function* unlockAccount(account: string) {
       return true
     }
   } catch (error) {
+    setCachedPincode(null)
     Logger.error(TAG + '@unlockAccount', 'Web3 account unlock failed', error)
     return false
   }
@@ -343,4 +355,134 @@ export function* getConnectedUnlockedAccount() {
   } else {
     throw new Error(ErrorMessages.INCORRECT_PIN)
   }
+}
+
+// Stores account and private key in web3 keystore using web3.eth.personal
+export function* addAccountToWeb3Keystore(key: string, currentAccount: string, pincode: string) {
+  let account: string
+  Logger.debug(TAG + '@addAccountToWeb3Keystore', `using key ${key} for account ${currentAccount}`)
+  const zeroSyncMode = yield select(zeroSyncSelector)
+  if (zeroSyncMode) {
+    // web3.eth.personal is not accessible in zeroSync mode
+    throw new Error('Cannot add account to Web3 keystore while in zeroSync mode')
+  }
+  try {
+    // @ts-ignore
+    account = yield call(web3.eth.personal.importRawKey, key, pincode)
+    Logger.debug(
+      TAG + '@addAccountToWeb3Keystore',
+      `Successfully imported raw key for account ${account}`
+    )
+    yield put(setAccountInWeb3Keystore(account))
+  } catch (e) {
+    Logger.error(TAG + '@addAccountToWeb3Keystore', 'Failed to import raw key', e)
+    if (e.toString().includes('account already exists')) {
+      account = currentAccount
+      Logger.debug(TAG + '@addAccountToWeb3Keystore', 'Importing same account as current one')
+    } else {
+      Logger.error(TAG + '@addAccountToWeb3Keystore', 'Error importing raw key')
+      throw e
+    }
+  }
+  yield call(web3.eth.personal.unlockAccount, account, pincode, UNLOCK_DURATION)
+  web3.eth.defaultAccount = account
+  return account
+}
+
+export function* ensureAccountInWeb3Keystore() {
+  const currentAccount: string = yield select(currentAccountSelector)
+  if (currentAccount) {
+    const accountInWeb3Keystore: string = yield select(currentAccountInWeb3KeystoreSelector)
+    if (!accountInWeb3Keystore) {
+      Logger.debug(
+        TAG + '@ensureAccountInWeb3Keystore',
+        'Importing account from private key to web3 keystore'
+      )
+      const pincode = yield call(getPincode)
+      const privateKey: string = yield call(readPrivateKeyFromLocalDisk, currentAccount, pincode)
+      const account: string = yield call(
+        addAccountToWeb3Keystore,
+        privateKey,
+        currentAccount,
+        pincode
+      )
+      return account
+    } else if (accountInWeb3Keystore.toLowerCase() === currentAccount.toLowerCase()) {
+      return accountInWeb3Keystore
+    } else {
+      throw new Error(
+        `Account in web3 keystore (${accountInWeb3Keystore}) does not match current account (${currentAccount})`
+      )
+    }
+  } else {
+    throw new Error('Account not yet initialized')
+  }
+}
+
+export function* switchToGethFromZeroSync() {
+  Logger.debug(TAG, 'Switching to geth from zeroSync..')
+  try {
+    const gethAlreadyStartedThisSession = yield select(gethStartedThisSessionSelector)
+    yield put(setZeroSyncMode(false))
+    yield call(initGethSaga)
+
+    switchWeb3ProviderForSyncMode(false)
+    // Ensure web3 is fully synced using new provider
+    yield call(waitForWeb3Sync)
+
+    // After switching off zeroSync mode, ensure key is stored in web3.personal
+    // Note that this must happen after the sync mode is switched
+    // as the web3.personal where the key is stored is not available in zeroSync mode
+    yield call(ensureAccountInWeb3Keystore)
+
+    if (gethAlreadyStartedThisSession) {
+      // If geth is started twice within the same session,
+      // there is an issue where it cannot find deployed contracts.
+      // Restarting the app fixes this issue.
+      restartApp()
+    }
+  } catch (e) {
+    Logger.error(TAG + '@switchToGethFromZeroSync', 'Error switching to geth from zeroSync')
+    yield put(showError(ErrorMessages.FAILED_TO_SWITCH_SYNC_MODES))
+  }
+}
+
+export function* switchToZeroSyncFromGeth() {
+  Logger.debug(TAG, 'Switching to zeroSync from geth..')
+  try {
+    yield put(setZeroSyncMode(true))
+    yield call(stopGethIfInitialized)
+
+    switchWeb3ProviderForSyncMode(true)
+
+    // Ensure web3 sync state is updated with new zeroSync state.
+    // This prevents a false positive "geth disconnected"
+    // when blocks stop syncing.
+    yield call(waitForWeb3Sync)
+  } catch (e) {
+    Logger.error(TAG + '@switchToGethFromZeroSync', 'Error switching to zeroSync from geth')
+    yield put(showError(ErrorMessages.FAILED_TO_SWITCH_SYNC_MODES))
+  }
+}
+
+export function* toggleZeroSyncMode(action: SetIsZeroSyncAction) {
+  Logger.debug(TAG + '@toggleZeroSyncMode', ` to: ${action.zeroSyncMode}`)
+  if (action.zeroSyncMode) {
+    yield call(switchToZeroSyncFromGeth)
+  } else {
+    yield call(switchToGethFromZeroSync)
+  }
+  // Unlock account to ensure private keys are accessible in new mode
+  const account = yield call(getConnectedUnlockedAccount)
+  Logger.debug(
+    TAG + '@toggleZeroSyncMode',
+    `Switched to ${action.zeroSyncMode} and able to unlock account ${account}`
+  )
+}
+export function* watchZeroSyncMode() {
+  yield takeLatest(Actions.TOGGLE_IS_ZERO_SYNC, toggleZeroSyncMode)
+}
+
+export function* web3Saga() {
+  yield spawn(watchZeroSyncMode)
 }
