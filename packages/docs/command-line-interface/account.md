@@ -38,6 +38,30 @@ EXAMPLE
 
 _See code: [packages/cli/src/commands/account/balance.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/account/balance.ts)_
 
+### Claim-account
+
+Claim another account in a local metadata file
+
+```
+USAGE
+  $ celocli account:claim-account FILE
+
+ARGUMENTS
+  FILE  Path of the metadata file
+
+OPTIONS
+  --address=address                                  (required) The address of the account you want to claim
+  --from=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) Addess of the account to set metadata for
+
+  --publicKey=publicKey                              The public key of the account if you want others to encrypt
+                                                     messages to you
+
+EXAMPLE
+  claim-account ~/metadata.json --address test.com --from 0x0
+```
+
+_See code: [packages/cli/src/commands/account/claim-account.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/account/claim-account.ts)_
+
 ### Claim-attestation-service-url
 
 Claim the URL of the attestation service in a local metadata file
@@ -308,10 +332,10 @@ USAGE
 
 OPTIONS
   --account=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) Account Address
-  --password=password                                   (required)
+  --password=password
 
 EXAMPLE
-  unlock --account 0x5409ed021d9299bf6814279a6a1411a7e866a631 --password 1234
+  unlock --account 0x5409ed021d9299bf6814279a6a1411a7e866a631
 ```
 
 _See code: [packages/cli/src/commands/account/unlock.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/account/unlock.ts)_
