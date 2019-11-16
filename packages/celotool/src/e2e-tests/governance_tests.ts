@@ -45,7 +45,7 @@ describe('governance tests', () => {
 
   before(async function(this: any) {
     this.timeout(0)
-    // await context.hooks.before()
+    await context.hooks.before()
   })
 
   after(context.hooks.after)
@@ -191,7 +191,7 @@ describe('governance tests', () => {
     assertAlmostEqual(currentBalance.minus(previousBalance), expected)
   }
 
-  describe.only('when the validator set is changing', () => {
+  describe('when the validator set is changing', () => {
     let epoch: number
     const blockNumbers: number[] = []
     let validatorAccounts: string[]
