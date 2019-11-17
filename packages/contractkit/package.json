@@ -40,6 +40,7 @@
     "web3-utils": "1.0.0-beta.37"
   },
   "devDependencies": {
+    "@celo/dev-utils": "0.0.1",
     "@celo/ganache-cli": "git+https://github.com/celo-org/ganache-cli.git#9d77e02",
     "@celo/protocol": "1.0.0",
     "@types/debug": "^4.1.5",
