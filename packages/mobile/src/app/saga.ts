@@ -13,15 +13,14 @@ import {
 } from 'src/app/actions'
 import { ErrorMessages } from 'src/app/ErrorMessages'
 import { handleDappkitDeepLink } from 'src/dappkit/dappkit'
-import { getVersionInfo } from 'src/firebase/firebase'
-import { waitForFirebaseAuth } from 'src/firebase/saga'
+import { isAppVersionDeprecated } from 'src/firebase/firebase'
 import { UNLOCK_DURATION } from 'src/geth/consts'
 import { NavActions, navigate } from 'src/navigator/NavigationService'
 import { Screens, Stacks } from 'src/navigator/Screens'
 import { PersistedRootState } from 'src/redux/reducers'
 import Logger from 'src/utils/Logger'
 import { clockInSync } from 'src/utils/time'
-import { setZeroSyncMode } from 'src/web3/actions'
+import { toggleZeroSyncMode } from 'src/web3/actions'
 import { isInitiallyZeroSyncMode, web3 } from 'src/web3/contracts'
 import { getAccount } from 'src/web3/saga'
 import { zeroSyncSelector } from 'src/web3/selectors'
@@ -60,23 +59,24 @@ const mapStateToProps = (state: PersistedRootState): PersistedStateProps | null 
 
 export function* checkAppDeprecation() {
   yield call(waitForRehydrate)
-  yield call(waitForFirebaseAuth)
-  const versionInfo = yield getVersionInfo()
-  Logger.info(TAG, 'Version Info', JSON.stringify(versionInfo))
-  if (versionInfo && versionInfo.deprecated) {
-    Logger.info(TAG, 'this version is deprecated')
+  const isDeprecated: boolean = yield call(isAppVersionDeprecated)
+  if (isDeprecated) {
+    Logger.warn(TAG, 'App version is deprecated')
     navigate(Screens.UpgradeScreen)
+  } else {
+    Logger.debug(TAG, 'App version is valid')
   }
 }
 
 // Upon every app restart, web3 is initialized according to .env file
 // This updates to the chosen zeroSync mode in store
 export function* toggleToProperSyncMode() {
-  Logger.info(TAG, '@toggleToProperSyncMode ensuring proper sync mode...')
+  Logger.info(TAG + '@toggleToProperSyncMode/', 'Ensuring proper sync mode...')
   yield take(REHYDRATE)
   const zeroSyncMode = yield select(zeroSyncSelector)
   if (zeroSyncMode !== isInitiallyZeroSyncMode()) {
-    yield put(setZeroSyncMode(zeroSyncMode))
+    Logger.info(TAG + '@toggleToProperSyncMode/', `Switching to zeroSyncMode: ${zeroSyncMode}`)
+    yield put(toggleZeroSyncMode(zeroSyncMode))
   }
 }
 
@@ -157,9 +157,13 @@ export function* navigatePinProtected(action: NavigatePinProtected) {
   }
 }
 
+export function* watchNavigatePinProtected() {
+  yield takeLatest(Actions.NAVIGATE_PIN_PROTECTED, navigatePinProtected)
+}
+
 export function* appSaga() {
-  yield spawn(checkAppDeprecation)
   yield spawn(navigateToProperScreen)
   yield spawn(toggleToProperSyncMode)
-  yield takeLatest(Actions.NAVIGATE_PIN_PROTECTED, navigatePinProtected)
+  yield spawn(checkAppDeprecation)
+  yield spawn(watchNavigatePinProtected)
 }

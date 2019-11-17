@@ -27,6 +27,22 @@ const DefaultConfig = {
     maxVotesPerAccount: 3,
     electabilityThreshold: 1 / 100,
   },
+  epochRewards: {
+    targetVotingYieldParameters: {
+      initial: 5 / 100,
+      max: 2 / 10,
+      adjustmentFactor: 1 / 365,
+    },
+    rewardsMultiplierParameters: {
+      max: 2,
+      adjustmentFactors: {
+        underspend: 1 / 2,
+        overspend: 5,
+      },
+    },
+    targetVotingGoldFraction: 2 / 3,
+    maxValidatorEpochPayment: '205479452054794520547', // (75,000 / 365) * 10 ^ 18
+  },
   exchange: {
     spread: 5 / 1000,
     reserveFraction: 1,
@@ -37,7 +53,6 @@ const DefaultConfig = {
     initialMinimum: 10000,
     targetDensity: 1 / 2,
     adjustmentSpeed: 1 / 2,
-    proposerFraction: 1 / 2,
   },
   governance: {
     approvalStageDuration: 15 * 60, // 15 minutes
@@ -95,7 +110,6 @@ const DefaultConfig = {
       exponent: 1,
       adjustmentSpeed: 0.1,
     },
-    validatorEpochPayment: '1000000000000000000',
     membershipHistoryLength: 60,
     maxGroupSize: '70',
 
