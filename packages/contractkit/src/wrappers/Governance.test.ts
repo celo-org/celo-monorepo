@@ -40,7 +40,9 @@ testWithGanache('Governance Wrapper', (web3) => {
 
   const verifyRepointResult = (repoints: Repoint[]) =>
     concurrentMap(1, repoints, async (repoint) => {
-      const newAddress = await registry.methods.getAddressForStringOrDie(repoint[0]).call()
+      const newAddress = await registry.methods
+        .getAddressForStringOrDie(repoint[0] as string)
+        .call()
       expect(newAddress).toBe(repoint[1])
     })
 

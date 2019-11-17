@@ -9,7 +9,7 @@ import {
   CeloTransactionObject,
   proxyCall,
   proxySend,
-  toSolidityBytes,
+  stringToBytes,
   toTransactionObject,
   tupleParser,
   valueToBigNumber,
@@ -117,7 +117,7 @@ export class ValidatorsWrapper extends BaseWrapper<Validators> {
   ) => CeloTransactionObject<boolean> = proxySend(
     this.kit,
     this.contract.methods.updateBlsPublicKey,
-    tupleParser(toSolidityBytes, toSolidityBytes)
+    tupleParser(stringToBytes, stringToBytes)
   )
 
   /**
@@ -251,7 +251,7 @@ export class ValidatorsWrapper extends BaseWrapper<Validators> {
   ) => CeloTransactionObject<boolean> = proxySend(
     this.kit,
     this.contract.methods.registerValidator,
-    tupleParser(toSolidityBytes, toSolidityBytes, toSolidityBytes)
+    tupleParser(stringToBytes, stringToBytes, stringToBytes)
   )
 
   /**

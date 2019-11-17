@@ -6,13 +6,13 @@ import { Address } from '../base'
 import { Governance } from '../generated/types/Governance'
 import {
   BaseWrapper,
+  bufferToBytes,
   bufferToString,
-  fromSolidityBytes,
+  bytesToString,
   identity,
   proxyCall,
   proxySend,
   stringToBuffer,
-  toSolidityBytes,
   toTransactionObject,
   tupleParser,
   valueToBigNumber,
@@ -178,14 +178,14 @@ export class GovernanceWrapper extends BaseWrapper<Governance> {
     (res) => ({
       value: res[0],
       to: res[1],
-      input: fromSolidityBytes(res[2]),
+      input: bytesToString(res[2]),
     })
   )
 
   static toParams = (proposal: Proposal): ProposalParams => [
     proposal.map((tx) => tx.value),
     proposal.map((tx) => tx.to),
-    toSolidityBytes(Buffer.concat(proposal.map((tx) => stringToBuffer(tx.input)))),
+    bufferToBytes(Buffer.concat(proposal.map((tx) => stringToBuffer(tx.input)))),
     proposal.map((tx) => tx.input.length),
   ]
 

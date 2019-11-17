@@ -38,17 +38,14 @@ export const stringToBuffer = (input: string) => Buffer.from(trimLeading0x(input
 export const bufferToString = (buf: Buffer) => ensureLeading0x(buf.toString('hex'))
 
 type SolBytes = Array<string | number[]>
-export function toSolidityBytes(input: Buffer | string): SolBytes {
-  const result =
-    typeof input === typeof Buffer
-      ? bufferToString(input as Buffer)
-      : ensureLeading0x(input as string)
-  return result as any
-}
+const toBytes = (input: any): SolBytes => input
+const fromBytes = (input: SolBytes): any => input as any
 
-export function fromSolidityBytes(input: SolBytes): string {
-  return input as any
-}
+export const stringToBytes = (input: string) => toBytes(ensureLeading0x(input))
+
+export const bufferToBytes = (input: Buffer) => stringToBytes(bufferToString(input))
+
+export const bytesToString = (input: SolBytes): string => fromBytes(input)
 
 type Parser<A, B> = (input: A) => B
 
