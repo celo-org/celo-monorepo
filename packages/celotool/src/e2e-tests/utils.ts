@@ -42,13 +42,13 @@ const NetworkId = 1101
 const MonorepoRoot = resolvePath(joinPath(__dirname, '../..', '../..'))
 
 export async function waitToStartAndFinishSyncing(web3: any) {
-  // If not syncing yet, wait until syncing starts.
-  if (!(await web3.eth.isSyncing())) {
-    while (!(await web3.eth.isSyncing())) {
-      await sleep(0.1)
-    }
+  while (!(await web3.eth.isSyncing())) {
+    await sleep(0.1)
   }
-  // Wait to finish syncing.
+  await waitToFinishSyncing(web3)
+}
+
+export async function waitToFinishSyncing(web3: any) {
   while (await web3.eth.isSyncing()) {
     await sleep(0.1)
   }

@@ -14,7 +14,7 @@ import {
   importGenesis,
   initAndStartGeth,
   sleep,
-  waitToStartAndFinishSyncing,
+  waitToFinishSyncing,
 } from './utils'
 
 interface MemberSwapper {
@@ -140,7 +140,7 @@ describe('governance tests', () => {
 
   before(async function(this: any) {
     this.timeout(0)
-    await context.hooks.before()
+    // await context.hooks.before()
   })
 
   after(context.hooks.after)
@@ -296,13 +296,13 @@ describe('governance tests', () => {
       do {
         blockNumber = await web3.eth.getBlockNumber()
         await sleep(0.1)
-      } while (blockNumber % epoch !== 1)
+      } while (blockNumber % epoch !== 0)
 
       await activate(validatorAccounts[0])
 
       // Prepare for member swapping.
       const groupWeb3 = new Web3('ws://localhost:8555')
-      await waitToStartAndFinishSyncing(groupWeb3)
+      await waitToFinishSyncing(groupWeb3)
       const groupKit = newKitFromWeb3(groupWeb3)
       validators = await groupKit._web3Contracts.getValidators()
       const membersToSwap = [validatorAccounts[0], validatorAccounts[1]]
@@ -311,6 +311,7 @@ describe('governance tests', () => {
       // Prepare for key rotation.
       const validatorWeb3 = new Web3('http://localhost:8549')
       const authorizedWeb3s = [new Web3('ws://localhost:8559'), new Web3('ws://localhost:8561')]
+      await Promise.all(authorizedWeb3s.map((w) => waitToFinishSyncing(w)))
       const authorizedPrivateKeys = [rotation0PrivateKey, rotation1PrivateKey]
       const keyRotator = await newKeyRotator(
         newKitFromWeb3(validatorWeb3),
