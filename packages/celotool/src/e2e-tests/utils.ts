@@ -281,7 +281,7 @@ export async function startGeth(gethBinaryPath: string, instance: GethInstanceCo
     '--networkid',
     NetworkId.toString(),
     '--verbosity',
-    '4',
+    '5',
     '--consoleoutput=stdout', // Send all logs to stdout
     '--consoleformat=term',
     '--nat',
@@ -316,9 +316,13 @@ export async function startGeth(gethBinaryPath: string, instance: GethInstanceCo
   }
 
   if (validating) {
-    gethArgs.push('--password=/dev/null', `--unlock=0`)
     gethArgs.push('--mine', '--minerthreads=10', `--nodekeyhex=${privateKey}`)
   }
+
+  if (privateKey) {
+    gethArgs.push('--password=/dev/null', `--unlock=0`)
+  }
+
   const gethProcess = spawnWithLog(gethBinaryPath, gethArgs, `${datadir}/logs.txt`)
   instance.pid = gethProcess.pid
 

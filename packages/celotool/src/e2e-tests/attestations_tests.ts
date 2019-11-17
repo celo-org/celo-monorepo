@@ -33,11 +33,6 @@ describe('attestations tests', () => {
     await context.hooks.restart()
     contractKit = newKit('http://localhost:8545')
     contractKit.defaultAccount = validatorAddress
-
-    // TODO(mcortesi): magic sleep. without it unlockAccount sometimes fails
-    await sleep(2)
-    // Assuming empty password
-    await contractKit.web3.eth.personal.unlockAccount(validatorAddress, '', 1000000)
     Attestations = await contractKit.contracts.getAttestations()
   }
 

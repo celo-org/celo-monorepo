@@ -27,11 +27,7 @@ describe('Blockchain parameters tests', function(this: any) {
   const restartGeth = async () => {
     // Restart the validator node
     await hooks.restart()
-
-    // TODO(mcortesi): magic sleep. without it unlockAccount sometimes fails
-    await sleep(2)
     kit = newKit('http://localhost:8545')
-    await kit.web3.eth.personal.unlockAccount(validatorAddress, '', 1000)
     parameters = await kit.contracts.getBlockchainParameters()
   }
 

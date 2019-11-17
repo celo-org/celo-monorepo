@@ -174,11 +174,6 @@ describe('Transfer tests', function(this: any) {
     kit = newKitFromWeb3(new Web3('http://localhost:8545'))
     kit.gasInflationFactor = 1
 
-    // TODO(mcortesi): magic sleep. without it unlockAccount sometimes fails
-    await sleep(2)
-    // Assuming empty password
-    await kit.web3.eth.personal.unlockAccount(validatorAddress, '', 1000000)
-
     // Spin up a node that we can sync with.
     const fullInstance = {
       name: 'txFull',
@@ -232,9 +227,6 @@ describe('Transfer tests', function(this: any) {
     while ((await kit.web3.eth.getBlock('latest')).number < upstream.number) {
       await sleep(0.5)
     }
-
-    // Unlock Node account
-    await kit.web3.eth.personal.unlockAccount(FromAddress, '', 1000000)
   }
 
   const transferCeloGold = async (

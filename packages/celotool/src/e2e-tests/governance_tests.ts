@@ -16,6 +16,106 @@ import {
   sleep,
 } from './utils'
 
+interface MemberSwapper {
+  swap(): Promise<void>
+}
+
+async function newMemberSwapper(kit: ContractKit, members: string[]): Promise<MemberSwapper> {
+  let index = 0
+  const group = (await kit.web3.eth.getAccounts())[0]
+  await Promise.all(members.slice(1).map((member) => removeMember(member)))
+
+  async function removeMember(member: string) {
+    return (await kit.contracts.getValidators())
+      .removeMember(member)
+      .sendAndWaitForReceipt({ from: group })
+  }
+
+  async function addMember(member: string) {
+    return (await (await kit.contracts.getValidators()).addMember(
+      group,
+      member
+    )).sendAndWaitForReceipt({ from: group })
+  }
+
+  async function getGroupMembers() {
+    const groupInfo = await (await kit._web3Contracts.getValidators()).methods
+      .getValidatorGroup(group)
+      .call()
+    return groupInfo[0]
+  }
+
+  return {
+    async swap() {
+      console.log('swapping members')
+      const removedMember = members[index % members.length]
+      console.log(await removeMember(members[index % members.length]))
+      index = index + 1
+      const addedMember = members[index % members.length]
+      console.log(await addMember(members[index % members.length]))
+      console.log('done swapping members')
+      const groupMembers = await getGroupMembers()
+      assert.include(groupMembers, addedMember)
+      assert.notInclude(groupMembers, removedMember)
+    },
+  }
+}
+
+interface KeyRotator {
+  rotate(): Promise<void>
+}
+
+async function newKeyRotator(
+  kit: ContractKit,
+  web3s: Web3[],
+  privateKeys: string[]
+): Promise<KeyRotator> {
+  let index = 0
+  const validator = (await kit.web3.eth.getAccounts())[0]
+  const accountsWrapper = await kit.contracts.getAccounts()
+
+  async function authorizeValidatorSigner(signer: string, signerWeb3: any) {
+    const signerKit = newKitFromWeb3(signerWeb3)
+    const pop = await (await signerKit.contracts.getAccounts()).generateProofOfSigningKeyPossession(
+      validator,
+      signer
+    )
+    return (await accountsWrapper.authorizeValidatorSigner(signer, pop)).sendAndWaitForReceipt({
+      from: validator,
+    })
+  }
+
+  async function updateValidatorBlsKey(signerPrivateKey: string) {
+    const blsPublicKey = getBlsPublicKey(signerPrivateKey)
+    const blsPop = getBlsPoP(validator, signerPrivateKey)
+    // TODO(asa): Send this from the signer instead.
+    const validatorsWrapper = await kit.contracts.getValidators()
+    return validatorsWrapper
+      .updateBlsPublicKey(blsPublicKey, blsPop)
+      .sendAndWaitForReceipt({ from: validator })
+  }
+
+  return {
+    async rotate() {
+      if (index < web3s.length) {
+        const signerWeb3 = web3s[index]
+        const signer: string = (await signerWeb3.eth.getAccounts())[0]
+        const signerPrivateKey = privateKeys[index]
+        console.log('rotating keys')
+        console.log(
+          await Promise.all([
+            authorizeValidatorSigner(signer, signerWeb3),
+            updateValidatorBlsKey(signerPrivateKey),
+          ])
+        )
+        console.log('rotated keys')
+        index += 1
+        assert.equal(await accountsWrapper.getValidatorSigner(validator), signer)
+      }
+    },
+  }
+}
+
 // TODO(asa): Test independent rotation of ecdsa, bls keys.
 describe('governance tests', () => {
   const gethConfig = {
@@ -45,7 +145,7 @@ describe('governance tests', () => {
 
   before(async function(this: any) {
     this.timeout(0)
-    await context.hooks.before()
+    // await context.hooks.before()
   })
 
   after(context.hooks.after)
@@ -62,11 +162,6 @@ describe('governance tests', () => {
     election = await kit._web3Contracts.getElection()
     epochRewards = await kit._web3Contracts.getEpochRewards()
     accounts = await kit._web3Contracts.getAccounts()
-  }
-
-  const unlockAccount = async (address: string, theWeb3: any) => {
-    // Assuming empty password
-    await theWeb3.eth.personal.unlockAccount(address, '', 1000)
   }
 
   const getValidatorGroupMembers = async (blockNumber?: number) => {
@@ -107,7 +202,6 @@ describe('governance tests', () => {
   }
 
   const activate = async (account: string, txOptions: any = {}) => {
-    await unlockAccount(account, web3)
     const [group] = await validators.methods.getRegisteredValidatorGroups().call()
     const tx = election.methods.activate(group)
     let gas = txOptions.gas
@@ -115,59 +209,6 @@ describe('governance tests', () => {
       gas = (await tx.estimateGas({ ...txOptions })) * 2
     }
     return tx.send({ from: account, ...txOptions, gas })
-  }
-
-  const removeMember = async (groupWeb3: any, member: string, txOptions: any = {}) => {
-    const group = (await groupWeb3.eth.getAccounts())[0]
-    await unlockAccount(group, groupWeb3)
-    const tx = validators.methods.removeMember(member)
-    let gas = txOptions.gas
-    if (!gas) {
-      gas = (await tx.estimateGas({ ...txOptions })) * 2
-    }
-    return tx.send({ from: group, ...txOptions, gas })
-  }
-
-  const addMember = async (groupWeb3: any, member: string, txOptions: any = {}) => {
-    const group = (await groupWeb3.eth.getAccounts())[0]
-    await unlockAccount(group, groupWeb3)
-    const tx = validators.methods.addMember(member)
-    let gas = txOptions.gas
-    if (!gas) {
-      gas = (await tx.estimateGas({ ...txOptions })) * 2
-    }
-    return tx.send({ from: group, ...txOptions, gas })
-  }
-
-  const authorizeValidatorSigner = async (validatorWeb3: any, signerWeb3: any) => {
-    const validator: string = (await validatorWeb3.eth.getAccounts())[0]
-    const signer: string = (await signerWeb3.eth.getAccounts())[0]
-    await unlockAccount(validator, validatorWeb3)
-    await unlockAccount(signer, signerWeb3)
-    const pop = await (await newKitFromWeb3(
-      signerWeb3
-    ).contracts.getAccounts()).generateProofOfSigningKeyPossession(validator, signer)
-    const accountsWrapper = await newKitFromWeb3(validatorWeb3).contracts.getAccounts()
-    return (await accountsWrapper.authorizeValidatorSigner(signer, pop)).sendAndWaitForReceipt({
-      from: validator,
-    })
-  }
-
-  const updateValidatorBlsKey = async (
-    validatorWeb3: any,
-    signerWeb3: any,
-    signerPrivateKey: string
-  ) => {
-    const validator: string = (await validatorWeb3.eth.getAccounts())[0]
-    const signer: string = (await signerWeb3.eth.getAccounts())[0]
-    await unlockAccount(signer, signerWeb3)
-    const blsPublicKey = getBlsPublicKey(signerPrivateKey)
-    const blsPop = getBlsPoP(validator, signerPrivateKey)
-    // TODO(asa): Send this from the signer instead.
-    const validatorsWrapper = await newKitFromWeb3(validatorWeb3).contracts.getValidators()
-    return validatorsWrapper
-      .updateBlsPublicKey(blsPublicKey, blsPop)
-      .sendAndWaitForReceipt({ from: validator })
   }
 
   const isLastBlockOfEpoch = (blockNumber: number, epochSize: number) => {
@@ -191,7 +232,7 @@ describe('governance tests', () => {
     assertAlmostEqual(currentBalance.minus(previousBalance), expected)
   }
 
-  describe('when the validator set is changing', () => {
+  describe.only('when the validator set is changing', () => {
     let epoch: number
     const blockNumbers: number[] = []
     let validatorAccounts: string[]
@@ -269,18 +310,19 @@ describe('governance tests', () => {
       const groupKit = newKitFromWeb3(groupWeb3)
       validators = await groupKit._web3Contracts.getValidators()
       const membersToSwap = [validatorAccounts[0], validatorAccounts[1]]
-      await removeMember(groupWeb3, membersToSwap[1])
+      const memberSwapper = await newMemberSwapper(groupKit, membersToSwap)
 
       // Prepare for key rotation.
       const validatorWeb3 = new Web3('http://localhost:8549')
       const authorizedWeb3s = [new Web3('ws://localhost:8559'), new Web3('ws://localhost:8561')]
       const authorizedPrivateKeys = [rotation0PrivateKey, rotation1PrivateKey]
+      const keyRotator = await newKeyRotator(
+        newKitFromWeb3(validatorWeb3),
+        authorizedWeb3s,
+        authorizedPrivateKeys
+      )
 
-      let index = 0
       let errorWhileChangingValidatorSet = ''
-      // Can't recycle signing keys.
-      let doneAuthorizing = false
-
       const changeValidatorSet = async (header: any) => {
         try {
           console.log('got new header', header.number)
@@ -289,36 +331,8 @@ describe('governance tests', () => {
           // Note that all of these actions MUST complete within the epoch.
           if (header.number % epoch === 0 && errorWhileChangingValidatorSet === '') {
             // 1. Swap validator0 and validator1 so one is a member of the group and the other is not.
-            const memberToRemove = membersToSwap[index]
-            const memberToAdd = membersToSwap[(index + 1) % 2]
-            console.log('removing member', memberToRemove)
-            console.log(await removeMember(groupWeb3, memberToRemove))
-            console.log('adding member', memberToAdd)
-            console.log(await addMember(groupWeb3, memberToAdd))
-            const newMembers = await getValidatorGroupMembers()
-            assert.include(newMembers, memberToAdd)
-            assert.notInclude(newMembers, memberToRemove)
             // 2. Rotate keys for validator 2 by authorizing a new validating key.
-            if (!doneAuthorizing) {
-              console.log('authorizing signer')
-              console.log(await authorizeValidatorSigner(validatorWeb3, authorizedWeb3s[index]))
-              console.log('updating bls key')
-              console.log(
-                await updateValidatorBlsKey(
-                  validatorWeb3,
-                  authorizedWeb3s[index],
-                  authorizedPrivateKeys[index]
-                )
-              )
-            }
-            doneAuthorizing = doneAuthorizing || index === 1
-            const signingKeys = await Promise.all(
-              newMembers.map((v: string) => getValidatorSigner(v))
-            )
-            // Confirm that authorizing signing keys worked.
-            // @ts-ignore Type does not include `notSameMembers`
-            assert.notSameMembers(newMembers, signingKeys)
-            index = (index + 1) % 2
+            await Promise.all([memberSwapper.swap(), keyRotator.rotate()])
           }
         } catch (e) {
           console.error(e)
