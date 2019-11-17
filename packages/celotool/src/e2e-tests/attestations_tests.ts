@@ -1,7 +1,7 @@
 import { ContractKit, newKit } from '@celo/contractkit'
 import { AttestationsWrapper } from '@celo/contractkit/lib/wrappers/Attestations'
 import { assert } from 'chai'
-import { getContext, GethTestConfig } from './utils'
+import { getContext, GethTestConfig, sleep } from './utils'
 
 const validatorAddress = '0x47e172f6cfb6c7d01c1574fa3e2be7cc73269d95'
 const phoneNumber = '+15555555555'
@@ -33,6 +33,11 @@ describe('attestations tests', () => {
     await context.hooks.restart()
     contractKit = newKit('http://localhost:8545')
     contractKit.defaultAccount = validatorAddress
+
+    // TODO(mcortesi): magic sleep. without it unlockAccount sometimes fails
+    await sleep(2)
+    // Assuming empty password
+    await contractKit.web3.eth.personal.unlockAccount(validatorAddress, '', 1000000)
     Attestations = await contractKit.contracts.getAttestations()
   }
 
