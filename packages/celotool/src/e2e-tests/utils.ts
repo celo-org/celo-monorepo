@@ -49,6 +49,17 @@ export interface MemberSwapper {
   swap(): Promise<void>
 }
 
+export async function waitToStartAndFinishSyncing(web3: any) {
+  // Wait for the node to start syncing.
+  while (!(await web3.eth.isSyncing())) {
+    await sleep(0.1)
+  }
+  // Wait for the node to finish syncing.
+  while (await web3.eth.isSyncing()) {
+    await sleep(0.1)
+  }
+}
+
 export async function newMemberSwapper(
   kit: ContractKit,
   members: string[]
@@ -58,14 +69,12 @@ export async function newMemberSwapper(
   await Promise.all(members.slice(1).map((member) => removeMember(member)))
 
   async function removeMember(member: string) {
-    console.log('removing', member)
     return (await kit.contracts.getValidators())
       .removeMember(member)
       .sendAndWaitForReceipt({ from: group })
   }
 
   async function addMember(member: string) {
-    console.log('adding', member)
     return (await (await kit.contracts.getValidators()).addMember(
       group,
       member

@@ -13,6 +13,7 @@ import {
   killInstance,
   newMemberSwapper,
   sleep,
+  waitToStartAndFinishSyncing,
 } from './utils'
 
 describe('sync tests', function(this: any) {
@@ -26,6 +27,7 @@ describe('sync tests', function(this: any) {
       { name: 'validator2', validating: true, syncmode: 'full', port: 30307, rpcport: 8549 },
       { name: 'validator3', validating: true, syncmode: 'full', port: 30309, rpcport: 8551 },
       { name: 'validator4', validating: true, syncmode: 'full', port: 30311, rpcport: 8553 },
+      { name: 'validator5', validating: true, syncmode: 'full', port: 30313, rpcport: 8555 },
     ],
   }
   const hooks = getHooks(gethConfig)
@@ -37,15 +39,14 @@ describe('sync tests', function(this: any) {
     await hooks.restart()
     const validatorKit = newKitFromWeb3(new Web3('http://localhost:8545'))
     const groupPrivateKey = await getValidatorGroupPrivateKey(validatorKit, gethConfig.instances[0])
-    console.log('group privatekey', groupPrivateKey)
     const fullInstance = {
       name: 'full',
       validating: false,
       syncmode: 'full',
       lightserv: true,
-      port: 30313,
-      wsport: 8555,
-      rpcport: 8557,
+      port: 30315,
+      wsport: 8557,
+      rpcport: 8559,
       privateKey: groupPrivateKey.slice(2),
       peers: [await getEnode(8545)],
     }
@@ -53,14 +54,14 @@ describe('sync tests', function(this: any) {
     const validators = await (await validatorKit._web3Contracts.getValidators()).methods
       .getRegisteredValidators()
       .call()
-    const web3 = new Web3('ws://localhost:8555')
-    // Give the full node time to sync.
-    while (await web3.eth.isSyncing()) {
-      await sleep(0.1)
-    }
+    const web3 = new Web3('ws://localhost:8557')
+    await waitToStartAndFinishSyncing(web3)
     const kit = newKitFromWeb3(web3)
-    const membersToSwap = [validators[0], validators[1]]
-    const memberSwapper = await newMemberSwapper(kit, membersToSwap)
+    // The validator set size at any one time will be 4, and we rotate two validators per epoch.
+    // This means that if a node were to have a static view of the validator set, we guarantee that
+    // the node will reject blocks.
+    const memberSwapper0 = await newMemberSwapper(kit, [validators[0], validators[1]])
+    const memberSwapper1 = await newMemberSwapper(kit, [validators[2], validators[3]])
 
     let errorWhileChangingValidatorSet = ''
     const changeValidatorSet = async (header: any) => {
@@ -68,7 +69,8 @@ describe('sync tests', function(this: any) {
         // At the start of epoch N, perform actions so the validator set is different for epoch N + 1.
         // Note that all of these actions MUST complete within the epoch.
         if (header.number % EPOCH === 0 && errorWhileChangingValidatorSet === '') {
-          await memberSwapper.swap()
+          await memberSwapper0.swap()
+          await memberSwapper1.swap()
         }
       } catch (e) {
         console.error(e)
@@ -95,10 +97,10 @@ describe('sync tests', function(this: any) {
           name: syncmode,
           validating: false,
           syncmode,
-          port: 30315,
-          wsport: 8559,
+          port: 30317,
+          wsport: 8561,
           lightserv: syncmode !== 'light' && syncmode !== 'ultralight',
-          peers: [await getEnode(8557)],
+          peers: [await getEnode(8559)],
         }
         await initAndStartGeth(hooks.gethBinaryPath, syncInstance)
       })
@@ -108,14 +110,10 @@ describe('sync tests', function(this: any) {
       it('should sync the latest block', async () => {
         const validatorWeb3 = new Web3(`http://localhost:8545`)
         const validatorFirstBlock = await validatorWeb3.eth.getBlockNumber()
-        const syncingWeb3 = new Web3('ws://localhost:8559')
-        // Give the node time to sync.
-        while (await syncingWeb3.eth.isSyncing()) {
-          console.log('sycning')
-          await sleep(0.1)
-        }
-        await sleep(5)
-
+        const syncingWeb3 = new Web3('ws://localhost:8561')
+        await waitToStartAndFinishSyncing(syncingWeb3)
+        // Give the validator time to create more blocks.
+        await sleep(2)
         const validatorLatestBlock = await validatorWeb3.eth.getBlockNumber()
         const syncLatestBlock = await syncingWeb3.eth.getBlockNumber()
         assert.isAbove(validatorLatestBlock, 1)
@@ -126,7 +124,7 @@ describe('sync tests', function(this: any) {
       })
     })
   }
-  describe.skip(`when a validator's data directory is deleted`, () => {
+  describe(`when a validator's data directory is deleted`, () => {
     let web3: any
     beforeEach(async function(this: any) {
       this.timeout(0) // Disable test timeout
