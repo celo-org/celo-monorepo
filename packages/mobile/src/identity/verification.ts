@@ -1,3 +1,25 @@
+import { eqAddress } from '@celo/utils/src/address'
+import { compressedPubKey } from '@celo/utils/src/commentEncryption'
+import { getPhoneHash, isE164Number } from '@celo/utils/src/phoneNumbers'
+import {
+  ActionableAttestation,
+  extractAttestationCodeFromMessage,
+  findMatchingIssuer,
+  getActionableAttestations,
+  getAttestationsContract,
+  getDataEncryptionKey,
+  getStableTokenContract,
+  getWalletAddress,
+  lookupPhoneNumbers,
+  makeApproveAttestationFeeTx,
+  makeCompleteTx,
+  makeRequestTx,
+  makeRevealTx,
+  makeSetAccountTx,
+  validateAttestationCode,
+} from '@celo/walletkit'
+import { Attestations as AttestationsType } from '@celo/walletkit/types/Attestations'
+import { StableToken as StableTokenType } from '@celo/walletkit/types/StableToken'
 import BigNumber from 'bignumber.js'
 import { Platform } from 'react-native'
 import { Task } from 'redux-saga'
@@ -25,29 +47,6 @@ import Logger from 'src/utils/Logger'
 import { web3 } from 'src/web3/contracts'
 import { getConnectedAccount, getConnectedUnlockedAccount } from 'src/web3/saga'
 import { privateCommentKeySelector } from 'src/web3/selectors'
-
-import { eqAddress } from '@celo/utils/src/address'
-import { compressedPubKey } from '@celo/utils/src/commentEncryption'
-import { getPhoneHash, isE164Number } from '@celo/utils/src/phoneNumbers'
-import {
-  ActionableAttestation,
-  extractAttestationCodeFromMessage,
-  findMatchingIssuer,
-  getActionableAttestations,
-  getAttestationsContract,
-  getDataEncryptionKey,
-  getStableTokenContract,
-  getWalletAddress,
-  lookupPhoneNumbers,
-  makeApproveAttestationFeeTx,
-  makeCompleteTx,
-  makeRequestTx,
-  makeRevealTx,
-  makeSetAccountTx,
-  validateAttestationCode,
-} from '@celo/walletkit'
-import { Attestations as AttestationsType } from '@celo/walletkit/types/Attestations'
-import { StableToken as StableTokenType } from '@celo/walletkit/types/StableToken'
 
 const TAG = 'identity/verification'
 

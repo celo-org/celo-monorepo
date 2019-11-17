@@ -1,3 +1,6 @@
+import { trimLeading0x } from '@celo/utils/src/address'
+import { getPhoneHash } from '@celo/utils/src/phoneNumbers'
+import { getEscrowContract, getGoldTokenContract, getStableTokenContract } from '@celo/walletkit'
 import BigNumber from 'bignumber.js'
 import { Linking, Platform } from 'react-native'
 import SendIntentAndroid from 'react-native-send-intent'
@@ -39,10 +42,6 @@ import Logger from 'src/utils/Logger'
 import { addLocalAccount, web3 } from 'src/web3/contracts'
 import { getConnectedUnlockedAccount, getOrCreateAccount } from 'src/web3/saga'
 import { zeroSyncSelector } from 'src/web3/selectors'
-
-import { trimLeading0x } from '@celo/utils/src/address'
-import { getPhoneHash } from '@celo/utils/src/phoneNumbers'
-import { getEscrowContract, getGoldTokenContract, getStableTokenContract } from '@celo/walletkit'
 
 const TAG = 'invite/saga'
 export const TEMP_PW = 'ce10'
