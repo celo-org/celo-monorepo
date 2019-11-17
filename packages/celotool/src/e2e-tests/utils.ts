@@ -41,7 +41,7 @@ const GENESIS_PATH = `${TEST_DIR}/genesis.json`
 const NetworkId = 1101
 const MonorepoRoot = resolvePath(joinPath(__dirname, '../..', '../..'))
 
-export async function waitToFinishSyncing(web3: any) {
+export async function waitToStartAndFinishSyncing(web3: any) {
   // If not syncing yet, wait until syncing starts.
   if (!(await web3.eth.isSyncing())) {
     while (!(await web3.eth.isSyncing())) {
