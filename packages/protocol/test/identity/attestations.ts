@@ -2,11 +2,11 @@ import Web3 = require('web3')
 
 import { CeloContractName } from '@celo/protocol/lib/registry-utils'
 import {
-  advanceBlockNum,
   assertEqualBN,
   assertLogMatches2,
   assertRevert,
   assertSameAddress,
+  mineBlocks,
   NULL_ADDRESS,
 } from '@celo/protocol/lib/test-utils'
 import { attestToIdentifier } from '@celo/utils'
@@ -26,6 +26,7 @@ import {
   MockRandomInstance,
   MockStableTokenContract,
   MockStableTokenInstance,
+  MockValidatorsContract,
   RegistryContract,
   RegistryInstance,
   TestAttestationsContract,
@@ -43,6 +44,7 @@ const Attestations: TestAttestationsContract = artifacts.require('TestAttestatio
 const MockStableToken: MockStableTokenContract = artifacts.require('MockStableToken')
 const MockElection: MockElectionContract = artifacts.require('MockElection')
 const MockLockedGold: MockLockedGoldContract = artifacts.require('MockLockedGold')
+const MockValidators: MockValidatorsContract = artifacts.require('MockValidators')
 const Random: MockRandomContract = artifacts.require('MockRandom')
 const Registry: RegistryContract = artifacts.require('Registry')
 
@@ -131,17 +133,21 @@ contract('Attestations', (accounts: string[]) => {
     accountsInstance = await Accounts.new()
     mockStableToken = await MockStableToken.new()
     otherMockStableToken = await MockStableToken.new()
+    const mockValidators = await MockValidators.new()
     attestations = await Attestations.new()
     random = await Random.new()
     random.addTestRandomness(0, '0x00')
     mockLockedGold = await MockLockedGold.new()
+    registry = await Registry.new()
+    await accountsInstance.initialize(registry.address)
+    await registry.setAddressFor(CeloContractName.Validators, mockValidators.address)
 
     await Promise.all(
       accounts.map(async (account) => {
         await accountsInstance.createAccount({ from: account })
         await unlockAndAuthorizeKey(
           KeyOffsets.VALIDATING_KEY_OFFSET,
-          accountsInstance.authorizeValidationSigner,
+          accountsInstance.authorizeValidatorSigner,
           account
         )
       })
@@ -153,7 +159,6 @@ contract('Attestations', (accounts: string[]) => {
         privateKeyToAddress(getDerivedKey(KeyOffsets.VALIDATING_KEY_OFFSET, account))
       )
     )
-    registry = await Registry.new()
     await registry.setAddressFor(CeloContractName.Accounts, accountsInstance.address)
     await registry.setAddressFor(CeloContractName.Random, random.address)
     await registry.setAddressFor(CeloContractName.Election, mockElection.address)
@@ -348,7 +353,7 @@ contract('Attestations', (accounts: string[]) => {
 
         describe('when the original request has expired', () => {
           it('should allow to request more attestations', async () => {
-            await advanceBlockNum(attestationExpiryBlocks, web3)
+            await mineBlocks(attestationExpiryBlocks, web3)
             await attestations.request(phoneHash, 1, mockStableToken.address)
           })
         })
@@ -480,7 +485,7 @@ contract('Attestations', (accounts: string[]) => {
         describe('after attestationExpiryBlocks', () => {
           beforeEach(async () => {
             await attestations.selectIssuers(phoneHash)
-            await advanceBlockNum(attestationExpiryBlocks, web3)
+            await mineBlocks(attestationExpiryBlocks, web3)
           })
 
           it('should no longer list the attestations in getCompletableAttestations', async () => {
@@ -551,7 +556,7 @@ contract('Attestations', (accounts: string[]) => {
     })
 
     it('should set the time of the successful completion', async () => {
-      await advanceBlockNum(1, web3)
+      await mineBlocks(1, web3)
       await attestations.complete(phoneHash, v, r, s)
 
       const expectedBlock = await web3.eth.getBlock('latest')
@@ -647,7 +652,7 @@ contract('Attestations', (accounts: string[]) => {
     })
 
     it('does not let you verify beyond the window', async () => {
-      await advanceBlockNum(attestationExpiryBlocks, web3)
+      await mineBlocks(attestationExpiryBlocks, web3)
       await assertRevert(attestations.complete(phoneHash, v, r, s))
     })
   })

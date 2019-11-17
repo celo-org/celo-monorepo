@@ -3,33 +3,12 @@
 import { setAndInitializeImplementation } from '@celo/protocol/lib/proxy-utils'
 import { CeloContractName } from '@celo/protocol/lib/registry-utils'
 import { signTransaction } from '@celo/protocol/lib/signing-utils'
+import { privateKeyToAddress } from '@celo/utils/lib/address'
 import { BigNumber } from 'bignumber.js'
-import { ec as EC } from 'elliptic'
 import { EscrowInstance, GoldTokenInstance, MultiSigInstance, OwnableInstance, ProxyContract, ProxyInstance, RegistryInstance, StableTokenInstance } from 'types'
 import { TransactionObject } from 'web3/eth/types'
 
 import Web3 = require('web3')
-
-const ec = new EC('secp256k1')
-const cachedWeb3 = new Web3()
-
-export function add0x(str: string) {
-  return '0x' + str
-}
-
-export function generatePublicKeyFromPrivateKey(privateKey: string) {
-  const ecPrivateKey = ec.keyFromPrivate(Buffer.from(privateKey, 'hex'))
-  const ecPublicKey: string = ecPrivateKey.getPublic('hex')
-  return ecPublicKey.slice(2)
-}
-
-export function generateAccountAddressFromPrivateKey(privateKey: string) {
-  if (!privateKey.startsWith('0x')) {
-    privateKey = '0x' + privateKey
-  }
-  // @ts-ignore-next-line
-  return cachedWeb3.eth.accounts.privateKeyToAccount(privateKey).address
-}
 
 export async function sendTransactionWithPrivateKey<T>(
   web3: Web3,
@@ -37,7 +16,7 @@ export async function sendTransactionWithPrivateKey<T>(
   privateKey: string,
   txArgs: any
 ) {
-  const address = generateAccountAddressFromPrivateKey(privateKey.slice(2))
+  const address = privateKeyToAddress(privateKey)
   const encodedTxData = tx.encodeABI()
   const estimatedGas = await tx.estimateGas({
     ...txArgs,
