@@ -1,4 +1,10 @@
-import { privateToAddress, privateToPublic, pubToAddress, toChecksumAddress } from 'ethereumjs-util'
+import {
+  isValidPrivate,
+  privateToAddress,
+  privateToPublic,
+  pubToAddress,
+  toChecksumAddress,
+} from 'ethereumjs-util'
 
 export type Address = string
 
@@ -43,6 +49,8 @@ export function stripHexLeader(hexString: string): string {
 export function ensureHexLeader(hexString: string): string {
   return '0x' + stripHexLeader(hexString)
 }
+export const isValidPrivateKey = (privateKey: string) =>
+  privateKey.startsWith('0x') && isValidPrivate(Buffer.from(privateKey.slice(2), 'hex'))
 
 export { isValidAddress } from 'ethereumjs-util'
 export { toChecksumAddress } from 'ethereumjs-util'
