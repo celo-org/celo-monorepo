@@ -8,56 +8,16 @@ import { assert } from 'chai'
 import Web3 from 'web3'
 import {
   assertAlmostEqual,
+  EPOCH,
   getContext,
   getEnode,
+  getValidatorGroupPrivateKey,
   GethInstanceConfig,
   importGenesis,
   initAndStartGeth,
+  newMemberSwapper,
   sleep,
 } from './utils'
-
-interface MemberSwapper {
-  swap(): Promise<void>
-}
-
-async function newMemberSwapper(kit: ContractKit, members: string[]): Promise<MemberSwapper> {
-  let index = 0
-  const group = (await kit.web3.eth.getAccounts())[0]
-  await Promise.all(members.slice(1).map((member) => removeMember(member)))
-
-  async function removeMember(member: string) {
-    return (await kit.contracts.getValidators())
-      .removeMember(member)
-      .sendAndWaitForReceipt({ from: group })
-  }
-
-  async function addMember(member: string) {
-    return (await (await kit.contracts.getValidators()).addMember(
-      group,
-      member
-    )).sendAndWaitForReceipt({ from: group })
-  }
-
-  async function getGroupMembers() {
-    const groupInfo = await (await kit._web3Contracts.getValidators()).methods
-      .getValidatorGroup(group)
-      .call()
-    return groupInfo[0]
-  }
-
-  return {
-    async swap() {
-      const removedMember = members[index % members.length]
-      await removeMember(members[index % members.length])
-      index = index + 1
-      const addedMember = members[index % members.length]
-      await addMember(members[index % members.length])
-      const groupMembers = await getGroupMembers()
-      assert.include(groupMembers, addedMember)
-      assert.notInclude(groupMembers, removedMember)
-    },
-  }
-}
 
 interface KeyRotator {
   rotate(): Promise<void>
@@ -182,19 +142,6 @@ describe('governance tests', () => {
     }
   }
 
-  const getValidatorGroupPrivateKey = async () => {
-    const [groupAddress] = await validators.methods.getRegisteredValidatorGroups().call()
-    const name = await accounts.methods.getName(groupAddress).call()
-    const encryptedKeystore64 = name.split(' ')[1]
-    const encryptedKeystore = JSON.parse(Buffer.from(encryptedKeystore64, 'base64').toString())
-    // The validator group ID is the validator group keystore encrypted with validator 0's
-    // private key.
-    // @ts-ignore
-    const encryptionKey = `0x${gethConfig.instances[0].privateKey}`
-    const decryptedKeystore = web3.eth.accounts.decrypt(encryptedKeystore, encryptionKey)
-    return decryptedKeystore.privateKey
-  }
-
   const activate = async (account: string, txOptions: any = {}) => {
     const [group] = await validators.methods.getRegisteredValidatorGroups().call()
     const tx = election.methods.activate(group)
@@ -233,7 +180,7 @@ describe('governance tests', () => {
     before(async function(this: any) {
       this.timeout(0) // Disable test timeout
       await restart()
-      const groupPrivateKey = await getValidatorGroupPrivateKey()
+      const groupPrivateKey = await getValidatorGroupPrivateKey(kit, gethConfig.instances[0])
       const rotation0PrivateKey =
         '0xa42ac9c99f6ab2c96ee6cae1b40d36187f65cd878737f6623cd363fb94ba7087'
       const rotation1PrivateKey =
@@ -288,7 +235,7 @@ describe('governance tests', () => {
       validatorAccounts = await getValidatorGroupMembers()
       assert.equal(validatorAccounts.length, 5)
       epoch = new BigNumber(await validators.methods.getEpochSize().call()).toNumber()
-      assert.equal(epoch, 10)
+      assert.equal(epoch, EPOCH)
 
       // Give the nodes time to sync, and time for an epoch transition so we can activate our vote.
       let blockNumber: number

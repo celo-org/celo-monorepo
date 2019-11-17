@@ -1,3 +1,6 @@
+// tslint:disable-next-line: no-reference (Required to make this work w/ ts-node)
+/// <reference path="../../../contractkit/types/web3.d.ts" />
+import { ContractKit } from '@celo/contractkit'
 import BigNumber from 'bignumber.js'
 import { assert } from 'chai'
 import { spawn, SpawnOptions } from 'child_process'
@@ -36,10 +39,77 @@ export interface GethTestConfig {
   genesisConfig?: any
 }
 
+export const EPOCH = 10
 const TEST_DIR = '/tmp/e2e'
 const GENESIS_PATH = `${TEST_DIR}/genesis.json`
 const NetworkId = 1101
 const MonorepoRoot = resolvePath(joinPath(__dirname, '../..', '../..'))
+
+export interface MemberSwapper {
+  swap(): Promise<void>
+}
+
+export async function newMemberSwapper(
+  kit: ContractKit,
+  members: string[]
+): Promise<MemberSwapper> {
+  let index = 0
+  const group = (await kit.web3.eth.getAccounts())[0]
+  await Promise.all(members.slice(1).map((member) => removeMember(member)))
+
+  async function removeMember(member: string) {
+    console.log('removing', member)
+    return (await kit.contracts.getValidators())
+      .removeMember(member)
+      .sendAndWaitForReceipt({ from: group })
+  }
+
+  async function addMember(member: string) {
+    console.log('adding', member)
+    return (await (await kit.contracts.getValidators()).addMember(
+      group,
+      member
+    )).sendAndWaitForReceipt({ from: group })
+  }
+
+  async function getGroupMembers() {
+    const groupInfo = await (await kit._web3Contracts.getValidators()).methods
+      .getValidatorGroup(group)
+      .call()
+    return groupInfo[0]
+  }
+
+  return {
+    async swap() {
+      const removedMember = members[index % members.length]
+      await removeMember(members[index % members.length])
+      index = index + 1
+      const addedMember = members[index % members.length]
+      await addMember(members[index % members.length])
+      const groupMembers = await getGroupMembers()
+      assert.include(groupMembers, addedMember)
+      assert.notInclude(groupMembers, removedMember)
+    },
+  }
+}
+
+export async function getValidatorGroupPrivateKey(
+  kit: ContractKit,
+  gethConfig: GethInstanceConfig
+) {
+  const validators = await kit._web3Contracts.getValidators()
+  const accounts = await kit._web3Contracts.getAccounts()
+  const [groupAddress] = await validators.methods.getRegisteredValidatorGroups().call()
+  const name = await accounts.methods.getName(groupAddress).call()
+  const encryptedKeystore64 = name.split(' ')[1]
+  const encryptedKeystore = JSON.parse(Buffer.from(encryptedKeystore64, 'base64').toString())
+  // The validator group ID is the validator group keystore encrypted with validator 0's
+  // private key.
+  // @ts-ignore
+  const encryptionKey = `0x${gethConfig.privateKey}`
+  const decryptedKeystore = kit.web3.eth.accounts.decrypt(encryptedKeystore, encryptionKey)
+  return decryptedKeystore.privateKey
+}
 
 export function assertAlmostEqual(
   actual: BigNumber,
@@ -103,69 +173,6 @@ export async function execCmdWithExitOnFailure(
   }
 }
 
-// TODO(asa): Use the contract kit here instead
-export const erc20Abi = [
-  // balanceOf
-  {
-    constant: true,
-    inputs: [{ name: '_owner', type: 'address' }],
-    name: 'balanceOf',
-    outputs: [{ name: 'balance', type: 'uint256' }],
-    type: 'function',
-  },
-  {
-    constant: false,
-    inputs: [
-      {
-        name: 'to',
-        type: 'address',
-      },
-      {
-        name: 'value',
-        type: 'uint256',
-      },
-    ],
-    name: 'transfer',
-    outputs: [
-      {
-        name: '',
-        type: 'bool',
-      },
-    ],
-    payable: false,
-    stateMutability: 'nonpayable',
-    type: 'function',
-  },
-  {
-    constant: false,
-    inputs: [],
-    name: 'totalSupply',
-    outputs: [
-      {
-        name: '',
-        type: 'uint256',
-      },
-    ],
-    payable: false,
-    stateMutability: 'view',
-    type: 'function',
-  },
-  {
-    constant: true,
-    inputs: [],
-    name: 'firstBlockWithReward',
-    outputs: [
-      {
-        name: '',
-        type: 'uint256',
-      },
-    ],
-    payable: false,
-    stateMutability: 'view',
-    type: 'function',
-  },
-]
-
 async function checkoutGethRepo(branch: string, path: string) {
   await execCmdWithExitOnFailure('rm', ['-rf', path])
   await execCmdWithExitOnFailure('git', [
@@ -193,7 +200,7 @@ function writeGenesis(validators: Validator[], path: string, configOverrides: an
   const genesis = generateGenesis({
     validators,
     blockTime: 0,
-    epoch: 10,
+    epoch: EPOCH,
     requestTimeout: 3000,
     chainId: NetworkId,
     ...configOverrides,
