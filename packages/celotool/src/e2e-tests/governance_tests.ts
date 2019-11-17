@@ -47,13 +47,11 @@ async function newMemberSwapper(kit: ContractKit, members: string[]): Promise<Me
 
   return {
     async swap() {
-      console.log('swapping members')
       const removedMember = members[index % members.length]
-      console.log(await removeMember(members[index % members.length]))
+      await removeMember(members[index % members.length])
       index = index + 1
       const addedMember = members[index % members.length]
-      console.log(await addMember(members[index % members.length]))
-      console.log('done swapping members')
+      await addMember(members[index % members.length])
       const groupMembers = await getGroupMembers()
       assert.include(groupMembers, addedMember)
       assert.notInclude(groupMembers, removedMember)
@@ -101,14 +99,10 @@ async function newKeyRotator(
         const signerWeb3 = web3s[index]
         const signer: string = (await signerWeb3.eth.getAccounts())[0]
         const signerPrivateKey = privateKeys[index]
-        console.log('rotating keys')
-        console.log(
-          await Promise.all([
-            authorizeValidatorSigner(signer, signerWeb3),
-            updateValidatorBlsKey(signerPrivateKey),
-          ])
-        )
-        console.log('rotated keys')
+        await Promise.all([
+          authorizeValidatorSigner(signer, signerWeb3),
+          updateValidatorBlsKey(signerPrivateKey),
+        ])
         index += 1
         assert.equal(await accountsWrapper.getValidatorSigner(validator), signer)
       }
@@ -232,7 +226,7 @@ describe('governance tests', () => {
     assertAlmostEqual(currentBalance.minus(previousBalance), expected)
   }
 
-  describe.only('when the validator set is changing', () => {
+  describe('when the validator set is changing', () => {
     let epoch: number
     const blockNumbers: number[] = []
     let validatorAccounts: string[]
@@ -325,7 +319,6 @@ describe('governance tests', () => {
       let errorWhileChangingValidatorSet = ''
       const changeValidatorSet = async (header: any) => {
         try {
-          console.log('got new header', header.number)
           blockNumbers.push(header.number)
           // At the start of epoch N, perform actions so the validator set is different for epoch N + 1.
           // Note that all of these actions MUST complete within the epoch.

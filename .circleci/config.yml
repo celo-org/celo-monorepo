@@ -525,7 +525,7 @@ jobs:
           command: |
             set -e
             cd packages/celotool
-            ./ci_test_transfers.sh checkout asaj/e2e-master
+            ./ci_test_transfers.sh checkout master
 
   end-to-end-geth-blockchain-parameters-test:
     <<: *e2e-defaults
@@ -543,7 +543,7 @@ jobs:
           command: |
             set -e
             cd packages/celotool
-            ./ci_test_blockchain_parameters.sh checkout asaj/e2e-master
+            ./ci_test_blockchain_parameters.sh checkout master
 
   end-to-end-geth-governance-test:
     <<: *e2e-defaults
@@ -563,7 +563,7 @@ jobs:
           command: |
             set -e
             cd packages/celotool
-            ./ci_test_governance.sh checkout asaj/e2e-master
+            ./ci_test_governance.sh checkout master
 
   end-to-end-geth-sync-test:
     <<: *e2e-defaults
@@ -582,7 +582,7 @@ jobs:
           command: |
             set -e
             cd packages/celotool
-            ./ci_test_sync.sh checkout asaj/e2e-master
+            ./ci_test_sync.sh checkout master
 
   end-to-end-geth-validator-order-test:
     <<: *e2e-defaults
@@ -600,7 +600,7 @@ jobs:
           command: |
             set -e
             cd packages/celotool
-            ./ci_test_validator_order.sh checkout asaj/e2e-master
+            ./ci_test_validator_order.sh checkout master
 
   web:
     working_directory: ~/app
@@ -672,9 +672,64 @@ workflows:
   celo-monorepo-build:
     jobs:
       - install_dependencies
-      - end-to-end-geth-governance-test:
+      - end-to-end-mobile-test:
           requires:
             - install_dependencies
+            - mobile-test-build-app
+      - lint-checks:
+          requires:
+            - install_dependencies
+      - general-test:
+          requires:
+            - install_dependencies
+      - walletkit-test:
+          requires:
+            - install_dependencies
+      - cli-test:
+          requires:
+            - install_dependencies
+      - contractkit-test:
+          requires:
+            - install_dependencies
+      - mobile-test:
+          requires:
+            - lint-checks
+      - mobile-test-build-app:
+          requires:
+            - mobile-test
+      - verification-pool-api:
+          requires:
+            - lint-checks
+      - protocol-test:
+          requires:
+            - lint-checks
+            - walletkit-test
+      - typescript-test:
+          requires:
+            - install_dependencies
+      - utils-test:
+          requires:
+            - install_dependencies
+      - end-to-end-geth-transfer-test:
+          requires:
+            - lint-checks
+            - contractkit-test
+      - end-to-end-geth-blockchain-parameters-test:
+          requires:
+            - lint-checks
+            - contractkit-test
+      - end-to-end-geth-governance-test:
+          requires:
+            - lint-checks
+            - contractkit-test
+      - end-to-end-geth-sync-test:
+          requires:
+            - lint-checks
+            - contractkit-test
+      - end-to-end-geth-validator-order-test:
+          requires:
+            - lint-checks
+            - contractkit-test
   npm-install-testing-cron-workflow:
     triggers:
       - schedule:
