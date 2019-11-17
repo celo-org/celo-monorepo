@@ -632,7 +632,7 @@ contract Governance is
    * @notice Returns whether given hotfix hash has been whitelisted by given address.
    * @param hash The abi encoded keccak256 hash of the hotfix transaction(s) to be whitelisted.
    * @param whitelister Address to check whitelist status of. 
-   */  
+   */
   function isHotfixWhitelistedBy(bytes32 hash, address whitelister) public view returns (bool) {
     return hotfixes[hash].whitelisted[whitelister];
   }
@@ -868,7 +868,7 @@ contract Governance is
     return voters[account].mostRecentReferendumProposal;
   }
 
-    /**
+  /**
    * @notice Returns number of validators from current set which have whitelisted the given hotfix.
    * @param hash The abi encoded keccak256 hash of the hotfix transaction.
    * @return Whitelist tally
