@@ -1,7 +1,7 @@
 import { ContractKit, newKit } from '@celo/contractkit'
 import { AttestationsWrapper } from '@celo/contractkit/lib/wrappers/Attestations'
 import { assert } from 'chai'
-import { getContext, GethTestConfig, sleep } from './utils'
+import { getContext, GethTestConfig } from './utils'
 
 const validatorAddress = '0x47e172f6cfb6c7d01c1574fa3e2be7cc73269d95'
 const phoneNumber = '+15555555555'
