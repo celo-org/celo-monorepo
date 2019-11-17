@@ -291,13 +291,12 @@ describe('governance tests', () => {
       epoch = new BigNumber(await validators.methods.getEpochSize().call()).toNumber()
       assert.equal(epoch, 10)
 
-      // Give the nodes time to sync, and time for an epoch transition so we can activate our vote.
+      // Wait for an epoch transition so we can activate our vote.
       let blockNumber: number
       do {
         blockNumber = await web3.eth.getBlockNumber()
         await sleep(0.1)
-      } while (blockNumber % epoch !== 0)
-
+      } while (blockNumber % epoch !== 1)
       await activate(validatorAccounts[0])
 
       // Prepare for member swapping.
