@@ -7,7 +7,7 @@ import {
   initAndStartGeth,
   killInstance,
   sleep,
-  waitToStartAndFinishSyncing,
+  waitToFinishSyncing,
 } from './utils'
 
 describe('sync tests', function(this: any) {
@@ -40,7 +40,7 @@ describe('sync tests', function(this: any) {
     }
     await initAndStartGeth(hooks.gethBinaryPath, fullInstance)
     const web3 = new Web3('http://localhost:8553')
-    await waitToStartAndFinishSyncing(web3)
+    await waitToFinishSyncing(web3)
   })
 
   after(hooks.after)
@@ -68,7 +68,7 @@ describe('sync tests', function(this: any) {
         const validatingWeb3 = new Web3(`http://localhost:8545`)
         const validatingFirstBlock = await validatingWeb3.eth.getBlockNumber()
         const syncWeb3 = new Web3(`http://localhost:8555`)
-        await waitToStartAndFinishSyncing(syncWeb3)
+        await waitToFinishSyncing(syncWeb3)
         // Give the validators time to create more blocks.
         await sleep(2)
         const validatingLatestBlock = await validatingWeb3.eth.getBlockNumber()
