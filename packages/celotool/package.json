@@ -6,8 +6,9 @@
   "author": "Celo",
   "license": "Apache-2.0",
   "dependencies": {
-    "@celo/verification-pool-api": "^1.0.0",
+    "@celo/contractkit": "0.1.6",
     "@celo/utils": "^0.1.0",
+    "@celo/verification-pool-api": "^1.0.0",
     "@celo/walletkit": "^0.0.14",
     "@celo/contractkit": "0.2.5-dev",
     "@google-cloud/monitoring": "0.7.1",
@@ -36,12 +37,14 @@
     "@types/dotenv": "^4.0.3",
     "@types/mocha": "^5.2.1",
     "@types/node-fetch": "^2.1.2",
+    "@types/portscanner": "^2.1.0",
     "@types/prompts": "^1.1.1",
     "@types/web3": "^1.0.18",
     "@types/yargs": "^13.0.2",
     "chai": "^4.1.2",
     "commander": "^2.20.3",
-    "mocha": "^5.1.1"
+    "mocha": "^5.1.1",
+    "portscanner": "^2.2.0"
   },
   "scripts": {
     "cli": "TS_NODE_FILES=true ts-node -r tsconfig-paths/register src/cli.ts",
