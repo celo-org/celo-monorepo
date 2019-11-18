@@ -23,8 +23,6 @@ For this reason, despite the fact that Celo uses a proof-of-stake protocol, user
 A note about conventions:  
 The code you'll see on this page is bash commands and their output.
 
-A $ signifies the bash prompt. Everything following it is the command you should run in a terminal. The $ isn't part of the command, so don't copy it.
-
 When you see text in angle brackets &lt;&gt;, replace them and the text inside with your own value of what it refers to. Don't include the &lt;&gt; in the command.
 {% endhint %}
 
@@ -34,14 +32,14 @@ First we are going to setup the environment depending on the network we want to 
 
 ```bash
 # If you want to connect to Baklava:
-$ export CELO_NETWORK=baklava
-$ export CELO_IMAGE=us.gcr.io/celo-testnet/celo-node
-$ export NETWORK_ID=1101
+export CELO_NETWORK=baklava
+export CELO_IMAGE=us.gcr.io/celo-testnet/celo-node
+export NETWORK_ID=1101
 
 # If you want to connect to Alfajores:
-$ export CELO_NETWORK=alfajores
-$ export CELO_IMAGE=us.gcr.io/celo-testnet/celo-node
-$ export NETWORK_ID=44785
+export CELO_NETWORK=alfajores
+export CELO_IMAGE=us.gcr.io/celo-testnet/celo-node
+export NETWORK_ID=44785
 ```
 
 ## **Pull the Celo Docker image**
@@ -53,7 +51,7 @@ If you are re-running these instructions, the Celo Docker image may have been up
 Run:
 
 ```bash
-$ docker pull $CELO_IMAGE:$CELO_NETWORK
+docker pull $CELO_IMAGE:$CELO_NETWORK
 ```
 
 ## **Set up a data directory**
@@ -61,8 +59,8 @@ $ docker pull $CELO_IMAGE:$CELO_NETWORK
 First, create the directory that will store your node's configuration and its copy of the blockchain. This directory can be named anything you'd like, but here's a default you can use. The commands below create a directory and then navigate into it. The rest of the steps assume you are running the commands from inside this directory.
 
 ```bash
-$ mkdir celo-data-dir
-$ cd celo-data-dir
+mkdir celo-data-dir
+cd celo-data-dir
 ```
 
 ## **Create an account and get its address**
@@ -72,7 +70,7 @@ In this step, you'll create an account on the network. If you've already done th
 Run the command to create a new account:
 
 ```bash
-$ docker run -v `pwd`:/root/.celo --entrypoint /bin/sh -it $CELO_IMAGE:$CELO_NETWORK -c "geth account new"
+docker run -v $PWD:/root/.celo --entrypoint /bin/sh -it $CELO_IMAGE:$CELO_NETWORK -c "geth account new"
 ```
 
 It will prompt you for a passphrase, ask you to confirm it, and then will output your account address: `Address: {<YOUR-ACCOUNT-ADDRESS>}`
@@ -80,7 +78,7 @@ It will prompt you for a passphrase, ask you to confirm it, and then will output
 Save this address to an environment variables, so that you can reference it below (don't include the braces):
 
 ```bash
-$ export CELO_ACCOUNT_ADDRESS=<YOUR-ACCOUNT-ADDRESS>
+export CELO_ACCOUNT_ADDRESS=<YOUR-ACCOUNT-ADDRESS>
 ```
 
 _Note: this environment variable will only persist while you have this terminal window open. If you want this environment variable to be available in the future, you can add it to your `~/.bash_profile_
@@ -90,13 +88,13 @@ _Note: this environment variable will only persist while you have this terminal 
 The genesis block is the first block in the chain, and is specific to each network. This command gets the `genesis.json` file for alfajores and uses it to initialize your nodes' data directory.
 
 ```bash
-$ docker run -v `pwd`:/root/.celo $CELO_IMAGE:$CELO_NETWORK init /celo/genesis.json
+docker run -v $PWD:/root/.celo $CELO_IMAGE:$CELO_NETWORK init /celo/genesis.json
 ```
 
 In order to allow the node to sync with the network, give it the address of existing nodes in the network:
 
 ```bash
-$ docker run -v `pwd`:/root/.celo --entrypoint cp $CELO_IMAGE:$CELO_NETWORK /celo/static-nodes.json /root/.celo/
+docker run -v $PWD:/root/.celo --entrypoint cp $CELO_IMAGE:$CELO_NETWORK /celo/static-nodes.json /root/.celo/
 ```
 
 ## **Start the node**
@@ -104,7 +102,7 @@ $ docker run -v `pwd`:/root/.celo --entrypoint cp $CELO_IMAGE:$CELO_NETWORK /cel
 This command specifies the settings needed to run the node, and gets it started.
 
 ```bash
-$ docker run -p 127.0.0.1:8545:8545 -p 127.0.0.1:8546:8546 -p 30303:30303 -p 30303:30303/udp -v `pwd`:/root/.celo $CELO_IMAGE:$CELO_NETWORK --verbosity 3 --networkid $NETWORK_ID --syncmode full --rpc --rpcaddr 0.0.0.0 --rpcapi eth,net,web3,debug,admin,personal --lightserv 90 --lightpeers 1000 --maxpeers 1100 --etherbase $CELO_ACCOUNT_ADDRESS
+docker run -p 127.0.0.1:8545:8545 -p 127.0.0.1:8546:8546 -p 30303:30303 -p 30303:30303/udp -v $PWD:/root/.celo $CELO_IMAGE:$CELO_NETWORK --verbosity 3 --networkid $NETWORK_ID --syncmode full --rpc --rpcaddr 0.0.0.0 --rpcapi eth,net,web3,debug,admin,personal --lightserv 90 --lightpeers 1000 --maxpeers 1100 --etherbase $CELO_ACCOUNT_ADDRESS
 ```
 
 You'll start seeing some output. There may be some errors or warnings that are ignorable. After a few minutes, you should see lines that look like this. This means your node has synced with the network and is receiving blocks.
