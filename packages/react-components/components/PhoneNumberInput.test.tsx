@@ -118,7 +118,9 @@ describe('when defaultCountry is truthy', () => {
       />
     )
 
-    wrapper.instance().getPhoneNumberFromNativePicker = jest.fn(async () => '+1 416-868-0000')
+    wrapper.instance()._getPhoneNumberFromNativePickerAndroid = jest.fn(
+      async () => '+1 416-868-0000'
+    )
 
     wrapper.instance().setState({})
     await wrapper.instance().triggerPhoneNumberRequest()
@@ -146,7 +148,9 @@ describe('when defaultCountry is truthy', () => {
       />
     )
 
-    wrapper.instance().getPhoneNumberFromNativePicker = jest.fn(async () => '+1 415-426-5200')
+    wrapper.instance()._getPhoneNumberFromNativePickerAndroid = jest.fn(
+      async () => '+1 415-426-5200'
+    )
 
     wrapper.instance().setState({})
     await wrapper.instance().triggerPhoneNumberRequest()

@@ -53,7 +53,7 @@ export default class PhoneNumberInput extends React.Component<Props, State> {
 
   componentDidMount() {
     if (this.props.defaultCountry) {
-      this.onChangeCountryQuery(this.props.defaultCountry)
+      this.ChangeCountryQuery(this.props.defaultCountry)
     }
 
     if (this.props.defaultCountryCode) {
@@ -61,7 +61,7 @@ export default class PhoneNumberInput extends React.Component<Props, State> {
         this.props.defaultCountryCode
       )
 
-      this.onChangeCountryQuery(country.displayName)
+      this.ChangeCountryQuery(country.displayName)
     }
 
     if (this.props.defaultPhoneNumber) {
@@ -69,17 +69,15 @@ export default class PhoneNumberInput extends React.Component<Props, State> {
     }
   }
 
-  async getPhoneNumberFromNativePicker() {
-    // linter doesn't allow following code without splitting this code in two lines
-    const number = await SmsRetriever.requestPhoneNumber()
-    return number
+  async _getPhoneNumberFromNativePickerAndroid() {
+    return SmsRetriever.requestPhoneNumber()
   }
 
   async triggerPhoneNumberRequestAndroid() {
     try {
       let phone
       try {
-        phone = await this.getPhoneNumberFromNativePicker()
+        phone = await this._getPhoneNumberFromNativePickerAndroid()
       } catch (error) {
         console.info(
           `${TAG}/triggerPhoneNumberRequestAndroid`,
@@ -95,11 +93,13 @@ export default class PhoneNumberInput extends React.Component<Props, State> {
       }
       this.setState({ phoneNumber: phoneNumber.displayNumber.toString() })
 
+      // A country code is not enough to know the country of a phone number (e.g. both the US and Canada share the +1)
+      // To get the country a Region Code is required, a two-letter country/region identifier (ISO-3166-1 Alpha2)
       const regionCode = phoneNumber.regionCode
 
       if (regionCode) {
         const displayName = this.state.countries.getCountryByCode(regionCode).displayName
-        this.onChangeCountryQuery(displayName)
+        this.ChangeCountryQuery(displayName)
       }
     } catch (error) {
       console.info(`${TAG}/triggerPhoneNumberRequestAndroid`, 'Could not request phone', error)
@@ -107,10 +107,6 @@ export default class PhoneNumberInput extends React.Component<Props, State> {
   }
 
   async triggerPhoneNumberRequest() {
-    if (this.state.phoneNumber || this.state.countryQuery) {
-      return
-    }
-
     try {
       if (Platform.OS === 'android') {
         await this.triggerPhoneNumberRequestAndroid()
@@ -126,10 +122,13 @@ export default class PhoneNumberInput extends React.Component<Props, State> {
     if (this.props.onInputFocus) {
       await this.props.onInputFocus()
     }
-    await this.triggerPhoneNumberRequest()
+
+    if (!(this.state.phoneNumber || this.state.countryQuery)) {
+      return this.triggerPhoneNumberRequest()
+    }
   }
 
-  onChangeCountryQuery = (countryQuery: string) => {
+  ChangeCountryQuery = (countryQuery: string) => {
     if (this.props.onInputChange) {
       this.props.onInputChange()
     }
@@ -196,7 +195,7 @@ export default class PhoneNumberInput extends React.Component<Props, State> {
     const { displayName, emoji, countryCallingCodes } = this.state.countries.getCountryByCode(
       countryCode
     )
-    const onPress = () => this.onChangeCountryQuery(displayName)
+    const onPress = () => this.ChangeCountryQuery(displayName)
 
     return (
       <TouchableOpacity onPress={onPress}>
@@ -246,7 +245,7 @@ export default class PhoneNumberInput extends React.Component<Props, State> {
             data={filteredCountries}
             keyExtractor={this.keyExtractor}
             defaultValue={countryQuery}
-            onChangeText={this.onChangeCountryQuery}
+            onChangeText={this.ChangeCountryQuery}
             onEndEditing={this.props.onEndEditingCountryCode}
             placeholder={this.props.inputCountryPlaceholder}
             renderItem={this.renderItem}
