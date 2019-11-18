@@ -152,12 +152,17 @@ export class BackupQuiz extends React.Component<Props, State> {
           <Text style={fontStyles.h1}>{t('confirmBackupKey')}</Text>
           <View style={styles.chosenWordsContainer}>
             {_.times(mnemonicLength, (i) => (
-              <Text
+              <View
+                style={[
+                  styles.chosenWordWrapper,
+                  userChosenWords[i] && styles.chosenWordWrapperFilled,
+                ]}
                 key={`selected-word-${i}`}
-                style={[styles.chosenWord, userChosenWords[i] && styles.chosenWordFilled]}
               >
-                {(userChosenWords[i] && userChosenWords[i].word) || i + 1}
-              </Text>
+                <Text style={userChosenWords[i] ? styles.chosenWordFilled : styles.chosenWord}>
+                  {(userChosenWords[i] && userChosenWords[i].word) || i + 1}
+                </Text>
+              </View>
             ))}
           </View>
           <Text style={styles.bodyText}>{t('backupQuizInfo')}</Text>
@@ -245,11 +250,7 @@ const styles = StyleSheet.create({
     flexWrap: 'wrap',
     justifyContent: 'center',
   },
-  chosenWord: {
-    ...fontStyles.bodySmall,
-    lineHeight: undefined,
-    color: colors.lightGray,
-    textAlign: 'center',
+  chosenWordWrapper: {
     paddingVertical: 2,
     paddingHorizontal: 4,
     marginHorizontal: 3,
@@ -259,8 +260,19 @@ const styles = StyleSheet.create({
     borderColor: colors.darkLightest,
     borderRadius: 100,
   },
-  chosenWordFilled: {
+  chosenWordWrapperFilled: {
     backgroundColor: colors.darkLightest,
+  },
+  chosenWord: {
+    ...fontStyles.bodySmall,
+    textAlign: 'center',
+    lineHeight: undefined,
+    color: colors.lightGray,
+  },
+  chosenWordFilled: {
+    ...fontStyles.bodySmall,
+    textAlign: 'center',
+    lineHeight: undefined,
     color: colors.darkSecondary,
   },
   mnemonicButtonsContainer: {

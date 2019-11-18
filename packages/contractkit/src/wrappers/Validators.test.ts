@@ -1,7 +1,8 @@
+import { testWithGanache } from '@celo/dev-utils/lib/ganache-test'
+import { addressToPublicKey } from '@celo/utils/lib/signatureUtils'
 import BigNumber from 'bignumber.js'
 import Web3 from 'web3'
 import { newKitFromWeb3 } from '../kit'
-import { testWithGanache } from '../test-utils/ganache-test'
 import { AccountsWrapper } from './Accounts'
 import { LockedGoldWrapper } from './LockedGold'
 import { ValidatorsWrapper } from './Validators'
@@ -13,15 +14,10 @@ TEST NOTES:
 
 const minLockedGoldValue = Web3.utils.toWei('10', 'ether') // 10 gold
 
-// A random 64 byte hex string.
-const publicKey =
-  'ea0733ad275e2b9e05541341a97ee82678c58932464fad26164657a111a7e37a9fa0300266fb90e2135a1f1512350cb4e985488a88809b14e3cbe415e76e82b2'
 const blsPublicKey =
-  '4d23d8cd06f30b1fa7cf368e2f5399ab04bb6846c682f493a98a607d3dfb7e53a712bb79b475c57b0ac2785460f91301'
+  '0x4d23d8cd06f30b1fa7cf368e2f5399ab04bb6846c682f493a98a607d3dfb7e53a712bb79b475c57b0ac2785460f91301'
 const blsPoP =
-  '9d3e1d8f49f6b0d8e9a03d80ca07b1d24cf1cc0557bdcc04f5e17a46e35d02d0d411d956dbd5d2d2464eebd7b74ae30005d223780d785d2abc5644fac7ac29fb0e302bdc80c81a5d45018b68b1045068a4b3a4861c93037685fd0d252d740501'
-
-const publicKeysData = '0x' + publicKey + blsPublicKey + blsPoP
+  '0x9d3e1d8f49f6b0d8e9a03d80ca07b1d24cf1cc0557bdcc04f5e17a46e35d02d0d411d956dbd5d2d2464eebd7b74ae30005d223780d785d2abc5644fac7ac29fb0e302bdc80c81a5d45018b68b1045068a4b3a4861c93037685fd0d252d740501'
 
 testWithGanache('Validators Wrapper', (web3) => {
   const kit = newKitFromWeb3(web3)
@@ -52,13 +48,12 @@ testWithGanache('Validators Wrapper', (web3) => {
   }
 
   const setupValidator = async (validatorAccount: string) => {
+    const publicKey = await addressToPublicKey(validatorAccount, web3.eth.sign)
     await registerAccountWithLockedGold(validatorAccount)
     // set account1 as the validator
     await validators
-      .registerValidator(
-        // @ts-ignore
-        publicKeysData
-      )
+      // @ts-ignore
+      .registerValidator(publicKey, blsPublicKey, blsPoP)
       .sendAndWaitForReceipt({ from: validatorAccount })
   }
 
