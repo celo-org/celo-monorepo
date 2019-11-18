@@ -70,14 +70,9 @@ export default class PhoneNumberInput extends React.Component<Props, State> {
   }
 
   async _getPhoneNumberFromNativePickerAndroid() {
-    return SmsRetriever.requestPhoneNumber()
-  }
-
-  async triggerPhoneNumberRequestAndroid() {
     try {
-      let phone
       try {
-        phone = await this._getPhoneNumberFromNativePickerAndroid()
+        return SmsRetriever.requestPhoneNumber()
       } catch (error) {
         console.info(
           `${TAG}/triggerPhoneNumberRequestAndroid`,
@@ -86,7 +81,19 @@ export default class PhoneNumberInput extends React.Component<Props, State> {
         )
         return
       }
+    } catch (error) {
+      console.info(`${TAG}/triggerPhoneNumberRequestAndroid`, 'Could not request phone', error)
+    }
+  }
 
+  async triggerPhoneNumberRequest() {
+    let phone
+    try {
+      if (Platform.OS === 'android') {
+        phone = await this._getPhoneNumberFromNativePickerAndroid()
+      } else {
+        console.info(`${TAG}/triggerPhoneNumberRequest`, 'Not implemented in this platform')
+      }
       const phoneNumber = parsePhoneNumber(phone, '')
       if (!phoneNumber) {
         return
@@ -100,18 +107,6 @@ export default class PhoneNumberInput extends React.Component<Props, State> {
       if (regionCode) {
         const displayName = this.state.countries.getCountryByCode(regionCode).displayName
         this.ChangeCountryQuery(displayName)
-      }
-    } catch (error) {
-      console.info(`${TAG}/triggerPhoneNumberRequestAndroid`, 'Could not request phone', error)
-    }
-  }
-
-  async triggerPhoneNumberRequest() {
-    try {
-      if (Platform.OS === 'android') {
-        await this.triggerPhoneNumberRequestAndroid()
-      } else {
-        console.info(`${TAG}/triggerPhoneNumberRequest`, 'Not implemented in this platform')
       }
     } catch (error) {
       console.info(`${TAG}/triggerPhoneNumberRequest`, 'Could not request phone', error)

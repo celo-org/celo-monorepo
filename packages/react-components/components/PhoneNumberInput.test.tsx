@@ -92,7 +92,8 @@ describe('when defaultCountry is truthy', () => {
     )
 
     wrapper.instance().setState({ phoneNumber: testNumber })
-    await wrapper.instance().triggerPhoneNumberRequest()
+    // await wrapper.instance().triggerPhoneNumberRequest()
+    wrapper.findWhere((node) => node.prop('testID') === 'PhoneNumberField').simulate('focus')
 
     expect(
       wrapper.findWhere((node) => node.prop('testID') === 'PhoneNumberField').props().value
