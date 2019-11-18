@@ -248,18 +248,17 @@ async function transferGold(
   amountInEther: number,
   gasFees: BigNumber,
   gasPrice: BigNumber,
-  feeCurrency: Tokens
+  gasCurrency: Tokens
 ) {
   const amountInWei = new BigNumber(amountInEther * 1e18)
   Logger.debug(
     'Send celo gold test',
-    `Testing using account: ${from} -> ${to}, feeCurrency: ${feeCurrency}`
+    `Testing using account: ${from} -> ${to}, gasCurrency: ${gasCurrency}`
   )
   const fromGoldBalanceBefore: BigNumber = await ContractUtils.getGoldBalance(web3, from)
   const fromDollarBalanceBefore: BigNumber = await ContractUtils.getDollarBalance(web3, from)
   const toGoldBalanceBefore: BigNumber = await ContractUtils.getGoldBalance(web3, to)
-  const gatewayFeeRecipient: string = await web3.eth.getCoinbase()
-  const gatewayFee = ContractUtils.defaultGatewayFee
+  const gasFeeRecipient: string = await web3.eth.getCoinbase()
   try {
     // This will go through but subscribing to notifications will fail.
     // "Failed to subscribe to new newBlockHeaders to confirm the transaction receipts."
@@ -271,9 +270,8 @@ async function transferGold(
       amountInWei,
       gasFees,
       gasPrice,
-      gatewayFeeRecipient,
-      gatewayFee,
-      feeCurrency
+      gasFeeRecipient,
+      gasCurrency
     )
     Logger.info('Send celo gold test', `Result of sendGold is ${result}`)
   } catch (error) {
@@ -295,9 +293,9 @@ async function transferGold(
     `Receiver Gold balance ${toGoldBalanceBefore} -> ${toGoldBalanceAfter}`
   )
   const senderBalanceLoss = fromGoldBalanceBefore.minus(fromGoldBalanceAfter).toNumber()
-  if (feeCurrency === Tokens.GOLD) {
+  if (gasCurrency === Tokens.GOLD) {
     expect(senderBalanceLoss > amountInEther).toBe(true)
-  } else if (feeCurrency === Tokens.DOLLAR) {
+  } else if (gasCurrency === Tokens.DOLLAR) {
     Logger.debug(
       'Send celo gold test',
       `Sender Dollar balance ${fromDollarBalanceBefore} -> ${fromDollarBalanceAfter}`
@@ -306,7 +304,7 @@ async function transferGold(
     Logger.debug('Send celo gold test', `Gas cost in Celo Dollars ${gasCostInCeloDollar}`)
     expect(fromDollarBalanceBefore.minus(fromDollarBalanceAfter).toNumber() > 0).toBe(true)
   } else {
-    fail(new Error(`unexpected fee currency ${feeCurrency}`))
+    fail(new Error(`unexpected gas currency ${gasCurrency}`))
   }
   expect(senderBalanceLoss < amountInEther + 0.01).toBe(true)
   expect(toGoldBalanceAfter.minus(toGoldBalanceBefore).toNumber()).toBe(amountInEther)
@@ -319,18 +317,17 @@ async function transferDollar(
   amountInEther: number,
   gasFees: BigNumber,
   gasPrice: BigNumber,
-  feeCurrency: Tokens
+  gasCurrency: Tokens
 ) {
   const amountInWei = new BigNumber(amountInEther * 1e18)
   Logger.debug(
     'Send celo dollar test',
-    `Testing using account: ${from} -> ${to}, feeCurrency: ${feeCurrency}`
+    `Testing using account: ${from} -> ${to}, gasCurrency: ${gasCurrency}`
   )
   const fromGoldBalanceBefore: BigNumber = await ContractUtils.getGoldBalance(web3, from)
   const fromDollarBalanceBefore: BigNumber = await ContractUtils.getDollarBalance(web3, from)
   const toDollarBalanceBefore: BigNumber = await ContractUtils.getDollarBalance(web3, to)
-  const gatewayFeeRecipient: string = await web3.eth.getCoinbase()
-  const gatewayFee = ContractUtils.defaultGatewayFee
+  const gasFeeRecipient: string = await web3.eth.getCoinbase()
   try {
     // This will go through but subscribing to notifications will fail.
     // "Failed to subscribe to new newBlockHeaders to confirm the transaction receipts."
@@ -342,9 +339,8 @@ async function transferDollar(
       amountInWei,
       gasFees,
       gasPrice,
-      gatewayFeeRecipient,
-      gatewayFee,
-      feeCurrency
+      gasFeeRecipient,
+      gasCurrency
     )
     Logger.info('Send celo dollar test', `Result of sendDollar is ${result}`)
   } catch (error) {
@@ -366,12 +362,12 @@ async function transferDollar(
     `Receiver Dollar balance ${toDollarBalanceBefore} -> ${toDollarBalanceAfter}`
   )
   const senderGoldBalanceLoss = fromGoldBalanceBefore.minus(fromGoldBalanceAfter).toNumber()
-  if (feeCurrency === Tokens.GOLD) {
+  if (gasCurrency === Tokens.GOLD) {
     const gasCostInCeloGold = fromGoldBalanceBefore.minus(fromGoldBalanceAfter).toNumber()
     Logger.debug('Send celo dollar test', `Gas cost in Celo Gold ${gasCostInCeloGold}`)
     expect(gasCostInCeloGold > 0).toBe(true)
     expect(senderGoldBalanceLoss < amountInEther + 0.01).toBe(true)
-  } else if (feeCurrency === Tokens.DOLLAR) {
+  } else if (gasCurrency === Tokens.DOLLAR) {
     Logger.debug(
       'Send celo dollar test',
       `Sender Dollar balance ${fromDollarBalanceBefore} -> ${fromDollarBalanceAfter}`
@@ -383,7 +379,7 @@ async function transferDollar(
     Logger.debug('Send celo dollar test', `Gas cost in Celo Dollars ${gasCostInCeloDollar}`)
     expect(gasCostInCeloDollar > 0).toBe(true)
   } else {
-    fail(new Error(`unexpected fee currency ${feeCurrency}`))
+    fail(new Error(`unexpected gas currency ${gasCurrency}`))
   }
   expect(toDollarBalanceAfter.minus(toDollarBalanceBefore).toNumber()).toBe(amountInEther)
 }

@@ -18,9 +18,6 @@ import { Logger } from './logger'
 import { CeloTransaction } from './transaction-utils'
 
 export default class ContractUtils {
-  // TODO(nategraf): Allow this paramter to be fetched from the full-node peer.
-  static readonly defaultGatewayFee = new BigNumber(10000)
-
   static async getGoldBalance(web3: Web3, accountNumber: string): Promise<BigNumber> {
     const goldToken: GoldTokenType = await getGoldTokenContract(web3)
     const balance = await getErc20Balance(goldToken, accountNumber, web3)
@@ -66,18 +63,17 @@ export default class ContractUtils {
     amount: BigNumber,
     gasFees: BigNumber,
     gasPrice?: BigNumber,
-    gatewayFeeRecipient?: string,
-    gatewayFee?: BigNumber,
-    feeCurrency: Tokens = Tokens.GOLD,
+    gasFeeRecipient?: string,
+    gasCurrency: Tokens = Tokens.GOLD,
     networkId?: number
   ): Promise<TransactionReceipt> {
     // Do nothing for the default currency Gold
-    let feeCurrencyAddress: string | undefined
-    if (feeCurrency !== Tokens.GOLD) {
-      feeCurrencyAddress = await ContractUtils.getAddressForCurrencyContract(web3, feeCurrency)
+    let gasCurrencyAddress: string | undefined
+    if (gasCurrency !== Tokens.GOLD) {
+      gasCurrencyAddress = await ContractUtils.getAddressForCurrencyContract(web3, gasCurrency)
     }
     if (gasPrice === undefined) {
-      gasPrice = await ContractUtils.getGasPrice(web3, feeCurrency)
+      gasPrice = await ContractUtils.getGasPrice(web3, gasCurrency)
       Logger.debug('sendGold', `Gas price will be ${gasPrice}`)
     }
 
@@ -88,9 +84,8 @@ export default class ContractUtils {
       value: amount.toString(),
       gas: gasFees.toString(),
       gasPrice: gasPrice.toString(),
-      feeCurrency: feeCurrencyAddress,
-      gatewayFeeRecipient,
-      gatewayFee: gatewayFee && gatewayFee.toString(),
+      gasCurrency: gasCurrencyAddress,
+      gasFeeRecipient,
     }
     Logger.debug('sendGold', `Transaction is ${JSON.stringify(transaction)}`)
     return web3.eth.sendTransaction(transaction)
@@ -103,18 +98,17 @@ export default class ContractUtils {
     amount: BigNumber,
     gasFees: BigNumber,
     gasPrice?: BigNumber,
-    gatewayFeeRecipient?: string,
-    gatewayFee?: BigNumber,
-    feeCurrency: Tokens = Tokens.GOLD,
+    gasFeeRecipient?: string,
+    gasCurrency: Tokens = Tokens.GOLD,
     networkId?: number
   ): Promise<boolean> {
     // Do nothing for the default currency Gold
-    let feeCurrencyAddress: string | undefined
-    if (feeCurrency !== Tokens.GOLD) {
-      feeCurrencyAddress = await ContractUtils.getAddressForCurrencyContract(web3, feeCurrency)
+    let gasCurrencyAddress: string | undefined
+    if (gasCurrency !== Tokens.GOLD) {
+      gasCurrencyAddress = await ContractUtils.getAddressForCurrencyContract(web3, gasCurrency)
     }
     if (gasPrice === undefined) {
-      gasPrice = await ContractUtils.getGasPrice(web3, feeCurrency)
+      gasPrice = await ContractUtils.getGasPrice(web3, gasCurrency)
       Logger.debug('sendGold', `Gas price will be ${gasPrice}`)
     }
 
@@ -129,9 +123,8 @@ export default class ContractUtils {
       from: fromAccountNumber,
       gas: gasFees.toString(),
       gasPrice: gasPrice.toString(),
-      feeCurrency: feeCurrencyAddress,
-      gatewayFeeRecipient,
-      gatewayFee: gatewayFee && gatewayFee.toString(),
+      gasCurrency: gasCurrencyAddress,
+      gasFeeRecipient,
     }
     return tx.send(celoTransactionParams)
   }
@@ -154,11 +147,11 @@ export default class ContractUtils {
     return tx.send({ from: fromAccountNumber, gas: gasFee.toString() })
   }
 
-  static async getGasPrice(web3: Web3, feeCurrency: Tokens = Tokens.GOLD): Promise<BigNumber> {
+  static async getGasPrice(web3: Web3, gasCurrency: Tokens = Tokens.GOLD): Promise<BigNumber> {
     const gasPriceMinimum: GasPriceMinimumType = await getGasPriceMinimumContract(web3)
     const currencyAddress: string = await ContractUtils.getAddressForCurrencyContract(
       web3,
-      feeCurrency
+      gasCurrency
     )
 
     const gasPriceMinimumInCurrency = await gasPriceMinimum.methods

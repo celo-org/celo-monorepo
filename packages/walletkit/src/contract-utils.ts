@@ -15,9 +15,6 @@ import { Logger } from './logger'
 
 const gasInflateFactor = 1.3
 
-// TODO(nategraf): Allow this paramter to be fetched from the full-node peer.
-const defaultGatewayFee = new BigNumber(10000)
-
 export function selectContractByAddress(contracts: Contract[], address: string) {
   const addresses = contracts.map((contract) => contract.options.address)
   const index = addresses.indexOf(address)
@@ -66,7 +63,7 @@ export async function sendTransaction(
       ...txParams,
       gas: estGas.toString(),
       // Hack to prevent web3 from adding the suggested gold gas price, allowing geth to add
-      // the suggested price in the selected feeCurrency.
+      // the suggested price in the selected gasCurrency.
       gasPrice: '0',
     })
     .on('transactionHash', (hash: string) => {
@@ -218,14 +215,14 @@ function Exception(error: Error): Exception {
 
 async function getGasPrice(
   web3: Web3,
-  feeCurrency: string | undefined
+  gasCurrency: string | undefined
 ): Promise<string | undefined> {
   // Gold Token
-  if (feeCurrency === undefined) {
+  if (gasCurrency === undefined) {
     return String(await web3.eth.getGasPrice())
   }
   const gasPriceMinimum: GasPriceMinimumType = await getGasPriceMinimumContract(web3)
-  const gasPrice: string = await gasPriceMinimum.methods.getGasPriceMinimum(feeCurrency).call()
+  const gasPrice: string = await gasPriceMinimum.methods.getGasPriceMinimum(gasCurrency).call()
   Logger.debug('contract-utils@getGasPrice', `Gas price is ${gasPrice}`)
   return String(parseInt(gasPrice, 10) * 10)
 }
@@ -244,14 +241,14 @@ const currentNonce = new Map<string, number>()
  *       sendTransaction
  * @param tx The transaction object itself
  * @param account The address from which the transaction should be sent
- * @param feeCurrencyContract The contract instance of the Token in which to pay gas for
+ * @param gasCurrencyContract The contract instance of the Token in which to pay gas for
  * @param logger An object whose log level functions can be passed a function to pass
  *               a transaction ID
  */
 export async function sendTransactionAsync<T>(
   tx: TransactionObject<T>,
   account: string,
-  feeCurrencyContract: StableToken | GoldToken,
+  gasCurrencyContract: StableToken | GoldToken,
   logger: TxLogger = emptyTxLogger,
   estimatedGas?: number | undefined
 ): Promise<TxPromises> {
@@ -286,7 +283,7 @@ export async function sendTransactionAsync<T>(
     logger(Started)
     const txParams: any = {
       from: account,
-      feeCurrency: feeCurrencyContract._address,
+      gasCurrency: gasCurrencyContract._address,
       gasPrice: '0',
     }
 
@@ -298,10 +295,10 @@ export async function sendTransactionAsync<T>(
     tx.send({
       from: account,
       // @ts-ignore
-      feeCurrency: feeCurrencyContract._address,
+      gasCurrency: gasCurrencyContract._address,
       gas: estimatedGas,
       // Hack to prevent web3 from adding the suggested gold gas price, allowing geth to add
-      // the suggested price in the selected feeCurrency.
+      // the suggested price in the selected gasCurrency.
       gasPrice: '0',
     })
       .on('receipt', (r: TransactionReceipt) => {
@@ -356,7 +353,7 @@ export async function sendTransactionAsync<T>(
  *
  * @param tx The transaction object itself
  * @param account The address from which the transaction should be sent
- * @param feeCurrencyContract The contract instance of the Token in which to pay gas for
+ * @param gasCurrencyContract The contract instance of the Token in which to pay gas for
  * @param logger An object whose log level functions can be passed a function to pass
  *               a transaction ID
  */
@@ -364,7 +361,7 @@ export async function sendTransactionAsyncWithWeb3Signing<T>(
   web3: Web3,
   tx: TransactionObject<T>,
   account: string,
-  feeCurrencyContract: StableToken | GoldToken,
+  gasCurrencyContract: StableToken | GoldToken,
   logger: TxLogger = emptyTxLogger,
   estimatedGas?: number | undefined
 ): Promise<TxPromises> {
@@ -400,7 +397,7 @@ export async function sendTransactionAsyncWithWeb3Signing<T>(
     logger(Started)
     const txParams: any = {
       from: account,
-      feeCurrency: feeCurrencyContract._address,
+      gasCurrency: gasCurrencyContract._address,
       gasPrice: '0',
     }
 
@@ -411,15 +408,14 @@ export async function sendTransactionAsyncWithWeb3Signing<T>(
     // Ideally, we should fill these fields in CeloProvider but as of now,
     // we don't have access to web3 inside it, so, in the short-term
     // fill the fields here.
-    let feeCurrency = feeCurrencyContract._address
-    const gatewayFeeRecipient = await web3.eth.getCoinbase()
-    const gatewayFee = defaultGatewayFee
-    Logger.debug(tag, `Gateway fee is ${gatewayFee} paid to ${gatewayFeeRecipient}`)
-    const gasPrice = await getGasPrice(web3, feeCurrency)
-    if (feeCurrency === undefined) {
-      feeCurrency = await getGoldTokenAddress(web3)
+    let gasCurrency = gasCurrencyContract._address
+    const gasFeeRecipient = await web3.eth.getCoinbase()
+    Logger.debug(tag, `Gas fee recipient is ${gasFeeRecipient}`)
+    const gasPrice = await getGasPrice(web3, gasCurrency)
+    if (gasCurrency === undefined) {
+      gasCurrency = await getGoldTokenAddress(web3)
     }
-    Logger.debug(tag, `Fee currency: ${feeCurrency}`)
+    Logger.debug(tag, `Gas currency: ${gasCurrency}`)
 
     let recievedTxHash: string | null = null
     let alreadyInformedResolversAboutConfirmation = false
@@ -461,13 +457,12 @@ export async function sendTransactionAsyncWithWeb3Signing<T>(
       from: account,
       nonce,
       // @ts-ignore
-      feeCurrency,
+      gasCurrency,
       gas: estimatedGas,
       // Hack to prevent web3 from adding the suggested gold gas price, allowing geth to add
-      // the suggested price in the selected feeCurrency.
+      // the suggested price in the selected gasCurrency.
       gasPrice,
-      gatewayFeeRecipient,
-      gatewayFee,
+      gasFeeRecipient,
     }
     // Increment and store nonce for the next call to sendTransaction.
     currentNonce.set(account, nonce + 1)

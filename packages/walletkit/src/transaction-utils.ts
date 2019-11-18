@@ -13,14 +13,13 @@ import { getAccountAddressFromPrivateKey } from './new-web3-utils'
 import { signTransaction } from './signing-utils'
 
 export interface CeloTransaction extends Tx {
-  feeCurrency?: string
-  gatewayFeeRecipient?: string
-  gatewayFee?: string
+  gasCurrency?: string
+  gasFeeRecipient?: string
 }
 
 export interface CeloPartialTxParams extends PartialTxParams {
-  feeCurrency?: string
-  gatewayFee?: string
+  gasCurrency?: string
+  gasFeeRecipient?: string
 }
 
 export class CeloProvider extends PrivateKeyWalletSubprovider {
@@ -115,9 +114,8 @@ export async function getRawTransaction(
   amount: BigNumber,
   gasFees: BigNumber,
   gasPrice: BigNumber,
-  gatewayFeeRecipient?: string,
-  gatewayFee?: string,
-  feeCurrency?: string,
+  gasFeeRecipient?: string,
+  gasCurrency?: string,
   networkId?: number
 ): Promise<string> {
   const transaction: CeloTransaction = {
@@ -128,9 +126,8 @@ export async function getRawTransaction(
     value: amount.toString(),
     gas: gasFees.toString(),
     gasPrice: gasPrice.toString(),
-    feeCurrency,
-    gatewayFeeRecipient,
-    gatewayFee,
+    gasCurrency,
+    gasFeeRecipient,
   }
   Logger.debug('transaction-utils@getRawTransaction@Signing', 'transaction...')
   const signedTransaction = await web3.eth.signTransaction(transaction)
