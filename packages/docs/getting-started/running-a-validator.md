@@ -400,7 +400,7 @@ $ celocli validator:register --id <VALIDATOR_ID_OF_YOUR_CHOICE> --from $CELO_VAL
 Affiliate your validator with your validator group. Note that you will not be a member of this group until the validator group accepts you:
 
 ```bash
-$ celocli validator:affiliation --set $CELO_VALIDATOR_GROUP_ADDRESS --from $CELO_VALIDATOR_ADDRESS
+$ celocli validator:affiliate --set $CELO_VALIDATOR_GROUP_ADDRESS --from $CELO_VALIDATOR_ADDRESS
 ```
 
 Accept the affiliation:
@@ -416,7 +416,7 @@ $ celocli validatorgroup:vote --from $CELO_VALIDATOR_ADDRESS --for $CELO_VALIDAT
 $ celocli validatorgroup:vote --from $CELO_VALIDATOR_GROUP_ADDRESS --for $CELO_VALIDATOR_GROUP_ADDRESS
 ```
 
-You’re all set! Note that elections are finalized at the end of each epoch, roughly once an hour in the Alfajores Testnet. After that hour, if you get elected, your node will start participating BFT consensus and validating blocks.
+You’re all set! Note that elections are finalized at the end of each epoch, roughly once an hour in the Alfajores or Baklava Testnets. After that hour, if you get elected, your node will start participating BFT consensus and validating blocks.
 
 You can inspect the current state of voting by running:
 
@@ -425,6 +425,24 @@ $ celocli validatorgroup:list
 ```
 
 If you find your validator still not getting elected you may need to faucet yourself more funds and bond a greater deposit to command more voting weight!
+
+At any moment you can check if you are validating running the following command:
+
+```bash
+TO BE DEFINED
+```
+
+You can de-affiliate a validator account of a validator group:
+
+```bash
+$ celocli validator:deaffiliate --from $CELO_VALIDATOR_ADDRESS
+```
+
+The rewards can be redeem running the following command:
+
+```bash
+
+```
 
 {% hint style="info" %}
 **Roadmap**: Different parameters will govern elections in a Celo production network. Epochs are likely to be daily, rather than hourly. Running a Validator will also include setting up proxy nodes to protect against DDoS attacks, and using hardware wallets to secure the key used to sign blocks. We plan to update these instructions with more details soon.
