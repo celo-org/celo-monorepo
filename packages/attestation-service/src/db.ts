@@ -1,7 +1,7 @@
 import { ContractKit, newKit } from '@celo/contractkit'
-import { Sequelize } from 'sequelize'
+import { FindOptions, Sequelize } from 'sequelize'
 import { fetchEnv } from './env'
-import Attestation, { AttestationStatic } from './models/attestation'
+import Attestation, { AttestationModel, AttestationStatic } from './models/attestation'
 
 export let sequelize: Sequelize | undefined
 
@@ -15,15 +15,21 @@ export function initializeDB() {
 
 export let kit: ContractKit
 
-export function initializeKit() {
+export async function initializeKit() {
   if (kit === undefined) {
     kit = newKit(fetchEnv('CELO_PROVIDER'))
+    const blockNumber = await kit.web3.eth.getBlockNumber()
+    if (blockNumber === 0) {
+      throw new Error(
+        'Could not fetch latest block from web3 provider ' + fetchEnv('CELO_PROVIDER')
+      )
+    }
   }
 }
 
 let AttestationTable: AttestationStatic
 
-async function getAttestationTable() {
+export async function getAttestationTable() {
   if (AttestationTable) {
     return AttestationTable
   }
@@ -31,18 +37,14 @@ async function getAttestationTable() {
   return AttestationTable
 }
 
-export async function existingAttestationRequest(
+export async function existingAttestationRequestRecord(
   phoneNumber: string,
   account: string,
-  issuer: string
-): Promise<AttestationStatic | null> {
-  return (await getAttestationTable()).findOne({ where: { phoneNumber, account, issuer } })
-}
-
-export async function persistAttestationRequest(
-  phoneNumber: string,
-  account: string,
-  issuer: string
-) {
-  return (await getAttestationTable()).create({ phoneNumber, account, issuer })
+  issuer: string,
+  options: FindOptions = {}
+): Promise<AttestationModel | null> {
+  return (await getAttestationTable()).findOne({
+    where: { phoneNumber, account, issuer },
+    ...options,
+  })
 }
