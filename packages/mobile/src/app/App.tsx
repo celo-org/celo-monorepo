@@ -70,7 +70,6 @@ export class App extends React.Component {
   }
 
   render() {
-    Logger.info('App', 'persisting store')
     return (
       // @ts-ignore Apollo doesn't like the typings
       <ApolloProvider client={apolloClient}>
