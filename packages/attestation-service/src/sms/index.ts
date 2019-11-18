@@ -8,15 +8,15 @@ import { TwilioSmsProvider } from './twilio'
 const smsProviders: SmsProvider[] = []
 
 export async function initializeSmsProviders() {
-  const configuredSmsProviders = fetchEnv('SMS_PROVIDERS').split(',') as Array<
+  const smsProvidersToConfigure = fetchEnv('SMS_PROVIDERS').split(',') as Array<
     SmsProviderType | string
   >
 
-  if (configuredSmsProviders.length === 0) {
+  if (smsProvidersToConfigure.length === 0) {
     throw new Error('You have to specify at least one sms provider')
   }
 
-  for (const configuredSmsProvider of configuredSmsProviders) {
+  for (const configuredSmsProvider of smsProvidersToConfigure) {
     switch (configuredSmsProvider) {
       case SmsProviderType.NEXMO:
         const nexmoProvider = NexmoSmsProvider.fromEnv()
