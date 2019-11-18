@@ -11,7 +11,7 @@ export function createValidatedHandler<T>(
   handler: (req: express.Request, res: express.Response, parsedRequest: T) => Promise<void>
 ) {
   return async (req: express.Request, res: express.Response) => {
-    const parsedRequest = requestType.decode(req.body)
+    const parsedRequest = requestType.decode({ ...req.query, ...req.body })
     if (isLeft(parsedRequest)) {
       res.status(422).json({
         success: false,
