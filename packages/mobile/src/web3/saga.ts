@@ -5,7 +5,17 @@ import * as Crypto from 'crypto'
 import { generateMnemonic, mnemonicToSeedHex } from 'react-native-bip39'
 import * as RNFS from 'react-native-fs'
 import { REHYDRATE } from 'redux-persist/es/constants'
-import { call, delay, put, race, select, spawn, take, takeLatest } from 'redux-saga/effects'
+import {
+  call,
+  delay,
+  put,
+  putResolve,
+  race,
+  select,
+  spawn,
+  take,
+  takeLatest,
+} from 'redux-saga/effects'
 import { setAccountCreationTime } from 'src/account/actions'
 import { getPincode } from 'src/account/saga'
 import { showError } from 'src/alert/actions'
@@ -423,10 +433,22 @@ export function* switchToGethFromZeroSync() {
   Logger.debug(TAG, 'Switching to geth from zeroSync..')
   try {
     const gethAlreadyStartedThisSession = yield select(gethStartedThisSessionSelector)
-    yield put(setZeroSyncMode(false))
-    yield call(initGethSaga)
 
+    yield putResolve(setZeroSyncMode(false))
+
+    if (gethAlreadyStartedThisSession) {
+      // yield call(waitForWeb3Sync)
+      const zeroSync3 = yield select(zeroSyncSelector)
+      Logger.info(TAG, `switchToGethFromZeroSync, zeroSync3 mode: ${zeroSync3}`)
+      delay(3000)
+      Logger.info(TAG, `done waiting`)
+      restartApp()
+      return
+    }
+
+    yield call(initGethSaga)
     switchWeb3ProviderForSyncMode(false)
+
     // Ensure web3 is fully synced using new provider
     yield call(waitForWeb3Sync)
 
@@ -434,14 +456,9 @@ export function* switchToGethFromZeroSync() {
     // Note that this must happen after the sync mode is switched
     // as the web3.personal where the key is stored is not available in zeroSync mode
     yield call(ensureAccountInWeb3Keystore)
-
-    if (gethAlreadyStartedThisSession) {
-      // If geth is started twice within the same session,
-      // there is an issue where it cannot find deployed contracts.
-      // Restarting the app fixes this issue.
-      restartApp()
-    }
   } catch (e) {
+    const zeroSync3 = yield select(zeroSyncSelector)
+    Logger.info(TAG, `switchToGethFromZeroSync, zeroSync3 mode: ${zeroSync3}`)
     Logger.error(TAG + '@switchToGethFromZeroSync', 'Error switching to geth from zeroSync')
     yield put(showError(ErrorMessages.FAILED_TO_SWITCH_SYNC_MODES))
   }

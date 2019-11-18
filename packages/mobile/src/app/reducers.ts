@@ -1,6 +1,7 @@
 import { Actions, ActionTypes } from 'src/app/actions'
 import { getRehydratePayload, REHYDRATE, RehydrateAction } from 'src/redux/persist-helper'
 import { RootState } from 'src/redux/reducers'
+import Logger from 'src/utils/Logger'
 
 export interface State {
   loggedIn: boolean

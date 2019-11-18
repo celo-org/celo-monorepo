@@ -1,6 +1,7 @@
 import networkConfig from 'src/geth/networkConfig'
 import { getRehydratePayload, REHYDRATE, RehydrateAction } from 'src/redux/persist-helper'
 import { Actions, ActionTypes } from 'src/web3/actions'
+import Logger from 'src/utils/Logger'
 
 export interface State {
   syncProgress: {
@@ -37,6 +38,7 @@ export const reducer = (
   switch (action.type) {
     case REHYDRATE: {
       // Ignore some persisted properties
+      Logger.info('appReducer', JSON.stringify(state))
       return {
         ...state,
         ...getRehydratePayload(action, 'web3'),

@@ -41,7 +41,7 @@ export function* waitForGethConnectivity() {
   }
 }
 
-function* waitForGethInstance() {
+export function* waitForGethInstance() {
   const zeroSyncMode = yield select(zeroSyncSelector)
   if (zeroSyncMode) {
     return GethInitOutcomes.SUCCESS
