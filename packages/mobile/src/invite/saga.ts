@@ -1,5 +1,5 @@
+import { stripHexLeader } from '@celo/utils/src/address'
 import { getPhoneHash } from '@celo/utils/src/phoneNumbers'
-import { stripHexLeader } from '@celo/utils/src/signatureUtils'
 import { getEscrowContract, getGoldTokenContract, getStableTokenContract } from '@celo/walletkit'
 import BigNumber from 'bignumber.js'
 import { Linking, Platform } from 'react-native'

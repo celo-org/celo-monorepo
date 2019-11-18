@@ -1,17 +1,20 @@
 import * as dotenv from 'dotenv'
 import express from 'express'
-import { AttestationRequestType, handleAttestationRequest } from './attestation'
+import { AttestationRequestType, getAttestationKey, handleAttestationRequest } from './attestation'
 import { initializeDB, initializeKit } from './db'
 import { createValidatedHandler } from './request'
 import { initializeSmsProviders } from './sms'
 
 async function init() {
+  console.info(process.env.CONFIG)
   if (process.env.CONFIG) {
     dotenv.config({ path: process.env.CONFIG })
   }
 
   await initializeDB()
   await initializeKit()
+  // TODO: Validate that the attestation key has been authorized by the account
+  getAttestationKey()
   await initializeSmsProviders()
 
   const app = express()
