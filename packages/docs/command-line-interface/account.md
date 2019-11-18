@@ -6,20 +6,23 @@ description: Manage your account, send and receive Celo Gold and Celo Dollars
 
 ### Authorize
 
-Authorize an attestation, validation or vote signing key
+Authorize an attestation, validator, or vote signer
 
 ```
 USAGE
   $ celocli account:authorize
 
 OPTIONS
-  -r, --role=vote|validation|attestation             Role to delegate
-  --from=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) Account Address
-  --to=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d    (required) Account Address
+  -r, --role=vote|validator|attestation                (required) Role to delegate
+  --from=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d    (required) Account Address
+  --pop=pop                                            (required) Proof-of-possession of the signer key
+  --signer=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) Account Address
 
 EXAMPLE
-  authorize --from 0x5409ED021D9299bf6814279A6A1411A7e866A631 --role vote --to
-  0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d
+  authorize --from 0x5409ED021D9299bf6814279A6A1411A7e866A631 --role vote --signer
+  0x6ecbe1db9ef729cbe972c83fb886247691fb6beb --pop
+  0x1b9fca4bbb5bfb1dbe69ef1cddbd9b4202dcb6b134c5170611e1e36ecfa468d7b46c85328d504934fce6c2a1571603a50ae224d2b32685e84d4d
+  1a1eebad8452eb
 ```
 
 _See code: [packages/cli/src/commands/account/authorize.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/account/authorize.ts)_
@@ -229,6 +232,25 @@ EXAMPLE
 
 _See code: [packages/cli/src/commands/account/new.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/account/new.ts)_
 
+### Proof-of-possession
+
+Generate proof-of-possession to be used to authorize a signer
+
+```
+USAGE
+  $ celocli account:proof-of-possession
+
+OPTIONS
+  --account=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) Account Address
+  --signer=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d   (required) Account Address
+
+EXAMPLE
+  proof-of-possession --account 0x5409ed021d9299bf6814279a6a1411a7e866a631 --signer
+  0x6ecbe1db9ef729cbe972c83fb886247691fb6beb
+```
+
+_See code: [packages/cli/src/commands/account/proof-of-possession.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/account/proof-of-possession.ts)_
+
 ### Register
 
 Register an account
@@ -239,10 +261,11 @@ USAGE
 
 OPTIONS
   --from=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) Account Address
-  --name=name                                        (required)
+  --name=name
 
-EXAMPLE
-  register
+EXAMPLES
+  register --from 0x5409ed021d9299bf6814279a6a1411a7e866a631
+  register --from 0x5409ed021d9299bf6814279a6a1411a7e866a631 --name test-account
 ```
 
 _See code: [packages/cli/src/commands/account/register.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/account/register.ts)_
@@ -332,10 +355,10 @@ USAGE
 
 OPTIONS
   --account=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) Account Address
-  --password=password                                   (required)
+  --password=password
 
 EXAMPLE
-  unlock --account 0x5409ed021d9299bf6814279a6a1411a7e866a631 --password 1234
+  unlock --account 0x5409ed021d9299bf6814279a6a1411a7e866a631
 ```
 
 _See code: [packages/cli/src/commands/account/unlock.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/account/unlock.ts)_
