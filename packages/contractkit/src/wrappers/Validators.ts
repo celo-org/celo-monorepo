@@ -18,7 +18,8 @@ import {
 
 export interface Validator {
   address: Address
-  publicKey: string
+  ecdsaPublicKey: string
+  blsPublicKey: string
   affiliation: string | null
   score: BigNumber
 }
@@ -57,7 +58,6 @@ export class ValidatorsWrapper extends BaseWrapper<Validators> {
       this.contract.methods.updateCommission(toFixed(commission).toFixed())
     )
   }
-  updatePublicKeysData = proxySend(this.kit, this.contract.methods.updatePublicKeysData)
   /**
    * Returns the Locked Gold requirements for validators.
    * @returns The Locked Gold requirements for validators.
@@ -100,8 +100,25 @@ export class ValidatorsWrapper extends BaseWrapper<Validators> {
 
   async signerToAccount(signerAddress: Address) {
     const accounts = await this.kit.contracts.getAccounts()
-    return accounts.activeValidationSignerToAccount(signerAddress)
+    return accounts.validatorSignerToAccount(signerAddress)
   }
+
+  /**
+   * Updates a validator's BLS key.
+   * @param blsPublicKey The BLS public key that the validator is using for consensus, should pass proof
+   *   of possession. 48 bytes.
+   * @param blsPop The BLS public key proof-of-possession, which consists of a signature on the
+   *   account address. 96 bytes.
+   * @return True upon success.
+   */
+  updateBlsPublicKey: (
+    blsPublicKey: string,
+    blsPop: string
+  ) => CeloTransactionObject<boolean> = proxySend(
+    this.kit,
+    this.contract.methods.updateBlsPublicKey,
+    tupleParser(parseBytes, parseBytes)
+  )
 
   /**
    * Returns whether a particular account has a registered validator.
@@ -147,9 +164,10 @@ export class ValidatorsWrapper extends BaseWrapper<Validators> {
     const res = await this.contract.methods.getValidator(address).call()
     return {
       address,
-      publicKey: res[0] as any,
-      affiliation: res[1],
-      score: fromFixed(new BigNumber(res[2])),
+      ecdsaPublicKey: res[0] as any,
+      blsPublicKey: res[1] as any,
+      affiliation: res[2],
+      score: fromFixed(new BigNumber(res[3])),
     }
   }
 
@@ -214,20 +232,23 @@ export class ValidatorsWrapper extends BaseWrapper<Validators> {
    * Registers a validator unaffiliated with any validator group.
    *
    * Fails if the account is already a validator or validator group.
-   * Fails if the account does not have sufficient weight.
    *
-   * @param publicKeysData Comprised of three tightly-packed elements:
-   *    - publicKey - The public key that the validator is using for consensus, should match
-   *      msg.sender. 64 bytes.
-   *    - blsPublicKey - The BLS public key that the validator is using for consensus, should pass
-   *      proof of possession. 48 bytes.
-   *    - blsPoP - The BLS public key proof of possession. 96 bytes.
+   * @param ecdsaPublicKey The ECDSA public key that the validator is using for consensus, should match
+   *   the validator signer. 64 bytes.
+   * @param blsPublicKey The BLS public key that the validator is using for consensus, should pass proof
+   *   of possession. 48 bytes.
+   * @param blsPop The BLS public key proof-of-possession, which consists of a signature on the
+   *   account address. 96 bytes.
    */
 
-  registerValidator: (publicKeysData: string) => CeloTransactionObject<boolean> = proxySend(
+  registerValidator: (
+    ecdsaPublicKey: string,
+    blsPublicKey: string,
+    blsPop: string
+  ) => CeloTransactionObject<boolean> = proxySend(
     this.kit,
     this.contract.methods.registerValidator,
-    tupleParser(parseBytes)
+    tupleParser(parseBytes, parseBytes, parseBytes)
   )
 
   /**

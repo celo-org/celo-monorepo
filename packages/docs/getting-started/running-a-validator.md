@@ -63,8 +63,6 @@ It is recommended to run the validator node in an environment that facilitates a
 A note about conventions:
 The code you'll see on this page is bash commands and their output.
 
-A $ signifies the bash prompt. Everything following it is the command you should run in a terminal. The $ isn't part of the command, so don't copy it.
-
 When you see text in angle brackets &lt;&gt;, replace them and the text inside with your own value of what it refers to. Don't include the &lt;&gt; in the command.
 {% endhint %}
 
@@ -288,7 +286,7 @@ Create two accounts, one for the Validator and one for Validator Group, and get 
 To create your two accounts, run this command twice:
 
 ```bash
-$ docker run -v `pwd`:/root/.celo --entrypoint /bin/sh -it $CELO_IMAGE:$CELO_NETWORK -c "geth account new"
+$ docker run -v $PWD:/root/.celo --entrypoint /bin/sh -it $CELO_IMAGE:$CELO_NETWORK -c "geth account new"
 ```
 
 It will prompt you for a passphrase, ask you to confirm it, and then will output your account address: `Address: {<YOUR-ACCOUNT-ADDRESS>}`
@@ -303,7 +301,7 @@ $ export CELO_VALIDATOR_ADDRESS=<YOUR-VALIDATOR-ADDRESS>
 In order to register the validator later on, generate a "proof of possession" - a signature proving you know your validator's BLS private key. Run this command:
 
 ```bash
-$ docker run -v `pwd`:/root/.celo --entrypoint /bin/sh -it $CELO_IMAGE:$CELO_NETWORK -c "geth account proof-of-possession $CELO_VALIDATOR_ADDRESS"
+$ docker run -v $PWD:/root/.celo --entrypoint /bin/sh -it $CELO_IMAGE:$CELO_NETWORK -c "geth account proof-of-possession $CELO_VALIDATOR_ADDRESS"
 ```
 
 It will prompt you for the passphrase you've chosen for the validator account. Let's save the resulting proof-of-possession to an environment variable:
@@ -317,34 +315,36 @@ $ export CELO_VALIDATOR_POP=<YOUR-VALIDATOR-PROOF-OF-POSSESSION>
 Initialize the docker container, building from an image for the network and initializing Celo with the genesis block:
 
 ```bash
-$ docker run -v `pwd`:/root/.celo $CELO_IMAGE:$CELO_NETWORK init /celo/genesis.json
+$ docker run -v $PWD:/root/.celo $CELO_IMAGE:$CELO_NETWORK init /celo/genesis.json
 ```
 
 To participate in consensus, we need to set up our nodekey for our account. We can do so via the following command \(it will prompt you for your passphrase\):
 
 ```bash
-$ docker run -v `pwd`:/root/.celo --entrypoint /bin/sh -it $CELO_IMAGE:$CELO_NETWORK -c "geth account set-node-key $CELO_VALIDATOR_ADDRESS"
+$ docker run -v $PWD:/root/.celo --entrypoint /bin/sh -it $CELO_IMAGE:$CELO_NETWORK -c "geth account set-node-key $CELO_VALIDATOR_ADDRESS"
 ```
 
 In order to allow the node to sync with the network, give it the address of existing nodes in the network:
 
 ```bash
-$ docker run -v `pwd`:/root/.celo --entrypoint cp $CELO_IMAGE:$CELO_NETWORK /celo/static-nodes.json /root/.celo/
+$ docker run -v $PWD:/root/.celo --entrypoint cp $CELO_IMAGE:$CELO_NETWORK /celo/static-nodes.json /root/.celo/
 ```
 
 Start up the node:
 
 ```bash
-$ docker run -p 127.0.0.1:8545:8545 -p 127.0.0.1:8546:8546 -p 30303:30303 -p 30303:30303/udp -v `pwd`:/root/.celo $CELO_IMAGE:$CELO_NETWORK --verbosity 3 --networkid 44785 --syncmode full --rpc --rpcaddr 0.0.0.0 --rpcapi eth,net,web3,debug,admin,personal --maxpeers 1100 --mine --miner.verificationpool=$URL_VERIFICATION_POOL --etherbase $CELO_VALIDATOR_ADDRESS
+$ docker run -p 127.0.0.1:8545:8545 -p 127.0.0.1:8546:8546 -p 30303:30303 -p 30303:30303/udp -v $PWD:/root/.celo $CELO_IMAGE:$CELO_NETWORK --verbosity 3 --networkid 44785 --syncmode full --rpc --rpcaddr 0.0.0.0 --rpcapi eth,net,web3,debug,admin,personal --maxpeers 1100 --mine --miner.verificationpool=$URL_VERIFICATION_POOL --etherbase $CELO_VALIDATOR_ADDRESS
 ```
 
 {% hint style="danger" %}
 **Security**: The command line above includes the parameter `--rpcaddr 0.0.0.0` which makes the Celo Blockchain software listen for incoming RPC requests on all network adaptors. Exercise extreme caution in doing this when running outside Docker, as it means that any unlocked accounts and their funds may be accessed from other machines on the Internet. In the context of running a Docker container on your local machine, this together with the `docker -p` flags allows you to make RPC calls from outside the container, i.e from your local host, but not from outside your machine. Read more about [Docker Networking](https://docs.docker.com/network/network-tutorial-standalone/#use-user-defined-bridge-networks) here.
 {% endhint %}
 
-The `mine` flag does not mean the node starts mining blocks, but rather starts trying to participate in the BFT consensus protocol. It cannot do this until it gets elected -- so next we need to stand for election.
+The `mine` flag will tell geth to try participating in the BFT consensus protocol, which is analogous to mining on the Ethereum PoW network. It will not be allowed to validate until it gets elected -- so next we need to stand for election.
 
 The `networkid` parameter value of `44785` indicates we are connecting the Alfajores Testnet.
+
+Now you may need to wait for your node to complete a full sync. You can check on the sync status with `celocli node:synced`. Your node will be fully synced when it has downloaded and processed the latest block, which you can see on the [Alfajores Testnet Stats](https://alfajores-ethstats.celo-testnet.org/) page.
 
 ### Obtain and lock up some Celo Gold for staking
 
@@ -359,8 +359,9 @@ Visit the [Alfajores Celo Faucet](https://celo.org/build/faucet) to send **both*
 In a new tab, unlock your accounts so that you can send transactions. This only unlocks the accounts for the lifetime of the validator that's running, so be sure to unlock `$CELO_VALIDATOR_ADDRESS` again if your node gets restarted:
 
 ```bash
-$ celocli account:unlock --account $CELO_VALIDATOR_GROUP_ADDRESS --password <YOUR_FIRST_PASSWORD>
-$ celocli account:unlock --account $CELO_VALIDATOR_ADDRESS --password <YOUR_SECOND_PASSWORD>
+# You will be prompted for your password.
+$ celocli account:unlock --account $CELO_VALIDATOR_GROUP_ADDRESS
+$ celocli account:unlock --account $CELO_VALIDATOR_ADDRESS
 ```
 
 In a new tab, make a locked Gold account for both of your addresses by running the Celo CLI. This will allow you to stake Celo Gold, which is required to register a validator and validator groups:
@@ -380,6 +381,8 @@ $ celocli lockedgold:lockup --from $CELO_VALIDATOR_ADDRESS --goldAmount 10000000
 ```
 
 ### Run for election
+
+In order to be elected as a validator, you will first need to register your group and validator and give them each an an ID, which people will know them by (e.g. `Awesome Validators Inc.` and `Alice's Awesome Validator`).
 
 Register your validator group:
 
