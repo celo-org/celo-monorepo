@@ -344,7 +344,7 @@ describe('governance tests', () => {
     })
 
     const getValidatorSetSignersAtBlock = async (blockNumber: number): Promise<string[]> => {
-      return election.methods.currentValidators().call({}, blockNumber)
+      return election.methods.getCurrentValidatorSigners().call({}, blockNumber)
     }
 
     const getValidatorSetAccountsAtBlock = async (blockNumber: number) => {
