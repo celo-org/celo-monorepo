@@ -1,0 +1,81 @@
+apiVersion: batch/v1beta1
+kind: CronJob
+metadata: 
+  name: {{ .Release.Name }}
+  labels: 
+    app: oracle
+    chart: oracle
+    release: {{ .Release.Service }}
+    component: oracle
+spec:
+  schedule: "*/1 * * * *"
+  concurrencyPolicy: Forbid
+  jobTemplate:
+    spec:
+      backoffLimit: 1
+      template:
+        spec:
+          initContainers:
+          - name: get-current-price
+            image: gcr.io/celo-testnet/oracle:{{ .Release.Namespace }}
+            imagePullPolicy: IfNotPresent
+            command:
+              - sh
+              - "-c"
+              - |
+                echo `python get_rate_for_now.py oracle_rates.csv` > /root/.celo/current_price
+            volumeMounts:
+            - name: data
+              mountPath: /root/.celo 
+          - name: celo-tool
+            image: gcr.io/celo-testnet/celo-monorepo:celotool-8189da8a150aaa80e325316f45009218765d6e43
+            imagePullPolicy: IfNotPresent
+            command: ["/bin/sh"]
+            # TODO: use price_oracle account type
+            args:
+            - "-c"
+            - |
+              echo "getting the oracle key + account"
+              echo 'current price:'
+              celotooljs.sh generate bip32 --mnemonic "$MNEMONIC" --accountType attestation --index 0 > /root/.celo/pkey
+            volumeMounts:
+            - name: data
+              mountPath: /root/.celo
+            env:
+            - name: MNEMONIC
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Release.Name }}
+                  key: MNEMONIC
+          containers:
+          - name: report-price
+            image: gcr.io/celo-testnet/celocli-standalone:yerduaoracletest
+            imagePullPolicy: IfNotPresent
+            command: ["/bin/sh"]
+            args:
+            - "-c"
+            - |
+              echo "running the celocli container"
+              echo 'current price:'
+              PRICE=`cat /root/.celo/current_price`
+              echo $PRICE
+              PK=`cat /root/.celo/pkey`
+              echo "key is:"
+              echo $PK
+              alias celocli='node_modules/@celo/celocli/bin/run'
+              celocli config:get
+            volumeMounts:
+            - name: data
+              mountPath: /root/.celo
+            env:
+            - name: MNEMONIC
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Release.Name }}
+                  key: MNEMONIC
+          restartPolicy: Never
+          volumes:
+            - name: data
+              emptyDir: {}
+
+          
