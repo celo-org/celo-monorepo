@@ -1,3 +1,4 @@
+import { intersection } from '@celo/utils/lib/collections'
 import { E164Number } from '@celo/utils/lib/io'
 import { fetchEnv } from '../env'
 import { SmsProvider, SmsProviderType } from './base'
@@ -35,4 +36,12 @@ export async function initializeSmsProviders() {
 
 export function smsProviderFor(phoneNumber: E164Number) {
   return smsProviders.find((provider) => provider.canServePhoneNumber(phoneNumber))
+}
+
+export function configuredSmsProviders() {
+  return smsProviders.map((provider) => provider.type)
+}
+
+export function blacklistRegionCodes() {
+  return intersection(smsProviders.map((provider) => provider.blacklistedRegionCodes))
 }

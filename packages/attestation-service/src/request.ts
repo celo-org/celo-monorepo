@@ -2,6 +2,10 @@ import express from 'express'
 import { isLeft } from 'fp-ts/lib/Either'
 import * as t from 'io-ts'
 
+export enum ErrorMessages {
+  UNKNOWN_ERROR = 'Unknown Error',
+}
+
 export function createValidatedHandler<T>(
   requestType: t.Type<T>,
   handler: (req: express.Request, res: express.Response, parsedRequest: T) => Promise<void>

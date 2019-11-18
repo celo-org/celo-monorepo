@@ -1,5 +1,5 @@
 import twilio, { Twilio } from 'twilio'
-import { fetchEnv } from '../env'
+import { fetchEnv, fetchEnvOrDefault } from '../env'
 import { SmsProvider, SmsProviderType } from './base'
 
 export class TwilioSmsProvider extends SmsProvider {
@@ -8,7 +8,9 @@ export class TwilioSmsProvider extends SmsProvider {
       fetchEnv('TWILIO_ACCOUNT_SID'),
       fetchEnv('TWILIO_MESSAGING_SERVICE_SID'),
       fetchEnv('TWILIO_AUTH_TOKEN'),
-      fetchEnv('TWILIO_BLACKLIST').split(',')
+      fetchEnvOrDefault('TWILIO_BLACKLIST', '')
+        .split(',')
+        .filter((code) => code !== '')
     )
   }
 
