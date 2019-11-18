@@ -255,8 +255,7 @@ jobs:
             # detox sometimes without releasing the terminal and thus making the CI timout
             # 480s = 8 minutes
             timeout 480 yarn test:detox || echo "failed, try again"
-            timeout 480 yarn test:detox || echo "detox failed, return 0 to prevent CI from failing"
-            # TODO errors are currently not reported, until we figure out why detox can't find functions https://github.com/wix/Detox/issues/1723
+            timeout 480 yarn test:detox 
       - run: cd ~/src
       - save_cache:
           key: yarn-v3-{{ arch }}-{{ .Branch }}-{{ checksum "packages/mobile/android/build.gradle" }}-{{ checksum "packages/mobile/android/settings.gradle" }}-{{ checksum "packages/mobile/android/app/build.gradle" }}-{{ checksum "packages/mobile/.env.test" }}
