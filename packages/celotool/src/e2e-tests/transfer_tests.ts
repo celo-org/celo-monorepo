@@ -75,7 +75,7 @@ const setIntrinsicGas = async (validatorUri: string, validatorAddress: string, g
   const kit = newKit(validatorUri)
   const parameters = await kit.contracts.getBlockchainParameters()
   await parameters
-    .setIntrinsicGasForAlternativeGasCurrency(gasCost.toString())
+    .setIntrinsicGasForAlternativeFeeCurrency(gasCost.toString())
     .sendAndWaitForReceipt({ from: validatorAddress })
 }
 
@@ -237,6 +237,8 @@ describe('Transfer tests', function(this: any) {
     await kit.web3.eth.personal.unlockAccount(FromAddress, '', 1000000)
   }
 
+  // DO NOT MERGE: Do I need to add gatewayFee here?
+
   const transferCeloGold = async (
     fromAddress: string,
     toAddress: string,
@@ -244,8 +246,8 @@ describe('Transfer tests', function(this: any) {
     txOptions: {
       gas?: number
       gasPrice?: string
-      gasCurrency?: string
-      gasFeeRecipient?: string
+      feeCurrency?: string
+      gatewayFeeRecipient?: string
     } = {}
   ) => {
     const res = await kit.sendTransaction({
@@ -264,8 +266,8 @@ describe('Transfer tests', function(this: any) {
     txOptions: {
       gas?: number
       gasPrice?: string
-      gasCurrency?: string
-      gasFeeRecipient?: string
+      feeCurrency?: string
+      gatewayFeeRecipient?: string
     } = {}
   ) => {
     const kitStableToken = await kit.contracts.getStableToken()
@@ -277,10 +279,10 @@ describe('Transfer tests', function(this: any) {
     return res
   }
 
-  const getGasPriceMinimum = async (gasCurrency: string | undefined) => {
+  const getGasPriceMinimum = async (feeCurrency: string | undefined) => {
     const gasPriceMinimum = await kit._web3Contracts.getGasPriceMinimum()
-    if (gasCurrency) {
-      return gasPriceMinimum.methods.getGasPriceMinimum(gasCurrency).call()
+    if (feeCurrency) {
+      return gasPriceMinimum.methods.getGasPriceMinimum(feeCurrency).call()
     } else {
       return gasPriceMinimum.methods.gasPriceMinimum().call()
     }
@@ -306,9 +308,9 @@ describe('Transfer tests', function(this: any) {
   const runTestTransaction = async (
     txResult: TransactionResult,
     expectedGasUsed: number,
-    gasCurrency?: string
+    feeCurrency?: string
   ): Promise<TestTxResults> => {
-    const minGasPrice = await getGasPriceMinimum(gasCurrency)
+    const minGasPrice = await getGasPriceMinimum(feeCurrency)
     assert.isAbove(parseInt(minGasPrice, 10), 0)
 
     let ok = false
@@ -355,14 +357,14 @@ describe('Transfer tests', function(this: any) {
     expectSuccess?: boolean
     txOptions?: {
       gas?: number
-      gasFeeRecipient?: string
+      gatewayFeeRecipient?: string
     }
   }) {
     let txRes: TestTxResults
     let balances: BalanceWatcher
 
     before(async () => {
-      const gasCurrency =
+      const feeCurrency =
         feeToken === CeloContract.StableToken
           ? await kit.registry.addressFor(CeloContract.StableToken)
           : undefined
@@ -380,7 +382,7 @@ describe('Transfer tests', function(this: any) {
         transferToken === CeloContract.StableToken ? transferCeloDollars : transferCeloGold
       const txResult = await transferFn(FromAddress, ToAddress, TransferAmount, {
         ...txOptions,
-        gasCurrency,
+        feeCurrency,
       })
 
       // Writing to an empty storage location (e.g. an uninitialized ERC20 account) costs 15k extra gas.
@@ -391,7 +393,7 @@ describe('Transfer tests', function(this: any) {
         expectedGas += 15000
       }
 
-      txRes = await runTestTransaction(txResult, expectedGas, gasCurrency)
+      txRes = await runTestTransaction(txResult, expectedGas, feeCurrency)
 
       await balances.update()
     })
@@ -440,8 +442,8 @@ describe('Transfer tests', function(this: any) {
       }
     }
 
-    // TODO(nategraf): Replace gas fee recipient with gateway fee and adjust this check.
-    it.skip(`should increment the gas fee recipient's ${feeToken} balance by a portion of the gas fee`, () =>
+    // DO NOT MERGE(nategraf): Replace gateway fee recipient with gateway fee and adjust this check.
+    it.skip(`should increment the gateway fee recipient's ${feeToken} balance by the gateway fee`, () =>
       assertEqualBN(balances.delta(FeeRecipientAddress, feeToken), new BigNumber(0)))
 
     it(`should increment the infrastructure fund's ${feeToken} balance by the base portion of the gas fee`, () =>
@@ -464,24 +466,24 @@ describe('Transfer tests', function(this: any) {
 
         describe('Transfer CeloGold >', () => {
           const GOLD_TRANSACTION_GAS_COST = 30005
-          describe('with gasCurrency = CeloGold >', () => {
+          describe('with feeCurrency = CeloGold >', () => {
             if (syncMode === 'light' || syncMode === 'ultralight') {
               describe('when running in light/ultralight sync mode', () => {
-                describe('when not explicitly specifying a gas fee recipient', () =>
+                describe('when not explicitly specifying a gateway fee recipient', () =>
                   testTransferToken({
                     expectedGas: GOLD_TRANSACTION_GAS_COST,
                     transferToken: CeloContract.GoldToken,
                     feeToken: CeloContract.GoldToken,
                   }))
 
-                describe('when explicitly specifying the gas fee recipient', () => {
+                describe('when explicitly specifying the gateway fee recipient', () => {
                   describe("when using a peer's etherbase", () =>
                     testTransferToken({
                       expectedGas: GOLD_TRANSACTION_GAS_COST,
                       transferToken: CeloContract.GoldToken,
                       feeToken: CeloContract.GoldToken,
                       txOptions: {
-                        gasFeeRecipient: FeeRecipientAddress,
+                        gatewayFeeRecipient: FeeRecipientAddress,
                       },
                     }))
 
@@ -489,7 +491,7 @@ describe('Transfer tests', function(this: any) {
                     it('should get rejected by the sending node before being added to the tx pool', async () => {
                       try {
                         const res = await transferCeloGold(FromAddress, ToAddress, TransferAmount, {
-                          gasFeeRecipient: kit.web3.utils.randomHex(20),
+                          gatewayFeeRecipient: kit.web3.utils.randomHex(20),
                         })
                         await res.waitReceipt()
                       } catch (error) {
@@ -508,13 +510,13 @@ describe('Transfer tests', function(this: any) {
                 transferToken: CeloContract.GoldToken,
                 feeToken: CeloContract.GoldToken,
                 txOptions: {
-                  gasFeeRecipient: FeeRecipientAddress,
+                  gatewayFeeRecipient: FeeRecipientAddress,
                 },
               })
             }
           })
 
-          describe('gasCurrency = CeloDollars >', () => {
+          describe('feeCurrency = CeloDollars >', () => {
             const intrinsicGas = 155000
             describe('when there is no demurrage', () => {
               describe('when setting a gas amount greater than the amount of gas necessary', () =>
@@ -523,7 +525,7 @@ describe('Transfer tests', function(this: any) {
                   transferToken: CeloContract.GoldToken,
                   feeToken: CeloContract.StableToken,
                   txOptions: {
-                    gasFeeRecipient: FeeRecipientAddress,
+                    gatewayFeeRecipient: FeeRecipientAddress,
                   },
                 }))
 
@@ -536,7 +538,7 @@ describe('Transfer tests', function(this: any) {
                   expectSuccess: false,
                   txOptions: {
                     gas,
-                    gasFeeRecipient: FeeRecipientAddress,
+                    gatewayFeeRecipient: FeeRecipientAddress,
                   },
                 })
               })
@@ -544,11 +546,11 @@ describe('Transfer tests', function(this: any) {
               describe('when setting a gas amount less than the intrinsic gas amount', () => {
                 it('should not add the transaction to the pool', async () => {
                   const gas = intrinsicGas - 1
-                  const gasCurrency = await kit.registry.addressFor(CeloContract.StableToken)
+                  const feeCurrency = await kit.registry.addressFor(CeloContract.StableToken)
                   try {
                     const res = await transferCeloGold(FromAddress, ToAddress, TransferAmount, {
                       gas,
-                      gasCurrency,
+                      feeCurrency,
                     })
                     await res.getHash()
                   } catch (error) {
@@ -561,24 +563,24 @@ describe('Transfer tests', function(this: any) {
         })
 
         describe('Transfer CeloDollars', () => {
-          describe('gasCurrency = CeloDollars >', () => {
+          describe('feeCurrency = CeloDollars >', () => {
             testTransferToken({
               expectedGas: 175303,
               transferToken: CeloContract.StableToken,
               feeToken: CeloContract.StableToken,
               txOptions: {
-                gasFeeRecipient: FeeRecipientAddress,
+                gatewayFeeRecipient: FeeRecipientAddress,
               },
             })
           })
 
-          describe('gasCurrency = CeloGold >', () => {
+          describe('feeCurrency = CeloGold >', () => {
             testTransferToken({
               expectedGas: 41303,
               transferToken: CeloContract.StableToken,
               feeToken: CeloContract.GoldToken,
               txOptions: {
-                gasFeeRecipient: FeeRecipientAddress,
+                gatewayFeeRecipient: FeeRecipientAddress,
               },
             })
           })
@@ -588,7 +590,7 @@ describe('Transfer tests', function(this: any) {
   })
 
   describe('Transfer with changed intrinsic gas cost >', () => {
-    const intrinsicGasForAlternativeGasCurrency = 34000
+    const intrinsicGasForAlternativeFeeCurrency = 34000
 
     before(restartWithCleanNodes)
 
@@ -604,8 +606,8 @@ describe('Transfer tests', function(this: any) {
         })
 
         describe('Transfer CeloGold >', () => {
-          describe('gasCurrency = CeloDollars >', () => {
-            const intrinsicGas = intrinsicGasForAlternativeGasCurrency + 21000
+          describe('feeCurrency = CeloDollars >', () => {
+            const intrinsicGas = intrinsicGasForAlternativeFeeCurrency + 21000
             describe('when there is no demurrage', () => {
               describe('when setting a gas amount greater than the amount of gas necessary', () =>
                 testTransferToken({
@@ -613,7 +615,7 @@ describe('Transfer tests', function(this: any) {
                   transferToken: CeloContract.GoldToken,
                   feeToken: CeloContract.StableToken,
                   txOptions: {
-                    gasFeeRecipient: FeeRecipientAddress,
+                    gatewayFeeRecipient: FeeRecipientAddress,
                   },
                 }))
 
@@ -626,7 +628,7 @@ describe('Transfer tests', function(this: any) {
                   expectSuccess: false,
                   txOptions: {
                     gas,
-                    gasFeeRecipient: FeeRecipientAddress,
+                    gatewayFeeRecipient: FeeRecipientAddress,
                   },
                 })
               })
@@ -634,11 +636,11 @@ describe('Transfer tests', function(this: any) {
               describe('when setting a gas amount less than the intrinsic gas amount', () => {
                 it('should not add the transaction to the pool', async () => {
                   const gas = intrinsicGas - 1
-                  const gasCurrency = await kit.registry.addressFor(CeloContract.StableToken)
+                  const feeCurrency = await kit.registry.addressFor(CeloContract.StableToken)
                   try {
                     const res = await transferCeloGold(FromAddress, ToAddress, TransferAmount, {
                       gas,
-                      gasCurrency,
+                      feeCurrency,
                     })
                     await res.getHash()
                   } catch (error) {
@@ -651,13 +653,13 @@ describe('Transfer tests', function(this: any) {
         })
 
         describe('Transfer CeloDollars', () => {
-          describe('gasCurrency = CeloDollars >', () => {
+          describe('feeCurrency = CeloDollars >', () => {
             testTransferToken({
               expectedGas: 75303,
               transferToken: CeloContract.StableToken,
               feeToken: CeloContract.StableToken,
               txOptions: {
-                gasFeeRecipient: FeeRecipientAddress,
+                gatewayFeeRecipient: FeeRecipientAddress,
               },
             })
           })
@@ -696,8 +698,8 @@ describe('Transfer tests', function(this: any) {
               const expectedGasUsed = 164005
               txRes = await runTestTransaction(
                 await transferCeloGold(FromAddress, ToAddress, TransferAmount, {
-                  gasCurrency: stableTokenAddress,
-                  gasFeeRecipient: FeeRecipientAddress,
+                  feeCurrency: stableTokenAddress,
+                  gatewayFeeRecipient: FeeRecipientAddress,
                 }),
                 expectedGasUsed,
                 stableTokenAddress
@@ -733,8 +735,8 @@ describe('Transfer tests', function(this: any) {
               )
             })
 
-            // TODO(nategraf): Replace gas fee recipient with gateway fee and adjust this check.
-            it.skip("should increment the fee receipient's Celo Dollar balance by a portion of the gas fee", () => {
+            // DO NOT MERGE(nategraf)
+            it.skip("should increment the gateway fee receipient's Celo Dollar balance by the gateway fee", () => {
               assertEqualBN(
                 balances
                   .current(FeeRecipientAddress, CeloContract.StableToken)
@@ -774,8 +776,8 @@ describe('Transfer tests', function(this: any) {
               txRes = await runTestTransaction(
                 await transferCeloGold(FromAddress, ToAddress, TransferAmount, {
                   gas,
-                  gasCurrency: await kit.registry.addressFor(CeloContract.StableToken),
-                  gasFeeRecipient: FeeRecipientAddress,
+                  feeCurrency: await kit.registry.addressFor(CeloContract.StableToken),
+                  gatewayFeeRecipient: FeeRecipientAddress,
                 }),
                 gas,
                 await kit.registry.addressFor(CeloContract.StableToken)
@@ -805,8 +807,8 @@ describe('Transfer tests', function(this: any) {
               )
             })
 
-            // TODO(nategraf): Replace gas fee recipient with gateway fee and adjust this check.
-            it.skip("should increment the fee recipient's Celo Dollar balance by a portion of the gas fee", () => {
+            // DO NOT MERGE(nategraf): Replace gateway fee recipient with gateway fee and adjust this check.
+            it.skip("should increment the gatewy fee recipient's Celo Dollar balance by the gateway fee", () => {
               assertEqualBN(
                 balances.delta(FeeRecipientAddress, CeloContract.StableToken),
                 new BigNumber(0)

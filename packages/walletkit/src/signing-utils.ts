@@ -59,19 +59,26 @@ export async function signTransaction(txn: CeloPartialTxParams, privateKey: stri
   }
 
   const signed = (tx: any): any => {
-    if (isNot(tx.gasCurrency)) {
+    if (isNot(tx.feeCurrency)) {
       Logger.info(
         'SigningUtils@signTransaction',
-        `Invalid transaction: Gas currency is \"${tx.gasCurrency}\"`
+        `Invalid transaction: fee currency is \"${tx.feeCurrency}\"`
       )
-      throw new Error(`Invalid transaction: Gas currency is \"${tx.gasCurrency}\"`)
+      throw new Error(`Invalid transaction: Gas currency is \"${tx.feeCurrency}\"`)
     }
-    if (isNot(tx.gasFeeRecipient)) {
+    if (isNot(tx.gatewayFeeRecipient)) {
       Logger.info(
         'SigningUtils@signTransaction',
-        `Invalid transaction: Gas fee recipient is \"${tx.gasFeeRecipient}\"`
+        `Invalid transaction: Gateway fee recipient is \"${tx.gatewayFeeRecipient}\"`
       )
-      throw new Error(`Invalid transaction: Gas fee recipient is \"${tx.gasFeeRecipient}\"`)
+      throw new Error(`Invalid transaction: Gateway fee recipient is \"${tx.gatewayFeeRecipient}\"`)
+    }
+    if (isNot(tx.gatewayFee)) {
+      Logger.info(
+        'SigningUtils@signTransaction',
+        `Invalid transaction: Gateway fee value is \"${tx.gatewayFee}\"`
+      )
+      throw new Error(`Invalid transaction: Gateway fee value is \"${tx.gatewayFee}\"`)
     }
 
     if (!tx.gas && !tx.gasLimit) {
@@ -100,8 +107,9 @@ export async function signTransaction(txn: CeloPartialTxParams, privateKey: stri
         Bytes.fromNat(transaction.nonce),
         Bytes.fromNat(transaction.gasPrice),
         Bytes.fromNat(transaction.gas),
-        transaction.gasCurrency.toLowerCase(),
-        transaction.gasFeeRecipient.toLowerCase(),
+        transaction.feeCurrency.toLowerCase(),
+        transaction.gatewayFeeRecipient.toLowerCase(),
+        Bytes.fromNat(transaction.gatewayFee),
         transaction.to.toLowerCase(),
         Bytes.fromNat(transaction.value),
         transaction.data,

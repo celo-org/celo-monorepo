@@ -52,8 +52,9 @@ export async function signTransaction(txn: any, privateKey: string) {
       transaction.data = tx.data || '0x'
       transaction.value = tx.value || '0x'
       transaction.chainId = '0x' + Number(tx.chainId).toString(16)
-      transaction.gasCurrency = tx.gasCurrency || '0x'
-      transaction.gasFeeRecipient = tx.gasFeeRecipient || '0x'
+      transaction.feeCurrency = tx.feeCurrency || '0x'
+      transaction.gatewayFeeRecipient = tx.gatewayFeeRecipient || '0x'
+      transaction.gatewayFee = tx.gatewayFee || '0x'
 
       // This order should match the order in Geth.
       // https://github.com/celo-org/celo-blockchain/blob/027dba2e4584936cc5a8e8993e4e27d28d5247b8/core/types/transaction.go#L65
@@ -61,8 +62,9 @@ export async function signTransaction(txn: any, privateKey: string) {
         Bytes.fromNat(transaction.nonce),
         Bytes.fromNat(transaction.gasPrice),
         Bytes.fromNat(transaction.gas),
-        transaction.gasCurrency.toLowerCase(),
-        transaction.gasFeeRecipient.toLowerCase(),
+        transaction.feeCurrency.toLowerCase(),
+        transaction.gatewayFeeRecipient.toLowerCase(),
+        Bytes.fromNat(transaction.gatewayFeeRecipient),
         transaction.to.toLowerCase(),
         Bytes.fromNat(transaction.value),
         transaction.data,
@@ -133,12 +135,13 @@ export function recoverTransaction(rawTx: string): [CeloTx, string] {
     nonce: rawValues[0].toLowerCase() === '0x' ? 0 : parseInt(rawValues[0], 16),
     gasPrice: rawValues[1].toLowerCase() === '0x' ? 0 : parseInt(rawValues[1], 16),
     gas: rawValues[2].toLowerCase() === '0x' ? 0 : parseInt(rawValues[2], 16),
-    gasCurrency: rawValues[3],
-    gasFeeRecipient: rawValues[4],
-    to: rawValues[5],
-    value: rawValues[6],
-    data: rawValues[7],
-    chainId: rawValues[8],
+    feeCurrency: rawValues[3],
+    gatewayFeeRecipient: rawValues[4],
+    gatewayFee: rawValues[5],
+    to: rawValues[6],
+    value: rawValues[7],
+    data: rawValues[8],
+    chainId: rawValues[9],
   }
   const signature = Account.encodeSignature(rawValues.slice(8, 11))
   const recovery = Bytes.toNumber(rawValues[8])

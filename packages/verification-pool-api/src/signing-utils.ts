@@ -49,15 +49,17 @@ export async function signTransaction(web3: Web3, txn: any, privateKey: string) 
       transaction.data = tx.data || '0x'
       transaction.value = tx.value || '0x'
       transaction.chainId = utils.numberToHex(tx.chainId)
-      transaction.gasCurrency = tx.gasCurrency || '0x'
-      transaction.gasFeeRecipient = tx.gasFeeRecipient || '0x'
+      transaction.feeCurrency = tx.feeCurrency || '0x'
+      transaction.gatewayFeeRecipient = tx.gatewayFeeRecipient || '0x'
+      transaction.gatewayFee = tx.gatewayFee || '0x'
 
       const rlpEncoded = RLP.encode([
         Bytes.fromNat(transaction.nonce),
         Bytes.fromNat(transaction.gasPrice),
         Bytes.fromNat(transaction.gas),
-        transaction.gasCurrency.toLowerCase(),
-        transaction.gasFeeRecipient.toLowerCase(),
+        transaction.feeCurrency.toLowerCase(),
+        transaction.gatewayFeeRecipient.toLowerCase(),
+        Bytes.fromNat(transaction.gatewayFee),
         transaction.to.toLowerCase(),
         Bytes.fromNat(transaction.value),
         transaction.data,

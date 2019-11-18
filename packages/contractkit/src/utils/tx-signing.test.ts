@@ -61,23 +61,35 @@ async function verifyLocalSigning(web3: Web3, celoTransaction: CeloTx): Promise<
       parseInt(celoTransaction.gasPrice.toString(), 16)
     )
   }
-  if (celoTransaction.gasCurrency != null) {
+  if (celoTransaction.feeCurrency != null) {
     debug(
-      'Checking gas Currency actual %o expected %o',
-      signedCeloTransaction.gasCurrency,
-      celoTransaction.gasCurrency
+      'Checking fee currency actual %o expected %o',
+      signedCeloTransaction.feeCurrency,
+      celoTransaction.feeCurrency
     )
-    expect(signedCeloTransaction.gasCurrency!.toLowerCase()).toEqual(
-      celoTransaction.gasCurrency.toLowerCase()
+    expect(signedCeloTransaction.feeCurrency!.toLowerCase()).toEqual(
+      celoTransaction.feeCurrency.toLowerCase()
     )
   }
-  if (celoTransaction.gasFeeRecipient != null) {
+  if (celoTransaction.gatewayFeeRecipient != null) {
     debug(
-      'Checking gas fee recipient actual ' +
-        `${signedCeloTransaction.gasFeeRecipient} expected ${celoTransaction.gasFeeRecipient}`
+      'Checking gateway fee recipient actual ' +
+        `${signedCeloTransaction.gatewayFeeRecipient} expected ${
+          celoTransaction.gatewayFeeRecipient
+        }`
     )
-    expect(signedCeloTransaction.gasFeeRecipient!.toLowerCase()).toEqual(
-      celoTransaction.gasFeeRecipient.toLowerCase()
+    expect(signedCeloTransaction.gatewayFeeRecipient!.toLowerCase()).toEqual(
+      celoTransaction.gatewayFeeRecipient.toLowerCase()
+    )
+  }
+  if (celoTransaction.gatewayFee != null) {
+    debug(
+      'Checking gateway fee value actual %o expected %o',
+      signedCeloTransaction.gatewayFee,
+      parseInt(celoTransaction.gatewayFee.toString(), 16)
+    )
+    expect(signedCeloTransaction.gatewayFee).toEqual(
+      parseInt(celoTransaction.gatewayFee.toString(), 16)
     )
   }
   if (celoTransaction.data != null) {
@@ -96,12 +108,13 @@ async function verifyLocalSigningInAllPermutations(
   const badNonce = 100
   const gas = 10
   const gasPrice = 99
-  const gasCurrency = '0x124356'
-  const gasFeeRecipient = '0x1234'
+  const feeCurrency = '0x124356'
+  const gatewayFeeRecipient = '0x1234'
+  const gatewayFee = '0x5678'
   const data = '0xabcdef'
 
   // Test all possible combinations for rigor.
-  for (let i = 0; i < 128; i++) {
+  for (let i = 0; i < 256; i++) {
     const celoTransaction: CeloTx = {
       from,
       to,
@@ -109,9 +122,10 @@ async function verifyLocalSigningInAllPermutations(
       nonce: i % 2 === 0 ? nonce : undefined,
       gas: i % 4 === 0 ? gas : undefined,
       gasPrice: i % 8 === 0 ? gasPrice : undefined,
-      gasCurrency: i % 16 === 0 ? gasCurrency : undefined,
-      gasFeeRecipient: i % 32 === 0 ? gasFeeRecipient : undefined,
-      data: i % 64 === 0 ? data : undefined,
+      feeCurrency: i % 16 === 0 ? feeCurrency : undefined,
+      gatewayFeeRecipient: i % 32 === 0 ? gatewayFeeRecipient : undefined,
+      gatewayFee: i % 64 === 0 ? gatewayFee : undefined,
+      data: i % 128 === 0 ? data : undefined,
     }
     await verifyLocalSigning(web3, celoTransaction)
   }
