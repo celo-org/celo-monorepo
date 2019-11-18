@@ -2,6 +2,7 @@ import { E164Number } from '@celo/utils/lib/io'
 import { fetchEnv } from '../env'
 import { SmsProvider, SmsProviderType } from './base'
 import { NexmoSmsProvider } from './nexmo'
+import { TwilioSmsProvider } from './twilio'
 
 const smsProviders: SmsProvider[] = []
 
@@ -17,12 +18,17 @@ export async function initializeSmsProviders() {
   for (const configuredSmsProvider of configuredSmsProviders) {
     switch (configuredSmsProvider) {
       case SmsProviderType.NEXMO:
-        const provider = NexmoSmsProvider.fromEnv()
-        await provider.initialize()
-        smsProviders.push(provider)
+        const nexmoProvider = NexmoSmsProvider.fromEnv()
+        await nexmoProvider.initialize()
+        smsProviders.push(nexmoProvider)
+        break
+      case SmsProviderType.TWILIO:
+        const twilioProvider = TwilioSmsProvider.fromEnv()
+        await twilioProvider.initialize()
+        smsProviders.push(twilioProvider)
         break
       default:
-        break
+        throw new Error(`Unknown sms provider type specified: ${configuredSmsProvider}`)
     }
   }
 }
