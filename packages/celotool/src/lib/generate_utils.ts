@@ -69,6 +69,9 @@ export const generatePrivateKey = (mnemonic: string, accountType: AccountType, i
   return newNode.privateKey.toString('hex')
 }
 
+export const generateAddress = (mnemonic: string, accountType: AccountType, index: number) =>
+  privateKeyToAddress(generatePrivateKey(mnemonic, accountType, index))
+
 export const privateKeyToPublicKey = (privateKey: string) => {
   const ecPrivateKey = ec.keyFromPrivate(Buffer.from(privateKey, 'hex'))
   const ecPublicKey: string = ecPrivateKey.getPublic('hex')

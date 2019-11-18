@@ -1,9 +1,6 @@
 /* tslint:disable: no-console */
-import {
-  CeloContract,
-  /* CeloToken, */ ContractKit,
-  newKit /*, newKitFromWeb3 */,
-} from '@celo/contractkit'
+import { CeloContract, ContractKit, newKit } from '@celo/contractkit'
+import { TransactionResult } from '@celo/contractkit/lib/utils/tx-result'
 import {
   convertToContractDecimals,
   GoldToken,
@@ -20,8 +17,14 @@ import fetch from 'node-fetch'
 import path from 'path'
 import Web3Type from 'web3'
 import { TransactionReceipt } from 'web3/types'
+import { getBlockscoutUrl } from './endpoints'
 import { envVar, fetchEnv, isVmBased } from './env-utils'
-import { AccountType, generatePrivateKey, privateKeyToPublicKey } from './generate_utils'
+import {
+  AccountType,
+  generatePrivateKey,
+  privateKeyToAddress,
+  privateKeyToPublicKey,
+} from './generate_utils'
 import { retrieveIPAddress } from './helm_deploy'
 import { execCmd, execCmdWithExitOnFailure } from './utils'
 import { getTestnetOutputs } from './vm-testnet-utils'
@@ -215,12 +218,12 @@ const validateGethRPC = async (
   handleError: HandleErrorCallback
 ) => {
   const transaction = await web3.eth.getTransaction(txHash)
-  if (!transaction.from || transaction.from.toLowerCase() !== from.toLowerCase()) {
-    handleError(!transaction.from || transaction.from.toLowerCase() !== from.toLowerCase(), {
-      location: '[GethRPC]',
-      error: `Expected "from" to equal ${from}, but found ${transaction.from}`,
-    })
-  }
+  const txFrom = transaction.from.toLowerCase()
+  const expectedFrom = from.toLowerCase()
+  handleError(!transaction.from || expectedFrom !== txFrom, {
+    location: '[GethRPC]',
+    error: `Expected "from" to equal ${expectedFrom}, but found ${txFrom}`,
+  })
 }
 
 const checkBlockscoutResponse = (
@@ -233,9 +236,11 @@ const checkBlockscoutResponse = (
 
   handleError(json.status !== '1', { location, error: `Invalid status: expected '1', received` })
   handleError(!json.result, { location, error: `No result found: receive ${json.status.result}` })
-  handleError(json.result.from !== from, {
+  const resultFrom = json.result.from.toLowerCase()
+  const expectedFrom = from.toLowerCase()
+  handleError(resultFrom !== expectedFrom, {
     location,
-    error: `Expected "from" to equal ${from}, but found ${json.result.from}`,
+    error: `Expected "from" to equal ${expectedFrom}, but found ${resultFrom}`,
   })
   handleError(json.result.hash !== txHash, {
     location,
@@ -293,7 +298,7 @@ const validateTransactionAndReceipt = (
     location,
     error: `Transaction receipt status (${txReceipt.status}) is not true!`,
   })
-  handleError(txReceipt.from !== from, {
+  handleError(txReceipt.from.toLowerCase() !== from.toLowerCase(), {
     location,
     error: `Transaction receipt from (${txReceipt.from}) is not equal to sender address (${from}).`,
   })
@@ -474,55 +479,6 @@ const measureBlockscout = async (
   }
 }
 
-export const simulateClientContractKit = async (
-  senderAddress: string,
-  recipientAddress: string,
-  gasFeeRecipientAddress: string,
-  txPeriodMs: number // time between each transaction in ms
-) => {
-  console.log('simulateClientContractKit')
-  // todo change this url
-  const kit = newKit('http://localhost:8545')
-  while (true) {
-    console.log('kit.web3.eth.blockNumber', await kit.web3.eth.getBlockNumber())
-    // Purposely don't use await syntax for this so we send a transaction every txPeriodMs
-    // rather than txPeriodMs after the previous transaction receipt is received
-    sendLoadTestTx(kit, senderAddress, recipientAddress, gasFeeRecipientAddress)
-      .then((txReceipt: TransactionReceipt) => {
-        console.info('Successully sent load test transaction with txReceipt:', txReceipt)
-      })
-      .catch((error) => {
-        console.error('Load test transaction failed with error:', error)
-      })
-    await sleep(txPeriodMs)
-  }
-}
-
-const sendLoadTestTx = async (
-  kit: ContractKit,
-  senderAddress: string,
-  recipientAddress: string,
-  gasFeeRecipientAddress: string
-) => {
-  // randomly choose to transfer gold or dollars
-  const transferGold = Boolean(Math.round(Math.random()))
-  const transferFn = false ? transferCeloGold : transferCeloDollars
-  // randomly choose which gas currency to use
-  const gasCurrency = false //Math.round(Math.random())
-    ? undefined
-    : await kit.registry.addressFor(CeloContract.StableToken)
-  console.info(
-    `Transferring ${LOAD_TEST_TRANSFER_WEI} ${
-      transferGold ? 'cGLD' : 'cUSD'
-    } with gasCurrency ${gasCurrency}`
-  )
-  const txResult = await transferFn(kit, senderAddress, recipientAddress, LOAD_TEST_TRANSFER_WEI, {
-    gasCurrency,
-    gasFeeRecipient: gasFeeRecipientAddress,
-  })
-  return txResult.waitReceipt()
-}
-
 export const transferCeloGold = async (
   kit: ContractKit,
   fromAddress: string,
@@ -535,13 +491,11 @@ export const transferCeloGold = async (
     gasFeeRecipient?: string
   } = {}
 ) => {
-  const res = await kit.sendTransaction({
+  const kitGoldToken = await kit.contracts.getGoldToken()
+  return kitGoldToken.transfer(toAddress, amount.toString()).send({
     from: fromAddress,
-    to: toAddress,
-    value: amount.toString(),
     ...txOptions,
   })
-  return res
 }
 
 export const transferCeloDollars = async (
@@ -557,133 +511,146 @@ export const transferCeloDollars = async (
   } = {}
 ) => {
   const kitStableToken = await kit.contracts.getStableToken()
-  const res = await kitStableToken.transfer(toAddress, amount.toString()).send({
+  return kitStableToken.transfer(toAddress, amount.toString()).send({
     from: fromAddress,
     ...txOptions,
   })
-
-  return res
 }
 
 export const simulateClient = async (
-  web3: Web3Type,
-  goldToken: GoldTokenType,
-  stableToken: StableTokenType,
-  senderAddress: string,
+  senderPrivateKey: string,
   recipientAddress: string,
-  blockscoutUrl: string,
-  delay: number,
-  blockscoutProbability: number,
-  loadTestID: string,
-  password: string = ''
+  gasFeeRecipientAddress: string,
+  txPeriodMs: number, // time between new transactions in ms
+  blockscoutMeasurePercent: number, // percent of time in range [0, 100] to measure blockscout for a tx
+  index: number
 ) => {
+  // Assume the node is accessible via localhost
+  const kit = newKit('http://localhost:8545')
+
+  kit.addAccount(senderPrivateKey)
+  const senderAddress = privateKeyToAddress(senderPrivateKey)
+  const baseLogMessage: any = {
+    loadTestID: index,
+    sender: senderAddress,
+    recipient: recipientAddress,
+    gasCurrency: '',
+    gasFeeRecipient: gasFeeRecipientAddress,
+    txHash: '',
+  }
+
   while (true) {
-    const baseLogMessage: any = {
-      loadTestID,
-      sender: senderAddress,
-      recipient: recipientAddress,
-      txHash: '',
+    const sendTransactionTime = Date.now()
+
+    const transferGold = Boolean(Math.round(Math.random()))
+    const transferFn = transferGold ? transferCeloGold : transferCeloDollars
+    // randomly choose which gas currency to use
+    const gasCurrencyGold = Boolean(Math.round(Math.random()))
+    const gasCurrency = gasCurrencyGold
+      ? undefined
+      : await kit.registry.addressFor(CeloContract.StableToken)
+    baseLogMessage.gasCurrency = gasCurrency || ''
+    // Contractkit does not yet fully estimate non-Gold currencies
+    let gasPrice: string | undefined = undefined
+    if (gasCurrency) {
+      const gasPriceMultiplier = new BigNumber(10)
+
+      const gasPriceMinimum = await kit.contracts.getGasPriceMinimum()
+      const gasPriceNum = (await gasPriceMinimum.getGasPriceMinimum(gasCurrency)).times(
+        gasPriceMultiplier
+      )
+      gasPrice = kit.web3.utils.toHex(gasPriceNum.toString())
     }
 
-    try {
-      const token = getRandomToken(goldToken, stableToken)
-      const gasCurrencyToken = getRandomToken(goldToken, stableToken)
-
-      const [tokenSymbol] = await Promise.all([
-        token.methods.symbol().call(),
-        gasCurrencyToken.methods.symbol().call(),
-      ])
-
-      const txParams: any = {}
-      // Fill txParams below
-      baseLogMessage.token = tokenSymbol
-
-      const sendTransactionTime = Date.now()
-
-      const transferToken = new Promise(async (resolve: (data: any) => void) => {
-        await transferERC20Token(
-          web3,
-          token,
+    transferFn(kit, senderAddress, recipientAddress, LOAD_TEST_TRANSFER_WEI, {
+      gasCurrency,
+      gasFeeRecipient: gasFeeRecipientAddress,
+      gasPrice,
+    })
+      .then(async (txResult: TransactionResult) => {
+        await onLoadTestTxResult(
+          kit,
           senderAddress,
-          recipientAddress,
-          DEFAULT_TRANSFER_AMOUNT,
-          password,
-          txParams,
-          (txHash: any) => {
-            tracerLog({
-              txHash,
-              tag: LOG_TAG_TRANSACTION_HASH_RECEIVED,
-              ...baseLogMessage,
-            })
-            console.warn('tx hash from trasnfer', txHash)
-          },
-          (receipt2: any) => {
-            resolve([receipt2, Date.now()])
-          },
-          undefined,
-          (error: any) => {
-            resolve([null, error])
-          }
+          txResult,
+          sendTransactionTime,
+          baseLogMessage,
+          transferGold ? 'cGLD' : 'cUSD',
+          blockscoutMeasurePercent
         )
       })
+      .catch((error: any) => {
+        console.error('Load test transaction failed with error:', JSON.stringify(error))
+      })
+    await sleep(txPeriodMs)
+  }
+}
 
-      const [receipt, obtainReceiptTimeOrError] = await transferToken
-      if (receipt === null) {
+export const onLoadTestTxResult = async (
+  kit: ContractKit,
+  senderAddress: string,
+  txResult: TransactionResult,
+  sendTransactionTime: number,
+  baseLogMessage: any,
+  tokenSymbol: string,
+  blockscoutMeasurePercent: number
+) => {
+  baseLogMessage.token = tokenSymbol
+
+  const txReceipt = await txResult.waitReceipt()
+  const txHash = txReceipt.transactionHash
+  baseLogMessage.txHash = txHash
+
+  const receiptTime = Date.now()
+
+  tracerLog({
+    txHash,
+    tag: LOG_TAG_TRANSACTION_HASH_RECEIVED,
+    ...baseLogMessage,
+  })
+
+  try {
+    tracerLog({
+      tag: LOG_TAG_TX_TIME_MEASUREMENT,
+      p_time: receiptTime - sendTransactionTime,
+      ...baseLogMessage,
+    })
+
+    // Continuing only with receipt received
+    validateTransactionAndReceipt(senderAddress, txReceipt, (isError, data) => {
+      if (isError) {
         tracerLog({
-          tag: LOG_TAG_TRANSACTION_ERROR,
-          error: obtainReceiptTimeOrError,
+          tag: LOG_TAG_TRANSACTION_VALIDATION_ERROR,
+          ...baseLogMessage,
+          ...data,
+        })
+      }
+    })
+
+    if (Math.random() * 10 < blockscoutMeasurePercent) {
+      await measureBlockscout(
+        getBlockscoutUrl(fetchEnv(envVar.CELOTOOL_CELOENV)),
+        txReceipt.transactionHash,
+        senderAddress,
+        receiptTime,
+        baseLogMessage
+      )
+    }
+
+    await validateGethRPC(kit.web3, txHash, senderAddress, (isError, data) => {
+      if (isError) {
+        tracerLog({
+          tag: LOG_TAG_GETH_RPC_ERROR,
+          ...data,
           ...baseLogMessage,
         })
-        process.exit(1)
       }
-
-      baseLogMessage.txHash = receipt.transactionHash
-      tracerLog({
-        tag: LOG_TAG_TX_TIME_MEASUREMENT,
-        p_time: obtainReceiptTimeOrError - sendTransactionTime,
-        ...baseLogMessage,
-      })
-
-      // Continuing only with receipt received
-      validateTransactionAndReceipt(senderAddress, receipt, (isError, data) => {
-        if (isError) {
-          tracerLog({
-            tag: LOG_TAG_TRANSACTION_VALIDATION_ERROR,
-            ...baseLogMessage,
-            ...data,
-          })
-        }
-      })
-
-      if (getRandomInt(0, 99) < blockscoutProbability) {
-        await measureBlockscout(
-          blockscoutUrl,
-          receipt.transactionHash,
-          senderAddress,
-          obtainReceiptTimeOrError,
-          baseLogMessage
-        )
-      }
-
-      await validateGethRPC(web3, receipt.transactionHash, senderAddress, (isError, data) => {
-        if (isError) {
-          tracerLog({
-            tag: LOG_TAG_GETH_RPC_ERROR,
-            ...data,
-            ...baseLogMessage,
-          })
-        }
-      })
-    } catch (error) {
-      tracerLog({
-        tag: LOG_TAG_TRANSACTION_ERROR,
-        error: error.toString(),
-        ...baseLogMessage,
-      })
-      process.exit(1)
-    }
-
-    await sleep(delay * 1000 /* turning delay in seconds into delay in ms */)
+    })
+  } catch (error) {
+    tracerLog({
+      tag: LOG_TAG_TRANSACTION_ERROR,
+      error: error.toString(),
+      ...baseLogMessage,
+    })
   }
 }
 

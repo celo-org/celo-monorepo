@@ -125,7 +125,6 @@ spec:
             --syncmode=full \
             ${NAT_FLAG} \
             --ethstats=${HOSTNAME}:${ETHSTATS_SECRET}@${ETHSTATS_SVC} \
-            --miner.verificationpool=${VERIFICATION_POOL_URL} \
             --consoleformat=json \
             --consoleoutput=stdout \
             --verbosity={{ .Values.geth.verbosity }} \

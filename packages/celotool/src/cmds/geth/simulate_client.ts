@@ -1,10 +1,10 @@
 // import fs from 'fs'
 // import { getBlockscoutClusterInternalUrl } from 'src/lib/endpoints'
-import { addCeloEnvMiddleware, CeloEnvArgv } from 'src/lib/env-utils'
-// import { privateKeyToAddress } from 'src/lib/generate_utils'
+import { addCeloEnvMiddleware, CeloEnvArgv, envVar, fetchEnv } from 'src/lib/env-utils'
+import { AccountType, generateAddress, generatePrivateKey } from 'src/lib/generate_utils'
 // import { checkGethStarted, getWeb3AndTokensContracts, simulateClient, sleep } from 'src/lib/geth'
-import { simulateClientContractKit } from 'src/lib/geth'
-import * as yargs from 'yargs'
+import { simulateClient } from 'src/lib/geth'
+// import * as yargs from 'yargs'
 // import { GethArgv } from '../geth'
 
 export const command = 'simulate-client'
@@ -13,138 +13,69 @@ export const describe = 'command for simulating client behavior'
 
 // const TRANSACTION_RECIPIENT = '0x4da58d267cd465b9313fdb19b120ec591d957ad2'
 
-// interface SimulateClientArgv extends CeloEnvArgv, GethArgv {
-//   delay: number
-//   privateKey: string
-//   blockscout: number
-//   loadTestId: string
-// }
-
-export const builder = (argv: yargs.Argv) => {
-  return addCeloEnvMiddleware(argv)
-  // .option('data-dir', {
-  //   type: 'string',
-  //   description: 'path to datadir',
-  //   demand: 'Please, specify geth datadir',
-  // })
-  // .option('private-key', {
-  //   type: 'string',
-  //   description: 'path to file with private key',
-  //   demand: 'Please, provide a path to file with account private key',
-  //   coerce: (path: string) => {
-  //     if (!fs.existsSync(path)) {
-  //       throw new Error(`File not found at: ${path}`)
-  //     }
-  //     return fs
-  //       .readFileSync(path)
-  //       .toString()
-  //       .trim()
-  //   },
-  // })
-  // .option('blockscout', {
-  //   type: 'number',
-  //   description: 'how often to measure blockscout time from on scale from 0 to 100',
-  //   default: 100,
-  // })
-  // .option('delay', {
-  //   type: 'number',
-  //   description: 'Deplay between sending transactions in seconds',
-  //   default: 10,
-  // })
-  // .option('load-test-id', {
-  //   type: 'string',
-  //   description: 'Unique identifier used to distinguish between ran load-tests',
-  //   demand: 'Please, specify the load test unique identifier',
-  // })
+interface SimulateClientArgv extends CeloEnvArgv {
+  blockscoutMeasurePercent: number
+  delay: number
+  index: number
+  recipientIndex: number
+  gasFeeRecipientIndex: number
 }
 
-export const handler = async (argv: CeloEnvArgv /*SimulateClientArgv*/) => {
-  console.info('argv', argv)
-  await simulateClientContractKit(
-    '0xf4314cb9046bece6aa54bb9533155434d0c76909',
-    '0xce7dfca4db4cf970b4bd8fdba33754e09c51cc98',
-    '0x1ac48f235c205f79ce1cff12463ca04e8e0ca2a1',
-    5000
+export const builder = (argv: SimulateClientArgv) => {
+  return addCeloEnvMiddleware(argv)
+    .option('blockscout-measure-percent', {
+      type: 'number',
+      description:
+        'Percent of transactions to measure blockscout time. Must be in the range of [0, 100]',
+      default: 100,
+    })
+    .option('delay', {
+      type: 'number',
+      description: 'Delay between sending transactions in milliseconds',
+      default: 10000,
+    })
+    .option('index', {
+      type: 'number',
+      description: 'Index of load test account to send transactions from',
+      default: 0,
+    })
+    .option('recipient-index', {
+      type: 'number',
+      description: 'Index of the load test account to send transactions to',
+      default: 0,
+    })
+    .option('gas-fee-recipient-index', {
+      type: 'number',
+      description: 'Index of the load test account to send gas fees to',
+      default: 0,
+    })
+}
+
+export const handler = async (argv: SimulateClientArgv) => {
+  const mnemonic = fetchEnv(envVar.MNEMONIC)
+  // send transactions to another load testing account
+  const senderPrivateKey = generatePrivateKey(
+    mnemonic,
+    AccountType.LOAD_TESTING_ACCOUNT,
+    argv.index
+  )
+  const recipientAddress = generateAddress(
+    mnemonic,
+    AccountType.LOAD_TESTING_ACCOUNT,
+    argv.recipientIndex
+  )
+  const gasFeeRecipientAddress = generateAddress(
+    mnemonic,
+    AccountType.LOAD_TESTING_ACCOUNT,
+    argv.gasFeeRecipientIndex
   )
 
-  // const dataDir = argv.dataDir
-  // const delay = argv.delay
-  // const privateKey = argv.privateKey
-  // const blockscoutProbability = argv.blockscout
-  // const loadTestID = argv.loadTestId
-  //
-  // const address = privateKeyToAddress(privateKey).toLowerCase()
-  //
-  // checkGethStarted(dataDir)
-  //
-  // let iterations = 70
-  // let web3AndContracts = null
-  // outerwhile: while (iterations-- > 0) {
-  //   try {
-  //     web3AndContracts = await getWeb3AndTokensContracts()
-  //     // tslint:disable-next-line: no-shadowed-variable
-  //     const { web3 } = web3AndContracts!
-  //     const latestBlock = await web3.eth.getBlock('latest')
-  //     if (latestBlock.number === 0) {
-  //       throw new Error('Latest block is zero')
-  //     } else {
-  //       break outerwhile
-  //     }
-  //   } catch (ignored) {
-  //     console.warn(ignored.toString())
-  //     if (iterations === 0) {
-  //       console.info(
-  //         JSON.stringify({
-  //           loadTestID,
-  //           sender: address.toLowerCase(),
-  //           receipient: TRANSACTION_RECIPIENT.toLowerCase(),
-  //           tag: 'geth_start_error',
-  //           error: ignored.toString(),
-  //         })
-  //       )
-  //     }
-  //     await sleep(1000)
-  //   }
-  // }
-  //
-  // if (iterations <= 0) {
-  //   console.warn('Can not wait for geth to sync')
-  //   console.info(
-  //     JSON.stringify({
-  //       loadTestID,
-  //       sender: address.toLowerCase(),
-  //       receipient: TRANSACTION_RECIPIENT.toLowerCase(),
-  //       tag: 'geth_start_unsuccessful',
-  //     })
-  //   )
-  //   process.exit(1)
-  // }
-  //
-  // const { web3, goldToken, stableToken } = web3AndContracts!
-  //
-  // // Needs to be called only once per private key
-  // // to create a file in keystore containing all the needed to geth info
-  // try {
-  //   await web3.eth.personal.importRawKey(privateKey, '')
-  // } catch (ignored) {
-  //   // ignore
-  // }
-  //
-  // // This is needed to turn off debug logging which is made in `sendTransaction`
-  // // and needed only for mobile client.
-  // console.debug = () => {
-  //   // empty
-  // }
-  //
-  // await simulateClient(
-  //   web3,
-  //   goldToken,
-  //   stableToken,
-  //   address.toLowerCase(),
-  //   TRANSACTION_RECIPIENT.toLowerCase(),
-  //   getBlockscoutClusterInternalUrl(argv),
-  //   delay,
-  //   blockscoutProbability,
-  //   loadTestID
-  // )
+  await simulateClient(
+    senderPrivateKey,
+    recipientAddress,
+    gasFeeRecipientAddress,
+    argv.delay,
+    argv.blockscoutMeasurePercent,
+    argv.index
+  )
 }

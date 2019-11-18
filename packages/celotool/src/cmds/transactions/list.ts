@@ -40,7 +40,7 @@ export const handler = async (argv: ListArgv) => {
   )
 
   const web3 = await getWeb3Client(argv.celoEnv)
-  const blockscoutURL = getBlockscoutUrl(argv)
+  const blockscoutURL = getBlockscoutUrl(argv.celoEnv)
   const resp = await fetch(
     `${blockscoutURL}/api?module=account&action=txlist&address=${argv.address}&sort=desc`
   )
