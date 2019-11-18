@@ -18,6 +18,7 @@
   "dependencies": {
     "@umpirsky/country-list": "git://github.com/umpirsky/country-list#05fda51",
     "bignumber.js": "^7.2.0",
+    "bls12377js": "https://github.com/celo-org/bls12377js#cada1105f4a5e4c2ddd239c1874df3bf33144a10",
     "bn.js": "4.11.8",
     "country-data": "^0.0.31",
     "crypto-js": "^3.1.9-1",

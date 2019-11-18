@@ -1,9 +1,10 @@
 import Button, { BtnTypes } from '@celo/react-components/components/Button'
+import Switch from '@celo/react-components/components/Switch'
 import colors from '@celo/react-components/styles/colors'
 import { fontStyles } from '@celo/react-components/styles/fonts'
 import * as React from 'react'
 import { WithNamespaces, withNamespaces } from 'react-i18next'
-import { ScrollView, StyleSheet, Switch, Text, View } from 'react-native'
+import { ScrollView, StyleSheet, Text, View } from 'react-native'
 import SafeAreaView from 'react-native-safe-area-view'
 import { connect } from 'react-redux'
 import { hideAlert, showError } from 'src/alert/actions'
@@ -117,12 +118,7 @@ class BackupPhrase extends React.Component<Props, State> {
         {!backupCompleted && (
           <View>
             <View style={styles.confirmationSwitchContainer}>
-              <Switch
-                value={isConfirmChecked}
-                onValueChange={this.onPressConfirmSwitch}
-                trackColor={switchTrackColors}
-                thumbColor={colors.celoGreen}
-              />
+              <Switch value={isConfirmChecked} onValueChange={this.onPressConfirmSwitch} />
               <Text style={styles.confirmationSwitchLabel}>{t('savedConfirmation')}</Text>
             </View>
             <Button
@@ -172,11 +168,6 @@ const styles = StyleSheet.create({
     paddingLeft: 10,
   },
 })
-
-const switchTrackColors = {
-  false: colors.inactive,
-  true: colors.celoGreen,
-}
 
 export default componentWithAnalytics(
   connect<StateProps, DispatchProps, {}, RootState>(
