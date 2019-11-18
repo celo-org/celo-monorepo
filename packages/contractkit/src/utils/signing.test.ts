@@ -1,6 +1,6 @@
+import { ACCOUNT_ADDRESSES, ACCOUNT_PRIVATE_KEYS } from '@celo/dev-utils/lib/ganache-setup'
+import { testWithGanache } from '@celo/dev-utils/lib/ganache-test'
 import { LocalSigner, NativeSigner, parseSignature } from '@celo/utils/lib/signatureUtils'
-import { testWithGanache } from '../test-utils/ganache-test'
-import { ACCOUNT_ADDRESSES, ACCOUNT_PRIVATE_KEYS } from '../test-utils/ganache.setup'
 
 // This only really tests signatureUtils in @celo/utils, but is tested here
 // to avoid the web3/ganache setup in @celo/utils
