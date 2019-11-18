@@ -1,4 +1,5 @@
-import { CeloProvider, ContractKit, newKitFromWeb3 } from '@celo/contractkit'
+import { ContractKit, newKitFromWeb3 } from '@celo/contractkit'
+import { CeloProvider } from '@celo/contractkit/lib/providers/celo-provider'
 import { Command, flags } from '@oclif/command'
 import Web3 from 'web3'
 import { getNodeUrl } from './utils/config'
