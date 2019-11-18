@@ -17,4 +17,5 @@ export abstract class SmsProvider {
 export enum SmsProviderType {
   NEXMO = 'nexmo',
   UNKNOWN = 'unknown',
+  TWILIO = 'twilio',
 }
