@@ -1,3 +1,8 @@
+#!/usr/bin/env ts-node
+
+import program from 'commander'
+import fs from 'fs'
+
 import {
   GethTestConfig,
   initAndStartGeth,
@@ -13,13 +18,47 @@ import {
   privateKeyToPublicKey,
 } from '../lib/generate_utils'
 import { getEnodeAddress } from '../lib/geth'
-;(async () => {
-  const numValidators = +(process.env.NUM_VALS || 4)
-  const migrateTo: number = +(process.env.MIGRATE || 20)
+
+program
+  .option('-g, --geth-repo <path>', 'Geth repo path')
+  .option('-v, --validators <number>', 'Number of validators', '3')
+  .option('-m, --migrations <number>', 'Number of migrations to be executed', '19')
+  .option(
+    '-w, --mnemonic <words>',
+    'Mnemonic seed words',
+    'jazz ripple brown cloth door bridge pen danger deer thumb cable prepare negative library vast'
+  )
+  .option('--test-dir <path>', 'Path to temporal data directory', '/tmp/e2e')
+  .action(() => {
+    const { gethRepo, validators, migrations, mnemonic, testDir } = program
+
+    main({
+      gethRepo,
+      validators: +validators,
+      migrations: +migrations,
+      mnemonic,
+      testDir,
+    })
+  })
+  .parse(process.argv)
+
+async function main({
+  gethRepo: gethRepoPath,
+  validators: numValidators,
+  migrations: migrateTo,
+  mnemonic: mnemonic,
+  testDir: tmpDir,
+}: {
+  gethRepo: string
+  validators: number
+  migrations: number
+  mnemonic: string
+  testDir: string
+}) {
   const ethstats = 'localhost:3000'
-  const numEthstats = +(process.env.ETHSTATS || numValidators)
+  const numEthstats = +numValidators
   const gethConfig: GethTestConfig = {
-    migrateTo: migrateTo,
+    migrateTo,
     instances: [...Array(numValidators).keys()].map((key: number) => {
       return {
         name: `validator-${key}`,
@@ -32,11 +71,7 @@ import { getEnodeAddress } from '../lib/geth'
       }
     }),
   }
-  const TEST_DIR = '/tmp/e2e'
-  const genesisPath = `${TEST_DIR}/genesis.json`
-  const gethRepoPath = '/home/dimi/celo/celo-blockchain'
-  const mnemonic =
-    'jazz ripple brown cloth door bridge pen danger deer thumb cable prepare negative library vast'
+  const genesisPath = `${tmpDir}/genesis.json`
   const validatorInstances = gethConfig.instances.filter((x: any) => x.validating)
   const validatorPrivateKeys = getPrivateKeysFor(AccountType.VALIDATOR, mnemonic, numValidators)
   const validators = getValidators(mnemonic, numValidators)
@@ -44,11 +79,17 @@ import { getEnodeAddress } from '../lib/geth'
     getEnodeAddress(privateKeyToPublicKey(x), '127.0.0.1', validatorInstances[i].port)
   )
   const gethBinaryPath = `${gethRepoPath}/build/bin/geth`
+
+  if (!fs.existsSync(tmpDir)) {
+    fs.mkdirSync(tmpDir)
+  }
+
   if (migrateTo) {
     console.log('writing genesis')
     await writeGenesis(validators, genesisPath)
     console.log('wrote   genesis')
   }
+
   console.log(validatorEnodes)
   let validatorIndex = 0
   for (const instance of gethConfig.instances) {
@@ -72,4 +113,4 @@ import { getEnodeAddress } from '../lib/geth'
       gethConfig.migrateTo
     )
   }
-})()
+}
