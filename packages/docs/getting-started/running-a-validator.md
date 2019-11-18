@@ -6,6 +6,7 @@
     - [Software requirements](#software-requirements)
   - [Celo Networks](#celo-networks)
     - [Baklava](#baklava)
+    - [Environment variables](#environment-variables)
       - [Create accounts](#create-accounts)
       - [Deploy the validator and proxy nodes](#deploy-the-validator-and-proxy-nodes)
       - [Deploy the attestation service](#deploy-the-attestation-service)
@@ -14,6 +15,9 @@
       - [Create accounts](#create-accounts-1)
       - [Deploy the validator node](#deploy-the-validator-node)
     - [Obtain and lock up some Celo Gold for staking](#obtain-and-lock-up-some-celo-gold-for-staking)
+      - [Baklava](#baklava-1)
+      - [Alfajores](#alfajores-1)
+      - [Lock up Celo Gold](#lock-up-celo-gold)
     - [Run for election](#run-for-election)
 
 This section explains how to get a validator node running on the network, using a Docker image that was built for this purpose. Most of this process is the same as running a full node, but with a few additional steps.
@@ -344,7 +348,13 @@ The `networkid` parameter value of `44785` indicates we are connecting the Alfaj
 
 ### Obtain and lock up some Celo Gold for staking
 
-Visit the [Celo Faucet](https://celo.org/build/faucet) to send **both** of your accounts some funds.
+#### Baklava
+
+To participate in The Great Celo Stake Off (aka TGCSO) and get fauceted it's necessary to register online via an [online form](https://docs.google.com/forms/d/e/1FAIpQLSfbn5hTJ4UIWpN92-o2qMTUB0UnrFsL0fm97XqGe4VhhN_r5A/viewform).
+
+#### Alfajores
+
+Visit the [Alfajores Celo Faucet](https://celo.org/build/faucet) to send **both** of your accounts some funds.
 
 In a new tab, unlock your accounts so that you can send transactions. This only unlocks the accounts for the lifetime of the validator that's running, so be sure to unlock `$CELO_VALIDATOR_ADDRESS` again if your node gets restarted:
 
@@ -359,6 +369,8 @@ In a new tab, make a locked Gold account for both of your addresses by running t
 $ celocli account:register --from $CELO_VALIDATOR_GROUP_ADDRESS --name <GROUP_NAME_OF_YOUR_CHOICE>
 $ celocli account:register --from $CELO_VALIDATOR_ADDRESS --name <VALIDATOR_NAME_OF_YOUR_CHOICE>
 ```
+
+#### Lock up Celo Gold
 
 Make a locked Gold commitment for both accounts in order to secure the right to register a validator and validator group. The current requirement is 1 Celo Gold with a notice period of 60 days. If you choose to stake more gold, or a longer notice period, be sure to use those values below:
 
