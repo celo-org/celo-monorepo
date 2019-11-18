@@ -213,7 +213,7 @@ export async function init(gethBinaryPath: string, datadir: string, genesisPath:
 }
 
 export async function importPrivateKey(gethBinaryPath: string, instance: GethInstanceConfig) {
-  const keyFile = '/tmp/key.txt'
+  const keyFile = `/${getDatadir(instance)}/key.txt`
   fs.writeFileSync(keyFile, instance.privateKey)
   console.info(`geth:${instance.name}: import account`)
   await execCmdWithExitOnFailure(
@@ -243,13 +243,12 @@ async function isPortOpen(host: string, port: number) {
 }
 
 async function waitForPortOpen(host: string, port: number, seconds: number) {
-  while (seconds > 0) {
+  const deadline = Date.now() + seconds * 1000
+  do {
     if (await isPortOpen(host, port)) {
       return true
     }
-    seconds -= 1
-    await sleep(1)
-  }
+  } while (Date.now() < deadline)
   return false
 }
 
@@ -317,9 +316,13 @@ export async function startGeth(gethBinaryPath: string, instance: GethInstanceCo
   }
 
   if (validating) {
-    gethArgs.push('--password=/dev/null', `--unlock=0`)
     gethArgs.push('--mine', '--minerthreads=10', `--nodekeyhex=${privateKey}`)
   }
+
+  if (privateKey) {
+    gethArgs.push('--password=/dev/null', `--unlock=0`)
+  }
+
   const gethProcess = spawnWithLog(gethBinaryPath, gethArgs, `${datadir}/logs.txt`)
   instance.pid = gethProcess.pid
 
