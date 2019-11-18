@@ -52,7 +52,7 @@ export function getAccountAddress() {
   return toChecksumAddress(process.env.ACCOUNT_ADDRESS)
 }
 
-async function validateAttestationRequest(request: AttestationRequest) {
+export async function validateAttestationRequest(request: AttestationRequest) {
   const attestationRecord = await existingAttestationRequestRecord(
     request.phoneNumber,
     request.account,

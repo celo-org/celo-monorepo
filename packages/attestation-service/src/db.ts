@@ -5,9 +5,9 @@ import Attestation, { AttestationModel, AttestationStatic } from './models/attes
 
 export let sequelize: Sequelize | undefined
 
-export function initializeDB() {
+export function initializeDB(databaseUrl?: string) {
   if (sequelize === undefined) {
-    sequelize = new Sequelize(fetchEnv('DATABASE_URL'))
+    sequelize = new Sequelize(databaseUrl ? databaseUrl : fetchEnv('DATABASE_URL'))
     return sequelize.authenticate() as Promise<void>
   }
   return Promise.resolve()
@@ -25,6 +25,10 @@ export async function initializeKit() {
       )
     }
   }
+}
+
+export function setKit(updatedKit: ContractKit) {
+  kit = updatedKit
 }
 
 let AttestationTable: AttestationStatic

@@ -42,6 +42,12 @@ export function evmSnapshot(web3: Web3) {
   return jsonRpcCall<string>(web3, 'evm_snapshot', [])
 }
 
+export async function mineBlocks(blocks: number, web3: Web3) {
+  for (let i = 0; i < blocks; i++) {
+    await jsonRpcCall(web3, 'evm_mine', [])
+  }
+}
+
 export function testWithGanache(name: string, fn: (web3: Web3) => void) {
   const web3 = new Web3('http://localhost:8545')
 

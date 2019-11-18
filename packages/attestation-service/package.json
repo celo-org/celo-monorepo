@@ -24,7 +24,9 @@
     "db:migrate:undo": "sequelize db:migrate:undo",
     "db:migrate:dev": "sequelize db:migrate",
     "dev": "CONFIG=config/.env.development nodemon",
-    "lint": "tslint -c tslint.json --project ."
+    "lint": "tslint -c tslint.json --project .",
+    "test:prepare": "yarn --cwd ../protocol devchain generate .devchain --migration_override ../dev-utils/src/migration-override.json",
+    "test": "jest --runInBand"
   },
   "dependencies": {
     "@celo/contractkit": "0.2.1-dev",
@@ -48,12 +50,14 @@
     "yargs": "13.3.0"
   },
   "devDependencies": {
+    "@celo/dev-utils": "0.0.1",
     "@celo/protocol": "1.0.0",
     "@types/dotenv": "4.0.3",
     "@types/debug": "^4.1.5",
     "@types/web3": "^1.0.18",
     "ts-node": "8.3.0",
     "nodemon": "1.19.1",
+    "umzug": "2.2.0",
     "webpack": "4.39.1",
     "webpack-cli": "3.3.6"
   },
