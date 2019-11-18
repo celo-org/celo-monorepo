@@ -1,0 +1,12 @@
+{
+  "logo": {
+    "title": "Logo",
+    "overviewCopy":
+      "The Celo logo is a universal signature used to unite projects behind a common journey. It is  important for it to be instantly recognizable so please do not edit, change, distort, recolor, reconfigure, or rearrange the lockup of the logo.",
+    "overviewBtn": "Download Logo Package",
+    "glyphTitle": "Glyph",
+    "glyphCopy":
+      "The glyph should be used when the wordmark is too small to achieve maximum impact. It is often used in place of the full logo in products and web pages. The glyph also works well with brand colors. Use the light or dark glyph with high contrast to your project’s brand colors."
+  },
+  "downloadAssetBtn": "Download Assets"
+}

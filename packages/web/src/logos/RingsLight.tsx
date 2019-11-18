@@ -5,9 +5,10 @@ import Svg, { Path } from 'svgs'
 interface Props {
   height?: number
   color?: colors
+  darkMode?: boolean
 }
 
-export default class LogoLightBg extends React.Component<Props> {
+export default class RingsLight extends React.Component<Props> {
   static defaultProps = {
     height: 25,
   }

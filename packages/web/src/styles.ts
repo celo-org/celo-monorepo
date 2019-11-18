@@ -30,6 +30,11 @@ export enum colors {
   purpleScreen = '#924EFF',
   redScreen = '#FF6553',
   blueScreen = '#52B6FF',
+
+  // added
+  faintGray = '#F8F9F9',
+  faintPurple = '#EFE5FF',
+  black = '#000',
 }
 
 export enum typeFaces {

@@ -1,15 +1,15 @@
-import * as React from 'react'
-import { StyleSheet, Text, View, findNodeHandle } from 'react-native'
-import Sidebar from 'src/brandkit/Sidebar'
-import Footer from 'src/shared/Footer.3'
-import { Cell, GridRow, Spans } from 'src/layout/GridRow'
-import Topbar from 'src/brandkit/TopBar'
 import { SingletonRouter, withRouter } from 'next/router'
-import { withScreenSize, ScreenProps, ScreenSizes } from 'src/layout/ScreenSize'
-import { colors, standardStyles } from 'src/styles'
-import menu, { hashNav } from 'src/shared/menu-items'
+import * as React from 'react'
+import { findNodeHandle, StyleSheet, View } from 'react-native'
 import MobileMenu from 'src/brandkit/MobileMenu'
+import Sidebar from 'src/brandkit/Sidebar'
+import Topbar from 'src/brandkit/TopBar'
+import { Cell, GridRow, Spans } from 'src/layout/GridRow'
+import { ScreenProps, ScreenSizes, withScreenSize } from 'src/layout/ScreenSize'
+import Footer from 'src/shared/Footer.3'
+import menu, { hashNav } from 'src/shared/menu-items'
 import { HEADER_HEIGHT } from 'src/shared/Styles'
+import { colors, standardStyles } from 'src/styles'
 
 const ROOT = menu.BRAND.link
 
@@ -33,9 +33,9 @@ const PAGES = [
 
     sections: [
       { title: 'Overview', href: `${LOGO_PATH}#${hashNav.brandLogo.overview}` },
-      { title: 'Glyph', href: `${LOGO_PATH}#${hashNav.brandLogo.glyph}` },
+      // { title: 'Glyph', href: `${LOGO_PATH}#${hashNav.brandLogo.glyph}` },
       { title: 'Clearspace', href: `${LOGO_PATH}#${hashNav.brandLogo.clearspace}` },
-      { title: 'Size', href: `${LOGO_PATH}#${hashNav.brandLogo.size}` },
+      // { title: 'Size', href: `${LOGO_PATH}#${hashNav.brandLogo.size}` },
       { title: 'Backgrounds', href: `${LOGO_PATH}#${hashNav.brandLogo.backgrounds}` },
     ],
   },
@@ -194,14 +194,13 @@ class Page extends React.Component<Props & ScreenProps, State> {
           </Cell>
           <Cell span={Spans.three4th}>
             <View style={styles.childrenArea} ref={this.pageRef}>
-              <Text>{this.state.routeHash}</Text>
               {sections.map(({ id, children }) => {
                 return (
                   <View
                     key={id}
                     nativeID={id}
                     ref={this.sectionRefs[id]}
-                    style={standardStyles.blockMargin}
+                    style={standardStyles.blockMarginBottom}
                   >
                     {children}
                   </View>
