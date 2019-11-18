@@ -13,6 +13,7 @@ export default class ReportPrice extends BaseCommand {
     {
       name: 'token',
       required: true,
+      default: CeloContract.StableToken,
       description: 'Token to report on',
       options: [CeloContract.StableToken],
     },
@@ -50,13 +51,13 @@ export default class ReportPrice extends BaseCommand {
       'sortedOracles.report',
       await sortedOracles.report(
         res.args.token,
-        numerator.toNumber(),
-        denominator.toNumber(),
+        numerator.toFixed(),
+        denominator.toFixed(),
         res.flags.from
       )
     )
     this.log(
-      `Reported oracle value of ${numerator.div(denominator).toNumber()} ${
+      `Reported oracle value of ${numerator.div(denominator).toFixed()} ${
         res.args.token
       } for 1 CeloGold`
     )
