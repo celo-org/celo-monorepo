@@ -200,16 +200,7 @@ export class ExchangeBuyScreen extends React.Component<Props, State> {
                 justifyContent: 'flex-start',
               }}
             >
-              {/* Row 1 */}
-              <View
-                style={{
-                  flex: 1,
-                  flexDirection: 'row',
-                  justifyContent: 'space-between',
-                  marginTop: 38,
-                  alignItems: 'center',
-                }}
-              >
+              <View style={[styles.rowContainer, styles.goldInputRow]}>
                 <Text style={[fontStyles.body, styles.exchangeBodyText]}>{CURRENCY_ENUM.GOLD}</Text>
                 <TextInput
                   autoFocus={true}
@@ -222,8 +213,7 @@ export class ExchangeBuyScreen extends React.Component<Props, State> {
                 />
               </View>
               <View style={styles.line} />
-              {/* Row 2*/}
-              <View style={{ flexDirection: 'row', flex: 1, justifyContent: 'space-between' }}>
+              <View style={styles.rowContainer}>
                 <Text style={[fontStyles.body, styles.exchangeBodyText]}>
                   {`Subtotal (@ ${getMoneyDisplayValue(
                     exchangeRateDisplay,
@@ -278,5 +268,10 @@ const styles = StyleSheet.create({
     flex: 1,
     flexDirection: 'column',
     justifyContent: 'space-between',
+  },
+  rowContainer: { flexDirection: 'row', flex: 1, justifyContent: 'space-between' },
+  goldInputRow: {
+    marginTop: 38,
+    alignItems: 'center',
   },
 })
