@@ -432,7 +432,7 @@ If you find your validator still not getting elected you may need to faucet your
 At any moment you can check if you are validating running the following command:
 
 ```bash
-TO BE DEFINED
+celocli validator:show $CELO_VALIDATOR_ADDRESS
 ```
 
 You can de-affiliate a validator account of a validator group:
@@ -441,10 +441,10 @@ You can de-affiliate a validator account of a validator group:
 celocli validator:deaffiliate --from $CELO_VALIDATOR_ADDRESS
 ```
 
-The rewards can be redeem running the following command:
+You can update your validator BLS key using the following command:
 
 ```bash
-
+celocli validator:update-bls-public-key --from $CELO_VALIDATOR_ADDRESS --blsKey $CELO_VALIDATOR_BLS_PUBLIC_KEY --blsPop $CELO_VALIDATOR_PROOF_OF_POSSESSION
 ```
 
 {% hint style="info" %}
