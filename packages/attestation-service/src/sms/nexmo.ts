@@ -2,8 +2,8 @@ import { retryAsyncWithBackOff } from '@celo/utils/lib/async'
 import { E164Number } from '@celo/utils/lib/io'
 import { PhoneNumberUtil } from 'google-libphonenumber'
 import Nexmo from 'nexmo'
-import { fetchEnv, fetchEnvOrDefault } from '../env'
-import { SmsProvider, SmsProviderType } from './base'
+import { fetchEnv } from '../env'
+import { readBlacklistFromEnv, SmsProvider, SmsProviderType } from './base'
 
 const phoneUtil = PhoneNumberUtil.getInstance()
 
@@ -12,9 +12,7 @@ export class NexmoSmsProvider extends SmsProvider {
     return new NexmoSmsProvider(
       fetchEnv('NEXMO_KEY'),
       fetchEnv('NEXMO_SECRET'),
-      fetchEnvOrDefault('NEXMO_BLACKLIST', '')
-        .split(',')
-        .filter((code) => code !== '')
+      readBlacklistFromEnv('NEXMO_BLACKLIST')
     )
   }
   type = SmsProviderType.NEXMO
