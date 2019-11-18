@@ -123,7 +123,7 @@ export class CeloPrivateKeysWalletProvider extends PrivateKeyWalletSubprovider {
       txParams.gatewayFeeRecipient = await this.getCoinbase()
       if (isEmpty(txParams.gatewayFeeRecipient)) {
         // Fail early. The validator nodes will reject a transaction missing
-        // gatewayj fee recipient anyways.
+        // gateway fee recipient anyways.
         throw new Error(
           'Gateway fee recipient is missing, cannot retrieve it' +
             ' from web3.eth.getCoinbase() either cannot process transaction'
