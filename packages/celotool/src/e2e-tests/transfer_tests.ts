@@ -79,6 +79,12 @@ const setIntrinsicGas = async (validatorUri: string, validatorAddress: string, g
     .sendAndWaitForReceipt({ from: validatorAddress })
 }
 
+// Intrinsic gas for a basic transaction
+const INTRINSIC_GAS_FOR_TX = 21000
+
+// Additional intrinsic gas for a transaction with gas currency specified
+const ADDITIONAL_INTRINSIC_TX_GAS_COST = 134000
+
 /** Helper to watch balance changes over accounts */
 interface BalanceWatcher {
   update(): Promise<void>
@@ -520,7 +526,8 @@ describe('Transfer tests', function(this: any) {
           })
 
           describe('gasCurrency = CeloDollars >', () => {
-            const intrinsicGas = 155000
+            const intrinsicGas = INTRINSIC_GAS_FOR_TX + ADDITIONAL_INTRINSIC_TX_GAS_COST
+
             describe('when there is no demurrage', () => {
               describe('when setting a gas amount greater than the amount of gas necessary', () =>
                 testTransferToken({
@@ -579,7 +586,7 @@ describe('Transfer tests', function(this: any) {
   })
 
   describe('Transfer with changed intrinsic gas cost >', () => {
-    const intrinsicGasForAlternativeGasCurrency = 34000
+    const changedIntrinsicGasForAlternativeGasCurrency = 34000
 
     before(restartWithCleanNodes)
 
@@ -588,7 +595,11 @@ describe('Transfer tests', function(this: any) {
         before(`start geth on sync: ${syncMode}`, async () => {
           try {
             await startSyncNode(syncMode)
-            await setIntrinsicGas('http://localhost:8545', validatorAddress, 34000)
+            await setIntrinsicGas(
+              'http://localhost:8545',
+              validatorAddress,
+              changedIntrinsicGasForAlternativeGasCurrency
+            )
           } catch (err) {
             console.debug('some error', err)
           }
@@ -596,11 +607,11 @@ describe('Transfer tests', function(this: any) {
 
         describe('Transfer CeloGold >', () => {
           describe('gasCurrency = CeloDollars >', () => {
-            const intrinsicGas = intrinsicGasForAlternativeGasCurrency + 21000
+            const intrinsicGas = changedIntrinsicGasForAlternativeGasCurrency + INTRINSIC_GAS_FOR_TX
             describe('when there is no demurrage', () => {
               describe('when setting a gas amount greater than the amount of gas necessary', () =>
                 testTransferToken({
-                  expectedGas: 55000,
+                  expectedGas: intrinsicGas,
                   transferToken: CeloContract.GoldToken,
                   feeToken: CeloContract.StableToken,
                   txOptions: {
