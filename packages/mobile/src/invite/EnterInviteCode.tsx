@@ -5,7 +5,7 @@ import colors from '@celo/react-components/styles/colors'
 import fontStyles from '@celo/react-components/styles/fonts'
 import * as React from 'react'
 import { WithNamespaces, withNamespaces } from 'react-i18next'
-import { Clipboard, StyleSheet, Text, View } from 'react-native'
+import { ActivityIndicator, Clipboard, StyleSheet, Text, View } from 'react-native'
 import SafeAreaView from 'react-native-safe-area-view'
 import { connect } from 'react-redux'
 import { hideAlert, showError } from 'src/alert/actions'
@@ -14,11 +14,10 @@ import CodeRow, { CodeRowStatus } from 'src/components/CodeRow'
 import DevSkipButton from 'src/components/DevSkipButton'
 import { CELO_FAUCET_LINK, SHOW_GET_INVITE_LINK } from 'src/config'
 import { Namespaces } from 'src/i18n'
-import { denyImportContacts, setHasSeenVerificationNux } from 'src/identity/actions'
-import { redeemInvite } from 'src/invite/actions'
+import { redeemInvite, skipInvite } from 'src/invite/actions'
 import { extractValidInviteCode, getValidInviteCodeFromReferrerData } from 'src/invite/utils'
 import { nuxNavigationOptionsNoBackButton } from 'src/navigator/Headers'
-import { navigate, navigateHome } from 'src/navigator/NavigationService'
+import { navigate } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
 import { RootState } from 'src/redux/reducers'
 import { navigateToURI } from 'src/utils/linking'
@@ -27,35 +26,33 @@ import { currentAccountSelector } from 'src/web3/selectors'
 interface StateProps {
   redeemComplete: boolean
   isRedeemingInvite: boolean
+  isSkippingInvite: boolean
   account: string | null
 }
 
 interface State {
-  // appState: AppStateStatus
   inputValue: string
 }
 
 interface DispatchProps {
   redeemInvite: typeof redeemInvite
+  skipInvite: typeof skipInvite
   showError: typeof showError
   hideAlert: typeof hideAlert
-  // TODO(Rossy): Remove when import screen is removed
-  denyImportContacts: typeof denyImportContacts
-  setHasSeenVerificationNux: typeof setHasSeenVerificationNux
 }
 
 const mapDispatchToProps = {
   redeemInvite,
+  skipInvite,
   showError,
   hideAlert,
-  denyImportContacts,
-  setHasSeenVerificationNux,
 }
 
 const mapStateToProps = (state: RootState): StateProps => {
   return {
     redeemComplete: state.invite.redeemComplete,
     isRedeemingInvite: state.invite.isRedeemingInvite,
+    isSkippingInvite: state.invite.isSkippingInvite,
     account: currentAccountSelector(state),
   }
 }
@@ -66,64 +63,28 @@ export class EnterInviteCode extends React.Component<Props, State> {
   static navigationOptions = nuxNavigationOptionsNoBackButton
 
   state: State = {
-    // appState: AppState.currentState,
     inputValue: '',
   }
 
   async componentDidMount() {
-    // AppState.addEventListener('change', this.handleAppStateChange)
     await this.checkIfValidCodeInClipboard()
     await this.checkForReferrerCode()
-  }
-
-  componentWillUnmount() {
-    // AppState.removeEventListener('change', this.handleAppStateChange)
   }
 
   checkForReferrerCode = async () => {
     const validCode = await getValidInviteCodeFromReferrerData()
     if (validCode) {
       this.setState({ inputValue: validCode })
+      this.props.redeemInvite(validCode)
     }
   }
 
   checkIfValidCodeInClipboard = async () => {
     const message = await Clipboard.getString()
-    const code = extractValidInviteCode(message)
-    if (code) {
-      this.onInputChange(code)
+    if (extractValidInviteCode(message)) {
+      this.onInputChange(message)
     }
   }
-
-  // handleAppStateChange = async (nextAppState: AppStateStatus) => {
-  //   if (this.state.appState.match(/inactive|background/) && nextAppState === 'active') {
-  //     await this.checkIfValidCodeInClipboard()
-  //   }
-  //   this.setState({ appState: nextAppState })
-  // }
-
-  // onPressOpenMessage = () => {
-  //   if (Platform.OS === 'android') {
-  //     SendIntentAndroid.openSMSApp()
-  //   } else {
-  //     navigateToURI('sms:')
-  //   }
-  // }
-
-  // onPressPaste = async () => {
-  //   this.props.hideAlert()
-  //   const { inputValue: validCode } = this.state
-
-  //   Logger.debug('Extracted invite code:', validCode || '')
-
-  //   if (!validCode) {
-  //     this.props.showError(ErrorMessages.INVALID_INVITATION)
-  //     return
-  //   }
-
-  //   this.props.redeemInvite(validCode)
-  // }
-
   onPressImportClick = async () => {
     navigate(Screens.ImportWallet)
   }
@@ -137,16 +98,14 @@ export class EnterInviteCode extends React.Component<Props, State> {
   }
 
   onPressSkip = () => {
-    //TODO create account
-    this.props.denyImportContacts()
-    this.props.setHasSeenVerificationNux(true)
-    navigateHome()
+    this.props.skipInvite()
   }
 
   onInputChange = (value: string) => {
     this.setState({ inputValue: value })
-    if (extractValidInviteCode(value)) {
-      this.props.redeemInvite(value)
+    const inviteCode = extractValidInviteCode(value)
+    if (inviteCode) {
+      this.props.redeemInvite(inviteCode)
     }
   }
 
@@ -155,7 +114,7 @@ export class EnterInviteCode extends React.Component<Props, State> {
   }
 
   render() {
-    const { t, isRedeemingInvite, redeemComplete, account } = this.props
+    const { t, isRedeemingInvite, isSkippingInvite, redeemComplete, account } = this.props
     const { inputValue } = this.state
 
     let codeStatus = CodeRowStatus.INPUTTING
@@ -171,78 +130,26 @@ export class EnterInviteCode extends React.Component<Props, State> {
           contentContainerStyle={styles.scrollContainer}
           keyboardShouldPersistTaps={'always'}
         >
-          <DevSkipButton nextScreen={Screens.ImportContacts} />
-          <Text style={styles.h1} testID={'InviteCodeTitle'}>
-            {t('inviteCodeText.title')}
-          </Text>
-          <Text style={fontStyles.body}>{t('inviteCodeText.body')}</Text>
-          <Text style={styles.codeHeader}>{t('inviteCodeText.codeHeader')}</Text>
-          <CodeRow
-            status={codeStatus}
-            inputValue={inputValue || t('global:accepted')}
-            inputPlaceholder={'Celo code: am9hBM3tiA+CuNb...'}
-            onInputChange={this.onInputChange}
-            shouldShowClipboard={this.shouldShowClipboard}
-          />
-
-          {/* <View style={styles.inviteActionContainer}>
-            {!redeemComplete && (
-              <Text style={styles.body}>
-                <Text>{t('inviteCodeText.copyInvite.0')}</Text>
-                {t('inviteCodeText.copyInvite.1')}
-              </Text>
-            )}
-
-            {redeemComplete ? (
-              <Text style={[styles.body, componentStyles.marginTop10]}>
-                {t('inviteCodeText.inviteAccepted')}
-              </Text>
-            ) : (
-              !isRedeemingInvite &&
-              (!validCode ? (
-                <View>
-                  <Text style={styles.hint}>
-                    <Text style={fontStyles.bodySmallSemiBold}>
-                      {t('inviteCodeText.openMessages.hint.0')}
-                    </Text>
-                    {t('inviteCodeText.openMessages.hint.1')}
-                  </Text>
-                  <SmallButton
-                    text={t('inviteCodeText.openMessages.message')}
-                    testID={'openMessageButton'}
-                    onPress={this.onPressOpenMessage}
-                    solid={true}
-                    style={styles.button}
-                  />
-                </View>
-              ) : (
-                <View>
-                  <Text style={styles.hint}>{t('inviteCodeText.pasteInviteCode.hint')}</Text>
-                  <SmallButton
-                    text={t('inviteCodeText.pasteInviteCode.message')}
-                    testID={'pasteMessageButton'}
-                    onPress={this.onPressPaste}
-                    solid={false}
-                    style={styles.button}
-                  />
-                </View>
-              ))
-            )}
-            {isRedeemingInvite &&
-              !redeemComplete && (
-                <View>
-                  <Text style={styles.hint}>{t('inviteCodeText.validating')}</Text>
-                  <ActivityIndicator
-                    size="large"
-                    color={colors.celoGreen}
-                    style={componentStyles.marginTop10}
-                  />
-                </View>
-              )}
-          </View> */}
-        </KeyboardAwareScrollView>
-
-        <View>
+          <View>
+            <DevSkipButton nextScreen={Screens.ImportContacts} />
+            <Text style={styles.h1} testID={'InviteCodeTitle'}>
+              {t('inviteCodeText.title')}
+            </Text>
+            <Text style={fontStyles.body}>{t('inviteCodeText.body')}</Text>
+            <Text style={styles.codeHeader}>{t('inviteCodeText.codeHeader')}</Text>
+            <CodeRow
+              status={codeStatus}
+              inputValue={inputValue}
+              inputPlaceholder={t('inviteCodeText.codePlaceholder')}
+              onInputChange={this.onInputChange}
+              shouldShowClipboard={this.shouldShowClipboard}
+            />
+          </View>
+          {isSkippingInvite && (
+            <View>
+              <ActivityIndicator size="large" color={colors.celoGreen} />
+            </View>
+          )}
           <Text style={styles.askInviteText}>
             <Text style={fontStyles.bodySmallBold}>{t('inviteCodeText.noCode')}</Text>
             {SHOW_GET_INVITE_LINK ? (
@@ -265,6 +172,8 @@ export class EnterInviteCode extends React.Component<Props, State> {
               </>
             )}
           </Text>
+        </KeyboardAwareScrollView>
+        <View>
           <Button
             onPress={this.onPressContinue}
             disabled={isRedeemingInvite || !redeemComplete || !account}
@@ -295,9 +204,10 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
   },
   scrollContainer: {
-    flex: 1,
+    flexGrow: 1,
     padding: 20,
     paddingTop: 0,
+    justifyContent: 'space-between',
   },
   codeHeader: {
     ...fontStyles.body,
@@ -310,8 +220,8 @@ const styles = StyleSheet.create({
   },
   askInviteText: {
     ...fontStyles.bodySmall,
-    marginVertical: 20,
-    marginHorizontal: 20,
+    marginTop: 20,
+    marginBottom: 10,
   },
   askInviteLink: {
     ...fontStyles.bodySmall,

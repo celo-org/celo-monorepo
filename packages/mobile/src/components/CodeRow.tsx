@@ -3,8 +3,11 @@ import withTextInputPasteAware from '@celo/react-components/components/WithTextI
 import Checkmark from '@celo/react-components/icons/Checkmark'
 import colors from '@celo/react-components/styles/colors'
 import fontStyles from '@celo/react-components/styles/fonts'
+import { componentStyles } from '@celo/react-components/styles/styles'
 import * as React from 'react'
+import { withNamespaces, WithNamespaces } from 'react-i18next'
 import { ActivityIndicator, StyleSheet, Text, View } from 'react-native'
+import { Namespaces } from 'src/i18n'
 
 const CodeInput = withTextInputPasteAware(TextInput)
 
@@ -24,13 +27,16 @@ export interface CodeRowProps {
   shouldShowClipboard: (value: string) => boolean
 }
 
+type Props = CodeRowProps & WithNamespaces
+
 function CodeRow({
   status,
   inputValue,
   inputPlaceholder,
   onInputChange,
   shouldShowClipboard,
-}: CodeRowProps) {
+  t,
+}: Props) {
   if (status === CodeRowStatus.DISABLED) {
     return (
       <View style={styles.codeInputDisabledContainer}>
@@ -51,26 +57,36 @@ function CodeRow({
     )
   }
 
+  const shortenedInput = inputValue && inputValue.substr(0, 25) + '...'
+
   if (status === CodeRowStatus.PROCESSING) {
     return (
-      <View style={styles.codeInputContainer}>
-        <Text style={styles.codeInput}>{inputValue.substr(0, 15) + '...'}</Text>
+      <View style={styles.codeProcessingContainer}>
+        <Text style={styles.codeValue}>{shortenedInput || t('processing')}</Text>
         <ActivityIndicator size="small" color={colors.celoGreen} style={styles.codeInputSpinner} />
       </View>
     )
   }
 
-  if (status >= CodeRowStatus.RECEIVED) {
+  if (status === CodeRowStatus.RECEIVED) {
     return (
-      <View style={styles.codeContainer}>
+      <View style={styles.codeReceivedContainer}>
         <Text style={styles.codeValue} numberOfLines={1} ellipsizeMode={'tail'}>
-          {inputValue}
+          {shortenedInput || t('processing')}
         </Text>
-        {status === CodeRowStatus.ACCEPTED && (
-          <View style={styles.checkmarkContainer}>
-            <Checkmark height={20} width={20} />
-          </View>
-        )}
+      </View>
+    )
+  }
+
+  if (status === CodeRowStatus.ACCEPTED) {
+    return (
+      <View style={styles.codeReceivedContainer}>
+        <Text style={styles.codeValue} numberOfLines={1} ellipsizeMode={'tail'}>
+          {shortenedInput || t('accepted')}
+        </Text>
+        <View style={styles.checkmarkContainer}>
+          <Checkmark height={20} width={20} />
+        </View>
       </View>
     )
   }
@@ -79,7 +95,15 @@ function CodeRow({
 }
 
 const styles = StyleSheet.create({
-  codeContainer: {
+  codeInput: {
+    ...componentStyles.roundedBorder,
+    flex: 0,
+    backgroundColor: '#FFF',
+    borderColor: colors.inputBorder,
+    height: 50,
+    marginVertical: 5,
+  },
+  codeReceivedContainer: {
     justifyContent: 'center',
     marginVertical: 5,
     paddingHorizontal: 10,
@@ -94,22 +118,20 @@ const styles = StyleSheet.create({
     right: 3,
     padding: 10,
   },
-  codeInputContainer: {
-    position: 'relative',
-  },
-  codeInput: {
-    flex: 0,
+  codeProcessingContainer: {
+    ...componentStyles.roundedBorder,
     backgroundColor: '#FFF',
-    borderColor: colors.inputBorder,
-    borderRadius: 3,
-    borderWidth: 1,
-    height: 50,
+    position: 'relative',
+    justifyContent: 'center',
     marginVertical: 5,
+    paddingHorizontal: 10,
+    borderColor: colors.inputBorder,
+    height: 50,
   },
   codeInputSpinner: {
     backgroundColor: '#FFF',
     position: 'absolute',
-    top: 9,
+    top: 5,
     right: 3,
     padding: 10,
   },
@@ -130,4 +152,4 @@ const styles = StyleSheet.create({
   },
 })
 
-export default CodeRow
+export default withNamespaces(Namespaces.global)(CodeRow)
