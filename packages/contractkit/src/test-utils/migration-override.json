@@ -23,11 +23,10 @@
   },
   "governance": {
     "dequeueFrequency": 30,
-    "queueExpiry": 101,
-    "approvalStageDuration": 103,
-    "referendumStageDuration": 104,
-    "executionStageDuration": 105,
-    "concurrentProposals": 2,
+    "queueExpiry": 1000,
+    "approvalStageDuration": 100,
+    "referendumStageDuration": 100,
+    "executionStageDuration": 100,
     "minDeposit": 1
   }
 }
