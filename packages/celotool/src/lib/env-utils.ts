@@ -200,18 +200,18 @@ export async function confirmAction(
   }
 }
 
+export function addCeloEnvOption(argv: yargs.Argv) {
+  return argv.option('celo-env', {
+    demand: 'Please specify a valid CELO_ENV',
+    alias: 'e',
+    required: true,
+    description: 'the environment in which you want to execute this command',
+  })
+}
+
 export function addCeloEnvMiddleware(argv: yargs.Argv) {
-  return (
-    argv
-      .option('celo-env', {
-        demand: 'Please specify a valid CELO_ENV',
-        alias: 'e',
-        required: true,
-        description: 'the environment in which you want to execute this command',
-      })
-      // @ts-ignore Since we pass it right above, we know that celoEnv will be there at runtime
-      .middleware([celoEnvMiddleware])
-  )
+  // @ts-ignore Since we pass it right above, we know that celoEnv will be there at runtime
+  return addCeloEnvOption(argv).middleware([celoEnvMiddleware])
 }
 
 export function isVmBased() {

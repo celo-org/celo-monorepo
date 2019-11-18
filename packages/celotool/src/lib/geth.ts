@@ -17,7 +17,6 @@ import fetch from 'node-fetch'
 import path from 'path'
 import Web3Type from 'web3'
 import { TransactionReceipt } from 'web3/types'
-import { getBlockscoutUrl } from './endpoints'
 import { envVar, fetchEnv, isVmBased } from './env-utils'
 import {
   AccountType,
@@ -522,6 +521,7 @@ export const simulateClient = async (
   recipientAddress: string,
   gasFeeRecipientAddress: string,
   txPeriodMs: number, // time between new transactions in ms
+  blockscoutUrl: string,
   blockscoutMeasurePercent: number, // percent of time in range [0, 100] to measure blockscout for a tx
   index: number
 ) => {
@@ -575,6 +575,7 @@ export const simulateClient = async (
           sendTransactionTime,
           baseLogMessage,
           transferGold ? 'cGLD' : 'cUSD',
+          blockscoutUrl,
           blockscoutMeasurePercent
         )
       })
@@ -592,6 +593,7 @@ export const onLoadTestTxResult = async (
   sendTransactionTime: number,
   baseLogMessage: any,
   tokenSymbol: string,
+  blockscoutUrl: string,
   blockscoutMeasurePercent: number
 ) => {
   baseLogMessage.token = tokenSymbol
@@ -628,7 +630,7 @@ export const onLoadTestTxResult = async (
 
     if (Math.random() * 10 < blockscoutMeasurePercent) {
       await measureBlockscout(
-        getBlockscoutUrl(fetchEnv(envVar.CELOTOOL_CELOENV)),
+        blockscoutUrl,
         txReceipt.transactionHash,
         senderAddress,
         receiptTime,
