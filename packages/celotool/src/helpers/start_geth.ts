@@ -1,7 +1,7 @@
 #!/usr/bin/env ts-node
 
 import program from 'commander'
-import fs from 'fs'
+import fs from 'fs-extra'
 
 import {
   GethTestConfig,
@@ -28,15 +28,17 @@ program
     'Mnemonic seed words',
     'jazz ripple brown cloth door bridge pen danger deer thumb cable prepare negative library vast'
   )
+  .option('-k, --keep-data', 'Skeps the clean up of the previous node data', '/tmp/e2e')
   .option('--test-dir <path>', 'Path to temporal data directory', '/tmp/e2e')
   .action(() => {
-    const { gethRepo, validators, migrations, mnemonic, testDir } = program
+    const { gethRepo, validators, migrations, mnemonic, keepData, testDir } = program
 
     main({
       gethRepo,
       validators: +validators,
       migrations: +migrations,
       mnemonic,
+      keepData,
       testDir,
     })
   })
@@ -46,13 +48,15 @@ async function main({
   gethRepo: gethRepoPath,
   validators: numValidators,
   migrations: migrateTo,
-  mnemonic: mnemonic,
+  mnemonic,
+  keepData,
   testDir: tmpDir,
 }: {
   gethRepo: string
   validators: number
   migrations: number
   mnemonic: string
+  keepData: boolean
   testDir: string
 }) {
   const ethstats = 'localhost:3000'
@@ -72,6 +76,7 @@ async function main({
     }),
   }
   const genesisPath = `${tmpDir}/genesis.json`
+  const validatorsFilePath = `${tmpDir}/validators.json`
   const validatorInstances = gethConfig.instances.filter((x: any) => x.validating)
   const validatorPrivateKeys = getPrivateKeysFor(AccountType.VALIDATOR, mnemonic, numValidators)
   const validators = getValidators(mnemonic, numValidators)
@@ -80,6 +85,9 @@ async function main({
   )
   const gethBinaryPath = `${gethRepoPath}/build/bin/geth`
 
+  if (!keepData) {
+    fs.removeSync(tmpDir)
+  }
   if (!fs.existsSync(tmpDir)) {
     fs.mkdirSync(tmpDir)
   }
@@ -91,6 +99,9 @@ async function main({
   }
 
   console.log(validatorEnodes)
+
+  fs.writeFileSync(validatorsFilePath, JSON.stringify(validatorEnodes), 'utf8')
+
   let validatorIndex = 0
   for (const instance of gethConfig.instances) {
     if (instance.validating) {
