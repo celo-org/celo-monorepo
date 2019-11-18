@@ -763,7 +763,7 @@ jobs:
           name: Build and run
           command: |
             cd packages/protocol
-            python3 scripts/certora/certoraBuild.py specs/harnesses/SortedListCheck.sol specs/harnesses/IntegerSortedListCheck.sol specs/harnesses/AddressSortedListCheck.sol --verify SortedListCheck:specs/list.spec IntegerSortedListCheck:specs/list.spec AddressSortedListCheck:specs/list.spec --solc ~/app/solc
+            python3 scripts/certora/certoraBuild.py specs/harnesses/LockedGoldHarness.sol --solc ~/app/solc --verify LockedGoldHarness:specs/locked_gold.spec --settings -assumeUnwindCond
             java -jar scripts/certora/prover_cli.jar verify . # need to setup key first
 
 workflows:
