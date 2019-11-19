@@ -441,7 +441,7 @@ describe('governance tests', () => {
         const expectedScore = adjustmentSpeed
           .times(uptime)
           .plus(new BigNumber(1).minus(adjustmentSpeed).times(fromFixed(previousScore)))
-        assertAlmostEqual(score.toFixed(), toFixed(expectedScore).toFixed())
+        assertAlmostEqual(score, toFixed(expectedScore))
       }
 
       for (const blockNumber of blockNumbers) {
