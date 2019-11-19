@@ -1,5 +1,8 @@
 import Web3 from 'web3'
 import { JsonRPCResponse } from 'web3/providers'
+import migrationOverride from './migration-override.json'
+
+export const NetworkConfig = migrationOverride
 
 export function jsonRpcCall<O>(web3: Web3, method: string, params: any[]): Promise<O> {
   return new Promise<O>((resolve, reject) => {
