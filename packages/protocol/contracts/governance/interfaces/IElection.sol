@@ -6,5 +6,5 @@ interface IElection {
   function getTotalVotesByAccount(address) external view returns (uint256);
   function markGroupIneligible(address) external;
   function markGroupEligible(address, address, address) external;
-  function electValidators() external view returns (address[] memory);
+  function electValidatorSigners() external view returns (address[] memory);
 }

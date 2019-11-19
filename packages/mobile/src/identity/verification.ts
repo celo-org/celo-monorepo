@@ -1,6 +1,6 @@
+import { eqAddress } from '@celo/utils/src/address'
 import { compressedPubKey } from '@celo/utils/src/commentEncryption'
 import { getPhoneHash, isE164Number } from '@celo/utils/src/phoneNumbers'
-import { areAddressesEqual } from '@celo/utils/src/signatureUtils'
 import {
   ActionableAttestation,
   extractAttestationCodeFromMessage,
@@ -487,10 +487,7 @@ function* setAccount(attestationsContract: AttestationsType, address: string, da
   Logger.debug(TAG, 'Setting wallet address and public data encryption key')
   const currentWalletAddress = yield call(getWalletAddress, attestationsContract, address)
   const currentWalletDEK = yield call(getDataEncryptionKey, attestationsContract, address)
-  if (
-    !areAddressesEqual(currentWalletAddress, address) ||
-    !areAddressesEqual(currentWalletDEK, dataKey)
-  ) {
+  if (!eqAddress(currentWalletAddress, address) || !eqAddress(currentWalletDEK, dataKey)) {
     const setAccountTx = makeSetAccountTx(attestationsContract, address, dataKey)
     yield call(sendTransaction, setAccountTx, address, TAG, `Set Wallet Address & DEK`)
     CeloAnalytics.track(CustomEventNames.verification_set_account)

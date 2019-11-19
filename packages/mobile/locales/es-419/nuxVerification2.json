@@ -11,68 +11,68 @@
   "pleaseRetry": "Por favor reinicie la verificación.",
   "retryVerification": "Reintentar la verificación",
   "education": {
-    "header": "~~Verify Your Phone",
-    "body1": "~~Next, please verify your phone number.",
+    "header": "Verificar el teléfono",
+    "body1": "Le solicitamos que verifique su número telefónico.",
     "body2":
-      "~~Verifying makes it easier to send and receive with friends. You can also skip this step and return to it later.",
-    "learnMore": "~~Learn more about phone verification",
-    "start": "~~Start Verification",
-    "skip": "~~Skip For Now"
+      "Esto facilita el envío y la recepción de valores entre amigos. Puede omitir este paso ahora y hacerlo después.",
+    "learnMore": "Más información sobre la verificación telefónica",
+    "start": "Comenzar la verificación",
+    "skip": "Omitir por ahora"
   },
   "learnMore": {
-    "header": "~~Phone Number Verification",
+    "header": "Verificación del teléfono",
     "intro":
-      "~~Celo Phone number verification works by associating your Celo Wallet with your phone number.",
-    "section1Header": "~~Do I need to complete this?",
+      "La verificación del número telefónico de Celo consiste en asociar su billetera de Celo con su teléfono.",
+    "section1Header": "¿Tengo que completar este paso?",
     "section1Body":
-      "~~Verification is not required. However, if you do not verify, others on the Celo network cannot send value to you using your phone number. They must use QR codes or addresses.",
-    "section2Header": "~~Security and Privacy",
+      "La verificación no es obligatoria. Cuando la completa, las personas de la red de Celo le podrán enviar valores usando su número telefónico. De lo contrario, deberán usar códigos QR o direcciones.",
+    "section2Header": "Seguridad y privacidad",
     "section2Body":
-      "~~To protect your privacy, only an obfuscated version of your phone number is stored on the Celo blockchain."
+      "Para proteger su privacidad, solo se guarda una versión oculta de su teléfono en la cadena de bloques de Celo."
   },
   "loading": {
-    "verifyingNumber": "~~Verifying {{number}}",
-    "keepOpen": "~~Please keep the app open",
-    "card1": "~~Verifying your phone number helps your friends find you on the Celo Network.",
-    "card2": "~~On Celo, you can send money to your anyone using just their phone number.",
-    "card3": "~~Celo is now requesting three text messages to confirm you own your phone number."
+    "verifyingNumber": "Verificando {{number}}",
+    "keepOpen": "Deje abierta la aplicación",
+    "card1":
+      "Verificar su número telefónico permite que sus amigos lo encuentren en la red de Celo.",
+    "card2": "Con Celo, puede enviar dinero a cualquier persona con tan solo el número telefónico.",
+    "card3":
+      "Celo ahora envía tres mensajes de texto para confirmar que es dueño de su propia línea telefónica."
   },
   "skipModal": {
-    "header": "~~Skip Verification?",
-    "body1": "~~Verifying allows others to send value to your phone number.",
+    "header": "¿Omitir la verificación?",
+    "body1": "La verificación permite que otras personas le envíen valores a su número telefónico.",
     "body2":
-      "~~Without verification, you can still receive payments but only using Celo addresses or QR codes."
+      "Sin la verificación, igual podrá recibir pagos, pero solo mediante las direcciones de Celo o códigos QR."
   },
   "interstitial": {
-    "header": "~~Almost Done",
+    "header": "Ya casi estamos",
     "body1":
-      "~~Your text messages are on the way! Please enter your three codes as you receive them.",
-    "body2": "~~This may take a minute."
+      "¡Estamos enviando sus mensajes de texto! Ingrese los tres códigos a medida que los reciba.",
+    "body2": "Esto puede tardar un poco."
   },
   "input": {
-    "header": "~~Submit Codes",
-    "body1": "~~Copy and Paste ",
-    "body2": "~~the verification codes from your Messages (SMS) app.",
-    "codeHeader1": "~~First Code",
-    "codeHeader2": "~~Second Code",
-    "codeHeader3": "~~Third Code",
-    "codesMissing": "~~I didn’t receive three codes",
-    "tip": "~~Typing? Try copying and pasting the code.",
-    "codeAccepted": "Aceptado",
-    "sendingCodes": "~~Sending verification codes..."
+    "header": "Enviar códigos",
+    "body1": "Copiar y pegar ",
+    "body2": "los códigos de verificación de su aplicación de mensajes de texto (SMS).",
+    "codeHeader1": "Primer código",
+    "codeHeader2": "Segundo código",
+    "codeHeader3": "Tercer código",
+    "codesMissing": "No recibí tres códigos",
+    "tip": "¿Está escribiendo el código? ¿Por qué no lo copia y pega?",
+    "sendingCodes": "Envío de códigos de verificación..."
   },
   "missingCodesModal": {
-    "header": "~~Missing Codes?",
+    "header": "¿Falta algún código?",
     "body":
-      "~~If you haven’t received all your codes yet after 60 seconds, you can skip verification and try again later.",
-    "wait": "~~Wait for codes",
-    "skip": "~~Skip for now"
+      "Si no recibe todos los códigos después de 60 segundos, puede saltar la verificación y volver a intentarlo más tarde.",
+    "wait": "Esperar los códigos.",
+    "skip": "Omitir por ahora"
   },
   "failModal": {
-    "header": "~~Verification has failed :(",
-    "body1":
-      "~~An issue has occured while verifying your phone number. Sorry for the inconvenience!",
-    "body2": "~~You can skip verification for now and try again later."
+    "header": "No se pudo verificar",
+    "body1": "Se produjo un problema al verificar su número de teléfono.",
+    "body2": "Puede saltar la verificación y volver a intentarlo más tarde."
   },
   "congratsVerified": "¡Felicitaciones se ha verificado tu suario!"
 }

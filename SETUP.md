@@ -14,6 +14,7 @@
       - [Installing OpenJDK 8](#installing-openjdk-8)
       - [Install Android Dev Tools](#install-android-dev-tools-1)
     - [Some common stuff](#some-common-stuff)
+      - [Install Go](#install-go)
       - [Optional: Install Rust](#optional-install-rust)
       - [Optional: Install an Android Emulator](#optional-install-an-android-emulator)
       - [Optional: Genymotion](#optional-genymotion)
@@ -175,6 +176,23 @@ The steps are:
 You can find the complete instructions about how to install the tools in Linux environments in the [Documentation page](https://developer.android.com/studio/install#linux).
 
 ### Some common stuff
+
+#### Install Go
+
+We need Go for [celo-blockchain](https://github.com/celo-org/celo-blockchain), the Go Celo implementation, and `gobind` to build Java language bindings to Go code for the Android Geth client).
+
+Note: We currently use Go 1.11. Brew installs Go 1.12 by default, which is not entirely compatible with our repositories. [Install Go 1.11 manually](https://golang.org/dl/), then run
+
+```
+go get golang.org/x/mobile/cmd/gobind
+```
+
+Execute the following (and make sure the lines are in your `~/.bash_profile`):
+
+```
+export GOPATH=$HOME/go
+export PATH=$PATH:$GOPATH/bin
+```
 
 #### Optional: Install Rust
 

@@ -5,3 +5,7 @@ export function fetchEnv(name: string): string {
   }
   return process.env[name] as string
 }
+
+export function fetchEnvOrDefault(name: string, defaultValue: string): string {
+  return process.env[name] === undefined ? defaultValue : (process.env[name] as string)
+}
