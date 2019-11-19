@@ -113,7 +113,7 @@ const DefaultConfig = {
     membershipHistoryLength: 60,
     maxGroupSize: '5',
 
-    // We register a number of C-Labs groups to contain and initial set of validators to run the network.
+    // We register a number of C-Labs groups to contain an initial set of validators to run the network.
     validatorKeys: [],
     groupName: 'C-Labs',
     commission: 0.1,
