@@ -1,6 +1,6 @@
 import { zip } from 'lodash'
 import { execCmd, execCmdWithExitOnFailure } from 'src/lib/utils'
-import * as yargs from 'yargs'
+import yargs from 'yargs'
 
 export const command = 'remove-leaked-forwarding-rules'
 

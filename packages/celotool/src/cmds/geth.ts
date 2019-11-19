@@ -1,4 +1,4 @@
-import * as yargs from 'yargs'
+import yargs from 'yargs'
 
 export const command = 'geth <command>'
 
