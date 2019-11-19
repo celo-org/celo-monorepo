@@ -1,21 +1,16 @@
 import { AttestationState } from '@celo/contractkit/lib/wrappers/Attestations'
 import { attestToIdentifier, SignatureUtils } from '@celo/utils'
-import {
-  Address,
-  isValidPrivateKey,
-  privateKeyToAddress,
-  toChecksumAddress,
-} from '@celo/utils/lib/address'
+import { Address, isValidPrivateKey, toChecksumAddress } from '@celo/utils/lib/address'
 import { AddressType, E164Number, E164PhoneNumberType } from '@celo/utils/lib/io'
 import { isValidAddress } from 'ethereumjs-util'
 import express from 'express'
 import * as t from 'io-ts'
 import { Transaction } from 'sequelize'
-import { existingAttestationRequestRecord, getAttestationTable, kit, sequelize } from './db'
-import { AttestationModel, AttestationStatus } from './models/attestation'
-import { respondWithError } from './request'
-import { smsProviderFor } from './sms'
-import { SmsProviderType } from './sms/base'
+import { existingAttestationRequestRecord, getAttestationTable, kit, sequelize } from '../db'
+import { AttestationModel, AttestationStatus } from '../models/attestation'
+import { respondWithError } from '../request'
+import { smsProviderFor } from '../sms'
+import { SmsProviderType } from '../sms/base'
 
 const SMS_SENDING_ERROR = 'Something went wrong while attempting to send SMS, try again later'
 const ATTESTATION_ERROR = 'Valid attestation could not be provided'
@@ -60,7 +55,6 @@ async function validateAttestationRequest(request: AttestationRequest) {
   )
   // check if it exists in the database
   if (attestationRecord && !attestationRecord.canSendSms()) {
-    console.log(attestationRecord.canSendSms())
     throw new Error(ATTESTATION_ALREADY_SENT_ERROR)
   }
   const address = getAccountAddress()
@@ -89,8 +83,7 @@ async function validateAttestation(
   attestationRequest: AttestationRequest,
   attestationCode: string
 ) {
-  const key = getAttestationKey()
-  const address = privateKeyToAddress(key)
+  const address = getAccountAddress()
   const attestations = await kit.contracts.getAttestations()
   const isValid = await attestations.validateAttestationCode(
     attestationRequest.phoneNumber,
@@ -187,6 +180,7 @@ async function sendSmsAndPersistAttestation(
         { transaction }
       )
     } catch (error) {
+      console.error(error)
       await attestationRecord.update(
         { status: AttestationStatus.FAILED, smsProvider: provider.type },
         { transaction }
