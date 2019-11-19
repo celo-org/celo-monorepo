@@ -58,8 +58,8 @@ export default function Initializer(CeloAnalytics: CeloAnalyticsType, Logger: Re
       }
     }
 
-    function forwardRef(props: {}, ref?: React.Ref<React.ReactElement<any>>) {
-      return <ComponentWithAnalytics {...props as P} forwardedRef={ref} />
+    function forwardRef(props: P, ref: any) {
+      return <ComponentWithAnalytics {...props} forwardedRef={ref} />
     }
 
     forwardRef.displayName = `WithAnalytics(${displayName})`

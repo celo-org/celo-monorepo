@@ -1,10 +1,15 @@
 import * as dotenv from 'dotenv'
 import express from 'express'
-import { AttestationRequestType, getAttestationKey, handleAttestationRequest } from './attestation'
+import RateLimiter from 'express-rate-limit'
 import { initializeDB, initializeKit } from './db'
 import { createValidatedHandler } from './request'
+import {
+  AttestationRequestType,
+  getAttestationKey,
+  handleAttestationRequest,
+} from './requestHandlers/attestation'
+import { handleStatusRequest, StatusRequestType } from './requestHandlers/status'
 import { initializeSmsProviders } from './sms'
-
 async function init() {
   console.info(process.env.CONFIG)
   if (process.env.CONFIG) {
@@ -22,6 +27,13 @@ async function init() {
   const port = process.env.PORT || 3000
   app.listen(port, () => console.log(`Server running on ${port}!`))
 
+  const rateLimiter = new RateLimiter({
+    windowMs: 5 * 60 * 100, // 5 minutes
+    max: 50,
+    // @ts-ignore
+    message: { status: false, error: 'Too many requests, please try again later' },
+  })
+  app.get('/status', rateLimiter, createValidatedHandler(StatusRequestType, handleStatusRequest))
   app.post(
     '/attestations',
     createValidatedHandler(AttestationRequestType, handleAttestationRequest)

@@ -2,12 +2,29 @@ import express from 'express'
 import { isLeft } from 'fp-ts/lib/Either'
 import * as t from 'io-ts'
 
+export enum ErrorMessages {
+  UNKNOWN_ERROR = 'Something went wrong',
+}
+
+export function catchAsyncErrorHandler<T>(
+  handler: (req: express.Request, res: express.Response) => Promise<T>
+) {
+  return async (req: express.Request, res: express.Response) => {
+    try {
+      return handler(req, res)
+    } catch (error) {
+      console.error(error)
+      respondWithError(res, 500, ErrorMessages.UNKNOWN_ERROR)
+    }
+  }
+}
+
 export function createValidatedHandler<T>(
   requestType: t.Type<T>,
   handler: (req: express.Request, res: express.Response, parsedRequest: T) => Promise<void>
 ) {
-  return async (req: express.Request, res: express.Response) => {
-    const parsedRequest = requestType.decode(req.body)
+  return catchAsyncErrorHandler(async (req: express.Request, res: express.Response) => {
+    const parsedRequest = requestType.decode({ ...req.query, ...req.body })
     if (isLeft(parsedRequest)) {
       res.status(422).json({
         success: false,
@@ -15,14 +32,9 @@ export function createValidatedHandler<T>(
         errors: serializeErrors(parsedRequest.left),
       })
     } else {
-      try {
-        await handler(req, res, parsedRequest.right)
-      } catch (error) {
-        console.error(error)
-        res.status(500).json({ success: false, error: 'Something went wrong' })
-      }
+      return handler(req, res, parsedRequest.right)
     }
-  }
+  })
 }
 
 function serializeErrors(errors: t.Errors) {
