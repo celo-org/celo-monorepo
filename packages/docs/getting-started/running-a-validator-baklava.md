@@ -9,7 +9,8 @@
     - [Deploy the attestation service](#deploy-the-attestation-service)
       - [Environment variables](#environment-variables-1)
       - [Sms Providers](#sms-providers)
-      - [Configuration](#configuration)
+      - [Accounts Configuration](#accounts-configuration)
+      - [Database Configuration](#database-configuration)
       - [Running the attestation service](#running-the-attestation-service)
 
 This section explains how to get a validator node running on the Baklava network, using a Docker image that was built for this purpose. Most of this process is the same as running a full node, but with a few additional steps.
@@ -191,7 +192,7 @@ If you prefer using Twilio, this is list of the variables to use:
 | TWILIO_AUTH_TOKEN            | The API authentication token                                    |
 | TWILIO_BLACKLIST             | A comma-sperated list of country codes you do not want to serve |
 
-#### Configuration
+#### Accounts Configuration
 
 First we need to create an account for getting the attestation key needed to sign the attestations. Run:
 
@@ -213,6 +214,8 @@ For example:
 ```bash
 export CELO_PROVIDER="https://my-attestation.example.com"
 ```
+
+#### Database Configuration
 
 For storing and retrieving the attestation requests the service needs a database to persist that information. Currently `sqlite`, `postgres` and `mysql` are supported. For testing purposes you can use `sqlite` but it's recommended to run a stand-alone database server using `mysql` or `postgres` if your intention is running the attestation service in a production environment.
 
