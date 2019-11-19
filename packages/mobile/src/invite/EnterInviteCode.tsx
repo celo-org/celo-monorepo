@@ -102,10 +102,12 @@ export class EnterInviteCode extends React.Component<Props, State> {
   }
 
   onInputChange = (value: string) => {
-    this.setState({ inputValue: value })
     const inviteCode = extractValidInviteCode(value)
     if (inviteCode) {
+      this.setState({ inputValue: inviteCode })
       this.props.redeemInvite(inviteCode)
+    } else {
+      this.setState({ inputValue: value })
     }
   }
 
