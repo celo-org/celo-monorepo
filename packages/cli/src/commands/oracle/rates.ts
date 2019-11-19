@@ -15,10 +15,11 @@ export default class GetRates extends BaseCommand {
       required: true,
       description: 'Token to get the rates for',
       options: [CeloContract.StableToken],
+      default: CeloContract.StableToken,
     },
   ]
 
-  static example = ['rates StableToken']
+  static example = ['rates StableToken', 'rates']
 
   async run() {
     const res = this.parse(GetRates)

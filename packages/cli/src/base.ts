@@ -5,12 +5,12 @@ import Web3 from 'web3'
 import { getNodeUrl } from './utils/config'
 import { injectDebugProvider } from './utils/eth-debug-provider'
 import { requireNodeIsSynced } from './utils/helpers'
-import { addKeysToKit } from './utils/local_accounts'
 
 export abstract class BaseCommand extends Command {
   static flags = {
     logLevel: flags.string({ char: 'l', hidden: true }),
     help: flags.help({ char: 'h', hidden: true }),
+    privateKey: flags.string({ hidden: true }),
   }
 
   // This specifies whether the node needs to be synced before the command
@@ -41,6 +41,11 @@ export abstract class BaseCommand extends Command {
     if (!this._kit) {
       this._kit = newKitFromWeb3(this.web3)
     }
+
+    const res = this.parse(this.constructor)
+    if (res.flags.privateKey) {
+      this._kit.addAccount(res.flags.privateKey)
+    }
     return this._kit
   }
 
@@ -48,7 +53,6 @@ export abstract class BaseCommand extends Command {
     if (this.requireSynced) {
       await requireNodeIsSynced(this.web3)
     }
-    addKeysToKit(this.kit, this.config.configDir)
   }
 
   // TODO(yorke): implement log(msg) switch on logLevel with chalk colored output

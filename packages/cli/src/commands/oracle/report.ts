@@ -28,21 +28,23 @@ export default class ReportPrice extends BaseCommand {
     denominator: flags.string({
       required: false,
       description: 'Amount of cGLD equal to the numerator. Defaults to 1 if left blank',
+      default: 1,
     }),
   }
 
   static example = [
-    'report --token StableToken --numerator 1.02 --from 0x8c349AAc7065a35B7166f2659d6C35D75A3893C1',
-    'report --token StableToken --numerator 102 --denominator 100 --from 0x8c349AAc7065a35B7166f2659d6C35D75A3893C1',
+    'report StableToken --numerator 1.02 --from 0x8c349AAc7065a35B7166f2659d6C35D75A3893C1',
+    'report StableToken --numerator 102 --denominator 100 --from 0x8c349AAc7065a35B7166f2659d6C35D75A3893C1',
+    'report --numerator 0.99 --from 0x8c349AAc7065a35B7166f2659d6C35D75A3893C1',
   ]
 
   async run() {
     const res = this.parse(ReportPrice)
     const sortedOracles = await this.kit.contracts.getSortedOracles()
     let numerator = new BigNumber(res.flags.numerator)
-    let denominator = new BigNumber(res.flags.denominator || 1)
+    let denominator = new BigNumber(res.flags.denominator)
     if (numerator.decimalPlaces() > 0) {
-      const multiplier = new BigNumber(10).pow(numerator.decimalPlaces()).toNumber()
+      const multiplier = new BigNumber(10).pow(numerator.decimalPlaces()).toFixed()
       numerator = numerator.multipliedBy(multiplier)
       denominator = denominator.multipliedBy(multiplier)
     }
