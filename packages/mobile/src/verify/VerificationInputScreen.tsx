@@ -92,7 +92,7 @@ class VerificationInputScreen extends React.Component<Props, State> {
   }
 
   componentDidMount() {
-    this.interval = setInterval(() => {
+    this.interval = window.setInterval(() => {
       const timer = this.state.timer
       if (timer === 1) {
         clearInterval(this.interval)
