@@ -1,5 +1,6 @@
 import { E164Number } from '@celo/utils/lib/io'
 import { PhoneNumberUtil } from 'google-libphonenumber'
+import { fetchEnvOrDefault } from '../env'
 const phoneUtil = PhoneNumberUtil.getInstance()
 
 export abstract class SmsProvider {
@@ -18,4 +19,10 @@ export enum SmsProviderType {
   NEXMO = 'nexmo',
   UNKNOWN = 'unknown',
   TWILIO = 'twilio',
+}
+
+export function readBlacklistFromEnv(envVarName: string) {
+  return fetchEnvOrDefault(envVarName, '')
+    .split(',')
+    .filter((code) => code !== '')
 }
