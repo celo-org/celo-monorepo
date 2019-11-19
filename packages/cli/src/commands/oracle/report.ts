@@ -26,9 +26,9 @@ export default class ReportPrice extends BaseCommand {
       description: 'Amount of the specified token equal to the amount of cGLD in the denominator',
     }),
     denominator: flags.string({
-      required: false,
+      required: true,
       description: 'Amount of cGLD equal to the numerator. Defaults to 1 if left blank',
-      default: 1,
+      default: '1',
     }),
   }
 
@@ -44,7 +44,7 @@ export default class ReportPrice extends BaseCommand {
     let numerator = new BigNumber(res.flags.numerator)
     let denominator = new BigNumber(res.flags.denominator)
     if (numerator.decimalPlaces() > 0) {
-      const multiplier = new BigNumber(10).pow(numerator.decimalPlaces()).toFixed()
+      const multiplier = new BigNumber(10).pow(numerator.decimalPlaces())
       numerator = numerator.multipliedBy(multiplier)
       denominator = denominator.multipliedBy(multiplier)
     }
@@ -53,8 +53,8 @@ export default class ReportPrice extends BaseCommand {
       'sortedOracles.report',
       await sortedOracles.report(
         res.args.token,
-        numerator.toFixed(),
-        denominator.toFixed(),
+        numerator.toNumber(),
+        denominator.toNumber(),
         res.flags.from
       )
     )
