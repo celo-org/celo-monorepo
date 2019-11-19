@@ -582,12 +582,19 @@ async function helmCommand(command: string) {
   await execCmdWithExitOnFailure(command)
 }
 
+function buildHelmChartDependencies(chartDir: string) {
+  console.info(`Building any chart dependencies...`)
+  return helmCommand(`helm dep build ${chartDir}`)
+}
+
 export async function installGenericHelmChart(
   celoEnv: string,
   releaseName: string,
   chartDir: string,
   parameters: string[]
 ) {
+  await buildHelmChartDependencies(chartDir)
+
   console.info(`Installing helm release ${releaseName}`)
   await helmCommand(
     `helm install ${chartDir} --name ${releaseName} --namespace ${celoEnv} ${parameters.join(' ')}`
@@ -600,8 +607,9 @@ export async function upgradeGenericHelmChart(
   chartDir: string,
   parameters: string[]
 ) {
-  console.info(`Upgrading helm release ${releaseName}`)
+  await buildHelmChartDependencies(chartDir)
 
+  console.info(`Upgrading helm release ${releaseName}`)
   await helmCommand(
     `helm upgrade ${releaseName} ${chartDir} --namespace ${celoEnv} ${parameters.join(' ')}`
   )

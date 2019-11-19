@@ -1,7 +1,7 @@
 import { getBlockscoutUrl } from 'src/lib/endpoints'
 import { envVar, fetchEnv } from 'src/lib/env-utils'
 import { generateGenesisFromEnv } from 'src/lib/generate_utils'
-import { getEnodesAddresses } from 'src/lib/geth'
+import { getEnodesWithExternalIPAddresses } from 'src/lib/geth'
 import { installGenericHelmChart, removeGenericHelmChart } from 'src/lib/helm_deploy'
 
 export async function installHelmChart(celoEnv: string, blockscoutProb: number, replicas: number) {
@@ -19,7 +19,7 @@ export async function removeHelmRelease(celoEnv: string) {
 }
 
 async function helmParameters(celoEnv: string, blockscoutProb: number, replicas: number) {
-  const enodes = await getEnodesAddresses(celoEnv)
+  const enodes = await getEnodesWithExternalIPAddresses(celoEnv)
   const staticNodesJsonB64 = Buffer.from(JSON.stringify(enodes)).toString('base64')
   return [
     `--set blockscout.measurePercent=${blockscoutProb}`,

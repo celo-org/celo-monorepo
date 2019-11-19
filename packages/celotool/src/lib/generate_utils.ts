@@ -11,7 +11,6 @@ import {
   CONTRACT_OWNER_STORAGE_LOCATION,
   GETH_CONFIG_OLD,
   ISTANBUL_MIX_HASH,
-  OG_ACCOUNTS,
   REGISTRY_ADDRESS,
   TEMPLATE,
 } from './genesis_constants'
@@ -87,7 +86,6 @@ export const privateKeyToStrippedAddress = (privateKey: string) =>
   strip0x(privateKeyToAddress(privateKey))
 
 const DEFAULT_BALANCE = '1000000000000000000000000'
-const VALIDATOR_OG_SOURCE = 'og'
 
 export const getPrivateKeysFor = (accountType: AccountType, mnemonic: string, n: number) =>
   range(0, n).map((i) => generatePrivateKey(mnemonic, accountType, i))
@@ -108,6 +106,14 @@ export const getValidators = (mnemonic: string, n: number) => {
   })
 }
 
+export const getFaucetedAddresses = (mnemonic: string) => {
+  const loadTestClients = parseInt(fetchEnv(envVar.LOAD_TEST_CLIENTS), 10)
+  return [
+    ...getStrippedAddressesFor(AccountType.FAUCET, mnemonic, 2),
+    ...getStrippedAddressesFor(AccountType.LOAD_TESTING_ACCOUNT, mnemonic, loadTestClients),
+  ]
+}
+
 export const getAddressFromEnv = (accountType: AccountType, n: number) => {
   const mnemonic = fetchEnv(envVar.MNEMONIC)
   const privateKey = generatePrivateKey(mnemonic, accountType, n)
@@ -116,17 +122,8 @@ export const getAddressFromEnv = (accountType: AccountType, n: number) => {
 
 export const generateGenesisFromEnv = (enablePetersburg: boolean = true) => {
   const mnemonic = fetchEnv(envVar.MNEMONIC)
-  const validatorEnv = fetchEnv(envVar.VALIDATORS)
-  const validators =
-    validatorEnv === VALIDATOR_OG_SOURCE
-      ? OG_ACCOUNTS.map((account) => {
-          const blsKeyBytes = blsPrivateKeyToProcessedPrivateKey(account.privateKey)
-          return {
-            address: account.address,
-            blsPublicKey: bls12377js.BLS.privateToPublicBytes(blsKeyBytes).toString('hex'),
-          }
-        })
-      : getValidators(mnemonic, parseInt(validatorEnv, 10))
+  const validatorCount = parseInt(fetchEnv(envVar.VALIDATORS), 10)
+  const validators = getValidators(mnemonic, validatorCount)
 
   const consensusType = fetchEnv(envVar.CONSENSUS_TYPE) as ConsensusType
 
@@ -144,13 +141,13 @@ export const generateGenesisFromEnv = (enablePetersburg: boolean = true) => {
   const chainId = parseInt(fetchEnv(envVar.NETWORK_ID), 10)
 
   // Assing DEFAULT ammount of gold to 2 faucet accounts
-  const faucetAddresses = getStrippedAddressesFor(AccountType.FAUCET, mnemonic, 2)
+  const faucetedAddresses = getFaucetedAddresses(mnemonic)
 
   return generateGenesis({
     validators,
     consensusType,
     blockTime,
-    initialAccounts: faucetAddresses,
+    initialAccounts: faucetedAddresses,
     epoch,
     chainId,
     requestTimeout,

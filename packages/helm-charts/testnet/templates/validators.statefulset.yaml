@@ -46,7 +46,7 @@ spec:
         component: validators
     spec:
       initContainers:
-{{ include "celo.init-genesis-container" .  | indent 6 }}
+{{ include "common.init-genesis-container" .  | indent 6 }}
       - name: get-account
         image: {{ .Values.celotool.image.repository }}:{{ .Values.celotool.image.tag }}
         imagePullPolicy: IfNotPresent

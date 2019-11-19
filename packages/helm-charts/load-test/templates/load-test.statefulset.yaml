@@ -69,7 +69,7 @@ spec:
         volumeMounts:
         - name: data
           mountPath: /root/.celo
-{{ include "init-genesis-container" .  | indent 6 }}
+{{ include "common.init-genesis-container" .  | indent 6 }}
       containers:
       - name: geth
         image: {{ .Values.geth.image.repository }}:{{ .Values.geth.image.tag }}

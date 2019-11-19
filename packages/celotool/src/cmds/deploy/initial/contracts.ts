@@ -14,7 +14,7 @@ import { envVar, fetchEnv } from 'src/lib/env-utils'
 import {
   AccountType,
   generatePrivateKey,
-  getAddressesFor,
+  getFaucetedAddresses,
   getPrivateKeysFor,
   privateKeyToAddress,
 } from 'src/lib/generate_utils'
@@ -31,6 +31,9 @@ export const describe = 'deploy the celo smart contracts'
 export const builder = {}
 
 export const CLABS_VALIDATOR_METADATA_BUCKET = 'clabs_validator_metadata'
+
+// 60k Celo Dollars
+const DEFAULT_FAUCET_AMOUNT = '60000000000000000000000'
 
 function minerForEnv() {
   if (fetchEnv(envVar.VALIDATORS) === 'og') {
@@ -109,16 +112,18 @@ export const handler = async (argv: InitialArgv) => {
   const cb = async () => {
     const mnemonic = fetchEnv(envVar.MNEMONIC)
     const validatorKeys = getValidatorKeys()
+
+    // Give balances to faucet & load testing addresses
+    const faucetedAddresses = getFaucetedAddresses(mnemonic)
+
     const migrationOverrides = JSON.stringify({
       validators: {
         validatorKeys,
       },
       stableToken: {
         initialBalances: {
-          addresses: getAddressesFor(AccountType.FAUCET, mnemonic, 2),
-          values: getAddressesFor(AccountType.FAUCET, mnemonic, 2).map(
-            () => '60000000000000000000000'
-          ), // 60k Celo Dollars
+          addresses: faucetedAddresses,
+          values: faucetedAddresses.map(() => DEFAULT_FAUCET_AMOUNT),
         },
       },
     })

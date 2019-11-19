@@ -1,4 +1,4 @@
-{{- define "init-genesis-container" -}}
+{{- define "common.init-genesis-container" -}}
 - name: init-genesis
   image: {{ .Values.geth.image.repository }}:{{ .Values.geth.image.tag }}
   imagePullPolicy: {{ .Values.imagePullPolicy }}

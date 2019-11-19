@@ -42,21 +42,6 @@ app: {{ template "ethereum.name" . }}
 release: {{ .Release.Name }}
 {{- end -}}
 
-
-{{- define "celo.init-genesis-container" -}}
-- name: init-genesis
-  image: {{ .Values.geth.image.repository }}:{{ .Values.geth.image.tag }}
-  imagePullPolicy: {{ .Values.imagePullPolicy }}
-  args:
-  - "init"
-  - "/var/geth/genesis.json"
-  volumeMounts:
-  - name: data
-    mountPath: /root/.celo
-  - name: config
-    mountPath: /var/geth
-{{- end -}}
-
 {{- define "celo.get-bootnodes-container" -}}
 - name: get-bootnodes
   image: celohq/minimal:latest
@@ -258,7 +243,7 @@ spec:
 {{ include "celo.geth-exporter-container" .  | indent 6 }}
 {{ include "celo.prom-to-sd-container" (dict "Values" .Values "Release" .Release "Chart" .Chart "component" "geth" "metricsPort" "9200" "metricsPath" "filteredmetrics" "containerNameLabel" .Node.name )  | indent 6 }}
       initContainers:
-{{ include "celo.init-genesis-container" .  | indent 6 }}
+{{ include "common.init-genesis-container" .  | indent 6 }}
 {{ include "celo.get-bootnodes-container" .  | indent 6 }}
       - name: import-geth-account
         image: {{ .Values.geth.image.repository }}:{{ .Values.geth.image.tag }}
@@ -367,7 +352,7 @@ spec:
 {{ include "celo.geth-exporter-container" .  | indent 6 }}
 {{ include "celo.prom-to-sd-container" (dict "Values" .Values "Release" .Release "Chart" .Chart "component" "geth" "metricsPort" "9200" "metricsPath" "filteredmetrics" "containerNameLabel" .node_name)  | indent 6 }}
       initContainers:
-{{ include "celo.init-genesis-container" .  | indent 6 }}
+{{ include "common.init-genesis-container" .  | indent 6 }}
 {{ include "celo.get-bootnodes-container" .  | indent 6 }}
 {{ include "celo.node-volumes" (dict "Values" .Values "Release" .Release "Chart" .Chart "node_prefix" .node_name) | indent 6 }}
     {{- with .Values.nodeSelector -}}
