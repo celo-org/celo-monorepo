@@ -5,10 +5,6 @@ provider "google" {
   zone        = "us-west1-a"
 }
 
-provider "acme" {
-  server_url = "https://acme-v02.api.letsencrypt.org/directory"
-}
-
 # For managing terraform state remotely
 terraform {
   backend "gcs" {
