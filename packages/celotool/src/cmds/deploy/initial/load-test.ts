@@ -1,7 +1,7 @@
 import { switchToClusterFromEnv } from 'src/lib/cluster'
 import { fetchEnv } from 'src/lib/env-utils'
 import { installHelmChart } from 'src/lib/load-test'
-import * as yargs from 'yargs'
+import yargs from 'yargs'
 import { InitialArgv } from '../../deploy/initial'
 
 export const command = 'load-test'
