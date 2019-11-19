@@ -205,7 +205,7 @@ module.exports = async (_deployer: any, networkName: string) => {
       groupKeys.length
     )
 
-    console.info('  * Registering validators ...')
+    console.info(`  * Registering ${groupKeys.length} validators ...`)
     await Promise.all(
       groupKeys.map((key, index) =>
         registerValidator(
@@ -220,23 +220,41 @@ module.exports = async (_deployer: any, networkName: string) => {
       )
     )
 
-    console.info('  * Adding the first validator to the group ...')
-    // @ts-ignore
-    const addTx = validators.contract.methods.addFirstMember(
-      privateKeyToAddress(groupKeys[0]),
-      NULL_ADDRESS,
-      prevGroupAddress
-    )
-    await sendTransactionWithPrivateKey(web3, addTx, account.privateKey, {
-      to: validators.address,
-    })
-
-    console.info(`  * Adding the remaining ${groupKeys.length - 1} validators to the group ...`)
-    await Promise.all(
-      groupKeys.slice(1).map((key) => {
+    console.info('  * Adding Validators to Validator Group ...')
+    for (const [i, key] of groupKeys.entries()) {
+      const address = privateKeyToAddress(key)
+      console.info(`    - Adding ${address} ...`)
+      let addTx: any
+      if (i === 0) {
         // @ts-ignore
-        const addTx = validators.contract.methods.addMember(privateKeyToAddress(key))
+        addTx = validators.contract.methods.addFirstMember(address, NULL_ADDRESS, prevGroupAddress)
+      } else {
+        // @ts-ignore
+        addTx = validators.contract.methods.addMember(address)
+      }
+      await sendTransactionWithPrivateKey(web3, addTx, account.privateKey, {
+        to: validators.address,
+      })
+    }
+
+    console.info('  * Adding the validators to the group ...')
+    const nonce = await web3.eth.getTransactionCount(account.address)
+    await Promise.all(
+      groupKeys.map((key, i) => {
+        let addTx: any
+        if (i === 0) {
+          // @ts-ignore
+          addTx = validators.contract.methods.addFirstMember(
+            privateKeyToAddress(key),
+            NULL_ADDRESS,
+            prevGroupAddress
+          )
+        } else {
+          // @ts-ignore
+          addTx = validators.contract.methods.addMember(privateKeyToAddress(key))
+        }
         return sendTransactionWithPrivateKey(web3, addTx, account.privateKey, {
+          nonce: nonce + i,
           to: validators.address,
         })
       })

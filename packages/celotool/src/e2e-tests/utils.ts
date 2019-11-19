@@ -461,7 +461,7 @@ export function getContext(gethConfig: GethTestConfig) {
       if (instance.validating) {
         // Automatically connect validator nodes to eachother.
         const otherValidators = validatorEnodes.filter(
-          (_: string, i: number) => i !== validatorIndex
+          (__: string, i: number) => i !== validatorIndex
         )
         instance.peers = (instance.peers || []).concat(otherValidators)
         instance.privateKey = instance.privateKey || validatorPrivateKeys[validatorIndex]
