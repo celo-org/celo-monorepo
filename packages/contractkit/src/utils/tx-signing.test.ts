@@ -86,11 +86,9 @@ async function verifyLocalSigning(web3: Web3, celoTransaction: CeloTx): Promise<
     debug(
       'Checking gateway fee value actual %o expected %o',
       signedCeloTransaction.gatewayFee,
-      parseInt(celoTransaction.gatewayFee.toString(), 16)
+      celoTransaction.gatewayFee.toString()
     )
-    expect(signedCeloTransaction.gatewayFee).toEqual(
-      parseInt(celoTransaction.gatewayFee.toString(), 16)
-    )
+    expect(signedCeloTransaction.gatewayFee).toEqual(celoTransaction.gatewayFee.toString())
   }
   if (celoTransaction.data != null) {
     debug(`Checking data actual ${signedCeloTransaction.data} expected ${celoTransaction.data}`)
@@ -113,22 +111,24 @@ async function verifyLocalSigningInAllPermutations(
   const gatewayFee = '0x5678'
   const data = '0xabcdef'
 
+  // tslint:disable:no-bitwise
   // Test all possible combinations for rigor.
-  for (let i = 0; i < 256; i++) {
+  for (let i = 0; i < 128; i++) {
     const celoTransaction: CeloTx = {
       from,
       to,
       value: amountInWei,
-      nonce: i % 2 === 0 ? nonce : undefined,
-      gas: i % 4 === 0 ? gas : undefined,
-      gasPrice: i % 8 === 0 ? gasPrice : undefined,
-      feeCurrency: i % 16 === 0 ? feeCurrency : undefined,
-      gatewayFeeRecipient: i % 32 === 0 ? gatewayFeeRecipient : undefined,
-      gatewayFee: i % 64 === 0 ? gatewayFee : undefined,
-      data: i % 128 === 0 ? data : undefined,
+      nonce: i & 1 ? nonce : undefined,
+      gas: i & 2 ? gas : undefined,
+      gasPrice: i & 4 ? gasPrice : undefined,
+      feeCurrency: i & 8 ? feeCurrency : undefined,
+      gatewayFeeRecipient: i & 16 ? gatewayFeeRecipient : undefined,
+      gatewayFee: i & 32 ? gatewayFee : undefined,
+      data: i & 64 ? data : undefined,
     }
     await verifyLocalSigning(web3, celoTransaction)
   }
+  // tslint:enable:no-bitwise
 
   // A special case.
   // An incorrect nonce  will only work, if no implict calls to estimate gas are required.

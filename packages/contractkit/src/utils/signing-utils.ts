@@ -64,7 +64,7 @@ export async function signTransaction(txn: any, privateKey: string) {
         Bytes.fromNat(transaction.gas),
         transaction.feeCurrency.toLowerCase(),
         transaction.gatewayFeeRecipient.toLowerCase(),
-        Bytes.fromNat(transaction.gatewayFeeRecipient),
+        Bytes.fromNat(transaction.gatewayFee),
         transaction.to.toLowerCase(),
         Bytes.fromNat(transaction.value),
         transaction.data,
@@ -81,21 +81,21 @@ export async function signTransaction(txn: any, privateKey: string) {
       )
 
       const rawTx = RLP.decode(rlpEncoded)
-        .slice(0, 8)
+        .slice(0, 9)
         .concat(Account.decodeSignature(signature))
 
-      rawTx[8] = makeEven(trimLeadingZero(rawTx[8]))
       rawTx[9] = makeEven(trimLeadingZero(rawTx[9]))
       rawTx[10] = makeEven(trimLeadingZero(rawTx[10]))
+      rawTx[11] = makeEven(trimLeadingZero(rawTx[11]))
 
       const rawTransaction = RLP.encode(rawTx)
 
       const values = RLP.decode(rawTransaction)
       result = {
         messageHash: hash,
-        v: trimLeadingZero(values[8]),
-        r: trimLeadingZero(values[9]),
-        s: trimLeadingZero(values[10]),
+        v: trimLeadingZero(values[9]),
+        r: trimLeadingZero(values[10]),
+        s: trimLeadingZero(values[11]),
         rawTransaction,
       }
     } catch (e) {
@@ -143,11 +143,11 @@ export function recoverTransaction(rawTx: string): [CeloTx, string] {
     data: rawValues[8],
     chainId: rawValues[9],
   }
-  const signature = Account.encodeSignature(rawValues.slice(8, 11))
-  const recovery = Bytes.toNumber(rawValues[8])
+  const signature = Account.encodeSignature(rawValues.slice(9, 12))
+  const recovery = Bytes.toNumber(rawValues[9])
   // tslint:disable-next-line:no-bitwise
   const extraData = recovery < 35 ? [] : [Bytes.fromNumber((recovery - 35) >> 1), '0x', '0x']
-  const signingData = rawValues.slice(0, 8).concat(extraData)
+  const signingData = rawValues.slice(0, 9).concat(extraData)
   const signingDataHex = RLP.encode(signingData)
   const signer = Account.recover(Hash.keccak256(signingDataHex), signature)
   return [celoTx, signer]

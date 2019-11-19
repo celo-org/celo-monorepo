@@ -27,13 +27,13 @@ export function generateAccountAddressFromPrivateKey(privateKey: string): string
   return new Web3().eth.accounts.privateKeyToAccount(privateKey).address
 }
 
-function isEmpty(value: string | undefined) {
+function isEmpty(value: string | number | undefined) {
   return (
     value === undefined ||
     value === null ||
-    value === '0' ||
-    value.toLowerCase() === '0x' ||
-    value.toLowerCase() === '0x0'
+    value === 0 ||
+    (typeof value === 'string' &&
+      (value === '0' || value.toLowerCase() === '0x' || value.toLowerCase() === '0x0'))
   )
 }
 
@@ -98,7 +98,8 @@ export class CeloPrivateKeysWalletProvider extends PrivateKeyWalletSubprovider {
     }
   }
 
-  public async signTransactionAsync(txParams: CeloPartialTxParams): Promise<string> {
+  public async signTransactionAsync(txParamsInput: CeloPartialTxParams): Promise<string> {
+    const txParams = { ...txParamsInput } // Make a copy of the input so it can be mutated.
     debug('signTransactionAsync: txParams are %o', txParams)
     if (!this.canSign(txParams.from)) {
       // If `handleRequest` works correctly then this code path should never trigger.
