@@ -15,10 +15,14 @@ terraform {
 # Create a new VPC for the new resources
 resource "google_compute_network" "celo_network" {
   name = "celo-network"
+  timeouts {
+    delete = "15m"
+  }
 }
 
 module "celo_cluster" {
   source = "../testnet"
+  network_depends_on = [google_compute_network.celo_network]
 
   gcloud_project = "canvas-genius-12345"
   gcloud_region  = "us-west1"

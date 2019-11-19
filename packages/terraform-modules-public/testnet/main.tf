@@ -11,13 +11,21 @@ locals {
   deploy_txnode_lb               = var.tx_node_count > 0 ? var.deploy_txnode_lb : false
 }
 
+# Dummy variable for network dependency
+variable network_depends_on {
+  type = any
+  default = null
+}
+
 data "google_compute_network" "celo" {
   name = var.network_name
+  depends_on = [var.network_depends_on]
 }
 
 data "google_compute_subnetwork" "celo" {
   name   = var.network_name
   region = var.gcloud_region
+  depends_on = [var.network_depends_on]
 }
 
 resource "google_compute_firewall" "ssh_firewall" {
