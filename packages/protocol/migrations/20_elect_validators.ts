@@ -224,17 +224,23 @@ module.exports = async (_deployer: any, networkName: string) => {
     for (const [i, key] of groupKeys.entries()) {
       const address = privateKeyToAddress(key)
       console.info(`    - Adding ${address} ...`)
-      let addTx: any
       if (i === 0) {
         // @ts-ignore
-        addTx = validators.contract.methods.addFirstMember(address, NULL_ADDRESS, prevGroupAddress)
+        const addTx = validators.contract.methods.addFirstMember(
+          address,
+          NULL_ADDRESS,
+          prevGroupAddress
+        )
+        await sendTransactionWithPrivateKey(web3, addTx, account.privateKey, {
+          to: validators.address,
+        })
       } else {
         // @ts-ignore
-        addTx = validators.contract.methods.addMember(address)
+        const addTx = validators.contract.methods.addMember(address)
+        await sendTransactionWithPrivateKey(web3, addTx, account.privateKey, {
+          to: validators.address,
+        })
       }
-      await sendTransactionWithPrivateKey(web3, addTx, account.privateKey, {
-        to: validators.address,
-      })
     }
 
     console.info('  * Adding the validators to the group ...')
