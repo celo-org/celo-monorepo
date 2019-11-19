@@ -1134,8 +1134,8 @@ contract('Validators', (accounts: string[]) => {
   })
 
   describe('#updateBlsPublicKey()', () => {
-    const newBlsPublicKey = web3.utils.randomHex(48)
-    const newBlsPoP = web3.utils.randomHex(96)
+    const newBlsPublicKey = web3.utils.randomHex(96)
+    const newBlsPoP = web3.utils.randomHex(48)
     describe('when called by a registered validator', () => {
       const validator = accounts[0]
       beforeEach(async () => {
@@ -1167,14 +1167,14 @@ contract('Validators', (accounts: string[]) => {
         })
       })
 
-      describe('when the public key is not 48 bytes', () => {
+      describe('when the public key is not 96 bytes', () => {
         it('should revert', async () => {
           // @ts-ignore Broken typechain typing for bytes
           await assertRevert(validators.updateBlsPublicKey(newBlsPublicKey + '01', newBlsPoP))
         })
       })
 
-      describe('when the proof of possession is not 96 bytes', () => {
+      describe('when the proof of possession is not 48 bytes', () => {
         it('should revert', async () => {
           // @ts-ignore Broken typechain typing for bytes
           await assertRevert(validators.updateBlsPublicKey(newBlsPublicKey, newBlsPoP + '01'))
