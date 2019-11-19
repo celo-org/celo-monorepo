@@ -483,61 +483,67 @@ describe('Transfer tests', function(this: any) {
           describe('with feeCurrency = CeloGold >', () => {
             if (syncMode === 'light' || syncMode === 'ultralight') {
               describe('when running in light/ultralight sync mode', () => {
-                describe('when not explicitly specifying a gateway fee recipient', () =>
-                  testTransferToken({
-                    expectedGas: GOLD_TRANSACTION_GAS_COST,
-                    transferToken: CeloContract.GoldToken,
-                    feeToken: CeloContract.GoldToken,
-                  }))
-
-                describe('when specifying the gateway fee', () => {
-                  describe("when using a peer's etherbase as recipient", () =>
-                    testTransferToken({
-                      expectedGas: GOLD_TRANSACTION_GAS_COST,
-                      transferToken: CeloContract.GoldToken,
-                      feeToken: CeloContract.GoldToken,
-                      txOptions: {
-                        gatewayFeeRecipient: FeeRecipientAddress,
-                        gatewayFee: '0x10000',
-                      },
-                    }))
-
-                  describe('when using an arbitrary address as recipient', () => {
-                    it('should get rejected by the sending node before being added to the tx pool', async () => {
-                      try {
-                        const res = await transferCeloGold(FromAddress, ToAddress, TransferAmount, {
-                          gatewayFeeRecipient: kit.web3.utils.randomHex(20),
-                          gatewayFee: '0x10000',
-                        })
-                        await res.waitReceipt()
-                        assert.fail('no error was thrown')
-                      } catch (error) {
-                        assert.include(
-                          error.toString(),
-                          'Returned error: no peer with etherbase found'
-                        )
-                      }
-                    })
+                const recipient = (choice: string) => {
+                  switch (choice) {
+                    case 'peer':
+                      return FeeRecipientAddress
+                    case 'random':
+                      return Web3.utils.randomHex(20)
+                    default:
+                      // unset
+                      return undefined
+                  }
+                }
+                const feeValue = (choice: string) => {
+                  switch (choice) {
+                    case 'sufficient':
+                      return '0x10000'
+                    case 'insufficient':
+                      return '0x1'
+                    default:
+                      // unset
+                      return undefined
+                  }
+                }
+                for (const recipientChoice of ['peer', 'random', 'unset']) {
+                  describe(`when the gateway fee recipient is ${recipientChoice}`, () => {
+                    for (const feeValueChoice of ['sufficient', 'insufficient', 'unset']) {
+                      describe(`when the gateway fee value is ${feeValueChoice}`, () => {
+                        const txOptions = {
+                          gatewayFeeRecipient: recipient(recipientChoice),
+                          gatewayFee: feeValue(feeValueChoice),
+                        }
+                        if (recipientChoice === 'random' || feeValueChoice === 'insufficient') {
+                          const errMsg =
+                            recipientChoice === 'random'
+                              ? 'no peer with etherbase found'
+                              : 'gateway fee too low to broadcast to peers'
+                          it('should get rejected by the sending node before being added to the tx pool', async () => {
+                            try {
+                              const res = await transferCeloGold(
+                                FromAddress,
+                                ToAddress,
+                                TransferAmount,
+                                txOptions
+                              )
+                              await res.waitReceipt()
+                              assert.fail('no error was thrown')
+                            } catch (error) {
+                              assert.include(error.toString(), `Returned error: ${errMsg}`)
+                            }
+                          })
+                        } else {
+                          testTransferToken({
+                            expectedGas: GOLD_TRANSACTION_GAS_COST,
+                            transferToken: CeloContract.GoldToken,
+                            feeToken: CeloContract.GoldToken,
+                            txOptions,
+                          })
+                        }
+                      })
+                    }
                   })
-
-                  describe('when using an insufficient gateway fee value', () => {
-                    it('should get rejected by the sending node before being added to the tx pool', async () => {
-                      try {
-                        const res = await transferCeloGold(FromAddress, ToAddress, TransferAmount, {
-                          gatewayFeeRecipient: FeeRecipientAddress,
-                          gatewayFee: '0x1',
-                        })
-                        await res.waitReceipt()
-                        assert.fail('no error was thrown')
-                      } catch (error) {
-                        assert.include(
-                          error.toString(),
-                          'Returned error: gateway fee too low to broadcast to peers'
-                        )
-                      }
-                    })
-                  })
-                })
+                }
               })
             } else {
               testTransferToken({
@@ -582,7 +588,7 @@ describe('Transfer tests', function(this: any) {
         describe('Transfer CeloDollars', () => {
           describe('feeCurrency = CeloDollars >', () => {
             testTransferToken({
-              expectedGas: 175303,
+              expectedGas: 207303,
               transferToken: CeloContract.StableToken,
               feeToken: CeloContract.StableToken,
             })
@@ -691,12 +697,11 @@ describe('Transfer tests', function(this: any) {
 
               await inflationManager.setInflationRateForNextTransfer(new BigNumber(2))
               const stableTokenAddress = await kit.registry.addressFor(CeloContract.StableToken)
-              const expectedGasUsed = 155000
               txRes = await runTestTransaction(
                 await transferCeloGold(FromAddress, ToAddress, TransferAmount, {
                   feeCurrency: stableTokenAddress,
                 }),
-                expectedGasUsed,
+                187000,
                 stableTokenAddress
               )
 
