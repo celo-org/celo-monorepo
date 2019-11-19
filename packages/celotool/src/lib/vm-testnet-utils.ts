@@ -378,7 +378,7 @@ function uploadSecrets(celoEnv: string, secrets: string, resourceName: string) {
 function generateBootnodeSecretEnvVars() {
   const mnemonic = fetchEnv(envVar.MNEMONIC)
   return formatEnvVars({
-    NODE_KEY: generatePrivateKey(mnemonic, AccountType.LOAD_TESTING_ACCOUNT, 0),
+    NODE_KEY: generatePrivateKey(mnemonic, AccountType.BOOTNODE, 0),
   })
 }
 
@@ -388,7 +388,7 @@ function generateValidatorSecretEnvVars(accountType: AccountType, index: number)
   const secrets = {
     ACCOUNT_ADDRESS: privateKeyToAddress(privateKey),
     BOOTNODE_ENODE_ADDRESS: privateKeyToPublicKey(
-      generatePrivateKey(mnemonic, AccountType.LOAD_TESTING_ACCOUNT, 0)
+      generatePrivateKey(mnemonic, AccountType.BOOTNODE, 0)
     ),
     PRIVATE_KEY: privateKey,
     [envVar.GETH_ACCOUNT_SECRET]: fetchEnv(envVar.GETH_ACCOUNT_SECRET),

@@ -85,12 +85,7 @@ const getExternalEnodeAddresses = async (namespace: string) => {
 
 export const getBootnodeEnode = async (namespace: string) => {
   const ip = await retrieveIPAddress(`${namespace}-bootnode`)
-  // We couldn't use our updated docker image, so for now the bootnodes id is based upon the load_testing account
-  const privateKey = generatePrivateKey(
-    fetchEnv(envVar.MNEMONIC),
-    AccountType.LOAD_TESTING_ACCOUNT,
-    0
-  )
+  const privateKey = generatePrivateKey(fetchEnv(envVar.MNEMONIC), AccountType.BOOTNODE, 0)
   const nodeId = privateKeyToPublicKey(privateKey)
   return [getEnodeAddress(nodeId, ip, DISCOVERY_PORT)]
 }

@@ -68,7 +68,8 @@ spec:
             fi
             echo -n "Generating IP address for validator: "
             cat /root/.celo/ipAddress
-            celotooljs.sh generate public-key --mnemonic "$MNEMONIC" --accountType load_testing --index 0 > /root/.celo/bootnodeEnodeAddress
+
+            celotooljs.sh generate public-key --mnemonic "$MNEMONIC" --accountType bootnode --index 0 > /root/.celo/bootnodeEnodeAddress
             echo -n "Generating Bootnode enode address for the validator: "
             cat /root/.celo/bootnodeEnodeAddress
             [[ "$BOOTNODE_IP_ADDRESS" == 'none' ]] && BOOTNODE_IP_ADDRESS=${{ .Release.Namespace | upper }}_BOOTNODE_SERVICE_HOST
