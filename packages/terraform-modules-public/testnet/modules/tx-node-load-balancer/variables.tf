@@ -12,3 +12,9 @@ variable tx_node_self_links {
   type        = list(string)
   description = "A list including the self_links of each tx-node"
 }
+
+variable deploy_txnode_lb {
+  type        = bool
+  description = ""
+  default     = false
+}

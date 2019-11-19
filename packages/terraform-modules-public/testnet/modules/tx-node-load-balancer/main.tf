@@ -3,36 +3,40 @@ locals {
 }
 
 resource "google_compute_address" "tx_node_lb" {
+  count        = var.deploy_txnode_lb ? 1 : 0
   name         = "${local.name_prefix}-address"
   address_type = "INTERNAL"
 }
 
 resource "google_compute_forwarding_rule" "tx_node_lb" {
-  name = "${local.name_prefix}-fwd-rule"
+  count = var.deploy_txnode_lb ? 1 : 0
+  name  = "${local.name_prefix}-fwd-rule"
 
-  backend_service       = google_compute_region_backend_service.tx_node_lb.self_link
-  ip_address            = google_compute_address.tx_node_lb.address
+  backend_service       = google_compute_region_backend_service.tx_node_lb[0].self_link
+  ip_address            = google_compute_address.tx_node_lb[0].address
   load_balancing_scheme = "INTERNAL"
   network               = var.network_name
   ports                 = ["8545", "8546"]
 }
 
 resource "google_compute_region_backend_service" "tx_node_lb" {
-  name = "${local.name_prefix}-service"
+  count = var.deploy_txnode_lb ? 1 : 0
+  name  = "${local.name_prefix}-service"
 
   protocol = "TCP"
 
   backend {
-    group = google_compute_instance_group.tx_node_lb.self_link
+    group = google_compute_instance_group.tx_node_lb[0].self_link
   }
 
   health_checks = [
-    google_compute_health_check.tx_node_lb.self_link
+    google_compute_health_check.tx_node_lb[0].self_link
   ]
 }
 
 resource "google_compute_health_check" "tx_node_lb" {
-  name = "${local.name_prefix}-health"
+  count = var.deploy_txnode_lb ? 1 : 0
+  name  = "${local.name_prefix}-health"
 
   tcp_health_check {
     port = 8545
@@ -40,7 +44,8 @@ resource "google_compute_health_check" "tx_node_lb" {
 }
 
 resource "google_compute_instance_group" "tx_node_lb" {
-  name = "${local.name_prefix}-group-${random_id.tx_node_lb.hex}"
+  count = var.deploy_txnode_lb ? 1 : 0
+  name  = "${local.name_prefix}-group-${random_id.tx_node_lb[0].hex}"
 
   instances = var.tx_node_self_links
 
@@ -50,5 +55,6 @@ resource "google_compute_instance_group" "tx_node_lb" {
 }
 
 resource "random_id" "tx_node_lb" {
+  count       = var.deploy_txnode_lb ? 1 : 0
   byte_length = 8
 }

@@ -5,9 +5,10 @@ provider "google" {
 }
 
 locals {
-  firewall_target_tags_txnode  = ["${var.celo_env}-txnode"]
+  firewall_target_tags_txnode    = ["${var.celo_env}-txnode"]
   firewall_target_tags_validator = ["${var.celo_env}-validator"]
-  firewall_target_tags_proxy = ["${var.celo_env}-proxy"]
+  firewall_target_tags_proxy     = ["${var.celo_env}-proxy"]
+  deploy_txnode_lb               = var.tx_node_count > 0 ? var.deploy_txnode_lb : false
 }
 
 data "google_compute_network" "celo" {
@@ -125,6 +126,7 @@ module "tx_node_lb" {
   celo_env           = var.celo_env
   network_name       = var.network_name
   tx_node_self_links = module.tx_node.self_links
+  deploy_txnode_lb   = local.deploy_txnode_lb
 }
 
 module "proxy" {
@@ -150,7 +152,7 @@ module "proxy" {
 
   proxy_account_addresses     = var.proxy_account_addresses
   proxy_private_keys          = var.proxy_private_keys
-  proxy_private_node_keys          = var.proxy_private_node_keys
+  proxy_private_node_keys     = var.proxy_private_node_keys
   proxy_account_passwords     = var.proxy_account_passwords
   validator_account_addresses = var.validator_account_addresses
   bootnode_enode_address      = var.bootnode_enode_address
@@ -184,3 +186,4 @@ module "validator" {
   proxy_ips                   = module.proxy.internal_ip_addresses
   bootnode_enode_address      = var.bootnode_enode_address
 }
+

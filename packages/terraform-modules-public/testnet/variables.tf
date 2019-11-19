@@ -9,7 +9,7 @@ variable celo_env {
 }
 
 variable ethstats_host {
-  type        = "string"
+  type        = string
   description = "Ethstats url or IP address"
 }
 
@@ -161,3 +161,8 @@ variable bootnode_ip_address {
   default     = ""
 }
 
+variable deploy_txnode_lb {
+  type        = bool
+  description = ""
+  default     = false
+}
