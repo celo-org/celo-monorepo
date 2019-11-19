@@ -3,7 +3,7 @@ import { readFileSync, writeFileSync } from 'fs'
 import { map, merge, reduce } from 'lodash'
 import path from 'path'
 import { CeloEnvArgv, genericEnvFilePath, isValidCeloEnv, monorepoRoot } from 'src/lib/env-utils'
-import * as yargs from 'yargs'
+import yargs from 'yargs'
 export const command = 'fork-env <newEnvName>'
 
 export const describe = 'command for forking an environment off the default .env file'

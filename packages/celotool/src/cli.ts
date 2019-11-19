@@ -1,5 +1,5 @@
 #!/usr/bin/env yarn run ts-node -r tsconfig-paths/register --cwd ../celotool
-import * as yargs from 'yargs'
+import yargs from 'yargs'
 
 // tslint:disable-next-line: no-unused-expression
 yargs
