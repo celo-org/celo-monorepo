@@ -66,6 +66,7 @@ const styles = StyleSheet.create({
     position: 'absolute',
     backgroundColor: `${colors.light}`,
     height: 'calc(100vh - 130px)',
+    overflow: 'scroll',
     width: '100%',
     padding: 15,
   },
