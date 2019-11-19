@@ -431,7 +431,13 @@ export function* switchToGethFromZeroSync() {
     yield put(setZeroSyncMode(false))
 
     if (gethAlreadyStartedThisSession) {
+      // Call any method on web3 to avoid a persist state issue
+      // This is a temporary workaround as this restart will be
+      // removed when the geth issue is resolved
       yield call(web3.eth.isSyncing)
+      // If geth is started twice within the same session,
+      // there is an issue where it cannot find deployed contracts.
+      // Restarting the app fixes this issue.
       restartApp()
       return
     }
