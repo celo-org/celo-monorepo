@@ -1,6 +1,7 @@
 import * as React from 'react'
 import { View, StyleSheet, Image } from 'react-native'
 import { GAP } from 'src/brandkit/constants'
+import { standardStyles } from 'src/styles'
 
 export enum Value {
   Good,
@@ -14,7 +15,7 @@ interface Props {
 
 export default function Judgement({ is, children }: Props) {
   return (
-    <View style={styles.box}>
+    <View style={[styles.box, standardStyles.elementalMarginTop]}>
       <Image
         style={styles.image}
         source={
@@ -31,9 +32,12 @@ export default function Judgement({ is, children }: Props) {
 const styles = StyleSheet.create({
   box: {
     paddingHorizontal: GAP,
+    flex: 1,
+    minWidth: 220,
   },
   image: {
     height: 24,
     width: 24,
+    marginVertical: 5,
   },
 })

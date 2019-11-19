@@ -1,7 +1,7 @@
 import * as React from 'react'
 import { StyleSheet, Text, View, Image } from 'react-native'
 import Page from 'src/brandkit/Page'
-import { H1, H4 } from 'src/fonts/Fonts'
+import { H1, H3 } from 'src/fonts/Fonts'
 import { I18nProps, NameSpaces, withNamespaces } from 'src/i18n'
 import Button, { BTN } from 'src/shared/Button.3'
 import { hashNav } from 'src/shared/menu-items'
@@ -63,7 +63,7 @@ const Overview = withNamespaces(NameSpaces.brand)(function _Overview({ t }: I18n
         <View style={[standardStyles.centered, styles.fullScreenLogo]}>
           <LogoLightBg height={100} />
         </View>
-        <Text style={fonts.h5}>{t('logo.logoTitle')}</Text>
+        <H3 style={standardStyles.elementalMargin}>{t('logo.logoTitle')}</H3>
         <Text style={fonts.p}>{t('logo.logoText')}</Text>
       </View>
       <View style={styles.tiling}>
@@ -93,7 +93,7 @@ const Overview = withNamespaces(NameSpaces.brand)(function _Overview({ t }: I18n
         />
       </View>
       <View style={styles.gap}>
-        <Text style={fonts.h5}>{t('logo.glyphTitle')}</Text>
+        <H3 style={standardStyles.elementalMargin}>{t('logo.glyphTitle')}</H3>
         <Text style={fonts.p}>{t('logo.glyphText')}</Text>
         <Button kind={BTN.TERTIARY} text={t('downloadAssetBtn')} style={styles.button} />
         <View style={styles.tiling}>
@@ -115,6 +115,19 @@ const Overview = withNamespaces(NameSpaces.brand)(function _Overview({ t }: I18n
           >
             <RingsLight height={35} color={colors.white} />
           </View>
+        </View>
+      </View>
+      <View>
+        <H3 style={[styles.gap, standardStyles.elementalMargin]}>{t('logo.sizeTitle')}</H3>
+        <Text style={[fonts.p, styles.gap]}>{t('logo.sizeText')}</Text>
+        <View style={[standardStyles.centered, styles.sizingArea]}>
+          <AspectRatio ratio={392 / 160} style={styles.sizing}>
+            <Image
+              source={require('src/brandkit/images/sizing.png')}
+              style={standardStyles.image}
+              resizeMode="contain"
+            />
+          </AspectRatio>
         </View>
       </View>
     </View>
@@ -144,47 +157,47 @@ const Backgrounds = withNamespaces(NameSpaces.brand)(function _Backgrounds({ t }
   return (
     <View>
       <View style={styles.gap}>
-        <SectionTitle>{t('backgrounds.title')}</SectionTitle>
+        <SectionTitle>{t('logo.backgroundsTitle')}</SectionTitle>
         <Text style={fonts.p}>{}</Text>
       </View>
-      <View style={styles.tiling}>
-        <View>
+      <View style={[styles.tiling, standardStyles.elementalMarginBottom]}>
+        <View style={[styles.gap, styles.container]}>
           <LogoWithBackground backgroundColor={colors.white} type="light" />
         </View>
-        <View style={styles.gap}>
+        <View style={[styles.gap, styles.container]}>
           <LogoWithBackground backgroundColor={'#F8F9F9'} type="light" />
         </View>
-        <View style={styles.gap}>
+        <View style={[styles.gap, styles.container]}>
           <LogoWithBackground backgroundColor={'#FEF2D6'} type="light" />
         </View>
       </View>
-      <Text style={[fonts.h5, styles.gap]}>{t('backgrounds.colorBackgroundsTitle')}</Text>
-      <Text style={[fonts.p, styles.gap]}>{t('backgrounds.colorBackgroundsText')}</Text>
+      <H3 style={[styles.gap, standardStyles.elementalMargin]}>
+        {t('logo.colorBackgroundsTitle')}
+      </H3>
+      <Text style={[fonts.p, styles.gap]}>{t('logo.colorBackgroundsText')}</Text>
       <View style={styles.tiling}>
-        <View style={styles.gap}>
+        <View style={[styles.gap, styles.container]}>
           <LogoWithBackground backgroundColor={colors.faintPurple} type="black" />
         </View>
-        <View style={styles.gap}>
+        <View style={[styles.gap, styles.container]}>
           <LogoWithBackground backgroundColor={'#FEDEDA'} type="black" />
         </View>
-        <View style={styles.gap}>
+        <View style={[styles.gap, styles.container]}>
           <LogoWithBackground backgroundColor={'#DCF6FF'} type="black" />
         </View>
       </View>
-      <Text style={styles.gap}>{t('backgrounds.darkLogoText')}</Text>
       <View style={styles.tiling}>
-        <View style={styles.gap}>
+        <View style={[styles.gap, styles.container]}>
           <LogoWithBackground backgroundColor={'#8857F6'} type="white" />
         </View>
-        <View style={styles.gap}>
+        <View style={[styles.gap, styles.container]}>
           <LogoWithBackground backgroundColor={'#F0544A'} type="white" />
         </View>
-        <View style={styles.gap}>
+        <View style={[styles.gap, styles.container]}>
           <LogoWithBackground backgroundColor={'#3DBFFF'} type="white" />
         </View>
       </View>
-      <Text style={styles.gap}>{t('backgrounds.darkLogoText')}</Text>
-      <Text style={styles.gap}>{t('backgrounds.badLogoBackgrounds')}</Text>
+      <Text style={[styles.gap, fonts.p]}>{t('logo.backgroundDoNotAndDo')}</Text>
       <View style={styles.tiling}>
         <Judgement is={Value.Bad}>
           <LogoWithBackground image={require('src/brandkit/images/lilah.jpg')} type="dark" />
@@ -216,7 +229,11 @@ const Backgrounds = withNamespaces(NameSpaces.brand)(function _Backgrounds({ t }
 })
 
 const styles = StyleSheet.create({
-  container: {},
+  container: {
+    flex: 1,
+    minWidth: 200,
+    paddingVertical: GAP,
+  },
   button: {
     transform: [{ translateX: -20 }],
   },
@@ -233,8 +250,15 @@ const styles = StyleSheet.create({
     marginVertical: 10,
   },
   clearspaceImageArea: {
-    backgroundColor: '#f8f9f9',
+    backgroundColor: colors.faintGray,
     padding: 20,
+  },
+  sizing: {
+    maxWidth: 500,
+    width: '100%',
+  },
+  sizingArea: {
+    paddingVertical: 60,
   },
   fullScreenLogo: { width: '100%', marginVertical: 100 },
 })

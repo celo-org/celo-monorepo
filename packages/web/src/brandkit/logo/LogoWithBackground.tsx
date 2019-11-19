@@ -34,10 +34,6 @@ export default React.memo(function LogoWithBackground({ type, backgroundColor, i
 
 const styles = StyleSheet.create({
   box: {
-    marginVertical: 10,
-    height: 230,
-    width: 230,
-    // flex: 1,
     flexBasis: 230,
   },
 })

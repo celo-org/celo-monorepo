@@ -1,12 +1,37 @@
 {
+  "home": {
+    "title": "Welcome to the Celo Brand Kit",
+    "introduction":
+      "The Celo brand is a visual representation of Celo’s mission to build a monetary system that creates the conditions of prosperity for all. It reflects the spirit, values, and principles of Celo. By using the Celo brand consistently, we reinforce the interconnectedness of all things and elevate each project’s unique purpose."
+  },
   "logo": {
     "title": "Logo",
     "overviewCopy":
       "The Celo logo is a universal signature used to unite projects behind a common journey. It is  important for it to be instantly recognizable so please do not edit, change, distort, recolor, reconfigure, or rearrange the lockup of the logo.",
     "overviewBtn": "Download Logo Package",
+    "logoTitle": "Logo",
+    "logoText":
+      "The Celo logo is composed of a glyph and wordmark. Their spacing is intentional and we ask for you to not alter them when using the logo. The Celo logo should never be distorted or redrawn when applied to communications. The Celo logo is a recognizable and highly visible brand asset that needs to be applied consistently.\n\nAs often as possible please use the two glyph color logo.",
     "glyphTitle": "Glyph",
-    "glyphCopy":
-      "The glyph should be used when the wordmark is too small to achieve maximum impact. It is often used in place of the full logo in products and web pages. The glyph also works well with brand colors. Use the light or dark glyph with high contrast to your project’s brand colors."
+    "glyphText":
+      "The glyph should be used when the wordmark is too small to achieve maximum impact. It is often used in place of the full logo in products and web pages. The glyph also works well with brand colors. Use the light or dark glyph with high contrast to your project’s brand colors.",
+    "fullColorOnLightCaption": "Full color logo for lighter backgrounds",
+    "fullColorOnDarkCaption": "Full color logo for darker backgrounds",
+    "monochromeCaption": "Monochrome logo",
+    "monochromeInverseCaption": "Monochrome logo (inverse)",
+    "sizeTitle": "Size",
+    "sizeText":
+      "The logo should have a minimum height of 24 pixels on digital displays (?), and 1.5 cm (?) on printed materials.",
+    "clearspaceTitle": "Clearspace",
+    "clearspaceText":
+      "The Celo logo has allotted Clearspace around the graphics to optically align the logo appropriately vertically and horizontally to the surface in which it lies. It should always be surrounded by generous white space. The minimum amount of white space is based on the x-height of the logo placed around the set crop zone of the Celo logo.",
+    "backgroundsTitle": "Backgrounds",
+    "colorBackgroundsTitle": "Color Backgrounds",
+    "colorBackgroundsText":
+      "When it comes to applying the Celo brand to your own projects, the light and dark Celo logo works well on a variety of backgrounds. <more about dark on light, light on dark>",
+    "darkLogoBackgroundText": "",
+    "backgroundDoNotAndDo":
+      "Do not overlay any of the logos of glyphs on top of images. Do not overlay the two-color logo ontop of unpreferred light colors."
   },
   "downloadAssetBtn": "Download Assets"
 }
