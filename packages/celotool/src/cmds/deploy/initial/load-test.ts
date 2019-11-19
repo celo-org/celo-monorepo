@@ -1,4 +1,5 @@
 import { switchToClusterFromEnv } from 'src/lib/cluster'
+import { envVar, fetchEnv } from 'src/lib/env-utils'
 import { installHelmChart } from 'src/lib/load-test'
 import * as yargs from 'yargs'
 import { InitialArgv } from '../../deploy/initial'
@@ -22,13 +23,20 @@ export const builder = (argv: yargs.Argv) => {
     })
     .option('replicas', {
       type: 'number',
-      description: 'Number of load test clients to create',
-      default: 3,
+      description:
+        'Number of load test clients to create, defaults to LOAD_TEST_CLIENTS in the .env file',
+      default: -1,
     })
 }
 
 export const handler = async (argv: LoadTestArgv) => {
   await switchToClusterFromEnv()
+
+  // Variables from the .env file are not set as environment variables
+  // in the builder, so we set the default here
+  if (argv.replicas < 0) {
+    argv.replicas = parseInt(fetchEnv(envVar.LOAD_TEST_CLIENTS), 10)
+  }
 
   await installHelmChart(argv.celoEnv, argv.blockscoutMeasurePercent, argv.replicas)
 }

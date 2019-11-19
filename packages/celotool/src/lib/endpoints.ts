@@ -15,3 +15,7 @@ export function getEthstatsUrl(celoEnv: string) {
 export function getBlockchainApiUrl(celoEnv: string) {
   return `https://${celoEnv}-dot-${fetchEnv(envVar.TESTNET_PROJECT_NAME)}.appspot.com`
 }
+
+export function getGenesisGoogleStorageUrl(celoEnv: string) {
+  return `https://www.googleapis.com/storage/v1/b/genesis_blocks/o/${celoEnv}?alt=media`
+}

@@ -1,8 +1,8 @@
 import { getBlockscoutUrl } from 'src/lib/endpoints'
 import { envVar, fetchEnv } from 'src/lib/env-utils'
-import { generateGenesisFromEnv } from 'src/lib/generate_utils'
 import { getEnodesWithExternalIPAddresses } from 'src/lib/geth'
 import { installGenericHelmChart, removeGenericHelmChart } from 'src/lib/helm_deploy'
+import { getGenesisBlockFromGoogleStorage } from 'src/lib/testnet-utils'
 
 export async function installHelmChart(celoEnv: string, blockscoutProb: number, replicas: number) {
   const params = await helmParameters(celoEnv, blockscoutProb, replicas)
@@ -21,6 +21,9 @@ export async function removeHelmRelease(celoEnv: string) {
 async function helmParameters(celoEnv: string, blockscoutProb: number, replicas: number) {
   const enodes = await getEnodesWithExternalIPAddresses(celoEnv)
   const staticNodesJsonB64 = Buffer.from(JSON.stringify(enodes)).toString('base64')
+  // Uses the genesis frile from google storage to ensure it's the correct genesis as the network
+  const genesis = await getGenesisBlockFromGoogleStorage(celoEnv)
+  const genesisFileJsonB64 = Buffer.from(JSON.stringify(genesis)).toString('base64')
   return [
     `--set blockscout.measurePercent=${blockscoutProb}`,
     `--set blockscout.url=${getBlockscoutUrl(celoEnv)}`,
@@ -28,7 +31,7 @@ async function helmParameters(celoEnv: string, blockscoutProb: number, replicas:
     `--set celotool.image.tag=${fetchEnv(envVar.CELOTOOL_DOCKER_IMAGE_TAG)}`,
     `--set delay=5000`, // send txs every 5 seconds
     `--set environment=${celoEnv}`,
-    `--set geth.genesisFile=${Buffer.from(generateGenesisFromEnv()).toString('base64')}`,
+    `--set geth.genesisFile=${genesisFileJsonB64}`,
     `--set geth.image.repository=${fetchEnv(envVar.GETH_NODE_DOCKER_IMAGE_REPOSITORY)}`,
     `--set geth.image.tag=${fetchEnv(envVar.GETH_NODE_DOCKER_IMAGE_TAG)}`,
     `--set geth.networkID=${fetchEnv(envVar.NETWORK_ID)}`,
