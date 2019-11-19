@@ -82,6 +82,8 @@ export const PublicKeyType = new t.Type<string, string, unknown>(
     ),
   String
 )
+export const SignatureType = t.string
 
+export type Signature = t.TypeOf<typeof SignatureType>
 export type Address = t.TypeOf<typeof AddressType>
 export type E164Number = t.TypeOf<typeof E164PhoneNumberType>

@@ -1,6 +1,6 @@
+import { NetworkConfig, testWithGanache } from '@celo/dev-utils/lib/ganache-test'
 import { Address, CeloContract } from '../base'
 import { newKitFromWeb3 } from '../kit'
-import { NetworkConfig, testWithGanache } from '../test-utils/ganache-test'
 import { OracleRate, SortedOraclesWrapper } from './SortedOracles'
 
 /*
