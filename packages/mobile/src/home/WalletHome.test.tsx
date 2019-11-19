@@ -54,4 +54,64 @@ describe('Testnet banner', () => {
     expect(tree).toMatchSnapshot()
     expect(showMessageMock).toHaveBeenCalledWith('testnetAlert.1', 5000, null, 'testnetAlert.0')
   })
+  it('Renders when disconnected', async () => {
+    const store = createMockStore({
+      ...storeData,
+      account: {
+        backupCompleted: false,
+      },
+    })
+    const tree = renderer.create(
+      <Provider store={store}>
+        <WalletHome
+          refreshAllBalances={jest.fn()}
+          resetStandbyTransactions={jest.fn()}
+          initializeSentryUserContext={jest.fn()}
+          exitBackupFlow={jest.fn()}
+          setLoading={jest.fn()}
+          showMessage={jest.fn()}
+          hideAlert={jest.fn()}
+          importContacts={jest.fn()}
+          loading={false}
+          appConnected={false}
+          address={null}
+          recipientCache={{}}
+          activeNotificationCount={0}
+          callToActNotification={false}
+          {...getMockI18nProps()}
+        />
+      </Provider>
+    )
+    expect(tree).toMatchSnapshot()
+  })
+  it('Renders when connected with backup complete', async () => {
+    const store = createMockStore({
+      ...storeData,
+      account: {
+        backupCompleted: true,
+      },
+    })
+    const tree = renderer.create(
+      <Provider store={store}>
+        <WalletHome
+          refreshAllBalances={jest.fn()}
+          resetStandbyTransactions={jest.fn()}
+          initializeSentryUserContext={jest.fn()}
+          exitBackupFlow={jest.fn()}
+          setLoading={jest.fn()}
+          showMessage={jest.fn()}
+          hideAlert={jest.fn()}
+          importContacts={jest.fn()}
+          loading={false}
+          appConnected={true}
+          address={null}
+          recipientCache={{}}
+          activeNotificationCount={0}
+          callToActNotification={false}
+          {...getMockI18nProps()}
+        />
+      </Provider>
+    )
+    expect(tree).toMatchSnapshot()
+  })
 })
