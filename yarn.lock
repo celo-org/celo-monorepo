@@ -21066,10 +21066,10 @@ lottie-ios@3.1.3, lottie-ios@^3.1.3:
   resolved "https://registry.yarnpkg.com/lottie-ios/-/lottie-ios-3.1.3.tgz#dfa18a3a7e66e5d4a6665bf0a2392d143d15661a"
   integrity sha512-FKSx9l5Ekwm1Wt/ncoCwvsq8NAb1nylzMFlxrHixLYNBtO2eCQet+vwQag+74Nc/E9Lp3DKkBUCyBfz+zjtmAw==
 
-lottie-react-native@^3.2.1:
-  version "3.2.1"
-  resolved "https://registry.yarnpkg.com/lottie-react-native/-/lottie-react-native-3.2.1.tgz#0b2b13b03a2cda9ece8474b9cf633d0fbe78d82b"
-  integrity sha512-dmOySV+qgFrQszCY+7uOZR0XkgbP2FXgCWJZ2h39GqlxJZRHD2uCmXoT+WxaBGw83Gk/2KfIQ1MQMFL8UqC2bw==
+lottie-react-native@^3.3.2:
+  version "3.3.2"
+  resolved "https://registry.yarnpkg.com/lottie-react-native/-/lottie-react-native-3.3.2.tgz#de832d4d3207e4e5c92a55ec4cf0ce0fd03e02f3"
+  integrity sha512-FS8sXDL7s7TUj3Aq0raAZKNOJUO7tuqqOAv5r5yzsZgc0t7Oo4QDxCREsaO2oqSGtTyJKlLlF6/e2g+J5XFSAQ==
   dependencies:
     invariant "^2.2.2"
     lottie-ios "^3.1.3"
@@ -33991,7 +33991,6 @@ websocket@^1.0.28:
   dependencies:
     debug "^2.2.0"
     es5-ext "^0.10.50"
-    gulp "^4.0.2"
     nan "^2.14.0"
     typedarray-to-buffer "^3.1.5"
     yaeti "^0.0.6"
