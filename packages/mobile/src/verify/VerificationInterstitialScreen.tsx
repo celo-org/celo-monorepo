@@ -24,7 +24,7 @@ class VerificationInterstitialScreen extends React.Component<WithNamespaces> {
   timeout: number | undefined
 
   componentDidMount() {
-    this.timeout = setTimeout(() => {
+    this.timeout = window.setTimeout(() => {
       navigate(Screens.VerificationInputScreen)
     }, SCREEN_DURATION)
   }
