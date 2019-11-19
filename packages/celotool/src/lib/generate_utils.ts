@@ -4,7 +4,7 @@ import { ec as EC } from 'elliptic'
 import fs from 'fs'
 import { range, repeat } from 'lodash'
 import path from 'path'
-import rlp from 'rlp'
+import * as rlp from 'rlp'
 import Web3 from 'web3'
 import { envVar, fetchEnv, fetchEnvOrFallback, monorepoRoot } from './env-utils'
 import {
@@ -166,7 +166,6 @@ const generateIstanbulExtraData = (validators: Validator[]) => {
     '0x' +
     repeat('0', istanbulVanity * 2) +
     rlp
-      // @ts-ignore
       .encode([
         // Added validators
         validators.map((validator) => Buffer.from(validator.address, 'hex')),

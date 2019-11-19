@@ -209,54 +209,46 @@ exports[`VerificationInputScreen renders correctly 1`] = `
         >
           <View
             style={
-              Object {
-                "position": "relative",
-              }
+              Array [
+                Object {
+                  "alignItems": "center",
+                  "flex": 1,
+                  "flexDirection": "row",
+                  "justifyContent": "center",
+                },
+                Object {
+                  "backgroundColor": "#FFF",
+                  "borderColor": "#D1D5D8",
+                  "borderRadius": 3,
+                  "borderWidth": 1,
+                  "flex": 0,
+                  "height": 50,
+                  "marginVertical": 5,
+                },
+              ]
             }
           >
-            <View
+            <TextInput
+              allowFontScaling={true}
+              onBlur={[Function]}
+              onChangeText={[Function]}
+              onFocus={[Function]}
+              placeholder="<#> m9oASm/3g7aZ..."
+              rejectResponderTermination={true}
+              shouldShowClipboard={[Function]}
               style={
-                Array [
-                  Object {
-                    "alignItems": "center",
-                    "flex": 1,
-                    "flexDirection": "row",
-                    "justifyContent": "center",
-                  },
-                  Object {
-                    "backgroundColor": "#FFF",
-                    "borderColor": "#D1D5D8",
-                    "borderRadius": 3,
-                    "borderWidth": 1,
-                    "flex": 0,
-                    "height": 50,
-                    "marginVertical": 5,
-                  },
-                ]
-              }
-            >
-              <TextInput
-                allowFontScaling={true}
-                onBlur={[Function]}
-                onChangeText={[Function]}
-                onFocus={[Function]}
-                placeholder="<#> m9oASm/3g7aZ..."
-                rejectResponderTermination={true}
-                shouldShowClipboard={[Function]}
-                style={
-                  Object {
-                    "backgroundColor": "#FFFFFF",
-                    "borderColor": "#D1D5D8",
-                    "borderRadius": 3,
-                    "flex": 1,
-                    "fontFamily": "Hind-Regular",
-                    "padding": 8,
-                  }
+                Object {
+                  "backgroundColor": "#FFFFFF",
+                  "borderColor": "#D1D5D8",
+                  "borderRadius": 3,
+                  "flex": 1,
+                  "fontFamily": "Hind-Regular",
+                  "padding": 8,
                 }
-                underlineColorAndroid="transparent"
-                value=""
-              />
-            </View>
+              }
+              underlineColorAndroid="transparent"
+              value=""
+            />
           </View>
         </View>
       </View>
