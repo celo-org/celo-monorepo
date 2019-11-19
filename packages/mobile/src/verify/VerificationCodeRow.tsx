@@ -3,7 +3,7 @@ import withTextInputPasteAware from '@celo/react-components/components/WithTextI
 import Checkmark from '@celo/react-components/icons/Checkmark'
 import colors from '@celo/react-components/styles/colors'
 import fontStyles from '@celo/react-components/styles/fonts'
-import { stripHexLeader } from '@celo/utils/src/signatureUtils'
+import { stripHexLeader } from '@celo/utils/src/address'
 import { extractAttestationCodeFromMessage } from '@celo/walletkit'
 import * as React from 'react'
 import { withNamespaces, WithNamespaces } from 'react-i18next'

@@ -48,3 +48,7 @@ function serializeErrors(errors: t.Errors) {
   })
   return serializedErrors
 }
+
+export function respondWithError(res: express.Response, statusCode: number, error: string) {
+  res.status(statusCode).json({ success: false, error })
+}
