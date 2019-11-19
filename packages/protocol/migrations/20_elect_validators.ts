@@ -71,9 +71,7 @@ async function registerValidatorGroup(
   await lockGold(accounts, lockedGold, lockedGoldValue, account.privateKey)
 
   // @ts-ignore
-  const setNameTx = accounts.contract.methods.setName(
-    `${config.validators.groupName} ${encodedKey}`
-  )
+  const setNameTx = accounts.contract.methods.setName(`${name} ${encodedKey}`)
   await sendTransactionWithPrivateKey(web3, setNameTx, account.privateKey, {
     to: accounts.address,
   })
@@ -198,8 +196,8 @@ module.exports = async (_deployer: any, networkName: string) => {
     }
 
     console.info(`  Registering Validator Group: ${groupName} ...`)
-    const firstPrivateKey = valKeys[0]
     const account = await registerValidatorGroup(
+      groupName,
       accounts,
       lockedGold,
       validators,
@@ -210,7 +208,15 @@ module.exports = async (_deployer: any, networkName: string) => {
     console.info('  * Registering Validators ...')
     await Promise.all(
       groupKeys.map((key, index) =>
-        registerValidator(accounts, lockedGold, validators, key, account.address, index, networkName)
+        registerValidator(
+          accounts,
+          lockedGold,
+          validators,
+          key,
+          account.address,
+          index,
+          networkName
+        )
       )
     )
 
