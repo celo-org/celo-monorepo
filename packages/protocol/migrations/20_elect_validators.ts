@@ -243,29 +243,6 @@ module.exports = async (_deployer: any, networkName: string) => {
       }
     }
 
-    console.info('  * Adding the validators to the group ...')
-    const nonce = await web3.eth.getTransactionCount(account.address)
-    await Promise.all(
-      groupKeys.map((key, i) => {
-        let addTx: any
-        if (i === 0) {
-          // @ts-ignore
-          addTx = validators.contract.methods.addFirstMember(
-            privateKeyToAddress(key),
-            NULL_ADDRESS,
-            prevGroupAddress
-          )
-        } else {
-          // @ts-ignore
-          addTx = validators.contract.methods.addMember(privateKeyToAddress(key))
-        }
-        return sendTransactionWithPrivateKey(web3, addTx, account.privateKey, {
-          nonce: nonce + i,
-          to: validators.address,
-        })
-      })
-    )
-
     console.info('  * Voting for the group ...')
     // Make another deposit so our vote has more weight.
     const minLockedGoldVotePerValidator = 10000
