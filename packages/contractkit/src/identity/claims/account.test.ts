@@ -69,10 +69,7 @@ testWithGanache('Account claims', (web3) => {
 
       const metadata = IdentityMetadataWrapper.fromEmpty(address)
       claim = createAccountClaim(otherAddress)
-      await metadata.addClaim(
-        createAccountClaim(otherAddress),
-        NativeSigner(kit.web3.eth.sign, address)
-      )
+      await metadata.addClaim(claim, NativeSigner(kit.web3.eth.sign, address))
     })
 
     afterEach(() => {
