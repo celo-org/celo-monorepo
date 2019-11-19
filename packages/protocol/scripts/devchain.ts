@@ -3,7 +3,7 @@ import chalk from 'chalk'
 import { spawn, SpawnOptions } from 'child_process'
 import * as fs from 'fs'
 import * as path from 'path'
-import yargs from 'yargs'
+import * as yargs from 'yargs'
 
 const MNEMONIC = 'concert load couple harbor equip island argue ramp clarify fence smart topic'
 
