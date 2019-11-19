@@ -3,7 +3,7 @@ import { hashMessage } from '@celo/utils/lib/signatureUtils'
 import * as t from 'io-ts'
 import { AccountClaim, AccountClaimType, MetadataURLGetter, verifyAccountClaim } from './account'
 import { KeybaseClaim, KeybaseClaimType, verifyKeybaseClaim } from './keybase'
-import { ClaimTypes, now, TimestampType } from './types'
+import { ClaimTypes, now, SignatureType, TimestampType } from './types'
 
 const AttestationServiceURLClaimType = t.type({
   type: t.literal(ClaimTypes.ATTESTATION_SERVICE_URL),
@@ -30,6 +30,11 @@ export const ClaimType = t.union([
   KeybaseClaimType,
   NameClaimType,
 ])
+
+export const SignedClaimType = t.type({
+  claim: ClaimType,
+  signature: SignatureType,
+})
 
 export type AttestationServiceURLClaim = t.TypeOf<typeof AttestationServiceURLClaimType>
 export type DomainClaim = t.TypeOf<typeof DomainClaimType>

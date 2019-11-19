@@ -1,5 +1,5 @@
 import { AddressType, SignatureType } from '@celo/utils/lib/io'
-import { parseSignature, Signer } from '@celo/utils/lib/signatureUtils'
+import { Signer, verifySignature } from '@celo/utils/lib/signatureUtils'
 import fetch from 'cross-fetch'
 import { isLeft } from 'fp-ts/lib/Either'
 import { readFileSync } from 'fs'
@@ -59,6 +59,7 @@ export class IdentityMetadataWrapper {
     const claims = validatedData.right.claims
     const hash = hashOfClaims(claims)
     if (
+      claims.length > 0 &&
       !verifySignature(hash, validatedData.right.meta.signature, validatedData.right.meta.address)
     ) {
       throw new Error('Signature could not be validated')
@@ -106,14 +107,5 @@ export class IdentityMetadataWrapper {
 
   filterClaims<K extends ClaimTypes>(type: K): Array<ClaimPayload<K>> {
     return this.data.claims.filter(isOfType(type))
-  }
-}
-
-export function verifySignature(message: string, signature: string, signer: string) {
-  try {
-    parseSignature(message, signature, signer)
-    return true
-  } catch (error) {
-    return false
   }
 }
