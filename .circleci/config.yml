@@ -46,6 +46,8 @@ general:
 jobs:
   install_dependencies:
     <<: *defaults
+    # Source: https://circleci.com/docs/2.0/configuration-reference/#resource_class
+    resource_class: medium+
     steps:
       - restore_cache:
           keys:
