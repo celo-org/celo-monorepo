@@ -1,17 +1,14 @@
 /* tslint:disable:no-console */
 import { NULL_ADDRESS } from '@celo/protocol/lib/test-utils'
 import {
-  add0x,
-  generateAccountAddressFromPrivateKey,
-  generatePublicKeyFromPrivateKey,
   getDeployedProxiedContract,
   sendTransactionWithPrivateKey,
 } from '@celo/protocol/lib/web3-utils'
 import { config } from '@celo/protocol/migrationsConfig'
-import { blsPrivateKeyToProcessedPrivateKey } from '@celo/utils/lib/bls'
+import { privateKeyToAddress, privateKeyToPublicKey } from '@celo/utils/lib/address'
+import { getBlsPoP, getBlsPublicKey } from '@celo/utils/lib/bls'
 import { toFixed } from '@celo/utils/lib/fixidity'
 import { BigNumber } from 'bignumber.js'
-import * as bls12377js from 'bls12377js'
 import { AccountsInstance, ElectionInstance, LockedGoldInstance, ValidatorsInstance } from 'types'
 
 const Web3 = require('web3')
@@ -66,7 +63,7 @@ async function registerValidatorGroup(
   )
 
   await web3.eth.sendTransaction({
-    from: generateAccountAddressFromPrivateKey(privateKey.slice(0)),
+    from: privateKeyToAddress(privateKey),
     to: account.address,
     value: lockedGoldValue.times(1.01).toFixed(), // Add a premium to cover tx fees
   })
@@ -102,21 +99,6 @@ async function registerValidator(
   index: number,
   networkName: string
 ) {
-  const validatorPrivateKeyHexStripped = validatorPrivateKey.slice(2)
-  const address = generateAccountAddressFromPrivateKey(validatorPrivateKey)
-  const publicKey = generatePublicKeyFromPrivateKey(validatorPrivateKeyHexStripped)
-  const blsValidatorPrivateKeyBytes = blsPrivateKeyToProcessedPrivateKey(
-    validatorPrivateKeyHexStripped
-  )
-  const blsPublicKey = bls12377js.BLS.privateToPublicBytes(blsValidatorPrivateKeyBytes).toString(
-    'hex'
-  )
-  const blsPoP = bls12377js.BLS.signPoP(
-    blsValidatorPrivateKeyBytes,
-    Buffer.from(address.slice(2), 'hex')
-  ).toString('hex')
-  const publicKeysData = publicKey + blsPublicKey + blsPoP
-
   await lockGold(
     accounts,
     lockedGold,
@@ -130,8 +112,12 @@ async function registerValidator(
     to: accounts.address,
   })
 
+  const publicKey = privateKeyToPublicKey(validatorPrivateKey)
+  const blsPublicKey = getBlsPublicKey(validatorPrivateKey)
+  const blsPoP = getBlsPoP(privateKeyToAddress(validatorPrivateKey), validatorPrivateKey)
+
   // @ts-ignore
-  const registerTx = validators.contract.methods.registerValidator(add0x(publicKeysData))
+  const registerTx = validators.contract.methods.registerValidator(publicKey, blsPublicKey, blsPoP)
 
   await sendTransactionWithPrivateKey(web3, registerTx, validatorPrivateKey, {
     to: validators.address,
@@ -146,7 +132,7 @@ async function registerValidator(
 
   // @ts-ignore
   const registerDataEncryptionKeyTx = accounts.contract.methods.setAccountDataEncryptionKey(
-    add0x(publicKey)
+    privateKeyToPublicKey(validatorPrivateKey)
   )
 
   await sendTransactionWithPrivateKey(web3, registerDataEncryptionKeyTx, validatorPrivateKey, {
@@ -216,7 +202,7 @@ module.exports = async (_deployer: any, networkName: string) => {
   console.info('  Adding Validators to Validator Group ...')
   for (let i = 0; i < valKeys.length; i++) {
     const key = valKeys[i]
-    const address = generateAccountAddressFromPrivateKey(key.slice(2))
+    const address = privateKeyToAddress(key)
     if (i === 0) {
       // @ts-ignore
       const addTx = validators.contract.methods.addFirstMember(address, NULL_ADDRESS, NULL_ADDRESS)

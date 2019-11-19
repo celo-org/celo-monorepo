@@ -120,6 +120,7 @@ export const handler = async (argv: InitialArgv) => {
             () => '60000000000000000000000'
           ), // 60k Celo Dollars
         },
+        oracles: getAddressesFor(AccountType.PRICE_ORACLE, mnemonic, 1),
       },
     })
 

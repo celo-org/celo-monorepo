@@ -41,6 +41,12 @@ const GENESIS_PATH = `${TEST_DIR}/genesis.json`
 const NetworkId = 1101
 const MonorepoRoot = resolvePath(joinPath(__dirname, '../..', '../..'))
 
+export async function waitToFinishSyncing(web3: any) {
+  while ((await web3.eth.isSyncing()) || (await web3.eth.getBlockNumber()) === 0) {
+    await sleep(0.1)
+  }
+}
+
 export function assertAlmostEqual(
   actual: BigNumber,
   expected: BigNumber,
@@ -213,7 +219,7 @@ export async function init(gethBinaryPath: string, datadir: string, genesisPath:
 }
 
 export async function importPrivateKey(gethBinaryPath: string, instance: GethInstanceConfig) {
-  const keyFile = '/tmp/key.txt'
+  const keyFile = `/${getDatadir(instance)}/key.txt`
   fs.writeFileSync(keyFile, instance.privateKey)
   console.info(`geth:${instance.name}: import account`)
   await execCmdWithExitOnFailure(
@@ -316,9 +322,13 @@ export async function startGeth(gethBinaryPath: string, instance: GethInstanceCo
   }
 
   if (validating) {
-    gethArgs.push('--password=/dev/null', `--unlock=0`)
     gethArgs.push('--mine', '--minerthreads=10', `--nodekeyhex=${privateKey}`)
   }
+
+  if (privateKey) {
+    gethArgs.push('--password=/dev/null', `--unlock=0`)
+  }
+
   const gethProcess = spawnWithLog(gethBinaryPath, gethArgs, `${datadir}/logs.txt`)
   instance.pid = gethProcess.pid
 

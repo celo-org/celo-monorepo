@@ -44,7 +44,7 @@ contract MockElection is IElection {
     electedValidators = _electedValidators;
   }
 
-  function electValidators() external view returns (address[] memory) {
+  function electValidatorSigners() external view returns (address[] memory) {
     return electedValidators;
   }
 }
