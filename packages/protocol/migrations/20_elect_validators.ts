@@ -195,7 +195,7 @@ module.exports = async (_deployer: any, networkName: string) => {
       groupName += ` (${idx + 1})`
     }
 
-    console.info(`  Registering Validator Group: ${groupName} ...`)
+    console.info(`  Registering validator group: ${groupName} ...`)
     const account = await registerValidatorGroup(
       groupName,
       accounts,
@@ -205,7 +205,7 @@ module.exports = async (_deployer: any, networkName: string) => {
       groupKeys.length
     )
 
-    console.info('  * Registering Validators ...')
+    console.info('  * Registering validators ...')
     await Promise.all(
       groupKeys.map((key, index) =>
         registerValidator(
@@ -220,30 +220,29 @@ module.exports = async (_deployer: any, networkName: string) => {
       )
     )
 
-    console.info('  * Adding Validators to Validator Group ...')
-    for (const [i, key] of groupKeys.entries()) {
-      const address = privateKeyToAddress(key)
-      console.info(`    - Adding ${address} ...`)
-      if (i === 0) {
-        // @ts-ignore
-        const addTx = validators.contract.methods.addFirstMember(
-          address,
-          NULL_ADDRESS,
-          prevGroupAddress
-        )
-        await sendTransactionWithPrivateKey(web3, addTx, account.privateKey, {
-          to: validators.address,
-        })
-      } else {
-        // @ts-ignore
-        const addTx = validators.contract.methods.addMember(address)
-        await sendTransactionWithPrivateKey(web3, addTx, account.privateKey, {
-          to: validators.address,
-        })
-      }
-    }
+    console.info('  * Adding the first validator to the group ...')
+    // @ts-ignore
+    const addTx = validators.contract.methods.addFirstMember(
+      privateKeyToAddress(groupKeys[0]),
+      NULL_ADDRESS,
+      prevGroupAddress
+    )
+    await sendTransactionWithPrivateKey(web3, addTx, account.privateKey, {
+      to: validators.address,
+    })
 
-    console.info('  * Voting for Validator Group ...')
+    console.info(`  * Adding the remaining ${groupKeys.length - 1} validators to the group ...`)
+    await Promise.all(
+      groupKeys.slice(1).map((key) => {
+        // @ts-ignore
+        const addTx = validators.contract.methods.addMember(privateKeyToAddress(key))
+        return sendTransactionWithPrivateKey(web3, addTx, account.privateKey, {
+          to: validators.address,
+        })
+      })
+    )
+
+    console.info('  * Voting for the group ...')
     // Make another deposit so our vote has more weight.
     const minLockedGoldVotePerValidator = 10000
     const value = new BigNumber(groupKeys.length)
