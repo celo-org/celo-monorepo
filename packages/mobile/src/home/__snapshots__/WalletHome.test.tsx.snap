@@ -971,7 +971,30 @@ exports[`Testnet banner Renders when disconnected 1`] = `
           "paddingVertical": 15,
         }
       }
-    />
+    >
+      <Text
+        style={
+          Array [
+            Object {
+              "color": "#2E3338",
+              "fontFamily": "Hind-Regular",
+              "fontSize": 14,
+              "lineHeight": undefined,
+              "textAlign": "center",
+            },
+            Object {
+              "color": "rgba(46, 51, 56, 0.4)",
+            },
+            Object {
+              "fontFamily": "Hind-Bold",
+            },
+          ]
+        }
+        testID="connectingToCeloBanner"
+      >
+        connectingToCelo
+      </Text>
+    </View>
     <View
       style={
         Object {
