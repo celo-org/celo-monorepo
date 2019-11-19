@@ -12,16 +12,6 @@ export default class LoadingSpinner extends React.PureComponent<Props> {
 
   animation: LottieView | null | undefined
 
-  componentDidMount() {
-    // Note(Rossy): This should not be required but the animation does not autoplay on iOS
-    // Possibly related: https://github.com/react-native-community/lottie-react-native/issues/581
-    setTimeout(() => {
-      if (this.animation) {
-        this.animation.play()
-      }
-    }, 10)
-  }
-
   render() {
     return (
       <LottieView

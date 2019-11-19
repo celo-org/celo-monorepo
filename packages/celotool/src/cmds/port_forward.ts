@@ -1,7 +1,7 @@
 import { switchToClusterFromEnv } from 'src/lib/cluster'
 import { addCeloEnvMiddleware, CeloEnvArgv } from 'src/lib/env-utils'
 import { defaultPortsString, portForward } from 'src/lib/port_forward'
-import * as yargs from 'yargs'
+import yargs from 'yargs'
 export const command = 'port-forward'
 
 export const describe = 'command for port-forwarding to a specific network'

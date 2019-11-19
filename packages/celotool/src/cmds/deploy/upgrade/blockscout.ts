@@ -4,7 +4,7 @@ import { switchToClusterFromEnv } from 'src/lib/cluster'
 import { fetchEnvOrFallback } from 'src/lib/env-utils'
 import { resetCloudSQLInstance, retrieveCloudSQLConnectionInfo } from 'src/lib/helm_deploy'
 import { execCmdWithExitOnFailure } from 'src/lib/utils'
-import * as yargs from 'yargs'
+import yargs from 'yargs'
 import { UpgradeArgv } from '../../deploy/upgrade'
 
 export const command = 'blockscout'

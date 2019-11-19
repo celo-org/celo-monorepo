@@ -94,5 +94,8 @@
   "calculateFeeFailed": "Could not calculate fee",
   "failedToSwitchSyncModes": "Failed to switch sync modes",
   "gold": "Gold",
-  "localCurrencyTitle": "Select Currency"
+  "localCurrencyTitle": "Select Currency",
+  "or": "or",
+  "accepted": "Accepted",
+  "processing": "Processing"
 }
