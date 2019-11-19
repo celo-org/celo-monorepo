@@ -84,21 +84,21 @@ export async function signTransaction(web3: Web3, txn: any, privateKey: string) 
       )
 
       const rawTx = RLP.decode(rlpEncoded)
-        .slice(0, 8)
+        .slice(0, 9)
         .concat(Account.decodeSignature(signature))
 
-      rawTx[8] = makeEven(trimLeadingZero(rawTx[8]))
       rawTx[9] = makeEven(trimLeadingZero(rawTx[9]))
       rawTx[10] = makeEven(trimLeadingZero(rawTx[10]))
+      rawTx[11] = makeEven(trimLeadingZero(rawTx[11]))
 
       const rawTransaction = RLP.encode(rawTx)
 
       const values = RLP.decode(rawTransaction)
       result = {
         messageHash,
-        v: trimLeadingZero(values[8]),
-        r: trimLeadingZero(values[9]),
-        s: trimLeadingZero(values[10]),
+        v: trimLeadingZero(values[9]),
+        r: trimLeadingZero(values[10]),
+        s: trimLeadingZero(values[11]),
         rawTransaction,
       }
     } catch (e) {

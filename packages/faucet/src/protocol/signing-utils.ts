@@ -70,7 +70,7 @@ export async function signTransaction(web3: Web3, txn: any, privateKey: string) 
         '0x',
       ])
 
-      const messagehash = hash.keccak256(rlpEncoded)
+      const messageHash = hash.keccak256(rlpEncoded)
 
       const signature = Account.makeSigner(nat.toNumber(transaction.chainId || '0x1') * 2 + 35)(
         hash.keccak256(rlpEncoded),
@@ -78,21 +78,21 @@ export async function signTransaction(web3: Web3, txn: any, privateKey: string) 
       )
 
       const rawTx = RLP.decode(rlpEncoded)
-        .slice(0, 8)
+        .slice(0, 9)
         .concat(Account.decodeSignature(signature))
 
-      rawTx[8] = makeEven(trimLeadingZero(rawTx[8]))
       rawTx[9] = makeEven(trimLeadingZero(rawTx[9]))
       rawTx[10] = makeEven(trimLeadingZero(rawTx[10]))
+      rawTx[11] = makeEven(trimLeadingZero(rawTx[11]))
 
       const rawTransaction = RLP.encode(rawTx)
 
       const values = RLP.decode(rawTransaction)
       result = {
-        messagehash,
-        v: trimLeadingZero(values[8]),
-        r: trimLeadingZero(values[9]),
-        s: trimLeadingZero(values[10]),
+        messageHash,
+        v: trimLeadingZero(values[9]),
+        r: trimLeadingZero(values[10]),
+        s: trimLeadingZero(values[11]),
         rawTransaction,
       }
     } catch (e) {
