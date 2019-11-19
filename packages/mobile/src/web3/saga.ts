@@ -5,17 +5,7 @@ import * as Crypto from 'crypto'
 import { generateMnemonic, mnemonicToSeedHex } from 'react-native-bip39'
 import * as RNFS from 'react-native-fs'
 import { REHYDRATE } from 'redux-persist/es/constants'
-import {
-  call,
-  delay,
-  put,
-  putResolve,
-  race,
-  select,
-  spawn,
-  take,
-  takeLatest,
-} from 'redux-saga/effects'
+import { call, delay, put, race, select, spawn, take, takeLatest } from 'redux-saga/effects'
 import { setAccountCreationTime } from 'src/account/actions'
 import { getPincode } from 'src/account/saga'
 import { showError } from 'src/alert/actions'
@@ -93,6 +83,11 @@ export function* checkWeb3SyncProgress() {
 
       yield delay(100) // wait 100ms while web3 syncs
     } catch (error) {
+      // Check not caused by switch to zeroSyncMode
+      const switchedToZeroSyncMode = yield select(zeroSyncSelector)
+      if (switchedToZeroSyncMode) {
+        return true
+      }
       if (error.toString().toLowerCase() === BLOCK_CHAIN_CORRUPTION_ERROR.toLowerCase()) {
         CeloAnalytics.track(CustomEventNames.blockChainCorruption, {}, true)
         const deleted = yield call(deleteChainData)
@@ -433,15 +428,10 @@ export function* switchToGethFromZeroSync() {
   Logger.debug(TAG, 'Switching to geth from zeroSync..')
   try {
     const gethAlreadyStartedThisSession = yield select(gethStartedThisSessionSelector)
-
-    yield putResolve(setZeroSyncMode(false))
+    yield put(setZeroSyncMode(false))
 
     if (gethAlreadyStartedThisSession) {
-      // yield call(waitForWeb3Sync)
-      const zeroSync3 = yield select(zeroSyncSelector)
-      Logger.info(TAG, `switchToGethFromZeroSync, zeroSync3 mode: ${zeroSync3}`)
-      delay(3000)
-      Logger.info(TAG, `done waiting`)
+      yield call(web3.eth.isSyncing)
       restartApp()
       return
     }
