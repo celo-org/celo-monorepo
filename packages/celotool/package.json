@@ -18,7 +18,7 @@
     "bignumber.js": "^7.2.0",
     "bip32": "^1.0.2",
     "bip39": "^2.5.0",
-    "bls12377js": "https://github.com/celo-org/bls12377js#0b6115c15643fa4ab99427b6b766f205d4e98242",
+    "bls12377js": "https://github.com/celo-org/bls12377js#ea09eba5c54fe63617af494a0c198fcc47582e0c",
     "dotenv": "6.1.0",
     "ecurve": "^1.0.6",
     "js-yaml": "^3.13.1",
