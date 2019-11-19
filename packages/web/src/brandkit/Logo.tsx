@@ -63,7 +63,9 @@ const Overview = withNamespaces(NameSpaces.brand)(function _Overview({ t }: I18n
         <View style={[standardStyles.centered, styles.fullScreenLogo]}>
           <LogoLightBg height={100} />
         </View>
-        <H3 style={standardStyles.elementalMargin}>{t('logo.logoTitle')}</H3>
+        <H3 style={[standardStyles.elementalMargin, standardStyles.blockMarginTop]}>
+          {t('logo.logoTitle')}
+        </H3>
         <Text style={fonts.p}>{t('logo.logoText')}</Text>
       </View>
       <View style={styles.tiling}>
@@ -93,7 +95,9 @@ const Overview = withNamespaces(NameSpaces.brand)(function _Overview({ t }: I18n
         />
       </View>
       <View style={styles.gap}>
-        <H3 style={standardStyles.elementalMargin}>{t('logo.glyphTitle')}</H3>
+        <H3 style={[standardStyles.elementalMargin, standardStyles.blockMarginTop]}>
+          {t('logo.glyphTitle')}
+        </H3>
         <Text style={fonts.p}>{t('logo.glyphText')}</Text>
         <Button kind={BTN.TERTIARY} text={t('downloadAssetBtn')} style={styles.button} />
         <View style={styles.tiling}>
@@ -118,7 +122,9 @@ const Overview = withNamespaces(NameSpaces.brand)(function _Overview({ t }: I18n
         </View>
       </View>
       <View>
-        <H3 style={[styles.gap, standardStyles.elementalMargin]}>{t('logo.sizeTitle')}</H3>
+        <H3 style={[styles.gap, standardStyles.elementalMargin, standardStyles.blockMarginTop]}>
+          {t('logo.sizeTitle')}
+        </H3>
         <Text style={[fonts.p, styles.gap]}>{t('logo.sizeText')}</Text>
         <View style={[standardStyles.centered, styles.sizingArea]}>
           <AspectRatio ratio={392 / 160} style={styles.sizing}>
@@ -139,7 +145,13 @@ const Clearspace = withNamespaces(NameSpaces.brand)(function _ClearSpace({ t }) 
     <View style={styles.gap}>
       <SectionTitle>{t('logo.clearspaceTitle')}</SectionTitle>
       <Text style={fonts.p}>{t('logo.clearspaceText')}</Text>
-      <View style={[standardStyles.centered, styles.clearspaceImageArea]}>
+      <View
+        style={[
+          standardStyles.centered,
+          standardStyles.elementalMarginTop,
+          styles.clearspaceImageArea,
+        ]}
+      >
         <AspectRatio ratio={714 / 357} style={styles.clearspaceImage}>
           <Image
             resizeMethod="resize"
@@ -158,20 +170,22 @@ const Backgrounds = withNamespaces(NameSpaces.brand)(function _Backgrounds({ t }
     <View>
       <View style={styles.gap}>
         <SectionTitle>{t('logo.backgroundsTitle')}</SectionTitle>
-        <Text style={fonts.p}>{}</Text>
+        <Text style={[fonts.p, standardStyles.elementalMarginBottom]}>
+          {t('logo.backgroundTextTop')}
+        </Text>
       </View>
       <View style={[styles.tiling, standardStyles.elementalMarginBottom]}>
         <View style={[styles.gap, styles.container]}>
-          <LogoWithBackground backgroundColor={colors.white} type="light" />
+          <LogoWithBackground backgroundColor={colors.white} hasBorder={true} type="light" />
         </View>
         <View style={[styles.gap, styles.container]}>
-          <LogoWithBackground backgroundColor={'#F8F9F9'} type="light" />
+          <LogoWithBackground backgroundColor={'#F8F9F9'} hasBorder={true} type="light" />
         </View>
         <View style={[styles.gap, styles.container]}>
           <LogoWithBackground backgroundColor={'#FEF2D6'} type="light" />
         </View>
       </View>
-      <H3 style={[styles.gap, standardStyles.elementalMargin]}>
+      <H3 style={[styles.gap, standardStyles.elementalMargin, standardStyles.blockMarginTop]}>
         {t('logo.colorBackgroundsTitle')}
       </H3>
       <Text style={[fonts.p, styles.gap]}>{t('logo.colorBackgroundsText')}</Text>
@@ -197,7 +211,9 @@ const Backgrounds = withNamespaces(NameSpaces.brand)(function _Backgrounds({ t }
           <LogoWithBackground backgroundColor={'#3DBFFF'} type="white" />
         </View>
       </View>
-      <Text style={[styles.gap, fonts.p]}>{t('logo.backgroundDoNotAndDo')}</Text>
+      <Text style={[styles.gap, fonts.p, standardStyles.elementalMarginTop]}>
+        {t('logo.backgroundDoNotAndDo')}
+      </Text>
       <View style={styles.tiling}>
         <Judgement is={Value.Bad}>
           <LogoWithBackground image={require('src/brandkit/images/lilah.jpg')} type="dark" />

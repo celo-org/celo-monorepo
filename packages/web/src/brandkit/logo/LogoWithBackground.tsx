@@ -2,15 +2,21 @@ import LogoLightBg from 'src/logos/LogoLightBg'
 import * as React from 'react'
 import LogoDarkBg from 'src/logos/LogoDarkBg'
 import { ImageBackground, StyleSheet, View, ImageRequireSource } from 'react-native'
-import { standardStyles } from 'src/styles'
+import { standardStyles, colors } from 'src/styles'
 
 interface Props {
   image?: ImageRequireSource
   backgroundColor?: string
   type: 'light' | 'dark' | 'black' | 'white'
+  hasBorder?: boolean
 }
 
-export default React.memo(function LogoWithBackground({ type, backgroundColor, image }: Props) {
+export default React.memo(function LogoWithBackground({
+  type,
+  backgroundColor,
+  image,
+  hasBorder,
+}: Props) {
   let logo
 
   if (type === 'light') {
@@ -23,17 +29,30 @@ export default React.memo(function LogoWithBackground({ type, backgroundColor, i
 
   if (image) {
     return (
-      <ImageBackground source={image} style={[standardStyles.centered, styles.box]}>
+      <ImageBackground
+        source={image}
+        style={[standardStyles.centered, hasBorder && styles.border, styles.box]}
+      >
         {logo}
       </ImageBackground>
     )
   }
 
-  return <View style={[standardStyles.centered, styles.box, { backgroundColor }]}>{logo}</View>
+  return (
+    <View
+      style={[standardStyles.centered, styles.box, hasBorder && styles.border, { backgroundColor }]}
+    >
+      {logo}
+    </View>
+  )
 })
 
 const styles = StyleSheet.create({
   box: {
     flexBasis: 230,
+  },
+  border: {
+    borderWidth: 1,
+    borderColor: colors.gray,
   },
 })
