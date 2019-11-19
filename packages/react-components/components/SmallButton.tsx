@@ -1,6 +1,6 @@
 import Touchable from '@celo/react-components/components/Touchable'
 import colors from '@celo/react-components/styles/colors'
-import fonts from '@celo/react-components/styles/fonts'
+import { fontStyles } from '@celo/react-components/styles/fonts'
 import * as React from 'react'
 import { StyleSheet, Text, TextStyle, ViewStyle } from 'react-native'
 
@@ -47,7 +47,6 @@ export default class SmallButton extends React.Component<ButtonProps> {
           <Text
             accessibilityLabel={accessibilityLabel}
             style={[
-              fonts.linkSmall,
               styles.text,
               solid ? { color: colors.white } : { color: colors.celoGreen },
               children ? styles.textPadding : null,
@@ -85,8 +84,11 @@ const styles = StyleSheet.create({
     borderColor: colors.celoGreen,
   },
   text: {
-    textAlign: 'center',
+    ...fontStyles.semiBold,
+    fontSize: 13,
     lineHeight: 20,
+    color: colors.darkSecondary,
+    textAlign: 'center',
   },
   textPadding: {
     paddingLeft: 10,

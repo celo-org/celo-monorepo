@@ -1,6 +1,6 @@
 import BaseNotification from '@celo/react-components/components/BaseNotification'
+import colors from '@celo/react-components/styles/colors'
 import fontStyles from '@celo/react-components/styles/fonts'
-import { componentStyles } from '@celo/react-components/styles/styles'
 import variables from '@celo/react-components/styles/variables'
 import * as React from 'react'
 import { WithNamespaces, withNamespaces } from 'react-i18next'
@@ -9,7 +9,6 @@ import { connect } from 'react-redux'
 import { PaymentRequest } from 'src/account'
 import CeloAnalytics from 'src/analytics/CeloAnalytics'
 import { CustomEventNames } from 'src/analytics/constants'
-import { componentWithAnalytics } from 'src/analytics/wrapper'
 import { Namespaces } from 'src/i18n'
 import {
   addressToE164NumberSelector,
@@ -67,9 +66,7 @@ export class PaymentRequestSummaryNotification extends React.Component<Props> {
     if (this.getTotal() - PREVIEW_SIZE > 0) {
       return (
         <View style={styles.counter}>
-          <Text style={[fontStyles.linkSmall, componentStyles.colorGreen]}>
-            +{this.getTotal() - PREVIEW_SIZE}
-          </Text>
+          <Text style={styles.requestCountText}>+{this.getTotal() - PREVIEW_SIZE}</Text>
         </View>
       )
     }
@@ -137,10 +134,14 @@ const styles = StyleSheet.create({
     paddingLeft: variables.contentPadding,
     justifyContent: 'flex-end',
   },
+  requestCountText: {
+    ...fontStyles.semiBold,
+    fontSize: 13,
+    lineHeight: 17,
+    color: colors.celoGreen,
+  },
 })
 
-export default componentWithAnalytics(
-  connect<StateProps, {}, {}, RootState>(mapStateToProps)(
-    withNamespaces(Namespaces.walletFlow5)(PaymentRequestSummaryNotification)
-  )
+export default connect<StateProps, {}, {}, RootState>(mapStateToProps)(
+  withNamespaces(Namespaces.walletFlow5)(PaymentRequestSummaryNotification)
 )

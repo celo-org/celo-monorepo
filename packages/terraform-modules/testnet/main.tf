@@ -42,7 +42,7 @@ resource "google_compute_firewall" "ssh_firewall" {
     local.firewall_target_tags_node,
     ["${var.celo_env}-external-ssl"]
   )
-
+  
   allow {
     protocol = "tcp"
     ports    = ["22"]

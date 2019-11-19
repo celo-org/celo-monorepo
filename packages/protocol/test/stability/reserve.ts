@@ -35,7 +35,7 @@ contract('Reserve', (accounts: string[]) => {
   const nonOwner: string = accounts[1]
   const spender: string = accounts[2]
   const aTobinTaxStalenessThreshold: number = 600
-
+  const sortedOraclesDenominator = new BigNumber('0x10000000000000000')
   beforeEach(async () => {
     reserve = await Reserve.new()
     registry = await Registry.new()
@@ -80,7 +80,7 @@ contract('Reserve', (accounts: string[]) => {
 
   describe('#addToken()', () => {
     beforeEach(async () => {
-      await mockSortedOracles.setMedianRate(anAddress, 1, 1)
+      await mockSortedOracles.setMedianRate(anAddress, sortedOraclesDenominator)
     })
 
     it('should allow owner to add a token', async () => {
@@ -124,7 +124,7 @@ contract('Reserve', (accounts: string[]) => {
 
     describe('when the token has already been added', async () => {
       beforeEach(async () => {
-        await mockSortedOracles.setMedianRate(anAddress, 1, 1)
+        await mockSortedOracles.setMedianRate(anAddress, sortedOraclesDenominator)
         await reserve.addToken(anAddress)
         const tokenList = await reserve.getTokens()
         index = -1
@@ -186,7 +186,10 @@ contract('Reserve', (accounts: string[]) => {
     beforeEach(async () => {
       mockStableToken = await MockStableToken.new()
       await registry.setAddressFor(CeloContractName.SortedOracles, mockSortedOracles.address)
-      await mockSortedOracles.setMedianRate(mockStableToken.address, 10, 1)
+      await mockSortedOracles.setMedianRate(
+        mockStableToken.address,
+        sortedOraclesDenominator.times(10)
+      )
       await reserve.addToken(mockStableToken.address)
       const reserveGoldBalance = new BigNumber(10).pow(19)
       await web3.eth.sendTransaction({
@@ -230,7 +233,10 @@ contract('Reserve', (accounts: string[]) => {
       let anotherMockStableToken: MockStableTokenInstance
       beforeEach(async () => {
         anotherMockStableToken = await MockStableToken.new()
-        await mockSortedOracles.setMedianRate(anotherMockStableToken.address, 10, 1)
+        await mockSortedOracles.setMedianRate(
+          anotherMockStableToken.address,
+          sortedOraclesDenominator.times(10)
+        )
         await reserve.addToken(anotherMockStableToken.address)
       })
 

@@ -34,30 +34,6 @@ export function assertContainSubset(superset: any, subset: any) {
   return assert2.containSubset(superset, subset)
 }
 
-export async function advanceBlockNum(numBlocks: number, web3: Web3) {
-  let returnValue: any
-  for (let i: number = 0; i < numBlocks; i++) {
-    returnValue = new Promise((resolve, reject) => {
-      web3.currentProvider.send(
-        {
-          jsonrpc: '2.0',
-          method: 'evm_mine',
-          params: [],
-          id: new Date().getTime(),
-        },
-        // @ts-ignore
-        (err: any, result: any) => {
-          if (err) {
-            return reject(err)
-          }
-          return resolve(result)
-        }
-      )
-    })
-  }
-  return returnValue
-}
-
 export async function jsonRpc(web3: Web3, method: string, params: any[] = []): Promise<any> {
   return new Promise((resolve, reject) => {
     web3.currentProvider.send(
@@ -239,6 +215,21 @@ export function assertEqualBN(
   )
 }
 
+export function assertEqualDpBN(
+  value: number | BN | BigNumber,
+  expected: number | BN | BigNumber,
+  decimals: number,
+  msg?: string
+) {
+  const valueDp = new BigNumber(value.toString()).dp(decimals)
+  const expectedDp = new BigNumber(expected.toString()).dp(decimals)
+  assert(
+    valueDp.isEqualTo(expectedDp),
+    `expected ${expectedDp.toString()} and got ${valueDp.toString()}. ${msg || ''}`
+  )
+}
+
+
 export function assertEqualBNArray(value: number[] | BN[] | BigNumber[], expected: number[] | BN[] | BigNumber[], msg?: string) {
   assert.equal(value.length, expected.length, msg)
   value.forEach((x, i) => assertEqualBN(x, expected[i]))
@@ -327,7 +318,6 @@ export const matchAny = () => {
 }
 
 export default {
-  advanceBlockNum,
   assertContainSubset,
   assertRevert,
   timeTravel,

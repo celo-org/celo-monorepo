@@ -52,7 +52,7 @@ Save this address to an environment variables, so that you can reference it belo
 
 `$ export CELO_ACCOUNT_ADDRESS=<YOUR-ACCOUNT-ADDRESS>`
 
-_Note: this environment variable will only persist while you have this terminal window open. If you want this environment variable to be available in the future, you can add it to your `~/.bash_profile_`
+_Note: this environment variable will only persist while you have this terminal window open. If you want this environment variable to be available in the future, you can add it to your `~/.bash_profile_
 
 ## **Configure the node**
 
@@ -68,7 +68,7 @@ In order to allow the node to sync with the network, give it the address of exis
 
 This command specifies the settings needed to run the node, and gets it started.
 
-`` $ docker run -p 127.0.0.1:8545:8545 -p 127.0.0.1:8546:8546 -p 30303:30303 -p 30303:30303/udp -v `pwd`:/root/.celo us.gcr.io/celo-testnet/celo-node:alfajores --verbosity 3 --networkid 44784 --syncmode full --rpc --rpcaddr 0.0.0.0 --rpcapi eth,net,web3,debug,admin,personal --lightserv 90 --lightpeers 1000 --maxpeers 1100 --etherbase $CELO_ACCOUNT_ADDRESS ``
+`` $ docker run -p 127.0.0.1:8545:8545 -p 127.0.0.1:8546:8546 -p 30303:30303 -p 30303:30303/udp -v `pwd`:/root/.celo us.gcr.io/celo-testnet/celo-node:alfajores --verbosity 3 --networkid 44785 --syncmode full --rpc --rpcaddr 0.0.0.0 --rpcapi eth,net,web3,debug,admin,personal --lightserv 90 --lightpeers 1000 --maxpeers 1100 --etherbase $CELO_ACCOUNT_ADDRESS ``
 
 You'll start seeing some output. There may be some errors or warnings that are ignorable. After a few minutes, you should see lines that look like this. This means your node has synced with the network and is receiving blocks.
 

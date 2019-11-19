@@ -38,9 +38,8 @@
     "validating": "Great! Validating copied invite code",
     "inviteAccepted": "🎉 Invite Accepted!",
     "askForInvite": {
-      "0":
-        "Request an invite from someone with Celo Wallet or sign up for the {{testnet}} network at ",
-      "1": "celo.org/build/wallet"
+      "0": "Request an invite from a friend on Celo or sign up for the {{testnet}} network at ",
+      "1": "celo.org/app"
     }
   },
   "enterFullName": "Please enter your first and last name",
