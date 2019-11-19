@@ -1,4 +1,4 @@
-import { SignedClaim } from '@celo/contractkit/lib/identity/claims/claim'
+import { hashOfClaim } from '@celo/contractkit/lib/identity/claims/claim'
 import {
   createKeybaseClaim,
   KeybaseClaim,
@@ -35,18 +35,15 @@ export default class ClaimKeybase extends ClaimCommand {
     const address = toChecksumAddress(res.flags.from)
     const username = res.flags.username
     const metadata = this.readMetadata()
-    const signedClaim = await this.addClaim(metadata, createKeybaseClaim(username))
+    const claim = createKeybaseClaim(username)
+    const signature = await this.signer.sign(hashOfClaim(claim))
+    await this.addClaim(metadata, claim)
     this.writeMetadata(metadata)
 
     try {
-      await this.uploadProof(
-        signedClaim.payload as KeybaseClaim,
-        signedClaim.signature,
-        username,
-        address
-      )
+      await this.uploadProof(claim, signature, username, address)
     } catch (error) {
-      this.printManualInstruction(signedClaim, username, address)
+      this.printManualInstruction(claim, signature, username, address)
     }
   }
 
@@ -56,7 +53,7 @@ export default class ClaimKeybase extends ClaimCommand {
     username: string,
     address: string
   ) {
-    const signedClaim = { payload: claim, signature }
+    const signedClaim = { claim, signature }
     try {
       cli.action.start(`Attempting to automate keybase proof`)
       const publicFolderPrefix = `/keybase/public/${username}/`
@@ -86,7 +83,6 @@ export default class ClaimKeybase extends ClaimCommand {
     }
   }
   async uploadProof(claim: KeybaseClaim, signature: string, username: string, address: string) {
-    const signedClaim = { payload: claim, signature }
     try {
       if (
         (await commandExists('keybase')) &&
@@ -96,7 +92,7 @@ export default class ClaimKeybase extends ClaimCommand {
       ) {
         await this.attemptAutomaticProofUpload(claim, signature, username, address)
       } else {
-        this.printManualInstruction(signedClaim, username, address)
+        this.printManualInstruction(claim, signature, username, address)
       }
     } catch (error) {
       cli.action.stop('Error')
@@ -104,13 +100,18 @@ export default class ClaimKeybase extends ClaimCommand {
         'Could not automatically finish the proving, please complete this step manually.\n\n ' +
           error
       )
-      this.printManualInstruction(signedClaim, username, address)
+      this.printManualInstruction(claim, signature, username, address)
     }
   }
 
-  printManualInstruction(claim: SignedClaim, username: string, address: string) {
+  printManualInstruction(
+    claim: KeybaseClaim,
+    signature: string,
+    username: string,
+    address: string
+  ) {
     const fileName = proofFileName(address)
-    writeFileSync(fileName, JSON.stringify(claim))
+    writeFileSync(fileName, JSON.stringify({ claim, signature }))
     console.info(
       `\nProving a keybase claim requires you to publish the signed claim on your Keybase file system to prove ownership. We saved it for you under ${fileName}. It should be hosted in your public folder at ${keybaseFilePathToProof}/${fileName}, so that it is available under ${targetURL(
         username,
