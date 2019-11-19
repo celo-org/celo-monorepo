@@ -8,6 +8,7 @@ import "./interfaces/IReserve.sol";
 import "./interfaces/ISortedOracles.sol";
 import "./interfaces/IStableToken.sol";
 
+import "../common/FixidityLib.sol";
 import "../common/Initializable.sol";
 import "../common/UsingRegistry.sol";
 
@@ -139,7 +140,9 @@ contract Reserve is IReserve, Ownable, Initializable, UsingRegistry, ReentrancyG
   function getOrComputeTobinTax() external nonReentrant returns (uint256, uint256) {
     // solhint-disable-next-line not-rely-on-time
     if (now.sub(tobinTaxCache.timestamp) > tobinTaxStalenessThreshold) {
-      tobinTaxCache.numerator = uint128(computeTobinTax());
+      FixidityLib.Fraction memory denominator = FixidityLib.newFixed(TOBIN_TAX_DENOMINATOR);
+      FixidityLib.Fraction memory numerator = FixidityLib.multiply(computeTobinTax(), denominator);
+      tobinTaxCache.numerator = uint128(FixidityLib.fromFixed(numerator));
       tobinTaxCache.timestamp = uint128(now); // solhint-disable-line not-rely-on-time
     }
     return (uint256(tobinTaxCache.numerator), TOBIN_TAX_DENOMINATOR);
@@ -156,7 +159,7 @@ contract Reserve is IReserve, Ownable, Initializable, UsingRegistry, ReentrancyG
    * @notice Computes a tobin tax based on the reserve ratio.
    * @return The numerator of the tobin tax amount, where the denominator is 1000.
    */
-  function computeTobinTax() private view returns (uint256) {
+  function computeTobinTax() private view returns (FixidityLib.Fraction memory) {
     address sortedOraclesAddress = registry.getAddressForOrDie(SORTED_ORACLES_REGISTRY_ID);
     ISortedOracles sortedOracles = ISortedOracles(sortedOraclesAddress);
     uint256 reserveGoldBalance = address(this).balance;
@@ -175,9 +178,9 @@ contract Reserve is IReserve, Ownable, Initializable, UsingRegistry, ReentrancyG
     // The protocol aims to keep half of the reserve value in gold, thus the reserve ratio
     // is two when the value of gold in the reserve is equal to the total supply of stable tokens.
     if (reserveGoldBalance >= stableTokensValueInGold) {
-      return 0;
+      return FixidityLib.newFixed(0);
     } else {
-      return 5;
+      return FixidityLib.newFixedFraction(5, 1000);
     }
   }
 
