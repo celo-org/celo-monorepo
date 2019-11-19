@@ -83,7 +83,7 @@ const setIntrinsicGas = async (validatorUri: string, validatorAddress: string, g
 const INTRINSIC_GAS_FOR_TX = 21000
 
 // Additional intrinsic gas for a transaction with gas currency specified
-const ADDITIONAL_INTRINSIC_TX_GAS_COST = 134000
+const ADDITIONAL_INTRINSIC_TX_GAS_COST = 166000
 
 /** Helper to watch balance changes over accounts */
 interface BalanceWatcher {

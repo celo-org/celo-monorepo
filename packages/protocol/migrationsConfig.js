@@ -13,7 +13,7 @@ const DefaultConfig = {
     selectIssuersWaitBlocks: 4,
   },
   blockchainParameters: {
-    gasForNonGoldCurrencies: 134000,
+    gasForNonGoldCurrencies: 166000,
     minimumClientVersion: {
       major: 1,
       minor: 8,
