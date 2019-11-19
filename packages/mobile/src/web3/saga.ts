@@ -83,7 +83,7 @@ export function* checkWeb3SyncProgress() {
 
       yield delay(100) // wait 100ms while web3 syncs
     } catch (error) {
-      // Check not caused by switch to zeroSyncMode
+      // Check if error caused by switch to zeroSyncMode
       const switchedToZeroSyncMode = yield select(zeroSyncSelector)
       if (switchedToZeroSyncMode) {
         return true
@@ -444,7 +444,6 @@ export function* switchToGethFromZeroSync() {
 
     yield call(initGethSaga)
     switchWeb3ProviderForSyncMode(false)
-
     // Ensure web3 is fully synced using new provider
     yield call(waitForWeb3Sync)
 
