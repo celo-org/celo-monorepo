@@ -7,6 +7,7 @@ exports[`ReviewFrame renders correctly 1`] = `
       Object {
         "backgroundColor": "#FFFFFF",
         "flex": 1,
+        "justifyContent": "space-between",
       },
       undefined,
     ]
@@ -15,8 +16,9 @@ exports[`ReviewFrame renders correctly 1`] = `
   <RCTScrollView
     contentContainerStyle={
       Object {
-        "flex": 1,
-        "justifyContent": "space-between",
+        "alignItems": "center",
+        "justifyContent": "flex-start",
+        "paddingVertical": 10,
       }
     }
   >
@@ -24,17 +26,7 @@ exports[`ReviewFrame renders correctly 1`] = `
       <View
         style={
           Object {
-            "backgroundColor": "#FFFFFF",
-            "flex": 1,
-          }
-        }
-      />
-      <View
-        style={
-          Object {
-            "flex": 4,
-            "marginHorizontal": 20,
-            "marginVertical": 10,
+            "margin": 20,
           }
         }
       />
@@ -62,6 +54,14 @@ exports[`ReviewFrame renders correctly 1`] = `
       <View
         accessible={true}
         focusable={true}
+        hitSlop={
+          Object {
+            "bottom": 10,
+            "left": 10,
+            "right": 10,
+            "top": 10,
+          }
+        }
         isTVSelectable={true}
         onClick={[Function]}
         onResponderGrant={[Function]}

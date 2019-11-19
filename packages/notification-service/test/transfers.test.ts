@@ -166,8 +166,8 @@ describe('Transfers', () => {
   // as we need both the gold and stable transfers fetch from blockscout to work
   // in order to send the right push notifications
   it('should propagate fetch errors', async () => {
-    fetchMock.mockRejectedValue(new Error('fetch error'))
-    await expect(handleTransferNotifications()).rejects.toThrow('fetch error')
+    fetchMock.mockRejectedValue(new Error('FAKE ERROR, IGNORE'))
+    await expect(handleTransferNotifications()).rejects.toThrow('FAKE ERROR, IGNORE')
     expect(sendPaymentNotificationMock).not.toHaveBeenCalled()
     expect(setLastBlockNotifiedMock).not.toHaveBeenCalled()
   })

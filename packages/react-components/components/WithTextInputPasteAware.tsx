@@ -2,6 +2,7 @@
 
 import TouchableDefault from '@celo/react-components/components/Touchable'
 import Paste from '@celo/react-components/icons/Paste'
+import { iconHitslop } from '@celo/react-components/styles/variables'
 import * as React from 'react'
 import { AppState, Clipboard, StyleSheet, TextInputProps, View, ViewStyle } from 'react-native'
 
@@ -20,18 +21,26 @@ export default function withTextInputPasteAware<P extends TextInputProps>(
       isPasteIconVisible: false,
     }
 
+    _isMounted = false
+
     async componentDidMount() {
+      this._isMounted = true
       AppState.addEventListener('change', this.checkClipboardContents)
       await this.checkClipboardContents()
     }
 
     componentWillUnmount() {
+      this._isMounted = false
       AppState.removeEventListener('change', this.checkClipboardContents)
     }
 
     checkClipboardContents = async () => {
       try {
         const clipboardContent = await Clipboard.getString()
+        if (!this._isMounted) {
+          return
+        }
+
         if (
           clipboardContent &&
           clipboardContent !== this.props.value &&
@@ -48,8 +57,8 @@ export default function withTextInputPasteAware<P extends TextInputProps>(
 
     onPressPate = async () => {
       const clipboardContents = await Clipboard.getString()
-      this.props.onChangeText(clipboardContents)
       this.setState({ isPasteIconVisible: false })
+      this.props.onChangeText(clipboardContents)
     }
 
     render() {
@@ -62,6 +71,7 @@ export default function withTextInputPasteAware<P extends TextInputProps>(
             <TouchableDefault
               style={[style.pasteIconContainer, pasteIconContainerStyle]}
               onPress={this.onPressPate}
+              hitSlop={iconHitslop}
             >
               <Paste />
             </TouchableDefault>

@@ -18,7 +18,7 @@ export default withNamespaces(NameSpaces.download)(
   memo(function AppStores({ t }: I18nProps) {
     return (
       <View>
-        <Title title={t('availableOnAndroid')} />
+        <Title ariaLevel="2" title={t('downloadDirect')} />
         <GridRow desktopStyle={standardStyles.centered}>
           <Logos />
         </GridRow>
@@ -72,7 +72,11 @@ const Logos = withScreenSize(({ screen }: ScreenProps) => {
         </a>
       </TouchableOpacity>
       {isMobile || <View style={[standardStyles.verticalLine, styles.verticalLine]} />}
-      <FadingImage source={appStoreLogo} />
+      <TouchableOpacity>
+        <a href={CeloLinks.appStoreWallet}>
+          <FadingImage source={appStoreLogo} />
+        </a>
+      </TouchableOpacity>
     </Cell>
   )
 })
