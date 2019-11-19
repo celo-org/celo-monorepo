@@ -2,24 +2,27 @@ import Logger from 'bunyan'
 import express from 'express'
 import { isLeft } from 'fp-ts/lib/Either'
 import * as t from 'io-ts'
-import { logger } from './logger'
+import { rootLogger } from './logger'
 
 export enum ErrorMessages {
   UNKNOWN_ERROR = 'Something went wrong',
 }
 
-export function catchAsyncErrorHandler<T>(
-  handler: (req: express.Request, res: Response) => Promise<T>
-) {
+export function asyncHandler<T>(handler: (req: express.Request, res: Response) => Promise<T>) {
   return (req: express.Request, res: Response) => {
-    handler(req, res)
-      .then(() => res.locals.logger.info({ res }))
-      .catch((error) => {
-        if (res.locals.logger) {
-          res.locals.logger.error(error)
-        }
-        respondWithError(res, 500, ErrorMessages.UNKNOWN_ERROR)
-      })
+    const handleUnknownError = (error: Error) => {
+      if (res.locals.logger) {
+        res.locals.logger.error(error)
+      }
+      respondWithError(res, 500, ErrorMessages.UNKNOWN_ERROR)
+    }
+    try {
+      handler(req, res)
+        .then(() => res.locals.logger.info({ res }))
+        .catch(handleUnknownError)
+    } catch (error) {
+      handleUnknownError(error)
+    }
   }
 }
 
@@ -27,7 +30,7 @@ export function createValidatedHandler<T>(
   requestType: t.Type<T>,
   handler: (req: express.Request, res: Response, parsedRequest: T) => Promise<void>
 ) {
-  return catchAsyncErrorHandler(async (req: express.Request, res: Response) => {
+  return asyncHandler(async (req: express.Request, res: Response) => {
     const parsedRequest = requestType.decode({ ...req.query, ...req.body })
     if (isLeft(parsedRequest)) {
       res.status(422).json({
@@ -70,7 +73,7 @@ export function respondWithError(res: express.Response, statusCode: number, erro
 }
 
 export type Response = Omit<express.Response, 'locals'> & {
-  locals: { logger: Logger } & any
+  locals: { logger: Logger } & Omit<any, 'logger'>
 }
 
 export function loggerMiddleware(
@@ -78,7 +81,7 @@ export function loggerMiddleware(
   res: express.Response,
   next: express.NextFunction
 ) {
-  const requestLogger = logger.child({
+  const requestLogger = rootLogger.child({
     // @ts-ignore express-request-id adds this
     req_id: req.id,
   })

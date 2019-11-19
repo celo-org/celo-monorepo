@@ -1,3 +1,9 @@
+import * as dotenv from 'dotenv'
+
+if (process.env.CONFIG) {
+  dotenv.config({ path: process.env.CONFIG })
+}
+
 export function fetchEnv(name: string): string {
   if (process.env[name] === undefined || process.env[name] === '') {
     console.error(`ENV var '${name}' was not defined`)

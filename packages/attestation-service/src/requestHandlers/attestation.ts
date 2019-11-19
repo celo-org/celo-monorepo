@@ -183,17 +183,20 @@ class AttestationRequestHandler {
           { transaction, logging: this.sequelizeLogger }
         )
         await transaction.commit()
+        Counters.attestationRequestsUnableToServe.inc()
         return attestationRecord
       }
 
       try {
         await provider.sendSms(this.attestationRequest.phoneNumber, textMessage)
+        Counters.attestationRequestsSentSms.inc()
         await attestationRecord.update(
           { status: AttestationStatus.SENT, smsProvider: provider.type },
           { transaction, logging: this.sequelizeLogger }
         )
       } catch (err) {
         this.logger.error({ err })
+        Counters.attestationRequestsFailedToSendSms.inc()
         await attestationRecord.update(
           { status: AttestationStatus.FAILED, smsProvider: provider.type },
           { transaction, logging: this.sequelizeLogger }
@@ -260,6 +263,7 @@ export async function handleAttestationRequest(
     const attestationRecord = await handler.sendSmsAndPersistAttestation(attestationCode)
     handler.respondAfterSendingSms(res, attestationRecord)
   } catch (err) {
+    Counters.attestationRequestUnexpectedErrors.inc()
     handler.logger.error({ err })
     respondWithError(res, 500, SMS_SENDING_ERROR)
     return

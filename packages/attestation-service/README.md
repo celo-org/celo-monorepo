@@ -19,6 +19,18 @@ You can use the following environment variables to configure the attestation ser
 - `NEXMO_SECRET` - The API secret to the Nexmo API
 - `NEXMO_BLACKLIST` - A comma-sperated list of country codes you do not want to serve
 
+`twilio`
+
+- `TWILIO_ACCOUNT_SID` - The SID of your Twilio account
+- `TWILIO_MESSAGE_SERVICE_SID` - The SID of the messaging service you want to use. The messaging service should have at least 1 phone number associated with it.
+- `TWILIO_AUTH_TOKEN` - The auth token for your Twilio account
+
+### Operations
+
+This service uses `bunyan` for structured logging with JSON lines. You can pipe STDOUT to `yarn run bunyan` for a more human friendly output. The `LOG_LEVEL` environment variable can specify desired log levels. With `LOG_FORMAT=stackdriver` you can get stackdriver specific format to recover information such as error traces etc.
+
+This service exposes prometheus metrics under `/metrics`.
+
 ### Running locally
 
 After checking out the source, you should create a local sqlite database by running:
