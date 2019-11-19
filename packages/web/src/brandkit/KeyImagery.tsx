@@ -3,8 +3,8 @@ import { withNamespaces } from 'react-i18next'
 import * as React from 'react'
 import { colors } from 'src/styles'
 import { hashNav } from 'src/shared/menu-items'
-import Page from 'src/brandkit/Page'
-import ImageryFetcher from 'src/brandkit/ImageryFetcher'
+import Page from 'src/brandkit/common/Page'
+import ImageryFetcher from 'src/brandkit/common/ImageryFetcher'
 
 const { brandImagery } = hashNav
 

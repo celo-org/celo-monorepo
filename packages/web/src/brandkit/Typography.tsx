@@ -3,7 +3,7 @@ import { withNamespaces } from 'react-i18next'
 import * as React from 'react'
 import { colors } from 'src/styles'
 import { hashNav } from 'src/shared/menu-items'
-import Page from 'src/brandkit/Page'
+import Page from 'src/brandkit/common/Page'
 
 const { brandTypography } = hashNav
 

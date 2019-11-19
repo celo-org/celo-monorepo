@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { View, StyleSheet, Image } from 'react-native'
-import { GAP } from 'src/brandkit/constants'
+import { GAP } from 'src/brandkit/common/constants'
 import { standardStyles } from 'src/styles'
 
 export enum Value {

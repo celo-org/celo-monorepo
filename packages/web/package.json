@@ -71,12 +71,14 @@
     "shuffle-seed": "^1.1.6",
     "stickyfilljs": "^2.0.5",
     "svgs": "^4.1.0",
-    "tls": "^0.0.1"
+    "tls": "^0.0.1",
+    "yiq": "^3.0.1"
   },
   "devDependencies": {
     "@firebase/app-types": "^0.4.6",
     "@sentry/types": "^5.6.1",
     "@types/airtable": "^0.5.6",
+    "@types/hex-rgba": "^1.0.0",
     "@types/i18next": "^12.1.0",
     "@types/mailgun-js": "^0.16.3",
     "@types/next": "^8.0.3",

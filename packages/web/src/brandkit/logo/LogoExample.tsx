@@ -4,7 +4,7 @@ import Button, { BTN } from 'src/shared/Button.3'
 import { colors, standardStyles, fonts } from 'src/styles'
 import LogoDarkBg from 'src/logos/LogoDarkBg'
 import LogoLightBg from 'src/logos/LogoLightBg'
-import { GAP } from 'src/brandkit/constants'
+import { GAP } from 'src/brandkit/common/constants'
 
 export enum Logos {
   dark,
