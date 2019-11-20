@@ -1,5 +1,5 @@
-import { JSONStringType, UrlType } from '@celo/utils/lib/io'
-import { hashMessage, parseSignature } from '@celo/utils/lib/signatureUtils'
+import { UrlType } from '@celo/utils/lib/io'
+import { hashMessage } from '@celo/utils/lib/signatureUtils'
 import * as t from 'io-ts'
 import { AccountClaim, AccountClaimType, MetadataURLGetter, verifyAccountClaim } from './account'
 import { KeybaseClaim, KeybaseClaimType, verifyKeybaseClaim } from './keybase'
@@ -30,17 +30,12 @@ export const ClaimType = t.union([
   KeybaseClaimType,
   NameClaimType,
 ])
+
 export const SignedClaimType = t.type({
-  payload: ClaimType,
+  claim: ClaimType,
   signature: SignatureType,
 })
 
-export const SerializedSignedClaimType = t.type({
-  payload: JSONStringType,
-  signature: SignatureType,
-})
-
-export type SignedClaim = t.TypeOf<typeof SignedClaimType>
 export type AttestationServiceURLClaim = t.TypeOf<typeof AttestationServiceURLClaimType>
 export type DomainClaim = t.TypeOf<typeof DomainClaimType>
 export type NameClaim = t.TypeOf<typeof NameClaimType>
@@ -61,19 +56,8 @@ export type ClaimPayload<K extends ClaimTypes> = K extends typeof ClaimTypes.DOM
         ? AttestationServiceURLClaim
         : AccountClaim
 
-export const isOfType = <K extends ClaimTypes>(type: K) => (
-  data: SignedClaim['payload']
-): data is ClaimPayload<K> => data.type === type
-
-export function verifySignature(serializedPayload: string, signature: string, signer: string) {
-  const hash = hashMessage(serializedPayload)
-  try {
-    parseSignature(hash, signature, signer)
-    return true
-  } catch (error) {
-    return false
-  }
-}
+export const isOfType = <K extends ClaimTypes>(type: K) => (data: Claim): data is ClaimPayload<K> =>
+  data.type === type
 
 /**
  * Verifies a claim made by an account
@@ -84,15 +68,15 @@ export function verifySignature(serializedPayload: string, signature: string, si
  * @returns If valid, returns undefined. If invalid or unable to verify, returns a string with the error
  */
 export async function verifyClaim(
-  claim: SignedClaim,
+  claim: Claim,
   address: string,
   metadataURLGetter: MetadataURLGetter
 ) {
-  switch (claim.payload.type) {
+  switch (claim.type) {
     case ClaimTypes.KEYBASE:
-      return verifyKeybaseClaim(claim.payload, address)
+      return verifyKeybaseClaim(claim, address)
     case ClaimTypes.ACCOUNT:
-      return verifyAccountClaim(claim.payload, address, metadataURLGetter)
+      return verifyAccountClaim(claim, address, metadataURLGetter)
     default:
       break
   }
@@ -101,6 +85,11 @@ export async function verifyClaim(
 
 export function hashOfClaim(claim: Claim) {
   return hashMessage(serializeClaim(claim))
+}
+
+export function hashOfClaims(claims: Claim[]) {
+  const hashes = claims.map(hashOfClaim)
+  return hashMessage(hashes.join(''))
 }
 
 export function serializeClaim(claim: Claim) {
