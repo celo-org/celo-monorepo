@@ -4,7 +4,7 @@ import "openzeppelin-solidity/contracts/utils/ReentrancyGuard.sol";
 import "openzeppelin-solidity/contracts/math/SafeMath.sol";
 import "../common/UsingRegistry.sol";
 
-contract VestingSchedule is UsingRegistry, ReentrancyGuard {
+contract VestingInstance is UsingRegistry, ReentrancyGuard {
   modifier onlyRevoker() {
     require(msg.sender == revoker, "sender must be the vesting revoker");
     _;
@@ -29,7 +29,7 @@ contract VestingSchedule is UsingRegistry, ReentrancyGuard {
     // timestamp for the starting point of the vesting. Timestamps are expressed in UNIX time, the same units as block.timestamp.
     uint256 vestingStartTime;
     // timestamps for the cliff starting point. Timestamps are expressed in UNIX time, the same units as block.timestamp.
-    uint256 cliffStartTime;
+    uint256 vestingCliffStartTime;
   }
 
   // beneficiary of the amount
@@ -64,31 +64,31 @@ contract VestingSchedule is UsingRegistry, ReentrancyGuard {
 
   /**
      * @notice A constructor for initialising a new instance of a Vesting Schedule contract
-     * @param beneficiary address of the beneficiary to whom vested tokens are transferred
+     * @param vestingBeneficiary address of the beneficiary to whom vested tokens are transferred
      * @param vestingAmount the amount that is to be vested by the contract
      * @param vestingCliff duration in seconds of the cliff in which tokens will begin to vest
      * @param vestingStartTime the time (as Unix time) at which point vesting starts
      * @param vestingPeriodSec duration in seconds of the period in which the tokens will vest
      * @param vestAmountPerPeriod the vesting amound per period where period is the vestingAmount distributed over the vestingPeriodSec
-     * @param revocable whether the vesting is revocable or not
-     * @param revoker address of the person revoking the vesting
-     * @param refundDestination address of the refund receiver after the vesting is deemed revoked
+     * @param vestingRevocable whether the vesting is revocable or not
+     * @param vestingRevoker address of the person revoking the vesting
+     * @param vestingRefundDestination address of the refund receiver after the vesting is deemed revoked
      */
   constructor(
-    address beneficiary,
+    address vestingBeneficiary,
     uint256 vestingAmount,
     uint256 vestingCliff,
     uint256 vestingStartTime,
     uint256 vestingPeriodSec,
     uint256 vestAmountPerPeriod,
-    bool revocable,
-    address revoker,
-    address refundDestination
+    bool vestingRevocable,
+    address vestingRevoker,
+    address vestingRefundDestination
   ) public {
     // perform checks on the input data
     require(vestingAmount > 0, "Vesting amount must be positive");
-    require(beneficiary != address(0), "Beneficiary is the zero address");
-    require(refundDestination != address(0), "Refund destination is the zero address");
+    require(vestingBeneficiary != address(0), "Beneficiary is the zero address");
+    require(vestingRefundDestination != address(0), "Refund destination is the zero address");
     require(vestingCliff <= vestingPeriodSec, "Vesting cliff is longer than vesting duration");
     require(vestingPeriodSec > 0, "Vesting period is 0 s.");
     require(
@@ -105,14 +105,14 @@ contract VestingSchedule is UsingRegistry, ReentrancyGuard {
     vestingScheme.vestingAmount = vestingAmount;
     vestingScheme.vestAmountPerPeriod = vestAmountPerPeriod;
     vestingScheme.vestingPeriodSec = vestingPeriodSec;
-    vestingScheme.cliffStartTime = vestingStartTime.add(vestingCliff);
+    vestingScheme.vestingCliffStartTime = vestingStartTime.add(vestingCliff);
     vestingScheme.vestingStartTime = vestingStartTime;
 
     // init the state vars
-    beneficiary = beneficiary;
-    revocable = revocable;
-    refundDestination = refundDestination;
-    revoker = revoker;
+    beneficiary = vestingBeneficiary;
+    revocable = vestingRevocable;
+    refundDestination = vestingRefundDestination;
+    revoker = vestingRevoker;
   }
 
   /**
@@ -131,18 +131,17 @@ contract VestingSchedule is UsingRegistry, ReentrancyGuard {
   /**
      * @notice Allows only the revoker to revoke the vesting. Gold already vested
      * remains in the contract, the rest is returned to the _refundDestination.
-     * @param revokeTime the revocation timestamp
-     * @dev revokeTime the revocation timestamp. If is less than the current block timestamp, it is set equal
+     * @param revokeTimestamp the revocation timestamp
+     * @dev If revokeTimestamp is less than the current block timestamp, it is set equal to the latter
      */
-  function revoke(revokeTime) external nonReentrant onlyRevoker {
+  function revoke(uint256 revokeTimestamp) external nonReentrant onlyRevoker {
     require(revocable, "Revoking is not allowed");
     require(!revoked, "Vesting already revoked");
-    uint256 revokeTimestamp = revokeTime > block.timestamp ? revokeTime : block.timestamp;
+    revokeTime = revokeTimestamp > block.timestamp ? revokeTimestamp : block.timestamp;
     uint256 balance = getGoldToken().balanceOf(address(this));
-    uint256 withdrawableAmount = getWithdrawableAmountAtTimestamp(revokeTimestamp);
+    uint256 withdrawableAmount = getWithdrawableAmountAtTimestamp(revokeTime);
     uint256 refundAmount = balance.sub(withdrawableAmount);
     revoked = true;
-    revokeTime = revokeTimestamp;
     require(
       getGoldToken().transfer(refundDestination, refundAmount),
       "Transfer of refund upon revokation failed"
@@ -153,7 +152,7 @@ contract VestingSchedule is UsingRegistry, ReentrancyGuard {
      * @notice Allows only the revoker to pause the gold withdrawal
      * @param pausePeriod the period for which the withdrawal shall be paused
      */
-  function pause(pausePeriod) external onlyRevoker {
+  function pause(uint256 pausePeriod) external onlyRevoker {
     require(!paused, "Vesting withdrawals already paused");
     require(revocable, "Vesting must be revokable");
     require(!revoked, "Vesting already revoked");
@@ -180,7 +179,7 @@ contract VestingSchedule is UsingRegistry, ReentrancyGuard {
     uint256 currentBalance = getGoldToken().balanceOf(address(this));
     uint256 totalBalance = currentBalance.add(currentlyWithdrawn);
 
-    if (timestamp < vestingScheme.cliffStartTime) {
+    if (timestamp < vestingScheme.vestingCliffStartTime) {
       return 0;
     }
     if (
@@ -213,7 +212,7 @@ contract VestingSchedule is UsingRegistry, ReentrancyGuard {
       value <= getGoldToken().balanceOf(address(this)),
       "Gold amount to lock is greater than the currently vested amount"
     );
-    address(getLockedGold()).lock.gas(gasleft()).value(value)();
+    getLockedGold().lock.gas(gasleft()).value(value)();
   }
 
   /**
@@ -323,7 +322,7 @@ contract VestingSchedule is UsingRegistry, ReentrancyGuard {
      * @param name A string to set as the name of the account
      * @dev To be called only by the beneficiary of the vesting.
      */
-  function setAccountName(string memory name) external onlyBeneficiary {
+  function setAccountName(string calldata name) external onlyBeneficiary {
     getAccounts().setName(name);
   }
 
@@ -341,7 +340,7 @@ contract VestingSchedule is UsingRegistry, ReentrancyGuard {
      * @param dataEncryptionKey secp256k1 public key for data encryption. Preferably compressed.
      * @dev To be called only by the beneficiary of the vesting.
      */
-  function setAccountDataEncryptionKey(bytes memory dataEncryptionKey) external onlyBeneficiary {
+  function setAccountDataEncryptionKey(bytes calldata dataEncryptionKey) external onlyBeneficiary {
     getAccounts().setAccountDataEncryptionKey(dataEncryptionKey);
   }
 
