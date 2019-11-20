@@ -23,10 +23,6 @@ __PWD=$PWD
 #### Internal functions
 remove_containers () {
     echo -e "\tRemoving previous celo-proxy and celo-validator containers"
-    #docker kill $(docker ps -a|grep celo-proxy|cut -d' ' -f 1) > /dev/null 2>&1
-    #docker rm -f $(docker ps -a|grep celo-proxy|cut -d' ' -f 1) > /dev/null 2>&1
-    #docker kill $(docker ps -a|grep celo-validator|cut -d' ' -f 1) > /dev/null 2>&1 
-    #docker rm -f $(docker ps -a|grep celo-validator|cut -d' ' -f 1) > /dev/null 2>&1
     docker rm -f celo-proxy celo-validator || echo -e "Containers removed"
 }
 
@@ -37,9 +33,6 @@ download_genesis () {
     
     docker run -v $PWD/validator:/root/.celo --entrypoint /bin/sh -it $CELO_IMAGE -c "wget https://www.googleapis.com/storage/v1/b/static_nodes/o/$NETWORK_NAME?alt=media -O /root/.celo/static-nodes.json"
     docker run -v $PWD/validator:/root/.celo --entrypoint /bin/sh -it $CELO_IMAGE -c "wget https://www.googleapis.com/storage/v1/b/genesis_blocks/o/$NETWORK_NAME?alt=media -O /root/.celo/genesis.json"
-    
-    #docker run -v $PWD/proxy:/root/.celo --entrypoint cp $CELO_IMAGE /root/.celo/genesis.json /celo/
-    #docker run -v $PWD/validator:/root/.celo --entrypoint cp $CELO_IMAGE /root/.celo/genesis.json /celo/
 
 }
 
@@ -120,9 +113,6 @@ if [[ $COMMAND == *"deploy"* ]]; then
     docker run -v $PWD/proxy:/root/.celo --entrypoint /bin/sh -it $CELO_IMAGE -c "printf '%s\n' $DEFAULT_PASSWORD | geth account set-node-key $CELO_PROXY_ADDRESS"
     docker run -v $PWD/validator:/root/.celo --entrypoint /bin/sh -it $CELO_IMAGE -c "printf '%s\n' $DEFAULT_PASSWORD | geth account set-node-key $CELO_VALIDATOR_ADDRESS"
     
-    #echo -e "\tPreparing for sync"
-    #docker run -v $PWD/proxy:/root/.celo --entrypoint cp $CELO_IMAGE /root/.celo/static-nodes.json /root/.celo/
-    #docker run -v $PWD/validator:/root/.celo --entrypoint cp $CELO_IMAGE /root/.celo/static-nodes.json /root/.celo/
 fi
 
 
