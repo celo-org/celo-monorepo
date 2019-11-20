@@ -66,13 +66,59 @@ export class LockedGoldWrapper extends BaseWrapper<LockedGold> {
     tupleParser(parseNumber)
   )
 
+  async getPendingWithdrawalsTotalValue(account: Address) {
+    const pendingWithdrawals = await this.getPendingWithdrawals(account)
+    // Ensure there are enough pending withdrawals to relock.
+    const values = pendingWithdrawals.map((pw: PendingWithdrawal) => pw.value)
+    const reducer = (total: BigNumber, pw: BigNumber) => pw.plus(total)
+    return values.reduce(reducer, new BigNumber(0))
+  }
+
   /**
    * Relocks gold that has been unlocked but not withdrawn.
-   * @param index The index of the pending withdrawal to relock.
+   * @param value The value to relock from pending withdrawals.
    */
-  relock: (index: number) => CeloTransactionObject<void> = proxySend(
+  async relock(account: Address, value: NumberLike): Promise<Array<CeloTransactionObject<void>>> {
+    const pendingWithdrawals = await this.getPendingWithdrawals(account)
+    // Ensure there are enough pending withdrawals to relock.
+    const totalValue = await this.getPendingWithdrawalsTotalValue(account)
+    if (totalValue.isLessThan(value)) {
+      throw new Error(`Not enough pending withdrawals to relock ${value}`)
+    }
+    // Assert pending withdrawals are sorted by time (increasing), so that we can re-lock starting
+    // with those furthest away from being available (at the end).
+    const throwIfNotSorted = (pw: PendingWithdrawal, i: number) => {
+      if (i > 0 && !pw.time.isGreaterThanOrEqualTo(pendingWithdrawals[i - 1].time)) {
+        throw new Error('Pending withdrawals not sorted by timestamp')
+      }
+    }
+    pendingWithdrawals.forEach(throwIfNotSorted)
+
+    let remainingToRelock = new BigNumber(value)
+    const relockPw = (
+      acc: Array<CeloTransactionObject<void>>,
+      pw: PendingWithdrawal,
+      i: number
+    ) => {
+      const valueToRelock = BigNumber.minimum(pw.value, remainingToRelock)
+      if (valueToRelock.isZero()) {
+        remainingToRelock = remainingToRelock.minus(valueToRelock)
+        acc.push(this._relock(i, valueToRelock))
+      }
+      return acc
+    }
+    return pendingWithdrawals.reduceRight(relockPw, []) as Array<CeloTransactionObject<void>>
+  }
+
+  /**
+   * Relocks gold that has been unlocked but not withdrawn.
+   * @param index The index of the pending withdrawal to relock from.
+   * @param value The value to relock from the specified pending withdrawal.
+   */
+  _relock: (index: number, value: NumberLike) => CeloTransactionObject<void> = proxySend(
     this.kit,
-    this.contract.methods.relock
+    this.contract.methods.relock,
+    tupleParser(parseNumber, parseNumber)
   )
 
   /**

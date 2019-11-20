@@ -804,10 +804,10 @@ contract Election is
   }
 
   /**
-   * @notice Returns get current validators using the precompile.
-   * @return List of current validators.
+   * @notice Returns get current validator signers using the precompiles.
+   * @return List of current validator signers.
    */
-  function currentValidators() public view returns (address[] memory) {
+  function getCurrentValidatorSigners() public view returns (address[] memory) {
     uint256 n = numberValidatorsInCurrentSet();
     address[] memory res = new address[](n);
     for (uint256 idx = 0; idx < n; idx++) {
