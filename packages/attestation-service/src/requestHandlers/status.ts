@@ -1,5 +1,5 @@
 import { privateKeyToAddress } from '@celo/utils/lib/address'
-import { AddressType, SignatureType } from '@celo/utils/lib/io'
+import { AttestationServiceStatusResponseType, SignatureType } from '@celo/utils/lib/io'
 import { serializeSignature, signMessage } from '@celo/utils/lib/signatureUtils'
 import express from 'express'
 import * as t from 'io-ts'
@@ -10,14 +10,6 @@ import { getAccountAddress, getAttestationKey } from './attestation'
 export const SIGNATURE_PREFIX = 'attestation-service-status-signature:'
 export const StatusRequestType = t.type({
   messageToSign: t.union([SignatureType, t.undefined]),
-})
-
-export const StatusResponseType = t.type({
-  status: t.literal('ok'),
-  smsProviders: t.array(t.string),
-  blacklistedRegionCodes: t.array(t.string),
-  accountAddress: AddressType,
-  signature: t.union([SignatureType, t.undefined]),
 })
 
 export type StatusRequest = t.TypeOf<typeof StatusRequestType>
@@ -39,7 +31,7 @@ export async function handleStatusRequest(
   try {
     res
       .json(
-        StatusResponseType.encode({
+        AttestationServiceStatusResponseType.encode({
           status: 'ok',
           smsProviders: configuredSmsProviders(),
           blacklistedRegionCodes: blacklistRegionCodes(),
