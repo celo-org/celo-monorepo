@@ -8,7 +8,7 @@ metadata:
     release: {{ .Release.Service }}
     component: oracle
 spec:
-  schedule: "*/1 * * * *"
+  schedule: {{ .Values.oracleSchedule }}
   concurrencyPolicy: Forbid
   jobTemplate:
     spec:
@@ -27,17 +27,14 @@ spec:
             volumeMounts:
             - name: data
               mountPath: /root/.celo 
-          - name: celo-tool
-            image: gcr.io/celo-testnet/celo-monorepo:celotool-8189da8a150aaa80e325316f45009218765d6e43
+          - name: get-account
+            image: {{ .Values.celotool.image.repository }}:{{ .Values.celotool.image.tag }}
             imagePullPolicy: IfNotPresent
             command: ["/bin/sh"]
-            # TODO: use price_oracle account type
             args:
             - "-c"
             - |
-              echo "getting the oracle key + account"
-              echo 'current price:'
-              celotooljs.sh generate bip32 --mnemonic "$MNEMONIC" --accountType attestation --index 0 > /root/.celo/pkey
+              celotooljs.sh generate bip32 --mnemonic "$MNEMONIC" --accountType price_oracle --index 0 > /root/.celo/pkey
             volumeMounts:
             - name: data
               mountPath: /root/.celo

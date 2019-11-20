@@ -8,7 +8,13 @@ export async function installHelmChart(celoEnv: string) {
 }
 
 function helmParameters() {
-  return [`--set mnemonic="${fetchEnv(envVar.MNEMONIC)}"`]
+  return [
+    `--set celotool.image.repository=${fetchEnv('CELOTOOL_DOCKER_IMAGE_REPOSITORY')}`,
+    `--set celotool.image.tag=${fetchEnv('CELOTOOL_DOCKER_IMAGE_TAG')}`,
+    `--set mnemonic="${fetchEnv(envVar.MNEMONIC)}"`,
+    `--set oracle.image.repository=${fetchEnv('ORACLE_DOCKER_IMAGE_REPOSITORY')}`,
+    `--set oracle.image.tag=${fetchEnv('ORACLE_DOCKER_IMAGE_TAG')}`,
+  ]
 }
 
 function releaseName(celoEnv: string) {
