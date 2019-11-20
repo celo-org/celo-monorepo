@@ -3,11 +3,12 @@ import { GenesisBlocksGoogleStorageBucketName } from '@celo/walletkit/lib/src/ge
 import { Storage } from '@google-cloud/storage'
 import * as fs from 'fs'
 import fetch from 'node-fetch'
+import sleep from 'sleep-promise'
 import { getGenesisGoogleStorageUrl } from './endpoints'
 import { getEnvFile } from './env-utils'
 import { ensureAuthenticatedGcloudAccount } from './gcloud_utils'
 import { generateGenesisFromEnv } from './generate_utils'
-import { getEnodesWithExternalIPAddresses, sleep } from './geth'
+import { getEnodesWithExternalIPAddresses } from './geth'
 import { execCmdWithExitOnFailure } from './utils'
 
 const genesisBlocksBucketName = GenesisBlocksGoogleStorageBucketName

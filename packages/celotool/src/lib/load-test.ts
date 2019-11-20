@@ -1,5 +1,5 @@
 import { getBlockscoutUrl } from 'src/lib/endpoints'
-import { CeloEnvArgv, envVar, fetchEnv } from 'src/lib/env-utils'
+import { envVar, fetchEnv } from 'src/lib/env-utils'
 import { getEnodesWithExternalIPAddresses } from 'src/lib/geth'
 import {
   installGenericHelmChart,
@@ -7,7 +7,6 @@ import {
   upgradeGenericHelmChart,
 } from 'src/lib/helm_deploy'
 import { getGenesisBlockFromGoogleStorage } from 'src/lib/testnet-utils'
-import yargs from 'yargs'
 
 export async function installHelmChart(
   celoEnv: string,
