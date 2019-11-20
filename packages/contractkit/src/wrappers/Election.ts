@@ -1,4 +1,5 @@
 import { eqAddress } from '@celo/utils/lib/address'
+import { concurrentMap } from '@celo/utils/lib/async'
 import { zip } from '@celo/utils/lib/collections'
 import BigNumber from 'bignumber.js'
 import { Address, NULL_ADDRESS } from '../base'
@@ -66,7 +67,16 @@ export class ElectionWrapper extends BaseWrapper<Election> {
     toNumber
   )
 
+  /**
+   * Returns get current validator signers using the precompiles.
+   * @return List of current validator signers.
+   */
   getCurrentValidatorSigners = proxyCall(this.contract.methods.getCurrentValidatorSigners)
+  /**
+   * Returns a list of elected validators with seats allocated to groups via the D'Hondt method.
+   * @return The list of elected validators.
+   * @dev See https://en.wikipedia.org/wiki/D%27Hondt_method#Allocation for more information.
+   */
   electValidatorSigners = proxyCall(this.contract.methods.electValidatorSigners)
 
   /**
@@ -123,7 +133,7 @@ export class ElectionWrapper extends BaseWrapper<Election> {
   async getValidatorGroupsVotes(): Promise<ValidatorGroupVote[]> {
     const validators = await this.kit.contracts.getValidators()
     const groups = (await validators.getRegisteredValidatorGroups()).map((g) => g.address)
-    return Promise.all(groups.map((g) => this.getValidatorGroupVotes(g)))
+    return concurrentMap(5, groups, (g) => this.getValidatorGroupVotes(g))
   }
 
   /**
@@ -176,7 +186,8 @@ export class ElectionWrapper extends BaseWrapper<Election> {
       currentVotes.push({
         address: votedGroup,
         votes: voteWeight,
-        capacity: voteWeight,
+        // Not used for the purposes of finding lesser and greater.
+        capacity: new BigNumber(0),
         eligible: true,
       })
     }
