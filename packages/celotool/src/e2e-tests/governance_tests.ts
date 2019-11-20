@@ -687,6 +687,15 @@ describe('governance tests', () => {
         }
       }
     })
+
+    it('should have emitted transfer events when paying epoch rewards', async () => {
+      const currentBlock = await web3.eth.getBlockNumber()
+      const lst = await web3.eth.getPastLogs({
+        fromBlock: currentBlock - 10,
+        toBlock: currentBlock,
+      })
+      assert(lst.some((a: any) => a.transactionHash == a.blockHash))
+    })
   })
 
   describe('after the gold token smart contract is registered', () => {
