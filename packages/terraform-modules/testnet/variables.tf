@@ -107,8 +107,3 @@ variable validator_count {
   type        = number
   description = "Number of validators to create"
 }
-
-variable verification_pool_url {
-  type        = string
-  description = "URL of the verification pool"
-}
