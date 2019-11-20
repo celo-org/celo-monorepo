@@ -3711,6 +3711,14 @@
   dependencies:
     "@types/node" "*"
 
+"@types/bunyan@1.8.4":
+  version "1.8.4"
+  resolved "https://registry.yarnpkg.com/@types/bunyan/-/bunyan-1.8.4.tgz#69c11adc7b50538d45fb68d9ae39d062b9432f38"
+  integrity sha512-bxOF3fsm69ezKxdcJ7Oo/PsZMOJ+JIV/QJO2IADfScmR3sLulR88dpSnz6+q+9JJ1kD7dXFFgUrGRSKHLkOX7w==
+  dependencies:
+    "@types/events" "*"
+    "@types/node" "*"
+
 "@types/bytebuffer@^5.0.40":
   version "5.0.40"
   resolved "https://registry.yarnpkg.com/@types/bytebuffer/-/bytebuffer-5.0.40.tgz#d6faac40dcfb09cd856cdc4c01d3690ba536d3ee"
@@ -12279,7 +12287,7 @@ express-request-id@1.4.1:
   dependencies:
     uuid "^3.3.2"
 
-express@4.16.4, express@^4.16.4:
+express@4.16.4:
   version "4.16.4"
   resolved "https://registry.yarnpkg.com/express/-/express-4.16.4.tgz#fddef61926109e24c515ea97fd2f1bdbf62df12e"
   integrity sha512-j12Uuyb4FMrd/qQAm6uCHAkPtO8FDTRJZBDd5D2KOL2eLaz1yUNdUB/NOIyq0iU4q4cFarsUCrnFDPBcnksuOg==
@@ -30374,6 +30382,7 @@ websocket@1.0.29, websocket@^1.0.28:
   dependencies:
     debug "^2.2.0"
     es5-ext "^0.10.50"
+    gulp "^4.0.2"
     nan "^2.14.0"
     typedarray-to-buffer "^3.1.5"
     yaeti "^0.0.6"
