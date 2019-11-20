@@ -177,8 +177,6 @@ spec:
             configMapKeyRef:
               name: {{ template "ethereum.fullname" . }}-geth-config
               key: networkid
-        - name: VERIFICATION_POOL_URL
-          value: {{ .Values.geth.miner.verificationpool }}
         - name: FAULTY_NODES
           value: {{ .Values.geth.faultyValidators | quote }}
         - name: FAULTY_NODE_TYPE

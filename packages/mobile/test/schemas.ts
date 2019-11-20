@@ -176,6 +176,10 @@ export const v3Schema = {
 
 export const v4Schema = {
   ...v3Schema,
+  invite: {
+    ...v3Schema.invite,
+    isSkippingInvite: false,
+  },
   identity: {
     ...v3Schema.identity,
     verificationStatus: 0,

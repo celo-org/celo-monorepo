@@ -145,8 +145,6 @@ spec:
             configMapKeyRef:
               name: {{ template "ethereum.fullname" . }}-geth-config
               key: networkid
-        - name: VERIFICATION_POOL_URL
-          value: {{ .Values.geth.miner.verificationpool }}
         - name: STATIC_IPS_FOR_GETH_NODES
           value: "{{ default "false" .Values.geth.static_ips }}"
         - name: PING_IP_FROM_PACKET
