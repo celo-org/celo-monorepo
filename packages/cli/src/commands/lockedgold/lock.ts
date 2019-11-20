@@ -28,15 +28,22 @@ export default class Lock extends BaseCommand {
 
     this.kit.defaultAccount = address
     const value = new BigNumber(res.flags.value)
+    const lockedGold = await this.kit.contracts.getLockedGold()
+    const pendingWithdrawalsValue = await lockedGold.getPendingWithdrawalsTotalValue(address)
+    const relockValue = BigNumber.minimum(pendingWithdrawalsValue, value)
+    const lockValue = value.minus(relockValue)
 
     await newCheckBuilder(this)
       .addCheck(`Value [${value.toString()}] is >= 0`, () => value.gt(0))
       .isAccount(address)
-      .hasEnoughGold(address, value)
+      .hasEnoughGold(address, lockValue)
       .runChecks()
 
-    const lockedGold = await this.kit.contracts.getLockedGold()
+    const txos = await lockedGold.relock(address, relockValue)
+    for (const txo of txos) {
+      await displaySendTx('relock', txo, { from: address })
+    }
     const tx = lockedGold.lock()
-    await displaySendTx('lock', tx, { value: value.toString() })
+    await displaySendTx('lock', tx, { value: lockValue.toString() })
   }
 }
