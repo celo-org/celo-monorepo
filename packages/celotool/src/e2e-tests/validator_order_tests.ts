@@ -42,7 +42,7 @@ describe('governance tests', () => {
 
     it('properly orders validators randomly', async function(this: any) {
       this.timeout(160000 /* 160 seconds */)
-      // If a concensus round fails during this test, the results are inconclusive.
+      // If a consensus round fails during this test, the results are inconclusive.
       // Retry up to two times to mitigate this issue. Restarting the nodes is not needed.
       this.retries(2)
 
