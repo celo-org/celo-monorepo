@@ -24,9 +24,10 @@ __PWD=$PWD
 remove_containers () {
     echo -e "\tRemoving previous celo-proxy and celo-validator containers"
     #docker kill $(docker ps -a|grep celo-proxy|cut -d' ' -f 1) > /dev/null 2>&1
-    docker rm -f $(docker ps -a|grep celo-proxy|cut -d' ' -f 1) > /dev/null 2>&1
+    #docker rm -f $(docker ps -a|grep celo-proxy|cut -d' ' -f 1) > /dev/null 2>&1
     #docker kill $(docker ps -a|grep celo-validator|cut -d' ' -f 1) > /dev/null 2>&1 
-    docker rm -f $(docker ps -a|grep celo-validator|cut -d' ' -f 1) > /dev/null 2>&1
+    #docker rm -f $(docker ps -a|grep celo-validator|cut -d' ' -f 1) > /dev/null 2>&1
+    docker rm -f celo-proxy celo-validator || echo -e "Containers removed"
 }
 
 download_genesis () {
@@ -134,6 +135,8 @@ if [[ $COMMAND == *"run-validator"* ]]; then
     echo -e "\tStarting the Proxy"
     screen -S celo-proxy -d -m docker run --name celo-proxy --restart always -p 8545:8545 -p 8546:8546 -p 30303:30303 -p 30303:30303/udp -p 30503:30503 -p 30503:30503/udp -v $PWD/proxy:/root/.celo $CELO_IMAGE --verbosity 3 --networkid $NETWORK_ID --syncmode full --rpc --rpcaddr 0.0.0.0 --rpcapi eth,net,web3,debug --maxpeers 1100 --etherbase=$CELO_PROXY_ADDRESS --proxy.proxy --proxy.proxiedvalidatoraddress $CELO_VALIDATOR_ADDRESS --proxy.internalendpoint :30503
     
+    sleep 10s
+    
     export PROXY_ENODE=$(docker exec celo-proxy geth --exec "admin.nodeInfo['enode'].split('//')[1].split('@')[0]" attach | tr -d '"')
     export PROXY_IP=$(docker inspect -f '{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' celo-proxy)
     echo -e "\tProxy running: enode://$PROXY_ENODE@$PROXY_IP"
@@ -141,7 +144,14 @@ if [[ $COMMAND == *"run-validator"* ]]; then
     echo -e "\tStarting Validator node"
     screen -S celo-validator -d -m docker run --name celo-validator --restart always -p 127.0.0.1:8547:8545 -p 127.0.0.1:8548:8546 -p 30304:30303 -p 30304:30303/udp -v $PWD/validator:/root/.celo $CELO_IMAGE --verbosity 3 --networkid $NETWORK_ID --syncmode full --rpc --rpcaddr 0.0.0.0 --rpcapi eth,net,web3,debug --maxpeers 125 --mine --istanbul.blockperiod=5 --istanbul.requesttimeout=3000 --etherbase $CELO_VALIDATOR_ADDRESS --nodiscover --proxy.proxied --proxy.proxyenodeurlpair=enode://$PROXY_ENODE@$PROXY_IP:30503\;enode://$PROXY_ENODE@$PROXY_IP:30503
     
+    sleep 5s
+    
     echo -e "\tEverything should be running, you can check running `screen -ls`"
+    screen -ls
+    
+    echo -e "\tYou can re-attach to the proxy or the validator running:"
+    echo -e "\t`screen -r -S celo-proxy` or `screen -r -S celo-validator`\n"
+    
 fi
 
 if [[ $COMMAND == *"run-attestation"* ]]; then
