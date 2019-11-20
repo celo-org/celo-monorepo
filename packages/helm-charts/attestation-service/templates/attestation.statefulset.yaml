@@ -80,7 +80,7 @@ spec:
         - name: CELO_PROVIDER
           value: https://{{ .Release.Namespace }}-forno.{{ .Values.domain.name }}.org
         - name: APP_SIGNATURE
-          value: {{ .Values.attestation_service.sms_retriever_hash_code }}}
+          value: {{ .Values.attestation_service.sms_retriever_hash_code }}
         - name: SMS_PROVIDERS
           value: nexmo
         - name: LOG_FORMAT
