@@ -95,5 +95,8 @@
   "calculateFeeFailed": "No se pudo calcular la comisión",
   "failedToSwitchSyncModes": "Error al cambiar de red modos",
   "gold": "Oro",
-  "localCurrencyTitle": "Seleccione el tipo de moneda"
+  "localCurrencyTitle": "Seleccione el tipo de moneda",
+  "or": "o",
+  "accepted": "Aceptado",
+  "processing": "Procesando"
 }

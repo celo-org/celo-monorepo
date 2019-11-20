@@ -6,7 +6,7 @@ import { Linking, Platform } from 'react-native'
 import SendIntentAndroid from 'react-native-send-intent'
 import SendSMS from 'react-native-sms'
 import VersionCheck from 'react-native-version-check'
-import { call, delay, put, race, select, spawn, takeLeading } from 'redux-saga/effects'
+import { call, delay, put, race, select, spawn, take, takeLeading } from 'redux-saga/effects'
 import { showError, showMessage } from 'src/alert/actions'
 import CeloAnalytics from 'src/analytics/CeloAnalytics'
 import { CustomEventNames } from 'src/analytics/constants'
@@ -15,6 +15,7 @@ import { transferEscrowedPayment } from 'src/escrow/actions'
 import { calculateFee } from 'src/fees/saga'
 import { CURRENCY_ENUM } from 'src/geth/consts'
 import i18n from 'src/i18n'
+import { denyImportContacts, setHasSeenVerificationNux } from 'src/identity/actions'
 import {
   Actions,
   InviteBy,
@@ -28,7 +29,7 @@ import {
   storeInviteeData,
 } from 'src/invite/actions'
 import { createInviteCode } from 'src/invite/utils'
-import { navigate } from 'src/navigator/NavigationService'
+import { navigate, navigateHome } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
 import { waitWeb3LastBlock } from 'src/networkInfo/saga'
 import { getSendTxGas } from 'src/send/saga'
@@ -259,6 +260,24 @@ export function* doRedeemInvite(inviteCode: string) {
   }
 }
 
+export function* skipInvite() {
+  yield take(Actions.SKIP_INVITE)
+  Logger.debug(TAG + '@skipInvite', 'Skip invite action taken')
+  try {
+    Logger.debug(TAG + '@skipInvite', 'Creating new account')
+    yield call(getOrCreateAccount)
+    Logger.debug(TAG + '@skipInvite', 'Marking nux flows as complete')
+    // TODO(Rossy): Remove when import screen is removed
+    yield put(denyImportContacts())
+    yield put(setHasSeenVerificationNux(true))
+    Logger.debug(TAG + '@skipInvite', 'Done skipping invite')
+    navigateHome()
+  } catch (e) {
+    Logger.error(TAG, 'Failed to skip invite', e)
+    yield put(showError(ErrorMessages.ACCOUNT_SETUP_FAILED))
+  }
+}
+
 function* addTempAccountToWallet(inviteCode: string) {
   Logger.debug(TAG + '@addTempAccountToWallet', 'Attempting to add temp wallet')
   try {
@@ -324,4 +343,5 @@ export function* watchRedeemInvite() {
 export function* inviteSaga() {
   yield spawn(watchSendInvite)
   yield spawn(watchRedeemInvite)
+  yield spawn(skipInvite)
 }

@@ -42,7 +42,7 @@ const defaultAnimation: LayoutAnimationConfig = {
 
 interface Props {
   topSpacing: number
-  onToggle: (visible: boolean, keyboardSpace: number) => void
+  onToggle: (visible: boolean, keyboardSpace?: number) => void
   style?: ViewStyle
 }
 
@@ -87,10 +87,12 @@ export default class KeyboardSpacer extends React.Component<Props> {
 
   updateKeyboardSpace = (event: KeyboardEvent) => {
     if (!event.endCoordinates) {
+      this.props.onToggle(true)
       return
     }
 
     if (!this._viewRef.current) {
+      this.props.onToggle(true)
       return
     }
 

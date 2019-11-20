@@ -14,6 +14,7 @@ import {
   importGenesis,
   initAndStartGeth,
   sleep,
+  waitToFinishSyncing,
 } from './utils'
 
 interface MemberSwapper {
@@ -290,17 +291,17 @@ describe('governance tests', () => {
       epoch = new BigNumber(await validators.methods.getEpochSize().call()).toNumber()
       assert.equal(epoch, 10)
 
-      // Give the nodes time to sync, and time for an epoch transition so we can activate our vote.
+      // Wait for an epoch transition so we can activate our vote.
       let blockNumber: number
       do {
         blockNumber = await web3.eth.getBlockNumber()
         await sleep(0.1)
       } while (blockNumber % epoch !== 1)
-
       await activate(validatorAccounts[0])
 
       // Prepare for member swapping.
       const groupWeb3 = new Web3('ws://localhost:8555')
+      await waitToFinishSyncing(groupWeb3)
       const groupKit = newKitFromWeb3(groupWeb3)
       validators = await groupKit._web3Contracts.getValidators()
       const membersToSwap = [validatorAccounts[0], validatorAccounts[1]]
@@ -309,6 +310,7 @@ describe('governance tests', () => {
       // Prepare for key rotation.
       const validatorWeb3 = new Web3('http://localhost:8549')
       const authorizedWeb3s = [new Web3('ws://localhost:8559'), new Web3('ws://localhost:8561')]
+      await Promise.all(authorizedWeb3s.map((w) => waitToFinishSyncing(w)))
       const authorizedPrivateKeys = [rotation0PrivateKey, rotation1PrivateKey]
       const keyRotator = await newKeyRotator(
         newKitFromWeb3(validatorWeb3),
@@ -439,7 +441,7 @@ describe('governance tests', () => {
         const expectedScore = adjustmentSpeed
           .times(uptime)
           .plus(new BigNumber(1).minus(adjustmentSpeed).times(fromFixed(previousScore)))
-        assert.equal(score.toFixed(), toFixed(expectedScore).toFixed())
+        assertAlmostEqual(score, toFixed(expectedScore))
       }
 
       for (const blockNumber of blockNumbers) {
