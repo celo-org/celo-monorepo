@@ -452,8 +452,6 @@ export function* switchToGethFromZeroSync() {
     // as the web3.personal where the key is stored is not available in zeroSync mode
     yield call(ensureAccountInWeb3Keystore)
   } catch (e) {
-    const zeroSync3 = yield select(zeroSyncSelector)
-    Logger.info(TAG, `switchToGethFromZeroSync, zeroSync3 mode: ${zeroSync3}`)
     Logger.error(TAG + '@switchToGethFromZeroSync', 'Error switching to geth from zeroSync')
     yield put(showError(ErrorMessages.FAILED_TO_SWITCH_SYNC_MODES))
   }
