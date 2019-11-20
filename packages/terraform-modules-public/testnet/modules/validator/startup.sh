@@ -131,7 +131,7 @@ docker run -v $DATA_DIR:$DATA_DIR --name geth --net=host --entrypoint /bin/sh -d
       --metrics \
       $IN_MEMORY_DISCOVERY_TABLE_FLAG \
       --proxy.proxied \
-      --proxy.proxyenodeurlpair=$PROXY_URL \
+      --proxy.proxyenodeurlpair=\"$PROXY_URL\" \
   )"
 
 # ---- Set Up and Run Geth Exporter ----
