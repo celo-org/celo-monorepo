@@ -6,7 +6,7 @@ import { readFileSync } from 'fs'
 import * as t from 'io-ts'
 import { PathReporter } from 'io-ts/lib/PathReporter'
 import { Claim, ClaimPayload, ClaimType, hashOfClaims, isOfType } from './claims/claim'
-import { ClaimTypes } from './claims/types'
+import { ClaimTypes, SINGULAR_CLAIM_TYPES } from './claims/types'
 export { ClaimTypes } from './claims/types'
 
 const MetaType = t.type({
@@ -64,7 +64,18 @@ export class IdentityMetadataWrapper {
     ) {
       throw new Error('Signature could not be validated')
     }
-    return new IdentityMetadataWrapper(validatedData.right)
+
+    const res = new IdentityMetadataWrapper(validatedData.right)
+
+    // Verify that singular claim types appear at most once
+    SINGULAR_CLAIM_TYPES.forEach((claimType) => {
+      const results = res.filterClaims(claimType)
+      if (results.length > 1) {
+        throw new Error(`Found ${results.length} claims of type ${claimType}, should be at most 1`)
+      }
+    })
+
+    return res
   }
 
   constructor(data: IdentityMetadata) {
@@ -97,6 +108,14 @@ export class IdentityMetadataWrapper {
       default:
         break
     }
+
+    if (SINGULAR_CLAIM_TYPES.includes(claim.type)) {
+      const index = this.data.claims.findIndex(isOfType(claim.type))
+      if (index !== -1) {
+        this.data.claims.splice(index, 1)
+      }
+    }
+
     this.data.claims.push(claim)
     this.data.meta.signature = await signer.sign(this.hashOfClaims())
   }

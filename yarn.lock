@@ -7430,9 +7430,9 @@ block-stream@0.0.9:
   dependencies:
     inherits "~2.0.0"
 
-"bls12377js@https://github.com/celo-org/bls12377js#cada1105f4a5e4c2ddd239c1874df3bf33144a10":
+"bls12377js@https://github.com/celo-org/bls12377js#ea09eba5c54fe63617af494a0c198fcc47582e0c":
   version "0.1.0"
-  resolved "https://github.com/celo-org/bls12377js#cada1105f4a5e4c2ddd239c1874df3bf33144a10"
+  resolved "https://github.com/celo-org/bls12377js#ea09eba5c54fe63617af494a0c198fcc47582e0c"
   dependencies:
     "@stablelib/blake2xs" "0.10.4"
     "@types/node" "^12.11.7"
