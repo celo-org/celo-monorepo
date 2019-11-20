@@ -31,7 +31,7 @@ async function helmParameters(
 ) {
   const enodes = await getEnodesWithExternalIPAddresses(celoEnv)
   const staticNodesJsonB64 = Buffer.from(JSON.stringify(enodes)).toString('base64')
-  // Uses the genesis frile from google storage to ensure it's the correct genesis as the network
+  // Uses the genesis file from google storage to ensure it's the correct genesis for the network
   const genesis = await getGenesisBlockFromGoogleStorage(celoEnv)
   const genesisFileJsonB64 = Buffer.from(JSON.stringify(genesis)).toString('base64')
   return [
