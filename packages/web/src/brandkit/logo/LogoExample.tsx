@@ -1,10 +1,10 @@
 import * as React from 'react'
-import { StyleSheet, Text, View, Image } from 'react-native'
-import Button, { BTN } from 'src/shared/Button.3'
-import { colors, standardStyles, fonts } from 'src/styles'
+import { Image, StyleSheet, Text, View } from 'react-native'
+import { GAP } from 'src/brandkit/common/constants'
 import LogoDarkBg from 'src/logos/LogoDarkBg'
 import LogoLightBg from 'src/logos/LogoLightBg'
-import { GAP } from 'src/brandkit/common/constants'
+import Button, { BTN } from 'src/shared/Button.3'
+import { colors, fonts, standardStyles } from 'src/styles'
 
 export enum Logos {
   dark,

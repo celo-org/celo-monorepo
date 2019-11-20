@@ -2,7 +2,6 @@ import { StyleSheet } from 'react-native'
 
 export enum colors {
   white = '#FFFFFF',
-  offWhite = 'rgba(221,221,221,1.00)',
   light = '#E5E5E5',
   gray = '#DDDDDD',
   screenGray = '#545C64',
@@ -34,12 +33,17 @@ export enum colors {
   // added
   faintGray = '#F8F9F9',
   faintPurple = '#EFE5FF',
+  faintGold = '#FEF2D6',
+
+  lightGray = '#EDEEEF',
+
+  grayHeavy = '#ABADAF',
   black = '#000',
 }
 
 export enum typeFaces {
-  futura = 'Jost,futura-pt, sans-serif',
-  garamond = 'EB Garamond, eb-garamond, serif',
+  futura = 'Jost, futura-pt, futura, sans-serif',
+  garamond = 'EB Garamond, eb-garamond, Garamond, serif',
 }
 
 export const fonts = StyleSheet.create({

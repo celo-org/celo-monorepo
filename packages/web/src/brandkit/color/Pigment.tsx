@@ -2,14 +2,15 @@ import hexRgba from 'hex-rgba'
 import * as React from 'react'
 import { StyleSheet, Text, View, ViewStyle } from 'react-native'
 import { brandStyles, GAP } from 'src/brandkit/common/constants'
-import { colors, fonts, standardStyles } from 'src/styles'
-import yiq from 'yiq'
 import CopyIcon from 'src/icons/CopyIcon'
 import Hoverable from 'src/shared/Hoverable'
+import { colors, fonts, standardStyles } from 'src/styles'
+import yiq from 'yiq'
+
+import { ColorTranslator } from 'colortranslator'
 
 export interface ColorData {
   hex: string
-  cmyk: string
   name: string
 }
 
@@ -33,15 +34,9 @@ export default class PigmentState extends React.PureComponent<ColorData> {
   }
 
   render() {
-    const { hex, cmyk, name } = this.props
+    const { hex, name } = this.props
     return (
-      <Pigment
-        onCopyHex={this.onCopy}
-        cmyk={cmyk}
-        hex={hex}
-        name={name}
-        justCopied={this.state.justCopied}
-      />
+      <Pigment onCopyHex={this.onCopy} hex={hex} name={name} justCopied={this.state.justCopied} />
     )
   }
 }
@@ -51,8 +46,12 @@ interface Props {
   justCopied: boolean
 }
 
-function Pigment({ hex, cmyk, name, onCopyHex, justCopied }: Props & ColorData) {
+function Pigment({ hex, name, onCopyHex, justCopied }: Props & ColorData) {
   const inline: ViewStyle = { backgroundColor: hex }
+
+  const cmyk = new ColorTranslator('#FF00FF').CMYK.toUpperCase()
+    .replace(/%/g, '')
+    .replace('K(', 'K (')
 
   if (hex === colors.white) {
     inline.borderColor = colors.gray
@@ -106,7 +105,7 @@ function Pigment({ hex, cmyk, name, onCopyHex, justCopied }: Props & ColorData) 
         <Text style={fonts.h5}>{name}</Text>
         <Text style={fonts.small}>{hex}</Text>
         <Text style={fonts.small}>{hexToHumanRGB(hex)}</Text>
-        <Text style={fonts.small}>CMYK {cmyk}</Text>
+        <Text style={fonts.small}>{cmyk}</Text>
       </View>
     </View>
   )

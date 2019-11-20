@@ -10418,6 +10418,11 @@ colorspace@1.1.x:
     color "3.0.x"
     text-hex "1.0.x"
 
+colortranslator@^1.1.1:
+  version "1.1.1"
+  resolved "https://registry.yarnpkg.com/colortranslator/-/colortranslator-1.1.1.tgz#9a4919802eb9e80ac9c0cb441f62d741e68049fc"
+  integrity sha512-7X4Hc5c4ewwsZZL5A3qSCYVmpWh7Ds94WIx1CB++/6Q4nkG3u/SFGXKKQ8YqpCxAohwnAjfJZ/axOls5HCpNiA==
+
 colour@~0.7.1:
   version "0.7.1"
   resolved "https://registry.yarnpkg.com/colour/-/colour-0.7.1.tgz#9cb169917ec5d12c0736d3e8685746df1cadf778"

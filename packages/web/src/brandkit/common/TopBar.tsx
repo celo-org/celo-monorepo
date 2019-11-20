@@ -1,4 +1,4 @@
-import { StyleSheet, Text, View, TouchableOpacity } from 'react-native'
+import { StyleSheet, Text, TouchableOpacity, View } from 'react-native'
 import { I18nProps, NameSpaces, withNamespaces } from 'src/i18n'
 import Octocat from 'src/icons/Octocat'
 import LogoLightBg from 'src/logos/LogoLightBg'

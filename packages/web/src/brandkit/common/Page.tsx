@@ -46,7 +46,7 @@ const PAGES = [
     sections: [
       { title: 'Overview', href: `${COLOR_PATH}#${hashNav.brandColor.overview}` },
       { title: 'Color System', href: `${COLOR_PATH}#${hashNav.brandColor.system}` },
-      { title: 'Guideline', href: `${COLOR_PATH}#${hashNav.brandColor.guideline}` },
+      // { title: 'Guideline', href: `${COLOR_PATH}#${hashNav.brandColor.guideline}` },
     ],
   },
   {
@@ -219,8 +219,8 @@ class Page extends React.Component<Props & ScreenProps, State> {
 
 const styles = StyleSheet.create({
   // @ts-ignore creates a stacking context
-  conatiner: { isolation: 'isolate' },
-  mobileMain: { zIndex: -5 },
+  conatiner: { transform: 'isolate' },
+  mobileMain: { zIndex: -5, marginTop: 50 },
   desktopMain: {},
   topbar: {
     position: 'fixed',
@@ -231,7 +231,6 @@ const styles = StyleSheet.create({
   footer: { zIndex: -10, backgroundColor: colors.white },
   childrenArea: {
     minHeight: `calc(100vh - ${HEADER_HEIGHT + 70}px)`,
-    // backgroundColor: colors.faintPurple,
   },
 })
 

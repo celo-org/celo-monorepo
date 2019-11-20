@@ -1,6 +1,6 @@
+import { Attachment, FieldSet, Table } from 'airtable'
 import getConfig from 'next/config'
 import airtableInit from './airtable'
-import { Table, Attachment, FieldSet } from 'airtable'
 
 interface Fields extends FieldSet {
   Name: string

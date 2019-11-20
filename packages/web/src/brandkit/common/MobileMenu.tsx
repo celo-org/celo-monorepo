@@ -1,8 +1,8 @@
 import * as React from 'react'
-import { Text, View, StyleSheet, TouchableOpacity, TouchableWithoutFeedback } from 'react-native'
+import { StyleSheet, Text, TouchableOpacity, TouchableWithoutFeedback, View } from 'react-native'
 import Sidebar, { Page } from 'src/brandkit/common/Sidebar'
-import { standardStyles, colors, fonts } from 'src/styles'
 import Triangle, { Direction } from 'src/shared/Triangle'
+import { colors, fonts, standardStyles } from 'src/styles'
 
 import { ROUTE_TO_TITLE } from 'src/brandkit/common/Page'
 

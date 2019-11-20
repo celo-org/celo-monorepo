@@ -1,9 +1,9 @@
-import { Text, View, StyleSheet } from 'react-native'
-import { withNamespaces } from 'react-i18next'
 import * as React from 'react'
-import { colors } from 'src/styles'
-import { hashNav } from 'src/shared/menu-items'
+import { withNamespaces } from 'react-i18next'
+import { StyleSheet, Text, View } from 'react-native'
 import Page from 'src/brandkit/common/Page'
+import { hashNav } from 'src/shared/menu-items'
+import { colors } from 'src/styles'
 
 const { brandTypography } = hashNav
 

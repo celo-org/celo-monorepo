@@ -41,7 +41,15 @@
       "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Pellentesque eget dignissim justo. Integer ac sodales dolor, quis aliquet nisi. Donec eget mattis neque, eu ultricies diam.",
     "primaries": "Primary Brand Colors",
     "primariesText":
-      "Our primary brand colors are green, gold, dark (name?), and white. They are used to provide accessibility, simplicity, and consistency throughout all brand communications."
+      "Our primary brand colors are green, gold, dark (name?), and white. They are used to provide accessibility, simplicity, and consistency throughout all brand communications.",
+    "backgroundTitle": "Background Colors",
+    "backgroundText":
+      "Common background colors lorem ipsum dolor sit amet, consectetur adipiscing elit. Ut id elit sapien. Sed sem ante, ornare a ipsum ut, consequat ullamcorper lorem.",
+    "contrastTitle": "Contrast",
+    "contrastText":
+      "General lorem ipsum dolor sit amet, consectetur adipiscing elit. Ut id elit sapien. Sed sem ante, ornare a ipsum ut, consequat ullamcorper lorem.",
+    "contrastText2":
+      "General lorem ipsum dolor sit amet, consectetur adipiscing elit. Ut id elit sapien. Sed sem ante, ornare a ipsum ut, consequat ullamcorper lorem."
   },
   "downloadAssetBtn": "Download Assets"
 }

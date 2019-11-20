@@ -1,9 +1,9 @@
 import * as React from 'react'
-import { Text, StyleSheet, View } from 'react-native'
+import { StyleSheet, Text, View } from 'react-native'
+import { ScreenProps, ScreenSizes, withScreenSize } from 'src/layout/ScreenSize'
 import Button, { BTN } from 'src/shared/Button.3'
 import OvalCoin from 'src/shared/OvalCoin'
 import { colors, standardStyles } from 'src/styles'
-import { withScreenSize, ScreenProps, ScreenSizes } from 'src/layout/ScreenSize'
 
 interface Section {
   title: string
@@ -137,7 +137,6 @@ const styles = StyleSheet.create({
     zIndex: 10,
   },
   container: {
-    // @ts-ignore
     position: 'fixed',
   },
   iconPlaceholder: { width: COIN_SIZE },
