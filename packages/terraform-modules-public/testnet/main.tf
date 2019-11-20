@@ -164,6 +164,7 @@ module "proxy" {
   proxy_account_passwords     = var.proxy_account_passwords
   validator_account_addresses = var.validator_account_addresses
   bootnode_enode_address      = var.bootnode_enode_address
+  static_nodes_base64         = var.static_nodes_base64
 }
 
 module "validator" {
@@ -193,6 +194,7 @@ module "validator" {
   proxy_enodes                = var.proxy_enodes
   proxy_ips                   = module.proxy.internal_ip_addresses
   bootnode_enode_address      = var.bootnode_enode_address
+  static_nodes_base64         = var.static_nodes_base64
 }
 
 module "attestation-service" {

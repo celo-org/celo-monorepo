@@ -72,7 +72,8 @@ resource "google_compute_instance" "proxy" {
       proxy_private_node_key : var.proxy_private_node_keys[count.index],
       proxy_geth_account_secret : var.proxy_account_passwords[count.index],
       validator_account_address : var.validator_account_addresses[count.index],
-      bootnode_enode_address : var.bootnode_enode_address
+      bootnode_enode_address : var.bootnode_enode_address,
+      static_nodes_base64 : var.static_nodes_base64
     }
   )
 }

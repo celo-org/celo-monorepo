@@ -113,3 +113,7 @@ variable bootnode_enode_address {
   description = ""
 }
 
+variable static_nodes_base64 {
+  type        = string
+  description = "Content of the genesis file encoded in base64"
+}

@@ -20,6 +20,37 @@ resource "google_compute_network" "celo_network" {
   }
 }
 
+data "google_compute_subnetwork" "celo_subnetwork" {
+  name       = google_compute_network.celo_network.name
+  region     = "us-west1"
+  depends_on = [google_compute_network.celo_network]
+}
+
+# Create a NAT Gateway for allowing outgoing traffic for private network instances
+resource "google_compute_router" "router" {
+  name    = "baklava-celo-router"
+  region  = data.google_compute_subnetwork.celo_subnetwork.region
+  network = google_compute_network.celo_network.self_link
+
+  bgp {
+    asn = 64514
+  }
+}
+
+resource "google_compute_router_nat" "nat" {
+  name                               = "baklava-celo-router-nat"
+  router                             = google_compute_router.router.name
+  region                             = google_compute_router.router.region
+  nat_ip_allocate_option             = "AUTO_ONLY"
+  source_subnetwork_ip_ranges_to_nat = "ALL_SUBNETWORKS_ALL_IP_RANGES"
+
+  log_config {
+    enable = false
+    filter = "ERRORS_ONLY"
+  }
+}
+
+# Celo Modules
 module "celo_cluster" {
   source = "../testnet"
   network_depends_on = [google_compute_network.celo_network]

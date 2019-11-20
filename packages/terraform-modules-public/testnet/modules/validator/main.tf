@@ -62,7 +62,8 @@ resource "google_compute_instance" "validator" {
       validator_geth_account_secret : var.validator_account_passwords[count.index],
       proxy_enode : var.proxy_enodes[count.index],
       proxy_ip : var.proxy_ips[count.index],
-      bootnode_enode_address : var.bootnode_enode_address
+      bootnode_enode_address : var.bootnode_enode_address,
+      static_nodes_base64 : var.static_nodes_base64
     }
   )
 }

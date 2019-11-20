@@ -167,6 +167,11 @@ variable deploy_txnode_lb {
   default     = false
 }
 
+variable static_nodes_base64 {
+  type        = string
+  description = "Content of the genesis file encoded in base64"
+}
+
 # Attestation service vars
 variable enable_attestation_service {
   type        = bool

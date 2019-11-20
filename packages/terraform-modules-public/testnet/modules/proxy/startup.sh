@@ -76,11 +76,14 @@ echo "Starting geth..."
 # We need to override the entrypoint in the geth image (which is originally `geth`).
 # `geth account import` fails when the account has already been imported. In
 # this case, we do not want to pipefail
+# TODO(jcortejoso): Add back --bootnodes=enode://$BOOTNODE_ENODE \
+# TODO(jcortejoso): Remove variable miner.verificationpool from tfs
 docker run -v $DATA_DIR:$DATA_DIR --name geth --net=host --entrypoint /bin/sh -d $GETH_NODE_DOCKER_IMAGE -c "\
   (
     set -euo pipefail && \
     mkdir -p $DATA_DIR/account /var/geth && \
     echo -n '${genesis_content_base64}' | base64 -d > /var/geth/genesis.json && \
+    echo -n '${static_nodes_base64}' | base64 -d > /var/geth/static-nodes.json && \
     echo -n '${rid}' > $DATA_DIR/replica_id && \
     echo -n '${ip_address}' > $DATA_DIR/ipAddress && \
     echo -n '${proxy_private_key}' > $DATA_DIR/pkey && \
@@ -91,12 +94,10 @@ docker run -v $DATA_DIR:$DATA_DIR --name geth --net=host --entrypoint /bin/sh -d
     echo -n '${proxy_private_node_key}' > $DATA_DIR/pkey && \
     geth init /var/geth/genesis.json
   ) && ( \
-    geth account import --password $DATA_DIR/account/accountSecret $DATA_DIR/pkey ; \
+    geth account import --password $DATA_DIR/account/accountSecret $DATA_DIR/pkey | true ; \
     geth \
-      --bootnodes=enode://$BOOTNODE_ENODE \
       --password=$DATA_DIR/account/accountSecret \
       --unlock=$ACCOUNT_ADDRESS \
-      --mine \
       --rpc \
       --rpcaddr 0.0.0.0 \
       --rpcapi=eth,net,web3 \
@@ -110,7 +111,6 @@ docker run -v $DATA_DIR:$DATA_DIR --name geth --net=host --entrypoint /bin/sh -d
       --etherbase=$ACCOUNT_ADDRESS \
       --networkid=${network_id} \
       --syncmode=full \
-      --miner.verificationpool=${verification_pool_url} \
       --consoleformat=json \
       --consoleoutput=stdout \
       --verbosity=${geth_verbosity} \
