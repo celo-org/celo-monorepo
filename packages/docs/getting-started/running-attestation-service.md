@@ -1,14 +1,14 @@
-# Running the attestation service
+# Running the Attestation Service
 
-- [Running the attestation service](#running-the-attestation-service)
+- [Running the Attestation Service](#running-the-attestation-service)
   - [Environment variables](#environment-variables)
   - [Sms Providers](#sms-providers)
     - [Nexmo](#nexmo)
     - [Twilio](#twilio)
   - [Accounts Configuration](#accounts-configuration) \* [Database Configuration](#database-configuration)
-  - [Executing the attestation service](#executing-the-attestation-service)
+  - [Executing the Attestation Service](#executing-the-attestation-service)
 
-As part of the [lightweight identity protocol](/celo-codebase/protocol/identity), validators are expected to run an attestation service to provide attestations that allow users to map their phone number to an account on Celo. The attestation service is a simple Node.js application that can be run with a Docker image.
+As part of the [lightweight identity protocol](/celo-codebase/protocol/identity), validators are expected to run an Attestation Service to provide attestations that allow users to map their phone number to an account on Celo. The Attestation Service is a simple Node.js application that can be run with a Docker image.
 
 ## Environment variables
 
@@ -56,13 +56,13 @@ First we need to create an account for getting the attestation key needed to sig
 celocli account:new
 ```
 
-We copy the account details and assign the Private Key to the `ATTESTATION_SERVICE` environment variable:
+We copy the account details and assign the Private Key to the `ATTESTATION_KEY` environment variable:
 
 ```bash
 export ATTESTATION_KEY=<Private Key>
 ```
 
-The attestation service needs to be publicly available from the internet, allowing the users to send attestation requests to the server. So depending on how and where you are making available the service, you need to configure the `CELO_PROVIDER` variable pointing to that.
+The Attestation Service needs to be publicly available from the internet, allowing the users to send attestation requests to the server. So depending on how and where you are making available the service, you need to configure the `CELO_PROVIDER` variable pointing to that.
 
 For example:
 
@@ -72,7 +72,7 @@ export CELO_PROVIDER="https://my-attestation.example.com"
 
 #### Database Configuration
 
-For storing and retrieving the attestation requests the service needs a database to persist that information. Currently `sqlite`, `postgres` and `mysql` are supported. For testing purposes you can use `sqlite` but it's recommended to run a stand-alone database server using `mysql` or `postgres` if your intention is running the attestation service in a production environment.
+For storing and retrieving the attestation requests the service needs a database to persist that information. Currently `sqlite`, `postgres` and `mysql` are supported. For testing purposes you can use `sqlite` but it's recommended to run a stand-alone database server using `mysql` or `postgres` if your intention is running the Attestation Service in a production environment.
 
 So for specifying the database url you need to setup the `DATABASE_URL` variable:
 
@@ -89,9 +89,9 @@ yarn run db:create
 yarn run db:migrate
 ```
 
-## Executing the attestation service
+## Executing the Attestation Service
 
-The following command for running the attestation service is using Nexmo, but you can adapt for using Twilio easily:
+The following command for running the Attestation Service is using Nexmo, but you can adapt for using Twilio easily:
 
 ```bash
 docker run -e ATTESTATION_KEY=$ATTESTATION_KEY -e ACCOUNT_ADDRESS=$CELO_VALIDATOR_ADDRESS -e CELO_PROVIDER=$CELO_PROVIDER -e DATABASE_URL=$DATABASE_URL -e SMS_PROVIDERS=nexmo -e NEXMO_KEY=$NEXMO_KEY -e NEXMO_SECRET=$NEXMO_SECRET -e NEXMO_BLACKLIST=$NEXMO_BLACKLIST  -p 3000:80 us.gcr.io/celo-testnet/attestation-service:$CELO_NETWORK
@@ -103,7 +103,7 @@ In order for users to request attestations from your service, you need to regist
 celocli identity:create-metadata ./metadata.json
 ```
 
-The `ATTESTATION_SERVICE_URL` variable stores the URL to access the attestation service deployed. In the following command we specify the URL where this attestation service is:
+The `ATTESTATION_SERVICE_URL` variable stores the URL to access the Attestation Service deployed. In the following command we specify the URL where this Attestation Service is:
 
 ```bash
 celocli identity:change-attestation-service-url ./metadata.json --url $ATTESTATION_SERVICE_URL

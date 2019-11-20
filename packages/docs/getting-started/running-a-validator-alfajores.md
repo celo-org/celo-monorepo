@@ -4,12 +4,12 @@
   - [Instructions](#instructions)
     - [Pull the Celo Docker image](#pull-the-celo-docker-image)
     - [Create accounts](#create-accounts)
-    - [Deploy the validator node](#deploy-the-validator-node)
-    - [Running the attestation service](#running-the-attestation-service)
+    - [Deploy the Validator node](#deploy-the-validator-node)
+    - [Running the Attestation Service](#running-the-attestation-service)
 
-This section explains how to get a validator node running on the Alfajores network, using a Docker image that was built for this purpose. Most of this process is the same as running a full node, but with a few additional steps.
+This section explains how to get a Validator node running on the Alfajores network, using a Docker image that was built for this purpose. Most of this process is the same as running a full node, but with a few additional steps.
 
-This section is specific for Alfajores Network. You can find more details about running a validator in different networks at [Running a Validator page](running-a-validator.md).
+This section is specific for Alfajores Network. You can find more details about running a Validator in different networks at [Running a Validator page](running-a-validator.md).
 
 ## Instructions
 
@@ -60,19 +60,19 @@ export CELO_VALIDATOR_GROUP_ADDRESS=<YOUR-VALIDATOR-GROUP-ADDRESS>
 export CELO_VALIDATOR_ADDRESS=<YOUR-VALIDATOR-ADDRESS>
 ```
 
-In order to register the validator later on, generate a "proof of possession" - a signature proving you know your validator's BLS private key. Run this command:
+In order to register the Validator later on, generate a "proof of possession" - a signature proving you know your Validator's BLS private key. Run this command:
 
 ```bash
 docker run -v $PWD:/root/.celo --entrypoint /bin/sh -it $CELO_IMAGE:$CELO_NETWORK -c "geth account proof-of-possession $CELO_VALIDATOR_ADDRESS"
 ```
 
-It will prompt you for the passphrase you've chosen for the validator account. Let's save the resulting proof-of-possession to an environment variable:
+It will prompt you for the passphrase you've chosen for the Validator account. Let's save the resulting proof-of-possession to an environment variable:
 
 ```bash
 export CELO_VALIDATOR_POP=<YOUR-VALIDATOR-PROOF-OF-POSSESSION>
 ```
 
-### Deploy the validator node
+### Deploy the Validator node
 
 Initialize the docker container, building from an image for the network and initializing Celo with the genesis block found inside the Docker image:
 
@@ -106,9 +106,9 @@ The `mine` flag will tell geth to try participating in the BFT consensus protoco
 
 The `networkid` parameter value of `44785` indicates we are connecting the Alfajores Testnet.
 
-### Running the attestation service
+### Running the Attestation Service
 
-As part of the [lightweight identity protocol](/celo-codebase/protocol/identity), validators are expected to run an [attestation service](https://github.com/celo-org/celo-monorepo/tree/master/packages/attestation-service) to provide attestations that allow users to map their phone number to an account on Celo.
+As part of the [lightweight identity protocol](/celo-codebase/protocol/identity), Validators are expected to run an [Attestation Service](https://github.com/celo-org/celo-monorepo/tree/master/packages/attestation-service) to provide attestations that allow users to map their phone number to an account on Celo.
 
 You can find the complete instructions about how to run the [Attestation Service at the documentation page](running-attestation-service.md).
 

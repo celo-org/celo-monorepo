@@ -5,42 +5,42 @@
     - [Environment variables](#environment-variables)
     - [Pull the Celo Docker image](#pull-the-celo-docker-image)
     - [Create accounts](#create-accounts)
-    - [Deploy the validator and proxy nodes](#deploy-the-validator-and-proxy-nodes)
-    - [Running the attestation service](#running-the-attestation-service)
+    - [Deploy the Validator and Proxy nodes](#deploy-the-validator-and-proxy-nodes)
+    - [Running the Attestation Service](#running-the-attestation-service)
 
-This section explains how to get a validator node running on the Baklava network, using a Docker image that was built for this purpose. Most of this process is the same as running a full node, but with a few additional steps.
+This section explains how to get a Validator node running on the Baklava network, using a Docker image that was built for this purpose. Most of this process is the same as running a full node, but with a few additional steps.
 
-This section is specific for Baklava Network. You can find more details about running a validator in different networks at [Running a Validator page](running-a-validator.md).
+This section is specific for Baklava Network. You can find more details about running a Validator in different networks at [Running a Validator page](running-a-validator.md).
 
 ## Instructions
 
 If you are re-running these instructions, the Celo Docker image may have been updated, and it's important to get the latest version.
 
-To run a complete validator it's necessary to execute the following components:
+To run a complete Validator it's necessary to execute the following components:
 
-- The validator software
-- A Proxy that acts as an intermediary for the validator requests
-- The attestation service
+- The Validator software
+- A Proxy that acts as an intermediary for the Validator requests
+- The Attestation Service
 
-The Proxy is not mandatory but highly recommended. It allows to protect the validator node from outside connections and hide the validator behind that Proxy from other nodes of the network.
+The Proxy is not mandatory but highly recommended. It allows to protect the Validator node from outside connections and hide the Validator behind that Proxy from other nodes of the network.
 
 ### Environment variables
 
 | Variable                     | Explanation                                                                   |
 | ---------------------------- | ----------------------------------------------------------------------------- |
-| CELO_IMAGE                   | The Docker image used for the validator and proxy containers                  |  |
+| CELO_IMAGE                   | The Docker image used for the Validator and Proxy containers                  |  |
 | CELO_NETWORK                 | The Celo network to connect with. This variable is also used as the image tag |  |
 | NETWORK_ID                   | The Celo network chain ID                                                     |  |
 | URL_VERIFICATION_POOL        | URL for the Verification pool for the attestation process                     |  |
 | CELO_VALIDATOR_GROUP_ADDRESS | The etherbase public address for the validation group                         |  |
-| CELO_VALIDATOR_ADDRESS       | The etherbase public address for the validator instance                       |  |
-| CELO_PROXY_ADDRESS           | The etherbase public address for the proxy instance                           |  |
+| CELO_VALIDATOR_ADDRESS       | The etherbase public address for the Validator instance                       |  |
+| CELO_PROXY_ADDRESS           | The etherbase public address for the Proxy instance                           |  |
 | CELO_VALIDATOR_POP           |                                                                               |  |
-| PROXY_ENODE                  | The ethereum node address for the validator                                   |  |
-| PROXY_IP                     | The proxy container internal IP address from docker pool address              |  |
-| ATTESTATION_KEY              | The etherbase private key for the account used in the attestation service     |  |
-| ATTESTATION_SERVICE_URL      | The URL to access the attestation service deployed                            |  |
-| METADATA_URL                 | The URL to access the metadata file for your attestation service              |  |
+| PROXY_ENODE                  | The ethereum node address for the Validator                                   |  |
+| PROXY_IP                     | The Proxy container internal IP address from docker pool address              |  |
+| ATTESTATION_KEY              | The etherbase private key for the account used in the Attestation Service     |  |
+| ATTESTATION_SERVICE_URL      | The URL to access the Attestation Service deployed                            |  |
+| METADATA_URL                 | The URL to access the metadata file for your Attestation Service              |  |
 
 First we are going to setup the main environment variables related with the `Baklava` network. Run:
 
@@ -67,11 +67,11 @@ mkdir -p celo-data-dir/proxy celo-data-dir/validator
 cd celo-data-dir
 ```
 
-We are going to need to create 3 accounts, 2 for the validator and 1 for the Proxy.
+We are going to need to create 3 accounts, 2 for the Validator and 1 for the Proxy.
 
 First we create three accounts, one for the Validator, one for the Validator Group and the last one for the Proxy. You can generate their addresses using the below commands if you don’t already have them. If you already have some accounts, you can skip this step.
 
-To create the accounts needed, run the following commands. The first two create the accounts for the validator, the third one for the proxy:
+To create the accounts needed, run the following commands. The first two create the accounts for the Validator, the third one for the Proxy:
 
 ```bash
 docker run -v $PWD/validator:/root/.celo --entrypoint /bin/sh -it $CELO_IMAGE:$CELO_NETWORK -c "geth account new"
@@ -93,21 +93,21 @@ export CELO_VALIDATOR_ADDRESS=<YOUR-VALIDATOR-ADDRESS>
 export CELO_PROXY_ADDRESS=<YOUR-PROXY-ADDRESS>
 ```
 
-In order to register the validator later on, generate a "proof of possession" - a signature proving you know your validator's BLS private key. Run this command:
+In order to register the Validator later on, generate a "proof of possession" - a signature proving you know your Validator's BLS private key. Run this command:
 
 ```bash
 docker run -v $PWD/validator:/root/.celo --entrypoint /bin/sh -it $CELO_IMAGE:$CELO_NETWORK -c "geth account proof-of-possession $CELO_VALIDATOR_ADDRESS"
 ```
 
-It will prompt you for the passphrase you've chosen for the validator account. Let's save the resulting proof-of-possession to an environment variable:
+It will prompt you for the passphrase you've chosen for the Validator account. Let's save the resulting proof-of-possession to an environment variable:
 
 ```bash
 export CELO_VALIDATOR_POP=<YOUR-VALIDATOR-PROOF-OF-POSSESSION>
 ```
 
-### Deploy the validator and proxy nodes
+### Deploy the Validator and Proxy nodes
 
-We initialize the Docker containers for the validator and the proxy, building from an image for the network and initializing Celo with the genesis block found inside the Docker image:
+We initialize the Docker containers for the Validator and the Proxy, building from an image for the network and initializing Celo with the genesis block found inside the Docker image:
 
 ```bash
 docker run -v $PWD/proxy:/root/.celo $CELO_IMAGE:$CELO_NETWORK init /celo/genesis.json
@@ -121,6 +121,10 @@ docker run -v $PWD/proxy:/root/.celo --entrypoint /bin/sh -it $CELO_IMAGE:$CELO_
 docker run -v $PWD/validator:/root/.celo --entrypoint /bin/sh -it $CELO_IMAGE:$CELO_NETWORK -c "geth account set-node-key $CELO_VALIDATOR_ADDRESS"
 ```
 
+{% hint style="danger" %}
+**Warning**: There is a known issue running geth inside Docker that happens eventually. So if that command fails, please check [this page](https://forum.celo.org/t/setting-up-a-validator-faq/90).
+{% endhint %}
+
 In order to allow the node to sync with the network, give it the address of existing nodes in the network:
 
 ```bash
@@ -128,7 +132,7 @@ docker run -v $PWD/proxy:/root/.celo --entrypoint cp $CELO_IMAGE:$CELO_NETWORK /
 docker run -v $PWD/validator:/root/.celo --entrypoint cp $CELO_IMAGE:$CELO_NETWORK /celo/static-nodes.json /root/.celo/
 ```
 
-At this point we are ready to start up the proxy:
+At this point we are ready to start up the Proxy:
 
 ```bash
 docker run --name celo-proxy --restart=Always -p 8545:8545 -p 8546:8546 -p 30303:30303 -p 30303:30303/udp -p 30503:30503 -p 30503:30503/udp -v $PWD/proxy:/root/.celo $CELO_IMAGE:$CELO_NETWORK --verbosity 3 --networkid $NETWORK_ID --syncmode full --rpc --rpcaddr 0.0.0.0 --rpcapi eth,net,web3,debug --maxpeers 1100 --etherbase=$CELO_PROXY_ADDRESS --proxy.proxy --proxy.proxiedvalidatoraddress $CELO_VALIDATOR_ADDRESS --proxy.internalendpoint :30503
@@ -141,7 +145,7 @@ export PROXY_ENODE=$(docker exec celo-proxy geth --exec "admin.nodeInfo['enode']
 export PROXY_IP=$(docker inspect -f '{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' celo-proxy)
 ```
 
-Now we can start up the validator node:
+Now we can start up the Validator node:
 
 ```bash
 docker run --name celo-validator --restart=Always -p 127.0.0.1:8547:8545 -p 127.0.0.1:8548:8546 -p 30304:30303 -p 30304:30303/udp -v $PWD/validator:/root/.celo $CELO_IMAGE:$CELO_NETWORK --verbosity 3 --networkid $NETWORK_ID --syncmode full --rpc --rpcaddr 0.0.0.0 --rpcapi eth,net,web3,debug --maxpeers 125 --mine --istanbul.blockperiod=5 --istanbul.requesttimeout=3000 --etherbase $CELO_VALIDATOR_ADDRESS --nodiscover --proxy.proxied --proxy.proxyenodeurlpair=enode://$PROXY_ENODE@$PROXY_IP:30503\;enode://$PROXY_ENODE@$PROXY_IP:30503
@@ -155,10 +159,10 @@ The `mine` flag does not mean the node starts mining blocks, but rather starts t
 
 The `networkid` parameter value of `44785` indicates we are connecting the Baklava Beta network.
 
-### Running the attestation service
+### Running the Attestation Service
 
-As part of the [lightweight identity protocol](/celo-codebase/protocol/identity), validators are expected to run an [attestation service](https://github.com/celo-org/celo-monorepo/tree/master/packages/attestation-service) to provide attestations that allow users to map their phone number to an account on Celo.
+As part of the [lightweight identity protocol](/celo-codebase/protocol/identity), Validators are expected to run an [Attestation Service](https://github.com/celo-org/celo-monorepo/tree/master/packages/attestation-service) to provide attestations that allow users to map their phone number to an account on Celo.
 
 You can find the complete instructions about how to run the [Attestation Service at the documentation page](running-attestation-service.md).
 
-You’re all set! Note that elections are finalized at the end of each epoch, roughly once an hour in the Baklava Testnet. After that hour, if you get elected, your node will start participating BFT consensus and validating blocks. Users requesting attestations will hit your registered attestation service.
+You’re all set! Note that elections are finalized at the end of each epoch, roughly once an hour in the Baklava Testnet. After that hour, if you get elected, your node will start participating BFT consensus and validating blocks. Users requesting attestations will hit your registered Attestation Service.

@@ -11,32 +11,32 @@
       - [Lock up Celo Gold](#lock-up-celo-gold)
     - [Run for election](#run-for-election)
 
-This section explains how to get a validator node running on the network, using a Docker image that was built for this purpose. Most of this process is the same as running a full node, but with a few additional steps.
+This section explains how to get a Validator node running on the network, using a Docker image that was built for this purpose. Most of this process is the same as running a full node, but with a few additional steps.
 
-Validators help secure the Celo network by participating in Celo’s Proof of Stake protocol. Validators are organized into Validator Groups, analogous to parties in representative democracies. A validator group is essentially an ordered list of validators, along with metadata like name and URL.
+Validators help secure the Celo network by participating in Celo’s Proof of Stake protocol. Validators are organized into Validator Groups, analogous to parties in representative democracies. A Validator Group is essentially an ordered list of Validators, along with metadata like name and URL.
 
-Just as anyone in a democracy can create their own political party, or seek to get selected to represent a party in an election, any Celo user can create a validator group and add themselves to it, or set up a potential validator and work to get an existing validator group to include them.
+Just as anyone in a democracy can create their own political party, or seek to get selected to represent a party in an election, any Celo user can create a Validator group and add themselves to it, or set up a potential Validator and work to get an existing Validator group to include them.
 
-While other Validator Groups will exist on the Celo Networks, the fastest way to get up and running with a validator will be to register a Validator Group, register a Validator, and add that Validator to your Validator Group. The addresses used to register Validator Groups and Validators must be unique, which will require that you create two accounts in the step-by-step guide below.
+While other Validator Groups will exist on the Celo Networks, the fastest way to get up and running with a Validator will be to register a Validator Group, register a Validator, and add that Validator to your Validator Group. The addresses used to register Validator Groups and Validators must be unique, which will require that you create two accounts in the step-by-step guide below.
 
-You can find more details about Celo mission and why becoming a validator [at the following page](https://medium.com/celohq/calling-all-chefs-become-a-celo-validator-c75d1c2909aa).
+You can find more details about Celo mission and why becoming a Validator [at the following page](https://medium.com/celohq/calling-all-chefs-become-a-celo-validator-c75d1c2909aa).
 
 {% hint style="info" %}
-If you are starting up a validator, please consider leaving it running for a few weeks to support the network.
+If you are starting up a Validator, please consider leaving it running for a few weeks to support the network.
 {% endhint %}
 
 ## Prerequisites
 
 ### Hardware requirements
 
-Because Celo network is based in Proof of Stake, the hardware requirements are not very high. Proof of Stake consensus is not so CPU intensive as Proof of Work but has a higher requirements of network connectivity and lantency. Here you have a list of the standard requirements for running a validator node:
+Because Celo network is based in Proof of Stake, the hardware requirements are not very high. Proof of Stake consensus is not so CPU intensive as Proof of Work but has a higher requirements of network connectivity and lantency. Here you have a list of the standard requirements for running a Validator node:
 
 - Memory: 8 GB RAM
 - CPU: Quad core 3GHz (64-bit)
 - Disk: 256 GB of SSD storage
 - Network: At least 1 GB input/output dual Ethernet
 
-It is recommended to run the validator node in an environment that facilitates a 24/7 execution. Deployments in a top-tier datacenter facilitates the security and better uptimes.
+It is recommended to run the Validator node in an environment that facilitates a 24/7 execution. Deployments in a top-tier datacenter facilitates the security and better uptimes.
 
 ### Software requirements
 
@@ -61,10 +61,10 @@ When you see text in angle brackets &lt;&gt;, replace them and the text inside w
 
 ## Celo Networks
 
-Celo provides different networks for different purposes. You can find the specifics about how to run a validator in the Celo networks in the following documentation pages:
+Celo provides different networks for different purposes. You can find the specifics about how to run a Validator in the Celo networks in the following documentation pages:
 
-- [Running a validator in Baklava Network](running-a-validator-baklava.md)
-- [Running a validator in Alfajores Network](running-a-validator-alfajores.md)
+- [Running a Validator in Baklava Network](running-a-validator-baklava.md)
+- [Running a Validator in Alfajores Network](running-a-validator-alfajores.md)
 
 In this documentation pages we're going to use a Docker image containing the Celo node software.
 
@@ -78,7 +78,7 @@ To participate in The Great Celo Stake Off (aka TGCSO) and get fauceted it's nec
 
 Visit the [Alfajores Celo Faucet](https://celo.org/build/faucet) to send **both** of your accounts some funds.
 
-In a new tab, unlock your accounts so that you can send transactions. This only unlocks the accounts for the lifetime of the validator that's running, so be sure to unlock `$CELO_VALIDATOR_ADDRESS` again if your node gets restarted:
+In a new tab, unlock your accounts so that you can send transactions. This only unlocks the accounts for the lifetime of the Validator that's running, so be sure to unlock `$CELO_VALIDATOR_ADDRESS` again if your node gets restarted:
 
 ```bash
 # You will be prompted for your password.
@@ -86,7 +86,7 @@ celocli account:unlock --account $CELO_VALIDATOR_GROUP_ADDRESS
 celocli account:unlock --account $CELO_VALIDATOR_ADDRESS
 ```
 
-In a new tab, make a locked Gold account for both of your addresses by running the Celo CLI. This will allow you to stake Celo Gold, which is required to register a validator and validator groups:
+In a new tab, make a locked Gold account for both of your addresses by running the Celo CLI. This will allow you to stake Celo Gold, which is required to register a Validator and Validator Groups:
 
 ```bash
 celocli account:register --from $CELO_VALIDATOR_GROUP_ADDRESS --name <GROUP_NAME_OF_YOUR_CHOICE>
@@ -95,7 +95,7 @@ celocli account:register --from $CELO_VALIDATOR_ADDRESS --name <VALIDATOR_NAME_O
 
 #### Lock up Celo Gold
 
-Make a locked Gold commitment for both accounts in order to secure the right to register a validator and validator group. The current requirement is 1 Celo Gold with a notice period of 60 days. If you choose to stake more gold, or a longer notice period, be sure to use those values below:
+Make a locked Gold commitment for both accounts in order to secure the right to register a Validator and Validator group. The current requirement is 1 Celo Gold with a notice period of 60 days. If you choose to stake more gold, or a longer notice period, be sure to use those values below:
 
 ```bash
 celocli lockedgold:lockup --from $CELO_VALIDATOR_GROUP_ADDRESS --goldAmount 1000000000000000000 --noticePeriod 5184000
@@ -104,15 +104,15 @@ celocli lockedgold:lockup --from $CELO_VALIDATOR_ADDRESS --goldAmount 1000000000
 
 ### Run for election
 
-In order to be elected as a validator, you will first need to register your group and validator and give them each an an ID, which people will know them by (e.g. `Awesome Validators Inc.` and `Alice's Awesome Validator`).
+In order to be elected as a Validator, you will first need to register your group and Validator and give them each an an ID, which people will know them by (e.g. `Awesome Validators Inc.` and `Alice's Awesome Validator`).
 
-Register your validator group:
+Register your Validator Group:
 
 ```bash
 celocli validatorgroup:register --id <GROUP_ID_OF_YOUR_CHOICE> --from $CELO_VALIDATOR_GROUP_ADDRESS --noticePeriod 5184000
 ```
 
-Register your validator:
+Register your Validator:
 
 ```bash
 celocli validator:register --id <VALIDATOR_ID_OF_YOUR_CHOICE> --from $CELO_VALIDATOR_ADDRESS --noticePeriod 5184000 --publicKey 0x`openssl rand -hex 64`$CELO_VALIDATOR_POP
@@ -122,7 +122,7 @@ celocli validator:register --id <VALIDATOR_ID_OF_YOUR_CHOICE> --from $CELO_VALID
 **Roadmap**: Note that the “publicKey” first part of the public key field is currently ignored, and thus can be set to any 128 character hex value. The rest is used for the BLS public key and proof-of-possession.
 {% endhint %}
 
-Affiliate your validator with your validator group. Note that you will not be a member of this group until the validator group accepts you:
+Affiliate your Validator with your Validator Group. Note that you will not be a member of this group until the Validator Group accepts you:
 
 ```bash
 celocli validator:affiliate --set $CELO_VALIDATOR_GROUP_ADDRESS --from $CELO_VALIDATOR_ADDRESS
@@ -134,7 +134,7 @@ Accept the affiliation:
 celocli validatorgroup:member --accept $CELO_VALIDATOR_ADDRESS --from $CELO_VALIDATOR_GROUP_ADDRESS
 ```
 
-Use both accounts to vote for your validator group:
+Use both accounts to vote for your Validator Group:
 
 ```bash
 celocli validatorgroup:vote --from $CELO_VALIDATOR_ADDRESS --for $CELO_VALIDATOR_GROUP_ADDRESS
@@ -149,7 +149,7 @@ You can inspect the current state of voting by running:
 celocli validatorgroup:list
 ```
 
-If you find your validator still not getting elected you may need to faucet yourself more funds and bond a greater deposit to command more voting weight!
+If you find your Validator still not getting elected you may need to faucet yourself more funds and bond a greater deposit to command more voting weight!
 
 At any moment you can check if you are validating running the following command:
 
@@ -157,13 +157,13 @@ At any moment you can check if you are validating running the following command:
 celocli validator:show $CELO_VALIDATOR_ADDRESS
 ```
 
-You can de-affiliate a validator account of a validator group:
+You can de-affiliate a Validator account of a Validator Group:
 
 ```bash
 celocli validator:deaffiliate --from $CELO_VALIDATOR_ADDRESS
 ```
 
-You can update your validator BLS key using the following command:
+You can update your Validator BLS key using the following command:
 
 ```bash
 celocli validator:update-bls-public-key --from $CELO_VALIDATOR_ADDRESS --blsKey $CELO_VALIDATOR_BLS_PUBLIC_KEY --blsPop $CELO_VALIDATOR_PROOF_OF_POSSESSION
