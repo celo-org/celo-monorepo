@@ -90,6 +90,8 @@ a few useful commands to make running a node really easy.
 
 - Start shell: `kubectl exec -n podname -it podname /bin/sh`
 
+- Tear down: `celotooljs deploy destroy testnet -e yourname`
+
 #### MacOS Setup
 
 - Install Helm 2.14.0 from https://get.helm.sh/ (Homebrew lacks this version.)
