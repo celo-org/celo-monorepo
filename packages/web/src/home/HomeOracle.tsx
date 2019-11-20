@@ -1,6 +1,6 @@
 import * as React from 'react'
+import { G, Path } from 'src/shared/svg'
 import Svg from 'svgs'
-import { Path, G } from 'src/shared/svg'
 
 export default React.memo(function HomeOracle() {
   return (
