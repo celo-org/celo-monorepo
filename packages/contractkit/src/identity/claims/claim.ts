@@ -83,9 +83,9 @@ export async function verifyClaim(
 
 /**
  * Validates a claim made by an account, i.e. whether the claim is usable
- * @param claim The claim to verify
+ * @param claim The claim to validate
  * @param address The address that is making the claim
- * @returns If valid, returns undefined. If invalid or unable to verify, returns a string with the error
+ * @returns If valid, returns undefined. If invalid or unable to validate, returns a string with the error
  */
 export async function validateClaim(claim: Claim, address: string, kit: ContractKit) {
   switch (claim.type) {
