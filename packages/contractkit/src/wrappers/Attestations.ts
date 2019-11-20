@@ -403,9 +403,11 @@ export class AttestationsWrapper extends BaseWrapper<Attestations> {
     issuer: Address,
     code: string
   ) {
+    const accounts = await this.kit.contracts.getAccounts()
+    const attestationSigner = await accounts.getAttestationSigner(issuer)
     const phoneHash = PhoneNumberUtils.getPhoneHash(phoneNumber)
     const expectedSourceMessage = attestationMessageToSign(phoneHash, account)
-    const { r, s, v } = parseSignature(expectedSourceMessage, code, issuer.toLowerCase())
+    const { r, s, v } = parseSignature(expectedSourceMessage, code, attestationSigner)
     const result = await this.contract.methods
       .validateAttestationCode(phoneHash, account, v, r, s)
       .call()
