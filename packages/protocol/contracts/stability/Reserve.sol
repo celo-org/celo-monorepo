@@ -30,6 +30,9 @@ contract Reserve is IReserve, Ownable, Initializable, UsingRegistry, ReentrancyG
   uint256 public constant TOBIN_TAX_DENOMINATOR = 1000;
   mapping(address => bool) public isSpender;
 
+  mapping(address => bool) public isCustodian;
+  address[] public _custodians;
+
   bytes32[] public assetAllocationSymbols;
   uint256[] public assetAllocationWeights;
   uint256 public totalAssetAllocationWeight;
@@ -39,9 +42,17 @@ contract Reserve is IReserve, Ownable, Initializable, UsingRegistry, ReentrancyG
   event TokenRemoved(address token, uint256 index);
   event SpenderAdded(address spender);
   event SpenderRemoved(address spender);
+  event CustodianAdded(address custodian);
+  event CustodianRemoved(address custodian, uint256 index);
+  event AssetAllocationSet(bytes32[] symbols, uint256[] weights, uint256 totalWeight);
 
   modifier isStableToken(address token) {
     require(isToken[token], "token addr was never registered");
+    _;
+  }
+
+  modifier isCustodialAddress(address custodian) {
+    require(isCustodian[custodian], "custodian addr was never registered");
     _;
   }
 
@@ -76,13 +87,14 @@ contract Reserve is IReserve, Ownable, Initializable, UsingRegistry, ReentrancyG
     onlyOwner
   {
     require(symbols.length == weights.length);
-    assetAllocationSymbols = symbols;
-    assetAllocationWeights = weights;
     uint256 sum = 0;
-    for (uint256 i; i < weights.length; i++) {
+    for (uint256 i = 0; i < weights.length; i++) {
       sum = SafeMath.add(sum, weights[i]);
     }
+    assetAllocationSymbols = symbols;
+    assetAllocationWeights = weights;
     totalAssetAllocationWeight = sum;
+    emit AssetAllocationSet(symbols, weights, sum);
   }
 
   /**
@@ -127,9 +139,40 @@ contract Reserve is IReserve, Ownable, Initializable, UsingRegistry, ReentrancyG
     return true;
   }
 
-  function addCustodialAddress() public onlyOwner {}
+  /**
+   * @notice Add a custodian whose balance shall be included in the reserve ratio.
+   * @param custodian The address of the custodian to add.
+   */
+  function addCustodialAddress(address custodian) external onlyOwner nonReentrant returns (bool) {
+    require(!isCustodian[custodian], "custodian addr already registered");
+    isCustodian[custodian] = true;
+    _custodians.push(custodian);
+    emit CustodianAdded(custodian);
+    return true;
+  }
 
-  function removeCustodialAddress() public onlyOwner {}
+  /**
+   * @notice Remove a custodian whose balance shall no longer be included in the reserve ratio.
+   * @param custodian The address of the custodian to remove.
+   * @param index The index of the cutodian in _custodians.
+   */
+  function removeCustodialAddress(address custodian, uint256 index)
+    external
+    onlyOwner
+    isCustodialAddress(custodian)
+    returns (bool)
+  {
+    require(
+      index < _custodians.length && _custodians[index] == custodian,
+      "index into custodians list not mapped to custodian"
+    );
+    isCustodian[custodian] = false;
+    address lastItem = _custodians[_custodians.length - 1];
+    _custodians[index] = lastItem;
+    _custodians.length--;
+    emit CustodianRemoved(custodian, index);
+    return true;
+  }
 
   /**
    * @notice Gives an address permission to spend Reserve funds.
@@ -179,6 +222,18 @@ contract Reserve is IReserve, Ownable, Initializable, UsingRegistry, ReentrancyG
     return _tokens;
   }
 
+  function getCustodians() external view returns (address[] memory) {
+    return _custodians;
+  }
+
+  function getReserveGoldBalance() public view returns (uint256) {
+    uint256 reserveGoldBalance = address(this).balance;
+    for (uint256 i = 0; i < _custodians.length; i++) {
+      reserveGoldBalance = SafeMath.add(reserveGoldBalance, _custodians[i].balance);
+    }
+    return reserveGoldBalance;
+  }
+
   /*
    * Internal functions
    */
@@ -189,7 +244,7 @@ contract Reserve is IReserve, Ownable, Initializable, UsingRegistry, ReentrancyG
   function computeTobinTax() private view returns (FixidityLib.Fraction memory) {
     address sortedOraclesAddress = registry.getAddressForOrDie(SORTED_ORACLES_REGISTRY_ID);
     ISortedOracles sortedOracles = ISortedOracles(sortedOraclesAddress);
-    uint256 reserveGoldBalance = address(this).balance;
+    uint256 reserveGoldBalance = getReserveGoldBalance();
     uint256 stableTokensValueInGold = 0;
 
     for (uint256 i = 0; i < _tokens.length; i++) {
