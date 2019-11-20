@@ -111,10 +111,10 @@ const DefaultConfig = {
       adjustmentSpeed: 0.1,
     },
     membershipHistoryLength: 60,
-    maxGroupSize: '70',
+    maxGroupSize: '5',
 
+    // We register a number of C-Labs groups to contain an initial set of validators to run the network.
     validatorKeys: [],
-    // We register a single validator group during the migration.
     groupName: 'C-Labs',
     commission: 0.1,
   },

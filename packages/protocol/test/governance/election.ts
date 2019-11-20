@@ -751,7 +751,7 @@ contract('Election', (accounts: string[]) => {
     })
   })
 
-  describe('#electValidators', () => {
+  describe('#electValidatorSigners', () => {
     let random: MockRandomInstance
     let totalLockedGold: number
     const group1 = accounts[0]
@@ -812,7 +812,7 @@ contract('Election', (accounts: string[]) => {
 
       it("should return that group's member list", async () => {
         await setRandomness(hash1)
-        assertSameAddresses(await election.electValidators(), [
+        assertSameAddresses(await election.electValidatorSigners(), [
           validator1,
           validator2,
           validator3,
@@ -830,7 +830,7 @@ contract('Election', (accounts: string[]) => {
 
       it('should return maxElectableValidators elected validators', async () => {
         await setRandomness(hash1)
-        assertSameAddresses(await election.electValidators(), [
+        assertSameAddresses(await election.electValidatorSigners(), [
           validator1,
           validator2,
           validator3,
@@ -850,9 +850,9 @@ contract('Election', (accounts: string[]) => {
 
       it('should return different results', async () => {
         await setRandomness(hash1)
-        const valsWithHash1 = (await election.electValidators()).map((x) => x.toLowerCase())
+        const valsWithHash1 = (await election.electValidatorSigners()).map((x) => x.toLowerCase())
         await setRandomness(hash2)
-        const valsWithHash2 = (await election.electValidators()).map((x) => x.toLowerCase())
+        const valsWithHash2 = (await election.electValidatorSigners()).map((x) => x.toLowerCase())
         assert.sameMembers(valsWithHash1, valsWithHash2)
         assert.notDeepEqual(valsWithHash1, valsWithHash2)
       })
@@ -872,7 +872,7 @@ contract('Election', (accounts: string[]) => {
 
       it('should elect only n members from that group', async () => {
         await setRandomness(hash1)
-        assertSameAddresses(await election.electValidators(), [
+        assertSameAddresses(await election.electValidatorSigners(), [
           validator7,
           validator1,
           validator2,
@@ -894,7 +894,7 @@ contract('Election', (accounts: string[]) => {
 
       it('should not elect any members from that group', async () => {
         await setRandomness(hash1)
-        assertSameAddresses(await election.electValidators(), [
+        assertSameAddresses(await election.electValidatorSigners(), [
           validator1,
           validator2,
           validator3,
@@ -913,7 +913,7 @@ contract('Election', (accounts: string[]) => {
 
       it('should revert', async () => {
         await setRandomness(hash1)
-        await assertRevert(election.electValidators())
+        await assertRevert(election.electValidatorSigners())
       })
     })
   })

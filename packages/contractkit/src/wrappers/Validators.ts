@@ -18,7 +18,8 @@ import {
 
 export interface Validator {
   address: Address
-  publicKey: string
+  ecdsaPublicKey: string
+  blsPublicKey: string
   affiliation: string | null
   score: BigNumber
 }
@@ -57,7 +58,6 @@ export class ValidatorsWrapper extends BaseWrapper<Validators> {
       this.contract.methods.updateCommission(toFixed(commission).toFixed())
     )
   }
-  updatePublicKeysData = proxySend(this.kit, this.contract.methods.updatePublicKeysData)
   /**
    * Returns the Locked Gold requirements for validators.
    * @returns The Locked Gold requirements for validators.
@@ -98,10 +98,44 @@ export class ValidatorsWrapper extends BaseWrapper<Validators> {
     }
   }
 
+  /**
+   * Returns the account associated with `signer`.
+   * @param signer The address of an account or currently authorized validator signer.
+   * @dev Fails if the `signer` is not an account or currently authorized validator.
+   * @return The associated account.
+   */
+  async validatorSignerToAccount(signerAddress: Address) {
+    const accounts = await this.kit.contracts.getAccounts()
+    return accounts.validatorSignerToAccount(signerAddress)
+  }
+
+  /**
+   * Returns the account associated with `signer`.
+   * @param signer The address of the account or previously authorized signer.
+   * @dev Fails if the `signer` is not an account or previously authorized signer.
+   * @return The associated account.
+   */
   async signerToAccount(signerAddress: Address) {
     const accounts = await this.kit.contracts.getAccounts()
-    return accounts.activeValidationSignerToAccount(signerAddress)
+    return accounts.signerToAccount(signerAddress)
   }
+
+  /**
+   * Updates a validator's BLS key.
+   * @param blsPublicKey The BLS public key that the validator is using for consensus, should pass proof
+   *   of possession. 48 bytes.
+   * @param blsPop The BLS public key proof-of-possession, which consists of a signature on the
+   *   account address. 96 bytes.
+   * @return True upon success.
+   */
+  updateBlsPublicKey: (
+    blsPublicKey: string,
+    blsPop: string
+  ) => CeloTransactionObject<boolean> = proxySend(
+    this.kit,
+    this.contract.methods.updateBlsPublicKey,
+    tupleParser(parseBytes, parseBytes)
+  )
 
   /**
    * Returns whether a particular account has a registered validator.
@@ -147,10 +181,18 @@ export class ValidatorsWrapper extends BaseWrapper<Validators> {
     const res = await this.contract.methods.getValidator(address).call()
     return {
       address,
-      publicKey: res[0] as any,
-      affiliation: res[1],
-      score: fromFixed(new BigNumber(res[2])),
+      // @ts-ignore Incorrect type for bytes
+      ecdsaPublicKey: res.ecdsaPublicKey,
+      // @ts-ignore Incorrect type for bytes
+      blsPublicKey: res.blsPublicKey,
+      affiliation: res.affiliation,
+      score: fromFixed(new BigNumber(res.score)),
     }
+  }
+
+  async getValidatorFromSigner(address: Address): Promise<Validator> {
+    const account = await this.signerToAccount(address)
+    return this.getValidator(account)
   }
 
   /** Get ValidatorGroup information */
@@ -214,20 +256,23 @@ export class ValidatorsWrapper extends BaseWrapper<Validators> {
    * Registers a validator unaffiliated with any validator group.
    *
    * Fails if the account is already a validator or validator group.
-   * Fails if the account does not have sufficient weight.
    *
-   * @param publicKeysData Comprised of three tightly-packed elements:
-   *    - publicKey - The public key that the validator is using for consensus, should match
-   *      msg.sender. 64 bytes.
-   *    - blsPublicKey - The BLS public key that the validator is using for consensus, should pass
-   *      proof of possession. 48 bytes.
-   *    - blsPoP - The BLS public key proof of possession. 96 bytes.
+   * @param ecdsaPublicKey The ECDSA public key that the validator is using for consensus, should match
+   *   the validator signer. 64 bytes.
+   * @param blsPublicKey The BLS public key that the validator is using for consensus, should pass proof
+   *   of possession. 48 bytes.
+   * @param blsPop The BLS public key proof-of-possession, which consists of a signature on the
+   *   account address. 96 bytes.
    */
 
-  registerValidator: (publicKeysData: string) => CeloTransactionObject<boolean> = proxySend(
+  registerValidator: (
+    ecdsaPublicKey: string,
+    blsPublicKey: string,
+    blsPop: string
+  ) => CeloTransactionObject<boolean> = proxySend(
     this.kit,
     this.contract.methods.registerValidator,
-    tupleParser(parseBytes)
+    tupleParser(parseBytes, parseBytes, parseBytes)
   )
 
   /**

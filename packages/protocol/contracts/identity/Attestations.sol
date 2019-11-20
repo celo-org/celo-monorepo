@@ -95,10 +95,10 @@ contract Attestations is
     address attestationRequestFeeToken
   );
 
-  event AttestationIssuersSelected(
+  event AttestationIssuerSelected(
     bytes32 indexed identifier,
     address indexed account,
-    uint256 attestationsRequested,
+    address indexed issuer,
     address attestationRequestFeeToken
   );
 
@@ -204,13 +204,6 @@ contract Attestations is
     );
 
     addIncompleteAttestations(identifier);
-    emit AttestationIssuersSelected(
-      identifier,
-      msg.sender,
-      state.unselectedRequests[msg.sender].attestationsRequested,
-      state.unselectedRequests[msg.sender].attestationRequestFeeToken
-    );
-
     delete state.unselectedRequests[msg.sender];
   }
 
@@ -508,7 +501,7 @@ contract Attestations is
   ) public view returns (address) {
     bytes32 codehash = keccak256(abi.encodePacked(identifier, account));
     address signer = Signatures.getSignerOfMessageHash(codehash, v, r, s);
-    address issuer = getAccounts().activeAttesttationSignerToAccount(signer);
+    address issuer = getAccounts().attestationSignerToAccount(signer);
 
     Attestation storage attestation = identifiers[identifier].attestations[account]
       .issuedAttestations[issuer];
@@ -577,7 +570,7 @@ contract Attestations is
     while (currentIndex < unselectedRequest.attestationsRequested) {
       seed = keccak256(abi.encodePacked(seed));
       validator = validatorAddressFromCurrentSet(uint256(seed) % numberValidators);
-      issuer = getAccounts().activeValidationSignerToAccount(validator);
+      issuer = getAccounts().validatorSignerToAccount(validator);
       Attestation storage attestation = state.issuedAttestations[issuer];
 
       // Attestation issuers can only be added if they haven't been already.
@@ -590,6 +583,13 @@ contract Attestations is
       attestation.blockNumber = unselectedRequest.blockNumber;
       attestation.attestationRequestFeeToken = unselectedRequest.attestationRequestFeeToken;
       state.selectedIssuers.push(issuer);
+
+      emit AttestationIssuerSelected(
+        identifier,
+        msg.sender,
+        issuer,
+        unselectedRequest.attestationRequestFeeToken
+      );
     }
   }
 

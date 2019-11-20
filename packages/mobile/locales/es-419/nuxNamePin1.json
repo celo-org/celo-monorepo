@@ -1,14 +1,6 @@
 {
-  "selectCountry": "Seleccionar país",
   "chooseLanguage": "Elegir idioma",
   "continue": "Continuar",
-  "secureAsset":
-    "Celo mantiene tu patrimonio seguro y le permite enviar capital a quien quiera y recibirlos de cualquier persona",
-  "stableAsset":
-    "Los {{CeloDollars}} constituyen un activo digital estable que está alineado con el valor del dólar estadounidense",
-  "verifyNumber":
-    "Verifique tu número de teléfono para conectarse con otros usuarios y recibir dinero",
-  "syncNetwork": "Sincronizando con la red",
   "welcomeCelo": "Te damos la bienvenida a Celo",
   "chooseCountryCode": "Código de país",
   "chooseCountry": "País",
@@ -20,34 +12,18 @@
   },
   "phoneNumber": "000 000 0000",
   "inviteCodeText": {
-    "title": "Ingresa el código de invitación",
-    "copyInvite": {
-      "0": "Copia el código de invitación ",
-      "1": "desde la aplicación de mensajes y vuelve."
-    },
-    "openMessages": {
-      "message": "Abrir mensajes",
-      "hint": {
-        "0": "Pista: ",
-        "1": "Copia el mensaje SMS completo"
-      }
-    },
-    "pasteInviteCode": {
-      "message": "Pegar código de invitación!",
-      "hint": "Parece que has copiado un código"
-    },
-    "validating": "Genial! Validando el código de invitación copiado",
-    "inviteAccepted": "🎉 Invitación aceptada!",
-    "askForInvite": {
-      "0": "Solicite una invitación de un amigo en Celo o regístrese en la red {{testnet}} en ",
-      "1": "celo.org/app"
-    }
+    "title": "Ingresa el Código de Invitación",
+    "body":
+      "Si tiene un código de invitación, ingréselo aquí. Puede copiar y pegar todo el mensaje.",
+    "codeHeader": "Código de Invitación",
+    "codePlaceholder": "Celo código: am9hBM3tiA+CuNb...",
+    "noCode": "¿No tienen un código? ",
+    "requestCodeNoFaucet": " Solicite una invitación de un amigo con una billetera Celo o ",
+    "requestCodeFromFaucet": "Solicite una invitación en ",
+    "faucetLink": "celo.org/app",
+    "skip": "continuar sin."
   },
-  "enterFullName": "Ingresa tu nombre y apellido",
   "fullName": "Nombre completo",
-  "InvitationCode": "Código de invitación",
-  "optIn": "Inscribirse",
-  "submitting": "Enviando ...",
   "importIt": "Restaurar tu monedero existente",
   "cancel": "Cancelar",
   "important": "Importante",

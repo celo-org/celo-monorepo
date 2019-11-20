@@ -2,13 +2,11 @@ pragma solidity ^0.5.3;
 
 interface IAccounts {
   function isAccount(address) external view returns (bool);
-  function activeVoteSignerToAccount(address) external view returns (address);
   function voteSignerToAccount(address) external view returns (address);
-  function activeValidationSignerToAccount(address) external view returns (address);
-  function validationSignerToAccount(address) external view returns (address);
-  function getValidationSigner(address) external view returns (address);
-  function activeAttesttationSignerToAccount(address) external view returns (address);
+  function validatorSignerToAccount(address) external view returns (address);
   function attestationSignerToAccount(address) external view returns (address);
+  function signerToAccount(address) external view returns (address);
+  function getValidatorSigner(address) external view returns (address);
   function getAttestationSigner(address) external view returns (address);
 
   function setAccountDataEncryptionKey(bytes calldata) external;

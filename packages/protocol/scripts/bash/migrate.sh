@@ -13,13 +13,13 @@ NETWORK=""
 RESET=""
 # https://github.com/trufflesuite/truffle-migrate/blob/develop/index.js#L161
 # Default to larger than the number of contracts we will ever have
-TO=100000
 
-while getopts 'n:rt:c:m:' flag; do
+while getopts 'n:rt:f:c:m:' flag; do
   case "${flag}" in
     n) NETWORK="$OPTARG" ;;
     r) RESET="--reset" ;;
     t) TO="$OPTARG" ;;
+    f) FROM="$OPTARG" ;;
     c) TRUFFLE_OVERRIDE="$OPTARG" ;;
     m) MIGRATION_OVERRIDE="$OPTARG" ;;
     *) error "Unexpected option ${flag}" ;;
@@ -34,8 +34,9 @@ if ! nc -z 127.0.0.1 8545 ; then
 fi
 
 yarn run build && \
-echo "Migrating contracts up to migration number ${TO}" && \
+echo "Migrating contracts migrations${FROM:+ from number $FROM}${TO:+ up to number $TO}" && \
 yarn run truffle migrate --compile-all --network $NETWORK --build_directory $PWD/build/$NETWORK $RESET \
-  --to ${TO} \
+  ${TO:+ --to $TO} \
+  ${FROM:+ -f $FROM} \
   --truffle_override "$TRUFFLE_OVERRIDE" \
   --migration_override "$MIGRATION_OVERRIDE"
