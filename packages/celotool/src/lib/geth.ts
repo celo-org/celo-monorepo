@@ -15,15 +15,11 @@ import fs from 'fs'
 import { range } from 'lodash'
 import fetch from 'node-fetch'
 import path from 'path'
+import sleep from 'sleep-promise'
 import Web3Type from 'web3'
 import { TransactionReceipt } from 'web3/types'
 import { envVar, fetchEnv, isVmBased } from './env-utils'
-import {
-  AccountType,
-  generatePrivateKey,
-  privateKeyToAddress,
-  privateKeyToPublicKey,
-} from './generate_utils'
+import { AccountType, generatePrivateKey, privateKeyToPublicKey } from './generate_utils'
 import { retrieveIPAddress } from './helm_deploy'
 import { execCmd, execCmdWithExitOnFailure } from './utils'
 import { getTestnetOutputs } from './vm-testnet-utils'
@@ -330,10 +326,6 @@ const exitTracerTool = (logMessage: any) => {
   process.exit(1)
 }
 
-export const sleep = (ms: number) => {
-  return new Promise((resolve) => setTimeout(resolve, ms))
-}
-
 const transferAndTrace = async (
   web3: Web3Type,
   goldToken: GoldTokenType,
@@ -543,7 +535,8 @@ export const simulateClient = async (
 
     // randomly choose which gas currency to use
     const gasCurrencyGold = Boolean(Math.round(Math.random()))
-    let gasCurrency = undefined
+
+    let gasCurrency
     if (!gasCurrencyGold) {
       try {
         gasCurrency = await kit.registry.addressFor(CeloContract.StableToken)

@@ -1,8 +1,13 @@
 import { getBlockscoutUrl } from 'src/lib/endpoints'
-import { envVar, fetchEnv } from 'src/lib/env-utils'
+import { CeloEnvArgv, envVar, fetchEnv } from 'src/lib/env-utils'
 import { getEnodesWithExternalIPAddresses } from 'src/lib/geth'
-import { installGenericHelmChart, removeGenericHelmChart } from 'src/lib/helm_deploy'
+import {
+  installGenericHelmChart,
+  removeGenericHelmChart,
+  upgradeGenericHelmChart,
+} from 'src/lib/helm_deploy'
 import { getGenesisBlockFromGoogleStorage } from 'src/lib/testnet-utils'
+import yargs from 'yargs'
 
 export async function installHelmChart(
   celoEnv: string,
@@ -12,6 +17,21 @@ export async function installHelmChart(
 ) {
   const params = await helmParameters(celoEnv, blockscoutProb, delayMs, replicas)
   return installGenericHelmChart(
+    celoEnv,
+    celoEnv + '-load-test',
+    '../helm-charts/load-test/',
+    params
+  )
+}
+
+export async function upgradeHelmChart(
+  celoEnv: string,
+  blockscoutProb: number,
+  delayMs: number,
+  replicas: number
+) {
+  const params = await helmParameters(celoEnv, blockscoutProb, delayMs, replicas)
+  await upgradeGenericHelmChart(
     celoEnv,
     celoEnv + '-load-test',
     '../helm-charts/load-test/',

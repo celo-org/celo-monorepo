@@ -1,14 +1,13 @@
 import { switchToClusterFromEnv } from 'src/lib/cluster'
-import { envVar, fetchEnv } from 'src/lib/env-utils'
+import { CeloEnvArgv, envVar, fetchEnv } from 'src/lib/env-utils'
 import { installHelmChart } from 'src/lib/load-test'
 import yargs from 'yargs'
-import { InitialArgv } from '../../deploy/initial'
 
 export const command = 'load-test'
 
 export const describe = 'deploy load-test'
 
-interface LoadTestArgv extends InitialArgv {
+export interface LoadTestArgv extends CeloEnvArgv {
   blockscoutMeasurePercent: number
   delay: number
   replicas: number
@@ -36,9 +35,7 @@ export const builder = (argv: yargs.Argv) => {
     })
 }
 
-export const handler = async (argv: LoadTestArgv) => {
-  await switchToClusterFromEnv()
-
+export function setArgvDefaults(argv: LoadTestArgv) {
   // Variables from the .env file are not set as environment variables
   // by the time the builder is run, so we set the default here
   if (argv.delay < 0) {
@@ -47,6 +44,11 @@ export const handler = async (argv: LoadTestArgv) => {
   if (argv.replicas < 0) {
     argv.replicas = parseInt(fetchEnv(envVar.LOAD_TEST_CLIENTS), 10)
   }
+}
+
+export const handler = async (argv: LoadTestArgv) => {
+  await switchToClusterFromEnv()
+  setArgvDefaults(argv)
 
   await installHelmChart(argv.celoEnv, argv.blockscoutMeasurePercent, argv.delay, argv.replicas)
 }
