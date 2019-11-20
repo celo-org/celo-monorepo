@@ -1,10 +1,8 @@
 /* tslint:disable no-console */
 import { newKit } from '@celo/contractkit'
 import { IdentityMetadataWrapper } from '@celo/contractkit/lib/identity'
-import {
-  createAttestationServiceURLClaim,
-  createNameClaim,
-} from '@celo/contractkit/lib/identity/claims/claim'
+import { createAttestationServiceURLClaim } from '@celo/contractkit/lib/identity/claims/attestation-service-url'
+import { createNameClaim } from '@celo/contractkit/lib/identity/claims/claim'
 import { concurrentMap } from '@celo/utils/lib/async'
 import { LocalSigner } from '@celo/utils/lib/signatureUtils'
 import { writeFileSync } from 'fs'
