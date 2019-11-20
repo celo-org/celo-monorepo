@@ -16,3 +16,5 @@ export enum ClaimTypes {
 }
 
 export const VERIFIABLE_CLAIM_TYPES = [ClaimTypes.KEYBASE, ClaimTypes.ACCOUNT]
+
+export const SINGULAR_CLAIM_TYPES = [ClaimTypes.NAME, ClaimTypes.ATTESTATION_SERVICE_URL]
