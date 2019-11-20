@@ -6,7 +6,7 @@ celo-blockchain has two initial coins: cGold and cDollar (stableToken).
 Both implement the ERC20 standard, and to interact with them is as simple as:
 
 ```ts
-const goldtoken = await kit.contract.getGoldToken()
+const goldtoken = await kit.contracts.getGoldToken()
 
 const balance = await goldtoken.balanceOf(someAddress)
 ```
@@ -26,7 +26,7 @@ const receipt = await tx.waitReceipt()
 To interact with cDollar, is the same but with a different contract:
 
 ```ts
-const stabletoken = await kit.contract.getStableToken()
+const stabletoken = await kit.contracts.getStableToken()
 ```
 
 ## Interacting with Other Contracts
