@@ -60,7 +60,6 @@
     "codeHeader3": "Tercer código",
     "codesMissing": "No recibí tres códigos",
     "tip": "¿Está escribiendo el código? ¿Por qué no lo copia y pega?",
-    "codeAccepted": "Aceptado",
     "sendingCodes": "Envío de códigos de verificación..."
   },
   "missingCodesModal": {

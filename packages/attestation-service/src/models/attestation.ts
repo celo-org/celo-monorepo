@@ -33,14 +33,6 @@ export default (sequelize: Sequelize) => {
   }) as AttestationStatic
 
   model.prototype.canSendSms = function() {
-    console.log(
-      this.status,
-      [
-        AttestationStatus.DISPATCHING,
-        AttestationStatus.FAILED,
-        AttestationStatus.UNABLE_TO_SERVE,
-      ].includes(this.status)
-    )
     return [
       AttestationStatus.DISPATCHING,
       AttestationStatus.FAILED,
