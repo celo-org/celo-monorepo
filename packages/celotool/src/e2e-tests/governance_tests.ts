@@ -694,7 +694,7 @@ describe('governance tests', () => {
         fromBlock: currentBlock - 10,
         toBlock: currentBlock,
       })
-      assert(lst.some((a: any) => a.transactionHash == a.blockHash))
+      assert(lst.some((a: any) => a.transactionHash === a.blockHash))
     })
   })
 
