@@ -22,13 +22,25 @@ __PWD=$PWD
 
 #### Internal functions
 remove_containers () {
-    echo -e "\tRemoving existing containers"
-    docker kill $(docker ps -a|grep celo-proxy|cut -d' ' -f 1) > /dev/null 2>&1
-    docker rm $(docker ps -a|grep celo-proxy|cut -d' ' -f 1)    
-    docker kill $(docker ps -a|grep celo-validator|cut -d' ' -f 1) > /dev/null 2>&1 
-    docker rm $(docker ps -a|grep celo-validator|cut -d' ' -f 1)
+    echo -e "\tRemoving previous celo-proxy and celo-validator containers"
+    #docker kill $(docker ps -a|grep celo-proxy|cut -d' ' -f 1) > /dev/null 2>&1
+    docker rm -f $(docker ps -a|grep celo-proxy|cut -d' ' -f 1) > /dev/null 2>&1
+    #docker kill $(docker ps -a|grep celo-validator|cut -d' ' -f 1) > /dev/null 2>&1 
+    docker rm -f $(docker ps -a|grep celo-validator|cut -d' ' -f 1) > /dev/null 2>&1
 }
 
+download_genesis () {
+    echo -e "\tDownload genesis.json and static-nodes.json to the container"
+    docker run -v $PWD/proxy:/root/.celo --entrypoint /bin/sh -it $CELO_IMAGE -c "wget https://www.googleapis.com/storage/v1/b/static_nodes/o/$NETWORK_NAME?alt=media -O /root/.celo/static-nodes.json"
+    docker run -v $PWD/proxy:/root/.celo --entrypoint /bin/sh -it $CELO_IMAGE -c "wget https://www.googleapis.com/storage/v1/b/genesis_blocks/o/$NETWORK_NAME?alt=media -O /root/.celo/genesis.json"
+    
+    docker run -v $PWD/validator:/root/.celo --entrypoint /bin/sh -it $CELO_IMAGE -c "wget https://www.googleapis.com/storage/v1/b/static_nodes/o/$NETWORK_NAME?alt=media -O /root/.celo/static-nodes.json"
+    docker run -v $PWD/validator:/root/.celo --entrypoint /bin/sh -it $CELO_IMAGE -c "wget https://www.googleapis.com/storage/v1/b/genesis_blocks/o/$NETWORK_NAME?alt=media -O /root/.celo/genesis.json"
+    
+    #docker run -v $PWD/proxy:/root/.celo --entrypoint cp $CELO_IMAGE /root/.celo/genesis.json /celo/
+    #docker run -v $PWD/validator:/root/.celo --entrypoint cp $CELO_IMAGE /root/.celo/genesis.json /celo/
+
+}
 
 #### Main 
 
@@ -98,19 +110,18 @@ if [[ $COMMAND == *"deploy"* ]]; then
     echo -e "* Deploying ..."
     cd $DATA_DIR
     
-    #curl https://www.googleapis.com/storage/v1/b/static_nodes/o/integration?alt=media > /tmp/static-nodes.json
-    
+    download_genesis
     echo -e "\tInitializing using genesis"
-    docker run -v $PWD/proxy:/root/.celo $CELO_IMAGE init /celo/genesis.json
-    docker run -v $PWD/validator:/root/.celo $CELO_IMAGE init /celo/genesis.json
+    docker run -v $PWD/proxy:/root/.celo $CELO_IMAGE init /root/.celo/genesis.json
+    docker run -v $PWD/validator:/root/.celo $CELO_IMAGE init /root/.celo/genesis.json
     
     echo -e "\tSetting up nodekey"
-    docker run -v $PWD/proxy:/root/.celo --entrypoint /bin/sh -it $CELO_IMAGE -c "geth account set-node-key $CELO_PROXY_ADDRESS"
-    docker run -v $PWD/validator:/root/.celo --entrypoint /bin/sh -it $CELO_IMAGE -c "geth account set-node-key $CELO_VALIDATOR_ADDRESS"
+    docker run -v $PWD/proxy:/root/.celo --entrypoint /bin/sh -it $CELO_IMAGE -c "printf '%s\n' $DEFAULT_PASSWORD | geth account set-node-key $CELO_PROXY_ADDRESS"
+    docker run -v $PWD/validator:/root/.celo --entrypoint /bin/sh -it $CELO_IMAGE -c "printf '%s\n' $DEFAULT_PASSWORD | geth account set-node-key $CELO_VALIDATOR_ADDRESS"
     
-    echo -e "\tPreparing for sync"
-    docker run -v $PWD/proxy:/root/.celo --entrypoint cp $CELO_IMAGE /celo/static-nodes.json /root/.celo/
-    docker run -v $PWD/validator:/root/.celo --entrypoint cp $CELO_IMAGE /celo/static-nodes.json /root/.celo/
+    #echo -e "\tPreparing for sync"
+    #docker run -v $PWD/proxy:/root/.celo --entrypoint cp $CELO_IMAGE /root/.celo/static-nodes.json /root/.celo/
+    #docker run -v $PWD/validator:/root/.celo --entrypoint cp $CELO_IMAGE /root/.celo/static-nodes.json /root/.celo/
 fi
 
 
