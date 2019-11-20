@@ -57,6 +57,7 @@ export async function validateAttestationServiceUrl(
 
     const attestationKeyAddress = await accounts.getAttestationSigner(address)
 
+    // Uncomment this once we opt in by specifying an attestation key
     // if (attestationKeyAddress === '0x0' || eqAddress(address, attestationKeyAddress)) {
     //   return `The account has not specified a separate attestation key`
     // }
