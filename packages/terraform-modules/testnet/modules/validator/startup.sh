@@ -105,7 +105,6 @@ docker run -v $DATA_DIR:$DATA_DIR --name geth --net=host --entrypoint /bin/sh -d
       --wsaddr 0.0.0.0 \
       --wsorigins=* \
       --wsapi=eth,net,web3 \
-      --nodekey=$DATA_DIR/pkey \
       --etherbase=$ACCOUNT_ADDRESS \
       --networkid=${network_id} \
       --syncmode=full \

@@ -141,7 +141,6 @@ spec:
             --wsaddr 0.0.0.0 \
             --wsorigins=* \
             --wsapi=eth,net,web3,debug \
-            --nodekey=/root/.celo/pkey \
             --etherbase=${ACCOUNT_ADDRESS} \
             --networkid=${NETWORK_ID} \
             --syncmode=full \
