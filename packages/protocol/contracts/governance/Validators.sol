@@ -263,9 +263,9 @@ contract Validators is
    * @param ecdsaPublicKey The ECDSA public key that the validator is using for consensus, should
    *   match the validator signer. 64 bytes.
    * @param blsPublicKey The BLS public key that the validator is using for consensus, should pass
-   *   proof of possession. 48 bytes.
+   *   proof of possession. 96 bytes.
    * @param blsPop The BLS public key proof-of-possession, which consists of a signature on the
-   *   account address. 96 bytes.
+   *   account address. 48 bytes.
    * @return True upon success.
    * @dev Fails if the account is already a validator or validator group.
    * @dev Fails if the account does not have sufficient Locked Gold.
@@ -481,7 +481,7 @@ contract Validators is
    * @param blsPublicKey The BLS public key that the validator is using for consensus, should pass
    *   proof of possession. 48 bytes.
    * @param blsPop The BLS public key proof-of-possession, which consists of a signature on the
-   *   account address. 96 bytes.
+   *   account address. 48 bytes.
    * @return True upon success.
    */
   function updateBlsPublicKey(bytes calldata blsPublicKey, bytes calldata blsPop)
@@ -501,9 +501,9 @@ contract Validators is
    * @param validator The validator whose BLS public key should be updated.
    * @param account The address under which the validator is registered.
    * @param blsPublicKey The BLS public key that the validator is using for consensus, should pass
-   *   proof of possession. 48 bytes.
+   *   proof of possession. 96 bytes.
    * @param blsPop The BLS public key proof-of-possession, which consists of a signature on the
-   *   account address. 96 bytes.
+   *   account address. 48 bytes.
    * @return True upon success.
    */
   function _updateBlsPublicKey(
@@ -512,8 +512,8 @@ contract Validators is
     bytes memory blsPublicKey,
     bytes memory blsPop
   ) private returns (bool) {
-    require(blsPublicKey.length == 48);
-    require(blsPop.length == 96);
+    require(blsPublicKey.length == 96);
+    require(blsPop.length == 48);
     require(checkProofOfPossession(account, blsPublicKey, blsPop));
     validator.publicKeys.bls = blsPublicKey;
     return true;
