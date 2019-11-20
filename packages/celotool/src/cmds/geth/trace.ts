@@ -1,7 +1,7 @@
 import { getBlockscoutUrl } from 'src/lib/endpoints'
 import { addCeloEnvMiddleware, CeloEnvArgv } from 'src/lib/env-utils'
 import { checkGethStarted, getWeb3AndTokensContracts, traceTransactions } from 'src/lib/geth'
-import * as yargs from 'yargs'
+import yargs from 'yargs'
 import { GethArgv } from '../geth'
 
 export const command = 'trace <address1> <address2>'
