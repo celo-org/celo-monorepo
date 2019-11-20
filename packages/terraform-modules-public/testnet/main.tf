@@ -13,18 +13,18 @@ locals {
 
 # Dummy variable for network dependency
 variable network_depends_on {
-  type = any
+  type    = any
   default = null
 }
 
 data "google_compute_network" "celo" {
-  name = var.network_name
+  name       = var.network_name
   depends_on = [var.network_depends_on]
 }
 
 data "google_compute_subnetwork" "celo" {
-  name   = var.network_name
-  region = var.gcloud_region
+  name       = var.network_name
+  region     = var.gcloud_region
   depends_on = [var.network_depends_on]
 }
 
@@ -193,5 +193,25 @@ module "validator" {
   proxy_enodes                = var.proxy_enodes
   proxy_ips                   = module.proxy.internal_ip_addresses
   bootnode_enode_address      = var.bootnode_enode_address
+}
+
+module "attestation-service" {
+  source = "./modules/attestation-service"
+  # Variables
+  celo_env                                    = var.celo_env
+  gcloud_region                               = var.gcloud_region
+  network_name                                = var.network_name
+  enable_attestation_service                  = var.enable_attestation_service
+  db_username                                 = var.attestation_service_db_username
+  db_password                                 = var.attestation_service_db_password
+  attestation_service_docker_image_repository = var.attestation_service_docker_image_repository
+  attestation_service_docker_image_tag        = var.attestation_service_docker_image_tag
+  attestation_key                             = var.attestation_service_attestation_key
+  account_address                             = var.attestation_service_account_address
+  celo_provider                               = var.attestation_service_celo_provider
+  sms_providers                               = var.attestation_service_sms_providers
+  nexmo_key                                   = var.attestation_service_nexmo_key
+  nexmo_secret                                = var.attestation_service_nexmo_secret
+  nexmo_blacklist                             = var.attestation_service_nexmo_blacklist
 }
 

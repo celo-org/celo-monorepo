@@ -1,4 +1,4 @@
-#! /bin/bash
+#!/bin/bash
 
 # ---- Set Up Logging ----
 

@@ -166,3 +166,77 @@ variable deploy_txnode_lb {
   description = ""
   default     = false
 }
+
+# Attestation service vars
+variable enable_attestation_service {
+  type        = bool
+  description = ""
+  default     = false
+}
+
+variable attestation_service_db_username {
+  type        = string
+  description = ""
+  default     = ""
+}
+
+variable attestation_service_db_password {
+  type        = string
+  description = ""
+  default     = ""
+}
+
+variable attestation_service_docker_image_repository {
+  type        = string
+  description = ""
+  default     = ""
+}
+
+variable attestation_service_docker_image_tag {
+  type        = string
+  description = ""
+  default     = ""
+}
+
+variable attestation_service_attestation_key {
+  type        = string
+  description = ""
+  default     = ""
+}
+
+variable attestation_service_account_address {
+  type        = string
+  description = ""
+  default     = ""
+}
+
+variable attestation_service_celo_provider {
+  type        = string
+  description = ""
+  default     = ""
+}
+
+variable attestation_service_sms_providers {
+  type        = string
+  description = ""
+  default     = ""
+}
+
+variable attestation_service_nexmo_key {
+  type        = string
+  description = ""
+  default     = ""
+}
+
+variable attestation_service_nexmo_secret {
+  type        = string
+  description = ""
+  default     = ""
+}
+
+variable attestation_service_nexmo_blacklist {
+  type        = string
+  description = ""
+  default     = ""
+}
+
