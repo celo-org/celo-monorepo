@@ -18,7 +18,7 @@ export const builder = (argv: yargs.Argv) => {
     .option('blockscout-measure-percent', {
       type: 'number',
       description:
-        'Percent of transactions to measure blockscout time. Must be in the range of [0, 100]',
+        'Percent of transactions to measure the time it takes for blockscout to process a transaction. Should be in the range of [0, 100]',
       default: 30,
     })
     .option('delay', {

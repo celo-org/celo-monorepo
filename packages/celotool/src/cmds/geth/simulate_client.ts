@@ -1,5 +1,6 @@
+import sleep from 'sleep-promise'
 import { AccountType, generateAddress } from 'src/lib/generate_utils'
-import { simulateClient, sleep } from 'src/lib/geth'
+import { simulateClient } from 'src/lib/geth'
 import * as yargs from 'yargs'
 
 export const command = 'simulate-client'
