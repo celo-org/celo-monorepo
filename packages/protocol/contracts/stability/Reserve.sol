@@ -30,6 +30,10 @@ contract Reserve is IReserve, Ownable, Initializable, UsingRegistry, ReentrancyG
   uint256 public constant TOBIN_TAX_DENOMINATOR = 1000;
   mapping(address => bool) public isSpender;
 
+  bytes32[] public assetAllocationSymbols;
+  uint256[] public assetAllocationWeights;
+  uint256 public totalAssetAllocationWeight;
+
   event TobinTaxStalenessThresholdSet(uint256 value);
   event TokenAdded(address token);
   event TokenRemoved(address token, uint256 index);
@@ -60,6 +64,25 @@ contract Reserve is IReserve, Ownable, Initializable, UsingRegistry, ReentrancyG
     require(value > 0, "value was zero");
     tobinTaxStalenessThreshold = value;
     emit TobinTaxStalenessThresholdSet(value);
+  }
+
+  /**
+   * @notice Sets target allocations for Celo Gold and a diversified basket of non-Celo crypto assets.
+   * @param symbols The symbol of each asset in the Reserve portfolio.
+   * @param weights The weight for the corresponding asset.
+   */
+  function setAssetAllocations(bytes32[] memory symbols, uint256[] memory weights)
+    public
+    onlyOwner
+  {
+    require(symbols.length == weights.length);
+    assetAllocationSymbols = symbols;
+    assetAllocationWeights = weights;
+    uint256 sum = 0;
+    for (uint256 i; i < weights.length; i++) {
+      sum = SafeMath.add(sum, weights[i]);
+    }
+    totalAssetAllocationWeight = sum;
   }
 
   /**
@@ -103,6 +126,10 @@ contract Reserve is IReserve, Ownable, Initializable, UsingRegistry, ReentrancyG
     emit TokenRemoved(token, index);
     return true;
   }
+
+  function addCustodialAddress() public onlyOwner {}
+
+  function removeCustodialAddress() public onlyOwner {}
 
   /**
    * @notice Gives an address permission to spend Reserve funds.
