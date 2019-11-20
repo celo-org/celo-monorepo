@@ -4,11 +4,11 @@ import { Tx } from 'web3/eth/types'
 export interface CeloTx extends Tx {
   feeCurrency?: string
   gatewayFeeRecipient?: string
-  gatewayFee?: string | number
+  gatewayFee?: string
 }
 
 export interface CeloPartialTxParams extends PartialTxParams {
   feeCurrency?: string
   gatewayFeeRecipient?: string
-  gatewayFee?: string | number
+  gatewayFee?: string
 }

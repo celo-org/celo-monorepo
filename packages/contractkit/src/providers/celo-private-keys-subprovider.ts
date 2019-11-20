@@ -27,13 +27,13 @@ export function generateAccountAddressFromPrivateKey(privateKey: string): string
   return new Web3().eth.accounts.privateKeyToAccount(privateKey).address
 }
 
-function isEmpty(value: string | number | undefined) {
+function isEmpty(value: string | undefined) {
   return (
     value === undefined ||
     value === null ||
-    value === 0 ||
-    (typeof value === 'string' &&
-      (value === '0' || value.toLowerCase() === '0x' || value.toLowerCase() === '0x0'))
+    value === '0' ||
+    value.toLowerCase() === '0x' ||
+    value.toLowerCase() === '0x0'
   )
 }
 

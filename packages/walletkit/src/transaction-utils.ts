@@ -20,6 +20,7 @@ export interface CeloTransaction extends Tx {
 
 export interface CeloPartialTxParams extends PartialTxParams {
   feeCurrency?: string
+  gatewayFeeRecipient?: string
   gatewayFee?: string
 }
 
@@ -116,7 +117,7 @@ export async function getRawTransaction(
   gasFees: BigNumber,
   gasPrice: BigNumber,
   gatewayFeeRecipient?: string,
-  gatewayFee?: string,
+  gatewayFee?: BigNumber,
   feeCurrency?: string,
   networkId?: number
 ): Promise<string> {
@@ -130,7 +131,7 @@ export async function getRawTransaction(
     gasPrice: gasPrice.toString(),
     feeCurrency,
     gatewayFeeRecipient,
-    gatewayFee,
+    gatewayFee: gatewayFee && gatewayFee.toString(),
   }
   Logger.debug('transaction-utils@getRawTransaction@Signing', 'transaction...')
   const signedTransaction = await web3.eth.signTransaction(transaction)

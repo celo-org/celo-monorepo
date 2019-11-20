@@ -64,7 +64,7 @@ export async function signTransaction(txn: CeloPartialTxParams, privateKey: stri
         'SigningUtils@signTransaction',
         `Invalid transaction: fee currency is \"${tx.feeCurrency}\"`
       )
-      throw new Error(`Invalid transaction: Gas currency is \"${tx.feeCurrency}\"`)
+      throw new Error(`Invalid transaction: Fee currency is \"${tx.feeCurrency}\"`)
     }
     if (isNot(tx.gatewayFeeRecipient)) {
       Logger.info(
@@ -192,7 +192,7 @@ export async function signTransaction(txn: CeloPartialTxParams, privateKey: stri
 export function recoverTransaction(rawTx: string): string {
   const values = RLP.decode(rawTx)
   Logger.debug('signing-utils@recoverTransaction', `Values are ${values}`)
-  const signature = Account.encodeSignature(values.slice(8, 12))
+  const signature = Account.encodeSignature(values.slice(9, 12))
   const recovery = Bytes.toNumber(values[9])
   // tslint:disable-next-line:no-bitwise
   const extraData = recovery < 35 ? [] : [Bytes.fromNumber((recovery - 35) >> 1), '0x', '0x']

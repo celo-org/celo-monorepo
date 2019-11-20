@@ -4,12 +4,12 @@ declare module 'web3/eth/types' {
   export interface Tx {
     feeCurrency?: string
     gatewayFeeRecipient?: string
-    gatewayFee?: string | number
+    gatewayFee?: string
   }
 
   export interface Transaction {
     feeCurrency?: string
     gatewayFeeRecipient?: string
-    gatewayFee?: string | number
+    gatewayFee?: string
   }
 }
