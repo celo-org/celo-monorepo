@@ -1,7 +1,10 @@
 import { ContractKit } from '@celo/contractkit'
 import { ClaimTypes, IdentityMetadataWrapper } from '@celo/contractkit/lib/identity'
-import { Claim, hashOfClaim, verifyClaim } from '@celo/contractkit/lib/identity/claims/claim'
-import { VERIFIABLE_CLAIM_TYPES } from '@celo/contractkit/lib/identity/claims/types'
+import { Claim, validateClaim, verifyClaim } from '@celo/contractkit/lib/identity/claims/claim'
+import {
+  VALIDATABLE_CLAIM_TYPES,
+  VERIFIABLE_CLAIM_TYPES,
+} from '@celo/contractkit/lib/identity/claims/types'
 import { concurrentMap } from '@celo/utils/lib/async'
 import { NativeSigner } from '@celo/utils/lib/signatureUtils'
 import { cli } from 'cli-ux'
@@ -80,10 +83,19 @@ export const claimFlags = {
 export const claimArgs = [Args.file('file', { description: 'Path of the metadata file' })]
 
 export const displayMetadata = async (metadata: IdentityMetadataWrapper, kit: ContractKit) => {
-  const accounts = await kit.contracts.getAccounts()
+  const metadataURLGetter = async (address: string) => {
+    const accounts = await kit.contracts.getAccounts()
+    return accounts.getMetadataURL(address)
+  }
+
   const data = await concurrentMap(5, metadata.claims, async (claim) => {
     const verifiable = VERIFIABLE_CLAIM_TYPES.includes(claim.type)
-    const status = await verifyClaim(claim, metadata.data.meta.address, accounts.getMetadataURL)
+    const validatable = VALIDATABLE_CLAIM_TYPES.includes(claim.type)
+    const status = verifiable
+      ? await verifyClaim(claim, metadata.data.meta.address, metadataURLGetter)
+      : validatable
+        ? await validateClaim(claim, metadata.data.meta.address, kit)
+        : 'N/A'
     let extra = ''
     switch (claim.type) {
       case ClaimTypes.ATTESTATION_SERVICE_URL:
@@ -105,10 +117,16 @@ export const displayMetadata = async (metadata: IdentityMetadataWrapper, kit: Co
     return {
       type: claim.type,
       extra,
-      verifiable: verifiable ? 'Yes' : 'No',
-      status: verifiable ? (status ? `Invalid: ${status}` : 'Valid!') : 'N/A',
+      status: verifiable
+        ? status
+          ? `Could not verify: ${status}`
+          : 'Verified!'
+        : validatable
+          ? status
+            ? `Invalid: ${status}`
+            : `Valid!`
+          : 'N/A',
       createdAt: moment.unix(claim.timestamp).fromNow(),
-      hash: hashOfClaim(claim),
     }
   })
 
@@ -117,10 +135,8 @@ export const displayMetadata = async (metadata: IdentityMetadataWrapper, kit: Co
     {
       type: { header: 'Type' },
       extra: { header: 'Value' },
-      verifiable: { header: 'Verifiable' },
       status: { header: 'Status' },
       createdAt: { header: 'Created At' },
-      hash: { header: 'Hash' },
     },
     {}
   )
