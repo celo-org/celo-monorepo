@@ -3,7 +3,7 @@ import { testWithGanache } from '@celo/dev-utils/lib/ganache-test'
 import { NativeSigner } from '@celo/utils/lib/signatureUtils'
 import { newKitFromWeb3 } from '../../kit'
 import { IdentityMetadataWrapper } from '../metadata'
-import { createAttestationServiceURLClaim } from './attestation-service-url'
+import { createAttestationServiceURLClaim } from './claim'
 
 testWithGanache('AttestationServiceURL claims', (web3) => {
   const kit = newKitFromWeb3(web3)
