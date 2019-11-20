@@ -84,6 +84,7 @@ export function* checkWeb3SyncProgress() {
       yield delay(100) // wait 100ms while web3 syncs
     } catch (error) {
       // Check if error caused by switch to zeroSyncMode
+      // as if it is in zeroSyncMode it should have returned above
       const switchedToZeroSyncMode = yield select(zeroSyncSelector)
       if (switchedToZeroSyncMode) {
         return true
@@ -108,7 +109,6 @@ export function* waitForWeb3Sync() {
       syncComplete: call(checkWeb3SyncProgress),
       timeout: delay(SYNC_TIMEOUT),
     })
-
     if (timeout || !syncComplete) {
       Logger.error(TAG, 'Could not complete sync')
       navigateToError('web3FailedToSync')
