@@ -8,7 +8,7 @@ metadata:
     release: {{ .Release.Service }}
     component: oracle
 spec:
-  schedule: {{ .Values.oracleSchedule }}
+  schedule: "{{ .Values.oracleSchedule }}"
   concurrencyPolicy: Forbid
   jobTemplate:
     spec:
@@ -35,6 +35,7 @@ spec:
             - "-c"
             - |
               celotooljs.sh generate bip32 --mnemonic "$MNEMONIC" --accountType price_oracle --index 0 > /root/.celo/pkey
+              celotooljs.sh generate account-address --private-key `cat /root/.celo/pkey` > /root/.celo/account
             volumeMounts:
             - name: data
               mountPath: /root/.celo
@@ -46,21 +47,20 @@ spec:
                   key: MNEMONIC
           containers:
           - name: report-price
-            image: gcr.io/celo-testnet/celocli-standalone:yerduaoracletest
+            image: {{ .Values.celocli.image.repository }}:{{ .Values.celocli.image.tag }}
             imagePullPolicy: IfNotPresent
             command: ["/bin/sh"]
             args:
             - "-c"
             - |
-              echo "running the celocli container"
-              echo 'current price:'
               PRICE=`cat /root/.celo/current_price`
+              echo 'current price:'
               echo $PRICE
               PK=`cat /root/.celo/pkey`
-              echo "key is:"
-              echo $PK
+              ACCOUNT=`cat /root/.celo/account`
               alias celocli='node_modules/@celo/celocli/bin/run'
-              celocli config:get
+              celocli config:set --node {{ .Values.celocli.nodeUrl }}
+              celocli oracle:report StableToken --numerator $PRICE --privateKey $PK --from $ACCOUNT
             volumeMounts:
             - name: data
               mountPath: /root/.celo
@@ -74,5 +74,3 @@ spec:
           volumes:
             - name: data
               emptyDir: {}
-
-          
