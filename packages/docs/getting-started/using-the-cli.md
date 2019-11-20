@@ -16,8 +16,13 @@ This section describes how to make a transaction using the Celo CLI. Doing so is
 
 Unlock your accounts so that you can send transactions:
 
-`$ celocli account:unlock --account $YOUR_ADDRESS --password <YOUR_PASSWORD>`
+```bash
+# You will be promted for your password.
+celocli account:unlock --account $YOUR_ADDRESS
+```
 
 Send a payment to another account:
 
-`$ celocli account:transferdollar --from $YOUR_ADDRESS --amountInWei $AMOUNT --to $DESTINATION_ADDRESS`
+```bash
+celocli account:transferdollar --from $YOUR_ADDRESS --amountInWei $AMOUNT --to $DESTINATION_ADDRESS
+```
