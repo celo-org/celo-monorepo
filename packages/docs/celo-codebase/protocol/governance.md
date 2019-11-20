@@ -36,3 +36,9 @@ Once the Approval phase is over, approved proposals graduate to the referendum p
 ### **Execution**
 
 Proposals that graduate from the Referendum phase to the execution phase may be executed by anyone, triggering a “call” operation code with the arguments defined in the proposal, originating from the Governance smart contract. Proposals expire from this phase after two days.
+
+## Infrastructure Fund
+
+Governance directly controls an account known as the Infrastructure Fund which can be dispatched as part of governance requests to pay for actions that benefit the network. Examples of this might include payments to developers to create new features, or to provide funding to a DAO which will benefit the Celo user base.
+
+Infrastructure Fund holdings come from [transactions fees](./transactions/gas-pricing.md) and a portion of epoch rewards.
