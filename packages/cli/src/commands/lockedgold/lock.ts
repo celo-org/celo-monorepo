@@ -40,7 +40,10 @@ export default class Lock extends BaseCommand {
       .runChecks()
 
     const txos = await lockedGold.relock(address, relockValue)
-    txos.forEach(async (txo) => await displaySendTx('relock', txo, { from: address }))
+    txos.forEach(async (txo) => {
+      await displaySendTx('relock', txo, { from: address })
+      return
+    })
     const tx = lockedGold.lock()
     await displaySendTx('lock', tx, { value: lockValue.toString() })
   }
