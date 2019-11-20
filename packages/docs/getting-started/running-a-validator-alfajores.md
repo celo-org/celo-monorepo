@@ -49,6 +49,10 @@ docker run -v $PWD:/root/.celo --entrypoint /bin/sh -it $CELO_IMAGE:$CELO_NETWOR
 
 It will prompt you for a passphrase, ask you to confirm it, and then will output your account address: `Address: {<YOUR-ACCOUNT-ADDRESS>}`
 
+{% hint style="danger" %}
+**Warning**: There is a known issue running geth inside Docker that happens eventually. So if that command fails, please check [this page](https://forum.celo.org/t/setting-up-a-validator-faq/90).
+{% endhint %}
+
 Let's save these addresses to environment variables, so that you can reference it later (don't include the braces):
 
 ```bash
@@ -70,7 +74,7 @@ export CELO_VALIDATOR_POP=<YOUR-VALIDATOR-PROOF-OF-POSSESSION>
 
 ### Deploy the validator node
 
-Initialize the docker container, building from an image for the network and initializing Celo with the genesis block:
+Initialize the docker container, building from an image for the network and initializing Celo with the genesis block found inside the Docker image:
 
 ```bash
 docker run -v $PWD:/root/.celo $CELO_IMAGE:$CELO_NETWORK init /celo/genesis.json
@@ -91,7 +95,7 @@ docker run -v $PWD:/root/.celo --entrypoint cp $CELO_IMAGE:$CELO_NETWORK /celo/s
 Start up the node:
 
 ```bash
-docker run -p 127.0.0.1:8545:8545 -p 127.0.0.1:8546:8546 -p 30303:30303 -p 30303:30303/udp -v $PWD:/root/.celo $CELO_IMAGE:$CELO_NETWORK --verbosity 3 --networkid 44785 --syncmode full --rpc --rpcaddr 0.0.0.0 --rpcapi eth,net,web3,debug,admin,personal --maxpeers 1100 --mine --miner.verificationpool=$URL_VERIFICATION_POOL --etherbase $CELO_VALIDATOR_ADDRESS
+docker run --name celo-validator --restart=Always -p 127.0.0.1:8545:8545 -p 127.0.0.1:8546:8546 -p 30303:30303 -p 30303:30303/udp -v $PWD:/root/.celo $CELO_IMAGE:$CELO_NETWORK --verbosity 3 --networkid 44785 --syncmode full --rpc --rpcaddr 0.0.0.0 --rpcapi eth,net,web3,debug,admin,personal --maxpeers 1100 --mine --miner.verificationpool=$URL_VERIFICATION_POOL --etherbase $CELO_VALIDATOR_ADDRESS
 ```
 
 {% hint style="danger" %}

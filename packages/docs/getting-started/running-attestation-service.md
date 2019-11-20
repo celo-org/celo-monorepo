@@ -8,20 +8,20 @@
   - [Accounts Configuration](#accounts-configuration) \* [Database Configuration](#database-configuration)
   - [Executing the attestation service](#executing-the-attestation-service)
 
-As part of the [lightweight identity protocol](/celo-codebase/protocol/identity), validators are expected to run an attestation service to provide attestations that allow users to map their phone number to an account on Celo. The attestation service is a simple Node.js application that can be run with a docker image.
+As part of the [lightweight identity protocol](/celo-codebase/protocol/identity), validators are expected to run an attestation service to provide attestations that allow users to map their phone number to an account on Celo. The attestation service is a simple Node.js application that can be run with a Docker image.
 
 ## Environment variables
 
 The service needs the following environment variables:
 
-| Variable        | Explanation                                                                                                                                                            | Default Value |
-| --------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------- |
-| DATABASE_URL    | The URL under which your database is accessible, currently supported are `postgres://`, `mysql://` and `sqlite://`                                                     |               |
-| CELO_PROVIDER   | The URL under which a celo blockchain node is reachable, i.e. something like `https://integration-forno.celo-testnet.org`                                              |               |
-| ACCOUNT_ADDRESS | The address of the validator account                                                                                                                                   |               |
-| ATTESTATION_KEY | The private key with which attestations should be signed. You could use your account key for attestations, but really you should authorize a dedicated attestation key |               |
-| APP_SIGNATURE   | The hash with which clients can auto-read SMS messages on android                                                                                                      |               |
-| SMS_PROVIDERS   | A comma-separated list of providers you want to configure, we currently support `nexmo` & `twilio`                                                                     |               |
+| Variable        | Explanation                                                                                                                                                            |
+| --------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| DATABASE_URL    | The URL under which your database is accessible, currently supported are `postgres://`, `mysql://` and `sqlite://`                                                     |  |
+| CELO_PROVIDER   | The URL under which a celo blockchain node is reachable, i.e. something like `https://integration-forno.celo-testnet.org`                                              |  |
+| ACCOUNT_ADDRESS | The address of the validator account                                                                                                                                   |  |
+| ATTESTATION_KEY | The private key with which attestations should be signed. You could use your account key for attestations, but really you should authorize a dedicated attestation key |  |
+| APP_SIGNATURE   | The hash with which clients can auto-read SMS messages on android                                                                                                      |  |
+| SMS_PROVIDERS   | A comma-separated list of providers you want to configure, we currently support `nexmo` & `twilio`                                                                     |  |
 
 ## Sms Providers
 
@@ -31,8 +31,8 @@ Currently the Sms providers supported are Nexmo & Twilio. You can create your us
 
 Here is the list of the enviromnet variables needed to use the Nexmo SMS broker:
 
-| Variable        | Explanation                                                     | Default Value |
-| --------------- | --------------------------------------------------------------- | ------------- |
+| Variable        | Explanation                                                     |
+| --------------- | --------------------------------------------------------------- |
 | NEXMO_KEY       | The API key to the Nexmo API                                    |
 | NEXMO_SECRET    | The API secret to the Nexmo API                                 |
 | NEXMO_BLACKLIST | A comma-sperated list of country codes you do not want to serve |
@@ -41,8 +41,8 @@ Here is the list of the enviromnet variables needed to use the Nexmo SMS broker:
 
 If you prefer using Twilio, this is list of the variables to use:
 
-| Variable                     | Explanation                                                     | Default Value |
-| ---------------------------- | --------------------------------------------------------------- | ------------- |
+| Variable                     | Explanation                                                     |
+| ---------------------------- | --------------------------------------------------------------- |
 | TWILIO_ACCOUNT_SID           | The Twilio account ID                                           |
 | TWILIO_MESSAGING_SERVICE_SID | The Twilio Message Service ID. Starts by `MG`                   |
 | TWILIO_AUTH_TOKEN            | The API authentication token                                    |
@@ -103,7 +103,7 @@ In order for users to request attestations from your service, you need to regist
 celocli identity:create-metadata ./metadata.json
 ```
 
-Add your URL:
+The `ATTESTATION_SERVICE_URL` variable stores the URL to access the attestation service deployed. In the following command we specify the URL where this attestation service is:
 
 ```bash
 celocli identity:change-attestation-service-url ./metadata.json --url $ATTESTATION_SERVICE_URL
@@ -114,6 +114,8 @@ And then host your metadata somewhere reachable via HTTP. You can register your 
 ```bash
 celocli identity:register-metadata --url <METADATA_URL> --from $CELO_VALIDATOR_ADDRESS
 ```
+
+You can use for testing a gist url (i.e: `https://gist.github.com/john.doe/a29f83d478c9daa2ac52596ba9778391`) or similar where you have publicly available your metadata.
 
 If everything goes well users should see that you are ready for attestations by running:
 

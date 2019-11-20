@@ -19,6 +19,8 @@ Just as anyone in a democracy can create their own political party, or seek to g
 
 While other Validator Groups will exist on the Celo Networks, the fastest way to get up and running with a validator will be to register a Validator Group, register a Validator, and add that Validator to your Validator Group. The addresses used to register Validator Groups and Validators must be unique, which will require that you create two accounts in the step-by-step guide below.
 
+You can find more details about Celo mission and why becoming a validator [at the following page](https://medium.com/celohq/calling-all-chefs-become-a-celo-validator-c75d1c2909aa).
+
 {% hint style="info" %}
 If you are starting up a validator, please consider leaving it running for a few weeks to support the network.
 {% endhint %}
