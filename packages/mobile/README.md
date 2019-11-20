@@ -89,13 +89,9 @@ components in react or overloading the should component update method
 ### Connecting to networks
 
 By default, we have the `alfajores` network set up. If you have other testnets
-that you want to use with the app, update `.env.ENV-NAME` and `packages/mobile/.env.ENV-NAME` with the new network name and settings, then run
-
-```bash
-yarn run build-sdk TESTNET
-```
-
-before rebuilding the app. Note that this will assume the testnets have a corresponding `/blockchain-api` and `/notification-service` set up.
+that you want to use with the app, update `.env.ENV-NAME` and `packages/mobile/.env.ENV-NAME` with
+the new network name and settings, then rebuild the app. Note that this will assume the testnets
+have a corresponding `/blockchain-api` and `/notification-service` set up.
 
 ### Running Wallet app in ZeroSync mode
 
