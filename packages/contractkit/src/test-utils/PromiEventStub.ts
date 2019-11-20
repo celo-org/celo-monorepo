@@ -12,6 +12,9 @@ interface PromiEventStub<T> extends PromiEvent<T> {
 export function promiEventSpy<T>(): PromiEventStub<T> {
   const ee = new EventEmitter()
   const pe: PromiEventStub<T> = {
+    finally: () => {
+      throw new Error('not implemented')
+    },
     catch: () => {
       throw new Error('not implemented')
     },

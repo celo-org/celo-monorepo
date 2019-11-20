@@ -62,7 +62,7 @@ describe('kit.sendTransactionObject()', () => {
   test('should use inflation factor on gas', async () => {
     const txo = txoStub()
     txo.estimateGasMock.mockResolvedValue(1000)
-    kit.gasInflactionFactor = 2
+    kit.gasInflationFactor = 2
     await kit.sendTransactionObject(txo)
     expect(txo.send).toBeCalledWith(
       expect.objectContaining({

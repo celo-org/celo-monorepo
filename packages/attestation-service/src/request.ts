@@ -1,15 +1,37 @@
-import { isE164NumberStrict } from '@celo/utils/lib/phoneNumbers'
-import { isValidAddress } from '@celo/utils/lib/signatureUtils'
+import Logger from 'bunyan'
 import express from 'express'
-import { either, isLeft } from 'fp-ts/lib/Either'
+import { isLeft } from 'fp-ts/lib/Either'
 import * as t from 'io-ts'
+import { rootLogger } from './logger'
+
+export enum ErrorMessages {
+  UNKNOWN_ERROR = 'Something went wrong',
+}
+
+export function asyncHandler<T>(handler: (req: express.Request, res: Response) => Promise<T>) {
+  return (req: express.Request, res: Response) => {
+    const handleUnknownError = (error: Error) => {
+      if (res.locals.logger) {
+        res.locals.logger.error(error)
+      }
+      respondWithError(res, 500, ErrorMessages.UNKNOWN_ERROR)
+    }
+    try {
+      handler(req, res)
+        .then(() => res.locals.logger.info({ res }))
+        .catch(handleUnknownError)
+    } catch (error) {
+      handleUnknownError(error)
+    }
+  }
+}
 
 export function createValidatedHandler<T>(
   requestType: t.Type<T>,
-  handler: (req: express.Request, res: express.Response, parsedRequest: T) => Promise<void>
+  handler: (req: express.Request, res: Response, parsedRequest: T) => Promise<void>
 ) {
-  return async (req: express.Request, res: express.Response) => {
-    const parsedRequest = requestType.decode(req.body)
+  return asyncHandler(async (req: express.Request, res: Response) => {
+    const parsedRequest = requestType.decode({ ...req.query, ...req.body })
     if (isLeft(parsedRequest)) {
       res.status(422).json({
         success: false,
@@ -17,46 +39,10 @@ export function createValidatedHandler<T>(
         errors: serializeErrors(parsedRequest.left),
       })
     } else {
-      try {
-        await handler(req, res, parsedRequest.right)
-      } catch (error) {
-        console.error(error)
-        res.status(500).json({ success: false, error: 'Something went wrong' })
-      }
+      return handler(req, res, parsedRequest.right)
     }
-  }
+  })
 }
-
-export const E164PhoneNumberType = new t.Type<string, string, unknown>(
-  'E164Number',
-  t.string.is,
-  (input, context) =>
-    either.chain(
-      t.string.validate(input, context),
-      (stringValue) =>
-        isE164NumberStrict(stringValue)
-          ? t.success(stringValue)
-          : t.failure(stringValue, context, 'is not a valid e164 number')
-    ),
-  String
-)
-
-export const AddressType = new t.Type<string, string, unknown>(
-  'Address',
-  t.string.is,
-  (input, context) =>
-    either.chain(
-      t.string.validate(input, context),
-      (stringValue) =>
-        isValidAddress(stringValue)
-          ? t.success(stringValue)
-          : t.failure(stringValue, context, 'is not a valid address')
-    ),
-  String
-)
-
-export type Address = t.TypeOf<typeof AddressType>
-export type E164Number = t.TypeOf<typeof E164PhoneNumberType>
 
 function serializeErrors(errors: t.Errors) {
   let serializedErrors: any = {}
@@ -80,4 +66,27 @@ function serializeErrors(errors: t.Errors) {
     serializedErrors = { ...serializedErrors, ...payload }
   })
   return serializedErrors
+}
+
+export function respondWithError(res: express.Response, statusCode: number, error: string) {
+  res.status(statusCode).json({ success: false, error })
+}
+
+export type Response = Omit<express.Response, 'locals'> & {
+  locals: { logger: Logger } & Omit<any, 'logger'>
+}
+
+export function loggerMiddleware(
+  req: express.Request,
+  res: express.Response,
+  next: express.NextFunction
+) {
+  const requestLogger = rootLogger.child({
+    // @ts-ignore express-request-id adds this
+    req_id: req.id,
+  })
+
+  res.locals.logger = requestLogger
+  requestLogger.info({ req })
+  next()
 }

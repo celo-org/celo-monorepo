@@ -9,7 +9,7 @@ import { concurrentMap } from '@celo/utils/lib/async'
 import { base64ToHex } from '@celo/utils/lib/attestations'
 import prompts from 'prompts'
 import { switchToClusterFromEnv } from 'src/lib/cluster'
-import * as yargs from 'yargs'
+import yargs from 'yargs'
 
 export const command = 'verify'
 export const describe = 'command for requesting attestations for a phone number'

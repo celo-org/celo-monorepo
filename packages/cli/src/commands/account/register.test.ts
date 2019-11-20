@@ -1,5 +1,5 @@
+import { testWithGanache } from '@celo/dev-utils/lib/ganache-test'
 import Web3 from 'web3'
-import { testWithGanache } from '../../test-utils/ganache-test'
 import Register from './register'
 
 process.env.NO_SYNCCHECK = 'true'
