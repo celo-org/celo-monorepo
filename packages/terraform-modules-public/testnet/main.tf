@@ -5,11 +5,11 @@ provider "google" {
 }
 
 locals {
-  firewall_target_tags_txnode    = ["${var.celo_env}-txnode"]
-  firewall_target_tags_validator = ["${var.celo_env}-validator"]
-  firewall_target_tags_proxy     = ["${var.celo_env}-proxy"]
-  firewall_target_tags_attestation_service     = ["${var.celo_env}-attestation-service"]
-  deploy_txnode_lb               = var.tx_node_count > 0 ? var.deploy_txnode_lb : false
+  firewall_target_tags_txnode              = ["${var.celo_env}-txnode"]
+  firewall_target_tags_validator           = ["${var.celo_env}-validator"]
+  firewall_target_tags_proxy               = ["${var.celo_env}-proxy"]
+  firewall_target_tags_attestation_service = ["${var.celo_env}-attestation-service"]
+  deploy_txnode_lb                         = var.tx_node_count > 0 ? var.deploy_txnode_lb : false
 }
 
 # Dummy variable for network dependency
@@ -211,9 +211,13 @@ module "attestation-service" {
   attestation_service_docker_image_tag        = var.attestation_service_docker_image_tag
   attestation_key                             = var.attestation_service_attestation_key
   account_address                             = var.attestation_service_account_address
-  celo_provider                               = var.attestation_service_celo_provider
+  celo_provider                               = var.attestation_service_celo_provider != "" ? var.attestation_service_celo_provider : "http://${module.proxy.internal_ip_addresses[0]}:8545"
   sms_providers                               = var.attestation_service_sms_providers
   nexmo_key                                   = var.attestation_service_nexmo_key
   nexmo_secret                                = var.attestation_service_nexmo_secret
   nexmo_blacklist                             = var.attestation_service_nexmo_blacklist
+  twilio_account_sid                          = var.attestation_service_twilio_account_sid
+  twilio_messaging_service_sid                = var.attestation_service_twilio_messaging_service_sid
+  twilio_auth_token                           = var.attestation_service_twilio_auth_token
+  twilio_blacklist                            = var.attestation_service_twilio_blacklist
 }

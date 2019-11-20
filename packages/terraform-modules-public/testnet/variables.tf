@@ -245,3 +245,26 @@ variable attestation_service_nexmo_blacklist {
   default     = ""
 }
 
+variable attestation_service_twilio_account_sid {
+  type        = string
+  description = ""
+  default     = ""
+}
+
+variable attestation_service_twilio_messaging_service_sid {
+  type        = string
+  description = ""
+  default     = ""
+}
+
+variable attestation_service_twilio_auth_token {
+  type        = string
+  description = ""
+  default     = ""
+}
+
+variable attestation_service_twilio_blacklist {
+  type        = string
+  description = ""
+  default     = ""
+}

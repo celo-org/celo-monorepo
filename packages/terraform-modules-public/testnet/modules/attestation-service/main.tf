@@ -61,6 +61,10 @@ resource "google_compute_instance" "attestation_service" {
       nexmo_key : var.nexmo_key,
       nexmo_secret : var.nexmo_secret,
       nexmo_blacklist : var.nexmo_blacklist,
+      twilio_account_sid : var.twilio_account_sid,
+      twilio_messaging_service_sid : var.twilio_messaging_service_sid,
+      twilio_auth_token : var.twilio_auth_token,
+      twilio_blacklist : var.twilio_blacklist,
     }
   )
 }

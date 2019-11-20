@@ -87,13 +87,25 @@ module "celo_cluster" {
   geth_verbosity                        = var.geth_verbosity
   geth_exporter_docker_image_repository = var.geth_exporter_docker_image_repository
   geth_exporter_docker_image_tag        = var.geth_exporter_docker_image_tag
-  bootnode_enode_address = var.bootnode["enode"]
-  bootnode_ip_address    = var.bootnode["ip"]
+  bootnode_enode_address                = var.bootnode["enode"]
+  bootnode_ip_address                   = var.bootnode["ip"]
 
-  deploy_attestation_service = var.deploy_attestation_service
-  attestation_service_db_username = var.attestation_service_db["username"]
-  attestation_service_db_password = var.attestation_service_db["password"]
+  deploy_attestation_service                       = var.deploy_attestation_service
+  attestation_service_db_username                  = var.attestation_service_db["username"]
+  attestation_service_db_password                  = var.attestation_service_db["password"]
+  attestation_service_docker_image_repository      = var.attestation_service_docker_image["repository"]
+  attestation_service_docker_image_tag             = var.attestation_service_docker_image["tag"]
+  attestation_service_account_address              = var.attestation_service_attestation_key["address"]
+  attestation_service_attestation_key              = var.attestation_service_attestation_key["private_key"]
+  attestation_service_sms_providers                = var.attestation_service_credentials["sms_providers"]
+  attestation_service_nexmo_key                    = var.attestation_service_credentials["nexmo_key"]
+  attestation_service_nexmo_secret                 = var.attestation_service_credentials["nexmo_secret"]
+  attestation_service_nexmo_blacklist              = var.attestation_service_credentials["nexmo_blacklist"]
+  attestation_service_twilio_account_sid           = var.attestation_service_credentials["twilio_account_sid"]
+  attestation_service_twilio_messaging_service_sid = var.attestation_service_credentials["twilio_messaging_service_sid"]
+  attestation_service_twilio_auth_token            = var.attestation_service_credentials["twilio_auth_token"]
+  attestation_service_twilio_blacklist             = var.attestation_service_credentials["twilio_blacklist"]
 
-  static_nodes_base64 = var.static_nodes
+  static_nodes_base64    = var.static_nodes
   genesis_content_base64 = var.genesis
 }

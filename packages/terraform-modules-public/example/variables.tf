@@ -50,7 +50,7 @@ variable deploy_attestation_service {
 
 variable attestation_service_db {
   description = "Configuration for the Postgres Cloud SQL DB"
-  type = map(string)
+  type        = map(string)
 
   default = {
     username = "celo"
@@ -134,6 +134,61 @@ variable txnode_accounts {
       "secret2",
       "secret3",
     ]
+  }
+}
+
+# Attestation variables
+variable deploy_attestation_service {
+  description = "Deploy the Load Balancer for Transmission nodes (if txnode > 0)"
+  type        = bool
+
+  default = true
+}
+
+variable attestation_service_db {
+  description = "Configuration for the Postgres Cloud SQL DB"
+  type = map(string)
+
+  default = {
+    username = "celo"
+    password = "mysecret"
+  }
+}
+
+variable attestation_service_docker_image {
+  description = "The attestation_service docker image"
+  type = map(string)
+
+  default = {
+    repository = "us.gcr.io/celo-testnet/celo-monorepo"
+    tag = "attestation-service-8deb4b1645a6e07f8abfd63281afce778d79e67e"
+  }
+}
+
+variable attestation_service_attestation_key {
+  description = "Etherbase address and private key to sign the attestations"
+  type = map(string)
+  
+  default = {
+    address = "0x7a17Cf58E90D470d39ed9E8A81c55711909d8177"
+    private_key = "97ff01684627ebb0b23d39f56733b3ad732f18254403b8ba9e23b7e663e95a56"
+  }
+}
+
+# SMS provider configuration
+variable attestation_service_credentials {
+  description = "Provider with the credentials for the SMS provider. Provider must be nexmo or twilio"
+  type = map(string)
+
+  default = {
+    sms_providers = "nexmo"
+    nexmo_key = "a..."
+    nexmo_secret = "o..."
+    nexmo_blacklist = ""
+    twilio_account_sid = ""
+    twilio_messaging_service_sid = ""
+    twilio_auth_token = ""
+    twilio_blacklist = ""
   }
 }
 
