@@ -1,4 +1,5 @@
 import KeyboardAwareScrollView from '@celo/react-components/components/KeyboardAwareScrollView'
+import KeyboardSpacer from '@celo/react-components/components/KeyboardSpacer'
 import Link from '@celo/react-components/components/Link'
 import TextButton from '@celo/react-components/components/TextButton'
 import colors from '@celo/react-components/styles/colors'
@@ -8,7 +9,7 @@ import dotProp from 'dot-prop-immutable'
 import { padStart } from 'lodash'
 import * as React from 'react'
 import { withNamespaces, WithNamespaces } from 'react-i18next'
-import { EmitterSubscription, Keyboard, StyleSheet, Text, View } from 'react-native'
+import { EmitterSubscription, StyleSheet, Text, View } from 'react-native'
 import Modal from 'react-native-modal'
 import SafeAreaView from 'react-native-safe-area-view'
 import { connect } from 'react-redux'
@@ -91,15 +92,13 @@ class VerificationInputScreen extends React.Component<Props, State> {
   }
 
   componentDidMount() {
-    this.interval = setInterval(() => {
+    this.interval = window.setInterval(() => {
       const timer = this.state.timer
       if (timer === 1) {
         clearInterval(this.interval)
       }
       this.setState({ timer: timer - 1 })
     }, 1000)
-    this.keyboardDidShowListener = Keyboard.addListener('keyboardDidShow', this.onKeyboardShow)
-    this.keyboardDidHideListener = Keyboard.addListener('keyboardDidHide', this.onKeyboardHide)
   }
 
   componentDidUpdate() {
@@ -113,8 +112,6 @@ class VerificationInputScreen extends React.Component<Props, State> {
 
   componentWillUnmount() {
     clearInterval(this.interval)
-    this.keyboardDidShowListener!.remove()
-    this.keyboardDidHideListener!.remove()
   }
 
   isVerificationComplete = () => {
@@ -155,12 +152,8 @@ class VerificationInputScreen extends React.Component<Props, State> {
     }
   }
 
-  onKeyboardShow = () => {
-    this.setState({ isTipVisible: true })
-  }
-
-  onKeyboardHide = () => {
-    this.setState({ isTipVisible: false })
+  onKeyboardToggle = (visible: boolean) => {
+    this.setState({ isTipVisible: visible })
   }
 
   onPressCodesNotReceived = () => {
@@ -185,7 +178,6 @@ class VerificationInputScreen extends React.Component<Props, State> {
       timer,
     } = this.state
     const { t, attestationCodes, numCompleteAttestations } = this.props
-    const numCodesAccepted = attestationCodes.length
 
     return (
       <SafeAreaView style={styles.container}>
@@ -213,19 +205,15 @@ class VerificationInputScreen extends React.Component<Props, State> {
             {t('input.body2')}
           </Text>
           {[0, 1, 2].map((i) => (
-            <View key={'verificationCode' + i}>
-              <Text style={styles.codeHeader} key={'verificationCodeHeader' + i}>
-                {t('input.codeHeader' + (i + 1))}
-              </Text>
+            <View key={'verificationCodeRow' + i}>
+              <Text style={styles.codeHeader}>{t('input.codeHeader' + (i + 1))}</Text>
               <VerificationCodeRow
-                key={'verificationCodeRow' + i}
                 index={i}
-                attestationCodes={attestationCodes}
-                isInputEnabled={numCodesAccepted >= i}
                 inputValue={codeInputValues[i]}
                 isCodeSubmitting={codeSubmittingStatuses[i]}
-                isCodeAccepted={numCompleteAttestations > i}
                 onInputChange={this.onChangeInputCode(i)}
+                attestationCodes={attestationCodes}
+                numCompleteAttestations={numCompleteAttestations}
               />
             </View>
           ))}
@@ -261,6 +249,7 @@ class VerificationInputScreen extends React.Component<Props, State> {
             </View>
           </View>
         </Modal>
+        <KeyboardSpacer onToggle={this.onKeyboardToggle} />
       </SafeAreaView>
     )
   }

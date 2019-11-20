@@ -42,8 +42,12 @@ export function execCmd(
     )
 
     if (pipeOutput) {
-      execProcess.stdout.pipe(process.stdout)
-      execProcess.stderr.pipe(process.stderr)
+      if (execProcess.stdout) {
+        execProcess.stdout.pipe(process.stdout)
+      }
+      if (execProcess.stderr) {
+        execProcess.stderr.pipe(process.stderr)
+      }
     }
   })
 }
@@ -90,14 +94,6 @@ export async function outputIncludes(cmd: string, matchString: string, matchMess
     return true
   }
   return false
-}
-
-export function getVerificationPoolSMSURL(celoEnv: string) {
-  return `https://us-central1-celo-testnet.cloudfunctions.net/handleVerificationRequest${celoEnv}/v0.1/sms/`
-}
-
-export function getVerificationPoolRewardsURL(celoEnv: string) {
-  return `https://us-central1-celo-testnet.cloudfunctions.net/handleVerificationRequest${celoEnv}/v0.1/rewards/`
 }
 
 export async function retrieveTxNodeIpAddress(celoEnv: string, txNodeIndex: number) {
