@@ -1,4 +1,4 @@
-import { createAttestationServiceURLClaim } from '@celo/contractkit/lib/identity/claims/claim'
+import { createAttestationServiceURLClaim } from '@celo/contractkit/lib/identity/claims/attestation-service-url'
 import { Flags } from '../../utils/command'
 import { ClaimCommand } from '../../utils/identity'
 export default class ClaimAttestationServiceUrl extends ClaimCommand {

@@ -1,15 +1,14 @@
-import { UrlType } from '@celo/utils/lib/io'
 import { hashMessage } from '@celo/utils/lib/signatureUtils'
 import * as t from 'io-ts'
+import { ContractKit } from '../../kit'
 import { AccountClaim, AccountClaimType, MetadataURLGetter, verifyAccountClaim } from './account'
+import {
+  AttestationServiceURLClaim,
+  AttestationServiceURLClaimType,
+  validateAttestationServiceUrl,
+} from './attestation-service-url'
 import { KeybaseClaim, KeybaseClaimType, verifyKeybaseClaim } from './keybase'
 import { ClaimTypes, now, SignatureType, TimestampType } from './types'
-
-const AttestationServiceURLClaimType = t.type({
-  type: t.literal(ClaimTypes.ATTESTATION_SERVICE_URL),
-  timestamp: TimestampType,
-  url: UrlType,
-})
 
 const DomainClaimType = t.type({
   type: t.literal(ClaimTypes.DOMAIN),
@@ -36,7 +35,6 @@ export const SignedClaimType = t.type({
   signature: SignatureType,
 })
 
-export type AttestationServiceURLClaim = t.TypeOf<typeof AttestationServiceURLClaimType>
 export type DomainClaim = t.TypeOf<typeof DomainClaimType>
 export type NameClaim = t.TypeOf<typeof NameClaimType>
 export type Claim =
@@ -60,7 +58,7 @@ export const isOfType = <K extends ClaimTypes>(type: K) => (data: Claim): data i
   data.type === type
 
 /**
- * Verifies a claim made by an account
+ * Verifies a claim made by an account, i.e. whether a claim can be verified to be correct
  * @param claim The claim to verify
  * @param address The address that is making the claim
  * @param metadataURLGetter A function that can retrieve the metadata URL for a given account address,
@@ -83,6 +81,22 @@ export async function verifyClaim(
   return
 }
 
+/**
+ * Validates a claim made by an account, i.e. whether the claim is usable
+ * @param claim The claim to validate
+ * @param address The address that is making the claim
+ * @returns If valid, returns undefined. If invalid or unable to validate, returns a string with the error
+ */
+export async function validateClaim(claim: Claim, address: string, kit: ContractKit) {
+  switch (claim.type) {
+    case ClaimTypes.ATTESTATION_SERVICE_URL:
+      return validateAttestationServiceUrl(claim, address, kit)
+    default:
+      break
+  }
+  return
+}
+
 export function hashOfClaim(claim: Claim) {
   return hashMessage(serializeClaim(claim))
 }
@@ -95,12 +109,6 @@ export function hashOfClaims(claims: Claim[]) {
 export function serializeClaim(claim: Claim) {
   return JSON.stringify(claim)
 }
-
-export const createAttestationServiceURLClaim = (url: string): AttestationServiceURLClaim => ({
-  url,
-  timestamp: now(),
-  type: ClaimTypes.ATTESTATION_SERVICE_URL,
-})
 
 export const createNameClaim = (name: string): NameClaim => ({
   name,
