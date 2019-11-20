@@ -181,8 +181,10 @@ export class ValidatorsWrapper extends BaseWrapper<Validators> {
     const res = await this.contract.methods.getValidator(address).call()
     return {
       address,
-      ecdsaPublicKey: parseBytes(res.ecdsaPublicKey),
-      blsPublicKey: parseBytes(res.blsPublicKey),
+      // @ts-ignore Incorrect type for bytes
+      ecdsaPublicKey: res.ecdsaPublicKey,
+      // @ts-ignore Incorrect type for bytes
+      blsPublicKey: res.blsPublicKey,
       affiliation: res.affiliation,
       score: fromFixed(new BigNumber(res.score)),
     }
