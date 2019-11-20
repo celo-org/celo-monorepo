@@ -78,7 +78,7 @@ contract Reserve is IReserve, Ownable, Initializable, UsingRegistry, ReentrancyG
   }
 
   /**
-   * @notice Sets target allocations for Celo Gold and a diversified basket of non-Celo crypto assets.
+   * @notice Sets target allocations for Celo Gold and a diversified basket of non-Celo assets.
    * @param symbols The symbol of each asset in the Reserve portfolio.
    * @param weights The weight for the corresponding asset.
    */
