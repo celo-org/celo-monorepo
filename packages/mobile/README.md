@@ -101,7 +101,7 @@ before rebuilding the app. Note that this will assume the testnets have a corres
 
 By default, the mobile wallet app runs geth in ultralight sync mode where all the epoch headers are fetched. The default sync mode is defined in [packages/mobile/.env](https://github.com/celo-org/celo-monorepo/blob/master/packages/mobile/.env#L4) file.
 
-To run the wallet in zero sync mode, where it uses a trusted node rather than the local geth node as a provider, turn on Celo Lite mode from settings or update the zero sync initially enabled parameter in the .env file. By default, the trusted node is `https://{TESTNET}-forno.celo-testnet.org/`, however any trusted node can be used. In zero sync mode, the wallet signs transactions locally in web3 then sends them to the trusted node.
+To run the wallet in zero sync mode, using a trusted node rather than the local geth node as a provider, turn it on from the Celo Lite page in settings or update the zero sync initially enabled parameter in the .env file linked above. When zero sync mode is turned back off, the wallet will switch to the default sync mode as specified in the .env file. By default, the trusted node is `https://{TESTNET}-forno.celo-testnet.org/`, however any trusted node can be used. In zero sync mode, the wallet signs transactions locally in web3 then sends them to the trusted node.
 
 ## Testing
 
