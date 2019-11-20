@@ -33,12 +33,35 @@ type HandleErrorCallback = (isError: boolean, data: { location: string; error: s
 const Web3 = require('web3')
 
 const DEFAULT_TRANSFER_AMOUNT = new BigNumber('0.00000000000001')
-const LOAD_TEST_TRANSFER_WEI = new BigNumber(100)
+const LOAD_TEST_TRANSFER_WEI = new BigNumber(10000)
 
 const GETH_IPC = 'geth.ipc'
 const DISCOVERY_PORT = 30303
 
 const BLOCKSCOUT_TIMEOUT = 12000 // ~ 12 seconds needed to see the transaction in the blockscout
+
+// for log messages which indicate that blockscout where not able to provide
+// information about transaction in a "timely" (15s for now) manner
+export const LOG_TAG_BLOCKSCOUT_TIMEOUT = 'blockscout_timeout'
+// for log messages which show time (+- 150-200ms) needed for blockscout to
+// fetch and publish information about transaction
+export const LOG_TAG_BLOCKSCOUT_TIME_MEASUREMENT = 'blockscout_time_measurement'
+// for log messages which show the error about validating transaction receipt
+export const LOG_TAG_BLOCKSCOUT_VALIDATION_ERROR = 'validate_blockscout_error'
+// for log messages which show the error occurred when fetching a contract address
+export const LOG_TAG_CONTRACT_ADDRESS_ERROR = 'contract_address_error'
+// for log messages which show the error while validating geth rpc response
+export const LOG_TAG_GETH_RPC_ERROR = 'geth_rpc_error'
+// for log messages which show the error occurred when the transaction has
+// been sent
+export const LOG_TAG_TRANSACTION_ERROR = 'transaction_error'
+// message indicating that the tx hash has been received in callback within sendTransaction
+export const LOG_TAG_TRANSACTION_HASH_RECEIVED = 'tx_hash_received'
+// for log messages which show the error about validating transaction receipt
+export const LOG_TAG_TRANSACTION_VALIDATION_ERROR = 'validate_transaction_error'
+// for log messages which show time needed to receive the receipt after
+// the transaction has been sent
+export const LOG_TAG_TX_TIME_MEASUREMENT = 'tx_time_measurement'
 
 const getTxNodeName = (namespace: string, id: number) => {
   return `${namespace}-gethtx${id}`
@@ -421,27 +444,6 @@ export const traceTransactions = async (
   console.info('Simulation finished successully!')
 }
 
-// for log messages which show time needed to receive the receipt after
-// the transaction has been sent
-export const LOG_TAG_TX_TIME_MEASUREMENT = 'tx_time_measurement'
-// for log messages which show time (+- 150-200ms) needed for blockscout to
-// fetch and publish information about transaction
-export const LOG_TAG_BLOCKSCOUT_TIME_MEASUREMENT = 'blockscout_time_measurement'
-// for log messages which show the error occurred when the transaction has
-// been sent
-export const LOG_TAG_TRANSACTION_ERROR = 'transaction_error'
-// for log messages which show the error about validating transaction receipt
-export const LOG_TAG_TRANSACTION_VALIDATION_ERROR = 'validate_transaction_error'
-// for log messages which indicate that blockscout where not able to provide
-// information about transaction in a "timely" (15s for now) manner
-export const LOG_TAG_BLOCKSCOUT_TIMEOUT = 'blockscout_timeout'
-// for log messages which show the error about validating transaction receipt
-export const LOG_TAG_BLOCKSCOUT_VALIDATION_ERROR = 'validate_blockscout_error'
-// for log messages which show the error while validating geth rpc response
-export const LOG_TAG_GETH_RPC_ERROR = 'geth_rpc_error'
-// message indicating that the tx hash has been received in callback within sendTransaction
-export const LOG_TAG_TRANSACTION_HASH_RECEIVED = 'tx_hash_received'
-
 const measureBlockscout = async (
   blockscoutUrl: string,
   txHash: string,
@@ -512,7 +514,7 @@ export const transferCeloDollars = async (
 }
 
 export const simulateClient = async (
-  senderPrivateKey: string,
+  senderAddress: string,
   recipientAddress: string,
   txPeriodMs: number, // time between new transactions in ms
   blockscoutUrl: string,
@@ -521,8 +523,6 @@ export const simulateClient = async (
 ) => {
   // Assume the node is accessible via localhost with senderAddress unlocked
   const kit = newKit('http://localhost:8545')
-
-  const senderAddress = privateKeyToAddress(senderPrivateKey)
   kit.defaultAccount = senderAddress
 
   const baseLogMessage: any = {
@@ -536,15 +536,29 @@ export const simulateClient = async (
   while (true) {
     const sendTransactionTime = Date.now()
 
+    // randomly choose which token to use
     const transferGold = Boolean(Math.round(Math.random()))
     const transferFn = transferGold ? transferCeloGold : transferCeloDollars
+    baseLogMessage.tokenName = transferGold ? 'cGLD' : 'cUSD'
+
     // randomly choose which gas currency to use
     const gasCurrencyGold = Boolean(Math.round(Math.random()))
-    const gasCurrency = gasCurrencyGold
-      ? undefined
-      : await kit.registry.addressFor(CeloContract.StableToken)
+    let gasCurrency = undefined
+    if (!gasCurrencyGold) {
+      try {
+        gasCurrency = await kit.registry.addressFor(CeloContract.StableToken)
+      } catch (error) {
+        tracerLog({
+          tag: LOG_TAG_CONTRACT_ADDRESS_ERROR,
+          error: error.toString(),
+          ...baseLogMessage,
+        })
+      }
+    }
     baseLogMessage.gasCurrency = gasCurrency || ''
 
+    // We purposely do not use await syntax so we sleep after sending the transaction,
+    // not after processing a transaction's result
     transferFn(kit, senderAddress, recipientAddress, LOAD_TEST_TRANSFER_WEI, {
       gasCurrency,
     })
@@ -555,13 +569,17 @@ export const simulateClient = async (
           txResult,
           sendTransactionTime,
           baseLogMessage,
-          transferGold ? 'cGLD' : 'cUSD',
           blockscoutUrl,
           blockscoutMeasurePercent
         )
       })
       .catch((error: any) => {
         console.error('Load test transaction failed with error:', JSON.stringify(error))
+        tracerLog({
+          tag: LOG_TAG_TRANSACTION_ERROR,
+          error: error.toString(),
+          ...baseLogMessage,
+        })
       })
     await sleep(txPeriodMs)
   }
@@ -573,12 +591,9 @@ export const onLoadTestTxResult = async (
   txResult: TransactionResult,
   sendTransactionTime: number,
   baseLogMessage: any,
-  tokenSymbol: string,
   blockscoutUrl: string,
   blockscoutMeasurePercent: number
 ) => {
-  baseLogMessage.token = tokenSymbol
-
   const txReceipt = await txResult.waitReceipt()
   const txHash = txReceipt.transactionHash
   baseLogMessage.txHash = txHash
@@ -586,55 +601,41 @@ export const onLoadTestTxResult = async (
   const receiptTime = Date.now()
 
   tracerLog({
-    txHash,
-    tag: LOG_TAG_TRANSACTION_HASH_RECEIVED,
+    tag: LOG_TAG_TX_TIME_MEASUREMENT,
+    p_time: receiptTime - sendTransactionTime,
     ...baseLogMessage,
   })
 
-  try {
-    tracerLog({
-      tag: LOG_TAG_TX_TIME_MEASUREMENT,
-      p_time: receiptTime - sendTransactionTime,
-      ...baseLogMessage,
-    })
-
-    // Continuing only with receipt received
-    validateTransactionAndReceipt(senderAddress, txReceipt, (isError, data) => {
-      if (isError) {
-        tracerLog({
-          tag: LOG_TAG_TRANSACTION_VALIDATION_ERROR,
-          ...baseLogMessage,
-          ...data,
-        })
-      }
-    })
-
-    if (Math.random() * 10 < blockscoutMeasurePercent) {
-      await measureBlockscout(
-        blockscoutUrl,
-        txReceipt.transactionHash,
-        senderAddress,
-        receiptTime,
-        baseLogMessage
-      )
+  // Continuing only with receipt received
+  validateTransactionAndReceipt(senderAddress, txReceipt, (isError, data) => {
+    if (isError) {
+      tracerLog({
+        tag: LOG_TAG_TRANSACTION_VALIDATION_ERROR,
+        ...baseLogMessage,
+        ...data,
+      })
     }
+  })
 
-    await validateGethRPC(kit.web3, txHash, senderAddress, (isError, data) => {
-      if (isError) {
-        tracerLog({
-          tag: LOG_TAG_GETH_RPC_ERROR,
-          ...data,
-          ...baseLogMessage,
-        })
-      }
-    })
-  } catch (error) {
-    tracerLog({
-      tag: LOG_TAG_TRANSACTION_ERROR,
-      error: error.toString(),
-      ...baseLogMessage,
-    })
+  if (Math.random() * 100 < blockscoutMeasurePercent) {
+    await measureBlockscout(
+      blockscoutUrl,
+      txReceipt.transactionHash,
+      senderAddress,
+      receiptTime,
+      baseLogMessage
+    )
   }
+
+  await validateGethRPC(kit.web3, txHash, senderAddress, (isError, data) => {
+    if (isError) {
+      tracerLog({
+        tag: LOG_TAG_GETH_RPC_ERROR,
+        ...data,
+        ...baseLogMessage,
+      })
+    }
+  })
 }
 
 export const transferERC20Token = async (

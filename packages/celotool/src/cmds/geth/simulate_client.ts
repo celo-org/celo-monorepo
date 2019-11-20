@@ -1,16 +1,10 @@
-// import fs from 'fs'
-// import { getBlockscoutClusterInternalUrl } from 'src/lib/endpoints'
-import { AccountType, generateAddress, generatePrivateKey } from 'src/lib/generate_utils'
-// import { checkGethStarted, getWeb3AndTokensContracts, simulateClient, sleep } from 'src/lib/geth'
+import { AccountType, generateAddress } from 'src/lib/generate_utils'
 import { simulateClient, sleep } from 'src/lib/geth'
 import * as yargs from 'yargs'
-// import { GethArgv } from '../geth'
 
 export const command = 'simulate-client'
 
 export const describe = 'command for simulating client behavior'
-
-// const TRANSACTION_RECIPIENT = '0x4da58d267cd465b9313fdb19b120ec591d957ad2'
 
 interface SimulateClientArgv extends yargs.Argv {
   blockscoutMeasurePercent: number
@@ -26,7 +20,7 @@ export const builder = () => {
     .option('blockscout-measure-percent', {
       type: 'number',
       description:
-        'Percent of transactions to measure blockscout time. Must be in the range of [0, 100]',
+        'Percent of transactions to measure the time it takes for blockscout to process a transaction. Should be in the range of [0, 100]',
       default: 100,
     })
     .option('blockscout-url', {
@@ -41,12 +35,14 @@ export const builder = () => {
     })
     .option('index', {
       type: 'number',
-      description: 'Index of load test account to send transactions from',
+      description:
+        'Index of the load test account to send transactions from. Used to generate account address',
       default: 0,
     })
     .option('recipient-index', {
       type: 'number',
-      description: 'Index of the load test account to send transactions to',
+      description:
+        'Index of the load test account to send transactions to. Used to generate account address',
       default: 0,
     })
     .options('mnemonic', {
@@ -57,12 +53,8 @@ export const builder = () => {
 }
 
 export const handler = async (argv: SimulateClientArgv) => {
-  // send transactions to another load testing account
-  const senderPrivateKey = generatePrivateKey(
-    argv.mnemonic,
-    AccountType.LOAD_TESTING_ACCOUNT,
-    argv.index
-  )
+  // So we can transactions to another load testing account
+  const senderAddress = generateAddress(argv.mnemonic, AccountType.LOAD_TESTING_ACCOUNT, argv.index)
   const recipientAddress = generateAddress(
     argv.mnemonic,
     AccountType.LOAD_TESTING_ACCOUNT,
@@ -77,7 +69,7 @@ export const handler = async (argv: SimulateClientArgv) => {
   await sleep(sleepMs)
 
   await simulateClient(
-    senderPrivateKey,
+    senderAddress,
     recipientAddress,
     argv.delay,
     argv.blockscoutUrl,

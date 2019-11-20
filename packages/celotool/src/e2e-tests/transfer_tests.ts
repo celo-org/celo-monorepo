@@ -8,7 +8,7 @@ import BigNumber from 'bignumber.js'
 import { assert } from 'chai'
 import Web3 from 'web3'
 import { TransactionReceipt } from 'web3/types'
-import { transferCeloGold, transferCeloDollars } from '../lib/geth'
+import { transferCeloDollars, transferCeloGold } from '../lib/geth'
 import {
   getEnode,
   GethInstanceConfig,
