@@ -51,7 +51,7 @@ class QRScanner extends React.Component<Props, State> {
         Logger.debug('QRScanner', 'Bar code detected')
         this.props.handleBarcodeDetected(rawData)
       })
-      this.timeout = setTimeout(() => {
+      this.timeout = window.setTimeout(() => {
         this.setState({ isScanningEnabled: true })
       }, 1000)
     }
