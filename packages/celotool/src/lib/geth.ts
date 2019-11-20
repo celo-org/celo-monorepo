@@ -514,23 +514,22 @@ export const transferCeloDollars = async (
 export const simulateClient = async (
   senderPrivateKey: string,
   recipientAddress: string,
-  gasFeeRecipientAddress: string,
   txPeriodMs: number, // time between new transactions in ms
   blockscoutUrl: string,
   blockscoutMeasurePercent: number, // percent of time in range [0, 100] to measure blockscout for a tx
   index: number
 ) => {
-  // Assume the node is accessible via localhost
+  // Assume the node is accessible via localhost with senderAddress unlocked
   const kit = newKit('http://localhost:8545')
 
-  kit.addAccount(senderPrivateKey)
   const senderAddress = privateKeyToAddress(senderPrivateKey)
+  kit.defaultAccount = senderAddress
+
   const baseLogMessage: any = {
     loadTestID: index,
     sender: senderAddress,
     recipient: recipientAddress,
     gasCurrency: '',
-    gasFeeRecipient: gasFeeRecipientAddress,
     txHash: '',
   }
 
@@ -545,22 +544,9 @@ export const simulateClient = async (
       ? undefined
       : await kit.registry.addressFor(CeloContract.StableToken)
     baseLogMessage.gasCurrency = gasCurrency || ''
-    // Contractkit does not yet fully estimate non-Gold currencies
-    let gasPrice: string | undefined = undefined
-    if (gasCurrency) {
-      const gasPriceMultiplier = new BigNumber(10)
-
-      const gasPriceMinimum = await kit.contracts.getGasPriceMinimum()
-      const gasPriceNum = (await gasPriceMinimum.getGasPriceMinimum(gasCurrency)).times(
-        gasPriceMultiplier
-      )
-      gasPrice = kit.web3.utils.toHex(gasPriceNum.toString())
-    }
 
     transferFn(kit, senderAddress, recipientAddress, LOAD_TEST_TRANSFER_WEI, {
       gasCurrency,
-      gasFeeRecipient: gasFeeRecipientAddress,
-      gasPrice,
     })
       .then(async (txResult: TransactionResult) => {
         await onLoadTestTxResult(

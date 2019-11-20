@@ -56,6 +56,11 @@ spec:
               --accountType load_testing \
               --index $RID \
               > /root/.celo/pkey
+
+            echo "Generating account address for rid=$RID"
+            celotooljs.sh generate account-address \
+              --private-key `cat /root/.celo/pkey` \
+              > /root/.celo/address
         env:
         - name: REPLICA_NAME
           valueFrom:
@@ -70,6 +75,7 @@ spec:
         - name: data
           mountPath: /root/.celo
 {{ include "common.init-genesis-container" .  | indent 6 }}
+{{ include "common.import-geth-account-container" .  | indent 6 }}
       containers:
       - name: geth
         image: {{ .Values.geth.image.repository }}:{{ .Values.geth.image.tag }}
@@ -81,15 +87,21 @@ spec:
           set -euo pipefail
           cp /var/geth/static-nodes.json /root/.celo/static-nodes.json
 
+          ACCOUNT_ADDRESS=`cat /root/.celo/address`
+
           geth \
           --rpc \
-          --rpcapi=eth,web3,debug \
+          --rpcapi=eth,web3,debug,admin,personal,net \
           --rpcvhosts=* \
           --networkid={{ .Values.geth.networkID }} \
+          --nodekey=/root/.celo/pkey \
           --syncmode=ultralight \
           --consoleformat=json \
           --consoleoutput=stdout \
-          --verbosity={{ .Values.geth.verbosity }}
+          --verbosity={{ .Values.geth.verbosity }} \
+          --unlock=${ACCOUNT_ADDRESS} \
+          --etherbase=${ACCOUNT_ADDRESS} \
+          --password=/root/.celo/account/accountSecret
         ports:
         - name: discovery-udp
           containerPort: 30303
@@ -102,13 +114,16 @@ spec:
           containerPort: 8546
         resources:
           requests:
-            memory: 412Mi
-            cpu: 200m
+            memory: 250Mi
+            cpu: 40m
         volumeMounts:
         - name: data
           mountPath: /root/.celo
         - name: config
           mountPath: /var/geth
+        - name: account
+          mountPath: "/root/.celo/account"
+          readOnly: true
       - name: simulate-client
         image: {{ .Values.celotool.image.repository }}:{{ .Values.celotool.image.tag }}
         imagePullPolicy: {{ .Values.imagePullPolicy }}
@@ -118,15 +133,12 @@ spec:
           - |
             RID=`cat /root/.celo/rid`
 
-            # Send the txs to the next load test client, and gas fees to the
-            # load test client after that
+            # Send the txs to the next load test client
             RECIPIENT_INDEX=$(( ($RID + 1) % {{ .Values.replicas }} ))
-            GAS_FEE_RECIPIENT_INDEX=$(( ($RID + 2) % {{ .Values.replicas }} ))
 
             celotooljs.sh geth simulate-client \
               --index $RID \
               --recipient-index $RECIPIENT_INDEX \
-              --gas-fee-recipient-index 0 \
               --delay {{ .Values.delay }} \
               --mnemonic "$MNEMONIC" \
               --blockscout-url {{ .Values.blockscout.url }} \
@@ -134,7 +146,13 @@ spec:
         resources:
           requests:
             memory: 256Mi
-            cpu: 200m
+            cpu: 5m
+        env:
+        - name: MNEMONIC
+          valueFrom:
+            secretKeyRef:
+              name: {{ .Values.environment }}-load-test
+              key: mnemonic
         volumeMounts:
         - name: data
           mountPath: /root/.celo
@@ -144,3 +162,6 @@ spec:
       - name: config
         configMap:
           name: {{ .Values.environment }}-load-test-config
+      - name: account
+        secret:
+          secretName: {{ .Values.environment }}-load-test

@@ -4,8 +4,13 @@ import { getEnodesWithExternalIPAddresses } from 'src/lib/geth'
 import { installGenericHelmChart, removeGenericHelmChart } from 'src/lib/helm_deploy'
 import { getGenesisBlockFromGoogleStorage } from 'src/lib/testnet-utils'
 
-export async function installHelmChart(celoEnv: string, blockscoutProb: number, replicas: number) {
-  const params = await helmParameters(celoEnv, blockscoutProb, replicas)
+export async function installHelmChart(
+  celoEnv: string,
+  blockscoutProb: number,
+  delayMs: number,
+  replicas: number
+) {
+  const params = await helmParameters(celoEnv, blockscoutProb, delayMs, replicas)
   return installGenericHelmChart(
     celoEnv,
     celoEnv + '-load-test',
@@ -18,18 +23,24 @@ export async function removeHelmRelease(celoEnv: string) {
   return removeGenericHelmChart(celoEnv + '-load-test')
 }
 
-async function helmParameters(celoEnv: string, blockscoutProb: number, replicas: number) {
+async function helmParameters(
+  celoEnv: string,
+  blockscoutProb: number,
+  delayMs: number,
+  replicas: number
+) {
   const enodes = await getEnodesWithExternalIPAddresses(celoEnv)
   const staticNodesJsonB64 = Buffer.from(JSON.stringify(enodes)).toString('base64')
   // Uses the genesis frile from google storage to ensure it's the correct genesis as the network
   const genesis = await getGenesisBlockFromGoogleStorage(celoEnv)
   const genesisFileJsonB64 = Buffer.from(JSON.stringify(genesis)).toString('base64')
   return [
+    `--set geth.accountSecret="${fetchEnv(envVar.GETH_ACCOUNT_SECRET)}"`,
     `--set blockscout.measurePercent=${blockscoutProb}`,
     `--set blockscout.url=${getBlockscoutUrl(celoEnv)}`,
     `--set celotool.image.repository=${fetchEnv(envVar.CELOTOOL_DOCKER_IMAGE_REPOSITORY)}`,
     `--set celotool.image.tag=${fetchEnv(envVar.CELOTOOL_DOCKER_IMAGE_TAG)}`,
-    `--set delay=5000`, // send txs every 5 seconds
+    `--set delay=${delayMs}`, // send txs every 5 seconds
     `--set environment=${celoEnv}`,
     `--set geth.genesisFile=${genesisFileJsonB64}`,
     `--set geth.image.repository=${fetchEnv(envVar.GETH_NODE_DOCKER_IMAGE_REPOSITORY)}`,

@@ -2,7 +2,7 @@
 // import { getBlockscoutClusterInternalUrl } from 'src/lib/endpoints'
 import { AccountType, generateAddress, generatePrivateKey } from 'src/lib/generate_utils'
 // import { checkGethStarted, getWeb3AndTokensContracts, simulateClient, sleep } from 'src/lib/geth'
-import { simulateClient } from 'src/lib/geth'
+import { simulateClient, sleep } from 'src/lib/geth'
 import * as yargs from 'yargs'
 // import { GethArgv } from '../geth'
 
@@ -16,7 +16,6 @@ interface SimulateClientArgv extends yargs.Argv {
   blockscoutMeasurePercent: number
   blockscoutUrl: string
   delay: number
-  gasFeeRecipientIndex: number
   index: number
   mnemonic: string
   recipientIndex: number
@@ -50,11 +49,6 @@ export const builder = () => {
       description: 'Index of the load test account to send transactions to',
       default: 0,
     })
-    .option('gas-fee-recipient-index', {
-      type: 'number',
-      description: 'Index of the load test account to send gas fees to',
-      default: 0,
-    })
     .options('mnemonic', {
       type: 'string',
       description: 'Mnemonic used to generate account addresses',
@@ -74,16 +68,17 @@ export const handler = async (argv: SimulateClientArgv) => {
     AccountType.LOAD_TESTING_ACCOUNT,
     argv.recipientIndex
   )
-  const gasFeeRecipientAddress = generateAddress(
-    argv.mnemonic,
-    AccountType.LOAD_TESTING_ACCOUNT,
-    argv.gasFeeRecipientIndex
-  )
+
+  // sleep a random amount of time in the range [0, argv.delay] before starting so
+  // that if multiple simulations are started at the same time, they don't all
+  // submit transactions at the same time
+  const sleepMs = Math.random() * argv.delay
+  console.info(`Sleeping for ${sleepMs} ms`)
+  await sleep(sleepMs)
 
   await simulateClient(
     senderPrivateKey,
     recipientAddress,
-    gasFeeRecipientAddress,
     argv.delay,
     argv.blockscoutUrl,
     argv.blockscoutMeasurePercent,
