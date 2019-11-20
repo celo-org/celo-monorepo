@@ -70,7 +70,7 @@ describe('sync tests', function(this: any) {
         const syncWeb3 = new Web3(`http://localhost:8555`)
         await waitToFinishSyncing(syncWeb3)
         // Give the validators time to create more blocks.
-        await sleep(2)
+        await sleep(4)
         const validatingLatestBlock = await validatingWeb3.eth.getBlockNumber()
         await sleep(1)
         const syncLatestBlock = await syncWeb3.eth.getBlockNumber()
