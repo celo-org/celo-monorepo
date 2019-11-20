@@ -94,9 +94,9 @@ contract('Validators', (accounts: string[]) => {
 
   // A random 64 byte hex string.
   const blsPublicKey =
-    '0x4d23d8cd06f30b1fa7cf368e2f5399ab04bb6846c682f493a98a607d3dfb7e53a712bb79b475c57b0ac2785460f91301'
+    '0x4fa3f67fc913878b068d1fa1cdddc54913d3bf988dbe5a36a20fa888f20d4894c408a6773f3d7bde11154f2a3076b700d345a42fd25a0e5e83f4db5586ac7979ac2053cd95d8f2efd3e959571ceccaa743e02cf4be3f5d7aaddb0b06fc9aff00'
   const blsPoP =
-    '0x9d3e1d8f49f6b0d8e9a03d80ca07b1d24cf1cc0557bdcc04f5e17a46e35d02d0d411d956dbd5d2d2464eebd7b74ae30005d223780d785d2abc5644fac7ac29fb0e302bdc80c81a5d45018b68b1045068a4b3a4861c93037685fd0d252d740501'
+    '0xcdb77255037eb68897cd487fdd85388cbda448f617f874449d4b11588b0b7ad8ddc20d9bb450b513bb35664ea3923900'
   const commission = toFixed(1 / 100)
   beforeEach(async () => {
     accountsInstance = await Accounts.new()
@@ -1134,8 +1134,8 @@ contract('Validators', (accounts: string[]) => {
   })
 
   describe('#updateBlsPublicKey()', () => {
-    const newBlsPublicKey = web3.utils.randomHex(48)
-    const newBlsPoP = web3.utils.randomHex(96)
+    const newBlsPublicKey = web3.utils.randomHex(96)
+    const newBlsPoP = web3.utils.randomHex(48)
     describe('when called by a registered validator', () => {
       const validator = accounts[0]
       beforeEach(async () => {
@@ -1167,14 +1167,14 @@ contract('Validators', (accounts: string[]) => {
         })
       })
 
-      describe('when the public key is not 48 bytes', () => {
+      describe('when the public key is not 96 bytes', () => {
         it('should revert', async () => {
           // @ts-ignore Broken typechain typing for bytes
           await assertRevert(validators.updateBlsPublicKey(newBlsPublicKey + '01', newBlsPoP))
         })
       })
 
-      describe('when the proof of possession is not 96 bytes', () => {
+      describe('when the proof of possession is not 48 bytes', () => {
         it('should revert', async () => {
           // @ts-ignore Broken typechain typing for bytes
           await assertRevert(validators.updateBlsPublicKey(newBlsPublicKey, newBlsPoP + '01'))
