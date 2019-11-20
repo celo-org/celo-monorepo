@@ -1,5 +1,6 @@
 import { downloadArtifacts, uploadArtifacts } from 'src/lib/artifacts'
 import { switchToClusterFromEnv } from 'src/lib/cluster'
+import { migrationOverrides, truffleOverrides } from 'src/lib/migration-utils'
 import { portForwardAnd } from 'src/lib/port_forward'
 import { execCmd } from 'src/lib/utils'
 import { UpgradeArgv } from '../../deploy/upgrade'
@@ -15,7 +16,11 @@ export const handler = async (argv: UpgradeArgv) => {
 
   console.info(`Upgrading smart contracts on ${argv.celoEnv}`)
   const cb = async () => {
-    await execCmd(`yarn --cwd ../protocol run migrate -n ${argv.celoEnv}`)
+    await execCmd(
+      `yarn --cwd ../protocol run migrate -n ${argv.celoEnv} -c '${JSON.stringify(
+        truffleOverrides()
+      )}' -m '${JSON.stringify(migrationOverrides())}'`
+    )
   }
 
   try {

@@ -2,6 +2,7 @@ import BigNumber from 'bignumber.js'
 import { assert } from 'chai'
 import { spawn, SpawnOptions } from 'child_process'
 import fs from 'fs'
+import _ from 'lodash'
 import { join as joinPath, resolve as resolvePath } from 'path'
 import { Admin } from 'web3-eth-admin'
 import {
@@ -34,12 +35,19 @@ export interface GethTestConfig {
   migrateTo?: number
   instances: GethInstanceConfig[]
   genesisConfig?: any
+  migrationOverrides?: any
 }
 
 const TEST_DIR = '/tmp/e2e'
 const GENESIS_PATH = `${TEST_DIR}/genesis.json`
 const NetworkId = 1101
 const MonorepoRoot = resolvePath(joinPath(__dirname, '../..', '../..'))
+
+export async function waitToFinishSyncing(web3: any) {
+  while ((await web3.eth.isSyncing()) || (await web3.eth.getBlockNumber()) === 0) {
+    await sleep(0.1)
+  }
+}
 
 export function assertAlmostEqual(
   actual: BigNumber,
@@ -343,22 +351,27 @@ export async function startGeth(gethBinaryPath: string, instance: GethInstanceCo
 export async function migrateContracts(
   validatorPrivateKeys: string[],
   validators: string[],
-  to: number = 1000
+  to: number = 1000,
+  overrides: any = {}
 ) {
-  const migrationOverrides = {
-    validators: {
-      validatorKeys: validatorPrivateKeys.map(ensure0x),
-    },
-    election: {
-      minElectableValidators: '1',
-    },
-    stableToken: {
-      initialBalances: {
-        addresses: validators.map(ensure0x),
-        values: validators.map(() => '10000000000000000000000'),
+  const migrationOverrides = _.merge(
+    {
+      validators: {
+        validatorKeys: validatorPrivateKeys.map(ensure0x),
+      },
+      election: {
+        minElectableValidators: '1',
+      },
+      stableToken: {
+        initialBalances: {
+          addresses: validators.map(ensure0x),
+          values: validators.map(() => '10000000000000000000000'),
+        },
       },
     },
-  }
+    overrides
+  )
+
   const args = [
     '--cwd',
     `${MonorepoRoot}/packages/protocol`,
@@ -448,7 +461,7 @@ export function getContext(gethConfig: GethTestConfig) {
       if (instance.validating) {
         // Automatically connect validator nodes to eachother.
         const otherValidators = validatorEnodes.filter(
-          (_: string, i: number) => i !== validatorIndex
+          (__: string, i: number) => i !== validatorIndex
         )
         instance.peers = (instance.peers || []).concat(otherValidators)
         instance.privateKey = instance.privateKey || validatorPrivateKeys[validatorIndex]
@@ -460,7 +473,8 @@ export function getContext(gethConfig: GethTestConfig) {
       await migrateContracts(
         validatorPrivateKeys,
         validators.map((x) => x.address),
-        gethConfig.migrateTo
+        gethConfig.migrateTo,
+        gethConfig.migrationOverrides
       )
     }
     await killGeth()
