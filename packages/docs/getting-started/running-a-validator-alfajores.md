@@ -5,6 +5,7 @@
     - [Pull the Celo Docker image](#pull-the-celo-docker-image)
     - [Create accounts](#create-accounts)
     - [Deploy the validator node](#deploy-the-validator-node)
+    - [Running the attestation service](#running-the-attestation-service)
 
 This section explains how to get a validator node running on the Alfajores network, using a Docker image that was built for this purpose. Most of this process is the same as running a full node, but with a few additional steps.
 
@@ -100,5 +101,11 @@ docker run -p 127.0.0.1:8545:8545 -p 127.0.0.1:8546:8546 -p 30303:30303 -p 30303
 The `mine` flag will tell geth to try participating in the BFT consensus protocol, which is analogous to mining on the Ethereum PoW network. It will not be allowed to validate until it gets elected -- so next we need to stand for election.
 
 The `networkid` parameter value of `44785` indicates we are connecting the Alfajores Testnet.
+
+### Running the attestation service
+
+As part of the [lightweight identity protocol](/celo-codebase/protocol/identity), validators are expected to run an [attestation service](https://github.com/celo-org/celo-monorepo/tree/master/packages/attestation-service) to provide attestations that allow users to map their phone number to an account on Celo.
+
+You can find the complete instructions about how to run the [Attestation Service at the documentation page](running-attestation-service.md).
 
 Now you may need to wait for your node to complete a full sync. You can check on the sync status with `celocli node:synced`. Your node will be fully synced when it has downloaded and processed the latest block, which you can see on the [Alfajores Testnet Stats](https://alfajores-ethstats.celo-testnet.org/) page.
