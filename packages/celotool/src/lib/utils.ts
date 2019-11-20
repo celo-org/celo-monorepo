@@ -96,14 +96,6 @@ export async function outputIncludes(cmd: string, matchString: string, matchMess
   return false
 }
 
-export function getVerificationPoolSMSURL(celoEnv: string) {
-  return `https://us-central1-celo-testnet.cloudfunctions.net/handleVerificationRequest${celoEnv}/v0.1/sms/`
-}
-
-export function getVerificationPoolRewardsURL(celoEnv: string) {
-  return `https://us-central1-celo-testnet.cloudfunctions.net/handleVerificationRequest${celoEnv}/v0.1/rewards/`
-}
-
 export async function retrieveTxNodeIpAddress(celoEnv: string, txNodeIndex: number) {
   if (isVmBased()) {
     const outputs = await getTestnetOutputs(celoEnv)
