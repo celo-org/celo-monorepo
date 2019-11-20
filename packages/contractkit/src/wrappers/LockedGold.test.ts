@@ -13,31 +13,32 @@ testWithGanache('Validators Wrapper', (web3) => {
   let account: string
   beforeAll(async () => {
     account = (await web3.eth.getAccounts())[0]
+    kit.defaultAccount = account
     lockedGold = await kit.contracts.getLockedGold()
     accounts = await kit.contracts.getAccounts()
-    await accounts.createAccount().sendAndWaitForReceipt({ from: account })
+    await accounts.createAccount().sendAndWaitForReceipt()
   })
 
   test('SBAT lock gold', async () => {
-    await lockedGold.lock().sendAndWaitForReceipt({ from: account, value })
+    await lockedGold.lock().sendAndWaitForReceipt({ value })
   })
 
   test('SBAT unlock gold', async () => {
-    await lockedGold.lock().sendAndWaitForReceipt({ from: account, value })
-    await lockedGold.unlock(value).sendAndWaitForReceipt({ from: account })
+    await lockedGold.lock().sendAndWaitForReceipt({ value })
+    await lockedGold.unlock(value).sendAndWaitForReceipt()
   })
 
   test('SBAT relock gold', async () => {
     // Make 5 pending withdrawals.
-    await lockedGold.lock().sendAndWaitForReceipt({ from: account, value: value * 5 })
-    await lockedGold.unlock(value).sendAndWaitForReceipt({ from: account })
-    await lockedGold.unlock(value).sendAndWaitForReceipt({ from: account })
-    await lockedGold.unlock(value).sendAndWaitForReceipt({ from: account })
-    await lockedGold.unlock(value).sendAndWaitForReceipt({ from: account })
-    await lockedGold.unlock(value).sendAndWaitForReceipt({ from: account })
+    await lockedGold.lock().sendAndWaitForReceipt({ value: value * 5 })
+    await lockedGold.unlock(value).sendAndWaitForReceipt()
+    await lockedGold.unlock(value).sendAndWaitForReceipt()
+    await lockedGold.unlock(value).sendAndWaitForReceipt()
+    await lockedGold.unlock(value).sendAndWaitForReceipt()
+    await lockedGold.unlock(value).sendAndWaitForReceipt()
     // Re-lock 2.5 of them
     const txos = await lockedGold.relock(account, value * 2.5)
-    await Promise.all(txos.map((txo) => txo.sendAndWaitForReceipt({ from: account })))
+    await Promise.all(txos.map((txo) => txo.sendAndWaitForReceipt()))
     //
   })
 })

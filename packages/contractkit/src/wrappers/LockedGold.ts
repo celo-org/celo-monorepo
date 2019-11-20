@@ -71,7 +71,7 @@ export class LockedGoldWrapper extends BaseWrapper<LockedGold> {
     // Ensure there are enough pending withdrawals to relock.
     const values = pendingWithdrawals.map((pw: PendingWithdrawal) => pw.value)
     const reducer = (total: BigNumber, pw: BigNumber) => pw.plus(total)
-    return values.reduce(reducer)
+    return values.reduce(reducer, new BigNumber(0))
   }
 
   /**
@@ -107,9 +107,7 @@ export class LockedGoldWrapper extends BaseWrapper<LockedGold> {
       }
       return acc
     }
-    return Promise.all(pendingWithdrawals.reduceRight(relockPw, []) as Array<
-      CeloTransactionObject<void>
-    >)
+    return pendingWithdrawals.reduceRight(relockPw, []) as Array<CeloTransactionObject<void>>
   }
 
   /**
