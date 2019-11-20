@@ -51,5 +51,19 @@
     "contrastText2":
       "General lorem ipsum dolor sit amet, consectetur adipiscing elit. Ut id elit sapien. Sed sem ante, ornare a ipsum ut, consequat ullamcorper lorem."
   },
+  "typography": {
+    "title": "Typography",
+    "headline":
+      "When creating the Celo font family The Celo Experience Team wanted to speak to Celo’s Approachable and Academic brand principles. Our thinking is the more different the two fonts were in visual tone the wider the more audience members we can include.\n\nPicking open-source fonts allows our community to be able to download immediately build and design Celo branded material.",
+    "downloadAllBTN": "Download Fonts",
+    "mainFontTitle": "This is Garamond, the Celo brand typeface.",
+    "mainFontText":
+      "Garamond became a natural choice as our team spoke to pillars that bring timelessness, professionalism, and an appropriate visual formal tone for education and declaration. <Should we specify the use of EB Garamond (google font) on digital displays?>\nUse Garamond for lorem ipsum dolor sit amet, consectetur adipiscing elit. Ut id elit sapien. Sed sem ante, ornare a ipsum ut, consequat ullamcorper lorem.",
+    "getMainfontBTN": "Download EB Garamond",
+    "subFontTitle": "This is Jost*, our supporting font.",
+    "subFontText":
+      "Jost*’s geometric form functions as approachable complimentary typography that we used more sparingly but speaks to the typography found in the logo and the round shape language in our illustration.\n\nUse Jost* for lorem ipsum dolor sit amet, consectetur adipiscing elit. Ut id elit sapien. Sed sem ante, ornare a ipsum ut, consequat ullamcorper lorem.",
+    "getSubfontBTN": "Download Jost"
+  },
   "downloadAssetBtn": "Download Assets"
 }

@@ -1,17 +1,17 @@
 import * as React from 'react'
 import { withNamespaces } from 'react-i18next'
 import { ImageBackground, ImageRequireSource, StyleSheet, Text, View } from 'react-native'
-import { H1, H2, H3, H4 } from 'src/fonts/Fonts'
-import { hashNav } from 'src/shared/menu-items'
-import { colors, fonts, standardStyles } from 'src/styles'
-const { brandColor } = hashNav
-
 import Palette from 'src/brandkit/color/Palette'
-import { brandStyles, GAP } from 'src/brandkit/common/constants'
+import { brandStyles } from 'src/brandkit/common/constants'
 import Page from 'src/brandkit/common/Page'
+import PageHeadline from 'src/brandkit/common/PageHeadline'
 import SectionTitle from 'src/brandkit/common/SectionTitle'
 import Judgement, { Value } from 'src/brandkit/logo/Judgement'
 import { I18nProps, NameSpaces } from 'src/i18n'
+import { hashNav } from 'src/shared/menu-items'
+import { colors, fonts, standardStyles } from 'src/styles'
+
+const { brandColor } = hashNav
 
 export default React.memo(function Color() {
   return (
@@ -55,10 +55,11 @@ const BACKGROUND_PALETTE = [
 const Overview = withNamespaces(NameSpaces.brand)(function _Overview({ t }: I18nProps) {
   return (
     <View>
-      <View style={[brandStyles.gap, standardStyles.blockMarginBottom]}>
-        <H1>{t('color.title')}</H1>
-        <H4>{t('color.headline')}</H4>
-      </View>
+      <PageHeadline
+        title={t('color.title')}
+        headline={t('color.headline')}
+        style={standardStyles.blockMarginBottom}
+      />
       <Palette
         title={t('color.primaries')}
         text={t('color.primariesText')}

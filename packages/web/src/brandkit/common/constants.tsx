@@ -15,4 +15,7 @@ export const brandStyles = StyleSheet.create({
     borderWidth: 1,
     borderColor: colors.gray,
   },
+  button: {
+    transform: [{ translateX: -20 }],
+  },
 })

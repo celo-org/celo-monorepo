@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { Image, StyleSheet, Text, View } from 'react-native'
-import { GAP } from 'src/brandkit/common/constants'
+import { GAP, brandStyles } from 'src/brandkit/common/constants'
 import Page from 'src/brandkit/common/Page'
 import SectionTitle from 'src/brandkit/common/SectionTitle'
 import Judgement, { Value } from 'src/brandkit/logo/Judgement'
@@ -99,7 +99,7 @@ const Overview = withNamespaces(NameSpaces.brand)(function _Overview({ t }: I18n
           {t('logo.glyphTitle')}
         </H3>
         <Text style={fonts.p}>{t('logo.glyphText')}</Text>
-        <Button kind={BTN.TERTIARY} text={t('downloadAssetBtn')} style={styles.button} />
+        <Button kind={BTN.TERTIARY} text={t('downloadAssetBtn')} style={brandStyles.button} />
         <View style={styles.tiling}>
           <View
             style={[standardStyles.centered, styles.pilar, { backgroundColor: colors.faintGray }]}
@@ -250,9 +250,7 @@ const styles = StyleSheet.create({
     minWidth: 200,
     paddingVertical: GAP,
   },
-  button: {
-    transform: [{ translateX: -20 }],
-  },
+
   pilar: { minWidth: 175, flex: 1, height: 350 },
   gap: { marginHorizontal: GAP },
   tiling: {

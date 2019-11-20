@@ -111,6 +111,14 @@ export const fonts = StyleSheet.create({
     color: colors.dark,
     textRendering: 'geometricPrecision',
   },
+  h6: {
+    fontFamily: typeFaces.futura,
+    fontSize: 16,
+    lineHeight: 18,
+    fontWeight: '500',
+    color: colors.dark,
+    textRendering: 'geometricPrecision',
+  },
   navigation: {
     fontFamily: typeFaces.futura,
     fontSize: 16,
@@ -197,7 +205,7 @@ export const textStyles = StyleSheet.create({
     color: colors.white,
   },
   readingOnDark: {
-    color: colors.offWhite,
+    color: colors.gray,
   },
   caption: {
     paddingTop: 5,
