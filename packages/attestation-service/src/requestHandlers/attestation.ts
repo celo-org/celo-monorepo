@@ -1,17 +1,18 @@
 import { AttestationState } from '@celo/contractkit/lib/wrappers/Attestations'
 import { attestToIdentifier, SignatureUtils } from '@celo/utils'
-import { Address, isValidPrivateKey, toChecksumAddress } from '@celo/utils/lib/address'
-import { AddressType, E164Number, E164PhoneNumberType } from '@celo/utils/lib/io'
+import { isValidPrivateKey, toChecksumAddress } from '@celo/utils/lib/address'
+import { AddressType, E164PhoneNumberType } from '@celo/utils/lib/io'
+import Logger from 'bunyan'
 import { isValidAddress } from 'ethereumjs-util'
 import express from 'express'
 import * as t from 'io-ts'
 import { Transaction } from 'sequelize'
 import { existingAttestationRequestRecord, getAttestationTable, kit, sequelize } from '../db'
+import { Counters } from '../metrics'
 import { AttestationModel, AttestationStatus } from '../models/attestation'
-import { respondWithError } from '../request'
+import { respondWithError, Response } from '../request'
 import { smsProviderFor } from '../sms'
 import { SmsProviderType } from '../sms/base'
-
 const SMS_SENDING_ERROR = 'Something went wrong while attempting to send SMS, try again later'
 const ATTESTATION_ERROR = 'Valid attestation could not be provided'
 const NO_INCOMPLETE_ATTESTATION_FOUND_ERROR = 'No incomplete attestation found'
@@ -45,63 +46,6 @@ export function getAccountAddress() {
   }
 
   return toChecksumAddress(process.env.ACCOUNT_ADDRESS)
-}
-
-async function validateAttestationRequest(request: AttestationRequest) {
-  const attestationRecord = await existingAttestationRequestRecord(
-    request.phoneNumber,
-    request.account,
-    request.issuer
-  )
-  // check if it exists in the database
-  if (attestationRecord && !attestationRecord.canSendSms()) {
-    throw new Error(ATTESTATION_ALREADY_SENT_ERROR)
-  }
-  const address = getAccountAddress()
-
-  // TODO: Check with the new Accounts.sol
-  if (address.toLowerCase() !== request.issuer.toLowerCase()) {
-    throw new Error(`Mismatching issuer, I am ${address}`)
-  }
-
-  const attestations = await kit.contracts.getAttestations()
-  const state = await attestations.getAttestationState(
-    request.phoneNumber,
-    request.account,
-    request.issuer
-  )
-
-  if (state.attestationState !== AttestationState.Incomplete) {
-    throw new Error(NO_INCOMPLETE_ATTESTATION_FOUND_ERROR)
-  }
-
-  // TODO: Check expiration
-  return
-}
-
-async function validateAttestation(
-  attestationRequest: AttestationRequest,
-  attestationCode: string
-) {
-  const address = getAccountAddress()
-  const attestations = await kit.contracts.getAttestations()
-  const isValid = await attestations.validateAttestationCode(
-    attestationRequest.phoneNumber,
-    attestationRequest.account,
-    address,
-    attestationCode
-  )
-
-  if (!isValid) {
-    throw new Error(ATTESTATION_ERROR)
-  }
-  return
-}
-
-function signAttestation(phoneNumber: E164Number, account: Address) {
-  const signature = attestToIdentifier(phoneNumber, account, getAttestationKey())
-
-  return SignatureUtils.serializeSignature(signature)
 }
 
 function toBase64(str: string) {
@@ -151,101 +95,176 @@ async function ensureLockedRecord(
   return attestationRecord
 }
 
-async function sendSmsAndPersistAttestation(
-  attestationRequest: AttestationRequest,
-  attestationCode: string
-) {
-  const textMessage = createAttestationTextMessage(attestationCode)
-  let attestationRecord: AttestationModel | null = null
-
-  const transaction = await sequelize!.transaction()
-
-  try {
-    attestationRecord = await ensureLockedRecord(attestationRequest, transaction)
-    const provider = smsProviderFor(attestationRequest.phoneNumber)
-
-    if (!provider) {
-      await attestationRecord.update(
-        { status: AttestationStatus.UNABLE_TO_SERVE, smsProvider: SmsProviderType.UNKNOWN },
-        { transaction }
-      )
-      await transaction.commit()
-      return attestationRecord
-    }
-
-    try {
-      await provider.sendSms(attestationRequest.phoneNumber, textMessage)
-      await attestationRecord.update(
-        { status: AttestationStatus.SENT, smsProvider: provider.type },
-        { transaction }
-      )
-    } catch (error) {
-      console.error(error)
-      await attestationRecord.update(
-        { status: AttestationStatus.FAILED, smsProvider: provider.type },
-        { transaction }
-      )
-    }
-
-    await transaction.commit()
-  } catch (error) {
-    console.error(error)
-    await transaction.rollback()
+class AttestationRequestHandler {
+  logger: Logger
+  sequelizeLogger: (_msg: string, sequelizeLog: any) => void
+  constructor(public readonly attestationRequest: AttestationRequest, logger: Logger) {
+    this.logger = logger.child({ attestationRequest })
+    this.sequelizeLogger = (msg: string, sequelizeLogArgs: any) =>
+      this.logger.debug({ sequelizeLogArgs, component: 'sequelize' }, msg)
   }
 
-  return attestationRecord
-}
+  async validateAttestationRequest() {
+    const attestationRecord = await existingAttestationRequestRecord(
+      this.attestationRequest.phoneNumber,
+      this.attestationRequest.account,
+      this.attestationRequest.issuer,
+      { logging: this.sequelizeLogger }
+    )
+    // check if it exists in the database
+    if (attestationRecord && !attestationRecord.canSendSms()) {
+      Counters.attestationRequestsAlreadySent.inc()
+      throw new Error(ATTESTATION_ALREADY_SENT_ERROR)
+    }
+    const address = getAccountAddress()
 
-function respondAfterSendingSms(res: express.Response, attestationRecord: AttestationModel | null) {
-  if (!attestationRecord) {
-    console.error('Attestation Record was not created')
-    respondWithError(res, 500, SMS_SENDING_ERROR)
+    // TODO: Check with the new Accounts.sol
+    if (address.toLowerCase() !== this.attestationRequest.issuer.toLowerCase()) {
+      Counters.attestationRequestsWrongIssuer.inc()
+      throw new Error(`Mismatching issuer, I am ${address}`)
+    }
+
+    const attestations = await kit.contracts.getAttestations()
+    const state = await attestations.getAttestationState(
+      this.attestationRequest.phoneNumber,
+      this.attestationRequest.account,
+      this.attestationRequest.issuer
+    )
+
+    if (state.attestationState !== AttestationState.Incomplete) {
+      Counters.attestationRequestsWOIncompleteAttestation.inc()
+      throw new Error(NO_INCOMPLETE_ATTESTATION_FOUND_ERROR)
+    }
+
+    // TODO: Check expiration
     return
   }
 
-  switch (attestationRecord.status) {
-    case AttestationStatus.SENT:
-      res.status(201).json({ success: true })
-      return
-    case AttestationStatus.FAILED:
+  signAttestation() {
+    const signature = attestToIdentifier(
+      this.attestationRequest.phoneNumber,
+      this.attestationRequest.account,
+      getAttestationKey()
+    )
+
+    return SignatureUtils.serializeSignature(signature)
+  }
+
+  async validateAttestation(attestationCode: string) {
+    const address = getAccountAddress()
+    const attestations = await kit.contracts.getAttestations()
+    const isValid = await attestations.validateAttestationCode(
+      this.attestationRequest.phoneNumber,
+      this.attestationRequest.account,
+      address,
+      attestationCode
+    )
+
+    if (!isValid) {
+      Counters.attestationRequestsAttestationErrors.inc()
+      throw new Error(ATTESTATION_ERROR)
+    }
+    return
+  }
+
+  async sendSmsAndPersistAttestation(attestationCode: string) {
+    const textMessage = createAttestationTextMessage(attestationCode)
+    let attestationRecord: AttestationModel | null = null
+
+    const transaction = await sequelize!.transaction({ logging: this.sequelizeLogger })
+
+    try {
+      attestationRecord = await ensureLockedRecord(this.attestationRequest, transaction)
+      const provider = smsProviderFor(this.attestationRequest.phoneNumber)
+
+      if (!provider) {
+        await attestationRecord.update(
+          { status: AttestationStatus.UNABLE_TO_SERVE, smsProvider: SmsProviderType.UNKNOWN },
+          { transaction, logging: this.sequelizeLogger }
+        )
+        await transaction.commit()
+        Counters.attestationRequestsUnableToServe.inc()
+        return attestationRecord
+      }
+
+      try {
+        await provider.sendSms(this.attestationRequest.phoneNumber, textMessage)
+        Counters.attestationRequestsSentSms.inc()
+        await attestationRecord.update(
+          { status: AttestationStatus.SENT, smsProvider: provider.type },
+          { transaction, logging: this.sequelizeLogger }
+        )
+      } catch (err) {
+        this.logger.error({ err })
+        Counters.attestationRequestsFailedToSendSms.inc()
+        await attestationRecord.update(
+          { status: AttestationStatus.FAILED, smsProvider: provider.type },
+          { transaction, logging: this.sequelizeLogger }
+        )
+      }
+
+      await transaction.commit()
+    } catch (err) {
+      this.logger.error({ err })
+      await transaction.rollback()
+    }
+
+    return attestationRecord
+  }
+
+  respondAfterSendingSms(res: express.Response, attestationRecord: AttestationModel | null) {
+    if (!attestationRecord) {
+      this.logger.error({ err: 'Attestation Record was not created' })
       respondWithError(res, 500, SMS_SENDING_ERROR)
       return
-    case AttestationStatus.UNABLE_TO_SERVE:
-      respondWithError(res, 422, COUNTRY_CODE_NOT_SERVED_ERROR)
-    default:
-      console.error(
-        'Attestation Record should either be failed or sent, but was ',
-        attestationRecord.status
-      )
-      respondWithError(res, 500, SMS_SENDING_ERROR)
-      return
+    }
+
+    switch (attestationRecord.status) {
+      case AttestationStatus.SENT:
+        res.status(201).json({ success: true })
+        return
+      case AttestationStatus.FAILED:
+        respondWithError(res, 500, SMS_SENDING_ERROR)
+        return
+      case AttestationStatus.UNABLE_TO_SERVE:
+        respondWithError(res, 422, COUNTRY_CODE_NOT_SERVED_ERROR)
+      default:
+        this.logger.error({
+          err:
+            'Attestation Record should either be failed or sent, but was ' +
+            attestationRecord.status,
+        })
+        respondWithError(res, 500, SMS_SENDING_ERROR)
+        return
+    }
   }
 }
 
 export async function handleAttestationRequest(
   _req: express.Request,
-  res: express.Response,
+  res: Response,
   attestationRequest: AttestationRequest
 ) {
+  const handler = new AttestationRequestHandler(attestationRequest, res.locals.logger)
   let attestationCode
   try {
-    await validateAttestationRequest(attestationRequest)
-    attestationCode = signAttestation(attestationRequest.phoneNumber, attestationRequest.account)
-    await validateAttestation(attestationRequest, attestationCode)
-  } catch (error) {
-    console.error(error)
-    respondWithError(res, 422, error.toString())
+    Counters.attestationRequestsTotal.inc()
+    await handler.validateAttestationRequest()
+    Counters.attestationRequestsValid.inc()
+    attestationCode = handler.signAttestation()
+    await handler.validateAttestation(attestationCode)
+  } catch (err) {
+    handler.logger.info({ err })
+    respondWithError(res, 422, err.toString())
     return
   }
 
   try {
-    const attestationRecord = await sendSmsAndPersistAttestation(
-      attestationRequest,
-      attestationCode
-    )
-    respondAfterSendingSms(res, attestationRecord)
-  } catch (error) {
-    console.error(error)
+    const attestationRecord = await handler.sendSmsAndPersistAttestation(attestationCode)
+    handler.respondAfterSendingSms(res, attestationRecord)
+  } catch (err) {
+    Counters.attestationRequestUnexpectedErrors.inc()
+    handler.logger.error({ err })
     respondWithError(res, 500, SMS_SENDING_ERROR)
     return
   }
