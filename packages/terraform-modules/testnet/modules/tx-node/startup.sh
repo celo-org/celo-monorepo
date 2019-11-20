@@ -81,7 +81,6 @@ docker run -v $DATA_DIR:$DATA_DIR -p 8545:8545/tcp -p 8546:8546/tcp --name geth 
     --etherbase=$ACCOUNT_ADDRESS \
     --networkid=${network_id} \
     --syncmode=full \
-    --miner.verificationpool=${verification_pool_url} \
     --consoleformat=json \
     --consoleoutput=stdout \
     --verbosity=${geth_verbosity} \
