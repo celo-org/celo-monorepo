@@ -16,18 +16,17 @@ This section is specific for Alfajores Network. You can find more details about 
 First we are going to setup the main environment variables related with the `Alfajores` network. Run:
 
 ```bash
-export CELO_NETWORK=alfajores
-export CELO_IMAGE=us.gcr.io/celo-testnet/celo-node
+export CELO_IMAGE=us.gcr.io/celo-testnet/celo-node:alfajores
 export NETWORK_ID=44785
 export URL_VERIFICATION_POOL=https://us-central1-celo-testnet-production.cloudfunctions.net/handleVerificationRequestalfajores/v0.1/sms/
 ```
 
 ### Pull the Celo Docker image
 
-In all the commands we are going to see the `CELO_IMAGE` and `CELO_NETWORK` variables to refer to the right Docker image and network to use. Now we can get the Docker image:
+In all the commands we are going to see the `CELO_IMAGE` variable to refer to the right Docker image to use. Now we can get the Docker image:
 
 ```bash
-docker pull $CELO_IMAGE:$CELO_NETWORK
+docker pull $CELO_IMAGE
 ```
 
 ### Create accounts
@@ -44,7 +43,7 @@ Create two accounts, one for the Validator and one for Validator Group, and get 
 To create your two accounts, run this command twice:
 
 ```bash
-docker run -v $PWD:/root/.celo --entrypoint /bin/sh -it $CELO_IMAGE:$CELO_NETWORK -c "geth account new"
+docker run -v $PWD:/root/.celo --entrypoint /bin/sh -it $CELO_IMAGE -c "geth account new"
 ```
 
 It will prompt you for a passphrase, ask you to confirm it, and then will output your account address: `Address: {<YOUR-ACCOUNT-ADDRESS>}`
@@ -63,7 +62,7 @@ export CELO_VALIDATOR_ADDRESS=<YOUR-VALIDATOR-ADDRESS>
 In order to register the Validator later on, generate a "proof of possession" - a signature proving you know your Validator's BLS private key. Run this command:
 
 ```bash
-docker run -v $PWD:/root/.celo --entrypoint /bin/sh -it $CELO_IMAGE:$CELO_NETWORK -c "geth account proof-of-possession $CELO_VALIDATOR_ADDRESS"
+docker run -v $PWD:/root/.celo --entrypoint /bin/sh -it $CELO_IMAGE -c "geth account proof-of-possession $CELO_VALIDATOR_ADDRESS"
 ```
 
 It will prompt you for the passphrase you've chosen for the Validator account. Let's save the resulting proof-of-possession to an environment variable:
@@ -77,25 +76,25 @@ export CELO_VALIDATOR_POP=<YOUR-VALIDATOR-PROOF-OF-POSSESSION>
 Initialize the docker container, building from an image for the network and initializing Celo with the genesis block found inside the Docker image:
 
 ```bash
-docker run -v $PWD:/root/.celo $CELO_IMAGE:$CELO_NETWORK init /celo/genesis.json
+docker run -v $PWD:/root/.celo $CELO_IMAGE init /celo/genesis.json
 ```
 
 To participate in consensus, we need to set up our nodekey for our account. We can do so via the following command \(it will prompt you for your passphrase\):
 
 ```bash
-docker run -v $PWD:/root/.celo --entrypoint /bin/sh -it $CELO_IMAGE:$CELO_NETWORK -c "geth account set-node-key $CELO_VALIDATOR_ADDRESS"
+docker run -v $PWD:/root/.celo --entrypoint /bin/sh -it $CELO_IMAGE -c "geth account set-node-key $CELO_VALIDATOR_ADDRESS"
 ```
 
 In order to allow the node to sync with the network, give it the address of existing nodes in the network:
 
 ```bash
-docker run -v $PWD:/root/.celo --entrypoint cp $CELO_IMAGE:$CELO_NETWORK /celo/static-nodes.json /root/.celo/
+docker run -v $PWD:/root/.celo --entrypoint cp $CELO_IMAGE /celo/static-nodes.json /root/.celo/
 ```
 
 Start up the node:
 
 ```bash
-docker run --name celo-validator --restart=Always -p 127.0.0.1:8545:8545 -p 127.0.0.1:8546:8546 -p 30303:30303 -p 30303:30303/udp -v $PWD:/root/.celo $CELO_IMAGE:$CELO_NETWORK --verbosity 3 --networkid 44785 --syncmode full --rpc --rpcaddr 0.0.0.0 --rpcapi eth,net,web3,debug,admin,personal --maxpeers 1100 --mine --miner.verificationpool=$URL_VERIFICATION_POOL --etherbase $CELO_VALIDATOR_ADDRESS
+docker run --name celo-validator --restart always -p 127.0.0.1:8545:8545 -p 127.0.0.1:8546:8546 -p 30303:30303 -p 30303:30303/udp -v $PWD:/root/.celo $CELO_IMAGE --verbosity 3 --networkid 44785 --syncmode full --rpc --rpcaddr 0.0.0.0 --rpcapi eth,net,web3,debug,admin,personal --maxpeers 1100 --mine --miner.verificationpool=$URL_VERIFICATION_POOL --etherbase $CELO_VALIDATOR_ADDRESS
 ```
 
 {% hint style="danger" %}

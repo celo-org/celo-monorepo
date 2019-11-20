@@ -26,36 +26,34 @@ The Proxy is not mandatory but highly recommended. It allows to protect the Vali
 
 ### Environment variables
 
-| Variable                     | Explanation                                                                   |
-| ---------------------------- | ----------------------------------------------------------------------------- |
-| CELO_IMAGE                   | The Docker image used for the Validator and Proxy containers                  |  |
-| CELO_NETWORK                 | The Celo network to connect with. This variable is also used as the image tag |  |
-| NETWORK_ID                   | The Celo network chain ID                                                     |  |
-| URL_VERIFICATION_POOL        | URL for the Verification pool for the attestation process                     |  |
-| CELO_VALIDATOR_GROUP_ADDRESS | The etherbase public address for the validation group                         |  |
-| CELO_VALIDATOR_ADDRESS       | The etherbase public address for the Validator instance                       |  |
-| CELO_PROXY_ADDRESS           | The etherbase public address for the Proxy instance                           |  |
-| CELO_VALIDATOR_POP           |                                                                               |  |
-| PROXY_ENODE                  | The ethereum node address for the Validator                                   |  |
-| PROXY_IP                     | The Proxy container internal IP address from docker pool address              |  |
-| ATTESTATION_KEY              | The etherbase private key for the account used in the Attestation Service     |  |
-| ATTESTATION_SERVICE_URL      | The URL to access the Attestation Service deployed                            |  |
-| METADATA_URL                 | The URL to access the metadata file for your Attestation Service              |  |
+| Variable                     | Explanation                                                               |
+| ---------------------------- | ------------------------------------------------------------------------- |
+| CELO_IMAGE                   | The Docker image used for the Validator and Proxy containers              |  |
+| NETWORK_ID                   | The Celo network chain ID                                                 |  |
+| URL_VERIFICATION_POOL        | URL for the Verification pool for the attestation process                 |  |
+| CELO_VALIDATOR_GROUP_ADDRESS | The etherbase public address for the validation group                     |  |
+| CELO_VALIDATOR_ADDRESS       | The etherbase public address for the Validator instance                   |  |
+| CELO_PROXY_ADDRESS           | The etherbase public address for the Proxy instance                       |  |
+| CELO_VALIDATOR_POP           |                                                                           |  |
+| PROXY_ENODE                  | The ethereum node address for the Validator                               |  |
+| PROXY_IP                     | The Proxy container internal IP address from docker pool address          |  |
+| ATTESTATION_KEY              | The etherbase private key for the account used in the Attestation Service |  |
+| ATTESTATION_SERVICE_URL      | The URL to access the Attestation Service deployed                        |  |
+| METADATA_URL                 | The URL to access the metadata file for your Attestation Service          |  |
 
 First we are going to setup the main environment variables related with the `Baklava` network. Run:
 
 ```bash
-export CELO_NETWORK=baklava
-export CELO_IMAGE=us.gcr.io/celo-testnet/celo-node
+export CELO_IMAGE=us.gcr.io/celo-testnet/celo-node:baklava
 export NETWORK_ID=1101
 ```
 
 ### Pull the Celo Docker image
 
-In all the commands we are going to see the `CELO_IMAGE` and `CELO_NETWORK` variables to refer to the right Docker image and network to use. Now we can get the Docker image:
+In all the commands we are going to see the `CELO_IMAGE` variable to refer to the right Docker image to use. Now we can get the Docker image:
 
 ```bash
-docker pull $CELO_IMAGE:$CELO_NETWORK
+docker pull $CELO_IMAGE
 ```
 
 ### Create accounts
@@ -74,9 +72,9 @@ First we create three accounts, one for the Validator, one for the Validator Gro
 To create the accounts needed, run the following commands. The first two create the accounts for the Validator, the third one for the Proxy:
 
 ```bash
-docker run -v $PWD/validator:/root/.celo --entrypoint /bin/sh -it $CELO_IMAGE:$CELO_NETWORK -c "geth account new"
-docker run -v $PWD/validator:/root/.celo --entrypoint /bin/sh -it $CELO_IMAGE:$CELO_NETWORK -c "geth account new"
-docker run -v $PWD/proxy:/root/.celo --entrypoint /bin/sh -it $CELO_IMAGE:$CELO_NETWORK -c "geth account new"
+docker run -v $PWD/validator:/root/.celo --entrypoint /bin/sh -it $CELO_IMAGE -c "geth account new"
+docker run -v $PWD/validator:/root/.celo --entrypoint /bin/sh -it $CELO_IMAGE -c "geth account new"
+docker run -v $PWD/proxy:/root/.celo --entrypoint /bin/sh -it $CELO_IMAGE -c "geth account new"
 ```
 
 Those commands will prompt you for a passphrase, ask you to confirm it, and then will output your account address: `Address: {<YOUR-ACCOUNT-ADDRESS>}`
@@ -96,7 +94,7 @@ export CELO_PROXY_ADDRESS=<YOUR-PROXY-ADDRESS>
 In order to register the Validator later on, generate a "proof of possession" - a signature proving you know your Validator's BLS private key. Run this command:
 
 ```bash
-docker run -v $PWD/validator:/root/.celo --entrypoint /bin/sh -it $CELO_IMAGE:$CELO_NETWORK -c "geth account proof-of-possession $CELO_VALIDATOR_ADDRESS"
+docker run -v $PWD/validator:/root/.celo --entrypoint /bin/sh -it $CELO_IMAGE -c "geth account proof-of-possession $CELO_VALIDATOR_ADDRESS"
 ```
 
 It will prompt you for the passphrase you've chosen for the Validator account. Let's save the resulting proof-of-possession to an environment variable:
@@ -110,15 +108,15 @@ export CELO_VALIDATOR_POP=<YOUR-VALIDATOR-PROOF-OF-POSSESSION>
 We initialize the Docker containers for the Validator and the Proxy, building from an image for the network and initializing Celo with the genesis block found inside the Docker image:
 
 ```bash
-docker run -v $PWD/proxy:/root/.celo $CELO_IMAGE:$CELO_NETWORK init /celo/genesis.json
-docker run -v $PWD/validator:/root/.celo $CELO_IMAGE:$CELO_NETWORK init /celo/genesis.json
+docker run -v $PWD/proxy:/root/.celo $CELO_IMAGE init /celo/genesis.json
+docker run -v $PWD/validator:/root/.celo $CELO_IMAGE init /celo/genesis.json
 ```
 
 To participate in consensus, we need to set up our nodekey for our accounts. We can do so via the following commands \(it will prompt you for your passphrase\):
 
 ```bash
-docker run -v $PWD/proxy:/root/.celo --entrypoint /bin/sh -it $CELO_IMAGE:$CELO_NETWORK -c "geth account set-node-key $CELO_PROXY_ADDRESS"
-docker run -v $PWD/validator:/root/.celo --entrypoint /bin/sh -it $CELO_IMAGE:$CELO_NETWORK -c "geth account set-node-key $CELO_VALIDATOR_ADDRESS"
+docker run -v $PWD/proxy:/root/.celo --entrypoint /bin/sh -it $CELO_IMAGE -c "geth account set-node-key $CELO_PROXY_ADDRESS"
+docker run -v $PWD/validator:/root/.celo --entrypoint /bin/sh -it $CELO_IMAGE -c "geth account set-node-key $CELO_VALIDATOR_ADDRESS"
 ```
 
 {% hint style="danger" %}
@@ -128,14 +126,14 @@ docker run -v $PWD/validator:/root/.celo --entrypoint /bin/sh -it $CELO_IMAGE:$C
 In order to allow the node to sync with the network, give it the address of existing nodes in the network:
 
 ```bash
-docker run -v $PWD/proxy:/root/.celo --entrypoint cp $CELO_IMAGE:$CELO_NETWORK /celo/static-nodes.json /root/.celo/
-docker run -v $PWD/validator:/root/.celo --entrypoint cp $CELO_IMAGE:$CELO_NETWORK /celo/static-nodes.json /root/.celo/
+docker run -v $PWD/proxy:/root/.celo --entrypoint cp $CELO_IMAGE /celo/static-nodes.json /root/.celo/
+docker run -v $PWD/validator:/root/.celo --entrypoint cp $CELO_IMAGE /celo/static-nodes.json /root/.celo/
 ```
 
 At this point we are ready to start up the Proxy:
 
 ```bash
-docker run --name celo-proxy --restart=Always -p 8545:8545 -p 8546:8546 -p 30303:30303 -p 30303:30303/udp -p 30503:30503 -p 30503:30503/udp -v $PWD/proxy:/root/.celo $CELO_IMAGE:$CELO_NETWORK --verbosity 3 --networkid $NETWORK_ID --syncmode full --rpc --rpcaddr 0.0.0.0 --rpcapi eth,net,web3,debug --maxpeers 1100 --etherbase=$CELO_PROXY_ADDRESS --proxy.proxy --proxy.proxiedvalidatoraddress $CELO_VALIDATOR_ADDRESS --proxy.internalendpoint :30503
+docker run --name celo-proxy --restart always -p 8545:8545 -p 8546:8546 -p 30303:30303 -p 30303:30303/udp -p 30503:30503 -p 30503:30503/udp -v $PWD/proxy:/root/.celo $CELO_IMAGE --verbosity 3 --networkid $NETWORK_ID --syncmode full --rpc --rpcaddr 0.0.0.0 --rpcapi eth,net,web3,debug --maxpeers 1100 --etherbase=$CELO_PROXY_ADDRESS --proxy.proxy --proxy.proxiedvalidatoraddress $CELO_VALIDATOR_ADDRESS --proxy.internalendpoint :30503
 ```
 
 Now we need to obtain the Proxy enode and ip addresses, running the following commands:
@@ -148,7 +146,7 @@ export PROXY_IP=$(docker inspect -f '{{range .NetworkSettings.Networks}}{{.IPAdd
 Now we can start up the Validator node:
 
 ```bash
-docker run --name celo-validator --restart=Always -p 127.0.0.1:8547:8545 -p 127.0.0.1:8548:8546 -p 30304:30303 -p 30304:30303/udp -v $PWD/validator:/root/.celo $CELO_IMAGE:$CELO_NETWORK --verbosity 3 --networkid $NETWORK_ID --syncmode full --rpc --rpcaddr 0.0.0.0 --rpcapi eth,net,web3,debug --maxpeers 125 --mine --istanbul.blockperiod=5 --istanbul.requesttimeout=3000 --etherbase $CELO_VALIDATOR_ADDRESS --nodiscover --proxy.proxied --proxy.proxyenodeurlpair=enode://$PROXY_ENODE@$PROXY_IP:30503\;enode://$PROXY_ENODE@$PROXY_IP:30503
+docker run --name celo-validator --restart always -p 127.0.0.1:8547:8545 -p 127.0.0.1:8548:8546 -p 30304:30303 -p 30304:30303/udp -v $PWD/validator:/root/.celo $CELO_IMAGE --verbosity 3 --networkid $NETWORK_ID --syncmode full --rpc --rpcaddr 0.0.0.0 --rpcapi eth,net,web3,debug --maxpeers 125 --mine --istanbul.blockperiod=5 --istanbul.requesttimeout=3000 --etherbase $CELO_VALIDATOR_ADDRESS --nodiscover --proxy.proxied --proxy.proxyenodeurlpair=enode://$PROXY_ENODE@$PROXY_IP:30503\;enode://$PROXY_ENODE@$PROXY_IP:30503
 ```
 
 {% hint style="danger" %}
