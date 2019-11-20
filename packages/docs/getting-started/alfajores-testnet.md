@@ -1,7 +1,3 @@
----
-description: More than a cookie; Celo's network is live for testing
----
-
 # Alfajores Testnet
 
 The Alfajores Testnet is the first Celo test network. It is a demonstration of the current Celo codebase. You can use it to try out the [Celo Wallet](https://celo.org/build/wallet) or the [Celo CLI](using-the-cli.md) \(by sending transfers to yourself or other users of the testnet\). You can also assist in running the network by operating a [full node](running-a-full-node.md) or a [validator](running-a-validator.md) on your machine \(or on a cloud or hosting provider\).
