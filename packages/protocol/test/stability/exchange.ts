@@ -60,8 +60,8 @@ contract('Exchange', (accounts: string[]) => {
   const initialGoldBucket = initialReserveBalance
     .times(fromFixed(reserveFraction))
     .integerValue(BigNumber.ROUND_FLOOR)
-  const stableAmountForRate = new BigNumber(2)
-  const goldAmountForRate = new BigNumber(1)
+  const goldAmountForRate = new BigNumber('0x10000000000000000')
+  const stableAmountForRate = new BigNumber(2).times(goldAmountForRate)
   const initialStableBucket = initialGoldBucket.times(stableAmountForRate).div(goldAmountForRate)
   function getBuyTokenAmount(
     sellAmount: BigNumber,
@@ -109,11 +109,7 @@ contract('Exchange', (accounts: string[]) => {
 
     mockSortedOracles = await MockSortedOracles.new()
     await registry.setAddressFor(CeloContractName.SortedOracles, mockSortedOracles.address)
-    await mockSortedOracles.setMedianRate(
-      stableToken.address,
-      stableAmountForRate,
-      goldAmountForRate
-    )
+    await mockSortedOracles.setMedianRate(stableToken.address, stableAmountForRate)
     await mockSortedOracles.setMedianTimestampToNow(stableToken.address)
     await mockSortedOracles.setNumRates(stableToken.address, 2)
 
@@ -330,7 +326,7 @@ contract('Exchange', (accounts: string[]) => {
 
     describe('after an oracle update', () => {
       beforeEach(async () => {
-        await mockSortedOracles.setMedianRate(stableToken.address, 4, 1)
+        await mockSortedOracles.setMedianRate(stableToken.address, goldAmountForRate.times(4))
       })
 
       it(`should return the same value if updateFrequency seconds haven't passed yet`, async () => {

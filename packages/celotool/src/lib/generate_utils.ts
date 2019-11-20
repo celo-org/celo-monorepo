@@ -4,7 +4,7 @@ import { ec as EC } from 'elliptic'
 import fs from 'fs'
 import { range, repeat } from 'lodash'
 import path from 'path'
-import rlp from 'rlp'
+import * as rlp from 'rlp'
 import Web3 from 'web3'
 import { envVar, fetchEnv, fetchEnvOrFallback, monorepoRoot } from './env-utils'
 import {
@@ -28,7 +28,8 @@ export enum AccountType {
   BOOTNODE = 3,
   FAUCET = 4,
   ATTESTATION = 5,
-  PROXY = 6,
+  PRICE_ORACLE = 6,
+  PROXY = 7,
 }
 
 export enum ConsensusType {
@@ -48,6 +49,7 @@ export const MNEMONIC_ACCOUNT_TYPE_CHOICES = [
   'bootnode',
   'faucet',
   'attestation',
+  'price_oracle',
   'proxy',
 ]
 
@@ -149,11 +151,13 @@ export const generateGenesisFromEnv = (enablePetersburg: boolean = true) => {
   // Assing DEFAULT ammount of gold to 2 faucet accounts
   const faucetAddresses = getStrippedAddressesFor(AccountType.FAUCET, mnemonic, 2)
 
+  const oracleAddress = getStrippedAddressesFor(AccountType.PRICE_ORACLE, mnemonic, 1)
+
   return generateGenesis({
     validators,
     consensusType,
     blockTime,
-    initialAccounts: faucetAddresses,
+    initialAccounts: faucetAddresses.concat(oracleAddress),
     epoch,
     chainId,
     requestTimeout,
@@ -163,20 +167,37 @@ export const generateGenesisFromEnv = (enablePetersburg: boolean = true) => {
 
 const generateIstanbulExtraData = (validators: Validator[]) => {
   const istanbulVanity = 32
-  const blsSignatureVanity = 192
-
+  const blsSignatureVanity = 96
+  const ecdsaSignatureVanity = 65
   return (
     '0x' +
     repeat('0', istanbulVanity * 2) +
     rlp
-      // @ts-ignore
       .encode([
+        // Added validators
         validators.map((validator) => Buffer.from(validator.address, 'hex')),
         validators.map((validator) => Buffer.from(validator.blsPublicKey, 'hex')),
+        // Removed validators
         new Buffer(0),
-        Buffer.from(repeat('0', blsSignatureVanity * 2), 'hex'),
-        new Buffer(0),
-        Buffer.from(repeat('0', blsSignatureVanity * 2), 'hex'),
+        // Seal
+        Buffer.from(repeat('0', ecdsaSignatureVanity * 2), 'hex'),
+        [
+          // AggregatedSeal.Bitmap
+          new Buffer(0),
+          // AggregatedSeal.Signature
+          Buffer.from(repeat('0', blsSignatureVanity * 2), 'hex'),
+          // AggregatedSeal.Round
+          new Buffer(0),
+        ],
+        [
+          // ParentAggregatedSeal.Bitmap
+          new Buffer(0),
+          // ParentAggregatedSeal.Signature
+          Buffer.from(repeat('0', blsSignatureVanity * 2), 'hex'),
+          // ParentAggregatedSeal.Round
+          new Buffer(0),
+        ],
+        // EpochData
         new Buffer(0),
       ])
       .toString('hex')

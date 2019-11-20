@@ -25,6 +25,8 @@ systemctl restart docker
 
 # ---- Set Up and Run Geth ----
 
+DATA_DIR=/root/.celo
+
 GETH_NODE_DOCKER_IMAGE=${geth_node_docker_image_repository}:${geth_node_docker_image_tag}
 
 # download & apply secrets pulled from Cloud Storage as environment vars
@@ -46,6 +48,10 @@ docker pull $GETH_NODE_DOCKER_IMAGE
 IN_MEMORY_DISCOVERY_TABLE_FLAG=""
 [[ ${in_memory_discovery_table} == "true" ]] && IN_MEMORY_DISCOVERY_TABLE_FLAG="--use-in-memory-discovery-table"
 
+if [[ ${proxy} == "true" ]]; then
+  ADDITIONAL_GETH_FLAGS="--proxy.proxy --proxy.internalendpoint :30503 --proxy.proxiedvalidatoraddress $PROXIED_VALIDATOR_ADDRESS"
+fi
+
 DATA_DIR=/root/.celo
 
 mkdir -p $DATA_DIR/account
@@ -63,36 +69,62 @@ fi
 
 echo "Starting geth..."
 # We need to override the entrypoint in the geth image (which is originally `geth`)
-docker run -v $DATA_DIR:$DATA_DIR -p 8545:8545/tcp -p 8546:8546/tcp --name geth --net=host --restart=always --entrypoint /bin/sh -d $GETH_NODE_DOCKER_IMAGE -c "\
-  (
-    set -euo pipefail ; \
-    geth init $DATA_DIR/genesis.json \
-  ) ; \
-  geth account import --password $DATA_DIR/account/accountSecret $DATA_DIR/pkey ; \
-  geth \
-    --bootnodes=enode://$BOOTNODE_ENODE \
-    --lightserv 90 \
-    --lightpeers 1000 \
-    --maxpeers 1100 \
-    --rpc \
-    --rpcaddr 0.0.0.0 \
-    --rpcapi=eth,net,web3,debug \
-    --rpccorsdomain='*' \
-    --rpcvhosts=* \
-    --ws \
-    --wsaddr 0.0.0.0 \
-    --wsorigins=* \
-    --wsapi=eth,net,web3,debug \
-    --nodekey=$DATA_DIR/pkey \
-    --etherbase=$ACCOUNT_ADDRESS \
-    --networkid=${network_id} \
-    --syncmode=full \
-    --miner.verificationpool=${verification_pool_url} \
-    --consoleformat=json \
-    --consoleoutput=stdout \
-    --verbosity=${geth_verbosity} \
-    --ethstats=${node_name}:$ETHSTATS_WEBSOCKETSECRET@${ethstats_host} \
-    --nat=extip:${ip_address} \
-    --metrics \
-    $IN_MEMORY_DISCOVERY_TABLE_FLAG \
-    ${additional_geth_flags}"
+docker run \
+  -v $DATA_DIR:$DATA_DIR \
+  -p 8545:8545/tcp \
+  -p 8546:8546/tcp \
+  --name geth \
+  --net=host \
+  --restart always \
+  --entrypoint /bin/sh \
+  -d \
+  $GETH_NODE_DOCKER_IMAGE -c "\
+    (
+      set -euo pipefail ; \
+      geth init $DATA_DIR/genesis.json \
+    ) ; \
+    geth account import --password $DATA_DIR/account/accountSecret $DATA_DIR/pkey ; \
+    geth \
+      --bootnodes=enode://$BOOTNODE_ENODE \
+      --lightserv 90 \
+      --lightpeers 1000 \
+      --maxpeers 1100 \
+      --rpc \
+      --rpcaddr 0.0.0.0 \
+      --rpcapi=eth,net,web3,debug \
+      --rpccorsdomain='*' \
+      --rpcvhosts=* \
+      --ws \
+      --wsaddr 0.0.0.0 \
+      --wsorigins=* \
+      --wsapi=eth,net,web3,debug \
+      --nodekey=$DATA_DIR/pkey \
+      --etherbase=$ACCOUNT_ADDRESS \
+      --networkid=${network_id} \
+      --syncmode=full \
+      --consoleformat=json \
+      --consoleoutput=stdout \
+      --verbosity=${geth_verbosity} \
+      --ethstats=${node_name}:$ETHSTATS_WEBSOCKETSECRET@${ethstats_host} \
+      --nat=extip:${ip_address} \
+      --metrics \
+      $IN_MEMORY_DISCOVERY_TABLE_FLAG \
+      $ADDITIONAL_GETH_FLAGS"
+
+# ---- Set Up and Run Geth Exporter ----
+
+GETH_EXPORTER_DOCKER_IMAGE=${geth_exporter_docker_image_repository}:${geth_exporter_docker_image_tag}
+
+echo "Pulling geth exporter..."
+docker pull $GETH_EXPORTER_DOCKER_IMAGE
+
+docker run \
+  -v $DATA_DIR:$DATA_DIR \
+  --name geth-exporter \
+  --restart always \
+  --net=host \
+  -d \
+  $GETH_EXPORTER_DOCKER_IMAGE \
+    /usr/local/bin/geth_exporter \
+      -ipc $DATA_DIR/geth.ipc \
+      -filter "(.*overall|percentiles_95)"

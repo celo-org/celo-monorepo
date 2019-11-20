@@ -13,11 +13,21 @@ resource "google_compute_address" "full_node" {
   }
 }
 
+resource "google_compute_address" "full_node_internal" {
+  name         = "${local.name_prefix}-internal-address-${count.index}-${random_id.full_node[count.index].hex}"
+  address_type = "INTERNAL"
+  purpose      = "GCE_ENDPOINT"
+
+  count = var.node_count
+}
+
 resource "google_compute_instance" "full_node" {
   name         = "${local.name_prefix}-${count.index}-${random_id.full_node[count.index].hex}"
   machine_type = "n1-standard-1"
 
   count = var.node_count
+
+  tags = ["${var.celo_env}-node"]
 
   allow_stopping_for_update = true
 
@@ -28,11 +38,12 @@ resource "google_compute_instance" "full_node" {
   }
 
   scratch_disk {
-
+    interface = "SCSI"
   }
 
   network_interface {
     network = var.network_name
+    network_ip = google_compute_address.full_node_internal[count.index].address
     access_config {
       nat_ip = google_compute_address.full_node[count.index].address
     }
@@ -47,6 +58,8 @@ resource "google_compute_instance" "full_node" {
       gcloud_secrets_base_path : var.gcloud_secrets_base_path,
       gcloud_secrets_bucket : var.gcloud_secrets_bucket,
       genesis_content_base64 : var.genesis_content_base64,
+      geth_exporter_docker_image_repository : var.geth_exporter_docker_image_repository,
+      geth_exporter_docker_image_tag : var.geth_exporter_docker_image_tag,
       geth_node_docker_image_repository : var.geth_node_docker_image_repository,
       geth_node_docker_image_tag : var.geth_node_docker_image_tag,
       geth_verbosity : var.geth_verbosity,
@@ -56,6 +69,7 @@ resource "google_compute_instance" "full_node" {
       name : var.name,
       network_id : var.network_id,
       node_name : "${var.celo_env}-${var.name}-${count.index}",
+      proxy : var.proxy,
       rid : count.index,
       verification_pool_url : var.verification_pool_url
     }

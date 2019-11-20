@@ -13,6 +13,11 @@
   "enableCeloLite": "Enable Celo Lite",
   "celoLiteDetail":
     "Celo Lite mode allows you to communicate with the Celo Network through a trusted node. You can always change this mode in app settings.",
+  "restartModal": {
+    "header": "Restart To Switch Off Celo Lite",
+    "body": "To switch Celo Lite on and off repeatedly, you will need to restart the app.",
+    "restart": "Restart to Switch"
+  },
   "testFaqLink": "Celo Wallet FAQ",
   "termsOfServiceLink": "Terms of service",
   "editProfile": "Edit Profile",

@@ -1,4 +1,4 @@
-import { isValidAddress } from '@celo/utils/src/signatureUtils'
+import { isValidAddress } from '@celo/utils/src/address'
 import { isEmpty } from 'lodash'
 import * as RNFS from 'react-native-fs'
 import Share from 'react-native-share'

@@ -66,10 +66,6 @@ export enum Screens {
   TabNavigator = 'TabNavigator',
   TransactionReview = 'TransactionReview',
   UpgradeScreen = 'UpgradeScreen',
-  // TODO(Rossy) Remove these next 3
-  VerifyEducation = 'VerifyEducation',
-  VerifyVerified = 'VerifyVerified',
-  VerifyVerifying = 'VerifyVerifying',
   VerificationEducationScreen = 'VerificationEducationScreen',
   VerificationLearnMoreScreen = 'VerificationLearnMoreScreen',
   VerificationLoadingScreen = 'VerificationLoadingScreen',

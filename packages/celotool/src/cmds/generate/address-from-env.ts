@@ -5,7 +5,7 @@ import {
   getAddressFromEnv,
   MNEMONIC_ACCOUNT_TYPE_CHOICES,
 } from 'src/lib/generate_utils'
-import * as yargs from 'yargs'
+import yargs from 'yargs'
 
 export const command = 'address-from-env'
 

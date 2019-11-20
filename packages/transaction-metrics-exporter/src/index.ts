@@ -2,8 +2,8 @@ import express from 'express'
 import * as PromClient from 'prom-client'
 import { metricExporterWithRestart } from './blockchain'
 
-process.on('unhandledRejection', (error) => {
-  console.log('unhandledRejection', error.message)
+process.on('unhandledRejection', (reason) => {
+  console.log('unhandledRejection', reason)
   process.exit(1)
 })
 

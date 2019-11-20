@@ -1,6 +1,6 @@
 import { addCeloEnvMiddleware, CeloEnvArgv, envVar, fetchEnv } from 'src/lib/env-utils'
 import { execCmd } from 'src/lib/utils'
-import * as yargs from 'yargs'
+import yargs from 'yargs'
 
 export const command = 'ssh-vm-node <nodeType> [nodeIndex]'
 

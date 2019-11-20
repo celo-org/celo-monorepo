@@ -120,7 +120,14 @@ echo "Starting geth..."
 # We need to override the entrypoint in the geth image (which is originally `geth`).
 # `geth account import` fails when the account has already been imported. In
 # this case, we do not want to pipefail
-docker run -v $DATA_DIR:$DATA_DIR --name geth --net=host --restart=always --entrypoint /bin/sh -d $GETH_NODE_DOCKER_IMAGE -c "\
+docker run \
+  -v $DATA_DIR:$DATA_DIR \
+  --name geth \
+  --net=host \
+  --restart always \
+  --entrypoint /bin/sh \
+  -d \
+  $GETH_NODE_DOCKER_IMAGE -c "\
   (
     set -euo pipefail ; \
     geth init $DATA_DIR/genesis.json \
@@ -144,7 +151,6 @@ docker run -v $DATA_DIR:$DATA_DIR --name geth --net=host --restart=always --entr
     --etherbase=$ACCOUNT_ADDRESS \
     --networkid=${network_id} \
     --syncmode=full \
-    --miner.verificationpool=${verification_pool_url} \
     --consoleformat=json \
     --consoleoutput=stdout \
     --verbosity=${geth_verbosity} \
@@ -155,3 +161,15 @@ docker run -v $DATA_DIR:$DATA_DIR --name geth --net=host --restart=always --entr
     --metrics \
     $IN_MEMORY_DISCOVERY_TABLE_FLAG \
     $PROXIED_FLAGS"
+
+# ---- Set Up and Run Geth Exporter ----
+
+GETH_EXPORTER_DOCKER_IMAGE=${geth_exporter_docker_image_repository}:${geth_exporter_docker_image_tag}
+
+echo "Pulling geth exporter..."
+docker pull $GETH_EXPORTER_DOCKER_IMAGE
+
+docker run -v $DATA_DIR:$DATA_DIR --name geth-exporter --restart=always --net=host -d $GETH_EXPORTER_DOCKER_IMAGE \
+  /usr/local/bin/geth_exporter \
+    -ipc $DATA_DIR/geth.ipc \
+    -filter "(.*overall|percentiles_95)"

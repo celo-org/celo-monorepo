@@ -15,11 +15,22 @@ resource "google_compute_address" "validator" {
   count = var.validator_count - var.proxied_validator_count
 }
 
+resource "google_compute_address" "validator_internal" {
+  name         = "${local.name_prefix}-internal-address-${count.index}"
+  subnetwork   = google_compute_subnetwork.validator.self_link
+  address_type = "INTERNAL"
+  purpose      = "GCE_ENDPOINT"
+
+  count = var.validator_count
+}
+
 resource "google_compute_instance" "validator" {
   name         = "${local.name_prefix}-${count.index}"
   machine_type = "n1-standard-1"
 
   count = var.validator_count
+
+  tags = ["${var.celo_env}-node"]
 
   allow_stopping_for_update = true
 
@@ -36,6 +47,7 @@ resource "google_compute_instance" "validator" {
 
   network_interface {
     network    = var.network_name
+    network_ip = google_compute_address.validator_internal[count.index].address
     subnetwork = google_compute_subnetwork.validator.name
     # We only want an access config for validators that will not be proxied
     dynamic "access_config" {
@@ -55,6 +67,8 @@ resource "google_compute_instance" "validator" {
       gcloud_secrets_base_path : var.gcloud_secrets_base_path,
       gcloud_secrets_bucket : var.gcloud_secrets_bucket,
       genesis_content_base64 : var.genesis_content_base64,
+      geth_exporter_docker_image_repository : var.geth_exporter_docker_image_repository,
+      geth_exporter_docker_image_tag : var.geth_exporter_docker_image_tag,
       geth_node_docker_image_repository : var.geth_node_docker_image_repository,
       geth_node_docker_image_tag : var.geth_node_docker_image_tag,
       geth_verbosity : var.geth_verbosity,
@@ -106,8 +120,7 @@ resource "google_compute_subnetwork" "validator" {
 
 module "proxy" {
   source = "../full-node"
-  # variable
-  additional_geth_flags             = "--proxy.proxy --proxy.internalendpoint :30503 --proxy.proxiedvalidatoraddress $VALIDATOR_ADDRESS"
+  # variables
   block_time                        = var.block_time
   bootnode_ip_address               = var.bootnode_ip_address
   celo_env                          = var.celo_env
@@ -116,6 +129,8 @@ module "proxy" {
   gcloud_secrets_bucket             = var.gcloud_secrets_bucket
   gcloud_vm_service_account_email   = var.gcloud_vm_service_account_email
   genesis_content_base64            = var.genesis_content_base64
+  geth_exporter_docker_image_repository = var.geth_exporter_docker_image_repository
+  geth_exporter_docker_image_tag    = var.geth_exporter_docker_image_tag
   geth_node_docker_image_repository = var.geth_node_docker_image_repository
   geth_node_docker_image_tag        = var.geth_node_docker_image_tag
   geth_verbosity                    = var.geth_verbosity
@@ -125,6 +140,7 @@ module "proxy" {
   network_name                      = var.network_name
   # NOTE this assumes only one proxy will be used
   node_count            = var.proxied_validator_count
+  proxy                             = true
   verification_pool_url = var.verification_pool_url
 }
 

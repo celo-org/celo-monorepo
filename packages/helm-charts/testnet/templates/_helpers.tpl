@@ -272,11 +272,15 @@ spec:
           [[ "$PING_IP_FROM_PACKET" == "true" ]] && PING_IP_FROM_PACKET_FLAG="--ping-ip-from-packet"
           IN_MEMORY_DISCOVERY_TABLE_FLAG=""
           [[ "$IN_MEMORY_DISCOVERY_TABLE" == "true" ]] && IN_MEMORY_DISCOVERY_TABLE_FLAG="--use-in-memory-discovery-table"
+
+          RPC_APIS="eth,net,web3,debug"
+
           {{ if .proxy }}
           VALIDATOR_HEX_ADDRESS=`cat /root/.celo/validator_address`
           ADDITIONAL_FLAGS="--proxy.proxiedvalidatoraddress $VALIDATOR_HEX_ADDRESS {{ .geth_flags | default "" }}"
           {{ else }}
           ADDITIONAL_FLAGS='{{ .geth_flags | default "" }}'
+          RPC_APIS=${RPC_APIS},txpool
           {{ end }}
           geth \
             --bootnodes=enode://`cat /root/.celo/bootnodeEnode` \
@@ -285,20 +289,19 @@ spec:
             --maxpeers 1100 \
             --rpc \
             --rpcaddr 0.0.0.0 \
-            --rpcapi=eth,net,web3,debug \
+            --rpcapi=${RPC_APIS} \
             --rpccorsdomain='*' \
             --rpcvhosts=* \
             --ws \
             --wsaddr 0.0.0.0 \
             --wsorigins=* \
-            --wsapi=eth,net,web3,debug \
+            --wsapi=${RPC_APIS} \
             --nodekey=/root/.celo/pkey \
             --etherbase=${ACCOUNT_ADDRESS} \
             --networkid=${NETWORK_ID} \
             --syncmode=full \
             ${NAT_FLAG} \
             --ethstats=${HOSTNAME}:${ETHSTATS_SECRET}@${ETHSTATS_SVC} \
-            --miner.verificationpool=${VERIFICATION_POOL_URL} \
             --consoleformat=json \
             --consoleoutput=stdout \
             --verbosity={{ .Values.geth.verbosity }} \
@@ -320,8 +323,6 @@ spec:
             configMapKeyRef:
               name: {{ template "ethereum.fullname" . }}-geth-config
               key: networkid
-        - name: VERIFICATION_POOL_URL
-          value: {{ .Values.geth.miner.verificationpool }}
         - name: STATIC_IPS_FOR_GETH_NODES
           value: "{{ default "false" .Values.geth.static_ips }}"
         - name: PING_IP_FROM_PACKET
