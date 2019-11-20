@@ -1,5 +1,1370 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
+exports[`Testnet banner Renders when connected with backup complete 1`] = `
+<SafeAreaView
+  style={
+    Object {
+      "backgroundColor": "#FFFFFF",
+      "flex": 1,
+      "position": "relative",
+    }
+  }
+>
+  <View
+    style={
+      Object {
+        "height": 56,
+        "left": 0,
+        "opacity": 0,
+        "position": "absolute",
+        "right": 0,
+        "top": 0,
+        "zIndex": 1,
+      }
+    }
+  >
+    <View
+      style={
+        Array [
+          Object {
+            "height": 56,
+            "position": "relative",
+            "width": 750,
+          },
+          Object {},
+        ]
+      }
+    >
+      <svg
+        height={58}
+        style={
+          Object {
+            "left": 0,
+            "position": "absolute",
+            "top": 1,
+          }
+        }
+        width={752}
+      >
+        <defs>
+          <linearGradient
+            id="top"
+            x1="0%"
+            x2="0%"
+            y1="100%"
+            y2="0%"
+          >
+            <stop
+              offset="0"
+              stopColor="#2e3338"
+              stopOpacity={0.1}
+            />
+            <stop
+              offset="1"
+              stopColor="#2e3338"
+              stopOpacity="0"
+            />
+          </linearGradient>
+          <linearGradient
+            id="bottom"
+            x1="0%"
+            x2="0%"
+            y1="0%"
+            y2="100%"
+          >
+            <stop
+              offset="0"
+              stopColor="#2e3338"
+              stopOpacity={0.1}
+            />
+            <stop
+              offset="1"
+              stopColor="#2e3338"
+              stopOpacity="0"
+            />
+          </linearGradient>
+          <linearGradient
+            id="left"
+            x1="100%"
+            x2="0%"
+            y1="0%"
+            y2="0%"
+          >
+            <stop
+              offset="0"
+              stopColor="#2e3338"
+              stopOpacity={0.1}
+            />
+            <stop
+              offset="1"
+              stopColor="#2e3338"
+              stopOpacity="0"
+            />
+          </linearGradient>
+          <linearGradient
+            id="right"
+            x1="0%"
+            x2="100%"
+            y1="0%"
+            y2="0%"
+          >
+            <stop
+              offset="0"
+              stopColor="#2e3338"
+              stopOpacity={0.1}
+            />
+            <stop
+              offset="1"
+              stopColor="#2e3338"
+              stopOpacity="0"
+            />
+          </linearGradient>
+          <radialGradient
+            cx="100%"
+            cy="100%"
+            fx="100%"
+            fy="100%"
+            id="border-left-top"
+            r="100%"
+          >
+            <stop
+              offset="0"
+              stopColor="#2e3338"
+              stopOpacity={0.1}
+            />
+            <stop
+              offset="1"
+              stopColor="#2e3338"
+              stopOpacity={0.1}
+            />
+            <stop
+              offset="1"
+              stopColor="#2e3338"
+              stopOpacity="0"
+            />
+          </radialGradient>
+          <radialGradient
+            cx="100%"
+            cy="0%"
+            fx="100%"
+            fy="0%"
+            id="border-left-bottom"
+            r="100%"
+          >
+            <stop
+              offset="0"
+              stopColor="#2e3338"
+              stopOpacity={0.1}
+            />
+            <stop
+              offset="1"
+              stopColor="#2e3338"
+              stopOpacity={0.1}
+            />
+            <stop
+              offset="1"
+              stopColor="#2e3338"
+              stopOpacity="0"
+            />
+          </radialGradient>
+          <radialGradient
+            cx="0%"
+            cy="100%"
+            fx="0%"
+            fy="100%"
+            id="border-right-top"
+            r="100%"
+          >
+            <stop
+              offset="0"
+              stopColor="#2e3338"
+              stopOpacity={0.1}
+            />
+            <stop
+              offset="1"
+              stopColor="#2e3338"
+              stopOpacity={0.1}
+            />
+            <stop
+              offset="1"
+              stopColor="#2e3338"
+              stopOpacity="0"
+            />
+          </radialGradient>
+          <radialGradient
+            cx="0%"
+            cy="0%"
+            fx="0%"
+            fy="0%"
+            id="border-right-bottom"
+            r="100%"
+          >
+            <stop
+              offset="0"
+              stopColor="#2e3338"
+              stopOpacity={0.1}
+            />
+            <stop
+              offset="1"
+              stopColor="#2e3338"
+              stopOpacity={0.1}
+            />
+            <stop
+              offset="1"
+              stopColor="#2e3338"
+              stopOpacity="0"
+            />
+          </radialGradient>
+        </defs>
+        <path
+          d="M 0 1,Q 0 0 1 0,v 0,q -1 0 -1 1,h 0,z"
+          fill="url(#border-left-top)"
+        />
+        <path
+          d="M 749 0,q 1 0 1 1,h 0,q 0 -1 -1 -1,v 0,z"
+          fill="url(#border-right-top)"
+        />
+        <path
+          d="M 750 55,h 0,q 0 1 -1 1,v 0,q 1 0 1 -1,z"
+          fill="url(#border-right-bottom)"
+        />
+        <path
+          d="M 0 55,q 0 1 1 1,v 0,q -1 0 -1 -1,h 0,z"
+          fill="url(#border-left-bottom)"
+        />
+        <rect
+          fill="url(#top)"
+          height={0}
+          width={748}
+          x={1}
+          y="0"
+        />
+        <rect
+          fill="url(#left)"
+          height={54}
+          width={0}
+          x="0"
+          y={1}
+        />
+        <rect
+          fill="url(#right)"
+          height={54}
+          width={0}
+          x={750}
+          y={1}
+        />
+        <rect
+          fill="url(#bottom)"
+          height={0}
+          width={748}
+          x={1}
+          y={56}
+        />
+        <path
+          d="M 1 0,h 748,q 1 0 1 1,v 54,q 0 1 -1 1,h -748,q -1 0 -1 -1,v -54,q 0 -1 1 -1"
+          fill="rgba(46,51,56,0.1)"
+        />
+      </svg>
+      <View
+        style={
+          Object {
+            "height": 56,
+            "width": 750,
+          }
+        }
+      />
+    </View>
+  </View>
+  <View
+    style={
+      Array [
+        Object {
+          "height": 56,
+        },
+        Object {
+          "alignItems": "center",
+          "backgroundColor": "#FFFFFF",
+          "flexDirection": "row",
+          "justifyContent": "center",
+          "zIndex": 2,
+        },
+      ]
+    }
+  >
+    <Text
+      style={
+        Object {
+          "color": "#2E3338",
+          "fontFamily": "Hind-Medium",
+          "fontSize": 14,
+          "opacity": 0,
+        }
+      }
+    >
+      wallet
+    </Text>
+    <View
+      style={
+        Object {
+          "alignItems": "center",
+          "bottom": 0,
+          "flexDirection": "row",
+          "position": "absolute",
+          "right": 4,
+          "top": 0,
+        }
+      }
+    >
+      <View
+        accessible={true}
+        focusable={true}
+        hitSlop={
+          Object {
+            "bottom": 15,
+            "left": 15,
+            "right": 15,
+            "top": 15,
+          }
+        }
+        isTVSelectable={true}
+        nativeBackgroundAndroid={
+          Object {
+            "attribute": "selectableItemBackgroundBorderless",
+            "type": "ThemeAttrAndroid",
+          }
+        }
+        onClick={[Function]}
+        onResponderGrant={[Function]}
+        onResponderMove={[Function]}
+        onResponderRelease={[Function]}
+        onResponderTerminate={[Function]}
+        onResponderTerminationRequest={[Function]}
+        onStartShouldSetResponder={[Function]}
+        style={
+          Object {
+            "justifyContent": "flex-end",
+            "margin": 12,
+          }
+        }
+      >
+        <svg
+          fill="none"
+          height={24}
+          style={Object {}}
+          width={24}
+        >
+          <rect
+            height={9.52}
+            stroke="#42D689"
+            strokeWidth={2}
+            style={Object {}}
+            width={9.52}
+            x={1}
+            y={1}
+          />
+          <rect
+            height={2.4}
+            stroke="#42D689"
+            strokeWidth={2.4}
+            style={Object {}}
+            width={2.4}
+            x={4.55986}
+            y={4.55986}
+          />
+          <rect
+            height={9.52}
+            stroke="#42D689"
+            strokeWidth={2}
+            style={Object {}}
+            width={9.52}
+            x={1}
+            y={13.48}
+          />
+          <rect
+            height={2.4}
+            stroke="#42D689"
+            strokeWidth={2.4}
+            style={Object {}}
+            width={2.4}
+            x={4.55986}
+            y={17.0398}
+          />
+          <rect
+            height={9.52}
+            stroke="#42D689"
+            strokeWidth={2}
+            style={Object {}}
+            width={9.52}
+            x={13.48}
+            y={1}
+          />
+          <rect
+            height={2.4}
+            stroke="#42D689"
+            strokeWidth={2.4}
+            style={Object {}}
+            width={2.4}
+            x={17.0398}
+            y={4.55986}
+          />
+          <mask
+            fill="white"
+            id="path-7-inside-1"
+            style={Object {}}
+          >
+            <path
+              d="M23.5563 15.1303C23.021 14.0209 22.0691 13.1789 20.8802 12.7588C19.6894 12.3404 18.4016 12.3942 17.2522 12.9116C16.1171 13.4237 15.2532 14.3265 14.8149 15.4584C12.7351 16.6442 11.8838 19.191 12.9237 21.349C13.4589 22.4583 14.4108 23.3003 15.6016 23.7205C16.1314 23.9062 16.6792 24 17.227 24C17.9095 24 18.592 23.8559 19.2296 23.5677C20.3647 23.0538 21.2268 22.151 21.665 21.0191C23.7448 19.8351 24.5962 17.2882 23.5563 15.1303ZM17.7443 13.9358C18.2256 13.7188 18.7393 13.6095 19.2547 13.6095C19.6678 13.6095 20.0809 13.6789 20.4814 13.8195C21.3795 14.1355 22.0961 14.7709 22.5002 15.6077C22.9043 16.4445 22.9474 17.3837 22.6205 18.2518C22.4714 18.6493 22.2487 19.0087 21.9721 19.3212C21.9596 18.6893 21.8123 18.0625 21.5267 17.4723C20.6143 15.5799 18.5273 14.573 16.4924 14.8803C16.8247 14.4827 17.2486 14.1581 17.7443 13.9358ZM15.7812 16.2483C17.5557 15.4914 19.6427 16.2414 20.4671 17.948C20.8155 18.6702 20.8927 19.467 20.6988 20.2309C19.8492 20.5938 18.9063 20.6268 18.0316 20.3195C17.1336 20.0035 16.417 19.3681 16.0129 18.5313C15.6645 17.8091 15.5872 17.0105 15.7812 16.2483ZM18.7357 22.5434C17.87 22.934 16.8983 22.9757 16.0003 22.6597C15.1023 22.3437 14.3857 21.7083 13.9816 20.8715C13.5775 20.0347 13.5344 19.0955 13.8612 18.2275C14.0103 17.8299 14.233 17.4705 14.5096 17.158C14.5222 17.79 14.6695 18.4167 14.955 19.007C15.7597 20.6736 17.4749 21.6545 19.2619 21.6545C19.5044 21.6545 19.7469 21.6354 19.9893 21.599C19.6535 21.9965 19.2314 22.3212 18.7357 22.5434Z"
+              style={Object {}}
+            />
+          </mask>
+          <path
+            d="M23.5563 15.1303L27.1597 13.3938L27.1589 13.3922L23.5563 15.1303ZM20.8802 12.7588L22.2128 8.9873L22.2062 8.98495L20.8802 12.7588ZM17.2522 12.9116L15.6104 9.26398L15.6071 9.26549L17.2522 12.9116ZM14.8149 15.4584L16.7961 18.9333L18.0316 18.2289L18.5451 16.9026L14.8149 15.4584ZM12.9237 21.349L9.32028 23.0854L9.32107 23.0871L12.9237 21.349ZM15.6016 23.7205L14.2707 27.4926L14.2782 27.4952L15.6016 23.7205ZM19.2296 23.5677L20.8771 27.2126L20.8793 27.2117L19.2296 23.5677ZM21.665 21.0191L19.6861 17.5429L18.4488 18.2473L17.9348 19.5749L21.665 21.0191ZM17.7443 13.9358L19.3805 17.5859L19.3883 17.5824L17.7443 13.9358ZM20.4814 13.8195L21.8091 10.0463L21.8066 10.0454L20.4814 13.8195ZM22.6205 18.2518L18.8771 16.8421L18.8752 16.8474L22.6205 18.2518ZM21.9721 19.3212L17.9729 19.4008L18.1767 29.6446L24.9674 21.9723L21.9721 19.3212ZM21.5267 17.4723L17.9237 19.2095L17.926 19.2143L21.5267 17.4723ZM16.4924 14.8803L13.4232 12.3152L6.65721 20.4108L17.0897 18.8354L16.4924 14.8803ZM15.7812 16.2483L14.2118 12.5691L12.3926 13.3451L11.9048 15.2617L15.7812 16.2483ZM20.4671 17.948L24.0697 16.2099L24.0688 16.2081L20.4671 17.948ZM20.6988 20.2309L22.2699 23.9094L24.0889 23.1325L24.5757 21.2154L20.6988 20.2309ZM18.0316 20.3195L16.704 24.0927L16.7058 24.0933L18.0316 20.3195ZM16.0129 18.5313L12.4102 20.2694L12.4109 20.2708L16.0129 18.5313ZM18.7357 22.5434L17.0994 18.8934L17.0905 18.8974L18.7357 22.5434ZM13.8612 18.2275L17.6046 19.6371L17.6066 19.6318L13.8612 18.2275ZM14.5096 17.158L18.5088 17.0785L18.305 6.83469L11.5143 14.5069L14.5096 17.158ZM14.955 19.007L18.5572 17.2679L18.5558 17.265L14.955 19.007ZM19.9893 21.599L23.0449 24.1803L29.9019 16.0635L19.3946 17.6434L19.9893 21.599ZM27.1589 13.3922C26.1511 11.3032 24.3666 9.74834 22.2128 8.98731L19.5475 16.5302C19.7717 16.6095 19.891 16.7386 19.9536 16.8684L27.1589 13.3922ZM22.2062 8.98495C20.0494 8.22714 17.699 8.32397 15.6104 9.26398L18.8939 16.5591C19.1043 16.4644 19.3294 16.4536 19.5542 16.5326L22.2062 8.98495ZM15.6071 9.26549C13.5426 10.197 11.9129 11.8751 11.0847 14.0142L18.5451 16.9026C18.5934 16.7778 18.6916 16.6504 18.8972 16.5576L15.6071 9.26549ZM12.8338 11.9835C9.00761 14.1649 7.32861 18.9524 9.32028 23.0854L16.5271 19.6125C16.4717 19.4974 16.4667 19.3888 16.5035 19.2756C16.5426 19.1555 16.6326 19.0265 16.7961 18.9333L12.8338 11.9835ZM9.32107 23.0871C10.3292 25.1767 12.1145 26.7318 14.2707 27.4926L16.9325 19.9484C16.7072 19.8689 16.5886 19.74 16.5263 19.6109L9.32107 23.0871ZM14.2782 27.4952C15.2257 27.8274 16.2205 28 17.227 28V20C17.1379 20 17.0372 19.9851 16.925 19.9458L14.2782 27.4952ZM17.227 28C18.4733 28 19.7178 27.7367 20.8771 27.2126L17.5821 19.9227C17.4662 19.9751 17.3458 20 17.227 20V28ZM20.8793 27.2117C22.9425 26.2776 24.568 24.5999 25.3952 22.4633L17.9348 19.5749C17.8856 19.7022 17.7869 19.83 17.5799 19.9237L20.8793 27.2117ZM23.644 24.4953C27.4732 22.3153 29.151 17.5261 27.1597 13.3938L19.9528 16.8667C20.0083 16.9819 20.0132 17.0905 19.9765 17.2032C19.9376 17.3228 19.8482 17.4506 19.6861 17.5429L23.644 24.4953ZM19.3883 17.5824C19.3542 17.5978 19.3076 17.6095 19.2547 17.6095V9.60946C18.171 9.60946 17.097 9.83992 16.1002 10.2893L19.3883 17.5824ZM19.2547 17.6095C19.2165 17.6095 19.1816 17.6025 19.1563 17.5937L21.8066 10.0454C20.9803 9.75528 20.1191 9.60946 19.2547 9.60946V17.6095ZM19.1538 17.5928C19.1231 17.582 19.0751 17.558 19.0234 17.5122C18.9714 17.4661 18.9279 17.4086 18.8982 17.3472L26.1022 13.8682C25.227 12.056 23.6791 10.7042 21.8091 10.0463L19.1538 17.5928ZM18.8982 17.3472C18.868 17.2847 18.8432 17.1996 18.8386 17.1003C18.8341 17.0008 18.8511 16.9113 18.8771 16.8421L26.3639 19.6614C27.0781 17.7647 26.9807 15.6874 26.1022 13.8682L18.8982 17.3472ZM18.8752 16.8474C18.9088 16.7577 18.9507 16.6997 18.9769 16.6701L24.9674 21.9723C25.5468 21.3178 26.0341 20.5409 26.3659 19.6561L18.8752 16.8474ZM25.9714 19.2416C25.9473 18.0347 25.6647 16.8408 25.1275 15.7302L17.926 19.2143C17.9599 19.2843 17.9718 19.3438 17.9729 19.4008L25.9714 19.2416ZM25.1298 15.7351C23.4045 12.1566 19.5465 10.3737 15.8952 10.9251L17.0897 18.8354C17.2732 18.8077 17.4655 18.8401 17.6263 18.9214C17.7796 18.9989 17.872 19.1024 17.9237 19.2095L25.1298 15.7351ZM19.5617 17.4454C19.5053 17.5128 19.4394 17.5595 19.3805 17.5859L16.108 10.2858C15.0578 10.7566 14.1441 11.4526 13.4232 12.3152L19.5617 17.4454ZM17.3506 19.9276C17.2681 19.9628 17.1849 19.9593 17.1199 19.9359C17.0526 19.9115 16.9383 19.8389 16.8653 19.6878L24.0688 16.2081C22.2778 12.5003 17.8711 11.0081 14.2118 12.5691L17.3506 19.9276ZM16.8644 19.686C16.8375 19.6302 16.8147 19.5572 16.8063 19.473C16.7979 19.3892 16.8054 19.3112 16.8218 19.2464L24.5757 21.2154C25.0005 19.5424 24.8279 17.7814 24.0697 16.2099L16.8644 19.686ZM19.1276 16.5524C19.1559 16.5403 19.1947 16.5303 19.24 16.5288C19.2856 16.5272 19.3264 16.5347 19.3575 16.5456L16.7058 24.0933C18.5281 24.7336 20.5045 24.6635 22.2699 23.9094L19.1276 16.5524ZM19.3593 16.5462C19.39 16.557 19.438 16.581 19.4897 16.6268C19.5417 16.6729 19.5852 16.7304 19.6149 16.7918L12.4109 20.2708C13.2861 22.083 14.834 23.4347 16.704 24.0927L19.3593 16.5462ZM19.6155 16.7932C19.6429 16.8499 19.6654 16.9226 19.6737 17.0058C19.682 17.0887 19.6748 17.1673 19.6576 17.2349L11.9048 15.2617C11.479 16.9348 11.6523 18.6983 12.4102 20.2694L19.6155 16.7932ZM17.0905 18.8974C17.1223 18.883 17.1636 18.8721 17.2098 18.8702C17.2561 18.8682 17.2971 18.8756 17.3279 18.8865L14.6727 26.433C16.5402 27.09 18.5765 27.0036 20.3809 26.1894L17.0905 18.8974ZM17.3279 18.8865C17.3586 18.8973 17.4067 18.9213 17.4584 18.967C17.5104 19.0131 17.5539 19.0707 17.5835 19.1321L10.3796 22.611C11.2548 24.4232 12.8027 25.775 14.6727 26.433L17.3279 18.8865ZM17.5835 19.1321C17.6137 19.1945 17.6386 19.2796 17.6431 19.379C17.6477 19.4784 17.6307 19.5679 17.6046 19.6371L10.1179 16.8178C9.40362 18.7145 9.50106 20.7918 10.3796 22.611L17.5835 19.1321ZM17.6066 19.6318C17.573 19.7215 17.531 19.7796 17.5049 19.8091L11.5143 14.5069C10.935 15.1615 10.4476 15.9383 10.1159 16.8231L17.6066 19.6318ZM10.5104 17.2376C10.5344 18.4445 10.817 19.6385 11.3543 20.749L18.5558 17.265C18.5219 17.1949 18.51 17.1354 18.5088 17.0785L10.5104 17.2376ZM11.3528 20.746C12.8741 23.897 16.0563 25.6545 19.2619 25.6545V17.6545C18.8934 17.6545 18.6452 17.4502 18.5572 17.2679L11.3528 20.746ZM19.2619 25.6545C19.7151 25.6545 20.1565 25.6188 20.5841 25.5545L19.3946 17.6434C19.3372 17.6521 19.2937 17.6545 19.2619 17.6545V25.6545ZM16.9337 19.0176C16.9749 18.9688 17.034 18.9227 17.0994 18.8934L20.372 26.1934C21.4288 25.7196 22.332 25.0242 23.0449 24.1803L16.9337 19.0176Z"
+            fill="#42D689"
+            mask="url(#path-7-inside-1)"
+            style={Object {}}
+          />
+        </svg>
+      </View>
+      <View
+        accessible={true}
+        focusable={true}
+        hitSlop={
+          Object {
+            "bottom": 15,
+            "left": 15,
+            "right": 15,
+            "top": 15,
+          }
+        }
+        isTVSelectable={true}
+        nativeBackgroundAndroid={
+          Object {
+            "attribute": "selectableItemBackgroundBorderless",
+            "type": "ThemeAttrAndroid",
+          }
+        }
+        onClick={[Function]}
+        onResponderGrant={[Function]}
+        onResponderMove={[Function]}
+        onResponderRelease={[Function]}
+        onResponderTerminate={[Function]}
+        onResponderTerminationRequest={[Function]}
+        onStartShouldSetResponder={[Function]}
+        style={
+          Object {
+            "justifyContent": "flex-end",
+            "margin": 12,
+          }
+        }
+      >
+        <svg
+          height={24}
+          style={Object {}}
+          viewBox="0 0 18 18"
+          width={24}
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <path
+            d="M0.0395506 12.0537C-0.108559 11.5415 0.178104 11.0054 0.6511 10.7948C1.26743 10.5267 1.68309 9.86619 1.79776 9.20085C1.79776 9.11469 1.79298 9.03331 1.79298 8.94715C1.79298 8.91365 1.79298 8.88493 1.79298 8.85142C1.68309 8.17651 1.29132 7.47287 0.6511 7.21918C0.173327 7.00378 -0.108559 6.47247 0.0395506 5.9603C0.192438 5.496 0.283214 5.26624 0.507768 4.83066C0.765766 4.36635 1.34387 4.18925 1.8312 4.37593C2.44753 4.62004 3.18808 4.4573 3.73752 4.07916C3.77574 4.03608 3.81874 3.993 3.86174 3.94992C3.91907 3.89248 3.97163 3.83982 4.02896 3.78717C4.41596 3.23192 4.62617 2.47563 4.35384 1.84859C4.16751 1.36035 4.34429 0.781169 4.80773 0.522691C5.03228 0.407812 5.20428 0.326439 5.38106 0.25464C5.55783 0.18284 5.73461 0.115827 5.97827 0.0392413C6.48949 -0.109144 7.0246 0.178054 7.23482 0.65193C7.51193 1.28855 8.19992 1.70977 8.88791 1.81029C8.93091 1.81029 8.97391 1.81029 9.02169 1.81029C9.06947 1.81029 9.11247 1.81029 9.16025 1.81508C9.82435 1.69541 10.5123 1.31248 10.756 0.675863C10.971 0.1972 11.5013 -0.085211 12.0126 0.0631745C12.476 0.216347 12.7053 0.307293 13.1401 0.532264C13.6035 0.790742 13.7803 1.36992 13.594 1.85816C13.3455 2.48521 13.5175 3.2415 13.9093 3.79674C13.9141 3.80153 13.9141 3.80153 13.9189 3.80632C13.9141 3.79674 13.9141 3.79196 13.9093 3.78238C14.4635 4.3137 15.4143 4.69184 16.1692 4.36157C16.6565 4.17489 17.2346 4.35199 17.4926 4.8163C17.7124 5.25188 17.8079 5.47685 17.9608 5.94594C18.1089 6.45811 17.8223 6.99421 17.3493 7.20482C16.604 7.52553 16.1548 8.42063 16.174 9.21521C16.174 9.21042 16.1692 9.21042 16.1692 9.20563C16.2886 9.87097 16.6756 10.5507 17.3063 10.7996C17.7841 11.015 18.0659 11.5463 17.9178 12.0585C17.7649 12.5228 17.6742 12.7525 17.4496 13.1881C17.1916 13.6524 16.6135 13.8295 16.1262 13.6428C15.4812 13.3891 14.7024 13.5806 14.1434 13.9923C13.6513 14.5523 13.3312 15.4378 13.6465 16.151C13.8329 16.6393 13.6561 17.2184 13.1927 17.4769C12.9681 17.5918 12.7961 17.6732 12.6193 17.745C12.4425 17.8168 12.2658 17.8838 12.0221 17.9604C11.5109 18.1088 10.9758 17.8216 10.7656 17.3477C10.4885 16.7015 9.78613 16.2803 9.08858 16.1893C9.03602 16.1893 8.97869 16.1893 8.92614 16.1893C8.92136 16.1893 8.91658 16.1893 8.91658 16.1893C8.21425 16.2803 7.45937 16.6728 7.20137 17.3477C6.98638 17.8263 6.45605 18.1088 5.94483 17.9604C5.48139 17.8072 5.25206 17.7163 4.81728 17.4913C4.35384 17.2328 4.17707 16.6536 4.3634 16.1654C4.61662 15.524 4.43029 14.7438 4.0194 14.1885C3.99551 14.1646 3.97163 14.1406 3.94296 14.1167C3.90951 14.0832 3.87129 14.0449 3.83785 14.0114C3.27885 13.595 2.48575 13.3509 1.84076 13.6381C1.35343 13.8247 0.775322 13.6476 0.517324 13.1833C0.283215 12.7477 0.192438 12.5228 0.0395506 12.0537ZM10.6031 12.944C12.777 12.0441 13.809 9.54548 12.9108 7.36757C12.0126 5.18965 9.51858 4.15574 7.34471 5.05563C5.17084 5.95551 4.13885 8.45413 5.03706 10.632C5.93527 12.81 8.42925 13.8487 10.6031 12.944Z"
+            fill="#42D689"
+            style={Object {}}
+          />
+        </svg>
+      </View>
+    </View>
+  </View>
+  <RCTScrollView
+    ListHeaderComponent={
+      Object {
+        "$$typeof": Symbol(react.forward_ref),
+        "render": [Function],
+      }
+    }
+    data={
+      Array [
+        Object {
+          "data": Array [
+            Object {},
+          ],
+          "renderItem": [Function],
+          "title": "activity",
+        },
+      ]
+    }
+    disableVirtualization={false}
+    getItem={[Function]}
+    getItemCount={[Function]}
+    horizontal={false}
+    initialNumToRender={10}
+    keyExtractor={[Function]}
+    maxToRenderPerBatch={10}
+    onContentSizeChange={[Function]}
+    onEndReachedThreshold={2}
+    onLayout={[Function]}
+    onMomentumScrollEnd={[Function]}
+    onRefresh={[Function]}
+    onScroll={[Function]}
+    onScrollBeginDrag={[Function]}
+    onScrollEndDrag={[Function]}
+    refreshControl={
+      <RefreshControlMock
+        colors={
+          Array [
+            "#42D689",
+          ]
+        }
+        onRefresh={[Function]}
+        refreshing={false}
+      />
+    }
+    refreshing={false}
+    renderItem={[Function]}
+    renderSectionHeader={[Function]}
+    scrollEventThrottle={50}
+    sections={
+      Array [
+        Object {
+          "data": Array [
+            Object {},
+          ],
+          "renderItem": [Function],
+          "title": "activity",
+        },
+      ]
+    }
+    stickyHeaderIndices={
+      Array [
+        1,
+      ]
+    }
+    stickySectionHeadersEnabled={true}
+    style={
+      Object {
+        "backgroundColor": "#FFFFFF",
+        "flex": 1,
+        "position": "relative",
+      }
+    }
+    updateCellsBatchingPeriod={50}
+    windowSize={21}
+  >
+    <RCTRefreshControl />
+    <View>
+      <View
+        onLayout={[Function]}
+      >
+        <View
+          style={
+            Object {
+              "paddingHorizontal": 16,
+              "paddingVertical": 20,
+            }
+          }
+        >
+          <Text
+            style={
+              Object {
+                "color": "#2E3338",
+                "fontSize": 44,
+                "height": 48,
+                "lineHeight": 62,
+              }
+            }
+          >
+            <Text
+              style={
+                Object {
+                  "fontFamily": "Hind-SemiBold",
+                }
+              }
+            >
+              $
+            </Text>
+            <Text
+              style={
+                Object {
+                  "fontFamily": "Hind-SemiBold",
+                }
+              }
+            >
+              0.00
+            </Text>
+            <Text
+              style={
+                Object {
+                  "fontSize": 22,
+                }
+              }
+            >
+               
+              
+            </Text>
+          </Text>
+          <Text
+            style={
+              Array [
+                Object {
+                  "fontFamily": "Hind-Light",
+                },
+                Object {
+                  "color": "#B0B5B9",
+                  "fontSize": 18,
+                },
+              ]
+            }
+          >
+            <Text>
+              0.00
+               
+            </Text>
+            <Text>
+              global:celoDollars
+            </Text>
+          </Text>
+        </View>
+      </View>
+      <View
+        onLayout={[Function]}
+        style={null}
+      >
+        <View
+          style={
+            Object {
+              "alignItems": "center",
+              "backgroundColor": "#FFFFFF",
+              "flexDirection": "row",
+              "justifyContent": "space-between",
+              "padding": 16,
+            }
+          }
+        >
+          <Text
+            style={
+              Object {
+                "color": "#2E3338",
+                "fontFamily": "Hind-SemiBold",
+                "fontSize": 18,
+              }
+            }
+          >
+            activity
+          </Text>
+        </View>
+        <View
+          style={
+            Object {
+              "backgroundColor": "rgba(134, 138, 141, 0.15)",
+              "height": 1,
+              "marginHorizontal": 16,
+            }
+          }
+        />
+      </View>
+      <View
+        onLayout={[Function]}
+        style={null}
+      />
+      <View
+        onLayout={[Function]}
+        style={null}
+      />
+    </View>
+  </RCTScrollView>
+</SafeAreaView>
+`;
+
+exports[`Testnet banner Renders when disconnected 1`] = `
+<SafeAreaView
+  style={
+    Object {
+      "backgroundColor": "#FFFFFF",
+      "flex": 1,
+      "position": "relative",
+    }
+  }
+>
+  <View
+    style={
+      Object {
+        "height": 56,
+        "left": 0,
+        "opacity": 0,
+        "position": "absolute",
+        "right": 0,
+        "top": 0,
+        "zIndex": 1,
+      }
+    }
+  >
+    <View
+      style={
+        Array [
+          Object {
+            "height": 56,
+            "position": "relative",
+            "width": 750,
+          },
+          Object {},
+        ]
+      }
+    >
+      <svg
+        height={58}
+        style={
+          Object {
+            "left": 0,
+            "position": "absolute",
+            "top": 1,
+          }
+        }
+        width={752}
+      >
+        <defs>
+          <linearGradient
+            id="top"
+            x1="0%"
+            x2="0%"
+            y1="100%"
+            y2="0%"
+          >
+            <stop
+              offset="0"
+              stopColor="#2e3338"
+              stopOpacity={0.1}
+            />
+            <stop
+              offset="1"
+              stopColor="#2e3338"
+              stopOpacity="0"
+            />
+          </linearGradient>
+          <linearGradient
+            id="bottom"
+            x1="0%"
+            x2="0%"
+            y1="0%"
+            y2="100%"
+          >
+            <stop
+              offset="0"
+              stopColor="#2e3338"
+              stopOpacity={0.1}
+            />
+            <stop
+              offset="1"
+              stopColor="#2e3338"
+              stopOpacity="0"
+            />
+          </linearGradient>
+          <linearGradient
+            id="left"
+            x1="100%"
+            x2="0%"
+            y1="0%"
+            y2="0%"
+          >
+            <stop
+              offset="0"
+              stopColor="#2e3338"
+              stopOpacity={0.1}
+            />
+            <stop
+              offset="1"
+              stopColor="#2e3338"
+              stopOpacity="0"
+            />
+          </linearGradient>
+          <linearGradient
+            id="right"
+            x1="0%"
+            x2="100%"
+            y1="0%"
+            y2="0%"
+          >
+            <stop
+              offset="0"
+              stopColor="#2e3338"
+              stopOpacity={0.1}
+            />
+            <stop
+              offset="1"
+              stopColor="#2e3338"
+              stopOpacity="0"
+            />
+          </linearGradient>
+          <radialGradient
+            cx="100%"
+            cy="100%"
+            fx="100%"
+            fy="100%"
+            id="border-left-top"
+            r="100%"
+          >
+            <stop
+              offset="0"
+              stopColor="#2e3338"
+              stopOpacity={0.1}
+            />
+            <stop
+              offset="1"
+              stopColor="#2e3338"
+              stopOpacity={0.1}
+            />
+            <stop
+              offset="1"
+              stopColor="#2e3338"
+              stopOpacity="0"
+            />
+          </radialGradient>
+          <radialGradient
+            cx="100%"
+            cy="0%"
+            fx="100%"
+            fy="0%"
+            id="border-left-bottom"
+            r="100%"
+          >
+            <stop
+              offset="0"
+              stopColor="#2e3338"
+              stopOpacity={0.1}
+            />
+            <stop
+              offset="1"
+              stopColor="#2e3338"
+              stopOpacity={0.1}
+            />
+            <stop
+              offset="1"
+              stopColor="#2e3338"
+              stopOpacity="0"
+            />
+          </radialGradient>
+          <radialGradient
+            cx="0%"
+            cy="100%"
+            fx="0%"
+            fy="100%"
+            id="border-right-top"
+            r="100%"
+          >
+            <stop
+              offset="0"
+              stopColor="#2e3338"
+              stopOpacity={0.1}
+            />
+            <stop
+              offset="1"
+              stopColor="#2e3338"
+              stopOpacity={0.1}
+            />
+            <stop
+              offset="1"
+              stopColor="#2e3338"
+              stopOpacity="0"
+            />
+          </radialGradient>
+          <radialGradient
+            cx="0%"
+            cy="0%"
+            fx="0%"
+            fy="0%"
+            id="border-right-bottom"
+            r="100%"
+          >
+            <stop
+              offset="0"
+              stopColor="#2e3338"
+              stopOpacity={0.1}
+            />
+            <stop
+              offset="1"
+              stopColor="#2e3338"
+              stopOpacity={0.1}
+            />
+            <stop
+              offset="1"
+              stopColor="#2e3338"
+              stopOpacity="0"
+            />
+          </radialGradient>
+        </defs>
+        <path
+          d="M 0 1,Q 0 0 1 0,v 0,q -1 0 -1 1,h 0,z"
+          fill="url(#border-left-top)"
+        />
+        <path
+          d="M 749 0,q 1 0 1 1,h 0,q 0 -1 -1 -1,v 0,z"
+          fill="url(#border-right-top)"
+        />
+        <path
+          d="M 750 55,h 0,q 0 1 -1 1,v 0,q 1 0 1 -1,z"
+          fill="url(#border-right-bottom)"
+        />
+        <path
+          d="M 0 55,q 0 1 1 1,v 0,q -1 0 -1 -1,h 0,z"
+          fill="url(#border-left-bottom)"
+        />
+        <rect
+          fill="url(#top)"
+          height={0}
+          width={748}
+          x={1}
+          y="0"
+        />
+        <rect
+          fill="url(#left)"
+          height={54}
+          width={0}
+          x="0"
+          y={1}
+        />
+        <rect
+          fill="url(#right)"
+          height={54}
+          width={0}
+          x={750}
+          y={1}
+        />
+        <rect
+          fill="url(#bottom)"
+          height={0}
+          width={748}
+          x={1}
+          y={56}
+        />
+        <path
+          d="M 1 0,h 748,q 1 0 1 1,v 54,q 0 1 -1 1,h -748,q -1 0 -1 -1,v -54,q 0 -1 1 -1"
+          fill="rgba(46,51,56,0.1)"
+        />
+      </svg>
+      <View
+        style={
+          Object {
+            "height": 56,
+            "width": 750,
+          }
+        }
+      />
+    </View>
+  </View>
+  <View
+    style={
+      Array [
+        Object {
+          "height": 56,
+        },
+        Object {
+          "alignItems": "center",
+          "backgroundColor": "#FFFFFF",
+          "flexDirection": "row",
+          "justifyContent": "center",
+          "zIndex": 2,
+        },
+      ]
+    }
+  >
+    <View
+      style={
+        Object {
+          "marginTop": 50,
+          "paddingVertical": 15,
+        }
+      }
+    >
+      <Text
+        style={
+          Array [
+            Object {
+              "color": "#2E3338",
+              "fontFamily": "Hind-Regular",
+              "fontSize": 14,
+              "lineHeight": undefined,
+              "textAlign": "center",
+            },
+            Object {
+              "color": "rgba(46, 51, 56, 0.4)",
+            },
+            Object {
+              "fontFamily": "Hind-Bold",
+            },
+          ]
+        }
+        testID="connectingToCeloBanner"
+      >
+        connectingToCelo
+      </Text>
+    </View>
+    <View
+      style={
+        Object {
+          "alignItems": "center",
+          "bottom": 0,
+          "flexDirection": "row",
+          "position": "absolute",
+          "right": 4,
+          "top": 0,
+        }
+      }
+    >
+      <View
+        accessible={true}
+        focusable={true}
+        hitSlop={
+          Object {
+            "bottom": 15,
+            "left": 15,
+            "right": 15,
+            "top": 15,
+          }
+        }
+        isTVSelectable={true}
+        nativeBackgroundAndroid={
+          Object {
+            "attribute": "selectableItemBackgroundBorderless",
+            "type": "ThemeAttrAndroid",
+          }
+        }
+        onClick={[Function]}
+        onResponderGrant={[Function]}
+        onResponderMove={[Function]}
+        onResponderRelease={[Function]}
+        onResponderTerminate={[Function]}
+        onResponderTerminationRequest={[Function]}
+        onStartShouldSetResponder={[Function]}
+        style={
+          Object {
+            "justifyContent": "flex-end",
+            "margin": 12,
+          }
+        }
+      >
+        <svg
+          fill="none"
+          height={24}
+          style={Object {}}
+          width={24}
+        >
+          <rect
+            height={9.52}
+            stroke="#42D689"
+            strokeWidth={2}
+            style={Object {}}
+            width={9.52}
+            x={1}
+            y={1}
+          />
+          <rect
+            height={2.4}
+            stroke="#42D689"
+            strokeWidth={2.4}
+            style={Object {}}
+            width={2.4}
+            x={4.55986}
+            y={4.55986}
+          />
+          <rect
+            height={9.52}
+            stroke="#42D689"
+            strokeWidth={2}
+            style={Object {}}
+            width={9.52}
+            x={1}
+            y={13.48}
+          />
+          <rect
+            height={2.4}
+            stroke="#42D689"
+            strokeWidth={2.4}
+            style={Object {}}
+            width={2.4}
+            x={4.55986}
+            y={17.0398}
+          />
+          <rect
+            height={9.52}
+            stroke="#42D689"
+            strokeWidth={2}
+            style={Object {}}
+            width={9.52}
+            x={13.48}
+            y={1}
+          />
+          <rect
+            height={2.4}
+            stroke="#42D689"
+            strokeWidth={2.4}
+            style={Object {}}
+            width={2.4}
+            x={17.0398}
+            y={4.55986}
+          />
+          <mask
+            fill="white"
+            id="path-7-inside-1"
+            style={Object {}}
+          >
+            <path
+              d="M23.5563 15.1303C23.021 14.0209 22.0691 13.1789 20.8802 12.7588C19.6894 12.3404 18.4016 12.3942 17.2522 12.9116C16.1171 13.4237 15.2532 14.3265 14.8149 15.4584C12.7351 16.6442 11.8838 19.191 12.9237 21.349C13.4589 22.4583 14.4108 23.3003 15.6016 23.7205C16.1314 23.9062 16.6792 24 17.227 24C17.9095 24 18.592 23.8559 19.2296 23.5677C20.3647 23.0538 21.2268 22.151 21.665 21.0191C23.7448 19.8351 24.5962 17.2882 23.5563 15.1303ZM17.7443 13.9358C18.2256 13.7188 18.7393 13.6095 19.2547 13.6095C19.6678 13.6095 20.0809 13.6789 20.4814 13.8195C21.3795 14.1355 22.0961 14.7709 22.5002 15.6077C22.9043 16.4445 22.9474 17.3837 22.6205 18.2518C22.4714 18.6493 22.2487 19.0087 21.9721 19.3212C21.9596 18.6893 21.8123 18.0625 21.5267 17.4723C20.6143 15.5799 18.5273 14.573 16.4924 14.8803C16.8247 14.4827 17.2486 14.1581 17.7443 13.9358ZM15.7812 16.2483C17.5557 15.4914 19.6427 16.2414 20.4671 17.948C20.8155 18.6702 20.8927 19.467 20.6988 20.2309C19.8492 20.5938 18.9063 20.6268 18.0316 20.3195C17.1336 20.0035 16.417 19.3681 16.0129 18.5313C15.6645 17.8091 15.5872 17.0105 15.7812 16.2483ZM18.7357 22.5434C17.87 22.934 16.8983 22.9757 16.0003 22.6597C15.1023 22.3437 14.3857 21.7083 13.9816 20.8715C13.5775 20.0347 13.5344 19.0955 13.8612 18.2275C14.0103 17.8299 14.233 17.4705 14.5096 17.158C14.5222 17.79 14.6695 18.4167 14.955 19.007C15.7597 20.6736 17.4749 21.6545 19.2619 21.6545C19.5044 21.6545 19.7469 21.6354 19.9893 21.599C19.6535 21.9965 19.2314 22.3212 18.7357 22.5434Z"
+              style={Object {}}
+            />
+          </mask>
+          <path
+            d="M23.5563 15.1303L27.1597 13.3938L27.1589 13.3922L23.5563 15.1303ZM20.8802 12.7588L22.2128 8.9873L22.2062 8.98495L20.8802 12.7588ZM17.2522 12.9116L15.6104 9.26398L15.6071 9.26549L17.2522 12.9116ZM14.8149 15.4584L16.7961 18.9333L18.0316 18.2289L18.5451 16.9026L14.8149 15.4584ZM12.9237 21.349L9.32028 23.0854L9.32107 23.0871L12.9237 21.349ZM15.6016 23.7205L14.2707 27.4926L14.2782 27.4952L15.6016 23.7205ZM19.2296 23.5677L20.8771 27.2126L20.8793 27.2117L19.2296 23.5677ZM21.665 21.0191L19.6861 17.5429L18.4488 18.2473L17.9348 19.5749L21.665 21.0191ZM17.7443 13.9358L19.3805 17.5859L19.3883 17.5824L17.7443 13.9358ZM20.4814 13.8195L21.8091 10.0463L21.8066 10.0454L20.4814 13.8195ZM22.6205 18.2518L18.8771 16.8421L18.8752 16.8474L22.6205 18.2518ZM21.9721 19.3212L17.9729 19.4008L18.1767 29.6446L24.9674 21.9723L21.9721 19.3212ZM21.5267 17.4723L17.9237 19.2095L17.926 19.2143L21.5267 17.4723ZM16.4924 14.8803L13.4232 12.3152L6.65721 20.4108L17.0897 18.8354L16.4924 14.8803ZM15.7812 16.2483L14.2118 12.5691L12.3926 13.3451L11.9048 15.2617L15.7812 16.2483ZM20.4671 17.948L24.0697 16.2099L24.0688 16.2081L20.4671 17.948ZM20.6988 20.2309L22.2699 23.9094L24.0889 23.1325L24.5757 21.2154L20.6988 20.2309ZM18.0316 20.3195L16.704 24.0927L16.7058 24.0933L18.0316 20.3195ZM16.0129 18.5313L12.4102 20.2694L12.4109 20.2708L16.0129 18.5313ZM18.7357 22.5434L17.0994 18.8934L17.0905 18.8974L18.7357 22.5434ZM13.8612 18.2275L17.6046 19.6371L17.6066 19.6318L13.8612 18.2275ZM14.5096 17.158L18.5088 17.0785L18.305 6.83469L11.5143 14.5069L14.5096 17.158ZM14.955 19.007L18.5572 17.2679L18.5558 17.265L14.955 19.007ZM19.9893 21.599L23.0449 24.1803L29.9019 16.0635L19.3946 17.6434L19.9893 21.599ZM27.1589 13.3922C26.1511 11.3032 24.3666 9.74834 22.2128 8.98731L19.5475 16.5302C19.7717 16.6095 19.891 16.7386 19.9536 16.8684L27.1589 13.3922ZM22.2062 8.98495C20.0494 8.22714 17.699 8.32397 15.6104 9.26398L18.8939 16.5591C19.1043 16.4644 19.3294 16.4536 19.5542 16.5326L22.2062 8.98495ZM15.6071 9.26549C13.5426 10.197 11.9129 11.8751 11.0847 14.0142L18.5451 16.9026C18.5934 16.7778 18.6916 16.6504 18.8972 16.5576L15.6071 9.26549ZM12.8338 11.9835C9.00761 14.1649 7.32861 18.9524 9.32028 23.0854L16.5271 19.6125C16.4717 19.4974 16.4667 19.3888 16.5035 19.2756C16.5426 19.1555 16.6326 19.0265 16.7961 18.9333L12.8338 11.9835ZM9.32107 23.0871C10.3292 25.1767 12.1145 26.7318 14.2707 27.4926L16.9325 19.9484C16.7072 19.8689 16.5886 19.74 16.5263 19.6109L9.32107 23.0871ZM14.2782 27.4952C15.2257 27.8274 16.2205 28 17.227 28V20C17.1379 20 17.0372 19.9851 16.925 19.9458L14.2782 27.4952ZM17.227 28C18.4733 28 19.7178 27.7367 20.8771 27.2126L17.5821 19.9227C17.4662 19.9751 17.3458 20 17.227 20V28ZM20.8793 27.2117C22.9425 26.2776 24.568 24.5999 25.3952 22.4633L17.9348 19.5749C17.8856 19.7022 17.7869 19.83 17.5799 19.9237L20.8793 27.2117ZM23.644 24.4953C27.4732 22.3153 29.151 17.5261 27.1597 13.3938L19.9528 16.8667C20.0083 16.9819 20.0132 17.0905 19.9765 17.2032C19.9376 17.3228 19.8482 17.4506 19.6861 17.5429L23.644 24.4953ZM19.3883 17.5824C19.3542 17.5978 19.3076 17.6095 19.2547 17.6095V9.60946C18.171 9.60946 17.097 9.83992 16.1002 10.2893L19.3883 17.5824ZM19.2547 17.6095C19.2165 17.6095 19.1816 17.6025 19.1563 17.5937L21.8066 10.0454C20.9803 9.75528 20.1191 9.60946 19.2547 9.60946V17.6095ZM19.1538 17.5928C19.1231 17.582 19.0751 17.558 19.0234 17.5122C18.9714 17.4661 18.9279 17.4086 18.8982 17.3472L26.1022 13.8682C25.227 12.056 23.6791 10.7042 21.8091 10.0463L19.1538 17.5928ZM18.8982 17.3472C18.868 17.2847 18.8432 17.1996 18.8386 17.1003C18.8341 17.0008 18.8511 16.9113 18.8771 16.8421L26.3639 19.6614C27.0781 17.7647 26.9807 15.6874 26.1022 13.8682L18.8982 17.3472ZM18.8752 16.8474C18.9088 16.7577 18.9507 16.6997 18.9769 16.6701L24.9674 21.9723C25.5468 21.3178 26.0341 20.5409 26.3659 19.6561L18.8752 16.8474ZM25.9714 19.2416C25.9473 18.0347 25.6647 16.8408 25.1275 15.7302L17.926 19.2143C17.9599 19.2843 17.9718 19.3438 17.9729 19.4008L25.9714 19.2416ZM25.1298 15.7351C23.4045 12.1566 19.5465 10.3737 15.8952 10.9251L17.0897 18.8354C17.2732 18.8077 17.4655 18.8401 17.6263 18.9214C17.7796 18.9989 17.872 19.1024 17.9237 19.2095L25.1298 15.7351ZM19.5617 17.4454C19.5053 17.5128 19.4394 17.5595 19.3805 17.5859L16.108 10.2858C15.0578 10.7566 14.1441 11.4526 13.4232 12.3152L19.5617 17.4454ZM17.3506 19.9276C17.2681 19.9628 17.1849 19.9593 17.1199 19.9359C17.0526 19.9115 16.9383 19.8389 16.8653 19.6878L24.0688 16.2081C22.2778 12.5003 17.8711 11.0081 14.2118 12.5691L17.3506 19.9276ZM16.8644 19.686C16.8375 19.6302 16.8147 19.5572 16.8063 19.473C16.7979 19.3892 16.8054 19.3112 16.8218 19.2464L24.5757 21.2154C25.0005 19.5424 24.8279 17.7814 24.0697 16.2099L16.8644 19.686ZM19.1276 16.5524C19.1559 16.5403 19.1947 16.5303 19.24 16.5288C19.2856 16.5272 19.3264 16.5347 19.3575 16.5456L16.7058 24.0933C18.5281 24.7336 20.5045 24.6635 22.2699 23.9094L19.1276 16.5524ZM19.3593 16.5462C19.39 16.557 19.438 16.581 19.4897 16.6268C19.5417 16.6729 19.5852 16.7304 19.6149 16.7918L12.4109 20.2708C13.2861 22.083 14.834 23.4347 16.704 24.0927L19.3593 16.5462ZM19.6155 16.7932C19.6429 16.8499 19.6654 16.9226 19.6737 17.0058C19.682 17.0887 19.6748 17.1673 19.6576 17.2349L11.9048 15.2617C11.479 16.9348 11.6523 18.6983 12.4102 20.2694L19.6155 16.7932ZM17.0905 18.8974C17.1223 18.883 17.1636 18.8721 17.2098 18.8702C17.2561 18.8682 17.2971 18.8756 17.3279 18.8865L14.6727 26.433C16.5402 27.09 18.5765 27.0036 20.3809 26.1894L17.0905 18.8974ZM17.3279 18.8865C17.3586 18.8973 17.4067 18.9213 17.4584 18.967C17.5104 19.0131 17.5539 19.0707 17.5835 19.1321L10.3796 22.611C11.2548 24.4232 12.8027 25.775 14.6727 26.433L17.3279 18.8865ZM17.5835 19.1321C17.6137 19.1945 17.6386 19.2796 17.6431 19.379C17.6477 19.4784 17.6307 19.5679 17.6046 19.6371L10.1179 16.8178C9.40362 18.7145 9.50106 20.7918 10.3796 22.611L17.5835 19.1321ZM17.6066 19.6318C17.573 19.7215 17.531 19.7796 17.5049 19.8091L11.5143 14.5069C10.935 15.1615 10.4476 15.9383 10.1159 16.8231L17.6066 19.6318ZM10.5104 17.2376C10.5344 18.4445 10.817 19.6385 11.3543 20.749L18.5558 17.265C18.5219 17.1949 18.51 17.1354 18.5088 17.0785L10.5104 17.2376ZM11.3528 20.746C12.8741 23.897 16.0563 25.6545 19.2619 25.6545V17.6545C18.8934 17.6545 18.6452 17.4502 18.5572 17.2679L11.3528 20.746ZM19.2619 25.6545C19.7151 25.6545 20.1565 25.6188 20.5841 25.5545L19.3946 17.6434C19.3372 17.6521 19.2937 17.6545 19.2619 17.6545V25.6545ZM16.9337 19.0176C16.9749 18.9688 17.034 18.9227 17.0994 18.8934L20.372 26.1934C21.4288 25.7196 22.332 25.0242 23.0449 24.1803L16.9337 19.0176Z"
+            fill="#42D689"
+            mask="url(#path-7-inside-1)"
+            style={Object {}}
+          />
+        </svg>
+      </View>
+      <View
+        accessible={true}
+        focusable={true}
+        hitSlop={
+          Object {
+            "bottom": 15,
+            "left": 15,
+            "right": 15,
+            "top": 15,
+          }
+        }
+        isTVSelectable={true}
+        nativeBackgroundAndroid={
+          Object {
+            "attribute": "selectableItemBackgroundBorderless",
+            "type": "ThemeAttrAndroid",
+          }
+        }
+        onClick={[Function]}
+        onResponderGrant={[Function]}
+        onResponderMove={[Function]}
+        onResponderRelease={[Function]}
+        onResponderTerminate={[Function]}
+        onResponderTerminationRequest={[Function]}
+        onStartShouldSetResponder={[Function]}
+        style={
+          Object {
+            "justifyContent": "flex-end",
+            "margin": 12,
+          }
+        }
+      >
+        <svg
+          height={24}
+          style={Object {}}
+          viewBox="0 0 18 18"
+          width={24}
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <path
+            d="M0.0395506 12.0537C-0.108559 11.5415 0.178104 11.0054 0.6511 10.7948C1.26743 10.5267 1.68309 9.86619 1.79776 9.20085C1.79776 9.11469 1.79298 9.03331 1.79298 8.94715C1.79298 8.91365 1.79298 8.88493 1.79298 8.85142C1.68309 8.17651 1.29132 7.47287 0.6511 7.21918C0.173327 7.00378 -0.108559 6.47247 0.0395506 5.9603C0.192438 5.496 0.283214 5.26624 0.507768 4.83066C0.765766 4.36635 1.34387 4.18925 1.8312 4.37593C2.44753 4.62004 3.18808 4.4573 3.73752 4.07916C3.77574 4.03608 3.81874 3.993 3.86174 3.94992C3.91907 3.89248 3.97163 3.83982 4.02896 3.78717C4.41596 3.23192 4.62617 2.47563 4.35384 1.84859C4.16751 1.36035 4.34429 0.781169 4.80773 0.522691C5.03228 0.407812 5.20428 0.326439 5.38106 0.25464C5.55783 0.18284 5.73461 0.115827 5.97827 0.0392413C6.48949 -0.109144 7.0246 0.178054 7.23482 0.65193C7.51193 1.28855 8.19992 1.70977 8.88791 1.81029C8.93091 1.81029 8.97391 1.81029 9.02169 1.81029C9.06947 1.81029 9.11247 1.81029 9.16025 1.81508C9.82435 1.69541 10.5123 1.31248 10.756 0.675863C10.971 0.1972 11.5013 -0.085211 12.0126 0.0631745C12.476 0.216347 12.7053 0.307293 13.1401 0.532264C13.6035 0.790742 13.7803 1.36992 13.594 1.85816C13.3455 2.48521 13.5175 3.2415 13.9093 3.79674C13.9141 3.80153 13.9141 3.80153 13.9189 3.80632C13.9141 3.79674 13.9141 3.79196 13.9093 3.78238C14.4635 4.3137 15.4143 4.69184 16.1692 4.36157C16.6565 4.17489 17.2346 4.35199 17.4926 4.8163C17.7124 5.25188 17.8079 5.47685 17.9608 5.94594C18.1089 6.45811 17.8223 6.99421 17.3493 7.20482C16.604 7.52553 16.1548 8.42063 16.174 9.21521C16.174 9.21042 16.1692 9.21042 16.1692 9.20563C16.2886 9.87097 16.6756 10.5507 17.3063 10.7996C17.7841 11.015 18.0659 11.5463 17.9178 12.0585C17.7649 12.5228 17.6742 12.7525 17.4496 13.1881C17.1916 13.6524 16.6135 13.8295 16.1262 13.6428C15.4812 13.3891 14.7024 13.5806 14.1434 13.9923C13.6513 14.5523 13.3312 15.4378 13.6465 16.151C13.8329 16.6393 13.6561 17.2184 13.1927 17.4769C12.9681 17.5918 12.7961 17.6732 12.6193 17.745C12.4425 17.8168 12.2658 17.8838 12.0221 17.9604C11.5109 18.1088 10.9758 17.8216 10.7656 17.3477C10.4885 16.7015 9.78613 16.2803 9.08858 16.1893C9.03602 16.1893 8.97869 16.1893 8.92614 16.1893C8.92136 16.1893 8.91658 16.1893 8.91658 16.1893C8.21425 16.2803 7.45937 16.6728 7.20137 17.3477C6.98638 17.8263 6.45605 18.1088 5.94483 17.9604C5.48139 17.8072 5.25206 17.7163 4.81728 17.4913C4.35384 17.2328 4.17707 16.6536 4.3634 16.1654C4.61662 15.524 4.43029 14.7438 4.0194 14.1885C3.99551 14.1646 3.97163 14.1406 3.94296 14.1167C3.90951 14.0832 3.87129 14.0449 3.83785 14.0114C3.27885 13.595 2.48575 13.3509 1.84076 13.6381C1.35343 13.8247 0.775322 13.6476 0.517324 13.1833C0.283215 12.7477 0.192438 12.5228 0.0395506 12.0537ZM10.6031 12.944C12.777 12.0441 13.809 9.54548 12.9108 7.36757C12.0126 5.18965 9.51858 4.15574 7.34471 5.05563C5.17084 5.95551 4.13885 8.45413 5.03706 10.632C5.93527 12.81 8.42925 13.8487 10.6031 12.944Z"
+            fill="#42D689"
+            style={Object {}}
+          />
+        </svg>
+      </View>
+    </View>
+  </View>
+  <RCTScrollView
+    ListHeaderComponent={
+      Object {
+        "$$typeof": Symbol(react.forward_ref),
+        "render": [Function],
+      }
+    }
+    data={
+      Array [
+        Object {
+          "data": Array [
+            Object {},
+          ],
+          "renderItem": [Function],
+          "title": "activity",
+        },
+      ]
+    }
+    disableVirtualization={false}
+    getItem={[Function]}
+    getItemCount={[Function]}
+    horizontal={false}
+    initialNumToRender={10}
+    keyExtractor={[Function]}
+    maxToRenderPerBatch={10}
+    onContentSizeChange={[Function]}
+    onEndReachedThreshold={2}
+    onLayout={[Function]}
+    onMomentumScrollEnd={[Function]}
+    onRefresh={[Function]}
+    onScroll={[Function]}
+    onScrollBeginDrag={[Function]}
+    onScrollEndDrag={[Function]}
+    refreshControl={
+      <RefreshControlMock
+        colors={
+          Array [
+            "#42D689",
+          ]
+        }
+        onRefresh={[Function]}
+        refreshing={false}
+      />
+    }
+    refreshing={false}
+    renderItem={[Function]}
+    renderSectionHeader={[Function]}
+    scrollEventThrottle={50}
+    sections={
+      Array [
+        Object {
+          "data": Array [
+            Object {},
+          ],
+          "renderItem": [Function],
+          "title": "activity",
+        },
+      ]
+    }
+    stickyHeaderIndices={
+      Array [
+        1,
+      ]
+    }
+    stickySectionHeadersEnabled={true}
+    style={
+      Object {
+        "backgroundColor": "#FFFFFF",
+        "flex": 1,
+        "position": "relative",
+      }
+    }
+    updateCellsBatchingPeriod={50}
+    windowSize={21}
+  >
+    <RCTRefreshControl />
+    <View>
+      <View
+        onLayout={[Function]}
+      >
+        <View
+          style={
+            Object {
+              "paddingHorizontal": 16,
+              "paddingVertical": 20,
+            }
+          }
+        >
+          <Text
+            style={
+              Object {
+                "color": "#2E3338",
+                "fontSize": 44,
+                "height": 48,
+                "lineHeight": 62,
+              }
+            }
+          >
+            <Text
+              style={
+                Object {
+                  "fontFamily": "Hind-SemiBold",
+                }
+              }
+            >
+              $
+            </Text>
+            <Text
+              style={
+                Object {
+                  "fontFamily": "Hind-SemiBold",
+                }
+              }
+            >
+              0.00
+            </Text>
+            <Text
+              style={
+                Object {
+                  "fontSize": 22,
+                }
+              }
+            >
+               
+              
+            </Text>
+          </Text>
+          <Text
+            style={
+              Array [
+                Object {
+                  "fontFamily": "Hind-Light",
+                },
+                Object {
+                  "color": "#B0B5B9",
+                  "fontSize": 18,
+                },
+              ]
+            }
+          >
+            <Text>
+              0.00
+               
+            </Text>
+            <Text>
+              global:celoDollars
+            </Text>
+          </Text>
+        </View>
+      </View>
+      <View
+        onLayout={[Function]}
+        style={null}
+      >
+        <View
+          style={
+            Object {
+              "alignItems": "center",
+              "backgroundColor": "#FFFFFF",
+              "flexDirection": "row",
+              "justifyContent": "space-between",
+              "padding": 16,
+            }
+          }
+        >
+          <Text
+            style={
+              Object {
+                "color": "#2E3338",
+                "fontFamily": "Hind-SemiBold",
+                "fontSize": 18,
+              }
+            }
+          >
+            activity
+          </Text>
+        </View>
+        <View
+          style={
+            Object {
+              "backgroundColor": "rgba(134, 138, 141, 0.15)",
+              "height": 1,
+              "marginHorizontal": 16,
+            }
+          }
+        />
+      </View>
+      <View
+        onLayout={[Function]}
+        style={null}
+      />
+      <View
+        onLayout={[Function]}
+        style={null}
+      />
+    </View>
+  </RCTScrollView>
+</SafeAreaView>
+`;
+
 exports[`Testnet banner Shows testnet banner for 5 seconds 1`] = `
 <SafeAreaView
   style={

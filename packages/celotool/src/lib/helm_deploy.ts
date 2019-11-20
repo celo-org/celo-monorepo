@@ -6,13 +6,7 @@ import { ensureAuthenticatedGcloudAccount } from './gcloud_utils'
 import { generateGenesisFromEnv } from './generate_utils'
 import { OG_ACCOUNTS } from './genesis_constants'
 import { getStatefulSetReplicas, scaleResource } from './kubernetes'
-import {
-  execCmd,
-  execCmdWithExitOnFailure,
-  getVerificationPoolRewardsURL,
-  outputIncludes,
-  switchToProjectFromEnv,
-} from './utils'
+import { execCmd, execCmdWithExitOnFailure, outputIncludes, switchToProjectFromEnv } from './utils'
 
 const CLOUDSQL_SECRET_NAME = 'blockscout-cloudsql-credentials'
 const BACKUP_GCS_SECRET_NAME = 'backup-blockchain-credentials'
@@ -535,10 +529,6 @@ async function helmParameters(celoEnv: string) {
     `--set cluster.name=${fetchEnv('KUBERNETES_CLUSTER_NAME')}`,
     `--set bucket=${bucketName}`,
     `--set project.name=${fetchEnv('TESTNET_PROJECT_NAME')}`,
-    `--set verification.rewardsUrl=${fetchEnvOrFallback(
-      'VERIFICATION_REWARDS_URL',
-      getVerificationPoolRewardsURL(celoEnv)
-    )}`,
     `--set celotool.image.repository=${fetchEnv('CELOTOOL_DOCKER_IMAGE_REPOSITORY')}`,
     `--set celotool.image.tag=${fetchEnv('CELOTOOL_DOCKER_IMAGE_TAG')}`,
     `--set promtosd.scrape_interval=${fetchEnv('PROMTOSD_SCRAPE_INTERVAL')}`,

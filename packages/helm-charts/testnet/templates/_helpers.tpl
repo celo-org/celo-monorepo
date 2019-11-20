@@ -245,8 +245,6 @@ spec:
             configMapKeyRef:
               name: {{ template "ethereum.fullname" . }}-geth-config
               key: networkid
-        - name: VERIFICATION_REWARDS_URL
-          value: {{ .Values.verification.rewardsUrl }}
 {{ include "celo.geth-exporter-container" .  | indent 6 }}
 {{ include "celo.prom-to-sd-container" (dict "Values" .Values "Release" .Release "Chart" .Chart "component" "geth" "metricsPort" "9200" "metricsPath" "filteredmetrics" "containerNameLabel" .Node.name )  | indent 6 }}
       initContainers:

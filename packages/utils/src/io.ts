@@ -1,8 +1,8 @@
 import { isValidPublic, toChecksumAddress } from 'ethereumjs-util'
 import { either } from 'fp-ts/lib/Either'
 import * as t from 'io-ts'
+import { isValidAddress } from './address'
 import { isE164NumberStrict } from './phoneNumbers'
-import { isValidAddress } from './signatureUtils'
 
 // from http://urlregex.com/
 export const URL_REGEX = new RegExp(
@@ -82,6 +82,8 @@ export const PublicKeyType = new t.Type<string, string, unknown>(
     ),
   String
 )
+export const SignatureType = t.string
 
+export type Signature = t.TypeOf<typeof SignatureType>
 export type Address = t.TypeOf<typeof AddressType>
 export type E164Number = t.TypeOf<typeof E164PhoneNumberType>
