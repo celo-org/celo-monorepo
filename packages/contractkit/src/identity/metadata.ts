@@ -70,10 +70,8 @@ export class IdentityMetadataWrapper {
     // Verify that singular claim types appear at most once
     SINGULAR_CLAIM_TYPES.forEach((claimType) => {
       const results = res.filterClaims(claimType)
-      if (results.length > 0) {
-        throw new Error(
-          `Found more ${results.length} claims of type ${claimType}, should be at most 1`
-        )
+      if (results.length > 1) {
+        throw new Error(`Found ${results.length} claims of type ${claimType}, should be at most 1`)
       }
     })
 
