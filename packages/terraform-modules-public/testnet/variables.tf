@@ -173,7 +173,7 @@ variable static_nodes_base64 {
 }
 
 # Attestation service vars
-variable enable_attestation_service {
+variable deploy_attestation_service {
   type        = bool
   description = ""
   default     = false

@@ -3,7 +3,7 @@ locals {
 }
 
 resource "google_sql_database_instance" "master" {
-  count            = var.enable_attestation_service ? 1 : 0
+  count            = var.deploy_attestation_service ? 1 : 0
   name             = "${local.name_prefix}-db"
   database_version = "POSTGRES_9_6"
   region           = var.gcloud_region
@@ -14,21 +14,21 @@ resource "google_sql_database_instance" "master" {
 }
 
 resource "google_sql_user" "celo" {
-  count    = var.enable_attestation_service ? 1 : 0
+  count    = var.deploy_attestation_service ? 1 : 0
   name     = var.db_username
   instance = google_sql_database_instance.master[0].name
   password = var.db_password
 }
 
 resource "google_compute_address" "attestation_service_internal" {
-  count        = var.enable_attestation_service ? 1 : 0
+  count        = var.deploy_attestation_service ? 1 : 0
   name         = "${local.name_prefix}-internal-address"
   address_type = "INTERNAL"
   purpose      = "GCE_ENDPOINT"
 }
 
 resource "google_compute_instance" "attestation_service" {
-  count        = var.enable_attestation_service ? 1 : 0
+  count        = var.deploy_attestation_service ? 1 : 0
   name         = "${local.name_prefix}"
   machine_type = "n1-standard-1"
 

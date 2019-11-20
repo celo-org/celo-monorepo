@@ -130,6 +130,7 @@ docker run -v $DATA_DIR:$DATA_DIR --name geth --net=host --entrypoint /bin/sh -d
       --nat=extip:${ip_address} \
       --metrics \
       $IN_MEMORY_DISCOVERY_TABLE_FLAG \
+      --nodiscover \
       --proxy.proxied \
       --proxy.proxyenodeurlpair=\"$PROXY_URL\" \
   )"

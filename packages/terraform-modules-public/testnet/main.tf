@@ -8,6 +8,7 @@ locals {
   firewall_target_tags_txnode    = ["${var.celo_env}-txnode"]
   firewall_target_tags_validator = ["${var.celo_env}-validator"]
   firewall_target_tags_proxy     = ["${var.celo_env}-proxy"]
+  firewall_target_tags_attestation_service     = ["${var.celo_env}-attestation-service"]
   deploy_txnode_lb               = var.tx_node_count > 0 ? var.deploy_txnode_lb : false
 }
 
@@ -32,7 +33,7 @@ resource "google_compute_firewall" "ssh_firewall" {
   name    = "${var.celo_env}-ssh-firewall"
   network = var.network_name
 
-  target_tags = concat(local.firewall_target_tags_txnode, local.firewall_target_tags_validator, local.firewall_target_tags_proxy)
+  target_tags = concat(local.firewall_target_tags_txnode, local.firewall_target_tags_validator, local.firewall_target_tags_proxy, local.firewall_target_tags_attestation_service)
 
   allow {
     protocol = "tcp"
@@ -203,7 +204,7 @@ module "attestation-service" {
   celo_env                                    = var.celo_env
   gcloud_region                               = var.gcloud_region
   network_name                                = var.network_name
-  enable_attestation_service                  = var.enable_attestation_service
+  deploy_attestation_service                  = var.deploy_attestation_service
   db_username                                 = var.attestation_service_db_username
   db_password                                 = var.attestation_service_db_password
   attestation_service_docker_image_repository = var.attestation_service_docker_image_repository
@@ -216,4 +217,3 @@ module "attestation-service" {
   nexmo_secret                                = var.attestation_service_nexmo_secret
   nexmo_blacklist                             = var.attestation_service_nexmo_blacklist
 }
-
