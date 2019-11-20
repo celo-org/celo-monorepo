@@ -12,7 +12,7 @@ As you might expect, transactions that offer a gas price above the current minim
 
 The gas price minimum will respond to demand, increasing during periods of sustained demand, but allowing temporary spikes in gas demand without price shocks. As part of this system Celo aims to have blocks filled at target utilization rate, for example 50% of the total block gas limit. When blocks are being filled more than the target, the gas price minimum will be raised until demand subsides. If blocks are being filled at less than the target rate, the gas price minimum will decrease until demand rises. Block producers only receive the tip and not the base of the gas fee, which provides incentives for them maintain the target utilization. For more information on this system, read [EIP-1559](https://eips.ethereum.org/EIPS/eip-1559).
 
-As a benefit, this system provides an each way for clients to determine what gas price they should pay. A [`GasPriceMinimum`](packages/protocol/contracts/common/GasPriceMinimum.sol) smart contract provides access to read the current gas price minimum, providing a reasonable basis for the gas price of transaction. During congestion, or when the client wants to ensure that their transaction is mined quickly, they may add a tip to the gas price of their transaction which will encourage block validators to include it in the next block.
+As a benefit, this system provides an each way for clients to determine what gas price they should pay. A `GasPriceMinimum` smart contract provides access to read the current gas price minimum, providing a reasonable basis for the gas price of transaction. During congestion, or when the client wants to ensure that their transaction is mined quickly, they may add a tip to the gas price of their transaction which will encourage block validators to include it in the next block.
 
 In the Celo protocol, the gas price minimum is calculated as follows:
 
@@ -29,9 +29,3 @@ With:
 - $$TargetDensity$$: Governable block target density
 
 - $$AdjustementSpeed$$: Governable adjustment speed
-
-## Alternative Fee Currencies
-
-Gas and [gateway fees](./full-node-incentives.md) may be paid in alternative currencies, such as Celo Dollars. This allows clients that may not own Celo Gold to fund transactions on the network.
-
-Setting the `FeeCurrency` field of a transaction to the address of a smart contract which implements the ERC20 interface and is whitelisted in the [`FeeCurrencyWhitelist`](packages/protocol/contracts/common/FeeCurrencyWhitelist.sol) contract will cause the fees to be paid in that currency. When this is the case the gas price is denominated in that currency, and must the Celo Gold conversion value of the gas price must be at least the gas price minimum.
