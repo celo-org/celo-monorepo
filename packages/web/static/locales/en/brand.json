@@ -35,5 +35,13 @@
     "backgroundDoNotAndDo":
       "Do not overlay any of the logos of glyphs on top of images. Do not overlay the two-color logo ontop of unpreferred light colors."
   },
+  "color": {
+    "title": "Color",
+    "headline":
+      "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Pellentesque eget dignissim justo. Integer ac sodales dolor, quis aliquet nisi. Donec eget mattis neque, eu ultricies diam.",
+    "primaries": "Primary Brand Colors",
+    "primariesText":
+      "Our primary brand colors are green, gold, dark (name?), and white. They are used to provide accessibility, simplicity, and consistency throughout all brand communications."
+  },
   "downloadAssetBtn": "Download Assets"
 }

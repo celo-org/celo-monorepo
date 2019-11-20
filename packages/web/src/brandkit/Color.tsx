@@ -1,7 +1,7 @@
 import { Text, View, StyleSheet } from 'react-native'
 import { withNamespaces } from 'react-i18next'
 import * as React from 'react'
-import { colors } from 'src/styles'
+import { colors, standardStyles } from 'src/styles'
 import { hashNav } from 'src/shared/menu-items'
 import { H1, H2, H3, H4 } from 'src/fonts/Fonts'
 
@@ -33,22 +33,35 @@ export default React.memo(function Color() {
   )
 })
 
-const PALET = Object.keys(colors)
-  .map((name) => ({
-    name,
-    hex: colors[name],
-    cmyk: 'purple yellow red and blue',
-  }))
-  .filter((info) => info.hex.startsWith('#'))
+// const PALET = Object.keys(colors)
+//   .map((name) => ({
+//     name,
+//     hex: colors[name],
+//     cmyk: 'todo',
+//   }))
+//   .filter((info) => info.hex.startsWith('#'))
+
+const PRIMARY_PALETTE = [
+  { name: 'Green', hex: colors.primary, cmyk: '???' },
+  { name: 'Gold', hex: colors.gold, cmyk: '??' },
+  { name: 'Dark', hex: colors.dark, cmyk: '??' },
+  { name: 'White', hex: colors.white, cmyk: '??' },
+]
 
 const Overview = withNamespaces(NameSpaces.brand)(function _Overview({ t }: I18nProps) {
   return (
     <View>
-      <View style={brandStyles.gap}>
+      <View style={[brandStyles.gap, standardStyles.blockMarginBottom]}>
         <H1>{t('color.title')}</H1>
         <H4>{t('color.headline')}</H4>
       </View>
-      <Palette title={t('color.primaries')} text={t('color.primariesText')} colors={PALET} />
+      <Palette
+        title={t('color.primaries')}
+        text={t('color.primariesText')}
+        colors={PRIMARY_PALETTE}
+      />
+      <Palette title={t('color.accents')} text={t('color.accentsText')} colors={PRIMARY_PALETTE} />
+      <Palette title={t('color.grays')} text={t('color.graysText')} colors={PRIMARY_PALETTE} />
     </View>
   )
 })

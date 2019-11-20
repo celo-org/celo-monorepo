@@ -228,8 +228,11 @@ const styles = StyleSheet.create({
     borderBottomColor: colors.gray,
     zIndex: 10,
   },
-  footer: { zIndex: -10 },
-  childrenArea: { minHeight: `calc(100vh - ${HEADER_HEIGHT + 70}px)` },
+  footer: { zIndex: -10, backgroundColor: colors.white },
+  childrenArea: {
+    minHeight: `calc(100vh - ${HEADER_HEIGHT + 70}px)`,
+    // backgroundColor: colors.faintPurple,
+  },
 })
 
 export default withScreenSize(withRouter(Page))

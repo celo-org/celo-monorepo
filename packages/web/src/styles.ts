@@ -38,8 +38,8 @@ export enum colors {
 }
 
 export enum typeFaces {
-  futura = 'futura-pt, sans-serif',
-  garamond = 'eb-garamond, serif',
+  futura = 'Jost,futura-pt, sans-serif',
+  garamond = 'EB Garamond, eb-garamond, serif',
 }
 
 export const fonts = StyleSheet.create({

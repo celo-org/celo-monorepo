@@ -1,11 +1,11 @@
-import Pigment, { Props as PigmentInfo } from 'src/brandkit/color/Pigment'
+import Pigment, { ColorData } from 'src/brandkit/color/Pigment'
 import { Text, View, StyleSheet } from 'react-native'
 import { fonts, standardStyles } from 'src/styles'
 import { H1, H2, H3, H4 } from 'src/fonts/Fonts'
 import { GAP } from 'src/brandkit/common/constants'
 
 interface Props {
-  colors: PigmentInfo[]
+  colors: ColorData[]
   title: string
   text: string
 }
