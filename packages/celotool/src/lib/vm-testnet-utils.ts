@@ -5,6 +5,7 @@ import {
   generateGenesisFromEnv,
   generatePrivateKey,
   generatePublicKey,
+  getAddressFromEnv,
   privateKeyToAddress,
 } from './generate_utils'
 import {
@@ -34,6 +35,7 @@ interface NodeSecrets {
   ACCOUNT_ADDRESS: string
   BOOTNODE_ENODE_ADDRESS: string
   PRIVATE_KEY: string
+  PROXIED_VALIDATOR_ADDRESS?: string
   PROXY_ENODE_ADDRESS?: string
   [envVar.GETH_ACCOUNT_SECRET]: string
   [envVar.ETHSTATS_WEBSOCKETSECRET]: string
@@ -332,6 +334,9 @@ function generateNodeSecretEnvVars(accountType: AccountType, index: number) {
     if (index < proxiedValidators) {
       secrets.PROXY_ENODE_ADDRESS = generatePublicKey(mnemonic, AccountType.PROXY, index)
     }
+  }
+  if (accountType === AccountType.PROXY) {
+    secrets.PROXIED_VALIDATOR_ADDRESS = getAddressFromEnv(AccountType.VALIDATOR, index)
   }
   return formatEnvVars(secrets)
 }

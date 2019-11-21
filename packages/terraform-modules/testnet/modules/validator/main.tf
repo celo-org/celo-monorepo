@@ -82,7 +82,6 @@ resource "google_compute_instance" "validator" {
       proxy_internal_ip_address : count.index < var.proxied_validator_count ? module.proxy.internal_ip_addresses[count.index] : "",
       proxy_external_ip_address : count.index < var.proxied_validator_count ? module.proxy.ip_addresses[count.index] : "",
       validator_name : "${local.name_prefix}-${count.index}",
-      verification_pool_url : var.verification_pool_url
     }
   )
 
@@ -141,7 +140,6 @@ module "proxy" {
   # NOTE this assumes only one proxy will be used
   node_count            = var.proxied_validator_count
   proxy                             = true
-  verification_pool_url = var.verification_pool_url
 }
 
 # if there are no proxied validators, we don't have to worry about

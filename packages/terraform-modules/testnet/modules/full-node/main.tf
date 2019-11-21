@@ -71,7 +71,6 @@ resource "google_compute_instance" "full_node" {
       node_name : "${var.celo_env}-${var.name}-${count.index}",
       proxy : var.proxy,
       rid : count.index,
-      verification_pool_url : var.verification_pool_url
     }
   )
 

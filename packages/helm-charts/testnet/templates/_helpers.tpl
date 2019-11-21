@@ -42,7 +42,6 @@ app: {{ template "ethereum.name" . }}
 release: {{ .Release.Name }}
 {{- end -}}
 
-
 {{- define "celo.init-genesis-container" -}}
 - name: init-genesis
   image: {{ .Values.geth.image.repository }}:{{ .Values.geth.image.tag }}

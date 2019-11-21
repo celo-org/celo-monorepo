@@ -93,3 +93,9 @@ variable node_count {
   type        = number
   description = "Number of nodes to create"
 }
+
+variable proxy {
+  type        = bool
+  description = "Whether the node is a proxy for a validator"
+  default     = false
+}
