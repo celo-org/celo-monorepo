@@ -1,10 +1,18 @@
 pragma solidity ^0.5.3;
 
+import "openzeppelin-solidity/contracts/ownership/Ownable.sol";
 import "./VestingInstance.sol";
+import "../common/Initializable.sol";
+import "../common/UsingRegistry.sol";
 
-contract VestingFactory {
+contract VestingFactory is Initializable, UsingRegistry {
   // mapping between beneficiary addresses and associated vesting contracts (schedules)
   mapping(address => VestingInstance) public hasVestedAt;
+
+  function initialize(address registryAddress) external initializer {
+    _transferOwnership(msg.sender);
+    setRegistry(registryAddress);
+  }
 
   /**
      * @notice Factory function for creating a new vesting contract instance
