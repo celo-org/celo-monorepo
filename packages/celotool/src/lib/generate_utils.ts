@@ -1,4 +1,7 @@
+// @ts-ignore
+import { config } from '@celo/protocol/migrationsConfig'
 import { blsPrivateKeyToProcessedPrivateKey } from '@celo/utils/lib/bls'
+import BigNumber from 'bignumber.js'
 import * as bls12377js from 'bls12377js'
 import { ec as EC } from 'elliptic'
 import fs from 'fs'
@@ -91,6 +94,9 @@ export const privateKeyToAddress = (privateKey: string) => {
 export const privateKeyToStrippedAddress = (privateKey: string) =>
   strip0x(privateKeyToAddress(privateKey))
 
+const WEI_PER_GOLD = new BigNumber(Math.pow(10, 18))
+
+// in wei
 const DEFAULT_BALANCE = '1000000000000000000000000'
 const VALIDATOR_OG_SOURCE = 'og'
 
@@ -261,6 +267,11 @@ export const generateGenesis = ({
       balance: DEFAULT_BALANCE,
     }
   }
+
+  // ensure validator 0, which performs the migration, will have enough
+  // cGLD to init the reserves
+  const reserveGoldBalanceWei = WEI_PER_GOLD.times(config.reserve.goldBalance).plus(DEFAULT_BALANCE)
+  genesis.alloc[validators[0].address].balance = reserveGoldBalanceWei.toString(10)
 
   for (const address of otherAccounts) {
     genesis.alloc[address] = {
