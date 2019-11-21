@@ -494,16 +494,22 @@ export function getContext(gethConfig: GethTestConfig) {
   const restart = async () => {
     await killGeth()
     let validatorIndex = 0
+    const validatorIndices: number[] = []
     for (const instance of gethConfig.instances) {
-      await restoreDatadir(instance)
-      if (!instance.privateKey && instance.validating) {
-        instance.privateKey = validatorPrivateKeys[validatorIndex]
-      }
-      await startGeth(gethBinaryPath, instance)
+      validatorIndices.push(validatorIndex)
       if (instance.validating) {
         validatorIndex++
       }
     }
+    await Promise.all(
+      gethConfig.instances.map(async (instance, i) => {
+        await restoreDatadir(instance)
+        if (!instance.privateKey && instance.validating) {
+          instance.privateKey = validatorPrivateKeys[validatorIndices[i]]
+        }
+        return startGeth(gethBinaryPath, instance)
+      })
+    )
   }
 
   const after = () => killGeth()

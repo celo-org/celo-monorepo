@@ -297,6 +297,11 @@ describe('governance tests', () => {
         blockNumber = await web3.eth.getBlockNumber()
         await sleep(0.1)
       } while (blockNumber % epoch !== 1)
+      // Wait for an extra epoch transition to ensure everyone is connected to one another.
+      do {
+        blockNumber = await web3.eth.getBlockNumber()
+        await sleep(0.1)
+      } while (blockNumber % epoch !== 1)
       await activate(validatorAccounts[0])
 
       // Prepare for member swapping.
