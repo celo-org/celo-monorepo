@@ -7,6 +7,7 @@
     - [Create accounts](#create-accounts)
     - [Deploy the Validator and Proxy nodes](#deploy-the-validator-and-proxy-nodes)
     - [Running the Attestation Service](#running-the-attestation-service)
+    - [Reference Script](#reference-script)
 
 This section explains how to get a Validator node running on the Baklava network, using a Docker image that was built for this purpose. Most of this process is the same as running a full node, but with a few additional steps.
 
@@ -165,3 +166,13 @@ As part of the [lightweight identity protocol](/celo-codebase/protocol/identity)
 You can find the complete instructions about how to run the [Attestation Service at the documentation page](running-attestation-service.md).
 
 You’re all set! Note that elections are finalized at the end of each epoch, roughly once an hour in the Baklava Testnet. After that hour, if you get elected, your node will start participating BFT consensus and validating blocks. Users requesting attestations will hit your registered Attestation Service.
+
+### Reference Script
+
+You can use (and modify if you want) this [reference bash script](../../../scripts/run-docker-validator-network.sh) automating all the above steps. It requires Docker and screen.
+
+You can see all the options using the following command:
+
+```bash
+./run-docker-validator-network.sh help
+```

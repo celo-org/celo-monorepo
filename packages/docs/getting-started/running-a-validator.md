@@ -68,6 +68,8 @@ Celo provides different networks for different purposes. You can find the specif
 
 In this documentation pages we're going to use a Docker image containing the Celo node software.
 
+You can use also this [reference script](../../../scripts/run-docker-validator-network.sh) for running the Celo validator stack using Docker containers.
+
 ### Obtain and lock up some Celo Gold for staking
 
 #### Baklava
