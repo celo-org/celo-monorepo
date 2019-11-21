@@ -133,7 +133,7 @@ async function deployModule(
   console.info('Planning...')
   await planTerraformModule(terraformModule, vars)
 
-  await showTerraformModulePlan(terraformModule)
+  // await showTerraformModulePlan(terraformModule)
 
   await confirmAction(
     `Are you sure you want to perform the above plan for Celo env ${celoEnv} in environment ${envType}?`,

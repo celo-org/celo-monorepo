@@ -105,6 +105,7 @@ resource "google_compute_target_https_proxy" "external" {
   name             = "${local.name_prefix}-external-http-proxy"
   url_map          = google_compute_url_map.external.self_link
   ssl_certificates = [google_compute_ssl_certificate.external.self_link]
+  quic_override    = "NONE"
 }
 
 resource "google_compute_url_map" "external" {

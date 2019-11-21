@@ -37,10 +37,6 @@ resource "google_compute_instance" "full_node" {
     }
   }
 
-  scratch_disk {
-    interface = "SCSI"
-  }
-
   network_interface {
     network = var.network_name
     network_ip = google_compute_address.full_node_internal[count.index].address

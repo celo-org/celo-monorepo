@@ -101,7 +101,7 @@ resource "google_compute_disk" "validator" {
 
   type = "pd-ssd"
   # in GB
-  size                      = 10
+  size                      = 15
   physical_block_size_bytes = 4096
 }
 
