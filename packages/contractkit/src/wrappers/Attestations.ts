@@ -209,6 +209,7 @@ export class AttestationsWrapper extends BaseWrapper<Attestations> {
    * @param attestationsRequested The number of attestations to request
    */
   async approveAttestationFee(attestationsRequested: number) {
+    // TODO should this use the registry like we do below in the request() function?
     const tokenContract = await this.kit.contracts.getContract(CeloContract.StableToken)
     const fee = await this.attestationFeeRequired(attestationsRequested)
     return tokenContract.approve(this.address, fee.toString())
@@ -396,12 +397,12 @@ export class AttestationsWrapper extends BaseWrapper<Attestations> {
    * @param phoneNumber The phone number for which to request attestations for
    * @param token The token with which to pay for the attestation fee
    */
-  async selectIssuers(phoneNumber: string) {
+  selectIssuers(phoneNumber: string) {
     const phoneHash = PhoneNumberUtils.getPhoneHash(phoneNumber)
     return toTransactionObject(this.kit, this.contract.methods.selectIssuers(phoneHash))
   }
 
-  async revealPhoneNumberToIssuer(
+  revealPhoneNumberToIssuer(
     phoneNumber: string,
     account: Address,
     issuer: Address,

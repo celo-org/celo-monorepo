@@ -74,7 +74,7 @@ async function verifyCmd(argv: VerifyArgv) {
   const currentWalletAddress = await accounts.getWalletAddress(account)
 
   if (currentWalletAddress !== account) {
-    const setWalletAddressTx = await accounts.setWalletAddress(account)
+    const setWalletAddressTx = accounts.setWalletAddress(account)
     const result = await setWalletAddressTx.send()
     await result.waitReceipt()
   }
@@ -114,7 +114,7 @@ async function requestMoreAttestations(
     .request(phoneNumber, attestationsRequested)
     .then((txo) => txo.sendAndWaitForReceipt())
   await attestations.waitForSelectingIssuers(phoneNumber, account)
-  await attestations.selectIssuers(phoneNumber).then((txo) => txo.sendAndWaitForReceipt())
+  await attestations.selectIssuers(phoneNumber).sendAndWaitForReceipt()
 }
 
 async function requestAttestationsFromIssuers(
