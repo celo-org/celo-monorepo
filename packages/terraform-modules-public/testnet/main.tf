@@ -94,12 +94,25 @@ resource "google_compute_firewall" "proxy" {
 
   allow {
     protocol = "tcp"
-    ports    = ["30301"]
+    ports    = ["30503"]
   }
 
   allow {
     protocol = "udp"
-    ports    = ["30301"]
+    ports    = ["30503"]
+  }
+}
+
+resource "google_compute_firewall" "attestation-service" {
+  name    = "${var.celo_env}-attestation-service-firewall"
+  network = var.network_name
+
+  target_tags   = local.firewall_target_tags_attestation_service
+  source_ranges = [data.google_compute_subnetwork.celo.ip_cidr_range]
+
+  allow {
+    protocol = "tcp"
+    ports    = ["3000"]
   }
 }
 
