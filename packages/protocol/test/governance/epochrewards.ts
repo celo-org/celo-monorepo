@@ -354,7 +354,7 @@ contract('EpochRewards', (accounts: string[]) => {
     describe('when it has been fewer than 15 years since genesis', () => {
       const timeDelta = YEAR.times(10)
       beforeEach(async () => {
-        await timeTravel(timeDelta.toNumber(), web3)
+        await timeTravelToDelta(timeDelta)
       })
 
       it('should return 600MM + 200MM * t / 15', async () => {

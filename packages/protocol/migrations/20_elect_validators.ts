@@ -8,6 +8,7 @@ import { config } from '@celo/protocol/migrationsConfig'
 import { privateKeyToAddress, privateKeyToPublicKey } from '@celo/utils/lib/address'
 import { getBlsPoP, getBlsPublicKey } from '@celo/utils/lib/bls'
 import { toFixed } from '@celo/utils/lib/fixidity'
+import { signMessage } from '@celo/utils/lib/signatureUtils'
 import { BigNumber } from 'bignumber.js'
 import { AccountsInstance, ElectionInstance, LockedGoldInstance, ValidatorsInstance } from 'types'
 
@@ -93,6 +94,7 @@ async function registerValidator(
   lockedGold: LockedGoldInstance,
   validators: ValidatorsInstance,
   validatorPrivateKey: string,
+  attestationKey: string,
   groupAddress: string,
   index: number,
   networkName: string
@@ -137,6 +139,26 @@ async function registerValidator(
     to: accounts.address,
   })
 
+  // Authorize the attestation signer
+  const attestationKeyAddress = privateKeyToAddress(attestationKey)
+  const message = web3.utils.soliditySha3({
+    type: 'address',
+    value: privateKeyToAddress(validatorPrivateKey),
+  })
+  const signature = signMessage(message, attestationKey, attestationKeyAddress)
+
+  // @ts-ignore
+  const registerAttestationKeyTx = accounts.contract.methods.authorizeAttestationSigner(
+    attestationKeyAddress,
+    signature.v,
+    signature.r,
+    signature.s
+  )
+
+  await sendTransactionWithPrivateKey(web3, registerAttestationKeyTx, validatorPrivateKey, {
+    to: accounts.address,
+  })
+
   return
 }
 
@@ -166,6 +188,7 @@ module.exports = async (_deployer: any, networkName: string) => {
   )
 
   const valKeys: string[] = config.validators.validatorKeys
+  const attestationKeys: string[] = config.validators.attestationKeys
 
   if (valKeys.length === 0) {
     console.info('  No validators to register')
@@ -213,6 +236,7 @@ module.exports = async (_deployer: any, networkName: string) => {
           lockedGold,
           validators,
           key,
+          attestationKeys[index],
           account.address,
           index,
           networkName
