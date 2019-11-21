@@ -1,20 +1,21 @@
 import { IdentityMetadataWrapper, newKitFromWeb3 } from '@celo/contractkit'
 import { ClaimTypes } from '@celo/contractkit/lib/identity'
+import { testWithGanache } from '@celo/dev-utils/lib/ganache-test'
 import { readFileSync, writeFileSync } from 'fs'
 import { tmpdir } from 'os'
 import Web3 from 'web3'
-import { testWithGanache } from '../../test-utils/ganache-test'
+import ClaimAccount from './claim-account'
 import ClaimDomain from './claim-domain'
 import ClaimName from './claim-name'
 import CreateMetadata from './create-metadata'
 import RegisterMetadata from './register-metadata'
 process.env.NO_SYNCCHECK = 'true'
 
-testWithGanache('account:authorize cmd', (web3: Web3) => {
+testWithGanache('account metadata cmds', (web3: Web3) => {
   let account: string
-
+  let accounts: string[]
   beforeEach(async () => {
-    const accounts = await web3.eth.getAccounts()
+    accounts = await web3.eth.getAccounts()
     account = accounts[0]
   })
 
@@ -53,6 +54,16 @@ testWithGanache('account:authorize cmd', (web3: Web3) => {
       const claim = metadata.findClaim(ClaimTypes.DOMAIN)
       expect(claim).toBeDefined()
       expect(claim!.domain).toEqual(domain)
+    })
+
+    test('account:claim-account cmd', async () => {
+      generateEmptyMetadataFile()
+      const otherAccount = accounts[1]
+      await ClaimAccount.run(['--from', account, '--address', otherAccount, emptyFilePath])
+      const metadata = readFile()
+      const claim = metadata.findClaim(ClaimTypes.ACCOUNT)
+      expect(claim).toBeDefined()
+      expect(claim!.address).toEqual(otherAccount)
     })
   })
 

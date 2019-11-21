@@ -209,7 +209,7 @@ contract Election is
     require(votes.total.eligible.contains(group));
     require(0 < value);
     require(canReceiveVotes(group, value));
-    address account = getAccounts().activeVoteSignerToAccount(msg.sender);
+    address account = getAccounts().voteSignerToAccount(msg.sender);
 
     // Add group to the groups voted for by the account.
     address[] storage groups = votes.groupsVotedFor[account];
@@ -233,7 +233,7 @@ contract Election is
    * @dev Pending votes cannot be activated until an election has been held.
    */
   function activate(address group) external nonReentrant returns (bool) {
-    address account = getAccounts().activeVoteSignerToAccount(msg.sender);
+    address account = getAccounts().voteSignerToAccount(msg.sender);
     PendingVote storage pendingVote = votes.pending.forGroup[group].byAccount[account];
     require(pendingVote.epoch < getEpochNumber());
     uint256 value = pendingVote.value;
@@ -241,6 +241,7 @@ contract Election is
     decrementPendingVotes(group, account, value);
     incrementActiveVotes(group, account, value);
     emit ValidatorGroupVoteActivated(account, group, value);
+    return true;
   }
 
   /**
@@ -263,7 +264,7 @@ contract Election is
     uint256 index
   ) external nonReentrant returns (bool) {
     require(group != address(0));
-    address account = getAccounts().activeVoteSignerToAccount(msg.sender);
+    address account = getAccounts().voteSignerToAccount(msg.sender);
     require(0 < value && value <= getPendingVotesForGroupByAccount(group, account));
     decrementPendingVotes(group, account, value);
     decrementTotalVotes(group, value, lesser, greater);
@@ -296,7 +297,7 @@ contract Election is
   ) external nonReentrant returns (bool) {
     // TODO(asa): Dedup with revokePending.
     require(group != address(0));
-    address account = getAccounts().activeVoteSignerToAccount(msg.sender);
+    address account = getAccounts().voteSignerToAccount(msg.sender);
     require(0 < value && value <= getActiveVotesForGroupByAccount(group, account));
     decrementActiveVotes(group, account, value);
     decrementTotalVotes(group, value, lesser, greater);
@@ -673,6 +674,14 @@ contract Election is
   }
 
   /**
+   * @notice Returns the active votes received across all groups.
+   * @return The active votes received across all groups.
+   */
+  function getActiveVotes() public view returns (uint256) {
+    return votes.active.total;
+  }
+
+  /**
    * @notice Returns the list of validator groups eligible to elect validators.
    * @return The list of validator groups eligible to elect validators.
    */
@@ -698,7 +707,7 @@ contract Election is
    * @return The list of elected validators.
    * @dev See https://en.wikipedia.org/wiki/D%27Hondt_method#Allocation for more information.
    */
-  function electValidators() external view returns (address[] memory) {
+  function electValidatorSigners() external view returns (address[] memory) {
     // Groups must have at least `electabilityThreshold` proportion of the total votes to be
     // considered for the election.
     uint256 requiredVotes = electabilityThreshold
@@ -793,5 +802,18 @@ contract Election is
       r = keccak256(abi.encodePacked(r));
     }
     return array;
+  }
+
+  /**
+   * @notice Returns get current validator signers using the precompiles.
+   * @return List of current validator signers.
+   */
+  function getCurrentValidatorSigners() public view returns (address[] memory) {
+    uint256 n = numberValidatorsInCurrentSet();
+    address[] memory res = new address[](n);
+    for (uint256 idx = 0; idx < n; idx++) {
+      res[idx] = validatorAddressFromCurrentSet(idx);
+    }
+    return res;
   }
 }

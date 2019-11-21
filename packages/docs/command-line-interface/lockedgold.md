@@ -4,6 +4,24 @@ description: View and manage locked Celo Gold
 
 ## Commands
 
+### Lock
+
+Locks Celo Gold to be used in governance and validator elections.
+
+```
+USAGE
+  $ celocli lockedgold:lock
+
+OPTIONS
+  --from=from    (required)
+  --value=value  (required) unit amount of Celo Gold (cGLD)
+
+EXAMPLE
+  lock --from 0x47e172F6CfB6c7D01C1574fa3E2Be7CC73269D95 --value 1000000000000000000
+```
+
+_See code: [packages/cli/src/commands/lockedgold/lock.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/lockedgold/lock.ts)_
+
 ### Show
 
 Show Locked Gold information for a given account

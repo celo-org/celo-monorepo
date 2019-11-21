@@ -133,7 +133,7 @@ const styles = StyleSheet.create({
   },
   buttonCancelContainer: {
     position: 'absolute',
-    top: 10,
+    top: 20,
     left: 5,
     zIndex: 10,
   },

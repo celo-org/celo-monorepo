@@ -1,7 +1,8 @@
 import { Address } from '@celo/utils/lib/address'
+import { verifySignature } from '@celo/utils/lib/signatureUtils'
 import { isLeft } from 'fp-ts/lib/Either'
 import * as t from 'io-ts'
-import { serializeClaim, SignedClaimType, verifySignature } from './claim'
+import { hashOfClaim, SignedClaimType } from './claim'
 import { ClaimTypes, now, TimestampType } from './types'
 
 export const KeybaseClaimType = t.type({
@@ -39,7 +40,7 @@ export async function verifyKeybaseClaim(
     }
 
     const hasValidSiganture = verifySignature(
-      serializeClaim(parsedClaim.right.payload),
+      hashOfClaim(parsedClaim.right.claim),
       parsedClaim.right.signature,
       signer
     )
@@ -48,7 +49,7 @@ export async function verifyKeybaseClaim(
       return 'Claim does not contain a valid signature'
     }
 
-    const parsedKeybaseClaim = KeybaseClaimType.decode(parsedClaim.right.payload)
+    const parsedKeybaseClaim = KeybaseClaimType.decode(parsedClaim.right.claim)
     if (isLeft(parsedKeybaseClaim)) {
       return 'Hosted claim is not a Keybase claim'
     }
