@@ -56,7 +56,7 @@ resource "google_compute_instance" "attestation_service" {
       attestation_service_docker_image_tag : var.attestation_service_docker_image_tag,
       db_username : google_sql_user.celo[0].name,
       db_password : google_sql_user.celo[0].password,
-      db_host : google_sql_database_instance.master[0].ip_address[0].ip_address,
+      db_host : google_sql_database_instance.master[0].first_ip_address,
       sms_providers : var.sms_providers,
       nexmo_key : var.nexmo_key,
       nexmo_secret : var.nexmo_secret,

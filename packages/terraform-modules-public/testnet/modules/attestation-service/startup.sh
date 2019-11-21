@@ -40,6 +40,16 @@ SMS_PROVIDERS=${sms_providers}
 ATTESTATION_SERVICE_DOCKER_IMAGE=${attestation_service_docker_image_repository}:${attestation_service_docker_image_tag}
 docker pull $ATTESTATION_SERVICE_DOCKER_IMAGE
 
+# TODO: DB connection is not working. Need to fix https://cloud.google.com/sql/docs/postgres/external-connection-methods?hl=en_US
+# Workaround: Run postgres container
+docker run --name postgres \
+  --network host \
+  -e POSTGRES_PASSWORD=${db_password} \
+  -e POSTGRES_USER=${db_username} \
+  -e POSTGRES_DB=attestation_service \
+  -d postgres
+DATABASE_URL="postgres://${db_username}:${db_password}@127.0.0.1:5432/attestation_service"
+
 # Switch between Nexmo and Twilio
 # TODO: Refactor
 if [ $SMS_PROVIDERS == "nexmo" ]; then
@@ -60,7 +70,6 @@ if [ $SMS_PROVIDERS == "nexmo" ]; then
     -e NEXMO_BLACKLIST=$NEXMO_BLACKLIST \
     $ATTESTATION_SERVICE_DOCKER_IMAGE -c "\
       (
-        set -euo pipefail && \
         echo -n '$DATABASE_URL' > $DATA_DIR/databaseUrl && \
         echo -n '$ATTESTATION_KEY' > $DATA_DIR/attestationKey && \
         echo -n '$ACCOUNT_ADDRESS' > $DATA_DIR/accountAddress && \
@@ -72,7 +81,7 @@ if [ $SMS_PROVIDERS == "nexmo" ]; then
       ) && ( \
         yarn run db:create:dev && \
         yarn run db:migrate:dev && \
-        node lib/index.js \
+        yarn run dev \
       )"
 elif [ $SMS_PROVIDERS == "twilio" ]; then
   TWILIO_ACCOUNT_SID=${twilio_account_sid}
@@ -94,7 +103,6 @@ elif [ $SMS_PROVIDERS == "twilio" ]; then
     -e TWILIO_BLACKLIST=$TWILIO_BLACKLIST \
     $ATTESTATION_SERVICE_DOCKER_IMAGE -c "\
       (
-        set -euo pipefail && \
         echo -n '$DATABASE_URL' > $DATA_DIR/databaseUrl && \
         echo -n '$ATTESTATION_KEY' > $DATA_DIR/attestationKey && \
         echo -n '$ACCOUNT_ADDRESS' > $DATA_DIR/accountAddress && \
@@ -107,7 +115,7 @@ elif [ $SMS_PROVIDERS == "twilio" ]; then
       ) && ( \
         yarn run db:create:dev && \
         yarn run db:migrate:dev && \
-        node lib/index.js \
+        yarn run dev \
       )"
 else
   echo "Variable \$SMS_PROVIDERS=$SMS_PROVIDERS must be one from nexmo or twilio"
