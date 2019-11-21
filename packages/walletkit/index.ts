@@ -10,7 +10,6 @@ export {
   LockedGold,
   Escrow,
   Exchange,
-  GasCurrencyWhitelist,
   GasPriceMinimum,
   GoldToken,
   Governance,

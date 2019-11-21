@@ -59,19 +59,26 @@ export async function signTransaction(txn: CeloPartialTxParams, privateKey: stri
   }
 
   const signed = (tx: any): any => {
-    if (isNot(tx.gasCurrency)) {
+    if (isNot(tx.feeCurrency)) {
       Logger.info(
         'SigningUtils@signTransaction',
-        `Invalid transaction: Gas currency is \"${tx.gasCurrency}\"`
+        `Invalid transaction: fee currency is \"${tx.feeCurrency}\"`
       )
-      throw new Error(`Invalid transaction: Gas currency is \"${tx.gasCurrency}\"`)
+      throw new Error(`Invalid transaction: Fee currency is \"${tx.feeCurrency}\"`)
     }
-    if (isNot(tx.gasFeeRecipient)) {
+    if (isNot(tx.gatewayFeeRecipient)) {
       Logger.info(
         'SigningUtils@signTransaction',
-        `Invalid transaction: Gas fee recipient is \"${tx.gasFeeRecipient}\"`
+        `Invalid transaction: Gateway fee recipient is \"${tx.gatewayFeeRecipient}\"`
       )
-      throw new Error(`Invalid transaction: Gas fee recipient is \"${tx.gasFeeRecipient}\"`)
+      throw new Error(`Invalid transaction: Gateway fee recipient is \"${tx.gatewayFeeRecipient}\"`)
+    }
+    if (isNot(tx.gatewayFee)) {
+      Logger.info(
+        'SigningUtils@signTransaction',
+        `Invalid transaction: Gateway fee value is \"${tx.gatewayFee}\"`
+      )
+      throw new Error(`Invalid transaction: Gateway fee value is \"${tx.gatewayFee}\"`)
     }
 
     if (!tx.gas && !tx.gasLimit) {
@@ -100,8 +107,9 @@ export async function signTransaction(txn: CeloPartialTxParams, privateKey: stri
         Bytes.fromNat(transaction.nonce),
         Bytes.fromNat(transaction.gasPrice),
         Bytes.fromNat(transaction.gas),
-        transaction.gasCurrency.toLowerCase(),
-        transaction.gasFeeRecipient.toLowerCase(),
+        transaction.feeCurrency.toLowerCase(),
+        transaction.gatewayFeeRecipient.toLowerCase(),
+        Bytes.fromNat(transaction.gatewayFee),
         transaction.to.toLowerCase(),
         Bytes.fromNat(transaction.value),
         transaction.data,
@@ -118,21 +126,21 @@ export async function signTransaction(txn: CeloPartialTxParams, privateKey: stri
       )
 
       const rawTx = RLP.decode(rlpEncoded)
-        .slice(0, 8)
+        .slice(0, 9)
         .concat(Account.decodeSignature(signature))
 
-      rawTx[8] = makeEven(trimLeadingZero(rawTx[8]))
       rawTx[9] = makeEven(trimLeadingZero(rawTx[9]))
       rawTx[10] = makeEven(trimLeadingZero(rawTx[10]))
+      rawTx[11] = makeEven(trimLeadingZero(rawTx[11]))
 
       const rawTransaction = RLP.encode(rawTx)
 
       const values = RLP.decode(rawTransaction)
       result = {
         messageHash: hash,
-        v: trimLeadingZero(values[8]),
-        r: trimLeadingZero(values[9]),
-        s: trimLeadingZero(values[10]),
+        v: trimLeadingZero(values[9]),
+        r: trimLeadingZero(values[10]),
+        s: trimLeadingZero(values[11]),
         rawTransaction,
       }
     } catch (e) {
@@ -184,11 +192,11 @@ export async function signTransaction(txn: CeloPartialTxParams, privateKey: stri
 export function recoverTransaction(rawTx: string): string {
   const values = RLP.decode(rawTx)
   Logger.debug('signing-utils@recoverTransaction', `Values are ${values}`)
-  const signature = Account.encodeSignature(values.slice(8, 11))
-  const recovery = Bytes.toNumber(values[8])
+  const signature = Account.encodeSignature(values.slice(9, 12))
+  const recovery = Bytes.toNumber(values[9])
   // tslint:disable-next-line:no-bitwise
   const extraData = recovery < 35 ? [] : [Bytes.fromNumber((recovery - 35) >> 1), '0x', '0x']
-  const signingData = values.slice(0, 8).concat(extraData)
+  const signingData = values.slice(0, 9).concat(extraData)
   const signingDataHex = RLP.encode(signingData)
   return Account.recover(Hash.keccak256(signingDataHex), signature)
 }

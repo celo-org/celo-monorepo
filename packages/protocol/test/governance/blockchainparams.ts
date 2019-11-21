@@ -84,22 +84,22 @@ contract('BlockchainParameters', (accounts: string[]) => {
       )
     })
   })
-  describe('#setIntrinsicGasForAlternativeGasCurrency()', () => {
+  describe('#setIntrinsicGasForAlternativeFeeCurrency()', () => {
     it('should set the variable', async () => {
-      await blockchainParameters.setIntrinsicGasForAlternativeGasCurrency(gasForNonGoldCurrencies)
+      await blockchainParameters.setIntrinsicGasForAlternativeFeeCurrency(gasForNonGoldCurrencies)
       assertEqualBN(
         gasForNonGoldCurrencies,
-        await blockchainParameters.intrinsicGasForAlternativeGasCurrency()
+        await blockchainParameters.intrinsicGasForAlternativeFeeCurrency()
       )
     })
     it('should emit the corresponding event', async () => {
-      const resp = await blockchainParameters.setIntrinsicGasForAlternativeGasCurrency(
+      const resp = await blockchainParameters.setIntrinsicGasForAlternativeFeeCurrency(
         gasForNonGoldCurrencies
       )
       assert.equal(resp.logs.length, 1)
       const log = resp.logs[0]
       assertContainSubset(log, {
-        event: 'IntrinsicGasForAlternativeGasCurrencySet',
+        event: 'IntrinsicGasForAlternativeFeeCurrencySet',
         args: {
           gas: new BigNumber(gasForNonGoldCurrencies),
         },
@@ -107,7 +107,7 @@ contract('BlockchainParameters', (accounts: string[]) => {
     })
     it('only owner should be able to set', async () => {
       await assertRevert(
-        blockchainParameters.setIntrinsicGasForAlternativeGasCurrency(gasLimit, {
+        blockchainParameters.setIntrinsicGasForAlternativeFeeCurrency(gasLimit, {
           from: accounts[1],
         })
       )
@@ -147,7 +147,7 @@ contract('BlockchainParameters', (accounts: string[]) => {
         },
       })
       assertContainSubset(resp.logs[3], {
-        event: 'IntrinsicGasForAlternativeGasCurrencySet',
+        event: 'IntrinsicGasForAlternativeFeeCurrencySet',
         args: {
           gas: new BigNumber(gasForNonGoldCurrencies),
         },
