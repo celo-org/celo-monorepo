@@ -357,18 +357,21 @@ export async function migrateContracts(
 ) {
   const migrationOverrides = _.merge(
     {
-      validators: {
-        validatorKeys: validatorPrivateKeys.map(ensure0x),
-        attestationKeys: attestationKeys.map(ensure0x),
-      },
       election: {
         minElectableValidators: '1',
+      },
+      reserve: {
+        goldBalance: 100000,
       },
       stableToken: {
         initialBalances: {
           addresses: validators.map(ensure0x),
           values: validators.map(() => '10000000000000000000000'),
         },
+      },
+      validators: {
+        validatorKeys: validatorPrivateKeys.map(ensure0x),
+        attestationKeys: attestationKeys.map(ensure0x),
       },
     },
     overrides
