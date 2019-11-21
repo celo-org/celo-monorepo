@@ -4,7 +4,7 @@ import { switchToClusterFromEnv } from 'src/lib/cluster'
 import { convertToContractDecimals } from 'src/lib/contract-utils'
 import { portForwardAnd } from 'src/lib/port_forward'
 import { validateAccountAddress } from 'src/lib/utils'
-import * as yargs from 'yargs'
+import yargs from 'yargs'
 import { AccountArgv } from '../account'
 
 export const command = 'faucet'

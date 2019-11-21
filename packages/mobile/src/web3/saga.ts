@@ -64,7 +64,7 @@ export function* checkWeb3SyncProgress() {
       Logger.debug(TAG, 'checkWeb3SyncProgress', 'Checking sync progress')
 
       // isSyncing returns a syncProgress object when it's still syncing, false otherwise
-      const syncProgress = yield web3.eth.isSyncing()
+      const syncProgress = yield call(web3.eth.isSyncing)
 
       if (typeof syncProgress === 'boolean' && !syncProgress) {
         Logger.debug(TAG, 'checkWeb3SyncProgress', 'Sync maybe complete, checking')
@@ -83,6 +83,12 @@ export function* checkWeb3SyncProgress() {
 
       yield delay(100) // wait 100ms while web3 syncs
     } catch (error) {
+      // Check if error caused by switch to zeroSyncMode
+      // as if it is in zeroSyncMode it should have returned above
+      const switchedToZeroSyncMode = yield select(zeroSyncSelector)
+      if (switchedToZeroSyncMode) {
+        return true
+      }
       if (error.toString().toLowerCase() === BLOCK_CHAIN_CORRUPTION_ERROR.toLowerCase()) {
         CeloAnalytics.track(CustomEventNames.blockChainCorruption, {}, true)
         const deleted = yield call(deleteChainData)
@@ -103,7 +109,6 @@ export function* waitForWeb3Sync() {
       syncComplete: call(checkWeb3SyncProgress),
       timeout: delay(SYNC_TIMEOUT),
     })
-
     if (timeout || !syncComplete) {
       Logger.error(TAG, 'Could not complete sync')
       navigateToError('web3FailedToSync')
@@ -424,8 +429,20 @@ export function* switchToGethFromZeroSync() {
   try {
     const gethAlreadyStartedThisSession = yield select(gethStartedThisSessionSelector)
     yield put(setZeroSyncMode(false))
-    yield call(initGethSaga)
 
+    if (gethAlreadyStartedThisSession) {
+      // Call any method on web3 to avoid a persist state issue
+      // This is a temporary workaround as this restart will be
+      // removed when the geth issue is resolved
+      yield call(web3.eth.isSyncing)
+      // If geth is started twice within the same session,
+      // there is an issue where it cannot find deployed contracts.
+      // Restarting the app fixes this issue.
+      restartApp()
+      return
+    }
+
+    yield call(initGethSaga)
     switchWeb3ProviderForSyncMode(false)
     // Ensure web3 is fully synced using new provider
     yield call(waitForWeb3Sync)
@@ -434,13 +451,6 @@ export function* switchToGethFromZeroSync() {
     // Note that this must happen after the sync mode is switched
     // as the web3.personal where the key is stored is not available in zeroSync mode
     yield call(ensureAccountInWeb3Keystore)
-
-    if (gethAlreadyStartedThisSession) {
-      // If geth is started twice within the same session,
-      // there is an issue where it cannot find deployed contracts.
-      // Restarting the app fixes this issue.
-      restartApp()
-    }
   } catch (e) {
     Logger.error(TAG + '@switchToGethFromZeroSync', 'Error switching to geth from zeroSync')
     yield put(showError(ErrorMessages.FAILED_TO_SWITCH_SYNC_MODES))

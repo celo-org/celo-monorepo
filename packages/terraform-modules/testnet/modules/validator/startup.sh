@@ -116,7 +116,6 @@ docker run \
       --etherbase=$ACCOUNT_ADDRESS \
       --networkid=${network_id} \
       --syncmode=full \
-      --miner.verificationpool=${verification_pool_url} \
       --consoleformat=json \
       --consoleoutput=stdout \
       --verbosity=${geth_verbosity} \

@@ -198,7 +198,6 @@ spec:
           --ethstats=${HOSTNAME}:${ETHSTATS_SECRET}@${ETHSTATS_SVC} \
           --metrics \
           --mine \
-          --miner.verificationpool=${VERIFICATION_POOL_URL} \
           --networkid=${NETWORK_ID} \
           --nodekey=/root/.celo/account/{{ .Node.name}}PrivateKey \
           --password=/root/.celo/account/accountSecret \
@@ -251,10 +250,6 @@ spec:
             configMapKeyRef:
               name: {{ template "ethereum.fullname" . }}-geth-config
               key: networkid
-        - name: VERIFICATION_POOL_URL
-          value: {{ .Values.geth.miner.verificationpool }}
-        - name: VERIFICATION_REWARDS_URL
-          value: {{ .Values.verification.rewardsUrl }}
 {{ include "celo.geth-exporter-container" .  | indent 6 }}
 {{ include "celo.prom-to-sd-container" (dict "Values" .Values "Release" .Release "Chart" .Chart "component" "geth" "metricsPort" "9200" "metricsPath" "filteredmetrics" "containerNameLabel" .Node.name )  | indent 6 }}
       initContainers:

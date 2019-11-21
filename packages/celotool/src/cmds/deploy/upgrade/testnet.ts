@@ -6,7 +6,7 @@ import {
   uploadGenesisBlockToGoogleStorage,
   uploadStaticNodesToGoogleStorage,
 } from 'src/lib/testnet-utils'
-import * as yargs from 'yargs'
+import yargs from 'yargs'
 import { UpgradeArgv } from '../../deploy/upgrade'
 
 export const command = 'testnet'
