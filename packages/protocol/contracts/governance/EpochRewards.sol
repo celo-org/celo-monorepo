@@ -3,6 +3,7 @@ pragma solidity ^0.5.3;
 import "openzeppelin-solidity/contracts/math/SafeMath.sol";
 import "openzeppelin-solidity/contracts/ownership/Ownable.sol";
 
+import "../baklava/Freezable.sol";
 import "../common/FixidityLib.sol";
 import "../common/Initializable.sol";
 import "../common/UsingRegistry.sol";
@@ -11,7 +12,7 @@ import "../common/UsingPrecompiles.sol";
 /**
  * @title Contract for calculating epoch rewards.
  */
-contract EpochRewards is Ownable, Initializable, UsingPrecompiles, UsingRegistry {
+contract EpochRewards is Ownable, Initializable, UsingPrecompiles, UsingRegistry, Freezable {
   using FixidityLib for FixidityLib.Fraction;
   using SafeMath for uint256;
 
@@ -82,6 +83,7 @@ contract EpochRewards is Ownable, Initializable, UsingPrecompiles, UsingRegistry
    */
   function initialize(
     address registryAddress,
+    address _freezer,
     uint256 targetVotingYieldInitial,
     uint256 targetVotingYieldMax,
     uint256 targetVotingYieldAdjustmentFactor,
@@ -92,6 +94,7 @@ contract EpochRewards is Ownable, Initializable, UsingPrecompiles, UsingRegistry
     uint256 _targetValidatorEpochPayment
   ) external initializer {
     _transferOwnership(msg.sender);
+    setFreezer(_freezer);
     setRegistry(registryAddress);
     setTargetVotingYieldParameters(targetVotingYieldMax, targetVotingYieldAdjustmentFactor);
     setRewardsMultiplierParameters(
@@ -125,6 +128,10 @@ contract EpochRewards is Ownable, Initializable, UsingPrecompiles, UsingRegistry
       params.adjustmentFactors.underspend.unwrap(),
       params.adjustmentFactors.overspend.unwrap()
     );
+  }
+
+  function setFreezer(address freezer) public onlyOwner {
+    _setFreezer(freezer);
   }
 
   /**
@@ -362,7 +369,7 @@ contract EpochRewards is Ownable, Initializable, UsingPrecompiles, UsingRegistry
    *   voting Gold fraction.
    * @dev Only called directly by the protocol.
    */
-  function updateTargetVotingYield() external {
+  function updateTargetVotingYield() external onlyWhenNotFrozen {
     require(msg.sender == address(0));
     _updateTargetVotingYield();
   }

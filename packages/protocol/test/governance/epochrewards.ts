@@ -84,6 +84,7 @@ contract('EpochRewards', (accounts: string[]) => {
 
     await epochRewards.initialize(
       registry.address,
+      accounts[0],
       targetVotingYieldParams.initial,
       targetVotingYieldParams.max,
       targetVotingYieldParams.adjustmentFactor,
@@ -123,6 +124,7 @@ contract('EpochRewards', (accounts: string[]) => {
       await assertRevert(
         epochRewards.initialize(
           registry.address,
+          account[0],
           targetVotingYieldParams.initial,
           targetVotingYieldParams.max,
           targetVotingYieldParams.adjustmentFactor,
