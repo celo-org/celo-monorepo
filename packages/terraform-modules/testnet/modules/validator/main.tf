@@ -53,7 +53,7 @@ resource "google_compute_instance" "validator" {
     dynamic "access_config" {
       for_each = count.index < var.proxied_validator_count ? [] : [0]
       content {
-        nat_ip = google_compute_address.validator[count.index].address
+        nat_ip = google_compute_address.validator[count.index - var.proxied_validator_count].address
       }
     }
   }
@@ -73,7 +73,7 @@ resource "google_compute_instance" "validator" {
       geth_node_docker_image_tag : var.geth_node_docker_image_tag,
       geth_verbosity : var.geth_verbosity,
       in_memory_discovery_table : var.in_memory_discovery_table,
-      ip_address : count.index < var.proxied_validator_count ? "" : google_compute_address.validator[var.proxied_validator_count - count.index].address,
+      ip_address : count.index < var.proxied_validator_count ? "" : google_compute_address.validator[count.index - var.proxied_validator_count].address,
       istanbul_request_timeout_ms : var.istanbul_request_timeout_ms,
       max_peers : 125,
       network_id : var.network_id,
