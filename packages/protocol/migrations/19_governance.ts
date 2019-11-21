@@ -57,7 +57,7 @@ module.exports = deploymentForCoreContract<GovernanceInstance>(
       'Election',
       'Escrow',
       'Exchange',
-      'GasCurrencyWhitelist',
+      'FeeCurrencyWhitelist',
       'GasPriceMinimum',
       'Governance',
       'LockedGold',
