@@ -9,7 +9,7 @@ import {
 import { config } from '@celo/protocol/migrationsConfig'
 import { toFixed } from '@celo/utils/lib/fixidity'
 import {
-  GasCurrencyWhitelistInstance,
+  FeeCurrencyWhitelistInstance,
   ReserveInstance,
   SortedOraclesInstance,
   StableTokenInstance,
@@ -70,10 +70,10 @@ module.exports = deploymentForCoreContract<StableTokenInstance>(
     console.info('Adding StableToken to Reserve')
     await reserve.addToken(stableToken.address)
 
-    console.info('Whitelisting StableToken as a gas currency')
-    const gasCurrencyWhitelist: GasCurrencyWhitelistInstance = await getDeployedProxiedContract<
-      GasCurrencyWhitelistInstance
-    >('GasCurrencyWhitelist', artifacts)
-    await gasCurrencyWhitelist.addToken(stableToken.address)
+    console.info('Whitelisting StableToken as a fee currency')
+    const feeCurrencyWhitelist: FeeCurrencyWhitelistInstance = await getDeployedProxiedContract<
+      FeeCurrencyWhitelistInstance
+    >('FeeCurrencyWhitelist', artifacts)
+    await feeCurrencyWhitelist.addToken(stableToken.address)
   }
 )
