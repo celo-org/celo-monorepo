@@ -11,7 +11,7 @@ export NETWORK_ID=${4:-"1101"}
 export NETWORK_NAME=${5:-"integration"}
 export DEFAULT_PASSWORD=${6:-"1234"}
 export CELO_IMAGE_ATTESTATION=${7:-"gcr.io/celo-testnet/attestation-service@sha256:f22701104dbeea41a638b002aeed7e5ec403726b47177c553c8a2607c58eb7f6"}
-export CELO_PROVIDER=${8:-"https://my-attestation.example.com"}
+export CELO_PROVIDER=${8:-"https://alfajores-forno.celo-testnet.org/"} # https://berlintestnet001-forno.celo-networks-dev.org/
 export DATABASE_URL=${9:-"sqlite://db/dev.db"}
 
 export NEXMO_KEY="xx"

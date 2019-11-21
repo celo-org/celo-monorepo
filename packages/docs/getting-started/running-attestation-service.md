@@ -62,12 +62,13 @@ We copy the account details and assign the Private Key to the `ATTESTATION_KEY` 
 export ATTESTATION_KEY=<Private Key>
 ```
 
-The Attestation Service needs to be publicly available from the internet, allowing the users to send attestation requests to the server. So depending on how and where you are making available the service, you need to configure the `CELO_PROVIDER` variable pointing to that.
+The Attestation Service needs to connect to a Web3 Provider. This is going to depend on the network you want to connect. So depending on which network you are making available the service, you need to configure the `CELO_PROVIDER` variable pointing to that.
 
 For example:
 
 ```bash
-export CELO_PROVIDER="https://my-attestation.example.com"
+# Web3 provider for Alfajores network
+export CELO_PROVIDER="https://alfajores-forno.celo-testnet.org/"
 ```
 
 #### Database Configuration
