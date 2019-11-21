@@ -189,6 +189,7 @@ class AttestationRequestHandler {
 
       try {
         await provider.sendSms(this.attestationRequest.phoneNumber, textMessage)
+        this.logger.info('Sent sms')
         Counters.attestationRequestsSentSms.inc()
         await attestationRecord.update(
           { status: AttestationStatus.SENT, smsProvider: provider.type },
