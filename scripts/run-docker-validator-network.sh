@@ -4,7 +4,7 @@ set -euo pipefail
 export LC_ALL=en_US.UTF-8
 
 # Usage: run-network.sh <COMMAND> <DATA_DIR>
-COMMAND=${1:-"pull,accounts,deploy,run-validator"}
+COMMAND=${1:-"pull,accounts,deploy,run-validator,status"}
 DATA_DIR=${2:-"/tmp/celo/network"}
 export CELO_IMAGE=${3:-"us.gcr.io/celo-testnet/geth@sha256:4bc97381db0bb81b7a3e473bb61d447c90be165834316d3f75bc34d7db718b39"}
 export NETWORK_ID=${4:-"1101"}
@@ -43,6 +43,21 @@ download_genesis () {
 
 }
 
+make_status_requests () {
+    echo -e "Checking Proxy and Validator state:"
+    
+    echo -n "* Proxy eth_blockNumber:"
+    curl -X POST --data '{"jsonrpc":"2.0","method":"eth_blockNumber","params":[],"id":1}' -H "Content-Type: application/json" localhost:8545
+    
+    echo -n "* Validator net_peerCount:"
+    curl -X POST --data '{"jsonrpc":"2.0","method":"net_peerCount","params":[],"id":74}' -H "Content-Type: application/json" localhost:8547
+    
+    echo -n "* Validator eth_mining:"
+    curl -X POST --data '{"jsonrpc":"2.0","method":"eth_mining","params":[],"id":1}' -H "Content-Type: application/json" localhost:8547
+    echo -e ""
+    
+}
+
 #### Main 
 
 if [[ $COMMAND == *"help"* ]]; then
@@ -54,7 +69,7 @@ if [[ $COMMAND == *"help"* ]]; then
 
     echo -e "Options:"
     echo -e "$0 <COMMAND> <DATA_DIR> <CELO_IMAGE> <NETWORK_ID> <NETWORK_NAME> <PASSWORD>"
-    echo -e "\t - Command; comma separated list of actions to execute. Options are: help, pull, clean, accounts, deploy, run-validator, run-attestation. Default: pull,accounts,deploy,run-validator"
+    echo -e "\t - Command; comma separated list of actions to execute. Options are: help, pull, clean, accounts, deploy, run-validator, run-attestation, status. Default: pull,accounts,deploy,run-validator,status"
     echo -e "\t - Data Dir; Local folder where will be created the data dir for the nodes. Default: /tmp/celo/network"
     echo -e "\t - Celo Image; Image to download"
     echo -e "\t - Celo Network; Docker image network to use (typically alfajores or baklava, but you can use a commit). "
@@ -144,10 +159,10 @@ if [[ $COMMAND == *"run-validator"* ]]; then
     screen -S celo-validator -d -m docker run --name celo-validator --restart always -p 127.0.0.1:8547:8545 -p 127.0.0.1:8548:8546 -p 30304:30303 -p 30304:30303/udp -v $PWD/validator:/root/.celo $CELO_IMAGE --verbosity 3 --networkid $NETWORK_ID --syncmode full --rpc --rpcaddr 0.0.0.0 --rpcapi eth,net,web3,debug --maxpeers 125 --mine --istanbul.blockperiod=5 --istanbul.requesttimeout=3000 --etherbase $CELO_VALIDATOR_ADDRESS --nodiscover --proxy.proxied --proxy.proxyenodeurlpair=enode://$PROXY_ENODE@$PROXY_IP:30503\;enode://$PROXY_ENODE@$PROXY_IP:30503  --unlock=$CELO_VALIDATOR_ADDRESS --password /root/.celo/.password
     
     sleep 5s
-    
+     
     echo -e "\tEverything should be running, you can check running `screen -ls`"
     screen -ls
-    
+        
     echo -e "\tYou can re-attach to the proxy or the validator running:"
     echo -e "\t`screen -r -S celo-proxy` or `screen -r -S celo-validator`\n"
     
@@ -168,6 +183,12 @@ if [[ $COMMAND == *"run-attestation"* ]]; then
     echo -e "\tAttestation service should be running, you can check running `screen -ls`"
     echo -e "\tYou can re-attach to the attestation-service running:"
     echo -e "\t`screen -r -S celo-attestation-service`\n"
+
+fi
+
+if [[ $COMMAND == *"status"* ]]; then
+
+    make_status_requests
 
 fi
 
