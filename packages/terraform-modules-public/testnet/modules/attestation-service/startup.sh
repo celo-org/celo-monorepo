@@ -35,20 +35,25 @@ mkdir -p $DATA_DIR
 ATTESTATION_KEY=${attestation_key}
 ACCOUNT_ADDRESS=${account_address}
 CELO_PROVIDER=${celo_provider}
-DATABASE_URL="postgres://${db_username}:${db_password}@${db_host}:5432/attestation_service"
 SMS_PROVIDERS=${sms_providers}
 ATTESTATION_SERVICE_DOCKER_IMAGE=${attestation_service_docker_image_repository}:${attestation_service_docker_image_tag}
 docker pull $ATTESTATION_SERVICE_DOCKER_IMAGE
 
-# TODO: DB connection is not working. Need to fix https://cloud.google.com/sql/docs/postgres/external-connection-methods?hl=en_US
-# Workaround: Run postgres container
-docker run --name postgres \
-  --network host \
-  -e POSTGRES_PASSWORD=${db_password} \
-  -e POSTGRES_USER=${db_username} \
-  -e POSTGRES_DB=attestation_service \
-  -d postgres
+# Run the Cloud SQL Proxy
+docker run -d -v /cloudsql:/cloudsql \
+  -p 127.0.0.1:5432:5432 \
+  gcr.io/cloudsql-docker/gce-proxy:1.11 /cloud_sql_proxy \
+  -instances=${db_connection_name}=tcp:0.0.0.0:5432
 DATABASE_URL="postgres://${db_username}:${db_password}@127.0.0.1:5432/attestation_service"
+
+# Workaround: Run postgres container
+# docker run --name postgres \
+#   --network host \
+#   -e POSTGRES_PASSWORD=${db_password} \
+#   -e POSTGRES_USER=${db_username} \
+#   -e POSTGRES_DB=attestation_service \
+#   -d postgres
+# DATABASE_URL="postgres://${db_username}:${db_password}@127.0.0.1:5432/attestation_service"
 
 # Switch between Nexmo and Twilio
 # TODO: Refactor
@@ -121,3 +126,38 @@ else
   echo "Variable \$SMS_PROVIDERS=$SMS_PROVIDERS must be one from nexmo or twilio"
   exit 1
 fi
+
+# docker run --name attestation-service \
+#   --net=host --entrypoint /bin/sh -d \
+#   -v $DATA_DIR:$DATA_DIR \
+#   -e DATABASE_URL=$DATABASE_URL \
+#   -e ATTESTATION_KEY=$ATTESTATION_KEY \
+#   -e ACCOUNT_ADDRESS=$ACCOUNT_ADDRESS \
+#   -e CELO_PROVIDER=$CELO_PROVIDER \
+#   -e SMS_PROVIDERS=$SMS_PROVIDERS \
+#   -e NEXMO_KEY=$NEXMO_KEY \
+#   -e NEXMO_SECRET=$NEXMO_SECRET \
+#   -e NEXMO_BLACKLIST=$NEXMO_BLACKLIST \
+#   -e TWILIO_ACCOUNT_SID=$TWILIO_ACCOUNT_SID \
+#   -e TWILIO_MESSAGING_SERVICE_SID=$TWILIO_MESSAGING_SERVICE_SID \
+#   -e TWILIO_AUTH_TOKEN=$TWILIO_AUTH_TOKEN \
+#   -e TWILIO_BLACKLIST=$TWILIO_BLACKLIST \
+#   $ATTESTATION_SERVICE_DOCKER_IMAGE -c "\
+#     (
+#       echo -n '$DATABASE_URL' > $DATA_DIR/databaseUrl && \
+#       echo -n '$ATTESTATION_KEY' > $DATA_DIR/attestationKey && \
+#       echo -n '$ACCOUNT_ADDRESS' > $DATA_DIR/accountAddress && \
+#       echo -n '$CELO_PROVIDER' > $DATA_DIR/celoProvider && \
+#       echo -n '$SMS_PROVIDERS' > $DATA_DIR/smsProviders && \
+#       echo -n '$NEXMO_KEY' > $DATA_DIR/nexmoKey && \
+#       echo -n '$NEXMO_SECRET' > $DATA_DIR/nexmoSecret && \
+#       echo -n '$NEXMO_BLACKLIST' > $DATA_DIR/nexmoBlacklist \
+#       echo -n '$TWILIO_ACCOUNT_SID' > $DATA_DIR/twilioAccountSid && \
+#       echo -n '$TWILIO_MESSAGING_SERVICE_SID' > $DATA_DIR/twilioMessagingServiceSid && \
+#       echo -n '$TWILIO_AUTH_TOKEN' > $DATA_DIR/twilioAuthToken && \
+#       echo -n '$TWILIO_BLACKLIST' > $DATA_DIR/twilioBlacklist \
+#     ) && ( \
+#       yarn run db:create:dev && \
+#       yarn run db:migrate:dev && \
+#       yarn run dev \
+#     )"
