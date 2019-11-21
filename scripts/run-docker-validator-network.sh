@@ -10,7 +10,7 @@ export CELO_IMAGE=${3:-"us.gcr.io/celo-testnet/geth@sha256:4bc97381db0bb81b7a3e4
 export NETWORK_ID=${4:-"1101"}
 export NETWORK_NAME=${5:-"integration"}
 export DEFAULT_PASSWORD=${6:-"1234"}
-export CELO_IMAGE_ATTESTATION=${7:-"gcr.io/celo-testnet/attestation-service@sha256:f22701104dbeea41a638b002aeed7e5ec403726b47177c553c8a2607c58eb7f6"}
+export CELO_IMAGE_ATTESTATION=${7:-"us.gcr.io/celo-testnet/celo-monorepo@sha256:3e958851e4a89e39eeefcc56e324d9ee0d09286a36cb63c285195183fe4dc4ee"}
 export CELO_PROVIDER=${8:-"https://alfajores-forno.celo-testnet.org/"} # https://berlintestnet001-forno.celo-networks-dev.org/
 export DATABASE_URL=${9:-"sqlite://db/dev.db"}
 
@@ -100,8 +100,6 @@ if [[ $COMMAND == *"accounts"* ]]; then
     echo -e "\tCELO_VALIDATOR_ADDRESS=$CELO_VALIDATOR_ADDRESS"
     echo -e "\tCELO_VALIDATOR_GROUP_ADDRESS=$CELO_VALIDATOR_ADDRESS"
     echo -e "\tCELO_PROXY_ADDRESS=$CELO_VALIDATOR_ADDRESS"
-
-    
     
     export CELO_VALIDATOR_POP=$(docker run -v $PWD/validator:/root/.celo --entrypoint /bin/sh -it $CELO_IMAGE -c " printf '%s\n' $DEFAULT_PASSWORD | geth account proof-of-possession $CELO_VALIDATOR_ADDRESS "| tail -1| cut -d' ' -f 3| tr -cd "[:alnum:]\n" )
 
@@ -142,7 +140,8 @@ if [[ $COMMAND == *"run-validator"* ]]; then
     echo -e "\tProxy running: enode://$PROXY_ENODE@$PROXY_IP"
     
     echo -e "\tStarting Validator node"
-    screen -S celo-validator -d -m docker run --name celo-validator --restart always -p 127.0.0.1:8547:8545 -p 127.0.0.1:8548:8546 -p 30304:30303 -p 30304:30303/udp -v $PWD/validator:/root/.celo $CELO_IMAGE --verbosity 3 --networkid $NETWORK_ID --syncmode full --rpc --rpcaddr 0.0.0.0 --rpcapi eth,net,web3,debug --maxpeers 125 --mine --istanbul.blockperiod=5 --istanbul.requesttimeout=3000 --etherbase $CELO_VALIDATOR_ADDRESS --nodiscover --proxy.proxied --proxy.proxyenodeurlpair=enode://$PROXY_ENODE@$PROXY_IP:30503\;enode://$PROXY_ENODE@$PROXY_IP:30503
+    docker run -v $PWD/validator:/root/.celo --entrypoint sh --rm $CELO_IMAGE -c "echo $DEFAULT_PASSWORD > /root/.celo/.password"
+    screen -S celo-validator -d -m docker run --name celo-validator --restart always -p 127.0.0.1:8547:8545 -p 127.0.0.1:8548:8546 -p 30304:30303 -p 30304:30303/udp -v $PWD/validator:/root/.celo $CELO_IMAGE --verbosity 3 --networkid $NETWORK_ID --syncmode full --rpc --rpcaddr 0.0.0.0 --rpcapi eth,net,web3,debug --maxpeers 125 --mine --istanbul.blockperiod=5 --istanbul.requesttimeout=3000 --etherbase $CELO_VALIDATOR_ADDRESS --nodiscover --proxy.proxied --proxy.proxyenodeurlpair=enode://$PROXY_ENODE@$PROXY_IP:30503\;enode://$PROXY_ENODE@$PROXY_IP:30503  --unlock=$CELO_VALIDATOR_ADDRESS --password /root/.celo/.password
     
     sleep 5s
     
