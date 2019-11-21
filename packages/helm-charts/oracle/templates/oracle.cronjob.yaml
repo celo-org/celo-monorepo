@@ -17,7 +17,7 @@ spec:
         spec:
           initContainers:
           - name: get-current-price
-            image: gcr.io/celo-testnet/oracle:{{ .Release.Namespace }}
+            image: {{ .Values.oracle.image.repository }}:{{ .Values.oracle.image.tag }}
             imagePullPolicy: IfNotPresent
             command:
               - sh

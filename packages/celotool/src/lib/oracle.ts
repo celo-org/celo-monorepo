@@ -15,13 +15,14 @@ export async function installHelmChart(celoEnv: string) {
 
 function helmParameters(celoEnv: string) {
   return [
-    `--set celotool.image.repository=${fetchEnv('CELOTOOL_DOCKER_IMAGE_REPOSITORY')}`,
-    `--set celotool.image.tag=${fetchEnv('CELOTOOL_DOCKER_IMAGE_TAG')}`,
+    `--set celotool.image.repository=${fetchEnv(envVar.CELOTOOL_DOCKER_IMAGE_REPOSITORY)}`,
+    `--set celotool.image.tag=${fetchEnv(envVar.CELOTOOL_DOCKER_IMAGE_TAG)}`,
     `--set mnemonic="${fetchEnv(envVar.MNEMONIC)}"`,
-    `--set oracle.image.repository=${fetchEnv('ORACLE_DOCKER_IMAGE_REPOSITORY')}`,
+    `--set oracle.image.repository=${fetchEnv(envVar.ORACLE_DOCKER_IMAGE_REPOSITORY)}`,
+    `--set oracle.image.tag=${fetchEnv(envVar.ORACLE_DOCKER_IMAGE_TAG)}`,
     `--set celocli.nodeUrl=${getFornoUrl(celoEnv)}`,
-    `--set celocli.image.repository=${fetchEnv('CELOCLI_STANDALONE_IMAGE_REPOSITORY')}`,
-    `--set celocli.image.tag=${fetchEnv('CELOCLI_STANDALONE_IMAGE_TAG')}`,
+    `--set celocli.image.repository=${fetchEnv(envVar.CELOCLI_STANDALONE_IMAGE_REPOSITORY)}`,
+    `--set celocli.image.tag=${fetchEnv(envVar.CELOCLI_STANDALONE_IMAGE_TAG)}`,
   ]
 }
 
