@@ -11,7 +11,7 @@ export NETWORK_ID=${4:-"1101"}
 export NETWORK_NAME=${5:-"integration"}
 export DEFAULT_PASSWORD=${6:-"1234"}
 export CELO_IMAGE_ATTESTATION=${7:-"us.gcr.io/celo-testnet/celo-monorepo@sha256:3e958851e4a89e39eeefcc56e324d9ee0d09286a36cb63c285195183fe4dc4ee"}
-export CELO_PROVIDER=${8:-"https://alfajores-forno.celo-testnet.org/"} # https://berlintestnet001-forno.celo-networks-dev.org/
+export CELO_PROVIDER=${8:-"https://integration-forno.celo-testnet.org/"} # https://berlintestnet001-forno.celo-networks-dev.org/
 export DATABASE_URL=${9:-"sqlite://db/dev.db"}
 
 export NEXMO_KEY="xx"
@@ -160,10 +160,10 @@ if [[ $COMMAND == *"run-attestation"* ]]; then
     echo -e "\tPulling docker image: $CELO_IMAGE_ATTESTATION"
     docker pull $CELO_IMAGE_ATTESTATION
     
-    export ATTESTATION_KEY=celocli account:new| tail -3| head -1| cut -d' ' -f 2| tr -cd "[:alnum:]\n"
+    export ATTESTATION_KEY=$(celocli account:new| tail -3| head -1| cut -d' ' -f 2| tr -cd "[:alnum:]\n")
     echo -e "\tATTESTATION_KEY=$ATTESTATION_KEY"
     
-    docker run --name celo-attestation-service --restart always -e ATTESTATION_KEY=$ATTESTATION_KEY -e ACCOUNT_ADDRESS=$CELO_VALIDATOR_ADDRESS -e CELO_PROVIDER=$CELO_PROVIDER -e DATABASE_URL=$DATABASE_URL -e SMS_PROVIDERS=nexmo -e NEXMO_KEY=$NEXMO_KEY -e NEXMO_SECRET=$NEXMO_SECRET -e NEXMO_BLACKLIST=$NEXMO_BLACKLIST  -p 3000:80 $CELO_IMAGE_ATTESTATION
+    screen -S attestation-service -d -m  docker run --name celo-attestation-service --restart always -e ATTESTATION_KEY=$ATTESTATION_KEY -e ACCOUNT_ADDRESS=$CELO_VALIDATOR_ADDRESS -e CELO_PROVIDER=$CELO_PROVIDER -e DATABASE_URL=$DATABASE_URL -e SMS_PROVIDERS=nexmo -e NEXMO_KEY=$NEXMO_KEY -e NEXMO_SECRET=$NEXMO_SECRET -e NEXMO_BLACKLIST=$NEXMO_BLACKLIST  -p 3000:80 $CELO_IMAGE_ATTESTATION
     
     echo -e "\tAttestation service should be running, you can check running `screen -ls`"
     echo -e "\tYou can re-attach to the attestation-service running:"
