@@ -78,7 +78,7 @@ contract('Attestations', (accounts: string[]) => {
   const phoneHash: string = getPhoneHash(phoneNumber)
 
   const attestationsRequested = 3
-  const attestationExpiryBlocks = 60
+  const attestationExpiryBlocks = (60 * 60) / 5
   const selectIssuersWaitBlocks = 4
   const attestationFee = new BigNumber(web3.utils.toWei('.05', 'ether').toString())
 
@@ -354,6 +354,14 @@ contract('Attestations', (accounts: string[]) => {
         describe('when the original request has expired', () => {
           it('should allow to request more attestations', async () => {
             await mineBlocks(attestationExpiryBlocks, web3)
+            await attestations.request(phoneHash, 1, mockStableToken.address)
+          })
+        })
+
+        describe('when the original request cannot be selected for due to randomness not being available', () => {
+          it.only('should allow to request more attestations', async () => {
+            const randomnessBlockRetentionWindow = await random.randomnessBlockRetentionWindow()
+            await mineBlocks(randomnessBlockRetentionWindow.toNumber(), web3)
             await attestations.request(phoneHash, 1, mockStableToken.address)
           })
         })

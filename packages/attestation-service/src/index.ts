@@ -7,6 +7,7 @@ import { rootLogger } from './logger'
 import { createValidatedHandler, loggerMiddleware } from './request'
 import {
   AttestationRequestType,
+  getAccountAddress,
   getAttestationKey,
   handleAttestationRequest,
 } from './requestHandlers/attestation'
@@ -18,6 +19,7 @@ async function init() {
   await initializeKit()
   // TODO: Validate that the attestation key has been authorized by the account
   getAttestationKey()
+  getAccountAddress()
   await initializeSmsProviders()
 
   const app = express()
