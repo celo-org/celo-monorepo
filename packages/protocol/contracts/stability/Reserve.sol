@@ -17,6 +17,7 @@ import "../common/UsingRegistry.sol";
  */
 contract Reserve is IReserve, Ownable, Initializable, UsingRegistry, ReentrancyGuard {
   using SafeMath for uint256;
+  using FixidityLib for FixidityLib.Fraction;
 
   struct TobinTaxCache {
     uint128 numerator;
@@ -30,29 +31,23 @@ contract Reserve is IReserve, Ownable, Initializable, UsingRegistry, ReentrancyG
   uint256 public constant TOBIN_TAX_DENOMINATOR = 1000;
   mapping(address => bool) public isSpender;
 
-  mapping(address => bool) public isCustodian;
-  address[] public _custodians;
+  mapping(address => bool) public isOtherReserveAddress;
+  address[] public otherReserveAddresses;
 
   bytes32[] public assetAllocationSymbols;
   uint256[] public assetAllocationWeights;
-  uint256 public totalAssetAllocationWeight;
 
   event TobinTaxStalenessThresholdSet(uint256 value);
   event TokenAdded(address token);
   event TokenRemoved(address token, uint256 index);
   event SpenderAdded(address spender);
   event SpenderRemoved(address spender);
-  event CustodianAdded(address custodian);
-  event CustodianRemoved(address custodian, uint256 index);
-  event AssetAllocationSet(bytes32[] symbols, uint256[] weights, uint256 totalWeight);
+  event OtherReserveAddressAdded(address otherReserveAddress);
+  event OtherReserveAddressRemoved(address otherReserveAddress, uint256 index);
+  event AssetAllocationSet(bytes32[] symbols, uint256[] weights);
 
   modifier isStableToken(address token) {
     require(isToken[token], "token addr was never registered");
-    _;
-  }
-
-  modifier isCustodialAddress(address custodian) {
-    require(isCustodian[custodian], "custodian addr was never registered");
     _;
   }
 
@@ -80,21 +75,21 @@ contract Reserve is IReserve, Ownable, Initializable, UsingRegistry, ReentrancyG
   /**
    * @notice Sets target allocations for Celo Gold and a diversified basket of non-Celo assets.
    * @param symbols The symbol of each asset in the Reserve portfolio.
-   * @param weights The weight for the corresponding asset.
+   * @param weights The weight for the corresponding asset as unwrapped Fixidity.Fraction.
    */
   function setAssetAllocations(bytes32[] memory symbols, uint256[] memory weights)
     public
     onlyOwner
   {
     require(symbols.length == weights.length);
-    uint256 sum = 0;
+    FixidityLib.Fraction memory sum = FixidityLib.wrap(0);
     for (uint256 i = 0; i < weights.length; i++) {
-      sum = SafeMath.add(sum, weights[i]);
+      sum = sum.add(FixidityLib.wrap(weights[i]));
     }
+    require(sum.equals(FixidityLib.fixed1()));
     assetAllocationSymbols = symbols;
     assetAllocationWeights = weights;
-    totalAssetAllocationWeight = sum;
-    emit AssetAllocationSet(symbols, weights, sum);
+    emit AssetAllocationSet(symbols, weights);
   }
 
   /**
@@ -140,37 +135,42 @@ contract Reserve is IReserve, Ownable, Initializable, UsingRegistry, ReentrancyG
   }
 
   /**
-   * @notice Add a custodian whose balance shall be included in the reserve ratio.
-   * @param custodian The address of the custodian to add.
+   * @notice Add a reserve address whose balance shall be included in the reserve ratio.
+   * @param reserveAddress The reserve address to add.
    */
-  function addCustodialAddress(address custodian) external onlyOwner nonReentrant returns (bool) {
-    require(!isCustodian[custodian], "custodian addr already registered");
-    isCustodian[custodian] = true;
-    _custodians.push(custodian);
-    emit CustodianAdded(custodian);
+  function addOtherReserveAddress(address reserveAddress)
+    external
+    onlyOwner
+    nonReentrant
+    returns (bool)
+  {
+    require(!isOtherReserveAddress[reserveAddress], "reserve addr already registered");
+    isOtherReserveAddress[reserveAddress] = true;
+    otherReserveAddresses.push(reserveAddress);
+    emit OtherReserveAddressAdded(reserveAddress);
     return true;
   }
 
   /**
-   * @notice Remove a custodian whose balance shall no longer be included in the reserve ratio.
-   * @param custodian The address of the custodian to remove.
-   * @param index The index of the cutodian in _custodians.
+   * @notice Remove reserve address whose balance shall no longer be included in the reserve ratio.
+   * @param reserveAddress The reserve address to remove.
+   * @param index The index of the reserve address in otherReserveAddresses.
    */
-  function removeCustodialAddress(address custodian, uint256 index)
+  function removeOtherReserveAddress(address reserveAddress, uint256 index)
     external
     onlyOwner
-    isCustodialAddress(custodian)
     returns (bool)
   {
+    require(isOtherReserveAddress[reserveAddress], "reserve addr was never registered");
     require(
-      index < _custodians.length && _custodians[index] == custodian,
-      "index into custodians list not mapped to custodian"
+      index < otherReserveAddresses.length && otherReserveAddresses[index] == reserveAddress,
+      "index into reserve list not mapped to address"
     );
-    isCustodian[custodian] = false;
-    address lastItem = _custodians[_custodians.length - 1];
-    _custodians[index] = lastItem;
-    _custodians.length--;
-    emit CustodianRemoved(custodian, index);
+    isOtherReserveAddress[reserveAddress] = false;
+    address lastItem = otherReserveAddresses[otherReserveAddresses.length - 1];
+    otherReserveAddresses[index] = lastItem;
+    otherReserveAddresses.length--;
+    emit OtherReserveAddressRemoved(reserveAddress, index);
     return true;
   }
 
@@ -210,9 +210,7 @@ contract Reserve is IReserve, Ownable, Initializable, UsingRegistry, ReentrancyG
   function getOrComputeTobinTax() external nonReentrant returns (uint256, uint256) {
     // solhint-disable-next-line not-rely-on-time
     if (now.sub(tobinTaxCache.timestamp) > tobinTaxStalenessThreshold) {
-      FixidityLib.Fraction memory denominator = FixidityLib.newFixed(TOBIN_TAX_DENOMINATOR);
-      FixidityLib.Fraction memory numerator = FixidityLib.multiply(computeTobinTax(), denominator);
-      tobinTaxCache.numerator = uint128(FixidityLib.fromFixed(numerator));
+      tobinTaxCache.numerator = uint128(computeTobinTax());
       tobinTaxCache.timestamp = uint128(now); // solhint-disable-line not-rely-on-time
     }
     return (uint256(tobinTaxCache.numerator), TOBIN_TAX_DENOMINATOR);
@@ -222,14 +220,10 @@ contract Reserve is IReserve, Ownable, Initializable, UsingRegistry, ReentrancyG
     return _tokens;
   }
 
-  function getCustodians() external view returns (address[] memory) {
-    return _custodians;
-  }
-
   function getReserveGoldBalance() public view returns (uint256) {
     uint256 reserveGoldBalance = address(this).balance;
-    for (uint256 i = 0; i < _custodians.length; i++) {
-      reserveGoldBalance = SafeMath.add(reserveGoldBalance, _custodians[i].balance);
+    for (uint256 i = 0; i < otherReserveAddresses.length; i++) {
+      reserveGoldBalance = reserveGoldBalance.add(otherReserveAddresses[i].balance);
     }
     return reserveGoldBalance;
   }
@@ -241,7 +235,7 @@ contract Reserve is IReserve, Ownable, Initializable, UsingRegistry, ReentrancyG
    * @notice Computes a tobin tax based on the reserve ratio.
    * @return The numerator of the tobin tax amount, where the denominator is 1000.
    */
-  function computeTobinTax() private view returns (FixidityLib.Fraction memory) {
+  function computeTobinTax() private view returns (uint256) {
     address sortedOraclesAddress = registry.getAddressForOrDie(SORTED_ORACLES_REGISTRY_ID);
     ISortedOracles sortedOracles = ISortedOracles(sortedOraclesAddress);
     uint256 reserveGoldBalance = getReserveGoldBalance();
@@ -260,9 +254,9 @@ contract Reserve is IReserve, Ownable, Initializable, UsingRegistry, ReentrancyG
     // The protocol aims to keep half of the reserve value in gold, thus the reserve ratio
     // is two when the value of gold in the reserve is equal to the total supply of stable tokens.
     if (reserveGoldBalance >= stableTokensValueInGold) {
-      return FixidityLib.newFixed(0);
+      return 0;
     } else {
-      return FixidityLib.newFixedFraction(5, 1000);
+      return 5;
     }
   }
 
