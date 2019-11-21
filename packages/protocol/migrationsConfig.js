@@ -74,7 +74,7 @@ const DefaultConfig = {
     reportExpiry: 60 * 60, // 1 hour
   },
   random: {
-    randomnessBlockRetentionWindow: 256,
+    randomnessBlockRetentionWindow: (60 * 60) / 5, // 1 hour to match attestationExpiryBlocks
   },
   registry: {
     predeployedProxyAddress: '0x000000000000000000000000000000000000ce10',
@@ -115,6 +115,7 @@ const DefaultConfig = {
 
     // We register a number of C-Labs groups to contain an initial set of validators to run the network.
     validatorKeys: [],
+    attestationKeys: [],
     groupName: 'C-Labs',
     commission: 0.1,
   },
