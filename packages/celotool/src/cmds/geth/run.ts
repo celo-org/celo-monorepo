@@ -124,6 +124,7 @@ export const handler = async (argv: RunArgv) => {
     verbosity.toString(),
     '--consoleoutput=stdout', // Send all logs to stdout
     '--consoleformat=term',
+    '--istanbul.lookbackwindow=2',
   ]
 
   if (nodekeyhex !== null && nodekeyhex.length > 0) {

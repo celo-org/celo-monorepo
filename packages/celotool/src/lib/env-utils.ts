@@ -29,6 +29,7 @@ export enum envVar {
   CLUSTER_DOMAIN_NAME = 'CLUSTER_DOMAIN_NAME',
   ENV_TYPE = 'ENV_TYPE',
   EPOCH = 'EPOCH',
+  LOOKBACK = 'LOOKBACK',
   ETHSTATS_DOCKER_IMAGE_REPOSITORY = 'ETHSTATS_DOCKER_IMAGE_REPOSITORY',
   ETHSTATS_DOCKER_IMAGE_TAG = 'ETHSTATS_DOCKER_IMAGE_TAG',
   ETHSTATS_WEBSOCKETSECRET = 'ETHSTATS_WEBSOCKETSECRET',
@@ -216,4 +217,11 @@ export function addCeloEnvMiddleware(argv: yargs.Argv) {
 
 export function isVmBased() {
   return fetchEnv(envVar.VM_BASED) === 'true'
+}
+
+export function failIfVmBased() {
+  if (isVmBased()) {
+    console.error('The celo env is intended for a VM-based testnet, aborting')
+    process.exit(1)
+  }
 }

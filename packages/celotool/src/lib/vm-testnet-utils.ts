@@ -222,9 +222,19 @@ export async function getTestnetOutputs(celoEnv: string) {
   return getTerraformModuleOutputs(testnetTerraformModule, vars)
 }
 
-export async function getTxNodeLoadBalancerIP(celoEnv: string) {
+export async function getInternalTxNodeLoadBalancerIP(celoEnv: string) {
   const outputs = await getTestnetOutputs(celoEnv)
-  return outputs.tx_node_lb_ip_address.value
+  return outputs.tx_node_lb_internal_ip_address.value
+}
+
+export async function getInternalValidatorIPs(celoEnv: string) {
+  const outputs = await getTestnetOutputs(celoEnv)
+  return outputs.validator_internal_ip_addresses.value
+}
+
+export async function getInternalTxNodeIPs(celoEnv: string) {
+  const outputs = await getTestnetOutputs(celoEnv)
+  return outputs.tx_node_internal_ip_addresses.value
 }
 
 export async function getInternalValidatorIPs(celoEnv: string) {
@@ -245,14 +255,19 @@ function getTerraformBackendConfigVars(celoEnv: string, terraformModule: string)
 
 function getTestnetVars(celoEnv: string) {
   const genesisBuffer = new Buffer(generateGenesisFromEnv())
+  const domainName = fetchEnv(envVar.CLUSTER_DOMAIN_NAME)
   return {
     ...getEnvVarValues(testnetEnvVars),
-    ethstats_host: `${celoEnv}-ethstats.${fetchEnv(envVar.CLUSTER_DOMAIN_NAME)}.org`,
+    dns_zone_name: dnsZoneName(domainName),
+    ethstats_host: `${celoEnv}-ethstats.${domainName}.org`,
+    forno_host: `${celoEnv}-forno.${domainName}.org`,
     gcloud_secrets_bucket: secretsBucketName,
     gcloud_secrets_base_path: secretsBasePath(celoEnv),
-    // only able to view objects (for accessing secrets)
+    // only able to view objects for accessing secrets & modify ssl certs for forno setup
     gcloud_vm_service_account_email: 'terraform-testnet@celo-testnet.iam.gserviceaccount.com',
     genesis_content_base64: genesisBuffer.toString('base64'),
+    // forno is the name for our setup that has tx-nodes reachable via a domain name
+    letsencrypt_email: 'n@celo.org',
     network_name: networkName(celoEnv),
   }
 }
@@ -361,4 +376,9 @@ function useDefaultNetwork() {
 
 export function networkName(celoEnv: string) {
   return useDefaultNetwork() ? 'default' : `${celoEnv}-network`
+}
+
+// name of the DNS zone in Google Cloud for a particular domain
+function dnsZoneName(domain: string) {
+  return `${domain}-org`
 }

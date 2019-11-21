@@ -41,7 +41,7 @@ const networks = {
     from: DEVELOPMENT_FROM,
     gasPrice: 0,
     gas: gasLimit,
-    defaultBalance: 1000000,
+    defaultBalance: 200000000,
     mnemonic: 'concert load couple harbor equip island argue ramp clarify fence smart topic',
   },
   coverage: {
@@ -146,7 +146,7 @@ if (argv.truffle_override || !(argv.network in networks)) {
 }
 
 module.exports = {
-  plugins: ['truffle-security'],
+  plugins: ['truffle-security', 'truffle-plugin-blockscout-verify'],
   compilers: {
     solc: {
       version: SOLC_VERSION,
@@ -162,7 +162,7 @@ if (process.argv.includes('--gas')) {
         version: '0.5.8',
       },
     },
-    plugins: ['truffle-security'],
+    plugins: ['truffle-security', 'truffle-plugin-blockscout-verify'],
     networks,
     reporter: 'eth-gas-reporter',
     reporterOptions: {

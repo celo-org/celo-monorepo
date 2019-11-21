@@ -105,7 +105,7 @@ docker run \
       --consoleformat=json \
       --consoleoutput=stdout \
       --verbosity=${geth_verbosity} \
-      --ethstats=${node_name}:$ETHSTATS_WEBSOCKETSECRET@${ethstats_host} \
+      --ethstats=${node_name}@${ethstats_host} \
       --nat=extip:${ip_address} \
       --metrics \
       $IN_MEMORY_DISCOVERY_TABLE_FLAG \
