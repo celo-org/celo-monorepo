@@ -48,8 +48,12 @@ docker pull $GETH_NODE_DOCKER_IMAGE
 IN_MEMORY_DISCOVERY_TABLE_FLAG=""
 [[ ${in_memory_discovery_table} == "true" ]] && IN_MEMORY_DISCOVERY_TABLE_FLAG="--use-in-memory-discovery-table"
 
+RPC_APIS="eth,net,web3,debug"
+
 if [[ ${proxy} == "true" ]]; then
   ADDITIONAL_GETH_FLAGS="--proxy.proxy --proxy.internalendpoint :30503 --proxy.proxiedvalidatoraddress $PROXIED_VALIDATOR_ADDRESS"
+else
+  RPC_APIS="$RPC_APIS,txpool"
 fi
 
 DATA_DIR=/root/.celo
@@ -91,13 +95,13 @@ docker run \
       --maxpeers 1100 \
       --rpc \
       --rpcaddr 0.0.0.0 \
-      --rpcapi=eth,net,web3,debug \
+      --rpcapi=$RPC_APIS \
       --rpccorsdomain='*' \
       --rpcvhosts=* \
       --ws \
       --wsaddr 0.0.0.0 \
       --wsorigins=* \
-      --wsapi=eth,net,web3,debug \
+      --wsapi=$RPC_APIS \
       --nodekey=$DATA_DIR/pkey \
       --etherbase=$ACCOUNT_ADDRESS \
       --networkid=${network_id} \
