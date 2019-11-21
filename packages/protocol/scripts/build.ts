@@ -25,6 +25,7 @@ export const ProxyContracts = [
   'GovernanceProxy',
   'RegistryProxy',
   'BlockchainParametersProxy',
+  'VestingFactoryProxy',
 ]
 export const CoreContracts = [
   // common
@@ -42,6 +43,7 @@ export const CoreContracts = [
   'BlockchainParameters',
   'LockedGold',
   'Validators',
+  'VestingFactory',
 
   // identity
   'Attestations',
