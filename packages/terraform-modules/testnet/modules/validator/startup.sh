@@ -119,7 +119,7 @@ docker run \
       --consoleformat=json \
       --consoleoutput=stdout \
       --verbosity=${geth_verbosity} \
-      --ethstats=${validator_name}:$ETHSTATS_WEBSOCKETSECRET@${ethstats_host} \
+      --ethstats=${validator_name}@${ethstats_host} \
       --istanbul.blockperiod=${block_time} \
       --istanbul.requesttimeout=${istanbul_request_timeout_ms} \
       --maxpeers=${max_peers} \
