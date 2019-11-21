@@ -66,10 +66,11 @@ const goldTokenAddress = await kit.registry.addressFor(CeloContract.GoldToken)
 
 ## Sending Custom Transactions
 
-Celo transaction object is not the same as Ethereum's. There are two new fields present:
+Celo transaction object is not the same as Ethereum's. There are three new fields present:
 
-- gasCurrency (address of the ERC20 contract to use to pay for gas)
-- gasFeeRecipient (address of the beneficiary for the gas, the full node)
+- feeCurrency (address of the ERC20 contract to use to pay for gas and the gateway fee)
+- gatewayFeeRecipient (coinbase address of the full serving the light client's trasactions)
+- gatewayFee (value paid to the gateway fee recipient, denominated in the fee currency)
 
 This means that using `web3.eth.sendTransaction` or `myContract.methods.transfer().send()` should be avoided.
 
