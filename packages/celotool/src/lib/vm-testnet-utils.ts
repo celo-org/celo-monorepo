@@ -84,8 +84,10 @@ const testnetResourcesToReset = [
   'module.tx_node.random_id.full_node.*',
   'module.tx_node.google_compute_instance.full_node.*',
   // tx-node load balancer instance group
-  'module.tx_node_lb.random_id.tx_node_lb',
-  'module.tx_node_lb.google_compute_instance_group.tx_node_lb',
+  'module.tx_node_lb.random_id.external',
+  'module.tx_node_lb.google_compute_instance_group.external',
+  'module.tx_node_lb.random_id.internal',
+  'module.tx_node_lb.google_compute_instance_group.internal',
 ]
 
 export async function deploy(celoEnv: string, onConfirmFailed?: () => Promise<void>) {
@@ -225,16 +227,6 @@ export async function getTestnetOutputs(celoEnv: string) {
 export async function getInternalTxNodeLoadBalancerIP(celoEnv: string) {
   const outputs = await getTestnetOutputs(celoEnv)
   return outputs.tx_node_lb_internal_ip_address.value
-}
-
-export async function getInternalValidatorIPs(celoEnv: string) {
-  const outputs = await getTestnetOutputs(celoEnv)
-  return outputs.validator_internal_ip_addresses.value
-}
-
-export async function getInternalTxNodeIPs(celoEnv: string) {
-  const outputs = await getTestnetOutputs(celoEnv)
-  return outputs.tx_node_internal_ip_addresses.value
 }
 
 export async function getInternalValidatorIPs(celoEnv: string) {
