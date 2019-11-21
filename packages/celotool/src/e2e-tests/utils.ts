@@ -350,6 +350,7 @@ export async function startGeth(gethBinaryPath: string, instance: GethInstanceCo
 
 export async function migrateContracts(
   validatorPrivateKeys: string[],
+  attestationKeys: string[],
   validators: string[],
   to: number = 1000,
   overrides: any = {}
@@ -358,6 +359,7 @@ export async function migrateContracts(
     {
       validators: {
         validatorKeys: validatorPrivateKeys.map(ensure0x),
+        attestationKeys: attestationKeys.map(ensure0x),
       },
       election: {
         minElectableValidators: '1',
@@ -440,6 +442,7 @@ export function getContext(gethConfig: GethTestConfig) {
   const validatorInstances = gethConfig.instances.filter((x: any) => x.validating)
   const numValidators = validatorInstances.length
   const validatorPrivateKeys = getPrivateKeysFor(AccountType.VALIDATOR, mnemonic, numValidators)
+  const attestationKeys = getPrivateKeysFor(AccountType.ATTESTATION, mnemonic, numValidators)
   const validators = getValidators(mnemonic, numValidators)
   const validatorEnodes = validatorPrivateKeys.map((x: any, i: number) =>
     getEnodeAddress(privateKeyToPublicKey(x), '127.0.0.1', validatorInstances[i].port)
@@ -472,6 +475,7 @@ export function getContext(gethConfig: GethTestConfig) {
     if (gethConfig.migrate || gethConfig.migrateTo) {
       await migrateContracts(
         validatorPrivateKeys,
+        attestationKeys,
         validators.map((x) => x.address),
         gethConfig.migrateTo,
         gethConfig.migrationOverrides

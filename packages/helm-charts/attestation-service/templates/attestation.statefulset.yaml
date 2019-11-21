@@ -40,6 +40,8 @@ spec:
             echo -n $RID >/root/.celo/replica_id
             echo "Generating private key for rid=$RID"
             celotooljs.sh generate bip32 --mnemonic "$MNEMONIC" --accountType validator --index $RID > /root/.celo/pkey
+            celotooljs.sh generate bip32 --mnemonic "$MNEMONIC" --accountType attestation --index $RID > /root/.celo/attestationKey
+            celotooljs.sh generate account-address --private-key `cat /root/.celo/pkey` > /root/.celo/address
         env:
         - name: MNEMONIC
           valueFrom:
@@ -62,7 +64,7 @@ spec:
         - "-c"
         - |
           yarn db:migrate
-          ATTESTATION_KEY=0x`cat /root/.celo/pkey` yarn start
+          ATTESTATION_KEY=0x`cat /root/.celo/attestationKey` ACCOUNT_ADDRESS=`cat /root/.celo/address` yarn start
         ports:
         - name: http
           containerPort: 3000
@@ -78,7 +80,11 @@ spec:
         - name: CELO_PROVIDER
           value: https://{{ .Release.Namespace }}-forno.{{ .Values.domain.name }}.org
         - name: APP_SIGNATURE
-          value: {{ .Values.attestation_service.sms_retriever_hash_code }}}
+          value: {{ .Values.attestation_service.sms_retriever_hash_code }}
+        - name: SMS_PROVIDERS
+          value: nexmo
+        - name: LOG_FORMAT
+          value: stackdriver
         - name: NEXMO_KEY
           valueFrom:
             secretKeyRef:

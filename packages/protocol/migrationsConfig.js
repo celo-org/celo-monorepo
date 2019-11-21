@@ -115,6 +115,7 @@ const DefaultConfig = {
 
     // We register a number of C-Labs groups to contain an initial set of validators to run the network.
     validatorKeys: [],
+    attestationKeys: [],
     groupName: 'C-Labs',
     commission: 0.1,
   },
