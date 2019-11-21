@@ -1,4 +1,4 @@
-import * as yargs from 'yargs'
+import yargs from 'yargs'
 import { DeployArgv } from '../deploy'
 export const command = 'initial <deployPackage>'
 

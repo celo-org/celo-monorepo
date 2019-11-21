@@ -123,16 +123,20 @@ contract UsingPrecompiles {
 
   /**
    * @notice Checks a BLS proof of possession.
-   * @param proofOfPossessionBytes The public key and signature of the proof of possession.
+   * @param sender The address signed by the BLS key to generate the proof of possession.
+   * @param blsKey The BLS public key that the validator is using for consensus, should pass proof
+   *   of possession. 48 bytes.
+   * @param blsPop The BLS public key proof-of-possession, which consists of a signature on the
+   *   account address. 96 bytes.
    * @return True upon success.
    */
-  function checkProofOfPossession(address sender, bytes memory proofOfPossessionBytes)
+  function checkProofOfPossession(address sender, bytes memory blsKey, bytes memory blsPop)
     public
     returns (bool)
   {
     bool success;
     (success, ) = PROOF_OF_POSSESSION.call.value(0).gas(gasleft())(
-      abi.encodePacked(sender, proofOfPossessionBytes)
+      abi.encodePacked(sender, blsKey, blsPop)
     );
     return success;
   }

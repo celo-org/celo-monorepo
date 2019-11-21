@@ -67,6 +67,13 @@ contract('EpochRewards', (accounts: string[]) => {
   const exchangeRate = 7
   const mockStableTokenAddress = web3.utils.randomHex(20)
   const sortedOraclesDenominator = new BigNumber('0x10000000000000000')
+  const timeTravelToDelta = async (timeDelta: BigNumber) => {
+    const currentTime = new BigNumber((await web3.eth.getBlock('latest')).timestamp)
+    const startTime = await epochRewards.startTime()
+    const desiredTime = startTime.plus(timeDelta)
+    await timeTravel(desiredTime.minus(currentTime).toNumber(), web3)
+  }
+
   beforeEach(async () => {
     epochRewards = await EpochRewards.new()
     mockElection = await MockElection.new()
@@ -349,7 +356,7 @@ contract('EpochRewards', (accounts: string[]) => {
     describe('when it has been fewer than 15 years since genesis', () => {
       const timeDelta = YEAR.times(10)
       beforeEach(async () => {
-        await timeTravel(timeDelta.toNumber(), web3)
+        await timeTravelToDelta(timeDelta)
       })
 
       it('should return 600MM + 200MM * t / 15', async () => {
@@ -398,7 +405,6 @@ contract('EpochRewards', (accounts: string[]) => {
     const expectedTargetRemainingSupply = SUPPLY_CAP.minus(expectedTargetTotalSupply)
     let targetEpochReward: BigNumber
     beforeEach(async () => {
-      await timeTravel(timeDelta.toNumber(), web3)
       targetEpochReward = await epochRewards.getTargetEpochRewards()
       targetEpochReward = targetEpochReward.plus(
         await epochRewards.getTargetTotalEpochPaymentsInGold()
@@ -408,6 +414,7 @@ contract('EpochRewards', (accounts: string[]) => {
     describe('when the target supply is equal to the actual supply after rewards', () => {
       beforeEach(async () => {
         await mockGoldToken.setTotalSupply(expectedTargetTotalSupply.minus(targetEpochReward))
+        await timeTravelToDelta(timeDelta)
       })
 
       it('should return one', async () => {
@@ -422,6 +429,7 @@ contract('EpochRewards', (accounts: string[]) => {
           .minus(targetEpochReward)
           .integerValue(BigNumber.ROUND_FLOOR)
         await mockGoldToken.setTotalSupply(totalSupply)
+        await timeTravelToDelta(timeDelta)
       })
 
       it('should return one plus 10% times the underspend adjustment', async () => {
@@ -429,8 +437,8 @@ contract('EpochRewards', (accounts: string[]) => {
         const expected = new BigNumber(1).plus(
           fromFixed(rewardsMultiplier.adjustments.underspend).times(0.1)
         )
-        // Assert equal to 7 decimal places due to fixidity imprecision.
-        assertEqualDpBN(actual, expected, 7)
+        // Assert equal to 9 decimal places due to fixidity imprecision.
+        assertEqualDpBN(actual, expected, 9)
       })
     })
 
@@ -441,6 +449,7 @@ contract('EpochRewards', (accounts: string[]) => {
           .minus(targetEpochReward)
           .integerValue(BigNumber.ROUND_FLOOR)
         await mockGoldToken.setTotalSupply(totalSupply)
+        await timeTravelToDelta(timeDelta)
       })
 
       it('should return one minus 10% times the underspend adjustment', async () => {
@@ -448,8 +457,8 @@ contract('EpochRewards', (accounts: string[]) => {
         const expected = new BigNumber(1).minus(
           fromFixed(rewardsMultiplier.adjustments.overspend).times(0.1)
         )
-        // Assert equal to 7 decimal places due to fixidity imprecision.
-        assertEqualDpBN(actual, expected, 7)
+        // Assert equal to 9 decimal places due to fixidity imprecision.
+        assertEqualDpBN(actual, expected, 9)
       })
     })
   })
@@ -535,7 +544,6 @@ contract('EpochRewards', (accounts: string[]) => {
       beforeEach(async () => {
         await epochRewards.setNumberValidatorsInCurrentSet(numberValidators)
         await mockElection.setActiveVotes(activeVotes)
-        await timeTravel(timeDelta.toNumber(), web3)
         const expectedTargetTotalEpochPaymentsInGold = targetValidatorEpochPayment
           .times(numberValidators)
           .div(exchangeRate)
@@ -556,6 +564,7 @@ contract('EpochRewards', (accounts: string[]) => {
         expectedMultiplier = new BigNumber(1).plus(
           fromFixed(rewardsMultiplier.adjustments.underspend).times(0.1)
         )
+        await timeTravelToDelta(timeDelta)
       })
 
       it('should return the target validator epoch payment times the rewards multiplier', async () => {

@@ -51,7 +51,7 @@ contract EpochRewards is Ownable, Initializable, UsingPrecompiles, UsingRegistry
     FixidityLib.Fraction max;
   }
 
-  uint256 private startTime = 0;
+  uint256 public startTime = 0;
   RewardsMultiplierParameters private rewardsMultiplierParams;
   TargetVotingYieldParameters private targetVotingYieldParams;
   FixidityLib.Fraction private targetVotingGoldFraction;

@@ -10,9 +10,14 @@ export default class LoadingSpinner extends React.PureComponent<Props> {
     width: 40,
   }
 
+  animation: LottieView | null | undefined
+
   render() {
     return (
       <LottieView
+        ref={(animation) => {
+          this.animation = animation
+        }}
         source={require('./loadingSpinnerGreen.json')}
         autoPlay={true}
         loop={true}

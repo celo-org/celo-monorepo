@@ -4,19 +4,64 @@ description: View and manage validator elections
 
 ## Commands
 
-### Validatorset
+### Current
 
-Outputs the current validator set
+Outputs the currently elected validator set
 
 ```
 USAGE
-  $ celocli election:validatorset
+  $ celocli election:current
 
 EXAMPLE
-  validatorset
+  current
 ```
 
-_See code: [packages/cli/src/commands/election/validatorset.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/election/validatorset.ts)_
+_See code: [packages/cli/src/commands/election/current.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/election/current.ts)_
+
+### List
+
+Outputs the validator groups and their vote totals
+
+```
+USAGE
+  $ celocli election:list
+
+EXAMPLE
+  list
+```
+
+_See code: [packages/cli/src/commands/election/list.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/election/list.ts)_
+
+### Run
+
+Runs an mock election and outputs the validators that were elected
+
+```
+USAGE
+  $ celocli election:run
+
+EXAMPLE
+  run
+```
+
+_See code: [packages/cli/src/commands/election/run.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/election/run.ts)_
+
+### Show
+
+Show election information about an existing Validator Group
+
+```
+USAGE
+  $ celocli election:show GROUPADDRESS
+
+ARGUMENTS
+  GROUPADDRESS  Validator Groups's address
+
+EXAMPLE
+  show 0x97f7333c51897469E8D98E7af8653aAb468050a3
+```
+
+_See code: [packages/cli/src/commands/election/show.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/election/show.ts)_
 
 ### Vote
 
