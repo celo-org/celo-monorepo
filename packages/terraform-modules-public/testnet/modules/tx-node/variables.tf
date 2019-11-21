@@ -75,21 +75,21 @@ variable verification_pool_url {
 
 variable txnode_account_addresses {
   type        = list(string)
-  description = ""
+  description = "Array with the TX node etherbase account addresses"
 }
 
 variable txnode_private_keys {
   type        = list(string)
-  description = ""
+  description = "Array with the TX node etherbase account private keys"
 }
 
 variable txnode_account_passwords {
   type        = list(string)
-  description = ""
+  description = "Array with the TX node etherbase account passwords"
 }
 
 variable bootnode_enode_address {
   type        = string
-  description = ""
+  description = "Network bootnode enode address"
 }
 

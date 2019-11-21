@@ -1,4 +1,4 @@
-# Terraform Testnets
+# Terraform Celo Validator Stack
 
 ## Overview
 

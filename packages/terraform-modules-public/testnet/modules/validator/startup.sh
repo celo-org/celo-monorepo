@@ -58,15 +58,19 @@ systemctl restart docker
 
 GETH_NODE_DOCKER_IMAGE=${geth_node_docker_image_repository}:${geth_node_docker_image_tag}
 
-echo "Address: ${validator_account_address}"
+ACCOUNT_ADDRESS=${validator_account_address}
+echo "Address: $ACCOUNT_ADDRESS"
 echo "Private Key: ${validator_private_key}"
 
 
 echo "Proxy enode address: ${proxy_enode}"
-echo "Proxy ip address: ${proxy_ip}"
-PROXY_URL="enode://${proxy_enode}@${proxy_ip}:30503;enode://${proxy_enode}@${proxy_ip}:30503"
-echo "Proxy URL: $PROXY_URL"
+echo "Proxy internal ip address: ${proxy_internal_ip}"
+echo "Proxy external ip address: ${proxy_external_ip}"
+PROXY_INTERNAL_ENODE="enode://${proxy_enode}@${proxy_internal_ip}:30503"
+PROXY_EXTERNAL_ENODE="enode://${proxy_enode}@${proxy_external_ip}:30503"
 
+PROXY_URL="$PROXY_INTERNAL_ENODE;$PROXY_EXTERNAL_ENODE"
+echo "Proxy URL: $PROXY_URL"
 
 echo "Bootnode enode address: ${bootnode_enode_address}"
 BOOTNODE_ENODE=${bootnode_enode_address}@${bootnode_ip_address}:30301
@@ -96,10 +100,11 @@ docker run -v $DATA_DIR:$DATA_DIR --name geth --net=host --entrypoint /bin/sh -d
     echo -n '${validator_account_address}' > $DATA_DIR/address && \
     echo -n '${bootnode_enode_address}' > $DATA_DIR/bootnodeEnodeAddress && \
     echo -n '${proxy_enode}' > $DATA_DIR/proxyEnodeAddress && \
-    echo -n '${proxy_ip}' > $DATA_DIR/proxyIpAddress && \
     echo -n '$PROXY_URL' > $DATA_DIR/proxyURL && \
     echo -n '$BOOTNODE_ENODE' > $DATA_DIR/bootnodeEnode && \
     echo -n '${validator_geth_account_secret}' > $DATA_DIR/account/accountSecret && \
+    echo -n $PROXY_INTERNAL_ENODE > /root/.celo/proxyInternalEnode && \
+    echo -n $PROXY_EXTERNAL_ENODE > /root/.celo/proxyExternalEnode && \
     geth init /var/geth/genesis.json
   ) && ( \
     geth account import --password $DATA_DIR/account/accountSecret $DATA_DIR/pkey | true ; \

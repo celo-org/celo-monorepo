@@ -15,6 +15,6 @@ variable tx_node_self_links {
 
 variable deploy_txnode_lb {
   type        = bool
-  description = ""
+  description = "Deploy or not the Load Balancer for the TX Nodes"
   default     = false
 }

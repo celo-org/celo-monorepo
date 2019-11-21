@@ -96,74 +96,74 @@ variable gcloud_zone {
 
 variable validator_account_addresses {
   type        = list(string)
-  description = ""
+  description = "Array with the Validator etherbase account addresses"
 }
 
 variable validator_private_keys {
   type        = list(string)
-  description = ""
+  description = "Array with the Validator etherbase account private keys"
 }
 
 variable validator_account_passwords {
   type        = list(string)
-  description = ""
+  description = "Array with the Validator etherbase account passwords"
 }
 
 variable txnode_account_addresses {
   type        = list(string)
-  description = ""
+  description = "Array with the TX node etherbase account addresses"
 }
 
 variable txnode_private_keys {
   type        = list(string)
-  description = ""
+  description = "Array with the TX node etherbase account private keys"
 }
 
 variable txnode_account_passwords {
   type        = list(string)
-  description = ""
-}
-
-variable proxy_enodes {
-  type        = list(string)
-  description = ""
+  description = "Array with the TX node etherbase account passwords"
 }
 
 variable proxy_account_addresses {
   type        = list(string)
-  description = ""
-}
-
-variable proxy_private_node_keys {
-  type        = list(string)
-  description = ""
+  description = "Array with the Proxy etherbase account addresses"
 }
 
 variable proxy_account_passwords {
   type        = list(string)
-  description = ""
+  description = "Array with the Proxy etherbase account passwords"
 }
 
 variable proxy_private_keys {
   type        = list(string)
-  description = ""
+  description = "Array with the Proxy etherbase account private keys"
+}
+
+variable proxy_enodes {
+  type        = list(string)
+  description = "Array list with the proxy enode address (without enode://)"
+}
+
+variable proxy_private_node_keys {
+  type        = list(string)
+  description = "Array with the Proxy node private keys"
 }
 
 variable bootnode_enode_address {
   type        = string
-  description = ""
+  description = "Network bootnode enode address (without enode://)"
   default     = ""
 }
 
 variable bootnode_ip_address {
   type        = string
-  description = ""
+  description = "Network bootnode ip address"
   default     = ""
 }
 
 variable deploy_txnode_lb {
   type        = bool
-  description = ""
+  description = "Deploy or not the Load Balancer for the TX Nodes"
   default     = false
 }
 
@@ -175,96 +175,97 @@ variable static_nodes_base64 {
 # Attestation service vars
 variable deploy_attestation_service {
   type        = bool
-  description = ""
+  description = "Deploy or not the Attestation Service"
   default     = false
 }
 
 variable attestation_service_db_username {
   type        = string
-  description = ""
-  default     = ""
+  description = "The User for the database"
+  default     = "celo"
 }
 
 variable attestation_service_db_password {
   type        = string
-  description = ""
-  default     = ""
+  description = "The password for the database"
+  default     = "secret"
 }
 
 variable attestation_service_docker_image_repository {
   type        = string
-  description = ""
+  description = "The docker image repository for the attestation service"
   default     = ""
 }
 
 variable attestation_service_docker_image_tag {
   type        = string
-  description = ""
-  default     = ""
-}
-
-variable attestation_service_attestation_key {
-  type        = string
-  description = ""
+  description = "The docker image tag for the attestation service"
   default     = ""
 }
 
 variable attestation_service_account_address {
   type        = string
-  description = ""
+  description = "The etherbase account address for signing the attestations"
   default     = ""
 }
 
+variable attestation_service_attestation_key {
+  type        = string
+  description = "The etherbase account private key for signing the attestations"
+  default     = ""
+}
+
+
 variable attestation_service_celo_provider {
   type        = string
-  description = ""
+  description = "The URL for the RPC interface for the Celo network"
   default     = ""
 }
 
 variable attestation_service_sms_providers {
   type        = string
-  description = ""
+  description = "The SMS Service provider. Must be nexmo or twilio"
   default     = ""
 }
 
 variable attestation_service_nexmo_key {
   type        = string
-  description = ""
+  description = "Nexmo api key (check nexmo documentation)"
   default     = ""
 }
 
 variable attestation_service_nexmo_secret {
   type        = string
-  description = ""
+  description = "Nexmo api secret (check nexmo documentation)"
   default     = ""
 }
 
 variable attestation_service_nexmo_blacklist {
   type        = string
-  description = ""
+  description = "Nexmo blacklisted country codes, separated by coma (check nexmo documentation)"
   default     = ""
 }
 
 variable attestation_service_twilio_account_sid {
   type        = string
-  description = ""
+  description = "Twilio account SID (check twilio documentation)"
   default     = ""
 }
 
 variable attestation_service_twilio_messaging_service_sid {
   type        = string
-  description = ""
+  description = "Twilio account messagin service SID (check twilio documentation)"
   default     = ""
 }
 
 variable attestation_service_twilio_auth_token {
   type        = string
-  description = ""
+  description = "Twilio account Auth Token (check twilio documentation)"
   default     = ""
 }
 
 variable attestation_service_twilio_blacklist {
   type        = string
-  description = ""
+  description = "Twilio blacklisted country codes, separated by coma  (check twilio documentation)"
   default     = ""
 }

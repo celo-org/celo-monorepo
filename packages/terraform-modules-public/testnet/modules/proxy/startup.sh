@@ -58,7 +58,8 @@ systemctl restart docker
 
 GETH_NODE_DOCKER_IMAGE=${geth_node_docker_image_repository}:${geth_node_docker_image_tag}
 
-echo "Address: ${proxy_account_address}"
+ACCOUNT_ADDRESS=${validator_account_address}
+echo "Address: $ACCOUNT_ADDRESS"
 echo "Private Key: ${proxy_private_key}"
 
 echo "Bootnode enode address: ${bootnode_enode_address}"
@@ -96,8 +97,6 @@ docker run -v $DATA_DIR:$DATA_DIR --name geth --net=host --entrypoint /bin/sh -d
   ) && ( \
     geth account import --password $DATA_DIR/account/accountSecret $DATA_DIR/pkey | true ; \
     geth \
-      --password=$DATA_DIR/account/accountSecret \
-      --unlock=$ACCOUNT_ADDRESS \
       --rpc \
       --rpcaddr 0.0.0.0 \
       --rpcapi=eth,net,web3 \

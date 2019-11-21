@@ -4,7 +4,8 @@ You can take this terraform code as base for your setup. You need to configure t
 
 ## Project parameters
 
-The first parameters to configure are the Google Cloud parameters. Please configure your GCP project, region and zone. Additionally, you can configure your `attestation_service_db` username/password for someone of your convenience.
+The file [variables.tf](./variables.tf) contains most of the parameters used by the module. The first parameters to configure are the Google Cloud parameters. Please configure your GCP project, region and zone. Additionally you can coonfigure, directly on [main.tf](./main.tf) the configuration for remote tfstate.
+
 Most of the parameters are safe to go with the default value. You can configure the replica count for each service, but a good starting point would be 1 validator, 1 proxy, and 1 attestation service. Each validator service has an attached proxy service.
 
 ## Validator accounts
@@ -45,3 +46,14 @@ Associated private node key: eb99dc2de55a5253dd2834411c2795050e8cb67ac3b6482352a
 ```
 
 The passwords referred in the variables will be used to import the accounts in the geth deployed (i.e.: The passwords have not to exist previously). They will keep your account safe if somebody access to the keystore file or if you want to unlock the account.
+
+## Validator accounts
+
+Once you have configured the variables with your accounts and parameters, proceed executing Terraform (gcloud cli must be correctly configured):
+
+```bash
+terraform init
+teerraform plan
+# Check the resources that will be created
+terraform apply
+```

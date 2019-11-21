@@ -10,54 +10,6 @@ variable google {
   }
 }
 
-variable network_name {
-  description = "The name of the new VPC network created"
-  type        = string
-
-  default = "celo-network"
-}
-
-variable celo_env {
-  description = "The celo network to connect with"
-  type        = string
-
-  default = "baklava"
-}
-
-variable replicas {
-  description = "The replica number for each component"
-  type        = map(number)
-
-  default = {
-    validator = 1 # Also used for proxy
-    txnode    = 0
-  }
-}
-
-variable deploy_txnode_loadbalancer {
-  description = "Deploy the Load Balancer for Transmission nodes (if txnode > 0)"
-  type        = bool
-
-  default = false
-}
-
-variable deploy_attestation_service {
-  description = "Deploy the Load Balancer for Transmission nodes (if txnode > 0)"
-  type        = bool
-
-  default = true
-}
-
-variable attestation_service_db {
-  description = "Configuration for the Postgres Cloud SQL DB"
-  type        = map(string)
-
-  default = {
-    username = "celo"
-    password = "mysecret"
-  }
-}
-
 variable proxy_accounts {
   description = "The account data for the proxy nodes"
   type        = map
@@ -137,33 +89,6 @@ variable txnode_accounts {
   }
 }
 
-# Attestation variables
-variable deploy_attestation_service {
-  description = "Deploy the Load Balancer for Transmission nodes (if txnode > 0)"
-  type        = bool
-
-  default = true
-}
-
-variable attestation_service_db {
-  description = "Configuration for the Postgres Cloud SQL DB"
-  type = map(string)
-
-  default = {
-    username = "celo"
-    password = "mysecret"
-  }
-}
-
-variable attestation_service_docker_image {
-  description = "The attestation_service docker image"
-  type = map(string)
-
-  default = {
-    repository = "us.gcr.io/celo-testnet/celo-monorepo"
-    tag = "attestation-service-8deb4b1645a6e07f8abfd63281afce778d79e67e"
-  }
-}
 
 variable attestation_service_attestation_key {
   description = "Etherbase address and private key to sign the attestations"
@@ -189,6 +114,82 @@ variable attestation_service_credentials {
     twilio_messaging_service_sid = ""
     twilio_auth_token = ""
     twilio_blacklist = ""
+  }
+}
+
+variable attestation_service_db {
+  description = "Configuration for the Postgres Cloud SQL DB"
+  type = map(string)
+
+  default = {
+    username = "celo"
+    password = "mysecret"
+  }
+}
+
+variable replicas {
+  description = "The replica number for each component"
+  type        = map(number)
+
+  default = {
+    validator = 1 # Also used for proxy
+    txnode    = 0
+  }
+}
+
+variable network_name {
+  description = "The name of the new VPC network created"
+  type        = string
+
+  default = "celo-network"
+}
+
+variable celo_env {
+  description = "The celo network to connect with"
+  type        = string
+
+  default = "baklava"
+}
+
+variable deploy_txnode_loadbalancer {
+  description = "Deploy the Load Balancer for Transmission nodes (if txnode > 0)"
+  type        = bool
+
+  default = false
+}
+
+variable deploy_attestation_service {
+  description = "Deploy the Load Balancer for Transmission nodes (if txnode > 0)"
+  type        = bool
+
+  default = true
+}
+
+variable attestation_service_db {
+  description = "Configuration for the Postgres Cloud SQL DB"
+  type        = map(string)
+
+  default = {
+    username = "celo"
+    password = "mysecret"
+  }
+}
+
+# Attestation variables
+variable deploy_attestation_service {
+  description = "Deploy the Load Balancer for Transmission nodes (if txnode > 0)"
+  type        = bool
+
+  default = true
+}
+
+variable attestation_service_docker_image {
+  description = "The attestation_service docker image"
+  type = map(string)
+
+  default = {
+    repository = "us.gcr.io/celo-testnet/celo-monorepo"
+    tag = "attestation-service-8deb4b1645a6e07f8abfd63281afce778d79e67e"
   }
 }
 

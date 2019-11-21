@@ -85,32 +85,32 @@ variable verification_pool_url {
 
 variable proxy_account_addresses {
   type        = list(string)
-  description = ""
+  description = "Array with the Proxy etherbase account addresses"
 }
 
 variable proxy_private_keys {
   type        = list(string)
-  description = ""
-}
-
-variable proxy_private_node_keys {
-  type        = list(string)
-  description = ""
+  description = "Array with the Proxy etherbase account private keys"
 }
 
 variable proxy_account_passwords {
   type        = list(string)
-  description = ""
+  description = "Array with the Proxy etherbase account passwords"
+}
+
+variable proxy_private_node_keys {
+  type        = list(string)
+  description = "Array with the Proxy node private keys"
 }
 
 variable validator_account_addresses {
   type        = list(string)
-  description = ""
+  description = "Array with the Validator etherbase account addresses"
 }
 
 variable bootnode_enode_address {
   type        = string
-  description = ""
+  description = "Network bootnode enode address"
 }
 
 variable static_nodes_base64 {

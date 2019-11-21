@@ -193,7 +193,8 @@ module "validator" {
   validator_private_keys      = var.validator_private_keys
   validator_account_passwords = var.validator_account_passwords
   proxy_enodes                = var.proxy_enodes
-  proxy_ips                   = module.proxy.internal_ip_addresses
+  proxy_internal_ips          = module.proxy.internal_ip_addresses
+  proxy_external_ips          = module.proxy.external_ip_addresses
   bootnode_enode_address      = var.bootnode_enode_address
   static_nodes_base64         = var.static_nodes_base64
 }

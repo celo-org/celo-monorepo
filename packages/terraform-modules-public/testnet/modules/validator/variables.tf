@@ -3,11 +3,6 @@ variable block_time {
   description = "Number of seconds between each block"
 }
 
-variable bootnode_ip_address {
-  type        = string
-  description = "The external IP address of the bootnode"
-}
-
 variable celo_env {
   type        = string
   description = "Name of the testnet Celo environment"
@@ -85,32 +80,42 @@ variable verification_pool_url {
 
 variable validator_account_addresses {
   type        = list(string)
-  description = ""
+  description = "Array with the Validator account addresses"
 }
 
 variable validator_private_keys {
   type        = list(string)
-  description = ""
+  description = "Array with the Validator account private keys"
 }
 
 variable validator_account_passwords {
   type        = list(string)
-  description = ""
+  description = "Array with the Validator account passwords"
 }
 
 variable proxy_enodes {
   type        = list(string)
-  description = ""
+  description = "Array list with the proxy enode address (without enode://)"
 }
 
-variable proxy_ips {
+variable proxy_internal_ips {
   type        = list(string)
-  description = ""
+  description = "Array list with the proxy internal addresses"
+}
+
+variable proxy_external_ips {
+  type        = list(string)
+  description = "Array list with the proxy external addresses"
 }
 
 variable bootnode_enode_address {
   type        = string
-  description = ""
+  description = "Network bootnode enode address (without enode://)"
+}
+
+variable bootnode_ip_address {
+  type        = string
+  description = "The external IP address of the bootnode"
 }
 
 variable static_nodes_base64 {
