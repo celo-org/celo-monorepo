@@ -1,4 +1,3 @@
-// import { confirmAction } from './utils'
 import { config } from 'dotenv'
 import { existsSync } from 'fs'
 import path from 'path'
@@ -52,6 +51,8 @@ export enum envVar {
   IN_MEMORY_DISCOVERY_TABLE = 'IN_MEMORY_DISCOVERY_TABLE',
   KUBERNETES_CLUSTER_NAME = 'KUBERNETES_CLUSTER_NAME',
   KUBERNETES_CLUSTER_ZONE = 'KUBERNETES_CLUSTER_ZONE',
+  LOAD_TEST_CLIENTS = 'LOAD_TEST_CLIENTS',
+  LOAD_TEST_TX_DELAY_MS = 'LOAD_TEST_TX_DELAY_MS',
   MNEMONIC = 'MNEMONIC',
   MOBILE_WALLET_PLAYSTORE_LINK = 'MOBILE_WALLET_PLAYSTORE_LINK',
   NETWORK_ID = 'NETWORK_ID',

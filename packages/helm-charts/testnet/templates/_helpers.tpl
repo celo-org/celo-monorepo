@@ -42,20 +42,6 @@ app: {{ template "ethereum.name" . }}
 release: {{ .Release.Name }}
 {{- end -}}
 
-{{- define "celo.init-genesis-container" -}}
-- name: init-genesis
-  image: {{ .Values.geth.image.repository }}:{{ .Values.geth.image.tag }}
-  imagePullPolicy: {{ .Values.imagePullPolicy }}
-  args:
-  - "init"
-  - "/var/geth/genesis.json"
-  volumeMounts:
-  - name: data
-    mountPath: /root/.celo
-  - name: config
-    mountPath: /var/geth
-{{- end -}}
-
 {{- define "celo.geth-exporter-container" -}}
 - name: geth-exporter
   image: "{{ .Values.gethexporter.image.repository }}:{{ .Values.gethexporter.image.tag }}"
@@ -181,7 +167,7 @@ spec:
         component: {{ .component_label }}
     spec:
       initContainers:
-{{ include "celo.init-genesis-container" .  | indent 6 }}
+{{ include "common.init-genesis-container" .  | indent 6 }}
       - name: get-account
         image: {{ .Values.celotool.image.repository }}:{{ .Values.celotool.image.tag }}
         imagePullPolicy: IfNotPresent
