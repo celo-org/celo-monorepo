@@ -160,11 +160,11 @@ if [[ $COMMAND == *"run-validator"* ]]; then
     
     sleep 5s
      
-    echo -e "\tEverything should be running, you can check running `screen -ls`"
+    echo -e "\tEverything should be running, you can check running 'screen -ls'"
     screen -ls
         
     echo -e "\tYou can re-attach to the proxy or the validator running:"
-    echo -e "\t`screen -r -S celo-proxy` or `screen -r -S celo-validator`\n"
+    echo -e "\t 'screen -r -S celo-proxy' or 'screen -r -S celo-validator'\n"
     
 fi
 
@@ -180,9 +180,9 @@ if [[ $COMMAND == *"run-attestation"* ]]; then
     
     screen -S attestation-service -d -m  docker run --name celo-attestation-service --restart always -e ATTESTATION_KEY=$ATTESTATION_KEY -e ACCOUNT_ADDRESS=$CELO_VALIDATOR_ADDRESS -e CELO_PROVIDER=$CELO_PROVIDER -e DATABASE_URL=$DATABASE_URL -e SMS_PROVIDERS=nexmo -e NEXMO_KEY=$NEXMO_KEY -e NEXMO_SECRET=$NEXMO_SECRET -e NEXMO_BLACKLIST=$NEXMO_BLACKLIST  -p 3000:80 $CELO_IMAGE_ATTESTATION
     
-    echo -e "\tAttestation service should be running, you can check running `screen -ls`"
+    echo -e "\tAttestation service should be running, you can check running 'screen -ls'"
     echo -e "\tYou can re-attach to the attestation-service running:"
-    echo -e "\t`screen -r -S celo-attestation-service`\n"
+    echo -e "\t 'screen -r -S celo-attestation-service'\n"
 
 fi
 
