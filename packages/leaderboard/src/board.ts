@@ -6,7 +6,8 @@ import fs from 'fs'
 import readline from 'readline'
 import { google } from 'googleapis'
 import { Client } from 'pg'
-import { verifyClaim } from '@celo/contractkit/lib/identity/claims/claim'
+import { verifyClaim, Claim } from '@celo/contractkit/lib/identity/claims/claim'
+import { ClaimTypes } from '@celo/contractkit/lib/identity'
 
 // If modifying these scopes, delete token.json.
 const SCOPES = ['https://www.googleapis.com/auth/spreadsheets.readonly']
@@ -64,16 +65,22 @@ async function updateRate(kit: ContractKit) {
 
 async function processClaims(kit: ContractKit, address: string, data: string) {
   try {
-    const orig_lst: any[] = JSON.parse(data).claims
+    console.log('process claim', address, data)
+    const info: any = JSON.parse(data)
+    const orig_lst: any[] = info.claims
     const lst: string[] = []
     const accounts = await kit.contracts.getAccounts()
     for (let i = 0; i < orig_lst.length; i++) {
-      if (!orig_lst[i].payload) continue
-      let payload = JSON.parse(orig_lst[i].payload)
-      let claim = { signature: orig_lst[i].signature, payload }
+      console.log('account claim', orig_lst[i])
+      let claim: Claim = {
+        type: ClaimTypes.ACCOUNT,
+        timestamp: orig_lst[i].timestamp,
+        address: orig_lst[i].address,
+        publicKey: undefined,
+      }
       const status = await verifyClaim(claim, address, accounts.getMetadataURL)
-      if (status) console.log(status)
-      else lst.push(payload.address)
+      if (status) console.error(status)
+      else lst.push(claim.address)
     }
     lst.push(address)
     const client = new Client({ database: 'blockscout' })
