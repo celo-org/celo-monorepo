@@ -146,7 +146,6 @@ spec:
             --networkid=${NETWORK_ID} \
             --syncmode=full \
             --ethstats=${HOSTNAME}:${ETHSTATS_SECRET}@${ETHSTATS_SVC} \
-            --miner.verificationpool=${VERIFICATION_POOL_URL} \
             --consoleformat=json \
             --consoleoutput=stdout \
             --verbosity={{ .Values.geth.verbosity }} \
@@ -177,8 +176,6 @@ spec:
             configMapKeyRef:
               name: {{ template "ethereum.fullname" . }}-geth-config
               key: networkid
-        - name: VERIFICATION_POOL_URL
-          value: {{ .Values.geth.miner.verificationpool }}
         - name: FAULTY_NODES
           value: {{ .Values.geth.faultyValidators | quote }}
         - name: FAULTY_NODE_TYPE

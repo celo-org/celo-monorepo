@@ -16,6 +16,7 @@ RUN apt-get update && \
 COPY lerna.json package.json yarn.lock ./
 COPY scripts/ scripts/
 COPY packages/utils/package.json packages/utils/
+COPY packages/dev-utils/package.json packages/dev-utils/
 COPY packages/typescript/package.json packages/typescript/
 COPY packages/walletkit/package.json packages/walletkit/
 COPY packages/contractkit/package.json packages/contractkit/
@@ -26,6 +27,7 @@ COPY packages/celotool/package.json packages/celotool/
 RUN yarn install --network-timeout 100000 --frozen-lockfile && yarn cache clean
 
 COPY packages/utils packages/utils/
+COPY packages/dev-utils packages/dev-utils/
 COPY packages/typescript packages/typescript/
 COPY packages/walletkit packages/walletkit/
 COPY packages/contractkit packages/contractkit/

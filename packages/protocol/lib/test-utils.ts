@@ -34,30 +34,6 @@ export function assertContainSubset(superset: any, subset: any) {
   return assert2.containSubset(superset, subset)
 }
 
-export async function advanceBlockNum(numBlocks: number, web3: Web3) {
-  let returnValue: any
-  for (let i: number = 0; i < numBlocks; i++) {
-    returnValue = new Promise((resolve, reject) => {
-      web3.currentProvider.send(
-        {
-          jsonrpc: '2.0',
-          method: 'evm_mine',
-          params: [],
-          id: new Date().getTime(),
-        },
-        // @ts-ignore
-        (err: any, result: any) => {
-          if (err) {
-            return reject(err)
-          }
-          return resolve(result)
-        }
-      )
-    })
-  }
-  return returnValue
-}
-
 export async function jsonRpc(web3: Web3, method: string, params: any[] = []): Promise<any> {
   return new Promise((resolve, reject) => {
     web3.currentProvider.send(
@@ -342,7 +318,6 @@ export const matchAny = () => {
 }
 
 export default {
-  advanceBlockNum,
   assertContainSubset,
   assertRevert,
   timeTravel,

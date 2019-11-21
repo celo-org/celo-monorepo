@@ -13,7 +13,7 @@ const DefaultConfig = {
     selectIssuersWaitBlocks: 4,
   },
   blockchainParameters: {
-    gasForNonGoldCurrencies: 134000,
+    gasForNonGoldCurrencies: 166000,
     minimumClientVersion: {
       major: 1,
       minor: 8,
@@ -29,8 +29,8 @@ const DefaultConfig = {
   },
   epochRewards: {
     targetVotingYieldParameters: {
-      initial: 5 / 100,
-      max: 2 / 10,
+      initial: 6 / 100,
+      max: 20 / 100,
       adjustmentFactor: 1 / 365,
     },
     rewardsMultiplierParameters: {
@@ -45,8 +45,8 @@ const DefaultConfig = {
   },
   exchange: {
     spread: 5 / 1000,
-    reserveFraction: 1,
-    updateFrequency: 3600,
+    reserveFraction: 1 / 100,
+    updateFrequency: 5 * 60, // 5 minutes
     minimumReports: 1,
   },
   gasPriceMinimum: {
@@ -71,26 +71,25 @@ const DefaultConfig = {
     unlockingPeriod: 60 * 60 * 24 * 3, // 3 days
   },
   oracles: {
-    reportExpiry: 60 * 60, // 1 hour
+    reportExpiry: 10 * 60, // 10 minutes
   },
   random: {
-    randomnessBlockRetentionWindow: 256,
+    randomnessBlockRetentionWindow: (60 * 60) / 5, // 1 hour to match attestationExpiryBlocks
   },
   registry: {
     predeployedProxyAddress: '0x000000000000000000000000000000000000ce10',
   },
   reserve: {
-    goldBalance: 100000,
-    tobinTaxStalenessThreshold: 3600, // 1 hour
+    goldBalance: 100000000,
+    tobinTaxStalenessThreshold: 60 * 60, // 1 hour
   },
   stableToken: {
     decimals: 18,
     goldPrice: 10,
     tokenName: 'Celo Dollar',
     tokenSymbol: 'cUSD',
-    // 52nd root of 1.005, equivalent to 0.5% annual inflation
-    inflationRate: 1.00009591886,
-    inflationPeriod: 7 * 24 * 60 * 60, // 1 week
+    inflationRate: 1,
+    inflationPeriod: 1.5 * 365 * 24 * 60 * 60, // 1.5 years
     initialBalances: {
       addresses: [],
       values: [],
@@ -99,22 +98,23 @@ const DefaultConfig = {
   },
   validators: {
     groupLockedGoldRequirements: {
-      value: '1000000000000000000', // 1 gold
+      value: '10000000000000000000000', // 10k gold
       duration: 60 * 24 * 60 * 60, // 60 days
     },
     validatorLockedGoldRequirements: {
-      value: '1000000000000000000', // 1 gold
+      value: '10000000000000000000000', // 1 gold
       duration: 60 * 24 * 60 * 60, // 60 days
     },
     validatorScoreParameters: {
-      exponent: 1,
+      exponent: 10,
       adjustmentSpeed: 0.1,
     },
     membershipHistoryLength: 60,
-    maxGroupSize: '70',
+    maxGroupSize: '5',
 
+    // We register a number of C-Labs groups to contain an initial set of validators to run the network.
     validatorKeys: [],
-    // We register a single validator group during the migration.
+    attestationKeys: [],
     groupName: 'C-Labs',
     commission: 0.1,
   },

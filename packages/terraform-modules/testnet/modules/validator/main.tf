@@ -68,7 +68,6 @@ resource "google_compute_instance" "validator" {
       network_id : var.network_id,
       rid : count.index,
       validator_name : "${local.name_prefix}-${count.index}",
-      verification_pool_url : var.verification_pool_url
     }
   )
 
