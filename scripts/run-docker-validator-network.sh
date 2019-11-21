@@ -10,6 +10,13 @@ export CELO_IMAGE=${3:-"us.gcr.io/celo-testnet/geth@sha256:4bc97381db0bb81b7a3e4
 export NETWORK_ID=${4:-"1101"}
 export NETWORK_NAME=${5:-"integration"}
 export DEFAULT_PASSWORD=${6:-"1234"}
+export CELO_IMAGE_ATTESTATION=${7:-"gcr.io/celo-testnet/attestation-service@sha256:f22701104dbeea41a638b002aeed7e5ec403726b47177c553c8a2607c58eb7f6"}
+export CELO_PROVIDER=${8:-"https://my-attestation.example.com"}
+export DATABASE_URL=${9:-"sqlite://db/dev.db"}
+
+export NEXMO_KEY="xx"
+export NEXMO_SECRET="xx"
+export NEXMO_BLACKLIST=""
 
 
 VALIDATOR_DIR="${DATA_DIR}/validator"
@@ -23,7 +30,7 @@ __PWD=$PWD
 #### Internal functions
 remove_containers () {
     echo -e "\tRemoving previous celo-proxy and celo-validator containers"
-    docker rm -f celo-proxy celo-validator || echo -e "Containers removed"
+    docker rm -f celo-proxy celo-validator celo-attestation-service || echo -e "Containers removed"
 }
 
 download_genesis () {
@@ -47,7 +54,7 @@ if [[ $COMMAND == *"help"* ]]; then
 
     echo -e "Options:"
     echo -e "$0 <COMMAND> <DATA_DIR> <CELO_IMAGE> <NETWORK_ID> <NETWORK_NAME> <PASSWORD>"
-    echo -e "\t - Command; comma separated list of actions to execute. Options are: help, pull, clean, accounts, deploy, run-validator, run-attestation. Default: pull,accounts,deploy,run"
+    echo -e "\t - Command; comma separated list of actions to execute. Options are: help, pull, clean, accounts, deploy, run-validator, run-attestation. Default: pull,accounts,deploy,run-validator"
     echo -e "\t - Data Dir; Local folder where will be created the data dir for the nodes. Default: /tmp/celo/network"
     echo -e "\t - Celo Image; Image to download"
     echo -e "\t - Celo Network; Docker image network to use (typically alfajores or baklava, but you can use a commit). "
@@ -65,8 +72,9 @@ fi
 
 if [[ $COMMAND == *"pull"* ]]; then
 
-    echo -e "* Downloading docker image from $CELO_IMAGE"
+    echo -e "* Downloading docker image: $CELO_IMAGE"
     docker pull $CELO_IMAGE
+
 fi
 
 
@@ -88,11 +96,13 @@ if [[ $COMMAND == *"accounts"* ]]; then
     export CELO_VALIDATOR_ADDRESS=$(docker run -v $PWD/validator:/root/.celo --entrypoint /bin/sh -it $CELO_IMAGE -c " printf '%s\n' $DEFAULT_PASSWORD $DEFAULT_PASSWORD | geth account new " |tail -1| cut -d'{' -f 2| tr -cd "[:alnum:]\n" )
     export CELO_VALIDATOR_GROUP_ADDRESS=$(docker run -v $PWD/validator:/root/.celo --entrypoint /bin/sh -it $CELO_IMAGE -c " printf '%s\n' $DEFAULT_PASSWORD $DEFAULT_PASSWORD | geth account new " |tail -1| cut -d'{' -f 2| tr -cd "[:alnum:]\n" )
     export CELO_PROXY_ADDRESS=$(docker run -v $PWD/proxy:/root/.celo --entrypoint /bin/sh -it $CELO_IMAGE -c " printf '%s\n' $DEFAULT_PASSWORD $DEFAULT_PASSWORD | geth account new " |tail -1| cut -d'{' -f 2| tr -cd "[:alnum:]\n" )
-
+    
     echo -e "\tCELO_VALIDATOR_ADDRESS=$CELO_VALIDATOR_ADDRESS"
     echo -e "\tCELO_VALIDATOR_GROUP_ADDRESS=$CELO_VALIDATOR_ADDRESS"
     echo -e "\tCELO_PROXY_ADDRESS=$CELO_VALIDATOR_ADDRESS"
 
+    
+    
     export CELO_VALIDATOR_POP=$(docker run -v $PWD/validator:/root/.celo --entrypoint /bin/sh -it $CELO_IMAGE -c " printf '%s\n' $DEFAULT_PASSWORD | geth account proof-of-possession $CELO_VALIDATOR_ADDRESS "| tail -1| cut -d' ' -f 3| tr -cd "[:alnum:]\n" )
 
     echo -e "\tCELO_VALIDATOR_POP=$CELO_VALIDATOR_POP"
@@ -147,7 +157,19 @@ fi
 if [[ $COMMAND == *"run-attestation"* ]]; then
 
     echo -e "* Let's run the attestation service ..."
-    echo -e "Not implemented yet"
+    
+    echo -e "\tPulling docker image: $CELO_IMAGE_ATTESTATION"
+    docker pull $CELO_IMAGE_ATTESTATION
+    
+    export ATTESTATION_KEY=celocli account:new| tail -3| head -1| cut -d' ' -f 2| tr -cd "[:alnum:]\n"
+    echo -e "\tATTESTATION_KEY=$ATTESTATION_KEY"
+    
+    docker run --name celo-attestation-service --restart always -e ATTESTATION_KEY=$ATTESTATION_KEY -e ACCOUNT_ADDRESS=$CELO_VALIDATOR_ADDRESS -e CELO_PROVIDER=$CELO_PROVIDER -e DATABASE_URL=$DATABASE_URL -e SMS_PROVIDERS=nexmo -e NEXMO_KEY=$NEXMO_KEY -e NEXMO_SECRET=$NEXMO_SECRET -e NEXMO_BLACKLIST=$NEXMO_BLACKLIST  -p 3000:80 $CELO_IMAGE_ATTESTATION
+    
+    echo -e "\tAttestation service should be running, you can check running `screen -ls`"
+    echo -e "\tYou can re-attach to the attestation-service running:"
+    echo -e "\t`screen -r -S celo-attestation-service`\n"
+
 fi
 
 cd $__PWD
