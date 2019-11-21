@@ -1304,23 +1304,26 @@
   resolved "https://registry.yarnpkg.com/@celo/client/-/client-0.0.173.tgz#30d8266f8f4897f1db5c9bf4ad344801e620326f"
   integrity sha512-pAzo3Oy+V/BEkKb7ZZe0l71s6mOdPLLJZfLNo2Ihm2bx37nx8g4LNkcfj+0vVtRQPtiLrGiQ42U8pby3LwmC4Q==
 
-"@celo/contractkit@0.1.5":
-  version "0.1.5"
-  resolved "https://registry.yarnpkg.com/@celo/contractkit/-/contractkit-0.1.5.tgz#097052ac8f672f03480a1226f11f0c398c35c75e"
-  integrity sha512-vW8/ZluqJXx4SOB64XyFZjR3Z6qzcCUjXk6ec5613NH8DC/7jzxPCnbPsnxL4R+zuEajDWKfjjeH94Y1uLgVGA==
+"@celo/contractkit@0.2.1":
+  version "0.2.1"
+  resolved "https://registry.yarnpkg.com/@celo/contractkit/-/contractkit-0.2.1.tgz#c29e8e202ac3784817b6c7b1e180725f294786a6"
+  integrity sha512-VJxhSNwGzC3fYGI/6QlpJLv7BDu8ygFAzzozGZPus7+cc/2fhzKc2mVqK71KoulONwg+AcwrpXabRHgTeIZTpQ==
   dependencies:
     "@0x/subproviders" "^5.0.0"
-    "@celo/utils" "0.1.0"
+    "@celo/utils" "^0.1.3"
     "@types/debug" "^4.1.5"
     bignumber.js "^7.2.0"
+    cross-fetch "3.0.4"
     debug "^4.1.1"
     eth-lib "^0.2.8"
+    fp-ts "2.1.1"
+    io-ts "2.0.1"
     web3 "1.0.0-beta.37"
     web3-core-helpers "1.0.0-beta.37"
     web3-eth-abi "1.0.0-beta.37"
     web3-utils "1.0.0-beta.37"
 
-"@celo/contractkit@0.1.6", "@celo/contractkit@^0.1.5", "@celo/contractkit@^0.1.6":
+"@celo/contractkit@^0.1.5", "@celo/contractkit@^0.1.6":
   version "0.1.6"
   resolved "https://registry.yarnpkg.com/@celo/contractkit/-/contractkit-0.1.6.tgz#c4f6d5003694cc28853f7331b5c0597a208a389d"
   integrity sha512-3mEmfOVaqOjyAT5mHWAESYdcKTvZPDDCkkh7GVDDpq7sPhnZ5dGX5oT26XzMLhe8TfdTQMzp6B22EDaPjOLx8A==
@@ -1333,25 +1336,6 @@
     debug "^4.1.1"
     eth-lib "^0.2.8"
     fp-ts "2.0.5"
-    io-ts "2.0.1"
-    web3 "1.0.0-beta.37"
-    web3-core-helpers "1.0.0-beta.37"
-    web3-eth-abi "1.0.0-beta.37"
-    web3-utils "1.0.0-beta.37"
-
-"@celo/contractkit@0.2.0":
-  version "0.2.0"
-  resolved "https://registry.yarnpkg.com/@celo/contractkit/-/contractkit-0.2.0.tgz#6db7479c786f36ac0a1c4ffe7cb23a5f98690f83"
-  integrity sha512-UGI6dvoL46H2pa8kbfG9CTNF1o2Pg1slhyVfAM1gK9Ohr7Agm+mNivdx5DESIjEZ8NX1PWcOOd4PMJWinBnWRg==
-  dependencies:
-    "@0x/subproviders" "^5.0.0"
-    "@celo/utils" "^0.1.0"
-    "@types/debug" "^4.1.5"
-    bignumber.js "^7.2.0"
-    cross-fetch "3.0.4"
-    debug "^4.1.1"
-    eth-lib "^0.2.8"
-    fp-ts "2.1.1"
     io-ts "2.0.1"
     web3 "1.0.0-beta.37"
     web3-core-helpers "1.0.0-beta.37"
@@ -1388,14 +1372,15 @@
   version "1.0.3"
   resolved "git+https://github.com/celo-org/react-native-sms-retriever#b88e502fcd5bab2b6b9a22f59829c3eb40e27780"
 
-"@celo/utils@0.1.0":
-  version "0.1.0"
-  resolved "https://registry.yarnpkg.com/@celo/utils/-/utils-0.1.0.tgz#081e0c9a7ea3e7b50cbc88e89b0f7ff8d5578499"
-  integrity sha512-sSE17+lu0dqG+Zo+H/aZYFXq436+Kd9xhXk5a36RtONXuJY8q6jfaXMFoBJ0Wft19rJM24e9F2aM84HM/IiUTQ==
+"@celo/utils@^0.1.0", "@celo/utils@^0.1.3":
+  version "0.1.3"
+  resolved "https://registry.yarnpkg.com/@celo/utils/-/utils-0.1.3.tgz#697dc3705bb39227603153fd8d9484fdf24ca79a"
+  integrity sha512-BO56RqbDpzOp9oCxfzKI1M/4hxGKfCxJVv2z0f7iwnMizvdnm9VwGfrphXbFZHXkm6NJQnGrKMpq50vAw1k3cg==
   dependencies:
     "@umpirsky/country-list" "git://github.com/umpirsky/country-list#05fda51"
     bigi "^1.1.0"
     bignumber.js "^7.2.0"
+    bls12377js "https://github.com/celo-org/bls12377js#ea09eba5c54fe63617af494a0c198fcc47582e0c"
     bn.js "4.11.8"
     buffer-reverse "^1.0.1"
     country-data "^0.0.31"
@@ -1406,6 +1391,7 @@
     google-libphonenumber "^3.2.4"
     keccak256 "^1.0.0"
     lodash "^4.17.14"
+    numeral "^2.0.6"
     web3-utils "1.0.0-beta.37"
 
 "@cnakazawa/watch@^1.0.3":
@@ -30430,7 +30416,6 @@ websocket@1.0.29, websocket@^1.0.28:
   dependencies:
     debug "^2.2.0"
     es5-ext "^0.10.50"
-    gulp "^4.0.2"
     nan "^2.14.0"
     typedarray-to-buffer "^3.1.5"
     yaeti "^0.0.6"

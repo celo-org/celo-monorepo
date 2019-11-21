@@ -6,7 +6,7 @@ import {
   VERIFIABLE_CLAIM_TYPES,
 } from '@celo/contractkit/lib/identity/claims/types'
 import { concurrentMap } from '@celo/utils/lib/async'
-import { NativeSigner } from '@celo/utils/lib/signatureUtils'
+import { NativeSigner, Signer } from '@celo/utils/lib/signatureUtils'
 import { cli } from 'cli-ux'
 import { toChecksumAddress } from 'ethereumjs-util'
 import { writeFileSync } from 'fs'
@@ -41,7 +41,7 @@ export abstract class ClaimCommand extends BaseCommand {
     }
   }
 
-  protected get signer() {
+  protected get signer(): Signer {
     const res = this.parse(this.self)
     const address = toChecksumAddress(res.flags.from)
     return NativeSigner(this.kit.web3.eth.sign, address)
