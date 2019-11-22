@@ -58,7 +58,6 @@
     "codeHeader3": "Third Code",
     "codesMissing": "I didn’t receive three codes",
     "tip": "Typing? Try copying and pasting the code.",
-    "codeAccepted": "Accepted",
     "sendingCodes": "Sending verification codes..."
   },
   "missingCodesModal": {

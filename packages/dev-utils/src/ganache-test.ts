@@ -1,13 +1,8 @@
-import * as fs from 'fs'
 import Web3 from 'web3'
 import { JsonRPCResponse } from 'web3/providers'
-import { injectDebugProvider } from '../providers/debug-provider'
+import migrationOverride from './migration-override.json'
 
-// This file specifies accounts available when ganache is running. These are derived
-// from the MNEMONIC
-export const NetworkConfig = JSON.parse(
-  fs.readFileSync('src/test-utils/migration-override.json').toString()
-)
+export const NetworkConfig = migrationOverride
 
 export function jsonRpcCall<O>(web3: Web3, method: string, params: any[]): Promise<O> {
   return new Promise<O>((resolve, reject) => {
@@ -38,10 +33,6 @@ export function jsonRpcCall<O>(web3: Web3, method: string, params: any[]): Promi
     )
   })
 }
-export async function timeTravel(seconds: number, web3: Web3) {
-  await jsonRpcCall(web3, 'evm_increaseTime', [seconds])
-  await jsonRpcCall(web3, 'evm_mine', [])
-}
 
 export function evmRevert(web3: Web3, snapId: string): Promise<void> {
   return jsonRpcCall(web3, 'evm_revert', [snapId])
@@ -53,7 +44,6 @@ export function evmSnapshot(web3: Web3) {
 
 export function testWithGanache(name: string, fn: (web3: Web3) => void) {
   const web3 = new Web3('http://localhost:8545')
-  injectDebugProvider(web3)
 
   describe(name, () => {
     let snapId: string | null = null
