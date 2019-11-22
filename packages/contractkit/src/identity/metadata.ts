@@ -1,30 +1,21 @@
-import { AddressType } from '@celo/utils/lib/io'
-import { Signer } from '@celo/utils/lib/signatureUtils'
+import { AddressType, SignatureType } from '@celo/utils/lib/io'
+import { Signer, verifySignature } from '@celo/utils/lib/signatureUtils'
 import fetch from 'cross-fetch'
 import { isLeft } from 'fp-ts/lib/Either'
 import { readFileSync } from 'fs'
 import * as t from 'io-ts'
 import { PathReporter } from 'io-ts/lib/PathReporter'
-import {
-  Claim,
-  ClaimPayload,
-  hashOfClaim,
-  isOfType,
-  serializeClaim,
-  SerializedSignedClaimType,
-  SignedClaim,
-  SignedClaimType,
-  verifySignature,
-} from './claims/claim'
-import { ClaimTypes } from './claims/types'
+import { Claim, ClaimPayload, ClaimType, hashOfClaims, isOfType } from './claims/claim'
+import { ClaimTypes, SINGULAR_CLAIM_TYPES } from './claims/types'
 export { ClaimTypes } from './claims/types'
 
 const MetaType = t.type({
   address: AddressType,
+  signature: SignatureType,
 })
 
 export const IdentityMetadataType = t.type({
-  claims: t.array(SignedClaimType),
+  claims: t.array(ClaimType),
   meta: MetaType,
 })
 export type IdentityMetadata = t.TypeOf<typeof IdentityMetadataType>
@@ -37,6 +28,7 @@ export class IdentityMetadataWrapper {
       claims: [],
       meta: {
         address,
+        signature: '',
       },
     })
   }
@@ -56,42 +48,34 @@ export class IdentityMetadataWrapper {
   static fromRawString(rawData: string) {
     const data = JSON.parse(rawData)
 
-    const validatedMeta = MetaType.decode(data.meta)
-    if (isLeft(validatedMeta)) {
-      throw new Error('Meta payload is invalid: ' + PathReporter.report(validatedMeta).join(', '))
-    }
-
-    const address = validatedMeta.right.address
-
-    const verifySignatureAndParse = (claim: any) => {
-      const parsedClaim = SerializedSignedClaimType.decode(claim)
-      if (isLeft(parsedClaim)) {
-        throw new Error(`Serialized claim is not of the right format: ${claim}`)
-      }
-      if (!verifySignature(parsedClaim.right.payload, parsedClaim.right.signature, address)) {
-        throw new Error(`Could not verify signature of the claim: ${claim.payload}`)
-      }
-      return {
-        payload: JSON.parse(parsedClaim.right.payload),
-        signature: parsedClaim.right.signature,
-      }
-    }
-
-    // TODO: Validate that data.claims is an array
-    const parsedData = {
-      claims: data.claims.map(verifySignatureAndParse),
-      meta: validatedMeta.right,
-    }
-
-    // Here we are mostly validating the shape of the claims
-    const validatedData = IdentityMetadataType.decode(parsedData)
+    const validatedData = IdentityMetadataType.decode(data)
 
     if (isLeft(validatedData)) {
       // TODO: We could probably return a more useful error in the future
       throw new Error(PathReporter.report(validatedData).join(', '))
     }
 
-    return new IdentityMetadataWrapper(validatedData.right)
+    // Verify signature on the data
+    const claims = validatedData.right.claims
+    const hash = hashOfClaims(claims)
+    if (
+      claims.length > 0 &&
+      !verifySignature(hash, validatedData.right.meta.signature, validatedData.right.meta.address)
+    ) {
+      throw new Error('Signature could not be validated')
+    }
+
+    const res = new IdentityMetadataWrapper(validatedData.right)
+
+    // Verify that singular claim types appear at most once
+    SINGULAR_CLAIM_TYPES.forEach((claimType) => {
+      const results = res.filterClaims(claimType)
+      if (results.length > 1) {
+        throw new Error(`Found ${results.length} claims of type ${claimType}, should be at most 1`)
+      }
+    })
+
+    return res
   }
 
   constructor(data: IdentityMetadata) {
@@ -102,12 +86,13 @@ export class IdentityMetadataWrapper {
     return this.data.claims
   }
 
+  hashOfClaims() {
+    return hashOfClaims(this.data.claims)
+  }
+
   toString() {
     return JSON.stringify({
-      claims: this.data.claims.map((claim) => ({
-        payload: serializeClaim(claim.payload),
-        signature: claim.signature,
-      })),
+      claims: this.data.claims,
       meta: this.data.meta,
     })
   }
@@ -123,25 +108,23 @@ export class IdentityMetadataWrapper {
       default:
         break
     }
-    const signedClaim = await this.signClaim(claim, signer)
-    this.data.claims.push(signedClaim)
-    return signedClaim
+
+    if (SINGULAR_CLAIM_TYPES.includes(claim.type)) {
+      const index = this.data.claims.findIndex(isOfType(claim.type))
+      if (index !== -1) {
+        this.data.claims.splice(index, 1)
+      }
+    }
+
+    this.data.claims.push(claim)
+    this.data.meta.signature = await signer.sign(this.hashOfClaims())
   }
 
   findClaim<K extends ClaimTypes>(type: K): ClaimPayload<K> | undefined {
-    return this.data.claims.map((x) => x.payload).find(isOfType(type))
+    return this.data.claims.find(isOfType(type))
   }
 
   filterClaims<K extends ClaimTypes>(type: K): Array<ClaimPayload<K>> {
-    return this.data.claims.map((x) => x.payload).filter(isOfType(type))
-  }
-
-  private signClaim = async (claim: Claim, signer: Signer): Promise<SignedClaim> => {
-    const messageHash = hashOfClaim(claim)
-    const signature = await signer.sign(messageHash)
-    return {
-      payload: claim,
-      signature,
-    }
+    return this.data.claims.filter(isOfType(type))
   }
 }

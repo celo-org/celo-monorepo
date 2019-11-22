@@ -1,7 +1,7 @@
 import * as fs from 'fs'
 import { CONTRACTS_TO_COPY, downloadArtifacts, getContractAddresses } from 'src/lib/artifacts'
 import { addCeloEnvMiddleware, CeloEnvArgv } from 'src/lib/env-utils'
-import * as yargs from 'yargs'
+import yargs from 'yargs'
 
 export const command = 'contract-addresses'
 

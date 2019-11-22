@@ -7,6 +7,7 @@ import {
   initAndStartGeth,
   killInstance,
   sleep,
+  waitToFinishSyncing,
 } from './utils'
 
 describe('sync tests', function(this: any) {
@@ -28,8 +29,6 @@ describe('sync tests', function(this: any) {
     await hooks.before()
     // Restart validator nodes.
     await hooks.restart()
-    // Give validators time to connect to eachother.
-    await sleep(40)
     const fullInstance = {
       name: 'full',
       validating: false,
@@ -40,7 +39,8 @@ describe('sync tests', function(this: any) {
       peers: [await getEnode(8545)],
     }
     await initAndStartGeth(hooks.gethBinaryPath, fullInstance)
-    await sleep(3)
+    const web3 = new Web3('http://localhost:8553')
+    await waitToFinishSyncing(web3)
   })
 
   after(hooks.after)
@@ -66,17 +66,19 @@ describe('sync tests', function(this: any) {
 
       it('should sync the latest block', async () => {
         const validatingWeb3 = new Web3(`http://localhost:8545`)
-        const validatingFirstBlock = await validatingWeb3.eth.getBlock('latest')
-        await sleep(20)
-        const validatingLatestBlock = await validatingWeb3.eth.getBlock('latest')
-        await sleep(3)
+        const validatingFirstBlock = await validatingWeb3.eth.getBlockNumber()
         const syncWeb3 = new Web3(`http://localhost:8555`)
-        const syncLatestBlock = await syncWeb3.eth.getBlock('latest')
-        assert.isAbove(validatingLatestBlock.number, 1)
+        await waitToFinishSyncing(syncWeb3)
+        // Give the validators time to create more blocks.
+        await sleep(10)
+        const validatingLatestBlock = await validatingWeb3.eth.getBlockNumber()
+        await sleep(1)
+        const syncLatestBlock = await syncWeb3.eth.getBlockNumber()
+        assert.isAbove(validatingLatestBlock, 1)
         // Assert that the validator is still producing blocks.
-        assert.isAbove(validatingLatestBlock.number, validatingFirstBlock.number)
+        assert.isAbove(validatingLatestBlock, validatingFirstBlock)
         // Assert that the syncing node has synced with the validator.
-        assert.isAtLeast(syncLatestBlock.number, validatingLatestBlock.number)
+        assert.isAtLeast(syncLatestBlock, validatingLatestBlock)
       })
     })
   }

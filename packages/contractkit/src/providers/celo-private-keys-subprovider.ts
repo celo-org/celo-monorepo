@@ -1,4 +1,5 @@
 import { Callback, ErrorCallback, PrivateKeyWalletSubprovider } from '@0x/subproviders'
+import BigNumber from 'bignumber.js'
 import debugFactory from 'debug'
 import { JSONRPCRequestPayload } from 'ethereum-types'
 import Web3 from 'web3'
@@ -10,6 +11,10 @@ const debug = debugFactory('kit:providers:celo-private-keys-subprovider')
 // Same as geth
 // https://github.com/celo-org/celo-blockchain/blob/027dba2e4584936cc5a8e8993e4e27d28d5247b8/internal/ethapi/api.go#L1222
 const DefaultGasLimit = 90000
+
+// Default gateway fee to send the serving full-node on each transaction.
+// TODO(nategraf): Provide a method of fecthing the gateway fee value from the full-node peer.
+const DefaultGatewayFee = new BigNumber(10000)
 
 function getPrivateKeyWithout0xPrefix(privateKey: string) {
   return privateKey.toLowerCase().startsWith('0x') ? privateKey.substring(2) : privateKey
@@ -41,7 +46,7 @@ export class CeloPrivateKeysWalletProvider extends PrivateKeyWalletSubprovider {
   private readonly accountAddressToPrivateKey = new Map<string, string>()
 
   private chainId: number | null = null
-  private gasFeeRecipient: string | null = null
+  private gatewayFeeRecipient: string | null = null
 
   constructor(readonly privateKey: string) {
     // This won't accept a privateKey with 0x prefix and will call that an invalid key.
@@ -93,7 +98,8 @@ export class CeloPrivateKeysWalletProvider extends PrivateKeyWalletSubprovider {
     }
   }
 
-  public async signTransactionAsync(txParams: CeloPartialTxParams): Promise<string> {
+  public async signTransactionAsync(txParamsInput: CeloPartialTxParams): Promise<string> {
+    const txParams = { ...txParamsInput } // Make a copy of the input so it can be mutated.
     debug('signTransactionAsync: txParams are %o', txParams)
     if (!this.canSign(txParams.from)) {
       // If `handleRequest` works correctly then this code path should never trigger.
@@ -114,20 +120,20 @@ export class CeloPrivateKeysWalletProvider extends PrivateKeyWalletSubprovider {
       txParams.nonce = await this.getNonce(txParams.from)
     }
 
-    if (isEmpty(txParams.gasFeeRecipient)) {
-      txParams.gasFeeRecipient = await this.getCoinbase()
-      if (isEmpty(txParams.gasFeeRecipient)) {
-        // Fail early. The validator nodes will reject a transaction missing
-        // gas fee recipient anyways.
-        throw new Error(
-          'Gas fee recipient is missing, cannot retrieve it' +
-            ' from web3.eth.getCoinbase() either cannot process transaction'
-        )
-      }
+    if (isEmpty(txParams.gatewayFeeRecipient)) {
+      txParams.gatewayFeeRecipient = await this.getCoinbase()
     }
+    if (!isEmpty(txParams.gatewayFeeRecipient) && isEmpty(txParams.gatewayFee)) {
+      txParams.gatewayFee = DefaultGatewayFee.toString()
+    }
+    debug(
+      'Gateway fee for the transaction is %s paid to %s',
+      txParams.gatewayFee,
+      txParams.gatewayFeeRecipient
+    )
 
     if (isEmpty(txParams.gasPrice)) {
-      txParams.gasPrice = await this.getGasPrice(txParams.gasCurrency)
+      txParams.gasPrice = await this.getGasPrice(txParams.feeCurrency)
     }
     debug('Gas price for the transaction is %s', txParams.gasPrice)
 
@@ -180,32 +186,32 @@ export class CeloPrivateKeysWalletProvider extends PrivateKeyWalletSubprovider {
   }
 
   private async getCoinbase(): Promise<string> {
-    if (this.gasFeeRecipient === null) {
+    if (this.gatewayFeeRecipient === null) {
       debug('getCoinbase fetching Coinbase...')
       // Reference: https://github.com/ethereum/wiki/wiki/JSON-RPC#eth_coinbase
       const result = await this.emitPayloadAsync({
         method: 'eth_coinbase',
         params: [],
       })
-      this.gasFeeRecipient = result.result.toString()
-      debug('getCoinbase gas fee recipient is %s', this.gasFeeRecipient)
+      this.gatewayFeeRecipient = result.result.toString()
+      debug('getCoinbase gateway fee recipient is %s', this.gatewayFeeRecipient)
     }
-    if (this.gasFeeRecipient == null) {
+    if (this.gatewayFeeRecipient == null) {
       throw new Error(
         `Coinbase is null, we are not connected to a full node, cannot sign transactions locally`
       )
     }
-    return this.gasFeeRecipient
+    return this.gatewayFeeRecipient
   }
 
-  private async getGasPrice(gasCurrency: string | undefined): Promise<string | undefined> {
+  private async getGasPrice(feeCurrency: string | undefined): Promise<string | undefined> {
     // Gold Token
-    if (!gasCurrency) {
+    if (!feeCurrency) {
       return this.getGasPriceInCeloGold()
     }
     throw new Error(
       `celo-private-keys-subprovider@getGasPrice: gas price for ` +
-        `currency ${gasCurrency} cannot be computed in the CeloPrivateKeysWalletProvider, ` +
+        `currency ${feeCurrency} cannot be computed in the CeloPrivateKeysWalletProvider, ` +
         ' pass it explicitly'
     )
   }
