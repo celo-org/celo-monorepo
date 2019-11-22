@@ -1,7 +1,3 @@
-import { concurrentMap } from '@celo/utils/lib/async'
-import { Address, CeloContract } from '../base'
-import { Registry } from '../generated/types/Registry'
-import { ProposalBuilder, ProposalUtility } from '../governance/proposals'
 import { newKitFromWeb3 } from '../kit'
 import { NetworkConfig, testWithGanache } from '../test-utils/ganache-test'
 import { GovernanceWrapper } from './Governance'
@@ -9,41 +5,41 @@ import { GovernanceWrapper } from './Governance'
 const expConfig = NetworkConfig.governance
 
 testWithGanache('Governance Wrapper', (web3) => {
-  const ONE_SEC = 1000
-  const EXTENDED_TIMEOUT = 10 * ONE_SEC
+  // const ONE_SEC = 1000
+  // const EXTENDED_TIMEOUT = 10 * ONE_SEC
   const kit = newKitFromWeb3(web3)
   const minDeposit = web3.utils.toWei(expConfig.minDeposit.toString(), 'ether')
 
-  let accounts: Address[] = []
+  // let accounts: Address[] = []
   let governance: GovernanceWrapper
-  let registry: Registry
+  // let registry: Registry
 
   beforeAll(async () => {
-    accounts = await web3.eth.getAccounts()
+    // accounts = await web3.eth.getAccounts()
     governance = await kit.contracts.getGovernance()
-    registry = await kit._web3Contracts.getRegistry()
+    // registry = await kit._web3Contracts.getRegistry()
   })
 
-  type Repoint = [CeloContract, Address]
+  // type Repoint = [CeloContract, Address]
 
-  const registryRepointProposal = (repoints: Repoint[]) => {
-    const builder = new ProposalBuilder(kit)
-    repoints.forEach((r) =>
-      builder.addWeb3Tx(registry.methods.setAddressFor(...r), {
-        to: registry._address,
-        value: '0',
-      })
-    )
-    return new ProposalUtility(kit, builder.proposal)
-  }
+  // const registryRepointProposal = (repoints: Repoint[]) => {
+  //   const builder = new ProposalBuilder(kit)
+  //   repoints.forEach((r) =>
+  //     builder.addWeb3Tx(registry.methods.setAddressFor(...r), {
+  //       to: registry._address,
+  //       value: '0',
+  //     })
+  //   )
+  //   return new ProposalUtility(kit, builder.proposal)
+  // }
 
-  const verifyRepointResult = (repoints: Repoint[]) =>
-    concurrentMap(1, repoints, async (repoint) => {
-      const newAddress = await registry.methods
-        .getAddressForStringOrDie(repoint[0] as string)
-        .call()
-      expect(newAddress).toBe(repoint[1])
-    })
+  // const verifyRepointResult = (repoints: Repoint[]) =>
+  //   concurrentMap(1, repoints, async (repoint) => {
+  //     const newAddress = await registry.methods
+  //       .getAddressForStringOrDie(repoint[0] as string)
+  //       .call()
+  //     expect(newAddress).toBe(repoint[1])
+  //   })
 
   it('#getConfig', async () => {
     const config = await governance.getConfig()
