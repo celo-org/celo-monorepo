@@ -1,6 +1,6 @@
 import { StyleSheet, View, ViewStyle } from 'react-native'
-import { H4 } from 'src/fonts/Fonts'
-import { colors, standardStyles } from 'src/styles'
+import { H2 } from 'src/fonts/Fonts'
+import { standardStyles } from 'src/styles'
 
 interface Props {
   children: string
@@ -10,7 +10,7 @@ interface Props {
 export default function SectionTitle({ children, containerStyle }: Props) {
   return (
     <View style={[styles.border, standardStyles.blockMarginTop, containerStyle]}>
-      <H4>{children}</H4>
+      <H2>{children}</H2>
     </View>
   )
 }

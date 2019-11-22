@@ -50,7 +50,7 @@ export default React.memo(function Showcase({
       </Fade>
       <View style={styles.text}>
         <Text style={[fonts.h6, styles.title]}>{name}</Text>
-        <Text style={fonts.mini}>{description}</Text>
+        <Text style={fonts.legal}>{description}</Text>
       </View>
       <View style={brandStyles.button}>
         <Button kind={BTN.TERTIARY} text={'Download Assets'} href={uri} />

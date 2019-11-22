@@ -83,12 +83,12 @@ function Pigment({ hex, name, onCopyHex, justCopied }: Props & ColorData) {
                 ]}
               >
                 <CopyIcon size={14} color={foreGround} />
-                <Text style={[fonts.small, styles.copyText, { color: foreGround }]}>Copy</Text>
+                <Text style={[fonts.legal, styles.copyText, { color: foreGround }]}>Copy</Text>
               </View>
               <Text
                 style={[
                   styles.afterEffect,
-                  fonts.small,
+                  fonts.legal,
                   styles.copy,
                   justCopied && styles.copyHover,
                   styles.transitions,
@@ -103,9 +103,9 @@ function Pigment({ hex, name, onCopyHex, justCopied }: Props & ColorData) {
       </Hoverable>
       <View style={brandStyles.gap}>
         <Text style={fonts.h5}>{name}</Text>
-        <Text style={fonts.small}>{hex}</Text>
-        <Text style={fonts.small}>{hexToHumanRGB(hex)}</Text>
-        <Text style={fonts.small}>{cmyk}</Text>
+        <Text style={fonts.legal}>{hex}</Text>
+        <Text style={fonts.legal}>{hexToHumanRGB(hex)}</Text>
+        <Text style={fonts.legal}>{cmyk}</Text>
       </View>
     </View>
   )

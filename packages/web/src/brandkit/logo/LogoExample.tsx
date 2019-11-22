@@ -31,7 +31,7 @@ export default React.memo(function LogoExample({ btnText, caption, background, l
           <LogoDarkBg height={35} allWhite={logoType === Logos.black} />
         )}
       </View>
-      <Text style={fonts.small}>{caption}</Text>
+      <Text style={fonts.legal}>{caption}</Text>
       <Button kind={BTN.TERTIARY} text={btnText} style={styles.button} />
     </View>
   )

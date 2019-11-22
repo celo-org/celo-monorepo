@@ -1,5 +1,4 @@
 import { StyleSheet, TextStyle } from 'react-native'
-import { FontFace } from 'csstype'
 
 export enum colors {
   white = '#FFFFFF',
@@ -52,7 +51,7 @@ export const fontInfo: Record<string, TextStyle> = {
     fontFamily: typeFaces.garamond,
     textRendering: 'geometricPrecision',
     fontSize: 48,
-    lineHeight: 52,
+    lineHeight: 56,
     color: colors.dark,
   },
   h1Mobile: {
@@ -65,7 +64,7 @@ export const fontInfo: Record<string, TextStyle> = {
   h2: {
     fontFamily: typeFaces.garamond,
     textRendering: 'geometricPrecision',
-    fontSize: 44,
+    fontSize: 40,
     lineHeight: 48,
     color: colors.dark,
   },
@@ -79,7 +78,7 @@ export const fontInfo: Record<string, TextStyle> = {
   h3: {
     fontFamily: typeFaces.futura,
     fontSize: 28,
-    lineHeight: 32,
+    lineHeight: 36,
     fontWeight: '400',
     color: colors.dark,
     textRendering: 'geometricPrecision',
@@ -126,7 +125,7 @@ export const fontInfo: Record<string, TextStyle> = {
     fontFamily: typeFaces.futura,
     fontSize: 16,
     lineHeight: 20,
-    fontWeight: '300',
+    fontWeight: '400',
     color: colors.dark,
     textRendering: 'geometricPrecision',
   },
@@ -147,6 +146,7 @@ export const fontInfo: Record<string, TextStyle> = {
     lineHeight: 28,
     color: colors.dark,
   },
+  // called small in the style guide
   legal: {
     fontFamily: typeFaces.garamond,
     textRendering: 'geometricPrecision',
@@ -168,7 +168,7 @@ export const fontInfo: Record<string, TextStyle> = {
     lineHeight: 16,
     color: colors.dark,
   },
-  small: {
+  micro: {
     fontFamily: typeFaces.futura,
     fontSize: 14,
     color: colors.dark,

@@ -71,7 +71,7 @@ const TYPEFACES = [
   { font: fonts.h5a, name: 'Heading Five', data: fontInfo.h5a },
   { font: fonts.h6, name: 'Heading Six', data: fontInfo.h6 },
   { font: fonts.p, name: 'Body', data: fontInfo.p },
-  { font: fonts.mini, name: 'Small', data: fontInfo.mini },
+  { font: fonts.legal, name: 'Small', data: fontInfo.legal },
 ]
 
 const TypeScale = withNamespaces(NameSpaces.brand)(
@@ -110,12 +110,12 @@ const TypeScale = withNamespaces(NameSpaces.brand)(
                       screen === ScreenSizes.MOBILE ? styles.stylesAreaMobile : styles.stylesArea,
                     ]}
                   >
-                    <Text>
+                    <Text style={fonts.h6}>
                       {typeface.data.fontFamily.split(',')[0]} •{' '}
                       {getWeight(typeface.data.fontWeight)}
                     </Text>
                     <View>
-                      <Text>
+                      <Text style={fonts.h6}>
                         {typeface.data.fontSize}px / {typeface.data.lineHeight}px
                       </Text>
                     </View>
@@ -134,7 +134,7 @@ function getWeight(number) {
   switch (number) {
     case '500':
       return 'Medium'
-    case '400':
+    case '300':
       return 'Book'
     case undefined:
       return 'Regular'
