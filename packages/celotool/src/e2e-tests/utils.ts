@@ -107,6 +107,7 @@ export async function execCmdWithExitOnFailure(
 ) {
   const code = await execCmd(cmd, args, options)
   if (code !== 0) {
+    console.error('execCmd failed for: ' + [cmd].concat(args).join(' '))
     process.exit(1)
   }
 }
@@ -202,6 +203,7 @@ function writeGenesis(validators: Validator[], path: string, configOverrides: an
     validators,
     blockTime: 0,
     epoch: 10,
+    lookback: 2,
     requestTimeout: 3000,
     chainId: NetworkId,
     ...configOverrides,
@@ -357,18 +359,21 @@ export async function migrateContracts(
 ) {
   const migrationOverrides = _.merge(
     {
-      validators: {
-        validatorKeys: validatorPrivateKeys.map(ensure0x),
-        attestationKeys: attestationKeys.map(ensure0x),
-      },
       election: {
         minElectableValidators: '1',
+      },
+      reserve: {
+        goldBalance: 100000,
       },
       stableToken: {
         initialBalances: {
           addresses: validators.map(ensure0x),
           values: validators.map(() => '10000000000000000000000'),
         },
+      },
+      validators: {
+        validatorKeys: validatorPrivateKeys.map(ensure0x),
+        attestationKeys: attestationKeys.map(ensure0x),
       },
     },
     overrides
@@ -493,16 +498,22 @@ export function getContext(gethConfig: GethTestConfig) {
   const restart = async () => {
     await killGeth()
     let validatorIndex = 0
+    const validatorIndices: number[] = []
     for (const instance of gethConfig.instances) {
-      await restoreDatadir(instance)
-      if (!instance.privateKey && instance.validating) {
-        instance.privateKey = validatorPrivateKeys[validatorIndex]
-      }
-      await startGeth(gethBinaryPath, instance)
+      validatorIndices.push(validatorIndex)
       if (instance.validating) {
         validatorIndex++
       }
     }
+    await Promise.all(
+      gethConfig.instances.map(async (instance, i) => {
+        await restoreDatadir(instance)
+        if (!instance.privateKey && instance.validating) {
+          instance.privateKey = validatorPrivateKeys[validatorIndices[i]]
+        }
+        return startGeth(gethBinaryPath, instance)
+      })
+    )
   }
 
   const after = () => killGeth()
