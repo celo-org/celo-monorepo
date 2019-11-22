@@ -1,5 +1,5 @@
 import { CeloContractName } from '@celo/protocol/lib/registry-utils'
-import { assertRevert } from '@celo/protocol/lib/test-utils'
+import { assertEqualBN, assertRevert } from '@celo/protocol/lib/test-utils'
 import { BigNumber } from 'bignumber.js'
 import * as _ from 'lodash'
 import {
@@ -13,11 +13,13 @@ import {
   RegistryInstance,
   VestingFactoryContract,
   VestingFactoryInstance,
+  VestingInstanceContract,
 } from 'types'
 
 const ONE_GOLDTOKEN = new BigNumber('1000000000000000000')
 
 const VestingFactory: VestingFactoryContract = artifacts.require('VestingFactory')
+const VestingInstance: VestingInstanceContract = artifacts.require('VestingInstance')
 const Accounts: AccountsContract = artifacts.require('Accounts')
 const LockedGold: LockedGoldContract = artifacts.require('LockedGold')
 const GoldToken: GoldTokenContract = artifacts.require('GoldToken')
@@ -43,7 +45,7 @@ contract('Vesting', (accounts: string[]) => {
   let vestingFactoryInstance: VestingFactoryInstance
   let registry: RegistryInstance
 
-  const vestingDefaultSchedule = {
+  let vestingDefaultSchedule = {
     vestingBeneficiary: beneficiary,
     vestingAmount: ONE_GOLDTOKEN,
     vestingCliff: HOUR,
@@ -105,17 +107,77 @@ contract('Vesting', (accounts: string[]) => {
   })
 
   describe('#vesting creation()', () => {
-    it('should create a new vesting instance', async () => {
-      const vestingInstanceCreation = await vestingFactoryInstance.createVestingInstance(
-        ...Object.keys(vestingDefaultSchedule).map((k) => vestingDefaultSchedule[k])
+    const createNewVestingInstanceTx = async () => {
+      const vestingInstanceTx = await vestingFactoryInstance.createVestingInstance(
+        vestingDefaultSchedule.vestingBeneficiary,
+        vestingDefaultSchedule.vestingAmount,
+        vestingDefaultSchedule.vestingCliff,
+        vestingDefaultSchedule.vestingStartTime,
+        vestingDefaultSchedule.vestingPeriodSec,
+        vestingDefaultSchedule.vestAmountPerPeriod,
+        vestingDefaultSchedule.vestingRevokable,
+        vestingDefaultSchedule.vestingRevoker,
+        vestingDefaultSchedule.vestingRefundDestination
       )
+      return vestingInstanceTx
+    }
 
-      const newVestingInstanceCreatedEvent = _.find(vestingInstanceCreation.logs, {
+    it('should create a new vesting instance and emit event', async () => {
+      const newVestingInstanceTx = await createNewVestingInstanceTx()
+
+      const newVestingInstanceCreatedEvent = _.find(newVestingInstanceTx.logs, {
         event: 'NewVestingInstanceCreated',
       })
       assert.exists(newVestingInstanceCreatedEvent)
-      const vestingRegistry = await vestingFactoryInstance.hasVestedAt(beneficiary)
-      assert.equal(newVestingInstanceCreatedEvent.args.atAddress, vestingRegistry)
+    })
+
+    it('should create a new vesting instance and map beneficiary to vesting', async () => {
+      const newVestingInstanceTx = await createNewVestingInstanceTx()
+      const newVestingInstanceCreatedEvent = _.find(newVestingInstanceTx.logs, {
+        event: 'NewVestingInstanceCreated',
+      })
+      assert.exists(newVestingInstanceCreatedEvent)
+      const newVestingInstanceAddress = newVestingInstanceCreatedEvent.args.atAddress
+      const vestingInstanceRegistryAddress = await vestingFactoryInstance.hasVestedAt(beneficiary)
+      assert.equal(newVestingInstanceAddress, vestingInstanceRegistryAddress)
+    })
+
+    it('should set a beneficiary to vesting instance', async () => {
+      await createNewVestingInstanceTx()
+      const vestingInstanceRegistryAddress = await vestingFactoryInstance.hasVestedAt(beneficiary)
+      const vestingInstance = await VestingInstance.at(vestingInstanceRegistryAddress)
+      const vestingBeneficiary = await vestingInstance.beneficiary()
+      assert.equal(vestingBeneficiary, vestingDefaultSchedule.vestingBeneficiary)
+    })
+
+    it('should set vesting amount to vesting instance', async () => {
+      await createNewVestingInstanceTx()
+      const vestingInstanceRegistryAddress = await vestingFactoryInstance.hasVestedAt(beneficiary)
+      const vestingInstance = await VestingInstance.at(vestingInstanceRegistryAddress)
+      const [
+        vestingAmount,
+        vestAmountPerPeriod,
+        vestingPeriods,
+        vestingPeriodSec,
+        vestingStartTime,
+        vestingCliffStartTime,
+      ] = await vestingInstance.vestingScheme()
+      assertEqualBN(vestingAmount, vestingDefaultSchedule.vestingAmount)
+    })
+
+    it('should set vesting amount to vesting instance', async () => {
+      await createNewVestingInstanceTx()
+      const vestingInstanceRegistryAddress = await vestingFactoryInstance.hasVestedAt(beneficiary)
+      const vestingInstance = await VestingInstance.at(vestingInstanceRegistryAddress)
+      const [
+        vestingAmount,
+        vestAmountPerPeriod,
+        vestingPeriods,
+        vestingPeriodSec,
+        vestingStartTime,
+        vestingCliffStartTime,
+      ] = await vestingInstance.vestingScheme()
+      assertEqualBN(vestAmountPerPeriod, vestingDefaultSchedule.vestAmountPerPeriod)
     })
   })
 })
