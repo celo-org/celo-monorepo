@@ -8,37 +8,25 @@ import {
 
 export type Address = string
 
-export function eqAddress(a: Address, b: Address) {
-  return trimLeading0x(a).toLowerCase() === trimLeading0x(b).toLowerCase()
-}
+export const eqAddress = (a: Address, b: Address) =>
+  trimLeading0x(a).toLowerCase() === trimLeading0x(b).toLowerCase()
 
-export function trimLeading0x(input: string) {
-  return input.startsWith('0x') ? input.slice(2) : input
-}
+export const trimLeading0x = (input: string) => (input.startsWith('0x') ? input.slice(2) : input)
 
-export function ensureLeading0x(input: string) {
-  return input.startsWith('0x') ? input : `0x${input}`
-}
+export const ensureLeading0x = (input: string) => (input.startsWith('0x') ? input : `0x${input}`)
 
-export const privateKeyToAddress = (privateKey: string) => {
-  return toChecksumAddress(
-    ensureLeading0x(privateToAddress(Buffer.from(trimLeading0x(privateKey), 'hex')).toString('hex'))
-  )
-}
+export const hexToBuffer = (input: string) => Buffer.from(trimLeading0x(input), 'hex')
 
-export const privateKeyToPublicKey = (privateKey: string) => {
-  return toChecksumAddress(
-    ensureLeading0x(privateToPublic(Buffer.from(trimLeading0x(privateKey), 'hex')).toString('hex'))
-  )
-}
+export const privateKeyToAddress = (privateKey: string) =>
+  toChecksumAddress(ensureLeading0x(privateToAddress(hexToBuffer(privateKey)).toString('hex')))
 
-export const publicKeyToAddress = (publicKey: string) => {
-  return toChecksumAddress(
-    ensureLeading0x(pubToAddress(Buffer.from(trimLeading0x(publicKey), 'hex')).toString('hex'))
-  )
-}
+export const privateKeyToPublicKey = (privateKey: string) =>
+  toChecksumAddress(ensureLeading0x(privateToPublic(hexToBuffer(privateKey)).toString('hex')))
+
+export const publicKeyToAddress = (publicKey: string) =>
+  toChecksumAddress(ensureLeading0x(pubToAddress(hexToBuffer(publicKey)).toString('hex')))
 
 export const isValidPrivateKey = (privateKey: string) =>
-  privateKey.startsWith('0x') && isValidPrivate(Buffer.from(privateKey.slice(2), 'hex'))
+  privateKey.startsWith('0x') && isValidPrivate(hexToBuffer(privateKey))
 
 export { isValidAddress, isValidChecksumAddress, toChecksumAddress } from 'ethereumjs-util'

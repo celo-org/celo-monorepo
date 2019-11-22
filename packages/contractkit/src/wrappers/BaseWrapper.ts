@@ -1,4 +1,4 @@
-import { ensureLeading0x, trimLeading0x } from '@celo/utils/lib/address'
+import { ensureLeading0x, hexToBuffer } from '@celo/utils/lib/address'
 import { zip } from '@celo/utils/lib/collections'
 import BigNumber from 'bignumber.js'
 import Contract from 'web3/eth/contract'
@@ -33,7 +33,7 @@ export const valueToInt = (input: BigNumber.Value) =>
 export const valueToFrac = (numerator: BigNumber.Value, denominator: BigNumber.Value) =>
   valueToBigNumber(numerator).div(valueToBigNumber(denominator))
 
-export const stringToBuffer = (input: string) => Buffer.from(trimLeading0x(input), 'hex')
+export const stringToBuffer = hexToBuffer
 
 export const bufferToString = (buf: Buffer) => ensureLeading0x(buf.toString('hex'))
 
