@@ -37,12 +37,10 @@ const createApolloClient = () => {
 // TODO (@diminator): change once leaderboard endpoint is ready
 const query = gql`
   query AddresessOrderedByBalance {
-    addresses(
-      where: { fetched_coin_balance: { _gt: "0" } }
-      order_by: { fetched_coin_balance: desc }
-    ) {
-      fetched_coin_balance
-      hash
+    leaderboard {
+      points
+      address
+      identity
     }
   }
 `
@@ -60,10 +58,10 @@ class LeaderBoardApp extends React.PureComponent<I18nProps> {
               return <LeaderBoardError error={error} />
             }
             // TODO (@diminator): change once leaderboard endpoint is ready
-            const LEADERS = data.addresses.map((account) => {
+            const LEADERS = data.leaderboard.map((account) => {
               return {
-                identity: account.hash,
-                points: account.fetched_coin_balance,
+                identity: account.identity,
+                points: account.points,
               }
             })
             return <LeaderBoard leaders={LEADERS} />

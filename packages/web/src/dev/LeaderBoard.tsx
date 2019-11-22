@@ -97,7 +97,8 @@ function sorter(alpha: Competitor, bravo: Competitor) {
 const PORTIONS = 8
 
 function Axis({ max }: { max: number }) {
-  const portion = max / PORTIONS
+  const scaled_max = max / Math.pow(10, 20)
+  const portion = scaled_max / PORTIONS
 
   return (
     <View style={[standardStyles.row, styles.xaxis]}>
@@ -112,7 +113,7 @@ function Axis({ max }: { max: number }) {
           )
         })}
       <Text key={max} style={[fonts.small, textStyles.invert]}>
-        {max}
+        {round(scaled_max)}
       </Text>
     </View>
   )
