@@ -69,11 +69,8 @@ testWithGanache('Governance Wrapper', (web3: Web3) => {
     let proposal: Proposal
     beforeAll(() => (proposal = registryRepointProposal(repoints).proposal))
 
-    const proposeFn = async (proposer: Address) => {
-      const tx = governance.propose(proposal)
-      const options = { from: proposer, value: minDeposit }
-      await tx.sendAndWaitForReceipt(options)
-    }
+    const proposeFn = async (proposer: Address) =>
+      governance.propose(proposal).sendAndWaitForReceipt({ from: proposer, value: minDeposit })
 
     const upvoteFn = async (upvoter: Address, shouldTimeTravel = true) => {
       const tx = await governance.upvote(proposalID, upvoter)
