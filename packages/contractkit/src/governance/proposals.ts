@@ -5,6 +5,7 @@ import { Transaction, TransactionObject } from 'web3/eth/types'
 import { AllContracts, CeloContract } from '../base'
 import { obtainKitContractDetails } from '../explorer/base'
 import { BlockExplorer } from '../explorer/block-explorer'
+import { ABI as GovernanceABI } from '../generated/Governance'
 import { ContractKit } from '../kit'
 import { CeloTransactionObject, valueToString } from '../wrappers/BaseWrapper'
 import { GovernanceWrapper, Proposal, ProposalTransaction } from '../wrappers/Governance'
@@ -16,12 +17,16 @@ export interface ProposalTransactionJSON {
   value: string
 }
 
+export const PROPOSE_PARAM_ABI_TYPES = (GovernanceABI.find(
+  (abiEntry) => abiEntry.name! === 'propose'
+)!.inputs! as Array<{ type: string }>).map((abiInput) => abiInput.type)
+
 export class ProposalUtility {
   constructor(private readonly kit: ContractKit, public readonly proposal: Proposal) {}
 
   get hash(): Buffer {
     const paramsEncoded = this.kit.web3.eth.abi.encodeParameters(
-      ['uint256[]', 'address[]', 'bytes', 'uint256[]'],
+      PROPOSE_PARAM_ABI_TYPES,
       GovernanceWrapper.toParams(this.proposal)
     )
     return keccak256(paramsEncoded) as Buffer
@@ -31,7 +36,7 @@ export class ProposalUtility {
     const contractDetails = await obtainKitContractDetails(this.kit)
     const blockExplorer = new BlockExplorer(this.kit, contractDetails)
 
-    return concurrentMap(1, this.proposal, async (transaction) => {
+    return concurrentMap(4, this.proposal, async (transaction) => {
       const parsedTx = blockExplorer.tryParseTx(transaction as Transaction)
       if (parsedTx == null) {
         throw new Error(`Unable to parse ${transaction} with block explorer`)
@@ -39,7 +44,7 @@ export class ProposalUtility {
       return {
         contract: parsedTx.callDetails.contract as CeloContract,
         function: parsedTx.callDetails.function,
-        args: parsedTx.callDetails.args,
+        args: parsedTx.callDetails.argList,
         value: parsedTx.tx.value,
       }
     })

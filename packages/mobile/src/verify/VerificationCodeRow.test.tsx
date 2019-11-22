@@ -5,72 +5,28 @@ import VerificationCodeRow from 'src/verify/VerificationCodeRow'
 import { mockAttestationMessage } from 'test/values'
 
 describe('VerificationCodeRow', () => {
-  it('renders correctly when input enabled', () => {
+  it('renders correctly for input', () => {
     const { toJSON } = render(
       <VerificationCodeRow
         index={0}
-        attestationCodes={[]}
-        isInputEnabled={true}
-        inputValue={'test'}
-        onInputChange={jest.fn()}
-        isCodeSubmitting={false}
-        isCodeAccepted={false}
-      />
-    )
-    expect(toJSON()).toMatchSnapshot()
-  })
-  it('renders correctly when input disabled', () => {
-    const { toJSON } = render(
-      <VerificationCodeRow
-        index={0}
-        attestationCodes={[]}
-        isInputEnabled={false}
-        inputValue={'test'}
-        onInputChange={jest.fn()}
-        isCodeSubmitting={false}
-        isCodeAccepted={false}
-      />
-    )
-    expect(toJSON()).toMatchSnapshot()
-  })
-  it('renders correctly when submitting', () => {
-    const { toJSON } = render(
-      <VerificationCodeRow
-        index={0}
-        attestationCodes={[]}
-        isInputEnabled={true}
-        inputValue={'test'}
+        inputValue={mockAttestationMessage.code}
         onInputChange={jest.fn()}
         isCodeSubmitting={true}
-        isCodeAccepted={false}
+        attestationCodes={[]}
+        numCompleteAttestations={0}
       />
     )
     expect(toJSON()).toMatchSnapshot()
   })
-  it('renders correctly when code received', () => {
+  it('renders correctly for accepted code', () => {
     const { toJSON } = render(
       <VerificationCodeRow
         index={0}
-        attestationCodes={[mockAttestationMessage]}
-        isInputEnabled={true}
-        inputValue={'test'}
+        inputValue={mockAttestationMessage.code}
         onInputChange={jest.fn()}
-        isCodeSubmitting={false}
-        isCodeAccepted={false}
-      />
-    )
-    expect(toJSON()).toMatchSnapshot()
-  })
-  it('renders correctly when code accepted', () => {
-    const { toJSON } = render(
-      <VerificationCodeRow
-        index={0}
+        isCodeSubmitting={true}
         attestationCodes={[mockAttestationMessage]}
-        isInputEnabled={true}
-        inputValue={'test'}
-        onInputChange={jest.fn()}
-        isCodeSubmitting={false}
-        isCodeAccepted={true}
+        numCompleteAttestations={1}
       />
     )
     expect(toJSON()).toMatchSnapshot()

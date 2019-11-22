@@ -1,4 +1,4 @@
-import { ensureLeading0x, trimLeading0x } from '@celo/utils/lib/address'
+import { ensureLeading0x, hexToBuffer } from '@celo/utils/lib/address'
 import { zip } from '@celo/utils/lib/collections'
 import BigNumber from 'bignumber.js'
 import Contract from 'web3/eth/contract'
@@ -33,7 +33,7 @@ export const valueToInt = (input: BigNumber.Value) =>
 export const valueToFrac = (numerator: BigNumber.Value, denominator: BigNumber.Value) =>
   valueToBigNumber(numerator).div(valueToBigNumber(denominator))
 
-export const stringToBuffer = (input: string) => Buffer.from(trimLeading0x(input), 'hex')
+export const stringToBuffer = hexToBuffer
 
 export const bufferToString = (buf: Buffer) => ensureLeading0x(buf.toString('hex'))
 
@@ -220,19 +220,20 @@ export function toTransactionObject<O>(
   return new CeloTransactionObject(kit, txo, defaultParams)
 }
 
+export type CeloTransactionParams = Omit<Tx, 'data'>
 export class CeloTransactionObject<O> {
   constructor(
     private kit: ContractKit,
     readonly txo: TransactionObject<O>,
-    readonly defaultParams?: Omit<Tx, 'data'>
+    readonly defaultParams?: CeloTransactionParams
   ) {}
 
   /** send the transaction to the chain */
-  send = (params?: Omit<Tx, 'data'>): Promise<TransactionResult> => {
+  send = (params?: CeloTransactionParams): Promise<TransactionResult> => {
     return this.kit.sendTransactionObject(this.txo, { ...this.defaultParams, ...params })
   }
 
   /** send the transaction and waits for the receipt */
-  sendAndWaitForReceipt = (params?: Omit<Tx, 'data'>): Promise<TransactionReceipt> =>
+  sendAndWaitForReceipt = (params?: CeloTransactionParams): Promise<TransactionReceipt> =>
     this.send(params).then((result) => result.waitReceipt())
 }
