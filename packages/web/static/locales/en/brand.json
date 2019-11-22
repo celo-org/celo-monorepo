@@ -65,5 +65,10 @@
       "Jost*’s geometric form functions as approachable complimentary typography that we used more sparingly but speaks to the typography found in the logo and the round shape language in our illustration.\n\nUse Jost* for lorem ipsum dolor sit amet, consectetur adipiscing elit. Ut id elit sapien. Sed sem ante, ornare a ipsum ut, consequat ullamcorper lorem.",
     "getSubfontBTN": "Download Jost"
   },
+  "icons": {
+    "tile": "Icons",
+    "headling":
+      "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Pellentesque eget dignissim justo. Integer ac sodales dolor, quis aliquet nisi. Donec eget mattis neque, eu ultricies diam."
+  },
   "downloadAssetBtn": "Download Assets"
 }

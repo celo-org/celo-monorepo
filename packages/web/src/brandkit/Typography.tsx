@@ -3,13 +3,14 @@ import { withNamespaces } from 'react-i18next'
 import { StyleSheet, Text, View } from 'react-native'
 import Page from 'src/brandkit/common/Page'
 import { hashNav } from 'src/shared/menu-items'
-import { standardStyles, fonts, typeFaces } from 'src/styles'
+import { standardStyles, fonts, typeFaces, fontInfo } from 'src/styles'
 import { NameSpaces, I18nProps } from 'src/i18n'
 import PageHeadline from 'src/brandkit/common/PageHeadline'
 import Button, { BTN } from 'src/shared/Button.3'
 import { brandStyles } from 'src/brandkit/common/constants'
 import { H2, H3 } from 'src/fonts/Fonts'
 import SectionTitle from 'src/brandkit/common/SectionTitle'
+import { withScreenSize, ScreenProps, ScreenSizes } from 'src/layout/ScreenSize'
 
 const { brandTypography } = hashNav
 
@@ -62,49 +63,103 @@ const Overview = withNamespaces(NameSpaces.brand)(
 )
 
 const TYPEFACES = [
-  { font: fonts.h1, name: 'Heading One' },
-  { font: fonts.h2, name: 'Heading Two' },
-  { font: fonts.h3, name: 'Heading Three' },
-  { font: fonts.h4, name: 'Heading Four' },
-  { font: fonts.h5, name: 'Heading Five' },
-  { font: fonts.h5, name: 'Heading Six' },
-  { font: fonts.p, name: 'Body' },
-  { font: fonts.mini, name: 'Small' },
+  { font: fonts.h1, name: 'Heading One', data: fontInfo.h1 },
+  { font: fonts.h2, name: 'Heading Two', data: fontInfo.h2 },
+  { font: fonts.h3, name: 'Heading Three', data: fontInfo.h3 },
+  { font: fonts.h4, name: 'Heading Four', data: fontInfo.h4 },
+  { font: fonts.h5a, name: 'Heading Five', data: fontInfo.h5a },
+  { font: fonts.h6, name: 'Heading Six', data: fontInfo.h6 },
+  { font: fonts.p, name: 'Body', data: fontInfo.p },
+  { font: fonts.mini, name: 'Small', data: fontInfo.mini },
 ]
 
 const TypeScale = withNamespaces(NameSpaces.brand)(
-  React.memo(function _TypeScale({ t }: I18nProps) {
-    return (
-      <View>
-        <SectionTitle containerStyle={brandStyles.gap}>
-          {t('typography.typescaleTitle')}
-        </SectionTitle>
-        <Text style={[fonts.p, brandStyles.gap]}>{t('typography.typescaleText')}</Text>
-        <View
-          style={[
-            standardStyles.elementalMargin,
-            brandStyles.gap,
-            brandStyles.fullBorder,
-            styles.box,
-          ]}
-        >
-          {TYPEFACES.map((typeface) => {
-            return (
-              <View key={typeface.name} style={standardStyles.row}>
-                <Text style={typeface.font}>{typeface.name} </Text>
-                <Text>{typeface.font.fontFamily}</Text>
-              </View>
-            )
-          })}
+  React.memo(
+    withScreenSize<I18nProps>(function _TypeScale({ t, screen }: I18nProps & ScreenProps) {
+      return (
+        <View>
+          <SectionTitle containerStyle={brandStyles.gap}>
+            {t('typography.typescaleTitle')}
+          </SectionTitle>
+          <Text style={[fonts.p, brandStyles.gap]}>{t('typography.typescaleText')}</Text>
+          <View
+            style={[
+              standardStyles.elementalMargin,
+              brandStyles.gap,
+              brandStyles.fullBorder,
+              styles.box,
+            ]}
+          >
+            {TYPEFACES.map((typeface) => {
+              return (
+                <View
+                  key={typeface.name}
+                  style={[
+                    screen !== ScreenSizes.MOBILE && standardStyles.row,
+                    brandStyles.bottomBorder,
+                    screen === ScreenSizes.MOBILE ? styles.fontInfoMobile : styles.fontInfo,
+                  ]}
+                >
+                  <View style={styles.fontNameBox}>
+                    <Text style={typeface.font}>{typeface.name} </Text>
+                  </View>
+                  <View
+                    style={[
+                      standardStyles.row,
+                      screen === ScreenSizes.MOBILE ? styles.stylesAreaMobile : styles.stylesArea,
+                    ]}
+                  >
+                    <Text>
+                      {typeface.data.fontFamily.split(',')[0]} •{' '}
+                      {getWeight(typeface.data.fontWeight)}
+                    </Text>
+                    <View>
+                      <Text>
+                        {typeface.data.fontSize}px / {typeface.data.lineHeight}px
+                      </Text>
+                    </View>
+                  </View>
+                </View>
+              )
+            })}
+          </View>
         </View>
-      </View>
-    )
-  })
+      )
+    })
+  )
 )
+
+function getWeight(number) {
+  switch (number) {
+    case '500':
+      return 'Medium'
+    case '400':
+      return 'Book'
+    case undefined:
+      return 'Regular'
+    default:
+      return number
+  }
+}
 
 const styles = StyleSheet.create({
   box: {
     padding: 30,
     flex: 1,
   },
+  fontInfo: {
+    justifyContent: 'space-between',
+    alignItems: 'flex-end',
+    alignContent: 'flex-end',
+    paddingBottom: 15,
+    paddingTop: 30,
+    flexWrap: 'wrap',
+  },
+  fontNameBox: { flex: 1, minWidth: 280 },
+  fontInfoMobile: {
+    paddingBottom: 15,
+    paddingTop: 30,
+  },
+  stylesArea: { flex: 1, minWidth: 250, justifyContent: 'space-between', marginTop: 5 },
+  stylesAreaMobile: { flex: 1, marginTop: 5 },
 })

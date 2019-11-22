@@ -99,7 +99,7 @@ const styles = StyleSheet.create({
     height: '100vh',
     flex: 1,
     justifyContent: 'flex-end',
-    backgroundColor: colh6s.dark,
+    backgroundColor: colors.dark,
   },
   content: {
     flexDirection: 'row',

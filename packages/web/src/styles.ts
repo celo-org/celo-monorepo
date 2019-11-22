@@ -1,4 +1,5 @@
-import { StyleSheet } from 'react-native'
+import { StyleSheet, TextStyle } from 'react-native'
+import { FontFace } from 'csstype'
 
 export enum colors {
   white = '#FFFFFF',
@@ -46,7 +47,7 @@ export enum typeFaces {
   garamond = 'EB Garamond, eb-garamond, Garamond, serif',
 }
 
-export const fonts = StyleSheet.create({
+export const fontInfo: Record<string, TextStyle> = {
   h1: {
     fontFamily: typeFaces.garamond,
     textRendering: 'geometricPrecision',
@@ -79,6 +80,7 @@ export const fonts = StyleSheet.create({
     fontFamily: typeFaces.futura,
     fontSize: 28,
     lineHeight: 32,
+    fontWeight: '400',
     color: colors.dark,
     textRendering: 'geometricPrecision',
   },
@@ -103,6 +105,15 @@ export const fonts = StyleSheet.create({
     lineHeight: 24,
     color: colors.dark,
   },
+  h5a: {
+    fontFamily: typeFaces.futura,
+    fontSize: 20,
+    lineHeight: 24,
+    fontWeight: '500',
+    color: colors.dark,
+    textRendering: 'geometricPrecision',
+  },
+  // deprecated replaced with h6
   h5: {
     fontFamily: typeFaces.futura,
     fontSize: 16,
@@ -114,8 +125,8 @@ export const fonts = StyleSheet.create({
   h6: {
     fontFamily: typeFaces.futura,
     fontSize: 16,
-    lineHeight: 18,
-    fontWeight: '500',
+    lineHeight: 20,
+    fontWeight: '300',
     color: colors.dark,
     textRendering: 'geometricPrecision',
   },
@@ -169,14 +180,17 @@ export const fonts = StyleSheet.create({
     fontFamily: typeFaces.futura,
     textRendering: 'geometricPrecision',
   },
-  // @ts-ignore
   specialOneOff: {
     fontFamily: typeFaces.garamond,
     textRendering: 'geometricPrecision',
+    // @ts-ignore
     fontSize: 'calc(33px + 0.25vw)',
+    // @ts-ignore
     lineHeight: `calc(33px + 0.25vw)`,
   },
-})
+}
+
+export const fonts = StyleSheet.create(fontInfo)
 
 export const textStyles = StyleSheet.create({
   center: {

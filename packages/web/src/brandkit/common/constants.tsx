@@ -15,6 +15,10 @@ export const brandStyles = StyleSheet.create({
     borderWidth: 1,
     borderColor: colors.gray,
   },
+  bottomBorder: {
+    borderBottomColor: colors.gray,
+    borderBottomWidth: 1,
+  },
   button: {
     transform: [{ translateX: -20 }],
   },
