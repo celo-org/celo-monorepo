@@ -77,7 +77,10 @@ export class LockedGoldWrapper extends BaseWrapper<LockedGold> {
    * Relocks gold that has been unlocked but not withdrawn.
    * @param value The value to relock from pending withdrawals.
    */
-  async relock(account: Address, value: NumberLike): Promise<Array<CeloTransactionObject<void>>> {
+  async relock(
+    account: Address,
+    value: BigNumber.Value
+  ): Promise<Array<CeloTransactionObject<void>>> {
     const pendingWithdrawals = await this.getPendingWithdrawals(account)
     // Ensure there are enough pending withdrawals to relock.
     const totalValue = await this.getPendingWithdrawalsTotalValue(account)

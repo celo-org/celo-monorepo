@@ -27,6 +27,7 @@
     "approvalStageDuration": 100,
     "referendumStageDuration": 100,
     "executionStageDuration": 100,
-    "minDeposit": 1
+    "minDeposit": 1,
+    "concurrentProposals": 5
   }
 }

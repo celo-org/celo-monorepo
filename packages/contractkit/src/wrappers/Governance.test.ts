@@ -1,45 +1,52 @@
+import { NetworkConfig, testWithGanache, timeTravel } from '@celo/dev-utils/lib/ganache-test'
+import { Address } from '@celo/utils/lib/address'
+import { concurrentMap } from '@celo/utils/lib/async'
+import BigNumber from 'bignumber.js'
+import Web3 from 'web3'
+import { CeloContract } from '..'
+import { Registry } from '../generated/types/Registry'
+import { ProposalBuilder, ProposalUtility } from '../governance'
 import { newKitFromWeb3 } from '../kit'
-import { NetworkConfig, testWithGanache } from '../test-utils/ganache-test'
-import { GovernanceWrapper } from './Governance'
+import { GovernanceWrapper, Proposal, ProposalStage, VoteValue } from './Governance'
 
 const expConfig = NetworkConfig.governance
 
-testWithGanache('Governance Wrapper', (web3) => {
-  // const ONE_SEC = 1000
-  // const EXTENDED_TIMEOUT = 10 * ONE_SEC
+testWithGanache('Governance Wrapper', (web3: Web3) => {
+  const ONE_SEC = 1000
+  const EXTENDED_TIMEOUT = 10 * ONE_SEC
   const kit = newKitFromWeb3(web3)
   const minDeposit = web3.utils.toWei(expConfig.minDeposit.toString(), 'ether')
 
-  // let accounts: Address[] = []
+  let accounts: Address[] = []
   let governance: GovernanceWrapper
-  // let registry: Registry
+  let registry: Registry
 
   beforeAll(async () => {
-    // accounts = await web3.eth.getAccounts()
+    accounts = await web3.eth.getAccounts()
     governance = await kit.contracts.getGovernance()
-    // registry = await kit._web3Contracts.getRegistry()
+    registry = await kit._web3Contracts.getRegistry()
   })
 
-  // type Repoint = [CeloContract, Address]
+  type Repoint = [CeloContract, Address]
 
-  // const registryRepointProposal = (repoints: Repoint[]) => {
-  //   const builder = new ProposalBuilder(kit)
-  //   repoints.forEach((r) =>
-  //     builder.addWeb3Tx(registry.methods.setAddressFor(...r), {
-  //       to: registry._address,
-  //       value: '0',
-  //     })
-  //   )
-  //   return new ProposalUtility(kit, builder.proposal)
-  // }
+  const registryRepointProposal = (repoints: Repoint[]) => {
+    const builder = new ProposalBuilder(kit)
+    repoints.forEach((r) =>
+      builder.addWeb3Tx(registry.methods.setAddressFor(...r), {
+        to: registry._address,
+        value: '0',
+      })
+    )
+    return new ProposalUtility(kit, builder.proposal)
+  }
 
-  // const verifyRepointResult = (repoints: Repoint[]) =>
-  //   concurrentMap(1, repoints, async (repoint) => {
-  //     const newAddress = await registry.methods
-  //       .getAddressForStringOrDie(repoint[0] as string)
-  //       .call()
-  //     expect(newAddress).toBe(repoint[1])
-  //   })
+  const verifyRepointResult = (repoints: Repoint[]) =>
+    concurrentMap(1, repoints, async (repoint) => {
+      const newAddress = await registry.methods
+        .getAddressForStringOrDie(repoint[0] as string)
+        .call()
+      expect(newAddress).toBe(repoint[1])
+    })
 
   it('#getConfig', async () => {
     const config = await governance.getConfig()
@@ -52,123 +59,121 @@ testWithGanache('Governance Wrapper', (web3) => {
     expect(config.stageDurations.Execution).toEqBigNumber(expConfig.executionStageDuration)
   })
 
-  // NOTE: disabled while validators are not accessible from ganache
+  describe('Proposals', () => {
+    const repoints: Repoint[] = [
+      [CeloContract.Random, '0x0000000000000000000000000000000000000001'],
+      [CeloContract.Escrow, '0x0000000000000000000000000000000000000002'],
+    ]
+    const proposalID = new BigNumber(1)
 
-  // describe('Proposals', () => {
-  //   const repoints: Repoint[] = [
-  //     [CeloContract.Random, '0x0000000000000000000000000000000000000001'],
-  //     [CeloContract.Escrow, '0x0000000000000000000000000000000000000002'],
-  //   ]
-  //   const proposalID = new BigNumber(1)
+    let proposal: Proposal
+    beforeAll(() => (proposal = registryRepointProposal(repoints).proposal))
 
-  //   let proposal: Proposal
-  //   beforeAll(() => (proposal = registryRepointProposal(repoints).proposal))
+    const proposeFn = async (proposer: Address) => {
+      const tx = governance.propose(proposal)
+      const options = { from: proposer, value: minDeposit }
+      await tx.sendAndWaitForReceipt(options)
+    }
 
-  //   const proposeFn = async (proposer: Address) => {
-  //     const tx = governance.propose(proposal)
-  //     const options = { from: proposer, value: minDeposit }
-  //     await tx.sendAndWaitForReceipt(options)
-  //   }
+    const upvoteFn = async (upvoter: Address, shouldTimeTravel = true) => {
+      const tx = await governance.upvote(proposalID, upvoter)
+      await tx.sendAndWaitForReceipt({ from: upvoter })
+      if (shouldTimeTravel) {
+        await timeTravel(expConfig.dequeueFrequency, web3)
+        await governance.dequeueProposalsIfReady().sendAndWaitForReceipt()
+      }
+    }
 
-  //   const upvoteFn = async (upvoter: Address, shouldTimeTravel = true) => {
-  //     const tx = await governance.upvote(proposalID, upvoter)
-  //     await tx.sendAndWaitForReceipt({ from: upvoter })
-  //     if (shouldTimeTravel) {
-  //       await timeTravel(expConfig.dequeueFrequency, web3)
-  //       await governance.dequeueProposalsIfReady().sendAndWaitForReceipt()
-  //     }
-  //   }
+    // protocol/truffle-config defines approver address as accounts[0]
+    const approveFn = async () => {
+      const tx = await governance.approve(proposalID)
+      await tx.sendAndWaitForReceipt({ from: accounts[0] })
+      await timeTravel(expConfig.approvalStageDuration, web3)
+    }
 
-  //   // protocol/truffle-config defines approver address as accounts[0]
-  //   const approveFn = async () => {
-  //     const tx = await governance.approve(proposalID)
-  //     await tx.sendAndWaitForReceipt({ from: accounts[0] })
-  //     await timeTravel(expConfig.approvalStageDuration, web3)
-  //   }
+    const voteFn = async (voter: Address) => {
+      const tx = await governance.vote(proposalID, VoteValue.Yes)
+      await tx.sendAndWaitForReceipt({ from: voter })
+      await timeTravel(expConfig.referendumStageDuration, web3)
+    }
 
-  //   const voteFn = async (voter: Address) => {
-  //     const tx = await governance.vote(proposalID, VoteValue.Yes)
-  //     await tx.sendAndWaitForReceipt({ from: voter })
-  //     await timeTravel(expConfig.referendumStageDuration, web3)
-  //   }
+    it('#propose', async () => {
+      await proposeFn(accounts[0])
 
-  //   it.only('#propose', async () => {
-  //     await proposeFn(accounts[0])
+      const proposalRecord = await governance.getProposalRecord(proposalID)
+      expect(proposalRecord.metadata.proposer).toBe(accounts[0])
+      expect(proposalRecord.metadata.transactionCount).toBe(proposal.length)
+      expect(proposalRecord.proposal).toStrictEqual(proposal)
+      expect(proposalRecord.stage).toBe(ProposalStage.Queued)
+    })
 
-  //     // const proposalRecord = await governance.getProposalRecord(proposalID)
-  //     // expect(proposalRecord.metadata.proposer).toBe(accounts[0])
-  //     // expect(proposalRecord.metadata.transactionCount).toBe(proposal.length)
-  //     // expect(proposalRecord.proposal).toStrictEqual(proposal)
-  //     // expect(proposalRecord.stage).toBe(ProposalStage.Queued)
-  //   })
+    it('#upvote', async () => {
+      await proposeFn(accounts[0])
+      // shouldTimeTravel is false so getUpvotes isn't on dequeued proposal
+      await upvoteFn(accounts[1], false)
 
-  //   it('#upvote', async () => {
-  //     await proposeFn(accounts[0])
-  //     // shouldTimeTravel is false so getUpvotes isn't on dequeued proposal
-  //     await upvoteFn(accounts[1], false)
+      const voteWeight = await governance.getVoteWeight(accounts[1])
+      const upvotes = await governance.getUpvotes(proposalID)
+      expect(upvotes).toEqBigNumber(voteWeight)
+    })
 
-  //     const voteWeight = await governance.getVoteWeight(accounts[1])
-  //     const upvotes = await governance.getUpvotes(proposalID)
-  //     expect(upvotes).toEqBigNumber(voteWeight)
-  //   })
+    it('#revokeUpvote', async () => {
+      await proposeFn(accounts[0])
+      // shouldTimeTravel is false so revoke isn't on dequeued proposal
+      await upvoteFn(accounts[1], false)
 
-  //   it('#revokeUpvote', async () => {
-  //     await proposeFn(accounts[0])
-  //     // shouldTimeTravel is false so revoke isn't on dequeued proposal
-  //     await upvoteFn(accounts[1], false)
+      const before = await governance.getUpvotes(proposalID)
+      const upvoteRecord = await governance.getUpvoteRecord(accounts[1])
 
-  //     const before = await governance.getUpvotes(proposalID)
-  //     const upvoteRecord = await governance.getUpvoteRecord(accounts[1])
+      const tx = await governance.revokeUpvote(accounts[1])
+      await tx.sendAndWaitForReceipt({ from: accounts[1] })
 
-  //     const tx = await governance.revokeUpvote(accounts[1])
-  //     await tx.sendAndWaitForReceipt({ from: accounts[1] })
+      const after = await governance.getUpvotes(proposalID)
+      expect(after).toEqBigNumber(before.minus(upvoteRecord.upvotes))
+    })
 
-  //     const after = await governance.getUpvotes(proposalID)
-  //     expect(after).toEqBigNumber(before.minus(upvoteRecord.upvotes))
-  //   })
+    it('#approve', async () => {
+      await proposeFn(accounts[0])
+      await upvoteFn(accounts[1])
+      await approveFn()
 
-  //   it('#approve', async () => {
-  //     await proposeFn(accounts[0])
-  //     await upvoteFn(accounts[1])
-  //     await approveFn()
+      const approved = await governance.isApproved(proposalID)
+      expect(approved).toBeTruthy()
+    })
 
-  //     const approved = await governance.isApproved(proposalID)
-  //     expect(approved).toBeTruthy()
-  //   })
+    it('#vote', async () => {
+      await proposeFn(accounts[0])
+      await upvoteFn(accounts[1])
+      await approveFn()
+      await voteFn(accounts[2])
 
-  //   it('#vote', async () => {
-  //     await proposeFn(accounts[0])
-  //     await upvoteFn(accounts[1])
-  //     await approveFn()
-  //     await voteFn(accounts[2])
+      const voteWeight = await governance.getVoteWeight(accounts[2])
+      const yesVotes = (await governance.getVotes(proposalID))[VoteValue.Yes]
+      expect(yesVotes).toEqBigNumber(voteWeight)
 
-  //     const voteWeight = await governance.getVoteWeight(accounts[2])
-  //     const yesVotes = (await governance.getVotes(proposalID))[VoteValue.Yes]
-  //     expect(yesVotes).toEqBigNumber(voteWeight)
+      const passing = await governance.isProposalPassing(proposalID)
+      console.log('passing', passing)
+    })
 
-  //     const passing = await governance.isProposalPassing(proposalID)
-  //     console.log('passing', passing)
-  //   })
+    it(
+      '#execute',
+      async () => {
+        await proposeFn(accounts[0])
+        await upvoteFn(accounts[1])
+        await approveFn()
+        await voteFn(accounts[2])
 
-  //   it(
-  //     '#execute',
-  //     async () => {
-  //       await proposeFn(accounts[0])
-  //       await upvoteFn(accounts[1])
-  //       await approveFn()
-  //       await voteFn(accounts[2])
+        const tx = await governance.execute(proposalID)
+        await tx.sendAndWaitForReceipt()
 
-  //       const tx = await governance.execute(proposalID)
-  //       await tx.sendAndWaitForReceipt()
+        const exists = await governance.proposalExists(proposalID)
+        expect(exists).toBeFalsy()
 
-  //       const exists = await governance.proposalExists(proposalID)
-  //       expect(exists).toBeFalsy()
-
-  //       await verifyRepointResult(repoints)
-  //     },
-  //     EXTENDED_TIMEOUT
-  //   )
-  // })
+        await verifyRepointResult(repoints)
+      },
+      EXTENDED_TIMEOUT
+    )
+  })
 
   // describe('Hotfixes', () => {
   //   const repoints: Repoint[] = [
