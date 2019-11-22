@@ -13,10 +13,21 @@ export interface GasPriceMinimumConfig {
  */
 export class GasPriceMinimumWrapper extends BaseWrapper<GasPriceMinimum> {
   /**
+   * Query current gas price minimum in gGLD.
+   * @returns current gas price minimum in cGLD
+   */
+  gasPriceMinimum = proxyCall(this.contract.methods.gasPriceMinimum, undefined, valueToBigNumber)
+
+  /**
    * Query current gas price minimum.
    * @returns current gas price minimum in the requested currency
    */
-  gasPriceMinimum = proxyCall(this.contract.methods.gasPriceMinimum, undefined, valueToBigNumber)
+  getGasPriceMinimum = proxyCall(
+    this.contract.methods.getGasPriceMinimum,
+    undefined,
+    valueToBigNumber
+  )
+
   /**
    * Query target density parameter.
    * @returns the current block density targeted by the gas price minimum algorithm.

@@ -357,7 +357,7 @@ export class GovernanceWrapper extends BaseWrapper<Governance> {
     return queue.sort((a, b) => a.upvotes.comparedTo(b.upvotes))
   }
 
-  private queueIndexOfproposalID(queue: UpvoteRecord[], proposalID: BigNumber.Value) {
+  private indexOfProposalID(queue: UpvoteRecord[], proposalID: BigNumber.Value) {
     const idx = queue.findIndex((qp) => qp.proposalID.isEqualTo(proposalID))
     if (idx === -1) {
       throw new Error(`Proposal ${proposalID} not in queue`)
@@ -366,7 +366,7 @@ export class GovernanceWrapper extends BaseWrapper<Governance> {
   }
 
   private lesserAndGreater(queue: UpvoteRecord[], proposalID: BigNumber.Value) {
-    const idx = this.queueIndexOfproposalID(queue, proposalID)
+    const idx = this.indexOfProposalID(queue, proposalID)
     return {
       lesserID: idx === 0 ? ZERO_BN : queue[idx - 1].proposalID,
       greaterID: idx === queue.length - 1 ? ZERO_BN : queue[idx + 1].proposalID,
@@ -375,7 +375,7 @@ export class GovernanceWrapper extends BaseWrapper<Governance> {
 
   private async withUpvoteRevoked(queue: UpvoteRecord[], upvoter: Address) {
     const upvoteRecord = await this.getUpvoteRecord(upvoter)
-    const queueIndex = this.queueIndexOfproposalID(queue, upvoteRecord.proposalID)
+    const queueIndex = this.indexOfProposalID(queue, upvoteRecord.proposalID)
     queue[queueIndex].upvotes = queue[queueIndex].upvotes.minus(upvoteRecord.upvotes)
     return {
       queue: this.sortedQueue(queue),
@@ -389,7 +389,7 @@ export class GovernanceWrapper extends BaseWrapper<Governance> {
     upvoter: Address
   ) {
     const weight = await this.getVoteWeight(upvoter)
-    const queueIndex = this.queueIndexOfproposalID(queue, proposalID)
+    const queueIndex = this.indexOfProposalID(queue, proposalID)
     queue[queueIndex].upvotes = queue[queueIndex].upvotes.plus(weight)
     return this.sortedQueue(queue)
   }

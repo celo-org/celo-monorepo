@@ -98,9 +98,26 @@ export class ValidatorsWrapper extends BaseWrapper<Validators> {
     }
   }
 
-  async signerToAccount(signerAddress: Address) {
+  /**
+   * Returns the account associated with `signer`.
+   * @param signer The address of an account or currently authorized validator signer.
+   * @dev Fails if the `signer` is not an account or currently authorized validator.
+   * @return The associated account.
+   */
+  async validatorSignerToAccount(signerAddress: Address) {
     const accounts = await this.kit.contracts.getAccounts()
     return accounts.validatorSignerToAccount(signerAddress)
+  }
+
+  /**
+   * Returns the account associated with `signer`.
+   * @param signer The address of the account or previously authorized signer.
+   * @dev Fails if the `signer` is not an account or previously authorized signer.
+   * @return The associated account.
+   */
+  async signerToAccount(signerAddress: Address) {
+    const accounts = await this.kit.contracts.getAccounts()
+    return accounts.signerToAccount(signerAddress)
   }
 
   /**
@@ -164,11 +181,18 @@ export class ValidatorsWrapper extends BaseWrapper<Validators> {
     const res = await this.contract.methods.getValidator(address).call()
     return {
       address,
-      ecdsaPublicKey: res[0] as any,
-      blsPublicKey: res[1] as any,
-      affiliation: res[2],
-      score: fromFixed(new BigNumber(res[3])),
+      // @ts-ignore Incorrect type for bytes
+      ecdsaPublicKey: res.ecdsaPublicKey,
+      // @ts-ignore Incorrect type for bytes
+      blsPublicKey: res.blsPublicKey,
+      affiliation: res.affiliation,
+      score: fromFixed(new BigNumber(res.score)),
     }
+  }
+
+  async getValidatorFromSigner(address: Address): Promise<Validator> {
+    const account = await this.signerToAccount(address)
+    return this.getValidator(account)
   }
 
   /** Get ValidatorGroup information */
