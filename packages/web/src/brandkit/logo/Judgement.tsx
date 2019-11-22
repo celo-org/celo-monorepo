@@ -33,7 +33,6 @@ const styles = StyleSheet.create({
   box: {
     paddingHorizontal: GAP,
     flex: 1,
-    minWidth: 220,
   },
   image: {
     height: 24,

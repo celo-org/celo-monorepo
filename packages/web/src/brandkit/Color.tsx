@@ -10,6 +10,7 @@ import Judgement, { Value } from 'src/brandkit/logo/Judgement'
 import { I18nProps, NameSpaces } from 'src/i18n'
 import { hashNav } from 'src/shared/menu-items'
 import { colors, fonts, standardStyles } from 'src/styles'
+import { withScreenSize, ScreenProps, ScreenSizes } from 'src/layout/ScreenSize'
 
 const { brandColor } = hashNav
 
@@ -25,22 +26,22 @@ export default React.memo(function Color() {
 })
 
 const PRIMARY_PALETTE = [
-  { name: 'Green', hex: colors.primary },
-  { name: 'Gold', hex: colors.gold },
-  { name: 'Dark', hex: colors.dark },
+  { name: 'Celo Green', hex: colors.primary },
+  { name: 'Celo Gold', hex: colors.gold },
+  { name: 'Celo Dark', hex: colors.dark },
   { name: 'White', hex: colors.white },
 ]
 
 const ACCENT_PALETTE = [
-  { name: 'Purple', hex: colors.purple },
+  { name: 'Violet', hex: colors.purple },
   { name: 'Red', hex: colors.red },
-  { name: 'Light Blue', hex: colors.lightBlue },
-  { name: 'Deep Blue', hex: colors.deepBlue },
+  { name: 'Cyan', hex: colors.lightBlue },
+  { name: 'Blue', hex: colors.deepBlue },
 ]
 
 const GRAY_PALETTE = [
+  { name: 'Heavy Gray', hex: colors.grayHeavy },
   { name: 'Gray', hex: colors.gray },
-  { name: 'Dark Gray', hex: colors.grayHeavy },
   { name: 'Light Gray', hex: colors.lightGray },
   { name: 'Faint Gray', hex: colors.faintGray },
 ]
@@ -71,51 +72,66 @@ const Overview = withNamespaces(NameSpaces.brand)(function _Overview({ t }: I18n
   )
 })
 
-const Backgrounds = withNamespaces(NameSpaces.brand)(function _Backgrounds({ t }: I18nProps) {
-  return (
-    <View>
-      <SectionTitle containerStyle={brandStyles.gap}>{t('color.backgroundTitle')}</SectionTitle>
-      <Palette text={t('color.backgroundText')} colors={BACKGROUND_PALETTE} />
-      <Text style={[brandStyles.gap, fonts.h3]}>{t('color.contrastTitle')}</Text>
-      <Text style={[brandStyles.gap, fonts.p]}>{t('color.contrastText')}</Text>
-      <View style={[standardStyles.elementalMargin, standardStyles.row]}>
-        <Lorem color={colors.dark} backgroundColor={colors.white} withGap={true} hasBorder={true} />
-        <Lorem color={colors.white} backgroundColor={colors.dark} withGap={true} />
-      </View>
-      <Text style={[brandStyles.gap, fonts.p]}>{t('color.contrastText2')}</Text>
-      <View style={brandStyles.tiling}>
-        <Judgement is={Value.Bad}>
-          <Lorem color={colors.gold} backgroundColor={colors.faintGold} />
-        </Judgement>
-        <Judgement is={Value.Bad}>
-          <Lorem color={colors.primary} backgroundColor={colors.deepBlue} />
-        </Judgement>
-        <Judgement is={Value.Bad}>
+const Backgrounds = withNamespaces(NameSpaces.brand)(
+  withScreenSize<I18nProps>(function _Backgrounds({ t, screen }: I18nProps & ScreenProps) {
+    const stylesForJudgemnt = screen === ScreenSizes.DESKTOP ? styles.column : [standardStyles.row]
+
+    return (
+      <View>
+        <SectionTitle containerStyle={brandStyles.gap}>{t('color.backgroundTitle')}</SectionTitle>
+        <Palette text={t('color.backgroundText')} colors={BACKGROUND_PALETTE} />
+        <Text style={[brandStyles.gap, fonts.h5a, standardStyles.elementalMarginBottom]}>
+          {t('color.contrastTitle')}
+        </Text>
+        <Text style={[brandStyles.gap, fonts.p]}>{t('color.contrastText')}</Text>
+        <View style={[standardStyles.elementalMargin, standardStyles.row]}>
           <Lorem
-            color={colors.white}
-            backgroundColor={colors.gray}
-            image={require('src/brandkit/images/lilah.jpg')}
+            color={colors.dark}
+            backgroundColor={colors.white}
+            withGap={true}
+            hasBorder={true}
           />
-        </Judgement>
+          <Lorem color={colors.white} backgroundColor={colors.dark} withGap={true} />
+        </View>
+        <Text style={[brandStyles.gap, fonts.p]}>{t('color.contrastText2')}</Text>
+        <View style={screen === ScreenSizes.DESKTOP ? brandStyles.tiling : { width: '100%' }}>
+          <View style={stylesForJudgemnt}>
+            <Judgement is={Value.Bad}>
+              <Lorem color={colors.gold} backgroundColor={colors.faintGold} />
+            </Judgement>
+            <Judgement is={Value.Good}>
+              <Lorem color={colors.dark} backgroundColor={colors.faintGold} />
+            </Judgement>
+          </View>
+          <View style={stylesForJudgemnt}>
+            <Judgement is={Value.Bad}>
+              <Lorem
+                color={colors.white}
+                backgroundColor={colors.gray}
+                image={require('src/brandkit/images/lilah.jpg')}
+              />
+            </Judgement>
+            <Judgement is={Value.Good}>
+              <Lorem
+                color={colors.white}
+                backgroundColor={colors.dark}
+                image={require('src/brandkit/images/lilahOverlay.jpg')}
+              />
+            </Judgement>
+          </View>
+          <View style={stylesForJudgemnt}>
+            <Judgement is={Value.Bad}>
+              <Lorem color={colors.primary} backgroundColor={colors.deepBlue} />
+            </Judgement>
+            <Judgement is={Value.Good}>
+              <Lorem color={colors.white} backgroundColor={colors.deepBlue} />
+            </Judgement>
+          </View>
+        </View>
       </View>
-      <View style={brandStyles.tiling}>
-        <Judgement is={Value.Good}>
-          <Lorem color={colors.dark} backgroundColor={colors.faintGold} />
-        </Judgement>
-        <Judgement is={Value.Good}>
-          <Lorem color={colors.white} backgroundColor={colors.deepBlue} />
-        </Judgement>
-        <Judgement is={Value.Good}>
-          <Lorem
-            color={colors.white}
-            backgroundColor={colors.dark}
-            image={require('src/brandkit/images/lilahOverlay.jpg')}
-          />
-        </Judgement>
-      </View>
-    </View>
-  )
-})
+    )
+  })
+)
 
 interface LoremProps {
   backgroundColor: colors
@@ -154,5 +170,8 @@ const styles = StyleSheet.create({
     paddingVertical: 20,
     paddingHorizontal: 20,
     minHeight: 150,
+  },
+  column: {
+    flex: 1,
   },
 })
