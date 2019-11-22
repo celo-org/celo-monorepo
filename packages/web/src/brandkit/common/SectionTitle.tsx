@@ -17,8 +17,6 @@ export default function SectionTitle({ children, containerStyle }: Props) {
 
 const styles = StyleSheet.create({
   border: {
-    borderBottomColor: colors.light,
-    borderBottomWidth: 1,
     paddingBottom: 10,
     marginVertical: 20,
   },

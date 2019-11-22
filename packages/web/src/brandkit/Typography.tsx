@@ -4,13 +4,13 @@ import { brandStyles } from 'src/brandkit/common/constants'
 import Page from 'src/brandkit/common/Page'
 import PageHeadline from 'src/brandkit/common/PageHeadline'
 import SectionTitle from 'src/brandkit/common/SectionTitle'
+import UseageExamples from 'src/brandkit/typography/UseageExample'
 import { H2, H3 } from 'src/fonts/Fonts'
 import { I18nProps, NameSpaces, withNamespaces } from 'src/i18n'
 import { ScreenProps, ScreenSizes, withScreenSize } from 'src/layout/ScreenSize'
 import Button, { BTN } from 'src/shared/Button.3'
 import { hashNav } from 'src/shared/menu-items'
 import { fontInfo, fonts, standardStyles, typeFaces } from 'src/styles'
-import UseageExamples from 'src/brandkit/typography/UseageExample'
 
 const { brandTypography } = hashNav
 
@@ -36,14 +36,14 @@ const Overview = withNamespaces(NameSpaces.brand)(
           style={standardStyles.elementalMarginBottom}
         />
         <View style={[brandStyles.gap, standardStyles.blockMarginBottom]}>
-          <Button kind={BTN.PRIMARY} text={t('typograpphy.downloadAllBTN')} />
+          <Button kind={BTN.PRIMARY} text={t('typography.downloadAllBTN')} />
         </View>
         <View style={brandStyles.gap}>
           <H2>{t('typography.mainFontTitle')}</H2>
           <Text style={fonts.p}>{t('typography.mainFontText')}</Text>
           <Button
             kind={BTN.TERTIARY}
-            text={t('typograpphy.getMainfontBTN')}
+            text={t('typography.getMainfontBTN')}
             style={brandStyles.button}
           />
           <View style={standardStyles.blockMargin}>
@@ -53,7 +53,7 @@ const Overview = withNamespaces(NameSpaces.brand)(
             </Text>
             <Button
               kind={BTN.TERTIARY}
-              text={t('typograpphy.getSubfontBTN')}
+              text={t('typography.getSubfontBTN')}
               style={brandStyles.button}
             />
           </View>
