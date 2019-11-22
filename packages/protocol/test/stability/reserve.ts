@@ -322,4 +322,36 @@ contract('Reserve', (accounts: string[]) => {
       assert.equal(events[0].args.value, newTobinTaxStalenessThreshold)
     })
   })
+
+  describe('#setAssetAllocations', () => {
+    const newAssetAllocationSymbols = ['cGLD', 'BTC']
+    const newAssetAllocationWeights = [
+      new BigNumber(500000000000000000000000),
+      new BigNumber(500000000000000000000000),
+    ]
+    it('should allow owner to set asset allocations', async () => {
+      await reserve.setAssetAllocations(newAssetAllocationSymbols, newAssetAllocationWeights)
+      assert.equal(await reserve.getAssetAllocationSymbols(), newAssetAllocationSymbols)
+      assert.equal(await reserve.getAssetAllocationWeights(), newAssetAllocationWeights)
+    })
+
+    it('should not allow other users to set tobin tax staleness threshold', async () => {
+      await assertRevert(
+        reserve.setAssetAllocations(newAssetAllocationSymbols, newAssetAllocationWeights, {
+          from: nonOwner,
+        })
+      )
+    })
+
+    it('should emit a AssetAllocationSet event', async () => {
+      const response = await reserve.setAssetAllocations(
+        newAssetAllocationSymbols,
+        newAssetAllocationWeights
+      )
+      const events = response.logs
+      assert.equal(events.length, 1)
+      assert.equal(events[0].event, 'AssetAllocationSet')
+      //assert.equal(events[0].args.value, newTobinTaxStalenessThreshold)
+    })
+  })
 })
