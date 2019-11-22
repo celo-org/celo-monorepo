@@ -34,7 +34,6 @@ const createApolloClient = () => {
   })
 }
 
-// TODO (@diminator): change once leaderboard endpoint is ready
 const query = gql`
   query AddresessOrderedByBalance {
     leaderboard {
@@ -57,7 +56,6 @@ class LeaderBoardApp extends React.PureComponent<I18nProps> {
             if (error) {
               return <LeaderBoardError error={error} />
             }
-            // TODO (@diminator): change once leaderboard endpoint is ready
             const LEADERS = data.leaderboard.map((account) => {
               return {
                 identity: account.identity,
