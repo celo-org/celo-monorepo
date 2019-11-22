@@ -16,6 +16,7 @@
   ],
   "scripts": {
     "build": "tsc -b .",
+    "watch": "tsc -b . --watch",
     "clean": "tsc -b . --clean",
     "clean:all": "yarn clean && rm -rf src/generated",
     "build:gen": "yarn --cwd ../protocol build",
