@@ -1,25 +1,8 @@
 import { Address } from '@celo/utils/lib/address'
 import abi, { ABIDefinition } from 'web3-eth-abi'
-import { Block, Transaction } from 'web3/eth/types'
 import { EventLog, Log, TransactionReceipt } from 'web3/types'
 import { ContractKit } from '../kit'
 import { ContractDetails, mapFromPairs, obtainKitContractDetails } from './base'
-
-export interface CallDetails {
-  contract: string
-  function: string
-  parameters: Record<string, any>
-}
-
-export interface ParsedTx {
-  callDetails: CallDetails
-  tx: Transaction
-}
-
-export interface ParsedBlock {
-  block: Block
-  parsedTx: ParsedTx[]
-}
 
 interface ContractMapping {
   details: ContractDetails

@@ -1,17 +1,15 @@
-import BigNumber from 'bignumber.js'
-
 import { eqAddress } from '@celo/utils/lib/address'
-
+import BigNumber from 'bignumber.js'
 import { Address, CeloContract, CeloToken, NULL_ADDRESS } from '../base'
 import { SortedOracles } from '../generated/types/SortedOracles'
 import {
   BaseWrapper,
   CeloTransactionObject,
-  numberLikeToBigNumber,
-  numberLikeToFrac,
-  numberLikeToInt,
   proxyCall,
   toTransactionObject,
+  valueToBigNumber,
+  valueToFrac,
+  valueToInt,
 } from './BaseWrapper'
 
 export enum MedianRelation {
@@ -47,7 +45,7 @@ export class SortedOraclesWrapper extends BaseWrapper<SortedOracles> {
   async numRates(token: CeloToken): Promise<number> {
     const tokenAddress = await this.kit.registry.addressFor(token)
     const response = await this.contract.methods.numRates(tokenAddress).call()
-    return numberLikeToInt(response)
+    return valueToInt(response)
   }
 
   /**
@@ -60,7 +58,7 @@ export class SortedOraclesWrapper extends BaseWrapper<SortedOracles> {
     const tokenAddress = await this.kit.registry.addressFor(token)
     const response = await this.contract.methods.medianRate(tokenAddress).call()
     return {
-      rate: numberLikeToFrac(response[0], response[1]),
+      rate: valueToFrac(response[0], response[1]),
     }
   }
 
@@ -82,7 +80,7 @@ export class SortedOraclesWrapper extends BaseWrapper<SortedOracles> {
   reportExpirySeconds = proxyCall(
     this.contract.methods.reportExpirySeconds,
     undefined,
-    numberLikeToBigNumber
+    valueToBigNumber
   )
 
   /**
@@ -158,7 +156,7 @@ export class SortedOraclesWrapper extends BaseWrapper<SortedOracles> {
       const medRelIndex = parseInt(response[2][i], 10)
       rates.push({
         address: response[0][i],
-        rate: numberLikeToFrac(response[1][i], denominator),
+        rate: valueToFrac(response[1][i], denominator),
         medianRelation: medRelIndex,
       })
     }
@@ -166,7 +164,7 @@ export class SortedOraclesWrapper extends BaseWrapper<SortedOracles> {
   }
 
   private async getInternalDenominator(): Promise<BigNumber> {
-    return numberLikeToBigNumber(await this.contract.methods.DENOMINATOR().call())
+    return valueToBigNumber(await this.contract.methods.DENOMINATOR().call())
   }
 
   private async findLesserAndGreaterKeys(
@@ -180,7 +178,7 @@ export class SortedOraclesWrapper extends BaseWrapper<SortedOracles> {
     // This is how the contract calculates the rate from the numerator and denominator.
     // To figure out where this new report goes in the list, we need to compare this
     // value with the other rates
-    const value = numberLikeToFrac(numerator, denominator)
+    const value = valueToFrac(numerator, denominator)
 
     let greaterKey = NULL_ADDRESS
     let lesserKey = NULL_ADDRESS

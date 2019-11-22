@@ -1,18 +1,14 @@
+import { ensureLeading0x, trimLeading0x } from '@celo/utils/lib/address'
+import { zip } from '@celo/utils/lib/collections'
 import BigNumber from 'bignumber.js'
 import Contract from 'web3/eth/contract'
 import { TransactionObject, Tx } from 'web3/eth/types'
 import { TransactionReceipt } from 'web3/types'
-
-import { prependLeading0x, trimLeading0x } from '@celo/utils/lib/address'
-import { zip } from '@celo/utils/lib/collections'
-
 import { ContractKit } from '../kit'
 import { TransactionResult } from '../utils/tx-result'
 
 /** Represents web3 native contract Method */
 type Method<I extends any[], O> = (...args: I) => TransactionObject<O>
-
-export type NumberLike = string | number | BigNumber
 
 /** Base ContractWrapper */
 export abstract class BaseWrapper<T extends Contract> {
@@ -25,31 +21,31 @@ export abstract class BaseWrapper<T extends Contract> {
   }
 }
 
-export const numberLikeToBigNumber = (input: NumberLike) => new BigNumber(input)
+export const valueToBigNumber = (input: BigNumber.Value) => new BigNumber(input)
 
-export const numberLikeToString = (input: NumberLike) => numberLikeToBigNumber(input).toFixed()
+export const valueToString = (input: BigNumber.Value) => valueToBigNumber(input).toFixed()
 
-export const numberLikeToInt = (input: NumberLike) =>
-  numberLikeToBigNumber(input)
+export const valueToInt = (input: BigNumber.Value) =>
+  valueToBigNumber(input)
     .integerValue()
     .toNumber()
 
-export const numberLikeToFrac = (numerator: NumberLike, denominator: NumberLike) =>
-  numberLikeToBigNumber(numerator).div(numberLikeToBigNumber(denominator))
+export const valueToFrac = (numerator: BigNumber.Value, denominator: BigNumber.Value) =>
+  valueToBigNumber(numerator).div(valueToBigNumber(denominator))
 
-export const stringToBuffer = (input: string | string[]) =>
-  Buffer.from(trimLeading0x(input as string), 'hex')
+export const stringToBuffer = (input: string) => Buffer.from(trimLeading0x(input), 'hex')
 
-export const bufferToString = (buf: Buffer) => prependLeading0x(buf.toString('hex'))
+export const bufferToString = (buf: Buffer) => ensureLeading0x(buf.toString('hex'))
 
 type SolBytes = Array<string | number[]>
-export function toSolidityBytes(input: Buffer | string): SolBytes {
-  const result =
-    typeof input === typeof Buffer
-      ? bufferToString(input as Buffer)
-      : prependLeading0x(input as string)
-  return result as any
-}
+const toBytes = (input: any): SolBytes => input
+const fromBytes = (input: SolBytes): any => input as any
+
+export const stringToBytes = (input: string) => toBytes(ensureLeading0x(input))
+
+export const bufferToBytes = (input: Buffer) => stringToBytes(bufferToString(input))
+
+export const bytesToString = (input: SolBytes): string => fromBytes(input)
 
 type Parser<A, B> = (input: A) => B
 

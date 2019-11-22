@@ -1,26 +1,25 @@
-import BigNumber from 'bignumber.js'
-
 import { eqAddress } from '@celo/utils/lib/address'
 import { zip } from '@celo/utils/lib/collections'
 import { fromFixed, toFixed } from '@celo/utils/lib/fixidity'
-
+import BigNumber from 'bignumber.js'
 import { Address, NULL_ADDRESS } from '../base'
 import { Validators } from '../generated/types/Validators'
 import {
   BaseWrapper,
   CeloTransactionObject,
-  numberLikeToBigNumber,
-  numberLikeToInt,
   proxyCall,
   proxySend,
-  toSolidityBytes,
+  stringToBytes,
   toTransactionObject,
   tupleParser,
+  valueToBigNumber,
+  valueToInt,
 } from './BaseWrapper'
 
 export interface Validator {
   address: Address
-  publicKey: string
+  ecdsaPublicKey: string
+  blsPublicKey: string
   affiliation: string | null
   score: BigNumber
 }
@@ -28,6 +27,7 @@ export interface Validator {
 export interface ValidatorGroup {
   address: Address
   members: Address[]
+  affiliates: Address[]
   commission: BigNumber
 }
 
@@ -50,8 +50,14 @@ export interface GroupMembership {
 /**
  * Contract for voting for validators and managing validator groups.
  */
-// TODO(asa): Support authorized validators
+// TODO(asa): Support validator signers
 export class ValidatorsWrapper extends BaseWrapper<Validators> {
+  async updateCommission(commission: BigNumber): Promise<CeloTransactionObject<boolean>> {
+    return toTransactionObject(
+      this.kit,
+      this.contract.methods.updateCommission(toFixed(commission).toFixed())
+    )
+  }
   /**
    * Returns the Locked Gold requirements for validators.
    * @returns The Locked Gold requirements for validators.
@@ -59,8 +65,8 @@ export class ValidatorsWrapper extends BaseWrapper<Validators> {
   async getValidatorLockedGoldRequirements(): Promise<LockedGoldRequirements> {
     const res = await this.contract.methods.getValidatorLockedGoldRequirements().call()
     return {
-      value: numberLikeToBigNumber(res[0]),
-      duration: numberLikeToBigNumber(res[1]),
+      value: valueToBigNumber(res[0]),
+      duration: valueToBigNumber(res[1]),
     }
   }
 
@@ -71,8 +77,8 @@ export class ValidatorsWrapper extends BaseWrapper<Validators> {
   async getGroupLockedGoldRequirements(): Promise<LockedGoldRequirements> {
     const res = await this.contract.methods.getGroupLockedGoldRequirements().call()
     return {
-      value: numberLikeToBigNumber(res[0]),
-      duration: numberLikeToBigNumber(res[1]),
+      value: valueToBigNumber(res[0]),
+      duration: valueToBigNumber(res[1]),
     }
   }
 
@@ -88,14 +94,31 @@ export class ValidatorsWrapper extends BaseWrapper<Validators> {
     return {
       validatorLockedGoldRequirements: res[0],
       groupLockedGoldRequirements: res[1],
-      maxGroupSize: numberLikeToBigNumber(res[2]),
+      maxGroupSize: valueToBigNumber(res[2]),
     }
   }
 
   async signerToAccount(signerAddress: Address) {
     const accounts = await this.kit.contracts.getAccounts()
-    return accounts.activeValidationSignerToAccount(signerAddress)
+    return accounts.validatorSignerToAccount(signerAddress)
   }
+
+  /**
+   * Updates a validator's BLS key.
+   * @param blsPublicKey The BLS public key that the validator is using for consensus, should pass proof
+   *   of possession. 48 bytes.
+   * @param blsPop The BLS public key proof-of-possession, which consists of a signature on the
+   *   account address. 96 bytes.
+   * @return True upon success.
+   */
+  updateBlsPublicKey: (
+    blsPublicKey: string,
+    blsPop: string
+  ) => CeloTransactionObject<boolean> = proxySend(
+    this.kit,
+    this.contract.methods.updateBlsPublicKey,
+    tupleParser(stringToBytes, stringToBytes)
+  )
 
   /**
    * Returns whether a particular account has a registered validator.
@@ -141,19 +164,25 @@ export class ValidatorsWrapper extends BaseWrapper<Validators> {
     const res = await this.contract.methods.getValidator(address).call()
     return {
       address,
-      publicKey: res[0] as any,
-      affiliation: res[1],
-      score: fromFixed(new BigNumber(res[2])),
+      ecdsaPublicKey: res[0] as any,
+      blsPublicKey: res[1] as any,
+      affiliation: res[2],
+      score: fromFixed(new BigNumber(res[3])),
     }
   }
 
   /** Get ValidatorGroup information */
   async getValidatorGroup(address: Address): Promise<ValidatorGroup> {
     const res = await this.contract.methods.getValidatorGroup(address).call()
+    const validators = await this.getRegisteredValidators()
+    const affiliates = validators
+      .filter((v) => v.affiliation === address)
+      .filter((v) => !res[0].includes(v.address))
     return {
       address,
       members: res[0],
       commission: fromFixed(new BigNumber(res[1])),
+      affiliates: affiliates.map((v) => v.address),
     }
   }
 
@@ -166,18 +195,14 @@ export class ValidatorsWrapper extends BaseWrapper<Validators> {
     this.contract.methods.getMembershipHistory,
     undefined,
     (res) =>
-      zip(
-        (epoch, group): GroupMembership => ({ epoch: numberLikeToInt(epoch), group }),
-        res[0],
-        res[1]
-      )
+      zip((epoch, group): GroupMembership => ({ epoch: valueToInt(epoch), group }), res[0], res[1])
   )
 
   /** Get the size (amount of members) of a ValidatorGroup */
   getValidatorGroupSize: (group: Address) => Promise<number> = proxyCall(
     this.contract.methods.getGroupNumMembers,
     undefined,
-    numberLikeToInt
+    valueToInt
   )
 
   /** Get list of registered validator addresses */
@@ -206,24 +231,27 @@ export class ValidatorsWrapper extends BaseWrapper<Validators> {
    * Registers a validator unaffiliated with any validator group.
    *
    * Fails if the account is already a validator or validator group.
-   * Fails if the account does not have sufficient weight.
    *
-   * @param publicKeysData Comprised of three tightly-packed elements:
-   *    - publicKey - The public key that the validator is using for consensus, should match
-   *      msg.sender. 64 bytes.
-   *    - blsPublicKey - The BLS public key that the validator is using for consensus, should pass
-   *      proof of possession. 48 bytes.
-   *    - blsPoP - The BLS public key proof of possession. 96 bytes.
+   * @param ecdsaPublicKey The ECDSA public key that the validator is using for consensus, should match
+   *   the validator signer. 64 bytes.
+   * @param blsPublicKey The BLS public key that the validator is using for consensus, should pass proof
+   *   of possession. 48 bytes.
+   * @param blsPop The BLS public key proof-of-possession, which consists of a signature on the
+   *   account address. 96 bytes.
    */
 
-  getEpochNumber = proxyCall(this.contract.methods.getEpochNumber, undefined, numberLikeToBigNumber)
+  getEpochNumber = proxyCall(this.contract.methods.getEpochNumber, undefined, valueToBigNumber)
 
-  getEpochSize = proxyCall(this.contract.methods.getEpochSize, undefined, numberLikeToBigNumber)
+  getEpochSize = proxyCall(this.contract.methods.getEpochSize, undefined, valueToBigNumber)
 
-  registerValidator: (publicKeysData: string) => CeloTransactionObject<boolean> = proxySend(
+  registerValidator: (
+    ecdsaPublicKey: string,
+    blsPublicKey: string,
+    blsPop: string
+  ) => CeloTransactionObject<boolean> = proxySend(
     this.kit,
     this.contract.methods.registerValidator,
-    tupleParser(toSolidityBytes)
+    tupleParser(stringToBytes, stringToBytes, stringToBytes)
   )
 
   /**

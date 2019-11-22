@@ -1,19 +1,20 @@
+import { PhoneNumberUtils, SignatureUtils } from '@celo/utils'
+import { concurrentMap, sleep } from '@celo/utils/lib/async'
+import { notEmpty, zip3 } from '@celo/utils/lib/collections'
+import { parseSolidityStringArray } from '@celo/utils/lib/parsing'
 import BigNumber from 'bignumber.js'
+import fetch from 'cross-fetch'
 import * as Web3Utils from 'web3-utils'
-
-import { ECIES, PhoneNumberUtils, SignatureUtils } from '@celo/utils'
-import { sleep } from '@celo/utils/lib/async'
-import { zip3 } from '@celo/utils/lib/collections'
-
 import { Address, CeloContract, NULL_ADDRESS } from '../base'
 import { Attestations } from '../generated/types/Attestations'
+import { ClaimTypes, IdentityMetadataWrapper } from '../identity'
 import {
   BaseWrapper,
-  numberLikeToBigNumber,
-  numberLikeToInt,
   proxyCall,
   toTransactionObject,
   tupleParser,
+  valueToBigNumber,
+  valueToInt,
 } from './BaseWrapper'
 
 const parseSignature = SignatureUtils.parseSignature
@@ -48,15 +49,9 @@ export enum AttestationState {
 
 export interface ActionableAttestation {
   issuer: Address
-  attestationState: AttestationState
   blockNumber: number
-  publicKey: string
+  attestationServiceURL: string
 }
-
-const parseAttestationInfo = (rawState: { 0: string; 1: string }) => ({
-  attestationState: parseInt(rawState[0], 10),
-  blockNumber: parseInt(rawState[1], 10),
-})
 
 function attestationMessageToSign(phoneHash: string, account: Address) {
   const messageHash: string = Web3Utils.soliditySha3(
@@ -64,6 +59,23 @@ function attestationMessageToSign(phoneHash: string, account: Address) {
     { type: 'address', value: account }
   )
   return messageHash
+}
+
+interface GetCompletableAttestationsResponse {
+  0: string[]
+  1: string[]
+  2: string[]
+  3: string[]
+}
+function parseGetCompletableAttestations(response: GetCompletableAttestationsResponse) {
+  const metadataURLs = parseSolidityStringArray(
+    response[2].map(valueToInt),
+    (response[3] as unknown) as string
+  )
+
+  return zip3(response[0].map(valueToInt), response[1], metadataURLs).map(
+    ([blockNumber, issuer, metadataURL]) => ({ blockNumber, issuer, metadataURL })
+  )
 }
 
 const stringIdentity = (x: string) => x
@@ -74,7 +86,7 @@ export class AttestationsWrapper extends BaseWrapper<Attestations> {
   attestationExpiryBlocks = proxyCall(
     this.contract.methods.attestationExpiryBlocks,
     undefined,
-    numberLikeToInt
+    valueToInt
   )
 
   /**
@@ -85,13 +97,13 @@ export class AttestationsWrapper extends BaseWrapper<Attestations> {
   attestationRequestFees = proxyCall(
     this.contract.methods.attestationRequestFees,
     undefined,
-    numberLikeToBigNumber
+    valueToBigNumber
   )
 
   selectIssuersWaitBlocks = proxyCall(
     this.contract.methods.selectIssuersWaitBlocks,
     undefined,
-    numberLikeToInt
+    valueToInt
   )
 
   /**
@@ -103,8 +115,8 @@ export class AttestationsWrapper extends BaseWrapper<Attestations> {
     this.contract.methods.getUnselectedRequest,
     tupleParser(PhoneNumberUtils.getPhoneHash, (x: string) => x),
     (res) => ({
-      blockNumber: numberLikeToInt(res[0]),
-      attestationsRequested: numberLikeToInt(res[1]),
+      blockNumber: valueToInt(res[0]),
+      attestationsRequested: valueToInt(res[1]),
       attestationRequestFeeToken: res[2],
     })
   )
@@ -132,6 +144,17 @@ export class AttestationsWrapper extends BaseWrapper<Attestations> {
       await sleep(pollDurationSeconds * 1000)
     }
   }
+
+  /**
+   * Returns the issuers of attestations for a phoneNumber/account combo
+   * @param phoneNumber Phone Number
+   * @param account Account
+   */
+  getAttestationIssuers = proxyCall(
+    this.contract.methods.getAttestationIssuers,
+    tupleParser(PhoneNumberUtils.getPhoneHash, (x: string) => x)
+  )
+
   /**
    * Returns the attestation state of a phone number/account/issuer tuple
    * @param phoneNumber Phone Number
@@ -158,7 +181,7 @@ export class AttestationsWrapper extends BaseWrapper<Attestations> {
   ) => Promise<AttestationStat> = proxyCall(
     this.contract.methods.getAttestationStats,
     tupleParser(PhoneNumberUtils.getPhoneHash, stringIdentity),
-    (stat) => ({ completed: numberLikeToInt(stat[0]), total: numberLikeToInt(stat[1]) })
+    (stat) => ({ completed: valueToInt(stat[0]), total: valueToInt(stat[1]) })
   )
 
   /**
@@ -182,7 +205,8 @@ export class AttestationsWrapper extends BaseWrapper<Attestations> {
   }
 
   /**
-   * Returns an array of attestations that can be completed, along with the issuers public key
+   * Returns an array of attestations that can be completed, along with the issuers' attestation
+   * service urls
    * @param phoneNumber
    * @param account
    */
@@ -190,42 +214,37 @@ export class AttestationsWrapper extends BaseWrapper<Attestations> {
     phoneNumber: string,
     account: Address
   ): Promise<ActionableAttestation[]> {
-    const accounts = await this.kit.contracts.getAccounts()
     const phoneHash = PhoneNumberUtils.getPhoneHash(phoneNumber)
-    const expiryBlocks = await this.attestationExpiryBlocks()
-    const currentBlockNumber = await this.kit.web3.eth.getBlockNumber()
 
-    const issuers = await this.contract.methods.getAttestationIssuers(phoneHash, account).call()
-    const issuerState = Promise.all(
-      issuers.map((issuer) =>
-        this.contract.methods
-          .getAttestationState(phoneHash, account, issuer)
-          .call()
-          .then(parseAttestationInfo)
-      )
+    const result = await this.contract.methods.getCompletableAttestations(phoneHash, account).call()
+
+    const withAttestationServiceURLs = await concurrentMap(
+      5,
+      parseGetCompletableAttestations(result),
+      async ({ blockNumber, issuer, metadataURL }) => {
+        try {
+          const metadata = await IdentityMetadataWrapper.fetchFromURL(metadataURL)
+          const attestationServiceURLClaim = metadata.findClaim(ClaimTypes.ATTESTATION_SERVICE_URL)
+
+          if (attestationServiceURLClaim === undefined) {
+            throw new Error(`No attestation service URL registered for ${issuer}`)
+          }
+
+          // TODO: Once we have status indicators, we should check if service is up
+          // https://github.com/celo-org/celo-monorepo/issues/1586
+          return {
+            blockNumber,
+            issuer,
+            attestationServiceURL: attestationServiceURLClaim.url,
+          }
+        } catch (error) {
+          console.error(error)
+          return null
+        }
+      }
     )
 
-    // Typechain is not properly typing getDataEncryptionKey
-    const publicKeys: Promise<string[]> = Promise.all(
-      issuers.map((issuer) => accounts.getDataEncryptionKey(issuer) as any)
-    )
-
-    const isIncomplete = (status: AttestationState) => status === AttestationState.Incomplete
-    const hasNotExpired = (blockNumber: number) => currentBlockNumber < blockNumber + expiryBlocks
-    const isValidKey = (key: string) => key !== null && key !== '0x0'
-
-    return zip3(issuers, await issuerState, await publicKeys)
-      .filter(
-        ([_issuer, attestation, publicKey]) =>
-          isIncomplete(attestation.attestationState) &&
-          hasNotExpired(attestation.blockNumber) &&
-          isValidKey(publicKey)
-      )
-      .map(([issuer, attestation, publicKey]) => ({
-        ...attestation,
-        issuer,
-        publicKey: publicKey.toString(),
-      }))
+    return withAttestationServiceURLs.filter(notEmpty)
   }
 
   /**
@@ -296,10 +315,10 @@ export class AttestationsWrapper extends BaseWrapper<Attestations> {
     // Unfortunately can't be destructured
     const stats = await this.contract.methods.batchGetAttestationStats(phoneNumberHashes).call()
 
-    const matches = stats[0].map(numberLikeToInt)
+    const matches = stats[0].map(valueToInt)
     const addresses = stats[1]
-    const completed = stats[2].map(numberLikeToInt)
-    const total = stats[3].map(numberLikeToInt)
+    const completed = stats[2].map(valueToInt)
+    const total = stats[3].map(valueToInt)
     // Map of phone hash -> (Map of address -> AttestationStat)
     const result: Record<string, Record<string, AttestationStat>> = {}
 
@@ -352,35 +371,23 @@ export class AttestationsWrapper extends BaseWrapper<Attestations> {
     return toTransactionObject(this.kit, this.contract.methods.selectIssuers(phoneHash))
   }
 
-  /**
-   * Reveals the phone number to the issuer of the attestation on-chain
-   * @param phoneNumber The phone number which requested attestation
-   * @param issuer The address of issuer of the attestation
-   */
-  async reveal(phoneNumber: string, issuer: Address) {
-    const accounts = await this.kit.contracts.getAccounts()
-    const publicKey: string = (await accounts.getDataEncryptionKey(issuer)) as any
-
-    if (!publicKey) {
-      throw new Error('Issuer data encryption key is null')
-    }
-
-    const encryptedPhone: any =
-      '0x' +
-      ECIES.Encrypt(
-        Buffer.from(publicKey.slice(2), 'hex'),
-        Buffer.from(phoneNumber, 'utf8')
-      ).toString('hex')
-
-    return toTransactionObject(
-      this.kit,
-      this.contract.methods.reveal(
-        PhoneNumberUtils.getPhoneHash(phoneNumber),
-        encryptedPhone,
+  async revealPhoneNumberToIssuer(
+    phoneNumber: string,
+    account: Address,
+    issuer: Address,
+    serviceURL: string
+  ) {
+    return fetch(serviceURL + '/attestations', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        account,
+        phoneNumber,
         issuer,
-        true
-      )
-    )
+      }),
+    })
   }
 
   /**

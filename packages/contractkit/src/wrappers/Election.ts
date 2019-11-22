@@ -1,20 +1,18 @@
-import BigNumber from 'bignumber.js'
-
 import { eqAddress } from '@celo/utils/lib/address'
 import { zip } from '@celo/utils/lib/collections'
-
+import BigNumber from 'bignumber.js'
 import { Address, NULL_ADDRESS } from '../base'
 import { Election } from '../generated/types/Election'
 import {
   BaseWrapper,
   CeloTransactionObject,
   identity,
-  numberLikeToBigNumber,
-  numberLikeToInt,
   proxyCall,
   proxySend,
   toTransactionObject,
   tupleParser,
+  valueToBigNumber,
+  valueToInt,
 } from './BaseWrapper'
 
 export interface Validator {
@@ -60,7 +58,7 @@ export class ElectionWrapper extends BaseWrapper<Election> {
    */
   async electableValidators(): Promise<ElectableValidators> {
     const { min, max } = await this.contract.methods.electableValidators().call()
-    return { min: numberLikeToBigNumber(min), max: numberLikeToBigNumber(max) }
+    return { min: valueToBigNumber(min), max: valueToBigNumber(max) }
   }
   /**
    * Returns the current election threshold.
@@ -69,7 +67,7 @@ export class ElectionWrapper extends BaseWrapper<Election> {
   electabilityThreshold = proxyCall(
     this.contract.methods.getElectabilityThreshold,
     undefined,
-    numberLikeToBigNumber
+    valueToBigNumber
   )
   validatorAddressFromCurrentSet: (index: number) => Promise<Address> = proxyCall(
     this.contract.methods.validatorAddressFromCurrentSet,
@@ -79,7 +77,7 @@ export class ElectionWrapper extends BaseWrapper<Election> {
   numberValidatorsInCurrentSet = proxyCall(
     this.contract.methods.numberValidatorsInCurrentSet,
     undefined,
-    numberLikeToInt
+    valueToInt
   )
 
   /**
@@ -91,7 +89,7 @@ export class ElectionWrapper extends BaseWrapper<Election> {
   getTotalVotesForGroup = proxyCall(
     this.contract.methods.getTotalVotesForGroup,
     undefined,
-    numberLikeToBigNumber
+    valueToBigNumber
   )
 
   /**
@@ -115,7 +113,7 @@ export class ElectionWrapper extends BaseWrapper<Election> {
     return {
       electableValidators: res[0],
       electabilityThreshold: res[1],
-      maxNumGroupsVotedFor: numberLikeToBigNumber(res[2]),
+      maxNumGroupsVotedFor: valueToBigNumber(res[2]),
     }
   }
 
@@ -150,7 +148,7 @@ export class ElectionWrapper extends BaseWrapper<Election> {
     )
     return validatorGroupAddresses.map((a, i) => ({
       address: a,
-      votes: numberLikeToBigNumber(validatorGroupVotes[i]),
+      votes: valueToBigNumber(validatorGroupVotes[i]),
       eligible: validatorGroupEligible[i],
     }))
   }

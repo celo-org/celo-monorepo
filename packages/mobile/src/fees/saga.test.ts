@@ -1,12 +1,13 @@
 import BigNumber from 'bignumber.js'
 import { expectSaga } from 'redux-saga-test-plan'
 import * as matchers from 'redux-saga-test-plan/matchers'
-import { call } from 'redux-saga/effects'
+import { call, select } from 'redux-saga/effects'
 import { getReclaimEscrowGas } from 'src/escrow/saga'
 import { feeEstimated, FeeType } from 'src/fees/actions'
 import { estimateFeeSaga } from 'src/fees/saga'
 import { getInvitationVerificationFeeInWei, getInviteTxGas } from 'src/invite/saga'
 import { getSendTxGas } from 'src/send/saga'
+import { stableTokenBalanceSelector } from 'src/stableToken/reducer'
 import { getConnectedAccount } from 'src/web3/saga'
 import { mockAccount } from 'test/values'
 
@@ -32,6 +33,8 @@ describe(estimateFeeSaga, () => {
       .provide([
         [call(getConnectedAccount), mockAccount],
         [matchers.call.fn(getInviteTxGas), new BigNumber(GAS_AMOUNT)],
+        [matchers.call.fn(getInviteTxGas), new BigNumber(GAS_AMOUNT)],
+        [select(stableTokenBalanceSelector), '1'],
       ])
       .put(
         feeEstimated(
@@ -50,6 +53,7 @@ describe(estimateFeeSaga, () => {
       .provide([
         [call(getConnectedAccount), mockAccount],
         [matchers.call.fn(getSendTxGas), new BigNumber(GAS_AMOUNT)],
+        [select(stableTokenBalanceSelector), '1'],
       ])
       .put(feeEstimated(FeeType.SEND, new BigNumber(10000).times(GAS_AMOUNT).toString()))
       .run()
@@ -60,8 +64,19 @@ describe(estimateFeeSaga, () => {
       .provide([
         [call(getConnectedAccount), mockAccount],
         [matchers.call.fn(getReclaimEscrowGas), new BigNumber(GAS_AMOUNT)],
+        [select(stableTokenBalanceSelector), '1'],
       ])
       .put(feeEstimated(FeeType.SEND, new BigNumber(10000).times(GAS_AMOUNT).toString()))
+      .run()
+  })
+
+  it("doesn't calculates fee if the balance is zero", async () => {
+    await expectSaga(estimateFeeSaga, { feeType: FeeType.SEND })
+      .provide([
+        [select(stableTokenBalanceSelector), '0'],
+        [matchers.call.fn(getSendTxGas), new BigNumber(GAS_AMOUNT)],
+      ])
+      .put(feeEstimated(FeeType.SEND, '0'))
       .run()
   })
 })

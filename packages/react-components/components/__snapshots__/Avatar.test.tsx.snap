@@ -102,7 +102,7 @@ exports[`Avatar renders correctly with address but without contact 1`] = `
       ]
     }
   >
-    #000000000000000...
+    #0x0000000000000000000000000000000000007E57
   </Text>
 </View>
 `;
