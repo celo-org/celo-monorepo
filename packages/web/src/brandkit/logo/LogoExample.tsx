@@ -1,6 +1,6 @@
 import * as React from 'react'
-import { Image, StyleSheet, Text, View } from 'react-native'
-import { GAP } from 'src/brandkit/common/constants'
+import { StyleSheet, Text, View } from 'react-native'
+import { GAP, brandStyles } from 'src/brandkit/common/constants'
 import LogoDarkBg from 'src/logos/LogoDarkBg'
 import LogoLightBg from 'src/logos/LogoLightBg'
 import Button, { BTN } from 'src/shared/Button.3'
@@ -18,13 +18,27 @@ interface Props {
   background: colors
   logoType: Logos
   btnText: string
+  hasBorder: boolean
 }
 
-export default React.memo(function LogoExample({ btnText, caption, background, logoType }: Props) {
+export default React.memo(function LogoExample({
+  btnText,
+  caption,
+  background,
+  logoType,
+  hasBorder,
+}: Props) {
   const useLight = logoType === Logos.light || logoType === Logos.black
   return (
     <View style={styles.container}>
-      <View style={[standardStyles.centered, styles.displayArea, { backgroundColor: background }]}>
+      <View
+        style={[
+          standardStyles.centered,
+          styles.displayArea,
+          hasBorder && brandStyles.fullBorder,
+          { backgroundColor: background },
+        ]}
+      >
         {useLight ? (
           <LogoLightBg height={35} allBlack={logoType === Logos.black} />
         ) : (

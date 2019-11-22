@@ -23,6 +23,7 @@ export enum colors {
   purple = '#BF97FF',
   deepBlue = '#3488EC',
   lightBlue = '#73DDFF',
+  cyan = '#3DBFFF',
   turquoise = '#29EDFF',
 
   greenScreen = '#0CDA6E',
@@ -34,7 +35,8 @@ export enum colors {
   faintGray = '#F8F9F9',
   faintPurple = '#EFE5FF',
   faintGold = '#FEF2D6',
-
+  faintRed = '#FEDEDA',
+  faintCyan = '#DCF6FF',
   lightGray = '#EDEEEF',
 
   grayHeavy = '#ABADAF',

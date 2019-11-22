@@ -8,7 +8,7 @@ interface Props {
   darkMode?: boolean
 }
 
-export default class RingsLight extends React.Component<Props> {
+export default class RingsGlyph extends React.Component<Props> {
   static defaultProps = {
     height: 25,
   }
@@ -26,7 +26,7 @@ export default class RingsLight extends React.Component<Props> {
         />
         <Path
           d="M15.4577 19.7369C16.1419 18.9077 16.6324 17.9361 16.8932 16.8932C17.9361 16.6324 18.9077 16.1421 19.7369 15.4579C19.699 16.6658 19.439 17.8563 18.9695 18.9698C17.8561 19.439 16.6656 19.6992 15.4577 19.7369ZM8.10687 8.10687C7.06397 8.36766 6.09239 8.85792 5.26318 9.54213C5.30108 8.33424 5.56108 7.14371 6.03055 6.03029C7.14397 5.56108 8.3345 5.30082 9.54239 5.26318C8.85818 6.09239 8.36766 7.06397 8.10687 8.10687Z"
-          fill={this.props.color || '#5EA33B'}
+          fill={this.props.darkMode ? '#ECFF8F' : this.props.color || '#5EA33B'}
         />
       </Svg>
     )

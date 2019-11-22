@@ -8,7 +8,7 @@ import MediumLogo from 'src/icons/MediumLogo'
 import Octocat from 'src/icons/Octocat'
 import TwiterLogo from 'src/icons/TwitterLogo'
 import { Cell, GridRow, Spans } from 'src/layout/GridRow'
-import RingsLight from 'src/logos/RingsLight'
+import RingsGlyph from 'src/logos/RingsGlyph'
 import Button, { BTN } from 'src/shared/Button.3'
 import menu, { CeloLinks } from 'src/shared/menu-items'
 import Responsive from 'src/shared/Responsive'
@@ -30,7 +30,7 @@ export class Footer extends React.PureComponent<Props & I18nProps> {
         <View style={styles.verticalContainer}>
           <Navigation t={t} isVertical={true} currentPage={currentPage} />
           <View style={[standardStyles.centered, styles.rings]}>
-            <RingsLight height={30} />
+            <RingsGlyph height={30} />
           </View>
         </View>
       )
