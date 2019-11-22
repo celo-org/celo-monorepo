@@ -359,7 +359,7 @@ contract('Attestations', (accounts: string[]) => {
         })
 
         describe('when the original request cannot be selected for due to randomness not being available', () => {
-          it.only('should allow to request more attestations', async () => {
+          it('should allow to request more attestations', async () => {
             const randomnessBlockRetentionWindow = await random.randomnessBlockRetentionWindow()
             await mineBlocks(randomnessBlockRetentionWindow.toNumber(), web3)
             await attestations.request(phoneHash, 1, mockStableToken.address)
