@@ -7,12 +7,14 @@ import "../common/UsingRegistry.sol";
 
 contract VestingFactory is Initializable, UsingRegistry {
   // mapping between beneficiary addresses and associated vesting contracts (schedules)
-  mapping(address => VestingInstance) public hasVestedAt;
+  mapping(address => address) public hasVestedAt;
 
   function initialize(address registryAddress) external initializer {
     _transferOwnership(msg.sender);
     setRegistry(registryAddress);
   }
+
+  event NewVestingInstanceCreated(address atAddress);
 
   /**
      * @notice Factory function for creating a new vesting contract instance
@@ -25,6 +27,7 @@ contract VestingFactory is Initializable, UsingRegistry {
      * @param vestingRevokable whether the vesting is revocable or not
      * @param vestingRevoker address of the person revoking the vesting
      * @param vestingRefundDestination address of the refund receiver after the vesting is deemed revoked
+     * @return The address of the newly created vesting instance
      */
   function createVestingInstance(
     address vestingBeneficiary,
@@ -36,18 +39,23 @@ contract VestingFactory is Initializable, UsingRegistry {
     bool vestingRevokable,
     address vestingRevoker,
     address vestingRefundDestination
-  ) public {
+  ) external returns (address) {
     // creation of a new vesting contract
-    hasVestedAt[vestingBeneficiary] = new VestingInstance(
-      vestingBeneficiary,
-      vestingAmount,
-      vestingCliff,
-      vestingStartTime,
-      vestingPeriodSec,
-      vestAmountPerPeriod,
-      vestingRevokable,
-      vestingRevoker,
-      vestingRefundDestination
+    address newVestingInstance = address(
+      new VestingInstance(
+        vestingBeneficiary,
+        vestingAmount,
+        vestingCliff,
+        vestingStartTime,
+        vestingPeriodSec,
+        vestAmountPerPeriod,
+        vestingRevokable,
+        vestingRevoker,
+        vestingRefundDestination
+      )
     );
+    hasVestedAt[vestingBeneficiary] = newVestingInstance;
+    emit NewVestingInstanceCreated(newVestingInstance);
+    return newVestingInstance;
   }
 }

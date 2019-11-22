@@ -165,6 +165,7 @@ contract VestingInstance is UsingRegistry, ReentrancyGuard {
   /**
      * @dev Calculates the amount that has already vested but hasn't been withdrawn yet.
      * @param timestamp the timestamp at which the calculate the withdrawable amount
+     * @return The withdrawable amount at the timestamp
      * @dev Function is also made public in order to be called for informational purpose
      */
   function getWithdrawableAmountAtTimestamp(uint256 timestamp) public view returns (uint256) {
