@@ -114,10 +114,10 @@ export class LockedGoldWrapper extends BaseWrapper<LockedGold> {
    * @param index The index of the pending withdrawal to relock from.
    * @param value The value to relock from the specified pending withdrawal.
    */
-  _relock: (index: number, value: NumberLike) => CeloTransactionObject<void> = proxySend(
+  _relock: (index: number, value: BigNumber.Value) => CeloTransactionObject<void> = proxySend(
     this.kit,
     this.contract.methods.relock,
-    tupleParser(parseNumber, parseNumber)
+    tupleParser(valueToString, valueToString)
   )
 
   /**
