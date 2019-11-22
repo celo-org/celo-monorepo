@@ -1,16 +1,16 @@
 import * as React from 'react'
-import { withNamespaces } from 'react-i18next'
 import { StyleSheet, Text, View } from 'react-native'
-import Page from 'src/brandkit/common/Page'
-import { hashNav } from 'src/shared/menu-items'
-import { standardStyles, fonts, typeFaces, fontInfo } from 'src/styles'
-import { NameSpaces, I18nProps } from 'src/i18n'
-import PageHeadline from 'src/brandkit/common/PageHeadline'
-import Button, { BTN } from 'src/shared/Button.3'
 import { brandStyles } from 'src/brandkit/common/constants'
-import { H2, H3 } from 'src/fonts/Fonts'
+import Page from 'src/brandkit/common/Page'
+import PageHeadline from 'src/brandkit/common/PageHeadline'
 import SectionTitle from 'src/brandkit/common/SectionTitle'
-import { withScreenSize, ScreenProps, ScreenSizes } from 'src/layout/ScreenSize'
+import { H2, H3 } from 'src/fonts/Fonts'
+import { I18nProps, NameSpaces, withNamespaces } from 'src/i18n'
+import { ScreenProps, ScreenSizes, withScreenSize } from 'src/layout/ScreenSize'
+import Button, { BTN } from 'src/shared/Button.3'
+import { hashNav } from 'src/shared/menu-items'
+import { fontInfo, fonts, standardStyles, typeFaces } from 'src/styles'
+import UseageExamples from 'src/brandkit/typography/UseageExample'
 
 const { brandTypography } = hashNav
 
@@ -20,6 +20,7 @@ export default React.memo(function Typography() {
       sections={[
         { id: brandTypography.overview, children: <Overview /> },
         { id: brandTypography.system, children: <TypeScale /> },
+        { id: brandTypography.guideline, children: <UseageExamples /> },
       ]}
     />
   )

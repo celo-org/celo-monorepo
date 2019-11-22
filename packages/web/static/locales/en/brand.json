@@ -63,7 +63,19 @@
     "subFontTitle": "This is Jost*, our supporting font.",
     "subFontText":
       "Jost*’s geometric form functions as approachable complimentary typography that we used more sparingly but speaks to the typography found in the logo and the round shape language in our illustration.\n\nUse Jost* for lorem ipsum dolor sit amet, consectetur adipiscing elit. Ut id elit sapien. Sed sem ante, ornare a ipsum ut, consequat ullamcorper lorem.",
-    "getSubfontBTN": "Download Jost"
+    "getSubfontBTN": "Download Jost",
+    "examplesTitle": "Usage Examples",
+    "h1Example": "Main Title",
+    "h2Example": "Article Title",
+    "h3Example": "Section Title",
+    "h4Example":
+      "Subtitle / larger text that is one size larger than the body, lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor.",
+    "h5Example": "Sub-section Title",
+    "h6Example": "Small Title",
+    "bodyExample":
+      "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vestibulum nec leo lorem. Donec in ligula vitae leo suscipit hendrerit. Vivamus commodo felis id nisi semper, ut pellentesque nunc sollicitudin. Nam at ligula lacus. Pellentesque lacinia justo feugiat, maximus nisi nec, venenatis neque. Aliquam tempor nec diam sed lobortis. Nam fringilla tempus posuere.",
+    "smallExample":
+      "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vestibulum nec leo lorem. Donec in ligula vitae leo suscipit hendrerit. Vivamus commodo felis id nisi semper, ut pellentesque nunc sollicitudin. Nam at ligula lacus. Pellentesque lacinia justo feugiat, maximus nisi nec, venenatis neque. Aliquam tempor nec diam sed lobortis. Nam fringilla tempus posuere."
   },
   "icons": {
     "tile": "Icons",
