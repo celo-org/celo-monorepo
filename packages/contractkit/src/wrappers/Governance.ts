@@ -216,7 +216,7 @@ export class GovernanceWrapper extends BaseWrapper<Governance> {
   async getProposal(proposalID: BigNumber.Value): Promise<Proposal> {
     const metadata = await this.getProposalMetadata(proposalID)
     const txIndices = Array.from(Array(metadata.transactionCount).keys())
-    return concurrentMap(1, txIndices, (idx) => this.getProposalTransaction(proposalID, idx))
+    return concurrentMap(4, txIndices, (idx) => this.getProposalTransaction(proposalID, idx))
   }
 
   /**
@@ -353,43 +353,56 @@ export class GovernanceWrapper extends BaseWrapper<Governance> {
     return index
   }
 
-  // TODO: merge with SortedOracles/Election findLesserAndGreater
-  // proposalID is zero for revokes
-  private async findLesserAndGreaterAfterUpvote(proposalID: BigNumber.Value, upvoter: Address) {
-    let queue = await this.getQueue()
-    let searchID: BigNumber.Value = ZERO_BN
+  private sortedQueue(queue: UpvoteRecord[]) {
+    return queue.sort((a, b) => a.upvotes.comparedTo(b.upvotes))
+  }
 
-    const upvoteRecord = await this.getUpvoteRecord(upvoter)
-    // does upvoter have a previous upvote?
-    if (upvoteRecord.proposalID.isGreaterThan(ZERO_BN)) {
-      const proposalIdx = queue.findIndex((qp) => qp.proposalID.isEqualTo(upvoteRecord.proposalID))
-      // is previous upvote in queue?
-      if (proposalIdx !== -1) {
-        queue[proposalIdx].upvotes = queue[proposalIdx].upvotes.minus(upvoteRecord.upvotes)
-        searchID = upvoteRecord.proposalID
-      }
+  private queueIndexOfproposalID(queue: UpvoteRecord[], proposalID: BigNumber.Value) {
+    const idx = queue.findIndex((qp) => qp.proposalID.isEqualTo(proposalID))
+    if (idx === -1) {
+      throw new Error(`Proposal ${proposalID} not in queue`)
     }
+    return idx
+  }
 
-    // is upvoter targeting a valid proposal?
-    if (ZERO_BN.isLessThan(proposalID)) {
-      const proposalIdx = queue.findIndex((qp) => qp.proposalID.isEqualTo(proposalID))
-      // is target proposal in queue?
-      if (proposalIdx !== -1) {
-        const weight = await this.getVoteWeight(upvoter)
-        queue[proposalIdx].upvotes = queue[proposalIdx].upvotes.plus(weight)
-        searchID = proposalID
-      } else {
-        throw new Error(`Proposal ${proposalID} not in queue`)
-      }
-    }
-
-    queue = queue.sort((a, b) => a.upvotes.comparedTo(b.upvotes))
-    const newIdx = queue.findIndex((qp) => qp.proposalID.isEqualTo(searchID))
-
+  private lesserAndGreater(queue: UpvoteRecord[], proposalID: BigNumber.Value) {
+    const idx = this.queueIndexOfproposalID(queue, proposalID)
     return {
-      lesserID: newIdx === 0 ? ZERO_BN : queue[newIdx - 1].proposalID,
-      greaterID: newIdx === queue.length - 1 ? ZERO_BN : queue[newIdx + 1].proposalID,
+      lesserID: idx === 0 ? ZERO_BN : queue[idx - 1].proposalID,
+      greaterID: idx === queue.length - 1 ? ZERO_BN : queue[idx + 1].proposalID,
     }
+  }
+
+  private async withUpvoteRevoked(queue: UpvoteRecord[], upvoter: Address) {
+    const upvoteRecord = await this.getUpvoteRecord(upvoter)
+    const queueIndex = this.queueIndexOfproposalID(queue, upvoteRecord.proposalID)
+    queue[queueIndex].upvotes = queue[queueIndex].upvotes.minus(upvoteRecord.upvotes)
+    return {
+      queue: this.sortedQueue(queue),
+      upvoteRecord,
+    }
+  }
+
+  private async withUpvoteApplied(
+    queue: UpvoteRecord[],
+    proposalID: BigNumber.Value,
+    upvoter: Address
+  ) {
+    const weight = await this.getVoteWeight(upvoter)
+    const queueIndex = this.queueIndexOfproposalID(queue, proposalID)
+    queue[queueIndex].upvotes = queue[queueIndex].upvotes.plus(weight)
+    return this.sortedQueue(queue)
+  }
+
+  private async lesserAndGreaterAfterRevoke(upvoter: Address) {
+    const { queue, upvoteRecord } = await this.withUpvoteRevoked(await this.getQueue(), upvoter)
+    return this.lesserAndGreater(queue, upvoteRecord.proposalID)
+  }
+
+  private async lesserAndGreaterAfterUpvote(proposalID: BigNumber.Value, upvoter: Address) {
+    const { queue: revokeQueue } = await this.withUpvoteRevoked(await this.getQueue(), upvoter)
+    const upvoteQueue = await this.withUpvoteApplied(revokeQueue, proposalID, upvoter)
+    return this.lesserAndGreater(upvoteQueue, proposalID)
   }
 
   /**
@@ -398,11 +411,7 @@ export class GovernanceWrapper extends BaseWrapper<Governance> {
    * @param upvoter Address of upvoter
    */
   async upvote(proposalID: BigNumber.Value, upvoter: Address) {
-    const exists = await this.proposalExists(proposalID)
-    if (!exists) {
-      throw new Error(`Proposal ${proposalID} does not exist`)
-    }
-    const { lesserID, greaterID } = await this.findLesserAndGreaterAfterUpvote(proposalID, upvoter)
+    const { lesserID, greaterID } = await this.lesserAndGreaterAfterUpvote(proposalID, upvoter)
     return toTransactionObject(
       this.kit,
       this.contract.methods.upvote(
@@ -418,11 +427,7 @@ export class GovernanceWrapper extends BaseWrapper<Governance> {
    * @param upvoter Address of upvoter
    */
   async revokeUpvote(upvoter: Address) {
-    const { proposalID } = await this.getUpvoteRecord(upvoter)
-    if (ZERO_BN.isEqualTo(proposalID)) {
-      throw new Error(`Voter ${upvoter} has no upvote to revoke`)
-    }
-    const { lesserID, greaterID } = await this.findLesserAndGreaterAfterUpvote(ZERO_BN, upvoter)
+    const { lesserID, greaterID } = await this.lesserAndGreaterAfterRevoke(upvoter)
     return toTransactionObject(
       this.kit,
       this.contract.methods.revokeUpvote(valueToString(lesserID), valueToString(greaterID))

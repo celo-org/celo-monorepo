@@ -7,8 +7,8 @@ import { ContractDetails, mapFromPairs, obtainKitContractDetails } from './base'
 export interface CallDetails {
   contract: string
   function: string
-  parameters: Record<string, any>
-  args: any[]
+  paramMap: Record<string, any>
+  argList: any[]
 }
 
 export interface ParsedTx {
@@ -96,6 +96,7 @@ export class BlockExplorer {
 
     const parameters = abi.decodeParameters(matchedAbi.inputs!, encodedParameters)
 
+    // remove numbers and number keys from parameters and build ordered list of arguments
     const args = new Array(parameters.__length__)
     delete parameters.__length__
     Object.keys(parameters).forEach((key) => {
@@ -109,8 +110,8 @@ export class BlockExplorer {
     const callDetails: CallDetails = {
       contract: contractMapping.details.name,
       function: matchedAbi.name!,
-      parameters,
-      args,
+      paramMap: parameters,
+      argList: args,
     }
 
     return {
