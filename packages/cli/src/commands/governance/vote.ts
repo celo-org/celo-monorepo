@@ -1,9 +1,8 @@
-import { VoteValue } from '@celo/contractkit/lib/wrappers/Governance';
-import { flags } from '@oclif/command';
-
-import { BaseCommand } from '../../base';
-import { displaySendTx } from '../../utils/cli';
-import { Flags } from '../../utils/command';
+import { VoteValue } from '@celo/contractkit/lib/wrappers/Governance'
+import { flags } from '@oclif/command'
+import { BaseCommand } from '../../base'
+import { displaySendTx } from '../../utils/cli'
+import { Flags } from '../../utils/command'
 
 export default class Vote extends BaseCommand {
   static description = 'Vote on an approved governance proposal'

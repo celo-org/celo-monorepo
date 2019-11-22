@@ -1,8 +1,7 @@
-import { flags } from '@oclif/command';
-
-import { BaseCommand } from '../../base';
-import { displaySendTx } from '../../utils/cli';
-import { Flags } from '../../utils/command';
+import { flags } from '@oclif/command'
+import { BaseCommand } from '../../base'
+import { displaySendTx } from '../../utils/cli'
+import { Flags } from '../../utils/command'
 
 export default class Execute extends BaseCommand {
   static description = 'Execute a passing governance proposal'
