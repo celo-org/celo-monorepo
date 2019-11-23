@@ -38,7 +38,6 @@ export interface ElectionConfig {
  * Contract for voting for validators and managing validator groups.
  */
 export class ElectionWrapper extends BaseWrapper<Election> {
-  activate = proxySend(this.kit, this.contract.methods.activate)
   /**
    * Returns the minimum and maximum number of validators that can be elected.
    * @returns The minimum and maximum number of validators that can be elected.
@@ -101,6 +100,31 @@ export class ElectionWrapper extends BaseWrapper<Election> {
   )
 
   /**
+   * Returns whether or not the account has any pending votes.
+   * @param account The address of the account casting votes.
+   * @return The groups that `account` has voted for.
+   */
+  async hasPendingVotes(account: Address): Promise<boolean> {
+    const groups = await this.contract.methods.getGroupsVotedForByAccount(account).call()
+    const isNotPending = await Promise.all(
+      groups.map(async (g: string) =>
+        toBigNumber(
+          await this.contract.methods.getPendingVotesForGroupByAccount(account, g).call()
+        ).isZero()
+      )
+    )
+    return !isNotPending.every((a: boolean) => a)
+  }
+
+  async hasActivatablePendingVotes(account: Address): Promise<boolean> {
+    const groups = await this.contract.methods.getGroupsVotedForByAccount(account).call()
+    const isActivatable = await Promise.all(
+      groups.map((g: string) => this.contract.methods.hasActivatablePendingVotes(account, g).call())
+    )
+    return isActivatable.some((a: boolean) => a)
+  }
+
+  /**
    * Returns current configuration parameters.
    */
   async getConfig(): Promise<ElectionConfig> {
@@ -134,6 +158,21 @@ export class ElectionWrapper extends BaseWrapper<Election> {
     const validators = await this.kit.contracts.getValidators()
     const groups = (await validators.getRegisteredValidatorGroups()).map((g) => g.address)
     return concurrentMap(5, groups, (g) => this.getValidatorGroupVotes(g))
+  }
+
+  _activate = proxySend(this.kit, this.contract.methods.activate)
+
+  /**
+   * Activates any activatable pending votes.
+   * @param account The account with pending votes to activate.
+   */
+  async activate(account: Address): Promise<Array<CeloTransactionObject<boolean>>> {
+    const groups = await this.contract.methods.getGroupsVotedForByAccount(account).call()
+    const isActivatable = await Promise.all(
+      groups.map((g) => this.contract.methods.hasActivatablePendingVotes(account, g).call())
+    )
+    const groupsActivatable = groups.filter((_, i) => isActivatable[i])
+    return groupsActivatable.map((g) => this._activate(g))
   }
 
   /**
