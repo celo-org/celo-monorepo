@@ -91,7 +91,7 @@ export const privateKeyToStrippedAddress = (privateKey: string) =>
 
 const validatorZeroBalance = fetchEnvOrFallback(
   envVar.VALIDATOR_ZERO_GENESIS_BALANCE,
-  '100010011000000000000000000'
+  '100010030000000000000000000'
 ) // 100,010,011 CG
 const validatorBalance = fetchEnvOrFallback(
   envVar.VALIDATOR_GENESIS_BALANCE,
@@ -109,12 +109,12 @@ export const getStrippedAddressesFor = (accountType: AccountType, mnemonic: stri
   getAddressesFor(accountType, mnemonic, n).map(strip0x)
 
 export const getValidators = (mnemonic: string, n: number) => {
-  return getPrivateKeysFor(AccountType.VALIDATOR, mnemonic, n).map((key) => {
+  return getPrivateKeysFor(AccountType.VALIDATOR, mnemonic, n).map((key, i) => {
     const blsKeyBytes = blsPrivateKeyToProcessedPrivateKey(key)
     return {
       address: strip0x(privateKeyToAddress(key)),
       blsPublicKey: bls12377js.BLS.privateToPublicBytes(blsKeyBytes).toString('hex'),
-      balance: n === 0 ? validatorZeroBalance : validatorBalance,
+      balance: i === 0 ? validatorZeroBalance : validatorBalance,
     }
   })
 }
