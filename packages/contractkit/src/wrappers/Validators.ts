@@ -267,9 +267,9 @@ export class ValidatorsWrapper extends BaseWrapper<Validators> {
    */
   async registerValidator(validatorAddress: Address, blsPublicKey: string, blsPop: string) {
     const ecdsaPublicKey = await addressToPublicKey(validatorAddress, this.kit.web3.eth.sign)
-    // @ts-ignore incorrect typing for bytes type
     return toTransactionObject(
       this.kit,
+      // @ts-ignore incorrect typing for bytes type
       this.contract.methods.registerValidator(ecdsaPublicKey, blsPublicKey, blsPop)
     )
   }
