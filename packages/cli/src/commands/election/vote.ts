@@ -25,7 +25,6 @@ export default class ElectionVote extends BaseCommand {
     const res = this.parse(ElectionVote)
 
     this.kit.defaultAccount = res.flags.from
-    console.log(res.flags.from)
     await newCheckBuilder(this, res.flags.from)
       .isSignerOrAccount()
       .isValidatorGroup(res.flags.for)
