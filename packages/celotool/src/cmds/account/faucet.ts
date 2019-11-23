@@ -1,6 +1,5 @@
 /* tslint:disable no-console */
 import { newKit } from '@celo/contractkit'
-import BigNumber from 'bignumber.js'
 import { switchToClusterFromEnv } from 'src/lib/cluster'
 import { convertToContractDecimals } from 'src/lib/contract-utils'
 import { portForwardAnd } from 'src/lib/port_forward'
@@ -59,21 +58,20 @@ export const handler = async (argv: FaucetArgv) => {
       kit.contracts.getStableToken(),
       kit.contracts.getReserve(),
     ])
-    const goldAmount = (await convertToContractDecimals(argv.gold, goldToken)).toString()
-    const stableTokenAmount = (await convertToContractDecimals(
-      argv.dollars,
-      stableToken
-    )).toString()
-    console.log(`Fauceting ${goldAmount} Gold and ${stableTokenAmount} StableToken to ${address}`)
-    if (!new BigNumber(goldAmount).isZero()) {
+    const goldAmount = await convertToContractDecimals(argv.gold, goldToken)
+    const stableTokenAmount = await convertToContractDecimals(argv.dollars, stableToken)
+    console.log(
+      `Fauceting ${goldAmount.toFixed()} Gold and ${stableTokenAmount.toFixed()} StableToken to ${address}`
+    )
+    if (!goldAmount.isZero()) {
       if (await reserve.isSpender(account)) {
-        await reserve.transferGold(address, goldAmount).sendAndWaitForReceipt()
+        await reserve.transferGold(address, goldAmount.toFixed()).sendAndWaitForReceipt()
       } else {
-        await goldToken.transfer(address, goldAmount).sendAndWaitForReceipt()
+        await goldToken.transfer(address, goldAmount.toFixed()).sendAndWaitForReceipt()
       }
     }
-    if (!new BigNumber(stableTokenAmount).isZero()) {
-      await stableToken.transfer(address, stableTokenAmount).sendAndWaitForReceipt()
+    if (stableTokenAmount.isZero()) {
+      await stableToken.transfer(address, stableTokenAmount.toFixed()).sendAndWaitForReceipt()
     }
   }
 
