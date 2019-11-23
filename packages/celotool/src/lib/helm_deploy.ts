@@ -1,10 +1,9 @@
-import { entries, flatMap, range } from 'lodash'
+import { entries, range } from 'lodash'
 import sleep from 'sleep-promise'
 import { getKubernetesClusterRegion, switchToClusterFromEnv } from './cluster'
 import { EnvTypes, envVar, fetchEnv, fetchEnvOrFallback, isProduction } from './env-utils'
 import { ensureAuthenticatedGcloudAccount } from './gcloud_utils'
 import { generateGenesisFromEnv } from './generate_utils'
-import { OG_ACCOUNTS } from './genesis_constants'
 import { getStatefulSetReplicas, scaleResource } from './kubernetes'
 import { execCmd, execCmdWithExitOnFailure, outputIncludes, switchToProjectFromEnv } from './utils'
 
@@ -507,12 +506,6 @@ async function helmParameters(celoEnv: string) {
       ]
     : []
 
-  const gethAccountParameters = flatMap(OG_ACCOUNTS, (account) => [
-    `--set geth.account.${account.name}.name=${account.name}`,
-    `--set geth.account.${account.name}.privateKey=${account.privateKey}`,
-    `--set geth.account.${account.name}.address=${account.address}`,
-  ])
-
   return [
     `--set domain.name=${fetchEnv('CLUSTER_DOMAIN_NAME')}`,
     `--set geth.verbosity=${fetchEnvOrFallback('GETH_VERBOSITY', '4')}`,
@@ -547,7 +540,6 @@ async function helmParameters(celoEnv: string) {
     `--set mnemonic="${fetchEnv('MNEMONIC')}"`,
     `--set contracts.cron_jobs.enabled=${fetchEnv('CONTRACT_CRONJOBS_ENABLED')}`,
     `--set geth.account.secret="${fetchEnv('GETH_ACCOUNT_SECRET')}"`,
-    `--set ethstats.webSocketSecret="${fetchEnv('ETHSTATS_WEBSOCKETSECRET')}"`,
     `--set geth.ping_ip_from_packet=${fetchEnvOrFallback('PING_IP_FROM_PACKET', 'false')}`,
     `--set geth.in_memory_discovery_table=${fetchEnvOrFallback(
       'IN_MEMORY_DISCOVERY_TABLE',
@@ -555,7 +547,6 @@ async function helmParameters(celoEnv: string) {
     )}`,
     ...productionTagOverrides,
     ...(await helmIPParameters(celoEnv)),
-    ...gethAccountParameters,
   ]
 }
 
