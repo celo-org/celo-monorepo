@@ -17,7 +17,7 @@ export const menuItems = {
   },
   BRAND: {
     name: 'Brand Kit',
-    link: '/brand',
+    link: '/experience/brand',
   },
   COMMUNITY: {
     name: 'Connect',

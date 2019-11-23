@@ -37,7 +37,7 @@ class MyApp extends App {
   }
 
   isBrand = () => {
-    return this.props.router.asPath.startsWith('/brand')
+    return this.props.router.asPath.startsWith('/experience')
   }
 
   componentDidCatch = (error: Error, info: object) => {
