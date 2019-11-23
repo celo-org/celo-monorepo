@@ -4,6 +4,25 @@ description: View and manage validator elections
 
 ## Commands
 
+### Activate
+
+Activate pending votes in validator elections to begin earning rewards
+
+```
+USAGE
+  $ celocli election:activate
+
+OPTIONS
+  --from=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) Voter's address
+  --wait                                             Wait until all pending votes become activatable
+
+EXAMPLES
+  activate --from 0x4443d0349e8b3075cba511a0a87796597602a0f1
+  activate --from 0x4443d0349e8b3075cba511a0a87796597602a0f1 --wait
+```
+
+_See code: [packages/cli/src/commands/election/activate.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/election/activate.ts)_
+
 ### Current
 
 Outputs the currently elected validator set
