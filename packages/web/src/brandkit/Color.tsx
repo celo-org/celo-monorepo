@@ -3,15 +3,20 @@ import { withNamespaces } from 'react-i18next'
 import { ImageBackground, ImageRequireSource, StyleSheet, Text, View } from 'react-native'
 import Palette from 'src/brandkit/color/Palette'
 import { brandStyles } from 'src/brandkit/common/constants'
+import {
+  ACCENT_PALETTE,
+  BACKGROUND_PALETTE,
+  GRAY_PALETTE,
+  PRIMARY_PALETTE,
+} from 'src/brandkit/common/data'
 import Page from 'src/brandkit/common/Page'
 import PageHeadline from 'src/brandkit/common/PageHeadline'
 import SectionTitle from 'src/brandkit/common/SectionTitle'
 import Judgement, { Value } from 'src/brandkit/logo/Judgement'
 import { I18nProps, NameSpaces } from 'src/i18n'
+import { ScreenProps, ScreenSizes, withScreenSize } from 'src/layout/ScreenSize'
 import { hashNav } from 'src/shared/menu-items'
 import { colors, fonts, standardStyles } from 'src/styles'
-import { withScreenSize, ScreenProps, ScreenSizes } from 'src/layout/ScreenSize'
-
 const { brandColor } = hashNav
 
 export default React.memo(function Color() {
@@ -24,34 +29,6 @@ export default React.memo(function Color() {
     />
   )
 })
-
-const PRIMARY_PALETTE = [
-  { name: 'Celo Green', hex: colors.primary },
-  { name: 'Celo Gold', hex: colors.gold },
-  { name: 'Celo Dark', hex: colors.dark },
-  { name: 'White', hex: colors.white },
-]
-
-const ACCENT_PALETTE = [
-  { name: 'Violet', hex: colors.purple },
-  { name: 'Red', hex: colors.red },
-  { name: 'Cyan', hex: colors.lightBlue },
-  { name: 'Blue', hex: colors.deepBlue },
-]
-
-const GRAY_PALETTE = [
-  { name: 'Heavy Gray', hex: colors.grayHeavy },
-  { name: 'Gray', hex: colors.gray },
-  { name: 'Light Gray', hex: colors.lightGray },
-  { name: 'Faint Gray', hex: colors.faintGray },
-]
-
-const BACKGROUND_PALETTE = [
-  { name: 'Faint Gray', hex: colors.faintGray },
-  { name: 'Faint Gold', hex: colors.faintGold },
-  { name: 'White', hex: colors.white },
-  { name: 'Dark', hex: colors.dark },
-]
 
 const Overview = withNamespaces(NameSpaces.brand)(function _Overview({ t }: I18nProps) {
   return (

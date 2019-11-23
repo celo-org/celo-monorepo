@@ -83,12 +83,12 @@ function Pigment({ hex, name, onCopyHex, justCopied }: Props & ColorData) {
                 ]}
               >
                 <CopyIcon size={14} color={foreGround} />
-                <Text style={[fonts.legal, styles.copyText, { color: foreGround }]}>Copy</Text>
+                <Text style={[fonts.micro, styles.copyText, { color: foreGround }]}>Copy</Text>
               </View>
               <Text
                 style={[
                   styles.afterEffect,
-                  fonts.legal,
+                  fonts.micro,
                   styles.copy,
                   justCopied && styles.copyHover,
                   styles.transitions,
@@ -102,10 +102,10 @@ function Pigment({ hex, name, onCopyHex, justCopied }: Props & ColorData) {
         )}
       </Hoverable>
       <View style={brandStyles.gap}>
-        <Text style={fonts.h5}>{name}</Text>
-        <Text style={fonts.legal}>{hex}</Text>
-        <Text style={fonts.legal}>{hexToHumanRGB(hex)}</Text>
-        <Text style={fonts.legal}>{cmyk}</Text>
+        <Text style={[fonts.h6, styles.title]}>{name}</Text>
+        <Text style={fonts.micro}>{hex}</Text>
+        <Text style={fonts.micro}>{hexToHumanRGB(hex)}</Text>
+        <Text style={fonts.micro}>{cmyk}</Text>
       </View>
     </View>
   )
@@ -115,6 +115,9 @@ const styles = StyleSheet.create({
   transitions: {
     transitionDuration: '500ms',
   },
+  title: {
+    marginVertical: 10,
+  },
   box: {
     cursor: 'copy',
     borderColor: colors.gray,
@@ -123,9 +126,9 @@ const styles = StyleSheet.create({
     margin: GAP,
   },
   pigment: {
-    height: 95,
-    flexBasis: 95,
-    width: 95,
+    height: 118,
+    flexBasis: 118,
+    width: 118,
     transitionProperty: 'transform',
   },
   pigmentHover: {

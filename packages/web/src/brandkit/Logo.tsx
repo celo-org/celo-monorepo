@@ -15,6 +15,8 @@ import AspectRatio from 'src/shared/AspectRatio'
 import Button, { BTN } from 'src/shared/Button.3'
 import { hashNav } from 'src/shared/menu-items'
 import { colors, fonts, standardStyles } from 'src/styles'
+import Palette from 'src/brandkit/color/Palette'
+import { BACKGROUND_PALETTE } from 'src/brandkit/common/data'
 
 export default React.memo(function Logo() {
   return (
@@ -55,7 +57,7 @@ export default React.memo(function Logo() {
 
 const Overview = withNamespaces(NameSpaces.brand)(
   withScreenSize<I18nProps>(function _Overview({ t, screen }: I18nProps & ScreenProps) {
-    const glyphAreaStyle = screen === ScreenSizes.MOBILE ? styles.square : styles.pilar
+    const glyphAreaStyle = screen === ScreenSizes.DESKTOP ? styles.pilar : styles.square
     return (
       <View style={styles.container}>
         <View style={styles.gap}>
@@ -103,9 +105,9 @@ const Overview = withNamespaces(NameSpaces.brand)(
           />
         </View>
         <View style={styles.gap}>
-          <H3 style={[standardStyles.elementalMargin, standardStyles.blockMarginTop]}>
+          <Text style={[fonts.h5a, standardStyles.elementalMargin, standardStyles.blockMarginTop]}>
             {t('logo.glyphTitle')}
-          </H3>
+          </Text>
           <Text style={fonts.p}>{t('logo.glyphText')}</Text>
           <Button kind={BTN.TERTIARY} text={t('downloadAssetBtn')} style={brandStyles.button} />
           <View style={[styles.tiling, standardStyles.elementalMarginTop]}>
@@ -139,21 +141,6 @@ const Overview = withNamespaces(NameSpaces.brand)(
             </View>
           </View>
         </View>
-        <View>
-          <H3 style={[styles.gap, standardStyles.elementalMargin, standardStyles.blockMarginTop]}>
-            {t('logo.sizeTitle')}
-          </H3>
-          <Text style={[fonts.p, styles.gap]}>{t('logo.sizeText')}</Text>
-          <View style={[standardStyles.centered, styles.sizingArea]}>
-            <AspectRatio ratio={392 / 160} style={styles.sizing}>
-              <Image
-                source={require('src/brandkit/images/sizing.png')}
-                style={standardStyles.image}
-                resizeMode="contain"
-              />
-            </AspectRatio>
-          </View>
-        </View>
       </View>
     )
   })
@@ -161,26 +148,60 @@ const Overview = withNamespaces(NameSpaces.brand)(
 
 const Clearspace = withNamespaces(NameSpaces.brand)(function _ClearSpace({ t }) {
   return (
-    <View style={styles.gap}>
-      <SectionTitle>{t('logo.clearspaceTitle')}</SectionTitle>
-      <Text style={fonts.p}>{t('logo.clearspaceText')}</Text>
-      <View
+    <>
+      <SectionTitle>{t('logo.SpaceSizeTitle')}</SectionTitle>
+      <Text
         style={[
-          standardStyles.centered,
-          standardStyles.elementalMarginTop,
-          styles.clearspaceImageArea,
+          fonts.h5a,
+          styles.gap,
+          standardStyles.elementalMargin,
+          standardStyles.blockMarginTop,
         ]}
       >
-        <AspectRatio ratio={714 / 357} style={styles.clearspaceImage}>
-          <Image
-            resizeMethod="resize"
-            resizeMode="contain"
-            source={require('src/brandkit/images/ClearspaceImage.png')}
-            style={standardStyles.image}
-          />
-        </AspectRatio>
+        {t('logo.clearspaceTitle')}
+      </Text>
+      <View style={styles.gap}>
+        <Text style={fonts.p}>{t('logo.clearspaceText')}</Text>
+        <View
+          style={[
+            standardStyles.centered,
+            standardStyles.elementalMarginTop,
+            styles.clearspaceImageArea,
+          ]}
+        >
+          <AspectRatio ratio={714 / 357} style={styles.clearspaceImage}>
+            <Image
+              resizeMethod="resize"
+              resizeMode="contain"
+              source={require('src/brandkit/images/ClearspaceImage.png')}
+              style={standardStyles.image}
+            />
+          </AspectRatio>
+        </View>
       </View>
-    </View>
+      <View>
+        <Text
+          style={[
+            fonts.h5a,
+            styles.gap,
+            standardStyles.elementalMargin,
+            standardStyles.blockMarginTop,
+          ]}
+        >
+          {t('logo.sizeTitle')}
+        </Text>
+        <Text style={[fonts.p, styles.gap]}>{t('logo.sizeText')}</Text>
+        <View style={[standardStyles.centered, styles.sizingArea]}>
+          <AspectRatio ratio={392 / 160} style={styles.sizing}>
+            <Image
+              source={require('src/brandkit/images/sizing.png')}
+              style={standardStyles.image}
+              resizeMode="contain"
+            />
+          </AspectRatio>
+        </View>
+      </View>
+    </>
   )
 })
 
@@ -189,24 +210,29 @@ const Backgrounds = withNamespaces(NameSpaces.brand)(function _Backgrounds({ t }
     <View>
       <View style={styles.gap}>
         <SectionTitle>{t('logo.backgroundsTitle')}</SectionTitle>
-        <Text style={[fonts.p, standardStyles.elementalMarginBottom]}>
-          {t('logo.backgroundTextTop')}
-        </Text>
       </View>
+      <Palette colors={BACKGROUND_PALETTE} text={t('logo.backgroundTextTop')} />
       <View style={[styles.tiling, standardStyles.elementalMarginBottom]}>
         <View style={[styles.gap, styles.container]}>
-          <LogoWithBackground backgroundColor={colors.white} hasBorder={true} type="light" />
+          <LogoWithBackground backgroundColor={colors.faintGray} type="light" />
         </View>
         <View style={[styles.gap, styles.container]}>
-          <LogoWithBackground backgroundColor={'#F8F9F9'} hasBorder={true} type="light" />
+          <LogoWithBackground backgroundColor={colors.faintGold} type="light" />
         </View>
         <View style={[styles.gap, styles.container]}>
-          <LogoWithBackground backgroundColor={'#FEF2D6'} type="light" />
+          <LogoWithBackground backgroundColor={colors.dark} type="dark" />
         </View>
       </View>
-      <H3 style={[styles.gap, standardStyles.elementalMargin, standardStyles.blockMarginTop]}>
+      <Text
+        style={[
+          fonts.h5a,
+          styles.gap,
+          standardStyles.elementalMargin,
+          standardStyles.blockMarginTop,
+        ]}
+      >
         {t('logo.colorBackgroundsTitle')}
-      </H3>
+      </Text>
       <Text style={[fonts.p, styles.gap]}>{t('logo.colorBackgroundsText')}</Text>
 
       <Text style={[styles.gap, fonts.p, standardStyles.elementalMargin]}>
@@ -336,8 +362,8 @@ const styles = StyleSheet.create({
     marginVertical: 10,
   },
   clearspaceImageArea: {
-    backgroundColor: colors.faintGray,
-    padding: 20,
+    backgroundColor: colors.white,
+    padding: 30,
   },
   sizing: {
     maxWidth: 500,

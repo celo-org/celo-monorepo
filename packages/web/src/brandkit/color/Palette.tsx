@@ -15,8 +15,8 @@ export default function Palette({ text, title, colors }: Props) {
       {title && <Text style={[fonts.h5, styles.gap]}>{title}</Text>}
       <Text style={[fonts.p, standardStyles.elementalMarginBottom, styles.gap]}>{text}</Text>
       <View style={styles.swatch}>
-        {colors.map(({ name, hex, cmyk }) => {
-          return <Pigment key={hex} name={name} hex={hex} cmyk={cmyk} />
+        {colors.map(({ name, hex }) => {
+          return <Pigment key={hex} name={name} hex={hex} />
         })}
       </View>
     </View>
