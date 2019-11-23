@@ -165,7 +165,7 @@ export const generateGenesisFromEnv = (enablePetersburg: boolean = true) => {
     getStrippedAddressesFor(AccountType.PRICE_ORACLE, mnemonic, 1).map((addr) => {
       return {
         address: addr,
-        balance: fetchEnvOrFallback(envVar.FAUCET_ORACLE_BALANCE, '100000000000000000000'),
+        balance: fetchEnvOrFallback(envVar.ORACLE_GENESIS_BALANCE, '100000000000000000000'),
       }
     })
   )
