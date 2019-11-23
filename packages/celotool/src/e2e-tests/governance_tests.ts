@@ -602,19 +602,6 @@ describe('governance tests', () => {
         return new BigNumber(gpm).times(new BigNumber(gas))
       }
 
-      const assertGoldTokenTotalSupplyChanged = async (
-        blockNumber: number,
-        expected: BigNumber
-      ) => {
-        const currentSupply = new BigNumber(
-          await goldToken.methods.totalSupply().call({}, blockNumber)
-        )
-        const previousSupply = new BigNumber(
-          await goldToken.methods.totalSupply().call({}, blockNumber - 1)
-        )
-        assertAlmostEqual(currentSupply.minus(previousSupply), expected)
-      }
-
       const assertLockedGoldBalanceChanged = async (blockNumber: number, expected: BigNumber) => {
         await assertBalanceChanged(lockedGold.options.address, blockNumber, expected, goldToken)
       }
@@ -625,10 +612,6 @@ describe('governance tests', () => {
 
       const assertVotesUnchanged = async (blockNumber: number) => {
         await assertVotesChanged(blockNumber, new BigNumber(0))
-      }
-
-      const assertGoldTokenTotalSupplyUnchanged = async (blockNumber: number) => {
-        await assertGoldTokenTotalSupplyChanged(blockNumber, new BigNumber(0))
       }
 
       const assertLockedGoldBalanceUnchanged = async (blockNumber: number) => {
@@ -725,7 +708,7 @@ describe('governance tests', () => {
     let blockFrozen: number
     let latestBlock: number
 
-    beforeEach(async function(this: any) {
+    before(async function(this: any) {
       this.timeout(0)
       const validator = (await kit.web3.eth.getAccounts())[0]
       await kit.web3.eth.personal.unlockAccount(validator, '', 1000000)
