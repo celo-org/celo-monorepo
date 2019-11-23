@@ -1,7 +1,7 @@
 import { IArg } from '@oclif/parser/lib/args'
 import { BaseCommand } from '../../base'
 import { newCheckBuilder } from '../../utils/checks'
-import { printValueMap } from '../../utils/cli'
+import { printValueMapRecursive } from '../../utils/cli'
 import { Args } from '../../utils/command'
 
 export default class ElectionShow extends BaseCommand {
@@ -27,6 +27,6 @@ export default class ElectionShow extends BaseCommand {
       .runChecks()
 
     const groupVotes = await election.getValidatorGroupVotes(address)
-    printValueMap(groupVotes)
+    printValueMapRecursive(groupVotes)
   }
 }

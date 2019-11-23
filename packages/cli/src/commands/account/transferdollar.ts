@@ -35,7 +35,7 @@ export default class DollarTransfer extends BaseCommand {
     const dollarBalanceFromBefore = await stableToken.balanceOf(from)
 
     // Perform the transfer
-    await displaySendTx('dollar.Transfer', stableToken.transfer(to, amountInWei.toString()))
+    await displaySendTx('dollar.Transfer', stableToken.transfer(to, amountInWei.toFixed()))
 
     // Check the balance after
     const goldBalanceFromAfter = await goldToken.balanceOf(from)
@@ -46,15 +46,15 @@ export default class DollarTransfer extends BaseCommand {
     const dollarDifference = dollarBalanceFromBefore.minus(dollarBalanceFromAfter)
     const gasCostInWei = goldDifference
     this.log(
-      `Transferred ${amountInWei} from ${from} to ${to}, gas cost: ${gasCostInWei.toString()}`
+      `Transferred ${amountInWei} from ${from} to ${to}, gas cost: ${gasCostInWei.toFixed()}`
     )
     this.log(
-      `Dollar Balance of sender ${from} went down by ${dollarDifference.toString()} wei,` +
-        `final balance: ${dollarBalanceFromAfter.toString()} Celo Dollars wei`
+      `Dollar Balance of sender ${from} went down by ${dollarDifference.toFixed()} wei,` +
+        `final balance: ${dollarBalanceFromAfter.toFixed()} Celo Dollars wei`
     )
     this.log(
-      `Gold Balance of sender ${from} went down by ${goldDifference.toString()} wei, ` +
-        `final balance: ${goldBalanceFromAfter.toString()} Celo Gold wei`
+      `Gold Balance of sender ${from} went down by ${goldDifference.toFixed()} wei, ` +
+        `final balance: ${goldBalanceFromAfter.toFixed()} Celo Gold wei`
     )
   }
 }

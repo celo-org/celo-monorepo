@@ -34,7 +34,7 @@ export default class GoldTransfer extends BaseCommand {
     const balanceFromBeforeInWei = await goldToken.balanceOf(from)
 
     // Perform the transfer
-    await displaySendTx('gold.Transfer', goldToken.transfer(to, amountInWei.toString()))
+    await displaySendTx('gold.Transfer', goldToken.transfer(to, amountInWei.toFixed()))
 
     // Check the balance after
     const balanceFromAfterInWei = await goldToken.balanceOf(from)
@@ -43,10 +43,10 @@ export default class GoldTransfer extends BaseCommand {
     const differenceInWei = balanceFromBeforeInWei.minus(balanceFromAfterInWei)
     const gasCostInWei = differenceInWei.minus(amountInWei)
     this.log(
-      `Transferred ${amountInWei} from ${from} to ${to}, gas cost: ${gasCostInWei.toString()} wei`
+      `Transferred ${amountInWei} from ${from} to ${to}, gas cost: ${gasCostInWei.toFixed()} wei`
     )
     this.log(
-      `Balance of sender ${from} went down by ${differenceInWei.toString()} wei, final balance: ${balanceFromAfterInWei} Celo Gold wei`
+      `Balance of sender ${from} went down by ${differenceInWei.toFixed()} wei, final balance: ${balanceFromAfterInWei} Celo Gold wei`
     )
   }
 }

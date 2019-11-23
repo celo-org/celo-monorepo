@@ -29,10 +29,16 @@ library SortedLinkedList {
     bytes32 lesserKey,
     bytes32 greaterKey
   ) public {
-    require(key != bytes32(0) && key != lesserKey && key != greaterKey && !contains(list, key));
-    require((lesserKey != bytes32(0) || greaterKey != bytes32(0)) || list.list.numElements == 0);
-    require(contains(list, lesserKey) || lesserKey == bytes32(0));
-    require(contains(list, greaterKey) || greaterKey == bytes32(0));
+    require(
+      key != bytes32(0) && key != lesserKey && key != greaterKey && !contains(list, key),
+      "one"
+    );
+    require(
+      (lesserKey != bytes32(0) || greaterKey != bytes32(0)) || list.list.numElements == 0,
+      "two"
+    );
+    require(contains(list, lesserKey) || lesserKey == bytes32(0), "three");
+    require(contains(list, greaterKey) || greaterKey == bytes32(0), "four");
     (lesserKey, greaterKey) = getLesserAndGreater(list, value, lesserKey, greaterKey);
     list.list.insert(key, lesserKey, greaterKey);
     list.values[key] = value;
@@ -160,7 +166,7 @@ library SortedLinkedList {
     //   1. The value is less than the current lowest value
     //   2. The value is greater than the current greatest value
     //   3. The value is just greater than the value for `lesserKey`
-    //   4. The value is just less than the value for `greaerKey`
+    //   4. The value is just less than the value for `greaterKey`
     if (lesserKey == bytes32(0) && isValueBetween(list, value, lesserKey, list.list.tail)) {
       return (lesserKey, list.list.tail);
     } else if (
@@ -178,7 +184,7 @@ library SortedLinkedList {
     ) {
       return (list.list.elements[greaterKey].previousKey, greaterKey);
     } else {
-      require(false);
+      require(false, "unable to get lesser and greater");
     }
   }
 

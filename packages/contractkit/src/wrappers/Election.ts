@@ -147,10 +147,11 @@ export class ElectionWrapper extends BaseWrapper<Election> {
     }
 
     const { lesser, greater } = await this.findLesserAndGreaterAfterVote(validatorGroup, value)
+    console.log(lesser, greater)
 
     return toTransactionObject(
       this.kit,
-      this.contract.methods.vote(validatorGroup, value.toString(), lesser, greater)
+      this.contract.methods.vote(validatorGroup, value.toFixed(), lesser, greater)
     )
   }
 

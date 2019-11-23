@@ -208,17 +208,20 @@ contract Election is
   {
     require(votes.total.eligible.contains(group));
     require(0 < value);
-    require(canReceiveVotes(group, value));
+    require(canReceiveVotes(group, value), "Unable to receive votes");
     address account = getAccounts().voteSignerToAccount(msg.sender);
 
     // Add group to the groups voted for by the account.
+    bool alreadyVotedForGroup = false;
     address[] storage groups = votes.groupsVotedFor[account];
-    require(groups.length < maxNumGroupsVotedFor);
     for (uint256 i = 0; i < groups.length; i = i.add(1)) {
-      require(groups[i] != group);
+      alreadyVotedForGroup = alreadyVotedForGroup || groups[i] == group;
+    }
+    if (!alreadyVotedForGroup) {
+      require(groups.length < maxNumGroupsVotedFor);
+      groups.push(group);
     }
 
-    groups.push(group);
     incrementPendingVotes(group, account, value);
     incrementTotalVotes(group, value, lesser, greater);
     getLockedGold().decrementNonvotingAccountBalance(account, value);
