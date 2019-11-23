@@ -91,13 +91,13 @@ export const privateKeyToStrippedAddress = (privateKey: string) =>
 
 const validatorZeroBalance = fetchEnvOrFallback(
   envVar.VALIDATOR_ZERO_GENESIS_BALANCE,
-  '000000000000000000'
+  '100010011000000000000000000'
 ) // 100,010,011 CG
 const validatorBalance = fetchEnvOrFallback(
   envVar.VALIDATOR_GENESIS_BALANCE,
   '10011000000000000000000'
 ) // 10,011 CG
-const faucetBalance = fetchEnvOrFallback(envVar.FAUCET_GENESIS_BALANCE, '100000000000000000000') // 100 CG
+const faucetBalance = fetchEnvOrFallback(envVar.FAUCET_GENESIS_BALANCE, '10011000000000000000000') // 10,000 CG
 
 export const getPrivateKeysFor = (accountType: AccountType, mnemonic: string, n: number) =>
   range(0, n).map((i) => generatePrivateKey(mnemonic, accountType, i))
