@@ -106,12 +106,17 @@ async function registerValidator(
     validatorPrivateKey
   )
 
+  const valName = `CLabs Validator #${index} on ${networkName}`
+
+  console.info(`    * setName ${valName}`)
+
   // @ts-ignore
-  const setNameTx = accounts.contract.methods.setName(`CLabs Validator #${index} on ${networkName}`)
+  const setNameTx = accounts.contract.methods.setName(valName)
   await sendTransactionWithPrivateKey(web3, setNameTx, validatorPrivateKey, {
     to: accounts.address,
   })
 
+  console.info(`    * registerValidator ${valName}`)
   const publicKey = privateKeyToPublicKey(validatorPrivateKey)
   const blsPublicKey = getBlsPublicKey(validatorPrivateKey)
   const blsPoP = getBlsPoP(privateKeyToAddress(validatorPrivateKey), validatorPrivateKey)
@@ -123,12 +128,16 @@ async function registerValidator(
     to: validators.address,
   })
 
+  console.info(`    * affiliate ${valName}`)
+
   // @ts-ignore
   const affiliateTx = validators.contract.methods.affiliate(groupAddress)
 
   await sendTransactionWithPrivateKey(web3, affiliateTx, validatorPrivateKey, {
     to: validators.address,
   })
+
+  console.info(`    * setAccountDataEncryptionKey ${valName}`)
 
   // @ts-ignore
   const registerDataEncryptionKeyTx = accounts.contract.methods.setAccountDataEncryptionKey(
@@ -140,6 +149,7 @@ async function registerValidator(
   })
 
   // Authorize the attestation signer
+  console.info(`    * authorizeAttestationSigner ${valName}`)
   const attestationKeyAddress = privateKeyToAddress(attestationKey)
   const message = web3.utils.soliditySha3({
     type: 'address',
@@ -159,6 +169,7 @@ async function registerValidator(
     to: accounts.address,
   })
 
+  console.info(`    * done ${valName}`)
   return
 }
 
