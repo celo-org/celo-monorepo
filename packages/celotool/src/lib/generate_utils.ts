@@ -91,7 +91,7 @@ export const privateKeyToStrippedAddress = (privateKey: string) =>
 
 const validatorZeroBalance = fetchEnvOrFallback(
   envVar.VALIDATOR_ZERO_GENESIS_BALANCE,
-  '100010030000000000000000000'
+  '102010030000000000000000000'
 ) // 100,010,011 CG
 const validatorBalance = fetchEnvOrFallback(
   envVar.VALIDATOR_GENESIS_BALANCE,
