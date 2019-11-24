@@ -44,6 +44,9 @@ export default class ElectionVote extends BaseCommand {
       for (const txo of txos) {
         await displaySendTx('activate', txo, { from: res.flags.from })
       }
+      if (txos.length === 0) {
+        this.log(`Pending votes not yet activatable. Consider using the --wait flag.`)
+      }
     } else {
       this.log(`No pending votes to activate`)
     }

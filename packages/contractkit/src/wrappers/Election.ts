@@ -23,6 +23,17 @@ export interface ValidatorGroupVote {
   eligible: boolean
 }
 
+export interface Voter {
+  address: Address
+  votes: GroupVote[]
+}
+
+export interface GroupVote {
+  group: Address
+  pending: BigNumber
+  active: BigNumber
+}
+
 export interface ElectableValidators {
   min: BigNumber
   max: BigNumber
@@ -98,6 +109,26 @@ export class ElectionWrapper extends BaseWrapper<Election> {
   getGroupsVotedForByAccount: (account: Address) => Promise<Address[]> = proxyCall(
     this.contract.methods.getGroupsVotedForByAccount
   )
+
+  async getVotesForGroupByAccount(account: Address, group: Address): Promise<GroupVote> {
+    const pending = await this.contract.methods
+      .getPendingVotesForGroupByAccount(group, account)
+      .call()
+    const active = await this.contract.methods
+      .getActiveVotesForGroupByAccount(group, account)
+      .call()
+    return {
+      group,
+      pending: toBigNumber(pending),
+      active: toBigNumber(active),
+    }
+  }
+
+  async getVoter(account: Address): Promise<Voter> {
+    const groups = await this.contract.methods.getGroupsVotedForByAccount(account).call()
+    const votes = await Promise.all(groups.map((g) => this.getVotesForGroupByAccount(account, g)))
+    return { address: account, votes }
+  }
 
   /**
    * Returns whether or not the account has any pending votes.
