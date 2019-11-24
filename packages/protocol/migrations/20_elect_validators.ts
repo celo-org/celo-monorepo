@@ -303,47 +303,6 @@ module.exports = async (_deployer: any, networkName: string) => {
       to: election.address,
     })
 
-    // TODO(tim) pointers
-
-    // console.info('  * Validators voting for their group ...')
-    // for (const key of groupKeys) {
-    //   // @ts-ignore
-    //   const voteTx = election.contract.methods.vote(
-    //     groupAccount.address,
-    //     '0x' + config.validators.validatorLockedGoldRequirements.value.toString(16),
-    //     NULL_ADDRESS,
-    //     prevGroupAddress
-    //   )
-    //   await sendTransactionWithPrivateKey(web3, voteTx, key, {
-    //     to: election.address,
-    //   })
-    // }
-
-    // TODO(tim) reintroduce more (or varied) voting weight for alfajores (or baklava).
-
-    // // Make another deposit so our vote has more weight.
-    // const minLockedGoldVotePerValidator = 1000
-    // const value = new BigNumber(groupKeys.length)
-    //   .times(minLockedGoldVotePerValidator)
-    //   .times(web3.utils.toWei('1'))
-    // // @ts-ignore
-    // const lockTx = lockedGold.contract.methods.lock()
-    // await sendTransactionWithPrivateKey(web3, lockTx, valKeys[0], {
-    //   to: lockedGold.address,
-    //   value,
-    // })
-
-    // // @ts-ignore
-    // const voteTx = election.contract.methods.vote(
-    //   account.address,
-    //   '0x' + groupLockedGoldValue.toString(16),
-    //   NULL_ADDRESS,
-    //   prevGroupAddress
-    // )
-    // await sendTransactionWithPrivateKey(web3, voteTx, groupKeys[0], {
-    //   to: election.address,
-    // })
-
     prevGroupAddress = groupAccount.address
   }
 }
