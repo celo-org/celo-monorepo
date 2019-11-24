@@ -114,7 +114,7 @@ requestTxSig(
       tx: txObject,
       from: this.state.address,
       to: stableToken.contract.options.address,
-      gasCurrency: GasCurrency.cUSD
+      feeCurrency: FeeCurrency.cUSD
     }
   ],
   { requestId, dappName, callback }
