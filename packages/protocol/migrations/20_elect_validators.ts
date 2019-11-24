@@ -157,8 +157,8 @@ async function registerValidator(
   })
 
   // Authorize the attestation signer
-  console.info(`    - authorizeAttestationSigner ${valName}`)
   const attestationKeyAddress = privateKeyToAddress(attestationKey)
+  console.info(`    - authorizeAttestationSigner ${valName}->${attestationKeyAddress}`)
   const message = web3.utils.soliditySha3({
     type: 'address',
     value: privateKeyToAddress(validatorPrivateKey),
@@ -215,8 +215,8 @@ module.exports = async (_deployer: any, networkName: string) => {
   }
 
   // Assumptions about where funds are located:
-  // * Validator 1-n holds funds needed for their own stake
   // * Validator 0 holds funds for all groups' stakes
+  // * Validator 1-n holds funds needed for their own stake
   const validator0Key = valKeys[0]
 
   if (valKeys.length < config.validators.minElectableValidators) {
@@ -253,8 +253,9 @@ module.exports = async (_deployer: any, networkName: string) => {
     )
     console.info(`  * Registering ${groupKeys.length} validators ...`)
     await Promise.all(
-      groupKeys.map((key, index) =>
-        registerValidator(
+      groupKeys.map((key, i) => {
+        const index = idx * config.validators.maxGroupSize + i
+        return registerValidator(
           accounts,
           lockedGold,
           validators,
@@ -264,7 +265,7 @@ module.exports = async (_deployer: any, networkName: string) => {
           index,
           networkName
         )
-      )
+      })
     )
 
     console.info(`  * Adding Validators to ${groupName} ...`)
