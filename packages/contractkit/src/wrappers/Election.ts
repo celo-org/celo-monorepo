@@ -206,6 +206,57 @@ export class ElectionWrapper extends BaseWrapper<Election> {
     return groupsActivatable.map((g) => this._activate(g))
   }
 
+  async revokePending(
+    account: Address,
+    group: Address,
+    value: BigNumber
+  ): Promise<CeloTransactionObject<boolean>> {
+    const groups = await this.contract.methods.getGroupsVotedForByAccount(account).call()
+    const index = groups.indexOf(group)
+    const { lesser, greater } = await this.findLesserAndGreaterAfterVote(group, value.times(-1))
+
+    return toTransactionObject(
+      this.kit,
+      this.contract.methods.revokePending(group, value.toFixed(), lesser, greater, index)
+    )
+  }
+
+  async revokeActive(
+    account: Address,
+    group: Address,
+    value: BigNumber
+  ): Promise<CeloTransactionObject<boolean>> {
+    const groups = await this.contract.methods.getGroupsVotedForByAccount(account).call()
+    const index = groups.indexOf(group)
+    const { lesser, greater } = await this.findLesserAndGreaterAfterVote(group, value.times(-1))
+
+    return toTransactionObject(
+      this.kit,
+      this.contract.methods.revokeActive(group, value.toFixed(), lesser, greater, index)
+    )
+  }
+
+  async revoke(
+    account: Address,
+    group: Address,
+    value: BigNumber
+  ): Promise<Array<CeloTransactionObject<boolean>>> {
+    const vote = await this.getVotesForGroupByAccount(account, group)
+    if (value.gt(vote.pending.plus(vote.active))) {
+      throw new Error(`can't revoke more votes for ${group} than have been made by ${account}`)
+    }
+    const txos = []
+    const pendingValue = BigNumber.minimum(vote.pending, value)
+    if (!pendingValue.isZero()) {
+      txos.push(await this.revokePending(account, group, pendingValue))
+    }
+    if (pendingValue.lt(value)) {
+      const activeValue = value.minus(pendingValue)
+      txos.push(await this.revokeActive(account, group, activeValue))
+    }
+    return txos
+  }
+
   /**
    * Increments the number of total and pending votes for `group`.
    * @param validatorGroup The validator group to vote for.
