@@ -1,5 +1,5 @@
 import { CeloContractName } from '@celo/protocol/lib/registry-utils'
-import { assertEqualBN, assertRevert } from '@celo/protocol/lib/test-utils'
+import { assertEqualBN, assertRevert, NULL_ADDRESS } from '@celo/protocol/lib/test-utils'
 import { BigNumber } from 'bignumber.js'
 import * as _ from 'lodash'
 import {
@@ -165,7 +165,7 @@ contract('Vesting', (accounts: string[]) => {
       assertEqualBN(vestingAmount, vestingDefaultSchedule.vestingAmount)
     })
 
-    it('should set vesting amount to vesting instance', async () => {
+    it('should set vesting amount per period to vesting instance', async () => {
       await createNewVestingInstanceTx()
       const vestingInstanceRegistryAddress = await vestingFactoryInstance.hasVestedAt(beneficiary)
       const vestingInstance = await VestingInstance.at(vestingInstanceRegistryAddress)
@@ -178,6 +178,155 @@ contract('Vesting', (accounts: string[]) => {
         vestingCliffStartTime,
       ] = await vestingInstance.vestingScheme()
       assertEqualBN(vestAmountPerPeriod, vestingDefaultSchedule.vestAmountPerPeriod)
+    })
+
+    it('should set vesting periods to vesting instance', async () => {
+      await createNewVestingInstanceTx()
+      const vestingInstanceRegistryAddress = await vestingFactoryInstance.hasVestedAt(beneficiary)
+      const vestingInstance = await VestingInstance.at(vestingInstanceRegistryAddress)
+      const [
+        vestingAmount,
+        vestAmountPerPeriod,
+        vestingPeriods,
+        vestingPeriodSec,
+        vestingStartTime,
+        vestingCliffStartTime,
+      ] = await vestingInstance.vestingScheme()
+      const vestingPeriodsComputed = vestingDefaultSchedule.vestingAmount.div(
+        vestingDefaultSchedule.vestAmountPerPeriod
+      )
+      assertEqualBN(vestingPeriodsComputed, vestingPeriods)
+    })
+
+    it('should set vesting period per sec to vesting instance', async () => {
+      await createNewVestingInstanceTx()
+      const vestingInstanceRegistryAddress = await vestingFactoryInstance.hasVestedAt(beneficiary)
+      const vestingInstance = await VestingInstance.at(vestingInstanceRegistryAddress)
+      const [
+        vestingAmount,
+        vestAmountPerPeriod,
+        vestingPeriods,
+        vestingPeriodSec,
+        vestingStartTime,
+        vestingCliffStartTime,
+      ] = await vestingInstance.vestingScheme()
+      assertEqualBN(vestingPeriodSec, vestingDefaultSchedule.vestingPeriodSec)
+    })
+
+    it('should set vesting start time to vesting instance', async () => {
+      await createNewVestingInstanceTx()
+      const vestingInstanceRegistryAddress = await vestingFactoryInstance.hasVestedAt(beneficiary)
+      const vestingInstance = await VestingInstance.at(vestingInstanceRegistryAddress)
+      const [
+        vestingAmount,
+        vestAmountPerPeriod,
+        vestingPeriods,
+        vestingPeriodSec,
+        vestingStartTime,
+        vestingCliffStartTime,
+      ] = await vestingInstance.vestingScheme()
+      assertEqualBN(vestingStartTime, vestingDefaultSchedule.vestingStartTime)
+    })
+
+    it('should set vesting cliff to vesting instance', async () => {
+      await createNewVestingInstanceTx()
+      const vestingInstanceRegistryAddress = await vestingFactoryInstance.hasVestedAt(beneficiary)
+      const vestingInstance = await VestingInstance.at(vestingInstanceRegistryAddress)
+      const [
+        vestingAmount,
+        vestAmountPerPeriod,
+        vestingPeriods,
+        vestingPeriodSec,
+        vestingStartTime,
+        vestingCliffStartTime,
+      ] = await vestingInstance.vestingScheme()
+      const vestingCliffStartTimeComputed = new BigNumber(
+        vestingDefaultSchedule.vestingStartTime
+      ).plus(vestingDefaultSchedule.vestingCliff)
+      assertEqualBN(vestingCliffStartTime, vestingCliffStartTimeComputed)
+    })
+
+    it('should set revokable flag to vesting instance', async () => {
+      await createNewVestingInstanceTx()
+      const vestingInstanceRegistryAddress = await vestingFactoryInstance.hasVestedAt(beneficiary)
+      const vestingInstance = await VestingInstance.at(vestingInstanceRegistryAddress)
+      const vestingRevocable = await vestingInstance.revocable()
+      assert.equal(vestingRevocable, vestingDefaultSchedule.vestingRevokable)
+    })
+
+    it('should set revoker to vesting instance', async () => {
+      await createNewVestingInstanceTx()
+      const vestingInstanceRegistryAddress = await vestingFactoryInstance.hasVestedAt(beneficiary)
+      const vestingInstance = await VestingInstance.at(vestingInstanceRegistryAddress)
+      const vestingRevoker = await vestingInstance.revoker()
+      assert.equal(vestingRevoker, vestingDefaultSchedule.vestingRevoker)
+    })
+
+    it('should set refund destination to vesting instance', async () => {
+      await createNewVestingInstanceTx()
+      const vestingInstanceRegistryAddress = await vestingFactoryInstance.hasVestedAt(beneficiary)
+      const vestingInstance = await VestingInstance.at(vestingInstanceRegistryAddress)
+      const vestingRefundDestination = await vestingInstance.refundDestination()
+      assert.equal(vestingRefundDestination, vestingDefaultSchedule.vestingRefundDestination)
+    })
+
+    it('should have zero currently withdrawn on init', async () => {
+      await createNewVestingInstanceTx()
+      const vestingInstanceRegistryAddress = await vestingFactoryInstance.hasVestedAt(beneficiary)
+      const vestingInstance = await VestingInstance.at(vestingInstanceRegistryAddress)
+      const currentlyWithdrawn = await vestingInstance.currentlyWithdrawn()
+      assertEqualBN(currentlyWithdrawn, 0)
+    })
+
+    it('should be unrevoked on init', async () => {
+      await createNewVestingInstanceTx()
+      const vestingInstanceRegistryAddress = await vestingFactoryInstance.hasVestedAt(beneficiary)
+      const vestingInstance = await VestingInstance.at(vestingInstanceRegistryAddress)
+      const isRevoked = await vestingInstance.revoked()
+      assert.equal(isRevoked, false)
+    })
+
+    it('should be unpaused on init', async () => {
+      await createNewVestingInstanceTx()
+      const vestingInstanceRegistryAddress = await vestingFactoryInstance.hasVestedAt(beneficiary)
+      const vestingInstance = await VestingInstance.at(vestingInstanceRegistryAddress)
+      const isPaused = await vestingInstance.paused()
+      assert.equal(isPaused, false)
+    })
+
+    it('should revert when vesting amount is zero', async () => {
+      vestingDefaultSchedule.vestingAmount = new BigNumber('0')
+      await assertRevert(createNewVestingInstanceTx())
+    })
+
+    it('should revert when vesting beneficiary is the genesis address', async () => {
+      vestingDefaultSchedule.vestingBeneficiary = NULL_ADDRESS
+      await assertRevert(createNewVestingInstanceTx())
+    })
+
+    it('should revert when refund destination is the genesis address', async () => {
+      vestingDefaultSchedule.vestingRefundDestination = NULL_ADDRESS
+      await assertRevert(createNewVestingInstanceTx())
+    })
+
+    it('should revert when vesting period per sec is zero', async () => {
+      vestingDefaultSchedule.vestingPeriodSec = 0
+      await assertRevert(createNewVestingInstanceTx())
+    })
+
+    it('should revert when vesting cliff is longer than vesting period per sec', async () => {
+      vestingDefaultSchedule.vestingCliff = 4 * MONTH
+      await assertRevert(createNewVestingInstanceTx())
+    })
+
+    it('should revert when vesting amount per period is greater than total vesting amout', async () => {
+      vestingDefaultSchedule.vestAmountPerPeriod = ONE_GOLDTOKEN.times(2)
+      await assertRevert(createNewVestingInstanceTx())
+    })
+
+    it('should revert when vesting cliff start point lies in the past', async () => {
+      vestingDefaultSchedule.vestingStartTime = Math.round(Date.now() / 1000) - 2 * HOUR
+      await assertRevert(createNewVestingInstanceTx())
     })
   })
 })
