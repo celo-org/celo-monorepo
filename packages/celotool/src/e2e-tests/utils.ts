@@ -107,6 +107,7 @@ export async function execCmdWithExitOnFailure(
 ) {
   const code = await execCmd(cmd, args, options)
   if (code !== 0) {
+    console.error('execCmd failed for: ' + [cmd].concat(args).join(' '))
     process.exit(1)
   }
 }

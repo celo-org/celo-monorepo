@@ -241,6 +241,7 @@ contract Election is
     decrementPendingVotes(group, account, value);
     incrementActiveVotes(group, account, value);
     emit ValidatorGroupVoteActivated(account, group, value);
+    return true;
   }
 
   /**
