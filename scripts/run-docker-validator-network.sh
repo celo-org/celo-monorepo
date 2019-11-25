@@ -7,7 +7,7 @@ export LC_ALL=en_US.UTF-8
 COMMAND=${1:-"pull,accounts,deploy,run-validator,status"}
 DATA_DIR=${2:-"/tmp/celo/network"}
 
-export CELO_IMAGE=${3:-"us.gcr.io/celo-testnet/geth@sha256:2ef4fe86fc19efdc9856a5bc6fa1364d5522da9e430996b97af09c66988a7936"}
+export CELO_IMAGE=${3:-"us.gcr.io/celo-testnet/celo-node@sha256:6612c17f1a531ce2d7c0d9bcd29afecaf4dcf348684eb747d167130381337552"}
 #export CELO_IMAGE=${3:-"us.gcr.io/celo-testnet/geth@sha256:4bc97381db0bb81b7a3e473bb61d447c90be165834316d3f75bc34d7db718b39"}
 export NETWORK_ID=${4:-"1101"}
 export NETWORK_NAME=${5:-"baklavastaging"}
@@ -218,6 +218,8 @@ if [[ $COMMAND == *"run-fullnode"* ]]; then
      docker rm -f celo-fullnode || echo -e "Container removed"
      
     export CELO_ACCOUNT_ADDRESS=$(celocli account:new |tail -1| cut -d' ' -f 2| tr -cd "[:alnum:]\n")
+
+    docker run -v $PWD/fullnode:/root/.celo --entrypoint /bin/sh -it $CELO_IMAGE -c "wget https://www.googleapis.com/storage/v1/b/static_nodes/o/$NETWORK_NAME?alt=media -O /root/.celo/static-nodes.json"
 
     docker run -v $PWD/fullnode:/root/.celo --entrypoint /bin/sh -it $CELO_IMAGE -c "wget https://www.googleapis.com/storage/v1/b/genesis_blocks/o/$NETWORK_NAME?alt=media -O /root/.celo/genesis.json"
     docker run -v $PWD/fullnode:/root/.celo $CELO_IMAGE init /root/.celo/genesis.json
