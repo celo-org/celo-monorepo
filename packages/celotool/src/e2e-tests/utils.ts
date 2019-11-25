@@ -362,9 +362,6 @@ export async function migrateContracts(
       election: {
         minElectableValidators: '1',
       },
-      reserve: {
-        goldBalance: 100000,
-      },
       stableToken: {
         initialBalances: {
           addresses: validators.map(ensure0x),

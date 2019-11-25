@@ -31,5 +31,7 @@ module.exports = deploymentForCoreContract<ReserveInstance>(
       to: reserve.address,
       value: web3.utils.toWei(config.reserve.goldBalance.toString(), 'ether') as string,
     })
+    console.info(`Marking ${network.from} as a reserve spender`)
+    await reserve.addSpender(network.from)
   }
 )
