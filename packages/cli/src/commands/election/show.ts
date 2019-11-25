@@ -5,7 +5,7 @@ import { printValueMap } from '../../utils/cli'
 import { Args } from '../../utils/command'
 
 export default class ElectionShow extends BaseCommand {
-  static description = 'Show election information about an existing Validator Group'
+  static description = 'Show election information about a registered Validator Group'
 
   static flags = {
     ...BaseCommand.flags,

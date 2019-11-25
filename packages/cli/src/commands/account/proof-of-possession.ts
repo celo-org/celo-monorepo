@@ -4,7 +4,8 @@ import { printValueMap } from '../../utils/cli'
 import { Flags } from '../../utils/command'
 
 export default class ProofOfPossession extends BaseCommand {
-  static description = 'Generate proof-of-possession to be used to authorize a signer'
+  static description =
+    'Generate proof-of-possession to be used to authorize a signer. See the "account:authorize" command for more details.'
 
   static flags = {
     ...BaseCommand.flags,
