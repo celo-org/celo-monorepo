@@ -72,7 +72,7 @@ export const handler = async function autoVerify(argv: AutoVerifyArgv) {
     kit.addAccount(validator0Key)
     kit.addAccount(clientKey)
 
-    await fundClient(kit, validator0Address, clientAddress)
+    await fundClient(kit, validator0Address, clientAddress, argv.attestationMax)
 
     const twilioClient = twilio(
       fetchEnv(envVar.TWILIO_ACCOUNT_SID),
@@ -198,7 +198,12 @@ async function pollForMessagesAndCompleteAttestations(
   }
 }
 
-export async function fundClient(kit: ContractKit, funder: Address, recipient: Address) {
+export async function fundClient(
+  kit: ContractKit,
+  funder: Address,
+  recipient: Address,
+  numberOfAttestations: number
+) {
   const [stableToken, attestations] = await Promise.all([
     kit.contracts.getStableToken(),
     kit.contracts.getAttestations(),
@@ -207,6 +212,6 @@ export async function fundClient(kit: ContractKit, funder: Address, recipient: A
   const attestationFee = new BigNumber(
     await attestations.attestationRequestFees(stableToken.address)
   )
-  const fundingAmount = attestationFee.times(10).toString()
+  const fundingAmount = attestationFee.times(3 * numberOfAttestations).toString()
   await stableToken.transfer(recipient, fundingAmount).sendAndWaitForReceipt({ from: funder })
 }
