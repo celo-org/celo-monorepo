@@ -901,23 +901,6 @@ contract('Election', (accounts: string[]) => {
       })
     })
 
-    describe('when different random values are provided', () => {
-      beforeEach(async () => {
-        await election.vote(group1, voter1.weight, group2, NULL_ADDRESS, { from: voter1.address })
-        await election.vote(group2, voter2.weight, NULL_ADDRESS, group1, { from: voter2.address })
-        await election.vote(group3, voter3.weight, NULL_ADDRESS, group2, { from: voter3.address })
-      })
-
-      it('should return different results', async () => {
-        await setRandomness(hash1)
-        const valsWithHash1 = (await election.electValidatorSigners()).map((x) => x.toLowerCase())
-        await setRandomness(hash2)
-        const valsWithHash2 = (await election.electValidatorSigners()).map((x) => x.toLowerCase())
-        assert.sameMembers(valsWithHash1, valsWithHash2)
-        assert.notDeepEqual(valsWithHash1, valsWithHash2)
-      })
-    })
-
     describe('when a group receives enough votes for > n seats but only has n members', () => {
       beforeEach(async () => {
         // By incrementing the total votes by 80, we allow group3 to receive 80 votes from voter3.
