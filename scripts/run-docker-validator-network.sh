@@ -1,4 +1,4 @@
-#!/usr/bin/bash 
+#!/usr/bin/bash
 set -euo pipefail
 
 export LC_ALL=en_US.UTF-8
@@ -6,12 +6,14 @@ export LC_ALL=en_US.UTF-8
 # Usage: run-network.sh <COMMAND> <DATA_DIR>
 COMMAND=${1:-"pull,accounts,deploy,run-validator,status"}
 DATA_DIR=${2:-"/tmp/celo/network"}
-export CELO_IMAGE=${3:-"us.gcr.io/celo-testnet/geth@sha256:4bc97381db0bb81b7a3e473bb61d447c90be165834316d3f75bc34d7db718b39"}
+
+export CELO_IMAGE=${3:-"us.gcr.io/celo-testnet/geth@sha256:2ef4fe86fc19efdc9856a5bc6fa1364d5522da9e430996b97af09c66988a7936"}
+#export CELO_IMAGE=${3:-"us.gcr.io/celo-testnet/geth@sha256:4bc97381db0bb81b7a3e473bb61d447c90be165834316d3f75bc34d7db718b39"}
 export NETWORK_ID=${4:-"1101"}
-export NETWORK_NAME=${5:-"integration"}
+export NETWORK_NAME=${5:-"baklavastaging"}
 export DEFAULT_PASSWORD=${6:-"1234"}
 export CELO_IMAGE_ATTESTATION=${7:-"us.gcr.io/celo-testnet/celo-monorepo@sha256:3e958851e4a89e39eeefcc56e324d9ee0d09286a36cb63c285195183fe4dc4ee"}
-export CELO_PROVIDER=${8:-"https://integration-forno.celo-testnet.org/"} # https://berlintestnet001-forno.celo-networks-dev.org/
+export CELO_PROVIDER=${8:-"https://baklavastaging-forno.celo-testnet.org/"} # https://berlintestnet001-forno.celo-networks-dev.org/
 export DATABASE_URL=${9:-"sqlite://db/dev.db"}
 
 export NEXMO_KEY="xx"
@@ -47,13 +49,13 @@ make_status_requests () {
     echo -e "Checking Proxy and Validator state:"
     
     echo -n "* Proxy eth_blockNumber:"
-    curl -X POST --data '{"jsonrpc":"2.0","method":"eth_blockNumber","params":[],"id":1}' -H "Content-Type: application/json" localhost:8545
+    curl -X POST --data '{"jsonrpc":"2.0","method":"eth_blockNumber","params":[],"id":1}' -H "Content-Type: application/json" localhost:8555
     
     echo -n "* Validator net_peerCount:"
-    curl -X POST --data '{"jsonrpc":"2.0","method":"net_peerCount","params":[],"id":74}' -H "Content-Type: application/json" localhost:8547
+    curl -X POST --data '{"jsonrpc":"2.0","method":"net_peerCount","params":[],"id":74}' -H "Content-Type: application/json" localhost:8545
     
     echo -n "* Validator eth_mining:"
-    curl -X POST --data '{"jsonrpc":"2.0","method":"eth_mining","params":[],"id":1}' -H "Content-Type: application/json" localhost:8547
+    curl -X POST --data '{"jsonrpc":"2.0","method":"eth_mining","params":[],"id":1}' -H "Content-Type: application/json" localhost:8545
     echo -e ""
     
 }
@@ -114,11 +116,13 @@ if [[ $COMMAND == *"accounts"* ]]; then
     
     echo -e "\tCELO_VALIDATOR_ADDRESS=$CELO_VALIDATOR_ADDRESS"
     echo -e "\tCELO_VALIDATOR_GROUP_ADDRESS=$CELO_VALIDATOR_ADDRESS"
-    echo -e "\tCELO_PROXY_ADDRESS=$CELO_VALIDATOR_ADDRESS"
+    echo -e "\tCELO_PROXY_ADDRESS=$CELO_PROXY_ADDRESS"
     
-    export CELO_VALIDATOR_POP=$(docker run -v $PWD/validator:/root/.celo --entrypoint /bin/sh -it $CELO_IMAGE -c " printf '%s\n' $DEFAULT_PASSWORD | geth account proof-of-possession $CELO_VALIDATOR_ADDRESS "| tail -1| cut -d' ' -f 3| tr -cd "[:alnum:]\n" )
-
-    echo -e "\tCELO_VALIDATOR_POP=$CELO_VALIDATOR_POP"
+    export CELO_VALIDATOR_BLS_PUBLIC_KEY=$(docker run -v $PWD/validator:/root/.celo --entrypoint /bin/sh -it $CELO_IMAGE -c " printf '%s\n' $DEFAULT_PASSWORD | geth account proof-of-possession $CELO_VALIDATOR_ADDRESS "| tail -1| cut -d' ' -f 5| tr -cd "[:alnum:]\n" )
+    export CELO_VALIDATOR_BLS_SIGNATURE=$(docker run -v $PWD/validator:/root/.celo --entrypoint /bin/sh -it $CELO_IMAGE -c " printf '%s\n' $DEFAULT_PASSWORD | geth account proof-of-possession $CELO_VALIDATOR_ADDRESS "|tail -2|head -1| cut -d' ' -f 4| tr -cd "[:alnum:]\n")
+    
+    echo -e "\tCELO_VALIDATOR_BLS_PUBLIC_KEY=$CELO_VALIDATOR_BLS_PUBLIC_KEY"
+    echo -e "\tCELO_VALIDATOR_BLS_SIGNATURE=$CELO_VALIDATOR_BLS_SIGNATURE"
 
 fi
 
@@ -146,7 +150,7 @@ if [[ $COMMAND == *"run-validator"* ]]; then
 
     remove_containers
     echo -e "\tStarting the Proxy"
-    screen -S celo-proxy -d -m docker run --name celo-proxy --restart always -p 8545:8545 -p 8546:8546 -p 30303:30303 -p 30303:30303/udp -p 30503:30503 -p 30503:30503/udp -v $PWD/proxy:/root/.celo $CELO_IMAGE --verbosity 3 --networkid $NETWORK_ID --syncmode full --rpc --rpcaddr 0.0.0.0 --rpcapi eth,net,web3,debug --maxpeers 1100 --etherbase=$CELO_PROXY_ADDRESS --proxy.proxy --proxy.proxiedvalidatoraddress $CELO_VALIDATOR_ADDRESS --proxy.internalendpoint :30503
+    screen -S celo-proxy -d -m docker run --name celo-proxy --restart always -p 8555:8545 -p 8556:8546 -p 30313:30303 -p 30313:30303/udp -p 30503:30503 -p 30503:30503/udp -v $PWD/proxy:/root/.celo $CELO_IMAGE --verbosity 3 --networkid $NETWORK_ID --syncmode full --rpc --rpcaddr 0.0.0.0 --rpcapi eth,net,web3,debug --maxpeers 1100 --etherbase=$CELO_PROXY_ADDRESS --proxy.proxy --proxy.proxiedvalidatoraddress $CELO_VALIDATOR_ADDRESS --proxy.internalendpoint :30503
     
     sleep 10s
     
@@ -156,7 +160,8 @@ if [[ $COMMAND == *"run-validator"* ]]; then
     
     echo -e "\tStarting Validator node"
     docker run -v $PWD/validator:/root/.celo --entrypoint sh --rm $CELO_IMAGE -c "echo $DEFAULT_PASSWORD > /root/.celo/.password"
-    screen -S celo-validator -d -m docker run --name celo-validator --restart always -p 127.0.0.1:8547:8545 -p 127.0.0.1:8548:8546 -p 30304:30303 -p 30304:30303/udp -v $PWD/validator:/root/.celo $CELO_IMAGE --verbosity 3 --networkid $NETWORK_ID --syncmode full --rpc --rpcaddr 0.0.0.0 --rpcapi eth,net,web3,debug --maxpeers 125 --mine --istanbul.blockperiod=5 --istanbul.requesttimeout=3000 --etherbase $CELO_VALIDATOR_ADDRESS --nodiscover --proxy.proxied --proxy.proxyenodeurlpair=enode://$PROXY_ENODE@$PROXY_IP:30503\;enode://$PROXY_ENODE@$PROXY_IP:30503  --unlock=$CELO_VALIDATOR_ADDRESS --password /root/.celo/.password
+    
+    screen -S celo-validator -d -m docker run --name celo-validator --restart always -p 127.0.0.1:8545:8545 -p 127.0.0.1:8546:8546 -p 30303:30303 -p 30303:30303/udp -v $PWD/validator:/root/.celo $CELO_IMAGE --verbosity 3 --networkid $NETWORK_ID --syncmode full --rpc --rpcaddr 0.0.0.0 --rpcapi eth,net,web3,debug --maxpeers 125 --mine --istanbul.blockperiod=5 --istanbul.requesttimeout=3000 --etherbase $CELO_VALIDATOR_ADDRESS --nodiscover --proxy.proxied --proxy.proxyenodeurlpair=enode://$PROXY_ENODE@$PROXY_IP:30503\;enode://$PROXY_ENODE@$PROXY_IP:30503  --unlock=$CELO_VALIDATOR_ADDRESS --password /root/.celo/.password
     
     sleep 5s
      
