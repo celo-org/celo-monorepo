@@ -5,7 +5,7 @@ import { newCheckBuilder } from '../../utils/checks'
 import { displaySendTx } from '../../utils/cli'
 import { Flags } from '../../utils/command'
 
-export default class ElectionVote extends BaseCommand {
+export default class ElectionActivate extends BaseCommand {
   static description = 'Activate pending votes in validator elections to begin earning rewards'
 
   static flags = {
@@ -19,7 +19,7 @@ export default class ElectionVote extends BaseCommand {
     'activate --from 0x4443d0349e8b3075cba511a0a87796597602a0f1 --wait',
   ]
   async run() {
-    const res = this.parse(ElectionVote)
+    const res = this.parse(ElectionActivate)
 
     this.kit.defaultAccount = res.flags.from
     await newCheckBuilder(this, res.flags.from)
