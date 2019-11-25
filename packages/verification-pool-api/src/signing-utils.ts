@@ -1,6 +1,6 @@
 // Originally taken from https://github.com/ethereum/web3.js/blob/1.x/packages/web3-eth-accounts/src/index.js
 
-import { account as Account, bytes as Bytes, hash as Hash, nat as Nat, RLP } from 'eth-lib'
+import { account as Account, hash as Hash, nat as Nat, RLP } from 'eth-lib'
 import * as _ from 'lodash'
 import * as helpers from 'web3-core-helpers'
 import * as utils from 'web3-utils'
