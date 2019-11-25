@@ -22,13 +22,13 @@ import { AccountType, generatePrivateKey } from 'src/lib/generate_utils'
 import { ensure0x } from 'src/lib/utils'
 import twilio, { Twilio } from 'twilio'
 import { Argv } from 'yargs'
-import { AccountArgv } from '../account'
+import { BotsArgv } from '../bots'
 
 export const command = 'auto-verify'
 
 export const describe = 'command for verifying an arbitrary twilio phone number'
 
-interface AutoVerifyArgv extends AccountArgv {
+interface AutoVerifyArgv extends BotsArgv {
   initialWaitSeconds: number
   inBetweenWaitSeconds: number
   attestationMax: number
@@ -110,6 +110,7 @@ export const handler = async function autoVerify(argv: AutoVerifyArgv) {
         gasPrice: gasPrice.toString(),
       }
 
+      console.info('request attestations')
       await requestMoreAttestations(attestations, phoneNumber, 1, clientAddress, txParams)
 
       const attestationsToComplete = await attestations.getActionableAttestations(
@@ -117,6 +118,7 @@ export const handler = async function autoVerify(argv: AutoVerifyArgv) {
         clientAddress
       )
 
+      console.info('reveal to issuer')
       const possibleErrors = await requestAttestationsFromIssuers(
         attestationsToComplete,
         attestations,
@@ -126,6 +128,7 @@ export const handler = async function autoVerify(argv: AutoVerifyArgv) {
 
       printAndIgnoreRequestErrors(possibleErrors)
 
+      console.info('wait for messages')
       await pollForMessagesAndCompleteAttestations(
         attestations,
         twilioClient,
