@@ -151,7 +151,7 @@ contract('Vesting', (accounts: string[]) => {
     })
   })
 
-  describe('#vesting creation()', () => {
+  describe('#vesting - creation()', () => {
     it('should create a new vesting instance and emit event', async () => {
       const newVestingInstanceTx = await createNewVestingInstanceTx(
         vestingDefaultSchedule,
@@ -393,7 +393,7 @@ contract('Vesting', (accounts: string[]) => {
     })
   })
 
-  describe('#vesting cycle()', () => {
+  describe('#vesting - withdraw()', () => {
     it('beneficiary should not be able to withdraw before start time of vesting', async () => {
       await createNewVestingInstanceTx(vestingDefaultSchedule, registry.address, web3)
       const vestingInstanceRegistryAddress = await vestingFactoryInstance.hasVestedAt(beneficiary)
@@ -428,6 +428,62 @@ contract('Vesting', (accounts: string[]) => {
       const timeToTravel = 3 * MONTH
       await timeTravel(timeToTravel, web3)
       await assertRevert(vestingInstance.withdraw({ from: accounts[5] }))
+    })
+  })
+
+  describe('#vesting - pause()', () => {
+    it('revoker should be able to pause the vesting', async () => {
+      await createNewVestingInstanceTx(vestingDefaultSchedule, registry.address, web3)
+      const vestingInstanceRegistryAddress = await vestingFactoryInstance.hasVestedAt(beneficiary)
+      const vestingInstance = await VestingInstance.at(vestingInstanceRegistryAddress)
+      const pauseTx = await vestingInstance.pause(300 * DAY, { from: revoker })
+      const isPaused = await vestingInstance.paused()
+      assert.isTrue(isPaused)
+      const vestingPausedEvent = _.find(pauseTx.logs, {
+        event: 'WithdrawalPaused',
+      })
+      assert.exists(vestingPausedEvent)
+    })
+
+    it('revoker should not be able to pause the vesting for more than 365 days', async () => {
+      await createNewVestingInstanceTx(vestingDefaultSchedule, registry.address, web3)
+      const vestingInstanceRegistryAddress = await vestingFactoryInstance.hasVestedAt(beneficiary)
+      const vestingInstance = await VestingInstance.at(vestingInstanceRegistryAddress)
+      await assertRevert(vestingInstance.pause(366 * DAY, { from: revoker }))
+    })
+
+    it('should revert when none-revoker attempts to pause the vesting', async () => {
+      await createNewVestingInstanceTx(vestingDefaultSchedule, registry.address, web3)
+      const vestingInstanceRegistryAddress = await vestingFactoryInstance.hasVestedAt(beneficiary)
+      const vestingInstance = await VestingInstance.at(vestingInstanceRegistryAddress)
+      await assertRevert(vestingInstance.pause(300 * DAY, { from: accounts[5] }))
+    })
+
+    it('should revert when revoker attempts to pause an already paused vesting', async () => {
+      await createNewVestingInstanceTx(vestingDefaultSchedule, registry.address, web3)
+      const vestingInstanceRegistryAddress = await vestingFactoryInstance.hasVestedAt(beneficiary)
+      const vestingInstance = await VestingInstance.at(vestingInstanceRegistryAddress)
+      await vestingInstance.pause(300 * DAY, { from: revoker })
+      await assertRevert(vestingInstance.pause(301 * DAY, { from: revoker }))
+    })
+
+    it('should revert when revoker attempts to pause a none-revokable vesting', async () => {
+      const vestingSchedule = _.clone(vestingDefaultSchedule)
+      vestingSchedule.vestingRevokable = false
+      await createNewVestingInstanceTx(vestingSchedule, registry.address, web3)
+      const vestingInstanceRegistryAddress = await vestingFactoryInstance.hasVestedAt(beneficiary)
+      const vestingInstance = await VestingInstance.at(vestingInstanceRegistryAddress)
+      await assertRevert(vestingInstance.pause(300 * DAY, { from: revoker }))
+    })
+
+    it('should revert when revoker attempts to pause an already revoked vesting', async () => {
+      await createNewVestingInstanceTx(vestingDefaultSchedule, registry.address, web3)
+      const vestingInstanceRegistryAddress = await vestingFactoryInstance.hasVestedAt(beneficiary)
+      const vestingInstance = await VestingInstance.at(vestingInstanceRegistryAddress)
+      await vestingInstance.revoke((await getCurrentBlockchainTimestamp(web3)) + 1 * MINUTE, {
+        from: revoker,
+      })
+      await assertRevert(vestingInstance.pause(300 * DAY, { from: revoker }))
     })
   })
 })
