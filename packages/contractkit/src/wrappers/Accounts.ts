@@ -1,8 +1,11 @@
 import {
   hashMessageWithPrefix,
+  LocalSigner,
+  NativeSigner,
   parseSignature,
   Signature,
   signedMessageToPublicKey,
+  Signer,
 } from '@celo/utils/lib/signatureUtils'
 import Web3 from 'web3'
 import { Address } from '../base'
@@ -47,6 +50,15 @@ export class AccountsWrapper extends BaseWrapper<Accounts> {
    */
   getValidatorSigner: (account: string) => Promise<Address> = proxyCall(
     this.contract.methods.getValidatorSigner
+  )
+
+  /**
+   * Returns the account address given the signer for voting
+   * @param signer Address that is authorized to sign the tx as voter
+   * @return The Account address
+   */
+  voteSignerToAccount: (signer: Address) => Promise<Address> = proxyCall(
+    this.contract.methods.voteSignerToAccount
   )
 
   /**
@@ -171,7 +183,19 @@ export class AccountsWrapper extends BaseWrapper<Accounts> {
   }
 
   async generateProofOfSigningKeyPossession(account: Address, signer: Address) {
-    return this.getParsedSignatureOfAddress(account, signer)
+    return this.getParsedSignatureOfAddress(
+      account,
+      signer,
+      NativeSigner(this.kit.web3.eth.sign, signer)
+    )
+  }
+
+  async generateProofOfSigningKeyPossessionLocally(
+    account: Address,
+    signer: Address,
+    privateKey: string
+  ) {
+    return this.getParsedSignatureOfAddress(account, signer, LocalSigner(privateKey))
   }
 
   /**
@@ -238,9 +262,9 @@ export class AccountsWrapper extends BaseWrapper<Accounts> {
     return parseSignature(hash, signature, signer)
   }
 
-  private async getParsedSignatureOfAddress(address: Address, signer: string) {
+  private async getParsedSignatureOfAddress(address: Address, signer: string, signerFn: Signer) {
     const hash = Web3.utils.soliditySha3({ type: 'address', value: address })
-    const signature = await this.kit.web3.eth.sign(hash, signer)
+    const signature = await signerFn.sign(hash)
     return parseSignature(hash, signature, signer)
   }
 }
