@@ -686,12 +686,15 @@ describe('governance tests', () => {
     })
 
     it('should have emitted transfer events when paying epoch rewards', async () => {
+      const transferTopic = '0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef'
       const currentBlock = await web3.eth.getBlockNumber()
       const lst = await web3.eth.getPastLogs({
         fromBlock: currentBlock - 10,
         toBlock: currentBlock,
       })
-      assert(lst.some((a: any) => a.transactionHash === a.blockHash))
+      assert(lst.filter((a: any) => a.transactionHash === a.blockHash).length >= 6)
+      assert(lst.filter((a: any) => a.topics[0] === transferTopic).length >= 6)
+      assert(lst.every((a: any) => a.blockNumber % 10 === 0 || a.topics[0] === transferTopic))
     })
   })
 
