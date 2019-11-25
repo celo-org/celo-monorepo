@@ -30,6 +30,7 @@ export default class ElectionShow extends BaseCommand {
     const res = this.parse(ElectionShow)
     const address = res.args.address
     const election = await this.kit.contracts.getElection()
+    const validators = await this.kit.contracts.getValidators()
 
     if (res.flags.group) {
       await newCheckBuilder(this)
