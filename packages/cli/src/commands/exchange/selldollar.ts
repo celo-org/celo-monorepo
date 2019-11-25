@@ -19,9 +19,9 @@ export default class SellDollar extends BaseCommand {
     const stableToken = await this.kit.contracts.getStableToken()
     const exchange = await this.kit.contracts.getExchange()
 
-    await displaySendTx('approve', stableToken.approve(exchange.address, sellAmount.toString()))
+    await displaySendTx('approve', stableToken.approve(exchange.address, sellAmount.toFixed()))
 
-    const exchangeTx = exchange.exchange(sellAmount.toString(), minBuyAmount.toString(), false)
+    const exchangeTx = exchange.exchange(sellAmount.toFixed(), minBuyAmount.toFixed(), false)
     await displaySendTx('exchange', exchangeTx)
   }
 }

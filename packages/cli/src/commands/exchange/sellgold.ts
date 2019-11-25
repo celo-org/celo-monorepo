@@ -19,9 +19,9 @@ export default class SellGold extends BaseCommand {
     const goldToken = await this.kit.contracts.getGoldToken()
     const exchange = await this.kit.contracts.getExchange()
 
-    await displaySendTx('approve', goldToken.approve(exchange.address, sellAmount.toString()))
+    await displaySendTx('approve', goldToken.approve(exchange.address, sellAmount.toFixed()))
 
-    const exchangeTx = exchange.exchange(sellAmount.toString(), minBuyAmount.toString(), true)
+    const exchangeTx = exchange.exchange(sellAmount.toFixed(), minBuyAmount.toFixed(), true)
     await displaySendTx('exchange', exchangeTx)
   }
 }

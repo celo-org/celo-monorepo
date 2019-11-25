@@ -5,8 +5,8 @@ import { newCheckBuilder } from '../../utils/checks'
 import { displaySendTx } from '../../utils/cli'
 import { Flags } from '../../utils/command'
 
-export default class ElectionVote extends BaseCommand {
-  static description = 'Vote for a Validator Group in validator elections.'
+export default class ElectionRevoke extends BaseCommand {
+  static description = 'Revoke votes for a Validator Group in validator elections.'
 
   static flags = {
     ...BaseCommand.flags,
@@ -15,14 +15,14 @@ export default class ElectionVote extends BaseCommand {
       description: "ValidatorGroup's address",
       required: true,
     }),
-    value: flags.string({ description: 'Amount of Gold used to vote for group', required: true }),
+    value: flags.string({ description: 'Value of votes to revoke', required: true }),
   }
 
   static examples = [
-    'vote --from 0x4443d0349e8b3075cba511a0a87796597602a0f1 --for 0x932fee04521f5fcb21949041bf161917da3f588b, --value 1000000',
+    'revoke --from 0x4443d0349e8b3075cba511a0a87796597602a0f1 --for 0x932fee04521f5fcb21949041bf161917da3f588b, --value 1000000',
   ]
   async run() {
-    const res = this.parse(ElectionVote)
+    const res = this.parse(ElectionRevoke)
 
     this.kit.defaultAccount = res.flags.from
     await newCheckBuilder(this, res.flags.from)
@@ -31,7 +31,11 @@ export default class ElectionVote extends BaseCommand {
       .runChecks()
 
     const election = await this.kit.contracts.getElection()
-    const tx = await election.vote(res.flags.for, new BigNumber(res.flags.value))
-    await displaySendTx('vote', tx)
+    const accounts = await this.kit.contracts.getAccounts()
+    const account = await accounts.voteSignerToAccount(res.flags.from)
+    const txos = await election.revoke(account, res.flags.for, new BigNumber(res.flags.value))
+    for (const txo of txos) {
+      await displaySendTx('revoke', txo, { from: res.flags.from })
+    }
   }
 }
