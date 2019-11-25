@@ -155,6 +155,8 @@ At any moment you can check the currently elected validators by running the foll
 celocli election:current
 ```
 
+### Stop Validating
+
 If for some reason you need to stop running your Validator, please do one or all of the following so that it will no longer be chosen as a participant in BFT:
 
 - Deregister your validator:
