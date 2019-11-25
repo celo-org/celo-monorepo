@@ -33,7 +33,7 @@ export function toNumber(input: string) {
 }
 
 export function parseNumber(input: NumberLike) {
-  return new BigNumber(input).toString(10)
+  return new BigNumber(input).toFixed()
 }
 
 export function parseBytes(input: string): Array<string | number[]> {
@@ -215,19 +215,20 @@ export function toTransactionObject<O>(
   return new CeloTransactionObject(kit, txo, defaultParams)
 }
 
+export type CeloTransactionParams = Omit<Tx, 'data'>
 export class CeloTransactionObject<O> {
   constructor(
     private kit: ContractKit,
     readonly txo: TransactionObject<O>,
-    readonly defaultParams?: Omit<Tx, 'data'>
+    readonly defaultParams?: CeloTransactionParams
   ) {}
 
   /** send the transaction to the chain */
-  send = (params?: Omit<Tx, 'data'>): Promise<TransactionResult> => {
+  send = (params?: CeloTransactionParams): Promise<TransactionResult> => {
     return this.kit.sendTransactionObject(this.txo, { ...this.defaultParams, ...params })
   }
 
   /** send the transaction and waits for the receipt */
-  sendAndWaitForReceipt = (params?: Omit<Tx, 'data'>): Promise<TransactionReceipt> =>
+  sendAndWaitForReceipt = (params?: CeloTransactionParams): Promise<TransactionReceipt> =>
     this.send(params).then((result) => result.waitReceipt())
 }

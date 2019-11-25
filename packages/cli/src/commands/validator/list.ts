@@ -2,7 +2,8 @@ import { cli } from 'cli-ux'
 import { BaseCommand } from '../../base'
 
 export default class ValidatorList extends BaseCommand {
-  static description = 'List existing Validators'
+  static description =
+    'List registered Validators, their name (if provided), affiliation, uptime score, and public keys used for validating.'
 
   static flags = {
     ...BaseCommand.flags,
@@ -21,8 +22,10 @@ export default class ValidatorList extends BaseCommand {
     cli.table(validatorList, {
       address: {},
       name: {},
-      publicKey: {},
       affiliation: {},
+      score: { get: (v) => v.score.toFixed() },
+      ecdsaPublicKey: {},
+      blsPublicKey: {},
     })
   }
 }

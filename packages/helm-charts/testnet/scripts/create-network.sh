@@ -4,7 +4,6 @@ set -euo pipefail
 NAMESPACE=""
 RELEASE=""
 DOMAIN_NAME_OPT=""
-VERIFICATION_POOL_URL="https://verification-pool-integration.celo.org/v0.1/sms/"
 ACTION=install
 TEST_OPT=""
 ZONE="us-west1-a"
@@ -17,7 +16,6 @@ while getopts ':utn:r:z:d:v:a:' flag; do
     r) RELEASE="${OPTARG}" ;;
     z) ZONE="${OPTARG}" ;;
     d) DOMAIN_NAME_OPT="--set domain.name=${OPTARG}" ;;
-    v) VERIFICATION_POOL_URL="${OPTARG}" ;;
     a) VERIFICATION_REWARDS_ADDRESS="${OPTARG}" ;;
     *) echo "Unexpected option ${flag}" ;;
   esac
@@ -55,7 +53,7 @@ if [ "$ACTION" = "install" ]; then
   echo "Deploying new environment..."
 
   helm install ./testnet --name $RELEASE --namespace $NAMESPACE \
-  $DOMAIN_NAME_OPT $TEST_OPT --set miner.verificationpool=$VERIFICATION_POOL_URL \
+  $DOMAIN_NAME_OPT $TEST_OPT \
   --set miner.verificationrewards=$VERIFICATION_REWARDS_ADDRESS \
   --set blockscout.db.username=$BLOCKSCOUT_DB_USERNAME \
   --set blockscout.db.password=$BLOCKSCOUT_DB_PASSWORD \
@@ -70,7 +68,7 @@ elif [ "$ACTION" = "upgrade" ]; then
   echo "Upgrading existing environment..."
 
   helm upgrade $RELEASE ./testnet \
-  $DOMAIN_NAME_OPT $TEST_OPT --set miner.verificationpool=$VERIFICATION_POOL_URL \
+  $DOMAIN_NAME_OPT $TEST_OPT \
   --set miner.verificationrewards=$VERIFICATION_REWARDS_ADDRESS \
   --set blockscout.db.username=$BLOCKSCOUT_DB_USERNAME \
   --set blockscout.db.password=$BLOCKSCOUT_DB_PASSWORD \
