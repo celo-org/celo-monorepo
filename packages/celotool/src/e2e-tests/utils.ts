@@ -374,10 +374,10 @@ export async function startGeth(gethBinaryPath: string, instance: GethInstanceCo
   } else if (isProxy) {
     gethArgs.push('--proxy.proxy')
     if (proxyport) {
-      gethArgs.push(`--proxy.internalendpoint=127.0.0.1:${proxyport.toString()}`)
+      gethArgs.push(`--proxy.internalendpoint=:${proxyport.toString()}`)
     }
     gethArgs.push(`--proxy.proxiedvalidatoraddress=${instance.proxiedValidatorAddress}`)
-    gethArgs.push(`--nodekeyhex=${privateKey}`)
+    // gethArgs.push(`--nodekeyhex=${privateKey}`)
   }
 
   if (bootnodeEnode) {

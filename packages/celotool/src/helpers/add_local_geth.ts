@@ -50,6 +50,7 @@ async function main({
   testDir: string
 }) {
   let key = (await findAPortNotInUse(30303)) - 30303
+  const proxyKey = key + 1
 
   const ethstats = 'localhost:3000'
   const gethConfig: GethTestConfig = {
@@ -63,7 +64,7 @@ async function main({
         wsport: 8546 + key * 2,
         ethstats: noEthStats ? '' : ethstats,
         isProxied: isProxy,
-        proxy: isProxy ? '${key}-proxy' : undefined,
+        proxy: isProxy ? '${proxyKey}-proxy' : undefined,
       },
     ],
   }
@@ -82,12 +83,12 @@ async function main({
   )
 
   instance.privateKey = validatorPrivateKey
+  instance.proxies = [validatorEnode, validatorEnode]
 
   if (isProxy) {
-    const proxyKey = key + 1
-    // const validatorPrivateKey = getPrivateKeysFor(AccountType.PROXY, mnemonic, key).pop()
+    const validatorPrivateKey = getPrivateKeysFor(AccountType.PROXY, mnemonic, key).pop()
 
-    gethConfig.instances.push({
+    gethConfig.instances.unshift({
       name: `${proxyKey}-proxy`,
       validating: false,
       syncmode: 'full',
@@ -96,7 +97,7 @@ async function main({
       rpcport: 8545 + proxyKey * 2,
       wsport: 8546 + proxyKey * 2,
       isProxy: true,
-      // proxiedValidatorAddress: '0x' + privateKeyToPublicKey(validatorPrivateKey as string),
+      proxiedValidatorAddress: privateKeyToPublicKey(validatorPrivateKey as string).slice(-40),
       // proxiedValidatorAddress: validatorEnode,
       // proxiedValidatorAddress:`127.0.0.1:${instance.port}`,
     })
@@ -120,9 +121,6 @@ async function main({
 
   for (const i of gethConfig.instances) {
     await initAndStartGeth(gethBinaryPath, i)
-    // if (i.isProxied) {
-    //   console.log('Waiting 30 seconds to start proxy')
-    //   await new Promise(_ => setTimeout(_, 60000))
-    // }
+    await new Promise((_) => setTimeout(_, 1000))
   }
 }
