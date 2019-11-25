@@ -2,11 +2,11 @@ import { memo } from 'react'
 import { StyleSheet, View } from 'react-native'
 import Fade from 'react-reveal/Fade'
 import Feature from 'src/dev/Feature'
+import { H3 } from 'src/fonts/Fonts'
 import { I18nProps, withNamespaces } from 'src/i18n'
 import { Cell, GridRow, Spans } from 'src/layout/GridRow'
 import { hashNav } from 'src/shared/menu-items'
-import { colors, textStyles, standardStyles } from 'src/styles'
-import { H3 } from 'src/fonts/Fonts'
+import { colors, standardStyles, textStyles } from 'src/styles'
 const stableImg = require('src/dev/features/stable.png')
 const pkiImg = require('src/dev/features/pki.png')
 const govImg = require('src/dev/features/gov.png')

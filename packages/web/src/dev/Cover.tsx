@@ -2,7 +2,6 @@ import * as React from 'react'
 import LazyLoad from 'react-lazyload'
 import { Image, StyleSheet, Text, View } from 'react-native'
 import Fade from 'react-reveal/Fade'
-import LeaderBoard from 'src/dev/LeaderBoard'
 import Transceive from 'src/dev/Transceive'
 import { H2, H4 } from 'src/fonts/Fonts'
 import { I18nProps, withNamespaces } from 'src/i18n'
@@ -10,20 +9,9 @@ import { Cell, GridRow, Spans } from 'src/layout/GridRow'
 import Button, { BTN } from 'src/shared/Button.3'
 import { HEADER_HEIGHT } from 'src/shared/Styles'
 import { colors, fonts, standardStyles, textStyles } from 'src/styles'
+import LeaderBoardApp from './LeaderBoardApp'
 const DELAY = 100
 const DURATION = 400
-
-const LEADERS = [
-  { points: 8, identity: 'Rex' },
-  { points: 840, identity: '100%_that_validator_who_is_an_absolute_diva' },
-  { points: 3200, identity: 'Heisenberg' },
-
-  { points: 7600, identity: 'DX-West' },
-  { points: 5000, identity: 'Simone2148' },
-  { points: 4009, identity: '$celo-$' },
-  { points: 1002, identity: '77zepher' },
-  { points: 9400, identity: 'Gatsby & Durben' },
-]
 
 const CoverComponent = React.memo(function Cover({ t }: I18nProps) {
   return (
@@ -56,7 +44,7 @@ const CoverComponent = React.memo(function Cover({ t }: I18nProps) {
           mobileStyle={standardStyles.blockMarginBottomMobile}
         >
           <Cell span={Spans.full}>
-            <LeaderBoard leaders={LEADERS} />
+            <LeaderBoardApp />
           </Cell>
         </GridRow>
       </LazyLoad>
