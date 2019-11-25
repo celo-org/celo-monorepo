@@ -2,13 +2,13 @@ import { flags } from '@oclif/command'
 import { cli } from 'cli-ux'
 import { BaseCommand } from '../../base'
 
-export default class List extends BaseCommand {
-  static description = 'List information about tokens on the exchange (all amounts in wei)'
+export default class ExchangeShow extends BaseCommand {
+  static description = 'Show the current exchange rates offered by the Exchange'
 
   static flags = {
     ...BaseCommand.flags,
     amount: flags.string({
-      description: 'Amount of sellToken (in wei) to report rates for',
+      description: 'Amount of the token being exchanged to report rates for',
       default: '1000000000000000000',
     }),
   }
@@ -18,7 +18,7 @@ export default class List extends BaseCommand {
   static examples = ['list']
 
   async run() {
-    const { flags: parsedFlags } = this.parse(List)
+    const { flags: parsedFlags } = this.parse(ExchangeShow)
 
     cli.action.start('Fetching exchange rates...')
     const exchange = await this.kit.contracts.getExchange()

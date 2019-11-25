@@ -1,12 +1,12 @@
 ---
-description: View and manage validator groups
+description: View and manage Validator Groups
 ---
 
 ## Commands
 
 ### Commission
 
-Update the commission for an existing validator group
+Update the commission for a registered Validator Group. This represents the share of the epoch rewards given to elected Validators that goes to the group they are a member of.
 
 ```
 USAGE
@@ -24,7 +24,7 @@ _See code: [packages/cli/src/commands/validatorgroup/commission.ts](https://gith
 
 ### Deregister
 
-Deregister a ValidatorGroup
+Deregister a Validator Group. Approximately 60 days after deregistration, the 10,000 Gold locked up to register the Validator Group will become possible to unlock. Note that the Group must be empty (i.e. no members) before deregistering.
 
 ```
 USAGE
@@ -41,7 +41,7 @@ _See code: [packages/cli/src/commands/validatorgroup/deregister.ts](https://gith
 
 ### List
 
-List existing Validator Groups
+List registered Validator Groups, their names (if provided), commission, and members.
 
 ```
 USAGE
@@ -87,7 +87,9 @@ USAGE
   $ celocli validatorgroup:register
 
 OPTIONS
-  --commission=commission                            (required)
+  --commission=commission                            (required) The share of the epoch rewards given to elected
+                                                     Validators that goes to the group.
+
   --from=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) Address for the Validator Group
 
 EXAMPLE
