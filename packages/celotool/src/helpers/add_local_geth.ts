@@ -123,4 +123,10 @@ async function main({
     await initAndStartGeth(gethBinaryPath, i)
     await new Promise((_) => setTimeout(_, 1000))
   }
+
+  console.log()
+  console.log(`Node RPC port: ${instance.rpcport}`)
+  if (isProxy) {
+    console.log(`Proxy RPC port: ${gethConfig.instances[0].rpcport}`)
+  }
 }
