@@ -369,7 +369,10 @@ function attestationCodeReceiver(
       const existingCode = yield call(isCodeAlreadyAccepted, code)
       if (existingCode) {
         Logger.warn(TAG + '@attestationCodeReceiver', 'Code already exists in store, skipping.')
-        if ([CodeInputType.MANUAL, CodeInputType.DEEP_LINK].indexOf(action.inputType) !== -1) {
+        if (
+          CodeInputType.MANUAL === action.inputType ||
+          CodeInputType.DEEP_LINK === action.inputType
+        ) {
           yield put(showError(ErrorMessages.REPEAT_ATTESTATION_CODE))
         }
         return
