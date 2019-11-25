@@ -1,5 +1,5 @@
 import { testWithGanache } from '@celo/dev-utils/lib/ganache-test'
-import { addressToPublicKey, parseSignature } from '@celo/utils/lib/signatureUtils'
+import { parseSignature } from '@celo/utils/lib/signatureUtils'
 import Web3 from 'web3'
 import { newKitFromWeb3 } from '../kit'
 import { AccountsWrapper } from './Accounts'
@@ -11,7 +11,7 @@ TEST NOTES:
 - In migrations: The only account that has cUSD is accounts[0]
 */
 
-const minLockedGoldValue = Web3.utils.toWei('10', 'ether') // 10 gold
+const minLockedGoldValue = Web3.utils.toWei('10000', 'ether') // 10k gold
 
 // Random hex strings
 const blsPublicKey =
@@ -47,12 +47,12 @@ testWithGanache('Accounts Wrapper', (web3) => {
   })
 
   const setupValidator = async (validatorAccount: string) => {
-    const publicKey = await addressToPublicKey(validatorAccount, web3.eth.sign)
     await registerAccountWithLockedGold(validatorAccount)
-    await validators
+    await (await validators
       // @ts-ignore
-      .registerValidator(publicKey, blsPublicKey, blsPoP)
-      .sendAndWaitForReceipt({ from: validatorAccount })
+      .registerValidator(validatorAccount, blsPublicKey, blsPoP)).sendAndWaitForReceipt({
+      from: validatorAccount,
+    })
   }
 
   test('SBAT authorize validator key when not a validator', async () => {

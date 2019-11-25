@@ -196,16 +196,6 @@ describe('governance tests', () => {
     return decryptedKeystore.privateKey
   }
 
-  const activate = async (account: string, txOptions: any = {}) => {
-    const [group] = await validators.methods.getRegisteredValidatorGroups().call()
-    const tx = election.methods.activate(group)
-    let gas = txOptions.gas
-    if (!gas) {
-      gas = (await tx.estimateGas({ ...txOptions })) * 2
-    }
-    return tx.send({ from: account, ...txOptions, gas })
-  }
-
   const isLastBlockOfEpoch = (blockNumber: number, epochSize: number) => {
     return blockNumber % epochSize === 0
   }
@@ -297,12 +287,19 @@ describe('governance tests', () => {
         blockNumber = await web3.eth.getBlockNumber()
         await sleep(0.1)
       } while (blockNumber % epoch !== 1)
-      await activate(validatorAccounts[0])
+      // Wait for an extra epoch transition to ensure everyone is connected to one another.
+      do {
+        blockNumber = await web3.eth.getBlockNumber()
+        await sleep(0.1)
+      } while (blockNumber % epoch !== 1)
 
       // Prepare for member swapping.
       const groupWeb3 = new Web3('ws://localhost:8555')
       await waitToFinishSyncing(groupWeb3)
       const groupKit = newKitFromWeb3(groupWeb3)
+      const group: string = (await groupWeb3.eth.getAccounts())[0]
+      await (await groupKit.contracts.getElection()).activate(group)
+
       validators = await groupKit._web3Contracts.getValidators()
       const membersToSwap = [validatorAccounts[0], validatorAccounts[1]]
       const memberSwapper = await newMemberSwapper(groupKit, membersToSwap)

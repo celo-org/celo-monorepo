@@ -149,7 +149,7 @@ async function verifyCode(
   attestationsToComplete: ActionableAttestation[]
 ) {
   const code = base64ToHex(base64Code)
-  const matchingIssuer = attestations.findMatchingIssuer(
+  const matchingIssuer = await attestations.findMatchingIssuer(
     phoneNumber,
     account,
     code,
@@ -172,7 +172,9 @@ async function verifyCode(
     return
   }
 
-  const tx = await attestations.complete(phoneNumber, account, matchingIssuer, code).send()
+  const tx = await attestations
+    .complete(phoneNumber, account, matchingIssuer, code)
+    .then((x) => x.send())
   return tx.waitReceipt()
 }
 

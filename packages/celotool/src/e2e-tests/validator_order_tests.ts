@@ -42,6 +42,9 @@ describe('governance tests', () => {
 
     it('properly orders validators randomly', async function(this: any) {
       this.timeout(160000 /* 160 seconds */)
+      // If a consensus round fails during this test, the results are inconclusive.
+      // Retry up to two times to mitigate this issue. Restarting the nodes is not needed.
+      this.retries(2)
 
       const latestBlockNumber = (await web3.eth.getBlock('latest')).number
       const indexInEpoch = ((latestBlockNumber % EPOCH) + EPOCH - 1) % EPOCH
