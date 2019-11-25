@@ -71,9 +71,9 @@ OPTIONS
   --reorder=reorder                                  Reorder a validator within the members list
 
 EXAMPLES
-  member --accept 0x97f7333c51897469e8d98e7af8653aab468050a3
-  member --remove 0x47e172f6cfb6c7d01c1574fa3e2be7cc73269d95
-  member --reorder 3 0x47e172f6cfb6c7d01c1574fa3e2be7cc73269d95
+  member --from 0x47e172f6cfb6c7d01c1574fa3e2be7cc73269d95 --accept 0x97f7333c51897469e8d98e7af8653aab468050a3
+  member --from 0x47e172f6cfb6c7d01c1574fa3e2be7cc73269d95 --remove 0x97f7333c51897469e8d98e7af8653aab468050a3
+  member --from 0x47e172f6cfb6c7d01c1574fa3e2be7cc73269d95 --reorder 3 0x47e172f6cfb6c7d01c1574fa3e2be7cc73269d95
 ```
 
 _See code: [packages/cli/src/commands/validatorgroup/member.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/validatorgroup/member.ts)_
