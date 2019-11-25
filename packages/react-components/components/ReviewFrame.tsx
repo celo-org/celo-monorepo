@@ -89,7 +89,7 @@ class ReviewFrame extends React.PureComponent<Props, State> {
     return (
       <View style={[styles.body, style]}>
         <ScrollView contentContainerStyle={styles.scrollViewContentContainer}>
-          <View style={styles.body}>{HeaderComponent && <HeaderComponent />}</View>
+          {HeaderComponent && <HeaderComponent />}
           <View style={styles.confirmationContainer}>{children}</View>
         </ScrollView>
         {FooterComponent && <FooterComponent />}
@@ -103,15 +103,15 @@ const styles = StyleSheet.create({
   body: {
     flex: 1,
     backgroundColor: colors.background,
-  },
-  scrollViewContentContainer: {
-    flex: 1,
     justifyContent: 'space-between',
   },
+  scrollViewContentContainer: {
+    paddingVertical: 10,
+    justifyContent: 'flex-start',
+    alignItems: 'center',
+  },
   confirmationContainer: {
-    flex: 4,
-    marginHorizontal: 20,
-    marginVertical: 10,
+    margin: 20,
   },
   circleButtonContainer: {
     marginVertical: 20,

@@ -75,10 +75,6 @@ contract Attestations is
 
   mapping(bytes32 => IdentifierState) identifiers;
 
-  // Address of the RequestAttestation precompiled contract.
-  // solhint-disable-next-line state-visibility
-  address constant REQUEST_ATTESTATION = address(0xff);
-
   // The duration in blocks in which an attestation can be completed from the block in which the
   // attestation was requested.
   uint256 public attestationExpiryBlocks;
@@ -99,10 +95,10 @@ contract Attestations is
     address attestationRequestFeeToken
   );
 
-  event AttestationIssuersSelected(
+  event AttestationIssuerSelected(
     bytes32 indexed identifier,
     address indexed account,
-    uint256 attestationsRequested,
+    address indexed issuer,
     address attestationRequestFeeToken
   );
 
@@ -115,10 +111,6 @@ contract Attestations is
   event Withdrawal(address indexed account, address indexed token, uint256 amount);
   event AttestationExpiryBlocksSet(uint256 value);
   event AttestationRequestFeeSet(address indexed token, uint256 value);
-  event AttestorAuthorized(address indexed account, address attestor);
-  event AccountDataEncryptionKeySet(address indexed account, bytes dataEncryptionKey);
-  event AccountMetadataURLSet(address indexed account, string metadataURL);
-  event AccountWalletAddressSet(address indexed account, address walletAddress);
   event SelectIssuersWaitBlocksSet(uint256 value);
 
   function initialize(
@@ -212,51 +204,7 @@ contract Attestations is
     );
 
     addIncompleteAttestations(identifier);
-    emit AttestationIssuersSelected(
-      identifier,
-      msg.sender,
-      state.unselectedRequests[msg.sender].attestationsRequested,
-      state.unselectedRequests[msg.sender].attestationRequestFeeToken
-    );
-
     delete state.unselectedRequests[msg.sender];
-  }
-
-  /**
-   * @notice Reveal the encrypted phone number to the issuer.
-   * @param identifier The hash of the identifier to be attested.
-   * @param encryptedPhone The number ECIES encrypted with the issuer's public key.
-   * @param issuer The issuer of the attestation.
-   * @param sendSms Whether or not to send an SMS. For testing purposes.
-   */
-  function reveal(bytes32 identifier, bytes calldata encryptedPhone, address issuer, bool sendSms)
-    external
-  {
-    Attestation storage attestation = identifiers[identifier].attestations[msg.sender]
-      .issuedAttestations[issuer];
-
-    require(attestation.status == AttestationStatus.Incomplete, "Attestation is not incomplete");
-
-    // solhint-disable-next-line not-rely-on-time
-    require(!isAttestationExpired(attestation.blockNumber), "Attestation timed out");
-
-    // Generate the yet-to-be-signed attestation code that will be signed and sent to the
-    // encrypted phone number via SMS via the 'RequestAttestation' precompiled contract.
-    if (sendSms) {
-      bool success;
-      // solhint-disable-next-line avoid-call-value
-      (success, ) = REQUEST_ATTESTATION.call.value(0).gas(gasleft())(
-        abi.encode(
-          identifier,
-          keccak256(abi.encodePacked(identifier, msg.sender)),
-          msg.sender,
-          issuer,
-          encryptedPhone
-        )
-      );
-
-      require(success, "sending SMS failed");
-    }
   }
 
   /**
@@ -450,6 +398,49 @@ contract Attestations is
   }
 
   /**
+    * @notice Returns the state of all attestations that are completable
+    * @param identifier Hash of the identifier.
+    * @param account Address of the account.
+    * @return ( blockNumbers[] - Block number of request/completion the attestation,
+    *           issuers[] - Address of the issuer,
+    *           stringLengths[] - The length of each metadataURL string for each issuer,
+    *           stringData - All strings concatenated
+    *         )
+    */
+  function getCompletableAttestations(bytes32 identifier, address account)
+    external
+    view
+    returns (uint32[] memory, address[] memory, uint256[] memory, bytes memory)
+  {
+    AttestedAddress storage state = identifiers[identifier].attestations[account];
+    address[] storage issuers = state.selectedIssuers;
+
+    uint256 num = 0;
+    for (uint256 i = 0; i < issuers.length; i = i.add(1)) {
+      if (isAttestationCompletable(state.issuedAttestations[issuers[i]])) {
+        num = num.add(1);
+      }
+    }
+
+    uint32[] memory blockNumbers = new uint32[](num);
+    address[] memory completableIssuers = new address[](num);
+
+    uint256 pointer = 0;
+    for (uint256 i = 0; i < issuers.length; i = i.add(1)) {
+      if (isAttestationCompletable(state.issuedAttestations[issuers[i]])) {
+        blockNumbers[pointer] = state.issuedAttestations[issuers[i]].blockNumber;
+        completableIssuers[pointer] = issuers[i];
+        pointer = pointer.add(1);
+      }
+    }
+
+    uint256[] memory stringLengths;
+    bytes memory stringData;
+    (stringLengths, stringData) = getAccounts().batchGetMetadataURL(completableIssuers);
+    return (blockNumbers, completableIssuers, stringLengths, stringData);
+  }
+
+  /**
    * @notice Returns the fee set for a particular token.
    * @param token Address of the attestationRequestFeeToken.
    * @return The fee.
@@ -568,7 +559,7 @@ contract Attestations is
       .sender];
 
     bytes32 seed = getRandom().getBlockRandomness(
-      unselectedRequest.blockNumber + selectIssuersWaitBlocks
+      uint256(unselectedRequest.blockNumber).add(selectIssuersWaitBlocks)
     );
     uint256 numberValidators = numberValidatorsInCurrentSet();
 
@@ -587,15 +578,27 @@ contract Attestations is
         continue;
       }
 
-      currentIndex++;
+      currentIndex = currentIndex.add(1);
       attestation.status = AttestationStatus.Incomplete;
       attestation.blockNumber = unselectedRequest.blockNumber;
       attestation.attestationRequestFeeToken = unselectedRequest.attestationRequestFeeToken;
       state.selectedIssuers.push(issuer);
+
+      emit AttestationIssuerSelected(
+        identifier,
+        msg.sender,
+        issuer,
+        unselectedRequest.attestationRequestFeeToken
+      );
     }
   }
 
   function isAttestationExpired(uint128 attestationRequestBlock) internal view returns (bool) {
     return block.number >= uint256(attestationRequestBlock).add(attestationExpiryBlocks);
+  }
+
+  function isAttestationCompletable(Attestation storage attestation) internal view returns (bool) {
+    return (attestation.status == AttestationStatus.Incomplete &&
+      !isAttestationExpired(attestation.blockNumber));
   }
 }

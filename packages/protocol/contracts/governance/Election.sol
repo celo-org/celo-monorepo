@@ -673,6 +673,14 @@ contract Election is
   }
 
   /**
+   * @notice Returns the active votes received across all groups.
+   * @return The active votes received across all groups.
+   */
+  function getActiveVotes() public view returns (uint256) {
+    return votes.active.total;
+  }
+
+  /**
    * @notice Returns the list of validator groups eligible to elect validators.
    * @return The list of validator groups eligible to elect validators.
    */
@@ -793,5 +801,18 @@ contract Election is
       r = keccak256(abi.encodePacked(r));
     }
     return array;
+  }
+
+  /**
+   * @notice Returns get current validators using the precompile.
+   * @return List of current validators.
+   */
+  function currentValidators() public view returns (address[] memory) {
+    uint256 n = numberValidatorsInCurrentSet();
+    address[] memory res = new address[](n);
+    for (uint256 idx = 0; idx < n; idx++) {
+      res[idx] = validatorAddressFromCurrentSet(idx);
+    }
+    return res;
   }
 }

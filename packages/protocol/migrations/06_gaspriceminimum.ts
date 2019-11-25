@@ -11,7 +11,6 @@ const initializeArgs = async (): Promise<any[]> => {
     config.gasPriceMinimum.initialMinimum,
     toFixed(config.gasPriceMinimum.targetDensity).toString(),
     toFixed(config.gasPriceMinimum.adjustmentSpeed).toString(),
-    toFixed(config.gasPriceMinimum.proposerFraction).toString(),
   ]
 }
 

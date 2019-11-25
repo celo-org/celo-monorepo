@@ -4,6 +4,24 @@ description: View and manage validator groups
 
 ## Commands
 
+### Commission
+
+Update the commission for an existing validator group
+
+```
+USAGE
+  $ celocli validatorgroup:commission
+
+OPTIONS
+  --commission=commission                            (required)
+  --from=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) Address for the Validator Group
+
+EXAMPLE
+  commission --from 0x47e172F6CfB6c7D01C1574fa3E2Be7CC73269D95 --commission 0.1
+```
+
+_See code: [packages/cli/src/commands/validatorgroup/commission.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/validatorgroup/commission.ts)_
+
 ### Deregister
 
 Deregister a ValidatorGroup
@@ -73,7 +91,7 @@ OPTIONS
   --from=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) Address for the Validator Group
 
 EXAMPLE
-  register --from 0x47e172F6CfB6c7D01C1574fa3E2Be7CC73269D95 --name myName --commission 0.1
+  register --from 0x47e172F6CfB6c7D01C1574fa3E2Be7CC73269D95 --commission 0.1
 ```
 
 _See code: [packages/cli/src/commands/validatorgroup/register.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/validatorgroup/register.ts)_

@@ -59,7 +59,7 @@ describe(getOrCreateAccount, () => {
       .withState(state)
       .provide([[select(currentAccountSelector), null]])
       .provide([[select(pincodeTypeSelector), '123']])
-      .returns('0x0000000000000000000000000000000000007E57')
+      .returns('0x0000000000000000000000000000000000007e57')
       .run()
   })
 })
