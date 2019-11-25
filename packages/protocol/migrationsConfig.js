@@ -98,11 +98,11 @@ const DefaultConfig = {
   },
   validators: {
     groupLockedGoldRequirements: {
-      value: '10000000000000000000000', // 10k gold
+      value: '10000000000000000000000', // 10k gold per validator
       duration: 60 * 24 * 60 * 60, // 60 days
     },
     validatorLockedGoldRequirements: {
-      value: '10000000000000000000000', // 1 gold
+      value: '10000000000000000000000', // 10k gold
       duration: 60 * 24 * 60 * 60, // 60 days
     },
     validatorScoreParameters: {

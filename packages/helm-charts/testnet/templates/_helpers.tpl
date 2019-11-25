@@ -195,7 +195,7 @@ spec:
           --consoleformat=json \
           --consoleoutput=stdout \
           --etherbase=${ACCOUNT_ADDRESS} \
-          --ethstats=${HOSTNAME}:${ETHSTATS_SECRET}@${ETHSTATS_SVC} \
+          --ethstats=${HOSTNAME}@${ETHSTATS_SVC} \
           --metrics \
           --mine \
           --networkid=${NETWORK_ID} \
@@ -238,11 +238,6 @@ spec:
         env:
         - name: ETHSTATS_SVC
           value: {{ template "ethereum.fullname" . }}-ethstats.{{ .Release.Namespace }}
-        - name: ETHSTATS_SECRET
-          valueFrom:
-            secretKeyRef:
-              name: {{ template "ethereum.fullname" . }}-ethstats
-              key: WS_SECRET
         - name: ACCOUNT_ADDRESS
           value: {{ .Node.address }}
         - name: NETWORK_ID
@@ -307,7 +302,7 @@ spec:
         - "geth --bootnodes=`cat /root/.celo/bootnodes` \
           --consoleformat=json \
           --consoleoutput=stdout \
-          --ethstats=${HOSTNAME}:${ETHSTATS_SECRET}@${ETHSTATS_SVC} \
+          --ethstats=${HOSTNAME}@${ETHSTATS_SVC} \
           --lightpeers 250 \
           --lightserv 90 \
           --metrics \
@@ -347,11 +342,6 @@ spec:
         env:
         - name: ETHSTATS_SVC
           value: {{ template "ethereum.fullname" . }}-ethstats.{{ .Release.Namespace }}
-        - name: ETHSTATS_SECRET
-          valueFrom:
-            secretKeyRef:
-              name: {{ template "ethereum.fullname" . }}-ethstats
-              key: WS_SECRET
         - name: TARGET_GAS_LIMIT
           value: {{ .Values.geth.genesis.gasLimit | quote }}
         - name: NETWORK_ID
