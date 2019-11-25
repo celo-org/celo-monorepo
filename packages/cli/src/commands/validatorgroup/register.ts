@@ -11,7 +11,11 @@ export default class ValidatorGroupRegister extends BaseCommand {
   static flags = {
     ...BaseCommand.flags,
     from: Flags.address({ required: true, description: 'Address for the Validator Group' }),
-    commission: flags.string({ required: true }),
+    commission: flags.string({
+      required: true,
+      description:
+        'The share of the epoch rewards given to elected Validators that goes to the group.',
+    }),
   }
 
   static examples = ['register --from 0x47e172F6CfB6c7D01C1574fa3E2Be7CC73269D95 --commission 0.1']

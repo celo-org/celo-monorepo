@@ -40,6 +40,10 @@ Make sure to kill the container when you are done.
 
 `$ docker kill celo_cli_container`
 
+### **Prerequisites**
+
+- **You have a full node running.** See the [Running a Full Node](running-a-full-node.md) instructions for more details on running a full node.
+
 ### Overview
 
 The tool is broken down into modules and commands with the following pattern:

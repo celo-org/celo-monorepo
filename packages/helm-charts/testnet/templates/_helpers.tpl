@@ -195,10 +195,9 @@ spec:
           --consoleformat=json \
           --consoleoutput=stdout \
           --etherbase=${ACCOUNT_ADDRESS} \
-          --ethstats=${HOSTNAME}:${ETHSTATS_SECRET}@${ETHSTATS_SVC} \
+          --ethstats=${HOSTNAME}@${ETHSTATS_SVC} \
           --metrics \
           --mine \
-          --miner.verificationpool=${VERIFICATION_POOL_URL} \
           --networkid=${NETWORK_ID} \
           --nodekey=/root/.celo/account/{{ .Node.name}}PrivateKey \
           --password=/root/.celo/account/accountSecret \
@@ -239,11 +238,6 @@ spec:
         env:
         - name: ETHSTATS_SVC
           value: {{ template "ethereum.fullname" . }}-ethstats.{{ .Release.Namespace }}
-        - name: ETHSTATS_SECRET
-          valueFrom:
-            secretKeyRef:
-              name: {{ template "ethereum.fullname" . }}-ethstats
-              key: WS_SECRET
         - name: ACCOUNT_ADDRESS
           value: {{ .Node.address }}
         - name: NETWORK_ID
@@ -251,10 +245,6 @@ spec:
             configMapKeyRef:
               name: {{ template "ethereum.fullname" . }}-geth-config
               key: networkid
-        - name: VERIFICATION_POOL_URL
-          value: {{ .Values.geth.miner.verificationpool }}
-        - name: VERIFICATION_REWARDS_URL
-          value: {{ .Values.verification.rewardsUrl }}
 {{ include "celo.geth-exporter-container" .  | indent 6 }}
 {{ include "celo.prom-to-sd-container" (dict "Values" .Values "Release" .Release "Chart" .Chart "component" "geth" "metricsPort" "9200" "metricsPath" "filteredmetrics" "containerNameLabel" .Node.name )  | indent 6 }}
       initContainers:
@@ -312,7 +302,7 @@ spec:
         - "geth --bootnodes=`cat /root/.celo/bootnodes` \
           --consoleformat=json \
           --consoleoutput=stdout \
-          --ethstats=${HOSTNAME}:${ETHSTATS_SECRET}@${ETHSTATS_SVC} \
+          --ethstats=${HOSTNAME}@${ETHSTATS_SVC} \
           --lightpeers 250 \
           --lightserv 90 \
           --metrics \
@@ -352,11 +342,6 @@ spec:
         env:
         - name: ETHSTATS_SVC
           value: {{ template "ethereum.fullname" . }}-ethstats.{{ .Release.Namespace }}
-        - name: ETHSTATS_SECRET
-          valueFrom:
-            secretKeyRef:
-              name: {{ template "ethereum.fullname" . }}-ethstats
-              key: WS_SECRET
         - name: TARGET_GAS_LIMIT
           value: {{ .Values.geth.genesis.gasLimit | quote }}
         - name: NETWORK_ID

@@ -10,3 +10,5 @@ ethstats:
     tag: latest
   service:
     type: NodePort
+  trusted_addresses: []
+  banned_addresses: []
