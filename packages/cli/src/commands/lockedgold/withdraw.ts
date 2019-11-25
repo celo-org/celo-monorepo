@@ -4,7 +4,8 @@ import { displaySendTx } from '../../utils/cli'
 import { Flags } from '../../utils/command'
 
 export default class Withdraw extends BaseCommand {
-  static description = 'Withdraw unlocked gold whose unlocking period has passed.'
+  static description =
+    'Withdraw any pending withdrawals created via "lockedgold:unlock" that have become available.'
 
   static flags = {
     ...BaseCommand.flags,
