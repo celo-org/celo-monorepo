@@ -136,9 +136,9 @@ export class ElectionWrapper extends BaseWrapper<Election> {
    * @return The groups that `account` has voted for.
    */
   async hasPendingVotes(account: Address): Promise<boolean> {
-    const groups = await this.contract.methods.getGroupsVotedForByAccount(account).call()
+    const groups: string[] = await this.contract.methods.getGroupsVotedForByAccount(account).call()
     const isNotPending = await Promise.all(
-      groups.map(async (g: string) =>
+      groups.map(async (g) =>
         toBigNumber(
           await this.contract.methods.getPendingVotesForGroupByAccount(account, g).call()
         ).isZero()

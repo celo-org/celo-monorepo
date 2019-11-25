@@ -1,12 +1,9 @@
+import { sleep } from '@celo/utils/lib/async'
 import { flags } from '@oclif/command'
 import { BaseCommand } from '../../base'
 import { newCheckBuilder } from '../../utils/checks'
 import { displaySendTx } from '../../utils/cli'
 import { Flags } from '../../utils/command'
-
-function sleep(ms: number) {
-  return new Promise((resolve) => setTimeout(resolve, ms))
-}
 
 export default class ElectionVote extends BaseCommand {
   static description = 'Activate pending votes in validator elections to begin earning rewards'
