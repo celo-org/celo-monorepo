@@ -208,17 +208,20 @@ contract Election is
   {
     require(votes.total.eligible.contains(group));
     require(0 < value);
-    require(canReceiveVotes(group, value));
+    require(canReceiveVotes(group, value), "Unable to receive votes");
     address account = getAccounts().voteSignerToAccount(msg.sender);
 
     // Add group to the groups voted for by the account.
+    bool alreadyVotedForGroup = false;
     address[] storage groups = votes.groupsVotedFor[account];
-    require(groups.length < maxNumGroupsVotedFor);
     for (uint256 i = 0; i < groups.length; i = i.add(1)) {
-      require(groups[i] != group);
+      alreadyVotedForGroup = alreadyVotedForGroup || groups[i] == group;
+    }
+    if (!alreadyVotedForGroup) {
+      require(groups.length < maxNumGroupsVotedFor);
+      groups.push(group);
     }
 
-    groups.push(group);
     incrementPendingVotes(group, account, value);
     incrementTotalVotes(group, value, lesser, greater);
     getLockedGold().decrementNonvotingAccountBalance(account, value);
@@ -242,6 +245,18 @@ contract Election is
     incrementActiveVotes(group, account, value);
     emit ValidatorGroupVoteActivated(account, group, value);
     return true;
+  }
+
+  /**
+   * @notice Returns whether or not an account's votes for the specified group can be activated.
+   * @param account The account with pending votes.
+   * @param group The validator group that `account` has pending votes for.
+   * @return Whether or not `account` has activatable votes for `group`.
+   * @dev Pending votes cannot be activated until an election has been held.
+   */
+  function hasActivatablePendingVotes(address account, address group) external view returns (bool) {
+    PendingVote storage pendingVote = votes.pending.forGroup[group].byAccount[account];
+    return pendingVote.epoch < getEpochNumber() && pendingVote.value > 0;
   }
 
   /**

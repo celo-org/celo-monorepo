@@ -4,6 +4,25 @@ description: View and manage validator elections
 
 ## Commands
 
+### Activate
+
+Activate pending votes in validator elections to begin earning rewards
+
+```
+USAGE
+  $ celocli election:activate
+
+OPTIONS
+  --from=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) Voter's address
+  --wait                                             Wait until all pending votes become activatable
+
+EXAMPLES
+  activate --from 0x4443d0349e8b3075cba511a0a87796597602a0f1
+  activate --from 0x4443d0349e8b3075cba511a0a87796597602a0f1 --wait
+```
+
+_See code: [packages/cli/src/commands/election/activate.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/election/activate.ts)_
+
 ### Current
 
 Outputs the currently elected validator set
@@ -32,6 +51,26 @@ EXAMPLE
 
 _See code: [packages/cli/src/commands/election/list.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/election/list.ts)_
 
+### Revoke
+
+Revoke votes for a Validator Group in validator elections.
+
+```
+USAGE
+  $ celocli election:revoke
+
+OPTIONS
+  --for=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d   (required) ValidatorGroup's address
+  --from=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) Voter's address
+  --value=value                                      (required) Value of votes to revoke
+
+EXAMPLE
+  revoke --from 0x4443d0349e8b3075cba511a0a87796597602a0f1 --for 0x932fee04521f5fcb21949041bf161917da3f588b, --value
+  1000000
+```
+
+_See code: [packages/cli/src/commands/election/revoke.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/election/revoke.ts)_
+
 ### Run
 
 Runs an mock election and outputs the validators that were elected
@@ -48,14 +87,18 @@ _See code: [packages/cli/src/commands/election/run.ts](https://github.com/celo-o
 
 ### Show
 
-Show election information about an existing Validator Group
+Show election information about a voter or Validator Group
 
 ```
 USAGE
-  $ celocli election:show GROUPADDRESS
+  $ celocli election:show ADDRESS
 
 ARGUMENTS
-  GROUPADDRESS  Validator Groups's address
+  ADDRESS  Voter or Validator Groups's address
+
+OPTIONS
+  --group  Show information about a group running in Validator elections
+  --voter  Show information about an account voting in Validator elections
 
 EXAMPLE
   show 0x97f7333c51897469E8D98E7af8653aAb468050a3
@@ -72,7 +115,7 @@ USAGE
   $ celocli election:vote
 
 OPTIONS
-  --for=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d   (required) Set vote for ValidatorGroup's address
+  --for=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d   (required) ValidatorGroup's address
   --from=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) Voter's address
   --value=value                                      (required) Amount of Gold used to vote for group
 

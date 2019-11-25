@@ -22,7 +22,7 @@ export default class ValidatorList extends BaseCommand {
       address: {},
       name: {},
       affiliation: {},
-      score: {},
+      score: { get: (v) => v.score.toFixed() },
       ecdsaPublicKey: {},
       blsPublicKey: {},
     })
