@@ -9,6 +9,7 @@ import {
   CeloTransactionObject,
   identity,
   proxyCall,
+  proxySend,
   toBigNumber,
   toNumber,
   toTransactionObject,
@@ -271,47 +272,6 @@ export class ElectionWrapper extends BaseWrapper<Election> {
     return toTransactionObject(
       this.kit,
       this.contract.methods.vote(validatorGroup, value.toFixed(), lesser, greater)
-    )
-  }
-
-  async revokePending(validatorGroup: Address, value: BigNumber, index: BigNumber): Promise<CeloTransactionObject<boolean>> {
-    if (this.kit.defaultAccount == null) {
-      throw new Error(`missing kit.defaultAccount`)
-    }
-
-    const { lesser, greater } = await this.findLesserAndGreaterAfterVote(validatorGroup, value)
-
-    return toTransactionObject(
-        this.kit,
-        this.contract.methods.revokePending(validatorGroup, value.toString(), lesser, greater, index.toString())
-    )
-  }
-
-  async revokeActive(validatorGroup: Address, value: BigNumber, index: BigNumber): Promise<CeloTransactionObject<boolean>> {
-    if (this.kit.defaultAccount == null) {
-      throw new Error(`missing kit.defaultAccount`)
-    }
-
-    const { lesser, greater } = await this.findLesserAndGreaterAfterVote(validatorGroup, value)
-
-    return toTransactionObject(
-        this.kit,
-        this.contract.methods.revokeActive(validatorGroup, value.toString(), lesser, greater, index.toString())
-    )
-  }
-
-  /**
-   * Converts `account`'s pending votes for `group` to active votes.
-   * @param validatorGroup The validator group to activate at.
-   */
-  async activate(validatorGroup: Address): Promise<CeloTransactionObject<boolean>> {
-    if (this.kit.defaultAccount == null) {
-      throw new Error(`missing kit.defaultAccount`)
-    }
-
-    return toTransactionObject(
-        this.kit,
-        this.contract.methods.activate(validatorGroup)
     )
   }
 

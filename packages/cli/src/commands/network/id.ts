@@ -1,16 +1,16 @@
-import {BaseCommand} from '../../base'
-import chalk from "chalk";
+import { BaseCommand } from '../../base'
+import chalk from 'chalk'
 
 export default class Id extends BaseCommand {
-    static description = 'View network parameters';
+  static description = 'View network parameters'
 
-    static flags = {
-        ...BaseCommand.flags,
-    };
+  static flags = {
+    ...BaseCommand.flags,
+  }
 
-    async run() {
-        const networkId: string = (await this.kit.web3.eth.net.getId()).toString();
+  async run() {
+    const networkId: string = (await this.kit.web3.eth.net.getId()).toString()
 
-        console.log(chalk`Network Id: {bold ${networkId}}.`)
-    }
+    console.log(chalk`Network Id: {bold ${networkId}}.`)
+  }
 }
