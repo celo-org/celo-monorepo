@@ -4,7 +4,7 @@ import program from 'commander'
 import fs from 'fs'
 import { findAPortNotInUse } from 'portscanner'
 
-import { GethTestConfig, initAndStartGeth, addStaticPeers } from '../e2e-tests/utils'
+import { GethTestConfig, initAndStartGeth, GethInstanceConfig } from '../e2e-tests/utils'
 
 import { AccountType, getPrivateKeysFor, privateKeyToPublicKey } from '../lib/generate_utils'
 import { getEnodeAddress } from '../lib/geth'
@@ -49,7 +49,7 @@ async function main({
   mnemonic: string
   testDir: string
 }) {
-  let key = (await findAPortNotInUse(30303)) - 30303
+  const key = (await findAPortNotInUse(30303)) - 30303
   const proxyKey = key + 1
 
   const ethstats = 'localhost:3000'
@@ -69,7 +69,8 @@ async function main({
     ],
   }
 
-  const instance = gethConfig.instances[0]
+  const instance: GethInstanceConfig = gethConfig.instances[0]
+  let proxyInstance: GethInstanceConfig = {} as any
 
   const validatorsFilePath = `${tmpDir}/validators.json`
   const validatorEnodes = JSON.parse(fs.readFileSync(validatorsFilePath, 'utf8'))
@@ -85,10 +86,21 @@ async function main({
   instance.privateKey = validatorPrivateKey
   instance.proxies = [validatorEnode, validatorEnode]
 
-  if (isProxy) {
-    const validatorPrivateKey = getPrivateKeysFor(AccountType.PROXY, mnemonic, key).pop()
+  let proxyEnode
 
-    gethConfig.instances.unshift({
+  if (isProxy) {
+    const validatorPrivateKey = getPrivateKeysFor(AccountType.VALIDATOR, mnemonic, key).pop()
+
+    proxyEnode = getEnodeAddress(
+      privateKeyToPublicKey(getPrivateKeysFor(
+        AccountType.PROXY,
+        mnemonic,
+        proxyKey
+      ).pop() as string),
+      '127.0.0.1',
+      instance.port
+    )
+    proxyInstance = {
       name: `${proxyKey}-proxy`,
       validating: false,
       syncmode: 'full',
@@ -100,23 +112,19 @@ async function main({
       proxiedValidatorAddress: privateKeyToPublicKey(validatorPrivateKey as string).slice(-40),
       // proxiedValidatorAddress: validatorEnode,
       // proxiedValidatorAddress:`127.0.0.1:${instance.port}`,
-    })
+    }
+    gethConfig.instances.unshift(proxyInstance)
   }
 
   const gethBinaryPath = `${gethRepoPath}/build/bin/geth`
 
-  instance.peers = (instance.peers || []).concat(validatorEnodes)
   instance.privateKey = validatorPrivateKey
 
-  const enodes = [...validatorEnodes, validatorEnode].filter((_, i, list) => list.indexOf(_) === i)
-
-  fs.writeFileSync(validatorsFilePath, JSON.stringify(enodes), 'utf8')
-
-  while (key-- > 0) {
-    await addStaticPeers(
-      `${tmpDir}/${key}-validator/datadir`,
-      enodes.filter((_, i: number) => i !== key)
-    )
+  if (isProxy) {
+    proxyInstance.peers = validatorEnodes
+    instance.peers = [proxyEnode as string]
+  } else {
+    instance.peers = validatorEnodes
   }
 
   for (const i of gethConfig.instances) {
