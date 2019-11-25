@@ -220,6 +220,10 @@ contract Reserve is IReserve, Ownable, Initializable, UsingRegistry, ReentrancyG
     return _tokens;
   }
 
+  function getOtherReserveAddresses() external view returns (address[] memory) {
+    return otherReserveAddresses;
+  }
+
   function getAssetAllocationSymbols() external view returns (bytes32[] memory) {
     return assetAllocationSymbols;
   }

@@ -323,19 +323,98 @@ contract('Reserve', (accounts: string[]) => {
     })
   })
 
+  describe('#addOtherReserveAddress()', () => {
+    it('should allow owner to add another reserve address', async () => {
+      await reserve.addOtherReserveAddress(anAddress)
+      assert.isTrue(await reserve.isOtherReserveAddress(anAddress))
+    })
+
+    it('should not allow other users to add another reserve address', async () => {
+      await assertRevert(reserve.addOtherReserveAddress(anAddress, { from: nonOwner }))
+    })
+
+    it('should emit a OtherReserveAddressAdded event', async () => {
+      const response = await reserve.addOtherReserveAddress(anAddress)
+      const events = response.logs
+      assert.equal(events.length, 1)
+      assert.equal(events[0].event, 'OtherReserveAddressAdded')
+      assert.equal(events[0].args.otherReserveAddress.toLowerCase(), anAddress.toLowerCase())
+    })
+
+    describe('when another reserve address has already been added', async () => {
+      beforeEach(async () => {
+        await reserve.addOtherReserveAddress(anAddress)
+      })
+
+      it('should not allow owner to add an existing reserve address', async () => {
+        await assertRevert(reserve.addOtherReserveAddress(anAddress))
+      })
+    })
+  })
+
+  describe.only('#removeOtherReserveAddress()', () => {
+    let index: number = 0
+
+    it('should not allow owner to remove an unadded reserve address', async () => {
+      await assertRevert(reserve.removeOtherReserveAddress(anAddress, index))
+    })
+
+    describe('when another reserve address has already been added', async () => {
+      beforeEach(async () => {
+        await mockSortedOracles.setMedianRate(anAddress, sortedOraclesDenominator)
+        await reserve.addOtherReserveAddress(anAddress)
+        const otherReserveAddresses = await reserve.getOtherReserveAddresses()
+        index = -1
+        for (let i = 0; i < otherReserveAddresses.length; i++) {
+          if (otherReserveAddresses[i].toLowerCase() === anAddress.toLowerCase()) {
+            index = i
+          }
+        }
+      })
+
+      it('should allow owner to remove another reserve address', async () => {
+        await reserve.removeOtherReserveAddress(anAddress, index)
+        assert.isFalse(await reserve.isOtherReserveAddress(anAddress))
+      })
+
+      it('should not allow other users to remove another reserve address', async () => {
+        await assertRevert(reserve.removeOtherReserveAddress(anAddress, index, { from: nonOwner }))
+      })
+
+      it('should emit a OtherReserveAddressRemoved event', async () => {
+        const response = await reserve.removeOtherReserveAddress(anAddress, index)
+        const events = response.logs
+        assert.equal(events.length, 1)
+        assert.equal(events[0].event, 'OtherReserveAddressRemoved')
+        assertSameAddress(events[0].args.otherReserveAddress, anAddress)
+        assert.equal(events[0].args.index, index)
+      })
+    })
+  })
+
   describe('#setAssetAllocations', () => {
-    const newAssetAllocationSymbols = ['cGLD', 'BTC']
+    const newAssetAllocationSymbols = [
+      web3.utils.padRight(web3.utils.utf8ToHex('cGLD'), 64),
+      web3.utils.padRight(web3.utils.utf8ToHex('BTC'), 64),
+    ]
     const newAssetAllocationWeights = [
       new BigNumber(500000000000000000000000),
       new BigNumber(500000000000000000000000),
     ]
+
     it('should allow owner to set asset allocations', async () => {
       await reserve.setAssetAllocations(newAssetAllocationSymbols, newAssetAllocationWeights)
-      assert.equal(await reserve.getAssetAllocationSymbols(), newAssetAllocationSymbols)
-      assert.equal(await reserve.getAssetAllocationWeights(), newAssetAllocationWeights)
+      var assetAllocationSymbols = await reserve.getAssetAllocationSymbols()
+      var assetAllocationWeights = await reserve.getAssetAllocationWeights()
+      assert.equal(assetAllocationSymbols.length, newAssetAllocationSymbols.length)
+      assert.equal(assetAllocationWeights.length, newAssetAllocationWeights.length)
+      assert.equal(web3.utils.hexToUtf8(assetAllocationSymbols[0]), 'cGLD')
+      assert.equal(web3.utils.hexToUtf8(assetAllocationSymbols[1]), 'BTC')
+      assert.equal(newAssetAllocationWeights[0].isEqualTo(assetAllocationWeights[0]), true)
+      assert.equal(newAssetAllocationWeights[1].isEqualTo(assetAllocationWeights[1]), true)
     })
 
-    it('should not allow other users to set tobin tax staleness threshold', async () => {
+    it('should not allow other users to set asset allocations', async () => {
       await assertRevert(
         reserve.setAssetAllocations(newAssetAllocationSymbols, newAssetAllocationWeights, {
           from: nonOwner,
@@ -351,7 +430,12 @@ contract('Reserve', (accounts: string[]) => {
       const events = response.logs
       assert.equal(events.length, 1)
       assert.equal(events[0].event, 'AssetAllocationSet')
-      //assert.equal(events[0].args.value, newTobinTaxStalenessThreshold)
+      assert.equal(events[0].args.symbols.length, 2)
+      assert.equal(events[0].args.weights.length, 2)
+      assert.equal(web3.utils.hexToUtf8(events[0].args.symbols[0]), 'cGLD')
+      assert.equal(web3.utils.hexToUtf8(events[0].args.symbols[1]), 'BTC')
+      assert.equal(newAssetAllocationWeights[0].isEqualTo(events[0].args.weights[0]), true)
+      assert.equal(newAssetAllocationWeights[1].isEqualTo(events[0].args.weights[1]), true)
     })
   })
 })
