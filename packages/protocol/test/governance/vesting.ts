@@ -697,6 +697,14 @@ contract('Vesting', (accounts: string[]) => {
         await lockedGoldInstance.getAccountNonvotingLockedGold(vestingInstance.address),
         vestingDefaultSchedule.vestingAmount
       )
+      assertEqualBN(
+        await lockedGoldInstance.getNonvotingLockedGold(),
+        vestingDefaultSchedule.vestingAmount
+      )
+      assertEqualBN(
+        await lockedGoldInstance.getTotalLockedGold(),
+        vestingDefaultSchedule.vestingAmount
+      )
     })
 
     it('should revert if vesting instance is not an account', async () => {
@@ -731,6 +739,56 @@ contract('Vesting', (accounts: string[]) => {
       await vestingInstance.createAccount({ from: beneficiary })
       await assertRevert(
         vestingInstance.lockGold(vestingDefaultSchedule.vestingAmount, { from: accounts[6] })
+      )
+    })
+  })
+
+  describe('#unlocking - unlock()', () => {
+    it('beneficiary should unlock his locked gold and add a pending withdrawal', async () => {
+      await createNewVestingInstanceTx(vestingDefaultSchedule, registry.address, web3)
+      const vestingInstanceRegistryAddress = await vestingFactoryInstance.hasVestedAt(beneficiary)
+      const vestingInstance = await VestingInstance.at(vestingInstanceRegistryAddress)
+      // beneficiary shall make the vested instance an account
+      await vestingInstance.createAccount({ from: beneficiary })
+      // lock the entire vesting amount
+      await vestingInstance.lockGold(vestingDefaultSchedule.vestingAmount, {
+        from: beneficiary,
+      })
+      // unlock the latter
+      await vestingInstance.unlockGold(vestingDefaultSchedule.vestingAmount, {
+        from: beneficiary,
+      })
+
+      const [values, timestamps] = await lockedGoldInstance.getPendingWithdrawals(
+        vestingInstance.address
+      )
+      assert.equal(values.length, 1)
+      assert.equal(timestamps.length, 1)
+      assertEqualBN(values[0], vestingDefaultSchedule.vestingAmount)
+      assertEqualBN(timestamps[0], (await getCurrentBlockchainTimestamp(web3)) + UNLOCKING_PERIOD)
+
+      assertEqualBN(await lockedGoldInstance.getAccountTotalLockedGold(vestingInstance.address), 0)
+      assertEqualBN(
+        await lockedGoldInstance.getAccountNonvotingLockedGold(vestingInstance.address),
+        0
+      )
+      assertEqualBN(await lockedGoldInstance.getNonvotingLockedGold(), 0)
+      assertEqualBN(await lockedGoldInstance.getTotalLockedGold(), 0)
+    })
+
+    it('should revert if none-beneficiary tries to unlock the locked amount', async () => {
+      await createNewVestingInstanceTx(vestingDefaultSchedule, registry.address, web3)
+      const vestingInstanceRegistryAddress = await vestingFactoryInstance.hasVestedAt(beneficiary)
+      const vestingInstance = await VestingInstance.at(vestingInstanceRegistryAddress)
+      // beneficiary shall make the vested instance an account
+      await vestingInstance.createAccount({ from: beneficiary })
+      // lock the entire vesting amount
+      await vestingInstance.lockGold(vestingDefaultSchedule.vestingAmount, {
+        from: beneficiary,
+      })
+      // unlock the latter
+      await assertRevert(
+        vestingInstance.unlockGold(vestingDefaultSchedule.vestingAmount, { from: accounts[5] })
       )
     })
   })
