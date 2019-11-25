@@ -1,4 +1,4 @@
-import { PhoneNumberUtils, SignatureUtils } from '@celo/utils'
+import { base64ToHex, PhoneNumberUtils, SignatureUtils } from '@celo/utils'
 import { concurrentMap, sleep } from '@celo/utils/lib/async'
 import { notEmpty, zip3 } from '@celo/utils/lib/collections'
 import { parseSolidityStringArray } from '@celo/utils/lib/parsing'
@@ -58,6 +58,17 @@ function attestationMessageToSign(phoneHash: string, account: Address) {
     { type: 'address', value: account }
   )
   return messageHash
+}
+
+function sanitizeBase64(base64String: string) {
+  // Replace occurrences of ¿ with _. Unsure why that is happening right now
+  return base64String.replace(/(¿|§)/gi, '_')
+}
+
+const attestationCodeRegex = new RegExp(/(.* |^)([a-zA-Z0-9=\+\/_-]{87,88})($| .*)/)
+
+function messageContainsAttestationCode(message: string) {
+  return attestationCodeRegex.test(message)
 }
 
 interface GetCompletableAttestationsResponse {
@@ -200,7 +211,7 @@ export class AttestationsWrapper extends BaseWrapper<Attestations> {
   async approveAttestationFee(attestationsRequested: number) {
     const tokenContract = await this.kit.contracts.getContract(CeloContract.StableToken)
     const fee = await this.attestationFeeRequired(attestationsRequested)
-    return tokenContract.approve(this.address, fee.toString())
+    return tokenContract.approve(this.address, fee.toFixed())
   }
 
   /**
@@ -244,6 +255,20 @@ export class AttestationsWrapper extends BaseWrapper<Attestations> {
     )
 
     return withAttestationServiceURLs.filter(notEmpty)
+  }
+
+  extractAttestationCodeFromMessage(message: string) {
+    const sanitizedMessage = sanitizeBase64(message)
+
+    if (!messageContainsAttestationCode(sanitizedMessage)) {
+      return null
+    }
+
+    const matches = sanitizedMessage.match(attestationCodeRegex)
+    if (!matches || matches.length < 3) {
+      return null
+    }
+    return base64ToHex(matches[2])
   }
 
   /**

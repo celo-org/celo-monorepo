@@ -2,7 +2,8 @@ import { cli } from 'cli-ux'
 import { BaseCommand } from '../../base'
 
 export default class ElectionRun extends BaseCommand {
-  static description = 'Runs an mock election and outputs the validators that were elected'
+  static description =
+    'Runs a "mock" election and prints out the validators that would be elected if the epoch ended right now.'
 
   static flags = {
     ...BaseCommand.flags,
