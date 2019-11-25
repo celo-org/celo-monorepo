@@ -1,11 +1,11 @@
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native'
+import { brandStyles } from 'src/brandkit/common/constants'
 import { I18nProps, NameSpaces, withNamespaces } from 'src/i18n'
 import Octocat from 'src/icons/Octocat'
 import LogoLightBg from 'src/logos/LogoLightBg'
 import Button, { BTN } from 'src/shared/Button.3'
 import menuItems, { CeloLinks } from 'src/shared/menu-items'
 import { colors, fonts, standardStyles } from 'src/styles'
-import { brandStyles } from 'src/brandkit/common/constants'
 
 export default withNamespaces(NameSpaces.common)(function TopBar({ t }: I18nProps) {
   return (

@@ -1,10 +1,10 @@
 import * as React from 'react'
-import { Text, View, StyleSheet, Image, ImageURISource } from 'react-native'
-import { fonts, colors, standardStyles } from 'src/styles'
+import { Image, ImageURISource, StyleSheet, Text, View } from 'react-native'
+import Fade from 'react-reveal/Fade'
 import { brandStyles } from 'src/brandkit/common/constants'
 import Button, { BTN } from 'src/shared/Button.3'
 import Spinner from 'src/shared/Spinner'
-import Fade from 'react-reveal/Fade'
+import { colors, fonts, standardStyles } from 'src/styles'
 
 interface Props {
   name: string

@@ -75,9 +75,14 @@ function wwwRedirect(req, res, nextAction) {
     })
   })
 
+  server.get('/brand', (_, res) => {
+    res.redirect('/experience/brand')
+  })
+
   server.get('/connect', (_, res) => {
     res.redirect('/community')
   })
+
   server.get('/tos', (_, res) => {
     res.redirect('/user-agreement')
   })

@@ -2,13 +2,13 @@ import * as React from 'react'
 import { withNamespaces } from 'react-i18next'
 import { StyleSheet, Text, View } from 'react-native'
 
-import { GAP, brandStyles } from 'src/brandkit/common/constants'
+import { brandStyles, GAP } from 'src/brandkit/common/constants'
 import Page from 'src/brandkit/common/Page'
-import { I18nProps } from 'src/i18n'
 import PageHeadline from 'src/brandkit/common/PageHeadline'
+import { I18nProps } from 'src/i18n'
 
-import IconShowcase from 'src/brandkit/common/Showcase'
 import Fetch from 'src/brandkit/common/Fetch'
+import IconShowcase from 'src/brandkit/common/Showcase'
 
 export default React.memo(function IconsPage() {
   return (

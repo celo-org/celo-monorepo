@@ -1,7 +1,7 @@
 import * as React from 'react'
 import { View, ViewStyle } from 'react-native'
-import { H1, H4 } from 'src/fonts/Fonts'
 import { brandStyles } from 'src/brandkit/common/constants'
+import { H1, H4 } from 'src/fonts/Fonts'
 import { standardStyles } from 'src/styles'
 
 interface Props {

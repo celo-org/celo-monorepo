@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { StyleSheet, Text, View } from 'react-native'
-import { GAP, brandStyles } from 'src/brandkit/common/constants'
+import { brandStyles, GAP } from 'src/brandkit/common/constants'
 import LogoDarkBg from 'src/logos/LogoDarkBg'
 import LogoLightBg from 'src/logos/LogoLightBg'
 import Button, { BTN } from 'src/shared/Button.3'
