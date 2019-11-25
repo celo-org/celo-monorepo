@@ -1,9 +1,7 @@
-import assert = require('assert')
-
-const ethjsutil = require('ethereumjs-util')
-
 import * as Web3Utils from 'web3-utils'
 import { eqAddress, privateKeyToAddress } from './address'
+
+const ethjsutil = require('ethereumjs-util')
 
 // If messages is a hex, the length of it should be the number of bytes
 function messageLength(message: string) {
@@ -46,7 +44,9 @@ export async function addressToPublicKey(
   )
 
   const computedAddr = ethjsutil.pubToAddress(pubKey).toString('hex')
-  assert(eqAddress(computedAddr, signer), 'computed address !== signer')
+  if (!eqAddress(computedAddr, signer)) {
+    throw new Error('computed address !== signer')
+  }
 
   return '0x' + pubKey.toString('hex')
 }

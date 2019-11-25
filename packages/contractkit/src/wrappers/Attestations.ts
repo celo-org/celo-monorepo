@@ -1,10 +1,9 @@
-import { base64ToHex, PhoneNumberUtils, SignatureUtils } from '@celo/utils'
+import { attestationMessageToSign, PhoneNumberUtils, SignatureUtils } from '@celo/utils'
 import { concurrentMap, sleep } from '@celo/utils/lib/async'
 import { notEmpty, zip3 } from '@celo/utils/lib/collections'
 import { parseSolidityStringArray } from '@celo/utils/lib/parsing'
 import BigNumber from 'bignumber.js'
 import fetch from 'cross-fetch'
-import * as Web3Utils from 'web3-utils'
 import { Address, CeloContract, NULL_ADDRESS } from '../base'
 import { Attestations } from '../generated/types/Attestations'
 import { ClaimTypes, IdentityMetadataWrapper } from '../identity'
@@ -50,25 +49,6 @@ export interface ActionableAttestation {
   issuer: Address
   blockNumber: number
   attestationServiceURL: string
-}
-
-function attestationMessageToSign(phoneHash: string, account: Address) {
-  const messageHash: string = Web3Utils.soliditySha3(
-    { type: 'bytes32', value: phoneHash },
-    { type: 'address', value: account }
-  )
-  return messageHash
-}
-
-function sanitizeBase64(base64String: string) {
-  // Replace occurrences of ¿ with _. Unsure why that is happening right now
-  return base64String.replace(/(¿|§)/gi, '_')
-}
-
-const attestationCodeRegex = new RegExp(/(.* |^)([a-zA-Z0-9=\+\/_-]{87,88})($| .*)/)
-
-function messageContainsAttestationCode(message: string) {
-  return attestationCodeRegex.test(message)
 }
 
 interface GetCompletableAttestationsResponse {
@@ -256,20 +236,6 @@ export class AttestationsWrapper extends BaseWrapper<Attestations> {
     )
 
     return withAttestationServiceURLs.filter(notEmpty)
-  }
-
-  extractAttestationCodeFromMessage(message: string) {
-    const sanitizedMessage = sanitizeBase64(message)
-
-    if (!messageContainsAttestationCode(sanitizedMessage)) {
-      return null
-    }
-
-    const matches = sanitizedMessage.match(attestationCodeRegex)
-    if (!matches || matches.length < 3) {
-      return null
-    }
-    return base64ToHex(matches[2])
   }
 
   /**

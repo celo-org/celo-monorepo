@@ -40,3 +40,28 @@ export function attestToIdentifier(
   )
   return { v, r, s }
 }
+
+export function sanitizeMessageBase64(base64String: string) {
+  // Replace occurrences of ¿ with _. Unsure why that is happening right now
+  return base64String.replace(/(¿|§)/gi, '_')
+}
+
+const attestationCodeRegex = new RegExp(/(.* |^)([a-zA-Z0-9=\+\/_-]{87,88})($| .*)/)
+
+export function messageContainsAttestationCode(message: string) {
+  return attestationCodeRegex.test(message)
+}
+
+export function extractAttestationCodeFromMessage(message: string) {
+  const sanitizedMessage = sanitizeMessageBase64(message)
+
+  if (!messageContainsAttestationCode(sanitizedMessage)) {
+    return null
+  }
+
+  const matches = sanitizedMessage.match(attestationCodeRegex)
+  if (!matches || matches.length < 3) {
+    return null
+  }
+  return base64ToHex(matches[2])
+}

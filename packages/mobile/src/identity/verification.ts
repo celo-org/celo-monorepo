@@ -5,6 +5,7 @@ import {
   AttestationsWrapper,
 } from '@celo/contractkit/lib/wrappers/Attestations'
 import { eqAddress } from '@celo/utils/src/address'
+import { extractAttestationCodeFromMessage } from '@celo/utils/src/attestations'
 import { compressedPubKey } from '@celo/utils/src/commentEncryption'
 import { Platform } from 'react-native'
 import { Task } from 'redux-saga'
@@ -102,11 +103,10 @@ export function* doVerificationFlow() {
       contractKit.contracts,
       contractKit.contracts.getAttestations,
     ])
-    //TODO uncomment
-    // const accountsWrapper: AccountsWrapper = yield call([
-    //   contractKit.contracts,
-    //   contractKit.contracts.getAccounts,
-    // ])
+    const accountsWrapper: AccountsWrapper = yield call([
+      contractKit.contracts,
+      contractKit.contracts.getAccounts,
+    ])
 
     CeloAnalytics.track(CustomEventNames.verification_setup)
 
@@ -155,7 +155,7 @@ export function* doVerificationFlow() {
     yield put(setVerificationStatus(VerificationStatus.RevealingNumber))
     yield all([
       // Set acccount and data encryption key in contract
-      // call(setAccount, accountsWrapper, account, dataKey),
+      call(setAccount, accountsWrapper, account, dataKey),
       // Request codes for the attestations needed
       call(revealNeededAttestations, attestationsWrapper, account, e164Number, attestations),
     ])
@@ -334,7 +334,7 @@ function attestationCodeReceiver(
     }
 
     try {
-      const code = attestationsWrapper.extractAttestationCodeFromMessage(action.message)
+      const code = extractAttestationCodeFromMessage(action.message)
       if (!code) {
         throw new Error('No code extracted from message')
       }
@@ -468,13 +468,28 @@ function* waitForAttestationCode(issuer: string) {
 
 function* setAccount(accountsWrapper: AccountsWrapper, address: string, dataKey: string) {
   Logger.debug(TAG, 'Setting wallet address and public data encryption key')
-  const currentWalletAddress = yield call(accountsWrapper.getWalletAddress, address)
-  if (!eqAddress(currentWalletAddress, address)) {
-    const setWalletAddressTx = accountsWrapper.setWalletAddress(address)
-    // TODO(Rossy) Set DEK too?
-    yield call(sendTransaction, setWalletAddressTx.txo, address, TAG, `Set Wallet Address & DEK`)
-    CeloAnalytics.track(CustomEventNames.verification_set_account)
+  const upToDate = yield call(isAccountUpToDate, accountsWrapper, address, dataKey)
+  if (upToDate) {
+    return
   }
+  // @ts-ignore datakey type seems wrong
+  const setAccountTx = accountsWrapper.setAccount('', dataKey, address)
+  yield call(sendTransaction, setAccountTx.txo, address, TAG, 'Set Wallet Address & DEK')
+  CeloAnalytics.track(CustomEventNames.verification_set_account)
+}
+
+async function isAccountUpToDate(
+  accountsWrapper: AccountsWrapper,
+  address: string,
+  dataKey: string
+) {
+  const [currentWalletAddress, currentDEK] = await Promise.all([
+    accountsWrapper.getWalletAddress(address),
+    accountsWrapper.getDataEncryptionKey(address),
+  ])
+  return (
+    eqAddress(currentWalletAddress, address) && currentDEK && eqAddress(currentDEK.join(), dataKey)
+  )
 }
 
 export function* revokeVerification() {
