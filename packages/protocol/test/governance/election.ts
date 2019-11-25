@@ -323,50 +323,110 @@ contract('Election', (accounts: string[]) => {
 
         describe('when the voter can vote for an additional group', () => {
           describe('when the voter has sufficient non-voting balance', () => {
-            let resp: any
             beforeEach(async () => {
               await mockLockedGold.incrementNonvotingAccountBalance(voter, value)
-              resp = await election.vote(group, value, NULL_ADDRESS, NULL_ADDRESS)
             })
 
-            it('should add the group to the list of groups the account has voted for', async () => {
-              assert.deepEqual(await election.getGroupsVotedForByAccount(voter), [group])
-            })
+            describe('when the voter has not already voted for this group', () => {
+              let resp: any
+              beforeEach(async () => {
+                resp = await election.vote(group, value, NULL_ADDRESS, NULL_ADDRESS)
+              })
 
-            it("should increment the account's pending votes for the group", async () => {
-              assertEqualBN(await election.getPendingVotesForGroupByAccount(group, voter), value)
-            })
+              it('should add the group to the list of groups the account has voted for', async () => {
+                assert.deepEqual(await election.getGroupsVotedForByAccount(voter), [group])
+              })
 
-            it("should increment the account's total votes for the group", async () => {
-              assertEqualBN(await election.getTotalVotesForGroupByAccount(group, voter), value)
-            })
+              it("should increment the account's pending votes for the group", async () => {
+                assertEqualBN(await election.getPendingVotesForGroupByAccount(group, voter), value)
+              })
 
-            it("should increment the account's total votes", async () => {
-              assertEqualBN(await election.getTotalVotesByAccount(voter), value)
-            })
+              it("should increment the account's total votes for the group", async () => {
+                assertEqualBN(await election.getTotalVotesForGroupByAccount(group, voter), value)
+              })
 
-            it('should increment the total votes for the group', async () => {
-              assertEqualBN(await election.getTotalVotesForGroup(group), value)
-            })
+              it("should increment the account's total votes", async () => {
+                assertEqualBN(await election.getTotalVotesByAccount(voter), value)
+              })
 
-            it('should increment the total votes', async () => {
-              assertEqualBN(await election.getTotalVotes(), value)
-            })
+              it('should increment the total votes for the group', async () => {
+                assertEqualBN(await election.getTotalVotesForGroup(group), value)
+              })
 
-            it("should decrement the account's nonvoting locked gold balance", async () => {
-              assertEqualBN(await mockLockedGold.nonvotingAccountBalance(voter), 0)
-            })
+              it('should increment the total votes', async () => {
+                assertEqualBN(await election.getTotalVotes(), value)
+              })
 
-            it('should emit the ValidatorGroupVoteCast event', async () => {
-              assert.equal(resp.logs.length, 1)
-              const log = resp.logs[0]
-              assertContainSubset(log, {
-                event: 'ValidatorGroupVoteCast',
-                args: {
-                  account: voter,
-                  group,
-                  value: new BigNumber(value),
-                },
+              it("should decrement the account's nonvoting locked gold balance", async () => {
+                assertEqualBN(await mockLockedGold.nonvotingAccountBalance(voter), 0)
+              })
+
+              it('should emit the ValidatorGroupVoteCast event', async () => {
+                assert.equal(resp.logs.length, 1)
+                const log = resp.logs[0]
+                assertContainSubset(log, {
+                  event: 'ValidatorGroupVoteCast',
+                  args: {
+                    account: voter,
+                    group,
+                    value: new BigNumber(value),
+                  },
+                })
+              })
+
+              describe('when the voter has already voted for this group', () => {
+                let resp: any
+                beforeEach(async () => {
+                  await mockLockedGold.incrementNonvotingAccountBalance(voter, value)
+                  resp = await election.vote(group, value, NULL_ADDRESS, NULL_ADDRESS)
+                })
+
+                it('should not change the list of groups the account has voted for', async () => {
+                  assert.deepEqual(await election.getGroupsVotedForByAccount(voter), [group])
+                })
+
+                it("should increment the account's pending votes for the group", async () => {
+                  assertEqualBN(
+                    await election.getPendingVotesForGroupByAccount(group, voter),
+                    value.times(2)
+                  )
+                })
+
+                it("should increment the account's total votes for the group", async () => {
+                  assertEqualBN(
+                    await election.getTotalVotesForGroupByAccount(group, voter),
+                    value.times(2)
+                  )
+                })
+
+                it("should increment the account's total votes", async () => {
+                  assertEqualBN(await election.getTotalVotesByAccount(voter), value.times(2))
+                })
+
+                it('should increment the total votes for the group', async () => {
+                  assertEqualBN(await election.getTotalVotesForGroup(group), value.times(2))
+                })
+
+                it('should increment the total votes', async () => {
+                  assertEqualBN(await election.getTotalVotes(), value.times(2))
+                })
+
+                it("should decrement the account's nonvoting locked gold balance", async () => {
+                  assertEqualBN(await mockLockedGold.nonvotingAccountBalance(voter), 0)
+                })
+
+                it('should emit the ValidatorGroupVoteCast event', async () => {
+                  assert.equal(resp.logs.length, 1)
+                  const log = resp.logs[0]
+                  assertContainSubset(log, {
+                    event: 'ValidatorGroupVoteCast',
+                    args: {
+                      account: voter,
+                      group,
+                      value: new BigNumber(value),
+                    },
+                  })
+                })
               })
             })
           })
