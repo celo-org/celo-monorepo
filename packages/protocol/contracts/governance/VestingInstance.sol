@@ -73,6 +73,7 @@ contract VestingInstance is UsingRegistry, ReentrancyGuard {
      * @param vestingRevocable whether the vesting is revocable or not
      * @param vestingRevoker address of the person revoking the vesting
      * @param vestingRefundDestination address of the refund receiver after the vesting is deemed revoked
+     * @param registryAddress address of the deployed contracts registry
      */
   constructor(
     address vestingBeneficiary,
@@ -83,9 +84,11 @@ contract VestingInstance is UsingRegistry, ReentrancyGuard {
     uint256 vestAmountPerPeriod,
     bool vestingRevocable,
     address vestingRevoker,
-    address vestingRefundDestination
+    address vestingRefundDestination,
+    address registryAddress
   ) public {
     // perform checks on the input data
+    require(registryAddress != address(0), "registry address must not be the zero address");
     require(vestingAmount > 0, "Vesting amount must be positive");
     require(vestingBeneficiary != address(0), "Beneficiary is the zero address");
     require(vestingRefundDestination != address(0), "Refund destination is the zero address");
@@ -99,6 +102,9 @@ contract VestingInstance is UsingRegistry, ReentrancyGuard {
       vestingStartTime.add(vestingCliff) > block.timestamp,
       "Vesting end time is before current time"
     );
+
+    // set the registry address
+    setRegistry(registryAddress);
 
     // init the vesting scheme
     vestingScheme.vestingPeriods = vestingAmount.div(vestAmountPerPeriod);
@@ -194,12 +200,9 @@ contract VestingInstance is UsingRegistry, ReentrancyGuard {
     }
 
     uint256 vestingCurveGradient = (timestamp.sub(vestingScheme.vestingStartTime)).div(
-      vestingScheme.vestingPeriodSec
+      vestingScheme.vestingPeriods
     );
-    return
-      ((currentBalance.mul(vestingCurveGradient)).mul(vestingScheme.vestAmountPerPeriod)).div(
-        totalBalance
-      );
+    return (currentBalance.mul(vestingCurveGradient)).div(vestingScheme.vestingPeriodSec);
   }
 
   /**

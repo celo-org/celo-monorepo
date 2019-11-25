@@ -27,6 +27,7 @@ contract VestingFactory is Initializable, UsingRegistry {
      * @param vestingRevokable whether the vesting is revocable or not
      * @param vestingRevoker address of the person revoking the vesting
      * @param vestingRefundDestination address of the refund receiver after the vesting is deemed revoked
+     * @param registryAddress address of the deployed contracts registry
      * @return The address of the newly created vesting instance
      */
   function createVestingInstance(
@@ -38,9 +39,14 @@ contract VestingFactory is Initializable, UsingRegistry {
     uint256 vestAmountPerPeriod,
     bool vestingRevokable,
     address vestingRevoker,
-    address vestingRefundDestination
+    address vestingRefundDestination,
+    address registryAddress
   ) external returns (address) {
-    // creation of a new vesting contract
+    require(
+      getGoldToken().balanceOf(address(this)) >= vestingAmount,
+      "factory balance is unsufficient to create a new vesting"
+    );
+
     address newVestingInstance = address(
       new VestingInstance(
         vestingBeneficiary,
@@ -51,10 +57,12 @@ contract VestingFactory is Initializable, UsingRegistry {
         vestAmountPerPeriod,
         vestingRevokable,
         vestingRevoker,
-        vestingRefundDestination
+        vestingRefundDestination,
+        registryAddress
       )
     );
     hasVestedAt[vestingBeneficiary] = newVestingInstance;
+    getGoldToken().transfer(hasVestedAt[vestingBeneficiary], vestingAmount);
     emit NewVestingInstanceCreated(newVestingInstance);
     return newVestingInstance;
   }
