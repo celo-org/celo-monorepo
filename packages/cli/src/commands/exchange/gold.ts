@@ -28,11 +28,11 @@ export default class ExchangeGold extends BaseCommand {
   ]
 
   async run() {
-    const { flags } = this.parse(ExchangeGold)
-    const sellAmount = new BigNumber(flags.value)
-    const minBuyAmount = new BigNumber(flags.for)
+    const res = this.parse(ExchangeGold)
+    const sellAmount = new BigNumber(res.flags.value)
+    const minBuyAmount = new BigNumber(res.flags.for)
 
-    this.kit.defaultAccount = flags.from
+    this.kit.defaultAccount = res.flags.from
     const goldToken = await this.kit.contracts.getGoldToken()
     const exchange = await this.kit.contracts.getExchange()
 

@@ -31,11 +31,11 @@ export default class ExchangeDollars extends BaseCommand {
   ]
 
   async run() {
-    const { flags } = this.parse(ExchangeDollars)
-    const sellAmount = new BigNumber(flags.value)
-    const minBuyAmount = new BigNumber(flags.for)
+    const res = this.parse(ExchangeDollars)
+    const sellAmount = new BigNumber(res.flags.value)
+    const minBuyAmount = new BigNumber(res.flags.for)
 
-    this.kit.defaultAccount = flags.from
+    this.kit.defaultAccount = res.flags.from
     const stableToken = await this.kit.contracts.getStableToken()
     const exchange = await this.kit.contracts.getExchange()
 
