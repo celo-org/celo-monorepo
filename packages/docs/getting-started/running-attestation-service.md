@@ -14,14 +14,14 @@ As part of the [lightweight identity protocol](/celo-codebase/protocol/identity)
 
 The service needs the following environment variables:
 
-| Variable        | Explanation                                                                                                                                                            |
-| --------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| DATABASE_URL    | The URL under which your database is accessible, currently supported are `postgres://`, `mysql://` and `sqlite://`                                                     |  |
-| CELO_PROVIDER   | The URL under which a celo blockchain node is reachable, i.e. something like `https://integration-forno.celo-testnet.org`                                              |  |
-| ACCOUNT_ADDRESS | The address of the validator account                                                                                                                                   |  |
-| ATTESTATION_KEY | The private key with which attestations should be signed. You could use your account key for attestations, but really you should authorize a dedicated attestation key |  |
-| APP_SIGNATURE   | The hash with which clients can auto-read SMS messages on android                                                                                                      |  |
-| SMS_PROVIDERS   | A comma-separated list of providers you want to configure, we currently support `nexmo` & `twilio`                                                                     |  |
+| Variable                | Explanation                                                                                                                                                            |
+| ----------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| DATABASE_URL            | The URL under which your database is accessible, currently supported are `postgres://`, `mysql://` and `sqlite://`                                                     |  |
+| CELO_PROVIDER           | The URL under which a celo blockchain node is reachable, i.e. something like `https://integration-forno.celo-testnet.org`                                              |  |
+| ACCOUNT_ADDRESS         | The address of the validator account                                                                                                                                   |  |
+| ATTESTATION_PRIVATE_KEY | The private key with which attestations should be signed. You could use your account key for attestations, but really you should authorize a dedicated attestation key |  |
+| APP_SIGNATURE           | The hash with which clients can auto-read SMS messages on android                                                                                                      |  |
+| SMS_PROVIDERS           | A comma-separated list of providers you want to configure, we currently support `nexmo` & `twilio`                                                                     |  |
 
 ## Sms Providers
 
@@ -56,23 +56,23 @@ First we need to create an account for getting the attestation key needed to sig
 celocli account:new
 ```
 
-We copy the account details and assign the Private Key to the `ATTESTATION_KEY` environment variable:
+We copy the account details and assign the Private Key to the `ATTESTATION_PRIVATE_KEY` environment variable:
 
 ```bash
-export ATTESTATION_KEY=0x<Private Key>
-export ADDRESS_OF_ATTESTATION_KEY=<Account address>
+export ATTESTATION_PRIVATE_KEY=0x<Private Key>
+export ATTESTATION_ADDRESS=<Account address>
 ```
 
 You can create a proof of posession of this attestation key by running the CLI commands (remember to prefix the key with 0x)
 
 ```bash
-celocli account:proof-of-possession --signer $ADDRESS_OF_ATTESTATION_KEY --account $CELO_VALIDATOR_ADDRESS --privateKey $ATTESTATION_KEY
+celocli account:proof-of-possession --signer $ATTESTATION_ADDRESS --account $CELO_VALIDATOR_ADDRESS --privateKey $ATTESTATION_KEY
 ```
 
 That will give you a signature that you can then use to authorize the key:
 
 ```bash
-celocli account:authorize --from $CELO_VALIDATOR_ADDRESS -r attestation --pop SIGNATURE --signer $ADDRESS_OF_ATTESTATION_KEY
+celocli account:authorize --from $CELO_VALIDATOR_ADDRESS -r attestation --pop SIGNATURE --signer $ATTESTATION_ADDRESS
 ```
 
 The Attestation Service needs to connect to a Web3 Provider. This is going to depend on the network you want to connect. So depending on which network you are making available the service, you need to configure the `CELO_PROVIDER` variable pointing to that.

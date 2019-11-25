@@ -9,9 +9,18 @@ export default class ProofOfPossession extends BaseCommand {
 
   static flags = {
     ...BaseCommand.flags,
-    signer: Flags.address({ required: true }),
-    account: Flags.address({ required: true }),
-    privateKey: flags.string({ description: 'Private Key if you want to sign locally' }),
+    signer: Flags.address({
+      required: true,
+      description: 'Address of the signer key to prove possession of.',
+    }),
+    account: Flags.address({
+      required: true,
+      description: 'Address of the account that needs to proove possession of the signer key.',
+    }),
+    privateKey: flags.string({
+      description:
+        'Optional. The signer private key, only necessary if the key is not being managed by a locally running node.',
+    }),
   }
 
   static examples = [
