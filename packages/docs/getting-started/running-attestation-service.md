@@ -59,7 +59,20 @@ celocli account:new
 We copy the account details and assign the Private Key to the `ATTESTATION_KEY` environment variable:
 
 ```bash
-export ATTESTATION_KEY=<Private Key>
+export ATTESTATION_KEY=0x<Private Key>
+export ADDRESS_OF_ATTESTATION_KEY=<Account address>
+```
+
+You can create a proof of posession of this attestation key by running the CLI commands (remember to prefix the key with 0x)
+
+```bash
+celocli account:proof-of-possession --signer $ADDRESS_OF_ATTESTATION_KEY --account $CELO_VALIDATOR_ADDRESS --privateKey $ATTESTATION_KEY
+```
+
+That will give you a signature that you can then use to authorize the key:
+
+```bash
+celocli account:authorize --from $CELO_VALIDATOR_ADDRESS -r attestation --pop SIGNATURE --signer $ADDRESS_OF_ATTESTATION_KEY
 ```
 
 The Attestation Service needs to connect to a Web3 Provider. This is going to depend on the network you want to connect. So depending on which network you are making available the service, you need to configure the `CELO_PROVIDER` variable pointing to that.

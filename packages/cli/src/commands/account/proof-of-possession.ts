@@ -10,6 +10,7 @@ export default class ProofOfPossession extends BaseCommand {
     ...BaseCommand.flags,
     signer: Flags.address({ required: true }),
     account: Flags.address({ required: true }),
+    privateKey: flags.string({ description: 'Private Key if you want to sign locally' }),
   }
 
   static examples = [
@@ -19,10 +20,19 @@ export default class ProofOfPossession extends BaseCommand {
   async run() {
     const res = this.parse(ProofOfPossession)
     const accounts = await this.kit.contracts.getAccounts()
-    const pop = await accounts.generateProofOfSigningKeyPossession(
-      res.flags.account,
-      res.flags.signer
-    )
-    printValueMap({ signature: serializeSignature(pop) })
+    if (res.flags.privateKey) {
+      const pop = await accounts.generateProofOfSigningKeyPossessionLocally(
+        res.flags.account,
+        res.flags.signer,
+        res.flags.privateKey
+      )
+      printValueMap({ signature: serializeSignature(pop) })
+    } else {
+      const pop = await accounts.generateProofOfSigningKeyPossession(
+        res.flags.account,
+        res.flags.signer
+      )
+      printValueMap({ signature: serializeSignature(pop) })
+    }
   }
 }
