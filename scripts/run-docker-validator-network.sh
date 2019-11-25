@@ -23,15 +23,19 @@ export NEXMO_BLACKLIST=""
 
 VALIDATOR_DIR="${DATA_DIR}/validator"
 PROXY_DIR="${DATA_DIR}/proxy"
+FULLNODE_DIR="${DATA_DIR}/fullnode"
+
 mkdir -p $DATA_DIR
 mkdir -p $VALIDATOR_DIR
 mkdir -p $PROXY_DIR
+mkdir -p $FULLNODE_DIR
+
 __PWD=$PWD
 
 
 #### Internal functions
 remove_containers () {
-    echo -e "\tRemoving previous celo-proxy and celo-validator containers"
+    echo -e "\tRemoving previous celo containers"
     docker rm -f celo-proxy celo-validator celo-attestation-service || echo -e "Containers removed"
 }
 
@@ -79,7 +83,7 @@ if [[ $COMMAND == *"help"* ]]; then
 
     echo -e "Options:"
     echo -e "$0 <COMMAND> <DATA_DIR> <CELO_IMAGE> <NETWORK_ID> <NETWORK_NAME> <PASSWORD>"
-    echo -e "\t - Command; comma separated list of actions to execute. Options are: help, pull, clean, accounts, deploy, run-validator, run-attestation, status. Default: pull,accounts,deploy,run-validator,status"
+    echo -e "\t - Command; comma separated list of actions to execute. Options are: help, pull, clean, accounts, deploy, run-validator, run-attestation, run-fullnode, status. Default: pull,accounts,deploy,run-validator,status"
     echo -e "\t - Data Dir; Local folder where will be created the data dir for the nodes. Default: /tmp/celo/network"
     echo -e "\t - Celo Image; Image to download"
     echo -e "\t - Celo Network; Docker image network to use (typically alfajores or baklava, but you can use a commit). "
@@ -121,6 +125,7 @@ if [[ $COMMAND == *"accounts"* ]]; then
     export CELO_VALIDATOR_ADDRESS=$(docker run -v $PWD/validator:/root/.celo --entrypoint /bin/sh -it $CELO_IMAGE -c " printf '%s\n' $DEFAULT_PASSWORD $DEFAULT_PASSWORD | geth account new " |tail -1| cut -d'{' -f 2| tr -cd "[:alnum:]\n" )
     export CELO_VALIDATOR_GROUP_ADDRESS=$(docker run -v $PWD/validator:/root/.celo --entrypoint /bin/sh -it $CELO_IMAGE -c " printf '%s\n' $DEFAULT_PASSWORD $DEFAULT_PASSWORD | geth account new " |tail -1| cut -d'{' -f 2| tr -cd "[:alnum:]\n" )
     export CELO_PROXY_ADDRESS=$(docker run -v $PWD/proxy:/root/.celo --entrypoint /bin/sh -it $CELO_IMAGE -c " printf '%s\n' $DEFAULT_PASSWORD $DEFAULT_PASSWORD | geth account new " |tail -1| cut -d'{' -f 2| tr -cd "[:alnum:]\n" )
+    
     
     echo -e "\tCELO_VALIDATOR_ADDRESS=$CELO_VALIDATOR_ADDRESS"
     echo -e "\tCELO_VALIDATOR_GROUP_ADDRESS=$CELO_VALIDATOR_ADDRESS"
@@ -203,6 +208,30 @@ if [[ $COMMAND == *"status"* ]]; then
 
     make_status_requests
 
+fi
+
+if [[ $COMMAND == *"run-fullnode"* ]]; then
+
+    echo -e "* Let's run the full node ..."
+    cd $DATA_DIR
+
+     docker rm -f celo-fullnode || echo -e "Container removed"
+     
+    export CELO_ACCOUNT_ADDRESS=$(celocli account:new |tail -1| cut -d' ' -f 2| tr -cd "[:alnum:]\n")
+
+    docker run -v $PWD/fullnode:/root/.celo --entrypoint /bin/sh -it $CELO_IMAGE -c "wget https://www.googleapis.com/storage/v1/b/genesis_blocks/o/$NETWORK_NAME?alt=media -O /root/.celo/genesis.json"
+    docker run -v $PWD/fullnode:/root/.celo $CELO_IMAGE init /root/.celo/genesis.json
+    
+    echo -e "\tStarting the Full Node"
+    screen -S celo-fullnode -d -m docker run --name celo-fullnode --restart always -p 127.0.0.1:8545:8545 -p 127.0.0.1:8546:8546 -p 30303:30303 -p 30303:30303/udp -v $PWD/fullnode:/root/.celo $CELO_IMAGE --verbosity 3 --networkid $NETWORK_ID --syncmode full --rpc --rpcaddr 0.0.0.0 --rpcapi eth,net,web3,debug,admin,personal --lightserv 90 --lightpeers 1000 --maxpeers 1100 --etherbase $CELO_ACCOUNT_ADDRESS
+    
+    sleep 2s
+
+    echo -e "\tEverything should be running, you can check running 'screen -ls'"
+    screen -ls
+        
+    echo -e "\tYou can re-attach to the full node running:"
+    echo -e "\t 'screen -r -S celo-fullnode'\n"
 fi
 
 cd $__PWD
