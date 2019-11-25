@@ -14,12 +14,12 @@ contract Accounts is IAccounts, Ownable, ReentrancyGuard, Initializable, UsingRe
   using SafeMath for uint256;
 
   struct Signers {
-    //The address that is authorized to vote in governance and validator elections on behalf of the
-    // account. The account can vote as well, whether or not an vote signing key has been specified.
+    // The address that is authorized to vote in governance and validator elections on behalf of the
+    // account. The account can vote as well, whether or not a vote signing key has been specified.
     address vote;
     // The address that is authorized to manage a validator or validator group and sign consensus
-    // messages on behalf of the account. The account can manage the validator, whether or not an
-    // validator signing key has been specified. However if an validator signing key has been
+    // messages on behalf of the account. The account can manage the validator, whether or not a
+    // validator signing key has been specified. However, if a validator signing key has been
     // specified, only that key may actually participate in consensus.
     address validator;
     // The address of the key with which this account wants to sign attestations on the Attestations
