@@ -1,5 +1,12 @@
 #!/bin/bash
 
+function save_variable {
+  local var=$1
+  local file=$2
+
+  [ ! -z "$var" ] && echo -n "$var" > "$file"
+}
+
 # ---- Set Up Logging ----
 
 curl -sSO https://dl.google.com/cloudagents/install-logging-agent.sh
@@ -40,127 +47,79 @@ ATTESTATION_SERVICE_DOCKER_IMAGE=${attestation_service_docker_image_repository}:
 docker pull $ATTESTATION_SERVICE_DOCKER_IMAGE
 
 # Run the Cloud SQL Proxy
-docker run -d -v /cloudsql:/cloudsql \
-  -p 127.0.0.1:5432:5432 \
-  gcr.io/cloudsql-docker/gce-proxy:1.11 /cloud_sql_proxy \
-  -instances=${db_connection_name}=tcp:0.0.0.0:5432
+
+cat <<EOF >/etc/systemd/system/cloudsql.service
+[Unit]
+Description=Docker Container %N
+Requires=docker.service
+After=docker.service
+
+[Service]
+Restart=always
+ExecStart=/usr/bin/docker run \\
+  -v /cloudsql:/cloudsql \\
+  -p 127.0.0.1:5432:5432 \\
+  gcr.io/cloudsql-docker/gce-proxy:1.11 \\
+    /cloud_sql_proxy \\
+    -instances=${db_connection_name}=tcp:0.0.0.0:5432
+ExecStop=/usr/bin/docker rm -f %N
+
+[Install]
+WantedBy=default.target
+EOF
 DATABASE_URL="postgres://${db_username}:${db_password}@127.0.0.1:5432/attestation_service"
+systemctl daemon-reload
+systemctl enable cloudsql.service
+systemctl restart cloudsql.service
 
-# Workaround: Run postgres container
-# docker run --name postgres \
-#   --network host \
-#   -e POSTGRES_PASSWORD=${db_password} \
-#   -e POSTGRES_USER=${db_username} \
-#   -e POSTGRES_DB=attestation_service \
-#   -d postgres
-# DATABASE_URL="postgres://${db_username}:${db_password}@127.0.0.1:5432/attestation_service"
+# Saving variables
+save_variable "$DATABASE_URL" "$DATA_DIR/databaseUrl"
+save_variable "$ATTESTATION_KEY" "$DATA_DIR/attestationKey"
+save_variable "$ACCOUNT_ADDRESS" "$DATA_DIR/accountAddress"
+save_variable "$CELO_PROVIDER" "$DATA_DIR/celoProvider"
+save_variable "$SMS_PROVIDERS" "$DATA_DIR/smsProviders"
+save_variable "$NEXMO_KEY" "$DATA_DIR/nexmoKey"
+save_variable "$NEXMO_SECRET" "$DATA_DIR/nexmoSecret"
+save_variable "$NEXMO_BLACKLIST" "$DATA_DIR/nexmoBlacklist"
+save_variable "$TWILIO_ACCOUNT_SID" "$DATA_DIR/twilioAccountSid"
+save_variable "$TWILIO_MESSAGING_SERVICE_SID" "$DATA_DIR/twilioMessagingServiceSid"
+save_variable "$TWILIO_AUTH_TOKEN" "$DATA_DIR/twilioAuthToken"
+save_variable "$TWILIO_BLACKLIST" "$DATA_DIR/twilioBlacklist"
 
-# Switch between Nexmo and Twilio
-# TODO: Refactor
-if [ $SMS_PROVIDERS == "nexmo" ]; then
-  NEXMO_KEY=${nexmo_key}
-  NEXMO_SECRET=${nexmo_secret}
-  NEXMO_BLACKLIST=${nexmo_blacklist}
+cat <<EOF >/etc/systemd/system/attestation-service.service
+[Unit]
+Description=Docker Container %N
+Requires=docker.service
+After=docker.service
 
-  docker run --name attestation-service \
-    --net=host --entrypoint /bin/sh -d \
-    -v $DATA_DIR:$DATA_DIR \
-    -e DATABASE_URL=$DATABASE_URL \
-    -e ATTESTATION_KEY=$ATTESTATION_KEY \
-    -e ACCOUNT_ADDRESS=$ACCOUNT_ADDRESS \
-    -e CELO_PROVIDER=$CELO_PROVIDER \
-    -e SMS_PROVIDERS=$SMS_PROVIDERS \
-    -e NEXMO_KEY=$NEXMO_KEY \
-    -e NEXMO_SECRET=$NEXMO_SECRET \
-    -e NEXMO_BLACKLIST=$NEXMO_BLACKLIST \
-    $ATTESTATION_SERVICE_DOCKER_IMAGE -c "\
-      (
-        echo -n '$DATABASE_URL' > $DATA_DIR/databaseUrl && \
-        echo -n '$ATTESTATION_KEY' > $DATA_DIR/attestationKey && \
-        echo -n '$ACCOUNT_ADDRESS' > $DATA_DIR/accountAddress && \
-        echo -n '$CELO_PROVIDER' > $DATA_DIR/celoProvider && \
-        echo -n '$SMS_PROVIDERS' > $DATA_DIR/smsProviders && \
-        echo -n '$NEXMO_KEY' > $DATA_DIR/nexmoKey && \
-        echo -n '$NEXMO_SECRET' > $DATA_DIR/nexmoSecret && \
-        echo -n '$NEXMO_BLACKLIST' > $DATA_DIR/nexmoBlacklist \
-      ) && ( \
-        yarn run db:create:dev && \
-        yarn run db:migrate:dev && \
-        yarn run dev \
-      )"
-elif [ $SMS_PROVIDERS == "twilio" ]; then
-  TWILIO_ACCOUNT_SID=${twilio_account_sid}
-  TWILIO_MESSAGING_SERVICE_SID=${twilio_messaging_service_sid}
-  TWILIO_AUTH_TOKEN=${twilio_auth_token}
-  TWILIO_BLACKLIST=${twilio_blacklist}
+[Service]
+Restart=always
+ExecStart=/usr/bin/docker run \\
+  --name attestation-service \\
+  --net=host 
+   --entrypoint /bin/sh \\
+  -v $DATA_DIR:$DATA_DIR \\
+  -e DATABASE_URL=$DATABASE_URL \\
+  -e ATTESTATION_KEY=$ATTESTATION_KEY \\
+  -e ACCOUNT_ADDRESS=$ACCOUNT_ADDRESS \\
+  -e CELO_PROVIDER=$CELO_PROVIDER \\
+  -e SMS_PROVIDERS=$SMS_PROVIDERS \\
+  -e NEXMO_KEY=$NEXMO_KEY \\
+  -e NEXMO_SECRET=$NEXMO_SECRET \\
+  -e NEXMO_BLACKLIST=$NEXMO_BLACKLIST \\
+  -e TWILIO_ACCOUNT_SID=$TWILIO_ACCOUNT_SID \\
+  -e TWILIO_MESSAGING_SERVICE_SID=$TWILIO_MESSAGING_SERVICE_SID \\
+  -e TWILIO_AUTH_TOKEN=$TWILIO_AUTH_TOKEN \\
+  -e TWILIO_BLACKLIST=$TWILIO_BLACKLIST \\
+  $ATTESTATION_SERVICE_DOCKER_IMAGE -c \\
+      yarn run db:create:dev && \\
+      yarn run db:migrate:dev && \\
+      yarn start
+ExecStop=/usr/bin/docker rm -f %N
 
-  docker run\
-    --name attestation-service \
-    --restart=always \
-    --net=host \
-    --entrypoint /bin/sh -d \
-    -v $DATA_DIR:$DATA_DIR \
-    -e DATABASE_URL=$DATABASE_URL \
-    -e ATTESTATION_KEY=$ATTESTATION_KEY \
-    -e ACCOUNT_ADDRESS=$ACCOUNT_ADDRESS \
-    -e CELO_PROVIDER=$CELO_PROVIDER \
-    -e SMS_PROVIDERS=$SMS_PROVIDERS \
-    -e TWILIO_ACCOUNT_SID=$TWILIO_ACCOUNT_SID \
-    -e TWILIO_MESSAGING_SERVICE_SID=$TWILIO_MESSAGING_SERVICE_SID \
-    -e TWILIO_AUTH_TOKEN=$TWILIO_AUTH_TOKEN \
-    -e TWILIO_BLACKLIST=$TWILIO_BLACKLIST \
-    $ATTESTATION_SERVICE_DOCKER_IMAGE -c "\
-      (
-        echo -n '$DATABASE_URL' > $DATA_DIR/databaseUrl && \
-        echo -n '$ATTESTATION_KEY' > $DATA_DIR/attestationKey && \
-        echo -n '$ACCOUNT_ADDRESS' > $DATA_DIR/accountAddress && \
-        echo -n '$CELO_PROVIDER' > $DATA_DIR/celoProvider && \
-        echo -n '$SMS_PROVIDERS' > $DATA_DIR/smsProviders && \
-        echo -n '$TWILIO_ACCOUNT_SID' > $DATA_DIR/twilioAccountSid && \
-        echo -n '$TWILIO_MESSAGING_SERVICE_SID' > $DATA_DIR/twilioMessagingServiceSid && \
-        echo -n '$TWILIO_AUTH_TOKEN' > $DATA_DIR/twilioAuthToken && \
-        echo -n '$TWILIO_BLACKLIST' > $DATA_DIR/twilioBlacklist \
-      ) && ( \
-        yarn run db:create:dev && \
-        yarn run db:migrate:dev && \
-        yarn run dev \
-      )"
-else
-  echo "Variable \$SMS_PROVIDERS=$SMS_PROVIDERS must be one from nexmo or twilio"
-  exit 1
-fi
-
-# docker run --name attestation-service \
-#   --net=host --entrypoint /bin/sh -d \
-#   -v $DATA_DIR:$DATA_DIR \
-#   -e DATABASE_URL=$DATABASE_URL \
-#   -e ATTESTATION_KEY=$ATTESTATION_KEY \
-#   -e ACCOUNT_ADDRESS=$ACCOUNT_ADDRESS \
-#   -e CELO_PROVIDER=$CELO_PROVIDER \
-#   -e SMS_PROVIDERS=$SMS_PROVIDERS \
-#   -e NEXMO_KEY=$NEXMO_KEY \
-#   -e NEXMO_SECRET=$NEXMO_SECRET \
-#   -e NEXMO_BLACKLIST=$NEXMO_BLACKLIST \
-#   -e TWILIO_ACCOUNT_SID=$TWILIO_ACCOUNT_SID \
-#   -e TWILIO_MESSAGING_SERVICE_SID=$TWILIO_MESSAGING_SERVICE_SID \
-#   -e TWILIO_AUTH_TOKEN=$TWILIO_AUTH_TOKEN \
-#   -e TWILIO_BLACKLIST=$TWILIO_BLACKLIST \
-#   $ATTESTATION_SERVICE_DOCKER_IMAGE -c "\
-#     (
-#       echo -n '$DATABASE_URL' > $DATA_DIR/databaseUrl && \
-#       echo -n '$ATTESTATION_KEY' > $DATA_DIR/attestationKey && \
-#       echo -n '$ACCOUNT_ADDRESS' > $DATA_DIR/accountAddress && \
-#       echo -n '$CELO_PROVIDER' > $DATA_DIR/celoProvider && \
-#       echo -n '$SMS_PROVIDERS' > $DATA_DIR/smsProviders && \
-#       echo -n '$NEXMO_KEY' > $DATA_DIR/nexmoKey && \
-#       echo -n '$NEXMO_SECRET' > $DATA_DIR/nexmoSecret && \
-#       echo -n '$NEXMO_BLACKLIST' > $DATA_DIR/nexmoBlacklist \
-#       echo -n '$TWILIO_ACCOUNT_SID' > $DATA_DIR/twilioAccountSid && \
-#       echo -n '$TWILIO_MESSAGING_SERVICE_SID' > $DATA_DIR/twilioMessagingServiceSid && \
-#       echo -n '$TWILIO_AUTH_TOKEN' > $DATA_DIR/twilioAuthToken && \
-#       echo -n '$TWILIO_BLACKLIST' > $DATA_DIR/twilioBlacklist \
-#     ) && ( \
-#       yarn run db:create:dev && \
-#       yarn run db:migrate:dev && \
-#       yarn run dev \
-#     )"
+[Install]
+WantedBy=default.target
+EOF
+systemctl daemon-reload
+systemctl enable attestation-service.service
+systemctl restart attestation-service.service
