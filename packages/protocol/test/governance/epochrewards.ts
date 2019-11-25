@@ -580,4 +580,19 @@ contract('EpochRewards', (accounts: string[]) => {
       })
     })
   })
+
+  describe('when the contract is frozen', () => {
+    beforeEach(async () => {
+      await epochRewards.freeze()
+    })
+
+    it('should make calculateTargetEpochPaymentAndRewards return zeroes', async () => {
+      const [
+        validatorPayment,
+        voterRewards,
+      ] = await epochRewards.calculateTargetEpochPaymentAndRewards()
+      assertEqualBN(validatorPayment, 0)
+      assertEqualBN(voterRewards, 0)
+    })
+  })
 })

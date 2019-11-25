@@ -379,6 +379,10 @@ contract EpochRewards is Ownable, Initializable, UsingPrecompiles, UsingRegistry
    * @return The per validator epoch payment and the total rewards to voters.
    */
   function calculateTargetEpochPaymentAndRewards() external view returns (uint256, uint256) {
+    if (frozen) {
+      return (0, 0);
+    }
+
     uint256 targetEpochRewards = getTargetEpochRewards();
     uint256 targetTotalEpochPaymentsInGold = getTargetTotalEpochPaymentsInGold();
     uint256 targetGoldSupplyIncrease = targetEpochRewards.add(targetTotalEpochPaymentsInGold);
