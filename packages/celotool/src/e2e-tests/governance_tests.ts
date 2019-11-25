@@ -27,12 +27,14 @@ async function newMemberSwapper(kit: ContractKit, members: string[]): Promise<Me
   await Promise.all(members.slice(1).map((member) => removeMember(member)))
 
   async function removeMember(member: string) {
+    console.log('removing member', member)
     return (await kit.contracts.getValidators())
       .removeMember(member)
       .sendAndWaitForReceipt({ from: group })
   }
 
   async function addMember(member: string) {
+    console.log('adding member', member)
     return (await (await kit.contracts.getValidators()).addMember(
       group,
       member
@@ -74,6 +76,7 @@ async function newKeyRotator(
   const accountsWrapper = await kit.contracts.getAccounts()
 
   async function authorizeValidatorSigner(signer: string, signerWeb3: any) {
+    console.log('authorizing validator signer', validator, signer)
     const signerKit = newKitFromWeb3(signerWeb3)
     const pop = await (await signerKit.contracts.getAccounts()).generateProofOfSigningKeyPossession(
       validator,
@@ -85,6 +88,7 @@ async function newKeyRotator(
   }
 
   async function updateValidatorBlsKey(signerPrivateKey: string) {
+    console.log('updating validator bls key')
     const blsPublicKey = getBlsPublicKey(signerPrivateKey)
     const blsPop = getBlsPoP(validator, signerPrivateKey)
     // TODO(asa): Send this from the signer instead.
@@ -302,6 +306,7 @@ describe('governance tests', () => {
         blockNumber = await web3.eth.getBlockNumber()
         await sleep(0.1)
       } while (blockNumber % epoch !== 1)
+      console.log('activating')
       await activate(validatorAccounts[0])
 
       // Prepare for member swapping.
