@@ -18,7 +18,7 @@ export default class ExchangeShow extends BaseCommand {
   static examples = ['list']
 
   async run() {
-    const { flags: parsedFlags } = this.parse(List)
+    const { flags: parsedFlags } = this.parse(ExchangeShow)
 
     cli.action.start('Fetching exchange rates...')
     const exchange = await this.kit.contracts.getExchange()
@@ -26,7 +26,7 @@ export default class ExchangeShow extends BaseCommand {
     const goldForDollar = await exchange.getBuyTokenAmount(parsedFlags.amount as string, false)
     cli.action.stop()
 
-    this.log(`${parsedFlags.amount} cGLD => ${dollarForGold.toString()} cUSD`)
-    this.log(`${parsedFlags.amount} cUSD => ${goldForDollar.toString()} cGLD`)
+    this.log(`${parsedFlags.amount} cGLD => ${dollarForGold.toFixed()} cUSD`)
+    this.log(`${parsedFlags.amount} cUSD => ${goldForDollar.toFixed()} cGLD`)
   }
 }

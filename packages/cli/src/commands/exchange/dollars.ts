@@ -1,7 +1,8 @@
+import { flags } from '@oclif/command'
 import BigNumber from 'bignumber.js'
 import { BaseCommand } from '../../base'
 import { displaySendTx } from '../../utils/cli'
-import { swapArguments } from '../../utils/exchange'
+import { Flags } from '../../utils/command'
 
 export default class ExchangeDollars extends BaseCommand {
   static description = 'Exchange Celo Dollars for Celo Gold via the stability mechanism'
@@ -38,9 +39,9 @@ export default class ExchangeDollars extends BaseCommand {
     const stableToken = await this.kit.contracts.getStableToken()
     const exchange = await this.kit.contracts.getExchange()
 
-    await displaySendTx('approve', stableToken.approve(exchange.address, sellAmount.toString()))
+    await displaySendTx('approve', stableToken.approve(exchange.address, sellAmount.toFixed()))
 
-    const exchangeTx = exchange.exchange(sellAmount.toString(), minBuyAmount.toString(), false)
+    const exchangeTx = exchange.exchange(sellAmount.toFixed(), minBuyAmount.toFixed(), false)
     await displaySendTx('exchange', exchangeTx)
   }
 }
