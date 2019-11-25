@@ -90,29 +90,33 @@ export async function findValidCode(
   account: string
 ) {
   for (const message of messages) {
-    const code = attestations.extractAttestationCodeFromMessage(message)
-    if (!code) {
+    try {
+      const code = attestations.extractAttestationCodeFromMessage(message)
+      if (!code) {
+        continue
+      }
+
+      const issuer = await attestations.findMatchingIssuer(
+        phoneNumber,
+        account,
+        code,
+        attestationsToComplete.map((_) => _.issuer)
+      )
+
+      if (!issuer) {
+        continue
+      }
+
+      const isValid = await attestations.validateAttestationCode(phoneNumber, account, issuer, code)
+
+      if (!isValid) {
+        continue
+      }
+
+      return { code, issuer }
+    } catch {
       continue
     }
-
-    const issuer = await attestations.findMatchingIssuer(
-      phoneNumber,
-      account,
-      code,
-      attestationsToComplete.map((_) => _.issuer)
-    )
-
-    if (!issuer) {
-      continue
-    }
-
-    const isValid = await attestations.validateAttestationCode(phoneNumber, account, issuer, code)
-
-    if (!isValid) {
-      continue
-    }
-
-    return { code, issuer }
   }
 
   return
