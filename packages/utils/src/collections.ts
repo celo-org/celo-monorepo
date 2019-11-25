@@ -22,3 +22,20 @@ export function zip3<A, B, C>(as: A[], bs: B[], cs: C[]) {
 export function notEmpty<TValue>(value: TValue | null | undefined): value is TValue {
   return value !== null && value !== undefined
 }
+
+export function intersection<T>(arrays: T[][]): T[] {
+  if (arrays.length === 0) {
+    return []
+  }
+
+  const sets = arrays.map((array) => new Set(array))
+  const res: T[] = []
+
+  for (const elem of arrays[0]) {
+    if (sets.every((set) => set.has(elem))) {
+      res.push(elem)
+    }
+  }
+
+  return res
+}

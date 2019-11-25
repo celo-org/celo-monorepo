@@ -4,7 +4,7 @@ import { switchToClusterFromEnv } from 'src/lib/cluster'
 import { getBlockchainApiUrl } from 'src/lib/endpoints'
 import { portForwardAnd } from 'src/lib/port_forward'
 import { execCmd } from 'src/lib/utils'
-import * as yargs from 'yargs'
+import yargs from 'yargs'
 import { AccountArgv } from '../account'
 
 export const command = 'weekly-faucet'
