@@ -7,6 +7,9 @@ import {
 } from '@celo/contractkit/lib/wrappers/Attestations'
 import { privateKeyToAddress } from '@celo/utils/lib/address'
 import BigNumber from 'bignumber.js'
+import Logger, { createLogger, stdSerializers } from 'bunyan'
+import { createStream } from 'bunyan-gke-stackdriver'
+import { Level } from 'bunyan-gke-stackdriver/dist/types'
 import moment from 'moment'
 import sleep from 'sleep-promise'
 import {
@@ -63,16 +66,25 @@ const ADDRESS_SID = 'ADfc7d865c6bb0489ff21f29fa0b0531fa'
 
 export const handler = async function autoVerify(argv: AutoVerifyArgv) {
   try {
+    let logger: Logger = createLogger({
+      name: 'attestation-bot',
+      serializers: stdSerializers,
+      streams: [createStream(Level.INFO)],
+    })
+
     const kit = newKit(argv.celoProvider)
     const mnemonic = fetchEnv(envVar.MNEMONIC)
     const validator0Key = ensure0x(generatePrivateKey(mnemonic, AccountType.VALIDATOR, 0))
     const validator0Address = privateKeyToAddress(validator0Key)
     const clientKey = ensure0x(generatePrivateKey(mnemonic, AccountType.ATTESTATION, 0))
     const clientAddress = privateKeyToAddress(clientKey)
+    logger = logger.child({ address: clientAddress })
     kit.addAccount(validator0Key)
     kit.addAccount(clientKey)
 
     await fundClient(kit, validator0Address, clientAddress, argv.attestationMax)
+
+    logger.info('Funded client')
 
     const twilioClient = twilio(
       fetchEnv(envVar.TWILIO_ACCOUNT_SID),
@@ -84,8 +96,8 @@ export const handler = async function autoVerify(argv: AutoVerifyArgv) {
     const gasPriceMinimum = await kit.contracts.getGasPriceMinimum()
 
     const waitTime = Math.random() * argv.initialWaitSeconds
-    console.log(`Waiting ${waitTime} seconds (from ${argv.initialWaitSeconds})`)
     await sleep(waitTime * 1000)
+    logger.info({ waitTime, initialWaitSeconds: argv.initialWaitSeconds }, 'Initial Wait')
 
     const phoneNumber = await getPhoneNumber(
       attestations,
@@ -94,12 +106,13 @@ export const handler = async function autoVerify(argv: AutoVerifyArgv) {
       argv.attestationMax
     )
 
-    console.log('Using ', phoneNumber)
+    logger = logger.child({ phoneNumber })
+    logger.info('Initialized phone number')
 
     let stat = await attestations.getAttestationStat(phoneNumber, clientAddress)
 
     while (stat.total < argv.attestationMax) {
-      console.log(`Starting, we completed ${stat.completed} out of ${stat.total} attestations`)
+      logger.info({ completed: stat.completed, total: stat.total }, 'Start Attestation')
 
       const gasPrice = new BigNumber(
         await gasPriceMinimum.getGasPriceMinimum(stableToken.address)
@@ -110,7 +123,7 @@ export const handler = async function autoVerify(argv: AutoVerifyArgv) {
         gasPrice: gasPrice.toString(),
       }
 
-      console.info('request attestations')
+      logger.info('Request Attestation')
       await requestMoreAttestations(attestations, phoneNumber, 1, clientAddress, txParams)
 
       const attestationsToComplete = await attestations.getActionableAttestations(
@@ -118,7 +131,7 @@ export const handler = async function autoVerify(argv: AutoVerifyArgv) {
         clientAddress
       )
 
-      console.info('reveal to issuer')
+      logger.info('Reveal to issuers')
       const possibleErrors = await requestAttestationsFromIssuers(
         attestationsToComplete,
         attestations,
@@ -126,6 +139,10 @@ export const handler = async function autoVerify(argv: AutoVerifyArgv) {
         clientAddress
       )
 
+      logger.info(
+        { possibleErrors: possibleErrors.filter((_) => _ && _.known).length },
+        'Reveal errors'
+      )
       printAndIgnoreRequestErrors(possibleErrors)
 
       console.info('wait for messages')
@@ -135,7 +152,8 @@ export const handler = async function autoVerify(argv: AutoVerifyArgv) {
         phoneNumber,
         clientAddress,
         attestationsToComplete,
-        txParams
+        txParams,
+        logger
       )
 
       const sleepTime = Math.random() * argv.inBetweenWaitSeconds
@@ -163,9 +181,11 @@ async function pollForMessagesAndCompleteAttestations(
   phoneNumber: string,
   account: Address,
   attestationsToComplete: ActionableAttestation[],
-  txParams: CeloTransactionParams = {}
+  txParams: CeloTransactionParams = {},
+  logger: Logger
 ) {
   const startDate = moment()
+  logger.info({ pollingWait: POLLING_WAIT }, 'Poll for the attestation code')
   while (
     moment().isBefore(startDate.add(TIME_TO_WAIT_FOR_ATTESTATIONS_IN_MINUTES, 'minutes')) &&
     attestationsToComplete.length > 0
@@ -187,10 +207,16 @@ async function pollForMessagesAndCompleteAttestations(
     }
     console.log('')
 
+    logger.info(
+      { waitingTime: moment.duration(startDate.diff(moment())).seconds() },
+      'Received valid code'
+    )
+
     const completeTx = await attestations.complete(phoneNumber, account, res.issuer, res.code)
 
     await completeTx.sendAndWaitForReceipt(txParams)
 
+    logger.info('Completed attestation')
     attestationsToComplete = await attestations.getActionableAttestations(phoneNumber, account)
     console.log(
       `Completed attestation for ${res.issuer}, ${attestationsToComplete.length} remaining`
