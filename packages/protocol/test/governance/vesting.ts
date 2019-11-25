@@ -388,7 +388,7 @@ contract('Vesting', (accounts: string[]) => {
 
     it('should revert when vesting cliff start point lies in the past', async () => {
       const vestingSchedule = _.clone(vestingDefaultSchedule)
-      vestingSchedule.vestingStartTime = Math.round(Date.now() / 1000) - 2 * HOUR
+      vestingSchedule.vestingStartTime = (await getCurrentBlockchainTimestamp(web3)) - 2 * HOUR
       await assertRevert(createNewVestingInstanceTx(vestingSchedule, registry.address, web3))
     })
   })
@@ -416,18 +416,65 @@ contract('Vesting', (accounts: string[]) => {
       await createNewVestingInstanceTx(vestingDefaultSchedule, registry.address, web3)
       const vestingInstanceRegistryAddress = await vestingFactoryInstance.hasVestedAt(beneficiary)
       const vestingInstance = await VestingInstance.at(vestingInstanceRegistryAddress)
+      // IMPORTANT: here some time must be passed as to avoid small numbers in solidity (e.g < 1*10**18)
       const timeToTravel = 3 * MONTH
       await timeTravel(timeToTravel, web3)
       await vestingInstance.withdraw({ from: beneficiary })
     })
 
-    it('none-beneficiary should not be able to withdraw after cliff start time', async () => {
+    it('none-beneficiary should not be able to withdraw after cliff start time nor at any point', async () => {
       await createNewVestingInstanceTx(vestingDefaultSchedule, registry.address, web3)
       const vestingInstanceRegistryAddress = await vestingFactoryInstance.hasVestedAt(beneficiary)
       const vestingInstance = await VestingInstance.at(vestingInstanceRegistryAddress)
-      const timeToTravel = 3 * MONTH
+      let timeToTravel = 3 * MONTH
       await timeTravel(timeToTravel, web3)
       await assertRevert(vestingInstance.withdraw({ from: accounts[5] }))
+      timeToTravel = 20 * MONTH
+      await timeTravel(timeToTravel, web3)
+      await assertRevert(vestingInstance.withdraw({ from: accounts[5] }))
+    })
+
+    it('beneficiary should not be able to withdraw within the pause period', async () => {
+      await createNewVestingInstanceTx(vestingDefaultSchedule, registry.address, web3)
+      const vestingInstanceRegistryAddress = await vestingFactoryInstance.hasVestedAt(beneficiary)
+      const vestingInstance = await VestingInstance.at(vestingInstanceRegistryAddress)
+      await vestingInstance.pause(300 * DAY, { from: revoker })
+      const timeToTravel = 3 * MONTH
+      await timeTravel(timeToTravel, web3)
+      await assertRevert(vestingInstance.withdraw({ from: beneficiary }))
+    })
+
+    it('beneficiary should be able to withdraw after the pause period', async () => {
+      await createNewVestingInstanceTx(vestingDefaultSchedule, registry.address, web3)
+      const vestingInstanceRegistryAddress = await vestingFactoryInstance.hasVestedAt(beneficiary)
+      const vestingInstance = await VestingInstance.at(vestingInstanceRegistryAddress)
+      await vestingInstance.pause(300 * DAY, { from: revoker })
+      const timeToTravel = 301 * DAY
+      await timeTravel(timeToTravel, web3)
+      await vestingInstance.withdraw({ from: beneficiary })
+    })
+
+    it('beneficiary should be able to withdraw the full amount after vesting period is over', async () => {
+      await createNewVestingInstanceTx(vestingDefaultSchedule, registry.address, web3)
+      const vestingInstanceRegistryAddress = await vestingFactoryInstance.hasVestedAt(beneficiary)
+      const vestingInstance = await VestingInstance.at(vestingInstanceRegistryAddress)
+      const timeToTravel = 12 * MONTH + 1 * DAY
+      await timeTravel(timeToTravel, web3)
+      const beneficiaryBalanceBefore = await goldTokenInstance.balanceOf(beneficiary)
+      const vestingInstanceBalanceBefore = await goldTokenInstance.balanceOf(
+        vestingInstance.address
+      )
+      await vestingInstance.withdraw({ from: beneficiary })
+      const beneficiaryBalanceAfter = await goldTokenInstance.balanceOf(beneficiary)
+      const vestingInstanceBalanceAfter = await goldTokenInstance.balanceOf(vestingInstance.address)
+      const beneficiaryBalanceDiff = new BigNumber(beneficiaryBalanceAfter).minus(
+        new BigNumber(beneficiaryBalanceBefore)
+      )
+      const vestingInstanceBalanceDiff = new BigNumber(vestingInstanceBalanceBefore).minus(
+        new BigNumber(vestingInstanceBalanceAfter)
+      )
+      assertEqualBN(vestingInstanceBalanceDiff, vestingDefaultSchedule.vestingAmount)
+      assertEqualBN(beneficiaryBalanceDiff, vestingDefaultSchedule.vestingAmount)
     })
   })
 
