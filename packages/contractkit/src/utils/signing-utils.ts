@@ -22,6 +22,9 @@ function trimLeadingZero(hex: string) {
 }
 
 function makeEven(hex: string) {
+  if (hex && !hex.startsWith('0x')) {
+    throw new Error('input string is not hex')
+  }
   if (hex.length % 2 === 1) {
     hex = hex.replace('0x', '0x0')
   }
@@ -59,16 +62,16 @@ export async function signTransaction(txn: any, privateKey: string) {
       // This order should match the order in Geth.
       // https://github.com/celo-org/celo-blockchain/blob/027dba2e4584936cc5a8e8993e4e27d28d5247b8/core/types/transaction.go#L65
       const rlpEncoded = RLP.encode([
-        Bytes.fromNat(transaction.nonce),
-        Bytes.fromNat(transaction.gasPrice),
-        Bytes.fromNat(transaction.gas),
+        makeEven(transaction.nonce),
+        makeEven(transaction.gasPrice),
+        makeEven(transaction.gas),
         transaction.feeCurrency.toLowerCase(),
         transaction.gatewayFeeRecipient.toLowerCase(),
-        Bytes.fromNat(transaction.gatewayFee),
+        makeEven(transaction.gatewayFee),
         transaction.to.toLowerCase(),
-        Bytes.fromNat(transaction.value),
+        makeEven(transaction.value),
         transaction.data,
-        Bytes.fromNat(transaction.chainId || '0x1'),
+        makeEven(transaction.chainId || '0x1'),
         '0x',
         '0x',
       ])
