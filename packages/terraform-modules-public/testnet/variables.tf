@@ -18,10 +18,10 @@ variable gcloud_project {
   description = "Name of the Google Cloud project to use"
 }
 
-variable genesis_content_base64 {
-  type        = string
-  description = "Content of the genesis file encoded in base64"
-}
+// variable genesis_content_base64 {
+//   type        = string
+//   description = "Content of the genesis file encoded in base64"
+// }
 
 variable geth_exporter_docker_image_repository {
   type        = string
@@ -162,10 +162,10 @@ variable deploy_txnode_lb {
   default     = false
 }
 
-variable static_nodes_base64 {
-  type        = string
-  description = "Content of the genesis file encoded in base64"
-}
+// variable static_nodes_base64 {
+//   type        = string
+//   description = "Content of the genesis file encoded in base64"
+// }
 
 variable reset_geth_data {
   type        = bool

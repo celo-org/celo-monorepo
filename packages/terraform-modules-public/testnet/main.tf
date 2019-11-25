@@ -18,6 +18,24 @@ variable network_depends_on {
   default = null
 }
 
+# Data resources
+data "http" "genesis" {
+  url = "https://storage.googleapis.com/genesis_blocks/${var.celo_env}"
+
+  request_headers = {
+    "Accept" = "application/json"
+  }
+}
+
+data "http" "static-nodes" {
+  // url = "https://storage.googleapis.com/static_nodes/${var.celo_env}"
+  url = "https://storage.googleapis.com/javier_cortejoso/baklavastaging"
+
+  request_headers = {
+    "Accept" = "application/json"
+  }
+}
+
 data "google_compute_network" "celo" {
   name       = var.network_name
   depends_on = [var.network_depends_on]
@@ -29,6 +47,7 @@ data "google_compute_subnetwork" "celo" {
   depends_on = [var.network_depends_on]
 }
 
+# GCP resources
 resource "google_compute_firewall" "ssh_firewall" {
   name    = "${var.celo_env}-ssh-firewall"
   network = var.network_name
@@ -123,7 +142,7 @@ module "tx_node" {
   bootnode_ip_address                   = var.bootnode_ip_address
   celo_env                              = var.celo_env
   ethstats_host                         = var.ethstats_host
-  genesis_content_base64                = var.genesis_content_base64
+  genesis_content_base64                = base64encode(data.http.genesis.body)
   geth_exporter_docker_image_repository = var.geth_exporter_docker_image_repository
   geth_exporter_docker_image_tag        = var.geth_exporter_docker_image_tag
   geth_node_docker_image_repository     = var.geth_node_docker_image_repository
@@ -157,7 +176,7 @@ module "proxy" {
   bootnode_ip_address                   = var.bootnode_ip_address
   celo_env                              = var.celo_env
   ethstats_host                         = var.ethstats_host
-  genesis_content_base64                = var.genesis_content_base64
+  genesis_content_base64                = base64encode(data.http.genesis.body)
   geth_exporter_docker_image_repository = var.geth_exporter_docker_image_repository
   geth_exporter_docker_image_tag        = var.geth_exporter_docker_image_tag
   geth_node_docker_image_repository     = var.geth_node_docker_image_repository
@@ -177,7 +196,7 @@ module "proxy" {
   proxy_account_passwords     = var.proxy_account_passwords
   validator_account_addresses = var.validator_account_addresses
   bootnode_enode_address      = var.bootnode_enode_address
-  static_nodes_base64         = var.static_nodes_base64
+  static_nodes_base64         = base64encode(data.http.static-nodes.body)
 }
 
 module "validator" {
@@ -187,7 +206,7 @@ module "validator" {
   bootnode_ip_address                   = var.bootnode_ip_address
   celo_env                              = var.celo_env
   ethstats_host                         = var.ethstats_host
-  genesis_content_base64                = var.genesis_content_base64
+  genesis_content_base64                = base64encode(data.http.genesis.body)
   geth_exporter_docker_image_repository = var.geth_exporter_docker_image_repository
   geth_exporter_docker_image_tag        = var.geth_exporter_docker_image_tag
   geth_node_docker_image_repository     = var.geth_node_docker_image_repository
@@ -208,7 +227,7 @@ module "validator" {
   proxy_internal_ips          = module.proxy.internal_ip_addresses
   proxy_external_ips          = module.proxy.external_ip_addresses
   bootnode_enode_address      = var.bootnode_enode_address
-  static_nodes_base64         = var.static_nodes_base64
+  static_nodes_base64         = base64encode(data.http.static-nodes.body)
 }
 
 module "attestation-service" {
