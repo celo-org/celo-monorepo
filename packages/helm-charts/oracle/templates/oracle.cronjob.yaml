@@ -1,8 +1,8 @@
 apiVersion: batch/v1beta1
 kind: CronJob
-metadata: 
+metadata:
   name: {{ .Release.Name }}
-  labels: 
+  labels:
     app: oracle
     chart: oracle
     release: {{ .Release.Service }}
@@ -23,10 +23,10 @@ spec:
               - sh
               - "-c"
               - |
-                echo `python get_rate_for_now.py oracle_rates.csv` > /root/.celo/current_price
+                echo `./current_rate.sh` > /celo/.celo/current_price
             volumeMounts:
             - name: data
-              mountPath: /root/.celo 
+              mountPath: /celo/.celo
           - name: get-account
             image: {{ .Values.celotool.image.repository }}:{{ .Values.celotool.image.tag }}
             imagePullPolicy: IfNotPresent
@@ -34,11 +34,11 @@ spec:
             args:
             - "-c"
             - |
-              celotooljs.sh generate bip32 --mnemonic "$MNEMONIC" --accountType price_oracle --index 0 > /root/.celo/pkey
-              celotooljs.sh generate account-address --private-key `cat /root/.celo/pkey` > /root/.celo/account
+              celotooljs.sh generate bip32 --mnemonic "$MNEMONIC" --accountType price_oracle --index 0 > /celo/.celo/pkey
+              celotooljs.sh generate account-address --private-key `cat /celo/.celo/pkey` > /celo/.celo/account
             volumeMounts:
             - name: data
-              mountPath: /root/.celo
+              mountPath: /celo/.celo
             env:
             - name: MNEMONIC
               valueFrom:
@@ -53,17 +53,16 @@ spec:
             args:
             - "-c"
             - |
-              PRICE=`cat /root/.celo/current_price`
+              PRICE=`cat /celo/.celo/current_price`
               echo 'current price:'
               echo $PRICE
-              PK=`cat /root/.celo/pkey`
-              ACCOUNT=`cat /root/.celo/account`
-              alias celocli='node_modules/@celo/celocli/bin/run'
+              PK=`cat /celo/.celo/pkey`
+              ACCOUNT=`cat /celo/.celo/account`
               celocli config:set --node {{ .Values.celocli.nodeUrl }}
               celocli oracle:report StableToken --numerator $PRICE --privateKey $PK --from $ACCOUNT
             volumeMounts:
             - name: data
-              mountPath: /root/.celo
+              mountPath: /celo/.celo
             env:
             - name: MNEMONIC
               valueFrom:

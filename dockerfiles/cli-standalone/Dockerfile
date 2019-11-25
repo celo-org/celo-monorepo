@@ -1,7 +1,15 @@
 FROM node:10-alpine
 
-RUN apk update && apk add python git make gcc g++
+RUN apk update && apk add python git make gcc g++ bash
 
-WORKDIR /celo/
+RUN adduser -D -S celo
 
-RUN npm install @celo/celocli@0.0.29
+USER celo
+
+RUN mkdir /home/celo/.npm-global
+ENV PATH=/home/celo/.npm-global/bin:$PATH
+ENV NPM_CONFIG_PREFIX=/home/celo/.npm-global
+
+WORKDIR /home/celo/
+
+RUN npm install -g @celo/celocli@0.0.30
