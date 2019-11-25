@@ -27,14 +27,12 @@ async function newMemberSwapper(kit: ContractKit, members: string[]): Promise<Me
   await Promise.all(members.slice(1).map((member) => removeMember(member)))
 
   async function removeMember(member: string) {
-    console.log('removing member', member)
     return (await kit.contracts.getValidators())
       .removeMember(member)
       .sendAndWaitForReceipt({ from: group })
   }
 
   async function addMember(member: string) {
-    console.log('adding member', member)
     return (await (await kit.contracts.getValidators()).addMember(
       group,
       member
@@ -76,7 +74,6 @@ async function newKeyRotator(
   const accountsWrapper = await kit.contracts.getAccounts()
 
   async function authorizeValidatorSigner(signer: string, signerWeb3: any) {
-    console.log('authorizing validator signer', validator, signer)
     const signerKit = newKitFromWeb3(signerWeb3)
     const pop = await (await signerKit.contracts.getAccounts()).generateProofOfSigningKeyPossession(
       validator,
@@ -88,7 +85,6 @@ async function newKeyRotator(
   }
 
   async function updateValidatorBlsKey(signerPrivateKey: string) {
-    console.log('updating validator bls key')
     const blsPublicKey = getBlsPublicKey(signerPrivateKey)
     const blsPop = getBlsPoP(validator, signerPrivateKey)
     // TODO(asa): Send this from the signer instead.
@@ -200,16 +196,6 @@ describe('governance tests', () => {
     return decryptedKeystore.privateKey
   }
 
-  const activate = async (account: string, txOptions: any = {}) => {
-    const [group] = await validators.methods.getRegisteredValidatorGroups().call()
-    const tx = election.methods.activate(group)
-    let gas = txOptions.gas
-    if (!gas) {
-      gas = (await tx.estimateGas({ ...txOptions })) * 2
-    }
-    return tx.send({ from: account, ...txOptions, gas })
-  }
-
   const isLastBlockOfEpoch = (blockNumber: number, epochSize: number) => {
     return blockNumber % epochSize === 0
   }
@@ -306,13 +292,14 @@ describe('governance tests', () => {
         blockNumber = await web3.eth.getBlockNumber()
         await sleep(0.1)
       } while (blockNumber % epoch !== 1)
-      console.log('activating')
-      await activate(validatorAccounts[0])
 
       // Prepare for member swapping.
       const groupWeb3 = new Web3('ws://localhost:8555')
       await waitToFinishSyncing(groupWeb3)
       const groupKit = newKitFromWeb3(groupWeb3)
+      const group: string = (await groupWeb3.eth.getAccounts())[0]
+      await (await groupKit.contracts.getElection()).activate(group)
+
       validators = await groupKit._web3Contracts.getValidators()
       const membersToSwap = [validatorAccounts[0], validatorAccounts[1]]
       const memberSwapper = await newMemberSwapper(groupKit, membersToSwap)
