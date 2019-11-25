@@ -5,8 +5,8 @@ import {
 } from '@celo/contractkit/lib/wrappers/Attestations'
 import { PhoneNumberUtils } from '@celo/utils'
 import { concurrentMap } from '@celo/utils/lib/async'
+import moment from 'moment'
 import { Twilio } from 'twilio'
-import moment = require('moment')
 
 export async function requestMoreAttestations(
   attestations: AttestationsWrapper,
