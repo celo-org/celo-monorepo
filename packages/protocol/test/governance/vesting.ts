@@ -420,6 +420,8 @@ contract('Vesting', (accounts: string[]) => {
       const timeToTravel = 3 * MONTH
       await timeTravel(timeToTravel, web3)
       await vestingInstance.withdraw({ from: beneficiary })
+      const currentlyWithdrawn = await vestingInstance.currentlyWithdrawn()
+      assert.isTrue(new BigNumber(currentlyWithdrawn).gt(0))
     })
 
     it('none-beneficiary should not be able to withdraw after cliff start time nor at any point', async () => {
@@ -478,6 +480,49 @@ contract('Vesting', (accounts: string[]) => {
     })
   })
 
+  describe('#vesting - withdrawal at timestamp()', () => {
+    it('beneficiary should not be able to withdraw a quarter of the vested amount after 3 months under current test constellation', async () => {
+      await createNewVestingInstanceTx(vestingDefaultSchedule, registry.address, web3)
+      const vestingInstanceRegistryAddress = await vestingFactoryInstance.hasVestedAt(beneficiary)
+      const vestingInstance = await VestingInstance.at(vestingInstanceRegistryAddress)
+      const timeToTravel = 3 * MONTH + 1 * DAY
+      await timeTravel(timeToTravel, web3)
+      await vestingInstance.withdraw({ from: beneficiary })
+      const currentlyWithdrawn = await vestingInstance.currentlyWithdrawn()
+      assert.isTrue(
+        new BigNumber(currentlyWithdrawn).gte(vestingDefaultSchedule.vestingAmount.div(4))
+      )
+    })
+
+    it('beneficiary should be able to withdraw half the vested amount after 6 months under current test constellation', async () => {
+      await createNewVestingInstanceTx(vestingDefaultSchedule, registry.address, web3)
+      const vestingInstanceRegistryAddress = await vestingFactoryInstance.hasVestedAt(beneficiary)
+      const vestingInstance = await VestingInstance.at(vestingInstanceRegistryAddress)
+      const timeToTravel = 6 * MONTH + 1 * DAY
+      await timeTravel(timeToTravel, web3)
+      await vestingInstance.withdraw({ from: beneficiary })
+      const currentlyWithdrawn = await vestingInstance.currentlyWithdrawn()
+      assert.isTrue(
+        new BigNumber(currentlyWithdrawn).gte(vestingDefaultSchedule.vestingAmount.div(2))
+      )
+    })
+
+    it('beneficiary should be able to withdraw at a timestamp and have 0 withdrawable limit straight after', async () => {
+      await createNewVestingInstanceTx(vestingDefaultSchedule, registry.address, web3)
+      const vestingInstanceRegistryAddress = await vestingFactoryInstance.hasVestedAt(beneficiary)
+      const vestingInstance = await VestingInstance.at(vestingInstanceRegistryAddress)
+      // IMPORTANT: here some time must be passed as to avoid small numbers in solidity (e.g < 1*10**18)
+      const timeToTravel = 3 * MONTH
+      await timeTravel(timeToTravel, web3)
+      await vestingInstance.withdraw({ from: beneficiary })
+      const currentTimestamp = await getCurrentBlockchainTimestamp(web3)
+      const currentlyWithdrawable = await vestingInstance.getWithdrawableAmountAtTimestamp(
+        currentTimestamp
+      )
+      assertEqualBN(currentlyWithdrawable, 0)
+    })
+  })
+
   describe('#vesting - pause()', () => {
     it('revoker should be able to pause the vesting', async () => {
       await createNewVestingInstanceTx(vestingDefaultSchedule, registry.address, web3)
@@ -531,6 +576,85 @@ contract('Vesting', (accounts: string[]) => {
         from: revoker,
       })
       await assertRevert(vestingInstance.pause(300 * DAY, { from: revoker }))
+    })
+  })
+
+  describe('#vesting - revoke()', () => {
+    it('revoker should be able to revoke the vesting', async () => {
+      await createNewVestingInstanceTx(vestingDefaultSchedule, registry.address, web3)
+      const vestingInstanceRegistryAddress = await vestingFactoryInstance.hasVestedAt(beneficiary)
+      const vestingInstance = await VestingInstance.at(vestingInstanceRegistryAddress)
+      const revokeVestingTx = await vestingInstance.revoke(
+        await getCurrentBlockchainTimestamp(web3),
+        { from: revoker }
+      )
+      const isVestingRevoked = await vestingInstance.revoked()
+      assert.isTrue(isVestingRevoked)
+      const vestingRevokedEvent = _.find(revokeVestingTx.logs, {
+        event: 'VestingRevoked',
+      })
+      assert.exists(vestingRevokedEvent)
+    })
+
+    it('revoker should be able to revoke the vesting even if revoked date is in the past', async () => {
+      await createNewVestingInstanceTx(vestingDefaultSchedule, registry.address, web3)
+      const vestingInstanceRegistryAddress = await vestingFactoryInstance.hasVestedAt(beneficiary)
+      const vestingInstance = await VestingInstance.at(vestingInstanceRegistryAddress)
+      const revokeVestingTx = await vestingInstance.revoke(
+        (await getCurrentBlockchainTimestamp(web3)) - 2 * DAY,
+        { from: revoker }
+      )
+      const isVestingRevoked = await vestingInstance.revoked()
+      assert.isTrue(isVestingRevoked)
+      const vestingRevokedEvent = _.find(revokeVestingTx.logs, {
+        event: 'VestingRevoked',
+      })
+      assert.exists(vestingRevokedEvent)
+    })
+
+    it('should revert if vesting is already revoked', async () => {
+      await createNewVestingInstanceTx(vestingDefaultSchedule, registry.address, web3)
+      const vestingInstanceRegistryAddress = await vestingFactoryInstance.hasVestedAt(beneficiary)
+      const vestingInstance = await VestingInstance.at(vestingInstanceRegistryAddress)
+      await vestingInstance.revoke((await getCurrentBlockchainTimestamp(web3)) - 2 * DAY, {
+        from: revoker,
+      })
+      await assertRevert(
+        vestingInstance.revoke(await getCurrentBlockchainTimestamp(web3), { from: revoker })
+      )
+    })
+
+    it('should revert if vesting is none-revokable', async () => {
+      const vestingSchedule = _.clone(vestingDefaultSchedule)
+      vestingSchedule.vestingRevokable = false
+      await createNewVestingInstanceTx(vestingSchedule, registry.address, web3)
+      const vestingInstanceRegistryAddress = await vestingFactoryInstance.hasVestedAt(beneficiary)
+      const vestingInstance = await VestingInstance.at(vestingInstanceRegistryAddress)
+      await assertRevert(
+        vestingInstance.revoke(await getCurrentBlockchainTimestamp(web3), { from: revoker })
+      )
+    })
+
+    it('refundDestination should obtain remaining unwithdrawn amount when revoked', async () => {
+      await createNewVestingInstanceTx(vestingDefaultSchedule, registry.address, web3)
+      const vestingInstanceRegistryAddress = await vestingFactoryInstance.hasVestedAt(beneficiary)
+      const vestingInstance = await VestingInstance.at(vestingInstanceRegistryAddress)
+      const timeToTravel = 6 * MONTH
+      await timeTravel(timeToTravel, web3)
+      // let the beneficiary withdraw
+      await vestingInstance.withdraw({ from: beneficiary })
+      const currentlyWithdrawnByBeneficiary = await vestingInstance.currentlyWithdrawn()
+      const refundAddressBalanceBefore = await goldTokenInstance.balanceOf(refundDestination)
+      // let the revoker revoke right after the withdraw
+      await vestingInstance.revoke(await getCurrentBlockchainTimestamp(web3), { from: revoker })
+      const refundAddressBalanceAfter = await goldTokenInstance.balanceOf(refundDestination)
+      const expectedRefundDestinationTransfer = vestingDefaultSchedule.vestingAmount.minus(
+        new BigNumber(currentlyWithdrawnByBeneficiary.toString())
+      )
+      const refundAddressBalanceDiff = new BigNumber(refundAddressBalanceAfter).minus(
+        new BigNumber(refundAddressBalanceBefore)
+      )
+      assertEqualBN(refundAddressBalanceDiff, expectedRefundDestinationTransfer)
     })
   })
 })

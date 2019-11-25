@@ -61,6 +61,7 @@ contract VestingInstance is UsingRegistry, ReentrancyGuard {
   VestingScheme public vestingScheme;
 
   event WithdrawalPaused(uint256 pausePeriod, uint256 pauseTimestamp);
+  event VestingRevoked(uint256 revokeTimestamp);
 
   /**
      * @notice A constructor for initialising a new instance of a Vesting Schedule contract
@@ -152,6 +153,7 @@ contract VestingInstance is UsingRegistry, ReentrancyGuard {
       getGoldToken().transfer(refundDestination, refundAmount),
       "Transfer of refund upon revokation failed"
     );
+    emit VestingRevoked(revokeTime);
   }
 
   /**
@@ -202,7 +204,7 @@ contract VestingInstance is UsingRegistry, ReentrancyGuard {
     uint256 vestingCurveGradient = (timestamp.sub(vestingScheme.vestingStartTime)).div(
       vestingScheme.vestingPeriods
     );
-    return (currentBalance.mul(vestingCurveGradient)).div(vestingScheme.vestingPeriodSec);
+    return (totalBalance.mul(vestingCurveGradient)).div(vestingScheme.vestingPeriodSec);
   }
 
   /**
