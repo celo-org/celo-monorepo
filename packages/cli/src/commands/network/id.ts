@@ -1,5 +1,5 @@
-import { BaseCommand } from '../../base'
 import chalk from 'chalk'
+import { BaseCommand } from '../../base'
 
 export default class Id extends BaseCommand {
   static description = 'View network parameters'
