@@ -1,7 +1,11 @@
 import * as React from 'react'
+import getConfig from 'next/config'
 import { LayoutChangeEvent, StyleSheet, Text, View } from 'react-native'
 import Racer from 'src/dev/Racer'
+import { I18nProps, withNamespaces } from 'src/i18n'
 import { colors, fonts, standardStyles, textStyles } from 'src/styles'
+import Button, { BTN, SIZE } from '../shared/Button.3'
+
 
 interface BoardProps {
   leaders: Competitor[]
@@ -14,20 +18,31 @@ interface Competitor {
 
 interface State {
   width: number
+  page: number
 }
 
-class LeaderBoard extends React.PureComponent<BoardProps, State> {
+class LeaderBoard extends React.PureComponent<BoardProps & I18nProps, State> {
   state: State = {
     width: 0,
+    page: 0,
   }
-
+  
   onLayout = (event: LayoutChangeEvent) => {
     const { width } = event.nativeEvent.layout
     this.setState({ width })
   }
 
+  onExpand = () => {
+    const { page } = this.state
+    this.setState({ page: page + 1 })
+  }
+
   render() {
-    const sortedLeaders = this.props.leaders.sort(sorter)
+    const { page } = this.state
+    const { pageLength } = getConfig().publicRuntimeConfig.LEADERBOARD
+    const showExpandButton = this.props.leaders.length >= (page + 1) * pageLength
+    const sortedLeaders = this.props.leaders.sort(sorter).slice(0, pageLength * (page + 1))
+
     const maxPoints = round(sortedLeaders[0].points * 1.1, 100)
     const width = this.state.width
     return (
@@ -49,11 +64,22 @@ class LeaderBoard extends React.PureComponent<BoardProps, State> {
             />
           ))}
         <Axis max={maxPoints} />
+        {showExpandButton && (
+          <View style={[styles.buttonExpand, standardStyles.elementalMarginTop]}>
+            <Button
+              text={this.props.t('expandLeaderboard')}
+              kind={BTN.NAKED}
+              size={SIZE.normal}
+              onPress={this.onExpand}
+            />
+          </View>
+        )}
       </View>
     )
   }
 }
-export default LeaderBoard
+export default withNamespaces('dev')(LeaderBoard)
+
 
 const JERSEYS = [colors.primary, colors.lightBlue, colors.red, colors.purple, colors.gold]
 
@@ -99,6 +125,10 @@ const styles = StyleSheet.create({
   xaxis: {
     justifyContent: 'space-between',
   },
+  buttonExpand: {
+    alignItems: 'center',
+  },
+
 })
 
 function round(number: number, magnitude?: number) {

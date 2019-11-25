@@ -3,6 +3,8 @@
   "aboutChallengeText":
     "We're looking for node operators and admins who can help develop the Celo menu. Spin up a validator or full node, build operational experience, and help the community prepare for opening night.",
   "aboutTheChallengeButton": "Get Involved",
+  "expandLeaderboard": "Expand Leaderboard",
+
   "makeWithCelo": "Build Celo",
   "makeWithCeloSubtitle": "Get a taste of Baklava, Celo’s incentivized testnet",
   "greatStakeOff": "The Great Celo\nStake Off",

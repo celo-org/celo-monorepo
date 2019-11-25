@@ -2,8 +2,8 @@ import * as React from 'react'
 import LazyLoad from 'react-lazyload'
 import { Image, StyleSheet, Text, View } from 'react-native'
 import Fade from 'react-reveal/Fade'
-import LeaderBoard from 'src/dev/LeaderBoard'
 import Transceive from 'src/dev/Transceive'
+import LeaderBoardApp from './LeaderBoardApp'
 import { H2, H3, H4 } from 'src/fonts/Fonts'
 import { I18nProps, Trans, withNamespaces } from 'src/i18n'
 import { Cell, GridRow, Spans } from 'src/layout/GridRow'
@@ -49,6 +49,7 @@ const CoverComponent = React.memo(function Cover({ t }: I18nProps) {
           </Fade>
         </TitleAndSubTitle>
       </GridRow>
+
       <GridRow
         mobileStyle={standardStyles.blockMarginBottomMobile}
         tabletStyle={standardStyles.blockMarginBottomTablet}
@@ -101,14 +102,14 @@ const CoverComponent = React.memo(function Cover({ t }: I18nProps) {
           <Text style={[fonts.p, textStyles.invert]}>{t('whoText')}</Text>
         </Cell>
       </GridRow>
-      <LazyLoad>
+        <LazyLoad>
         <GridRow
           desktopStyle={standardStyles.blockMarginBottom}
           tabletStyle={standardStyles.blockMarginBottomTablet}
           mobileStyle={standardStyles.blockMarginBottomMobile}
         >
           <Cell span={Spans.full}>
-            <LeaderBoard leaders={LEADERS} />
+            <LeaderBoardApp />
           </Cell>
         </GridRow>
       </LazyLoad>
