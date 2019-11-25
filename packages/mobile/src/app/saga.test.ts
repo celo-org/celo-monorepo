@@ -97,13 +97,13 @@ describe('App saga', () => {
     expect(navigate).toHaveBeenCalledWith(testRoute.routeName, testRoute.params)
   })
 
-  it('Handle Dappkit deep link', async () => {
+  it('Handles Dappkit deep link', async () => {
     const deepLink = 'celo://wallet/dappkit?abcdsa'
     await expectSaga(handleDeepLink, openDeepLink(deepLink)).run()
     expect(handleDappkitDeepLink).toHaveBeenCalledWith(deepLink)
   })
 
-  it('Handle verification deep link', async () => {
+  it('Handles verification deep link', async () => {
     await expectSaga(handleDeepLink, openDeepLink('celo://wallet/v/12345'))
       .put(receiveAttestationMessage('12345', CodeInputType.DEEP_LINK))
       .run()
