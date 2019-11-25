@@ -38,7 +38,6 @@ interface NodeSecrets {
   PROXIED_VALIDATOR_ADDRESS?: string
   PROXY_ENODE_ADDRESS?: string
   [envVar.GETH_ACCOUNT_SECRET]: string
-  [envVar.ETHSTATS_WEBSOCKETSECRET]: string
   [envVar.MNEMONIC]: string
 }
 
@@ -246,7 +245,7 @@ function getTerraformBackendConfigVars(celoEnv: string, terraformModule: string)
 }
 
 function getTestnetVars(celoEnv: string) {
-  const genesisBuffer = new Buffer(generateGenesisFromEnv())
+  const genesisBuffer = Buffer.from(generateGenesisFromEnv())
   const domainName = fetchEnv(envVar.CLUSTER_DOMAIN_NAME)
   return {
     ...getEnvVarValues(testnetEnvVars),

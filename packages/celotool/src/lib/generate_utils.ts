@@ -1,7 +1,6 @@
 // @ts-ignore
 import { config } from '@celo/protocol/migrationsConfig'
 import { blsPrivateKeyToProcessedPrivateKey } from '@celo/utils/lib/bls'
-import BigNumber from 'bignumber.js'
 import * as bls12377js from 'bls12377js'
 import { ec as EC } from 'elliptic'
 import fs from 'fs'
