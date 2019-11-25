@@ -14,6 +14,12 @@ import {
   GoldTokenInstance,
   LockedGoldContract,
   LockedGoldInstance,
+  MockElectionContract,
+  MockElectionInstance,
+  MockGovernanceContract,
+  MockGovernanceInstance,
+  MockValidatorsContract,
+  MockValidatorsInstance,
   RegistryContract,
   RegistryInstance,
   VestingFactoryContract,
@@ -41,6 +47,9 @@ const VestingInstance: VestingInstanceContract = artifacts.require('VestingInsta
 const Accounts: AccountsContract = artifacts.require('Accounts')
 const LockedGold: LockedGoldContract = artifacts.require('LockedGold')
 const GoldToken: GoldTokenContract = artifacts.require('GoldToken')
+const MockGovernance: MockGovernanceContract = artifacts.require('MockGovernance')
+const MockValidators: MockValidatorsContract = artifacts.require('MockValidators')
+const MockElection: MockElectionContract = artifacts.require('MockElection')
 const Registry: RegistryContract = artifacts.require('Registry')
 
 // @ts-ignore
@@ -51,6 +60,7 @@ const MINUTE = 60
 const HOUR = 60 * 60
 const DAY = 24 * HOUR
 const MONTH = 30 * DAY
+const UNLOCKING_PERIOD = 3 * DAY
 
 contract('Vesting', (accounts: string[]) => {
   const owner = accounts[0]
@@ -61,6 +71,9 @@ contract('Vesting', (accounts: string[]) => {
   let lockedGoldInstance: LockedGoldInstance
   let goldTokenInstance: GoldTokenInstance
   let vestingFactoryInstance: VestingFactoryInstance
+  let mockElection: MockElectionInstance
+  let mockGovernance: MockGovernanceInstance
+  let mockValidators: MockValidatorsInstance
   let registry: RegistryInstance
 
   const vestingDefaultSchedule: IVestingSchedule = {
@@ -107,12 +120,19 @@ contract('Vesting', (accounts: string[]) => {
     lockedGoldInstance = await LockedGold.new()
     goldTokenInstance = await GoldToken.new()
     vestingFactoryInstance = await VestingFactory.new()
+    mockElection = await MockElection.new()
+    mockValidators = await MockValidators.new()
+    mockGovernance = await MockGovernance.new()
 
     registry = await Registry.new()
     await registry.setAddressFor(CeloContractName.Accounts, accountsInstance.address)
     await registry.setAddressFor(CeloContractName.LockedGold, lockedGoldInstance.address)
     await registry.setAddressFor(CeloContractName.GoldToken, goldTokenInstance.address)
     await registry.setAddressFor(CeloContractName.VestingFactory, vestingFactoryInstance.address)
+    await registry.setAddressFor(CeloContractName.Election, mockElection.address)
+    await registry.setAddressFor(CeloContractName.Governance, mockGovernance.address)
+    await registry.setAddressFor(CeloContractName.Validators, mockValidators.address)
+    await lockedGoldInstance.initialize(registry.address, UNLOCKING_PERIOD)
     await vestingFactoryInstance.initialize(registry.address)
     await accountsInstance.createAccount()
 
@@ -655,6 +675,63 @@ contract('Vesting', (accounts: string[]) => {
         new BigNumber(refundAddressBalanceBefore)
       )
       assertEqualBN(refundAddressBalanceDiff, expectedRefundDestinationTransfer)
+    })
+  })
+
+  describe('#locking - lock()', () => {
+    it('beneficiary should lock up to the vested amount', async () => {
+      await createNewVestingInstanceTx(vestingDefaultSchedule, registry.address, web3)
+      const vestingInstanceRegistryAddress = await vestingFactoryInstance.hasVestedAt(beneficiary)
+      const vestingInstance = await VestingInstance.at(vestingInstanceRegistryAddress)
+      // beneficiary shall make the vested instance an account
+      await vestingInstance.createAccount({ from: beneficiary })
+      // lock the entire vesting amount
+      await vestingInstance.lockGold(vestingDefaultSchedule.vestingAmount, {
+        from: beneficiary,
+      })
+      assertEqualBN(
+        await lockedGoldInstance.getAccountTotalLockedGold(vestingInstance.address),
+        vestingDefaultSchedule.vestingAmount
+      )
+      assertEqualBN(
+        await lockedGoldInstance.getAccountNonvotingLockedGold(vestingInstance.address),
+        vestingDefaultSchedule.vestingAmount
+      )
+    })
+
+    it('should revert if vesting instance is not an account', async () => {
+      await createNewVestingInstanceTx(vestingDefaultSchedule, registry.address, web3)
+      const vestingInstanceRegistryAddress = await vestingFactoryInstance.hasVestedAt(beneficiary)
+      const vestingInstance = await VestingInstance.at(vestingInstanceRegistryAddress)
+      await assertRevert(
+        vestingInstance.lockGold(vestingDefaultSchedule.vestingAmount, {
+          from: beneficiary,
+        })
+      )
+    })
+
+    it('should revert if beneficiary tries to lock up more than the vested amount', async () => {
+      await createNewVestingInstanceTx(vestingDefaultSchedule, registry.address, web3)
+      const vestingInstanceRegistryAddress = await vestingFactoryInstance.hasVestedAt(beneficiary)
+      const vestingInstance = await VestingInstance.at(vestingInstanceRegistryAddress)
+      // beneficiary shall make the vested instance an account
+      await vestingInstance.createAccount({ from: beneficiary })
+      await assertRevert(
+        vestingInstance.lockGold(vestingDefaultSchedule.vestingAmount.multipliedBy(1.1), {
+          from: beneficiary,
+        })
+      )
+    })
+
+    it('should revert if none-beneficiary tries to lock up to the vested amount', async () => {
+      await createNewVestingInstanceTx(vestingDefaultSchedule, registry.address, web3)
+      const vestingInstanceRegistryAddress = await vestingFactoryInstance.hasVestedAt(beneficiary)
+      const vestingInstance = await VestingInstance.at(vestingInstanceRegistryAddress)
+      // beneficiary shall make the vested instance an account
+      await vestingInstance.createAccount({ from: beneficiary })
+      await assertRevert(
+        vestingInstance.lockGold(vestingDefaultSchedule.vestingAmount, { from: accounts[6] })
+      )
     })
   })
 })
