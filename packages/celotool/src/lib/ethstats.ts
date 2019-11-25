@@ -1,6 +1,6 @@
 import { installGenericHelmChart, removeGenericHelmChart } from 'src/lib/helm_deploy'
 import { execCmdWithExitOnFailure } from 'src/lib/utils'
-import { envVar, fetchEnv } from './env-utils'
+import { envVar, fetchEnv, fetchEnvOrFallback } from './env-utils'
 import { AccountType, getAddressesFor } from './generate_utils'
 
 const helmChartPath = '../helm-charts/ethstats'
@@ -50,6 +50,6 @@ function generateAuthorizedAddresses() {
   publicKeys.push(getAddressesFor(AccountType.TX_NODE, mnemonic, txNodes))
   publicKeys.push(getAddressesFor(AccountType.VALIDATOR, mnemonic, validatorNodes))
 
-  publicKeys.push(fetchEnv(envVar.ETHSTATS_TRUSTED_ADDRESSES).split(','))
+  publicKeys.push(fetchEnvOrFallback(envVar.ETHSTATS_TRUSTED_ADDRESSES, '').split(','))
   return publicKeys.reduce((accumulator, value) => accumulator.concat(value), [])
 }

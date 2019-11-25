@@ -103,8 +103,8 @@ export const privateKeyToStrippedAddress = (privateKey: string) =>
 
 const validatorZeroBalance = fetchEnvOrFallback(
   envVar.VALIDATOR_ZERO_GENESIS_BALANCE,
-  '100010011000000000000000000'
-) // 100,010,011 CG
+  '103010030000000000000000000'
+) // 103,010,030 CG
 const validatorBalance = fetchEnvOrFallback(
   envVar.VALIDATOR_GENESIS_BALANCE,
   '10011000000000000000000'
@@ -121,23 +121,14 @@ export const getStrippedAddressesFor = (accountType: AccountType, mnemonic: stri
   getAddressesFor(accountType, mnemonic, n).map(strip0x)
 
 export const getValidators = (mnemonic: string, n: number) => {
-  return getPrivateKeysFor(AccountType.VALIDATOR, mnemonic, n).map((key) => {
+  return getPrivateKeysFor(AccountType.VALIDATOR, mnemonic, n).map((key, i) => {
     const blsKeyBytes = blsPrivateKeyToProcessedPrivateKey(key)
     return {
       address: strip0x(privateKeyToAddress(key)),
       blsPublicKey: bls12377js.BLS.privateToPublicBytes(blsKeyBytes).toString('hex'),
-      balance: n === 0 ? validatorZeroBalance : validatorBalance,
+      balance: i === 0 ? validatorZeroBalance : validatorBalance,
     }
   })
-}
-
-export const getFaucetedAddresses = (mnemonic: string) => {
-  const loadTestClients = parseInt(fetchEnv(envVar.LOAD_TEST_CLIENTS), 10)
-  return [
-    ...getStrippedAddressesFor(AccountType.FAUCET, mnemonic, 2),
-    ...getStrippedAddressesFor(AccountType.LOAD_TESTING_ACCOUNT, mnemonic, loadTestClients),
-    ...getStrippedAddressesFor(AccountType.PRICE_ORACLE, mnemonic, 1),
-  ]
 }
 
 export const getAddressFromEnv = (accountType: AccountType, n: number) => {
@@ -181,12 +172,25 @@ export const generateGenesisFromEnv = (enablePetersburg: boolean = true) => {
     }
   })
 
+  // Allocate load test accounts
+  const loadTestClients = parseInt(fetchEnvOrFallback(envVar.LOAD_TEST_CLIENTS, '0'), 10)
+  initialAccounts.concat(
+    getStrippedAddressesFor(AccountType.LOAD_TESTING_ACCOUNT, mnemonic, loadTestClients).map(
+      (addr) => {
+        return {
+          address: addr,
+          balance: fetchEnvOrFallback(envVar.LOAD_TEST_GENESIS_BALANCE, '1000000000000000000000'), // 1,000 CG
+        }
+      }
+    )
+  )
+
   // Allocate oracle account(s)
   initialAccounts.concat(
     getStrippedAddressesFor(AccountType.PRICE_ORACLE, mnemonic, 1).map((addr) => {
       return {
         address: addr,
-        balance: fetchEnvOrFallback(envVar.ORACLE_GENESIS_BALANCE, '100000000000000000000'),
+        balance: fetchEnvOrFallback(envVar.ORACLE_GENESIS_BALANCE, '100000000000000000000'), // 100 CG
       }
     })
   )
