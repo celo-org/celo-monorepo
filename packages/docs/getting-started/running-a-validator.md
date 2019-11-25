@@ -29,7 +29,7 @@ If you are starting up a Validator, please consider leaving it running for a few
 
 ### Hardware requirements
 
-Because Celo network is based in Proof of Stake, the hardware requirements are not very high. Proof of Stake consensus is not so CPU intensive as Proof of Work but has a higher requirements of network connectivity and lantency. Here you have a list of the standard requirements for running a Validator node:
+Because Celo network is based in Proof of Stake, the hardware requirements are not very high. Proof of Stake consensus is not so CPU intensive as Proof of Work but has a higher requirements of network connectivity and latency. Here you have a list of the standard requirements for running a Validator node:
 
 - Memory: 8 GB RAM
 - CPU: Quad core 3GHz (64-bit)
