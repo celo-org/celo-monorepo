@@ -1,12 +1,12 @@
 ---
-description: View and manage validators
+description: View and manage Validators
 ---
 
 ## Commands
 
 ### Affiliate
 
-Affiliate to a ValidatorGroup
+Affiliate a Validator with a Validator Group. This allows the Validator Group to add that Validator as a member. If the Validator is already a member of a Validator Group, affiliating with a different Group will remove the Validator from the first group's members.
 
 ```
 USAGE
@@ -26,7 +26,7 @@ _See code: [packages/cli/src/commands/validator/affiliate.ts](https://github.com
 
 ### Deaffiliate
 
-DeAffiliate to a ValidatorGroup
+Deaffiliate a Validator from a Validator Group, and remove it from the Group if it is also a member.
 
 ```
 USAGE
@@ -43,7 +43,7 @@ _See code: [packages/cli/src/commands/validator/deaffiliate.ts](https://github.c
 
 ### Deregister
 
-Deregister a Validator
+Deregister a Validator. Approximately 60 days after deregistration, the 10,000 Gold locked up to register the Validator will become possible to unlock. Note that deregistering a Validator will also deaffiliate and remove the Validator from any Group it may be an affiliate or member of.
 
 ```
 USAGE
@@ -60,7 +60,7 @@ _See code: [packages/cli/src/commands/validator/deregister.ts](https://github.co
 
 ### List
 
-List registered Validators
+List registered Validators, their name (if provided), affiliation, uptime score, and public keys used for validating.
 
 ```
 USAGE
@@ -96,7 +96,7 @@ _See code: [packages/cli/src/commands/validator/register.ts](https://github.com/
 
 ### Requirements
 
-Get Requirements for Validators
+List the Locked Gold requirements for registering a Validator. This consists of a value, which is the amount of Celo Gold that needs to be locked in order to register, and a duration, which is the amount of time that Gold must stay locked following the deregistration of the Validator.
 
 ```
 USAGE
@@ -110,7 +110,7 @@ _See code: [packages/cli/src/commands/validator/requirements.ts](https://github.
 
 ### Show
 
-Show information about an existing Validator
+Show information about a registered Validator.
 
 ```
 USAGE
@@ -127,7 +127,7 @@ _See code: [packages/cli/src/commands/validator/show.ts](https://github.com/celo
 
 ### Update-bls-public-key
 
-Update BLS key for a validator
+Update the BLS public key for a Validator to be used in consensus. Regular (ECDSA and BLS) key rotation is recommended for Validator operational security.
 
 ```
 USAGE
