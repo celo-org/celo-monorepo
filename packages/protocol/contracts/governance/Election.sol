@@ -755,8 +755,7 @@ contract Election is
         totalNumMembersElected = totalNumMembersElected.add(1);
       }
     }
-    // Shuffle the validator set using validator-supplied entropy
-    return shuffleArray(electedValidators);
+    return electedValidators;
   }
 
   /**
@@ -790,21 +789,6 @@ contract Election is
       }
     }
     return (groupIndex, memberElected);
-  }
-
-  /**
-   * @notice Randomly permutes an array of addresses.
-   * @param array The array to permute.
-   * @return The permuted array.
-   */
-  function shuffleArray(address[] memory array) private view returns (address[] memory) {
-    bytes32 r = getRandom().getBlockRandomness(block.number);
-    for (uint256 i = array.length - 1; i > 0; i = i.sub(1)) {
-      uint256 j = uint256(r) % (i + 1);
-      (array[i], array[j]) = (array[j], array[i]);
-      r = keccak256(abi.encodePacked(r));
-    }
-    return array;
   }
 
   /**
