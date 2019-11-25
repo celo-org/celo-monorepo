@@ -826,7 +826,6 @@ contract('Election', (accounts: string[]) => {
     const validator7 = accounts[9]
 
     const hash1 = '0xa5b9d60f32436310afebcfda832817a68921beb782fabf7915cc0460b443116a'
-    const hash2 = '0xa832817a68921b10afebcfd0460b443116aeb782fabf7915cca5b9d60f324363'
 
     // If voterN votes for groupN:
     //   group1 gets 20 votes per member
