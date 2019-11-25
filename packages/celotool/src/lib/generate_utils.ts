@@ -42,6 +42,11 @@ export enum ConsensusType {
 export interface Validator {
   address: string
   blsPublicKey: string
+  balance: string
+}
+export interface AccountAndBalance {
+  address: string
+  balance: string
 }
 
 export const MNEMONIC_ACCOUNT_TYPE_CHOICES = [
@@ -96,10 +101,15 @@ export const privateKeyToAddress = (privateKey: string) => {
 export const privateKeyToStrippedAddress = (privateKey: string) =>
   strip0x(privateKeyToAddress(privateKey))
 
-const WEI_PER_GOLD = new BigNumber(Math.pow(10, 18))
-
-// in wei
-const DEFAULT_BALANCE = '1000000000000000000000000'
+const validatorZeroBalance = fetchEnvOrFallback(
+  envVar.VALIDATOR_ZERO_GENESIS_BALANCE,
+  '100010011000000000000000000'
+) // 100,010,011 CG
+const validatorBalance = fetchEnvOrFallback(
+  envVar.VALIDATOR_GENESIS_BALANCE,
+  '10011000000000000000000'
+) // 10,011 CG
+const faucetBalance = fetchEnvOrFallback(envVar.FAUCET_GENESIS_BALANCE, '10011000000000000000000') // 10,000 CG
 
 export const getPrivateKeysFor = (accountType: AccountType, mnemonic: string, n: number) =>
   range(0, n).map((i) => generatePrivateKey(mnemonic, accountType, i))
@@ -116,6 +126,7 @@ export const getValidators = (mnemonic: string, n: number) => {
     return {
       address: strip0x(privateKeyToAddress(key)),
       blsPublicKey: bls12377js.BLS.privateToPublicBytes(blsKeyBytes).toString('hex'),
+      balance: n === 0 ? validatorZeroBalance : validatorBalance,
     }
   })
 }
@@ -137,8 +148,8 @@ export const getAddressFromEnv = (accountType: AccountType, n: number) => {
 
 export const generateGenesisFromEnv = (enablePetersburg: boolean = true) => {
   const mnemonic = fetchEnv(envVar.MNEMONIC)
-  const validatorCount = parseInt(fetchEnv(envVar.VALIDATORS), 10)
-  const validators = getValidators(mnemonic, validatorCount)
+  const validatorEnv = fetchEnv(envVar.VALIDATORS)
+  const validators = getValidators(mnemonic, parseInt(validatorEnv, 10))
 
   const consensusType = fetchEnv(envVar.CONSENSUS_TYPE) as ConsensusType
 
@@ -157,14 +168,34 @@ export const generateGenesisFromEnv = (enablePetersburg: boolean = true) => {
   const lookbackwindow = parseInt(fetchEnvOrFallback(envVar.LOOKBACK, '12'), 10)
   const chainId = parseInt(fetchEnv(envVar.NETWORK_ID), 10)
 
-  // Assing DEFAULT ammount of gold to 2 faucet accounts
-  const faucetedAddresses = getFaucetedAddresses(mnemonic)
+  // Allocate faucet accounts
+  const numFaucetAccounts = parseInt(fetchEnvOrFallback(envVar.FAUCET_GENESIS_ACCOUNTS, '0'), 10)
+  const initialAccounts = getStrippedAddressesFor(
+    AccountType.FAUCET,
+    mnemonic,
+    numFaucetAccounts
+  ).map((addr) => {
+    return {
+      address: addr,
+      balance: fetchEnvOrFallback(envVar.FAUCET_GENESIS_BALANCE, faucetBalance),
+    }
+  })
+
+  // Allocate oracle account(s)
+  initialAccounts.concat(
+    getStrippedAddressesFor(AccountType.PRICE_ORACLE, mnemonic, 1).map((addr) => {
+      return {
+        address: addr,
+        balance: fetchEnvOrFallback(envVar.ORACLE_GENESIS_BALANCE, '100000000000000000000'),
+      }
+    })
+  )
 
   return generateGenesis({
     validators,
     consensusType,
     blockTime,
-    initialAccounts: faucetedAddresses,
+    initialAccounts,
     epoch,
     lookbackwindow,
     chainId,
@@ -225,7 +256,7 @@ export const generateGenesis = ({
 }: {
   validators: Validator[]
   consensusType?: ConsensusType
-  initialAccounts?: string[]
+  initialAccounts?: AccountAndBalance[]
   blockTime: number
   epoch: number
   lookbackwindow: number
@@ -263,18 +294,13 @@ export const generateGenesis = ({
 
   for (const validator of validators) {
     genesis.alloc[validator.address] = {
-      balance: DEFAULT_BALANCE,
+      balance: validator.balance,
     }
   }
 
-  // ensure validator 0, which performs the migration, will have enough
-  // cGLD to init the reserves
-  const reserveGoldBalanceWei = WEI_PER_GOLD.times(config.reserve.goldBalance).plus(DEFAULT_BALANCE)
-  genesis.alloc[validators[0].address].balance = reserveGoldBalanceWei.toString(10)
-
-  for (const address of otherAccounts) {
-    genesis.alloc[address] = {
-      balance: DEFAULT_BALANCE,
+  for (const account of otherAccounts) {
+    genesis.alloc[account.address] = {
+      balance: account.balance,
     }
   }
 

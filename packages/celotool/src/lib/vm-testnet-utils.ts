@@ -332,7 +332,6 @@ function generateNodeSecretEnvVars(accountType: AccountType, index: number) {
     BOOTNODE_ENODE_ADDRESS: generatePublicKey(mnemonic, AccountType.BOOTNODE, 0),
     PRIVATE_KEY: privateKey,
     [envVar.GETH_ACCOUNT_SECRET]: fetchEnv(envVar.GETH_ACCOUNT_SECRET),
-    [envVar.ETHSTATS_WEBSOCKETSECRET]: fetchEnv(envVar.ETHSTATS_WEBSOCKETSECRET),
     [envVar.MNEMONIC]: mnemonic,
   }
   // If this is meant to be a proxied validator, also generate the enode of its proxy
