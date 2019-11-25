@@ -671,11 +671,39 @@ jobs:
           name: Minor test of celocli
           command: ./node_modules/.bin/celocli account:new # Small test
 
+
+  certora-test:
+    working_directory: ~/app
+    docker:
+      - image: circleci/openjdk:11-jdk
+    steps:
+      - attach_workspace:
+          at: ~/app
+      - run:
+          name: Certora dependencies
+          command: |
+            sudo apt-get update || sudo apt-get update
+            sudo apt-get install -y software-properties-common
+            sudo apt-get install python3-pip
+            pip3 install pycryptodome
+            wget https://github.com/ethereum/solidity/releases/download/v0.5.12/solc-static-linux
+            mv solc-static-linux solc
+            chmod +x solc
+      - run:
+          name: Build and run
+          command: |
+            cd packages/protocol
+            python3 scripts/certora/certoraBuild.py specs/harnesses/LockedGoldHarness.sol --solc ~/app/solc --verify LockedGoldHarness:specs/locked_gold.spec --settings -assumeUnwindCond
+            java -jar scripts/certora/prover_cli.jar verify . # need to setup key first
+
 workflows:
   version: 2
   celo-monorepo-build:
     jobs:
       - install_dependencies
+      - certora-test:
+          requires:
+            - install_dependencies
       - end-to-end-mobile-test:
           requires:
             - install_dependencies
