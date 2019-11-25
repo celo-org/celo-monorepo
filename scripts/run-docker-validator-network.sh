@@ -50,12 +50,20 @@ make_status_requests () {
     
     echo -n "* Proxy eth_blockNumber:"
     curl -X POST --data '{"jsonrpc":"2.0","method":"eth_blockNumber","params":[],"id":1}' -H "Content-Type: application/json" localhost:8555
+    echo -n "* Validator eth_blockNumber:"
+    curl -X POST --data '{"jsonrpc":"2.0","method":"eth_blockNumber","params":[],"id":1}' -H "Content-Type: application/json" localhost:8545
+
     
+    echo -n "* Proxy net_peerCount:"
+    curl -X POST --data '{"jsonrpc":"2.0","method":"net_peerCount","params":[],"id":74}' -H "Content-Type: application/json" localhost:8555
     echo -n "* Validator net_peerCount:"
     curl -X POST --data '{"jsonrpc":"2.0","method":"net_peerCount","params":[],"id":74}' -H "Content-Type: application/json" localhost:8545
     
+    echo -n "* Proxy eth_mining:"
+    curl -X POST --data '{"jsonrpc":"2.0","method":"eth_mining","params":[],"id":1}' -H "Content-Type: application/json" localhost:8555
     echo -n "* Validator eth_mining:"
     curl -X POST --data '{"jsonrpc":"2.0","method":"eth_mining","params":[],"id":1}' -H "Content-Type: application/json" localhost:8545
+
     echo -e ""
     
 }
@@ -150,7 +158,7 @@ if [[ $COMMAND == *"run-validator"* ]]; then
 
     remove_containers
     echo -e "\tStarting the Proxy"
-    screen -S celo-proxy -d -m docker run --name celo-proxy --restart always -p 8555:8545 -p 8556:8546 -p 30313:30303 -p 30313:30303/udp -p 30503:30503 -p 30503:30503/udp -v $PWD/proxy:/root/.celo $CELO_IMAGE --verbosity 3 --networkid $NETWORK_ID --syncmode full --rpc --rpcaddr 0.0.0.0 --rpcapi eth,net,web3,debug --maxpeers 1100 --etherbase=$CELO_PROXY_ADDRESS --proxy.proxy --proxy.proxiedvalidatoraddress $CELO_VALIDATOR_ADDRESS --proxy.internalendpoint :30503
+    screen -S celo-proxy -d -m docker run --name celo-proxy --restart always -p 8555:8545 -p 8556:8546 -p 30313:30303 -p 30313:30303/udp -p 30503:30503 -p 30503:30503/udp -v $PWD/proxy:/root/.celo $CELO_IMAGE --verbosity 4 --networkid $NETWORK_ID --syncmode full --rpc --rpcaddr 0.0.0.0 --nodekey=/root/.celo/geth/nodekey --rpcapi eth,net,web3,debug,admin,personal,istanbul --maxpeers 1100 --etherbase=$CELO_PROXY_ADDRESS --proxy.proxy --proxy.proxiedvalidatoraddress $CELO_VALIDATOR_ADDRESS --proxy.internalendpoint :30503
     
     sleep 10s
     
@@ -161,7 +169,7 @@ if [[ $COMMAND == *"run-validator"* ]]; then
     echo -e "\tStarting Validator node"
     docker run -v $PWD/validator:/root/.celo --entrypoint sh --rm $CELO_IMAGE -c "echo $DEFAULT_PASSWORD > /root/.celo/.password"
     
-    screen -S celo-validator -d -m docker run --name celo-validator --restart always -p 127.0.0.1:8545:8545 -p 127.0.0.1:8546:8546 -p 30303:30303 -p 30303:30303/udp -v $PWD/validator:/root/.celo $CELO_IMAGE --verbosity 3 --networkid $NETWORK_ID --syncmode full --rpc --rpcaddr 0.0.0.0 --rpcapi eth,net,web3,debug --maxpeers 125 --mine --istanbul.blockperiod=5 --istanbul.requesttimeout=3000 --etherbase $CELO_VALIDATOR_ADDRESS --nodiscover --proxy.proxied --proxy.proxyenodeurlpair=enode://$PROXY_ENODE@$PROXY_IP:30503\;enode://$PROXY_ENODE@$PROXY_IP:30503  --unlock=$CELO_VALIDATOR_ADDRESS --password /root/.celo/.password
+    screen -S celo-validator -d -m docker run --name celo-validator --restart always -p 127.0.0.1:8545:8545 -p 127.0.0.1:8546:8546 -p 30303:30303 -p 30303:30303/udp -v $PWD/validator:/root/.celo $CELO_IMAGE --verbosity 4 --networkid $NETWORK_ID --syncmode full --rpc --rpcaddr 0.0.0.0 --nodekey=/root/.celo/geth/nodekey --rpcapi eth,net,web3,debug,admin,personal,istanbul --maxpeers 125 --mine --istanbul.blockperiod=5 --istanbul.requesttimeout=3000 --etherbase $CELO_VALIDATOR_ADDRESS --nodiscover --proxy.proxied --proxy.proxyenodeurlpair=enode://$PROXY_ENODE@$PROXY_IP:30503\;enode://$PROXY_ENODE@$PROXY_IP:30503  --unlock=$CELO_VALIDATOR_ADDRESS --password /root/.celo/.password
     
     sleep 5s
      
