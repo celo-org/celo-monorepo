@@ -67,7 +67,7 @@ mkdir -p celo-data-dir/proxy celo-data-dir/validator
 cd celo-data-dir
 ```
 
-We are going to need to create 3 accounts, 2 for the Validator and 1 for the Proxy.
+We are going to need to create 4 accounts, 2 for the Validator, 1 for the Proxy and the last one for the Attestation Service. For the Attestation Service the steps are described [this page](running-attestation-service.md##accounts-configuration).
 
 First we create three accounts, one for the Validator, one for the Validator Group and the last one for the Proxy. You can generate their addresses using the below commands if you don’t already have them. If you already have some accounts, you can skip this step.
 
