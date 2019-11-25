@@ -2,7 +2,8 @@ import { cli } from 'cli-ux'
 import { BaseCommand } from '../../base'
 
 export default class ElectionCurrent extends BaseCommand {
-  static description = 'Outputs the currently elected validator set'
+  static description =
+    'Outputs the set of validators currently participating in BFT to create blocks. The validator set is re-elected at the end of every epoch.'
 
   static flags = {
     ...BaseCommand.flags,

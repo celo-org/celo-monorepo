@@ -1,5 +1,5 @@
 ---
-description: View and manage validator elections
+description: Participate in and view the state of Validator Elections
 ---
 
 ## Commands
@@ -25,7 +25,7 @@ _See code: [packages/cli/src/commands/election/activate.ts](https://github.com/c
 
 ### Current
 
-Outputs the currently elected validator set
+Outputs the set of validators currently participating in BFT to create blocks. The validator set is re-elected at the end of every epoch.
 
 ```
 USAGE
@@ -39,7 +39,7 @@ _See code: [packages/cli/src/commands/election/current.ts](https://github.com/ce
 
 ### List
 
-Outputs the validator groups and their vote totals
+Prints the list of validator groups, the number of votes they have received, the number of additional votes they are able to receive, and whether or not they are eleigible to elect validators.
 
 ```
 USAGE
@@ -73,7 +73,7 @@ _See code: [packages/cli/src/commands/election/revoke.ts](https://github.com/cel
 
 ### Run
 
-Runs an mock election and outputs the validators that were elected
+Runs a "mock" election and prints out the validators that would be elected if the epoch ended right now.
 
 ```
 USAGE
@@ -87,7 +87,7 @@ _See code: [packages/cli/src/commands/election/run.ts](https://github.com/celo-o
 
 ### Show
 
-Show election information about a voter or Validator Group
+Show election information about a voter or registered Validator Group
 
 ```
 USAGE
