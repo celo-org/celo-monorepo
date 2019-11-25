@@ -107,6 +107,7 @@ export async function execCmdWithExitOnFailure(
 ) {
   const code = await execCmd(cmd, args, options)
   if (code !== 0) {
+    console.error('execCmd failed for: ' + [cmd].concat(args).join(' '))
     process.exit(1)
   }
 }
@@ -360,9 +361,6 @@ export async function migrateContracts(
     {
       election: {
         minElectableValidators: '1',
-      },
-      reserve: {
-        goldBalance: 100000,
       },
       stableToken: {
         initialBalances: {
