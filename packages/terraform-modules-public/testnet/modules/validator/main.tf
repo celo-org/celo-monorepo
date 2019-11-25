@@ -56,7 +56,6 @@ resource "google_compute_instance" "validator" {
       network_id : var.network_id,
       rid : count.index,
       validator_name : "${local.name_prefix}-${count.index}",
-      verification_pool_url : var.verification_pool_url,
       validator_account_address : var.validator_account_addresses[count.index],
       validator_private_key : var.validator_private_keys[count.index],
       validator_geth_account_secret : var.validator_account_passwords[count.index],
@@ -64,7 +63,8 @@ resource "google_compute_instance" "validator" {
       proxy_internal_ip : var.proxy_internal_ips[count.index],
       proxy_external_ip : var.proxy_external_ips[count.index],
       bootnode_enode_address : var.bootnode_enode_address,
-      static_nodes_base64 : var.static_nodes_base64
+      static_nodes_base64 : var.static_nodes_base64,
+      reset_geth_data : var.reset_geth_data
     }
   )
 }

@@ -201,12 +201,6 @@ variable geth_verbosity {
 }
 
 # The next variables have a default value are not intended to be changed if you do not have a reason for it
-variable verification_pool_url {
-  description = ""
-  type        = string
-  default     = "https://us-central1-celo-testnet-production.cloudfunctions.net/handleVerificationRequestalfajores/v0.1/sms/"
-}
-
 variable ethstats_host {
   description = "Ethstats host to report data"
   type        = string

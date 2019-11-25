@@ -94,8 +94,11 @@ elif [ $SMS_PROVIDERS == "twilio" ]; then
   TWILIO_AUTH_TOKEN=${twilio_auth_token}
   TWILIO_BLACKLIST=${twilio_blacklist}
 
-  docker run --name attestation-service \
-    --net=host --entrypoint /bin/sh -d \
+  docker run\
+    --name attestation-service \
+    --restart=always \
+    --net=host \
+    --entrypoint /bin/sh -d \
     -v $DATA_DIR:$DATA_DIR \
     -e DATABASE_URL=$DATABASE_URL \
     -e ATTESTATION_KEY=$ATTESTATION_KEY \

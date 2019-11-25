@@ -76,7 +76,6 @@ module "celo_cluster" {
   proxy_account_passwords = var.proxy_accounts["account_passwords"]
   proxy_enodes            = var.proxy_accounts["enodes"]
 
-  verification_pool_url                 = var.verification_pool_url
   ethstats_host                         = var.ethstats_host
   in_memory_discovery_table             = var.in_memory_discovery_table
   geth_node_docker_image_repository     = var.geth_node_docker_image_repository

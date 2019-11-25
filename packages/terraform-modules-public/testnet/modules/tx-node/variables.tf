@@ -68,11 +68,6 @@ variable tx_node_count {
   description = "Number of tx-nodes to create"
 }
 
-variable verification_pool_url {
-  type        = string
-  description = "URL of the verification pool"
-}
-
 variable txnode_account_addresses {
   type        = list(string)
   description = "Array with the TX node etherbase account addresses"

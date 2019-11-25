@@ -133,7 +133,6 @@ module "tx_node" {
   network_id                            = var.network_id
   network_name                          = var.network_name
   tx_node_count                         = var.tx_node_count
-  verification_pool_url                 = var.verification_pool_url
 
   txnode_account_addresses = var.txnode_account_addresses
   txnode_private_keys      = var.txnode_private_keys
@@ -170,7 +169,7 @@ module "proxy" {
   network_name                          = var.network_name
   tx_node_count                         = var.tx_node_count
   validator_count                       = var.validator_count
-  verification_pool_url                 = var.verification_pool_url
+  reset_geth_data                       = var.reset_geth_data
 
   proxy_account_addresses     = var.proxy_account_addresses
   proxy_private_keys          = var.proxy_private_keys
@@ -200,7 +199,7 @@ module "validator" {
   network_name                          = var.network_name
   tx_node_count                         = var.tx_node_count
   validator_count                       = var.validator_count
-  verification_pool_url                 = var.verification_pool_url
+  reset_geth_data                       = var.reset_geth_data
 
   validator_account_addresses = var.validator_account_addresses
   validator_private_keys      = var.validator_private_keys

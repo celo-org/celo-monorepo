@@ -78,11 +78,6 @@ variable validator_count {
   description = "Number of proxys to create"
 }
 
-variable verification_pool_url {
-  type        = string
-  description = "URL of the verification pool"
-}
-
 variable proxy_account_addresses {
   type        = list(string)
   description = "Array with the Proxy etherbase account addresses"
@@ -116,4 +111,10 @@ variable bootnode_enode_address {
 variable static_nodes_base64 {
   type        = string
   description = "Content of the genesis file encoded in base64"
+}
+
+variable reset_geth_data {
+  type        = bool
+  description = "Specifies if the existing chain data should be removed while creating the instance"
+  default     = false
 }

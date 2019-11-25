@@ -48,47 +48,77 @@ docker pull $GETH_NODE_DOCKER_IMAGE
 IN_MEMORY_DISCOVERY_TABLE_FLAG=""
 [[ ${in_memory_discovery_table} == "true" ]] && IN_MEMORY_DISCOVERY_TABLE_FLAG="--use-in-memory-discovery-table"
 
+mkdir -p $DATA_DIR/account
+echo -n '${genesis_content_base64}' | base64 -d > $DATA_DIR/genesis.json
+echo -n '${rid}' > $DATA_DIR/replica_id
+echo -n '${ip_address}' > $DATA_DIR/ipAddress
+echo -n '${txnode_private_key}' > $DATA_DIR/pkey
+echo -n '${txnode_account_address}' > $DATA_DIR/address
+echo -n '${bootnode_enode_address}' > $DATA_DIR/bootnodeEnodeAddress
+echo -n '$BOOTNODE_ENODE' > $DATA_DIR/bootnodeEnode
+echo -n '${txnode_geth_account_secret}' > $DATA_DIR/account/accountSecret
+
+
 echo "Starting geth..."
 # We need to override the entrypoint in the geth image (which is originally `geth`)
-docker run -v $DATA_DIR:$DATA_DIR -p 8545:8545/tcp -p 8546:8546/tcp --name geth --net=host --entrypoint /bin/sh -d $GETH_NODE_DOCKER_IMAGE -c "\
-  set -euo pipefail && \
-  mkdir -p $DATA_DIR/account /var/geth && \
-  echo -n '${genesis_content_base64}' | base64 -d > /var/geth/genesis.json && \
-  echo -n '${rid}' > $DATA_DIR/replica_id && \
-  echo -n '${ip_address}' > $DATA_DIR/ipAddress && \
-  echo -n '${txnode_private_key}' > $DATA_DIR/pkey && \
-  echo -n '${txnode_account_address}' > $DATA_DIR/address && \
-  echo -n '${bootnode_enode_address}' > $DATA_DIR/bootnodeEnodeAddress && \
-  echo -n '$BOOTNODE_ENODE' > $DATA_DIR/bootnodeEnode && \
-  echo -n '${txnode_geth_account_secret}' > $DATA_DIR/account/accountSecret && \
-  geth init /var/geth/genesis.json && \
-  geth account import --password $DATA_DIR/account/accountSecret $DATA_DIR/pkey && \
-  geth \
-    --bootnodes=enode://$BOOTNODE_ENODE \
-    --lightserv 90 \
-    --lightpeers 1000 \
-    --maxpeers 1100 \
-    --rpc \
-    --rpcaddr 0.0.0.0 \
-    --rpcapi=eth,net,web3,debug \
-    --rpccorsdomain='*' \
-    --rpcvhosts=* \
-    --ws \
-    --wsaddr 0.0.0.0 \
-    --wsorigins=* \
-    --wsapi=eth,net,web3,debug \
-    --nodekey=$DATA_DIR/pkey \
-    --etherbase=$ACCOUNT_ADDRESS \
-    --networkid=${network_id} \
-    --syncmode=full \
-    --miner.verificationpool=${verification_pool_url} \
-    --consoleformat=json \
-    --consoleoutput=stdout \
-    --verbosity=${geth_verbosity} \
-    --ethstats=${tx_node_name}:$ETHSTATS_WEBSOCKETSECRET@${ethstats_host} \
-    --nat=extip:${ip_address} \
-    --metrics \
-    $IN_MEMORY_DISCOVERY_TABLE_FLAG"
+docker run \
+  --rm \
+  --net=host \
+  -v $DATA_DIR:$DATA_DIR \
+  --entrypoint /bin/sh \
+  -i $GETH_NODE_DOCKER_IMAGE \
+  -c "geth init $DATA_DIR/genesis.json && geth account import --password $DATA_DIR/account/accountSecret $DATA_DIR/pkey | true"
+
+cat <<EOF >/etc/systemd/system/geth.service
+[Unit]
+Description=Docker Container %N
+Requires=docker.service
+After=docker.service
+
+[Service]
+Restart=always
+ExecStart=/usr/bin/docker run \\
+  --name geth \\
+  --restart=always \\
+  --net=host \\
+  -v $DATA_DIR:$DATA_DIR \\
+  --entrypoint /bin/sh \\
+  $GETH_NODE_DOCKER_IMAGE -c "\\
+    geth \\
+      --bootnodes=enode://$BOOTNODE_ENODE \\
+      --lightserv 90 \\
+      --lightpeers 1000 \\
+      --maxpeers 1100 \\
+      --rpc \\
+      --rpcaddr 0.0.0.0 \\
+      --rpcapi=eth,net,web3,debug \\
+      --rpccorsdomain='*' \\
+      --rpcvhosts=* \\
+      --ws \\
+      --wsaddr 0.0.0.0 \\
+      --wsorigins=* \\
+      --wsapi=eth,net,web3,debug \\
+      --nodekey=$DATA_DIR/pkey \\
+      --etherbase=$ACCOUNT_ADDRESS \\
+      --networkid=${network_id} \\
+      --syncmode=full \\
+      --consoleformat=json \\
+      --consoleoutput=stdout \\
+      --verbosity=${geth_verbosity} \\
+      --ethstats=${tx_node_name}:$ETHSTATS_WEBSOCKETSECRET@${ethstats_host} \\
+      --nat=extip:${ip_address} \\
+      --metrics \\
+      $IN_MEMORY_DISCOVERY_TABLE_FLAG \\
+  "
+ExecStop=/usr/bin/docker rm -f %N
+
+[Install]
+WantedBy=default.target
+EOF
+
+systemctl daemon-reload
+systemctl enable geth.service
+systemctl restart geth.service
 
 # ---- Set Up and Run Geth Exporter ----
 
@@ -97,7 +127,29 @@ GETH_EXPORTER_DOCKER_IMAGE=${geth_exporter_docker_image_repository}:${geth_expor
 echo "Pulling geth exporter..."
 docker pull $GETH_EXPORTER_DOCKER_IMAGE
 
-docker run -v $DATA_DIR:$DATA_DIR --name geth-exporter --net=host -d $GETH_EXPORTER_DOCKER_IMAGE \
-  /usr/local/bin/geth_exporter \
-    -ipc $DATA_DIR/geth.ipc \
+cat <<EOF >/etc/systemd/system/geth-exporter.service
+[Unit]
+Description=Docker Container %N
+Requires=docker.service
+After=docker.service
+
+[Service]
+Restart=always
+ExecStart=/usr/bin/docker run \\
+  --name geth-exporter \\
+  --restart=always \\
+  -v $DATA_DIR:$DATA_DIR \\
+  --net=host \\
+  $GETH_EXPORTER_DOCKER_IMAGE \\
+  /usr/local/bin/geth_exporter \\
+    -ipc $DATA_DIR/geth.ipc \\
     -filter "(.*overall|percentiles_95)"
+ExecStop=/usr/bin/docker rm -f %N
+
+[Install]
+WantedBy=default.target
+EOF
+
+systemctl daemon-reload
+systemctl enable geth-exporter.service
+systemctl restart geth-exporter.service

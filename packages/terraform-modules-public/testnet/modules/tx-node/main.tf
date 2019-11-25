@@ -66,7 +66,6 @@ resource "google_compute_instance" "tx_node" {
       network_id : var.network_id,
       rid : count.index,
       tx_node_name : "${var.celo_env}-tx-node-${count.index}",
-      verification_pool_url : var.verification_pool_url,
       txnode_account_address : var.txnode_account_addresses[count.index],
       txnode_private_key : var.txnode_private_keys[count.index],
       txnode_geth_account_secret : var.txnode_account_passwords[count.index],
