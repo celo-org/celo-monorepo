@@ -33,7 +33,7 @@ export function toNumber(input: string) {
 }
 
 export function parseNumber(input: NumberLike) {
-  return new BigNumber(input).toString(10)
+  return new BigNumber(input).toFixed()
 }
 
 export function parseBytes(input: string): Array<string | number[]> {
