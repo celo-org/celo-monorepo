@@ -26,8 +26,9 @@ export enum AccountType {
   TX_NODE = 2,
   BOOTNODE = 3,
   FAUCET = 4,
-  ATTESTATION = 5,
-  PRICE_ORACLE = 6,
+  PROXY = 5,
+  ATTESTATION = 6,
+  PRICE_ORACLE = 7,
 }
 
 export enum ConsensusType {

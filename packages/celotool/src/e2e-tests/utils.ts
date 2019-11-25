@@ -10,8 +10,11 @@ import {
   generateGenesis,
   getPrivateKeysFor,
   getValidators,
+  privateKeyToAddress,
+  privateKeyToPublicKey,
   Validator,
 } from '../lib/generate_utils'
+import { getEnodeAddress } from '../lib/geth'
 import { ensure0x } from '../lib/utils'
 
 export interface GethInstanceConfig {
@@ -19,13 +22,20 @@ export interface GethInstanceConfig {
   validating: boolean
   syncmode: string
   port: number
+  proxyport?: number
   rpcport?: number
   wsport?: number
   lightserv?: boolean
   privateKey?: string
   etherbase?: string
-  peers?: number[]
+  peers?: string[]
+  proxies?: string[2][]
   pid?: number
+  isProxied?: boolean
+  isProxy?: boolean
+  bootnodeEnode?: string
+  proxy?: string
+  proxiedValidatorAddress?: string
   ethstats?: string
 }
 
@@ -33,6 +43,7 @@ export interface GethTestConfig {
   migrate?: boolean
   migrateTo?: number
   instances: GethInstanceConfig[]
+  useBootnode?: boolean
   genesisConfig?: any
   migrationOverrides?: any
 }
@@ -71,6 +82,8 @@ export function spawnWithLog(cmd: string, args: string[], logsFilepath: string) 
     // nothing to do
   }
   const logStream = fs.createWriteStream(logsFilepath, { flags: 'a' })
+  console.log(cmd)
+  console.log(args)
   const process = spawn(cmd, args)
   process.stdout.pipe(logStream)
   process.stderr.pipe(logStream)
@@ -232,6 +245,11 @@ export async function importPrivateKey(gethBinaryPath: string, instance: GethIns
   )
 }
 
+export async function killBootnode() {
+  console.info(`Killing the bootnode`)
+  await execCmd('pkill', ['-SIGINT', 'bootnode'], { silent: true })
+}
+
 export async function killGeth() {
   console.info(`Killing ALL geth instances`)
   await execCmd('pkill', ['-SIGINT', 'geth'], { silent: true })
@@ -243,9 +261,20 @@ export async function killInstance(instance: GethInstanceConfig) {
   }
 }
 
-export async function addStaticPeers(datadir: string, ports: number[]) {
-  const enodes = await Promise.all(ports.map((port) => getEnode(port)))
+export async function addStaticPeers(datadir: string, enodes: string[]) {
   fs.writeFileSync(`${datadir}/static-nodes.json`, JSON.stringify(enodes))
+}
+
+export async function addProxyPeer(gethBinaryPath: string, instance: GethInstanceConfig) {
+  if (instance.proxies) {
+    await execCmdWithExitOnFailure(gethBinaryPath, [
+      '--datadir',
+      getDatadir(instance),
+      'attach',
+      '--exec',
+      `istanbul.addProxy('${instance.proxies[0]!}', '${instance.proxies[1]!}')`,
+    ])
+  }
 }
 
 async function isPortOpen(host: string, port: number) {
@@ -274,7 +303,18 @@ export async function getEnode(port: number, ws: boolean = false) {
 
 export async function startGeth(gethBinaryPath: string, instance: GethInstanceConfig) {
   const datadir = getDatadir(instance)
-  const { syncmode, port, rpcport, wsport, validating, ethstats } = instance
+  const {
+    syncmode,
+    port,
+    rpcport,
+    wsport,
+    validating,
+    bootnodeEnode,
+    isProxy,
+    isProxied,
+    proxyport,
+    ethstats,
+  } = instance
   const privateKey = instance.privateKey || ''
   const lightserv = instance.lightserv || false
   const etherbase = instance.etherbase || ''
@@ -286,12 +326,11 @@ export async function startGeth(gethBinaryPath: string, instance: GethInstanceCo
     '--debug',
     '--port',
     port.toString(),
-    '--nodiscover',
     '--rpcvhosts=*',
     '--networkid',
     NetworkId.toString(),
     '--verbosity',
-    '3',
+    '5',
     '--consoleoutput=stdout', // Send all logs to stdout
     '--consoleformat=term',
     '--nat',
@@ -304,7 +343,7 @@ export async function startGeth(gethBinaryPath: string, instance: GethInstanceCo
       '--rpcport',
       rpcport.toString(),
       '--rpccorsdomain=*',
-      '--rpcapi=eth,net,web3,debug,admin,personal,txpool'
+      '--rpcapi=eth,net,web3,debug,admin,personal,txpool,istanbul'
     )
   }
 
@@ -327,13 +366,33 @@ export async function startGeth(gethBinaryPath: string, instance: GethInstanceCo
   }
 
   if (validating) {
-    gethArgs.push('--mine')
+    gethArgs.push('--mine', '--minerthreads=10', `--nodekeyhex=${privateKey}`)
+
+    if (isProxied) {
+      gethArgs.push('--proxy.proxied')
+    }
+  } else if (isProxy) {
+    gethArgs.push('--proxy.proxy')
+    if (proxyport) {
+      gethArgs.push(`--proxy.internalendpoint=127.0.0.1:${proxyport.toString()}`)
+    }
+    gethArgs.push(`--proxy.proxiedvalidatoraddress=${instance.proxiedValidatorAddress}`)
+    gethArgs.push(`--nodekeyhex=${privateKey}`)
+  }
+
+  if (bootnodeEnode) {
+    gethArgs.push(`--bootnodes=${bootnodeEnode}`)
+  } else {
+    gethArgs.push('--nodiscover')
+  }
+
+  if (isProxied && instance.proxies) {
+    gethArgs.push(`--proxy.proxyenodeurlpair=${instance.proxies[0]!};${instance.proxies[1]!}`)
   }
 
   if (privateKey) {
     gethArgs.push('--password=/dev/null', `--unlock=0`)
   }
-
 
   if (!!ethstats) {
     gethArgs.push(`--ethstats=${instance.name}@${ethstats}`)
@@ -344,7 +403,7 @@ export async function startGeth(gethBinaryPath: string, instance: GethInstanceCo
   // Give some time for geth to come up
   const waitForPort = wsport ? wsport : rpcport
   if (waitForPort) {
-    const isOpen = await waitForPortOpen('localhost', waitForPort, 5)
+    const isOpen = await waitForPortOpen('localhost', waitForPort, 10)
     if (!isOpen) {
       console.error(`geth:${instance.name}: jsonRPC didn't open after 5 seconds`)
       process.exit(1)
@@ -352,6 +411,7 @@ export async function startGeth(gethBinaryPath: string, instance: GethInstanceCo
       console.info(`geth:${instance.name}: jsonRPC port open ${waitForPort}`)
     }
   }
+
   return instance
 }
 
@@ -443,27 +503,17 @@ export async function initAndStartGeth(gethBinaryPath: string, instance: GethIns
   return startGeth(gethBinaryPath, instance)
 }
 
-// Add validator 0 as a peer of each other validator.
-async function connectValidatorPeers(gethConfig: GethTestConfig) {
-  const admins = gethConfig.instances
-    .filter(({ wsport, rpcport, validating }) => validating && (wsport || rpcport))
-    .map(
-      ({ wsport, rpcport }) =>
-        new Admin(`${wsport ? 'ws' : 'http'}://localhost:${wsport || rpcport}`)
-    )
-  const enodes = await Promise.all(admins.map(async (admin) => (await admin.getNodeInfo()).enode))
-  await Promise.all(
-    admins.map(async (admin, i) => {
-      await Promise.all(
-        enodes.map(async (enode, j) => {
-          if (i === j) {
-            return
-          }
-          await admin.addPeer(enode)
-        })
-      )
-    })
-  )
+export async function startBootnode(bootnodeBinaryPath: string, mnemonic: string) {
+  const bootnodePrivateKey = getPrivateKeysFor(AccountType.BOOTNODE, mnemonic, 1)[0]
+  const bootnodeLog = joinPath(TEST_DIR, 'bootnode.log')
+  const bootnodeArgs = [
+    '--verbosity=5',
+    `--nodekeyhex=${bootnodePrivateKey}`,
+    `--networkid=${NetworkId}`,
+  ]
+
+  spawnWithLog(bootnodeBinaryPath, bootnodeArgs, bootnodeLog)
+  return getEnodeAddress(privateKeyToPublicKey(bootnodePrivateKey), '127.0.0.1', 30301)
 }
 
 export function getContext(gethConfig: GethTestConfig) {
@@ -474,10 +524,22 @@ export function getContext(gethConfig: GethTestConfig) {
   const validatorPrivateKeys = getPrivateKeysFor(AccountType.VALIDATOR, mnemonic, numValidators)
   const attestationKeys = getPrivateKeysFor(AccountType.ATTESTATION, mnemonic, numValidators)
   const validators = getValidators(mnemonic, numValidators)
+
+  const proxyInstances = gethConfig.instances.filter((x: any) => x.isProxy)
+  const numProxies = proxyInstances.length
+  const proxyPrivateKeys = getPrivateKeysFor(AccountType.PROXY, mnemonic, numProxies)
+  const proxyEnodes = proxyPrivateKeys.map((x: any, i: number) => [
+    proxyInstances[i].name,
+    getEnodeAddress(privateKeyToPublicKey(x), '127.0.0.1', proxyInstances[i].proxyport!),
+    getEnodeAddress(privateKeyToPublicKey(x), '127.0.0.1', proxyInstances[i].port),
+  ])
+
   const argv = require('minimist')(process.argv.slice(2))
   const branch = argv.branch || 'master'
   const gethRepoPath = argv.localgeth || '/tmp/geth'
   const gethBinaryPath = `${gethRepoPath}/build/bin/geth`
+
+  const bootnodeBinaryPath = `${gethRepoPath}/build/bin/bootnode`
 
   const before = async () => {
     if (!argv.localgeth) {
@@ -486,15 +548,64 @@ export function getContext(gethConfig: GethTestConfig) {
     await buildGeth(gethRepoPath)
     await setupTestDir(TEST_DIR)
     await writeGenesis(validators, GENESIS_PATH, gethConfig.genesisConfig)
+
+    let bootnodeEnode: string = ''
+    if (gethConfig.useBootnode) {
+      bootnodeEnode = await startBootnode(bootnodeBinaryPath, mnemonic)
+    }
     let validatorIndex = 0
+    let proxyIndex = 0
     for (const instance of gethConfig.instances) {
+      // Non proxied validators and proxies should connect to the bootnode
+      if ((instance.validating && !instance.isProxied) || instance.isProxy) {
+        if (gethConfig.useBootnode) {
+          instance.bootnodeEnode = bootnodeEnode
+        }
+      } else if (instance.validating && instance.isProxied) {
+        // Proxied validators should connect to only the proxy
+        // Find this proxied validator's proxy
+        const proxyEnode = proxyEnodes.filter((x: any, _: number) => x[0] === instance.proxy)
+
+        if (proxyEnode.length != 1) {
+          throw new Error('proxied validator must have exactly one proxy')
+        }
+
+        instance.proxies = [proxyEnode[0][1]!, proxyEnode[0][2]!]
+      }
+
+      // Set the private key for the validator or proxy instance
       if (instance.validating) {
         instance.privateKey = instance.privateKey || validatorPrivateKeys[validatorIndex]
         validatorIndex++
+      } else if (instance.isProxy) {
+        instance.privateKey = instance.privateKey || proxyPrivateKeys[proxyIndex]
+        proxyIndex++
       }
+    }
+
+    // The proxies will need to know their proxied validator's address
+    for (const instance of gethConfig.instances) {
+      if (instance.isProxy) {
+        const proxiedValidator = gethConfig.instances.filter(
+          (x: GethInstanceConfig, _: number) => x.proxy == instance.name
+        )
+
+        if (proxiedValidator.length != 1) {
+          throw new Error('proxied validator must have exactly one proxy')
+        }
+
+        instance.proxiedValidatorAddress = privateKeyToAddress(proxiedValidator[0].privateKey!)
+      }
+    }
+
+    // Start all the instances
+    for (const instance of gethConfig.instances) {
       await initAndStartGeth(gethBinaryPath, instance)
     }
-    await connectValidatorPeers(gethConfig)
+
+    // Give validators time to connect to each other
+    await sleep(60)
+
     if (gethConfig.migrate || gethConfig.migrateTo) {
       await migrateContracts(
         validatorPrivateKeys,
@@ -515,6 +626,10 @@ export function getContext(gethConfig: GethTestConfig) {
 
   const restart = async () => {
     await killGeth()
+    if (gethConfig.useBootnode) {
+      killBootnode()
+      await startBootnode(bootnodeBinaryPath, mnemonic)
+    }
     let validatorIndex = 0
     const validatorIndices: number[] = []
     for (const instance of gethConfig.instances) {
@@ -532,7 +647,6 @@ export function getContext(gethConfig: GethTestConfig) {
         return startGeth(gethBinaryPath, instance)
       })
     )
-    await connectValidatorPeers(gethConfig)
   }
 
   const after = () => killGeth()
