@@ -19,7 +19,6 @@
     "prepublishOnly": "yarn build:gen && yarn build",
     "start-ts": "TS_NODE_FILES=true ts-node src/index.ts",
     "start": "node lib/index.js",
-    "db:create": "mkdir -p db && touch db/dev.db",
     "db:create:dev": "mkdir -p db && touch db/dev.db",
     "db:migrate": "sequelize db:migrate",
     "db:migrate:undo": "sequelize db:migrate:undo",
