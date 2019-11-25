@@ -124,7 +124,7 @@ export class CeloPrivateKeysWalletProvider extends PrivateKeyWalletSubprovider {
       txParams.gatewayFeeRecipient = await this.getCoinbase()
     }
     if (!isEmpty(txParams.gatewayFeeRecipient) && isEmpty(txParams.gatewayFee)) {
-      txParams.gatewayFee = DefaultGatewayFee.toString()
+      txParams.gatewayFee = DefaultGatewayFee.toString(16)
     }
     debug(
       'Gateway fee for the transaction is %s paid to %s',

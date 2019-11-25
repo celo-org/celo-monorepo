@@ -12,7 +12,7 @@
     "clean": "rm -rf lib .artifacts contracts types lib",
     "lint": "tslint -c tslint.json --project tsconfig.json",
     "prebuild": "yarn clean",
-    "build": "yarn run build:for-env integration",
+    "build": "yarn run build:for-env pilotstaging",
     "prepublishOnly": "yarn run build",
     "test": "export TZ=UTC && jest --ci --silent --coverage --runInBand test/attestations.test.ts test/erc20-utils.test.ts test/google-storage-utils.test.ts test/start_geth.sh test/transaction-utils.test.ts",
     "test:verbose": "export TZ=UTC && jest --ci --verbose --runInBand  test/attestations.test.ts test/erc20-utils.test.ts test/google-storage-utils.test.ts test/start_geth.sh test/transaction-utils.test.ts"
