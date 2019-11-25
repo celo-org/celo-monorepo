@@ -97,37 +97,33 @@ celocli account:register --from $CELO_VALIDATOR_ADDRESS --name <VALIDATOR_NAME_O
 
 #### Lock up Celo Gold
 
-Make a locked Gold commitment for both accounts in order to secure the right to register a Validator and Validator group. The current requirement is 1 Celo Gold with a notice period of 60 days. If you choose to stake more gold, or a longer notice period, be sure to use those values below:
+Lock up Celo Gold for both accounts in order to secure the right to register a Validator and Validator Group. The current requirement is 10k Celo Gold to register a validator, and 10k Celo Gold _per member validator_ to register a Validator Group. For Validators, this gold remains locked for approximately 60 days following deregistration. For groups, this gold remains locked for approximately 60 days following the removal of the Nth validator from the group.
 
 ```bash
-celocli lockedgold:lockup --from $CELO_VALIDATOR_GROUP_ADDRESS --goldAmount 1000000000000000000 --noticePeriod 5184000
-celocli lockedgold:lockup --from $CELO_VALIDATOR_ADDRESS --goldAmount 1000000000000000000 --noticePeriod 5184000
+celocli lockedgold:lock --from $CELO_VALIDATOR_GROUP_ADDRESS --value 10000000000000000000000
+celocli lockedgold:lock --from $CELO_VALIDATOR_ADDRESS --value 10000000000000000000000
 ```
 
 ### Run for election
 
-In order to be elected as a Validator, you will first need to register your group and Validator and give them each an an ID, which people will know them by (e.g. `Awesome Validators Inc.` and `Alice's Awesome Validator`).
+In order to be elected as a Validator, you will first need to register your group and Validator. Note that when registering a Validator Group, you need to specify a commission, which is the fraction of epoch rewards paid to the group by its members.
 
 Register your Validator Group:
 
 ```bash
-celocli validatorgroup:register --id <GROUP_ID_OF_YOUR_CHOICE> --from $CELO_VALIDATOR_GROUP_ADDRESS --noticePeriod 5184000
+celocli validatorgroup:register --from $CELO_VALIDATOR_GROUP_ADDRESS --commission 0.1
 ```
 
 Register your Validator:
 
 ```bash
-celocli validator:register --id <VALIDATOR_ID_OF_YOUR_CHOICE> --from $CELO_VALIDATOR_ADDRESS --noticePeriod 5184000 --publicKey 0x`openssl rand -hex 64`$CELO_VALIDATOR_POP
+celocli validator:register --from $CELO_VALIDATOR_ADDRESS --blsKey $CELO_VALIDATOR_BLS_PUBLIC_KEY --blsPop $CELO_VALIDATOR_BLS_SIGNATURE
 ```
-
-{% hint style="info" %}
-**Roadmap**: Note that the “publicKey” first part of the public key field is currently ignored, and thus can be set to any 128 character hex value. The rest is used for the BLS public key and proof-of-possession.
-{% endhint %}
 
 Affiliate your Validator with your Validator Group. Note that you will not be a member of this group until the Validator Group accepts you:
 
 ```bash
-celocli validator:affiliate --set $CELO_VALIDATOR_GROUP_ADDRESS --from $CELO_VALIDATOR_ADDRESS
+celocli validator:affiliate $CELO_VALIDATOR_GROUP_ADDRESS --from $CELO_VALIDATOR_ADDRESS
 ```
 
 Accept the affiliation:
@@ -139,8 +135,8 @@ celocli validatorgroup:member --accept $CELO_VALIDATOR_ADDRESS --from $CELO_VALI
 Use both accounts to vote for your Validator Group:
 
 ```bash
-celocli validatorgroup:vote --from $CELO_VALIDATOR_ADDRESS --for $CELO_VALIDATOR_GROUP_ADDRESS
-celocli validatorgroup:vote --from $CELO_VALIDATOR_GROUP_ADDRESS --for $CELO_VALIDATOR_GROUP_ADDRESS
+celocli election:vote --from $CELO_VALIDATOR_ADDRESS --for $CELO_VALIDATOR_GROUP_ADDRESS --value 10000000000000000000000
+celocli election:vote --from $CELO_VALIDATOR_GROUP_ADDRESS --for $CELO_VALIDATOR_GROUP_ADDRESS --value 10000000000000000000000
 ```
 
 You’re all set! Note that elections are finalized at the end of each epoch, roughly once an hour in the Alfajores or Baklava Testnets. After that hour, if you get elected, your node will start participating BFT consensus and validating blocks.
@@ -148,27 +144,37 @@ You’re all set! Note that elections are finalized at the end of each epoch, ro
 You can inspect the current state of voting by running:
 
 ```bash
-celocli validatorgroup:list
+celocli election:list
 ```
 
-If you find your Validator still not getting elected you may need to faucet yourself more funds and bond a greater deposit to command more voting weight!
+If you find your Validator still not getting elected you may need to faucet yourself more funds and lock more gold in order to be able to cast more votes for your Validator Group!
 
-At any moment you can check if you are validating running the following command:
+At any moment you can check the currently elected validators by running the following command:
 
 ```bash
-celocli validator:show $CELO_VALIDATOR_ADDRESS
+celocli election:current
 ```
 
-You can de-affiliate a Validator account of a Validator Group:
+If for some reason you need to stop running your Validator, please do one or all of the following so that it will no longer be chosen as a participant in BFT:
+
+- Deregister your validator:
 
 ```bash
 celocli validator:deaffiliate --from $CELO_VALIDATOR_ADDRESS
+celocli validator:deregister --from $CELO_VALIDATOR_ADDRESS
 ```
 
-You can update your Validator BLS key using the following command:
+- Stop voting for your validator group:
 
 ```bash
-celocli validator:update-bls-public-key --from $CELO_VALIDATOR_ADDRESS --blsKey $CELO_VALIDATOR_BLS_PUBLIC_KEY --blsPop $CELO_VALIDATOR_PROOF_OF_POSSESSION
+celocli election:revoke --from $CELO_VALIDATOR_ADDRESS --for $CELO_VALIDATOR_GROUP_ADDRESS --value 10000000000000000000000
+celocli election:revoke --from $CELO_VALIDATOR_GROUP_ADDRESS --for $CELO_VALIDATOR_GROUP_ADDRESS --value 10000000000000000000000
+```
+
+- Deregister your validator group:
+
+```bash
+celocli validatorgroup:deregister --from $CELO_VALIDATOR_GORUP_ADDRESS
 ```
 
 {% hint style="info" %}
