@@ -106,7 +106,7 @@ export const handler = async function autoVerify(argv: AutoVerifyArgv) {
       ).times(5)
       const txParams = {
         from: clientAddress,
-        gasCurrency: stableToken.address,
+        feeCurrency: stableToken.address,
         gasPrice: gasPrice.toString(),
       }
 
@@ -143,9 +143,11 @@ export const handler = async function autoVerify(argv: AutoVerifyArgv) {
     }
 
     console.log(`In the end, we completed ${stat.completed} out of ${stat.total} attestations`)
+    process.exit(0)
   } catch (error) {
     console.error('Something went wrong')
     console.error(error)
+    process.exit(1)
   }
 }
 
