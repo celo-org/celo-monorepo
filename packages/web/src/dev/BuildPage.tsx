@@ -30,9 +30,9 @@ class BuildPage extends React.PureComponent<I18nProps> {
           }
         />
         <Cover />
-        <Engage />
         <FullStack />
         <Features />
+        <Engage />
         <ConnectionFooter includeDividerLine={false} />
       </View>
     )
