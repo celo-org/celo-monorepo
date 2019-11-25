@@ -50,12 +50,31 @@ export class AccountsWrapper extends BaseWrapper<Accounts> {
   )
 
   /**
+   * Returns the account address given the signer for voting
+   * @param signer Address that is authorized to sign the tx as voter
+   * @return The Account address
+   */
+  voteSignerToAccount: (signer: Address) => Promise<Address> = proxyCall(
+    this.contract.methods.voteSignerToAccount
+  )
+
+  /**
    * Returns the account address given the signer for validating
    * @param signer Address that is authorized to sign the tx as validator
    * @return The Account address
    */
   validatorSignerToAccount: (signer: Address) => Promise<Address> = proxyCall(
     this.contract.methods.validatorSignerToAccount
+  )
+
+  /**
+   * Returns the account associated with `signer`.
+   * @param signer The address of the account or previously authorized signer.
+   * @dev Fails if the `signer` is not an account or previously authorized signer.
+   * @return The associated account.
+   */
+  signerToAccount: (signer: Address) => Promise<Address> = proxyCall(
+    this.contract.methods.signerToAccount
   )
 
   /**

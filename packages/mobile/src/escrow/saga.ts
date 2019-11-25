@@ -173,7 +173,7 @@ export async function getReclaimEscrowGas(account: string, paymentID: string) {
   const tx = await createReclaimTransaction(paymentID)
   const txParams = {
     from: account,
-    gasCurrency: (await getStableTokenContract(web3))._address,
+    feeCurrency: (await getStableTokenContract(web3))._address,
   }
   const gas = new BigNumber(await tx.estimateGas(txParams))
   Logger.debug(`${TAG}/getReclaimEscrowGas`, `Estimated gas of ${gas.toString()}}`)

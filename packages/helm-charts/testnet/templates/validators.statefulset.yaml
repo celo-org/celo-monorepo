@@ -145,11 +145,10 @@ spec:
             --etherbase=${ACCOUNT_ADDRESS} \
             --networkid=${NETWORK_ID} \
             --syncmode=full \
-            --ethstats=${HOSTNAME}:${ETHSTATS_SECRET}@${ETHSTATS_SVC} \
+            --ethstats=${HOSTNAME}@${ETHSTATS_SVC} \
             --consoleformat=json \
             --consoleoutput=stdout \
             --verbosity={{ .Values.geth.verbosity }} \
-            --ethstats=${HOSTNAME}:${ETHSTATS_SECRET}@${ETHSTATS_SVC} \
             ${FAULTY_NODE_FLAGS} \
             --istanbul.blockperiod={{ .Values.geth.blocktime }} \
             --istanbul.requesttimeout={{ .Values.geth.istanbulrequesttimeout }} \
@@ -166,11 +165,6 @@ spec:
               fieldPath: status.podIP
         - name: ETHSTATS_SVC
           value: {{ template "ethereum.fullname" . }}-ethstats.{{ .Release.Namespace }}
-        - name: ETHSTATS_SECRET
-          valueFrom:
-            secretKeyRef:
-              name: {{ template "ethereum.fullname" . }}-ethstats
-              key: WS_SECRET
         - name: NETWORK_ID
           valueFrom:
             configMapKeyRef:

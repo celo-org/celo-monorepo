@@ -6,7 +6,7 @@ ContractKit supports the following functionality:
 
 - Connect to a node
 - Access web3 object to interact with node's Json RPC API
-- Send Transaction with celo's extra fields: (gasCurrency)
+- Send Transaction with celo's extra fields: (feeCurrency, gatewayFeeRecipient and gatewayFee)
 - Simple interface to interact with cGold and cDollar
 - Simple interface to interact with Celo Core contracts
 - Utilities

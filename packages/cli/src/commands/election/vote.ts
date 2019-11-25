@@ -1,6 +1,7 @@
 import { flags } from '@oclif/command'
 import BigNumber from 'bignumber.js'
 import { BaseCommand } from '../../base'
+import { newCheckBuilder } from '../../utils/checks'
 import { displaySendTx } from '../../utils/cli'
 import { Flags } from '../../utils/command'
 
@@ -11,7 +12,7 @@ export default class ElectionVote extends BaseCommand {
     ...BaseCommand.flags,
     from: Flags.address({ required: true, description: "Voter's address" }),
     for: Flags.address({
-      description: "Set vote for ValidatorGroup's address",
+      description: "ValidatorGroup's address",
       required: true,
     }),
     value: flags.string({ description: 'Amount of Gold used to vote for group', required: true }),
@@ -24,6 +25,11 @@ export default class ElectionVote extends BaseCommand {
     const res = this.parse(ElectionVote)
 
     this.kit.defaultAccount = res.flags.from
+    await newCheckBuilder(this, res.flags.from)
+      .isSignerOrAccount()
+      .isValidatorGroup(res.flags.for)
+      .runChecks()
+
     const election = await this.kit.contracts.getElection()
     const tx = await election.vote(res.flags.for, new BigNumber(res.flags.value))
     await displaySendTx('vote', tx)

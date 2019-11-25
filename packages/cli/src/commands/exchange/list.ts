@@ -26,7 +26,7 @@ export default class List extends BaseCommand {
     const goldForDollar = await exchange.getBuyTokenAmount(parsedFlags.amount as string, false)
     cli.action.stop()
 
-    this.log(`${parsedFlags.amount} cGLD => ${dollarForGold.toString()} cUSD`)
-    this.log(`${parsedFlags.amount} cUSD => ${goldForDollar.toString()} cGLD`)
+    this.log(`${parsedFlags.amount} cGLD => ${dollarForGold.toFixed()} cUSD`)
+    this.log(`${parsedFlags.amount} cUSD => ${goldForDollar.toFixed()} cGLD`)
   }
 }
