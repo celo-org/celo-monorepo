@@ -23,6 +23,17 @@ export interface ValidatorGroupVote {
   eligible: boolean
 }
 
+export interface Voter {
+  address: Address
+  votes: GroupVote[]
+}
+
+export interface GroupVote {
+  group: Address
+  pending: BigNumber
+  active: BigNumber
+}
+
 export interface ElectableValidators {
   min: BigNumber
   max: BigNumber
@@ -38,7 +49,6 @@ export interface ElectionConfig {
  * Contract for voting for validators and managing validator groups.
  */
 export class ElectionWrapper extends BaseWrapper<Election> {
-  activate = proxySend(this.kit, this.contract.methods.activate)
   /**
    * Returns the minimum and maximum number of validators that can be elected.
    * @returns The minimum and maximum number of validators that can be elected.
@@ -100,6 +110,51 @@ export class ElectionWrapper extends BaseWrapper<Election> {
     this.contract.methods.getGroupsVotedForByAccount
   )
 
+  async getVotesForGroupByAccount(account: Address, group: Address): Promise<GroupVote> {
+    const pending = await this.contract.methods
+      .getPendingVotesForGroupByAccount(group, account)
+      .call()
+    const active = await this.contract.methods
+      .getActiveVotesForGroupByAccount(group, account)
+      .call()
+    return {
+      group,
+      pending: toBigNumber(pending),
+      active: toBigNumber(active),
+    }
+  }
+
+  async getVoter(account: Address): Promise<Voter> {
+    const groups = await this.contract.methods.getGroupsVotedForByAccount(account).call()
+    const votes = await Promise.all(groups.map((g) => this.getVotesForGroupByAccount(account, g)))
+    return { address: account, votes }
+  }
+
+  /**
+   * Returns whether or not the account has any pending votes.
+   * @param account The address of the account casting votes.
+   * @return The groups that `account` has voted for.
+   */
+  async hasPendingVotes(account: Address): Promise<boolean> {
+    const groups = await this.contract.methods.getGroupsVotedForByAccount(account).call()
+    const isNotPending = await Promise.all(
+      groups.map(async (g: string) =>
+        toBigNumber(
+          await this.contract.methods.getPendingVotesForGroupByAccount(account, g).call()
+        ).isZero()
+      )
+    )
+    return !isNotPending.every((a: boolean) => a)
+  }
+
+  async hasActivatablePendingVotes(account: Address): Promise<boolean> {
+    const groups = await this.contract.methods.getGroupsVotedForByAccount(account).call()
+    const isActivatable = await Promise.all(
+      groups.map((g: string) => this.contract.methods.hasActivatablePendingVotes(account, g).call())
+    )
+    return isActivatable.some((a: boolean) => a)
+  }
+
   /**
    * Returns current configuration parameters.
    */
@@ -134,6 +189,72 @@ export class ElectionWrapper extends BaseWrapper<Election> {
     const validators = await this.kit.contracts.getValidators()
     const groups = (await validators.getRegisteredValidatorGroups()).map((g) => g.address)
     return concurrentMap(5, groups, (g) => this.getValidatorGroupVotes(g))
+  }
+
+  _activate = proxySend(this.kit, this.contract.methods.activate)
+
+  /**
+   * Activates any activatable pending votes.
+   * @param account The account with pending votes to activate.
+   */
+  async activate(account: Address): Promise<Array<CeloTransactionObject<boolean>>> {
+    const groups = await this.contract.methods.getGroupsVotedForByAccount(account).call()
+    const isActivatable = await Promise.all(
+      groups.map((g) => this.contract.methods.hasActivatablePendingVotes(account, g).call())
+    )
+    const groupsActivatable = groups.filter((_, i) => isActivatable[i])
+    return groupsActivatable.map((g) => this._activate(g))
+  }
+
+  async revokePending(
+    account: Address,
+    group: Address,
+    value: BigNumber
+  ): Promise<CeloTransactionObject<boolean>> {
+    const groups = await this.contract.methods.getGroupsVotedForByAccount(account).call()
+    const index = groups.indexOf(group)
+    const { lesser, greater } = await this.findLesserAndGreaterAfterVote(group, value.times(-1))
+
+    return toTransactionObject(
+      this.kit,
+      this.contract.methods.revokePending(group, value.toFixed(), lesser, greater, index)
+    )
+  }
+
+  async revokeActive(
+    account: Address,
+    group: Address,
+    value: BigNumber
+  ): Promise<CeloTransactionObject<boolean>> {
+    const groups = await this.contract.methods.getGroupsVotedForByAccount(account).call()
+    const index = groups.indexOf(group)
+    const { lesser, greater } = await this.findLesserAndGreaterAfterVote(group, value.times(-1))
+
+    return toTransactionObject(
+      this.kit,
+      this.contract.methods.revokeActive(group, value.toFixed(), lesser, greater, index)
+    )
+  }
+
+  async revoke(
+    account: Address,
+    group: Address,
+    value: BigNumber
+  ): Promise<Array<CeloTransactionObject<boolean>>> {
+    const vote = await this.getVotesForGroupByAccount(account, group)
+    if (value.gt(vote.pending.plus(vote.active))) {
+      throw new Error(`can't revoke more votes for ${group} than have been made by ${account}`)
+    }
+    const txos = []
+    const pendingValue = BigNumber.minimum(vote.pending, value)
+    if (!pendingValue.isZero()) {
+      txos.push(await this.revokePending(account, group, pendingValue))
+    }
+    if (pendingValue.lt(value)) {
+      const activeValue = value.minus(pendingValue)
+      txos.push(await this.revokeActive(account, group, activeValue))
+    }
+    return txos
   }
 
   /**
