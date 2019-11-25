@@ -20,6 +20,7 @@ import {
   VestingFactoryInstance,
   VestingInstanceContract,
 } from 'types'
+import Web3 = require('web3')
 
 const ONE_GOLDTOKEN = new BigNumber('1000000000000000000')
 
@@ -66,15 +67,20 @@ contract('Vesting', (accounts: string[]) => {
     vestingBeneficiary: beneficiary,
     vestingAmount: ONE_GOLDTOKEN,
     vestingCliff: HOUR,
-    vestingStartTime: Math.round((Date.now() + 5 * MINUTE * 1000) / 1000),
-    vestingPeriodSec: MONTH * 3,
+    vestingStartTime: null, // to be adjusted on every next run
+    vestingPeriodSec: 3 * MONTH,
     vestAmountPerPeriod: ONE_GOLDTOKEN.div(4),
     vestingRevokable: true,
     vestingRevoker: revoker,
     vestingRefundDestination: refundDestination,
   }
 
-  const createNewVestingInstanceTx = async (vestingSchedule: IVestingSchedule, registryAddress) => {
+  const createNewVestingInstanceTx = async (
+    vestingSchedule: IVestingSchedule,
+    registryAddress: any,
+    web3: Web3
+  ) => {
+    vestingSchedule.vestingStartTime = (await getCurrentBlockchainTimestamp(web3)) + 5 * MINUTE
     const vestingInstanceTx = await vestingFactoryInstance.createVestingInstance(
       vestingSchedule.vestingBeneficiary,
       vestingSchedule.vestingAmount,
@@ -88,6 +94,12 @@ contract('Vesting', (accounts: string[]) => {
       registryAddress
     )
     return vestingInstanceTx
+  }
+
+  const getCurrentBlockchainTimestamp = async (web3: Web3) => {
+    const currentBlockNumber = await web3.eth.getBlockNumber()
+    const currentDateTimeStamp = await web3.eth.getBlock(currentBlockNumber)
+    return currentDateTimeStamp.timestamp
   }
 
   beforeEach(async () => {
@@ -143,7 +155,8 @@ contract('Vesting', (accounts: string[]) => {
     it('should create a new vesting instance and emit event', async () => {
       const newVestingInstanceTx = await createNewVestingInstanceTx(
         vestingDefaultSchedule,
-        registry.address
+        registry.address,
+        web3
       )
 
       const newVestingInstanceCreatedEvent = _.find(newVestingInstanceTx.logs, {
@@ -155,7 +168,8 @@ contract('Vesting', (accounts: string[]) => {
     it('should create a new vesting instance and map beneficiary to vesting', async () => {
       const newVestingInstanceTx = await createNewVestingInstanceTx(
         vestingDefaultSchedule,
-        registry.address
+        registry.address,
+        web3
       )
       const newVestingInstanceCreatedEvent = _.find(newVestingInstanceTx.logs, {
         event: 'NewVestingInstanceCreated',
@@ -169,11 +183,11 @@ contract('Vesting', (accounts: string[]) => {
     it('should revert when vesting factory has insufficient balance to create new instance', async () => {
       const vestingSchedule = _.clone(vestingDefaultSchedule)
       vestingSchedule.vestingAmount = ONE_GOLDTOKEN.times(3)
-      await assertRevert(createNewVestingInstanceTx(vestingSchedule, registry.address))
+      await assertRevert(createNewVestingInstanceTx(vestingSchedule, registry.address, web3))
     })
 
     it('should have associated funds with a schedule upon creation', async () => {
-      await createNewVestingInstanceTx(vestingDefaultSchedule, registry.address)
+      await createNewVestingInstanceTx(vestingDefaultSchedule, registry.address, web3)
       const vestingInstanceRegistryAddress = await vestingFactoryInstance.hasVestedAt(beneficiary)
       const vestingInstance = await VestingInstance.at(vestingInstanceRegistryAddress)
       const allocatedFunds = await goldTokenInstance.balanceOf(vestingInstance.address)
@@ -181,7 +195,7 @@ contract('Vesting', (accounts: string[]) => {
     })
 
     it('should set a beneficiary to vesting instance', async () => {
-      await createNewVestingInstanceTx(vestingDefaultSchedule, registry.address)
+      await createNewVestingInstanceTx(vestingDefaultSchedule, registry.address, web3)
       const vestingInstanceRegistryAddress = await vestingFactoryInstance.hasVestedAt(beneficiary)
       const vestingInstance = await VestingInstance.at(vestingInstanceRegistryAddress)
       const vestingBeneficiary = await vestingInstance.beneficiary()
@@ -189,7 +203,7 @@ contract('Vesting', (accounts: string[]) => {
     })
 
     it('should set vesting amount to vesting instance', async () => {
-      await createNewVestingInstanceTx(vestingDefaultSchedule, registry.address)
+      await createNewVestingInstanceTx(vestingDefaultSchedule, registry.address, web3)
       const vestingInstanceRegistryAddress = await vestingFactoryInstance.hasVestedAt(beneficiary)
       const vestingInstance = await VestingInstance.at(vestingInstanceRegistryAddress)
       const [
@@ -204,7 +218,7 @@ contract('Vesting', (accounts: string[]) => {
     })
 
     it('should set vesting amount per period to vesting instance', async () => {
-      await createNewVestingInstanceTx(vestingDefaultSchedule, registry.address)
+      await createNewVestingInstanceTx(vestingDefaultSchedule, registry.address, web3)
       const vestingInstanceRegistryAddress = await vestingFactoryInstance.hasVestedAt(beneficiary)
       const vestingInstance = await VestingInstance.at(vestingInstanceRegistryAddress)
       const [
@@ -219,7 +233,7 @@ contract('Vesting', (accounts: string[]) => {
     })
 
     it('should set vesting periods to vesting instance', async () => {
-      await createNewVestingInstanceTx(vestingDefaultSchedule, registry.address)
+      await createNewVestingInstanceTx(vestingDefaultSchedule, registry.address, web3)
       const vestingInstanceRegistryAddress = await vestingFactoryInstance.hasVestedAt(beneficiary)
       const vestingInstance = await VestingInstance.at(vestingInstanceRegistryAddress)
       const [
@@ -237,7 +251,7 @@ contract('Vesting', (accounts: string[]) => {
     })
 
     it('should set vesting period per sec to vesting instance', async () => {
-      await createNewVestingInstanceTx(vestingDefaultSchedule, registry.address)
+      await createNewVestingInstanceTx(vestingDefaultSchedule, registry.address, web3)
       const vestingInstanceRegistryAddress = await vestingFactoryInstance.hasVestedAt(beneficiary)
       const vestingInstance = await VestingInstance.at(vestingInstanceRegistryAddress)
       const [
@@ -252,7 +266,7 @@ contract('Vesting', (accounts: string[]) => {
     })
 
     it('should set vesting start time to vesting instance', async () => {
-      await createNewVestingInstanceTx(vestingDefaultSchedule, registry.address)
+      await createNewVestingInstanceTx(vestingDefaultSchedule, registry.address, web3)
       const vestingInstanceRegistryAddress = await vestingFactoryInstance.hasVestedAt(beneficiary)
       const vestingInstance = await VestingInstance.at(vestingInstanceRegistryAddress)
       const [
@@ -267,7 +281,7 @@ contract('Vesting', (accounts: string[]) => {
     })
 
     it('should set vesting cliff to vesting instance', async () => {
-      await createNewVestingInstanceTx(vestingDefaultSchedule, registry.address)
+      await createNewVestingInstanceTx(vestingDefaultSchedule, registry.address, web3)
       const vestingInstanceRegistryAddress = await vestingFactoryInstance.hasVestedAt(beneficiary)
       const vestingInstance = await VestingInstance.at(vestingInstanceRegistryAddress)
       const [
@@ -285,7 +299,7 @@ contract('Vesting', (accounts: string[]) => {
     })
 
     it('should set revokable flag to vesting instance', async () => {
-      await createNewVestingInstanceTx(vestingDefaultSchedule, registry.address)
+      await createNewVestingInstanceTx(vestingDefaultSchedule, registry.address, web3)
       const vestingInstanceRegistryAddress = await vestingFactoryInstance.hasVestedAt(beneficiary)
       const vestingInstance = await VestingInstance.at(vestingInstanceRegistryAddress)
       const vestingRevocable = await vestingInstance.revocable()
@@ -293,7 +307,7 @@ contract('Vesting', (accounts: string[]) => {
     })
 
     it('should set revoker to vesting instance', async () => {
-      await createNewVestingInstanceTx(vestingDefaultSchedule, registry.address)
+      await createNewVestingInstanceTx(vestingDefaultSchedule, registry.address, web3)
       const vestingInstanceRegistryAddress = await vestingFactoryInstance.hasVestedAt(beneficiary)
       const vestingInstance = await VestingInstance.at(vestingInstanceRegistryAddress)
       const vestingRevoker = await vestingInstance.revoker()
@@ -301,7 +315,7 @@ contract('Vesting', (accounts: string[]) => {
     })
 
     it('should set refund destination to vesting instance', async () => {
-      await createNewVestingInstanceTx(vestingDefaultSchedule, registry.address)
+      await createNewVestingInstanceTx(vestingDefaultSchedule, registry.address, web3)
       const vestingInstanceRegistryAddress = await vestingFactoryInstance.hasVestedAt(beneficiary)
       const vestingInstance = await VestingInstance.at(vestingInstanceRegistryAddress)
       const vestingRefundDestination = await vestingInstance.refundDestination()
@@ -309,7 +323,7 @@ contract('Vesting', (accounts: string[]) => {
     })
 
     it('should have zero currently withdrawn on init', async () => {
-      await createNewVestingInstanceTx(vestingDefaultSchedule, registry.address)
+      await createNewVestingInstanceTx(vestingDefaultSchedule, registry.address, web3)
       const vestingInstanceRegistryAddress = await vestingFactoryInstance.hasVestedAt(beneficiary)
       const vestingInstance = await VestingInstance.at(vestingInstanceRegistryAddress)
       const currentlyWithdrawn = await vestingInstance.currentlyWithdrawn()
@@ -317,7 +331,7 @@ contract('Vesting', (accounts: string[]) => {
     })
 
     it('should be unrevoked on init', async () => {
-      await createNewVestingInstanceTx(vestingDefaultSchedule, registry.address)
+      await createNewVestingInstanceTx(vestingDefaultSchedule, registry.address, web3)
       const vestingInstanceRegistryAddress = await vestingFactoryInstance.hasVestedAt(beneficiary)
       const vestingInstance = await VestingInstance.at(vestingInstanceRegistryAddress)
       const isRevoked = await vestingInstance.revoked()
@@ -325,7 +339,7 @@ contract('Vesting', (accounts: string[]) => {
     })
 
     it('should be unpaused on init', async () => {
-      await createNewVestingInstanceTx(vestingDefaultSchedule, registry.address)
+      await createNewVestingInstanceTx(vestingDefaultSchedule, registry.address, web3)
       const vestingInstanceRegistryAddress = await vestingFactoryInstance.hasVestedAt(beneficiary)
       const vestingInstance = await VestingInstance.at(vestingInstanceRegistryAddress)
       const isPaused = await vestingInstance.paused()
@@ -333,58 +347,55 @@ contract('Vesting', (accounts: string[]) => {
     })
 
     it('should revert when registry address is zero', async () => {
-      await assertRevert(createNewVestingInstanceTx(vestingDefaultSchedule, NULL_ADDRESS))
+      await assertRevert(createNewVestingInstanceTx(vestingDefaultSchedule, NULL_ADDRESS, web3))
     })
 
     it('should revert when vesting amount is zero', async () => {
       const vestingSchedule = _.clone(vestingDefaultSchedule)
       vestingSchedule.vestingAmount = new BigNumber('0')
-      await assertRevert(createNewVestingInstanceTx(vestingSchedule, registry.address))
+      await assertRevert(createNewVestingInstanceTx(vestingSchedule, registry.address, web3))
     })
 
     it('should revert when vesting beneficiary is the genesis address', async () => {
       const vestingSchedule = _.clone(vestingDefaultSchedule)
       vestingSchedule.vestingBeneficiary = NULL_ADDRESS
-      await assertRevert(createNewVestingInstanceTx(vestingSchedule, registry.address))
+      await assertRevert(createNewVestingInstanceTx(vestingSchedule, registry.address, web3))
     })
 
     it('should revert when refund destination is the genesis address', async () => {
       const vestingSchedule = _.clone(vestingDefaultSchedule)
       vestingSchedule.vestingRefundDestination = NULL_ADDRESS
-      await assertRevert(createNewVestingInstanceTx(vestingSchedule, registry.address))
+      await assertRevert(createNewVestingInstanceTx(vestingSchedule, registry.address, web3))
     })
 
     it('should revert when vesting period per sec is zero', async () => {
       const vestingSchedule = _.clone(vestingDefaultSchedule)
       vestingSchedule.vestingPeriodSec = 0
-      await assertRevert(createNewVestingInstanceTx(vestingSchedule, registry.address))
+      await assertRevert(createNewVestingInstanceTx(vestingSchedule, registry.address, web3))
     })
 
     it('should revert when vesting cliff is longer than vesting period per sec', async () => {
       const vestingSchedule = _.clone(vestingDefaultSchedule)
       vestingSchedule.vestingCliff = 4 * MONTH
-      await assertRevert(createNewVestingInstanceTx(vestingSchedule, registry.address))
+      await assertRevert(createNewVestingInstanceTx(vestingSchedule, registry.address, web3))
     })
 
     it('should revert when vesting amount per period is greater than total vesting amout', async () => {
       const vestingSchedule = _.clone(vestingDefaultSchedule)
       vestingSchedule.vestAmountPerPeriod = ONE_GOLDTOKEN.times(2)
-      await assertRevert(createNewVestingInstanceTx(vestingSchedule, registry.address))
+      await assertRevert(createNewVestingInstanceTx(vestingSchedule, registry.address, web3))
     })
 
     it('should revert when vesting cliff start point lies in the past', async () => {
       const vestingSchedule = _.clone(vestingDefaultSchedule)
       vestingSchedule.vestingStartTime = Math.round(Date.now() / 1000) - 2 * HOUR
-      await assertRevert(createNewVestingInstanceTx(vestingSchedule, registry.address))
+      await assertRevert(createNewVestingInstanceTx(vestingSchedule, registry.address, web3))
     })
   })
 
   describe('#vesting cycle()', () => {
     it('beneficiary should not be able to withdraw before start time of vesting', async () => {
-      const vestingSchedule = _.clone(vestingDefaultSchedule)
-      vestingSchedule.vestingStartTime = Math.round((Date.now() + 5 * MINUTE * 1000) / 1000)
-      vestingSchedule.vestingCliff = HOUR
-      await createNewVestingInstanceTx(vestingDefaultSchedule, registry.address)
+      await createNewVestingInstanceTx(vestingDefaultSchedule, registry.address, web3)
       const vestingInstanceRegistryAddress = await vestingFactoryInstance.hasVestedAt(beneficiary)
       const vestingInstance = await VestingInstance.at(vestingInstanceRegistryAddress)
       const timeToTravel = 4 * MINUTE
@@ -393,10 +404,7 @@ contract('Vesting', (accounts: string[]) => {
     })
 
     it('beneficiary should not be able to withdraw after start time of vesting and before cliff start time', async () => {
-      const vestingSchedule = _.clone(vestingDefaultSchedule)
-      vestingSchedule.vestingStartTime = Math.round((Date.now() + 5 * MINUTE * 1000) / 1000)
-      vestingSchedule.vestingCliff = HOUR
-      await createNewVestingInstanceTx(vestingDefaultSchedule, registry.address)
+      await createNewVestingInstanceTx(vestingDefaultSchedule, registry.address, web3)
       const vestingInstanceRegistryAddress = await vestingFactoryInstance.hasVestedAt(beneficiary)
       const vestingInstance = await VestingInstance.at(vestingInstanceRegistryAddress)
       const timeToTravel = 30 * MINUTE
@@ -405,10 +413,7 @@ contract('Vesting', (accounts: string[]) => {
     })
 
     it('beneficiary should be able to withdraw after cliff start time', async () => {
-      const vestingSchedule = _.clone(vestingDefaultSchedule)
-      vestingSchedule.vestingStartTime = Math.round((Date.now() + 5 * MINUTE * 1000) / 1000)
-      vestingSchedule.vestingCliff = HOUR
-      await createNewVestingInstanceTx(vestingSchedule, registry.address)
+      await createNewVestingInstanceTx(vestingDefaultSchedule, registry.address, web3)
       const vestingInstanceRegistryAddress = await vestingFactoryInstance.hasVestedAt(beneficiary)
       const vestingInstance = await VestingInstance.at(vestingInstanceRegistryAddress)
       const timeToTravel = 3 * MONTH
@@ -417,15 +422,12 @@ contract('Vesting', (accounts: string[]) => {
     })
 
     it('none-beneficiary should not be able to withdraw after cliff start time', async () => {
-      const vestingSchedule = _.clone(vestingDefaultSchedule)
-      vestingSchedule.vestingStartTime = Math.round((Date.now() + 5 * MINUTE * 1000) / 1000)
-      vestingSchedule.vestingCliff = HOUR
-      await createNewVestingInstanceTx(vestingSchedule, registry.address)
+      await createNewVestingInstanceTx(vestingDefaultSchedule, registry.address, web3)
       const vestingInstanceRegistryAddress = await vestingFactoryInstance.hasVestedAt(beneficiary)
       const vestingInstance = await VestingInstance.at(vestingInstanceRegistryAddress)
       const timeToTravel = 3 * MONTH
       await timeTravel(timeToTravel, web3)
-      await vestingInstance.withdraw({ from: accounts[5] })
+      await assertRevert(vestingInstance.withdraw({ from: accounts[5] }))
     })
   })
 })
