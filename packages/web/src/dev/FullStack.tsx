@@ -162,10 +162,10 @@ class FullStack extends React.PureComponent<I18nProps & ScreenProps, State> {
           <Cell span={Spans.half} tabletSpan={Spans.full}>
             <View style={this.modeStyle()} ref={this.illoRef}>
               <View style={styles.illoContainer}>
-                <H3 style={textStyles.invert}>{t('stackSubtitle')}</H3>
-                <H2 style={[textStyles.invert, standardStyles.elementalMargin]}>
+                <H2 style={textStyles.invert}>{t('stackSubtitle')}</H2>
+                <H3 style={[textStyles.invert, standardStyles.elementalMargin]}>
                   {t('stackTitle')}
-                </H2>
+                </H3>
                 <Text style={[fonts.p, textStyles.invert, standardStyles.elementalMarginBottom]}>
                   {t('stackDescription')}
                 </Text>
