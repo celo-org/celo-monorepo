@@ -25,8 +25,10 @@ function addressToBinary(a: string) {
   }
 }
 
+const LEADERBOARD_DATABASE = process.env['LEADERBOARD_DATABASE'] || 'blockscout'
+
 async function updateDB(lst: any[][]) {
-  const client = new Client({ database: 'blockscout' })
+  const client = new Client({ database: LEADERBOARD_DATABASE })
   await client.connect()
   const res = await client.query(
     'INSERT INTO competitors (address, multiplier)' +
@@ -46,7 +48,7 @@ async function updateDB(lst: any[][]) {
 }
 
 async function updateRate(kit: ContractKit) {
-  const client = new Client({ database: 'blockscout' })
+  const client = new Client({ database: LEADERBOARD_DATABASE })
   await client.connect()
   const token = await kit.contracts.getStableToken()
   const oracle = await kit.contracts.getSortedOracles()
@@ -83,7 +85,7 @@ async function processClaims(kit: ContractKit, address: string, data: string) {
       else lst.push(claim.address)
     }
     lst.push(address)
-    const client = new Client({ database: 'blockscout' })
+    const client = new Client({ database: LEADERBOARD_DATABASE })
     await client.connect()
     const res = await client.query(
       'INSERT INTO claims (address, claimed_address)' +
@@ -108,14 +110,21 @@ async function processClaims(kit: ContractKit, address: string, data: string) {
 
 readSheet()
 
-function readSheet() {
-  // Load client secrets from a local file.
-  fs.readFile('credentials.json', (err, content) => {
-    if (err) return console.log('Error loading client secret file:', err)
-    // Authorize a client with credentials, then call the Google Sheets API.
-    authorize(JSON.parse(content.toString()), getInfo)
-  })
+function getCredentials() {
+  let credentials = process.env['LEADERBOARD_CREDENTIALS']
+  if (!credentials) {
+    return fs.readFileSync('credentials.json')
+  }
+  return credentials
 }
+
+function readSheet() {
+  const content = getCredentials()
+  // Authorize a client with credentials, then call the Google Sheets API.
+  authorize(JSON.parse(content.toString()), getInfo)
+}
+
+const LEADERBOARD_TOKEN = process.env['LEADERBOARD_TOKEN']
 
 /**
  * Create an OAuth2 client with the given credentials, and then execute the
@@ -127,12 +136,17 @@ function authorize(credentials: any, callback: any) {
   const { client_secret, client_id, redirect_uris } = credentials.installed
   const oAuth2Client = new google.auth.OAuth2(client_id, client_secret, redirect_uris[0])
 
-  // Check if we have previously stored a token.
-  fs.readFile(TOKEN_PATH, (err, token) => {
-    if (err) return getNewToken(oAuth2Client, callback)
-    oAuth2Client.setCredentials(JSON.parse(token.toString()))
+  if (LEADERBOARD_TOKEN) {
+    oAuth2Client.setCredentials(JSON.parse(LEADERBOARD_TOKEN.toString()))
     callback(oAuth2Client)
-  })
+  }
+  // Check if we have previously stored a token.
+  else
+    fs.readFile(TOKEN_PATH, (err, token) => {
+      if (err) return getNewToken(oAuth2Client, callback)
+      oAuth2Client.setCredentials(JSON.parse(token.toString()))
+      callback(oAuth2Client)
+    })
 }
 
 /**
@@ -166,11 +180,14 @@ function getNewToken(oAuth2Client: any, callback: any) {
   })
 }
 
+const LEADERBOARD_SPREADSHEET =
+  process.env['LEADERBOARD_SPREADSHEET'] || '1d3pZNof8p3z8M9O3MH5FZG5dA3e-L52XiJ4qA5o7X0Y'
+
 function getInfo(auth: any) {
   const sheets = google.sheets({ version: 'v4', auth })
   sheets.spreadsheets.values.get(
     {
-      spreadsheetId: '1d3pZNof8p3z8M9O3MH5FZG5dA3e-L52XiJ4qA5o7X0Y',
+      spreadsheetId: LEADERBOARD_SPREADSHEET,
       range: 'Sheet1!A2:B',
     },
     (err, res) => {
@@ -187,8 +204,10 @@ function getInfo(auth: any) {
   )
 }
 
+const LEADERBOARD_WEB3 = process.env['LEADERBOARD_WEB3'] || 'http://localhost:8545'
+
 async function readAssoc(lst: string[]) {
-  const web3 = new Web3('http://localhost:8545')
+  const web3 = new Web3(LEADERBOARD_WEB3)
   const kit: ContractKit = newKitFromWeb3(web3)
   updateRate(kit)
   const accounts: AccountsWrapper = await kit.contracts.getAccounts()
