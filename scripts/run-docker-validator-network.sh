@@ -58,7 +58,7 @@ make_status_requests () {
     echo -n "* Validator eth_blockNumber:"
     curl -X POST --data '{"jsonrpc":"2.0","method":"eth_blockNumber","params":[],"id":1}' -H "Content-Type: application/json" localhost:8545
 
-    
+
     echo -n "* Proxy net_peerCount:"
     curl -X POST --data '{"jsonrpc":"2.0","method":"net_peerCount","params":[],"id":74}' -H "Content-Type: application/json" localhost:8555
     echo -n "* Validator net_peerCount:"
@@ -122,12 +122,12 @@ if [[ $COMMAND == *"accounts"* ]]; then
 
     echo -e "* Creating addresses ..."
     cd $DATA_DIR
-    
+
     export CELO_VALIDATOR_ADDRESS=$(docker run -v $PWD/validator:/root/.celo --entrypoint /bin/sh -it $CELO_IMAGE -c " printf '%s\n' $DEFAULT_PASSWORD $DEFAULT_PASSWORD | geth account new " |tail -1| cut -d'{' -f 2| tr -cd "[:alnum:]\n" )
     export CELO_VALIDATOR_GROUP_ADDRESS=$(docker run -v $PWD/validator:/root/.celo --entrypoint /bin/sh -it $CELO_IMAGE -c " printf '%s\n' $DEFAULT_PASSWORD $DEFAULT_PASSWORD | geth account new " |tail -1| cut -d'{' -f 2| tr -cd "[:alnum:]\n" )
     export CELO_PROXY_ADDRESS=$(docker run -v $PWD/proxy:/root/.celo --entrypoint /bin/sh -it $CELO_IMAGE -c " printf '%s\n' $DEFAULT_PASSWORD $DEFAULT_PASSWORD | geth account new " |tail -1| cut -d'{' -f 2| tr -cd "[:alnum:]\n" )
     
-    
+
     echo -e "\tCELO_VALIDATOR_ADDRESS=$CELO_VALIDATOR_ADDRESS"
     echo -e "\tCELO_VALIDATOR_GROUP_ADDRESS=$CELO_VALIDATOR_ADDRESS"
     echo -e "\tCELO_PROXY_ADDRESS=$CELO_PROXY_ADDRESS"
@@ -149,7 +149,7 @@ if [[ $COMMAND == *"deploy"* ]]; then
     echo -e "\tInitializing using genesis"
     docker run -v $PWD/proxy:/root/.celo $CELO_IMAGE init /root/.celo/genesis.json
     docker run -v $PWD/validator:/root/.celo $CELO_IMAGE init /root/.celo/genesis.json
-    
+
 fi
 
 
@@ -170,7 +170,7 @@ if [[ $COMMAND == *"run-validator"* ]]; then
     
     echo -e "\tStarting Validator node"
     docker run -v $PWD/validator:/root/.celo --entrypoint sh --rm $CELO_IMAGE -c "echo $DEFAULT_PASSWORD > /root/.celo/.password"
-    
+
     screen -S celo-validator -d -m docker run --name celo-validator --restart always -p 127.0.0.1:8545:8545 -p 127.0.0.1:8546:8546 -p 30303:30303 -p 30303:30303/udp -v $PWD/validator:/root/.celo $CELO_IMAGE --verbosity 3 --networkid $NETWORK_ID --syncmode full --rpc --rpcaddr 0.0.0.0 --rpcapi eth,net,web3,debug,admin,personal,istanbul --maxpeers 125 --mine --istanbul.blockperiod=5 --istanbul.requesttimeout=3000 --etherbase $CELO_VALIDATOR_ADDRESS --nodiscover --proxy.proxied --proxy.proxyenodeurlpair=enode://$PROXY_ENODE@$PROXY_IP:30503\;enode://$PROXY_ENODE@$PROXY_IP:30303  --unlock=$CELO_VALIDATOR_ADDRESS --password /root/.celo/.password 
     
     sleep 5s
@@ -213,22 +213,23 @@ if [[ $COMMAND == *"run-fullnode"* ]]; then
     cd $DATA_DIR
 
      docker rm -f celo-fullnode || echo -e "Container removed"
-     
+
     export CELO_ACCOUNT_ADDRESS=$(celocli account:new |tail -1| cut -d' ' -f 2| tr -cd "[:alnum:]\n")
 
     docker run -v $PWD/fullnode:/root/.celo --entrypoint /bin/sh -it $CELO_IMAGE -c "wget https://www.googleapis.com/storage/v1/b/static_nodes/o/$NETWORK_NAME?alt=media -O /root/.celo/static-nodes.json"
 
     docker run -v $PWD/fullnode:/root/.celo --entrypoint /bin/sh -it $CELO_IMAGE -c "wget https://www.googleapis.com/storage/v1/b/genesis_blocks/o/$NETWORK_NAME?alt=media -O /root/.celo/genesis.json"
     docker run -v $PWD/fullnode:/root/.celo $CELO_IMAGE init /root/.celo/genesis.json
-    
+
     echo -e "\tStarting the Full Node"
+
     screen -S celo-fullnode -d -m docker run --name celo-fullnode --restart always -p 127.0.0.1:8545:8545 -p 127.0.0.1:8546:8546 -p 30303:30303 -p 30303:30303/udp -v $PWD/fullnode:/root/.celo $CELO_IMAGE --verbosity 3 --networkid $NETWORK_ID --syncmode full --rpc --rpcaddr 0.0.0.0 --rpcapi eth,net,web3,debug,admin,personal --lightserv 90 --lightpeers 1000 --maxpeers 1100 --etherbase $CELO_ACCOUNT_ADDRESS 
     
     sleep 2s
 
     echo -e "\tEverything should be running, you can check running 'screen -ls'"
     screen -ls
-        
+
     echo -e "\tYou can re-attach to the full node running:"
     echo -e "\t 'screen -r -S celo-fullnode'\n"
 fi
