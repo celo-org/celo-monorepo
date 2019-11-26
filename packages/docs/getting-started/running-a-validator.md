@@ -190,7 +190,7 @@ docker run --name celo-proxy -d --restart always -p 8555:8545 -p 8556:8546 -p 30
 
 #### Running the Validator
 
-Having the Proxy up and running, we need to obtain the Proxy enode and ip addresses, running the following commands:
+Now that we have the Proxy up and running, we need to obtain its enode and IP address, so that we can connect the Validator to the proxy. You can do that running the following commands:
 
 ```bash
 export PROXY_ENODE=$(docker exec celo-proxy geth --exec "admin.nodeInfo['enode'].split('//')[1].split('@')[0]" attach | tr -d '"')
@@ -219,7 +219,7 @@ You can find the complete instructions about how to run the [Attestation Service
 ### Stop the containers
 
 You can stop the Docker containers at any time without problem. If you stop your containers that means those containers stop of providing service.
-The data dir of the validator and the proxy are Docker volumes mounted in the containers from the `celo-data-dir` you created at the very beginning. So if you don't remove that folder, you can stop or restart the containers without loosing any data.
+The data dir of the validator and the proxy are Docker volumes mounted in the containers from the `celo-data-dir` you created at the very beginning. So if you don't remove that folder, you can stop or restart the containers without losing any data.
 
 You can stop the `celo-validator` and `celo-proxy` containers running:
 
