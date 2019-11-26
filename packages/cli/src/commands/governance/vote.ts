@@ -18,16 +18,12 @@ export default class Vote extends BaseCommand {
 
   static examples = []
 
-  private static voteValueFromOption = (voteOption: string) =>
-    (Vote.voteOptions.indexOf(voteOption) + 1) as VoteValue
-
   async run() {
     const res = this.parse(Vote)
 
     const governance = await this.kit.contracts.getGovernance()
 
-    const voteValue = Vote.voteValueFromOption(res.flags.vote)
-    const tx = await governance.vote(res.flags.proposalID, voteValue)
+    const tx = await governance.vote(res.flags.proposalID, res.flags.vote as keyof typeof VoteValue)
     await displaySendTx('voteTx', tx, { from: res.flags.from })
   }
 }
