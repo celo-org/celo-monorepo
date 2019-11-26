@@ -30,12 +30,19 @@ export interface GethInstanceConfig {
   pid?: number
 }
 
+export interface GethRepository {
+  path: string
+  remote?: boolean
+  branch?: string
+}
+
 export interface GethTestConfig {
   migrate?: boolean
   migrateTo?: number
   instances: GethInstanceConfig[]
   genesisConfig?: any
   migrationOverrides?: any
+  repository?: GethRepository
 }
 
 const TEST_DIR = '/tmp/e2e'
@@ -422,6 +429,15 @@ function getSnapshotdir(instance: GethInstanceConfig) {
   return joinPath(getInstanceDir(instance), 'snapshot')
 }
 
+function gethRepositoryFromFlags() {
+  const argv = require('minimist')(process.argv.slice(2))
+  return {
+    path: argv.localgeth || '/tmp/geth',
+    remote: !argv.localgeth,
+    branch: argv.branch,
+  }
+}
+
 /**
  * @returns Promise<number> the geth pid number
  */
@@ -449,16 +465,15 @@ export function getContext(gethConfig: GethTestConfig) {
   const validatorEnodes = validatorPrivateKeys.map((x: any, i: number) =>
     getEnodeAddress(privateKeyToPublicKey(x), '127.0.0.1', validatorInstances[i].port)
   )
-  const argv = require('minimist')(process.argv.slice(2))
-  const branch = argv.branch || 'master'
-  const gethRepoPath = argv.localgeth || '/tmp/geth'
-  const gethBinaryPath = `${gethRepoPath}/build/bin/geth`
 
-  const before = async () => {
-    if (!argv.localgeth) {
-      await checkoutGethRepo(branch, gethRepoPath)
+  const repo: GethRepository = gethConfig.repository || gethRepositoryFromFlags()
+  const gethBinaryPath = `${repo.path}/build/bin/geth`
+
+  const initialize = async () => {
+    if (repo.remote) {
+      await checkoutGethRepo(repo.branch || 'master', repo.path)
     }
-    await buildGeth(gethRepoPath)
+    await buildGeth(repo.path)
     await setupTestDir(TEST_DIR)
     await writeGenesis(validators, GENESIS_PATH, gethConfig.genesisConfig)
     let validatorIndex = 0
@@ -483,6 +498,10 @@ export function getContext(gethConfig: GethTestConfig) {
         gethConfig.migrationOverrides
       )
     }
+  }
+
+  const before = async () => {
+    await initialize()
     await killGeth()
     await sleep(2)
     // Snapshot the datadir after the contract migrations so we can start from a "clean slate"
@@ -517,7 +536,7 @@ export function getContext(gethConfig: GethTestConfig) {
 
   return {
     validators,
-    hooks: { before, after, restart, gethBinaryPath },
+    hooks: { initialize, before, after, restart, gethBinaryPath },
   }
 }
 
