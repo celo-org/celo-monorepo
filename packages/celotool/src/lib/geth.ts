@@ -337,8 +337,8 @@ const transferAndTrace = async (
 ) => {
   console.info('Transfer')
 
-  const token = getRandomlyChoseToken(goldToken, stableToken)
-  const feeCurrencyToken = getRandomlyChoseToken(goldToken, stableToken)
+  const token = getRandomToken(goldToken, stableToken)
+  const feeCurrencyToken = getRandomToken(goldToken, stableToken)
 
   const [tokenName, feeCurrencySymbol] = await Promise.all([
     token.methods.symbol().call(),

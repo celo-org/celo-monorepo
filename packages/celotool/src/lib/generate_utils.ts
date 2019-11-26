@@ -101,7 +101,7 @@ const validatorBalance = fetchEnvOrFallback(
   '10011000000000000000000'
 ) // 10,011 CG
 const faucetBalance = fetchEnvOrFallback(envVar.FAUCET_GENESIS_BALANCE, '10011000000000000000000') // 10,011 CG
-const oraceBalance = fetchEnvOrFallback(envVar.ORACLE_GENESIS_BALANCE, '100000000000000000000') // 100 CG
+const oracleBalance = fetchEnvOrFallback(envVar.ORACLE_GENESIS_BALANCE, '100000000000000000000') // 100 CG
 
 export const getPrivateKeysFor = (accountType: AccountType, mnemonic: string, n: number) =>
   range(0, n).map((i) => generatePrivateKey(mnemonic, accountType, i))
@@ -144,11 +144,11 @@ export const getFaucetedAccounts = (mnemonic: string) => {
     faucetBalance
   )
 
-  const numloadTestClients = parseInt(fetchEnv(envVar.LOAD_TEST_CLIENTS), 10)
+  const numLoadTestAccounts = parseInt(fetchEnv(envVar.LOAD_TEST_CLIENTS), 10)
   const loadTestAccounts = getFaucetedAccountsFor(
     AccountType.LOAD_TESTING_ACCOUNT,
     mnemonic,
-    numLoadTestClients,
+    numLoadTestAccounts,
     faucetBalance
   )
 
