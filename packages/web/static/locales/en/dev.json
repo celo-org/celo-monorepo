@@ -3,11 +3,24 @@
   "aboutChallengeText":
     "We're looking for node operators and admins who can help develop the Celo menu. Spin up a validator or full node, build operational experience, and help the community prepare for opening night.",
   "aboutTheChallengeButton": "Get Involved",
-  "makeWithCelo": "Make With Celo",
-  "makeWithCeloSubtitle": "Developer and validator resources to\nlaunch Celo in 2020",
-  "greatStakeOff": "The Great Celo Stake Off",
+  "expandLeaderboard": "Expand Leaderboard",
+
+  "makeWithCelo": "Build Celo",
+  "makeWithCeloSubtitle": "Get a taste of Baklava, Celo’s incentivized testnet",
+  "greatStakeOff": "The Great Celo\nStake Off",
   "greatStakeOffSubtitle": "Win prizes by operating and hardening\nthe Baklava Testnet",
   "expandLeaderboard": "Expand Leaderboard",
+  "purposeTitle": "Purpose",
+  "purposeText":
+    "Learn how to run a node on Celo’s peer-to-peer network and win up to <0>2 million Celo Gold in rewards.</0>*",
+  "purposeAsterisk": "* subject to Terms and Conditions",
+  "challengeTitle": "The Challenge",
+  "challengeText":
+    "Let the staking season commence! Starting December 4th, all chefs, bakers, and validators are invited to compete for the ultimate glory: honor, food, and Celo Gold.",
+  "whoTitle": "Who",
+  "whoText":
+    "If you have a technical background and you’re interested in open source, security, or building & operating infrastructure, you’d make a perfect Celo validator!",
+  "challengeBtnText": "Join the Stake Off",
   "buildCoverTitle": "Get a Taste of Alfajores",
   "buildCoverSubtitle": "Developer resources for the Celo Protocol and Celo Wallet",
   "viewGitHub": "View on Github",

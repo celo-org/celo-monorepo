@@ -25,7 +25,7 @@ class LeaderBoard extends React.PureComponent<BoardProps & I18nProps, State> {
     width: 0,
     page: 0,
   }
-
+  
   onLayout = (event: LayoutChangeEvent) => {
     const { width } = event.nativeEvent.layout
     this.setState({ width })

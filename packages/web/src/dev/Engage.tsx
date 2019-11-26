@@ -20,52 +20,15 @@ const Engage = React.memo(function _Engage({ t, screen }: I18nProps & ScreenProp
         allStyle={styles.alignOut}
       >
         <Cell span={Spans.half}>
-          <H3 style={standardStyles.elementalMarginBottom}>{t('engage.topTitle')}</H3>
-          <H2 style={standardStyles.blockMarginBottom}>{t('engage.mainTitle')}</H2>
+          <H2 style={standardStyles.elementalMarginBottom}>{t('engage.topTitle')}</H2>
           <Content
-            screen={screen}
-            noun={t('engage.validators.noun')}
-            verb={t('engage.validators.verb')}
-            network={t('engage.validators.network')}
-            caption={t('engage.validators.caption')}
-            primaryAction={{ text: t('engage.validators.primaryAction'), href: '/TODO' }}
-            secondaryAction={{ text: t('engage.validators.secondaryAction'), href: '/TODO' }}
-          />
-        </Cell>
-        <Cell span={Spans.half} style={[styles.asides]}>
-          <Aside
-            screen={screen}
-            text={t('engage.tutorial.copy')}
-            title={t('engage.tutorial.title')}
-            href="?todo"
-            btnText={t('engage.tutorial.btnText')}
-            image={require('src/icons/download-dark.png')}
-          />
-          <Aside
-            screen={screen}
-            text={t('engage.blog.copy')}
-            title={t('engage.blog.title')}
-            href="?todo"
-            btnText={t('engage.blog.btnText')}
-            image={require('src/icons/blog-dark.png')}
-          />
-        </Cell>
-      </GridRow>
-      <GridRow
-        allStyle={styles.alignOut}
-        desktopStyle={standardStyles.blockMarginTop}
-        tabletStyle={standardStyles.blockMarginTopTablet}
-        mobileStyle={standardStyles.blockMarginTopMobile}
-      >
-        <Cell span={Spans.half}>
-          <Content
+            image={require('src/dev/cakeLayering.jpg')}
             screen={screen}
             noun={t('engage.developers.noun')}
             verb={t('engage.developers.verb')}
             network={t('engage.developers.network')}
             caption={t('engage.developers.caption')}
             primaryAction={{ text: t('engage.developers.primaryAction'), href: '/TODO' }}
-            secondaryAction={{ text: t('engage.developers.secondaryAction'), href: '/TODO' }}
           />
         </Cell>
         <Cell span={Spans.half} style={[styles.asides]}>
@@ -84,6 +47,42 @@ const Engage = React.memo(function _Engage({ t, screen }: I18nProps & ScreenProp
             href="?todo"
             btnText={t('engage.docs.btnText')}
             image={require('src/icons/documentation-dark.png')}
+          />
+        </Cell>
+      </GridRow>
+      <GridRow
+        allStyle={styles.alignOut}
+        desktopStyle={standardStyles.blockMarginTop}
+        tabletStyle={standardStyles.blockMarginTopTablet}
+        mobileStyle={standardStyles.blockMarginTopMobile}
+      >
+        <Cell span={Spans.half}>
+          <Content
+            image={require('src/dev/chefs.png')}
+            screen={screen}
+            noun={t('engage.validators.noun')}
+            verb={t('engage.validators.verb')}
+            network={t('engage.validators.network')}
+            caption={t('engage.validators.caption')}
+            primaryAction={{ text: t('engage.validators.primaryAction'), href: '/TODO' }}
+          />
+        </Cell>
+        <Cell span={Spans.half} style={[styles.asides]}>
+          <Aside
+            screen={screen}
+            text={t('engage.tutorial.copy')}
+            title={t('engage.tutorial.title')}
+            href="?todo"
+            btnText={t('engage.tutorial.btnText')}
+            image={require('src/icons/download-dark.png')}
+          />
+          <Aside
+            screen={screen}
+            text={t('engage.blog.copy')}
+            title={t('engage.blog.title')}
+            href="?todo"
+            btnText={t('engage.blog.btnText')}
+            image={require('src/icons/blog-dark.png')}
           />
         </Cell>
       </GridRow>
@@ -166,7 +165,7 @@ interface ContentProps {
   network: string
   caption: string
   primaryAction: { text: string; href: string }
-  secondaryAction: { text: string; href: string }
+  image: ImageRequireSource
   screen: ScreenSizes
 }
 
@@ -178,11 +177,7 @@ const Content = React.memo(function _Content(props: ContentProps) {
       <Text style={fonts.h5}>{props.network}</Text>
       <Fade fraction={0.5} bottom={true} distance={'10px'}>
         <AspectRatio style={styles.graphicContainer} ratio={290 / 225}>
-          <Image
-            style={styles.graphic}
-            source={require('src/dev/cakeLayering.jpg')}
-            resizeMode="contain"
-          />
+          <Image style={styles.graphic} source={props.image} resizeMode="contain" />
         </AspectRatio>
       </Fade>
       <Text style={[fonts.p]}>{props.caption}</Text>
@@ -193,15 +188,6 @@ const Content = React.memo(function _Content(props: ContentProps) {
             kind={BTN.PRIMARY}
             text={props.primaryAction.text}
             href={props.primaryAction.href}
-          />
-        </View>
-        <View style={styles.nakedButtonContainer}>
-          <Button
-            size={SIZE.normal}
-            kind={BTN.NAKED}
-            text={props.secondaryAction.text}
-            href={props.secondaryAction.href}
-            align={'center'}
           />
         </View>
       </View>

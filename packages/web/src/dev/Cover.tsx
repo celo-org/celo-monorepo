@@ -3,10 +3,11 @@ import LazyLoad from 'react-lazyload'
 import { Image, StyleSheet, Text, View } from 'react-native'
 import Fade from 'react-reveal/Fade'
 import Transceive from 'src/dev/Transceive'
-import { H2, H4 } from 'src/fonts/Fonts'
-import { I18nProps, withNamespaces } from 'src/i18n'
+import LeaderBoardApp from './LeaderBoardApp'
+import { H2, H3, H4 } from 'src/fonts/Fonts'
+import { I18nProps, Trans, withNamespaces } from 'src/i18n'
 import { Cell, GridRow, Spans } from 'src/layout/GridRow'
-import Button, { BTN } from 'src/shared/Button.3'
+import Button, { BTN, SIZE } from 'src/shared/Button.3'
 import { HEADER_HEIGHT } from 'src/shared/Styles'
 import { colors, fonts, standardStyles, textStyles } from 'src/styles'
 import LeaderBoardApp from './LeaderBoardApp'
@@ -27,7 +28,7 @@ const CoverComponent = React.memo(function Cover({ t }: I18nProps) {
         <TitleAndSubTitle title={t('makeWithCelo')} subtitle={t('makeWithCeloSubtitle')} />
       </GridRow>
       <GridRow allStyle={standardStyles.centered}>
-        <TitleAndSubTitle title={t('greatStakeOff')} subtitle={t('greatStakeOffSubtitle')}>
+        <TitleAndSubTitle title={t('greatStakeOff')} subtitle={''}>
           <Fade delay={DELAY} duration={DURATION}>
             <Image
               style={styles.baking}
@@ -37,7 +38,60 @@ const CoverComponent = React.memo(function Cover({ t }: I18nProps) {
           </Fade>
         </TitleAndSubTitle>
       </GridRow>
-      <LazyLoad>
+
+      <GridRow
+        mobileStyle={standardStyles.blockMarginBottomMobile}
+        tabletStyle={standardStyles.blockMarginBottomTablet}
+        desktopStyle={standardStyles.blockMarginBottom}
+      >
+        <Cell span={Spans.fourth}>
+          <H3 style={textStyles.invert}>{t('purposeTitle')}</H3>
+        </Cell>
+        <Cell span={Spans.half}>
+          <H4 style={[textStyles.invert, standardStyles.elementalMarginBottom]}>
+            <Trans i18nKey={t('purposeText')}>
+              Learn how to run a node on Celo’s peer-to-peer network and win up to{' '}
+              <Text style={styles.colorEmphasis}>2 million Celo Gold in rewards.</Text>*
+            </Trans>
+          </H4>
+          <Text style={[fonts.p, textStyles.invert]}>
+            <Trans i18nKey={t('purposeAsterisk')}>{}</Trans>
+          </Text>
+        </Cell>
+      </GridRow>
+      <GridRow
+        mobileStyle={standardStyles.blockMarginBottomMobile}
+        tabletStyle={standardStyles.blockMarginBottomTablet}
+        desktopStyle={standardStyles.blockMarginBottom}
+      >
+        <Cell span={Spans.fourth}>
+          <H3 style={textStyles.invert}>{t('challengeTitle')}</H3>
+        </Cell>
+        <Cell span={Spans.half}>
+          <Text style={[fonts.p, textStyles.invert, standardStyles.elementalMarginBottom]}>
+            {t('challengeText')}
+          </Text>
+          <Button
+            size={SIZE}
+            kind={BTN.PRIMARY}
+            text={t('challengeBtnText')}
+            href="https://medium.com/celohq/announcing-the-great-celo-stake-off-12eb15dd5eb0"
+          />
+        </Cell>
+      </GridRow>
+      <GridRow
+        mobileStyle={standardStyles.blockMarginBottomMobile}
+        tabletStyle={standardStyles.blockMarginBottomTablet}
+        desktopStyle={standardStyles.blockMarginBottom}
+      >
+        <Cell span={Spans.fourth}>
+          <H3 style={textStyles.invert}>{t('whoTitle')}</H3>
+        </Cell>
+        <Cell span={Spans.half}>
+          <Text style={[fonts.p, textStyles.invert]}>{t('whoText')}</Text>
+        </Cell>
+      </GridRow>
+        <LazyLoad>
         <GridRow
           desktopStyle={standardStyles.blockMarginBottom}
           tabletStyle={standardStyles.blockMarginBottomTablet}
@@ -48,29 +102,6 @@ const CoverComponent = React.memo(function Cover({ t }: I18nProps) {
           </Cell>
         </GridRow>
       </LazyLoad>
-      <GridRow
-        allStyle={standardStyles.centered}
-        desktopStyle={standardStyles.sectionMarginBottom}
-        tabletStyle={standardStyles.sectionMarginBottomTablet}
-        mobileStyle={standardStyles.sectionMarginBottomMobile}
-      >
-        <Cell span={Spans.half} style={standardStyles.centered}>
-          <H4 style={[textStyles.center, textStyles.invert, standardStyles.elementalMarginBottom]}>
-            {t('aboutTheChallenge')}
-          </H4>
-          <Text
-            style={[
-              fonts.p,
-              textStyles.center,
-              textStyles.invert,
-              standardStyles.elementalMarginBottom,
-            ]}
-          >
-            {t('aboutChallengeText')}
-          </Text>
-          <Button text={t('aboutTheChallengeButton')} kind={BTN.PRIMARY} href={'/TODO'} />
-        </Cell>
-      </GridRow>
     </View>
   )
 })
@@ -140,6 +171,9 @@ const styles = StyleSheet.create({
   baking: { height: 151, width: 169 },
   button: {
     marginHorizontal: 10,
+  },
+  colorEmphasis: {
+    color: colors.gold,
   },
 })
 
