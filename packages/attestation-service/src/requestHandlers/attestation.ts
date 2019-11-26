@@ -1,6 +1,6 @@
 import { AttestationState } from '@celo/contractkit/lib/wrappers/Attestations'
 import { attestationMessageToSign } from '@celo/utils'
-import { isValidPrivateKey, toChecksumAddress } from '@celo/utils/lib/address'
+import { toChecksumAddress } from '@celo/utils/lib/address'
 import { AddressType, E164PhoneNumberType } from '@celo/utils/lib/io'
 import Logger from 'bunyan'
 import { isValidAddress } from 'ethereumjs-util'
@@ -30,7 +30,7 @@ export type AttestationRequest = t.TypeOf<typeof AttestationRequestType>
 export function getAttestationSignerAddress() {
   if (
     process.env.ATTESTATION_SIGNER_ADDRESS === undefined ||
-    !isValidPrivateKey(process.env.ATTESTATION_SIGNER_ADDRESS)
+    !isValidAddress(process.env.ATTESTATION_SIGNER_ADDRESS)
   ) {
     console.error('Did not specify valid ATTESTATION_SIGNER_ADDRESS')
     throw new Error('Did not specify valid ATTESTATION_SIGNER_ADDRESS')
