@@ -31,7 +31,7 @@ interface OwnProps {
 
 type Props = OwnProps & WithNamespaces
 
-export class PaymentRequestListItem extends React.Component<Props> {
+export class IncomingPaymentRequestListItem extends React.Component<Props> {
   onPay = () => {
     const { amount, comment: reason, requester: recipient } = this.props
     navigate(Screens.SendConfirmation, {
@@ -127,5 +127,5 @@ const styles = StyleSheet.create({
 })
 
 export default componentWithAnalytics(
-  withNamespaces(Namespaces.paymentRequestFlow)(PaymentRequestListItem)
+  withNamespaces(Namespaces.paymentRequestFlow)(IncomingPaymentRequestListItem)
 )

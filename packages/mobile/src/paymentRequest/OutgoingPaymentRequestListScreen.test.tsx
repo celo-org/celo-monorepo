@@ -4,7 +4,7 @@ import { Provider } from 'react-redux'
 import * as renderer from 'react-test-renderer'
 import { PaymentRequest } from 'src/account'
 import { paymentRequestDouble } from 'src/paymentRequest/__mocks__'
-import PaymentRequestListScreen from 'src/paymentRequest/PaymentRequestListScreen'
+import OutgoingPaymentRequestListScreen from 'src/paymentRequest/OutgoingPaymentRequestListScreen'
 import { createMockStore } from 'test/utils'
 import { mockAccount, mockE164Number } from 'test/values'
 
@@ -29,20 +29,20 @@ const requests = [
   }),
 ]
 
-function testStore(paymentRequests: PaymentRequest[]) {
+function testStore(outgoingPaymentRequests: PaymentRequest[]) {
   return createMockStore({
     stableToken: { balance: '120' },
-    account: { paymentRequests },
+    account: { outgoingPaymentRequests },
   })
 }
 
-describe('PaymentRequestListScreen', () => {
+describe('OutgoingPaymentRequestListScreen', () => {
   it('renders correctly with requests', () => {
     const store = testStore(requests)
 
     const tree = renderer.create(
       <Provider store={store}>
-        <PaymentRequestListScreen />
+        <OutgoingPaymentRequestListScreen />
       </Provider>
     )
     expect(tree).toMatchSnapshot()
@@ -53,7 +53,7 @@ describe('PaymentRequestListScreen', () => {
 
     const tree = renderer.create(
       <Provider store={store}>
-        <PaymentRequestListScreen />
+        <OutgoingPaymentRequestListScreen />
       </Provider>
     )
     expect(tree).toMatchSnapshot()

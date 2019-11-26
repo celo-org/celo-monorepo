@@ -29,7 +29,7 @@ interface OwnProps {
 
 type Props = OwnProps & WithNamespaces
 
-export class PaymentRequestListItem extends React.Component<Props> {
+export class OutgoingPaymentRequestListItem extends React.Component<Props> {
   onRemind = () => {
     const { id } = this.props
     this.props.updatePaymentRequestNotified(id.toString(), false)
@@ -105,5 +105,5 @@ const styles = StyleSheet.create({
 })
 
 export default componentWithAnalytics(
-  withNamespaces(Namespaces.paymentRequestFlow)(PaymentRequestListItem)
+  withNamespaces(Namespaces.paymentRequestFlow)(OutgoingPaymentRequestListItem)
 )

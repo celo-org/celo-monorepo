@@ -45,7 +45,7 @@ const mapStateToProps = (state: RootState): StateProps => ({
 const PREVIEW_SIZE = 2
 
 // Payment Request notification for the notification center on home screen
-export class PaymentRequestSummaryNotification extends React.Component<Props> {
+export class IncomingPaymentRequestSummaryNotification extends React.Component<Props> {
   getCTA = () => {
     return [
       {
@@ -143,5 +143,5 @@ const styles = StyleSheet.create({
 })
 
 export default connect<StateProps, {}, {}, RootState>(mapStateToProps)(
-  withNamespaces(Namespaces.walletFlow5)(PaymentRequestSummaryNotification)
+  withNamespaces(Namespaces.walletFlow5)(IncomingPaymentRequestSummaryNotification)
 )

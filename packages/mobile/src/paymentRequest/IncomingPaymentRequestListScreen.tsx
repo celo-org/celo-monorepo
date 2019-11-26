@@ -46,7 +46,7 @@ const mapStateToProps = (state: RootState): StateProps => ({
 
 type Props = WithNamespaces & StateProps & DispatchProps
 
-export class PaymentRequestListScreen extends React.Component<Props> {
+export class IncomingPaymentRequestListScreen extends React.Component<Props> {
   static navigationOptions = () => ({
     ...headerWithBackButton,
     headerTitle: i18n.t('paymentRequestFlow:incomingPaymentRequests'),
@@ -110,4 +110,4 @@ export default connect<StateProps, DispatchProps, {}, RootState>(
     updatePaymentRequestStatus,
     fetchPhoneAddresses,
   }
-)(withNamespaces(Namespaces.paymentRequestFlow)(PaymentRequestListScreen))
+)(withNamespaces(Namespaces.paymentRequestFlow)(IncomingPaymentRequestListScreen))

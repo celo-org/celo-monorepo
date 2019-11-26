@@ -677,7 +677,7 @@ exports[`NotificationBox Payment Requests exist 1`] = `
                 }
               }
             >
-              paymentRequest
+              incomingPaymentRequest
             </Text>
             <View>
               <View

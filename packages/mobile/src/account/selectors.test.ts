@@ -7,7 +7,7 @@ describe('selectors', () => {
     it('excludes declined and completed requests', () => {
       const state: any = {
         account: {
-          paymentRequests: [
+          incomingPaymentRequests: [
             paymentRequestDouble({ status: PaymentRequestStatus.DECLINED }),
             paymentRequestDouble({ status: PaymentRequestStatus.COMPLETED }),
           ],
@@ -21,7 +21,7 @@ describe('selectors', () => {
 
       const state: any = {
         account: {
-          paymentRequests: [
+          incomingPaymentRequests: [
             paymentRequestDouble({
               status: PaymentRequestStatus.COMPLETED,
             }),

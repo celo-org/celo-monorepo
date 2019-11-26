@@ -75,7 +75,7 @@ describe('NotificationBox', () => {
       ...storeData,
       account: {
         ...storeData.account,
-        paymentRequests: mockPaymentRequests,
+        incomingPaymentRequests: mockPaymentRequests,
       },
     })
     const tree = renderer.create(
