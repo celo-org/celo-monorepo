@@ -3,6 +3,7 @@ import { TransactionResult } from '@celo/contractkit/lib/utils/tx-result'
 import { GoldTokenWrapper } from '@celo/contractkit/lib/wrappers/GoldTokenWrapper'
 import { StableTokenWrapper } from '@celo/contractkit/lib/wrappers/StableTokenWrapper'
 import BigNumber from 'bignumber.js'
+import sleep from 'sleep-promise'
 import {
   checkBlockscoutResponse,
   fetchBlockscoutTxInfo,
@@ -15,7 +16,6 @@ import {
   validateGethRPC,
   validateTransactionAndReceipt,
 } from 'src/lib/geth'
-import sleep from 'sleep-promise'
 
 // for log messages which indicate that blockscout where not able to provide
 // information about transaction in a "timely" (15s for now) manner
