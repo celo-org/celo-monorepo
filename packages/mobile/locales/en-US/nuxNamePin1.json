@@ -1,13 +1,6 @@
 {
-  "selectCountry": "Select Country",
   "chooseLanguage": "Choose Language",
   "continue": "Continue",
-  "secureAsset":
-    "Celo keeps your assets secure and enables you to send and receive value with anyone",
-  "stableAsset":
-    "{{CeloDollars}} are a stable digital asset that tracks to the value of the US {{Dollar}}",
-  "verifyNumber": "Verify your phone number so other Celo users can find you and send you value",
-  "syncNetwork": "Syncing with Network",
   "welcomeCelo": "Welcome to Celo Wallet",
   "chooseCountryCode": "Country Code",
   "chooseCountry": "Country",
@@ -20,33 +13,17 @@
   "phoneNumber": "000 000 0000",
   "inviteCodeText": {
     "title": "Enter Invite Code",
-    "copyInvite": {
-      "0": "Copy invite ",
-      "1": "from Messages App and come back"
-    },
-    "openMessages": {
-      "message": "Open Messages",
-      "hint": {
-        "0": "Hint ",
-        "1": "Copy the whole SMS message"
-      }
-    },
-    "pasteInviteCode": {
-      "message": "Paste Invite Code!",
-      "hint": "Looks like you've copied a code"
-    },
-    "validating": "Great! Validating copied invite code",
-    "inviteAccepted": "🎉 Invite Accepted!",
-    "askForInvite": {
-      "0": "Request an invite from a friend on Celo or sign up for the {{testnet}} network at ",
-      "1": "celo.org/app"
-    }
+    "body":
+      "If you have an invite code, please enter it here. You can copy and paste the entire message.",
+    "codeHeader": "Invite Code",
+    "codePlaceholder": "Celo code: am9hBM3tiA+CuNb...",
+    "noCode": "Don’t have a code? ",
+    "requestCodeNoFaucet": " Request an invite from a friend with a Celo Wallet or ",
+    "requestCodeFromFaucet": "Request an invite at ",
+    "faucetLink": "celo.org/app",
+    "skip": "continue without."
   },
-  "enterFullName": "Please enter your first and last name",
   "fullName": "Full Name",
-  "InvitationCode": "Invitation Code",
-  "optIn": "Opt In",
-  "submitting": "Submitting ...",
   "importIt": "Restore Existing Wallet",
   "cancel": "Cancel",
   "important": "Important",

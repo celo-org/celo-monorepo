@@ -166,7 +166,8 @@ contract Attestations is
 
     require(
       state.unselectedRequests[msg.sender].blockNumber == 0 ||
-        isAttestationExpired(state.unselectedRequests[msg.sender].blockNumber),
+        isAttestationExpired(state.unselectedRequests[msg.sender].blockNumber) ||
+        !isAttestationRequestSelectable(state.unselectedRequests[msg.sender].blockNumber),
       "There exists an unexpired, unselected attestation request"
     );
 
@@ -501,7 +502,7 @@ contract Attestations is
   ) public view returns (address) {
     bytes32 codehash = keccak256(abi.encodePacked(identifier, account));
     address signer = Signatures.getSignerOfMessageHash(codehash, v, r, s);
-    address issuer = getAccounts().activeAttesttationSignerToAccount(signer);
+    address issuer = getAccounts().attestationSignerToAccount(signer);
 
     Attestation storage attestation = identifiers[identifier].attestations[account]
       .issuedAttestations[issuer];
@@ -570,7 +571,7 @@ contract Attestations is
     while (currentIndex < unselectedRequest.attestationsRequested) {
       seed = keccak256(abi.encodePacked(seed));
       validator = validatorAddressFromCurrentSet(uint256(seed) % numberValidators);
-      issuer = getAccounts().activeValidationSignerToAccount(validator);
+      issuer = getAccounts().validatorSignerToAccount(validator);
       Attestation storage attestation = state.issuedAttestations[issuer];
 
       // Attestation issuers can only be added if they haven't been already.
@@ -600,5 +601,13 @@ contract Attestations is
   function isAttestationCompletable(Attestation storage attestation) internal view returns (bool) {
     return (attestation.status == AttestationStatus.Incomplete &&
       !isAttestationExpired(attestation.blockNumber));
+  }
+
+  function isAttestationRequestSelectable(uint256 attestationRequestBlock)
+    internal
+    view
+    returns (bool)
+  {
+    return block.number < attestationRequestBlock.add(getRandom().randomnessBlockRetentionWindow());
   }
 }

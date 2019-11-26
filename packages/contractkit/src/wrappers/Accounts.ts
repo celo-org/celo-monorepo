@@ -1,3 +1,12 @@
+import {
+  hashMessageWithPrefix,
+  LocalSigner,
+  NativeSigner,
+  parseSignature,
+  Signature,
+  signedMessageToPublicKey,
+  Signer,
+} from '@celo/utils/lib/signatureUtils'
 import Web3 from 'web3'
 import { Address } from '../base'
 import { Accounts } from '../generated/types/Accounts'
@@ -9,11 +18,6 @@ import {
   toTransactionObject,
 } from '../wrappers/BaseWrapper'
 
-enum SignerRole {
-  Attestation,
-  Validation,
-  Vote,
-}
 /**
  * Contract for handling deposits needed for voting.
  */
@@ -40,12 +44,21 @@ export class AccountsWrapper extends BaseWrapper<Accounts> {
     this.contract.methods.getVoteSigner
   )
   /**
-   * Returns the validation signere for the specified account.
+   * Returns the validator signer for the specified account.
    * @param account The address of the account.
    * @return The address with which the account can register a validator or group.
    */
-  getValidationSigner: (account: string) => Promise<Address> = proxyCall(
-    this.contract.methods.getValidationSigner
+  getValidatorSigner: (account: string) => Promise<Address> = proxyCall(
+    this.contract.methods.getValidatorSigner
+  )
+
+  /**
+   * Returns the account address given the signer for voting
+   * @param signer Address that is authorized to sign the tx as voter
+   * @return The Account address
+   */
+  voteSignerToAccount: (signer: Address) => Promise<Address> = proxyCall(
+    this.contract.methods.voteSignerToAccount
   )
 
   /**
@@ -53,8 +66,18 @@ export class AccountsWrapper extends BaseWrapper<Accounts> {
    * @param signer Address that is authorized to sign the tx as validator
    * @return The Account address
    */
-  activeValidationSignerToAccount: (signer: Address) => Promise<Address> = proxyCall(
-    this.contract.methods.activeValidationSignerToAccount
+  validatorSignerToAccount: (signer: Address) => Promise<Address> = proxyCall(
+    this.contract.methods.validatorSignerToAccount
+  )
+
+  /**
+   * Returns the account associated with `signer`.
+   * @param signer The address of the account or previously authorized signer.
+   * @dev Fails if the `signer` is not an account or previously authorized signer.
+   * @return The associated account.
+   */
+  signerToAccount: (signer: Address) => Promise<Address> = proxyCall(
+    this.contract.methods.signerToAccount
   )
 
   /**
@@ -69,44 +92,110 @@ export class AccountsWrapper extends BaseWrapper<Accounts> {
    * @param address The address of the account
    * @return Returns `true` if account exists. Returns `false` otherwise.
    */
-  isSigner: (address: string) => Promise<boolean> = proxyCall(this.contract.methods.isAuthorized)
+  isSigner: (address: string) => Promise<boolean> = proxyCall(
+    this.contract.methods.isAuthorizedSigner
+  )
 
   /**
    * Authorize an attestation signing key on behalf of this account to another address.
-   * @param account Address of the active account.
-   * @param attestationSigner The address of the signing key to authorize.
+   * @param signer The address of the signing key to authorize.
+   * @param proofOfSigningKeyPossession The account address signed by the signer address.
    * @return A CeloTransactionObject
    */
   async authorizeAttestationSigner(
-    account: Address,
-    attestationSigner: Address
+    signer: Address,
+    proofOfSigningKeyPossession: Signature
   ): Promise<CeloTransactionObject<void>> {
-    return this.authorizeSigner(SignerRole.Attestation, account, attestationSigner)
+    return toTransactionObject(
+      this.kit,
+      this.contract.methods.authorizeAttestationSigner(
+        signer,
+        proofOfSigningKeyPossession.v,
+        proofOfSigningKeyPossession.r,
+        proofOfSigningKeyPossession.s
+      )
+    )
   }
   /**
    * Authorizes an address to sign votes on behalf of the account.
-   * @param account Address of the active account.
-   * @param voteSigner The address of the vote signing key to authorize.
+   * @param signer The address of the vote signing key to authorize.
+   * @param proofOfSigningKeyPossession The account address signed by the signer address.
    * @return A CeloTransactionObject
    */
   async authorizeVoteSigner(
-    account: Address,
-    voteSigner: Address
+    signer: Address,
+    proofOfSigningKeyPossession: Signature
   ): Promise<CeloTransactionObject<void>> {
-    return this.authorizeSigner(SignerRole.Vote, account, voteSigner)
+    return toTransactionObject(
+      this.kit,
+      this.contract.methods.authorizeVoteSigner(
+        signer,
+        proofOfSigningKeyPossession.v,
+        proofOfSigningKeyPossession.r,
+        proofOfSigningKeyPossession.s
+      )
+    )
   }
 
   /**
    * Authorizes an address to sign consensus messages on behalf of the account.
-   * @param account Address of the active account.
-   * @param validationSigner The address of the signing key to authorize.
+   * @param signer The address of the signing key to authorize.
+   * @param proofOfSigningKeyPossession The account address signed by the signer address.
    * @return A CeloTransactionObject
    */
-  async authorizeValidationSigner(
-    account: Address,
-    validationSigner: Address
+  async authorizeValidatorSigner(
+    signer: Address,
+    proofOfSigningKeyPossession: Signature
   ): Promise<CeloTransactionObject<void>> {
-    return this.authorizeSigner(SignerRole.Validation, account, validationSigner)
+    const validators = await this.kit.contracts.getValidators()
+    const account = this.kit.defaultAccount || (await this.kit.web3.eth.getAccounts())[0]
+    if (await validators.isValidator(account)) {
+      const message = this.kit.web3.utils.soliditySha3({ type: 'address', value: account })
+      const prefixedMsg = hashMessageWithPrefix(message)
+      const pubKey = signedMessageToPublicKey(
+        prefixedMsg,
+        proofOfSigningKeyPossession.v,
+        proofOfSigningKeyPossession.r,
+        proofOfSigningKeyPossession.s
+      )
+      return toTransactionObject(
+        this.kit,
+        this.contract.methods.authorizeValidatorSigner(
+          signer,
+          pubKey,
+          proofOfSigningKeyPossession.v,
+          proofOfSigningKeyPossession.r,
+          // @ts-ignore Typescript does not support overloading.
+          proofOfSigningKeyPossession.s
+        )
+      )
+    } else {
+      return toTransactionObject(
+        this.kit,
+        this.contract.methods.authorizeValidatorSigner(
+          signer,
+          proofOfSigningKeyPossession.v,
+          proofOfSigningKeyPossession.r,
+          proofOfSigningKeyPossession.s
+        )
+      )
+    }
+  }
+
+  async generateProofOfSigningKeyPossession(account: Address, signer: Address) {
+    return this.getParsedSignatureOfAddress(
+      account,
+      signer,
+      NativeSigner(this.kit.web3.eth.sign, signer)
+    )
+  }
+
+  async generateProofOfSigningKeyPossessionLocally(
+    account: Address,
+    signer: Address,
+    privateKey: string
+  ) {
+    return this.getParsedSignatureOfAddress(account, signer, LocalSigner(privateKey))
   }
 
   /**
@@ -168,25 +257,14 @@ export class AccountsWrapper extends BaseWrapper<Accounts> {
    */
   setWalletAddress = proxySend(this.kit, this.contract.methods.setWalletAddress)
 
-  private authorizeFns = {
-    [SignerRole.Attestation]: this.contract.methods.authorizeAttestationSigner,
-    [SignerRole.Validation]: this.contract.methods.authorizeValidationSigner,
-    [SignerRole.Vote]: this.contract.methods.authorizeVoteSigner,
-  }
-
-  private async authorizeSigner(role: SignerRole, account: Address, signer: Address) {
-    const sig = await this.getParsedSignatureOfAddress(account, signer)
-    // TODO(asa): Pass default tx "from" argument.
-    return toTransactionObject(this.kit, this.authorizeFns[role](signer, sig.v, sig.r, sig.s))
-  }
-
-  private async getParsedSignatureOfAddress(address: Address, signer: string) {
+  parseSignatureOfAddress(address: Address, signer: string, signature: string) {
     const hash = Web3.utils.soliditySha3({ type: 'address', value: address })
-    const signature = (await this.kit.web3.eth.sign(hash, signer)).slice(2)
-    return {
-      r: `0x${signature.slice(0, 64)}`,
-      s: `0x${signature.slice(64, 128)}`,
-      v: Web3.utils.hexToNumber(signature.slice(128, 130)) + 27,
-    }
+    return parseSignature(hash, signature, signer)
+  }
+
+  private async getParsedSignatureOfAddress(address: Address, signer: string, signerFn: Signer) {
+    const hash = Web3.utils.soliditySha3({ type: 'address', value: address })
+    const signature = await signerFn.sign(hash)
+    return parseSignature(hash, signature, signer)
   }
 }

@@ -1,19 +1,11 @@
-import { entries, flatMap, range } from 'lodash'
+import { entries, range } from 'lodash'
 import sleep from 'sleep-promise'
 import { getKubernetesClusterRegion, switchToClusterFromEnv } from './cluster'
 import { EnvTypes, envVar, fetchEnv, fetchEnvOrFallback, isProduction } from './env-utils'
 import { ensureAuthenticatedGcloudAccount } from './gcloud_utils'
 import { generateGenesisFromEnv } from './generate_utils'
-import { OG_ACCOUNTS } from './genesis_constants'
 import { getStatefulSetReplicas, scaleResource } from './kubernetes'
-import {
-  execCmd,
-  execCmdWithExitOnFailure,
-  getVerificationPoolRewardsURL,
-  getVerificationPoolSMSURL,
-  outputIncludes,
-  switchToProjectFromEnv,
-} from './utils'
+import { execCmd, execCmdWithExitOnFailure, outputIncludes, switchToProjectFromEnv } from './utils'
 
 const CLOUDSQL_SECRET_NAME = 'blockscout-cloudsql-credentials'
 const BACKUP_GCS_SECRET_NAME = 'backup-blockchain-credentials'
@@ -514,18 +506,8 @@ async function helmParameters(celoEnv: string) {
       ]
     : []
 
-  const gethAccountParameters = flatMap(OG_ACCOUNTS, (account) => [
-    `--set geth.account.${account.name}.name=${account.name}`,
-    `--set geth.account.${account.name}.privateKey=${account.privateKey}`,
-    `--set geth.account.${account.name}.address=${account.address}`,
-  ])
-
   return [
     `--set domain.name=${fetchEnv('CLUSTER_DOMAIN_NAME')}`,
-    `--set geth.miner.verificationpool=${fetchEnvOrFallback(
-      'VERIFICATION_POOL_URL',
-      getVerificationPoolSMSURL(celoEnv)
-    )}`,
     `--set geth.verbosity=${fetchEnvOrFallback('GETH_VERBOSITY', '4')}`,
     `--set geth.node.cpu_request=${fetchEnv('GETH_NODE_CPU_REQUEST')}`,
     `--set geth.node.memory_request=${fetchEnv('GETH_NODE_MEMORY_REQUEST')}`,
@@ -540,10 +522,6 @@ async function helmParameters(celoEnv: string) {
     `--set cluster.name=${fetchEnv('KUBERNETES_CLUSTER_NAME')}`,
     `--set bucket=${bucketName}`,
     `--set project.name=${fetchEnv('TESTNET_PROJECT_NAME')}`,
-    `--set verification.rewardsUrl=${fetchEnvOrFallback(
-      'VERIFICATION_REWARDS_URL',
-      getVerificationPoolRewardsURL(celoEnv)
-    )}`,
     `--set celotool.image.repository=${fetchEnv('CELOTOOL_DOCKER_IMAGE_REPOSITORY')}`,
     `--set celotool.image.tag=${fetchEnv('CELOTOOL_DOCKER_IMAGE_TAG')}`,
     `--set promtosd.scrape_interval=${fetchEnv('PROMTOSD_SCRAPE_INTERVAL')}`,
@@ -562,7 +540,6 @@ async function helmParameters(celoEnv: string) {
     `--set mnemonic="${fetchEnv('MNEMONIC')}"`,
     `--set contracts.cron_jobs.enabled=${fetchEnv('CONTRACT_CRONJOBS_ENABLED')}`,
     `--set geth.account.secret="${fetchEnv('GETH_ACCOUNT_SECRET')}"`,
-    `--set ethstats.webSocketSecret="${fetchEnv('ETHSTATS_WEBSOCKETSECRET')}"`,
     `--set geth.ping_ip_from_packet=${fetchEnvOrFallback('PING_IP_FROM_PACKET', 'false')}`,
     `--set geth.in_memory_discovery_table=${fetchEnvOrFallback(
       'IN_MEMORY_DISCOVERY_TABLE',
@@ -570,7 +547,6 @@ async function helmParameters(celoEnv: string) {
     )}`,
     ...productionTagOverrides,
     ...(await helmIPParameters(celoEnv)),
-    ...gethAccountParameters,
   ]
 }
 

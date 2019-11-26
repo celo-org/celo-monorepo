@@ -6,7 +6,8 @@ import { Flags } from '../../utils/command'
 import { LockedGoldArgs } from '../../utils/lockedgold'
 
 export default class Unlock extends BaseCommand {
-  static description = 'Unlocks Celo Gold, which can be withdrawn after the unlocking period.'
+  static description =
+    'Unlocks Celo Gold, which can be withdrawn after the unlocking period. Unlocked gold will appear as a "pending withdrawal" until the unlocking period is over, after which it can be withdrawn via "lockedgold:withdraw".'
 
   static flags = {
     ...BaseCommand.flags,

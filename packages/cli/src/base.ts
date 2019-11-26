@@ -1,5 +1,7 @@
 import { ContractKit, newKitFromWeb3 } from '@celo/contractkit'
+import { CeloProvider } from '@celo/contractkit/lib/providers/celo-provider'
 import { Command, flags } from '@oclif/command'
+import { ParserOutput } from '@oclif/parser/lib/parse'
 import Web3 from 'web3'
 import { getNodeUrl } from './utils/config'
 import { injectDebugProvider } from './utils/eth-debug-provider'
@@ -9,6 +11,7 @@ export abstract class BaseCommand extends Command {
   static flags = {
     logLevel: flags.string({ char: 'l', hidden: true }),
     help: flags.help({ char: 'h', hidden: true }),
+    privateKey: flags.string({ hidden: true }),
   }
 
   // This specifies whether the node needs to be synced before the command
@@ -39,6 +42,11 @@ export abstract class BaseCommand extends Command {
     if (!this._kit) {
       this._kit = newKitFromWeb3(this.web3)
     }
+
+    const res: ParserOutput<any, any> = this.parse()
+    if (res.flags && res.flags.privateKey) {
+      this._kit.addAccount(res.flags.privateKey)
+    }
     return this._kit
   }
 
@@ -59,8 +67,16 @@ export abstract class BaseCommand extends Command {
 
   finally(arg: Error | undefined): Promise<any> {
     try {
-      // Close the web3 connection or the CLI hangs forever.
+      // If local-signing accounts are added, the debug wrapper is itself wrapped
+      // with a CeloProvider. This class has a stop() function that handles closing
+      // the connection for underlying providers
+      if (this.web3.currentProvider instanceof CeloProvider) {
+        const celoProvider = this.web3.currentProvider as CeloProvider
+        celoProvider.stop()
+      }
+
       if (this._originalProvider && this._originalProvider.hasOwnProperty('connection')) {
+        // Close the web3 connection or the CLI hangs forever.
         const connection = this._originalProvider.connection
         if (connection.hasOwnProperty('_connection')) {
           connection._connection.close()

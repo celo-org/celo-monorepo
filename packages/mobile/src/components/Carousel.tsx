@@ -25,7 +25,7 @@ export interface CarouselItem {
 
 function renderItem({ item, index }: { item: CarouselItem; index: number }) {
   return (
-    <View style={{ position: 'relative' }}>
+    <View>
       <BoxShadow setting={shadowOpt}>
         <View style={styles.itemContainer}>
           {item.icon}
@@ -43,7 +43,7 @@ function Carousel(props: OwnProps) {
   return (
     <View style={props.containerStyle}>
       {/* For some reason the carousel is adding a bunch of item height, wrapping to cut it off*/}
-      <View style={{ height: ITEM_HEIGHT }}>
+      <View style={styles.carouselContainer}>
         <RNCarousel
           ref={ref}
           data={props.items}
@@ -55,6 +55,7 @@ function Carousel(props: OwnProps) {
           inactiveSlideScale={0.9}
           inactiveSlideOpacity={1}
           onSnapToItem={setActiveItem}
+          removeClippedSubviews={false}
         />
       </View>
       <Pagination
@@ -97,13 +98,21 @@ const styles = StyleSheet.create({
     height: ITEM_HEIGHT - 6,
     alignItems: 'center',
     justifyContent: 'center',
-    // TODO style shadow right on iOS
+    // Android only
     elevation: 1,
+    // iOS only
+    shadowOpacity: 0.2,
+    shadowRadius: 4,
+    shadowColor: '#000000',
+    shadowOffset: { height: 4, width: 4 },
   },
   itemText: {
     ...fontStyles.bodyLarge,
     ...fontStyles.center,
     marginTop: 20,
+  },
+  carouselContainer: {
+    height: ITEM_HEIGHT,
   },
   paginationContainer: {
     marginTop: 5,

@@ -1,7 +1,7 @@
 {
   "name": "@celo/celocli",
   "description": "CLI Tool for transacting with the Celo protocol",
-  "version": "0.0.29",
+  "version": "0.0.30-beta",
   "author": "Celo",
   "license": "Apache-2.0",
   "repository": "celo-org/celo-monorepo",
@@ -26,7 +26,7 @@
     "docs": "yarn oclif-dev readme --multi --dir=../docs/command-line-interface && yarn prettier ../docs/command-line-interface/*.md --write",
     "lint": "tslint -c tslint.json --project tsconfig.json",
     "prepack": "yarn run build && oclif-dev manifest && oclif-dev readme",
-    "test:reset": "yarn --cwd ../protocol devchain generate .devchain",
+    "test:reset": "yarn --cwd ../protocol devchain generate .devchain --migration_override ../dev-utils/src/migration-override.json",
     "test:livechain": "yarn --cwd ../protocol devchain run .devchain",
     "test": "TZ=UTC jest --runInBand"
   },
@@ -38,6 +38,7 @@
     "@oclif/plugin-help": "^2",
     "bip32": "^1.0.2",
     "bip39": "^2.5.0",
+    "bls12377js": "https://github.com/celo-org/bls12377js#ea09eba5c54fe63617af494a0c198fcc47582e0c",
     "chalk": "^2.4.2",
     "cli-table": "^0.3.1",
     "cli-ux": "^5.3.1",
@@ -54,6 +55,7 @@
   },
   "devDependencies": {
     "@celo/dev-cli": "^2.0.3",
+    "@celo/dev-utils": "0.0.1-dev",
     "@types/bip32": "^1.0.1",
     "@types/bip39": "^2.4.2",
     "@types/cli-table": "^0.3.0",
@@ -77,16 +79,16 @@
     "commands": "./lib/commands",
     "topics": {
       "account": {
-        "description": "Manage your account, send and receive Celo Gold and Celo Dollars"
+        "description": "Manage your account, keys, and metadata"
       },
       "config": {
         "description": "Configure CLI options which persist across commands"
       },
       "election": {
-        "description": "View and manage validator elections"
+        "description": "Participate in and view the state of Validator Elections"
       },
       "exchange": {
-        "description": "Commands for interacting with the Exchange"
+        "description": "Exchange Celo Dollars and Celo Gold via the stability mechanism"
       },
       "lockedgold": {
         "description": "View and manage locked Celo Gold"
@@ -94,11 +96,14 @@
       "node": {
         "description": "Manage your full node"
       },
+      "transfer": {
+        "description": "Transfer Celo Gold and Celo Dollars"
+      },
       "validator": {
-        "description": "View and manage validators"
+        "description": "View and manage Validators"
       },
       "validatorgroup": {
-        "description": "View and manage validator groups"
+        "description": "View and manage Validator Groups"
       }
     },
     "bin": "celocli",

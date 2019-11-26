@@ -1,36 +1,39 @@
 ---
-description: Manage your account, send and receive Celo Gold and Celo Dollars
+description: Manage your account, keys, and metadata
 ---
 
 ## Commands
 
 ### Authorize
 
-Authorize an attestation, validation or vote signing key
+Keep your locked Gold more secure by authorizing alternative keys to be used for signing attestations, voting, or validating. By doing so, you can continue to participate in the protocol why keeping the key with access to your locked Gold in cold storage. You must include a "proof-of-possession" of the key being authorized, which can be generated with the "account:proof-of-possession" command.
 
 ```
 USAGE
   $ celocli account:authorize
 
 OPTIONS
-  -r, --role=vote|validation|attestation             Role to delegate
-  --from=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) Account Address
-  --to=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d    (required) Account Address
+  -r, --role=vote|validator|attestation                (required) Role to delegate
+  --from=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d    (required) Account Address
+  --pop=pop                                            (required) Proof-of-possession of the signer key
+  --signer=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) Account Address
 
 EXAMPLE
-  authorize --from 0x5409ED021D9299bf6814279A6A1411A7e866A631 --role vote --to
-  0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d
+  authorize --from 0x5409ED021D9299bf6814279A6A1411A7e866A631 --role vote --signer
+  0x6ecbe1db9ef729cbe972c83fb886247691fb6beb --pop
+  0x1b9fca4bbb5bfb1dbe69ef1cddbd9b4202dcb6b134c5170611e1e36ecfa468d7b46c85328d504934fce6c2a1571603a50ae224d2b32685e84d4d
+  1a1eebad8452eb
 ```
 
 _See code: [packages/cli/src/commands/account/authorize.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/account/authorize.ts)_
 
 ### Balance
 
-View Celo Dollar and Gold balances given account address
+View Celo Dollar and Gold balances for an address
 
 ```
 USAGE
-  $ celocli account:balance ACCOUNT
+  $ celocli account:balance ADDRESS
 
 EXAMPLE
   balance 0x5409ed021d9299bf6814279a6a1411a7e866a631
@@ -197,24 +200,6 @@ EXAMPLE
 
 _See code: [packages/cli/src/commands/account/isvalidator.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/account/isvalidator.ts)_
 
-### Lock
-
-Locks Celo Gold to be used in governance and validator elections.
-
-```
-USAGE
-  $ celocli account:lock
-
-OPTIONS
-  --from=from    (required)
-  --value=value  (required) unit amount of Celo Gold (cGLD)
-
-EXAMPLE
-  lock --from 0x47e172F6CfB6c7D01C1574fa3E2Be7CC73269D95 --value 1000000000000000000
-```
-
-_See code: [packages/cli/src/commands/account/lock.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/account/lock.ts)_
-
 ### New
 
 Creates a new account
@@ -229,9 +214,33 @@ EXAMPLE
 
 _See code: [packages/cli/src/commands/account/new.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/account/new.ts)_
 
+### Proof-of-possession
+
+Generate proof-of-possession to be used to authorize a signer. See the "account:authorize" command for more details.
+
+```
+USAGE
+  $ celocli account:proof-of-possession
+
+OPTIONS
+  --account=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) Address of the account that needs to proove
+                                                        possession of the signer key.
+
+  --privateKey=privateKey                               Optional. The signer private key, only necessary if the key is
+                                                        not being managed by a locally running node.
+
+  --signer=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d   (required) Address of the signer key to prove possession of.
+
+EXAMPLE
+  proof-of-possession --account 0x5409ed021d9299bf6814279a6a1411a7e866a631 --signer
+  0x6ecbe1db9ef729cbe972c83fb886247691fb6beb
+```
+
+_See code: [packages/cli/src/commands/account/proof-of-possession.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/account/proof-of-possession.ts)_
+
 ### Register
 
-Register an account
+Register an account on-chain. This allows you to lock Gold, which is a pre-requisite for registering a Validator or Group, participating in Validator elections and on-chain Governance, and earning epoch rewards.
 
 ```
 USAGE
@@ -239,10 +248,11 @@ USAGE
 
 OPTIONS
   --from=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) Account Address
-  --name=name                                        (required)
+  --name=name
 
-EXAMPLE
-  register
+EXAMPLES
+  register --from 0x5409ed021d9299bf6814279a6a1411a7e866a631
+  register --from 0x5409ed021d9299bf6814279a6a1411a7e866a631 --name test-account
 ```
 
 _See code: [packages/cli/src/commands/account/register.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/account/register.ts)_
@@ -281,46 +291,6 @@ EXAMPLE
 ```
 
 _See code: [packages/cli/src/commands/account/show-metadata.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/account/show-metadata.ts)_
-
-### Transferdollar
-
-Transfer Celo Dollars
-
-```
-USAGE
-  $ celocli account:transferdollar
-
-OPTIONS
-  --amountInWei=amountInWei                          (required) Amount to transfer (in wei)
-  --from=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) Address of the sender
-  --to=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d    (required) Address of the receiver
-
-EXAMPLE
-  transferdollar --from 0xa0Af2E71cECc248f4a7fD606F203467B500Dd53B --to 0x5409ed021d9299bf6814279a6a1411a7e866a631
-  --amountInWei 1
-```
-
-_See code: [packages/cli/src/commands/account/transferdollar.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/account/transferdollar.ts)_
-
-### Transfergold
-
-Transfer gold
-
-```
-USAGE
-  $ celocli account:transfergold
-
-OPTIONS
-  --amountInWei=amountInWei                          (required) Amount to transfer (in wei)
-  --from=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) Address of the sender
-  --to=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d    (required) Address of the receiver
-
-EXAMPLE
-  transfergold --from 0xa0Af2E71cECc248f4a7fD606F203467B500Dd53B --to 0x5409ed021d9299bf6814279a6a1411a7e866a631
-  --amountInWei 1
-```
-
-_See code: [packages/cli/src/commands/account/transfergold.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/account/transfergold.ts)_
 
 ### Unlock
 
