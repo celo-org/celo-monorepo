@@ -68,10 +68,15 @@
 - [Introduction](command-line-interface/introduction.md)
 - [Config](command-line-interface/config.md)
 - [Account](command-line-interface/account.md)
+- [Election](command-line-interface/election.md)
 - [Exchange](command-line-interface/exchange.md)
 - [Locked Gold](command-line-interface/lockedgold.md)
+- [Network](command-line-interface/network.md)
+- [Node](command-line-interface/node.md)
+- [Transfer](command-line-interface/transfer.md)
 - [Validator Node](command-line-interface/validator.md)
 - [Validator Groups](command-line-interface/validatorgroup.md)
+- [Help](command-line-interface/help.md)
 
 ## Community
 
