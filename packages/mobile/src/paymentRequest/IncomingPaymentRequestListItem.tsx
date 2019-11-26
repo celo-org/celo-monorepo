@@ -51,7 +51,7 @@ export class PaymentRequestListItem extends React.Component<Props> {
     const { id } = this.props
     this.props.updatePaymentRequestStatus(id.toString(), PaymentRequestStatus.COMPLETED)
     Logger.showMessage(this.props.t('requestPaid'))
-    CeloAnalytics.track(CustomEventNames.request_payment_pay)
+    CeloAnalytics.track(CustomEventNames.incoming_request_payment_pay)
     this.onFinalized()
   }
 
@@ -59,12 +59,12 @@ export class PaymentRequestListItem extends React.Component<Props> {
     const { id } = this.props
     this.props.updatePaymentRequestStatus(id.toString(), PaymentRequestStatus.DECLINED)
     Logger.showMessage(this.props.t('requestDeclined'))
-    CeloAnalytics.track(CustomEventNames.request_payment_decline)
+    CeloAnalytics.track(CustomEventNames.incoming_request_payment_decline)
     this.onFinalized()
   }
 
   onFinalized = () => {
-    navigate(Screens.PaymentRequestListScreen)
+    navigate(Screens.IncomingPaymentRequestListScreen)
   }
 
   getCTA = () => {

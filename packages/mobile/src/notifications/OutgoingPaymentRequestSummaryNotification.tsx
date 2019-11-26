@@ -51,8 +51,8 @@ export class PaymentRequestSummaryNotification extends React.Component<Props> {
       {
         text: this.props.t('review'),
         onPress: () => {
-          CeloAnalytics.track(CustomEventNames.request_payment_review)
-          navigate(Stacks.RequestStack)
+          CeloAnalytics.track(CustomEventNames.outgoing_request_payment_review)
+          navigate(Stacks.OutgoingRequestStack)
         },
       },
     ]
@@ -75,8 +75,8 @@ export class PaymentRequestSummaryNotification extends React.Component<Props> {
   getTitle() {
     const { t } = this.props
     return this.getTotal() > 1
-      ? t('paymentRequestWithCount', { count: this.getTotal() })
-      : t('paymentRequest')
+      ? t('outgoingPaymentRequestWithCount', { count: this.getTotal() })
+      : t('outgoingPaymentRequest')
   }
 
   getRequesterRecipient = (requesterE164Number: string) => {

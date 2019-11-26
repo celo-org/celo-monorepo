@@ -1,9 +1,9 @@
-import { getPaymentRequests } from 'src/account/selectors'
+import { getIncomingPaymentRequests } from 'src/account/selectors'
 import { PaymentRequestStatus } from 'src/account/types'
 import { paymentRequestDouble } from 'src/paymentRequest/__mocks__'
 
 describe('selectors', () => {
-  describe(getPaymentRequests, () => {
+  describe(getIncomingPaymentRequests, () => {
     it('excludes declined and completed requests', () => {
       const state: any = {
         account: {
@@ -13,7 +13,7 @@ describe('selectors', () => {
           ],
         },
       }
-      expect(getPaymentRequests(state)).toEqual([])
+      expect(getIncomingPaymentRequests(state)).toEqual([])
     })
 
     it('returns requested payments', () => {
@@ -30,7 +30,7 @@ describe('selectors', () => {
         },
       }
 
-      expect(getPaymentRequests(state)).toEqual([goodRequest])
+      expect(getIncomingPaymentRequests(state)).toEqual([goodRequest])
     })
   })
 })

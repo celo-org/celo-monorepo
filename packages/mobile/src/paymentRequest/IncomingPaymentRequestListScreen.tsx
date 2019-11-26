@@ -7,16 +7,16 @@ import { WithNamespaces, withNamespaces } from 'react-i18next'
 import { ScrollView, StyleSheet, View } from 'react-native'
 import SafeAreaView from 'react-native-safe-area-view'
 import { connect } from 'react-redux'
-import { getPaymentRequests } from 'src/account/selectors'
+import { getIncomingPaymentRequests } from 'src/account/selectors'
 import { PaymentRequest } from 'src/account/types'
 import { updatePaymentRequestStatus } from 'src/firebase/actions'
 import i18n, { Namespaces } from 'src/i18n'
 import { fetchPhoneAddresses } from 'src/identity/actions'
 import { e164NumberToAddressSelector, E164NumberToAddressType } from 'src/identity/reducer'
 import { headerWithBackButton } from 'src/navigator/Headers'
+import IncomingPaymentRequestListItem from 'src/paymentRequest/IncomingPaymentRequestListItem'
 import PaymentRequestBalance from 'src/paymentRequest/PaymentRequestBalance'
 import PaymentRequestListEmpty from 'src/paymentRequest/PaymentRequestListEmpty'
-import PaymentRequestListItem from 'src/paymentRequest/PaymentRequestListItem'
 import { getRecipientFromPaymentRequest } from 'src/paymentRequest/utils'
 import { NumberToRecipient } from 'src/recipients/recipient'
 import { recipientCacheSelector } from 'src/recipients/reducer'
@@ -39,7 +39,7 @@ interface DispatchProps {
 
 const mapStateToProps = (state: RootState): StateProps => ({
   dollarBalance: state.stableToken.balance,
-  paymentRequests: getPaymentRequests(state),
+  paymentRequests: getIncomingPaymentRequests(state),
   e164PhoneNumberAddressMapping: e164NumberToAddressSelector(state),
   recipientCache: recipientCacheSelector(state),
 })
@@ -49,7 +49,7 @@ type Props = WithNamespaces & StateProps & DispatchProps
 export class PaymentRequestListScreen extends React.Component<Props> {
   static navigationOptions = () => ({
     ...headerWithBackButton,
-    headerTitle: i18n.t('paymentRequestFlow:paymentRequests'),
+    headerTitle: i18n.t('paymentRequestFlow:incomingPaymentRequests'),
   })
 
   renderRequest = (request: PaymentRequest, key: number, allRequests: PaymentRequest[]) => {
@@ -58,7 +58,7 @@ export class PaymentRequestListScreen extends React.Component<Props> {
 
     return (
       <View key={key}>
-        <PaymentRequestListItem
+        <IncomingPaymentRequestListItem
           id={request.uid || ''}
           amount={request.amount}
           updatePaymentRequestStatus={this.props.updatePaymentRequestStatus}
@@ -75,7 +75,6 @@ export class PaymentRequestListScreen extends React.Component<Props> {
       <SafeAreaView style={styles.container}>
         <DisconnectBanner />
         <PaymentRequestBalance dollarBalance={this.props.dollarBalance} />
-        <SectionHeader text={this.props.t('requests')} />
         {this.props.paymentRequests.length > 0 ? (
           <ScrollView>
             <View style={[componentStyles.roundedBorder, styles.scrollArea]}>
