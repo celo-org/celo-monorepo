@@ -9,6 +9,8 @@
     - [Pull the Celo Docker image](#pull-the-celo-docker-image)
     - [Create accounts](#create-accounts)
     - [Deploy the Validator and Proxy nodes](#deploy-the-validator-and-proxy-nodes)
+      - [Running the Proxy](#running-the-proxy)
+      - [Running the Validator](#running-the-validator)
     - [Running the Attestation Service](#running-the-attestation-service)
     - [Stop the containers](#stop-the-containers)
     - [Running the Docker containers in the background](#running-the-docker-containers-in-the-background)
@@ -177,13 +179,17 @@ docker run -v $PWD/proxy:/root/.celo --entrypoint cp $CELO_IMAGE /celo/static-no
 docker run -v $PWD/validator:/root/.celo --entrypoint cp $CELO_IMAGE /celo/static-nodes.json /root/.celo/
 ```
 
+#### Running the Proxy
+
 At this point we are ready to start up the Proxy:
 
 ```bash
 docker run --name celo-proxy -d --restart always -p 8555:8545 -p 8556:8546 -p 30313:30303 -p 30313:30303/udp -p 30503:30503 -p 30503:30503/udp -v $PWD/proxy:/root/.celo $CELO_IMAGE --verbosity 3 --networkid $NETWORK_ID --syncmode full --rpc --rpcaddr 0.0.0.0 --rpcapi eth,net,web3,debug,admin,personal,istanbul --minerthreads=10 --maxpeers 1100 --etherbase=$CELO_PROXY_ADDRESS --proxy.proxy --proxy.proxiedvalidatoraddress $CELO_VALIDATOR_ADDRESS --proxy.internalendpoint :30503
 ```
 
-Now we need to obtain the Proxy enode and ip addresses, running the following commands:
+#### Running the Validator
+
+Having the Proxy up and running, we need to obtain the Proxy enode and ip addresses, running the following commands:
 
 ```bash
 export PROXY_ENODE=$(docker exec celo-proxy geth --exec "admin.nodeInfo['enode'].split('//')[1].split('@')[0]" attach | tr -d '"')
