@@ -6,6 +6,8 @@ Reads and verifies account claims.
 
 Reads the exchange rate into DB.
 
+This script reads data directly into the DB that Blockscout uses, so it needs to be ran on the same machine as Blockscout.
+
 ## Environment variables
 
 For Postgres: `PG_USER` and `PG_PASSWORD`
