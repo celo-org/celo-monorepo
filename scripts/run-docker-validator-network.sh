@@ -1,4 +1,4 @@
-#!/usr/bin/bash 
+#!/bin/bash
 set -euo pipefail
 
 export LC_ALL=en_US.UTF-8
@@ -107,7 +107,7 @@ if [[ $COMMAND == *"accounts"* ]]; then
 
     echo -e "* Creating addresses ..."
     cd $DATA_DIR
-    
+
     export CELO_VALIDATOR_ADDRESS=$(docker run -v $PWD/validator:/root/.celo --entrypoint /bin/sh -it $CELO_IMAGE -c " printf '%s\n' $DEFAULT_PASSWORD $DEFAULT_PASSWORD | geth account new " |tail -1| cut -d'{' -f 2| tr -cd "[:alnum:]\n" )
     export CELO_VALIDATOR_GROUP_ADDRESS=$(docker run -v $PWD/validator:/root/.celo --entrypoint /bin/sh -it $CELO_IMAGE -c " printf '%s\n' $DEFAULT_PASSWORD $DEFAULT_PASSWORD | geth account new " |tail -1| cut -d'{' -f 2| tr -cd "[:alnum:]\n" )
     export CELO_PROXY_ADDRESS=$(docker run -v $PWD/proxy:/root/.celo --entrypoint /bin/sh -it $CELO_IMAGE -c " printf '%s\n' $DEFAULT_PASSWORD $DEFAULT_PASSWORD | geth account new " |tail -1| cut -d'{' -f 2| tr -cd "[:alnum:]\n" )
@@ -116,7 +116,7 @@ if [[ $COMMAND == *"accounts"* ]]; then
     echo -e "\tCELO_VALIDATOR_GROUP_ADDRESS=$CELO_VALIDATOR_ADDRESS"
     echo -e "\tCELO_PROXY_ADDRESS=$CELO_VALIDATOR_ADDRESS"
     
-    export CELO_VALIDATOR_POP=$(docker run -v $PWD/validator:/root/.celo --entrypoint /bin/sh -it $CELO_IMAGE -c " printf '%s\n' $DEFAULT_PASSWORD | geth account proof-of-possession $CELO_VALIDATOR_ADDRESS "| tail -1| cut -d' ' -f 3| tr -cd "[:alnum:]\n" )
+    export CELO_VALIDATOR_POP=$(docker run -v $PWD/validator:/root/.celo --entrypoint /bin/sh -it $CELO_IMAGE -c " printf '%s\n' $DEFAULT_PASSWORD $DEFAULT_PASSWORD | geth account proof-of-possession $CELO_VALIDATOR_ADDRESS "| tail -1| cut -d' ' -f 3| tr -cd "[:alnum:]\n" )
 
     echo -e "\tCELO_VALIDATOR_POP=$CELO_VALIDATOR_POP"
 
@@ -133,8 +133,8 @@ if [[ $COMMAND == *"deploy"* ]]; then
     docker run -v $PWD/validator:/root/.celo $CELO_IMAGE init /root/.celo/genesis.json
     
     echo -e "\tSetting up nodekey"
-    docker run -v $PWD/proxy:/root/.celo --entrypoint /bin/sh -it $CELO_IMAGE -c "printf '%s\n' $DEFAULT_PASSWORD | geth account set-node-key $CELO_PROXY_ADDRESS"
-    docker run -v $PWD/validator:/root/.celo --entrypoint /bin/sh -it $CELO_IMAGE -c "printf '%s\n' $DEFAULT_PASSWORD | geth account set-node-key $CELO_VALIDATOR_ADDRESS"
+    docker run -v $PWD/proxy:/root/.celo --entrypoint /bin/sh -it $CELO_IMAGE -c " printf '%s\n' $DEFAULT_PASSWORD $DEFAULT_PASSWORD | geth account set-node-key $CELO_PROXY_ADDRESS"
+    docker run -v $PWD/validator:/root/.celo --entrypoint /bin/sh -it $CELO_IMAGE -c " printf '%s\n' $DEFAULT_PASSWORD $DEFAULT_PASSWORD | geth account set-node-key $CELO_VALIDATOR_ADDRESS"
     
 fi
 
