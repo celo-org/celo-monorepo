@@ -12,4 +12,4 @@ ENV NPM_CONFIG_PREFIX=/home/celo/.npm-global
 
 WORKDIR /home/celo/
 
-RUN npm install -g @celo/celocli@0.0.30
+RUN npm install -g @celo/celocli@0.0.30-beta2

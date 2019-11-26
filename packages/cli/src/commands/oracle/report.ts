@@ -2,7 +2,7 @@ import { CeloContract } from '@celo/contractkit'
 import { flags } from '@oclif/command'
 import BigNumber from 'bignumber.js'
 import { BaseCommand } from '../../base'
-import { displaySendTx } from '../../utils/cli'
+import { displaySendTx, failWith } from '../../utils/cli'
 import { Flags } from '../../utils/command'
 
 export default class ReportPrice extends BaseCommand {
@@ -47,6 +47,12 @@ export default class ReportPrice extends BaseCommand {
       const multiplier = new BigNumber(10).pow(numerator.decimalPlaces())
       numerator = numerator.multipliedBy(multiplier)
       denominator = denominator.multipliedBy(multiplier)
+    }
+
+    // Give a sensible error if this account is not an oracle
+    const isOracle = await sortedOracles.isOracle(res.args.token, res.flags.from)
+    if (!isOracle) {
+      failWith(`Account ${res.flags.from} is not an oracle for ${res.args.token}`)
     }
 
     await displaySendTx(

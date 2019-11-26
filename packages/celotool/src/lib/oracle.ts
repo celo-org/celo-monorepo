@@ -20,7 +20,8 @@ function helmParameters(_celoEnv: string) {
     `--set oracle.image.repository=${fetchEnv(envVar.ORACLE_DOCKER_IMAGE_REPOSITORY)}`,
     `--set oracle.image.tag=${fetchEnv(envVar.ORACLE_DOCKER_IMAGE_TAG)}`,
     // `--set celocli.nodeUrl=${getFornoUrl(celoEnv)}`,
-    `--set celocli.nodeUrl='http://34.83.46.9:8545'`,
+    // Temporary hardcode for baklava while forno doesn't work
+    '--set celocli.nodeUrl="http://34.83.46.9:8545"',
     `--set celocli.image.repository=${fetchEnv(envVar.CELOCLI_STANDALONE_IMAGE_REPOSITORY)}`,
     `--set celocli.image.tag=${fetchEnv(envVar.CELOCLI_STANDALONE_IMAGE_TAG)}`,
   ]
