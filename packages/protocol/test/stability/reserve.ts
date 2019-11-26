@@ -352,7 +352,7 @@ contract('Reserve', (accounts: string[]) => {
     })
   })
 
-  describe.only('#removeOtherReserveAddress()', () => {
+  describe('#removeOtherReserveAddress()', () => {
     let index: number = 0
 
     it('should not allow owner to remove an unadded reserve address', async () => {
