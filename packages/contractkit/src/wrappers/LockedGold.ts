@@ -101,7 +101,7 @@ export class LockedGoldWrapper extends BaseWrapper<LockedGold> {
       i: number
     ) => {
       const valueToRelock = BigNumber.minimum(pw.value, remainingToRelock)
-      if (!valueToRelock.isZero()) {
+      if (valueToRelock.isZero()) {
         remainingToRelock = remainingToRelock.minus(valueToRelock)
         acc.push(this._relock(i, valueToRelock))
       }
