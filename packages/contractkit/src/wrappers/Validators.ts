@@ -18,6 +18,7 @@ import {
 } from './BaseWrapper'
 
 export interface Validator {
+  name: string
   address: Address
   ecdsaPublicKey: string
   blsPublicKey: string
@@ -244,7 +245,14 @@ export class ValidatorsWrapper extends BaseWrapper<Validators> {
   /** Get list of registered validators */
   async getRegisteredValidators(): Promise<Validator[]> {
     const vgAddresses = await this.getRegisteredValidatorsAddresses()
-    return Promise.all(vgAddresses.map((addr) => this.getValidator(addr)))
+    let validators = await Promise.all(vgAddresses.map((addr) => this.getValidator(addr)))
+    const accounts = await this.kit.contracts.getAccounts()
+    return Promise.all(
+      validators.map(async function(v) {
+        v.name = (await accounts.getName(v.address)) || ''
+        return v
+      })
+    )
   }
 
   /** Get list of registered validator groups */
