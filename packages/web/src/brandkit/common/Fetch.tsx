@@ -8,6 +8,7 @@ interface Props {
 
 interface State {
   loading: boolean
+  hasError: boolean
   data: any[]
 }
 
@@ -15,13 +16,18 @@ export default class Fetch extends React.PureComponent<Props, State> {
   state: State = {
     loading: true,
     data: [],
+    hasError: false,
   }
 
   componentDidMount = async () => {
     const response = await fetch(this.props.query)
-    const data = await response.json()
-    console.log(data)
-    this.setState({ data, loading: false })
+    console.log(response.status)
+    if (response.status === 200) {
+      const data = await response.json()
+      this.setState({ data, loading: false })
+    } else {
+      this.setState({ hasError: true, loading: false })
+    }
   }
 
   render() {

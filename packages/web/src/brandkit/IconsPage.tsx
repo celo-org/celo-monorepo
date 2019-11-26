@@ -43,7 +43,7 @@ const Overview = withNamespaces()(function _Overview({ t }: I18nProps) {
               return LOADING.map((x) => {
                 return (
                   <IconShowcase
-                    size={160}
+                    size={166}
                     key={x}
                     loading={true}
                     name={'Celo Icon'}
@@ -61,7 +61,7 @@ const Overview = withNamespaces()(function _Overview({ t }: I18nProps) {
                 preview={{ uri: icon.preview }}
                 uri={icon.uri}
                 loading={false}
-                size={160}
+                size={166}
               />
             ))
           }}

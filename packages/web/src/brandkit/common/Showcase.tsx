@@ -5,6 +5,8 @@ import { brandStyles } from 'src/brandkit/common/constants'
 import Button, { BTN } from 'src/shared/Button.3'
 import Spinner from 'src/shared/Spinner'
 import { colors, fonts, standardStyles } from 'src/styles'
+import Download from 'src/icons/Download'
+import AspectRatio from 'src/shared/AspectRatio'
 
 interface Props {
   name: string
@@ -32,28 +34,27 @@ export default React.memo(function Showcase({
         { width: size },
       ]}
     >
-      <Fade>
-        <View
-          style={[
-            standardStyles.centered,
-            brandStyles.fullBorder,
-            styles.previewContainer,
-            { width: size, height: size },
-          ]}
-        >
+      <View style={styles.previewContainer}>
+        <AspectRatio ratio={1}>
           {loading ? (
             <Spinner color={colors.dark} size={'small'} />
           ) : (
-            <Image resizeMode="contain" source={preview} style={styles.image} />
+            <Image resizeMode="contain" source={preview} style={standardStyles.image} />
           )}
-        </View>
-      </Fade>
+        </AspectRatio>
+      </View>
       <View style={styles.text}>
         <Text style={[fonts.h6, styles.title]}>{name}</Text>
         <Text style={fonts.legal}>{description}</Text>
       </View>
       <View style={brandStyles.button}>
-        <Button kind={BTN.TERTIARY} text={'Download Assets'} href={uri} />
+        <Button
+          kind={BTN.TERTIARY}
+          text={'Download'}
+          href={uri}
+          style={styles.pullStart}
+          iconRight={<Download size={12} color={colors.primary} />}
+        />
       </View>
     </View>
   )
@@ -62,15 +63,13 @@ export default React.memo(function Showcase({
 const styles = StyleSheet.create({
   title: { marginVertical: 5 },
   previewContainer: {
-    padding: 20,
-    marginBottom: 10,
-  },
-  image: {
-    width: '100%',
-    height: '100%',
+    marginVertical: 20,
+    marginRight: 40,
   },
   text: { flex: 1 },
+  pullStart: { paddingLeft: 0 },
   container: {
+    marginRight: 20,
     justifyContent: 'space-between',
   },
 })

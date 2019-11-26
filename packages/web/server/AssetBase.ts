@@ -10,6 +10,7 @@ interface Fields extends FieldSet {
   Description: string
   [ASSSET_FIELD_LIGHT]: Attachment[]
   [ASSSET_FIELD_DARK]: Attachment[]
+  Zip: Attachment[]
   Terms: boolean
   Tags: string[]
 }
@@ -42,13 +43,20 @@ function getAirtable(sheet: AssetSheet): Table<Fields> {
 }
 
 const IS_APROVED = 'Approved=1'
-const TERMS_SIGNED = 'TERMS=1'
+const TERMS_SIGNED = 'Terms=1'
 
 function normalize(asset: Fields) {
-  return {
-    name: asset.Name,
-    description: asset.Description,
-    preview: asset[ASSSET_FIELD_LIGHT][0].thumbnails.large.url,
-    uri: asset[ASSSET_FIELD_LIGHT][0].url,
-  }
+  return { name: asset.Name, description: asset.Description, preview: getPreview(asset), uri: '' }
+}
+
+function getPreview(asset) {
+  const previewField = asset[ASSSET_FIELD_LIGHT]
+
+  return (
+    (previewField &&
+      previewField[0] &&
+      previewField[0].thumbnails &&
+      previewField[0].thumbnails.large.url) ||
+    ''
+  )
 }

@@ -35,10 +35,7 @@ const Overview = withNamespaces(NameSpaces.brand)(
           headline={t('typography.headline')}
           style={standardStyles.elementalMarginBottom}
         />
-        <View style={[brandStyles.gap, standardStyles.blockMarginBottom]}>
-          <Button kind={BTN.PRIMARY} text={t('typography.downloadAllBTN')} />
-        </View>
-        <View style={brandStyles.gap}>
+        <View style={[brandStyles.gap, standardStyles.blockMarginTop]}>
           <H2>{t('typography.mainFontTitle')}</H2>
           <Text style={fonts.p}>{t('typography.mainFontText')}</Text>
           <Button
