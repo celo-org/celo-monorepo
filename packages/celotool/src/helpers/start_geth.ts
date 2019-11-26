@@ -33,7 +33,7 @@ program
   .action(async () => {
     const { gethRepo, validators, migrations, mnemonic, keepData, testDir } = program
 
-    await runTestNetwork({
+    await main({
       gethRepo,
       validators: +validators,
       migrations: +migrations,
@@ -44,7 +44,7 @@ program
   })
   .parse(process.argv)
 
-async function runTestNetwork({
+async function main({
   gethRepo: gethRepoPath,
   validators: numValidators,
   migrations: migrateTo,
@@ -59,11 +59,8 @@ async function runTestNetwork({
   keepData: boolean
   testDir: string
 }) {
-  // configure eth stats
   const ethstats = 'localhost:3000'
   const numEthstats = +numValidators
-
-  // configure geth
   const gethConfig: GethTestConfig = {
     migrateTo,
     instances: [...Array(numValidators).keys()].map((index: number) => {
@@ -78,51 +75,12 @@ async function runTestNetwork({
       }
     }),
   }
-
-  // handle keys
-  const attestationKeys = getPrivateKeysFor(AccountType.ATTESTATION, mnemonic, numValidators)
-  const validators = getValidators(mnemonic, numValidators)
-  const validatorPrivateKeys = getPrivateKeysFor(AccountType.VALIDATOR, mnemonic, numValidators)
-
-  // run the nodes
-  await runNodes({
-    keepData,
-    gethConfig,
-    validatorPrivateKeys,
-    gethRepoPath,
-    tmpDir,
-    validators,
-  })
-
-  // do migration
-  if (gethConfig.migrate || gethConfig.migrateTo) {
-    await migrateContracts(
-      validatorPrivateKeys,
-      attestationKeys,
-      validators.map((v) => v.address),
-      gethConfig.migrateTo
-    )
-  }
-}
-
-async function runNodes({
-  gethConfig,
-  keepData,
-  gethRepoPath,
-  validatorPrivateKeys,
-  tmpDir,
-  validators,
-}: {
-  gethConfig: GethTestConfig
-  keepData: boolean
-  gethRepoPath: string
-  tmpDir: string
-  validators: any
-  validatorPrivateKeys: any
-}) {
   const genesisPath = `${tmpDir}/genesis.json`
   const validatorsFilePath = `${tmpDir}/validators.json`
   const validatorInstances = gethConfig.instances.filter((x: any) => x.validating)
+  const validatorPrivateKeys = getPrivateKeysFor(AccountType.VALIDATOR, mnemonic, numValidators)
+  const attestationKeys = getPrivateKeysFor(AccountType.ATTESTATION, mnemonic, numValidators)
+  const validators = getValidators(mnemonic, numValidators)
   const validatorEnodes = validatorPrivateKeys.map((x: any, i: number) =>
     getEnodeAddress(privateKeyToPublicKey(x), '127.0.0.1', validatorInstances[i].port)
   )
@@ -131,16 +89,17 @@ async function runNodes({
   if (!keepData && fs.existsSync(tmpDir)) {
     fs.removeSync(tmpDir)
   }
-
   if (!fs.existsSync(tmpDir)) {
     fs.mkdirSync(tmpDir, { recursive: true })
   }
 
-  console.log('writing genesis')
-  await writeGenesis(validators, genesisPath)
-  console.log('wrote   genesis')
+  if (migrateTo) {
+    console.log('writing genesis')
+    await writeGenesis(validators, genesisPath)
+    console.log('wrote   genesis')
+  }
 
-  console.log('Validator eNodes', JSON.stringify(validatorEnodes, null, 2))
+  console.log(validatorEnodes)
 
   fs.writeFileSync(validatorsFilePath, JSON.stringify(validatorEnodes), 'utf8')
 
@@ -154,11 +113,19 @@ async function runNodes({
       instance.privateKey = instance.privateKey || validatorPrivateKeys[validatorIndex]
       validatorIndex++
     }
-
     if (gethConfig.migrate || gethConfig.migrateTo) {
       await initAndStartGeth(gethBinaryPath, instance)
     } else {
       await startGeth(gethBinaryPath, instance)
     }
+  }
+
+  if (gethConfig.migrate || gethConfig.migrateTo) {
+    await migrateContracts(
+      validatorPrivateKeys,
+      attestationKeys,
+      validators.map((v) => v.address),
+      gethConfig.migrateTo
+    )
   }
 }
