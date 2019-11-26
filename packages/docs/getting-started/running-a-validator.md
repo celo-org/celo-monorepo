@@ -218,7 +218,8 @@ You can find the complete instructions about how to run the [Attestation Service
 
 ### Stop the containers
 
-You can stop the Docker containers at any time without problem. The data dir of the validator and the proxy are Docker volumes mounted in the containers from the `celo-data-dir` you created at the very beginning. So if you don't remove that folder, you can stop or restart the containers without loosing any data.
+You can stop the Docker containers at any time without problem. If you stop your containers that means those containers stop of providing service.
+The data dir of the validator and the proxy are Docker volumes mounted in the containers from the `celo-data-dir` you created at the very beginning. So if you don't remove that folder, you can stop or restart the containers without loosing any data.
 
 You can stop the `celo-validator` and `celo-proxy` containers running:
 
