@@ -38,8 +38,11 @@
   "fullStackText": "Each layer of the technical stack is designed to meet mobile user needs.",
   "engage": {
     "mainTitle": "Make Celo your own",
-    "topTitle": "Engage with the Project",
-    "contributeTitle": "Contribute To the Project",
+    "topTitle": "Engage with Celo",
+    "contributeTitle": "Contribute To Celo",
+    "contributeText":
+      "There are a variety of resources to support contributions to Celo, including: grants, security bounties, an Ecosystem Fund, fellowships, and more.",
+    "contributeBtn": "Get Involved",
     "validators": {
       "noun": "For Validators and Full Nodes",
       "verb": "Operate Celo",

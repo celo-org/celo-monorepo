@@ -1,5 +1,5 @@
-import * as React from 'react'
 import getConfig from 'next/config'
+import * as React from 'react'
 import { LayoutChangeEvent, StyleSheet, Text, View } from 'react-native'
 import Racer from 'src/dev/Racer'
 import { I18nProps, withNamespaces } from 'src/i18n'

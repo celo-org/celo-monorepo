@@ -96,9 +96,7 @@ const CoverComponent = React.memo(function Cover({ t }: I18nProps) {
           tabletStyle={standardStyles.blockMarginBottomTablet}
           mobileStyle={standardStyles.blockMarginBottomMobile}
         >
-          <Cell span={Spans.full}>
-            <LeaderBoardApp />
-          </Cell>
+          <Cell span={Spans.full}>{/* <LeaderBoardApp /> */}</Cell>
         </GridRow>
       </LazyLoad>
     </View>
