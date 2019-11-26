@@ -10,10 +10,8 @@ import {
   generateGenesis,
   getPrivateKeysFor,
   getValidators,
-  privateKeyToPublicKey,
   Validator,
 } from '../lib/generate_utils'
-import { getEnodeAddress } from '../lib/geth'
 import { ensure0x } from '../lib/utils'
 
 export interface GethInstanceConfig {
@@ -244,10 +242,6 @@ export async function killInstance(instance: GethInstanceConfig) {
   }
 }
 
-export async function addStaticPeers(datadir: string, enodes: string[]) {
-  fs.writeFileSync(`${datadir}/static-nodes.json`, JSON.stringify(enodes))
-}
-
 async function isPortOpen(host: string, port: number) {
   return (await execCmd('nc', ['-z', host, port.toString()], { silent: true })) === 0
 }
@@ -432,10 +426,18 @@ export async function initAndStartGeth(gethBinaryPath: string, instance: GethIns
   if (instance.privateKey) {
     await importPrivateKey(gethBinaryPath, instance)
   }
-  if (instance.peers) {
-    await addStaticPeers(datadir, instance.peers)
-  }
   return startGeth(gethBinaryPath, instance)
+}
+
+async function connectValidatorPeers(gethConfig: GethTestConfig) {
+  const admins = gethConfig.instances
+    .filter(({ wsport, rpcport }) => wsport || rpcport)
+    .map(
+      ({ wsport, rpcport }) =>
+        new Admin(`${wsport ? 'ws' : 'http'}://localhost:${wsport || rpcport}`)
+    )
+  const enodes = await Promise.all(admins.map(async (admin) => (await admin.getNodeInfo()).enode))
+  await Promise.all(admins.map((admin) => Promise.all(enodes.map((enode) => admin.addPeer(enode)))))
 }
 
 export function getContext(gethConfig: GethTestConfig) {
@@ -446,9 +448,6 @@ export function getContext(gethConfig: GethTestConfig) {
   const validatorPrivateKeys = getPrivateKeysFor(AccountType.VALIDATOR, mnemonic, numValidators)
   const attestationKeys = getPrivateKeysFor(AccountType.ATTESTATION, mnemonic, numValidators)
   const validators = getValidators(mnemonic, numValidators)
-  const validatorEnodes = validatorPrivateKeys.map((x: any, i: number) =>
-    getEnodeAddress(privateKeyToPublicKey(x), '127.0.0.1', validatorInstances[i].port)
-  )
   const argv = require('minimist')(process.argv.slice(2))
   const branch = argv.branch || 'master'
   const gethRepoPath = argv.localgeth || '/tmp/geth'
@@ -464,16 +463,12 @@ export function getContext(gethConfig: GethTestConfig) {
     let validatorIndex = 0
     for (const instance of gethConfig.instances) {
       if (instance.validating) {
-        // Automatically connect validator nodes to eachother.
-        const otherValidators = validatorEnodes.filter(
-          (__: string, i: number) => i !== validatorIndex
-        )
-        instance.peers = (instance.peers || []).concat(otherValidators)
         instance.privateKey = instance.privateKey || validatorPrivateKeys[validatorIndex]
         validatorIndex++
       }
       await initAndStartGeth(gethBinaryPath, instance)
     }
+    await connectValidatorPeers(gethConfig)
     if (gethConfig.migrate || gethConfig.migrateTo) {
       await migrateContracts(
         validatorPrivateKeys,
@@ -511,6 +506,7 @@ export function getContext(gethConfig: GethTestConfig) {
         return startGeth(gethBinaryPath, instance)
       })
     )
+    await connectValidatorPeers(gethConfig)
   }
 
   const after = () => killGeth()
