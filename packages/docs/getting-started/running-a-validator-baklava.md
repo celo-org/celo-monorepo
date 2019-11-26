@@ -102,8 +102,8 @@ docker run -v $PWD/validator:/root/.celo --entrypoint /bin/sh -it $CELO_IMAGE -c
 It will prompt you for the passphrase you've chosen for the Validator account. Let's save the resulting proof-of-possession to two environment variables:
 
 ```bash
-export CELO_VALIDATOR_BLS_PUBLIC_KEY=<YOUR-VALIDATOR-BLS-PUBLIC-KEY>
 export CELO_VALIDATOR_BLS_SIGNATURE=<YOUR-VALIDATOR-BLS-SIGNATURE>
+export CELO_VALIDATOR_BLS_PUBLIC_KEY=<YOUR-VALIDATOR-BLS-PUBLIC-KEY>
 ```
 
 ### Deploy the Validator and Proxy nodes
