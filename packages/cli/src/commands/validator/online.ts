@@ -27,7 +27,9 @@ export default class ValidatorOnline extends BaseCommand {
   async run() {
     const { flags } = this.parse(ValidatorOnline)
 
+    // Use redundant checks to help the user diagnose issues.
     await newCheckBuilder(this, flags.signer)
+      .canSignValidatorTxs()
       .signerMeetsValidatorBalanceRequirements()
       .signerAccountIsValidator()
       .runChecks()
@@ -69,7 +71,7 @@ export default class ValidatorOnline extends BaseCommand {
       } blocks`
     )
   }
-
+  k
   // Check the parent seal in the given block header for a bit indicating at the given index.
   private validatorIndexSignedParentHeader(block: Block, index: number) {
     // See https://github.com/celo-org/celo-blockchain/blob/master/core/types/istanbul.go
