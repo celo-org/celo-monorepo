@@ -30,6 +30,7 @@ const LEADERBOARD_TOKEN = process.env['LEADERBOARD_TOKEN'] || 0
 const LEADERBOARD_SHEET =
   process.env['LEADERBOARD_SHEET'] || '1d3pZNof8p3z8M9O3MH5FZG5dA3e-L52XiJ4qA5o7X0Y'
 const LEADERBOARD_WEB3 = process.env['LEADERBOARD_WEB3'] || 'http://localhost:8545'
+const LEADERBOARD_FORMAT = process.env['LEADERBOARD_FORMAT'] || 'Sheet2!A1:B'
 
 async function updateDB(lst: any[][]) {
   const client = new Client({ database: LEADERBOARD_DATABASE })
@@ -40,7 +41,8 @@ async function updateDB(lst: any[][]) {
       ' ON CONFLICT (address) DO UPDATE SET multiplier = EXCLUDED.multiplier RETURNING *',
     [
       JSON.stringify(
-        lst.map((a) => {
+        lst.filter((a) => a[1] !== '0').map((a) => {
+          console.log(a)
           return { address: addressToBinary(a[0]), multiplier: a[1] }
         })
       ),
@@ -185,14 +187,13 @@ function getInfo(auth: any) {
   sheets.spreadsheets.values.get(
     {
       spreadsheetId: LEADERBOARD_SHEET,
-      range: 'Sheet1!A2:B',
+      range: LEADERBOARD_FORMAT,
     },
     (err, res) => {
       if (err) return console.log('The API returned an error: ' + err)
       if (res == null) return
       const rows = res.data.values
       if (rows && rows.length) {
-        console.log(rows)
         updateDB(rows)
       } else {
         console.log('No data found.')
