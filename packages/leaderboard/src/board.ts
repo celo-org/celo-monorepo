@@ -27,8 +27,8 @@ function addressToBinary(a: string) {
 
 const LEADERBOARD_DATABASE = process.env['LEADERBOARD_DATABASE'] || 'blockscout'
 const LEADERBOARD_TOKEN = process.env['LEADERBOARD_TOKEN'] || 0
-const LEADERBOARD_SPREADSHEET =
-  process.env['LEADERBOARD_SPREADSHEET'] || '1d3pZNof8p3z8M9O3MH5FZG5dA3e-L52XiJ4qA5o7X0Y'
+const LEADERBOARD_SHEET =
+  process.env['LEADERBOARD_SHEET'] || '1d3pZNof8p3z8M9O3MH5FZG5dA3e-L52XiJ4qA5o7X0Y'
 const LEADERBOARD_WEB3 = process.env['LEADERBOARD_WEB3'] || 'http://localhost:8545'
 
 async function updateDB(lst: any[][]) {
@@ -184,7 +184,7 @@ function getInfo(auth: any) {
   const sheets = google.sheets({ version: 'v4', auth })
   sheets.spreadsheets.values.get(
     {
-      spreadsheetId: LEADERBOARD_SPREADSHEET,
+      spreadsheetId: LEADERBOARD_SHEET,
       range: 'Sheet1!A2:B',
     },
     (err, res) => {
