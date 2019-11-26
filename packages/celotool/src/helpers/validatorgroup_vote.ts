@@ -8,7 +8,6 @@ const web3 = new Web3('http://localhost:8543')
 const keystorePath: string = process.env.KEYSTORE || ''
 const group: string = process.env.GROUP || ''
 const amount: BigNumber = new BigNumber(process.env.AMOUNT || 1e22)
-
 ;(async () => {
   const kit = newKitFromWeb3(web3)
   const account = await importAndUnlockAccount(web3, keystorePath)
