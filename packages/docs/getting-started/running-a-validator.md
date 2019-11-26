@@ -174,11 +174,10 @@ docker run -v $PWD/validator:/root/.celo $CELO_IMAGE init /celo/genesis.json
 **Warning**: There is a known issue `(Fatal: Failed to read passphrase: liner: function not supported in this terminal” rather than just failing)` running geth inside Docker that happens eventually. So if that command fails, please try again, and if it continues to fail after several attempts, check this page [this page](https://forum.celo.org/t/setting-up-a-validator-faq/90).
 {% endhint %}
 
-In order to allow the node to sync with the network, give it the address of existing nodes in the network:
+In order to allow the node to sync with the network, give it the address of existing nodes in the network to the Proxy. The Validator will sync through the Proxy:
 
 ```bash
 docker run -v $PWD/proxy:/root/.celo --entrypoint cp $CELO_IMAGE /celo/static-nodes.json /root/.celo/
-docker run -v $PWD/validator:/root/.celo --entrypoint cp $CELO_IMAGE /celo/static-nodes.json /root/.celo/
 ```
 
 #### Running the Proxy
