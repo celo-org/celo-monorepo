@@ -195,7 +195,7 @@ if [[ $COMMAND == *"run-attestation"* ]]; then
     export ATTESTATION_KEY=0x$(celocli account:new| tail -3| head -1| cut -d' ' -f 2| tr -cd "[:alnum:]\n")
     echo -e "\tATTESTATION_KEY=$ATTESTATION_KEY"
     
-    echo screen -S attestation-service -d -m  docker run -v $PWD/attestation-service:/celo-monorepo/packages/attestation-service/db --name celo-attestation-service -d --restart always --entrypoint /bin/bash -e ATTESTATION_KEY=$ATTESTATION_KEY -e ACCOUNT_ADDRESS=0x$CELO_VALIDATOR_ADDRESS -e CELO_PROVIDER=$CELO_PROVIDER -e DATABASE_URL=$DATABASE_URL -e SMS_PROVIDERS=nexmo -e NEXMO_KEY=$NEXMO_KEY -e NEXMO_SECRET=$NEXMO_SECRET -e NEXMO_BLACKLIST=$NEXMO_BLACKLIST  -p 3000:80 -v $PWD/attestation-service:/root/.celo $CELO_IMAGE_ATTESTATION -c " cd /celo-monorepo/packages/attestation-service && touch db/attestation.db && yarn run db:migrate && yarn start "
+    screen -S attestation-service -d -m  docker run -v $PWD/attestation-service:/celo-monorepo/packages/attestation-service/db --name celo-attestation-service -d --restart always --entrypoint /bin/bash -e ATTESTATION_KEY=$ATTESTATION_KEY -e ACCOUNT_ADDRESS=0x$CELO_VALIDATOR_ADDRESS -e CELO_PROVIDER=$CELO_PROVIDER -e DATABASE_URL=$DATABASE_URL -e SMS_PROVIDERS=nexmo -e NEXMO_KEY=$NEXMO_KEY -e NEXMO_SECRET=$NEXMO_SECRET -e NEXMO_BLACKLIST=$NEXMO_BLACKLIST  -p 3000:80 -v $PWD/attestation-service:/root/.celo $CELO_IMAGE_ATTESTATION -c " cd /celo-monorepo/packages/attestation-service && touch db/attestation.db && yarn run db:migrate && yarn start "
     
     echo -e "\tAttestation service should be running, you can check running 'screen -ls'"
     echo -e "\tYou can re-attach to the attestation-service running:"
