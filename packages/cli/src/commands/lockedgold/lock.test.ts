@@ -1,9 +1,9 @@
 import { newKitFromWeb3 } from '@celo/contractkit'
 import { testWithGanache } from '@celo/dev-utils/lib/ganache-test'
 import Web3 from 'web3'
+import Register from '../account/register'
 import Lock from './lock'
 import Unlock from './unlock'
-import Register from '../account/register'
 
 process.env.NO_SYNCCHECK = 'true'
 
