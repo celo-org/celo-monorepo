@@ -4,7 +4,7 @@ import Web3 from 'web3'
 import http from 'http'
 import fs from 'fs'
 import readline from 'readline'
-import { google } from 'googleapis'
+import { google, sheets_v4 } from 'googleapis'
 import { Client } from 'pg'
 import { verifyClaim, Claim } from '@celo/contractkit/lib/identity/claims/claim'
 import { ClaimTypes } from '@celo/contractkit/lib/identity'
@@ -30,27 +30,33 @@ const LEADERBOARD_TOKEN = process.env['LEADERBOARD_TOKEN'] || 0
 const LEADERBOARD_SHEET =
   process.env['LEADERBOARD_SHEET'] || '1d3pZNof8p3z8M9O3MH5FZG5dA3e-L52XiJ4qA5o7X0Y'
 const LEADERBOARD_WEB3 = process.env['LEADERBOARD_WEB3'] || 'http://localhost:8545'
-const LEADERBOARD_FORMAT = process.env['LEADERBOARD_FORMAT'] || 'Sheet2!A1:B'
 
-async function updateDB(lst: any[][]) {
+function parsePercentage(str: string) {
+  return parseFloat(str.substr(0, str.length - 1)) * 0.01
+}
+
+async function updateDB(addresses: any[], multipliers: any[]) {
   const client = new Client({ database: LEADERBOARD_DATABASE })
   await client.connect()
+  let lst = []
+  for (let i = 0; i < addresses.length && i < multipliers.length; i++) {
+    if (multipliers[i] == '0' || addresses[i] == '') continue
+    let item = {
+      address: addressToBinary(addresses[i]),
+      multiplier: parsePercentage(multipliers[i]),
+    }
+    console.log(item)
+    lst.push(item)
+  }
   const res = await client.query(
     'INSERT INTO competitors (address, multiplier)' +
       " SELECT decode(m.address, 'hex') AS address, m.multiplier FROM json_populate_recordset(null::json_type, $1) AS m" +
       ' ON CONFLICT (address) DO UPDATE SET multiplier = EXCLUDED.multiplier RETURNING *',
-    [
-      JSON.stringify(
-        lst.filter((a) => a[1] !== '0').map((a) => {
-          console.log(a)
-          return { address: addressToBinary(a[0]), multiplier: a[1] }
-        })
-      ),
-    ]
+    [JSON.stringify(lst)]
   )
   console.log(res.rows)
   await client.end()
-  await readAssoc(lst.map((a) => a[0].toString()))
+  await readAssoc(addresses.map((a) => a.toString()))
 }
 
 async function updateRate(kit: ContractKit) {
@@ -182,24 +188,32 @@ function getNewToken(oAuth2Client: any, callback: any) {
   })
 }
 
-function getInfo(auth: any) {
-  const sheets = google.sheets({ version: 'v4', auth })
+function getColumn(sheets: sheets_v4.Sheets, range: string, cb: any) {
   sheets.spreadsheets.values.get(
     {
       spreadsheetId: LEADERBOARD_SHEET,
-      range: LEADERBOARD_FORMAT,
+      range,
     },
     (err, res) => {
       if (err) return console.log('The API returned an error: ' + err)
       if (res == null) return
       const rows = res.data.values
       if (rows && rows.length) {
-        updateDB(rows)
+        cb(rows.map((a) => a[0]))
       } else {
         console.log('No data found.')
       }
     }
   )
+}
+
+function getInfo(auth: any) {
+  const sheets = google.sheets({ version: 'v4', auth })
+  getColumn(sheets, 'Sheet1!A3:A', function(addresses: any[]) {
+    getColumn(sheets, 'Sheet1!C3:C', function(multipliers: any[]) {
+      updateDB(addresses, multipliers)
+    })
+  })
 }
 
 async function readAssoc(lst: string[]) {
