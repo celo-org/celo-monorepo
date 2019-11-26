@@ -1,5 +1,5 @@
-import { getHooks, sleep, GethInstanceConfig } from 'src/e2e-tests/utils'
 import { range } from 'lodash'
+import { GethInstanceConfig, getHooks, sleep } from 'src/e2e-tests/utils'
 import { Admin } from 'web3-eth-admin'
 import yargs from 'yargs'
 
