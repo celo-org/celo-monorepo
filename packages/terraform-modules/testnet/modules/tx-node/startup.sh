@@ -77,6 +77,7 @@ docker run -v $DATA_DIR:$DATA_DIR -p 8545:8545/tcp -p 8546:8546/tcp --name geth 
     --wsaddr 0.0.0.0 \
     --wsorigins=* \
     --wsapi=eth,net,web3,debug \
+    --nodekey=$DATA_DIR/pkey \
     --etherbase=$ACCOUNT_ADDRESS \
     --networkid=${network_id} \
     --syncmode=full \
