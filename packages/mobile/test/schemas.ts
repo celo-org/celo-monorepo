@@ -182,6 +182,7 @@ export const v4Schema = {
   },
   identity: {
     ...v3Schema.identity,
+    acceptedAttestationCodes: [],
     verificationStatus: 0,
     hasSeenVerificationNux: false,
   },
