@@ -28,16 +28,12 @@ When you see text in angle brackets &lt;&gt;, replace them and the text inside w
 
 ## **Celo Networks**
 
-First we are going to setup the environment depending on the network we want to use (`Baklava` or `Alfajores`). Run:
+First we are going to setup the environment variables required for `Baklava` network. Run:
 
 ```bash
 # If you want to connect to Baklava:
 export CELO_IMAGE=us.gcr.io/celo-testnet/celo-node:baklava
 export NETWORK_ID=1101
-
-# If you want to connect to Alfajores:
-export CELO_IMAGE=us.gcr.io/celo-testnet/celo-node:alfajores
-export NETWORK_ID=44785
 ```
 
 ## **Pull the Celo Docker image**
@@ -100,7 +96,7 @@ docker run -v $PWD:/root/.celo --entrypoint cp $CELO_IMAGE /celo/static-nodes.js
 This command specifies the settings needed to run the node, and gets it started.
 
 ```bash
-docker run --name celo-fullnode --restart always -p 127.0.0.1:8545:8545 -p 127.0.0.1:8546:8546 -p 30303:30303 -p 30303:30303/udp -v $PWD:/root/.celo $CELO_IMAGE --verbosity 3 --networkid $NETWORK_ID --syncmode full --rpc --rpcaddr 0.0.0.0 --rpcapi eth,net,web3,debug,admin,personal --lightserv 90 --lightpeers 1000 --maxpeers 1100 --etherbase $CELO_ACCOUNT_ADDRESS
+docker run --name celo-fullnode -d --restart always -p 127.0.0.1:8545:8545 -p 127.0.0.1:8546:8546 -p 30303:30303 -p 30303:30303/udp -v $PWD:/root/.celo $CELO_IMAGE --verbosity 3 --networkid $NETWORK_ID --syncmode full --rpc --rpcaddr 0.0.0.0 --rpcapi eth,net,web3,debug,admin,personal --lightserv 90 --lightpeers 1000 --maxpeers 1100 --etherbase $CELO_ACCOUNT_ADDRESS
 ```
 
 You'll start seeing some output. There may be some errors or warnings that are ignorable. After a few minutes, you should see lines that look like this. This means your node has synced with the network and is receiving blocks.
