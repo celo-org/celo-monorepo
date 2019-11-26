@@ -1,6 +1,5 @@
 pragma solidity ^0.5.3;
 
-
 interface IValidators {
   function getAccountLockedGoldRequirement(address) external view returns (uint256);
   function meetsAccountLockedGoldRequirements(address) external view returns (bool);

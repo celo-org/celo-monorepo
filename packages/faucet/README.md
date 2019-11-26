@@ -30,20 +30,20 @@ You can verify with `yarn cli config:get --net alfajores`
 
 ### Setting StableToken and GoldToken Addresses
 
-To obtain the StableToken and GoldToken addresses on a given environment run:
+To obtain the StableToken, GoldToken, and Escrow addresses on a given environment run:
 
 ```bash
-celotooljs contract-addresses --e alfajores --contracts StableToken,GoldToken
+celotooljs contract-addresses --e alfajores --contracts StableToken,GoldToken,Escrow
 ```
 
 Replace `alfajores` by proper environment
 
 To set the address for faucet, in directory: `packages/faucet`, run:
 
-Replace `net`, `stableTokenAddress`, and `goldTokenAddress` with proper values
+Replace `net`, `stableTokenAddress`, `goldTokenAddress`, and `escrowAddress` with proper values
 
 ```bash
-yarn cli config:set --net alfajores --stableTokenAddress 0x299E74bdCD90d4E10f7957EF074ceE32d7e9089a --goldTokenAddress 0x4813BFD311E132ade22c70dFf7e5DB045d26D070
+yarn cli config:set --net alfajores --stableTokenAddress 0x299E74bdCD90d4E10f7957EF074ceE32d7e9089a --goldTokenAddress 0x4813BFD311E132ade22c70dFf7e5DB045d26D070 --escrowAddress 0x299E74bdCD90d4E10f7957EF074ceE32d7e9089a
 ```
 
 You can verify with `yarn cli config:get --net alfajores`

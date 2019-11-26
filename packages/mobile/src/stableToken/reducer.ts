@@ -1,3 +1,4 @@
+import { RootState } from 'src/redux/reducers'
 import { Actions, ActionTypes } from 'src/stableToken/actions'
 
 export interface State {
@@ -29,3 +30,5 @@ export const reducer = (state: State | undefined = initialState, action: ActionT
       return state
   }
 }
+
+export const stableTokenBalanceSelector = (state: RootState) => state.stableToken.balance

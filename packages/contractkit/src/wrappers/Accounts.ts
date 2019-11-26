@@ -49,11 +49,27 @@ export class AccountsWrapper extends BaseWrapper<Accounts> {
   )
 
   /**
+   * Returns the account address given the signer for validating
+   * @param signer Address that is authorized to sign the tx as validator
+   * @return The Account address
+   */
+  activeValidationSignerToAccount: (signer: Address) => Promise<Address> = proxyCall(
+    this.contract.methods.activeValidationSignerToAccount
+  )
+
+  /**
    * Check if an account already exists.
    * @param account The address of the account
    * @return Returns `true` if account exists. Returns `false` otherwise.
    */
   isAccount: (account: string) => Promise<boolean> = proxyCall(this.contract.methods.isAccount)
+
+  /**
+   * Check if an address is a signer address
+   * @param address The address of the account
+   * @return Returns `true` if account exists. Returns `false` otherwise.
+   */
+  isSigner: (address: string) => Promise<boolean> = proxyCall(this.contract.methods.isAuthorized)
 
   /**
    * Authorize an attestation signing key on behalf of this account to another address.
