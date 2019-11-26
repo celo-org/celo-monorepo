@@ -175,7 +175,9 @@ export function makeCompleteTx(
   return attestations.methods.complete(phoneHash, v, r, s)
 }
 
-const attestationCodeRegex = new RegExp(/(.* |^)([a-zA-Z0-9=_-]{87,88})($| .*)/)
+const attestationCodeRegex = new RegExp(
+  /(.* |^)(?:celo:\/\/wallet\/v\/)?([a-zA-Z0-9=_-]{87,88})($| .*)/
+)
 
 export function messageContainsAttestationCode(message: string) {
   return attestationCodeRegex.test(message)

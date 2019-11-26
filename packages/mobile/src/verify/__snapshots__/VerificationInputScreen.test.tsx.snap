@@ -233,7 +233,7 @@ exports[`VerificationInputScreen renders correctly 1`] = `
               onBlur={[Function]}
               onChangeText={[Function]}
               onFocus={[Function]}
-              placeholder="<#> m9oASm/3g7aZ..."
+              placeholder="<#> celo://wallet/v/m9o..."
               rejectResponderTermination={true}
               shouldShowClipboard={[Function]}
               style={
@@ -290,7 +290,7 @@ exports[`VerificationInputScreen renders correctly 1`] = `
               }
             }
           >
-            &lt;#&gt; m9oASm/3g7aZ...
+            &lt;#&gt; celo://wallet/v/m9o...
           </Text>
         </View>
       </View>
@@ -332,7 +332,7 @@ exports[`VerificationInputScreen renders correctly 1`] = `
               }
             }
           >
-            &lt;#&gt; m9oASm/3g7aZ...
+            &lt;#&gt; celo://wallet/v/m9o...
           </Text>
         </View>
       </View>

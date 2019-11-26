@@ -13,14 +13,14 @@ export interface GasPriceMinimumConfig {
  */
 export class GasPriceMinimumWrapper extends BaseWrapper<GasPriceMinimum> {
   /**
-   * Query current gas price minimum for Celo Gold.
-   * @returns current gas price minimum for Celo Gold.
+   * Query current gas price minimum in gGLD.
+   * @returns current gas price minimum in cGLD
    */
   gasPriceMinimum = proxyCall(this.contract.methods.gasPriceMinimum, undefined, toBigNumber)
 
   /**
-   * Query current gas price minimum for a currency.
-   * @returns current gas price minimum for a currency
+   * Query current gas price minimum.
+   * @returns current gas price minimum in the requested currency
    */
   getGasPriceMinimum = proxyCall(this.contract.methods.getGasPriceMinimum, undefined, toBigNumber)
 

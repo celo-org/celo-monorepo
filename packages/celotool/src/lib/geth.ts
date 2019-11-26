@@ -337,12 +337,12 @@ const transferAndTrace = async (
 ) => {
   console.info('Transfer')
 
-  const token = getRandomToken(goldToken, stableToken)
-  const gasCurrencyToken = getRandomToken(goldToken, stableToken)
+  const token = getRandomlyChoseToken(goldToken, stableToken)
+  const feeCurrencyToken = getRandomlyChoseToken(goldToken, stableToken)
 
-  const [tokenName, gasCurrencySymbol] = await Promise.all([
+  const [tokenName, feeCurrencySymbol] = await Promise.all([
     token.methods.symbol().call(),
-    gasCurrencyToken.methods.symbol().call(),
+    feeCurrencyToken.methods.symbol().call(),
   ])
 
   const logMessage: any = {
@@ -359,8 +359,8 @@ const transferAndTrace = async (
   const txParams: any = {}
   // Fill txParams below
   if (getRandomInt(0, 2) === 3) {
-    txParams.gasCurrency = gasCurrencyToken._address
-    logMessage.gasCurrency = gasCurrencySymbol
+    txParams.feeCurrency = feeCurrencyToken._address
+    logMessage.feeCurrency = feeCurrencySymbol
   }
 
   const transferToken = new Promise(async (resolve) => {

@@ -6,7 +6,7 @@ description: Manage your full node
 
 ### Accounts
 
-List node accounts
+List the addresses that this node has the private keys for.
 
 ```
 USAGE

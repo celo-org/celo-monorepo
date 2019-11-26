@@ -53,7 +53,7 @@ function toBase64(str: string) {
 }
 
 function createAttestationTextMessage(attestationCode: string) {
-  return `<#> ${toBase64(attestationCode)} ${process.env.APP_SIGNATURE}`
+  return `<#> celo://wallet/v/${toBase64(attestationCode)} ${process.env.APP_SIGNATURE}`
 }
 
 async function ensureLockedRecord(
@@ -189,6 +189,7 @@ class AttestationRequestHandler {
 
       try {
         await provider.sendSms(this.attestationRequest.phoneNumber, textMessage)
+        this.logger.info('Sent sms')
         Counters.attestationRequestsSentSms.inc()
         await attestationRecord.update(
           { status: AttestationStatus.SENT, smsProvider: provider.type },
