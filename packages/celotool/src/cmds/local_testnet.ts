@@ -1,4 +1,3 @@
-import { addCeloEnvMiddleware, CeloEnvArgv } from 'src/lib/env-utils'
 import { getHooks, sleep, GethInstanceConfig } from 'src/e2e-tests/utils'
 import { range } from 'lodash'
 import { Admin } from 'web3-eth-admin'
@@ -7,7 +6,7 @@ import yargs from 'yargs'
 export const command = 'local-testnet'
 export const describe = 'command to run a local testnet of geth instances'
 
-interface LocalTestnetArgs extends CeloEnvArgv {
+interface LocalTestnetArgs {
   localpath?: string
   branch?: string
   validators: number
@@ -17,7 +16,7 @@ interface LocalTestnetArgs extends CeloEnvArgv {
 }
 
 export const builder = (argv: yargs.Argv) => {
-  return addCeloEnvMiddleware(argv)
+  return argv
     .option('localpath', {
       type: 'string',
       description: 'local path to celo-blockchain repository',
@@ -51,13 +50,13 @@ export const builder = (argv: yargs.Argv) => {
 async function waitForSigInt() {
   let signaled = false
   const sigintHandler = () => {
-    console.info('Received SIGINT: Shutting down...')
     signaled = true
   }
   process.on('SIGINT', sigintHandler)
   while (!signaled) {
     await sleep(0.1)
   }
+  console.info('Received SIGINT: Shutting down...')
   process.removeListener('SIGINT', sigintHandler)
 }
 
