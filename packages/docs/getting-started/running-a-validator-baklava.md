@@ -116,13 +116,6 @@ docker run -v $PWD/proxy:/root/.celo $CELO_IMAGE init /celo/genesis.json
 docker run -v $PWD/validator:/root/.celo $CELO_IMAGE init /celo/genesis.json
 ```
 
-To participate in consensus, we need to set up our nodekey for our accounts. We can do so via the following commands \(it will prompt you for your passphrase\):
-
-```bash
-docker run -v $PWD/proxy:/root/.celo --entrypoint /bin/sh -it $CELO_IMAGE -c "geth account set-node-key $CELO_PROXY_ADDRESS"
-docker run -v $PWD/validator:/root/.celo --entrypoint /bin/sh -it $CELO_IMAGE -c "geth account set-node-key $CELO_VALIDATOR_ADDRESS"
-```
-
 {% hint style="danger" %}
 **Warning**: There is a known issue running geth inside Docker that happens eventually. So if that command fails, please check [this page](https://forum.celo.org/t/setting-up-a-validator-faq/90).
 {% endhint %}
@@ -147,10 +140,10 @@ export PROXY_ENODE=$(docker exec celo-proxy geth --exec "admin.nodeInfo['enode']
 export PROXY_IP=$(docker inspect -f '{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' celo-proxy)
 ```
 
-Now we can start up the Validator node:
+Now we can start up the Validator node. In the below command remember to replace the **VALIDATOR_ADDRESS_PASSWORD** for the password you used when you created the `CELO_VALIDATOR_ADDRESS`:
 
 ```bash
-docker run -v $PWD/validator:/root/.celo --entrypoint sh --rm $CELO_IMAGE -c "echo $DEFAULT_PASSWORD > /root/.celo/.password"
+docker run -v $PWD/validator:/root/.celo --entrypoint sh --rm $CELO_IMAGE -c "echo VALIDATOR_ADDRESS_PASSWORD > /root/.celo/.password"
 docker run --name celo-validator --restart always -p 127.0.0.1:8545:8545 -p 127.0.0.1:8546:8546 -p 30303:30303 -p 30303:30303/udp -v $PWD/validator:/root/.celo $CELO_IMAGE --verbosity 3 --networkid $NETWORK_ID --syncmode full --rpc --rpcaddr 0.0.0.0 --rpcapi eth,net,web3,debug,admin,personal,istanbul --maxpeers 125 --mine --minerthreads=10 --istanbul.blockperiod=5 --istanbul.requesttimeout=3000 --etherbase $CELO_VALIDATOR_ADDRESS --nodiscover --proxy.proxied --proxy.proxyenodeurlpair=enode://$PROXY_ENODE@$PROXY_IP:30503\;enode://$PROXY_ENODE@$PROXY_IP:30503  --unlock=$CELO_VALIDATOR_ADDRESS --password /root/.celo/.password
 ```
 
