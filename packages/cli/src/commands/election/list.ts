@@ -2,7 +2,8 @@ import { cli } from 'cli-ux'
 import { BaseCommand } from '../../base'
 
 export default class List extends BaseCommand {
-  static description = 'Outputs the validator groups and their vote totals'
+  static description =
+    'Prints the list of validator groups, the number of votes they have received, the number of additional votes they are able to receive, and whether or not they are eleigible to elect validators.'
 
   static flags = {
     ...BaseCommand.flags,
@@ -17,8 +18,8 @@ export default class List extends BaseCommand {
     cli.action.stop()
     cli.table(groupVotes, {
       address: {},
-      votes: {},
-      capacity: {},
+      votes: { get: (g) => g.votes.toFixed() },
+      capacity: { get: (g) => g.capacity.toFixed() },
       eligible: {},
     })
   }

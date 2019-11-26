@@ -107,6 +107,7 @@ export async function execCmdWithExitOnFailure(
 ) {
   const code = await execCmd(cmd, args, options)
   if (code !== 0) {
+    console.error('execCmd failed for: ' + [cmd].concat(args).join(' '))
     process.exit(1)
   }
 }
@@ -202,6 +203,7 @@ function writeGenesis(validators: Validator[], path: string, configOverrides: an
     validators,
     blockTime: 0,
     epoch: 10,
+    lookback: 2,
     requestTimeout: 3000,
     chainId: NetworkId,
     ...configOverrides,
@@ -357,10 +359,6 @@ export async function migrateContracts(
 ) {
   const migrationOverrides = _.merge(
     {
-      validators: {
-        validatorKeys: validatorPrivateKeys.map(ensure0x),
-        attestationKeys: attestationKeys.map(ensure0x),
-      },
       election: {
         minElectableValidators: '1',
       },
@@ -369,6 +367,10 @@ export async function migrateContracts(
           addresses: validators.map(ensure0x),
           values: validators.map(() => '10000000000000000000000'),
         },
+      },
+      validators: {
+        validatorKeys: validatorPrivateKeys.map(ensure0x),
+        attestationKeys: attestationKeys.map(ensure0x),
       },
     },
     overrides
