@@ -8,6 +8,7 @@
     - [Deploy the Validator and Proxy nodes](#deploy-the-validator-and-proxy-nodes)
     - [Running the Attestation Service](#running-the-attestation-service)
     - [Stop the containers](#stop-the-containers)
+    - [Running the Docker containers in the background](#running-the-docker-containers-in-the-background)
     - [Reference Script](#reference-script)
     - [Getting some Celo Gold](#getting-some-celo-gold)
 
@@ -143,9 +144,7 @@ docker run -v $PWD/validator:/root/.celo --entrypoint sh --rm $CELO_IMAGE -c "ec
 docker run --name celo-validator --restart always -p 127.0.0.1:8545:8545 -p 127.0.0.1:8546:8546 -p 30303:30303 -p 30303:30303/udp -v $PWD/validator:/root/.celo $CELO_IMAGE --verbosity 3 --networkid $NETWORK_ID --syncmode full --rpc --rpcaddr 0.0.0.0 --rpcapi eth,net,web3,debug,admin,personal,istanbul --maxpeers 125 --mine --minerthreads=10 --istanbul.blockperiod=5 --istanbul.requesttimeout=3000 --etherbase $CELO_VALIDATOR_ADDRESS --nodiscover --proxy.proxied --proxy.proxyenodeurlpair=enode://$PROXY_ENODE@$PROXY_IP:30503\;enode://$PROXY_ENODE@$PROXY_IP:30503  --unlock=$CELO_VALIDATOR_ADDRESS --password /root/.celo/.password
 ```
 
-{% hint style="danger" %}
 **Security**: The command line above includes the parameter `--rpcaddr 0.0.0.0` which makes the Celo Blockchain software listen for incoming RPC requests on all the interfaces of the Docker container. Exercise extreme caution in doing this when running outside Docker, as it means that any unlocked accounts and their funds may be accessed from other machines on the Internet. In the context of running a Docker container on your local machine, this together with the `docker -p` flags allows you to make RPC calls from outside the container, i.e from your local host, but not from outside your machine. Read more about [Docker Networking](https://docs.docker.com/network/network-tutorial-standalone/#use-user-defined-bridge-networks) here.
-{% endhint %}
 
 The `mine` flag does not mean the node starts mining blocks, but rather starts trying to participate in the BFT consensus protocol. It cannot do this until it gets elected -- so next we need to stand for election.
 
@@ -173,6 +172,34 @@ And you can remove the containers (not the data dir) running:
 
 ```bash
 docker rm -f celo-validator celo-proxy
+```
+
+### Running the Docker containers in the background
+
+For long running processes, specially when you run in a remote computer, you can use a tool like [screen](https://ss64.com/osx/screen.html). It allows to connect and disconnect from running processes providing an easy way to manage long run processes.
+
+It's out of the scope of this documentation to go through the `screen` options, but you can use the following command format with your `docker` commands:
+
+```bash
+screen -S <SESSION NAME> -d -m <YOUR COMMAND>
+```
+
+For example:
+
+```bash
+screen -S celo-validator -d -m docker run --name celo-validator --restart always -p 127.0.0.1:8545:8545 .......
+```
+
+You can list your existing `screen` sessions:
+
+```bash
+screen -ls
+```
+
+And re-atach to any of the existing sessions:
+
+```bash
+screen -r -S celo-validator
 ```
 
 ### Reference Script
