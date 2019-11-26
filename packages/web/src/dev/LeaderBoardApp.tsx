@@ -10,20 +10,6 @@ import LeaderBoardError from 'src/dev/LeaderBoardError'
 import LeaderBoardLoading from 'src/dev/LeaderBoardLoading'
 import { I18nProps, withNamespaces } from 'src/i18n'
 
-const LEADERS = [
-  { points: 8, identity: 'Rex' },
-  { points: 840, identity: '100%_that_validator_who_is_an_absolute_diva' },
-  { points: 3200, identity: 'Heisenberg' },
-
-  { points: 7600, identity: 'DX-West' },
-  { points: 5000, identity: 'Simone2148' },
-  { points: 4009, identity: '$celo-$' },
-  { points: 1002, identity: '77zepher' },
-  { points: 9400, identity: 'Gatsby & Durben' },
-]
-/* tslint:disable-next-line */
-console.log(LEADERS)
-
 const graphqlURI = getConfig().publicRuntimeConfig.LEADERBOARD.uri
 
 const createApolloClient = () => {

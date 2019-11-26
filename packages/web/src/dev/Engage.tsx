@@ -1,22 +1,22 @@
 import { I18nProps } from 'next-i18next'
 import * as React from 'react'
-import Fade from 'react-reveal/Fade'
 import {
   Image,
+  ImageRequireSource,
   ImageSourcePropType,
   StyleSheet,
   Text,
   View,
-  ImageRequireSource,
 } from 'react-native'
+import Fade from 'react-reveal/Fade'
 import { H2, H3, H4 } from 'src/fonts/Fonts'
 import { NameSpaces, withNamespaces } from 'src/i18n'
 import { Cell, GridRow, Spans } from 'src/layout/GridRow'
 import { ScreenProps, ScreenSizes, withScreenSize } from 'src/layout/ScreenSize'
 import AspectRatio from 'src/shared/AspectRatio'
 import Button, { BTN, SIZE } from 'src/shared/Button.3'
-import { fonts, standardStyles, textStyles } from 'src/styles'
 import { CeloLinks } from 'src/shared/menu-items'
+import { fonts, standardStyles, textStyles } from 'src/styles'
 
 const Engage = React.memo(function _Engage({ t, screen }: I18nProps & ScreenProps) {
   return (

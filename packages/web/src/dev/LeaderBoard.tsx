@@ -1,11 +1,10 @@
-import * as React from 'react'
 import getConfig from 'next/config'
+import * as React from 'react'
 import { LayoutChangeEvent, StyleSheet, Text, View } from 'react-native'
 import Racer from 'src/dev/Racer'
 import { I18nProps, withNamespaces } from 'src/i18n'
 import { colors, fonts, standardStyles, textStyles } from 'src/styles'
 import Button, { BTN, SIZE } from '../shared/Button.3'
-
 
 interface BoardProps {
   leaders: Competitor[]
@@ -26,7 +25,7 @@ class LeaderBoard extends React.PureComponent<BoardProps & I18nProps, State> {
     width: 0,
     page: 0,
   }
-  
+
   onLayout = (event: LayoutChangeEvent) => {
     const { width } = event.nativeEvent.layout
     this.setState({ width })
@@ -80,7 +79,6 @@ class LeaderBoard extends React.PureComponent<BoardProps & I18nProps, State> {
 }
 export default withNamespaces('dev')(LeaderBoard)
 
-
 const JERSEYS = [colors.primary, colors.lightBlue, colors.red, colors.purple, colors.gold]
 
 function getJersey(rank: number): colors {
@@ -128,7 +126,6 @@ const styles = StyleSheet.create({
   buttonExpand: {
     alignItems: 'center',
   },
-
 })
 
 function round(number: number, magnitude?: number) {
