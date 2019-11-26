@@ -5,48 +5,58 @@ import BigNumber from 'bignumber.js'
 import Web3 from 'web3'
 import { CeloContract } from '..'
 import { Registry } from '../generated/types/Registry'
-import { ProposalBuilder, ProposalUtility } from '../governance'
+import { ProposalBuilder } from '../governance'
 import { newKitFromWeb3 } from '../kit'
-import { GovernanceWrapper, Proposal, ProposalStage, VoteValue } from './Governance'
+import { AccountsWrapper } from './Accounts'
+import { GovernanceWrapper, Proposal, VoteValue } from './Governance'
+import { LockedGoldWrapper } from './LockedGold'
 
 const expConfig = NetworkConfig.governance
 
 testWithGanache('Governance Wrapper', (web3: Web3) => {
   const ONE_SEC = 1000
-  const EXTENDED_TIMEOUT = 10 * ONE_SEC
   const kit = newKitFromWeb3(web3)
   const minDeposit = web3.utils.toWei(expConfig.minDeposit.toString(), 'ether')
+  const ONE_USD = web3.utils.toWei('1', 'ether')
 
   let accounts: Address[] = []
   let governance: GovernanceWrapper
+  let lockedGold: LockedGoldWrapper
+  let accountWrapper: AccountsWrapper
   let registry: Registry
 
   beforeAll(async () => {
     accounts = await web3.eth.getAccounts()
+    kit.defaultAccount = accounts[0]
     governance = await kit.contracts.getGovernance()
     registry = await kit._web3Contracts.getRegistry()
-  })
+    lockedGold = await kit.contracts.getLockedGold()
+    accountWrapper = await kit.contracts.getAccounts()
+
+    await concurrentMap(4, accounts.slice(0, 4), async (account) => {
+      await accountWrapper.createAccount().sendAndWaitForReceipt({ from: account })
+      await lockedGold.lock().sendAndWaitForReceipt({ from: account, value: ONE_USD })
+    })
+  }, 5 * ONE_SEC)
 
   type Repoint = [CeloContract, Address]
 
-  const registryRepointProposal = (repoints: Repoint[]) => {
+  const registryRepointProposal = async (repoints: Repoint[]) => {
     const builder = new ProposalBuilder(kit)
-    repoints.forEach((r) =>
-      builder.addWeb3Tx(registry.methods.setAddressFor(...r), {
+    repoints.forEach((repoint) =>
+      builder.addWeb3Tx(registry.methods.setAddressFor(...repoint), {
         to: registry._address,
         value: '0',
       })
     )
-    return new ProposalUtility(kit, builder.proposal)
+    return builder.build()
   }
 
-  const verifyRepointResult = (repoints: Repoint[]) =>
-    concurrentMap(1, repoints, async (repoint) => {
-      const newAddress = await registry.methods
-        .getAddressForStringOrDie(repoint[0] as string)
-        .call()
-      expect(newAddress).toBe(repoint[1])
-    })
+  // const verifyRepointResult = (repoints: Repoint[]) =>
+  //   concurrentMap(4, repoints, async (repoint) => {
+  //     const newAddress = await registry.methods.getAddressForStringOrDie(repoint[0]).call()
+  //     expect(newAddress).toBe(repoint[1])
+  //   })
 
   it('#getConfig', async () => {
     const config = await governance.getConfig()
@@ -67,7 +77,7 @@ testWithGanache('Governance Wrapper', (web3: Web3) => {
     const proposalID = new BigNumber(1)
 
     let proposal: Proposal
-    beforeAll(() => (proposal = registryRepointProposal(repoints).proposal))
+    beforeAll(async () => (proposal = await registryRepointProposal(repoints)))
 
     const proposeFn = async (proposer: Address) =>
       governance.propose(proposal).sendAndWaitForReceipt({ from: proposer, value: minDeposit })
@@ -89,7 +99,7 @@ testWithGanache('Governance Wrapper', (web3: Web3) => {
     }
 
     const voteFn = async (voter: Address) => {
-      const tx = await governance.vote(proposalID, VoteValue.Yes)
+      const tx = await governance.vote(proposalID, 'Yes')
       await tx.sendAndWaitForReceipt({ from: voter })
       await timeTravel(expConfig.referendumStageDuration, web3)
     }
@@ -101,7 +111,7 @@ testWithGanache('Governance Wrapper', (web3: Web3) => {
       expect(proposalRecord.metadata.proposer).toBe(accounts[0])
       expect(proposalRecord.metadata.transactionCount).toBe(proposal.length)
       expect(proposalRecord.proposal).toStrictEqual(proposal)
-      expect(proposalRecord.stage).toBe(ProposalStage.Queued)
+      expect(proposalRecord.stage).toBe('Queued')
     })
 
     it('#upvote', async () => {
@@ -147,9 +157,6 @@ testWithGanache('Governance Wrapper', (web3: Web3) => {
       const voteWeight = await governance.getVoteWeight(accounts[2])
       const yesVotes = (await governance.getVotes(proposalID))[VoteValue.Yes]
       expect(yesVotes).toEqBigNumber(voteWeight)
-
-      const passing = await governance.isProposalPassing(proposalID)
-      console.log('passing', passing)
     })
 
     it(
@@ -166,11 +173,14 @@ testWithGanache('Governance Wrapper', (web3: Web3) => {
         const exists = await governance.proposalExists(proposalID)
         expect(exists).toBeFalsy()
 
-        await verifyRepointResult(repoints)
+        // await verifyRepointResult(repoints)
       },
-      EXTENDED_TIMEOUT
+      10 * ONE_SEC
     )
   })
+
+  // Disabled until validator set precompile is available in ganache
+  // https://github.com/celo-org/celo-monorepo/issues/1737
 
   // describe('Hotfixes', () => {
   //   const repoints: Repoint[] = [
@@ -178,11 +188,15 @@ testWithGanache('Governance Wrapper', (web3: Web3) => {
   //     [CeloContract.Escrow, '0x0000000000000000000000000000000000000004'],
   //   ]
 
-  //   let hotfix: ProposalUtility
-  //   beforeAll(() => (hotfix = registryRepointProposal(repoints)))
+  //   let hotfixProposal: Proposal
+  //   let hotfixHash: Buffer
+  //   beforeAll(async () => {
+  //     hotfixProposal = await registryRepointProposal(repoints)
+  //     hotfixHash = proposalToHash(kit, hotfixProposal)
+  //   })
 
   //   const whitelistFn = async (whitelister: Address) => {
-  //     const tx = governance.whitelistHotfix(hotfix.hash)
+  //     const tx = governance.whitelistHotfix(proposalToHash(kit, hotfixProposal))
   //     await tx.sendAndWaitForReceipt({ from: whitelister })
   //   }
 
@@ -191,26 +205,26 @@ testWithGanache('Governance Wrapper', (web3: Web3) => {
 
   //   // protocol/truffle-config defines approver address as accounts[0]
   //   const approveFn = async () => {
-  //     const tx = governance.approveHotfix(hotfix.hash)
+  //     const tx = governance.approveHotfix(proposalToHash(kit, hotfixProposal))
   //     await tx.sendAndWaitForReceipt({ from: accounts[0] })
   //   }
 
   //   const prepareFn = async () => {
-  //     const tx = governance.prepareHotfix(hotfix.hash)
+  //     const tx = governance.prepareHotfix(hotfixHash)
   //     await tx.sendAndWaitForReceipt()
   //   }
 
   //   it('#whitelistHotfix', async () => {
   //     await whitelistFn(accounts[9])
 
-  //     const whitelisted = await governance.isHotfixWhitelistedBy(hotfix.hash, accounts[9])
+  //     const whitelisted = await governance.isHotfixWhitelistedBy(hotfixHash, accounts[9])
   //     expect(whitelisted).toBeTruthy()
   //   })
 
   //   it('#approveHotfix', async () => {
   //     await approveFn()
 
-  //     const record = await governance.getHotfixRecord(hotfix.hash)
+  //     const record = await governance.getHotfixRecord(hotfixHash)
   //     expect(record.approved).toBeTruthy()
   //   })
 
@@ -222,10 +236,10 @@ testWithGanache('Governance Wrapper', (web3: Web3) => {
   //       await prepareFn()
 
   //       const validators = await kit.contracts.getValidators()
-  //       const record = await governance.getHotfixRecord(hotfix.hash)
+  //       const record = await governance.getHotfixRecord(hotfixHash)
   //       expect(record.preparedEpoch).toBe(await validators.getEpochNumber())
   //     },
-  //     EXTENDED_TIMEOUT
+  //     10 * ONE_SEC
   //   )
 
   //   it(
@@ -235,15 +249,15 @@ testWithGanache('Governance Wrapper', (web3: Web3) => {
   //       await approveFn()
   //       await prepareFn()
 
-  //       const tx = governance.executeHotfix(hotfix.proposal)
+  //       const tx = governance.executeHotfix(hotfixProposal)
   //       await tx.sendAndWaitForReceipt()
 
-  //       const record = await governance.getHotfixRecord(hotfix.hash)
+  //       const record = await governance.getHotfixRecord(hotfixHash)
   //       expect(record.executed).toBeTruthy()
 
   //       await verifyRepointResult(repoints)
   //     },
-  //     EXTENDED_TIMEOUT
+  //     10 * ONE_SEC
   //   )
   // })
 })

@@ -68,11 +68,12 @@ export interface UpvoteRecord {
 }
 
 export enum VoteValue {
-  None = 0,
-  Abstain,
-  No,
-  Yes,
+  None = 'NONE',
+  Abstain = 'Abstain',
+  No = 'No',
+  Yes = 'Yes',
 }
+
 export interface Votes {
   [VoteValue.Yes]: BigNumber
   [VoteValue.No]: BigNumber
@@ -182,12 +183,15 @@ export class GovernanceWrapper extends BaseWrapper<Governance> {
     })
   )
 
-  static toParams = (proposal: Proposal): ProposalParams => [
-    proposal.map((tx) => tx.value),
-    proposal.map((tx) => tx.to),
-    bufferToBytes(Buffer.concat(proposal.map((tx) => stringToBuffer(tx.input)))),
-    proposal.map((tx) => tx.input.length),
-  ]
+  static toParams = (proposal: Proposal): ProposalParams => {
+    const data = proposal.map((tx) => stringToBuffer(tx.input))
+    return [
+      proposal.map((tx) => tx.value),
+      proposal.map((tx) => tx.to),
+      bufferToBytes(Buffer.concat(data)),
+      data.map((inp) => inp.length),
+    ]
+  }
 
   /**
    * Returns whether a given proposal is approved.
@@ -344,39 +348,44 @@ export class GovernanceWrapper extends BaseWrapper<Governance> {
     return lockedGoldContract.getAccountTotalLockedGold(voter)
   }
 
-  private async getDequeueIndex(proposalID: BigNumber.Value) {
-    const dequeue = await this.getDequeue()
-    const index = dequeue.findIndex((d) => d.isEqualTo(proposalID))
+  private getIndex(id: BigNumber.Value, array: BigNumber[]) {
+    const index = array.findIndex((bn) => bn.isEqualTo(id))
     if (index === -1) {
-      throw new Error(`Proposal ${proposalID} not in dequeue`)
+      throw new Error(`ID ${id} not found in array ${array}`)
     }
     return index
+  }
+
+  private async getDequeueIndex(proposalID: BigNumber.Value, dequeue?: BigNumber[]) {
+    if (!dequeue) {
+      dequeue = await this.getDequeue()
+    }
+    return this.getIndex(proposalID, dequeue)
+  }
+
+  private async getQueueIndex(proposalID: BigNumber.Value, queue?: UpvoteRecord[]) {
+    if (!queue) {
+      queue = await this.getQueue()
+    }
+    return { index: this.getIndex(proposalID, queue.map((record) => record.proposalID)), queue }
+  }
+
+  private async lesserAndGreater(proposalID: BigNumber.Value, _queue?: UpvoteRecord[]) {
+    const { index, queue } = await this.getQueueIndex(proposalID, _queue)
+    return {
+      lesserID: index === 0 ? ZERO_BN : queue[index - 1].proposalID,
+      greaterID: index === queue.length - 1 ? ZERO_BN : queue[index + 1].proposalID,
+    }
   }
 
   private sortedQueue(queue: UpvoteRecord[]) {
     return queue.sort((a, b) => a.upvotes.comparedTo(b.upvotes))
   }
 
-  private indexOfProposalID(queue: UpvoteRecord[], proposalID: BigNumber.Value) {
-    const idx = queue.findIndex((qp) => qp.proposalID.isEqualTo(proposalID))
-    if (idx === -1) {
-      throw new Error(`Proposal ${proposalID} not in queue`)
-    }
-    return idx
-  }
-
-  private lesserAndGreater(queue: UpvoteRecord[], proposalID: BigNumber.Value) {
-    const idx = this.indexOfProposalID(queue, proposalID)
-    return {
-      lesserID: idx === 0 ? ZERO_BN : queue[idx - 1].proposalID,
-      greaterID: idx === queue.length - 1 ? ZERO_BN : queue[idx + 1].proposalID,
-    }
-  }
-
-  private async withUpvoteRevoked(queue: UpvoteRecord[], upvoter: Address) {
+  private async withUpvoteRevoked(upvoter: Address, _queue?: UpvoteRecord[]) {
     const upvoteRecord = await this.getUpvoteRecord(upvoter)
-    const queueIndex = this.indexOfProposalID(queue, upvoteRecord.proposalID)
-    queue[queueIndex].upvotes = queue[queueIndex].upvotes.minus(upvoteRecord.upvotes)
+    const { index, queue } = await this.getQueueIndex(upvoteRecord.proposalID, _queue)
+    queue[index].upvotes = queue[index].upvotes.minus(upvoteRecord.upvotes)
     return {
       queue: this.sortedQueue(queue),
       upvoteRecord,
@@ -384,25 +393,28 @@ export class GovernanceWrapper extends BaseWrapper<Governance> {
   }
 
   private async withUpvoteApplied(
-    queue: UpvoteRecord[],
+    upvoter: Address,
     proposalID: BigNumber.Value,
-    upvoter: Address
+    _queue?: UpvoteRecord[]
   ) {
+    const { index, queue } = await this.getQueueIndex(proposalID, _queue)
     const weight = await this.getVoteWeight(upvoter)
-    const queueIndex = this.indexOfProposalID(queue, proposalID)
-    queue[queueIndex].upvotes = queue[queueIndex].upvotes.plus(weight)
+    queue[index].upvotes = queue[index].upvotes.plus(weight)
     return this.sortedQueue(queue)
   }
 
   private async lesserAndGreaterAfterRevoke(upvoter: Address) {
-    const { queue, upvoteRecord } = await this.withUpvoteRevoked(await this.getQueue(), upvoter)
-    return this.lesserAndGreater(queue, upvoteRecord.proposalID)
+    const { queue, upvoteRecord } = await this.withUpvoteRevoked(upvoter)
+    return this.lesserAndGreater(upvoteRecord.proposalID, queue)
   }
 
-  private async lesserAndGreaterAfterUpvote(proposalID: BigNumber.Value, upvoter: Address) {
-    const { queue: revokeQueue } = await this.withUpvoteRevoked(await this.getQueue(), upvoter)
-    const upvoteQueue = await this.withUpvoteApplied(revokeQueue, proposalID, upvoter)
-    return this.lesserAndGreater(upvoteQueue, proposalID)
+  private async lesserAndGreaterAfterUpvote(upvoter: Address, proposalID: BigNumber.Value) {
+    const upvoteRecord = await this.getUpvoteRecord(upvoter)
+    const queue = upvoteRecord.proposalID.isZero()
+      ? await this.getQueue()
+      : (await this.withUpvoteRevoked(upvoter)).queue
+    const upvoteQueue = await this.withUpvoteApplied(upvoter, proposalID, queue)
+    return this.lesserAndGreater(proposalID, upvoteQueue)
   }
 
   /**
@@ -411,7 +423,7 @@ export class GovernanceWrapper extends BaseWrapper<Governance> {
    * @param upvoter Address of upvoter
    */
   async upvote(proposalID: BigNumber.Value, upvoter: Address) {
-    const { lesserID, greaterID } = await this.lesserAndGreaterAfterUpvote(proposalID, upvoter)
+    const { lesserID, greaterID } = await this.lesserAndGreaterAfterUpvote(upvoter, proposalID)
     return toTransactionObject(
       this.kit,
       this.contract.methods.upvote(
@@ -452,11 +464,12 @@ export class GovernanceWrapper extends BaseWrapper<Governance> {
    * @param proposalID Governance proposal UUID
    * @param vote Choice to apply (yes, no, abstain)
    */
-  async vote(proposalID: BigNumber.Value, vote: VoteValue) {
+  async vote(proposalID: BigNumber.Value, vote: keyof typeof VoteValue) {
     const proposalIndex = await this.getDequeueIndex(proposalID)
+    const voteNum = Object.keys(VoteValue).indexOf(vote)
     return toTransactionObject(
       this.kit,
-      this.contract.methods.vote(valueToString(proposalID), proposalIndex, vote)
+      this.contract.methods.vote(valueToString(proposalID), proposalIndex, voteNum)
     )
   }
 
@@ -468,7 +481,7 @@ export class GovernanceWrapper extends BaseWrapper<Governance> {
   async getVoteValue(proposalID: BigNumber.Value, voter: Address) {
     const proposalIndex = await this.getDequeueIndex(proposalID)
     const res = await this.contract.methods.getVoteRecord(voter, proposalIndex).call()
-    return valueToInt(res[1]) as VoteValue
+    return Object.keys(VoteValue)[valueToInt(res[1])] as VoteValue
   }
 
   /**
