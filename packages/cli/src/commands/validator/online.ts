@@ -28,6 +28,7 @@ export default class ValidatorOnline extends BaseCommand {
     const { flags } = this.parse(ValidatorOnline)
 
     await newCheckBuilder(this, flags.signer)
+      .signerMeetsValidatorBalanceRequirements()
       .signerAccountIsValidator()
       .runChecks()
 
