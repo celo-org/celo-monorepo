@@ -7,7 +7,8 @@ import { newCheckBuilder } from '../../utils/checks'
 import { Flags } from '../../utils/command'
 
 export default class ValidatorOnline extends BaseCommand {
-  static description = 'Show information about whether the signer is elected and validating'
+  static description =
+    'Show information about whether the signer is elected and validating. This command will check that the signer, which may be a validator or its authorized signer, meets the registration requirements, is currently elected, and is actively signing blocks.'
 
   // How many blocks to look back for proposals of this signer.
   static readonly lookback = 50

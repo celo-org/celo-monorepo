@@ -125,6 +125,24 @@ EXAMPLE
 
 _See code: [packages/cli/src/commands/validator/show.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/validator/show.ts)_
 
+### Status
+
+Show information about whether the signer is elected and validating. This command will check that the signer, which may be a validator or its authorized signer, meets the registration requirements, is currently elected, and is actively signing blocks.
+
+```
+USAGE
+  $ celocli validator:status
+
+OPTIONS
+  --signer=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) address of the signer to check if elected and
+                                                       validating
+
+EXAMPLE
+  status --signer 0x5409ED021D9299bf6814279A6A1411A7e866A631
+```
+
+_See code: [packages/cli/src/commands/validator/status.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/validator/status.ts)_
+
 ### Update-bls-public-key
 
 Update the BLS public key for a Validator to be used in consensus. Regular (ECDSA and BLS) key rotation is recommended for Validator operational security.
