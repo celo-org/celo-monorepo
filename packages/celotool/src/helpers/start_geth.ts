@@ -140,7 +140,7 @@ async function runNodes({
   await writeGenesis(validators, genesisPath)
   console.log('wrote   genesis')
 
-  console.log(validatorEnodes)
+  console.log('Validator eNodes', JSON.stringify(validatorEnodes, null, 2))
 
   fs.writeFileSync(validatorsFilePath, JSON.stringify(validatorEnodes), 'utf8')
 
