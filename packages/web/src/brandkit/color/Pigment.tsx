@@ -9,6 +9,20 @@ import yiq from 'yiq'
 
 import { ColorTranslator } from 'colortranslator'
 
+function hexToHumanRGB(hex: string) {
+  return hexRgba(hex)
+    .toUpperCase()
+    .replace('A(', 'A (')
+}
+
+function getContrastingColor(hex: string) {
+  return yiq(hex, { white: colors.white, black: colors.dark })
+}
+
+async function onCopy(text: string) {
+  await navigator.clipboard.writeText(text)
+}
+
 export interface ColorData {
   hex: string
   name: string
@@ -120,9 +134,8 @@ const styles = StyleSheet.create({
   },
   box: {
     cursor: 'copy',
-    borderColor: colors.gray,
-    borderWidth: 1,
-    padding: 30,
+    paddingVertical: 30,
+    paddingRight: 40,
     margin: GAP,
   },
   pigment: {
@@ -130,9 +143,10 @@ const styles = StyleSheet.create({
     flexBasis: 118,
     width: 118,
     transitionProperty: 'transform',
+    transformOrigin: 'left',
   },
   pigmentHover: {
-    transform: [{ scaleX: 1.05 }, { scaleY: 1.05 }],
+    transform: [{ scaleX: 1.01 }],
   },
   copyText: {
     paddingLeft: 5,
@@ -147,27 +161,3 @@ const styles = StyleSheet.create({
   },
   afterEffect: { position: 'absolute' },
 })
-
-function hexToHumanRGB(hex: string) {
-  return hexRgba(hex)
-    .toUpperCase()
-    .replace('A(', 'A (')
-}
-
-// function hexToMachineRGB(hex) {
-//   const rgba = hexRgba(hex)
-//   const [red, green, blue, alpha] = rgba
-//     .replace('rgba(', '')
-//     .replace(')', '')
-//     .split(',')
-
-//   return { red, green, blue }
-// }
-
-function getContrastingColor(hex: string) {
-  return yiq(hex, { white: colors.white, black: colors.dark })
-}
-
-async function onCopy(text: string) {
-  await navigator.clipboard.writeText(text)
-}
