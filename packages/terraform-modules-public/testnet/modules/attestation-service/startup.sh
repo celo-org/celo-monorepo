@@ -39,12 +39,20 @@ systemctl restart docker
 
 DATA_DIR=/root/.celo
 mkdir -p $DATA_DIR
-ATTESTATION_KEY=${attestation_key}
-ACCOUNT_ADDRESS=${account_address}
-CELO_PROVIDER=${celo_provider}
-SMS_PROVIDERS=${sms_providers}
-ATTESTATION_SERVICE_DOCKER_IMAGE=${attestation_service_docker_image_repository}:${attestation_service_docker_image_tag}
-docker pull $ATTESTATION_SERVICE_DOCKER_IMAGE
+ATTESTATION_KEY='${attestation_key}'
+ACCOUNT_ADDRESS='${account_address}'
+CELO_PROVIDER='${celo_provider}'
+SMS_PROVIDERS='${sms_providers}'
+NEXMO_KEY='${nexmo_key}'
+NEXMO_SECRET='${nexmo_secret}'
+NEXMO_BLACKLIST='${nexmo_blacklist}'
+TWILIO_ACCOUNT_SID='${twilio_account_sid}'
+TWILIO_MESSAGING_SERVICE_SID='${twilio_messaging_service_sid}'
+TWILIO_AUTH_TOKEN='${twilio_auth_token}'
+TWILIO_BLACKLIST='${twilio_blacklist}'
+
+ATTESTATION_SERVICE_DOCKER_IMAGE='${attestation_service_docker_image_repository}:${attestation_service_docker_image_tag}'
+docker pull "$ATTESTATION_SERVICE_DOCKER_IMAGE"
 
 # Run the Cloud SQL Proxy
 
@@ -67,7 +75,7 @@ ExecStop=/usr/bin/docker rm -f %N
 [Install]
 WantedBy=default.target
 EOF
-DATABASE_URL="postgres://${db_username}:${db_password}@127.0.0.1:5432/attestation_service"
+DATABASE_URL="postgres://${db_username}:${db_password}@127.0.0.1:5432/postgres"
 systemctl daemon-reload
 systemctl enable cloudsql.service
 systemctl restart cloudsql.service
@@ -96,25 +104,28 @@ After=docker.service
 Restart=always
 ExecStart=/usr/bin/docker run \\
   --name attestation-service \\
-  --net=host 
-   --entrypoint /bin/sh \\
+  --net=host \\
+  --entrypoint /bin/bash \\
   -v $DATA_DIR:$DATA_DIR \\
-  -e DATABASE_URL=$DATABASE_URL \\
-  -e ATTESTATION_KEY=$ATTESTATION_KEY \\
-  -e ACCOUNT_ADDRESS=$ACCOUNT_ADDRESS \\
-  -e CELO_PROVIDER=$CELO_PROVIDER \\
-  -e SMS_PROVIDERS=$SMS_PROVIDERS \\
-  -e NEXMO_KEY=$NEXMO_KEY \\
-  -e NEXMO_SECRET=$NEXMO_SECRET \\
-  -e NEXMO_BLACKLIST=$NEXMO_BLACKLIST \\
-  -e TWILIO_ACCOUNT_SID=$TWILIO_ACCOUNT_SID \\
-  -e TWILIO_MESSAGING_SERVICE_SID=$TWILIO_MESSAGING_SERVICE_SID \\
-  -e TWILIO_AUTH_TOKEN=$TWILIO_AUTH_TOKEN \\
-  -e TWILIO_BLACKLIST=$TWILIO_BLACKLIST \\
-  $ATTESTATION_SERVICE_DOCKER_IMAGE -c \\
-      yarn run db:create:dev && \\
-      yarn run db:migrate:dev && \\
-      yarn start
+  -e NODE_ENV=production \\
+  -e DATABASE_URL="$DATABASE_URL" \\
+  -e ACCOUNT_ADDRESS="$ACCOUNT_ADDRESS" \\
+  -e ATTESTATION_KEY="$ATTESTATION_KEY" \\
+  -e CELO_PROVIDER="$CELO_PROVIDER" \\
+  -e SMS_PROVIDERS="$SMS_PROVIDERS" \\
+  -e NEXMO_KEY="$NEXMO_KEY" \\
+  -e NEXMO_SECRET="$NEXMO_SECRET" \\
+  -e NEXMO_BLACKLIST="$NEXMO_BLACKLIST" \\
+  -e TWILIO_ACCOUNT_SID="$TWILIO_ACCOUNT_SID" \\
+  -e TWILIO_MESSAGING_SERVICE_SID="$TWILIO_MESSAGING_SERVICE_SID" \\
+  -e TWILIO_AUTH_TOKEN="$TWILIO_AUTH_TOKEN" \\
+  -e TWILIO_BLACKLIST="$TWILIO_BLACKLIST" \\
+  $ATTESTATION_SERVICE_DOCKER_IMAGE -c "\\
+  ( \\
+      cd /celo-monorepo/packages/attestation-service && \\
+      yarn run db:migrate && \\
+      yarn start \\
+  )"
 ExecStop=/usr/bin/docker rm -f %N
 
 [Install]

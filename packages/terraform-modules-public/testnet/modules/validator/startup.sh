@@ -27,10 +27,10 @@ else
   mkfs.ext4 -m 0 -F -E lazy_itable_init=0,lazy_journal_init=0,discard $DISK_PATH
 fi
 
-mkdir -p $DATA_DIR
 echo "Mounting $DISK_PATH onto $DATA_DIR"
 mount -o discard,defaults $DISK_PATH $DATA_DIR
 [[ ${reset_geth_data} == "true" ]] && rm -rf $DATA_DIR/geth
+mkdir -p $DATA_DIR/account
 
 # ---- Install Docker ----
 
@@ -146,7 +146,7 @@ ExecStart=/usr/bin/docker run \\
       --consoleformat=json \\
       --consoleoutput=stdout \\
       --verbosity=${geth_verbosity} \\
-      --ethstats=${validator_name}:$ETHSTATS_WEBSOCKETSECRET@${ethstats_host} \\
+      --ethstats=${validator_name}@${ethstats_host} \\
       --istanbul.blockperiod=${block_time} \\
       --istanbul.requesttimeout=${istanbul_request_timeout_ms} \\
       --maxpeers=${max_peers} \\

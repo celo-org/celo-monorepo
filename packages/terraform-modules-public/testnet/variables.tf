@@ -203,16 +203,16 @@ variable attestation_service_docker_image_tag {
   default     = ""
 }
 
-variable attestation_service_account_address {
-  type        = string
-  description = "The etherbase account address for signing the attestations"
-  default     = ""
+variable attestation_service_addresses {
+  type        = list(string)
+  description = "The account address for signing the attestations. Must be the address of the associated validator"
+  default     = [""]
 }
 
-variable attestation_service_attestation_key {
-  type        = string
-  description = "The etherbase account private key for signing the attestations"
-  default     = ""
+variable attestation_service_private_keys {
+  type        = list(string)
+  description = "The account private key for signing the attestations. Must be the private key of the associated validator"
+  default     = [""]
 }
 
 

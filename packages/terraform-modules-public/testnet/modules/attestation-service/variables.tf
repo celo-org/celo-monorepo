@@ -39,13 +39,13 @@ variable network_name {
 }
 
 variable account_address {
-  type        = string
-  description = "The etherbase account address for signing the attestations"
+  type        = list(string)
+  description = "The account address for signing the attestations. Must be the address of the associated validator"
 }
 
 variable attestation_key {
-  type        = string
-  description = "The etherbase account private key for signing the attestations"
+  type        = list(string)
+  description = "The account private key for signing the attestations. Must be the private key of the associated validator"
 }
 
 variable celo_provider {

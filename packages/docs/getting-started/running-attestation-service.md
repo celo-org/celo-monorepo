@@ -23,9 +23,11 @@ The service needs the following environment variables:
 | APP_SIGNATURE           | The hash with which clients can auto-read SMS messages on android                                                                                                      |  |
 | SMS_PROVIDERS           | A comma-separated list of providers you want to configure, we currently support `nexmo` & `twilio`                                                                     |  |
 
-## Sms Providers
+## SMS Providers
 
 Currently the Sms providers supported are Nexmo & Twilio. You can create your user account in the provider of your election using the [Nexmo Sign Up form](https://dashboard.nexmo.com/sign-up) or the [Twilio Sign Up form](https://www.twilio.com/try-twilio).
+
+After signing up over any of these SMS Providers, you need to add/buy at least one number to send the SMS messages from them.
 
 ### Nexmo
 
@@ -50,13 +52,7 @@ If you prefer using Twilio, this is list of the variables to use:
 
 ## Accounts Configuration
 
-First we need to create an account for getting the attestation key needed to sign the attestations. Run:
-
-```bash
-celocli account:new
-```
-
-We copy the account details and assign the Private Key to the `ATTESTATION_PRIVATE_KEY` environment variable:
+First we need select an account for getting the attestation key needed to sign the attestations. The account will be the same as the one assigned to the validator.
 
 ```bash
 export ATTESTATION_PRIVATE_KEY=0x<Private Key>
@@ -77,11 +73,11 @@ celocli account:authorize --from $CELO_VALIDATOR_ADDRESS -r attestation --pop SI
 
 The Attestation Service needs to connect to a Web3 Provider. This is going to depend on the network you want to connect. So depending on which network you are making available the service, you need to configure the `CELO_PROVIDER` variable pointing to that.
 
-For example:
+You can connect for `CELO_PROVIDER` to your proxy local instance, or also can use the public endpoint for the network, that will be something like `https://{celo_network}-forno.celo-testnet.org/`. For example, for baklava network:
 
 ```bash
 # Web3 provider for Alfajores network
-export CELO_PROVIDER="https://alfajores-forno.celo-testnet.org/"
+export CELO_PROVIDER="https://baklava-forno.celo-testnet.org/"
 ```
 
 #### Database Configuration

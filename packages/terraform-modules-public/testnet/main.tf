@@ -241,8 +241,8 @@ module "attestation-service" {
   db_password                                 = var.attestation_service_db_password
   attestation_service_docker_image_repository = var.attestation_service_docker_image_repository
   attestation_service_docker_image_tag        = var.attestation_service_docker_image_tag
-  attestation_key                             = var.attestation_service_attestation_key
-  account_address                             = var.attestation_service_account_address
+  account_address                             = var.attestation_service_addresses
+  attestation_key                             = var.attestation_service_private_keys
   celo_provider                               = var.attestation_service_celo_provider != "" ? var.attestation_service_celo_provider : "http://${module.proxy.internal_ip_addresses[0]}:8545"
   sms_providers                               = var.attestation_service_sms_providers
   nexmo_key                                   = var.attestation_service_nexmo_key

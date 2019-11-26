@@ -29,19 +29,19 @@ The Proxy is not mandatory but highly recommended. It allows to protect the Vali
 
 | Variable                      | Explanation                                                      |
 | ----------------------------- | ---------------------------------------------------------------- |
-| CELO_IMAGE                    | The Docker image used for the Validator and Proxy containers     |  |
-| NETWORK_ID                    | The Celo network chain ID                                        |  |
-| URL_VERIFICATION_POOL         | URL for the Verification pool for the attestation process        |  |
-| CELO_VALIDATOR_GROUP_ADDRESS  | The public address for the validation group                      |  |
-| CELO_VALIDATOR_ADDRESS        | The public address for the Validator instance                    |  |
-| CELO_PROXY_ADDRESS            | The public address for the Proxy instance                        |  |
-| CELO_VALIDATOR_BLS_PUBLIC_KEY | The BLS public key for the Validator instance                    |  |
-| CELO_VALIDATOR_BLS_SIGNATURE  | A proof-of-possession of the BLS public key                      |  |
-| PROXY_ENODE                   | The enode address for the Validator proxy                        |  |
-| PROXY_IP                      | The Proxy container internal IP address from docker pool address |  |
-| ATTESTATION_KEY               | The private key for the account used in the Attestation Service  |  |
-| ATTESTATION_SERVICE_URL       | The URL to access the Attestation Service deployed               |  |
-| METADATA_URL                  | The URL to access the metadata file for your Attestation Service |  |
+| CELO_IMAGE                    | The Docker image used for the Validator and Proxy containers     |
+| NETWORK_ID                    | The Celo network chain ID                                        |
+| URL_VERIFICATION_POOL         | URL for the Verification pool for the attestation process        |
+| CELO_VALIDATOR_GROUP_ADDRESS  | The public address for the validation group                      |
+| CELO_VALIDATOR_ADDRESS        | The public address for the Validator instance                    |
+| CELO_PROXY_ADDRESS            | The public address for the Proxy instance                        |
+| CELO_VALIDATOR_BLS_PUBLIC_KEY | The BLS public key for the Validator instance                    |
+| CELO_VALIDATOR_BLS_SIGNATURE  | A proof-of-possession of the BLS public key                      |
+| PROXY_ENODE                   | The enode address for the Validator proxy                        |
+| PROXY_IP                      | The Proxy container internal IP address from docker pool address |
+| ATTESTATION_KEY               | The private key for the account used in the Attestation Service  |
+| ATTESTATION_SERVICE_URL       | The URL to access the Attestation Service deployed               |
+| METADATA_URL                  | The URL to access the metadata file for your Attestation Service |
 
 First we are going to setup the main environment variables related with the `Baklava` network. Run:
 

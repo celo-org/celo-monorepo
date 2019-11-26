@@ -20,6 +20,12 @@ resource "google_sql_user" "celo" {
   password = var.db_password
 }
 
+resource "google_compute_address" "attestation_service" {
+  count        = var.deploy_attestation_service ? 1 : 0
+  name         = "${local.name_prefix}-address"
+  address_type = "EXTERNAL"
+}
+
 resource "google_compute_address" "attestation_service_internal" {
   count        = var.deploy_attestation_service ? 1 : 0
   name         = "${local.name_prefix}-internal-address"
@@ -44,7 +50,10 @@ resource "google_compute_instance" "attestation_service" {
 
   network_interface {
     network    = var.network_name
-    network_ip = google_compute_address.attestation_service_internal[0].address
+    network_ip = google_compute_address.attestation_service_internal[count.index].address
+    access_config {
+      nat_ip = google_compute_address.attestation_service[count.index].address
+    }
   }
 
   service_account {
@@ -53,8 +62,8 @@ resource "google_compute_instance" "attestation_service" {
 
   metadata_startup_script = templatefile(
     format("%s/startup.sh", path.module), {
-      attestation_key : var.attestation_key,
-      account_address : var.account_address,
+      attestation_key : "0x${var.attestation_key[count.index]}",
+      account_address : var.account_address[count.index],
       celo_provider : var.celo_provider,
       attestation_service_docker_image_repository : var.attestation_service_docker_image_repository,
       attestation_service_docker_image_tag : var.attestation_service_docker_image_tag,
