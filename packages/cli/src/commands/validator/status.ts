@@ -7,7 +7,7 @@ import { newCheckBuilder } from '../../utils/checks'
 import { Flags } from '../../utils/command'
 
 export default class ValidatorOnline extends BaseCommand {
-  static description = 'Show information about whether the given signer is online and validating'
+  static description = 'Show information about whether the signer is elected and validating'
 
   // How many blocks to look back for proposals of this signer.
   static readonly lookback = 50
@@ -16,11 +16,11 @@ export default class ValidatorOnline extends BaseCommand {
     ...BaseCommand.flags,
     signer: Flags.address({
       required: true,
-      description: 'address of the signer to check if online and validating',
+      description: 'address of the signer to check if elected and validating',
     }),
   }
 
-  static examples = ['online --signer 0x5409ED021D9299bf6814279A6A1411A7e866A631']
+  static examples = ['status --signer 0x5409ED021D9299bf6814279A6A1411A7e866A631']
 
   requireSynced = true
 
@@ -57,10 +57,9 @@ export default class ValidatorOnline extends BaseCommand {
       if (this.validatorIndexSignedParentHeader(block, signerIndex)) {
         const parent =
           i + 1 < blocks.length ? blocks[i + 1] : await this.web3.getBlock(block.number - 1)
+        const timedelta = Date.now() / 1000 - parent.timestamp
         console.info(
-          `Signer is online and signed block ${parent.number} ${Math.ceil(
-            Date.now() / 1000 - parent.timestamp
-          )} seconds ago`
+          `Signer most recently signed block ${parent.number} ${Math.ceil(timedelta)} seconds ago`
         )
         return
       }
