@@ -24,7 +24,7 @@ export default React.memo(function Color() {
     <Page
       sections={[
         { id: brandColor.overview, children: <Overview /> },
-        { id: brandColor.system, children: <Backgrounds /> },
+        { id: brandColor.backgrounds, children: <Backgrounds /> },
       ]}
     />
   )

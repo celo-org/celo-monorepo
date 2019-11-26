@@ -1,12 +1,10 @@
 import * as React from 'react'
 import { Image, ImageURISource, StyleSheet, Text, View } from 'react-native'
-import Fade from 'react-reveal/Fade'
 import { brandStyles } from 'src/brandkit/common/constants'
-import Button, { BTN } from 'src/shared/Button.3'
 import Spinner from 'src/shared/Spinner'
 import { colors, fonts, standardStyles } from 'src/styles'
-import Download from 'src/icons/Download'
 import AspectRatio from 'src/shared/AspectRatio'
+import DownloadButton from 'src/brandkit/common/DownloadButton'
 
 interface Props {
   name: string
@@ -47,15 +45,7 @@ export default React.memo(function Showcase({
         <Text style={[fonts.h6, styles.title]}>{name}</Text>
         <Text style={fonts.legal}>{description}</Text>
       </View>
-      <View style={brandStyles.button}>
-        <Button
-          kind={BTN.TERTIARY}
-          text={'Download'}
-          href={uri}
-          style={styles.pullStart}
-          iconRight={<Download size={12} color={colors.primary} />}
-        />
-      </View>
+      <DownloadButton uri={uri} />
     </View>
   )
 })

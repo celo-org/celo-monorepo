@@ -108,17 +108,14 @@ export const hashNav = {
   home: { partnerships: 'partnerships' },
   brandLogo: {
     overview: 'overview',
-    glyph: 'glyph',
-    clearspace: 'clearspace',
-    size: 'size',
+    space: 'space-and-sizing',
     backgrounds: 'backgrounds',
   },
   brandColor: {
     overview: 'overview',
-    system: 'color-system',
-    guideline: 'guideline',
+    backgrounds: 'background-colors',
   },
-  brandTypography: { overview: 'overview', system: 'type-system', guideline: 'guideline' },
+  brandTypography: { overview: 'overview', scale: 'type-scale' },
   brandImagery: {
     overview: 'overview',
     icons: 'icons',

@@ -20,6 +20,9 @@ export const brandStyles = StyleSheet.create({
     borderBottomWidth: 1,
   },
   button: {
-    transform: [{ translateX: -20 }],
+    // by default buttons have padding on all sides this resets so it can align with left
+    paddingLeft: 0,
+    // default is center which means with the icon its a little to far right for our usecase
+    justifyContent: 'flex-start',
   },
 })

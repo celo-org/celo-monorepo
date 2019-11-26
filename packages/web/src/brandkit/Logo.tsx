@@ -17,6 +17,7 @@ import AspectRatio from 'src/shared/AspectRatio'
 import Button, { BTN } from 'src/shared/Button.3'
 import { hashNav } from 'src/shared/menu-items'
 import { colors, fonts, standardStyles } from 'src/styles'
+import DownloadButton from 'src/brandkit/common/DownloadButton'
 
 export default React.memo(function Logo() {
   return (
@@ -35,7 +36,7 @@ export default React.memo(function Logo() {
         //   ),
         // },
         {
-          id: hashNav.brandLogo.clearspace,
+          id: hashNav.brandLogo.space,
           children: <Clearspace />,
         },
         // {
@@ -79,28 +80,28 @@ const Overview = withNamespaces(NameSpaces.brand)(
             hasBorder={true}
             logoType={Logos.light}
             background={colors.white}
-            btnText={t('downloadAssetBtn')}
+            href="/todo"
             caption={t('logo.fullColorOnLightCaption')}
           />
           <LogoExample
             hasBorder={false}
             logoType={Logos.dark}
             background={colors.dark}
-            btnText={t('downloadAssetBtn')}
+            href="/todo"
             caption={t('logo.fullColorOnDarkCaption')}
           />
           <LogoExample
             hasBorder={true}
             logoType={Logos.black}
             background={colors.white}
-            btnText={t('downloadAssetBtn')}
+            href="/todo"
             caption={t('logo.monochromeCaption')}
           />
           <LogoExample
             hasBorder={false}
             logoType={Logos.white}
             background={colors.dark}
-            btnText={t('downloadAssetBtn')}
+            href="/todo"
             caption={t('logo.monochromeInverseCaption')}
           />
         </View>
@@ -109,7 +110,7 @@ const Overview = withNamespaces(NameSpaces.brand)(
             {t('logo.glyphTitle')}
           </Text>
           <Text style={fonts.p}>{t('logo.glyphText')}</Text>
-          <Button kind={BTN.TERTIARY} text={t('downloadAssetBtn')} style={brandStyles.button} />
+          <DownloadButton href="/todo" />
           <View style={[styles.tiling, standardStyles.elementalMarginTop]}>
             <View
               style={[
@@ -149,7 +150,9 @@ const Overview = withNamespaces(NameSpaces.brand)(
 const Clearspace = withNamespaces(NameSpaces.brand)(function _ClearSpace({ t }) {
   return (
     <>
-      <SectionTitle>{t('logo.SpaceSizeTitle')}</SectionTitle>
+      <View style={styles.gap}>
+        <SectionTitle>{t('logo.SpaceSizeTitle')}</SectionTitle>
+      </View>
       <Text
         style={[
           fonts.h5a,

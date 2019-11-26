@@ -19,7 +19,7 @@ const COLOR_PATH = `${ROOT}/color`
 
 const TYPE_PATH = `${ROOT}/typography`
 
-const IMAGERY_PATH = `${ROOT}/key-imagery`
+// const IMAGERY_PATH = `${ROOT}/key-imagery`
 const ICONS_PATH = `${ROOT}/icons`
 
 const PAGES = [
@@ -34,9 +34,7 @@ const PAGES = [
 
     sections: [
       { title: 'Overview', href: `${LOGO_PATH}#${hashNav.brandLogo.overview}` },
-      // { title: 'Glyph', href: `${LOGO_PATH}#${hashNav.brandLogo.glyph}` },
-      { title: 'Clearspace', href: `${LOGO_PATH}#${hashNav.brandLogo.clearspace}` },
-      // { title: 'Size', href: `${LOGO_PATH}#${hashNav.brandLogo.size}` },
+      { title: 'Space and Sizing', href: `${LOGO_PATH}#${hashNav.brandLogo.space}` },
       { title: 'Backgrounds', href: `${LOGO_PATH}#${hashNav.brandLogo.backgrounds}` },
     ],
   },
@@ -46,8 +44,7 @@ const PAGES = [
 
     sections: [
       { title: 'Overview', href: `${COLOR_PATH}#${hashNav.brandColor.overview}` },
-      { title: 'Color System', href: `${COLOR_PATH}#${hashNav.brandColor.system}` },
-      // { title: 'Guideline', href: `${COLOR_PATH}#${hashNav.brandColor.guideline}` },
+      { title: 'Background Colors', href: `${COLOR_PATH}#${hashNav.brandColor.backgrounds}` },
     ],
   },
   {
@@ -56,8 +53,7 @@ const PAGES = [
 
     sections: [
       { title: 'Overview', href: `${TYPE_PATH}#${hashNav.brandTypography.overview}` },
-      { title: 'Color System', href: `${TYPE_PATH}#${hashNav.brandTypography.system}` },
-      { title: 'Guideline', href: `${TYPE_PATH}#${hashNav.brandTypography.guideline}` },
+      { title: 'Type Scale', href: `${TYPE_PATH}#${hashNav.brandTypography.system}` },
     ],
   },
   {
@@ -65,16 +61,16 @@ const PAGES = [
     href: ICONS_PATH,
     sections: [],
   },
-  {
-    title: 'Key Imagery',
-    href: IMAGERY_PATH,
+  // {
+  //   title: 'Key Imagery',
+  //   href: IMAGERY_PATH,
 
-    sections: [
-      { title: 'Overview', href: `${IMAGERY_PATH}#${hashNav.brandImagery.overview}` },
-      { title: 'Illustrations', href: `${IMAGERY_PATH}#${hashNav.brandImagery.illustrations}` },
-      { title: 'Abstract Graphics', href: `${IMAGERY_PATH}#${hashNav.brandImagery.graphics}` },
-    ],
-  },
+  //   sections: [
+  //     { title: 'Overview', href: `${IMAGERY_PATH}#${hashNav.brandImagery.overview}` },
+  //     { title: 'Illustrations', href: `${IMAGERY_PATH}#${hashNav.brandImagery.illustrations}` },
+  //     { title: 'Abstract Graphics', href: `${IMAGERY_PATH}#${hashNav.brandImagery.graphics}` },
+  //   ],
+  // },
 ]
 
 export const ROUTE_TO_TITLE = PAGES.reduce((mapping, page) => {
@@ -201,12 +197,7 @@ class Page extends React.Component<Props & ScreenProps, State> {
             <View style={styles.childrenArea} ref={this.pageRef}>
               {sections.map(({ id, children }) => {
                 return (
-                  <View
-                    key={id}
-                    nativeID={id}
-                    ref={this.sectionRefs[id]}
-                    style={standardStyles.blockMarginBottom}
-                  >
+                  <View key={id} nativeID={id} ref={this.sectionRefs[id]}>
                     {children}
                   </View>
                 )

@@ -3,8 +3,8 @@ import { StyleSheet, Text, View } from 'react-native'
 import { brandStyles, GAP } from 'src/brandkit/common/constants'
 import LogoDarkBg from 'src/logos/LogoDarkBg'
 import LogoLightBg from 'src/logos/LogoLightBg'
-import Button, { BTN } from 'src/shared/Button.3'
 import { colors, fonts, standardStyles } from 'src/styles'
+import DownloadButton from 'src/brandkit/common/DownloadButton'
 
 export enum Logos {
   dark,
@@ -17,12 +17,12 @@ interface Props {
   caption: string
   background: colors
   logoType: Logos
-  btnText: string
   hasBorder: boolean
+  href: string
 }
 
 export default React.memo(function LogoExample({
-  btnText,
+  href,
   caption,
   background,
   logoType,
@@ -46,7 +46,7 @@ export default React.memo(function LogoExample({
         )}
       </View>
       <Text style={fonts.legal}>{caption}</Text>
-      <Button kind={BTN.TERTIARY} text={btnText} style={styles.button} />
+      <DownloadButton uri={href} />
     </View>
   )
 })
@@ -63,6 +63,6 @@ const styles = StyleSheet.create({
     marginVertical: 15,
   },
   button: {
-    transform: [{ translateX: -20 }],
+    transform: [{ translateX: -30 }],
   },
 })

@@ -1,6 +1,7 @@
 import * as React from 'react'
 import { StyleSheet, Text, View } from 'react-native'
 import { brandStyles } from 'src/brandkit/common/constants'
+import DownloadButton from 'src/brandkit/common/DownloadButton'
 import Page from 'src/brandkit/common/Page'
 import PageHeadline from 'src/brandkit/common/PageHeadline'
 import SectionTitle from 'src/brandkit/common/SectionTitle'
@@ -8,19 +9,29 @@ import UseageExamples from 'src/brandkit/typography/UseageExample'
 import { H2, H3 } from 'src/fonts/Fonts'
 import { I18nProps, NameSpaces, withNamespaces } from 'src/i18n'
 import { ScreenProps, ScreenSizes, withScreenSize } from 'src/layout/ScreenSize'
-import Button, { BTN } from 'src/shared/Button.3'
 import { hashNav } from 'src/shared/menu-items'
-import { fontInfo, fonts, standardStyles, typeFaces } from 'src/styles'
-
+import { fontInfo, fonts, standardStyles } from 'src/styles'
 const { brandTypography } = hashNav
+
+function getWeight(number) {
+  switch (number) {
+    case '500':
+      return 'Medium'
+    case '400':
+      return 'Book'
+    case undefined:
+      return 'Regular'
+    default:
+      return number
+  }
+}
 
 export default React.memo(function Typography() {
   return (
     <Page
       sections={[
         { id: brandTypography.overview, children: <Overview /> },
-        { id: brandTypography.system, children: <TypeScale /> },
-        { id: brandTypography.guideline, children: <UseageExamples /> },
+        { id: brandTypography.scale, children: <TypeScale /> },
       ]}
     />
   )
@@ -35,24 +46,18 @@ const Overview = withNamespaces(NameSpaces.brand)(
           headline={t('typography.headline')}
           style={standardStyles.elementalMarginBottom}
         />
-        <View style={[brandStyles.gap, standardStyles.blockMarginTop]}>
-          <H2>{t('typography.mainFontTitle')}</H2>
-          <Text style={fonts.p}>{t('typography.mainFontText')}</Text>
-          <Button
-            kind={BTN.TERTIARY}
-            text={t('typography.getMainfontBTN')}
-            style={brandStyles.button}
-          />
-          <View style={standardStyles.blockMargin}>
-            <H3>{t('typography.subFontTitle')}</H3>
-            <Text style={[fonts.p, { fontFamily: typeFaces.futura }]}>
+        <View style={brandStyles.gap}>
+          <H2 style={styles.hero}>{t('typography.mainFontTitle')}</H2>
+          <Text style={[fonts.p, standardStyles.elementalMarginBottom]}>
+            {t('typography.mainFontText')}
+          </Text>
+          <DownloadButton uri="TODO" />
+          <View style={standardStyles.blockMarginTopTablet}>
+            <H3 style={styles.hero}>{t('typography.subFontTitle')}</H3>
+            <Text style={[fonts.p, standardStyles.elementalMarginBottom]}>
               {t('typography.subFontText')}
             </Text>
-            <Button
-              kind={BTN.TERTIARY}
-              text={t('typography.getSubfontBTN')}
-              style={brandStyles.button}
-            />
+            <DownloadButton uri="TODO" />
           </View>
         </View>
       </View>
@@ -82,7 +87,8 @@ const TypeScale = withNamespaces(NameSpaces.brand)(
           <Text style={[fonts.p, brandStyles.gap]}>{t('typography.typescaleText')}</Text>
           <View
             style={[
-              standardStyles.elementalMargin,
+              standardStyles.elementalMarginTop,
+              standardStyles.blockMarginBottom,
               brandStyles.gap,
               brandStyles.fullBorder,
               styles.box,
@@ -121,24 +127,12 @@ const TypeScale = withNamespaces(NameSpaces.brand)(
               )
             })}
           </View>
+          <UseageExamples />
         </View>
       )
     })
   )
 )
-
-function getWeight(number) {
-  switch (number) {
-    case '500':
-      return 'Medium'
-    case '300':
-      return 'Book'
-    case undefined:
-      return 'Regular'
-    default:
-      return number
-  }
-}
 
 const styles = StyleSheet.create({
   box: {
@@ -160,4 +154,7 @@ const styles = StyleSheet.create({
   },
   stylesArea: { flex: 1, minWidth: 250, justifyContent: 'space-between', marginTop: 5 },
   stylesAreaMobile: { flex: 1, marginTop: 5 },
+  hero: {
+    margin: 30,
+  },
 })
