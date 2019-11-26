@@ -1,12 +1,12 @@
 ---
-description: View and manage validators
+description: View and manage Validators
 ---
 
 ## Commands
 
 ### Affiliate
 
-Affiliate to a ValidatorGroup
+Affiliate a Validator with a Validator Group. This allows the Validator Group to add that Validator as a member. If the Validator is already a member of a Validator Group, affiliating with a different Group will remove the Validator from the first group's members.
 
 ```
 USAGE
@@ -26,7 +26,7 @@ _See code: [packages/cli/src/commands/validator/affiliate.ts](https://github.com
 
 ### Deaffiliate
 
-DeAffiliate to a ValidatorGroup
+Deaffiliate a Validator from a Validator Group, and remove it from the Group if it is also a member.
 
 ```
 USAGE
@@ -43,7 +43,7 @@ _See code: [packages/cli/src/commands/validator/deaffiliate.ts](https://github.c
 
 ### Deregister
 
-Deregister a Validator
+Deregister a Validator. Approximately 60 days after deregistration, the 10,000 Gold locked up to register the Validator will become possible to unlock. Note that deregistering a Validator will also deaffiliate and remove the Validator from any Group it may be an affiliate or member of.
 
 ```
 USAGE
@@ -60,7 +60,7 @@ _See code: [packages/cli/src/commands/validator/deregister.ts](https://github.co
 
 ### List
 
-List registered Validators
+List registered Validators, their name (if provided), affiliation, uptime score, and public keys used for validating.
 
 ```
 USAGE
@@ -83,13 +83,10 @@ USAGE
 OPTIONS
   --blsKey=0x                                        (required) BLS Public Key
   --blsPop=0x                                        (required) BLS Proof-of-Possession
-  --ecdsaKey=0x                                      (required) ECDSA Public Key
   --from=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) Address for the Validator
 
 EXAMPLE
-  register --from 0x47e172F6CfB6c7D01C1574fa3E2Be7CC73269D95 --ecdsaKey
-  0xc52f3fab06e22a54915a8765c4f6826090cfac5e40282b43844bf1c0df83aaa632e55b67869758f2291d1aabe0ebecc7cbf4236aaa45e3e0cfbf
-  997eda082ae1 --blsKey
+  register --from 0x47e172F6CfB6c7D01C1574fa3E2Be7CC73269D95 --blsKey
   0x4fa3f67fc913878b068d1fa1cdddc54913d3bf988dbe5a36a20fa888f20d4894c408a6773f3d7bde11154f2a3076b700d345a42fd25a0e5e83f4
   db5586ac7979ac2053cd95d8f2efd3e959571ceccaa743e02cf4be3f5d7aaddb0b06fc9aff00 --blsPop
   0xcdb77255037eb68897cd487fdd85388cbda448f617f874449d4b11588b0b7ad8ddc20d9bb450b513bb35664ea3923900
@@ -99,7 +96,7 @@ _See code: [packages/cli/src/commands/validator/register.ts](https://github.com/
 
 ### Requirements
 
-Get Requirements for Validators
+List the Locked Gold requirements for registering a Validator. This consists of a value, which is the amount of Celo Gold that needs to be locked in order to register, and a duration, which is the amount of time that Gold must stay locked following the deregistration of the Validator.
 
 ```
 USAGE
@@ -113,7 +110,7 @@ _See code: [packages/cli/src/commands/validator/requirements.ts](https://github.
 
 ### Show
 
-Show information about an existing Validator
+Show information about a registered Validator.
 
 ```
 USAGE
@@ -130,7 +127,7 @@ _See code: [packages/cli/src/commands/validator/show.ts](https://github.com/celo
 
 ### Update-bls-public-key
 
-Update BLS key for a validator
+Update the BLS public key for a Validator to be used in consensus. Regular (ECDSA and BLS) key rotation is recommended for Validator operational security.
 
 ```
 USAGE

@@ -5,7 +5,8 @@ import { displaySendTx } from '../../utils/cli'
 import { Args, Flags } from '../../utils/command'
 
 export default class ValidatorAffiliate extends BaseCommand {
-  static description = 'Affiliate to a ValidatorGroup'
+  static description =
+    "Affiliate a Validator with a Validator Group. This allows the Validator Group to add that Validator as a member. If the Validator is already a member of a Validator Group, affiliating with a different Group will remove the Validator from the first group's members."
 
   static flags = {
     ...BaseCommand.flags,
