@@ -144,7 +144,9 @@ export CELO_PROXY_ADDRESS=<YOUR-PROXY-ADDRESS>
 
 Those commands will prompt you for a passphrase, ask you to confirm it, and then will output your account address: `Address: {<YOUR-ACCOUNT-ADDRESS>}`
 
-**Warning**: There is a known issue running geth inside Docker that happens eventually. So if that command fails, please check [this page](https://forum.celo.org/t/setting-up-a-validator-faq/90).
+{% hint style="danger" %}
+**Warning**: There is a known issue `(Fatal: Failed to read passphrase: liner: function not supported in this terminal” rather than just failing)` running geth inside Docker that happens eventually. So if that command fails, please try again, and if it continues to fail after several attempts, check this page [this page](https://forum.celo.org/t/setting-up-a-validator-faq/90).
+{% endhint %}
 
 In order to register the Validator later on, generate a "proof of possession" - a signature proving you know your Validator's BLS private key. Run this command to generate this "proof-of-possession", which consists of a the BLS public key and a signature:
 
@@ -169,7 +171,7 @@ docker run -v $PWD/validator:/root/.celo $CELO_IMAGE init /celo/genesis.json
 ```
 
 {% hint style="danger" %}
-**Warning**: There is a known issue running geth inside Docker that happens eventually. So if that command fails, please check [this page](https://forum.celo.org/t/setting-up-a-validator-faq/90).
+**Warning**: There is a known issue `(Fatal: Failed to read passphrase: liner: function not supported in this terminal” rather than just failing)` running geth inside Docker that happens eventually. So if that command fails, please try again, and if it continues to fail after several attempts, check this page [this page](https://forum.celo.org/t/setting-up-a-validator-faq/90).
 {% endhint %}
 
 In order to allow the node to sync with the network, give it the address of existing nodes in the network:
