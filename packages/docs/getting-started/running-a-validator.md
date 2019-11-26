@@ -5,11 +5,11 @@
     - [Hardware requirements](#hardware-requirements)
     - [Software requirements](#software-requirements)
   - [Celo Networks](#celo-networks)
-    - [Obtain and lock up some Celo Gold for staking](#obtain-and-lock-up-some-celo-gold-for-staking)
-      - [Baklava](#baklava)
-      - [Alfajores](#alfajores)
-      - [Lock up Celo Gold](#lock-up-celo-gold)
-    - [Run for election](#run-for-election)
+  - [Obtain and lock up some Celo Gold for staking](#obtain-and-lock-up-some-celo-gold-for-staking)
+    - [Baklava](#baklava)
+    - [Alfajores](#alfajores)
+  - [Lock up Celo Gold](#lock-up-celo-gold)
+  - [Run for election](#run-for-election)
 
 This section explains how to get a Validator node running on the network, using a Docker image that was built for this purpose. Most of this process is the same as running a full node, but with a few additional steps.
 
@@ -70,13 +70,13 @@ In this documentation pages we're going to use a Docker image containing the Cel
 
 You can use also this [reference script](../../../scripts/run-docker-validator-network.sh) for running the Celo validator stack using Docker containers.
 
-### Obtain and lock up some Celo Gold for staking
+## Obtain and lock up some Celo Gold for staking
 
-#### Baklava
+### Baklava
 
 To participate in The Great Celo Stake Off (aka TGCSO) and get fauceted it's necessary to register online via an [online form](https://docs.google.com/forms/d/e/1FAIpQLSfbn5hTJ4UIWpN92-o2qMTUB0UnrFsL0fm97XqGe4VhhN_r5A/viewform).
 
-#### Alfajores
+### Alfajores
 
 Visit the [Alfajores Celo Faucet](https://celo.org/build/faucet) to send **both** of your accounts some funds.
 
@@ -95,7 +95,7 @@ celocli account:register --from $CELO_VALIDATOR_GROUP_ADDRESS --name <GROUP_NAME
 celocli account:register --from $CELO_VALIDATOR_ADDRESS --name <VALIDATOR_NAME_OF_YOUR_CHOICE>
 ```
 
-#### Lock up Celo Gold
+### Lock up Celo Gold
 
 Lock up Celo Gold for both accounts in order to secure the right to register a Validator and Validator Group. The current requirement is 10k Celo Gold to register a validator, and 10k Celo Gold _per member validator_ to register a Validator Group. For Validators, this gold remains locked for approximately 60 days following deregistration. For groups, this gold remains locked for approximately 60 days following the removal of the Nth validator from the group.
 
@@ -104,7 +104,7 @@ celocli lockedgold:lock --from $CELO_VALIDATOR_GROUP_ADDRESS --value 10000000000
 celocli lockedgold:lock --from $CELO_VALIDATOR_ADDRESS --value 10000000000000000000000
 ```
 
-### Run for election
+## Run for election
 
 In order to be elected as a Validator, you will first need to register your group and Validator. Note that when registering a Validator Group, you need to specify a commission, which is the fraction of epoch rewards paid to the group by its members.
 
@@ -155,7 +155,7 @@ At any moment you can check the currently elected validators by running the foll
 celocli election:current
 ```
 
-### Stop Validating
+## Stop Validating
 
 If for some reason you need to stop running your Validator, please do one or all of the following so that it will no longer be chosen as a participant in BFT:
 

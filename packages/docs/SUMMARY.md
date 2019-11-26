@@ -10,7 +10,6 @@
 - [Getting an Account and Funds](getting-started/faucet.md)
 - [Running a Full Node](getting-started/running-a-full-node.md)
 - [Running a Validator](getting-started/running-a-validator.md)
-- [Using the CLI](getting-started/using-the-cli.md)
 - [Glossary](getting-started/glossary.md)
 
 ## Celo Codebase
