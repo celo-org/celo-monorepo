@@ -8,6 +8,7 @@ import {
   Actions,
   finishPinVerification,
   NavigatePinProtected,
+  OpenDeepLink,
   setLanguage,
   startPinVerification,
 } from 'src/app/actions'
@@ -15,6 +16,8 @@ import { ErrorMessages } from 'src/app/ErrorMessages'
 import { handleDappkitDeepLink } from 'src/dappkit/dappkit'
 import { isAppVersionDeprecated } from 'src/firebase/firebase'
 import { UNLOCK_DURATION } from 'src/geth/consts'
+import { receiveAttestationMessage } from 'src/identity/actions'
+import { CodeInputType } from 'src/identity/verification'
 import { NavActions, navigate } from 'src/navigator/NavigationService'
 import { Screens, Stacks } from 'src/navigator/Screens'
 import { PersistedRootState } from 'src/redux/reducers'
@@ -24,6 +27,7 @@ import { toggleZeroSyncMode } from 'src/web3/actions'
 import { isInitiallyZeroSyncMode, web3 } from 'src/web3/contracts'
 import { getAccount } from 'src/web3/saga'
 import { zeroSyncSelector } from 'src/web3/selectors'
+import { parse } from 'url'
 
 const TAG = 'app/saga'
 
@@ -130,10 +134,19 @@ export function* navigateToProperScreen() {
   }
 }
 
-export function handleDeepLink(deepLink: string) {
+export function* handleDeepLink(action: OpenDeepLink) {
+  const { deepLink } = action
   Logger.debug(TAG, 'Handling deep link', deepLink)
-  handleDappkitDeepLink(deepLink)
-  // Other deep link handlers can go here later
+  const rawParams = parse(deepLink, true)
+  if (rawParams.path) {
+    if (rawParams.path.startsWith('/v/')) {
+      yield put(receiveAttestationMessage(rawParams.path.substr(3), CodeInputType.DEEP_LINK))
+    }
+
+    if (rawParams.path.startsWith('/dappkit')) {
+      handleDappkitDeepLink(deepLink)
+    }
+  }
 }
 
 export function* navigatePinProtected(action: NavigatePinProtected) {
@@ -161,9 +174,14 @@ export function* watchNavigatePinProtected() {
   yield takeLatest(Actions.NAVIGATE_PIN_PROTECTED, navigatePinProtected)
 }
 
+export function* watchDeepLinks() {
+  yield takeLatest(Actions.OPEN_DEEP_LINK, handleDeepLink)
+}
+
 export function* appSaga() {
   yield spawn(navigateToProperScreen)
   yield spawn(toggleToProperSyncMode)
   yield spawn(checkAppDeprecation)
   yield spawn(watchNavigatePinProtected)
+  yield spawn(watchDeepLinks)
 }
