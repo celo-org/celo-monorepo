@@ -77,7 +77,6 @@ export default class ValidatorOnline extends BaseCommand {
     // tslint:disable:no-bitwise
     // @ts-ignore
     const parentSealBitmap = rlp.decode('0x' + block.extraData.slice(66))[5][0]
-    // @ts-ignore
     return (
       (parentSealBitmap[parentSealBitmap.length - 1 - Math.floor(index / 8)] & (1 << index % 8)) > 0
     )
