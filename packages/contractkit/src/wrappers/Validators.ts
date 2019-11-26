@@ -181,7 +181,10 @@ export class ValidatorsWrapper extends BaseWrapper<Validators> {
   /** Get Validator information */
   async getValidator(address: Address): Promise<Validator> {
     const res = await this.contract.methods.getValidator(address).call()
+    const accounts = await this.kit.contracts.getAccounts()
+    const name = (await accounts.getName(address)) || ''
     return {
+      name,
       address,
       // @ts-ignore Incorrect type for bytes
       ecdsaPublicKey: res.ecdsaPublicKey,
@@ -245,14 +248,7 @@ export class ValidatorsWrapper extends BaseWrapper<Validators> {
   /** Get list of registered validators */
   async getRegisteredValidators(): Promise<Validator[]> {
     const vgAddresses = await this.getRegisteredValidatorsAddresses()
-    let validators = await Promise.all(vgAddresses.map((addr) => this.getValidator(addr)))
-    const accounts = await this.kit.contracts.getAccounts()
-    return Promise.all(
-      validators.map(async function(v) {
-        v.name = (await accounts.getName(v.address)) || ''
-        return v
-      })
-    )
+    return Promise.all(vgAddresses.map((addr) => this.getValidator(addr)))
   }
 
   /** Get list of registered validator groups */
