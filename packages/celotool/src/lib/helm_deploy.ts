@@ -223,6 +223,7 @@ export async function installCertManager() {
   )
   console.info('Updating cert-manager-cluster-issuers dependencies')
   await execCmdWithExitOnFailure(`helm dependency update ${clusterIssuersHelmChartPath}`)
+  console.info('Installing cert-manager-cluster-issuers')
   await execCmdWithExitOnFailure(
     `helm install --name cert-manager-cluster-issuers ${clusterIssuersHelmChartPath}`
   )
