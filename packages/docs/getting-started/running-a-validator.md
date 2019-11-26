@@ -149,7 +149,7 @@ Those commands will prompt you for a passphrase, ask you to confirm it, and then
 In order to register the Validator later on, generate a "proof of possession" - a signature proving you know your Validator's BLS private key. Run this command to generate this "proof-of-possession", which consists of a the BLS public key and a signature:
 
 ```bash
-docker run -v $PWD/validator:/root/.celo --entrypoint /bin/sh -it $CELO_IMAGE -c "geth account proof-of-possession $CELO_VALIDATOR_ADDRESS"
+docker run -v $PWD/validator:/root/.celo --entrypoint /bin/sh -it $CELO_IMAGE -c "geth account proof-of-possession $CELO_VALIDATOR_ADDRESS $CELO_VALIDATOR_ADDRESS"
 ```
 
 It will prompt you for the passphrase you've chosen for the Validator account. Let's save the resulting proof-of-possession to two environment variables:
