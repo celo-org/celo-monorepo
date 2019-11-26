@@ -5,7 +5,7 @@
 
 ## Getting Started
 
-- [Alfajores Testnet](getting-started/alfajores-testnet.md)
+- [Baklava Testnet](getting-started/baklava-testnet.md)
 - [Using the Mobile Wallet](getting-started/using-the-mobile-wallet.md)
 - [Getting an Account and Funds](getting-started/faucet.md)
 - [Running a Full Node](getting-started/running-a-full-node.md)

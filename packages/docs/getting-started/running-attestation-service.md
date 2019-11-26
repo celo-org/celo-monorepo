@@ -66,7 +66,7 @@ export ATTESTATION_ADDRESS=<Account address>
 You can create a proof of posession of this attestation key by running the CLI commands (remember to prefix the key with 0x)
 
 ```bash
-celocli account:proof-of-possession --signer $ATTESTATION_ADDRESS --account $CELO_VALIDATOR_ADDRESS --privateKey $ATTESTATION_KEY
+celocli account:proof-of-possession --signer $ATTESTATION_ADDRESS --account $CELO_VALIDATOR_ADDRESS --privateKey $ATTESTATION_PRIVATE_KEY
 ```
 
 That will give you a signature that you can then use to authorize the key:
@@ -88,7 +88,9 @@ export CELO_PROVIDER="https://alfajores-forno.celo-testnet.org/"
 
 For storing and retrieving the attestation requests the service needs a database to persist that information. Currently `sqlite`, `postgres` and `mysql` are supported. For testing purposes you can use `sqlite` but it's recommended to run a stand-alone database server using `mysql` or `postgres` if your intention is running the Attestation Service in a production environment.
 
-So for specifying the database url you need to setup the `DATABASE_URL` variable:
+Depending on your database technology you need to create a database with the access for a specific user and password.
+
+For specifying the database url you need to setup the `DATABASE_URL` variable:
 
 ```bash
 export DATABASE_URL="sqlite://db/dev.db"
@@ -96,10 +98,9 @@ export DATABASE_URL="mysql://user:password@mysql.example.com:3306/attestation-se
 export DATABASE_URL="postgres://user:password@postgres.example.com:5432/attestation-service"
 ```
 
-You can find the migration scripts for creating the schema at the `celo-monorepo`, `packages/attestation-service` folder. From there, after setting up the `DATABASE_URL` env variable you can run the following commands:
+You can find the migration scripts for creating the schema at the `celo-monorepo`, `packages/attestation-service` folder. From there, after setting up the `DATABASE_URL` env variable you can run the following command:
 
 ```bash
-yarn run db:create
 yarn run db:migrate
 ```
 
@@ -108,7 +109,7 @@ yarn run db:migrate
 The following command for running the Attestation Service is using Nexmo, but you can adapt for using Twilio easily:
 
 ```bash
-docker run -e ATTESTATION_KEY=$ATTESTATION_KEY -e ACCOUNT_ADDRESS=$CELO_VALIDATOR_ADDRESS -e CELO_PROVIDER=$CELO_PROVIDER -e DATABASE_URL=$DATABASE_URL -e SMS_PROVIDERS=nexmo -e NEXMO_KEY=$NEXMO_KEY -e NEXMO_SECRET=$NEXMO_SECRET -e NEXMO_BLACKLIST=$NEXMO_BLACKLIST  -p 3000:80 us.gcr.io/celo-testnet/attestation-service:$CELO_NETWORK
+docker run -e ATTESTATION_KEY=$ATTESTATION_PRIVATE_KEY -e ACCOUNT_ADDRESS=$CELO_VALIDATOR_ADDRESS -e CELO_PROVIDER=$CELO_PROVIDER -e DATABASE_URL=$DATABASE_URL -e SMS_PROVIDERS=nexmo -e NEXMO_KEY=$NEXMO_KEY -e NEXMO_SECRET=$NEXMO_SECRET -e NEXMO_BLACKLIST=$NEXMO_BLACKLIST  -d -p 3000:80 us.gcr.io/celo-testnet/attestation-service:$CELO_NETWORK
 ```
 
 In order for users to request attestations from your service, you need to register the endpoint under which your service is reachable in your [metadata](/celo-codebase/protocol/identity/metadata).

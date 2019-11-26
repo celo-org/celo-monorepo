@@ -6,6 +6,7 @@
     - [Create accounts](#create-accounts)
     - [Deploy the Validator node](#deploy-the-validator-node)
     - [Running the Attestation Service](#running-the-attestation-service)
+    - [Getting some Celo Gold](#getting-some-celo-gold)
 
 This section explains how to get a Validator node running on the Alfajores network, using a Docker image that was built for this purpose. Most of this process is the same as running a full node, but with a few additional steps.
 
@@ -112,3 +113,7 @@ As part of the [lightweight identity protocol](/celo-codebase/protocol/identity)
 You can find the complete instructions about how to run the [Attestation Service at the documentation page](running-attestation-service.md).
 
 Now you may need to wait for your node to complete a full sync. You can check on the sync status with `celocli node:synced`. Your node will be fully synced when it has downloaded and processed the latest block, which you can see on the [Alfajores Testnet Stats](https://alfajores-ethstats.celo-testnet.org/) page.
+
+### Getting some Celo Gold
+
+Visit the [Alfajores Celo Faucet](https://celo.org/build/faucet) to send **both** of your accounts some funds.
