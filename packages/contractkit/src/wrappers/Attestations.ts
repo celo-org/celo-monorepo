@@ -1,4 +1,4 @@
-import { PhoneNumberUtils, SignatureUtils } from '@celo/utils'
+import { base64ToHex, PhoneNumberUtils, SignatureUtils } from '@celo/utils'
 import { concurrentMap, sleep } from '@celo/utils/lib/async'
 import { notEmpty, zip3 } from '@celo/utils/lib/collections'
 import { parseSolidityStringArray } from '@celo/utils/lib/parsing'
@@ -58,6 +58,17 @@ function attestationMessageToSign(phoneHash: string, account: Address) {
     { type: 'address', value: account }
   )
   return messageHash
+}
+
+function sanitizeBase64(base64String: string) {
+  // Replace occurrences of ¿ with _. Unsure why that is happening right now
+  return base64String.replace(/(¿|§)/gi, '_')
+}
+
+const attestationCodeRegex = new RegExp(/(.* |^)([a-zA-Z0-9=\+\/_-]{87,88})($| .*)/)
+
+function messageContainsAttestationCode(message: string) {
+  return attestationCodeRegex.test(message)
 }
 
 interface GetCompletableAttestationsResponse {
@@ -200,7 +211,7 @@ export class AttestationsWrapper extends BaseWrapper<Attestations> {
   async approveAttestationFee(attestationsRequested: number) {
     const tokenContract = await this.kit.contracts.getContract(CeloContract.StableToken)
     const fee = await this.attestationFeeRequired(attestationsRequested)
-    return tokenContract.approve(this.address, fee.toString())
+    return tokenContract.approve(this.address, fee.toFixed())
   }
 
   /**
@@ -246,6 +257,20 @@ export class AttestationsWrapper extends BaseWrapper<Attestations> {
     return withAttestationServiceURLs.filter(notEmpty)
   }
 
+  extractAttestationCodeFromMessage(message: string) {
+    const sanitizedMessage = sanitizeBase64(message)
+
+    if (!messageContainsAttestationCode(sanitizedMessage)) {
+      return null
+    }
+
+    const matches = sanitizedMessage.match(attestationCodeRegex)
+    if (!matches || matches.length < 3) {
+      return null
+    }
+    return base64ToHex(matches[2])
+  }
+
   /**
    * Completes an attestation with the corresponding code
    * @param phoneNumber The phone number of the attestation
@@ -253,10 +278,12 @@ export class AttestationsWrapper extends BaseWrapper<Attestations> {
    * @param issuer The issuer of the attestation
    * @param code The code received by the validator
    */
-  complete(phoneNumber: string, account: Address, issuer: Address, code: string) {
+  async complete(phoneNumber: string, account: Address, issuer: Address, code: string) {
     const phoneHash = PhoneNumberUtils.getPhoneHash(phoneNumber)
+    const accounts = await this.kit.contracts.getAccounts()
+    const attestationSigner = await accounts.getAttestationSigner(issuer)
     const expectedSourceMessage = attestationMessageToSign(phoneHash, account)
-    const { r, s, v } = parseSignature(expectedSourceMessage, code, issuer.toLowerCase())
+    const { r, s, v } = parseSignature(expectedSourceMessage, code, attestationSigner)
     return toTransactionObject(this.kit, this.contract.methods.complete(phoneHash, v, r, s))
   }
 
@@ -267,17 +294,20 @@ export class AttestationsWrapper extends BaseWrapper<Attestations> {
    * @param code The code received by the validator
    * @param issuers The list of potential issuers
    */
-  findMatchingIssuer(
+  async findMatchingIssuer(
     phoneNumber: string,
     account: Address,
     code: string,
     issuers: string[]
-  ): string | null {
+  ): Promise<string | null> {
     const phoneHash = PhoneNumberUtils.getPhoneHash(phoneNumber)
+    const accounts = await this.kit.contracts.getAccounts()
+    const expectedSourceMessage = attestationMessageToSign(phoneHash, account)
     for (const issuer of issuers) {
-      const expectedSourceMessage = attestationMessageToSign(phoneHash, account)
+      const attestationSigner = await accounts.getAttestationSigner(issuer)
+
       try {
-        parseSignature(expectedSourceMessage, code, issuer.toLowerCase())
+        parseSignature(expectedSourceMessage, code, attestationSigner)
         return issuer
       } catch (error) {
         console.log(error)
@@ -403,9 +433,11 @@ export class AttestationsWrapper extends BaseWrapper<Attestations> {
     issuer: Address,
     code: string
   ) {
+    const accounts = await this.kit.contracts.getAccounts()
+    const attestationSigner = await accounts.getAttestationSigner(issuer)
     const phoneHash = PhoneNumberUtils.getPhoneHash(phoneNumber)
     const expectedSourceMessage = attestationMessageToSign(phoneHash, account)
-    const { r, s, v } = parseSignature(expectedSourceMessage, code, issuer.toLowerCase())
+    const { r, s, v } = parseSignature(expectedSourceMessage, code, attestationSigner)
     const result = await this.contract.methods
       .validateAttestationCode(phoneHash, account, v, r, s)
       .call()

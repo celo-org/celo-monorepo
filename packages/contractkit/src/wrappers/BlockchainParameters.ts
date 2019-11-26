@@ -8,9 +8,9 @@ export class BlockchainParametersWrapper extends BaseWrapper<BlockchainParameter
   /**
    * Setting the extra intrinsic gas for transactions, where gas is paid using non-gold currency.
    */
-  setIntrinsicGasForAlternativeGasCurrency = proxySend(
+  setIntrinsicGasForAlternativeFeeCurrency = proxySend(
     this.kit,
-    this.contract.methods.setIntrinsicGasForAlternativeGasCurrency
+    this.contract.methods.setIntrinsicGasForAlternativeFeeCurrency
   )
   /**
    * Setting the block gas limit.

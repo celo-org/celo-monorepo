@@ -107,6 +107,7 @@ export async function execCmdWithExitOnFailure(
 ) {
   const code = await execCmd(cmd, args, options)
   if (code !== 0) {
+    console.error('execCmd failed for: ' + [cmd].concat(args).join(' '))
     process.exit(1)
   }
 }
@@ -202,6 +203,7 @@ function writeGenesis(validators: Validator[], path: string, configOverrides: an
     validators,
     blockTime: 0,
     epoch: 10,
+    lookback: 2,
     requestTimeout: 3000,
     chainId: NetworkId,
     ...configOverrides,
@@ -350,15 +352,13 @@ export async function startGeth(gethBinaryPath: string, instance: GethInstanceCo
 
 export async function migrateContracts(
   validatorPrivateKeys: string[],
+  attestationKeys: string[],
   validators: string[],
   to: number = 1000,
   overrides: any = {}
 ) {
   const migrationOverrides = _.merge(
     {
-      validators: {
-        validatorKeys: validatorPrivateKeys.map(ensure0x),
-      },
       election: {
         minElectableValidators: '1',
       },
@@ -367,6 +367,10 @@ export async function migrateContracts(
           addresses: validators.map(ensure0x),
           values: validators.map(() => '10000000000000000000000'),
         },
+      },
+      validators: {
+        validatorKeys: validatorPrivateKeys.map(ensure0x),
+        attestationKeys: attestationKeys.map(ensure0x),
       },
     },
     overrides
@@ -440,6 +444,7 @@ export function getContext(gethConfig: GethTestConfig) {
   const validatorInstances = gethConfig.instances.filter((x: any) => x.validating)
   const numValidators = validatorInstances.length
   const validatorPrivateKeys = getPrivateKeysFor(AccountType.VALIDATOR, mnemonic, numValidators)
+  const attestationKeys = getPrivateKeysFor(AccountType.ATTESTATION, mnemonic, numValidators)
   const validators = getValidators(mnemonic, numValidators)
   const validatorEnodes = validatorPrivateKeys.map((x: any, i: number) =>
     getEnodeAddress(privateKeyToPublicKey(x), '127.0.0.1', validatorInstances[i].port)
@@ -472,6 +477,7 @@ export function getContext(gethConfig: GethTestConfig) {
     if (gethConfig.migrate || gethConfig.migrateTo) {
       await migrateContracts(
         validatorPrivateKeys,
+        attestationKeys,
         validators.map((x) => x.address),
         gethConfig.migrateTo,
         gethConfig.migrationOverrides
@@ -489,16 +495,22 @@ export function getContext(gethConfig: GethTestConfig) {
   const restart = async () => {
     await killGeth()
     let validatorIndex = 0
+    const validatorIndices: number[] = []
     for (const instance of gethConfig.instances) {
-      await restoreDatadir(instance)
-      if (!instance.privateKey && instance.validating) {
-        instance.privateKey = validatorPrivateKeys[validatorIndex]
-      }
-      await startGeth(gethBinaryPath, instance)
+      validatorIndices.push(validatorIndex)
       if (instance.validating) {
         validatorIndex++
       }
     }
+    await Promise.all(
+      gethConfig.instances.map(async (instance, i) => {
+        await restoreDatadir(instance)
+        if (!instance.privateKey && instance.validating) {
+          instance.privateKey = validatorPrivateKeys[validatorIndices[i]]
+        }
+        return startGeth(gethBinaryPath, instance)
+      })
+    )
   }
 
   const after = () => killGeth()
