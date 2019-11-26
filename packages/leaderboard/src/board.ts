@@ -26,6 +26,10 @@ function addressToBinary(a: string) {
 }
 
 const LEADERBOARD_DATABASE = process.env['LEADERBOARD_DATABASE'] || 'blockscout'
+const LEADERBOARD_TOKEN = process.env['LEADERBOARD_TOKEN'] || 0
+const LEADERBOARD_SPREADSHEET =
+  process.env['LEADERBOARD_SPREADSHEET'] || '1d3pZNof8p3z8M9O3MH5FZG5dA3e-L52XiJ4qA5o7X0Y'
+const LEADERBOARD_WEB3 = process.env['LEADERBOARD_WEB3'] || 'http://localhost:8545'
 
 async function updateDB(lst: any[][]) {
   const client = new Client({ database: LEADERBOARD_DATABASE })
@@ -108,8 +112,6 @@ async function processClaims(kit: ContractKit, address: string, data: string) {
   }
 }
 
-readSheet()
-
 function getCredentials() {
   let credentials = process.env['LEADERBOARD_CREDENTIALS']
   if (!credentials) {
@@ -123,8 +125,6 @@ function readSheet() {
   // Authorize a client with credentials, then call the Google Sheets API.
   authorize(JSON.parse(content.toString()), getInfo)
 }
-
-const LEADERBOARD_TOKEN = process.env['LEADERBOARD_TOKEN']
 
 /**
  * Create an OAuth2 client with the given credentials, and then execute the
@@ -180,9 +180,6 @@ function getNewToken(oAuth2Client: any, callback: any) {
   })
 }
 
-const LEADERBOARD_SPREADSHEET =
-  process.env['LEADERBOARD_SPREADSHEET'] || '1d3pZNof8p3z8M9O3MH5FZG5dA3e-L52XiJ4qA5o7X0Y'
-
 function getInfo(auth: any) {
   const sheets = google.sheets({ version: 'v4', auth })
   sheets.spreadsheets.values.get(
@@ -203,8 +200,6 @@ function getInfo(auth: any) {
     }
   )
 }
-
-const LEADERBOARD_WEB3 = process.env['LEADERBOARD_WEB3'] || 'http://localhost:8545'
 
 async function readAssoc(lst: string[]) {
   const web3 = new Web3(LEADERBOARD_WEB3)
@@ -230,3 +225,5 @@ async function readAssoc(lst: string[]) {
     }
   })
 }
+
+readSheet()
