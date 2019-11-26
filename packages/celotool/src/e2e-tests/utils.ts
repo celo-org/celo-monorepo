@@ -82,8 +82,8 @@ export function spawnWithLog(cmd: string, args: string[], logsFilepath: string) 
     // nothing to do
   }
   const logStream = fs.createWriteStream(logsFilepath, { flags: 'a' })
-  console.log(cmd)
-  console.log(args)
+  console.log(logsFilepath)
+  console.log(cmd, ...args)
   const process = spawn(cmd, args)
   process.stdout.pipe(logStream)
   process.stderr.pipe(logStream)
@@ -326,7 +326,7 @@ export async function startGeth(gethBinaryPath: string, instance: GethInstanceCo
     '--debug',
     '--port',
     port.toString(),
-    '--rpcvhosts=*',
+    '--rpcvhosts="*"',
     '--networkid',
     NetworkId.toString(),
     '--verbosity',
@@ -342,14 +342,14 @@ export async function startGeth(gethBinaryPath: string, instance: GethInstanceCo
       '--rpc',
       '--rpcport',
       rpcport.toString(),
-      '--rpccorsdomain=*',
+      '--rpccorsdomain="*"',
       '--rpcapi=eth,net,web3,debug,admin,personal,txpool,istanbul'
     )
   }
 
   if (wsport) {
     gethArgs.push(
-      '--wsorigins=*',
+      '--wsorigins="*"',
       '--ws',
       '--wsport',
       wsport.toString(),
