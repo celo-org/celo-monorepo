@@ -3,13 +3,13 @@ import LazyLoad from 'react-lazyload'
 import { Image, StyleSheet, Text, View } from 'react-native'
 import Fade from 'react-reveal/Fade'
 import Transceive from 'src/dev/Transceive'
-// import LeaderBoardApp from './LeaderBoardApp'
 import { H2, H3, H4 } from 'src/fonts/Fonts'
 import { I18nProps, Trans, withNamespaces } from 'src/i18n'
 import { Cell, GridRow, Spans } from 'src/layout/GridRow'
 import Button, { BTN, SIZE } from 'src/shared/Button.3'
 import { HEADER_HEIGHT } from 'src/shared/Styles'
 import { colors, fonts, standardStyles, textStyles } from 'src/styles'
+import LeaderBoardApp from './LeaderBoardApp'
 const DELAY = 100
 const DURATION = 400
 

@@ -9,7 +9,7 @@ const environments = {
       projectId: 'celo-faucet',
     },
     LEADERBOARD: {
-      uri: "http://localhost:8080/v1/graphql",
+      uri: "http://localhost:4000/graphiql",
       pageLength: 5
     },
     V3: true,

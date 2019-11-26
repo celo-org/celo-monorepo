@@ -41,7 +41,6 @@ class LeaderBoard extends React.PureComponent<BoardProps & I18nProps, State> {
     const { pageLength } = getConfig().publicRuntimeConfig.LEADERBOARD
     const showExpandButton = this.props.leaders.length >= (page + 1) * pageLength
     const sortedLeaders = this.props.leaders.sort(sorter).slice(0, pageLength * (page + 1))
-
     const maxPoints = round(sortedLeaders[0].points * 1.1, 100)
     const width = this.state.width
     return (
@@ -95,10 +94,11 @@ function sorter(alpha: Competitor, bravo: Competitor) {
   return -1
 }
 
-const PORTIONS = 8
+const Portions = 8
 
 function Axis({ max }: { max: number }) {
-  const portion = max / PORTIONS
+  const scaled_max = max / Math.pow(10, 20)
+  const portion = scaled_max / Portions
 
   return (
     <View style={[standardStyles.row, styles.xaxis]}>
@@ -113,7 +113,7 @@ function Axis({ max }: { max: number }) {
           )
         })}
       <Text key={max} style={[fonts.small, textStyles.invert]}>
-        {max}
+        {round(scaled_max)}
       </Text>
     </View>
   )
