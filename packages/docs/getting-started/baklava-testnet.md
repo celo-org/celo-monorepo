@@ -4,7 +4,7 @@ description: More than a cookie; Celo's network is live for testing
 
 # Baklava Beta Network
 
-The Baklava Beta Network is the second Celo test network after [Alfajores testnet](alfajores-network.md). It is a demonstration of the current Celo codebase. You can use it to participate in the [The Great Celo Stake Off](https://forum.celo.org/t/the-great-celo-stake-off-the-details/136/2).
+The Baklava Beta Network is the second Celo test network after **Alfajores testnet**. It is a demonstration of the current Celo codebase. You can use it to participate in the [The Great Celo Stake Off](https://forum.celo.org/t/the-great-celo-stake-off-the-details/136/2).
 
 You have some instructions about running the network by operating a [full node](running-a-full-node.md) or a [validator](running-a-validator.md) on your machine \(or on a cloud or hosting provider\).
 
