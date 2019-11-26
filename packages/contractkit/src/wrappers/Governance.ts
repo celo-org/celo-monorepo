@@ -183,12 +183,15 @@ export class GovernanceWrapper extends BaseWrapper<Governance> {
     })
   )
 
-  static toParams = (proposal: Proposal): ProposalParams => [
-    proposal.map((tx) => tx.value),
-    proposal.map((tx) => tx.to),
-    bufferToBytes(Buffer.concat(proposal.map((tx) => stringToBuffer(tx.input)))),
-    proposal.map((tx) => tx.input.length),
-  ]
+  static toParams = (proposal: Proposal): ProposalParams => {
+    const data = proposal.map((tx) => stringToBuffer(tx.input))
+    return [
+      proposal.map((tx) => tx.value),
+      proposal.map((tx) => tx.to),
+      bufferToBytes(Buffer.concat(data)),
+      data.map((inp) => inp.length),
+    ]
+  }
 
   /**
    * Returns whether a given proposal is approved.
@@ -394,8 +397,8 @@ export class GovernanceWrapper extends BaseWrapper<Governance> {
     proposalID: BigNumber.Value,
     _queue?: UpvoteRecord[]
   ) {
-    const weight = await this.getVoteWeight(upvoter)
     const { index, queue } = await this.getQueueIndex(proposalID, _queue)
+    const weight = await this.getVoteWeight(upvoter)
     queue[index].upvotes = queue[index].upvotes.plus(weight)
     return this.sortedQueue(queue)
   }
@@ -406,8 +409,11 @@ export class GovernanceWrapper extends BaseWrapper<Governance> {
   }
 
   private async lesserAndGreaterAfterUpvote(upvoter: Address, proposalID: BigNumber.Value) {
-    const { queue: revokeQueue } = await this.withUpvoteRevoked(upvoter)
-    const upvoteQueue = await this.withUpvoteApplied(upvoter, proposalID, revokeQueue)
+    const upvoteRecord = await this.getUpvoteRecord(upvoter)
+    const queue = upvoteRecord.proposalID.isZero()
+      ? await this.getQueue()
+      : (await this.withUpvoteRevoked(upvoter)).queue
+    const upvoteQueue = await this.withUpvoteApplied(upvoter, proposalID, queue)
     return this.lesserAndGreater(proposalID, upvoteQueue)
   }
 
@@ -453,9 +459,6 @@ export class GovernanceWrapper extends BaseWrapper<Governance> {
     )
   }
 
-  private voteValueToNum = (vote: keyof typeof VoteValue) => VoteValue[vote]
-  private voteNumToValue = (voteNum: number) => Object.keys(VoteValue)[voteNum] as VoteValue
-
   /**
    * Applies `sender`'s vote choice to a given proposal.
    * @param proposalID Governance proposal UUID
@@ -463,7 +466,7 @@ export class GovernanceWrapper extends BaseWrapper<Governance> {
    */
   async vote(proposalID: BigNumber.Value, vote: keyof typeof VoteValue) {
     const proposalIndex = await this.getDequeueIndex(proposalID)
-    const voteNum = this.voteValueToNum(vote)
+    const voteNum = Object.keys(VoteValue).indexOf(vote)
     return toTransactionObject(
       this.kit,
       this.contract.methods.vote(valueToString(proposalID), proposalIndex, voteNum)
@@ -478,7 +481,7 @@ export class GovernanceWrapper extends BaseWrapper<Governance> {
   async getVoteValue(proposalID: BigNumber.Value, voter: Address) {
     const proposalIndex = await this.getDequeueIndex(proposalID)
     const res = await this.contract.methods.getVoteRecord(voter, proposalIndex).call()
-    return this.voteNumToValue(valueToInt(res[1]))
+    return Object.keys(VoteValue)[valueToInt(res[1])] as VoteValue
   }
 
   /**
