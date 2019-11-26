@@ -40,7 +40,7 @@ async function updateDB(addresses: any[], multipliers: any[]) {
   await client.connect()
   let lst = []
   for (let i = 0; i < addresses.length && i < multipliers.length; i++) {
-    if (multipliers[i] == '0' || addresses[i] == '') continue
+    if (multipliers[i] == '0%' || addresses[i] == '') continue
     let item = {
       address: addressToBinary(addresses[i]),
       multiplier: parsePercentage(multipliers[i]),
