@@ -115,13 +115,6 @@ docker run -v $PWD/proxy:/root/.celo $CELO_IMAGE init /celo/genesis.json
 docker run -v $PWD/validator:/root/.celo $CELO_IMAGE init /celo/genesis.json
 ```
 
-To participate in consensus, we need to set up our nodekey for our accounts. We can do so via the following commands \(it will prompt you for your passphrase\):
-
-```bash
-docker run -v $PWD/proxy:/root/.celo --entrypoint /bin/sh -it $CELO_IMAGE -c "geth account set-node-key $CELO_PROXY_ADDRESS"
-docker run -v $PWD/validator:/root/.celo --entrypoint /bin/sh -it $CELO_IMAGE -c "geth account set-node-key $CELO_VALIDATOR_ADDRESS"
-```
-
 {% hint style="danger" %}
 **Warning**: There is a known issue running geth inside Docker that happens eventually. So if that command fails, please check [this page](https://forum.celo.org/t/setting-up-a-validator-faq/90).
 {% endhint %}

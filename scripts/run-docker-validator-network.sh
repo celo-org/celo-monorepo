@@ -131,11 +131,6 @@ if [[ $COMMAND == *"deploy"* ]]; then
     echo -e "\tInitializing using genesis"
     docker run -v $PWD/proxy:/root/.celo $CELO_IMAGE init /root/.celo/genesis.json
     docker run -v $PWD/validator:/root/.celo $CELO_IMAGE init /root/.celo/genesis.json
-    
-    echo -e "\tSetting up nodekey"
-    docker run -v $PWD/proxy:/root/.celo --entrypoint /bin/sh -it $CELO_IMAGE -c "printf '%s\n' $DEFAULT_PASSWORD | geth account set-node-key $CELO_PROXY_ADDRESS"
-    docker run -v $PWD/validator:/root/.celo --entrypoint /bin/sh -it $CELO_IMAGE -c "printf '%s\n' $DEFAULT_PASSWORD | geth account set-node-key $CELO_VALIDATOR_ADDRESS"
-    
 fi
 
 

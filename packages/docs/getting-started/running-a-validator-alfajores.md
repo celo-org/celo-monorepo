@@ -79,12 +79,6 @@ Initialize the docker container, building from an image for the network and init
 docker run -v $PWD:/root/.celo $CELO_IMAGE init /celo/genesis.json
 ```
 
-To participate in consensus, we need to set up our nodekey for our account. We can do so via the following command \(it will prompt you for your passphrase\):
-
-```bash
-docker run -v $PWD:/root/.celo --entrypoint /bin/sh -it $CELO_IMAGE -c "geth account set-node-key $CELO_VALIDATOR_ADDRESS"
-```
-
 In order to allow the node to sync with the network, give it the address of existing nodes in the network:
 
 ```bash
