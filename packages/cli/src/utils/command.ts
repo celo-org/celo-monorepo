@@ -7,8 +7,9 @@ import { pathExistsSync } from 'fs-extra'
 import Web3 from 'web3'
 
 const parseBytes = (input: string, length: number, msg: string) => {
-  // Check that the string starts with 0x and has byte length of `length`.
-  if (Web3.utils.isHex(input) && input.length === length * 2 + 2 && input.startsWith('0x')) {
+  // Check that the string is hex and and has byte length of `length`.
+  const expectedLength = input.startsWith('0x') ? length * 2 + 2 : length * 2
+  if (Web3.utils.isHex(input) && input.length === expectedLength) {
     return input
   } else {
     throw new CLIError(msg)
