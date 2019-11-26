@@ -18,7 +18,7 @@ async function produceSignature(message: string | undefined) {
     return undefined
   }
 
-  return kit.web3.eth.sign(getAttestationSignerAddress(), SIGNATURE_PREFIX + message)
+  return kit.web3.eth.sign(SIGNATURE_PREFIX + message, getAttestationSignerAddress())
 }
 
 export async function handleStatusRequest(

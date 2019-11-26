@@ -146,7 +146,7 @@ class AttestationRequestHandler {
       this.attestationRequest.account
     )
 
-    return kit.web3.eth.sign(getAttestationSignerAddress(), message)
+    return kit.web3.eth.sign(message, getAttestationSignerAddress())
   }
 
   async validateAttestation(attestationCode: string) {
