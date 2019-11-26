@@ -1,5 +1,7 @@
 import { CeloContract, ContractKit, newKit } from '@celo/contractkit'
 import { TransactionResult } from '@celo/contractkit/lib/utils/tx-result'
+import { GoldTokenWrapper } from '@celo/contractkit/lib/wrappers/GoldTokenWrapper'
+import { StableTokenWrapper } from '@celo/contractkit/lib/wrappers/StableTokenWrapper'
 import BigNumber from 'bignumber.js'
 import {
   checkBlockscoutResponse,
@@ -170,10 +172,7 @@ export const transferCeloGold = async (
   } = {}
 ) => {
   const kitGoldToken = await kit.contracts.getGoldToken()
-  return kitGoldToken.transfer(toAddress, amount.toString()).send({
-    from: fromAddress,
-    ...txOptions,
-  })
+  return transferToken(kitGoldToken, fromAddress, toAddress, amount, txOptions)
 }
 
 export const transferCeloDollars = async (
@@ -186,7 +185,19 @@ export const transferCeloDollars = async (
   } = {}
 ) => {
   const kitStableToken = await kit.contracts.getStableToken()
-  return kitStableToken.transfer(toAddress, amount.toString()).send({
+  return transferToken(kitStableToken, fromAddress, toAddress, amount, txOptions)
+}
+
+const transferToken = (
+  kitToken: GoldTokenWrapper | StableTokenWrapper,
+  fromAddress: string,
+  toAddress: string,
+  amount: BigNumber,
+  txOptions: {
+    gasCurrency?: string
+  } = {}
+) => {
+  return kitToken.transfer(toAddress, amount.toString()).send({
     from: fromAddress,
     ...txOptions,
   })

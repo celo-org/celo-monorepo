@@ -1,4 +1,5 @@
 /* tslint:disable: no-console */
+import { eqAddress } from '@celo/utils/lib/address'
 import {
   convertToContractDecimals,
   GoldToken,
@@ -222,7 +223,7 @@ export const validateGethRPC = async (
   const transaction = await web3.eth.getTransaction(txHash)
   const txFrom = transaction.from.toLowerCase()
   const expectedFrom = from.toLowerCase()
-  handleError(!transaction.from || expectedFrom !== txFrom, {
+  handleError(!eqAddress(expectedFrom, txFrom), {
     location: '[GethRPC]',
     error: `Expected "from" to equal ${expectedFrom}, but found ${txFrom}`,
   })
@@ -240,7 +241,7 @@ export const checkBlockscoutResponse = (
   handleError(!json.result, { location, error: `No result found: receive ${json.status.result}` })
   const resultFrom = json.result.from.toLowerCase()
   const expectedFrom = from.toLowerCase()
-  handleError(resultFrom !== expectedFrom, {
+  handleError(!eqAddress(resultFrom, expectedFrom), {
     location,
     error: `Expected "from" to equal ${expectedFrom}, but found ${resultFrom}`,
   })

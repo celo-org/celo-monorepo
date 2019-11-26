@@ -54,7 +54,7 @@ export const builder = () => {
 }
 
 export const handler = async (argv: SimulateClientArgv) => {
-  // So we can transactions to another load testing account
+  // So we can send transactions to another load testing account
   const senderAddress = generateAddress(argv.mnemonic, AccountType.LOAD_TESTING_ACCOUNT, argv.index)
   const recipientAddress = generateAddress(
     argv.mnemonic,
