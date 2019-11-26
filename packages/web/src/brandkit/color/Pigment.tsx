@@ -63,7 +63,7 @@ interface Props {
 function Pigment({ hex, name, onCopyHex, justCopied }: Props & ColorData) {
   const inline: ViewStyle = { backgroundColor: hex }
 
-  const cmyk = new ColorTranslator('#FF00FF').CMYK.toUpperCase()
+  const cmyk = new ColorTranslator(hex).CMYK.toUpperCase()
     .replace(/%/g, '')
     .replace('K(', 'K (')
 
@@ -75,10 +75,10 @@ function Pigment({ hex, name, onCopyHex, justCopied }: Props & ColorData) {
   const foreGround = getContrastingColor(hex) as colors
 
   return (
-    <View style={[standardStyles.elementalMarginBottom]}>
+    <View style={[standardStyles.elementalMarginBottom, brandStyles.gap, styles.container]}>
       <Hoverable onPress={onCopyHex}>
         {(isHovering) => (
-          <View style={[standardStyles.centered, styles.box]}>
+          <View style={[styles.box]}>
             <View
               style={[
                 standardStyles.centered,
@@ -115,7 +115,7 @@ function Pigment({ hex, name, onCopyHex, justCopied }: Props & ColorData) {
           </View>
         )}
       </Hoverable>
-      <View style={brandStyles.gap}>
+      <View>
         <Text style={[fonts.h6, styles.title]}>{name}</Text>
         <Text style={fonts.micro}>{hex}</Text>
         <Text style={fonts.micro}>{hexToHumanRGB(hex)}</Text>
@@ -126,6 +126,7 @@ function Pigment({ hex, name, onCopyHex, justCopied }: Props & ColorData) {
 }
 
 const styles = StyleSheet.create({
+  container: { flex: 1, minWidth: 155 },
   transitions: {
     transitionDuration: '500ms',
   },
@@ -136,12 +137,11 @@ const styles = StyleSheet.create({
     cursor: 'copy',
     paddingVertical: 30,
     paddingRight: 40,
-    margin: GAP,
   },
   pigment: {
-    height: 118,
-    flexBasis: 118,
-    width: 118,
+    height: 100,
+    flexBasis: 100,
+    width: 100,
     transitionProperty: 'transform',
     transformOrigin: 'left',
   },
