@@ -30,10 +30,10 @@ program
   )
   .option('-k, --keep-data', 'Skeps the clean up of the previous node data', '/tmp/e2e')
   .option('--test-dir <path>', 'Path to temporal data directory', '/tmp/e2e')
-  .action(() => {
+  .action(async () => {
     const { gethRepo, validators, migrations, mnemonic, keepData, testDir } = program
 
-    main({
+    await main({
       gethRepo,
       validators: +validators,
       migrations: +migrations,
@@ -63,15 +63,15 @@ async function main({
   const numEthstats = +numValidators
   const gethConfig: GethTestConfig = {
     migrateTo,
-    instances: [...Array(numValidators).keys()].map((key: number) => {
+    instances: [...Array(numValidators).keys()].map((index: number) => {
       return {
-        name: `${key}-validator`,
+        name: `${index}-validator`,
         validating: true,
         syncmode: 'full',
-        port: 30303 + key,
-        rpcport: 8545 + key * 2,
-        wsport: 8546 + key * 2,
-        ethstats: key >= numEthstats ? '' : ethstats,
+        port: 30303 + index,
+        rpcport: 8545 + index * 2,
+        wsport: 8546 + index * 2,
+        ethstats: index >= numEthstats ? '' : ethstats,
       }
     }),
   }
@@ -86,11 +86,11 @@ async function main({
   )
   const gethBinaryPath = `${gethRepoPath}/build/bin/geth`
 
-  if (!keepData) {
+  if (!keepData && fs.existsSync(tmpDir)) {
     fs.removeSync(tmpDir)
   }
   if (!fs.existsSync(tmpDir)) {
-    fs.mkdirSync(tmpDir)
+    fs.mkdirSync(tmpDir, { recursive: true })
   }
 
   if (migrateTo) {
@@ -104,6 +104,7 @@ async function main({
   fs.writeFileSync(validatorsFilePath, JSON.stringify(validatorEnodes), 'utf8')
 
   let validatorIndex = 0
+
   for (const instance of gethConfig.instances) {
     if (instance.validating) {
       // Automatically connect validator nodes to eachother.
@@ -118,6 +119,7 @@ async function main({
       await startGeth(gethBinaryPath, instance)
     }
   }
+
   if (gethConfig.migrate || gethConfig.migrateTo) {
     await migrateContracts(
       validatorPrivateKeys,
