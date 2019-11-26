@@ -73,27 +73,22 @@ We are going to need to create 4 accounts, 2 for the Validator, 1 for the Proxy 
 
 First we create three accounts, one for the Validator, one for the Validator Group and the last one for the Proxy. You can generate their addresses using the below commands if you don’t already have them. If you already have some accounts, you can skip this step.
 
-To create the accounts needed, run the following commands. The first two create the accounts for the Validator, the third one for the Proxy:
+To create the accounts needed, run the following commands. The first two blocks create the accounts for the Validator, the third one for the Proxy. Also we save these addresses to environment variables, so that you can reference it later (don't include the braces):
 
 ```bash
 docker run -v $PWD/validator:/root/.celo --entrypoint /bin/sh -it $CELO_IMAGE -c "geth account new"
+export CELO_VALIDATOR_GROUP_ADDRESS=<YOUR-VALIDATOR-GROUP-ADDRESS>
+
 docker run -v $PWD/validator:/root/.celo --entrypoint /bin/sh -it $CELO_IMAGE -c "geth account new"
+export CELO_VALIDATOR_ADDRESS=<YOUR-VALIDATOR-ADDRESS>
+
 docker run -v $PWD/proxy:/root/.celo --entrypoint /bin/sh -it $CELO_IMAGE -c "geth account new"
+export CELO_PROXY_ADDRESS=<YOUR-PROXY-ADDRESS>
 ```
 
 Those commands will prompt you for a passphrase, ask you to confirm it, and then will output your account address: `Address: {<YOUR-ACCOUNT-ADDRESS>}`
 
-{% hint style="danger" %}
 **Warning**: There is a known issue running geth inside Docker that happens eventually. So if that command fails, please check [this page](https://forum.celo.org/t/setting-up-a-validator-faq/90).
-{% endhint %}
-
-Let's save these addresses to environment variables, so that you can reference it later (don't include the braces):
-
-```bash
-export CELO_VALIDATOR_GROUP_ADDRESS=<YOUR-VALIDATOR-GROUP-ADDRESS>
-export CELO_VALIDATOR_ADDRESS=<YOUR-VALIDATOR-ADDRESS>
-export CELO_PROXY_ADDRESS=<YOUR-PROXY-ADDRESS>
-```
 
 In order to register the Validator later on, generate a "proof of possession" - a signature proving you know your Validator's BLS private key. Run this command to generate this "proof-of-possession", which consists of a the BLS public key and a signature:
 
