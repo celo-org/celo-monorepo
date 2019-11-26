@@ -3,7 +3,7 @@ import LazyLoad from 'react-lazyload'
 import { Image, StyleSheet, Text, View } from 'react-native'
 import Fade from 'react-reveal/Fade'
 import Transceive from 'src/dev/Transceive'
-import LeaderBoardApp from './LeaderBoardApp'
+// import LeaderBoardApp from './LeaderBoardApp'
 import { H2, H3, H4 } from 'src/fonts/Fonts'
 import { I18nProps, Trans, withNamespaces } from 'src/i18n'
 import { Cell, GridRow, Spans } from 'src/layout/GridRow'
@@ -12,18 +12,6 @@ import { HEADER_HEIGHT } from 'src/shared/Styles'
 import { colors, fonts, standardStyles, textStyles } from 'src/styles'
 const DELAY = 100
 const DURATION = 400
-
-const LEADERS = [
-  { points: 8, identity: 'Rex' },
-  { points: 840, identity: '100%_that_validator_who_is_an_absolute_diva' },
-  { points: 3200, identity: 'Heisenberg' },
-
-  { points: 7600, identity: 'DX-West' },
-  { points: 5000, identity: 'Simone2148' },
-  { points: 4009, identity: '$celo-$' },
-  { points: 1002, identity: '77zepher' },
-  { points: 9400, identity: 'Gatsby & Durben' },
-]
 
 const CoverComponent = React.memo(function Cover({ t }: I18nProps) {
   return (
@@ -102,15 +90,13 @@ const CoverComponent = React.memo(function Cover({ t }: I18nProps) {
           <Text style={[fonts.p, textStyles.invert]}>{t('whoText')}</Text>
         </Cell>
       </GridRow>
-        <LazyLoad>
+      <LazyLoad>
         <GridRow
           desktopStyle={standardStyles.blockMarginBottom}
           tabletStyle={standardStyles.blockMarginBottomTablet}
           mobileStyle={standardStyles.blockMarginBottomMobile}
         >
-          <Cell span={Spans.full}>
-            <LeaderBoardApp />
-          </Cell>
+          <Cell span={Spans.full}>{/* <LeaderBoardApp /> */}</Cell>
         </GridRow>
       </LazyLoad>
     </View>

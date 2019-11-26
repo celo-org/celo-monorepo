@@ -15,7 +15,8 @@ import { Cell, GridRow, Spans } from 'src/layout/GridRow'
 import { ScreenProps, ScreenSizes, withScreenSize } from 'src/layout/ScreenSize'
 import AspectRatio from 'src/shared/AspectRatio'
 import Button, { BTN, SIZE } from 'src/shared/Button.3'
-import { fonts, standardStyles } from 'src/styles'
+import { fonts, standardStyles, textStyles } from 'src/styles'
+import { CeloLinks } from 'src/shared/menu-items'
 
 const Engage = React.memo(function _Engage({ t, screen }: I18nProps & ScreenProps) {
   return (
@@ -35,7 +36,10 @@ const Engage = React.memo(function _Engage({ t, screen }: I18nProps & ScreenProp
             verb={t('engage.developers.verb')}
             network={t('engage.developers.network')}
             caption={t('engage.developers.caption')}
-            primaryAction={{ text: t('engage.developers.primaryAction'), href: '/TODO' }}
+            primaryAction={{
+              text: t('engage.developers.primaryAction'),
+              href: CeloLinks.walletApp,
+            }}
           />
         </Cell>
         <Cell span={Spans.half} style={[styles.asides]}>
@@ -43,7 +47,7 @@ const Engage = React.memo(function _Engage({ t, screen }: I18nProps & ScreenProp
             screen={screen}
             text={t('engage.faucet.copy')}
             title={t('engage.faucet.title')}
-            href="?todo"
+            href={CeloLinks.faucet}
             btnText={t('engage.faucet.btnText')}
             image={require('src/icons/faucet-dark.png')}
           />
@@ -51,7 +55,7 @@ const Engage = React.memo(function _Engage({ t, screen }: I18nProps & ScreenProp
             screen={screen}
             text={t('engage.docs.copy')}
             title={t('engage.docs.title')}
-            href="?todo"
+            href={CeloLinks.docs}
             btnText={t('engage.docs.btnText')}
             image={require('src/icons/documentation-dark.png')}
           />
@@ -71,7 +75,10 @@ const Engage = React.memo(function _Engage({ t, screen }: I18nProps & ScreenProp
             verb={t('engage.validators.verb')}
             network={t('engage.validators.network')}
             caption={t('engage.validators.caption')}
-            primaryAction={{ text: t('engage.validators.primaryAction'), href: '/TODO' }}
+            primaryAction={{
+              text: t('engage.validators.primaryAction'),
+              href: 'https://medium.com/celohq/announcing-the-great-celo-stake-off-12eb15dd5eb0',
+            }}
           />
         </Cell>
         <Cell span={Spans.half} style={[styles.asides]}>
@@ -87,7 +94,7 @@ const Engage = React.memo(function _Engage({ t, screen }: I18nProps & ScreenProp
             screen={screen}
             text={t('engage.blog.copy')}
             title={t('engage.blog.title')}
-            href="?todo"
+            href="https://medium.com/celohq/consensus-and-proof-of-stake-in-the-celo-protocol-3ff8eee331f6"
             btnText={t('engage.blog.btnText')}
             image={require('src/icons/blog-dark.png')}
           />
@@ -101,63 +108,19 @@ const Engage = React.memo(function _Engage({ t, screen }: I18nProps & ScreenProp
       >
         <Cell span={Spans.half}>
           <H3>{t('engage.contributeTitle')}</H3>
+          <Text style={[fonts.p, standardStyles.elementalMargin]}>
+            {t('engage.contributeText')}
+          </Text>
+          <Button text={t('engage.contributeBtn')} kind={BTN.PRIMARY} href={'/TODO'} />
         </Cell>
-      </GridRow>
-      <GridRow
-        allStyle={[styles.alignOut]}
-        desktopStyle={standardStyles.sectionMarginBottom}
-        tabletStyle={standardStyles.sectionMarginBottomTablet}
-        mobileStyle={standardStyles.sectionMarginBottomMobile}
-      >
-        <Cell span={Spans.half}>
-          <View
-            style={[
-              styles.paragraphArea,
-              styles.matchNeighbourHeight,
-              screen === ScreenSizes.MOBILE && standardStyles.blockMarginMobile,
-            ]}
-          >
-            <Fade fraction={0.5} bottom={true} distance={'10px'}>
-              <AspectRatio ratio={248 / 286} style={styles.cakeContainer}>
-                <Image
-                  source={require('src/dev/cakeProtector.png')}
-                  style={styles.graphic}
-                  resizeMode="contain"
-                />
-              </AspectRatio>
-            </Fade>
-            <H4 style={standardStyles.elementalMarginTop}>{t('engage.secure.title')}</H4>
-            <Text style={[fonts.p, standardStyles.elementalMarginBottom]}>
-              {t('engage.secure.copy')}
-            </Text>
-            <Button kind={BTN.PRIMARY} text={t('engage.secure.btnText')} />
-          </View>
-        </Cell>
-        <Cell span={Spans.half}>
-          <View
-            style={[
-              styles.paragraphArea,
-              styles.matchNeighbourHeight,
-              screen === ScreenSizes.MOBILE && standardStyles.blockMarginMobile,
-            ]}
-          >
-            <Fade fraction={0.5} bottom={true} distance={'10px'}>
-              <AspectRatio ratio={248 / 286} style={styles.cakeContainer}>
-                <Image
-                  source={require('src/dev/cakeProtector.png')}
-                  style={styles.graphic}
-                  resizeMode="contain"
-                />
-              </AspectRatio>
-              ) }}
-            </Fade>
-
-            <H4 style={standardStyles.elementalMarginTop}>{t('engage.improve.title')}</H4>
-            <Text style={[fonts.p, standardStyles.elementalMarginBottom]}>
-              {t('engage.improve.copy')}
-            </Text>
-            <Button kind={BTN.PRIMARY} text={t('engage.improve.btnText')} />
-          </View>
+        <Cell span={Spans.half} style={standardStyles.centered}>
+          <AspectRatio ratio={309 / 360} style={[standardStyles.image, styles.feastImage]}>
+            <Image
+              source={require('src/dev/Feast.png')}
+              style={styles.graphic}
+              resizeMode="contain"
+            />
+          </AspectRatio>
         </Cell>
       </GridRow>
     </>
@@ -187,7 +150,7 @@ const Content = React.memo(function _Content(props: ContentProps) {
           <Image style={styles.graphic} source={props.image} resizeMode="contain" />
         </AspectRatio>
       </Fade>
-      <Text style={[fonts.p]}>{props.caption}</Text>
+      <Text style={[fonts.p, standardStyles.elementalMarginTop]}>{props.caption}</Text>
       <View style={[standardStyles.row, standardStyles.elementalMarginTop, styles.buttons]}>
         <View style={styles.primaryButtonContainer}>
           <Button
@@ -265,6 +228,9 @@ const styles = StyleSheet.create({
     width: '100%',
     height: '100%',
   },
+  feastImage: {
+    maxWidth: 309,
+  },
   asideGraphic: { width: 60 },
   asideFrame: { flexBasis: 80 },
   asideContentMobile: { marginHorizontal: 0 },
@@ -276,7 +242,6 @@ const styles = StyleSheet.create({
   alignOut: {
     justifyContent: 'space-between',
   },
-  cakeContainer: { height: 248, maxWidth: 286 },
   paragraphArea: {
     maxWidth: 430,
   },
