@@ -9,7 +9,7 @@
   - [<strong>Configure the node</strong>](#configure-the-node)
   - [<strong>Start the node</strong>](#start-the-node)
 
-This section explains how to get a full node running on the [Alfajores Testnet](alfajores-testnet.md) and Baklava Beta Network, using a Docker image that was built for this purpose.
+This section explains how to get a full node running on the [Baklava Beta Network](baklava-testnet.md) and Baklava Beta Network, using a Docker image that was built for this purpose.
 
 Full nodes play a special purpose in the Celo ecosystem, acting as a bridge between the mobile wallets \(running as light clients\) and the validator nodes. To make sure that full nodes are rewarded for this service, the Celo protocol includes full node incentives. Every time a light client sends a new transaction, a portion of the transaction fees will go to the full node that gossips the transaction to other full nodes and validators.
 
@@ -28,18 +28,11 @@ When you see text in angle brackets &lt;&gt;, replace them and the text inside w
 
 ## **Celo Networks**
 
-First we are going to setup the environment depending on the network we want to use (`Baklava` or `Alfajores`). Run:
+First we are going to setup the environment variables required for `Baklava` network. Run:
 
 ```bash
-# If you want to connect to Baklava:
-export CELO_NETWORK=baklava
-export CELO_IMAGE=us.gcr.io/celo-testnet/celo-node
+export CELO_IMAGE=us.gcr.io/celo-testnet/celo-node:baklava
 export NETWORK_ID=1101
-
-# If you want to connect to Alfajores:
-export CELO_NETWORK=alfajores
-export CELO_IMAGE=us.gcr.io/celo-testnet/celo-node
-export NETWORK_ID=44785
 ```
 
 ## **Pull the Celo Docker image**
@@ -51,7 +44,7 @@ If you are re-running these instructions, the Celo Docker image may have been up
 Run:
 
 ```bash
-docker pull $CELO_IMAGE:$CELO_NETWORK
+docker pull $CELO_IMAGE
 ```
 
 ## **Set up a data directory**
@@ -70,7 +63,7 @@ In this step, you'll create an account on the network. If you've already done th
 Run the command to create a new account:
 
 ```bash
-docker run -v $PWD:/root/.celo --entrypoint /bin/sh -it $CELO_IMAGE:$CELO_NETWORK -c "geth account new"
+docker run -v $PWD:/root/.celo --entrypoint /bin/sh -it $CELO_IMAGE -c "geth account new"
 ```
 
 It will prompt you for a passphrase, ask you to confirm it, and then will output your account address: `Address: {<YOUR-ACCOUNT-ADDRESS>}`
@@ -85,16 +78,16 @@ _Note: this environment variable will only persist while you have this terminal 
 
 ## **Configure the node**
 
-The genesis block is the first block in the chain, and is specific to each network. This command gets the `genesis.json` file for alfajores and uses it to initialize your nodes' data directory.
+The genesis block is the first block in the chain, and is specific to each network. This command gets the `genesis.json` file for baklava and uses it to initialize your nodes' data directory.
 
 ```bash
-docker run -v $PWD:/root/.celo $CELO_IMAGE:$CELO_NETWORK init /celo/genesis.json
+docker run -v $PWD:/root/.celo $CELO_IMAGE init /celo/genesis.json
 ```
 
 In order to allow the node to sync with the network, give it the address of existing nodes in the network:
 
 ```bash
-docker run -v $PWD:/root/.celo --entrypoint cp $CELO_IMAGE:$CELO_NETWORK /celo/static-nodes.json /root/.celo/
+docker run -v $PWD:/root/.celo --entrypoint cp $CELO_IMAGE /celo/static-nodes.json /root/.celo/
 ```
 
 ## **Start the node**
@@ -102,7 +95,7 @@ docker run -v $PWD:/root/.celo --entrypoint cp $CELO_IMAGE:$CELO_NETWORK /celo/s
 This command specifies the settings needed to run the node, and gets it started.
 
 ```bash
-docker run -p 127.0.0.1:8545:8545 -p 127.0.0.1:8546:8546 -p 30303:30303 -p 30303:30303/udp -v $PWD:/root/.celo $CELO_IMAGE:$CELO_NETWORK --verbosity 3 --networkid $NETWORK_ID --syncmode full --rpc --rpcaddr 0.0.0.0 --rpcapi eth,net,web3,debug,admin,personal --lightserv 90 --lightpeers 1000 --maxpeers 1100 --etherbase $CELO_ACCOUNT_ADDRESS
+docker run --name celo-fullnode -d --restart always -p 127.0.0.1:8545:8545 -p 127.0.0.1:8546:8546 -p 30303:30303 -p 30303:30303/udp -v $PWD:/root/.celo $CELO_IMAGE --verbosity 3 --networkid $NETWORK_ID --syncmode full --rpc --rpcaddr 0.0.0.0 --rpcapi eth,net,web3,debug,admin,personal --lightserv 90 --lightpeers 1000 --maxpeers 1100 --etherbase $CELO_ACCOUNT_ADDRESS
 ```
 
 You'll start seeing some output. There may be some errors or warnings that are ignorable. After a few minutes, you should see lines that look like this. This means your node has synced with the network and is receiving blocks.
@@ -115,7 +108,7 @@ INFO [07-16|14:04:48.941] Imported new chain segment               blocks=335  t
 INFO [07-16|14:04:56.944] Imported new chain segment               blocks=472  txs=0   mgas=0.000  elapsed=8.003s mgasps=0.000 number=1927 hash=4f1010…1414c1 age=4h52m31s cache=2.34mB
 ```
 
-You will have fully synced with the network once you have pulled the latest block number, which you can lookup by visiting at the [Baklava Testnet Stats](https://baklava-ethstats.celo-testnet.org/) or [Alfajores Testnet Stats](https://alfajores-ethstats.celo-testnet.org/) pages.
+You will have fully synced with the network once you have pulled the latest block number, which you can lookup by visiting at the [Baklava Testnet Stats](https://baklava-ethstats.celo-testnet.org/) or [Baklava Beta Network Stats](https://baklava-ethstats.celo-testnet.org/) pages.
 
 {% hint style="danger" %}
 **Security**: The command line above includes the parameter `--rpcaddr 0.0.0.0` which makes the Celo Blockchain software listen for incoming RPC requests on all network adaptors. Exercise extreme caution in doing this when running outside Docker, as it means that any unlocked accounts and their funds may be accessed from other machines on the Internet. In the context of running a Docker container on your local machine, this together with the `docker -p` flags allows you to make RPC calls from outside the container, i.e from your local host, but not from outside your machine. Read more about [Docker Networking](https://docs.docker.com/network/network-tutorial-standalone/#use-user-defined-bridge-networks) here.
