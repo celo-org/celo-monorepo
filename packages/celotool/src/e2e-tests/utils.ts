@@ -242,6 +242,10 @@ export async function killInstance(instance: GethInstanceConfig) {
   }
 }
 
+export async function addStaticPeers(datadir: string, enodes: string[]) {
+  fs.writeFileSync(`${datadir}/static-nodes.json`, JSON.stringify(enodes))
+}
+
 async function isPortOpen(host: string, port: number) {
   return (await execCmd('nc', ['-z', host, port.toString()], { silent: true })) === 0
 }
@@ -426,9 +430,13 @@ export async function initAndStartGeth(gethBinaryPath: string, instance: GethIns
   if (instance.privateKey) {
     await importPrivateKey(gethBinaryPath, instance)
   }
+  if (instance.peers) {
+    await addStaticPeers(datadir, instance.peers)
+  }
   return startGeth(gethBinaryPath, instance)
 }
 
+// Add each validator as a peer of each other validator via the admin interface.
 async function connectValidatorPeers(gethConfig: GethTestConfig) {
   const admins = gethConfig.instances
     .filter(({ wsport, rpcport }) => wsport || rpcport)
@@ -437,7 +445,18 @@ async function connectValidatorPeers(gethConfig: GethTestConfig) {
         new Admin(`${wsport ? 'ws' : 'http'}://localhost:${wsport || rpcport}`)
     )
   const enodes = await Promise.all(admins.map(async (admin) => (await admin.getNodeInfo()).enode))
-  await Promise.all(admins.map((admin) => Promise.all(enodes.map((enode) => admin.addPeer(enode)))))
+  await Promise.all(
+    admins.map(async (admin, i) => {
+      await Promise.all(
+        enodes.map(async (enode, j) => {
+          if (i === j) {
+            return
+          }
+          await admin.addPeer(enode)
+        })
+      )
+    })
+  )
 }
 
 export function getContext(gethConfig: GethTestConfig) {
