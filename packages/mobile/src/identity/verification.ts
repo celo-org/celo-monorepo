@@ -26,7 +26,7 @@ import {
   resetVerification,
   setVerificationStatus,
 } from 'src/identity/actions'
-import { attestationCodesSelector } from 'src/identity/reducer'
+import { acceptedAttestationCodesSelector, attestationCodesSelector } from 'src/identity/reducer'
 import { startAutoSmsRetrieval } from 'src/identity/smsRetrieval'
 import { sendTransaction, sendTransactionPromises } from 'src/transactions/send'
 import Logger from 'src/utils/Logger'
@@ -52,6 +52,7 @@ export enum VerificationStatus {
 export enum CodeInputType {
   AUTOMATIC = 'automatic',
   MANUAL = 'manual',
+  DEEP_LINK = 'deepLink',
 }
 
 export interface AttestationCode {
@@ -339,6 +340,18 @@ function attestationCodeReceiver(
         throw new Error('No code extracted from message')
       }
 
+      const existingCode = yield call(isCodeAlreadyAccepted, code)
+      if (existingCode) {
+        Logger.warn(TAG + '@attestationCodeReceiver', 'Code already exists in store, skipping.')
+        if (
+          CodeInputType.MANUAL === action.inputType ||
+          CodeInputType.DEEP_LINK === action.inputType
+        ) {
+          yield put(showError(ErrorMessages.REPEAT_ATTESTATION_CODE))
+        }
+        return
+      }
+
       const issuer = yield call(
         [attestationsWrapper, attestationsWrapper.findMatchingIssuer],
         e164Number,
@@ -348,15 +361,6 @@ function attestationCodeReceiver(
       )
       if (!issuer) {
         throw new Error('No issuer found for attestion code')
-      }
-
-      const existingCode = yield call(getCodeForIssuer, issuer)
-      if (existingCode) {
-        Logger.warn(TAG + '@attestationCodeReceiver', 'Code already exists in store, skipping.')
-        if (action.inputType === CodeInputType.MANUAL) {
-          yield put(showError(ErrorMessages.REPEAT_ATTESTATION_CODE))
-        }
-        return
       }
 
       Logger.debug(TAG + '@attestationCodeReceiver', `Received code for issuer ${issuer}`)
@@ -386,6 +390,11 @@ function attestationCodeReceiver(
 function* getCodeForIssuer(issuer: string) {
   const existingCodes: AttestationCode[] = yield select(attestationCodesSelector)
   return existingCodes.find((c) => c.issuer === issuer)
+}
+
+function* isCodeAlreadyAccepted(code: string) {
+  const existingCodes: AttestationCode[] = yield select(acceptedAttestationCodesSelector)
+  return existingCodes.find((c) => c.code === code)
 }
 
 function* revealNeededAttestations(

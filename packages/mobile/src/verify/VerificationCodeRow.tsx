@@ -6,7 +6,7 @@ import { ATTESTATION_CODE_PLACEHOLDER } from 'src/identity/reducer'
 import { AttestationCode } from 'src/identity/verification'
 import Logger from 'src/utils/Logger'
 
-export const CODE_INPUT_PLACEHOLDER = '<#> m9oASm/3g7aZ...'
+export const CODE_INPUT_PLACEHOLDER = '<#> celo://wallet/v/m9o...'
 
 interface OwnProps {
   index: number // index of code in attestationCodes array
