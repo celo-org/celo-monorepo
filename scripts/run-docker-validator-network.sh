@@ -132,8 +132,8 @@ if [[ $COMMAND == *"accounts"* ]]; then
     echo -e "\tCELO_VALIDATOR_GROUP_ADDRESS=$CELO_VALIDATOR_ADDRESS"
     echo -e "\tCELO_PROXY_ADDRESS=$CELO_PROXY_ADDRESS"
     
-    export CELO_VALIDATOR_BLS_PUBLIC_KEY=$(docker run -v $PWD/validator:/root/.celo --entrypoint /bin/sh -it $CELO_IMAGE -c " printf '%s\n' $DEFAULT_PASSWORD | geth account proof-of-possession $CELO_VALIDATOR_ADDRESS $CELO_VALIDATOR_ADDRESS "| tail -1| cut -d' ' -f 5| tr -cd "[:alnum:]\n" )
-    export CELO_VALIDATOR_BLS_SIGNATURE=$(docker run -v $PWD/validator:/root/.celo --entrypoint /bin/sh -it $CELO_IMAGE -c " printf '%s\n' $DEFAULT_PASSWORD | geth account proof-of-possession $CELO_VALIDATOR_ADDRESS $CELO_VALIDATOR_ADDRESS "|tail -2|head -1| cut -d' ' -f 4| tr -cd "[:alnum:]\n")
+    export CELO_VALIDATOR_BLS_PUBLIC_KEY=$(docker run -v $PWD/validator:/root/.celo --entrypoint /bin/sh -it $CELO_IMAGE -c " printf '%s\n' $DEFAULT_PASSWORD $DEFAULT_PASSWORD | geth account proof-of-possession $CELO_VALIDATOR_ADDRESS $CELO_VALIDATOR_ADDRESS "| tail -1| cut -d' ' -f 5| tr -cd "[:alnum:]\n" )
+    export CELO_VALIDATOR_BLS_SIGNATURE=$(docker run -v $PWD/validator:/root/.celo --entrypoint /bin/sh -it $CELO_IMAGE -c " printf '%s\n' $DEFAULT_PASSWORD $DEFAULT_PASSWORD | geth account proof-of-possession $CELO_VALIDATOR_ADDRESS $CELO_VALIDATOR_ADDRESS "|tail -2|head -1| cut -d' ' -f 4| tr -cd "[:alnum:]\n" )
     
     echo -e "\tCELO_VALIDATOR_BLS_PUBLIC_KEY=$CELO_VALIDATOR_BLS_PUBLIC_KEY"
     echo -e "\tCELO_VALIDATOR_BLS_SIGNATURE=$CELO_VALIDATOR_BLS_SIGNATURE"
