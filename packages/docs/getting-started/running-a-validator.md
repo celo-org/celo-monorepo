@@ -216,8 +216,6 @@ As part of the [lightweight identity protocol](/celo-codebase/protocol/identity)
 
 You can find the complete instructions about how to run the [Attestation Service at the documentation page](running-attestation-service.md).
 
-You’re all set! Note that elections are finalized at the end of each epoch, roughly once an hour in the Baklava Testnet. After that hour, if you get elected, your node will start participating BFT consensus and validating blocks. Users requesting attestations will hit your registered Attestation Service.
-
 ### Stop the containers
 
 You can stop the Docker containers at any time without problem. The data dir of the validator and the proxy are Docker volumes mounted in the containers from the `celo-data-dir` you created at the very beginning. So if you don't remove that folder, you can stop or restart the containers without loosing any data.
@@ -359,6 +357,10 @@ celocli election:revoke --from $CELO_VALIDATOR_GROUP_ADDRESS --for $CELO_VALIDAT
 ```bash
 celocli validatorgroup:deregister --from $CELO_VALIDATOR_GORUP_ADDRESS
 ```
+
+{% hint style="info" %}
+You’re all set! Note that elections are finalized at the end of each epoch, roughly once an hour in the Baklava Testnet. After that hour, if you get elected, your node will start participating BFT consensus and validating blocks. Users requesting attestations will hit your registered Attestation Service.
+{% endhint %}
 
 {% hint style="info" %}
 **Roadmap**: Different parameters will govern elections in a Celo production network. Epochs are likely to be daily, rather than hourly. Running a Validator will also include setting up proxy nodes to protect against DDoS attacks, and using hardware wallets to secure the key used to sign blocks. We plan to update these instructions with more details soon.
