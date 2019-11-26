@@ -9,6 +9,7 @@ import { Cell, GridRow, Spans } from 'src/layout/GridRow'
 import Button, { BTN, SIZE } from 'src/shared/Button.3'
 import { HEADER_HEIGHT } from 'src/shared/Styles'
 import { colors, fonts, standardStyles, textStyles } from 'src/styles'
+import { CeloLinks } from 'src/shared/menu-items'
 // import LeaderBoardApp from './LeaderBoardApp'
 const DELAY = 100
 const DURATION = 400
@@ -47,10 +48,12 @@ const CoverComponent = React.memo(function Cover({ t }: I18nProps) {
           <H3 style={textStyles.invert}>{t('purposeTitle')}</H3>
         </Cell>
         <Cell span={Spans.half}>
-          <H4 style={[textStyles.invert, standardStyles.elementalMarginBottom]}>
+          <H4 style={[textStyles.invert, standardStyles.elementalMarginBottom, styles.purposeText]}>
             <Trans i18nKey={t('purposeText')}>
               Learn how to run a node on Celo’s peer-to-peer network and win up to{' '}
-              <Text style={styles.colorEmphasis}>2 million Celo Gold in rewards.</Text>*
+              <Text href={CeloLinks.discourse} style={styles.colorEmphasis}>
+                2 million Celo Gold in rewards.
+              </Text>*
             </Trans>
           </H4>
           <Text style={[fonts.p, textStyles.invert]}>
@@ -171,6 +174,9 @@ const styles = StyleSheet.create({
   },
   colorEmphasis: {
     color: colors.gold,
+  },
+  purposeText: {
+    maxWidth: 385,
   },
 })
 
