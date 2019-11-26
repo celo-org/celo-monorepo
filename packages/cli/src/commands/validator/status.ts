@@ -8,7 +8,7 @@ import { Flags } from '../../utils/command'
 
 export default class ValidatorOnline extends BaseCommand {
   static description =
-    'Show information about whether the signer is elected and validating. This command will check that the signer, which may be a validator or its authorized signer, meets the registration requirements, is currently elected, and is actively signing blocks.'
+    'Show information about whether the signer is elected and validating. This command will check that the signer, which may be the validator itself, meets the registration requirements, is currently elected, and is actively signing blocks.'
 
   // How many blocks to look back for proposals of this signer.
   static readonly lookback = 50
@@ -35,15 +35,25 @@ export default class ValidatorOnline extends BaseCommand {
       .signerAccountIsValidator()
       .runChecks()
 
-    cli.action.start('Querying current validator set')
     const election = await this.kit.contracts.getElection()
-    const size = await election.numberValidatorsInCurrentSet()
-    const set = await Promise.all(range(size).map(election.validatorAddressFromCurrentSet))
-    cli.action.stop()
-
-    const signerIndex = set.map((a) => a.toLowerCase()).indexOf(flags.signer.toLowerCase())
+    const signers = await election.getCurrentValidatorSigners()
+    const signerIndex = signers.map((a) => a.toLowerCase()).indexOf(flags.signer.toLowerCase())
     if (signerIndex < 0) {
-      this.error(`Signer ${flags.signer} is not in the validator set for this epoch`)
+      // Determine whether the signer will be elected at the next epoch to provide a helpful error.
+      const frontrunners = await election.electValidatorSigners()
+      if (frontrunners.map((a) => a.toLowerCase()).indexOf(flags.signer.toLowerCase()) >= 0) {
+        this.error(
+          `Signer ${
+            flags.signer
+          } is not elected for this epoch, but is currently winning in the upcoming election. Wait for the next epoch.`
+        )
+      } else {
+        this.error(
+          `Signer ${
+            flags.signer
+          } is not elected for this epoch, and is not currently winning the upcoming election.`
+        )
+      }
     }
 
     cli.action.start('Searching for proposed blocks')

@@ -56,7 +56,7 @@ class CheckBuilder {
     }
   }
 
-  withAccounts<A>(f: (lockedGold: AccountsWrapper) => A): () => Promise<Resolve<A>> {
+  withAccounts<A>(f: (accounts: AccountsWrapper) => A): () => Promise<Resolve<A>> {
     return async () => {
       const accounts = await this.kit.contracts.getAccounts()
       return f(accounts) as Resolve<A>
