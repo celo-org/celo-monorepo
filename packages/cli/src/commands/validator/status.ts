@@ -56,7 +56,7 @@ export default class ValidatorOnline extends BaseCommand {
     for (const [i, block] of blocks.entries()) {
       if (this.validatorIndexSignedParentHeader(block, signerIndex)) {
         const parent =
-          i + 1 < blocks.length ? blocks[i + 1] : await this.web3.getBlock(block.number - 1)
+          i + 1 < blocks.length ? blocks[i + 1] : await this.web3.eth.getBlock(block.number - 1)
         const timedelta = Date.now() / 1000 - parent.timestamp
         console.info(
           `Signer most recently signed block ${parent.number} ${Math.ceil(timedelta)} seconds ago`
