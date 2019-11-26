@@ -7,6 +7,7 @@
     - [Create accounts](#create-accounts)
     - [Deploy the Validator and Proxy nodes](#deploy-the-validator-and-proxy-nodes)
     - [Running the Attestation Service](#running-the-attestation-service)
+    - [Stop the containers](#stop-the-containers)
     - [Reference Script](#reference-script)
     - [Getting some Celo Gold](#getting-some-celo-gold)
 
@@ -162,6 +163,22 @@ As part of the [lightweight identity protocol](/celo-codebase/protocol/identity)
 You can find the complete instructions about how to run the [Attestation Service at the documentation page](running-attestation-service.md).
 
 You’re all set! Note that elections are finalized at the end of each epoch, roughly once an hour in the Baklava Testnet. After that hour, if you get elected, your node will start participating BFT consensus and validating blocks. Users requesting attestations will hit your registered Attestation Service.
+
+### Stop the containers
+
+You can stop the Docker containers at any time without problem. The data dir of the validator and the proxy are Docker volumes mounted in the containers from the `celo-data-dir` you created at the very beginning. So if you don't remove that folder, you can stop or restart the containers without loosing any data.
+
+You can stop the `celo-validator` and `celo-proxy` containers running:
+
+```bash
+docker stop celo-validator celo-proxy
+```
+
+And you can remove the containers (not the data dir) running:
+
+```bash
+docker rm -f celo-validator celo-proxy
+```
 
 ### Reference Script
 
