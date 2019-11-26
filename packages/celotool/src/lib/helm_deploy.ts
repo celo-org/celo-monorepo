@@ -194,7 +194,7 @@ export async function installLegoAndNginx() {
     `kube-lego-release`,
     `kube-lego-release exists, skipping install`
   )
-  // certManager is the newer version of lego, while we transition
+  // Cert Manager is the newer version of lego,
   // we want to use cert-manager for any new clusters
   const certManagerExists = await outputIncludes(
     `helm list`,
