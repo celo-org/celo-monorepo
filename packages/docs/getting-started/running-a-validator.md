@@ -50,6 +50,7 @@ It is recommended to run the Validator node in an environment that facilitates a
 - **You have Docker installed.**
 
   If you don’t have it already, follow the instructions here: [Get Started with Docker](https://www.docker.com/get-started). It will involve creating or signing in with a Docker account, downloading a desktop app, and then launching the app to be able to use the Docker CLI. If you are running on a Linux server, follow the instructions for your distro [here](https://docs.docker.com/install/#server). You may be required to run Docker with sudo depending on your installation environment.
+  You can check you have Docker installed and running if the command `docker info` works properly.
 
 - **You have celocli installed.**
 
