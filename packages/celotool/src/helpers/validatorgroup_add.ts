@@ -6,7 +6,6 @@ import { importAndUnlockAccount } from './utils'
 const web3 = new Web3('http://localhost:8543')
 const keystorePath: string = process.env.KEYSTORE || ''
 const member: string = process.env.MEMBER || ''
-
 ;(async () => {
   const kit = newKitFromWeb3(web3)
   const account = await importAndUnlockAccount(web3, keystorePath)
