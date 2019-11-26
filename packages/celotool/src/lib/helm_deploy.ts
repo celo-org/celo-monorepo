@@ -198,8 +198,8 @@ export async function installLegoAndNginx() {
   // we want to use cert-manager for any new clusters
   const certManagerExists = await outputIncludes(
     `helm list`,
-    `cert-manager`,
-    `cert-manager exists, skipping install`
+    `cert-manager-cluster-issuers`,
+    `cert-manager-cluster-issuers exists, skipping install`
   )
   if (!legoReleaseExists && !certManagerExists) {
     await installCertManager()
@@ -215,20 +215,14 @@ export async function installLegoAndNginx() {
 }
 
 export async function installCertManager() {
+  const clusterIssuersHelmChartPath = `../helm-charts/cert-manager-cluster-issuers`
+
   console.info('Installing cert-manager CustomResourceDefinitions')
   await execCmdWithExitOnFailure(
     `kubectl apply --validate=false -f https://raw.githubusercontent.com/jetstack/cert-manager/release-0.11/deploy/manifests/00-crds.yaml`
   )
-  console.info('Adding jetstack repo to helm')
-  await execCmdWithExitOnFailure(
-    `helm repo add jetstack https://charts.jetstack.io && helm repo update`
-  )
-  console.info('Installing jetstack/cert-manager helm chart')
-  await execCmdWithExitOnFailure(
-    `helm install --name cert-manager --version v0.11.0 jetstack/cert-manager --set ingressShim.defaultIssuerName=letsencrypt-prod --set ingressShim.defaultIssuerKind=ClusterIssuer --set webhook.enabled=false`
-  )
-
-  const clusterIssuersHelmChartPath = `../helm-charts/cert-manager-cluster-issuers`
+  console.info('Updating cert-manager-cluster-issuers dependencies')
+  await execCmdWithExitOnFailure(`helm dependency update ${clusterIssuersHelmChartPath}`)
   await execCmdWithExitOnFailure(
     `helm install --name cert-manager-cluster-issuers ${clusterIssuersHelmChartPath}`
   )

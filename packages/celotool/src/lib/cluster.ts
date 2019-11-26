@@ -16,7 +16,6 @@ import { networkName } from './vm-testnet-utils'
 const SYSTEM_HELM_RELEASES = [
   'nginx-ingress-release',
   'kube-lego-release',
-  'cert-manager',
   'cert-manager-cluster-issuers',
 ]
 const HELM_RELEASE_REGEX = new RegExp(/(.*)-\d+\.\d+\.\d+$/)
