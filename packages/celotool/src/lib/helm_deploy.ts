@@ -188,20 +188,14 @@ export async function redeployTiller() {
   }
 }
 
-export async function installLegoAndNginx() {
-  const legoReleaseExists = await outputIncludes(
-    `helm list`,
-    `kube-lego-release`,
-    `kube-lego-release exists, skipping install`
-  )
-  // Cert Manager is the newer version of lego,
-  // we want to use cert-manager for any new clusters
+export async function installCertManagerAndNginx() {
+  // Cert Manager is the newer version of lego
   const certManagerExists = await outputIncludes(
     `helm list`,
     `cert-manager-cluster-issuers`,
     `cert-manager-cluster-issuers exists, skipping install`
   )
-  if (!legoReleaseExists && !certManagerExists) {
+  if (!certManagerExists) {
     await installCertManager()
   }
   const nginxIngressReleaseExists = await outputIncludes(

@@ -6,7 +6,7 @@ import {
   getServiceAccountName,
   grantRoles,
   installAndEnableMetricsDeps,
-  installLegoAndNginx,
+  installCertManagerAndNginx,
   redeployTiller,
   uploadStorageClass,
 } from './helm_deploy'
@@ -108,7 +108,7 @@ export async function setupCluster(celoEnv: string, createdCluster: boolean) {
   await uploadStorageClass()
   await redeployTiller()
 
-  await installLegoAndNginx()
+  await installCertManagerAndNginx()
 
   if (envType !== EnvTypes.DEVELOPMENT) {
     await installAndEnableMetricsDeps()
