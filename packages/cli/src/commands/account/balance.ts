@@ -3,13 +3,13 @@ import { printValueMap } from '../../utils/cli'
 import { Args } from '../../utils/command'
 
 export default class Balance extends BaseCommand {
-  static description = 'View Celo Dollar and Gold balances given account address'
+  static description = 'View Celo Dollar and Gold balances for an address'
 
   static flags = {
     ...BaseCommand.flags,
   }
 
-  static args = [Args.address('account')]
+  static args = [Args.address('address')]
 
   static examples = ['balance 0x5409ed021d9299bf6814279a6a1411a7e866a631']
 
@@ -19,8 +19,8 @@ export default class Balance extends BaseCommand {
     const goldToken = await this.kit.contracts.getGoldToken()
     const stableToken = await this.kit.contracts.getStableToken()
     const balances = {
-      goldBalance: await goldToken.balanceOf(args.account),
-      dollarBalance: await stableToken.balanceOf(args.account),
+      goldBalance: await goldToken.balanceOf(args.address),
+      dollarBalance: await stableToken.balanceOf(args.address),
     }
     printValueMap(balances)
   }
