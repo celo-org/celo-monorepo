@@ -7,9 +7,11 @@ import {
   AccountType,
   getPrivateKeysFor,
   getValidators,
+  Validator,
   privateKeyToAddress,
   privateKeyToPublicKey,
 } from '../lib/generate_utils'
+import { ensure0x } from '../lib/utils'
 import {
   GethInstanceConfig,
   GethRunConfig,
@@ -300,6 +302,7 @@ export function getContext(gethConfig: GethRunConfig) {
     for (const instance of gethConfig.instances) {
       await initAndStartGeth(gethBinaryPath, instance)
     }
+    await connectValidatorPeers(gethConfig)
 
     // Give validators time to connect to each other
     await sleep(60)
@@ -345,6 +348,7 @@ export function getContext(gethConfig: GethRunConfig) {
         return startGeth(gethBinaryPath, instance)
       })
     )
+    await connectValidatorPeers(gethConfig)
   }
 
   const after = () => killGeth()

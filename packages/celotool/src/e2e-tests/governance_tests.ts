@@ -6,8 +6,15 @@ import { fromFixed, toFixed } from '@celo/utils/lib/fixidity'
 import BigNumber from 'bignumber.js'
 import { assert } from 'chai'
 import Web3 from 'web3'
-import { assertAlmostEqual, getEnode, sleep, getContext, waitToFinishSyncing } from './utils'
-import { GethRunConfig, GethInstanceConfig, importGenesis, initAndStartGeth } from '../lib/geth'
+import {
+  assertAlmostEqual,
+  getContext,
+  GethInstanceConfig,
+  importGenesis,
+  initAndStartGeth,
+  sleep,
+  waitToFinishSyncing,
+} from './utils'
 
 interface MemberSwapper {
   swap(): Promise<void>
@@ -276,7 +283,7 @@ describe('governance tests', () => {
           wsport: 8555,
           rpcport: 8557,
           privateKey: groupPrivateKey.slice(2),
-          peers: [await getEnode(8545)],
+          peers: [8545],
         },
       ]
       await Promise.all(
@@ -296,8 +303,8 @@ describe('governance tests', () => {
           port: 30315,
           wsport: 8559,
           privateKey: rotation0PrivateKey.slice(2),
-          peers: [await getEnode(8557)],
-        } as GethInstanceConfig,
+          peers: [8557],
+        },
         {
           gethRunConfig: gethConfig,
           name: 'validator2KeyRotation1',
@@ -307,8 +314,8 @@ describe('governance tests', () => {
           port: 30317,
           wsport: 8561,
           privateKey: rotation1PrivateKey.slice(2),
-          peers: [await getEnode(8557)],
-        } as GethInstanceConfig,
+          peers: [8557],
+        },
       ]
       await Promise.all(
         additionalValidatingNodes.map((nodeConfig) =>

@@ -419,6 +419,7 @@ contract Validators is
    * @param index The index of this validator in the list of all registered validators.
    * @return True upon success.
    * @dev Fails if the account is not a validator.
+   * @dev Fails if the validator has been a member of a group too recently.
    */
   function deregisterValidator(uint256 index) external nonReentrant returns (bool) {
     address account = getAccounts().signerToAccount(msg.sender);
@@ -587,6 +588,7 @@ contract Validators is
    * @param index The index of this validator group in the list of all validator groups.
    * @return True upon success.
    * @dev Fails if the account is not a validator group with no members.
+   * @dev Fails if the group has had members too recently.
    */
   function deregisterValidatorGroup(uint256 index) external nonReentrant returns (bool) {
     address account = getAccounts().signerToAccount(msg.sender);
@@ -720,9 +722,9 @@ contract Validators is
   }
 
   /**
-   * @notice Returns the locked gold balance requirement for the supplied account.
+   * @notice Returns the current locked gold balance requirement for the supplied account.
    * @param account The account that may have to meet locked gold balance requirements.
-   * @return The locked gold balance requirement for the supplied account.
+   * @return The current locked gold balance requirement for the supplied account.
    */
   function getAccountLockedGoldRequirement(address account) public view returns (uint256) {
     if (isValidator(account)) {
