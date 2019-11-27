@@ -4,10 +4,8 @@ import program from 'commander'
 import fs from 'fs'
 import { findAPortNotInUse } from 'portscanner'
 
-import { GethTestConfig, initAndStartGeth, GethInstanceConfig } from '../e2e-tests/utils'
-
 import { AccountType, getPrivateKeysFor, privateKeyToPublicKey } from '../lib/generate_utils'
-import { getEnodeAddress } from '../lib/geth'
+import { getEnodeAddress, GethInstanceConfig, GethRunConfig, initAndStartGeth } from '../lib/geth'
 
 program
   .option('-g, --geth-repo <path>', 'Geth repo path')
@@ -53,21 +51,28 @@ async function main({
   const proxyKey = key + 1
 
   const ethstats = 'localhost:3000'
-  const gethConfig: GethTestConfig = {
-    instances: [
-      {
-        name: `${key}-validator`,
-        validating: validator,
-        syncmode: 'full',
-        port: 30303 + key,
-        rpcport: 8545 + key * 2,
-        wsport: 8546 + key * 2,
-        ethstats: noEthStats ? '' : ethstats,
-        isProxied: isProxy,
-        proxy: isProxy ? '${proxyKey}-proxy' : undefined,
-      },
-    ],
+  const gethConfig: GethRunConfig = {
+    gethRepoPath: '../../../celo-blockchain',
+    runPath: tmpDir,
+    genesisPath: tmpDir + '/genesis.json',
+    networkId: 1101,
+    instances: [],
   }
+
+  gethConfig.instances = [
+    {
+      gethRunConfig: gethConfig,
+      name: `${key}-validator`,
+      validating: validator,
+      syncmode: 'full',
+      port: 30303 + key,
+      rpcport: 8545 + key * 2,
+      wsport: 8546 + key * 2,
+      ethstats: noEthStats ? '' : ethstats,
+      isProxied: isProxy,
+      proxy: isProxy ? '${proxyKey}-proxy' : undefined,
+    },
+  ]
 
   const instance: GethInstanceConfig = gethConfig.instances[0]
   let proxyInstance: GethInstanceConfig = {} as any
@@ -101,6 +106,7 @@ async function main({
       instance.port
     )
     proxyInstance = {
+      gethRunConfig: gethConfig,
       name: `${proxyKey}-proxy`,
       validating: false,
       syncmode: 'full',
@@ -112,7 +118,7 @@ async function main({
       proxiedValidatorAddress: privateKeyToPublicKey(validatorPrivateKey as string).slice(-40),
       // proxiedValidatorAddress: validatorEnode,
       // proxiedValidatorAddress:`127.0.0.1:${instance.port}`,
-    }
+    } as GethInstanceConfig
     gethConfig.instances.unshift(proxyInstance)
   }
 

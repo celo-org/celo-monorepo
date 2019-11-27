@@ -16,8 +16,12 @@ const validatorGroup: string = process.env.GROUP || '0x0'
     await lockGoldIfNeeded(web3, from)
     await delay(1000)
     console.log(pubkey)
-    const txRegisterVal = validatorContract.registerValidator(pubkey as any)
-    await displaySendTx('registerValidator', txRegisterVal, { from: from })
+
+    // todo: generate blsPublicKey & blsPop
+    const blsPublicKey = ''
+    const blsPop = ''
+    const txRegisterVal = validatorContract.registerValidator(pubkey as any, blsPublicKey, blsPop)
+    await displaySendTx('registerValidator', await txRegisterVal, { from: from })
     await delay(1000)
   }
   const me = await validatorContract.getValidator(from)

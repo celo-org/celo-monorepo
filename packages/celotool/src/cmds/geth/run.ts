@@ -91,11 +91,11 @@ export const handler = async (argv: RunArgv) => {
   const port = argv.port
   const rpcport = argv.rpcport
   const wsport = argv.wsport
-
-  console.info(`sync mode is ${syncMode}`)
   const mining = argv.mining
   const minerAddress = argv.minerAddress
   const minerGasPrice = argv.minerGasPrice
+
+  console.info(`sync mode is ${syncMode}`)
 
   if (!fs.existsSync(path.resolve(datadir, STATIC_NODES_FILE_NAME))) {
     console.error(`Error: static-nodes.json was not found in datadir ${datadir}`)

@@ -1,23 +1,11 @@
 #!/usr/bin/env ts-node
 
 import program from 'commander'
-import fs from 'fs-extra'
 
-import {
-  GethTestConfig,
-  initAndStartGeth,
-  migrateContracts,
-  startGeth,
-  writeGenesis,
-} from '../e2e-tests/utils'
+import { migrateContracts } from '../e2e-tests/utils'
 
-import {
-  AccountType,
-  getPrivateKeysFor,
-  getValidators,
-  privateKeyToPublicKey,
-} from '../lib/generate_utils'
-import { getEnodeAddress } from '../lib/geth'
+import { AccountType, getPrivateKeysFor, getValidators } from '../lib/generate_utils'
+import { GethRunConfig, runGethNodes } from '../lib/geth'
 
 program
   .option('-g, --geth-repo <path>', 'Geth repo path')
@@ -28,7 +16,7 @@ program
     'Mnemonic seed words',
     'jazz ripple brown cloth door bridge pen danger deer thumb cable prepare negative library vast'
   )
-  .option('-k, --keep-data', 'Skeps the clean up of the previous node data', '/tmp/e2e')
+  .option('-k, --keep-data', 'Skeps the clean up of the previous node data', 'true')
   .option('--test-dir <path>', 'Path to temporal data directory', '/tmp/e2e')
   .action(async () => {
     const { gethRepo, validators, migrations, mnemonic, keepData, testDir } = program
@@ -64,20 +52,27 @@ async function runTestNetwork({
   const numEthstats = +numValidators
 
   // configure geth
-  const gethConfig: GethTestConfig = {
+  const gethConfig: GethRunConfig = {
+    networkId: 1101,
+    runPath: tmpDir,
+    genesisPath: tmpDir + '/genesis.json',
+    gethRepoPath,
     migrateTo,
-    instances: [...Array(numValidators).keys()].map((index: number) => {
-      return {
-        name: `${index}-validator`,
-        validating: true,
-        syncmode: 'full',
-        port: 30303 + index,
-        rpcport: 8545 + index * 2,
-        wsport: 8546 + index * 2,
-        ethstats: index >= numEthstats ? '' : ethstats,
-      }
-    }),
+    instances: [],
   }
+
+  gethConfig.instances = [...Array(numValidators).keys()].map((index: number) => {
+    return {
+      gethRunConfig: gethConfig,
+      name: `${index}-validator`,
+      validating: true,
+      syncmode: 'full',
+      port: 30303 + index,
+      rpcport: 8545 + index * 2,
+      wsport: 8546 + index * 2,
+      ethstats: index >= numEthstats ? '' : ethstats,
+    }
+  })
 
   // handle keys
   const attestationKeys = getPrivateKeysFor(AccountType.ATTESTATION, mnemonic, numValidators)
@@ -85,12 +80,11 @@ async function runTestNetwork({
   const validatorPrivateKeys = getPrivateKeysFor(AccountType.VALIDATOR, mnemonic, numValidators)
 
   // run the nodes
-  await runNodes({
+  await runGethNodes({
     keepData,
     gethConfig,
     validatorPrivateKeys,
     gethRepoPath,
-    tmpDir,
     validators,
   })
 
@@ -102,63 +96,5 @@ async function runTestNetwork({
       validators.map((v) => v.address),
       gethConfig.migrateTo
     )
-  }
-}
-
-async function runNodes({
-  gethConfig,
-  keepData,
-  gethRepoPath,
-  validatorPrivateKeys,
-  tmpDir,
-  validators,
-}: {
-  gethConfig: GethTestConfig
-  keepData: boolean
-  gethRepoPath: string
-  tmpDir: string
-  validators: any
-  validatorPrivateKeys: any
-}) {
-  const genesisPath = `${tmpDir}/genesis.json`
-  const validatorsFilePath = `${tmpDir}/validators.json`
-  const validatorInstances = gethConfig.instances.filter((x: any) => x.validating)
-  const validatorEnodes = validatorPrivateKeys.map((x: any, i: number) =>
-    getEnodeAddress(privateKeyToPublicKey(x), '127.0.0.1', validatorInstances[i].port)
-  )
-  const gethBinaryPath = `${gethRepoPath}/build/bin/geth`
-
-  if (!keepData && fs.existsSync(tmpDir)) {
-    fs.removeSync(tmpDir)
-  }
-
-  if (!fs.existsSync(tmpDir)) {
-    fs.mkdirSync(tmpDir, { recursive: true })
-  }
-
-  console.log('writing genesis')
-  await writeGenesis(validators, genesisPath)
-  console.log('wrote   genesis')
-
-  console.log('Validator eNodes', JSON.stringify(validatorEnodes, null, 2))
-
-  fs.writeFileSync(validatorsFilePath, JSON.stringify(validatorEnodes), 'utf8')
-
-  let validatorIndex = 0
-
-  for (const instance of gethConfig.instances) {
-    if (instance.validating) {
-      // Automatically connect validator nodes to eachother.
-      const otherValidators = validatorEnodes.filter((_: string, i: number) => i !== validatorIndex)
-      instance.peers = (instance.peers || []).concat(otherValidators)
-      instance.privateKey = instance.privateKey || validatorPrivateKeys[validatorIndex]
-      validatorIndex++
-    }
-
-    if (gethConfig.migrate || gethConfig.migrateTo) {
-      await initAndStartGeth(gethBinaryPath, instance)
-    } else {
-      await startGeth(gethBinaryPath, instance)
-    }
   }
 }

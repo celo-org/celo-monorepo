@@ -6,20 +6,14 @@ import { fromFixed, toFixed } from '@celo/utils/lib/fixidity'
 import BigNumber from 'bignumber.js'
 import { assert } from 'chai'
 import Web3 from 'web3'
-import {
-  assertAlmostEqual,
-  getContext,
-  getEnode,
-  GethInstanceConfig,
-  importGenesis,
-  initAndStartGeth,
-  sleep,
-  waitToFinishSyncing,
-} from './utils'
+import { assertAlmostEqual, getEnode, sleep, getContext, waitToFinishSyncing } from './utils'
+import { GethRunConfig, GethInstanceConfig, importGenesis, initAndStartGeth } from '../lib/geth'
 
 interface MemberSwapper {
   swap(): Promise<void>
 }
+
+const TMP_PATH = '/tmp/e2e'
 
 async function newMemberSwapper(kit: ContractKit, members: string[]): Promise<MemberSwapper> {
   let index = 0
@@ -113,18 +107,59 @@ async function newKeyRotator(
 
 // TODO(asa): Test independent rotation of ecdsa, bls keys.
 describe('governance tests', () => {
-  const gethConfig = {
+  const gethConfig: GethRunConfig = {
+    gethRepoPath: '../../../celo-blockchain',
     migrate: true,
-    instances: [
-      // Validators 0 and 1 are swapped in and out of the group.
-      { name: 'validator0', validating: true, syncmode: 'full', port: 30303, rpcport: 8545 },
-      { name: 'validator1', validating: true, syncmode: 'full', port: 30305, rpcport: 8547 },
-      // Validator 2 will authorize a validating key every other epoch.
-      { name: 'validator2', validating: true, syncmode: 'full', port: 30307, rpcport: 8549 },
-      { name: 'validator3', validating: true, syncmode: 'full', port: 30309, rpcport: 8551 },
-      { name: 'validator4', validating: true, syncmode: 'full', port: 30311, rpcport: 8553 },
-    ],
+    runPath: TMP_PATH,
+    genesisPath: TMP_PATH + '/genesis.json',
+    networkId: 1101,
+    instances: [],
   }
+
+  gethConfig.instances = [
+    // Validators 0 and 1 are swapped in and out of the group.
+    {
+      gethRunConfig: gethConfig,
+      name: 'validator0',
+      validating: true,
+      syncmode: 'full',
+      port: 30303,
+      rpcport: 8545,
+    },
+    {
+      gethRunConfig: gethConfig,
+      name: 'validator1',
+      validating: true,
+      syncmode: 'full',
+      port: 30305,
+      rpcport: 8547,
+    },
+    // Validator 2 will authorize a validating key every other epoch.
+    {
+      gethRunConfig: gethConfig,
+      name: 'validator2',
+      validating: true,
+      syncmode: 'full',
+      port: 30307,
+      rpcport: 8549,
+    },
+    {
+      gethRunConfig: gethConfig,
+      name: 'validator3',
+      validating: true,
+      syncmode: 'full',
+      port: 30309,
+      rpcport: 8551,
+    },
+    {
+      gethRunConfig: gethConfig,
+      name: 'validator4',
+      validating: true,
+      syncmode: 'full',
+      port: 30311,
+      rpcport: 8553,
+    },
+  ]
 
   const context: any = getContext(gethConfig)
   let web3: any
@@ -231,6 +266,9 @@ describe('governance tests', () => {
         '0x4519cae145fb9499358be484ca60c80d8f5b7f9c13ff82c88ec9e13283e9de1a'
       const additionalNodes: GethInstanceConfig[] = [
         {
+          gethRunConfig: {
+            networkId: 1101,
+          } as GethRunConfig,
           name: 'validatorGroup',
           validating: false,
           syncmode: 'full',
@@ -250,6 +288,7 @@ describe('governance tests', () => {
       // are properly gossiped.
       const additionalValidatingNodes = [
         {
+          gethRunConfig: gethConfig,
           name: 'validator2KeyRotation0',
           validating: true,
           syncmode: 'full',
@@ -258,8 +297,9 @@ describe('governance tests', () => {
           wsport: 8559,
           privateKey: rotation0PrivateKey.slice(2),
           peers: [await getEnode(8557)],
-        },
+        } as GethInstanceConfig,
         {
+          gethRunConfig: gethConfig,
           name: 'validator2KeyRotation1',
           validating: true,
           syncmode: 'full',
@@ -268,7 +308,7 @@ describe('governance tests', () => {
           wsport: 8561,
           privateKey: rotation1PrivateKey.slice(2),
           peers: [await getEnode(8557)],
-        },
+        } as GethInstanceConfig,
       ]
       await Promise.all(
         additionalValidatingNodes.map((nodeConfig) =>
@@ -691,7 +731,7 @@ describe('governance tests', () => {
     beforeEach(async function(this: any) {
       this.timeout(0) // Disable test timeout
       await restart()
-      const genesis = await importGenesis()
+      const genesis = await importGenesis(gethConfig.genesisPath)
       Object.keys(genesis.alloc).forEach((address) => {
         goldGenesisSupply = goldGenesisSupply.plus(genesis.alloc[address].balance)
       })

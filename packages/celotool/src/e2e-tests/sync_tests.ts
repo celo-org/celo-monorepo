@@ -1,27 +1,57 @@
 import { assert } from 'chai'
 import Web3 from 'web3'
-import {
-  getEnode,
-  GethInstanceConfig,
-  getHooks,
-  initAndStartGeth,
-  killInstance,
-  sleep,
-  waitToFinishSyncing,
-} from './utils'
+import { getEnode, getHooks, killInstance, sleep, waitToFinishSyncing } from './utils'
+import { GethInstanceConfig, GethRunConfig, initAndStartGeth } from '../lib/geth'
+
+const TMP_PATH = '/tmp/e2e'
 
 describe('sync tests', function(this: any) {
   this.timeout(0)
 
-  const gethConfig = {
+  const gethConfig: GethRunConfig = {
+    networkId: 1101,
+    runPath: TMP_PATH,
+    genesisPath: TMP_PATH + '/genesis.json',
+    gethRepoPath: '../../../celo-blockchain',
     migrate: true,
-    instances: [
-      { name: 'validator0', validating: true, syncmode: 'full', port: 30303, rpcport: 8545 },
-      { name: 'validator1', validating: true, syncmode: 'full', port: 30305, rpcport: 8547 },
-      { name: 'validator2', validating: true, syncmode: 'full', port: 30307, rpcport: 8549 },
-      { name: 'validator3', validating: true, syncmode: 'full', port: 30309, rpcport: 8551 },
-    ],
+    instances: [],
   }
+
+  gethConfig.instances = [
+    {
+      gethRunConfig: gethConfig,
+      name: 'validator0',
+      validating: true,
+      syncmode: 'full',
+      port: 30303,
+      rpcport: 8545,
+    },
+    {
+      gethRunConfig: gethConfig,
+      name: 'validator1',
+      validating: true,
+      syncmode: 'full',
+      port: 30305,
+      rpcport: 8547,
+    },
+    {
+      gethRunConfig: gethConfig,
+      name: 'validator2',
+      validating: true,
+      syncmode: 'full',
+      port: 30307,
+      rpcport: 8549,
+    },
+    {
+      gethRunConfig: gethConfig,
+      name: 'validator3',
+      validating: true,
+      syncmode: 'full',
+      port: 30309,
+      rpcport: 8551,
+    },
+  ]
+
   const hooks = getHooks(gethConfig)
 
   before(async () => {
@@ -29,7 +59,8 @@ describe('sync tests', function(this: any) {
     await hooks.before()
     // Restart validator nodes.
     await hooks.restart()
-    const fullInstance = {
+    const fullInstance: GethInstanceConfig = {
+      gethRunConfig: gethConfig,
       name: 'full',
       validating: false,
       syncmode: 'full',
@@ -51,6 +82,7 @@ describe('sync tests', function(this: any) {
       let syncInstance: GethInstanceConfig
       beforeEach(async () => {
         syncInstance = {
+          gethRunConfig: gethConfig,
           name: syncmode,
           validating: false,
           syncmode,
