@@ -233,10 +233,11 @@ contract VestingInstance is UsingRegistry, ReentrancyGuard {
   /**
      * @notice A wrapper func for the relock locked gold method function
      * @param index the index of the pending locked gold withdrawal
+     * @param value the value of gold to be relocked for the vesting instance
      * @dev To be called only by the beneficiary of the vesting.
      */
-  function relockGold(uint256 index) external nonReentrant onlyBeneficiary {
-    getLockedGold().relock(index);
+  function relockGold(uint256 index, uint256 value) external nonReentrant onlyBeneficiary {
+    getLockedGold().relock(index, value);
   }
 
   /**

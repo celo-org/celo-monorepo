@@ -159,7 +159,7 @@ export class VestingInstanceWrapper extends BaseWrapper<VestingInstance> {
    * Relocks gold that has been unlocked but not withdrawn.
    * @param index The index of the pending withdrawal to relock.
    */
-  relockGold: (index: number) => CeloTransactionObject<void> = proxySend(
+  relockGold: (index: number, value: string | number) => CeloTransactionObject<void> = proxySend(
     this.kit,
     this.contract.methods.relockGold
   )
