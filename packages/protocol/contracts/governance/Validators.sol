@@ -726,7 +726,7 @@ contract Validators is
    * @param account The account that may have to meet locked gold balance requirements.
    * @return The current locked gold balance requirement for the supplied account.
    */
-  function getAccountLockedGoldRequirementValue(address account) public view returns (uint256) {
+  function getAccountLockedGoldRequirement(address account) public view returns (uint256) {
     if (isValidator(account)) {
       return validatorLockedGoldRequirements.value;
     } else if (isValidatorGroup(account)) {
