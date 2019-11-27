@@ -30,11 +30,15 @@ You can also use the Celo Blockchain client to create and manage account keypair
 
 Create and cd into the directory where you want to store the keypair. You can name this whatever you’d like, but here’s a default you can use:
 
-`$ mkdir celo-data-dir $ cd celo-data-dir`
+```bash
+mkdir celo-data-dir $ cd celo-data-dir
+```
 
 Create an account by running this command:
 
-`` $ docker run -v `pwd`:/root/.celo -it us.gcr.io/celo-testnet/celo-node:alfajores account new ``
+```bash
+docker run -v `pwd`:/root/.celo -it us.gcr.io/celo-testnet/celo-node:alfajores account new
+```
 
 It will prompt you for a passphrase, ask you to confirm it, and then will output your account address:
 
@@ -42,7 +46,9 @@ It will prompt you for a passphrase, ask you to confirm it, and then will output
 
 This creates a keypair and stores it. Save this address to an environment variable, so that you can reference it later:
 
-`$ export CELO_ACCOUNT_ADDRESS=<YOUR-ACCOUNT-ADDRESS>`
+```bash
+export CELO_ACCOUNT_ADDRESS=<YOUR-ACCOUNT-ADDRESS>
+```
 
 ## **Add funds to an existing account with the Faucet**
 
