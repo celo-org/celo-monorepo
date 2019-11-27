@@ -6,6 +6,7 @@ import { RootState } from 'src/redux/reducers'
 export interface State {
   isSendingInvite: boolean
   isRedeemingInvite: boolean
+  isSkippingInvite: boolean
   invitees: Invitees
   redeemComplete: boolean
   redeemedInviteCode: string
@@ -14,6 +15,7 @@ export interface State {
 export const initialState: State = {
   isSendingInvite: false,
   isRedeemingInvite: false,
+  isSkippingInvite: false,
   invitees: {},
   redeemComplete: false,
   redeemedInviteCode: '',
@@ -31,6 +33,7 @@ export const inviteReducer = (
         ...getRehydratePayload(action, 'invite'),
         isSendingInvite: false,
         isRedeemingInvite: false,
+        isSkippingInvite: false,
       }
     }
     case Actions.SEND_INVITE:
@@ -62,6 +65,23 @@ export const inviteReducer = (
         ...state,
         redeemComplete: false,
         isRedeemingInvite: false,
+      }
+    case Actions.SKIP_INVITE:
+      return {
+        ...state,
+        isSkippingInvite: true,
+      }
+    case Actions.SKIP_INVITE_SUCCESS:
+      return {
+        ...state,
+        redeemComplete: true,
+        isSkippingInvite: false,
+      }
+    case Actions.SKIP_INVITE_FAILURE:
+      return {
+        ...state,
+        redeemComplete: false,
+        isSkippingInvite: false,
       }
     default:
       return state

@@ -53,7 +53,7 @@ export default class PhoneNumberInput extends React.Component<Props, State> {
 
   componentDidMount() {
     if (this.props.defaultCountry) {
-      this.onChangeCountryQuery(this.props.defaultCountry)
+      this.changeCountryQuery(this.props.defaultCountry)
     }
 
     if (this.props.defaultCountryCode) {
@@ -61,7 +61,7 @@ export default class PhoneNumberInput extends React.Component<Props, State> {
         this.props.defaultCountryCode
       )
 
-      this.onChangeCountryQuery(country.displayName)
+      this.changeCountryQuery(country.displayName)
     }
 
     if (this.props.defaultPhoneNumber) {
@@ -69,40 +69,47 @@ export default class PhoneNumberInput extends React.Component<Props, State> {
     }
   }
 
-  async triggerPhoneNumberRequestAndroid() {
+  async getPhoneNumberFromNativePickerAndroid() {
     try {
-      const phone = await SmsRetriever.requestPhoneNumber()
-      const phoneNumber = parsePhoneNumber(phone, '')
-
-      if (!phoneNumber) {
+      try {
+        return SmsRetriever.requestPhoneNumber()
+      } catch (error) {
+        console.info(
+          `${TAG}/triggerPhoneNumberRequestAndroid`,
+          'Could not request phone. This might be thrown if the user dismissed the modal',
+          error
+        )
         return
       }
-
-      this.setState({ phoneNumber: phoneNumber.displayNumber.toString() })
-
-      if (phoneNumber.countryCode) {
-        // TODO known issue, the country code is not enough to
-        // get a country, e.g. +1 could be USA or Canada
-        const displayName = this.state.countries.getCountryByPhoneCountryCode(
-          '+' + phoneNumber.countryCode.toString()
-        ).displayName
-
-        this.onChangeCountryQuery(displayName)
-      }
     } catch (error) {
-      console.error(`${TAG}/triggerPhoneNumberRequestAndroid`, 'Could not request phone', error)
+      console.info(`${TAG}/triggerPhoneNumberRequestAndroid`, 'Could not request phone', error)
     }
   }
 
   async triggerPhoneNumberRequest() {
+    let phone
     try {
       if (Platform.OS === 'android') {
-        await this.triggerPhoneNumberRequestAndroid()
+        phone = await this.getPhoneNumberFromNativePickerAndroid()
       } else {
         console.info(`${TAG}/triggerPhoneNumberRequest`, 'Not implemented in this platform')
       }
+      const phoneNumber = parsePhoneNumber(phone, '')
+      if (!phoneNumber) {
+        return
+      }
+      this.setState({ phoneNumber: phoneNumber.displayNumber.toString() })
+
+      // A country code is not enough to know the country of a phone number (e.g. both the US and Canada share the +1)
+      // To get the country a Region Code is required, a two-letter country/region identifier (ISO-3166-1 Alpha2)
+      const regionCode = phoneNumber.regionCode
+
+      if (regionCode) {
+        const displayName = this.state.countries.getCountryByCode(regionCode).displayName
+        this.changeCountryQuery(displayName)
+      }
     } catch (error) {
-      console.error(`${TAG}/triggerPhoneNumberRequest`, 'Could not request phone', error)
+      console.info(`${TAG}/triggerPhoneNumberRequest`, 'Could not request phone', error)
     }
   }
 
@@ -110,10 +117,13 @@ export default class PhoneNumberInput extends React.Component<Props, State> {
     if (this.props.onInputFocus) {
       await this.props.onInputFocus()
     }
-    await this.triggerPhoneNumberRequest()
+
+    if (!(this.state.phoneNumber || this.state.countryQuery)) {
+      return this.triggerPhoneNumberRequest()
+    }
   }
 
-  onChangeCountryQuery = (countryQuery: string) => {
+  changeCountryQuery = (countryQuery: string) => {
     if (this.props.onInputChange) {
       this.props.onInputChange()
     }
@@ -180,7 +190,7 @@ export default class PhoneNumberInput extends React.Component<Props, State> {
     const { displayName, emoji, countryCallingCodes } = this.state.countries.getCountryByCode(
       countryCode
     )
-    const onPress = () => this.onChangeCountryQuery(displayName)
+    const onPress = () => this.changeCountryQuery(displayName)
 
     return (
       <TouchableOpacity onPress={onPress}>
@@ -230,7 +240,7 @@ export default class PhoneNumberInput extends React.Component<Props, State> {
             data={filteredCountries}
             keyExtractor={this.keyExtractor}
             defaultValue={countryQuery}
-            onChangeText={this.onChangeCountryQuery}
+            onChangeText={this.changeCountryQuery}
             onEndEditing={this.props.onEndEditingCountryCode}
             placeholder={this.props.inputCountryPlaceholder}
             renderItem={this.renderItem}
