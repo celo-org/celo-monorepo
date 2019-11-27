@@ -60,6 +60,11 @@ The genesis block is the first block in the chain, and is specific to each netwo
 
 `` $ docker run -v `pwd`:/root/.celo us.gcr.io/celo-testnet/celo-node:alfajores init /celo/genesis.json ``
 
+A successfull output would have the following line.
+```text
+INFO [11-27|13:31:51.550] Successfully wrote genesis state         database=ultralightchaindata                  hash=92b2a5…86b4d6
+```
+
 In order to allow the node to sync with the network, give it the address of existing nodes in the network:
 
 `` $ docker run -v `pwd`:/root/.celo --entrypoint cp us.gcr.io/celo-testnet/celo-node:alfajores /celo/static-nodes.json /root/.celo/ ``
@@ -76,8 +81,6 @@ You'll start seeing some output. There may be some errors or warnings that are i
 INFO [07-16|14:04:24.924] Imported new chain segment               blocks=139  txs=319 mgas=61.987 elapsed=8.085s mgasps=7.666 number=406  hash=9acf16…4fddc8 age=6h58m44s cache=1.51mB
 INFO [07-16|14:04:32.928] Imported new chain segment               blocks=303  txs=179 mgas=21.837 elapsed=8.004s mgasps=2.728 number=709  hash=8de06a…77bb92 age=6h33m37s cache=1.77mB
 INFO [07-16|14:04:40.918] Imported new chain segment               blocks=411  txs=0   mgas=0.000  elapsed=8.023s mgasps=0.000 number=1120 hash=3db22a…9fa95a age=5h59m30s cache=1.92mB
-INFO [07-16|14:04:48.941] Imported new chain segment               blocks=335  txs=0   mgas=0.000  elapsed=8.023s mgasps=0.000 number=1455 hash=7eb3f8…32ebf0 age=5h31m43s cache=2.09mB
-INFO [07-16|14:04:56.944] Imported new chain segment               blocks=472  txs=0   mgas=0.000  elapsed=8.003s mgasps=0.000 number=1927 hash=4f1010…1414c1 age=4h52m31s cache=2.34mB
 ```
 
 You will have fully synced with the network once you have pulled the latest block number, which you can lookup by visiting at the [Alfajores Testnet Stats](https://alfajores-ethstats.celo-testnet.org/) page.
