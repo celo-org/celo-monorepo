@@ -19,6 +19,7 @@ export enum CeloContract {
   SortedOracles = 'SortedOracles',
   StableToken = 'StableToken',
   Validators = 'Validators',
+  VestingFactory = 'VestingFactory',
 }
 
 export type CeloToken = CeloContract.GoldToken | CeloContract.StableToken

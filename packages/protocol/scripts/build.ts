@@ -44,6 +44,7 @@ export const CoreContracts = [
   'LockedGold',
   'Validators',
   'VestingFactory',
+  'VestingInstance',
 
   // identity
   'Attestations',

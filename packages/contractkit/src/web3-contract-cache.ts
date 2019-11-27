@@ -18,6 +18,7 @@ import { newReserve } from './generated/Reserve'
 import { newSortedOracles } from './generated/SortedOracles'
 import { newStableToken } from './generated/StableToken'
 import { newValidators } from './generated/Validators'
+import { newVestingFactory } from './generated/VestingFactory'
 import { ContractKit } from './kit'
 
 const debug = debugFactory('kit:web3-contract-cache')
@@ -41,6 +42,7 @@ const ContractFactories = {
   [CeloContract.SortedOracles]: newSortedOracles,
   [CeloContract.StableToken]: newStableToken,
   [CeloContract.Validators]: newValidators,
+  [CeloContract.VestingFactory]: newVestingFactory,
 }
 
 type CFType = typeof ContractFactories
@@ -111,6 +113,9 @@ export class Web3ContractCache {
   }
   getValidators() {
     return this.getContract(CeloContract.Validators)
+  }
+  getVestingFactory() {
+    return this.getContract(CeloContract.VestingFactory)
   }
 
   /**

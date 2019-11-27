@@ -15,6 +15,7 @@ import { ReserveWrapper } from './wrappers/Reserve'
 import { SortedOraclesWrapper } from './wrappers/SortedOracles'
 import { StableTokenWrapper } from './wrappers/StableTokenWrapper'
 import { ValidatorsWrapper } from './wrappers/Validators'
+import { VestingFactoryWrapper } from './wrappers/VestingFactoryWrapper'
 
 const WrapperFactories = {
   [CeloContract.Accounts]: AccountsWrapper,
@@ -36,6 +37,7 @@ const WrapperFactories = {
   [CeloContract.SortedOracles]: SortedOraclesWrapper,
   [CeloContract.StableToken]: StableTokenWrapper,
   [CeloContract.Validators]: ValidatorsWrapper,
+  [CeloContract.VestingFactory]: VestingFactoryWrapper,
 }
 
 type CFType = typeof WrapperFactories
@@ -61,6 +63,7 @@ interface WrapperCacheMap {
   [CeloContract.SortedOracles]?: SortedOraclesWrapper
   [CeloContract.StableToken]?: StableTokenWrapper
   [CeloContract.Validators]?: ValidatorsWrapper
+  [CeloContract.VestingFactory]?: VestingFactoryWrapper
 }
 
 /**
@@ -127,6 +130,9 @@ export class WrapperCache {
   }
   getValidators() {
     return this.getContract(CeloContract.Validators)
+  }
+  getVestingFactory() {
+    return this.getContract(CeloContract.VestingFactory)
   }
 
   /**
