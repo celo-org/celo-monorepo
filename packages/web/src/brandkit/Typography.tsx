@@ -44,20 +44,22 @@ const Overview = withNamespaces(NameSpaces.brand)(
         <PageHeadline
           title={t('typography.title')}
           headline={t('typography.headline')}
-          style={standardStyles.elementalMarginBottom}
+          style={standardStyles.blockMarginBottom}
         />
         <View style={brandStyles.gap}>
+          <Text style={fonts.h5a}>{t('typography.facesTitle')}</Text>
+          <Text style={[fonts.p, standardStyles.elementalMargin]}>{t('typography.facesText')}</Text>
           <H2 style={styles.hero}>{t('typography.mainFontTitle')}</H2>
           <Text style={[fonts.p, standardStyles.elementalMarginBottom]}>
             {t('typography.mainFontText')}
           </Text>
-          <DownloadButton uri="TODO" />
+          <DownloadButton uri="https://fonts.google.com/specimen/EB+Garamond" />
           <View style={standardStyles.blockMarginTopTablet}>
             <H3 style={styles.hero}>{t('typography.subFontTitle')}</H3>
             <Text style={[fonts.p, standardStyles.elementalMarginBottom]}>
               {t('typography.subFontText')}
             </Text>
-            <DownloadButton uri="TODO" />
+            <DownloadButton uri="https://indestructibletype.com/Jost.html" />
           </View>
         </View>
       </View>

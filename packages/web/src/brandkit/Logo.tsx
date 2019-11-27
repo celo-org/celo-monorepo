@@ -18,6 +18,7 @@ import Button, { BTN } from 'src/shared/Button.3'
 import { hashNav } from 'src/shared/menu-items'
 import { colors, fonts, standardStyles } from 'src/styles'
 import DownloadButton from 'src/brandkit/common/DownloadButton'
+import TripplePairing from 'src/brandkit/common/TripplePairing'
 
 export default React.memo(function Logo() {
   return (
@@ -27,26 +28,10 @@ export default React.memo(function Logo() {
           id: hashNav.brandLogo.overview,
           children: <Overview />,
         },
-        // {
-        //   id: hashNav.brandLogo.glyph,
-        //   children: (
-        //     <View style={[styles.container, { minHeight: 400, backgroundColor: colors.primary }]}>
-        //       <Text>glyph</Text>
-        //     </View>
-        //   ),
-        // },
         {
           id: hashNav.brandLogo.space,
           children: <Clearspace />,
         },
-        // {
-        //   id: hashNav.brandLogo.size,
-        //   children: (
-        //     <View style={[styles.container, { height: 500, backgroundColor: colors.deepBlue }]}>
-        //       <Text>size</Text>
-        //     </View>
-        //   ),
-        // },
         {
           id: hashNav.brandLogo.backgrounds,
           children: <Backgrounds />,
@@ -110,7 +95,7 @@ const Overview = withNamespaces(NameSpaces.brand)(
             {t('logo.glyphTitle')}
           </Text>
           <Text style={fonts.p}>{t('logo.glyphText')}</Text>
-          <DownloadButton href="/todo" />
+          <DownloadButton uri="/todo" />
           <View style={[styles.tiling, standardStyles.elementalMarginTop]}>
             <View
               style={[
@@ -151,7 +136,7 @@ const Clearspace = withNamespaces(NameSpaces.brand)(function _ClearSpace({ t }) 
   return (
     <>
       <View style={styles.gap}>
-        <SectionTitle>{t('logo.SpaceSizeTitle')}</SectionTitle>
+        <SectionTitle>{t('logo.spaceSizeTitle')}</SectionTitle>
       </View>
       <Text
         style={[
@@ -319,34 +304,6 @@ const Backgrounds = withNamespaces(NameSpaces.brand)(function _Backgrounds({ t }
           </>
         }
       />
-    </View>
-  )
-})
-
-interface TripplePairingProps {
-  first: React.ReactNode
-  second: React.ReactNode
-  third: React.ReactNode
-}
-
-const TripplePairing = withScreenSize<TripplePairingProps>(function _TripplePairing({
-  first,
-  second,
-  third,
-  screen,
-}: TripplePairingProps & ScreenProps) {
-  return (
-    <View style={screen === ScreenSizes.DESKTOP ? styles.tiling : {}}>
-      {[first, second, third].map((pair, index) => {
-        return (
-          <View
-            style={screen === ScreenSizes.DESKTOP ? { flex: 1 } : standardStyles.row}
-            key={index}
-          >
-            {pair}
-          </View>
-        )
-      })}
     </View>
   )
 })

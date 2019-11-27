@@ -63,19 +63,19 @@
   "typography": {
     "title": "Typography",
     "headline":
-      "When creating the Celo font family The Celo Experience Team wanted to speak to Celo’s Approachable and Academic brand principles. Our thinking is the more different the two fonts were in visual tone the wider the more audience members we can include.\n\nPicking open-source fonts allows our community to be able to download immediately build and design Celo branded material.",
+      "The Celo fonts were intentionally chosen to speak to Celo’s Approachable and Academic brand principles. To honor both energies and compliment a broader range of expression, a serif and a sans serif font were chosen.",
+    "facesTitle": "Typefaces",
+    "facesText":
+      "Celo uses open-source fonts in order for community members to download, build, and design Celo branded material.\n\nRefer to the guidelines below when building a project on Celo.",
     "downloadAllBTN": "Download Fonts",
     "mainFontTitle": "This is Garamond,\nthe Celo brand typeface.",
     "mainFontText":
-      "Garamond became a natural choice as our team spoke to pillars that bring timelessness, professionalism, and an appropriate visual formal tone for education and declaration. <Should we specify the use of EB Garamond (google font) on digital displays?>\nUse Garamond for lorem ipsum dolor sit amet, consectetur adipiscing elit. Ut id elit sapien. Sed sem ante, ornare a ipsum ut, consequat ullamcorper lorem.",
-    "getMainfontBTN": "Download EB Garamond",
+      "EB Garamond represents our Academic brand principle described as timeless and professional. It is an appropriate formal visual tone for education and declaration.\n\nUse EB Garamond for the majority of titles and paragraphs",
     "subFontTitle": "This is Jost*, our supporting font.",
     "subFontText":
-      "Jost*’s geometric form functions as approachable complimentary typography that we used more sparingly but speaks to the typography found in the logo and the round shape language in our illustration.\n\nUse Jost* for lorem ipsum dolor sit amet, consectetur adipiscing elit. Ut id elit sapien. Sed sem ante, ornare a ipsum ut, consequat ullamcorper lorem.",
+      "Jost*’s geometric form functions as an approachable compliment to EB Garamond. It is used more sparingly and speaks to the typography found in the logo and the round shapes in the illustrations.\n\nUse Jost* for call to actions, diagrams, instructions, and infographics.",
     "typescaleTitle": "Type Scale",
-    "typescaleText":
-      "General lorem ipsum dolor sit amet, consectetur adipiscing elit. Ut id elit sapien. <Below are styles from the site. Perhaps it should serve as a guide and not a rule>",
-    "getSubfontBTN": "Download Jost",
+    "typescaleText": "For typographic hierarchy, we recommend the following type scale.",
     "examplesTitle": "Usage Examples",
     "h1Example": "Main Title",
     "h2Example": "Article Title",
