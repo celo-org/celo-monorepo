@@ -279,9 +279,11 @@ export const validateTransactionAndReceipt = (
     location,
     error: `Transaction receipt status (${txReceipt.status}) is not true!`,
   })
-  handleError(txReceipt.from.toLowerCase() !== from.toLowerCase(), {
+  const receiptFrom = txReceipt.from.toLowerCase()
+  const expectedFrom = from.toLowerCase()
+  handleError(!eqAddress(receiptFrom, expectedFrom), {
     location,
-    error: `Transaction receipt from (${txReceipt.from}) is not equal to sender address (${from}).`,
+    error: `Transaction receipt from (${receiptFrom}) is not equal to sender address (${expectedFrom}).`,
   })
 }
 
