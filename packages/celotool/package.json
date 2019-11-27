@@ -48,7 +48,8 @@
   "scripts": {
     "cli": "TS_NODE_FILES=true ts-node -r tsconfig-paths/register src/cli.ts",
     "lint": "tslint -c tslint.json --project tsconfig.json",
-    "build": "tsc -b ."
+    "build": "tsc -b .",
+    "watch": "tsc -b --watch ."
   },
   "private": true
 }

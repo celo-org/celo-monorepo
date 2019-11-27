@@ -8,14 +8,10 @@ import BigNumber from 'bignumber.js'
 import { assert } from 'chai'
 import Web3 from 'web3'
 import { TransactionReceipt } from 'web3/types'
-import {
-  GethInstanceConfig,
-  getHooks,
-  GethTestConfig,
-  initAndStartGeth,
-  killInstance,
-  sleep,
-} from './utils'
+import { getEnode, killInstance, sleep, getHooks } from './utils'
+import { GethRunConfig, GethInstanceConfig, initAndStartGeth } from '../lib/geth'
+
+const TMP_PATH = '/tmp/e2e'
 
 /**
  * Helper Class to change StableToken Inflation in tests
@@ -163,12 +159,26 @@ describe('Transfer tests', function(this: any) {
   const FeeRecipientAddress = '0x4f5f8a3f45d179553e7b95119ce296010f50f6f1'
 
   const syncModes = ['full', 'fast', 'light', 'ultralight']
-  const gethConfig: GethTestConfig = {
+  const gethConfig: GethRunConfig = {
+    gethRepoPath: '../../../celo-blockchain',
     migrateTo: 18,
-    instances: [
-      { name: 'validator', validating: true, syncmode: 'full', port: 30303, rpcport: 8545 },
-    ],
+    networkId: 1101,
+    runPath: TMP_PATH,
+    genesisPath: TMP_PATH + '/genesis.json',
+    instances: [],
   }
+
+  gethConfig.instances = [
+    {
+      gethRunConfig: gethConfig,
+      name: 'validator',
+      validating: true,
+      syncmode: 'full',
+      port: 30303,
+      rpcport: 8545,
+    },
+  ]
+
   const hooks = getHooks(gethConfig)
   after(hooks.after)
   before(hooks.before)
@@ -186,6 +196,7 @@ describe('Transfer tests', function(this: any) {
 
     // Spin up a node that we can sync with.
     const fullInstance = {
+      gethRunConfig: gethConfig,
       name: 'txFull',
       validating: false,
       syncmode: 'full',
@@ -195,8 +206,9 @@ describe('Transfer tests', function(this: any) {
       // We need to set an etherbase here so that the full node will accept transactions from
       // light clients.
       etherbase: FeeRecipientAddress,
-      peers: [8545],
-    }
+      peers: [await getEnode(8545)],
+    } as GethInstanceConfig
+
     await initAndStartGeth(hooks.gethBinaryPath, fullInstance)
 
     // Install an arbitrary address as the goverance address to act as the infrastructure fund.
@@ -220,14 +232,15 @@ describe('Transfer tests', function(this: any) {
     }
     // Spin up the node to run transfers as.
     currentGethInstance = await initAndStartGeth(hooks.gethBinaryPath, {
+      gethRunConfig: gethConfig,
       name: syncmode,
       validating: false,
       syncmode,
       port: 30307,
       rpcport: 8549,
       privateKey: DEF_FROM_PK,
-      peers: [8547],
-    })
+      peers: [await getEnode(8547)],
+    } as GethInstanceConfig)
 
     // Reset contracts to send RPCs through transferring node.
     kit.web3.currentProvider = new kit.web3.providers.HttpProvider('http://localhost:8549')

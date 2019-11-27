@@ -4,7 +4,10 @@
 import { ContractKit, newKit } from '@celo/contractkit'
 import { BlockchainParametersWrapper } from '@celo/contractkit/lib/wrappers/BlockchainParameters'
 import { assert } from 'chai'
-import { getHooks, GethTestConfig, sleep } from './utils'
+import { getHooks, sleep } from './utils'
+import { GethRunConfig } from '../lib/geth'
+
+const TMP_PATH = '/tmp/e2e'
 
 describe('Blockchain parameters tests', function(this: any) {
   this.timeout(0)
@@ -12,12 +15,26 @@ describe('Blockchain parameters tests', function(this: any) {
   let kit: ContractKit
   let parameters: BlockchainParametersWrapper
 
-  const gethConfig: GethTestConfig = {
+  const gethConfig: GethRunConfig = {
+    gethRepoPath: '../../../celo-blockchain',
     migrateTo: 18,
-    instances: [
-      { name: 'validator', validating: true, syncmode: 'full', port: 30303, rpcport: 8545 },
-    ],
+    runPath: TMP_PATH,
+    genesisPath: TMP_PATH + '/genesis.json',
+    networkId: 1101,
+    instances: [],
   }
+
+  gethConfig.instances = [
+    {
+      gethRunConfig: gethConfig,
+      name: 'validator',
+      validating: true,
+      syncmode: 'full',
+      port: 30303,
+      rpcport: 8545,
+    },
+  ]
+
   const hooks = getHooks(gethConfig)
   before(hooks.before)
   after(hooks.after)

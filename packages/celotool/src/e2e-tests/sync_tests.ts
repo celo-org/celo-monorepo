@@ -1,26 +1,57 @@
 import { assert } from 'chai'
 import Web3 from 'web3'
-import {
-  GethInstanceConfig,
-  getHooks,
-  initAndStartGeth,
-  killInstance,
-  sleep,
-  waitToFinishSyncing,
-} from './utils'
+import { getEnode, getHooks, killInstance, sleep, waitToFinishSyncing } from './utils'
+import { GethInstanceConfig, GethRunConfig, initAndStartGeth } from '../lib/geth'
+
+const TMP_PATH = '/tmp/e2e'
 
 describe('sync tests', function(this: any) {
   this.timeout(0)
 
-  const gethConfig = {
+  const gethConfig: GethRunConfig = {
+    networkId: 1101,
+    runPath: TMP_PATH,
+    genesisPath: TMP_PATH + '/genesis.json',
+    gethRepoPath: '../../../celo-blockchain',
     migrate: true,
-    instances: [
-      { name: 'validator0', validating: true, syncmode: 'full', port: 30303, rpcport: 8545 },
-      { name: 'validator1', validating: true, syncmode: 'full', port: 30305, rpcport: 8547 },
-      { name: 'validator2', validating: true, syncmode: 'full', port: 30307, rpcport: 8549 },
-      { name: 'validator3', validating: true, syncmode: 'full', port: 30309, rpcport: 8551 },
-    ],
+    instances: [],
   }
+
+  gethConfig.instances = [
+    {
+      gethRunConfig: gethConfig,
+      name: 'validator0',
+      validating: true,
+      syncmode: 'full',
+      port: 30303,
+      rpcport: 8545,
+    },
+    {
+      gethRunConfig: gethConfig,
+      name: 'validator1',
+      validating: true,
+      syncmode: 'full',
+      port: 30305,
+      rpcport: 8547,
+    },
+    {
+      gethRunConfig: gethConfig,
+      name: 'validator2',
+      validating: true,
+      syncmode: 'full',
+      port: 30307,
+      rpcport: 8549,
+    },
+    {
+      gethRunConfig: gethConfig,
+      name: 'validator3',
+      validating: true,
+      syncmode: 'full',
+      port: 30309,
+      rpcport: 8551,
+    },
+  ]
+
   const hooks = getHooks(gethConfig)
 
   before(async () => {
@@ -28,14 +59,15 @@ describe('sync tests', function(this: any) {
     await hooks.before()
     // Restart validator nodes.
     await hooks.restart()
-    const fullInstance = {
+    const fullInstance: GethInstanceConfig = {
+      gethRunConfig: gethConfig,
       name: 'full',
       validating: false,
       syncmode: 'full',
       lightserv: true,
       port: 30311,
       rpcport: 8553,
-      peers: [8545],
+      peers: [await getEnode(8545)],
     }
     await initAndStartGeth(hooks.gethBinaryPath, fullInstance)
     const web3 = new Web3('http://localhost:8553')
@@ -50,13 +82,14 @@ describe('sync tests', function(this: any) {
       let syncInstance: GethInstanceConfig
       beforeEach(async () => {
         syncInstance = {
+          gethRunConfig: gethConfig,
           name: syncmode,
           validating: false,
           syncmode,
           port: 30313,
           rpcport: 8555,
           lightserv: syncmode !== 'light' && syncmode !== 'ultralight',
-          peers: [8553],
+          peers: [await getEnode(8553)],
         }
         await initAndStartGeth(hooks.gethBinaryPath, syncInstance)
       })
@@ -69,9 +102,9 @@ describe('sync tests', function(this: any) {
         const syncWeb3 = new Web3(`http://localhost:8555`)
         await waitToFinishSyncing(syncWeb3)
         // Give the validators time to create more blocks.
-        await sleep(20)
-        const validatingLatestBlock = await validatingWeb3.eth.getBlockNumber()
         await sleep(10)
+        const validatingLatestBlock = await validatingWeb3.eth.getBlockNumber()
+        await sleep(1)
         const syncLatestBlock = await syncWeb3.eth.getBlockNumber()
         assert.isAbove(validatingLatestBlock, 1)
         // Assert that the validator is still producing blocks.
@@ -93,7 +126,7 @@ describe('sync tests', function(this: any) {
       this.timeout(0)
       const instance: GethInstanceConfig = gethConfig.instances[0]
       await killInstance(instance)
-      await initAndStartGeth(hooks.gethBinaryPath, { ...instance, peers: [8547] })
+      await initAndStartGeth(hooks.gethBinaryPath, instance)
       await sleep(120) // wait for round change / resync
       const address = (await web3.eth.getAccounts())[0]
       const currentBlock = await web3.eth.getBlock('latest')
