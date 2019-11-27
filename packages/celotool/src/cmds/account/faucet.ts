@@ -70,7 +70,7 @@ export const handler = async (argv: FaucetArgv) => {
         await goldToken.transfer(address, goldAmount.toFixed()).sendAndWaitForReceipt()
       }
     }
-    if (stableTokenAmount.isZero()) {
+    if (!stableTokenAmount.isZero()) {
       await stableToken.transfer(address, stableTokenAmount.toFixed()).sendAndWaitForReceipt()
     }
   }

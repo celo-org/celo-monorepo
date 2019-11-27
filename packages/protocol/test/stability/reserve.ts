@@ -104,7 +104,7 @@ contract('Reserve', (accounts: string[]) => {
       await assertRevert(reserve.addToken(web3.utils.randomHex(20)))
     })
 
-    describe('when the token has already been added', async () => {
+    describe('when the token has already been added', () => {
       beforeEach(async () => {
         await reserve.addToken(anAddress)
       })
@@ -122,7 +122,7 @@ contract('Reserve', (accounts: string[]) => {
       await assertRevert(reserve.removeToken(anAddress, index))
     })
 
-    describe('when the token has already been added', async () => {
+    describe('when the token has already been added', () => {
       beforeEach(async () => {
         await mockSortedOracles.setMedianRate(anAddress, sortedOraclesDenominator)
         await reserve.addToken(anAddress)
