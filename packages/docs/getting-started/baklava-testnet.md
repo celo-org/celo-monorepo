@@ -1,5 +1,5 @@
 ---
-description: More than a cookie; Celo's network is live for testing
+description: More than a desert; Celo's incentivized testnet is live for testing, learn to validate with an opportunity to win rewards
 ---
 
 # Baklava Beta Network
