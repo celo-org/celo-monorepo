@@ -226,9 +226,6 @@ OPTIONS
   --account=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) Address of the account that needs to proove
                                                         possession of the signer key.
 
-  --privateKey=privateKey                               Optional. The signer private key, only necessary if the key is
-                                                        not being managed by a locally running node.
-
   --signer=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d   (required) Address of the signer key to prove possession of.
 
 EXAMPLE

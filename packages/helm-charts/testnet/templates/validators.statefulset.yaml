@@ -104,7 +104,8 @@ spec:
         args:
         - "-c"
         - |
-          geth account import --password /root/.celo/account/accountSecret /root/.celo/pkey || true
+          geth account import --password /root/.celo/account/accountSecret /root/.celo/pkey
+          rm /root/.celo/pkey
         volumeMounts:
         - name: data
           mountPath: /root/.celo
@@ -141,7 +142,6 @@ spec:
             --wsaddr 0.0.0.0 \
             --wsorigins=* \
             --wsapi=eth,net,web3,debug \
-            --nodekey=/root/.celo/pkey \
             --etherbase=${ACCOUNT_ADDRESS} \
             --networkid=${NETWORK_ID} \
             --syncmode=full \
