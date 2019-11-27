@@ -140,7 +140,7 @@ class AttestationRequestHandler {
     return
   }
 
-  async signAttestation() {
+  signAttestation() {
     const message = attestationMessageToSign(
       this.attestationRequest.phoneNumber,
       this.attestationRequest.account

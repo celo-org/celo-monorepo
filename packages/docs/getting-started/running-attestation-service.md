@@ -57,7 +57,7 @@ If you prefer using Twilio, this is list of the variables to use:
 
 ## Accounts Configuration
 
-First, the validator account needs to authorize the attestation signer. With `celocli` connected a node that has the attestation signer unlocked, let's create a proof-of-posession:
+First, the validator account needs to authorize the attestation signer. With `celocli` connected to a node that has the attestation signer unlocked, let's create a proof-of-posession:
 
 ```bash
 celocli account:proof-of-possession --signer $ATTESTATION_SIGNER_ADDRESS --account $CELO_VALIDATOR_ADDRESS

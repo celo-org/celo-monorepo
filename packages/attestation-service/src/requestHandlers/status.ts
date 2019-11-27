@@ -13,7 +13,7 @@ export const StatusRequestType = t.type({
 
 export type StatusRequest = t.TypeOf<typeof StatusRequestType>
 
-async function produceSignature(message: string | undefined) {
+function produceSignature(message: string | undefined) {
   if (!message) {
     return undefined
   }
