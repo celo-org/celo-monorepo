@@ -151,6 +151,7 @@ if [[ $COMMAND == *"deploy"* ]]; then
     echo -e "\tInitializing using genesis"
     docker run -v $PWD/proxy:/root/.celo $CELO_IMAGE init /root/.celo/genesis.json
     docker run -v $PWD/validator:/root/.celo $CELO_IMAGE init /root/.celo/genesis.json
+
 fi
 
 
