@@ -324,7 +324,7 @@ export async function startGeth(gethBinaryPath: string, instance: GethInstanceCo
   }
 
   if (validating) {
-    gethArgs.push('--mine', '--minerthreads=10')
+    gethArgs.push('--mine')
   }
 
   if (privateKey) {
@@ -436,7 +436,7 @@ export async function initAndStartGeth(gethBinaryPath: string, instance: GethIns
   return startGeth(gethBinaryPath, instance)
 }
 
-// Add each validator as a peer of each other validator via the admin interface.
+// Add validator 0 as a peer of each other validator.
 async function connectValidatorPeers(gethConfig: GethTestConfig) {
   const admins = gethConfig.instances
     .filter(({ wsport, rpcport }) => wsport || rpcport)
@@ -444,17 +444,10 @@ async function connectValidatorPeers(gethConfig: GethTestConfig) {
       ({ wsport, rpcport }) =>
         new Admin(`${wsport ? 'ws' : 'http'}://localhost:${wsport || rpcport}`)
     )
-  const enodes = await Promise.all(admins.map(async (admin) => (await admin.getNodeInfo()).enode))
+  const enode = (await admins[0].getNodeInfo()).enode
   await Promise.all(
-    admins.map(async (admin, i) => {
-      await Promise.all(
-        enodes.map(async (enode, j) => {
-          if (i === j) {
-            return
-          }
-          await admin.addPeer(enode)
-        })
-      )
+    admins.slice(1).map((admin) => {
+      admin.addPeer(enode)
     })
   )
 }
