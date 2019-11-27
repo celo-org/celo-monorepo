@@ -1,13 +1,13 @@
 # Running a Full Node
 
 - [Running a Full Node](#running-a-full-node)
-  - [<strong>Prerequisites</strong>](#prerequisites)
-  - [<strong>Celo Networks</strong>](#celo-networks)
-  - [<strong>Pull the Celo Docker image</strong>](#pull-the-celo-docker-image)
-  - [<strong>Set up a data directory</strong>](#set-up-a-data-directory)
-  - [<strong>Create an account and get its address</strong>](#create-an-account-and-get-its-address)
-  - [<strong>Configure the node</strong>](#configure-the-node)
-  - [<strong>Start the node</strong>](#start-the-node)
+  - [Prerequisites](#prerequisites)
+  - [Celo Networks](#celo-networks)
+  - [Pull the Celo Docker image](#pull-the-celo-docker-image)
+  - [Set up a data directory](#set-up-a-data-directory)
+  - [Create an account and get its address](#create-an-account-and-get-its-address)
+  - [Configure the node](#configure-the-node)
+  - [Start the node](#start-the-node)
 
 This section explains how to get a full node running on the [Baklava Beta Network](baklava-testnet.md) and Baklava Beta Network, using a Docker image that was built for this purpose.
 
@@ -15,7 +15,7 @@ Full nodes play a special purpose in the Celo ecosystem, acting as a bridge betw
 
 For this reason, despite the fact that Celo uses a proof-of-stake protocol, users can earn cryptocurrency without first having to own any, simply by running a full node.
 
-## **Prerequisites**
+## Prerequisites
 
 - **You have Docker installed.** If you don’t have it already, follow the instructions here: [Get Started with Docker](https://www.docker.com/get-started). It will involve creating or signing in with a Docker account, downloading a desktop app, and then launching the app to be able to use the Docker CLI. If you are running on a Linux server, follow the instructions for your distro [here](https://docs.docker.com/install/#server). You may be required to run Docker with sudo depending on your installation environment.
 
@@ -26,7 +26,7 @@ The code you'll see on this page is bash commands and their output.
 When you see text in angle brackets &lt;&gt;, replace them and the text inside with your own value of what it refers to. Don't include the &lt;&gt; in the command.
 {% endhint %}
 
-## **Celo Networks**
+## Celo Networks
 
 First we are going to setup the environment variables required for `Baklava` network. Run:
 
@@ -35,19 +35,17 @@ export CELO_IMAGE=us.gcr.io/celo-testnet/celo-node:baklava
 export NETWORK_ID=1101
 ```
 
-## **Pull the Celo Docker image**
+## Pull the Celo Docker image
 
 We're going to use a Docker image containing the Celo node software in this tutorial.
 
 If you are re-running these instructions, the Celo Docker image may have been updated, and it's important to get the latest version.
 
-Run:
-
 ```bash
 docker pull $CELO_IMAGE
 ```
 
-## **Set up a data directory**
+## Set up a data directory
 
 First, create the directory that will store your node's configuration and its copy of the blockchain. This directory can be named anything you'd like, but here's a default you can use. The commands below create a directory and then navigate into it. The rest of the steps assume you are running the commands from inside this directory.
 
@@ -56,9 +54,9 @@ mkdir celo-data-dir
 cd celo-data-dir
 ```
 
-## **Create an account and get its address**
+## Create an account and get its address
 
-In this step, you'll create an account on the network. If you've already done this and have an account address, you can skip this and move on to step 3.
+In this step, you'll create an account on the network. If you've already done this and have an account address, you can skip this and move on to configuring your node.
 
 Run the command to create a new account:
 
@@ -76,7 +74,7 @@ export CELO_ACCOUNT_ADDRESS=<YOUR-ACCOUNT-ADDRESS>
 
 _Note: this environment variable will only persist while you have this terminal window open. If you want this environment variable to be available in the future, you can add it to your `~/.bash_profile_
 
-## **Configure the node**
+## Configure the node
 
 The genesis block is the first block in the chain, and is specific to each network. This command gets the `genesis.json` file for baklava and uses it to initialize your nodes' data directory.
 
@@ -90,7 +88,7 @@ In order to allow the node to sync with the network, give it the address of exis
 docker run -v $PWD:/root/.celo --entrypoint cp $CELO_IMAGE /celo/static-nodes.json /root/.celo/
 ```
 
-## **Start the node**
+## Start the node
 
 This command specifies the settings needed to run the node, and gets it started.
 
@@ -114,4 +112,6 @@ You will have fully synced with the network once you have pulled the latest bloc
 **Security**: The command line above includes the parameter `--rpcaddr 0.0.0.0` which makes the Celo Blockchain software listen for incoming RPC requests on all network adaptors. Exercise extreme caution in doing this when running outside Docker, as it means that any unlocked accounts and their funds may be accessed from other machines on the Internet. In the context of running a Docker container on your local machine, this together with the `docker -p` flags allows you to make RPC calls from outside the container, i.e from your local host, but not from outside your machine. Read more about [Docker Networking](https://docs.docker.com/network/network-tutorial-standalone/#use-user-defined-bridge-networks) here.
 {% endhint %}
 
-Light clients may connect to you as people run the [Celo Mobile Wallet](using-the-mobile-wallet.md) and you will start earning transaction fees for any transactions that these users initiate. The account that this node advertises for light clients to use for these fees is given by the `etherbase` parameter. The `lightserv` parameter defines the percentage of time this node should spend serving light clients. Valid values are 0-100. If this node is having trouble catching up to the current block, dropping this to a lower percentage may help. The `lightpeers` and `maxpeers` parameters set limits on the number of light clients and full node peers that the node will accept.
+## Light Client Serving
+
+Light clients may connect to you as people run the [Celo Mobile Wallet](using-the-mobile-wallet.md) and you will start earning gateway fees for any transactions that these users initiate, which you can read more about in the [Full Node Incentives](../celo-codebase/protocol/transactions/full-node-incentives.md) document. The account that this node advertises for light clients to use for these fees is given by the `etherbase` parameter. The `lightserv` parameter defines the percentage of time this node should spend serving light clients. Valid values are 0-100. If this node is having trouble catching up to the current block, dropping this to a lower percentage may help. The `lightpeers` and `maxpeers` parameters set limits on the number of light clients and full node peers that the node will accept.
