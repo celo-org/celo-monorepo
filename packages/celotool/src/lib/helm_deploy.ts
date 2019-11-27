@@ -188,16 +188,15 @@ export async function redeployTiller() {
   }
 }
 
-export async function installLegoAndNginx() {
-  const legoReleaseExists = await outputIncludes(
+export async function installCertManagerAndNginx() {
+  // Cert Manager is the newer version of lego
+  const certManagerExists = await outputIncludes(
     `helm list`,
-    `kube-lego-release`,
-    `kube-lego-release exists, skipping install`
+    `cert-manager-cluster-issuers`,
+    `cert-manager-cluster-issuers exists, skipping install`
   )
-  if (!legoReleaseExists) {
-    await execCmdWithExitOnFailure(
-      `helm install --name kube-lego-release stable/kube-lego --set config.LEGO_EMAIL=n@celo.org --set rbac.create=true --set rbac.serviceAccountName=kube-lego --set config.LEGO_URL=https://acme-v01.api.letsencrypt.org/directory`
-    )
+  if (!certManagerExists) {
+    await installCertManager()
   }
   const nginxIngressReleaseExists = await outputIncludes(
     `helm list`,
@@ -207,6 +206,21 @@ export async function installLegoAndNginx() {
   if (!nginxIngressReleaseExists) {
     await execCmdWithExitOnFailure(`helm install --name nginx-ingress-release stable/nginx-ingress`)
   }
+}
+
+export async function installCertManager() {
+  const clusterIssuersHelmChartPath = `../helm-charts/cert-manager-cluster-issuers`
+
+  console.info('Installing cert-manager CustomResourceDefinitions')
+  await execCmdWithExitOnFailure(
+    `kubectl apply --validate=false -f https://raw.githubusercontent.com/jetstack/cert-manager/release-0.11/deploy/manifests/00-crds.yaml`
+  )
+  console.info('Updating cert-manager-cluster-issuers dependencies')
+  await execCmdWithExitOnFailure(`helm dependency update ${clusterIssuersHelmChartPath}`)
+  console.info('Installing cert-manager-cluster-issuers')
+  await execCmdWithExitOnFailure(
+    `helm install --name cert-manager-cluster-issuers ${clusterIssuersHelmChartPath}`
+  )
 }
 
 export async function installAndEnableMetricsDeps() {
