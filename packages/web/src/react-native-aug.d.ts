@@ -28,6 +28,7 @@ declare module 'react-native' {
     animationIterationCount?: string | number
     animationKeyframes?: unknown[]
     animationTimingFunction?: string
+    scrollPadding?: number
     cursor?: string
     display?: 'none' | 'flex' | 'inline' | 'inline-flex'
     fill?: string

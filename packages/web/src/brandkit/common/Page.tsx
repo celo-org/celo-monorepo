@@ -192,7 +192,10 @@ class Page extends React.Component<Props & ScreenProps, State> {
           </Cell>
           <Cell span={Spans.three4th} style={!isMobile && styles.desktopMain}>
             <View
-              style={[styles.childrenArea, !isMobile && styles.childrenAreaDesktop]}
+              style={[
+                styles.childrenArea,
+                screen === ScreenSizes.DESKTOP && styles.childrenAreaDesktop,
+              ]}
               ref={this.pageRef}
             >
               {sections.map(({ id, children }) => {
@@ -214,7 +217,6 @@ class Page extends React.Component<Props & ScreenProps, State> {
 }
 
 const styles = StyleSheet.create({
-  // @ts-ignore creates a stacking context
   conatiner: { isolation: 'isolate' },
   mobileMain: { zIndex: -5, marginTop: 50 },
   desktopMain: { flex: 1, flexBasis: 'calc(75% - 50px)' },

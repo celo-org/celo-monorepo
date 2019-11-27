@@ -1,16 +1,27 @@
+import { ensureHexLeader } from '@celo/utils/lib/address'
+import { BLS_POP_SIZE, BLS_PUBLIC_KEY_SIZE } from '@celo/utils/lib/bls'
+import { URL_REGEX } from '@celo/utils/lib/io'
 import { flags } from '@oclif/command'
 import { CLIError } from '@oclif/errors'
 import { IArg, ParseFn } from '@oclif/parser/lib/args'
 import { pathExistsSync } from 'fs-extra'
 import Web3 from 'web3'
 
-const parsePublicKey: ParseFn<string> = (input) => {
-  // Check that the string starts with 0x and has byte length of ecdsa pub key (64 bytes) + bls pub key (48 bytes) + proof of pos (96 bytes)
-  if (Web3.utils.isHex(input) && input.length === 418 && input.startsWith('0x')) {
-    return input
+const parseBytes = (input: string, length: number, msg: string) => {
+  // Check that the string is hex and and has byte length of `length`.
+  const expectedLength = input.startsWith('0x') ? length * 2 + 2 : length * 2
+  if (Web3.utils.isHex(input) && input.length === expectedLength) {
+    return ensureHexLeader(input)
   } else {
-    throw new CLIError(`${input} is not a public key`)
+    throw new CLIError(msg)
   }
+}
+
+const parseBlsPublicKey: ParseFn<string> = (input) => {
+  return parseBytes(input, BLS_PUBLIC_KEY_SIZE, `${input} is not a BLS public key`)
+}
+const parseBlsProofOfPossession: ParseFn<string> = (input) => {
+  return parseBytes(input, BLS_POP_SIZE, `${input} is not a BLS proof-of-possession`)
 }
 const parseAddress: ParseFn<string> = (input) => {
   if (Web3.utils.isAddress(input)) {
@@ -27,11 +38,6 @@ const parsePath: ParseFn<string> = (input) => {
     throw new CLIError(`File at "${input}" does not exist`)
   }
 }
-
-// from http://urlregex.com/
-const URL_REGEX = new RegExp(
-  /((([A-Za-z]{3,9}:(?:\/\/)?)(?:[\-;:&=\+\$,\w]+@)?[A-Za-z0-9\.\-]+|(?:www\.|[\-;:&=\+\$,\w]+@)[A-Za-z0-9\.\-]+)((?:\/[\+~%\/\.\w\-_]*)?\??(?:[\-\+=&;%@\.\w_]*)#?(?:[\.\!\/\\\w]*))?)/
-)
 
 const parseUrl: ParseFn<string> = (input) => {
   if (URL_REGEX.test(input)) {
@@ -58,9 +64,14 @@ export const Flags = {
     description: 'Account Address',
     helpValue: '0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d',
   }),
-  publicKey: flags.build({
-    parse: parsePublicKey,
-    description: 'Public Key',
+  blsPublicKey: flags.build({
+    parse: parseBlsPublicKey,
+    description: 'BLS Public Key',
+    helpValue: '0x',
+  }),
+  blsProofOfPossession: flags.build({
+    parse: parseBlsProofOfPossession,
+    description: 'BLS Proof-of-Possession',
     helpValue: '0x',
   }),
   url: flags.build({

@@ -55,7 +55,6 @@ export default class MobileMenu extends React.PureComponent<Props, State> {
   }
 }
 
-// TODO something better props a hash map
 function pageTitleFromRoute(route: string) {
   return ROUTE_TO_TITLE[route]
 }

@@ -1,6 +1,6 @@
+import { NetworkConfig, testWithGanache } from '@celo/dev-utils/lib/ganache-test'
 import { Address, CeloContract } from '../base'
 import { newKitFromWeb3 } from '../kit'
-import { NetworkConfig, testWithGanache } from '../test-utils/ganache-test'
 import { OracleRate, SortedOraclesWrapper } from './SortedOracles'
 
 /*
@@ -211,7 +211,7 @@ testWithGanache('SortedOracles Wrapper', (web3) => {
   describe('#reportExpirySeconds', () => {
     it('returns the number of seconds after which a report expires', async () => {
       const result = await sortedOracles.reportExpirySeconds()
-      expect(result).toEqBigNumber(3600)
+      expect(result).toEqBigNumber(600)
     })
   })
 

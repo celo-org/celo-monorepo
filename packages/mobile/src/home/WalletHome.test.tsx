@@ -2,7 +2,7 @@ import * as React from 'react'
 import { Provider } from 'react-redux'
 import * as renderer from 'react-test-renderer'
 import { WalletHome } from 'src/home/WalletHome'
-import { createMockStore, getMockI18nProps } from 'test/utils'
+import { createMockStore, createMockStoreAppDisconnected, getMockI18nProps } from 'test/utils'
 
 const TWO_DAYS_MS = 2 * 24 * 60 * 1000
 
@@ -53,5 +53,55 @@ describe('Testnet banner', () => {
 
     expect(tree).toMatchSnapshot()
     expect(showMessageMock).toHaveBeenCalledWith('testnetAlert.1', 5000, null, 'testnetAlert.0')
+  })
+  it('Renders when disconnected', async () => {
+    const store = createMockStoreAppDisconnected()
+    const tree = renderer.create(
+      <Provider store={store}>
+        <WalletHome
+          refreshAllBalances={jest.fn()}
+          resetStandbyTransactions={jest.fn()}
+          initializeSentryUserContext={jest.fn()}
+          exitBackupFlow={jest.fn()}
+          setLoading={jest.fn()}
+          showMessage={jest.fn()}
+          hideAlert={jest.fn()}
+          importContacts={jest.fn()}
+          loading={false}
+          appConnected={false}
+          address={null}
+          recipientCache={{}}
+          activeNotificationCount={0}
+          callToActNotification={false}
+          {...getMockI18nProps()}
+        />
+      </Provider>
+    )
+    expect(tree).toMatchSnapshot()
+  })
+  it('Renders when connected with backup complete', async () => {
+    const store = createMockStore()
+    const tree = renderer.create(
+      <Provider store={store}>
+        <WalletHome
+          refreshAllBalances={jest.fn()}
+          resetStandbyTransactions={jest.fn()}
+          initializeSentryUserContext={jest.fn()}
+          exitBackupFlow={jest.fn()}
+          setLoading={jest.fn()}
+          showMessage={jest.fn()}
+          hideAlert={jest.fn()}
+          importContacts={jest.fn()}
+          loading={false}
+          appConnected={true}
+          address={null}
+          recipientCache={{}}
+          activeNotificationCount={0}
+          callToActNotification={false}
+          {...getMockI18nProps()}
+        />
+      </Provider>
+    )
+    expect(tree).toMatchSnapshot()
   })
 })

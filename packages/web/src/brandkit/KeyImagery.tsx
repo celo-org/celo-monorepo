@@ -1,7 +1,7 @@
 import * as React from 'react'
 import { withNamespaces } from 'react-i18next'
 import { StyleSheet, Text, View } from 'react-native'
-import ImageryFetcher from 'src/brandkit/common/ImageryFetcher'
+import Fetch from 'src/brandkit/common/Fetch'
 import Page from 'src/brandkit/common/Page'
 import { hashNav } from 'src/shared/menu-items'
 import { colors } from 'src/styles'
@@ -18,15 +18,6 @@ const KeyImageryWrapped = withNamespaces()(
             children: (
               <View style={[styles.container, { height: 900, backgroundColor: colors.gold }]}>
                 <Text>overview</Text>
-                <ImageryFetcher />
-              </View>
-            ),
-          },
-          {
-            id: brandImagery.icons,
-            children: (
-              <View style={[styles.container, { minHeight: 400, backgroundColor: colors.primary }]}>
-                <Text>icons</Text>
               </View>
             ),
           },
@@ -35,6 +26,7 @@ const KeyImageryWrapped = withNamespaces()(
             children: (
               <View style={[styles.container, { height: 2000, backgroundColor: colors.purple }]}>
                 <Text>illustrations</Text>
+                {/* <Fetch /> */}
               </View>
             ),
           },

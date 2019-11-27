@@ -81,3 +81,6 @@ lerna-debug.log
 
 .terraform/
 tsconfig.tsbuildinfo
+
+# git mergetool
+*.orig

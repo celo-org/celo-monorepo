@@ -265,52 +265,103 @@ contract('LockedGold', (accounts: string[]) => {
   })
 
   describe('#relock()', () => {
-    const value = 1000
+    const pendingWithdrawalValue = 1000
     const index = 0
     let resp: any
     describe('when a pending withdrawal exists', () => {
       beforeEach(async () => {
         // @ts-ignore: TODO(mcortesi) fix typings for TransactionDetails
-        await lockedGold.lock({ value })
-        await lockedGold.unlock(value)
-        resp = await lockedGold.relock(index)
+        await lockedGold.lock({ value: pendingWithdrawalValue })
+        await lockedGold.unlock(pendingWithdrawalValue)
       })
 
-      it("should increase the account's nonvoting locked gold balance", async () => {
-        assertEqualBN(await lockedGold.getAccountNonvotingLockedGold(account), value)
-      })
+      describe('when relocking value equal to the value of the pending withdrawal', () => {
+        const value = pendingWithdrawalValue
+        beforeEach(async () => {
+          resp = await lockedGold.relock(index, value)
+        })
 
-      it("should increase the account's total locked gold balance", async () => {
-        assertEqualBN(await lockedGold.getAccountTotalLockedGold(account), value)
-      })
+        it("should increase the account's nonvoting locked gold balance", async () => {
+          assertEqualBN(await lockedGold.getAccountNonvotingLockedGold(account), value)
+        })
 
-      it('should increase the nonvoting locked gold balance', async () => {
-        assertEqualBN(await lockedGold.getNonvotingLockedGold(), value)
-      })
+        it("should increase the account's total locked gold balance", async () => {
+          assertEqualBN(await lockedGold.getAccountTotalLockedGold(account), value)
+        })
 
-      it('should increase the total locked gold balance', async () => {
-        assertEqualBN(await lockedGold.getTotalLockedGold(), value)
-      })
+        it('should increase the nonvoting locked gold balance', async () => {
+          assertEqualBN(await lockedGold.getNonvotingLockedGold(), value)
+        })
 
-      it('should emit a GoldLocked event', async () => {
-        assert.equal(resp.logs.length, 1)
-        const log = resp.logs[0]
-        assertLogMatches(log, 'GoldLocked', {
-          account,
-          value: new BigNumber(value),
+        it('should increase the total locked gold balance', async () => {
+          assertEqualBN(await lockedGold.getTotalLockedGold(), value)
+        })
+
+        it('should emit a GoldLocked event', async () => {
+          assert.equal(resp.logs.length, 1)
+          const log = resp.logs[0]
+          assertLogMatches(log, 'GoldLocked', {
+            account,
+            value: new BigNumber(value),
+          })
+        })
+
+        it('should remove the pending withdrawal', async () => {
+          const [values, timestamps] = await lockedGold.getPendingWithdrawals(account)
+          assert.equal(values.length, 0)
+          assert.equal(timestamps.length, 0)
         })
       })
 
-      it('should remove the pending withdrawal', async () => {
-        const [values, timestamps] = await lockedGold.getPendingWithdrawals(account)
-        assert.equal(values.length, 0)
-        assert.equal(timestamps.length, 0)
+      describe('when relocking value less than the value of the pending withdrawal', () => {
+        const value = pendingWithdrawalValue - 1
+        beforeEach(async () => {
+          resp = await lockedGold.relock(index, value)
+        })
+
+        it("should increase the account's nonvoting locked gold balance", async () => {
+          assertEqualBN(await lockedGold.getAccountNonvotingLockedGold(account), value)
+        })
+
+        it("should increase the account's total locked gold balance", async () => {
+          assertEqualBN(await lockedGold.getAccountTotalLockedGold(account), value)
+        })
+
+        it('should increase the nonvoting locked gold balance', async () => {
+          assertEqualBN(await lockedGold.getNonvotingLockedGold(), value)
+        })
+
+        it('should increase the total locked gold balance', async () => {
+          assertEqualBN(await lockedGold.getTotalLockedGold(), value)
+        })
+
+        it('should emit a GoldLocked event', async () => {
+          assert.equal(resp.logs.length, 1)
+          const log = resp.logs[0]
+          assertLogMatches(log, 'GoldLocked', {
+            account,
+            value: new BigNumber(value),
+          })
+        })
+
+        it('should decrement the value of the pending withdrawal', async () => {
+          const [values, timestamps] = await lockedGold.getPendingWithdrawals(account)
+          assert.equal(values.length, 1)
+          assert.equal(timestamps.length, 1)
+          assertEqualBN(values[0], 1)
+        })
+      })
+      describe('when relocking value greater than the value of the pending withdrawal', () => {
+        const value = pendingWithdrawalValue + 1
+        it('should revert', async () => {
+          await assertRevert(lockedGold.relock(index, value))
+        })
       })
     })
 
     describe('when a pending withdrawal does not exist', () => {
       it('should revert', async () => {
-        await assertRevert(lockedGold.relock(index))
+        await assertRevert(lockedGold.relock(index, pendingWithdrawalValue))
       })
     })
   })

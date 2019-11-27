@@ -18,7 +18,6 @@ class MyApp extends App {
     if (canTrack()) {
       initSentry()
     }
-
     if (window.location.hash) {
       hashScroller(window.location.hash)
     }
