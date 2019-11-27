@@ -6,14 +6,18 @@ import {
   getServiceAccountName,
   grantRoles,
   installAndEnableMetricsDeps,
-  installLegoAndNginx,
+  installCertManagerAndNginx,
   redeployTiller,
   uploadStorageClass,
 } from './helm_deploy'
 import { execCmd, execCmdWithExitOnFailure, outputIncludes, switchToProjectFromEnv } from './utils'
 import { networkName } from './vm-testnet-utils'
 
-const SYSTEM_HELM_RELEASES = ['nginx-ingress-release', 'kube-lego-release']
+const SYSTEM_HELM_RELEASES = [
+  'nginx-ingress-release',
+  'kube-lego-release',
+  'cert-manager-cluster-issuers',
+]
 const HELM_RELEASE_REGEX = new RegExp(/(.*)-\d+\.\d+\.\d+$/)
 
 export async function switchToClusterFromEnv(checkOrPromptIfStagingOrProduction = true) {
@@ -104,7 +108,7 @@ export async function setupCluster(celoEnv: string, createdCluster: boolean) {
   await uploadStorageClass()
   await redeployTiller()
 
-  await installLegoAndNginx()
+  await installCertManagerAndNginx()
 
   if (envType !== EnvTypes.DEVELOPMENT) {
     await installAndEnableMetricsDeps()
