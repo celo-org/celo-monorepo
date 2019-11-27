@@ -58,7 +58,8 @@ spec:
             RID=${BASH_REMATCH[1]}
             echo -n $RID > /root/.celo/replica_id
             echo 'Generating address'
-            celotooljs.sh generate account-address --mnemonic "$MNEMONIC" --accountType validator --index $RID > /root/.celo/address
+            PRIVATE_KEY=$(celotooljs.sh generate bip32 --mnemonic "$MNEMONIC" --accountType validator --index $RID)
+            celotooljs.sh generate account-address --private-key $PRIVATE_KEY > /root/.celo/address
             if [ -z $IP_ADDRESSES ]; then
               echo $POD_IP > /root/.celo/ipAddress
             else
