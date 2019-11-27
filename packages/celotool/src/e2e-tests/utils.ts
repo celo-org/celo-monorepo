@@ -10,10 +10,8 @@ import {
   generateGenesis,
   getPrivateKeysFor,
   getValidators,
-  privateKeyToPublicKey,
   Validator,
 } from '../lib/generate_utils'
-import { getEnodeAddress } from '../lib/geth'
 import { ensure0x } from '../lib/utils'
 
 export interface GethInstanceConfig {
@@ -26,7 +24,7 @@ export interface GethInstanceConfig {
   lightserv?: boolean
   privateKey?: string
   etherbase?: string
-  peers?: string[]
+  peers?: number[]
   pid?: number
 }
 
@@ -244,7 +242,8 @@ export async function killInstance(instance: GethInstanceConfig) {
   }
 }
 
-export async function addStaticPeers(datadir: string, enodes: string[]) {
+export async function addStaticPeers(datadir: string, ports: number[]) {
+  const enodes = await Promise.all(ports.map((port) => getEnode(port)))
   fs.writeFileSync(`${datadir}/static-nodes.json`, JSON.stringify(enodes))
 }
 
@@ -326,7 +325,7 @@ export async function startGeth(gethBinaryPath: string, instance: GethInstanceCo
   }
 
   if (validating) {
-    gethArgs.push('--mine', '--minerthreads=10', `--nodekeyhex=${privateKey}`)
+    gethArgs.push('--mine')
   }
 
   if (privateKey) {
@@ -438,6 +437,29 @@ export async function initAndStartGeth(gethBinaryPath: string, instance: GethIns
   return startGeth(gethBinaryPath, instance)
 }
 
+// Add validator 0 as a peer of each other validator.
+async function connectValidatorPeers(gethConfig: GethTestConfig) {
+  const admins = gethConfig.instances
+    .filter(({ wsport, rpcport, validating }) => validating && (wsport || rpcport))
+    .map(
+      ({ wsport, rpcport }) =>
+        new Admin(`${wsport ? 'ws' : 'http'}://localhost:${wsport || rpcport}`)
+    )
+  const enodes = await Promise.all(admins.map(async (admin) => (await admin.getNodeInfo()).enode))
+  await Promise.all(
+    admins.map(async (admin, i) => {
+      await Promise.all(
+        enodes.map(async (enode, j) => {
+          if (i === j) {
+            return
+          }
+          await admin.addPeer(enode)
+        })
+      )
+    })
+  )
+}
+
 export function getContext(gethConfig: GethTestConfig) {
   const mnemonic =
     'jazz ripple brown cloth door bridge pen danger deer thumb cable prepare negative library vast'
@@ -446,9 +468,6 @@ export function getContext(gethConfig: GethTestConfig) {
   const validatorPrivateKeys = getPrivateKeysFor(AccountType.VALIDATOR, mnemonic, numValidators)
   const attestationKeys = getPrivateKeysFor(AccountType.ATTESTATION, mnemonic, numValidators)
   const validators = getValidators(mnemonic, numValidators)
-  const validatorEnodes = validatorPrivateKeys.map((x: any, i: number) =>
-    getEnodeAddress(privateKeyToPublicKey(x), '127.0.0.1', validatorInstances[i].port)
-  )
   const argv = require('minimist')(process.argv.slice(2))
   const branch = argv.branch || 'master'
   const gethRepoPath = argv.localgeth || '/tmp/geth'
@@ -464,16 +483,12 @@ export function getContext(gethConfig: GethTestConfig) {
     let validatorIndex = 0
     for (const instance of gethConfig.instances) {
       if (instance.validating) {
-        // Automatically connect validator nodes to eachother.
-        const otherValidators = validatorEnodes.filter(
-          (__: string, i: number) => i !== validatorIndex
-        )
-        instance.peers = (instance.peers || []).concat(otherValidators)
         instance.privateKey = instance.privateKey || validatorPrivateKeys[validatorIndex]
         validatorIndex++
       }
       await initAndStartGeth(gethBinaryPath, instance)
     }
+    await connectValidatorPeers(gethConfig)
     if (gethConfig.migrate || gethConfig.migrateTo) {
       await migrateContracts(
         validatorPrivateKeys,
@@ -511,6 +526,7 @@ export function getContext(gethConfig: GethTestConfig) {
         return startGeth(gethBinaryPath, instance)
       })
     )
+    await connectValidatorPeers(gethConfig)
   }
 
   const after = () => killGeth()
