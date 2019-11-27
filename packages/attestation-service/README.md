@@ -8,8 +8,8 @@ You can use the following environment variables to configure the attestation ser
 
 - `DATABASE_URL` - The URL under which your database is accessible, currently supported are `postgres://`, `mysql://` and `sqlite://`
 - `CELO_PROVIDER` - The URL under which a celo blockchain node is reachable. This node should also have the `ATTESTATION_SIGNER_ADDRESS` unlocked for signing of the attestations themselves.
-- `ACCOUNT_ADDRESS` - The address of the account on the `Accounts` smart contract
-- `ATTESTATION_SIGNER_ADDRESS` - The address of the key with which attestations should be signed. You could use your account for attestations, but really you should authorize a dedicated attestation key
+- `CELO_VALIDATOR_ADDRESS` - The address of the validator on the `Accounts` smart contract
+- `ATTESTATION_SIGNER_ADDRESS` - The address of the key with which attestations should be signed.
 - `APP_SIGNATURE` - The hash with which clients can auto-read SMS messages on android
 - `SMS_PROVIDERS` - A comma-separated list of providers you want to configure, we currently support:
 
