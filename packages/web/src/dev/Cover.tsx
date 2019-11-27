@@ -10,7 +10,7 @@ import Button, { BTN, SIZE } from 'src/shared/Button.3'
 import { CeloLinks } from 'src/shared/menu-items'
 import { HEADER_HEIGHT } from 'src/shared/Styles'
 import { colors, fonts, standardStyles, textStyles } from 'src/styles'
-// import LeaderBoardApp from './LeaderBoardApp'
+import LeaderBoardApp from './LeaderBoardApp'
 const DELAY = 100
 const DURATION = 400
 
@@ -105,7 +105,9 @@ const CoverComponent = React.memo(function Cover({ t }: I18nProps) {
           tabletStyle={standardStyles.blockMarginBottomTablet}
           mobileStyle={standardStyles.blockMarginBottomMobile}
         >
-          <Cell span={Spans.full}>{/* <LeaderBoardApp /> */}</Cell>
+          <Cell span={Spans.full}>
+            <LeaderBoardApp />
+          </Cell>
         </GridRow>
       </LazyLoad>
     </View>
