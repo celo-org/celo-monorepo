@@ -1,5 +1,4 @@
 import { serializeSignature } from '@celo/utils/lib/signatureUtils'
-import { flags } from '@oclif/command'
 import { BaseCommand } from '../../base'
 import { printValueMap } from '../../utils/cli'
 import { Flags } from '../../utils/command'
@@ -17,10 +16,6 @@ export default class ProofOfPossession extends BaseCommand {
       required: true,
       description: 'Address of the account that needs to proove possession of the signer key.',
     }),
-    privateKey: flags.string({
-      description:
-        'Optional. The signer private key, only necessary if the key is not being managed by a locally running node.',
-    }),
   }
 
   static examples = [
@@ -30,19 +25,10 @@ export default class ProofOfPossession extends BaseCommand {
   async run() {
     const res = this.parse(ProofOfPossession)
     const accounts = await this.kit.contracts.getAccounts()
-    if (res.flags.privateKey) {
-      const pop = await accounts.generateProofOfSigningKeyPossessionLocally(
-        res.flags.account,
-        res.flags.signer,
-        res.flags.privateKey
-      )
-      printValueMap({ signature: serializeSignature(pop) })
-    } else {
-      const pop = await accounts.generateProofOfSigningKeyPossession(
-        res.flags.account,
-        res.flags.signer
-      )
-      printValueMap({ signature: serializeSignature(pop) })
-    }
+    const pop = await accounts.generateProofOfSigningKeyPossession(
+      res.flags.account,
+      res.flags.signer
+    )
+    printValueMap({ signature: serializeSignature(pop) })
   }
 }

@@ -98,7 +98,25 @@ spec:
         volumeMounts:
         - name: data
           mountPath: /root/.celo
+<<<<<<< HEAD
 {{ include "common.import-geth-account-container" .  | indent 6 }}
+=======
+      - name: import-geth-account
+        image: {{ .Values.geth.image.repository }}:{{ .Values.geth.image.tag }}
+        imagePullPolicy: {{ .Values.imagePullPolicy }}
+        command: ["/bin/sh"]
+        args:
+        - "-c"
+        - |
+          geth account import --password /root/.celo/account/accountSecret /root/.celo/pkey
+          rm /root/.celo/pkey
+        volumeMounts:
+        - name: data
+          mountPath: /root/.celo
+        - name: account
+          mountPath: "/root/.celo/account"
+          readOnly: true
+>>>>>>> a205604a901d250e6c767702079ff1007e2da0fc
       containers:
       - name: geth
         image: {{ .Values.geth.image.repository }}:{{ .Values.geth.image.tag }}
@@ -129,7 +147,6 @@ spec:
             --wsaddr 0.0.0.0 \
             --wsorigins=* \
             --wsapi=eth,net,web3,debug \
-            --nodekey=/root/.celo/pkey \
             --etherbase=${ACCOUNT_ADDRESS} \
             --networkid=${NETWORK_ID} \
             --syncmode=full \

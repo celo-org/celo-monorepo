@@ -44,8 +44,8 @@ export function migrationOverrides() {
     stableToken: {
       initialAccounts: initialAccounts.map((account) => account.address),
       values: initialAccounts.map(() => stableTokenBalance), // Give each account the same amount
+      oracles: getAddressesFor(AccountType.PRICE_ORACLE, mnemonic, 1),
     },
-    oracles: getAddressesFor(AccountType.PRICE_ORACLE, mnemonic, 1),
   }
 }
 

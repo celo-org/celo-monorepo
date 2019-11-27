@@ -24,6 +24,7 @@ interface AccountSummary {
   lockedGold: {
     total: BigNumber
     nonvoting: BigNumber
+    requirement: BigNumber
   }
   pendingWithdrawals: PendingWithdrawal[]
 }
@@ -155,11 +156,14 @@ export class LockedGoldWrapper extends BaseWrapper<LockedGold> {
   async getAccountSummary(account: string): Promise<AccountSummary> {
     const nonvoting = await this.getAccountNonvotingLockedGold(account)
     const total = await this.getAccountTotalLockedGold(account)
+    const validators = await this.kit.contracts.getValidators()
+    const requirement = await validators.getAccountLockedGoldRequirement(account)
     const pendingWithdrawals = await this.getPendingWithdrawals(account)
     return {
       lockedGold: {
         total,
         nonvoting,
+        requirement,
       },
       pendingWithdrawals,
     }
