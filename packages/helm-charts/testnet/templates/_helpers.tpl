@@ -199,7 +199,6 @@ spec:
           --metrics \
           --mine \
           --networkid=${NETWORK_ID} \
-          --nodekey=/root/.celo/account/{{ .Node.name}}PrivateKey \
           --password=/root/.celo/account/accountSecret \
           --rpc \
           --rpcaddr 0.0.0.0 \
