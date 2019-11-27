@@ -1,6 +1,5 @@
 import { NULL_ADDRESS } from '@celo/contractkit'
 import { BaseCommand } from '../../base'
-import { newCheckBuilder } from '../../utils/checks'
 import { printValueMapRecursive } from '../../utils/cli'
 import { Flags } from '../../utils/command'
 
@@ -20,18 +19,10 @@ export default class VestingInfo extends BaseCommand {
     this.kit.defaultAccount = flags.beneficiary
     const vestingFactory = await this.kit.contracts.getVestingFactory()
     const vestingFactoryInstance = await vestingFactory.getVestedAt(flags.beneficiary)
-    if ((await vestingFactoryInstance.getBeneficiary()) === NULL_ADDRESS) {
-      console.error(`Beneficiary has no vested instance`)
+    if (vestingFactoryInstance.address === NULL_ADDRESS) {
+      console.error(`No vested instance found under the given beneficiary`)
       return
     }
-    if ((await vestingFactoryInstance.getBeneficiary()) !== flags.beneficiary) {
-      console.error(`Vested instance has a different beneficiary`)
-      return
-    }
-
-    await newCheckBuilder(this)
-      .isAccount(vestingFactoryInstance.address)
-      .runChecks()
 
     const vestingScheme = await vestingFactoryInstance.getVestingScheme()
 
@@ -41,9 +32,9 @@ export default class VestingInfo extends BaseCommand {
       revoker: await vestingFactoryInstance.getRevoker(),
       refunder: await vestingFactoryInstance.getRefundDestination(),
       currentlyWithdrawn: await vestingFactoryInstance.getCurrentlyWithdrawn(),
-      isPaused: vestingFactoryInstance.isPaused(),
-      isRevokable: vestingFactoryInstance.isRevokable(),
-      isRevoked: vestingFactoryInstance.isRevoked(),
+      isPaused: await vestingFactoryInstance.isPaused(),
+      isRevokable: await vestingFactoryInstance.isRevokable(),
+      isRevoked: await vestingFactoryInstance.isRevoked(),
       vestingScheme: {
         vestingAmount: vestingScheme.vestingAmount.toString(),
         vestingAmountPerPeriod: vestingScheme.vestingAmountPerPeriod.toString(),

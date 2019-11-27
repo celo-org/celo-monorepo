@@ -11,8 +11,7 @@ export default class Authorize extends BaseCommand {
 
   static flags = {
     ...BaseCommand.flags,
-    vestingaddress: Flags.address({ required: true, description: 'Address of the vesting ' }),
-    from: Flags.address({ required: true }),
+    from: Flags.address({ required: true, description: 'Beneficiary of the vesting ' }),
     role: flags.string({
       char: 'r',
       options: ['vote', 'validator', 'attestation'],
@@ -29,7 +28,7 @@ export default class Authorize extends BaseCommand {
   static args = []
 
   static examples = [
-    'authorize --vestingaddress 0x6ecbe1db9ef729cbe972c83fb886247691fb6beb --from 0x5409ED021D9299bf6814279A6A1411A7e866A631 --role vote --signer 0x6ecbe1db9ef729cbe972c83fb886247691fb6beb --pop 0x1b9fca4bbb5bfb1dbe69ef1cddbd9b4202dcb6b134c5170611e1e36ecfa468d7b46c85328d504934fce6c2a1571603a50ae224d2b32685e84d4d1a1eebad8452eb',
+    'authorize --from 0x5409ED021D9299bf6814279A6A1411A7e866A631 --role vote --signer 0x6ecbe1db9ef729cbe972c83fb886247691fb6beb --pop 0x1b9fca4bbb5bfb1dbe69ef1cddbd9b4202dcb6b134c5170611e1e36ecfa468d7b46c85328d504934fce6c2a1571603a50ae224d2b32685e84d4d1a1eebad8452eb',
   ]
 
   async run() {
@@ -37,8 +36,8 @@ export default class Authorize extends BaseCommand {
     this.kit.defaultAccount = res.flags.from
     const vestingFactory = await this.kit.contracts.getVestingFactory()
     const vestingFactoryInstance = await vestingFactory.getVestedAt(this.kit.defaultAccount)
-    if ((await vestingFactoryInstance.getBeneficiary()) === NULL_ADDRESS) {
-      console.error(`Beneficiary has no vested instance`)
+    if (vestingFactoryInstance.address === NULL_ADDRESS) {
+      console.error(`No vested instance found under the given beneficiary`)
       return
     }
     if ((await vestingFactoryInstance.getBeneficiary()) !== res.flags.from) {
@@ -51,6 +50,10 @@ export default class Authorize extends BaseCommand {
 
     await newCheckBuilder(this)
       .isAccount(res.flags.from)
+      .runChecks()
+
+    await newCheckBuilder(this)
+      .isAccount(vestingFactoryInstance.address)
       .runChecks()
 
     let tx: any

@@ -11,8 +11,7 @@ export default class SetAccount extends BaseCommand {
 
   static flags = {
     ...BaseCommand.flags,
-    vestingaddress: Flags.address({ required: true, description: 'Address of the vesting ' }),
-    from: Flags.address({ required: true }),
+    from: Flags.address({ required: true, description: 'Beneficiary of the vesting ' }),
     property: flags.string({
       char: 'p',
       options: ['name', 'walletaddress', 'dataenckey', 'metaurl'],
@@ -28,16 +27,16 @@ export default class SetAccount extends BaseCommand {
   static args = []
 
   static examples = [
-    'set-account --vestingaddress 0x6ecbe1db9ef729cbe972c83fb886247691fb6beb --from 0x5409ED021D9299bf6814279A6A1411A7e866A631 --property name --value mywallet',
+    'set-account --from 0x5409ED021D9299bf6814279A6A1411A7e866A631 --property name --value mywallet',
   ]
 
   async run() {
     const res = this.parse(SetAccount)
     this.kit.defaultAccount = res.flags.from
     const vestingFactory = await this.kit.contracts.getVestingFactory()
-    const vestingFactoryInstance = await vestingFactory.getVestedAt(this.kit.defaultAccount)
-    if ((await vestingFactoryInstance.getBeneficiary()) === NULL_ADDRESS) {
-      console.error(`Beneficiary has no vested instance`)
+    const vestingFactoryInstance = await vestingFactory.getVestedAt(res.flags.from)
+    if (vestingFactoryInstance.address === NULL_ADDRESS) {
+      console.error(`No vested instance found under the given beneficiary`)
       return
     }
     if ((await vestingFactoryInstance.getBeneficiary()) !== res.flags.from) {
@@ -47,6 +46,10 @@ export default class SetAccount extends BaseCommand {
 
     await newCheckBuilder(this)
       .isAccount(res.flags.from)
+      .runChecks()
+
+    await newCheckBuilder(this)
+      .isAccount(vestingFactoryInstance.address)
       .runChecks()
 
     let tx: any

@@ -166,7 +166,7 @@ contract VestingInstance is UsingRegistry, ReentrancyGuard {
     require(!revoked, "Vesting already revoked");
     require(pausePeriod <= 365 days, "Pause period is limited to max. 365 days");
     paused = true;
-    pauseEndTime = block.timestamp + pausePeriod;
+    pauseEndTime = block.timestamp.add(pausePeriod);
     emit WithdrawalPaused(pausePeriod, block.timestamp);
   }
 
