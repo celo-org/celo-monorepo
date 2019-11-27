@@ -217,8 +217,8 @@ const styles = StyleSheet.create({
   // @ts-ignore creates a stacking context
   conatiner: { transform: 'isolate' },
   mobileMain: { zIndex: -5, marginTop: 50 },
-  desktopMain: { flex: 1, flexBasis: 'calc(75% - 50px)', backgroundColor: colors.faintGold },
-  sidebar: { minWidth: 190, backgroundColor: colors.goldSubtle, paddingLeft: 0 },
+  desktopMain: { flex: 1, flexBasis: 'calc(75% - 50px)' },
+  sidebar: { minWidth: 190, paddingLeft: 0 },
   topbar: {
     position: 'fixed',
     width: '100%',

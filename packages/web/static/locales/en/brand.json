@@ -22,6 +22,7 @@
     "fullColorOnDarkCaption": "Full color logo for darker backgrounds",
     "monochromeCaption": "Monochrome logo",
     "monochromeInverseCaption": "Monochrome logo (inverse)",
+    "spaceSizeTitle": "Space and Sizing",
     "sizeTitle": "Size",
     "sizeText":
       "The logo and glyph should not appear smaller than their minimum height of 24 pixels on digital displays or 8mm in print..",

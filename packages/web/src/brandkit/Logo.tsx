@@ -221,7 +221,7 @@ const Backgrounds = withNamespaces(NameSpaces.brand)(function _Backgrounds({ t }
       <View style={styles.gap}>
         <SectionTitle>{t('logo.backgroundsTitle')}</SectionTitle>
       </View>
-      <Palette colors={BACKGROUND_PALETTE} text={t('logo.backgroundTextTop')} />
+      <Palette colors={BACKGROUND_PALETTE} text={t('logo.backgroundsTextTop')} />
       <View style={[styles.tiling, standardStyles.elementalMarginBottom]}>
         <View style={[styles.gap, styles.container]}>
           <LogoWithBackground backgroundColor={colors.faintGray} type="light" />
