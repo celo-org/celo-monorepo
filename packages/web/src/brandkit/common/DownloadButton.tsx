@@ -16,7 +16,7 @@ export default withNamespaces(NameSpaces.brand)(function DownloadButton({
     <Button
       kind={BTN.TERTIARY}
       text={t('downloadAssetBtn')}
-      target={uri && uri.startsWith('http') ? '_blank' : undefined}
+      target={uri && uri.startsWith('http') && !uri.endsWith('.zip') ? '_blank' : undefined}
       href={uri}
       style={brandStyles.button}
       iconRight={<Download size={12} color={colors.primary} />}
