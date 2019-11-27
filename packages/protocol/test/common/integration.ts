@@ -69,7 +69,7 @@ contract('Integration: Governance', (accounts: string[]) => {
     ]
   })
 
-  describe('When making a governance proposal', async () => {
+  describe('When making a governance proposal', () => {
     before(async () => {
       await governance.propose(
         proposalTransactions.map((x: any) => x.value),
@@ -87,7 +87,7 @@ contract('Integration: Governance', (accounts: string[]) => {
     })
   })
 
-  describe('When upvoting that proposal', async () => {
+  describe('When upvoting that proposal', () => {
     before(async () => {
       await governance.upvote(proposalId, 0, 0)
     })
@@ -97,7 +97,7 @@ contract('Integration: Governance', (accounts: string[]) => {
     })
   })
 
-  describe('When approving that proposal', async () => {
+  describe('When approving that proposal', () => {
     before(async () => {
       await timeTravel(config.governance.dequeueFrequency, web3)
       await governance.approve(proposalId, dequeuedIndex)
@@ -108,7 +108,7 @@ contract('Integration: Governance', (accounts: string[]) => {
     })
   })
 
-  describe('When voting on that proposal', async () => {
+  describe('When voting on that proposal', () => {
     before(async () => {
       await timeTravel(config.governance.approvalStageDuration, web3)
       await governance.vote(proposalId, dequeuedIndex, VoteValue.Yes)
@@ -120,7 +120,7 @@ contract('Integration: Governance', (accounts: string[]) => {
     })
   })
 
-  describe('When executing that proposal', async () => {
+  describe('When executing that proposal', () => {
     before(async () => {
       await timeTravel(config.governance.referendumStageDuration, web3)
       await governance.execute(proposalId, dequeuedIndex)
