@@ -1,5 +1,5 @@
 import { brandStyles } from 'src/brandkit/common/constants'
-import { NameSpaces, withNamespaces, I18nProps } from 'src/i18n'
+import { I18nProps, NameSpaces, withNamespaces } from 'src/i18n'
 import Download from 'src/icons/Download'
 import Button, { BTN } from 'src/shared/Button.3'
 import { colors } from 'src/styles'
@@ -16,7 +16,7 @@ export default withNamespaces(NameSpaces.brand)(function DownloadButton({
     <Button
       kind={BTN.TERTIARY}
       text={t('downloadAssetBtn')}
-      target={uri.startsWith('http') ? '_blank' : undefined}
+      target={uri && uri.startsWith('http') ? '_blank' : undefined}
       href={uri}
       style={brandStyles.button}
       iconRight={<Download size={12} color={colors.primary} />}

@@ -15,11 +15,6 @@ interface Fields extends FieldSet {
   Tags: string[]
 }
 
-// interface QueryError {
-//   message: string
-//   error: number
-// }
-
 enum AssetSheet {
   Icons = 'Icons',
   Illustrations = 'Illustrations',
@@ -46,10 +41,16 @@ const IS_APROVED = 'Approved=1'
 const TERMS_SIGNED = 'Terms=1'
 
 function normalize(asset: Fields) {
-  return { name: asset.Name, description: asset.Description, preview: getPreview(asset), uri: '' }
+  console.warn(asset)
+  return {
+    name: asset.Name,
+    description: asset.Description,
+    preview: getPreview(asset),
+    uri: getURI(asset),
+  }
 }
 
-function getPreview(asset) {
+function getPreview(asset: Fields) {
   const previewField = asset[ASSSET_FIELD_LIGHT]
 
   return (
@@ -59,4 +60,8 @@ function getPreview(asset) {
       previewField[0].thumbnails.large.url) ||
     ''
   )
+}
+
+function getURI(asset: Fields) {
+  return (asset.Zip && asset.Zip[0] && asset.Zip[0].url) || ''
 }

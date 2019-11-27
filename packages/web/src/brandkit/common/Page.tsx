@@ -53,7 +53,7 @@ const PAGES = [
 
     sections: [
       { title: 'Overview', href: `${TYPE_PATH}#${hashNav.brandTypography.overview}` },
-      { title: 'Type Scale', href: `${TYPE_PATH}#${hashNav.brandTypography.system}` },
+      { title: 'Type Scale', href: `${TYPE_PATH}#${hashNav.brandTypography.scale}` },
     ],
   },
   {
@@ -215,7 +215,7 @@ class Page extends React.Component<Props & ScreenProps, State> {
 
 const styles = StyleSheet.create({
   // @ts-ignore creates a stacking context
-  conatiner: { transform: 'isolate' },
+  conatiner: { isolation: 'isolate' },
   mobileMain: { zIndex: -5, marginTop: 50 },
   desktopMain: { flex: 1, flexBasis: 'calc(75% - 50px)' },
   sidebar: { minWidth: 190, paddingLeft: 0 },

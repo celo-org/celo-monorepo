@@ -8,9 +8,9 @@ import OpenGraph from 'src/header/OpenGraph'
 import { I18nProps, NameSpaces, Trans, withNamespaces } from 'src/i18n'
 import SideTitledSection from 'src/layout/SideTitledSection'
 import Button, { BTN, SIZE } from 'src/shared/Button.3'
+import InlineAnchor from 'src/shared/InlineAnchor'
 import { CeloLinks } from 'src/shared/menu-items'
 import { HEADER_HEIGHT } from 'src/shared/Styles'
-import InlineAnchor from 'src/shared/InlineAnchor'
 import { colors, fonts, standardStyles, textStyles } from 'src/styles'
 interface State {
   address: string

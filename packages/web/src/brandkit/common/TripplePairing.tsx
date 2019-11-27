@@ -1,8 +1,8 @@
 import * as React from 'react'
 import { View } from 'react-native'
+import { brandStyles } from 'src/brandkit/common/constants'
 import { ScreenProps, ScreenSizes, withScreenSize } from 'src/layout/ScreenSize'
 import { standardStyles } from 'src/styles'
-import { brandStyles } from 'src/brandkit/common/constants'
 
 interface TripplePairingProps {
   first: React.ReactNode

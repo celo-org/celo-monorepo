@@ -5,7 +5,7 @@ import { StyleSheet, Text, View } from 'react-native'
 import { brandStyles, GAP } from 'src/brandkit/common/constants'
 import Page from 'src/brandkit/common/Page'
 import PageHeadline from 'src/brandkit/common/PageHeadline'
-import { I18nProps } from 'src/i18n'
+import { I18nProps, NameSpaces } from 'src/i18n'
 
 import Fetch from 'src/brandkit/common/Fetch'
 import IconShowcase from 'src/brandkit/common/Showcase'
@@ -32,7 +32,7 @@ interface IconData {
 
 const LOADING = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]
 
-const Overview = withNamespaces()(function _Overview({ t }: I18nProps) {
+const Overview = withNamespaces(NameSpaces.brand)(function _Overview({ t }: I18nProps) {
   return (
     <View style={styles.container}>
       <PageHeadline title={t('icons.title')} headline={t('icons.headline')} />
@@ -43,10 +43,11 @@ const Overview = withNamespaces()(function _Overview({ t }: I18nProps) {
               return LOADING.map((x) => {
                 return (
                   <IconShowcase
-                    size={166}
+                    size={160}
                     key={x}
                     loading={true}
                     name={'Celo Icon'}
+                    uri={'#'}
                     description="..."
                   />
                 )
@@ -61,7 +62,7 @@ const Overview = withNamespaces()(function _Overview({ t }: I18nProps) {
                 preview={{ uri: icon.preview }}
                 uri={icon.uri}
                 loading={false}
-                size={166}
+                size={160}
               />
             ))
           }}

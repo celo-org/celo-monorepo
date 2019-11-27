@@ -90,8 +90,8 @@
       "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vestibulum nec leo lorem. Donec in ligula vitae leo suscipit hendrerit. Vivamus commodo felis id nisi semper, ut pellentesque nunc sollicitudin. Nam at ligula lacus. Pellentesque lacinia justo feugiat, maximus nisi nec, venenatis neque. Aliquam tempor nec diam sed lobortis. Nam fringilla tempus posuere."
   },
   "icons": {
-    "tile": "Icons",
-    "headling":
+    "title": "Icons",
+    "headline":
       "Used to simplify the complexities of Celo technology, icons are useful visual tools that can educate, clarify, and instruct in ways simple text can not.\n\nCelo icons have descriptions that act as guidelines. While some descriptions are specific, many icons have multiple meanings and we encourage the Celo community to find new culturally appropriate applications for them. "
   },
   "downloadAssetBtn": "Download"

@@ -1,10 +1,10 @@
 import * as React from 'react'
 import { StyleSheet, Text, View } from 'react-native'
 import { brandStyles, GAP } from 'src/brandkit/common/constants'
+import DownloadButton from 'src/brandkit/common/DownloadButton'
 import LogoDarkBg from 'src/logos/LogoDarkBg'
 import LogoLightBg from 'src/logos/LogoLightBg'
 import { colors, fonts, standardStyles } from 'src/styles'
-import DownloadButton from 'src/brandkit/common/DownloadButton'
 
 export enum Logos {
   dark,

@@ -1,16 +1,16 @@
 import * as React from 'react'
 import { Image, ImageURISource, StyleSheet, Text, View } from 'react-native'
 import { brandStyles } from 'src/brandkit/common/constants'
+import DownloadButton from 'src/brandkit/common/DownloadButton'
+import AspectRatio from 'src/shared/AspectRatio'
 import Spinner from 'src/shared/Spinner'
 import { colors, fonts, standardStyles } from 'src/styles'
-import AspectRatio from 'src/shared/AspectRatio'
-import DownloadButton from 'src/brandkit/common/DownloadButton'
 
 interface Props {
   name: string
   description: string
   preview?: ImageURISource
-  uri?: string
+  uri: string
   loading: boolean
   size: number
 }
@@ -59,7 +59,6 @@ const styles = StyleSheet.create({
   text: { flex: 1 },
   pullStart: { paddingLeft: 0 },
   container: {
-    marginRight: 20,
     justifyContent: 'space-between',
   },
 })

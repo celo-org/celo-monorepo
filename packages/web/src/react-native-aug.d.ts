@@ -20,6 +20,7 @@ declare module 'react-native' {
 
   interface ViewStyle {
     position?: 'absolute' | 'relative' | 'fixed'
+    isolation?: 'isolate'
     appearance?: string
     animationDelay?: string
     animationDuration?: string
