@@ -9,7 +9,6 @@ import { assert } from 'chai'
 import Web3 from 'web3'
 import { TransactionReceipt } from 'web3/types'
 import {
-  getEnode,
   GethInstanceConfig,
   getHooks,
   GethTestConfig,
@@ -196,7 +195,7 @@ describe('Transfer tests', function(this: any) {
       // We need to set an etherbase here so that the full node will accept transactions from
       // light clients.
       etherbase: FeeRecipientAddress,
-      peers: [await getEnode(8545)],
+      peers: [8545],
     }
     await initAndStartGeth(hooks.gethBinaryPath, fullInstance)
 
@@ -227,7 +226,7 @@ describe('Transfer tests', function(this: any) {
       port: 30307,
       rpcport: 8549,
       privateKey: DEF_FROM_PK,
-      peers: [await getEnode(8547)],
+      peers: [8547],
     })
 
     // Reset contracts to send RPCs through transferring node.
