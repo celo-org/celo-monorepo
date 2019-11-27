@@ -1,4 +1,4 @@
-import { attestationMessageToSign, PhoneNumberUtils, SignatureUtils } from '@celo/utils'
+import { AttestationUtils, PhoneNumberUtils, SignatureUtils } from '@celo/utils'
 import { concurrentMap, sleep } from '@celo/utils/lib/async'
 import { notEmpty, zip3 } from '@celo/utils/lib/collections'
 import { parseSolidityStringArray } from '@celo/utils/lib/parsing'
@@ -249,7 +249,10 @@ export class AttestationsWrapper extends BaseWrapper<Attestations> {
     const phoneHash = PhoneNumberUtils.getPhoneHash(phoneNumber)
     const accounts = await this.kit.contracts.getAccounts()
     const attestationSigner = await accounts.getAttestationSigner(issuer)
-    const expectedSourceMessage = attestationMessageToSign(phoneHash, account)
+    const expectedSourceMessage = AttestationUtils.getAttestationMessageToSignFromPhoneHash(
+      phoneHash,
+      account
+    )
     const { r, s, v } = parseSignature(expectedSourceMessage, code, attestationSigner)
     return toTransactionObject(this.kit, this.contract.methods.complete(phoneHash, v, r, s))
   }
@@ -269,7 +272,10 @@ export class AttestationsWrapper extends BaseWrapper<Attestations> {
   ): Promise<string | null> {
     const phoneHash = PhoneNumberUtils.getPhoneHash(phoneNumber)
     const accounts = await this.kit.contracts.getAccounts()
-    const expectedSourceMessage = attestationMessageToSign(phoneHash, account)
+    const expectedSourceMessage = AttestationUtils.getAttestationMessageToSignFromPhoneHash(
+      phoneHash,
+      account
+    )
     for (const issuer of issuers) {
       const attestationSigner = await accounts.getAttestationSigner(issuer)
 
@@ -403,7 +409,10 @@ export class AttestationsWrapper extends BaseWrapper<Attestations> {
     const accounts = await this.kit.contracts.getAccounts()
     const attestationSigner = await accounts.getAttestationSigner(issuer)
     const phoneHash = PhoneNumberUtils.getPhoneHash(phoneNumber)
-    const expectedSourceMessage = attestationMessageToSign(phoneHash, account)
+    const expectedSourceMessage = AttestationUtils.getAttestationMessageToSignFromPhoneHash(
+      phoneHash,
+      account
+    )
     const { r, s, v } = parseSignature(expectedSourceMessage, code, attestationSigner)
     const result = await this.contract.methods
       .validateAttestationCode(phoneHash, account, v, r, s)

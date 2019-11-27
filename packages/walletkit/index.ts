@@ -30,29 +30,6 @@ export {
   parseLog,
 } from './src/abi'
 export { unlockAccount } from './src/account-utils'
-// export {
-//   ActionableAttestation,
-//   attestationMessageToSign,
-//   AttestationState,
-//   decodeAttestationCode,
-//   extractAttestationCodeFromMessage,
-//   findMatchingIssuer,
-//   getActionableAttestations,
-//   getAttestationFee,
-//   getAttestationState,
-//   getDataEncryptionKey,
-//   getWalletAddress,
-//   lookupPhoneNumbers,
-//   makeApproveAttestationFeeTx,
-//   makeCompleteTx,
-//   makeRequestTx,
-//   makeRevealTx,
-//   makeSetAccountTx,
-//   makeSetWalletAddressTx,
-//   messageContainsAttestationCode,
-//   sanitizeBase64,
-//   validateAttestationCode,
-// } from './src/attestations'
 export {
   awaitConfirmation,
   CeloContract,
