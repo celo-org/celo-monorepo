@@ -229,8 +229,6 @@ We'll get back to this machine later, but for now, let's give it a proxy.
 
 ### Deploy a proxy
 
-TODO: Kevin to fill in here properly
-
 To avoid exposing the validator to the public internet, we are deploying a proxy node which is responsible to communicate with the network. On our Proxy machine, we'll setup the node as per usual now:
 
 ```bash
@@ -246,6 +244,21 @@ You can then run the proxy with
 ```bash
 # On the proxy machine
 docker run --name celo-proxy -d --restart always -p 30313:30303 -p 30313:30303/udp -p 30503:30503 -p 30503:30503/udp -v $PWD/proxy:/root/.celo $CELO_IMAGE --verbosity 3 --networkid $NETWORK_ID --syncmode full --proxy.proxy --proxy.proxiedvalidatoraddress $CELO_VALIDATOR_SIGNER_ADDRESS --proxy.internalendpoint :30503
+```
+
+Once the proxy is running, we will need to retrieve it's enode so that the validator will be able to connect to it. 
+
+```bash
+# On the proxy machine, retrieve the proxy enode
+echo $(docker exec celo-proxy geth --exec "admin.nodeInfo['enode'].split('//')[1].split('@')[0]" attach | tr -d '"')
+```
+
+Now we need to set the proxy enode and proxy IP address in environment variables on the validator machine.
+
+```bash
+# On the validator machine
+export PROXY_ENODE=<proxy enode>
+export PROXY_IP=<proxy ip address>
 ```
 
 Let's connect the validator to the proxy:
