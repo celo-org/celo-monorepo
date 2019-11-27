@@ -26,6 +26,33 @@ spec:
       - name: ethstats
         image: {{ .Values.ethstats.image.repository }}:{{ .Values.ethstats.image.tag }}
         imagePullPolicy: {{ .Values.imagePullPolicy }}
+        command:
+        - /bin/sh
+        - -c
+        args:
+        - |
+          cat <<'EOF' > /celostats-server/lib/utils/config.js
+          var trusted = [
+            {{- range .Values.ethstats.trusted_addresses }}
+            {{- if . }}
+            "{{lower . }}",
+            {{- end }}
+            {{- end }}
+          ]
+          var banned = [
+            {{- range .Values.ethstats.banned_addresses }}
+            {{- if . }}
+            "{{lower . }}",
+            {{- end }}
+            {{- end }}
+          ]
+          module.exports = {
+            trusted:  trusted,
+            banned:   banned,
+            reserved: []
+          };
+          EOF
+          npm start
         ports:
         - name: http
           containerPort: 3000
@@ -33,12 +60,6 @@ spec:
           requests:
             cpu: 100m
             memory: 250Mi
-        env:
-        - name: WS_SECRET
-          valueFrom:
-            secretKeyRef:
-              name: {{ .Release.Name }}
-              key: WS_SECRET
     {{- with .Values.nodeSelector }}
       nodeSelector:
 {{ toYaml . | indent 8 }}
