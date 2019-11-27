@@ -24,7 +24,7 @@ export interface GethInstanceConfig {
   lightserv?: boolean
   privateKey?: string
   etherbase?: string
-  peers?: string[]
+  peers?: number[]
   pid?: number
 }
 
@@ -242,7 +242,8 @@ export async function killInstance(instance: GethInstanceConfig) {
   }
 }
 
-export async function addStaticPeers(datadir: string, enodes: string[]) {
+export async function addStaticPeers(datadir: string, ports: number[]) {
+  const enodes = await Promise.all(ports.map((port) => getEnode(port)))
   fs.writeFileSync(`${datadir}/static-nodes.json`, JSON.stringify(enodes))
 }
 
@@ -444,8 +445,19 @@ async function connectValidatorPeers(gethConfig: GethTestConfig) {
       ({ wsport, rpcport }) =>
         new Admin(`${wsport ? 'ws' : 'http'}://localhost:${wsport || rpcport}`)
     )
-  const enode = (await admins[0].getNodeInfo()).enode
-  await Promise.all(admins.slice(1).map((admin) => admin.addPeer(enode)))
+  const enodes = await Promise.all(admins.map(async (admin) => (await admin.getNodeInfo()).enode))
+  await Promise.all(
+    admins.map(async (admin, i) => {
+      await Promise.all(
+        enodes.map(async (enode, j) => {
+          if (i === j) {
+            return
+          }
+          await admin.addPeer(enode)
+        })
+      )
+    })
+  )
 }
 
 export function getContext(gethConfig: GethTestConfig) {
