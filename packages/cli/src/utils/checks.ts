@@ -70,7 +70,7 @@ class CheckBuilder {
   }
 
   addCheck(name: string, predicate: () => Promise<boolean> | boolean, errorMessage?: string) {
-    this.checks.push(check(name, predicate))
+    this.checks.push(check(name, predicate, errorMessage))
     return this
   }
 
