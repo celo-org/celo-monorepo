@@ -34,6 +34,12 @@ export class NexmoSmsProvider extends SmsProvider {
 
   initialize = async () => {
     const availableNumbers = await this.getAvailableNumbers()
+
+    if (!availableNumbers) {
+      throw new Error(
+        'You have no phone numbers in your Nexmo account. Please buy at least one number at https://dashboard.nexmo.com/buy-numbers'
+      )
+    }
     this.nexmoNumbers = availableNumbers.map((number: any) => ({
       phoneNumber: number.msisdn,
       code: phoneUtil.getRegionCodeForNumber(phoneUtil.parse('+' + number.msisdn)),
