@@ -90,14 +90,16 @@ docker run \
     echo -n '${genesis_content_base64}' | base64 -d > /var/geth/genesis.json && \
     echo -n '${rid}' > $DATA_DIR/replica_id && \
     echo -n '${ip_address}' > $DATA_DIR/ipAddress && \
-    echo -n '$PRIVATE_KEY' > $DATA_DIR/pkey && \
     echo -n '$ACCOUNT_ADDRESS' > $DATA_DIR/address && \
     echo -n '$BOOTNODE_ENODE_ADDRESS' > $DATA_DIR/bootnodeEnodeAddress && \
     echo -n '$BOOTNODE_ENODE' > $DATA_DIR/bootnodeEnode && \
     echo -n '$GETH_ACCOUNT_SECRET' > $DATA_DIR/account/accountSecret && \
     geth init /var/geth/genesis.json
   ) && ( \
-    geth account import --password $DATA_DIR/account/accountSecret $DATA_DIR/pkey ; \
+    TMP_PRIVATE_KEY_FILE=$(mktemp) && \
+    echo -n $PRIVATE_KEY > $TMP_PRIVATE_KEY_FILE && \
+    geth account import --password $DATA_DIR/account/accountSecret $TMP_PRIVATE_KEY_FILE && \
+    rm $TMP_PRIVATE_KEY_FILE ; \
     geth \
       --bootnodes=enode://$BOOTNODE_ENODE \
       --password=$DATA_DIR/account/accountSecret \
@@ -112,7 +114,6 @@ docker run \
       --wsaddr 0.0.0.0 \
       --wsorigins=* \
       --wsapi=eth,net,web3 \
-      --nodekey=$DATA_DIR/pkey \
       --etherbase=$ACCOUNT_ADDRESS \
       --networkid=${network_id} \
       --syncmode=full \
