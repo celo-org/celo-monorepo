@@ -12,7 +12,7 @@ const SELL_AMOUNTS = {
 
 export async function handleExchangeQuery() {
   const contractKitInstance = await getContractKit()
-  const fetchTime = Date.now().toString()
+  const fetchTime = Date.now()
   const [dollarMakerRate, goldMakerRate] = await Promise.all([
     getExchangeRate(CURRENCY_ENUM.DOLLAR, contractKitInstance),
     getExchangeRate(CURRENCY_ENUM.GOLD, contractKitInstance),

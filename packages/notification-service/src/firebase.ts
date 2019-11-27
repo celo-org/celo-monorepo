@@ -46,7 +46,7 @@ interface PendingRequests {
 interface ExchangeRateObject {
   makerToken: CURRENCY_ENUM
   exchangeRate: string
-  timestamp: string
+  timestamp: number // timestamp in milliseconds
 }
 
 let registrations: Registrations = {}
@@ -151,7 +151,7 @@ export function setPaymentRequestNotified(uid: string): Promise<void> {
 export function writeExchangeRatePair(
   makerToken: CURRENCY_ENUM,
   exchangeRate: string,
-  timestamp: string
+  timestamp: number
 ) {
   const exchangeRateRecord: ExchangeRateObject = { makerToken, exchangeRate, timestamp }
   exchangeRatesRef.push(exchangeRateRecord)
