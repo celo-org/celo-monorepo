@@ -135,7 +135,7 @@ contract('Accounts', (accounts: string[]) => {
     })
   })
 
-  describe('#setAccount', async () => {
+  describe('#setAccount', () => {
     describe('when the account has been created', () => {
       beforeEach(async () => {
         await accountsInstance.createAccount()
@@ -234,7 +234,7 @@ contract('Accounts', (accounts: string[]) => {
     })
   })
 
-  describe('#setWalletAddress', async () => {
+  describe('#setWalletAddress', () => {
     describe('when the account has not been created', () => {
       it('should revert', async () => {
         await assertRevert(accountsInstance.setWalletAddress(caller))
@@ -270,7 +270,7 @@ contract('Accounts', (accounts: string[]) => {
     })
   })
 
-  describe('#setMetadataURL', async () => {
+  describe('#setMetadataURL', () => {
     describe('when the account has not been created', () => {
       it('should revert', async () => {
         await assertRevert(accountsInstance.setMetadataURL(caller))
@@ -320,7 +320,7 @@ contract('Accounts', (accounts: string[]) => {
     })
   })
 
-  describe('#setName', async () => {
+  describe('#setName', () => {
     describe('when the account has not been created', () => {
       it('should revert', async () => {
         await assertRevert(accountsInstance.setWalletAddress(caller))
@@ -408,7 +408,7 @@ contract('Accounts', (accounts: string[]) => {
           )
         })
 
-        describe('when a previous authorization has been made', async () => {
+        describe('when a previous authorization has been made', () => {
           const newAuthorized = accounts[2]
           let newSig
           beforeEach(async () => {
