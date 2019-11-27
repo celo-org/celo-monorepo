@@ -386,18 +386,13 @@ docker run -v $PWD/attestations:/root/.celo --entrypoint /bin/sh -it $CELO_IMAGE
 export ATTESTATION_SIGNER_ADDRESS=<YOUR-ATTESTATION-SIGNER-ADDRESS>
 ```
 
-Let's run the node in the background (both to generate the proof-of-possession now and to run the attestation service later.)
+Let's generate the proof-of-possession for the attestation signer
 
 ```bash
 # On the Attestation machine
-docker run --name celo-attestations -d --restart always -p 8545:8545 -v $PWD/accounts:/root/.celo $CELO_IMAGE --verbosity 3 --networkid $NETWORK_ID --syncmode full --rpc --rpcaddr 0.0.0.0 --rpcapi eth,net,web3,debug,admin,personal --unlock $ATTESTATION_SIGNER_ADDRESS
-```
-
-Generate the proof-of-possession for the attestation signer
-
-```bash
-# On the Attestation machine
-celocli account:proof-of-possession --signer $ATTESTATION_SIGNER_ADDRESS --account $CELO_VALIDATOR_ADDRESS
+# Note that you have to export CELO_VALIDATOR_ADDRESS on this machine
+export $CELO_VALIDATOR_ADDRESS=<CELO_VALIDATOR_ADDRESS>
+docker run -v $PWD/attestations:/root/.celo --entrypoint /bin/sh -it $CELO_IMAGE -c "geth account proof-of-possession $CELO_ATTESTATION_SIGNER_ADDRESS $CELO_VALIDATOR_ADDRESS"
 ```
 
 With this proof, authorize the attestation signer on your local machine:
@@ -405,6 +400,13 @@ With this proof, authorize the attestation signer on your local machine:
 ```bash
 # On your local machine
 celocli account:authorize --from $CELO_VALIDATOR_ADDRESS --role attestation --pop <ATTESTATION_SIGNER_POP> --signer $ATTESTATION_SIGNER_ADDRESS
+```
+
+You can now run the node for the attestation service in the background:
+
+```bash
+# On the Attestation machine
+docker run --name celo-attestations -d --restart always -p 8545:8545 -v $PWD/accounts:/root/.celo $CELO_IMAGE --verbosity 3 --networkid $NETWORK_ID --syncmode full --rpc --rpcaddr 0.0.0.0 --rpcapi eth,net,web3,debug,admin --unlock $ATTESTATION_SIGNER_ADDRESS
 ```
 
 By now, you should have setup your Validator account appropriately. You can finish the actual deploy of the attestation service under the [Attestation Service at the documentation page](running-attestation-service.md).
