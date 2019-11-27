@@ -158,6 +158,7 @@ export class VestingInstanceWrapper extends BaseWrapper<VestingInstance> {
   /**
    * Relocks gold that has been unlocked but not withdrawn.
    * @param index The index of the pending withdrawal to relock.
+   * @param value The value to relock.
    */
   relockGold: (index: number, value: string | number) => CeloTransactionObject<void> = proxySend(
     this.kit,
@@ -168,19 +169,15 @@ export class VestingInstanceWrapper extends BaseWrapper<VestingInstance> {
    * Withdraw gold that has been unlocked but not withdrawn.
    * @param index The index of the pending withdrawal to relock.
    */
-  withdrawLockedGold: (index: number) => CeloTransactionObject<void> = proxySend(
+  withdrawLockedGold: (index: string | number) => CeloTransactionObject<void> = proxySend(
     this.kit,
     this.contract.methods.withdrawLockedGold
   )
 
   /**
    * Withdraws a gold that has been unlocked after the unlocking period has passed.
-   * @param index The index of the pending withdrawal to withdraw.
    */
-  withdraw: (index: number) => CeloTransactionObject<void> = proxySend(
-    this.kit,
-    this.contract.methods.withdraw
-  )
+  withdraw: () => CeloTransactionObject<void> = proxySend(this.kit, this.contract.methods.withdraw)
 
   /**
    * Beneficiary creates an account on behalf of the vesting contract.

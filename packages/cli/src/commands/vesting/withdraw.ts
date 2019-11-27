@@ -8,8 +8,8 @@ import { displaySendTx } from '../../utils/cli'
 import { Flags } from '../../utils/command'
 import { LockedGoldArgs } from '../../utils/lockedgold'
 
-export default class LockGold extends BaseCommand {
-  static description = 'Locks Celo Gold to be used in governance and validator elections.'
+export default class Withdraw extends BaseCommand {
+  static description = 'Withdraws gold as per the vesting schedule.'
 
   static flags = {
     ...BaseCommand.flags,
@@ -20,11 +20,11 @@ export default class LockGold extends BaseCommand {
   static args = []
 
   static examples = [
-    'lock-gold --from 0x47e172F6CfB6c7D01C1574fa3E2Be7CC73269D95 --value 10000000000000000000000',
+    'withdraw --from 0x47e172F6CfB6c7D01C1574fa3E2Be7CC73269D95 --value 10000000000000000000000',
   ]
 
   async run() {
-    const res = this.parse(LockGold)
+    const res = this.parse(Withdraw)
     const address: Address = res.flags.from
 
     this.kit.defaultAccount = address
@@ -36,7 +36,7 @@ export default class LockGold extends BaseCommand {
       console.error(`No vested instance found under the given beneficiary`)
       return
     }
-    if ((await vestingFactoryInstance.getRevoker()) !== res.flags.from) {
+    if ((await vestingFactoryInstance.getBeneficiary()) !== res.flags.from) {
       console.error(`Vested instance has a different revoker`)
       return
     }
@@ -50,22 +50,6 @@ export default class LockGold extends BaseCommand {
       .isAccount(vestingFactoryInstance.address)
       .runChecks()
 
-    const lockedGold = await this.kit.contracts.getLockedGold()
-    const pendingWithdrawalsValue = await lockedGold.getPendingWithdrawalsTotalValue(
-      vestingFactoryInstance.address
-    )
-    const relockValue = BigNumber.minimum(pendingWithdrawalsValue, value)
-    const lockValue = value.minus(relockValue)
-
-    await newCheckBuilder(this)
-      .hasEnoughGold(vestingFactoryInstance.address, lockValue)
-      .runChecks()
-
-    const txos = await lockedGold.relock(address, relockValue)
-    for (const txo of txos) {
-      await displaySendTx('relock', txo, { from: vestingFactoryInstance.address })
-    }
-    const tx = lockedGold.lock()
-    await displaySendTx('lock', tx, { value: lockValue.toFixed() })
+    await displaySendTx('withdraw', vestingFactoryInstance.withdraw())
   }
 }

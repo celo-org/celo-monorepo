@@ -58,7 +58,7 @@ export default class SetAccount extends BaseCommand {
     } else if (res.flags.property === 'walletaddress') {
       tx = await vestingFactoryInstance.setAccountWalletAddress(res.flags.value)
     } else if (res.flags.property === 'dataenckey') {
-      tx = await vestingFactoryInstance.setAccountDataEncryptionKey(res.flags.value)
+      // tx = await vestingFactoryInstance.setAccountDataEncryptionKey(res.flags.value)
     } else if (res.flags.property === 'metaurl') {
       tx = await vestingFactoryInstance.setAccountMetadataURL(res.flags.value)
     } else {
