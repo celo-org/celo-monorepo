@@ -144,8 +144,6 @@ class Page extends React.Component<Props & ScreenProps, State> {
 
   observation = () => {
     this.observer = new IntersectionObserver(this.onIntersection, {
-      // root: findNodeHandle(this.pageRef.current) as any,
-      // rootMargin: `200px`,
       threshold: [0.1, 0.5, 0.9, 1],
     })
 
@@ -176,7 +174,7 @@ class Page extends React.Component<Props & ScreenProps, State> {
         <View style={styles.topbar}>
           <Topbar isMobile={isMobile} />
         </View>
-        <View style={{ marginTop: 70 }} />
+        <View style={styles.justNeedSpace} />
         {isMobile && (
           <MobileMenu pages={PAGES} pathname={router.pathname} routeHash={this.state.routeHash} />
         )}
@@ -221,11 +219,15 @@ const styles = StyleSheet.create({
   mobileMain: { zIndex: -5, marginTop: 50 },
   desktopMain: { flex: 1, flexBasis: 'calc(75% - 50px)' },
   sidebar: { minWidth: 190, paddingLeft: 0 },
+  justNeedSpace: {
+    marginTop: 70,
+  },
   topbar: {
     position: 'fixed',
     width: '100%',
     borderBottomColor: colors.gray,
     zIndex: 10,
+    marginBottom: 70,
   },
   footer: { zIndex: -10, backgroundColor: colors.white },
   childrenArea: {

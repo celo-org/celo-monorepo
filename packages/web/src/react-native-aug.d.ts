@@ -22,6 +22,7 @@ declare module 'react-native' {
     position?: 'absolute' | 'relative' | 'fixed'
     isolation?: 'isolate'
     appearance?: string
+    transformOrigin?: string | number
     animationDelay?: string
     animationDuration?: string
     animationFillMode?: 'both' | 'backwards' | 'forwards' | 'none'
