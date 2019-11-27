@@ -10,7 +10,7 @@ const environments = {
     },
     LEADERBOARD: {
       pageLength: 5,
-      uri: "http://localhost:4000/graphiql"
+      uri: 'http://localhost:4000/graphiql',
     },
     V3: true,
     __SEGMENT_KEY__: 'REPLACE_ME',
