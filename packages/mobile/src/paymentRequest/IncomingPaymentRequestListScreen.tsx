@@ -1,4 +1,3 @@
-import SectionHeader from '@celo/react-components/components/SectionHead'
 import colors from '@celo/react-components/styles/colors'
 import { componentStyles } from '@celo/react-components/styles/styles'
 import variables from '@celo/react-components/styles/variables'
