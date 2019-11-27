@@ -180,11 +180,8 @@ class Page extends React.Component<Props & ScreenProps, State> {
         {isMobile && (
           <MobileMenu pages={PAGES} pathname={router.pathname} routeHash={this.state.routeHash} />
         )}
-        <GridRow
-          mobileStyle={styles.mobileMain}
-          desktopStyle={[styles.desktopMain, standardStyles.sectionMarginTop]}
-        >
-          <Cell span={Spans.fourth}>
+        <GridRow mobileStyle={styles.mobileMain} desktopStyle={standardStyles.sectionMarginTop}>
+          <Cell span={Spans.fourth} style={styles.sidebar}>
             {!isMobile && (
               <Sidebar
                 pages={PAGES}
@@ -193,7 +190,7 @@ class Page extends React.Component<Props & ScreenProps, State> {
               />
             )}
           </Cell>
-          <Cell span={Spans.three4th}>
+          <Cell span={Spans.three4th} style={!isMobile && styles.desktopMain}>
             <View
               style={[styles.childrenArea, !isMobile && styles.childrenAreaDesktop]}
               ref={this.pageRef}
@@ -220,7 +217,8 @@ const styles = StyleSheet.create({
   // @ts-ignore creates a stacking context
   conatiner: { transform: 'isolate' },
   mobileMain: { zIndex: -5, marginTop: 50 },
-  desktopMain: {},
+  desktopMain: { flex: 1, flexBasis: 'calc(75% - 50px)', backgroundColor: colors.faintGold },
+  sidebar: { minWidth: 190, backgroundColor: colors.goldSubtle, paddingLeft: 0 },
   topbar: {
     position: 'fixed',
     width: '100%',

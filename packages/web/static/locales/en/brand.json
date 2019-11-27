@@ -10,24 +10,24 @@
   "logo": {
     "title": "Logo",
     "overviewCopy":
-      "The Celo logo is a universal signature used to unite projects behind a common journey. It is  important for it to be instantly recognizable so please do not edit, change, distort, recolor, reconfigure, or rearrange the lockup of the logo.",
+      "The Celo logo is a universal signature uniting community efforts and bringing prosperity to the world.",
     "overviewBtn": "Download Logo Package",
     "logoTitle": "Logo",
     "logoText":
-      "The Celo logo is composed of a glyph and wordmark. Their spacing is intentional and we ask for you to not alter them when using the logo. The Celo logo should never be distorted or redrawn when applied to communications. The Celo logo is a recognizable and highly visible brand asset that needs to be applied consistently.\n\nAs often as possible please use the two glyph color logo.",
+      "The Celo logo is composed of a glyph and wordmark. All aspects of its construction are intentional, so please do not edit, change, distort, recolor, reconfigure, or rearrange the lockup of the logo.\n\nPlease use the full-color logo whenever possible.",
     "glyphTitle": "Glyph",
     "glyphText":
-      "The glyph should be used when the wordmark is too small to achieve maximum impact. It is often used in place of the full logo in products and web pages. The glyph also works well with brand colors. Use the light or dark glyph with high contrast to your project’s brand colors.",
+      "Utilize the glyph when the full logo is too small to achieve maximum impact. It works best on Celo brand colors. Be sure to use the monochrome glyphs on other custom colors.",
     "fullColorOnLightCaption": "Full color logo for lighter backgrounds",
     "fullColorOnDarkCaption": "Full color logo for darker backgrounds",
     "monochromeCaption": "Monochrome logo",
     "monochromeInverseCaption": "Monochrome logo (inverse)",
     "sizeTitle": "Size",
     "sizeText":
-      "The logo should have a minimum height of 24 pixels on digital displays (?), and 1.5 cm (?) on printed materials.",
+      "The logo and glyph should not appear smaller than their minimum height of 24 pixels on digital displays or 8mm in print..",
     "clearspaceTitle": "Clearspace",
     "clearspaceText":
-      "The Celo logo has allotted Clearspace around the graphics to optically align the logo appropriately vertically and horizontally to the surface in which it lies. It should always be surrounded by generous white space. The minimum amount of white space is based on the x-height of the logo placed around the set crop zone of the Celo logo.",
+      "Clearspace is the protected area around the logo. This space must be kept free of all other graphics and text, including other logos. The Celo logo has allotted Clearspace based on the height of the “o” in Celo.  Please use the below image as a guide.",
     "backgroundsTitle": "Backgrounds",
     "backgroundsTextTop":
       "As a general rule of thumb, the Celo logo works best on the following three background colors.",

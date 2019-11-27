@@ -194,10 +194,17 @@ const Clearspace = withNamespaces(NameSpaces.brand)(function _ClearSpace({ t }) 
           {t('logo.sizeTitle')}
         </Text>
         <Text style={[fonts.p, styles.gap]}>{t('logo.sizeText')}</Text>
-        <View style={[standardStyles.centered, styles.sizingArea]}>
-          <AspectRatio ratio={392 / 160} style={styles.sizing}>
+        <View style={[styles.tiling, standardStyles.blockMarginTopMobile]}>
+          <AspectRatio ratio={345 / 172} style={[styles.sizing, brandStyles.gap]}>
             <Image
-              source={require('src/brandkit/images/sizing.png')}
+              source={require('src/brandkit/images/digital-min.png')}
+              style={standardStyles.image}
+              resizeMode="contain"
+            />
+          </AspectRatio>
+          <AspectRatio ratio={345 / 172} style={[styles.sizing, brandStyles.gap]}>
+            <Image
+              source={require('src/brandkit/images/print-min.png')}
               style={standardStyles.image}
               resizeMode="contain"
             />
@@ -369,11 +376,9 @@ const styles = StyleSheet.create({
     padding: 30,
   },
   sizing: {
-    maxWidth: 500,
-    width: '100%',
-  },
-  sizingArea: {
-    paddingVertical: 60,
+    flex: 1,
+    minWidth: 280,
+    marginVertical: GAP,
   },
   fullScreenLogo: { width: '100%', marginVertical: 100 },
 })
