@@ -439,7 +439,7 @@ export async function initAndStartGeth(gethBinaryPath: string, instance: GethIns
 // Add validator 0 as a peer of each other validator.
 async function connectValidatorPeers(gethConfig: GethTestConfig) {
   const admins = gethConfig.instances
-    .filter(({ wsport, rpcport }) => wsport || rpcport)
+    .filter(({ wsport, rpcport, validating }) => validating && (wsport || rpcport))
     .map(
       ({ wsport, rpcport }) =>
         new Admin(`${wsport ? 'ws' : 'http'}://localhost:${wsport || rpcport}`)
