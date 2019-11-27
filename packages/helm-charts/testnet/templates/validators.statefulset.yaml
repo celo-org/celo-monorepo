@@ -102,8 +102,10 @@ spec:
         args:
         - "-c"
         - |
-          PRIVATE_KEY=$(celotooljs.sh generate bip32 --mnemonic "$MNEMONIC" --accountType validator --index $(cat /root/.celo/replica_id))
-          geth account import --password /root/.celo/account/accountSecret <(echo -n $PRIVATE_KEY) || true
+          TMP_PRIVATE_KEY_FILE=$(mktemp)
+          celotooljs.sh generate bip32 --mnemonic "$MNEMONIC" --accountType validator --index $(cat /root/.celo/replica_id > TMP_PRIVATE_KEY_FILE:=$(mktemp)
+          geth account import --password /root/.celo/account/accountSecret $TMP_PRIVATE_KEY_FILE || true
+          rm $TMP_PRIVATE_KEY_FILE
         volumeMounts:
         - name: data
           mountPath: /root/.celo
