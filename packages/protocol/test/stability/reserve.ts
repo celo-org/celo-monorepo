@@ -183,6 +183,12 @@ contract('Reserve', (accounts: string[]) => {
   describe('#getOrComputeTobinTax()', () => {
     let mockStableToken: MockStableTokenInstance
 
+    const expectedNoTobinTax: [BN, BN] = [new BN(0), new BN(10).pow(new BN(24))]
+    const expectedTobinTax: [BN, BN] = [
+      new BN(5).mul(new BN(10).pow(new BN(21))),
+      new BN(10).pow(new BN(24)),
+    ]
+
     beforeEach(async () => {
       mockStableToken = await MockStableToken.new()
       await registry.setAddressFor(CeloContractName.SortedOracles, mockSortedOracles.address)
@@ -199,33 +205,33 @@ contract('Reserve', (accounts: string[]) => {
       })
     })
 
-    async function getOrComputeTobinTax(): Promise<[number, number]> {
+    async function getOrComputeTobinTax(): Promise<[BN, BN]> {
       // @ts-ignore TODO(mcortesi): bad typings
       const tobinTax = await reserve.getOrComputeTobinTax.call()
-      const actual = Object.keys(tobinTax).map((key) => tobinTax[key].toNumber())
-      return actual as [number, number]
+      const actual = Object.keys(tobinTax).map((key) => web3.utils.toBN(tobinTax[key]))
+      return actual as [BN, BN]
     }
 
     describe('when there is one stable token', () => {
       it('should set tobin tax to 0% when reserve gold balance > gold value of floating stable tokens', async () => {
         const stableTokenSupply = new BN(10).pow(new BN(19)).toString()
         await mockStableToken.setTotalSupply(stableTokenSupply)
-        const expected: [number, number] = [0, 1000]
-        assert.deepEqual(await getOrComputeTobinTax(), expected)
+        const actual = await getOrComputeTobinTax()
+        actual.forEach((v, i) => assert(expectedNoTobinTax[i].eq(v)))
       })
 
       it('should set tobin tax to 0% when reserve gold balance = gold value of floating stable tokens', async () => {
         const stableTokenSupply = new BN(10).pow(new BN(20)).toString()
         await mockStableToken.setTotalSupply(stableTokenSupply)
-        const expected: [number, number] = [0, 1000]
-        assert.deepEqual(await getOrComputeTobinTax(), expected)
+        const actual = await getOrComputeTobinTax()
+        actual.forEach((v, i) => assert(expectedNoTobinTax[i].eq(v)))
       })
 
       it('should set tobin tax to 0.5% when reserve gold balance < gold value of floating stable tokens', async () => {
         const stableTokenSupply = new BN(10).pow(new BN(21)).toString()
         await mockStableToken.setTotalSupply(stableTokenSupply)
-        const expected: [number, number] = [5, 1000]
-        assert.deepEqual(await getOrComputeTobinTax(), expected)
+        const actual = await getOrComputeTobinTax()
+        actual.forEach((v, i) => assert(expectedTobinTax[i].eq(v)))
       })
     })
 
@@ -244,16 +250,16 @@ contract('Reserve', (accounts: string[]) => {
         const stableTokenSupply = new BN(10).pow(new BN(19)).toString()
         await mockStableToken.setTotalSupply(stableTokenSupply)
         await anotherMockStableToken.setTotalSupply(stableTokenSupply)
-        const expected: [number, number] = [0, 1000]
-        assert.deepEqual(await getOrComputeTobinTax(), expected)
+        const actual = await getOrComputeTobinTax()
+        actual.forEach((v, i) => assert(expectedNoTobinTax[i].eq(v)))
       })
 
       it('should set tobin tax to 0.5% when reserve gold balance < gold value of floating stable tokens', async () => {
         const stableTokenSupply = new BN(10).pow(new BN(21)).toString()
         await mockStableToken.setTotalSupply(stableTokenSupply)
         await anotherMockStableToken.setTotalSupply(stableTokenSupply)
-        const expected: [number, number] = [5, 1000]
-        assert.deepEqual(await getOrComputeTobinTax(), expected)
+        const actual = await getOrComputeTobinTax()
+        actual.forEach((v, i) => assert(expectedTobinTax[i].eq(v)))
       })
 
       it('should set tobin tax to 0.5% when reserve gold balance < gold value of floating stable tokens', async () => {
@@ -263,8 +269,8 @@ contract('Reserve', (accounts: string[]) => {
           .toString()
         await mockStableToken.setTotalSupply(stableTokenSupply)
         await anotherMockStableToken.setTotalSupply(stableTokenSupply)
-        const expected: [number, number] = [5, 1000]
-        assert.deepEqual(await getOrComputeTobinTax(), expected)
+        const actual = await getOrComputeTobinTax()
+        actual.forEach((v, i) => assert(expectedTobinTax[i].eq(v)))
       })
     })
 
