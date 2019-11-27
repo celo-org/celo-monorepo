@@ -11,7 +11,7 @@ You have some instructions about running the network by operating a [full node](
 Please refer to [Key Concepts](../overview.md#background-and-key-concepts) for background on blockchains and an explanation of terms used in the section.
 
 {% hint style="warning" %}
-The Baklava Bet Network is designed for testing and experimentation by developers. Its tokens hold no real world economic value. The testnet software will be upgraded and the entirety of its data reset on a regular basis. This will erase your accounts, their balance and your transaction history. The testnet software will be upgraded on a regular basis. You may encounter bugs and limitations with the software and documentation.
+Baklava, the incentivized testnet for the Celo Protocol. It is an early, partially audited release betanet version of the Celo Protocol. The Great Celo Stake Off allows eligible participants to engage with Baklava and, related to that participation and subject to these Terms and Conditions, eligible participants will have the opportunity to receive Celo Gold at the Mainnet launch of the Celo Protocol. The Great Celo Stake Off will operate in phases, with each phase focusing on a different part of the protocol or infrastructure to test. Transitions between each phase may include a full network reset, a hard fork, or an upgrade.
 {% endhint %}
 
 Please help us improve Celo by asking questions on the [Forum](https://forum.celo.org)!
