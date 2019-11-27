@@ -91,7 +91,7 @@ docker run -v $DATA_DIR:$DATA_DIR --name geth --net=host --entrypoint /bin/sh -d
   ) && ( \
     TMP_PRIVATE_KEY_FILE=$(mktemp) \
     echo -n $PRIVATE_KEY > $TMP_PRIVATE_KEY_FILE && \
-    geth account import --password $DATA_DIR/account/accountSecret $TMP_PRIVATE_KEY_FILE ; \
+    geth account import --password $DATA_DIR/account/accountSecret $TMP_PRIVATE_KEY_FILE && \
     rm $TMP_PRIVATE_KEY_FILE ; \
     geth \
       --bootnodes=enode://$BOOTNODE_ENODE \
