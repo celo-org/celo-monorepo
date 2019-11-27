@@ -159,7 +159,8 @@ class CheckBuilder {
       const passed = await aCheck.run()
       const status︎Str = chalk.bold(passed ? '✔' : '✘')
       const color = passed ? chalk.green : chalk.red
-      console.log(color(`   ${status︎Str}  ${aCheck.name}`))
+      const msg = !passed && aCheck.errorMessage ? aCheck.errorMessage : ''
+      console.log(color(`   ${status︎Str}  ${aCheck.name} ${msg}`))
       allPassed = allPassed && passed
     }
 
