@@ -466,7 +466,7 @@ You can see all the options using the following command:
 ./run-docker-validator-network.sh help
 ```
 
-### Stop Validating
+## Stop Validating
 
 If for some reason you need to stop running your Validator, please do one or all of the following so that it will no longer be chosen as a participant in BFT:
 
