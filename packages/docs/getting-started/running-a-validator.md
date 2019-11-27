@@ -4,7 +4,7 @@
   - [Prerequisites](#prerequisites)
     - [Hardware requirements](#hardware-requirements)
     - [Software requirements](#software-requirements)
-  - [Instructions](#instructions)
+  - [Setup Instructions](#instructions)
     - [Environment variables](#environment-variables)
     - [Pull the Celo Docker image](#pull-the-celo-docker-image)
     - [Create accounts](#create-accounts)
@@ -13,6 +13,7 @@
       - [Running the Validator](#running-the-validator)
     - [Running the Attestation Service](#running-the-attestation-service)
     - [Stop the containers](#stop-the-containers)
+  - [Get elected as validator](#get-elected-as-validator)
     - [Running the Docker containers in the background](#running-the-docker-containers-in-the-background)
     - [Reference Script](#reference-script)
     - [Obtain and lock up some Celo Gold for staking](#obtain-and-lock-up-some-celo-gold-for-staking)
@@ -85,21 +86,21 @@ The Proxy is not mandatory but highly recommended. It allows to protect the Vali
 
 ### Environment variables
 
-| Variable                      | Explanation                                                      |
-| ----------------------------- | ---------------------------------------------------------------- |
-| CELO_IMAGE                    | The Docker image used for the Validator and Proxy containers     |  |
-| NETWORK_ID                    | The Celo network chain ID                                        |  |
-| URL_VERIFICATION_POOL         | URL for the Verification pool for the attestation process        |  |
-| CELO_VALIDATOR_GROUP_ADDRESS  | The public address for the validation group                      |  |
-| CELO_VALIDATOR_ADDRESS        | The public address for the Validator instance                    |  |
-| CELO_PROXY_ADDRESS            | The public address for the Proxy instance                        |  |
-| CELO_VALIDATOR_BLS_PUBLIC_KEY | The BLS public key for the Validator instance                    |  |
-| CELO_VALIDATOR_BLS_SIGNATURE  | A proof-of-possession of the BLS public key                      |  |
-| PROXY_ENODE                   | The enode address for the Validator proxy                        |  |
-| PROXY_IP                      | The Proxy container internal IP address from docker pool address |  |
-| ATTESTATION_KEY               | The private key for the account used in the Attestation Service  |  |
-| ATTESTATION_SERVICE_URL       | The URL to access the Attestation Service deployed               |  |
-| METADATA_URL                  | The URL to access the metadata file for your Attestation Service |  |
+| Variable                      | Explanation                                                       |
+| ----------------------------- | ----------------------------------------------------------------- |
+| CELO_IMAGE                    | The Docker image used for the Validator and Proxy containers      |  |
+| NETWORK_ID                    | The Celo network chain ID                                         |  |
+| URL_VERIFICATION_POOL         | URL for the Verification pool for the attestation process         |  |
+| CELO_VALIDATOR_GROUP_ADDRESS  | The public address for the validation group                       |  |
+| CELO_VALIDATOR_ADDRESS        | The public address for the Validator instance                     |  |
+| CELO_PROXY_ADDRESS            | The public address for the Proxy instance                         |  |
+| CELO_VALIDATOR_BLS_PUBLIC_KEY | The BLS public key for the Validator instance                     |  |
+| CELO_VALIDATOR_BLS_SIGNATURE  | A proof-of-possession of the BLS public key                       |  |
+| PROXY_ENODE                   | The enode address for the Validator proxy                         |  |
+| PROXY_IP                      | The Proxy container internal IP address from docker pool address  |  |
+| ATTESTATION_SIGNER_ADDRESS    | The address of the attestation signer authorized by the validator |  |
+| ATTESTATION_SERVICE_URL       | The URL to access the Attestation Service deployed                |  |
+| METADATA_URL                  | The URL to access the metadata file for your Attestation Service  |  |
 
 First we are going to setup the main environment variables related with the `Baklava` network. Run:
 
@@ -118,18 +119,16 @@ docker pull $CELO_IMAGE
 
 ### Create accounts
 
-At this point we need to create the accounts that will be used by the Validator and the Proxy. We create and cd into the directory where you want to store the data and any other files needed to run your node. You can name this whatever you’d like, but here’s a default you can use:
+At this point we need to create the accounts that will be used by the Validator, the Proxy and the attestation signer. We create and cd into the directory where you want to store the data and any other files needed to run your node. You can name this whatever you’d like, but here’s a default you can use:
 
 ```bash
-mkdir -p celo-data-dir/proxy celo-data-dir/validator
+mkdir -p celo-data-dir/proxy celo-data-dir/validator celo-data-dir/attestations
 cd celo-data-dir
 ```
 
-We are going to need to create 4 accounts, 2 for the Validator, 1 for the Proxy and the last one for the Attestation Service. For the Attestation Service the steps are described [this page](running-attestation-service.md##accounts-configuration).
+It is worth noting that we create all these accounts on the same machine right now, but you are expected to use these accounts on the services on separate machines. We are going to need to create 4 accounts, 2 for the Validator, 1 for the Proxy and the last one for the Attestation Service. You can generate their addresses using the below commands if you don’t already have them. If you already have some accounts, you can skip this step.
 
-First we create three accounts, one for the Validator, one for the Validator Group and the last one for the Proxy. You can generate their addresses using the below commands if you don’t already have them. If you already have some accounts, you can skip this step.
-
-To create the accounts needed, run the following commands. The first two blocks create the accounts for the Validator, the third one for the Proxy. Also we save these addresses to environment variables, so that you can reference it later (don't include the braces):
+To create the accounts needed, run the following commands. The first two blocks create the accounts for the Validator, the third one for the Proxy, and the last one for the attestation service. Also we save these addresses to environment variables, so that you can reference it later (don't include the braces):
 
 ```bash
 docker run -v $PWD/validator:/root/.celo --entrypoint /bin/sh -it $CELO_IMAGE -c "geth account new"
@@ -140,6 +139,9 @@ export CELO_VALIDATOR_ADDRESS=<YOUR-VALIDATOR-ADDRESS>
 
 docker run -v $PWD/proxy:/root/.celo --entrypoint /bin/sh -it $CELO_IMAGE -c "geth account new"
 export CELO_PROXY_ADDRESS=<YOUR-PROXY-ADDRESS>
+
+docker run -v $PWD/attestations:/root/.celo --entrypoint /bin/sh -it $CELO_IMAGE -c "geth account new"
+export ATTESTATION_SIGNER_ADDRESS=<YOUR-ATTESTATION_SIGNER-ADDRESS>
 ```
 
 Those commands will prompt you for a passphrase, ask you to confirm it, and then will output your account address: `Address: {<YOUR-ACCOUNT-ADDRESS>}`
@@ -210,7 +212,7 @@ The `mine` flag does not mean the node starts mining blocks, but rather starts t
 
 The `networkid` parameter value of `1101` indicates we are connecting the Baklava Beta network.
 
-### Running the Attestation Service
+### Running the Attestation signer
 
 As part of the [lightweight identity protocol](/celo-codebase/protocol/identity), Validators are expected to run an [Attestation Service](https://github.com/celo-org/celo-monorepo/tree/master/packages/attestation-service) to provide attestations that allow users to map their phone number to an account on Celo.
 
@@ -271,9 +273,15 @@ You can see all the options using the following command:
 ./run-docker-validator-network.sh help
 ```
 
+## Get elected as validator
+
 ### Obtain and lock up some Celo Gold for staking
 
 To participate in The Great Celo Stake Off (aka TGCSO) and get fauceted it's necessary to register online via an [online form](https://docs.google.com/forms/d/e/1FAIpQLSfbn5hTJ4UIWpN92-o2qMTUB0UnrFsL0fm97XqGe4VhhN_r5A/viewform).
+
+### Submitting transactions
+
+We created the `celocli` to allow users to easily interact with the smart contracts on the command line. The `celocli` generally expects a celo node, by default we are using the RPC API interface at `http://localhost:8545`. To submit transactions, the node should have the account unlocked (the one that is usually specified with `--from`). You can specify that through the `--unlock` parameter when starting your celo node. Otherwise you can use `celocli` to unlock the account with `celocli account:unlock` (assuming you have the `personal` module enabled).
 
 ### Lock up Celo Gold
 
