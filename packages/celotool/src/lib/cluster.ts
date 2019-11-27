@@ -38,7 +38,7 @@ export async function switchToClusterFromEnv(checkOrPromptIfStagingOrProduction 
   const kubernetesClusterName = fetchEnv(envVar.KUBERNETES_CLUSTER_NAME)
   const kubernetesClusterZone = fetchEnv(envVar.KUBERNETES_CLUSTER_ZONE)
 
-  const expectedCluster = `gke_${projectName}_${kubernetesClusterName}_${kubernetesClusterName}`
+  const expectedCluster = `gke_${projectName}_${kubernetesClusterZone}_${kubernetesClusterName}`
 
   if (currentCluster === null || currentCluster.trim() !== expectedCluster) {
     await execCmdWithExitOnFailure(
