@@ -1,6 +1,6 @@
 import { AttestationState } from '@celo/contractkit/lib/wrappers/Attestations'
-import { attestToIdentifier, SignatureUtils } from '@celo/utils'
-import { isValidPrivateKey, toChecksumAddress } from '@celo/utils/lib/address'
+import { attestationMessageToSign } from '@celo/utils'
+import { toChecksumAddress } from '@celo/utils/lib/address'
 import { AddressType, E164PhoneNumberType } from '@celo/utils/lib/io'
 import Logger from 'bunyan'
 import { isValidAddress } from 'ethereumjs-util'
@@ -27,16 +27,16 @@ export const AttestationRequestType = t.type({
 
 export type AttestationRequest = t.TypeOf<typeof AttestationRequestType>
 
-export function getAttestationKey() {
+export function getAttestationSignerAddress() {
   if (
-    process.env.ATTESTATION_KEY === undefined ||
-    !isValidPrivateKey(process.env.ATTESTATION_KEY)
+    process.env.ATTESTATION_SIGNER_ADDRESS === undefined ||
+    !isValidAddress(process.env.ATTESTATION_SIGNER_ADDRESS)
   ) {
-    console.error('Did not specify valid ATTESTATION_KEY')
-    throw new Error('Did not specify valid ATTESTATION_KEY')
+    console.error('Did not specify valid ATTESTATION_SIGNER_ADDRESS')
+    throw new Error('Did not specify valid ATTESTATION_SIGNER_ADDRESS')
   }
 
-  return process.env.ATTESTATION_KEY
+  return process.env.ATTESTATION_SIGNER_ADDRESS
 }
 
 export function getAccountAddress() {
@@ -53,7 +53,7 @@ function toBase64(str: string) {
 }
 
 function createAttestationTextMessage(attestationCode: string) {
-  return `<#> ${toBase64(attestationCode)} ${process.env.APP_SIGNATURE}`
+  return `<#> celo://wallet/v/${toBase64(attestationCode)} ${process.env.APP_SIGNATURE}`
 }
 
 async function ensureLockedRecord(
@@ -141,13 +141,12 @@ class AttestationRequestHandler {
   }
 
   signAttestation() {
-    const signature = attestToIdentifier(
+    const message = attestationMessageToSign(
       this.attestationRequest.phoneNumber,
-      this.attestationRequest.account,
-      getAttestationKey()
+      this.attestationRequest.account
     )
 
-    return SignatureUtils.serializeSignature(signature)
+    return kit.web3.eth.sign(message, getAttestationSignerAddress())
   }
 
   async validateAttestation(attestationCode: string) {
@@ -252,7 +251,7 @@ export async function handleAttestationRequest(
     Counters.attestationRequestsTotal.inc()
     await handler.validateAttestationRequest()
     Counters.attestationRequestsValid.inc()
-    attestationCode = handler.signAttestation()
+    attestationCode = await handler.signAttestation()
     await handler.validateAttestation(attestationCode)
   } catch (err) {
     handler.logger.info({ err })
