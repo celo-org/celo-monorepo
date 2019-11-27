@@ -10,6 +10,7 @@ export enum Actions {
   SET_LOGGED_IN = 'APP/SET_LOGGED_IN',
   SET_NUMBER_VERIFIED = 'APP/SET_NUMBER_VERIFIED',
   SET_LANGUAGE = 'APP/SET_LANGUAGE',
+  OPEN_DEEP_LINK = 'APP/OPEN_DEEP_LINK',
   RESET_APP_OPENED_STATE = 'APP/RESET_APP_OPENED_STATE',
   ENTER_BACKUP_FLOW = 'APP/ENTER_BACKUP_FLOW',
   EXIT_BACKUP_FLOW = 'APP/EXIT_BACKUP_FLOW',
@@ -33,6 +34,11 @@ interface SetNumberVerifiedAction {
 export interface SetLanguage {
   type: Actions.SET_LANGUAGE
   language: string
+}
+
+export interface OpenDeepLink {
+  type: Actions.OPEN_DEEP_LINK
+  deepLink: string
 }
 
 interface ResetAppOpenedState {
@@ -71,6 +77,7 @@ export type ActionTypes =
   | SetNumberVerifiedAction
   | ResetAppOpenedState
   | SetLanguage
+  | OpenDeepLink
   | EnterBackupFlow
   | ExitBackupFlow
   | SetAnalyticsEnabled
@@ -98,6 +105,13 @@ export const setLanguage = (language: string, nextScreen?: Screens) => {
   return {
     type: Actions.SET_LANGUAGE,
     language,
+  }
+}
+
+export const openDeepLink = (deepLink: string) => {
+  return {
+    type: Actions.OPEN_DEEP_LINK,
+    deepLink,
   }
 }
 
