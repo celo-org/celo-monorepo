@@ -1,7 +1,7 @@
 {
   "requests": "Requests",
   "empty": "You have no Payment Requests",
-  "incomingPaymentRequests": "Requests Waiting For You",
+  "incomingPaymentRequests": "Requests Waiting on You",
   "outgoingPaymentRequests": "Payments You’ve Requested",
   "celoDollarBalance": "{{CeloDollar}} Balance",
   "pay": "Pay",

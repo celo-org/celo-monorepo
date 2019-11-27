@@ -1,10 +1,13 @@
 {
   "requests": "Solicitudes",
   "empty": "No tienes solicitudes de pago",
-  "paymentRequests": "Solicitudes de pago",
+  "incomingPaymentRequests": "Pedidos esperandote",
+  "outgoingPaymentRequests": "Pagos que tu has pedido",
   "celoDollarBalance": "Saldo de {{CeloDollar}}",
   "pay": "Paga",
   "decline": "Disminución",
+  "remind": "Recordar",
+  "cancel": "Cancelar",
   "requestDeclined": "Solicitud rechazada",
   "requestPaid": "Solicitud Pagada"
 }
