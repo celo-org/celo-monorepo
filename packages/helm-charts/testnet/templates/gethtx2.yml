@@ -1,0 +1,7 @@
+{{ if eq (.Values.geth.tx_nodes | toString) "og" }}
+{{ template "celo.tx-deployment" (dict "Values" .Values "Release" .Release "Files" .Files "Chart" .Chart "node_name" "gethtx2" ) }}
+---
+{{ template "celo.node-pvc" dict "Values" .Values "Release" .Release "Chart" .Chart "pvc_name" "gethtx2-pvc" }}
+---
+{{ template "celo.tx-service" (dict "Values" .Values "Release" .Release "Files" .Files "Chart" .Chart "node_name" "gethtx2" "loadbalancer_ip" .Values.geth.tx.gethtx2.loadBalancerIp) }}
+{{ end }}

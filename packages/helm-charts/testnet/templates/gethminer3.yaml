@@ -1,0 +1,5 @@
+{{ if eq (.Values.geth.validators | toString) "og" }}
+{{ template "celo.miner-deployment" (dict "Values" .Values "Release" .Release "Files" .Files "Chart" .Chart "Node" .Values.geth.account.gethminer3 ) }}
+---
+{{ template "celo.node-pvc" dict "Values" .Values "Release" .Release "Chart" .Chart "pvc_name" "gethminer3-pvc" }}
+{{ end }}
