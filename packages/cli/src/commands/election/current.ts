@@ -24,7 +24,7 @@ export default class ElectionCurrent extends BaseCommand {
       address: {},
       name: {},
       affiliation: {},
-      score: {},
+      score: { get: (v) => v.score.toFixed() },
       ecdsaPublicKey: {},
       blsPublicKey: {},
     })
