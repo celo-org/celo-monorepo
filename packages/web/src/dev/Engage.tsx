@@ -16,7 +16,7 @@ import { ScreenProps, ScreenSizes, withScreenSize } from 'src/layout/ScreenSize'
 import AspectRatio from 'src/shared/AspectRatio'
 import Button, { BTN, SIZE } from 'src/shared/Button.3'
 import { CeloLinks } from 'src/shared/menu-items'
-import { fonts, standardStyles, textStyles } from 'src/styles'
+import { fonts, standardStyles } from 'src/styles'
 
 const Engage = React.memo(function _Engage({ t, screen }: I18nProps & ScreenProps) {
   return (

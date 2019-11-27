@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { View, StyleSheet } from 'react-native'
+import { StyleSheet, View } from 'react-native'
 import Cover from 'src/dev/Cover'
 import Engage from 'src/dev/Engage'
 import Features from 'src/dev/Features'
