@@ -56,11 +56,9 @@ spec:
           - |
             [[ $REPLICA_NAME =~ -([0-9]+)$ ]] || exit 1
             RID=${BASH_REMATCH[1]}
-            echo -n $RID >/root/.celo/replica_id
-            echo "Generating private key for rid=$RID"
-            celotooljs.sh generate bip32 --mnemonic "$MNEMONIC" --accountType validator --index $RID > /root/.celo/pkey
+            echo -n $RID > /root/.celo/replica_id
             echo 'Generating address'
-            celotooljs.sh generate account-address --private-key `cat /root/.celo/pkey` > /root/.celo/address
+            celotooljs.sh generate account-address --mnemonic "$MNEMONIC" --accountType validator --index $RID > /root/.celo/address
             if [ -z $IP_ADDRESSES ]; then
               echo $POD_IP > /root/.celo/ipAddress
             else
@@ -104,13 +102,20 @@ spec:
         args:
         - "-c"
         - |
-          geth account import --password /root/.celo/account/accountSecret /root/.celo/pkey || true
+          PRIVATE_KEY=$(celotooljs.sh generate bip32 --mnemonic "$MNEMONIC" --accountType validator --index $(cat /root/.celo/replica_id))
+          geth account import --password /root/.celo/account/accountSecret <(echo -n $PRIVATE_KEY) || true
         volumeMounts:
         - name: data
           mountPath: /root/.celo
         - name: account
           mountPath: "/root/.celo/account"
           readOnly: true
+        env:
+        - name: MNEMONIC
+          valueFrom:
+            secretKeyRef:
+              name: {{ template "ethereum.fullname" . }}-geth-account
+              key: mnemonic
       containers:
       - name: geth
         image: {{ .Values.geth.image.repository }}:{{ .Values.geth.image.tag }}
