@@ -35,7 +35,7 @@ resource "google_compute_address" "attestation_service_internal" {
 
 resource "google_compute_instance" "attestation_service" {
   count        = var.deploy_attestation_service ? 1 : 0
-  name         = "${local.name_prefix}"
+  name         = "${local.name_prefix}-instance"
   machine_type = "n1-standard-1"
 
   tags = ["${var.celo_env}-attestation-service"]

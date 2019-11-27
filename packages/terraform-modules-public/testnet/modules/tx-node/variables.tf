@@ -14,7 +14,7 @@ variable celo_env {
 }
 
 variable ethstats_host {
-  type        = "string"
+  type        = string
   description = "Ethstats url or IP address"
 }
 
