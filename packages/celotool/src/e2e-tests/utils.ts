@@ -445,11 +445,7 @@ async function connectValidatorPeers(gethConfig: GethTestConfig) {
         new Admin(`${wsport ? 'ws' : 'http'}://localhost:${wsport || rpcport}`)
     )
   const enode = (await admins[0].getNodeInfo()).enode
-  await Promise.all(
-    admins.slice(1).map((admin) => {
-      admin.addPeer(enode)
-    })
-  )
+  await Promise.all(admins.slice(1).map((admin) => admin.addPeer(enode)))
 }
 
 export function getContext(gethConfig: GethTestConfig) {
