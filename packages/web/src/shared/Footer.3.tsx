@@ -10,10 +10,10 @@ import TwiterLogo from 'src/icons/TwitterLogo'
 import { Cell, GridRow, Spans } from 'src/layout/GridRow'
 import RingsGlyph from 'src/logos/RingsGlyph'
 import Button, { BTN } from 'src/shared/Button.3'
+import InlineAnchor from 'src/shared/InlineAnchor'
 import menu, { CeloLinks } from 'src/shared/menu-items'
 import Responsive from 'src/shared/Responsive'
 import { colors, fonts, standardStyles, textStyles } from 'src/styles'
-
 const menuItems = [menu.HOME, menu.ABOUT_US, menu.JOBS, menu.BUILD, menu.COMMUNITY]
 
 interface Props {
@@ -141,7 +141,7 @@ const Details = React.memo(function _Details({ t }: { t: I18nProps['t'] }) {
       <Responsive medium={[textStyles.left, styles.detailsText, fonts.legal]}>
         <Text style={[textStyles.center, styles.detailsText, fonts.legal]}>
           <Trans i18nKey={'footerReadMoreTerms'}>
-            <LinkButon>Terms of Service</LinkButon>
+            <InlineAnchor href={menu.TERMS.link}>Terms of Service</InlineAnchor>
           </Trans>
         </Text>
       </Responsive>
@@ -151,10 +151,6 @@ const Details = React.memo(function _Details({ t }: { t: I18nProps['t'] }) {
     </View>
   )
 })
-
-function LinkButon({ children }) {
-  return <Button kind={BTN.INLINE} href={menu.TERMS.link} text={children} style={fonts.legal} />
-}
 
 const styles = StyleSheet.create({
   social: {

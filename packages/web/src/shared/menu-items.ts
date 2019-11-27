@@ -16,7 +16,7 @@ export const menuItems = {
     link: '/build',
   },
   BRAND: {
-    name: 'Brand Kit',
+    name: 'Experience - Brand Kit',
     link: '/experience/brand',
   },
   COMMUNITY: {
@@ -46,6 +46,10 @@ export const menuItems = {
   TWITTER: {
     name: 'Twitter',
     link: 'https://twitter.com/CeloHQ',
+  },
+  CODE_OF_CONDUCT: {
+    name: 'Code of Conduct',
+    link: '/code-of-conduct',
   },
 }
 
