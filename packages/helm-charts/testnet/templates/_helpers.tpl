@@ -158,3 +158,232 @@ spec:
         fieldRef:
           fieldPath: metadata.namespace
 {{- end -}}
+
+{{- define "celo.miner-deployment" -}}
+apiVersion: apps/v1beta2
+kind: Deployment
+metadata:
+  name: {{ template "ethereum.fullname" . }}-{{ .Node.name }}
+  labels:
+{{ include "standard.labels" .  | indent 4 }}
+    component: {{ .Node.name }}
+    type: sealer
+spec:
+  strategy:
+    type: Recreate
+  replicas: {{ .Values.geth.miner.replicaCount }}
+  selector:
+    matchLabels:
+{{ include "standard.short_labels" .  | indent 6 }}
+      component: {{ .Node.name }}
+      type: sealer
+  template:
+    metadata:
+      labels:
+{{ include "standard.short_labels" .  | indent 8 }}
+        component: {{ .Node.name }}
+        type: sealer
+    spec:
+      containers:
+      - name: geth
+        image: {{ .Values.geth.image.repository }}:{{ .Values.geth.image.tag }}
+        imagePullPolicy: {{ .Values.imagePullPolicy }}
+        command: ["/bin/sh"]
+        args:
+        - "-c"
+        - "geth --bootnodes=`cat /root/.celo/bootnodes` \
+          --consoleformat=json \
+          --consoleoutput=stdout \
+          --etherbase=${ACCOUNT_ADDRESS} \
+          --ethstats=${HOSTNAME}@${ETHSTATS_SVC} \
+          --metrics \
+          --mine \
+          --networkid=${NETWORK_ID} \
+          --password=/root/.celo/account/accountSecret \
+          --rpc \
+          --rpcaddr 0.0.0.0 \
+          --rpcapi=eth,net,web3,debug,txpool \
+          --rpccorsdomain=* \
+          --rpcvhosts=* \
+          --syncmode=full \
+          --unlock=${ACCOUNT_ADDRESS} \
+          --verbosity={{ .Values.geth.verbosity }} \
+          --ws \
+          --wsaddr 0.0.0.0 \
+          --wsapi=eth,net,web3,debug,txpool \
+          --wsorigins=*"
+        ports:
+        - name: discovery-udp
+          containerPort: 30303
+          protocol: UDP
+        - name: discovery-tcp
+          containerPort: 30303
+        - name: rpc
+          containerPort: 8545
+        - name: ws
+          containerPort: 8546
+        resources:
+          requests:
+            memory: {{ .Values.geth.node.memory_request }}
+            cpu: {{ .Values.geth.node.cpu_request }}
+        volumeMounts:
+        - name: data
+          mountPath: /root/.celo
+        - name: account
+          readOnly: true
+          mountPath: /root/.celo/account
+        - name: config
+          mountPath: /var/geth
+        env:
+        - name: ETHSTATS_SVC
+          value: {{ template "ethereum.fullname" . }}-ethstats.{{ .Release.Namespace }}
+        - name: ACCOUNT_ADDRESS
+          value: {{ .Node.address }}
+        - name: NETWORK_ID
+          valueFrom:
+            configMapKeyRef:
+              name: {{ template "ethereum.fullname" . }}-geth-config
+              key: networkid
+{{ include "celo.geth-exporter-container" .  | indent 6 }}
+{{ include "celo.prom-to-sd-container" (dict "Values" .Values "Release" .Release "Chart" .Chart "component" "geth" "metricsPort" "9200" "metricsPath" "filteredmetrics" "containerNameLabel" .Node.name )  | indent 6 }}
+      initContainers:
+{{ include "celo.init-genesis-container" .  | indent 6 }}
+{{ include "celo.get-bootnodes-container" .  | indent 6 }}
+      - name: import-geth-account
+        image: {{ .Values.geth.image.repository }}:{{ .Values.geth.image.tag }}
+        imagePullPolicy: {{ .Values.imagePullPolicy }}
+        command: ["/bin/sh"]
+        args:
+        - "-c"
+        - "geth account import --password /root/.celo/account/accountSecret /root/.celo/account/{{ .Node.name}}PrivateKey || true"
+        volumeMounts:
+        - name: data
+          mountPath: /root/.celo
+        - name: account
+          readOnly: true
+          mountPath: /root/.celo/account
+{{ include "celo.node-volumes" (dict "Values" .Values "Release" .Release "Chart" .Chart "node_prefix" .Node.name)  | indent 6 }}
+    {{- with .Values.nodeSelector }}
+      nodeSelector:
+{{ toYaml . | indent 8 }}
+    {{- end -}}
+{{- end -}}
+
+{{- define "celo.tx-deployment" -}}
+apiVersion: apps/v1beta2
+kind: Deployment
+metadata:
+  name: {{ template "ethereum.fullname" . }}-{{ .node_name }}
+  labels:
+{{ include "standard.labels" .  | indent 4 }}
+    component: {{ .node_name }}
+spec:
+  strategy:
+    type: Recreate
+  replicas: {{ .Values.geth.tx.replicaCount }}
+  selector:
+    matchLabels:
+{{ include "standard.short_labels" .  | indent 6 }}
+      component: {{ .node_name }}
+  template:
+    metadata:
+      labels:
+{{ include "standard.short_labels" .  | indent 8 }}
+        component: {{ .node_name }}
+    spec:
+      containers:
+      - name: geth
+        image: {{ .Values.geth.image.repository }}:{{ .Values.geth.image.tag }}
+        imagePullPolicy: {{ .Values.imagePullPolicy }}
+        command: ["/bin/sh"]
+        args:
+        - "-c"
+        - "geth --bootnodes=`cat /root/.celo/bootnodes` \
+          --consoleformat=json \
+          --consoleoutput=stdout \
+          --ethstats=${HOSTNAME}@${ETHSTATS_SVC} \
+          --lightpeers 250 \
+          --lightserv 90 \
+          --metrics \
+          --networkid=${NETWORK_ID} \
+          --nodekey=/root/.celo/account/{{ .node_name }}NodeKey \
+          --rpc \
+          --rpcaddr 0.0.0.0 \
+          --rpcapi=eth,net,web3,debug,txpool \
+          --rpccorsdomain=* \
+          --rpcvhosts=* \
+          --targetgaslimit=${TARGET_GAS_LIMIT} \
+          --verbosity={{ .Values.geth.verbosity }} \
+          --ws \
+          --wsaddr 0.0.0.0 \
+          --wsapi=eth,net,web3,debug,txpool \
+          --wsorigins=*"
+        ports:
+        - name: discovery-udp
+          containerPort: 30303
+          protocol: UDP
+        - name: discovery-tcp
+          containerPort: 30303
+        - name: rpc
+          containerPort: 8545
+        - name: ws
+          containerPort: 8546
+        resources:
+          requests:
+            memory: {{ .Values.geth.node.memory_request }}
+            cpu: {{ .Values.geth.node.cpu_request }}
+        volumeMounts:
+        - name: data
+          mountPath: /root/.celo
+        - name: account
+          readOnly: true
+          mountPath: /root/.celo/account
+        env:
+        - name: ETHSTATS_SVC
+          value: {{ template "ethereum.fullname" . }}-ethstats.{{ .Release.Namespace }}
+        - name: TARGET_GAS_LIMIT
+          value: {{ .Values.geth.genesis.gasLimit | quote }}
+        - name: NETWORK_ID
+          valueFrom:
+            configMapKeyRef:
+              name: {{ template "ethereum.fullname" . }}-geth-config
+              key: networkid
+{{ include "celo.geth-exporter-container" .  | indent 6 }}
+{{ include "celo.prom-to-sd-container" (dict "Values" .Values "Release" .Release "Chart" .Chart "component" "geth" "metricsPort" "9200" "metricsPath" "filteredmetrics" "containerNameLabel" .node_name)  | indent 6 }}
+      initContainers:
+{{ include "celo.init-genesis-container" .  | indent 6 }}
+{{ include "celo.get-bootnodes-container" .  | indent 6 }}
+{{ include "celo.node-volumes" (dict "Values" .Values "Release" .Release "Chart" .Chart "node_prefix" .node_name) | indent 6 }}
+    {{- with .Values.nodeSelector -}}
+      nodeSelector:
+{{ toYaml . | indent 8 }}
+    {{- end -}}
+{{- end -}}
+
+{{- define "celo.tx-service" -}}
+kind: Service
+apiVersion: v1
+metadata:
+  name: {{ template "ethereum.fullname" . }}-{{ .node_name }}
+  labels:
+    app: {{ template "ethereum.name" . }}
+    chart: {{ template "ethereum.chart" . }}
+    release: {{ .Release.Name }}
+    heritage: {{ .Release.Service }}
+    component: {{ .node_name }}
+spec:
+  selector:
+    app: {{ template "ethereum.name" . }}
+    release: {{ .Release.Name }}
+    component: {{ .node_name }}
+  type: LoadBalancer
+  loadBalancerIP: {{ .loadbalancer_ip }}
+  sessionAffinity: ClientIP
+  ports:
+  - name: discovery
+    port: 30303
+  - name: rpc
+    port: 8545
+  - name: ws
+    port: 8546
+{{- end -}}
