@@ -265,7 +265,11 @@ Let's connect the validator to the proxy:
 
 ### Connect the Validator to the Proxy
 
-TODO: Kevin to fill in here properly
+When starting up your validator, it will attempt to create a network connection between the validator machine and the proxy machine.  You will need make sure that your proxy machine has the appropriate firewall settings to allow the validator to connect to it.
+
+Specifically, on the proxy machine, port 30303 should allow TCP and UDP connections from all ip addresses.  And port 30503 should allow TCP connections from the IP address of your validator machine.
+
+Once that it completed, go ahead an run the validator.
 
 ```bash
 # On the validator machine
