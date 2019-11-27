@@ -40,12 +40,15 @@ export function getAttestationSignerAddress() {
 }
 
 export function getAccountAddress() {
-  if (process.env.ACCOUNT_ADDRESS === undefined || !isValidAddress(process.env.ACCOUNT_ADDRESS)) {
-    console.error('Did not specify valid ACCOUNT_ADDRESS')
-    throw new Error('Did not specify valid ACCOUNT_ADDRESS')
+  if (
+    process.env.CELO_VALIDATOR_ADDRESS === undefined ||
+    !isValidAddress(process.env.CELO_VALIDATOR_ADDRESS)
+  ) {
+    console.error('Did not specify valid CELO_VALIDATOR_ADDRESS')
+    throw new Error('Did not specify valid CELO_VALIDATOR_ADDRESS')
   }
 
-  return toChecksumAddress(process.env.ACCOUNT_ADDRESS)
+  return toChecksumAddress(process.env.CELO_VALIDATOR_ADDRESS)
 }
 
 function toBase64(str: string) {

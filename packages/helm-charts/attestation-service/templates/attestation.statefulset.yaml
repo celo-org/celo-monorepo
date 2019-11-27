@@ -131,7 +131,7 @@ spec:
         - |
           yarn db:migrate
           sleep 5
-          ATTESTATION_SIGNER_ADDRESS=`cat /root/.celo/attestationSignerAddress` ACCOUNT_ADDRESS=`cat /root/.celo/address` yarn start
+          ATTESTATION_SIGNER_ADDRESS=`cat /root/.celo/attestationSignerAddress` CELO_VALIDATOR_ADDRESS=`cat /root/.celo/address` yarn start
         ports:
         - name: http
           containerPort: 3000
