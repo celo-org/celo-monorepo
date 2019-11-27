@@ -18,8 +18,18 @@ export async function handleExchangeQuery() {
     getExchangeRate(CURRENCY_ENUM.GOLD, contractKitInstance),
   ])
 
-  writeExchangeRatePair(CURRENCY_ENUM.DOLLAR, dollarMakerRate.toString(), fetchTime)
-  writeExchangeRatePair(CURRENCY_ENUM.GOLD, goldMakerRate.toString(), fetchTime)
+  writeExchangeRatePair(
+    CURRENCY_ENUM.GOLD,
+    CURRENCY_ENUM.DOLLAR,
+    dollarMakerRate.toString(),
+    fetchTime
+  )
+  writeExchangeRatePair(
+    CURRENCY_ENUM.DOLLAR,
+    CURRENCY_ENUM.GOLD,
+    goldMakerRate.toString(),
+    fetchTime
+  )
 }
 
 async function getExchangeRate(makerToken: CURRENCY_ENUM, contractKitInstance: ContractKit) {
