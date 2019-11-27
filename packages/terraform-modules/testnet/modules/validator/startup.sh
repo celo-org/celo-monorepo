@@ -89,7 +89,7 @@ docker run -v $DATA_DIR:$DATA_DIR --name geth --net=host --entrypoint /bin/sh -d
     echo -n '$GETH_ACCOUNT_SECRET' > $DATA_DIR/account/accountSecret && \
     geth init /var/geth/genesis.json
   ) && ( \
-    TMP_PRIVATE_KEY_FILE=$(mktemp) \
+    TMP_PRIVATE_KEY_FILE=$(mktemp) && \
     echo -n $PRIVATE_KEY > $TMP_PRIVATE_KEY_FILE && \
     geth account import --password $DATA_DIR/account/accountSecret $TMP_PRIVATE_KEY_FILE && \
     rm $TMP_PRIVATE_KEY_FILE ; \
