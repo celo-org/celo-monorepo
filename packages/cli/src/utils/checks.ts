@@ -8,12 +8,18 @@ import { BaseCommand } from '../base'
 
 export interface CommandCheck {
   name: string
+  errorMessage?: string
   run(): Promise<boolean> | boolean
 }
 
-export function check(name: string, predicate: () => Promise<boolean> | boolean): CommandCheck {
+export function check(
+  name: string,
+  predicate: () => Promise<boolean> | boolean,
+  errorMessage?: string
+): CommandCheck {
   return {
     name,
+    errorMessage,
     run: predicate,
   }
 }
@@ -63,7 +69,7 @@ class CheckBuilder {
     }
   }
 
-  addCheck(name: string, predicate: () => Promise<boolean> | boolean) {
+  addCheck(name: string, predicate: () => Promise<boolean> | boolean, errorMessage?: string) {
     this.checks.push(check(name, predicate))
     return this
   }
@@ -130,7 +136,11 @@ class CheckBuilder {
     )
 
   isAccount = (address: Address) =>
-    this.addCheck(`${address} is Account`, this.withAccounts((accs) => accs.isAccount(address)))
+    this.addCheck(
+      `${address} is Account`,
+      this.withAccounts((accs) => accs.isAccount(address)),
+      `${address} is not registered as an account. Try running account:register`
+    )
 
   hasEnoughGold = (account: Address, value: BigNumber) => {
     const valueInEth = this.kit.web3.utils.fromWei(value.toFixed(), 'ether')
