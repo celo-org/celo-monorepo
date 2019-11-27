@@ -84,6 +84,16 @@ export class ValidatorsWrapper extends BaseWrapper<Validators> {
   }
 
   /**
+   * Returns the Locked Gold requirements for specific account.
+   * @returns The Locked Gold requirements for a specific account.
+   */
+  getAccountLockedGoldRequirement = proxyCall(
+    this.contract.methods.getAccountLockedGoldRequirement,
+    undefined,
+    toBigNumber
+  )
+
+  /**
    * Returns current configuration parameters.
    */
   async getConfig(): Promise<ValidatorsConfig> {
