@@ -40,7 +40,7 @@ $ cd celo-data-dir
 
 ## **Create an account and get its address**
 
-In this step, you'll create an account on the network. If you've already done this and have an account address, you can skip this and move on to step 3.
+In this step, you'll create an account on the network. If you've already done this and have an account address, you can skip this and move on to configuring the node.
 
 Run the command to create a new account:
 
@@ -48,7 +48,7 @@ Run the command to create a new account:
 
 It will prompt you for a passphrase, ask you to confirm it, and then will output your account address: `Address: {<YOUR-ACCOUNT-ADDRESS>}`
 
-Save this address to an environment variables, so that you can reference it below (don't include the braces):
+Save this address to an environment variable (don't include the braces). You'll reference it when you'll start the node.
 
 `$ export CELO_ACCOUNT_ADDRESS=<YOUR-ACCOUNT-ADDRESS>`
 
