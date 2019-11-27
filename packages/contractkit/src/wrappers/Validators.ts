@@ -18,6 +18,7 @@ import {
 } from './BaseWrapper'
 
 export interface Validator {
+  name: string
   address: Address
   ecdsaPublicKey: string
   blsPublicKey: string
@@ -190,7 +191,10 @@ export class ValidatorsWrapper extends BaseWrapper<Validators> {
   /** Get Validator information */
   async getValidator(address: Address): Promise<Validator> {
     const res = await this.contract.methods.getValidator(address).call()
+    const accounts = await this.kit.contracts.getAccounts()
+    const name = (await accounts.getName(address)) || ''
     return {
+      name,
       address,
       // @ts-ignore Incorrect type for bytes
       ecdsaPublicKey: res.ecdsaPublicKey,
