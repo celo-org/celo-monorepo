@@ -174,7 +174,7 @@ class Page extends React.Component<Props & ScreenProps, State> {
     return (
       <View style={styles.conatiner} ref={this.pageRef}>
         <View style={styles.topbar}>
-          <Topbar />
+          <Topbar isMobile={isMobile} />
         </View>
         <View style={{ marginTop: 70 }} />
         {isMobile && (
@@ -194,7 +194,10 @@ class Page extends React.Component<Props & ScreenProps, State> {
             )}
           </Cell>
           <Cell span={Spans.three4th}>
-            <View style={styles.childrenArea} ref={this.pageRef}>
+            <View
+              style={[styles.childrenArea, !isMobile && styles.childrenAreaDesktop]}
+              ref={this.pageRef}
+            >
               {sections.map(({ id, children }) => {
                 return (
                   <View key={id} nativeID={id} ref={this.sectionRefs[id]}>
@@ -226,7 +229,11 @@ const styles = StyleSheet.create({
   },
   footer: { zIndex: -10, backgroundColor: colors.white },
   childrenArea: {
-    minHeight: `calc(100vh - ${HEADER_HEIGHT + 70}px)`,
+    minHeight: `calc(100vh - ${HEADER_HEIGHT}px)`,
+  },
+  childrenAreaDesktop: {
+    // Design calls for *baseline* of text Title to match that of intro on side nav
+    transform: [{ translateY: -25 }],
   },
 })
 

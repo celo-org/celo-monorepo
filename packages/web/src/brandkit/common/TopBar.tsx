@@ -7,14 +7,21 @@ import Button, { BTN } from 'src/shared/Button.3'
 import menuItems, { CeloLinks } from 'src/shared/menu-items'
 import { colors, fonts, standardStyles } from 'src/styles'
 
-export default withNamespaces(NameSpaces.common)(function TopBar({ t }: I18nProps) {
+interface Props {
+  isMobile: boolean
+}
+
+export default withNamespaces(NameSpaces.common)(function TopBar({
+  t,
+  isMobile,
+}: I18nProps & Props) {
   return (
     <View style={[brandStyles.bottomBorder, standardStyles.centered]}>
       <View style={[standardStyles.row, styles.container]}>
         <a href={menuItems.BRAND.link}>
           <TouchableOpacity style={standardStyles.row}>
             <LogoLightBg height={30} />
-            <Text style={[fonts.h3, styles.title]}>Brand Kit</Text>
+            {!isMobile && <Text style={[fonts.h3, styles.title]}>Brand Kit</Text>}
           </TouchableOpacity>
         </a>
         <Button
