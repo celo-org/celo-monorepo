@@ -5,7 +5,7 @@ import { H1, H4 } from 'src/fonts/Fonts'
 import { standardStyles } from 'src/styles'
 
 interface Props {
-  headline: string
+  headline?: string
   title: string
   style?: ViewStyle
 }
@@ -14,7 +14,7 @@ export default React.memo(function PageHeadline({ headline, title, style }: Prop
   return (
     <View style={[brandStyles.gap, style]}>
       <H1 style={standardStyles.elementalMarginBottom}>{title}</H1>
-      <H4>{headline}</H4>
+      {headline && <H4>{headline}</H4>}
     </View>
   )
 })

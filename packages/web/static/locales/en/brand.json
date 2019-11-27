@@ -41,15 +41,20 @@
       "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Pellentesque eget dignissim justo. Integer ac sodales dolor, quis aliquet nisi. Donec eget mattis neque, eu ultricies diam.",
     "primaries": "Primary Brand Colors",
     "primariesText":
-      "Our primary brand colors are green, gold, dark (name?), and white. They are used to provide accessibility, simplicity, and consistency throughout all brand communications.",
+      "Primary brand colors are Celo Green, Celo Gold, Celo Dark, and Celo Light.\n\nCelo Green is used to denote value and action including communication and applications of the cUSD. Celo Gold is used more often when speaking to actions related to cGLD like validation, proof of stake, and governance.\n\nCelo Dark and Celo Light are high contrast complementary colors, interchangeably switching between background and typography. Celo Dark has a tendency to represent technical content while Celo Light represents non-technical topics.",
+    "accents": "Accent Colors",
+    "accentsText":
+      "Accent colors include violet, red, cyan, and blue.\n\nViolet, red, and cyan are colors that often represent alternative coins, projects, and personas in the ecosystem.\n\nBlue represents help within digital experiences like websites and mobile applications.",
+    "grays": "Grays",
+    "graysText":
+      "Grays are used when hierarchy needs to be established. Use grays to visually communicate intended ranking of importance in Typography or UI.",
     "backgroundTitle": "Background Colors",
     "backgroundText":
-      "Common background colors lorem ipsum dolor sit amet, consectetur adipiscing elit. Ut id elit sapien. Sed sem ante, ornare a ipsum ut, consequat ullamcorper lorem.",
-    "contrastTitle": "Contrast",
+      "Background colors function as canvases in which accent and brand colors can punctuate layout compositions.",
+    "contrast": "Contrast",
     "contrastText":
-      "General lorem ipsum dolor sit amet, consectetur adipiscing elit. Ut id elit sapien. Sed sem ante, ornare a ipsum ut, consequat ullamcorper lorem.",
-    "contrastText2":
-      "General lorem ipsum dolor sit amet, consectetur adipiscing elit. Ut id elit sapien. Sed sem ante, ornare a ipsum ut, consequat ullamcorper lorem."
+      "For accessibility, choose high contrast color combinations when laying out text.",
+    "contrastText2": "For best results, we recommend following these dos and don’ts:"
   },
   "typography": {
     "title": "Typography",

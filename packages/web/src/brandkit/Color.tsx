@@ -33,11 +33,7 @@ export default React.memo(function Color() {
 const Overview = withNamespaces(NameSpaces.brand)(function _Overview({ t }: I18nProps) {
   return (
     <View>
-      <PageHeadline
-        title={t('color.title')}
-        headline={t('color.headline')}
-        style={standardStyles.blockMarginBottom}
-      />
+      <PageHeadline title={t('color.title')} style={standardStyles.blockMarginBottom} />
       <Palette
         title={t('color.primaries')}
         text={t('color.primariesText')}
@@ -58,7 +54,7 @@ const Backgrounds = withNamespaces(NameSpaces.brand)(
         <SectionTitle containerStyle={brandStyles.gap}>{t('color.backgroundTitle')}</SectionTitle>
         <Palette text={t('color.backgroundText')} colors={BACKGROUND_PALETTE} />
         <Text style={[brandStyles.gap, fonts.h5a, standardStyles.elementalMarginBottom]}>
-          {t('color.contrastTitle')}
+          {t('color.contrast')}
         </Text>
         <Text style={[brandStyles.gap, fonts.p]}>{t('color.contrastText')}</Text>
         <View style={[standardStyles.elementalMargin, standardStyles.row]}>
