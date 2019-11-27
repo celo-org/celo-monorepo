@@ -8,7 +8,7 @@ export enum CeloContract {
   EpochRewards = 'EpochRewards',
   Escrow = 'Escrow',
   Exchange = 'Exchange',
-  GasCurrencyWhitelist = 'GasCurrencyWhitelist',
+  FeeCurrencyWhitelist = 'FeeCurrencyWhitelist',
   GasPriceMinimum = 'GasPriceMinimum',
   GoldToken = 'GoldToken',
   Governance = 'Governance',

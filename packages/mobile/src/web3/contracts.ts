@@ -56,7 +56,7 @@ function getIpcProvider() {
   return ipcProvider
 }
 
-function getWebSocketProvider(url: string): Provider {
+function getHttpProvider(url: string): Provider {
   Logger.debug(tag, 'creating HttpProvider...')
   const provider = new Web3.providers.HttpProvider(url)
   Logger.debug(tag, 'created HttpProvider')
@@ -77,7 +77,7 @@ function getWeb3(): Web3 {
     // Geth free mode
     const url = DEFAULT_FORNO_URL
     Logger.debug(`${tag}@getWeb3`, `Connecting to url ${url}`)
-    return new Web3(getWebSocketProvider(url))
+    return new Web3(getHttpProvider(url))
   } else {
     return new Web3(getIpcProvider())
   }
@@ -86,7 +86,7 @@ function getWeb3(): Web3 {
 // Mutates web3 with new provider
 export function switchWeb3ProviderForSyncMode(zeroSync: boolean) {
   if (zeroSync) {
-    web3.setProvider(getWebSocketProvider(DEFAULT_FORNO_URL))
+    web3.setProvider(getHttpProvider(DEFAULT_FORNO_URL))
     Logger.info(`${tag}@switchWeb3ProviderForSyncMode`, `Set provider to ${DEFAULT_FORNO_URL}`)
   } else {
     web3.setProvider(getIpcProvider())

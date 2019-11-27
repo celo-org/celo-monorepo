@@ -35,6 +35,8 @@ e2e-defaults: &e2e-defaults
   <<: *defaults
   docker:
     - image: celohq/circleci
+  environment:
+    CELO_BLOCKCHAIN_BRANCH_TO_TEST: master
 
 general:
   artifacts:
@@ -44,6 +46,8 @@ general:
 jobs:
   install_dependencies:
     <<: *defaults
+    # Source: https://circleci.com/docs/2.0/configuration-reference/#resource_class
+    resource_class: medium+
     steps:
       - restore_cache:
           keys:
@@ -251,7 +255,7 @@ jobs:
           name: Run test itself
 
           command: |
-            cd ~/src/packages/mobile 
+            cd ~/src/packages/mobile
             # detox sometimes without releasing the terminal and thus making the CI timout
             # 480s = 8 minutes
             timeout 480 yarn test:detox || echo "failed, try again"
@@ -398,7 +402,7 @@ jobs:
       - run:
           name: Generate DevChain
           command: |
-            (cd packages/contractkit && yarn test:prepare)
+            (cd packages/contractkit && yarn test:reset)
       - run:
           name: Run Tests
           command: yarn --cwd=packages/contractkit test
@@ -525,7 +529,7 @@ jobs:
           command: |
             set -e
             cd packages/celotool
-            ./ci_test_transfers.sh checkout master
+            ./ci_test_transfers.sh checkout ${CELO_BLOCKCHAIN_BRANCH_TO_TEST}
 
   end-to-end-geth-blockchain-parameters-test:
     <<: *e2e-defaults
@@ -543,7 +547,7 @@ jobs:
           command: |
             set -e
             cd packages/celotool
-            ./ci_test_blockchain_parameters.sh checkout master
+            ./ci_test_blockchain_parameters.sh checkout ${CELO_BLOCKCHAIN_BRANCH_TO_TEST}
 
   end-to-end-geth-governance-test:
     <<: *e2e-defaults
@@ -563,7 +567,7 @@ jobs:
           command: |
             set -e
             cd packages/celotool
-            ./ci_test_governance.sh checkout master
+            ./ci_test_governance.sh checkout ${CELO_BLOCKCHAIN_BRANCH_TO_TEST}
 
   end-to-end-geth-sync-test:
     <<: *e2e-defaults
@@ -582,7 +586,7 @@ jobs:
           command: |
             set -e
             cd packages/celotool
-            ./ci_test_sync.sh checkout master
+            ./ci_test_sync.sh checkout ${CELO_BLOCKCHAIN_BRANCH_TO_TEST}
 
   end-to-end-geth-validator-order-test:
     <<: *e2e-defaults
@@ -600,7 +604,7 @@ jobs:
           command: |
             set -e
             cd packages/celotool
-            ./ci_test_validator_order.sh checkout master
+            ./ci_test_validator_order.sh checkout ${CELO_BLOCKCHAIN_BRANCH_TO_TEST}
 
   web:
     working_directory: ~/app

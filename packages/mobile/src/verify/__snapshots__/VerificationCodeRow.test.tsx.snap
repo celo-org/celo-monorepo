@@ -1,6 +1,6 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`VerificationCodeRow renders correctly when code accepted 1`] = `
+exports[`VerificationCodeRow renders correctly for accepted code 1`] = `
 <View
   style={
     Object {
@@ -25,7 +25,7 @@ exports[`VerificationCodeRow renders correctly when code accepted 1`] = `
       }
     }
   >
-    q4BJuVrALpiaroth/dwQ/ps6w8auvNPmi+SVVwstPaFaq8aRq4jeaWSPmI+rZTrJQ/Z0BOUyz9EBNif1Y2XzZQE=
+    q4BJuVrALpiaroth/dwQ/ps6w...
   </Text>
   <View
     style={
@@ -71,41 +71,11 @@ exports[`VerificationCodeRow renders correctly when code accepted 1`] = `
 </View>
 `;
 
-exports[`VerificationCodeRow renders correctly when code received 1`] = `
+exports[`VerificationCodeRow renders correctly for input 1`] = `
 <View
   style={
     Object {
-      "backgroundColor": "#EEEEEE",
-      "borderRadius": 3,
-      "height": 50,
-      "justifyContent": "center",
-      "marginVertical": 5,
-      "paddingHorizontal": 10,
-    }
-  }
->
-  <Text
-    ellipsizeMode="tail"
-    numberOfLines={1}
-    style={
-      Object {
-        "color": "#81868B",
-        "fontFamily": "Hind-Regular",
-        "fontSize": 15,
-        "lineHeight": 24,
-      }
-    }
-  >
-    q4BJuVrALpiaroth/dwQ/ps6w8auvNPmi+SVVwstPaFaq8aRq4jeaWSPmI+rZTrJQ/Z0BOUyz9EBNif1Y2XzZQE=
-  </Text>
-</View>
-`;
-
-exports[`VerificationCodeRow renders correctly when input disabled 1`] = `
-<View
-  style={
-    Object {
-      "backgroundColor": "#F0F0F0",
+      "backgroundColor": "#FFF",
       "borderColor": "#D1D5D8",
       "borderRadius": 3,
       "borderWidth": 1,
@@ -113,6 +83,7 @@ exports[`VerificationCodeRow renders correctly when input disabled 1`] = `
       "justifyContent": "center",
       "marginVertical": 5,
       "paddingHorizontal": 10,
+      "position": "relative",
     }
   }
 >
@@ -126,132 +97,8 @@ exports[`VerificationCodeRow renders correctly when input disabled 1`] = `
       }
     }
   >
-    &lt;#&gt; m9oASm/3g7aZ...
+    ab8049b95ac02e989aae8b61f...
   </Text>
-</View>
-`;
-
-exports[`VerificationCodeRow renders correctly when input enabled 1`] = `
-<View
-  style={
-    Object {
-      "position": "relative",
-    }
-  }
->
-  <View
-    style={
-      Object {
-        "position": "relative",
-      }
-    }
-  >
-    <View
-      style={
-        Array [
-          Object {
-            "alignItems": "center",
-            "flex": 1,
-            "flexDirection": "row",
-            "justifyContent": "center",
-          },
-          Object {
-            "backgroundColor": "#FFF",
-            "borderColor": "#D1D5D8",
-            "borderRadius": 3,
-            "borderWidth": 1,
-            "flex": 0,
-            "height": 50,
-            "marginVertical": 5,
-          },
-        ]
-      }
-    >
-      <TextInput
-        allowFontScaling={true}
-        onBlur={[Function]}
-        onChangeText={[MockFunction]}
-        onFocus={[Function]}
-        placeholder="<#> m9oASm/3g7aZ..."
-        rejectResponderTermination={true}
-        shouldShowClipboard={[Function]}
-        style={
-          Object {
-            "backgroundColor": "#FFFFFF",
-            "borderColor": "#D1D5D8",
-            "borderRadius": 3,
-            "flex": 1,
-            "fontFamily": "Hind-Regular",
-            "padding": 8,
-          }
-        }
-        underlineColorAndroid="transparent"
-        value="test"
-      />
-    </View>
-  </View>
-</View>
-`;
-
-exports[`VerificationCodeRow renders correctly when submitting 1`] = `
-<View
-  style={
-    Object {
-      "position": "relative",
-    }
-  }
->
-  <View
-    style={
-      Object {
-        "position": "relative",
-      }
-    }
-  >
-    <View
-      style={
-        Array [
-          Object {
-            "alignItems": "center",
-            "flex": 1,
-            "flexDirection": "row",
-            "justifyContent": "center",
-          },
-          Object {
-            "backgroundColor": "#FFF",
-            "borderColor": "#D1D5D8",
-            "borderRadius": 3,
-            "borderWidth": 1,
-            "flex": 0,
-            "height": 50,
-            "marginVertical": 5,
-          },
-        ]
-      }
-    >
-      <TextInput
-        allowFontScaling={true}
-        onBlur={[Function]}
-        onChangeText={[MockFunction]}
-        onFocus={[Function]}
-        placeholder="<#> m9oASm/3g7aZ..."
-        rejectResponderTermination={true}
-        shouldShowClipboard={[Function]}
-        style={
-          Object {
-            "backgroundColor": "#FFFFFF",
-            "borderColor": "#D1D5D8",
-            "borderRadius": 3,
-            "flex": 1,
-            "fontFamily": "Hind-Regular",
-            "padding": 8,
-          }
-        }
-        underlineColorAndroid="transparent"
-        value="test"
-      />
-    </View>
-  </View>
   <ActivityIndicator
     animating={true}
     color="#42D689"
@@ -263,7 +110,7 @@ exports[`VerificationCodeRow renders correctly when submitting 1`] = `
         "padding": 10,
         "position": "absolute",
         "right": 3,
-        "top": 9,
+        "top": 5,
       }
     }
   />

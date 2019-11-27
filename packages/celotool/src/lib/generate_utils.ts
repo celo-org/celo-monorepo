@@ -4,14 +4,13 @@ import { ec as EC } from 'elliptic'
 import fs from 'fs'
 import { range, repeat } from 'lodash'
 import path from 'path'
-import rlp from 'rlp'
+import * as rlp from 'rlp'
 import Web3 from 'web3'
 import { envVar, fetchEnv, fetchEnvOrFallback, monorepoRoot } from './env-utils'
 import {
   CONTRACT_OWNER_STORAGE_LOCATION,
   GETH_CONFIG_OLD,
   ISTANBUL_MIX_HASH,
-  OG_ACCOUNTS,
   REGISTRY_ADDRESS,
   TEMPLATE,
 } from './genesis_constants'
@@ -39,6 +38,11 @@ export enum ConsensusType {
 export interface Validator {
   address: string
   blsPublicKey: string
+  balance: string
+}
+export interface AccountAndBalance {
+  address: string
+  balance: string
 }
 
 export const MNEMONIC_ACCOUNT_TYPE_CHOICES = [
@@ -85,8 +89,15 @@ export const privateKeyToAddress = (privateKey: string) => {
 export const privateKeyToStrippedAddress = (privateKey: string) =>
   strip0x(privateKeyToAddress(privateKey))
 
-const DEFAULT_BALANCE = '1000000000000000000000000'
-const VALIDATOR_OG_SOURCE = 'og'
+const validatorZeroBalance = fetchEnvOrFallback(
+  envVar.VALIDATOR_ZERO_GENESIS_BALANCE,
+  '103010030000000000000000000'
+) // 103,010,030 CG
+const validatorBalance = fetchEnvOrFallback(
+  envVar.VALIDATOR_GENESIS_BALANCE,
+  '10011000000000000000000'
+) // 10,011 CG
+const faucetBalance = fetchEnvOrFallback(envVar.FAUCET_GENESIS_BALANCE, '10011000000000000000000') // 10,000 CG
 
 export const getPrivateKeysFor = (accountType: AccountType, mnemonic: string, n: number) =>
   range(0, n).map((i) => generatePrivateKey(mnemonic, accountType, i))
@@ -98,11 +109,12 @@ export const getStrippedAddressesFor = (accountType: AccountType, mnemonic: stri
   getAddressesFor(accountType, mnemonic, n).map(strip0x)
 
 export const getValidators = (mnemonic: string, n: number) => {
-  return getPrivateKeysFor(AccountType.VALIDATOR, mnemonic, n).map((key) => {
+  return getPrivateKeysFor(AccountType.VALIDATOR, mnemonic, n).map((key, i) => {
     const blsKeyBytes = blsPrivateKeyToProcessedPrivateKey(key)
     return {
       address: strip0x(privateKeyToAddress(key)),
       blsPublicKey: bls12377js.BLS.privateToPublicBytes(blsKeyBytes).toString('hex'),
+      balance: i === 0 ? validatorZeroBalance : validatorBalance,
     }
   })
 }
@@ -116,16 +128,7 @@ export const getAddressFromEnv = (accountType: AccountType, n: number) => {
 export const generateGenesisFromEnv = (enablePetersburg: boolean = true) => {
   const mnemonic = fetchEnv(envVar.MNEMONIC)
   const validatorEnv = fetchEnv(envVar.VALIDATORS)
-  const validators =
-    validatorEnv === VALIDATOR_OG_SOURCE
-      ? OG_ACCOUNTS.map((account) => {
-          const blsKeyBytes = blsPrivateKeyToProcessedPrivateKey(account.privateKey)
-          return {
-            address: account.address,
-            blsPublicKey: bls12377js.BLS.privateToPublicBytes(blsKeyBytes).toString('hex'),
-          }
-        })
-      : getValidators(mnemonic, parseInt(validatorEnv, 10))
+  const validators = getValidators(mnemonic, parseInt(validatorEnv, 10))
 
   const consensusType = fetchEnv(envVar.CONSENSUS_TYPE) as ConsensusType
 
@@ -140,19 +143,40 @@ export const generateGenesisFromEnv = (enablePetersburg: boolean = true) => {
     10
   )
   const epoch = parseInt(fetchEnvOrFallback(envVar.EPOCH, '30000'), 10)
+  // allow 12 blocks in prod for the uptime metric
+  const lookbackwindow = parseInt(fetchEnvOrFallback(envVar.LOOKBACK, '12'), 10)
   const chainId = parseInt(fetchEnv(envVar.NETWORK_ID), 10)
 
-  // Assing DEFAULT ammount of gold to 2 faucet accounts
-  const faucetAddresses = getStrippedAddressesFor(AccountType.FAUCET, mnemonic, 2)
+  // Allocate faucet accounts
+  const numFaucetAccounts = parseInt(fetchEnvOrFallback(envVar.FAUCET_GENESIS_ACCOUNTS, '0'), 10)
+  const initialAccounts = getStrippedAddressesFor(
+    AccountType.FAUCET,
+    mnemonic,
+    numFaucetAccounts
+  ).map((addr) => {
+    return {
+      address: addr,
+      balance: fetchEnvOrFallback(envVar.FAUCET_GENESIS_BALANCE, faucetBalance),
+    }
+  })
 
-  const oracleAddress = getStrippedAddressesFor(AccountType.PRICE_ORACLE, mnemonic, 1)
+  // Allocate oracle account(s)
+  initialAccounts.concat(
+    getStrippedAddressesFor(AccountType.PRICE_ORACLE, mnemonic, 1).map((addr) => {
+      return {
+        address: addr,
+        balance: fetchEnvOrFallback(envVar.ORACLE_GENESIS_BALANCE, '100000000000000000000'),
+      }
+    })
+  )
 
   return generateGenesis({
     validators,
     consensusType,
     blockTime,
-    initialAccounts: faucetAddresses.concat(oracleAddress),
+    initialAccounts,
     epoch,
+    lookbackwindow,
     chainId,
     requestTimeout,
     enablePetersburg,
@@ -161,12 +185,12 @@ export const generateGenesisFromEnv = (enablePetersburg: boolean = true) => {
 
 const generateIstanbulExtraData = (validators: Validator[]) => {
   const istanbulVanity = 32
-  const blsSignatureVanity = 192
+  const blsSignatureVanity = 96
+  const ecdsaSignatureVanity = 65
   return (
     '0x' +
     repeat('0', istanbulVanity * 2) +
     rlp
-      // @ts-ignore
       .encode([
         // Added validators
         validators.map((validator) => Buffer.from(validator.address, 'hex')),
@@ -174,7 +198,7 @@ const generateIstanbulExtraData = (validators: Validator[]) => {
         // Removed validators
         new Buffer(0),
         // Seal
-        Buffer.from(repeat('0', blsSignatureVanity * 2), 'hex'),
+        Buffer.from(repeat('0', ecdsaSignatureVanity * 2), 'hex'),
         [
           // AggregatedSeal.Bitmap
           new Buffer(0),
@@ -204,15 +228,17 @@ export const generateGenesis = ({
   initialAccounts: otherAccounts = [],
   blockTime,
   epoch,
+  lookbackwindow,
   chainId,
   requestTimeout,
   enablePetersburg = true,
 }: {
   validators: Validator[]
   consensusType?: ConsensusType
-  initialAccounts?: string[]
+  initialAccounts?: AccountAndBalance[]
   blockTime: number
   epoch: number
+  lookbackwindow: number
   chainId: number
   requestTimeout: number
   enablePetersburg?: boolean
@@ -241,18 +267,19 @@ export const generateGenesis = ({
       period: blockTime,
       requesttimeout: requestTimeout,
       epoch,
+      lookbackwindow,
     }
   }
 
   for (const validator of validators) {
     genesis.alloc[validator.address] = {
-      balance: DEFAULT_BALANCE,
+      balance: validator.balance,
     }
   }
 
-  for (const address of otherAccounts) {
-    genesis.alloc[address] = {
-      balance: DEFAULT_BALANCE,
+  for (const account of otherAccounts) {
+    genesis.alloc[account.address] = {
+      balance: account.balance,
     }
   }
 

@@ -19,7 +19,7 @@ contract('ExtractFunctionSignatureTest', () => {
     testTransactions = await TestTransactions.new()
   })
 
-  describe('#extractFunctionSignature', async () => {
+  describe('#extractFunctionSignature', () => {
     it('should extract the method signature', async () => {
       // @ts-ignore
       const data = testTransactions.contract.methods.setValue(1, 1, true).encodeABI()

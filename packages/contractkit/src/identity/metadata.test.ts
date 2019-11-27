@@ -1,7 +1,7 @@
+import { ACCOUNT_ADDRESSES } from '@celo/dev-utils/lib/ganache-setup'
+import { testWithGanache } from '@celo/dev-utils/lib/ganache-test'
 import { NativeSigner } from '@celo/utils/lib/signatureUtils'
 import { newKitFromWeb3 } from '../kit'
-import { testWithGanache } from '../test-utils/ganache-test'
-import { ACCOUNT_ADDRESSES } from '../test-utils/ganache.setup'
 import { createNameClaim } from './claims/claim'
 import { ClaimTypes, IdentityMetadataWrapper } from './metadata'
 

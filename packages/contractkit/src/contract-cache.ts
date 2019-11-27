@@ -25,7 +25,7 @@ const WrapperFactories = {
   // [CeloContract.EpochRewards]?: EpochRewardsWrapper,
   [CeloContract.Escrow]: EscrowWrapper,
   [CeloContract.Exchange]: ExchangeWrapper,
-  // [CeloContract.GasCurrencyWhitelist]: GasCurrencyWhitelistWrapper,
+  // [CeloContract.FeeCurrencyWhitelist]: FeeCurrencyWhitelistWrapper,
   [CeloContract.GasPriceMinimum]: GasPriceMinimumWrapper,
   [CeloContract.GoldToken]: GoldTokenWrapper,
   [CeloContract.Governance]: GovernanceWrapper,
@@ -51,7 +51,7 @@ interface WrapperCacheMap {
   // [CeloContract.EpochRewards]?: EpochRewardsWrapper
   [CeloContract.Escrow]?: EscrowWrapper
   [CeloContract.Exchange]?: ExchangeWrapper
-  // [CeloContract.GasCurrencyWhitelist]?: GasCurrencyWhitelistWrapper,
+  // [CeloContract.FeeCurrencyWhitelist]?: FeeCurrencyWhitelistWrapper,
   [CeloContract.GasPriceMinimum]?: GasPriceMinimumWrapper
   [CeloContract.GoldToken]?: GoldTokenWrapper
   [CeloContract.Governance]?: GovernanceWrapper
@@ -98,8 +98,8 @@ export class WrapperCache {
   getExchange() {
     return this.getContract(CeloContract.Exchange)
   }
-  // getGasCurrencyWhitelist() {
-  //   return this.getWrapper(CeloContract.GasCurrencyWhitelist, newGasCurrencyWhitelist)
+  // getFeeCurrencyWhitelist() {
+  //   return this.getWrapper(CeloContract.FeeCurrencyWhitelist, newFeeCurrencyWhitelist)
   // }
   getGasPriceMinimum() {
     return this.getContract(CeloContract.GasPriceMinimum)

@@ -8,6 +8,7 @@ import { config } from '@celo/protocol/migrationsConfig'
 import { privateKeyToAddress, privateKeyToPublicKey } from '@celo/utils/lib/address'
 import { getBlsPoP, getBlsPublicKey } from '@celo/utils/lib/bls'
 import { toFixed } from '@celo/utils/lib/fixidity'
+import { signMessage } from '@celo/utils/lib/signatureUtils'
 import { BigNumber } from 'bignumber.js'
 import { AccountsInstance, ElectionInstance, LockedGoldInstance, ValidatorsInstance } from 'types'
 
@@ -39,6 +40,7 @@ async function lockGold(
 }
 
 async function registerValidatorGroup(
+  name: string,
   accounts: AccountsInstance,
   lockedGold: LockedGoldInstance,
   validators: ValidatorsInstance,
@@ -62,22 +64,26 @@ async function registerValidatorGroup(
     numMembers
   )
 
-  await web3.eth.sendTransaction({
-    from: privateKeyToAddress(privateKey),
+  // Add a premium to cover tx fees
+  const v = lockedGoldValue.times(1.01).toFixed()
+
+  console.info(`    - send funds ${v} to group address ${account.address}`)
+  await sendTransactionWithPrivateKey(web3, null, privateKey, {
     to: account.address,
-    value: lockedGoldValue.times(1.01).toFixed(), // Add a premium to cover tx fees
+    value: v,
   })
 
+  console.info(`    - lock gold`)
   await lockGold(accounts, lockedGold, lockedGoldValue, account.privateKey)
 
+  console.info(`    - setName`)
   // @ts-ignore
-  const setNameTx = accounts.contract.methods.setName(
-    `${config.validators.groupName} ${encodedKey}`
-  )
+  const setNameTx = accounts.contract.methods.setName(`${name} ${encodedKey}`)
   await sendTransactionWithPrivateKey(web3, setNameTx, account.privateKey, {
     to: accounts.address,
   })
 
+  console.info(`    - registerValidatorGroup`)
   // @ts-ignore
   const tx = validators.contract.methods.registerValidatorGroup(
     toFixed(config.validators.commission).toString()
@@ -87,7 +93,7 @@ async function registerValidatorGroup(
     to: validators.address,
   })
 
-  return account
+  return [account, lockedGoldValue]
 }
 
 async function registerValidator(
@@ -95,10 +101,14 @@ async function registerValidator(
   lockedGold: LockedGoldInstance,
   validators: ValidatorsInstance,
   validatorPrivateKey: string,
+  attestationKey: string,
   groupAddress: string,
   index: number,
   networkName: string
 ) {
+  const valName = `CLabs Validator #${index} on ${networkName}`
+
+  console.info(`    - lockGold ${valName}`)
   await lockGold(
     accounts,
     lockedGold,
@@ -106,12 +116,15 @@ async function registerValidator(
     validatorPrivateKey
   )
 
+  console.info(`    - setName ${valName}`)
+
   // @ts-ignore
-  const setNameTx = accounts.contract.methods.setName(`CLabs Validator #${index} on ${networkName}`)
+  const setNameTx = accounts.contract.methods.setName(valName)
   await sendTransactionWithPrivateKey(web3, setNameTx, validatorPrivateKey, {
     to: accounts.address,
   })
 
+  console.info(`    - registerValidator ${valName}`)
   const publicKey = privateKeyToPublicKey(validatorPrivateKey)
   const blsPublicKey = getBlsPublicKey(validatorPrivateKey)
   const blsPoP = getBlsPoP(privateKeyToAddress(validatorPrivateKey), validatorPrivateKey)
@@ -123,12 +136,16 @@ async function registerValidator(
     to: validators.address,
   })
 
+  console.info(`    - affiliate ${valName}`)
+
   // @ts-ignore
   const affiliateTx = validators.contract.methods.affiliate(groupAddress)
 
   await sendTransactionWithPrivateKey(web3, affiliateTx, validatorPrivateKey, {
     to: validators.address,
   })
+
+  console.info(`    - setAccountDataEncryptionKey ${valName}`)
 
   // @ts-ignore
   const registerDataEncryptionKeyTx = accounts.contract.methods.setAccountDataEncryptionKey(
@@ -139,6 +156,28 @@ async function registerValidator(
     to: accounts.address,
   })
 
+  // Authorize the attestation signer
+  const attestationKeyAddress = privateKeyToAddress(attestationKey)
+  console.info(`    - authorizeAttestationSigner ${valName}->${attestationKeyAddress}`)
+  const message = web3.utils.soliditySha3({
+    type: 'address',
+    value: privateKeyToAddress(validatorPrivateKey),
+  })
+  const signature = signMessage(message, attestationKey, attestationKeyAddress)
+
+  // @ts-ignore
+  const registerAttestationKeyTx = accounts.contract.methods.authorizeAttestationSigner(
+    attestationKeyAddress,
+    signature.v,
+    signature.r,
+    signature.s
+  )
+
+  await sendTransactionWithPrivateKey(web3, registerAttestationKeyTx, validatorPrivateKey, {
+    to: accounts.address,
+  })
+
+  console.info(`    - done ${valName}`)
   return
 }
 
@@ -168,63 +207,102 @@ module.exports = async (_deployer: any, networkName: string) => {
   )
 
   const valKeys: string[] = config.validators.validatorKeys
+  const attestationKeys: string[] = config.validators.attestationKeys
 
   if (valKeys.length === 0) {
     console.info('  No validators to register')
     return
   }
 
+  // Assumptions about where funds are located:
+  // * Validator 0 holds funds for all groups' stakes
+  // * Validator 1-n holds funds needed for their own stake
+  const validator0Key = valKeys[0]
+
   if (valKeys.length < config.validators.minElectableValidators) {
-    console.info(
+    console.warn(
       `  Warning: Have ${valKeys.length} Validator keys but require a minimum of ${
         config.validators.minElectableValidators
       } Validators in order for a new validator set to be elected.`
     )
   }
 
-  console.info('  Registering ValidatorGroup ...')
-  const firstPrivateKey = valKeys[0]
-  const account = await registerValidatorGroup(
-    accounts,
-    lockedGold,
-    validators,
-    firstPrivateKey,
-    valKeys.length
-  )
-
-  console.info('  Registering Validators ...')
-  await Promise.all(
-    valKeys.map((key, index) =>
-      registerValidator(accounts, lockedGold, validators, key, account.address, index, networkName)
-    )
-  )
-
-  console.info('  Adding Validators to Validator Group ...')
-  for (let i = 0; i < valKeys.length; i++) {
-    const key = valKeys[i]
-    const address = privateKeyToAddress(key)
-    if (i === 0) {
-      // @ts-ignore
-      const addTx = validators.contract.methods.addFirstMember(address, NULL_ADDRESS, NULL_ADDRESS)
-      await sendTransactionWithPrivateKey(web3, addTx, account.privateKey, {
-        to: validators.address,
-      })
-    } else {
-      // @ts-ignore
-      const addTx = validators.contract.methods.addMember(address)
-      await sendTransactionWithPrivateKey(web3, addTx, account.privateKey, {
-        to: validators.address,
-      })
-    }
+  // Split the validator keys into groups that will fit within the max group size.
+  const valKeyGroups: string[][] = []
+  const maxGroupSize: number = Number(config.validators.maxGroupSize)
+  for (let i = 0; i < valKeys.length; i += maxGroupSize) {
+    valKeyGroups.push(valKeys.slice(i, Math.min(i + maxGroupSize, valKeys.length)))
   }
 
-  console.info('  Voting for Validator Group ...')
-  // Make another deposit so our vote has more weight.
-  const minLockedGoldVotePerValidator = 10000
-  const value = new BigNumber(valKeys.length)
-    .times(minLockedGoldVotePerValidator)
-    .times(web3.utils.toWei('1'))
-  // @ts-ignore
-  await lockedGold.lock({ value })
-  await election.vote(account.address, value, NULL_ADDRESS, NULL_ADDRESS)
+  let prevGroupAddress = NULL_ADDRESS
+  for (const [idx, groupKeys] of valKeyGroups.entries()) {
+    // Append an index to the group name if there is more than one group.
+    let groupName: string = config.validators.groupName
+    if (valKeyGroups.length > 1) {
+      groupName += ` (${idx + 1})`
+    }
+
+    console.info(`  Registering validator group: ${groupName} ...`)
+    const [groupAccount, groupLockedGoldValue] = await registerValidatorGroup(
+      groupName,
+      accounts,
+      lockedGold,
+      validators,
+      validator0Key,
+      groupKeys.length
+    )
+    console.info(`  * Registering ${groupKeys.length} validators ...`)
+    await Promise.all(
+      groupKeys.map((key, i) => {
+        const index = idx * config.validators.maxGroupSize + i
+        return registerValidator(
+          accounts,
+          lockedGold,
+          validators,
+          key,
+          attestationKeys[index],
+          groupAccount.address,
+          index,
+          networkName
+        )
+      })
+    )
+
+    console.info(`  * Adding Validators to ${groupName} ...`)
+    for (const [i, key] of groupKeys.entries()) {
+      const address = privateKeyToAddress(key)
+      console.info(`    - Adding ${address} ...`)
+      if (i === 0) {
+        // @ts-ignore
+        const addTx = validators.contract.methods.addFirstMember(
+          address,
+          NULL_ADDRESS,
+          prevGroupAddress
+        )
+        await sendTransactionWithPrivateKey(web3, addTx, groupAccount.privateKey, {
+          to: validators.address,
+        })
+      } else {
+        // @ts-ignore
+        const addTx = validators.contract.methods.addMember(address)
+        await sendTransactionWithPrivateKey(web3, addTx, groupAccount.privateKey, {
+          to: validators.address,
+        })
+      }
+    }
+
+    console.info('  * Group voting for itself ...')
+    // @ts-ignore
+    const voteTx = election.contract.methods.vote(
+      groupAccount.address,
+      '0x' + groupLockedGoldValue.toString(16),
+      NULL_ADDRESS,
+      prevGroupAddress
+    )
+    await sendTransactionWithPrivateKey(web3, voteTx, groupAccount.privateKey, {
+      to: election.address,
+    })
+
+    prevGroupAddress = groupAccount.address
+  }
 }
