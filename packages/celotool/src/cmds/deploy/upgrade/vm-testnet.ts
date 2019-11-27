@@ -1,6 +1,11 @@
 import { switchToClusterFromEnv } from 'src/lib/cluster'
 import { upgradeHelmChart } from 'src/lib/prom-to-sd-utils'
-import { deploy, taintTestnet, untaintTestnet } from 'src/lib/vm-testnet-utils'
+import {
+  deploy,
+  setFornoSSLCertificate,
+  taintTestnet,
+  untaintTestnet,
+} from 'src/lib/vm-testnet-utils'
 import yargs from 'yargs'
 import { UpgradeArgv } from '../../deploy/upgrade'
 
@@ -28,7 +33,11 @@ export const handler = async (argv: VmTestnetArgv) => {
     await taintTestnet(argv.celoEnv)
   }
   await deploy(argv.celoEnv, onDeployFailed)
-  
+
   // upgrade prom to sd statefulset
   await upgradeHelmChart(argv.celoEnv)
+
+  // Upgrading will cause the forno URL to use a dummy SSL certificate again,
+  // so we need to manually use the one pulled by Let's Encrypt again:
+  await setFornoSSLCertificate()
 }

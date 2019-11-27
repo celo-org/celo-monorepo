@@ -14,7 +14,6 @@ import {
   getTerraformModuleResourceNames,
   initTerraformModule,
   planTerraformModule,
-  showTerraformModulePlan,
   taintTerraformModuleResource,
   TerraformVars,
   untaintTerraformModuleResource,
@@ -25,6 +24,7 @@ import {
   uploadGenesisBlockToGoogleStorage,
   uploadStaticNodesToGoogleStorage,
 } from './testnet-utils'
+import { execCmd } from './utils'
 
 const secretsBucketName = 'celo-testnet-secrets'
 
@@ -101,7 +101,8 @@ async function deployModule(
   console.info('Planning...')
   await planTerraformModule(terraformModule, vars)
 
-  await showTerraformModulePlan(terraformModule)
+  // NOTE(trevor): this seems to cause terraform v0.12.16 to panic, commenting out for now
+  // await showTerraformModulePlan(terraformModule)
 
   await confirmAction(
     `Are you sure you want to perform the above plan for Celo env ${celoEnv} in environment ${envType}?`,
@@ -144,7 +145,8 @@ async function destroyModule(celoEnv: string, terraformModule: string, vars: Ter
   console.info('Planning...')
   await planTerraformModule(terraformModule, vars, true)
 
-  await showTerraformModulePlan(terraformModule)
+  // NOTE(trevor): this seems to cause terraform v0.12.16 to panic, commenting out for now
+  // await showTerraformModulePlan(terraformModule)
 
   await confirmAction(`Are you sure you want to destroy ${celoEnv} in environment ${envType}?`)
 
@@ -194,17 +196,23 @@ export async function taintTestnet(celoEnv: string) {
     testnetTerraformModule,
     `module.tx_node.google_compute_instance.tx_node`
   )
-  // tx-node instance group random id
-  console.info('Tainting tx-node instance group random id...')
+  // tx-node internal instance group random id
+  console.info('Tainting internal tx-node instance group random id...')
+  await taintTerraformModuleResource(testnetTerraformModule, `module.tx_node_lb.random_id.internal`)
+  // tx-node internal instance group
+  console.info('Tainting internal tx-node instance group...')
   await taintTerraformModuleResource(
     testnetTerraformModule,
-    `module.tx_node_lb.random_id.tx_node_lb`
+    `module.tx_node_lb.google_compute_instance_group.internal`
   )
-  // tx-node instance group
-  console.info('Tainting tx-node instance group...')
+  // tx-node external instance group random id
+  console.info('Tainting external tx-node instance group random id...')
+  await taintTerraformModuleResource(testnetTerraformModule, `module.tx_node_lb.random_id.external`)
+  // tx-node external instance group
+  console.info('Tainting external tx-node instance group...')
   await taintTerraformModuleResource(
     testnetTerraformModule,
-    `module.tx_node_lb.google_compute_instance_group.tx_node_lb`
+    `module.tx_node_lb.google_compute_instance_group.external`
   )
 }
 
@@ -250,17 +258,29 @@ export async function untaintTestnet(celoEnv: string) {
     testnetTerraformModule,
     `module.tx_node.google_compute_instance.tx_node`
   )
-  // tx-node instance group random id
-  console.info('Untainting tx-node instance group random id...')
+  // tx-node internal instance group random id
+  console.info('Untainting internal tx-node instance group random id...')
   await untaintTerraformModuleResource(
     testnetTerraformModule,
-    `module.tx_node_lb.random_id.tx_node_lb`
+    `module.tx_node_lb.random_id.internal`
   )
-  // tx-node instance group
-  console.info('Untainting tx-node instance group...')
+  // tx-node internal instance group
+  console.info('Untainting internal tx-node instance group...')
   await untaintTerraformModuleResource(
     testnetTerraformModule,
-    `module.tx_node_lb.google_compute_instance_group.tx_node_lb`
+    `module.tx_node_lb.google_compute_instance_group.internal`
+  )
+  // tx-node external instance group random id
+  console.info('Untainting tx-node external instance group random id...')
+  await untaintTerraformModuleResource(
+    testnetTerraformModule,
+    `module.tx_node_lb.random_id.external`
+  )
+  // tx-node external instance group
+  console.info('Untainting external tx-node instance group...')
+  await untaintTerraformModuleResource(
+    testnetTerraformModule,
+    `module.tx_node_lb.google_compute_instance_group.external`
   )
 }
 
@@ -308,16 +328,6 @@ export async function getInternalTxNodeIPs(celoEnv: string) {
   return outputs.tx_node_internal_ip_addresses.value
 }
 
-export async function getInternalValidatorIPs(celoEnv: string) {
-  const outputs = await getTestnetOutputs(celoEnv)
-  return outputs.validator_internal_ip_addresses.value
-}
-
-export async function getInternalTxNodeIPs(celoEnv: string) {
-  const outputs = await getTestnetOutputs(celoEnv)
-  return outputs.tx_node_internal_ip_addresses.value
-}
-
 function getTerraformBackendConfigVars(celoEnv: string, terraformModule: string) {
   return {
     prefix: `${celoEnv}/${terraformModule}`,
@@ -331,13 +341,13 @@ function getTestnetVars(celoEnv: string) {
     ...getEnvVarValues(testnetEnvVars),
     dns_zone_name: dnsZoneName(domainName),
     ethstats_host: `${celoEnv}-ethstats.${domainName}.org`,
+    // forno is the name for our setup that has tx-nodes reachable via a domain name
     forno_host: `${celoEnv}-forno.${domainName}.org`,
     gcloud_secrets_bucket: secretsBucketName,
     gcloud_secrets_base_path: secretsBasePath(celoEnv),
     // only able to view objects for accessing secrets & modify ssl certs for forno setup
     gcloud_vm_service_account_email: 'terraform-testnet@celo-testnet.iam.gserviceaccount.com',
     genesis_content_base64: genesisBuffer.toString('base64'),
-    // forno is the name for our setup that has tx-nodes reachable via a domain name
     letsencrypt_email: 'n@celo.org',
     network_name: networkName(celoEnv),
   }
@@ -436,4 +446,45 @@ export function networkName(celoEnv: string) {
 // name of the DNS zone in Google Cloud for a particular domain
 function dnsZoneName(domain: string) {
   return `${domain}-org`
+}
+
+// Sets the forno ssl certificate to be the newest one that's from Let's Encrypt.
+// A dummy SSL certificate is used inside the Terraform module, but we have an instance
+// that requests and auto-renews SSL certificates. When updating, Terraform will spot that the
+// dummy SSL certificate the module specifies is not being used, and will start
+// using it again. We must therefore switch back to using the correct SSL certificate
+export async function setFornoSSLCertificate() {
+  console.info('Getting most recent SSL certificate...')
+  // Get the newest SSL certificate
+  const certName = await getNewestSSLCertificateName()
+  if (!certName) {
+    return
+  }
+  console.info(`Found SSL cert: ${certName}`)
+
+  // Use the correct SSL certificate
+  const targetHttpsProxyName = `${fetchEnv(envVar.CELOTOOL_CELOENV)}-tx-node-lb-external-http-proxy`
+  console.info(
+    `Setting ${certName} as SSL certificate for target https proxy ${targetHttpsProxyName}`
+  )
+  await execGcloudCmd(
+    `gcloud compute target-https-proxies update ${targetHttpsProxyName} --ssl-certificates ${certName}`
+  )
+}
+
+async function getNewestSSLCertificateName() {
+  const certPrefix = `${fetchEnv(envVar.CELOTOOL_CELOENV)}-tx-node-lb-forno-cert`
+  const [jsonOutput] = await execGcloudCmd(
+    `gcloud compute ssl-certificates list --sort-by="~creation_timestamp" --filter="name ~ ^${certPrefix}" --format="json(name)" --limit 1`
+  )
+  const sslCert = JSON.parse(jsonOutput)
+  if (!sslCert.length) {
+    console.warn('No existing SSL certificates found')
+    return null
+  }
+  return sslCert[0].name
+}
+
+function execGcloudCmd(cmd: string) {
+  return execCmd(`${cmd} --project ${fetchEnv(envVar.TESTNET_PROJECT_NAME)}`)
 }
