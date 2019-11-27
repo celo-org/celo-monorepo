@@ -18,6 +18,10 @@ import {
   updateIncomingPaymentRequests,
   updateOutgoingPaymentRequests,
 } from 'src/account'
+import {
+  UpdateIncomingPaymentRequestsAction,
+  UpdateOutgoingPaymentRequestsAction,
+} from 'src/account/actions'
 import { showError } from 'src/alert/actions'
 import { Actions as AppActions, SetLanguage } from 'src/app/actions'
 import { ErrorMessages } from 'src/app/ErrorMessages'
@@ -43,6 +47,8 @@ const REQUEST_DB = 'pendingRequests'
 const REQUESTEE_ADDRESS = 'requesteeAddress'
 const REQUESTER_ADDRESS = 'requesterAddress'
 const VALUE = 'value'
+
+type ADDRESS_KEY_FIELD = typeof REQUESTEE_ADDRESS | typeof REQUESTER_ADDRESS
 
 let firebaseAlreadyAuthorized = false
 export function* waitForFirebaseAuth() {
@@ -83,7 +89,7 @@ function* initializeFirebase() {
   }
 }
 
-function createIncomingPaymentRequestChannel(address: string) {
+function createPaymentRequestChannel(address: string, addressKeyField: ADDRESS_KEY_FIELD) {
   const errorCallback = (error: Error) => {
     Logger.warn(TAG, error.toString())
   }
@@ -99,7 +105,7 @@ function createIncomingPaymentRequestChannel(address: string) {
       firebase
         .database()
         .ref(REQUEST_DB)
-        .orderByChild(REQUESTEE_ADDRESS)
+        .orderByChild(addressKeyField)
         .equalTo(address)
         .off(VALUE, emitter)
     }
@@ -107,38 +113,7 @@ function createIncomingPaymentRequestChannel(address: string) {
     firebase
       .database()
       .ref(REQUEST_DB)
-      .orderByChild(REQUESTEE_ADDRESS)
-      .equalTo(address)
-      .on(VALUE, emitter, errorCallback)
-    return cancel
-  })
-}
-
-function createOutgoingPaymentRequestChannel(address: string) {
-  const errorCallback = (error: Error) => {
-    Logger.warn(TAG, error.toString())
-  }
-
-  return eventChannel((emit: any) => {
-    const emitter = (data: DataSnapshot) => {
-      if (data.toJSON()) {
-        emit(data.toJSON())
-      }
-    }
-
-    const cancel = () => {
-      firebase
-        .database()
-        .ref(REQUEST_DB)
-        .orderByChild(REQUESTER_ADDRESS)
-        .equalTo(address)
-        .off(VALUE, emitter)
-    }
-
-    firebase
-      .database()
-      .ref(REQUEST_DB)
-      .orderByChild(REQUESTER_ADDRESS)
+      .orderByChild(addressKeyField)
       .equalTo(address)
       .on(VALUE, emitter, errorCallback)
     return cancel
@@ -151,10 +126,15 @@ const compareTimestamps = (a: PaymentRequest, b: PaymentRequest) => {
 
 const onlyRequested = (pr: PaymentRequest) => pr.status === PaymentRequestStatus.REQUESTED
 
-function* subscribeToIncomingPaymentRequests() {
+function* subscribeToPaymentRequests(
+  addressKeyField: ADDRESS_KEY_FIELD,
+  updatePaymentRequestsActionCreator: (
+    paymentRequests: PaymentRequest[]
+  ) => UpdateIncomingPaymentRequestsAction | UpdateOutgoingPaymentRequestsAction
+) {
   yield all([call(waitForFirebaseAuth), call(getAccount)])
   const address = yield select(currentAccountSelector)
-  const paymentRequestChannel = yield createIncomingPaymentRequestChannel(address)
+  const paymentRequestChannel = yield createPaymentRequestChannel(address, addressKeyField)
   while (true) {
     try {
       const paymentRequestsObject = yield take(paymentRequestChannel)
@@ -165,7 +145,7 @@ function* subscribeToIncomingPaymentRequests() {
         }))
         .sort(compareTimestamps)
         .filter(onlyRequested)
-      yield put(updateIncomingPaymentRequests(paymentRequests))
+      yield put(updatePaymentRequestsActionCreator(paymentRequests))
     } catch (error) {
       Logger.error(`${TAG}@subscribeToPaymentRequests`, error)
     } finally {
@@ -176,29 +156,12 @@ function* subscribeToIncomingPaymentRequests() {
   }
 }
 
+function* subscribeToIncomingPaymentRequests() {
+  yield subscribeToPaymentRequests(REQUESTEE_ADDRESS, updateIncomingPaymentRequests)
+}
+
 function* subscribeToOutgoingPaymentRequests() {
-  yield all([call(waitForFirebaseAuth), call(getAccount)])
-  const address = yield select(currentAccountSelector)
-  const paymentRequestChannel = yield createOutgoingPaymentRequestChannel(address)
-  while (true) {
-    try {
-      const paymentRequestsObject = yield take(paymentRequestChannel)
-      const paymentRequests = Object.keys(paymentRequestsObject)
-        .map((key) => ({
-          uid: key,
-          ...paymentRequestsObject[key],
-        }))
-        .sort(compareTimestamps)
-        .filter(onlyRequested)
-      yield put(updateOutgoingPaymentRequests(paymentRequests))
-    } catch (error) {
-      Logger.error(`${TAG}@subscribeToPaymentRequests`, error)
-    } finally {
-      if (yield cancelled()) {
-        paymentRequestChannel.close()
-      }
-    }
-  }
+  yield subscribeToPaymentRequests(REQUESTER_ADDRESS, updateOutgoingPaymentRequests)
 }
 
 function* updatePaymentRequestStatus({ id, status }: UpdatePaymentRequestStatusAction) {
