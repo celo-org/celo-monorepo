@@ -20,7 +20,7 @@ The service needs the following environment variables:
 | DATABASE_URL               | The URL under which your database is accessible, currently supported are `postgres://`, `mysql://` and `sqlite://`                                                                    |  |
 | CELO_PROVIDER              | The endpoint under which your node with the unlocked attestation signer key is available, should be `http://localhost:8545` if you followed the [instructions](./running-a-validator) |  |
 | CELO_VALIDATOR_ADDRESS     | The address of the Validator account                                                                                                                                                  |  |
-| ATTESTATION_SIGNER_ADDRESS | The address of the attestation signer that was authorized by the validator account                                                                                                    |  |
+| ATTESTATION_SIGNER_ADDRESS | The address of the attestation signer that was authorized by the Validator account                                                                                                    |  |
 | APP_SIGNATURE              | The hash with which clients can auto-read SMS messages on android                                                                                                                     |  |
 | SMS_PROVIDERS              | A comma-separated list of providers you want to configure, we currently support `nexmo` & `twilio`                                                                                    |  |
 
@@ -79,7 +79,7 @@ docker run --name celo-attestation-service -d --restart always --entrypoint /bin
 
 ## Registering the Attestation Service
 
-In order for users to request attestations from your service, you need to register the endpoint under which your service is reachable in your [metadata](/celo-codebase/protocol/identity/metadata). Run the following commands on your local machine where `$CELO_VALIDATOR_ADDRESS` is unlocked
+In order for users to request attestations from your service, you need to register the endpoint under which your service is reachable in your [metadata](/celo-codebase/protocol/identity/metadata). Run the following commands on your local machine where `$CELO_VALIDATOR_ADDRESS` is unlocked.
 
 ```bash
 celocli account:create-metadata ./metadata.json --from $CELO_VALIDATOR_ADDRESS
@@ -88,10 +88,10 @@ celocli account:create-metadata ./metadata.json --from $CELO_VALIDATOR_ADDRESS
 The `ATTESTATION_SERVICE_URL` variable stores the URL to access the Attestation Service deployed. In the following command we specify the URL where this Attestation Service is:
 
 ```bash
-celocli account:claim-attestation-service-url ./metadata.json --url $ATTESTATION_SERVICE_URL
+celocli account:claim-attestation-service-url ./metadata.json --url $ATTESTATION_SERVICE_URL --from $CELO_VALIDATOR_ADDRESS
 ```
 
-And then host your metadata somewhere reachable via HTTP. You can use a service like [gist.github.com](https://gist.github.com) (remember to register the raw link)
+And then host your metadata somewhere reachable via HTTP. You can use a service like [gist.github.com](https://gist.github.com). Create a gist with the contents of the file and then click on the `Raw` buttton to receive the permalink to the machine-readable file.
 
 ```bash
 celocli account:register-metadata --url <METADATA_URL> --from $CELO_VALIDATOR_ADDRESS
