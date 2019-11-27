@@ -14,6 +14,10 @@ import { CeloLinks } from 'src/shared/menu-items'
 const DELAY = 100
 const DURATION = 400
 
+function Link({ children, href }) {
+  return <Button style={textStyles.invert} kind={BTN.INLINE} text={children} href={href} />
+}
+
 const CoverComponent = React.memo(function Cover({ t }: I18nProps) {
   return (
     <View style={styles.cover}>
@@ -57,7 +61,9 @@ const CoverComponent = React.memo(function Cover({ t }: I18nProps) {
             </Trans>
           </H4>
           <Text style={[fonts.p, textStyles.invert]}>
-            <Trans i18nKey={t('purposeAsterisk')}>{}</Trans>
+            <Trans i18nKey={'purposeAsterisk'}>
+              <Link href={CeloLinks.stakeOffTerms}>Terms and Conditions</Link>
+            </Trans>
           </Text>
         </Cell>
       </GridRow>

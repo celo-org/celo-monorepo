@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { View } from 'react-native'
+import { View, StyleSheet } from 'react-native'
 import Cover from 'src/dev/Cover'
 import Engage from 'src/dev/Engage'
 import Features from 'src/dev/Features'
@@ -16,12 +16,7 @@ class BuildPage extends React.PureComponent<I18nProps> {
 
   render() {
     return (
-      <View
-        style={{
-          // @ts-ignore
-          scrollPadding: 20,
-        }}
-      >
+      <View style={styles.container}>
         <OpenGraph
           path={menuItems.BUILD.link}
           title={'Build with Celo | Celo Developers'}
@@ -40,3 +35,7 @@ class BuildPage extends React.PureComponent<I18nProps> {
 }
 
 export default withNamespaces('dev')(BuildPage)
+
+const styles = StyleSheet.create({
+  container: { scrollPadding: 20 },
+})

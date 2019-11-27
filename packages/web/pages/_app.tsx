@@ -15,7 +15,9 @@ import { appWithTranslation } from '../src/i18n'
 config({ ssrReveal: true })
 class MyApp extends App {
   componentDidMount() {
-    initSentry()
+    if (canTrack()) {
+      initSentry()
+    }
     if (window.location.hash) {
       hashScroller(window.location.hash)
     }

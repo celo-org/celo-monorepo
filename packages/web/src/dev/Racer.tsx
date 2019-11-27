@@ -74,7 +74,6 @@ const styles = StyleSheet.create({
   line: {
     height: 2,
     width: 1,
-
     transformOrigin: 'left',
   },
   onLine: {
@@ -88,7 +87,6 @@ const styles = StyleSheet.create({
     animationDuration: '2s',
     animationDelay: '100ms',
     animationIterationCount: 1,
-    // animationTimingFunction: 'ease-in',
     animationFillMode: 'both',
   },
 })
