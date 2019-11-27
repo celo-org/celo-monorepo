@@ -27,7 +27,11 @@ You can use the following environment variables to configure the attestation ser
 
 ### Operations
 
-This service uses `bunyan` for structured logging with JSON lines. You can pipe STDOUT to `yarn run bunyan` for a more human friendly output. The `LOG_LEVEL` environment variable can specify desired log levels. With `LOG_FORMAT=stackdriver` you can get stackdriver specific format to recover information such as error traces etc.
+This service uses `bunyan` for structured logging with JSON lines. You can pipe STDOUT to `yarn run bunyan` for a more human friendly output. The `LOG_LEVEL` environment variable can specify desired log levels. We support the following `LOG_FORMAT`s:
+
+- Default are json lines `LOG_FORMAT=json`
+- With `LOG_FORMAT=stackdriver` you can get stackdriver specific format to recover information such as error traces etc.
+- To get something more human readable, use `LOG_FORMAT=human`
 
 This service exposes prometheus metrics under `/metrics`.
 
