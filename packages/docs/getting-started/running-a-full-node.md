@@ -16,6 +16,8 @@ The code you'll see on this page is bash commands and their output.
 
 A $ signifies the bash prompt. Everything following it is the command you should run in a terminal. The $ isn't part of the command, so don't copy it.
 
+A PS> signifies the PowerShell prompt. Everything following it is the command you should run in a terminal. The PS> isn't part of the command, so don't copy it.
+
 When you see text in angle brackets &lt;&gt;, replace them and the text inside with your own value of what it refers to. Don't include the &lt;&gt; in the command.
 {% endhint %}
 
@@ -60,15 +62,30 @@ The genesis block is the first block in the chain, and is specific to each netwo
 
 `` $ docker run -v `pwd`:/root/.celo us.gcr.io/celo-testnet/celo-node:alfajores init /celo/genesis.json ``
 
+`` PS> docker run --volume "${pwd}:/root/.celo" us.gcr.io/celo-testnet/celo-node:alfajores init /celo/genesis.json ``
+
+`--volume "${pwd}:/root/.celo"` makes the local working directory available as a volume in the linux docker container at the path `/root/.celo`.
+
+
 In order to allow the node to sync with the network, give it the address of existing nodes in the network:
 
 `` $ docker run -v `pwd`:/root/.celo --entrypoint cp us.gcr.io/celo-testnet/celo-node:alfajores /celo/static-nodes.json /root/.celo/ ``
+
+`` PS> docker run -v "${pwd}:/root/.celo" --entrypoint cp us.gcr.io/celo-testnet/celo-node:alfajores /celo/static-nodes.json /root/.celo/ ``
+
+As a result the file `static-nodes.json` will show up in your local host celo-data-dir directory.
 
 ## **Start the node**
 
 This command specifies the settings needed to run the node, and gets it started.
 
 `` $ docker run -p 127.0.0.1:8545:8545 -p 127.0.0.1:8546:8546 -p 30303:30303 -p 30303:30303/udp -v `pwd`:/root/.celo us.gcr.io/celo-testnet/celo-node:alfajores --verbosity 3 --networkid 44785 --syncmode full --rpc --rpcaddr 0.0.0.0 --rpcapi eth,net,web3,debug,admin,personal --lightserv 90 --lightpeers 1000 --maxpeers 1100 --etherbase $CELO_ACCOUNT_ADDRESS ``
+
+``
+PS> docker run -p 127.0.0.1:8545:8545 -p 127.0.0.1:8546:8546 -p 30303:30303 -p 30303:30303/udp -v "${pwd}:/root/.celo" us.gcr.io/celo-testnet/celo-node:alfajores --verbosity 3 --networkid 44785 --syncmode full --rpc --rpcaddr 0.0.0.0 --rpcapi eth,net,web3,debug,admin,personal --lightserv 90 --lightpeers 1000 --maxpeers 1100 --etherbase $Env:CELO_ACCOUNT_ADDRESS --ipcdisable
+``
+
+Do not forget the `--ipcdisable` parameter on Windows ([more info](https://github.com/ethereum/go-ethereum/issues/16215#issuecomment-369192502)). 
 
 You'll start seeing some output. There may be some errors or warnings that are ignorable. After a few minutes, you should see lines that look like this. This means your node has synced with the network and is receiving blocks.
 
