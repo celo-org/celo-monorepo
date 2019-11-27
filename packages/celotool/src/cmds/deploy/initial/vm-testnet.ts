@@ -14,7 +14,7 @@ export const handler = async (argv: InitialArgv) => {
   await setupCluster(argv.celoEnv, createdCluster)
   // deploy VM testnet with Terraform
   await deploy(argv.celoEnv)
-  
+
   // deploy prom to sd statefulset
   await installHelmChart(argv.celoEnv)
 }
