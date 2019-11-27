@@ -34,6 +34,22 @@ export CELO_IMAGE_ATTESTATION="us.gcr.io/celo-testnet/celo-monorepo:attestation-
 
 Currently the Sms providers supported are Nexmo & Twilio. You can create your user account in the provider of your election using the [Nexmo Sign Up form](https://dashboard.nexmo.com/sign-up) or the [Twilio Sign Up form](https://www.twilio.com/try-twilio).
 
+### Twilio
+
+Twilio is the most common and popular provider. For that you will need to provision the following variables:
+
+| Variable                     | Explanation                                                     |
+| ---------------------------- | --------------------------------------------------------------- |
+| TWILIO_ACCOUNT_SID           | The Twilio account ID                                           |
+| TWILIO_MESSAGING_SERVICE_SID | The Twilio Message Service ID. Starts by `MG`                   |
+| TWILIO_AUTH_TOKEN            | The API authentication token                                    |
+| TWILIO_BLACKLIST             | A comma-sperated list of country codes you do not want to serve |
+
+**Setup**
+After you signed up for Twilio at [https://www.twilio.com/try-twilio](https://www.twilio.com/try-twilio), you should see your `ACCOUNT SID` and your `AUTH_TOKEN` in the top right of the console. You'll also want to enter in a credit card to fund the account. For most text messages, the costs will be very low. Find a more comprehensive price list at [https://www.twilio.com/sms/pricing](https://www.twilio.com/sms/pricing). If there are countries that you do not want to serve, you can specify them with the `TWILIO_BLACKLIST`.
+
+To actually be able to send SMS, you need to create a messaging service under [Programmable SMS > SMS](https://www.twilio.com/console/sms/services). The resulting `SID` you want to specify under the `TWILIO_MESSAGING_SERVICE_SID`.
+
 ### Nexmo
 
 Here is the list of the enviromnet variables needed to use the Nexmo SMS broker:
@@ -43,17 +59,6 @@ Here is the list of the enviromnet variables needed to use the Nexmo SMS broker:
 | NEXMO_KEY       | The API key to the Nexmo API                                    |
 | NEXMO_SECRET    | The API secret to the Nexmo API                                 |
 | NEXMO_BLACKLIST | A comma-sperated list of country codes you do not want to serve |
-
-### Twilio
-
-If you prefer using Twilio, this is list of the variables to use:
-
-| Variable                     | Explanation                                                     |
-| ---------------------------- | --------------------------------------------------------------- |
-| TWILIO_ACCOUNT_SID           | The Twilio account ID                                           |
-| TWILIO_MESSAGING_SERVICE_SID | The Twilio Message Service ID. Starts by `MG`                   |
-| TWILIO_AUTH_TOKEN            | The API authentication token                                    |
-| TWILIO_BLACKLIST             | A comma-sperated list of country codes you do not want to serve |
 
 #### Database Configuration
 
