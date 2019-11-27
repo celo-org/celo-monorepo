@@ -8,12 +8,18 @@ import { BaseCommand } from '../base'
 
 export interface CommandCheck {
   name: string
+  errorMessage?: string
   run(): Promise<boolean> | boolean
 }
 
-export function check(name: string, predicate: () => Promise<boolean> | boolean): CommandCheck {
+export function check(
+  name: string,
+  predicate: () => Promise<boolean> | boolean,
+  errorMessage?: string
+): CommandCheck {
   return {
     name,
+    errorMessage,
     run: predicate,
   }
 }
@@ -63,8 +69,8 @@ class CheckBuilder {
     }
   }
 
-  addCheck(name: string, predicate: () => Promise<boolean> | boolean) {
-    this.checks.push(check(name, predicate))
+  addCheck(name: string, predicate: () => Promise<boolean> | boolean, errorMessage?: string) {
+    this.checks.push(check(name, predicate, errorMessage))
     return this
   }
 
@@ -130,7 +136,11 @@ class CheckBuilder {
     )
 
   isAccount = (address: Address) =>
-    this.addCheck(`${address} is Account`, this.withAccounts((accs) => accs.isAccount(address)))
+    this.addCheck(
+      `${address} is Account`,
+      this.withAccounts((accs) => accs.isAccount(address)),
+      `${address} is not registered as an account. Try running account:register`
+    )
 
   hasEnoughGold = (account: Address, value: BigNumber) => {
     const valueInEth = this.kit.web3.utils.fromWei(value.toFixed(), 'ether')
@@ -149,7 +159,8 @@ class CheckBuilder {
       const passed = await aCheck.run()
       const status︎Str = chalk.bold(passed ? '✔' : '✘')
       const color = passed ? chalk.green : chalk.red
-      console.log(color(`   ${status︎Str}  ${aCheck.name}`))
+      const msg = !passed && aCheck.errorMessage ? aCheck.errorMessage : ''
+      console.log(color(`   ${status︎Str}  ${aCheck.name} ${msg}`))
       allPassed = allPassed && passed
     }
 
