@@ -18,6 +18,18 @@ import {
   toTransactionObject,
 } from '../wrappers/BaseWrapper'
 
+interface AccountSummary {
+  name: string
+  authorizedSigners: {
+    vote: Address
+    validator: Address
+    attestation: Address
+  }
+  metadataURL: string
+  wallet: Address
+  dataEncryptionKey: string
+}
+
 /**
  * Contract for handling deposits needed for voting.
  */
@@ -95,6 +107,30 @@ export class AccountsWrapper extends BaseWrapper<Accounts> {
   isSigner: (address: string) => Promise<boolean> = proxyCall(
     this.contract.methods.isAuthorizedSigner
   )
+
+  async getAccountSummary(account: string): Promise<AccountSummary> {
+    const ret = await Promise.all([
+      this.getName(account),
+      this.getVoteSigner(account),
+      this.getValidatorSigner(account),
+      this.getAttestationSigner(account),
+      this.getMetadataURL(account),
+      this.getWalletAddress(account),
+      this.getDataEncryptionKey(account),
+    ])
+    return {
+      name: ret[0],
+      authorizedSigners: {
+        vote: ret[1],
+        validator: ret[2],
+        attestation: ret[3],
+      },
+      metadataURL: ret[4],
+      wallet: ret[5],
+      // @ts-ignore Incorrect bytes type.
+      dataEncryptionKey: ret[6],
+    }
+  }
 
   /**
    * Authorize an attestation signing key on behalf of this account to another address.
