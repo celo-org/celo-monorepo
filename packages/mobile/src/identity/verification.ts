@@ -28,7 +28,7 @@ import {
 } from 'src/identity/actions'
 import { acceptedAttestationCodesSelector, attestationCodesSelector } from 'src/identity/reducer'
 import { startAutoSmsRetrieval } from 'src/identity/smsRetrieval'
-import { sendTransaction, sendTransactionPromises } from 'src/transactions/send'
+import { sendTransaction } from 'src/transactions/send'
 import Logger from 'src/utils/Logger'
 import { contractKit } from 'src/web3/contracts'
 import { getConnectedAccount, getConnectedUnlockedAccount } from 'src/web3/saga'
@@ -194,17 +194,14 @@ export function* requestAndRetrieveAttestations(
   attestationsRemaining: number
 ) {
   // The set of attestations we can reveal right now
-  console.log('===1')
   let attestations: ActionableAttestation[] = yield call(
     [attestationsWrapper, attestationsWrapper.getActionableAttestations],
     e164Number,
     account
   )
-  console.log('===2')
 
   while (attestations.length < attestationsRemaining) {
     // Request any additional attestations beyond the original set
-    console.log('===3')
     yield call(
       requestAttestations,
       attestationsWrapper,
@@ -212,7 +209,6 @@ export function* requestAndRetrieveAttestations(
       e164Number,
       account
     )
-    console.log('===4')
 
     CeloAnalytics.track(CustomEventNames.verification_actionable_attestation_start)
     // Check if we have a sufficient set now by fetching the new total set
@@ -282,12 +278,7 @@ function* requestAttestations(
     numAttestationsRequestsNeeded
   )
 
-  const {
-    confirmation: approveConfirmationPromise,
-    transactionHash: approveTransactionHashPromise,
-  } = yield call(sendTransactionPromises, approveTx.txo, account, TAG, 'Approve Attestations')
-
-  yield approveTransactionHashPromise
+  yield call(sendTransaction, approveTx.txo, account, TAG, 'Approve Attestations')
 
   Logger.debug(
     `${TAG}@requestNeededAttestations`,
@@ -300,10 +291,7 @@ function* requestAttestations(
     numAttestationsRequestsNeeded
   )
 
-  yield all([
-    approveConfirmationPromise,
-    call(sendTransaction, requestTx.txo, account, TAG, 'Request Attestations'),
-  ])
+  yield call(sendTransaction, requestTx.txo, account, TAG, 'Request Attestations')
 
   Logger.debug(`${TAG}@requestNeededAttestations`, 'Waiting for block to select issuer')
 
@@ -435,7 +423,7 @@ function* revealAndCompleteAttestation(
     attestation.attestationServiceURL
   )
   if (!response.ok) {
-    throw new Error('Error revealing to issuer')
+    throw new Error(`Error revealing to issuer. Status code: ${response.status}`)
   }
 
   const code: AttestationCode = yield call(waitForAttestationCode, issuer)
