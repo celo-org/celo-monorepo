@@ -38,7 +38,7 @@ import { createTransaction, fetchTokenBalanceInWeiWithRetry } from 'src/tokens/s
 import { generateStandbyTransactionId } from 'src/transactions/actions'
 import { waitForTransactionWithId } from 'src/transactions/saga'
 import { sendTransaction } from 'src/transactions/send'
-import { dynamicLink } from 'src/utils/dynamicLink'
+import { generateDynamicShortLink } from 'src/utils/dynamicLink'
 import Logger from 'src/utils/Logger'
 import { addLocalAccount, web3 } from 'src/web3/contracts'
 import { getConnectedUnlockedAccount, getOrCreateAccount } from 'src/web3/saga'
@@ -84,16 +84,17 @@ export function getInvitationVerificationFeeInWei() {
 export async function generateLink(inviteCode: string, recipientName: string) {
   const packageName = VersionCheck.getPackageName().replace(/\.debug$/g, '.integration')
   const playStoreLink = await VersionCheck.getPlayStoreUrl({ packageName })
+  const playStoreUrl = 'https://apps.apple.com/us/app/celo-alfajores-wallet/id1482389446' // await VersionCheck.getAppStoreUrl()
   const referrerData = encodeURIComponent(`invite-code=${inviteCode}`)
   const referrerLink = `${playStoreLink}&referrer=${referrerData}`
-  const shortUrl = await dynamicLink(referrerLink)
-  const msg = i18n.t('sendFlow7:inviteSMS', {
+  Logger.info(TAG, `referrerLink before short ${referrerLink}`)
+  const shortUrl = await generateDynamicShortLink(referrerLink, playStoreUrl)
+
+  return {
     name: recipientName,
     code: inviteCode,
     link: shortUrl,
-  })
-
-  return msg
+  }
 }
 
 async function sendSms(toPhone: string, msg: string) {
@@ -141,7 +142,7 @@ export function* sendInvite(
     // TODO: Improve this by not checking specifically for this
     // display name. Requires improvements in recipient handling
     recipientName = recipientName === i18n.t('sendFlow7:mobileNumber') ? '' : ' ' + recipientName
-    const msg = yield call(generateLink, inviteCode, recipientName)
+    const msg = i18n.t('sendFlow7:inviteSMS', yield call(generateLink, inviteCode, recipientName))
 
     // Store the Temp Address locally so we know which transactions were invites
     yield put(storeInviteeData(temporaryAddress.toLowerCase(), e164Number))

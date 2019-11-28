@@ -32,6 +32,7 @@ import { callToActNotificationSelector, getActiveNotificationCount } from 'src/h
 import TransactionsList from 'src/home/TransactionsList'
 import { Namespaces } from 'src/i18n'
 import { importContacts } from 'src/identity/actions'
+import { generateLink } from 'src/invite/saga'
 import { navigate } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
 import { withDispatchAfterNavigate } from 'src/navigator/WithDispatchAfterNavigate'
@@ -136,6 +137,7 @@ export class WalletHome extends React.Component<Props> {
   }
 
   componentDidMount() {
+    generateLink('asdf', 'asdf')
     this.props.resetStandbyTransactions()
     this.props.initializeSentryUserContext()
     this.importContactsIfNeeded()

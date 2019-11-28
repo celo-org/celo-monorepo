@@ -5,7 +5,7 @@
   "license": "Apache-2.0",
   "private": true,
   "scripts": {
-    "start": "react-native start",
+    "start": "adb reverse tcp:8081 tcp:8081 && react-native start",
     "start:bg": "react-native start &",
     "lint": "tslint -c tslint.json --project tsconfig.json",
     "build": "yarn run build:ts && yarn run build:metro",

@@ -1,4 +1,4 @@
 export default {
-  getPackageName: () => 'org.celo.mobile',
-  getPlayStoreUrl: () => 'http://play.google.com',
+  getPackageName: () => 'org.celo.mobile.alfajores',
+  getPlayStoreUrl: () => 'https://play.google.com/store/apps/details?id=org.celo.mobile.alfajores',
 }
