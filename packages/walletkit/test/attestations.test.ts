@@ -11,6 +11,8 @@ const MESSAGE_2 =
   'Celo attestation code: IDOp4SaFdr9d_uNUo3SAUp1x-ZvoLAUAX_txx9dC0Q56mqAfisxNeZjh6LGDz2uMtNSo2SP-z93RkeYeB0rcXgA='
 const MESSAGE_3 =
   '<#> GTCp4SaFdr9d3uNUo3SAUp1x-ZvoLAUAX3txx9dC0Q56mqAfisxNeZP3WrGDz2uMtNSo2SP-z93RkeYeB0rcWhA= l5k6LvdPDXS'
+const MESSAGE_3_WITH_LINK =
+  '<#> celo://wallet/v/GTCp4SaFdr9d3uNUo3SAUp1x-ZvoLAUAX3txx9dC0Q56mqAfisxNeZP3WrGDz2uMtNSo2SP-z93RkeYeB0rcWhA= l5k6LvdPDXS'
 const MESSAGE_4_UNSANITIZED =
   '<#> AOvujFUk§HkATAEsmVZRgB2phcFp69eqMqg0ps4Z8688s2-kgmyHybsRWYfTgjYMJv0jmFnjM8KKmb2tThROLAE= l5k6LvdPDXS'
 
@@ -36,6 +38,7 @@ describe('Attestation Utils', () => {
       expect(messageContainsAttestationCode(MESSAGE_1)).toBeTruthy()
       expect(messageContainsAttestationCode(MESSAGE_2)).toBeTruthy()
       expect(messageContainsAttestationCode(MESSAGE_3)).toBeTruthy()
+      expect(messageContainsAttestationCode(MESSAGE_3_WITH_LINK)).toBeTruthy()
     })
 
     it('should fail if a message does not contain a attestation code', () => {
@@ -50,6 +53,7 @@ describe('Attestation Utils', () => {
       expect(extractAttestationCodeFromMessage(MESSAGE_1)).toBe(MESSAGE_1_DECODED)
       expect(extractAttestationCodeFromMessage(MESSAGE_2)).toBe(MESSAGE_2_DECODED)
       expect(extractAttestationCodeFromMessage(MESSAGE_3)).toBe(MESSAGE_3_DECODED)
+      expect(extractAttestationCodeFromMessage(MESSAGE_3_WITH_LINK)).toBe(MESSAGE_3_DECODED)
       expect(extractAttestationCodeFromMessage(MESSAGE_4_UNSANITIZED)).toBe(MESSAGE_4_DECODED)
     })
   })

@@ -1,3 +1,4 @@
+import { ensureHexLeader, stripHexLeader } from '@celo/utils/lib/address'
 import { BLS_POP_SIZE, BLS_PUBLIC_KEY_SIZE } from '@celo/utils/lib/bls'
 import { URL_REGEX } from '@celo/utils/lib/io'
 import { flags } from '@oclif/command'
@@ -7,14 +8,24 @@ import { pathExistsSync } from 'fs-extra'
 import Web3 from 'web3'
 
 const parseBytes = (input: string, length: number, msg: string) => {
-  // Check that the string starts with 0x and has byte length of `length`.
-  if (Web3.utils.isHex(input) && input.length === length * 2 + 2 && input.startsWith('0x')) {
-    return input
+  // Check that the string is hex and and has byte length of `length`.
+  const expectedLength = input.startsWith('0x') ? length * 2 + 2 : length * 2
+  if (Web3.utils.isHex(input) && input.length === expectedLength) {
+    return ensureHexLeader(input)
   } else {
     throw new CLIError(msg)
   }
 }
 
+const parseEcdsaPublicKey: ParseFn<string> = (input) => {
+  const stripped = stripHexLeader(input)
+  // ECDSA public keys may be passed as 65 byte values. When this happens, we drop the first byte.
+  if (stripped.length === 65 * 2) {
+    return parseBytes(stripped.slice(2), 64, `${input} is not an ECDSA public key`)
+  } else {
+    return parseBytes(input, 64, `${input} is not an ECDSA public key`)
+  }
+}
 const parseBlsPublicKey: ParseFn<string> = (input) => {
   return parseBytes(input, BLS_PUBLIC_KEY_SIZE, `${input} is not a BLS public key`)
 }
@@ -61,6 +72,11 @@ export const Flags = {
     parse: parseAddress,
     description: 'Account Address',
     helpValue: '0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d',
+  }),
+  ecdsaPublicKey: flags.build({
+    parse: parseEcdsaPublicKey,
+    description: 'ECDSA Public Key',
+    helpValue: '0x',
   }),
   blsPublicKey: flags.build({
     parse: parseBlsPublicKey,
