@@ -4,7 +4,7 @@ import program from 'commander'
 
 import { migrateContracts } from '../e2e-tests/utils'
 
-import { AccountType, getPrivateKeysFor, getValidators } from '../lib/generate_utils'
+import { AccountType, getPrivateKeysFor, getValidatorsInformation } from '../lib/generate_utils'
 import { GethRunConfig, runGethNodes } from '../lib/geth'
 
 program
@@ -76,16 +76,15 @@ async function runTestNetwork({
 
   // handle keys
   const attestationKeys = getPrivateKeysFor(AccountType.ATTESTATION, mnemonic, numValidators)
-  const validators = getValidators(mnemonic, numValidators)
+  const validators = getValidatorsInformation(mnemonic, numValidators)
   const validatorPrivateKeys = getPrivateKeysFor(AccountType.VALIDATOR, mnemonic, numValidators)
 
   // run the nodes
   await runGethNodes({
     keepData,
     gethConfig,
-    validatorPrivateKeys,
-    gethRepoPath,
     validators,
+    validatorPrivateKeys,
   })
 
   // do migration

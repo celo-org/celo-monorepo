@@ -1,14 +1,10 @@
-import { spawnSync } from 'child_process'
-import fs from 'fs'
-import path from 'path'
-import { addCeloGethMiddleware, ensure0x, validateAccountAddress } from 'src/lib/utils'
+import { addCeloGethMiddleware, ensure0x } from 'src/lib/utils'
 import yargs from 'yargs'
 import { GethArgv } from '../geth'
-
-const STATIC_NODES_FILE_NAME = 'static-nodes.json'
+import { GethInstanceConfig, GethRunConfig, runGethNodes } from '../../lib/geth'
+import { AccountType, getPrivateKeysFor, getValidatorsInformation } from '../../lib/generate_utils'
 
 export const command = 'run'
-
 export const describe = 'command for running geth'
 
 interface RunArgv extends GethArgv {
@@ -22,6 +18,7 @@ interface RunArgv extends GethArgv {
   rpcport: number
   wsport: number
   verbosity: number
+  amount: number
 }
 
 export const builder = (argv: yargs.Argv) => {
@@ -45,11 +42,6 @@ export const builder = (argv: yargs.Argv) => {
       description: 'Address of the miner',
       default: null,
     })
-    .option('nodekeyhex', {
-      type: 'string',
-      description: 'P2P node key as hex',
-      default: null,
-    })
     .option('miner-gas-price', {
       type: 'number',
       description: 'Mining gas price',
@@ -70,6 +62,11 @@ export const builder = (argv: yargs.Argv) => {
       description: 'WS-RPC server listening port',
       default: 8546,
     })
+    .option('amount', {
+      type: 'number',
+      description: 'Amount of nodes to run',
+      default: 1,
+    })
     .option('verbosity', {
       type: 'number',
       description: 'Verbosity level',
@@ -82,75 +79,56 @@ export const builder = (argv: yargs.Argv) => {
 }
 
 export const handler = async (argv: RunArgv) => {
-  const gethBinary = `${argv.gethDir}/build/bin/geth`
+  //  const verbosity = argv.verbosity
+
+  const gethDir = argv.gethDir
   const datadir = argv.dataDir
-  const networkId = argv.networkId
+  const networkId = parseInt(argv.networkId)
   const syncMode = argv.syncMode
-  const verbosity = argv.verbosity
-  const nodekeyhex = argv.nodekeyhex
+
   const port = argv.port
   const rpcport = argv.rpcport
   const wsport = argv.wsport
-  const mining = argv.mining
-  const minerAddress = argv.minerAddress
-  const minerGasPrice = argv.minerGasPrice
+
+  //  const mining = argv.mining
+  //  const minerAddress = argv.minerAddress
+  //  const minerGasPrice = argv.minerGasPrice
+
+  const mnemonic =
+    'jazz ripple brown cloth door bridge pen danger deer thumb cable prepare negative library vast'
+
+  const numNodes = argv.amount
+  // const network = 'local'
 
   console.info(`sync mode is ${syncMode}`)
 
-  if (!fs.existsSync(path.resolve(datadir, STATIC_NODES_FILE_NAME))) {
-    console.error(`Error: static-nodes.json was not found in datadir ${datadir}`)
-    console.info(`Try running "celotooljs geth static-nodes" or "celotooljs geth init"`)
-    process.exit(1)
+  const gethConfig: GethRunConfig = {
+    runPath: datadir,
+    genesisPath: datadir + '/genesis.json',
+    gethRepoPath: gethDir,
+    networkId: networkId,
+    instances: [],
   }
 
-  const gethArgs = [
-    '--datadir',
-    datadir,
-    '--syncmode',
-    syncMode,
-    '--rpc',
-    '--ws',
-    `--wsport=${wsport}`,
-    '--wsorigins=*',
-    '--rpcapi=eth,net,web3,debug,admin,personal',
-    '--debug',
-    `--port=${port}`,
-    '--nodiscover',
-    `--rpcport=${rpcport}`,
-    '--rpcvhosts=*',
-    '--networkid',
-    networkId,
-    '--verbosity',
-    verbosity.toString(),
-    '--consoleoutput=stdout', // Send all logs to stdout
-    '--consoleformat=term',
-    '--istanbul.lookbackwindow=2',
-  ]
-
-  if (nodekeyhex !== null && nodekeyhex.length > 0) {
-    gethArgs.push('--nodekeyhex', nodekeyhex)
+  for (let x = 0; x < numNodes; x++) {
+    gethConfig.instances.push({
+      gethRunConfig: gethConfig,
+      name: `${x}-node`,
+      validating: true,
+      syncmode: syncMode,
+      port: port + x,
+      rpcport: rpcport + x * 2,
+      wsport: wsport + x * 2,
+    } as GethInstanceConfig)
   }
 
-  if (mining) {
-    if (syncMode !== 'full' && syncMode !== 'fast') {
-      console.error('Mining works only in full or fast mode')
-      process.exit(1)
-    }
+  const validators = getValidatorsInformation(mnemonic, numNodes)
+  const validatorPrivateKeys = getPrivateKeysFor(AccountType.VALIDATOR, mnemonic, numNodes)
 
-    if (!validateAccountAddress(minerAddress)) {
-      console.error(`Miner address is incorrect: "${minerAddress}"`)
-      process.exit(1)
-    }
-
-    gethArgs.push(
-      '--mine',
-      '--minerthreads=10',
-      `--miner.gasprice=${minerGasPrice}`,
-      '--password=/dev/null',
-      `--unlock=${minerAddress}`,
-      '--lightserv=90'
-    )
-  }
-
-  spawnSync(gethBinary, gethArgs, { stdio: 'inherit' })
+  await runGethNodes({
+    gethConfig,
+    keepData: true,
+    validatorPrivateKeys,
+    validators,
+  })
 }

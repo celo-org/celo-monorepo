@@ -97,7 +97,7 @@ export async function spawnCmdWithExitOnFailure(
 ) {
   const code = await spawnCmd(cmd, args, options)
   if (code !== 0) {
-    console.error('execCmd failed for: ' + [cmd].concat(args).join(' '))
+    console.error('spawnCmd failed for: ' + [cmd].concat(args).join(' '))
     process.exit(1)
   }
 }
