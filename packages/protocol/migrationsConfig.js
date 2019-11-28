@@ -29,8 +29,8 @@ const DefaultConfig = {
   },
   epochRewards: {
     targetVotingYieldParameters: {
-      initial: 6 / 100,
-      max: 20 / 100,
+      initial: 0.00016, // (x + 1) ^ 365 = 1.06
+      max: 0.0005, // (x + 1) ^ 365 = 1.20
       adjustmentFactor: 1 / 365,
     },
     rewardsMultiplierParameters: {
