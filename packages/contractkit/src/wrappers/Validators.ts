@@ -277,7 +277,7 @@ export class ValidatorsWrapper extends BaseWrapper<Validators> {
    *
    * @param validatorAddress The address that the validator is using for consensus, should match
    *   the validator signer.
-   * @param ecdsaPublicKey The ECDSA public key that the validator is using for consensus. 65 bytes.
+   * @param ecdsaPublicKey The ECDSA public key that the validator is using for consensus. 64 bytes.
    * @param blsPublicKey The BLS public key that the validator is using for consensus, should pass proof
    *   of possession. 48 bytes.
    * @param blsPop The BLS public key proof-of-possession, which consists of a signature on the

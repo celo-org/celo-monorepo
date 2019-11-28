@@ -1,4 +1,5 @@
 import { testWithGanache } from '@celo/dev-utils/lib/ganache-test'
+import { addressToPublicKey } from '@celo/utils/lib/signatureUtils'
 import { parseSignature } from '@celo/utils/lib/signatureUtils'
 import Web3 from 'web3'
 import { newKitFromWeb3 } from '../kit'
@@ -48,11 +49,13 @@ testWithGanache('Accounts Wrapper', (web3) => {
 
   const setupValidator = async (validatorAccount: string) => {
     await registerAccountWithLockedGold(validatorAccount)
-    await (await validators
+    const ecdsaPublicKey = await addressToPublicKey(validatorAccount, kit.web3.eth.sign)
+    await validators
       // @ts-ignore
-      .registerValidator(validatorAccount, blsPublicKey, blsPoP)).sendAndWaitForReceipt({
-      from: validatorAccount,
-    })
+      .registerValidator(ecdsaPublicKey, blsPublicKey, blsPoP)
+      .sendAndWaitForReceipt({
+        from: validatorAccount,
+      })
   }
 
   test('SBAT authorize validator key when not a validator', async () => {

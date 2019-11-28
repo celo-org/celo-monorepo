@@ -20,7 +20,7 @@ const parseBytes = (input: string, length: number, msg: string) => {
 const parseEcdsaPublicKey: ParseFn<string> = (input) => {
   const stripped = stripHexLeader(input)
   // ECDSA public keys may be passed as 65 byte values. When this happens, we drop the first byte.
-  if (stripped.length == 65 * 2) {
+  if (stripped.length === 65 * 2) {
     return parseBytes(stripped.slice(2), 64, `${input} is not an ECDSA public key`)
   } else {
     return parseBytes(input, 64, `${input} is not an ECDSA public key`)
