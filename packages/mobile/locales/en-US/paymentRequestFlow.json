@@ -6,5 +6,5 @@
   "celoDollarBalance": "{{CeloDollar}} Balance",
   "requestDeclined": "Request Declined",
   "requestPaid": "Request Paid",
-  "paymentRequestUpdateFailed": "Can not update payment request"
+  "paymentRequestUpdateFailed": "Cannot update payment request"
 }
