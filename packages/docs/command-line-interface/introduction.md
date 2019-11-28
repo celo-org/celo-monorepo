@@ -66,4 +66,6 @@ celocli <module>:<command> <...args> <...flags?>
 
 The `celocli` tool assumes that users are running a node which they have access to signing transactions on. The config module is included below for convenience. Use the sidebar to navigate to the other modules.
 
+**All balances of Celo Gold or Celo Dollars returned from the CeloCLI are expressed in units of 10<sup>-18</sup>**
+
 {% embed url="https://www.npmjs.com/package/@celo/celocli" %}
