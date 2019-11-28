@@ -233,6 +233,10 @@ module.exports = async (_deployer: any, networkName: string) => {
     return
   }
 
+  if (config.validators.votesRatioOfLastVsFirstGroup < 1) {
+    throw new Error(`votesRatioOfLastVsFirstGroup needs to be >= 1`)
+  }
+
   // Calculate per validator locked gold for first group...
   const lockedGoldPerValAtFirstGroup = new BigNumber(
     config.validators.groupLockedGoldRequirements.value
