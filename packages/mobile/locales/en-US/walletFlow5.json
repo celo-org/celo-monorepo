@@ -1,6 +1,6 @@
 {
   "getStarted": "Get Started",
-  "incomingPaymentRequest": "Request Waiting on You",
+  "incomingPaymentRequest": "Request Waiting for You",
   "incomingPaymentRequestWithCount_plural": "{{count}} Requests Waiting on You",
   "outgoingPaymentRequest": "Payment You’ve Requested",
   "outgoingPaymentRequestWithCount_plural": "{{count}} Payments You’ve Requested",
