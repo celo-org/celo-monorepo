@@ -4,7 +4,7 @@ import 'react-native'
 import { fireEvent, render } from 'react-native-testing-library'
 import { Provider } from 'react-redux'
 import ImportWallet, { ImportWallet as ImportWalletClass } from 'src/import/ImportWallet'
-import { createMockStore, getMockI18nProps } from 'test/utils'
+import { createMockNavigationProp, createMockStore, getMockI18nProps } from 'test/utils'
 import { mockMnemonic } from 'test/values'
 
 jest.mock('src/geth/GethAwareButton', () => {
@@ -32,6 +32,7 @@ describe('ImportWallet', () => {
           importBackupPhrase={importFn}
           hideAlert={jest.fn()}
           isImportingWallet={false}
+          navigation={createMockNavigationProp({})}
           {...getMockI18nProps()}
         />
       </Provider>

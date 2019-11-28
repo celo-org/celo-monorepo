@@ -8,11 +8,7 @@ import * as React from 'react'
 import { WithNamespaces, withNamespaces } from 'react-i18next'
 import { ActivityIndicator, Image, Keyboard, StyleSheet, Text, View } from 'react-native'
 import SafeAreaView from 'react-native-safe-area-view'
-import {
-  NavigationInjectedProps,
-  withNavigationFocus,
-  NavigationEventSubscription,
-} from 'react-navigation'
+import { NavigationEvents, NavigationInjectedProps } from 'react-navigation'
 import { connect } from 'react-redux'
 import { hideAlert } from 'src/alert/actions'
 import CeloAnalytics from 'src/analytics/CeloAnalytics'
@@ -62,25 +58,13 @@ export class ImportWallet extends React.Component<Props, State> {
   state = {
     backupPhrase: '',
   }
-  didFocusSubscription?: NavigationEventSubscription
-
-  componentDidMount() {
-    this.didFocusSubscription = this.props.navigation.addListener('didFocus', () =>
-      this.checkCleanBackupPhrase()
-    )
-  }
-
-  componentWillUnmount() {
-    if (this.didFocusSubscription) {
-      this.didFocusSubscription.remove()
-    }
-  }
 
   checkCleanBackupPhrase() {
     if (this.props.navigation.getParam('clean')) {
       this.setState({
         backupPhrase: '',
       })
+      this.props.navigation.setParams({ clean: false })
     }
   }
 
@@ -114,6 +98,7 @@ export class ImportWallet extends React.Component<Props, State> {
 
     return (
       <SafeAreaView style={styles.container}>
+        <NavigationEvents onDidFocus={this.checkCleanBackupPhrase} />
         <KeyboardAwareScrollView
           contentContainerStyle={styles.scrollContainer}
           keyboardShouldPersistTaps="always"
@@ -190,12 +175,10 @@ const styles = StyleSheet.create({
   },
 })
 
-export default withNavigationFocus(
-  connect<StateProps, DispatchProps, {}, RootState>(
-    mapStateToProps,
-    {
-      importBackupPhrase,
-      hideAlert,
-    }
-  )(withNamespaces(Namespaces.nuxRestoreWallet3)(ImportWallet))
-)
+export default connect<StateProps, DispatchProps, any, RootState>(
+  mapStateToProps,
+  {
+    importBackupPhrase,
+    hideAlert,
+  }
+)(withNamespaces(Namespaces.nuxRestoreWallet3)(ImportWallet))
