@@ -190,6 +190,10 @@ export const v4Schema = {
     verificationStatus: 0,
     hasSeenVerificationNux: false,
   },
+  account: {
+    ...v3Schema.account,
+    dismissedGetVerified: false,
+  },
 }
 
 export function getLatestSchema(): Partial<RootState> {
