@@ -1,18 +1,96 @@
 {
+  "aboutTheChallenge": "About the Challenge",
+  "aboutChallengeText":
+    "We're looking for node operators and admins who can help develop the Celo menu. Spin up a validator or full node, build operational experience, and help the community prepare for opening night.",
+  "aboutTheChallengeButton": "Get Involved",
+  "expandLeaderboard": "Expand Leaderboard",
+  "makeWithCelo": "Build Celo",
+  "makeWithCeloSubtitle": "Get a taste of Baklava, Celo’s incentivized testnet",
+  "greatStakeOff": "The Great Celo\nStake Off",
+  "greatStakeOffSubtitle": "Win prizes by operating and hardening\nthe Baklava Testnet",
+  "purposeTitle": "Purpose",
+  "purposeText":
+    "Learn how to run a node on Celo’s peer-to-peer network and win up to <0>2 million Celo Gold in rewards.</0>*",
+  "purposeAsterisk": "* subject to <0>Terms and Conditions</0>",
+  "challengeTitle": "The Challenge",
+  "challengeText":
+    "Let the staking season commence! Starting December 4th, all chefs, bakers, and validators are invited to compete for the ultimate glory: honor, food, and Celo Gold.",
+  "whoTitle": "Who",
+  "whoText":
+    "If you have a technical background and you’re interested in open source, security, or building & operating infrastructure, you’d make a perfect Celo validator!",
+  "challengeBtnText": "Join the Stake Off",
   "buildCoverTitle": "Get a Taste of Alfajores",
   "buildCoverSubtitle": "Developer resources for the Celo Protocol and Celo Wallet",
   "viewGitHub": "View on Github",
   "getStarted": "Get Wallet",
   "seeTutorial": "See Tutorial",
-  "featureTitle": "Celo Platform Features",
+  "featureTitle": "Platform Features",
   "techTitle": "Full Stack Approach",
   "learnMore": "Learn More",
   "readMore": "Read More",
   "installWallet": "Install Wallet",
   "seeCode": "See Code",
   "celoStack": "The Celo Stack",
+  "stackSubtitle": "Full Stack Approach",
+  "stackTitle": "Celo Layers of Technology",
+  "stackDescription": "Each layer of the technical stack is designed to meet mobile user needs.",
   "exploreCLI": "Explore the Celo CLI",
   "fullStackText": "Each layer of the technical stack is designed to meet mobile user needs.",
+  "engage": {
+    "mainTitle": "Make Celo your own",
+    "topTitle": "Engage with Celo",
+    "contributeTitle": "Contribute To Celo",
+    "contributeText":
+      "There are a variety of resources to support contributions to Celo, including: grants, security bounties, an Ecosystem Fund, fellowships, and more.",
+    "contributeBtn": "Get Involved",
+    "validators": {
+      "noun": "For Validators and Full Nodes",
+      "verb": "Operate Celo",
+      "network": "Baklava Testnet",
+      "caption":
+        "Participate in testing and hardening the Celo Protocol.\nDeploy a Full Node or Validator and win prizes.",
+      "primaryAction": "Register",
+      "secondaryAction": "Start Validating"
+    },
+    "developers": {
+      "noun": "For Developers",
+      "verb": "Extend & Enrich the Ecosystem",
+      "network": "Alfajores Testnet",
+      "caption": "Try out the Celo Protocol and Celo Wallet.\nBuild apps for the Celo platform.",
+      "primaryAction": "Get Wallet",
+      "secondaryAction": "Explore Celo CLI"
+    },
+    "secure": {
+      "title": "Strengthen Celo",
+      "copy": "Make Celo more secure and earn money by participating in Celo’s Bug Bounty Program",
+      "btnText": "Learn More"
+    },
+    "improve": {
+      "title": "Advance Celo",
+      "copy": "Get funding to improve Celo through Celo Grants",
+      "btnText": "View Grants"
+    },
+    "tutorial": {
+      "title": "Tutorial",
+      "copy": "Deploy Celo blockchain software and connect to Baklava",
+      "btnText": "Read Tutorial"
+    },
+    "blog": {
+      "title": "Technical Blog",
+      "copy": "Learn about Proof of Stake, validating and incentives in the Celo Protocol",
+      "btnText": "Read Blog"
+    },
+    "faucet": {
+      "title": "Add Alfajores Funds",
+      "copy": "Top up your wallet on an existing Testnet account",
+      "btnText": "Get Funds"
+    },
+    "docs": {
+      "title": "Documentation",
+      "copy": "Learn about the technology behind the Celo Protocol & Celo Wallet",
+      "btnText": "Read Documentation"
+    }
+  },
   "coverAction": {
     "docs": {
       "title": "Documentation",
@@ -93,5 +171,8 @@
     "latestUpdates": "Receive the latest updates to your inbox",
     "signUp": "Sign Up",
     "signUpThanks": "Thank you for signing up"
-  }
+  },
+  "stackBrowseTitle": "Browse the Code",
+  "stackBrowseCopy": "Explore and contribute to the Celo codebase",
+  "stackBrowseButton": "View On Github"
 }

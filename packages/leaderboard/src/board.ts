@@ -2,19 +2,11 @@ import { ContractKit, newKitFromWeb3, CeloContract } from '@celo/contractkit'
 import { AccountsWrapper } from '@celo/contractkit/lib/wrappers/Accounts'
 import Web3 from 'web3'
 import http from 'http'
-import fs from 'fs'
-import readline from 'readline'
-import { google, sheets_v4 } from 'googleapis'
 import { Client } from 'pg'
 import { verifyClaim, Claim } from '@celo/contractkit/lib/identity/claims/claim'
 import { ClaimTypes } from '@celo/contractkit/lib/identity'
 
-// If modifying these scopes, delete token.json.
-const SCOPES = ['https://www.googleapis.com/auth/spreadsheets.readonly']
-// The file token.json stores the user's access and refresh tokens, and is
-// created automatically when the authorization flow completes for the first
-// time.
-const TOKEN_PATH = 'token.json'
+const GoogleSpreadsheet = require('google-spreadsheet')
 
 function addressToBinary(a: string) {
   try {
@@ -26,28 +18,47 @@ function addressToBinary(a: string) {
 }
 
 const LEADERBOARD_DATABASE = process.env['LEADERBOARD_DATABASE'] || 'blockscout'
-const LEADERBOARD_TOKEN = process.env['LEADERBOARD_TOKEN'] || 0
 const LEADERBOARD_SHEET =
-  process.env['LEADERBOARD_SHEET'] || '1d3pZNof8p3z8M9O3MH5FZG5dA3e-L52XiJ4qA5o7X0Y'
+  process.env['LEADERBOARD_SHEET'] || '1HCs1LZv1BOB1v2bVlH4qNPnxVRlYVhQ7CKhkMibE4EY'
 const LEADERBOARD_WEB3 = process.env['LEADERBOARD_WEB3'] || 'http://localhost:8545'
 
-function parsePercentage(str: string) {
-  return parseFloat(str.substr(0, str.length - 1)) * 0.01
+function readSheet() {
+  // spreadsheet key is the long id in the sheets URL
+  const doc = new GoogleSpreadsheet(LEADERBOARD_SHEET)
+
+  doc.getInfo(function(_err: any, info: any) {
+    let sheet = info.worksheets[0]
+    sheet.getCells(
+      {
+        'min-row': 3,
+        'max-row': 500,
+        'min-col': 1,
+        'max-col': 3,
+        'return-empty': true,
+      },
+      function(err: any, cells: any) {
+        console.log(err)
+        let arr: any = {}
+        for (let e of cells) {
+          // console.log(e)
+          arr[e.row] = arr[e.row] || {}
+          if (e.col == 1) {
+            arr[e.row].address = addressToBinary(e.value)
+          }
+          if (e.col == 3) {
+            arr[e.row].multiplier = e.numericValue
+          }
+        }
+        updateDB(Object.values(arr).filter((a: any) => !!a.address && a.multiplier !== 0))
+      }
+    )
+  })
 }
 
-async function updateDB(addresses: any[], multipliers: any[]) {
+async function updateDB(lst: any[]) {
+  console.log(lst)
   const client = new Client({ database: LEADERBOARD_DATABASE })
   await client.connect()
-  let lst = []
-  for (let i = 0; i < addresses.length && i < multipliers.length; i++) {
-    if (multipliers[i] == '0%' || addresses[i] == '') continue
-    let item = {
-      address: addressToBinary(addresses[i]),
-      multiplier: parsePercentage(multipliers[i]),
-    }
-    console.log(item)
-    lst.push(item)
-  }
   const res = await client.query(
     'INSERT INTO competitors (address, multiplier)' +
       " SELECT decode(m.address, 'hex') AS address, m.multiplier FROM json_populate_recordset(null::json_type, $1) AS m" +
@@ -56,7 +67,7 @@ async function updateDB(addresses: any[], multipliers: any[]) {
   )
   console.log(res.rows)
   await client.end()
-  await readAssoc(addresses.map((a) => a.toString()))
+  await readAssoc(lst.map((a: any) => a.address.toString()))
 }
 
 async function updateRate(kit: ContractKit) {
@@ -118,102 +129,6 @@ async function processClaims(kit: ContractKit, address: string, data: string) {
   } catch (err) {
     console.error('Cannot process claims', err)
   }
-}
-
-function getCredentials() {
-  let credentials = process.env['LEADERBOARD_CREDENTIALS']
-  if (!credentials) {
-    return fs.readFileSync('credentials.json')
-  }
-  return credentials
-}
-
-function readSheet() {
-  const content = getCredentials()
-  // Authorize a client with credentials, then call the Google Sheets API.
-  authorize(JSON.parse(content.toString()), getInfo)
-}
-
-/**
- * Create an OAuth2 client with the given credentials, and then execute the
- * given callback function.
- * @param {Object} credentials The authorization client credentials.
- * @param {function} callback The callback to call with the authorized client.
- */
-function authorize(credentials: any, callback: any) {
-  const { client_secret, client_id, redirect_uris } = credentials.installed
-  const oAuth2Client = new google.auth.OAuth2(client_id, client_secret, redirect_uris[0])
-
-  if (LEADERBOARD_TOKEN) {
-    oAuth2Client.setCredentials(JSON.parse(LEADERBOARD_TOKEN.toString()))
-    callback(oAuth2Client)
-  }
-  // Check if we have previously stored a token.
-  else
-    fs.readFile(TOKEN_PATH, (err, token) => {
-      if (err) return getNewToken(oAuth2Client, callback)
-      oAuth2Client.setCredentials(JSON.parse(token.toString()))
-      callback(oAuth2Client)
-    })
-}
-
-/**
- * Get and store new token after prompting for user authorization, and then
- * execute the given callback with the authorized OAuth2 client.
- * @param {google.auth.OAuth2} oAuth2Client The OAuth2 client to get token for.
- * @param {getEventsCallback} callback The callback for the authorized client.
- */
-function getNewToken(oAuth2Client: any, callback: any) {
-  const authUrl = oAuth2Client.generateAuthUrl({
-    access_type: 'offline',
-    scope: SCOPES,
-  })
-  console.log('Authorize this app by visiting this url:', authUrl)
-  const rl = readline.createInterface({
-    input: process.stdin,
-    output: process.stdout,
-  })
-  rl.question('Enter the code from that page here: ', (code) => {
-    rl.close()
-    oAuth2Client.getToken(code, (err: any, token: any) => {
-      if (err) return console.error('Error while trying to retrieve access token', err)
-      oAuth2Client.setCredentials(token)
-      // Store the token to disk for later program executions
-      fs.writeFile(TOKEN_PATH, JSON.stringify(token), (err) => {
-        if (err) return console.error(err)
-        console.log('Token stored to', TOKEN_PATH)
-      })
-      callback(oAuth2Client)
-    })
-  })
-}
-
-function getColumn(sheets: sheets_v4.Sheets, range: string, cb: any) {
-  sheets.spreadsheets.values.get(
-    {
-      spreadsheetId: LEADERBOARD_SHEET,
-      range,
-    },
-    (err, res) => {
-      if (err) return console.log('The API returned an error: ' + err)
-      if (res == null) return
-      const rows = res.data.values
-      if (rows && rows.length) {
-        cb(rows.map((a) => a[0]))
-      } else {
-        console.log('No data found.')
-      }
-    }
-  )
-}
-
-function getInfo(auth: any) {
-  const sheets = google.sheets({ version: 'v4', auth })
-  getColumn(sheets, 'Sheet1!A3:A', function(addresses: any[]) {
-    getColumn(sheets, 'Sheet1!C3:C', function(multipliers: any[]) {
-      updateDB(addresses, multipliers)
-    })
-  })
 }
 
 async function readAssoc(lst: string[]) {
