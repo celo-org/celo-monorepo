@@ -43,6 +43,8 @@ export default class ElectionShow extends BaseCommand {
         .runChecks()
       const voter = await election.getVoter(address)
       printValueMapRecursive(voter)
+    } else {
+      throw Error('Must select --voter or --group')
     }
   }
 }
