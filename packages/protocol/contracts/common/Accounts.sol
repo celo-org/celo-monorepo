@@ -44,7 +44,7 @@ contract Accounts is IAccounts, Ownable, ReentrancyGuard, Initializable, UsingRe
     string metadataURL;
   }
 
-  mapping(address => Account) private accounts;
+  mapping(address => Account) internal accounts;
   // Maps authorized signers to the account that provided the authorization.
   mapping(address => address) public authorizedBy;
 
