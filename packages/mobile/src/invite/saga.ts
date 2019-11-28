@@ -46,7 +46,7 @@ import { zeroSyncSelector } from 'src/web3/selectors'
 
 const TAG = 'invite/saga'
 export const TEMP_PW = 'ce10'
-export const REDEEM_INVITE_TIMEOUT = 1.5 * 60 * 1000 // 1.5 minutes
+export const REDEEM_INVITE_TIMEOUT = 2 * 60 * 1000 // 2 minutes
 const INVITE_FEE = '0.2'
 
 export async function getInviteTxGas(

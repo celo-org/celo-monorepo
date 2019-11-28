@@ -34,7 +34,8 @@ export const isAppConnected = createSelector(
 
 export const isAppSynced = (state: RootState) => {
   return (
-    state.web3.syncProgress &&
+    state.web3.syncProgress.currentBlock > 0 &&
+    state.web3.syncProgress.highestBlock > 0 &&
     state.web3.syncProgress.currentBlock === state.web3.syncProgress.highestBlock
   )
 }

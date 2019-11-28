@@ -49,7 +49,7 @@ const MNEMONIC_BIT_LENGTH = (ETH_PRIVATE_KEY_LENGTH * 8) / 2
 
 const TAG = 'web3/saga'
 // The timeout for web3 to complete syncing and the latestBlock to be > 0
-export const SYNC_TIMEOUT = 2 * 60 * 1000 // 2 minutes
+export const SYNC_TIMEOUT = 3 * 60 * 1000 // 3 minutes
 const BLOCK_CHAIN_CORRUPTION_ERROR = "Error: CONNECTION ERROR: Couldn't connect to node on IPC."
 
 // checks if web3 claims it is currently syncing and attempts to wait for it to complete
@@ -501,5 +501,4 @@ export function* watchZeroSyncMode() {
 
 export function* web3Saga() {
   yield spawn(watchZeroSyncMode)
-  yield spawn(waitForWeb3Sync)
 }
