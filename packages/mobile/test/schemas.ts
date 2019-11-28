@@ -48,8 +48,8 @@ export const vNeg1Schema = {
     isReady: false,
     syncProgress: 0,
     syncProgressData: {
-      currentBlock: 0,
-      highestBlock: 0,
+      currentBlock: 100,
+      highestBlock: 100,
       startBlock: 0,
     },
     latestBlockNumber: 0,
@@ -59,6 +59,10 @@ export const vNeg1Schema = {
     gasPriceLastUpdated: 0,
     zeroSyncMode: false,
     gethStartedThisSession: true,
+  },
+  geth: {
+    initialized: 'INITIALIZED',
+    connected: true,
   },
   identity: {
     attestationCodes: [],
@@ -125,8 +129,8 @@ export const v0Schema = {
     ...vNeg1Schema.web3,
     syncProgress: {
       startingBlock: 0,
-      currentBlock: 0,
-      highestBlock: 0,
+      currentBlock: 100,
+      highestBlock: 100,
     },
   },
   localCurrency: {
