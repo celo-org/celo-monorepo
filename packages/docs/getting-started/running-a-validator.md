@@ -31,7 +31,7 @@ While other Validator Groups will exist on the Celo Networks, the fastest way to
 
 Because of the importance of Validator security and availability, Validators are expected to run one or more additional "proxy" nodes. In this setup, the proxy node connects with the rest of the network, and the machine running the Validator communicates only with the proxy, ideally via a private network.
 
-Additionally, Validators are expected to run an [Attestation Service](https://github.com/celo-org/celo-monorepo/tree/master/packages/attestation-service) as part of the [lightweight identity protocol](/celo-codebase/protocol/identity), to provide attestations that allow users to map their phone number to a Celo address.
+Additionally, Validators are expected to run an [Attestation Service](running-attestation-service.md) as part of the [lightweight identity protocol](../celo-codebase/protocol/identity), to provide attestations that allow users to map their phone number to a Celo address.
 
 You can find more details about Celo mission and why to become a Validator [at the following page](https://medium.com/celohq/calling-all-chefs-become-a-celo-validator-c75d1c2909aa).
 
@@ -108,22 +108,23 @@ Note that account and signer keys must be unique and may not be reused.
 
 ### Environment variables
 
-| Variable                      | Explanation                                                               |
-| ----------------------------- | ------------------------------------------------------------------------- |
-| CELO_IMAGE                    | The Docker image used for the Validator and Proxy containers              |  |
-| NETWORK_ID                    | The Celo Baklava network chain ID                                         |  |
-| CELO_VALIDATOR_GROUP_ADDRESS  | The account address for the Validator Group                               |  |
-| CELO_VALIDATOR_ADDRESS        | The account address for the Validator                                     |  |
-| CELO_VALIDATOR_SIGNER_ADDRESS | The address of the validator signer authorized by the validator account   |  |
-| CELO_VALIDATOR_SIGNER_POP     | The proof-of-possession of the validator signer key                       |  |
-| CELO_VALIDATOR_BLS_PUBLIC_KEY | The BLS public key for the Validator instance                             |  |
-| CELO_VALIDATOR_BLS_SIGNATURE  | A proof-of-possession of the BLS public key                               |  |
-| PROXY_ENODE                   | The enode address for the Validator proxy                                 |  |
-| PROXY_IP                      | The Proxy container internal IP address from docker pool address          |  |
-| ATTESTATION_SIGNER_ADDRESS    | The address of the attestation signer authorized by the validator account |  |
-| ATTESTATION_SIGNER_POP        | The proof-of-possession of the attestation signer key                     |  |
-| ATTESTATION_SERVICE_URL       | The URL to access the deployed Attestation Service                        |  |
-| METADATA_URL                  | The URL to access the metadata file for your Attestation Service          |  |
+| Variable                             | Explanation                                                               |
+| ------------------------------------ | ------------------------------------------------------------------------- |
+| CELO_IMAGE                           | The Docker image used for the Validator and Proxy containers              |  |
+| NETWORK_ID                           | The Celo Baklava network chain ID                                         |  |
+| CELO_VALIDATOR_GROUP_ADDRESS         | The account address for the Validator Group                               |  |
+| CELO_VALIDATOR_ADDRESS               | The account address for the Validator                                     |  |
+| CELO_VALIDATOR_SIGNER_ADDRESS        | The address of the validator signer authorized by the validator account   |  |
+| CELO_VALIDATOR_SIGNER_PUBLIC_KEY     | The ECDSA public key associated with the validator signer address         |  |
+| CELO_VALIDATOR_SIGNER_SIGNATURE      | The proof-of-possession of the validator signer key                       |  |
+| CELO_VALIDATOR_SIGNER_BLS_PUBLIC_KEY | The BLS public key for the Validator instance                             |  |
+| CELO_VALIDATOR_SIGNER_BLS_SIGNATURE  | A proof-of-possession of the BLS public key                               |  |
+| PROXY_ENODE                          | The enode address for the Validator proxy                                 |  |
+| PROXY_IP                             | The Proxy container internal IP address from docker pool address          |  |
+| ATTESTATION_SIGNER_ADDRESS           | The address of the attestation signer authorized by the validator account |  |
+| ATTESTATION_SIGNER_SIGNATURE         | The proof-of-possession of the attestation signer key                     |  |
+| ATTESTATION_SERVICE_URL              | The URL to access the deployed Attestation Service                        |  |
+| METADATA_URL                         | The URL to access the metadata file for your Attestation Service          |  |
 
 First we are going to setup the main environment variables related with the `Baklava` network. Run:
 
@@ -146,10 +147,10 @@ First, you'll need to generate account keys for your Validator and Validator Gro
 
 ```bash
 # On your local machine
-mkdir -p celo-data-dir/accounts
-cd celo-data-dir/accounts
-docker run -v $PWD/accounts:/root/.celo --entrypoint /bin/sh -it $CELO_IMAGE -c "geth account new"
-docker run -v $PWD/accounts:/root/.celo --entrypoint /bin/sh -it $CELO_IMAGE -c "geth account new"
+mkdir celo-accounts-node
+cd celo-accounts-node
+docker run -v $PWD:/root/.celo --entrypoint /bin/sh -it $CELO_IMAGE -c "geth account new"
+docker run -v $PWD:/root/.celo --entrypoint /bin/sh -it $CELO_IMAGE -c "geth account new"
 ```
 
 This should generate two accounts in your current directory and print them out, set them in an environment variables:
@@ -164,15 +165,15 @@ Next, we'll run a node on your local machine so that we can use these accounts t
 
 ```bash
 # On your local machine
-docker run -v $PWD/accounts:/root/.celo $CELO_IMAGE init /celo/genesis.json
-docker run -v $PWD/accounts:/root/.celo --entrypoint cp $CELO_IMAGE /celo/static-nodes.json /root/.celo/
+docker run -v $PWD:/root/.celo $CELO_IMAGE init /celo/genesis.json
+docker run -v $PWD:/root/.celo --entrypoint cp $CELO_IMAGE /celo/static-nodes.json /root/.celo/
 ```
 
 To run the node:
 
 ```bash
 # On your local machine
-docker run --name celo-accounts -d --restart always -p 8545:8545 -v $PWD/accounts:/root/.celo $CELO_IMAGE --verbosity 3 --networkid $NETWORK_ID --syncmode full --rpc --rpcaddr 0.0.0.0 --rpcapi eth,net,web3,debug,admin,personal
+docker run --name celo-accounts --restart always -p 8545:8545 -v $PWD:/root/.celo $CELO_IMAGE --verbosity 3 --networkid $NETWORK_ID --syncmode full --rpc --rpcaddr 0.0.0.0 --rpcapi eth,net,web3,debug,admin,personal
 ```
 
 ### Obtain and lock up some Celo Gold for staking
@@ -185,10 +186,12 @@ To actually register as a validator, we'll need to generate a validating signer 
 
 ```bash
 # On the validator machine
-mkdir -p celo-data-dir/validator
-cd celo-data-dir/validator
-docker run -v $PWD/validator:/root/.celo $CELO_IMAGE init /celo/genesis.json
-docker run -v $PWD/validator:/root/.celo --entrypoint /bin/sh -it $CELO_IMAGE -c "geth account new"
+# Note that you have to export $CELO_IMAGE on this machine
+export CELO_IMAGE=us.gcr.io/celo-testnet/celo-node:baklava
+mkdir celo-validator-node
+cd celo-validator-node
+docker run -v $PWD:/root/.celo $CELO_IMAGE init /celo/genesis.json
+docker run -v $PWD:/root/.celo --entrypoint /bin/sh -it $CELO_IMAGE -c "geth account new"
 export CELO_VALIDATOR_SIGNER_ADDRESS=<YOUR-VALIDATOR-SIGNER-ADDRESS>
 ```
 
@@ -197,24 +200,32 @@ In order to authorize our Validator signer, we need to create a proof that we ha
 ```bash
 # On the validator machine
 # Note that you have to export CELO_VALIDATOR_ADDRESS on this machine
-export $CELO_VALIDATOR_ADDRESS=<CELO_VALIDATOR_ADDRESS>
-docker run -v $PWD/validator:/root/.celo --entrypoint /bin/sh -it $CELO_IMAGE -c "geth account proof-of-possession $CELO_VALIDATOR_SIGNER_ADDRESS $CELO_VALIDATOR_ADDRESS"
+export CELO_VALIDATOR_ADDRESS=<CELO_VALIDATOR_ADDRESS>
+docker run -v $PWD:/root/.celo --entrypoint /bin/sh -it $CELO_IMAGE -c "geth account proof-of-possession $CELO_VALIDATOR_SIGNER_ADDRESS $CELO_VALIDATOR_ADDRESS"
+```
+
+Save the signer address, public key, and proof-of-possession signature to your local machine:
+
+```bash
+# On your local machine
+export CELO_VALIDATOR_SIGNER_ADDRESS=<YOUR-VALIDATOR-SIGNER-ADDRESS>
+export CELO_VALIDATOR_SIGNER_PUBLIC_KEY=<YOUR-VALIDATOR-SIGNER-PUBLIC-KEY>
+export CELO_VALIDATOR_SIGNER_SIGNATURE=<YOUR-VALIDATOR-SIGNER-SIGNATURE>
 ```
 
 Validators on the Celo network use BLS aggregated signatures to create blocks in addition to the Validator signer (ECDSA) key. While an independent BLS key can be specified, the simplest thing to do is to derive the BLS key from the Validator signer key. When we register our Validator, we'll need to prove possession of the BLS key as well, which can be done by running the following command:
 
 ```bash
 # On the validator machine
-docker run -v $PWD/validator:/root/.celo --entrypoint /bin/sh -it $CELO_IMAGE -c "geth account proof-of-possession $CELO_VALIDATOR_SIGNER_ADDRESS $CELO_VALIDATOR_ADDRESS --bls"
+docker run -v $PWD:/root/.celo --entrypoint /bin/sh -it $CELO_IMAGE -c "geth account proof-of-possession $CELO_VALIDATOR_SIGNER_ADDRESS $CELO_VALIDATOR_ADDRESS --bls"
 ```
 
-It will prompt you for the passphrase you've chosen for the Validator signer key. Let's save the resulting proof-of-possession to three environment variables:
+Save the resulting signature and public key to your local machine:
 
 ```bash
 # On your local machine
-export CELO_VALIDATOR_SIGNER_POP=<YOUR-VALIDATOR-SIGNER-POP>
-export CELO_VALIDATOR_BLS_PUBLIC_KEY=<YOUR-VALIDATOR-BLS-PUBLIC-KEY>
-export CELO_VALIDATOR_BLS_SIGNATURE=<YOUR-VALIDATOR-BLS-SIGNATURE>
+export CELO_VALIDATOR_SIGNER_BLS_PUBLIC_KEY=<YOUR-VALIDATOR-SIGNER-BLS-PUBLIC-KEY>
+export CELO_VALIDATOR_SIGNER_BLS_SIGNATURE=<YOUR-VALIDATOR-SIGNER-SIGNATURE>
 ```
 
 We'll get back to this machine later, but for now, let's give it a proxy.
@@ -225,18 +236,22 @@ To avoid exposing the validator to the public internet, we are deploying a proxy
 
 ```bash
 # On the proxy machine
-mkdir -p celo-data-dir/proxy
-cd celo-data-dir/proxy
-docker run -v $PWD/proxy:/root/.celo $CELO_IMAGE init /celo/genesis.json
-docker run -v $PWD/proxy:/root/.celo --entrypoint cp $CELO_IMAGE /celo/static-nodes.json /root/.celo/
+# Note that you have to export $CELO_IMAGE on this machine
+export CELO_IMAGE=us.gcr.io/celo-testnet/celo-node:baklava
+mkdir celo-proxy-node
+cd celo-proxy-node
+docker run -v $PWD:/root/.celo $CELO_IMAGE init /celo/genesis.json
+docker run -v $PWD:/root/.celo --entrypoint cp $CELO_IMAGE /celo/static-nodes.json /root/.celo/
 ```
 
 You can then run the proxy with
 
 ```bash
 # On the proxy machine
-# Note that you'll have to export CELO_VALIDATOR_SIGNER_ADDRESS on this machine
-docker run --name celo-proxy -d --restart always -p 30313:30303 -p 30313:30303/udp -p 30503:30503 -p 30503:30503/udp -v $PWD/proxy:/root/.celo $CELO_IMAGE --verbosity 3 --networkid $NETWORK_ID --syncmode full --proxy.proxy --proxy.proxiedvalidatoraddress $CELO_VALIDATOR_SIGNER_ADDRESS --proxy.internalendpoint :30503
+# Note that you'll have to export CELO_VALIDATOR_SIGNER_ADDRESS and $NETWORK_ID on this machine
+export NETWORK_ID=1101
+export CELO_VALIDATOR_SIGNER_ADDRESS=<YOUR-VALIDATOR-SIGNER-ADDRESS>
+docker run --name celo-proxy --restart always -p 30313:30303 -p 30313:30303/udp -p 30503:30503 -p 30503:30503/udp -v $PWD:/root/.celo $CELO_IMAGE --verbosity 3 --networkid $NETWORK_ID --syncmode full --proxy.proxy --proxy.proxiedvalidatoraddress $CELO_VALIDATOR_SIGNER_ADDRESS --proxy.internalendpoint :30503
 ```
 
 Once the proxy is running, we will need to retrieve it's enode so that the validator will be able to connect to it.
@@ -250,8 +265,8 @@ Now we need to set the proxy enode and proxy IP address in environment variables
 
 ```bash
 # On the validator machine
-export PROXY_ENODE=<proxy enode>
-export PROXY_IP=<proxy ip address>
+export PROXY_ENODE=<YOUR-PROXY-ENODE>
+export PROXY_IP=<YOUR-PROXY-IP>
 ```
 
 Let's connect the validator to the proxy:
@@ -262,12 +277,12 @@ When starting up your validator, it will attempt to create a network connection 
 
 Specifically, on the proxy machine, port 30303 should allow TCP and UDP connections from all IP addresses. And port 30503 should allow TCP connections from the IP address of your validator machine.
 
-Once that it completed, go ahead and run the validator.
+Once that it completed, go ahead and run the validator. You should see the validator begin syncing via the Proxy within a few seconds.
 
 ```bash
 # On the validator machine
-docker run -v $PWD/validator:/root/.celo --entrypoint sh --rm $CELO_IMAGE -c "echo VALIDATOR_SIGNER_PASSWORD > /root/.celo/.password"
-docker run --name celo-validator -d --restart always -p 30303:30303 -p 30303:30303/udp -v $PWD/validator:/root/.celo $CELO_IMAGE --verbosity 3 --networkid $NETWORK_ID --syncmode full --mine --istanbul.blockperiod=5 --istanbul.requesttimeout=3000 --etherbase $CELO_VALIDATOR_ADDRESS --nodiscover --proxy.proxied --proxy.proxyenodeurlpair=enode://$PROXY_ENODE@$PROXY_IP:30503\;enode://$PROXY_ENODE@$PROXY_IP:30303  --unlock=$CELO_VALIDATOR_SIGNER_ADDRESS --password /root/.celo/.password
+docker run -v $PWD:/root/.celo --entrypoint sh --rm $CELO_IMAGE -c "echo <VALIDATOR-SIGNER-PASSWORD > > /root/.celo/.password"
+docker run --name celo-validator --restart always -p 30303:30303 -p 30303:30303/udp -v $PWD:/root/.celo $CELO_IMAGE --verbosity 3 --networkid $NETWORK_ID --syncmode full --mine --istanbul.blockperiod=5 --istanbul.requesttimeout=3000 --etherbase $CELO_VALIDATOR_SIGNER_ADDRESS --nodiscover --proxy.proxied --proxy.proxyenodeurlpair=enode://$PROXY_ENODE@$PROXY_IP:30503\;enode://$PROXY_ENODE@$PROXY_IP:30303  --unlock=$CELO_VALIDATOR_SIGNER_ADDRESS --password /root/.celo/.password
 ```
 
 The `mine` flag does not mean the node starts mining blocks, but rather starts trying to participate in the BFT consensus protocol. It cannot do this until it gets elected -- so next we need to stand for election.
@@ -276,21 +291,16 @@ The `networkid` parameter value of `1101` indicates we are connecting the Baklav
 
 ### Register the Accounts
 
-By now 12,000 Celo Gold should have been sent to your Validator and Validator Group account addresses. This will allow you to submit transactions to the network via the `celocli`. To do so, you'll need to have a running node with access to the account keys. Start one by running the following commands on your local machine:
+By now 12,000 Celo Gold should have been sent to your Validator and Validator Group account addresses. This will allow you to submit transactions to the network via `celocli`.
+
+First, we unlock our accounts so that we can sign transactions. Then, we register our accounts with the Celo core smart contracts:
 
 ```bash
 # On your local machine
-docker run -v $PWD/accounts:/root/.celo $CELO_IMAGE init /celo/genesis.json
-docker run -v $PWD/accounts:/root/.celo --entrypoint cp $CELO_IMAGE /celo/static-nodes.json /root/.celo/
-docker run --name celo-accounts -d --restart always -p 8545:8545 -v $PWD/accounts:/root/.celo $CELO_IMAGE --verbosity 3 --networkid $NETWORK_ID --syncmode full --rpc --rpcaddr 0.0.0.0 --rpcapi eth,net,web3,debug,admin,personal
-```
-
-Once the node is synced, we can register our accounts:
-
-```bash
-# On your local machine
-celocli accounts:register --from $CELO_VALIDATOR_GROUP_ADDRESS --name <NAME YOUR VALIDATOR GROUP>
-celocli accounts:register --from $CELO_VALIDATOR_ADDRESS --name <NAME YOUR VALIDATOR>
+celocli account:unlock --account $CELO_VALIDATOR_GROUP_ADDRESS
+celocli account:unlock --account $CELO_VALIDATOR_ADDRESS
+celocli account:register --from $CELO_VALIDATOR_GROUP_ADDRESS --name <NAME YOUR VALIDATOR GROUP>
+celocli account:register --from $CELO_VALIDATOR_ADDRESS --name <NAME YOUR VALIDATOR>
 ```
 
 ### Lock up Celo Gold
@@ -311,7 +321,7 @@ We don't want to use our account key for validating, so first let's authorize th
 
 ```bash
 # On your local machine
-celocli account:authorize --from $CELO_VALIDATOR_ADDRESS --role validator --pop $CELO_VALIDATOR_SIGNER_POP --signer $CELO_VALIDATOR_SIGNER_ADDRESS
+celocli account:authorize --from $CELO_VALIDATOR_ADDRESS --role validator --pop 0x$CELO_VALIDATOR_SIGNER_SIGNATURE --signer $CELO_VALIDATOR_SIGNER_ADDRESS
 ```
 
 Register your Validator Group by running the following command. Note that because we did not authorize a Validator signer for our Validator Group account, we register the Validator Group with the account key.
@@ -325,7 +335,7 @@ Next, register your Validator by running the following command. Note that becaus
 
 ```bash
 # On your local machine
-celocli validator:register --from $CELO_VALIDATOR_ADDRESS --blsKey $CELO_VALIDATOR_BLS_PUBLIC_KEY --blsPop $CELO_VALIDATOR_BLS_SIGNATURE
+celocli validator:register --from $CELO_VALIDATOR_ADDRESS --ecdsaKey $CELO_VALIDATOR_SIGNER_PUBLIC_KEY --blsKey $CELO_VALIDATOR_SIGNER_BLS_PUBLIC_KEY --blsSignature $CELO_VALIDATOR_SIGNER_BLS_SIGNATURE
 ```
 
 Affiliate your Validator with your Validator Group. Note that you will not be a member of this group until the Validator Group accepts you. This command could also be run from the Validator signer, if running on the validator machine.
@@ -378,11 +388,11 @@ Just like with the Validator signer, we'll want to authorize a separate Attestat
 # On the Attestation machine
 # You have to export CELO_VALIDATOR_ADDRESS on this machine
 export $CELO_VALIDATOR_ADDRESS=<CELO_VALIDATOR_ADDRESS>
-mkdir -p celo-data-dir/attestations
-cd celo-data-dir/attestations
-docker run -v $PWD/attestations:/root/.celo $CELO_IMAGE init /celo/genesis.json
-docker run -v $PWD/attestations:/root/.celo --entrypoint cp $CELO_IMAGE /celo/static-nodes.json /root/.celo/
-docker run -v $PWD/attestations:/root/.celo --entrypoint /bin/sh -it $CELO_IMAGE -c "geth account new"
+mkdir celo-attestations-node
+cd celo-attestations-node
+docker run -v $PWD:/root/.celo $CELO_IMAGE init /celo/genesis.json
+docker run -v $PWD:/root/.celo --entrypoint cp $CELO_IMAGE /celo/static-nodes.json /root/.celo/
+docker run -v $PWD:/root/.celo --entrypoint /bin/sh -it $CELO_IMAGE -c "geth account new"
 export ATTESTATION_SIGNER_ADDRESS=<YOUR-ATTESTATION-SIGNER-ADDRESS>
 ```
 
@@ -392,21 +402,21 @@ Let's generate the proof-of-possession for the attestation signer
 # On the Attestation machine
 # Note that you have to export CELO_VALIDATOR_ADDRESS on this machine
 export $CELO_VALIDATOR_ADDRESS=<CELO_VALIDATOR_ADDRESS>
-docker run -v $PWD/attestations:/root/.celo --entrypoint /bin/sh -it $CELO_IMAGE -c "geth account proof-of-possession $CELO_ATTESTATION_SIGNER_ADDRESS $CELO_VALIDATOR_ADDRESS"
+docker run -v $PWD:/root/.celo --entrypoint /bin/sh -it $CELO_IMAGE -c "geth account proof-of-possession $CELO_ATTESTATION_SIGNER_ADDRESS $CELO_VALIDATOR_ADDRESS"
 ```
 
 With this proof, authorize the attestation signer on your local machine:
 
 ```bash
 # On your local machine
-celocli account:authorize --from $CELO_VALIDATOR_ADDRESS --role attestation --pop <ATTESTATION_SIGNER_POP> --signer $ATTESTATION_SIGNER_ADDRESS
+celocli account:authorize --from $CELO_VALIDATOR_ADDRESS --role attestation --pop <ATTESTATION_SIGNER_SIGNATURE> --signer $ATTESTATION_SIGNER_ADDRESS
 ```
 
 You can now run the node for the attestation service in the background:
 
 ```bash
 # On the Attestation machine
-docker run --name celo-attestations -d --restart always -p 8545:8545 -v $PWD/accounts:/root/.celo $CELO_IMAGE --verbosity 3 --networkid $NETWORK_ID --syncmode full --rpc --rpcaddr 0.0.0.0 --rpcapi eth,net,web3,debug,admin --unlock $ATTESTATION_SIGNER_ADDRESS
+docker run --name celo-attestations -d --restart always -p 8545:8545 -v $PWD:/root/.celo $CELO_IMAGE --verbosity 3 --networkid $NETWORK_ID --syncmode full --rpc --rpcaddr 0.0.0.0 --rpcapi eth,net,web3,debug,admin --unlock $ATTESTATION_SIGNER_ADDRESS
 ```
 
 By now, you should have setup your Validator account appropriately. You can finish the actual deploy of the attestation service under the [Attestation Service at the documentation page](running-attestation-service.md).
