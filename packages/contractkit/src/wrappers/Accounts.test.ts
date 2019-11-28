@@ -1,6 +1,5 @@
 import { testWithGanache } from '@celo/dev-utils/lib/ganache-test'
-import { addressToPublicKey } from '@celo/utils/lib/signatureUtils'
-import { parseSignature } from '@celo/utils/lib/signatureUtils'
+import { addressToPublicKey, parseSignature } from '@celo/utils/lib/signatureUtils'
 import Web3 from 'web3'
 import { newKitFromWeb3 } from '../kit'
 import { AccountsWrapper } from './Accounts'
