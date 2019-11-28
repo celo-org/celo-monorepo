@@ -91,7 +91,7 @@ async function main({
   instance.privateKey = validatorPrivateKey
   instance.proxies = [validatorEnode, validatorEnode]
 
-  let proxyEnode
+  let proxyEnode: string = ''
 
   if (isProxy) {
     const validatorPrivateKey = getPrivateKeysFor(AccountType.VALIDATOR, mnemonic, key).pop()
@@ -128,7 +128,7 @@ async function main({
 
   if (isProxy) {
     proxyInstance.peers = validatorEnodes
-    instance.peers = [proxyEnode as string]
+    instance.peers = [proxyEnode]
   } else {
     instance.peers = validatorEnodes
   }

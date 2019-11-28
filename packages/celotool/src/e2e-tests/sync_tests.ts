@@ -1,13 +1,7 @@
 import { assert } from 'chai'
 import Web3 from 'web3'
-import {
-  GethInstanceConfig,
-  getHooks,
-  initAndStartGeth,
-  killInstance,
-  sleep,
-  waitToFinishSyncing,
-} from './utils'
+import { getHooks, killInstance, sleep, waitToFinishSyncing } from './utils'
+import { GethRunConfig, GethInstanceConfig, initAndStartGeth } from '../lib/geth'
 
 const TMP_PATH = '/tmp/e2e'
 
@@ -73,7 +67,7 @@ describe('sync tests', function(this: any) {
       lightserv: true,
       port: 30311,
       rpcport: 8553,
-      peers: [8545],
+      peers: ['8545'],
     }
     await initAndStartGeth(hooks.gethBinaryPath, fullInstance)
     const web3 = new Web3('http://localhost:8553')
@@ -95,7 +89,7 @@ describe('sync tests', function(this: any) {
           port: 30313,
           rpcport: 8555,
           lightserv: syncmode !== 'light' && syncmode !== 'ultralight',
-          peers: [8553],
+          peers: ['8553'],
         }
         await initAndStartGeth(hooks.gethBinaryPath, syncInstance)
       })
@@ -132,7 +126,7 @@ describe('sync tests', function(this: any) {
       this.timeout(0)
       const instance: GethInstanceConfig = gethConfig.instances[0]
       await killInstance(instance)
-      await initAndStartGeth(hooks.gethBinaryPath, { ...instance, peers: [8547] })
+      await initAndStartGeth(hooks.gethBinaryPath, { ...instance, peers: ['8547'] })
       await sleep(120) // wait for round change / resync
       const address = (await web3.eth.getAccounts())[0]
       const currentBlock = await web3.eth.getBlock('latest')

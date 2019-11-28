@@ -27,6 +27,7 @@ import { retrieveIPAddress } from './helm_deploy'
 import { execCmd, execCmdWithExitOnFailure, spawnCmd, spawnCmdWithExitOnFailure } from './utils'
 import { getTestnetOutputs } from './vm-testnet-utils'
 import { spawn } from 'child_process'
+import { Admin } from 'web3-eth-admin'
 
 type HandleErrorCallback = (isError: boolean, data: { location: string; error: string }) => void
 
@@ -680,7 +681,6 @@ export const runGethNodes = async ({
 }: {
   gethConfig: GethRunConfig
   keepData: boolean
-  gethRepoPath: string
   validators: any
   validatorPrivateKeys: any
 }) => {
@@ -692,16 +692,14 @@ export const runGethNodes = async ({
   const gethBinaryPath = `${gethConfig.gethRepoPath}/build/bin/geth`
 
   if (!keepData && fs.existsSync(gethConfig.runPath)) {
-    setupTmpDir(gethConfig.runPath)
+    // await setupTmpDir(gethConfig.runPath)
   }
 
   if (!fs.existsSync(gethConfig.runPath)) {
     fs.mkdirSync(gethConfig.runPath, { recursive: true })
   }
 
-  console.log('writing genesis')
   await writeGenesis(validators, gethConfig)
-  console.log('wrote   genesis')
 
   console.log('Validator eNodes', JSON.stringify(validatorEnodes, null, 2))
 
@@ -716,6 +714,14 @@ export const runGethNodes = async ({
       instance.peers = (instance.peers || []).concat(otherValidators)
       instance.privateKey = instance.privateKey || validatorPrivateKeys[validatorIndex]
       validatorIndex++
+    }
+
+    if (instance.privateKey) {
+      await importPrivateKey(gethBinaryPath, instance)
+    }
+
+    if (instance.peers) {
+      await addStaticPeers(getDatadir(instance), instance.peers)
     }
 
     if (gethConfig.migrate || gethConfig.migrateTo) {
@@ -752,14 +758,6 @@ export async function initAndStartGeth(gethBinaryPath: string, instance: GethIns
 
   await init(gethBinaryPath, datadir, instance.gethRunConfig.genesisPath)
 
-  if (instance.privateKey) {
-    await importPrivateKey(gethBinaryPath, instance)
-  }
-
-  if (instance.peers) {
-    await addStaticPeers(datadir, instance.peers)
-  }
-
   return startGeth(gethBinaryPath, instance)
 }
 
@@ -771,8 +769,8 @@ export async function init(gethBinaryPath: string, datadir: string, genesisPath:
 }
 
 export async function importPrivateKey(gethBinaryPath: string, instance: GethInstanceConfig) {
-  const keyFile = `/${getDatadir(instance)}/key.txt`
-  fs.writeFileSync(keyFile, instance.privateKey)
+  const keyFile = `${getDatadir(instance)}/key.txt`
+  fs.writeFileSync(keyFile, instance.privateKey, { flag: 'a' })
   console.info(`geth:${instance.name}: import account`)
   await spawnCmdWithExitOnFailure(
     gethBinaryPath,
@@ -926,7 +924,9 @@ export function writeGenesis(validators: Validator[], gethConfig: GethRunConfig)
     chainId: gethConfig.networkId,
     ...gethConfig.genesisConfig,
   })
+  console.log('writing genesis')
   fs.writeFileSync(gethConfig.genesisPath, genesis)
+  console.log(`wrote   genesis to ${gethConfig.genesisPath}`)
 }
 
 async function isPortOpen(host: string, port: number) {
@@ -962,8 +962,8 @@ export async function buildGeth(path: string) {
 }
 
 export async function setupTmpDir(testDir: string) {
-  await spawnCmd('rm', ['-rf', testDir])
-  await spawnCmd('mkdir', [testDir])
+  await spawnCmd('rm', ['-rf', testDir], { silent: true })
+  await spawnCmd('mkdir', [testDir], { silent: true })
 }
 
 export async function checkoutGethRepo(branch: string, path: string) {
@@ -986,11 +986,35 @@ export function spawnWithLog(cmd: string, args: string[], logsFilepath: string) 
   } catch (error) {
     // nothing to do
   }
-  const logStream = fs.createWriteStream(logsFilepath, { flags: 'a' })
   console.log(logsFilepath)
+  console.log(fs.existsSync(logsFilepath))
+  const logStream = fs.createWriteStream(logsFilepath, { flags: 'a' })
   console.log(cmd, ...args)
   const process = spawn(cmd, args)
   process.stdout.pipe(logStream)
   process.stderr.pipe(logStream)
   return process
+}
+
+// Add validator 0 as a peer of each other validator.
+export async function connectValidatorPeers(gethConfig: GethRunConfig) {
+  const admins = gethConfig.instances
+    .filter(({ wsport, rpcport, validating }) => validating && (wsport || rpcport))
+    .map(
+      ({ wsport, rpcport }) =>
+        new Admin(`${wsport ? 'ws' : 'http'}://localhost:${wsport || rpcport}`)
+    )
+  const enodes = await Promise.all(admins.map(async (admin) => (await admin.getNodeInfo()).enode))
+  await Promise.all(
+    admins.map(async (admin, i) => {
+      await Promise.all(
+        enodes.map(async (enode, j) => {
+          if (i === j) {
+            return
+          }
+          await admin.addPeer(enode)
+        })
+      )
+    })
+  )
 }

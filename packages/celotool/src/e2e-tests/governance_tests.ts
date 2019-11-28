@@ -6,15 +6,8 @@ import { fromFixed, toFixed } from '@celo/utils/lib/fixidity'
 import BigNumber from 'bignumber.js'
 import { assert } from 'chai'
 import Web3 from 'web3'
-import {
-  assertAlmostEqual,
-  getContext,
-  GethInstanceConfig,
-  importGenesis,
-  initAndStartGeth,
-  sleep,
-  waitToFinishSyncing,
-} from './utils'
+import { assertAlmostEqual, getContext, sleep, waitToFinishSyncing } from './utils'
+import { initAndStartGeth, GethRunConfig, GethInstanceConfig, importGenesis } from '../lib/geth'
 
 interface MemberSwapper {
   swap(): Promise<void>
@@ -283,7 +276,7 @@ describe('governance tests', () => {
           wsport: 8555,
           rpcport: 8557,
           privateKey: groupPrivateKey.slice(2),
-          peers: [8545],
+          peers: ['8545'],
         },
       ]
       await Promise.all(
@@ -303,7 +296,7 @@ describe('governance tests', () => {
           port: 30315,
           wsport: 8559,
           privateKey: rotation0PrivateKey.slice(2),
-          peers: [8557],
+          peers: ['8557'],
         },
         {
           gethRunConfig: gethConfig,
@@ -314,7 +307,7 @@ describe('governance tests', () => {
           port: 30317,
           wsport: 8561,
           privateKey: rotation1PrivateKey.slice(2),
-          peers: [8557],
+          peers: ['8557'],
         },
       ]
       await Promise.all(

@@ -8,7 +8,7 @@ import BigNumber from 'bignumber.js'
 import { assert } from 'chai'
 import Web3 from 'web3'
 import { TransactionReceipt } from 'web3/types'
-import { getEnode, killInstance, sleep, getHooks } from './utils'
+import { killInstance, sleep, getHooks } from './utils'
 import { GethRunConfig, GethInstanceConfig, initAndStartGeth } from '../lib/geth'
 
 const TMP_PATH = '/tmp/e2e'
@@ -206,7 +206,7 @@ describe('Transfer tests', function(this: any) {
       // We need to set an etherbase here so that the full node will accept transactions from
       // light clients.
       etherbase: FeeRecipientAddress,
-      peers: [8545],
+      peers: ['8545'],
     }
     await initAndStartGeth(hooks.gethBinaryPath, fullInstance)
 
@@ -238,7 +238,7 @@ describe('Transfer tests', function(this: any) {
       port: 30307,
       rpcport: 8549,
       privateKey: DEF_FROM_PK,
-      peers: [8547],
+      peers: ['8547'],
     })
 
     // Reset contracts to send RPCs through transferring node.

@@ -6,12 +6,10 @@ import { Admin } from 'web3-eth-admin'
 import {
   AccountType,
   getPrivateKeysFor,
-  getValidators,
-  Validator,
+  getValidatorsInformation,
   privateKeyToAddress,
   privateKeyToPublicKey,
 } from '../lib/generate_utils'
-import { ensure0x } from '../lib/utils'
 import {
   GethInstanceConfig,
   GethRunConfig,
@@ -25,6 +23,7 @@ import {
   buildGeth,
   spawnWithLog,
   setupTmpDir,
+  connectValidatorPeers,
 } from '../lib/geth'
 import { ensure0x, spawnCmd, spawnCmdWithExitOnFailure } from '../lib/utils'
 
@@ -223,7 +222,7 @@ export function getContext(gethConfig: GethRunConfig) {
   const numValidators = validatorInstances.length
   const validatorPrivateKeys = getPrivateKeysFor(AccountType.VALIDATOR, mnemonic, numValidators)
   const attestationKeys = getPrivateKeysFor(AccountType.ATTESTATION, mnemonic, numValidators)
-  const validators = getValidators(mnemonic, numValidators)
+  const validators = getValidatorsInformation(mnemonic, numValidators)
 
   const proxyInstances = gethConfig.instances.filter((x: any) => x.isProxy)
   const numProxies = proxyInstances.length
