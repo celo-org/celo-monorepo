@@ -1,60 +1,62 @@
 ---
-description: Commands for interacting with the Exchange
+description: Exchange Celo Dollars and Celo Gold via the stability mechanism
 ---
 
 ## Commands
 
-### List
+### Dollars
 
-List information about tokens on the exchange (all amounts in wei)
+Exchange Celo Dollars for Celo Gold via the stability mechanism
 
 ```
 USAGE
-  $ celocli exchange:list
+  $ celocli exchange:dollars
 
 OPTIONS
-  --amount=amount  [default: 1000000000000000000] Amount of sellToken (in wei) to report rates for
+  --commission=commission                             (required)
+  --for=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d    (required) The minimum value of Celo Gold to receive in return
+  --from=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d   (required) The address with Celo Dollars to exchange
+  --value=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) The value of Celo Dollars to exchange for Celo Gold
+
+EXAMPLE
+  dollars --value 10000000000000 --for 50000000000000 --from 0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d
+```
+
+_See code: [packages/cli/src/commands/exchange/dollars.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/exchange/dollars.ts)_
+
+### Gold
+
+Exchange Celo Gold for Celo Dollars via the stability mechanism
+
+```
+USAGE
+  $ celocli exchange:gold
+
+OPTIONS
+  --commission=commission                             (required)
+  --for=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d    (required) The minimum value of Celo Dollars to receive in return
+  --from=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d   (required) The address with Celo Gold to exchange
+  --value=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) The value of Celo Gold to exchange for Celo Dollars
+
+EXAMPLE
+  gold --value 5000000000000 --for 100000000000000 --from 0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d
+```
+
+_See code: [packages/cli/src/commands/exchange/gold.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/exchange/gold.ts)_
+
+### Show
+
+Show the current exchange rates offered by the Exchange
+
+```
+USAGE
+  $ celocli exchange:show
+
+OPTIONS
+  --amount=amount  [default: 1000000000000000000] Amount of the token being exchanged to report rates for
 
 EXAMPLE
   list
 ```
 
-_See code: [packages/cli/src/commands/exchange/list.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/exchange/list.ts)_
-
-### Selldollar
-
-Sell Celo dollars for Celo gold on the exchange
-
-```
-USAGE
-  $ celocli exchange:selldollar SELLAMOUNT MINBUYAMOUNT FROM
-
-ARGUMENTS
-  SELLAMOUNT    the amount of sellToken (in wei) to sell
-  MINBUYAMOUNT  the minimum amount of buyToken (in wei) expected
-  FROM
-
-EXAMPLE
-  selldollar 100 300 0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d
-```
-
-_See code: [packages/cli/src/commands/exchange/selldollar.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/exchange/selldollar.ts)_
-
-### Sellgold
-
-Sell Celo gold for Celo dollars on the exchange
-
-```
-USAGE
-  $ celocli exchange:sellgold SELLAMOUNT MINBUYAMOUNT FROM
-
-ARGUMENTS
-  SELLAMOUNT    the amount of sellToken (in wei) to sell
-  MINBUYAMOUNT  the minimum amount of buyToken (in wei) expected
-  FROM
-
-EXAMPLE
-  sellgold 100 300 0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d
-```
-
-_See code: [packages/cli/src/commands/exchange/sellgold.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/exchange/sellgold.ts)_
+_See code: [packages/cli/src/commands/exchange/show.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/exchange/show.ts)_
