@@ -197,7 +197,7 @@ In order to authorize our Validator signer, we need to create a proof that we ha
 ```bash
 # On the validator machine
 # Note that you have to export CELO_VALIDATOR_ADDRESS on this machine
-export $CELO_VALIDATOR_ADDRESS=<CELO_VALIDATOR_ADDRESS>
+export CELO_VALIDATOR_ADDRESS=<CELO_VALIDATOR_ADDRESS>
 docker run -v $PWD/validator:/root/.celo --entrypoint /bin/sh -it $CELO_IMAGE -c "geth account proof-of-possession $CELO_VALIDATOR_SIGNER_ADDRESS $CELO_VALIDATOR_ADDRESS"
 ```
 
