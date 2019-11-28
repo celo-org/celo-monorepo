@@ -20,6 +20,7 @@ export enum Actions {
   UPDATE_PAYMENT_REQUESTS = 'ACCOUNT/UPDATE_PAYMENT_REQUESTS',
   DISMISS_EARN_REWARDS = 'ACCOUNT/DISMISS_EARN_REWARDS',
   DISMISS_INVITE_FRIENDS = 'ACCOUNT/DISMISS_INVITE_FRIENDS',
+  DISMISS_GET_VERIFIED = 'ACCOUNT/DISMISS_GET_VERIFIED',
   SET_USER_CONTACT_DETAILS = 'ACCOUNT/SET_USER_CONTACT_DETAILS',
 }
 
@@ -82,12 +83,16 @@ export interface UpdatePaymentRequestsAction {
   paymentRequests: PaymentRequest[]
 }
 
-export interface DismissEarnRewards {
+export interface DismissEarnRewardsAction {
   type: Actions.DISMISS_EARN_REWARDS
 }
 
-export interface DismissInviteFriends {
+export interface DismissInviteFriendsAction {
   type: Actions.DISMISS_INVITE_FRIENDS
+}
+
+export interface DismissGetVerifiedAction {
+  type: Actions.DISMISS_GET_VERIFIED
 }
 
 export interface SetContactDetailsAction {
@@ -110,8 +115,9 @@ export type ActionTypes =
   | SetSocialBackupCompletedAction
   | ResetBackupState
   | UpdatePaymentRequestsAction
-  | DismissEarnRewards
-  | DismissInviteFriends
+  | DismissEarnRewardsAction
+  | DismissInviteFriendsAction
+  | DismissGetVerifiedAction
   | SetContactDetailsAction
 
 export function setName(name: string): SetNameAction {
@@ -180,12 +186,16 @@ export const updatePaymentRequests = (
   paymentRequests,
 })
 
-export const dismissEarnRewards = (): DismissEarnRewards => ({
+export const dismissEarnRewards = (): DismissEarnRewardsAction => ({
   type: Actions.DISMISS_EARN_REWARDS,
 })
 
-export const dismissInviteFriends = (): DismissInviteFriends => ({
+export const dismissInviteFriends = (): DismissInviteFriendsAction => ({
   type: Actions.DISMISS_INVITE_FRIENDS,
+})
+
+export const dismissGetVerified = (): DismissGetVerifiedAction => ({
+  type: Actions.DISMISS_GET_VERIFIED,
 })
 
 export const setUserContactDetails = (

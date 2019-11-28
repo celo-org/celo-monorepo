@@ -2,6 +2,7 @@ import { isE164Number } from '@celo/utils/src/phoneNumbers'
 import { Actions, ActionTypes } from 'src/account/actions'
 import { PaymentRequest } from 'src/account/types'
 import { DEV_SETTINGS_ACTIVE_INITIALLY } from 'src/config'
+import { getRehydratePayload, REHYDRATE, RehydrateAction } from 'src/redux/persist-helper'
 import { RootState } from 'src/redux/reducers'
 import { getRemoteTime } from 'src/utils/time'
 
@@ -22,6 +23,7 @@ export interface State {
   paymentRequests: PaymentRequest[]
   dismissedEarnRewards: boolean
   dismissedInviteFriends: boolean
+  dismissedGetVerified: boolean
 }
 
 export enum PincodeType {
@@ -55,10 +57,22 @@ export const initialState = {
   socialBackupCompleted: false,
   dismissedEarnRewards: false,
   dismissedInviteFriends: false,
+  dismissedGetVerified: false,
 }
 
-export const reducer = (state: State | undefined = initialState, action: ActionTypes): State => {
+export const reducer = (
+  state: State | undefined = initialState,
+  action: ActionTypes | RehydrateAction
+): State => {
   switch (action.type) {
+    case REHYDRATE: {
+      // Ignore some persisted properties
+      return {
+        ...state,
+        ...getRehydratePayload(action, 'account'),
+        dismissedGetVerified: false,
+      }
+    }
     case Actions.SET_NAME:
       return {
         ...state,
@@ -143,6 +157,11 @@ export const reducer = (state: State | undefined = initialState, action: ActionT
       return {
         ...state,
         dismissedInviteFriends: true,
+      }
+    case Actions.DISMISS_GET_VERIFIED:
+      return {
+        ...state,
+        dismissedGetVerified: true,
       }
     case Actions.SET_USER_CONTACT_DETAILS:
       return {
