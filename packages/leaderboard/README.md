@@ -15,39 +15,8 @@ For Postgres: `PG_USER` and `PG_PASSWORD`
 Other variables:
 
 - `LEADERBOARD_DATABASE`: which database to connect into. Defaults to `blockscout`
-- `LEADERBOARD_TOKEN`: permission token for accessing the sheet, see the JSON format below. Default: read from `token.json`
-- `LEADERBOARD_CREDENTIALS`: credentials token for accessing the Google Sheets API, see the JSON format below. Default: read from `credentials.json`
 - `LEADERBOARD_WEB3`: Geth RPC address. Default: `http://localhost:8545`
-- `LEADERBOARD_SPREET`: Google spreadsheet identifier. Default: `1d3pZNof8p3z8M9O3MH5FZG5dA3e-L52XiJ4qA5o7X0Y`
-
-## Token and credential format
-
-Token sample
-
-```
-{
-    "access_token": "random stuff",
-    "refresh_token": "random junk",
-    "scope":"https://www.googleapis.com/auth/spreadsheets.readonly",
-    "token_type":"Bearer",
-    "expiry_date":1574775683045
-}
-```
-
-Credential sample
-
-```
-{
-    "installed":{
-        "client_id":"476096020070-mhh2oksek4ekunjh68p7t57rq7djgegh.apps.googleusercontent.com","project_id":"quickstart-1574329758573",
-        "auth_uri":"https://accounts.google.com/o/oauth2/auth",
-        "token_uri":"https://oauth2.googleapis.com/token",
-        "auth_provider_x509_cert_url":"https://www.googleapis.com/oauth2/v1/certs",
-        "client_secret":"secure string",
-        "redirect_uris":["urn:ietf:wg:oauth:2.0:oob","http://localhost"]
-        }
-}
-```
+- `LEADERBOARD_SPREET`: Google spreadsheet identifier. Default: `1HCs1LZv1BOB1v2bVlH4qNPnxVRlYVhQ7CKhkMibE4EY`
 
 ## Setup and running
 
@@ -62,14 +31,11 @@ export PGPASSWORD=1234
 
 Make sure geth is running.
 
-Get credentials for using Google API as explained in
-https://developers.google.com/sheets/api/quickstart/nodejs
+Make sure that public can access the spreadsheet: File/Publish to the Web
 
 ```
 ts-node src/board.ts
 ```
-
-It will ask a token, it might tell you that it's very unsafe, and it probably is too.
 
 ## Account claims
 
