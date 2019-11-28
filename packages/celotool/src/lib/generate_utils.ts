@@ -109,7 +109,7 @@ export const getAddressesFor = (accountType: AccountType, mnemonic: string, n: n
 export const getStrippedAddressesFor = (accountType: AccountType, mnemonic: string, n: number) =>
   getAddressesFor(accountType, mnemonic, n).map(strip0x)
 
-export const getValidators = (mnemonic: string, n: number) => {
+export const getValidatorsInformation = (mnemonic: string, n: number) => {
   return getPrivateKeysFor(AccountType.VALIDATOR, mnemonic, n).map((key, i) => {
     const blsKeyBytes = blsPrivateKeyToProcessedPrivateKey(key)
     return {
@@ -129,7 +129,7 @@ export const getAddressFromEnv = (accountType: AccountType, n: number) => {
 export const generateGenesisFromEnv = (enablePetersburg: boolean = true) => {
   const mnemonic = fetchEnv(envVar.MNEMONIC)
   const validatorEnv = fetchEnv(envVar.VALIDATORS)
-  const validators = getValidators(mnemonic, parseInt(validatorEnv, 10))
+  const validators = getValidatorsInformation(mnemonic, parseInt(validatorEnv, 10))
 
   const consensusType = fetchEnv(envVar.CONSENSUS_TYPE) as ConsensusType
 
