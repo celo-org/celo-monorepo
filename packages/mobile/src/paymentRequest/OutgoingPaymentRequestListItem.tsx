@@ -9,7 +9,6 @@ import { StyleSheet, Text, View } from 'react-native'
 import { PaymentRequestStatus } from 'src/account'
 import CeloAnalytics from 'src/analytics/CeloAnalytics'
 import { CustomEventNames } from 'src/analytics/constants'
-import { componentWithAnalytics } from 'src/analytics/wrapper'
 import { updatePaymentRequestNotified, updatePaymentRequestStatus } from 'src/firebase/actions'
 import { Namespaces } from 'src/i18n'
 import { navigate } from 'src/navigator/NavigationService'
@@ -81,7 +80,7 @@ export class OutgoingPaymentRequestListItem extends React.Component<Props> {
         roundedBorders={false}
         callout={<NotificationAmount amount={multiplyByWei(this.props.amount)} />}
       >
-        <View style={styles.body}>
+        <View>
           {this.isDisplayingNumber() && (
             <Text style={[fontStyles.subSmall, styles.phoneNumber]}>
               {this.props.requester.displayId}
@@ -95,7 +94,6 @@ export class OutgoingPaymentRequestListItem extends React.Component<Props> {
 }
 
 const styles = StyleSheet.create({
-  body: {},
   comment: {
     paddingTop: variables.contentPadding,
   },
@@ -104,6 +102,4 @@ const styles = StyleSheet.create({
   },
 })
 
-export default componentWithAnalytics(
-  withNamespaces(Namespaces.paymentRequestFlow)(OutgoingPaymentRequestListItem)
-)
+export default withNamespaces(Namespaces.global)(OutgoingPaymentRequestListItem)

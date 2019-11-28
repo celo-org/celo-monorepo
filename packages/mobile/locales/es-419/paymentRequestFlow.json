@@ -4,10 +4,7 @@
   "incomingPaymentRequests": "Pedidos esperandote",
   "outgoingPaymentRequests": "Pagos que tu has pedido",
   "celoDollarBalance": "Saldo de {{CeloDollar}}",
-  "pay": "Paga",
-  "decline": "Disminución",
-  "remind": "Recordar",
-  "cancel": "Cancelar",
   "requestDeclined": "Solicitud rechazada",
-  "requestPaid": "Solicitud Pagada"
+  "requestPaid": "Solicitud Pagada",
+  "paymentRequestUpdateFailed": "~~Can not update payment request"
 }

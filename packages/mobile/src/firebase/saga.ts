@@ -175,6 +175,7 @@ function* updatePaymentRequestStatus({ id, status }: UpdatePaymentRequestStatusA
     )
     Logger.debug(TAG, 'Payment request status updated', id)
   } catch (error) {
+    yield put(showError(ErrorMessages.PAYMENT_REQUEST_UPDATE_FAILED))
     Logger.error(TAG, `Error while updating payment request ${id} status`, error)
   }
 }
@@ -194,6 +195,7 @@ function* updatePaymentRequestNotified({ id, notified }: UpdatePaymentRequestNot
     )
     Logger.debug(TAG, 'Payment request notified updated', id)
   } catch (error) {
+    yield put(showError(ErrorMessages.PAYMENT_REQUEST_UPDATE_FAILED))
     Logger.error(TAG, `Error while updating payment request ${id} status`, error)
   }
 }
