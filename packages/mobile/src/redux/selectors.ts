@@ -32,6 +32,14 @@ export const isAppConnected = createSelector(
   (gethConnected, networkConnected) => gethConnected && networkConnected
 )
 
+export const isAppSynced = (state: RootState) => {
+  return (
+    state.web3.syncProgress.currentBlock > 0 &&
+    state.web3.syncProgress.highestBlock > 0 &&
+    state.web3.syncProgress.currentBlock === state.web3.syncProgress.highestBlock
+  )
+}
+
 export const getTabBarActiveNotification = createSelector(
   isBackupTooLate,
   getPaymentRequests,
