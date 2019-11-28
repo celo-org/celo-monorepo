@@ -3,3 +3,5 @@ nodeSelector: {}
 # Expects cron schedule syntax
 leaderboard:
   schedule: "*/1 * * * *"
+  database: "blockscout"
+  

@@ -36,7 +36,6 @@ function helmParameters() {
       envVar.ATTESTATION_SERVICE_DOCKER_IMAGE_REPOSITORY
     )}`,
     `--set attestation_service.image.tag=${fetchEnv(envVar.ATTESTATION_SERVICE_DOCKER_IMAGE_TAG)}`,
-    `--set attestation_service.image.tag=${fetchEnv(envVar.ATTESTATION_SERVICE_DOCKER_IMAGE_TAG)}`,
     `--set attestation_service.nexmo.apiKey="${fetchEnv(envVar.NEXMO_KEY)}"`,
     `--set attestation_service.nexmo.apiSecret="${fetchEnv(envVar.NEXMO_SECRET)}"`,
     `--set attestation_service.sms_retriever_hash_code="${fetchEnv(

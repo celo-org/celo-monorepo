@@ -31,16 +31,14 @@ export async function upgradeHelmChart(celoEnv: string) {
   console.info(`Helm release ${releaseName(celoEnv)} upgrade successful`)
 }
 
-function helmParameters(_celoEnv: string) {
+function helmParameters(celoEnv: string) {
   return [
-    `--set leaderboard.schedule=${fetchEnv(envVar.LEADERBOARD_SCHEDULE)}`,
-    `--set leaderboard.image.repository=${fetchEnv(envVar.LEADERBOARD_IMAGE_REPOSITORY)}`,
-    `--set leaderboard.image.tag=${fetchEnv(envVar.LEADERBOARD_IMAGE_TAG)}`,
-    `--set leaderboard.database=${fetchEnv(envVar.LEADERBOARD_DATABASE)}`,
+    `--set leaderboard.image.repository=${fetchEnv(envVar.LEADERBOARD_DOCKER_IMAGE_REPOSITORY)}`,
+    `--set leaderboard.image.tag=${fetchEnv(envVar.LEADERBOARD_DOCKER_IMAGE_TAG)}`,
     `--set leaderboard.token=${fetchEnv(envVar.LEADERBOARD_TOKEN)}`,
     `--set leaderboard.credentials=${fetchEnv(envVar.LEADERBOARD_CREDENTIALS)}`,
-    `--set leaderboard.web3=${fetchEnv(envVar.LEADERBOARD_WEB3)}`,
     `--set leaderboard.spreet=${fetchEnv(envVar.LEADERBOARD_SPREET)}`,
+    `--set leaderboard.web3=https://${celoEnv}-forno.${fetchEnv(envVar.CLUSTER_DOMAIN_NAME)}.org`,
   ]
 }
 
