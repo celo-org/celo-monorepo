@@ -22,6 +22,7 @@ export default class Balance extends BaseCommand {
       goldBalance: await goldToken.balanceOf(args.address),
       dollarBalance: await stableToken.balanceOf(args.address),
     }
+    console.log('All balances expressed in units of 10^-18.')
     printValueMap(balances)
   }
 }
