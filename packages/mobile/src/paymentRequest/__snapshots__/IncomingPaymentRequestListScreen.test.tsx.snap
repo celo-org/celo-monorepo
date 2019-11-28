@@ -291,9 +291,7 @@ exports[`IncomingPaymentRequestListScreen renders correctly with requests 1`] = 
                       }
                     }
                   >
-                    <View
-                      style={Object {}}
-                    >
+                    <View>
                       <Text
                         style={
                           Array [
@@ -566,9 +564,7 @@ exports[`IncomingPaymentRequestListScreen renders correctly with requests 1`] = 
                       }
                     }
                   >
-                    <View
-                      style={Object {}}
-                    >
+                    <View>
                       <Text
                         style={
                           Array [
@@ -841,9 +837,7 @@ exports[`IncomingPaymentRequestListScreen renders correctly with requests 1`] = 
                       }
                     }
                   >
-                    <View
-                      style={Object {}}
-                    >
+                    <View>
                       <Text
                         style={
                           Array [

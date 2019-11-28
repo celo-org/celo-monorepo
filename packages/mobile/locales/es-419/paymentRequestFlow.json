@@ -6,5 +6,5 @@
   "celoDollarBalance": "Saldo de {{CeloDollar}}",
   "requestDeclined": "Solicitud rechazada",
   "requestPaid": "Solicitud Pagada",
-  "paymentRequestUpdateFailed": "~~Can not update payment request"
+  "paymentRequestUpdateFailed": "No se pudo actualizar el pedido de pago"
 }
