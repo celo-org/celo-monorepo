@@ -744,12 +744,18 @@ contract('Vesting', (accounts: string[]) => {
   })
 
   describe('#unlocking - unlock()', () => {
-    it('beneficiary should unlock his locked gold and add a pending withdrawal', async () => {
+    let vestingInstanceRegistryAddress
+    let vestingInstance
+
+    beforeEach(async () => {
       await createNewVestingInstanceTx(vestingDefaultSchedule, registry.address, web3)
-      const vestingInstanceRegistryAddress = await vestingFactoryInstance.hasVestedAt(beneficiary)
-      const vestingInstance = await VestingInstance.at(vestingInstanceRegistryAddress)
+      vestingInstanceRegistryAddress = await vestingFactoryInstance.hasVestedAt(beneficiary)
+      vestingInstance = await VestingInstance.at(vestingInstanceRegistryAddress)
       // beneficiary shall make the vested instance an account
       await vestingInstance.createAccount({ from: beneficiary })
+    })
+
+    it('beneficiary should unlock his locked gold and add a pending withdrawal', async () => {
       // lock the entire vesting amount
       await vestingInstance.lockGold(vestingDefaultSchedule.vestingAmount, {
         from: beneficiary,
@@ -777,11 +783,6 @@ contract('Vesting', (accounts: string[]) => {
     })
 
     it('beneficiary should unlock his locked gold and add a pending withdrawal', async () => {
-      await createNewVestingInstanceTx(vestingDefaultSchedule, registry.address, web3)
-      const vestingInstanceRegistryAddress = await vestingFactoryInstance.hasVestedAt(beneficiary)
-      const vestingInstance = await VestingInstance.at(vestingInstanceRegistryAddress)
-      // beneficiary shall make the vested instance an account
-      await vestingInstance.createAccount({ from: beneficiary })
       // lock the entire vesting amount
       await vestingInstance.lockGold(vestingDefaultSchedule.vestingAmount, {
         from: beneficiary,
@@ -809,11 +810,6 @@ contract('Vesting', (accounts: string[]) => {
     })
 
     it('should revert if none-beneficiary tries to unlock the locked amount', async () => {
-      await createNewVestingInstanceTx(vestingDefaultSchedule, registry.address, web3)
-      const vestingInstanceRegistryAddress = await vestingFactoryInstance.hasVestedAt(beneficiary)
-      const vestingInstance = await VestingInstance.at(vestingInstanceRegistryAddress)
-      // beneficiary shall make the vested instance an account
-      await vestingInstance.createAccount({ from: beneficiary })
       // lock the entire vesting amount
       await vestingInstance.lockGold(vestingDefaultSchedule.vestingAmount, {
         from: beneficiary,
@@ -825,13 +821,8 @@ contract('Vesting', (accounts: string[]) => {
     })
 
     it('should revert if beneficiary in voting tries to unlock the locked amount', async () => {
-      await createNewVestingInstanceTx(vestingDefaultSchedule, registry.address, web3)
-      const vestingInstanceRegistryAddress = await vestingFactoryInstance.hasVestedAt(beneficiary)
-      const vestingInstance = await VestingInstance.at(vestingInstanceRegistryAddress)
       // set the contract in voting
       await mockGovernance.setVoting(vestingInstance.address)
-      // beneficiary shall make the vested instance an account
-      await vestingInstance.createAccount({ from: beneficiary })
       // lock the entire vesting amount
       await vestingInstance.lockGold(vestingDefaultSchedule.vestingAmount, {
         from: beneficiary,
@@ -840,6 +831,229 @@ contract('Vesting', (accounts: string[]) => {
       await assertRevert(
         vestingInstance.unlockGold(vestingDefaultSchedule.vestingAmount, { from: accounts[5] })
       )
+    })
+
+    it('should revert if beneficiary with balance requirements tries to unlock the locked amount', async () => {
+      // set the contract in voting
+      await mockGovernance.setVoting(vestingInstance.address)
+      // lock the entire vesting amount
+      await vestingInstance.lockGold(vestingDefaultSchedule.vestingAmount, {
+        from: beneficiary,
+      })
+      // set some balance requirements
+      const balanceRequirement = 10
+      await mockValidators.setAccountLockedGoldRequirement(
+        vestingInstance.address,
+        balanceRequirement
+      )
+      // unlock the latter
+      await assertRevert(
+        vestingInstance.unlockGold(vestingDefaultSchedule.vestingAmount, { from: beneficiary })
+      )
+    })
+  })
+
+  describe('#createAccount', () => {
+    let vestingInstanceRegistryAddress
+    let vestingInstance
+
+    beforeEach(async () => {
+      await createNewVestingInstanceTx(vestingDefaultSchedule, registry.address, web3)
+      vestingInstanceRegistryAddress = await vestingFactoryInstance.hasVestedAt(beneficiary)
+      vestingInstance = await VestingInstance.at(vestingInstanceRegistryAddress)
+    })
+
+    it('creates the account by beneficiary', async () => {
+      let isAccount = await accountsInstance.isAccount(vestingInstance.address)
+      assert.isFalse(isAccount)
+      await vestingInstance.createAccount({ from: beneficiary })
+      isAccount = await accountsInstance.isAccount(vestingInstance.address)
+      assert.isTrue(isAccount)
+    })
+
+    it('reverts if none-beneficiary attempst account creation', async () => {
+      const isAccount = await accountsInstance.isAccount(vestingInstance.address)
+      assert.isFalse(isAccount)
+      await assertRevert(vestingInstance.createAccount({ from: accounts[2] }))
+    })
+  })
+
+  describe('#setAccountName', () => {
+    let vestingInstanceRegistryAddress
+    let vestingInstance
+    const accountName = 'name'
+
+    beforeEach(async () => {
+      await createNewVestingInstanceTx(vestingDefaultSchedule, registry.address, web3)
+      vestingInstanceRegistryAddress = await vestingFactoryInstance.hasVestedAt(beneficiary)
+      vestingInstance = await VestingInstance.at(vestingInstanceRegistryAddress)
+    })
+
+    describe('when the account has not been created', () => {
+      it('should revert', async () => {
+        await assertRevert(vestingInstance.setAccountName(accountName, { from: beneficiary }))
+      })
+    })
+
+    describe('when the account has been created', () => {
+      beforeEach(async () => {
+        await vestingInstance.createAccount({ from: beneficiary })
+      })
+
+      it('beneficiary should set the name', async () => {
+        await vestingInstance.setAccountName(accountName, { from: beneficiary })
+        const result = await accountsInstance.getName(vestingInstance.address)
+        assert.equal(result, accountName)
+      })
+
+      it('should revert if none-beneficiary attempts to set the name', async () => {
+        await assertRevert(vestingInstance.setAccountName(accountName, { from: accounts[2] }))
+      })
+    })
+  })
+
+  describe('#setAccountWalletAddress', () => {
+    let vestingInstanceRegistryAddress
+    let vestingInstance
+    const walletAddress = beneficiary
+
+    beforeEach(async () => {
+      await createNewVestingInstanceTx(vestingDefaultSchedule, registry.address, web3)
+      vestingInstanceRegistryAddress = await vestingFactoryInstance.hasVestedAt(beneficiary)
+      vestingInstance = await VestingInstance.at(vestingInstanceRegistryAddress)
+    })
+
+    describe('when the vesting account has not been created', () => {
+      it('should revert', async () => {
+        await assertRevert(
+          vestingInstance.setAccountWalletAddress(walletAddress, { from: beneficiary })
+        )
+      })
+    })
+
+    describe('when the account has been created', () => {
+      beforeEach(async () => {
+        await vestingInstance.createAccount({ from: beneficiary })
+      })
+
+      it('beneficiary should set the walletAddress', async () => {
+        await vestingInstance.setAccountWalletAddress(walletAddress, { from: beneficiary })
+        const result = await accountsInstance.getWalletAddress(vestingInstance.address)
+        assert.equal(result, walletAddress)
+      })
+
+      it('should revert if none-beneficiary attempts to set the walletAddress', async () => {
+        await assertRevert(
+          vestingInstance.setAccountWalletAddress(walletAddress, { from: accounts[2] })
+        )
+      })
+
+      it('should set the NULL_ADDRESS', async () => {
+        await vestingInstance.setAccountWalletAddress(NULL_ADDRESS, { from: beneficiary })
+        const result = await accountsInstance.getWalletAddress(vestingInstance.address)
+        assert.equal(result, NULL_ADDRESS)
+      })
+    })
+  })
+
+  describe('#setAccountMetadataURL', () => {
+    let vestingInstanceRegistryAddress
+    let vestingInstance
+    const metadataURL = 'meta'
+
+    beforeEach(async () => {
+      await createNewVestingInstanceTx(vestingDefaultSchedule, registry.address, web3)
+      vestingInstanceRegistryAddress = await vestingFactoryInstance.hasVestedAt(beneficiary)
+      vestingInstance = await VestingInstance.at(vestingInstanceRegistryAddress)
+    })
+
+    describe('when the account has not been created', () => {
+      it('should revert', async () => {
+        await assertRevert(
+          vestingInstance.setAccountMetadataURL(metadataURL, { from: beneficiary })
+        )
+      })
+    })
+
+    describe('when the account has been created', () => {
+      beforeEach(async () => {
+        await vestingInstance.createAccount({ from: beneficiary })
+      })
+
+      it('beneficiary should set the metadataURL', async () => {
+        await vestingInstance.setAccountMetadataURL(metadataURL, { from: beneficiary })
+        const result = await accountsInstance.getMetadataURL(vestingInstance.address)
+        assert.equal(result, metadataURL)
+      })
+
+      it('should revert if none-beneficiary attempts to set the metadataURL', async () => {
+        await assertRevert(
+          vestingInstance.setAccountMetadataURL(metadataURL, { from: accounts[2] })
+        )
+      })
+    })
+  })
+
+  describe('#setAccountDataEncryptionKey()', () => {
+    let vestingInstanceRegistryAddress
+    let vestingInstance
+    const dataEncryptionKey = '0x02f2f48ee19680706196e2e339e5da3491186e0c4c5030670656b0e01611111111'
+    const longDataEncryptionKey =
+      '0x04f2f48ee19680706196e2e339e5da3491186e0c4c5030670656b0e01611111111' +
+      '02f2f48ee19680706196e2e339e5da3491186e0c4c5030670656b0e01611111111'
+
+    beforeEach(async () => {
+      await createNewVestingInstanceTx(vestingDefaultSchedule, registry.address, web3)
+      vestingInstanceRegistryAddress = await vestingFactoryInstance.hasVestedAt(beneficiary)
+      vestingInstance = await VestingInstance.at(vestingInstanceRegistryAddress)
+      await vestingInstance.createAccount({ from: beneficiary })
+    })
+
+    it('beneficiary should set dataEncryptionKey', async () => {
+      // @ts-ignore
+      await vestingInstance.setAccountDataEncryptionKey(dataEncryptionKey, { from: beneficiary })
+      // @ts-ignore
+      const fetchedKey: string = await accountsInstance.getDataEncryptionKey(
+        vestingInstance.address
+      )
+      assert.equal(fetchedKey, dataEncryptionKey)
+    })
+
+    it('should revert if none-beneficiary attempts to set dataEncryptionKey', async () => {
+      // @ts-ignore
+      await assertRevert(
+        vestingInstance.setAccountDataEncryptionKey(dataEncryptionKey, { from: accounts[2] })
+      )
+    })
+
+    it('should allow setting a key with leading zeros', async () => {
+      const keyWithZeros = '0x00000000000000000000000000000000000000000000000f2f48ee19680706191111'
+      // @ts-ignore
+      await vestingInstance.setAccountDataEncryptionKey(keyWithZeros, { from: beneficiary })
+      // @ts-ignore
+      const fetchedKey: string = await accountsInstance.getDataEncryptionKey(
+        vestingInstance.address
+      )
+      assert.equal(fetchedKey, keyWithZeros)
+    })
+
+    it('should revert when the key is invalid', async () => {
+      // @ts-ignore
+      await assertRevert(
+        vestingInstance.setAccountDataEncryptionKey('0x32132931293', { from: beneficiary })
+      )
+    })
+
+    it('should allow a key that is longer than 33 bytes', async () => {
+      // @ts-ignore
+      await vestingInstance.setAccountDataEncryptionKey(longDataEncryptionKey, {
+        from: beneficiary,
+      })
+      // @ts-ignore
+      const fetchedKey: string = await accountsInstance.getDataEncryptionKey(
+        vestingInstance.address
+      )
+      assert.equal(fetchedKey, longDataEncryptionKey)
     })
   })
 })
