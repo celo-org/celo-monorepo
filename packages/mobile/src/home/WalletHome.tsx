@@ -136,8 +136,8 @@ export class WalletHome extends React.Component<Props> {
     this.props.refreshAllBalances()
   }
 
-  componentDidMount() {
-    generateLink('asdf', 'asdf')
+  async componentDidMount() {
+    await generateLink('asdf', 'asdf')
     this.props.resetStandbyTransactions()
     this.props.initializeSentryUserContext()
     this.importContactsIfNeeded()

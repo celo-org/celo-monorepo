@@ -28,7 +28,7 @@ import { transactionConfirmed } from 'src/transactions/actions'
 import { generateDynamicShortLink } from 'src/utils/dynamicLink'
 import { getConnectedUnlockedAccount, getOrCreateAccount } from 'src/web3/saga'
 import { createMockStore, mockContractKitBalance, mockContractKitContract } from 'test/utils'
-import { mockAccount, mockE164Number, mockInviteCode, mockName } from 'test/values'
+import { mockAccount, mockE164Number, mockName } from 'test/values'
 
 const mockFetch = fetch as FetchMock
 const mockKey = '0x1129eb2fbccdc663f4923a6495c35b096249812b589f7c4cd1dba01e1edaf724'

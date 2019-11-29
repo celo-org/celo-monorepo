@@ -84,11 +84,11 @@ export function getInvitationVerificationFeeInWei() {
 export async function generateLink(inviteCode: string, recipientName: string) {
   const packageName = VersionCheck.getPackageName().replace(/\.debug$/g, '.integration')
   const playStoreLink = await VersionCheck.getPlayStoreUrl({ packageName })
-  const playStoreUrl = 'https://apps.apple.com/us/app/celo-alfajores-wallet/id1482389446' // await VersionCheck.getAppStoreUrl()
+  const appStoreUrl = 'https://apps.apple.com/us/app/celo-alfajores-wallet/id1482389446' // await VersionCheck.getAppStoreUrl()
   const referrerData = encodeURIComponent(`invite-code=${inviteCode}`)
   const referrerLink = `${playStoreLink}&referrer=${referrerData}`
   Logger.info(TAG, `referrerLink before short ${referrerLink}`)
-  const shortUrl = await generateDynamicShortLink(referrerLink, playStoreUrl)
+  const shortUrl = await generateDynamicShortLink(referrerLink, appStoreUrl)
 
   return {
     name: recipientName,
