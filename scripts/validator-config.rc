@@ -1,10 +1,19 @@
-NEXMO_KEY="nexmokey"
-NEXMO_SECRET="xxx"
-NEXMO_BLACKLIST=""
+#CELO_IMAGE="us.gcr.io/celo-testnet/geth@baklavastaging"
+#NETWORK_ID=31416
+#NETWORK_NAME=baklavastaging
+#DEFAULT_PASSWORD="abcd"
+#CELO_IMAGE_ATTESTATION="us.gcr.io/celo-testnet/celo-monorepo@sha256:1e5ad356d3c1be81f6b8401549f84f71cdb8c453abd072db5fdc5a1e5e3cc992
+#CELO_PROVIDER="https://baklavastaging-forno.celo-testnet.org/"
+#DATABASE_URL="sqlite://db/attestation.db
 
+#CELOCLI=~/Projects/Celo/celo-monorepo/packages/cli/bin/run
 
-#VALIDATOR_GROUP_NAME="tijuana"
-#VALIDATOR_NAME="johndoe"
+#NEXMO_KEY="nexmokey"
+#NEXMO_SECRET="xxx"
+#NEXMO_BLACKLIST=""
+
+#VALIDATOR_GROUP_NAME="myvalidator"
+#VALIDATOR_NAME="whoknows"
 
 #CELO_VALIDATOR_ADDRESS=b652d50f52969e1344048bb55193bfa06ca84e81
 #CELO_VALIDATOR_GROUP_ADDRESS=9e488cf8ea0d79ada01af7edaf21dff347c915f5
@@ -14,4 +23,3 @@ NEXMO_BLACKLIST=""
 #CELO_VALIDATOR_SIGNER_BLS_PUBLIC_KEY=54d7f374e1cd8381b7eb606d1721bb162a39acf1aabffad88981caa9b4fd28c389bbee18dad4ae75caee78661a55f800da75d2a1345d6f12d725e4459fda5612f5f287433b26c53fe3b610b5613664490d932be2e7cb0b56b781c598ac491f00
 #CELO_VALIDATOR_SIGNER_BLS_SIGNATURE=eb00e6792cb40d7a516b03df36616e8d3dfe0e56cdcb324c6b4fee9e118dafd631f14941017e261071c834de1bde7301
 
-#CELOCLI=~/Projects/Celo/celo-monorepo/packages/cli/bin/run

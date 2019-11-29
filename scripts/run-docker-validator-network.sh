@@ -4,7 +4,7 @@ set -euo pipefail
 export LC_ALL=en_US.UTF-8
 
 # Usage: run-network.sh <COMMAND> <DATA_DIR>
-COMMAND=${1:-"pull,accounts,run-validator,run-proxy,status"}
+COMMAND=${1:-"pull,clean,accounts,run-validator,run-proxy,status,print-env"}
 DATA_DIR=${2:-"/tmp/celo/network"}
 
 export CELO_IMAGE=${3:-"us.gcr.io/celo-testnet/geth@sha256:37ff19487dfe436ca2be87725cf7ba0009c223614bbaf5b79d856ea9e73917f4"}
@@ -104,7 +104,7 @@ if [[ $COMMAND == *"help"* ]]; then
 
     echo -e "Options:"
     echo -e "$0 <COMMAND> <DATA_DIR> <CELO_IMAGE> <NETWORK_ID> <NETWORK_NAME> <PASSWORD>"
-    echo -e "\t - Command; comma separated list of actions to execute. Options are: help, pull, clean, accounts, run-validator, run-proxy, run-attestation, run-fullnode, status. Default: pull,accounts,run-validator,run-proxy,status"
+    echo -e "\t - Command; comma separated list of actions to execute. Options are: help, pull, clean, accounts, run-validator, run-proxy, run-attestation, run-fullnode, status, print-env, game. Default: pull,accounts,run-validator,run-proxy,status"
     echo -e "\t - Data Dir; Local folder where will be created the data dir for the nodes. Default: /tmp/celo/network"
     echo -e "\t - Celo Image; Image to download"
     echo -e "\t - Celo Network; Docker image network to use (typically alfajores or baklava, but you can use a commit). "
@@ -112,9 +112,14 @@ if [[ $COMMAND == *"help"* ]]; then
     echo -e "\t - Network Name; integration by default"
     echo -e "\t - Password; Password to use during the creation of accounts"
     
-    echo -e "\nExamples:"
-    echo -e "$0 pull,clean,deploy,run-validator "
-    echo -e "$0 deploy,run-validator /tmp/celo/network"
+    echo -e "\n**********\n\nExamples:\n"
+    echo -e "\tIf you want to create the local accounts, run a Proxy and a Validator connected to it:"
+    echo -e "\t$0 pull,clean,accounts,run-validator,run-proxy,status,print-env"
+    
+    echo -e "\n\tIf you have already your accounts, proxy and validator set up, you can run the following command to run TGCSO"
+    echo -e "\t$0 game"
+    
+    echo -e "\n\tIf you want to play TGCSO without being re-using your previously created accounts without restarting the proxy and validator, it's recommended to copy all your CELO environment variables in the 'validator-config.rc' file. The script will source the variables from there. "
 
     echo -e "\n"
     exit 0
@@ -159,10 +164,6 @@ if [[ $COMMAND == *"accounts"* ]]; then
     echo -e "\tCELO_VALIDATOR_GROUP_ADDRESS=$CELO_VALIDATOR_GROUP_ADDRESS"
     echo -e "\tCELO_VALIDATOR_SIGNER_ADDRESS=$CELO_VALIDATOR_SIGNER_ADDRESS"
 
-    #export CELO_PROXY_ADDRESS=$(docker run -v $PWD/proxy:/root/.celo --entrypoint /bin/sh -it $CELO_IMAGE -c " printf '%s\n' $DEFAULT_PASSWORD $DEFAULT_PASSWORD | geth account new " |tail -1| cut -d'{' -f 2| tr -cd "[:alnum:]\n" )
-    
-
-    #docker run -v $PWD/accounts:/root/.celo --entrypoint cp $CELO_IMAGE /celo/static-nodes.json /root/.celo/
     cd $ACCOUNTS_DIR
 
     echo -e "Starting local Docker holding the accounts. You can attach to it running 'screen -r -S celo-accounts'\n"
@@ -215,8 +216,6 @@ if [[ $COMMAND == *"run-validator"* ]]; then
     __BLS=$(docker run -v $PWD:/root/.celo --entrypoint /bin/sh -it $CELO_IMAGE -c " printf '%s\n' $DEFAULT_PASSWORD $DEFAULT_PASSWORD | geth account proof-of-possession $CELO_VALIDATOR_SIGNER_ADDRESS $CELO_VALIDATOR_ADDRESS --bls "| tail -1 )
     export CELO_VALIDATOR_SIGNER_BLS_PUBLIC_KEY=$(echo $__BLS | cut -d' ' -f 4| tr -cd "[:alnum:]\n" )
     export CELO_VALIDATOR_SIGNER_BLS_SIGNATURE=$(echo $__BLS | cut -d' ' -f 1| tr -cd "[:alnum:]\n" )
-    #export CELO_VALIDATOR_SIGNER_BLS_PUBLIC_KEY=$(docker run -v $PWD:/root/.celo --entrypoint /bin/sh -it $CELO_IMAGE -c " printf '%s\n' $DEFAULT_PASSWORD $DEFAULT_PASSWORD | geth account proof-of-possession $CELO_VALIDATOR_SIGNER_ADDRESS $CELO_VALIDATOR_ADDRESS --bls "| tail -1| cut -d' ' -f 5| tr -cd "[:alnum:]\n" )
-    #export CELO_VALIDATOR_SIGNER_BLS_SIGNATURE=$(docker run -v $PWD:/root/.celo --entrypoint /bin/sh -it $CELO_IMAGE -c " printf '%s\n' $DEFAULT_PASSWORD $DEFAULT_PASSWORD | geth account proof-of-possession $CELO_VALIDATOR_SIGNER_ADDRESS $CELO_VALIDATOR_ADDRESS --bls "|tail -1|head -1| cut -d' ' -f 4| tr -cd "[:alnum:]\n" )
     
     echo -e "\tCELO_VALIDATOR_SIGNER_BLS_PUBLIC_KEY=$CELO_VALIDATOR_SIGNER_BLS_PUBLIC_KEY"
     echo -e "\tCELO_VALIDATOR_SIGNER_BLS_SIGNATURE=$CELO_VALIDATOR_SIGNER_BLS_SIGNATURE"
@@ -317,13 +316,13 @@ if [[ $COMMAND == *"game"* ]]; then
 
     echo -e "\t4. Run for election .."
     echo -e "\t   * Authorize the validator signing key"
-    $CELOCLI account:authorize --from $CELO_VALIDATOR_ADDRESS --role validator --signature 0x$CELO_VALIDATOR_SIGNER_SIGNATURE --signer 0x$CELO_VALIDATOR_SIGNER_ADDRESS
+    $CELOCLI account:authorize --from $CELO_VALIDATOR_ADDRESS --role validator --signature 0x$CELO_VALIDATOR_SIGNER_SIGNATURE --signer 0x$CELO_VALIDATOR_SIGNER_ADDRESS || echo -e "Validator Signing Key $CELO_VALIDATOR_ADDRESS already authorized"
     
     echo -e "\t   * Register Validator Group address"
-    $CELOCLI validatorgroup:register --from $CELO_VALIDATOR_GROUP_ADDRESS --commission 0.1
+    $CELOCLI validatorgroup:register --from $CELO_VALIDATOR_GROUP_ADDRESS --commission 0.1 || echo -e "Validator Group  $CELO_VALIDATOR_GROUP_ADDRESS already registered"
 
     echo -e "\t   * Register Validator"
-    $CELOCLI validator:register --from $CELO_VALIDATOR_ADDRESS --ecdsaKey $CELO_VALIDATOR_SIGNER_PUBLIC_KEY --blsKey $CELO_VALIDATOR_SIGNER_BLS_PUBLIC_KEY --blsSignature $CELO_VALIDATOR_SIGNER_BLS_SIGNATURE
+    $CELOCLI validator:register --from $CELO_VALIDATOR_ADDRESS --ecdsaKey $CELO_VALIDATOR_SIGNER_PUBLIC_KEY --blsKey $CELO_VALIDATOR_SIGNER_BLS_PUBLIC_KEY --blsSignature $CELO_VALIDATOR_SIGNER_BLS_SIGNATURE || echo -e "Validator $CELO_VALIDATOR_GROUP_ADDRESS already registered"
 
     echo -e "\t   * Affiliate Validator with Validator Group"
     $CELOCLI validator:affiliate $CELO_VALIDATOR_GROUP_ADDRESS --from $CELO_VALIDATOR_ADDRESS
@@ -332,8 +331,8 @@ if [[ $COMMAND == *"game"* ]]; then
     $CELOCLI validatorgroup:member --accept $CELO_VALIDATOR_ADDRESS --from $CELO_VALIDATOR_GROUP_ADDRESS
 
     echo -e "\t   * Vote Validator Group"
-    $CELOCLI election:vote --from $CELO_VALIDATOR_ADDRESS --for $CELO_VALIDATOR_GROUP_ADDRESS --value 10000000000000000000000
-    $CELOCLI election:vote --from $CELO_VALIDATOR_GROUP_ADDRESS --for $CELO_VALIDATOR_GROUP_ADDRESS --value 10000000000000000000000
+    $CELOCLI election:vote --from $CELO_VALIDATOR_ADDRESS --for $CELO_VALIDATOR_GROUP_ADDRESS --value 10000000000000000000000 || echo -e "Validator $CELO_VALIDATOR_ADDRESS already vote to $CELO_VALIDATOR_GROUP_ADDRESS"
+    $CELOCLI election:vote --from $CELO_VALIDATOR_GROUP_ADDRESS --for $CELO_VALIDATOR_GROUP_ADDRESS --value 10000000000000000000000 || echo -e "Validator $CELO_VALIDATOR_ADDRESS already vote to $CELO_VALIDATOR_GROUP_ADDRESS"
     
     echo -e "\t State of the validation elections"
     $CELOCLI election:list
