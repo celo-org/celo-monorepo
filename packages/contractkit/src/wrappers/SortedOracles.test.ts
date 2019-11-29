@@ -1,4 +1,5 @@
 import { NetworkConfig, testWithGanache } from '@celo/dev-utils/lib/ganache-test'
+import { privateKeyToAddress } from '@celo/utils/lib/address'
 import { Address, CeloContract } from '../base'
 import { newKitFromWeb3 } from '../kit'
 import { OracleRate, SortedOraclesWrapper } from './SortedOracles'
@@ -13,7 +14,8 @@ testWithGanache('SortedOracles Wrapper', (web3) => {
   // from the MNEMONIC. If the MNEMONIC has changed, these will need to be reset.
   // To do that, look at the output of web3.eth.getAccounts(), and pick a few
   // addresses from that set to be oracles
-  const stableTokenOracles: Address[] = NetworkConfig.stableToken.oracles
+  const stableTokenOracleKeys: string[] = NetworkConfig.stableToken.oracleKeys
+  const stableTokenOracles: Address[] = stableTokenOracleKeys.map(privateKeyToAddress)
   const oracleAddress = stableTokenOracles[stableTokenOracles.length - 1]
 
   const kit = newKitFromWeb3(web3)

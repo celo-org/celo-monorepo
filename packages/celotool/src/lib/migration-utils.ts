@@ -30,6 +30,10 @@ function getAttestationKeys() {
   ).map(ensure0x)
 }
 
+function getOracleKeys() {
+  return getPrivateKeysFor(AccountType.PRICE_ORACLE, fetchEnv(envVar.MNEMONIC), 1).map(ensure0x)
+}
+
 export function migrationOverrides() {
   const mnemonic = fetchEnv(envVar.MNEMONIC)
   return {
@@ -40,7 +44,7 @@ export function migrationOverrides() {
     stableToken: {
       initialAccounts: getAddressesFor(AccountType.FAUCET, mnemonic, 2),
       values: getAddressesFor(AccountType.FAUCET, mnemonic, 2).map(() => '60000000000000000000000'), // 60k Celo Dollars
-      oracles: getAddressesFor(AccountType.PRICE_ORACLE, mnemonic, 1),
+      oracleKeys: getOracleKeys(),
     },
   }
 }

@@ -94,7 +94,7 @@ const DefaultConfig = {
       addresses: [],
       values: [],
     },
-    oracles: [],
+    oracleKeys: [],
   },
   validators: {
     groupLockedGoldRequirements: {
