@@ -1,4 +1,4 @@
-#CELO_IMAGE="us.gcr.io/celo-testnet/geth@baklavastaging"
+#CELO_IMAGE="us.gcr.io/celo-testnet/celo-node:baklavastaging"
 #NETWORK_ID=31416
 #NETWORK_NAME=baklavastaging
 #DEFAULT_PASSWORD="abcd"
