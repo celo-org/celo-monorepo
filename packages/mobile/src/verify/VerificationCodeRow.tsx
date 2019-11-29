@@ -1,4 +1,4 @@
-import { extractAttestationCodeFromMessage } from '@celo/utils'
+import { AttestationUtils } from '@celo/utils'
 import { stripHexLeader } from '@celo/utils/src/address'
 import * as React from 'react'
 import CodeRow, { CodeRowStatus } from 'src/components/CodeRow'
@@ -63,7 +63,7 @@ function getRecodedAttestationValue(attestationCode: AttestationCode) {
 
 function shouldShowClipboard(attestationCodes: AttestationCode[]) {
   return (value: string) => {
-    const extractedCode = extractAttestationCodeFromMessage(value)
+    const extractedCode = AttestationUtils.extractAttestationCodeFromMessage(value)
     return !!extractedCode && !attestationCodes.find((c) => c.code === extractedCode)
   }
 }

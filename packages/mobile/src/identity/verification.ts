@@ -210,6 +210,11 @@ export function* requestAndRetrieveAttestations(
       account
     )
 
+    console.log('===delay start')
+    //TODO Figure out why getActionable fails without this delay
+    yield delay(10000)
+    console.log('===delay end')
+
     CeloAnalytics.track(CustomEventNames.verification_actionable_attestation_start)
     // Check if we have a sufficient set now by fetching the new total set
     attestations = yield call(

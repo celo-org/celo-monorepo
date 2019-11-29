@@ -229,7 +229,7 @@ export class AttestationsWrapper extends BaseWrapper<Attestations> {
             attestationServiceURL: attestationServiceURLClaim.url,
           }
         } catch (error) {
-          console.error(error)
+          console.info('Error getting attestation service URLs', error)
           return null
         }
       }
