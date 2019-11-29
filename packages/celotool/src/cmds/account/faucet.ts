@@ -33,12 +33,12 @@ export const builder = (argv: yargs.Argv) => {
     .option('dollars', {
       type: 'number',
       description: 'Number of dollars to faucet',
-      default: 10,
+      default: 0,
     })
     .option('gold', {
       type: 'number',
       description: 'Amount of gold to faucet',
-      default: 1,
+      default: 0,
     })
 }
 
@@ -61,7 +61,7 @@ export const handler = async (argv: FaucetArgv) => {
     const goldAmount = await convertToContractDecimals(argv.gold, goldToken)
     const stableTokenAmount = await convertToContractDecimals(argv.dollars, stableToken)
     console.log(
-      `Fauceting ${argv.gold.toFixed()} Gold and ${argv.dollars.toFixed()} StableToken to ${address}`
+      `Fauceting ${goldAmount.toFixed()} Gold and ${stableTokenAmount.toFixed()} StableToken to ${address}`
     )
     if (!goldAmount.isZero()) {
       if (await reserve.isSpender(account)) {
