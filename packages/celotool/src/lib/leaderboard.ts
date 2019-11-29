@@ -21,9 +21,9 @@ export async function removeHelmRelease(celoEnv: string) {
 export async function upgradeHelmChart(celoEnv: string) {
   console.info(`Upgrading helm release ${releaseName(celoEnv)}`)
 
-  const upgradeCmdArgs = `${releaseName(
-    celoEnv
-  )} ${helmChartPath} --namespace ${celoEnv} ${helmParameters(celoEnv).join(' ')}`
+  const params = (await helmParameters(celoEnv)).join(' ')
+
+  const upgradeCmdArgs = `${releaseName(celoEnv)} ${helmChartPath} --namespace ${celoEnv} ${params}`
 
   if (process.env.CELOTOOL_VERBOSE === 'true') {
     await execCmdWithExitOnFailure(`helm upgrade --debug --dry-run ${upgradeCmdArgs}`)
@@ -40,8 +40,6 @@ export async function helmParameters(celoEnv: string) {
     `--set leaderboard.db.password=${dbValues.password}`,
     `--set leaderboard.image.repository=${fetchEnv(envVar.LEADERBOARD_DOCKER_IMAGE_REPOSITORY)}`,
     `--set leaderboard.image.tag=${fetchEnv(envVar.LEADERBOARD_DOCKER_IMAGE_TAG)}`,
-    `--set leaderboard.token=${fetchEnv(envVar.LEADERBOARD_TOKEN)}`,
-    `--set leaderboard.credentials=${fetchEnv(envVar.LEADERBOARD_CREDENTIALS)}`,
     `--set leaderboard.spreet=${fetchEnv(envVar.LEADERBOARD_SPREET)}`,
     `--set leaderboard.web3=https://${celoEnv}-forno.${fetchEnv(envVar.CLUSTER_DOMAIN_NAME)}.org`,
   ]
@@ -53,6 +51,6 @@ function releaseName(celoEnv: string) {
 
 export async function getBlockscoutHelmValues(celoEnv: string) {
   const [output] = await execCmd(`helm get values ${celoEnv}-blockscout`)
-  const blockscoutValues: any[] = yaml.safeLoadAll(output)
+  const blockscoutValues: any = yaml.safeLoad(output)
   return blockscoutValues.db
 }
