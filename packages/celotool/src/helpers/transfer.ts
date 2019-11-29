@@ -1,14 +1,12 @@
 import BigNumber from 'bignumber.js'
-import Web3 from 'web3'
 import { displaySendTx } from '@celo/celocli/lib/utils/cli'
-import { newKitFromWeb3 } from '@celo/contractkit'
+import { newKit } from '@celo/contractkit'
 
-const web3 = new Web3('http://localhost:8545')
 const from: string = process.env.FROM || '0x0'
 const to: string = process.env.TO || '0x0'
 const amountInWei = new BigNumber(process.env.AMOUNT || 0)
 ;(async () => {
-  const kit = newKitFromWeb3(web3)
+  const kit = newKit('http://localhost:8545')
   const goldToken = await kit.contracts.getGoldToken()
 
   // Check the balance before

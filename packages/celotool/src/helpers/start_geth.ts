@@ -10,7 +10,7 @@ import { GethRunConfig, runGethNodes } from '../lib/geth'
 program
   .option('-g, --geth-repo <path>', 'Geth repo path')
   .option('-v, --validators <number>', 'Number of validators', '3')
-  .option('-m, --migrations <number>', 'Number of migrations to be executed', '19')
+  .option('-m, --migrations <number>', 'Number of migrations to be executed', '20')
   .option(
     '-w, --mnemonic <words>',
     'Mnemonic seed words',

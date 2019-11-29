@@ -756,7 +756,7 @@ export async function initAndStartGeth(gethBinaryPath: string, instance: GethIns
 
   console.info(`geth:${instance.name}: init datadir ${datadir}`)
 
-  await init(gethBinaryPath, datadir, instance.gethRunConfig.genesisPath)
+  // await init(gethBinaryPath, datadir, instance.gethRunConfig.genesisPath)
 
   return startGeth(gethBinaryPath, instance)
 }
@@ -770,6 +770,7 @@ export async function init(gethBinaryPath: string, datadir: string, genesisPath:
 
 export async function importPrivateKey(gethBinaryPath: string, instance: GethInstanceConfig) {
   const keyFile = `${getDatadir(instance)}/key.txt`
+  await init(gethBinaryPath, getDatadir(instance), instance.gethRunConfig.genesisPath)
   fs.writeFileSync(keyFile, instance.privateKey, { flag: 'a' })
   console.info(`geth:${instance.name}: import account`)
   await spawnCmdWithExitOnFailure(
@@ -820,7 +821,7 @@ export async function startGeth(gethBinaryPath: string, instance: GethInstanceCo
     '--debug',
     '--port',
     port.toString(),
-    '--rpcvhosts="*"',
+    '--rpcvhosts=*',
     '--networkid',
     instance.gethRunConfig.networkId.toString(),
     '--verbosity',

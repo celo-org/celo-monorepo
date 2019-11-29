@@ -1,10 +1,7 @@
 import Web3 from 'web3'
 import fs from 'fs'
-import * as bls12377js from 'bls12377js'
 import { displaySendTx } from '@celo/celocli/lib/utils/cli'
 import { newKitFromWeb3 } from '@celo/contractkit'
-import { blsPrivateKeyToProcessedPrivateKey } from '@celo/utils/lib/bls'
-import { add0x } from '../lib/generate_utils'
 import BigNumber from 'bignumber.js'
 import { ec as EC } from 'elliptic'
 
@@ -16,18 +13,18 @@ export function generatePublicKeyFromPrivateKey(privateKey: string) {
   return ecPublicKey.slice(2)
 }
 
-export function generateAccountAddressFromPrivateKey(privateKey: string) {
+export function generateAccountAddressFromPrivateKey(web3: Web3, privateKey: string) {
   if (!privateKey.startsWith('0x')) {
     privateKey = '0x' + privateKey
   }
   // @ts-ignore-next-line
-  return cachedWeb3.eth.accounts.privateKeyToAccount(privateKey).address
+  return web3.eth.accounts.privateKeyToAccount(privateKey).address
 }
 
 export async function importAndUnlockAccount(
   web3: Web3,
   keystorePath: string,
-  password: string = ''
+  password: string = '/dev/null'
 ) {
   console.log(keystorePath)
   const keystore = fs.readFileSync(keystorePath, 'utf8')
@@ -35,23 +32,6 @@ export async function importAndUnlockAccount(
   const account = web3.eth.accounts.decrypt(keystore, password)
   await web3.eth.personal.unlockAccount(account.address, password, 300000)
   return account
-}
-
-export function getPublicKeysData(validatorPrivateKey: string) {
-  const validatorPrivateKeyHexStripped = validatorPrivateKey.slice(2)
-  const address = generateAccountAddressFromPrivateKey(validatorPrivateKey)
-  const publicKey = generatePublicKeyFromPrivateKey(validatorPrivateKeyHexStripped)
-  const blsValidatorPrivateKeyBytes = blsPrivateKeyToProcessedPrivateKey(
-    validatorPrivateKeyHexStripped
-  )
-  const blsPublicKey = bls12377js.BLS.privateToPublicBytes(blsValidatorPrivateKeyBytes).toString(
-    'hex'
-  )
-  const blsPoP = bls12377js.BLS.signPoP(
-    blsValidatorPrivateKeyBytes,
-    Buffer.from(address.slice(2), 'hex')
-  ).toString('hex')
-  return add0x(publicKey + blsPublicKey + blsPoP)
 }
 
 export async function lockGoldIfNeeded(web3: Web3, from: string) {
