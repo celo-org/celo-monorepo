@@ -21,9 +21,8 @@ spec:
             command:
             - /bin/sh
             args:
-            - c
+            - -c
             - |
-              tail -f /dev/null
               /cloud_sql_proxy \
               -instances={{ .Values.leaderboard.db.connection_name }}=tcp:5432 \
               -credential_file=/secrets/cloudsql/credentials.json
@@ -37,10 +36,12 @@ spec:
           - name: update-sheet
             image: {{ .Values.leaderboard.image.repository }}:{{ .Values.leaderboard.image.tag }}
             imagePullPolicy: IfNotPresent
-            command: ["/bin/sh"]
+            command:
+            - /bin/sh
             args:
-            - "-c"
+            - -c
             - |
+              tail -f /dev/null
               ts-node src/board.ts
             env:
             - name: LEADERBOARD_DATABASE

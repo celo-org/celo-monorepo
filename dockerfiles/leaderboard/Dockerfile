@@ -1,6 +1,4 @@
 FROM node:10
-RUN npm install -g typescript
-RUN npm install -g ts-node
 WORKDIR /celo-monorepo
 
 # ensure yarn.lock is evaluated by kaniko cache diff
@@ -29,4 +27,7 @@ COPY packages/leaderboard packages/leaderboard/
 RUN yarn build
 
 WORKDIR /celo-monorepo/packages/leaderboard
-CMD ["node lib/index.js"]
+RUN npm install -g typescript
+RUN npm install -g ts-node
+
+CMD ["ts-node src/board.ts"]
