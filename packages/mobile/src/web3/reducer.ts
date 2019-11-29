@@ -1,13 +1,9 @@
 import networkConfig from 'src/geth/networkConfig'
 import { getRehydratePayload, REHYDRATE, RehydrateAction } from 'src/redux/persist-helper'
-import { Actions, ActionTypes } from 'src/web3/actions'
+import { Actions, ActionTypes, Web3SyncProgress } from 'src/web3/actions'
 
 export interface State {
-  syncProgress: {
-    startingBlock: number
-    currentBlock: number
-    highestBlock: number
-  }
+  syncProgress: Web3SyncProgress
   latestBlockNumber: number
   account: string | null
   accountInWeb3Keystore: string | null
@@ -71,9 +67,14 @@ export const reducer = (
         ...state,
         commentKey: action.commentKey,
       }
-    case Actions.SET_BLOCK_NUMBER:
+    case Actions.COMPLETE_WEB3_SYNC:
       return {
         ...state,
+        syncProgress: {
+          startingBlock: state.syncProgress.startingBlock,
+          currentBlock: action.latestBlockNumber,
+          highestBlock: action.latestBlockNumber,
+        },
         latestBlockNumber: action.latestBlockNumber,
       }
     case Actions.UPDATE_WEB3_SYNC_PROGRESS:
