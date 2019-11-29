@@ -16,7 +16,7 @@ Other variables:
 
 - `LEADERBOARD_DATABASE`: which database to connect into. Defaults to `blockscout`
 - `LEADERBOARD_WEB3`: Geth RPC address. Default: `http://localhost:8545`
-- `LEADERBOARD_SPREET`: Google spreadsheet identifier. Default: `1HCs1LZv1BOB1v2bVlH4qNPnxVRlYVhQ7CKhkMibE4EY`
+- `LEADERBOARD_SHEET`: Google spreadsheet identifier. Default: `1HCs1LZv1BOB1v2bVlH4qNPnxVRlYVhQ7CKhkMibE4EY`
 
 ## Setup and running
 
