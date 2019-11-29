@@ -25,13 +25,20 @@ spec:
             - |
               /cloud_sql_proxy \
               -instances={{ .Values.leaderboard.db.connection_name }}=tcp:5432 \
-              -credential_file=/secrets/cloudsql/credentials.json
+              -credential_file=/secrets/cloudsql/credentials.json &
+              CHILD_PID=$!
+              (while true; do if [[ -f "/tmp/pod/main-terminated" ]]; then kill $CHILD_PID; fi; sleep 1; done) &
+              wait $CHILD_PID
+              if [[ -f "/tmp/pod/main-terminated" ]]; then exit 0; fi
             securityContext:
             runAsUser: 2  # non-root user
             allowPrivilegeEscalation: false
             volumeMounts:
             - name: blockscout-cloudsql-credentials
               mountPath: /secrets/cloudsql
+              readOnly: true
+            - mountPath: /tmp/pod
+              name: tmp-pod
               readOnly: true
           - name: update-sheet
             image: {{ .Values.leaderboard.image.repository }}:{{ .Values.leaderboard.image.tag }}
@@ -41,8 +48,8 @@ spec:
             args:
             - -c
             - |
-              tail -f /dev/null
-              ts-node src/board.ts
+              trap "touch /tmp/pod/main-terminated" EXIT
+              yarn run ts-node src/board.ts
             env:
             - name: LEADERBOARD_DATABASE
               value: {{ .Values.leaderboard.database }}
@@ -60,9 +67,14 @@ spec:
                 secretKeyRef:
                   name: {{ .Release.Namespace }}-leaderboard
                   key: DATABASE_PASSWORD
+            volumeMounts:
+            - mountPath: /tmp/pod
+              name: tmp-pod
           restartPolicy: Never
           volumes:
           - name: blockscout-cloudsql-credentials
             secret:
               defaultMode: 420
               secretName: blockscout-cloudsql-credentials
+          - name: tmp-pod
+            emptyDir: {}
