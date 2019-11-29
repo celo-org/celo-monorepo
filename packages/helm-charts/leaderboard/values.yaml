@@ -1,0 +1,16 @@
+nodeSelector: {}
+
+# Expects cron schedule syntax
+leaderboard:
+  schedule: "*/1 * * * *"
+  database: "blockscout"
+  image:
+    repository: jcortejoso/leaderboard
+    tag: latest
+  database: blockscout
+  web3: https://baklavastaging-forno.celo-testnet.org/
+  spreet: 1HCs1LZv1BOB1v2bVlH4qNPnxVRlYVhQ7CKhkMibE4EY
+  db:
+    username: ls880fd3
+    password: dg7mTjVB2khgkDFd
+    connection_name: celo-testnet:us-west1:baklavastaging0

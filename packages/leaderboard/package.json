@@ -9,7 +9,8 @@
     "@celo/contractkit": "0.2.1-dev",
     "@types/pg": "^7.11.2",
     "google-spreadsheet": "^2.0.8",
-    "pg": "^7.12.1"
+    "pg": "^7.12.1",
+    "ts-node": "^8.5.4"
   },
   "devDependencies": {},
   "scripts": {

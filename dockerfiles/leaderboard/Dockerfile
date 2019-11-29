@@ -27,4 +27,5 @@ COPY packages/leaderboard packages/leaderboard/
 RUN yarn build
 
 WORKDIR /celo-monorepo/packages/leaderboard
-CMD ["node lib/index.js"]
+
+CMD ["yarn run ts-node src/board.ts"]
