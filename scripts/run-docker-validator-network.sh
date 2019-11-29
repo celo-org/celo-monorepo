@@ -8,7 +8,7 @@ COMMAND=${1:-"pull,accounts,run-validator,run-proxy,status"}
 DATA_DIR=${2:-"/tmp/celo/network"}
 
 export CELO_IMAGE=${3:-"us.gcr.io/celo-testnet/geth@sha256:37ff19487dfe436ca2be87725cf7ba0009c223614bbaf5b79d856ea9e73917f4"}
-export NETWORK_ID=${4:-"31415"}
+export NETWORK_ID=${4:-"31416"}
 export NETWORK_NAME=${5:-"baklavastaging"}
 export DEFAULT_PASSWORD=${6:-"1234"}
 export CELO_IMAGE_ATTESTATION=${7:-"us.gcr.io/celo-testnet/celo-monorepo@sha256:1e5ad356d3c1be81f6b8401549f84f71cdb8c453abd072db5fdc5a1e5e3cc992"}
@@ -301,8 +301,8 @@ if [[ $COMMAND == *"game"* ]]; then
     cd $ACCOUNTS_DIR
     
     echo -e "\t1. Unlocking accounts .."
-    celocli account:unlock --account $CELO_VALIDATOR_GROUP_ADDRESS
-    celocli account:unlock --account $CELO_VALIDATOR_ADDRESS
+    celocli account:unlock --account $CELO_VALIDATOR_GROUP_ADDRESS --password $DEFAULT_PASSWORD
+    celocli account:unlock --account $CELO_VALIDATOR_ADDRESS --password $DEFAULT_PASSWORD
     
     echo -e "\t2. Registering accounts .."
     celocli account:register --from $CELO_VALIDATOR_GROUP_ADDRESS --name $VALIDATOR_GROUP_NAME
