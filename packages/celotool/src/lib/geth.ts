@@ -692,7 +692,7 @@ export const runGethNodes = async ({
   const gethBinaryPath = `${gethConfig.gethRepoPath}/build/bin/geth`
 
   if (!keepData && fs.existsSync(gethConfig.runPath)) {
-    // await setupTmpDir(gethConfig.runPath)
+    await resetDataDir(gethConfig.runPath)
   }
 
   if (!fs.existsSync(gethConfig.runPath)) {
@@ -709,7 +709,7 @@ export const runGethNodes = async ({
 
   for (const instance of gethConfig.instances) {
     if (instance.validating) {
-      // Automatically connect validator nodes to eachother.
+      // Automatically connect validator nodes to each other.
       const otherValidators = validatorEnodes.filter((_: string, i: number) => i !== validatorIndex)
       instance.peers = (instance.peers || []).concat(otherValidators)
       instance.privateKey = instance.privateKey || validatorPrivateKeys[validatorIndex]
@@ -961,9 +961,9 @@ export async function buildGeth(path: string) {
   await spawnCmdWithExitOnFailure('make', ['geth'], { cwd: path })
 }
 
-export async function setupTmpDir(testDir: string) {
-  await spawnCmd('rm', ['-rf', testDir], { silent: true })
-  await spawnCmd('mkdir', [testDir], { silent: true })
+export async function resetDataDir(dataDir: string) {
+  await spawnCmd('rm', ['-rf', dataDir], { silent: true })
+  await spawnCmd('mkdir', [dataDir], { silent: true })
 }
 
 export async function checkoutGethRepo(branch: string, path: string) {
@@ -986,8 +986,6 @@ export function spawnWithLog(cmd: string, args: string[], logsFilepath: string) 
   } catch (error) {
     // nothing to do
   }
-  console.log(logsFilepath)
-  console.log(fs.existsSync(logsFilepath))
   const logStream = fs.createWriteStream(logsFilepath, { flags: 'a' })
   console.log(cmd, ...args)
   const process = spawn(cmd, args)

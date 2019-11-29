@@ -11,6 +11,5 @@ const web3 = new Web3('http://localhost:8543')
   console.log(
     Object.values(await electionContract.electableValidators()).map((num) => num.toString())
   )
-  console.log(await electionContract.getEligibleValidatorGroupsVotes())
   console.log((await electionContract.electabilityThreshold()).toString())
 })()
