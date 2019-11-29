@@ -18,6 +18,7 @@ export DATABASE_URL=${9:-"sqlite://db/attestation.db"}
 export VALIDATOR_NAME=johndoe_$(cat /dev/urandom | tr -dc 'a-z0-9' | fold -w 8 | head -n 1)
 export VALIDATOR_GROUP_NAME=tijuana_$(cat /dev/urandom | tr -dc 'a-z0-9' | fold -w 8 | head -n 1)
 
+export CELOCLI="celocli"
 export NEXMO_KEY="xx"
 export NEXMO_SECRET="xx"
 export NEXMO_BLACKLIST=""
@@ -300,43 +301,45 @@ if [[ $COMMAND == *"game"* ]]; then
     echo -e "* Playing the Game of Stakes ..."
     cd $ACCOUNTS_DIR
     
+    which $CELOCLI
+    
     echo -e "\t1. Unlocking accounts .."
-    celocli account:unlock --account $CELO_VALIDATOR_GROUP_ADDRESS --password $DEFAULT_PASSWORD
-    celocli account:unlock --account $CELO_VALIDATOR_ADDRESS --password $DEFAULT_PASSWORD
+    $CELOCLI account:unlock --account $CELO_VALIDATOR_GROUP_ADDRESS --password $DEFAULT_PASSWORD
+    $CELOCLI account:unlock --account $CELO_VALIDATOR_ADDRESS --password $DEFAULT_PASSWORD
     
     echo -e "\t2. Registering accounts .."
-    celocli account:register --from $CELO_VALIDATOR_GROUP_ADDRESS --name $VALIDATOR_GROUP_NAME
-    celocli account:register --from $CELO_VALIDATOR_ADDRESS --name $VALIDATOR_NAME
+    $CELOCLI account:register --from $CELO_VALIDATOR_GROUP_ADDRESS --name $VALIDATOR_GROUP_NAME
+    $CELOCLI account:register --from $CELO_VALIDATOR_ADDRESS --name $VALIDATOR_NAME
     
     echo -e "\t3. Locking Gold .."
-    celocli lockedgold:lock --from $CELO_VALIDATOR_GROUP_ADDRESS --value 10000000000000000000000
-    celocli lockedgold:lock --from $CELO_VALIDATOR_ADDRESS --value 10000000000000000000000
+    $CELOCLI lockedgold:lock --from $CELO_VALIDATOR_GROUP_ADDRESS --value 10000000000000000000000
+    $CELOCLI lockedgold:lock --from $CELO_VALIDATOR_ADDRESS --value 10000000000000000000000
 
     echo -e "\t4. Run for election .."
     echo -e "\t   * Authorize the validator signing key"
-    celocli account:authorize --from $CELO_VALIDATOR_ADDRESS --role validator --pop 0x$CELO_VALIDATOR_SIGNER_SIGNATURE --signer $CELO_VALIDATOR_SIGNER_ADDRESS
+    $CELOCLI account:authorize --from $CELO_VALIDATOR_ADDRESS --role validator --pop 0x$CELO_VALIDATOR_SIGNER_SIGNATURE --signer $CELO_VALIDATOR_SIGNER_ADDRESS
     
     echo -e "\t   * Register Validator Group address"
-    celocli validatorgroup:register --from $CELO_VALIDATOR_GROUP_ADDRESS --commission 0.1
+    $CELOCLI validatorgroup:register --from $CELO_VALIDATOR_GROUP_ADDRESS --commission 0.1
 
     echo -e "\t   * Register Validator"
-    celocli validator:register --from $CELO_VALIDATOR_ADDRESS --ecdsaKey $CELO_VALIDATOR_SIGNER_PUBLIC_KEY --blsKey $CELO_VALIDATOR_SIGNER_BLS_PUBLIC_KEY --blsSignature $CELO_VALIDATOR_SIGNER_BLS_SIGNATURE
+    $CELOCLI validator:register --from $CELO_VALIDATOR_ADDRESS --ecdsaKey $CELO_VALIDATOR_SIGNER_PUBLIC_KEY --blsKey $CELO_VALIDATOR_SIGNER_BLS_PUBLIC_KEY --blsSignature $CELO_VALIDATOR_SIGNER_BLS_SIGNATURE
 
     echo -e "\t   * Affiliate Validator with Validator Group"
-    celocli validator:affiliate $CELO_VALIDATOR_GROUP_ADDRESS --from $CELO_VALIDATOR_ADDRESS
+    $CELOCLI validator:affiliate $CELO_VALIDATOR_GROUP_ADDRESS --from $CELO_VALIDATOR_ADDRESS
 
     echo -e "\t   * Accept affiliation"
-    celocli validatorgroup:member --accept $CELO_VALIDATOR_ADDRESS --from $CELO_VALIDATOR_GROUP_ADDRESS
+    $CELOCLI validatorgroup:member --accept $CELO_VALIDATOR_ADDRESS --from $CELO_VALIDATOR_GROUP_ADDRESS
 
     echo -e "\t   * Vote Validator Group"
-    celocli election:vote --from $CELO_VALIDATOR_ADDRESS --for $CELO_VALIDATOR_GROUP_ADDRESS --value 10000000000000000000000
-    celocli election:vote --from $CELO_VALIDATOR_GROUP_ADDRESS --for $CELO_VALIDATOR_GROUP_ADDRESS --value 10000000000000000000000
+    $CELOCLI election:vote --from $CELO_VALIDATOR_ADDRESS --for $CELO_VALIDATOR_GROUP_ADDRESS --value 10000000000000000000000
+    $CELOCLI election:vote --from $CELO_VALIDATOR_GROUP_ADDRESS --for $CELO_VALIDATOR_GROUP_ADDRESS --value 10000000000000000000000
     
     echo -e "\t State of the validation elections"
-    celocli election:list
+    $CELOCLI election:list
 
     echo -e "\t Current elected validators"
-    celocli election:current
+    $CELOCLI election:current
 
 fi
 
