@@ -206,6 +206,7 @@ export function* sendInviteSaga(action: SendInviteAction) {
 }
 
 export function* redeemInviteSaga({ inviteCode }: RedeemInviteAction) {
+  yield call(waitWeb3LastBlock)
   Logger.debug(TAG, 'Starting Redeem Invite')
 
   const { result, timeout } = yield race({
@@ -230,7 +231,6 @@ export function* redeemInviteSaga({ inviteCode }: RedeemInviteAction) {
 }
 
 export function* doRedeemInvite(inviteCode: string) {
-  yield call(waitWeb3LastBlock)
   try {
     const tempAccount = web3.eth.accounts.privateKeyToAccount(inviteCode).address
     Logger.debug(TAG + '@doRedeemInvite', 'Invite code contains temp account', tempAccount)
