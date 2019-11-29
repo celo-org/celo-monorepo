@@ -75,16 +75,23 @@ async function updateRate(kit: ContractKit) {
   await client.connect()
   const token = await kit.contracts.getStableToken()
   const oracle = await kit.contracts.getSortedOracles()
-  const rate = await oracle.medianRate(CeloContract.StableToken)
+  const rate = (await oracle.medianRate(CeloContract.StableToken)).rate.toNumber()
 
   console.log(token.address)
 
   const res = await client.query(
     'INSERT INTO exchange_rates (token, rate) VALUES ($1, $2)' +
       ' ON CONFLICT (token) DO UPDATE SET rate = EXCLUDED.rate RETURNING *',
-    [Buffer.from(token.address.substr(2), 'hex'), rate.rate.toNumber()]
+    [Buffer.from(token.address.substr(2), 'hex'), rate]
   )
   console.log(res.rows)
+  const date = new Date().toLocaleDateString()
+  const res2 = await client.query(
+    'INSERT INTO market_history (date, closing_price, opening_price) VALUES ($1, $2, $3)' +
+      ' ON CONFLICT (date) DO UPDATE SET closing_price = EXCLUDED.closing_price, opening_price = EXCLUDED.opening_price RETURNING *',
+    [date, rate, rate]
+  )
+  console.log(res2.rows)
   await client.end()
 }
 
