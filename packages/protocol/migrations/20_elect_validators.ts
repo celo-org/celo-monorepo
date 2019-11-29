@@ -247,6 +247,7 @@ module.exports = async (_deployer: any, networkName: string) => {
     lockedGoldPerValEachGroup = new BigNumber(config.validators.votesRatioOfLastVsFirstGroup - 1)
       .times(lockedGoldPerValAtFirstGroup)
       .div(valKeyGroups.length - 1)
+      .integerValue()
   }
 
   let prevGroupAddress = NULL_ADDRESS
