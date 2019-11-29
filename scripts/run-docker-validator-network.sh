@@ -138,8 +138,11 @@ if [[ $COMMAND == *"clean"* ]]; then
     echo -e "* Removing data dir $DATA_DIR"
     rm -rf $DATA_DIR/*
     mkdir -p $DATA_DIR
+    mkdir -p $ACCOUNTS_DIR
     mkdir -p $VALIDATOR_DIR
     mkdir -p $PROXY_DIR
+    mkdir -p $FULLNODE_DIR
+    mkdir -p $ATTESTATION_DIR
 fi
 
 
