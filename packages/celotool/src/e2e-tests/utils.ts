@@ -22,7 +22,7 @@ import {
   checkoutGethRepo,
   buildGeth,
   spawnWithLog,
-  setupTmpDir,
+  resetDataDir,
   connectValidatorPeers,
 } from '../lib/geth'
 import { ensure0x, spawnCmd, spawnCmdWithExitOnFailure } from '../lib/utils'
@@ -245,7 +245,7 @@ export function getContext(gethConfig: GethRunConfig) {
       await checkoutGethRepo(branch, gethRepoPath)
     }
     await buildGeth(gethRepoPath)
-    await setupTmpDir(gethConfig.runPath)
+    await resetDataDir(gethConfig.runPath)
     await writeGenesis(validators, gethConfig)
 
     let bootnodeEnode: string = ''

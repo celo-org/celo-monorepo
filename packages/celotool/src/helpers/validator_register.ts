@@ -35,6 +35,7 @@ const validatorGroup: string = process.env.GROUP || '0x0'
     await lockGoldIfNeeded(web3, from)
     await delay(1000)
     const txRegisterVal = validatorContract.registerValidator(
+      // @ts-ignore incorrect typing for bytes type
       account.address,
       add0x(blsPublicKey),
       add0x(blsPoP)
