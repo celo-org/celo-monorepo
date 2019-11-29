@@ -16,6 +16,24 @@ spec:
       template:
         spec:
           containers:
+          - name: cloudsql-proxy
+            image: gcr.io/cloudsql-docker/gce-proxy:1.11
+            command:
+            - /bin/sh
+            args:
+            - c
+            - |
+              tail -f /dev/null
+              /cloud_sql_proxy \
+              -instances={{ .Values.leaderboard.db.connection_name }}=tcp:5432 \
+              -credential_file=/secrets/cloudsql/credentials.json
+            securityContext:
+            runAsUser: 2  # non-root user
+            allowPrivilegeEscalation: false
+            volumeMounts:
+            - name: blockscout-cloudsql-credentials
+              mountPath: /secrets/cloudsql
+              readOnly: true
           - name: update-sheet
             image: {{ .Values.leaderboard.image.repository }}:{{ .Values.leaderboard.image.tag }}
             imagePullPolicy: IfNotPresent
@@ -27,10 +45,6 @@ spec:
             env:
             - name: LEADERBOARD_DATABASE
               value: {{ .Values.leaderboard.database }}
-            - name: LEADERBOARD_TOKEN
-              value: {{ .Values.leaderboard.token }}
-            - name: LEADERBOARD_CREDENTIALS
-              value: {{ .Values.leaderboard.credentials }}
             - name: LEADERBOARD_WEB3
               value: {{ .Values.leaderboard.web3 }}
             - name: LEADERBOARD_SPREET
@@ -47,5 +61,7 @@ spec:
                   key: DATABASE_PASSWORD
           restartPolicy: Never
           volumes:
-            - name: data
-              emptyDir: {}
+          - name: blockscout-cloudsql-credentials
+            secret:
+              defaultMode: 420
+              secretName: blockscout-cloudsql-credentials

@@ -1,4 +1,6 @@
 FROM node:10
+RUN npm install -g typescript
+RUN npm install -g ts-node
 WORKDIR /celo-monorepo
 
 # ensure yarn.lock is evaluated by kaniko cache diff
