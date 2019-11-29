@@ -468,12 +468,28 @@ screen -r -S celo-validator
 
 ### Reference Script
 
-You can use (and modify if you want) this [reference bash script](../../../scripts/run-docker-validator-network.sh) automating all the above steps. It requires Docker and screen.
+If you want to run everything locally, you can use (and modify if you want) this [reference bash script](../../../scripts/run-docker-validator-network.sh) automating all the above steps.
+
+**Warning:** The script requires `Docker` and `screen`.
 
 You can see all the options using the following command:
 
 ```bash
 ./run-docker-validator-network.sh help
+```
+
+If you want to create the local accounts, run a Proxy and a Validator connected to it, you can use the following command:
+
+```bash
+./run-docker-validator-network.sh pull,clean,accounts,run-validator,run-proxy,status,print-env
+```
+
+After doing that you can copy all the `CELO*` environment variables in the `validator-config.rc` file. The script will source the variables from there avoiding the accounts multiple times.
+
+If you have already your accounts, proxy and validator set up, you can run the following command to run TGCSO:
+
+```bash
+./run-docker-validator-network.sh game
 ```
 
 ## Stop Validating
