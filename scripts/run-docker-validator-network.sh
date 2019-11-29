@@ -108,7 +108,7 @@ if [[ $COMMAND == *"help"* ]]; then
     echo -e "\t - Data Dir; Local folder where will be created the data dir for the nodes. Default: /tmp/celo/network"
     echo -e "\t - Celo Image; Image to download"
     echo -e "\t - Celo Network; Docker image network to use (typically alfajores or baklava, but you can use a commit). "
-    echo -e "\t - Network Id; 31415 for integration, 44785 for alfajores, etc."
+    echo -e "\t - Network Id; 31416 for integration, 44785 for alfajores, etc."
     echo -e "\t - Network Name; integration by default"
     echo -e "\t - Password; Password to use during the creation of accounts"
     
@@ -308,8 +308,8 @@ if [[ $COMMAND == *"game"* ]]; then
     $CELOCLI account:unlock --account $CELO_VALIDATOR_ADDRESS --password $DEFAULT_PASSWORD
     
     echo -e "\t2. Registering accounts .."
-    $CELOCLI account:register --from $CELO_VALIDATOR_GROUP_ADDRESS --name $VALIDATOR_GROUP_NAME
-    $CELOCLI account:register --from $CELO_VALIDATOR_ADDRESS --name $VALIDATOR_NAME
+    $CELOCLI account:register --from $CELO_VALIDATOR_GROUP_ADDRESS --name $VALIDATOR_GROUP_NAME || echo -e "$CELO_VALIDATOR_GROUP_ADDRESS already registered"
+    $CELOCLI account:register --from $CELO_VALIDATOR_ADDRESS --name $VALIDATOR_NAME || echo -e "$CELO_VALIDATOR_ADDRESS already registered"
     
     echo -e "\t3. Locking Gold .."
     $CELOCLI lockedgold:lock --from $CELO_VALIDATOR_GROUP_ADDRESS --value 10000000000000000000000
@@ -317,7 +317,7 @@ if [[ $COMMAND == *"game"* ]]; then
 
     echo -e "\t4. Run for election .."
     echo -e "\t   * Authorize the validator signing key"
-    $CELOCLI account:authorize --from $CELO_VALIDATOR_ADDRESS --role validator --pop 0x$CELO_VALIDATOR_SIGNER_SIGNATURE --signer $CELO_VALIDATOR_SIGNER_ADDRESS
+    $CELOCLI account:authorize --from $CELO_VALIDATOR_ADDRESS --role validator --signature 0x$CELO_VALIDATOR_SIGNER_SIGNATURE --signer 0x$CELO_VALIDATOR_SIGNER_ADDRESS
     
     echo -e "\t   * Register Validator Group address"
     $CELOCLI validatorgroup:register --from $CELO_VALIDATOR_GROUP_ADDRESS --commission 0.1
