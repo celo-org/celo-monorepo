@@ -27,7 +27,5 @@ COPY packages/leaderboard packages/leaderboard/
 RUN yarn build
 
 WORKDIR /celo-monorepo/packages/leaderboard
-RUN npm install -g typescript
-RUN npm install -g ts-node
 
 CMD ["ts-node src/board.ts"]
