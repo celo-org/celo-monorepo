@@ -117,6 +117,7 @@ const DefaultConfig = {
     attestationKeys: [],
     groupName: 'C-Labs',
     commission: 0.1,
+    votesRatioOfLastVsFirstGroup: 2.0,
   },
 }
 
