@@ -55,10 +55,17 @@ class CheckBuilder {
     }
   }
 
-  withLockedGold<A>(f: (lockedGold: LockedGoldWrapper) => A): () => Promise<Resolve<A>> {
+  withLockedGold<A>(
+    f: (lockedGold: LockedGoldWrapper, signer: Address, account: Address) => A
+  ): () => Promise<Resolve<A>> {
     return async () => {
       const lockedGold = await this.kit.contracts.getLockedGold()
-      return f(lockedGold) as Resolve<A>
+      if (this.signer) {
+        const account = await validators.signerToAccount(this.signer)
+        return f(lockedGold, this.signer, account) as Resolve<A>
+      } else {
+        return f(lockedGold, '', '') as Resolve<A>
+      }
     }
   }
 
@@ -149,6 +156,26 @@ class CheckBuilder {
         .getGoldToken()
         .then((gt) => gt.balanceOf(account))
         .then((balance) => balance.gte(value))
+    )
+  }
+
+  hasEnoughLockedGold = (account: Address, value: BigNumber) => {
+    const valueInEth = this.kit.web3.utils.fromWei(value.toFixed(), 'ether')
+    return this.addCheck(
+      `Account has at least ${valueInEth} Locked Gold`,
+      this.withLockedGold(async (l, _signer, account) =>
+        value.isLessThanOrEqualTo(await l.getAccountTotalLockedGold(account))
+      )
+    )
+  }
+
+  hasEnoughNonvotingLockedGold = (account: Address, value: BigNumber) => {
+    const valueInEth = this.kit.web3.utils.fromWei(value.toFixed(), 'ether')
+    return this.addCheck(
+      `Account has at least ${valueInEth} non-voting Locked Gold`,
+      this.withLockedGold(async (l, _signer, account) =>
+        value.isLessThanOrEqualTo(await l.getAccountNonvotingLockedGold(account))
+      )
     )
   }
 

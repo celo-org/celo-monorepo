@@ -25,7 +25,7 @@ const DefaultConfig = {
     minElectableValidators: '22',
     maxElectableValidators: '100',
     maxVotesPerAccount: 3,
-    electabilityThreshold: 1 / 100,
+    electabilityThreshold: 1 / 1000,
   },
   epochRewards: {
     targetVotingYieldParameters: {
