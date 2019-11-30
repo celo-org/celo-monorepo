@@ -40,3 +40,18 @@ See the [issue backlog](https://github.com/celo-org/celo-monorepo/issues) for a 
 All packages are licensed under the terms of the Apache 2.0 License unless otherwise specified in the LICENSE file at package's root.
 
 Improvements and contributions are highly encouraged! See the [contributing guide](https://github.com/celo-org/celo-monorepo/tree/master/.github/CONTRIBUTING.md) for details on how to participate.
+<!--
+
+### Backers
+
+Thank you to all our backers! 🙏 [[Become a backer](https://opencollective.com/shields#backer)]
+
+<a href="https://opencollective.com/shields#backers" target="_blank"><img src="https://opencollective.com/shields/backers.svg?width=890"></a>
+
+### Sponsors
+
+Support this project by becoming a sponsor. Your logo will show up here with a link to your website. [[Become a sponsor](https://opencollective.com/shields#sponsor)]
+
+<a href="https://opencollective.com/shields/sponsor/0/website" target="_blank"><img src="https://opencollective.com/shields/sponsor/0/avatar.svg"></a>
+
+-->
