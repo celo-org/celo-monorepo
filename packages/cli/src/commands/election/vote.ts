@@ -29,7 +29,7 @@ export default class ElectionVote extends BaseCommand {
     await newCheckBuilder(this, res.flags.from)
       .isSignerOrAccount()
       .isValidatorGroup(res.flags.for)
-      .hasEnoughNonvotingLockedGold(res.flags.for, value)
+      .hasEnoughNonvotingLockedGold(value)
       .runChecks()
 
     const election = await this.kit.contracts.getElection()

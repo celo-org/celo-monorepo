@@ -1,4 +1,5 @@
 import { flags } from '@oclif/command'
+import BigNumber from 'bignumber.js'
 import { BaseCommand } from '../../base'
 import { newCheckBuilder } from '../../utils/checks'
 import { displaySendTx } from '../../utils/cli'
@@ -27,7 +28,7 @@ export default class Unlock extends BaseCommand {
 
     await newCheckBuilder(this)
       .isAccount(res.flags.from)
-      .hasEnoughNonvotingLockedGold(res.flags.from, value)
+      .hasEnoughNonvotingLockedGold(value)
       .runChecks()
 
     await displaySendTx('unlock', lockedgold.unlock(value))

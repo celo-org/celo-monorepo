@@ -60,6 +60,7 @@ class CheckBuilder {
   ): () => Promise<Resolve<A>> {
     return async () => {
       const lockedGold = await this.kit.contracts.getLockedGold()
+      const validators = await this.kit.contracts.getValidators()
       if (this.signer) {
         const account = await validators.signerToAccount(this.signer)
         return f(lockedGold, this.signer, account) as Resolve<A>
@@ -159,7 +160,7 @@ class CheckBuilder {
     )
   }
 
-  hasEnoughLockedGold = (account: Address, value: BigNumber) => {
+  hasEnoughLockedGold = (value: BigNumber) => {
     const valueInEth = this.kit.web3.utils.fromWei(value.toFixed(), 'ether')
     return this.addCheck(
       `Account has at least ${valueInEth} Locked Gold`,
@@ -169,7 +170,7 @@ class CheckBuilder {
     )
   }
 
-  hasEnoughNonvotingLockedGold = (account: Address, value: BigNumber) => {
+  hasEnoughNonvotingLockedGold = (value: BigNumber) => {
     const valueInEth = this.kit.web3.utils.fromWei(value.toFixed(), 'ether')
     return this.addCheck(
       `Account has at least ${valueInEth} non-voting Locked Gold`,
