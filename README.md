@@ -38,5 +38,18 @@ See the [issue backlog](https://github.com/celo-org/celo-monorepo/issues) for a 
 ## License & Contributing
 
 All packages are licensed under the terms of the Apache 2.0 License unless otherwise specified in the LICENSE file at package's root.
+### Project leaders
+
+Maintainers:
+
+- [timmoreton](https://github.com/timmoreton) (core team)
+- [jmrossy](https://github.com/jmrossy) (core team)
+- [marekolszewski](https://github.com/marekolszewski) (core team)
+- ...
+
+<!--
+Maybe at (core team celo cli), (core team Android)
+Alumni:
+-->
 
 Improvements and contributions are highly encouraged! See the [contributing guide](https://github.com/celo-org/celo-monorepo/tree/master/.github/CONTRIBUTING.md) for details on how to participate.
