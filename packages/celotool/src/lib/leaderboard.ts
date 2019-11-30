@@ -52,5 +52,5 @@ function releaseName(celoEnv: string) {
 export async function getBlockscoutHelmValues(celoEnv: string) {
   const [output] = await execCmd(`helm get values ${celoEnv}-blockscout`)
   const blockscoutValues: any = yaml.safeLoad(output)
-  return blockscoutValues.db
+  return blockscoutValues.blockscout.db
 }
