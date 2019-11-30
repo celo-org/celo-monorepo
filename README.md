@@ -49,6 +49,7 @@ Contents:
 - [Issues](#issues)
 - [Repo Structure](#repo)
 - [Contributing](#contributing)
+- [Contributors](#contributors)
 - [Ask Questions, Find Answers, Get in Touch](#ask)
 - [License](#license)
   <!-- /TOC -->
@@ -145,6 +146,17 @@ Not yet ready to contribute but do like the project? Support Celo with a ⭐ or 
 Twitter
 twitter intent generator - http://tech.cymi.org/tweet-intents
 -->
+
+## 🤝 <a id="contributors"></a>Contributors
+This project exists thanks to all the people who contribute.
+
+<!--
+<a href="https://github.com/badges/shields/graphs/contributors"><img src="https://opencollective.com/shields/contributors.svg?width=890" /></a>
+-->
+
+Special thanks to our 🏆 hall-of-fame contributors 🥇
+
+[![](https://sourcerer.io/fame/KoenBal/celo-org/celo-monorepo/images/0)](https://sourcerer.io/fame/KoenBal/celo-org/celo-monorepo/links/0)[![](https://sourcerer.io/fame/KoenBal/celo-org/celo-monorepo/images/1)](https://sourcerer.io/fame/KoenBal/celo-org/celo-monorepo/links/1)[![](https://sourcerer.io/fame/KoenBal/celo-org/celo-monorepo/images/2)](https://sourcerer.io/fame/KoenBal/celo-org/celo-monorepo/links/2)[![](https://sourcerer.io/fame/KoenBal/celo-org/celo-monorepo/images/3)](https://sourcerer.io/fame/KoenBal/celo-org/celo-monorepo/links/3)[![](https://sourcerer.io/fame/KoenBal/celo-org/celo-monorepo/images/4)](https://sourcerer.io/fame/KoenBal/celo-org/celo-monorepo/links/4)[![](https://sourcerer.io/fame/KoenBal/celo-org/celo-monorepo/images/5)](https://sourcerer.io/fame/KoenBal/celo-org/celo-monorepo/links/5)[![](https://sourcerer.io/fame/KoenBal/celo-org/celo-monorepo/images/6)](https://sourcerer.io/fame/KoenBal/celo-org/celo-monorepo/links/6)[![](https://sourcerer.io/fame/KoenBal/celo-org/celo-monorepo/images/7)](https://sourcerer.io/fame/KoenBal/celo-org/celo-monorepo/links/7)
 
 ## 💬 <a id="ask"></a>Ask Questions, Find Answers, Get in Touch
 
