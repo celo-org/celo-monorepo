@@ -347,7 +347,7 @@ We don't want to use our account key for validating, so first let's authorize th
 
 ```bash
 # On your local machine
-celocli account:authorize --from $CELO_VALIDATOR_ADDRESS --role validator --pop 0x$CELO_VALIDATOR_SIGNER_SIGNATURE --signer $CELO_VALIDATOR_SIGNER_ADDRESS
+celocli account:authorize --from $CELO_VALIDATOR_ADDRESS --role validator --signature 0x$CELO_VALIDATOR_SIGNER_SIGNATURE --signer $CELO_VALIDATOR_SIGNER_ADDRESS
 ```
 
 Confirm by checking the authorized Validator signer for you Validator:
@@ -489,7 +489,7 @@ With this proof, authorize the attestation signer on your local machine:
 
 ```bash
 # On your local machine
-celocli account:authorize --from $CELO_VALIDATOR_ADDRESS --role attestation --pop <ATTESTATION_SIGNER_SIGNATURE> --signer $ATTESTATION_SIGNER_ADDRESS
+celocli account:authorize --from $CELO_VALIDATOR_ADDRESS --role attestation --signature <ATTESTATION_SIGNER_SIGNATURE> --signer $ATTESTATION_SIGNER_ADDRESS
 ```
 
 You can now run the node for the attestation service in the background:
