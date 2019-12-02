@@ -35,6 +35,32 @@ See [Developer's Guide](https://docs.celo.org/) for full details about the desig
 
 See the [issue backlog](https://github.com/celo-org/celo-monorepo/issues) for a list of active or proposed tasks. Feel free to create new issues to report bugs and/or request features. Please add labels to your issues, tagging the appropriate package/area.
 
+### 📂 Repo structure
+The repository has the following packages (sub projects):
+- [analytics](packages/analytics) - Cloud Dataflow/Apache Beam jobs
+- [attestation-service](packages/attestation-service) - service run by validators on the Celo network to send SMS messages, enabling attestations of user phone numbers and their accounts on the Celo network
+- [blockchain-api](packages/analytics) - example of how to compile TypeScript files while deploying to App Engine (correct?)
+- [celotool](packages/celotool) - tool for various scripts that the engineering team might run
+- [cli](packages/cli) - tool for interacting with the Celo protocol ([docs](https://docs.celo.org/getting-started/using-the-cli))
+- [contractkit](packages/contractkit) - library to help developers and validators interact with the celo-blockchain ([docs](https://docs.celo.org/celo-sdk/contractkit))
+- [dappkit](packages/dappkit) - set of functions for mobile DApps to work with the wallet app (ex. sign transactions and access the user's account) ([docs](https://docs.celo.org/celo-sdk/dappkit))
+- [dev-utils](packages/dev-utils) - no README available (improve?)
+- [docs](packages/docs) - technical documentation for the celo project ([live](https://docs.celo.org/))
+- [faucet](packages/faucet) - faucet deployment configuration ([live](https://celo.org/build/faucet))
+- [helm-charts](packages/helm-charts) - templatized deployments of entire environments to Kubernetes clusters (improve?)
+- [mobile](packages/mobile) - Android wallet app for the celo platform ([docs](https://docs.celo.org/getting-started/using-the-mobile-wallet), [live](https://play.google.com/store/apps/details?id=org.celo.mobile.alfajores))
+- [notification-service](packages/notification-service) - service for dispatching notifications to mobile clients
+- [protocol](packages/protocol) - identity, stability and other smart contracts for the celo protocol ([docs](https://docs.celo.org/celo-codebase/protocol))
+- [react-components](packages/react-components) - no README available (improve?)
+- [terraform-modules](packages/terraform-modules) - tool that allows developers to treat infrastructure as code
+- [transaction-metrics-exporter](packages/transaction-metrics-exporter) - tool to export celo transaction metrics (improve?)
+- [typescript](packages/typescript) - no README available (improve?)
+- [utils](packages/utils) - no README available (improve?)
+- [verification-pool-api](packages/verification-pool-api) - firebase cloud functions to process verification requests
+- [verifier](packages/verifier) - Android verifier app to send SMS messages, enabling attestations of user phone numbers and their accounts on the Celo network (correct, improve?)
+- [walletkit](packages/walletkit) - no README available (improve?)
+- [web](packages/web) - celo website ([live](https://celo.org/))
+
 ## License & Contributing
 
 All packages are licensed under the terms of the Apache 2.0 License unless otherwise specified in the LICENSE file at package's root.
