@@ -133,6 +133,10 @@ contract('MultiSig', (accounts: any) => {
     it('should not allow an external account to add an owner', async () => {
       await assertRevert(multiSig.addOwner(accounts[3]))
     })
+
+    it('should not allow a new owner - the 0x address to be added', async () => {
+      await assertRevert(multiSig.contract.addOwner.getData(NULL_ADDRESS))
+    })
   })
 
   describe('#removeOwner()', () => {
@@ -166,6 +170,14 @@ contract('MultiSig', (accounts: any) => {
 
     it('should not allow an external account to replace an owner', async () => {
       await assertRevert(multiSig.replaceOwner(accounts[1], accounts[2]))
+    })
+
+    it('should not allow a new owner - the 0x address to be replaced by an old owner', async () => {
+      await assertRevert(multiSig.contract.replaceOwner.getData(accounts[1], NULL_ADDRESS))
+    })
+
+    it('should not allow the 0x address to call the replace owner function', async () => {
+      await assertRevert(multiSig.contract.replaceOwner.getData(NULL_ADDRESS, accounts[2]))
     })
   })
 

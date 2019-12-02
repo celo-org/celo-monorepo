@@ -156,6 +156,7 @@ contract MultiSig is Initializable {
     onlyWallet
     ownerExists(owner)
     notNull(owner)
+    notNull(newOwner)
     ownerDoesNotExist(newOwner)
   {
     for (uint256 i = 0; i < owners.length - 1; i++)
