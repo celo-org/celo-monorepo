@@ -7,6 +7,8 @@ import "openzeppelin-solidity/contracts/math/SafeMath.sol";
  * @title A mock StableToken for testing.
  */
 contract MockStableToken {
+  using SafeMath for uint256;
+
   uint8 public constant decimals = 18;
   bool public _needsRebase;
   uint256 public _totalSupply;
