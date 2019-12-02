@@ -39,6 +39,7 @@
     - [Encrypted Payment Comments](celo-codebase/protocol/transactions/tx-comment-encyption.md)
     - [Full Node Incentives](celo-codebase/protocol/transactions/full-node-incentives.md)
   - [Lightweight Identity](celo-codebase/protocol/identity/README.md)
+    - [Metadata](celo-codebase/protocol/identity/metadata.md)
     - [Randomness](celo-codebase/protocol/identity/randomness.md)
   - [Stability Mechanism](celo-codebase/protocol/stability/README.md)
     - [Stability Algorithm \(CP-DOTO\)](celo-codebase/protocol/stability/doto.md)
