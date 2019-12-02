@@ -254,7 +254,6 @@ module "attestation-service" {
   twilio_blacklist                            = var.attestation_service_twilio_blacklist
 }
 
-
 module "accounts" {
   source = "./modules/accounts"
 }
