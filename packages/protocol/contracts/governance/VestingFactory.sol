@@ -1,11 +1,14 @@
 pragma solidity ^0.5.3;
 
 import "openzeppelin-solidity/contracts/ownership/Ownable.sol";
+
 import "./VestingInstance.sol";
+import "./interfaces/IVestingFactory.sol";
+
 import "../common/Initializable.sol";
 import "../common/UsingRegistry.sol";
 
-contract VestingFactory is Initializable, UsingRegistry {
+contract VestingFactory is Initializable, UsingRegistry, IVestingFactory {
   // mapping between beneficiary addresses and associated vesting contracts (schedules)
   mapping(address => address) public hasVestedAt;
 

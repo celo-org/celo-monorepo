@@ -7,7 +7,7 @@ interface IVestingInstance {
   function getWithdrawableAmountAtTimestamp(uint256) external view returns (uint256);
   function lockGold(uint256) external;
   function unlockGold(uint256) external;
-  function relockGold(uint256) external;
+  function relockGold(uint256, uint256) external;
   function withdrawLockedGold(uint256) external;
   function authorizeVoteSigner(address, uint8, bytes32, bytes32) external;
   function authorizeValidatorSigner(address, uint8, bytes32, bytes32) external;
