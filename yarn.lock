@@ -1299,6 +1299,33 @@
     lodash "^4.17.13"
     to-fast-properties "^2.0.0"
 
+"@celo/celocli@~0.0.30-beta2":
+  version "0.0.30-beta2"
+  resolved "https://registry.yarnpkg.com/@celo/celocli/-/celocli-0.0.30-beta2.tgz#c292468a52ea05fef9b6ec0b70ae540dc16be027"
+  integrity sha512-hycvn7j8JU5yinl06SWKAvqDalKKAAu8QslaLlTCvj15sosHMj81zyyfBpPHT8sLXsgqrM0eoZPo0nySLMX9Tg==
+  dependencies:
+    "@celo/contractkit" "0.2.2"
+    "@celo/utils" "^0.1.0"
+    "@oclif/command" "^1"
+    "@oclif/config" "^1"
+    "@oclif/plugin-help" "^2"
+    bip32 "^1.0.2"
+    bip39 "^2.5.0"
+    bls12377js "https://github.com/celo-org/bls12377js#ea09eba5c54fe63617af494a0c198fcc47582e0c"
+    chalk "^2.4.2"
+    cli-table "^0.3.1"
+    cli-ux "^5.3.1"
+    debug "^4.1.1"
+    elliptic "^6.4.1"
+    ethereumjs-util "^5.2.0"
+    events "^3.0.0"
+    firebase "^7.2.2"
+    fs-extra "^8.1.0"
+    moment "2.24.0"
+    path "^0.12.7"
+    tslib "^1"
+    web3 "1.0.0-beta.37"
+
 "@celo/client@9575a01":
   version "0.0.173"
   resolved "https://registry.yarnpkg.com/@celo/client/-/client-0.0.173.tgz#30d8266f8f4897f1db5c9bf4ad344801e620326f"
@@ -1343,6 +1370,25 @@
   version "0.2.0"
   resolved "https://registry.yarnpkg.com/@celo/contractkit/-/contractkit-0.2.0.tgz#6db7479c786f36ac0a1c4ffe7cb23a5f98690f83"
   integrity sha512-UGI6dvoL46H2pa8kbfG9CTNF1o2Pg1slhyVfAM1gK9Ohr7Agm+mNivdx5DESIjEZ8NX1PWcOOd4PMJWinBnWRg==
+  dependencies:
+    "@0x/subproviders" "^5.0.0"
+    "@celo/utils" "^0.1.0"
+    "@types/debug" "^4.1.5"
+    bignumber.js "^7.2.0"
+    cross-fetch "3.0.4"
+    debug "^4.1.1"
+    eth-lib "^0.2.8"
+    fp-ts "2.1.1"
+    io-ts "2.0.1"
+    web3 "1.0.0-beta.37"
+    web3-core-helpers "1.0.0-beta.37"
+    web3-eth-abi "1.0.0-beta.37"
+    web3-utils "1.0.0-beta.37"
+
+"@celo/contractkit@0.2.2":
+  version "0.2.2"
+  resolved "https://registry.yarnpkg.com/@celo/contractkit/-/contractkit-0.2.2.tgz#dbfb8b5a6c6591661b1b13b542063efaff7fcc1c"
+  integrity sha512-RQBlKd3AOceiJKD8Bm1r2YR0fAKn1ToOXL4K3N6+yWRohi/BjvX+LWmtimcfK4oyNZGu8PQq174SqNMjhFbSwg==
   dependencies:
     "@0x/subproviders" "^5.0.0"
     "@celo/utils" "^0.1.0"
