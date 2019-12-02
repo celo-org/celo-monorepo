@@ -23,7 +23,7 @@ spec:
               - sh
               - "-c"
               - |
-                echo `./current_rate.sh` > /celo/.celo/current_price
+                ./current_rate.sh > /celo/.celo/current_price
             volumeMounts:
             - name: data
               mountPath: /celo/.celo
