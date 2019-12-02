@@ -484,7 +484,7 @@ If you want to create the local accounts, run a Proxy and a Validator connected 
 ./run-docker-validator-network.sh pull,clean,accounts,run-validator,run-proxy,status,print-env
 ```
 
-After doing that you can copy all the `CELO*` environment variables in the `validator-config.rc` file. The script will source the variables from there avoiding the accounts multiple times.
+After doing that you can copy all the `CELO_*` environment variables in the `validator-config.rc` file. The script will source the variables from there avoiding the accounts multiple times.
 
 If you have already your accounts, proxy and validator set up, you can run the following command to run TGCSO:
 
