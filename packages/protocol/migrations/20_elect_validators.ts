@@ -238,16 +238,22 @@ module.exports = async (_deployer: any, networkName: string) => {
     config.validators.groupLockedGoldRequirements.value
   )
   // ...and the delta for each subsequent group
-  const lockedGoldPerValEachGroup = new BigNumber(config.validators.votesRatioOfLastVsFirstGroup - 1)
+  const lockedGoldPerValEachGroup = new BigNumber(
+    config.validators.votesRatioOfLastVsFirstGroup - 1
+  )
     .times(lockedGoldPerValAtFirstGroup)
     .div(Math.max(valKeyGroups.length - 1, 1))
     .integerValue()
 
   const groups = valKeyGroups.map((keys, i) => ({
-      valKeys: keys,
-      name: valKeyGroups.length ? config.validators.groupName + `(${i + 1})` : config.validators.groupName,
-      lockedGold: lockedGoldPerValAtFirstGroup.plus(lockedGoldPerValEachGroup.times(i)).times(keys.length),
-      account: null,
+    valKeys: keys,
+    name: valKeyGroups.length
+      ? config.validators.groupName + `(${i + 1})`
+      : config.validators.groupName,
+    lockedGold: lockedGoldPerValAtFirstGroup
+      .plus(lockedGoldPerValEachGroup.times(i))
+      .times(keys.length),
+    account: null,
   }))
 
   for (const [idx, group] of groups.entries()) {
@@ -292,7 +298,7 @@ module.exports = async (_deployer: any, networkName: string) => {
         const addTx = validators.contract.methods.addFirstMember(
           address,
           NULL_ADDRESS,
-          groupsWithVotes.length ? groupsWithVotes[0].account.address : NULL_ADDRESS,
+          groupsWithVotes.length ? groupsWithVotes[0].account.address : NULL_ADDRESS
         )
         await sendTransactionWithPrivateKey(web3, addTx, group.account.privateKey, {
           to: validators.address,
@@ -307,11 +313,13 @@ module.exports = async (_deployer: any, networkName: string) => {
     }
 
     // Determine the lesser and greater group addresses after voting.
-    const sortedGroups = groups.slice(0, idx+1)
+    const sortedGroups = groups.slice(0, idx + 1)
     sortedGroups.sort((a, b) => a.lockedGold.comparedTo(b.lockedGold))
     const groupSortedIndex = sortedGroups.indexOf(group)
-    const lesser = groupSortedIndex > 0 ? sortedGroups[groupSortedIndex - 1].account.address : NULL_ADDRESS
-    const greater = groupSortedIndex < idx ? sortedGroups[groupSortedIndex + 1].account.address : NULL_ADDRESS
+    const lesser =
+      groupSortedIndex > 0 ? sortedGroups[groupSortedIndex - 1].account.address : NULL_ADDRESS
+    const greater =
+      groupSortedIndex < idx ? sortedGroups[groupSortedIndex + 1].account.address : NULL_ADDRESS
 
     // Note: Only the groups vote for themselves here. The validators do not vote.
     console.info('  * Group voting for itself ...')
