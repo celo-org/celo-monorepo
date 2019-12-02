@@ -79,7 +79,7 @@ export DATABASE_URL="postgres://user:password@postgres.example.com:5432/attestat
 The following command for running the Attestation Service is using Nexmo, but you can adapt for using Twilio easily:
 
 ```bash
-docker run --name celo-attestation-service -d --restart always --entrypoint /bin/bash -e ATTESTATION_SIGNER_ADDRESS=$ATTESTATION_SIGNER_ADDRESS -e CELO_VALIDATOR_ADDRESS=0x$CELO_VALIDATOR_ADDRESS -e CELO_PROVIDER=$CELO_PROVIDER -e DATABASE_URL=$DATABASE_URL -e SMS_PROVIDERS=nexmo -e NEXMO_KEY=$NEXMO_KEY -e NEXMO_SECRET=$NEXMO_SECRET -e NEXMO_BLACKLIST=$NEXMO_BLACKLIST -p 3000:80 $CELO_IMAGE_ATTESTATION -c " cd /celo-monorepo/packages/attestation-service && yarn run db:migrate && yarn start "
+docker run --name celo-attestation-service -v $PWD/attestations:/celo-monorepo/packages/attestation-service/db -d --restart always --entrypoint /bin/bash -e ATTESTATION_KEY=$ATTESTATION_KEY -e ATTESTATION_SIGNER_ADDRESS=$CELO_ATTESTATION_SIGNER_ADDRESS -e CELO_VALIDATOR_ADDRESS=0x$CELO_VALIDATOR_ADDRESS -e CELO_PROVIDER=$CELO_PROVIDER -e DATABASE_URL=$DATABASE_URL -e SMS_PROVIDERS=nexmo -e NEXMO_KEY=$NEXMO_KEY -e NEXMO_SECRET=$NEXMO_SECRET -e NEXMO_BLACKLIST=$NEXMO_BLACKLIST -p 3000:80 $CELO_IMAGE_ATTESTATION -c " cd /celo-monorepo/packages/attestation-service && yarn run db:migrate && yarn start "
 ```
 
 ## Registering the Attestation Service
