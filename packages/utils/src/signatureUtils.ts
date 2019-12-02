@@ -176,7 +176,7 @@ function isValidSignature(signer: string, message: string, v: number, r: string,
       ethjsutil.toBuffer(s)
     )
     const retrievedAddress: string = ethjsutil.bufferToHex(ethjsutil.pubToAddress(publicKey))
-    return signer.toLowerCase() === retrievedAddress.toLowerCase()
+    return eqAddress(retrievedAddress, signer)
   } catch (err) {
     return false
   }
