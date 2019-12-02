@@ -54,6 +54,11 @@ contract Reserve is IReserve, Ownable, Initializable, UsingRegistry, ReentrancyG
 
   function() external payable {} // solhint-disable no-empty-blocks
 
+  /**
+   * @notice Initializes critical variables.
+   * @param registryAddress The address of the registry contract.
+   * @param _tobinTaxStalenessThreshold The initial number of seconds to cache the tobin tax value for.
+   */
   function initialize(address registryAddress, uint256 _tobinTaxStalenessThreshold)
     external
     initializer
@@ -233,12 +238,12 @@ contract Reserve is IReserve, Ownable, Initializable, UsingRegistry, ReentrancyG
     return assetAllocationWeights;
   }
 
-  function getReserveGoldBalance() public view returns (uint256) {
-    uint256 reserveGoldBalance = address(this).balance;
-    for (uint256 i = 0; i < otherReserveAddresses.length; i++) {
-      reserveGoldBalance = reserveGoldBalance.add(otherReserveAddresses[i].balance);
-    }
-    return reserveGoldBalance;
+  function getReserveGoldBalance() external view returns (uint256) {
+    return _getReserveGoldBalance();
+  }
+
+  function _getReserveGoldBalance() public view returns (uint256) {
+    return 0;
   }
 
   /*
@@ -251,7 +256,7 @@ contract Reserve is IReserve, Ownable, Initializable, UsingRegistry, ReentrancyG
   function computeTobinTax() private view returns (FixidityLib.Fraction memory) {
     address sortedOraclesAddress = registry.getAddressForOrDie(SORTED_ORACLES_REGISTRY_ID);
     ISortedOracles sortedOracles = ISortedOracles(sortedOraclesAddress);
-    uint256 reserveGoldBalance = getReserveGoldBalance();
+    uint256 reserveGoldBalance = _getReserveGoldBalance();
     uint256 stableTokensValueInGold = 0;
 
     for (uint256 i = 0; i < _tokens.length; i++) {
