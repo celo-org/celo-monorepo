@@ -872,6 +872,58 @@ contract('Vesting', (accounts: string[]) => {
     })
   })
 
+  describe('#withdrawLockedGold()', () => {
+    let vestingInstanceRegistryAddress
+    let vestingInstance
+    const value = 1000
+    const index = 0
+
+    describe('when a pending withdrawal exists', () => {
+      beforeEach(async () => {
+        // @ts-ignore: TODO(mcortesi) fix typings for TransactionDetails
+        await createNewVestingInstanceTx(vestingDefaultSchedule, registry.address, web3)
+        vestingInstanceRegistryAddress = await vestingFactoryInstance.hasVestedAt(beneficiary)
+        vestingInstance = await VestingInstance.at(vestingInstanceRegistryAddress)
+        await vestingInstance.createAccount({ from: beneficiary })
+        await vestingInstance.lockGold(value, { from: beneficiary })
+        await vestingInstance.unlockGold(value, { from: beneficiary })
+      })
+
+      describe('when it is after the availablity time', () => {
+        beforeEach(async () => {
+          await timeTravel(UNLOCKING_PERIOD, web3)
+          await vestingInstance.withdrawLockedGold(index, { from: beneficiary })
+        })
+
+        it('should remove the pending withdrawal', async () => {
+          const [values, timestamps] = await lockedGoldInstance.getPendingWithdrawals(
+            vestingInstance.address
+          )
+          assert.equal(values.length, 0)
+          assert.equal(timestamps.length, 0)
+        })
+      })
+
+      describe('when it is before the availablity time', () => {
+        it('should revert', async () => {
+          await assertRevert(vestingInstance.withdrawLockedGold(index, { from: beneficiary }))
+        })
+      })
+
+      describe('when none-beneficiary attempts to withdraw the gold', () => {
+        it('should revert', async () => {
+          await assertRevert(vestingInstance.withdrawLockedGold(index, { from: accounts[4] }))
+        })
+      })
+    })
+
+    describe('when a pending withdrawal does not exist', () => {
+      it('should revert', async () => {
+        await assertRevert(vestingInstance.withdrawLockedGold(index, { from: beneficiary }))
+      })
+    })
+  })
+
   describe('#createAccount', () => {
     let vestingInstanceRegistryAddress
     let vestingInstance
