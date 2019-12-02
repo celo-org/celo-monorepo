@@ -54,6 +54,7 @@ contract UsingRegistry is Ownable {
    * @param registryAddress The address of a registry contract for routing to other contracts.
    */
   function setRegistry(address registryAddress) public onlyOwner {
+    require(registryAddress != address(0), "attempt to set the reserved 0x0 address to registry");
     registry = IRegistry(registryAddress);
     emit RegistrySet(registryAddress);
   }
