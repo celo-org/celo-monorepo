@@ -1,4 +1,0 @@
-nodeSelector: {}
-
-# Expects cron schedule syntax
-oracleSchedule: "*/1 * * * *"

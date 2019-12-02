@@ -8,7 +8,7 @@ metadata:
     release: {{ .Release.Service }}
     component: oracle
 spec:
-  schedule: "{{ .Values.oracleSchedule }}"
+  schedule: "{{ .Values.oracle.cronSchedule }}"
   concurrencyPolicy: Forbid
   jobTemplate:
     spec:
