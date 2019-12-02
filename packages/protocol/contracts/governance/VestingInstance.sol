@@ -64,18 +64,18 @@ contract VestingInstance is UsingRegistry, ReentrancyGuard {
   event VestingRevoked(uint256 revokeTimestamp);
 
   /**
-     * @notice A constructor for initialising a new instance of a Vesting Schedule contract
-     * @param vestingBeneficiary address of the beneficiary to whom vested tokens are transferred
-     * @param vestingAmount the amount that is to be vested by the contract
-     * @param vestingCliff duration in seconds of the cliff in which tokens will begin to vest
-     * @param vestingStartTime the time (as Unix time) at which point vesting starts
-     * @param vestingPeriodSec duration in seconds of the period in which the tokens will vest
-     * @param vestAmountPerPeriod the vesting amound per period where period is the vestingAmount distributed over the vestingPeriodSec
-     * @param vestingRevocable whether the vesting is revocable or not
-     * @param vestingRevoker address of the person revoking the vesting
-     * @param vestingRefundDestination address of the refund receiver after the vesting is deemed revoked
-     * @param registryAddress address of the deployed contracts registry
-     */
+   * @notice A constructor for initialising a new instance of a Vesting Schedule contract
+   * @param vestingBeneficiary address of the beneficiary to whom vested tokens are transferred
+   * @param vestingAmount the amount that is to be vested by the contract
+   * @param vestingCliff duration in seconds of the cliff in which tokens will begin to vest
+   * @param vestingStartTime the time (as Unix time) at which point vesting starts
+   * @param vestingPeriodSec duration in seconds of the period in which the tokens will vest
+   * @param vestAmountPerPeriod the vesting amound per period where period is the vestingAmount distributed over the vestingPeriodSec
+   * @param vestingRevocable whether the vesting is revocable or not
+   * @param vestingRevoker address of the person revoking the vesting
+   * @param vestingRefundDestination address of the refund receiver after the vesting is deemed revoked
+   * @param registryAddress address of the deployed contracts registry
+   */
   constructor(
     address vestingBeneficiary,
     uint256 vestingAmount,
@@ -123,8 +123,8 @@ contract VestingInstance is UsingRegistry, ReentrancyGuard {
   }
 
   /**
-     * @notice Transfers available released tokens from the vesting back to beneficiary.
-     */
+   * @notice Transfers available released tokens from the vesting back to beneficiary.
+   */
   function withdraw() external nonReentrant onlyBeneficiary {
     bool isUnpaused = !paused || (paused && block.timestamp >= pauseEndTime);
     require(isUnpaused, "Withdrawals only allowed in the unpaused state");
@@ -136,11 +136,11 @@ contract VestingInstance is UsingRegistry, ReentrancyGuard {
   }
 
   /**
-     * @notice Allows only the revoker to revoke the vesting. Gold already vested
-     * remains in the contract, the rest is returned to the _refundDestination.
-     * @param revokeTimestamp the revocation timestamp
-     * @dev If revokeTimestamp is less than the current block timestamp, it is set equal to the latter
-     */
+   * @notice Allows only the revoker to revoke the vesting. Gold already vested
+   * remains in the contract, the rest is returned to the _refundDestination.
+   * @param revokeTimestamp the revocation timestamp
+   * @dev If revokeTimestamp is less than the current block timestamp, it is set equal to the latter
+   */
   function revoke(uint256 revokeTimestamp) external nonReentrant onlyRevoker {
     require(revocable, "Revoking is not allowed");
     require(!revoked, "Vesting already revoked");
@@ -157,9 +157,9 @@ contract VestingInstance is UsingRegistry, ReentrancyGuard {
   }
 
   /**
-     * @notice Allows only the revoker to pause the gold withdrawal
-     * @param pausePeriod the period for which the withdrawal shall be paused
-     */
+   * @notice Allows only the revoker to pause the gold withdrawal
+   * @param pausePeriod the period for which the withdrawal shall be paused
+   */
   function pause(uint256 pausePeriod) external onlyRevoker {
     require(!paused, "Vesting withdrawals already paused");
     require(revocable, "Vesting must be revokable");
@@ -171,19 +171,19 @@ contract VestingInstance is UsingRegistry, ReentrancyGuard {
   }
 
   /**
-     * @dev Calculates the amount that has already vested but hasn't been withdrawn yet.
-     * @param timestamp the timestamp at which the calculate the withdrawable amount
-     * @return The withdrawable amount at the timestamp
-     * @dev Function is also made public in order to be called for informational purpose
-     */
+   * @dev Calculates the amount that has already vested but hasn't been withdrawn yet.
+   * @param timestamp the timestamp at which the calculate the withdrawable amount
+   * @return The withdrawable amount at the timestamp
+   * @dev Function is also made public in order to be called for informational purpose
+   */
   function getWithdrawableAmountAtTimestamp(uint256 timestamp) public view returns (uint256) {
     return calculateFreeAmountAtTimestamp(timestamp).sub(currentlyWithdrawn);
   }
 
   /**
-     * @dev Calculates the amount that has already vested.
-     * @param timestamp the timestamp at which the calculate the already vested amount
-     */
+   * @dev Calculates the amount that has already vested.
+   * @param timestamp the timestamp at which the calculate the already vested amount
+   */
   function calculateFreeAmountAtTimestamp(uint256 timestamp) private view returns (uint256) {
     uint256 currentBalance = getGoldToken().balanceOf(address(this));
     uint256 totalBalance = currentBalance.add(currentlyWithdrawn);
@@ -208,10 +208,10 @@ contract VestingInstance is UsingRegistry, ReentrancyGuard {
   }
 
   /**
-     * @notice A wrapper func for the lock gold method
-     * @param value the value of gold to be locked
-     * @dev To be called only by the beneficiary of the vesting
-     */
+   * @notice A wrapper func for the lock gold method
+   * @param value the value of gold to be locked
+   * @dev To be called only by the beneficiary of the vesting
+   */
   function lockGold(uint256 value) external nonReentrant onlyBeneficiary {
     // the beneficiary may not lock more than the vesting currently has available
     require(
@@ -222,41 +222,41 @@ contract VestingInstance is UsingRegistry, ReentrancyGuard {
   }
 
   /**
-     * @notice A wrapper func for the unlock gold method function
-     * @param value the value of gold to be unlocked for the vesting instance
-     * @dev To be called only by the beneficiary of the vesting
-     */
+   * @notice A wrapper func for the unlock gold method function
+   * @param value the value of gold to be unlocked for the vesting instance
+   * @dev To be called only by the beneficiary of the vesting
+   */
   function unlockGold(uint256 value) external nonReentrant onlyBeneficiary {
     getLockedGold().unlock(value);
   }
 
   /**
-     * @notice A wrapper func for the relock locked gold method function
-     * @param index the index of the pending locked gold withdrawal
-     * @param value the value of gold to be relocked for the vesting instance
-     * @dev To be called only by the beneficiary of the vesting.
-     */
+   * @notice A wrapper func for the relock locked gold method function
+   * @param index the index of the pending locked gold withdrawal
+   * @param value the value of gold to be relocked for the vesting instance
+   * @dev To be called only by the beneficiary of the vesting.
+   */
   function relockGold(uint256 index, uint256 value) external nonReentrant onlyBeneficiary {
     getLockedGold().relock(index, value);
   }
 
   /**
-     * @notice A wrapper func for the withdraw locked gold method function
-     * @param index the index of the pending locked gold withdrawal
-     * @dev To be called only by the beneficiary of the vesting. The amount shall be withdrawn back to the vesting instance
-     */
+   * @notice A wrapper func for the withdraw locked gold method function
+   * @param index the index of the pending locked gold withdrawal
+   * @dev To be called only by the beneficiary of the vesting. The amount shall be withdrawn back to the vesting instance
+   */
   function withdrawLockedGold(uint256 index) external nonReentrant onlyBeneficiary {
     getLockedGold().withdraw(index);
   }
 
   /**
-     * @notice A wrapper func for the authorize vote signer account method
-     * @param signer The address of the signing key to authorize.
-     * @param v The recovery id of the incoming ECDSA signature.
-     * @param r Output value r of the ECDSA signature.
-     * @param s Output value s of the ECDSA signature.
-     * @dev To be called only by the beneficiary of the vesting. The v,r and s signature should be a signed message by the beneficiary being the authorized address
-     */
+   * @notice A wrapper func for the authorize vote signer account method
+   * @param signer The address of the signing key to authorize.
+   * @param v The recovery id of the incoming ECDSA signature.
+   * @param r Output value r of the ECDSA signature.
+   * @param s Output value s of the ECDSA signature.
+   * @dev To be called only by the beneficiary of the vesting. The v,r and s signature should be a signed message by the beneficiary being the authorized address
+   */
   function authorizeVoteSigner(address signer, uint8 v, bytes32 r, bytes32 s)
     external
     nonReentrant
@@ -266,13 +266,13 @@ contract VestingInstance is UsingRegistry, ReentrancyGuard {
   }
 
   /**
-     * @notice A wrapper func for the authorize validator signer account method
-     * @param signer The address of the signing key to authorize.
-     * @param v The recovery id of the incoming ECDSA signature.
-     * @param r Output value r of the ECDSA signature.
-     * @param s Output value s of the ECDSA signature.
-     * @dev To be called only by the beneficiary of the vesting. The v,r and s signature should be a signed message by the beneficiary being the the authorized address
-     */
+   * @notice A wrapper func for the authorize validator signer account method
+   * @param signer The address of the signing key to authorize.
+   * @param v The recovery id of the incoming ECDSA signature.
+   * @param r Output value r of the ECDSA signature.
+   * @param s Output value s of the ECDSA signature.
+   * @dev To be called only by the beneficiary of the vesting. The v,r and s signature should be a signed message by the beneficiary being the the authorized address
+   */
   function authorizeValidatorSigner(address signer, uint8 v, bytes32 r, bytes32 s)
     external
     nonReentrant
@@ -282,14 +282,14 @@ contract VestingInstance is UsingRegistry, ReentrancyGuard {
   }
 
   /**
-     * @notice A wrapper func for the authorize validator signer account method
-     * @param signer The address of the signing key to authorize.
-     * @param ecdsaPublicKey The ECDSA public key corresponding to `signer`.
-     * @param v The recovery id of the incoming ECDSA signature.
-     * @param r Output value r of the ECDSA signature.
-     * @param s Output value s of the ECDSA signature.
-     * @dev To be called only by the beneficiary of the vesting. The v,r and s signature should be a signed message by the beneficiary being the authorized address
-     */
+   * @notice A wrapper func for the authorize validator signer account method
+   * @param signer The address of the signing key to authorize.
+   * @param ecdsaPublicKey The ECDSA public key corresponding to `signer`.
+   * @param v The recovery id of the incoming ECDSA signature.
+   * @param r Output value r of the ECDSA signature.
+   * @param s Output value s of the ECDSA signature.
+   * @dev To be called only by the beneficiary of the vesting. The v,r and s signature should be a signed message by the beneficiary being the authorized address
+   */
   function authorizeValidatorSigner(
     address signer,
     bytes calldata ecdsaPublicKey,
@@ -301,13 +301,13 @@ contract VestingInstance is UsingRegistry, ReentrancyGuard {
   }
 
   /**
-     * @notice A wrapper func for the authorize attestation signer account method
-     * @param signer The address of the signing key to authorize.
-     * @param v The recovery id of the incoming ECDSA signature.
-     * @param r Output value r of the ECDSA signature.
-     * @param s Output value s of the ECDSA signature.
-     * @dev To be called only by the beneficiary of the vesting. The v,r and s signature should be a signed message by the beneficiary being the authorized address
-     */
+   * @notice A wrapper func for the authorize attestation signer account method
+   * @param signer The address of the signing key to authorize.
+   * @param v The recovery id of the incoming ECDSA signature.
+   * @param r Output value r of the ECDSA signature.
+   * @param s Output value s of the ECDSA signature.
+   * @dev To be called only by the beneficiary of the vesting. The v,r and s signature should be a signed message by the beneficiary being the authorized address
+   */
   function authorizeAttestationSigner(address signer, uint8 v, bytes32 r, bytes32 s)
     external
     nonReentrant
@@ -317,45 +317,45 @@ contract VestingInstance is UsingRegistry, ReentrancyGuard {
   }
 
   /**
-     * @notice A wrapper setter function for creating an account
-     * @dev To be called only by the beneficiary of the vesting.
-     */
+   * @notice A wrapper setter function for creating an account
+   * @dev To be called only by the beneficiary of the vesting.
+   */
   function createAccount() external onlyBeneficiary {
     require(getAccounts().createAccount(), "Account creation failed");
   }
 
   /**
-     * @notice A wrapper setter function for the name of an account
-     * @param name A string to set as the name of the account
-     * @dev To be called only by the beneficiary of the vesting.
-     */
+   * @notice A wrapper setter function for the name of an account
+   * @param name A string to set as the name of the account
+   * @dev To be called only by the beneficiary of the vesting.
+   */
   function setAccountName(string calldata name) external onlyBeneficiary {
     getAccounts().setName(name);
   }
 
   /**
-     * @notice A wrapper setter function for the wallet address of an account
-     * @param walletAddress The wallet address to set for the account
-     * @dev To be called only by the beneficiary of the vesting.
-     */
+   * @notice A wrapper setter function for the wallet address of an account
+   * @param walletAddress The wallet address to set for the account
+   * @dev To be called only by the beneficiary of the vesting.
+   */
   function setAccountWalletAddress(address walletAddress) external onlyBeneficiary {
     getAccounts().setWalletAddress(walletAddress);
   }
 
   /**
-     * @notice A wrapper setter function for the for the data encryption key and version of an account
-     * @param dataEncryptionKey secp256k1 public key for data encryption. Preferably compressed.
-     * @dev To be called only by the beneficiary of the vesting.
-     */
+   * @notice A wrapper setter function for the for the data encryption key and version of an account
+   * @param dataEncryptionKey secp256k1 public key for data encryption. Preferably compressed.
+   * @dev To be called only by the beneficiary of the vesting.
+   */
   function setAccountDataEncryptionKey(bytes calldata dataEncryptionKey) external onlyBeneficiary {
     getAccounts().setAccountDataEncryptionKey(dataEncryptionKey);
   }
 
   /**
-     * @notice A wrapper setter function for the metadata of an account
-     * @param metadataURL The URL to access the metadata.
-     * @dev To be called only by the beneficiary of the vesting.
-     */
+   * @notice A wrapper setter function for the metadata of an account
+   * @param metadataURL The URL to access the metadata.
+   * @dev To be called only by the beneficiary of the vesting.
+   */
   function setAccountMetadataURL(string calldata metadataURL) external onlyBeneficiary {
     getAccounts().setMetadataURL(metadataURL);
   }
