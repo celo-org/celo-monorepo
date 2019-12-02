@@ -1,6 +1,6 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`PaymentRequestListScreen renders correctly with no requests 1`] = `
+exports[`IncomingPaymentRequestListScreen renders correctly with no requests 1`] = `
 <SafeAreaView
   style={
     Object {
@@ -68,31 +68,6 @@ exports[`PaymentRequestListScreen renders correctly with no requests 1`] = `
         $120
       </Text>
     </View>
-  </View>
-  <View
-    style={
-      Object {
-        "alignItems": "center",
-        "backgroundColor": "#F8F8F8",
-        "display": "flex",
-        "flexDirection": "row",
-        "height": 36,
-        "justifyContent": "space-between",
-        "paddingHorizontal": 10,
-      }
-    }
-  >
-    <Text
-      style={
-        Object {
-          "color": "#81868B",
-          "fontFamily": "Hind-Medium",
-          "fontSize": 12,
-        }
-      }
-    >
-      requests
-    </Text>
   </View>
   <Text
     style={
@@ -115,7 +90,7 @@ exports[`PaymentRequestListScreen renders correctly with no requests 1`] = `
 </SafeAreaView>
 `;
 
-exports[`PaymentRequestListScreen renders correctly with requests 1`] = `
+exports[`IncomingPaymentRequestListScreen renders correctly with requests 1`] = `
 <SafeAreaView
   style={
     Object {
@@ -183,31 +158,6 @@ exports[`PaymentRequestListScreen renders correctly with requests 1`] = `
         $120
       </Text>
     </View>
-  </View>
-  <View
-    style={
-      Object {
-        "alignItems": "center",
-        "backgroundColor": "#F8F8F8",
-        "display": "flex",
-        "flexDirection": "row",
-        "height": 36,
-        "justifyContent": "space-between",
-        "paddingHorizontal": 10,
-      }
-    }
-  >
-    <Text
-      style={
-        Object {
-          "color": "#81868B",
-          "fontFamily": "Hind-Medium",
-          "fontSize": 12,
-        }
-      }
-    >
-      requests
-    </Text>
   </View>
   <RCTScrollView>
     <View>
@@ -341,9 +291,7 @@ exports[`PaymentRequestListScreen renders correctly with requests 1`] = `
                       }
                     }
                   >
-                    <View
-                      style={Object {}}
-                    >
+                    <View>
                       <Text
                         style={
                           Array [
@@ -616,9 +564,7 @@ exports[`PaymentRequestListScreen renders correctly with requests 1`] = `
                       }
                     }
                   >
-                    <View
-                      style={Object {}}
-                    >
+                    <View>
                       <Text
                         style={
                           Array [
@@ -891,9 +837,7 @@ exports[`PaymentRequestListScreen renders correctly with requests 1`] = `
                       }
                     }
                   >
-                    <View
-                      style={Object {}}
-                    >
+                    <View>
                       <Text
                         style={
                           Array [
