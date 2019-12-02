@@ -7,6 +7,10 @@ import { ReactNativeBip39MnemonicGenerator } from '../../utils/key_generator'
 export default class NewAccount extends BaseCommand {
   static description = 'Creates a new account'
 
+  static flags = {
+    ...BaseCommand.flags,
+  }
+
   static examples = ['new']
 
   static getRandomMnemonic(): string {
