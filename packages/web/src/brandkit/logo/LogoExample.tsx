@@ -42,7 +42,7 @@ export default React.memo(function LogoExample({
         {useLight ? (
           <LogoLightBg height={35} allBlack={logoType === Logos.black} />
         ) : (
-          <LogoDarkBg height={35} allWhite={logoType === Logos.black} />
+          <LogoDarkBg height={35} allWhite={logoType === Logos.white} />
         )}
       </View>
       <Text style={fonts.legal}>{caption}</Text>

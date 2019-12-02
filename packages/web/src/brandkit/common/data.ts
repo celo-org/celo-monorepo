@@ -4,7 +4,7 @@ export const PRIMARY_PALETTE = [
   { name: 'Celo Green', hex: colors.primary },
   { name: 'Celo Gold', hex: colors.gold },
   { name: 'Celo Dark', hex: colors.dark },
-  { name: 'White', hex: colors.white },
+  { name: 'Celo White', hex: colors.white },
 ]
 
 export const ACCENT_PALETTE = [
@@ -22,8 +22,8 @@ export const GRAY_PALETTE = [
 ]
 
 export const BACKGROUND_PALETTE = [
-  { name: 'White', hex: colors.white },
+  { name: 'Celo White', hex: colors.white },
   { name: 'Faint Gray', hex: colors.faintGray },
   { name: 'Faint Gold', hex: colors.faintGold },
-  { name: 'Dark', hex: colors.dark },
+  { name: 'Celo Dark', hex: colors.dark },
 ]

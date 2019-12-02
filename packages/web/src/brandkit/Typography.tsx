@@ -96,13 +96,13 @@ const TypeScale = withNamespaces(NameSpaces.brand)(
               styles.box,
             ]}
           >
-            {TYPEFACES.map((typeface) => {
+            {TYPEFACES.map((typeface, index) => {
               return (
                 <View
                   key={typeface.name}
                   style={[
                     screen !== ScreenSizes.MOBILE && standardStyles.row,
-                    brandStyles.bottomBorder,
+                    index !== TYPEFACES.length - 1 && brandStyles.bottomBorder,
                     screen === ScreenSizes.MOBILE ? styles.fontInfoMobile : styles.fontInfo,
                   ]}
                 >

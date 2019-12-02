@@ -131,11 +131,12 @@ const styles = StyleSheet.create({
     transitionDuration: '500ms',
   },
   title: {
-    marginVertical: 10,
+    marginBottom: 5,
   },
   box: {
     cursor: 'copy',
-    paddingVertical: 30,
+    paddingTop: 30,
+    paddingBottom: 10,
     paddingRight: 40,
   },
   pigment: {
