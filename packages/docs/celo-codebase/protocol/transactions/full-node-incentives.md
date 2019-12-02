@@ -1,7 +1,9 @@
 # Full Node Incentives
 
-Full nodes are incentivized to serve light clients by receiving transaction fees \(note a minimum base fee is set which is shared with the infrastructure fund\). Transactions are augmented with a `gas_recipient` field, which light clients set to the address of the full node through which they route a transaction.
+Full nodes are incentivized to serve light clients by gateway fees which are attach to transaction by the light clients they serve.
 
-Full nodes can use the `--etherbase` field to set the account to which it wishes to receive transaction fees. Light clients can send a `GetEtherbase` message to retrieve this address. By default, full nodes refuse to process transactions whose `gas_recipient` field is not set to the expected value.
+Gateway fees are specified by a pair of optional fields, the `GatewayFee` and `GatewayFeeRecipient` which are specified by light clients to pay the full node which is acting as their gateway to the Celo network. Light clients will set the `GatewayFeeRecipient` to the Etherbase of the serving full node and the `GatewayFee` field to a small amount of Celo Gold, or alternative fee currency, which will be sent to the recipient as atomically as part of the transaction. Note that the gateway fee is paid even if the transaction is reverted.
 
-While many APIs of full nodes are not explicitly incentivized, not accepting light client connections or disconnecting non-transaction RPC calls will cause those peers to seek other full nodes that do. Light clients will choose full node peers based on location, cost, reliability and other factors.
+Full nodes set their Etherbase with the `--etherbase` flag to indicate the address to which gateway fees should be sent and the `--gatewayfee` flag to indicate the minimum fee value they will accept. Light clients can send a `GetEtherbase` message to retrieve this address. (Retrieval for the gateway fee value is work in progress) By default, full nodes refuse to process a transaction if the `GatewayFeeRecipient` field is not set to the full node's Etherbase or the `GatewayFee` value is not high enough.
+
+While many APIs of full nodes are not explicitly incentivized, not accepting light client connections or disconnecting non-transaction RPC calls will cause those peers to seek other full nodes to serve their transactions. Light clients will choose full node peers based on location, cost, reliability and other factors.

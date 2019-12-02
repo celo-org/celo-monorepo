@@ -1,14 +1,20 @@
 # Gas Pricing
 
-The Celo protocol uses a minimum gas price which moves as a function of block congestion. The required transaction fee, `minimum gas price * gas amount,` is split between the infrastructure fund and the `gas_recipient` . The rest of the transaction fee is given to the `gas_recipient.` As you might expect, transactions that offer a gas price above the current minimum gas price are accepted while transactions that fail to meet this minimum will be held in the mempool until the minimum gas price falls below the transaction gas price.
+## Gas Price Minimum
 
-The primary reason for the departure from ethereum's transaction fee protocol comes from a requirement for incentive realignment due to the new incentive structure in the Celo protocol design. Without this minimum gas price, full nodes which propagate light client transactions to validators would receive 100% of the transaction fees. This means that transaction construction would be free for full nodes as would a denial-of-service attack on network validators. Therefore, some amount of the transaction fees must not be returned to the full node. Additionally, a simple percentage would not work because it incentivizes side-channels between light clients and full nodes.
+The Celo protocol uses a gas market based on [EIP-1559](https://eips.ethereum.org/EIPS/eip-1559), which establishes a gas price minimum that moves up and down in response to demand to provide elasticity in transaction throughput.
 
-Another constraint that fueled this change was the desire for low transaction fees in order to best serve the target population while maintaining high enough transaction costs to make denial-of-service attacks expensive.
+Every transaction is required to pay at or above the gas price minimum to be included in a block. The required portion of gas fee, known as the base, is equal to `gas price minimum * gas used` and is sent to the [Infrastructure Fund](../governance.md). The rest of the gas fee, known as the tip, is rewarded to the validator that proposes the block.
 
-This approach, which is based on [EIP-1559](https://eips.ethereum.org/EIPS/eip-1559), provides all of these features. We expect the minimum gas price to be low \(especially in the early days of the protocol\) but, thanks to congestion based pricing, will quickly increase in response to congestion spikes. Additionally, basing pricing on congestion rather than historic gas pricing allows adjustments following gas price spikes to occur more quickly and makes client-side price suggestion much simpler.
+<!--- DO NOT MERGE: I don't think the following is true based on https://github.com/celo-org/celo-blockchain/blob/6de2cdd871ea710d84a084b138aa52e13300e842/core/tx_pool.go#L687 --->
 
-The minimum gas price is calculated as follows:
+As you might expect, transactions that offer a gas price above the current minimum gas price are accepted while transactions that fail to meet this minimum will be held in the mempool until the minimum gas price falls below the transaction gas price.
+
+The gas price minimum will respond to demand, increasing during periods of sustained demand, but allowing temporary spikes in gas demand without price shocks. As part of this system Celo aims to have blocks filled at target utilization rate, for example 50% of the total block gas limit. When blocks are being filled more than the target, the gas price minimum will be raised until demand subsides. If blocks are being filled at less than the target rate, the gas price minimum will decrease until demand rises. Block producers only receive the tip and not the base of the gas fee, which provides incentives for them maintain the target utilization. For more information on this system, read [EIP-1559](https://eips.ethereum.org/EIPS/eip-1559).
+
+As a benefit, this system provides an each way for clients to determine what gas price they should pay. A `GasPriceMinimum` smart contract provides access to read the current gas price minimum, providing a reasonable basis for the gas price of transaction. During congestion, or when the client wants to ensure that their transaction is mined quickly, they may add a tip to the gas price of their transaction which will encourage block validators to include it in the next block.
+
+In the Celo protocol, the gas price minimum is calculated as follows:
 
 $$MinGasPrice_1 = MinGasPrice_0 \times ( 1 + ( BlockDensity_0 − TargetDensity ) \times AdjustementSpeed )$$
 
