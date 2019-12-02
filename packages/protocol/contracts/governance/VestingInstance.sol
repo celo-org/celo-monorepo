@@ -320,6 +320,20 @@ contract VestingInstance is UsingRegistry, ReentrancyGuard, IVestingInstance {
   }
 
   /**
+   * @notice A wrapper setter function for a convenience Setter for the dataEncryptionKey and wallet address for an account
+   * @param name A string to set as the name of the account
+   * @param dataEncryptionKey secp256k1 public key for data encryption. Preferably compressed.
+   * @param walletAddress The wallet address to set for the account
+   * @dev To be called only by the beneficiary of the vesting.
+   */
+  function setAccount(string calldata name, bytes calldata dataEncryptionKey, address walletAddress)
+    external
+    onlyBeneficiary
+  {
+    getAccounts().setAccount(name, dataEncryptionKey, walletAddress);
+  }
+
+  /**
    * @notice A wrapper setter function for creating an account
    * @dev To be called only by the beneficiary of the vesting.
    */

@@ -185,6 +185,14 @@ export class VestingInstanceWrapper extends BaseWrapper<VestingInstance> {
   createAccount = proxySend(this.kit, this.contract.methods.createAccount)
 
   /**
+   * Beneficiary creates an account on behalf of the vesting contract.
+   * @param name The name to set
+   * @param dataEncryptionKey The key to set
+   * @param walletAddress The address to set
+   */
+  setAccount = proxySend(this.kit, this.contract.methods.setAccount)
+
+  /**
    * Sets the name for the account
    * @param name The name to set
    */

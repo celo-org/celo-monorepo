@@ -871,10 +871,44 @@ contract('Vesting', (accounts: string[]) => {
       assert.isTrue(isAccount)
     })
 
-    it('reverts if none-beneficiary attempst account creation', async () => {
+    it('reverts if a none-beneficiary attempts account creation', async () => {
       const isAccount = await accountsInstance.isAccount(vestingInstance.address)
       assert.isFalse(isAccount)
       await assertRevert(vestingInstance.createAccount({ from: accounts[2] }))
+    })
+  })
+
+  describe('#setAccount', () => {
+    let vestingInstanceRegistryAddress
+    let vestingInstance
+    const accountName = 'name'
+    const dataEncryptionKey = '0x02f2f48ee19680706196e2e339e5da3491186e0c4c5030670656b0e01611111111'
+    const walletAddress = beneficiary
+
+    beforeEach(async () => {
+      await createNewVestingInstanceTx(vestingDefaultSchedule, registry.address, web3)
+      vestingInstanceRegistryAddress = await vestingFactoryInstance.hasVestedAt(beneficiary)
+      vestingInstance = await VestingInstance.at(vestingInstanceRegistryAddress)
+    })
+
+    it('sets the account by beneficiary', async () => {
+      let isAccount = await accountsInstance.isAccount(vestingInstance.address)
+      assert.isFalse(isAccount)
+      await vestingInstance.setAccount(accountName, dataEncryptionKey, walletAddress, {
+        from: beneficiary,
+      })
+      isAccount = await accountsInstance.isAccount(vestingInstance.address)
+      assert.isTrue(isAccount)
+    })
+
+    it('reverts if a none-beneficiary attempts to set the account', async () => {
+      const isAccount = await accountsInstance.isAccount(vestingInstance.address)
+      assert.isFalse(isAccount)
+      await assertRevert(
+        vestingInstance.setAccount(accountName, dataEncryptionKey, walletAddress, {
+          from: accounts[2],
+        })
+      )
     })
   })
 
