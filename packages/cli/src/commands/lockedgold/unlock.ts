@@ -26,7 +26,7 @@ export default class Unlock extends BaseCommand {
     const lockedgold = await this.kit.contracts.getLockedGold()
     const value = new BigNumber(res.flags.value)
 
-    await newCheckBuilder(this)
+    await newCheckBuilder(this, res.flags.from)
       .isAccount(res.flags.from)
       .hasEnoughNonvotingLockedGold(value)
       .runChecks()
