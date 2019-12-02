@@ -8,7 +8,7 @@ import { createValidatedHandler, loggerMiddleware } from './request'
 import {
   AttestationRequestType,
   getAccountAddress,
-  getAttestationKey,
+  getAttestationSignerAddress,
   handleAttestationRequest,
 } from './requestHandlers/attestation'
 import { handleStatusRequest, StatusRequestType } from './requestHandlers/status'
@@ -17,8 +17,8 @@ import { initializeSmsProviders } from './sms'
 async function init() {
   await initializeDB()
   await initializeKit()
-  // TODO: Validate that the attestation key has been authorized by the account
-  getAttestationKey()
+  // TODO: Validate that the attestation signer has been authorized by the account
+  getAttestationSignerAddress()
   getAccountAddress()
   await initializeSmsProviders()
 

@@ -1,6 +1,6 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`PaymentRequestListScreen renders correctly with no payments 1`] = `
+exports[`EscrowedPaymentListScreen renders correctly with no payments 1`] = `
 <SafeAreaView
   style={
     Object {
@@ -115,7 +115,7 @@ exports[`PaymentRequestListScreen renders correctly with no payments 1`] = `
 </SafeAreaView>
 `;
 
-exports[`PaymentRequestListScreen renders correctly with payments 1`] = `
+exports[`EscrowedPaymentListScreen renders correctly with payments 1`] = `
 <SafeAreaView
   style={
     Object {

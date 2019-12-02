@@ -15,6 +15,9 @@ export interface E164NumberToAddressType {
 
 export interface State {
   attestationCodes: AttestationCode[]
+  // we store acceptedAttestationCodes to tell user if code
+  // was already used even after Actions.RESET_VERIFICATION
+  acceptedAttestationCodes: AttestationCode[]
   numCompleteAttestations: number
   verificationStatus: VerificationStatus
   hasSeenVerificationNux: boolean
@@ -26,6 +29,7 @@ export interface State {
 
 const initialState: State = {
   attestationCodes: [],
+  acceptedAttestationCodes: [],
   numCompleteAttestations: 0,
   verificationStatus: 0,
   hasSeenVerificationNux: false,
@@ -58,6 +62,7 @@ export const reducer = (state: State | undefined = initialState, action: ActionT
       return {
         ...state,
         attestationCodes: [...state.attestationCodes, action.code],
+        acceptedAttestationCodes: [...state.acceptedAttestationCodes, action.code],
       }
     case Actions.COMPLETE_ATTESTATION_CODE:
       return {
@@ -110,5 +115,7 @@ const completeCodeReducer = (state: State, numCompleteAttestations: number) => {
 }
 
 export const attestationCodesSelector = (state: RootState) => state.identity.attestationCodes
+export const acceptedAttestationCodesSelector = (state: RootState) =>
+  state.identity.acceptedAttestationCodes
 export const e164NumberToAddressSelector = (state: RootState) => state.identity.e164NumberToAddress
 export const addressToE164NumberSelector = (state: RootState) => state.identity.addressToE164Number
