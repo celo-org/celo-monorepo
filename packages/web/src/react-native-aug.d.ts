@@ -12,7 +12,7 @@ declare module 'react-native' {
 
   interface TextStyle {
     textRendering?: string
-    listStyle?: 'disc' | 'circle' | 'square' | 'decimal' | 'none'
+    listStyle?: 'disc' | 'circle' | 'square' | 'decimal' | 'none' | 'lower-alpha'
     display?: 'list-item' | 'inline' | 'none' | 'inline-flex'
     transitionProperty?: string
     transitionDuration?: string

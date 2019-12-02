@@ -85,13 +85,16 @@ USAGE
 
 OPTIONS
   --blsKey=0x                                        (required) BLS Public Key
-  --blsPop=0x                                        (required) BLS Proof-of-Possession
+  --blsSignature=0x                                  (required) BLS Proof-of-Possession
+  --ecdsaKey=0x                                      (required) ECDSA Public Key
   --from=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) Address for the Validator
 
 EXAMPLE
-  register --from 0x47e172F6CfB6c7D01C1574fa3E2Be7CC73269D95 --blsKey
+  register --from 0x47e172F6CfB6c7D01C1574fa3E2Be7CC73269D95 --ecdsaKey
+  0x049b7291ab8813a095d6b7913a7930ede5ea17466abd5e1a26c6c44f6df9a400a6f474080098b2c752c6c4871978ca977b90dcd3aed92bc9d564
+  137c8dfa14ee72 --blsKey
   0x4fa3f67fc913878b068d1fa1cdddc54913d3bf988dbe5a36a20fa888f20d4894c408a6773f3d7bde11154f2a3076b700d345a42fd25a0e5e83f4
-  db5586ac7979ac2053cd95d8f2efd3e959571ceccaa743e02cf4be3f5d7aaddb0b06fc9aff00 --blsPop
+  db5586ac7979ac2053cd95d8f2efd3e959571ceccaa743e02cf4be3f5d7aaddb0b06fc9aff00 --blsSignature
   0xcdb77255037eb68897cd487fdd85388cbda448f617f874449d4b11588b0b7ad8ddc20d9bb450b513bb35664ea3923900
 ```
 
