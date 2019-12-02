@@ -350,7 +350,7 @@ We don't want to use our account key for validating, so first let's authorize th
 celocli account:authorize --from $CELO_VALIDATOR_ADDRESS --role validator --signature 0x$CELO_VALIDATOR_SIGNER_SIGNATURE --signer $CELO_VALIDATOR_SIGNER_ADDRESS
 ```
 
-Confirm by checking the authorized Validator signer for you Validator:
+Confirm by checking the authorized Validator signer for your Validator:
 
 ```bash
 # On your local machine
