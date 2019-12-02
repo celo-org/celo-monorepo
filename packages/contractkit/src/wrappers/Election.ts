@@ -137,14 +137,14 @@ export class ElectionWrapper extends BaseWrapper<Election> {
    */
   async hasPendingVotes(account: Address): Promise<boolean> {
     const groups: string[] = await this.contract.methods.getGroupsVotedForByAccount(account).call()
-    const isNotPending = await Promise.all(
+    const isPending = await Promise.all(
       groups.map(async (g) =>
         toBigNumber(
-          await this.contract.methods.getPendingVotesForGroupByAccount(account, g).call()
-        ).isZero()
+          await this.contract.methods.getPendingVotesForGroupByAccount(g, account).call()
+        ).isGreaterThan(0)
       )
     )
-    return !isNotPending.every((a: boolean) => a)
+    return isPending.some((a: boolean) => a)
   }
 
   async hasActivatablePendingVotes(account: Address): Promise<boolean> {

@@ -190,6 +190,30 @@ export const v4Schema = {
     verificationStatus: 0,
     hasSeenVerificationNux: false,
   },
+  account: {
+    name: 'John Doe',
+    e164PhoneNumber: '+14155556666',
+    defaultCountryCode: '+1',
+    contactDetails: {
+      contactId: 'contactId',
+      thumbnailPath: null,
+    },
+    devModeActive: false,
+    devModeClickCount: 0,
+    photosNUXClicked: false,
+    pincodeSet: false,
+    accountCreationTime: 99999999999999,
+    incomingPaymentRequests: [],
+    outgoingPaymentRequests: [],
+    showFakeData: false,
+    backupCompleted: false,
+    socialBackupCompleted: false,
+    backupDelayedTime: 0,
+    dismissedEarnRewards: false,
+    dismissedInviteFriends: false,
+    pincodeType: PincodeType.Unset,
+    isSettingPin: false,
+  },
 }
 
 export function getLatestSchema(): Partial<RootState> {
