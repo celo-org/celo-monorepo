@@ -1,6 +1,6 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`PaymentRequestListItem renders correctly 1`] = `
+exports[`IncomingPaymentRequestListItem renders correctly 1`] = `
 <View
   accessible={true}
   focusable={true}
@@ -116,9 +116,7 @@ exports[`PaymentRequestListItem renders correctly 1`] = `
             }
           }
         >
-          <View
-            style={Object {}}
-          >
+          <View>
             <Text
               style={
                 Array [

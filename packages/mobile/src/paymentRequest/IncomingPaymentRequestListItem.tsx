@@ -10,7 +10,6 @@ import { StyleSheet, Text, TouchableOpacity, View } from 'react-native'
 import { PaymentRequestStatus } from 'src/account'
 import CeloAnalytics from 'src/analytics/CeloAnalytics'
 import { CustomEventNames } from 'src/analytics/constants'
-import { componentWithAnalytics } from 'src/analytics/wrapper'
 import { updatePaymentRequestStatus } from 'src/firebase/actions'
 import { Namespaces } from 'src/i18n'
 import { navigate } from 'src/navigator/NavigationService'
@@ -31,7 +30,7 @@ interface OwnProps {
 
 type Props = OwnProps & WithNamespaces
 
-export class PaymentRequestListItem extends React.Component<Props> {
+export class IncomingPaymentRequestListItem extends React.Component<Props> {
   onPay = () => {
     const { amount, comment: reason, requester: recipient } = this.props
     navigate(Screens.SendConfirmation, {
@@ -51,7 +50,7 @@ export class PaymentRequestListItem extends React.Component<Props> {
     const { id } = this.props
     this.props.updatePaymentRequestStatus(id.toString(), PaymentRequestStatus.COMPLETED)
     Logger.showMessage(this.props.t('requestPaid'))
-    CeloAnalytics.track(CustomEventNames.request_payment_pay)
+    CeloAnalytics.track(CustomEventNames.incoming_request_payment_pay)
     this.onFinalized()
   }
 
@@ -59,12 +58,12 @@ export class PaymentRequestListItem extends React.Component<Props> {
     const { id } = this.props
     this.props.updatePaymentRequestStatus(id.toString(), PaymentRequestStatus.DECLINED)
     Logger.showMessage(this.props.t('requestDeclined'))
-    CeloAnalytics.track(CustomEventNames.request_payment_decline)
+    CeloAnalytics.track(CustomEventNames.incoming_request_payment_decline)
     this.onFinalized()
   }
 
   onFinalized = () => {
-    navigate(Screens.PaymentRequestListScreen)
+    navigate(Screens.IncomingPaymentRequestListScreen)
   }
 
   getCTA = () => {
@@ -102,7 +101,7 @@ export class PaymentRequestListItem extends React.Component<Props> {
           roundedBorders={false}
           callout={<NotificationAmount amount={multiplyByWei(this.props.amount)} />}
         >
-          <View style={styles.body}>
+          <View>
             {this.isDisplayingNumber() && (
               <Text style={[fontStyles.subSmall, styles.phoneNumber]}>
                 {this.props.requester.displayId}
@@ -117,7 +116,6 @@ export class PaymentRequestListItem extends React.Component<Props> {
 }
 
 const styles = StyleSheet.create({
-  body: {},
   comment: {
     paddingTop: variables.contentPadding,
   },
@@ -126,6 +124,4 @@ const styles = StyleSheet.create({
   },
 })
 
-export default componentWithAnalytics(
-  withNamespaces(Namespaces.paymentRequestFlow)(PaymentRequestListItem)
-)
+export default withNamespaces(Namespaces.global)(IncomingPaymentRequestListItem)
