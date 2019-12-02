@@ -3,6 +3,7 @@ import {
   AccountType,
   generatePrivateKey,
   getAddressesFor,
+  getFaucetedAccounts,
   getPrivateKeysFor,
   privateKeyToAddress,
 } from './generate_utils'
@@ -32,14 +33,15 @@ function getAttestationKeys() {
 
 export function migrationOverrides() {
   const mnemonic = fetchEnv(envVar.MNEMONIC)
+  const faucetedAccounts = getFaucetedAccounts(mnemonic)
   return {
     validators: {
       validatorKeys: validatorKeys(),
       attestationKeys: getAttestationKeys(),
     },
     stableToken: {
-      initialAccounts: getAddressesFor(AccountType.FAUCET, mnemonic, 2),
-      values: getAddressesFor(AccountType.FAUCET, mnemonic, 2).map(() => '60000000000000000000000'), // 60k Celo Dollars
+      initialAccounts: faucetedAccounts.map((account) => account.address),
+      values: faucetedAccounts.map(() => '60000000000000000000000'), // 60k Celo Dollars
       oracles: getAddressesFor(AccountType.PRICE_ORACLE, mnemonic, 1),
     },
   }

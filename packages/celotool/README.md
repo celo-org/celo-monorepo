@@ -82,7 +82,7 @@ a few useful commands to make running a node really easy.
 
 ### How to Deploy a Test Network to the Cloud
 
-- Setup the environment variables: MNEMONIC, GETH_ACCOUNT_SECRET, and ETHSTATS_WEBSOCKETSECRET.
+- Setup the environment variables: MNEMONIC, and GETH_ACCOUNT_SECRET.
 
 - Deploy: `celotooljs deploy initial testnet -e yourname`
 

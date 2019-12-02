@@ -1,31 +1,31 @@
 locals {
-  name_prefix = "${var.celo_env}-tx-node"
+  name_prefix = "${var.celo_env}-${var.name}"
 }
 
-resource "google_compute_address" "tx_node" {
-  name         = "${local.name_prefix}-address-${count.index}-${random_id.tx_node[count.index].hex}"
+resource "google_compute_address" "full_node" {
+  name         = "${local.name_prefix}-address-${count.index}-${random_id.full_node[count.index].hex}"
   address_type = "EXTERNAL"
 
-  count = var.tx_node_count
+  count = var.node_count
 
   lifecycle {
     create_before_destroy = true
   }
 }
 
-resource "google_compute_address" "tx_node_internal" {
-  name         = "${local.name_prefix}-internal-address-${count.index}-${random_id.tx_node[count.index].hex}"
+resource "google_compute_address" "full_node_internal" {
+  name         = "${local.name_prefix}-internal-address-${count.index}-${random_id.full_node[count.index].hex}"
   address_type = "INTERNAL"
   purpose      = "GCE_ENDPOINT"
 
-  count = var.tx_node_count
+  count = var.node_count
 }
 
-resource "google_compute_instance" "tx_node" {
-  name         = "${local.name_prefix}-${count.index}-${random_id.tx_node[count.index].hex}"
+resource "google_compute_instance" "full_node" {
+  name         = "${local.name_prefix}-${count.index}-${random_id.full_node[count.index].hex}"
   machine_type = "n1-standard-1"
 
-  count = var.tx_node_count
+  count = var.node_count
 
   tags = ["${var.celo_env}-node", "${var.celo_env}-tx-node"]
 
@@ -37,20 +37,17 @@ resource "google_compute_instance" "tx_node" {
     }
   }
 
-  scratch_disk {
-
-  }
-
   network_interface {
     network = var.network_name
-    network_ip = google_compute_address.tx_node_internal[count.index].address
+    network_ip = google_compute_address.full_node_internal[count.index].address
     access_config {
-      nat_ip = google_compute_address.tx_node[count.index].address
+      nat_ip = google_compute_address.full_node[count.index].address
     }
   }
 
   metadata_startup_script = templatefile(
     format("%s/startup.sh", path.module), {
+      additional_geth_flags : var.additional_geth_flags,
       block_time : var.block_time,
       bootnode_ip_address : var.bootnode_ip_address,
       ethstats_host : var.ethstats_host,
@@ -63,11 +60,13 @@ resource "google_compute_instance" "tx_node" {
       geth_node_docker_image_tag : var.geth_node_docker_image_tag,
       geth_verbosity : var.geth_verbosity,
       in_memory_discovery_table : var.in_memory_discovery_table,
-      ip_address : google_compute_address.tx_node[count.index].address,
-      max_peers : var.tx_node_count * 2,
+      ip_address : google_compute_address.full_node[count.index].address,
+      max_peers : 1100,
+      name : var.name,
       network_id : var.network_id,
+      node_name : "${var.celo_env}-${var.name}-${count.index}",
+      proxy : var.proxy,
       rid : count.index,
-      tx_node_name : "${var.celo_env}-tx-node-${count.index}",
     }
   )
 
@@ -84,8 +83,8 @@ resource "google_compute_instance" "tx_node" {
   }
 }
 
-resource "random_id" "tx_node" {
-  count = var.tx_node_count
+resource "random_id" "full_node" {
+  count = var.node_count
 
   byte_length = 8
 }

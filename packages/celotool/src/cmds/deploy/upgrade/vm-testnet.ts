@@ -28,6 +28,7 @@ export const handler = async (argv: VmTestnetArgv) => {
     await taintTestnet(argv.celoEnv)
   }
   await deploy(argv.celoEnv, onDeployFailed)
+
   // upgrade prom to sd statefulset
   await upgradeHelmChart(argv.celoEnv)
 }

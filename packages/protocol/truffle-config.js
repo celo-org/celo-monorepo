@@ -9,6 +9,7 @@ const argv = require('minimist')(process.argv.slice(2), { string: ['truffle_over
 
 const SOLC_VERSION = '0.5.8'
 const ALFAJORES_NETWORKID = 44785
+const BAKLAVASTAGING_NETWORKID = 31416
 
 const OG_FROM = '0xfeE1a22F43BeeCB912B5a4912ba87527682ef0fC'
 const DEVELOPMENT_FROM = '0x5409ed021d9299bf6814279a6a1411a7e866a631'
@@ -132,6 +133,10 @@ const networks = {
   pilotstaging: {
     ...defaultConfig,
     from: PILOTSTAGING_FROM,
+  },
+  baklavastaging: {
+    ...defaultConfig,
+    network_id: BAKLAVASTAGING_NETWORKID,
   },
 }
 // If an override was provided, apply it.

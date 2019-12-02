@@ -1,4 +1,3 @@
-// import { confirmAction } from './utils'
 import { config } from 'dotenv'
 import { existsSync } from 'fs'
 import path from 'path'
@@ -56,6 +55,9 @@ export enum envVar {
   IN_MEMORY_DISCOVERY_TABLE = 'IN_MEMORY_DISCOVERY_TABLE',
   KUBERNETES_CLUSTER_NAME = 'KUBERNETES_CLUSTER_NAME',
   KUBERNETES_CLUSTER_ZONE = 'KUBERNETES_CLUSTER_ZONE',
+  LOAD_TEST_CLIENTS = 'LOAD_TEST_CLIENTS',
+  LOAD_TEST_GENESIS_BALANCE = 'LOAD_TEST_GENESIS_BALANCE',
+  LOAD_TEST_TX_DELAY_MS = 'LOAD_TEST_TX_DELAY_MS',
   MNEMONIC = 'MNEMONIC',
   MOBILE_WALLET_PLAYSTORE_LINK = 'MOBILE_WALLET_PLAYSTORE_LINK',
   NETWORK_ID = 'NETWORK_ID',
@@ -64,6 +66,7 @@ export enum envVar {
   NOTIFICATION_SERVICE_FIREBASE_DB = 'NOTIFICATION_SERVICE_FIREBASE_DB',
   PROMTOSD_EXPORT_INTERVAL = 'PROMTOSD_EXPORT_INTERVAL',
   PROMTOSD_SCRAPE_INTERVAL = 'PROMTOSD_SCRAPE_INTERVAL',
+  PROXIED_VALIDATORS = 'PROXIED_VALIDATORS',
   SMS_RETRIEVER_HASH_CODE = 'SMS_RETRIEVER_HASH_CODE',
   STACKDRIVER_MONITORING_DASHBOARD = 'STACKDRIVER_MONITORING_DASHBOARD',
   STACKDRIVER_NOTIFICATION_APPLICATIONS_PREFIX = 'STACKDRIVER_NOTIFICATION_APPLICATIONS_PREFIX',
@@ -222,4 +225,11 @@ export function addCeloEnvMiddleware(argv: yargs.Argv) {
 
 export function isVmBased() {
   return fetchEnv(envVar.VM_BASED) === 'true'
+}
+
+export function failIfVmBased() {
+  if (isVmBased()) {
+    console.error('The celo env is intended for a VM-based testnet, aborting')
+    process.exit(1)
+  }
 }

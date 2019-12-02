@@ -14,7 +14,7 @@ variable celo_env {
 }
 
 variable ethstats_host {
-  type        = "string"
+  type        = string
   description = "Ethstats url or IP address"
 }
 
@@ -81,6 +81,11 @@ variable network_id {
 variable network_name {
   type        = string
   description = "Name of the GCP network the validator VM is in"
+}
+
+variable proxied_validator_count {
+  type        = number
+  description = "Number of validator_count validators that are hidden behind proxies"
 }
 
 variable tx_node_count {

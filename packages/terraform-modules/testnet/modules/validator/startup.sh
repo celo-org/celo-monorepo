@@ -1,5 +1,13 @@
 #! /bin/bash
 
+GCLOUD_ZONE=`gcloud compute instances list --filter="name=('${validator_name}')" --format 'value(zone)'`
+
+# If this validator is proxied, it won't have an access config. We need to
+# create one for the initial 1 time setup so we can reach the external internet
+if [[ ${proxied} == "true" ]]; then
+  gcloud compute instances add-access-config ${validator_name} --zone=$GCLOUD_ZONE
+fi
+
 # ---- Set Up Logging ----
 
 curl -sSO https://dl.google.com/cloudagents/install-logging-agent.sh
@@ -69,58 +77,93 @@ echo "Bootnode enode: $BOOTNODE_ENODE"
 echo "Pulling geth..."
 docker pull $GETH_NODE_DOCKER_IMAGE
 
+PROXIED_FLAGS=""
+PROXY_ENODE=""
+if [[ ${proxied} == "true" ]]; then
+  # $PROXY_ENODE_ADDRESS is from the secrets pulled from google cloud
+  PROXY_INTERNAL_ENODE="enode://$PROXY_ENODE_ADDRESS@${proxy_internal_ip_address}:30503"
+  PROXY_EXTERNAL_ENODE="enode://$PROXY_ENODE_ADDRESS@${proxy_external_ip_address}:30303"
+
+  echo "Proxy internal enode: $PROXY_INTERNAL_ENODE"
+  echo "Proxy external enode: $PROXY_EXTERNAL_ENODE"
+
+  PROXIED_FLAGS="--proxy.proxied --nodiscover --proxy.proxyenodeurlpair=\"$PROXY_INTERNAL_ENODE;$PROXY_EXTERNAL_ENODE\""
+
+
+  # if this validator is proxied, cut it off from the external internet after
+  # we've downloaded everything
+  echo "Deleting access config"
+  # The command hangs but still succeeds, give it some time
+  # This is likely because when the access config is actually deleted, this
+  # instance cannot reach the external internet so the success ack from the server
+  # is never received
+  timeout 20 gcloud compute instances delete-access-config ${validator_name} --zone=$GCLOUD_ZONE
+fi
+
 IN_MEMORY_DISCOVERY_TABLE_FLAG=""
 [[ ${in_memory_discovery_table} == "true" ]] && IN_MEMORY_DISCOVERY_TABLE_FLAG="--use-in-memory-discovery-table"
+
+mkdir -p $DATA_DIR/account
+echo -n "${genesis_content_base64}" | base64 -d > $DATA_DIR/genesis.json
+echo -n "${rid}" > $DATA_DIR/replica_id
+echo -n "$PRIVATE_KEY" > $DATA_DIR/pkey
+echo -n "$ACCOUNT_ADDRESS" > $DATA_DIR/address
+echo -n "$BOOTNODE_ENODE_ADDRESS" > $DATA_DIR/bootnodeEnodeAddress
+echo -n "$BOOTNODE_ENODE" > $DATA_DIR/bootnodeEnode
+echo -n "$GETH_ACCOUNT_SECRET" > $DATA_DIR/account/accountSecret
+if [ "${ip_address}" ]; then
+  echo -n "${ip_address}" > $DATA_DIR/ipAddress
+  NAT_FLAG="--nat=extip:${ip_address}"
+fi
 
 echo "Starting geth..."
 # We need to override the entrypoint in the geth image (which is originally `geth`).
 # `geth account import` fails when the account has already been imported. In
 # this case, we do not want to pipefail
-docker run -v $DATA_DIR:$DATA_DIR --name geth --net=host --entrypoint /bin/sh -d $GETH_NODE_DOCKER_IMAGE -c "\
+docker run \
+  -v $DATA_DIR:$DATA_DIR \
+  --name geth \
+  --net=host \
+  --restart always \
+  --entrypoint /bin/sh \
+  -d \
+  $GETH_NODE_DOCKER_IMAGE -c "\
   (
-    set -euo pipefail && \
-    mkdir -p $DATA_DIR/account /var/geth && \
-    echo -n '${genesis_content_base64}' | base64 -d > /var/geth/genesis.json && \
-    echo -n '${rid}' > $DATA_DIR/replica_id && \
-    echo -n '${ip_address}' > $DATA_DIR/ipAddress && \
-    echo -n '$ACCOUNT_ADDRESS' > $DATA_DIR/address && \
-    echo -n '$BOOTNODE_ENODE_ADDRESS' > $DATA_DIR/bootnodeEnodeAddress && \
-    echo -n '$BOOTNODE_ENODE' > $DATA_DIR/bootnodeEnode && \
-    echo -n '$GETH_ACCOUNT_SECRET' > $DATA_DIR/account/accountSecret && \
-    geth init /var/geth/genesis.json
-  ) && ( \
-    TMP_PRIVATE_KEY_FILE=$(mktemp) && \
-    echo -n $PRIVATE_KEY > $TMP_PRIVATE_KEY_FILE && \
-    geth account import --password $DATA_DIR/account/accountSecret $TMP_PRIVATE_KEY_FILE && \
-    rm $TMP_PRIVATE_KEY_FILE ; \
-    geth \
-      --bootnodes=enode://$BOOTNODE_ENODE \
-      --password=$DATA_DIR/account/accountSecret \
-      --unlock=$ACCOUNT_ADDRESS \
-      --mine \
-      --rpc \
-      --rpcaddr 0.0.0.0 \
-      --rpcapi=eth,net,web3 \
-      --rpccorsdomain='*' \
-      --rpcvhosts=* \
-      --ws \
-      --wsaddr 0.0.0.0 \
-      --wsorigins=* \
-      --wsapi=eth,net,web3 \
-      --etherbase=$ACCOUNT_ADDRESS \
-      --networkid=${network_id} \
-      --syncmode=full \
-      --consoleformat=json \
-      --consoleoutput=stdout \
-      --verbosity=${geth_verbosity} \
-      --ethstats=${validator_name}:$ETHSTATS_WEBSOCKETSECRET@${ethstats_host} \
-      --istanbul.blockperiod=${block_time} \
-      --istanbul.requesttimeout=${istanbul_request_timeout_ms} \
-      --maxpeers=${max_peers} \
-      --nat=extip:${ip_address} \
-      --metrics \
-      $IN_MEMORY_DISCOVERY_TABLE_FLAG \
-  )"
+    set -euo pipefail ; \
+    geth init $DATA_DIR/genesis.json \
+  ) ; \
+  TMP_PRIVATE_KEY_FILE=$(mktemp) ; \
+  echo -n $PRIVATE_KEY > $TMP_PRIVATE_KEY_FILE ; \
+  geth account import --password $DATA_DIR/account/accountSecret $TMP_PRIVATE_KEY_FILE ; \
+  rm $TMP_PRIVATE_KEY_FILE ; \
+  geth \
+    --bootnodes=enode://$BOOTNODE_ENODE \
+    --password=$DATA_DIR/account/accountSecret \
+    --unlock=$ACCOUNT_ADDRESS \
+    --mine \
+    --rpc \
+    --rpcaddr 0.0.0.0 \
+    --rpcapi=eth,net,web3 \
+    --rpccorsdomain='*' \
+    --rpcvhosts=* \
+    --ws \
+    --wsaddr 0.0.0.0 \
+    --wsorigins=* \
+    --wsapi=eth,net,web3 \
+    --nodekey=$DATA_DIR/pkey \
+    --etherbase=$ACCOUNT_ADDRESS \
+    --networkid=${network_id} \
+    --syncmode=full \
+    --consoleformat=json \
+    --consoleoutput=stdout \
+    --verbosity=${geth_verbosity} \
+    --ethstats=${validator_name}@${ethstats_host} \
+    --istanbul.blockperiod=${block_time} \
+    --istanbul.requesttimeout=${istanbul_request_timeout_ms} \
+    --maxpeers=${max_peers} \
+    --metrics \
+    $IN_MEMORY_DISCOVERY_TABLE_FLAG \
+    $PROXIED_FLAGS"
 
 # ---- Set Up and Run Geth Exporter ----
 
@@ -129,7 +172,7 @@ GETH_EXPORTER_DOCKER_IMAGE=${geth_exporter_docker_image_repository}:${geth_expor
 echo "Pulling geth exporter..."
 docker pull $GETH_EXPORTER_DOCKER_IMAGE
 
-docker run -v $DATA_DIR:$DATA_DIR --name geth-exporter --net=host -d $GETH_EXPORTER_DOCKER_IMAGE \
+docker run -v $DATA_DIR:$DATA_DIR --name geth-exporter --restart=always --net=host -d $GETH_EXPORTER_DOCKER_IMAGE \
   /usr/local/bin/geth_exporter \
     -ipc $DATA_DIR/geth.ipc \
     -filter "(.*overall|percentiles_95)"
