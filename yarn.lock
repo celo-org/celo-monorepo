@@ -9319,6 +9319,14 @@ bun@^0.0.12:
   dependencies:
     readable-stream "~1.0.32"
 
+bunyan-debug-stream@2.0.0:
+  version "2.0.0"
+  resolved "https://registry.yarnpkg.com/bunyan-debug-stream/-/bunyan-debug-stream-2.0.0.tgz#b9593e38753f594e3f9db3eb2fdebdc2af147a9f"
+  integrity sha512-Ovl43CJ7nUwalLzdXc6E1nGIy6ift9Z/QpYXUtsjpDAg35ZFKXifKNZyfpMGuN3N7ijLLqbnxPsMMHsXDdXa9A==
+  dependencies:
+    colors "^1.0.3"
+    exception-formatter "^1.0.4"
+
 bunyan-debug-stream@^1.1.0:
   version "1.1.1"
   resolved "https://registry.yarnpkg.com/bunyan-debug-stream/-/bunyan-debug-stream-1.1.1.tgz#4740a00b7d5c2d9d1b714925ab0802516040813e"
