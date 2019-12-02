@@ -101,7 +101,7 @@ Geth
 : [go-ethereum](https://github.com/ethereum/go-ethereum), a Golang implementation of the Ethereum protocol from which the Celo Blockchain software is forked.
 
 Governable
-: A smart contract that is owned by the Celo Governance mechanism and so can be manipulated or updated by on-chain governance proposal.
+: A smart contract that is owned by the Celo [Governance](../celo-codebase/protocol/governance.md) mechanism and so can be manipulated or updated by an on-chain governance proposal.
 
 Group Share
 : The proportion of epoch rewards for an elected validator that is passed to the validator group that caused it to be elected. This is a property that can be configured by each group.
@@ -112,8 +112,8 @@ Header
 HSM
 : Hardware Security Module. A hardware device that hosts one or more private keys and signs data without passing the key off the device.  
 
-Infrastructure Fund
-: An account that supports the development and operational costs of the Celo protocol. The Infrastructure Fund is maintained by a transfer made as part of Epoch Rewards, and is intended to cover costs beyond the other specific incentives provided to validators and validator groups. Awards can be made through an on-chain governance proposal.
+[Community Fund](../celo-codebase/protocol/proof-of-stake/community-fund.md)
+: An account that supports the development and operational costs of the Celo protocol. The Community Fund is maintained by a transfer made as part of Epoch Rewards, and is intended to cover costs beyond the other specific incentives provided to validators and validator groups. Awards can be made through an on-chain governance proposal.
 
 Istanbul
 : Istanbul, or IBFT, is the original name of the implementation of the Byzantine Fault Tolerant consensus algorithm used by Celo. Istanbul is also the name of a hard fork of the Ethereum network.
