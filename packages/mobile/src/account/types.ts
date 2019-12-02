@@ -9,6 +9,7 @@ export enum PaymentRequestStatus {
   REQUESTED = 'REQUESTED',
   COMPLETED = 'COMPLETED',
   DECLINED = 'DECLINED',
+  CANCELLED = 'CANCELLED',
 }
 
 // TODO(Rossy) Find a better home for this

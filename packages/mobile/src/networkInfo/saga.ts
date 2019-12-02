@@ -50,4 +50,5 @@ function* subscribeToNetworkStatus() {
 
 export function* networkInfoSaga() {
   yield spawn(subscribeToNetworkStatus)
+  yield spawn(waitWeb3LastBlock)
 }
