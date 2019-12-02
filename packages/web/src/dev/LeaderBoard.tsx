@@ -7,6 +7,7 @@ import { I18nProps, Trans, withNamespaces } from 'src/i18n'
 import Chevron, { Direction } from 'src/icons/chevron'
 import { colors, fonts, standardStyles, textStyles } from 'src/styles'
 import Button, { BTN, SIZE } from '../shared/Button.3'
+import { CeloLinks } from 'src/shared/menu-items'
 interface BoardProps {
   leaders: Competitor[]
 }
@@ -26,6 +27,27 @@ const PORTIONS = 8
 const INITIAL_MAX = 8
 
 const EXPANDED_MAX = 50
+
+const JERSEYS = [colors.primary, colors.lightBlue, colors.red, colors.purple, colors.gold]
+
+function round(number: number, magnitude?: number) {
+  const precision = magnitude || 10
+  return Math.ceil(number / precision) * precision
+}
+
+function getJersey(rank: number): colors {
+  const index = rank % JERSEYS.length
+  return JERSEYS[index]
+}
+
+function sorter(alpha: Competitor, bravo: Competitor) {
+  if (alpha.points === bravo.points) {
+    return 0
+  } else if (alpha.points < bravo.points) {
+    return 1
+  }
+  return -1
+}
 
 class LeaderBoard extends React.PureComponent<BoardProps & I18nProps, State> {
   state: State = {
@@ -102,7 +124,9 @@ class LeaderBoard extends React.PureComponent<BoardProps & I18nProps, State> {
             ]}
           >
             <Text style={[fonts.p, textStyles.invert, textStyles.center, styles.prizeInfo]}>
-              <Trans i18nKey="prizeInfo" />
+              <Trans i18nKey="prizeInfo">
+                <Link href={CeloLinks.stakeOffTerms}>Terms and Conditions</Link>
+              </Trans>
             </Text>
           </View>
         </View>
@@ -111,22 +135,6 @@ class LeaderBoard extends React.PureComponent<BoardProps & I18nProps, State> {
   }
 }
 export default withNamespaces('dev')(LeaderBoard)
-
-const JERSEYS = [colors.primary, colors.lightBlue, colors.red, colors.purple, colors.gold]
-
-function getJersey(rank: number): colors {
-  const index = rank % JERSEYS.length
-  return JERSEYS[index]
-}
-
-function sorter(alpha: Competitor, bravo: Competitor) {
-  if (alpha.points === bravo.points) {
-    return 0
-  } else if (alpha.points < bravo.points) {
-    return 1
-  }
-  return -1
-}
 
 function Axis({ max }: { max: number }) {
   const scaledMax = max
@@ -150,6 +158,10 @@ function Axis({ max }: { max: number }) {
   )
 }
 
+function Link({ children, href }) {
+  return <Button style={textStyles.invert} kind={BTN.INLINE} text={children} href={href} />
+}
+
 const styles = StyleSheet.create({
   xaxis: {
     justifyContent: 'space-between',
@@ -161,8 +173,3 @@ const styles = StyleSheet.create({
     maxWidth: 450,
   },
 })
-
-function round(number: number, magnitude?: number) {
-  const precision = magnitude || 10
-  return Math.ceil(number / precision) * precision
-}
