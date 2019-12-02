@@ -484,11 +484,6 @@ export function getContext(gethConfig: GethTestConfig) {
   const validatorPrivateKeys = getPrivateKeysFor(AccountType.VALIDATOR, mnemonic, numValidators)
   const attestationKeys = getPrivateKeysFor(AccountType.ATTESTATION, mnemonic, numValidators)
   const validators = getValidators(mnemonic, numValidators)
-  const argv = require('minimist')(process.argv.slice(2))
-  const branch = argv.branch || 'master'
-  const gethRepoPath = argv.localgeth || '/tmp/geth'
-  const gethBinaryPath = `${gethRepoPath}/build/bin/geth`
-
   const repo: GethRepository = gethConfig.repository || gethRepositoryFromFlags()
   const gethBinaryPath = `${repo.path}/build/bin/geth`
 

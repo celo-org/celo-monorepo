@@ -12,7 +12,9 @@ interface LocalTestnetArgs {
   validators: number
   txnodes: number
   lightclients: number
+  ultralightclients: number
   migrateto: number
+  instances: string
 }
 
 export const builder = (argv: yargs.Argv) => {
@@ -28,14 +30,19 @@ export const builder = (argv: yargs.Argv) => {
     .option('validators', {
       type: 'number',
       description: 'number of validator nodes to create',
-      default: 3,
+      default: 0,
     })
     .option('txnodes', {
       type: 'number',
       description: 'number of transaction nodes to create',
-      default: 2,
+      default: 0,
     })
     .option('lightclients', {
+      type: 'number',
+      description: 'number of light client nodes to create',
+      default: 0,
+    })
+    .option('ultralightclients', {
       type: 'number',
       description: 'number of transaction nodes to create',
       default: 0,
@@ -44,6 +51,11 @@ export const builder = (argv: yargs.Argv) => {
       type: 'number',
       description: 'maximum migration number to run',
       default: 1000,
+    })
+    .option('instances', {
+      type: 'string',
+      description: 'manually enter a GethInstanceConfig[] json blob to add to the config',
+      default: '[]',
     })
 }
 
@@ -88,11 +100,24 @@ function lightClientConfigs(count: number): GethInstanceConfig[] {
   }))
 }
 
+function ultralightClientConfigs(count: number): GethInstanceConfig[] {
+  return range(count).map((i) => ({
+    name: `ultralight-client-${i}`,
+    validating: false,
+    syncmode: 'ultralight',
+    port: 0,
+  }))
+}
+
 // Populate port information for node configs.
 function selectPorts(configs: GethInstanceConfig[]): GethInstanceConfig[] {
   for (const [i, config] of configs.entries()) {
-    config.port = 30303 + 2 * i
-    config.rpcport = 8545 + 2 * i
+    if (!config.port) {
+      config.port = 30303 + 2 * i
+    }
+    if (!config.rpcport && !config.wsport) {
+      config.rpcport = 8545 + 2 * i
+    }
   }
   return configs
 }
@@ -127,7 +152,7 @@ async function connectNodes(configs: GethInstanceConfig[]) {
   )
 
   // Connect light clients to tx nodes.
-  const lightClients = configs.filter((config) => config.syncmode === 'light')
+  const lightClients = configs.filter((config) => ['light', 'ultralight'].includes(config.syncmode))
   await Promise.all(lightClients.map((lightClient) => connectToEnodes(lightClient, txNodeEnodes)))
 }
 
@@ -138,6 +163,8 @@ export const handler = async (argv: LocalTestnetArgs) => {
       ...validatorConfigs(argv.validators),
       ...txNodeConfigs(argv.txnodes),
       ...lightClientConfigs(argv.lightclients),
+      ...ultralightClientConfigs(argv.ultralightclients),
+      ...JSON.parse(argv.instances),
     ]),
     repository: {
       path: argv.localpath || '/tmp/geth',
