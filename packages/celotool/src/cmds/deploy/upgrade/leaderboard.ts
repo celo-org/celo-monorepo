@@ -1,7 +1,7 @@
+import { UpgradeArgv } from 'src/cmds/deploy/upgrade'
 import { createClusterIfNotExists, switchToClusterFromEnv } from 'src/lib/cluster'
 import { installHelmChart, removeHelmRelease, upgradeHelmChart } from 'src/lib/leaderboard'
 import yargs from 'yargs'
-import { UpgradeArgv } from 'src/cmds/deploy/upgrade'
 
 export const command = 'leaderboard'
 

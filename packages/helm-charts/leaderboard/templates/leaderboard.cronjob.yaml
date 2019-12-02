@@ -55,8 +55,8 @@ spec:
               value: {{ .Values.leaderboard.database }}
             - name: LEADERBOARD_WEB3
               value: {{ .Values.leaderboard.web3 }}
-            - name: LEADERBOARD_SPREET
-              value: {{ .Values.leaderboard.spreet }}
+            - name: LEADERBOARD_SHEET
+              value: {{ .Values.leaderboard.sheet }}
             - name: PGUSER
               valueFrom:
                 secretKeyRef:

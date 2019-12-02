@@ -1,7 +1,7 @@
-import { envVar, fetchEnv } from 'src/lib/env-utils'
-import { execCmd, execCmdWithExitOnFailure } from 'src/lib/utils'
-import { installGenericHelmChart, removeGenericHelmChart } from 'src/lib/helm_deploy'
 import yaml from 'js-yaml'
+import { envVar, fetchEnv } from 'src/lib/env-utils'
+import { installGenericHelmChart, removeGenericHelmChart } from 'src/lib/helm_deploy'
+import { execCmd, execCmdWithExitOnFailure } from 'src/lib/utils'
 
 const helmChartPath = '../helm-charts/leaderboard'
 
@@ -40,7 +40,7 @@ export async function helmParameters(celoEnv: string) {
     `--set leaderboard.db.password=${dbValues.password}`,
     `--set leaderboard.image.repository=${fetchEnv(envVar.LEADERBOARD_DOCKER_IMAGE_REPOSITORY)}`,
     `--set leaderboard.image.tag=${fetchEnv(envVar.LEADERBOARD_DOCKER_IMAGE_TAG)}`,
-    `--set leaderboard.spreet=${fetchEnv(envVar.LEADERBOARD_SPREET)}`,
+    `--set leaderboard.sheet=${fetchEnv(envVar.LEADERBOARD_SHEET)}`,
     `--set leaderboard.web3=https://${celoEnv}-forno.${fetchEnv(envVar.CLUSTER_DOMAIN_NAME)}.org`,
   ]
 }
