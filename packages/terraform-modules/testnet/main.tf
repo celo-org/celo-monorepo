@@ -27,7 +27,7 @@ locals {
   target_tag_tx_node   = "${var.celo_env}-tx-node"
   target_tag_validator = "${var.celo_env}-validator"
 
-  target_tag_all = [
+  target_tags_all = [
     local.target_tag_bootnode,
     local.target_tag_node
   ]
@@ -41,7 +41,7 @@ resource "google_compute_firewall" "ssh_firewall" {
   name    = "${var.celo_env}-ssh-firewall"
   network = data.google_compute_network.network.name
 
-  target_tags = local.target_tag_all
+  target_tags = local.target_tags_all
 
   allow {
     protocol = "tcp"
