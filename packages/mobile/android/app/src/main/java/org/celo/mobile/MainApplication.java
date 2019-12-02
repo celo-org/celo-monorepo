@@ -26,6 +26,7 @@ import ru.ivanarh.jndcrash.NDCrash;
 import ru.ivanarh.jndcrash.NDCrashUnwinder;
 
 import io.invertase.firebase.auth.RNFirebaseAuthPackage;
+import io.invertase.firebase.links.RNFirebaseLinksPackage;
 import io.invertase.firebase.database.RNFirebaseDatabasePackage;
 import io.invertase.firebase.storage.RNFirebaseStoragePackage;
 import io.invertase.firebase.messaging.RNFirebaseMessagingPackage;
@@ -55,6 +56,7 @@ public class MainApplication extends Application implements ShareApplication, Re
       packages.add(new RNFirebaseStoragePackage());
       packages.add(new RNFirebaseMessagingPackage());
       packages.add(new RNFirebaseNotificationsPackage());
+      packages.add(new RNFirebaseLinksPackage());
       return packages;
     }
 
