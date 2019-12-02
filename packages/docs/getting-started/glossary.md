@@ -15,9 +15,6 @@ Attestation
 Attestation Service
 : A service operated by validators that sends signed SMS messages in order to allow accounts to prove they have access to a phone number.
 
-AttoGold, aG
-: Equivalent to Wei in Ethereum, AttoGold is the smallest unit in which Celo Gold is accounted. One Celo Gold is equal to 1,000,000,000,000,000,000 aG (10<sup>18</sup>).
-
 Baklava
 : The second public Celo test network, used for [The Great Celo Stake Off](https://www.celo.org/stake-off)
  subject to the [Baklava Testnet Disclaimer](../important-information/baklava-testnet-disclaimer.md).
@@ -47,7 +44,7 @@ Celo Gold, cGLD
 : Celo's native asset, Celo Gold is used to obtain service on the Celo network. The cryptocurrency Celo Gold is equivalent to Ether in Ethereum but is also an ERC-20 token. Celo Gold can be locked as Locked Gold and used to participate in validator elections and on-chain governance. The smallest unit in which cGLD is accounted is AttoGold.
 
 Claim
-: Part of the metadata that Celo can associate with an address, a claim is used by an account to assert it has control over a particular off-chain entity (for example, a DNS domain name, an account on a third party service, etc). Claims can only be verified off-chain. 
+: Part of the metadata that Celo can associate with an address, a claim is used by an account to assert it has control over a particular off-chain entity (for example, a DNS domain name, an account on a third party service, etc). Claims can only be verified off-chain.
 
 Client
 : See [Node](#node).
@@ -68,7 +65,7 @@ DeFi
 : Decentralized Finance; open source software and networks without intermediaries in the financial space.
 
 Double Signing
-: When a validator signs two different blocks at the same position in the blockchain.
+: When a validator signs two different blocks at the same height and with the same parent hash in the blockchain.
 
 Epoch
 : A fixed number of blocks, configured in the network's genesis block, during which the same validator set is used for consensus. A validator election is carried out after the last block of an epoch, and any resulting changes to the validator set are written into that block's header.

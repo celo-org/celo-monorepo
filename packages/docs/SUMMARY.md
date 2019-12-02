@@ -89,3 +89,5 @@
 ## Important Information
 
 - [Alfajores Testnet Disclaimer](important-information/alfajores-testnet-disclaimer.md)
+- [Baklava Testnet Disclaimer](important-information/baklava-testnet-disclaimer.md)
+
