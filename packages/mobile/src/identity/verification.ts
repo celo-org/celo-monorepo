@@ -7,6 +7,7 @@ import {
 import { eqAddress } from '@celo/utils/src/address'
 import { extractAttestationCodeFromMessage } from '@celo/utils/src/attestations'
 import { compressedPubKey } from '@celo/utils/src/commentEncryption'
+import { TxPromises } from '@celo/walletkit'
 import { Platform } from 'react-native'
 import { Task } from 'redux-saga'
 import { all, call, delay, fork, put, race, select, take, takeEvery } from 'redux-saga/effects'
@@ -28,7 +29,7 @@ import {
 } from 'src/identity/actions'
 import { acceptedAttestationCodesSelector, attestationCodesSelector } from 'src/identity/reducer'
 import { startAutoSmsRetrieval } from 'src/identity/smsRetrieval'
-import { sendTransaction } from 'src/transactions/send'
+import { sendTransaction, sendTransactionPromises } from 'src/transactions/send'
 import Logger from 'src/utils/Logger'
 import { contractKit } from 'src/web3/contracts'
 import { getConnectedAccount, getConnectedUnlockedAccount } from 'src/web3/saga'
@@ -210,11 +211,6 @@ export function* requestAndRetrieveAttestations(
       account
     )
 
-    console.log('===delay start')
-    //TODO Figure out why getActionable fails without this delay
-    yield delay(10000)
-    console.log('===delay end')
-
     CeloAnalytics.track(CustomEventNames.verification_actionable_attestation_start)
     // Check if we have a sufficient set now by fetching the new total set
     attestations = yield call(
@@ -310,7 +306,14 @@ function* requestAttestations(
 
   const selectIssuersTx = attestationsWrapper.selectIssuers(e164Number)
 
-  yield call(sendTransaction, selectIssuersTx.txo, account, TAG, 'Select Issuer')
+  const txPromises: TxPromises = yield call(
+    sendTransactionPromises,
+    selectIssuersTx.txo,
+    account,
+    TAG,
+    'Select Issuer'
+  )
+  yield txPromises.receipt
 
   CeloAnalytics.track(CustomEventNames.verification_requested_attestations)
 }
@@ -428,7 +431,11 @@ function* revealAndCompleteAttestation(
     attestation.attestationServiceURL
   )
   if (!response.ok) {
-    throw new Error(`Error revealing to issuer. Status code: ${response.status}`)
+    throw new Error(
+      `Error revealing to issuer ${attestation.attestationServiceURL}. Status code: ${
+        response.status
+      }`
+    )
   }
 
   const code: AttestationCode = yield call(waitForAttestationCode, issuer)
