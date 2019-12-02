@@ -110,6 +110,7 @@ const stableTokenStub = {
   approve: null,
 }
 
+// TODO fix for off-chain reveal
 describe('Start Verification Saga', () => {
   beforeEach(() => {
     MockedAnalytics.startTracking.mockReset()
