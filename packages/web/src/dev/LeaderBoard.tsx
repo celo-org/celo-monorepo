@@ -5,9 +5,9 @@ import Racer from 'src/dev/Racer'
 import { H2, H3 } from 'src/fonts/Fonts'
 import { I18nProps, Trans, withNamespaces } from 'src/i18n'
 import Chevron, { Direction } from 'src/icons/chevron'
+import { CeloLinks } from 'src/shared/menu-items'
 import { colors, fonts, standardStyles, textStyles } from 'src/styles'
 import Button, { BTN, SIZE } from '../shared/Button.3'
-import { CeloLinks } from 'src/shared/menu-items'
 interface BoardProps {
   leaders: Competitor[]
 }
