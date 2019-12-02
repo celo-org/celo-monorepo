@@ -11,7 +11,8 @@ interface IVestingInstance {
   function withdrawLockedGold(uint256) external;
   function authorizeVoteSigner(address, uint8, bytes32, bytes32) external;
   function authorizeValidatorSigner(address, uint8, bytes32, bytes32) external;
-  function authorizeValidatorSigner(address, bytes calldata, uint8, bytes32, bytes32) external;
+  function authorizeValidatorSignerPubKey(address, bytes calldata, uint8, bytes32, bytes32)
+    external;
   function authorizeAttestationSigner(address, uint8, bytes32, bytes32) external;
   function createAccount() external;
   function setAccount(string calldata, bytes calldata, address) external;

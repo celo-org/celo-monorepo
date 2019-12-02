@@ -1,4 +1,5 @@
 import { CeloContractName } from '@celo/protocol/lib/registry-utils'
+import { getParsedSignatureOfAddress } from '@celo/protocol/lib/signing-utils'
 import {
   assertEqualBN,
   assertRevert,
@@ -7,6 +8,7 @@ import {
 } from '@celo/protocol/lib/test-utils'
 import { BigNumber } from 'bignumber.js'
 import * as _ from 'lodash'
+import { upperFirst } from 'lodash'
 import {
   AccountsContract,
   AccountsInstance,
@@ -29,6 +31,22 @@ import {
 import Web3 = require('web3')
 
 const ONE_GOLDTOKEN = new BigNumber('1000000000000000000')
+
+const authorizationTests: any = {}
+const authorizationTestDescriptions = {
+  voting: {
+    me: 'vote signing key',
+    subject: 'voteSigner',
+  },
+  validating: {
+    me: 'validator signing key',
+    subject: 'validatorSigner',
+  },
+  attesting: {
+    me: 'attestation signing key',
+    subject: 'attestationSigner',
+  },
+}
 
 interface IVestingSchedule {
   vestingBeneficiary: string
@@ -134,7 +152,8 @@ contract('Vesting', (accounts: string[]) => {
     await registry.setAddressFor(CeloContractName.Validators, mockValidators.address)
     await lockedGoldInstance.initialize(registry.address, UNLOCKING_PERIOD)
     await vestingFactoryInstance.initialize(registry.address)
-    await accountsInstance.createAccount()
+    await accountsInstance.initialize(registry.address)
+    await accountsInstance.createAccount({ from: beneficiary })
 
     // prefund the vesting factory instance with 2 gold tokens to simulate a well-funded core contract in the genesis block
     await goldTokenInstance.transfer(vestingFactoryInstance.address, ONE_GOLDTOKEN.times(2), {
@@ -910,6 +929,25 @@ contract('Vesting', (accounts: string[]) => {
         })
       )
     })
+
+    it('should set the name, dataEncryptionKey and walletAddress by beneficiary', async () => {
+      let isAccount = await accountsInstance.isAccount(vestingInstance.address)
+      assert.isFalse(isAccount)
+      await vestingInstance.setAccount(accountName, dataEncryptionKey, walletAddress, {
+        from: beneficiary,
+      })
+      isAccount = await accountsInstance.isAccount(vestingInstance.address)
+      assert.isTrue(isAccount)
+      const expectedWalletAddress = await accountsInstance.getWalletAddress(vestingInstance.address)
+      assert.equal(expectedWalletAddress, walletAddress)
+      // @ts-ignore
+      const expectedKey: string = await accountsInstance.getDataEncryptionKey(
+        vestingInstance.address
+      )
+      assert.equal(expectedKey, dataEncryptionKey)
+      const expectedName = await accountsInstance.getName(vestingInstance.address)
+      assert.equal(expectedName, accountName)
+    })
   })
 
   describe('#setAccountName', () => {
@@ -1088,6 +1126,135 @@ contract('Vesting', (accounts: string[]) => {
         vestingInstance.address
       )
       assert.equal(fetchedKey, longDataEncryptionKey)
+    })
+  })
+
+  Object.keys(authorizationTestDescriptions).forEach((key) => {
+    describe('authorization tests:', () => {
+      let authorizationTest: any
+      let vestingInstanceRegistryAddress: any
+      let vestingInstance: any
+
+      beforeEach(async () => {
+        await createNewVestingInstanceTx(vestingDefaultSchedule, registry.address, web3)
+        vestingInstanceRegistryAddress = await vestingFactoryInstance.hasVestedAt(beneficiary)
+        vestingInstance = await VestingInstance.at(vestingInstanceRegistryAddress)
+        await vestingInstance.createAccount({ from: beneficiary })
+
+        authorizationTests.voting = {
+          fn: vestingInstance.authorizeVoteSigner,
+          eventName: 'VoteSignerAuthorized',
+          getAuthorizedFromAccount: accountsInstance.getVoteSigner,
+          authorizedSignerToAccount: accountsInstance.voteSignerToAccount,
+        }
+        authorizationTests.validating = {
+          fn: vestingInstance.authorizeValidatorSigner,
+          eventName: 'ValidatorSignerAuthorized',
+          getAuthorizedFromAccount: accountsInstance.getValidatorSigner,
+          authorizedSignerToAccount: accountsInstance.validatorSignerToAccount,
+        }
+        authorizationTests.attesting = {
+          fn: vestingInstance.authorizeAttestationSigner,
+          eventName: 'AttestationSignerAuthorized',
+          getAuthorizedFromAccount: accountsInstance.getAttestationSigner,
+          authorizedSignerToAccount: accountsInstance.attestationSignerToAccount,
+        }
+
+        authorizationTest = authorizationTests[key]
+      })
+
+      describe(`#authorize${upperFirst(authorizationTestDescriptions[key].subject)}()`, () => {
+        const authorized = accounts[4] // the account that is to be authorized for whatever role
+        let sig: any
+
+        beforeEach(async () => {
+          sig = await getParsedSignatureOfAddress(web3, vestingInstance.address, authorized)
+        })
+
+        it(`should set the authorized ${authorizationTestDescriptions[key].me}`, async () => {
+          await authorizationTest.fn(authorized, sig.v, sig.r, sig.s, { from: beneficiary })
+          assert.equal(await accountsInstance.authorizedBy(authorized), vestingInstance.address)
+          assert.equal(
+            await authorizationTest.getAuthorizedFromAccount(vestingInstance.address),
+            authorized
+          )
+          assert.equal(
+            await authorizationTest.authorizedSignerToAccount(authorized),
+            vestingInstance.address
+          )
+        })
+
+        it(`should revert if the ${
+          authorizationTestDescriptions[key].me
+        } is an account`, async () => {
+          await accountsInstance.createAccount({ from: authorized })
+          await assertRevert(
+            authorizationTest.fn(authorized, sig.v, sig.r, sig.s, { from: beneficiary })
+          )
+        })
+
+        it(`should revert if the ${
+          authorizationTestDescriptions[key].me
+        } is already authorized`, async () => {
+          const otherAccount = accounts[5]
+          const otherSig = await getParsedSignatureOfAddress(
+            web3,
+            vestingInstance.address,
+            otherAccount
+          )
+          await accountsInstance.createAccount({ from: otherAccount })
+          await assertRevert(
+            authorizationTest.fn(otherAccount, otherSig.v, otherSig.r, otherSig.s, {
+              from: beneficiary,
+            })
+          )
+        })
+
+        it('should revert if the signature is incorrect', async () => {
+          const nonVoter = accounts[5]
+          const incorrectSig = await getParsedSignatureOfAddress(
+            web3,
+            vestingInstance.address,
+            nonVoter
+          )
+          await assertRevert(
+            authorizationTest.fn(authorized, incorrectSig.v, incorrectSig.r, incorrectSig.s, {
+              from: beneficiary,
+            })
+          )
+        })
+
+        describe('when a previous authorization has been made', () => {
+          const newAuthorized = accounts[6]
+          let newSig
+          beforeEach(async () => {
+            await authorizationTest.fn(authorized, sig.v, sig.r, sig.s, { from: beneficiary })
+            newSig = await getParsedSignatureOfAddress(web3, vestingInstance.address, newAuthorized)
+            await authorizationTest.fn(newAuthorized, newSig.v, newSig.r, newSig.s, {
+              from: beneficiary,
+            })
+          })
+
+          it(`should set the new authorized ${authorizationTestDescriptions[key].me}`, async () => {
+            assert.equal(
+              await accountsInstance.authorizedBy(newAuthorized),
+              vestingInstance.address
+            )
+            assert.equal(
+              await authorizationTest.getAuthorizedFromAccount(vestingInstance.address),
+              newAuthorized
+            )
+            assert.equal(
+              await authorizationTest.authorizedSignerToAccount(newAuthorized),
+              vestingInstance.address
+            )
+          })
+
+          it('should preserve the previous authorization', async () => {
+            assert.equal(await accountsInstance.authorizedBy(authorized), vestingInstance.address)
+          })
+        })
+      })
     })
   })
 })

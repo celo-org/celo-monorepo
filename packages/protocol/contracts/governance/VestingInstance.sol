@@ -274,7 +274,7 @@ contract VestingInstance is UsingRegistry, ReentrancyGuard, IVestingInstance {
    * @param v The recovery id of the incoming ECDSA signature.
    * @param r Output value r of the ECDSA signature.
    * @param s Output value s of the ECDSA signature.
-   * @dev To be called only by the beneficiary of the vesting. The v,r and s signature should be a signed message by the beneficiary being the the authorized address
+   * @dev To be called only by the beneficiary of the vesting.
    */
   function authorizeValidatorSigner(address signer, uint8 v, bytes32 r, bytes32 s)
     external
@@ -291,9 +291,9 @@ contract VestingInstance is UsingRegistry, ReentrancyGuard, IVestingInstance {
    * @param v The recovery id of the incoming ECDSA signature.
    * @param r Output value r of the ECDSA signature.
    * @param s Output value s of the ECDSA signature.
-   * @dev To be called only by the beneficiary of the vesting. The v,r and s signature should be a signed message by the beneficiary being the authorized address
+   * @dev To be called only by the beneficiary of the vesting.
    */
-  function authorizeValidatorSigner(
+  function authorizeValidatorSignerPubKey(
     address signer,
     bytes calldata ecdsaPublicKey,
     uint8 v,
@@ -309,7 +309,7 @@ contract VestingInstance is UsingRegistry, ReentrancyGuard, IVestingInstance {
    * @param v The recovery id of the incoming ECDSA signature.
    * @param r Output value r of the ECDSA signature.
    * @param s Output value s of the ECDSA signature.
-   * @dev To be called only by the beneficiary of the vesting. The v,r and s signature should be a signed message by the beneficiary being the authorized address
+   * @dev To be called only by the beneficiary of the vesting.
    */
   function authorizeAttestationSigner(address signer, uint8 v, bytes32 r, bytes32 s)
     external

@@ -284,7 +284,7 @@ export class VestingInstanceWrapper extends BaseWrapper<VestingInstance> {
       )
       return toTransactionObject(
         this.kit,
-        this.contract.methods.authorizeValidatorSigner(
+        this.contract.methods.authorizeValidatorSignerPubKey(
           signer,
           // @ts-ignore Typescript does not support overloading.
           pubKey,
@@ -298,7 +298,6 @@ export class VestingInstanceWrapper extends BaseWrapper<VestingInstance> {
         this.kit,
         this.contract.methods.authorizeValidatorSigner(
           signer,
-          '' as any, // TODO: FIX!!!
           proofOfSigningKeyPossession.v,
           proofOfSigningKeyPossession.r,
           proofOfSigningKeyPossession.s
