@@ -2,7 +2,7 @@
 
 Celo’s unique purpose is to make financial tools accessible to anyone with a mobile phone. One barrier for the usage of many other platforms is their required usage of 30+ hexadecimal-character-long strings as addresses. It’s like bank account numbers, but worse. Hard to remember, easy to mess up. They are so hard to use that the predominant way of exchanging addresses is usually via copy-paste over an existing messaging channel or via QR-codes in person. Both approaches are practically interactive protocols and thus not cover many use cases in which people would like to transact. Celo offers a lightweight identity layer that starts with a decentralized mapping of phone numbers to wallet addresses, allowing users to transact with one another via the most common identity scheme everyone is familiar with: their address book.
 
-![](https://storage.googleapis.com/celo-website/docs/verification-steps.png)
+![](https://storage.googleapis.com/celo-website/docs/attestations-flow.jpg)
 
 ### **Adding their phone number to the mapping**
 
