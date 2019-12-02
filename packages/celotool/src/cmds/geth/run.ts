@@ -144,7 +144,6 @@ export const handler = async (argv: RunArgv) => {
 
     gethArgs.push(
       '--mine',
-      '--minerthreads=10',
       `--miner.gasprice=${minerGasPrice}`,
       '--password=/dev/null',
       `--unlock=${minerAddress}`,
