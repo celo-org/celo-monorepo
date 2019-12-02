@@ -110,6 +110,8 @@ contract Election is
 
   event ValidatorGroupVoteRevoked(address indexed account, address indexed group, uint256 value);
 
+  event EpochRewardsDistributedToVoters();
+
   /**
    * @notice Initializes critical variables.
    * @param registryAddress The address of the registry contract.
