@@ -7,10 +7,11 @@ import { connect } from 'react-redux'
 import componentWithAnalytics from 'src/analytics/wrapper'
 import { Namespaces } from 'src/i18n'
 import { RootState } from 'src/redux/reducers'
-import { isAppConnected } from 'src/redux/selectors'
+import { isAppConnected, isAppSynced } from 'src/redux/selectors'
 
 interface StateProps {
   appConnected: boolean
+  appSynced: boolean
 }
 
 type Props = StateProps & WithNamespaces
@@ -18,6 +19,7 @@ type Props = StateProps & WithNamespaces
 const mapStateToProps = (state: RootState): StateProps => {
   return {
     appConnected: isAppConnected(state),
+    appSynced: isAppSynced(state),
   }
 }
 
@@ -25,25 +27,41 @@ class DisconnectBanner extends React.PureComponent<Props> {
   // This component is used in many screens but needs to remember when the app  been conneted.
   // This flag tracks that. Could move to redux but no need yet as it's the only consumer
   static hasAppConnected = false
+  static hasAppSynced = false
 
   componentDidUpdate() {
     if (this.props.appConnected && !DisconnectBanner.hasAppConnected) {
       DisconnectBanner.hasAppConnected = true
     }
+    if (this.props.appSynced && !DisconnectBanner.hasAppSynced) {
+      DisconnectBanner.hasAppSynced = true
+    }
   }
 
   render() {
-    const { t, appConnected } = this.props
+    const { t, appConnected, appSynced } = this.props
 
-    if (appConnected) {
+    // App's connected: show nothing
+    if (appConnected && appSynced) {
       return null
     }
 
-    return DisconnectBanner.hasAppConnected ? (
-      <Text style={[styles.text, styles.textRed]}>
-        <Text style={fontStyles.bold}>{t('poorConnection.0')}</Text> {t('poorConnection.1')}
-      </Text>
-    ) : (
+    // App's connected, was synced, and now resyncing to new blocks: show nothing
+    if (appConnected && !appSynced && DisconnectBanner.hasAppSynced) {
+      return null
+    }
+
+    // App's not connected but was before: show red banner
+    if (!appConnected && DisconnectBanner.hasAppConnected) {
+      return (
+        <Text style={[styles.text, styles.textRed]}>
+          <Text style={fontStyles.bold}>{t('poorConnection.0')}</Text> {t('poorConnection.1')}
+        </Text>
+      )
+    }
+
+    // App is connecting for first time, show grey banner
+    return (
       <Text style={[styles.text, styles.textGrey, fontStyles.bold]} testID="connectingToCeloBanner">
         {t('connectingToCelo')}
       </Text>

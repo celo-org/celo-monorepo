@@ -45,7 +45,7 @@ async function registerValidatorGroup(
   lockedGold: LockedGoldInstance,
   validators: ValidatorsInstance,
   privateKey: string,
-  numMembers: number
+  lockedGoldValue: BigNumber
 ) {
   // Validators can't also be validator groups, so we create a new account to register the
   // validator group with, and set the name of the group account to the private key of this account
@@ -58,11 +58,6 @@ async function registerValidatorGroup(
   const encryptionWeb3 = new Web3('http://localhost:8545')
   const encryptedPrivateKey = encryptionWeb3.eth.accounts.encrypt(account.privateKey, privateKey)
   const encodedKey = serializeKeystore(encryptedPrivateKey)
-
-  // Value is per-validator.
-  const lockedGoldValue = new BigNumber(config.validators.groupLockedGoldRequirements.value).times(
-    numMembers
-  )
 
   // Add a premium to cover tx fees
   const v = lockedGoldValue.times(1.01).toFixed()
@@ -93,7 +88,7 @@ async function registerValidatorGroup(
     to: validators.address,
   })
 
-  return [account, lockedGoldValue]
+  return account
 }
 
 async function registerValidator(
@@ -234,6 +229,27 @@ module.exports = async (_deployer: any, networkName: string) => {
     valKeyGroups.push(valKeys.slice(i, Math.min(i + maxGroupSize, valKeys.length)))
   }
 
+  if (valKeyGroups.length < 1) {
+    return
+  }
+
+  if (config.validators.votesRatioOfLastVsFirstGroup < 1) {
+    throw new Error(`votesRatioOfLastVsFirstGroup needs to be >= 1`)
+  }
+
+  // Calculate per validator locked gold for first group...
+  const lockedGoldPerValAtFirstGroup = new BigNumber(
+    config.validators.groupLockedGoldRequirements.value
+  )
+  // ...and the delta for each subsequent group
+  let lockedGoldPerValEachGroup = new BigNumber(0)
+  if (valKeyGroups.length > 1) {
+    lockedGoldPerValEachGroup = new BigNumber(config.validators.votesRatioOfLastVsFirstGroup - 1)
+      .times(lockedGoldPerValAtFirstGroup)
+      .div(valKeyGroups.length - 1)
+      .integerValue()
+  }
+
   let prevGroupAddress = NULL_ADDRESS
   for (const [idx, groupKeys] of valKeyGroups.entries()) {
     // Append an index to the group name if there is more than one group.
@@ -242,15 +258,23 @@ module.exports = async (_deployer: any, networkName: string) => {
       groupName += ` (${idx + 1})`
     }
 
-    console.info(`  Registering validator group: ${groupName} ...`)
-    const [groupAccount, groupLockedGoldValue] = await registerValidatorGroup(
+    // Calculate the LockedGold at this group
+    const groupLockedGoldValue = new BigNumber(lockedGoldPerValAtFirstGroup)
+      .plus(lockedGoldPerValEachGroup.times(idx))
+      .times(groupKeys.length)
+
+    console.info(
+      `  Registering validator group: ${groupName} with: ${groupLockedGoldValue} CG locked...`
+    )
+    const groupAccount = await registerValidatorGroup(
       groupName,
       accounts,
       lockedGold,
       validators,
       validator0Key,
-      groupKeys.length
+      groupLockedGoldValue
     )
+
     console.info(`  * Registering ${groupKeys.length} validators ...`)
     await Promise.all(
       groupKeys.map((key, i) => {
@@ -291,6 +315,7 @@ module.exports = async (_deployer: any, networkName: string) => {
       }
     }
 
+    // NB: Only the groups vote for themselves here. The validators do not vote.
     console.info('  * Group voting for itself ...')
     // @ts-ignore
     const voteTx = election.contract.methods.vote(
