@@ -86,7 +86,7 @@ const Engage = React.memo(function _Engage({ t, screen }: I18nProps & ScreenProp
             screen={screen}
             text={t('engage.tutorial.copy')}
             title={t('engage.tutorial.title')}
-            href="?todo"
+            href="https://docs.celo.org/getting-started/running-a-validator"
             btnText={t('engage.tutorial.btnText')}
             image={require('src/icons/download-dark.png')}
           />

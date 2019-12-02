@@ -5,12 +5,13 @@
   "aboutTheChallengeButton": "Get Involved",
   "expandLeaderboard": "Expand Leaderboard",
   "makeWithCelo": "Build Celo",
-  "makeWithCeloSubtitle": "Get a taste of Baklava, Celo’s incentivized testnet",
+  "makeWithCeloSubtitle":
+    "Get a taste of Baklava, Celo’s incentivized testnet, and participate in The Great Celo Stake Off",
   "greatStakeOff": "The Great Celo\nStake Off",
   "greatStakeOffSubtitle": "Win prizes by operating and hardening\nthe Baklava Testnet",
   "purposeTitle": "Purpose",
   "purposeText":
-    "Learn how to run a node on Celo’s peer-to-peer network and win up to <0>2 million Celo Gold in rewards.</0>*",
+    "Learn how to run a node on Celo’s peer-to-peer network and take a slice of up to <0>2 million Celo Gold in rewards.</0>*",
   "purposeAsterisk": "* subject to <0>Terms and Conditions</0>",
   "challengeTitle": "The Challenge",
   "challengeText":
