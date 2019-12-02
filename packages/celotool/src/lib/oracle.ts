@@ -1,3 +1,4 @@
+import { getFornoUrl } from 'src/lib/endpoints'
 import { envVar, fetchEnv } from 'src/lib/env-utils'
 import { installGenericHelmChart, removeGenericHelmChart } from 'src/lib/helm_deploy'
 
@@ -10,6 +11,9 @@ export async function installHelmChart(celoEnv: string) {
     helmChartPath,
     helmParameters(celoEnv)
   )
+}
+export async function removeHelmRelease(celoEnv: string) {
+  await removeGenericHelmChart(releaseName(celoEnv))
 }
 
 function helmParameters(celoEnv: string) {
