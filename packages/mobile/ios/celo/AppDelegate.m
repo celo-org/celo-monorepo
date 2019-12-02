@@ -12,11 +12,13 @@
 #import <React/RCTBridge.h>
 #import <React/RCTBundleURLProvider.h>
 #import <React/RCTRootView.h>
+#import <React/RCTLinkingManager.h>
 
 @import Firebase;
 #import "RNFirebaseNotifications.h"
 #import "RNFirebaseMessaging.h"
 #import "RNSplashScreen.h"
+
 
 // Use same key as react-native-secure-key-store
 // so we don't reset already working installs
@@ -93,4 +95,8 @@ fetchCompletionHandler:(nonnull void (^)(UIBackgroundFetchResult))completionHand
   [defaults synchronize];
 }
 
+- (BOOL)application:(UIApplication *)application openURL:(NSURL *)url sourceApplication:(NSString *)sourceApplication annotation:(id)annotation
+{
+  return [RCTLinkingManager application:application openURL:url sourceApplication:sourceApplication annotation:annotation];
+}
 @end

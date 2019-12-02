@@ -9,7 +9,6 @@ import Web3 from 'web3'
 import {
   assertAlmostEqual,
   getContext,
-  getEnode,
   GethInstanceConfig,
   importGenesis,
   initAndStartGeth,
@@ -238,7 +237,7 @@ describe('governance tests', () => {
           wsport: 8555,
           rpcport: 8557,
           privateKey: groupPrivateKey.slice(2),
-          peers: [await getEnode(8545)],
+          peers: [8545],
         },
       ]
       await Promise.all(
@@ -257,7 +256,7 @@ describe('governance tests', () => {
           port: 30315,
           wsport: 8559,
           privateKey: rotation0PrivateKey.slice(2),
-          peers: [await getEnode(8557)],
+          peers: [8557],
         },
         {
           name: 'validator2KeyRotation1',
@@ -267,7 +266,7 @@ describe('governance tests', () => {
           port: 30317,
           wsport: 8561,
           privateKey: rotation1PrivateKey.slice(2),
-          peers: [await getEnode(8557)],
+          peers: [8557],
         },
       ]
       await Promise.all(
