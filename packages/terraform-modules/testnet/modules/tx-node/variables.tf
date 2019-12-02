@@ -82,8 +82,3 @@ variable tx_node_count {
   type        = number
   description = "Number of tx-nodes to create"
 }
-
-variable verification_pool_url {
-  type        = string
-  description = "URL of the verification pool"
-}

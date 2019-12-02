@@ -1,13 +1,17 @@
 import { ContractKit, newKit } from '@celo/contractkit'
 import { FindOptions, Sequelize } from 'sequelize'
 import { fetchEnv } from './env'
+import { rootLogger } from './logger'
 import Attestation, { AttestationModel, AttestationStatic } from './models/attestation'
 
 export let sequelize: Sequelize | undefined
 
 export function initializeDB() {
   if (sequelize === undefined) {
-    sequelize = new Sequelize(fetchEnv('DATABASE_URL'))
+    sequelize = new Sequelize(fetchEnv('DATABASE_URL'), {
+      logging: (msg: string, sequelizeLogArgs: any) =>
+        rootLogger.debug({ sequelizeLogArgs, component: 'sequelize' }, msg),
+    })
     return sequelize.authenticate() as Promise<void>
   }
   return Promise.resolve()

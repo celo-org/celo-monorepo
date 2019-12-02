@@ -73,11 +73,11 @@ describe('kit.sendTransactionObject()', () => {
 
   test('should forward txoptions to txo.send()', async () => {
     const txo = txoStub()
-    await kit.sendTransactionObject(txo, { gas: 555, gasCurrency: 'XXX', from: '0xAAFFF' })
+    await kit.sendTransactionObject(txo, { gas: 555, feeCurrency: 'XXX', from: '0xAAFFF' })
     expect(txo.send).toBeCalledWith({
       gasPrice: '0',
       gas: 555,
-      gasCurrency: 'XXX',
+      feeCurrency: 'XXX',
       from: '0xAAFFF',
     })
   })

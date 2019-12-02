@@ -116,6 +116,15 @@ export function serializeSignature(signature: Signature) {
   return '0x' + serializedV + serializedR + serializedS
 }
 
+export function verifySignature(message: string, signature: string, signer: string) {
+  try {
+    parseSignature(message, signature, signer)
+    return true
+  } catch (error) {
+    return false
+  }
+}
+
 export function parseSignature(message: string, signature: string, signer: string) {
   return parseSignatureWithoutPrefix(hashMessageWithPrefix(message), signature, signer)
 }
@@ -167,7 +176,7 @@ function isValidSignature(signer: string, message: string, v: number, r: string,
       ethjsutil.toBuffer(s)
     )
     const retrievedAddress: string = ethjsutil.bufferToHex(ethjsutil.pubToAddress(publicKey))
-    return signer.toLowerCase() === retrievedAddress.toLowerCase()
+    return eqAddress(retrievedAddress, signer)
   } catch (err) {
     return false
   }
