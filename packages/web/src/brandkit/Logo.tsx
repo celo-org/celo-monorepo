@@ -236,10 +236,6 @@ const Backgrounds = withNamespaces(NameSpaces.brand)(function _Backgrounds({ t }
       </Text>
       <Text style={[fonts.p, styles.gap]}>{t('logo.colorBackgroundsText')}</Text>
 
-      <Text style={[styles.gap, fonts.p, standardStyles.elementalMargin]}>
-        {t('logo.backgroundDoNotAndDo')}
-      </Text>
-
       <TripplePairing
         first={
           <>
@@ -273,7 +269,9 @@ const Backgrounds = withNamespaces(NameSpaces.brand)(function _Backgrounds({ t }
           </>
         }
       />
-
+      <Text style={[styles.gap, fonts.p, standardStyles.elementalMargin]}>
+        {t('logo.backgroundDoNotAndDo')}
+      </Text>
       <TripplePairing
         first={
           <>

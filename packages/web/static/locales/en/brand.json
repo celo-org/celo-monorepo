@@ -27,13 +27,12 @@
     "spaceSizeTitle": "Space and Sizing",
     "sizeTitle": "Size",
     "sizeText":
-      "The logo and glyph should not appear smaller than their minimum height of 24 pixels on digital displays or 8mm in print..",
+      "The logo and glyph should not appear smaller than their minimum height of 24 pixels on digital displays or 8mm in print.",
     "clearspaceTitle": "Clearspace",
     "clearspaceText":
       "Clearspace is the protected area around the logo. This space must be kept free of all other graphics and text, including other logos. The Celo logo has allotted Clearspace based on the height of the “o” in Celo.  Please use the below image as a guide.",
     "backgroundsTitle": "Backgrounds",
-    "backgroundsTextTop":
-      "As a general rule of thumb, the Celo logo works best on the following three background colors.",
+    "backgroundsTextTop": "The Celo logo works best on these brand background colors.",
     "colorBackgroundsTitle": "Color Backgrounds",
     "colorBackgroundsText":
       "When it comes to applying the Celo brand to your own projects, the monochrome Celo logo works well on a variety of backgrounds. Use the dark logo on lighter backgrounds and the inverse logo on darker and more colorful backgrounds.",
@@ -68,7 +67,7 @@
       "The Celo fonts were intentionally chosen to speak to Celo’s Approachable and Academic brand principles. To honor both energies and compliment a broader range of expression, a serif and a sans serif font were chosen.",
     "facesTitle": "Typefaces",
     "facesText":
-      "Celo uses open-source fonts in order for community members to download, build, and design Celo branded material.\n\nRefer to the guidelines below when building a project on Celo.",
+      "Celo uses open-source fonts in order for community members to download, build, and design Celo branded material.\n\nRefer to the <0>philosophy</0> and guidelines below when building a project on Celo",
     "downloadAllBTN": "Download Fonts",
     "mainFontTitle": "This is Garamond,\nthe Celo brand typeface.",
     "mainFontText":
@@ -94,7 +93,7 @@
   "icons": {
     "title": "Icons",
     "license":
-      "All icons are licensed under a <0>Creative Commons License Attribution-NoDerivatives 4.0 International</0> (CC BY-ND 4.0).",
+      "All icons are licensed under a <0>Creative Commons Attribution-NoDerivatives 4.0 International License</0> (CC BY-ND 4.0).",
     "headline":
       "Used to simplify the complexities of Celo technology, icons are useful visual tools that can educate, clarify, and instruct in ways simple text can not.\n\nCelo icons have descriptions that act as guidelines. While some descriptions are specific, many icons have multiple meanings and we encourage the Celo community to find new culturally appropriate applications for them. "
   },

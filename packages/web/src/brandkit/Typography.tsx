@@ -7,10 +7,11 @@ import PageHeadline from 'src/brandkit/common/PageHeadline'
 import SectionTitle from 'src/brandkit/common/SectionTitle'
 import UseageExamples from 'src/brandkit/typography/UseageExample'
 import { H2, H3 } from 'src/fonts/Fonts'
-import { I18nProps, NameSpaces, withNamespaces } from 'src/i18n'
+import { I18nProps, NameSpaces, Trans, withNamespaces } from 'src/i18n'
 import { ScreenProps, ScreenSizes, withScreenSize } from 'src/layout/ScreenSize'
 import { hashNav } from 'src/shared/menu-items'
 import { fontInfo, fonts, standardStyles } from 'src/styles'
+import InlineAnchor from 'src/shared/InlineAnchor'
 const { brandTypography } = hashNav
 
 function getWeight(weight: string | undefined) {
@@ -48,7 +49,13 @@ const Overview = withNamespaces(NameSpaces.brand)(
         />
         <View style={brandStyles.gap}>
           <Text style={fonts.h5a}>{t('typography.facesTitle')}</Text>
-          <Text style={[fonts.p, standardStyles.elementalMargin]}>{t('typography.facesText')}</Text>
+          <Text style={[fonts.p, standardStyles.elementalMargin]}>
+            <Trans i18nKey={'typography.facesText'}>
+              <InlineAnchor href="https://medium.com/celohq/the-why-of-the-celo-coin-part-1-of-3-5e5701805847">
+                philosophy
+              </InlineAnchor>
+            </Trans>
+          </Text>
           <H2 style={styles.hero}>{t('typography.mainFontTitle')}</H2>
           <Text style={[fonts.p, standardStyles.elementalMarginBottom]}>
             {t('typography.mainFontText')}
@@ -107,7 +114,7 @@ const TypeScale = withNamespaces(NameSpaces.brand)(
                   ]}
                 >
                   <View style={styles.fontNameBox}>
-                    <Text style={typeface.font}>{typeface.name} </Text>
+                    <Text style={typeface.font}>{typeface.name}</Text>
                   </View>
                   <View
                     style={[
