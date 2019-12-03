@@ -23,7 +23,7 @@ export interface Validator {
   blsPublicKey: string
   affiliation: string | null
   score: BigNumber
-  signer: string
+  signer: Address
 }
 
 export interface ValidatorGroup {
