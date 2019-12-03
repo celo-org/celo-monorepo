@@ -13,7 +13,9 @@ Furthermore, these tools may want to include user chosen information such as nam
 
 On the `Accounts` smart contract, any account can register a URL under which their metadata file is available. The metadata file contains an unordered list of claims, signed by the account.
 
-ContractKit currently supports the following claims:
+## Types of Claim
+
+ContractKit currently supports the following types of claim:
 
 * **Name Claim** - An account can claim a human-readable name. This claim is not verifiable.
 
@@ -21,13 +23,13 @@ ContractKit currently supports the following claims:
 
 * **Keybase User Claim** - Accounts can make claims on [Keybase](https://keybase.io) usernames. This claim is verifiable by signing a message with the account and hosting it on the publicly accessible path of the Keybase file system.
 
-Future Claims we hope to support soon:
+In the future ContractKit may support other types of claim, including:
 
 * **Twitter User Claim** - Accounts can make claims on [Twitter](https://twitter.com/) usernames. This claim is verifiable by signing a message with the account and posting it as a tweet. Any client can verify the claim with a reference to the tweet in the claim.
 
 * **Domain Claim** - Accounts can make claims on domain names. This claim is verifiable by signing a message with the account and embedding it in a [TXT record](https://en.wikipedia.org/wiki/TXT_record).
 
-### Handling Metadata
+## Handling Metadata
 
 You can interact with metadata files easily through the [CLI](../../../command-line-interface/account.md), or in your own scripts, tools or DApps via [ContractKit](../../../developer-resources/contractkit/). Most commands require a node being available under `http://localhost:8545` to make view calls, and to modify metadata files, you'll need the relevant account to be unlocked to sign the files.
 
