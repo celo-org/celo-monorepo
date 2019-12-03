@@ -58,8 +58,8 @@ spec:
           containerPort: 3000
         resources:
           requests:
-            cpu: 100m
-            memory: 250Mi
+            cpu: 2
+            memory: 1Gi
     {{- with .Values.nodeSelector }}
       nodeSelector:
 {{ toYaml . | indent 8 }}
