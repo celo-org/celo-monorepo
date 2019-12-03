@@ -57,6 +57,7 @@ export enum CeloLinks {
   agreement = '/user-agreement',
   faq = '/faq',
   faucet = '/build/faucet',
+  iconsLicense = 'https://creativecommons.org/licenses/by-nd/4.0/legalcode',
   discord = 'https://discord.gg/6yWMkgM',
   discourse = 'https://forum.celo.org/',
   walletApp = '/build/wallet',

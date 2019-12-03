@@ -15,6 +15,8 @@
     "logoTitle": "Logo",
     "logoText":
       "The Celo logo is composed of a glyph and wordmark. All aspects of its construction are intentional, so please do not edit, change, distort, recolor, reconfigure, or rearrange the lockup of the logo.\n\nPlease use the full-color logo whenever possible.",
+    "license":
+      "The use of the Celo logo requires following the Celo Community Code of Conduct as provided <0>here.</0>",
     "glyphTitle": "Glyph",
     "glyphText":
       "Utilize the glyph when the full logo is too small to achieve maximum impact. It works best on Celo brand colors. Be sure to use the monochrome glyphs on other custom colors.",
@@ -91,8 +93,11 @@
   },
   "icons": {
     "title": "Icons",
+    "license":
+      "All icons are licensed under a <0>Creative Commons License Attribution-NoDerivatives 4.0 International</0> (CC BY-ND 4.0).",
     "headline":
       "Used to simplify the complexities of Celo technology, icons are useful visual tools that can educate, clarify, and instruct in ways simple text can not.\n\nCelo icons have descriptions that act as guidelines. While some descriptions are specific, many icons have multiple meanings and we encourage the Celo community to find new culturally appropriate applications for them. "
   },
-  "downloadAssetBtn": "Download"
+  "downloadAssetBtn": "Download",
+  "licenseTitle": "Usage & License Note"
 }
