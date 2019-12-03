@@ -23,6 +23,8 @@ COPY packages/protocol packages/protocol/
 COPY packages/contractkit packages/contractkit/
 COPY packages/attestation-service packages/attestation-service/
 
+ENV NODE_ENV production
+
 # build all
 RUN yarn build
 
