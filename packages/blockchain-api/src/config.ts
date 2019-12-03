@@ -14,10 +14,30 @@ function getSecrets(deployEnv: string) {
   return envSecrets
 }
 
+export function getFirebaseAdminCreds(admin: any) {
+  if (DEPLOY_ENV === 'local') {
+    try {
+      const serviceAccount = require('../serviceAccountKey.json')
+      return admin.credential.cert(serviceAccount)
+    } catch {
+      console.error(
+        'Error: Could not initialize admin credentials. Is serviceAccountKey.json missing?'
+      )
+    }
+  } else {
+    try {
+      return admin.credential.applicationDefault()
+    } catch (error) {
+      console.error('Error: Could not retrieve default app creds', error)
+    }
+  }
+}
+
 export const DEPLOY_ENV = (process.env.DEPLOY_ENV as string).toLowerCase()
 export const EXCHANGE_RATES_API = (process.env.EXCHANGE_RATES_API as string).toLowerCase()
 export const { EXCHANGE_RATES_API_ACCESS_KEY } = getSecrets(DEPLOY_ENV)
 export const BLOCKSCOUT_API = (process.env.BLOCKSCOUT_API as string).toLowerCase()
+export const FIREBASE_DB = process.env.FIREBASE_DB
 export const FAUCET_ADDRESS = (process.env.FAUCET_ADDRESS as string).toLowerCase()
 export const VERIFICATION_REWARDS_ADDRESS = (process.env
   .VERIFICATION_REWARDS_ADDRESS as string).toLowerCase()
