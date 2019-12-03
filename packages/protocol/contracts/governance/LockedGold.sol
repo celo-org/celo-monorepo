@@ -31,8 +31,6 @@ contract LockedGold is ILockedGold, ReentrancyGuard, Initializable, UsingRegistr
   }
 
   mapping(address => Balances) private balances;
-  // Maps voting and validating keys to the account that provided the authorization.
-  // Authorized addresses may not be reused.
   uint256 public totalNonvoting;
   uint256 public unlockingPeriod;
 
