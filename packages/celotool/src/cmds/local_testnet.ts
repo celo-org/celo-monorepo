@@ -7,7 +7,7 @@ export const command = 'local-testnet'
 export const describe = 'command to run a local testnet of geth instances'
 
 interface LocalTestnetArgs {
-  localpath?: string
+  localgeth?: string
   branch?: string
   validators: number
   txnodes: number
@@ -19,7 +19,7 @@ interface LocalTestnetArgs {
 
 export const builder = (argv: yargs.Argv) => {
   return argv
-    .option('localpath', {
+    .option('localgeth', {
       type: 'string',
       description: 'local path to celo-blockchain repository',
     })
@@ -167,9 +167,9 @@ export const handler = async (argv: LocalTestnetArgs) => {
       ...JSON.parse(argv.instances),
     ]),
     repository: {
-      path: argv.localpath || '/tmp/geth',
+      path: argv.localgeth || '/tmp/geth',
       branch: argv.branch,
-      remote: !argv.localpath,
+      remote: !argv.localgeth,
     },
   }
   const hooks = getHooks(gethConfig)
