@@ -3,6 +3,7 @@ import { ImageBackground, ImageRequireSource, StyleSheet, View } from 'react-nat
 import LogoDarkBg from 'src/logos/LogoDarkBg'
 import LogoLightBg from 'src/logos/LogoLightBg'
 import { colors, standardStyles } from 'src/styles'
+import AspectRatio from 'src/shared/AspectRatio'
 
 interface Props {
   image?: ImageRequireSource
@@ -29,27 +30,37 @@ export default React.memo(function LogoWithBackground({
 
   if (image) {
     return (
-      <ImageBackground
-        source={image}
-        style={[standardStyles.centered, hasBorder && styles.border, styles.box]}
-      >
-        {logo}
-      </ImageBackground>
+      <AspectRatio ratio={1}>
+        <ImageBackground
+          source={image}
+          style={[standardStyles.centered, hasBorder && styles.border, styles.box]}
+        >
+          {logo}
+        </ImageBackground>
+      </AspectRatio>
     )
   }
 
   return (
-    <View
-      style={[standardStyles.centered, styles.box, hasBorder && styles.border, { backgroundColor }]}
-    >
-      {logo}
-    </View>
+    <AspectRatio ratio={1}>
+      <View
+        style={[
+          standardStyles.centered,
+          styles.box,
+          hasBorder && styles.border,
+          { backgroundColor },
+        ]}
+      >
+        {logo}
+      </View>
+    </AspectRatio>
   )
 })
 
 const styles = StyleSheet.create({
   box: {
-    flexBasis: 230,
+    height: '100%',
+    width: '100%',
   },
   border: {
     borderWidth: 1,

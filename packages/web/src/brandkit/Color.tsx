@@ -142,7 +142,7 @@ const styles = StyleSheet.create({
     flex: 1,
     paddingVertical: 20,
     paddingHorizontal: 20,
-    minHeight: 150,
+    minHeight: 200,
   },
   column: {
     flex: 1,

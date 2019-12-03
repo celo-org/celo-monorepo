@@ -148,7 +148,6 @@ export const fontInfo: Record<string, TextStyle> = {
     lineHeight: 28,
     color: colors.dark,
   },
-  // called small in the style guide
   legal: {
     fontFamily: typeFaces.garamond,
     textRendering: 'geometricPrecision',
@@ -173,6 +172,12 @@ export const fontInfo: Record<string, TextStyle> = {
   micro: {
     fontFamily: typeFaces.futura,
     fontSize: 14,
+    color: colors.dark,
+    textRendering: 'geometricPrecision',
+  },
+  uiSmall: {
+    fontFamily: typeFaces.futura,
+    fontSize: 12,
     color: colors.dark,
     textRendering: 'geometricPrecision',
   },

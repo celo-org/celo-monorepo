@@ -93,7 +93,7 @@ const TypeScale = withNamespaces(NameSpaces.brand)(
               standardStyles.blockMarginBottom,
               brandStyles.gap,
               brandStyles.fullBorder,
-              styles.box,
+              screen === ScreenSizes.MOBILE ? styles.mobileBox : styles.box,
             ]}
           >
             {TYPEFACES.map((typeface, index) => {
@@ -140,6 +140,9 @@ const styles = StyleSheet.create({
   box: {
     padding: 30,
     flex: 1,
+  },
+  mobileBox: {
+    padding: 10,
   },
   fontInfo: {
     justifyContent: 'space-between',

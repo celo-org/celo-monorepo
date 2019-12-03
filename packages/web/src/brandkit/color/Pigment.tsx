@@ -117,16 +117,16 @@ function Pigment({ hex, name, onCopyHex, justCopied }: Props & ColorData) {
       </Hoverable>
       <View>
         <Text style={[fonts.h6, styles.title]}>{name}</Text>
-        <Text style={fonts.micro}>{hex}</Text>
-        <Text style={fonts.micro}>{hexToHumanRGB(hex)}</Text>
-        <Text style={fonts.micro}>{cmyk}</Text>
+        <Text style={fonts.uiSmall}>{hex}</Text>
+        <Text style={fonts.uiSmall}>{hexToHumanRGB(hex)}</Text>
+        <Text style={fonts.uiSmall}>{cmyk}</Text>
       </View>
     </View>
   )
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, minWidth: 155 },
+  container: { flex: 1, minWidth: 120 },
   transitions: {
     transitionDuration: '500ms',
   },

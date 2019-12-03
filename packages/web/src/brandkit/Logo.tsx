@@ -19,6 +19,7 @@ import AspectRatio from 'src/shared/AspectRatio'
 import Button, { BTN } from 'src/shared/Button.3'
 import { hashNav } from 'src/shared/menu-items'
 import { colors, fonts, standardStyles } from 'src/styles'
+import { Digital, Print } from 'src/brandkit/logo/Minimums'
 
 export default React.memo(function Logo() {
   return (
@@ -51,7 +52,11 @@ const Overview = withNamespaces(NameSpaces.brand)(
           <Text style={[fonts.p, standardStyles.elementalMarginBottom]}>
             {t('logo.overviewCopy')}
           </Text>
-          <Button kind={BTN.PRIMARY} text={t('logo.overviewBtn')} />
+          <Button
+            kind={BTN.PRIMARY}
+            text={t('logo.overviewBtn')}
+            href="/static/assets/CeloLogoPackage.zip"
+          />
           <View style={[standardStyles.centered, styles.fullScreenLogo]}>
             <LogoLightBg height={100} />
           </View>
@@ -65,28 +70,28 @@ const Overview = withNamespaces(NameSpaces.brand)(
             hasBorder={true}
             logoType={Logos.light}
             background={colors.white}
-            href="/todo"
+            href="/static/assets/CeloColorLogo.zip"
             caption={t('logo.fullColorOnLightCaption')}
           />
           <LogoExample
             hasBorder={false}
             logoType={Logos.dark}
             background={colors.dark}
-            href="/todo"
+            href="/static/assets/CeloColorLogoReverse.zip"
             caption={t('logo.fullColorOnDarkCaption')}
           />
           <LogoExample
             hasBorder={true}
             logoType={Logos.black}
             background={colors.white}
-            href="/todo"
+            href="/static/assets/CeloMonochromeLogo.zip"
             caption={t('logo.monochromeCaption')}
           />
           <LogoExample
             hasBorder={false}
             logoType={Logos.white}
             background={colors.dark}
-            href="/todo"
+            href="/static/assets/CeloMonochromeLogoReverse.zip"
             caption={t('logo.monochromeInverseCaption')}
           />
         </View>
@@ -95,7 +100,7 @@ const Overview = withNamespaces(NameSpaces.brand)(
             {t('logo.glyphTitle')}
           </Text>
           <Text style={fonts.p}>{t('logo.glyphText')}</Text>
-          <DownloadButton uri="/todo" />
+          <DownloadButton uri="/static/assets/CeloGlyphs.zip" />
           <View style={[styles.tiling, standardStyles.elementalMarginTop]}>
             <View
               style={[
@@ -181,18 +186,10 @@ const Clearspace = withNamespaces(NameSpaces.brand)(function _ClearSpace({ t }) 
         <Text style={[fonts.p, styles.gap]}>{t('logo.sizeText')}</Text>
         <View style={[styles.tiling, standardStyles.blockMarginTopMobile]}>
           <AspectRatio ratio={345 / 172} style={[styles.sizing, brandStyles.gap]}>
-            <Image
-              source={require('src/brandkit/images/digital-min.png')}
-              style={standardStyles.image}
-              resizeMode="contain"
-            />
+            <Digital />
           </AspectRatio>
           <AspectRatio ratio={345 / 172} style={[styles.sizing, brandStyles.gap]}>
-            <Image
-              source={require('src/brandkit/images/print-min.png')}
-              style={standardStyles.image}
-              resizeMode="contain"
-            />
+            <Print />
           </AspectRatio>
         </View>
       </View>
@@ -208,13 +205,13 @@ const Backgrounds = withNamespaces(NameSpaces.brand)(function _Backgrounds({ t }
       </View>
       <Palette colors={BACKGROUND_PALETTE} text={t('logo.backgroundsTextTop')} />
       <View style={[styles.tiling, standardStyles.elementalMarginBottom]}>
-        <View style={[styles.gap, styles.container]}>
+        <View style={[styles.gap, styles.container, styles.backgroundExample]}>
           <LogoWithBackground backgroundColor={colors.faintGray} type="light" />
         </View>
-        <View style={[styles.gap, styles.container]}>
+        <View style={[styles.gap, styles.container, styles.backgroundExample]}>
           <LogoWithBackground backgroundColor={colors.faintGold} type="light" />
         </View>
-        <View style={[styles.gap, styles.container]}>
+        <View style={[styles.gap, styles.container, styles.backgroundExample]}>
           <LogoWithBackground backgroundColor={colors.dark} type="dark" />
         </View>
       </View>
@@ -311,7 +308,6 @@ const Backgrounds = withNamespaces(NameSpaces.brand)(function _Backgrounds({ t }
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    minWidth: 200,
     paddingVertical: GAP,
   },
 
@@ -336,6 +332,9 @@ const styles = StyleSheet.create({
     flex: 1,
     minWidth: 280,
     marginVertical: GAP,
+  },
+  backgroundExample: {
+    minWidth: 145,
   },
   fullScreenLogo: { width: '100%', marginVertical: 100 },
 })
