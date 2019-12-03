@@ -1,4 +1,3 @@
-import SectionHeader from '@celo/react-components/components/SectionHead'
 import colors from '@celo/react-components/styles/colors'
 import { componentStyles } from '@celo/react-components/styles/styles'
 import variables from '@celo/react-components/styles/variables'
@@ -7,16 +6,16 @@ import { WithNamespaces, withNamespaces } from 'react-i18next'
 import { ScrollView, StyleSheet, View } from 'react-native'
 import SafeAreaView from 'react-native-safe-area-view'
 import { connect } from 'react-redux'
-import { getPaymentRequests } from 'src/account/selectors'
+import { getOutgoingPaymentRequests } from 'src/account/selectors'
 import { PaymentRequest } from 'src/account/types'
-import { updatePaymentRequestStatus } from 'src/firebase/actions'
+import { updatePaymentRequestNotified, updatePaymentRequestStatus } from 'src/firebase/actions'
 import i18n, { Namespaces } from 'src/i18n'
 import { fetchPhoneAddresses } from 'src/identity/actions'
 import { e164NumberToAddressSelector, E164NumberToAddressType } from 'src/identity/reducer'
 import { headerWithBackButton } from 'src/navigator/Headers'
+import OutgoingPaymentRequestListItem from 'src/paymentRequest/OutgoingPaymentRequestListItem'
 import PaymentRequestBalance from 'src/paymentRequest/PaymentRequestBalance'
 import PaymentRequestListEmpty from 'src/paymentRequest/PaymentRequestListEmpty'
-import PaymentRequestListItem from 'src/paymentRequest/PaymentRequestListItem'
 import { getRecipientFromPaymentRequest } from 'src/paymentRequest/utils'
 import { NumberToRecipient } from 'src/recipients/recipient'
 import { recipientCacheSelector } from 'src/recipients/reducer'
@@ -34,22 +33,23 @@ interface StateProps {
 
 interface DispatchProps {
   updatePaymentRequestStatus: typeof updatePaymentRequestStatus
+  updatePaymentRequestNotified: typeof updatePaymentRequestNotified
   fetchPhoneAddresses: typeof fetchPhoneAddresses
 }
 
 const mapStateToProps = (state: RootState): StateProps => ({
   dollarBalance: state.stableToken.balance,
-  paymentRequests: getPaymentRequests(state),
+  paymentRequests: getOutgoingPaymentRequests(state),
   e164PhoneNumberAddressMapping: e164NumberToAddressSelector(state),
   recipientCache: recipientCacheSelector(state),
 })
 
 type Props = WithNamespaces & StateProps & DispatchProps
 
-export class PaymentRequestListScreen extends React.Component<Props> {
+export class OutgoingPaymentRequestListScreen extends React.Component<Props> {
   static navigationOptions = () => ({
     ...headerWithBackButton,
-    headerTitle: i18n.t('paymentRequestFlow:paymentRequests'),
+    headerTitle: i18n.t('paymentRequestFlow:outgoingPaymentRequests'),
   })
 
   renderRequest = (request: PaymentRequest, key: number, allRequests: PaymentRequest[]) => {
@@ -58,10 +58,11 @@ export class PaymentRequestListScreen extends React.Component<Props> {
 
     return (
       <View key={key}>
-        <PaymentRequestListItem
+        <OutgoingPaymentRequestListItem
           id={request.uid || ''}
           amount={request.amount}
           updatePaymentRequestStatus={this.props.updatePaymentRequestStatus}
+          updatePaymentRequestNotified={this.props.updatePaymentRequestNotified}
           requester={requester}
           comment={request.comment}
         />
@@ -75,7 +76,6 @@ export class PaymentRequestListScreen extends React.Component<Props> {
       <SafeAreaView style={styles.container}>
         <DisconnectBanner />
         <PaymentRequestBalance dollarBalance={this.props.dollarBalance} />
-        <SectionHeader text={this.props.t('requests')} />
         {this.props.paymentRequests.length > 0 ? (
           <ScrollView>
             <View style={[componentStyles.roundedBorder, styles.scrollArea]}>
@@ -109,6 +109,7 @@ export default connect<StateProps, DispatchProps, {}, RootState>(
   mapStateToProps,
   {
     updatePaymentRequestStatus,
+    updatePaymentRequestNotified,
     fetchPhoneAddresses,
   }
-)(withNamespaces(Namespaces.paymentRequestFlow)(PaymentRequestListScreen))
+)(withNamespaces(Namespaces.paymentRequestFlow)(OutgoingPaymentRequestListScreen))
