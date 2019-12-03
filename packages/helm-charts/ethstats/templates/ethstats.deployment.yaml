@@ -52,7 +52,12 @@ spec:
             reserved: []
           };
           EOF
-          npm start
+          sed -i "s#networkName =.*#networkName = '{{ .Values.ethstats.network_name }}'#g" /celostats-server/src/js/celoConfig.js
+          sed -i "s#blockscoutUrl =.*#blockscoutUrl = '{{ .Values.ethstats.blockscout_url }}'#g" /celostats-server/src/js/celoConfig.js
+          grunt --configPath=/celostats-server/src/js/celoConfig.js
+          while true; do
+            timeout 600 npm start
+          done
         ports:
         - name: http
           containerPort: 3000

@@ -56,6 +56,7 @@ async function helmParameters(
   blockscoutDBPassword: string,
   blockscoutDBConnectionName: string
 ) {
+  // TODO: Refactor using envVar
   const params = [
     `--set domain.name=${fetchEnv('CLUSTER_DOMAIN_NAME')}`,
     `--set blockscout.image.repository=${fetchEnv('BLOCKSCOUT_DOCKER_IMAGE_REPOSITORY')}`,

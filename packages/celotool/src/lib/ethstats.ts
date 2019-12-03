@@ -1,12 +1,18 @@
 import { installGenericHelmChart, removeGenericHelmChart } from 'src/lib/helm_deploy'
 import { execCmdWithExitOnFailure } from 'src/lib/utils'
+import { getBlockscoutUrl } from 'src/lib/endpoints'
 import { envVar, fetchEnv, fetchEnvOrFallback } from './env-utils'
 import { AccountType, getAddressesFor } from './generate_utils'
 
 const helmChartPath = '../helm-charts/ethstats'
 
 export async function installHelmChart(celoEnv: string) {
-  return installGenericHelmChart(celoEnv, releaseName(celoEnv), helmChartPath, helmParameters())
+  return installGenericHelmChart(
+    celoEnv,
+    releaseName(celoEnv),
+    helmChartPath,
+    helmParameters(celoEnv)
+  )
 }
 
 export async function removeHelmRelease(celoEnv: string) {
@@ -18,7 +24,7 @@ export async function upgradeHelmChart(celoEnv: string) {
 
   const upgradeCmdArgs = `${releaseName(
     celoEnv
-  )} ${helmChartPath} --namespace ${celoEnv} ${helmParameters().join(' ')}`
+  )} ${helmChartPath} --namespace ${celoEnv} ${helmParameters(celoEnv).join(' ')}`
 
   if (process.env.CELOTOOL_VERBOSE === 'true') {
     await execCmdWithExitOnFailure(`helm upgrade --debug --dry-run ${upgradeCmdArgs}`)
@@ -27,13 +33,15 @@ export async function upgradeHelmChart(celoEnv: string) {
   console.info(`Helm release ${releaseName(celoEnv)} upgrade successful`)
 }
 
-function helmParameters() {
+function helmParameters(celoEnv: string) {
   return [
     `--set domain.name=${fetchEnv(envVar.CLUSTER_DOMAIN_NAME)}`,
     `--set ethstats.image.repository=${fetchEnv(envVar.ETHSTATS_DOCKER_IMAGE_REPOSITORY)}`,
     `--set ethstats.image.tag=${fetchEnv(envVar.ETHSTATS_DOCKER_IMAGE_TAG)}`,
     `--set ethstats.trusted_addresses='{${generateAuthorizedAddresses()}}'`,
     `--set ethstats.banned_addresses='{${fetchEnv(envVar.ETHSTATS_BANNED_ADDRESSES)}}'`,
+    `--set ethstats.network_name='Celo ${fetchEnv(envVar.BLOCKSCOUT_SUBNETWORK_NAME)}'`,
+    `--set ethstats.blockscout_url='${getBlockscoutUrl(celoEnv)}'`,
   ]
 }
 
