@@ -1,5 +1,4 @@
 import BigNumber from 'bignumber.js'
-import { FetchMock } from 'jest-fetch-mock'
 import { Linking } from 'react-native'
 import SendIntentAndroid from 'react-native-send-intent'
 import { expectSaga } from 'redux-saga-test-plan'
@@ -30,7 +29,6 @@ import { getConnectedUnlockedAccount, getOrCreateAccount } from 'src/web3/saga'
 import { createMockStore, mockContractKitBalance, mockContractKitContract } from 'test/utils'
 import { mockAccount, mockE164Number, mockName } from 'test/values'
 
-const mockFetch = fetch as FetchMock
 const mockKey = '0x1129eb2fbccdc663f4923a6495c35b096249812b589f7c4cd1dba01e1edaf724'
 const mockBalance = jest.fn()
 
@@ -53,9 +51,7 @@ jest.mock('@celo/walletkit', () => {
 
 jest.mock('src/utils/dynamicLink', () => ({
   ...jest.requireActual('src/utils/dynamicLink'),
-  generateDynamicShortLink: jest.fn(async (x) =>
-    jest.requireActual('src/utils/dynamicLink').generateDynamicShortLink(x)
-  ),
+  generateDynamicShortLink: jest.fn(async (x) => 'htttp://celo.page.link/PARAMS'),
 }))
 
 jest.mock('src/account/actions', () => ({
@@ -106,12 +102,6 @@ const state = createMockStore({ web3: { account: mockAccount } }).getState()
 describe.skip(watchSendInvite, () => {
   beforeAll(() => {
     jest.useRealTimers()
-
-    mockFetch.mockResponse(
-      JSON.stringify({
-        shortLink: 'htttp://celo.page.link/PARAMS',
-      })
-    )
   })
 
   it('sends an SMS invite as expected', async () => {
@@ -221,9 +211,13 @@ describe(generateLink, () => {
     expect(result.code).toBe(mockKey)
 
     expect(result.link).toBe('htttp://celo.page.link/PARAMS')
+
     expect(generateDynamicShortLink).toBeCalledTimes(1)
     expect(generateDynamicShortLink).toHaveBeenCalledWith(
-      'https://play.google.com/store/apps/details?id=org.celo.mobile.alfajores&referrer=invite-code%3DjaH%2F%2FWBe2sXW1tcVml1xJ%2BYI684RnjzlVU5XVOCX3zg%3D'
+      'https://play.google.com/store/apps/details?id=org.celo.mobile.alfajores&referrer=invite-code%3D0x1129eb2fbccdc663f4923a6495c35b096249812b589f7c4cd1dba01e1edaf724',
+      'http://play.google.com/store/apps/details?id=org.celo.mobile.integration',
+      'org.celo.mobile.alfajores',
+      'org.celo.mobile.debug'
     )
   })
 })
