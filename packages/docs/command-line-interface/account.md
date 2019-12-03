@@ -15,12 +15,15 @@ USAGE
 OPTIONS
   -r, --role=vote|validator|attestation                (required) Role to delegate
   --from=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d    (required) Account Address
-  --pop=pop                                            (required) Proof-of-possession of the signer key
+
+  --signature=signature                                (required) Signature (a.k.a proof-of-possession) of the signer
+                                                       key
+
   --signer=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) Account Address
 
 EXAMPLE
   authorize --from 0x5409ED021D9299bf6814279A6A1411A7e866A631 --role vote --signer
-  0x6ecbe1db9ef729cbe972c83fb886247691fb6beb --pop
+  0x6ecbe1db9ef729cbe972c83fb886247691fb6beb --signature
   0x1b9fca4bbb5bfb1dbe69ef1cddbd9b4202dcb6b134c5170611e1e36ecfa468d7b46c85328d504934fce6c2a1571603a50ae224d2b32685e84d4d
   1a1eebad8452eb
 ```
@@ -289,6 +292,20 @@ EXAMPLE
 ```
 
 _See code: [packages/cli/src/commands/account/set-name.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/account/set-name.ts)_
+
+### Show
+
+Show information for an account, including name, authorized vote, validator, and attestation signers, the URL at which account metadata is hosted, the address the account is using with the mobile wallet, and a public key that can be used to encrypt information for the account.
+
+```
+USAGE
+  $ celocli account:show ADDRESS
+
+EXAMPLE
+  show 0x5409ed021d9299bf6814279a6a1411a7e866a631
+```
+
+_See code: [packages/cli/src/commands/account/show.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/account/show.ts)_
 
 ### Show-metadata
 

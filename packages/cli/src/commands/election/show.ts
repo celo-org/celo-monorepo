@@ -24,7 +24,10 @@ export default class ElectionShow extends BaseCommand {
     Args.address('address', { description: "Voter or Validator Groups's address" }),
   ]
 
-  static examples = ['show 0x97f7333c51897469E8D98E7af8653aAb468050a3']
+  static examples = [
+    'show 0x97f7333c51897469E8D98E7af8653aAb468050a3 --voter',
+    'show 0x97f7333c51897469E8D98E7af8653aAb468050a3 --group',
+  ]
 
   async run() {
     const res = this.parse(ElectionShow)
@@ -43,6 +46,8 @@ export default class ElectionShow extends BaseCommand {
         .runChecks()
       const voter = await election.getVoter(address)
       printValueMapRecursive(voter)
+    } else {
+      throw Error('Must select --voter or --group')
     }
   }
 }

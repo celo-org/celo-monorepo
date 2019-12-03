@@ -12,12 +12,26 @@ import {
   takeEvery,
   takeLeading,
 } from 'redux-saga/effects'
-import { PaymentRequest, PaymentRequestStatus, updatePaymentRequests } from 'src/account'
+import {
+  PaymentRequest,
+  PaymentRequestStatus,
+  updateIncomingPaymentRequests,
+  updateOutgoingPaymentRequests,
+} from 'src/account'
+import {
+  UpdateIncomingPaymentRequestsAction,
+  UpdateOutgoingPaymentRequestsAction,
+} from 'src/account/actions'
 import { showError } from 'src/alert/actions'
 import { Actions as AppActions, SetLanguage } from 'src/app/actions'
 import { ErrorMessages } from 'src/app/ErrorMessages'
 import { FIREBASE_ENABLED } from 'src/config'
-import { Actions, firebaseAuthorized, UpdatePaymentRequestStatusAction } from 'src/firebase/actions'
+import {
+  Actions,
+  firebaseAuthorized,
+  UpdatePaymentRequestNotifiedAction,
+  UpdatePaymentRequestStatusAction,
+} from 'src/firebase/actions'
 import {
   initializeAuth,
   initializeCloudMessaging,
@@ -31,7 +45,10 @@ import { currentAccountSelector } from 'src/web3/selectors'
 const TAG = 'firebase/saga'
 const REQUEST_DB = 'pendingRequests'
 const REQUESTEE_ADDRESS = 'requesteeAddress'
+const REQUESTER_ADDRESS = 'requesterAddress'
 const VALUE = 'value'
+
+type ADDRESS_KEY_FIELD = typeof REQUESTEE_ADDRESS | typeof REQUESTER_ADDRESS
 
 let firebaseAlreadyAuthorized = false
 export function* waitForFirebaseAuth() {
@@ -72,7 +89,7 @@ function* initializeFirebase() {
   }
 }
 
-function createPaymentRequestChannel(address: string) {
+function createPaymentRequestChannel(address: string, addressKeyField: ADDRESS_KEY_FIELD) {
   const errorCallback = (error: Error) => {
     Logger.warn(TAG, error.toString())
   }
@@ -88,7 +105,7 @@ function createPaymentRequestChannel(address: string) {
       firebase
         .database()
         .ref(REQUEST_DB)
-        .orderByChild(REQUESTEE_ADDRESS)
+        .orderByChild(addressKeyField)
         .equalTo(address)
         .off(VALUE, emitter)
     }
@@ -96,7 +113,7 @@ function createPaymentRequestChannel(address: string) {
     firebase
       .database()
       .ref(REQUEST_DB)
-      .orderByChild(REQUESTEE_ADDRESS)
+      .orderByChild(addressKeyField)
       .equalTo(address)
       .on(VALUE, emitter, errorCallback)
     return cancel
@@ -109,10 +126,15 @@ const compareTimestamps = (a: PaymentRequest, b: PaymentRequest) => {
 
 const onlyRequested = (pr: PaymentRequest) => pr.status === PaymentRequestStatus.REQUESTED
 
-function* subscribeToPaymentRequests() {
+function* subscribeToPaymentRequests(
+  addressKeyField: ADDRESS_KEY_FIELD,
+  updatePaymentRequestsActionCreator: (
+    paymentRequests: PaymentRequest[]
+  ) => UpdateIncomingPaymentRequestsAction | UpdateOutgoingPaymentRequestsAction
+) {
   yield all([call(waitForFirebaseAuth), call(getAccount)])
   const address = yield select(currentAccountSelector)
-  const paymentRequestChannel = yield createPaymentRequestChannel(address)
+  const paymentRequestChannel = yield createPaymentRequestChannel(address, addressKeyField)
   while (true) {
     try {
       const paymentRequestsObject = yield take(paymentRequestChannel)
@@ -123,7 +145,7 @@ function* subscribeToPaymentRequests() {
         }))
         .sort(compareTimestamps)
         .filter(onlyRequested)
-      yield put(updatePaymentRequests(paymentRequests))
+      yield put(updatePaymentRequestsActionCreator(paymentRequests))
     } catch (error) {
       Logger.error(`${TAG}@subscribeToPaymentRequests`, error)
     } finally {
@@ -134,9 +156,17 @@ function* subscribeToPaymentRequests() {
   }
 }
 
+function* subscribeToIncomingPaymentRequests() {
+  yield subscribeToPaymentRequests(REQUESTEE_ADDRESS, updateIncomingPaymentRequests)
+}
+
+function* subscribeToOutgoingPaymentRequests() {
+  yield subscribeToPaymentRequests(REQUESTER_ADDRESS, updateOutgoingPaymentRequests)
+}
+
 function* updatePaymentRequestStatus({ id, status }: UpdatePaymentRequestStatusAction) {
   try {
-    Logger.debug(TAG, 'Updating payment request', id, status)
+    Logger.debug(TAG, 'Updating payment request', id, `status: ${status}`)
     yield call(() =>
       firebase
         .database()
@@ -145,12 +175,33 @@ function* updatePaymentRequestStatus({ id, status }: UpdatePaymentRequestStatusA
     )
     Logger.debug(TAG, 'Payment request status updated', id)
   } catch (error) {
+    yield put(showError(ErrorMessages.PAYMENT_REQUEST_UPDATE_FAILED))
     Logger.error(TAG, `Error while updating payment request ${id} status`, error)
   }
 }
 
 export function* watchPaymentRequestStatusUpdates() {
   yield takeLeading(Actions.PAYMENT_REQUEST_UPDATE_STATUS, updatePaymentRequestStatus)
+}
+
+function* updatePaymentRequestNotified({ id, notified }: UpdatePaymentRequestNotifiedAction) {
+  try {
+    Logger.debug(TAG, 'Updating payment request', id, `notified: ${notified}`)
+    yield call(() =>
+      firebase
+        .database()
+        .ref(`${REQUEST_DB}/${id}`)
+        .update({ notified })
+    )
+    Logger.debug(TAG, 'Payment request notified updated', id)
+  } catch (error) {
+    yield put(showError(ErrorMessages.PAYMENT_REQUEST_UPDATE_FAILED))
+    Logger.error(TAG, `Error while updating payment request ${id} status`, error)
+  }
+}
+
+export function* watchPaymentRequestNotifiedUpdates() {
+  yield takeLeading(Actions.PAYMENT_REQUEST_UPDATE_NOTIFIED, updatePaymentRequestNotified)
 }
 
 export function* syncLanguageSelection({ language }: SetLanguage) {
@@ -174,7 +225,9 @@ export function* watchWritePaymentRequest() {
 export function* firebaseSaga() {
   yield spawn(initializeFirebase)
   yield spawn(watchLanguage)
-  yield spawn(subscribeToPaymentRequests)
+  yield spawn(subscribeToIncomingPaymentRequests)
+  yield spawn(subscribeToOutgoingPaymentRequests)
   yield spawn(watchPaymentRequestStatusUpdates)
+  yield spawn(watchPaymentRequestNotifiedUpdates)
   yield spawn(watchWritePaymentRequest)
 }
