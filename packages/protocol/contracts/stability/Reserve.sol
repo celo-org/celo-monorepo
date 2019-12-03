@@ -56,7 +56,7 @@ contract Reserve is IReserve, Ownable, Initializable, UsingRegistry, ReentrancyG
   /**
    * @notice Initializes critical variables.
    * @param registryAddress The address of the registry contract.
-   * @param _tobinTaxStalenessThreshold The initial number of seconds to cache the tobin tax value for.
+   * @param _tobinTaxStalenessThreshold The initial number of seconds to cache tobin tax value for.
    */
   function initialize(address registryAddress, uint256 _tobinTaxStalenessThreshold)
     external
