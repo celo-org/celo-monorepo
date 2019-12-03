@@ -19,3 +19,7 @@ export function getBlockchainApiUrl(celoEnv: string) {
 export function getGenesisGoogleStorageUrl(celoEnv: string) {
   return `https://www.googleapis.com/storage/v1/b/genesis_blocks/o/${celoEnv}?alt=media`
 }
+
+export function getFornoUrl(celoEnv: string) {
+  return `https://${celoEnv}-forno.${fetchEnv(envVar.CLUSTER_DOMAIN_NAME)}.org`
+}
