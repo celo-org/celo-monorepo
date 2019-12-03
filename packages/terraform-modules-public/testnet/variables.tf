@@ -104,36 +104,6 @@ variable validator_account_passwords {
   description = "Array with the Validator etherbase account passwords"
 }
 
-variable txnode_account_addresses {
-  type        = list(string)
-  description = "Array with the TX node etherbase account addresses"
-}
-
-variable txnode_private_keys {
-  type        = list(string)
-  description = "Array with the TX node etherbase account private keys"
-}
-
-variable txnode_account_passwords {
-  type        = list(string)
-  description = "Array with the TX node etherbase account passwords"
-}
-
-variable proxy_account_addresses {
-  type        = list(string)
-  description = "Array with the Proxy etherbase account addresses"
-}
-
-variable proxy_account_passwords {
-  type        = list(string)
-  description = "Array with the Proxy etherbase account passwords"
-}
-
-variable proxy_private_keys {
-  type        = list(string)
-  description = "Array with the Proxy etherbase account private keys"
-}
-
 variable proxy_enodes {
   type        = list(string)
   description = "Array list with the proxy enode address (without enode://)"

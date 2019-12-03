@@ -68,21 +68,6 @@ variable tx_node_count {
   description = "Number of tx-nodes to create"
 }
 
-variable txnode_account_addresses {
-  type        = list(string)
-  description = "Array with the TX node etherbase account addresses"
-}
-
-variable txnode_private_keys {
-  type        = list(string)
-  description = "Array with the TX node etherbase account private keys"
-}
-
-variable txnode_account_passwords {
-  type        = list(string)
-  description = "Array with the TX node etherbase account passwords"
-}
-
 variable bootnode_enode_address {
   type        = string
   description = "Network bootnode enode address"

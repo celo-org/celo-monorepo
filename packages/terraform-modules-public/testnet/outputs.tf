@@ -14,6 +14,6 @@ output tx_node_lb_ip_address {
 //   value = module.validator.internal_ip_addresses
 // }
 
-output "mnemonic" {
-  value = module.accounts.mnemonic
-}
+// output "mnemonic" {
+//   value = module.accounts.mnemonic
+// }

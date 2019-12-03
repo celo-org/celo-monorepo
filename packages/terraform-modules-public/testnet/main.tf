@@ -28,8 +28,8 @@ data "http" "genesis" {
 }
 
 data "http" "static-nodes" {
-  // url = "https://storage.googleapis.com/static_nodes/${var.celo_env}"
-  url = "https://storage.googleapis.com/javier_cortejoso/baklavastaging"
+  url = "https://storage.googleapis.com/static_nodes/${var.celo_env}"
+  // url = "https://storage.googleapis.com/javier_cortejoso/baklavastaging"
 
   request_headers = {
     "Accept" = "application/json"
@@ -153,9 +153,6 @@ module "tx_node" {
   network_name                          = var.network_name
   tx_node_count                         = var.tx_node_count
 
-  txnode_account_addresses = var.txnode_account_addresses
-  txnode_private_keys      = var.txnode_private_keys
-  txnode_account_passwords = var.txnode_account_passwords
   bootnode_enode_address   = var.bootnode_enode_address
 }
 
@@ -190,10 +187,7 @@ module "proxy" {
   validator_count                       = var.validator_count
   reset_geth_data                       = var.reset_geth_data
 
-  proxy_account_addresses     = var.proxy_account_addresses
-  proxy_private_keys          = var.proxy_private_keys
   proxy_private_node_keys     = var.proxy_private_node_keys
-  proxy_account_passwords     = var.proxy_account_passwords
   validator_account_addresses = var.validator_account_addresses
   bootnode_enode_address      = var.bootnode_enode_address
   static_nodes_base64         = base64encode(data.http.static-nodes.body)
@@ -254,6 +248,6 @@ module "attestation-service" {
   twilio_blacklist                            = var.attestation_service_twilio_blacklist
 }
 
-module "accounts" {
-  source = "./modules/accounts"
-}
+// module "accounts" {
+//   source = "./modules/accounts"
+// }

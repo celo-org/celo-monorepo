@@ -59,10 +59,6 @@ systemctl restart docker
 
 GETH_NODE_DOCKER_IMAGE=${geth_node_docker_image_repository}:${geth_node_docker_image_tag}
 
-ACCOUNT_ADDRESS=${validator_account_address}
-echo "Address: $ACCOUNT_ADDRESS"
-echo "Private Key: ${proxy_private_key}"
-
 echo "Bootnode enode address: ${bootnode_enode_address}"
 
 BOOTNODE_ENODE=${bootnode_enode_address}@${bootnode_ip_address}:30301
@@ -79,11 +75,8 @@ echo -n '${genesis_content_base64}' | base64 -d > $DATA_DIR/genesis.json
 echo -n '${static_nodes_base64}' | base64 -d > $DATA_DIR/static-nodes.json
 echo -n '${rid}' > $DATA_DIR/replica_id
 echo -n '${ip_address}' > $DATA_DIR/ipAddress
-echo -n '${proxy_private_key}' > $DATA_DIR/pkey
-echo -n '${proxy_account_address}' > $DATA_DIR/address
 echo -n '${bootnode_enode_address}' > $DATA_DIR/bootnodeEnodeAddress
 echo -n '$BOOTNODE_ENODE' > $DATA_DIR/bootnodeEnode
-echo -n '${proxy_geth_account_secret}' > $DATA_DIR/account/accountSecret
 echo -n '${proxy_private_node_key}' > $DATA_DIR/pkey
 
 echo "Starting geth..."
@@ -97,7 +90,7 @@ docker run \
   -v $DATA_DIR:$DATA_DIR \
   --entrypoint /bin/sh \
   -i $GETH_NODE_DOCKER_IMAGE \
-  -c "geth init $DATA_DIR/genesis.json && geth account import --password $DATA_DIR/account/accountSecret $DATA_DIR/pkey | true"
+  -c "geth init $DATA_DIR/genesis.json"
 
 cat <<EOF >/etc/systemd/system/geth.service
 [Unit]

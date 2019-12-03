@@ -34,9 +34,6 @@ DATA_DIR=/root/.celo
 
 GETH_NODE_DOCKER_IMAGE=${geth_node_docker_image_repository}:${geth_node_docker_image_tag}
 
-echo "Address: ${txnode_account_address}"
-echo "Private Key: ${txnode_private_key}"
-
 echo "Bootnode enode address: ${bootnode_enode_address}"
 
 BOOTNODE_ENODE=${bootnode_enode_address}@${bootnode_ip_address}:30301
@@ -52,11 +49,8 @@ mkdir -p $DATA_DIR/account
 echo -n '${genesis_content_base64}' | base64 -d > $DATA_DIR/genesis.json
 echo -n '${rid}' > $DATA_DIR/replica_id
 echo -n '${ip_address}' > $DATA_DIR/ipAddress
-echo -n '${txnode_private_key}' > $DATA_DIR/pkey
-echo -n '${txnode_account_address}' > $DATA_DIR/address
 echo -n '${bootnode_enode_address}' > $DATA_DIR/bootnodeEnodeAddress
 echo -n '$BOOTNODE_ENODE' > $DATA_DIR/bootnodeEnode
-echo -n '${txnode_geth_account_secret}' > $DATA_DIR/account/accountSecret
 
 
 echo "Starting geth..."
@@ -67,7 +61,7 @@ docker run \
   -v $DATA_DIR:$DATA_DIR \
   --entrypoint /bin/sh \
   -i $GETH_NODE_DOCKER_IMAGE \
-  -c "geth init $DATA_DIR/genesis.json && geth account import --password $DATA_DIR/account/accountSecret $DATA_DIR/pkey | true"
+  -c "geth init $DATA_DIR/genesis.json"
 
 cat <<EOF >/etc/systemd/system/geth.service
 [Unit]
@@ -98,8 +92,6 @@ ExecStart=/usr/bin/docker run \\
       --wsaddr 0.0.0.0 \\
       --wsorigins=* \\
       --wsapi=eth,net,web3,debug \\
-      --nodekey=$DATA_DIR/pkey \\
-      --etherbase=$ACCOUNT_ADDRESS \\
       --networkid=${network_id} \\
       --syncmode=full \\
       --consoleformat=json \\
