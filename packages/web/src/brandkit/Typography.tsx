@@ -13,8 +13,8 @@ import { hashNav } from 'src/shared/menu-items'
 import { fontInfo, fonts, standardStyles } from 'src/styles'
 const { brandTypography } = hashNav
 
-function getWeight(number) {
-  switch (number) {
+function getWeight(weight: string | undefined) {
+  switch (weight) {
     case '500':
       return 'Medium'
     case '400':
@@ -22,7 +22,7 @@ function getWeight(number) {
     case undefined:
       return 'Regular'
     default:
-      return number
+      return weight
   }
 }
 

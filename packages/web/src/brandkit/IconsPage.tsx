@@ -9,13 +9,14 @@ import { I18nProps, NameSpaces } from 'src/i18n'
 
 import Fetch from 'src/brandkit/common/Fetch'
 import IconShowcase from 'src/brandkit/common/Showcase'
+import { hashNav } from 'src/shared/menu-items'
 
 export default React.memo(function IconsPage() {
   return (
     <Page
       sections={[
         {
-          id: 'overview',
+          id: hashNav.brandIcons.overview,
           children: <Overview />,
         },
       ]}
@@ -30,7 +31,7 @@ interface IconData {
   uri: string
 }
 
-const LOADING = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]
+const LOADING = new Array(12)
 
 const Overview = withNamespaces(NameSpaces.brand)(function _Overview({ t }: I18nProps) {
   return (
@@ -40,11 +41,11 @@ const Overview = withNamespaces(NameSpaces.brand)(function _Overview({ t }: I18n
         <Fetch query="/brand/api/assets/icons">
           {({ loading, data }: { loading: boolean; data: IconData[] }) => {
             if (loading) {
-              return LOADING.map((x) => {
+              return LOADING.map((_, i) => {
                 return (
                   <IconShowcase
                     size={160}
-                    key={x}
+                    key={i}
                     loading={true}
                     name={'Celo Icon'}
                     uri={'#'}

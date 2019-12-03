@@ -118,7 +118,7 @@ function Lorem({ backgroundColor, color, withGap, hasBorder, image }: LoremProps
   const Component = image ? ImageBackground : View
 
   return (
-    // @ts-ignore
+    // @ts-ignore : component does not have call signature?
     <Component
       source={image}
       style={[

@@ -111,21 +111,16 @@ export const hashNav = {
   },
   join: { roles: 'roles' },
   home: { partnerships: 'partnerships' },
-  brandLogo: {
-    overview: 'overview',
-    space: 'space-and-sizing',
-    backgrounds: 'backgrounds',
-  },
-  brandColor: {
-    overview: 'overview',
-    backgrounds: 'background-colors',
-  },
+  brandLogo: { overview: 'overview', space: 'space-and-sizing', backgrounds: 'backgrounds' },
+  brandColor: { overview: 'overview', backgrounds: 'background-colors' },
   brandTypography: { overview: 'overview', scale: 'type-scale' },
   brandImagery: {
     overview: 'overview',
-    icons: 'icons',
     illustrations: 'illustrations',
     graphics: 'abstract-graphics',
+  },
+  brandIcons: {
+    overview: 'overview',
   },
 }
 

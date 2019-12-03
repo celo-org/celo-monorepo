@@ -41,7 +41,6 @@ const IS_APROVED = 'Approved=1'
 const TERMS_SIGNED = 'Terms=1'
 
 function normalize(asset: Fields) {
-  console.warn(asset)
   return {
     name: asset.Name,
     description: asset.Description,

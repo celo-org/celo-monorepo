@@ -1,7 +1,6 @@
 import * as React from 'react'
 import { withNamespaces } from 'react-i18next'
 import { StyleSheet, Text, View } from 'react-native'
-// import Fetch from 'src/brandkit/common/Fetch'
 import Page from 'src/brandkit/common/Page'
 import { hashNav } from 'src/shared/menu-items'
 
