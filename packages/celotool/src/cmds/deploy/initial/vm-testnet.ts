@@ -8,12 +8,13 @@ export const describe = 'upgrade a testnet on a VM'
 export const builder = {}
 
 export const handler = async (argv: InitialArgv) => {
+  // deploy VM testnet with Terraform
+  await deploy(argv.celoEnv)
+
   // set up Kubernetes cluster that will have prometheus to stackdriver statefulset
   const createdCluster = await createClusterIfNotExists()
   await switchToClusterFromEnv()
   await setupCluster(argv.celoEnv, createdCluster)
-  // deploy VM testnet with Terraform
-  await deploy(argv.celoEnv)
 
   // deploy prom to sd statefulset
   await installHelmChart(argv.celoEnv)

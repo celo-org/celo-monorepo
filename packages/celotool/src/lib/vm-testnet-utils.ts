@@ -26,7 +26,7 @@ import {
   uploadStaticNodesToGoogleStorage,
 } from './testnet-utils'
 
-const secretsBucketName = 'celo-testnet-secrets'
+const secretsBucketName = 'celo-testnet-secrets-prod'
 
 const testnetTerraformModule = 'testnet'
 const testnetNetworkTerraformModule = 'testnet-network'
@@ -100,8 +100,8 @@ export async function deploy(celoEnv: string, onConfirmFailed?: () => Promise<vo
 
   const testnetVars: TerraformVars = getTestnetVars(celoEnv)
   await deployModule(celoEnv, testnetTerraformModule, testnetVars, onConfirmFailed, async () => {
-    console.info('Generating and uploading secrets env files to Google Storage...')
-    await generateAndUploadSecrets(celoEnv)
+    // console.info('Generating and uploading secrets env files to Google Storage...')
+    // await generateAndUploadSecrets(celoEnv)
   })
 
   await uploadGenesisBlockToGoogleStorage(celoEnv)
@@ -255,7 +255,9 @@ function getTestnetVars(celoEnv: string) {
     gcloud_secrets_bucket: secretsBucketName,
     gcloud_secrets_base_path: secretsBasePath(celoEnv),
     // only able to view objects for accessing secrets & modify ssl certs for forno setup
-    gcloud_vm_service_account_email: 'terraform-testnet@celo-testnet.iam.gserviceaccount.com',
+    gcloud_vm_service_account_email: `terraform-testnet@${fetchEnv(
+      envVar.TESTNET_PROJECT_NAME
+    )}.iam.gserviceaccount.com`,
     genesis_content_base64: genesisBuffer.toString('base64'),
     // forno is the name for our setup that has tx-nodes reachable via a domain name
     letsencrypt_email: 'n@celo.org',

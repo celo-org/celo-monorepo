@@ -153,10 +153,13 @@ resource "google_dns_record_set" "external" {
   ttl          = 3600
 
   rrdatas = [google_compute_global_address.external.address]
+
+  project = "celo-testnet"
 }
 
 data "google_dns_managed_zone" "external" {
   name = var.dns_zone_name
+  project = "celo-testnet"
 }
 
 # SSL certificate from Let's Encrypt:
@@ -185,7 +188,7 @@ resource "google_compute_instance" "external_ssl" {
     format("%s/ssl-startup.sh", path.module), {
       cert_prefix : "${local.name_prefix}-forno-",
       forno_host : var.forno_host,
-      gcloud_project : var.gcloud_project,
+      gcloud_project : "celo-testnet",
       letsencrypt_email : var.letsencrypt_email,
       target_https_proxy_name : local.target_https_proxy_name
     }

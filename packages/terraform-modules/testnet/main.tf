@@ -12,7 +12,7 @@ provider "acme" {
 # For managing terraform state remotely
 terraform {
   backend "gcs" {
-    bucket = "celo_tf_state"
+    bucket = "celo_tf_state_prod"
   }
   required_providers {
     google = "~> 2.16.0"
@@ -22,7 +22,7 @@ terraform {
 data "terraform_remote_state" "state" {
   backend = "gcs"
   config = {
-    bucket = "celo_tf_state"
+    bucket = "celo_tf_state_prod"
     prefix = "${var.celo_env}/testnet"
   }
 }
@@ -41,7 +41,7 @@ locals {
   target_tags_all = [
     local.target_tag_bootnode,
     local.target_tag_node,
-    target_tag_ssl
+    local.target_tag_ssl
   ]
 }
 

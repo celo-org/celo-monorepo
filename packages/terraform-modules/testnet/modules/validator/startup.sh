@@ -133,9 +133,9 @@ docker run \
     geth init $DATA_DIR/genesis.json \
   ) ; \
   TMP_PRIVATE_KEY_FILE=$(mktemp) ; \
-  echo -n $PRIVATE_KEY > $TMP_PRIVATE_KEY_FILE ; \
-  geth account import --password $DATA_DIR/account/accountSecret $TMP_PRIVATE_KEY_FILE ; \
-  rm $TMP_PRIVATE_KEY_FILE ; \
+  echo -n $PRIVATE_KEY > \$TMP_PRIVATE_KEY_FILE ; \
+  geth account import --password $DATA_DIR/account/accountSecret \$TMP_PRIVATE_KEY_FILE ; \
+  rm \$TMP_PRIVATE_KEY_FILE ; \
   geth \
     --bootnodes=enode://$BOOTNODE_ENODE \
     --password=$DATA_DIR/account/accountSecret \
@@ -162,6 +162,7 @@ docker run \
     --istanbul.requesttimeout=${istanbul_request_timeout_ms} \
     --maxpeers=${max_peers} \
     --metrics \
+    $NAT_FLAG \
     $IN_MEMORY_DISCOVERY_TABLE_FLAG \
     $PROXIED_FLAGS"
 
