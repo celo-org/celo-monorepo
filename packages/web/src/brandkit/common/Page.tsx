@@ -11,6 +11,8 @@ import menu, { hashNav } from 'src/shared/menu-items'
 import { HEADER_HEIGHT } from 'src/shared/Styles'
 import { colors, standardStyles } from 'src/styles'
 
+const FOOTER_ID = 'experience-footer'
+
 const ROOT = menu.BRAND.link
 
 const LOGO_PATH = `${ROOT}/logo`
@@ -73,6 +75,8 @@ const PAGES = [
   // },
 ]
 
+const THAW_DISTANCE = 600
+
 export const ROUTE_TO_TITLE = PAGES.reduce((mapping, page) => {
   mapping[page.href] = page.title
   return mapping
@@ -90,11 +94,15 @@ interface Props {
 
 interface State {
   routeHash: string
+  isSidebarFrozen: boolean
+  distanceToTop: number
 }
 
 class Page extends React.Component<Props & ScreenProps, State> {
   state: State = {
     routeHash: '',
+    isSidebarFrozen: true,
+    distanceToTop: 0,
   }
 
   ratios: Record<string, { id: string; ratio: number; top: number }> = {}
@@ -102,6 +110,8 @@ class Page extends React.Component<Props & ScreenProps, State> {
   observer: IntersectionObserver
 
   pageRef = React.createRef<View>()
+
+  footer = React.createRef<View>()
 
   sectionRefs = this.props.sections.reduce((acc, section) => {
     acc[section.id] = React.createRef<View>()
@@ -112,8 +122,10 @@ class Page extends React.Component<Props & ScreenProps, State> {
     this.setState({ routeHash: window.location.hash })
   }
 
-  onIntersection = (entries: IntersectionObserverEntry[]) => {
-    this.ratios = entries
+  updateSectionHashWhenInView = (entries: IntersectionObserverEntry[]) => {
+    const filteredEntries = entries.filter((entry) => entry.target.id !== FOOTER_ID)
+
+    this.ratios = filteredEntries
       .map((entry) => ({
         id: entry.target.id,
         ratio: entry.intersectionRatio,
@@ -140,10 +152,31 @@ class Page extends React.Component<Props & ScreenProps, State> {
       this.setState({ routeHash: top.id })
       window.history.replaceState({}, top.id, `${location.pathname}#${top.id}`)
     }
+
+    setImmediate(() => {
+      const footer = entries.find((entry) => entry.target.id === FOOTER_ID)
+      if (footer) {
+        if (footer.boundingClientRect.top < THAW_DISTANCE) {
+          this.setState({
+            isSidebarFrozen: false,
+            distanceToTop: footer.boundingClientRect.top - THAW_DISTANCE,
+          })
+        } else {
+          this.setState({
+            isSidebarFrozen: true,
+          })
+        }
+      } else {
+        this.setState({ isSidebarFrozen: true })
+      }
+    })
   }
 
-  observation = () => {
-    this.observer = new IntersectionObserver(this.onIntersection, {
+  createSectionObservers = () => {
+    if (!('IntersectionObserver' in window)) {
+      return
+    }
+    this.observer = new IntersectionObserver(this.updateSectionHashWhenInView, {
       threshold: [0.1, 0.5, 0.9, 1],
     })
 
@@ -153,10 +186,14 @@ class Page extends React.Component<Props & ScreenProps, State> {
       const element = (findNodeHandle(value.current) as unknown) as Element
       this.observer.observe(element)
     })
+
+    const footer = (findNodeHandle(this.footer.current) as unknown) as Element
+
+    this.observer.observe(footer)
   }
 
   componentDidMount = () => {
-    this.observation()
+    this.createSectionObservers()
 
     window.addEventListener('hashchange', this.onChangeHash, false)
   }
@@ -185,6 +222,8 @@ class Page extends React.Component<Props & ScreenProps, State> {
                 pages={PAGES}
                 currentPathName={router.pathname}
                 routeHash={this.state.routeHash}
+                isFlowing={!this.state.isSidebarFrozen}
+                distance={this.state.distanceToTop}
               />
             )}
           </Cell>
@@ -206,7 +245,7 @@ class Page extends React.Component<Props & ScreenProps, State> {
             </View>
           </Cell>
         </GridRow>
-        <View style={styles.footer}>
+        <View style={styles.footer} nativeID={FOOTER_ID} ref={this.footer}>
           <Footer />
         </View>
       </View>
