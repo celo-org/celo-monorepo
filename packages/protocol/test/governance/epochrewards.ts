@@ -18,6 +18,8 @@ import {
   EpochRewardsTestInstance,
   RegistryContract,
   RegistryInstance,
+  ReserveContract,
+  ReserveInstance,
 } from 'types'
 import { fromFixed, toFixed } from '@celo/utils/lib/fixidity'
 
@@ -26,6 +28,7 @@ const MockElection: MockElectionContract = artifacts.require('MockElection')
 const MockGoldToken: MockGoldTokenContract = artifacts.require('MockGoldToken')
 const MockSortedOracles: MockSortedOraclesContract = artifacts.require('MockSortedOracles')
 const Registry: RegistryContract = artifacts.require('Registry')
+const Reserve: ReserveContract = artifacts.require('Reserve')
 
 // @ts-ignore
 // TODO(mcortesi): Use BN
@@ -461,7 +464,7 @@ contract('EpochRewards', (accounts: string[]) => {
     })
   })
 
-  describe.only('#updateTargetVotingYield()', () => {
+  describe('#updateTargetVotingYield()', () => {
     // Arbitrary numbers
     const totalSupply = new BigNumber(129762987346298761037469283746)
     const reserveBalance = new BigNumber(2397846127684712867321)
@@ -472,14 +475,6 @@ contract('EpochRewards', (accounts: string[]) => {
       reserve = await Reserve.new()
       await registry.setAddressFor(CeloContractName.Reserve, reserve.address)
       await reserve.initialize(registry.address, 60)
-
-      const owner: string = await epochRewards.owner()
-      assert.equal(owner, accounts[0])
-
-      const owner2: string = await reserve.owner()
-      assert.equal(owner2, accounts[0])
-
-      await reserve.setGoldToken(mockGoldToken.address)
       await mockGoldToken.setTotalSupply(totalSupply)
       await web3.eth.sendTransaction({
         from: accounts[9],

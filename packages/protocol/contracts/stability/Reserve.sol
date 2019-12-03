@@ -29,7 +29,6 @@ contract Reserve is IReserve, Ownable, Initializable, UsingRegistry, ReentrancyG
   TobinTaxCache public tobinTaxCache;
   uint256 public tobinTaxStalenessThreshold;
   uint256 public constant TOBIN_TAX_NUMERATOR = 5000000000000000000000; // 0.005
-  uint256 public constant TOBIN_TAX_DENOMINATOR = 1000000000000000000000000;
   mapping(address => bool) public isSpender;
 
   mapping(address => bool) public isOtherReserveAddress;
@@ -83,8 +82,8 @@ contract Reserve is IReserve, Ownable, Initializable, UsingRegistry, ReentrancyG
    * @param symbols The symbol of each asset in the Reserve portfolio.
    * @param weights The weight for the corresponding asset as unwrapped Fixidity.Fraction.
    */
-  function setAssetAllocations(bytes32[] memory symbols, uint256[] memory weights)
-    public
+  function setAssetAllocations(bytes32[] calldata symbols, uint256[] calldata weights)
+    external
     onlyOwner
   {
     require(symbols.length == weights.length);
@@ -219,7 +218,7 @@ contract Reserve is IReserve, Ownable, Initializable, UsingRegistry, ReentrancyG
       tobinTaxCache.numerator = uint128(FixidityLib.unwrap(computeTobinTax()));
       tobinTaxCache.timestamp = uint128(now); // solhint-disable-line not-rely-on-time
     }
-    return (uint256(tobinTaxCache.numerator), TOBIN_TAX_DENOMINATOR);
+    return (uint256(tobinTaxCache.numerator), FixidityLib.fixed1().unwrap());
   }
 
   function getTokens() external view returns (address[] memory) {
@@ -238,12 +237,12 @@ contract Reserve is IReserve, Ownable, Initializable, UsingRegistry, ReentrancyG
     return assetAllocationWeights;
   }
 
-  function getReserveGoldBalance() external view returns (uint256) {
-    return _getReserveGoldBalance();
-  }
-
-  function _getReserveGoldBalance() public view returns (uint256) {
-    return 0;
+  function getReserveGoldBalance() public view returns (uint256) {
+    uint256 reserveGoldBalance = address(this).balance;
+    for (uint256 i = 0; i < otherReserveAddresses.length; i++) {
+      reserveGoldBalance = reserveGoldBalance.add(otherReserveAddresses[i].balance);
+    }
+    return reserveGoldBalance;
   }
 
   /*
@@ -256,7 +255,7 @@ contract Reserve is IReserve, Ownable, Initializable, UsingRegistry, ReentrancyG
   function computeTobinTax() private view returns (FixidityLib.Fraction memory) {
     address sortedOraclesAddress = registry.getAddressForOrDie(SORTED_ORACLES_REGISTRY_ID);
     ISortedOracles sortedOracles = ISortedOracles(sortedOraclesAddress);
-    uint256 reserveGoldBalance = _getReserveGoldBalance();
+    uint256 reserveGoldBalance = getReserveGoldBalance();
     uint256 stableTokensValueInGold = 0;
 
     for (uint256 i = 0; i < _tokens.length; i++) {
