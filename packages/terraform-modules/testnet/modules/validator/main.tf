@@ -24,7 +24,7 @@ resource "google_compute_instance" "validator" {
 
   count = var.validator_count
 
-  tags = ["${var.celo_env}-node"]
+  tags = ["${var.celo_env}-node", "${var.celo_env}-validator"]
 
   allow_stopping_for_update = true
 
