@@ -215,7 +215,7 @@ contract Reserve is IReserve, Ownable, Initializable, UsingRegistry, ReentrancyG
   function getOrComputeTobinTax() external nonReentrant returns (uint256, uint256) {
     // solhint-disable-next-line not-rely-on-time
     if (now.sub(tobinTaxCache.timestamp) > tobinTaxStalenessThreshold) {
-      tobinTaxCache.numerator = uint128(FixidityLib.unwrap(computeTobinTax()));
+      tobinTaxCache.numerator = uint128(computeTobinTax().unwrap());
       tobinTaxCache.timestamp = uint128(now); // solhint-disable-line not-rely-on-time
     }
     return (uint256(tobinTaxCache.numerator), FixidityLib.fixed1().unwrap());
