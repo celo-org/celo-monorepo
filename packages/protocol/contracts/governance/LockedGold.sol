@@ -30,7 +30,7 @@ contract LockedGold is ILockedGold, ReentrancyGuard, Initializable, UsingRegistr
     PendingWithdrawal[] pendingWithdrawals;
   }
 
-  mapping(address => Balances) private accounts;
+  mapping(address => Balances) private balances;
   // Maps voting and validating keys to the account that provided the authorization.
   // Authorized addresses may not be reused.
   uint256 public totalNonvoting;
@@ -99,7 +99,7 @@ contract LockedGold is ILockedGold, ReentrancyGuard, Initializable, UsingRegistr
    * @param value The amount by which to increment.
    */
   function _incrementNonvotingAccountBalance(address account, uint256 value) private {
-    accounts[account].nonvoting = accounts[account].nonvoting.add(value);
+    balances[account].nonvoting = balances[account].nonvoting.add(value);
     totalNonvoting = totalNonvoting.add(value);
   }
 
@@ -109,7 +109,7 @@ contract LockedGold is ILockedGold, ReentrancyGuard, Initializable, UsingRegistr
    * @param value The amount by which to decrement.
    */
   function _decrementNonvotingAccountBalance(address account, uint256 value) private {
-    accounts[account].nonvoting = accounts[account].nonvoting.sub(value);
+    balances[account].nonvoting = balances[account].nonvoting.sub(value);
     totalNonvoting = totalNonvoting.sub(value);
   }
 
@@ -119,7 +119,7 @@ contract LockedGold is ILockedGold, ReentrancyGuard, Initializable, UsingRegistr
    */
   function unlock(uint256 value) external nonReentrant {
     require(getAccounts().isAccount(msg.sender));
-    Balances storage account = accounts[msg.sender];
+    Balances storage account = balances[msg.sender];
     // Prevent unlocking gold when voting on governance proposals so that the gold cannot be
     // used to vote more than once.
     require(!getGovernance().isVoting(msg.sender));
@@ -141,7 +141,7 @@ contract LockedGold is ILockedGold, ReentrancyGuard, Initializable, UsingRegistr
    */
   function relock(uint256 index, uint256 value) external nonReentrant {
     require(getAccounts().isAccount(msg.sender));
-    Balances storage account = accounts[msg.sender];
+    Balances storage account = balances[msg.sender];
     require(index < account.pendingWithdrawals.length);
     PendingWithdrawal storage pendingWithdrawal = account.pendingWithdrawals[index];
     require(value <= pendingWithdrawal.value);
@@ -160,7 +160,7 @@ contract LockedGold is ILockedGold, ReentrancyGuard, Initializable, UsingRegistr
    */
   function withdraw(uint256 index) external nonReentrant {
     require(getAccounts().isAccount(msg.sender));
-    Balances storage account = accounts[msg.sender];
+    Balances storage account = balances[msg.sender];
     require(index < account.pendingWithdrawals.length);
     PendingWithdrawal storage pendingWithdrawal = account.pendingWithdrawals[index];
     require(now >= pendingWithdrawal.timestamp);
@@ -193,7 +193,7 @@ contract LockedGold is ILockedGold, ReentrancyGuard, Initializable, UsingRegistr
    * @return The total amount of locked gold for an account.
    */
   function getAccountTotalLockedGold(address account) public view returns (uint256) {
-    uint256 total = accounts[account].nonvoting;
+    uint256 total = balances[account].nonvoting;
     return total.add(getElection().getTotalVotesByAccount(account));
   }
 
@@ -203,7 +203,7 @@ contract LockedGold is ILockedGold, ReentrancyGuard, Initializable, UsingRegistr
    * @return The total amount of non-voting locked gold for an account.
    */
   function getAccountNonvotingLockedGold(address account) external view returns (uint256) {
-    return accounts[account].nonvoting;
+    return balances[account].nonvoting;
   }
 
   /**
@@ -217,12 +217,12 @@ contract LockedGold is ILockedGold, ReentrancyGuard, Initializable, UsingRegistr
     returns (uint256[] memory, uint256[] memory)
   {
     require(getAccounts().isAccount(account));
-    uint256 length = accounts[account].pendingWithdrawals.length;
+    uint256 length = balances[account].pendingWithdrawals.length;
     uint256[] memory values = new uint256[](length);
     uint256[] memory timestamps = new uint256[](length);
     for (uint256 i = 0; i < length; i++) {
       PendingWithdrawal memory pendingWithdrawal = (
-        accounts[account].pendingWithdrawals[i]
+        balances[account].pendingWithdrawals[i]
       );
       values[i] = pendingWithdrawal.value;
       timestamps[i] = pendingWithdrawal.timestamp;
