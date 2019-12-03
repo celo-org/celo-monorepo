@@ -10,6 +10,7 @@ import TripplePairing from 'src/brandkit/common/TripplePairing'
 import Judgement, { Value } from 'src/brandkit/logo/Judgement'
 import LogoExample, { Logos } from 'src/brandkit/logo/LogoExample'
 import LogoWithBackground from 'src/brandkit/logo/LogoWithBackground'
+import { Digital, Print } from 'src/brandkit/logo/Minimums'
 import { H1, H3 } from 'src/fonts/Fonts'
 import { I18nProps, NameSpaces, withNamespaces } from 'src/i18n'
 import { ScreenProps, ScreenSizes, withScreenSize } from 'src/layout/ScreenSize'
@@ -19,7 +20,6 @@ import AspectRatio from 'src/shared/AspectRatio'
 import Button, { BTN } from 'src/shared/Button.3'
 import { hashNav } from 'src/shared/menu-items'
 import { colors, fonts, standardStyles } from 'src/styles'
-import { Digital, Print } from 'src/brandkit/logo/Minimums'
 
 export default React.memo(function Logo() {
   return (
