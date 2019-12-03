@@ -8,7 +8,7 @@ COMMAND=${1:-"pull,clean,accounts,run-validator,run-proxy,status,print-env"}
 DATA_DIR=${2:-"/tmp/celo/network"}
 
 export CELO_IMAGE=${3:-"us.gcr.io/celo-testnet/geth@sha256:37ff19487dfe436ca2be87725cf7ba0009c223614bbaf5b79d856ea9e73917f4"}
-export NETWORK_ID=${4:-"31416"}
+export NETWORK_ID=${4:-"31417"}
 export NETWORK_NAME=${5:-"baklavastaging"}
 export DEFAULT_PASSWORD=${6:-"1234"}
 export CELO_IMAGE_ATTESTATION=${7:-"us.gcr.io/celo-testnet/celo-monorepo@sha256:1e5ad356d3c1be81f6b8401549f84f71cdb8c453abd072db5fdc5a1e5e3cc992"}
@@ -108,7 +108,7 @@ if [[ $COMMAND == *"help"* ]]; then
     echo -e "\t - Data Dir; Local folder where will be created the data dir for the nodes. Default: /tmp/celo/network"
     echo -e "\t - Celo Image; Image to download"
     echo -e "\t - Celo Network; Docker image network to use (typically alfajores or baklava, but you can use a commit). "
-    echo -e "\t - Network Id; 31416 for integration, 44785 for alfajores, etc."
+    echo -e "\t - Network Id; 31417 for integration, 44785 for alfajores, etc."
     echo -e "\t - Network Name; integration by default"
     echo -e "\t - Password; Password to use during the creation of accounts"
     
@@ -185,7 +185,7 @@ if [[ $COMMAND == *"run-proxy"* ]]; then
 
     initialize_geth
     
-    screen -S celo-proxy -d -m docker run --name celo-proxy --restart always -p 30313:30303 -p 30313:30303/udp -p 30503:30503 -p 30503:30503/udp -v $PWD:/root/.celo $CELO_IMAGE --verbosity 3 --networkid $NETWORK_ID --syncmode full --proxy.proxy --proxy.proxiedvalidatoraddress $CELO_VALIDATOR_SIGNER_ADDRESS --proxy.internalendpoint :30503 --ethstats=wss://proxy-$ETHSTATS_ARG
+    screen -S celo-proxy -d -m docker run --name celo-proxy --restart always -p 30313:30303 -p 30313:30303/udp -p 30503:30503 -p 30503:30503/udp -v $PWD:/root/.celo $CELO_IMAGE --verbosity 3 --networkid $NETWORK_ID --syncmode full --proxy.proxy --proxy.proxiedvalidatoraddress $CELO_VALIDATOR_SIGNER_ADDRESS --proxy.internalendpoint :30503 --ethstats=proxy-$ETHSTATS_ARG
     
     sleep 5s
     export PROXY_ENODE=$(docker exec celo-proxy geth --exec "admin.nodeInfo['enode'].split('//')[1].split('@')[0]" attach | tr -d '"')
@@ -207,7 +207,7 @@ if [[ $COMMAND == *"run-validator"* ]]; then
 
     echo -e "\tGenerating the Validator Proof of Possesion"
 
-    __POS=$(docker run -v $PWD:/root/.celo --entrypoint /bin/sh -it $CELO_IMAGE -c " printf '%s\n' $DEFAULT_PASSWORD $DEFAULT_PASSWORD | geth account proof-of-possession $CELO_VALIDATOR_SIGNER_ADDRESS $CELO_VALIDATOR_ADDRESS "| tail -1 )
+    __POS=$(docker run -v $PWD:/root/.celo --entrypoint /bin/sh -it $CELO_IMAGE -c " printf '%s\n' $DEFAULT_PASSWORD $DEFAULT_PASSWORD | geth account proof-of-possession $CELO_VALIDATOR_SIGNER_ADDRESS $CELO_VALIDATOR_ADDRESS "| tail -2 )
     export CELO_VALIDATOR_SIGNER_PUBLIC_KEY=$(echo $__POS | cut -d' ' -f 4| tr -cd "[:alnum:]\n" )
     export CELO_VALIDATOR_SIGNER_SIGNATURE=$(echo $__POS | cut -d' ' -f 1| tr -cd "[:alnum:]\n" )
     
@@ -226,7 +226,7 @@ if [[ $COMMAND == *"run-validator"* ]]; then
     
     echo -e "\tConnecting Validator to Proxy running at enode://$PROXY_ENODE@$PROXY_IP"
     docker run -v $PWD:/root/.celo --entrypoint sh --rm $CELO_IMAGE -c "echo $DEFAULT_PASSWORD > /root/.celo/.password"
-    screen -S celo-validator -d -m docker run --name celo-validator --restart always -p 30303:30303 -p 30303:30303/udp -v $PWD:/root/.celo $CELO_IMAGE --verbosity 3 --networkid $NETWORK_ID --syncmode full --mine --istanbul.blockperiod=5 --istanbul.requesttimeout=3000 --etherbase $CELO_VALIDATOR_SIGNER_ADDRESS --nodiscover --proxy.proxied --proxy.proxyenodeurlpair=enode://$PROXY_ENODE@$PROXY_IP:30503\;enode://$PROXY_ENODE@$PROXY_IP:30303  --unlock=$CELO_VALIDATOR_SIGNER_ADDRESS --password /root/.celo/.password --ethstats=wss://validator-$ETHSTATS_ARG
+    screen -S celo-validator -d -m docker run --name celo-validator --restart always -p 30303:30303 -p 30303:30303/udp -v $PWD:/root/.celo $CELO_IMAGE --verbosity 3 --networkid $NETWORK_ID --syncmode full --mine --istanbul.blockperiod=5 --istanbul.requesttimeout=3000 --etherbase $CELO_VALIDATOR_SIGNER_ADDRESS --nodiscover --proxy.proxied --proxy.proxyenodeurlpair=enode://$PROXY_ENODE@$PROXY_IP:30503\;enode://$PROXY_ENODE@$PROXY_IP:30303  --unlock=$CELO_VALIDATOR_SIGNER_ADDRESS --password /root/.celo/.password --ethstats=validator-$ETHSTATS_ARG
 
     sleep 5s
      
