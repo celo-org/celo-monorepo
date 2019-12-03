@@ -168,8 +168,9 @@
   "proof": {
     "title": "Blockchain",
     "text": "Open source smart contract platform built on decentralized infrastructure.",
-    "permissionless": "Permissionless BFT-based consensus algorithm",
-    "rewardsWeighted": "Rewards weighted by stake size and stake release notice period",
+    "permissionless":
+      "Proof of Stake based consensus with high throughput, low latency, and zero carbon",
+    "rewardsWeighted": "Incentives for serving mobile devices",
     "onChain": "On-chain governance"
   },
   "updates": {
