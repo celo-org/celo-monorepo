@@ -23,6 +23,7 @@ export interface Validator {
   blsPublicKey: string
   affiliation: string | null
   score: BigNumber
+  signer: Address
 }
 
 export interface ValidatorGroup {
@@ -202,6 +203,7 @@ export class ValidatorsWrapper extends BaseWrapper<Validators> {
       blsPublicKey: res.blsPublicKey,
       affiliation: res.affiliation,
       score: fromFixed(new BigNumber(res.score)),
+      signer: res.signer,
     }
   }
 
