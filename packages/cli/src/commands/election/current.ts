@@ -3,13 +3,11 @@ import { BaseCommand } from '../../base'
 
 export default class ElectionCurrent extends BaseCommand {
   static description =
-    'Outputs the set of validators currently participating in BFT to create blocks. The validator set is re-elected at the end of every epoch.'
+    'Outputs the set of validators currently participating in BFT to create blocks. An election is run to select the validator set at the end of every epoch.'
 
   static flags = {
     ...BaseCommand.flags,
   }
-
-  static examples = ['current']
 
   async run() {
     cli.action.start('Fetching currently elected Validators')
