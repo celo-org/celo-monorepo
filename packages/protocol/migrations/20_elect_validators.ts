@@ -45,7 +45,7 @@ async function registerValidatorGroup(
   lockedGold: LockedGoldInstance,
   validators: ValidatorsInstance,
   privateKey: string,
-  numMembers: number
+  lockedGoldValue: BigNumber
 ) {
   // Validators can't also be validator groups, so we create a new account to register the
   // validator group with, and set the name of the group account to the private key of this account
@@ -59,13 +59,8 @@ async function registerValidatorGroup(
   const encryptedPrivateKey = encryptionWeb3.eth.accounts.encrypt(account.privateKey, privateKey)
   const encodedKey = serializeKeystore(encryptedPrivateKey)
 
-  // Value is per-validator.
-  const lockedGoldValue = new BigNumber(config.validators.groupLockedGoldRequirements.value).times(
-    numMembers
-  )
-
   // Add a premium to cover tx fees
-  const v = lockedGoldValue.times(1.01).toFixed()
+  const v = lockedGoldValue.times(1.01).integerValue()
 
   console.info(`    - send funds ${v} to group address ${account.address}`)
   await sendTransactionWithPrivateKey(web3, null, privateKey, {
@@ -93,7 +88,7 @@ async function registerValidatorGroup(
     to: validators.address,
   })
 
-  return [account, lockedGoldValue]
+  return account
 }
 
 async function registerValidator(
@@ -214,6 +209,10 @@ module.exports = async (_deployer: any, networkName: string) => {
     return
   }
 
+  if (config.validators.votesRatioOfLastVsFirstGroup < 1) {
+    throw new Error(`votesRatioOfLastVsFirstGroup needs to be >= 1`)
+  }
+
   // Assumptions about where funds are located:
   // * Validator 0 holds funds for all groups' stakes
   // * Validator 1-n holds funds needed for their own stake
@@ -234,26 +233,45 @@ module.exports = async (_deployer: any, networkName: string) => {
     valKeyGroups.push(valKeys.slice(i, Math.min(i + maxGroupSize, valKeys.length)))
   }
 
-  let prevGroupAddress = NULL_ADDRESS
-  for (const [idx, groupKeys] of valKeyGroups.entries()) {
-    // Append an index to the group name if there is more than one group.
-    let groupName: string = config.validators.groupName
-    if (valKeyGroups.length > 1) {
-      groupName += ` (${idx + 1})`
-    }
+  // Calculate per validator locked gold for first group...
+  const lockedGoldPerValAtFirstGroup = new BigNumber(
+    config.validators.groupLockedGoldRequirements.value
+  )
+  // ...and the delta for each subsequent group
+  const lockedGoldPerValEachGroup = new BigNumber(
+    config.validators.votesRatioOfLastVsFirstGroup - 1
+  )
+    .times(lockedGoldPerValAtFirstGroup)
+    .div(Math.max(valKeyGroups.length - 1, 1))
+    .integerValue()
 
-    console.info(`  Registering validator group: ${groupName} ...`)
-    const [groupAccount, groupLockedGoldValue] = await registerValidatorGroup(
-      groupName,
+  const groups = valKeyGroups.map((keys, i) => ({
+    valKeys: keys,
+    name: valKeyGroups.length
+      ? config.validators.groupName + `(${i + 1})`
+      : config.validators.groupName,
+    lockedGold: lockedGoldPerValAtFirstGroup
+      .plus(lockedGoldPerValEachGroup.times(i))
+      .times(keys.length),
+    account: null,
+  }))
+
+  for (const [idx, group] of groups.entries()) {
+    console.info(
+      `  Registering validator group: ${group.name} with: ${group.lockedGold} CG locked...`
+    )
+    group.account = await registerValidatorGroup(
+      group.name,
       accounts,
       lockedGold,
       validators,
       validator0Key,
-      groupKeys.length
+      group.lockedGold
     )
-    console.info(`  * Registering ${groupKeys.length} validators ...`)
+
+    console.info(`  * Registering ${group.valKeys.length} validators ...`)
     await Promise.all(
-      groupKeys.map((key, i) => {
+      group.valKeys.map((key, i) => {
         const index = idx * config.validators.maxGroupSize + i
         return registerValidator(
           accounts,
@@ -261,48 +279,59 @@ module.exports = async (_deployer: any, networkName: string) => {
           validators,
           key,
           attestationKeys[index],
-          groupAccount.address,
+          group.account.address,
           index,
           networkName
         )
       })
     )
 
-    console.info(`  * Adding Validators to ${groupName} ...`)
-    for (const [i, key] of groupKeys.entries()) {
+    console.info(`  * Adding Validators to ${group.name} ...`)
+    for (const [i, key] of group.valKeys.entries()) {
       const address = privateKeyToAddress(key)
       console.info(`    - Adding ${address} ...`)
       if (i === 0) {
+        const groupsWithVotes = groups.slice(0, idx)
+        groupsWithVotes.sort((a, b) => a.lockedGold.comparedTo(b.lockedGold))
+
         // @ts-ignore
         const addTx = validators.contract.methods.addFirstMember(
           address,
           NULL_ADDRESS,
-          prevGroupAddress
+          groupsWithVotes.length ? groupsWithVotes[0].account.address : NULL_ADDRESS
         )
-        await sendTransactionWithPrivateKey(web3, addTx, groupAccount.privateKey, {
+        await sendTransactionWithPrivateKey(web3, addTx, group.account.privateKey, {
           to: validators.address,
         })
       } else {
         // @ts-ignore
         const addTx = validators.contract.methods.addMember(address)
-        await sendTransactionWithPrivateKey(web3, addTx, groupAccount.privateKey, {
+        await sendTransactionWithPrivateKey(web3, addTx, group.account.privateKey, {
           to: validators.address,
         })
       }
     }
 
+    // Determine the lesser and greater group addresses after voting.
+    const sortedGroups = groups.slice(0, idx + 1)
+    sortedGroups.sort((a, b) => a.lockedGold.comparedTo(b.lockedGold))
+    const groupSortedIndex = sortedGroups.indexOf(group)
+    const lesser =
+      groupSortedIndex > 0 ? sortedGroups[groupSortedIndex - 1].account.address : NULL_ADDRESS
+    const greater =
+      groupSortedIndex < idx ? sortedGroups[groupSortedIndex + 1].account.address : NULL_ADDRESS
+
+    // Note: Only the groups vote for themselves here. The validators do not vote.
     console.info('  * Group voting for itself ...')
     // @ts-ignore
     const voteTx = election.contract.methods.vote(
-      groupAccount.address,
-      '0x' + groupLockedGoldValue.toString(16),
-      NULL_ADDRESS,
-      prevGroupAddress
+      group.account.address,
+      '0x' + group.lockedGold.toString(16),
+      lesser,
+      greater
     )
-    await sendTransactionWithPrivateKey(web3, voteTx, groupAccount.privateKey, {
+    await sendTransactionWithPrivateKey(web3, voteTx, group.account.privateKey, {
       to: election.address,
     })
-
-    prevGroupAddress = groupAccount.address
   }
 }

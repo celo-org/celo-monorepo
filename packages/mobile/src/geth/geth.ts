@@ -79,7 +79,7 @@ async function createNewGeth(): Promise<typeof RNGeth> {
   const genesis: string = await readGenesisBlockFile(nodeDir)
   const networkID: number = GenesisBlockUtils.getChainIdFromGenesis(genesis)
 
-  Logger.debug('Geth@newGeth', `Network ID is ${networkID}`)
+  Logger.debug('Geth@newGeth', `Network ID is ${networkID}, syncMode is ${syncMode}`)
 
   const gethOptions: any = {
     nodeDir,
