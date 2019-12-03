@@ -45,6 +45,7 @@ const parseValidatorParams = (validatorParams: any) => {
     blsPublicKey: validatorParams[1],
     affiliation: validatorParams[2],
     score: validatorParams[3],
+    signer: validatorParams[4],
   }
 }
 
@@ -539,8 +540,9 @@ contract('Validators', (accounts: string[]) => {
       describe('when the account has authorized a validator signer', () => {
         let validatorRegistrationEpochNumber: number
         let publicKey: string
+        let signer: string
         beforeEach(async () => {
-          const signer = accounts[9]
+          signer = accounts[9]
           const sig = await getParsedSignatureOfAddress(web3, validator, signer)
           await accountsInstance.authorizeValidatorSigner(signer, sig.v, sig.r, sig.s)
           publicKey = await addressToPublicKey(signer, web3.eth.sign)
@@ -572,6 +574,11 @@ contract('Validators', (accounts: string[]) => {
         it('should set the validator bls public key', async () => {
           const parsedValidator = parseValidatorParams(await validators.getValidator(validator))
           assert.equal(parsedValidator.blsPublicKey, blsPublicKey)
+        })
+
+        it('should set the validator signer', async () => {
+          const parsedValidator = parseValidatorParams(await validators.getValidator(validator))
+          assert.equal(parsedValidator.signer, signer)
         })
 
         it('should set account locked gold requirements', async () => {
@@ -1091,6 +1098,7 @@ contract('Validators', (accounts: string[]) => {
           })
 
           it('should set the validator ecdsa public key', async () => {
+            await registry.setAddressFor(CeloContractName.Accounts, accountsInstance.address)
             const parsedValidator = parseValidatorParams(await validators.getValidator(validator))
             assert.equal(parsedValidator.ecdsaPublicKey, newPublicKey)
           })
