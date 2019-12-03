@@ -10,6 +10,7 @@ export const validatorTable = {
   score: { get: (v: Validator) => v.score.toFixed() },
   ecdsaPublicKey: {},
   blsPublicKey: {},
+  signer: {},
 }
 
 export default class ValidatorList extends BaseCommand {
