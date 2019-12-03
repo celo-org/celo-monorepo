@@ -225,16 +225,12 @@ contract Reserve is IReserve, Ownable, Initializable, UsingRegistry, ReentrancyG
     return _tokens;
   }
 
-  function getOtherReserveAddresses() external view returns (address[] memory) {
-    return otherReserveAddresses;
+  function getAssetAllocationCount() external view returns (uint256) {
+    return assetAllocationSymbols.length;
   }
 
-  function getAssetAllocationSymbols() external view returns (bytes32[] memory) {
-    return assetAllocationSymbols;
-  }
-
-  function getAssetAllocationWeights() external view returns (uint256[] memory) {
-    return assetAllocationWeights;
+  function getOtherReserveAddressCount() external view returns (uint256) {
+    return otherReserveAddresses.length;
   }
 
   function getReserveGoldBalance() public view returns (uint256) {

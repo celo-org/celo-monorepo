@@ -369,10 +369,10 @@ contract('Reserve', (accounts: string[]) => {
       beforeEach(async () => {
         await mockSortedOracles.setMedianRate(anAddress, sortedOraclesDenominator)
         await reserve.addOtherReserveAddress(anAddress)
-        const otherReserveAddresses = await reserve.getOtherReserveAddresses()
+        const otherReserveAddressCount = (await reserve.getOtherReserveAddressCount()).toNumber()
         index = -1
-        for (let i = 0; i < otherReserveAddresses.length; i++) {
-          if (otherReserveAddresses[i].toLowerCase() === anAddress.toLowerCase()) {
+        for (let i = 0; i < otherReserveAddressCount; i++) {
+          if ((await reserve.otherReserveAddresses(i)).toLowerCase() === anAddress.toLowerCase()) {
             index = i
           }
         }
@@ -410,14 +410,18 @@ contract('Reserve', (accounts: string[]) => {
 
     it('should allow owner to set asset allocations', async () => {
       await reserve.setAssetAllocations(newAssetAllocationSymbols, newAssetAllocationWeights)
-      var assetAllocationSymbols = await reserve.getAssetAllocationSymbols()
-      var assetAllocationWeights = await reserve.getAssetAllocationWeights()
-      assert.equal(assetAllocationSymbols.length, newAssetAllocationSymbols.length)
-      assert.equal(assetAllocationWeights.length, newAssetAllocationWeights.length)
-      assert.equal(web3.utils.hexToUtf8(assetAllocationSymbols[0]), 'cGLD')
-      assert.equal(web3.utils.hexToUtf8(assetAllocationSymbols[1]), 'BTC')
-      assert.equal(newAssetAllocationWeights[0].isEqualTo(assetAllocationWeights[0]), true)
-      assert.equal(newAssetAllocationWeights[1].isEqualTo(assetAllocationWeights[1]), true)
+      const assetAllocationCount = (await reserve.getAssetAllocationCount()).toNumber()
+      assert.equal(newAssetAllocationSymbols.length, assetAllocationCount)
+      assert.equal(web3.utils.hexToUtf8(await reserve.assetAllocationSymbols(0)), 'cGLD')
+      assert.equal(web3.utils.hexToUtf8(await reserve.assetAllocationSymbols(1)), 'BTC')
+      assert.equal(
+        newAssetAllocationWeights[0].isEqualTo(await reserve.assetAllocationWeights(0)),
+        true
+      )
+      assert.equal(
+        newAssetAllocationWeights[1].isEqualTo(await reserve.assetAllocationWeights(1)),
+        true
+      )
     })
 
     it('should not allow other users to set asset allocations', async () => {
