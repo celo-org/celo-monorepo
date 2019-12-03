@@ -126,7 +126,7 @@ exports[`IncomingPaymentRequestSummaryNotification renders correctly 1`] = `
                   ]
                 }
               >
-                $200,000
+                 $200,000
               </Text>
             </Text>
             <Text
@@ -169,7 +169,7 @@ exports[`IncomingPaymentRequestSummaryNotification renders correctly 1`] = `
                   ]
                 }
               >
-                $180.89
+                 $180.89
               </Text>
             </Text>
           </View>
@@ -373,7 +373,7 @@ exports[`IncomingPaymentRequestSummaryNotification when more 1 requests renders 
                   ]
                 }
               >
-                $200,000
+                 $200,000
               </Text>
             </Text>
           </View>
@@ -555,7 +555,7 @@ exports[`IncomingPaymentRequestSummaryNotification when more than 2 requests ren
                   ]
                 }
               >
-                $200,000
+                 $200,000
               </Text>
             </Text>
             <Text
@@ -598,7 +598,7 @@ exports[`IncomingPaymentRequestSummaryNotification when more than 2 requests ren
                   ]
                 }
               >
-                $180.89
+                 $180.89
               </Text>
             </Text>
           </View>
