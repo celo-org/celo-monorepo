@@ -789,7 +789,8 @@ contract Validators is
       bytes memory ecdsaPublicKey,
       bytes memory blsPublicKey,
       address affiliation,
-      uint256 score
+      uint256 score,
+      address signer
     )
   {
     require(isValidator(account));
@@ -798,7 +799,8 @@ contract Validators is
       validator.publicKeys.ecdsa,
       validator.publicKeys.bls,
       validator.affiliation,
-      validator.score.unwrap()
+      validator.score.unwrap(),
+      getAccounts().getValidatorSigner(account)
     );
   }
 
