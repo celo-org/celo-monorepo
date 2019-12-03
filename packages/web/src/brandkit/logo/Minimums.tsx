@@ -1,6 +1,6 @@
-import Svg, { G, Path, Rect } from 'svgs'
-import * as React from 'react'
 import { func } from 'prop-types'
+import * as React from 'react'
+import Svg, { G, Path, Rect } from 'svgs'
 
 export const Digital = React.memo(function _Digital() {
   return (
