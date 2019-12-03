@@ -4,14 +4,14 @@ set -euo pipefail
 export LC_ALL=en_US.UTF-8
 
 # Usage: run-network.sh <COMMAND> <DATA_DIR>
-COMMAND=${1:-"pull,clean,accounts,run-validator,run-proxy,status,print-env"}
+COMMAND=${1:-"pull,accounts,run-validator,run-proxy,status,print-env"}
 DATA_DIR=${2:-"/tmp/celo/network"}
 
 export CELO_IMAGE=${3:-"us.gcr.io/celo-testnet/geth@sha256:37ff19487dfe436ca2be87725cf7ba0009c223614bbaf5b79d856ea9e73917f4"}
 export NETWORK_ID=${4:-"31417"}
 export NETWORK_NAME=${5:-"baklavastaging"}
 export DEFAULT_PASSWORD=${6:-"1234"}
-export CELO_IMAGE_ATTESTATION=${7:-"us.gcr.io/celo-testnet/celo-monorepo@sha256:1e5ad356d3c1be81f6b8401549f84f71cdb8c453abd072db5fdc5a1e5e3cc992"}
+export CELO_IMAGE_ATTESTATION=${7:-"us.gcr.io/celo-testnet/celo-monorepo@sha256:90ea6739f9d239218245b5dce30e1bb5f05ac8dbc59f8e6f315502635c05ccb1"}
 export CELO_PROVIDER=${8:-"https://baklavastaging-forno.celo-testnet.org/"} # https://berlintestnet001-forno.celo-networks-dev.org/
 export DATABASE_URL=${9:-"sqlite://db/attestation.db"}
 
@@ -114,7 +114,7 @@ if [[ $COMMAND == *"help"* ]]; then
     
     echo -e "\n**********\n\nExamples:\n"
     echo -e "\tIf you want to create the local accounts, run a Proxy and a Validator connected to it:"
-    echo -e "\t$0 pull,clean,accounts,run-validator,run-proxy,status,print-env"
+    echo -e "\t$0 pull,accounts,run-validator,run-proxy,status,print-env"
     
     echo -e "\n\tIf you have already your accounts, proxy and validator set up, you can run the following command to run TGCSO"
     echo -e "\t$0 game"
@@ -185,7 +185,7 @@ if [[ $COMMAND == *"run-proxy"* ]]; then
 
     initialize_geth
     
-    screen -S celo-proxy -d -m docker run --name celo-proxy --restart always -p 30313:30303 -p 30313:30303/udp -p 30503:30503 -p 30503:30503/udp -v $PWD:/root/.celo $CELO_IMAGE --verbosity 3 --networkid $NETWORK_ID --syncmode full --proxy.proxy --proxy.proxiedvalidatoraddress $CELO_VALIDATOR_SIGNER_ADDRESS --proxy.internalendpoint :30503 --ethstats=proxy-$ETHSTATS_ARG
+    screen -S celo-proxy -d -m docker run --name celo-proxy --restart always -p 30313:30303 -p 30313:30303/udp -p 30503:30503 -p 30503:30503/udp -v $PWD:/root/.celo $CELO_IMAGE --verbosity 3 --networkid $NETWORK_ID --syncmode full --proxy.proxy --proxy.proxiedvalidatoraddress $CELO_VALIDATOR_SIGNER_ADDRESS --proxy.internalendpoint :30503 --etherbase $CELO_VALIDATOR_SIGNER_ADDRESS --ethstats=proxy-$ETHSTATS_ARG
     
     sleep 5s
     export PROXY_ENODE=$(docker exec celo-proxy geth --exec "admin.nodeInfo['enode'].split('//')[1].split('@')[0]" attach | tr -d '"')
@@ -208,17 +208,17 @@ if [[ $COMMAND == *"run-validator"* ]]; then
     echo -e "\tGenerating the Validator Proof of Possesion"
 
     __POS=$(docker run -v $PWD:/root/.celo --entrypoint /bin/sh -it $CELO_IMAGE -c " printf '%s\n' $DEFAULT_PASSWORD $DEFAULT_PASSWORD | geth account proof-of-possession $CELO_VALIDATOR_SIGNER_ADDRESS $CELO_VALIDATOR_ADDRESS "| tail -2 )
-    export CELO_VALIDATOR_SIGNER_PUBLIC_KEY=$(echo $__POS | cut -d' ' -f 4| tr -cd "[:alnum:]\n" )
-    export CELO_VALIDATOR_SIGNER_SIGNATURE=$(echo $__POS | cut -d' ' -f 1| tr -cd "[:alnum:]\n" )
+    export CELO_VALIDATOR_SIGNER_PUBLIC_KEY=$(echo $__POS | cut -d' ' -f 6| tr -cd "[:alnum:]\n" )
+    export CELO_VALIDATOR_SIGNER_SIGNATURE=$(echo $__POS | cut -d' ' -f 2| tr -cd "[:alnum:]\n" )
     
     echo -e "\tCELO_VALIDATOR_SIGNER_PUBLIC_KEY=$CELO_VALIDATOR_SIGNER_PUBLIC_KEY"
     echo -e "\tCELO_VALIDATOR_SIGNER_SIGNATURE=$CELO_VALIDATOR_SIGNER_SIGNATURE"
 
     
     echo -e "\tGenerating the Validator Proof of Possesion of the BLS key"
-    __BLS=$(docker run -v $PWD:/root/.celo --entrypoint /bin/sh -it $CELO_IMAGE -c " printf '%s\n' $DEFAULT_PASSWORD $DEFAULT_PASSWORD | geth account proof-of-possession $CELO_VALIDATOR_SIGNER_ADDRESS $CELO_VALIDATOR_ADDRESS --bls "| tail -1 )
-    export CELO_VALIDATOR_SIGNER_BLS_PUBLIC_KEY=$(echo $__BLS | cut -d' ' -f 4| tr -cd "[:alnum:]\n" )
-    export CELO_VALIDATOR_SIGNER_BLS_SIGNATURE=$(echo $__BLS | cut -d' ' -f 1| tr -cd "[:alnum:]\n" )
+    __BLS=$(docker run -v $PWD:/root/.celo --entrypoint /bin/sh -it $CELO_IMAGE -c " printf '%s\n' $DEFAULT_PASSWORD $DEFAULT_PASSWORD | geth account proof-of-possession $CELO_VALIDATOR_SIGNER_ADDRESS $CELO_VALIDATOR_ADDRESS --bls "| tail -2 )
+    export CELO_VALIDATOR_SIGNER_BLS_PUBLIC_KEY=$(echo $__BLS | cut -d' ' -f 6| tr -cd "[:alnum:]\n" )
+    export CELO_VALIDATOR_SIGNER_BLS_SIGNATURE=$(echo $__BLS | cut -d' ' -f 2| tr -cd "[:alnum:]\n" )
     
     echo -e "\tCELO_VALIDATOR_SIGNER_BLS_PUBLIC_KEY=$CELO_VALIDATOR_SIGNER_BLS_PUBLIC_KEY"
     echo -e "\tCELO_VALIDATOR_SIGNER_BLS_SIGNATURE=$CELO_VALIDATOR_SIGNER_BLS_SIGNATURE"
@@ -288,6 +288,8 @@ fi
 
 if [[ $COMMAND == *"print-env"* ]]; then
 
+    echo -e "\n************************************************************************\n"
+    echo -e "Celo Environment Variables (copy to validator-config.rc to re-use them!):\n\n"
     echo -e "CELO_VALIDATOR_ADDRESS=$CELO_VALIDATOR_ADDRESS"
     echo -e "CELO_VALIDATOR_GROUP_ADDRESS=$CELO_VALIDATOR_GROUP_ADDRESS"
     echo -e "CELO_VALIDATOR_SIGNER_ADDRESS=$CELO_VALIDATOR_SIGNER_ADDRESS"
@@ -295,6 +297,7 @@ if [[ $COMMAND == *"print-env"* ]]; then
     echo -e "CELO_VALIDATOR_SIGNER_SIGNATURE=$CELO_VALIDATOR_SIGNER_SIGNATURE"
     echo -e "CELO_VALIDATOR_SIGNER_BLS_PUBLIC_KEY=$CELO_VALIDATOR_SIGNER_BLS_PUBLIC_KEY"
     echo -e "CELO_VALIDATOR_SIGNER_BLS_SIGNATURE=$CELO_VALIDATOR_SIGNER_BLS_SIGNATURE"
+    echo -e "\n************************************************************************\n"
 
 fi
 
