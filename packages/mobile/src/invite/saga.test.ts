@@ -99,7 +99,7 @@ SendIntentAndroid.sendSms = jest.fn()
 
 const state = createMockStore({ web3: { account: mockAccount } }).getState()
 
-describe.skip(watchSendInvite, () => {
+describe(watchSendInvite, () => {
   beforeAll(() => {
     jest.useRealTimers()
   })
@@ -129,7 +129,7 @@ describe.skip(watchSendInvite, () => {
   })
 })
 
-describe.skip(watchRedeemInvite, () => {
+describe(watchRedeemInvite, () => {
   beforeAll(() => {
     jest.useRealTimers()
   })
@@ -201,7 +201,7 @@ describe.skip(watchRedeemInvite, () => {
 })
 
 describe(generateLink, () => {
-  afterEach(() => {
+  beforeEach(() => {
     jest.clearAllMocks()
   })
 
