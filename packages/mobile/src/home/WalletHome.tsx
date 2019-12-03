@@ -137,7 +137,7 @@ export class WalletHome extends React.Component<Props> {
   }
 
   async componentDidMount() {
-    await generateLink('asdf', 'asdf')
+    await generateLink('inviteCode', 'recipientName')
     this.props.resetStandbyTransactions()
     this.props.initializeSentryUserContext()
     this.importContactsIfNeeded()

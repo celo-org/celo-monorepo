@@ -3,6 +3,7 @@ import { getPhoneHash } from '@celo/utils/src/phoneNumbers'
 import { getEscrowContract, getGoldTokenContract, getStableTokenContract } from '@celo/walletkit'
 import BigNumber from 'bignumber.js'
 import { Linking, Platform } from 'react-native'
+import DeviceInfo from 'react-native-device-info'
 import SendIntentAndroid from 'react-native-send-intent'
 import SendSMS from 'react-native-sms'
 import VersionCheck from 'react-native-version-check'
@@ -82,14 +83,31 @@ export function getInvitationVerificationFeeInWei() {
 }
 
 export async function generateLink(inviteCode: string, recipientName: string) {
-  const packageName = VersionCheck.getPackageName().replace(/\.debug$/g, '.integration')
-  const playStoreLink = await VersionCheck.getPlayStoreUrl({ packageName })
-  const appStoreUrl = 'https://apps.apple.com/us/app/celo-alfajores-wallet/id1482389446' // await VersionCheck.getAppStoreUrl()
+  const AndroidPackageName = VersionCheck.getPackageName().replace(/\.debug$/g, '.integration')
+  const playStoreLink = await VersionCheck.getPlayStoreUrl({ AndroidPackageName })
   const referrerData = encodeURIComponent(`invite-code=${inviteCode}`)
   const referrerLink = `${playStoreLink}&referrer=${referrerData}`
-  Logger.info(TAG, `referrerLink before short ${referrerLink}`)
-  const shortUrl = await generateDynamicShortLink(referrerLink, appStoreUrl)
 
+  let appStoreUrl
+  try {
+    appStoreUrl = await VersionCheck.getAppStoreUrl()
+  } catch (error) {
+    // can't get App Store url on Android
+    appStoreUrl = 'http://play.google.com/store/apps/details?id=org.celo.mobile.debug'.replace(
+      /\.debug$/g,
+      '.integration'
+    )
+  }
+
+  const iOSBundleId = await DeviceInfo.getBundleId()
+
+  Logger.info(TAG, `referrerLink before short ${referrerLink}`)
+  const shortUrl = await generateDynamicShortLink(
+    referrerLink,
+    appStoreUrl,
+    AndroidPackageName,
+    iOSBundleId
+  )
   return {
     name: recipientName,
     code: inviteCode,
@@ -142,7 +160,8 @@ export function* sendInvite(
     // TODO: Improve this by not checking specifically for this
     // display name. Requires improvements in recipient handling
     recipientName = recipientName === i18n.t('sendFlow7:mobileNumber') ? '' : ' ' + recipientName
-    const msg = i18n.t('sendFlow7:inviteSMS', yield call(generateLink, inviteCode, recipientName))
+    const inviteLink = yield call(generateLink, inviteCode, recipientName)
+    const msg = i18n.t('sendFlow7:inviteSMS', inviteLink)
 
     // Store the Temp Address locally so we know which transactions were invites
     yield put(storeInviteeData(temporaryAddress.toLowerCase(), e164Number))
