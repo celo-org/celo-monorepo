@@ -1,7 +1,7 @@
-import { Address } from '@celo/contractkit'
 import BigNumber from 'bignumber.js'
 import { toChecksumAddress } from 'ethereumjs-util'
 import * as rlp from 'rlp'
+import { Address } from './address'
 
 // See https://github.com/celo-org/celo-blockchain/blob/master/core/types/istanbul.go
 export const ISTANBUL_EXTRA_VANITY_BYTES = 32
