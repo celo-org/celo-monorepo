@@ -1,33 +1,26 @@
 # Running the Attestation Service
 
-- [Running the Attestation Service](#running-the-attestation-service)
-  - [Environment variables](#environment-variables)
-  - [Sms Providers](#sms-providers)
-    - [Nexmo](#nexmo)
-    - [Twilio](#twilio)
-  - [Accounts Configuration](#accounts-configuration) \* [Database Configuration](#database-configuration)
-  - [Executing the Attestation Service](#executing-the-attestation-service)
-  - [Registering the Attestation Service](#registering-the-attestation-service)
-
 As part of the [lightweight identity protocol](/celo-codebase/protocol/identity), validators are expected to run an Attestation Service to provide attestations that allow users to map their phone number to an account on Celo. The Attestation Service is a simple Node.js application that can be run with a Docker image.
 
 ## Environment variables
 
 The service needs the following environment variables:
 
-| Variable                   | Explanation                                                                                                                                                                           |
-| -------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| DATABASE_URL               | The URL under which your database is accessible, currently supported are `postgres://`, `mysql://` and `sqlite://`                                                                    |  |
-| CELO_PROVIDER              | The endpoint under which your node with the unlocked attestation signer key is available, should be `http://localhost:8545` if you followed the [instructions](./running-a-validator) |  |
-| CELO_VALIDATOR_ADDRESS     | The address of the Validator account                                                                                                                                                  |  |
-| ATTESTATION_SIGNER_ADDRESS | The address of the attestation signer that was authorized by the Validator account                                                                                                    |  |
-| APP_SIGNATURE              | The hash with which clients can auto-read SMS messages on android                                                                                                                     |  |
-| SMS_PROVIDERS              | A comma-separated list of providers you want to configure, we currently support `nexmo` & `twilio`                                                                                    |  |
+| Variable                   | Explanation                                                                                                                                                                                       |
+| -------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| DATABASE_URL               | The URL under which your database is accessible, currently supported are `postgres://`, `mysql://` and `sqlite://`                                                                                |  |
+| CELO_PROVIDER              | The endpoint under which your node with the unlocked attestation signer key is available, should be `http://localhost:8545` if you followed the [getting started guide](./running-a-validator.md) |  |
+| CELO_VALIDATOR_ADDRESS     | The address of the Validator account                                                                                                                                                              |  |
+| ATTESTATION_SIGNER_ADDRESS | The address of the attestation signer that was authorized by the Validator account                                                                                                                |  |
+| APP_SIGNATURE              | The hash with which clients can auto-read SMS messages on android                                                                                                                                 |  |
+| SMS_PROVIDERS              | A comma-separated list of providers you want to configure, we currently support `nexmo` & `twilio`                                                                                                |  |
 
 A part of that we are going to setup the following environment variable about the Attestation Service Docker image:
 
 ```bash
-export CELO_IMAGE_ATTESTATION="us.gcr.io/celo-testnet/celo-monorepo:attestation-service-708ea8b24736a755c4dd3792e8973a6f0bf92b1f91edceb8e0b603ad66f2d70c"
+export CELO_IMAGE_ATTESTATION="us.gcr.io/celo-testnet/celo-monorepo:attestation-service-8f87dda20f1854c9532a5cbcf8ff556f48dff413"
+# if you followed the instruction of setting up the attestation signer
+export CELO_PROVIDER=http://localhost:8545
 ```
 
 ## Sms Providers
@@ -74,12 +67,21 @@ export DATABASE_URL="mysql://user:password@mysql.example.com:3306/attestation-se
 export DATABASE_URL="postgres://user:password@postgres.example.com:5432/attestation-service"
 ```
 
-## Executing the Attestation Service
-
-The following command for running the Attestation Service is using Nexmo, but you can adapt for using Twilio easily:
+**Example of setting up a local postgres database on Ubuntu**:
 
 ```bash
-docker run --name celo-attestation-service -d --restart always --entrypoint /bin/bash -e ATTESTATION_SIGNER_ADDRESS=$ATTESTATION_SIGNER_ADDRESS -e CELO_VALIDATOR_ADDRESS=0x$CELO_VALIDATOR_ADDRESS -e CELO_PROVIDER=$CELO_PROVIDER -e DATABASE_URL=$DATABASE_URL -e SMS_PROVIDERS=nexmo -e NEXMO_KEY=$NEXMO_KEY -e NEXMO_SECRET=$NEXMO_SECRET -e NEXMO_BLACKLIST=$NEXMO_BLACKLIST -p 3000:80 $CELO_IMAGE_ATTESTATION -c " cd /celo-monorepo/packages/attestation-service && yarn run db:migrate && yarn start "
+apt install postgres
+sudo -u postgres createdb attestation-service
+sudo -u postgres psql -c "ALTER USER postgres PASSWORD '<DATABASE_PASSWORD>';"
+export DATABASE_URL="postgres://postgres:<DATABASE_PASSWORD>@localhost:5432/attestation-service"
+```
+
+## Executing the Attestation Service
+
+The following command for running the Attestation Service is using Twilio and uses `--network host` to access a local database (only works on Linux):
+
+```bash
+docker run --name celo-attestation-service --restart always --entrypoint /bin/bash --network host -e ATTESTATION_SIGNER_ADDRESS=$ATTESTATION_SIGNER_ADDRESS -e CELO_VALIDATOR_ADDRESS=0x$CELO_VALIDATOR_ADDRESS -e CELO_PROVIDER=$CELO_PROVIDER -e DATABASE_URL=$DATABASE_URL -e SMS_PROVIDERS=twilio -e TWILIO_MESSAGING_SERVICE_SID=$TWILIO_MESSAGING_SERVICE_SID -e TWILIO_ACCOUNT_SID=$TWILIO_ACCOUNT_SID -e TWILIO_BLACKLIST=$TWILIO_BLACKLIST -e TWILIO_AUTH_TOKEN=$TWILIO_AUTH_TOKEN -e PORT=80 -p 80:80 $CELO_IMAGE_ATTESTATION -c " cd /celo-monorepo/packages/attestation-service && yarn run db:migrate && yarn start "
 ```
 
 ## Registering the Attestation Service
