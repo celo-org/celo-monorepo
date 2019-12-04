@@ -94,7 +94,7 @@
         "description": "View and manage locked Celo Gold"
       },
       "node": {
-        "description": "Manage your full node"
+        "description": "Manage your Celo node"
       },
       "transfer": {
         "description": "Transfer Celo Gold and Celo Dollars"

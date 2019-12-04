@@ -2,7 +2,8 @@
 
 This section explains how to get a full node running on the [Baklava Beta Network](baklava-testnet.md) and Baklava Beta Network, using a Docker image that was built for this purpose.
 
-Full nodes play a special purpose in the Celo ecosystem, acting as a bridge between the mobile wallets \(running as light clients\) and the validator nodes. To make sure that full nodes are rewarded for this service, the Celo protocol includes full node incentives. Every time a light client sends a new transaction, a portion of the transaction fees will go to the full node that gossips the transaction to other full nodes and validators.
+Full nodes play a special purpose in the Celo ecosystem, acting as a bridge between the mobile wallets \(running as light clients\) and the validator nodes. To make sure that full nodes are rewarded for this service, the Celo protocol includes full node incentives.
+When a light client sends transactions, they will include specify a gateway fee to be paid to the node that gossips transactions to the other full nodes and validators.
 
 For this reason, despite the fact that Celo uses a proof-of-stake protocol, users can earn cryptocurrency without first having to own any, simply by running a full node.
 
@@ -11,7 +12,7 @@ For this reason, despite the fact that Celo uses a proof-of-stake protocol, user
 - **You have Docker installed.** If you don’t have it already, follow the instructions here: [Get Started with Docker](https://www.docker.com/get-started). It will involve creating or signing in with a Docker account, downloading a desktop app, and then launching the app to be able to use the Docker CLI. If you are running on a Linux server, follow the instructions for your distro [here](https://docs.docker.com/install/#server). You may be required to run Docker with sudo depending on your installation environment.
 
 {% hint style="info" %}
-A note about conventions:  
+A note about conventions:
 The code you'll see on this page is bash commands and their output.
 
 When you see text in angle brackets &lt;&gt;, replace them and the text inside with your own value of what it refers to. Don't include the &lt;&gt; in the command.
