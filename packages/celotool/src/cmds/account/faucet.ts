@@ -14,7 +14,7 @@ export const describe = 'command for fauceting an address with gold and/or dolla
 interface FaucetArgv extends AccountArgv {
   account: string
   gold: number
-  dollars: number
+  dollar: number
 }
 
 export const builder = (argv: yargs.Argv) => {
@@ -30,15 +30,15 @@ export const builder = (argv: yargs.Argv) => {
         return address
       },
     })
-    .option('dollars', {
+    .option('dollar', {
       type: 'number',
       description: 'Number of dollars to faucet',
-      default: 0,
+      demand: 'Please specify dollars to faucet',
     })
     .option('gold', {
       type: 'number',
       description: 'Amount of gold to faucet',
-      default: 0,
+      demand: 'Please specify gold to faucet',
     })
 }
 
@@ -59,10 +59,8 @@ export const handler = async (argv: FaucetArgv) => {
       kit.contracts.getReserve(),
     ])
     const goldAmount = await convertToContractDecimals(argv.gold, goldToken)
-    const stableTokenAmount = await convertToContractDecimals(argv.dollars, stableToken)
-    console.log(
-      `Fauceting ${goldAmount.toFixed()} Gold and ${stableTokenAmount.toFixed()} StableToken to ${address}`
-    )
+    const stableTokenAmount = await convertToContractDecimals(argv.dollar, stableToken)
+    console.log(`Fauceting ${argv.gold} Gold and ${argv.dollar} StableToken to ${address}`)
     if (!goldAmount.isZero()) {
       if (await reserve.isSpender(account)) {
         await reserve.transferGold(address, goldAmount.toFixed()).sendAndWaitForReceipt()

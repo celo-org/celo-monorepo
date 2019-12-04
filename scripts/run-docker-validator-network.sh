@@ -7,18 +7,18 @@ export LC_ALL=en_US.UTF-8
 COMMAND=${1:-"pull,accounts,run-validator,run-proxy,status,print-env"}
 DATA_DIR=${2:-"/tmp/celo/network"}
 
-export CELO_IMAGE=${3:-"us.gcr.io/celo-testnet/geth@sha256:37ff19487dfe436ca2be87725cf7ba0009c223614bbaf5b79d856ea9e73917f4"}
-export NETWORK_ID=${4:-"31417"}
-export NETWORK_NAME=${5:-"baklavastaging"}
+export CELO_IMAGE=${3:-"us.gcr.io/celo-testnet/celo-node:baklava"}
+export NETWORK_ID=${4:-"12219"}
+export NETWORK_NAME=${5:-"baklava"}
 export DEFAULT_PASSWORD=${6:-"1234"}
 export CELO_IMAGE_ATTESTATION=${7:-"us.gcr.io/celo-testnet/celo-monorepo@sha256:90ea6739f9d239218245b5dce30e1bb5f05ac8dbc59f8e6f315502635c05ccb1"}
-export CELO_PROVIDER=${8:-"https://baklavastaging-forno.celo-testnet.org/"} # https://berlintestnet001-forno.celo-networks-dev.org/
+export CELO_PROVIDER=${8:-"https://baklava-forno.celo-testnet.org/"} # https://berlintestnet001-forno.celo-networks-dev.org/
 export DATABASE_URL=${9:-"sqlite://db/attestation.db"}
 
 export VALIDATOR_NAME=johndoe_$(cat /dev/urandom | tr -dc 'a-z0-9' | fold -w 8 | head -n 1)
 export VALIDATOR_GROUP_NAME=tijuana_$(cat /dev/urandom | tr -dc 'a-z0-9' | fold -w 8 | head -n 1)
 
-export CELOCLI="celocli"
+export CELOCLI="npx celocli"
 export NEXMO_KEY="xx"
 export NEXMO_SECRET="xx"
 export NEXMO_BLACKLIST=""
@@ -242,7 +242,7 @@ if [[ $COMMAND == *"run-attestation"* ]]; then
     echo -e "\tPulling docker image: $CELO_IMAGE_ATTESTATION"
     docker pull $CELO_IMAGE_ATTESTATION
     
-    export ATTESTATION_KEY=0x$(celocli account:new| tail -3| head -1| cut -d' ' -f 2| tr -cd "[:alnum:]\n")
+    export ATTESTATION_KEY=0x$($CELOCLI account:new| tail -3| head -1| cut -d' ' -f 2| tr -cd "[:alnum:]\n")
     echo -e "\tATTESTATION_KEY=$ATTESTATION_KEY"
     
     screen -S attestation-service -d -m  docker run -v $PWD/attestation-service:/celo-monorepo/packages/attestation-service/db --name celo-attestation-service -d --restart always --entrypoint /bin/bash -e ATTESTATION_KEY=$ATTESTATION_KEY -e ACCOUNT_ADDRESS=0x$CELO_VALIDATOR_ADDRESS -e CELO_PROVIDER=$CELO_PROVIDER -e DATABASE_URL=$DATABASE_URL -e SMS_PROVIDERS=nexmo -e NEXMO_KEY=$NEXMO_KEY -e NEXMO_SECRET=$NEXMO_SECRET -e NEXMO_BLACKLIST=$NEXMO_BLACKLIST  -p 3000:80 -v $PWD/attestation-service:/root/.celo $CELO_IMAGE_ATTESTATION -c " cd /celo-monorepo/packages/attestation-service && touch db/attestation.db && yarn run db:migrate && yarn start "
@@ -266,7 +266,7 @@ if [[ $COMMAND == *"run-fullnode"* ]]; then
 
     docker rm -f celo-fullnode || echo -e "Container removed"
 
-    export CELO_ACCOUNT_ADDRESS=$(celocli account:new |tail -1| cut -d' ' -f 2| tr -cd "[:alnum:]\n")
+    export CELO_ACCOUNT_ADDRESS=$($CELOCLI account:new |tail -1| cut -d' ' -f 2| tr -cd "[:alnum:]\n")
 
     docker run -v $PWD/fullnode:/root/.celo --entrypoint /bin/sh -it $CELO_IMAGE -c "wget https://www.googleapis.com/storage/v1/b/static_nodes/o/$NETWORK_NAME?alt=media -O /root/.celo/static-nodes.json"
 
@@ -304,9 +304,6 @@ fi
 if [[ $COMMAND == *"get-cooking"* ]]; then
 
     echo -e "* Prepping validator for The Great Celo Stake Off..."
-    cd $ACCOUNTS_DIR
-    
-    which $CELOCLI
     
     echo -e "\t1. Unlocking accounts .."
     $CELOCLI account:unlock --account $CELO_VALIDATOR_GROUP_ADDRESS --password $DEFAULT_PASSWORD
