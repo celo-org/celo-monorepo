@@ -1,9 +1,53 @@
 import { assertRevert, NULL_ADDRESS } from '@celo/protocol/lib/test-utils'
 import { parseMultiSigTransaction } from '@celo/protocol/lib/web3-utils'
-import { MultiSigInstance } from 'types'
-import BigNumber from 'bignumber.js'
+import * as _ from 'lodash'
+import { MultiSigContract, MultiSigInstance } from 'types'
 
-const MultiSig: Truffle.Contract<MultiSigInstance> = artifacts.require('MultiSig')
+const MultiSig: MultiSigContract = artifacts.require('MultiSig')
+
+const encodeAddOwnerFunc = (web3, ownerAddress) => {
+  return web3.eth.abi.encodeFunctionCall(
+    {
+      name: 'addOwner',
+      type: 'function',
+      inputs: [{ name: 'owner', type: 'address' }],
+    },
+    [ownerAddress]
+  )
+}
+
+const encodeRemoveOwnerFunc = (web3, ownerAddress) => {
+  return web3.eth.abi.encodeFunctionCall(
+    {
+      name: 'removeOwner',
+      type: 'function',
+      inputs: [{ name: 'owner', type: 'address' }],
+    },
+    [ownerAddress]
+  )
+}
+
+const encodeReplaceOwnerFunc = (web3, oldOwner, newOwner) => {
+  return web3.eth.abi.encodeFunctionCall(
+    {
+      name: 'replaceOwner',
+      type: 'function',
+      inputs: [{ name: 'owner', type: 'address' }, { name: 'newOwner', type: 'address' }],
+    },
+    [oldOwner, newOwner]
+  )
+}
+
+const encodeChangeRequirementFunc = (web3, required) => {
+  return web3.eth.abi.encodeFunctionCall(
+    {
+      name: 'changeRequirement',
+      type: 'function',
+      inputs: [{ name: '_required', type: 'uint256' }],
+    },
+    [required]
+  )
+}
 
 // TODO(asa): Test more governance configurations, calling functions on external contracts.
 contract('MultiSig', (accounts: any) => {
@@ -35,21 +79,26 @@ contract('MultiSig', (accounts: any) => {
   describe('#submitTransaction()', () => {
     let txData: string
     beforeEach(async () => {
-      // @ts-ignore contract is a property
-      txData = multiSig.contract.addOwner.getData(accounts[2])
+      txData = encodeAddOwnerFunc(web3, accounts[2])
     })
 
     it('should allow an owner to submit a transaction', async () => {
       // @ts-ignore: TODO(mcortesi): fix typings
-      const txId = await multiSig.submitTransaction(multiSig.address, 0, txData)
+      const tx = await multiSig.submitTransaction(multiSig.address, 0, txData, {
+        from: accounts[0],
+      })
+
+      const txEvent = _.find(tx.logs, {
+        event: 'Confirmation',
+      })
+      const txId = txEvent.args.transactionId
+
       // @ts-ignore: TODO(mcortesi): fix typings
-      await multiSig.submitTransaction(multiSig.address, 0, txData)
-      // @ts-ignore: TODO(mcortesi): fix typings
-      const tx = parseMultiSigTransaction(await multiSig.transactions(txId))
-      assert.equal(tx.destination, multiSig.address)
-      assert.equal(tx.value, 0)
-      assert.equal(tx.data, txData)
-      assert.isFalse(tx.executed)
+      const parsedTxData = parseMultiSigTransaction(await multiSig.transactions(txId))
+      assert.equal(parsedTxData.destination, multiSig.address)
+      assert.equal(parsedTxData.value, 0)
+      assert.equal(parsedTxData.data, txData)
+      assert.isFalse(parsedTxData.executed)
       assert.isTrue(await multiSig.confirmations(txId, accounts[0]))
       assert.equal((await multiSig.transactionCount()).toNumber(), 1)
     })
@@ -69,12 +118,19 @@ contract('MultiSig', (accounts: any) => {
 
   describe('#confirmTransaction()', () => {
     let txId: number
+    let tx: string
     beforeEach(async () => {
-      // @ts-ignore contract is a property
-      const txData = multiSig.contract.addOwner.getData(accounts[2])
+      const txData = encodeAddOwnerFunc(web3, accounts[2])
       // @ts-ignore: TODO(mcortesi): fix typings
-      txId = await multiSig.submitTransaction(multiSig.address, 0, txData)
-      await multiSig.submitTransaction(multiSig.address, 0, txData)
+      tx = await multiSig.submitTransaction(multiSig.address, 0, txData, {
+        from: accounts[0],
+      })
+
+      // @ts-ignore: TODO(mcortesi): fix typings
+      const txEvent = _.find(tx.logs, {
+        event: 'Confirmation',
+      })
+      txId = txEvent.args.transactionId
     })
 
     it('should allow an owner to confirm a transaction', async () => {
@@ -82,8 +138,8 @@ contract('MultiSig', (accounts: any) => {
       assert.isTrue(await multiSig.confirmations(txId, accounts[1]))
 
       // @ts-ignore: TODO(mcortesi): fix typings
-      const tx = parseMultiSigTransaction(await multiSig.transactions(txId))
-      assert.isTrue(tx.executed)
+      const parsedTxData = parseMultiSigTransaction(await multiSig.transactions(txId))
+      assert.isTrue(parsedTxData.executed)
     })
 
     it('should not allow an owner to confirm a transaction twice', async () => {
@@ -97,12 +153,19 @@ contract('MultiSig', (accounts: any) => {
 
   describe('#revokeConfirmation()', () => {
     let txId: number
+    let tx: string
     beforeEach(async () => {
-      // @ts-ignore contract is a property
-      const txData = multiSig.contract.addOwner.getData(accounts[2])
+      const txData = encodeAddOwnerFunc(web3, accounts[2])
       // @ts-ignore: TODO(mcortesi): fix typings
-      txId = await multiSig.submitTransaction(multiSig.address, 0, txData)
-      await multiSig.submitTransaction(multiSig.address, 0, txData)
+      tx = await multiSig.submitTransaction(multiSig.address, 0, txData, {
+        from: accounts[0],
+      })
+
+      // @ts-ignore: TODO(mcortesi): fix typings
+      const txEvent = _.find(tx.logs, {
+        event: 'Confirmation',
+      })
+      txId = txEvent.args.transactionId
     })
 
     it('should allow an owner to revoke a confirmation', async () => {
@@ -121,10 +184,17 @@ contract('MultiSig', (accounts: any) => {
 
   describe('#addOwner()', () => {
     it('should allow a new owner to be added via the MultiSig', async () => {
-      // @ts-ignore contract is a property
-      const txData = multiSig.contract.addOwner.getData(accounts[2])
-      const txId = await multiSig.submitTransaction(multiSig.address, 0, txData)
-      await multiSig.submitTransaction(multiSig.address, 0, txData)
+      const txData = encodeAddOwnerFunc(web3, accounts[2])
+      // @ts-ignore: TODO(mcortesi): fix typings
+      const tx = await multiSig.submitTransaction(multiSig.address, 0, txData, {
+        from: accounts[0],
+      })
+
+      // @ts-ignore: TODO(mcortesi): fix typings
+      const txEvent = _.find(tx.logs, {
+        event: 'Confirmation',
+      })
+      const txId = txEvent.args.transactionId
       // @ts-ignore: TODO(mcortesi): fix typings
       await multiSig.confirmTransaction(txId, { from: accounts[1] })
       assert.isTrue(await multiSig.isOwner(accounts[2]))
@@ -134,21 +204,31 @@ contract('MultiSig', (accounts: any) => {
       await assertRevert(multiSig.addOwner(accounts[3]))
     })
 
-    it('should not allow a new owner - the 0x address to be added', async () => {
-      await assertRevert(multiSig.contract.addOwner.getData(NULL_ADDRESS))
+    it('should not allow adding the null address', async () => {
+      await assertRevert(multiSig.addOwner(NULL_ADDRESS))
     })
   })
 
   describe('#removeOwner()', () => {
     it('should allow an owner to be removed via the MultiSig', async () => {
       // @ts-ignore contract is a property
-      const txData = multiSig.contract.removeOwner.getData(accounts[1])
-      const txId = await multiSig.submitTransaction(multiSig.address, 0, txData)
-      await multiSig.submitTransaction(multiSig.address, 0, txData)
+      const txData = encodeRemoveOwnerFunc(web3, accounts[1])
+      const tx = await multiSig.submitTransaction(multiSig.address, 0, txData, {
+        from: accounts[0],
+      })
+
+      // @ts-ignore: TODO(mcortesi): fix typings
+      const txEvent = _.find(tx.logs, {
+        event: 'Confirmation',
+      })
+      // @ts-ignore: TODO(mcortesi): fix typings
+      const txId = txEvent.args.transactionId
+
       // @ts-ignore: TODO(mcortesi): fix typings
       await multiSig.confirmTransaction(txId, { from: accounts[1] })
+
       assert.isFalse(await multiSig.isOwner(accounts[1]))
-      assert.equal(await multiSig.required(), new BigNumber(1))
+      assert.equal((await multiSig.required()).toNumber(), 1)
     })
 
     it('should not allow an external account to remove an owner', async () => {
@@ -159,9 +239,16 @@ contract('MultiSig', (accounts: any) => {
   describe('#replaceOwner()', () => {
     it('should allow an existing owner to be replaced by a new one via the MultiSig', async () => {
       // @ts-ignore contract is a property
-      const txData = multiSig.contract.replaceOwner.getData(accounts[1], accounts[2])
-      const txId = await multiSig.submitTransaction(multiSig.address, 0, txData)
-      await multiSig.submitTransaction(multiSig.address, 0, txData)
+      const txData = encodeReplaceOwnerFunc(web3, accounts[1], accounts[2])
+      const tx = await multiSig.submitTransaction(multiSig.address, 0, txData, {
+        from: accounts[0],
+      })
+      // @ts-ignore: TODO(mcortesi): fix typings
+      const txEvent = _.find(tx.logs, {
+        event: 'Confirmation',
+      })
+      // @ts-ignore: TODO(mcortesi): fix typings
+      const txId = txEvent.args.transactionId
       // @ts-ignore: TODO(mcortesi): fix typings
       await multiSig.confirmTransaction(txId, { from: accounts[1] })
       assert.isTrue(await multiSig.isOwner(accounts[2]))
@@ -172,24 +259,28 @@ contract('MultiSig', (accounts: any) => {
       await assertRevert(multiSig.replaceOwner(accounts[1], accounts[2]))
     })
 
-    it('should not allow a new owner - the 0x address to be replaced by an old owner', async () => {
-      await assertRevert(multiSig.contract.replaceOwner.getData(accounts[1], NULL_ADDRESS))
-    })
-
-    it('should not allow the 0x address to call the replace owner function', async () => {
-      await assertRevert(multiSig.contract.replaceOwner.getData(NULL_ADDRESS, accounts[2]))
+    it('should not allow an owner to be replaced by the null address', async () => {
+      await assertRevert(multiSig.replaceOwner(accounts[1], NULL_ADDRESS))
     })
   })
 
   describe('#changeRequirement()', () => {
     it('should allow the requirement to be changed via the MultiSig', async () => {
-      // @ts-ignore contract is a property
-      const txData = multiSig.contract.changeRequirement.getData(1)
-      const txId = await multiSig.submitTransaction(multiSig.address, 0, txData)
-      await multiSig.submitTransaction(multiSig.address, 0, txData)
+      // @ts-ignore: TODO(mcortesi): fix typings
+      const txData = encodeChangeRequirementFunc(web3, 1)
+      const tx = await multiSig.submitTransaction(multiSig.address, 0, txData, {
+        from: accounts[0],
+      })
+      // @ts-ignore: TODO(mcortesi): fix typings
+      const txEvent = _.find(tx.logs, {
+        event: 'Confirmation',
+      })
+      // @ts-ignore: TODO(mcortesi): fix typings
+      const txId = txEvent.args.transactionId
+
       // @ts-ignore: TODO(mcortesi): fix typings
       await multiSig.confirmTransaction(txId, { from: accounts[1] })
-      assert.equal(await multiSig.required(), new BigNumber(1))
+      assert.equal((await multiSig.required()).toNumber(), 1)
     })
 
     it('should not allow an external account to change the requirement', async () => {
@@ -200,27 +291,35 @@ contract('MultiSig', (accounts: any) => {
   describe('#getConfirmationCount()', () => {
     let txId: number
     beforeEach(async () => {
-      // @ts-ignore contract is a property
-      const txData = multiSig.contract.addOwner.getData(accounts[2])
       // @ts-ignore: TODO(mcortesi): fix typings
-      txId = await multiSig.submitTransaction(multiSig.address, 0, txData)
-      await multiSig.submitTransaction(multiSig.address, 0, txData)
+      const txData = encodeAddOwnerFunc(web3, accounts[2])
+      const tx = await multiSig.submitTransaction(multiSig.address, 0, txData, {
+        from: accounts[0],
+      })
+      // @ts-ignore: TODO(mcortesi): fix typings
+      const txEvent = _.find(tx.logs, {
+        event: 'Confirmation',
+      })
+      // @ts-ignore: TODO(mcortesi): fix typings
+      txId = txEvent.args.transactionId
     })
 
     it('should return the confirmation count', async () => {
-      assert.equal(await multiSig.getConfirmationCount(txId), new BigNumber(1))
+      assert.equal((await multiSig.getConfirmationCount(txId)).toNumber(), 1)
     })
   })
 
   describe('#getTransactionCount()', () => {
     beforeEach(async () => {
-      // @ts-ignore contract is a property
-      const txData = multiSig.contract.addOwner.getData(accounts[2])
-      await multiSig.submitTransaction(multiSig.address, 0, txData)
+      // @ts-ignore: TODO(mcortesi): fix typings
+      const txData = encodeAddOwnerFunc(web3, accounts[2])
+      await multiSig.submitTransaction(multiSig.address, 0, txData, {
+        from: accounts[0],
+      })
     })
 
     it('should return the transaction count', async () => {
-      assert.equal(await multiSig.getTransactionCount(true, true), new BigNumber(1))
+      assert.equal((await multiSig.getTransactionCount(true, true)).toNumber(), 1)
     })
   })
 
@@ -233,11 +332,17 @@ contract('MultiSig', (accounts: any) => {
   describe('#getConfirmations()', () => {
     let txId: number
     beforeEach(async () => {
-      // @ts-ignore contract is a property
-      const txData = multiSig.contract.addOwner.getData(accounts[2])
       // @ts-ignore: TODO(mcortesi): fix typings
-      txId = await multiSig.submitTransaction(multiSig.address, 0, txData)
-      await multiSig.submitTransaction(multiSig.address, 0, txData)
+      const txData = encodeAddOwnerFunc(web3, accounts[2])
+      const tx = await multiSig.submitTransaction(multiSig.address, 0, txData, {
+        from: accounts[0],
+      })
+      // @ts-ignore: TODO(mcortesi): fix typings
+      const txEvent = _.find(tx.logs, {
+        event: 'Confirmation',
+      })
+      // @ts-ignore: TODO(mcortesi): fix typings
+      txId = txEvent.args.transactionId
     })
 
     it('should return the confirmations', async () => {
@@ -247,9 +352,11 @@ contract('MultiSig', (accounts: any) => {
 
   describe('#getTransactionIds()', () => {
     beforeEach(async () => {
-      // @ts-ignore contract is a property
-      const txData = multiSig.contract.addOwner.getData(accounts[2])
-      await multiSig.submitTransaction(multiSig.address, 0, txData)
+      // @ts-ignore: TODO(mcortesi): fix typings
+      const txData = encodeAddOwnerFunc(web3, accounts[2])
+      await multiSig.submitTransaction(multiSig.address, 0, txData, {
+        from: accounts[0],
+      })
     })
 
     it('should return the confirmations', async () => {

@@ -155,7 +155,6 @@ contract MultiSig is Initializable {
     external
     onlyWallet
     ownerExists(owner)
-    notNull(owner)
     notNull(newOwner)
     ownerDoesNotExist(newOwner)
   {
