@@ -1,6 +1,6 @@
 import Web3 from 'web3'
 import { newKitFromWeb3 } from '@celo/contractkit'
-import { displaySendTx } from '@celo/celocli/lib/utils/cli'
+import { displaySendTx } from '../../../cli/lib/utils/cli'
 import { importAndUnlockAccount } from './utils'
 import BigNumber from 'bignumber.js'
 
