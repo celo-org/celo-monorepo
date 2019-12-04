@@ -13,13 +13,17 @@ interface ExchangeRateObject {
 
 // Binary search in sorted array
 function findClosestIndex(arr: number[], target: number) {
-  if (target < arr[0]) return 0
-  if (target > arr[arr.length - 1]) return arr.length - 1
+  if (target < arr[0]) {
+    return 0
+  }
+  if (target > arr[arr.length - 1]) {
+    return arr.length - 1
+  }
 
   let lo = 0
   let hi = arr.length - 1
   while (lo <= hi) {
-    const mid = (lo + hi) >>> 1
+    const mid = Math.floor((lo + hi) / 2)
     if (target < arr[mid]) {
       hi = mid - 1
     } else if (target > arr[mid]) {

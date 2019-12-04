@@ -32,7 +32,7 @@ export default class CurrencyConversionAPI<TContext = any> extends DataSource {
     const fromCode = sourceCurrencyCode || USD
     const toCode = currencyCode
 
-    let steps = this.getConversionSteps(fromCode, toCode)
+    const steps = this.getConversionSteps(fromCode, toCode)
 
     const ratesPromises = []
     for (let i = 1; i < steps.length; i++) {
@@ -44,9 +44,7 @@ export default class CurrencyConversionAPI<TContext = any> extends DataSource {
     const rates = await Promise.all(ratesPromises)
 
     // Multiply all rates
-    const rate = rates.reduce((acc, rate) => acc.multipliedBy(rate), new BigNumber(1))
-
-    return rate
+    return rates.reduce((acc, rate) => acc.multipliedBy(rate), new BigNumber(1))
   }
 
   private getConversionSteps(fromCode: string, toCode: string) {
@@ -81,7 +79,7 @@ export default class CurrencyConversionAPI<TContext = any> extends DataSource {
     toCode: string,
     timestamp?: number
   ): Promise<BigNumber> {
-    let pair = `${fromCode}/${toCode}`
+    const pair = `${fromCode}/${toCode}`
 
     if (pair === 'cUSD/USD' || pair === 'USD/cUSD') {
       return Promise.resolve(new BigNumber(1))
