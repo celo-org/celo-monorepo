@@ -54,8 +54,9 @@ async function runTestNetwork({
   // configure geth
   const gethConfig: GethRunConfig = {
     networkId: 1101,
+    network: 'local',
     runPath: tmpDir,
-    genesisPath: tmpDir + '/genesis.json',
+    keepData,
     gethRepoPath,
     migrateTo,
     instances: [],
@@ -81,10 +82,10 @@ async function runTestNetwork({
 
   // run the nodes
   await runGethNodes({
-    keepData,
     gethConfig,
     validators,
     validatorPrivateKeys,
+    verbose: true,
   })
 
   // do migration

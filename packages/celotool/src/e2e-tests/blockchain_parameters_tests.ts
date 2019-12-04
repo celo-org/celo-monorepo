@@ -19,8 +19,8 @@ describe('Blockchain parameters tests', function(this: any) {
     gethRepoPath: '../../../celo-blockchain',
     migrateTo: 18,
     runPath: TMP_PATH,
-    genesisPath: TMP_PATH + '/genesis.json',
     networkId: 1101,
+    network: 'local',
     instances: [],
   }
 

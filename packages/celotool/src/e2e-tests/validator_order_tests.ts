@@ -15,8 +15,8 @@ describe('governance tests', () => {
   const gethConfig: GethRunConfig = {
     gethRepoPath: '../../../celo-blockchain',
     networkId: 1101,
+    network: 'local',
     runPath: TMP_PATH,
-    genesisPath: TMP_PATH + '/gensis.json',
     migrateTo: 15,
     instances: _.range(VALIDATORS).map((i) => ({
       gethRunConfig: gethConfig,
