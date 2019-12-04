@@ -12,8 +12,8 @@ reference:
     shell: /bin/bash --login -eo pipefail
     environment:
       TERM: dumb
-      _JAVA_OPTIONS: "-Xmx7g -XX:+UnlockExperimentalVMOptions -XX:+UseCGroupMemoryLimitForHeap"
-      GRADLE_OPTS: '-Dorg.gradle.daemon=false -Dorg.gradle.configureondemand=true -Dorg.gradle.jvmargs="-Xmx6g -XX:MaxPermSize=3g -XX:+HeapDumpOnOutOfMemoryError -Dfile.encoding=UTF-8"'
+      _JAVA_OPTIONS: "-XX:+UnlockExperimentalVMOptions -XX:+UseCGroupMemoryLimitForHeap"
+      GRADLE_OPTS: "-Dorg.gradle.daemon=false -Dorg.gradle.configureondemand=true"
 
 defaults: &defaults
   working_directory: ~/app
@@ -28,13 +28,15 @@ android-defaults: &android-defaults
   docker:
     - image: circleci/android:api-28-node
   environment:
-    _JAVA_OPTIONS: "-Xmx7g -XX:+UnlockExperimentalVMOptions -XX:+UseCGroupMemoryLimitForHeap"
-    GRADLE_OPTS: '-Dorg.gradle.daemon=false -Dorg.gradle.configureondemand=true -Dorg.gradle.jvmargs="-Xmx6g -XX:MaxPermSize=3g -XX:+HeapDumpOnOutOfMemoryError -Dfile.encoding=UTF-8"'
+    _JAVA_OPTIONS: "-XX:+UnlockExperimentalVMOptions -XX:+UseCGroupMemoryLimitForHeap"
+    GRADLE_OPTS: "-Dorg.gradle.daemon=false -Dorg.gradle.configureondemand=true"
 
 e2e-defaults: &e2e-defaults
   <<: *defaults
   docker:
     - image: celohq/circleci
+  environment:
+    CELO_BLOCKCHAIN_BRANCH_TO_TEST: master
 
 general:
   artifacts:
@@ -44,6 +46,8 @@ general:
 jobs:
   install_dependencies:
     <<: *defaults
+    # Source: https://circleci.com/docs/2.0/configuration-reference/#resource_class
+    resource_class: medium+
     steps:
       - restore_cache:
           keys:
@@ -240,7 +244,7 @@ jobs:
       - run:
           name: Start pidcat logging
           command: pidcat -t "GoLog" -t "Go" # React logs are on metro step since RN 61
-          background: true 
+          background: true
       - run:
           name: Run yarn dev
           command: cd ~/src/packages/mobile && ENVFILE=".env.test" yarn dev
@@ -249,9 +253,9 @@ jobs:
           command: adb kill-server && adb start-server
       - run:
           name: Run test itself
-          
+
           command: |
-            cd ~/src/packages/mobile 
+            cd ~/src/packages/mobile
             # detox sometimes without releasing the terminal and thus making the CI timout
             # 480s = 8 minutes
             timeout 480 yarn test:detox || echo "failed, try again"
@@ -398,7 +402,7 @@ jobs:
       - run:
           name: Generate DevChain
           command: |
-            (cd packages/contractkit && yarn test:prepare)
+            (cd packages/contractkit && yarn test:reset)
       - run:
           name: Run Tests
           command: yarn --cwd=packages/contractkit test
@@ -450,7 +454,7 @@ jobs:
       - run:
           name: Generate DevChain
           command: |
-            (cd packages/cli && yarn test:reset)          
+            (cd packages/cli && yarn test:reset)
       - run:
           name: Run Tests
           command: yarn --cwd=packages/cli test
@@ -468,15 +472,16 @@ jobs:
           command: |
             yarn --cwd=packages/cli run celocli account:new
 
-      - run:
-          name: Install and test the npm package
-          command: |
-            set -euo pipefail
-            cd packages/cli
-            yarn pack
-            cd /tmp
-            npm install ~/app/packages/cli/celo-celocli-*.tgz
-            ./node_modules/.bin/celocli account:new # Small test
+      # Won't work when cli uses git dependencies!
+      # - run:
+      #     name: Install and test the npm package
+      #     command: |
+      #       set -euo pipefail
+      #       cd packages/cli
+      #       yarn pack
+      #       cd /tmp
+      #       npm install ~/app/packages/cli/celo-celocli-*.tgz
+      #       ./node_modules/.bin/celocli account:new # Small test
 
   typescript-test:
     <<: *defaults
@@ -524,7 +529,7 @@ jobs:
           command: |
             set -e
             cd packages/celotool
-            ./ci_test_transfers.sh checkout master
+            ./ci_test_transfers.sh checkout ${CELO_BLOCKCHAIN_BRANCH_TO_TEST}
 
   end-to-end-geth-blockchain-parameters-test:
     <<: *e2e-defaults
@@ -542,7 +547,7 @@ jobs:
           command: |
             set -e
             cd packages/celotool
-            ./ci_test_blockchain_parameters.sh checkout master
+            ./ci_test_blockchain_parameters.sh checkout ${CELO_BLOCKCHAIN_BRANCH_TO_TEST}
 
   end-to-end-geth-governance-test:
     <<: *e2e-defaults
@@ -562,7 +567,7 @@ jobs:
           command: |
             set -e
             cd packages/celotool
-            ./ci_test_governance.sh checkout master
+            ./ci_test_governance.sh checkout ${CELO_BLOCKCHAIN_BRANCH_TO_TEST}
 
   end-to-end-geth-sync-test:
     <<: *e2e-defaults
@@ -581,42 +586,7 @@ jobs:
           command: |
             set -e
             cd packages/celotool
-            ./ci_test_sync.sh checkout master
-
-  end-to-end-geth-integration-sync-test:
-    <<: *e2e-defaults
-    steps:
-      - attach_workspace:
-          at: ~/app
-      - run:
-          name: Check if the test should run
-          command: |
-            FILES_TO_CHECK="${PWD}/packages/celotool,${PWD}/packages/protocol,${PWD}/.circleci/config.yml"
-            ./scripts/ci_check_if_test_should_run_v2.sh ${FILES_TO_CHECK}
-      - run:
-          name: Run test
-          command: |
-            set -e
-            cd packages/celotool
-            ./ci_test_sync_with_network.sh checkout master
-
-  end-to-end-geth-attestations-test:
-    <<: *e2e-defaults
-    resource_class: medium+
-    steps:
-      - attach_workspace:
-          at: ~/app
-      - run:
-          name: Check if the test should run
-          command: |
-            FILES_TO_CHECK="${PWD}/packages/celotool,${PWD}/packages/protocol,${PWD}/.circleci/config.yml"
-            ./scripts/ci_check_if_test_should_run_v2.sh ${FILES_TO_CHECK}
-      - run:
-          name: Run test
-          command: |
-            set -e
-            cd packages/celotool
-            ./ci_test_attestations.sh checkout master
+            ./ci_test_sync.sh checkout ${CELO_BLOCKCHAIN_BRANCH_TO_TEST}
 
   end-to-end-geth-validator-order-test:
     <<: *e2e-defaults
@@ -634,7 +604,7 @@ jobs:
           command: |
             set -e
             cd packages/celotool
-            ./ci_test_validator_order.sh checkout master
+            ./ci_test_validator_order.sh checkout ${CELO_BLOCKCHAIN_BRANCH_TO_TEST}
 
   web:
     working_directory: ~/app
@@ -757,14 +727,6 @@ workflows:
             - lint-checks
             - contractkit-test
       - end-to-end-geth-sync-test:
-          requires:
-            - lint-checks
-            - contractkit-test
-      - end-to-end-geth-integration-sync-test:
-          requires:
-            - lint-checks
-            - contractkit-test
-      - end-to-end-geth-attestations-test:
           requires:
             - lint-checks
             - contractkit-test

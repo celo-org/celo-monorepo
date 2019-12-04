@@ -213,16 +213,19 @@ contract Election is
     require(votes.total.eligible.contains(group), "Group not eligible");
     require(0 < value, "Vote value cannot be zero");
     require(canReceiveVotes(group, value), "Group cannot receive votes");
-    address account = getAccounts().activeVoteSignerToAccount(msg.sender);
+    address account = getAccounts().voteSignerToAccount(msg.sender);
 
     // Add group to the groups voted for by the account.
+    bool alreadyVotedForGroup = false;
     address[] storage groups = votes.groupsVotedFor[account];
-    require(groups.length < maxNumGroupsVotedFor, "Has voted for max number of groups");
     for (uint256 i = 0; i < groups.length; i = i.add(1)) {
-      require(groups[i] != group, "Already voted group");
+      alreadyVotedForGroup = alreadyVotedForGroup || groups[i] == group;
+    }
+    if (!alreadyVotedForGroup) {
+      require(groups.length < maxNumGroupsVotedFor, "Voted for too many groups");
+      groups.push(group);
     }
 
-    groups.push(group);
     incrementPendingVotes(group, account, value);
     incrementTotalVotes(group, value, lesser, greater);
     getLockedGold().decrementNonvotingAccountBalance(account, value);
@@ -237,7 +240,7 @@ contract Election is
    * @dev Pending votes cannot be activated until an election has been held.
    */
   function activate(address group) external nonReentrant returns (bool) {
-    address account = getAccounts().activeVoteSignerToAccount(msg.sender);
+    address account = getAccounts().voteSignerToAccount(msg.sender);
     PendingVote storage pendingVote = votes.pending.forGroup[group].byAccount[account];
     require(pendingVote.epoch < getEpochNumber(), "Pending vote epoch not passed");
     uint256 value = pendingVote.value;
@@ -245,6 +248,19 @@ contract Election is
     decrementPendingVotes(group, account, value);
     incrementActiveVotes(group, account, value);
     emit ValidatorGroupVoteActivated(account, group, value);
+    return true;
+  }
+
+  /**
+   * @notice Returns whether or not an account's votes for the specified group can be activated.
+   * @param account The account with pending votes.
+   * @param group The validator group that `account` has pending votes for.
+   * @return Whether or not `account` has activatable votes for `group`.
+   * @dev Pending votes cannot be activated until an election has been held.
+   */
+  function hasActivatablePendingVotes(address account, address group) external view returns (bool) {
+    PendingVote storage pendingVote = votes.pending.forGroup[group].byAccount[account];
+    return pendingVote.epoch < getEpochNumber() && pendingVote.value > 0;
   }
 
   /**
@@ -267,7 +283,7 @@ contract Election is
     uint256 index
   ) external nonReentrant returns (bool) {
     require(group != address(0), "Group address zero");
-    address account = getAccounts().activeVoteSignerToAccount(msg.sender);
+    address account = getAccounts().voteSignerToAccount(msg.sender);
     require(0 < value, "Vote value cannot be zero");
     require(
       value <= getPendingVotesForGroupByAccount(group, account),
@@ -304,7 +320,7 @@ contract Election is
   ) external nonReentrant returns (bool) {
     // TODO(asa): Dedup with revokePending.
     require(group != address(0), "Group address zero");
-    address account = getAccounts().activeVoteSignerToAccount(msg.sender);
+    address account = getAccounts().voteSignerToAccount(msg.sender);
     require(0 < value, "Vote value cannot be zero");
     require(
       value <= getActiveVotesForGroupByAccount(group, account),
@@ -685,6 +701,14 @@ contract Election is
   }
 
   /**
+   * @notice Returns the active votes received across all groups.
+   * @return The active votes received across all groups.
+   */
+  function getActiveVotes() public view returns (uint256) {
+    return votes.active.total;
+  }
+
+  /**
    * @notice Returns the list of validator groups eligible to elect validators.
    * @return The list of validator groups eligible to elect validators.
    */
@@ -710,7 +734,7 @@ contract Election is
    * @return The list of elected validators.
    * @dev See https://en.wikipedia.org/wiki/D%27Hondt_method#Allocation for more information.
    */
-  function electValidators() external view returns (address[] memory) {
+  function electValidatorSigners() external view returns (address[] memory) {
     // Groups must have at least `electabilityThreshold` proportion of the total votes to be
     // considered for the election.
     uint256 requiredVotes = electabilityThreshold
@@ -755,8 +779,7 @@ contract Election is
         totalNumMembersElected = totalNumMembersElected.add(1);
       }
     }
-    // Shuffle the validator set using validator-supplied entropy
-    return shuffleArray(electedValidators);
+    return electedValidators;
   }
 
   /**
@@ -793,17 +816,15 @@ contract Election is
   }
 
   /**
-   * @notice Randomly permutes an array of addresses.
-   * @param array The array to permute.
-   * @return The permuted array.
+   * @notice Returns get current validator signers using the precompiles.
+   * @return List of current validator signers.
    */
-  function shuffleArray(address[] memory array) private view returns (address[] memory) {
-    bytes32 r = getRandom().getBlockRandomness(block.number);
-    for (uint256 i = array.length - 1; i > 0; i = i.sub(1)) {
-      uint256 j = uint256(r) % (i + 1);
-      (array[i], array[j]) = (array[j], array[i]);
-      r = keccak256(abi.encodePacked(r));
+  function getCurrentValidatorSigners() public view returns (address[] memory) {
+    uint256 n = numberValidatorsInCurrentSet();
+    address[] memory res = new address[](n);
+    for (uint256 idx = 0; idx < n; idx++) {
+      res[idx] = validatorAddressFromCurrentSet(idx);
     }
-    return array;
+    return res;
   }
 }

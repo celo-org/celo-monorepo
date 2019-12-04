@@ -1,12 +1,12 @@
 ---
-description: View network parameters
+description: View parameters of the network, including but not limited to configuration for the various Celo core smart contracts.
 ---
 
 ## Commands
 
 ### Parameters
 
-View network parameters
+View parameters of the network, including but not limited to configuration for the various Celo core smart contracts.
 
 ```
 USAGE

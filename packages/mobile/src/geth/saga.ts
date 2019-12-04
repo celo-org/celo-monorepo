@@ -9,7 +9,7 @@ import {
 } from 'src/geth/geth'
 import { InitializationState, isGethConnectedSelector } from 'src/geth/reducer'
 import { navigateToError } from 'src/navigator/NavigationService'
-import { restartApp } from 'src/utils/AppRestart'
+import { deleteChainDataAndRestartApp } from 'src/utils/AppRestart'
 import Logger from 'src/utils/Logger'
 import { zeroSyncSelector } from 'src/web3/selectors'
 
@@ -118,7 +118,7 @@ export function* initGethSaga() {
 
   if (restartAppAutomatically) {
     Logger.error(TAG, 'Geth initialization failed, restarting the app.')
-    restartApp()
+    deleteChainDataAndRestartApp()
   } else {
     navigateToError('networkConnectionFailed')
   }
@@ -152,11 +152,18 @@ function* monitorGeth() {
         yield put(setGethConnected(true))
         yield delay(GETH_MONITOR_DELAY)
       } else {
-        Logger.error(
-          `${TAG}@monitorGeth`,
-          `Did not receive a block in ${NEW_BLOCK_TIMEOUT} milliseconds`
-        )
-        yield put(setGethConnected(false))
+        // Check whether reason for no new blocks is switch to zeroSync mode
+        const switchedToZeroSync = yield select(zeroSyncSelector)
+        if (switchedToZeroSync) {
+          yield put(setGethConnected(true))
+          return
+        } else {
+          Logger.error(
+            `${TAG}@monitorGeth`,
+            `Did not receive a block in ${NEW_BLOCK_TIMEOUT} milliseconds`
+          )
+          yield put(setGethConnected(false))
+        }
       }
     } catch (error) {
       Logger.error(`${TAG}@monitorGeth`, error)

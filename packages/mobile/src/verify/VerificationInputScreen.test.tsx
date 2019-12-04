@@ -1,7 +1,7 @@
 import * as React from 'react'
 import 'react-native'
+import { render } from 'react-native-testing-library'
 import { Provider } from 'react-redux'
-import * as renderer from 'react-test-renderer'
 import VerificationInputScreen from 'src/verify/VerificationInputScreen'
 import { createMockStore } from 'test/utils'
 
@@ -9,19 +9,19 @@ describe('VerificationInputScreen', () => {
   const store = createMockStore({})
 
   it('renders correctly', () => {
-    const tree = renderer.create(
+    const { toJSON, queryByTestId } = render(
       <Provider store={store}>
         <VerificationInputScreen />
       </Provider>
     )
-    expect(tree).toMatchSnapshot()
+    expect(toJSON()).toMatchSnapshot()
+    expect(queryByTestId('noTypeTip')).toBeFalsy()
+
+    // TODO find way to simulate keyboard showing
+    // expect(queryByTestId('noTypeTip')).toBeTruthy()
   })
 
   it('enables button after timer', () => {
-    // TODO
-  })
-
-  it('shows tip when typing', () => {
     // TODO
   })
 })

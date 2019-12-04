@@ -1,5 +1,5 @@
+import { testWithGanache } from '@celo/dev-utils/lib/ganache-test'
 import { newKitFromWeb3 } from '../kit'
-import { testWithGanache } from '../test-utils/ganache-test'
 import { ExchangeWrapper } from './Exchange'
 
 /*

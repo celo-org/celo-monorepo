@@ -156,18 +156,23 @@ contract LockedGold is ILockedGold, ReentrancyGuard, Initializable, UsingRegistr
     emit GoldUnlocked(msg.sender, value, available);
   }
 
-  // TODO(asa): Allow partial relock
   /**
    * @notice Relocks gold that has been unlocked but not withdrawn.
-   * @param index The index of the pending withdrawal to relock.
+   * @param index The index of the pending withdrawal to relock from.
+   * @param value The value to relock from the specified pending withdrawal.
    */
-  function relock(uint256 index) external nonReentrant {
+  function relock(uint256 index, uint256 value) external nonReentrant {
     require(getAccounts().isAccount(msg.sender), "Unknown account");
     Account storage account = accounts[msg.sender];
     require(index < account.balances.pendingWithdrawals.length, "Bad pending withdrawal index");
-    uint256 value = account.balances.pendingWithdrawals[index].value;
+    PendingWithdrawal storage pendingWithdrawal = account.balances.pendingWithdrawals[index];
+    require(value <= pendingWithdrawal.value, "Requested value larger than pending value");
+    if (value == pendingWithdrawal.value) {
+      deletePendingWithdrawal(account.balances.pendingWithdrawals, index);
+    } else {
+      pendingWithdrawal.value = pendingWithdrawal.value.sub(value);
+    }
     _incrementNonvotingAccountBalance(msg.sender, value);
-    deletePendingWithdrawal(account.balances.pendingWithdrawals, index);
     emit GoldLocked(msg.sender, value);
   }
 

@@ -1,35 +1,48 @@
 # Running a Validator
 
-This section explains how to get a validator node running on the network, using a Docker image that was built for this purpose. Most of this process is the same as running a full node, but with a few additional steps.
+This section explains how to get a Validator node running on the network, using the same docker image used for running a full node.
 
-Validators help secure the Celo network by participating in Celo’s Proof of Stake protocol. Validators are organized into Validator Groups, analogous to parties in representative democracies. A validator group is essentially an ordered list of validators, along with metadata like name and URL.
+Validators help secure the Celo network by participating in Celo’s Proof of Stake protocol. Validators are organized into Validator Groups, analogous to parties in representative democracies. A Validator Group is essentially an ordered list of Validators.
 
-Just as anyone in a democracy can create their own political party, or seek to get selected to represent a party in an election, any Celo user can create a validator group and add themselves to it, or set up a potential validator and work to get an existing validator group to include them.
+Just as anyone in a democracy can create their own political party, or seek to get selected to represent a party in an election, any Celo user can create a Validator group and add themselves to it, or set up a potential Validator and work to get an existing Validator group to include them.
 
-While other Validator Groups will exist on the Alfajores Testnet, the fastest way to get up and running with a validator will be to register a Validator Group, register a Validator, and add that Validator to your Validator Group. The addresses used to register Validator Groups and Validators must be unique, which will require that you create two accounts in the step-by-step guide below.
+While other Validator Groups will exist on the Celo Networks, the fastest way to get up and running with a Validator will be to register a Validator Group, register a Validator, and add that Validator to your Validator Group. The addresses used to register Validator Groups and Validators must be unique, which will require that you create two accounts in the step-by-step guide below.
 
-{% hint style="info" %}
-If you are starting up a validator, please consider leaving it running for a few weeks to support the network.
-{% endhint %}
+Because of the importance of Validator security and availability, Validators are expected to run one or more additional "proxy" nodes. In this setup, the proxy node connects with the rest of the network, and the machine running the Validator communicates only with the proxy, ideally via a private network.
 
-## **Prerequisites**
+Additionally, Validators are expected to run an [Attestation Service](running-attestation-service.md) as part of the [lightweight identity protocol](../celo-codebase/protocol/identity), to provide attestations that allow users to map their phone number to a Celo address.
+
+You can find more details about Celo mission and why to become a Validator [in our Medium article](https://medium.com/celohq/calling-all-chefs-become-a-celo-validator-c75d1c2909aa).
+
+## Prerequisites
+
+### Register for the Stake Off
+
+Participation in The Great Celo Stake Off is subject to these [Terms and Conditions](https://docs.google.com/document/d/1b5SzeRbq60nx50NeezAEMpwLkaBDQ9hjZc0QAh4Mbdk/). If you agree to those, register online via an [online form](https://docs.google.com/forms/d/e/1FAIpQLSfbn5hTJ4UIWpN92-o2qMTUB0UnrFsL0fm97XqGe4VhhN_r5A/viewform). **Once the C-Labs team receive your registration, they will send you instructions to get fauceted.** Do this first.
 
 ### Hardware requirements
 
-Because Celo network is based in Proof of Stake, the hardware requirements are not very high. Proof of Stake consensus is not so CPU intensive as Proof of Work but has a higher requirements of network connectivity and lantency. Here you have a list of the standard requirements for running a validator node:
+The recommended Celo Validator setup involves continually running three nodes on separate hardware:
+
+- 1 **Validator node**: should be deployed to single-tenant hardware in a secure, high availability data center
+- 1 **Validator Proxy node**: can be a VM or container in a multi-tenant environment (e.g. a public cloud), but requires high availability
+- 1 **Attestation node**: can be a VM or container in a multi-tenant environment (e.g. a public cloud), and has moderate availability requirements
+
+Celo is a Proof of Stake network, which has different hardware requirements than a Proof of Work network. Proof of Stake consensus is less CPU intensive, but has is more sensitive to network connectivity and latency. Below is a list of standard requirements for running a Validator node on the Celo Network:
 
 - Memory: 8 GB RAM
 - CPU: Quad core 3GHz (64-bit)
-- Disk: 256 GB of SSD storage
-- Network: At least 1 GB input/output dual Ethernet
+- Disk: 256 GB of SSD storage, plus a secondary HDD desirable
+- Network: At least 1 GB input/output Ethernet with a fiber Internet connection, ideally redundant connections and HA switches
 
-It is recommended to run the validator node in an environment that facilitates a 24/7 execution. Deployments in a top-tier datacenter facilitates the security and better uptimes.
+In addition, to get things started, it will be useful to temporarily run a node on your local machine.
 
 ### Software requirements
 
 - **You have Docker installed.**
 
-  If you don’t have it already, follow the instructions here: [Get Started with Docker](https://www.docker.com/get-started). It will involve creating or signing in with a Docker account, downloading a desktop app, and then launching the app to be able to use the Docker CLI. If you are running on a Linux server, follow the instructions for your distro [here](https://docs.docker.com/install/#server). You may be required to run Docker with sudo depending on your installation environment.
+  If you don’t have it already, follow the instructions here: [Get Started with Docker](https://www.docker.com/get-started). It will involve creating or signing in with a Docker account, downloading a desktop app, and then launching the app to be able to use the Docker CLI. If you are running on a Linux server, follow the instructions for your distro [here](https://docs.docker.com/install/#server). You may be required to run Docker with `sudo` depending on your installation environment.
+  You can check you have Docker installed and running if the command `docker info` works properly.
 
 - **You have celocli installed.**
 
@@ -43,145 +56,539 @@ It is recommended to run the validator node in an environment that facilitates a
 A note about conventions:
 The code you'll see on this page is bash commands and their output.
 
-A $ signifies the bash prompt. Everything following it is the command you should run in a terminal. The $ isn't part of the command, so don't copy it.
-
 When you see text in angle brackets &lt;&gt;, replace them and the text inside with your own value of what it refers to. Don't include the &lt;&gt; in the command.
 {% endhint %}
 
-## **Pull the Celo Docker image**
+## Instructions
 
-We're going to use a Docker image containing the Celo node software in this tutorial.
+### Key Management
 
-If you are re-running these instructions, the Celo Docker image may have been updated, and it's important to get the latest version.
+Private keys are the central primitive of any cryptographic system and need to be handled with extreme care. Loss of your private key can lead to irreversible loss of value.
 
-Run:
+#### Unlocking
 
-`$ docker pull us.gcr.io/celo-testnet/celo-node:alfajores`
+Celo nodes store private keys encrypted on disk with a password, and need to be "unlocked" before use. Private keys can be unlocked in two ways:
 
-## **Create accounts**
+1.  By running the `celocli account:unlock` command. Note that the node must have the "personal" RPC API enabled in order for this command to work.
+2.  By setting the `--unlock` flag when starting the node.
 
-Create and cd into the directory where you want to store the data and any other files needed to run your node. You can name this whatever you’d like, but here’s a default you can use:
+It is important to note that when a key is unlocked you need to be particularly careful about enabling access to the node's RPC APIs.
 
+#### Account and Signer keys
+
+Running a Celo Validator node requires the management of several different keys, each with different privileges. Keys that need to be accessed frequently (e.g. for signing blocks) are at greater risk of being compromised, and thus have more limited permissions, while keys that need to be accessed infrequently (e.g. for locking Celo Gold) are less onerous to store securely, and thus have more expansive permissions. Below is a summary of the various keys that are used in the Celo network, and a description of their permissions.
+
+| Name of the key        | Purpose                                                                                                                                                                                                                                                               |
+| ---------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Account key            | This is the key with the highest level of permissions, and is thus the most sensitive. It can be used to lock and unlock Celo Gold, and authorize vote, validator, and attestation keys. Note that the account key also has all of the permissions of the other keys. |  |
+| Validator signer key   | This is the key that has permission to register and manage a Validator or Validator Group, and participate in BFT consensus.                                                                                                                                          |  |
+| Vote signer key        | This key can be used to vote in Validator elections and on-chain governance.                                                                                                                                                                                          |  |
+| Attestation signer key | This key is used to sign attestations in Celo's lightweight identity protocol.                                                                                                                                                                                        |  |
+
+Note that account and signer keys must be unique and may not be reused.
+
+### Environment variables
+
+| Variable                             | Explanation                                                               |
+| ------------------------------------ | ------------------------------------------------------------------------- |
+| CELO_IMAGE                           | The Docker image used for the Validator and Proxy containers              |  |
+| NETWORK_ID                           | The Celo Baklava network chain ID                                         |  |
+| CELO_VALIDATOR_GROUP_ADDRESS         | The account address for the Validator Group                               |  |
+| CELO_VALIDATOR_ADDRESS               | The account address for the Validator                                     |  |
+| CELO_VALIDATOR_SIGNER_ADDRESS        | The address of the validator signer authorized by the validator account   |  |
+| CELO_VALIDATOR_SIGNER_PUBLIC_KEY     | The ECDSA public key associated with the validator signer address         |  |
+| CELO_VALIDATOR_SIGNER_SIGNATURE      | The proof-of-possession of the validator signer key                       |  |
+| CELO_VALIDATOR_SIGNER_BLS_PUBLIC_KEY | The BLS public key for the Validator instance                             |  |
+| CELO_VALIDATOR_SIGNER_BLS_SIGNATURE  | A proof-of-possession of the BLS public key                               |  |
+| PROXY_ENODE                          | The enode address for the Validator proxy                                 |  |
+| PROXY_IP                             | The Proxy container internal IP address from docker pool address          |  |
+| ATTESTATION_SIGNER_ADDRESS           | The address of the attestation signer authorized by the validator account |  |
+| ATTESTATION_SIGNER_SIGNATURE         | The proof-of-possession of the attestation signer key                     |  |
+| ATTESTATION_SERVICE_URL              | The URL to access the deployed Attestation Service                        |  |
+| METADATA_URL                         | The URL to access the metadata file for your Attestation Service          |  |
+
+First we are going to setup the main environment variables related with the `Baklava` network. Run:
+
+```bash
+export CELO_IMAGE=us.gcr.io/celo-testnet/celo-node:baklava
+export NETWORK_ID=12219
 ```
-$ mkdir celo-data-dir
-$ cd celo-data-dir
+
+### Pull the Celo Docker image
+
+In all the commands we are going to see the `CELO_IMAGE` variable to refer to the right Docker image to use. Now we can get the Docker image:
+
+```bash
+docker pull $CELO_IMAGE
 ```
 
-Create two accounts, one for the Validator and one for Validator Group, and get their addresses if you don’t already have them. If you already have your accounts, you can skip this step.
+### Create the Validator and Validator Group accounts
 
-To create your two accounts, run this command twice:
+First, you'll need to generate account keys for your Validator and Validator Group. These are the keys that will have access to your locked Celo Gold, and thus should be handled with care. For the purposes of this guide, we will be storing these keys on your local machine, but we recommend that you store then in a more secure manner.
 
-`` $ docker run -v `pwd`:/root/.celo --entrypoint /bin/sh -it us.gcr.io/celo-testnet/celo-node:alfajores -c "geth account new" ``
-
-It will prompt you for a passphrase, ask you to confirm it, and then will output your account address: `Address: {<YOUR-ACCOUNT-ADDRESS>}`
-
-Let's save these addresses to environment variables, so that you can reference it later (don't include the braces):
-
-```
-$ export CELO_VALIDATOR_GROUP_ADDRESS=<YOUR-VALIDATOR-GROUP-ADDRESS>
-$ export CELO_VALIDATOR_ADDRESS=<YOUR-VALIDATOR-ADDRESS>
+```bash
+# On your local machine
+mkdir celo-accounts-node
+cd celo-accounts-node
+docker run -v $PWD:/root/.celo --entrypoint /bin/sh -it $CELO_IMAGE -c "sleep 1 && geth account new"
+docker run -v $PWD:/root/.celo --entrypoint /bin/sh -it $CELO_IMAGE -c "sleep 1 && geth account new"
 ```
 
-In order to register the validator later on, generate a "proof of possession" - a signature proving you know your validator's BLS private key. Run this command:
+This should generate two accounts in your current directory and print them out, set them in environment variables:
 
-`` $ docker run -v `pwd`:/root/.celo --entrypoint /bin/sh -it us.gcr.io/celo-testnet/celo-node:alfajores -c "geth account proof-of-possession $CELO_VALIDATOR_ADDRESS" ``
-
-It will prompt you for the passphrase you've chosen for the validator account. Let's save the resulting proof-of-possession to an environment variable:
-
-```
-$ export CELO_VALIDATOR_POP=<YOUR-VALIDATOR-PROOF-OF-POSSESSION>
+```bash
+# On your local machine
+export CELO_VALIDATOR_GROUP_ADDRESS=<YOUR-VALIDATOR-GROUP-ADDRESS>
+export CELO_VALIDATOR_ADDRESS=<YOUR-VALIDATOR-ADDRESS>
 ```
 
-## Deploy the validator node
+Next, we'll run a node on your local machine so that we can use these accounts to lock Celo Gold and authorize the keys needed to run your validator. To do this, we need to run the following commands, which fetch the genesis block and a list of other nodes in the network to connect to.
 
-Initialize the docker container, building from an image for the network and initializing Celo with the genesis block:
+```bash
+# On your local machine
+docker run -v $PWD:/root/.celo $CELO_IMAGE init /celo/genesis.json
+docker run -v $PWD:/root/.celo --entrypoint cp $CELO_IMAGE /celo/static-nodes.json /root/.celo/
+```
 
-`` $ docker run -v `pwd`:/root/.celo us.gcr.io/celo-testnet/celo-node:alfajores init /celo/genesis.json ``
+To run the node:
 
-To participate in consensus, we need to set up our nodekey for our account. We can do so via the following command \(it will prompt you for your passphrase\):
+```bash
+# On your local machine
+docker run --name celo-accounts --restart always -p 8545:8545 -v $PWD:/root/.celo $CELO_IMAGE --verbosity 3 --networkid $NETWORK_ID --syncmode full --rpc --rpcaddr 0.0.0.0 --rpcapi eth,net,web3,debug,admin,personal
+```
 
-`` $ docker run -v `pwd`:/root/.celo --entrypoint /bin/sh -it us.gcr.io/celo-testnet/celo-node:alfajores -c "geth account set-node-key $CELO_VALIDATOR_ADDRESS" ``
+### Obtain and lock up some Celo Gold for staking
 
-In order to allow the node to sync with the network, give it the address of existing nodes in the network:
+To participate in The Great Celo Stake Off (aka TGCSO) and get fauceted it's necessary to register online via an [online form](https://docs.google.com/forms/d/e/1FAIpQLSfbn5hTJ4UIWpN92-o2qMTUB0UnrFsL0fm97XqGe4VhhN_r5A/viewform). Once the C-Labs team receives your registration, they'll send you instructions to get fauceted. Follow those instructions now. Then, while you wait, let's deploy the remaining components:
 
-`` $ docker run -v `pwd`:/root/.celo --entrypoint cp us.gcr.io/celo-testnet/celo-node:alfajores /celo/static-nodes.json /root/.celo/ ``
+### Deploy a Validator
 
-Start up the node:
+To actually register as a validator, we'll need to generate a validating signer key. On your Validator machine (which should not be accessible from the public internet), follow very similar steps:
 
-`` $ docker run -p 127.0.0.1:8545:8545 -p 127.0.0.1:8546:8546 -p 30303:30303 -p 30303:30303/udp -v `pwd`:/root/.celo us.gcr.io/celo-testnet/celo-node:alfajores --verbosity 3 --networkid 44785 --syncmode full --rpc --rpcaddr 0.0.0.0 --rpcapi eth,net,web3,debug,admin,personal --maxpeers 1100 --mine --miner.verificationpool=https://us-central1-celo-testnet-production.cloudfunctions.net/handleVerificationRequestalfajores/v0.1/sms/ --etherbase $CELO_VALIDATOR_ADDRESS ``
+```bash
+# On the validator machine
+# Note that you have to export $CELO_IMAGE and $NETWORK_ID on this machine
+export CELO_IMAGE=us.gcr.io/celo-testnet/celo-node:baklava
+export NETWORK_ID=12219
+mkdir celo-validator-node
+cd celo-validator-node
+docker run -v $PWD:/root/.celo $CELO_IMAGE init /celo/genesis.json
+docker run -v $PWD:/root/.celo --entrypoint /bin/sh -it $CELO_IMAGE -c "sleep 1 && geth account new"
+export CELO_VALIDATOR_SIGNER_ADDRESS=<YOUR-VALIDATOR-SIGNER-ADDRESS>
+```
 
-{% hint style="danger" %}
-**Security**: The command line above includes the parameter `--rpcaddr 0.0.0.0` which makes the Celo Blockchain software listen for incoming RPC requests on all network adaptors. Exercise extreme caution in doing this when running outside Docker, as it means that any unlocked accounts and their funds may be accessed from other machines on the Internet. In the context of running a Docker container on your local machine, this together with the `docker -p` flags allows you to make RPC calls from outside the container, i.e from your local host, but not from outside your machine. Read more about [Docker Networking](https://docs.docker.com/network/network-tutorial-standalone/#use-user-defined-bridge-networks) here.
-{% endhint %}
+In order to authorize our Validator signer, we need to create a proof that we have possession of the Validator signer private key. We do so by signing a message that consists of the Validator account address. To generate the proof-of-possession, run the following command:
+
+```bash
+# On the validator machine
+# Note that you have to export CELO_VALIDATOR_ADDRESS on this machine
+export CELO_VALIDATOR_ADDRESS=<CELO-VALIDATOR-ADDRESS>
+docker run -v $PWD:/root/.celo --entrypoint /bin/sh -it $CELO_IMAGE -c "geth account proof-of-possession $CELO_VALIDATOR_SIGNER_ADDRESS $CELO_VALIDATOR_ADDRESS"
+```
+
+Save the signer address, public key, and proof-of-possession signature to your local machine:
+
+```bash
+# On your local machine
+export CELO_VALIDATOR_SIGNER_ADDRESS=<YOUR-VALIDATOR-SIGNER-ADDRESS>
+export CELO_VALIDATOR_SIGNER_SIGNATURE=<YOUR-VALIDATOR-SIGNER-SIGNATURE>
+export CELO_VALIDATOR_SIGNER_PUBLIC_KEY=<YOUR-VALIDATOR-SIGNER-PUBLIC-KEY>
+```
+
+Validators on the Celo network use BLS aggregated signatures to create blocks in addition to the Validator signer (ECDSA) key. While an independent BLS key can be specified, the simplest thing to do is to derive the BLS key from the Validator signer key. When we register our Validator, we'll need to prove possession of the BLS key as well, which can be done by running the following command:
+
+```bash
+# On the validator machine
+docker run -v $PWD:/root/.celo --entrypoint /bin/sh -it $CELO_IMAGE -c "geth account proof-of-possession $CELO_VALIDATOR_SIGNER_ADDRESS $CELO_VALIDATOR_ADDRESS --bls"
+```
+
+Save the resulting signature and public key to your local machine:
+
+```bash
+# On your local machine
+export CELO_VALIDATOR_SIGNER_BLS_SIGNATURE=<YOUR-VALIDATOR-SIGNER-SIGNATURE>
+export CELO_VALIDATOR_SIGNER_BLS_PUBLIC_KEY=<YOUR-VALIDATOR-SIGNER-BLS-PUBLIC-KEY>
+```
+
+We'll get back to this machine later, but for now, let's give it a proxy.
+
+### Deploy a proxy
+
+To avoid exposing the validator to the public internet, we are deploying a proxy node which is responsible to communicate with the network. On our Proxy machine, we'll setup the node as per usual now:
+
+```bash
+# On the proxy machine
+# Note that you have to export $CELO_IMAGE on this machine
+export CELO_IMAGE=us.gcr.io/celo-testnet/celo-node:baklava
+mkdir celo-proxy-node
+cd celo-proxy-node
+docker run -v $PWD:/root/.celo $CELO_IMAGE init /celo/genesis.json
+docker run -v $PWD:/root/.celo --entrypoint cp $CELO_IMAGE /celo/static-nodes.json /root/.celo/
+```
+
+You can then run the proxy with the following command. Be sure to replace `<YOUR-VALIDATOR-NAME>` with the name you set for your Validator account earlier.
+
+```bash
+# On the proxy machine
+# Note that you'll have to export CELO_VALIDATOR_SIGNER_ADDRESS and $NETWORK_ID on this machine
+export NETWORK_ID=12219
+export CELO_VALIDATOR_SIGNER_ADDRESS=<YOUR-VALIDATOR-SIGNER-ADDRESS>
+docker run --name celo-proxy --restart always -p 30313:30303 -p 30313:30303/udp -p 30503:30503 -p 30503:30503/udp -v $PWD:/root/.celo $CELO_IMAGE --verbosity 3 --networkid $NETWORK_ID --syncmode full --proxy.proxy --proxy.proxiedvalidatoraddress $CELO_VALIDATOR_SIGNER_ADDRESS --proxy.internalendpoint :30503 --etherbase $CELO_VALIDATOR_SIGNER_ADDRESS --ethstats=<YOUR-VALIDATOR-NAME>-proxy@baklava-ethstats.celo-testnet.org
+```
+
+Once the proxy is running, we will need to retrieve its enode and IP address so that the validator will be able to connect to it.
+
+```bash
+# On the proxy machine, retrieve the proxy enode and IP
+echo $(docker exec celo-proxy geth --exec "admin.nodeInfo['enode'].split('//')[1].split('@')[0]" attach | tr -d '"')
+echo $(docker inspect -f '{{range.NetworkSettings.Networks}}{{.IPAddress}}{{end}}' celo-proxy)
+```
+
+Now we need to set the proxy enode and proxy IP address in environment variables on the validator machine.
+
+```bash
+# On the validator machine
+export PROXY_ENODE=<YOUR-PROXY-ENODE>
+export PROXY_IP=<YOUR-PROXY-IP>
+```
+
+Let's connect the validator to the proxy:
+
+### Connect the Validator to the Proxy
+
+When starting up your validator, it will attempt to create a network connection between the validator machine and the proxy machine. You will need make sure that your proxy machine has the appropriate firewall settings to allow the validator to connect to it.
+
+Specifically, on the proxy machine, port 30303 should allow TCP and UDP connections from all IP addresses. And port 30503 should allow TCP connections from the IP address of your validator machine.
+
+Once that is completed, go ahead and run the validator. Be sure to replace `<VALIDATOR-SIGNER-PASSWORD>` with the password for your Validator signer. You should see the validator begin syncing via the Proxy within a few seconds.
+
+```bash
+# On the validator machine
+docker run -v $PWD:/root/.celo --entrypoint sh --rm $CELO_IMAGE -c "echo <VALIDATOR-SIGNER-PASSWORD> > /root/.celo/.password"
+docker run --name celo-validator --restart always -p 30303:30303 -p 30303:30303/udp -v $PWD:/root/.celo $CELO_IMAGE --verbosity 3 --networkid $NETWORK_ID --syncmode full --mine --istanbul.blockperiod=5 --istanbul.requesttimeout=3000 --etherbase $CELO_VALIDATOR_SIGNER_ADDRESS --nodiscover --proxy.proxied --proxy.proxyenodeurlpair=enode://$PROXY_ENODE@$PROXY_IP:30503\;enode://$PROXY_ENODE@$PROXY_IP:30303  --unlock=$CELO_VALIDATOR_SIGNER_ADDRESS --password /root/.celo/.password --ethstats=<YOUR-VALIDATOR-NAME>@baklava-ethstats.celo-testnet.org
+```
 
 The `mine` flag does not mean the node starts mining blocks, but rather starts trying to participate in the BFT consensus protocol. It cannot do this until it gets elected -- so next we need to stand for election.
 
-The `networkid` parameter value of `44785` indicates we are connecting the Alfajores Testnet.
+The `networkid` parameter value of `12219` indicates we are connecting to the Baklava network, Stake Off Phase 1.
 
-## Obtain and lock up some Celo Gold for staking
+### Register the Accounts
 
-Visit the [Alfajores Faucet](https://celo.org/build/faucet) to send **both** of your accounts some funds.
+You've now done all the infrastructure setup to get a validator and proxy running. The C-Labs team will review your submission to receive funds and send you 12,000 testnet Celo Gold to each of your Validator and Validator Group account addresses. These funds have no real world value but will allow you to submit transactions to the network via [`celocli`](../command-line-interface/introduction.md) and put up a stake to register as a validator and validator group.
 
-In a new tab, unlock your accounts so that you can send transactions. This only unlocks the accounts for the lifetime of the validator that's running, so be sure to unlock `$CELO_VALIDATOR_ADDRESS` again if your node gets restarted:
+You can view your Celo Gold balances by running the following commands:
 
-```
-$ celocli account:unlock --account $CELO_VALIDATOR_GROUP_ADDRESS --password <YOUR_FIRST_PASSWORD>
-$ celocli account:unlock --account $CELO_VALIDATOR_ADDRESS --password <YOUR_SECOND_PASSWORD>
-```
-
-In a new tab, make a locked Gold account for both of your addresses by running the Celo CLI. This will allow you to stake Celo Gold, which is required to register a validator and validator groups:
-
-```
-$ celocli account:register --from $CELO_VALIDATOR_GROUP_ADDRESS --name <GROUP_NAME_OF_YOUR_CHOICE>
-$ celocli account:register --from $CELO_VALIDATOR_ADDRESS --name <VALIDATOR_NAME_OF_YOUR_CHOICE>
+```bash
+# On your local machine
+celocli account:balance $CELO_VALIDATOR_GROUP_ADDRESS
+celocli account:balance $CELO_VALIDATOR_ADDRESS
 ```
 
-Make a locked Gold commitment for both accounts in order to secure the right to register a validator and validator group. The current requirement is 1 Celo Gold with a notice period of 60 days. If you choose to stake more gold, or a longer notice period, be sure to use those values below:
+At some point the output of these commands will change from `0` to `12e12`, indicating you have received the testnet Celo Gold. This process involves a human, so please be patient. If you haven't received a balance within 24 hours, please get in touch again.
 
+You can also look at an account's current balance and transaction history on [Blockscout](https://baklava-blockscout.celo-testnet.org/). Enter the address into the search bar.
+
+Once these accounts have a balance, unlock them so that we can sign transactions. Then, we will register the accounts with the Celo core smart contracts:
+
+```bash
+# On your local machine
+celocli account:unlock --account $CELO_VALIDATOR_GROUP_ADDRESS
+celocli account:unlock --account $CELO_VALIDATOR_ADDRESS
+celocli account:register --from $CELO_VALIDATOR_GROUP_ADDRESS --name <NAME YOUR VALIDATOR GROUP>
+celocli account:register --from $CELO_VALIDATOR_ADDRESS --name <NAME YOUR VALIDATOR>
 ```
-$ celocli lockedgold:lockup --from $CELO_VALIDATOR_GROUP_ADDRESS --goldAmount 1000000000000000000 --noticePeriod 5184000
-$ celocli lockedgold:lockup --from $CELO_VALIDATOR_ADDRESS --goldAmount 1000000000000000000 --noticePeriod 5184000
+
+Check that your accounts were registered successfully with the following commands:
+
+```bash
+# On your local machine
+celocli account:show $CELO_VALIDATOR_GROUP_ADDRESS
+celocli account:show $CELO_VALIDATOR_ADDRESS
 ```
 
-## Run for election
+### Lock up Celo Gold
 
-Register your validator group:
+Lock up testnet Celo Gold for both accounts in order to secure the right to register a Validator and Validator Group. The current requirement is 10k Celo Gold to register a validator, and 10,000 Celo Gold _per member validator_ to register a Validator Group. For Validators, this gold remains locked for approximately 60 days following deregistration. For groups, this gold remains locked for approximately 60 days following the removal of the Nth validator from the group.
 
-`$ celocli validatorgroup:register --id <GROUP_ID_OF_YOUR_CHOICE> --from $CELO_VALIDATOR_GROUP_ADDRESS --noticePeriod 5184000`
+```bash
+# On your local machine
+celocli lockedgold:lock --from $CELO_VALIDATOR_GROUP_ADDRESS --value 10000000000000000000000
+celocli lockedgold:lock --from $CELO_VALIDATOR_ADDRESS --value 10000000000000000000000
+```
 
-Register your validator:
+This amount (10,000 Celo Gold) represents the minimum amount needed to be locked in order to register a Validator and Validator group. Since your balance is in fact higher than this, you may wish to lock more with these accounts. Note that you will want to be sure to leave enough Gold unlocked to be able to continue to pay transaction fees for future transactions (such as those issued by running some CLI commands).
 
-`` $ celocli validator:register --id <VALIDATOR_ID_OF_YOUR_CHOICE> --from $CELO_VALIDATOR_ADDRESS --noticePeriod 5184000 --publicKey 0x`openssl rand -hex 64`$CELO_VALIDATOR_POP ``
+Check that your Celo Gold was successfully locked with the following commands:
 
-{% hint style="info" %}
-**Roadmap**: Note that the “publicKey” first part of the public key field is currently ignored, and thus can be set to any 128 character hex value. The rest is used for the BLS public key and proof-of-possession.
-{% endhint %}
+```bash
+# On your local machine
+celocli lockedgold:show $CELO_VALIDATOR_GROUP_ADDRESS
+celocli lockedgold:show $CELO_VALIDATOR_ADDRESS
+```
 
-Affiliate your validator with your validator group. Note that you will not be a member of this group until the validator group accepts you:
+### Run for election
 
-`$ celocli validator:affiliation --set $CELO_VALIDATOR_GROUP_ADDRESS --from $CELO_VALIDATOR_ADDRESS`
+In order to be elected as a Validator, you will first need to register your group and Validator. Note that when registering a Validator Group, you need to specify a commission, which is the fraction of epoch rewards paid to the group by its members.
+
+We don't want to use our account key for validating, so first let's authorize the validator signing key:
+
+```bash
+# On your local machine
+celocli account:authorize --from $CELO_VALIDATOR_ADDRESS --role validator --signature 0x$CELO_VALIDATOR_SIGNER_SIGNATURE --signer 0x$CELO_VALIDATOR_SIGNER_ADDRESS
+```
+
+Confirm by checking the authorized Validator signer for your Validator:
+
+```bash
+# On your local machine
+celocli account:show $CELO_VALIDATOR_ADDRESS
+```
+
+Then, register your Validator Group by running the following command. Note that because we did not authorize a Validator signer for our Validator Group account, we register the Validator Group with the account key.
+
+```bash
+# On your local machine
+celocli validatorgroup:register --from $CELO_VALIDATOR_GROUP_ADDRESS --commission 0.1
+```
+
+You can view information about your Validator Group by running the following command:
+
+```bash
+# On your local machine
+celocli validatorgroup:show $CELO_VALIDATOR_GROUP_ADDRESS
+```
+
+Next, register your Validator by running the following command. Note that because we have authorized a Validator signer, this step could also be performed on the Validator machine. Running it on the local machine allows us to avoid needing to install the celocli on the Validator machine.
+
+```bash
+# On your local machine
+celocli validator:register --from $CELO_VALIDATOR_ADDRESS --ecdsaKey $CELO_VALIDATOR_SIGNER_PUBLIC_KEY --blsKey $CELO_VALIDATOR_SIGNER_BLS_PUBLIC_KEY --blsSignature $CELO_VALIDATOR_SIGNER_BLS_SIGNATURE
+```
+
+Affiliate your Validator with your Validator Group. Note that you will not be a member of this group until the Validator Group accepts you. This command could also be run from the Validator signer, if running on the validator machine.
+
+```bash
+# On your local machine
+celocli validator:affiliate $CELO_VALIDATOR_GROUP_ADDRESS --from $CELO_VALIDATOR_ADDRESS
+```
 
 Accept the affiliation:
 
-`$ celocli validatorgroup:member --accept $CELO_VALIDATOR_ADDRESS --from $CELO_VALIDATOR_GROUP_ADDRESS`
-
-Use both accounts to vote for your validator group:
-
-```
-$ celocli validatorgroup:vote --from $CELO_VALIDATOR_ADDRESS --for $CELO_VALIDATOR_GROUP_ADDRESS
-$ celocli validatorgroup:vote --from $CELO_VALIDATOR_GROUP_ADDRESS --for $CELO_VALIDATOR_GROUP_ADDRESS
+```bash
+# On your local machine
+celocli validatorgroup:member --accept $CELO_VALIDATOR_ADDRESS --from $CELO_VALIDATOR_GROUP_ADDRESS
 ```
 
-You’re all set! Note that elections are finalized at the end of each epoch, roughly once an hour in the Alfajores Testnet. After that hour, if you get elected, your node will start participating BFT consensus and validating blocks.
+Next, double check that your Validator is now a member of your Validator Group:
 
-You can inspect the current state of voting by running:
-
-```text
-$ celocli validatorgroup:list
+```bash
+# On your local machine
+celocli validator:show $CELO_VALIDATOR_ADDRESS
+celocli validatorgroup:show $CELO_VALIDATOR_GROUP_ADDRESS
 ```
 
-If you find your validator still not getting elected you may need to faucet yourself more funds and bond a greater deposit to command more voting weight!
+Use both accounts to vote for your Validator Group. Note that because we have not authorized a vote signer for either account, these transactions must be sent from the account keys. Since you're likely to need to place additional votes throughout the course of the stake-off, consider creating and authorizing vote signers for additional operational security.
+
+```bash
+# On your local machine
+celocli election:vote --from $CELO_VALIDATOR_ADDRESS --for $CELO_VALIDATOR_GROUP_ADDRESS --value 10000000000000000000000
+celocli election:vote --from $CELO_VALIDATOR_GROUP_ADDRESS --for $CELO_VALIDATOR_GROUP_ADDRESS --value 10000000000000000000000
+```
+
+Double check that your votes were cast successfully:
+
+```bash
+# On your local machine
+celocli election:show $CELO_VALIDATOR_GROUP_ADDRESS --group
+celocli election:show $CELO_VALIDATOR_GROUP_ADDRESS --voter
+celocli election:show $CELO_VALIDATOR_ADDRESS --voter
+```
+
+Users in the Celo protocol receive epoch rewards for voting in Validator Elections only after submitting a special transaction to enable them. This must be done every time new votes are cast, and can only be made after the most recent epoch has ended. For convenience, we can use the following command, which will wait until the epoch has ended before sending a transaction.
+
+```bash
+# On your local machine
+celocli election:activate --from $CELO_VALIDATOR_ADDRESS --wait && celocli election:activate --from $CELO_VALIDATOR_GROUP_ADDRESS --wait
+```
+
+Check that your votes were activated by re-running the following commands:
+
+```bash
+# On your local machine
+celocli election:show $CELO_VALIDATOR_GROUP_ADDRESS --voter
+celocli election:show $CELO_VALIDATOR_ADDRESS --voter
+```
+
+If your Validator Group elects validators, you will receive epoch rewards in the form of additional Locked Gold voting for your Validator Group from your account addresses. You can see these rewards accumulate with the commands in the previous set, as well as:
+
+```bash
+# On your local machine
+celocli lockedgold:show $CELO_VALIDATOR_GROUP_ADDRESS
+celocli lockedgold:show $CELO_VALIDATOR_ADDRESS
+```
+
+You're all set! Elections are finalized at the end of each epoch, roughly once an hour in the Alfajores or Baklava Testnets. After that hour, if you get elected, your node will start participating BFT consensus and validating blocks. After the first epoch in which your Validator participates in BFT, you should receive your first set of epoch rewards.
 
 {% hint style="info" %}
 **Roadmap**: Different parameters will govern elections in a Celo production network. Epochs are likely to be daily, rather than hourly. Running a Validator will also include setting up proxy nodes to protect against DDoS attacks, and using hardware wallets to secure the key used to sign blocks. We plan to update these instructions with more details soon.
 {% endhint %}
+
+You can inspect the current state of the validator elections by running:
+
+```bash
+# On your local machine
+celocli election:list
+```
+
+If you find your Validator still not getting elected you may need to faucet yourself more funds and lock more gold in order to be able to cast more votes for your Validator Group!
+
+At any moment you can check the currently elected validators by running the following command:
+
+```bash
+# On your local machine
+celocli election:current
+```
+
+### Running the Attestation Service
+
+As part of the [lightweight identity protocol](/celo-codebase/protocol/identity), Validators are expected to run an [Attestation Service](https://github.com/celo-org/celo-monorepo/tree/master/packages/attestation-service) to provide attestations that allow users to map their phone number to an account on Celo.
+
+Just like with the Validator signer, we'll want to authorize a separate Attestation signer. For that let's start our node on the Attestations machine:
+
+```bash
+# On the Attestation machine
+# Note that you have to export CELO_IMAGE and CELO_VALIDATOR_ADDRESS on this machine
+export CELO_IMAGE=us.gcr.io/celo-testnet/celo-node:baklava
+export CELO_VALIDATOR_ADDRESS=<CELO_VALIDATOR_ADDRESS>
+mkdir celo-attestations-node
+cd celo-attestations-node
+docker run -v $PWD:/root/.celo $CELO_IMAGE init /celo/genesis.json
+docker run -v $PWD:/root/.celo --entrypoint cp $CELO_IMAGE /celo/static-nodes.json /root/.celo/
+docker run -v $PWD:/root/.celo --entrypoint /bin/sh -it $CELO_IMAGE -c "sleep 1 && geth account new"
+export CELO_ATTESTATION_SIGNER_ADDRESS=<YOUR-ATTESTATION-SIGNER-ADDRESS>
+```
+
+Let's generate the proof-of-possession for the attestation signer
+
+```bash
+# On the Attestation machine
+docker run -v $PWD:/root/.celo --entrypoint /bin/sh -it $CELO_IMAGE -c "sleep 1 && geth account proof-of-possession $CELO_ATTESTATION_SIGNER_ADDRESS $CELO_VALIDATOR_ADDRESS"
+export CELO_ATTESTATION_SIGNER_SIGNATURE=<ATTESTATION-SIGNER-SIGNATURE>
+```
+
+With this proof, authorize the attestation signer on your local machine:
+
+```bash
+# On your local machine
+celocli account:authorize --from $CELO_VALIDATOR_ADDRESS --role attestation --signature 0x$CELO_ATTESTATION_SIGNER_SIGNATURE --signer 0x$CELO_ATTESTATION_SIGNER_ADDRESS
+```
+
+You can now run the node for the attestation service in the background:
+
+```bash
+# On the Attestation machine
+docker run --name celo-attestations --restart always -p 8545:8545 -v $PWD:/root/.celo $CELO_IMAGE --verbosity 3 --networkid $NETWORK_ID --syncmode full --rpc --rpcaddr 0.0.0.0 --rpcapi eth,net,web3,debug,admin --unlock $CELO_ATTESTATION_SIGNER_ADDRESS
+```
+
+By now, you should have setup your Validator account appropriately. You can finish the actual deploy of the attestation service under the [Attestation Service at the documentation page](running-attestation-service.md).
+
+{% hint style="tip" %}
+Congratulations on setting up your validator. If you want to win the TGCSO, it may be helpful to familiar with the inner workings of the Celo network. Dig into the [protocol documentation](../celo-codebase/protocol) for more information.
+{% endhint %}
+
+## Deployment Tips
+
+### Running the Docker containers in the background
+
+There are different option for executing Docker containers in the background. The most typical one is to use in your docker run commands the `-d` option. Also for long running processes, specially when you run in a remote computer, you can use a tool like [screen](https://ss64.com/osx/screen.html). It allows to connect and disconnect from running processes providing an easy way to manage long run processes.
+
+It's out of the scope of this documentation to go through the `screen` options, but you can use the following command format with your `docker` commands:
+
+```bash
+screen -S <SESSION NAME> -d -m <YOUR COMMAND>
+```
+
+For example:
+
+```bash
+screen -S celo-validator -d -m docker run --name celo-validator --restart always -p 127.0.0.1:8545:8545 .......
+```
+
+You can list your existing `screen` sessions:
+
+```bash
+screen -ls
+```
+
+And re-attach to any of the existing sessions:
+
+```bash
+screen -r -S celo-validator
+```
+
+### Stopping containers
+
+You can stop the Docker containers at any time without problem. If you stop your containers that means those containers stop of providing service.
+The data dir of the validator and the proxy are Docker volumes mounted in the containers from the `celo-data-dir` you created at the very beginning. So if you don't remove that folder, you can stop or restart the containers without losing any data.
+
+You can stop the `celo-validator` and `celo-proxy` containers running:
+
+```bash
+docker stop celo-validator celo-proxy
+```
+
+And you can remove the containers (not the data dir) running:
+
+```bash
+docker rm -f celo-validator celo-proxy
+```
+
+### Reference Script
+
+If you want to run everything locally, you can use (and modify if you want) this [reference bash script](../../../scripts/run-docker-validator-network.sh) automating all the above steps.
+
+**Warning:** The script requires `Docker` and `screen`.
+
+You can see all the options using the following command:
+
+```bash
+./run-docker-validator-network.sh help
+```
+
+If you want to create the local accounts, run a Proxy and a Validator connected to it, you can use the following command:
+
+```bash
+./run-docker-validator-network.sh pull,clean,accounts,run-validator,run-proxy,status,print-env
+```
+
+After doing that you can copy all the `CELO_*` environment variables in the `validator-config.rc` file. The script will source the variables from there avoiding the accounts multiple times.
+
+If you have already your accounts, proxy and validator set up, you can run the following command to run TGCSO:
+
+```bash
+./run-docker-validator-network.sh game
+```
+
+## Stop Validating
+
+If for some reason you need to stop running your Validator, please do one or all of the following so that it will no longer be chosen as a participant in BFT:
+
+- Deregister your validator:
+
+```bash
+celocli validator:deaffiliate --from $CELO_VALIDATOR_ADDRESS
+celocli validator:deregister --from $CELO_VALIDATOR_ADDRESS
+```
+
+- Stop voting for your validator group:
+
+```bash
+celocli election:revoke --from $CELO_VALIDATOR_ADDRESS --for $CELO_VALIDATOR_GROUP_ADDRESS --value 10000000000000000000000
+celocli election:revoke --from $CELO_VALIDATOR_GROUP_ADDRESS --for $CELO_VALIDATOR_GROUP_ADDRESS --value 10000000000000000000000
+```
+
+- Deregister your validator group:
+
+```bash
+celocli validatorgroup:deregister --from $CELO_VALIDATOR_GORUP_ADDRESS
+```

@@ -41,6 +41,8 @@ const testnetEnvVars: TerraformVars = {
   geth_verbosity: envVar.GETH_VERBOSITY,
   geth_bootnode_docker_image_repository: envVar.GETH_BOOTNODE_DOCKER_IMAGE_REPOSITORY,
   geth_bootnode_docker_image_tag: envVar.GETH_BOOTNODE_DOCKER_IMAGE_TAG,
+  geth_exporter_docker_image_repository: envVar.GETH_EXPORTER_DOCKER_IMAGE_REPOSITORY,
+  geth_exporter_docker_image_tag: envVar.GETH_EXPORTER_DOCKER_IMAGE_TAG,
   geth_node_docker_image_repository: envVar.GETH_NODE_DOCKER_IMAGE_REPOSITORY,
   geth_node_docker_image_tag: envVar.GETH_NODE_DOCKER_IMAGE_TAG,
   in_memory_discovery_table: envVar.IN_MEMORY_DISCOVERY_TABLE,
@@ -48,7 +50,6 @@ const testnetEnvVars: TerraformVars = {
   network_id: envVar.NETWORK_ID,
   tx_node_count: envVar.TX_NODES,
   validator_count: envVar.VALIDATORS,
-  verification_pool_url: envVar.VERIFICATION_POOL_URL,
 }
 
 const testnetNetworkEnvVars: TerraformVars = {
@@ -297,6 +298,16 @@ export async function getTxNodeLoadBalancerIP(celoEnv: string) {
   return outputs.tx_node_lb_ip_address.value
 }
 
+export async function getInternalValidatorIPs(celoEnv: string) {
+  const outputs = await getTestnetOutputs(celoEnv)
+  return outputs.validator_internal_ip_addresses.value
+}
+
+export async function getInternalTxNodeIPs(celoEnv: string) {
+  const outputs = await getTestnetOutputs(celoEnv)
+  return outputs.tx_node_internal_ip_addresses.value
+}
+
 function getTerraformBackendConfigVars(celoEnv: string, terraformModule: string) {
   return {
     prefix: `${celoEnv}/${terraformModule}`,
@@ -380,7 +391,6 @@ function generateValidatorSecretEnvVars(accountType: AccountType, index: number)
     ),
     PRIVATE_KEY: privateKey,
     [envVar.GETH_ACCOUNT_SECRET]: fetchEnv(envVar.GETH_ACCOUNT_SECRET),
-    [envVar.ETHSTATS_WEBSOCKETSECRET]: fetchEnv(envVar.ETHSTATS_WEBSOCKETSECRET),
     [envVar.MNEMONIC]: mnemonic,
   }
   return formatEnvVars(secrets)

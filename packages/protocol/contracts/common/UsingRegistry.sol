@@ -13,6 +13,7 @@ import "../governance/interfaces/IValidators.sol";
 
 import "../identity/interfaces/IRandom.sol";
 
+import "../stability/interfaces/ISortedOracles.sol";
 import "../stability/interfaces/IStableToken.sol";
 
 // Ideally, UsingRegistry should inherit from Initializable and implement initialize() which calls
@@ -29,7 +30,7 @@ contract UsingRegistry is Ownable {
   bytes32 constant ELECTION_REGISTRY_ID = keccak256(abi.encodePacked("Election"));
   bytes32 constant EXCHANGE_REGISTRY_ID = keccak256(abi.encodePacked("Exchange"));
   bytes32 constant GAS_CURRENCY_WHITELIST_REGISTRY_ID = keccak256(
-    abi.encodePacked("GasCurrencyWhitelist")
+    abi.encodePacked("FeeCurrencyWhitelist")
   );
   bytes32 constant GOLD_TOKEN_REGISTRY_ID = keccak256(abi.encodePacked("GoldToken"));
   bytes32 constant GOVERNANCE_REGISTRY_ID = keccak256(abi.encodePacked("Governance"));
@@ -79,6 +80,10 @@ contract UsingRegistry is Ownable {
 
   function getRandom() internal view returns (IRandom) {
     return IRandom(registry.getAddressForOrDie(RANDOM_REGISTRY_ID));
+  }
+
+  function getSortedOracles() internal view returns (ISortedOracles) {
+    return ISortedOracles(registry.getAddressForOrDie(SORTED_ORACLES_REGISTRY_ID));
   }
 
   function getStableToken() internal view returns (IStableToken) {

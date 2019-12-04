@@ -463,7 +463,7 @@ contract Governance is
     nonReentrant
     returns (bool)
   {
-    address account = getAccounts().activeVoteSignerToAccount(msg.sender);
+    address account = getAccounts().voteSignerToAccount(msg.sender);
     // TODO(asa): When upvoting a proposal that will get dequeued, should we let the tx succeed
     // and return false?
     dequeueProposalsIfReady();
@@ -510,7 +510,7 @@ contract Governance is
    */
   function revokeUpvote(uint256 lesser, uint256 greater) external nonReentrant returns (bool) {
     dequeueProposalsIfReady();
-    address account = getAccounts().activeVoteSignerToAccount(msg.sender);
+    address account = getAccounts().voteSignerToAccount(msg.sender);
     Voter storage voter = voters[account];
     uint256 proposalId = voter.upvote.proposalId;
     Proposals.Proposal storage proposal = proposals[proposalId];
@@ -576,7 +576,7 @@ contract Governance is
     nonReentrant
     returns (bool)
   {
-    address account = getAccounts().activeVoteSignerToAccount(msg.sender);
+    address account = getAccounts().voteSignerToAccount(msg.sender);
     dequeueProposalsIfReady();
     Proposals.Proposal storage proposal = proposals[proposalId];
     require(isDequeuedProposal(proposal, proposalId, index), "Proposal not dequeued");
