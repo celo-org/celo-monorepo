@@ -7,12 +7,12 @@ export LC_ALL=en_US.UTF-8
 COMMAND=${1:-"pull,accounts,run-validator,run-proxy,status,print-env"}
 DATA_DIR=${2:-"/tmp/celo/network"}
 
-export CELO_IMAGE=${3:-"us.gcr.io/celo-testnet/geth@sha256:37ff19487dfe436ca2be87725cf7ba0009c223614bbaf5b79d856ea9e73917f4"}
-export NETWORK_ID=${4:-"31417"}
-export NETWORK_NAME=${5:-"baklavastaging"}
+export CELO_IMAGE=${3:-"us.gcr.io/celo-testnet/celo-node:baklava"}
+export NETWORK_ID=${4:-"12219"}
+export NETWORK_NAME=${5:-"baklava"}
 export DEFAULT_PASSWORD=${6:-"1234"}
 export CELO_IMAGE_ATTESTATION=${7:-"us.gcr.io/celo-testnet/celo-monorepo@sha256:90ea6739f9d239218245b5dce30e1bb5f05ac8dbc59f8e6f315502635c05ccb1"}
-export CELO_PROVIDER=${8:-"https://baklavastaging-forno.celo-testnet.org/"} # https://berlintestnet001-forno.celo-networks-dev.org/
+export CELO_PROVIDER=${8:-"https://baklava-forno.celo-testnet.org/"} # https://berlintestnet001-forno.celo-networks-dev.org/
 export DATABASE_URL=${9:-"sqlite://db/attestation.db"}
 
 export VALIDATOR_NAME=johndoe_$(cat /dev/urandom | tr -dc 'a-z0-9' | fold -w 8 | head -n 1)
