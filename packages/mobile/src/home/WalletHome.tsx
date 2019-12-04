@@ -135,7 +135,7 @@ export class WalletHome extends React.Component<Props> {
     this.props.refreshAllBalances()
   }
 
-  async componentDidMount() {
+  componentDidMount() {
     this.props.resetStandbyTransactions()
     this.props.initializeSentryUserContext()
     this.importContactsIfNeeded()

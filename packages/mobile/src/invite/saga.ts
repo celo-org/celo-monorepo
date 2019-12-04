@@ -101,7 +101,6 @@ export async function generateLink(inviteCode: string, recipientName: string) {
 
   const iOSBundleId = await DeviceInfo.getBundleId()
 
-  Logger.info(TAG, `referrerLink before short ${referrerLink}`)
   const shortUrl = await generateDynamicShortLink(
     referrerLink,
     appStoreUrl,
