@@ -4,31 +4,36 @@ set -euo pipefail
 export LC_ALL=en_US.UTF-8
 
 # Usage: run-network.sh <COMMAND> <DATA_DIR>
-COMMAND=${1:-"pull,accounts,deploy,run-validator,status"}
+COMMAND=${1:-"pull,accounts,run-validator,run-proxy,status,print-env"}
 DATA_DIR=${2:-"/tmp/celo/network"}
 
-export CELO_IMAGE=${3:-"us.gcr.io/celo-testnet/celo-node@sha256:6612c17f1a531ce2d7c0d9bcd29afecaf4dcf348684eb747d167130381337552"}
-#export CELO_IMAGE=${3:-"us.gcr.io/celo-testnet/geth@sha256:4bc97381db0bb81b7a3e473bb61d447c90be165834316d3f75bc34d7db718b39"}
-export NETWORK_ID=${4:-"1101"}
+export CELO_IMAGE=${3:-"us.gcr.io/celo-testnet/geth@sha256:37ff19487dfe436ca2be87725cf7ba0009c223614bbaf5b79d856ea9e73917f4"}
+export NETWORK_ID=${4:-"31417"}
 export NETWORK_NAME=${5:-"baklavastaging"}
 export DEFAULT_PASSWORD=${6:-"1234"}
-export CELO_IMAGE_ATTESTATION=${7:-"us.gcr.io/celo-testnet/celo-monorepo@sha256:708ea8b24736a755c4dd3792e8973a6f0bf92b1f91edceb8e0b603ad66f2d70c"}
+export CELO_IMAGE_ATTESTATION=${7:-"us.gcr.io/celo-testnet/celo-monorepo@sha256:90ea6739f9d239218245b5dce30e1bb5f05ac8dbc59f8e6f315502635c05ccb1"}
 export CELO_PROVIDER=${8:-"https://baklavastaging-forno.celo-testnet.org/"} # https://berlintestnet001-forno.celo-networks-dev.org/
 export DATABASE_URL=${9:-"sqlite://db/attestation.db"}
 
+export VALIDATOR_NAME=johndoe_$(cat /dev/urandom | tr -dc 'a-z0-9' | fold -w 8 | head -n 1)
+export VALIDATOR_GROUP_NAME=tijuana_$(cat /dev/urandom | tr -dc 'a-z0-9' | fold -w 8 | head -n 1)
+
+export CELOCLI="celocli"
 export NEXMO_KEY="xx"
 export NEXMO_SECRET="xx"
 export NEXMO_BLACKLIST=""
 HOSTNAME=$(hostname)
 export ETHSTATS_ARG="$HOSTNAME@$NETWORK_NAME-ethstats.celo-testnet.org"
 
+ACCOUNTS_DIR="${DATA_DIR}/accounts"
 VALIDATOR_DIR="${DATA_DIR}/validator"
 PROXY_DIR="${DATA_DIR}/proxy"
 FULLNODE_DIR="${DATA_DIR}/fullnode"
-ATTESTATION_DIR="${DATA_DIR}/attestation-service"
+ATTESTATION_DIR="${DATA_DIR}/attestations"
 
 
 mkdir -p $DATA_DIR
+mkdir -p $ACCOUNTS_DIR
 mkdir -p $VALIDATOR_DIR
 mkdir -p $PROXY_DIR
 mkdir -p $FULLNODE_DIR
@@ -36,11 +41,21 @@ mkdir -p $ATTESTATION_DIR
 
 __PWD=$PWD
 
+__DIRNAME=$(dirname $0)
+
+if [[ -f $__DIRNAME/validator-config.rc ]]; then
+
+    echo -e "Loading config from $__DIRNAME/validator-config.rc"
+    set -o allexport
+    source $__DIRNAME/validator-config.rc
+    set +o allexport
+fi
+
 
 #### Internal functions
 remove_containers () {
     echo -e "\tRemoving previous celo containers"
-    docker rm -f celo-proxy celo-validator celo-attestation-service || echo -e "Containers removed"
+    docker rm -f celo-proxy celo-validator celo-attestation-service celo-accounts || echo -e "Containers removed"
 }
 
 download_genesis () {
@@ -55,19 +70,12 @@ download_genesis () {
 make_status_requests () {
     echo -e "Checking Proxy and Validator state:"
     
-    echo -n "* Proxy eth_blockNumber:"
-    curl -X POST --data '{"jsonrpc":"2.0","method":"eth_blockNumber","params":[],"id":1}' -H "Content-Type: application/json" localhost:8555
-    echo -n "* Validator eth_blockNumber:"
+    echo -n "* eth_blockNumber:"
     curl -X POST --data '{"jsonrpc":"2.0","method":"eth_blockNumber","params":[],"id":1}' -H "Content-Type: application/json" localhost:8545
-
-
-    echo -n "* Proxy net_peerCount:"
-    curl -X POST --data '{"jsonrpc":"2.0","method":"net_peerCount","params":[],"id":74}' -H "Content-Type: application/json" localhost:8555
+    
     echo -n "* Validator net_peerCount:"
     curl -X POST --data '{"jsonrpc":"2.0","method":"net_peerCount","params":[],"id":74}' -H "Content-Type: application/json" localhost:8545
     
-    echo -n "* Proxy eth_mining:"
-    curl -X POST --data '{"jsonrpc":"2.0","method":"eth_mining","params":[],"id":1}' -H "Content-Type: application/json" localhost:8555
     echo -n "* Validator eth_mining:"
     curl -X POST --data '{"jsonrpc":"2.0","method":"eth_mining","params":[],"id":1}' -H "Content-Type: application/json" localhost:8545
 
@@ -75,7 +83,17 @@ make_status_requests () {
     
 }
 
+initialize_geth () {
+
+    echo -e "\tDownload genesis.json and static-nodes.json to the container"
+    docker run -v $PWD:/root/.celo --entrypoint /bin/sh -it $CELO_IMAGE -c "wget https://www.googleapis.com/storage/v1/b/genesis_blocks/o/$NETWORK_NAME?alt=media -O /root/.celo/genesis.json"
+    docker run -v $PWD:/root/.celo --entrypoint /bin/sh -it $CELO_IMAGE -c "wget https://www.googleapis.com/storage/v1/b/static_nodes/o/$NETWORK_NAME?alt=media -O /root/.celo/static-nodes.json"
+    
+    docker run -v $PWD:/root/.celo $CELO_IMAGE init /root/.celo/genesis.json
+}
+
 #### Main 
+
 
 if [[ $COMMAND == *"help"* ]]; then
     
@@ -86,17 +104,22 @@ if [[ $COMMAND == *"help"* ]]; then
 
     echo -e "Options:"
     echo -e "$0 <COMMAND> <DATA_DIR> <CELO_IMAGE> <NETWORK_ID> <NETWORK_NAME> <PASSWORD>"
-    echo -e "\t - Command; comma separated list of actions to execute. Options are: help, pull, clean, accounts, deploy, run-validator, run-attestation, run-fullnode, status. Default: pull,accounts,deploy,run-validator,status"
+    echo -e "\t - Command; comma separated list of actions to execute. Options are: help, pull, clean, accounts, run-validator, run-proxy, run-attestation, run-fullnode, status, print-env, get-cooking. Default: pull,accounts,run-validator,run-proxy,status"
     echo -e "\t - Data Dir; Local folder where will be created the data dir for the nodes. Default: /tmp/celo/network"
     echo -e "\t - Celo Image; Image to download"
     echo -e "\t - Celo Network; Docker image network to use (typically alfajores or baklava, but you can use a commit). "
-    echo -e "\t - Network Id; 1101 for integration, 44785 for alfajores, etc."
+    echo -e "\t - Network Id; 31417 for integration, 44785 for alfajores, etc."
     echo -e "\t - Network Name; integration by default"
     echo -e "\t - Password; Password to use during the creation of accounts"
     
-    echo -e "\nExamples:"
-    echo -e "$0 pull,clean,deploy,run-validator "
-    echo -e "$0 deploy,run-validator /tmp/celo/network"
+    echo -e "\n**********\n\nExamples:\n"
+    echo -e "\tIf you want to create the local accounts, run a Proxy and a Validator connected to it:"
+    echo -e "\t$0 pull,accounts,run-validator,run-proxy,status,print-env"
+    
+    echo -e "\n\tIf you have already your accounts, proxy and validator set up, you can run the following command to run TGCSO"
+    echo -e "\t$0 get-cooking"
+    
+    echo -e "\n\tIf you want to play TGCSO without being re-using your previously created accounts without restarting the proxy and validator, it's recommended to copy all your CELO environment variables in the 'validator-config.rc' file. The script will source the variables from there. "
 
     echo -e "\n"
     exit 0
@@ -113,82 +136,109 @@ fi
 if [[ $COMMAND == *"clean"* ]]; then
 
     echo -e "* Removing data dir $DATA_DIR"
-    rm -rf $DATA_DIR
+    rm -rf $DATA_DIR/*
     mkdir -p $DATA_DIR
+    mkdir -p $ACCOUNTS_DIR
     mkdir -p $VALIDATOR_DIR
     mkdir -p $PROXY_DIR
+    mkdir -p $FULLNODE_DIR
+    mkdir -p $ATTESTATION_DIR
 fi
 
 
 if [[ $COMMAND == *"accounts"* ]]; then
 
-    echo -e "* Creating addresses ..."
-    cd $DATA_DIR
+    echo -e "* Creating accounts ..."
+    cd $ACCOUNTS_DIR
 
-    export CELO_VALIDATOR_ADDRESS=$(docker run -v $PWD/validator:/root/.celo --entrypoint /bin/sh -it $CELO_IMAGE -c " printf '%s\n' $DEFAULT_PASSWORD $DEFAULT_PASSWORD | geth account new " |tail -1| cut -d'{' -f 2| tr -cd "[:alnum:]\n" )
-    export CELO_VALIDATOR_GROUP_ADDRESS=$(docker run -v $PWD/validator:/root/.celo --entrypoint /bin/sh -it $CELO_IMAGE -c " printf '%s\n' $DEFAULT_PASSWORD $DEFAULT_PASSWORD | geth account new " |tail -1| cut -d'{' -f 2| tr -cd "[:alnum:]\n" )
-    export CELO_PROXY_ADDRESS=$(docker run -v $PWD/proxy:/root/.celo --entrypoint /bin/sh -it $CELO_IMAGE -c " printf '%s\n' $DEFAULT_PASSWORD $DEFAULT_PASSWORD | geth account new " |tail -1| cut -d'{' -f 2| tr -cd "[:alnum:]\n" )
+    docker rm -f celo-accounts || echo -e "Containers removed"
+
+    export CELO_VALIDATOR_ADDRESS=$(docker run -v $PWD:/root/.celo --entrypoint /bin/sh -it $CELO_IMAGE -c " printf '%s\n' $DEFAULT_PASSWORD $DEFAULT_PASSWORD | geth account new " |tail -1| cut -d'{' -f 2| tr -cd "[:alnum:]\n" )
+    export CELO_VALIDATOR_GROUP_ADDRESS=$(docker run -v $PWD:/root/.celo --entrypoint /bin/sh -it $CELO_IMAGE -c " printf '%s\n' $DEFAULT_PASSWORD $DEFAULT_PASSWORD | geth account new " |tail -1| cut -d'{' -f 2| tr -cd "[:alnum:]\n" )
     
-
+    initialize_geth
+    
+    cd $VALIDATOR_DIR
+    export CELO_VALIDATOR_SIGNER_ADDRESS=$(docker run -v $PWD:/root/.celo --entrypoint /bin/sh -it $CELO_IMAGE -c " printf '%s\n' $DEFAULT_PASSWORD $DEFAULT_PASSWORD | geth account new " |tail -1| cut -d'{' -f 2| tr -cd "[:alnum:]\n" )
+        
+    initialize_geth
+    
     echo -e "\tCELO_VALIDATOR_ADDRESS=$CELO_VALIDATOR_ADDRESS"
     echo -e "\tCELO_VALIDATOR_GROUP_ADDRESS=$CELO_VALIDATOR_GROUP_ADDRESS"
-    echo -e "\tCELO_PROXY_ADDRESS=$CELO_PROXY_ADDRESS"
+    echo -e "\tCELO_VALIDATOR_SIGNER_ADDRESS=$CELO_VALIDATOR_SIGNER_ADDRESS"
+
+    cd $ACCOUNTS_DIR
+
+    echo -e "Starting local Docker holding the accounts. You can attach to it running 'screen -r -S celo-accounts'\n"
+    screen -S celo-accounts -d -m docker run --name celo-accounts --restart always -p 8545:8545 -v $PWD:/root/.celo $CELO_IMAGE --verbosity 3 --networkid $NETWORK_ID --syncmode full --rpc --rpcaddr 0.0.0.0 --rpcapi eth,net,web3,debug,admin,personal
     
-    export CELO_VALIDATOR_BLS_PUBLIC_KEY=$(docker run -v $PWD/validator:/root/.celo --entrypoint /bin/sh -it $CELO_IMAGE -c " printf '%s\n' $DEFAULT_PASSWORD $DEFAULT_PASSWORD | geth account proof-of-possession $CELO_VALIDATOR_ADDRESS $CELO_VALIDATOR_ADDRESS "| tail -1| cut -d' ' -f 5| tr -cd "[:alnum:]\n" )
-    export CELO_VALIDATOR_BLS_SIGNATURE=$(docker run -v $PWD/validator:/root/.celo --entrypoint /bin/sh -it $CELO_IMAGE -c " printf '%s\n' $DEFAULT_PASSWORD $DEFAULT_PASSWORD | geth account proof-of-possession $CELO_VALIDATOR_ADDRESS $CELO_VALIDATOR_ADDRESS "|tail -2|head -1| cut -d' ' -f 4| tr -cd "[:alnum:]\n" )
-    
-    echo -e "\tCELO_VALIDATOR_BLS_PUBLIC_KEY=$CELO_VALIDATOR_BLS_PUBLIC_KEY"
-    echo -e "\tCELO_VALIDATOR_BLS_SIGNATURE=$CELO_VALIDATOR_BLS_SIGNATURE"
+
 
 fi
 
-if [[ $COMMAND == *"deploy"* ]]; then
+if [[ $COMMAND == *"run-proxy"* ]]; then
 
-    echo -e "* Deploying ..."
-    cd $DATA_DIR
+    echo -e "* Let's run the Proxy ..."
+    cd $PROXY_DIR
     
-    download_genesis
-    echo -e "\tInitializing using genesis"
-    docker run -v $PWD/proxy:/root/.celo $CELO_IMAGE init /root/.celo/genesis.json
-    docker run -v $PWD/validator:/root/.celo $CELO_IMAGE init /root/.celo/genesis.json
+    docker rm -f celo-proxy || echo -e "Containers removed"
+
+    initialize_geth
+    
+    screen -S celo-proxy -d -m docker run --name celo-proxy --restart always -p 30313:30303 -p 30313:30303/udp -p 30503:30503 -p 30503:30503/udp -v $PWD:/root/.celo $CELO_IMAGE --verbosity 3 --networkid $NETWORK_ID --syncmode full --proxy.proxy --proxy.proxiedvalidatoraddress $CELO_VALIDATOR_SIGNER_ADDRESS --proxy.internalendpoint :30503 --etherbase $CELO_VALIDATOR_SIGNER_ADDRESS --ethstats=proxy-$ETHSTATS_ARG
+    
+    sleep 5s
+    export PROXY_ENODE=$(docker exec celo-proxy geth --exec "admin.nodeInfo['enode'].split('//')[1].split('@')[0]" attach | tr -d '"')
+    export PROXY_IP=$(docker inspect -f '{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' celo-proxy)
+    echo -e "The Proxy should be starting. You can attach to it running 'screen -r -S celo-proxy'\n"
 
 fi
+
+
+
 
 
 if [[ $COMMAND == *"run-validator"* ]]; then
 
-    echo -e "* Let's run the validator network ..."
-    cd $DATA_DIR
+    echo -e "* Let's run the Validator ..."
+    cd $VALIDATOR_DIR
 
-    remove_containers
-    echo -e "\tStarting the Proxy"
-    screen -S celo-proxy -d -m docker run --name celo-proxy --restart always -p 8555:8545 -p 8556:8546 -p 30313:30303 -p 30313:30303/udp -p 30503:30503 -p 30503:30503/udp -v $PWD/proxy:/root/.celo $CELO_IMAGE --verbosity 3 --networkid $NETWORK_ID --syncmode full --rpc --rpcaddr 0.0.0.0 --rpcapi eth,net,web3,debug,admin,personal,istanbul --maxpeers 1100 --etherbase=$CELO_PROXY_ADDRESS --proxy.proxy --proxy.proxiedvalidatoraddress $CELO_VALIDATOR_ADDRESS --proxy.internalendpoint :30503 --ethstats=wss://proxy-$ETHSTATS_ARG
-    
-    sleep 10s
-    
-    export PROXY_ENODE=$(docker exec celo-proxy geth --exec "admin.nodeInfo['enode'].split('//')[1].split('@')[0]" attach | tr -d '"')
-    export PROXY_IP=$(docker inspect -f '{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' celo-proxy)
-    echo -e "\tProxy running: enode://$PROXY_ENODE@$PROXY_IP"
-    
-    echo -e "\tStarting Validator node"
-    docker run -v $PWD/validator:/root/.celo --entrypoint sh --rm $CELO_IMAGE -c "echo $DEFAULT_PASSWORD > /root/.celo/.password"
+    docker rm -f celo-validator || echo -e "Containers removed"
 
-    screen -S celo-validator -d -m docker run --name celo-validator --restart always -p 127.0.0.1:8545:8545 -p 127.0.0.1:8546:8546 -p 30303:30303 -p 30303:30303/udp -v $PWD/validator:/root/.celo $CELO_IMAGE --verbosity 3 --networkid $NETWORK_ID --syncmode full --rpc --rpcaddr 0.0.0.0 --rpcapi eth,net,web3,debug,admin,personal,istanbul --maxpeers 125 --mine --istanbul.blockperiod=5 --istanbul.requesttimeout=3000 --etherbase $CELO_VALIDATOR_ADDRESS --nodiscover --proxy.proxied --proxy.proxyenodeurlpair=enode://$PROXY_ENODE@$PROXY_IP:30503\;enode://$PROXY_ENODE@$PROXY_IP:30303  --unlock=$CELO_VALIDATOR_ADDRESS --password /root/.celo/.password --ethstats=wss://validator-$ETHSTATS_ARG
+    echo -e "\tGenerating the Validator Proof of Possesion"
+
+    __POS=$(docker run -v $PWD:/root/.celo --entrypoint /bin/sh -it $CELO_IMAGE -c " printf '%s\n' $DEFAULT_PASSWORD $DEFAULT_PASSWORD | geth account proof-of-possession $CELO_VALIDATOR_SIGNER_ADDRESS $CELO_VALIDATOR_ADDRESS "| tail -2 )
+    export CELO_VALIDATOR_SIGNER_PUBLIC_KEY=$(echo $__POS | cut -d' ' -f 6| tr -cd "[:alnum:]\n" )
+    export CELO_VALIDATOR_SIGNER_SIGNATURE=$(echo $__POS | cut -d' ' -f 2| tr -cd "[:alnum:]\n" )
     
+    echo -e "\tCELO_VALIDATOR_SIGNER_PUBLIC_KEY=$CELO_VALIDATOR_SIGNER_PUBLIC_KEY"
+    echo -e "\tCELO_VALIDATOR_SIGNER_SIGNATURE=$CELO_VALIDATOR_SIGNER_SIGNATURE"
+
+    
+    echo -e "\tGenerating the Validator Proof of Possesion of the BLS key"
+    __BLS=$(docker run -v $PWD:/root/.celo --entrypoint /bin/sh -it $CELO_IMAGE -c " printf '%s\n' $DEFAULT_PASSWORD $DEFAULT_PASSWORD | geth account proof-of-possession $CELO_VALIDATOR_SIGNER_ADDRESS $CELO_VALIDATOR_ADDRESS --bls "| tail -2 )
+    export CELO_VALIDATOR_SIGNER_BLS_PUBLIC_KEY=$(echo $__BLS | cut -d' ' -f 6| tr -cd "[:alnum:]\n" )
+    export CELO_VALIDATOR_SIGNER_BLS_SIGNATURE=$(echo $__BLS | cut -d' ' -f 2| tr -cd "[:alnum:]\n" )
+    
+    echo -e "\tCELO_VALIDATOR_SIGNER_BLS_PUBLIC_KEY=$CELO_VALIDATOR_SIGNER_BLS_PUBLIC_KEY"
+    echo -e "\tCELO_VALIDATOR_SIGNER_BLS_SIGNATURE=$CELO_VALIDATOR_SIGNER_BLS_SIGNATURE"
+    
+    
+    echo -e "\tConnecting Validator to Proxy running at enode://$PROXY_ENODE@$PROXY_IP"
+    docker run -v $PWD:/root/.celo --entrypoint sh --rm $CELO_IMAGE -c "echo $DEFAULT_PASSWORD > /root/.celo/.password"
+    screen -S celo-validator -d -m docker run --name celo-validator --restart always -p 30303:30303 -p 30303:30303/udp -v $PWD:/root/.celo $CELO_IMAGE --verbosity 3 --networkid $NETWORK_ID --syncmode full --mine --istanbul.blockperiod=5 --istanbul.requesttimeout=3000 --etherbase $CELO_VALIDATOR_SIGNER_ADDRESS --nodiscover --proxy.proxied --proxy.proxyenodeurlpair=enode://$PROXY_ENODE@$PROXY_IP:30503\;enode://$PROXY_ENODE@$PROXY_IP:30303  --unlock=$CELO_VALIDATOR_SIGNER_ADDRESS --password /root/.celo/.password --ethstats=validator-$ETHSTATS_ARG
+
     sleep 5s
      
-    echo -e "\tEverything should be running, you can check running 'screen -ls'"
-    screen -ls
-        
-    echo -e "\tYou can re-attach to the proxy or the validator running:"
-    echo -e "\t 'screen -r -S celo-proxy' or 'screen -r -S celo-validator'\n"
+    echo -e "The Validator should be starting. You can attach to it running 'screen -r -S celo-validator'\n"
     
 fi
 
 if [[ $COMMAND == *"run-attestation"* ]]; then
 
     echo -e "* Let's run the attestation service ..."
-    
+    docker rm -f celo-attestation || echo -e "Containers removed"
+
     echo -e "\tPulling docker image: $CELO_IMAGE_ATTESTATION"
     docker pull $CELO_IMAGE_ATTESTATION
     
@@ -214,7 +264,7 @@ if [[ $COMMAND == *"run-fullnode"* ]]; then
     echo -e "* Let's run the full node ..."
     cd $DATA_DIR
 
-     docker rm -f celo-fullnode || echo -e "Container removed"
+    docker rm -f celo-fullnode || echo -e "Container removed"
 
     export CELO_ACCOUNT_ADDRESS=$(celocli account:new |tail -1| cut -d' ' -f 2| tr -cd "[:alnum:]\n")
 
@@ -234,6 +284,68 @@ if [[ $COMMAND == *"run-fullnode"* ]]; then
 
     echo -e "\tYou can re-attach to the full node running:"
     echo -e "\t 'screen -r -S celo-fullnode'\n"
+fi
+
+if [[ $COMMAND == *"print-env"* ]]; then
+
+    echo -e "\n************************************************************************\n"
+    echo -e "Celo Environment Variables (copy to validator-config.rc to re-use them!):\n\n"
+    echo -e "CELO_VALIDATOR_ADDRESS=$CELO_VALIDATOR_ADDRESS"
+    echo -e "CELO_VALIDATOR_GROUP_ADDRESS=$CELO_VALIDATOR_GROUP_ADDRESS"
+    echo -e "CELO_VALIDATOR_SIGNER_ADDRESS=$CELO_VALIDATOR_SIGNER_ADDRESS"
+    echo -e "CELO_VALIDATOR_SIGNER_PUBLIC_KEY=$CELO_VALIDATOR_SIGNER_PUBLIC_KEY"
+    echo -e "CELO_VALIDATOR_SIGNER_SIGNATURE=$CELO_VALIDATOR_SIGNER_SIGNATURE"
+    echo -e "CELO_VALIDATOR_SIGNER_BLS_PUBLIC_KEY=$CELO_VALIDATOR_SIGNER_BLS_PUBLIC_KEY"
+    echo -e "CELO_VALIDATOR_SIGNER_BLS_SIGNATURE=$CELO_VALIDATOR_SIGNER_BLS_SIGNATURE"
+    echo -e "\n************************************************************************\n"
+
+fi
+
+if [[ $COMMAND == *"get-cooking"* ]]; then
+
+    echo -e "* Prepping validator for The Great Celo Stake Off..."
+    cd $ACCOUNTS_DIR
+    
+    which $CELOCLI
+    
+    echo -e "\t1. Unlocking accounts .."
+    $CELOCLI account:unlock --account $CELO_VALIDATOR_GROUP_ADDRESS --password $DEFAULT_PASSWORD
+    $CELOCLI account:unlock --account $CELO_VALIDATOR_ADDRESS --password $DEFAULT_PASSWORD
+    
+    echo -e "\t2. Registering accounts .."
+    $CELOCLI account:register --from $CELO_VALIDATOR_GROUP_ADDRESS --name $VALIDATOR_GROUP_NAME || echo -e "$CELO_VALIDATOR_GROUP_ADDRESS already registered"
+    $CELOCLI account:register --from $CELO_VALIDATOR_ADDRESS --name $VALIDATOR_NAME || echo -e "$CELO_VALIDATOR_ADDRESS already registered"
+    
+    echo -e "\t3. Locking Gold .."
+    $CELOCLI lockedgold:lock --from $CELO_VALIDATOR_GROUP_ADDRESS --value 10000000000000000000000
+    $CELOCLI lockedgold:lock --from $CELO_VALIDATOR_ADDRESS --value 10000000000000000000000
+
+    echo -e "\t4. Run for election .."
+    echo -e "\t   * Authorize the validator signing key"
+    $CELOCLI account:authorize --from $CELO_VALIDATOR_ADDRESS --role validator --signature 0x$CELO_VALIDATOR_SIGNER_SIGNATURE --signer 0x$CELO_VALIDATOR_SIGNER_ADDRESS || echo -e "Validator Signing Key $CELO_VALIDATOR_ADDRESS already authorized"
+    
+    echo -e "\t   * Register Validator Group address"
+    $CELOCLI validatorgroup:register --from $CELO_VALIDATOR_GROUP_ADDRESS --commission 0.1 || echo -e "Validator Group  $CELO_VALIDATOR_GROUP_ADDRESS already registered"
+
+    echo -e "\t   * Register Validator"
+    $CELOCLI validator:register --from $CELO_VALIDATOR_ADDRESS --ecdsaKey $CELO_VALIDATOR_SIGNER_PUBLIC_KEY --blsKey $CELO_VALIDATOR_SIGNER_BLS_PUBLIC_KEY --blsSignature $CELO_VALIDATOR_SIGNER_BLS_SIGNATURE || echo -e "Validator $CELO_VALIDATOR_GROUP_ADDRESS already registered"
+
+    echo -e "\t   * Affiliate Validator with Validator Group"
+    $CELOCLI validator:affiliate $CELO_VALIDATOR_GROUP_ADDRESS --from $CELO_VALIDATOR_ADDRESS
+
+    echo -e "\t   * Accept affiliation"
+    $CELOCLI validatorgroup:member --accept $CELO_VALIDATOR_ADDRESS --from $CELO_VALIDATOR_GROUP_ADDRESS
+
+    echo -e "\t   * Vote Validator Group"
+    $CELOCLI election:vote --from $CELO_VALIDATOR_ADDRESS --for $CELO_VALIDATOR_GROUP_ADDRESS --value 10000000000000000000000 || echo -e "Validator $CELO_VALIDATOR_ADDRESS already vote to $CELO_VALIDATOR_GROUP_ADDRESS"
+    $CELOCLI election:vote --from $CELO_VALIDATOR_GROUP_ADDRESS --for $CELO_VALIDATOR_GROUP_ADDRESS --value 10000000000000000000000 || echo -e "Validator $CELO_VALIDATOR_ADDRESS already vote to $CELO_VALIDATOR_GROUP_ADDRESS"
+    
+    echo -e "\t State of the validation elections"
+    $CELOCLI election:list
+
+    echo -e "\t Current elected validators"
+    $CELOCLI election:current
+
 fi
 
 cd $__PWD

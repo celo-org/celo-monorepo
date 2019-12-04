@@ -45,14 +45,14 @@ const mapStateToProps = (state: RootState): StateProps => ({
 const PREVIEW_SIZE = 2
 
 // Payment Request notification for the notification center on home screen
-export class PaymentRequestSummaryNotification extends React.Component<Props> {
+export class OutgoingPaymentRequestSummaryNotification extends React.Component<Props> {
   getCTA = () => {
     return [
       {
         text: this.props.t('review'),
         onPress: () => {
-          CeloAnalytics.track(CustomEventNames.request_payment_review)
-          navigate(Stacks.RequestStack)
+          CeloAnalytics.track(CustomEventNames.outgoing_request_payment_review)
+          navigate(Stacks.OutgoingRequestStack)
         },
       },
     ]
@@ -75,8 +75,8 @@ export class PaymentRequestSummaryNotification extends React.Component<Props> {
   getTitle() {
     const { t } = this.props
     return this.getTotal() > 1
-      ? t('paymentRequestWithCount', { count: this.getTotal() })
-      : t('paymentRequest')
+      ? t('outgoingPaymentRequestWithCount', { count: this.getTotal() })
+      : t('outgoingPaymentRequest')
   }
 
   getRequesterRecipient = (requesterE164Number: string) => {
@@ -143,5 +143,5 @@ const styles = StyleSheet.create({
 })
 
 export default connect<StateProps, {}, {}, RootState>(mapStateToProps)(
-  withNamespaces(Namespaces.walletFlow5)(PaymentRequestSummaryNotification)
+  withNamespaces(Namespaces.walletFlow5)(OutgoingPaymentRequestSummaryNotification)
 )
