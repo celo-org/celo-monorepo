@@ -30,7 +30,7 @@ export default class Lock extends BaseCommand {
     const value = new BigNumber(res.flags.value)
 
     await newCheckBuilder(this)
-      .addCheck(`Value [${value.toFixed()}] is not > 0`, () => value.gt(0))
+      .addCheck(`Value [${value.toFixed()}] is > 0`, () => value.gt(0))
       .isAccount(address)
       .runChecks()
 
