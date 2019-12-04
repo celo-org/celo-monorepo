@@ -9,9 +9,9 @@ import UseageExamples from 'src/brandkit/typography/UseageExample'
 import { H2, H3 } from 'src/fonts/Fonts'
 import { I18nProps, NameSpaces, Trans, withNamespaces } from 'src/i18n'
 import { ScreenProps, ScreenSizes, withScreenSize } from 'src/layout/ScreenSize'
+import InlineAnchor from 'src/shared/InlineAnchor'
 import { hashNav } from 'src/shared/menu-items'
 import { fontInfo, fonts, standardStyles } from 'src/styles'
-import InlineAnchor from 'src/shared/InlineAnchor'
 const { brandTypography } = hashNav
 
 function getWeight(weight: string | undefined) {

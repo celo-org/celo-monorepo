@@ -9,8 +9,8 @@ import { I18nProps, NameSpaces, Trans } from 'src/i18n'
 
 import Fetch from 'src/brandkit/common/Fetch'
 import IconShowcase from 'src/brandkit/common/Showcase'
-import { hashNav, CeloLinks } from 'src/shared/menu-items'
 import InlineAnchor from 'src/shared/InlineAnchor'
+import { CeloLinks, hashNav } from 'src/shared/menu-items'
 import { fonts, standardStyles } from 'src/styles'
 
 export default React.memo(function IconsPage() {
