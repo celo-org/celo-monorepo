@@ -207,7 +207,7 @@ _See code: [packages/cli/src/commands/account/isvalidator.ts](https://github.com
 
 ### New
 
-Creates a new account
+Creates a new account locally and print out the key information. Save this information for local transaction signing or import into a Celo node.
 
 ```
 USAGE
