@@ -49,14 +49,18 @@ function readSheet() {
             arr[e.row].multiplier = e.numericValue
           }
         }
-        updateDB(Object.values(arr).filter((a: any) => !!a.address && a.multiplier !== 0))
+        let lst = Object.values(arr)
+        updateDB(
+          lst.filter((a: any) => !!a.address && a.multiplier !== 0),
+          lst.filter((a: any) => !!a.address && a.multiplier === 0)
+        )
       }
     )
   })
 }
 
-async function updateDB(lst: any[]) {
-  console.log(lst)
+async function updateDB(lst: any[], remove: any[]) {
+  console.log('Adding', lst)
   const client = new Client({ database: LEADERBOARD_DATABASE })
   await client.connect()
   const res = await client.query(
@@ -66,6 +70,12 @@ async function updateDB(lst: any[]) {
     [JSON.stringify(lst)]
   )
   console.log(res.rows)
+  console.log('Removing', remove)
+  for (let elem of remove) {
+    await client.query(
+      "DELETE FROM competitors WHERE address = '\\x" + elem.address.toString() + "'"
+    )
+  }
   await client.end()
   await readAssoc(lst.map((a: any) => a.address.toString()))
 }
