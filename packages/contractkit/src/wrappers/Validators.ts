@@ -23,6 +23,7 @@ export interface Validator {
   blsPublicKey: string
   affiliation: string | null
   score: BigNumber
+  signer: Address
 }
 
 export interface ValidatorGroup {
@@ -196,12 +197,11 @@ export class ValidatorsWrapper extends BaseWrapper<Validators> {
     return {
       name,
       address,
-      // @ts-ignore Incorrect type for bytes
-      ecdsaPublicKey: res.ecdsaPublicKey,
-      // @ts-ignore Incorrect type for bytes
-      blsPublicKey: res.blsPublicKey,
+      ecdsaPublicKey: (res.ecdsaPublicKey as unknown) as string,
+      blsPublicKey: (res.blsPublicKey as unknown) as string,
       affiliation: res.affiliation,
       score: fromFixed(new BigNumber(res.score)),
+      signer: res.signer,
     }
   }
 

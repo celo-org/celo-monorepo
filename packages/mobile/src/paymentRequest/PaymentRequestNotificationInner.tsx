@@ -20,7 +20,7 @@ export default function PaymentRequestNotificationInner(props: Props) {
         {(requesterRecipient && requesterRecipient.displayName) || requesterE164Number} - {message}
       </Text>
       <Text style={[fontStyles.subSmall, fontStyles.semiBold]}>
-        {CURRENCIES[CURRENCY_ENUM.DOLLAR].symbol + getCentAwareMoneyDisplay(amount)}
+        {' ' + CURRENCIES[CURRENCY_ENUM.DOLLAR].symbol + getCentAwareMoneyDisplay(amount)}
       </Text>
     </Text>
   )
