@@ -226,7 +226,7 @@ docker run -v $PWD:/root/.celo $CELO_IMAGE init /celo/genesis.json
 docker run -v $PWD:/root/.celo --entrypoint cp $CELO_IMAGE /celo/static-nodes.json /root/.celo/
 ```
 
-You can then run the proxy with the following command. Be sure to replace `<YOUR-VALIDATOR-NAME>` with the name you set for your Validator account earlier.
+You can then run the proxy with the following command. Be sure to replace `<YOUR-VALIDATOR-NAME>` with the name you'd like to use for your Validator account.
 
 ```bash
 # On the proxy machine
