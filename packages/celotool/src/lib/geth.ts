@@ -790,9 +790,18 @@ export async function init(
   })
 }
 
-export async function importPrivateKey(gethBinaryPath: string, instance: GethInstanceConfig) {
-  const keyFile = `${getDatadir(instance)}/key.txt`
+export async function importPrivateKey(
+  gethBinaryPath: string,
+  instance: GethInstanceConfig,
+  verbose: boolean
+) {
+  const keyFile = path.join(getDatadir(instance), 'key.txt')
+  const genesisPath = path.join(instance.gethRunConfig.runPath, 'genesis.json')
+
+  await init(gethBinaryPath, getDatadir(instance), genesisPath, verbose)
+
   fs.writeFileSync(keyFile, instance.privateKey, { flag: 'a' })
+
   console.info(`geth:${instance.name}: import account`)
 
   await spawnCmdWithExitOnFailure(
