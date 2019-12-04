@@ -46,7 +46,7 @@ steps:
   args: [
     "--dockerfile=dockerfiles/leaderboard/Dockerfile",
     "--cache=true",
-    "--destination=us.gcr.io/$PROJECT_ID/celo-monorepo:leaderboard-$COMMIT_SHA"
+    "--destination=gcr.io/$PROJECT_ID/celo-monorepo:leaderboard-$COMMIT_SHA"
   ]
   waitFor: ['-']
 
