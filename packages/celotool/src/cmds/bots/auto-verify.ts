@@ -101,7 +101,7 @@ export const handler = async function autoVerify(argv: AutoVerifyArgv) {
     let stat = await attestations.getAttestationStat(phoneNumber, clientAddress)
 
     while (stat.total < argv.attestationMax) {
-      logger.info({ completed: stat.completed, total: stat.total }, 'Start Attestation')
+      logger.info({ ...stat }, 'Start Attestation')
 
       const gasPrice = new BigNumber(
         await gasPriceMinimum.getGasPriceMinimum(stableToken.address)
