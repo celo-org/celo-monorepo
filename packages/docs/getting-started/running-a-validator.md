@@ -2,7 +2,7 @@
 
 - [Running a Validator](#running-a-validator)
   - [Prerequisites](#prerequisites)
-    - [Agree Terms and Conditions and register](#agree-terms-and-conditions-and-register)
+    - [Register for the Stake Off](#register-for-the-stake-off)
     - [Hardware requirements](#hardware-requirements)
     - [Software requirements](#software-requirements)
   - [Setup Instructions](#instructions)
@@ -42,7 +42,7 @@ If you are starting up a Validator, please consider leaving it running for a few
 
 ## Prerequisites
 
-### Agree Terms and Conditions and Register
+### Register for the Stake Off
 
 Participation in The Great Celo Stake Off is subject to these [Terms and Conditions](https://docs.google.com/document/d/1b5SzeRbq60nx50NeezAEMpwLkaBDQ9hjZc0QAh4Mbdk/). If you agree to those, register online via an [online form](https://docs.google.com/forms/d/e/1FAIpQLSfbn5hTJ4UIWpN92-o2qMTUB0UnrFsL0fm97XqGe4VhhN_r5A/viewform). Once the C-Labs team receive your registration, they will send you instructions to get fauceted. Do this first.
 
@@ -185,7 +185,7 @@ docker run --name celo-accounts --restart always -p 8545:8545 -v $PWD:/root/.cel
 
 ### Obtain and lock up some Celo Gold for staking
 
-To participate in The Great Celo Stake Off (aka TGCSO) and get fauceted it's necessary to register online via an [online form](https://docs.google.com/forms/d/e/1FAIpQLSfbn5hTJ4UIWpN92-o2qMTUB0UnrFsL0fm97XqGe4VhhN_r5A/viewform). Once the C-Labs team receive your registration, they'll send you instructions to get fauceted. Follow those instructions now. Then, while you wait, let's deploy the remaining components:
+To participate in The Great Celo Stake Off (aka TGCSO) and get fauceted it's necessary to register online via an [online form](https://docs.google.com/forms/d/e/1FAIpQLSfbn5hTJ4UIWpN92-o2qMTUB0UnrFsL0fm97XqGe4VhhN_r5A/viewform). Once the C-Labs team receives your registration, they'll send you instructions to get fauceted. Follow those instructions now. Then, while you wait, let's deploy the remaining components:
 
 ### Deploy a Validator
 
@@ -334,7 +334,7 @@ celocli account:show $CELO_VALIDATOR_ADDRESS
 
 ### Lock up Celo Gold
 
-Lock up Celo Gold for both accounts in order to secure the right to register a Validator and Validator Group. The current requirement is 10k Celo Gold to register a validator, and 10k Celo Gold _per member validator_ to register a Validator Group. For Validators, this gold remains locked for approximately 60 days following deregistration. For groups, this gold remains locked for approximately 60 days following the removal of the Nth validator from the group.
+Lock up testnet Celo Gold for both accounts in order to secure the right to register a Validator and Validator Group. The current requirement is 10k Celo Gold to register a validator, and 10,000 Celo Gold _per member validator_ to register a Validator Group. For Validators, this gold remains locked for approximately 60 days following deregistration. For groups, this gold remains locked for approximately 60 days following the removal of the Nth validator from the group.
 
 ```bash
 # On your local machine
@@ -342,7 +342,7 @@ celocli lockedgold:lock --from $CELO_VALIDATOR_GROUP_ADDRESS --value 10000000000
 celocli lockedgold:lock --from $CELO_VALIDATOR_ADDRESS --value 10000000000000000000000
 ```
 
-Since your balance is in fact higher than this, you may wish to lock more with these accounts.
+This amount (10,000 Celo Gold) represents the minimum amount needed to be locked in order to register a Validator and Validator group. Since your balance is in fact higher than this, you may wish to lock more with these accounts. Note that you will want to be sure to leave enough Gold unlocked to be able to continue to pay transaction fees for future transactions (such as those issued by running some CLI commands).
 
 Check that your Celo Gold was successfully locked with the following commands:
 
