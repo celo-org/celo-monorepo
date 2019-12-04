@@ -46,7 +46,7 @@ _See code: [packages/cli/src/commands/account/balance.ts](https://github.com/cel
 
 ### Claim-account
 
-Claim another account in a local metadata file
+Claim another account, and optionally its public key, and add the claim to a local metadata file
 
 ```
 USAGE
@@ -59,18 +59,19 @@ OPTIONS
   --address=address                                  (required) The address of the account you want to claim
   --from=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) Addess of the account to set metadata for
 
-  --publicKey=publicKey                              The public key of the account if you want others to encrypt
-                                                     messages to you
+  --publicKey=publicKey                              The public key of the account that others may use to send you
+                                                     encrypted messages
 
 EXAMPLE
-  claim-account ~/metadata.json --address test.com --from 0x0
+  claim-account ~/metadata.json --address 0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d --from
+  0x47e172F6CfB6c7D01C1574fa3E2Be7CC73269D95
 ```
 
 _See code: [packages/cli/src/commands/account/claim-account.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/account/claim-account.ts)_
 
 ### Claim-attestation-service-url
 
-Claim the URL of the attestation service in a local metadata file
+Claim the URL of the attestation service and add the claim to a local metadata file
 
 ```
 USAGE
@@ -84,14 +85,15 @@ OPTIONS
   --url=htttps://www.celo.org                        (required) The url you want to claim
 
 EXAMPLE
-  claim-attestation-service-url ~/metadata.json --url http://test.com/myurl --from 0x0
+  claim-attestation-service-url ~/metadata.json --url http://test.com/myurl --from
+  0x47e172F6CfB6c7D01C1574fa3E2Be7CC73269D95
 ```
 
 _See code: [packages/cli/src/commands/account/claim-attestation-service-url.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/account/claim-attestation-service-url.ts)_
 
 ### Claim-domain
 
-Change the domain in a local metadata file
+Claim a domain and add the claim to a local metadata file
 
 ```
 USAGE
@@ -105,14 +107,14 @@ OPTIONS
   --from=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) Addess of the account to set metadata for
 
 EXAMPLE
-  claim-domain ~/metadata.json --domain test.com --from 0x0
+  claim-domain ~/metadata.json --domain test.com --from 0x47e172F6CfB6c7D01C1574fa3E2Be7CC73269D95
 ```
 
 _See code: [packages/cli/src/commands/account/claim-domain.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/account/claim-domain.ts)_
 
 ### Claim-keybase
 
-Claim a keybase username in a local metadata file
+Claim a keybase username and add the claim to a local metadata file
 
 ```
 USAGE
@@ -126,14 +128,14 @@ OPTIONS
   --username=username                                (required) The keybase username you want to claim
 
 EXAMPLE
-  claim-keybase ~/metadata.json --from 0x0 --username test
+  claim-keybase ~/metadata.json --from 0x47e172F6CfB6c7D01C1574fa3E2Be7CC73269D95 --username myusername
 ```
 
 _See code: [packages/cli/src/commands/account/claim-keybase.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/account/claim-keybase.ts)_
 
 ### Claim-name
 
-Change the name in a local metadata file
+Claim a name and add the claim to a local metadata file
 
 ```
 USAGE
@@ -147,14 +149,14 @@ OPTIONS
   --name=name                                        (required) The name you want to claim
 
 EXAMPLE
-  change-name ~/metadata.json --from 0x0 --name myname
+  claim-name ~/metadata.json --from 0x47e172F6CfB6c7D01C1574fa3E2Be7CC73269D95 --name myname
 ```
 
 _See code: [packages/cli/src/commands/account/claim-name.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/account/claim-name.ts)_
 
 ### Create-metadata
 
-Create an empty metadata file
+Create an empty identity metadata file. Use this metadata file to store claims attesting to ownership of off-chain resources. Claims can be generated with the account:claim-\* commands.
 
 ```
 USAGE
@@ -167,14 +169,14 @@ OPTIONS
   --from=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) Addess of the account to set metadata for
 
 EXAMPLE
-  create-metadata ~/metadata.json --from 0x0
+  create-metadata ~/metadata.json --from 0x47e172F6CfB6c7D01C1574fa3E2Be7CC73269D95
 ```
 
 _See code: [packages/cli/src/commands/account/create-metadata.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/account/create-metadata.ts)_
 
 ### Get-metadata
 
-Show information about an address
+Show information about an address. Retreives the metadata URL for an account from the on-chain, then fetches the metadata file off-chain and verifies proofs as able.
 
 ```
 USAGE
@@ -259,7 +261,7 @@ _See code: [packages/cli/src/commands/account/register.ts](https://github.com/ce
 
 ### Register-metadata
 
-Register metadata about an address
+Register metadata URL for an account where users will be able to retieve the metadata file and verify your claims
 
 ```
 USAGE
@@ -270,7 +272,7 @@ OPTIONS
   --url=htttps://www.celo.org                        (required) The url to the metadata you want to register
 
 EXAMPLE
-  register-metadata --url https://www.celo.org --from 0x0
+  register-metadata --url https://www.mywebsite.com/celo-metadata --from 0x47e172F6CfB6c7D01C1574fa3E2Be7CC73269D95
 ```
 
 _See code: [packages/cli/src/commands/account/register-metadata.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/account/register-metadata.ts)_
