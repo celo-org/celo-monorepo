@@ -14,6 +14,8 @@ export default class Unlock extends BaseCommand {
 
   static examples = ['unlock --account 0x5409ed021d9299bf6814279a6a1411a7e866a631']
 
+  requireSynced = false
+
   async run() {
     const res = this.parse(Unlock)
     // Unlock till geth exits
