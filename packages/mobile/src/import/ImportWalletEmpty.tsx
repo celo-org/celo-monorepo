@@ -12,7 +12,8 @@ import { Namespaces } from 'src/i18n'
 import { backupIcon } from 'src/images/Images'
 import { importBackupPhrase } from 'src/import/actions'
 import { nuxNavigationOptions } from 'src/navigator/Headers'
-import { navigateBack } from 'src/navigator/NavigationService'
+import { navigate } from 'src/navigator/NavigationService'
+import { Screens } from 'src/navigator/Screens'
 import { RootState } from 'src/redux/reducers'
 import { getMoneyDisplayValue } from 'src/utils/formatting'
 
@@ -48,7 +49,7 @@ export class ImportWalletEmpty extends React.Component<Props> {
   }
 
   onPressTryAnotherKey = () => {
-    navigateBack()
+    navigate(Screens.ImportWallet, { clean: true })
   }
 
   render() {

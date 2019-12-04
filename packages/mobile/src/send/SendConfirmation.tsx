@@ -191,12 +191,12 @@ class SendConfirmation extends React.Component<Props, State> {
     if (type === TransactionTypes.PAY_REQUEST) {
       primaryBtnInfo = {
         action: this.sendOrInvite,
-        text: i18n.t('paymentRequestFlow:pay'),
+        text: i18n.t('global:pay'),
         disabled: isPrimaryButtonDisabled,
       }
       secondaryBtnInfo = {
         action: this.onEditClick,
-        text: i18n.t('paymentRequestFlow:decline'),
+        text: i18n.t('global:decline'),
         disabled: isSending,
       }
     } else {

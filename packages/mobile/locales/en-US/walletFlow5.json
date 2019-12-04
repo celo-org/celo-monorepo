@@ -1,7 +1,9 @@
 {
   "getStarted": "Get Started",
-  "paymentRequest": "Payment Request",
-  "paymentRequestWithCount_plural": "{{count}} Payment Requests",
+  "incomingPaymentRequest": "Request Waiting for You",
+  "incomingPaymentRequestWithCount_plural": "{{count}} Requests Waiting on You",
+  "outgoingPaymentRequest": "Payment You’ve Requested",
+  "outgoingPaymentRequestWithCount_plural": "{{count}} Payments You’ve Requested",
   "SMSError": "Error sending SMS",
   "notifications": "Notifications",
   "getBackupKey": "Get Backup Key",

@@ -1,7 +1,9 @@
 {
   "getStarted": "Primeros pasos",
-  "paymentRequest": "Solicitud de pago",
-  "paymentRequestWithCount_plural": "{{count}} solicitudes de pago",
+  "incomingPaymentRequest": "Pedido esperandote",
+  "incomingPaymentRequestWithCount_plural": "{{count}} Pedidos esperandote",
+  "outgoingPaymentRequest": "Pago que tu has pedido",
+  "outgoingPaymentRequestWithCount_plural": "{{count}} Pagos que tu has pedido",
   "SMSError": "Error al enviar SMS",
   "notifications": "Notificaciones",
   "getBackupKey": "Obtener clave de respaldo",
