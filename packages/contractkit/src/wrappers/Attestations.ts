@@ -65,7 +65,9 @@ function sanitizeBase64(base64String: string) {
   return base64String.replace(/(¿|§)/gi, '_')
 }
 
-const attestationCodeRegex = new RegExp(/(.* |^)([a-zA-Z0-9=\+\/_-]{87,88})($| .*)/)
+const attestationCodeRegex = new RegExp(
+  /(.* |^)(?:celo:\/\/wallet\/v\/)?([a-zA-Z0-9=\+\/_-]{87,88})($| .*)/
+)
 
 function messageContainsAttestationCode(message: string) {
   return attestationCodeRegex.test(message)
@@ -394,7 +396,6 @@ export class AttestationsWrapper extends BaseWrapper<Attestations> {
   /**
    * Selects the issuers for previously requested attestations for a phone number
    * @param phoneNumber The phone number for which to request attestations for
-   * @param token The token with which to pay for the attestation fee
    */
   async selectIssuers(phoneNumber: string) {
     const phoneHash = PhoneNumberUtils.getPhoneHash(phoneNumber)

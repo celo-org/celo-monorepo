@@ -28,6 +28,7 @@ export enum AccountType {
   FAUCET = 4,
   ATTESTATION = 5,
   PRICE_ORACLE = 6,
+  ATTESTATION_BOT = 7,
 }
 
 export enum ConsensusType {
@@ -53,6 +54,7 @@ export const MNEMONIC_ACCOUNT_TYPE_CHOICES = [
   'faucet',
   'attestation',
   'price_oracle',
+  'attestation_bot',
 ]
 
 export const add0x = (str: string) => {
@@ -191,6 +193,7 @@ const generateIstanbulExtraData = (validators: Validator[]) => {
     '0x' +
     repeat('0', istanbulVanity * 2) +
     rlp
+      // @ts-ignore
       .encode([
         // Added validators
         validators.map((validator) => Buffer.from(validator.address, 'hex')),

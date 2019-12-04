@@ -40,7 +40,7 @@
     "graphql": "^14.1.1",
     "i18next": "^12.1.0",
     "react": "16.9.0",
-    "react-apollo": "^2.4.1",
+    "react-apollo": "^2.5.8",
     "react-i18next": "^8.3.8",
     "react-native": "^0.61.2",
     "react-native-config": "https://github.com/luggit/react-native-config#89a602b",

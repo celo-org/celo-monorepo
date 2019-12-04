@@ -8,6 +8,7 @@ import * as React from 'react'
 import { WithNamespaces, withNamespaces } from 'react-i18next'
 import { ActivityIndicator, Image, Keyboard, StyleSheet, Text, View } from 'react-native'
 import SafeAreaView from 'react-native-safe-area-view'
+import { NavigationEvents, NavigationInjectedProps } from 'react-navigation'
 import { connect } from 'react-redux'
 import { hideAlert } from 'src/alert/actions'
 import CeloAnalytics from 'src/analytics/CeloAnalytics'
@@ -43,7 +44,7 @@ interface StateProps {
   isImportingWallet: boolean
 }
 
-type Props = StateProps & DispatchProps & WithNamespaces
+type Props = StateProps & DispatchProps & WithNamespaces & NavigationInjectedProps
 
 const mapStateToProps = (state: RootState): StateProps => {
   return {
@@ -56,6 +57,15 @@ export class ImportWallet extends React.Component<Props, State> {
 
   state = {
     backupPhrase: '',
+  }
+
+  checkCleanBackupPhrase() {
+    if (this.props.navigation.getParam('clean')) {
+      this.setState({
+        backupPhrase: '',
+      })
+      this.props.navigation.setParams({ clean: false })
+    }
   }
 
   setBackupPhrase = (input: string) => {
@@ -88,6 +98,7 @@ export class ImportWallet extends React.Component<Props, State> {
 
     return (
       <SafeAreaView style={styles.container}>
+        <NavigationEvents onDidFocus={this.checkCleanBackupPhrase} />
         <KeyboardAwareScrollView
           contentContainerStyle={styles.scrollContainer}
           keyboardShouldPersistTaps="always"
@@ -164,7 +175,7 @@ const styles = StyleSheet.create({
   },
 })
 
-export default connect<StateProps, DispatchProps, {}, RootState>(
+export default connect<StateProps, DispatchProps, any, RootState>(
   mapStateToProps,
   {
     importBackupPhrase,
