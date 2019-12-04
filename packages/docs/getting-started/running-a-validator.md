@@ -1,27 +1,5 @@
 # Running a Validator
 
-- [Running a Validator](#running-a-validator)
-  - [Prerequisites](#prerequisites)
-    - [Register for the Stake Off](#register-for-the-stake-off)
-    - [Hardware requirements](#hardware-requirements)
-    - [Software requirements](#software-requirements)
-  - [Setup Instructions](#instructions)
-    - [Environment variables](#environment-variables)
-    - [Pull the Celo Docker image](#pull-the-celo-docker-image)
-    - [Create accounts](#create-accounts)
-    - [Deploy the Validator and Proxy nodes](#deploy-the-validator-and-proxy-nodes)
-      - [Running the Proxy](#running-the-proxy)
-      - [Running the Validator](#running-the-validator)
-    - [Running the Attestation Service](#running-the-attestation-service)
-    - [Stop the containers](#stop-the-containers)
-  - [Get elected as validator](#get-elected-as-validator)
-    - [Running the Docker containers in the background](#running-the-docker-containers-in-the-background)
-    - [Reference Script](#reference-script)
-    - [Obtain and lock up some Celo Gold for staking](#obtain-and-lock-up-some-celo-gold-for-staking)
-    - [Lock up Celo Gold](#lock-up-celo-gold)
-    - [Run for election](#run-for-election)
-    - [Stop Validating](#stop-validating)
-
 This section explains how to get a Validator node running on the network, using the same docker image used for running a full node.
 
 Validators help secure the Celo network by participating in Celo’s Proof of Stake protocol. Validators are organized into Validator Groups, analogous to parties in representative democracies. A Validator Group is essentially an ordered list of Validators.

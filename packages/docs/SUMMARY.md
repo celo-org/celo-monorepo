@@ -5,11 +5,12 @@
 
 ## Getting Started
 
+- [Alfajores Testnet](getting-started/alfajores-testnet.md)
+  - [Using the Mobile Wallet](getting-started/using-the-mobile-wallet.md)
+  - [Getting an Account and Funds](getting-started/faucet.md)
 - [Baklava Testnet](getting-started/baklava-testnet.md)
-- [Using the Mobile Wallet](getting-started/using-the-mobile-wallet.md)
-- [Getting an Account and Funds](getting-started/faucet.md)
-- [Running a Full Node](getting-started/running-a-full-node.md)
-- [Running a Validator](getting-started/running-a-validator.md)
+  - [Running a Full Node](getting-started/running-a-full-node.md)
+  - [Running a Validator](getting-started/running-a-validator.md)
 - [Glossary](getting-started/glossary.md)
 
 ## Celo Codebase
