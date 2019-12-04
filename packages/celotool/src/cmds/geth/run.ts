@@ -1,4 +1,4 @@
-import { addCeloGethMiddleware, ensure0x } from 'src/lib/utils'
+import { addCeloGethMiddleware } from 'src/lib/utils'
 import yargs from 'yargs'
 import { GethArgv } from '../geth'
 import { GethInstanceConfig, GethRunConfig, runGethNodes } from '../../lib/geth'
@@ -11,7 +11,6 @@ interface RunArgv extends GethArgv {
   networkId: string
   syncMode: string
   mining: boolean
-  minerAddress: string
   nodekeyhex: string
   minerGasPrice: number
   port: number
@@ -19,6 +18,7 @@ interface RunArgv extends GethArgv {
   wsport: number
   verbosity: number
   amount: number
+  purge: boolean
 }
 
 export const builder = (argv: yargs.Argv) => {
@@ -36,11 +36,6 @@ export const builder = (argv: yargs.Argv) => {
       type: 'boolean',
       description: 'Is mining enabled',
       default: false,
-    })
-    .option('miner-address', {
-      type: 'string',
-      description: 'Address of the miner',
-      default: null,
     })
     .option('miner-gas-price', {
       type: 'number',
@@ -72,14 +67,15 @@ export const builder = (argv: yargs.Argv) => {
       description: 'Verbosity level',
       default: 5,
     })
-    .coerce(
-      'miner-address',
-      (minerAddress: string) => (minerAddress === null ? null : ensure0x(minerAddress))
-    )
+    .option('purge', {
+      type: 'boolean',
+      description: 'purge',
+      default: false,
+    })
 }
 
 export const handler = async (argv: RunArgv) => {
-  //  const verbosity = argv.verbosity
+  const verbosity = argv.verbosity
 
   const gethDir = argv.gethDir
   const datadir = argv.dataDir
@@ -90,23 +86,25 @@ export const handler = async (argv: RunArgv) => {
   const rpcport = argv.rpcport
   const wsport = argv.wsport
 
-  //  const mining = argv.mining
-  //  const minerAddress = argv.minerAddress
-  //  const minerGasPrice = argv.minerGasPrice
+  const mining = argv.mining
+  const minerGasPrice = argv.minerGasPrice
 
   const mnemonic =
     'jazz ripple brown cloth door bridge pen danger deer thumb cable prepare negative library vast'
 
   const numNodes = argv.amount
-  // const network = 'local'
+  const purge = argv.purge
+
+  const network = 'local'
 
   console.info(`sync mode is ${syncMode}`)
 
   const gethConfig: GethRunConfig = {
     runPath: datadir,
-    genesisPath: datadir + '/genesis.json',
+    keepData: !purge,
     gethRepoPath: gethDir,
-    networkId: networkId,
+    networkId,
+    network,
     instances: [],
   }
 
@@ -114,9 +112,11 @@ export const handler = async (argv: RunArgv) => {
     gethConfig.instances.push({
       gethRunConfig: gethConfig,
       name: `${x}-node`,
-      validating: true,
+      validating: mining,
+      validatingGasPrice: minerGasPrice,
       syncmode: syncMode,
       port: port + x,
+      ethstats: 'localhost:3000',
       rpcport: rpcport + x * 2,
       wsport: wsport + x * 2,
     } as GethInstanceConfig)
@@ -127,8 +127,8 @@ export const handler = async (argv: RunArgv) => {
 
   await runGethNodes({
     gethConfig,
-    keepData: true,
-    validatorPrivateKeys,
     validators,
+    validatorPrivateKeys,
+    verbose: verbosity > 5,
   })
 }

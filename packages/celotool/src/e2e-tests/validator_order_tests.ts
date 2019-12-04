@@ -14,9 +14,9 @@ const TMP_PATH = '/tmp/e2e'
 describe('governance tests', () => {
   const gethConfig: GethRunConfig = {
     gethRepoPath: '../../../celo-blockchain',
+    network: 'local',
     networkId: 1101,
     runPath: TMP_PATH,
-    genesisPath: TMP_PATH + '/gensis.json',
     migrateTo: 15,
     instances: _.range(VALIDATORS).map((i) => ({
       gethRunConfig: gethConfig,

@@ -36,15 +36,17 @@ export interface GethRunConfig {
   migrate?: boolean
   migrateTo?: number
   migrationOverrides?: any
+  keepData?: boolean
   // ??
   useBootnode?: boolean
   // genesis config
-  genesisPath: string
   genesisConfig?: any
   // network
+  network: string
   networkId: number
   // where to run
   runPath: string
+  verbosity?: number
   gethRepoPath: string
   // running instances
   instances: GethInstanceConfig[]
@@ -54,6 +56,7 @@ export interface GethInstanceConfig {
   gethRunConfig: GethRunConfig
   name: string
   validating: boolean
+  validatingGasPrice?: number
   syncmode: string
   port: number
   proxyport?: number
@@ -675,23 +678,27 @@ export const transferERC20Token = async (
 
 export const runGethNodes = async ({
   gethConfig,
-  keepData,
-  validatorPrivateKeys,
   validators,
+  validatorPrivateKeys,
+  verbose,
 }: {
   gethConfig: GethRunConfig
-  keepData: boolean
-  validators: any
+  validators: any[]
   validatorPrivateKeys: any
+  verbose: boolean
 }) => {
-  const validatorsFilePath = `${gethConfig.runPath}/validators.json`
+  const validatorsFilePath = `${gethConfig.runPath}/nodes.json`
   const validatorInstances = gethConfig.instances.filter((x: any) => x.validating)
-  const validatorEnodes = validatorPrivateKeys.map((x: any, i: number) =>
-    getEnodeAddress(privateKeyToPublicKey(x), '127.0.0.1', validatorInstances[i].port)
-  )
+  const validatorEnodes =
+    validatorInstances.length > 0
+      ? validatorPrivateKeys.map((x: any, i: number) => {
+          return getEnodeAddress(privateKeyToPublicKey(x), '127.0.0.1', validatorInstances[i].port)
+        })
+      : []
+
   const gethBinaryPath = `${gethConfig.gethRepoPath}/build/bin/geth`
 
-  if (!keepData && fs.existsSync(gethConfig.runPath)) {
+  if (!gethConfig.keepData && fs.existsSync(gethConfig.runPath)) {
     await resetDataDir(gethConfig.runPath)
   }
 
@@ -699,10 +706,13 @@ export const runGethNodes = async ({
     fs.mkdirSync(gethConfig.runPath, { recursive: true })
   }
 
+  console.log(gethConfig.runPath)
+
   await writeGenesis(validators, gethConfig)
 
-  console.log('Validator eNodes', JSON.stringify(validatorEnodes, null, 2))
+  console.log('eNodes', JSON.stringify(validatorEnodes, null, 2))
 
+  console.log(validators.map((validator) => validator.address))
   fs.writeFileSync(validatorsFilePath, JSON.stringify(validatorEnodes), 'utf8')
 
   let validatorIndex = 0
@@ -717,7 +727,7 @@ export const runGethNodes = async ({
     }
 
     if (instance.privateKey) {
-      await importPrivateKey(gethBinaryPath, instance)
+      await importPrivateKey(gethBinaryPath, instance, verbose)
     }
 
     if (instance.peers) {
@@ -725,9 +735,9 @@ export const runGethNodes = async ({
     }
 
     if (gethConfig.migrate || gethConfig.migrateTo) {
-      await initAndStartGeth(gethBinaryPath, instance)
+      await initAndStartGeth(gethBinaryPath, instance, verbose)
     } else {
-      await startGeth(gethBinaryPath, instance)
+      await startGeth(gethBinaryPath, instance, verbose)
     }
   }
 }
@@ -745,34 +755,55 @@ export function importGenesis(genesisPath: string) {
 }
 
 function getDatadir(instance: GethInstanceConfig) {
-  return path.join(getInstanceDir(instance), 'datadir')
+  const dir = path.join(getInstanceDir(instance), 'datadir')
+  fs.mkdirSync(dir, { recursive: true })
+  return dir
 }
 
 /**
  * @returns Promise<number> the geth pid number
  */
-export async function initAndStartGeth(gethBinaryPath: string, instance: GethInstanceConfig) {
+export async function initAndStartGeth(
+  gethBinaryPath: string,
+  instance: GethInstanceConfig,
+  verbose: boolean
+) {
   const datadir = getDatadir(instance)
 
   console.info(`geth:${instance.name}: init datadir ${datadir}`)
 
-  // await init(gethBinaryPath, datadir, instance.gethRunConfig.genesisPath)
+  const genesisPath = path.join(instance.gethRunConfig.runPath, 'genesis.json')
+  await init(gethBinaryPath, datadir, genesisPath, verbose)
 
-  return startGeth(gethBinaryPath, instance)
+  return startGeth(gethBinaryPath, instance, verbose)
 }
 
-export async function init(gethBinaryPath: string, datadir: string, genesisPath: string) {
+export async function init(
+  gethBinaryPath: string,
+  datadir: string,
+  genesisPath: string,
+  verbose: boolean
+) {
   await spawnCmdWithExitOnFailure('rm', ['-rf', datadir], { silent: true })
   await spawnCmdWithExitOnFailure(gethBinaryPath, ['--datadir', datadir, 'init', genesisPath], {
-    silent: false,
+    silent: !verbose,
   })
 }
 
-export async function importPrivateKey(gethBinaryPath: string, instance: GethInstanceConfig) {
-  const keyFile = `${getDatadir(instance)}/key.txt`
-  await init(gethBinaryPath, getDatadir(instance), instance.gethRunConfig.genesisPath)
+export async function importPrivateKey(
+  gethBinaryPath: string,
+  instance: GethInstanceConfig,
+  verbose: boolean
+) {
+  const keyFile = path.join(getDatadir(instance), 'key.txt')
+  const genesisPath = path.join(instance.gethRunConfig.runPath, 'genesis.json')
+
+  await init(gethBinaryPath, getDatadir(instance), genesisPath, verbose)
+
   fs.writeFileSync(keyFile, instance.privateKey, { flag: 'a' })
+
   console.info(`geth:${instance.name}: import account`)
+
   await spawnCmdWithExitOnFailure(
     gethBinaryPath,
     ['account', 'import', '--datadir', getDatadir(instance), '--password', '/dev/null', keyFile],
@@ -796,7 +827,11 @@ export async function addProxyPeer(gethBinaryPath: string, instance: GethInstanc
   }
 }
 
-export async function startGeth(gethBinaryPath: string, instance: GethInstanceConfig) {
+export async function startGeth(
+  gethBinaryPath: string,
+  instance: GethInstanceConfig,
+  verbose: boolean
+) {
   const datadir = getDatadir(instance)
   const {
     syncmode,
@@ -804,6 +839,7 @@ export async function startGeth(gethBinaryPath: string, instance: GethInstanceCo
     rpcport,
     wsport,
     validating,
+    validatingGasPrice,
     bootnodeEnode,
     isProxy,
     isProxied,
@@ -821,11 +857,10 @@ export async function startGeth(gethBinaryPath: string, instance: GethInstanceCo
     '--debug',
     '--port',
     port.toString(),
-    '--rpcvhosts="*"',
+    "--rpcvhosts='*'",
     '--networkid',
     instance.gethRunConfig.networkId.toString(),
-    '--verbosity',
-    '5',
+    `--verbosity=${instance.gethRunConfig.verbosity ? instance.gethRunConfig.verbosity : '3'}`,
     '--consoleoutput=stdout', // Send all logs to stdout
     '--consoleformat=term',
     '--nat',
@@ -837,14 +872,14 @@ export async function startGeth(gethBinaryPath: string, instance: GethInstanceCo
       '--rpc',
       '--rpcport',
       rpcport.toString(),
-      '--rpccorsdomain="*"',
+      "--rpccorsdomain='*'",
       '--rpcapi=eth,net,web3,debug,admin,personal,txpool,istanbul'
     )
   }
 
   if (wsport) {
     gethArgs.push(
-      '--wsorigins="*"',
+      "--wsorigins='*'",
       '--ws',
       '--wsport',
       wsport.toString(),
@@ -862,6 +897,10 @@ export async function startGeth(gethBinaryPath: string, instance: GethInstanceCo
 
   if (validating) {
     gethArgs.push('--mine', '--minerthreads=10', `--nodekeyhex=${privateKey}`)
+
+    if (validatingGasPrice) {
+      gethArgs.push(`--miner.gasprice=${validatingGasPrice}`)
+    }
 
     if (isProxied) {
       gethArgs.push('--proxy.proxied')
@@ -893,22 +932,32 @@ export async function startGeth(gethBinaryPath: string, instance: GethInstanceCo
     gethArgs.push(`--ethstats=${instance.name}@${ethstats}`)
   }
 
-  const gethProcess = spawnWithLog(gethBinaryPath, gethArgs, `${datadir}/logs.txt`)
+  const gethProcess = spawnWithLog(gethBinaryPath, gethArgs, `${datadir}/logs.txt`, verbose)
   instance.pid = gethProcess.pid
 
   gethProcess.on('error', (err) => {
     throw new Error(`Geth crashed! Error: ${err}`)
   })
 
+  const secondsToWait = 5
   // Give some time for geth to come up
-  const waitForPort = wsport ? wsport : rpcport
-  if (waitForPort) {
-    const isOpen = await waitForPortOpen('localhost', waitForPort, 10)
+  if (rpcport) {
+    const isOpen = await waitForPortOpen('localhost', rpcport, secondsToWait)
     if (!isOpen) {
-      console.error(`geth:${instance.name}: jsonRPC didn't open after 5 seconds`)
+      console.error(`geth:${instance.name}: jsonRPC didn't open after ${secondsToWait} seconds`)
       process.exit(1)
     } else {
-      console.info(`geth:${instance.name}: jsonRPC port open ${waitForPort}`)
+      console.info(`geth:${instance.name}: jsonRPC port open ${rpcport}`)
+    }
+  }
+
+  if (wsport) {
+    const isOpen = await waitForPortOpen('localhost', wsport, secondsToWait)
+    if (!isOpen) {
+      console.error(`geth:${instance.name}: jsonRPC didn't open after ${secondsToWait} seconds`)
+      process.exit(1)
+    } else {
+      console.info(`geth:${instance.name}: ws port open ${wsport}`)
     }
   }
 
@@ -925,9 +974,11 @@ export function writeGenesis(validators: Validator[], gethConfig: GethRunConfig)
     chainId: gethConfig.networkId,
     ...gethConfig.genesisConfig,
   })
+
+  const genesisPath = path.join(gethConfig.runPath, 'genesis.json')
   console.log('writing genesis')
-  fs.writeFileSync(gethConfig.genesisPath, genesis)
-  console.log(`wrote   genesis to ${gethConfig.genesisPath}`)
+  fs.writeFileSync(genesisPath, genesis)
+  console.log(`wrote   genesis to ${genesisPath}`)
 }
 
 async function isPortOpen(host: string, port: number) {
@@ -981,18 +1032,28 @@ export async function checkoutGethRepo(branch: string, path: string) {
   await spawnCmdWithExitOnFailure('git', ['checkout', branch], { cwd: path })
 }
 
-export function spawnWithLog(cmd: string, args: string[], logsFilepath: string) {
+export function spawnWithLog(cmd: string, args: string[], logsFilepath: string, verbose: boolean) {
   try {
     fs.unlinkSync(logsFilepath)
   } catch (error) {
     // nothing to do
   }
+
   const logStream = fs.createWriteStream(logsFilepath, { flags: 'a' })
+
   console.log(cmd, ...args)
-  const process = spawn(cmd, args)
-  process.stdout.pipe(logStream)
-  process.stderr.pipe(logStream)
-  return process
+
+  const p = spawn(cmd, args)
+
+  p.stdout.pipe(logStream)
+  p.stderr.pipe(logStream)
+
+  if (verbose) {
+    p.stdout.pipe(process.stdout)
+    p.stderr.pipe(process.stderr)
+  }
+
+  return p
 }
 
 // Add validator 0 as a peer of each other validator.

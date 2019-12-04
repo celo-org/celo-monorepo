@@ -13,8 +13,8 @@ describe('attestations tests', () => {
   const gethConfig: GethRunConfig = {
     gethRepoPath: '../../../celo-blockchain',
     runPath: TMP_PATH,
-    genesisPath: TMP_PATH + '/genesis.json',
     networkId: 1101,
+    network: 'local',
     migrate: true,
     instances: [],
   }

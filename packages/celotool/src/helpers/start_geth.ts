@@ -5,7 +5,7 @@ import program from 'commander'
 import { migrateContracts } from '../e2e-tests/utils'
 
 import { AccountType, getPrivateKeysFor, getValidatorsInformation } from '../lib/generate_utils'
-import { GethRunConfig, runGethNodes } from '../lib/geth'
+import { GethInstanceConfig, GethRunConfig, runGethNodes } from '../lib/geth'
 
 program
   .option('-g, --geth-repo <path>', 'Geth repo path')
@@ -54,8 +54,9 @@ async function runTestNetwork({
   // configure geth
   const gethConfig: GethRunConfig = {
     networkId: 1101,
+    network: 'local',
     runPath: tmpDir,
-    genesisPath: tmpDir + '/genesis.json',
+    keepData,
     gethRepoPath,
     migrateTo,
     instances: [],
@@ -71,7 +72,7 @@ async function runTestNetwork({
       rpcport: 8545 + index * 2,
       wsport: 8546 + index * 2,
       ethstats: index >= numEthstats ? '' : ethstats,
-    }
+    } as GethInstanceConfig
   })
 
   // handle keys
@@ -81,10 +82,10 @@ async function runTestNetwork({
 
   // run the nodes
   await runGethNodes({
-    keepData,
     gethConfig,
     validators,
     validatorPrivateKeys,
+    verbose: true,
   })
 
   // do migration
