@@ -12,17 +12,13 @@ Because of the importance of Validator security and availability, Validators are
 
 Additionally, Validators are expected to run an [Attestation Service](running-attestation-service.md) as part of the [lightweight identity protocol](../celo-codebase/protocol/identity), to provide attestations that allow users to map their phone number to a Celo address.
 
-You can find more details about Celo mission and why to become a Validator [at the following page](https://medium.com/celohq/calling-all-chefs-become-a-celo-validator-c75d1c2909aa).
-
-{% hint style="info" %}
-If you are starting up a Validator, please consider leaving it running for a few weeks to support the network.
-{% endhint %}
+You can find more details about Celo mission and why to become a Validator [in our Medium article](https://medium.com/celohq/calling-all-chefs-become-a-celo-validator-c75d1c2909aa).
 
 ## Prerequisites
 
 ### Register for the Stake Off
 
-Participation in The Great Celo Stake Off is subject to these [Terms and Conditions](https://docs.google.com/document/d/1b5SzeRbq60nx50NeezAEMpwLkaBDQ9hjZc0QAh4Mbdk/). If you agree to those, register online via an [online form](https://docs.google.com/forms/d/e/1FAIpQLSfbn5hTJ4UIWpN92-o2qMTUB0UnrFsL0fm97XqGe4VhhN_r5A/viewform). Once the C-Labs team receive your registration, they will send you instructions to get fauceted. Do this first.
+Participation in The Great Celo Stake Off is subject to these [Terms and Conditions](https://docs.google.com/document/d/1b5SzeRbq60nx50NeezAEMpwLkaBDQ9hjZc0QAh4Mbdk/). If you agree to those, register online via an [online form](https://docs.google.com/forms/d/e/1FAIpQLSfbn5hTJ4UIWpN92-o2qMTUB0UnrFsL0fm97XqGe4VhhN_r5A/viewform). **Once the C-Labs team receive your registration, they will send you instructions to get fauceted.** Do this first.
 
 ### Hardware requirements
 
@@ -433,6 +429,10 @@ celocli lockedgold:show $CELO_VALIDATOR_ADDRESS
 
 You're all set! Elections are finalized at the end of each epoch, roughly once an hour in the Alfajores or Baklava Testnets. After that hour, if you get elected, your node will start participating BFT consensus and validating blocks. After the first epoch in which your Validator participates in BFT, you should receive your first set of epoch rewards.
 
+{% hint style="info" %}
+**Roadmap**: Different parameters will govern elections in a Celo production network. Epochs are likely to be daily, rather than hourly. Running a Validator will also include setting up proxy nodes to protect against DDoS attacks, and using hardware wallets to secure the key used to sign blocks. We plan to update these instructions with more details soon.
+{% endhint %}
+
 You can inspect the current state of the validator elections by running:
 
 ```bash
@@ -586,11 +586,3 @@ celocli election:revoke --from $CELO_VALIDATOR_GROUP_ADDRESS --for $CELO_VALIDAT
 ```bash
 celocli validatorgroup:deregister --from $CELO_VALIDATOR_GORUP_ADDRESS
 ```
-
-{% hint style="info" %}
-You’re all set! Note that elections are finalized at the end of each epoch, roughly once an hour in the Baklava Testnet. After that hour, if you get elected, your node will start participating BFT consensus and validating blocks. Users requesting attestations will hit your registered Attestation Service.
-{% endhint %}
-
-{% hint style="info" %}
-**Roadmap**: Different parameters will govern elections in a Celo production network. Epochs are likely to be daily, rather than hourly. Running a Validator will also include setting up proxy nodes to protect against DDoS attacks, and using hardware wallets to secure the key used to sign blocks. We plan to update these instructions with more details soon.
-{% endhint %}
