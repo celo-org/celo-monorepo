@@ -24,6 +24,10 @@ npm install -g @celo/celocli
 We are currently deploying the CLI with only Node v10.x LTS support. If you are running a different version of Node, consider using [NVM](https://github.com/nvm-sh/nvm#installation-and-update) to manage your node versions. e.g. with: `nvm install 10 && nvm use 10`
 {% endhint %}
 
+{% hint style="info" %}
+If you have trouble installing globally (i.e. with the `-g` flag), try installing to a local directory instead with `npm install @celo/celocli` and run with `npx celocli`.
+{% endhint %}
+
 ### Overview
 
 The tool is broken down into modules and commands with the following pattern:
