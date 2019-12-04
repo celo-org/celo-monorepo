@@ -1,11 +1,12 @@
 import { ec as EC } from 'elliptic'
 import Web3 from 'web3'
-import { BaseCommand } from '../../base'
+import { LocalCommand } from '../../base'
 import { printValueMap } from '../../utils/cli'
 import { ReactNativeBip39MnemonicGenerator } from '../../utils/key_generator'
 
-export default class NewAccount extends BaseCommand {
-  static description = 'Creates a new account'
+export default class NewAccount extends LocalCommand {
+  static description =
+    'Creates a new account locally and print out the key information. Save this information for local transaction signing or import into a Celo node.'
 
   static flags = {
     ...BaseCommand.flags,
@@ -36,8 +37,6 @@ export default class NewAccount extends BaseCommand {
     }
     return new Web3().eth.accounts.privateKeyToAccount(privateKey).address
   }
-
-  requireSynced = false
 
   async run() {
     // Generate a random mnemonic (uses crypto.randomBytes under the hood), defaults to 128-bits of entropy
