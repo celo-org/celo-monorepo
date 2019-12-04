@@ -6,7 +6,7 @@ Account
 Address
 : A unique identifier for an account on the Celo blockchain.
 
-[Alfajores](alfajores-testnet)
+[Alfajores](alfajores-testnet.md)
 : The first public Celo test network, available for developers to use freely subject to the [Alfajores Testnet Disclaimer](../important-information/alfajores-testnet-disclaimer.md).
 
 Attestation
@@ -15,7 +15,7 @@ Attestation
 Attestation Service
 : A service operated by validators that sends signed SMS messages in order to allow accounts to prove they have access to a phone number.
 
-Baklava
+[Baklava](baklava-testnet.md)
 : The second public Celo test network, used for [The Great Celo Stake Off](https://www.celo.org/stake-off)
  subject to the [Baklava Testnet Disclaimer](../important-information/baklava-testnet-disclaimer.md).
 
@@ -36,12 +36,6 @@ Carbon Offsetting Fund
 
 Celo
 : An open platform that makes financial tools accessible to anyone with a mobile phone.
-
-Celo Dollar, cUSD
-: The first of an ecology of stablecoins deployed on the Celo platform. The Celo protocol acts with the intention of keeping its value pegged to the US Dollar.
-
-Celo Gold, cGLD
-: Celo's native asset, Celo Gold is used to obtain service on the Celo network. The cryptocurrency Celo Gold is equivalent to Ether in Ethereum but is also an ERC-20 token. Celo Gold can be locked as Locked Gold and used to participate in validator elections and on-chain governance. The smallest unit in which cGLD is accounted is AttoGold.
 
 Claim
 : Part of the metadata that Celo can associate with an address, a claim is used by an account to assert it has control over a particular off-chain entity (for example, a DNS domain name, an account on a third party service, etc). Claims can only be verified off-chain.
@@ -71,10 +65,10 @@ Epoch
 : A fixed number of blocks, configured in the network's genesis block, during which the same validator set is used for consensus. A validator election is carried out after the last block of an epoch, and any resulting changes to the validator set are written into that block's header.
 
 Epoch Rewards
-: Funds disbursed by the protocol at the end of every epoch as incentives for validators, validator groups, holders of Locked Gold that voted for validator groups that elected one or more validators, the Reserve, the Infrastructure Fund, and the Carbon Offsetting Fund.
+: Funds disbursed by the protocol at the end of every epoch as incentives for validators, validator groups, holders of Locked Gold that voted for validator groups that elected one or more validators, the Reserve, the Community Fund, and the Carbon Offsetting Fund.
 
 ERC-20
-: A standard interface for implementing cryptocurrencies or tokens as smart contracts. Balances associated with addresses are typically maintained inside the contract's storage. Both Celo Gold and Celo Dollars implement the ERC-20 interface.
+: A standard interface for implementing tokens as smart contracts. Balances associated with addresses are typically maintained inside the contract's storage. Both Celo Gold and Celo Dollars implement the ERC-20 interface.
 
 Ethereum
 : A project with which the code of the Celo Blockchain has shared ancestry. [Ethereum](https://www.ethereum.org) facilitates building general-purpose decentralized applications.
@@ -135,9 +129,6 @@ On-chain
 
 Proof of Stake
 : The system that determines the participants in a Byzantine Fault Tolerant consensus mechanism. [Celo's Proof of Stake mechanism](../celo-codebase/protocol/proof-of-stake/README.md) permits accounts to convert units of Celo Gold into Locked Gold then vote for Validator Groups, such that an election held at the end of every epoch selects a new set of validators for the following epoch.
-
-Reserve
-: Generally, the assets that are collateral for one or more stablecoins. In Celo, the Reserve combines on-chain holdings of Celo Gold with a basket of other cryptocurrencies held at exchanges. 
 
 Savings Circle
 : A common practice in societies without easy access to banking (source); a peer-to-peer savings and loan group.
