@@ -1,18 +1,15 @@
 import networkConfig from 'src/geth/networkConfig'
 import { getRehydratePayload, REHYDRATE, RehydrateAction } from 'src/redux/persist-helper'
-import { Actions, ActionTypes } from 'src/web3/actions'
+import { Actions, ActionTypes, Web3SyncProgress } from 'src/web3/actions'
 
 export interface State {
-  syncProgress: {
-    startingBlock: number
-    currentBlock: number
-    highestBlock: number
-  }
+  syncProgress: Web3SyncProgress
   latestBlockNumber: number
   account: string | null
   accountInWeb3Keystore: string | null
   commentKey: string | null
   zeroSyncMode: boolean
+  gethStartedThisSession: boolean
 }
 
 const initialState: State = {
@@ -26,6 +23,7 @@ const initialState: State = {
   accountInWeb3Keystore: null,
   commentKey: null,
   zeroSyncMode: networkConfig.initiallyZeroSync,
+  gethStartedThisSession: !networkConfig.initiallyZeroSync,
 }
 
 export const reducer = (
@@ -44,6 +42,7 @@ export const reducer = (
           highestBlock: 0,
         },
         latestBlockNumber: 0,
+        gethStartedThisSession: !state.zeroSyncMode,
       }
     }
     case Actions.SET_ACCOUNT:
@@ -60,15 +59,22 @@ export const reducer = (
       return {
         ...state,
         zeroSyncMode: action.zeroSyncMode,
+        // If switching to geth, then geth has been started this session
+        gethStartedThisSession: !action.zeroSyncMode ? true : state.gethStartedThisSession,
       }
     case Actions.SET_COMMENT_KEY:
       return {
         ...state,
         commentKey: action.commentKey,
       }
-    case Actions.SET_BLOCK_NUMBER:
+    case Actions.COMPLETE_WEB3_SYNC:
       return {
         ...state,
+        syncProgress: {
+          startingBlock: state.syncProgress.startingBlock,
+          currentBlock: action.latestBlockNumber,
+          highestBlock: action.latestBlockNumber,
+        },
         latestBlockNumber: action.latestBlockNumber,
       }
     case Actions.UPDATE_WEB3_SYNC_PROGRESS:

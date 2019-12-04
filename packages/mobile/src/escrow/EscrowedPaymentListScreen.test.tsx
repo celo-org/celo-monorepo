@@ -16,7 +16,7 @@ function testStore(sentEscrowedPayments: EscrowedPayment[]) {
   })
 }
 
-describe('PaymentRequestListScreen', () => {
+describe('EscrowedPaymentListScreen', () => {
   it('renders correctly with payments', () => {
     const store = testStore(payments)
 

@@ -2,7 +2,7 @@ import { spawnSync } from 'child_process'
 import fs from 'fs'
 import path from 'path'
 import { addCeloGethMiddleware, ensure0x, validateAccountAddress } from 'src/lib/utils'
-import * as yargs from 'yargs'
+import yargs from 'yargs'
 import { GethArgv } from '../geth'
 
 const STATIC_NODES_FILE_NAME = 'static-nodes.json'
@@ -124,6 +124,7 @@ export const handler = async (argv: RunArgv) => {
     verbosity.toString(),
     '--consoleoutput=stdout', // Send all logs to stdout
     '--consoleformat=term',
+    '--istanbul.lookbackwindow=2',
   ]
 
   if (nodekeyhex !== null && nodekeyhex.length > 0) {

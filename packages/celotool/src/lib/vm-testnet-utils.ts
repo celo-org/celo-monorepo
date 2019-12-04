@@ -50,7 +50,6 @@ const testnetEnvVars: TerraformVars = {
   network_id: envVar.NETWORK_ID,
   tx_node_count: envVar.TX_NODES,
   validator_count: envVar.VALIDATORS,
-  verification_pool_url: envVar.VERIFICATION_POOL_URL,
 }
 
 const testnetNetworkEnvVars: TerraformVars = {
@@ -392,7 +391,6 @@ function generateValidatorSecretEnvVars(accountType: AccountType, index: number)
     ),
     PRIVATE_KEY: privateKey,
     [envVar.GETH_ACCOUNT_SECRET]: fetchEnv(envVar.GETH_ACCOUNT_SECRET),
-    [envVar.ETHSTATS_WEBSOCKETSECRET]: fetchEnv(envVar.ETHSTATS_WEBSOCKETSECRET),
     [envVar.MNEMONIC]: mnemonic,
   }
   return formatEnvVars(secrets)

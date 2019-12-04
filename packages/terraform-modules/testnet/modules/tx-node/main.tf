@@ -27,7 +27,7 @@ resource "google_compute_instance" "tx_node" {
 
   count = var.tx_node_count
 
-  tags = ["${var.celo_env}-node"]
+  tags = ["${var.celo_env}-node", "${var.celo_env}-tx-node"]
 
   allow_stopping_for_update = true
 
@@ -68,7 +68,6 @@ resource "google_compute_instance" "tx_node" {
       network_id : var.network_id,
       rid : count.index,
       tx_node_name : "${var.celo_env}-tx-node-${count.index}",
-      verification_pool_url : var.verification_pool_url
     }
   )
 

@@ -70,7 +70,7 @@ async function startGanache(datadir: string, opts: { verbose?: boolean }) {
       }
 
   const server = ganache.server({
-    default_balance_ether: 1000000,
+    default_balance_ether: 200000000,
     logger: {
       log: logFn,
     },

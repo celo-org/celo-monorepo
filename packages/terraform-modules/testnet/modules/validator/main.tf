@@ -24,7 +24,7 @@ resource "google_compute_instance" "validator" {
 
   count = var.validator_count
 
-  tags = ["${var.celo_env}-node"]
+  tags = ["${var.celo_env}-node", "${var.celo_env}-validator"]
 
   allow_stopping_for_update = true
 
@@ -68,7 +68,6 @@ resource "google_compute_instance" "validator" {
       network_id : var.network_id,
       rid : count.index,
       validator_name : "${local.name_prefix}-${count.index}",
-      verification_pool_url : var.verification_pool_url
     }
   )
 
