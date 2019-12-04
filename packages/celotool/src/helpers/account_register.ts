@@ -1,6 +1,6 @@
 import Web3 from 'web3'
 import { newKitFromWeb3 } from '@celo/contractkit'
-import { displaySendTx } from '@celo/celocli/lib/utils/cli'
+import { displaySendTx } from '../../../cli/lib/utils/cli'
 import { delay, generatePublicKeyFromPrivateKey, importAndUnlockAccount } from './utils'
 import { add0x } from '../lib/generate_utils'
 

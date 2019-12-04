@@ -1,6 +1,6 @@
 import Web3 from 'web3'
 import fs from 'fs'
-import { displaySendTx } from '@celo/celocli/lib/utils/cli'
+import { displaySendTx } from '../../../cli/lib/utils/cli'
 import { newKitFromWeb3 } from '@celo/contractkit'
 import BigNumber from 'bignumber.js'
 import { ec as EC } from 'elliptic'
