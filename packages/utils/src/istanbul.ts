@@ -3,8 +3,10 @@ import { toChecksumAddress } from 'ethereumjs-util'
 import * as rlp from 'rlp'
 import { Address } from './address'
 
+// This file contains utilities that help with istanbul-specific block information.
 // See https://github.com/celo-org/celo-blockchain/blob/master/core/types/istanbul.go
-export const ISTANBUL_EXTRA_VANITY_BYTES = 32
+
+const ISTANBUL_EXTRA_VANITY_BYTES = 32
 
 export type Bitmap = BigNumber
 
@@ -59,4 +61,9 @@ export function bitIsSet(bitmap: Bitmap, index: number): boolean {
     .idiv('1' + '0'.repeat(index), 2)
     .mod(2)
     .gt(0)
+}
+
+export const IstanbulUtils = {
+  parseBlockExtraData,
+  bitIsSet,
 }
