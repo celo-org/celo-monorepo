@@ -492,22 +492,11 @@ docker run --name celo-attestations --restart always -p 8545:8545 -v $PWD:/root/
 
 By now, you should have setup your Validator account appropriately. You can finish the actual deploy of the attestation service under the [Attestation Service at the documentation page](running-attestation-service.md).
 
-### Stop the containers
+{% hint style="tip" %}
+Congratulations on setting up your validator. If you want to win the TGCSO, it may be helpful to familiar with the inner workings of the Celo network. Dig into the [protocol documentation](../celo-codebase/protocol) for more information.
+{% endhint %}
 
-You can stop the Docker containers at any time without problem. If you stop your containers that means those containers stop of providing service.
-The data dir of the validator and the proxy are Docker volumes mounted in the containers from the `celo-data-dir` you created at the very beginning. So if you don't remove that folder, you can stop or restart the containers without losing any data.
-
-You can stop the `celo-validator` and `celo-proxy` containers running:
-
-```bash
-docker stop celo-validator celo-proxy
-```
-
-And you can remove the containers (not the data dir) running:
-
-```bash
-docker rm -f celo-validator celo-proxy
-```
+## Deployment Tips
 
 ### Running the Docker containers in the background
 
@@ -531,10 +520,27 @@ You can list your existing `screen` sessions:
 screen -ls
 ```
 
-And re-atach to any of the existing sessions:
+And re-attach to any of the existing sessions:
 
 ```bash
 screen -r -S celo-validator
+```
+
+### Stopping containers
+
+You can stop the Docker containers at any time without problem. If you stop your containers that means those containers stop of providing service.
+The data dir of the validator and the proxy are Docker volumes mounted in the containers from the `celo-data-dir` you created at the very beginning. So if you don't remove that folder, you can stop or restart the containers without losing any data.
+
+You can stop the `celo-validator` and `celo-proxy` containers running:
+
+```bash
+docker stop celo-validator celo-proxy
+```
+
+And you can remove the containers (not the data dir) running:
+
+```bash
+docker rm -f celo-validator celo-proxy
 ```
 
 ### Reference Script
