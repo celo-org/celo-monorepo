@@ -22,14 +22,16 @@ import { ExchangeRatePair } from 'src/exchange/reducer'
 import { CURRENCIES, CURRENCY_ENUM } from 'src/geth/consts'
 import i18n, { Namespaces } from 'src/i18n'
 import { headerWithCancelButton } from 'src/navigator/Headers'
-import { navigate, navigateBack } from 'src/navigator/NavigationService'
+import { navigate } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
 import { RootState } from 'src/redux/reducers'
 import DisconnectBanner from 'src/shared/DisconnectBanner'
 import { getRateForMakerToken, getTakerAmount } from 'src/utils/currencyExchange'
 import { getMoneyDisplayValue } from 'src/utils/formatting'
+import { TouchableOpacity } from 'react-native-gesture-handler'
 
 interface State {
+  inputToken: CURRENCY_ENUM
   makerToken: CURRENCY_ENUM
   makerTokenAvailableBalance: string
   goldAmount: string
@@ -38,6 +40,11 @@ interface State {
 interface StateProps {
   exchangeRatePair: ExchangeRatePair | null
   error: ErrorMessages | null
+}
+
+interface NavProps {
+  makerToken: CURRENCY_ENUM
+  makerTokenBalance: string
 }
 
 interface DispatchProps {
@@ -54,24 +61,29 @@ const mapStateToProps = (state: RootState): StateProps => ({
 })
 
 export class ExchangeBuyScreen extends React.Component<Props, State> {
-  static navigationOptions = () => ({
-    ...headerWithCancelButton,
-    headerStyle: {
-      marginTop: 20,
-      height: 24,
-      elevation: 0, // remove shadow on Android
-      shadowOpacity: 0, // remove shadow on iOS
-    },
-    headerTitle: (
-      <View style={{ flex: 1, alignSelf: 'center', alignItems: 'center' }}>
-        <Text style={fontStyles.headerBoldTitle}>
-          {i18n.t(`${Namespaces.exchangeFlow9}:buyGold`)}
-        </Text>
-      </View>
-    ),
-  })
+  static navigationOptions = ({ navigation }: NavigationInjectedProps<NavProps>) => {
+    const makerToken = navigation.getParam('makerToken')
+    const title = makerToken === CURRENCY_ENUM.DOLLAR ? 'Buy Gold' : 'Sell Gold' // TODO(anna) translate
+    const makerTokenBalance = navigation.getParam('makerTokenBalance')
+    return {
+      ...headerWithCancelButton,
+      headerTitle: (
+        <View style={styles.headerTextContainer}>
+          <Text style={fontStyles.headerBoldTitle}>{title}</Text>
+          <View>
+            <Text style={fontStyles.subSmall}>
+              {getMoneyDisplayValue(makerTokenBalance, makerToken, true) +
+                ' ' +
+                i18n.t(`${Namespaces.exchangeFlow9}:lowerCaseAvailable`)}
+            </Text>
+          </View>
+        </View>
+      ),
+    }
+  }
 
   state: State = {
+    inputToken: CURRENCY_ENUM.GOLD,
     makerToken: CURRENCY_ENUM.DOLLAR,
     makerTokenAvailableBalance: '',
     goldAmount: '',
@@ -110,11 +122,6 @@ export class ExchangeBuyScreen extends React.Component<Props, State> {
     } else {
       this.props.hideAlert()
     }
-  }
-
-  goBack = () => {
-    this.props.hideAlert()
-    navigateBack()
   }
 
   getDollarAmount = () => {
@@ -166,8 +173,23 @@ export class ExchangeBuyScreen extends React.Component<Props, State> {
     }
   }
 
+  isDollarInput = () => {
+    return this.state.inputToken === CURRENCY_ENUM.DOLLAR
+  }
+
+  getInputTokenDisplayText = () => {
+    return this.isDollarInput() ? 'USD' : 'Gold'
+  }
+
+  getOppositeInputTokenDisplayText = () => {
+    return this.isDollarInput() ? 'Gold' : 'USD'
+  }
+
+  switchInputToken = () => {
+    this.setState({ inputToken: this.isDollarInput() ? CURRENCY_ENUM.GOLD : CURRENCY_ENUM.DOLLAR })
+  }
+
   render() {
-    const { makerToken } = this.state
     const { t, exchangeRatePair } = this.props
 
     const exchangeRateDisplay = getRateForMakerToken(exchangeRatePair, CURRENCY_ENUM.DOLLAR) // Always show rate in dollars
@@ -186,13 +208,6 @@ export class ExchangeBuyScreen extends React.Component<Props, State> {
           }}
         >
           <DisconnectBanner />
-          <View style={{ flex: 1, alignItems: 'center' }}>
-            <Text style={fontStyles.subSmall}>
-              {getMoneyDisplayValue(this.state.makerTokenAvailableBalance, makerToken, true) +
-                ' ' +
-                t('lowerCaseAvailable')}
-            </Text>
-          </View>
           <KeyboardAwareScrollView keyboardShouldPersistTaps={'always'}>
             <View
               style={{
@@ -201,7 +216,14 @@ export class ExchangeBuyScreen extends React.Component<Props, State> {
               }}
             >
               <View style={[styles.rowContainer, styles.goldInputRow]}>
-                <Text style={[fontStyles.body, styles.exchangeBodyText]}>{CURRENCY_ENUM.GOLD}</Text>
+                <Text style={[fontStyles.body, styles.exchangeBodyText]}>
+                  Amount ({this.getInputTokenDisplayText()})
+                </Text>
+                <TouchableOpacity onPress={this.switchInputToken}>
+                  <Text style={[fontStyles.body, styles.exchangeBodyText]}>
+                    Switch to ({this.getInputTokenDisplayText()})
+                  </Text>
+                </TouchableOpacity>
                 <TextInput
                   autoFocus={true}
                   keyboardType={'decimal-pad'}
@@ -232,7 +254,7 @@ export class ExchangeBuyScreen extends React.Component<Props, State> {
         <View style={componentStyles.bottomContainer}>
           <Button
             onPress={this.goToReview}
-            text={t('continue')}
+            text={t(`${Namespaces.walletFlow5}:review`)}
             accessibilityLabel={t('continue')}
             standard={false}
             disabled={this.isExchangeInvalid()}
@@ -257,6 +279,7 @@ export default componentWithAnalytics(
 )
 
 const styles = StyleSheet.create({
+  headerTextContainer: { flex: 1, alignSelf: 'center', alignItems: 'center' },
   line: {
     borderBottomColor: colors.darkLightest,
     borderBottomWidth: 1,
