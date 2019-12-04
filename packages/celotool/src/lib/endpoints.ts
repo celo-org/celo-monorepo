@@ -15,3 +15,7 @@ export function getEthstatsUrl(argv: CeloEnvArgv) {
 export function getBlockchainApiUrl(argv: CeloEnvArgv) {
   return `https://${argv.celoEnv}-dot-${fetchEnv(envVar.TESTNET_PROJECT_NAME)}.appspot.com`
 }
+
+export function getFornoUrl(celoEnv: string) {
+  return `https://${celoEnv}-forno.${fetchEnv(envVar.CLUSTER_DOMAIN_NAME)}.org`
+}
