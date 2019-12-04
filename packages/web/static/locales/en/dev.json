@@ -4,13 +4,15 @@
     "We're looking for node operators and admins who can help develop the Celo menu. Spin up a validator or full node, build operational experience, and help the community prepare for opening night.",
   "aboutTheChallengeButton": "Get Involved",
   "expandLeaderboard": "Expand Leaderboard",
+  "collapseLeaderboard": "Collapse Leaderboard",
   "makeWithCelo": "Build Celo",
-  "makeWithCeloSubtitle": "Get a taste of Baklava, Celo’s incentivized testnet",
+  "makeWithCeloSubtitle":
+    "Get a taste of Baklava, Celo’s incentivized testnet, and participate in The Great Celo Stake Off",
   "greatStakeOff": "The Great Celo\nStake Off",
   "greatStakeOffSubtitle": "Win prizes by operating and hardening\nthe Baklava Testnet",
   "purposeTitle": "Purpose",
   "purposeText":
-    "Learn how to run a node on Celo’s peer-to-peer network and win up to <0>2 million Celo Gold in rewards.</0>*",
+    "Learn how to run a node on Celo’s peer-to-peer network and take a slice of up to <0>2 million Celo Gold in rewards.</0>*",
   "purposeAsterisk": "* subject to <0>Terms and Conditions</0>",
   "challengeTitle": "The Challenge",
   "challengeText":
@@ -19,6 +21,11 @@
   "whoText":
     "If you have a technical background and you’re interested in open source, security, or building & operating infrastructure, you’d make a perfect Celo validator!",
   "challengeBtnText": "Join the Stake Off",
+  "ranking": "Ranking Baklava Validators",
+  "unitOfMeasure": "Baklava Testnet Units (BTUs)",
+  "leaderboardTitle": "The Great Celo Stake Off\nLeaderboard",
+  "prizeInfo":
+    "The top 50 eligible participants may receive Celo Gold, subject to <0>Terms & Conditions</0>",
   "buildCoverTitle": "Get a Taste of Alfajores",
   "buildCoverSubtitle": "Developer resources for the Celo Protocol and Celo Wallet",
   "viewGitHub": "View on Github",
@@ -161,8 +168,9 @@
   "proof": {
     "title": "Blockchain",
     "text": "Open source smart contract platform built on decentralized infrastructure.",
-    "permissionless": "Permissionless BFT-based consensus algorithm",
-    "rewardsWeighted": "Rewards weighted by stake size and stake release notice period",
+    "permissionless":
+      "Proof of Stake based consensus with high throughput, low latency, and zero carbon",
+    "rewardsWeighted": "Incentives for serving mobile devices",
     "onChain": "On-chain governance"
   },
   "updates": {
