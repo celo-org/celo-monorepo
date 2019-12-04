@@ -30,7 +30,6 @@
       - [Community Fund](celo-codebase/protocol/proof-of-stake/community-fund.md)
       - [Carbon Offsetting Fund](celo-codebase/protocol/proof-of-stake/carbon-offsetting-fund.md)
     - [Penalties](celo-codebase/protocol/proof-of-stake/penalties.md)
-  - [Full Node Incentives](celo-codebase/protocol/full-node-incentives.md)
   - [Governance](celo-codebase/protocol/governance.md)
   - [Transactions](celo-codebase/protocol/transactions/README.md)
     - [Native Currency](celo-codebase/protocol/transactions/native-currency.md)
@@ -91,4 +90,3 @@
 
 - [Alfajores Testnet Disclaimer](important-information/alfajores-testnet-disclaimer.md)
 - [Baklava Testnet Disclaimer](important-information/baklava-testnet-disclaimer.md)
-
