@@ -104,7 +104,7 @@ if [[ $COMMAND == *"help"* ]]; then
 
     echo -e "Options:"
     echo -e "$0 <COMMAND> <DATA_DIR> <CELO_IMAGE> <NETWORK_ID> <NETWORK_NAME> <PASSWORD>"
-    echo -e "\t - Command; comma separated list of actions to execute. Options are: help, pull, clean, accounts, run-validator, run-proxy, run-attestation, run-fullnode, status, print-env, game. Default: pull,accounts,run-validator,run-proxy,status"
+    echo -e "\t - Command; comma separated list of actions to execute. Options are: help, pull, clean, accounts, run-validator, run-proxy, run-attestation, run-fullnode, status, print-env, get-cooking. Default: pull,accounts,run-validator,run-proxy,status"
     echo -e "\t - Data Dir; Local folder where will be created the data dir for the nodes. Default: /tmp/celo/network"
     echo -e "\t - Celo Image; Image to download"
     echo -e "\t - Celo Network; Docker image network to use (typically alfajores or baklava, but you can use a commit). "
@@ -117,7 +117,7 @@ if [[ $COMMAND == *"help"* ]]; then
     echo -e "\t$0 pull,accounts,run-validator,run-proxy,status,print-env"
     
     echo -e "\n\tIf you have already your accounts, proxy and validator set up, you can run the following command to run TGCSO"
-    echo -e "\t$0 game"
+    echo -e "\t$0 get-cooking"
     
     echo -e "\n\tIf you want to play TGCSO without being re-using your previously created accounts without restarting the proxy and validator, it's recommended to copy all your CELO environment variables in the 'validator-config.rc' file. The script will source the variables from there. "
 
@@ -301,9 +301,9 @@ if [[ $COMMAND == *"print-env"* ]]; then
 
 fi
 
-if [[ $COMMAND == *"game"* ]]; then
+if [[ $COMMAND == *"get-cooking"* ]]; then
 
-    echo -e "* Playing the Game of Stakes ..."
+    echo -e "* Prepping validator for The Great Celo Stake Off..."
     cd $ACCOUNTS_DIR
     
     which $CELOCLI
