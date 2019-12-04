@@ -24,6 +24,7 @@ export abstract class LocalCommand extends Command {
   }
 }
 
+// tslint:disable-next-line:max-classes-per-file
 export abstract class BaseCommand extends LocalCommand {
   static flags = {
     ...LocalCommand.flags,
