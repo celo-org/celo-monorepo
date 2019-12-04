@@ -14,6 +14,7 @@ interface BoardProps {
 
 interface Competitor {
   identity: string
+  address: string
   points: number
 }
 
@@ -69,13 +70,18 @@ class LeaderBoard extends React.PureComponent<BoardProps & I18nProps, State> {
     const { isExpanded } = this.state
     const showExpandButton = leaders.length >= INITIAL_MAX + 1
 
-    if (leaders.length < 1) {
+    const leadersWithBTUs = leaders.map((leader) => ({
+      points: leader.points / Math.pow(10, 18),
+      identity: leader.identity === 'Unknown account' ? leader.address : leader.identity,
+    }))
+
+    if (leadersWithBTUs.length < 3) {
       return null
     }
 
     const realMax = leaders.length > EXPANDED_MAX ? EXPANDED_MAX : leaders.length
 
-    const sortedLeaders = leaders.sort(sorter).slice(0, isExpanded ? realMax : INITIAL_MAX)
+    const sortedLeaders = leadersWithBTUs.sort(sorter).slice(0, isExpanded ? realMax : INITIAL_MAX)
     const maxPoints = round(sortedLeaders[0].points * 1.1, 100)
     const width = this.state.width
     return (
