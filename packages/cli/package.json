@@ -31,7 +31,7 @@
     "test": "TZ=UTC jest --runInBand"
   },
   "dependencies": {
-    "@celo/contractkit": "0.2.3-dev",
+    "@celo/contractkit": "0.2.5-dev",
     "@celo/utils": "^0.1.0",
     "@oclif/command": "^1",
     "@oclif/config": "^1",
@@ -94,7 +94,7 @@
         "description": "View and manage locked Celo Gold"
       },
       "node": {
-        "description": "Manage your full node"
+        "description": "Manage your Celo node"
       },
       "transfer": {
         "description": "Transfer Celo Gold and Celo Dollars"

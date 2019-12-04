@@ -86,7 +86,7 @@ const Engage = React.memo(function _Engage({ t, screen }: I18nProps & ScreenProp
             screen={screen}
             text={t('engage.tutorial.copy')}
             title={t('engage.tutorial.title')}
-            href="?todo"
+            href="https://docs.celo.org/getting-started/running-a-validator"
             btnText={t('engage.tutorial.btnText')}
             image={require('src/icons/download-dark.png')}
           />
@@ -111,7 +111,7 @@ const Engage = React.memo(function _Engage({ t, screen }: I18nProps & ScreenProp
           <Text style={[fonts.p, standardStyles.elementalMargin]}>
             {t('engage.contributeText')}
           </Text>
-          <Button text={t('engage.contributeBtn')} kind={BTN.PRIMARY} href={'/TODO'} />
+          <Button disabled={true} text={'Coming Soon'} kind={BTN.PRIMARY} />
         </Cell>
         <Cell span={Spans.half} style={standardStyles.centered}>
           <AspectRatio ratio={309 / 360} style={[standardStyles.image, styles.feastImage]}>
