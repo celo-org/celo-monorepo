@@ -68,7 +68,7 @@ Run this command:
 ### How to Faucet an Account
 
 Run this command:
-`celotooljs account faucet --celo-env <integration-or-your-testnet> --account <account-address>`
+`celotooljs account faucet --celo-env <integration-or-your-testnet> --account <account-address> --gold 10 --dollar 10`
 
 ### How to Setup a Local Celo Blockchain Node
 
