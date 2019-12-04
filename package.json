@@ -7,8 +7,8 @@
   "scripts": {
     "install-pkg": "yarn install --link-duplicates",
     "lint": "yarn lerna run lint",
-    "prettify": "yarn run prettier --config .prettierrc.js --write '**/*.+(ts|tsx|js|jsx|sol)'",
-    "prettify:diff": "yarn run prettier --config .prettierrc.js --list-different '**/*.+(ts|tsx|js|jsx|sol)'",
+    "prettify": "yarn run prettier --config .prettierrc.js --write '**/*.+(ts|tsx|js|jsx|sol|java)'",
+    "prettify:diff": "yarn run prettier --config .prettierrc.js --list-different '**/*.+(ts|tsx|js|jsx|sol|java)'",
     "reset": "yarn reset-modules && yarn reset-cache",
     "reset-cache": "yarn reset-yarn && yarn reset-rn",
     "reset-modules": "rm -rf node_modules/ packages/*/node_modules",
@@ -64,7 +64,8 @@
     "typescript-tslint-plugin": "^0.5.4"
   },
   "dependencies": {
-    "codecov": "^3.1.0"
+    "codecov": "^3.1.0",
+    "prettier-plugin-java": "^0.4.0"
   },
   "resolutions": {
     "node-gyp": "5.0.1",
