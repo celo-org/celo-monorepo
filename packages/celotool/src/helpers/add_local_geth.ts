@@ -54,7 +54,7 @@ async function main({
   const gethConfig: GethRunConfig = {
     gethRepoPath: '../../../celo-blockchain',
     runPath: tmpDir,
-    genesisPath: tmpDir + '/genesis.json',
+    network: 'local',
     networkId: 1101,
     instances: [],
   }
@@ -134,7 +134,7 @@ async function main({
   }
 
   for (const i of gethConfig.instances) {
-    await initAndStartGeth(gethBinaryPath, i)
+    await initAndStartGeth(gethBinaryPath, i, true)
     await new Promise((_) => setTimeout(_, 1000))
   }
 

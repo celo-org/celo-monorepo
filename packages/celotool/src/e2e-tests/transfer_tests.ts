@@ -163,8 +163,8 @@ describe('Transfer tests', function(this: any) {
     gethRepoPath: '../../../celo-blockchain',
     migrateTo: 18,
     networkId: 1101,
+    network: 'local',
     runPath: TMP_PATH,
-    genesisPath: TMP_PATH + '/genesis.json',
     instances: [],
   }
 
@@ -208,7 +208,7 @@ describe('Transfer tests', function(this: any) {
       etherbase: FeeRecipientAddress,
       peers: ['8545'],
     }
-    await initAndStartGeth(hooks.gethBinaryPath, fullInstance)
+    await initAndStartGeth(hooks.gethBinaryPath, fullInstance, true)
 
     // Install an arbitrary address as the goverance address to act as the infrastructure fund.
     // This is chosen instead of full migration for speed and to avoid the need for a governance
@@ -230,16 +230,20 @@ describe('Transfer tests', function(this: any) {
       await killInstance(currentGethInstance)
     }
     // Spin up the node to run transfers as.
-    currentGethInstance = await initAndStartGeth(hooks.gethBinaryPath, {
-      gethRunConfig: gethConfig,
-      name: syncmode,
-      validating: false,
-      syncmode,
-      port: 30307,
-      rpcport: 8549,
-      privateKey: DEF_FROM_PK,
-      peers: ['8547'],
-    })
+    currentGethInstance = await initAndStartGeth(
+      hooks.gethBinaryPath,
+      {
+        gethRunConfig: gethConfig,
+        name: syncmode,
+        validating: false,
+        syncmode,
+        port: 30307,
+        rpcport: 8549,
+        privateKey: DEF_FROM_PK,
+        peers: ['8547'],
+      },
+      true
+    )
 
     // Reset contracts to send RPCs through transferring node.
     kit.web3.currentProvider = new kit.web3.providers.HttpProvider('http://localhost:8549')

@@ -8,6 +8,7 @@ import { assert } from 'chai'
 import Web3 from 'web3'
 import { assertAlmostEqual, getContext, sleep, waitToFinishSyncing } from './utils'
 import { initAndStartGeth, GethRunConfig, GethInstanceConfig, importGenesis } from '../lib/geth'
+import path from 'path'
 
 interface MemberSwapper {
   swap(): Promise<void>
@@ -111,7 +112,7 @@ describe('governance tests', () => {
     gethRepoPath: '../../../celo-blockchain',
     migrate: true,
     runPath: TMP_PATH,
-    genesisPath: TMP_PATH + '/genesis.json',
+    network: 'local',
     networkId: 1101,
     instances: [],
   }
@@ -281,7 +282,7 @@ describe('governance tests', () => {
       ]
       await Promise.all(
         additionalNodes.map((nodeConfig) =>
-          initAndStartGeth(context.hooks.gethBinaryPath, nodeConfig)
+          initAndStartGeth(context.hooks.gethBinaryPath, nodeConfig, true)
         )
       )
       // Connect the validating nodes to the non-validating nodes, to test that announce messages
@@ -312,7 +313,7 @@ describe('governance tests', () => {
       ]
       await Promise.all(
         additionalValidatingNodes.map((nodeConfig) =>
-          initAndStartGeth(context.hooks.gethBinaryPath, nodeConfig)
+          initAndStartGeth(context.hooks.gethBinaryPath, nodeConfig, true)
         )
       )
 
@@ -731,7 +732,7 @@ describe('governance tests', () => {
     beforeEach(async function(this: any) {
       this.timeout(0) // Disable test timeout
       await restart()
-      const genesis = await importGenesis(gethConfig.genesisPath)
+      const genesis = await importGenesis(path.join(gethConfig.runPath, 'genesis.json'))
       Object.keys(genesis.alloc).forEach((address) => {
         goldGenesisSupply = goldGenesisSupply.plus(genesis.alloc[address].balance)
       })

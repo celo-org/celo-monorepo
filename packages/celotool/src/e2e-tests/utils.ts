@@ -193,7 +193,7 @@ export async function startBootnode(
     `--networkid=${gethConfig.networkId}`,
   ]
 
-  spawnWithLog(bootnodeBinaryPath, bootnodeArgs, bootnodeLog)
+  spawnWithLog(bootnodeBinaryPath, bootnodeArgs, bootnodeLog, true)
   return getEnodeAddress(privateKeyToPublicKey(bootnodePrivateKey), '127.0.0.1', 30301)
 }
 
@@ -299,7 +299,7 @@ export function getContext(gethConfig: GethRunConfig) {
 
     // Start all the instances
     for (const instance of gethConfig.instances) {
-      await initAndStartGeth(gethBinaryPath, instance)
+      await initAndStartGeth(gethBinaryPath, instance, true)
     }
     await connectValidatorPeers(gethConfig)
 
@@ -344,7 +344,7 @@ export function getContext(gethConfig: GethRunConfig) {
         if (!instance.privateKey && instance.validating) {
           instance.privateKey = validatorPrivateKeys[validatorIndices[i]]
         }
-        return startGeth(gethBinaryPath, instance)
+        return startGeth(gethBinaryPath, instance, true)
       })
     )
     await connectValidatorPeers(gethConfig)
