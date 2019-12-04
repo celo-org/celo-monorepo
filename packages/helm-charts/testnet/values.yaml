@@ -10,12 +10,12 @@ nodeSelector: {}
 
 bootnode:
   image:
-    repository: gcr.io/celo-testnet/geth-all
+    repository: us.gcr.io/celo-testnet/geth-all
     tag: fc254b550a4993956ac7aa3fcd8dd4db63b8c9d2
 
 geth:
   image:
-    repository: gcr.io/celo-testnet/geth
+    repository: us.gcr.io/celo-testnet/geth
     tag: fc254b550a4993956ac7aa3fcd8dd4db63b8c9d2
   tx:
     # transaction nodes
