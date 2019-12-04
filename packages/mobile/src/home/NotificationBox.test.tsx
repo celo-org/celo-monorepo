@@ -70,12 +70,27 @@ describe('NotificationBox', () => {
     expect(tree).toMatchSnapshot()
   })
 
-  it('Payment Requests exist', () => {
+  it('Incoming Payment Requests exist', () => {
     const store = createMockStore({
       ...storeData,
       account: {
         ...storeData.account,
-        paymentRequests: mockPaymentRequests,
+        incomingPaymentRequests: mockPaymentRequests,
+      },
+    })
+    const tree = renderer.create(
+      <Provider store={store}>
+        <NotificationBox />
+      </Provider>
+    )
+    expect(tree).toMatchSnapshot()
+  })
+  it('Outgoing Payment Requests exist', () => {
+    const store = createMockStore({
+      ...storeData,
+      account: {
+        ...storeData.account,
+        outgoingPaymentRequests: mockPaymentRequests,
       },
     })
     const tree = renderer.create(

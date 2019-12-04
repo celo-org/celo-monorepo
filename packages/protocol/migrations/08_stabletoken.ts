@@ -7,9 +7,10 @@ import {
   getDeployedProxiedContract,
 } from '@celo/protocol/lib/web3-utils'
 import { config } from '@celo/protocol/migrationsConfig'
+import { ensureHexLeader } from '@celo/utils/lib/address'
 import { toFixed } from '@celo/utils/lib/fixidity'
 import {
-  GasCurrencyWhitelistInstance,
+  FeeCurrencyWhitelistInstance,
   ReserveInstance,
   SortedOraclesInstance,
   StableTokenInstance,
@@ -46,7 +47,7 @@ module.exports = deploymentForCoreContract<StableTokenInstance>(
 
     for (const oracle of config.stableToken.oracles) {
       console.info(`Adding ${oracle} as an Oracle for StableToken`)
-      await sortedOracles.addOracle(stableToken.address, oracle)
+      await sortedOracles.addOracle(stableToken.address, ensureHexLeader(oracle))
     }
 
     // We need to seed the exchange rate, and that must be done with an account
@@ -70,10 +71,10 @@ module.exports = deploymentForCoreContract<StableTokenInstance>(
     console.info('Adding StableToken to Reserve')
     await reserve.addToken(stableToken.address)
 
-    console.info('Whitelisting StableToken as a gas currency')
-    const gasCurrencyWhitelist: GasCurrencyWhitelistInstance = await getDeployedProxiedContract<
-      GasCurrencyWhitelistInstance
-    >('GasCurrencyWhitelist', artifacts)
-    await gasCurrencyWhitelist.addToken(stableToken.address)
+    console.info('Whitelisting StableToken as a fee currency')
+    const feeCurrencyWhitelist: FeeCurrencyWhitelistInstance = await getDeployedProxiedContract<
+      FeeCurrencyWhitelistInstance
+    >('FeeCurrencyWhitelist', artifacts)
+    await feeCurrencyWhitelist.addToken(stableToken.address)
   }
 )

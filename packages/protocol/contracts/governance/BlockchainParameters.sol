@@ -15,10 +15,10 @@ contract BlockchainParameters is Ownable, Initializable {
 
   ClientVersion private minimumClientVersion;
   uint256 public blockGasLimit;
-  uint256 public intrinsicGasForAlternativeGasCurrency;
+  uint256 public intrinsicGasForAlternativeFeeCurrency;
 
   event MinimumClientVersionSet(uint256 major, uint256 minor, uint256 patch);
-  event IntrinsicGasForAlternativeGasCurrencySet(uint256 gas);
+  event IntrinsicGasForAlternativeFeeCurrencySet(uint256 gas);
   event BlockGasLimitSet(uint256 limit);
 
   /**
@@ -42,7 +42,7 @@ contract BlockchainParameters is Ownable, Initializable {
     _transferOwnership(msg.sender);
     setMinimumClientVersion(major, minor, patch);
     setBlockGasLimit(gasLimit);
-    setIntrinsicGasForAlternativeGasCurrency(_gasForNonGoldCurrencies);
+    setIntrinsicGasForAlternativeFeeCurrency(_gasForNonGoldCurrencies);
   }
 
   /**
@@ -73,9 +73,9 @@ contract BlockchainParameters is Ownable, Initializable {
    * @notice Sets the intrinsic gas for non-gold gas currencies.
    * @param gas Intrinsic gas for non-gold gas currencies.
    */
-  function setIntrinsicGasForAlternativeGasCurrency(uint256 gas) public onlyOwner {
-    intrinsicGasForAlternativeGasCurrency = gas;
-    emit IntrinsicGasForAlternativeGasCurrencySet(gas);
+  function setIntrinsicGasForAlternativeFeeCurrency(uint256 gas) public onlyOwner {
+    intrinsicGasForAlternativeFeeCurrency = gas;
+    emit IntrinsicGasForAlternativeFeeCurrencySet(gas);
   }
 
   /**

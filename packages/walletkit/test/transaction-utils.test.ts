@@ -25,7 +25,8 @@ describe('Transaction Utils V2', () => {
       const to = accountAddress
       const amountInWei = new BigNumber(1e18)
       const gasFees = new BigNumber(1000 * 1000)
-      const gasCurrency = await getGoldTokenAddress(web3)
+      const gatewayFee = new BigNumber(25000)
+      const feeCurrency = await getGoldTokenAddress(web3)
       const nonce = await web3.eth.getTransactionCount(from)
 
       const rawTransaction: string = await getRawTransaction(
@@ -37,7 +38,8 @@ describe('Transaction Utils V2', () => {
         gasFees,
         new BigNumber(gasPrice),
         await web3.eth.getCoinbase(),
-        gasCurrency
+        gatewayFee,
+        feeCurrency
       )
       const recoveredSigner = recoverTransaction(rawTransaction)
       expect(recoveredSigner).toEqual(from)

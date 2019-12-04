@@ -25,14 +25,15 @@ import { setKey } from 'src/utils/keyStore'
 import Logger from 'src/utils/Logger'
 import {
   Actions,
+  completeWeb3Sync,
   getLatestBlock,
   setAccount,
   setAccountInWeb3Keystore,
   SetIsZeroSyncAction,
-  setLatestBlockNumber,
   setPrivateCommentKey,
   setZeroSyncMode,
   updateWeb3SyncProgress,
+  Web3SyncProgress,
 } from 'src/web3/actions'
 import { addLocalAccount, switchWeb3ProviderForSyncMode, web3 } from 'src/web3/contracts'
 import {
@@ -48,41 +49,52 @@ const MNEMONIC_BIT_LENGTH = (ETH_PRIVATE_KEY_LENGTH * 8) / 2
 
 const TAG = 'web3/saga'
 // The timeout for web3 to complete syncing and the latestBlock to be > 0
-export const SYNC_TIMEOUT = 60000
+export const SYNC_TIMEOUT = 3 * 60 * 1000 // 3 minutes
 const BLOCK_CHAIN_CORRUPTION_ERROR = "Error: CONNECTION ERROR: Couldn't connect to node on IPC."
 
 // checks if web3 claims it is currently syncing and attempts to wait for it to complete
 export function* checkWeb3SyncProgress() {
-  const zeroSyncMode = yield select(zeroSyncSelector)
-  if (zeroSyncMode) {
-    // In this mode, the check seems to fail with
-    // web3/saga/checking web3 sync progress: Error: Invalid JSON RPC response: "":
-    return true
-  }
+  Logger.debug(TAG, 'checkWeb3SyncProgress', 'Checking sync progress')
+
   while (true) {
     try {
-      Logger.debug(TAG, 'checkWeb3SyncProgress', 'Checking sync progress')
-
-      // isSyncing returns a syncProgress object when it's still syncing, false otherwise
-      const syncProgress = yield call(web3.eth.isSyncing)
+      let syncProgress: boolean | Web3SyncProgress
+      const zeroSyncMode = yield select(zeroSyncSelector)
+      // tslint:disable-next-line: prefer-conditional-expression
+      if (zeroSyncMode) {
+        // In this mode, the check seems to fail with
+        // web3/saga/checking web3 sync progress: Error: Invalid JSON RPC response: "":
+        syncProgress = false
+      } else {
+        // isSyncing returns a syncProgress object when it's still syncing, false otherwise
+        syncProgress = yield call(web3.eth.isSyncing)
+      }
 
       if (typeof syncProgress === 'boolean' && !syncProgress) {
         Logger.debug(TAG, 'checkWeb3SyncProgress', 'Sync maybe complete, checking')
 
         const latestBlock: Block = yield call(getLatestBlock)
         if (latestBlock && latestBlock.number > 0) {
-          yield put(setLatestBlockNumber(latestBlock.number))
+          yield put(completeWeb3Sync(latestBlock.number))
           Logger.debug(TAG, 'checkWeb3SyncProgress', 'Sync is complete')
           return true
         } else {
           Logger.debug(TAG, 'checkWeb3SyncProgress', 'Sync not actually complete, still waiting')
         }
-      } else {
+      } else if (typeof syncProgress === 'object') {
         yield put(updateWeb3SyncProgress(syncProgress))
+      } else {
+        throw new Error('Invalid syncProgress type')
       }
 
-      yield delay(100) // wait 100ms while web3 syncs
+      yield delay(100) // wait 100ms while web3 syncs then check again
     } catch (error) {
+      // Check if error caused by switch to zeroSyncMode
+      // as if it is in zeroSyncMode it should have returned above
+      const switchedToZeroSyncMode = yield select(zeroSyncSelector)
+      if (switchedToZeroSyncMode) {
+        return true
+      }
       if (error.toString().toLowerCase() === BLOCK_CHAIN_CORRUPTION_ERROR.toLowerCase()) {
         CeloAnalytics.track(CustomEventNames.blockChainCorruption, {}, true)
         const deleted = yield call(deleteChainData)
@@ -103,7 +115,6 @@ export function* waitForWeb3Sync() {
       syncComplete: call(checkWeb3SyncProgress),
       timeout: delay(SYNC_TIMEOUT),
     })
-
     if (timeout || !syncComplete) {
       Logger.error(TAG, 'Could not complete sync')
       navigateToError('web3FailedToSync')
@@ -424,8 +435,20 @@ export function* switchToGethFromZeroSync() {
   try {
     const gethAlreadyStartedThisSession = yield select(gethStartedThisSessionSelector)
     yield put(setZeroSyncMode(false))
-    yield call(initGethSaga)
 
+    if (gethAlreadyStartedThisSession) {
+      // Call any method on web3 to avoid a persist state issue
+      // This is a temporary workaround as this restart will be
+      // removed when the geth issue is resolved
+      yield call(web3.eth.isSyncing)
+      // If geth is started twice within the same session,
+      // there is an issue where it cannot find deployed contracts.
+      // Restarting the app fixes this issue.
+      restartApp()
+      return
+    }
+
+    yield call(initGethSaga)
     switchWeb3ProviderForSyncMode(false)
     // Ensure web3 is fully synced using new provider
     yield call(waitForWeb3Sync)
@@ -434,13 +457,6 @@ export function* switchToGethFromZeroSync() {
     // Note that this must happen after the sync mode is switched
     // as the web3.personal where the key is stored is not available in zeroSync mode
     yield call(ensureAccountInWeb3Keystore)
-
-    if (gethAlreadyStartedThisSession) {
-      // If geth is started twice within the same session,
-      // there is an issue where it cannot find deployed contracts.
-      // Restarting the app fixes this issue.
-      restartApp()
-    }
   } catch (e) {
     Logger.error(TAG + '@switchToGethFromZeroSync', 'Error switching to geth from zeroSync')
     yield put(showError(ErrorMessages.FAILED_TO_SWITCH_SYNC_MODES))

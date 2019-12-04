@@ -17,14 +17,17 @@ import {
 } from './BaseWrapper'
 
 export interface Validator {
+  name: string
   address: Address
   ecdsaPublicKey: string
   blsPublicKey: string
   affiliation: string | null
   score: BigNumber
+  signer: Address
 }
 
 export interface ValidatorGroup {
+  name: string
   address: Address
   members: Address[]
   affiliates: Address[]
@@ -83,6 +86,16 @@ export class ValidatorsWrapper extends BaseWrapper<Validators> {
   }
 
   /**
+   * Returns the Locked Gold requirements for specific account.
+   * @returns The Locked Gold requirements for a specific account.
+   */
+  getAccountLockedGoldRequirement = proxyCall(
+    this.contract.methods.getAccountLockedGoldRequirement,
+    undefined,
+    toBigNumber
+  )
+
+  /**
    * Returns current configuration parameters.
    */
   async getConfig(): Promise<ValidatorsConfig> {
@@ -98,9 +111,26 @@ export class ValidatorsWrapper extends BaseWrapper<Validators> {
     }
   }
 
-  async signerToAccount(signerAddress: Address) {
+  /**
+   * Returns the account associated with `signer`.
+   * @param signer The address of an account or currently authorized validator signer.
+   * @dev Fails if the `signer` is not an account or currently authorized validator.
+   * @return The associated account.
+   */
+  async validatorSignerToAccount(signerAddress: Address) {
     const accounts = await this.kit.contracts.getAccounts()
     return accounts.validatorSignerToAccount(signerAddress)
+  }
+
+  /**
+   * Returns the account associated with `signer`.
+   * @param signer The address of the account or previously authorized signer.
+   * @dev Fails if the `signer` is not an account or previously authorized signer.
+   * @return The associated account.
+   */
+  async signerToAccount(signerAddress: Address) {
+    const accounts = await this.kit.contracts.getAccounts()
+    return accounts.signerToAccount(signerAddress)
   }
 
   /**
@@ -162,23 +192,35 @@ export class ValidatorsWrapper extends BaseWrapper<Validators> {
   /** Get Validator information */
   async getValidator(address: Address): Promise<Validator> {
     const res = await this.contract.methods.getValidator(address).call()
+    const accounts = await this.kit.contracts.getAccounts()
+    const name = (await accounts.getName(address)) || ''
     return {
+      name,
       address,
-      ecdsaPublicKey: res[0] as any,
-      blsPublicKey: res[1] as any,
-      affiliation: res[2],
-      score: fromFixed(new BigNumber(res[3])),
+      ecdsaPublicKey: (res.ecdsaPublicKey as unknown) as string,
+      blsPublicKey: (res.blsPublicKey as unknown) as string,
+      affiliation: res.affiliation,
+      score: fromFixed(new BigNumber(res.score)),
+      signer: res.signer,
     }
+  }
+
+  async getValidatorFromSigner(address: Address): Promise<Validator> {
+    const account = await this.signerToAccount(address)
+    return this.getValidator(account)
   }
 
   /** Get ValidatorGroup information */
   async getValidatorGroup(address: Address): Promise<ValidatorGroup> {
     const res = await this.contract.methods.getValidatorGroup(address).call()
+    const accounts = await this.kit.contracts.getAccounts()
+    const name = (await accounts.getName(address)) || ''
     const validators = await this.getRegisteredValidators()
     const affiliates = validators
       .filter((v) => v.affiliation === address)
       .filter((v) => !res[0].includes(v.address))
     return {
+      name,
       address,
       members: res[0],
       commission: fromFixed(new BigNumber(res[1])),
@@ -233,23 +275,15 @@ export class ValidatorsWrapper extends BaseWrapper<Validators> {
    *
    * Fails if the account is already a validator or validator group.
    *
-   * @param ecdsaPublicKey The ECDSA public key that the validator is using for consensus, should match
-   *   the validator signer. 64 bytes.
+   * @param validatorAddress The address that the validator is using for consensus, should match
+   *   the validator signer.
+   * @param ecdsaPublicKey The ECDSA public key that the validator is using for consensus. 64 bytes.
    * @param blsPublicKey The BLS public key that the validator is using for consensus, should pass proof
    *   of possession. 48 bytes.
    * @param blsPop The BLS public key proof-of-possession, which consists of a signature on the
    *   account address. 96 bytes.
    */
-
-  registerValidator: (
-    ecdsaPublicKey: string,
-    blsPublicKey: string,
-    blsPop: string
-  ) => CeloTransactionObject<boolean> = proxySend(
-    this.kit,
-    this.contract.methods.registerValidator,
-    tupleParser(parseBytes, parseBytes, parseBytes)
-  )
+  registerValidator = proxySend(this.kit, this.contract.methods.registerValidator)
 
   /**
    * De-registers a validator, removing it from the group for which it is a member.

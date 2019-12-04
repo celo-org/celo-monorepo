@@ -68,6 +68,7 @@ export enum CeloLinks {
   privacyDocs = 'https://docs.celo.org/celo-codebase/protocol/privacy',
   tutorial = 'https://docs.celo.org/getting-started/faucet#creating-an-empty-account-with-the-celo-client',
   buildWalletDocs = 'https://docs.celo.org/celo-codebase/wallet/intro',
+  stakeOffTerms = '/stake-off/terms',
 }
 
 export const languageOptions = {

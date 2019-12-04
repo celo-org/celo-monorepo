@@ -6,7 +6,8 @@ import { displaySendTx } from '../../utils/cli'
 import { Flags } from '../../utils/command'
 
 export default class ValidatorGroupCommission extends BaseCommand {
-  static description = 'Update the commission for an existing validator group'
+  static description =
+    'Update the commission for a registered Validator Group. This represents the share of the epoch rewards given to elected Validators that goes to the group they are a member of.'
 
   static flags = {
     ...BaseCommand.flags,

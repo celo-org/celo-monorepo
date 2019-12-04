@@ -263,9 +263,9 @@ contract Validators is
    * @param ecdsaPublicKey The ECDSA public key that the validator is using for consensus, should
    *   match the validator signer. 64 bytes.
    * @param blsPublicKey The BLS public key that the validator is using for consensus, should pass
-   *   proof of possession. 48 bytes.
+   *   proof of possession. 96 bytes.
    * @param blsPop The BLS public key proof-of-possession, which consists of a signature on the
-   *   account address. 96 bytes.
+   *   account address. 48 bytes.
    * @return True upon success.
    * @dev Fails if the account is already a validator or validator group.
    * @dev Fails if the account does not have sufficient Locked Gold.
@@ -419,6 +419,7 @@ contract Validators is
    * @param index The index of this validator in the list of all registered validators.
    * @return True upon success.
    * @dev Fails if the account is not a validator.
+   * @dev Fails if the validator has been a member of a group too recently.
    */
   function deregisterValidator(uint256 index) external nonReentrant returns (bool) {
     address account = getAccounts().signerToAccount(msg.sender);
@@ -481,7 +482,7 @@ contract Validators is
    * @param blsPublicKey The BLS public key that the validator is using for consensus, should pass
    *   proof of possession. 48 bytes.
    * @param blsPop The BLS public key proof-of-possession, which consists of a signature on the
-   *   account address. 96 bytes.
+   *   account address. 48 bytes.
    * @return True upon success.
    */
   function updateBlsPublicKey(bytes calldata blsPublicKey, bytes calldata blsPop)
@@ -501,9 +502,9 @@ contract Validators is
    * @param validator The validator whose BLS public key should be updated.
    * @param account The address under which the validator is registered.
    * @param blsPublicKey The BLS public key that the validator is using for consensus, should pass
-   *   proof of possession. 48 bytes.
+   *   proof of possession. 96 bytes.
    * @param blsPop The BLS public key proof-of-possession, which consists of a signature on the
-   *   account address. 96 bytes.
+   *   account address. 48 bytes.
    * @return True upon success.
    */
   function _updateBlsPublicKey(
@@ -512,8 +513,8 @@ contract Validators is
     bytes memory blsPublicKey,
     bytes memory blsPop
   ) private returns (bool) {
-    require(blsPublicKey.length == 48);
-    require(blsPop.length == 96);
+    require(blsPublicKey.length == 96);
+    require(blsPop.length == 48);
     require(checkProofOfPossession(account, blsPublicKey, blsPop));
     validator.publicKeys.bls = blsPublicKey;
     return true;
@@ -587,6 +588,7 @@ contract Validators is
    * @param index The index of this validator group in the list of all validator groups.
    * @return True upon success.
    * @dev Fails if the account is not a validator group with no members.
+   * @dev Fails if the group has had members too recently.
    */
   function deregisterValidatorGroup(uint256 index) external nonReentrant returns (bool) {
     address account = getAccounts().signerToAccount(msg.sender);
@@ -720,9 +722,9 @@ contract Validators is
   }
 
   /**
-   * @notice Returns the locked gold balance requirement for the supplied account.
+   * @notice Returns the current locked gold balance requirement for the supplied account.
    * @param account The account that may have to meet locked gold balance requirements.
-   * @return The locked gold balance requirement for the supplied account.
+   * @return The current locked gold balance requirement for the supplied account.
    */
   function getAccountLockedGoldRequirement(address account) public view returns (uint256) {
     if (isValidator(account)) {
@@ -780,7 +782,8 @@ contract Validators is
       bytes memory ecdsaPublicKey,
       bytes memory blsPublicKey,
       address affiliation,
-      uint256 score
+      uint256 score,
+      address signer
     )
   {
     require(isValidator(account));
@@ -789,7 +792,8 @@ contract Validators is
       validator.publicKeys.ecdsa,
       validator.publicKeys.bls,
       validator.affiliation,
-      validator.score.unwrap()
+      validator.score.unwrap(),
+      getAccounts().getValidatorSigner(account)
     );
   }
 

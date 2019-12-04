@@ -2,7 +2,7 @@ import { expectSaga } from 'redux-saga-test-plan'
 import { call, delay, select } from 'redux-saga/effects'
 import { pincodeTypeSelector } from 'src/account/reducer'
 import { navigateToError } from 'src/navigator/NavigationService'
-import { setLatestBlockNumber, updateWeb3SyncProgress } from 'src/web3/actions'
+import { completeWeb3Sync, updateWeb3SyncProgress } from 'src/web3/actions'
 import {
   checkWeb3SyncProgress,
   getDecryptedData,
@@ -94,7 +94,7 @@ describe(checkWeb3SyncProgress, () => {
     await expectSaga(checkWeb3SyncProgress)
       .withState(state)
       .put(updateWeb3SyncProgress({ startingBlock: 0, currentBlock: 10, highestBlock: 100 })) // is syncing the first time
-      .put(setLatestBlockNumber(LAST_BLOCK_NUMBER)) // finished syncing the second time
+      .put(completeWeb3Sync(LAST_BLOCK_NUMBER)) // finished syncing the second time
       .returns(true)
       .run()
   })

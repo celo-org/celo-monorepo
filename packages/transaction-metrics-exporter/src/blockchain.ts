@@ -166,6 +166,10 @@ async function newBlockHeaderProcessor(kit: ContractKit): Promise<(block: BlockH
             log: event.event,
           })
 
+          // @ts-ignore We want to rename event => eventName to avoid overwriting
+          event.eventName = event.event
+          delete event.event
+
           logEvent('RECEIVED_PARSED_LOG', event)
         }
       }

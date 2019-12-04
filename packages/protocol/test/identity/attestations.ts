@@ -78,7 +78,7 @@ contract('Attestations', (accounts: string[]) => {
   const phoneHash: string = getPhoneHash(phoneNumber)
 
   const attestationsRequested = 3
-  const attestationExpiryBlocks = 60
+  const attestationExpiryBlocks = (60 * 60) / 5
   const selectIssuersWaitBlocks = 4
   const attestationFee = new BigNumber(web3.utils.toWei('.05', 'ether').toString())
 
@@ -341,7 +341,7 @@ contract('Attestations', (accounts: string[]) => {
       })
     })
 
-    describe('when attestations have already been requested', async () => {
+    describe('when attestations have already been requested', () => {
       beforeEach(async () => {
         await attestations.request(phoneHash, attestationsRequested, mockStableToken.address)
       })
@@ -357,9 +357,17 @@ contract('Attestations', (accounts: string[]) => {
             await attestations.request(phoneHash, 1, mockStableToken.address)
           })
         })
+
+        describe('when the original request cannot be selected for due to randomness not being available', () => {
+          it('should allow to request more attestations', async () => {
+            const randomnessBlockRetentionWindow = await random.randomnessBlockRetentionWindow()
+            await mineBlocks(randomnessBlockRetentionWindow.toNumber(), web3)
+            await attestations.request(phoneHash, 1, mockStableToken.address)
+          })
+        })
       })
 
-      describe('when the issuers have been selected', async () => {
+      describe('when the issuers have been selected', () => {
         beforeEach(async () => {
           const requestBlockNumber = await web3.eth.getBlockNumber()
           await random.addTestRandomness(requestBlockNumber + selectIssuersWaitBlocks, '0x1')
@@ -387,7 +395,7 @@ contract('Attestations', (accounts: string[]) => {
       // These tests/functionality implicitly relies on randomness to only be available
       // historically. The attestation contract itself will not test that the current block
       //  number is sufficiently in the future after the request block
-      describe('when the randomness of the right block has been set', async () => {
+      describe('when the randomness of the right block has been set', () => {
         beforeEach(async () => {
           const requestBlockNumber = await web3.eth.getBlockNumber()
           await random.addTestRandomness(requestBlockNumber + selectIssuersWaitBlocks, '0x1')
@@ -730,14 +738,14 @@ contract('Attestations', (accounts: string[]) => {
         await requestAndCompleteAttestations()
       })
 
-      describe('when the account has no walletAddress mapped', async () => {
+      describe('when the account has no walletAddress mapped', () => {
         it('should allow a user to lookup the attested account of a phone number', async () => {
           const attestedAccounts = await attestations.lookupAccountsForIdentifier.call(phoneHash)
           assert.deepEqual(attestedAccounts, [caller])
         })
       })
 
-      describe('when the account has a walletAddress mapped', async () => {
+      describe('when the account has a walletAddress mapped', () => {
         beforeEach(setAccountWalletAddress)
 
         it('should allow a user to lookup the attested account of a phone number', async () => {
@@ -782,7 +790,7 @@ contract('Attestations', (accounts: string[]) => {
         await requestAndCompleteAttestations()
       })
 
-      describe('when the account has a walletAddress mapped', async () => {
+      describe('when the account has a walletAddress mapped', () => {
         beforeEach(setAccountWalletAddress)
 
         it('should allow a user to lookup the attested account of a phone number', async () => {
@@ -803,7 +811,7 @@ contract('Attestations', (accounts: string[]) => {
           assert.equal(total[0].toNumber(), 3)
         })
 
-        describe('and another account also has an attestation to the same phone number', async () => {
+        describe('and another account also has an attestation to the same phone number', () => {
           let other
           beforeEach(async () => {
             other = accounts[1]
@@ -845,7 +853,7 @@ contract('Attestations', (accounts: string[]) => {
         })
       })
 
-      describe('when the account has no walletAddress mapped', async () => {
+      describe('when the account has no walletAddress mapped', () => {
         it("returns the user's account with a zeroAddress", async () => {
           const [matches, addresses, completed, total]: [
             BigNumber[],

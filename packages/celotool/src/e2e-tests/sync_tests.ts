@@ -1,7 +1,6 @@
 import { assert } from 'chai'
 import Web3 from 'web3'
 import {
-  getEnode,
   GethInstanceConfig,
   getHooks,
   initAndStartGeth,
@@ -36,7 +35,7 @@ describe('sync tests', function(this: any) {
       lightserv: true,
       port: 30311,
       rpcport: 8553,
-      peers: [await getEnode(8545)],
+      peers: [8545],
     }
     await initAndStartGeth(hooks.gethBinaryPath, fullInstance)
     const web3 = new Web3('http://localhost:8553')
@@ -57,7 +56,7 @@ describe('sync tests', function(this: any) {
           port: 30313,
           rpcport: 8555,
           lightserv: syncmode !== 'light' && syncmode !== 'ultralight',
-          peers: [await getEnode(8553)],
+          peers: [8553],
         }
         await initAndStartGeth(hooks.gethBinaryPath, syncInstance)
       })
@@ -70,9 +69,9 @@ describe('sync tests', function(this: any) {
         const syncWeb3 = new Web3(`http://localhost:8555`)
         await waitToFinishSyncing(syncWeb3)
         // Give the validators time to create more blocks.
-        await sleep(2)
+        await sleep(20)
         const validatingLatestBlock = await validatingWeb3.eth.getBlockNumber()
-        await sleep(1)
+        await sleep(10)
         const syncLatestBlock = await syncWeb3.eth.getBlockNumber()
         assert.isAbove(validatingLatestBlock, 1)
         // Assert that the validator is still producing blocks.
@@ -94,7 +93,7 @@ describe('sync tests', function(this: any) {
       this.timeout(0)
       const instance: GethInstanceConfig = gethConfig.instances[0]
       await killInstance(instance)
-      await initAndStartGeth(hooks.gethBinaryPath, instance)
+      await initAndStartGeth(hooks.gethBinaryPath, { ...instance, peers: [8547] })
       await sleep(120) // wait for round change / resync
       const address = (await web3.eth.getAccounts())[0]
       const currentBlock = await web3.eth.getBlock('latest')
