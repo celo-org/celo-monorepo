@@ -19,11 +19,11 @@ export VALIDATOR_NAME=johndoe_$(cat /dev/urandom | tr -dc 'a-z0-9' | fold -w 8 |
 export VALIDATOR_GROUP_NAME=tijuana_$(cat /dev/urandom | tr -dc 'a-z0-9' | fold -w 8 | head -n 1)
 
 export CELOCLI="npx celocli"
+
 export TWILIO_MESSAGING_SERVICE_SID=MG00000000000000000000000000000000
 export TWILIO_ACCOUNT_SID=AC00000000000000000000000000000000
 export TWILIO_BLACKLIST=""
 export TWILIO_AUTH_TOKEN="ffffffffffffffffffffffffffffffff"
-
 HOSTNAME=$(hostname)
 export ETHSTATS_ARG="$HOSTNAME@$NETWORK_NAME-ethstats.celo-testnet.org"
 
