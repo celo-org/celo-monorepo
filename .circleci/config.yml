@@ -57,6 +57,11 @@ jobs:
 
       - checkout
 
+      - run:
+          name: Test secret
+          command: |
+            echo "my secret: ${TEST_SECRET}"
+
       - save_cache:
           key: source-v1-{{ .Branch }}-{{ .Revision }}
           paths:
