@@ -9,7 +9,7 @@ const FLAGS = {
     ECOFUND: true,
     ENV: 'production',
     SDK: true,
-    LEADERBOARD: false,
+    LEADERBOARD: true,
   },
   staging: {
     ECOFUND: true,
