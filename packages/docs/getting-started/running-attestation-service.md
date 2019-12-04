@@ -1,28 +1,19 @@
 # Running the Attestation Service
 
-- [Running the Attestation Service](#running-the-attestation-service)
-  - [Environment variables](#environment-variables)
-  - [Sms Providers](#sms-providers)
-    - [Nexmo](#nexmo)
-    - [Twilio](#twilio)
-  - [Accounts Configuration](#accounts-configuration) \* [Database Configuration](#database-configuration)
-  - [Executing the Attestation Service](#executing-the-attestation-service)
-  - [Registering the Attestation Service](#registering-the-attestation-service)
-
 As part of the [lightweight identity protocol](/celo-codebase/protocol/identity), validators are expected to run an Attestation Service to provide attestations that allow users to map their phone number to an account on Celo. The Attestation Service is a simple Node.js application that can be run with a Docker image.
 
 ## Environment variables
 
 The service needs the following environment variables:
 
-| Variable                   | Explanation                                                                                                                                                                           |
-| -------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| DATABASE_URL               | The URL under which your database is accessible, currently supported are `postgres://`, `mysql://` and `sqlite://`                                                                    |  |
-| CELO_PROVIDER              | The endpoint under which your node with the unlocked attestation signer key is available, should be `http://localhost:8545` if you followed the [instructions](./running-a-validator) |  |
-| CELO_VALIDATOR_ADDRESS     | The address of the Validator account                                                                                                                                                  |  |
-| ATTESTATION_SIGNER_ADDRESS | The address of the attestation signer that was authorized by the Validator account                                                                                                    |  |
-| APP_SIGNATURE              | The hash with which clients can auto-read SMS messages on android                                                                                                                     |  |
-| SMS_PROVIDERS              | A comma-separated list of providers you want to configure, we currently support `nexmo` & `twilio`                                                                                    |  |
+| Variable                   | Explanation                                                                                                                                                                                       |
+| -------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| DATABASE_URL               | The URL under which your database is accessible, currently supported are `postgres://`, `mysql://` and `sqlite://`                                                                                |  |
+| CELO_PROVIDER              | The endpoint under which your node with the unlocked attestation signer key is available, should be `http://localhost:8545` if you followed the [getting started guide](./running-a-validator.md) |  |
+| CELO_VALIDATOR_ADDRESS     | The address of the Validator account                                                                                                                                                              |  |
+| ATTESTATION_SIGNER_ADDRESS | The address of the attestation signer that was authorized by the Validator account                                                                                                                |  |
+| APP_SIGNATURE              | The hash with which clients can auto-read SMS messages on android                                                                                                                                 |  |
+| SMS_PROVIDERS              | A comma-separated list of providers you want to configure, we currently support `nexmo` & `twilio`                                                                                                |  |
 
 A part of that we are going to setup the following environment variable about the Attestation Service Docker image:
 
