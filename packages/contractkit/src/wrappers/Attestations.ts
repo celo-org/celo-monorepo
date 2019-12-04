@@ -50,6 +50,7 @@ export interface ActionableAttestation {
   issuer: Address
   blockNumber: number
   attestationServiceURL: string
+  name: string | undefined
 }
 
 function attestationMessageToSign(phoneHash: string, account: Address) {
@@ -242,12 +243,15 @@ export class AttestationsWrapper extends BaseWrapper<Attestations> {
             throw new Error(`No attestation service URL registered for ${issuer}`)
           }
 
+          const nameClaim = metadata.findClaim(ClaimTypes.NAME)
+
           // TODO: Once we have status indicators, we should check if service is up
           // https://github.com/celo-org/celo-monorepo/issues/1586
           return {
             blockNumber,
             issuer,
             attestationServiceURL: attestationServiceURLClaim.url,
+            name: nameClaim ? nameClaim.name : undefined,
           }
         } catch (error) {
           console.error(error)
@@ -312,7 +316,6 @@ export class AttestationsWrapper extends BaseWrapper<Attestations> {
         parseSignature(expectedSourceMessage, code, attestationSigner)
         return issuer
       } catch (error) {
-        console.log(error)
         continue
       }
     }

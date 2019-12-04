@@ -28,6 +28,7 @@ export enum AccountType {
   FAUCET = 4,
   ATTESTATION = 5,
   PRICE_ORACLE = 6,
+  ATTESTATION_BOT = 7,
 }
 
 export enum ConsensusType {
