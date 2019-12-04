@@ -10,7 +10,7 @@ Please refer to [Key Concepts](../overview.md#background-and-key-concepts) for b
 Baklava is an incentivized testnet for the Celo Protocol. Its tokens hold no real world economic value. It is an early, partially audited release of the Celo Protocol. Transitions between each phases of The Great Celo Stake Off may require a full network reset, a hard fork, or an upgrade. Network resets will erase your accounts, their balance and your transaction history. You may encounter bugs and limitations with the software and documentation. Continued participation may require you to upgrade your client software.
 {% endhint %}
 
-Please help us improve Celo by asking questions on the [Forum](https://forum.celo.org/c/baklava-testnet)!
+Please help the community to improve Celo by asking questions on the [Forum](https://forum.celo.org/c/baklava-testnet)!
 
 {% hint style="info" %}
 Your use of the Baklava Testnet is subject to the [Baklava Testnet Disclaimer](../important-information/baklava-testnet-disclaimer.md). Participation in The Great Celo Stake Off is subject to the [Terms and Conditions](https://docs.google.com/document/d/1b5SzeRbq60nx50NeezAEMpwLkaBDQ9hjZc0QAh4Mbdk/).
