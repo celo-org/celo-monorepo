@@ -75,7 +75,7 @@ class LeaderBoard extends React.PureComponent<BoardProps & I18nProps, State> {
       identity: leader.identity === 'Unknown account' ? leader.address : leader.identity,
     }))
 
-    if (leadersWithBTUs.length < 3) {
+    if (leadersWithBTUs.length < 1) {
       return null
     }
 
