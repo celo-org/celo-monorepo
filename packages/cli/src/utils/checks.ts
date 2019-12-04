@@ -157,7 +157,7 @@ class CheckBuilder {
 
   isAccount = (address: Address) =>
     this.addCheck(
-      `${address} is Account`,
+      `${address} is a registered Account`,
       this.withAccounts((accs) => accs.isAccount(address)),
       `${address} is not registered as an account. Try running account:register`
     )
