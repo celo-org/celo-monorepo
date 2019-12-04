@@ -54,6 +54,7 @@ const Overview = withNamespaces(NameSpaces.brand)(function _Overview({ t }: I18n
                 return (
                   <IconShowcase
                     size={160}
+                    ratio={1}
                     key={i}
                     loading={true}
                     name={'Celo Icon'}
@@ -67,6 +68,7 @@ const Overview = withNamespaces(NameSpaces.brand)(function _Overview({ t }: I18n
             return data.map((icon) => (
               <IconShowcase
                 key={icon.name}
+                ratio={1}
                 description={icon.description}
                 name={icon.name}
                 preview={{ uri: icon.preview }}

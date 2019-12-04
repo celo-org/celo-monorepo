@@ -83,6 +83,17 @@
     "license": "All icons are licensed under a <0>Creative Commons Attribution-NoDerivatives 4.0 International License</0> (CC BY-ND 4.0).",
     "headline": "Used to simplify the complexities of Celo technology, icons are useful visual tools that can educate, clarify, and instruct in ways simple text can not.\n\nCelo icons have descriptions that act as guidelines. While some descriptions are specific, many icons have multiple meanings and we encourage the Celo community to find new culturally appropriate applications for them. "
   },
+  "keyImagery": {
+    "title": "Key Imagery",
+    "headline":
+      "Images Lorem ipsum dolor sit amet, consectetur adipiscing elit. Pellentesque eget dignissim justo. Integer ac sodales dolor, quis aliquet nisi. Donec eget mattis neque, eu ultricies diam.",
+    "illoTitle": "Illustrations",
+    "illoText":
+      "General Blah consectetur adipiscing elit. Pellentesque eget dignissim justo. Integer ac sodales dolor, quis aliquet nisi. Donec eget mattis neque",
+    "abstractTitle": "Abstract Graphics",
+    "abstractText": "Abstract",
+    "errorMessage": "Assets could not be found"
+  },
   "downloadAssetBtn": "Download",
   "licenseTitle": "Usage & License Note"
 }

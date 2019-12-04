@@ -11,6 +11,7 @@ interface Props {
   description: string
   preview?: ImageURISource
   uri: string
+  ratio: number
   loading: boolean
   size: number
 }
@@ -22,6 +23,7 @@ export default React.memo(function Showcase({
   loading,
   uri,
   size,
+  ratio,
 }: Props) {
   return (
     <View
@@ -33,7 +35,7 @@ export default React.memo(function Showcase({
       ]}
     >
       <View style={styles.previewContainer}>
-        <AspectRatio ratio={1}>
+        <AspectRatio ratio={ratio}>
           {loading ? (
             <Spinner color={colors.dark} size={'small'} />
           ) : (

@@ -73,17 +73,16 @@ const PAGES = [
     href: ICONS_PATH,
     sections: [],
   },
+  {
+    title: 'Key Imagery',
+    href: IMAGERY_PATH,
 
-  // {
-  //   title: 'Key Imagery',
-  //   href: IMAGERY_PATH,
-
-  //   sections: [
-  //     { title: 'Overview', href: `${IMAGERY_PATH}#${hashNav.brandImagery.overview}` },
-  //     { title: 'Illustrations', href: `${IMAGERY_PATH}#${hashNav.brandImagery.illustrations}` },
-  //     { title: 'Abstract Graphics', href: `${IMAGERY_PATH}#${hashNav.brandImagery.graphics}` },
-  //   ],
-  // },
+    sections: [
+      { title: 'Overview', href: `${IMAGERY_PATH}#${hashNav.brandImagery.overview}` },
+      { title: 'Illustrations', href: `${IMAGERY_PATH}#${hashNav.brandImagery.illustrations}` },
+      { title: 'Abstract Graphics', href: `${IMAGERY_PATH}#${hashNav.brandImagery.graphics}` },
+    ],
+  },
 ]
 
 const THAW_DISTANCE = 600
