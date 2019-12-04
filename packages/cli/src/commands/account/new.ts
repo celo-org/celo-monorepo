@@ -9,7 +9,7 @@ export default class NewAccount extends LocalCommand {
     'Creates a new account locally and print out the key information. Save this information for local transaction signing or import into a Celo node.'
 
   static flags = {
-    ...BaseCommand.flags,
+    ...LocalCommand.flags,
   }
 
   static examples = ['new']
@@ -45,7 +45,7 @@ export default class NewAccount extends LocalCommand {
     const publicKey = NewAccount.getPublicKey(privateKey)
     const accountAddress = NewAccount.generateAccountAddressFromPrivateKey(privateKey)
     this.log(
-      'This is not being stored anywhere, so, save the mnemonic somewhere to use this account at a later point\n'
+      'This is not being stored anywhere. Save the mnemonic somewhere to use this account at a later point.\n'
     )
     printValueMap({ mnemonic: mnemonic, privateKey, publicKey, accountAddress })
   }

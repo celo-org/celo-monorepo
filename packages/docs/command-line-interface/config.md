@@ -24,7 +24,7 @@ USAGE
   $ celocli config:set
 
 OPTIONS
-  -n, --node=node  (required) [default: http://localhost:8545] URL of the node to run celocli commands against
+  -n, --node=node  (required) [default: http://localhost:8545] URL of the node to run commands against
 
 EXAMPLE
   set  --node ws://localhost:2500
