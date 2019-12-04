@@ -71,7 +71,7 @@ describe('sync tests', function(this: any) {
         // Give the validators time to create more blocks.
         await sleep(20)
         const validatingLatestBlock = await validatingWeb3.eth.getBlockNumber()
-        await sleep(1)
+        await sleep(10)
         const syncLatestBlock = await syncWeb3.eth.getBlockNumber()
         assert.isAbove(validatingLatestBlock, 1)
         // Assert that the validator is still producing blocks.

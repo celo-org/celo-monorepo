@@ -18,4 +18,4 @@ For more detailed information on how to get an account please refer to the [Gett
 
 ### Report a Bug
 
-To report a bug, navigate to the settings screen of the Celo Wallet and tap 'Send an Issue Report'. As always, please reach out on [forum.celo.org](https://forum.celo.org) if you have any questions
+To report a bug, navigate to the settings screen of the Celo Wallet and tap 'Send an Issue Report'. As always, please reach out on [forum.celo.org](https://forum.celo.org) if you have any questions.

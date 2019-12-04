@@ -119,7 +119,7 @@ export async function createTransaction(
   const decimals: string = await tokenContract.methods.decimals().call()
   const decimalBigNum = new BigNumber(decimals)
   const decimalFactor = new BigNumber(10).pow(decimalBigNum.toNumber())
-  const convertedAmount = new BigNumber(amount).multipliedBy(decimalFactor)
+  const convertedAmount = new BigNumber(amount).multipliedBy(decimalFactor).toFixed(0)
 
   const tx = tokenContract.methods.transferWithComment(
     recipientAddress,
