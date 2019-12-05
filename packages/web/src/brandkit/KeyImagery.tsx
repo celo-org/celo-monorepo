@@ -1,5 +1,6 @@
 import * as React from 'react'
 import { StyleSheet, Text, View } from 'react-native'
+import CCLicense from 'src/brandkit/common/CCLicense'
 import { brandStyles } from 'src/brandkit/common/constants'
 import Fetch from 'src/brandkit/common/Fetch'
 import Page, { IMAGERY_PATH } from 'src/brandkit/common/Page'
@@ -41,7 +42,12 @@ export default KeyImageryWrapped
 
 const Overview = React.memo(
   withNamespaces(NameSpaces.brand)(function _Overview({ t }: I18nProps) {
-    return <PageHeadline title={t('keyImagery.title')} headline={t('keyImagery.headline')} />
+    return (
+      <>
+        <PageHeadline title={t('keyImagery.title')} headline={t('keyImagery.headline')} />
+        <CCLicense textI18nKey="keyImagery.license" />
+      </>
+    )
   })
 )
 

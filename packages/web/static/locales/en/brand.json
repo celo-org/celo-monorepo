@@ -86,13 +86,16 @@
   "keyImagery": {
     "title": "Key Imagery",
     "headline":
-      "Images Lorem ipsum dolor sit amet, consectetur adipiscing elit. Pellentesque eget dignissim justo. Integer ac sodales dolor, quis aliquet nisi. Donec eget mattis neque, eu ultricies diam.",
+      "Used to tell a story, key images are visual tools that bring the text to life. These images help the user comprehend the material multidimensionally.\n\nImages have descriptions that act as guidelines for both accessibility and communication clarity. Most images can have multiple meanings and we encourage the Celo community to find new culturally appropriate applications for them.",
+    "license":
+      "All imagery is licensed under a <0>Creative Commons Attribution-NoDerivatives 4.0 International License</0> (CC BY-ND 4.0).",
     "illoTitle": "Illustrations",
     "illoText":
-      "General Blah consectetur adipiscing elit. Pellentesque eget dignissim justo. Integer ac sodales dolor, quis aliquet nisi. Donec eget mattis neque",
+      "Illustrations show concrete ways that humans interact with an idea. They utilize current mental models to simplify a concept.",
     "abstractTitle": "Abstract Graphics",
-    "abstractText": "Abstract",
-    "errorMessage": "Assets could not be found"
+    "abstractText":
+      "Abstract Graphics are visual tools that use coins to animate an idea. They can be dynamic or static.",
+    "errorMessage": "Images could not be found"
   },
   "downloadAssetBtn": "Download",
   "licenseTitle": "Usage & License Note"
