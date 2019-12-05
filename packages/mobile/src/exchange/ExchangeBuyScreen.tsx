@@ -126,13 +126,12 @@ export class ExchangeBuyScreen extends React.Component<Props, State> {
   }
 
   goToReview = () => {
-    const { makerToken, inputAmount } = this.state
+    const { makerToken, inputToken, inputAmount } = this.state
     navigate(Screens.ExchangeReview, {
-      confirmationInput: {
-        makerToken,
-        // inputToken,
-        inputTokenAmount: parseInputAmount(inputAmount),
-      },
+      makerToken,
+      makerTokenBalance: this.state.makerTokenAvailableBalance,
+      inputToken,
+      inputAmount: parseInputAmount(inputAmount),
     })
   }
 
