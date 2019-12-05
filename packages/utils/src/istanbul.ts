@@ -55,7 +55,7 @@ export function parseBlockExtraData(data: string): IstanbulExtra {
 
 export function bitIsSet(bitmap: Bitmap, index: number): boolean {
   if (index < 0) {
-    throw new Error(`bit index must be greate than zero: got ${index}`)
+    throw new Error(`bit index must be greater than zero: got ${index}`)
   }
   return bitmap
     .idiv('1' + '0'.repeat(index), 2)
