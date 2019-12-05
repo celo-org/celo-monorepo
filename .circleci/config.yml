@@ -173,7 +173,7 @@ jobs:
             HOMEBREW_NO_AUTO_UPDATE=1 brew tap homebrew/cask-versions
             HOMEBREW_NO_AUTO_UPDATE=1 brew cask install homebrew/cask-versions/adoptopenjdk8
       - run:
-          name: Creace Android Virtual Device (AVD)
+          name: Create Android Virtual Device (AVD)
           command: |
             avdmanager create avd -n Nexus_5X_API_28_x86 -k "system-images;android-26;google_apis;x86" -g google_apis -d "Nexus 5"
             # Copy device configuarion, adv for some reason doesn't
