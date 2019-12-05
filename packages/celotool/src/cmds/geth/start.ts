@@ -19,6 +19,7 @@ interface StartArgv extends GethArgv {
   verbosity: number
   amount: number
   purge: boolean
+  withProxy: boolean
 }
 
 export const builder = (argv: yargs.Argv) => {
@@ -62,6 +63,11 @@ export const builder = (argv: yargs.Argv) => {
       description: 'Amount of nodes to run',
       default: 1,
     })
+    .option('with-proxy', {
+      type: 'boolean',
+      description: 'Start with proxy in front',
+      default: false,
+    })
     .option('verbosity', {
       type: 'number',
       description: 'Verbosity level',
@@ -94,6 +100,7 @@ export const handler = async (argv: StartArgv) => {
 
   const numNodes = argv.amount
   const purge = argv.purge
+  const withProxy = argv.withProxy
 
   const network = 'local'
 
@@ -120,6 +127,20 @@ export const handler = async (argv: StartArgv) => {
       rpcport: rpcport + x * 2,
       wsport: wsport + x * 2,
     } as GethInstanceConfig)
+
+    if (withProxy) {
+      gethConfig.instances.push({
+        gethRunConfig: gethConfig,
+        name: `${x}-proxy`,
+        validating: false,
+        isProxy: true,
+        syncmode: syncMode,
+        port: port + x + 1000,
+        ethstats: 'localhost:3000',
+        rpcport: rpcport + x * 2 + 1000,
+        wsport: wsport + x * 2 + 1000,
+      } as GethInstanceConfig)
+    }
   }
 
   const validators = getValidatorsInformation(mnemonic, numNodes)
