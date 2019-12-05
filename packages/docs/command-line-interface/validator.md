@@ -143,9 +143,9 @@ OPTIONS
   --lookback=lookback                                     [default: 100] how many blocks to look back for signer
                                                           activity
 
-  --signer=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d     address of the validator to check if elected and validating
+  --signer=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d     address of the signer to check if elected and validating
 
-  --validator=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  address of the signer to check if elected and validating
+  --validator=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  address of the validator to check if elected and validating
 
 EXAMPLES
   status --validator 0x5409ED021D9299bf6814279A6A1411A7e866A631
