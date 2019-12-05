@@ -11,7 +11,6 @@
 - [Baklava Testnet](getting-started/baklava-testnet.md)
   - [Running a Full Node](getting-started/running-a-full-node.md)
   - [Running a Validator](getting-started/running-a-validator.md)
-  - [Running an Attestation Service](getting-started/running-attestation-service.md)
 - [Glossary](getting-started/glossary.md)
 
 ## Celo Codebase
