@@ -1,4 +1,4 @@
-import { envVar, fetchEnv } from './env-utils'
+import { envVar, fetchEnv, fetchEnvOrFallback } from './env-utils'
 import {
   AccountType,
   generatePrivateKey,
@@ -8,6 +8,8 @@ import {
   privateKeyToAddress,
 } from './generate_utils'
 import { ensure0x } from './utils'
+
+const DEFAULT_FAUCET_CUSD_WEI = '60000000000000000000000' /* 60k Celo Dollars */
 
 export function minerForEnv() {
   return privateKeyToAddress(
@@ -35,6 +37,9 @@ export function migrationOverrides() {
   const mnemonic = fetchEnv(envVar.MNEMONIC)
   const faucetedAccountAddresses = getFaucetedAccounts(mnemonic).map((account) => account.address)
   const attestationBotAddresses = getAddressesFor(AccountType.ATTESTATION_BOT, mnemonic, 1)
+  const initialBalance = fetchEnvOrFallback(envVar.FAUCET_CUSD_WEI, DEFAULT_FAUCET_CUSD_WEI)
+
+  const initialAddresses = [...faucetedAccountAddresses, ...attestationBotAddresses]
 
   return {
     validators: {
@@ -43,11 +48,8 @@ export function migrationOverrides() {
     },
     stableToken: {
       initialBalances: {
-        addresses: [...faucetedAccountAddresses, ...attestationBotAddresses],
-        values: [
-          ...faucetedAccountAddresses.map(() => '60000000000000000000000' /* 60k Celo Dollars */),
-          ...attestationBotAddresses.map(() => '10000000000000000000000' /* 10k Celo Dollars */),
-        ],
+        addresses: initialAddresses,
+        values: initialAddresses.map(() => initialBalance),
       },
       oracles: getAddressesFor(AccountType.PRICE_ORACLE, mnemonic, 1),
     },
