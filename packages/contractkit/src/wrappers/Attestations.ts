@@ -396,7 +396,6 @@ export class AttestationsWrapper extends BaseWrapper<Attestations> {
   /**
    * Selects the issuers for previously requested attestations for a phone number
    * @param phoneNumber The phone number for which to request attestations for
-   * @param token The token with which to pay for the attestation fee
    */
   async selectIssuers(phoneNumber: string) {
     const phoneHash = PhoneNumberUtils.getPhoneHash(phoneNumber)

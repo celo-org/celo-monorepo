@@ -1,27 +1,5 @@
 # Running a Validator
 
-- [Running a Validator](#running-a-validator)
-  - [Prerequisites](#prerequisites)
-    - [Register for the Stake Off](#register-for-the-stake-off)
-    - [Hardware requirements](#hardware-requirements)
-    - [Software requirements](#software-requirements)
-  - [Setup Instructions](#instructions)
-    - [Environment variables](#environment-variables)
-    - [Pull the Celo Docker image](#pull-the-celo-docker-image)
-    - [Create accounts](#create-accounts)
-    - [Deploy the Validator and Proxy nodes](#deploy-the-validator-and-proxy-nodes)
-      - [Running the Proxy](#running-the-proxy)
-      - [Running the Validator](#running-the-validator)
-    - [Running the Attestation Service](#running-the-attestation-service)
-    - [Stop the containers](#stop-the-containers)
-  - [Get elected as validator](#get-elected-as-validator)
-    - [Running the Docker containers in the background](#running-the-docker-containers-in-the-background)
-    - [Reference Script](#reference-script)
-    - [Obtain and lock up some Celo Gold for staking](#obtain-and-lock-up-some-celo-gold-for-staking)
-    - [Lock up Celo Gold](#lock-up-celo-gold)
-    - [Run for election](#run-for-election)
-    - [Stop Validating](#stop-validating)
-
 This section explains how to get a Validator node running on the network, using the same docker image used for running a full node.
 
 Validators help secure the Celo network by participating in Celo’s Proof of Stake protocol. Validators are organized into Validator Groups, analogous to parties in representative democracies. A Validator Group is essentially an ordered list of Validators.
@@ -34,17 +12,13 @@ Because of the importance of Validator security and availability, Validators are
 
 Additionally, Validators are expected to run an [Attestation Service](running-attestation-service.md) as part of the [lightweight identity protocol](../celo-codebase/protocol/identity), to provide attestations that allow users to map their phone number to a Celo address.
 
-You can find more details about Celo mission and why to become a Validator [at the following page](https://medium.com/celohq/calling-all-chefs-become-a-celo-validator-c75d1c2909aa).
-
-{% hint style="info" %}
-If you are starting up a Validator, please consider leaving it running for a few weeks to support the network.
-{% endhint %}
+You can find more details about Celo mission and why to become a Validator [in our Medium article](https://medium.com/celohq/calling-all-chefs-become-a-celo-validator-c75d1c2909aa).
 
 ## Prerequisites
 
 ### Register for the Stake Off
 
-Participation in The Great Celo Stake Off is subject to these [Terms and Conditions](https://docs.google.com/document/d/1b5SzeRbq60nx50NeezAEMpwLkaBDQ9hjZc0QAh4Mbdk/). If you agree to those, register online via an [online form](https://docs.google.com/forms/d/e/1FAIpQLSfbn5hTJ4UIWpN92-o2qMTUB0UnrFsL0fm97XqGe4VhhN_r5A/viewform). Once the C-Labs team receive your registration, they will send you instructions to get fauceted. Do this first.
+Participation in The Great Celo Stake Off is subject to these [Terms and Conditions](https://docs.google.com/document/d/1b5SzeRbq60nx50NeezAEMpwLkaBDQ9hjZc0QAh4Mbdk/). If you agree to those, register online via an [online form](https://docs.google.com/forms/d/e/1FAIpQLSfbn5hTJ4UIWpN92-o2qMTUB0UnrFsL0fm97XqGe4VhhN_r5A/viewform). **Once the C-Labs team receive your registration, they will send you instructions to get fauceted.** Do this first.
 
 ### Hardware requirements
 
@@ -54,7 +28,7 @@ The recommended Celo Validator setup involves continually running three nodes on
 - 1 **Validator Proxy node**: can be a VM or container in a multi-tenant environment (e.g. a public cloud), but requires high availability
 - 1 **Attestation node**: can be a VM or container in a multi-tenant environment (e.g. a public cloud), and has moderate availability requirements
 
-Celo is a Proof of Stake network, which has different hardware requirements than a Proof of Work network. Proof of Stake consensus is less CPU intensive, but has is more sensitive to network connectivity and latency. Below is a list of standard requirements for running a Validator node on the Celo Network:
+Celo is a Proof of Stake network, which has different hardware requirements than a Proof of Work network. Proof of Stake consensus is less CPU intensive, but is more sensitive to network connectivity and latency. Below is a list of standard requirements for running a Validator node on the Celo Network:
 
 - Memory: 8 GB RAM
 - CPU: Quad core 3GHz (64-bit)
@@ -153,7 +127,7 @@ docker pull $CELO_IMAGE
 
 ### Create the Validator and Validator Group accounts
 
-First, you'll need to generate account keys for your Validator and Validator Group. These are the keys that will have access to your locked Celo Gold, and thus should be handled with care. For the purposes of this guide, we will be storing these keys on your local machine, but we recommend that you store then in a more secure manner.
+First, you'll need to generate account keys for your Validator and Validator Group. These are the keys that will have access to your locked Celo Gold, and thus should be handled with care. For the purposes of this guide, we will be storing these keys on your local machine, but we recommend that you store them in a more secure manner.
 
 ```bash
 # On your local machine
@@ -255,7 +229,7 @@ docker run -v $PWD:/root/.celo $CELO_IMAGE init /celo/genesis.json
 docker run -v $PWD:/root/.celo --entrypoint cp $CELO_IMAGE /celo/static-nodes.json /root/.celo/
 ```
 
-You can then run the proxy with the following command. Be sure to replace `<YOUR-VALIDATOR-NAME>` with the name you set for your Validator account earlier.
+You can then run the proxy with the following command. Be sure to replace `<YOUR-VALIDATOR-NAME>` with the name you'd like to use for your Validator account.
 
 ```bash
 # On the proxy machine
@@ -458,6 +432,10 @@ celocli lockedgold:show $CELO_VALIDATOR_ADDRESS
 
 You're all set! Elections are finalized at the end of each epoch, roughly once an hour in the Alfajores or Baklava Testnets. After that hour, if you get elected, your node will start participating BFT consensus and validating blocks. After the first epoch in which your Validator participates in BFT, you should receive your first set of epoch rewards.
 
+{% hint style="info" %}
+**Roadmap**: Different parameters will govern elections in a Celo production network. Epochs are likely to be daily, rather than hourly. Running a Validator will also include setting up proxy nodes to protect against DDoS attacks, and using hardware wallets to secure the key used to sign blocks. We plan to update these instructions with more details soon.
+{% endhint %}
+
 You can inspect the current state of the validator elections by running:
 
 ```bash
@@ -618,26 +596,15 @@ celocli account:get-metadata $CELO_VALIDATOR_ADDRESS
 
 By now, you should have setup your Validator account appropriately.
 
-### Stop the containers
+{% hint style="tip" %}
+Congratulations on setting up your validator. If you want to win the TGCSO, it may be helpful to familiar with the inner workings of the Celo network. Dig into the [protocol documentation](../celo-codebase/protocol) for more information.
+{% endhint %}
 
-You can stop the Docker containers at any time without problem. If you stop your containers that means those containers stop of providing service.
-The data dir of the validator and the proxy are Docker volumes mounted in the containers from the `celo-data-dir` you created at the very beginning. So if you don't remove that folder, you can stop or restart the containers without losing any data.
-
-You can stop the `celo-validator` and `celo-proxy` containers running:
-
-```bash
-docker stop celo-validator celo-proxy
-```
-
-And you can remove the containers (not the data dir) running:
-
-```bash
-docker rm -f celo-validator celo-proxy
-```
+## Deployment Tips
 
 ### Running the Docker containers in the background
 
-There are different option for executing Docker containers in the background. The most typical one is to use in your docker run commands the `-d` option. Also for long running processes, specially when you run in a remote computer, you can use a tool like [screen](https://ss64.com/osx/screen.html). It allows to connect and disconnect from running processes providing an easy way to manage long run processes.
+There are different options for executing Docker containers in the background. The most typical one is to use in your docker run commands the `-d` option. Also for long running processes, especially when you run in a remote computer, you can use a tool like [screen](https://ss64.com/osx/screen.html). It allows to connect and disconnect from running processes providing an easy way to manage long running processes.
 
 It's out of the scope of this documentation to go through the `screen` options, but you can use the following command format with your `docker` commands:
 
@@ -657,10 +624,27 @@ You can list your existing `screen` sessions:
 screen -ls
 ```
 
-And re-atach to any of the existing sessions:
+And re-attach to any of the existing sessions:
 
 ```bash
 screen -r -S celo-validator
+```
+
+### Stopping containers
+
+You can stop the Docker containers at any time without problem. If you stop your containers that means those containers stop providing service.
+The data dir of the validator and the proxy are Docker volumes mounted in the containers from the `celo-data-dir` you created at the very beginning. So if you don't remove that folder, you can stop or restart the containers without losing any data.
+
+You can stop the `celo-validator` and `celo-proxy` containers running:
+
+```bash
+docker stop celo-validator celo-proxy
+```
+
+And you can remove the containers (not the data dir) running:
+
+```bash
+docker rm -f celo-validator celo-proxy
 ```
 
 ### Reference Script
@@ -712,11 +696,3 @@ celocli election:revoke --from $CELO_VALIDATOR_GROUP_ADDRESS --for $CELO_VALIDAT
 ```bash
 celocli validatorgroup:deregister --from $CELO_VALIDATOR_GORUP_ADDRESS
 ```
-
-{% hint style="info" %}
-You’re all set! Note that elections are finalized at the end of each epoch, roughly once an hour in the Baklava Testnet. After that hour, if you get elected, your node will start participating BFT consensus and validating blocks. Users requesting attestations will hit your registered Attestation Service.
-{% endhint %}
-
-{% hint style="info" %}
-**Roadmap**: Different parameters will govern elections in a Celo production network. Epochs are likely to be daily, rather than hourly. Running a Validator will also include setting up proxy nodes to protect against DDoS attacks, and using hardware wallets to secure the key used to sign blocks. We plan to update these instructions with more details soon.
-{% endhint %}
