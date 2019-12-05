@@ -2,20 +2,20 @@ const FLAGS = {
   development: {
     ECOFUND: true,
     ENV: 'development',
-    SDK: true,
     LEADERBOARD: true,
+    SDK: true,
   },
   production: {
     ECOFUND: true,
     ENV: 'production',
-    SDK: true,
     LEADERBOARD: true,
+    SDK: true,
   },
   staging: {
     ECOFUND: true,
     ENV: 'staging',
-    SDK: true,
     LEADERBOARD: true,
+    SDK: true,
   },
 }
 module.exports = FLAGS[process.env.DEPLOY_ENV]
