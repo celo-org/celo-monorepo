@@ -11,19 +11,19 @@ import {
   privateKeyToPublicKey,
 } from '../lib/generate_utils'
 import {
+  buildGeth,
+  checkoutGethRepo,
+  connectValidatorPeers,
+  getEnodeAddress,
   GethInstanceConfig,
   GethRunConfig,
-  getEnodeAddress,
   initAndStartGeth,
+  resetDataDir,
   restoreDatadir,
   snapshotDatadir,
+  spawnWithLog,
   startGeth,
   writeGenesis,
-  checkoutGethRepo,
-  buildGeth,
-  spawnWithLog,
-  resetDataDir,
-  connectValidatorPeers,
 } from '../lib/geth'
 import { ensure0x, spawnCmd, spawnCmdWithExitOnFailure } from '../lib/utils'
 
@@ -263,9 +263,9 @@ export function getContext(gethConfig: GethRunConfig) {
       } else if (instance.validating && instance.isProxied) {
         // Proxied validators should connect to only the proxy
         // Find this proxied validator's proxy
-        const proxyEnode = proxyEnodes.filter((x: any, _: number) => x[0] === instance.proxy)
+        const proxyEnode = proxyEnodes.filter((x: any) => x[0] === instance.proxy)
 
-        if (proxyEnode.length != 1) {
+        if (proxyEnode.length !== 1) {
           throw new Error('proxied validator must have exactly one proxy')
         }
 
@@ -286,10 +286,10 @@ export function getContext(gethConfig: GethRunConfig) {
     for (const instance of gethConfig.instances) {
       if (instance.isProxy) {
         const proxiedValidator = gethConfig.instances.filter(
-          (x: GethInstanceConfig, _: number) => x.proxy == instance.name
+          (x: GethInstanceConfig) => x.proxy === instance.name
         )
 
-        if (proxiedValidator.length != 1) {
+        if (proxiedValidator.length !== 1) {
           throw new Error('proxied validator must have exactly one proxy')
         }
 
@@ -327,7 +327,7 @@ export function getContext(gethConfig: GethRunConfig) {
   const restart = async () => {
     await killGeth()
     if (gethConfig.useBootnode) {
-      killBootnode()
+      await killBootnode()
       await startBootnode(bootnodeBinaryPath, mnemonic, gethConfig)
     }
     let validatorIndex = 0

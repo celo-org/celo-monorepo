@@ -1,4 +1,5 @@
 #!/usr/bin/env ts-node
+// tslint:disable:no-console
 
 import program from 'commander'
 import fs from 'fs'
@@ -18,10 +19,10 @@ program
     'jazz ripple brown cloth door bridge pen danger deer thumb cable prepare negative library vast'
   )
   .option('--test-dir <path>', 'Path to temporal data directory', '/tmp/e2e')
-  .action(() => {
+  .action(async () => {
     const { gethRepo, validator, proxy, noEthStats, mnemonic, testDir } = program
 
-    main({
+    await main({
       gethRepo,
       validator,
       proxy,
@@ -70,7 +71,7 @@ async function main({
       wsport: 8546 + key * 2,
       ethstats: noEthStats ? '' : ethstats,
       isProxied: isProxy,
-      proxy: isProxy ? '${proxyKey}-proxy' : undefined,
+      proxy: isProxy ? `${proxyKey}-proxy` : undefined,
     },
   ]
 
@@ -80,15 +81,15 @@ async function main({
   const validatorsFilePath = `${tmpDir}/validators.json`
   const validatorEnodes = JSON.parse(fs.readFileSync(validatorsFilePath, 'utf8'))
 
-  const validatorPrivateKey =
+  const instancePrivateKey =
     instance.privateKey || getPrivateKeysFor(AccountType.VALIDATOR, mnemonic, key).pop()
   const validatorEnode = getEnodeAddress(
-    privateKeyToPublicKey(validatorPrivateKey as string),
+    privateKeyToPublicKey(instancePrivateKey as string),
     '127.0.0.1',
     instance.port
   )
 
-  instance.privateKey = validatorPrivateKey
+  instance.privateKey = instancePrivateKey
   instance.proxies = [validatorEnode, validatorEnode]
 
   let proxyEnode: string = ''
@@ -118,13 +119,13 @@ async function main({
       proxiedValidatorAddress: privateKeyToPublicKey(validatorPrivateKey as string).slice(-40),
       // proxiedValidatorAddress: validatorEnode,
       // proxiedValidatorAddress:`127.0.0.1:${instance.port}`,
-    } as GethInstanceConfig
+    }
     gethConfig.instances.unshift(proxyInstance)
   }
 
   const gethBinaryPath = `${gethRepoPath}/build/bin/geth`
 
-  instance.privateKey = validatorPrivateKey
+  instance.privateKey = instancePrivateKey
 
   if (isProxy) {
     proxyInstance.peers = validatorEnodes

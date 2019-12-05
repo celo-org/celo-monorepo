@@ -4,8 +4,8 @@
 import { ContractKit, newKit } from '@celo/contractkit'
 import { BlockchainParametersWrapper } from '@celo/contractkit/lib/wrappers/BlockchainParameters'
 import { assert } from 'chai'
-import { getHooks, sleep } from './utils'
 import { GethRunConfig } from '../lib/geth'
+import { getHooks, sleep } from './utils'
 
 const TMP_PATH = '/tmp/e2e'
 

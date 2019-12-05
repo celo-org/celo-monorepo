@@ -9,11 +9,13 @@ import {
 import { GoldToken as GoldTokenType } from '@celo/walletkit/types/GoldToken'
 import { StableToken as StableTokenType } from '@celo/walletkit/types/StableToken'
 import BigNumber from 'bignumber.js'
+import { spawn } from 'child_process'
 import fs from 'fs'
 import { range } from 'lodash'
 import fetch from 'node-fetch'
 import path from 'path'
 import Web3Type from 'web3'
+import { Admin } from 'web3-eth-admin'
 import { TransactionReceipt } from 'web3/types'
 import { envVar, fetchEnv, isVmBased } from './env-utils'
 import {
@@ -26,8 +28,6 @@ import {
 import { retrieveIPAddress } from './helm_deploy'
 import { execCmd, execCmdWithExitOnFailure, spawnCmd, spawnCmdWithExitOnFailure } from './utils'
 import { getTestnetOutputs } from './vm-testnet-utils'
-import { spawn } from 'child_process'
-import { Admin } from 'web3-eth-admin'
 
 type HandleErrorCallback = (isError: boolean, data: { location: string; error: string }) => void
 
@@ -66,7 +66,7 @@ export interface GethInstanceConfig {
   privateKey?: string
   etherbase?: string
   peers?: string[]
-  proxies?: string[2][]
+  proxies?: Array<string[2]>
   pid?: number
   isProxied?: boolean
   isProxy?: boolean
@@ -928,7 +928,7 @@ export async function startGeth(
     gethArgs.push('--password=/dev/null', `--unlock=0`)
   }
 
-  if (!!ethstats) {
+  if (ethstats) {
     gethArgs.push(`--ethstats=${instance.name}@${ethstats}`)
   }
 
@@ -1009,8 +1009,8 @@ export async function restoreDatadir(instance: GethInstanceConfig) {
   await spawnCmdWithExitOnFailure('cp', ['-r', snapshotdir, datadir], { silent: true })
 }
 
-export async function buildGeth(path: string) {
-  await spawnCmdWithExitOnFailure('make', ['geth'], { cwd: path })
+export async function buildGeth(gethPath: string) {
+  await spawnCmdWithExitOnFailure('make', ['geth'], { cwd: gethPath })
 }
 
 export async function resetDataDir(dataDir: string) {
@@ -1018,18 +1018,18 @@ export async function resetDataDir(dataDir: string) {
   await spawnCmd('mkdir', [dataDir], { silent: true })
 }
 
-export async function checkoutGethRepo(branch: string, path: string) {
-  await spawnCmdWithExitOnFailure('rm', ['-rf', path])
+export async function checkoutGethRepo(branch: string, gethPath: string) {
+  await spawnCmdWithExitOnFailure('rm', ['-rf', gethPath])
   await spawnCmdWithExitOnFailure('git', [
     'clone',
     '--depth',
     '1',
     'https://github.com/celo-org/celo-blockchain.git',
-    path,
+    gethPath,
     '-b',
     branch,
   ])
-  await spawnCmdWithExitOnFailure('git', ['checkout', branch], { cwd: path })
+  await spawnCmdWithExitOnFailure('git', ['checkout', branch], { cwd: gethPath })
 }
 
 export function spawnWithLog(cmd: string, args: string[], logsFilepath: string, verbose: boolean) {

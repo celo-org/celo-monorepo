@@ -8,8 +8,8 @@ import BigNumber from 'bignumber.js'
 import { assert } from 'chai'
 import Web3 from 'web3'
 import { TransactionReceipt } from 'web3/types'
-import { killInstance, sleep, getHooks } from './utils'
-import { GethRunConfig, GethInstanceConfig, initAndStartGeth } from '../lib/geth'
+import { GethInstanceConfig, GethRunConfig, initAndStartGeth } from '../lib/geth'
+import { getHooks, killInstance, sleep } from './utils'
 
 const TMP_PATH = '/tmp/e2e'
 

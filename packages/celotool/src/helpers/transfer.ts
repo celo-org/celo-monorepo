@@ -1,11 +1,12 @@
-import BigNumber from 'bignumber.js'
+// tslint:disable:no-console
 import { newKit } from '@celo/contractkit'
+import BigNumber from 'bignumber.js'
 import { displaySendTx } from './utils'
 
 const from: string = process.env.FROM || '0x0'
 const to: string = process.env.TO || '0x0'
 const amountInWei = new BigNumber(process.env.AMOUNT || 0)
-;(async () => {
+void (async () => {
   const kit = newKit('http://localhost:8545')
   const goldToken = await kit.contracts.getGoldToken()
 
@@ -17,7 +18,7 @@ const amountInWei = new BigNumber(process.env.AMOUNT || 0)
 
   // Perform the transfer
   await displaySendTx('gold.Transfer', goldToken.transfer(to, amountInWei.toFixed()), {
-    from: from,
+    from,
   })
 
   // Check the balance after

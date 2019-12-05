@@ -5,10 +5,10 @@ import { getBlsPoP, getBlsPublicKey } from '@celo/utils/lib/bls'
 import { fromFixed, toFixed } from '@celo/utils/lib/fixidity'
 import BigNumber from 'bignumber.js'
 import { assert } from 'chai'
-import Web3 from 'web3'
-import { assertAlmostEqual, getContext, sleep, waitToFinishSyncing } from './utils'
-import { initAndStartGeth, GethRunConfig, GethInstanceConfig, importGenesis } from '../lib/geth'
 import path from 'path'
+import Web3 from 'web3'
+import { GethInstanceConfig, GethRunConfig, importGenesis, initAndStartGeth } from '../lib/geth'
+import { assertAlmostEqual, getContext, sleep, waitToFinishSyncing } from './utils'
 
 interface MemberSwapper {
   swap(): Promise<void>
@@ -335,9 +335,7 @@ describe('governance tests', () => {
         '0x4519cae145fb9499358be484ca60c80d8f5b7f9c13ff82c88ec9e13283e9de1a'
       const additionalNodes: GethInstanceConfig[] = [
         {
-          gethRunConfig: {
-            networkId: 1101,
-          } as GethRunConfig,
+          gethRunConfig: gethConfig,
           name: 'validatorGroup',
           validating: false,
           syncmode: 'full',

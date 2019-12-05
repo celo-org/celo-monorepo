@@ -1,9 +1,10 @@
-import Web3 from 'web3'
+// tslint:disable:no-console
 import { newKitFromWeb3 } from '@celo/contractkit'
+import Web3 from 'web3'
 
 const web3 = new Web3('http://localhost:8543')
 // const keystorePath: string = process.env.KEYSTORE || "";
-;(async () => {
+void (async () => {
   const kit = newKitFromWeb3(web3)
   // const account = await importAndUnlockAccount(web3, keystorePath)
   // const from = account.address

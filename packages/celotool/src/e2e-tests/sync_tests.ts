@@ -1,7 +1,7 @@
 import { assert } from 'chai'
 import Web3 from 'web3'
+import { GethInstanceConfig, GethRunConfig, initAndStartGeth } from '../lib/geth'
 import { getHooks, killInstance, sleep, waitToFinishSyncing } from './utils'
-import { GethRunConfig, GethInstanceConfig, initAndStartGeth } from '../lib/geth'
 
 const TMP_PATH = '/tmp/e2e'
 

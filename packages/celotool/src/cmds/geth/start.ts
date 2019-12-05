@@ -1,8 +1,8 @@
 import { addCeloGethMiddleware } from 'src/lib/utils'
 import yargs from 'yargs'
-import { GethArgv } from '../geth'
-import { GethInstanceConfig, GethRunConfig, runGethNodes } from '../../lib/geth'
 import { AccountType, getPrivateKeysFor, getValidatorsInformation } from '../../lib/generate_utils'
+import { GethRunConfig, runGethNodes } from '../../lib/geth'
+import { GethArgv } from '../geth'
 
 export const command = 'start'
 export const describe = 'command for running geth'
@@ -85,7 +85,7 @@ export const handler = async (argv: StartArgv) => {
 
   const gethDir = argv.gethDir
   const datadir = argv.dataDir
-  const networkId = parseInt(argv.networkId)
+  const networkId = parseInt(argv.networkId, 10)
   const syncMode = argv.syncMode
 
   const port = argv.port
@@ -126,7 +126,7 @@ export const handler = async (argv: StartArgv) => {
       ethstats: 'localhost:3000',
       rpcport: rpcport + x * 2,
       wsport: wsport + x * 2,
-    } as GethInstanceConfig)
+    })
 
     if (withProxy) {
       gethConfig.instances.push({
@@ -139,7 +139,7 @@ export const handler = async (argv: StartArgv) => {
         ethstats: 'localhost:3000',
         rpcport: rpcport + x * 2 + 1000,
         wsport: wsport + x * 2 + 1000,
-      } as GethInstanceConfig)
+      })
     }
   }
 

@@ -1,8 +1,8 @@
-import Web3 from 'web3'
-import fs from 'fs'
 import { CeloTransactionObject, newKitFromWeb3 } from '@celo/contractkit'
 import BigNumber from 'bignumber.js'
 import { ec as EC } from 'elliptic'
+import fs from 'fs'
+import Web3 from 'web3'
 
 const ec = new EC('secp256k1')
 
@@ -21,6 +21,7 @@ export function generateAccountAddressFromPrivateKey(web3: Web3, privateKey: str
 }
 
 export async function displaySendTx(method: string, result: CeloTransactionObject<any>, args: any) {
+  // tslint:disable-next-line:no-console
   console.log(method, await result, args.from)
 }
 
@@ -29,7 +30,6 @@ export async function importAndUnlockAccount(
   keystorePath: string,
   password: string = '/dev/null'
 ) {
-  console.log(keystorePath)
   const keystore = fs.readFileSync(keystorePath, 'utf8')
   // @ts-ignore
   const account = web3.eth.accounts.decrypt(keystore, password)
@@ -45,7 +45,7 @@ export async function lockGoldIfNeeded(web3: Web3, from: string) {
   if (nonvotingGold.lt(minLockedGold)) {
     const txLock = lockedGoldContract.lock()
     await displaySendTx('lock', txLock, {
-      from: from,
+      from,
       value: minLockedGold.toString(),
     })
   }

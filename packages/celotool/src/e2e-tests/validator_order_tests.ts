@@ -1,8 +1,8 @@
 import { assert } from 'chai'
 import _ from 'lodash'
 import Web3 from 'web3'
-import { getContext, sleep } from './utils'
 import { GethRunConfig } from '../lib/geth'
+import { getContext, sleep } from './utils'
 
 const VALIDATORS = 10
 const EPOCH = 20
