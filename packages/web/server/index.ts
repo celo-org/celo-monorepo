@@ -12,6 +12,7 @@ import addToCRM from '../server/addToCRM'
 import ecoFundSubmission from '../server/EcoFundApp'
 import { RequestType } from '../src/fauceting/FaucetInterfaces'
 import nextI18next from '../src/i18n'
+import { abort } from '../src/utils/abortableFetch'
 import latestAnnouncements from './Announcement'
 import { faucetOrInviteController } from './controllers'
 import getFormattedEvents from './EventHelpers'
@@ -154,13 +155,21 @@ function wwwRedirect(req, res, nextAction) {
   })
 
   server.get('/proxy/medium', async (_, res) => {
-    const articlesdata = await getFormattedMediumArticles()
-    res.json(articlesdata)
+    try {
+      const articlesdata = await getFormattedMediumArticles()
+      res.json(articlesdata)
+    } catch (e) {
+      res.status(e.statusCode || 500).json({ message: e.message || 'unknownError' })
+    }
   })
 
   server.get('/proxy/events/', async (_, res) => {
-    const events = await getFormattedEvents()
-    res.json(events)
+    try {
+      const events = await Promise.race([getFormattedEvents(), abort('Events from Airtable')])
+      res.json(events)
+    } catch (e) {
+      res.status(e.statusCode || 500).json({ message: e.message || 'unknownError' })
+    }
   })
 
   server.get('*', (req, res) => {
