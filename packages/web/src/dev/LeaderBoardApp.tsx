@@ -25,12 +25,16 @@ const query = gql`
     leaderboard {
       points
       identity
+      address
     }
   }
 `
 
 class LeaderBoardApp extends React.PureComponent<I18nProps> {
   render() {
+    if (!getConfig().publicRuntimeConfig.FLAGS.LEADERBOARD) {
+      return null
+    }
     return (
       <ApolloProvider client={createApolloClient()}>
         <Query query={query}>
