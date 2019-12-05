@@ -460,7 +460,7 @@ Just like with the Validator signer, we'll want to authorize a separate Attestat
 
 ```bash
 # On the Attestation machine
-# Note that you have to export CELO_IMAGE and CELO_VALIDATOR_ADDRESS on this machine
+# Note that you have to export CELO_IMAGE, NETWORK_ID and CELO_VALIDATOR_ADDRESS on this machine
 export CELO_IMAGE=us.gcr.io/celo-testnet/celo-node:baklava
 export NETWORK_ID=12219
 export CELO_VALIDATOR_ADDRESS=<CELO_VALIDATOR_ADDRESS>
