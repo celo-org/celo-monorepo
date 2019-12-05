@@ -1,8 +1,8 @@
-import airtableInit, { AirRecord } from '../server/airtable'
-import { abort } from '../src/utils/abortableFetch'
 import getConfig from 'next/config'
 import { EventProps } from '../fullstack/EventProps'
 import Sentry from '../fullstack/sentry'
+import airtableInit, { AirRecord } from '../server/airtable'
+import { abort } from '../src/utils/abortableFetch'
 const TABLE_NAME = 'Community Calendar'
 // Intermediate step Event With all String Values
 interface IncomingEvent {
