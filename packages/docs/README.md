@@ -98,7 +98,7 @@ Browse the code, raise an issue, or contribute a PR:
 Try Celo out:
 
 - [Using the Mobile Wallet](getting-started/using-the-mobile-wallet.md) on the Alfajores Testnet
-- [Using the CLI ](getting-started/using-the-cli.md)on the Alfajores Testnet
+- [Introduction to the CLI ](command-line-interface/introduction.md)on the Alfajores Testnet
 
 Read the Whitepapers:
 
