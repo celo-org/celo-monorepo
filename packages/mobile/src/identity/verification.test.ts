@@ -114,6 +114,7 @@ const mockAttestationsWrapperUnverified = {
     .fn()
     .mockImplementationOnce(() => [])
     .mockImplementationOnce(() => mockActionableAttestations),
+  getUnselectedRequest: jest.fn(() => ({ blockNumber: 0 })),
   approveAttestationFee: jest.fn(() => mockContractKitTxObject),
   request: jest.fn(() => mockContractKitTxObject),
   waitForSelectingIssuers: jest.fn(),

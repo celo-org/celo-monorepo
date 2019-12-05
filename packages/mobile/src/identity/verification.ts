@@ -3,6 +3,7 @@ import { AccountsWrapper } from '@celo/contractkit/lib/wrappers/Accounts'
 import {
   ActionableAttestation,
   AttestationsWrapper,
+  UnselectedRequest,
 } from '@celo/contractkit/lib/wrappers/Attestations'
 import { eqAddress } from '@celo/utils/src/address'
 import { extractAttestationCodeFromMessage } from '@celo/utils/src/attestations'
@@ -269,30 +270,43 @@ function* requestAttestations(
     return
   }
   CeloAnalytics.track(CustomEventNames.verification_request_attestations)
-  Logger.debug(
-    `${TAG}@requestNeededAttestations`,
-    `Approving ${numAttestationsRequestsNeeded} new attestations`
-  )
 
-  const approveTx: CeloTransactionObject<boolean> = yield call(
-    [attestationsWrapper, attestationsWrapper.approveAttestationFee],
-    numAttestationsRequestsNeeded
-  )
-
-  yield call(sendTransaction, approveTx.txo, account, TAG, 'Approve Attestations')
-
-  Logger.debug(
-    `${TAG}@requestNeededAttestations`,
-    `Requesting ${numAttestationsRequestsNeeded} new attestations`
-  )
-
-  const requestTx: CeloTransactionObject<void> = yield call(
-    [attestationsWrapper, attestationsWrapper.request],
+  const unselectedRequest: UnselectedRequest = yield call(
+    [attestationsWrapper, attestationsWrapper.getUnselectedRequest],
     e164Number,
-    numAttestationsRequestsNeeded
+    account
   )
 
-  yield call(sendTransaction, requestTx.txo, account, TAG, 'Request Attestations')
+  if (unselectedRequest.blockNumber === 0) {
+    Logger.debug(
+      `${TAG}@requestNeededAttestations`,
+      `Approving ${numAttestationsRequestsNeeded} new attestations`
+    )
+    const approveTx: CeloTransactionObject<boolean> = yield call(
+      [attestationsWrapper, attestationsWrapper.approveAttestationFee],
+      numAttestationsRequestsNeeded
+    )
+
+    yield call(sendTransaction, approveTx.txo, account, TAG, 'Approve Attestations')
+
+    Logger.debug(
+      `${TAG}@requestNeededAttestations`,
+      `Requesting ${numAttestationsRequestsNeeded} new attestations`
+    )
+
+    const requestTx: CeloTransactionObject<void> = yield call(
+      [attestationsWrapper, attestationsWrapper.request],
+      e164Number,
+      numAttestationsRequestsNeeded
+    )
+
+    yield call(sendTransaction, requestTx.txo, account, TAG, 'Request Attestations')
+  } else {
+    Logger.debug(
+      `${TAG}@requestNeededAttestations`,
+      `Unselected request found, skipping approval/request`
+    )
+  }
 
   Logger.debug(`${TAG}@requestNeededAttestations`, 'Waiting for block to select issuer')
 

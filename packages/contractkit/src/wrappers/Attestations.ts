@@ -51,6 +51,12 @@ export interface ActionableAttestation {
   attestationServiceURL: string
 }
 
+export interface UnselectedRequest {
+  blockNumber: number
+  attestationsRequested: number
+  attestationRequestFeeToken: string
+}
+
 interface GetCompletableAttestationsResponse {
   0: string[]
   1: string[]
