@@ -50,7 +50,8 @@ const DefaultConfig = {
     minimumReports: 1,
   },
   gasPriceMinimum: {
-    initialMinimum: 10000,
+    initialMinimum: 1000000000,
+    minimumThreshold: 1000000000,
     targetDensity: 1 / 2,
     adjustmentSpeed: 1 / 2,
   },
