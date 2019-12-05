@@ -1,4 +1,5 @@
 import { BaseCommand } from '../../base'
+import { printValueMapRecursive } from '../../utils/cli'
 import { Flags } from '../../utils/command'
 
 export default class Show extends BaseCommand {
@@ -15,33 +16,49 @@ export default class Show extends BaseCommand {
 
   async run() {
     const res = this.parse(Show)
-    const currentBlock = await this.web3.eth.getBlockNumber()
-    console.log('address: ' + res.flags.address)
-    console.log('currentBlock: ' + currentBlock)
-    const epochRewards = await this.kit._web3Contracts.getEpochRewards()
-    const validators = await this.kit._web3Contracts.getValidators()
-    const election = await this.kit._web3Contracts.getElection()
-    const fromBlock = currentBlock - 10000
+    //voterRewards = await this.getValidatorRewards(1, res.flags.address)
+    const validatorRewards = await this.getValidatorRewards(1, res.flags.address)
+    printValueMapRecursive(validatorRewards)
+  }
 
-    const epochRewardsEvents = await epochRewards.getPastEvents(
-      'allevents', // 'TargetVotingYieldUpdated',
-      { fromBlock }
+  async getVoterRewards(epochs = 1, address?: string) {
+    const election = await this.kit._web3Contracts.getElection()
+    const epochSize = 1000 // await election.getEpochSize()
+    const currentBlock = await this.web3.eth.getBlockNumber()
+    const lastEpochBlock = Math.floor(currentBlock / epochSize) * epochSize
+    const fromBlock: number = lastEpochBlock - (epochSize - 1) * epochs
+    var epochRewardsEvents = await election.getPastEvents('EpochRewardsDistributedToVoters', {
+      fromBlock,
+      toBlock: lastEpochBlock,
+    })
+    console.log(epochs + ' ' + address)
+    //if (address) epochRewardsEvents = epochRewardsEvents.filter((e) => e.address == address)
+    console.log(epochRewardsEvents[0])
+    return epochRewardsEvents
+  }
+
+  async getValidatorRewards(epochs = 1, address?: string) {
+    const validatorsContract = await this.kit._web3Contracts.getValidators()
+    const validators = await this.kit.contracts.getValidators()
+    const epochSize = 1000 // await validators.getEpochSize()
+    const currentBlock = await this.web3.eth.getBlockNumber()
+    const lastEpochBlock = Math.floor(currentBlock / epochSize) * epochSize
+    const fromBlock: number = lastEpochBlock - (epochSize - 1) * epochs
+    var validatorRewardsEvents = await validatorsContract.getPastEvents(
+      'ValidatorEpochPaymentDistributed',
+      { fromBlock, toBlock: lastEpochBlock }
     )
-    const validatorRewardsEvents = await validators.getPastEvents(
-      'allevents', // 'ValidatorEpochPaymentDistributed',
-      { fromBlock }
-    )
-    const electionRewardsEvents = await election.getPastEvents(
-      'allevents', // 'EpochRewardsDistributedToVoters',
-      { fromBlock }
-    )
-    console.log(epochRewardsEvents)
-    console.log(validatorRewardsEvents)
-    console.log(electionRewardsEvents)
-    /* address: undefined
-       currentBlock: 54200
-       []
-       []
-       [] */
+    if (address) {
+      const lowerAddress = address.toLowerCase()
+      validatorRewardsEvents = validatorRewardsEvents.filter(
+        (e) => e.returnValues.validator.toLowerCase() == lowerAddress
+      )
+    }
+    return validatorRewardsEvents.map((e) => ({
+      validator: e.returnValues.validator,
+      validatorPayment: e.returnValues.validatorPayment,
+      group: e.returnValues.group,
+      groupPayment: e.returnValues.groupPayment,
+    }))
   }
 }
