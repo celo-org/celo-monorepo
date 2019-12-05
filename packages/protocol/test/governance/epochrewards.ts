@@ -91,6 +91,7 @@ contract('EpochRewards', (accounts: string[]) => {
 
     await epochRewards.initialize(
       registry.address,
+      accounts[0],
       targetVotingYieldParams.initial,
       targetVotingYieldParams.max,
       targetVotingYieldParams.adjustmentFactor,
@@ -130,6 +131,7 @@ contract('EpochRewards', (accounts: string[]) => {
       await assertRevert(
         epochRewards.initialize(
           registry.address,
+          accounts[0],
           targetVotingYieldParams.initial,
           targetVotingYieldParams.max,
           targetVotingYieldParams.adjustmentFactor,
@@ -576,6 +578,21 @@ contract('EpochRewards', (accounts: string[]) => {
           .times(expectedMultiplier)
         assertEqualBN((await epochRewards.calculateTargetEpochPaymentAndRewards())[1], expected)
       })
+    })
+  })
+
+  describe('when the contract is frozen', () => {
+    beforeEach(async () => {
+      await epochRewards.freeze()
+    })
+
+    it('should make calculateTargetEpochPaymentAndRewards return zeroes', async () => {
+      const [
+        validatorPayment,
+        voterRewards,
+      ] = await epochRewards.calculateTargetEpochPaymentAndRewards()
+      assertEqualBN(validatorPayment, 0)
+      assertEqualBN(voterRewards, 0)
     })
   })
 })
