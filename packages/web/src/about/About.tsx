@@ -13,9 +13,10 @@ import BookLayout from 'src/layout/BookLayout'
 import { Cell, GridRow, Spans } from 'src/layout/GridRow'
 import { ScreenProps, ScreenSizes, withScreenSize } from 'src/layout/ScreenSize'
 import LogoLightBg from 'src/logos/LogoLightBg'
+import Button, { BTN } from 'src/shared/Button.3'
+import InlineAnchor from 'src/shared/InlineAnchor'
 import menuItems from 'src/shared/menu-items'
 import { fonts, standardStyles, textStyles } from 'src/styles'
-import Button, { BTN } from 'src/shared/Button.3'
 
 interface Props {
   randomSeed: number
@@ -54,8 +55,9 @@ export class About extends React.Component<Props & I18nProps> {
           <BookLayout label={t('MeaningTile')} endBlock={true}>
             <H1 style={standardStyles.elementalMarginBottom}>
               <Trans
-                // @ts-ignore
-                t={t}
+                t={
+                  t // @ts-ignore
+                }
                 i18nKey={'MeaningText'}
                 values={{ phonetic: '/ˈtselo/' }}
                 components={[
@@ -69,16 +71,26 @@ export class About extends React.Component<Props & I18nProps> {
           </BookLayout>
           <Image source={team} style={styles.teamImage} resizeMode={'cover'} />
           <BookLayout label={t('ValuesTitle')}>
-            <H1>{t('ValuesText')}</H1>
-            <Text style={[fonts.p, standardStyles.elementalMargin]}>
-              {t('ValuesCopy', { celoCLabs: 'Celo\u00a0– C\u00a0Labs' })}
+            <Text style={[fonts.p, standardStyles.elementalMarginBottom]}>
+              <Trans
+                i18nKey={'ValuesCopy'}
+                values={{ celoCLabs: 'Celo\u00a0– C\u00a0Labs' }}
+                components={[<Strong key="0">M</Strong>]}
+              />
             </Text>
           </BookLayout>
           <CeloValues />
           <BeautifulQuote />
           <BookLayout label={t('SacredEconTitle')} startBlock={true}>
             <Text style={[fonts.p, standardStyles.blockMarginBottomTablet]}>
-              {t('SacredEconText')}
+              <Trans
+                i18nKey="SacredEconText"
+                components={[
+                  <InlineAnchor key="sacred" href="http://sacred-economics.com/film/">
+                    Sacred Econ
+                  </InlineAnchor>,
+                ]}
+              />
             </Text>
             <Button
               kind={BTN.PRIMARY}
@@ -139,6 +151,10 @@ const BeautifulQuote = withScreenSize(
     )
   })
 )
+
+function Strong({ children }) {
+  return <Text style={textStyles.heavy}>{children}</Text>
+}
 
 const styles = StyleSheet.create({
   sacredEconImage: { width: '100%', height: 510, padding: 15 },
