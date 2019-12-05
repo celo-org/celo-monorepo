@@ -23,21 +23,14 @@ import { CURRENCY_ENUM as Token } from 'src/geth/consts'
 import i18n, { Namespaces } from 'src/i18n'
 import { navigate, navigateBack } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
+import { headerWithCancelButton } from 'src/navigator/Headers'
 import { RootState } from 'src/redux/reducers'
 import { isAppConnected } from 'src/redux/selectors'
 import DisconnectBanner from 'src/shared/DisconnectBanner'
-import {
-  getNewDollarBalance,
-  getNewGoldBalance,
-  getRateForMakerToken,
-  getTakerAmount,
-} from 'src/utils/currencyExchange'
+import { getRateForMakerToken, getTakerAmount } from 'src/utils/currencyExchange'
 import { getMoneyDisplayValue } from 'src/utils/formatting'
-import { headerWithCancelButton } from 'src/navigator/Headers'
 
 interface StateProps {
-  dollarBalance: string | null
-  goldBalance: string | null
   exchangeRatePair: ExchangeRatePair | null
   fee: string
   appConnected: boolean
@@ -56,8 +49,6 @@ interface NavProps {
 type Props = StateProps & WithNamespaces & DispatchProps & NavigationInjectedProps
 
 const mapStateToProps = (state: RootState): StateProps => ({
-  goldBalance: state.goldToken.balance,
-  dollarBalance: state.stableToken.balance,
   exchangeRatePair: state.exchange.exchangeRatePair,
   fee: getMoneyDisplayValue(0),
   appConnected: isAppConnected(state),
@@ -113,7 +104,7 @@ class ExchangeReview extends React.Component<Props> {
   }
 
   render() {
-    const { exchangeRatePair, fee, t, appConnected, dollarBalance, goldBalance } = this.props
+    const { exchangeRatePair, fee, t, appConnected } = this.props
     const makerAmount = new BigNumber(40)
     const makerToken = Token.DOLLAR
     const rate = getRateForMakerToken(exchangeRatePair, makerToken)
@@ -150,22 +141,24 @@ class ExchangeReview extends React.Component<Props> {
                 justifyContent: 'flex-start',
               }}
             >
-              <View style={[styles.rowContainer, styles.goldInputRow]}>
+              <View style={[styles.rowContainer, styles.amountRow]}>
                 <Text style={[fontStyles.body, styles.exchangeBodyText]}>Amount (EUR)</Text>
                 <Text style={[fontStyles.body, styles.currencyAmountText]}>{'$20.00'}</Text>
               </View>
               <View style={styles.line} />
-              <View style={[styles.rowContainer]}>
+              <View style={[styles.rowContainer, styles.feeRowContainer]}>
                 <Text style={[fontStyles.body, styles.exchangeBodyText]}>Subtotal (@ rate 10)</Text>
                 <Text style={[fontStyles.body, styles.exchangeBodyText]}>{'$20.00'}</Text>
               </View>
-              <View style={[styles.rowContainer]}>
+              <View style={[styles.rowContainer, styles.feeRowContainer]}>
                 <Text style={[fontStyles.body, styles.exchangeBodyText]}>Exchange Fee</Text>
-                <Text style={[fontStyles.body, styles.exchangeBodyText]}>{'$20.00'}</Text>
+                <Text style={[fontStyles.body, styles.exchangeBodyText]}>{fee}</Text>
               </View>
-              <View style={[styles.rowContainer]}>
+              <View style={[styles.rowContainer, styles.feeRowContainer]}>
                 <Text style={[fontStyles.body, styles.exchangeBodyText]}>Security Fee</Text>
-                <Text style={[fontStyles.body, styles.exchangeBodyText]}>{'$20.00'}</Text>
+                <Text style={[fontStyles.body, styles.exchangeBodyText]}>
+                  {fee /*TODO(anna) don't hardcode fee*/}
+                </Text>
               </View>
               <View style={styles.line} />
               <View style={styles.rowContainer}>
@@ -200,16 +193,14 @@ const styles = StyleSheet.create({
   line: {
     borderBottomColor: colors.darkLightest,
     borderBottomWidth: 1,
-    marginBottom: 16,
+    marginVertical: 10,
   },
   exchangeBodyText: { fontSize: 15 },
   currencyAmountText: { fontSize: 24, lineHeight: 39, color: colors.celoGreen },
 
   rowContainer: { flexDirection: 'row', flex: 1, justifyContent: 'space-between' },
-  goldInputRow: {
-    marginTop: 38,
-    alignItems: 'center',
-  },
+  feeRowContainer: { marginVertical: 5 },
+  amountRow: { marginTop: 30 },
 })
 
 export default componentWithAnalytics(
