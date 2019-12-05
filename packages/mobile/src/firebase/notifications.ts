@@ -6,7 +6,7 @@ import {
   NotificationTypes,
   PaymentRequest,
   TransferNotificationData,
-} from 'src/account'
+} from 'src/account/types'
 import { showMessage } from 'src/alert/actions'
 import { resolveCurrency } from 'src/geth/consts'
 import { refreshAllBalances } from 'src/home/actions'

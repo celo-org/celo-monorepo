@@ -75,8 +75,7 @@
   "congratsVerified": "Congratulations you are now verified!",
   "notification": {
     "title": "Verify Your Phone",
-    "body":
-      "Verifying your phone number allows you to send and receive value with contacts in your phone.",
+    "body": "Verifying allows you to send and receive with your phone contacts.",
     "cta": "Get Verified"
   }
 }

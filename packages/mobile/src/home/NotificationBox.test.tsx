@@ -96,7 +96,7 @@ describe('NotificationBox', () => {
         <NotificationBox />
       </Provider>
     )
-    expect(getByText('todo')).toBeTruthy()
+    expect(getByText('incomingPaymentRequest')).toBeTruthy()
   })
 
   it('renders verification reminder when not verified', () => {

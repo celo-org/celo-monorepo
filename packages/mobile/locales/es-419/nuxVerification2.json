@@ -77,8 +77,7 @@
   "congratsVerified": "¡Felicitaciones se ha verificado tu suario!",
   "notification": {
     "title": "Verificar el Teléfono",
-    "body":
-      "Verificar su número de teléfono le permite enviar y recibir valor con los contactos en su teléfono.",
+    "body": "La verificación le permite enviar y recibir con sus contactos telefónicos.",
     "cta": "Verifícate"
   }
 }
