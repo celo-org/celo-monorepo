@@ -473,7 +473,7 @@ export const transferCeloGold = async (
   toAddress: string,
   amount: BigNumber,
   txOptions: {
-    gasCurrency?: string
+    feeCurrency?: string
   } = {}
 ) => {
   const kitGoldToken = await kit.contracts.getGoldToken()
@@ -489,7 +489,7 @@ export const transferCeloDollars = async (
   toAddress: string,
   amount: BigNumber,
   txOptions: {
-    gasCurrency?: string
+    feeCurrency?: string
   } = {}
 ) => {
   const kitStableToken = await kit.contracts.getStableToken()
@@ -515,7 +515,7 @@ export const simulateClient = async (
     loadTestID: index,
     sender: senderAddress,
     recipient: recipientAddress,
-    gasCurrency: '',
+    feeCurrency: '',
     txHash: '',
   }
 
@@ -528,12 +528,12 @@ export const simulateClient = async (
     baseLogMessage.tokenName = transferGold ? 'cGLD' : 'cUSD'
 
     // randomly choose which gas currency to use
-    const gasCurrencyGold = Boolean(Math.round(Math.random()))
+    const feeCurrencyGold = Boolean(Math.round(Math.random()))
 
-    let gasCurrency
-    if (!gasCurrencyGold) {
+    let feeCurrency
+    if (!feeCurrencyGold) {
       try {
-        gasCurrency = await kit.registry.addressFor(CeloContract.StableToken)
+        feeCurrency = await kit.registry.addressFor(CeloContract.StableToken)
       } catch (error) {
         tracerLog({
           tag: LOG_TAG_CONTRACT_ADDRESS_ERROR,
@@ -542,12 +542,12 @@ export const simulateClient = async (
         })
       }
     }
-    baseLogMessage.gasCurrency = gasCurrency || ''
+    baseLogMessage.feeCurrency = feeCurrency || ''
 
     // We purposely do not use await syntax so we sleep after sending the transaction,
     // not after processing a transaction's result
     transferFn(kit, senderAddress, recipientAddress, LOAD_TEST_TRANSFER_WEI, {
-      gasCurrency,
+      feeCurrency,
     })
       .then(async (txResult: TransactionResult) => {
         await onLoadTestTxResult(
