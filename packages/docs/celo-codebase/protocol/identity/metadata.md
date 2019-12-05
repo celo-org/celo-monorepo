@@ -17,17 +17,17 @@ On the `Accounts` smart contract, any account can register a URL under which the
 
 ContractKit currently supports the following types of claim:
 
-* **Name Claim** - An account can claim a human-readable name. This claim is not verifiable.
+- **Name Claim** - An account can claim a human-readable name. This claim is not verifiable.
 
-* **Attestation Service URL Claim** - For the [lightweight identity layer](../), validators can make a claim under which their Attestation Service is reachable to provide attestations. This claim is not verifiable.
+- **Attestation Service URL Claim** - For the [lightweight identity layer](../), validators can make a claim under which their Attestation Service is reachable to provide attestations. This claim is not verifiable.
 
-* **Keybase User Claim** - Accounts can make claims on [Keybase](https://keybase.io) usernames. This claim is verifiable by signing a message with the account and hosting it on the publicly accessible path of the Keybase file system.
+- **Keybase User Claim** - Accounts can make claims on [Keybase](https://keybase.io) usernames. This claim is verifiable by signing a message with the account and hosting it on the publicly accessible path of the Keybase file system.
 
 In the future ContractKit may support other types of claim, including:
 
-* **Twitter User Claim** - Accounts can make claims on [Twitter](https://twitter.com/) usernames. This claim is verifiable by signing a message with the account and posting it as a tweet. Any client can verify the claim with a reference to the tweet in the claim.
+- **Twitter User Claim** - Accounts can make claims on [Twitter](https://twitter.com/) usernames. This claim is verifiable by signing a message with the account and posting it as a tweet. Any client can verify the claim with a reference to the tweet in the claim.
 
-* **Domain Claim** - Accounts can make claims on domain names. This claim is verifiable by signing a message with the account and embedding it in a [TXT record](https://en.wikipedia.org/wiki/TXT_record).
+- **Domain Claim** - Accounts can make claims on domain names. This claim is verifiable by signing a message with the account and embedding it in a [TXT record](https://en.wikipedia.org/wiki/TXT_record).
 
 ## Handling Metadata
 
