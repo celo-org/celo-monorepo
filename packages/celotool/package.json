@@ -34,6 +34,7 @@
     "yargs": "14.0.0"
   },
   "devDependencies": {
+    "@types/bunyan": "1.8.4",
     "@types/dotenv": "^4.0.3",
     "@types/node-fetch": "^2.1.2",
     "@types/prompts": "^1.1.1",
