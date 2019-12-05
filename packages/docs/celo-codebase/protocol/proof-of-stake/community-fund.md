@@ -8,7 +8,7 @@ The Community Fund receives assets from three sources:
 
 - The Community Fund is the default destination for slashed assets.
 
-- The Community Fund also receives the 'base' portion of [transaction fees](transactions/gas-pricing.md).
+- The Community Fund also receives the 'base' portion of [transaction fees](../transactions/gas-pricing.md).
 
 ## <a name="bolster-reserve"></a>Bolstering the Reserve
 

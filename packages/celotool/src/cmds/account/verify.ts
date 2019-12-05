@@ -29,7 +29,7 @@ export const builder = (argv: yargs.Argv) => {
   return argv
     .option('phone', {
       type: 'string',
-      description: 'Phone number to attest to,',
+      description: `Phone number to attest to. Should be an E.164 number matching formatted like +451234567890.`,
       demand: 'Please specify phone number to attest to',
     })
     .option('num', {

@@ -14,12 +14,15 @@ export default class Unlock extends BaseCommand {
 
   static examples = ['unlock --account 0x5409ed021d9299bf6814279a6a1411a7e866a631']
 
+  requireSynced = false
+
   async run() {
     const res = this.parse(Unlock)
     // Unlock till geth exits
     // Source: https://github.com/ethereum/go-ethereum/wiki/Management-APIs#personal_unlockaccount
     const unlockDurationInMs = 0
-    const password = res.flags.password || (await cli.prompt('Password', { type: 'hide' }))
+    const password =
+      res.flags.password || (await cli.prompt('Password', { type: 'hide', required: false }))
 
     this.web3.eth.personal.unlockAccount(res.flags.account, password, unlockDurationInMs)
   }
