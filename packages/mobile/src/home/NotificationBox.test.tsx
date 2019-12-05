@@ -19,7 +19,7 @@ const storeDataNotificationsEnabled = {
     dismissedInviteFriends: false,
     dismissedGetVerified: false,
     accountCreationTime: EXPIRED_BACKUP_TIME,
-    paymentRequests: mockPaymentRequests,
+    incomingPaymentRequests: mockPaymentRequests,
   },
 }
 
@@ -31,7 +31,7 @@ const storeDataNotificationsDisabled = {
     dismissedInviteFriends: true,
     dismissedGetVerified: true,
     accountCreationTime: RECENT_BACKUP_TIME,
-    paymentRequests: [],
+    incomingPaymentRequests: [],
   },
 }
 
@@ -88,7 +88,7 @@ describe('NotificationBox', () => {
       ...storeDataNotificationsDisabled,
       account: {
         ...storeDataNotificationsDisabled.account,
-        paymentRequests: mockPaymentRequests,
+        incomingPaymentRequests: mockPaymentRequests,
       },
     })
     const { getByText } = render(
@@ -96,7 +96,7 @@ describe('NotificationBox', () => {
         <NotificationBox />
       </Provider>
     )
-    expect(getByText('paymentRequest')).toBeTruthy()
+    expect(getByText('todo')).toBeTruthy()
   })
 
   it('renders verification reminder when not verified', () => {

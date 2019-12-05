@@ -17,7 +17,8 @@ export enum Actions {
   SET_BACKUP_DELAYED_ACTION = 'ACCOUNT/SET_BACKUP_DELAYED_ACTION',
   SET_SOCIAL_BACKUP_COMPLETED_ACTION = 'ACCOUNT/SET_SOCIAL_BACKUP_COMPLETED_ACTION',
   RESET_BACKUP_STATE = 'ACCOUNT/RESET_BACKUP_STATE',
-  UPDATE_PAYMENT_REQUESTS = 'ACCOUNT/UPDATE_PAYMENT_REQUESTS',
+  UPDATE_INCOMING_PAYMENT_REQUESTS = 'ACCOUNT/UPDATE_INCOMING_PAYMENT_REQUESTS',
+  UPDATE_OUTGOING_PAYMENT_REQUESTS = 'ACCOUNT/UPDATE_OUTGOING_PAYMENT_REQUESTS',
   DISMISS_EARN_REWARDS = 'ACCOUNT/DISMISS_EARN_REWARDS',
   DISMISS_INVITE_FRIENDS = 'ACCOUNT/DISMISS_INVITE_FRIENDS',
   DISMISS_GET_VERIFIED = 'ACCOUNT/DISMISS_GET_VERIFIED',
@@ -78,8 +79,13 @@ export interface ResetBackupState {
   type: Actions.RESET_BACKUP_STATE
 }
 
-export interface UpdatePaymentRequestsAction {
-  type: Actions.UPDATE_PAYMENT_REQUESTS
+export interface UpdateIncomingPaymentRequestsAction {
+  type: Actions.UPDATE_INCOMING_PAYMENT_REQUESTS
+  paymentRequests: PaymentRequest[]
+}
+
+export interface UpdateOutgoingPaymentRequestsAction {
+  type: Actions.UPDATE_OUTGOING_PAYMENT_REQUESTS
   paymentRequests: PaymentRequest[]
 }
 
@@ -114,10 +120,11 @@ export type ActionTypes =
   | SetBackupDelayedAction
   | SetSocialBackupCompletedAction
   | ResetBackupState
-  | UpdatePaymentRequestsAction
   | DismissEarnRewardsAction
   | DismissInviteFriendsAction
   | DismissGetVerifiedAction
+  | UpdateIncomingPaymentRequestsAction
+  | UpdateOutgoingPaymentRequestsAction
   | SetContactDetailsAction
 
 export function setName(name: string): SetNameAction {
@@ -179,10 +186,17 @@ export const resetBackupState = (): ResetBackupState => ({
   type: Actions.RESET_BACKUP_STATE,
 })
 
-export const updatePaymentRequests = (
+export const updateIncomingPaymentRequests = (
   paymentRequests: PaymentRequest[]
-): UpdatePaymentRequestsAction => ({
-  type: Actions.UPDATE_PAYMENT_REQUESTS,
+): UpdateIncomingPaymentRequestsAction => ({
+  type: Actions.UPDATE_INCOMING_PAYMENT_REQUESTS,
+  paymentRequests,
+})
+
+export const updateOutgoingPaymentRequests = (
+  paymentRequests: PaymentRequest[]
+): UpdateOutgoingPaymentRequestsAction => ({
+  type: Actions.UPDATE_OUTGOING_PAYMENT_REQUESTS,
   paymentRequests,
 })
 
