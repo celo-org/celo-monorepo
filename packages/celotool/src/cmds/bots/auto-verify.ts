@@ -120,7 +120,7 @@ export const handler = async function autoVerify(argv: AutoVerifyArgv) {
         clientAddress
       )
 
-      logger.info('Reveal to issuers')
+      logger.info({ attestationsToComplete }, 'Reveal to issuers')
       const possibleErrors = await requestAttestationsFromIssuers(
         attestationsToComplete,
         attestations,
