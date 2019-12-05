@@ -109,9 +109,9 @@ variable proxy_enodes {
   description = "Array list with the proxy enode address (without enode://)"
 }
 
-variable proxy_private_node_keys {
+variable proxy_private_keys {
   type        = list(string)
-  description = "Array with the Proxy node private keys"
+  description = "Array with the Proxy private keys"
 }
 
 variable bootnode_enode_address {

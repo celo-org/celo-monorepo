@@ -78,14 +78,24 @@ variable validator_count {
   description = "Number of proxys to create"
 }
 
-variable proxy_private_node_keys {
+variable proxy_private_keys {
   type        = list(string)
-  description = "Array with the Proxy node private keys"
+  description = "Array with the Proxy private keys"
 }
 
 variable validator_account_addresses {
   type        = list(string)
   description = "Array with the Validator etherbase account addresses"
+}
+
+variable validator_account_passwords {
+  type        = list(string)
+  description = "Array with the Validator etherbase account passwords"
+}
+
+variable validator_private_keys {
+  type        = list(string)
+  description = "Array with the Validator private keys"
 }
 
 variable bootnode_enode_address {

@@ -66,8 +66,10 @@ resource "google_compute_instance" "proxy" {
       network_id : var.network_id,
       rid : count.index,
       proxy_name : "${local.name_prefix}-${count.index}",
-      proxy_private_node_key : var.proxy_private_node_keys[count.index],
+      proxy_private_key : var.proxy_private_keys[count.index],
       validator_account_address : var.validator_account_addresses[count.index],
+      validator_account_password : var.validator_account_passwords[count.index],
+      validator_private_key : var.validator_private_keys[count.index],
       bootnode_enode_address : var.bootnode_enode_address,
       static_nodes_base64 : var.static_nodes_base64,
       reset_geth_data : var.reset_geth_data

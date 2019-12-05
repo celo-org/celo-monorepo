@@ -187,8 +187,10 @@ module "proxy" {
   validator_count                       = var.validator_count
   reset_geth_data                       = var.reset_geth_data
 
-  proxy_private_node_keys     = var.proxy_private_node_keys
+  proxy_private_keys     = var.proxy_private_keys
   validator_account_addresses = var.validator_account_addresses
+  validator_account_passwords = var.validator_account_passwords
+  validator_private_keys       = var.validator_private_keys
   bootnode_enode_address      = var.bootnode_enode_address
   static_nodes_base64         = base64encode(data.http.static-nodes.body)
 }

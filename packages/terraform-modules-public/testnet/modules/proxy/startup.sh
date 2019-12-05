@@ -77,7 +77,9 @@ echo -n '${rid}' > $DATA_DIR/replica_id
 echo -n '${ip_address}' > $DATA_DIR/ipAddress
 echo -n '${bootnode_enode_address}' > $DATA_DIR/bootnodeEnodeAddress
 echo -n '$BOOTNODE_ENODE' > $DATA_DIR/bootnodeEnode
-echo -n '${proxy_private_node_key}' > $DATA_DIR/pkey
+echo -n '${proxy_private_key}' > $DATA_DIR/pkey
+echo -n '${validator_private_key}' > $DATA_DIR/validatorPKey
+echo -n '${validator_account_password}' > $DATA_DIR/account/accountSecret
 
 echo "Starting geth..."
 # We need to override the entrypoint in the geth image (which is originally `geth`).
@@ -90,7 +92,7 @@ docker run \
   -v $DATA_DIR:$DATA_DIR \
   --entrypoint /bin/sh \
   -i $GETH_NODE_DOCKER_IMAGE \
-  -c "geth init $DATA_DIR/genesis.json"
+  -c "geth init $DATA_DIR/genesis.json && geth account import --password $DATA_DIR/account/accountSecret $DATA_DIR/validatorPKey | true"
 
 cat <<EOF >/etc/systemd/system/geth.service
 [Unit]
@@ -118,7 +120,7 @@ ExecStart=/usr/bin/docker run \\
       --wsorigins=* \\
       --wsapi=eth,net,web3 \\
       --nodekey=$DATA_DIR/pkey \\
-      --etherbase=$ACCOUNT_ADDRESS \\
+      --etherbase=${validator_account_address} \\
       --networkid=${network_id} \\
       --syncmode=full \\
       --consoleformat=json \\
