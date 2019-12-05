@@ -1,3 +1,4 @@
+import BigNumber from 'bignumber.js'
 import gql from 'graphql-tag'
 import { call, put, select, spawn, take, takeLatest } from 'redux-saga/effects'
 import { apolloClient } from 'src/apollo'
@@ -37,11 +38,11 @@ export async function fetchExchangeRate(symbol: string): Promise<number> {
   }
 
   const { rate } = currencyConversion
-  if (typeof rate !== 'number') {
+  if (typeof rate !== 'number' && typeof rate !== 'string') {
     throw new Error(`Invalid response data ${data}`)
   }
 
-  return rate
+  return new BigNumber(rate).toNumber()
 }
 
 export function* fetchLocalCurrencyRateSaga() {
