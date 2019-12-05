@@ -26,7 +26,17 @@ import {
   uploadStaticNodesToGoogleStorage,
 } from './testnet-utils'
 
-const secretsBucketName = 'celo-testnet-secrets-prod'
+// Keys = gcloud project name
+const projectConfig = {
+  'celo-testnet': {
+    secretsBucketName: 'celo-testnet-secrets',
+    stateBucketName: 'celo_tf_state',
+  },
+  'celo-testnet-production': {
+    secretsBucketName: 'celo-testnet-secrets-prod',
+    stateBucketName: 'celo_tf_state_prod',
+  },
+}
 
 const testnetTerraformModule = 'testnet'
 const testnetNetworkTerraformModule = 'testnet-network'
@@ -89,7 +99,11 @@ const testnetResourcesToReset = [
   'module.tx_node_lb.google_compute_instance_group.internal',
 ]
 
-export async function deploy(celoEnv: string, onConfirmFailed?: () => Promise<void>) {
+export async function deploy(
+  celoEnv: string,
+  generateSecrets: boolean = true,
+  onConfirmFailed?: () => Promise<void>
+) {
   // If we are not using the default network, we want to create/upgrade our network
   if (!useDefaultNetwork()) {
     console.info('First deploying the testnet VPC network')
@@ -100,8 +114,10 @@ export async function deploy(celoEnv: string, onConfirmFailed?: () => Promise<vo
 
   const testnetVars: TerraformVars = getTestnetVars(celoEnv)
   await deployModule(celoEnv, testnetTerraformModule, testnetVars, onConfirmFailed, async () => {
-    // console.info('Generating and uploading secrets env files to Google Storage...')
-    // await generateAndUploadSecrets(celoEnv)
+    if (generateSecrets) {
+      console.info('Generating and uploading secrets env files to Google Storage...')
+      await generateAndUploadSecrets(celoEnv)
+    }
   })
 
   await uploadGenesisBlockToGoogleStorage(celoEnv)
@@ -240,6 +256,7 @@ export async function getInternalTxNodeIPs(celoEnv: string) {
 
 function getTerraformBackendConfigVars(celoEnv: string, terraformModule: string) {
   return {
+    bucket: stateBucketName(),
     prefix: `${celoEnv}/${terraformModule}`,
   }
 }
@@ -249,10 +266,12 @@ function getTestnetVars(celoEnv: string) {
   const domainName = fetchEnv(envVar.CLUSTER_DOMAIN_NAME)
   return {
     ...getEnvVarValues(testnetEnvVars),
+    // Cloud DNS for our domains only lives in celo-testnet
+    dns_gcloud_project: 'celo-testnet',
     dns_zone_name: dnsZoneName(domainName),
     ethstats_host: `${celoEnv}-ethstats.${domainName}.org`,
     forno_host: `${celoEnv}-forno.${domainName}.org`,
-    gcloud_secrets_bucket: secretsBucketName,
+    gcloud_secrets_bucket: secretsBucketName(),
     gcloud_secrets_base_path: secretsBasePath(celoEnv),
     // only able to view objects for accessing secrets & modify ssl certs for forno setup
     gcloud_vm_service_account_email: `terraform-testnet@${fetchEnv(
@@ -311,7 +330,7 @@ function uploadSecrets(celoEnv: string, secrets: string, resourceName: string) {
   const cloudStorageFileName = `${secretsBasePath(celoEnv)}/.env.${resourceName}`
   return uploadFileToGoogleStorage(
     localTmpFilePath,
-    secretsBucketName,
+    secretsBucketName(),
     cloudStorageFileName,
     false,
     'text/plain'
@@ -368,6 +387,25 @@ function useDefaultNetwork() {
 
 export function networkName(celoEnv: string) {
   return useDefaultNetwork() ? 'default' : `${celoEnv}-network`
+}
+
+function secretsBucketName() {
+  const config = configForProject()
+  return config.secretsBucketName
+}
+
+function stateBucketName() {
+  const config = configForProject()
+  return config.stateBucketName
+}
+
+function configForProject() {
+  const project = fetchEnv(envVar.TESTNET_PROJECT_NAME)
+  if (!projectConfig.hasOwnProperty(project)) {
+    throw new Error(`No config for project ${project}`)
+  }
+  // @ts-ignore - we check above to see if the property exists
+  return projectConfig[project]
 }
 
 // name of the DNS zone in Google Cloud for a particular domain

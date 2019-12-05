@@ -30,13 +30,13 @@ data "terraform_remote_state" "state" {
 locals {
   target_tag_bootnode = "${var.celo_env}-bootnode"
   # any geth node (tx nodes & validators)
-  target_tag_node      = "${var.celo_env}-node"
+  target_tag_node = "${var.celo_env}-node"
 
   target_tag_proxy     = "${var.celo_env}-proxy"
   target_tag_tx_node   = "${var.celo_env}-tx-node"
   target_tag_validator = "${var.celo_env}-validator"
 
-  target_tag_ssl       = "${var.celo_env}-external-ssl"
+  target_tag_ssl = "${var.celo_env}-external-ssl"
 
   target_tags_all = [
     local.target_tag_bootnode,
@@ -158,6 +158,7 @@ module "tx_node_lb" {
   source = "./modules/tx-node-load-balancer"
   # variables
   celo_env                        = var.celo_env
+  dns_gcloud_project              = var.dns_gcloud_project
   dns_zone_name                   = var.dns_zone_name
   forno_host                      = var.forno_host
   gcloud_credentials_path         = var.gcloud_credentials_path
