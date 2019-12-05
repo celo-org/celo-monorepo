@@ -473,10 +473,7 @@ export const transferCeloGold = async (
   toAddress: string,
   amount: BigNumber,
   txOptions: {
-    gas?: number
-    gasPrice?: string
     gasCurrency?: string
-    gasFeeRecipient?: string
   } = {}
 ) => {
   const kitGoldToken = await kit.contracts.getGoldToken()
@@ -492,10 +489,7 @@ export const transferCeloDollars = async (
   toAddress: string,
   amount: BigNumber,
   txOptions: {
-    gas?: number
-    gasPrice?: string
     gasCurrency?: string
-    gasFeeRecipient?: string
   } = {}
 ) => {
   const kitStableToken = await kit.contracts.getStableToken()
