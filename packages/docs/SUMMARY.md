@@ -5,11 +5,12 @@
 
 ## Getting Started
 
+- [Alfajores Testnet](getting-started/alfajores-testnet.md)
+  - [Using the Mobile Wallet](getting-started/using-the-mobile-wallet.md)
+  - [Getting an Account and Funds](getting-started/faucet.md)
 - [Baklava Testnet](getting-started/baklava-testnet.md)
-- [Using the Mobile Wallet](getting-started/using-the-mobile-wallet.md)
-- [Getting an Account and Funds](getting-started/faucet.md)
-- [Running a Full Node](getting-started/running-a-full-node.md)
-- [Running a Validator](getting-started/running-a-validator.md)
+  - [Running a Full Node](getting-started/running-a-full-node.md)
+  - [Running a Validator](getting-started/running-a-validator.md)
 - [Glossary](getting-started/glossary.md)
 
 ## Celo Codebase
@@ -19,14 +20,16 @@
     - [Validator Set Differences](celo-codebase/protocol/consensus/validator-set-differences.md)
     - [Locating Validators](celo-codebase/protocol/consensus/locating-validators.md)
     - [Ultralight Sync](celo-codebase/protocol/consensus/ultralight-sync.md)
-  - [Proof-of-Stake](celo-codebase/protocol/proof-of-stake/README.md)
-    - [Locked Gold](celo-codebase/protocol/proof-of-stake/locked-gold.md)
-    - [Electing Validators](celo-codebase/protocol/proof-of-stake/electing-validators.md)
-    - [Becoming a Validator](celo-codebase/protocol/proof-of-stake/becoming-a-validator.md)
-    - [Creating and Managing Validator Groups](celo-codebase/protocol/proof-of-stake/creating-and-managing-validator-groups.md)
+  - [Proof of Stake](celo-codebase/protocol/proof-of-stake/README.md)
+    - [Validator Groups](celo-codebase/protocol/proof-of-stake/validator-groups.md)
+    - [Locked Gold and Voting](celo-codebase/protocol/proof-of-stake/locked-gold.md)
+    - [Validator Elections](celo-codebase/protocol/proof-of-stake/validator-elections.md)
     - [Epoch Rewards](celo-codebase/protocol/proof-of-stake/epoch-rewards.md)
-    - [Slashing](celo-codebase/protocol/proof-of-stake/slashing.md)
-    - [Full Node Incentives](celo-codebase/protocol/proof-of-stake/full-node-incentives.md)
+      - [Rewards for Validators and Validator Groups](celo-codebase/protocol/proof-of-stake/validator-rewards.md)
+      - [Rewards for Locked Gold Holders](celo-codebase/protocol/proof-of-stake/locked-gold-rewards.md)
+      - [Community Fund](celo-codebase/protocol/proof-of-stake/community-fund.md)
+      - [Carbon Offsetting Fund](celo-codebase/protocol/proof-of-stake/carbon-offsetting-fund.md)
+    - [Penalties](celo-codebase/protocol/proof-of-stake/penalties.md)
   - [Governance](celo-codebase/protocol/governance.md)
   - [Transactions](celo-codebase/protocol/transactions/README.md)
     - [Native Currency](celo-codebase/protocol/transactions/native-currency.md)
@@ -36,6 +39,7 @@
     - [Encrypted Payment Comments](celo-codebase/protocol/transactions/tx-comment-encyption.md)
     - [Full Node Incentives](celo-codebase/protocol/transactions/full-node-incentives.md)
   - [Lightweight Identity](celo-codebase/protocol/identity/README.md)
+    - [Metadata](celo-codebase/protocol/identity/metadata.md)
     - [Randomness](celo-codebase/protocol/identity/randomness.md)
   - [Stability Mechanism](celo-codebase/protocol/stability/README.md)
     - [Stability Algorithm \(CP-DOTO\)](celo-codebase/protocol/stability/doto.md)
@@ -85,3 +89,4 @@
 ## Important Information
 
 - [Alfajores Testnet Disclaimer](important-information/alfajores-testnet-disclaimer.md)
+- [Baklava Testnet Disclaimer](important-information/baklava-testnet-disclaimer.md)

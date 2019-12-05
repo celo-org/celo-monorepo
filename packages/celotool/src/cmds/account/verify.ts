@@ -5,9 +5,13 @@ import {
   ActionableAttestation,
   AttestationsWrapper,
 } from '@celo/contractkit/lib/wrappers/Attestations'
-import { concurrentMap } from '@celo/utils/lib/async'
 import { base64ToHex } from '@celo/utils/lib/attestations'
 import prompts from 'prompts'
+import {
+  printAndIgnoreRequestErrors,
+  requestAttestationsFromIssuers,
+  requestMoreAttestations,
+} from 'src/lib/attestation'
 import { switchToClusterFromEnv } from 'src/lib/cluster'
 import yargs from 'yargs'
 
@@ -25,7 +29,7 @@ export const builder = (argv: yargs.Argv) => {
   return argv
     .option('phone', {
       type: 'string',
-      description: 'Phone number to attest to,',
+      description: `Phone number to attest to. Should be an E.164 number matching formatted like +451234567890.`,
       demand: 'Please specify phone number to attest to',
     })
     .option('num', {
@@ -82,8 +86,13 @@ async function verifyCmd(argv: VerifyArgv) {
   attestationsToComplete = await attestations.getActionableAttestations(argv.phone, account)
   // Find attestations we can verify
   console.info(`Requesting ${attestationsToComplete.length} attestations from issuers`)
-  await requestAttestationsFromIssuers(attestationsToComplete, attestations, argv.phone, account)
-
+  const possibleErrors = await requestAttestationsFromIssuers(
+    attestationsToComplete,
+    attestations,
+    argv.phone,
+    account
+  )
+  printAndIgnoreRequestErrors(possibleErrors)
   await promptForCodeAndVerify(attestations, argv.phone, account)
 }
 
@@ -99,46 +108,6 @@ export async function printCurrentCompletedAttestations(
       attestationStat.completed
     } attestations out of a total of ${attestationStat.total}`
   )
-}
-
-async function requestMoreAttestations(
-  attestations: AttestationsWrapper,
-  phoneNumber: string,
-  attestationsRequested: number,
-  account: string
-) {
-  await attestations
-    .approveAttestationFee(attestationsRequested)
-    .then((txo) => txo.sendAndWaitForReceipt())
-  await attestations
-    .request(phoneNumber, attestationsRequested)
-    .then((txo) => txo.sendAndWaitForReceipt())
-  await attestations.waitForSelectingIssuers(phoneNumber, account)
-  await attestations.selectIssuers(phoneNumber).then((txo) => txo.sendAndWaitForReceipt())
-}
-
-async function requestAttestationsFromIssuers(
-  attestationsToReveal: ActionableAttestation[],
-  attestations: AttestationsWrapper,
-  phoneNumber: string,
-  account: string
-) {
-  return concurrentMap(5, attestationsToReveal, async (attestation) => {
-    try {
-      const response = await attestations.revealPhoneNumberToIssuer(
-        phoneNumber,
-        account,
-        attestation.issuer,
-        attestation.attestationServiceURL
-      )
-      if (!response.ok) {
-        throw new Error(`Request failed with status ${response.status}: ${await response.text()}`)
-      }
-    } catch (error) {
-      console.error(`Error requesting attestations from issuer ${attestation.issuer}`)
-      console.error(error)
-    }
-  })
 }
 
 async function verifyCode(
