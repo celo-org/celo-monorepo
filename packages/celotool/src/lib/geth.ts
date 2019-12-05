@@ -726,10 +726,6 @@ export const runGethNodes = async ({
       validatorIndex++
     }
 
-    if (instance.privateKey) {
-      await importPrivateKey(gethBinaryPath, instance, verbose)
-    }
-
     if (instance.peers) {
       await addStaticPeers(getDatadir(instance), instance.peers)
     }
@@ -775,6 +771,10 @@ export async function initAndStartGeth(
   const genesisPath = path.join(instance.gethRunConfig.runPath, 'genesis.json')
   await init(gethBinaryPath, datadir, genesisPath, verbose)
 
+  if (instance.privateKey) {
+    await importPrivateKey(gethBinaryPath, instance, true)
+  }
+
   return startGeth(gethBinaryPath, instance, verbose)
 }
 
@@ -796,19 +796,28 @@ export async function importPrivateKey(
   verbose: boolean
 ) {
   const keyFile = path.join(getDatadir(instance), 'key.txt')
-  const genesisPath = path.join(instance.gethRunConfig.runPath, 'genesis.json')
-
-  await init(gethBinaryPath, getDatadir(instance), genesisPath, verbose)
 
   fs.writeFileSync(keyFile, instance.privateKey, { flag: 'a' })
 
-  console.info(`geth:${instance.name}: import account`)
+  if (verbose) {
+    console.info(`geth:${instance.name}: import account`)
+  }
 
-  await spawnCmdWithExitOnFailure(
-    gethBinaryPath,
-    ['account', 'import', '--datadir', getDatadir(instance), '--password', '/dev/null', keyFile],
-    { silent: true }
-  )
+  const args = [
+    'account',
+    'import',
+    '--datadir',
+    getDatadir(instance),
+    '--password',
+    '/dev/null',
+    keyFile,
+  ]
+
+  if (verbose) {
+    console.log(gethBinaryPath, ...args)
+  }
+
+  await spawnCmdWithExitOnFailure(gethBinaryPath, args, { silent: true })
 }
 
 export async function addStaticPeers(datadir: string, enodes: string[]) {
@@ -1057,14 +1066,19 @@ export function spawnWithLog(cmd: string, args: string[], logsFilepath: string, 
 }
 
 // Add validator 0 as a peer of each other validator.
-export async function connectValidatorPeers(gethConfig: GethRunConfig) {
+export async function connectValidatorPeers(gethConfig: GethRunConfig, verbose: boolean) {
   const admins = gethConfig.instances
     .filter(({ wsport, rpcport, validating }) => validating && (wsport || rpcport))
-    .map(
-      ({ wsport, rpcport }) =>
-        new Admin(`${wsport ? 'ws' : 'http'}://localhost:${wsport || rpcport}`)
-    )
+    .map(({ wsport, rpcport }) => {
+      const url = `${wsport ? 'ws' : 'http'}://127.0.0.1:${wsport || rpcport}`
+      if (verbose) {
+        console.log(url)
+      }
+      return new Admin(url)
+    })
+
   const enodes = await Promise.all(admins.map(async (admin) => (await admin.getNodeInfo()).enode))
+
   await Promise.all(
     admins.map(async (admin, i) => {
       await Promise.all(

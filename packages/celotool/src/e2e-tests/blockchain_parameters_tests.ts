@@ -1,4 +1,5 @@
-// tslint:disable-next-line: no-reference (Required to make this work w/ ts-node)
+// tslint:disable:no-console
+// tslint:disable-next-line:no-reference (Required to make this work w/ ts-node)
 /// <reference path="../../../contractkit/types/web3.d.ts" />
 
 import { ContractKit, newKit } from '@celo/contractkit'
@@ -8,6 +9,7 @@ import { GethRunConfig } from '../lib/geth'
 import { getHooks, sleep } from './utils'
 
 const TMP_PATH = '/tmp/e2e'
+const url = 'http://127.0.0.1:8545'
 
 describe('Blockchain parameters tests', function(this: any) {
   this.timeout(0)
@@ -18,7 +20,9 @@ describe('Blockchain parameters tests', function(this: any) {
   const gethConfig: GethRunConfig = {
     gethRepoPath: '../../../celo-blockchain',
     migrateTo: 18,
+    migrate: true,
     runPath: TMP_PATH,
+    keepData: false,
     networkId: 1101,
     network: 'local',
     instances: [],
@@ -47,7 +51,10 @@ describe('Blockchain parameters tests', function(this: any) {
 
     // TODO(mcortesi): magic sleep. without it unlockAccount sometimes fails
     await sleep(2)
-    kit = newKit('http://localhost:8545')
+
+    console.log(url)
+    kit = newKit(url)
+
     await kit.web3.eth.personal.unlockAccount(validatorAddress, '', 1000)
     parameters = await kit.contracts.getBlockchainParameters()
   }

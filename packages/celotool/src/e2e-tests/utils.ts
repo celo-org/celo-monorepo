@@ -1,5 +1,6 @@
 import BigNumber from 'bignumber.js'
 import { assert } from 'chai'
+import fs from 'fs'
 import _ from 'lodash'
 import { join as joinPath, resolve as resolvePath } from 'path'
 import { Admin } from 'web3-eth-admin'
@@ -28,6 +29,7 @@ import {
 import { ensure0x, spawnCmd, spawnCmdWithExitOnFailure } from '../lib/utils'
 
 const MonorepoRoot = resolvePath(joinPath(__dirname, '../..', '../..'))
+const verboseOutput = true
 
 export async function waitToFinishSyncing(web3: any) {
   while ((await web3.eth.isSyncing()) || (await web3.eth.getBlockNumber()) === 0) {
@@ -50,69 +52,6 @@ export function assertAlmostEqual(
     )
   }
 }
-
-// TODO(asa): Use the contract kit here instead
-export const erc20Abi = [
-  // balanceOf
-  {
-    constant: true,
-    inputs: [{ name: '_owner', type: 'address' }],
-    name: 'balanceOf',
-    outputs: [{ name: 'balance', type: 'uint256' }],
-    type: 'function',
-  },
-  {
-    constant: false,
-    inputs: [
-      {
-        name: 'to',
-        type: 'address',
-      },
-      {
-        name: 'value',
-        type: 'uint256',
-      },
-    ],
-    name: 'transfer',
-    outputs: [
-      {
-        name: '',
-        type: 'bool',
-      },
-    ],
-    payable: false,
-    stateMutability: 'nonpayable',
-    type: 'function',
-  },
-  {
-    constant: false,
-    inputs: [],
-    name: 'totalSupply',
-    outputs: [
-      {
-        name: '',
-        type: 'uint256',
-      },
-    ],
-    payable: false,
-    stateMutability: 'view',
-    type: 'function',
-  },
-  {
-    constant: true,
-    inputs: [],
-    name: 'firstBlockWithReward',
-    outputs: [
-      {
-        name: '',
-        type: 'uint256',
-      },
-    ],
-    payable: false,
-    stateMutability: 'view',
-    type: 'function',
-  },
-]
 
 export async function killBootnode() {
   console.info(`Killing the bootnode`)
@@ -183,7 +122,8 @@ export async function migrateContracts(
 export async function startBootnode(
   bootnodeBinaryPath: string,
   mnemonic: string,
-  gethConfig: GethRunConfig
+  gethConfig: GethRunConfig,
+  verbose: boolean
 ) {
   const bootnodePrivateKey = getPrivateKeysFor(AccountType.BOOTNODE, mnemonic, 1)[0]
   const bootnodeLog = joinPath(gethConfig.runPath, 'bootnode.log')
@@ -193,7 +133,7 @@ export async function startBootnode(
     `--networkid=${gethConfig.networkId}`,
   ]
 
-  spawnWithLog(bootnodeBinaryPath, bootnodeArgs, bootnodeLog, true)
+  spawnWithLog(bootnodeBinaryPath, bootnodeArgs, bootnodeLog, verbose)
   return getEnodeAddress(privateKeyToPublicKey(bootnodePrivateKey), '127.0.0.1', 30301)
 }
 
@@ -237,7 +177,6 @@ export function getContext(gethConfig: GethRunConfig) {
   const branch = argv.branch || 'master'
   const gethRepoPath = argv.localgeth || '/tmp/geth'
   const gethBinaryPath = `${gethRepoPath}/build/bin/geth`
-
   const bootnodeBinaryPath = `${gethRepoPath}/build/bin/bootnode`
 
   const before = async () => {
@@ -245,15 +184,22 @@ export function getContext(gethConfig: GethRunConfig) {
       await checkoutGethRepo(branch, gethRepoPath)
     }
     await buildGeth(gethRepoPath)
-    await resetDataDir(gethConfig.runPath)
+
+    if (!gethConfig.keepData && fs.existsSync(gethConfig.runPath)) {
+      await resetDataDir(gethConfig.runPath)
+    }
+
     await writeGenesis(validators, gethConfig)
 
     let bootnodeEnode: string = ''
+
     if (gethConfig.useBootnode) {
-      bootnodeEnode = await startBootnode(bootnodeBinaryPath, mnemonic, gethConfig)
+      bootnodeEnode = await startBootnode(bootnodeBinaryPath, mnemonic, gethConfig, verboseOutput)
     }
+
     let validatorIndex = 0
     let proxyIndex = 0
+
     for (const instance of gethConfig.instances) {
       // Non proxied validators and proxies should connect to the bootnode
       if ((instance.validating && !instance.isProxied) || instance.isProxy) {
@@ -299,9 +245,10 @@ export function getContext(gethConfig: GethRunConfig) {
 
     // Start all the instances
     for (const instance of gethConfig.instances) {
-      await initAndStartGeth(gethBinaryPath, instance, true)
+      await initAndStartGeth(gethBinaryPath, instance, verboseOutput)
     }
-    await connectValidatorPeers(gethConfig)
+
+    await connectValidatorPeers(gethConfig, true)
 
     // Give validators time to connect to each other
     await sleep(60)
@@ -326,28 +273,35 @@ export function getContext(gethConfig: GethRunConfig) {
 
   const restart = async () => {
     await killGeth()
+
     if (gethConfig.useBootnode) {
       await killBootnode()
-      await startBootnode(bootnodeBinaryPath, mnemonic, gethConfig)
+      await startBootnode(bootnodeBinaryPath, mnemonic, gethConfig, verboseOutput)
     }
+
+    // just in case
+    gethConfig.keepData = true
+
     let validatorIndex = 0
     const validatorIndices: number[] = []
+
     for (const instance of gethConfig.instances) {
       validatorIndices.push(validatorIndex)
       if (instance.validating) {
         validatorIndex++
       }
     }
+
     await Promise.all(
       gethConfig.instances.map(async (instance, i) => {
         await restoreDatadir(instance)
         if (!instance.privateKey && instance.validating) {
           instance.privateKey = validatorPrivateKeys[validatorIndices[i]]
         }
-        return startGeth(gethBinaryPath, instance, true)
+        return startGeth(gethBinaryPath, instance, verboseOutput)
       })
     )
-    await connectValidatorPeers(gethConfig)
+    await connectValidatorPeers(gethConfig, true)
   }
 
   const after = () => killGeth()
