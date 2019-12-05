@@ -12,7 +12,6 @@ import addToCRM from '../server/addToCRM'
 import ecoFundSubmission from '../server/EcoFundApp'
 import { RequestType } from '../src/fauceting/FaucetInterfaces'
 import nextI18next from '../src/i18n'
-import { abort } from '../src/utils/abortableFetch'
 import latestAnnouncements from './Announcement'
 import getAssets from './AssetBase'
 import { faucetOrInviteController } from './controllers'
@@ -180,7 +179,7 @@ function wwwRedirect(req, res, nextAction) {
 
   server.get('/proxy/events/', async (_, res) => {
     try {
-      const events = await Promise.race([getFormattedEvents(), abort('Events from Airtable')])
+      const events = await getFormattedEvents()
       res.json(events)
     } catch (e) {
       res.status(e.statusCode || 500).json({ message: e.message || 'unknownError' })

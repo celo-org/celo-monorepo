@@ -1,5 +1,5 @@
 import airtableInit, { AirRecord } from '../server/airtable'
-
+import { abort } from '../src/utils/abortableFetch'
 import getConfig from 'next/config'
 import { EventProps } from '../fullstack/EventProps'
 import Sentry from '../fullstack/sentry'
@@ -57,7 +57,10 @@ export interface RawAirTableEvent {
 }
 
 export default async function getFormattedEvents() {
-  const eventData = await fetchEventsFromAirtable()
+  const eventData = await Promise.race([
+    fetchEventsFromAirtable(),
+    abort('Events from Airtable', 1000),
+  ])
   return splitEvents(normalizeEvents(eventData as RawAirTableEvent[]))
 }
 
