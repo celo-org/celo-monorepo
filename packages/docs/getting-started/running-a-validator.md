@@ -493,7 +493,7 @@ You can now run the node for the attestation service in the background:
 docker run --name celo-attestations --restart always -p 8545:8545 -v $PWD:/root/.celo $CELO_IMAGE --verbosity 3 --networkid $NETWORK_ID --syncmode full --rpc --rpcaddr 0.0.0.0 --rpcapi eth,net,web3,debug,admin --unlock $CELO_ATTESTATION_SIGNER_ADDRESS
 ```
 
-A part of that we are going to setup the following environment variable about the Attestation Service Docker image:
+Next we will set up the Attestation Service itself. First, specify the following environment variables:
 
 ```bash
 # On the Attestation machine
@@ -502,9 +502,9 @@ export CELO_IMAGE_ATTESTATION="us.gcr.io/celo-testnet/celo-monorepo:attestation-
 export CELO_PROVIDER=http://localhost:8545
 ```
 
-### Sms Providers
+### SMS Providers
 
-Currently the Sms providers supported are Nexmo & Twilio. You can create your user account in the provider of your election using the [Nexmo Sign Up form](https://dashboard.nexmo.com/sign-up) or the [Twilio Sign Up form](https://www.twilio.com/try-twilio).
+Currently the SMS providers supported are [Twilio](https://www.twilio.com/try-twilio) and [Nexmo Sign Up form](https://dashboard.nexmo.com/sign-up). We recommend using [Twilio](https://www.twilio.com/try-twilio).
 
 **Twilio**
 
