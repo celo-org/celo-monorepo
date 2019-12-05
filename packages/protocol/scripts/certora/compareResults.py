@@ -1,5 +1,6 @@
 from test import compareResultsWithExpected
 import json
+import sys
 
 args = sys.argv[1:]
 actualFilename=args[0]
