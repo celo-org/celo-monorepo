@@ -1,4 +1,4 @@
-import { CURRENCY_ENUM } from '@celo/utils'
+import { CURRENCIES, CURRENCY_ENUM } from '@celo/utils'
 import * as admin from 'firebase-admin'
 import i18next from 'i18next'
 import { Currencies } from './blockscout/transfers'
@@ -44,9 +44,9 @@ interface PendingRequests {
 }
 
 interface ExchangeRateObject {
-  makerToken: CURRENCY_ENUM
+  pair: string
   exchangeRate: string
-  timestamp: string
+  timestamp: number // timestamp in milliseconds
 }
 
 let registrations: Registrations = {}
@@ -149,11 +149,16 @@ export function setPaymentRequestNotified(uid: string): Promise<void> {
 }
 
 export function writeExchangeRatePair(
+  takerToken: CURRENCY_ENUM,
   makerToken: CURRENCY_ENUM,
   exchangeRate: string,
-  timestamp: string
+  timestamp: number
 ) {
-  const exchangeRateRecord: ExchangeRateObject = { makerToken, exchangeRate, timestamp }
+  const exchangeRateRecord: ExchangeRateObject = {
+    pair: `${CURRENCIES[takerToken].code}/${CURRENCIES[makerToken].code}`,
+    exchangeRate,
+    timestamp,
+  }
   exchangeRatesRef.push(exchangeRateRecord)
   console.debug('Recorded exchange rate ', exchangeRateRecord)
 }

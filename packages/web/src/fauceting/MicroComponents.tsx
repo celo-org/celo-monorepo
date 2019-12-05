@@ -17,8 +17,8 @@ const BAD_STATES = new Set([RequestState.Failed, RequestState.Invalid])
 
 export function ContextualInfo({ requestState, t, isFaucet }: InfoProps) {
   const contextStyle = [
-    fonts.small,
-    !isFaucet && textStyles.invert,
+    fonts.micro,
+    !isFaucet && textStyles.readingOnDark,
     BAD_STATES.has(requestState) && textStyles.error,
   ]
 

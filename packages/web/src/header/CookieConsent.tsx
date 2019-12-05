@@ -94,7 +94,6 @@ export class CookieConsent extends React.PureComponent<I18nProps, State> {
 const styles = StyleSheet.create({
   container: {
     bottom: 0,
-    // @ts-ignore-next-line
     position: 'fixed',
     backgroundColor: '#3C9BF4',
     width: '100%',

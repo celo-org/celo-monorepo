@@ -124,30 +124,21 @@ spec:
             --networkid=${NETWORK_ID} \
             --syncmode=full \
             ${NAT_FLAG} \
-            --ethstats=${HOSTNAME}:${ETHSTATS_SECRET}@${ETHSTATS_SVC} \
-            --miner.verificationpool=${VERIFICATION_POOL_URL} \
+            --ethstats=${HOSTNAME}@${ETHSTATS_SVC} \
             --consoleformat=json \
             --consoleoutput=stdout \
             --verbosity={{ .Values.geth.verbosity }} \
-            --ethstats=${HOSTNAME}:${ETHSTATS_SECRET}@${ETHSTATS_SVC} \
             --metrics \
             ${PING_IP_FROM_PACKET_FLAG} \
             ${IN_MEMORY_DISCOVERY_TABLE_FLAG}
         env:
         - name: ETHSTATS_SVC
           value: {{ template "ethereum.fullname" . }}-ethstats.{{ .Release.Namespace }}
-        - name: ETHSTATS_SECRET
-          valueFrom:
-            secretKeyRef:
-              name: {{ template "ethereum.fullname" . }}-ethstats
-              key: WS_SECRET
         - name: NETWORK_ID
           valueFrom:
             configMapKeyRef:
               name: {{ template "ethereum.fullname" . }}-geth-config
               key: networkid
-        - name: VERIFICATION_POOL_URL
-          value: {{ .Values.geth.miner.verificationpool }}
         - name: STATIC_IPS_FOR_GETH_NODES
           value: "{{ default "false" .Values.geth.static_ips }}"
         - name: PING_IP_FROM_PACKET

@@ -4,7 +4,7 @@ import * as React from 'react'
 import { withNamespaces, WithNamespaces } from 'react-i18next'
 import { Text, View } from 'react-native'
 import { NavigationParams, NavigationScreenProp } from 'react-navigation'
-import { RESTART_APP_I18N_KEY, restartApp } from 'src/utils/AppRestart'
+import { deleteChainDataAndRestartApp, RESTART_APP_I18N_KEY } from 'src/utils/AppRestart'
 
 interface OwnProps {
   errorMessage?: string
@@ -30,7 +30,7 @@ class ErrorScreen extends React.Component<Props> {
     return (
       <FullscreenCTA
         CTAText={t(RESTART_APP_I18N_KEY)}
-        CTAHandler={restartApp}
+        CTAHandler={deleteChainDataAndRestartApp}
         title={t('oops')}
         subtitle={t('somethingWrong')}
       >

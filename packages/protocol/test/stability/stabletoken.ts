@@ -214,12 +214,13 @@ contract('StableToken', (accounts: string[]) => {
     it('should emit an InflationParametersUpdated event', async () => {
       const newUpdatePeriod = SECONDS_IN_A_WEEK + 5
       const res = await stableToken.setInflationParameters(inflationRate, newUpdatePeriod)
+      const latestBlock = await web3.eth.getBlock('latest')
       assertLogMatches2(res.logs[0], {
         event: 'InflationParametersUpdated',
         args: {
           rate: inflationRate,
           updatePeriod: newUpdatePeriod,
-          lastUpdated: initializationTime,
+          lastUpdated: latestBlock.timestamp,
         },
       })
     })

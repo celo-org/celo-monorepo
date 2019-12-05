@@ -7,8 +7,7 @@ import { withNamespaces, WithNamespaces } from 'react-i18next'
 import { StyleSheet, Text, View } from 'react-native'
 import Modal from 'react-native-modal'
 import { Namespaces } from 'src/i18n'
-import { navigate } from 'src/navigator/NavigationService'
-import { Stacks } from 'src/navigator/Screens'
+import { navigateHome } from 'src/navigator/NavigationService'
 
 interface OwnProps {
   isVisible: boolean
@@ -18,7 +17,7 @@ type Props = OwnProps & WithNamespaces
 
 function VerificationFailedModal(props: Props) {
   const onSkip = () => {
-    navigate(Stacks.AppStack)
+    navigateHome()
   }
 
   return (

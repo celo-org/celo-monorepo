@@ -5,8 +5,7 @@ import { withNamespaces, WithNamespaces } from 'react-i18next'
 import { StyleSheet, Text, View } from 'react-native'
 import { Namespaces } from 'src/i18n'
 import DancingRings from 'src/icons/DancingRings'
-import { navigate } from 'src/navigator/NavigationService'
-import { Stacks } from 'src/navigator/Screens'
+import { navigateHome } from 'src/navigator/NavigationService'
 
 export class VerificationSuccessScreen extends React.Component<WithNamespaces> {
   static navigationOptions = { header: null }
@@ -20,7 +19,7 @@ export class VerificationSuccessScreen extends React.Component<WithNamespaces> {
   }
 
   onAnimationFinish = () => {
-    navigate(Stacks.AppStack)
+    navigateHome()
   }
 
   render() {

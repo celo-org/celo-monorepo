@@ -4,7 +4,7 @@ import { switchToClusterFromEnv } from 'src/lib/cluster'
 import { addCeloEnvMiddleware, CeloEnvArgv } from 'src/lib/env-utils'
 import { getEnodesAddresses, writeStaticNodes } from 'src/lib/geth'
 import { addCeloGethMiddleware, execCmdWithExitOnFailure } from 'src/lib/utils'
-import * as yargs from 'yargs'
+import yargs from 'yargs'
 import { GethArgv } from '../geth'
 
 const STATIC_NODES_FILE_NAME = 'static-nodes.json'

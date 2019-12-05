@@ -40,7 +40,7 @@ import { CeloContract } from '@celo/contractkit'
 // default from
 kit.defaultAccount = myAddress
 // paid gas in celo dollars
-await kit.setGasCurrency(CeloContract.StableToken)
+await kit.setFeeCurrency(CeloContract.StableToken)
 ```
 
 You're ready to start using ContractKit! See the [Examples](examples.md) section to learn more.

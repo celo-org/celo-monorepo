@@ -8,13 +8,14 @@ interface Props {
 }
 
 export default class DancingRings extends React.PureComponent<Props> {
-  static defaultProps = {
-    width: 40,
-  }
+  animation: LottieView | null | undefined
 
   render() {
     return (
       <LottieView
+        ref={(animation) => {
+          this.animation = animation
+        }}
         source={require('./dancingRings.json')}
         autoPlay={true}
         loop={false}
