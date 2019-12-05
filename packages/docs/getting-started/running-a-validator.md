@@ -101,7 +101,8 @@ Note that account and signer keys must be unique and may not be reused.
 | CELO_VALIDATOR_SIGNER_BLS_PUBLIC_KEY | The BLS public key for the Validator instance                                                                      |  |
 | CELO_VALIDATOR_SIGNER_BLS_SIGNATURE  | A proof-of-possession of the BLS public key                                                                        |  |
 | PROXY_ENODE                          | The enode address for the Validator proxy                                                                          |  |
-| PROXY_IP                             | The Proxy container internal IP address from docker pool address                                                   |  |
+| PROXY_IP_INTERNAL                    | The Proxy internal IP address                                                                                      |  |
+| PROXY_IP_EXTERNAL                    | The Proxy external IP address                                                                                      |  |
 | ATTESTATION_SIGNER_ADDRESS           | The address of the attestation signer authorized by the validator account                                          |  |
 | ATTESTATION_SIGNER_SIGNATURE         | The proof-of-possession of the attestation signer key                                                              |  |
 | ATTESTATION_SERVICE_URL              | The URL to access the deployed Attestation Service                                                                 |  |
@@ -252,7 +253,15 @@ Now we need to set the proxy enode and proxy IP address in environment variables
 ```bash
 # On the validator machine
 export PROXY_ENODE=<YOUR-PROXY-ENODE>
-export PROXY_IP=<YOUR-PROXY-IP>
+```
+
+Depending on your setup, the proxy ips will be different. In the next step, when we specify the `--proxy.proxyenodeurlpair` option, we will set up two enode addresses.
+The first enode will use the `PROXY_IP_INTERNAL`, which corresponds to the IP that the validator can use to connect to the proxy (for example, a local IP).
+The second enode corresponds to the `PROXY_IP_EXTERNAL`, which corresponds to the IP that the rest of nodes of the network can use to connect with the proxy. In this case this will be the public IP of the proxy node.
+
+```bash
+export PROXY_IP_INTERNAL=<PROXY_IP_INTERNAL>
+export PROXY_IP_EXTERNAL=<PROXY_IP_EXTERNAL>
 ```
 
 Let's connect the validator to the proxy:
@@ -268,7 +277,7 @@ Once that is completed, go ahead and run the validator. Be sure to replace `<VAL
 ```bash
 # On the validator machine
 echo <VALIDATOR-SIGNER-PASSWORD> > .password
-docker run --name celo-validator --restart always -p 30303:30303 -p 30303:30303/udp -v $PWD:/root/.celo $CELO_IMAGE --verbosity 3 --networkid $NETWORK_ID --syncmode full --mine --istanbul.blockperiod=5 --istanbul.requesttimeout=3000 --etherbase $CELO_VALIDATOR_SIGNER_ADDRESS --nodiscover --proxy.proxied --proxy.proxyenodeurlpair=enode://$PROXY_ENODE@$PROXY_IP:30503\;enode://$PROXY_ENODE@$PROXY_IP:30303  --unlock=$CELO_VALIDATOR_SIGNER_ADDRESS --password /root/.celo/.password --ethstats=<YOUR-VALIDATOR-NAME>@baklava-ethstats.celo-testnet.org
+docker run --name celo-validator --restart always -p 30303:30303 -p 30303:30303/udp -v $PWD:/root/.celo $CELO_IMAGE --verbosity 3 --networkid $NETWORK_ID --syncmode full --mine --istanbul.blockperiod=5 --istanbul.requesttimeout=3000 --etherbase $CELO_VALIDATOR_SIGNER_ADDRESS --nodiscover --proxy.proxied --proxy.proxyenodeurlpair=enode://$PROXY_ENODE@$PROXY_IP_INTERNAL:30503\;enode://$PROXY_ENODE@$PROXY_IP_EXTERNAL:30303  --unlock=$CELO_VALIDATOR_SIGNER_ADDRESS --password /root/.celo/.password --ethstats=<YOUR-VALIDATOR-NAME>@baklava-ethstats.celo-testnet.org
 ```
 
 The `mine` flag does not mean the node starts mining blocks, but rather starts trying to participate in the BFT consensus protocol. It cannot do this until it gets elected -- so next we need to stand for election.
