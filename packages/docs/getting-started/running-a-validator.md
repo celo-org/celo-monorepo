@@ -569,7 +569,7 @@ docker run --name celo-attestation-service --restart always --entrypoint /bin/ba
 
 ## Registering Metadata
 
-We are using [Metadata](/celo-codebase/protocol/identity/metadata) to allow accounts to make certain claims without having to do so on-chain. For us to complete the process, we have to make two claims:
+We are using [Metadata]()(../celo-codebase/protocol/identity/metadata) to allow accounts to make certain claims without having to do so on-chain. For us to complete the process, we have to make two claims:
 
 1.  Under which URL users can request attestations from
 2.  Which accounts belong together for the purpose of the leaderboard
@@ -602,7 +602,7 @@ And then host your metadata somewhere reachable via HTTP. You can use a service 
 celocli account:register-metadata --url <METADATA_URL> --from $CELO_VALIDATOR_ADDRESS
 ```
 
-If everything goes well users should be able to see your claims by by running:
+If everything goes well users should be able to see your claims by running:
 
 ```bash
 # On your local machine
