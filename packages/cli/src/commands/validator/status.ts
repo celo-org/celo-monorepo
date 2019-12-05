@@ -15,10 +15,12 @@ export default class ValidatorStatus extends BaseCommand {
   static flags = {
     ...BaseCommand.flags,
     signer: Flags.address({
-      description: 'address of the validator to check if elected and validating',
+      description: 'address of the signer to check if elected and validating',
+      exclusive: ['validator'],
     }),
     validator: Flags.address({
-      description: 'address of the signer to check if elected and validating',
+      description: 'address of the validator to check if elected and validating',
+      exclusive: ['signer'],
     }),
     lookback: flags.integer({
       description: 'how many blocks to look back for signer activity',
@@ -41,27 +43,23 @@ export default class ValidatorStatus extends BaseCommand {
     const checker = newCheckBuilder(this, res.flags.signer)
     if (res.flags.validator) {
       const account = res.flags.validator
-      checker.isValidator(account).meetsValidatorBalanceRequirements(account)
+      checker
+        .isAccount(account)
+        .isValidator(account)
+        .meetsValidatorBalanceRequirements(account)
     } else if (res.flags.signer) {
-      checker.signerMeetsValidatorBalanceRequirements().signerAccountIsValidator()
+      checker
+        .isSignerOrAccount()
+        .signerMeetsValidatorBalanceRequirements()
+        .signerAccountIsValidator()
     } else {
       this.error('Either validator or signer must be specified')
     }
     await checker.runChecks()
 
-    // Assign and verify the signer.
-    let signer: Address
-    if (res.flags.signer) {
-      signer = res.flags.signer
-      if (res.flags.validator) {
-        const accounts = await this.kit.contracts.getAccounts()
-        if ((await accounts.signerToAccount(signer)) !== res.flags.validator) {
-          this.error(
-            `Signer ${signer} has never been authorized for account ${res.flags.validator}`
-          )
-        }
-      }
-    } else {
+    // Get the signer from the validator account if not provided.
+    let signer = res.flags.signer
+    if (!signer) {
       const accounts = await this.kit.contracts.getAccounts()
       signer = await accounts.getValidatorSigner(res.flags.validator!)
       console.info(`Identified ${signer} as the authorized validator signer`)
@@ -76,11 +74,11 @@ export default class ValidatorStatus extends BaseCommand {
       const frontrunners = await election.electValidatorSigners()
       if (frontrunners.some((a) => eqAddress(a, signer))) {
         this.error(
-          `Signer ${signer} is not elected for this epoch, but is currently winning in the upcoming election. Wait for the next epoch.`
+          `Signer ${signer} is not elected for this epoch, but would be elected if an election were to be held now. Please wait until the next epoch.`
         )
       } else {
         this.error(
-          `Signer ${signer} is not elected for this epoch, and is not currently winning the upcoming election.`
+          `Signer ${signer} is not elected for this epoch, and would not be elected if an election were to be held now.`
         )
       }
     }
