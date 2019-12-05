@@ -58,7 +58,7 @@ export default class ValidatorStatus extends BaseCommand {
     await checker.runChecks()
 
     // Get the signer from the validator account if not provided.
-    let signer = res.flags.signer
+    let signer: Address = res.flags.signer || ''
     if (!signer) {
       const accounts = await this.kit.contracts.getAccounts()
       signer = await accounts.getValidatorSigner(res.flags.validator!)
