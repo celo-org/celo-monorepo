@@ -1,9 +1,13 @@
 {
-	"only_initializer_changes_initialized_field": {
-		"SUCCESS": ["0", "initialized()", "decrementNonvotingAccountBalance(address,uint256)", "unlockingPeriod()", "withdraw(uint256)", "getTotalLockedGold()", "getAccountTotalLockedGold(address)", "getAccountNonvotingLockedGold(address)", "unlock(uint256)", "setUnlockingPeriod(uint256)", "incrementNonvotingAccountBalance(address,uint256)", "renounceOwnership()", "registry()", "getNonvotingLockedGold()", "owner()", "isOwner()", "setRegistry(address)", "relock(uint256,uint256)", "totalNonvoting()", "initialize(address,uint256)", "transferOwnership(address)", "getPendingWithdrawals(address)", "lock()"],
-		"FAIL": [],
-		"UNKNOWN": [],
-		"TIMEOUT": []
+	"rules": {
+		"only_initializer_changes_initialized_field": {
+			"SUCCESS": ["0", "initialized()", "decrementNonvotingAccountBalance(address,uint256)", "unlockingPeriod()", "withdraw(uint256)", "getTotalLockedGold()", "getAccountTotalLockedGold(address)", "getAccountNonvotingLockedGold(address)", "unlock(uint256)", "setUnlockingPeriod(uint256)", "incrementNonvotingAccountBalance(address,uint256)", "renounceOwnership()", "registry()", "getNonvotingLockedGold()", "owner()", "isOwner()", "setRegistry(address)", "relock(uint256,uint256)", "totalNonvoting()", "initialize(address,uint256)", "transferOwnership(address)", "getPendingWithdrawals(address)", "lock()"],
+			"FAIL": [],
+			"UNKNOWN": [],
+			"TIMEOUT": []
+		},
+		"check_initializer": "SUCCESS"
 	},
-	"check_initializer": "SUCCESS"
+	"assertMessages": {
+	}
 }

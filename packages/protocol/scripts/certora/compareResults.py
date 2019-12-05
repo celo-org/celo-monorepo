@@ -1,4 +1,4 @@
-from test import compareResultsWithExpected,errors
+from test import compareResultsWithExpected
 import json
 
 args = sys.argv[1:]
