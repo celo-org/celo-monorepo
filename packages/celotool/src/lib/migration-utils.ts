@@ -33,15 +33,22 @@ function getAttestationKeys() {
 
 export function migrationOverrides() {
   const mnemonic = fetchEnv(envVar.MNEMONIC)
-  const faucetedAccounts = getFaucetedAccounts(mnemonic)
+  const faucetedAccountAddresses = getFaucetedAccounts(mnemonic).map((account) => account.address)
+  const attestationBotAddresses = getAddressesFor(AccountType.ATTESTATION_BOT, mnemonic, 1)
+
   return {
     validators: {
       validatorKeys: validatorKeys(),
       attestationKeys: getAttestationKeys(),
     },
     stableToken: {
-      initialAccounts: faucetedAccounts.map((account) => account.address),
-      values: faucetedAccounts.map(() => '60000000000000000000000'), // 60k Celo Dollars
+      initialBalances: {
+        addresses: [...faucetedAccountAddresses, ...attestationBotAddresses],
+        values: [
+          ...faucetedAccountAddresses.map(() => '60000000000000000000000' /* 60k Celo Dollars */),
+          ...attestationBotAddresses.map(() => '10000000000000000000000' /* 10k Celo Dollars */),
+        ],
+      },
       oracles: getAddressesFor(AccountType.PRICE_ORACLE, mnemonic, 1),
     },
   }

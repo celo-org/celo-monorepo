@@ -31,6 +31,7 @@ export enum AccountType {
   ATTESTATION = 5,
   PRICE_ORACLE = 6,
   PROXY = 7,
+  ATTESTATION_BOT = 8,
 }
 
 export enum ConsensusType {
@@ -57,6 +58,7 @@ export const MNEMONIC_ACCOUNT_TYPE_CHOICES = [
   'attestation',
   'price_oracle',
   'proxy',
+  'attestation_bot',
 ]
 
 export const add0x = (str: string) => {
