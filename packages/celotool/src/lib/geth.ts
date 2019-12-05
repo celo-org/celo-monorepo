@@ -55,7 +55,7 @@ export interface GethRunConfig {
 export interface GethInstanceConfig {
   gethRunConfig: GethRunConfig
   name: string
-  validating: boolean
+  validating?: boolean
   validatingGasPrice?: number
   syncmode: string
   port: number
