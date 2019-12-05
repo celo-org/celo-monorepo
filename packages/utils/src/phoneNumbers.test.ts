@@ -2,11 +2,11 @@ import {
   getCountryCode,
   getDisplayPhoneNumber,
   getE164Number,
+  getExampleNumber,
   getRegionCode,
   getRegionCodeFromCountryCode,
   isE164Number,
   parsePhoneNumber,
-  getExampleNumber,
 } from './phoneNumbers'
 
 const COUNTRY_CODES = {

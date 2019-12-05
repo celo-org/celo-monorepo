@@ -236,10 +236,12 @@ export function getExampleNumber(
   showZero: boolean = true,
   isInternational: boolean = false
 ) {
-  let examplePhone = phoneUtil.getExampleNumber(regionCode)
+  let examplePhone =
+    phoneUtil.getExampleNumber(regionCode) ||
+    phoneUtil.getExampleNumber(getRegionCodeFromCountryCode(regionCode) as string)
 
   if (!examplePhone) {
-    examplePhone = phoneUtil.getExampleNumber(getRegionCodeFromCountryCode(regionCode) as string)
+    return
   }
 
   const formatedExample = phoneUtil.format(

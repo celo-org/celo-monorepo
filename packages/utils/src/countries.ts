@@ -1,3 +1,4 @@
+import { getExampleNumber } from '@celo/utils/src/phoneNumbers'
 const esData = require('@umpirsky/country-list/data/es/country.json')
 import countryData from 'country-data'
 import { notEmpty } from './collections'
@@ -9,6 +10,10 @@ interface CountryNames {
 export interface LocalizedCountry extends countryData.Country {
   displayName: string
   names: CountryNames
+  countryPhonePlaceholder: {
+    national: string
+    internation: string
+  }
 }
 
 const EMPTY_COUNTRY: LocalizedCountry = {
@@ -23,6 +28,7 @@ const EMPTY_COUNTRY: LocalizedCountry = {
   name: '',
   names: {},
   status: '',
+  countryPhonePlaceholder: { national: '', internation: '' },
 }
 
 const removeDiacritics = (word: string) =>
@@ -140,6 +146,10 @@ export class Countries {
         const localizedCountry = {
           names,
           displayName: names[this.language],
+          countryPhonePlaceholder: {
+            national: getExampleNumber(country.countryCallingCodes[0]),
+            internation: getExampleNumber(country.countryCallingCodes[0], true, true),
+          },
           ...country,
         }
 
