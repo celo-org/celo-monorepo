@@ -11,9 +11,9 @@ import { PersistGate } from 'redux-persist/integration/react'
 import CeloAnalytics from 'src/analytics/CeloAnalytics'
 import { DefaultEventNames } from 'src/analytics/constants'
 import { apolloClient } from 'src/apollo/index'
+import { openDeepLink } from 'src/app/actions'
 import AppLoading from 'src/app/AppLoading'
 import ErrorBoundary from 'src/app/ErrorBoundary'
-import { handleDeepLink } from 'src/app/saga'
 import i18n from 'src/i18n'
 import Navigator from 'src/navigator/NavigatorWrapper'
 import { persistor, store } from 'src/redux/store'
@@ -28,6 +28,7 @@ YellowBox.ignoreWarnings([
   'componentWillReceiveProps',
   'Remote debugger', // To avoid "Remote debugger in background tab" warning
   'cancelTouches', // rn-screens warning on iOS
+  'Setting a timer', // warns about long setTimeouts which are actually saga timeouts
 ])
 
 const WrappedNavigator = withNamespaces('common', {
@@ -61,7 +62,7 @@ export class App extends React.Component {
   }
 
   handleOpenURL = (event: any) => {
-    handleDeepLink(event.url)
+    store.dispatch(openDeepLink(event.url))
   }
 
   hideSplashScreen() {

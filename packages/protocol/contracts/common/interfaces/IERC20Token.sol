@@ -1,6 +1,5 @@
 pragma solidity ^0.5.3;
 
-
 /**
  * @title This interface describes the ERC20 functions shared by all Celo Tokens.
  */

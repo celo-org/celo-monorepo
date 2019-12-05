@@ -1,5 +1,5 @@
 import { Actions, ActionTypes } from 'src/identity/actions'
-import { AttestationCode, NUM_ATTESTATIONS_REQUIRED } from 'src/identity/verification'
+import { AttestationCode, VerificationStatus } from 'src/identity/verification'
 import { RootState } from 'src/redux/reducers'
 
 export const ATTESTATION_CODE_PLACEHOLDER = 'ATTESTATION_CODE_PLACEHOLDER'
@@ -15,22 +15,26 @@ export interface E164NumberToAddressType {
 
 export interface State {
   attestationCodes: AttestationCode[]
+  // we store acceptedAttestationCodes to tell user if code
+  // was already used even after Actions.RESET_VERIFICATION
+  acceptedAttestationCodes: AttestationCode[]
   numCompleteAttestations: number
-  verificationFailed: boolean
+  verificationStatus: VerificationStatus
+  hasSeenVerificationNux: boolean
   addressToE164Number: AddressToE164NumberType
   e164NumberToAddress: E164NumberToAddressType
-  startedVerification: boolean
   askedContactsPermission: boolean
   isLoadingImportContacts: boolean
 }
 
-const initialState = {
+const initialState: State = {
   attestationCodes: [],
+  acceptedAttestationCodes: [],
   numCompleteAttestations: 0,
-  verificationFailed: false,
+  verificationStatus: 0,
+  hasSeenVerificationNux: false,
   addressToE164Number: {},
   e164NumberToAddress: {},
-  startedVerification: false,
   askedContactsPermission: false,
   isLoadingImportContacts: false,
 }
@@ -42,25 +46,23 @@ export const reducer = (state: State | undefined = initialState, action: ActionT
         ...state,
         attestationCodes: [],
         numCompleteAttestations: 0,
-        verificationFailed: false,
-        startedVerification: true,
+        verificationStatus: VerificationStatus.Stopped,
       }
-    case Actions.END_VERIFICATION:
-      return action.success
-        ? {
-            ...state,
-            ...completeCodeReducer(state, NUM_ATTESTATIONS_REQUIRED),
-            verificationFailed: false,
-          }
-        : {
-            ...state,
-            verificationFailed: true,
-            startedVerification: false,
-          }
+    case Actions.SET_VERIFICATION_STATUS:
+      return {
+        ...state,
+        verificationStatus: action.status,
+      }
+    case Actions.SET_SEEN_VERIFICATION_NUX:
+      return {
+        ...state,
+        hasSeenVerificationNux: action.status,
+      }
     case Actions.INPUT_ATTESTATION_CODE:
       return {
         ...state,
         attestationCodes: [...state.attestationCodes, action.code],
+        acceptedAttestationCodes: [...state.acceptedAttestationCodes, action.code],
       }
     case Actions.COMPLETE_ATTESTATION_CODE:
       return {
@@ -113,5 +115,7 @@ const completeCodeReducer = (state: State, numCompleteAttestations: number) => {
 }
 
 export const attestationCodesSelector = (state: RootState) => state.identity.attestationCodes
+export const acceptedAttestationCodesSelector = (state: RootState) =>
+  state.identity.acceptedAttestationCodes
 export const e164NumberToAddressSelector = (state: RootState) => state.identity.e164NumberToAddress
 export const addressToE164NumberSelector = (state: RootState) => state.identity.addressToE164Number

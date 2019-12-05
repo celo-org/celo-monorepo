@@ -11,7 +11,6 @@ import "../common/Signatures.sol";
 import "../common/UsingRegistry.sol";
 
 contract LockedGold is ILockedGold, ReentrancyGuard, Initializable, UsingRegistry {
-
   using SafeMath for uint256;
 
   struct Authorizations {
@@ -95,10 +94,7 @@ contract LockedGold is ILockedGold, ReentrancyGuard, Initializable, UsingRegistr
    * @param value The amount by which to increment.
    * @dev Can only be called by the registered Election smart contract.
    */
-  function incrementNonvotingAccountBalance(
-    address account,
-    uint256 value
-  )
+  function incrementNonvotingAccountBalance(address account, uint256 value)
     external
     onlyRegisteredContract(ELECTION_REGISTRY_ID)
   {
@@ -111,10 +107,7 @@ contract LockedGold is ILockedGold, ReentrancyGuard, Initializable, UsingRegistr
    * @param value The amount by which to decrement.
    * @dev Can only be called by the registered "Election" smart contract.
    */
-  function decrementNonvotingAccountBalance(
-    address account,
-    uint256 value
-  )
+  function decrementNonvotingAccountBalance(address account, uint256 value)
     external
     onlyRegisteredContract(ELECTION_REGISTRY_ID)
   {
@@ -154,7 +147,7 @@ contract LockedGold is ILockedGold, ReentrancyGuard, Initializable, UsingRegistr
     uint256 balanceRequirement = getValidators().getAccountLockedGoldRequirement(msg.sender);
     require(
       balanceRequirement == 0 ||
-      balanceRequirement <= getAccountTotalLockedGold(msg.sender).sub(value)
+        balanceRequirement <= getAccountTotalLockedGold(msg.sender).sub(value)
     );
     _decrementNonvotingAccountBalance(msg.sender, value);
     uint256 available = now.add(unlockingPeriod);
@@ -162,18 +155,23 @@ contract LockedGold is ILockedGold, ReentrancyGuard, Initializable, UsingRegistr
     emit GoldUnlocked(msg.sender, value, available);
   }
 
-  // TODO(asa): Allow partial relock
   /**
    * @notice Relocks gold that has been unlocked but not withdrawn.
-   * @param index The index of the pending withdrawal to relock.
+   * @param index The index of the pending withdrawal to relock from.
+   * @param value The value to relock from the specified pending withdrawal.
    */
-  function relock(uint256 index) external nonReentrant {
+  function relock(uint256 index, uint256 value) external nonReentrant {
     require(getAccounts().isAccount(msg.sender));
     Account storage account = accounts[msg.sender];
     require(index < account.balances.pendingWithdrawals.length);
-    uint256 value = account.balances.pendingWithdrawals[index].value;
+    PendingWithdrawal storage pendingWithdrawal = account.balances.pendingWithdrawals[index];
+    require(value <= pendingWithdrawal.value);
+    if (value == pendingWithdrawal.value) {
+      deletePendingWithdrawal(account.balances.pendingWithdrawals, index);
+    } else {
+      pendingWithdrawal.value = pendingWithdrawal.value.sub(value);
+    }
     _incrementNonvotingAccountBalance(msg.sender, value);
-    deletePendingWithdrawal(account.balances.pendingWithdrawals, index);
     emit GoldLocked(msg.sender, value);
   }
 
@@ -234,9 +232,7 @@ contract LockedGold is ILockedGold, ReentrancyGuard, Initializable, UsingRegistr
    * @param account The address of the account.
    * @return The value and timestamp for each pending withdrawal.
    */
-  function getPendingWithdrawals(
-    address account
-  )
+  function getPendingWithdrawals(address account)
     external
     view
     returns (uint256[] memory, uint256[] memory)

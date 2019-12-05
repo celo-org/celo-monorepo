@@ -35,6 +35,7 @@ import BackupSocialIntro from 'src/backup/BackupSocialIntro'
 import DappKitAccountScreen from 'src/dappkit/DappKitAccountScreen'
 import DappKitSignTxScreen from 'src/dappkit/DappKitSignTxScreen'
 import DappKitTxDataScreen from 'src/dappkit/DappKitTxDataScreen'
+import EscrowedPaymentListScreen from 'src/escrow/EscrowedPaymentListScreen'
 import ReclaimPaymentConfirmationScreen from 'src/escrow/ReclaimPaymentConfirmationScreen'
 import ExchangeReview from 'src/exchange/ExchangeReview'
 import ExchangeTradeScreen from 'src/exchange/ExchangeTradeScreen'
@@ -49,8 +50,9 @@ import Language from 'src/language/Language'
 import SelectLocalCurrency from 'src/localCurrency/SelectLocalCurrency'
 import { Screens, Stacks } from 'src/navigator/Screens'
 import TabNavigator from 'src/navigator/TabNavigator'
+import IncomingPaymentRequestListScreen from 'src/paymentRequest/IncomingPaymentRequestListScreen'
+import OutgoingPaymentRequestListScreen from 'src/paymentRequest/OutgoingPaymentRequestListScreen'
 import PaymentRequestConfirmation from 'src/paymentRequest/PaymentRequestConfirmation'
-import PaymentRequestListScreen from 'src/paymentRequest/PaymentRequestListScreen'
 import PincodeConfirmation from 'src/pincode/PincodeConfirmation'
 import PincodeEducation from 'src/pincode/PincodeEducation'
 import PincodeSet from 'src/pincode/PincodeSet'
@@ -68,9 +70,6 @@ import VerificationInterstitialScreen from 'src/verify/VerificationInterstitialS
 import VerificationLearnMoreScreen from 'src/verify/VerificationLearnMoreScreen'
 import VerificationLoadingScreen from 'src/verify/VerificationLoadingScreen'
 import VerificationSuccessScreen from 'src/verify/VerificationSuccessScreen'
-import VerifyVerified from 'src/verify/Verified'
-import VerifyVerifying from 'src/verify/Verifying'
-import VerifyEducation from 'src/verify/VerifyPhoneEducation'
 
 export const headerArea: CreateNavigatorConfig<
   NavigationStackConfig,
@@ -117,9 +116,6 @@ const NuxStack = createStackNavigator(
     [Screens.ImportWalletSocial]: { screen: ImportWalletSocial },
     [Screens.ImportWalletEmpty]: { screen: ImportWalletEmpty },
     [Screens.ImportContacts]: { screen: ImportContacts },
-    [Screens.VerifyEducation]: { screen: VerifyEducation },
-    [Screens.VerifyVerifying]: { screen: VerifyVerifying },
-    [Screens.VerifyVerified]: { screen: VerifyVerified },
     [Screens.VerificationEducationScreen]: { screen: VerificationEducationScreen },
     [Screens.VerificationLearnMoreScreen]: { screen: VerificationLearnMoreScreen },
     [Screens.VerificationLoadingScreen]: { screen: VerificationLoadingScreen },
@@ -129,6 +125,9 @@ const NuxStack = createStackNavigator(
     ...commonScreens,
   },
   {
+    navigationOptions: {
+      header: null,
+    },
     ...headerArea,
     initialRouteName: Screens.Language,
   }
@@ -184,9 +183,9 @@ const ExchangeStack = createStackNavigator(
   }
 )
 
-const RequestStack = createStackNavigator(
+const IncomingRequestStack = createStackNavigator(
   {
-    [Screens.PaymentRequestListScreen]: { screen: PaymentRequestListScreen },
+    [Screens.IncomingPaymentRequestListScreen]: { screen: IncomingPaymentRequestListScreen },
     [Screens.SendConfirmation]: { screen: SendConfirmation },
   },
   {
@@ -194,7 +193,36 @@ const RequestStack = createStackNavigator(
       header: null,
     },
     ...headerArea,
-    initialRouteName: Screens.PaymentRequestListScreen,
+    initialRouteName: Screens.IncomingPaymentRequestListScreen,
+  }
+)
+
+const OutgoingRequestStack = createStackNavigator(
+  {
+    [Screens.OutgoingPaymentRequestListScreen]: { screen: OutgoingPaymentRequestListScreen },
+  },
+  {
+    navigationOptions: {
+      header: null,
+    },
+    ...headerArea,
+    initialRouteName: Screens.OutgoingPaymentRequestListScreen,
+  }
+)
+
+const EscrowStack = createStackNavigator(
+  {
+    [Screens.EscrowedPaymentListScreen]: { screen: EscrowedPaymentListScreen },
+    [Screens.ReclaimPaymentConfirmationScreen]: {
+      screen: ReclaimPaymentConfirmationScreen,
+    },
+  },
+  {
+    navigationOptions: {
+      header: null,
+    },
+    ...headerArea,
+    initialRouteName: Screens.EscrowedPaymentListScreen,
   }
 )
 
@@ -229,6 +257,12 @@ const SettingsStack = createStackNavigator(
     [Screens.InviteReview]: { screen: InviteReview },
     [Screens.SelectLocalCurrency]: { screen: SelectLocalCurrency },
     [Screens.Licenses]: { screen: Licenses },
+    [Screens.VerificationEducationScreen]: { screen: VerificationEducationScreen },
+    [Screens.VerificationLearnMoreScreen]: { screen: VerificationLearnMoreScreen },
+    [Screens.VerificationLoadingScreen]: { screen: VerificationLoadingScreen },
+    [Screens.VerificationInterstitialScreen]: { screen: VerificationInterstitialScreen },
+    [Screens.VerificationInputScreen]: { screen: VerificationInputScreen },
+    [Screens.VerificationSuccessScreen]: { screen: VerificationSuccessScreen },
   },
   {
     navigationOptions: {
@@ -246,17 +280,15 @@ const AppStack = createStackNavigator(
     [Stacks.SendStack]: { screen: SendStack },
     [Stacks.QRSendStack]: { screen: QRSendStack },
     [Stacks.ExchangeStack]: { screen: ExchangeStack },
-    [Stacks.RequestStack]: { screen: RequestStack },
+    [Stacks.IncomingRequestStack]: { screen: IncomingRequestStack },
+    [Stacks.OutgoingRequestStack]: { screen: OutgoingRequestStack },
+    [Stacks.EscrowStack]: { screen: EscrowStack },
     [Stacks.SettingsStack]: { screen: SettingsStack },
     [Screens.SetClock]: { screen: SetClock },
     [Screens.DollarEducation]: { screen: DollarEducation },
     [Screens.TransactionReview]: { screen: TransactionReviewScreen },
     [Screens.PhotosEducation]: { screen: PhotosEducation },
     [Screens.GoldEducation]: { screen: GoldEducation },
-    [Screens.PaymentRequestListScreen]: { screen: PaymentRequestListScreen },
-    [Screens.ReclaimPaymentConfirmationScreen]: {
-      screen: ReclaimPaymentConfirmationScreen,
-    },
     [Screens.FeeEducation]: { screen: FeeEducation },
     ...commonScreens,
   },

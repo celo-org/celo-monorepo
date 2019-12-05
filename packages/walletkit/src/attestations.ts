@@ -4,7 +4,8 @@ import { Dictionary, zip } from 'lodash'
 import * as Web3Utils from 'web3-utils'
 import { Attestations } from '../types/Attestations'
 import { CeloTokenType } from './erc20-utils'
-const parseSignature = SignatureUtils.parseSignature
+// TODO(Rossy): Change back to SignatureUtils.parseSignature when the app is updated to work with latest attestations changes
+const parseSignature = SignatureUtils.parseSignatureWithoutPrefix
 
 export async function makeApproveAttestationFeeTx(
   attestations: Attestations,
@@ -174,7 +175,9 @@ export function makeCompleteTx(
   return attestations.methods.complete(phoneHash, v, r, s)
 }
 
-const attestationCodeRegex = new RegExp(/(.* |^)([a-zA-Z0-9=_-]{87,88})($| .*)/)
+const attestationCodeRegex = new RegExp(
+  /(.* |^)(?:celo:\/\/wallet\/v\/)?([a-zA-Z0-9=_-]{87,88})($| .*)/
+)
 
 export function messageContainsAttestationCode(message: string) {
   return attestationCodeRegex.test(message)
@@ -182,12 +185,12 @@ export function messageContainsAttestationCode(message: string) {
 
 export function extractAttestationCodeFromMessage(message: string) {
   if (!message) {
-    throw new Error('Empty message')
+    return null
   }
 
   const sanitizedMessage = sanitizeBase64(message)
   if (!messageContainsAttestationCode(sanitizedMessage)) {
-    throw new Error('Message did not contain verification code')
+    return null
   }
 
   const matches = sanitizedMessage.match(attestationCodeRegex)

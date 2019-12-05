@@ -5,7 +5,7 @@ import { withNamespaces, WithNamespaces } from 'react-i18next'
 import { NativeScrollEvent, ScrollView, StyleSheet, View } from 'react-native'
 import { connect } from 'react-redux'
 import { dismissEarnRewards, dismissInviteFriends, PaymentRequest } from 'src/account'
-import { getPaymentRequests } from 'src/account/selectors'
+import { getIncomingPaymentRequests, getOutgoingPaymentRequests } from 'src/account/selectors'
 import CeloAnalytics from 'src/analytics/CeloAnalytics'
 import { CustomEventNames } from 'src/analytics/constants'
 import { componentWithAnalytics } from 'src/analytics/wrapper'
@@ -17,8 +17,9 @@ import i18n, { Namespaces } from 'src/i18n'
 import { backupIcon, homeIcon, inviteFriendsIcon, rewardsAppIcon } from 'src/images/Images'
 import { navigate } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
-import EscrowedPaymentReminderNotification from 'src/notifications/EscrowedPaymentReminderNotification'
-import PaymentRequestSummaryNotification from 'src/notifications/PaymentRequestSummaryNotification'
+import EscrowedPaymentReminderSummaryNotification from 'src/notifications/EscrowedPaymentReminderSummaryNotification'
+import IncomingPaymentRequestSummaryNotification from 'src/notifications/IncomingPaymentRequestSummaryNotification'
+import OutgoingPaymentRequestSummaryNotification from 'src/notifications/OutgoingPaymentRequestSummaryNotification'
 import SimpleNotification from 'src/notifications/SimpleNotification'
 import { RootState } from 'src/redux/reducers'
 import { isBackupTooLate } from 'src/redux/selectors'
@@ -29,7 +30,8 @@ interface StateProps {
   goldEducationCompleted: boolean
   dismissedEarnRewards: boolean
   dismissedInviteFriends: boolean
-  paymentRequests: PaymentRequest[]
+  incomingPaymentRequests: PaymentRequest[]
+  outgoingPaymentRequests: PaymentRequest[]
   backupTooLate: boolean
   sentEscrowPayments: EscrowedPayment[]
 }
@@ -45,7 +47,8 @@ type Props = DispatchProps & StateProps & WithNamespaces
 const mapStateToProps = (state: RootState): StateProps => ({
   backupCompleted: state.account.backupCompleted,
   goldEducationCompleted: state.goldToken.educationCompleted,
-  paymentRequests: getPaymentRequests(state),
+  incomingPaymentRequests: getIncomingPaymentRequests(state),
+  outgoingPaymentRequests: getOutgoingPaymentRequests(state),
   dismissedEarnRewards: state.account.dismissedEarnRewards,
   dismissedInviteFriends: state.account.dismissedInviteFriends,
   backupTooLate: isBackupTooLate(state),
@@ -68,15 +71,29 @@ export class NotificationBox extends React.Component<Props, State> {
   }
 
   escrowedPaymentReminderNotification = () => {
-    return getReclaimableEscrowPayments(this.props.sentEscrowPayments).map((payment) => (
-      <EscrowedPaymentReminderNotification key={payment.paymentID} payment={payment} />
-    ))
+    const escrowPayments = getReclaimableEscrowPayments(this.props.sentEscrowPayments)
+    if (escrowPayments && escrowPayments.length) {
+      return [<EscrowedPaymentReminderSummaryNotification key={1} payments={escrowPayments} />]
+    }
+    return []
   }
 
-  paymentRequestsNotification = (): Array<React.ReactElement<any>> => {
-    const { paymentRequests } = this.props
-    if (paymentRequests && paymentRequests.length) {
-      return [<PaymentRequestSummaryNotification key={1} requests={paymentRequests} />]
+  incomingPaymentRequestsNotification = (): Array<React.ReactElement<any>> => {
+    const { incomingPaymentRequests } = this.props
+    if (incomingPaymentRequests && incomingPaymentRequests.length) {
+      return [
+        <IncomingPaymentRequestSummaryNotification key={1} requests={incomingPaymentRequests} />,
+      ]
+    }
+    return []
+  }
+
+  outgoingPaymentRequestsNotification = (): Array<React.ReactElement<any>> => {
+    const { outgoingPaymentRequests } = this.props
+    if (outgoingPaymentRequests && outgoingPaymentRequests.length) {
+      return [
+        <OutgoingPaymentRequestSummaryNotification key={1} requests={outgoingPaymentRequests} />,
+      ]
     }
     return []
   }
@@ -212,7 +229,8 @@ export class NotificationBox extends React.Component<Props, State> {
 
   render() {
     const notifications = [
-      ...this.paymentRequestsNotification(),
+      ...this.incomingPaymentRequestsNotification(),
+      ...this.outgoingPaymentRequestsNotification(),
       ...this.escrowedPaymentReminderNotification(),
       ...this.generalNotifications(),
     ]

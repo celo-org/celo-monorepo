@@ -9,9 +9,10 @@ interface Props {
   nativeID?: string
   endBlock?: boolean
   startBlock?: boolean
+  isWide?: boolean
 }
 
-function BookLayout({ label, children, nativeID, endBlock, startBlock }: Props) {
+function BookLayout({ label, children, nativeID, endBlock, startBlock, isWide }: Props) {
   const margins = {
     desktop: [
       standardStyles.blockMarginTop,
@@ -40,7 +41,7 @@ function BookLayout({ label, children, nativeID, endBlock, startBlock }: Props) 
       <Cell span={Spans.fourth}>
         <H3>{label}</H3>
       </Cell>
-      <Cell tabletSpan={Spans.three4th} span={Spans.half}>
+      <Cell tabletSpan={Spans.three4th} span={isWide ? Spans.three4th : Spans.half}>
         {children}
       </Cell>
     </GridRow>

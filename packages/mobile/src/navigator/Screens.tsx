@@ -6,7 +6,9 @@ export enum Stacks {
   SendStack = 'SendStack',
   QRSendStack = 'QRSendStack',
   SettingsStack = 'SettingsStack',
-  RequestStack = 'RequestStack',
+  IncomingRequestStack = 'IncomingRequestStack',
+  OutgoingRequestStack = 'OutgoingRequestStack',
+  EscrowStack = 'EscrowStack',
   BackupStack = 'BackupStack',
 }
 
@@ -43,7 +45,9 @@ export enum Screens {
   JoinCelo = 'JoinCelo',
   Language = 'Language',
   Licenses = 'Licenses',
-  PaymentRequestListScreen = 'PaymentRequestListScreen',
+  IncomingPaymentRequestListScreen = 'IncomingPaymentRequestListScreen',
+  OutgoingPaymentRequestListScreen = 'OutgoingPaymentRequestListScreen',
+  EscrowedPaymentListScreen = 'EscrowedPaymentListScreen',
   PhotosEducation = 'PhotosEducation',
   PhotosNUX = 'PhotosNUX',
   PincodeEducation = 'PincodeEducation',
@@ -64,10 +68,6 @@ export enum Screens {
   TabNavigator = 'TabNavigator',
   TransactionReview = 'TransactionReview',
   UpgradeScreen = 'UpgradeScreen',
-  // TODO(Rossy) Remove these next 3
-  VerifyEducation = 'VerifyEducation',
-  VerifyVerified = 'VerifyVerified',
-  VerifyVerifying = 'VerifyVerifying',
   VerificationEducationScreen = 'VerificationEducationScreen',
   VerificationLearnMoreScreen = 'VerificationLearnMoreScreen',
   VerificationLoadingScreen = 'VerificationLoadingScreen',

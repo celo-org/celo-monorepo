@@ -9,10 +9,9 @@ import { Cell, GridRow, Spans } from 'src/layout/GridRow'
 import { ScreenProps, ScreenSizes, withScreenSize } from 'src/layout/ScreenSize'
 import AspectRatio from 'src/shared/AspectRatio'
 import Button, { BTN, SIZE } from 'src/shared/Button.3'
-import menuItems, { hashNav } from 'src/shared/menu-items'
+import menuItems from 'src/shared/menu-items'
 import Responsive from 'src/shared/Responsive'
 import { colors, fonts, standardStyles, textStyles } from 'src/styles'
-import { scrollTo } from 'src/utils/utils'
 import analytics from '../analytics/analytics'
 const builtOn = require('src/home/version3/builtOn.png')
 const groupVerify = require('src/home/version3/groupVerify.png')
@@ -20,26 +19,15 @@ const mobileFirst = require('src/home/version3/mobileFirst.png')
 
 type Props = I18nProps & ScreenProps
 
-const downloadWhitePaper = (link, name) => {
-  window.open(link, `_${name}`)
+const trackPaper = (name) => {
   analytics.track(`${name} opened`)
 }
 
 const onWhitePaperPress = () => {
-  downloadWhitePaper(
-    'https://storage.googleapis.com/celo_whitepapers/Celo__A_Multi_Asset_Cryptographic_Protocol_for_Decentralized_Social_Payments.pdf',
-    'white_paper'
-  )
+  trackPaper('white_paper')
 }
 const onStabilityPress = () => {
-  downloadWhitePaper(
-    'https://storage.googleapis.com/celo_whitepapers/Celo_Stability_Analysis.pdf',
-    'stability'
-  )
-}
-
-const onLearnMorePress = () => {
-  scrollTo(hashNav.home.partnerships)
+  trackPaper('stability')
 }
 
 class HomeSystems extends React.PureComponent<Props> {
@@ -178,7 +166,12 @@ class HomeSystems extends React.PureComponent<Props> {
                   </Responsive>
                   <Responsive medium={styles.button}>
                     <View style={[styles.button, standardStyles.centered]}>
-                      <DownLoadButton t={t} screen={screen} onPress={onWhitePaperPress} />
+                      <DownLoadButton
+                        t={t}
+                        screen={screen}
+                        onPress={onWhitePaperPress}
+                        href="https://storage.googleapis.com/celo_whitepapers/Celo__A_Multi_Asset_Cryptographic_Protocol_for_Decentralized_Social_Payments.pdf"
+                      />
                     </View>
                   </Responsive>
                 </View>
@@ -211,7 +204,12 @@ class HomeSystems extends React.PureComponent<Props> {
                   </View>
                   <Responsive medium={styles.button}>
                     <View style={[styles.button, standardStyles.centered]}>
-                      <DownLoadButton t={t} screen={screen} onPress={onStabilityPress} />
+                      <DownLoadButton
+                        t={t}
+                        screen={screen}
+                        onPress={onStabilityPress}
+                        href="https://storage.googleapis.com/celo_whitepapers/Celo_Stability_Analysis.pdf"
+                      />
                     </View>
                   </Responsive>
                 </View>
@@ -224,12 +222,14 @@ class HomeSystems extends React.PureComponent<Props> {
   }
 }
 
-function DownLoadButton({ onPress, screen, t }) {
+function DownLoadButton({ onPress, screen, t, href }) {
   return (
     <Button
       text={t('downloadPDF')}
       kind={BTN.PRIMARY}
       onPress={onPress}
+      href={href}
+      target="_blank"
       align={screen === ScreenSizes.MOBILE ? 'center' : 'flex-start'}
     />
   )

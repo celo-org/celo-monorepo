@@ -48,8 +48,8 @@ export const vNeg1Schema = {
     isReady: false,
     syncProgress: 0,
     syncProgressData: {
-      currentBlock: 0,
-      highestBlock: 0,
+      currentBlock: 100,
+      highestBlock: 100,
       startBlock: 0,
     },
     latestBlockNumber: 0,
@@ -58,6 +58,11 @@ export const vNeg1Schema = {
     commentKey: '0x0000000000000000000000000000000000008F68',
     gasPriceLastUpdated: 0,
     zeroSyncMode: false,
+    gethStartedThisSession: true,
+  },
+  geth: {
+    initialized: 'INITIALIZED',
+    connected: true,
   },
   identity: {
     attestationCodes: [],
@@ -124,8 +129,8 @@ export const v0Schema = {
     ...vNeg1Schema.web3,
     syncProgress: {
       startingBlock: 0,
-      currentBlock: 0,
-      highestBlock: 0,
+      currentBlock: 100,
+      highestBlock: 100,
     },
   },
   localCurrency: {
@@ -173,6 +178,44 @@ export const v3Schema = {
   },
 }
 
+export const v4Schema = {
+  ...v3Schema,
+  invite: {
+    ...v3Schema.invite,
+    isSkippingInvite: false,
+  },
+  identity: {
+    ...v3Schema.identity,
+    acceptedAttestationCodes: [],
+    verificationStatus: 0,
+    hasSeenVerificationNux: false,
+  },
+  account: {
+    name: 'John Doe',
+    e164PhoneNumber: '+14155556666',
+    defaultCountryCode: '+1',
+    contactDetails: {
+      contactId: 'contactId',
+      thumbnailPath: null,
+    },
+    devModeActive: false,
+    devModeClickCount: 0,
+    photosNUXClicked: false,
+    pincodeSet: false,
+    accountCreationTime: 99999999999999,
+    incomingPaymentRequests: [],
+    outgoingPaymentRequests: [],
+    showFakeData: false,
+    backupCompleted: false,
+    socialBackupCompleted: false,
+    backupDelayedTime: 0,
+    dismissedEarnRewards: false,
+    dismissedInviteFriends: false,
+    pincodeType: PincodeType.Unset,
+    isSettingPin: false,
+  },
+}
+
 export function getLatestSchema(): Partial<RootState> {
-  return v3Schema as Partial<RootState>
+  return v4Schema as Partial<RootState>
 }

@@ -32,24 +32,12 @@ contract Governance is
   using IntegerSortedLinkedList for SortedLinkedList.List;
   using BytesLib for bytes;
 
-  uint256 constant private FIXED_HALF = 500000000000000000000000;
+  uint256 private constant FIXED_HALF = 500000000000000000000000;
 
   // TODO(asa): Consider a delay stage.
-  enum ProposalStage {
-    None,
-    Queued,
-    Approval,
-    Referendum,
-    Execution,
-    Expiration
-  }
+  enum ProposalStage { None, Queued, Approval, Referendum, Execution, Expiration }
 
-  enum VoteValue {
-    None,
-    Abstain,
-    No,
-    Yes
-  }
+  enum VoteValue { None, Abstain, No, Yes }
 
   struct UpvoteRecord {
     uint256 proposalId;
@@ -114,43 +102,23 @@ contract Governance is
   uint256[] public emptyIndices;
   ParticipationParameters private participationParameters;
 
-  event ApproverSet(
-    address approver
-  );
+  event ApproverSet(address approver);
 
-  event ConcurrentProposalsSet(
-    uint256 concurrentProposals
-  );
+  event ConcurrentProposalsSet(uint256 concurrentProposals);
 
-  event MinDepositSet(
-    uint256 minDeposit
-  );
+  event MinDepositSet(uint256 minDeposit);
 
-  event QueueExpirySet(
-    uint256 queueExpiry
-  );
+  event QueueExpirySet(uint256 queueExpiry);
 
-  event DequeueFrequencySet(
-    uint256 dequeueFrequency
-  );
+  event DequeueFrequencySet(uint256 dequeueFrequency);
 
-  event ApprovalStageDurationSet(
-    uint256 approvalStageDuration
-  );
+  event ApprovalStageDurationSet(uint256 approvalStageDuration);
 
-  event ReferendumStageDurationSet(
-    uint256 referendumStageDuration
-  );
+  event ReferendumStageDurationSet(uint256 referendumStageDuration);
 
-  event ExecutionStageDurationSet(
-    uint256 executionStageDuration
-  );
+  event ExecutionStageDurationSet(uint256 executionStageDuration);
 
-  event ConstitutionSet(
-    address indexed destination,
-    bytes4 indexed functionId,
-    uint256 threshold
-  );
+  event ConstitutionSet(address indexed destination, bytes4 indexed functionId, uint256 threshold);
 
   event ProposalQueued(
     uint256 indexed proposalId,
@@ -160,11 +128,7 @@ contract Governance is
     uint256 timestamp
   );
 
-  event ProposalUpvoted(
-    uint256 indexed proposalId,
-    address indexed account,
-    uint256 upvotes
-  );
+  event ProposalUpvoted(uint256 indexed proposalId, address indexed account, uint256 upvotes);
 
   event ProposalUpvoteRevoked(
     uint256 indexed proposalId,
@@ -172,14 +136,9 @@ contract Governance is
     uint256 revokedUpvotes
   );
 
-  event ProposalDequeued(
-    uint256 indexed proposalId,
-    uint256 timestamp
-  );
+  event ProposalDequeued(uint256 indexed proposalId, uint256 timestamp);
 
-  event ProposalApproved(
-    uint256 indexed proposalId
-  );
+  event ProposalApproved(uint256 indexed proposalId);
 
   event ProposalVoted(
     uint256 indexed proposalId,
@@ -188,47 +147,25 @@ contract Governance is
     uint256 weight
   );
 
-  event ProposalExecuted(
-    uint256 indexed proposalId
-  );
+  event ProposalExecuted(uint256 indexed proposalId);
 
-  event ProposalExpired(
-    uint256 proposalId
-  );
+  event ProposalExpired(uint256 proposalId);
 
-  event ParticipationBaselineUpdated(
-    uint256 participationBaseline
-  );
+  event ParticipationBaselineUpdated(uint256 participationBaseline);
 
-  event ParticipationFloorSet(
-    uint256 participationFloor
-  );
+  event ParticipationFloorSet(uint256 participationFloor);
 
-  event ParticipationBaselineUpdateFactorSet(
-    uint256 baselineUpdateFactor
-  );
+  event ParticipationBaselineUpdateFactorSet(uint256 baselineUpdateFactor);
 
-  event ParticipationBaselineQuorumFactorSet(
-    uint256 baselineQuorumFactor
-  );
+  event ParticipationBaselineQuorumFactorSet(uint256 baselineQuorumFactor);
 
-  event HotfixWhitelisted(
-    bytes32 indexed hash,
-    address whitelister
-  );
+  event HotfixWhitelisted(bytes32 indexed hash, address whitelister);
 
-  event HotfixApproved(
-    bytes32 indexed hash
-  );
+  event HotfixApproved(bytes32 indexed hash);
 
-  event HotfixPrepared(
-    bytes32 indexed hash,
-    uint256 indexed epoch
-  );
+  event HotfixPrepared(bytes32 indexed hash, uint256 indexed epoch);
 
-  event HotfixExecuted(
-    bytes32 indexed hash
-  );
+  event HotfixExecuted(bytes32 indexed hash);
 
   function() external payable {} // solhint-disable no-empty-blocks
 
@@ -267,19 +204,16 @@ contract Governance is
     uint256 participationFloor,
     uint256 baselineUpdateFactor,
     uint256 baselineQuorumFactor
-  )
-    external
-    initializer
-  {
+  ) external initializer {
     require(
       _approver != address(0) &&
-      _concurrentProposals != 0 &&
-      _minDeposit != 0 &&
-      _queueExpiry != 0 &&
-      _dequeueFrequency != 0 &&
-      approvalStageDuration != 0 &&
-      referendumStageDuration != 0 &&
-      executionStageDuration != 0
+        _concurrentProposals != 0 &&
+        _minDeposit != 0 &&
+        _queueExpiry != 0 &&
+        _dequeueFrequency != 0 &&
+        approvalStageDuration != 0 &&
+        referendumStageDuration != 0 &&
+        executionStageDuration != 0
     );
     _transferOwnership(msg.sender);
     setRegistry(registryAddress);
@@ -389,7 +323,7 @@ contract Governance is
     FixidityLib.Fraction memory participationBaselineFrac = FixidityLib.wrap(participationBaseline);
     require(
       FixidityLib.isProperFraction(participationBaselineFrac) &&
-      !participationBaselineFrac.equals(participationParameters.baseline)
+        !participationBaselineFrac.equals(participationParameters.baseline)
     );
     participationParameters.baseline = participationBaselineFrac;
     emit ParticipationBaselineUpdated(participationBaseline);
@@ -403,7 +337,7 @@ contract Governance is
     FixidityLib.Fraction memory participationFloorFrac = FixidityLib.wrap(participationFloor);
     require(
       FixidityLib.isProperFraction(participationFloorFrac) &&
-      !participationFloorFrac.equals(participationParameters.baselineFloor)
+        !participationFloorFrac.equals(participationParameters.baselineFloor)
     );
     participationParameters.baselineFloor = participationFloorFrac;
     emit ParticipationFloorSet(participationFloor);
@@ -417,7 +351,7 @@ contract Governance is
     FixidityLib.Fraction memory baselineUpdateFactorFrac = FixidityLib.wrap(baselineUpdateFactor);
     require(
       FixidityLib.isProperFraction(baselineUpdateFactorFrac) &&
-      !baselineUpdateFactorFrac.equals(participationParameters.baselineUpdateFactor)
+        !baselineUpdateFactorFrac.equals(participationParameters.baselineUpdateFactor)
     );
     participationParameters.baselineUpdateFactor = baselineUpdateFactorFrac;
     emit ParticipationBaselineUpdateFactorSet(baselineUpdateFactor);
@@ -431,7 +365,7 @@ contract Governance is
     FixidityLib.Fraction memory baselineQuorumFactorFrac = FixidityLib.wrap(baselineQuorumFactor);
     require(
       FixidityLib.isProperFraction(baselineQuorumFactorFrac) &&
-      !baselineQuorumFactorFrac.equals(participationParameters.baselineQuorumFactor)
+        !baselineQuorumFactorFrac.equals(participationParameters.baselineQuorumFactor)
     );
     participationParameters.baselineQuorumFactor = baselineQuorumFactorFrac;
     emit ParticipationBaselineQuorumFactorSet(baselineQuorumFactor);
@@ -445,11 +379,7 @@ contract Governance is
    * @param threshold The threshold.
    * @dev If no constitution is explicitly set the default is a simple majority, i.e. 1:2.
    */
-  function setConstitution(
-    address destination,
-    bytes4 functionId,
-    uint256 threshold
-  )
+  function setConstitution(address destination, bytes4 functionId, uint256 threshold)
     external
     onlyOwner
   {
@@ -460,8 +390,7 @@ contract Governance is
     if (functionId == 0) {
       constitution[destination].defaultThreshold = FixidityLib.wrap(threshold);
     } else {
-      constitution[destination].functionThresholds[functionId] =
-        FixidityLib.wrap(threshold);
+      constitution[destination].functionThresholds[functionId] = FixidityLib.wrap(threshold);
     }
     emit ConstitutionSet(destination, functionId, threshold);
   }
@@ -481,11 +410,7 @@ contract Governance is
     address[] calldata destinations,
     bytes calldata data,
     uint256[] calldata dataLengths
-  )
-    external
-    payable
-    returns (uint256)
-  {
+  ) external payable returns (uint256) {
     dequeueProposalsIfReady();
     require(msg.value >= minDeposit);
 
@@ -507,16 +432,12 @@ contract Governance is
    * @dev Provide 0 for `lesser`/`greater` when the proposal will be at the tail/head of the queue.
    * @dev Reverts if the account has already upvoted a proposal in the queue.
    */
-  function upvote(
-    uint256 proposalId,
-    uint256 lesser,
-    uint256 greater
-  )
+  function upvote(uint256 proposalId, uint256 lesser, uint256 greater)
     external
     nonReentrant
     returns (bool)
   {
-    address account = getAccounts().activeVoteSignerToAccount(msg.sender);
+    address account = getAccounts().voteSignerToAccount(msg.sender);
     // TODO(asa): When upvoting a proposal that will get dequeued, should we let the tx succeed
     // and return false?
     dequeueProposalsIfReady();
@@ -561,16 +482,9 @@ contract Governance is
    * @return Whether or not the upvote was revoked successfully.
    * @dev Provide 0 for `lesser`/`greater` when the proposal will be at the tail/head of the queue.
    */
-  function revokeUpvote(
-    uint256 lesser,
-    uint256 greater
-  )
-    external
-    nonReentrant
-    returns (bool)
-  {
+  function revokeUpvote(uint256 lesser, uint256 greater) external nonReentrant returns (bool) {
     dequeueProposalsIfReady();
-    address account = getAccounts().activeVoteSignerToAccount(msg.sender);
+    address account = getAccounts().voteSignerToAccount(msg.sender);
     Voter storage voter = voters[account];
     uint256 proposalId = voter.upvote.proposalId;
     Proposals.Proposal storage proposal = proposals[proposalId];
@@ -629,16 +543,12 @@ contract Governance is
    * @return Whether or not the vote was cast successfully.
    */
   /* solhint-disable code-complexity */
-  function vote(
-    uint256 proposalId,
-    uint256 index,
-    Proposals.VoteValue value
-  )
+  function vote(uint256 proposalId, uint256 index, Proposals.VoteValue value)
     external
     nonReentrant
     returns (bool)
   {
-    address account = getAccounts().activeVoteSignerToAccount(msg.sender);
+    address account = getAccounts().voteSignerToAccount(msg.sender);
     dequeueProposalsIfReady();
     Proposals.Proposal storage proposal = proposals[proposalId];
     require(isDequeuedProposal(proposal, proposalId, index));
@@ -651,9 +561,9 @@ contract Governance is
     uint256 weight = getLockedGold().getAccountTotalLockedGold(account);
     require(
       proposal.isApproved() &&
-      stage == Proposals.Stage.Referendum &&
-      value != Proposals.VoteValue.None &&
-      weight > 0
+        stage == Proposals.Stage.Referendum &&
+        value != Proposals.VoteValue.None &&
+        weight > 0
     );
     VoteRecord storage voteRecord = voter.referendumVotes[index];
     proposal.updateVote(
@@ -740,9 +650,7 @@ contract Governance is
     address[] calldata destinations,
     bytes calldata data,
     uint256[] calldata dataLengths
-  )
-    external
-  {
+  ) external {
     bytes32 hash = keccak256(abi.encode(values, destinations, data, dataLengths));
 
     (bool approved, bool executed, uint256 preparedEpoch) = getHotfixRecord(hash);
@@ -750,14 +658,7 @@ contract Governance is
     require(approved, "hotfix not approved");
     require(preparedEpoch == getEpochNumber(), "hotfix must be prepared for this epoch");
 
-    Proposals.makeMem(
-      values,
-      destinations,
-      data,
-      dataLengths,
-      msg.sender,
-      0
-    ).executeMem();
+    Proposals.makeMem(values, destinations, data, dataLengths, msg.sender, 0).executeMem();
 
     hotfixes[hash].executed = true;
     emit HotfixExecuted(hash);
@@ -785,9 +686,8 @@ contract Governance is
     uint256 upvotedProposal = voter.upvote.proposalId;
     bool isVotingQueue = upvotedProposal != 0 && isQueued(upvotedProposal);
     Proposals.Proposal storage proposal = proposals[voter.mostRecentReferendumProposal];
-    bool isVotingReferendum = (
-      proposal.getDequeuedStage(stageDurations) == Proposals.Stage.Referendum
-    );
+    bool isVotingReferendum = (proposal.getDequeuedStage(stageDurations) ==
+      Proposals.Stage.Referendum);
     return isVotingQueue || isVotingReferendum;
   }
 
@@ -842,9 +742,7 @@ contract Governance is
    * @param proposalId The ID of the proposal to unpack.
    * @return The unpacked proposal with its transaction count.
    */
-  function getProposal(
-    uint256 proposalId
-  )
+  function getProposal(uint256 proposalId)
     external
     view
     returns (address, uint256, uint256, uint256)
@@ -858,10 +756,7 @@ contract Governance is
    * @param index The index of the specified transaction in the proposal's transaction list.
    * @return The specified transaction.
    */
-  function getProposalTransaction(
-    uint256 proposalId,
-    uint256 index
-  )
+  function getProposalTransaction(uint256 proposalId, uint256 index)
     external
     view
     returns (uint256, address, bytes memory)
@@ -984,11 +879,7 @@ contract Governance is
    * @return Hotfix tuple of (approved, executed, preparedEpoch)
    */
   function getHotfixRecord(bytes32 hash) public view returns (bool, bool, uint256) {
-    return (
-      hotfixes[hash].approved,
-      hotfixes[hash].executed,
-      hotfixes[hash].preparedEpoch
-    );
+    return (hotfixes[hash].approved, hotfixes[hash].executed, hotfixes[hash].preparedEpoch);
   }
 
   /**
@@ -1086,11 +977,7 @@ contract Governance is
     Proposals.Proposal storage proposal,
     uint256 proposalId,
     uint256 index
-  )
-    private
-    view
-    returns (bool)
-  {
+  ) private view returns (bool) {
     return proposal.exists() && dequeued[index] == proposalId;
   }
 
@@ -1099,10 +986,7 @@ contract Governance is
    * @param proposal The proposal struct.
    * @return Whether or not the dequeued proposal has expired.
    */
-  function isDequeuedProposalExpired(
-    Proposals.Proposal storage proposal,
-    Proposals.Stage stage
-  )
+  function isDequeuedProposalExpired(Proposals.Proposal storage proposal, Proposals.Stage stage)
     private
     view
     returns (bool)
@@ -1111,11 +995,9 @@ contract Governance is
     //   1. Past the approval stage and not approved.
     //   2. Past the referendum stage and not passing.
     //   3. Past the execution stage.
-    return (
-      (stage > Proposals.Stage.Execution) ||
+    return ((stage > Proposals.Stage.Execution) ||
       (stage > Proposals.Stage.Referendum && !_isProposalPassing(proposal)) ||
-      (stage > Proposals.Stage.Approval && !proposal.isApproved())
-    );
+      (stage > Proposals.Stage.Approval && !proposal.isApproved()));
   }
 
   /**
@@ -1128,9 +1010,7 @@ contract Governance is
     Proposals.Proposal storage proposal,
     uint256 proposalId,
     uint256 index
-  )
-    private
-  {
+  ) private {
     if (proposal.isApproved() && proposal.networkWeight > 0) {
       updateParticipationBaseline(proposal);
     }
@@ -1159,14 +1039,7 @@ contract Governance is
     emit ParticipationBaselineUpdated(participationParameters.baseline.unwrap());
   }
 
-  function getConstitution(
-    address destination,
-    bytes4 functionId
-  )
-    external
-    view
-    returns (uint256)
-  {
+  function getConstitution(address destination, bytes4 functionId) external view returns (uint256) {
     return _getConstitution(destination, functionId).unwrap();
   }
 
@@ -1177,10 +1050,7 @@ contract Governance is
    *   default.
    * @return The ratio of yes:no votes needed to exceed in order to pass the proposal.
    */
-  function _getConstitution(
-    address destination,
-    bytes4 functionId
-  )
+  function _getConstitution(address destination, bytes4 functionId)
     internal
     view
     returns (FixidityLib.Fraction memory)

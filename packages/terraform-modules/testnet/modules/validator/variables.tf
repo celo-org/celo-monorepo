@@ -38,6 +38,16 @@ variable genesis_content_base64 {
   description = "Content of the genesis file encoded in base64"
 }
 
+variable geth_exporter_docker_image_repository {
+  type        = string
+  description = "Repository of the geth exporter docker image"
+}
+
+variable geth_exporter_docker_image_tag {
+  type        = string
+  description = "Tag of the geth exporter docker image"
+}
+
 variable geth_node_docker_image_repository {
   type        = string
   description = "Repository of the geth docker image"
@@ -81,9 +91,4 @@ variable tx_node_count {
 variable validator_count {
   type        = number
   description = "Number of validators to create"
-}
-
-variable verification_pool_url {
-  type        = string
-  description = "URL of the verification pool"
 }

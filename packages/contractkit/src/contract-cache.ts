@@ -2,7 +2,10 @@ import { CeloContract } from './base'
 import { ContractKit } from './kit'
 import { AccountsWrapper } from './wrappers/Accounts'
 import { AttestationsWrapper } from './wrappers/Attestations'
+import { BlockchainParametersWrapper } from './wrappers/BlockchainParameters'
 import { ElectionWrapper } from './wrappers/Election'
+// import { EpochRewardsWrapper } from './wrappers/EpochRewards'
+import { EscrowWrapper } from './wrappers/Escrow'
 import { ExchangeWrapper } from './wrappers/Exchange'
 import { GasPriceMinimumWrapper } from './wrappers/GasPriceMinimum'
 import { GoldTokenWrapper } from './wrappers/GoldTokenWrapper'
@@ -16,10 +19,12 @@ import { ValidatorsWrapper } from './wrappers/Validators'
 const WrapperFactories = {
   [CeloContract.Accounts]: AccountsWrapper,
   [CeloContract.Attestations]: AttestationsWrapper,
+  [CeloContract.BlockchainParameters]: BlockchainParametersWrapper,
   [CeloContract.Election]: ElectionWrapper,
-  // [CeloContract.Escrow]: EscrowWrapper,
+  // [CeloContract.EpochRewards]?: EpochRewardsWrapper,
+  [CeloContract.Escrow]: EscrowWrapper,
   [CeloContract.Exchange]: ExchangeWrapper,
-  // [CeloContract.GasCurrencyWhitelist]: GasCurrencyWhitelistWrapper,
+  // [CeloContract.FeeCurrencyWhitelist]: FeeCurrencyWhitelistWrapper,
   [CeloContract.GasPriceMinimum]: GasPriceMinimumWrapper,
   [CeloContract.GoldToken]: GoldTokenWrapper,
   [CeloContract.Governance]: GovernanceWrapper,
@@ -39,10 +44,12 @@ export type ValidWrappers = keyof CFType
 interface WrapperCacheMap {
   [CeloContract.Accounts]?: AccountsWrapper
   [CeloContract.Attestations]?: AttestationsWrapper
+  [CeloContract.BlockchainParameters]?: BlockchainParametersWrapper
   [CeloContract.Election]?: ElectionWrapper
-  // [CeloContract.Escrow]?: EscrowWrapper,
+  // [CeloContract.EpochRewards]?: EpochRewardsWrapper
+  [CeloContract.Escrow]?: EscrowWrapper
   [CeloContract.Exchange]?: ExchangeWrapper
-  // [CeloContract.GasCurrencyWhitelist]?: GasCurrencyWhitelistWrapper,
+  // [CeloContract.FeeCurrencyWhitelist]?: FeeCurrencyWhitelistWrapper,
   [CeloContract.GasPriceMinimum]?: GasPriceMinimumWrapper
   [CeloContract.GoldToken]?: GoldTokenWrapper
   [CeloContract.Governance]?: GovernanceWrapper
@@ -73,17 +80,23 @@ export class WrapperCache {
   getAttestations() {
     return this.getContract(CeloContract.Attestations)
   }
+  getBlockchainParameters() {
+    return this.getContract(CeloContract.BlockchainParameters)
+  }
   getElection() {
     return this.getContract(CeloContract.Election)
   }
-  // getEscrow() {
-  //   return this.getWrapper(CeloContract.Escrow, newEscrow)
+  // getEpochRewards() {
+  //   return this.getContract(CeloContract.EpochRewards)
   // }
+  getEscrow() {
+    return this.getContract(CeloContract.Escrow)
+  }
   getExchange() {
     return this.getContract(CeloContract.Exchange)
   }
-  // getGasCurrencyWhitelist() {
-  //   return this.getWrapper(CeloContract.GasCurrencyWhitelist, newGasCurrencyWhitelist)
+  // getFeeCurrencyWhitelist() {
+  //   return this.getWrapper(CeloContract.FeeCurrencyWhitelist, newFeeCurrencyWhitelist)
   // }
   getGasPriceMinimum() {
     return this.getContract(CeloContract.GasPriceMinimum)

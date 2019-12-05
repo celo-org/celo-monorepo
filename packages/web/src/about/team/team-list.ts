@@ -82,7 +82,7 @@ const people: Person[] = [
   },
   {
     name: 'Markus Franke',
-    role: 'Finance',
+    role: 'Economics',
     photo: require('./markus@2x.jpg'),
   },
   {
@@ -95,7 +95,6 @@ const people: Person[] = [
     role: 'Finance',
     photo: require('./mz-hammer@2x.png'),
   },
-
   {
     name: 'Nam Chu Hoai',
     role: 'Engineering',
@@ -118,7 +117,7 @@ const people: Person[] = [
   },
   {
     name: 'Roman Croessmann',
-    role: 'Finance',
+    role: 'Data Science',
     photo: require('./roman@2x.png'),
   },
   {

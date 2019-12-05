@@ -1,6 +1,5 @@
 pragma solidity ^0.5.3;
 
-
 library Signatures {
   /**
   * @notice Given a signed address, returns the signer of the address.
@@ -9,12 +8,7 @@ library Signatures {
   * @param r Output value r of the ECDSA signature.
   * @param s Output value s of the ECDSA signature.
   */
-  function getSignerOfAddress(
-    address message,
-    uint8 v,
-    bytes32 r,
-    bytes32 s
-  )
+  function getSignerOfAddress(address message, uint8 v, bytes32 r, bytes32 s)
     public
     pure
     returns (address)
@@ -30,12 +24,7 @@ library Signatures {
   * @param r Output value r of the ECDSA signature.
   * @param s Output value s of the ECDSA signature.
   */
-  function getSignerOfMessageHash(
-    bytes32 messageHash,
-    uint8 v,
-    bytes32 r,
-    bytes32 s
-  )
+  function getSignerOfMessageHash(bytes32 messageHash, uint8 v, bytes32 r, bytes32 s)
     public
     pure
     returns (address)

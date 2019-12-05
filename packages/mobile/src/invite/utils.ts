@@ -1,5 +1,6 @@
 import { sanitizeBase64 } from '@celo/walletkit'
 import URLSearchParamsReal from '@ungap/url-search-params'
+import { Platform } from 'react-native'
 import RNInstallReferrer from 'react-native-install-referrer'
 import Logger from 'src/utils/Logger'
 
@@ -52,19 +53,26 @@ interface ReferrerDataError {
   message: string
 }
 
-export const getInviteCodeFromReferrerData = async () => {
-  const referrerData: ReferrerData | ReferrerDataError = await RNInstallReferrer.getReferrer()
-  Logger.info(
-    'invite/utils/getInviteCodeFromReferrerData',
-    'Referrer Data: ' + JSON.stringify(referrerData)
-  )
-  if (referrerData && referrerData.hasOwnProperty('installReferrer')) {
-    const params = new URLSearchParamsReal(
-      decodeURIComponent((referrerData as ReferrerData).installReferrer)
+export const getValidInviteCodeFromReferrerData = async () => {
+  if (Platform.OS === 'android') {
+    const referrerData: ReferrerData | ReferrerDataError = await RNInstallReferrer.getReferrer()
+    Logger.info(
+      'invite/utils/getInviteCodeFromReferrerData',
+      'Referrer Data: ' + JSON.stringify(referrerData)
     )
-    const inviteCode = params.get('invite-code')
-    if (inviteCode) {
-      return inviteCode.replace(' ', '+')
+    if (referrerData && referrerData.hasOwnProperty('installReferrer')) {
+      const params = new URLSearchParamsReal(
+        decodeURIComponent((referrerData as ReferrerData).installReferrer)
+      )
+      const inviteCode = params.get('invite-code')
+      if (inviteCode) {
+        const sanitizedCode = inviteCode.replace(' ', '+')
+        // Accept invite codes which are either base64 encoded or direct hex keys
+        if (isValidPrivateKey(sanitizedCode)) {
+          return sanitizedCode
+        }
+        return extractValidInviteCode(sanitizedCode)
+      }
     }
   }
   return null

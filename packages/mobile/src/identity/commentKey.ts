@@ -1,5 +1,5 @@
+import { stripHexLeader } from '@celo/utils/src/address'
 import { encryptComment as encryptCommentRaw } from '@celo/utils/src/commentEncryption'
-import { stripHexLeader } from '@celo/utils/src/signatureUtils'
 import { getAttestationsContract, getDataEncryptionKey } from '@celo/walletkit'
 import { web3 } from 'src/web3/contracts'
 
