@@ -1,8 +1,8 @@
 import Web3 from 'web3'
 import BigNumber from 'bignumber.js'
 import { newKitFromWeb3 } from '@celo/contractkit'
-import { displaySendTx } from '../../../cli/lib/utils/cli'
 import { delay, importAndUnlockAccount, lockGoldIfNeeded } from './utils'
+import { displaySendTx } from '@celo/celocli/lib/utils/cli'
 
 const web3 = new Web3('http://localhost:8543')
 const keystorePath: string = process.env.KEYSTORE || ''

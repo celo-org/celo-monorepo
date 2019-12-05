@@ -1,6 +1,6 @@
 import BigNumber from 'bignumber.js'
-import { displaySendTx } from '../../../cli/lib/utils/cli'
 import { newKit } from '@celo/contractkit'
+import { displaySendTx } from '@celo/celocli/lib/utils/cli'
 
 const from: string = process.env.FROM || '0x0'
 const to: string = process.env.TO || '0x0'
