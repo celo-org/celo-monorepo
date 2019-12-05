@@ -2193,25 +2193,6 @@
     web3-eth-abi "1.0.0-beta.37"
     web3-utils "1.0.0-beta.37"
 
-"@celo/contractkit@0.1.6", "@celo/contractkit@^0.1.5", "@celo/contractkit@^0.1.6":
-  version "0.1.6"
-  resolved "https://registry.yarnpkg.com/@celo/contractkit/-/contractkit-0.1.6.tgz#c4f6d5003694cc28853f7331b5c0597a208a389d"
-  integrity sha512-3mEmfOVaqOjyAT5mHWAESYdcKTvZPDDCkkh7GVDDpq7sPhnZ5dGX5oT26XzMLhe8TfdTQMzp6B22EDaPjOLx8A==
-  dependencies:
-    "@0x/subproviders" "^5.0.0"
-    "@celo/utils" "^0.1.0"
-    "@types/debug" "^4.1.5"
-    bignumber.js "^7.2.0"
-    cross-fetch "3.0.4"
-    debug "^4.1.1"
-    eth-lib "^0.2.8"
-    fp-ts "2.0.5"
-    io-ts "2.0.1"
-    web3 "1.0.0-beta.37"
-    web3-core-helpers "1.0.0-beta.37"
-    web3-eth-abi "1.0.0-beta.37"
-    web3-utils "1.0.0-beta.37"
-
 "@celo/contractkit@0.2.0":
   version "0.2.0"
   resolved "https://registry.yarnpkg.com/@celo/contractkit/-/contractkit-0.2.0.tgz#6db7479c786f36ac0a1c4ffe7cb23a5f98690f83"
@@ -2225,6 +2206,44 @@
     debug "^4.1.1"
     eth-lib "^0.2.8"
     fp-ts "2.1.1"
+    io-ts "2.0.1"
+    web3 "1.0.0-beta.37"
+    web3-core-helpers "1.0.0-beta.37"
+    web3-eth-abi "1.0.0-beta.37"
+    web3-utils "1.0.0-beta.37"
+
+"@celo/contractkit@0.2.4":
+  version "0.2.4"
+  resolved "https://registry.yarnpkg.com/@celo/contractkit/-/contractkit-0.2.4.tgz#bbe0e1d10cb8f936f43433fbd81c1b1a2d21c47d"
+  integrity sha512-bDpxaeN5WXXFx0/ayrjI89MHkB5WwlL5WAGN3A1RXyX2h1Ycs+sK2+6Z19X4Cps7kKMKF+O3oiEabYSn1Qdpfw==
+  dependencies:
+    "@0x/subproviders" "^5.0.0"
+    "@celo/utils" "^0.1.0"
+    "@types/debug" "^4.1.5"
+    bignumber.js "^7.2.0"
+    cross-fetch "3.0.4"
+    debug "^4.1.1"
+    eth-lib "^0.2.8"
+    fp-ts "2.1.1"
+    io-ts "2.0.1"
+    web3 "1.0.0-beta.37"
+    web3-core-helpers "1.0.0-beta.37"
+    web3-eth-abi "1.0.0-beta.37"
+    web3-utils "1.0.0-beta.37"
+
+"@celo/contractkit@^0.1.5", "@celo/contractkit@^0.1.6":
+  version "0.1.6"
+  resolved "https://registry.yarnpkg.com/@celo/contractkit/-/contractkit-0.1.6.tgz#c4f6d5003694cc28853f7331b5c0597a208a389d"
+  integrity sha512-3mEmfOVaqOjyAT5mHWAESYdcKTvZPDDCkkh7GVDDpq7sPhnZ5dGX5oT26XzMLhe8TfdTQMzp6B22EDaPjOLx8A==
+  dependencies:
+    "@0x/subproviders" "^5.0.0"
+    "@celo/utils" "^0.1.0"
+    "@types/debug" "^4.1.5"
+    bignumber.js "^7.2.0"
+    cross-fetch "3.0.4"
+    debug "^4.1.1"
+    eth-lib "^0.2.8"
+    fp-ts "2.0.5"
     io-ts "2.0.1"
     web3 "1.0.0-beta.37"
     web3-core-helpers "1.0.0-beta.37"
@@ -4986,6 +5005,11 @@
   integrity sha512-hS/ueljJBb6i7r7VqhgmBVmDqGKMqQg2nlGIaf71CCG6+iGNE7yeaHgtBWR/wveD+o+K0ma0VE/XweUBHHTQFQ==
   dependencies:
     "@types/node" "*"
+
+"@types/hex-rgba@^1.0.0":
+  version "1.0.0"
+  resolved "https://registry.yarnpkg.com/@types/hex-rgba/-/hex-rgba-1.0.0.tgz#b2aed2aa9fdd6152b7f0ac5e3733b974d4eba35a"
+  integrity sha512-u3AGV8fjRsDBqY4wOvVWhVCgKDfh2b0h3mux7KPKU1cm/6mJp14OWBINLgBypeBTM89Nm2j+eKQqIoIe7150DA==
 
 "@types/hoist-non-react-statics@^3.3.0", "@types/hoist-non-react-statics@^3.3.1":
   version "3.3.1"
@@ -10496,6 +10520,11 @@ colorspace@1.1.x:
   dependencies:
     color "3.0.x"
     text-hex "1.0.x"
+
+colortranslator@^1.1.1:
+  version "1.1.1"
+  resolved "https://registry.yarnpkg.com/colortranslator/-/colortranslator-1.1.1.tgz#9a4919802eb9e80ac9c0cb441f62d741e68049fc"
+  integrity sha512-7X4Hc5c4ewwsZZL5A3qSCYVmpWh7Ds94WIx1CB++/6Q4nkG3u/SFGXKKQ8YqpCxAohwnAjfJZ/axOls5HCpNiA==
 
 colour@~0.7.1:
   version "0.7.1"
@@ -34092,6 +34121,7 @@ websocket@^1.0.28:
   dependencies:
     debug "^2.2.0"
     es5-ext "^0.10.50"
+    gulp "^4.0.2"
     nan "^2.14.0"
     typedarray-to-buffer "^3.1.5"
     yaeti "^0.0.6"
@@ -35047,6 +35077,11 @@ yauzl@^2.4.2:
   dependencies:
     buffer-crc32 "~0.2.3"
     fd-slicer "~1.0.1"
+
+yiq@^3.0.1:
+  version "3.0.1"
+  resolved "https://registry.yarnpkg.com/yiq/-/yiq-3.0.1.tgz#42c82374a550689b8c9430621492d62cd7bfa0c9"
+  integrity sha512-nfKzGVKrOuEQBNQX3z71InpqQb47KMkkyo0xZB0YFsHirqxFU+rBHV7cgPHzVQ2pOKhqbrm2XDsxaQ6nWlKW2Q==
 
 yn@^3.0.0:
   version "3.1.0"
