@@ -1,8 +1,12 @@
 import Web3 from 'web3'
 import { newKitFromWeb3 } from '@celo/contractkit'
-import { delay, generatePublicKeyFromPrivateKey, importAndUnlockAccount } from './utils'
+import {
+  delay,
+  displaySendTx,
+  generatePublicKeyFromPrivateKey,
+  importAndUnlockAccount,
+} from './utils'
 import { add0x } from '../lib/generate_utils'
-import { displaySendTx } from '@celo/celocli/lib/utils/cli'
 
 const web3 = new Web3('http://localhost:8543')
 const keystorePath: string = process.env.KEYSTORE || ''

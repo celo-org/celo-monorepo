@@ -1,9 +1,8 @@
 import Web3 from 'web3'
 import fs from 'fs'
-import { newKitFromWeb3 } from '@celo/contractkit'
+import { CeloTransactionObject, newKitFromWeb3 } from '@celo/contractkit'
 import BigNumber from 'bignumber.js'
 import { ec as EC } from 'elliptic'
-import { displaySendTx } from '@celo/celocli/lib/utils/cli'
 
 const ec = new EC('secp256k1')
 
@@ -19,6 +18,10 @@ export function generateAccountAddressFromPrivateKey(web3: Web3, privateKey: str
   }
   // @ts-ignore-next-line
   return web3.eth.accounts.privateKeyToAccount(privateKey).address
+}
+
+export async function displaySendTx(method: string, result: CeloTransactionObject<any>, args: any) {
+  console.log(method, await result, args.from)
 }
 
 export async function importAndUnlockAccount(

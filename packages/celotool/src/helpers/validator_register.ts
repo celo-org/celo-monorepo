@@ -2,6 +2,7 @@ import Web3 from 'web3'
 import { newKitFromWeb3 } from '@celo/contractkit'
 import {
   delay,
+  displaySendTx,
   generateAccountAddressFromPrivateKey,
   importAndUnlockAccount,
   lockGoldIfNeeded,
@@ -9,7 +10,6 @@ import {
 import { blsPrivateKeyToProcessedPrivateKey } from '@celo/utils/lib/bls'
 import * as bls12377js from 'bls12377js'
 import { add0x } from '../lib/generate_utils'
-import { displaySendTx } from '@celo/celocli/lib/utils/cli'
 
 const web3 = new Web3('http://localhost:8543')
 const keystorePath: string = process.env.KEYSTORE || ''
@@ -40,7 +40,7 @@ const validatorGroup: string = process.env.GROUP || '0x0'
       add0x(blsPublicKey),
       add0x(blsPoP)
     )
-    await displaySendTx('registerValidator', await txRegisterVal, { from: from })
+    await displaySendTx('registerValidator', txRegisterVal, { from: from })
     await delay(1000)
   }
   const me = await validatorContract.getValidator(from)
