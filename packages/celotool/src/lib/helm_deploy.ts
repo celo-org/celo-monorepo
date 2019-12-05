@@ -512,8 +512,8 @@ async function helmIPParameters(celoEnv: string) {
 }
 
 async function helmParameters(celoEnv: string) {
-  const bucketName = isProduction(celoEnv) ? 'contract_artifacts_production' : 'contract_artifacts'
-  const productionTagOverrides = isProduction(celoEnv)
+  const bucketName = isProduction() ? 'contract_artifacts_production' : 'contract_artifacts'
+  const productionTagOverrides = isProduction()
     ? [
         `--set gethexporter.image.repository=${fetchEnv('GETH_EXPORTER_DOCKER_IMAGE_REPOSITORY')}`,
         `--set gethexporter.image.tag=${fetchEnv('GETH_EXPORTER_DOCKER_IMAGE_TAG')}`,
