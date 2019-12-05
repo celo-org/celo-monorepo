@@ -191,20 +191,6 @@ EXAMPLE
 
 _See code: [packages/cli/src/commands/account/get-metadata.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/account/get-metadata.ts)_
 
-### Isvalidator
-
-Check whether a given address is elected to be validating in the current epoch
-
-```
-USAGE
-  $ celocli account:isvalidator ADDRESS
-
-EXAMPLE
-  isvalidator 0x5409ed021d9299bf6814279a6a1411a7e866a631
-```
-
-_See code: [packages/cli/src/commands/account/isvalidator.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/account/isvalidator.ts)_
-
 ### New
 
 Creates a new account locally and print out the key information. Save this information for local transaction signing or import into a Celo node.

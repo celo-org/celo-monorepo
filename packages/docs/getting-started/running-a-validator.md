@@ -445,11 +445,11 @@ celocli election:list
 
 If you find your Validator still not getting elected you may need to faucet yourself more funds and lock more gold in order to be able to cast more votes for your Validator Group!
 
-At any moment you can check the currently elected validators by running the following command:
+You can check the status of your validator, including whether it is elected and signing blocks, by running:
 
 ```bash
 # On your local machine
-celocli election:current
+celocli validator:status --validator $CELO_VALIDATOR_ADDRESS
 ```
 
 ### Running the Attestation Service
