@@ -215,7 +215,7 @@ class SetupAccountScreen extends React.Component<Props, State> {
                 onEndEditingPhoneNumber={this.onChangePhoneEndEditing}
                 onEndEditingCountryCode={this.onSetCountryCodeEndEditing}
                 inputCountryPlaceholder={t('country')}
-                inputPhonePlaceholder={t('phoneNumber')}
+                initialInputPhonePlaceholder={t('phoneNumber')}
               />
             </View>
           </View>
