@@ -1,5 +1,5 @@
 ---
-description: Manage your full node
+description: Manage your Celo node
 ---
 
 ## Commands

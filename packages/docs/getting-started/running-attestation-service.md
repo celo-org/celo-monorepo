@@ -1,31 +1,47 @@
 # Running the Attestation Service
 
-- [Running the Attestation Service](#running-the-attestation-service)
-  - [Environment variables](#environment-variables)
-  - [Sms Providers](#sms-providers)
-    - [Nexmo](#nexmo)
-    - [Twilio](#twilio)
-  - [Accounts Configuration](#accounts-configuration) \* [Database Configuration](#database-configuration)
-  - [Executing the Attestation Service](#executing-the-attestation-service)
-
 As part of the [lightweight identity protocol](/celo-codebase/protocol/identity), validators are expected to run an Attestation Service to provide attestations that allow users to map their phone number to an account on Celo. The Attestation Service is a simple Node.js application that can be run with a Docker image.
 
 ## Environment variables
 
 The service needs the following environment variables:
 
-| Variable                | Explanation                                                                                                                                                            |
-| ----------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| DATABASE_URL            | The URL under which your database is accessible, currently supported are `postgres://`, `mysql://` and `sqlite://`                                                     |  |
-| CELO_PROVIDER           | The URL under which a celo blockchain node is reachable, i.e. something like `https://integration-forno.celo-testnet.org`                                              |  |
-| ACCOUNT_ADDRESS         | The address of the validator account                                                                                                                                   |  |
-| ATTESTATION_PRIVATE_KEY | The private key with which attestations should be signed. You could use your account key for attestations, but really you should authorize a dedicated attestation key |  |
-| APP_SIGNATURE           | The hash with which clients can auto-read SMS messages on android                                                                                                      |  |
-| SMS_PROVIDERS           | A comma-separated list of providers you want to configure, we currently support `nexmo` & `twilio`                                                                     |  |
+| Variable                   | Explanation                                                                                                                                                                                       |
+| -------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| DATABASE_URL               | The URL under which your database is accessible, currently supported are `postgres://`, `mysql://` and `sqlite://`                                                                                |  |
+| CELO_PROVIDER              | The endpoint under which your node with the unlocked attestation signer key is available, should be `http://localhost:8545` if you followed the [getting started guide](./running-a-validator.md) |  |
+| CELO_VALIDATOR_ADDRESS     | The address of the Validator account                                                                                                                                                              |  |
+| ATTESTATION_SIGNER_ADDRESS | The address of the attestation signer that was authorized by the Validator account                                                                                                                |  |
+| APP_SIGNATURE              | The hash with which clients can auto-read SMS messages on android                                                                                                                                 |  |
+| SMS_PROVIDERS              | A comma-separated list of providers you want to configure, we currently support `nexmo` & `twilio`                                                                                                |  |
+
+A part of that we are going to setup the following environment variable about the Attestation Service Docker image:
+
+```bash
+export CELO_IMAGE_ATTESTATION="us.gcr.io/celo-testnet/celo-monorepo:attestation-service-8f87dda20f1854c9532a5cbcf8ff556f48dff413"
+# if you followed the instruction of setting up the attestation signer
+export CELO_PROVIDER=http://localhost:8545
+```
 
 ## Sms Providers
 
 Currently the Sms providers supported are Nexmo & Twilio. You can create your user account in the provider of your election using the [Nexmo Sign Up form](https://dashboard.nexmo.com/sign-up) or the [Twilio Sign Up form](https://www.twilio.com/try-twilio).
+
+### Twilio
+
+Twilio is the most common and popular provider. For that you will need to provision the following variables:
+
+| Variable                     | Explanation                                                     |
+| ---------------------------- | --------------------------------------------------------------- |
+| TWILIO_ACCOUNT_SID           | The Twilio account ID                                           |
+| TWILIO_MESSAGING_SERVICE_SID | The Twilio Message Service ID. Starts by `MG`                   |
+| TWILIO_AUTH_TOKEN            | The API authentication token                                    |
+| TWILIO_BLACKLIST             | A comma-sperated list of country codes you do not want to serve |
+
+**Setup**
+After you signed up for Twilio at [https://www.twilio.com/try-twilio](https://www.twilio.com/try-twilio), you should see your `ACCOUNT SID` and your `AUTH_TOKEN` in the top right of the console. You'll also want to enter in a credit card to fund the account. For most text messages, the costs will be very low. Find a more comprehensive price list at [https://www.twilio.com/sms/pricing](https://www.twilio.com/sms/pricing). If there are countries that you do not want to serve, you can specify them with the `TWILIO_BLACKLIST`.
+
+To actually be able to send SMS, you need to create a messaging service under [Programmable SMS > SMS](https://www.twilio.com/console/sms/services). The resulting `SID` you want to specify under the `TWILIO_MESSAGING_SERVICE_SID`. Now that you have provisioned your messaging service, you need to buy at least 1 phone number to send SMS from. You can do so under the `Numbers` option of the messaging service page. To maximize the chances of reliable and prompt SMS sending (and thus attestation fee revenue), you can buy numbers in many locales, and Twilio will intelligently select the best number to send each SMS.
 
 ### Nexmo
 
@@ -37,102 +53,59 @@ Here is the list of the enviromnet variables needed to use the Nexmo SMS broker:
 | NEXMO_SECRET    | The API secret to the Nexmo API                                 |
 | NEXMO_BLACKLIST | A comma-sperated list of country codes you do not want to serve |
 
-### Twilio
-
-If you prefer using Twilio, this is list of the variables to use:
-
-| Variable                     | Explanation                                                     |
-| ---------------------------- | --------------------------------------------------------------- |
-| TWILIO_ACCOUNT_SID           | The Twilio account ID                                           |
-| TWILIO_MESSAGING_SERVICE_SID | The Twilio Message Service ID. Starts by `MG`                   |
-| TWILIO_AUTH_TOKEN            | The API authentication token                                    |
-| TWILIO_BLACKLIST             | A comma-sperated list of country codes you do not want to serve |
-
-## Accounts Configuration
-
-First we need to create an account for getting the attestation key needed to sign the attestations. Run:
-
-```bash
-celocli account:new
-```
-
-We copy the account details and assign the Private Key to the `ATTESTATION_PRIVATE_KEY` environment variable:
-
-```bash
-export ATTESTATION_PRIVATE_KEY=0x<Private Key>
-export ATTESTATION_ADDRESS=<Account address>
-```
-
-You can create a proof of posession of this attestation key by running the CLI commands (remember to prefix the key with 0x)
-
-```bash
-celocli account:proof-of-possession --signer $ATTESTATION_ADDRESS --account $CELO_VALIDATOR_ADDRESS --privateKey $ATTESTATION_KEY
-```
-
-That will give you a signature that you can then use to authorize the key:
-
-```bash
-celocli account:authorize --from $CELO_VALIDATOR_ADDRESS -r attestation --pop SIGNATURE --signer $ATTESTATION_ADDRESS
-```
-
-The Attestation Service needs to connect to a Web3 Provider. This is going to depend on the network you want to connect. So depending on which network you are making available the service, you need to configure the `CELO_PROVIDER` variable pointing to that.
-
-For example:
-
-```bash
-# Web3 provider for Alfajores network
-export CELO_PROVIDER="https://alfajores-forno.celo-testnet.org/"
-```
-
 #### Database Configuration
 
-For storing and retrieving the attestation requests the service needs a database to persist that information. Currently `sqlite`, `postgres` and `mysql` are supported. For testing purposes you can use `sqlite` but it's recommended to run a stand-alone database server using `mysql` or `postgres` if your intention is running the Attestation Service in a production environment.
+For storing and retrieving the attestation requests the service needs a database to persist that information. Currently `sqlite`, `postgres` and `mysql` are supported. For testing purposes you can use `sqlite` but it's recommended to run a stand-alone database server using `mysql` or `postgres` if your intention is running the Attestation Service in a production environment. If you are running on a popular cloud provider, consider using their hosted SQL services.
 
-So for specifying the database url you need to setup the `DATABASE_URL` variable:
+Depending on your database technology you need to create a database with the access for a specific user and password.
+
+For specifying the database url you need to setup the `DATABASE_URL` variable:
 
 ```bash
-export DATABASE_URL="sqlite://db/dev.db"
+export DATABASE_URL="sqlite://db/attestation.db"
 export DATABASE_URL="mysql://user:password@mysql.example.com:3306/attestation-service"
 export DATABASE_URL="postgres://user:password@postgres.example.com:5432/attestation-service"
 ```
 
-You can find the migration scripts for creating the schema at the `celo-monorepo`, `packages/attestation-service` folder. From there, after setting up the `DATABASE_URL` env variable you can run the following commands:
+**Example of setting up a local postgres database on Ubuntu**:
 
 ```bash
-yarn run db:create
-yarn run db:migrate
+apt install postgres
+sudo -u postgres createdb attestation-service
+sudo -u postgres psql -c "ALTER USER postgres PASSWORD '<DATABASE_PASSWORD>';"
+export DATABASE_URL="postgres://postgres:<DATABASE_PASSWORD>@localhost:5432/attestation-service"
 ```
 
 ## Executing the Attestation Service
 
-The following command for running the Attestation Service is using Nexmo, but you can adapt for using Twilio easily:
+The following command for running the Attestation Service is using Twilio and uses `--network host` to access a local database (only works on Linux):
 
 ```bash
-docker run -e ATTESTATION_KEY=$ATTESTATION_KEY -e ACCOUNT_ADDRESS=$CELO_VALIDATOR_ADDRESS -e CELO_PROVIDER=$CELO_PROVIDER -e DATABASE_URL=$DATABASE_URL -e SMS_PROVIDERS=nexmo -e NEXMO_KEY=$NEXMO_KEY -e NEXMO_SECRET=$NEXMO_SECRET -e NEXMO_BLACKLIST=$NEXMO_BLACKLIST  -p 3000:80 us.gcr.io/celo-testnet/attestation-service:$CELO_NETWORK
+docker run --name celo-attestation-service --restart always --entrypoint /bin/bash --network host -e ATTESTATION_SIGNER_ADDRESS=$ATTESTATION_SIGNER_ADDRESS -e CELO_VALIDATOR_ADDRESS=0x$CELO_VALIDATOR_ADDRESS -e CELO_PROVIDER=$CELO_PROVIDER -e DATABASE_URL=$DATABASE_URL -e SMS_PROVIDERS=twilio -e TWILIO_MESSAGING_SERVICE_SID=$TWILIO_MESSAGING_SERVICE_SID -e TWILIO_ACCOUNT_SID=$TWILIO_ACCOUNT_SID -e TWILIO_BLACKLIST=$TWILIO_BLACKLIST -e TWILIO_AUTH_TOKEN=$TWILIO_AUTH_TOKEN -e PORT=80 -p 80:80 $CELO_IMAGE_ATTESTATION -c " cd /celo-monorepo/packages/attestation-service && yarn run db:migrate && yarn start "
 ```
 
-In order for users to request attestations from your service, you need to register the endpoint under which your service is reachable in your [metadata](/celo-codebase/protocol/identity/metadata).
+## Registering the Attestation Service
+
+In order for users to request attestations from your service, you need to register the endpoint under which your service is reachable in your [metadata](/celo-codebase/protocol/identity/metadata). Run the following commands on your local machine where `$CELO_VALIDATOR_ADDRESS` is unlocked.
 
 ```bash
-celocli identity:create-metadata ./metadata.json
+celocli account:create-metadata ./metadata.json --from $CELO_VALIDATOR_ADDRESS
 ```
 
 The `ATTESTATION_SERVICE_URL` variable stores the URL to access the Attestation Service deployed. In the following command we specify the URL where this Attestation Service is:
 
 ```bash
-celocli identity:change-attestation-service-url ./metadata.json --url $ATTESTATION_SERVICE_URL
+celocli account:claim-attestation-service-url ./metadata.json --url $ATTESTATION_SERVICE_URL --from $CELO_VALIDATOR_ADDRESS
 ```
 
-And then host your metadata somewhere reachable via HTTP. You can register your metadata URL with:
+And then host your metadata somewhere reachable via HTTP. You can use a service like [gist.github.com](https://gist.github.com). Create a gist with the contents of the file and then click on the `Raw` buttton to receive the permalink to the machine-readable file.
 
 ```bash
-celocli identity:register-metadata --url <METADATA_URL> --from $CELO_VALIDATOR_ADDRESS
+celocli account:register-metadata --url <METADATA_URL> --from $CELO_VALIDATOR_ADDRESS
 ```
-
-You can use for testing a gist url (i.e: `https://gist.github.com/john.doe/a29f83d478c9daa2ac52596ba9778391`) or similar where you have publicly available your metadata.
 
 If everything goes well users should see that you are ready for attestations by running:
 
 ```bash
-celocli identity:get-metadata $CELO_VALIDATOR_ADDRESS
+celocli account:get-metadata $CELO_VALIDATOR_ADDRESS
 ```

@@ -9,7 +9,6 @@ import Web3 from 'web3'
 import {
   assertAlmostEqual,
   getContext,
-  getEnode,
   GethInstanceConfig,
   importGenesis,
   initAndStartGeth,
@@ -242,17 +241,26 @@ describe('governance tests', () => {
     const previousTarget = new BigNumber(
       (await epochRewards.methods.getTargetVotingYieldParameters().call({}, blockNumber - 1))[0]
     )
-    const difference = currentTarget.minus(previousTarget)
-
-    // Assert equal to 9 decimal places due to rounding errors.
-    assert.equal(
-      fromFixed(difference)
-        .dp(9)
-        .toFixed(),
-      fromFixed(expected)
-        .dp(9)
-        .toFixed()
+    const max = new BigNumber(
+      (await epochRewards.methods.getTargetVotingYieldParameters().call({}, blockNumber))[1]
     )
+    const expectedTarget = previousTarget.plus(expected)
+    if (expectedTarget.isGreaterThanOrEqualTo(max)) {
+      assert.equal(currentTarget.toFixed(), max.toFixed())
+    } else if (expectedTarget.isLessThanOrEqualTo(0)) {
+      assert.isTrue(currentTarget.isZero())
+    } else {
+      const difference = currentTarget.minus(previousTarget)
+      // Assert equal to 9 decimal places due to rounding errors.
+      assert.equal(
+        fromFixed(difference)
+          .dp(9)
+          .toFixed(),
+        fromFixed(expected)
+          .dp(9)
+          .toFixed()
+      )
+    }
   }
 
   const assertTargetVotingYieldUnchanged = async (blockNumber: number) => {
@@ -297,7 +305,7 @@ describe('governance tests', () => {
           wsport: 8555,
           rpcport: 8557,
           privateKey: groupPrivateKey.slice(2),
-          peers: [await getEnode(8545)],
+          peers: [8545],
         },
       ]
       await Promise.all(
@@ -316,7 +324,7 @@ describe('governance tests', () => {
           port: 30315,
           wsport: 8559,
           privateKey: rotation0PrivateKey.slice(2),
-          peers: [await getEnode(8557)],
+          peers: [8557],
         },
         {
           name: 'validator2KeyRotation1',
@@ -326,7 +334,7 @@ describe('governance tests', () => {
           port: 30317,
           wsport: 8561,
           privateKey: rotation1PrivateKey.slice(2),
-          peers: [await getEnode(8557)],
+          peers: [8557],
         },
       ]
       await Promise.all(
@@ -350,7 +358,10 @@ describe('governance tests', () => {
       await waitToFinishSyncing(groupWeb3)
       const groupKit = newKitFromWeb3(groupWeb3)
       const group: string = (await groupWeb3.eth.getAccounts())[0]
-      await (await groupKit.contracts.getElection()).activate(group)
+      const txos = await (await groupKit.contracts.getElection()).activate(group)
+      for (const txo of txos) {
+        await txo.sendAndWaitForReceipt({ from: group })
+      }
 
       validators = await groupKit._web3Contracts.getValidators()
       const membersToSwap = [validatorAccounts[0], validatorAccounts[1]]
@@ -634,6 +645,7 @@ describe('governance tests', () => {
           const activeVotes = new BigNumber(
             await election.methods.getActiveVotes().call({}, blockNumber - 1)
           )
+          assert.isFalse(activeVotes.isZero())
           const targetVotingYield = new BigNumber(
             (await epochRewards.methods.getTargetVotingYieldParameters().call({}, blockNumber))[0]
           )
