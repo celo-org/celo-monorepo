@@ -54,6 +54,7 @@ export const MNEMONIC_ACCOUNT_TYPE_CHOICES = [
   'faucet',
   'attestation',
   'price_oracle',
+  'attestation_bot',
 ]
 
 export const add0x = (str: string) => {
