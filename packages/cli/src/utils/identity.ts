@@ -1,10 +1,11 @@
 import { ContractKit } from '@celo/contractkit'
 import { ClaimTypes, IdentityMetadataWrapper } from '@celo/contractkit/lib/identity'
-import { Claim, validateClaim, verifyClaim } from '@celo/contractkit/lib/identity/claims/claim'
+import { Claim, validateClaim } from '@celo/contractkit/lib/identity/claims/claim'
 import {
   VALIDATABLE_CLAIM_TYPES,
   VERIFIABLE_CLAIM_TYPES,
 } from '@celo/contractkit/lib/identity/claims/types'
+import { verifyClaim } from '@celo/contractkit/lib/identity/claims/verify'
 import { concurrentMap } from '@celo/utils/lib/async'
 import { NativeSigner } from '@celo/utils/lib/signatureUtils'
 import { cli } from 'cli-ux'

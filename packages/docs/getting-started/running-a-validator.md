@@ -567,20 +567,32 @@ The following command for running the Attestation Service is using Twilio and us
 docker run --name celo-attestation-service --restart always --entrypoint /bin/bash --network host -e ATTESTATION_SIGNER_ADDRESS=0x$CELO_ATTESTATION_SIGNER_ADDRESS -e CELO_VALIDATOR_ADDRESS=0x$CELO_VALIDATOR_ADDRESS -e CELO_PROVIDER=$CELO_PROVIDER -e DATABASE_URL=$DATABASE_URL -e SMS_PROVIDERS=twilio -e TWILIO_MESSAGING_SERVICE_SID=$TWILIO_MESSAGING_SERVICE_SID -e TWILIO_ACCOUNT_SID=$TWILIO_ACCOUNT_SID -e TWILIO_BLACKLIST=$TWILIO_BLACKLIST -e TWILIO_AUTH_TOKEN=$TWILIO_AUTH_TOKEN -e PORT=80 -p 80:80 $CELO_IMAGE_ATTESTATION -c " cd /celo-monorepo/packages/attestation-service && yarn run db:migrate && yarn start "
 ```
 
-## Registering the Attestation Service
+## Registering Metadata
 
-In order for users to request attestations from your service, you need to register the endpoint under which your service is reachable in your [metadata](/celo-codebase/protocol/identity/metadata). Run the following commands on your local machine where `$CELO_VALIDATOR_ADDRESS` is unlocked.
+We are using [Metadata]()(../celo-codebase/protocol/identity/metadata) to allow accounts to make certain claims without having to do so on-chain. For us to complete the process, we have to make two claims:
+
+1.  Under which URL users can request attestations from
+2.  Which accounts belong together for the purpose of the leaderboard
+
+Run the following commands on your local machine where `$CELO_VALIDATOR_ADDRESS` is unlocked.
 
 ```bash
 # On your local machine
-celocli account:create-metadata ./metadata.json --from $CELO_VALIDATOR_ADDRESS
+celocli account:create-metadata ./metadata.json --from 0x$CELO_VALIDATOR_ADDRESS
 ```
 
 The `ATTESTATION_SERVICE_URL` variable stores the URL to access the Attestation Service deployed. In the following command we specify the URL where this Attestation Service is:
 
 ```bash
 # On your local machine
-celocli account:claim-attestation-service-url ./metadata.json --url $ATTESTATION_SERVICE_URL --from $CELO_VALIDATOR_ADDRESS
+celocli account:claim-attestation-service-url ./metadata.json --url $ATTESTATION_SERVICE_URL --from 0x$CELO_VALIDATOR_ADDRESS
+```
+
+Let's claim our group address
+
+```bash
+# On your local machine
+celocli account:claim-account ./metadata.json --address 0x$CELO_VALIDATOR_GROUP_ADDRESS --from 0x$CELO_VALIDATOR_ADDRESS
 ```
 
 And then host your metadata somewhere reachable via HTTP. You can use a service like [gist.github.com](https://gist.github.com). Create a gist with the contents of the file and then click on the `Raw` buttton to receive the permalink to the machine-readable file.
@@ -590,7 +602,7 @@ And then host your metadata somewhere reachable via HTTP. You can use a service 
 celocli account:register-metadata --url <METADATA_URL> --from $CELO_VALIDATOR_ADDRESS
 ```
 
-If everything goes well users should see that you are ready for attestations by running:
+If everything goes well users should be able to see your claims by running:
 
 ```bash
 # On your local machine
