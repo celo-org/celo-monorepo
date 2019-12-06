@@ -10,7 +10,7 @@ import { Cell, GridRow, Spans } from 'src/layout/GridRow'
 import { ScreenProps, ScreenSizes, withScreenSize } from 'src/layout/ScreenSize'
 import AspectRatio from 'src/shared/AspectRatio'
 import Responsive from 'src/shared/Responsive'
-import { fonts, standardStyles } from 'src/styles'
+import { colors, fonts, standardStyles, textStyles } from 'src/styles'
 
 interface Props {
   randomSeed: number
@@ -20,7 +20,8 @@ export class Team extends React.Component<Props & I18nProps & ScreenProps> {
   render() {
     const { t, randomSeed, screen } = this.props
     const shuffledTeamList = shuffleSeed.shuffle(teamList, randomSeed)
-
+    const isTablet = screen === ScreenSizes.TABLET
+    const isMobile = screen === ScreenSizes.MOBILE
     return (
       <>
         <BookLayout label={t('teamTitle')} startBlock={true}>
@@ -32,34 +33,24 @@ export class Team extends React.Component<Props & I18nProps & ScreenProps> {
             <View
               style={[
                 styles.photoList,
-                screen === ScreenSizes.MOBILE && { justifyContent: 'center' },
+                isMobile ? styles.photoListAuxMobile : isTablet && styles.photoListAuxTablet,
               ]}
             >
               {shuffledTeamList.map((person: Person) => (
-                <Responsive
-                  key={person.name}
-                  medium={styles.mediumPerson}
-                  large={styles.largePerson}
-                >
-                  <View style={styles.person}>
-                    <View style={styles.imageBackground}>
-                      <LazyLoadFadin>
-                        {(onLoad: () => void) => (
-                          <Portrait source={{ uri: person.photo }} onLoad={onLoad} />
-                        )}
-                      </LazyLoadFadin>
-                    </View>
-                    <H4>{person.name}</H4>
-                    <Text style={fonts.p}>{t(person.role) as string}</Text>
-                  </View>
-                </Responsive>
+                <React.Fragment key={person.name}>
+                  <LazyLoadFadin>
+                    {(onLoad: () => void) => (
+                      <Portrait
+                        name={person.name}
+                        team={person.role}
+                        purpose="Methodically Manages Mischief"
+                        source={{ uri: person.photo }}
+                        onLoad={onLoad}
+                      />
+                    )}
+                  </LazyLoadFadin>
+                </React.Fragment>
               ))}
-              <Responsive medium={styles.mediumFiller} large={styles.largeFiller}>
-                <View style={styles.filler} />
-              </Responsive>
-              <Responsive medium={styles.mediumFiller} large={styles.largeFiller}>
-                <View style={styles.filler} />
-              </Responsive>
             </View>
           </Cell>
         </GridRow>
@@ -70,14 +61,41 @@ export class Team extends React.Component<Props & I18nProps & ScreenProps> {
 
 interface PortraitProps {
   source: ImageURISource
+  name: string
+  purpose: string
+  team: string
   onLoad?: () => void
 }
 
-const Portrait = React.memo(function _Portrait({ source, onLoad }: PortraitProps) {
+const Portrait = React.memo(function _Portrait({
+  source,
+  onLoad,
+  name,
+  team,
+  purpose,
+}: PortraitProps) {
   return (
-    <AspectRatio ratio={275 / 400}>
-      <Image source={source} onLoad={onLoad} style={styles.photo} />
-    </AspectRatio>
+    <>
+      <Responsive medium={styles.mediumPerson} large={styles.largePerson}>
+        <View style={styles.person}>
+          <AspectRatio ratio={1}>
+            <Image source={source} onLoad={onLoad} style={styles.photo} />
+          </AspectRatio>
+          <Text
+            style={[
+              fonts.p,
+              textStyles.italic,
+              styles.purposeText,
+              standardStyles.elementalMarginTop,
+            ]}
+          >
+            {purpose}
+          </Text>
+          <Text style={[fonts.p, textStyles.heavy, standardStyles.elementalMarginTop]}>{name}</Text>
+          <Text style={[fonts.p]}>{team}</Text>
+        </View>
+      </Responsive>
+    </>
   )
 })
 
@@ -85,12 +103,15 @@ const PHOTO_BACKGROUND = '#E5E2DD'
 
 // @ts-ignore
 const styles = StyleSheet.create({
+  purposeText: { fontSize: 24, lineHeight: 28 },
   container: {
     flex: 1,
     flexDirection: 'column',
     justifyContent: 'flex-start',
     alignItems: 'center',
   },
+  photoListAuxMobile: { justifyContent: 'center' },
+  photoListAuxTablet: { justifyContent: 'space-around' },
   imageBackground: { backgroundColor: PHOTO_BACKGROUND, marginBottom: 20 },
   photo: {
     height: '100%',
@@ -105,31 +126,20 @@ const styles = StyleSheet.create({
   person: {
     flexDirection: 'column',
     margin: 5,
-    width: 176,
-    minHeight: 400,
+    marginBottom: 30,
+    flex: 1,
+    maxWidth: '100%',
   },
   mediumPerson: {
     flexDirection: 'column',
-    marginVertical: 20,
-    width: 210,
-    minHeight: 420,
+    marginBottom: 30,
+    width: 245,
+    paddingHorizontal: 10,
   },
   largePerson: {
     flexDirection: 'column',
-    marginVertical: 30,
+    marginBottom: 30,
     width: 275,
-  },
-  filler: {
-    width: 176 + 10,
-    height: 0,
-  },
-  mediumFiller: {
-    width: 210 + 40,
-    height: 0,
-  },
-  largeFiller: {
-    width: 275 + 60,
-    height: 0,
   },
 })
 
