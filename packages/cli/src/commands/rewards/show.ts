@@ -14,6 +14,10 @@ export default class Show extends BaseCommand {
     address: Flags.address({ required: false, description: 'Address to filter' }),
     group: Flags.address({ required: false, description: 'Group to filter' }),
     epochs: flags.integer({ required: false, description: 'Number of epochs' }),
+    'no-truncate': flags.boolean({
+      required: false,
+      description: "Don't truncate fields to fit line",
+    }),
   }
 
   static args = []
@@ -22,56 +26,72 @@ export default class Show extends BaseCommand {
 
   async run() {
     const res = this.parse(Show)
-    var votes: { [key: string]: BigNumber } | null = null
+    const addressVotes: { [key: string]: BigNumber } = {}
 
+    // Map the currently cast votes by address.
     if (res.flags.address) {
       await newCheckBuilder(this)
         .isAccount(res.flags.address)
         .runChecks()
-
       const election = await this.kit.contracts.getElection()
       const voter = await election.getVoter(res.flags.address)
-      printValueMapRecursive(voter)
-
-      votes = {}
       voter.votes.forEach(function(x) {
         const group: string = x.group.toLowerCase()
-        votes![group] = (votes![group] || new BigNumber(0)).plus(x.pending)
+        addressVotes[group] = (addressVotes[group] || new BigNumber(0)).plus(x.pending)
       })
+      printValueMapRecursive(voter)
     }
 
-    const voterRewards = await this.getVoterRewards(res.flags.epochs, votes)
+    // voterRewards applies to address when voterReward.group in addressVotes.
+    const voterRewards = await this.getVoterRewards(
+      res.flags.epochs,
+      res.flags.address ? addressVotes : null
+    )
+
+    // validatorRewards applies to address when validatorReward.validator is address.
     const validatorRewards = await this.getValidatorRewards(res.flags.epochs, res.flags.address)
-    const validators = await this.kit.contracts.getValidators()
-    var validatorDetails: { [key: string]: any } = {}
 
-    for (const validatorReward of validatorRewards) {
-      const validator: string = validatorReward.returnValues.validator.toLowerCase()
-      if (!(validator in validatorDetails))
-        validatorDetails[validator] = await validators.getValidator(validator)
-    }
+    const validatorDetails = await this.getValidatorDetails(validatorRewards, (x: any) =>
+      x.returnValues.validator.toLowerCase()
+    )
 
-    cli.table(voterRewards, {
-      group: { get: (x: any) => x.returnValues.group },
-      value: { get: (x: any) => x.returnValues.value },
-      blockNumber: {},
-    })
+    const validatorGroupDetails = await this.getValidatorGroupDetails(voterRewards, (x: any) =>
+      x.returnValues.group.toLowerCase()
+    )
 
-    cli.table(validatorRewards, {
-      name: {
-        get: (x: any) => validatorDetails[x.returnValues.validator.toLowerCase()].name,
+    cli.table(
+      voterRewards,
+      {
+        name: {
+          get: (x: any) => validatorGroupDetails[x.returnValues.group.toLowerCase()].name,
+        },
+        group: { get: (x: any) => x.returnValues.group },
+        value: { get: (x: any) => x.returnValues.value },
+        blockNumber: {},
       },
-      validator: { get: (x: any) => x.returnValues.validator },
-      validatorPayment: { get: (x: any) => x.returnValues.validatorPayment },
-      currentValidatorScore: {
-        get: (x: any) => validatorDetails[x.returnValues.validator.toLowerCase()].score.toFixed(),
+      { 'no-truncate': res.flags['no-truncate'] }
+    )
+
+    cli.table(
+      validatorRewards,
+      {
+        name: {
+          get: (x: any) => validatorDetails[x.returnValues.validator.toLowerCase()].name,
+        },
+        validator: { get: (x: any) => x.returnValues.validator },
+        validatorPayment: { get: (x: any) => x.returnValues.validatorPayment },
+        currentValidatorScore: {
+          get: (x: any) => validatorDetails[x.returnValues.validator.toLowerCase()].score.toFixed(),
+        },
+        group: { get: (x: any) => x.returnValues.group },
+        groupPayment: { get: (x: any) => x.returnValues.groupPayment },
+        blockNumber: {},
       },
-      group: { get: (x: any) => x.returnValues.group },
-      groupPayment: { get: (x: any) => x.returnValues.groupPayment },
-      blockNumber: {},
-    })
+      { 'no-truncate': res.flags['no-truncate'] }
+    )
   }
 
+  // Gets EpochRewardsDistributedToVoters events with getEpochEvents().
   async getVoterRewards(epochs = 1, votes?: { [key: string]: BigNumber } | null) {
     var epochRewardsEvents = await this.getEpochEvents(
       await this.kit._web3Contracts.getElection(),
@@ -86,6 +106,7 @@ export default class Show extends BaseCommand {
     return epochRewardsEvents
   }
 
+  // Gets ValidatorEpochPaymentDistributed events with getEpochEvents().
   async getValidatorRewards(epochs = 1, address?: string) {
     var validatorRewardsEvents = await this.getEpochEvents(
       await this.kit._web3Contracts.getValidators(),
@@ -103,6 +124,35 @@ export default class Show extends BaseCommand {
     return validatorRewardsEvents
   }
 
+  // Gets Validator objects with Promise.all().
+  async getValidatorDetails(listWithValidators: any, getValidatorAddress: any) {
+    const validators = await this.kit.contracts.getValidators()
+    const validatorDetails: { [key: string]: any } = {}
+    for (const validator of listWithValidators) {
+      const validatorAddress = getValidatorAddress(validator)
+      // Better to use Promise.all()
+      if (!(validatorAddress in validatorDetails))
+        validatorDetails[validatorAddress] = await validators.getValidator(validatorAddress)
+    }
+    return validatorDetails
+  }
+
+  // Gets ValidatorGroup objects with Promise.all().
+  async getValidatorGroupDetails(listWithValidatorGroups: any, getValidatorGroupAddress: any) {
+    const validators = await this.kit.contracts.getValidators()
+    const validatorGroupDetails: { [key: string]: any } = {}
+    for (const validatorGroup of listWithValidatorGroups) {
+      const validatorGroupAddress = getValidatorGroupAddress(validatorGroup)
+      // Better to use Promise.all()
+      if (!(validatorGroupAddress in validatorGroupDetails))
+        validatorGroupDetails[validatorGroupAddress] = await validators.getValidatorGroup(
+          validatorGroupAddress
+        )
+    }
+    return validatorGroupDetails
+  }
+
+  /// Gets contract events from the last N epochs.
   async getEpochEvents(contract: any, eventName: string, epochs = 1) {
     const validators = await this.kit.contracts.getValidators()
     const epochSize = await validators.getEpochSize()
