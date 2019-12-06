@@ -53,6 +53,7 @@
     "lerna": "^3.16.0",
     "patch-package": "^5.1.1",
     "prettier": "1.13.5",
+    "prettier-plugin-java": "^0.4.0",
     "prettier-plugin-solidity": "1.0.0-alpha.34",
     "pretty-quick": "^1.11.1",
     "solc": "0.5.8",
@@ -64,8 +65,7 @@
     "typescript-tslint-plugin": "^0.5.4"
   },
   "dependencies": {
-    "codecov": "^3.1.0",
-    "prettier-plugin-java": "^0.4.0"
+    "codecov": "^3.1.0"
   },
   "resolutions": {
     "node-gyp": "5.0.1",
