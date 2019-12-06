@@ -22,7 +22,7 @@ export default class Show extends BaseCommand {
 
   async run() {
     const res = this.parse(Show)
-    var votes: { [key: string]: BigNumber }
+    var votes: { [key: string]: BigNumber } | null = null
 
     if (res.flags.address) {
       await newCheckBuilder(this)
@@ -36,12 +36,20 @@ export default class Show extends BaseCommand {
       votes = {}
       voter.votes.forEach(function(x) {
         const group: string = x.group.toLowerCase()
-        votes[group] = (votes[group] || new BigNumber(0)).plus(x.pending)
+        votes![group] = (votes![group] || new BigNumber(0)).plus(x.pending)
       })
     }
 
     const voterRewards = await this.getVoterRewards(res.flags.epochs, votes)
     const validatorRewards = await this.getValidatorRewards(res.flags.epochs, res.flags.address)
+    const validators = await this.kit.contracts.getValidators()
+    var validatorDetails: { [key: string]: any } = {}
+
+    for (const validatorReward of validatorRewards) {
+      const validator: string = validatorReward.returnValues.validator.toLowerCase()
+      if (!(validator in validatorDetails))
+        validatorDetails[validator] = await validators.getValidator(validator)
+    }
 
     cli.table(voterRewards, {
       group: { get: (x: any) => x.returnValues.group },
@@ -50,15 +58,21 @@ export default class Show extends BaseCommand {
     })
 
     cli.table(validatorRewards, {
+      name: {
+        get: (x: any) => validatorDetails[x.returnValues.validator.toLowerCase()].name,
+      },
       validator: { get: (x: any) => x.returnValues.validator },
       validatorPayment: { get: (x: any) => x.returnValues.validatorPayment },
+      currentValidatorScore: {
+        get: (x: any) => validatorDetails[x.returnValues.validator.toLowerCase()].score.toFixed(),
+      },
       group: { get: (x: any) => x.returnValues.group },
       groupPayment: { get: (x: any) => x.returnValues.groupPayment },
       blockNumber: {},
     })
   }
 
-  async getVoterRewards(epochs = 1, votes?: object) {
+  async getVoterRewards(epochs = 1, votes?: { [key: string]: BigNumber } | null) {
     var epochRewardsEvents = await this.getEpochEvents(
       await this.kit._web3Contracts.getElection(),
       'EpochRewardsDistributedToVoters',
