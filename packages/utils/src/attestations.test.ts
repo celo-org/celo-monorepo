@@ -1,9 +1,8 @@
 import {
-  decodeAttestationCode,
   extractAttestationCodeFromMessage,
   messageContainsAttestationCode,
-  sanitizeBase64,
-} from '../src/attestations'
+  sanitizeMessageBase64,
+} from './attestations'
 
 const MESSAGE_1 =
   'Celo : q4BJuVrALpiaroth_dwQ_ps6w8auvNPmi-SVVwstPaFaq8aRq4jeaWSPmI-rZTrJQ_Z0BOUyz9EBNif1Y2XzZQE='
@@ -15,13 +14,6 @@ const MESSAGE_3_WITH_LINK =
   '<#> celo://wallet/v/GTCp4SaFdr9d3uNUo3SAUp1x-ZvoLAUAX3txx9dC0Q56mqAfisxNeZP3WrGDz2uMtNSo2SP-z93RkeYeB0rcWhA= l5k6LvdPDXS'
 const MESSAGE_4_UNSANITIZED =
   '<#> AOvujFUk§HkATAEsmVZRgB2phcFp69eqMqg0ps4Z8688s2-kgmyHybsRWYfTgjYMJv0jmFnjM8KKmb2tThROLAE= l5k6LvdPDXS'
-
-const MESSAGE_1_CODE =
-  'q4BJuVrALpiaroth_dwQ_ps6w8auvNPmi-SVVwstPaFaq8aRq4jeaWSPmI-rZTrJQ_Z0BOUyz9EBNif1Y2XzZQE='
-const MESSAGE_2_CODE =
-  'IDOp4SaFdr9d_uNUo3SAUp1x-ZvoLAUAX_txx9dC0Q56mqAfisxNeZjh6LGDz2uMtNSo2SP-z93RkeYeB0rcXgA='
-const MESSAGE_3_CODE =
-  'GTCp4SaFdr9d3uNUo3SAUp1x-ZvoLAUAX3txx9dC0Q56mqAfisxNeZP3WrGDz2uMtNSo2SP-z93RkeYeB0rcWhA='
 
 const MESSAGE_1_DECODED =
   '0xab8049b95ac02e989aae8b61fddc10fe9b3ac3c6aebcd3e68be495570b2d3da15aabc691ab88de69648f988fab653ac943f67404e532cfd1013627f56365f36501'
@@ -58,6 +50,7 @@ describe('Attestation Utils', () => {
     })
   })
 
+  // TODO Update codes to include deeplink prefix
   describe('sanitizeBase64', () => {
     const CODE_1 =
       'Celo attestation code: NaLrNSYGRQ1JurhgREF1tNF43KDJnO6KaatnD¿hoim1XTq0O0IKNDQuBOF¿Fn5xIAjLQMtWbxbOgrtTBZ1oYAQA='
@@ -71,17 +64,9 @@ describe('Attestation Utils', () => {
       'Celo attestation code: T7p-Mn1_L5zJuycAgAxYVqaJDp5r2TORcb775fdVoARbdJ-rNP-LArWCNJzJ6KjuVg0yskkEM8vVtl1PPmOsWwE='
 
     it('sanitizes correctly', () => {
-      expect(sanitizeBase64(CODE_1)).toBe(SANITIZED_CODE_1)
-      expect(sanitizeBase64(CODE_2)).toBe(SANITIZED_CODE_2)
-      expect(sanitizeBase64(NORMAL_CODE)).toBe(NORMAL_CODE)
-    })
-  })
-
-  describe('decodeAttestationCode', () => {
-    it('decodes the base64 message correctly', () => {
-      expect(decodeAttestationCode(MESSAGE_1_CODE)).toBe(MESSAGE_1_DECODED)
-      expect(decodeAttestationCode(MESSAGE_2_CODE)).toBe(MESSAGE_2_DECODED)
-      expect(decodeAttestationCode(MESSAGE_3_CODE)).toBe(MESSAGE_3_DECODED)
+      expect(sanitizeMessageBase64(CODE_1)).toBe(SANITIZED_CODE_1)
+      expect(sanitizeMessageBase64(CODE_2)).toBe(SANITIZED_CODE_2)
+      expect(sanitizeMessageBase64(NORMAL_CODE)).toBe(NORMAL_CODE)
     })
   })
 })
