@@ -212,6 +212,10 @@ export function* requestAndRetrieveAttestations(
       account
     )
 
+    // TODO: We can't explain why this delay is necessary but without it,
+    // the `getActionableAttestations` calls cause errors
+    yield delay(5000)
+
     CeloAnalytics.track(CustomEventNames.verification_actionable_attestation_start)
     // Check if we have a sufficient set now by fetching the new total set
     attestations = yield call(

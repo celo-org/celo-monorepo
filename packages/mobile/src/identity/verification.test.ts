@@ -20,8 +20,8 @@ import {
   doVerificationFlow,
   requestAndRetrieveAttestations,
   startVerification,
-  VERIFICATION_TIMEOUT,
   VerificationStatus,
+  VERIFICATION_TIMEOUT,
 } from 'src/identity/verification'
 import { contractKit } from 'src/web3/contracts'
 import { getConnectedAccount, getConnectedUnlockedAccount } from 'src/web3/saga'
@@ -188,6 +188,7 @@ describe('Do Verification Saga', () => {
         ],
         [call([contractKit.contracts, contractKit.contracts.getAccounts]), mockAccountsWrapper],
         [select(e164NumberSelector), mockE164Number],
+        [delay(5000), 0],
         [select(attestationCodesSelector), attestationCodes],
         [select(attestationCodesSelector), attestationCodes],
         [select(attestationCodesSelector), attestationCodes],
