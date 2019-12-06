@@ -64,6 +64,7 @@ export function spawnWithLog(cmd: string, args: string[], logsFilepath: string) 
     // nothing to do
   }
   const logStream = fs.createWriteStream(logsFilepath, { flags: 'a' })
+  console.debug('$ ' + [cmd].concat(args).join(' '))
   const process = spawn(cmd, args)
   process.stdout.pipe(logStream)
   process.stderr.pipe(logStream)
@@ -77,9 +78,9 @@ export function execCmd(
 ) {
   return new Promise<number>(async (resolve, reject) => {
     const { silent, ...spawnOptions } = options || { silent: false }
-    if (!silent) {
-      console.debug('$ ' + [cmd].concat(args).join(' '))
-    }
+    //if (!silent) {
+    console.debug('$ ' + [cmd].concat(args).join(' '))
+    //}
     const process = spawn(cmd, args, { ...spawnOptions, stdio: silent ? 'ignore' : 'inherit' })
     process.on('close', (code) => {
       try {
@@ -281,7 +282,7 @@ export async function startGeth(gethBinaryPath: string, instance: GethInstanceCo
     '--networkid',
     NetworkId.toString(),
     '--verbosity',
-    '4',
+    '5',
     '--consoleoutput=stdout', // Send all logs to stdout
     '--consoleformat=term',
     '--nat',
@@ -320,7 +321,7 @@ export async function startGeth(gethBinaryPath: string, instance: GethInstanceCo
   }
 
   if (privateKey) {
-    gethArgs.push('--password=/dev/null', `--unlock=0`)
+    gethArgs.push('--password=/dev/null', `--allow-insecure-unlock`, `--unlock=0`)
   }
 
   const gethProcess = spawnWithLog(gethBinaryPath, gethArgs, `${datadir}/logs.txt`)
@@ -381,7 +382,7 @@ export function getContractAddress(contractName: string) {
 
 export async function snapshotDatadir(instance: GethInstanceConfig) {
   // Sometimes the socket is still present, preventing us from snapshotting.
-  await execCmd('rm', [`${getDatadir(instance)}/geth.ipc`], { silent: true })
+  await execCmd('rm', [`${getDatadir(instance)}/celo.ipc`], { silent: true })
   await execCmdWithExitOnFailure('cp', ['-r', getDatadir(instance), getSnapshotdir(instance)])
 }
 

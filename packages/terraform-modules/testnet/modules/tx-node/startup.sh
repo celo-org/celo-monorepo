@@ -99,5 +99,5 @@ docker pull $GETH_EXPORTER_DOCKER_IMAGE
 
 docker run -v $DATA_DIR:$DATA_DIR --name geth-exporter --net=host -d $GETH_EXPORTER_DOCKER_IMAGE \
   /usr/local/bin/geth_exporter \
-    -ipc $DATA_DIR/geth.ipc \
+    -ipc $DATA_DIR/celo.ipc \
     -filter "(.*overall|percentiles_95)"

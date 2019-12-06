@@ -27,7 +27,7 @@ const Web3 = require('web3')
 
 const DEFAULT_TRANSFER_AMOUNT = new BigNumber('0.00000000000001')
 
-const GETH_IPC = 'geth.ipc'
+const GETH_IPC = 'celo.ipc'
 const DISCOVERY_PORT = 30303
 
 const BLOCKSCOUT_TIMEOUT = 12000 // ~ 12 seconds needed to see the transaction in the blockscout

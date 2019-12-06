@@ -117,7 +117,7 @@ spec:
   command:
     - /usr/local/bin/geth_exporter
     - -ipc
-    - /root/.celo/geth.ipc
+    - /root/.celo/celo.ipc
     - -filter
     - (.*overall|percentiles_95)
   resources:
