@@ -1,7 +1,10 @@
-import { BaseCommand } from '../../base'
-import { printValueMapRecursive } from '../../utils/cli'
+import { cli } from 'cli-ux'
 import { Flags } from '../../utils/command'
 import { flags } from '@oclif/command'
+import { BaseCommand } from '../../base'
+import { newCheckBuilder } from '../../utils/checks'
+import { printValueMapRecursive } from '../../utils/cli'
+import Web3 from 'web3'
 
 export default class Show extends BaseCommand {
   static description = 'Show rewards.'
@@ -18,12 +21,33 @@ export default class Show extends BaseCommand {
 
   async run() {
     const res = this.parse(Show)
+    var voter
+
+    if (res.flags.address) {
+      await newCheckBuilder(this)
+        .isAccount(res.flags.address)
+        .runChecks()
+
+      const election = await this.kit.contracts.getElection()
+      voter = await election.getVoter(res.flags.address)
+      printValueMapRecursive(voter)
+    }
 
     const voterRewards = await this.getVoterRewards(res.flags.epochs, res.flags.address)
-    printValueMapRecursive(voterRewards)
-
     const validatorRewards = await this.getValidatorRewards(res.flags.epochs, res.flags.address)
-    printValueMapRecursive(validatorRewards)
+
+    cli.table(voterRewards, {
+      group: { get: (x) => x.returnValues.group },
+      value: { get: (x) => x.returnValues.value },
+    })
+
+    cli.table(validatorRewards, {
+      validator: { get: (x) => x.returnValues.validator },
+      validatorPayment: { get: (x) => x.returnValues.validatorPayment },
+      group: { get: (x) => x.returnValues.group },
+      groupPayment: { get: (x) => x.returnValues.groupPayment },
+      blockNumber: {},
+    })
   }
 
   async getVoterRewards(epochs = 1, address?: string) {
@@ -38,10 +62,7 @@ export default class Show extends BaseCommand {
         (e: any) => e.returnValues.group.toLowerCase() == lowerAddress
       )
     }
-    return epochRewardsEvents.map((e: any) => ({
-      group: e.returnValues.group,
-      value: e.returnValues.value,
-    }))
+    return epochRewardsEvents
   }
 
   async getValidatorRewards(epochs = 1, address?: string) {
@@ -58,15 +79,10 @@ export default class Show extends BaseCommand {
           e.returnValues.group.toLowerCase() == lowerAddress
       )
     }
-    return validatorRewardsEvents.map((e: any) => ({
-      validator: e.returnValues.validator,
-      validatorPayment: e.returnValues.validatorPayment,
-      group: e.returnValues.group,
-      groupPayment: e.returnValues.groupPayment,
-    }))
+    return validatorRewardsEvents
   }
 
-  async getEpochEvents(contract: any, eventName: string, epochs = 1) {
+  async getEpochEvents(contract: Web3.eth.contract, eventName: string, epochs = 1) {
     const validators = await this.kit.contracts.getValidators()
     const epochSize = await validators.getEpochSize()
     const currentBlock = await this.web3.eth.getBlockNumber()
