@@ -53,7 +53,7 @@ if [[ -f $__DIRNAME/validator-config.rc ]]; then
     set +o allexport
 fi
 
-if [[ -z "${CELO_VALIDATOR_NAME}" ]]; then
+if [[ ! -v CELO_VALIDATOR_NAME ]]; then
   echo "Enter a name for your validator"
   read CELO_VALIDATOR_NAME
 fi
