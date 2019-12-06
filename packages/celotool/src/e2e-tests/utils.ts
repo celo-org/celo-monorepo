@@ -266,8 +266,10 @@ export function getContext(gethConfig: GethRunConfig) {
         gethConfig.migrationOverrides
       )
     }
+
     await killGeth()
     await sleep(2)
+
     // Snapshot the datadir after the contract migrations so we can start from a "clean slate"
     // for every test.
     for (const instance of gethConfig.instances) {

@@ -953,11 +953,14 @@ export async function startGeth(
   })
 
   const secondsToWait = 5
+
   // Give some time for geth to come up
   if (rpcport) {
     const isOpen = await waitForPortOpen('localhost', rpcport, secondsToWait)
     if (!isOpen) {
-      console.error(`geth:${instance.name}: jsonRPC didn't open after ${secondsToWait} seconds`)
+      console.error(
+        `geth:${instance.name}: jsonRPC port didn't open after ${secondsToWait} seconds`
+      )
       process.exit(1)
     } else {
       console.info(`geth:${instance.name}: jsonRPC port open ${rpcport}`)
@@ -967,7 +970,7 @@ export async function startGeth(
   if (wsport) {
     const isOpen = await waitForPortOpen('localhost', wsport, secondsToWait)
     if (!isOpen) {
-      console.error(`geth:${instance.name}: jsonRPC didn't open after ${secondsToWait} seconds`)
+      console.error(`geth:${instance.name}: ws port didn't open after ${secondsToWait} seconds`)
       process.exit(1)
     } else {
       console.info(`geth:${instance.name}: ws port open ${wsport}`)

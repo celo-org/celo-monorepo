@@ -3,6 +3,7 @@
 import { ContractKit, newKitFromWeb3 } from '@celo/contractkit'
 import { getBlsPoP, getBlsPublicKey } from '@celo/utils/lib/bls'
 import { fromFixed, toFixed } from '@celo/utils/lib/fixidity'
+import { consoleLogger } from '@celo/utils/lib/logger'
 import BigNumber from 'bignumber.js'
 import { assert } from 'chai'
 import path from 'path'
@@ -112,8 +113,9 @@ describe('governance tests', () => {
     gethRepoPath: '../../../celo-blockchain',
     migrate: true,
     runPath: TMP_PATH,
-    network: 'local',
+    verbosity: 3,
     networkId: 1101,
+    network: 'local',
     instances: [],
   }
 
@@ -322,9 +324,10 @@ describe('governance tests', () => {
   }
 
   describe('when the validator set is changing', () => {
-    let epoch: number
     const blockNumbers: number[] = []
+    let epoch: number
     let validatorAccounts: string[]
+
     before(async function(this: any) {
       this.timeout(0) // Disable test timeout
       await restart()
@@ -346,11 +349,13 @@ describe('governance tests', () => {
           peers: ['8545'],
         },
       ]
+
       await Promise.all(
         additionalNodes.map((nodeConfig) =>
           initAndStartGeth(context.hooks.gethBinaryPath, nodeConfig, true)
         )
       )
+
       // Connect the validating nodes to the non-validating nodes, to test that announce messages
       // are properly gossiped.
       const additionalValidatingNodes = [
@@ -404,10 +409,21 @@ describe('governance tests', () => {
       const membersToSwap = [validatorAccounts[0], validatorAccounts[1]]
       const memberSwapper = await newMemberSwapper(groupKit, membersToSwap)
 
+      const validatorRpc = 'http://127.0.0.1:8549'
+      consoleLogger(validatorRpc)
+
       // Prepare for key rotation.
-      const validatorWeb3 = new Web3('http://127.0.0.1:8549')
-      const authorizedWeb3s = [new Web3('ws://127.0.0.1:8559'), new Web3('ws://127.0.0.1:8561')]
+      const validatorWeb3 = new Web3(validatorRpc)
+
+      const authWeb31 = 'ws://127.0.0.1:8559'
+      const authWeb32 = 'ws://127.0.0.1:8561'
+
+      consoleLogger(authWeb31, authWeb32)
+
+      const authorizedWeb3s = [new Web3(authWeb31), new Web3(authWeb32)]
+
       await Promise.all(authorizedWeb3s.map((w) => waitToFinishSyncing(w)))
+
       const authorizedPrivateKeys = [rotation0PrivateKey, rotation1PrivateKey]
       const keyRotator = await newKeyRotator(
         newKitFromWeb3(validatorWeb3),
@@ -437,6 +453,7 @@ describe('governance tests', () => {
       // Wait for a few epochs while changing the validator set.
       await sleep(epoch * 4)
       ;(subscription as any).unsubscribe()
+
       // Wait for the current epoch to complete.
       await sleep(epoch)
       assert.equal(errorWhileChangingValidatorSet, '')
