@@ -121,7 +121,7 @@ contract Validators is
   event ValidatorDeaffiliated(address indexed validator, address indexed group);
   event ValidatorEcdsaPublicKeyUpdated(address indexed validator, bytes ecdsaPublicKey);
   event ValidatorBlsPublicKeyUpdated(address indexed validator, bytes blsPublicKey);
-  event ValiadtorScoreUpdated(address indexed validator, uint256 score, uint256 epochScore);
+  event ValidatorScoreUpdated(address indexed validator, uint256 score, uint256 epochScore);
   event ValidatorGroupRegistered(address indexed group, uint256 commission);
   event ValidatorGroupDeregistered(address indexed group);
   event ValidatorGroupMemberAdded(address indexed group, address indexed validator);
@@ -409,7 +409,7 @@ contract Validators is
     validators[account].score = FixidityLib.wrap(
       Math.min(epochScore.unwrap(), newComponent.add(currentComponent).unwrap())
     );
-    emit ValiadtorScoreUpdated(account, validators[account].score.unwrap(), epochScore.unwrap());
+    emit ValidatorScoreUpdated(account, validators[account].score.unwrap(), epochScore.unwrap());
   }
 
   /**
