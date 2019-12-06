@@ -147,10 +147,13 @@ export const handler = async function autoVerify(argv: AutoVerifyArgv) {
         'Reveal errors'
       )
 
-      possibleErrors
-        .map((_) => (_ && _.known ? _ : null))
-        .filter(notEmpty)
-        .forEach((error) => logger.info({ ...error }, 'Error while revealing to issuer'))
+      possibleErrors.filter(notEmpty).forEach((error) => {
+        if (error.known) {
+          logger.info({ ...error }, 'Error while requesting from attestation service')
+        } else {
+          logger.info({ ...error }, 'Unknown error while revealing to issuer')
+        }
+      })
 
       await pollForMessagesAndCompleteAttestations(
         attestations,
