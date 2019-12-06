@@ -242,9 +242,8 @@ docker run --name celo-proxy -it --restart always -p 30303:30303 -p 30303:30303/
 Once the proxy is running, we will need to retrieve its enode and IP address so that the validator will be able to connect to it.
 
 ```bash
-# On the proxy machine, retrieve the proxy enode and IP
+# On the proxy machine, retrieve the proxy enode
 echo $(docker exec celo-proxy geth --exec "admin.nodeInfo['enode'].split('//')[1].split('@')[0]" attach | tr -d '"')
-echo $(docker inspect -f '{{range.NetworkSettings.Networks}}{{.IPAddress}}{{end}}' celo-proxy)
 ```
 
 Now we need to set the proxy enode and proxy IP address in environment variables on the validator machine.
@@ -252,7 +251,7 @@ Now we need to set the proxy enode and proxy IP address in environment variables
 ```bash
 # On the validator machine
 export PROXY_ENODE=<YOUR-PROXY-ENODE>
-export PROXY_IP=<YOUR-PROXY-IP>
+export PROXY_IP=<PROXY-MACHINE-EXTERNAL-IP-ADDRESS>
 ```
 
 Let's connect the validator to the proxy:
