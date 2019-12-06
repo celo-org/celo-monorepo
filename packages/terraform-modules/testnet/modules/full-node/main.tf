@@ -61,7 +61,7 @@ resource "google_compute_instance" "full_node" {
       geth_verbosity : var.geth_verbosity,
       in_memory_discovery_table : var.in_memory_discovery_table,
       ip_address : google_compute_address.full_node[count.index].address,
-      max_peers : 1100,
+      max_peers : 2000,
       name : var.name,
       network_id : var.network_id,
       node_name : "${var.celo_env}-${var.name}-${count.index}",

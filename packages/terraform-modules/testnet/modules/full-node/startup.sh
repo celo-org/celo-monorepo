@@ -92,7 +92,7 @@ docker run \
       --bootnodes=enode://$BOOTNODE_ENODE \
       --lightserv 90 \
       --lightpeers 1000 \
-      --maxpeers 1100 \
+      --maxpeers=${max_peers} \
       --rpc \
       --rpcaddr 0.0.0.0 \
       --rpcapi=$RPC_APIS \
