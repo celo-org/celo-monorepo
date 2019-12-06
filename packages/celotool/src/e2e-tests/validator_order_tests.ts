@@ -18,18 +18,20 @@ describe('governance tests', () => {
     network: 'local',
     runPath: TMP_PATH,
     migrateTo: 15,
-    instances: _.range(VALIDATORS).map((i) => ({
-      gethRunConfig: gethConfig,
-      name: `validator${i}`,
-      validating: true,
-      syncmode: 'full',
-      port: 30303 + 2 * i,
-      rpcport: 8545 + 2 * i,
-    })),
+    instances: [],
     genesisConfig: {
       epoch: EPOCH,
     },
   }
+
+  gethConfig.instances = _.range(VALIDATORS).map((i) => ({
+    gethRunConfig: gethConfig,
+    name: `validator${i}`,
+    validating: true,
+    syncmode: 'full',
+    port: 30303 + 2 * i,
+    rpcport: 8545 + 2 * i,
+  }))
 
   const context: any = getContext(gethConfig)
   let web3: Web3
@@ -44,7 +46,7 @@ describe('governance tests', () => {
   describe('Validator ordering', () => {
     before(async function() {
       this.timeout(0)
-      web3 = new Web3('http://localhost:8545')
+      web3 = new Web3('http://127.0.0.1:8545')
       await context.hooks.restart()
     })
 

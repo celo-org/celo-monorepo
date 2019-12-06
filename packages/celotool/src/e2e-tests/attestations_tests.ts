@@ -75,7 +75,7 @@ describe('attestations tests', () => {
 
   const restart = async () => {
     await context.hooks.restart()
-    contractKit = newKit('http://localhost:8545')
+    contractKit = newKit('http://127.0.0.1:8545')
     contractKit.defaultAccount = validatorAddress
 
     // TODO(mcortesi): magic sleep. without it unlockAccount sometimes fails

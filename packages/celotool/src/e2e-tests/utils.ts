@@ -75,7 +75,7 @@ export function sleep(seconds: number) {
 
 export async function getEnode(port: number, ws: boolean = false) {
   const p = ws ? 'ws' : 'http'
-  const admin = new Admin(`${p}://localhost:${port}`)
+  const admin = new Admin(`${p}://127.0.0.1:${port}`)
   return (await admin.getNodeInfo()).enode
 }
 

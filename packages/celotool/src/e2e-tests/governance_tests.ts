@@ -183,7 +183,7 @@ describe('governance tests', () => {
 
   const restart = async () => {
     await context.hooks.restart()
-    web3 = new Web3('http://localhost:8545')
+    web3 = new Web3('http://127.0.0.1:8545')
     kit = newKitFromWeb3(web3)
     goldToken = await kit._web3Contracts.getGoldToken()
     stableToken = await kit._web3Contracts.getStableToken()
@@ -394,7 +394,7 @@ describe('governance tests', () => {
       await waitForEpochTransition(epoch)
 
       // Prepare for member swapping.
-      const groupWeb3 = new Web3('ws://localhost:8555')
+      const groupWeb3 = new Web3('ws://127.0.0.1:8555')
       await waitToFinishSyncing(groupWeb3)
       const groupKit = newKitFromWeb3(groupWeb3)
       const group: string = (await groupWeb3.eth.getAccounts())[0]
@@ -405,8 +405,8 @@ describe('governance tests', () => {
       const memberSwapper = await newMemberSwapper(groupKit, membersToSwap)
 
       // Prepare for key rotation.
-      const validatorWeb3 = new Web3('http://localhost:8549')
-      const authorizedWeb3s = [new Web3('ws://localhost:8559'), new Web3('ws://localhost:8561')]
+      const validatorWeb3 = new Web3('http://127.0.0.1:8549')
+      const authorizedWeb3s = [new Web3('ws://127.0.0.1:8559'), new Web3('ws://127.0.0.1:8561')]
       await Promise.all(authorizedWeb3s.map((w) => waitToFinishSyncing(w)))
       const authorizedPrivateKeys = [rotation0PrivateKey, rotation1PrivateKey]
       const keyRotator = await newKeyRotator(
