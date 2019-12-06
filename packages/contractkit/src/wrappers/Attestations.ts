@@ -224,8 +224,9 @@ export class AttestationsWrapper extends BaseWrapper<Attestations> {
           const metadata = await IdentityMetadataWrapper.fetchFromURL(metadataURL)
           const attestationServiceURLClaim = metadata.findClaim(ClaimTypes.ATTESTATION_SERVICE_URL)
 
-          if (attestationServiceURLClaim === undefined) {
-            throw new Error(`No attestation service URL registered for ${issuer}`)
+          if (!attestationServiceURLClaim) {
+            console.info(`No attestation service URL registered for ${issuer}`)
+            return null
           }
 
           const nameClaim = metadata.findClaim(ClaimTypes.NAME)
@@ -239,7 +240,7 @@ export class AttestationsWrapper extends BaseWrapper<Attestations> {
             name: nameClaim ? nameClaim.name : undefined,
           }
         } catch (error) {
-          console.info('Error getting attestation service URLs', error)
+          console.error('Error getting attestation service URLs', error)
           return null
         }
       }
