@@ -870,7 +870,7 @@ export async function startGeth(
     '--debug',
     '--port',
     port.toString(),
-    "--rpcvhosts='*'",
+    '--rpcvhosts="*"',
     '--networkid',
     instance.gethRunConfig.networkId.toString(),
     `--verbosity=${instance.gethRunConfig.verbosity ? instance.gethRunConfig.verbosity : '3'}`,
@@ -885,14 +885,14 @@ export async function startGeth(
       '--rpc',
       '--rpcport',
       rpcport.toString(),
-      "--rpccorsdomain='*'",
+      '--rpccorsdomain="*"',
       '--rpcapi=eth,net,web3,debug,admin,personal,txpool,istanbul'
     )
   }
 
   if (wsport) {
     gethArgs.push(
-      "--wsorigins='*'",
+      '--wsorigins="*"',
       '--ws',
       '--wsport',
       wsport.toString(),
