@@ -1,13 +1,50 @@
-# Celo Monorepo
+<p align="center">
+  <a href="https://celo.org/">
+    <img src="https://i.imgur.com/fyrJi0R.png" alt="celo logo" title="Go to celo.org" width="600" style="border:none;"/>
+  </a>
+</p>
 
-[![CircleCI](https://circleci.com/gh/celo-org/celo-monorepo/tree/master.svg?style=svg)](https://circleci.com/gh/celo-org/celo-monorepo/tree/master)
+<!-- row 1 - status -->
+[![CircleCI](https://img.shields.io/circleci/build/github/celo-org/celo-monorepo/master)](https://circleci.com/gh/celo-org/celo-monorepo/tree/master)
+[![Codecov](https://img.shields.io/codecov/c/github/celo-org/celo-monorepo)](https://codecov.io/gh/celo-org/celo-monorepo)
+[![GitHub contributors](https://img.shields.io/github/contributors/celo-org/celo-monorepo)](https://github.com/celo-org/celo-monorepo/graphs/contributors)
+[![GitHub commit activity](https://img.shields.io/github/commit-activity/w/celo-org/celo-monorepo)](https://github.com/celo-org/celo-monorepo/graphs/contributors)
+[![GitHub Stars](https://img.shields.io/github/stars/celo-org/celo-monorepo.svg)](https://github.com/celo-org/celo-monorepo/stargazers)
+![GitHub repo size](https://img.shields.io/github/repo-size/celo-org/celo-monorepo)
+[![GitHub](https://img.shields.io/github/license/celo-org/celo-monorepo?color=blue)](https://github.com/celo-org/celo-monorepo/blob/master/LICENSE)
 
-**Official repository for core projects comprising the Celo platform**
+<!-- row 2 - links & profiles -->
+[![Website celo.org](https://img.shields.io/website-up-down-green-red/https/celo.org.svg)](https://celo.org)
+[![Blog](https://img.shields.io/badge/blog-up-green)](https://medium.com/celohq)
+[![docs](https://img.shields.io/badge/docs-up-green)](https://docs.celo.org/)
+[![Youtube](https://img.shields.io/badge/YouTube%20channel-up-green)](https://www.youtube.com/channel/UCCZgos_YAJSXm5QX5D5Wkcw/videos?view=0&sort=p&flow=grid)
+[![forum](https://img.shields.io/badge/forum-up-green)](https://forum.celo.org)
+[![Discord](https://img.shields.io/discord/600834479145353243.svg)](https://discord.gg/JvJ66Wc)
+[![Twitter Follow](https://img.shields.io/twitter/follow/celohq?style=social)](https://twitter.com/celohq)
+[![Subreddit subscribers](https://img.shields.io/reddit/subreddit-subscribers/CeloHQ?style=social)](https://www.reddit.com/r/CeloHQ/)
+
+<!-- row 3 - detailed status -->
+[![GitHub pull requests by-label](https://img.shields.io/github/issues-pr-raw/celo-org/celo-monorepo)](https://github.com/celo-org/celo-monorepo/pulls)
+[![GitHub Issues](https://img.shields.io/github/issues-raw/celo-org/celo-monorepo.svg)](https://github.com/celo-org/celo-monorepo/issues)
+[![GitHub issues by-label](https://img.shields.io/github/issues/celo-org/celo-monorepo/1%20hour%20tasks)](https://github.com/celo-org/celo-monorepo/issues?q=is%3Aopen+is%3Aissue+label%3A%221+hour+tasks%22)
+[![GitHub issues by-label](https://img.shields.io/github/issues/celo-org/celo-monorepo/betanet-phase-3)](https://github.com/celo-org/celo-monorepo/issues?q=is%3Aopen+is%3Aissue+label%3Abetanet-phase-3)
+
+<!--
+Notes about badges
+
+forum, docs, blog up is not really checked
+
+backers & sponsors opencollective
+[![Open Collective backers and sponsors](https://img.shields.io/opencollective/all/redis)](https://opencollective.com/code-for-venezuela)
+
+Twitter
+twitter intent generator - http://tech.cymi.org/tweet-intents
+-->
+
+**Celo Monorepo - Official repository for core projects comprising the Celo platform** 📱💵🔑🔗📡🌍❤️🚀
 
 This repository contains the source code for the Celo core projects including the [smart contracts](https://github.com/celo-org/celo-monorepo/tree/master/packages/protocol), [wallet app](https://github.com/celo-org/celo-monorepo/tree/master/packages/mobile),
-and other packages.
-
-The source code for the Celo Blockchain which operates a node on the Celo Network is kept in a separate repo [here](https://github.com/celo-org/celo-blockchain).
+and other packages. The source code for the Celo Blockchain which operates a node on the Celo Network is kept in a separate repo [here](https://github.com/celo-org/celo-blockchain).
 
 ### Celo's Mission - Prosperity for All
 
@@ -54,7 +91,7 @@ See [Developer's Guide](https://docs.celo.org/) for full details about the desig
 
 ### 🙋 Issues
 
-See the [issue backlog](https://github.com/celo-org/celo-monorepo/issues) for a list of active or proposed tasks. Feel free to create new issues to report bugs and/or request features. Please add labels to your issues, tagging the appropriate package/area.
+See the [issue backlog](https://github.com/celo-org/celo-monorepo/issues) for a list of active or proposed tasks. Feel free to create new issues to report bugs and/or request features.
 
 ### ✍️ Contributing
 
