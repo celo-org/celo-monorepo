@@ -17,6 +17,7 @@ import getAssets from './AssetBase'
 import { faucetOrInviteController } from './controllers'
 import getFormattedEvents from './EventHelpers'
 import { submitFellowApp } from './FellowshipApp'
+import getContributors from './getContributors'
 import mailer from './mailer'
 import { getFormattedMediumArticles } from './mediumAPI'
 const port = parseInt(process.env.PORT, 10) || 3000
@@ -26,7 +27,7 @@ const app = next({ dev })
 const handle = app.getRequestHandler()
 
 // Strip the leading "www." prefix from the domain
-function wwwRedirect(req, res, nextAction) {
+function wwwRedirect(req: express.Request, res: express.Response, nextAction: () => unknown) {
   if (req.headers.host.startsWith('www.')) {
     const newHost = req.headers.host.slice(4)
     return res.redirect(301, req.protocol + '://' + newHost + req.originalUrl)
@@ -108,7 +109,7 @@ function wwwRedirect(req, res, nextAction) {
         scope.setTag('Service', 'Airtable')
         Sentry.captureException(e)
       })
-      res.status(e.statusCode || 500).json({ message: e.message || 'unknownError' })
+      respondToError(res, e)
     }
   })
 
@@ -121,7 +122,7 @@ function wwwRedirect(req, res, nextAction) {
         scope.setTag('Service', 'Airtable')
         Sentry.captureEvent(e)
       })
-      res.status(e.statusCode || 500).json({ message: e.message || 'unknownError' })
+      respondToError(res, e)
     }
   })
 
@@ -143,7 +144,16 @@ function wwwRedirect(req, res, nextAction) {
       const annoucements = await latestAnnouncements()
       res.json(annoucements)
     } catch (e) {
-      res.status(e.statusCode || 500).json({ message: e.message || 'unknownError' })
+      respondToError(res, e)
+    }
+  })
+
+  server.get('/api/contributors', async (_, res) => {
+    try {
+      const assets = await getContributors()
+      res.json(assets)
+    } catch (e) {
+      respondToError(res, e)
     }
   })
 
@@ -152,7 +162,7 @@ function wwwRedirect(req, res, nextAction) {
       const assets = await getAssets(req.params.asset)
       res.json(assets)
     } catch (e) {
-      res.status(e.statusCode || 500).json({ message: e.message || 'unknownError' })
+      respondToError(res, e)
     }
   })
 
@@ -173,7 +183,7 @@ function wwwRedirect(req, res, nextAction) {
       const articlesdata = await getFormattedMediumArticles()
       res.json(articlesdata)
     } catch (e) {
-      res.status(e.statusCode || 500).json({ message: e.message || 'unknownError' })
+      respondToError(res, e)
     }
   })
 
@@ -182,7 +192,7 @@ function wwwRedirect(req, res, nextAction) {
       const events = await getFormattedEvents()
       res.json(events)
     } catch (e) {
-      res.status(e.statusCode || 500).json({ message: e.message || 'unknownError' })
+      respondToError(res, e)
     }
   })
 
@@ -196,3 +206,7 @@ function wwwRedirect(req, res, nextAction) {
   // tslint:disable-next-line
   console.log(`> Ready on http://localhost:${port}`)
 })()
+
+function respondToError(res: express.Response, error: { message: string; statusCode: number }) {
+  res.status(error.statusCode || 500).json({ message: error.message || 'unknownError' })
+}
