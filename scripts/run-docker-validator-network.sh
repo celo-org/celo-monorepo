@@ -25,8 +25,7 @@ export TWILIO_ACCOUNT_SID=AC00000000000000000000000000000000
 export TWILIO_BLACKLIST=""
 export TWILIO_AUTH_TOKEN="ffffffffffffffffffffffffffffffff"
 
-HOSTNAME=$(hostname)
-export ETHSTATS_ARG="$HOSTNAME@$NETWORK_NAME-ethstats.celo-testnet.org"
+export ETHSTATS_ARG="@$NETWORK_NAME-ethstats.celo-testnet.org"
 
 ACCOUNTS_DIR="${DATA_DIR}/accounts"
 VALIDATOR_DIR="${DATA_DIR}/validator"
@@ -54,6 +53,13 @@ if [[ -f $__DIRNAME/validator-config.rc ]]; then
     set +o allexport
 fi
 
+if [[ -z "${CELO_VALIDATOR_NAME}" ]]; then
+  echo "Enter a name for your validator"
+  read CELO_VALIDATOR_NAME
+fi
+
+export PROXY_ETHSTATS="$CELO_VALIDATOR_NAME-proxy$ETHSTATS_ARG"
+export VALIDATOR_ETHSTATS="$CELO_VALIDATOR_NAME$ETHSTATS_ARG"
 
 #### Internal functions
 remove_containers () {
@@ -187,8 +193,8 @@ if [[ $COMMAND == *"run-proxy"* ]]; then
     docker rm -f celo-proxy || echo -e "Containers removed"
 
     initialize_geth
-    
-    screen -S celo-proxy -d -m docker run --name celo-proxy --restart always -p 30313:30303 -p 30313:30303/udp -p 30503:30503 -p 30503:30503/udp -v $PWD:/root/.celo $CELO_IMAGE --verbosity 3 --networkid $NETWORK_ID --syncmode full --proxy.proxy --proxy.proxiedvalidatoraddress $CELO_VALIDATOR_SIGNER_ADDRESS --proxy.internalendpoint :30503 --etherbase $CELO_VALIDATOR_SIGNER_ADDRESS --ethstats=proxy-$ETHSTATS_ARG
+
+    screen -S celo-proxy -d -m docker run --name celo-proxy --restart always -p 30313:30303 -p 30313:30303/udp -p 30503:30503 -p 30503:30503/udp -v $PWD:/root/.celo $CELO_IMAGE --verbosity 3 --networkid $NETWORK_ID --syncmode full --proxy.proxy --proxy.proxiedvalidatoraddress $CELO_VALIDATOR_SIGNER_ADDRESS --proxy.internalendpoint :30503 --etherbase $CELO_VALIDATOR_SIGNER_ADDRESS --ethstats=$PROXY_ETHSTATS
     
     sleep 5s
     export PROXY_ENODE=$(docker exec celo-proxy geth --exec "admin.nodeInfo['enode'].split('//')[1].split('@')[0]" attach | tr -d '"')
@@ -229,7 +235,7 @@ if [[ $COMMAND == *"run-validator"* ]]; then
     
     echo -e "\tConnecting Validator to Proxy running at enode://$PROXY_ENODE@$PROXY_IP"
     docker run -v $PWD:/root/.celo --entrypoint sh --rm $CELO_IMAGE -c "echo $DEFAULT_PASSWORD > /root/.celo/.password"
-    screen -S celo-validator -d -m docker run --name celo-validator --restart always -p 30303:30303 -p 30303:30303/udp -v $PWD:/root/.celo $CELO_IMAGE --verbosity 3 --networkid $NETWORK_ID --syncmode full --mine --istanbul.blockperiod=5 --istanbul.requesttimeout=3000 --etherbase $CELO_VALIDATOR_SIGNER_ADDRESS --nodiscover --proxy.proxied --proxy.proxyenodeurlpair=enode://$PROXY_ENODE@$PROXY_IP:30503\;enode://$PROXY_ENODE@$PROXY_IP:30303  --unlock=$CELO_VALIDATOR_SIGNER_ADDRESS --password /root/.celo/.password --ethstats=validator-$ETHSTATS_ARG
+    screen -S celo-validator -d -m docker run --name celo-validator --restart always -p 30303:30303 -p 30303:30303/udp -v $PWD:/root/.celo $CELO_IMAGE --verbosity 3 --networkid $NETWORK_ID --syncmode full --mine --istanbul.blockperiod=5 --istanbul.requesttimeout=3000 --etherbase $CELO_VALIDATOR_SIGNER_ADDRESS --nodiscover --proxy.proxied --proxy.proxyenodeurlpair=enode://$PROXY_ENODE@$PROXY_IP:30503\;enode://$PROXY_ENODE@$PROXY_IP:30303  --unlock=$CELO_VALIDATOR_SIGNER_ADDRESS --password /root/.celo/.password --ethstats=$VALIDATOR_ETHSTATS
 
     sleep 5s
      
@@ -300,6 +306,7 @@ if [[ $COMMAND == *"print-env"* ]]; then
     echo -e "CELO_VALIDATOR_SIGNER_SIGNATURE=$CELO_VALIDATOR_SIGNER_SIGNATURE"
     echo -e "CELO_VALIDATOR_SIGNER_BLS_PUBLIC_KEY=$CELO_VALIDATOR_SIGNER_BLS_PUBLIC_KEY"
     echo -e "CELO_VALIDATOR_SIGNER_BLS_SIGNATURE=$CELO_VALIDATOR_SIGNER_BLS_SIGNATURE"
+    echo -e "CELO_VALIDATOR_NAME=$CELO_VALIDATOR_NAME"
     echo -e "\n************************************************************************\n"
 
 fi
