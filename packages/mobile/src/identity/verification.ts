@@ -6,6 +6,7 @@ import {
   UnselectedRequest,
 } from '@celo/contractkit/lib/wrappers/Attestations'
 import { eqAddress } from '@celo/utils/src/address'
+import { retryAsync } from '@celo/utils/src/async'
 import { extractAttestationCodeFromMessage } from '@celo/utils/src/attestations'
 import { compressedPubKey } from '@celo/utils/src/commentEncryption'
 import { TxPromises } from '@celo/walletkit'
@@ -197,7 +198,8 @@ export function* requestAndRetrieveAttestations(
 ) {
   // The set of attestations we can reveal right now
   let attestations: ActionableAttestation[] = yield call(
-    [attestationsWrapper, attestationsWrapper.getActionableAttestations],
+    getActionableAttestations,
+    attestationsWrapper,
     e164Number,
     account
   )
@@ -212,20 +214,25 @@ export function* requestAndRetrieveAttestations(
       account
     )
 
-    // TODO: We can't explain why this delay is necessary but without it,
-    // the `getActionableAttestations` calls cause errors
-    yield delay(5000)
-
-    CeloAnalytics.track(CustomEventNames.verification_actionable_attestation_start)
     // Check if we have a sufficient set now by fetching the new total set
-    attestations = yield call(
-      [attestationsWrapper, attestationsWrapper.getActionableAttestations],
-      e164Number,
-      account
-    )
-    CeloAnalytics.track(CustomEventNames.verification_actionable_attestation_finish)
+    attestations = yield call(getActionableAttestations, attestationsWrapper, e164Number, account)
   }
 
+  return attestations
+}
+
+async function getActionableAttestations(
+  attestationsWrapper: AttestationsWrapper,
+  e164Number: string,
+  account: string
+) {
+  CeloAnalytics.track(CustomEventNames.verification_actionable_attestation_start)
+  const attestations = await retryAsync(
+    attestationsWrapper.getActionableAttestations.bind(attestationsWrapper),
+    3,
+    [e164Number, account]
+  )
+  CeloAnalytics.track(CustomEventNames.verification_actionable_attestation_finish)
   return attestations
 }
 
