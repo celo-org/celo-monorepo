@@ -1,5 +1,5 @@
 import { AttestationState } from '@celo/contractkit/lib/wrappers/Attestations'
-import { attestationMessageToSign } from '@celo/utils'
+import { AttestationUtils } from '@celo/utils'
 import { toChecksumAddress } from '@celo/utils/lib/address'
 import { AddressType, E164PhoneNumberType } from '@celo/utils/lib/io'
 import Logger from 'bunyan'
@@ -144,7 +144,7 @@ class AttestationRequestHandler {
   }
 
   signAttestation() {
-    const message = attestationMessageToSign(
+    const message = AttestationUtils.getAttestationMessageToSignFromIdentifier(
       this.attestationRequest.phoneNumber,
       this.attestationRequest.account
     )
