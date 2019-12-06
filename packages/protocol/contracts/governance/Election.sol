@@ -110,6 +110,8 @@ contract Election is
 
   event ValidatorGroupVoteRevoked(address indexed account, address indexed group, uint256 value);
 
+  event EpochRewardsDistributedToVoters(address indexed group, uint256 value);
+
   /**
    * @notice Initializes critical variables.
    * @param registryAddress The address of the registry contract.
@@ -459,6 +461,7 @@ contract Election is
 
     votes.active.forGroup[group].total = votes.active.forGroup[group].total.add(value);
     votes.active.total = votes.active.total.add(value);
+    emit EpochRewardsDistributedToVoters(group, value);
   }
 
   /**
