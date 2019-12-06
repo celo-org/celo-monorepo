@@ -1084,13 +1084,24 @@ contract Validators is
     return true;
   }
 
+  bytes32[] canForceDeaffiliation = [
+    DOWNTIME_SLASHER_REGISTRY_ID,
+    DOUBLE_SIGNING_SLASHER_REGISTRY_ID,
+    GOVERNANCE_REGISTRY_ID
+  ];
+
   /**
    * @notice Removes a validator from the group for which it is a member.
-   * @param validatorAccount The validator to remove and deaffiliate from their affiliated validator group.
+   * @param validatorAccount The validator to deaffiliate from their affiliated validator group.
    */
-  function removeSlashedMember(address validatorAccount) external {
+  function forceDeaffiliate(address validatorAccount)
+    external
+    onlyRegisteredContracts(canForceDeaffiliation)
+  {
+    require(isValidator(validatorAccount));
     Validator storage validator = validators[validatorAccount];
-    _deaffiliate(validator, validatorAccount);
+    if (validator.affiliation != address(0)) {
+      _deaffiliate(validator, validatorAccount);
+    }
   }
-
 }

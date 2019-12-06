@@ -2060,94 +2060,20 @@ contract('Validators', (accounts: string[]) => {
     })
   })
 
-  describe.only('#removeSlashedMember', () => {
+  describe('#forceDeaffiliate', () => {
+    // TODO(lucas): instantiate governace/slasher contracts to test modifier
     const validator = accounts[0]
     const group = accounts[1]
-    let registrationEpoch: number
     beforeEach(async () => {
       await registerValidator(validator)
-      registrationEpoch = Math.floor((await web3.eth.getBlockNumber()) / EPOCH)
       await registerValidatorGroup(group)
       await validators.affiliate(group)
     })
 
-    it('should clear the affiliate', async () => {
-      await validators.removeSlashedMember(validator)
-      const parsedValidator = parseValidatorParams(await validators.getValidator(validator))
-      assert.equal(parsedValidator.affiliation, NULL_ADDRESS)
-    })
-
-    it('should emit the ValidatorDeaffiliated event', async () => {
-      const resp = await validators.removeSlashedMember(validator)
-      assert.equal(resp.logs.length, 1)
-      const log = resp.logs[0]
-      assertContainSubset(log, {
-        event: 'ValidatorDeaffiliated',
-        args: {
-          validator,
-          group,
-        },
+    describe('when the caller is not one of the registered contracts', async () => {
+      it('should revert', async () => {
+        await assertRevert(validators.forceDeaffiliate(validator))
       })
-    })
-
-    describe('when the validator is a member of the affiliated group', () => {
-      let additionEpoch: number
-      let deaffiliationEpoch: number
-      let resp: any
-      beforeEach(async () => {
-        await validators.addFirstMember(validator, NULL_ADDRESS, NULL_ADDRESS, { from: group })
-        additionEpoch = Math.floor((await web3.eth.getBlockNumber()) / EPOCH)
-        resp = await validators.removeSlashedMember(validator)
-        deaffiliationEpoch = Math.floor((await web3.eth.getBlockNumber()) / EPOCH)
-      })
-
-      it('should remove the validator from the group membership list', async () => {
-        const parsedGroup = parseValidatorGroupParams(await validators.getValidatorGroup(group))
-        assert.deepEqual(parsedGroup.members, [])
-      })
-
-      it("should update the member's membership history", async () => {
-        const membershipHistory = parseMembershipHistory(
-          await validators.getMembershipHistory(validator)
-        )
-        let expectedEntries = 1
-        if (registrationEpoch != additionEpoch || additionEpoch != deaffiliationEpoch) {
-          expectedEntries = 2
-        }
-        assert.equal(membershipHistory.epochs.length, expectedEntries)
-        assertEqualBN(membershipHistory.epochs[expectedEntries - 1], deaffiliationEpoch)
-        assert.equal(membershipHistory.groups.length, expectedEntries)
-        assertSameAddress(membershipHistory.groups[expectedEntries - 1], NULL_ADDRESS)
-        const latestBlock = await web3.eth.getBlock('latest')
-        assert.equal(membershipHistory.lastRemovedFromGroupTimestamp, latestBlock.timestamp)
-      })
-
-      it('should emit the ValidatorGroupMemberRemoved event', async () => {
-        assert.equal(resp.logs.length, 2)
-        const log = resp.logs[0]
-        assertContainSubset(log, {
-          event: 'ValidatorGroupMemberRemoved',
-          args: {
-            validator,
-            group,
-          },
-        })
-      })
-
-      describe('when the validator is the only member of that group', () => {
-        it('should should mark the group as ineligible for election', async () => {
-          assert.isTrue(await mockElection.isIneligible(group))
-        })
-      })
-    })
-
-    it('should revert when the account is not a registered validator', async () => {
-      await assertRevert(validators.removeSlashedMember(validator))
-    })
-
-    it('should revert when the validator is not affiliated with a validator group', async () => {
-      await validators.removeSlashedMember(validator)
-      await assertRevert(validators.removeSlashedMember(validator))
     })
   })
 })
