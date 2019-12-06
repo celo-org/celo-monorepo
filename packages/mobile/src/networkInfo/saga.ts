@@ -15,8 +15,8 @@ export function* waitForRehydrate() {
 }
 
 export function* waitWeb3LastBlock() {
-  yield waitForGethConnectivity()
-  yield waitForWeb3Sync()
+  yield call(waitForGethConnectivity)
+  yield call(waitForWeb3Sync)
 }
 
 function createNetworkStatusChannel() {
@@ -50,5 +50,4 @@ function* subscribeToNetworkStatus() {
 
 export function* networkInfoSaga() {
   yield spawn(subscribeToNetworkStatus)
-  yield spawn(waitWeb3LastBlock)
 }
