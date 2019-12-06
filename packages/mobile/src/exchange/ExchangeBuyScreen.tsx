@@ -88,25 +88,21 @@ export class ExchangeBuyScreen extends React.Component<Props, State> {
     inputAmount: '',
   }
 
-  getMakerTokenPropertiesFromNavProps(): {
-    makerToken: CURRENCY_ENUM
-    makerTokenAvailableBalance: string
-  } {
+  getMakerTokenPropertiesFromNavProps() {
     const makerToken = this.props.navigation.getParam('makerToken')
     const makerTokenAvailableBalance = this.props.navigation.getParam('makerTokenBalance')
     if (!makerToken || !makerTokenAvailableBalance) {
       throw new Error('Maker token or maker token balance missing from nav props')
     }
-    return { makerToken, makerTokenAvailableBalance }
-  }
-
-  componentDidMount() {
-    this.props.fetchExchangeRate()
-    const { makerToken, makerTokenAvailableBalance } = this.getMakerTokenPropertiesFromNavProps()
     this.setState({
       makerToken,
       makerTokenAvailableBalance,
     })
+    this.props.fetchExchangeRate(makerToken, makerTokenAvailableBalance)
+  }
+
+  componentDidMount() {
+    this.getMakerTokenPropertiesFromNavProps()
   }
 
   onChangeExchangeAmount = (amount: string) => {
@@ -127,10 +123,11 @@ export class ExchangeBuyScreen extends React.Component<Props, State> {
 
   goToReview = () => {
     const { makerToken, inputToken, inputAmount } = this.state
+    const inputTokenCode = this.getInputTokenDisplayText()
     navigate(Screens.ExchangeReview, {
-      makerToken,
       makerTokenBalance: this.state.makerTokenAvailableBalance,
       inputToken,
+      inputTokenCode,
       inputAmount: parseInputAmount(inputAmount),
     })
   }
@@ -175,16 +172,16 @@ export class ExchangeBuyScreen extends React.Component<Props, State> {
     return this.state.makerToken === CURRENCY_ENUM.DOLLAR
   }
 
+  isDollarInput = () => {
+    return this.state.inputToken === CURRENCY_ENUM.DOLLAR
+  }
+
   getInputValue = () => {
     if (this.state.inputAmount) {
       return this.state.inputAmount
     } else {
       return ''
     }
-  }
-
-  isDollarInput = () => {
-    return this.state.inputToken === CURRENCY_ENUM.DOLLAR
   }
 
   getInputTokenDisplayText = () => {

@@ -29,6 +29,7 @@ import { isAppConnected } from 'src/redux/selectors'
 import DisconnectBanner from 'src/shared/DisconnectBanner'
 import { getRateForMakerToken, getTakerAmount } from 'src/utils/currencyExchange'
 import { getMoneyDisplayValue } from 'src/utils/formatting'
+import Logger from 'src/utils/Logger'
 
 interface StateProps {
   exchangeRatePair: ExchangeRatePair | null
@@ -44,6 +45,16 @@ interface DispatchProps {
 interface NavProps {
   makerToken: Token
   makerTokenBalance: string
+  inputToken: Token
+  inputTokenCode: string
+  inputAmount: BigNumber
+}
+
+interface State {
+  makerToken: Token
+  inputToken: Token
+  inputTokenCode: string
+  inputAmount: BigNumber
 }
 
 type Props = StateProps & WithNamespaces & DispatchProps & NavigationInjectedProps
@@ -54,7 +65,7 @@ const mapStateToProps = (state: RootState): StateProps => ({
   appConnected: isAppConnected(state),
 })
 
-class ExchangeReview extends React.Component<Props> {
+class ExchangeReview extends React.Component<Props, State> {
   static navigationOptions = ({ navigation }: NavigationInjectedProps<NavProps>) => {
     const makerToken = navigation.getParam('makerToken')
     const title = makerToken === Token.DOLLAR ? 'Buy Gold' : 'Sell Gold' // TODO(anna) translate
@@ -76,6 +87,13 @@ class ExchangeReview extends React.Component<Props> {
     }
   }
 
+  state: State = {
+    makerToken: Token.GOLD,
+    inputToken: Token.GOLD,
+    inputTokenCode: 'gold',
+    inputAmount: new BigNumber(0),
+  }
+
   onPressConfirm = () => {
     // const confirmationInput = this.getConfirmationInput()
     /*
@@ -88,15 +106,23 @@ class ExchangeReview extends React.Component<Props> {
     navigate(Screens.ExchangeHomeScreen)
   }
 
-  onPressEdit = () => {
-    CeloAnalytics.track(CustomEventNames.exchange_edit)
-    navigateBack()
+  getExchangePropertiesFromNavProps() {
+    const makerToken = this.props.navigation.getParam('makerToken')
+    const inputToken = this.props.navigation.getParam('inputToken')
+    const inputTokenCode = this.props.navigation.getParam('inputTokenCode')
+    const inputAmount = this.props.navigation.getParam('inputAmount')
+    this.setState({
+      makerToken,
+      inputToken,
+      inputTokenCode,
+      inputAmount,
+    })
+    this.props.fetchExchangeRate(makerToken, inputAmount) // TODO convert input amount if necessary
+    Logger.debug('@getExchangePropertiesFromNavProps', JSON.stringify(this.props.exchangeRatePair))
   }
 
   componentDidMount() {
-    const makerAmount = new BigNumber(40)
-    const makerToken = Token.DOLLAR
-    this.props.fetchExchangeRate(makerAmount, makerToken)
+    this.getExchangePropertiesFromNavProps()
   }
 
   renderHeader = () => {
@@ -105,21 +131,13 @@ class ExchangeReview extends React.Component<Props> {
 
   render() {
     const { exchangeRatePair, fee, t, appConnected } = this.props
-    const makerAmount = new BigNumber(40)
-    const makerToken = Token.DOLLAR
-    const rate = getRateForMakerToken(exchangeRatePair, makerToken)
-    const takerAmount = getTakerAmount(makerAmount, rate)
-    /*
-<ExchangeConfirmationCard
-          makerToken={makerToken}
-          newDollarBalance={newDollarBalance}
-          newGoldBalance={newGoldBalance}
-          makerAmount={makerAmount}
-          takerAmount={takerAmount}
-          exchangeRate={rate}
-          fee={fee}
-        />
-    */
+    const takerToken = this.state.makerToken === Token.GOLD ? Token.DOLLAR : Token.GOLD
+    const goldRateInDollars = getRateForMakerToken(exchangeRatePair, Token.DOLLAR)
+    let dollarAmount = this.state.inputAmount
+    const dollarRateInGold = getRateForMakerToken(exchangeRatePair, Token.GOLD)
+    if (this.state.inputToken === Token.GOLD) {
+      dollarAmount = getTakerAmount(this.state.inputAmount, dollarRateInGold)
+    }
 
     return (
       <SafeAreaView
@@ -142,13 +160,23 @@ class ExchangeReview extends React.Component<Props> {
               }}
             >
               <View style={[styles.rowContainer, styles.amountRow]}>
-                <Text style={[fontStyles.body, styles.exchangeBodyText]}>Amount (EUR)</Text>
-                <Text style={[fontStyles.body, styles.currencyAmountText]}>{'$20.00'}</Text>
+                <Text style={[fontStyles.body, styles.exchangeBodyText]}>
+                  Amount ({this.state.inputTokenCode})
+                  {JSON.stringify(exchangeRatePair)}
+                </Text>
+                <Text style={[fontStyles.body, styles.currencyAmountText]}>
+                  {this.state.inputAmount.toString()}
+                </Text>
               </View>
               <View style={styles.line} />
               <View style={[styles.rowContainer, styles.feeRowContainer]}>
-                <Text style={[fontStyles.body, styles.exchangeBodyText]}>Subtotal (@ rate 10)</Text>
-                <Text style={[fontStyles.body, styles.exchangeBodyText]}>{'$20.00'}</Text>
+                <Text style={[fontStyles.body, styles.exchangeBodyText]}>
+                  Subtotal @ {getMoneyDisplayValue(goldRateInDollars, Token.DOLLAR, true)}
+                  Subtotal @ {getMoneyDisplayValue(dollarRateInGold, Token.DOLLAR, true)}
+                </Text>
+                <Text style={[fontStyles.body, styles.exchangeBodyText]}>
+                  {getMoneyDisplayValue(dollarAmount, Token.DOLLAR, true)}
+                </Text>
               </View>
               <View style={[styles.rowContainer, styles.feeRowContainer]}>
                 <Text style={[fontStyles.body, styles.exchangeBodyText]}>Exchange Fee</Text>
@@ -174,7 +202,7 @@ class ExchangeReview extends React.Component<Props> {
             onPress={this.onPressConfirm}
             text={t(`${Namespaces.walletFlow5}:review`)}
             standard={false}
-            disabled={!appConnected || rate.isZero()}
+            disabled={!appConnected || goldRateInDollars.isZero()}
             type={BtnTypes.PRIMARY}
           />
         </View>
