@@ -1083,4 +1083,14 @@ contract Validators is
     emit ValidatorDeaffiliated(validatorAccount, affiliation);
     return true;
   }
+
+  /**
+   * @notice Removes a validator from the group for which it is a member.
+   * @param validatorAccount The validator to remove and deaffiliate from their affiliated validator group.
+   */
+  function removeSlashedMember(address validatorAccount) external {
+    Validator storage validator = validators[validatorAccount];
+    _deaffiliate(validator, validatorAccount);
+  }
+
 }
