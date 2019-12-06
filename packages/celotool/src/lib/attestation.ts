@@ -3,7 +3,7 @@ import {
   ActionableAttestation,
   AttestationsWrapper,
 } from '@celo/contractkit/lib/wrappers/Attestations'
-import { PhoneNumberUtils } from '@celo/utils'
+import { AttestationUtils, PhoneNumberUtils } from '@celo/utils'
 import { concurrentMap } from '@celo/utils/lib/async'
 import { sample } from 'lodash'
 import moment from 'moment'
@@ -27,7 +27,7 @@ export async function requestMoreAttestations(
   }
 
   await attestations.waitForSelectingIssuers(phoneNumber, account)
-  await attestations.selectIssuers(phoneNumber).then((txo) => txo.sendAndWaitForReceipt(txParams))
+  await attestations.selectIssuers(phoneNumber).sendAndWaitForReceipt(txParams)
 }
 
 type RequestAttestationError =
@@ -99,7 +99,7 @@ export async function findValidCode(
 ) {
   for (const message of messages) {
     try {
-      const code = attestations.extractAttestationCodeFromMessage(message)
+      const code = AttestationUtils.extractAttestationCodeFromMessage(message)
       if (!code) {
         continue
       }
