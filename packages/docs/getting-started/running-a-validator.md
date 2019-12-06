@@ -236,7 +236,7 @@ You can then run the proxy with the following command. Be sure to replace `<YOUR
 # Note that you'll have to export CELO_VALIDATOR_SIGNER_ADDRESS and $NETWORK_ID on this machine
 export NETWORK_ID=12219
 export CELO_VALIDATOR_SIGNER_ADDRESS=<YOUR-VALIDATOR-SIGNER-ADDRESS>
-docker run --name celo-proxy -it --restart always -p 30313:30303 -p 30313:30303/udp -p 30503:30503 -p 30503:30503/udp -v $PWD:/root/.celo $CELO_IMAGE --verbosity 3 --networkid $NETWORK_ID --syncmode full --proxy.proxy --proxy.proxiedvalidatoraddress $CELO_VALIDATOR_SIGNER_ADDRESS --proxy.internalendpoint :30503 --etherbase $CELO_VALIDATOR_SIGNER_ADDRESS --ethstats=<YOUR-VALIDATOR-NAME>-proxy@baklava-ethstats.celo-testnet.org
+docker run --name celo-proxy -it --restart always -p 30303:30303 -p 30303:30303/udp -p 30503:30503 -p 30503:30503/udp -v $PWD:/root/.celo $CELO_IMAGE --verbosity 3 --networkid $NETWORK_ID --syncmode full --proxy.proxy --proxy.proxiedvalidatoraddress $CELO_VALIDATOR_SIGNER_ADDRESS --proxy.internalendpoint :30503 --etherbase $CELO_VALIDATOR_SIGNER_ADDRESS --ethstats=<YOUR-VALIDATOR-NAME>-proxy@baklava-ethstats.celo-testnet.org
 ```
 
 Once the proxy is running, we will need to retrieve its enode and IP address so that the validator will be able to connect to it.
@@ -274,6 +274,8 @@ docker run --name celo-validator -it --restart always -p 30303:30303 -p 30303:30
 The `mine` flag does not mean the node starts mining blocks, but rather starts trying to participate in the BFT consensus protocol. It cannot do this until it gets elected -- so next we need to stand for election.
 
 The `networkid` parameter value of `12219` indicates we are connecting to the Baklava network, Stake Off Phase 1.
+
+Note that if you are running the validator and the proxy on the same machine, then you should set the validator's listening port to something other than `30303`.  E.g. you could use the flag `--port 30313` and set the docker port forwarding rules accordingly (e.g. use the flags `-p 30313:30313` and `-p 30313:30313/udp`).
 
 ### Register the Accounts
 
