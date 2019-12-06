@@ -127,6 +127,12 @@ contract Validators is
   event ValidatorGroupMemberRemoved(address indexed group, address indexed validator);
   event ValidatorGroupMemberReordered(address indexed group, address indexed validator);
   event ValidatorGroupCommissionUpdated(address indexed group, uint256 commission);
+  event ValidatorEpochPaymentDistributed(
+    address indexed validator,
+    uint256 validatorPayment,
+    address indexed group,
+    uint256 groupPayment
+  );
 
   modifier onlyVm() {
     require(msg.sender == address(0));
@@ -408,6 +414,7 @@ contract Validators is
       uint256 validatorPayment = totalPayment.fromFixed().sub(groupPayment);
       getStableToken().mint(group, groupPayment);
       getStableToken().mint(account, validatorPayment);
+      emit ValidatorEpochPaymentDistributed(account, validatorPayment, group, groupPayment);
       return totalPayment.fromFixed();
     } else {
       return 0;
