@@ -112,6 +112,16 @@ export class ValidatorsWrapper extends BaseWrapper<Validators> {
   }
 
   /**
+   * @notice Returns the current epoch size in blocks.
+   * @return The current epoch size in blocks.
+   */
+  getEpochSize: () => Promise<number> = proxyCall(
+    this.contract.methods.getEpochSize,
+    undefined,
+    toNumber
+  )
+
+  /**
    * Returns the account associated with `signer`.
    * @param signer The address of an account or currently authorized validator signer.
    * @dev Fails if the `signer` is not an account or currently authorized validator.
