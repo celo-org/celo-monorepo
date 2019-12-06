@@ -238,21 +238,7 @@ export async function killGeth() {
 
 export async function killInstance(instance: GethInstanceConfig) {
   if (instance.pid) {
-    await process.kill(instance.pid, 'SIGKILL')
-  }
-}
-
-// Stop an instance such that it can be woken up later.
-export async function pauseInstance(instance: GethInstanceConfig) {
-  if (instance.pid) {
-    await process.kill(instance.pid, 'SIGTSTP')
-  }
-}
-
-// Resume an istance that was previously stoped.
-export async function resumeInstance(instance: GethInstanceConfig) {
-  if (instance.pid) {
-    await process.kill(instance.pid, 'SIGCONT')
+    await execCmd('kill', ['-9', instance.pid.toString()])
   }
 }
 

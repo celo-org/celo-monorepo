@@ -109,7 +109,7 @@ export async function exec(command: string, args: string[]) {
   })
 }
 
-export function execCmd(
+function execCmd(
   cmd: string,
   args: string[],
   options?: SpawnOptions & { silent?: boolean }
@@ -134,7 +134,7 @@ async function isPortOpen(host: string, port: number) {
   return (await execCmd('nc', ['-z', host, port.toString()], { silent: true })) === 0
 }
 
-async function waitForPortOpen(host: string, port: number, seconds: number) {
+export async function waitForPortOpen(host: string, port: number, seconds: number) {
   const deadline = Date.now() + seconds * 1000
   do {
     if (await isPortOpen(host, port)) {
