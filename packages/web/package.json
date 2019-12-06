@@ -56,6 +56,7 @@
     "next-i18next": "^0.36.5",
     "next-images": "^1.1.1",
     "next-plugin-transpile-modules": "^2.0.0",
+    "node-cache": "^5.0.2",
     "nuka-carousel": "git://github.com/cmcewen/nuka-carousel#fee86bf",
     "react": "^16.9.0",
     "react-apollo": "^2.5.8",
