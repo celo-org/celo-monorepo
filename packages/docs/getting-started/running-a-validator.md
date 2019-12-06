@@ -133,8 +133,8 @@ First, you'll need to generate account keys for your Validator and Validator Gro
 # On your local machine
 mkdir celo-accounts-node
 cd celo-accounts-node
-docker run -v $PWD:/root/.celo --entrypoint /bin/sh -it $CELO_IMAGE -c "sleep 1 && geth account new"
-docker run -v $PWD:/root/.celo --entrypoint /bin/sh -it $CELO_IMAGE -c "sleep 1 && geth account new"
+docker run -v $PWD:/root/.celo -it $CELO_IMAGE account new
+docker run -v $PWD:/root/.celo -it $CELO_IMAGE account new
 ```
 
 This should generate two accounts in your current directory and print them out, set them in environment variables:
@@ -176,7 +176,7 @@ export NETWORK_ID=12219
 mkdir celo-validator-node
 cd celo-validator-node
 docker run -v $PWD:/root/.celo $CELO_IMAGE init /celo/genesis.json
-docker run -v $PWD:/root/.celo --entrypoint /bin/sh -it $CELO_IMAGE -c "sleep 1 && geth account new"
+docker run -v $PWD:/root/.celo -it $CELO_IMAGE account new
 export CELO_VALIDATOR_SIGNER_ADDRESS=<YOUR-VALIDATOR-SIGNER-ADDRESS>
 ```
 
@@ -186,7 +186,7 @@ In order to authorize our Validator signer, we need to create a proof that we ha
 # On the validator machine
 # Note that you have to export CELO_VALIDATOR_ADDRESS on this machine
 export CELO_VALIDATOR_ADDRESS=<CELO-VALIDATOR-ADDRESS>
-docker run -v $PWD:/root/.celo --entrypoint /bin/sh -it $CELO_IMAGE -c "geth account proof-of-possession $CELO_VALIDATOR_SIGNER_ADDRESS $CELO_VALIDATOR_ADDRESS"
+docker run -v $PWD:/root/.celo -it $CELO_IMAGE account proof-of-possession $CELO_VALIDATOR_SIGNER_ADDRESS $CELO_VALIDATOR_ADDRESS
 ```
 
 Save the signer address, public key, and proof-of-possession signature to your local machine:
@@ -202,7 +202,7 @@ Validators on the Celo network use BLS aggregated signatures to create blocks in
 
 ```bash
 # On the validator machine
-docker run -v $PWD:/root/.celo --entrypoint /bin/sh -it $CELO_IMAGE -c "geth account proof-of-possession $CELO_VALIDATOR_SIGNER_ADDRESS $CELO_VALIDATOR_ADDRESS --bls"
+docker run -v $PWD:/root/.celo -it $CELO_IMAGE account proof-of-possession $CELO_VALIDATOR_SIGNER_ADDRESS $CELO_VALIDATOR_ADDRESS --bls
 ```
 
 Save the resulting signature and public key to your local machine:
@@ -468,7 +468,7 @@ mkdir celo-attestations-node
 cd celo-attestations-node
 docker run -v $PWD:/root/.celo $CELO_IMAGE init /celo/genesis.json
 docker run -v $PWD:/root/.celo --entrypoint cp $CELO_IMAGE /celo/static-nodes.json /root/.celo/
-docker run -v $PWD:/root/.celo --entrypoint /bin/sh -it $CELO_IMAGE -c "sleep 1 && geth account new"
+docker run -v $PWD:/root/.celo -it $CELO_IMAGE account new
 export CELO_ATTESTATION_SIGNER_ADDRESS=<YOUR-ATTESTATION-SIGNER-ADDRESS>
 ```
 
@@ -476,7 +476,7 @@ Let's generate the proof-of-possession for the attestation signer
 
 ```bash
 # On the Attestation machine
-docker run -v $PWD:/root/.celo --entrypoint /bin/sh -it $CELO_IMAGE -c "sleep 1 && geth account proof-of-possession $CELO_ATTESTATION_SIGNER_ADDRESS $CELO_VALIDATOR_ADDRESS"
+docker run -v $PWD:/root/.celo -it $CELO_IMAGE account proof-of-possession $CELO_ATTESTATION_SIGNER_ADDRESS $CELO_VALIDATOR_ADDRESS
 ```
 
 With this proof, authorize the attestation signer on your local machine:
