@@ -100,7 +100,7 @@ spec:
             --wsorigins=* \
             --wsapi=eth,net,web3,debug \
             --networkid=${NETWORK_ID} \
-            --syncmode=light \
+            --syncmode=ultralight \
             --consoleformat=json \
             --consoleoutput=stdout \
             --verbosity={{ .Values.geth.verbosity }} \
