@@ -61,7 +61,7 @@ export async function requestAttestationsFromIssuers(
 
       return
     } catch (error) {
-      return { error: { error }, issuer: attestation.issuer, known: false }
+      return { error, issuer: attestation.issuer, known: false }
     }
   })
 }

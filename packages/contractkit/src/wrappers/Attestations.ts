@@ -53,6 +53,10 @@ export interface ActionableAttestation {
   name: string | undefined
 }
 
+type AttestationServiceRunningCheckResult =
+  | { isValid: true; result: ActionableAttestation }
+  | { isValid: false; issuer: Address }
+
 function attestationMessageToSign(phoneHash: string, account: Address) {
   const messageHash: string = Web3Utils.soliditySha3(
     { type: 'bytes32', value: phoneHash },
@@ -231,36 +235,63 @@ export class AttestationsWrapper extends BaseWrapper<Attestations> {
 
     const result = await this.contract.methods.getCompletableAttestations(phoneHash, account).call()
 
+    const results = await concurrentMap(
+      5,
+      parseGetCompletableAttestations(result),
+      this.isIssuerRunningAttestationService
+    )
+
+    return results.map((_) => (_.isValid ? _.result : null)).filter(notEmpty)
+  }
+
+  /**
+   * Returns an array of issuer addresses that were found to not run the attestation service
+   * @param phoneNumber
+   * @param account
+   */
+  async getNonCompliantIssuers(phoneNumber: string, account: Address): Promise<Address[]> {
+    const phoneHash = PhoneNumberUtils.getPhoneHash(phoneNumber)
+
+    const result = await this.contract.methods.getCompletableAttestations(phoneHash, account).call()
+
     const withAttestationServiceURLs = await concurrentMap(
       5,
       parseGetCompletableAttestations(result),
-      async ({ blockNumber, issuer, metadataURL }) => {
-        try {
-          const metadata = await IdentityMetadataWrapper.fetchFromURL(metadataURL)
-          const attestationServiceURLClaim = metadata.findClaim(ClaimTypes.ATTESTATION_SERVICE_URL)
-
-          if (attestationServiceURLClaim === undefined) {
-            throw new Error(`No attestation service URL registered for ${issuer}`)
-          }
-
-          const nameClaim = metadata.findClaim(ClaimTypes.NAME)
-
-          // TODO: Once we have status indicators, we should check if service is up
-          // https://github.com/celo-org/celo-monorepo/issues/1586
-          return {
-            blockNumber,
-            issuer,
-            attestationServiceURL: attestationServiceURLClaim.url,
-            name: nameClaim ? nameClaim.name : undefined,
-          }
-        } catch (error) {
-          console.error(error)
-          return null
-        }
-      }
+      this.isIssuerRunningAttestationService
     )
 
-    return withAttestationServiceURLs.filter(notEmpty)
+    return withAttestationServiceURLs.map((_) => (_.isValid ? null : _.issuer)).filter(notEmpty)
+  }
+
+  private async isIssuerRunningAttestationService(arg: {
+    blockNumber: number
+    issuer: string
+    metadataURL: string
+  }): Promise<AttestationServiceRunningCheckResult> {
+    try {
+      const metadata = await IdentityMetadataWrapper.fetchFromURL(arg.metadataURL)
+      const attestationServiceURLClaim = metadata.findClaim(ClaimTypes.ATTESTATION_SERVICE_URL)
+
+      if (attestationServiceURLClaim === undefined) {
+        throw new Error(`No attestation service URL registered for ${arg.issuer}`)
+      }
+
+      const nameClaim = metadata.findClaim(ClaimTypes.NAME)
+
+      // TODO: Once we have status indicators, we should check if service is up
+      // https://github.com/celo-org/celo-monorepo/issues/1586
+      return {
+        isValid: true,
+        result: {
+          blockNumber: arg.blockNumber,
+          issuer: arg.issuer,
+          attestationServiceURL: attestationServiceURLClaim.url,
+          name: nameClaim ? nameClaim.name : undefined,
+        },
+      }
+    } catch (error) {
+      return { isValid: false, issuer: arg.issuer }
+    }
   }
 
   extractAttestationCodeFromMessage(message: string) {
