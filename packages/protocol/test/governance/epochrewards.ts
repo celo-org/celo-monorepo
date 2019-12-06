@@ -360,9 +360,10 @@ contract('EpochRewards', (accounts: string[]) => {
       })
 
       it('should return 600MM + 200MM * t / 15', async () => {
-        assertEqualBN(
+        assertEqualDpBN(
           await epochRewards.getTargetGoldTotalSupply(),
-          getExpectedTargetTotalSupply(timeDelta)
+          getExpectedTargetTotalSupply(timeDelta),
+          8
         )
       })
     })
