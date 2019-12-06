@@ -11,11 +11,9 @@ export async function scaleResource(
   allowFail: boolean = false
 ) {
   const execFn = allowFail ? execCmd : execCmdWithExitOnFailure
-  try {
-    await execFn(
-      `kubectl scale ${type} ${resourceName} --replicas=${replicaCount} --namespace ${celoEnv}`
-    )
-  } catch {}
+  await execFn(
+    `kubectl scale ${type} ${resourceName} --replicas=${replicaCount} --namespace ${celoEnv}`
+  )
 }
 
 export async function getStatefulSetReplicas(celoEnv: string, resourceName: string) {
