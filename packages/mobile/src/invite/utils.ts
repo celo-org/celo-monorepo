@@ -1,4 +1,4 @@
-import { sanitizeBase64 } from '@celo/walletkit'
+import { sanitizeMessageBase64 } from '@celo/utils/src/attestations'
 import URLSearchParamsReal from '@ungap/url-search-params'
 import { Platform } from 'react-native'
 import RNInstallReferrer from 'react-native-install-referrer'
@@ -13,7 +13,7 @@ export const createInviteCode = (privateKey: string) => {
 
 // exported for testing
 export const extractInviteCode = (inviteFieldInput: string) => {
-  const sanitizedCode = sanitizeBase64(inviteFieldInput)
+  const sanitizedCode = sanitizeMessageBase64(inviteFieldInput)
   const regex = new RegExp('([0-9A-Za-z/\\+\\-\\_]*=)')
   const matches = sanitizedCode.match(regex)
   if (matches == null || matches.length === 0) {
