@@ -43,6 +43,37 @@ async function startGanache() {
     })
 }
 
+function execCmd(cmd, args, options) {
+  return new Promise(async (resolve, reject) => {
+    const { silent, ...spawnOptions } = options || { silent: false }
+    if (!silent) {
+      console.debug('$ ' + [cmd].concat(args).join(' '))
+    }
+    const process = spawn(cmd, args, { ...spawnOptions, stdio: silent ? 'ignore' : 'inherit' })
+    process.on('close', (code) => {
+      try {
+        resolve(code)
+      } catch (error) {
+        reject(error)
+      }
+    })
+  })
+}
+
+async function isPortOpen(host, port) {
+  return (await execCmd('nc', ['-z', host, port.toString()], { silent: true })) === 0
+}
+
+async function waitForPortOpen(host, port, seconds) {
+  const deadline = Date.now() + seconds * 1000
+  do {
+    if (await isPortOpen(host, port)) {
+      return true
+    }
+  } while (Date.now() < deadline)
+  return false
+}
+
 async function test() {
   const argv = minimist(process.argv.slice(2), {
     boolean: ['gas', 'coverage', 'verbose-rpc'],
@@ -51,9 +82,8 @@ async function test() {
   try {
     const closeGanache = await startGanache()
     if (isCI) {
-      // if we are running on circle ci we need to wait for ganache to be up
-      // TODO(mcortesi): improvement: check for open port instead of a fixed wait time.
-      await sleep(60)
+      // If we are running on circle ci we need to wait for ganache to be up.
+      await waitForPortOpen('localhost', 8545, 60)
     }
 
     let testArgs = ['run', 'truffle', 'test']

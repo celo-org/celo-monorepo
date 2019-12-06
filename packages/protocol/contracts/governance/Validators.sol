@@ -121,6 +121,7 @@ contract Validators is
   event ValidatorDeaffiliated(address indexed validator, address indexed group);
   event ValidatorEcdsaPublicKeyUpdated(address indexed validator, bytes ecdsaPublicKey);
   event ValidatorBlsPublicKeyUpdated(address indexed validator, bytes blsPublicKey);
+  event ValiadtorScoreUpdated(address indexed validator, uint256 score, uint256 epochScore);
   event ValidatorGroupRegistered(address indexed group, uint256 commission);
   event ValidatorGroupDeregistered(address indexed group);
   event ValidatorGroupMemberAdded(address indexed group, address indexed validator);
@@ -325,6 +326,51 @@ contract Validators is
   }
 
   /**
+   * @notice Calculates the validator score for an epoch from the uptime value for the epoch.
+   * @param uptime The Fixidity representation of the validator's uptime, between 0 and 1.
+   * @dev epoxh_score = uptime ** exponent
+   * @return Numerator and denominator of the epoch score.
+   */
+  function calculateEpochScore(uint256 uptime) public view returns (uint256, uint256) {
+    require(uptime <= FixidityLib.fixed1().unwrap());
+    return
+      fractionMulExp(
+        FixidityLib.fixed1().unwrap(),
+        FixidityLib.fixed1().unwrap(),
+        uptime,
+        FixidityLib.fixed1().unwrap(),
+        validatorScoreParameters.exponent,
+        18
+      );
+  }
+
+  /**
+   * @notice Calculates the aggregate score of a group for an epoch from individual uptimes.
+   * @param uptimes Array of Fixidity representations of the validators' uptimes, between 0 and 1.
+   * @dev group_score = average(uptimes ** exponent)
+   * @return Numerator and denominator of the group epoch score.
+   */
+  function calculateGroupEpochScore(uint256[] calldata uptimes)
+    external
+    view
+    returns (uint256, uint256)
+  {
+    require(uptimes.length > 0);
+    require(uptimes.length <= maxGroupSize);
+    uint256 numerator;
+    uint256 denominator;
+    FixidityLib.Fraction memory sum;
+    for (uint256 i = 0; i < uptimes.length; i = i.add(1)) {
+      (numerator, denominator) = calculateEpochScore(uptimes[i]);
+      sum = sum.add(FixidityLib.newFixedFraction(numerator, denominator));
+    }
+    return (
+      sum.divide(FixidityLib.newFixed(uptimes.length)).unwrap(),
+      FixidityLib.fixed1().unwrap()
+    );
+  }
+
+  /**
    * @notice Updates a validator's score based on its uptime for the epoch.
    * @param signer The validator signer of the validator account whose score needs updating.
    * @param uptime The Fixidity representation of the validator's uptime, between 0 and 1.
@@ -344,18 +390,10 @@ contract Validators is
   function _updateValidatorScoreFromSigner(address signer, uint256 uptime) internal {
     address account = getAccounts().signerToAccount(signer);
     require(isValidator(account));
-    require(uptime <= FixidityLib.fixed1().unwrap());
 
     uint256 numerator;
     uint256 denominator;
-    (numerator, denominator) = fractionMulExp(
-      FixidityLib.fixed1().unwrap(),
-      FixidityLib.fixed1().unwrap(),
-      uptime,
-      FixidityLib.fixed1().unwrap(),
-      validatorScoreParameters.exponent,
-      18
-    );
+    (numerator, denominator) = calculateEpochScore(uptime);
 
     FixidityLib.Fraction memory epochScore = FixidityLib.wrap(numerator).divide(
       FixidityLib.wrap(denominator)
@@ -371,6 +409,7 @@ contract Validators is
     validators[account].score = FixidityLib.wrap(
       Math.min(epochScore.unwrap(), newComponent.add(currentComponent).unwrap())
     );
+    emit ValiadtorScoreUpdated(account, validators[account].score.unwrap(), epochScore.unwrap());
   }
 
   /**

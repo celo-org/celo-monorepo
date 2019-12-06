@@ -412,21 +412,30 @@ contract Election is
    * @notice Returns the amount of rewards that voters for `group` are due at the end of an epoch.
    * @param group The group to calculate epoch rewards for.
    * @param totalEpochRewards The total amount of rewards going to all voters.
+   * @param uptimes Array of Fixidity representations of the validators' uptimes, between 0 and 1.
    * @return The amount of rewards that voters for `group` are due at the end of an epoch.
    * @dev Eligible groups that have received their maximum number of votes cannot receive more.
    */
-  function getGroupEpochRewards(address group, uint256 totalEpochRewards)
-    external
-    view
-    returns (uint256)
-  {
-    // The group must meet the balance requirements in order for their voters to receive epoch
-    // rewards.
-    if (getValidators().meetsAccountLockedGoldRequirements(group) && votes.active.total > 0) {
-      return totalEpochRewards.mul(votes.active.forGroup[group].total).div(votes.active.total);
-    } else {
+  function getGroupEpochRewards(
+    address group,
+    uint256 totalEpochRewards,
+    uint256[] calldata uptimes
+  ) external view returns (uint256) {
+    // The group must meet the balance requirements for their voters to receive epoch rewards.
+    if (!getValidators().meetsAccountLockedGoldRequirements(group) || votes.active.total <= 0) {
       return 0;
     }
+
+    uint256 scoreNumerator;
+    uint256 scoreDenominator;
+    (scoreNumerator, scoreDenominator) = getValidators().calculateGroupEpochScore(uptimes);
+
+    return
+      totalEpochRewards
+        .mul(votes.active.forGroup[group].total)
+        .div(votes.active.total)
+        .mul(scoreNumerator)
+        .div(scoreDenominator);
   }
 
   /**
