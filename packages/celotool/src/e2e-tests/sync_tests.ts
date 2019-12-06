@@ -70,7 +70,7 @@ describe('sync tests', function(this: any) {
       peers: ['8545'],
     }
     await initAndStartGeth(hooks.gethBinaryPath, fullInstance, true)
-    const web3 = new Web3('http://localhost:8553')
+    const web3 = new Web3('http://127.0.0.1:8553')
     await waitToFinishSyncing(web3)
   })
 

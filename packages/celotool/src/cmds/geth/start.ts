@@ -20,6 +20,7 @@ interface StartArgv extends GethArgv {
   amount: number
   purge: boolean
   withProxy: boolean
+  ethstats: string
 }
 
 export const builder = (argv: yargs.Argv) => {
@@ -78,6 +79,10 @@ export const builder = (argv: yargs.Argv) => {
       description: 'purge',
       default: false,
     })
+    .option('ethstats', {
+      type: 'string',
+      description: 'address of the ethstats server',
+    })
 }
 
 export const handler = async (argv: StartArgv) => {
@@ -103,6 +108,7 @@ export const handler = async (argv: StartArgv) => {
   const withProxy = argv.withProxy
 
   const network = 'local'
+  const ethstats = argv.ethstats || undefined
 
   console.info(`sync mode is ${syncMode}`)
 
@@ -123,7 +129,7 @@ export const handler = async (argv: StartArgv) => {
       validatingGasPrice: minerGasPrice,
       syncmode: syncMode,
       port: port + x,
-      ethstats: 'localhost:3000',
+      ethstats,
       rpcport: rpcport + x * 2,
       wsport: wsport + x * 2,
     })
@@ -136,7 +142,6 @@ export const handler = async (argv: StartArgv) => {
         isProxy: true,
         syncmode: syncMode,
         port: port + x + 1000,
-        ethstats: 'localhost:3000',
         rpcport: rpcport + x * 2 + 1000,
         wsport: wsport + x * 2 + 1000,
       })
@@ -150,6 +155,6 @@ export const handler = async (argv: StartArgv) => {
     gethConfig,
     validators,
     validatorPrivateKeys,
-    verbose: verbosity > 5,
+    verbose: verbosity > 3,
   })
 }

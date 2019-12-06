@@ -699,7 +699,7 @@ export const runGethNodes = async ({
   const gethBinaryPath = `${gethConfig.gethRepoPath}/build/bin/geth`
 
   if (!gethConfig.keepData && fs.existsSync(gethConfig.runPath)) {
-    await resetDataDir(gethConfig.runPath)
+    await resetDataDir(gethConfig.runPath, verbose)
   }
 
   if (!fs.existsSync(gethConfig.runPath)) {
@@ -730,11 +730,7 @@ export const runGethNodes = async ({
       await addStaticPeers(getDatadir(instance), instance.peers)
     }
 
-    if (gethConfig.migrate || gethConfig.migrateTo) {
-      await initAndStartGeth(gethBinaryPath, instance, verbose)
-    } else {
-      await startGeth(gethBinaryPath, instance, verbose)
-    }
+    await initAndStartGeth(gethBinaryPath, instance, verbose)
   }
 }
 
@@ -784,6 +780,10 @@ export async function init(
   genesisPath: string,
   verbose: boolean
 ) {
+  if (verbose) {
+    console.log('init geth')
+  }
+
   await spawnCmdWithExitOnFailure('rm', ['-rf', datadir], { silent: true })
   await spawnCmdWithExitOnFailure(gethBinaryPath, ['--datadir', datadir, 'init', genesisPath], {
     silent: !verbose,
@@ -841,6 +841,10 @@ export async function startGeth(
   instance: GethInstanceConfig,
   verbose: boolean
 ) {
+  if (verbose) {
+    console.log('starting geth')
+  }
+
   const datadir = getDatadir(instance)
   const {
     syncmode,
@@ -938,7 +942,7 @@ export async function startGeth(
   }
 
   if (ethstats) {
-    gethArgs.push(`--ethstats=${instance.name}@${ethstats}`)
+    gethArgs.push(`--ethstats=${instance.name}@${ethstats}`, '--etherbase=0')
   }
 
   const gethProcess = spawnWithLog(gethBinaryPath, gethArgs, `${datadir}/logs.txt`, verbose)
@@ -974,7 +978,7 @@ export async function startGeth(
 }
 
 export function writeGenesis(validators: Validator[], gethConfig: GethRunConfig) {
-  const genesis = generateGenesis({
+  const genesis: string = generateGenesis({
     validators,
     blockTime: 0,
     epoch: 10,
@@ -1022,9 +1026,9 @@ export async function buildGeth(gethPath: string) {
   await spawnCmdWithExitOnFailure('make', ['geth'], { cwd: gethPath })
 }
 
-export async function resetDataDir(dataDir: string) {
-  await spawnCmd('rm', ['-rf', dataDir], { silent: true })
-  await spawnCmd('mkdir', [dataDir], { silent: true })
+export async function resetDataDir(dataDir: string, verbose: boolean) {
+  await spawnCmd('rm', ['-rf', dataDir], { silent: !verbose })
+  await spawnCmd('mkdir', [dataDir], { silent: !verbose })
 }
 
 export async function checkoutGethRepo(branch: string, gethPath: string) {

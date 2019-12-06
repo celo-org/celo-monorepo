@@ -186,7 +186,11 @@ export function getContext(gethConfig: GethRunConfig) {
     await buildGeth(gethRepoPath)
 
     if (!gethConfig.keepData && fs.existsSync(gethConfig.runPath)) {
-      await resetDataDir(gethConfig.runPath)
+      await resetDataDir(gethConfig.runPath, verboseOutput)
+    }
+
+    if (!fs.existsSync(gethConfig.runPath)) {
+      fs.mkdirSync(gethConfig.runPath, { recursive: true })
     }
 
     await writeGenesis(validators, gethConfig)

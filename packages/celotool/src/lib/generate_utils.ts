@@ -246,7 +246,7 @@ export const generateGenesis = ({
   chainId: number
   requestTimeout: number
   enablePetersburg?: boolean
-}) => {
+}): string => {
   const genesis: any = { ...TEMPLATE }
 
   if (!enablePetersburg) {
@@ -302,5 +302,5 @@ export const generateGenesis = ({
     }
   }
 
-  return JSON.stringify(genesis)
+  return JSON.stringify(genesis, null, 2)
 }
