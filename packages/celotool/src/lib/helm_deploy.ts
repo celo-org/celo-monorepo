@@ -631,15 +631,8 @@ export async function installHelmChart(celoEnv: string) {
 
 export async function upgradeHelmChart(celoEnv: string) {
   console.info(`Upgrading helm release ${celoEnv}`)
-  const parameters = (await helmParameters(celoEnv)).join(' ')
-  if (process.env.CELOTOOL_VERBOSE === 'true') {
-    await execCmdWithExitOnFailure(
-      `helm upgrade --debug --dry-run ${celoEnv} ../helm-charts/testnet --namespace ${celoEnv} ${parameters}`
-    )
-  }
-  await execCmdWithExitOnFailure(
-    `helm upgrade ${celoEnv} ../helm-charts/testnet --namespace ${celoEnv} ${parameters}`
-  )
+  const parameters = await helmParameters(celoEnv)
+  await upgradeGenericHelmChart(celoEnv, celoEnv, '../helm-charts/testnet', parameters)
   console.info(`Helm release ${celoEnv} upgrade successful`)
 }
 
