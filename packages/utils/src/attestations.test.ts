@@ -50,6 +50,7 @@ describe('Attestation Utils', () => {
     })
   })
 
+  // TODO Update codes to include deeplink prefix
   describe('sanitizeBase64', () => {
     const CODE_1 =
       'Celo attestation code: NaLrNSYGRQ1JurhgREF1tNF43KDJnO6KaatnD¿hoim1XTq0O0IKNDQuBOF¿Fn5xIAjLQMtWbxbOgrtTBZ1oYAQA='
