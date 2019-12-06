@@ -2,7 +2,7 @@ const ganache = require('@celo/ganache-cli')
 const glob = require('glob-fs')({
   gitignore: false,
 })
-const { exec } = require('./lib/test-utils')
+const { exec, waitForPortOpen } = require('./lib/test-utils')
 const minimist = require('minimist')
 const network = require('./truffle-config.js').networks.development
 
@@ -41,37 +41,6 @@ async function startGanache() {
         }
       })
     })
-}
-
-function execCmd(cmd, args, options) {
-  return new Promise(async (resolve, reject) => {
-    const { silent, ...spawnOptions } = options || { silent: false }
-    if (!silent) {
-      console.debug('$ ' + [cmd].concat(args).join(' '))
-    }
-    const process = spawn(cmd, args, { ...spawnOptions, stdio: silent ? 'ignore' : 'inherit' })
-    process.on('close', (code) => {
-      try {
-        resolve(code)
-      } catch (error) {
-        reject(error)
-      }
-    })
-  })
-}
-
-async function isPortOpen(host, port) {
-  return (await execCmd('nc', ['-z', host, port.toString()], { silent: true })) === 0
-}
-
-async function waitForPortOpen(host, port, seconds) {
-  const deadline = Date.now() + seconds * 1000
-  do {
-    if (await isPortOpen(host, port)) {
-      return true
-    }
-  } while (Date.now() < deadline)
-  return false
 }
 
 async function test() {
