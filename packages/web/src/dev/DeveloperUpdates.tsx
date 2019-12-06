@@ -48,7 +48,7 @@ export default withNamespaces('dev')(
                 listID={DEVELOPER_LIST}
                 whenComplete={
                   <Fade>
-                    <Text style={fonts.small}>{t('updates.signUpThanks')}</Text>
+                    <Text style={fonts.micro}>{t('updates.signUpThanks')}</Text>
                   </Fade>
                 }
               />

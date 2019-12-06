@@ -25,14 +25,11 @@ _See code: [packages/cli/src/commands/election/activate.ts](https://github.com/c
 
 ### Current
 
-Outputs the set of validators currently participating in BFT to create blocks. The validator set is re-elected at the end of every epoch.
+Outputs the set of validators currently participating in BFT to create blocks. An election is run to select the validator set at the end of every epoch.
 
 ```
 USAGE
   $ celocli election:current
-
-EXAMPLE
-  current
 ```
 
 _See code: [packages/cli/src/commands/election/current.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/election/current.ts)_
@@ -78,9 +75,6 @@ Runs a "mock" election and prints out the validators that would be elected if th
 ```
 USAGE
   $ celocli election:run
-
-EXAMPLE
-  run
 ```
 
 _See code: [packages/cli/src/commands/election/run.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/election/run.ts)_

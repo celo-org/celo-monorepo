@@ -3972,6 +3972,11 @@
   dependencies:
     "@types/node" "*"
 
+"@types/hex-rgba@^1.0.0":
+  version "1.0.0"
+  resolved "https://registry.yarnpkg.com/@types/hex-rgba/-/hex-rgba-1.0.0.tgz#b2aed2aa9fdd6152b7f0ac5e3733b974d4eba35a"
+  integrity sha512-u3AGV8fjRsDBqY4wOvVWhVCgKDfh2b0h3mux7KPKU1cm/6mJp14OWBINLgBypeBTM89Nm2j+eKQqIoIe7150DA==
+
 "@types/hoist-non-react-statics@^3.3.0", "@types/hoist-non-react-statics@^3.3.1":
   version "3.3.1"
   resolved "https://registry.yarnpkg.com/@types/hoist-non-react-statics/-/hoist-non-react-statics-3.3.1.tgz#1124aafe5118cb591977aeb1ceaaed1070eb039f"
@@ -8978,6 +8983,11 @@ colorspace@1.1.x:
   dependencies:
     color "3.0.x"
     text-hex "1.0.x"
+
+colortranslator@^1.1.1:
+  version "1.1.1"
+  resolved "https://registry.yarnpkg.com/colortranslator/-/colortranslator-1.1.1.tgz#9a4919802eb9e80ac9c0cb441f62d741e68049fc"
+  integrity sha512-7X4Hc5c4ewwsZZL5A3qSCYVmpWh7Ds94WIx1CB++/6Q4nkG3u/SFGXKKQ8YqpCxAohwnAjfJZ/axOls5HCpNiA==
 
 colour@~0.7.1:
   version "0.7.1"
@@ -31376,6 +31386,11 @@ yauzl@^2.4.2:
   dependencies:
     buffer-crc32 "~0.2.3"
     fd-slicer "~1.0.1"
+
+yiq@^3.0.1:
+  version "3.0.1"
+  resolved "https://registry.yarnpkg.com/yiq/-/yiq-3.0.1.tgz#42c82374a550689b8c9430621492d62cd7bfa0c9"
+  integrity sha512-nfKzGVKrOuEQBNQX3z71InpqQb47KMkkyo0xZB0YFsHirqxFU+rBHV7cgPHzVQ2pOKhqbrm2XDsxaQ6nWlKW2Q==
 
 yn@^3.0.0:
   version "3.1.0"
