@@ -448,7 +448,7 @@ If you find your Validator still not getting elected you may need to faucet your
 You can check the status of your validator, including whether it is elected and signing blocks, by running:
 
 ```bash
-# On your local machine with celocli > 0.0.30-beta9
+# On your local machine with celocli >= 0.0.30-beta9
 celocli validator:status --validator $CELO_VALIDATOR_ADDRESS
 ```
 
