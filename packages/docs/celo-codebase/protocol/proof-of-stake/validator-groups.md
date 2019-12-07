@@ -40,7 +40,7 @@ Validator Groups can receive votes from Locked Gold up to a [voting cap](validat
 
 ## Slashing Penalty
 
-A [slashing penalty](penalties.md), initially `1.0`, is also tracked for each validator group. This value between may be reduced as a penalty for misbehavior of the validator in the group, and affects the future rewards of the group, its validators, and Locked Gold holders receiving rewards for voting for the group.  
+A [slashing penalty](penalties.md), initially `1.0`, is also tracked for each validator group. This value between may be reduced as a penalty for misbehavior of the validator in the group, and affects the future rewards of the group, its validators, and Locked Gold holders receiving rewards for voting for the group.
 
 ## Metadata
 

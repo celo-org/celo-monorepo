@@ -4,11 +4,11 @@ The Community Fund provides for general upkeep of the Celo platform. Celo Gold h
 
 The Community Fund receives assets from three sources:
 
-* The Community Fund obtains a desired epoch payment defined as a fraction of the total desired epoch rewards \(governable, initially planned to be $$25\%$$\). This amount is subject to adjustment up or down in the event of under- or over-spending against the epoch rewards target schedule. It may also be reduced to [bolster the Reserve](#bolster-reserve).  
+- The Community Fund obtains a desired epoch payment defined as a fraction of the total desired epoch rewards \(governable, initially planned to be $$25\%$$\). This amount is subject to adjustment up or down in the event of under- or over-spending against the epoch rewards target schedule. It may also be reduced to [bolster the Reserve](#bolster-reserve).
 
-* The Community Fund is the default destination for slashed assets.
+- The Community Fund is the default destination for slashed assets.
 
-* The Community Fund also receives the 'base' portion of [transaction fees](transactions/gas-pricing.md).
+- The Community Fund also receives the 'base' portion of [transaction fees](../transactions/gas-pricing.md).
 
 ## <a name="bolster-reserve"></a>Bolstering the Reserve
 
