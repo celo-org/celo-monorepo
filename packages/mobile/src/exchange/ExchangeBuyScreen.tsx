@@ -122,7 +122,7 @@ export class ExchangeBuyScreen extends React.Component<Props, State> {
   }
 
   goToReview = () => {
-    const { makerToken, inputToken, inputAmount } = this.state
+    const { inputToken, inputAmount } = this.state
     const inputTokenCode = this.getInputTokenDisplayText()
     navigate(Screens.ExchangeReview, {
       makerTokenBalance: this.state.makerTokenAvailableBalance,

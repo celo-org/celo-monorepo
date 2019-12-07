@@ -1,7 +1,5 @@
 import Button, { BtnTypes } from '@celo/react-components/components/Button'
 import KeyboardAwareScrollView from '@celo/react-components/components/KeyboardAwareScrollView'
-
-import ReviewFrame from '@celo/react-components/components/ReviewFrame'
 import ReviewHeader from '@celo/react-components/components/ReviewHeader'
 import colors from '@celo/react-components/styles/colors'
 import { fontStyles } from '@celo/react-components/styles/fonts'
@@ -9,21 +7,18 @@ import { componentStyles } from '@celo/react-components/styles/styles'
 import BigNumber from 'bignumber.js'
 import * as React from 'react'
 import { withNamespaces, WithNamespaces } from 'react-i18next'
-import { StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native'
+import { StyleSheet, Text, View } from 'react-native'
 import SafeAreaView from 'react-native-safe-area-view'
 import { NavigationInjectedProps } from 'react-navigation'
 import { connect } from 'react-redux'
-import CeloAnalytics from 'src/analytics/CeloAnalytics'
-import { CustomEventNames } from 'src/analytics/constants'
 import componentWithAnalytics from 'src/analytics/wrapper'
 import { exchangeTokens, fetchExchangeRate } from 'src/exchange/actions'
-import ExchangeConfirmationCard from 'src/exchange/ExchangeConfirmationCard'
 import { ExchangeRatePair } from 'src/exchange/reducer'
 import { CURRENCY_ENUM as Token } from 'src/geth/consts'
 import i18n, { Namespaces } from 'src/i18n'
-import { navigate, navigateBack } from 'src/navigator/NavigationService'
-import { Screens } from 'src/navigator/Screens'
 import { headerWithCancelButton } from 'src/navigator/Headers'
+import { navigate } from 'src/navigator/NavigationService'
+import { Screens } from 'src/navigator/Screens'
 import { RootState } from 'src/redux/reducers'
 import { isAppConnected } from 'src/redux/selectors'
 import DisconnectBanner from 'src/shared/DisconnectBanner'
@@ -131,7 +126,6 @@ class ExchangeReview extends React.Component<Props, State> {
 
   render() {
     const { exchangeRatePair, fee, t, appConnected } = this.props
-    const takerToken = this.state.makerToken === Token.GOLD ? Token.DOLLAR : Token.GOLD
     const goldRateInDollars = getRateForMakerToken(exchangeRatePair, Token.DOLLAR)
     let dollarAmount = this.state.inputAmount
     const dollarRateInGold = getRateForMakerToken(exchangeRatePair, Token.GOLD)
@@ -140,12 +134,7 @@ class ExchangeReview extends React.Component<Props, State> {
     }
 
     return (
-      <SafeAreaView
-        // Force inset as this screen uses auto focus and KeyboardSpacer padding is initially
-        // incorrect because of that
-        forceInset={{ top: 'never', bottom: 'always' }}
-        style={styles.container}
-      >
+      <SafeAreaView style={styles.container}>
         <View
           style={{
             paddingHorizontal: 16,
