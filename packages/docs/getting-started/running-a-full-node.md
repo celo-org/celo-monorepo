@@ -53,7 +53,7 @@ In this step, you'll create an account on the network. If you've already done th
 Run the command to create a new account:
 
 ```bash
-docker run -v $PWD:/root/.celo --entrypoint /bin/sh -it $CELO_IMAGE -c "sleep 1 && geth account new"
+docker run -v $PWD:/root/.celo -it $CELO_IMAGE account new
 ```
 
 It will prompt you for a passphrase, ask you to confirm it, and then will output your account address: `Address: {<YOUR-ACCOUNT-ADDRESS>}`
