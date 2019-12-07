@@ -117,9 +117,12 @@ async function processClaims(kit: ContractKit, address: string, info: IdentityMe
         case ClaimTypes.KEYBASE:
           break
         case ClaimTypes.ACCOUNT:
-          const status = await verifyClaim(claim, address, accounts.getMetadataURL)
-          if (status) console.error(status)
-          else lst.push(claim.address)
+          const status = await verifyClaim(claim, '0x' + address, accounts.getMetadataURL)
+          if (status) console.error('Cannot verify claim:', status)
+          else {
+            console.log('Claim success', address, claim.address)
+            lst.push(claim.address)
+          }
         default:
           break
       }
@@ -127,7 +130,7 @@ async function processClaims(kit: ContractKit, address: string, info: IdentityMe
     lst.push(address)
     const client = new Client({ database: LEADERBOARD_DATABASE })
     await client.connect()
-    const res = await client.query(
+    await client.query(
       'INSERT INTO claims (address, claimed_address)' +
         " SELECT decode(m.address,'hex'), decode(m.claimed_address,'hex') FROM json_populate_recordset(null::json_assoc, $1) AS m" +
         ' ON CONFLICT (address, claimed_address) DO NOTHING RETURNING *',
@@ -140,7 +143,6 @@ async function processClaims(kit: ContractKit, address: string, info: IdentityMe
         ),
       ]
     )
-    console.log('claim success', res.rows)
     await client.end()
   } catch (err) {
     console.error('Cannot process claims', err)
