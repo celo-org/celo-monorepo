@@ -218,8 +218,8 @@ export async function createPhoneNumber(
     await twilioClient.incomingPhoneNumbers.create({
       phoneNumber: usableNumber,
       addressSid,
-      // We don't really care
-      smsUrl: 'https://celo.org',
+      // Just an requestbin.com endpoint to avoid errors
+      smsUrl: 'https://enzyutth0wxme.x.pipedream.net/',
     })
 
     return usableNumber
