@@ -18,3 +18,18 @@ export function addLocalAccount(web3: Web3, privateKey: string): Web3 {
   debug('Providers configured')
   return web3
 }
+
+// Returns contract events from the last N epochs.
+export async function getEpochEvents(
+  web3: Web3,
+  contract: any,
+  eventName: string,
+  epochSize: number,
+  epochs = 1
+) {
+  const currentBlock = await web3.eth.getBlockNumber()
+  const lastEpochBlock = Math.floor(currentBlock / epochSize) * epochSize
+  const fromBlock: number = lastEpochBlock - (epochSize - 1) * epochs
+  // Better to call contract.getPastEvents() N times with fromBlock == toBlock?
+  return await contract.getPastEvents(eventName, { fromBlock, toBlock: lastEpochBlock })
+}

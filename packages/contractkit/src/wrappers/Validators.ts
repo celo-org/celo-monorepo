@@ -4,6 +4,7 @@ import { fromFixed, toFixed } from '@celo/utils/lib/fixidity'
 import BigNumber from 'bignumber.js'
 import { Address, NULL_ADDRESS } from '../base'
 import { Validators } from '../generated/types/Validators'
+import { getEpochEvents } from '../utils/web3-utils'
 import {
   BaseWrapper,
   CeloTransactionObject,
@@ -417,5 +418,51 @@ export class ValidatorsWrapper extends BaseWrapper<Validators> {
       this.kit,
       this.contract.methods.reorderMember(validator, nextMember, prevMember)
     )
+  }
+
+  // Returns ValidatorEpochPaymentDistributed events via getEpochEvents().
+  async getValidatorRewardEvents(epochSize: number, epochs = 1, address?: string) {
+    var validatorRewardsEvents = await getEpochEvents(
+      this.kit.web3,
+      await this.kit._web3Contracts.getValidators(),
+      'ValidatorEpochPaymentDistributed',
+      epochSize,
+      epochs
+    )
+    if (address) {
+      const lowerAddress = address.toLowerCase()
+      validatorRewardsEvents = validatorRewardsEvents.filter(
+        (x: any) =>
+          x.returnValues.validator.toLowerCase() == lowerAddress ||
+          x.returnValues.group.toLowerCase() == lowerAddress
+      )
+    }
+    return validatorRewardsEvents
+  }
+
+  // Returns map of Validator objects via Promise.all().
+  async getUniqueValidators(listWithValidators: any, getValidatorAddress: any) {
+    const uniqueValidators: { [key: string]: any } = {}
+    for (const validator of listWithValidators) {
+      const validatorAddress = getValidatorAddress(validator)
+      // Better to use Promise.all()
+      if (!(validatorAddress in uniqueValidators))
+        uniqueValidators[validatorAddress] = await this.getValidator(validatorAddress)
+    }
+    return uniqueValidators
+  }
+
+  // Returns map of ValidatorGroup objects via Promise.all().
+  async getUniqueValidatorGroups(listWithValidatorGroups: any, getValidatorGroupAddress: any) {
+    const uniqueValidatorGroups: { [key: string]: any } = {}
+    for (const validatorGroup of listWithValidatorGroups) {
+      const validatorGroupAddress = getValidatorGroupAddress(validatorGroup)
+      // Better to use Promise.all()
+      if (!(validatorGroupAddress in uniqueValidatorGroups))
+        uniqueValidatorGroups[validatorGroupAddress] = await this.getValidatorGroup(
+          validatorGroupAddress
+        )
+    }
+    return uniqueValidatorGroups
   }
 }

@@ -4,6 +4,7 @@ import { zip } from '@celo/utils/lib/collections'
 import BigNumber from 'bignumber.js'
 import { Address, NULL_ADDRESS } from '../base'
 import { Election } from '../generated/types/Election'
+import { getEpochEvents } from '../utils/web3-utils'
 import {
   BaseWrapper,
   CeloTransactionObject,
@@ -323,5 +324,26 @@ export class ElectionWrapper extends BaseWrapper<Election> {
       lesser: newIdx === 0 ? NULL_ADDRESS : currentVotes[newIdx - 1].address,
       greater: newIdx === currentVotes.length - 1 ? NULL_ADDRESS : currentVotes[newIdx + 1].address,
     }
+  }
+
+  // Returns EpochRewardsDistributedToVoters events via getEpochEvents().
+  async getVoterRewardEvents(
+    epochSize: number,
+    epochs = 1,
+    votes?: { [key: string]: BigNumber } | null
+  ) {
+    var voterRewardsEvents = await getEpochEvents(
+      this.kit.web3,
+      await this.kit._web3Contracts.getElection(),
+      'EpochRewardsDistributedToVoters',
+      epochSize,
+      epochs
+    )
+    if (votes) {
+      voterRewardsEvents = voterRewardsEvents.filter(
+        (x: any) => x.returnValues.group.toLowerCase() in votes
+      )
+    }
+    return voterRewardsEvents
   }
 }
