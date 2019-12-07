@@ -173,11 +173,11 @@ export class Account extends React.Component<Props, State> {
     } else {
       return (
         <View style={style.devSettings}>
-          <View style={style.devSettingsItem}>
+          {/* <View style={style.devSettingsItem}>
             <TouchableOpacity onPress={this.revokeNumberVerification}>
               <Text>Revoke Number Verification</Text>
             </TouchableOpacity>
-          </View>
+          </View> */}
           <View style={style.devSettingsItem}>
             <TouchableOpacity onPress={this.resetAppOpenedState}>
               <Text>Reset app opened state</Text>

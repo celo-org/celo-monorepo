@@ -66,6 +66,8 @@ contract EpochRewards is Ownable, Initializable, UsingPrecompiles, UsingRegistry
     uint256 overspendAdjustmentFactor
   );
 
+  event TargetVotingYieldUpdated(uint256 fraction);
+
   /**
    * @notice Initializes critical variables.
    * @param registryAddress The address of the registry contract.
@@ -362,6 +364,7 @@ contract EpochRewards is Ownable, Initializable, UsingPrecompiles, UsingRegistry
         targetVotingYieldParams.target = targetVotingYieldParams.max;
       }
     }
+    emit TargetVotingYieldUpdated(targetVotingYieldParams.target.unwrap());
   }
 
   /**

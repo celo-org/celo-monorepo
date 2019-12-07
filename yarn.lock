@@ -2172,10 +2172,10 @@
     lodash "^4.17.13"
     to-fast-properties "^2.0.0"
 
-"@celo/client@9575a01":
-  version "0.0.173"
-  resolved "https://registry.yarnpkg.com/@celo/client/-/client-0.0.173.tgz#30d8266f8f4897f1db5c9bf4ad344801e620326f"
-  integrity sha512-pAzo3Oy+V/BEkKb7ZZe0l71s6mOdPLLJZfLNo2Ihm2bx37nx8g4LNkcfj+0vVtRQPtiLrGiQ42U8pby3LwmC4Q==
+"@celo/client@0.0.224":
+  version "0.0.224"
+  resolved "https://registry.yarnpkg.com/@celo/client/-/client-0.0.224.tgz#253706fd6e692c85ea36de7de3c3aeec294a25cb"
+  integrity sha512-9+e+xUvE1M7LksaCzFwX9tvANexHopJdrY3nerhegm5k2mQtDRRgRTsd6b6AZwN4jOXvIlukGf0SxEhSX1iFFQ==
 
 "@celo/contractkit@0.1.5":
   version "0.1.5"
@@ -34121,7 +34121,6 @@ websocket@^1.0.28:
   dependencies:
     debug "^2.2.0"
     es5-ext "^0.10.50"
-    gulp "^4.0.2"
     nan "^2.14.0"
     typedarray-to-buffer "^3.1.5"
     yaeti "^0.0.6"
