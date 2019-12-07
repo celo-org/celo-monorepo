@@ -16,6 +16,11 @@ function addressToBinary(a: string) {
   }
 }
 
+process.on('unhandledRejection', (reason, _promise) => {
+  console.log('Unhandled Rejection at:', reason.stack || reason)
+  process.exit(0)
+})
+
 const LEADERBOARD_DATABASE = process.env['LEADERBOARD_DATABASE'] || 'blockscout'
 const LEADERBOARD_SHEET =
   process.env['LEADERBOARD_SHEET'] || '1HCs1LZv1BOB1v2bVlH4qNPnxVRlYVhQ7CKhkMibE4EY'
