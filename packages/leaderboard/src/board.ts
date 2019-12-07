@@ -1,10 +1,9 @@
 import { ContractKit, newKitFromWeb3, CeloContract } from '@celo/contractkit'
 import { AccountsWrapper } from '@celo/contractkit/lib/wrappers/Accounts'
 import Web3 from 'web3'
-import http from 'http'
 import { Client } from 'pg'
 import { verifyClaim, Claim } from '@celo/contractkit/lib/identity/claims/claim'
-import { ClaimTypes } from '@celo/contractkit/lib/identity'
+import { ClaimTypes, IdentityMetadataWrapper } from '@celo/contractkit/lib/identity'
 
 const GoogleSpreadsheet = require('google-spreadsheet')
 
@@ -63,13 +62,12 @@ async function updateDB(lst: any[], remove: any[]) {
   console.log('Adding', lst)
   const client = new Client({ database: LEADERBOARD_DATABASE })
   await client.connect()
-  const res = await client.query(
+  await client.query(
     'INSERT INTO competitors (address, multiplier)' +
       " SELECT decode(m.address, 'hex') AS address, m.multiplier FROM json_populate_recordset(null::json_type, $1) AS m" +
       ' ON CONFLICT (address) DO UPDATE SET multiplier = EXCLUDED.multiplier RETURNING *',
     [JSON.stringify(lst)]
   )
-  console.log(res.rows)
   console.log('Removing', remove)
   for (let elem of remove) {
     await client.query(
@@ -105,24 +103,26 @@ async function updateRate(kit: ContractKit) {
   await client.end()
 }
 
-async function processClaims(kit: ContractKit, address: string, data: string) {
+async function processClaims(kit: ContractKit, address: string, info: IdentityMetadataWrapper) {
   try {
-    console.log('process claim', address, data)
-    const info: any = JSON.parse(data)
-    const orig_lst: any[] = info.claims
+    // const info: any = JSON.parse(data)
+    const orig_lst: Claim[] = info.claims
+
     const lst: string[] = []
     const accounts = await kit.contracts.getAccounts()
     for (let i = 0; i < orig_lst.length; i++) {
-      console.log('account claim', orig_lst[i])
-      let claim: Claim = {
-        type: ClaimTypes.ACCOUNT,
-        timestamp: orig_lst[i].timestamp,
-        address: orig_lst[i].address,
-        publicKey: undefined,
+      console.log('processing claim for', address, orig_lst[i])
+      let claim: Claim = orig_lst[i]
+      switch (claim.type) {
+        case ClaimTypes.KEYBASE:
+          break
+        case ClaimTypes.ACCOUNT:
+          const status = await verifyClaim(claim, address, accounts.getMetadataURL)
+          if (status) console.error(status)
+          else lst.push(claim.address)
+        default:
+          break
       }
-      const status = await verifyClaim(claim, address, accounts.getMetadataURL)
-      if (status) console.error(status)
-      else lst.push(claim.address)
     }
     lst.push(address)
     const client = new Client({ database: LEADERBOARD_DATABASE })
@@ -135,13 +135,12 @@ async function processClaims(kit: ContractKit, address: string, data: string) {
         JSON.stringify(
           lst.map((a) => {
             const res = { address: addressToBinary(address), claimed_address: addressToBinary(a) }
-            console.log(res)
             return res
           })
         ),
       ]
     )
-    console.log(res.rows)
+    console.log('claim success', res.rows)
     await client.end()
   } catch (err) {
     console.error('Cannot process claims', err)
@@ -153,20 +152,14 @@ async function readAssoc(lst: string[]) {
   const kit: ContractKit = newKitFromWeb3(web3)
   updateRate(kit)
   const accounts: AccountsWrapper = await kit.contracts.getAccounts()
-  function getFromUrl(a: string, url: string) {
-    http
-      .get(url, (resp) => {
-        let data = ''
-        resp.on('data', (chunk) => (data += chunk))
-        resp.on('end', () => processClaims(kit, a, data))
-      })
-      .on('error', (err) => console.log('Error: ' + err.message))
-  }
   lst.forEach(async (a) => {
     try {
       const url = await accounts.getMetadataURL(a)
-      if (url == '') processClaims(kit, a, '{"claims": []}')
-      else getFromUrl(a, url)
+      console.log(a, 'has url', url)
+      let metadata: IdentityMetadataWrapper
+      if (url == '') metadata = IdentityMetadataWrapper.fromEmpty(a)
+      else metadata = await IdentityMetadataWrapper.fetchFromURL(url)
+      processClaims(kit, a, metadata)
     } catch (err) {
       console.error('Bad address', a, err.toString())
     }
