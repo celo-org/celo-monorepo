@@ -17,6 +17,7 @@ import { ReserveConfig } from './wrappers/Reserve'
 import { SortedOraclesConfig } from './wrappers/SortedOracles'
 import { StableTokenConfig } from './wrappers/StableTokenWrapper'
 import { ValidatorsConfig } from './wrappers/Validators'
+import { BigNumber } from 'bignumber.js'
 
 const debug = debugFactory('kit:kit')
 
@@ -73,6 +74,18 @@ export class ContractKit {
     this.registry = new AddressRegistry(this)
     this._web3Contracts = new Web3ContractCache(this)
     this.contracts = new WrapperCache(this)
+  }
+
+  async getTotalBalance(address: string): Promise<BigNumber> {
+    const goldToken = await this.contracts.getGoldToken()
+    const stableToken = await this.contracts.getStableToken()
+    const lockedGold = await this.contracts.getLockedGold()
+    const oracle = await this.contracts.getSortedOracles()
+    const goldBalance = await goldToken.balanceOf(address)
+    const lockedBalance = await lockedGold.getAccountTotalLockedGold(address)
+    const dollarBalance = await stableToken.balanceOf(address)
+    const rate = await oracle.medianRate(CeloContract.StableToken)
+    return goldBalance.plus(lockedBalance).plus(dollarBalance.multipliedBy(rate.rate))
   }
 
   async getNetworkConfig(): Promise<NetworkConfig> {
