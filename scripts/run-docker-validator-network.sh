@@ -5,7 +5,7 @@ export LC_ALL=en_US.UTF-8
 
 # Usage: run-network.sh <COMMAND> <DATA_DIR>
 COMMAND=${1:-"pull,accounts,run-validator,run-proxy,status,print-env"}
-DATA_DIR=${2:-"/tmp/celo/network"}
+DATA_DIR=${2:-"$HOME/.celo/network"}
 
 export CELO_IMAGE=${3:-"us.gcr.io/celo-testnet/celo-node:baklava"}
 export NETWORK_ID=${4:-"12219"}
@@ -108,7 +108,7 @@ if [[ $COMMAND == *"help"* ]]; then
     echo -e "Options:"
     echo -e "$0 <COMMAND> <DATA_DIR> <CELO_IMAGE> <NETWORK_ID> <NETWORK_NAME> <PASSWORD>"
     echo -e "\t - Command; comma separated list of actions to execute. Options are: help, pull, clean, accounts, run-validator, run-proxy, run-attestation, run-fullnode, status, print-env, get-cooking. Default: pull,accounts,run-validator,run-proxy,status"
-    echo -e "\t - Data Dir; Local folder where will be created the data dir for the nodes. Default: /tmp/celo/network"
+    echo -e "\t - Data Dir; Local folder where will be created the data dir for the nodes. Default: $HOME/.celo/network"
     echo -e "\t - Celo Image; Image to download"
     echo -e "\t - Celo Network; Docker image network to use (typically alfajores or baklava, but you can use a commit). "
     echo -e "\t - Network Id; 31417 for integration, 44785 for alfajores, etc."
