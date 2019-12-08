@@ -4,6 +4,7 @@ import {
   AttestationsWrapper,
 } from '@celo/contractkit/lib/wrappers/Attestations'
 import { privateKeyToAddress } from '@celo/utils/lib/address'
+import { notEmpty } from '@celo/utils/lib/collections'
 import BigNumber from 'bignumber.js'
 import Logger, { createLogger, stdSerializers } from 'bunyan'
 import { createStream } from 'bunyan-gke-stackdriver'
@@ -14,7 +15,6 @@ import {
   fetchLatestMessagesFromToday,
   findValidCode,
   getPhoneNumber,
-  printAndIgnoreRequestErrors,
   requestAttestationsFromIssuers,
   requestMoreAttestations,
 } from 'src/lib/attestation'
@@ -95,6 +95,8 @@ export const handler = async function autoVerify(argv: AutoVerifyArgv) {
       argv.attestationMax
     )
 
+    const nonCompliantIssuersAlreadyLogged: string[] = []
+
     logger = logger.child({ phoneNumber })
     logger.info('Initialized phone number')
 
@@ -120,7 +122,19 @@ export const handler = async function autoVerify(argv: AutoVerifyArgv) {
         clientAddress
       )
 
+      const nonCompliantIssuers = await attestations.getNonCompliantIssuers(
+        phoneNumber,
+        clientAddress
+      )
+      nonCompliantIssuers
+        .filter((_) => !nonCompliantIssuersAlreadyLogged.includes(_))
+        .forEach((issuer) => {
+          logger.info({ issuer }, 'Did not run the attestation service')
+          nonCompliantIssuersAlreadyLogged.push(issuer)
+        })
+
       logger.info({ attestationsToComplete }, 'Reveal to issuers')
+
       const possibleErrors = await requestAttestationsFromIssuers(
         attestationsToComplete,
         attestations,
@@ -132,7 +146,14 @@ export const handler = async function autoVerify(argv: AutoVerifyArgv) {
         { possibleErrors: possibleErrors.filter((_) => _ && _.known).length },
         'Reveal errors'
       )
-      printAndIgnoreRequestErrors(possibleErrors)
+
+      possibleErrors.filter(notEmpty).forEach((error) => {
+        if (error.known) {
+          logger.info({ ...error }, 'Error while requesting from attestation service')
+        } else {
+          logger.info({ ...error }, 'Unknown error while revealing to issuer')
+        }
+      })
 
       await pollForMessagesAndCompleteAttestations(
         attestations,
