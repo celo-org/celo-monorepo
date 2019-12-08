@@ -610,7 +610,17 @@ If everything goes well users should be able to see your claims by running:
 celocli account:get-metadata $CELO_VALIDATOR_ADDRESS
 ```
 
-By now, you should have setup your Validator account appropriately.
+You should see that your claim for `$CELO_VALIDATOR_GROUP_ADDRESS` could not be verified! We need to create the corresponding claim from `$CELO_VALIDATOR_GROUP_ADDRESS` otherwise anyone could claim it!
+
+```bash
+# On your local machine
+celocli account:create-metadata ./group-metadata.json --from 0x$CELO_VALIDATOR_GROUP_ADDRESS
+celocli account:claim-account ./group-metadata.json --address 0x$CELO_VALIDATOR_ADDRESS --from 0x$CELO_VALIDATOR_GROUP_ADDRESS
+# Upload group-metadata.json
+celocli account:register-metadata --url <GROUP_METADATA_URL> --from $CELO_VALIDATOR_GROUP_ADDRESS
+```
+
+Now when you run `celocli account:get-metadata $CELO_VALIDATOR_ADDRESS`, you should see your claim for the group account to be verified. By now, you should have setup your Validator account appropriately. Note that you need to add these claims for any other addresses that are yours to calculate your score for the leaderboard appropriately.
 
 {% hint style="tip" %}
 Congratulations on setting up your validator. If you want to win the TGCSO, it may be helpful to familiar with the inner workings of the Celo network. Dig into the [protocol documentation](../celo-codebase/protocol) for more information.
