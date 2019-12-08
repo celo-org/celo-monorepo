@@ -1,3 +1,4 @@
+import { BigNumber } from 'bignumber.js'
 import debugFactory from 'debug'
 import Web3 from 'web3'
 import { TransactionObject, Tx } from 'web3/eth/types'
@@ -17,7 +18,6 @@ import { ReserveConfig } from './wrappers/Reserve'
 import { SortedOraclesConfig } from './wrappers/SortedOracles'
 import { StableTokenConfig } from './wrappers/StableTokenWrapper'
 import { ValidatorsConfig } from './wrappers/Validators'
-import { BigNumber } from 'bignumber.js'
 
 const debug = debugFactory('kit:kit')
 

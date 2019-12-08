@@ -1,17 +1,19 @@
+import BigNumber from 'bignumber.js'
+
+import { ContractKit } from '@celo/contractkit'
+import { ClaimTypes, IdentityMetadataWrapper } from '@celo/contractkit/lib/identity'
+import { verifyAccountClaim } from '@celo/contractkit/lib/identity/claims/verify'
+
 import { BaseCommand } from '../../base'
 import { printValueMap } from '../../utils/cli'
 import { Args } from '../../utils/command'
-import { ClaimTypes, IdentityMetadataWrapper } from '@celo/contractkit/lib/identity'
-import { ContractKit } from '@celo/contractkit'
-import { verifyAccountClaim } from '@celo/contractkit/lib/identity/claims/verify'
-import BigNumber from 'bignumber.js'
 
 async function getMetadata(kit: ContractKit, address: string) {
   const accounts = await kit.contracts.getAccounts()
   const url = await accounts.getMetadataURL(address)
   console.log(address, 'has url', url)
-  if (url == '') return IdentityMetadataWrapper.fromEmpty(address)
-  else return await IdentityMetadataWrapper.fetchFromURL(url)
+  if (url === '') return IdentityMetadataWrapper.fromEmpty(address)
+  else return IdentityMetadataWrapper.fetchFromURL(url)
 }
 
 async function getClaims(
@@ -22,9 +24,9 @@ async function getClaims(
   if (address.substr(0, 2) === '0x') {
     address = address.substr(2)
   }
-  let res = [address]
+  const res = [address]
   const accounts = await kit.contracts.getAccounts()
-  for (let claim of data.claims) {
+  for (const claim of data.claims) {
     switch (claim.type) {
       case ClaimTypes.KEYBASE:
         break
@@ -65,9 +67,9 @@ export default class ShowClaimedAccounts extends BaseCommand {
 
     console.log('All balances expressed in units of 10^-18.')
     let sum = new BigNumber(0)
-    for (let address of claimedAccounts) {
+    for (const address of claimedAccounts) {
       console.log('\nShowing balances for', address)
-      let totalBalance = await this.kit.getTotalBalance(address)
+      const totalBalance = await this.kit.getTotalBalance(address)
       const balances = {
         goldBalance: await goldToken.balanceOf(address),
         dollarBalance: await stableToken.balanceOf(address),
