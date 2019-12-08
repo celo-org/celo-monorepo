@@ -478,7 +478,6 @@ describe('Transfer tests', function(this: any) {
         before(`start geth on sync: ${syncMode}`, () => startSyncNode(syncMode))
 
         describe('Transfer CeloGold >', () => {
-          const GOLD_TRANSACTION_GAS_COST = 21000
           describe('with feeCurrency = CeloGold >', () => {
             if (syncMode === 'light' || syncMode === 'ultralight') {
               describe('when running in light/ultralight sync mode', () => {
@@ -533,7 +532,7 @@ describe('Transfer tests', function(this: any) {
                           })
                         } else {
                           testTransferToken({
-                            expectedGas: GOLD_TRANSACTION_GAS_COST,
+                            expectedGas: INTRINSIC_GAS_FOR_TX,
                             transferToken: CeloContract.GoldToken,
                             feeToken: CeloContract.GoldToken,
                             txOptions,
@@ -546,7 +545,7 @@ describe('Transfer tests', function(this: any) {
               })
             } else {
               testTransferToken({
-                expectedGas: GOLD_TRANSACTION_GAS_COST,
+                expectedGas: INTRINSIC_GAS_FOR_TX,
                 transferToken: CeloContract.GoldToken,
                 feeToken: CeloContract.GoldToken,
               })
@@ -585,9 +584,10 @@ describe('Transfer tests', function(this: any) {
         })
 
         describe('Transfer CeloDollars', () => {
+          const evmGasCost = 20303
           describe('feeCurrency = CeloDollars >', () => {
             testTransferToken({
-              expectedGas: 207303,
+              expectedGas: evmGasCost + INTRINSIC_TX_GAS_COST + ADDITIONAL_INTRINSIC_TX_GAS_COST,
               transferToken: CeloContract.StableToken,
               feeToken: CeloContract.StableToken,
             })
@@ -595,7 +595,7 @@ describe('Transfer tests', function(this: any) {
 
           describe('feeCurrency = CeloGold >', () => {
             testTransferToken({
-              expectedGas: 41303,
+              expectedGas: evmGasCost + INTRINSIC_TX_GAS_COST,
               transferToken: CeloContract.StableToken,
               feeToken: CeloContract.GoldToken,
             })
@@ -700,7 +700,7 @@ describe('Transfer tests', function(this: any) {
                 await transferCeloGold(FromAddress, ToAddress, TransferAmount, {
                   feeCurrency: stableTokenAddress,
                 }),
-                187000,
+                INTRINSIC_TX_GAS_COST + ADDITIONAL_INTRINSIC_TX_GAS_COST,
                 stableTokenAddress
               )
 
