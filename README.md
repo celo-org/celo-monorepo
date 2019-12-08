@@ -10,6 +10,7 @@ and other packages.
 The source code for the Celo Blockchain which operates a node on the Celo Network is kept in a separate repo [here](https://github.com/celo-org/celo-blockchain).
 
 ### Celo's Mission - Prosperity for All
+
 Celo, pronounced /ˈtselo/, means ‘purpose’ in Esperanto. In a similar spirit, we are aiming to create a new platform to connect people globally and bring financial stability to those who need it most. We believe blockchain technology is one of the most exciting innovations in recent history and as a community we look to push the boundaries of what is possible with it today. More importantly, we are driven by purpose -- to solve real-world problems such as lack of access to sound currency, or friction for cash-transfer programs aimed to alleviate poverty. Our mission is to build a monetary system that creates the conditions for prosperity for all.
 
 <!-- image with YouTube link -->
@@ -20,7 +21,6 @@ Celo, pronounced /ˈtselo/, means ‘purpose’ in Esperanto. In a similar spiri
   <br />
   <i>What if money were beautiful?</i>
 </p>
-
 
 ### The Celo Stack
 
