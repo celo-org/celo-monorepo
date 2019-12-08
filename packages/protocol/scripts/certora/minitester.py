@@ -32,7 +32,7 @@ def compareResultsWithExpected(testName, rulesResults, expectedRulesResults, ass
                     expectedFuncSet = getFunctionsSet(expectedRulesResults[rule])
                     gotFuncSet = getFunctionsSet(rulesResults[rule])
                     
-                    warnings = checkMissingFunctions(warnings, testName, rule, expectedFuncSet, gotFuncSet)
+                    #warnings = checkMissingFunctions(warnings, testName, rule, expectedFuncSet, gotFuncSet)
                     
                     for result, funcList in rulesResults[rule].items():
                         if funcList.sort() != expectedRulesResults[rule][result].sort(): # compare functions sets (current results with expected)
