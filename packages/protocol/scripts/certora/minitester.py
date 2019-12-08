@@ -10,6 +10,16 @@ import glob
 errors = ""
 warnings = ""
 
+def addError(errors, testName, rule, ruleResult, expectedResult="", funcName=""):
+    errors += "Violation in "+testName+": "+rule
+    if funcName != "":
+        errors+=", " + funcName
+    errors+=" result is "+ruleResult+"."
+    if expectedResult != "":
+        errors += "Should be "+expectedResult
+    errors +="\n"
+    return errors
+
 # compare jar results with expected
 # @param rulesResults is a dictionary that includes all the rule names and their results from the jar output
 # @param expectedRulesResults is a dictionary that includes all the rule names and their results from tester file
