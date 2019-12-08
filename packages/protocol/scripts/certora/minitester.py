@@ -7,6 +7,9 @@ import os
 import csv
 import glob
 
+errors = ""
+warnings = ""
+
 # compare jar results with expected
 # @param rulesResults is a dictionary that includes all the rule names and their results from the jar output
 # @param expectedRulesResults is a dictionary that includes all the rule names and their results from tester file
