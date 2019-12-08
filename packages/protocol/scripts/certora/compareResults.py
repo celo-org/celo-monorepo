@@ -1,4 +1,4 @@
-from test import compareResultsWithExpected,get_errors
+from miniTester import compareResultsWithExpected,get_errors
 import json
 import sys
 
