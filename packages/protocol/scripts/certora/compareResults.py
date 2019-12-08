@@ -1,4 +1,4 @@
-from test import compareResultsWithExpected
+from test import compareResultsWithExpected,get_errors
 import json
 import sys
 
@@ -15,7 +15,8 @@ with open(actualFilename) as actualFile:
 		expected = json.load(expectedFile)
 
 		testres = True
-		result = compareResultsWithExpected("test",actual,expected,[],None,testres)
+		result = compareResultsWithExpected("test",actual["rules"],expected["rules"],actual["assertMessages"],expected["assertMessages"],testres)
 		print(result)
+		print(get_errors())
 		sys.exit(0 if result else 1)
 
