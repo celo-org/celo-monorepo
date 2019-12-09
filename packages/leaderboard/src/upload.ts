@@ -227,12 +227,52 @@ async function updateBTUs(kit: ContractKit, rows: any[][], sheets: any) {
   })
 }
 
+async function updateAttestations(kit: ContractKit, rows: any[][], sheets: any) {
+  let data = []
+  let attestations = await kit._web3Contracts.getAttestations()
+  for (let item of rows) {
+    let address = item[0]
+    if (!address) data.push('')
+    else {
+      try {
+        let req = (await attestations.getPastEvents('AttestationIssuerSelected', {
+          fromBlock: 0,
+          filter: { issuer: address },
+        })).length
+        let full = (await attestations.getPastEvents('AttestationCompleted', {
+          fromBlock: 0,
+          filter: { issuer: address },
+        })).length
+        console.log('Attestations requested', req, 'fulfilled', full, 'by', address)
+        data.push(full / req)
+      } catch (err) {
+        console.error('Cannot resolve attestations for', address, err)
+        data.push('')
+      }
+    }
+  }
+  let req = {
+    spreadsheetId: LEADERBOARD_SHEET,
+    range: 'TGCSO!G3',
+    valueInputOption: 'USER_ENTERED',
+    requestBody: {
+      range: 'TGCSO!G3',
+      majorDimension: 'COLUMNS',
+      values: [data],
+    },
+  }
+  sheets.spreadsheets.values.update(req, (err: any, res: any) => {
+    console.log(res, err)
+  })
+}
+
 function main() {
   const web3 = new Web3('http://localhost:8545')
   const kit: ContractKit = newKitFromWeb3(web3)
   readSheet((rows: any, sheets: any) => {
     updateNames(kit, rows, sheets)
     updateBTUs(kit, rows, sheets)
+    updateAttestations(kit, rows, sheets)
   })
 }
 
