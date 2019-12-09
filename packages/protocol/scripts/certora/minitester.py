@@ -41,11 +41,13 @@ def compareResultsWithExpected(testName, rulesResults, expectedRulesResults, ass
                 else: # nested rule ( ruleName: {result1: [funcionts list], result2: [funcionts list] ... } )
                     expectedFuncSet = getFunctionsSet(expectedRulesResults[rule])
                     gotFuncSet = getFunctionsSet(rulesResults[rule])
-                    
+                                        
                     #warnings = checkMissingFunctions(warnings, testName, rule, expectedFuncSet, gotFuncSet)
                     
                     for result, funcList in rulesResults[rule].items():
-                        if funcList.sort() != expectedRulesResults[rule][result].sort(): # compare functions sets (current results with expected)
+                        funcList.sort()
+                        expectedRulesResults[rule][result].sort()
+                        if funcList != expectedRulesResults[rule][result]: # compare functions sets (current results with expected)
                             for funcName in funcList:
                                 # if funcion appears in current results but does not appear in the expected ones
                                 if funcName not in expectedRulesResults[rule][result]: 
