@@ -45,20 +45,26 @@ export function* doFetchExchangeRate(action: FetchExchangeRateAction) {
   Logger.debug(TAG, 'Calling @doFetchExchangeRate')
   Logger.debug(TAG, 'Calling @doFetchExchangeRate', JSON.stringify(action))
 
-  let { makerToken, makerAmount } = action
+  const { makerToken, makerAmount } = action
 
-  if (makerAmount) {
-    Logger.debug(TAG, `Calling @doFetchExchangeRate, ${JSON.stringify(makerAmount)}`)
-    makerAmount = new BigNumber(web3.utils.toWei(makerAmount.toString()))
+  let makerAmountInWei
+  if (makerAmount && makerToken) {
+    Logger.debug(
+      TAG,
+      `@doFetchExchangeRate, ${JSON.stringify(makerAmount)} to be converted to contract decimals`
+    )
+    makerAmountInWei = yield call(convertToContractDecimals, makerAmount, makerToken)
   }
 
   // If makerAmount and makerToken are given, use them to estimate the exchange rate,
   // as exchange rate depends on amount sold. Else default to preset large sell amount.
   const goldMakerAmount =
-    makerAmount && makerToken === CURRENCY_ENUM.GOLD ? makerAmount : LARGE_GOLD_SELL_AMOUNT_IN_WEI
+    makerAmountInWei && makerToken === CURRENCY_ENUM.GOLD
+      ? makerAmountInWei
+      : LARGE_GOLD_SELL_AMOUNT_IN_WEI
   const dollarMakerAmount =
-    makerAmount && makerToken === CURRENCY_ENUM.DOLLAR
-      ? makerAmount
+    makerAmountInWei && makerToken === CURRENCY_ENUM.DOLLAR
+      ? makerAmountInWei
       : LARGE_DOLLARS_SELL_AMOUNT_IN_WEI
 
   try {
@@ -67,17 +73,26 @@ export function* doFetchExchangeRate(action: FetchExchangeRateAction) {
 
     Logger.debug(TAG, `Calling @doFetchExchangeRate, about to get rates`)
 
-    const sellGold = yield call([exchange, exchange.getExchangeRate], dollarMakerAmount, true)
+    const sellGold = yield call([exchange, exchange.getExchangeRate], goldMakerAmount, true)
     const sellDollar = yield call([exchange, exchange.getExchangeRate], dollarMakerAmount, false)
     Logger.debug(
       TAG,
-      `Calling @doFetchExchangeRate, sell Gold: ${sellGold}, sell Dollar: ${sellDollar}`
+      `Calling @doFetchExchangeRate, sell Gold: ${sellGold}, (estimated at ${dollarMakerAmount}) sell Dollar: ${sellDollar}`
     )
 
     let dollarMakerExchangeRate: BigNumber
     let goldMakerExchangeRate: BigNumber
+    ;[dollarMakerExchangeRate, goldMakerExchangeRate] = yield all([
+      call([exchange, exchange.getUsdExchangeRate], dollarMakerAmount),
+      call([exchange, exchange.getGoldExchangeRate], goldMakerAmount),
+    ])
+
+    /*
+    let dollarMakerExchangeRate: BigNumber
+    let goldMakerExchangeRate: BigNumber
     if (!makerToken) {
       // General: fetch estimated rates for both sides
+      Logger.debug(TAG, `@doFetchExchangeRate getting general exchange rate`)
       ;[dollarMakerExchangeRate, goldMakerExchangeRate] = yield all([
         call([exchange, exchange.getUsdExchangeRate], dollarMakerAmount),
         call([exchange, exchange.getGoldExchangeRate], goldMakerAmount),
@@ -85,23 +100,44 @@ export function* doFetchExchangeRate(action: FetchExchangeRateAction) {
     } else if (makerToken === CURRENCY_ENUM.DOLLAR) {
       // Fetch exchange rate based on dollarMaker
       // Selling dollars
+      Logger.debug(TAG, `@doFetchExchangeRate sell dollar exchange rate at ${dollarMakerAmount}`)
       dollarMakerExchangeRate = yield call(
-        [exchange, exchange.getUsdExchangeRate],
-        dollarMakerAmount
+        [exchange, exchange.getExchangeRate],
+        dollarMakerAmount,
+        false
+      )
+      Logger.debug(
+        TAG,
+        `@doFetchExchangeRate dollarMakerExchangeRate rate is ${dollarMakerExchangeRate}`
       )
       goldMakerExchangeRate = dollarMakerExchangeRate.pow(-1)
+      Logger.debug(
+        TAG,
+        `@doFetchExchangeRate // Selling gold ${goldMakerExchangeRate.toString()}, implied dollarMaker: ${dollarMakerExchangeRate}`
+      )
     } else if (makerToken === CURRENCY_ENUM.GOLD) {
       // Selling gold
-      goldMakerExchangeRate = yield call([exchange, exchange.getUsdExchangeRate], dollarMakerAmount)
+      Logger.debug(TAG, `@doFetchExchangeRate sell gold exchange rate at ${goldMakerAmount}`)
+      // getExchangeRate(buyAmount: NumberLike, sellGold: boolean)
+      goldMakerExchangeRate = yield call(
+        [exchange, exchange.getExchangeRate],
+        goldMakerAmount,
+        true
+      )
+      Logger.debug(
+        TAG,
+        `@doFetchExchangeRate goldMakerExchangeRate rate is ${goldMakerExchangeRate}`
+      )
       dollarMakerExchangeRate = goldMakerExchangeRate.pow(-1)
       Logger.debug(
         TAG,
-        `Calling @doFetchExchangeRate selling gold, ${goldMakerExchangeRate.toString()}, implied dollarMaker: ${dollarMakerExchangeRate}`
+        `@doFetchExchangeRate // Selling gold ${goldMakerExchangeRate.toString()}, implied dollarMaker: ${dollarMakerExchangeRate}`
       )
     } else {
       // Unrecognized token
       throw Error()
     }
+     */
 
     if (!dollarMakerExchangeRate || !goldMakerExchangeRate) {
       Logger.error(TAG, 'Invalid exchange rate')
