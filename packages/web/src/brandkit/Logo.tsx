@@ -58,7 +58,7 @@ const Overview = withNamespaces(NameSpaces.brand)(
             text={t('logo.overviewBtn')}
             href="/static/assets/CeloLogoPackage.zip"
           />
-          <Text style={[fonts.h5a, standardStyles.blockMarginTop]}>{t('licenseTitle')}</Text>
+          <Text style={[fonts.h5, standardStyles.blockMarginTop]}>{t('licenseTitle')}</Text>
           <Text
             style={[fonts.p, standardStyles.blockMarginBottom, standardStyles.elementalMarginTop]}
           >
@@ -69,7 +69,7 @@ const Overview = withNamespaces(NameSpaces.brand)(
           <View style={[standardStyles.centered, styles.fullScreenLogo]}>
             <LogoLightBg height={100} />
           </View>
-          <Text style={[fonts.h5a, standardStyles.elementalMargin, standardStyles.blockMarginTop]}>
+          <Text style={[fonts.h5, standardStyles.elementalMargin, standardStyles.blockMarginTop]}>
             {t('logo.logoTitle')}
           </Text>
           <Text style={fonts.p}>{t('logo.logoText')}</Text>
@@ -105,7 +105,7 @@ const Overview = withNamespaces(NameSpaces.brand)(
           />
         </View>
         <View style={styles.gap}>
-          <Text style={[fonts.h5a, standardStyles.elementalMargin, standardStyles.blockMarginTop]}>
+          <Text style={[fonts.h5, standardStyles.elementalMargin, standardStyles.blockMarginTop]}>
             {t('logo.glyphTitle')}
           </Text>
           <Text style={fonts.p}>{t('logo.glyphText')}</Text>
@@ -154,7 +154,7 @@ const Clearspace = withNamespaces(NameSpaces.brand)(function _ClearSpace({ t }) 
       </View>
       <Text
         style={[
-          fonts.h5a,
+          fonts.h5,
           styles.gap,
           standardStyles.elementalMargin,
           standardStyles.blockMarginTop,
@@ -184,7 +184,7 @@ const Clearspace = withNamespaces(NameSpaces.brand)(function _ClearSpace({ t }) 
       <View>
         <Text
           style={[
-            fonts.h5a,
+            fonts.h5,
             styles.gap,
             standardStyles.elementalMargin,
             standardStyles.blockMarginTop,
@@ -226,7 +226,7 @@ const Backgrounds = withNamespaces(NameSpaces.brand)(function _Backgrounds({ t }
       </View>
       <Text
         style={[
-          fonts.h5a,
+          fonts.h5,
           styles.gap,
           standardStyles.elementalMargin,
           standardStyles.blockMarginTop,
