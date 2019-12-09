@@ -75,10 +75,10 @@ const setIntrinsicGas = async (validatorUri: string, validatorAddress: string, g
 }
 
 // Intrinsic gas for a basic transaction
-const INTRINSIC_GAS_FOR_TX = 21000
+const INTRINSIC_TX_GAS_COST = 21000
 
 // Additional intrinsic gas for a transaction with fee currency specified
-const ADDITIONAL_INTRINSIC_TX_GAS_COST = 166000
+const ADDITIONAL_INTRINSIC_TX_GAS_COST = 50000
 
 /** Helper to watch balance changes over accounts */
 interface BalanceWatcher {
@@ -494,7 +494,6 @@ describe('Transfer tests', function(this: any) {
         before(`start geth on sync: ${syncMode}`, () => startSyncNode(syncMode))
 
         describe('Transfer CeloGold >', () => {
-          const GOLD_TRANSACTION_GAS_COST = 21000
           describe('with feeCurrency = CeloGold >', () => {
             if (syncMode === 'light' || syncMode === 'ultralight') {
               describe('when running in light/ultralight sync mode', () => {
@@ -549,7 +548,7 @@ describe('Transfer tests', function(this: any) {
                           })
                         } else {
                           testTransferToken({
-                            expectedGas: GOLD_TRANSACTION_GAS_COST,
+                            expectedGas: INTRINSIC_TX_GAS_COST,
                             transferToken: CeloContract.GoldToken,
                             feeToken: CeloContract.GoldToken,
                             txOptions,
@@ -562,7 +561,7 @@ describe('Transfer tests', function(this: any) {
               })
             } else {
               testTransferToken({
-                expectedGas: GOLD_TRANSACTION_GAS_COST,
+                expectedGas: INTRINSIC_TX_GAS_COST,
                 transferToken: CeloContract.GoldToken,
                 feeToken: CeloContract.GoldToken,
               })
@@ -570,7 +569,7 @@ describe('Transfer tests', function(this: any) {
           })
 
           describe('feeCurrency = CeloDollars >', () => {
-            const intrinsicGas = INTRINSIC_GAS_FOR_TX + ADDITIONAL_INTRINSIC_TX_GAS_COST
+            const intrinsicGas = INTRINSIC_TX_GAS_COST + ADDITIONAL_INTRINSIC_TX_GAS_COST
 
             describe('when there is no demurrage', () => {
               describe('when setting a gas amount greater than the amount of gas necessary', () =>
@@ -601,9 +600,10 @@ describe('Transfer tests', function(this: any) {
         })
 
         describe('Transfer CeloDollars', () => {
+          const evmGasCost = 20303
           describe('feeCurrency = CeloDollars >', () => {
             testTransferToken({
-              expectedGas: 207303,
+              expectedGas: evmGasCost + INTRINSIC_TX_GAS_COST + ADDITIONAL_INTRINSIC_TX_GAS_COST,
               transferToken: CeloContract.StableToken,
               feeToken: CeloContract.StableToken,
             })
@@ -611,7 +611,7 @@ describe('Transfer tests', function(this: any) {
 
           describe('feeCurrency = CeloGold >', () => {
             testTransferToken({
-              expectedGas: 41303,
+              expectedGas: evmGasCost + INTRINSIC_TX_GAS_COST,
               transferToken: CeloContract.StableToken,
               feeToken: CeloContract.GoldToken,
             })
@@ -643,7 +643,8 @@ describe('Transfer tests', function(this: any) {
 
         describe('Transfer CeloGold >', () => {
           describe('feeCurrency = CeloDollars >', () => {
-            const intrinsicGas = changedIntrinsicGasForAlternativeFeeCurrency + INTRINSIC_GAS_FOR_TX
+            const intrinsicGas =
+              changedIntrinsicGasForAlternativeFeeCurrency + INTRINSIC_TX_GAS_COST
             describe('when there is no demurrage', () => {
               describe('when setting a gas amount greater than the amount of gas necessary', () =>
                 testTransferToken({
@@ -716,7 +717,7 @@ describe('Transfer tests', function(this: any) {
                 await transferCeloGold(FromAddress, ToAddress, TransferAmount, {
                   feeCurrency: stableTokenAddress,
                 }),
-                187000,
+                INTRINSIC_TX_GAS_COST + ADDITIONAL_INTRINSIC_TX_GAS_COST,
                 stableTokenAddress
               )
 
