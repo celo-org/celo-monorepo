@@ -25,7 +25,6 @@ import { isAppConnected } from 'src/redux/selectors'
 import DisconnectBanner from 'src/shared/DisconnectBanner'
 import { getRateForMakerToken, getTakerAmount } from 'src/utils/currencyExchange'
 import { getMoneyDisplayValue } from 'src/utils/formatting'
-import Logger from 'src/utils/Logger'
 
 interface StateProps {
   exchangeRatePair: ExchangeRatePair | null
@@ -51,7 +50,6 @@ interface State {
   inputToken: Token
   inputTokenCode: string
   inputAmount: BigNumber
-  exchangeRate: BigNumber
 }
 
 type Props = StateProps & WithNamespaces & DispatchProps & NavigationInjectedProps
@@ -89,7 +87,6 @@ class ExchangeReview extends React.Component<Props, State> {
     inputToken: Token.GOLD,
     inputTokenCode: 'gold',
     inputAmount: new BigNumber(0),
-    exchangeRate: new BigNumber(10), // TODO anna fix placeholder
   }
 
   onPressConfirm = () => {
@@ -112,7 +109,6 @@ class ExchangeReview extends React.Component<Props, State> {
       throw new Error('Maker token or maker token balance missing from nav props')
     }
 
-    Logger.debug('@getExchangePropertiesFromNavProps', `makerToken is: ${makerToken}`)
     this.setState({
       makerToken,
       inputToken,
@@ -120,12 +116,11 @@ class ExchangeReview extends React.Component<Props, State> {
       inputAmount,
     })
     this.props.fetchExchangeRate(makerToken, inputAmount) // TODO convert input amount if necessary
-    Logger.debug('@getExchangePropertiesFromNavProps', JSON.stringify(this.props.exchangeRatePair))
   }
 
   getMakerAmount() {
     const input = this.state.inputAmount
-    if (this.state.makerToken != this.state.inputToken) {
+    if (this.state.makerToken !== this.state.inputToken) {
       const exchangeRate = getRateForMakerToken(
         this.props.exchangeRatePair,
         this.state.makerToken,
@@ -140,24 +135,24 @@ class ExchangeReview extends React.Component<Props, State> {
     this.getExchangePropertiesFromNavProps()
   }
 
-  render() {
-    const { exchangeRatePair, fee, t, appConnected } = this.props
-
+  getDollarAmount() {
     let dollarAmount = this.state.inputAmount
-    const exchangeRate = getRateForMakerToken(
-      this.props.exchangeRatePair,
-      this.state.makerToken,
-      Token.DOLLAR
-    )
-
     if (this.state.inputToken === Token.GOLD) {
       const dollarRateInGold = getRateForMakerToken(
-        exchangeRatePair,
+        this.props.exchangeRatePair,
         this.state.makerToken,
         Token.GOLD
       )
       dollarAmount = getTakerAmount(this.state.inputAmount, dollarRateInGold)
     }
+    return dollarAmount
+  }
+
+  render() {
+    const { exchangeRatePair, fee, t, appConnected } = this.props
+
+    const exchangeRate = getRateForMakerToken(exchangeRatePair, this.state.makerToken, Token.DOLLAR)
+    const dollarAmount = this.getDollarAmount()
 
     return (
       <SafeAreaView style={styles.container}>

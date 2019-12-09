@@ -28,7 +28,6 @@ import { RootState } from 'src/redux/reducers'
 import DisconnectBanner from 'src/shared/DisconnectBanner'
 import { getRateForMakerToken, getTakerAmount } from 'src/utils/currencyExchange'
 import { getMoneyDisplayValue } from 'src/utils/formatting'
-import Logger from 'src/utils/Logger'
 
 interface State {
   inputToken: CURRENCY_ENUM
@@ -99,10 +98,6 @@ export class ExchangeTradeScreen extends React.Component<Props, State> {
       makerToken,
       makerTokenAvailableBalance,
     })
-    Logger.info(
-      'ExchangeTradeScreen Getting exchange rate',
-      `makerToken: ${makerToken}, available balance: ${makerTokenAvailableBalance}`
-    )
     this.props.fetchExchangeRate(makerToken, makerTokenAvailableBalance)
   }
 
@@ -162,7 +157,6 @@ export class ExchangeTradeScreen extends React.Component<Props, State> {
         this.isDollarToGold() ? DOLLAR_TRANSACTION_MIN_AMOUNT : GOLD_TRANSACTION_MIN_AMOUNT
       )
 
-    Logger.info('ExchangeTradeScreen', `isExchangeInvalid calling with ${this.state.makerToken}`)
     const exchangeRate = getRateForMakerToken(this.props.exchangeRatePair, this.state.makerToken)
     const exchangeRateIsInvalid = exchangeRate.isLessThanOrEqualTo(0)
     const takerToken = this.isDollarToGold() ? CURRENCY_ENUM.GOLD : CURRENCY_ENUM.DOLLAR
@@ -204,18 +198,12 @@ export class ExchangeTradeScreen extends React.Component<Props, State> {
   }
 
   getOppositeInputTokenAmount = (amount: string) => {
-    Logger.info('ExchangeTradeScreen', JSON.stringify(this.props.exchangeRatePair))
-
-    // If dollar maker, use dollar maker rate
-    // if we are selling, always use sell rate
-
     const exchangeRate = getRateForMakerToken(
       this.props.exchangeRatePair,
       this.state.makerToken,
       this.state.inputToken
     )
     const oppositeInputTokenAmount = getTakerAmount(amount, exchangeRate)
-    Logger.info('ExchangeTradeScreen', `oppositeInputTokenAmount: ${oppositeInputTokenAmount}`)
     return oppositeInputTokenAmount
   }
 
@@ -240,8 +228,7 @@ export class ExchangeTradeScreen extends React.Component<Props, State> {
       exchangeRatePair,
       this.state.makerToken,
       CURRENCY_ENUM.DOLLAR
-    ) // Always show rate in dollars
-    Logger.info('ExchangeTradeScreen', `display: ${exchangeRateDisplay}`)
+    )
 
     return (
       <SafeAreaView
