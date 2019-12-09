@@ -12,7 +12,13 @@ async function getMetadata(kit: ContractKit, address: string) {
   const url = await accounts.getMetadataURL(address)
   console.log(address, 'has url', url)
   if (url === '') return IdentityMetadataWrapper.fromEmpty(address)
-  else return IdentityMetadataWrapper.fetchFromURL(url)
+  try {
+    let data = await IdentityMetadataWrapper.fetchFromURL(url)
+    return data
+  } catch (err) {
+    console.error('Cannot fetch metadata', err)
+    return IdentityMetadataWrapper.fromEmpty(address)
+  }
 }
 
 async function getClaims(
@@ -30,11 +36,15 @@ async function getClaims(
       case ClaimTypes.KEYBASE:
         break
       case ClaimTypes.ACCOUNT:
-        const status = await verifyAccountClaim(claim, '0x' + address, accounts.getMetadataURL)
-        if (status) console.error('Cannot verify claim:', status)
-        else {
-          console.log('Claim success', address, claim.address)
-          res.push(claim.address)
+        try {
+          const status = await verifyAccountClaim(claim, '0x' + address, accounts.getMetadataURL)
+          if (status) console.error('Cannot verify claim:', status)
+          else {
+            console.log('Claim success', address, claim.address)
+            res.push(claim.address)
+          }
+        } catch (err) {
+          console.error('Cannot fetch metadata', err)
         }
       default:
         break
@@ -176,8 +186,12 @@ async function getBTUs(kit: ContractKit, address: string) {
 
   let sum = new BigNumber(0)
   for (const address of claimedAccounts) {
-    const totalBalance = await kit.getTotalBalance(address)
-    sum = sum.plus(totalBalance)
+    try {
+      const totalBalance = await kit.getTotalBalance(address)
+      sum = sum.plus(totalBalance)
+    } catch (err) {
+      console.error('Error', err)
+    }
   }
   return sum.toString(10)
 }
