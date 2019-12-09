@@ -265,20 +265,25 @@ fi
 if [[ $COMMAND == *"run-fullnode"* ]]; then
 
     echo -e "* Let's run the full node ..."
-    cd $DATA_DIR
+    cd $FULLNODE_DIR
 
     docker rm -f celo-fullnode || echo -e "Container removed"
 
-    export CELO_ACCOUNT_ADDRESS=$($CELOCLI account:new |tail -1| cut -d' ' -f 2| tr -cd "[:alnum:]\n")
+    if [ -z ${CELO_ACCOUNT_ADDRESS+x} ]; then 
+        echo "CELO_ACCOUNT_ADDRESS is unset, creating account";
+        export CELO_ACCOUNT_ADDRESS=$(docker run -v $PWD:/root/.celo --entrypoint /bin/sh -it $CELO_IMAGE -c " printf '%s\n' $DEFAULT_PASSWORD $DEFAULT_PASSWORD | geth account new " |tail -1| cut -d'{' -f 2| tr -cd "[:alnum:]\n" )
+    else 
+        echo "CELO_ACCOUNT_ADDRESS is set to '$CELO_ACCOUNT_ADDRESS'"; 
+    fi
 
-    docker run -v $PWD/fullnode:/root/.celo --entrypoint /bin/sh -it $CELO_IMAGE -c "wget https://www.googleapis.com/storage/v1/b/static_nodes/o/$NETWORK_NAME?alt=media -O /root/.celo/static-nodes.json"
+    docker run -v $PWD:/root/.celo --entrypoint /bin/sh -it $CELO_IMAGE -c "wget https://www.googleapis.com/storage/v1/b/static_nodes/o/$NETWORK_NAME?alt=media -O /root/.celo/static-nodes.json"
 
-    docker run -v $PWD/fullnode:/root/.celo --entrypoint /bin/sh -it $CELO_IMAGE -c "wget https://www.googleapis.com/storage/v1/b/genesis_blocks/o/$NETWORK_NAME?alt=media -O /root/.celo/genesis.json"
-    docker run -v $PWD/fullnode:/root/.celo $CELO_IMAGE init /root/.celo/genesis.json
+    docker run -v $PWD:/root/.celo --entrypoint /bin/sh -it $CELO_IMAGE -c "wget https://www.googleapis.com/storage/v1/b/genesis_blocks/o/$NETWORK_NAME?alt=media -O /root/.celo/genesis.json"
+    docker run -v $PWD:/root/.celo $CELO_IMAGE init /root/.celo/genesis.json
 
     echo -e "\tStarting the Full Node"
 
-    screen -S celo-fullnode -d -m docker run --name celo-fullnode --restart always -p 127.0.0.1:8545:8545 -p 127.0.0.1:8546:8546 -p 30303:30303 -p 30303:30303/udp -v $PWD/fullnode:/root/.celo $CELO_IMAGE --verbosity 3 --networkid $NETWORK_ID --syncmode full --rpc --rpcaddr 0.0.0.0 --rpcapi eth,net,web3,debug,admin,personal --lightserv 90 --lightpeers 1000 --maxpeers 1100 --etherbase $CELO_ACCOUNT_ADDRESS --ethstats=fullnode-$ETHSTATS_ARG
+    screen -S celo-fullnode -d -m docker run --name celo-fullnode --restart always -p 127.0.0.1:8545:8545 -p 127.0.0.1:8546:8546 -p 30303:30303 -p 30303:30303/udp -v $PWD:/root/.celo $CELO_IMAGE --verbosity 3 --networkid $NETWORK_ID --syncmode full --rpc --rpcaddr 0.0.0.0 --rpcapi eth,net,web3,debug,admin,personal --lightserv 90 --lightpeers 1000 --maxpeers 1100 --etherbase $CELO_ACCOUNT_ADDRESS --ethstats=fullnode-$ETHSTATS_ARG
     
     sleep 2s
 
