@@ -1732,7 +1732,6 @@ contract('Validators', (accounts: string[]) => {
 
   describe('#calculateEpochScore', () => {
     describe('when uptime is in the interval [0, 1.0]', () => {
-      const fraction = ([n, d]: [BigNumber, BigNumber]) => n.div(d)
       const uptime = new BigNumber(0.99)
       // @ts-ignore
       const expected = uptime.pow(validatorScoreParameters.exponent)
@@ -1740,12 +1739,12 @@ contract('Validators', (accounts: string[]) => {
       it('should calculate the score correctly', async () => {
         // Compare expected and actual to 8 decimal places.
         assertEqualDpBN(
-          fraction(await validators.calculateEpochScore(toFixed(uptime))),
+          fromFixed(await validators.calculateEpochScore(toFixed(uptime))),
           expected,
           8
         )
-        assertEqualDpBN(fraction(await validators.calculateEpochScore(new BigNumber(0))), 0, 8)
-        assertEqualDpBN(fraction(await validators.calculateEpochScore(fixed1)), 1, 8)
+        assertEqualDpBN(fromFixed(await validators.calculateEpochScore(new BigNumber(0))), 0, 8)
+        assertEqualDpBN(fromFixed(await validators.calculateEpochScore(fixed1)), 1, 8)
       })
     })
 
@@ -1759,7 +1758,6 @@ contract('Validators', (accounts: string[]) => {
 
   describe('#calculateGroupEpochScore', () => {
     describe('when all uptimes are in the interval [0, 1.0]', () => {
-      const fraction = ([n, d]: [BigNumber, BigNumber]) => n.div(d)
       const testGroupUptimeCalculation = (uptimes) => {
         const expected = uptimes
           .map((uptime) => new BigNumber(uptime))
@@ -1768,7 +1766,7 @@ contract('Validators', (accounts: string[]) => {
           .div(uptimes.length)
         it('should calculate the group score correctly', async () => {
           assertEqualDpBN(
-            fraction(await validators.calculateGroupEpochScore(uptimes.map(toFixed))),
+            fromFixed(await validators.calculateGroupEpochScore(uptimes.map(toFixed))),
             expected,
             8
           )

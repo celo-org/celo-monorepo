@@ -55,12 +55,8 @@ contract MockValidators is IValidators {
     return lockedGoldRequirements[account];
   }
 
-  function calculateGroupEpochScore(uint256[] calldata uptimes)
-    external
-    view
-    returns (uint256, uint256)
-  {
-    return (uptimes[0], FIXED1_UINT);
+  function calculateGroupEpochScore(uint256[] calldata uptimes) external view returns (uint256) {
+    return uptimes[0];
   }
 
   function getTopGroupValidators(address group, uint256 n)

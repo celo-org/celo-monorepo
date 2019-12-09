@@ -426,16 +426,14 @@ contract Election is
       return 0;
     }
 
-    uint256 scoreNumerator;
-    uint256 scoreDenominator;
-    (scoreNumerator, scoreDenominator) = getValidators().calculateGroupEpochScore(uptimes);
-
-    return
-      totalEpochRewards
-        .mul(votes.active.forGroup[group].total)
-        .div(votes.active.total)
-        .mul(scoreNumerator)
-        .div(scoreDenominator);
+    FixidityLib.Fraction memory maxReward = FixidityLib.newFixedFraction(
+      totalEpochRewards.mul(votes.active.forGroup[group].total),
+      votes.active.total
+    );
+    FixidityLib.Fraction memory score = FixidityLib.wrap(
+      getValidators().calculateGroupEpochScore(uptimes)
+    );
+    return maxReward.multiply(score).fromFixed();
   }
 
   /**
