@@ -4,9 +4,9 @@ import { URL_REGEX } from '@celo/utils/lib/io'
 import { flags } from '@oclif/command'
 import { CLIError } from '@oclif/errors'
 import { IArg, ParseFn } from '@oclif/parser/lib/args'
+import BigNumber from 'bignumber.js'
 import { pathExistsSync } from 'fs-extra'
 import Web3 from 'web3'
-import BigNumber from 'bignumber.js'
 
 const parseBytes = (input: string, length: number, msg: string) => {
   // Check that the string is hex and and has byte length of `length`.
