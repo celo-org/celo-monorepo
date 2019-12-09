@@ -29,16 +29,6 @@ export const DEV_SETTINGS_ACTIVE_INITIALLY = stringToBoolean(
   Config.DEV_SETTINGS_ACTIVE_INITIALLY || 'false'
 )
 
-// LINKS
-export const CELO_VERIFIER_DOWNLOAD_LINK = 'https://celo.org/rewards'
-export const CELO_VERIFIER_START_MINING_LINK = 'celo://verifier/start'
-export const CELO_FAUCET_LINK = 'https://celo.org/app'
-export const CELO_TERMS_LINK = 'https://celo.org/terms'
-export const TOS_LINK = 'https://celo.org/user-agreement'
-export const FAQ_LINK = 'https://celo.org/faq'
-export const CELO_SUPPORT_EMAIL_ADDRESS = 'support@celo.org'
-export const DEFAULT_FORNO_URL = `https://${DEFAULT_TESTNET}-forno.celo-testnet.org`
-
 // VALUES
 export const BALANCE_OUT_OF_SYNC_THRESHOLD = 5 * 60 // 5 minutes
 export const ALERT_BANNER_DURATION = 5000
@@ -52,6 +42,16 @@ export const GOLD_TRANSACTION_MIN_AMOUNT = 0.001
 export const ESCROW_PAYMENT_EXPIRY_SECONDS = 172800 // 2 days
 // We need to fallback to `integration` for testing under jest where react-native-config is undefined.
 export const DEFAULT_TESTNET = Config.DEFAULT_TESTNET || 'integration'
+
+// LINKS
+export const CELO_VERIFIER_DOWNLOAD_LINK = 'https://celo.org/rewards'
+export const CELO_VERIFIER_START_MINING_LINK = 'celo://verifier/start'
+export const CELO_FAUCET_LINK = 'https://celo.org/app'
+export const CELO_TERMS_LINK = 'https://celo.org/terms'
+export const TOS_LINK = 'https://celo.org/user-agreement'
+export const FAQ_LINK = 'https://celo.org/faq'
+export const CELO_SUPPORT_EMAIL_ADDRESS = 'support@celo.org'
+export const DEFAULT_FORNO_URL = `https://${DEFAULT_TESTNET}-forno.celo-testnet.org`
 
 // FEATURE FLAGS
 export const FIREBASE_ENABLED = stringToBoolean(Config.FIREBASE_ENABLED || 'true')
