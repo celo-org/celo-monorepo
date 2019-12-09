@@ -12,10 +12,6 @@ export function getRateForMakerToken(
   makerToken: CURRENCY_ENUM,
   inputToken?: CURRENCY_ENUM // Token to convert from, defaults to makerToken
 ) {
-  Logger.warn(TAG, `Tokens: ${makerToken}`)
-  if (inputToken) {
-    Logger.warn(TAG, `Tokens: and ${inputToken}`)
-  }
   if (!exchangeRatePair) {
     Logger.warn(TAG, `Rate for token ${makerToken} is NaN`)
     return new BigNumber(0)

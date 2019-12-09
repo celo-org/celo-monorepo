@@ -172,7 +172,7 @@ class ExchangeReview extends React.Component<Props, State> {
               <View style={styles.line} />
               <View style={[styles.rowContainer, styles.feeRowContainer]}>
                 <Text style={[fontStyles.body, styles.exchangeBodyText]}>
-                  {t('subtotal') + '@' + getMoneyDisplayValue(exchangeRate, Token.DOLLAR, true)}
+                  {t('subtotal') + ' @ ' + getMoneyDisplayValue(exchangeRate, Token.DOLLAR, true)}
                 </Text>
                 <Text style={[fontStyles.body, styles.exchangeBodyText]}>
                   {getMoneyDisplayValue(dollarAmount, Token.DOLLAR, true)}
@@ -188,7 +188,7 @@ class ExchangeReview extends React.Component<Props, State> {
               </View>
               <View style={styles.line} />
               <View style={styles.rowContainer}>
-                <Text style={[fontStyles.bodyBold]}>{t('total')}</Text>
+                <Text style={[fontStyles.bodyBold]}>{t('sendFlow7:total')}</Text>
                 <Text style={fontStyles.bodyBold}>
                   {getMoneyDisplayValue(dollarAmount.plus(fee), Token.DOLLAR, true)}
                 </Text>

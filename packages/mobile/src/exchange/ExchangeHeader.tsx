@@ -9,8 +9,8 @@ import { getMoneyDisplayValue } from 'src/utils/formatting'
 export const ExchangeHeader = (makerToken: CURRENCY_ENUM, makerTokenBalance: string) => {
   const title =
     makerToken === CURRENCY_ENUM.DOLLAR
-      ? i18n.t(`${Namespaces.exchangeFlow9}:'buyGold'`)
-      : i18n.t(`${Namespaces.exchangeFlow9}:'sellGold'`)
+      ? i18n.t(`${Namespaces.exchangeFlow9}:buyGold`)
+      : i18n.t(`${Namespaces.exchangeFlow9}:sellGold`)
   return {
     ...headerWithCancelButton,
     headerTitle: (

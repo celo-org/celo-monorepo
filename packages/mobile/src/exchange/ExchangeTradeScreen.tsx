@@ -172,11 +172,11 @@ export class ExchangeTradeScreen extends React.Component<Props, State> {
   }
 
   getInputTokenDisplayText = () => {
-    return this.isDollarInput() ? 'USD' : 'Gold'
+    return this.isDollarInput() ? 'USD' : this.props.t('global:gold')
   }
 
   getOppositeInputTokenDisplayText = () => {
-    return this.isDollarInput() ? 'Gold' : 'USD'
+    return this.isDollarInput() ? this.props.t('global:gold') : 'USD'
   }
 
   getOppositeInputToken = () => {
