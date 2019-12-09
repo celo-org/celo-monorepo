@@ -45,7 +45,7 @@ export const builder = (yargs: Argv) => {
     })
     .option('inBetweenWaitSeconds', {
       type: 'number',
-      description: 'Betweeen each attsetation how long to wait',
+      description: 'Between each attestation how long to wait',
       required: true,
     })
     .option('attestationMax', {
