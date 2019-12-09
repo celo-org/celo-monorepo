@@ -119,8 +119,8 @@ export class ElectionWrapper extends BaseWrapper<Election> {
       .call()
     return {
       group,
-      pending: toBigNumber(pending),
-      active: toBigNumber(active),
+      pending: valueToBigNumber(pending),
+      active: valueToBigNumber(active),
     }
   }
 
@@ -139,7 +139,7 @@ export class ElectionWrapper extends BaseWrapper<Election> {
     const groups: string[] = await this.contract.methods.getGroupsVotedForByAccount(account).call()
     const isPending = await Promise.all(
       groups.map(async (g) =>
-        toBigNumber(
+        valueToBigNumber(
           await this.contract.methods.getPendingVotesForGroupByAccount(g, account).call()
         ).isGreaterThan(0)
       )
