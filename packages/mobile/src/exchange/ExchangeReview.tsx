@@ -14,10 +14,10 @@ import CeloAnalytics from 'src/analytics/CeloAnalytics'
 import { CustomEventNames } from 'src/analytics/constants'
 import componentWithAnalytics from 'src/analytics/wrapper'
 import { exchangeTokens, fetchExchangeRate } from 'src/exchange/actions'
+import { ExchangeHeader } from 'src/exchange/ExchangeHeader'
 import { ExchangeRatePair } from 'src/exchange/reducer'
 import { CURRENCY_ENUM as Token } from 'src/geth/consts'
-import i18n, { Namespaces } from 'src/i18n'
-import { headerWithCancelButton } from 'src/navigator/Headers'
+import { Namespaces } from 'src/i18n'
 import { navigate } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
 import { RootState } from 'src/redux/reducers'
@@ -62,24 +62,10 @@ const mapStateToProps = (state: RootState): StateProps => ({
 
 class ExchangeReview extends React.Component<Props, State> {
   static navigationOptions = ({ navigation }: NavigationInjectedProps<NavProps>) => {
-    const makerToken = navigation.getParam('makerToken')
-    const title = makerToken === Token.DOLLAR ? 'Buy Gold' : 'Sell Gold' // TODO(anna) translate
-    const makerTokenBalance = navigation.getParam('makerTokenBalance')
-    return {
-      ...headerWithCancelButton,
-      headerTitle: (
-        <View style={styles.headerTextContainer}>
-          <Text style={fontStyles.headerBoldTitle}>{title}</Text>
-          <View>
-            <Text style={fontStyles.subSmall}>
-              {getMoneyDisplayValue(makerTokenBalance, makerToken, true) +
-                ' ' +
-                i18n.t(`${Namespaces.exchangeFlow9}:lowerCaseAvailable`)}
-            </Text>
-          </View>
-        </View>
-      ),
-    }
+    return ExchangeHeader(
+      navigation.getParam('makerToken'),
+      navigation.getParam('makerTokenBalance')
+    )
   }
 
   state: State = {

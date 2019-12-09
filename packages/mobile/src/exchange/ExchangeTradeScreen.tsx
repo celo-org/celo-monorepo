@@ -18,10 +18,10 @@ import componentWithAnalytics from 'src/analytics/wrapper'
 import { ErrorMessages } from 'src/app/ErrorMessages'
 import { DOLLAR_TRANSACTION_MIN_AMOUNT, GOLD_TRANSACTION_MIN_AMOUNT } from 'src/config'
 import { fetchExchangeRate } from 'src/exchange/actions'
+import { ExchangeHeader } from 'src/exchange/ExchangeHeader'
 import { ExchangeRatePair } from 'src/exchange/reducer'
 import { CURRENCIES, CURRENCY_ENUM } from 'src/geth/consts'
-import i18n, { Namespaces } from 'src/i18n'
-import { headerWithCancelButton } from 'src/navigator/Headers'
+import { Namespaces } from 'src/i18n'
 import { navigate } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
 import { RootState } from 'src/redux/reducers'
@@ -61,24 +61,10 @@ const mapStateToProps = (state: RootState): StateProps => ({
 
 export class ExchangeTradeScreen extends React.Component<Props, State> {
   static navigationOptions = ({ navigation }: NavigationInjectedProps<NavProps>) => {
-    const makerToken = navigation.getParam('makerToken')
-    const title = makerToken === CURRENCY_ENUM.DOLLAR ? 'Buy Gold' : 'Sell Gold' // TODO(anna) translate
-    const makerTokenBalance = navigation.getParam('makerTokenBalance')
-    return {
-      ...headerWithCancelButton,
-      headerTitle: (
-        <View style={styles.headerTextContainer}>
-          <Text style={fontStyles.headerBoldTitle}>{title}</Text>
-          <View>
-            <Text style={fontStyles.subSmall}>
-              {getMoneyDisplayValue(makerTokenBalance, makerToken, true) +
-                ' ' +
-                i18n.t(`${Namespaces.exchangeFlow9}:lowerCaseAvailable`)}
-            </Text>
-          </View>
-        </View>
-      ),
-    }
+    return ExchangeHeader(
+      navigation.getParam('makerToken'),
+      navigation.getParam('makerTokenBalance')
+    )
   }
 
   state: State = {
@@ -311,7 +297,6 @@ export default componentWithAnalytics(
 )
 
 const styles = StyleSheet.create({
-  headerTextContainer: { flex: 1, alignSelf: 'center', alignItems: 'center' },
   line: {
     borderBottomColor: colors.darkLightest,
     borderBottomWidth: 1,
