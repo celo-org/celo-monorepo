@@ -156,7 +156,7 @@ export function writeExchangeRatePair(
     exchangeRate,
     timestamp,
   }
-  database.ref(`/exchangesRates/${pair}`).push(exchangeRateRecord)
+  database.ref(`/exchangeRates/${pair}`).push(exchangeRateRecord)
   console.debug(`Recorded exchange rate for ${pair}`, exchangeRateRecord)
 }
 
