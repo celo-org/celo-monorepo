@@ -1094,14 +1094,16 @@ contract Validators is
    * @notice Removes a validator from the group for which it is a member.
    * @param validatorAccount The validator to deaffiliate from their affiliated validator group.
    */
-  function forceDeaffiliate(address validatorAccount)
+  function forceDeaffiliateIfValidator(address validatorAccount)
     external
+    nonReentrant
     onlyRegisteredContracts(canForceDeaffiliation)
   {
-    require(isValidator(validatorAccount));
-    Validator storage validator = validators[validatorAccount];
-    if (validator.affiliation != address(0)) {
-      _deaffiliate(validator, validatorAccount);
+    if (isValidator(validatorAccount)) {
+      Validator storage validator = validators[validatorAccount];
+      if (validator.affiliation != address(0)) {
+        _deaffiliate(validator, validatorAccount);
+      }
     }
   }
 }

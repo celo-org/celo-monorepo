@@ -2060,19 +2060,33 @@ contract('Validators', (accounts: string[]) => {
     })
   })
 
-  describe('#forceDeaffiliate', () => {
-    // TODO(lucas): instantiate governace/slasher contracts to test modifier
+  describe('#forceDeaffiliateIfValidator', async () => {
     const validator = accounts[0]
     const group = accounts[1]
+
     beforeEach(async () => {
       await registerValidator(validator)
       await registerValidatorGroup(group)
       await validators.affiliate(group)
     })
 
-    describe('when the caller is not one of the registered contracts', async () => {
+    describe('when the caller is the DowntimeSlasher Address', async () => {
+      beforeEach(async () => {
+        await registry.setAddressFor(CeloContractName.DowntimeSlasher, validator)
+        await registry.setAddressFor(CeloContractName.DoubleSigningSlasher, accounts[3])
+        await registry.setAddressFor(CeloContractName.Governance, accounts[4])
+      })
+
+      it('should succeed when sender is the downtime slasher contract', async () => {
+        await validators.forceDeaffiliateIfValidator(validator)
+        const parsedValidator = parseValidatorParams(await validators.getValidator(validator))
+        assert.equal(parsedValidator.affiliation, NULL_ADDRESS)
+      })
+    })
+
+    describe('when the caller is not an approved address', async () => {
       it('should revert', async () => {
-        await assertRevert(validators.forceDeaffiliate(validator))
+        await assertRevert(validators.forceDeaffiliateIfValidator(validator))
       })
     })
   })

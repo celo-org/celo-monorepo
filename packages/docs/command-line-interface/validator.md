@@ -58,6 +58,24 @@ EXAMPLE
 
 _See code: [packages/cli/src/commands/validator/deregister.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/validator/deregister.ts)_
 
+### ForceDeaffiliate
+
+Force deaffiliate a Validator from a Validator Group, and remove it from the Group if it is also a member.
+
+```
+USAGE
+  $ celocli validator:forceDeaffiliate
+
+OPTIONS
+  --from=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d       (required) Initiator
+  --validator=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) Validator's address
+
+EXAMPLE
+  forcedeaffiliate --from 0x47e172f6cfb6c7d01c1574fa3e2be7cc73269d95 --validator 0x...
+```
+
+_See code: [packages/cli/src/commands/validator/forceDeaffiliate.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/validator/forceDeaffiliate.ts)_
+
 ### List
 
 List registered Validators, their name (if provided), affiliation, uptime score, and public keys used for validating.
