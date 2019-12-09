@@ -163,7 +163,7 @@ class ExchangeReview extends React.Component<Props, State> {
             >
               <View style={[styles.rowContainer, styles.amountRow]}>
                 <Text style={[fontStyles.body, styles.exchangeBodyText]}>
-                  Amount ({this.state.inputTokenCode})
+                  {t('amount') + ` (${this.state.inputTokenCode})`}
                 </Text>
                 <Text style={[fontStyles.body, styles.currencyAmountText]}>
                   {this.state.inputAmount.toString()}
@@ -172,23 +172,23 @@ class ExchangeReview extends React.Component<Props, State> {
               <View style={styles.line} />
               <View style={[styles.rowContainer, styles.feeRowContainer]}>
                 <Text style={[fontStyles.body, styles.exchangeBodyText]}>
-                  Subtotal @ {getMoneyDisplayValue(exchangeRate, Token.DOLLAR, true)}
+                  {t('subtotal') + '@' + getMoneyDisplayValue(exchangeRate, Token.DOLLAR, true)}
                 </Text>
                 <Text style={[fontStyles.body, styles.exchangeBodyText]}>
                   {getMoneyDisplayValue(dollarAmount, Token.DOLLAR, true)}
                 </Text>
               </View>
               <View style={[styles.rowContainer, styles.feeRowContainer]}>
-                <Text style={[fontStyles.body, styles.exchangeBodyText]}>Exchange Fee</Text>
+                <Text style={[fontStyles.body, styles.exchangeBodyText]}>{t('exchangeFee')}</Text>
                 <Text style={[fontStyles.body, styles.exchangeBodyText]}>{fee}</Text>
               </View>
               <View style={[styles.rowContainer, styles.feeRowContainer]}>
-                <Text style={[fontStyles.body, styles.exchangeBodyText]}>Security Fee</Text>
+                <Text style={[fontStyles.body, styles.exchangeBodyText]}>{t('securityFee')}</Text>
                 <Text style={[fontStyles.body, styles.exchangeBodyText]}>{fee}</Text>
               </View>
               <View style={styles.line} />
               <View style={styles.rowContainer}>
-                <Text style={[fontStyles.bodyBold]}>Total</Text>
+                <Text style={[fontStyles.bodyBold]}>{t('total')}</Text>
                 <Text style={fontStyles.bodyBold}>
                   {getMoneyDisplayValue(dollarAmount.plus(fee), Token.DOLLAR, true)}
                 </Text>

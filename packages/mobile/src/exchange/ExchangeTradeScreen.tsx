@@ -239,11 +239,11 @@ export class ExchangeTradeScreen extends React.Component<Props, State> {
               <View style={[styles.rowContainer, styles.goldInputRow]}>
                 <View style={{ flexDirection: 'column' }}>
                   <Text style={[fontStyles.bodyBold, styles.exchangeBodyText]}>
-                    Amount ({this.getInputTokenDisplayText()})
+                    {t('amount') + ` (${this.getInputTokenDisplayText()})`}
                   </Text>
                   <TouchableOpacity onPress={this.switchInputToken}>
                     <Text style={[fontStyles.subSmall, { textDecorationLine: 'underline' }]}>
-                      Switch to {this.getOppositeInputTokenDisplayText()}
+                      {t('switchTo') + ' ' + this.getOppositeInputTokenDisplayText()}
                     </Text>
                   </TouchableOpacity>
                 </View>
@@ -260,8 +260,8 @@ export class ExchangeTradeScreen extends React.Component<Props, State> {
               <View style={styles.line} />
               <View style={styles.rowContainer}>
                 <Text style={[fontStyles.body, styles.exchangeBodyText]}>
-                  {this.isDollarInput() ? 'Celo Gold' : 'Subtotal'}{' '}
-                  {`(@ ${getMoneyDisplayValue(exchangeRateDisplay, CURRENCY_ENUM.DOLLAR, true)})`}
+                  {this.isDollarInput() ? t('global:celoGold') : t('subtotal')}
+                  {` (@ ${getMoneyDisplayValue(exchangeRateDisplay, CURRENCY_ENUM.DOLLAR, true)})`}
                 </Text>
                 <Text style={fontStyles.regular}>{this.getSubtotalDisplayValue()}</Text>
               </View>

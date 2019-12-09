@@ -10,6 +10,11 @@
   "buy": "Buy",
   "sell": "Sell",
   "buyGold": "Buy Gold",
+  "sellGold": "Sell Gold",
+  "amount": "Amount",
+  "switchTo": "Switch to",
+  "subtotal": "Subtotal",
+
   "cancel": "Cancel",
   "includeExchangeFee": "*includes exchange fee",
   "available": "Available",
