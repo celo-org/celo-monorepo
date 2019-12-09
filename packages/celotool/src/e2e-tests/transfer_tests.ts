@@ -79,7 +79,7 @@ const setIntrinsicGas = async (validatorUri: string, validatorAddress: string, g
 }
 
 // Intrinsic gas for a basic transaction
-const INTRINSIC_GAS_FOR_TX = 21000
+const INTRINSIC_TX_GAS_COST = 21000
 
 // Additional intrinsic gas for a transaction with fee currency specified
 const ADDITIONAL_INTRINSIC_TX_GAS_COST = 50000
@@ -532,7 +532,7 @@ describe('Transfer tests', function(this: any) {
                           })
                         } else {
                           testTransferToken({
-                            expectedGas: INTRINSIC_GAS_FOR_TX,
+                            expectedGas: INTRINSIC_TX_GAS_COST,
                             transferToken: CeloContract.GoldToken,
                             feeToken: CeloContract.GoldToken,
                             txOptions,
@@ -545,7 +545,7 @@ describe('Transfer tests', function(this: any) {
               })
             } else {
               testTransferToken({
-                expectedGas: INTRINSIC_GAS_FOR_TX,
+                expectedGas: INTRINSIC_TX_GAS_COST,
                 transferToken: CeloContract.GoldToken,
                 feeToken: CeloContract.GoldToken,
               })
@@ -553,7 +553,7 @@ describe('Transfer tests', function(this: any) {
           })
 
           describe('feeCurrency = CeloDollars >', () => {
-            const intrinsicGas = INTRINSIC_GAS_FOR_TX + ADDITIONAL_INTRINSIC_TX_GAS_COST
+            const intrinsicGas = INTRINSIC_TX_GAS_COST + ADDITIONAL_INTRINSIC_TX_GAS_COST
 
             describe('when there is no demurrage', () => {
               describe('when setting a gas amount greater than the amount of gas necessary', () =>
@@ -627,7 +627,8 @@ describe('Transfer tests', function(this: any) {
 
         describe('Transfer CeloGold >', () => {
           describe('feeCurrency = CeloDollars >', () => {
-            const intrinsicGas = changedIntrinsicGasForAlternativeFeeCurrency + INTRINSIC_GAS_FOR_TX
+            const intrinsicGas =
+              changedIntrinsicGasForAlternativeFeeCurrency + INTRINSIC_TX_GAS_COST
             describe('when there is no demurrage', () => {
               describe('when setting a gas amount greater than the amount of gas necessary', () =>
                 testTransferToken({
