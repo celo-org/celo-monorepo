@@ -886,7 +886,6 @@ export async function startGeth(
     '--debug',
     '--port',
     port.toString(),
-    // escape asterisk, otherwise it will not work on other shells than bash
     '--rpcvhosts=*',
     '--networkid',
     instance.gethRunConfig.networkId.toString(),
@@ -902,7 +901,6 @@ export async function startGeth(
       '--rpc',
       '--rpcport',
       rpcport.toString(),
-      // escape asterisk, otherwise it will not work on other shells than bash
       '--rpccorsdomain=*',
       '--rpcapi=eth,net,web3,debug,admin,personal,txpool,istanbul'
     )
@@ -910,7 +908,6 @@ export async function startGeth(
 
   if (wsport) {
     gethArgs.push(
-      // escape asterisk, otherwise it will not work on other shells than bash
       '--wsorigins=*',
       '--ws',
       '--wsport',
