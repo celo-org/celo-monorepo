@@ -188,6 +188,7 @@ describe('governance tests', () => {
     await context.hooks.restart()
     web3 = new Web3('http://127.0.0.1:8545')
     kit = newKitFromWeb3(web3)
+
     goldToken = await kit._web3Contracts.getGoldToken()
     stableToken = await kit._web3Contracts.getStableToken()
     sortedOracles = await kit._web3Contracts.getSortedOracles()
@@ -332,12 +333,16 @@ describe('governance tests', () => {
 
     before(async function(this: any) {
       this.timeout(0) // Disable test timeout
+
       await restart()
+
       const groupPrivateKey = await getValidatorGroupPrivateKey()
+
       const rotation0PrivateKey =
         '0xa42ac9c99f6ab2c96ee6cae1b40d36187f65cd878737f6623cd363fb94ba7087'
       const rotation1PrivateKey =
         '0x4519cae145fb9499358be484ca60c80d8f5b7f9c13ff82c88ec9e13283e9de1a'
+
       const additionalNodes: GethInstanceConfig[] = [
         {
           gethRunConfig: gethConfig,
@@ -384,6 +389,7 @@ describe('governance tests', () => {
           peers: ['8557'],
         },
       ]
+
       await Promise.all(
         additionalValidatingNodes.map((nodeConfig) =>
           initAndStartGeth(context.hooks.gethBinaryPath, nodeConfig, true)
@@ -400,12 +406,20 @@ describe('governance tests', () => {
       // Wait for an extra epoch transition to ensure everyone is connected to one another.
       await waitForEpochTransition(epoch)
 
+      const groupWeb3Url = 'ws://127.0.0.1:8555'
+      consoleLogger(groupWeb3Url)
+
       // Prepare for member swapping.
-      const groupWeb3 = new Web3('ws://127.0.0.1:8555')
+      const groupWeb3 = new Web3(groupWeb3Url)
       await waitToFinishSyncing(groupWeb3)
+
       const groupKit = newKitFromWeb3(groupWeb3)
       const group: string = (await groupWeb3.eth.getAccounts())[0]
-      await (await groupKit.contracts.getElection()).activate(group)
+
+      const txos = await (await groupKit.contracts.getElection()).activate(group)
+      for (const txo of txos) {
+        await txo.sendAndWaitForReceipt({ from: group })
+      }
 
       validators = await groupKit._web3Contracts.getValidators()
       const membersToSwap = [validatorAccounts[0], validatorAccounts[1]]
@@ -709,6 +723,7 @@ describe('governance tests', () => {
           const activeVotes = new BigNumber(
             await election.methods.getActiveVotes().call({}, blockNumber - 1)
           )
+          assert.isFalse(activeVotes.isZero())
           const targetVotingYield = new BigNumber(
             (await epochRewards.methods.getTargetVotingYieldParameters().call({}, blockNumber))[0]
           )

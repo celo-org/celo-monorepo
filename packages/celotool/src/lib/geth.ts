@@ -229,7 +229,7 @@ export const checkGethStarted = (dataDir: string) => {
 }
 
 export const getWeb3AndTokensContracts = async () => {
-  const web3Instance = new Web3('http://localhost:8545')
+  const web3Instance = new Web3('http://127.0.0.1:8545')
   const [goldTokenContact, stableTokenContact] = await Promise.all([
     GoldToken(web3Instance),
     StableToken(web3Instance),
@@ -848,6 +848,7 @@ export async function startGeth(
   }
 
   const datadir = getDatadir(instance)
+
   const {
     syncmode,
     port,
@@ -861,9 +862,11 @@ export async function startGeth(
     proxyport,
     ethstats,
   } = instance
+
   const privateKey = instance.privateKey || ''
   const lightserv = instance.lightserv || false
   const etherbase = instance.etherbase || ''
+
   const gethArgs = [
     '--datadir',
     datadir,
@@ -958,7 +961,7 @@ export async function startGeth(
 
   // Give some time for geth to come up
   if (rpcport) {
-    const isOpen = await waitForPortOpen('localhost', rpcport, secondsToWait)
+    const isOpen = await waitForPortOpen('127.0.0.1', rpcport, secondsToWait)
     if (!isOpen) {
       console.error(
         `geth:${instance.name}: jsonRPC port didn't open after ${secondsToWait} seconds`
@@ -970,7 +973,7 @@ export async function startGeth(
   }
 
   if (wsport) {
-    const isOpen = await waitForPortOpen('localhost', wsport, secondsToWait)
+    const isOpen = await waitForPortOpen('127.0.0.1', wsport, secondsToWait)
     if (!isOpen) {
       console.error(`geth:${instance.name}: ws port didn't open after ${secondsToWait} seconds`)
       process.exit(1)
