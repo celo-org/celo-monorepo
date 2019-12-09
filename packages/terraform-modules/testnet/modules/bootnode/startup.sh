@@ -43,7 +43,7 @@ echo "Pulling bootnode..."
 docker pull $GETH_BOOTNODE_DOCKER_IMAGE
 
 echo "Starting bootnode..."
-docker run -p 30301:30301/udp --name bootnode --net=host -d $GETH_BOOTNODE_DOCKER_IMAGE /bin/sh -c "\
+docker run -p 30301:30301/udp --name bootnode --net=host --restart=always -d $GETH_BOOTNODE_DOCKER_IMAGE /bin/sh -c "\
   set -euo pipefail && \
   mkdir /etc/bootnode && \
   echo $NODE_KEY > /etc/bootnode/node.key && \
