@@ -17,7 +17,7 @@ import { exchangeTokens, fetchExchangeRate } from 'src/exchange/actions'
 import { ExchangeHeader } from 'src/exchange/ExchangeHeader'
 import FeeIcon from 'src/exchange/FeeExchangeIcon'
 import { ExchangeRatePair } from 'src/exchange/reducer'
-import { CURRENCY_ENUM as Token } from 'src/geth/consts'
+import { CURRENCY_ENUM } from 'src/geth/consts'
 import { Namespaces } from 'src/i18n'
 import { navigate } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
@@ -39,16 +39,16 @@ interface DispatchProps {
 }
 
 interface NavProps {
-  makerToken: Token
+  makerToken: CURRENCY_ENUM
   makerTokenBalance: string
-  inputToken: Token
+  inputToken: CURRENCY_ENUM
   inputTokenCode: string
   inputAmount: BigNumber
 }
 
 interface State {
-  makerToken: Token
-  inputToken: Token
+  makerToken: CURRENCY_ENUM
+  inputToken: CURRENCY_ENUM
   inputTokenCode: string
   inputAmount: BigNumber
 }
@@ -70,8 +70,8 @@ class ExchangeReview extends React.Component<Props, State> {
   }
 
   state: State = {
-    makerToken: Token.GOLD,
-    inputToken: Token.GOLD,
+    makerToken: CURRENCY_ENUM.GOLD,
+    inputToken: CURRENCY_ENUM.GOLD,
     inputTokenCode: 'gold',
     inputAmount: new BigNumber(0),
   }
@@ -128,7 +128,7 @@ class ExchangeReview extends React.Component<Props, State> {
     this.getExchangePropertiesFromNavProps()
   }
 
-  getAmountInToken(token: Token) {
+  getAmountInToken(token: CURRENCY_ENUM) {
     let amount = this.state.inputAmount
     if (this.state.inputToken !== token) {
       const conversionRate = getRateForMakerToken(
@@ -144,11 +144,15 @@ class ExchangeReview extends React.Component<Props, State> {
   render() {
     const { exchangeRatePair, fee, t, appConnected } = this.props
 
-    const exchangeRate = getRateForMakerToken(exchangeRatePair, this.state.makerToken, Token.DOLLAR)
-    const dollarAmount = this.getAmountInToken(Token.DOLLAR)
+    const exchangeRate = getRateForMakerToken(
+      exchangeRatePair,
+      this.state.makerToken,
+      CURRENCY_ENUM.DOLLAR
+    )
+    const dollarAmount = this.getAmountInToken(CURRENCY_ENUM.DOLLAR)
 
     const buttonText =
-      this.state.makerToken === Token.DOLLAR
+      this.state.makerToken === CURRENCY_ENUM.DOLLAR
         ? t(`${Namespaces.exchangeFlow9}:buy`)
         : t(`${Namespaces.exchangeFlow9}:sell`)
 
@@ -169,10 +173,12 @@ class ExchangeReview extends React.Component<Props, State> {
               <View style={styles.line} />
               <View style={[styles.rowContainer, styles.feeRowContainer]}>
                 <Text style={[fontStyles.body, styles.exchangeBodyText]}>
-                  {t('subtotal') + ' @ ' + getMoneyDisplayValue(exchangeRate, Token.DOLLAR, true)}
+                  {t('subtotal') +
+                    ' @ ' +
+                    getMoneyDisplayValue(exchangeRate, CURRENCY_ENUM.DOLLAR, true)}
                 </Text>
                 <Text style={[fontStyles.body, styles.exchangeBodyText]}>
-                  {getMoneyDisplayValue(dollarAmount, Token.DOLLAR, true)}
+                  {getMoneyDisplayValue(dollarAmount, CURRENCY_ENUM.DOLLAR, true)}
                 </Text>
               </View>
               <View style={[styles.rowContainer, styles.feeRowContainer]}>
@@ -193,7 +199,7 @@ class ExchangeReview extends React.Component<Props, State> {
               <View style={styles.rowContainer}>
                 <Text style={[fontStyles.bodyBold]}>{t('sendFlow7:total')}</Text>
                 <Text style={fontStyles.bodyBold}>
-                  {getMoneyDisplayValue(dollarAmount.plus(fee), Token.DOLLAR, true)}
+                  {getMoneyDisplayValue(dollarAmount.plus(fee), CURRENCY_ENUM.DOLLAR, true)}
                 </Text>
               </View>
             </View>
@@ -206,7 +212,12 @@ class ExchangeReview extends React.Component<Props, State> {
             text={
               buttonText +
               ' ' +
-              getMoneyDisplayValue(this.getAmountInToken(Token.GOLD), Token.GOLD, false, 3) +
+              getMoneyDisplayValue(
+                this.getAmountInToken(CURRENCY_ENUM.GOLD),
+                CURRENCY_ENUM.GOLD,
+                false,
+                3
+              ) +
               ' ' +
               t('global:gold')
             }

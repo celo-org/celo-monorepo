@@ -12,7 +12,7 @@ import AccountOverview from 'src/components/AccountOverview'
 import { fetchExchangeRate } from 'src/exchange/actions'
 import Activity from 'src/exchange/Activity'
 import ExchangeRate from 'src/exchange/ExchangeRate'
-import { CURRENCY_ENUM as Token } from 'src/geth/consts'
+import { CURRENCY_ENUM } from 'src/geth/consts'
 import { Namespaces } from 'src/i18n'
 import { navigate } from 'src/navigator/NavigationService'
 import { Stacks } from 'src/navigator/Screens'
@@ -33,7 +33,7 @@ interface DispatchProps {
 type Props = StateProps & DispatchProps & WithNamespaces
 
 const mapStateToProps = (state: RootState): StateProps => ({
-  exchangeRate: getRateForMakerToken(state.exchange.exchangeRatePair, Token.DOLLAR),
+  exchangeRate: getRateForMakerToken(state.exchange.exchangeRatePair, CURRENCY_ENUM.DOLLAR),
   goldBalance: state.goldToken.balance,
   dollarBalance: state.stableToken.balance,
 })
@@ -45,14 +45,14 @@ export class ExchangeHomeScreen extends React.Component<Props> {
 
   goToBuyGold = () => {
     navigate(Stacks.ExchangeStack, {
-      makerToken: Token.DOLLAR,
+      makerToken: CURRENCY_ENUM.DOLLAR,
       makerTokenBalance: this.props.dollarBalance,
     })
   }
 
   goToBuyDollars = () => {
     navigate(Stacks.ExchangeStack, {
-      makerToken: Token.GOLD,
+      makerToken: CURRENCY_ENUM.GOLD,
       makerTokenBalance: this.props.goldBalance,
     })
   }
@@ -71,7 +71,7 @@ export class ExchangeHomeScreen extends React.Component<Props> {
           <View>
             <AccountOverview testID="ExchangeAccountOverview" />
             <View style={styles.lowerTop}>
-              <ExchangeRate rate={exchangeRate} makerToken={Token.DOLLAR} />
+              <ExchangeRate rate={exchangeRate} makerToken={CURRENCY_ENUM.DOLLAR} />
             </View>
             <View style={styles.buttonContainer}>
               <Button
