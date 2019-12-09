@@ -31,7 +31,7 @@ export default React.memo(function Racer({
   const animationTimingFunction = `cubic-bezier(${Math.random()},${Math.random()},${Math.random()},${Math.random()})`
 
   return (
-    <View style={[standardStyles.elementalMarginTop, { overflow: 'hidden' }]}>
+    <View style={[standardStyles.elementalMarginTop, styles.containment]}>
       <Text style={[fonts.legal, { color }]}>{identity}</Text>
       <View
         style={[
@@ -51,6 +51,7 @@ export default React.memo(function Racer({
 })
 
 const styles = StyleSheet.create({
+  containment: { overflow: 'hidden' },
   line: {
     height: 2,
     minWidth: COIN_OFFSET,
