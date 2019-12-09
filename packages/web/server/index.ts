@@ -169,13 +169,21 @@ function wwwRedirect(req, res, nextAction) {
   })
 
   server.get('/proxy/medium', async (_, res) => {
-    const articlesdata = await getFormattedMediumArticles()
-    res.json(articlesdata)
+    try {
+      const articlesdata = await getFormattedMediumArticles()
+      res.json(articlesdata)
+    } catch (e) {
+      res.status(e.statusCode || 500).json({ message: e.message || 'unknownError' })
+    }
   })
 
   server.get('/proxy/events/', async (_, res) => {
-    const events = await getFormattedEvents()
-    res.json(events)
+    try {
+      const events = await getFormattedEvents()
+      res.json(events)
+    } catch (e) {
+      res.status(e.statusCode || 500).json({ message: e.message || 'unknownError' })
+    }
   })
 
   server.get('*', (req, res) => {
