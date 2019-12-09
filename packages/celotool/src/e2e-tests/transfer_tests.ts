@@ -186,7 +186,7 @@ describe('Transfer tests', function(this: any) {
   const restartWithCleanNodes = async () => {
     await hooks.restart()
 
-    kit = newKitFromWeb3(new Web3('http://127.0.0.1:8545'))
+    kit = newKitFromWeb3(new Web3('http://localhost:8545'))
     kit.gasInflationFactor = 1
 
     // TODO(mcortesi): magic sleep. without it unlockAccount sometimes fails
@@ -246,10 +246,10 @@ describe('Transfer tests', function(this: any) {
     )
 
     // Reset contracts to send RPCs through transferring node.
-    kit.web3.currentProvider = new kit.web3.providers.HttpProvider('http://127.0.0.1:8549')
+    kit.web3.currentProvider = new kit.web3.providers.HttpProvider('http://localhost:8549')
 
     // Give the node time to sync the latest block.
-    const upstream = await new Web3('http://127.0.0.1:8545').eth.getBlock('latest')
+    const upstream = await new Web3('http://localhost:8545').eth.getBlock('latest')
     while ((await kit.web3.eth.getBlock('latest')).number < upstream.number) {
       await sleep(0.5)
     }
@@ -632,7 +632,7 @@ describe('Transfer tests', function(this: any) {
           try {
             await startSyncNode(syncMode)
             await setIntrinsicGas(
-              'http://127.0.0.1:8545',
+              'http://localhost:8545',
               validatorAddress,
               changedIntrinsicGasForAlternativeFeeCurrency
             )
@@ -692,7 +692,7 @@ describe('Transfer tests', function(this: any) {
         let inflationManager: InflationManager
         before(`start geth on sync: ${syncMode}`, async () => {
           await restartWithCleanNodes()
-          inflationManager = new InflationManager('http://127.0.0.1:8545', validatorAddress)
+          inflationManager = new InflationManager('http://localhost:8545', validatorAddress)
           await startSyncNode(syncMode)
         })
 

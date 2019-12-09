@@ -1,4 +1,5 @@
 /* tslint:disable: no-console */
+import { consoleLogger } from '@celo/utils/lib/logger'
 import {
   convertToContractDecimals,
   GoldToken,
@@ -229,7 +230,7 @@ export const checkGethStarted = (dataDir: string) => {
 }
 
 export const getWeb3AndTokensContracts = async () => {
-  const web3Instance = new Web3('http://127.0.0.1:8545')
+  const web3Instance = new Web3('http://localhost:8545')
   const [goldTokenContact, stableTokenContact] = await Promise.all([
     GoldToken(web3Instance),
     StableToken(web3Instance),
@@ -875,7 +876,8 @@ export async function startGeth(
     '--debug',
     '--port',
     port.toString(),
-    '--rpcvhosts="*"',
+    // escape asterisk, otherwise it will not work on other shells than bash
+    '--rpcvhosts=*',
     '--networkid',
     instance.gethRunConfig.networkId.toString(),
     `--verbosity=${instance.gethRunConfig.verbosity ? instance.gethRunConfig.verbosity : '3'}`,
@@ -890,14 +892,16 @@ export async function startGeth(
       '--rpc',
       '--rpcport',
       rpcport.toString(),
-      '--rpccorsdomain="*"',
+      // escape asterisk, otherwise it will not work on other shells than bash
+      '--rpccorsdomain=*',
       '--rpcapi=eth,net,web3,debug,admin,personal,txpool,istanbul'
     )
   }
 
   if (wsport) {
     gethArgs.push(
-      '--wsorigins="*"',
+      // escape asterisk, otherwise it will not work on other shells than bash
+      '--wsorigins=*',
       '--ws',
       '--wsport',
       wsport.toString(),
@@ -961,7 +965,7 @@ export async function startGeth(
 
   // Give some time for geth to come up
   if (rpcport) {
-    const isOpen = await waitForPortOpen('127.0.0.1', rpcport, secondsToWait)
+    const isOpen = await waitForPortOpen('localhost', rpcport, secondsToWait)
     if (!isOpen) {
       console.error(
         `geth:${instance.name}: jsonRPC port didn't open after ${secondsToWait} seconds`
@@ -973,7 +977,7 @@ export async function startGeth(
   }
 
   if (wsport) {
-    const isOpen = await waitForPortOpen('127.0.0.1', wsport, secondsToWait)
+    const isOpen = await waitForPortOpen('localhost', wsport, secondsToWait)
     if (!isOpen) {
       console.error(`geth:${instance.name}: ws port didn't open after ${secondsToWait} seconds`)
       process.exit(1)
@@ -1016,7 +1020,11 @@ async function waitForPortOpen(host: string, port: number, seconds: number) {
   return false
 }
 
-export async function snapshotDatadir(instance: GethInstanceConfig) {
+export async function snapshotDatadir(instance: GethInstanceConfig, verbose: boolean) {
+  if (verbose) {
+    consoleLogger('snapshotting data dir')
+  }
+
   // Sometimes the socket is still present, preventing us from snapshotting.
   await spawnCmd('rm', [`${getDatadir(instance)}/geth.ipc`], { silent: true })
   await spawnCmdWithExitOnFailure('cp', ['-r', getDatadir(instance), getSnapshotdir(instance)])
@@ -1025,7 +1033,9 @@ export async function snapshotDatadir(instance: GethInstanceConfig) {
 export async function restoreDatadir(instance: GethInstanceConfig) {
   const datadir = getDatadir(instance)
   const snapshotdir = getSnapshotdir(instance)
+
   console.info(`geth:${instance.name}: restore datadir: ${datadir}`)
+
   await spawnCmdWithExitOnFailure('rm', ['-rf', datadir], { silent: true })
   await spawnCmdWithExitOnFailure('cp', ['-r', snapshotdir, datadir], { silent: true })
 }
@@ -1082,7 +1092,7 @@ export async function connectValidatorPeers(gethConfig: GethRunConfig, verbose: 
   const admins = gethConfig.instances
     .filter(({ wsport, rpcport, validating }) => validating && (wsport || rpcport))
     .map(({ wsport, rpcport }) => {
-      const url = `${wsport ? 'ws' : 'http'}://127.0.0.1:${wsport || rpcport}`
+      const url = `${wsport ? 'ws' : 'http'}://localhost:${wsport || rpcport}`
       if (verbose) {
         console.log(url)
       }

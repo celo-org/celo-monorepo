@@ -186,7 +186,7 @@ describe('governance tests', () => {
 
   const restart = async () => {
     await context.hooks.restart()
-    web3 = new Web3('http://127.0.0.1:8545')
+    web3 = new Web3('http://localhost:8545')
     kit = newKitFromWeb3(web3)
 
     goldToken = await kit._web3Contracts.getGoldToken()
@@ -406,7 +406,7 @@ describe('governance tests', () => {
       // Wait for an extra epoch transition to ensure everyone is connected to one another.
       await waitForEpochTransition(epoch)
 
-      const groupWeb3Url = 'ws://127.0.0.1:8555'
+      const groupWeb3Url = 'ws://localhost:8555'
       consoleLogger(groupWeb3Url)
 
       // Prepare for member swapping.
@@ -425,14 +425,14 @@ describe('governance tests', () => {
       const membersToSwap = [validatorAccounts[0], validatorAccounts[1]]
       const memberSwapper = await newMemberSwapper(groupKit, membersToSwap)
 
-      const validatorRpc = 'http://127.0.0.1:8549'
+      const validatorRpc = 'http://localhost:8549'
       consoleLogger(validatorRpc)
 
       // Prepare for key rotation.
       const validatorWeb3 = new Web3(validatorRpc)
 
-      const authWeb31 = 'ws://127.0.0.1:8559'
-      const authWeb32 = 'ws://127.0.0.1:8561'
+      const authWeb31 = 'ws://localhost:8559'
+      const authWeb32 = 'ws://localhost:8561'
 
       consoleLogger(authWeb31, authWeb32)
 
@@ -466,6 +466,7 @@ describe('governance tests', () => {
 
       const subscription = await groupWeb3.eth.subscribe('newBlockHeaders')
       subscription.on('data', changeValidatorSet)
+
       // Wait for a few epochs while changing the validator set.
       await sleep(epoch * 4)
       ;(subscription as any).unsubscribe()

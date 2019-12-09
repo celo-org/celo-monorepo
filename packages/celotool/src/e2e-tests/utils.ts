@@ -75,7 +75,7 @@ export function sleep(seconds: number) {
 
 export async function getEnode(port: number, ws: boolean = false) {
   const p = ws ? 'ws' : 'http'
-  const admin = new Admin(`${p}://127.0.0.1:${port}`)
+  const admin = new Admin(`${p}://localhost:${port}`)
   return (await admin.getNodeInfo()).enode
 }
 
@@ -274,7 +274,7 @@ export function getContext(gethConfig: GethRunConfig) {
     // Snapshot the datadir after the contract migrations so we can start from a "clean slate"
     // for every test.
     for (const instance of gethConfig.instances) {
-      await snapshotDatadir(instance)
+      await snapshotDatadir(instance, verboseOutput)
     }
   }
 

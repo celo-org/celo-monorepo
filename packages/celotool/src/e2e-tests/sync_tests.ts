@@ -70,7 +70,7 @@ describe('sync tests', function(this: any) {
       peers: ['8545'],
     }
     await initAndStartGeth(hooks.gethBinaryPath, fullInstance, true)
-    const web3 = new Web3('http://127.0.0.1:8553')
+    const web3 = new Web3('http://localhost:8553')
     await waitToFinishSyncing(web3)
   })
 
@@ -97,9 +97,9 @@ describe('sync tests', function(this: any) {
       afterEach(() => killInstance(syncInstance))
 
       it('should sync the latest block', async () => {
-        const validatingWeb3 = new Web3(`http://127.0.0.1:8545`)
+        const validatingWeb3 = new Web3(`http://localhost:8545`)
         const validatingFirstBlock = await validatingWeb3.eth.getBlockNumber()
-        const syncWeb3 = new Web3(`http://127.0.0.1:8555`)
+        const syncWeb3 = new Web3(`http://localhost:8555`)
         await waitToFinishSyncing(syncWeb3)
         // Give the validators time to create more blocks.
         await sleep(20)
@@ -118,7 +118,7 @@ describe('sync tests', function(this: any) {
     let web3: any
     beforeEach(async function(this: any) {
       this.timeout(0) // Disable test timeout
-      web3 = new Web3('http://127.0.0.1:8545')
+      web3 = new Web3('http://localhost:8545')
       await hooks.restart()
     })
 

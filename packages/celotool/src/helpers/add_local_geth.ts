@@ -118,7 +118,7 @@ async function main({
       isProxy: true,
       proxiedValidatorAddress: privateKeyToPublicKey(validatorPrivateKey as string).slice(-40),
       // proxiedValidatorAddress: validatorEnode,
-      // proxiedValidatorAddress:`127.0.0.1:${instance.port}`,
+      // proxiedValidatorAddress:`localhost:${instance.port}`,
     }
     gethConfig.instances.unshift(proxyInstance)
   }

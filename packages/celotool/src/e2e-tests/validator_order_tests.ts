@@ -46,7 +46,7 @@ describe('governance tests', () => {
   describe('Validator ordering', () => {
     before(async function() {
       this.timeout(0)
-      web3 = new Web3('http://127.0.0.1:8545')
+      web3 = new Web3('http://localhost:8545')
       await context.hooks.restart()
     })
 

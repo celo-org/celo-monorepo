@@ -9,7 +9,7 @@ import { GethRunConfig } from '../lib/geth'
 import { getHooks, sleep } from './utils'
 
 const TMP_PATH = '/tmp/e2e'
-const url = 'http://127.0.0.1:8545'
+const url = 'http://localhost:8545'
 
 describe('Blockchain parameters tests', function(this: any) {
   this.timeout(0)
