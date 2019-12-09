@@ -37,7 +37,7 @@ import DappKitSignTxScreen from 'src/dappkit/DappKitSignTxScreen'
 import DappKitTxDataScreen from 'src/dappkit/DappKitTxDataScreen'
 import EscrowedPaymentListScreen from 'src/escrow/EscrowedPaymentListScreen'
 import ReclaimPaymentConfirmationScreen from 'src/escrow/ReclaimPaymentConfirmationScreen'
-import ExchangeBuyScreen from 'src/exchange/ExchangeBuyScreen'
+import ExchangeTradeScreen from 'src/exchange/ExchangeTradeScreen'
 import ExchangeReview from 'src/exchange/ExchangeReview'
 import FeeExchangeEducation from 'src/exchange/FeeExchangeEducation'
 import ImportContacts from 'src/import/ImportContacts'
@@ -170,7 +170,7 @@ const QRSendStack = createStackNavigator(
 const ExchangeStack = createStackNavigator(
   {
     // Note, ExchangeHomeScreen isn't in this stack because it's part of the tab navigator
-    [Screens.ExchangeTradeScreen]: { screen: ExchangeBuyScreen }, // TODO switch back, anna just using for dev
+    [Screens.ExchangeTradeScreen]: { screen: ExchangeTradeScreen },
     [Screens.ExchangeReview]: { screen: ExchangeReview },
     [Screens.FeeExchangeEducation]: { screen: FeeExchangeEducation },
   },

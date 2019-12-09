@@ -141,6 +141,7 @@ class ExchangeReview extends React.Component<Props, State> {
           }}
         >
           <DisconnectBanner />
+          {/*
           <KeyboardAwareScrollView keyboardShouldPersistTaps={'always'}>
             <View
               style={{
@@ -174,7 +175,7 @@ class ExchangeReview extends React.Component<Props, State> {
               <View style={[styles.rowContainer, styles.feeRowContainer]}>
                 <Text style={[fontStyles.body, styles.exchangeBodyText]}>Security Fee</Text>
                 <Text style={[fontStyles.body, styles.exchangeBodyText]}>
-                  {fee /*TODO(anna) don't hardcode fee*/}
+                  {fee }
                 </Text>
               </View>
               <View style={styles.line} />
@@ -194,6 +195,7 @@ class ExchangeReview extends React.Component<Props, State> {
             disabled={!appConnected || goldRateInDollars.isZero()}
             type={BtnTypes.PRIMARY}
           />
+          */}
         </View>
       </SafeAreaView>
     )
