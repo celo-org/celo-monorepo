@@ -24,14 +24,17 @@ const query = gql`
   query AddresessOrderedByBalance {
     leaderboard {
       points
-      address
       identity
+      address
     }
   }
 `
 
 class LeaderBoardApp extends React.PureComponent<I18nProps> {
   render() {
+    if (!getConfig().publicRuntimeConfig.FLAGS.LEADERBOARD) {
+      return null
+    }
     return (
       <ApolloProvider client={createApolloClient()}>
         <Query query={query}>
@@ -42,13 +45,8 @@ class LeaderBoardApp extends React.PureComponent<I18nProps> {
             if (error) {
               return <LeaderBoardError error={error} />
             }
-            const LEADERS = data.leaderboard.map((account) => {
-              return {
-                identity: account.identity,
-                points: account.points,
-              }
-            })
-            return <LeaderBoard leaders={LEADERS} />
+            const leaders = data.leaderboard
+            return <LeaderBoard leaders={leaders} />
           }}
         </Query>
       </ApolloProvider>
