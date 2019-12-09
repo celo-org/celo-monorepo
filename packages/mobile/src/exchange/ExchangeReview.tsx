@@ -108,14 +108,20 @@ class ExchangeReview extends React.Component<Props, State> {
     if (!makerToken || !inputAmount || !inputToken || !inputTokenCode) {
       throw new Error('Maker token or maker token balance missing from nav props')
     }
-
     this.setState({
       makerToken,
       inputToken,
       inputTokenCode,
       inputAmount,
     })
-    this.props.fetchExchangeRate(makerToken, inputAmount) // TODO convert input amount if necessary
+    // Update exchange rate based on makerToken and makerAmount
+    let makerAmount = inputAmount
+    if (inputToken !== makerToken) {
+      // Convert input amount to makerToken if necessary
+      const exchangeRate = getRateForMakerToken(this.props.exchangeRatePair, makerToken, inputToken)
+      makerAmount = getTakerAmount(inputAmount, exchangeRate)
+    }
+    this.props.fetchExchangeRate(makerToken, makerAmount)
   }
 
   getMakerAmount() {

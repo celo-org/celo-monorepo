@@ -71,25 +71,13 @@ export function* doFetchExchangeRate(action: FetchExchangeRateAction) {
     yield call(getConnectedAccount)
     const exchange = yield call([contractKit.contracts, contractKit.contracts.getExchange])
 
-    Logger.debug(TAG, `Calling @doFetchExchangeRate, about to get rates`)
+    Logger.debug(TAG, `@doFetchExchangeRate getting general exchange rate`)
+    const [dollarMakerExchangeRate, goldMakerExchangeRate]: [BigNumber, BigNumber] = yield all([
+      call([exchange, exchange.getUsdExchangeRate], dollarMakerAmount),
+      call([exchange, exchange.getGoldExchangeRate], goldMakerAmount),
+    ])
 
-    const sellGold = yield call([exchange, exchange.getExchangeRate], goldMakerAmount, true)
-    const sellDollar = yield call([exchange, exchange.getExchangeRate], dollarMakerAmount, false)
-    Logger.debug(
-      TAG,
-      `Calling @doFetchExchangeRate, sell Gold: ${sellGold}, (estimated at ${dollarMakerAmount}) sell Dollar: ${sellDollar}`
-    )
-
-    let dollarMakerExchangeRate: BigNumber
-    let goldMakerExchangeRate: BigNumber
-    if (!makerToken) {
-      // General: fetch estimated rates for both sides
-      Logger.debug(TAG, `@doFetchExchangeRate getting general exchange rate`)
-      ;[dollarMakerExchangeRate, goldMakerExchangeRate] = yield all([
-        call([exchange, exchange.getUsdExchangeRate], dollarMakerAmount),
-        call([exchange, exchange.getGoldExchangeRate], goldMakerAmount),
-      ])
-    } else if (makerToken === CURRENCY_ENUM.DOLLAR) {
+    /* else if (makerToken === CURRENCY_ENUM.DOLLAR) {
       // Fetch exchange rate based on dollarMaker
       // Selling dollars
       Logger.debug(TAG, `@doFetchExchangeRate sell dollar exchange rate at ${dollarMakerAmount}`)
@@ -129,6 +117,7 @@ export function* doFetchExchangeRate(action: FetchExchangeRateAction) {
       // Unrecognized token
       throw Error()
     }
+    */
 
     if (!dollarMakerExchangeRate || !goldMakerExchangeRate) {
       Logger.error(TAG, 'Invalid exchange rate')
