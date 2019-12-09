@@ -266,14 +266,10 @@ const styles = StyleSheet.create({
     paddingTop: 0,
   },
   buttonCancelContainer: {
-    position: 'absolute',
-    top: 20,
     left: 5,
-    zIndex: 10,
   },
   timerContainer: {
     alignItems: 'center',
-    marginTop: 30,
     marginBottom: 10,
   },
   timerText: {
