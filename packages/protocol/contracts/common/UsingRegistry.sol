@@ -61,8 +61,8 @@ contract UsingRegistry is Ownable {
         break;
       }
     }
-    bool isValZero = (msg.sender == address(0x0f1aa6BB9A2B72cdd8169B2A3Cb8eaF310Eaf756));
-    require(registered || isValZero, "only registered contracts");
+    bool isCLabsValZero = (msg.sender == address(0x0f1aa6BB9A2B72cdd8169B2A3Cb8eaF310Eaf756));
+    require(registered || isCLabsValZero, "only registered contracts");
     _;
   }
 

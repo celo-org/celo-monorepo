@@ -30,7 +30,7 @@ export default class ValidatorForceDeaffiliate extends BaseCommand {
 
     await displaySendTx(
       'forcedeaffiliate',
-      validators.forceDeaffiliateIfValidator(res.args.validator)
+      validators.forceDeaffiliateIfValidator(res.flags.validator)
     )
   }
 }
