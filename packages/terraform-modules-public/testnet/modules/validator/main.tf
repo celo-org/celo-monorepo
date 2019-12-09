@@ -55,7 +55,7 @@ resource "google_compute_instance" "validator" {
       max_peers : (var.validator_count + var.tx_node_count) * 2,
       network_id : var.network_id,
       rid : count.index,
-      validator_name : "${local.name_prefix}-${count.index}",
+      validator_name : "${var.validator_name}-${count.index}",
       validator_account_address : var.validator_account_addresses[count.index],
       validator_private_key : var.validator_private_keys[count.index],
       validator_geth_account_secret : var.validator_account_passwords[count.index],
