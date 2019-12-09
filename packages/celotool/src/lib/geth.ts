@@ -767,10 +767,10 @@ export async function initAndStartGeth(
   await init(gethBinaryPath, datadir, genesisPath, verbose)
 
   if (instance.privateKey) {
-    await importPrivateKey(gethBinaryPath, instance, true)
+    await importPrivateKey(gethBinaryPath, instance, verbose)
   }
   if (instance.peers) {
-    await addStaticPeers(getDatadir(instance), instance.peers)
+    await addStaticPeers(getDatadir(instance), instance.peers, verbose)
   }
 
   return startGeth(gethBinaryPath, instance, verbose)
@@ -786,7 +786,7 @@ export async function init(
     console.log('init geth')
   }
 
-  await spawnCmdWithExitOnFailure('rm', ['-rf', datadir], { silent: true })
+  await spawnCmdWithExitOnFailure('rm', ['-rf', datadir], { silent: !verbose })
   await spawnCmdWithExitOnFailure(gethBinaryPath, ['--datadir', datadir, 'init', genesisPath], {
     silent: !verbose,
   })
@@ -828,9 +828,13 @@ export async function getEnode(port: string, ws: boolean = false) {
   return (await admin.getNodeInfo()).enode
 }
 
-export async function addStaticPeers(datadir: string, ports: string[]) {
+export async function addStaticPeers(datadir: string, ports: string[], verbose: boolean) {
+  const staticPeersPath = `${datadir}/static-nodes.json`
+  if (verbose) {
+    consoleLogger(`Writing static peers to ${staticPeersPath}`)
+  }
   const enodes = await Promise.all(ports.map((port) => getEnode(port)))
-  fs.writeFileSync(`${datadir}/static-nodes.json`, JSON.stringify(enodes))
+  fs.writeFileSync(staticPeersPath, JSON.stringify(enodes, null, 2))
 }
 
 export async function addProxyPeer(gethBinaryPath: string, instance: GethInstanceConfig) {

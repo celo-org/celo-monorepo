@@ -113,7 +113,7 @@ describe('governance tests', () => {
     gethRepoPath: '../../../celo-blockchain',
     migrate: true,
     runPath: TMP_PATH,
-    verbosity: 3,
+    verbosity: 0,
     networkId: 1101,
     network: 'local',
     instances: [],
@@ -123,7 +123,7 @@ describe('governance tests', () => {
     // Validators 0 and 1 are swapped in and out of the group.
     {
       gethRunConfig: gethConfig,
-      name: 'validator0',
+      name: 'validator-0',
       validating: true,
       syncmode: 'full',
       port: 30303,
@@ -131,7 +131,7 @@ describe('governance tests', () => {
     },
     {
       gethRunConfig: gethConfig,
-      name: 'validator1',
+      name: 'validator-1',
       validating: true,
       syncmode: 'full',
       port: 30305,
@@ -140,7 +140,7 @@ describe('governance tests', () => {
     // Validator 2 will authorize a validating key every other epoch.
     {
       gethRunConfig: gethConfig,
-      name: 'validator2',
+      name: 'validator-2',
       validating: true,
       syncmode: 'full',
       port: 30307,
@@ -148,7 +148,7 @@ describe('governance tests', () => {
     },
     {
       gethRunConfig: gethConfig,
-      name: 'validator3',
+      name: 'validator-3',
       validating: true,
       syncmode: 'full',
       port: 30309,
@@ -156,7 +156,7 @@ describe('governance tests', () => {
     },
     {
       gethRunConfig: gethConfig,
-      name: 'validator4',
+      name: 'validator-4',
       validating: true,
       syncmode: 'full',
       port: 30311,
@@ -368,7 +368,7 @@ describe('governance tests', () => {
       const additionalValidatingNodes = [
         {
           gethRunConfig: gethConfig,
-          name: 'validator2KeyRotation0',
+          name: 'validator-2-KeyRotation-0',
           validating: true,
           syncmode: 'full',
           lightserv: false,
@@ -379,7 +379,7 @@ describe('governance tests', () => {
         },
         {
           gethRunConfig: gethConfig,
-          name: 'validator2KeyRotation1',
+          name: 'validator-2-KeyRotation-1',
           validating: true,
           syncmode: 'full',
           lightserv: false,
