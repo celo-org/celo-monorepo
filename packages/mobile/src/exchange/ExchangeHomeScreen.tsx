@@ -6,7 +6,6 @@ import * as React from 'react'
 import { withNamespaces, WithNamespaces } from 'react-i18next'
 import { StyleSheet, View } from 'react-native'
 import SafeAreaView from 'react-native-safe-area-view'
-import { NavigationInjectedProps } from 'react-navigation'
 import { connect } from 'react-redux'
 import componentWithAnalytics from 'src/analytics/wrapper'
 import AccountOverview from 'src/components/AccountOverview'
@@ -27,16 +26,11 @@ interface StateProps {
   dollarBalance: string | null
 }
 
-interface State {
-  goldBalance: string
-  dollarBalance: string
-}
-
 interface DispatchProps {
   fetchExchangeRate: typeof fetchExchangeRate
 }
 
-type Props = StateProps & DispatchProps & NavigationInjectedProps & WithNamespaces
+type Props = StateProps & DispatchProps & WithNamespaces
 
 const mapStateToProps = (state: RootState): StateProps => ({
   exchangeRate: getRateForMakerToken(state.exchange.exchangeRatePair, Token.DOLLAR),
@@ -44,7 +38,7 @@ const mapStateToProps = (state: RootState): StateProps => ({
   dollarBalance: state.stableToken.balance,
 })
 
-export class ExchangeHomeScreen extends React.Component<Props, State> {
+export class ExchangeHomeScreen extends React.Component<Props> {
   componentDidMount() {
     this.props.fetchExchangeRate()
   }
