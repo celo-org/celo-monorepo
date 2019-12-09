@@ -396,6 +396,8 @@ describe('governance tests', () => {
         )
       )
 
+      await sleep(10)
+
       validatorAccounts = await getValidatorGroupMembers()
       assert.equal(validatorAccounts.length, 5)
       epoch = new BigNumber(await validators.methods.getEpochSize().call()).toNumber()
@@ -411,6 +413,7 @@ describe('governance tests', () => {
 
       // Prepare for member swapping.
       const groupWeb3 = new Web3(groupWeb3Url)
+      console.info('Waiting to finish syncing')
       await waitToFinishSyncing(groupWeb3)
 
       const groupKit = newKitFromWeb3(groupWeb3)

@@ -728,10 +728,6 @@ export const runGethNodes = async ({
       validatorIndex++
     }
 
-    if (instance.peers) {
-      await addStaticPeers(getDatadir(instance), instance.peers)
-    }
-
     await initAndStartGeth(gethBinaryPath, instance, verbose)
   }
 }
@@ -772,6 +768,9 @@ export async function initAndStartGeth(
 
   if (instance.privateKey) {
     await importPrivateKey(gethBinaryPath, instance, true)
+  }
+  if (instance.peers) {
+    await addStaticPeers(getDatadir(instance), instance.peers)
   }
 
   return startGeth(gethBinaryPath, instance, verbose)
@@ -823,7 +822,14 @@ export async function importPrivateKey(
   await spawnCmdWithExitOnFailure(gethBinaryPath, args, { silent: true })
 }
 
-export async function addStaticPeers(datadir: string, enodes: string[]) {
+export async function getEnode(port: string, ws: boolean = false) {
+  const p = ws ? 'ws' : 'http'
+  const admin = new Admin(`${p}://localhost:${port}`)
+  return (await admin.getNodeInfo()).enode
+}
+
+export async function addStaticPeers(datadir: string, ports: string[]) {
+  const enodes = await Promise.all(ports.map((port) => getEnode(port)))
   fs.writeFileSync(`${datadir}/static-nodes.json`, JSON.stringify(enodes))
 }
 
