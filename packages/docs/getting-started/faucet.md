@@ -12,7 +12,7 @@ Getting an account is really being given or generating a public-private keypair.
 
 ### Get an Invitation Code
 
-If you have access to an Android device and would like to try the Celo Wallet, the fastest way to get stared is to get an invitation code, pre-funded with 10 Celo Dollars
+If you have access to an Android device and would like to try the Celo Wallet, the fastest way to get started is to get an invitation code, pre-funded with 10 Celo Dollars.
 
 Visit the [Celo Wallet Page](https://celo.org/build/wallet) and enter your phone number to be messaged an invitation. Following this personalized URL will download the [Celo Wallet App](https://play.google.com/store/apps/details?id=org.celo.mobile.alfajores) from the Play Store, generate an account only you have access to, and transfer escrowed funds into it.
 

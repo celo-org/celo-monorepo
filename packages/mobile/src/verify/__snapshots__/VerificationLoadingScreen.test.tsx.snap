@@ -14,9 +14,6 @@ exports[`VerificationLoadingScreen renders correctly 1`] = `
     style={
       Object {
         "left": 5,
-        "position": "absolute",
-        "top": 20,
-        "zIndex": 10,
       }
     }
   >
@@ -65,7 +62,7 @@ exports[`VerificationLoadingScreen renders correctly 1`] = `
         "alignItems": "center",
         "flex": 1,
         "justifyContent": "space-between",
-        "paddingTop": 60,
+        "paddingTop": 30,
       }
     }
   >
@@ -379,9 +376,6 @@ exports[`VerificationLoadingScreen renders correctly with fail modal 1`] = `
     style={
       Object {
         "left": 5,
-        "position": "absolute",
-        "top": 20,
-        "zIndex": 10,
       }
     }
   >
@@ -430,7 +424,7 @@ exports[`VerificationLoadingScreen renders correctly with fail modal 1`] = `
         "alignItems": "center",
         "flex": 1,
         "justifyContent": "space-between",
-        "paddingTop": 60,
+        "paddingTop": 30,
       }
     }
   >

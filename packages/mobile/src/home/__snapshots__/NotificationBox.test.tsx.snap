@@ -743,7 +743,7 @@ exports[`NotificationBox Incoming Payment Requests exist 1`] = `
                           ]
                         }
                       >
-                        $12.34
+                         $12.34
                       </Text>
                     </Text>
                   </View>
@@ -952,7 +952,7 @@ exports[`NotificationBox Outgoing Payment Requests exist 1`] = `
                           ]
                         }
                       >
-                        $12.34
+                         $12.34
                       </Text>
                     </Text>
                   </View>
