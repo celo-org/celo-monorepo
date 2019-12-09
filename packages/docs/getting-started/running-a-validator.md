@@ -501,7 +501,7 @@ Next we will set up the Attestation Service itself. First, specify the following
 
 ```bash
 # On the Attestation machine
-export CELO_IMAGE_ATTESTATION="us.gcr.io/celo-testnet/celo-monorepo:attestation-service-8f87dda20f1854c9532a5cbcf8ff556f48dff413"
+export CELO_IMAGE_ATTESTATION=us.gcr.io/celo-testnet/celo-monorepo:attestation-service-baklava
 # if you followed the instruction of setting up the attestation signer
 export CELO_PROVIDER=http://localhost:8545
 ```
