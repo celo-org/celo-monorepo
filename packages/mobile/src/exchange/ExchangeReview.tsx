@@ -127,40 +127,36 @@ class ExchangeReview extends React.Component<Props, State> {
     this.getExchangePropertiesFromNavProps()
   }
 
-  getDollarAmount() {
-    let dollarAmount = this.state.inputAmount
-    if (this.state.inputToken === Token.GOLD) {
-      const dollarRateInGold = getRateForMakerToken(
+  getAmountInToken(token: Token) {
+    let amount = this.state.inputAmount
+    if (this.state.inputToken !== token) {
+      const conversionRate = getRateForMakerToken(
         this.props.exchangeRatePair,
         this.state.makerToken,
-        Token.GOLD
+        this.state.inputToken
       )
-      dollarAmount = getTakerAmount(this.state.inputAmount, dollarRateInGold)
+      amount = getTakerAmount(amount, conversionRate)
     }
-    return dollarAmount
+    return amount
   }
 
   render() {
     const { exchangeRatePair, fee, t, appConnected } = this.props
 
     const exchangeRate = getRateForMakerToken(exchangeRatePair, this.state.makerToken, Token.DOLLAR)
-    const dollarAmount = this.getDollarAmount()
+    const dollarAmount = this.getAmountInToken(Token.DOLLAR)
+
+    const buttonText =
+      this.state.makerToken === Token.DOLLAR
+        ? t(`${Namespaces.exchangeFlow9}:buy`)
+        : t(`${Namespaces.exchangeFlow9}:sell`)
 
     return (
       <SafeAreaView style={styles.container}>
-        <View
-          style={{
-            paddingHorizontal: 16,
-          }}
-        >
+        <View style={styles.paddedContainer}>
           <DisconnectBanner />
           <KeyboardAwareScrollView keyboardShouldPersistTaps={'always'}>
-            <View
-              style={{
-                flexDirection: 'column',
-                justifyContent: 'flex-start',
-              }}
-            >
+            <View style={styles.column}>
               <View style={[styles.rowContainer, styles.amountRow]}>
                 <Text style={[fontStyles.body, styles.exchangeBodyText]}>
                   {t('amount') + ` (${this.state.inputTokenCode})`}
@@ -200,7 +196,13 @@ class ExchangeReview extends React.Component<Props, State> {
         <View style={componentStyles.bottomContainer}>
           <Button
             onPress={this.onPressConfirm}
-            text={t(`${Namespaces.walletFlow5}:review`)}
+            text={
+              buttonText +
+              ' ' +
+              getMoneyDisplayValue(this.getAmountInToken(Token.GOLD), Token.GOLD, false, 3) +
+              ' ' +
+              t('global:gold')
+            }
             standard={false}
             disabled={!appConnected || exchangeRate.isZero()}
             type={BtnTypes.PRIMARY}
@@ -216,6 +218,13 @@ const styles = StyleSheet.create({
     flex: 1,
     flexDirection: 'column',
     justifyContent: 'space-between',
+  },
+  paddedContainer: {
+    paddingHorizontal: 16,
+  },
+  column: {
+    flexDirection: 'column',
+    justifyContent: 'flex-start',
   },
   headerTextContainer: { flex: 1, alignSelf: 'center', alignItems: 'center' },
   line: {
