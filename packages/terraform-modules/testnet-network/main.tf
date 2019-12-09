@@ -8,14 +8,14 @@ provider "google" {
 # For managing terraform state remotely
 terraform {
   backend "gcs" {
-    bucket = "celo_tf_state"
+    bucket = "celo_tf_state_prod"
   }
 }
 
 data "terraform_remote_state" "state" {
   backend = "gcs"
   config = {
-    bucket = "celo_tf_state"
+    bucket = "celo_tf_state_prod"
     prefix = "${var.celo_env}/testnet-network"
   }
 }
