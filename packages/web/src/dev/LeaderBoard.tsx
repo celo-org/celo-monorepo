@@ -6,6 +6,7 @@ import { H2, H3 } from 'src/fonts/Fonts'
 import { I18nProps, Trans, withNamespaces } from 'src/i18n'
 import Chevron, { Direction } from 'src/icons/chevron'
 import { CeloLinks } from 'src/shared/menu-items'
+import { withScreenSize, ScreenSizes, ScreenProps } from 'src/layout/ScreenSize'
 import { colors, fonts, standardStyles, textStyles } from 'src/styles'
 import Button, { BTN, SIZE } from '../shared/Button.3'
 interface BoardProps {
@@ -22,6 +23,8 @@ interface State {
   width: number
   isExpanded: boolean
 }
+
+const MOBILE_PORTIONS = 4
 
 const PORTIONS = 8
 
@@ -50,7 +53,7 @@ function sorter(alpha: Competitor, bravo: Competitor) {
   return -1
 }
 
-class LeaderBoard extends React.PureComponent<BoardProps & I18nProps, State> {
+class LeaderBoard extends React.PureComponent<BoardProps & I18nProps & ScreenProps, State> {
   state: State = {
     width: 0,
     isExpanded: false,
@@ -66,7 +69,7 @@ class LeaderBoard extends React.PureComponent<BoardProps & I18nProps, State> {
   }
 
   render() {
-    const { t, leaders } = this.props
+    const { t, leaders, screen } = this.props
     const { isExpanded } = this.state
     const showExpandButton = leaders.length >= INITIAL_MAX + 1
 
@@ -103,7 +106,7 @@ class LeaderBoard extends React.PureComponent<BoardProps & I18nProps, State> {
                 />
               </Fade>
             ))}
-          <Axis max={maxPoints} />
+          <Axis max={maxPoints} isMobile={screen === ScreenSizes.MOBILE} />
           <Text style={[fonts.small, textStyles.invert]}>{t('unitOfMeasure')}</Text>
           {showExpandButton && (
             <View style={[styles.buttonExpand, standardStyles.elementalMarginTop]}>
@@ -140,14 +143,16 @@ class LeaderBoard extends React.PureComponent<BoardProps & I18nProps, State> {
     )
   }
 }
-export default withNamespaces('dev')(LeaderBoard)
 
-function Axis({ max }: { max: number }) {
+export default withScreenSize<BoardProps>(withNamespaces('dev')(LeaderBoard))
+
+function Axis({ max, isMobile }: { max: number; isMobile: boolean }) {
   const scaledMax = max
-  const portion = scaledMax / PORTIONS
+  const numberOfPortions = isMobile ? MOBILE_PORTIONS : PORTIONS
+  const portion = scaledMax / numberOfPortions
   return (
     <View style={[standardStyles.row, styles.xaxis, standardStyles.elementalMargin]}>
-      {Array(PORTIONS)
+      {Array(numberOfPortions)
         .fill(portion)
         .map((ratio, index) => {
           const amount = round(ratio * index)
