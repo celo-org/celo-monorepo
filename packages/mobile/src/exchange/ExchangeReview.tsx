@@ -1,6 +1,5 @@
 import Button, { BtnTypes } from '@celo/react-components/components/Button'
 import KeyboardAwareScrollView from '@celo/react-components/components/KeyboardAwareScrollView'
-import ReviewHeader from '@celo/react-components/components/ReviewHeader'
 import colors from '@celo/react-components/styles/colors'
 import { fontStyles } from '@celo/react-components/styles/fonts'
 import { componentStyles } from '@celo/react-components/styles/styles'
@@ -11,6 +10,8 @@ import { StyleSheet, Text, View } from 'react-native'
 import SafeAreaView from 'react-native-safe-area-view'
 import { NavigationInjectedProps } from 'react-navigation'
 import { connect } from 'react-redux'
+import CeloAnalytics from 'src/analytics/CeloAnalytics'
+import { CustomEventNames } from 'src/analytics/constants'
 import componentWithAnalytics from 'src/analytics/wrapper'
 import { exchangeTokens, fetchExchangeRate } from 'src/exchange/actions'
 import { ExchangeRatePair } from 'src/exchange/reducer'
@@ -92,14 +93,13 @@ class ExchangeReview extends React.Component<Props, State> {
   }
 
   onPressConfirm = () => {
-    // const confirmationInput = this.getConfirmationInput()
-    /*
-    this.props.exchangeTokens(confirmationInput.makerToken, confirmationInput.makerAmount)
+    const makerToken = this.state.makerToken
+    const makerAmount = this.getMakerAmount()
+    this.props.exchangeTokens(makerToken, makerAmount)
     CeloAnalytics.track(CustomEventNames.exchange_confirm, {
-      makerToken: confirmationInput.makerToken,
-      makerAmount: confirmationInput.makerAmount,
+      makerToken,
+      makerAmount,
     })
-    */
     navigate(Screens.ExchangeHomeScreen)
   }
 
@@ -123,12 +123,21 @@ class ExchangeReview extends React.Component<Props, State> {
     Logger.debug('@getExchangePropertiesFromNavProps', JSON.stringify(this.props.exchangeRatePair))
   }
 
-  componentDidMount() {
-    this.getExchangePropertiesFromNavProps()
+  getMakerAmount() {
+    const input = this.state.inputAmount
+    if (this.state.makerToken != this.state.inputToken) {
+      const exchangeRate = getRateForMakerToken(
+        this.props.exchangeRatePair,
+        this.state.makerToken,
+        this.state.inputToken
+      )
+      getTakerAmount(input, exchangeRate)
+    }
+    return input
   }
 
-  renderHeader = () => {
-    return <ReviewHeader title={this.props.t('reviewExchange')} />
+  componentDidMount() {
+    this.getExchangePropertiesFromNavProps()
   }
 
   render() {
@@ -141,13 +150,12 @@ class ExchangeReview extends React.Component<Props, State> {
       Token.DOLLAR
     )
 
-    const dollarRateInGold = getRateForMakerToken(
-      exchangeRatePair,
-      this.state.makerToken,
-      Token.GOLD
-    )
-
     if (this.state.inputToken === Token.GOLD) {
+      const dollarRateInGold = getRateForMakerToken(
+        exchangeRatePair,
+        this.state.makerToken,
+        Token.GOLD
+      )
       dollarAmount = getTakerAmount(this.state.inputAmount, dollarRateInGold)
     }
 
@@ -198,7 +206,6 @@ class ExchangeReview extends React.Component<Props, State> {
                   {getMoneyDisplayValue(dollarAmount.plus(fee), Token.DOLLAR, true)}
                 </Text>
               </View>
-              <Text style={[fontStyles.bodyBold]}>{JSON.stringify(exchangeRatePair)}</Text>
             </View>
           </KeyboardAwareScrollView>
         </View>
@@ -208,7 +215,7 @@ class ExchangeReview extends React.Component<Props, State> {
             onPress={this.onPressConfirm}
             text={t(`${Namespaces.walletFlow5}:review`)}
             standard={false}
-            disabled={!appConnected} // todo make sure nonzero rate || this.getExchangeDisplay().isZero()}
+            disabled={!appConnected || exchangeRate.isZero()}
             type={BtnTypes.PRIMARY}
           />
         </View>
