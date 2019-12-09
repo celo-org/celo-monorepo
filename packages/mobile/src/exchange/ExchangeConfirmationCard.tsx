@@ -130,7 +130,7 @@ export function ExchangeConfirmationCard(props: Props) {
       <View style={styles.feeContainer}>
         <LineItemRow
           currencySymbol={takerToken}
-          amount={fee}
+          amount={fee || '0.00'}
           title={t('securityFee')}
           titleIcon={<FeeIcon />}
         />

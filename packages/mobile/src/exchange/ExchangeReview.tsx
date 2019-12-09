@@ -15,6 +15,7 @@ import { CustomEventNames } from 'src/analytics/constants'
 import componentWithAnalytics from 'src/analytics/wrapper'
 import { exchangeTokens, fetchExchangeRate } from 'src/exchange/actions'
 import { ExchangeHeader } from 'src/exchange/ExchangeHeader'
+import FeeIcon from 'src/exchange/FeeExchangeIcon'
 import { ExchangeRatePair } from 'src/exchange/reducer'
 import { CURRENCY_ENUM as Token } from 'src/geth/consts'
 import { Namespaces } from 'src/i18n'
@@ -175,11 +176,17 @@ class ExchangeReview extends React.Component<Props, State> {
                 </Text>
               </View>
               <View style={[styles.rowContainer, styles.feeRowContainer]}>
-                <Text style={[fontStyles.body, styles.exchangeBodyText]}>{t('exchangeFee')}</Text>
+                <View style={styles.feeTextWithIconContainer}>
+                  <Text style={[fontStyles.body, styles.exchangeBodyText]}>{t('exchangeFee')}</Text>
+                  <FeeIcon />
+                </View>
                 <Text style={[fontStyles.body, styles.exchangeBodyText]}>{fee}</Text>
               </View>
               <View style={[styles.rowContainer, styles.feeRowContainer]}>
-                <Text style={[fontStyles.body, styles.exchangeBodyText]}>{t('securityFee')}</Text>
+                <View style={styles.feeTextWithIconContainer}>
+                  <Text style={[fontStyles.body, styles.exchangeBodyText]}>{t('securityFee')}</Text>
+                  <FeeIcon />
+                </View>
                 <Text style={[fontStyles.body, styles.exchangeBodyText]}>{fee}</Text>
               </View>
               <View style={styles.line} />
@@ -234,7 +241,7 @@ const styles = StyleSheet.create({
   },
   exchangeBodyText: { fontSize: 15 },
   currencyAmountText: { fontSize: 24, lineHeight: 39, color: colors.celoGreen },
-
+  feeTextWithIconContainer: { flexDirection: 'row', alignItems: 'center' },
   rowContainer: { flexDirection: 'row', flex: 1, justifyContent: 'space-between' },
   feeRowContainer: { marginVertical: 5 },
   amountRow: { marginTop: 30 },
