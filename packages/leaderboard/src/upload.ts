@@ -193,7 +193,7 @@ async function getBTUs(kit: ContractKit, address: string) {
       console.error('Error', err)
     }
   }
-  return sum.toString(10)
+  return sum.multipliedBy(new BigNumber('1e-18')).toString(10)
 }
 
 async function updateBTUs(kit: ContractKit, rows: any[][], sheets: any) {
