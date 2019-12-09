@@ -201,8 +201,17 @@ export class ValidatorsWrapper extends BaseWrapper<Validators> {
   }
 
   /** Get Validator information */
-  async getValidator(address: Address): Promise<Validator> {
+  async getValidator(address: Address /*, blockNumber?: number*/): Promise<Validator> {
+    // Expected 0-1 arguments, but got 2
+    //const contract = await this.kit._web3Contracts.getValidators()
+    //const res = await contract.methods.getValidator(address).call({}, blockNumber)
+
+    // Expected 0-1 arguments, but got 2
+    //const contract2 = await this.kit._web3Contracts.getAccounts()
+    //const res2 = await contract2.methods.getValidatorSigner(address).call({}, blockNumber)
+
     const res = await this.contract.methods.getValidator(address).call()
+
     const accounts = await this.kit.contracts.getAccounts()
     const name = (await accounts.getName(address)) || ''
     return {

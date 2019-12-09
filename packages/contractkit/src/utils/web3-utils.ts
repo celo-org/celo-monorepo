@@ -27,9 +27,25 @@ export async function getEpochEvents(
   epochSize: number,
   epochs = 1
 ) {
+  return [].concat.apply(
+    [],
+    await forEachEpochAsync(
+      web3,
+      (blockNumber: number) =>
+        contract.getPastEvents(eventName, { fromBlock: blockNumber, toBlock: blockNumber }),
+      epochSize,
+      epochs
+    )
+  )
+}
+
+// Waits on callback(blockNumber) for the last N epochs.
+export async function forEachEpochAsync(web3: Web3, callback: any, epochSize: number, epochs = 1) {
   const currentBlock = await web3.eth.getBlockNumber()
   const lastEpochBlock = Math.floor(currentBlock / epochSize) * epochSize
-  const fromBlock: number = lastEpochBlock - (epochSize - 1) * epochs
-  // Better to call contract.getPastEvents() N times with fromBlock == toBlock?
-  return await contract.getPastEvents(eventName, { fromBlock, toBlock: lastEpochBlock })
+  const fromBlock: number = lastEpochBlock - epochSize * (epochs - 1)
+  var results = []
+  for (var blockNumber = fromBlock; blockNumber <= lastEpochBlock; blockNumber += epochSize)
+    results.push(callback(blockNumber))
+  return await Promise.all(results)
 }
