@@ -1,12 +1,11 @@
 import Button, { BtnTypes } from '@celo/react-components/components/Button'
-import KeyboardAwareScrollView from '@celo/react-components/components/KeyboardAwareScrollView'
 import colors from '@celo/react-components/styles/colors'
 import { fontStyles } from '@celo/react-components/styles/fonts'
 import { componentStyles } from '@celo/react-components/styles/styles'
 import BigNumber from 'bignumber.js'
 import * as React from 'react'
 import { withNamespaces, WithNamespaces } from 'react-i18next'
-import { StyleSheet, Text, View } from 'react-native'
+import { ScrollView, StyleSheet, Text, View } from 'react-native'
 import SafeAreaView from 'react-native-safe-area-view'
 import { NavigationInjectedProps } from 'react-navigation'
 import { connect } from 'react-redux'
@@ -160,7 +159,7 @@ class ExchangeReview extends React.Component<Props, State> {
       <SafeAreaView style={styles.container}>
         <View style={styles.paddedContainer}>
           <DisconnectBanner />
-          <KeyboardAwareScrollView keyboardShouldPersistTaps={'always'}>
+          <ScrollView>
             <View style={styles.column}>
               <View style={[styles.rowContainer, styles.amountRow]}>
                 <Text style={[fontStyles.body, styles.exchangeBodyText]}>
@@ -203,7 +202,7 @@ class ExchangeReview extends React.Component<Props, State> {
                 </Text>
               </View>
             </View>
-          </KeyboardAwareScrollView>
+          </ScrollView>
         </View>
 
         <View style={componentStyles.bottomContainer}>
