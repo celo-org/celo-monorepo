@@ -61,7 +61,7 @@ export async function requestAttestationsFromIssuers(
 
       return
     } catch (error) {
-      return { error: { error }, issuer: attestation.issuer, known: false }
+      return { error, issuer: attestation.issuer, known: false }
     }
   })
 }
@@ -218,8 +218,8 @@ export async function createPhoneNumber(
     await twilioClient.incomingPhoneNumbers.create({
       phoneNumber: usableNumber,
       addressSid,
-      // We don't really care
-      smsUrl: 'https://celo.org',
+      // Just an requestbin.com endpoint to avoid errors
+      smsUrl: 'https://enzyutth0wxme.x.pipedream.net/',
     })
 
     return usableNumber
