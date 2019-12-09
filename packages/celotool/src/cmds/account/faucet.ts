@@ -106,13 +106,13 @@ export const handler = async (argv: FaucetArgv) => {
 
       if (!goldAmount.isZero()) {
         if (await reserve.isSpender(account)) {
-          // await reserve.transferGold(address, goldAmount.toFixed()).sendAndWaitForReceipt()
+          await reserve.transferGold(address, goldAmount.toFixed()).sendAndWaitForReceipt()
         } else {
-          // await goldToken.transfer(address, goldAmount.toFixed()).sendAndWaitForReceipt()
+          await goldToken.transfer(address, goldAmount.toFixed()).sendAndWaitForReceipt()
         }
       }
       if (!stableTokenAmount.isZero()) {
-        // await stableToken.transfer(address, stableTokenAmount.toFixed()).sendAndWaitForReceipt()
+        await stableToken.transfer(address, stableTokenAmount.toFixed()).sendAndWaitForReceipt()
       }
     }
 

@@ -3,8 +3,9 @@ import {
   ActionableAttestation,
   AttestationsWrapper,
 } from '@celo/contractkit/lib/wrappers/Attestations'
-import { PhoneNumberUtils } from '@celo/utils'
+import { AttestationUtils, PhoneNumberUtils } from '@celo/utils'
 import { concurrentMap } from '@celo/utils/lib/async'
+import { sample } from 'lodash'
 import moment from 'moment'
 import { Twilio } from 'twilio'
 
@@ -15,19 +16,23 @@ export async function requestMoreAttestations(
   account: Address,
   txParams: CeloTransactionParams = {}
 ) {
-  await attestations
-    .approveAttestationFee(attestationsRequested)
-    .then((txo) => txo.sendAndWaitForReceipt(txParams))
-  await attestations
-    .request(phoneNumber, attestationsRequested)
-    .then((txo) => txo.sendAndWaitForReceipt(txParams))
+  const unselectedRequest = await attestations.getUnselectedRequest(phoneNumber, account)
+  if (unselectedRequest.blockNumber === 0) {
+    await attestations
+      .approveAttestationFee(attestationsRequested)
+      .then((txo) => txo.sendAndWaitForReceipt(txParams))
+    await attestations
+      .request(phoneNumber, attestationsRequested)
+      .then((txo) => txo.sendAndWaitForReceipt(txParams))
+  }
+
   await attestations.waitForSelectingIssuers(phoneNumber, account)
-  await attestations.selectIssuers(phoneNumber).then((txo) => txo.sendAndWaitForReceipt(txParams))
+  await attestations.selectIssuers(phoneNumber).sendAndWaitForReceipt(txParams)
 }
 
 type RequestAttestationError =
   | undefined
-  | { status: number; text: string; issuer: string; known: true }
+  | { status: number; text: string; issuer: string; name: string | undefined; known: true }
   | { error: any; issuer: string; known: false }
 
 export async function requestAttestationsFromIssuers(
@@ -49,13 +54,14 @@ export async function requestAttestationsFromIssuers(
           status: response.status,
           text: await response.text(),
           issuer: attestation.issuer,
+          name: attestation.name,
           known: true,
         }
       }
 
       return
     } catch (error) {
-      return { error: { error }, issuer: attestation.issuer, known: false }
+      return { error, issuer: attestation.issuer, known: false }
     }
   })
 }
@@ -65,9 +71,11 @@ export function printAndIgnoreRequestErrors(possibleErrors: RequestAttestationEr
     if (possibleError) {
       if (possibleError.known) {
         console.info(
-          `Error while requesting from issuer ${possibleError.issuer}. Returned status ${
-            possibleError.status
-          } with response: ${possibleError.text}. Ignoring.`
+          `Error while requesting from issuer ${possibleError.issuer} ${
+            possibleError.name ? `(Name: ${possibleError.name})` : ''
+          }. Returned status ${possibleError.status} with response: ${
+            possibleError.text
+          }. Ignoring.`
         )
       } else {
         console.info(
@@ -91,7 +99,7 @@ export async function findValidCode(
 ) {
   for (const message of messages) {
     try {
-      const code = attestations.extractAttestationCodeFromMessage(message)
+      const code = AttestationUtils.extractAttestationCodeFromMessage(message)
       if (!code) {
         continue
       }
@@ -184,27 +192,38 @@ export async function createPhoneNumber(
   addressSid: string,
   maximumNumberOfAttestations: number
 ) {
-  const usContext = await twilioClient.availablePhoneNumbers.get('GB')
-  const numbers = await usContext.mobile.list({ limit: 20 })
+  const countryCodes = ['GB', 'DE', 'AU']
+  let attempts = 0
+  while (true) {
+    const countryCode = sample(countryCodes)
+    const context = await twilioClient.availablePhoneNumbers.get(countryCode!)
+    const numbers = await context.mobile.list({ limit: 100 })
 
-  const usableNumber = await findSuitableNumber(
-    attestations,
-    numbers.map((number) => number.phoneNumber),
-    maximumNumberOfAttestations
-  )
+    const usableNumber = await findSuitableNumber(
+      attestations,
+      numbers.map((number) => number.phoneNumber),
+      maximumNumberOfAttestations
+    )
 
-  if (!usableNumber) {
-    throw new Error('Could not find suitable number')
+    if (!usableNumber) {
+      if (attempts > 10) {
+        throw new Error('Could not find suitable number')
+      }
+      {
+        attempts += 1
+        continue
+      }
+    }
+
+    await twilioClient.incomingPhoneNumbers.create({
+      phoneNumber: usableNumber,
+      addressSid,
+      // Just an requestbin.com endpoint to avoid errors
+      smsUrl: 'https://enzyutth0wxme.x.pipedream.net/',
+    })
+
+    return usableNumber
   }
-
-  await twilioClient.incomingPhoneNumbers.create({
-    phoneNumber: usableNumber,
-    addressSid,
-    // We don't really care
-    smsUrl: 'https://celo.org',
-  })
-
-  return usableNumber
 }
 
 export async function fetchLatestMessagesFromToday(

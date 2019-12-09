@@ -151,11 +151,10 @@ export function ExchangeConfirmationCard(props: Props) {
 
 const styles = StyleSheet.create({
   container: {
-    minHeight: 300,
-    flex: 1,
     borderWidth: 1,
     borderColor: colors.darkLightest,
     justifyContent: 'center',
+    paddingHorizontal: 20,
   },
   feeContainer: {
     marginBottom: 10,
@@ -186,9 +185,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   titleContainer: {
-    paddingTop: 30,
-    paddingBottom: 20,
-    flex: 1,
+    paddingTop: 15,
     justifyContent: 'center',
     alignItems: 'center',
   },

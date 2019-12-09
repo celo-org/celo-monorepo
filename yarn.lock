@@ -2172,10 +2172,10 @@
     lodash "^4.17.13"
     to-fast-properties "^2.0.0"
 
-"@celo/client@9575a01":
-  version "0.0.173"
-  resolved "https://registry.yarnpkg.com/@celo/client/-/client-0.0.173.tgz#30d8266f8f4897f1db5c9bf4ad344801e620326f"
-  integrity sha512-pAzo3Oy+V/BEkKb7ZZe0l71s6mOdPLLJZfLNo2Ihm2bx37nx8g4LNkcfj+0vVtRQPtiLrGiQ42U8pby3LwmC4Q==
+"@celo/client@0.0.224":
+  version "0.0.224"
+  resolved "https://registry.yarnpkg.com/@celo/client/-/client-0.0.224.tgz#253706fd6e692c85ea36de7de3c3aeec294a25cb"
+  integrity sha512-9+e+xUvE1M7LksaCzFwX9tvANexHopJdrY3nerhegm5k2mQtDRRgRTsd6b6AZwN4jOXvIlukGf0SxEhSX1iFFQ==
 
 "@celo/contractkit@0.1.5":
   version "0.1.5"
@@ -9941,6 +9941,13 @@ cheerio@^1.0.0-rc.2:
     htmlparser2 "^3.9.1"
     lodash "^4.15.0"
     parse5 "^3.0.1"
+
+chevrotain@6.5.0:
+  version "6.5.0"
+  resolved "https://registry.yarnpkg.com/chevrotain/-/chevrotain-6.5.0.tgz#dcbef415516b0af80fd423cc0d96b28d3f11374e"
+  integrity sha512-BwqQ/AgmKJ8jcMEjaSnfMybnKMgGTrtDKowfTP3pX4jwVy0kNjRsT/AP6h+wC3+3NC+X8X15VWBnTCQlX+wQFg==
+  dependencies:
+    regexp-to-ast "0.4.0"
 
 child-process-promise@^2.2.0:
   version "2.2.1"
@@ -19054,6 +19061,14 @@ jStat@^1.5.2:
   resolved "https://registry.yarnpkg.com/jStat/-/jStat-1.7.1.tgz#e636dd87d72b305c060dfcc901de1732d15130c1"
   integrity sha512-toueem/U5hyHM6pqe6OZOL/5P8MrY7Ss1K8Brg+TcfX+RAjDU/sbwy72fwzmLPQ5ykdBe1UEoWQHc7OSNWMUDQ==
 
+java-parser@^0.4.0:
+  version "0.4.0"
+  resolved "https://registry.yarnpkg.com/java-parser/-/java-parser-0.4.0.tgz#baf00a906a51921b380ba2b06fc2547271c0e97a"
+  integrity sha512-mzmgkwOIYdEQiWInuRp4PDQulZyCKaGXMF/o/EaIO215M6FTUW28BdMFnnEasgqZjHMpNx8IrhNBoSP3gG7PBQ==
+  dependencies:
+    chevrotain "6.5.0"
+    lodash "4.17.15"
+
 javascript-natural-sort@0.7.1:
   version "0.7.1"
   resolved "https://registry.yarnpkg.com/javascript-natural-sort/-/javascript-natural-sort-0.7.1.tgz#f9e2303d4507f6d74355a73664d1440fb5a0ef59"
@@ -25463,6 +25478,15 @@ preserve@^0.2.0:
   resolved "https://registry.yarnpkg.com/preserve/-/preserve-0.2.0.tgz#815ed1f6ebc65926f865b310c0713bcb3315ce4b"
   integrity sha1-gV7R9uvGWSb4ZbMQwHE7yzMVzks=
 
+prettier-plugin-java@^0.4.0:
+  version "0.4.0"
+  resolved "https://registry.yarnpkg.com/prettier-plugin-java/-/prettier-plugin-java-0.4.0.tgz#e05a0282fc39a5deb89739d1b54bcd9bc6534bb6"
+  integrity sha512-TgO3VDGBUyPX4jV1+KPdVKlVsoExLFf/jhvNdEs/bhyZIAHXg6LV7MGAaJqblDCh2CIJrOp/j3KLpKvwftFIrQ==
+  dependencies:
+    java-parser "^0.4.0"
+    lodash "4.17.15"
+    prettier "1.18.2"
+
 prettier-plugin-solidity@1.0.0-alpha.34:
   version "1.0.0-alpha.34"
   resolved "https://registry.yarnpkg.com/prettier-plugin-solidity/-/prettier-plugin-solidity-1.0.0-alpha.34.tgz#9a2584fb1773569e2b22c0edba36cd4b80aa3905"
@@ -25492,15 +25516,15 @@ prettier@1.16.4, prettier@^1.14.2:
   resolved "https://registry.yarnpkg.com/prettier/-/prettier-1.16.4.tgz#73e37e73e018ad2db9c76742e2647e21790c9717"
   integrity sha512-ZzWuos7TI5CKUeQAtFd6Zhm2s6EpAD/ZLApIhsF9pRvRtM1RFo61dM/4MSRUA0SuLugA/zgrZD8m0BaY46Og7g==
 
+prettier@1.18.2, prettier@^1.15.3:
+  version "1.18.2"
+  resolved "https://registry.yarnpkg.com/prettier/-/prettier-1.18.2.tgz#6823e7c5900017b4bd3acf46fe9ac4b4d7bda9ea"
+  integrity sha512-OeHeMc0JhFE9idD4ZdtNibzY0+TPHSpSSb9h8FqtP+YnoZZ1sl8Vc9b1sasjfymH3SonAF4QcA2+mzHPhMvIiw==
+
 prettier@^1.14.3:
   version "1.17.1"
   resolved "https://registry.yarnpkg.com/prettier/-/prettier-1.17.1.tgz#ed64b4e93e370cb8a25b9ef7fef3e4fd1c0995db"
   integrity sha512-TzGRNvuUSmPgwivDqkZ9tM/qTGW9hqDKWOE9YHiyQdixlKbv7kvEqsmDPrcHJTKwthU774TQwZXVtaQ/mMsvjg==
-
-prettier@^1.15.3:
-  version "1.18.2"
-  resolved "https://registry.yarnpkg.com/prettier/-/prettier-1.18.2.tgz#6823e7c5900017b4bd3acf46fe9ac4b4d7bda9ea"
-  integrity sha512-OeHeMc0JhFE9idD4ZdtNibzY0+TPHSpSSb9h8FqtP+YnoZZ1sl8Vc9b1sasjfymH3SonAF4QcA2+mzHPhMvIiw==
 
 pretty-bytes@^1.0.2:
   version "1.0.4"
@@ -27533,6 +27557,11 @@ regex-not@^1.0.0, regex-not@^1.0.2:
   dependencies:
     extend-shallow "^3.0.2"
     safe-regex "^1.1.0"
+
+regexp-to-ast@0.4.0:
+  version "0.4.0"
+  resolved "https://registry.yarnpkg.com/regexp-to-ast/-/regexp-to-ast-0.4.0.tgz#f3dbcb42726cd71902ba50193f63eab5325cd7cb"
+  integrity sha512-4qf/7IsIKfSNHQXSwial1IFmfM1Cc/whNBQqRwe0V2stPe7KmN1U0tWQiIx6JiirgSrisjE0eECdNf7Tav1Ntw==
 
 regexp-tree@^0.1.6:
   version "0.1.11"
@@ -34121,7 +34150,6 @@ websocket@^1.0.28:
   dependencies:
     debug "^2.2.0"
     es5-ext "^0.10.50"
-    gulp "^4.0.2"
     nan "^2.14.0"
     typedarray-to-buffer "^3.1.5"
     yaeti "^0.0.6"
