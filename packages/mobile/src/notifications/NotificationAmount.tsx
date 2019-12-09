@@ -14,7 +14,7 @@ export default class NotificationAmount extends React.PureComponent<Props> {
   render() {
     return (
       <View>
-        <Text style={[fontStyles.bodySmallSemiBold, styles.amount]}>
+        <Text style={[fontStyles.bodySmall, styles.amount]}>
           {CURRENCIES[CURRENCY_ENUM.DOLLAR].symbol +
             getCentAwareMoneyDisplay(divideByWei(this.props.amount))}
         </Text>

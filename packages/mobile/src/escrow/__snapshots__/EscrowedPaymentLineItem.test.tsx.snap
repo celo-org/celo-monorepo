@@ -23,8 +23,8 @@ exports[`renders correctly 1`] = `
     }
   >
     +491522345678
-     - 
-    test message
+     
+    global:for
   </Text>
   <Text
     style={

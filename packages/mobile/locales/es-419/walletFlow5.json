@@ -55,9 +55,6 @@
   "maybeLater": "quizas mas tarde",
   "balanceNeedUpdating": "Saldo necesita actualizarse",
   "refreshBalances": "Actualizar saldos",
-  "reclaimPayment": "Reclamar el Pago",
-  "sendMessage": "Enviar Mensaje",
-  "escrowedPaymentReminderListItemTitle": "Recuérdele a {{mobile #}} que acepte el pago",
   "escrowedPaymentReminder": "Reacuerda al receptor aceptar el pago",
   "escrowedPaymentReminderWithCount_plural": "Recordar {{count}} receptores to aceptar el pago",
   "escrowedPaymentReminderSms":

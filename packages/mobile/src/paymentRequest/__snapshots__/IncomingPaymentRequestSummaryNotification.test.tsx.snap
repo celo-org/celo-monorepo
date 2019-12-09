@@ -1,73 +1,79 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`EscrowedPaymentReminderSummaryNotification renders correctly 1`] = `
-<View
-  style={
-    Array [
-      Object {
-        "flexDirection": "row",
-        "justifyContent": "space-between",
-        "padding": 16,
-        "width": "100%",
-      },
-      Object {
-        "borderColor": "#EEEEEE",
-        "borderRadius": 3,
-        "borderWidth": 1,
-      },
-    ]
-  }
->
+exports[`IncomingPaymentRequestSummaryNotification renders correctly 1`] = `
+<View>
   <View
     style={
-      Object {
-        "alignItems": "center",
-        "flexDirection": "column",
-        "paddingRight": 16,
-      }
+      Array [
+        Object {
+          "backgroundColor": "#FFFFFF",
+          "flexDirection": "row",
+          "justifyContent": "space-between",
+          "padding": 16,
+          "width": "100%",
+        },
+        Object {
+          "elevation": 2,
+          "shadowColor": "black",
+          "shadowOffset": Object {
+            "height": 1,
+            "width": 0,
+          },
+          "shadowOpacity": 0.3,
+          "shadowRadius": 1.6,
+        },
+      ]
     }
   >
-    <Image
-      resizeMode="contain"
-      source={
-        Object {
-          "testUri": "../../../packages/mobile/src/images/Invite-Friends.png",
-        }
-      }
+    <View
       style={
         Object {
-          "height": 30,
-          "width": 30,
-        }
-      }
-    />
-  </View>
-  <View
-    style={
-      Object {
-        "flex": 1,
-        "justifyContent": "space-between",
-      }
-    }
-  >
-    <Text
-      style={
-        Object {
-          "color": "#2E3338",
-          "fontFamily": "Hind-Bold",
-          "fontSize": 14,
-          "lineHeight": 18,
+          "alignItems": "center",
+          "flexDirection": "column",
+          "paddingRight": 16,
         }
       }
     >
-      escrowedPaymentReminderWithCount_plural
-    </Text>
-    <View>
+      <Image
+        resizeMode="contain"
+        source={
+          Object {
+            "testUri": "../../../packages/mobile/src/images/send-dollar.png",
+          }
+        }
+        style={
+          Object {
+            "height": 40,
+            "width": 40,
+          }
+        }
+      />
+    </View>
+    <View
+      style={
+        Object {
+          "flex": 1,
+          "justifyContent": "space-between",
+        }
+      }
+    >
+      <Text
+        style={
+          Object {
+            "color": "#2E3338",
+            "fontFamily": "Hind-Bold",
+            "fontSize": 14,
+            "lineHeight": 18,
+          }
+        }
+      >
+        incomingPaymentRequests
+      </Text>
       <View
         style={
           Object {
             "justifyContent": "space-between",
-            "minHeight": 70,
+            "minHeight": 60,
           }
         }
       >
@@ -108,8 +114,8 @@ exports[`EscrowedPaymentReminderSummaryNotification renders correctly 1`] = `
                 }
               >
                 +491522345678
-                 - 
-                test message
+                 
+                global:for
               </Text>
               <Text
                 style={
@@ -126,63 +132,30 @@ exports[`EscrowedPaymentReminderSummaryNotification renders correctly 1`] = `
                   ]
                 }
               >
-                 
-                $
-                7
+                 $200,000
               </Text>
             </Text>
-            <Text
-              ellipsizeMode="middle"
-              numberOfLines={1}
-              style={
-                Object {
-                  "flexDirection": "row",
-                }
-              }
-            >
+            <View>
               <Text
                 style={
-                  Array [
-                    Object {
-                      "color": "#81868B",
-                      "fontFamily": "Hind-Regular",
-                      "fontSize": 14,
-                      "lineHeight": 20,
-                    },
-                  ]
+                  Object {
+                    "color": "#81868B",
+                    "fontFamily": "Hind-Regular",
+                    "fontSize": 14,
+                    "lineHeight": 20,
+                  }
                 }
               >
-                +491522345678
-                 - 
-                test message
+                global:moreWithCount
               </Text>
-              <Text
-                style={
-                  Array [
-                    Object {
-                      "color": "#81868B",
-                      "fontFamily": "Hind-Regular",
-                      "fontSize": 14,
-                      "lineHeight": 20,
-                    },
-                    Object {
-                      "fontFamily": "Hind-SemiBold",
-                    },
-                  ]
-                }
-              >
-                 
-                $
-                7
-              </Text>
-            </Text>
+            </View>
           </View>
         </View>
         <View
           style={
             Object {
               "flexDirection": "row",
-              "marginTop": 15,
+              "marginTop": 5,
             }
           }
         >
@@ -219,7 +192,7 @@ exports[`EscrowedPaymentReminderSummaryNotification renders correctly 1`] = `
                 ]
               }
             >
-              review
+              walletFlow5:review
             </Text>
           </View>
         </View>
@@ -229,144 +202,156 @@ exports[`EscrowedPaymentReminderSummaryNotification renders correctly 1`] = `
 </View>
 `;
 
-exports[`EscrowedPaymentReminderSummaryNotification when more 1 requests renders just it alone 1`] = `
+exports[`IncomingPaymentRequestSummaryNotification when more 1 requests renders just it alone 1`] = `
 <View
   style={
-    Array [
-      Object {
-        "flexDirection": "row",
-        "justifyContent": "space-between",
-        "padding": 16,
-        "width": "100%",
-      },
-      Object {
-        "borderColor": "#EEEEEE",
-        "borderRadius": 3,
-        "borderWidth": 1,
-      },
-    ]
+    Object {
+      "marginBottom": 16,
+    }
   }
 >
   <View
-    style={
+    accessible={true}
+    focusable={true}
+    isTVSelectable={true}
+    nativeBackgroundAndroid={
       Object {
-        "alignItems": "center",
-        "flexDirection": "column",
-        "paddingRight": 16,
+        "attribute": "selectableItemBackground",
+        "type": "ThemeAttrAndroid",
       }
     }
-  >
-    <Image
-      resizeMode="contain"
-      source={
-        Object {
-          "testUri": "../../../packages/mobile/src/images/Invite-Friends.png",
-        }
-      }
-      style={
-        Object {
-          "height": 30,
-          "width": 30,
-        }
-      }
-    />
-  </View>
-  <View
+    onClick={[Function]}
+    onResponderGrant={[Function]}
+    onResponderMove={[Function]}
+    onResponderRelease={[Function]}
+    onResponderTerminate={[Function]}
+    onResponderTerminationRequest={[Function]}
+    onStartShouldSetResponder={[Function]}
     style={
-      Object {
-        "flex": 1,
-        "justifyContent": "space-between",
-      }
+      Array [
+        Object {
+          "backgroundColor": "#FFFFFF",
+          "flexDirection": "row",
+          "justifyContent": "space-between",
+          "padding": 16,
+          "width": "100%",
+        },
+        Object {
+          "elevation": 2,
+          "shadowColor": "black",
+          "shadowOffset": Object {
+            "height": 1,
+            "width": 0,
+          },
+          "shadowOpacity": 0.3,
+          "shadowRadius": 1.6,
+        },
+      ]
     }
   >
-    <Text
+    <View
       style={
         Object {
-          "color": "#2E3338",
-          "fontFamily": "Hind-Bold",
-          "fontSize": 14,
-          "lineHeight": 18,
+          "alignItems": "center",
+          "flexDirection": "column",
+          "paddingRight": 16,
         }
       }
     >
-      escrowedPaymentReminder
-    </Text>
-    <View>
+      <View
+        style={
+          Array [
+            Object {
+              "alignItems": "center",
+              "flexDirection": "row",
+              "justifyContent": "center",
+            },
+            undefined,
+          ]
+        }
+      >
+        <View
+          style={
+            Array [
+              Object {
+                "alignItems": "center",
+                "justifyContent": "center",
+              },
+              Object {
+                "backgroundColor": "#7AD6FE",
+                "borderRadius": 20,
+                "height": 40,
+                "width": 40,
+              },
+            ]
+          }
+        >
+          <Image
+            source={
+              Object {
+                "testUri": "../../../packages/mobile/src/images/unknown-user-icon.png",
+              }
+            }
+            style={
+              Object {
+                "alignItems": "center",
+                "height": 40,
+                "justifyContent": "center",
+                "width": 40,
+              }
+            }
+          />
+        </View>
+      </View>
+    </View>
+    <View
+      style={
+        Object {
+          "flex": 1,
+          "justifyContent": "space-between",
+        }
+      }
+    >
+      <Text
+        style={
+          Object {
+            "color": "#81868B",
+            "fontFamily": "Hind-Regular",
+            "fontSize": 14,
+            "lineHeight": 18,
+          }
+        }
+      >
+        incomingPaymentRequestNotificationTitle
+      </Text>
       <View
         style={
           Object {
             "justifyContent": "space-between",
-            "minHeight": 70,
+            "minHeight": 60,
+            "paddingTop": 8,
           }
         }
       >
+        <Text
+          style={
+            Array [
+              Object {
+                "color": "#2E3338",
+                "fontFamily": "Hind-Regular",
+                "fontSize": 14,
+                "lineHeight": 18,
+              },
+            ]
+          }
+        >
+          Dinner for me and the gals, PIZZAA!
+        </Text>
         <View
           style={
             Object {
               "flexDirection": "row",
               "marginTop": 5,
-            }
-          }
-        >
-          <View
-            style={
-              Object {
-                "flex": 1,
-              }
-            }
-          >
-            <Text
-              ellipsizeMode="middle"
-              numberOfLines={1}
-              style={
-                Object {
-                  "flexDirection": "row",
-                }
-              }
-            >
-              <Text
-                style={
-                  Array [
-                    Object {
-                      "color": "#81868B",
-                      "fontFamily": "Hind-Regular",
-                      "fontSize": 14,
-                      "lineHeight": 20,
-                    },
-                  ]
-                }
-              >
-                +491522345678
-                 - 
-                test message
-              </Text>
-              <Text
-                style={
-                  Array [
-                    Object {
-                      "color": "#81868B",
-                      "fontFamily": "Hind-Regular",
-                      "fontSize": 14,
-                      "lineHeight": 20,
-                    },
-                    Object {
-                      "fontFamily": "Hind-SemiBold",
-                    },
-                  ]
-                }
-              >
-                 
-                $
-                7
-              </Text>
-            </Text>
-          </View>
-        </View>
-        <View
-          style={
-            Object {
-              "flexDirection": "row",
-              "marginTop": 15,
             }
           }
         >
@@ -403,7 +388,43 @@ exports[`EscrowedPaymentReminderSummaryNotification when more 1 requests renders
                 ]
               }
             >
-              review
+              global:pay
+            </Text>
+          </View>
+          <View
+            accessible={true}
+            focusable={true}
+            isTVSelectable={true}
+            nativeBackgroundAndroid={
+              Object {
+                "attribute": "selectableItemBackgroundBorderless",
+                "type": "ThemeAttrAndroid",
+              }
+            }
+            onClick={[Function]}
+            onResponderGrant={[Function]}
+            onResponderMove={[Function]}
+            onResponderRelease={[Function]}
+            onResponderTerminate={[Function]}
+            onResponderTerminationRequest={[Function]}
+            onStartShouldSetResponder={[Function]}
+          >
+            <Text
+              style={
+                Array [
+                  Object {
+                    "color": "#42D689",
+                    "fontFamily": "Hind-SemiBold",
+                    "fontSize": 14,
+                    "lineHeight": 18,
+                  },
+                  Object {
+                    "paddingEnd": 15,
+                  },
+                ]
+              }
+            >
+              global:decline
             </Text>
           </View>
         </View>
@@ -413,74 +434,80 @@ exports[`EscrowedPaymentReminderSummaryNotification when more 1 requests renders
 </View>
 `;
 
-exports[`EscrowedPaymentReminderSummaryNotification when more than 2 requests renders just two 1`] = `
-<View
-  style={
-    Array [
-      Object {
-        "flexDirection": "row",
-        "justifyContent": "space-between",
-        "padding": 16,
-        "width": "100%",
-      },
-      Object {
-        "borderColor": "#EEEEEE",
-        "borderRadius": 3,
-        "borderWidth": 1,
-      },
-    ]
-  }
->
+exports[`IncomingPaymentRequestSummaryNotification when more than 2 requests renders just two 1`] = `
+<View>
   <View
     style={
-      Object {
-        "alignItems": "center",
-        "flexDirection": "column",
-        "paddingRight": 16,
-      }
+      Array [
+        Object {
+          "backgroundColor": "#FFFFFF",
+          "flexDirection": "row",
+          "justifyContent": "space-between",
+          "padding": 16,
+          "width": "100%",
+        },
+        Object {
+          "elevation": 2,
+          "shadowColor": "black",
+          "shadowOffset": Object {
+            "height": 1,
+            "width": 0,
+          },
+          "shadowOpacity": 0.3,
+          "shadowRadius": 1.6,
+        },
+      ]
     }
   >
-    <Image
-      resizeMode="contain"
-      source={
-        Object {
-          "testUri": "../../../packages/mobile/src/images/Invite-Friends.png",
-        }
-      }
+    <View
       style={
         Object {
-          "height": 30,
-          "width": 30,
-        }
-      }
-    />
-  </View>
-  <View
-    style={
-      Object {
-        "flex": 1,
-        "justifyContent": "space-between",
-      }
-    }
-  >
-    <Text
-      style={
-        Object {
-          "color": "#2E3338",
-          "fontFamily": "Hind-Bold",
-          "fontSize": 14,
-          "lineHeight": 18,
+          "alignItems": "center",
+          "flexDirection": "column",
+          "paddingRight": 16,
         }
       }
     >
-      escrowedPaymentReminderWithCount_plural
-    </Text>
-    <View>
+      <Image
+        resizeMode="contain"
+        source={
+          Object {
+            "testUri": "../../../packages/mobile/src/images/send-dollar.png",
+          }
+        }
+        style={
+          Object {
+            "height": 40,
+            "width": 40,
+          }
+        }
+      />
+    </View>
+    <View
+      style={
+        Object {
+          "flex": 1,
+          "justifyContent": "space-between",
+        }
+      }
+    >
+      <Text
+        style={
+          Object {
+            "color": "#2E3338",
+            "fontFamily": "Hind-Bold",
+            "fontSize": 14,
+            "lineHeight": 18,
+          }
+        }
+      >
+        incomingPaymentRequests
+      </Text>
       <View
         style={
           Object {
             "justifyContent": "space-between",
-            "minHeight": 70,
+            "minHeight": 60,
           }
         }
       >
@@ -521,8 +548,8 @@ exports[`EscrowedPaymentReminderSummaryNotification when more than 2 requests re
                 }
               >
                 +491522345678
-                 - 
-                test message
+                 
+                global:for
               </Text>
               <Text
                 style={
@@ -539,63 +566,30 @@ exports[`EscrowedPaymentReminderSummaryNotification when more than 2 requests re
                   ]
                 }
               >
-                 
-                $
-                7
+                 $200,000
               </Text>
             </Text>
-            <Text
-              ellipsizeMode="middle"
-              numberOfLines={1}
-              style={
-                Object {
-                  "flexDirection": "row",
-                }
-              }
-            >
+            <View>
               <Text
                 style={
-                  Array [
-                    Object {
-                      "color": "#81868B",
-                      "fontFamily": "Hind-Regular",
-                      "fontSize": 14,
-                      "lineHeight": 20,
-                    },
-                  ]
+                  Object {
+                    "color": "#81868B",
+                    "fontFamily": "Hind-Regular",
+                    "fontSize": 14,
+                    "lineHeight": 20,
+                  }
                 }
               >
-                +491522345678
-                 - 
-                test message
+                global:moreWithCount
               </Text>
-              <Text
-                style={
-                  Array [
-                    Object {
-                      "color": "#81868B",
-                      "fontFamily": "Hind-Regular",
-                      "fontSize": 14,
-                      "lineHeight": 20,
-                    },
-                    Object {
-                      "fontFamily": "Hind-SemiBold",
-                    },
-                  ]
-                }
-              >
-                 
-                $
-                7
-              </Text>
-            </Text>
+            </View>
           </View>
         </View>
         <View
           style={
             Object {
               "flexDirection": "row",
-              "marginTop": 15,
+              "marginTop": 5,
             }
           }
         >
@@ -632,7 +626,7 @@ exports[`EscrowedPaymentReminderSummaryNotification when more than 2 requests re
                 ]
               }
             >
-              review
+              walletFlow5:review
             </Text>
           </View>
         </View>

@@ -25,5 +25,6 @@
   "inviteAnyone": "Invite Anyone in your address book to send and receive value",
   "inviteComplete": "Invite Complete",
   "inviteReceived": "Invite Received",
-  "pedningInvitations": "Pending Invitations"
+  "escrowPaymentNotificationTitle": "Invited ({{amount}}) {{mobile}}",
+  "defaultComment": "Invitation sent"
 }

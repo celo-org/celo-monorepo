@@ -23,8 +23,8 @@ exports[`renders correctly 1`] = `
     }
   >
     +14155552671
-     - 
-    Hey thanks for the loan, Ill pay you back ASAP. LOVE YOU
+     
+    global:for
   </Text>
   <Text
     style={
