@@ -52,7 +52,7 @@ class EventRow extends React.PureComponent<Props> {
         <View style={styles.start}>
           <a href={link} target="_external">
             <TouchableOpacity style={styles.title}>
-              <Text numberOfLines={1} style={[fonts.h5, styles.name]}>
+              <Text numberOfLines={1} style={[fonts.h6, styles.name]}>
                 {name}
               </Text>
               {filteredCoins.map(({ color }, index) => {

@@ -15,6 +15,12 @@ interface State {
   mode: Mode
 }
 
+function After({ t }) {
+  return (
+    <Text style={[fonts.h6, textStyles.center, styles.foreground]}>{t('stayConnectedThanks')}</Text>
+  )
+}
+
 const DURATION = 3000
 
 class HomeCover extends React.PureComponent<Props, State> {
@@ -96,12 +102,6 @@ class HomeCover extends React.PureComponent<Props, State> {
 }
 
 export default withNamespaces('home')(HomeCover)
-
-function After({ t }) {
-  return (
-    <Text style={[fonts.h5, textStyles.center, styles.foreground]}>{t('stayConnectedThanks')}</Text>
-  )
-}
 
 const styles = StyleSheet.create({
   animationWrapper: {
