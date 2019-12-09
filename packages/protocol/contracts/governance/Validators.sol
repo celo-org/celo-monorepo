@@ -127,6 +127,12 @@ contract Validators is
   event ValidatorGroupMemberRemoved(address indexed group, address indexed validator);
   event ValidatorGroupMemberReordered(address indexed group, address indexed validator);
   event ValidatorGroupCommissionUpdated(address indexed group, uint256 commission);
+  event ValidatorEpochPaymentDistributed(
+    address indexed validator,
+    uint256 validatorPayment,
+    address indexed group,
+    uint256 groupPayment
+  );
 
   modifier onlyVm() {
     require(msg.sender == address(0));
@@ -408,6 +414,7 @@ contract Validators is
       uint256 validatorPayment = totalPayment.fromFixed().sub(groupPayment);
       getStableToken().mint(group, groupPayment);
       getStableToken().mint(account, validatorPayment);
+      emit ValidatorEpochPaymentDistributed(account, validatorPayment, group, groupPayment);
       return totalPayment.fromFixed();
     } else {
       return 0;
@@ -419,6 +426,7 @@ contract Validators is
    * @param index The index of this validator in the list of all registered validators.
    * @return True upon success.
    * @dev Fails if the account is not a validator.
+   * @dev Fails if the validator has been a member of a group too recently.
    */
   function deregisterValidator(uint256 index) external nonReentrant returns (bool) {
     address account = getAccounts().signerToAccount(msg.sender);
@@ -587,6 +595,7 @@ contract Validators is
    * @param index The index of this validator group in the list of all validator groups.
    * @return True upon success.
    * @dev Fails if the account is not a validator group with no members.
+   * @dev Fails if the group has had members too recently.
    */
   function deregisterValidatorGroup(uint256 index) external nonReentrant returns (bool) {
     address account = getAccounts().signerToAccount(msg.sender);
@@ -720,9 +729,9 @@ contract Validators is
   }
 
   /**
-   * @notice Returns the locked gold balance requirement for the supplied account.
+   * @notice Returns the current locked gold balance requirement for the supplied account.
    * @param account The account that may have to meet locked gold balance requirements.
-   * @return The locked gold balance requirement for the supplied account.
+   * @return The current locked gold balance requirement for the supplied account.
    */
   function getAccountLockedGoldRequirement(address account) public view returns (uint256) {
     if (isValidator(account)) {
@@ -780,7 +789,8 @@ contract Validators is
       bytes memory ecdsaPublicKey,
       bytes memory blsPublicKey,
       address affiliation,
-      uint256 score
+      uint256 score,
+      address signer
     )
   {
     require(isValidator(account));
@@ -789,7 +799,8 @@ contract Validators is
       validator.publicKeys.ecdsa,
       validator.publicKeys.bls,
       validator.affiliation,
-      validator.score.unwrap()
+      validator.score.unwrap(),
+      getAccounts().getValidatorSigner(account)
     );
   }
 

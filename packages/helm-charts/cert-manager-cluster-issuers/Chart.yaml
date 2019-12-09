@@ -1,0 +1,7 @@
+name: cert-manager-issuers
+version: 0.0.1
+description: Chart which is used to deploy let's encrypt issuers
+keywords:
+- "let's encrypt"
+- cert-manager
+appVersion: v1.7.3

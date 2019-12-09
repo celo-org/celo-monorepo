@@ -89,19 +89,15 @@ components in react or overloading the should component update method
 ### Connecting to networks
 
 By default, we have the `alfajores` network set up. If you have other testnets
-that you want to use with the app, update `.env.ENV-NAME` and `packages/mobile/.env.ENV-NAME` with the new network name and settings, then run
-
-```bash
-yarn run build-sdk TESTNET
-```
-
-before rebuilding the app. Note that this will assume the testnets have a corresponding `/blockchain-api` and `/notification-service` set up.
+that you want to use with the app, update `.env.ENV-NAME` and `packages/mobile/.env.ENV-NAME` with
+the new network name and settings, then rebuild the app. Note that this will assume the testnets
+have a corresponding `/blockchain-api` and `/notification-service` set up.
 
 ### Running Wallet app in ZeroSync mode
 
 By default, the mobile wallet app runs geth in ultralight sync mode where all the epoch headers are fetched. The default sync mode is defined in [packages/mobile/.env](https://github.com/celo-org/celo-monorepo/blob/master/packages/mobile/.env#L4) file.
 
-To run wallet in zero sync mode, where it would connect to the remote nodes and sign transactions in web3, change the default sync mode in the aforementioned file to -1. The mode has only been tested on Android and is hard-coded to be [crash](https://github.com/celo-org/celo-monorepo/blob/aeddeefbfb230db51d2ef76d50c5f882644a1cd3/packages/mobile/src/web3/contracts.ts#L73) on iOS.
+To run the wallet in zero sync mode, using a trusted node rather than the local geth node as a provider, turn it on from the Celo Lite page in settings or update the zero sync initially enabled parameter in the .env file linked above. When zero sync mode is turned back off, the wallet will switch to the default sync mode as specified in the .env file. By default, the trusted node is `https://{TESTNET}-forno.celo-testnet.org`, however any trusted node can be used by updating `DEFAULT_FORNO_URL`. In zero sync mode, the wallet signs transactions locally in web3 then sends them to the trusted node.
 
 ## Testing
 

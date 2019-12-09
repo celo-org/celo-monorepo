@@ -8,12 +8,18 @@ import { BaseCommand } from '../base'
 
 export interface CommandCheck {
   name: string
+  errorMessage?: string
   run(): Promise<boolean> | boolean
 }
 
-export function check(name: string, predicate: () => Promise<boolean> | boolean): CommandCheck {
+export function check(
+  name: string,
+  predicate: () => Promise<boolean> | boolean,
+  errorMessage?: string
+): CommandCheck {
   return {
     name,
+    errorMessage,
     run: predicate,
   }
 }
@@ -49,22 +55,30 @@ class CheckBuilder {
     }
   }
 
-  withLockedGold<A>(f: (lockedGold: LockedGoldWrapper) => A): () => Promise<Resolve<A>> {
+  withLockedGold<A>(
+    f: (lockedGold: LockedGoldWrapper, signer: Address, account: Address) => A
+  ): () => Promise<Resolve<A>> {
     return async () => {
       const lockedGold = await this.kit.contracts.getLockedGold()
-      return f(lockedGold) as Resolve<A>
+      const validators = await this.kit.contracts.getValidators()
+      if (this.signer) {
+        const account = await validators.signerToAccount(this.signer)
+        return f(lockedGold, this.signer, account) as Resolve<A>
+      } else {
+        return f(lockedGold, '', '') as Resolve<A>
+      }
     }
   }
 
-  withAccounts<A>(f: (lockedGold: AccountsWrapper) => A): () => Promise<Resolve<A>> {
+  withAccounts<A>(f: (accounts: AccountsWrapper) => A): () => Promise<Resolve<A>> {
     return async () => {
       const accounts = await this.kit.contracts.getAccounts()
       return f(accounts) as Resolve<A>
     }
   }
 
-  addCheck(name: string, predicate: () => Promise<boolean> | boolean) {
-    this.checks.push(check(name, predicate))
+  addCheck(name: string, predicate: () => Promise<boolean> | boolean, errorMessage?: string) {
+    this.checks.push(check(name, predicate, errorMessage))
     return this
   }
 
@@ -108,10 +122,22 @@ class CheckBuilder {
 
   signerMeetsValidatorGroupBalanceRequirements = () =>
     this.addCheck(
-      `Signer's account has enough locked gold for registration`,
+      `Signer's account has enough locked gold for group registration`,
       this.withValidators((v, _signer, account) =>
         v.meetsValidatorGroupBalanceRequirements(account)
       )
+    )
+
+  meetsValidatorBalanceRequirements = (account: Address) =>
+    this.addCheck(
+      `${account} has enough locked gold for registration`,
+      this.withValidators((v) => v.meetsValidatorBalanceRequirements(account))
+    )
+
+  meetsValidatorGroupBalanceRequirements = (account: Address) =>
+    this.addCheck(
+      `${account} has enough locked gold for group registration`,
+      this.withValidators((v) => v.meetsValidatorGroupBalanceRequirements(account))
     )
 
   isNotAccount = (address: Address) =>
@@ -130,7 +156,11 @@ class CheckBuilder {
     )
 
   isAccount = (address: Address) =>
-    this.addCheck(`${address} is Account`, this.withAccounts((accs) => accs.isAccount(address)))
+    this.addCheck(
+      `${address} is a registered Account`,
+      this.withAccounts((accs) => accs.isAccount(address)),
+      `${address} is not registered as an account. Try running account:register`
+    )
 
   hasEnoughGold = (account: Address, value: BigNumber) => {
     const valueInEth = this.kit.web3.utils.fromWei(value.toFixed(), 'ether')
@@ -142,6 +172,26 @@ class CheckBuilder {
     )
   }
 
+  hasEnoughLockedGold = (value: BigNumber) => {
+    const valueInEth = this.kit.web3.utils.fromWei(value.toFixed(), 'ether')
+    return this.addCheck(
+      `Account has at least ${valueInEth} Locked Gold`,
+      this.withLockedGold(async (l, _signer, account) =>
+        value.isLessThanOrEqualTo(await l.getAccountTotalLockedGold(account))
+      )
+    )
+  }
+
+  hasEnoughNonvotingLockedGold = (value: BigNumber) => {
+    const valueInEth = this.kit.web3.utils.fromWei(value.toFixed(), 'ether')
+    return this.addCheck(
+      `Account has at least ${valueInEth} non-voting Locked Gold`,
+      this.withLockedGold(async (l, _signer, account) =>
+        value.isLessThanOrEqualTo(await l.getAccountNonvotingLockedGold(account))
+      )
+    )
+  }
+
   async runChecks() {
     console.log(`Running Checks:`)
     let allPassed = true
@@ -149,7 +199,8 @@ class CheckBuilder {
       const passed = await aCheck.run()
       const status︎Str = chalk.bold(passed ? '✔' : '✘')
       const color = passed ? chalk.green : chalk.red
-      console.log(color(`   ${status︎Str}  ${aCheck.name}`))
+      const msg = !passed && aCheck.errorMessage ? aCheck.errorMessage : ''
+      console.log(color(`   ${status︎Str}  ${aCheck.name} ${msg}`))
       allPassed = allPassed && passed
     }
 

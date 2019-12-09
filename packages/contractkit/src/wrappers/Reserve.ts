@@ -1,6 +1,6 @@
 import BigNumber from 'bignumber.js'
 import { Reserve } from '../generated/types/Reserve'
-import { BaseWrapper, proxyCall, valueToBigNumber } from './BaseWrapper'
+import { BaseWrapper, proxyCall, proxySend, valueToBigNumber } from './BaseWrapper'
 
 export interface ReserveConfig {
   tobinTaxStalenessThreshold: BigNumber
@@ -19,6 +19,9 @@ export class ReserveWrapper extends BaseWrapper<Reserve> {
     undefined,
     valueToBigNumber
   )
+  isSpender: (account: string) => Promise<boolean> = proxyCall(this.contract.methods.isSpender)
+  transferGold = proxySend(this.kit, this.contract.methods.transferGold)
+
   /**
    * Returns current configuration parameters.
    */

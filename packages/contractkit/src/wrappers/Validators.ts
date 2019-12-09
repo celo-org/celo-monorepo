@@ -17,14 +17,17 @@ import {
 } from './BaseWrapper'
 
 export interface Validator {
+  name: string
   address: Address
   ecdsaPublicKey: string
   blsPublicKey: string
   affiliation: string | null
   score: BigNumber
+  signer: Address
 }
 
 export interface ValidatorGroup {
+  name: string
   address: Address
   members: Address[]
   affiliates: Address[]
@@ -81,6 +84,16 @@ export class ValidatorsWrapper extends BaseWrapper<Validators> {
       duration: valueToBigNumber(res[1]),
     }
   }
+
+  /**
+   * Returns the Locked Gold requirements for specific account.
+   * @returns The Locked Gold requirements for a specific account.
+   */
+  getAccountLockedGoldRequirement = proxyCall(
+    this.contract.methods.getAccountLockedGoldRequirement,
+    undefined,
+    valueToBigNumber
+  )
 
   /**
    * Returns current configuration parameters.
@@ -179,14 +192,16 @@ export class ValidatorsWrapper extends BaseWrapper<Validators> {
   /** Get Validator information */
   async getValidator(address: Address): Promise<Validator> {
     const res = await this.contract.methods.getValidator(address).call()
+    const accounts = await this.kit.contracts.getAccounts()
+    const name = (await accounts.getName(address)) || ''
     return {
+      name,
       address,
-      // @ts-ignore Incorrect type for bytes
-      ecdsaPublicKey: res.ecdsaPublicKey,
-      // @ts-ignore Incorrect type for bytes
-      blsPublicKey: res.blsPublicKey,
+      ecdsaPublicKey: (res.ecdsaPublicKey as unknown) as string,
+      blsPublicKey: (res.blsPublicKey as unknown) as string,
       affiliation: res.affiliation,
       score: fromFixed(new BigNumber(res.score)),
+      signer: res.signer,
     }
   }
 
@@ -198,11 +213,14 @@ export class ValidatorsWrapper extends BaseWrapper<Validators> {
   /** Get ValidatorGroup information */
   async getValidatorGroup(address: Address): Promise<ValidatorGroup> {
     const res = await this.contract.methods.getValidatorGroup(address).call()
+    const accounts = await this.kit.contracts.getAccounts()
+    const name = (await accounts.getName(address)) || ''
     const validators = await this.getRegisteredValidators()
     const affiliates = validators
       .filter((v) => v.affiliation === address)
       .filter((v) => !res[0].includes(v.address))
     return {
+      name,
       address,
       members: res[0],
       commission: fromFixed(new BigNumber(res[1])),
@@ -256,8 +274,9 @@ export class ValidatorsWrapper extends BaseWrapper<Validators> {
    *
    * Fails if the account is already a validator or validator group.
    *
-   * @param ecdsaPublicKey The ECDSA public key that the validator is using for consensus, should match
-   *   the validator signer. 64 bytes.
+   * @param validatorAddress The address that the validator is using for consensus, should match
+   *   the validator signer.
+   * @param ecdsaPublicKey The ECDSA public key that the validator is using for consensus. 64 bytes.
    * @param blsPublicKey The BLS public key that the validator is using for consensus, should pass proof
    *   of possession. 48 bytes.
    * @param blsPop The BLS public key proof-of-possession, which consists of a signature on the
