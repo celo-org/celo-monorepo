@@ -8,9 +8,7 @@ set -euo pipefail
 DIRS_TO_CHECK=${1}
 # This code has to be executed from a dir with 'esModuleInterop' set to true or it fails.
 cd packages/mobile
-
-TS_NODE="../../node_modules/.bin/ts-node"
-CHANGED=$(TS_NODE_FILES=true $TS_NODE -r tsconfig-paths/register --project="../contractkit/tsconfig.json" ../../scripts/check_if_test_should_run_v2.ts --dirs ${DIRS_TO_CHECK})
+CHANGED=$(node -r ts-node/register ../../scripts/check_if_test_should_run_v2.ts --dirs ${DIRS_TO_CHECK})
 cd -
 if [ $CHANGED = false ] ; then
   echo "No changes in ${1} - skipping  testing"
