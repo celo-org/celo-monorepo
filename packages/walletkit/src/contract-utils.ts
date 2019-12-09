@@ -13,9 +13,9 @@ import { getGasPriceMinimumContract } from './contracts'
 import { getGoldTokenAddress } from './erc20-utils'
 import { Logger } from './logger'
 
-const gasInflateFactor = 1.3
+const gasInflateFactor = 1.5
 
-// TODO(nategraf): Allow this paramter to be fetched from the full-node peer.
+// TODO(nategraf): Allow this parameter to be fetched from the full-node peer.
 const defaultGatewayFee = new BigNumber(10000)
 
 export function selectContractByAddress(contracts: Contract[], address: string) {
