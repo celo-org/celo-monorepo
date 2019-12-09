@@ -190,6 +190,7 @@ export function getContext(gethConfig: GethRunConfig) {
     }
 
     if (!fs.existsSync(gethConfig.runPath)) {
+      // @ts-ignore
       fs.mkdirSync(gethConfig.runPath, { recursive: true })
     }
 

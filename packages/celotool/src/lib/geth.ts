@@ -703,6 +703,7 @@ export const runGethNodes = async ({
   }
 
   if (!fs.existsSync(gethConfig.runPath)) {
+    // @ts-ignore
     fs.mkdirSync(gethConfig.runPath, { recursive: true })
   }
 
@@ -748,6 +749,7 @@ export function importGenesis(genesisPath: string) {
 
 function getDatadir(instance: GethInstanceConfig) {
   const dir = path.join(getInstanceDir(instance), 'datadir')
+  // @ts-ignore
   fs.mkdirSync(dir, { recursive: true })
   return dir
 }
