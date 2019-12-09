@@ -54,8 +54,15 @@ export default class MyDocument extends Document {
           <meta name="viewport" content="width=device-width, initial-scale=1.0" />
           <link rel="stylesheet" href={'/static/normalize.css'} />
 
-          <link rel="preconnect" href="https://use.typekit.net" />
-          <link rel="stylesheet" href="https://use.typekit.net/dki6jkb.css" />
+          <link
+            rel="stylesheet"
+            href="https://indestructibletype.com/fonts/Jost.css"
+            type="text/css"
+          />
+          <link
+            href="https://fonts.googleapis.com/css?family=EB+Garamond:400,500,500i,700&display=swap"
+            rel="stylesheet"
+          />
 
           <link rel="shortcut icon" type="image/x-icon" href="/static/favicon.ico" />
         </Head>

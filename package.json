@@ -7,8 +7,8 @@
   "scripts": {
     "install-pkg": "yarn install --link-duplicates",
     "lint": "yarn lerna run lint",
-    "prettify": "yarn run prettier --config .prettierrc.js --write '**/*.+(ts|tsx|js|jsx|sol)'",
-    "prettify:diff": "yarn run prettier --config .prettierrc.js --list-different '**/*.+(ts|tsx|js|jsx|sol)'",
+    "prettify": "yarn run prettier --config .prettierrc.js --write '**/*.+(ts|tsx|js|jsx|sol|java)'",
+    "prettify:diff": "yarn run prettier --config .prettierrc.js --list-different '**/*.+(ts|tsx|js|jsx|sol|java)'",
     "reset": "yarn reset-modules && yarn reset-cache",
     "reset-cache": "yarn reset-yarn && yarn reset-rn",
     "reset-modules": "rm -rf node_modules/ packages/*/node_modules",
@@ -53,6 +53,7 @@
     "lerna": "^3.16.0",
     "patch-package": "^5.1.1",
     "prettier": "1.13.5",
+    "prettier-plugin-java": "^0.4.0",
     "prettier-plugin-solidity": "1.0.0-alpha.34",
     "pretty-quick": "^1.11.1",
     "solc": "0.5.8",

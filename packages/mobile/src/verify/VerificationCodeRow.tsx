@@ -1,5 +1,5 @@
 import { stripHexLeader } from '@celo/utils/src/address'
-import { extractAttestationCodeFromMessage } from '@celo/walletkit'
+import { extractAttestationCodeFromMessage } from '@celo/utils/src/attestations'
 import * as React from 'react'
 import CodeRow, { CodeRowStatus } from 'src/components/CodeRow'
 import { ATTESTATION_CODE_PLACEHOLDER } from 'src/identity/reducer'
