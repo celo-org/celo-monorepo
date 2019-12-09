@@ -82,14 +82,6 @@ export function* doFetchExchangeRate(action: FetchExchangeRateAction) {
 
     let dollarMakerExchangeRate: BigNumber
     let goldMakerExchangeRate: BigNumber
-    ;[dollarMakerExchangeRate, goldMakerExchangeRate] = yield all([
-      call([exchange, exchange.getUsdExchangeRate], dollarMakerAmount),
-      call([exchange, exchange.getGoldExchangeRate], goldMakerAmount),
-    ])
-
-    /*
-    let dollarMakerExchangeRate: BigNumber
-    let goldMakerExchangeRate: BigNumber
     if (!makerToken) {
       // General: fetch estimated rates for both sides
       Logger.debug(TAG, `@doFetchExchangeRate getting general exchange rate`)
@@ -137,7 +129,6 @@ export function* doFetchExchangeRate(action: FetchExchangeRateAction) {
       // Unrecognized token
       throw Error()
     }
-     */
 
     if (!dollarMakerExchangeRate || !goldMakerExchangeRate) {
       Logger.error(TAG, 'Invalid exchange rate')

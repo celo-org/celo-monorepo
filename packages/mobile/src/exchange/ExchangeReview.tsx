@@ -141,7 +141,6 @@ class ExchangeReview extends React.Component<Props, State> {
           }}
         >
           <DisconnectBanner />
-          {/*
           <KeyboardAwareScrollView keyboardShouldPersistTaps={'always'}>
             <View
               style={{
@@ -152,7 +151,6 @@ class ExchangeReview extends React.Component<Props, State> {
               <View style={[styles.rowContainer, styles.amountRow]}>
                 <Text style={[fontStyles.body, styles.exchangeBodyText]}>
                   Amount ({this.state.inputTokenCode})
-                  {JSON.stringify(exchangeRatePair)}
                 </Text>
                 <Text style={[fontStyles.body, styles.currencyAmountText]}>
                   {this.state.inputAmount.toString()}
@@ -162,7 +160,6 @@ class ExchangeReview extends React.Component<Props, State> {
               <View style={[styles.rowContainer, styles.feeRowContainer]}>
                 <Text style={[fontStyles.body, styles.exchangeBodyText]}>
                   Subtotal @ {getMoneyDisplayValue(goldRateInDollars, Token.DOLLAR, true)}
-                  Subtotal @ {getMoneyDisplayValue(dollarRateInGold, Token.DOLLAR, true)}
                 </Text>
                 <Text style={[fontStyles.body, styles.exchangeBodyText]}>
                   {getMoneyDisplayValue(dollarAmount, Token.DOLLAR, true)}
@@ -174,15 +171,16 @@ class ExchangeReview extends React.Component<Props, State> {
               </View>
               <View style={[styles.rowContainer, styles.feeRowContainer]}>
                 <Text style={[fontStyles.body, styles.exchangeBodyText]}>Security Fee</Text>
-                <Text style={[fontStyles.body, styles.exchangeBodyText]}>
-                  {fee }
-                </Text>
+                <Text style={[fontStyles.body, styles.exchangeBodyText]}>{fee}</Text>
               </View>
               <View style={styles.line} />
               <View style={styles.rowContainer}>
                 <Text style={[fontStyles.bodyBold]}>Total</Text>
-                <Text style={fontStyles.bodyBold}>{'$20.013'}</Text>
+                <Text style={fontStyles.bodyBold}>
+                  {getMoneyDisplayValue(dollarAmount.plus(fee), Token.DOLLAR, true)}
+                </Text>
               </View>
+              <Text style={[fontStyles.bodyBold]}>{JSON.stringify(exchangeRatePair)}</Text>
             </View>
           </KeyboardAwareScrollView>
         </View>
@@ -195,7 +193,6 @@ class ExchangeReview extends React.Component<Props, State> {
             disabled={!appConnected || goldRateInDollars.isZero()}
             type={BtnTypes.PRIMARY}
           />
-          */}
         </View>
       </SafeAreaView>
     )
