@@ -50,6 +50,7 @@ interface State {
   inputToken: Token
   inputTokenCode: string
   inputAmount: BigNumber
+  exchangeRate: BigNumber
 }
 
 type Props = StateProps & WithNamespaces & DispatchProps & NavigationInjectedProps
@@ -87,6 +88,7 @@ class ExchangeReview extends React.Component<Props, State> {
     inputToken: Token.GOLD,
     inputTokenCode: 'gold',
     inputAmount: new BigNumber(0),
+    exchangeRate: new BigNumber(10), // TODO anna fix placeholder
   }
 
   onPressConfirm = () => {
@@ -103,9 +105,14 @@ class ExchangeReview extends React.Component<Props, State> {
 
   getExchangePropertiesFromNavProps() {
     const makerToken = this.props.navigation.getParam('makerToken')
+    const inputAmount = this.props.navigation.getParam('inputAmount')
     const inputToken = this.props.navigation.getParam('inputToken')
     const inputTokenCode = this.props.navigation.getParam('inputTokenCode')
-    const inputAmount = this.props.navigation.getParam('inputAmount')
+    if (!makerToken || !inputAmount || !inputToken || !inputTokenCode) {
+      throw new Error('Maker token or maker token balance missing from nav props')
+    }
+
+    Logger.debug('@getExchangePropertiesFromNavProps', `makerToken is: ${makerToken}`)
     this.setState({
       makerToken,
       inputToken,
@@ -126,9 +133,20 @@ class ExchangeReview extends React.Component<Props, State> {
 
   render() {
     const { exchangeRatePair, fee, t, appConnected } = this.props
-    const goldRateInDollars = getRateForMakerToken(exchangeRatePair, Token.DOLLAR)
+
     let dollarAmount = this.state.inputAmount
-    const dollarRateInGold = getRateForMakerToken(exchangeRatePair, Token.GOLD)
+    const exchangeRate = getRateForMakerToken(
+      this.props.exchangeRatePair,
+      this.state.makerToken,
+      Token.DOLLAR
+    )
+
+    const dollarRateInGold = getRateForMakerToken(
+      exchangeRatePair,
+      this.state.makerToken,
+      Token.GOLD
+    )
+
     if (this.state.inputToken === Token.GOLD) {
       dollarAmount = getTakerAmount(this.state.inputAmount, dollarRateInGold)
     }
@@ -159,7 +177,7 @@ class ExchangeReview extends React.Component<Props, State> {
               <View style={styles.line} />
               <View style={[styles.rowContainer, styles.feeRowContainer]}>
                 <Text style={[fontStyles.body, styles.exchangeBodyText]}>
-                  Subtotal @ {getMoneyDisplayValue(goldRateInDollars, Token.DOLLAR, true)}
+                  Subtotal @ {getMoneyDisplayValue(exchangeRate, Token.DOLLAR, true)}
                 </Text>
                 <Text style={[fontStyles.body, styles.exchangeBodyText]}>
                   {getMoneyDisplayValue(dollarAmount, Token.DOLLAR, true)}
@@ -190,7 +208,7 @@ class ExchangeReview extends React.Component<Props, State> {
             onPress={this.onPressConfirm}
             text={t(`${Namespaces.walletFlow5}:review`)}
             standard={false}
-            disabled={!appConnected || goldRateInDollars.isZero()}
+            disabled={!appConnected} // todo make sure nonzero rate || this.getExchangeDisplay().isZero()}
             type={BtnTypes.PRIMARY}
           />
         </View>
