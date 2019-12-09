@@ -47,12 +47,14 @@ testWithGanache('Accounts Wrapper', (web3) => {
   })
 
   const setupValidator = async (validatorAccount: string) => {
-    const publicKey = await addressToPublicKey(validatorAccount, web3.eth.sign)
     await registerAccountWithLockedGold(validatorAccount)
+    const ecdsaPublicKey = await addressToPublicKey(validatorAccount, kit.web3.eth.sign)
     await validators
       // @ts-ignore
-      .registerValidator(publicKey, blsPublicKey, blsPoP)
-      .sendAndWaitForReceipt({ from: validatorAccount })
+      .registerValidator(ecdsaPublicKey, blsPublicKey, blsPoP)
+      .sendAndWaitForReceipt({
+        from: validatorAccount,
+      })
   }
 
   test('SBAT authorize validator key when not a validator', async () => {

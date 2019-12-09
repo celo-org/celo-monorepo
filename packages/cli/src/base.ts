@@ -7,11 +7,29 @@ import { getNodeUrl } from './utils/config'
 import { injectDebugProvider } from './utils/eth-debug-provider'
 import { requireNodeIsSynced } from './utils/helpers'
 
-export abstract class BaseCommand extends Command {
+// Base for commands that do not need web3.
+export abstract class LocalCommand extends Command {
   static flags = {
     logLevel: flags.string({ char: 'l', hidden: true }),
     help: flags.help({ char: 'h', hidden: true }),
+  }
+
+  // TODO(yorke): implement log(msg) switch on logLevel with chalk colored output
+  log(msg: string, logLevel: string = 'info') {
+    if (logLevel === 'info') {
+      console.debug(msg)
+    } else if (logLevel === 'error') {
+      console.error(msg)
+    }
+  }
+}
+
+// tslint:disable-next-line:max-classes-per-file
+export abstract class BaseCommand extends LocalCommand {
+  static flags = {
+    ...LocalCommand.flags,
     privateKey: flags.string({ hidden: true }),
+    node: flags.string({ char: 'n', hidden: true }),
   }
 
   // This specifies whether the node needs to be synced before the command
@@ -31,7 +49,9 @@ export abstract class BaseCommand extends Command {
 
   get web3() {
     if (!this._web3) {
-      this._web3 = new Web3(getNodeUrl(this.config.configDir))
+      const res: ParserOutput<any, any> = this.parse()
+      const nodeUrl = (res.flags && res.flags.node) || getNodeUrl(this.config.configDir)
+      this._web3 = new Web3(nodeUrl)
       this._originalProvider = this._web3.currentProvider
       injectDebugProvider(this._web3)
     }
@@ -53,15 +73,6 @@ export abstract class BaseCommand extends Command {
   async init() {
     if (this.requireSynced) {
       await requireNodeIsSynced(this.web3)
-    }
-  }
-
-  // TODO(yorke): implement log(msg) switch on logLevel with chalk colored output
-  log(msg: string, logLevel: string = 'info') {
-    if (logLevel === 'info') {
-      console.debug(msg)
-    } else if (logLevel === 'error') {
-      console.error(msg)
     }
   }
 

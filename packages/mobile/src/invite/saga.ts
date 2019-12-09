@@ -46,7 +46,7 @@ import { zeroSyncSelector } from 'src/web3/selectors'
 
 const TAG = 'invite/saga'
 export const TEMP_PW = 'ce10'
-export const REDEEM_INVITE_TIMEOUT = 1 * 60 * 1000 // 1 minute
+export const REDEEM_INVITE_TIMEOUT = 2 * 60 * 1000 // 2 minutes
 const INVITE_FEE = '0.2'
 
 export async function getInviteTxGas(
@@ -206,6 +206,7 @@ export function* sendInviteSaga(action: SendInviteAction) {
 }
 
 export function* redeemInviteSaga({ inviteCode }: RedeemInviteAction) {
+  yield call(waitWeb3LastBlock)
   Logger.debug(TAG, 'Starting Redeem Invite')
 
   const { result, timeout } = yield race({
@@ -230,10 +231,9 @@ export function* redeemInviteSaga({ inviteCode }: RedeemInviteAction) {
 }
 
 export function* doRedeemInvite(inviteCode: string) {
-  yield call(waitWeb3LastBlock)
   try {
     const tempAccount = web3.eth.accounts.privateKeyToAccount(inviteCode).address
-    Logger.debug(`TAG@doRedeemInvite`, 'Invite code contains temp account', tempAccount)
+    Logger.debug(TAG + '@doRedeemInvite', 'Invite code contains temp account', tempAccount)
     const tempAccountBalanceWei: BigNumber = yield call(
       fetchTokenBalanceInWeiWithRetry,
       CURRENCY_ENUM.DOLLAR,
@@ -250,7 +250,7 @@ export function* doRedeemInvite(inviteCode: string) {
     yield put(fetchDollarBalance())
     return true
   } catch (e) {
-    Logger.error(TAG, 'Failed to redeem invite', e)
+    Logger.error(TAG + '@doRedeemInvite', 'Failed to redeem invite', e)
     if (e.message in ErrorMessages) {
       yield put(showError(e.message))
     } else {

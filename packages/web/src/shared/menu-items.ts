@@ -3,45 +3,53 @@ export const menuItems = {
     name: 'Home',
     link: '/',
   },
+  APPLICATIONS: {
+    name: 'Applications',
+    link: '/applications',
+  },
   ABOUT_US: {
     name: 'About Us',
     link: '/about-us',
-  },
-  JOBS: {
-    name: 'Join',
-    link: '/jobs',
-  },
-  TECH: {
-    name: 'Technology',
-    link: '/technology',
   },
   BUILD: {
     name: 'Build',
     link: '/build',
   },
-  APPLICATIONS: {
-    name: 'Applications',
-    link: '/applications',
+  BRAND: {
+    name: 'Experience - Brand Kit',
+    link: '/experience/brand',
   },
   COMMUNITY: {
     name: 'Connect',
     link: '/community',
   },
-  PRIVACY: {
-    name: 'Privacy Policy',
-    link: '/privacy',
-  },
-  TERMS: {
-    name: 'Terms',
-    link: '/terms',
+  JOBS: {
+    name: 'Join',
+    link: '/jobs',
   },
   MEDIUM: {
     name: 'Medium',
     link: 'https://medium.com/@celo.org',
   },
+  PRIVACY: {
+    name: 'Privacy Policy',
+    link: '/privacy',
+  },
+  TECH: {
+    name: 'Technology',
+    link: '/technology',
+  },
+  TERMS: {
+    name: 'Terms',
+    link: '/terms',
+  },
   TWITTER: {
     name: 'Twitter',
     link: 'https://twitter.com/CeloHQ',
+  },
+  CODE_OF_CONDUCT: {
+    name: 'Code of Conduct',
+    link: '/code-of-conduct',
   },
 }
 
@@ -49,6 +57,7 @@ export enum CeloLinks {
   agreement = '/user-agreement',
   faq = '/faq',
   faucet = '/build/faucet',
+  iconsLicense = 'https://creativecommons.org/licenses/by-nd/4.0/legalcode',
   discord = 'https://discord.gg/6yWMkgM',
   discourse = 'https://forum.celo.org/',
   walletApp = '/build/wallet',
@@ -68,6 +77,7 @@ export enum CeloLinks {
   privacyDocs = 'https://docs.celo.org/celo-codebase/protocol/privacy',
   tutorial = 'https://docs.celo.org/getting-started/faucet#creating-an-empty-account-with-the-celo-client',
   buildWalletDocs = 'https://docs.celo.org/celo-codebase/wallet/intro',
+  stakeOffTerms = '/stake-off/terms',
 }
 
 export const languageOptions = {
@@ -82,9 +92,7 @@ export const languageOptions = {
 }
 
 export const hashNav = {
-  about: {
-    backers: 'backers',
-  },
+  about: { backers: 'backers' },
   build: {
     features: 'features',
     stack: 'stack',
@@ -102,11 +110,18 @@ export const hashNav = {
     fund: 'fund',
     newsletter: 'newsletter',
   },
-  join: {
-    roles: 'roles',
+  join: { roles: 'roles' },
+  home: { partnerships: 'partnerships' },
+  brandLogo: { overview: 'overview', space: 'space-and-sizing', backgrounds: 'backgrounds' },
+  brandColor: { overview: 'overview', backgrounds: 'background-colors' },
+  brandTypography: { overview: 'overview', scale: 'type-scale' },
+  brandImagery: {
+    overview: 'overview',
+    illustrations: 'illustrations',
+    graphics: 'abstract-graphics',
   },
-  home: {
-    partnerships: 'partnerships',
+  brandIcons: {
+    overview: 'overview',
   },
 }
 
