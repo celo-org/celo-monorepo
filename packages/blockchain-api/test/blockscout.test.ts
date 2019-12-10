@@ -30,6 +30,7 @@ jest.mock('../src/utils.ts', () => {
   contractGetter.mockReturnValue({
     tokenAddressMapping,
     attestationsAddress: '0x0000000000000000000000000000000000a77357',
+    escrowAddress: '0x0000000000000000000000000000000000a77327',
   })
   return {
     ...jest.requireActual('../src/utils.ts'),
