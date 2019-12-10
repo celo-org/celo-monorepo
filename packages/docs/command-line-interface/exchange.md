@@ -13,10 +13,10 @@ USAGE
   $ celocli exchange:dollars
 
 OPTIONS
-  --commission=commission                             (required)
-  --for=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d    (required) The minimum value of Celo Gold to receive in return
-  --from=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d   (required) The address with Celo Dollars to exchange
-  --value=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) The value of Celo Dollars to exchange for Celo Gold
+  --commission=commission                            (required)
+  --for=10000000000000000000000                      (required) The minimum value of Celo Gold to receive in return
+  --from=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) The address with Celo Dollars to exchange
+  --value=10000000000000000000000                    (required) The value of Celo Dollars to exchange for Celo Gold
 
 EXAMPLE
   dollars --value 10000000000000 --for 50000000000000 --from 0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d
@@ -33,10 +33,10 @@ USAGE
   $ celocli exchange:gold
 
 OPTIONS
-  --commission=commission                             (required)
-  --for=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d    (required) The minimum value of Celo Dollars to receive in return
-  --from=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d   (required) The address with Celo Gold to exchange
-  --value=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) The value of Celo Gold to exchange for Celo Dollars
+  --commission=commission                            (required)
+  --for=10000000000000000000000                      (required) The minimum value of Celo Dollars to receive in return
+  --from=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) The address with Celo Gold to exchange
+  --value=10000000000000000000000                    (required) The value of Celo Gold to exchange for Celo Dollars
 
 EXAMPLE
   gold --value 5000000000000 --for 100000000000000 --from 0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d

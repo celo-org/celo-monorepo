@@ -274,7 +274,7 @@ The `mine` flag does not mean the node starts mining blocks, but rather starts t
 
 The `networkid` parameter value of `12219` indicates we are connecting to the Baklava network, Stake Off Phase 1.
 
-Note that if you are running the validator and the proxy on the same machine, then you should set the validator's listening port to something other than `30303`.  E.g. you could use the flag `--port 30313` and set the docker port forwarding rules accordingly (e.g. use the flags `-p 30313:30313` and `-p 30313:30313/udp`).
+Note that if you are running the validator and the proxy on the same machine, then you should set the validator's listening port to something other than `30303`. E.g. you could use the flag `--port 30313` and set the docker port forwarding rules accordingly (e.g. use the flags `-p 30313:30313` and `-p 30313:30313/udp`).
 
 ### Register the Accounts
 
