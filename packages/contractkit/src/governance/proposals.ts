@@ -9,6 +9,7 @@ import { ABI as GovernanceABI } from '../generated/Governance'
 import { ContractKit } from '../kit'
 import { CeloTransactionObject, valueToString } from '../wrappers/BaseWrapper'
 import { GovernanceWrapper, Proposal, ProposalTransaction } from '../wrappers/Governance'
+import { setImplementationOnProxy } from './proxy'
 
 export const PROPOSE_PARAM_ABI_TYPES = (GovernanceABI.find(
   (abiEntry) => abiEntry.name! === 'propose'
@@ -59,6 +60,13 @@ export class ProposalBuilder {
     to: params.to,
     input: tx.encodeABI(),
   })
+
+  addProxyRepointingTx = (proxyAddress: string, newImplementationAddress: string) => {
+    this.addWeb3Tx(setImplementationOnProxy(newImplementationAddress), {
+      to: proxyAddress,
+      value: '0',
+    })
+  }
 
   addWeb3Tx = (tx: TransactionObject<any>, params: ProposalTxParams) =>
     this.builders.push(async () => this.fromWeb3tx(tx, params))
