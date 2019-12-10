@@ -13,15 +13,12 @@ import {
   takeLeading,
 } from 'redux-saga/effects'
 import {
-  PaymentRequest,
-  PaymentRequestStatus,
   updateIncomingPaymentRequests,
-  updateOutgoingPaymentRequests,
-} from 'src/account'
-import {
   UpdateIncomingPaymentRequestsAction,
+  updateOutgoingPaymentRequests,
   UpdateOutgoingPaymentRequestsAction,
 } from 'src/account/actions'
+import { PaymentRequest, PaymentRequestStatus } from 'src/account/types'
 import { showError } from 'src/alert/actions'
 import { Actions as AppActions, SetLanguage } from 'src/app/actions'
 import { ErrorMessages } from 'src/app/ErrorMessages'
