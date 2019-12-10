@@ -40,7 +40,7 @@ export default withScreenSize(
         <View style={styles.content}>
           <Text
             onPress={onPress}
-            style={[fonts.h5, standardStyles.elementalMarginBottom, textStyles.invert]}
+            style={[fonts.h6, standardStyles.elementalMarginBottom, textStyles.invert]}
           >
             {screen === ScreenSizes.DESKTOP && (
               <View style={[styles.coin, isSelected ? styles.bright : styles.off]}>

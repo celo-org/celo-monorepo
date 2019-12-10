@@ -80,6 +80,6 @@ export const handler = async (argv: TraceArgv) => {
     goldToken,
     stableToken,
     [address1, address2],
-    getBlockscoutUrl(argv)
+    getBlockscoutUrl(argv.celoEnv)
   )
 }
