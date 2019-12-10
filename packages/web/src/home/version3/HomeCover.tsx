@@ -15,7 +15,7 @@ const ANIMATION_DURATION = 5
 
 function After({ t }) {
   return (
-    <Text style={[fonts.h5, textStyles.center, styles.foreground]}>{t('stayConnectedThanks')}</Text>
+    <Text style={[fonts.h6, textStyles.center, styles.foreground]}>{t('stayConnectedThanks')}</Text>
   )
 }
 
