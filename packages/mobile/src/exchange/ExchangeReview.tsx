@@ -38,11 +38,13 @@ interface DispatchProps {
 }
 
 interface NavProps {
-  makerToken: CURRENCY_ENUM
-  makerTokenBalance: string
-  inputToken: CURRENCY_ENUM
-  inputTokenCode: string
-  inputAmount: BigNumber
+  exchangeInput: {
+    makerToken: CURRENCY_ENUM
+    makerTokenBalance: string
+    inputToken: CURRENCY_ENUM
+    inputTokenCode: string
+    inputAmount: BigNumber
+  }
 }
 
 interface State {
@@ -62,10 +64,8 @@ const mapStateToProps = (state: RootState): StateProps => ({
 
 class ExchangeReview extends React.Component<Props, State> {
   static navigationOptions = ({ navigation }: NavigationInjectedProps<NavProps>) => {
-    return ExchangeHeader(
-      navigation.getParam('makerToken'),
-      navigation.getParam('makerTokenBalance')
-    )
+    const { makerToken, makerTokenBalance } = navigation.getParam('exchangeInput')
+    return ExchangeHeader(makerToken, makerTokenBalance)
   }
 
   state: State = {
@@ -87,10 +87,9 @@ class ExchangeReview extends React.Component<Props, State> {
   }
 
   getExchangePropertiesFromNavProps() {
-    const makerToken = this.props.navigation.getParam('makerToken')
-    const inputAmount = this.props.navigation.getParam('inputAmount')
-    const inputToken = this.props.navigation.getParam('inputToken')
-    const inputTokenCode = this.props.navigation.getParam('inputTokenCode')
+    const { makerToken, inputAmount, inputToken, inputTokenCode } = this.props.navigation.getParam(
+      'exchangeInput'
+    )
     if (!makerToken || !inputAmount || !inputToken || !inputTokenCode) {
       throw new Error('Maker token or maker token balance missing from nav props')
     }

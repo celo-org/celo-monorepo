@@ -71,6 +71,7 @@ function createSendMethod(): SendMethod {
 }
 
 export function createMockNavigationProp(params: any): NavigationScreenProp<any> {
+  console.log(JSON.stringify(params))
   return {
     ...mockNavigation,
     state: {

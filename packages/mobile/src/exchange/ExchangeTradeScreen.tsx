@@ -42,8 +42,10 @@ interface StateProps {
 }
 
 interface NavProps {
-  makerToken: CURRENCY_ENUM
-  makerTokenBalance: string
+  makerTokenDisplay: {
+    makerToken: CURRENCY_ENUM
+    makerTokenBalance: string
+  }
 }
 
 interface DispatchProps {
@@ -61,10 +63,8 @@ const mapStateToProps = (state: RootState): StateProps => ({
 
 export class ExchangeTradeScreen extends React.Component<Props, State> {
   static navigationOptions = ({ navigation }: NavigationInjectedProps<NavProps>) => {
-    return ExchangeHeader(
-      navigation.getParam('makerToken'),
-      navigation.getParam('makerTokenBalance')
-    )
+    const { makerToken, makerTokenBalance } = navigation.getParam('makerTokenDisplay')
+    return ExchangeHeader(makerToken, makerTokenBalance)
   }
 
   state: State = {
@@ -75,16 +75,15 @@ export class ExchangeTradeScreen extends React.Component<Props, State> {
   }
 
   getMakerTokenPropertiesFromNavProps() {
-    const makerToken = this.props.navigation.getParam('makerToken')
-    const makerTokenAvailableBalance = this.props.navigation.getParam('makerTokenBalance')
-    if (!makerToken || !makerTokenAvailableBalance) {
+    const { makerToken, makerTokenBalance } = this.props.navigation.getParam('makerTokenDisplay')
+    if (!makerToken || !makerTokenBalance) {
       throw new Error('Maker token or maker token balance missing from nav props')
     }
     this.setState({
       makerToken,
-      makerTokenAvailableBalance,
+      makerTokenAvailableBalance: makerTokenBalance,
     })
-    this.props.fetchExchangeRate(makerToken, makerTokenAvailableBalance)
+    this.props.fetchExchangeRate(makerToken, makerTokenBalance)
   }
 
   componentDidMount() {
@@ -113,9 +112,11 @@ export class ExchangeTradeScreen extends React.Component<Props, State> {
     navigate(Screens.ExchangeReview, {
       makerToken: this.state.makerToken,
       makerTokenBalance: this.state.makerTokenAvailableBalance,
-      inputToken,
-      inputTokenCode,
-      inputAmount: parseInputAmount(inputAmount),
+      exchangeInput: {
+        inputToken,
+        inputTokenCode,
+        inputAmount: parseInputAmount(inputAmount),
+      },
     })
   }
 
@@ -209,6 +210,8 @@ export class ExchangeTradeScreen extends React.Component<Props, State> {
 
   render() {
     const { t, exchangeRatePair } = this.props
+
+    console.log('@getRateForMakerToken about to call with', ` makerToken ${this.state.makerToken}`)
 
     const exchangeRateDisplay = getRateForMakerToken(
       exchangeRatePair,

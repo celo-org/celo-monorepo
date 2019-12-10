@@ -23,7 +23,7 @@ export function getRateForMakerToken(
   } else if (makerToken === CURRENCY_ENUM.GOLD) {
     rateBN = new BigNumber(exchangeRatePair.goldMaker)
   } else {
-    Logger.warn(TAG, `Unexpected token ${makerToken}`)
+    Logger.warn(TAG, `Unexpected token ${JSON.stringify(makerToken)}`)
     throw new Error(`Unexpected token ${makerToken}`)
   }
 
