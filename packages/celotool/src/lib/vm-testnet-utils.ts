@@ -89,9 +89,13 @@ const testnetResourcesToReset = [
   // validator proxies
   'module.validator.module.proxy.random_id.full_node.*',
   'module.validator.module.proxy.google_compute_instance.full_node.*',
+  'module.validator.module.proxy.random_id.full_node_disk.*',
+  'module.validator.module.proxy.google_compute_disk.full_node.*',
   // tx-nodes
   'module.tx_node.random_id.full_node.*',
   'module.tx_node.google_compute_instance.full_node.*',
+  'module.tx_node.random_id.full_node_disk.*',
+  'module.tx_node.google_compute_disk.full_node.*',
   // tx-node load balancer instance group
   'module.tx_node_lb.random_id.external',
   'module.tx_node_lb.google_compute_instance_group.external',

@@ -5,6 +5,37 @@
 curl -sSO https://dl.google.com/cloudagents/install-logging-agent.sh
 bash install-logging-agent.sh
 
+# ---- Set Up Monitoring Agent ----
+
+curl -sSO https://dl.google.com/cloudagents/install-monitoring-agent.sh
+bash install-monitoring-agent.sh
+
+# ---- Set Up Persistent Disk ----
+
+# gives a path similar to `/dev/sdb`
+DISK_PATH=`readlink -f /dev/disk/by-id/google-${attached_disk_name}`
+DATA_DIR=/root/.celo
+
+echo "Setting up persistent disk ${attached_disk_name} at $DISK_PATH..."
+
+DISK_FORMAT=ext4
+CURRENT_DISK_FORMAT=`lsblk -i -n -o fstype $DISK_PATH`
+
+echo "Checking if disk $DISK_PATH format $CURRENT_DISK_FORMAT matches desired $DISK_FORMAT..."
+
+# If the disk has already been formatted previously (this will happen
+# if this instance has been recreated with the same disk), we skip formatting
+if [[ $CURRENT_DISK_FORMAT == $DISK_FORMAT ]]; then
+  echo "Disk $DISK_PATH is correctly formatted as $DISK_FORMAT"
+else
+  echo "Disk $DISK_PATH is not formatted correctly, formatting as $DISK_FORMAT..."
+  mkfs.ext4 -m 0 -F -E lazy_itable_init=0,lazy_journal_init=0,discard $DISK_PATH
+fi
+
+mkdir -p $DATA_DIR
+echo "Mounting $DISK_PATH onto $DATA_DIR"
+mount -o discard,defaults $DISK_PATH $DATA_DIR
+
 # ---- Install Docker ----
 
 echo "Installing Docker..."
@@ -24,8 +55,6 @@ echo '{"log-driver":"gcplogs"}' > /etc/docker/daemon.json
 systemctl restart docker
 
 # ---- Set Up and Run Geth ----
-
-DATA_DIR=/root/.celo
 
 GETH_NODE_DOCKER_IMAGE=${geth_node_docker_image_repository}:${geth_node_docker_image_tag}
 
@@ -110,7 +139,6 @@ docker run \
       --consoleoutput=stdout \
       --verbosity=${geth_verbosity} \
       --ethstats=${node_name}@${ethstats_host} \
-      --nat=extip:${ip_address} \
       --metrics \
       $IN_MEMORY_DISCOVERY_TABLE_FLAG \
       $ADDITIONAL_GETH_FLAGS"

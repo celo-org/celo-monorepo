@@ -13,6 +13,11 @@ fi
 curl -sSO https://dl.google.com/cloudagents/install-logging-agent.sh
 bash install-logging-agent.sh
 
+# ---- Set Up Monitoring Agent ----
+
+curl -sSO https://dl.google.com/cloudagents/install-monitoring-agent.sh
+bash install-monitoring-agent.sh
+
 # ---- Set Up Persistent Disk ----
 
 # gives a path similar to `/dev/sdb`
@@ -113,7 +118,6 @@ echo -n "$BOOTNODE_ENODE" > $DATA_DIR/bootnodeEnode
 echo -n "$GETH_ACCOUNT_SECRET" > $DATA_DIR/account/accountSecret
 if [ "${ip_address}" ]; then
   echo -n "${ip_address}" > $DATA_DIR/ipAddress
-  NAT_FLAG="--nat=extip:${ip_address}"
 fi
 
 echo "Starting geth..."
@@ -162,7 +166,6 @@ docker run \
     --istanbul.requesttimeout=${istanbul_request_timeout_ms} \
     --maxpeers=${max_peers} \
     --metrics \
-    $NAT_FLAG \
     $IN_MEMORY_DISCOVERY_TABLE_FLAG \
     $PROXIED_FLAGS"
 

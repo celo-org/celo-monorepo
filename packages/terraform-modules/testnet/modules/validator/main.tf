@@ -26,7 +26,7 @@ resource "google_compute_address" "validator_internal" {
 
 resource "google_compute_instance" "validator" {
   name         = "${local.name_prefix}-${count.index}"
-  machine_type = "n1-standard-1"
+  machine_type = "n1-standard-2"
 
   count = var.validator_count
 
@@ -90,7 +90,8 @@ resource "google_compute_instance" "validator" {
     scopes = [
       "https://www.googleapis.com/auth/compute",
       "https://www.googleapis.com/auth/devstorage.read_only",
-      "https://www.googleapis.com/auth/logging.write"
+      "https://www.googleapis.com/auth/logging.write",
+      "https://www.googleapis.com/auth/monitoring.write"
     ]
   }
 }
@@ -101,7 +102,7 @@ resource "google_compute_disk" "validator" {
 
   type = "pd-ssd"
   # in GB
-  size                      = 15
+  size                      = 25
   physical_block_size_bytes = 4096
 }
 

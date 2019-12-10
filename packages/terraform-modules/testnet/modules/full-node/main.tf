@@ -1,4 +1,5 @@
 locals {
+  attached_disk_name = "celo-data"
   name_prefix = "${var.celo_env}-${var.name}"
 }
 
@@ -23,7 +24,7 @@ resource "google_compute_address" "full_node_internal" {
 
 resource "google_compute_instance" "full_node" {
   name         = "${local.name_prefix}-${count.index}-${random_id.full_node[count.index].hex}"
-  machine_type = "n1-standard-1"
+  machine_type = "n1-standard-2"
 
   count = var.node_count
 
@@ -37,6 +38,11 @@ resource "google_compute_instance" "full_node" {
     }
   }
 
+  attached_disk {
+    source      = google_compute_disk.full_node[count.index].self_link
+    device_name = local.attached_disk_name
+  }
+
   network_interface {
     network = var.network_name
     network_ip = google_compute_address.full_node_internal[count.index].address
@@ -48,6 +54,7 @@ resource "google_compute_instance" "full_node" {
   metadata_startup_script = templatefile(
     format("%s/startup.sh", path.module), {
       additional_geth_flags : var.additional_geth_flags,
+      attached_disk_name : local.attached_disk_name,
       block_time : var.block_time,
       bootnode_ip_address : var.bootnode_ip_address,
       ethstats_host : var.ethstats_host,
@@ -74,7 +81,8 @@ resource "google_compute_instance" "full_node" {
     email = var.gcloud_vm_service_account_email
     scopes = [
       "https://www.googleapis.com/auth/devstorage.read_only",
-      "https://www.googleapis.com/auth/logging.write"
+      "https://www.googleapis.com/auth/logging.write",
+      "https://www.googleapis.com/auth/monitoring.write"
     ]
   }
 
@@ -83,7 +91,24 @@ resource "google_compute_instance" "full_node" {
   }
 }
 
+resource "google_compute_disk" "full_node" {
+  name  = "${local.name_prefix}-disk-${count.index}-${random_id.full_node_disk[count.index].hex}"
+  count = var.node_count
+
+  type = "pd-ssd"
+  # in GB
+  size                      = 25
+  physical_block_size_bytes = 4096
+}
+
 resource "random_id" "full_node" {
+  count = var.node_count
+
+  byte_length = 8
+}
+
+# Separate random id so that updating the ID of the instance doesn't force a new disk
+resource "random_id" "full_node_disk" {
   count = var.node_count
 
   byte_length = 8

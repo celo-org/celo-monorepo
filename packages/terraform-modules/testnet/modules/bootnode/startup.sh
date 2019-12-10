@@ -5,6 +5,11 @@
 curl -sSO https://dl.google.com/cloudagents/install-logging-agent.sh
 bash install-logging-agent.sh
 
+# ---- Set Up Monitoring Agent ----
+
+curl -sSO https://dl.google.com/cloudagents/install-monitoring-agent.sh
+bash install-monitoring-agent.sh
+
 # ---- Install Docker ----
 
 echo "Installing Docker..."
