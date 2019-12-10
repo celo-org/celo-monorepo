@@ -87,6 +87,10 @@ function wwwRedirect(req, res, nextAction) {
     res.redirect('/user-agreement')
   })
 
+  server.get('/stake-off', (_, res) => {
+    res.redirect('https://forum.celo.org/t/the-great-celo-stake-off-the-details/136')
+  })
+
   server.use(bodyParser.json())
   server.use(nextI18NextMiddleware(nextI18next))
 
@@ -169,13 +173,21 @@ function wwwRedirect(req, res, nextAction) {
   })
 
   server.get('/proxy/medium', async (_, res) => {
-    const articlesdata = await getFormattedMediumArticles()
-    res.json(articlesdata)
+    try {
+      const articlesdata = await getFormattedMediumArticles()
+      res.json(articlesdata)
+    } catch (e) {
+      res.status(e.statusCode || 500).json({ message: e.message || 'unknownError' })
+    }
   })
 
   server.get('/proxy/events/', async (_, res) => {
-    const events = await getFormattedEvents()
-    res.json(events)
+    try {
+      const events = await getFormattedEvents()
+      res.json(events)
+    } catch (e) {
+      res.status(e.statusCode || 500).json({ message: e.message || 'unknownError' })
+    }
   })
 
   server.get('*', (req, res) => {

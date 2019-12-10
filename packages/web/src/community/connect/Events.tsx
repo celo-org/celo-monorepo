@@ -92,7 +92,7 @@ class Events extends React.PureComponent<Props, State> {
       >
         <Cell span={Spans.fourth}>
           <View style={standardStyles.blockMarginMobile}>
-            <Text style={fonts.h5}>{t('events.refineBy')}</Text>
+            <Text style={fonts.h6}>{t('events.refineBy')}</Text>
             <Radio
               icon={<OvalCoin size={14} color={colors.primary} />}
               selected={this.state.filter === Filter.hosting}
@@ -108,7 +108,7 @@ class Events extends React.PureComponent<Props, State> {
               onValueSelected={this.filterBy}
             />
           </View>
-          <Text style={[fonts.h5, standardStyles.elementalMarginBottom]}>
+          <Text style={[fonts.h6, standardStyles.elementalMarginBottom]}>
             {t('events.reppingCelo')}
           </Text>
           <Text style={fonts.p}>
