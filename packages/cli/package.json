@@ -32,7 +32,7 @@
   },
   "dependencies": {
     "@celo/contractkit": "0.2.8-dev",
-    "@celo/utils": "^0.1.0",
+    "@celo/utils": "^0.1.4",
     "@oclif/command": "^1",
     "@oclif/config": "^1",
     "@oclif/plugin-help": "^2",
