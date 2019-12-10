@@ -1,10 +1,10 @@
-/* globals artifacts, web3, beforeEach, it, */
 import { CeloContractName } from '@celo/protocol/lib/registry-utils'
 import {
   assertContainSubset,
   assertEqualBN,
   assertEqualDpBN,
   assertRevert,
+  jsonRpc,
   timeTravel,
 } from '@celo/protocol/lib/test-utils'
 import { fromFixed, toFixed } from '@celo/utils/lib/fixidity'
@@ -35,7 +35,7 @@ EpochRewards.numberFormat = 'BigNumber'
 const YEAR = new BigNumber(365 * 24 * 60 * 60)
 const SUPPLY_CAP = new BigNumber(web3.utils.toWei('1000000000'))
 
-const getExpectedTargetTotalSupply = (timeDelta: BigNumber) => {
+const getExpectedTargetTotalSupply = (timeDelta: BigNumber): BigNumber => {
   const genesisSupply = new BigNumber(web3.utils.toWei('600000000'))
   const linearRewards = new BigNumber(web3.utils.toWei('200000000'))
   return genesisSupply
@@ -69,10 +69,13 @@ contract('EpochRewards', (accounts: string[]) => {
   const mockStableTokenAddress = web3.utils.randomHex(20)
   const sortedOraclesDenominator = new BigNumber('0x10000000000000000')
   const timeTravelToDelta = async (timeDelta: BigNumber) => {
-    const currentTime = new BigNumber((await web3.eth.getBlock('latest')).timestamp)
-    const startTime = await epochRewards.startTime()
-    const desiredTime = startTime.plus(timeDelta)
-    await timeTravel(desiredTime.minus(currentTime).toNumber(), web3)
+    // mine beforehand, just in case
+    await jsonRpc(web3, 'evm_mine', [])
+    const currentTime: BigNumber = new BigNumber((await web3.eth.getBlock('latest')).timestamp)
+    const startTime: BigNumber = await epochRewards.startTime()
+    const desiredTime: BigNumber = startTime.plus(timeDelta)
+    const delta: number = desiredTime.minus(currentTime).toNumber()
+    await timeTravel(delta, web3)
   }
 
   beforeEach(async () => {
@@ -355,7 +358,7 @@ contract('EpochRewards', (accounts: string[]) => {
 
   describe('#getTargetGoldTotalSupply()', () => {
     describe('when it has been fewer than 15 years since genesis', () => {
-      const timeDelta = YEAR.times(10)
+      const timeDelta: BigNumber = YEAR.times(10)
       beforeEach(async () => {
         await timeTravelToDelta(timeDelta)
       })
