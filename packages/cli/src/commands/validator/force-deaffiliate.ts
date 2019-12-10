@@ -14,7 +14,7 @@ export default class ValidatorForceDeaffiliate extends BaseCommand {
   }
 
   static examples = [
-    'forcedeaffiliate --from 0x47e172f6cfb6c7d01c1574fa3e2be7cc73269d95 --validator 0xb7ef0985bdb4f19460A29d9829aA1514B181C4CD',
+    'force-deaffiliate --from 0x47e172f6cfb6c7d01c1574fa3e2be7cc73269d95 --validator 0xb7ef0985bdb4f19460A29d9829aA1514B181C4CD',
   ]
 
   async run() {
@@ -29,7 +29,7 @@ export default class ValidatorForceDeaffiliate extends BaseCommand {
       .runChecks()
 
     await displaySendTx(
-      'forcedeaffiliate',
+      'force-deaffiliate',
       validators.forceDeaffiliateIfValidator(res.flags.validator)
     )
   }
