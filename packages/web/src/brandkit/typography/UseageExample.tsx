@@ -11,7 +11,7 @@ export default withNamespaces(NameSpaces.brand)(
   React.memo(function UseageExamples({ t }: Props) {
     return (
       <View style={brandStyles.gap}>
-        <Text style={[fonts.h5a, standardStyles.elementalMarginBottom]}>
+        <Text style={[fonts.h5, standardStyles.elementalMarginBottom]}>
           {t('typography.examplesTitle')}
         </Text>
         <View style={[brandStyles.fullBorder, styles.box]}>
@@ -19,7 +19,7 @@ export default withNamespaces(NameSpaces.brand)(
           <H2 style={styles.bigMargin}>{t('typography.h2Example')}</H2>
           <H3 style={styles.bigMargin}>{t('typography.h3Example')}</H3>
           <H4 style={styles.bigMargin}>{t('typography.h4Example')}</H4>
-          <Text style={[fonts.h5a, styles.modestMargin]}>{t('typography.h5Example')}</Text>
+          <Text style={[fonts.h5, styles.modestMargin]}>{t('typography.h5Example')}</Text>
           <Text style={[fonts.p, styles.bigMargin]}>{t('typography.bodyExample')}</Text>
           <Text style={[fonts.h6, styles.modestMargin]}>{t('typography.h5Example')}</Text>
           <Text style={fonts.legal}>{t('typography.smallExample')}</Text>
