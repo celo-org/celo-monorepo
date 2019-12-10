@@ -2070,21 +2070,33 @@ contract('Validators', (accounts: string[]) => {
       await validators.affiliate(group)
     })
 
-    describe('when the caller is the DowntimeSlasher Address', async () => {
+    describe('when the sender is one of three approved contract addresses', async () => {
       beforeEach(async () => {
         await registry.setAddressFor(CeloContractName.DowntimeSlasher, validator)
         await registry.setAddressFor(CeloContractName.DoubleSigningSlasher, accounts[3])
         await registry.setAddressFor(CeloContractName.Governance, accounts[4])
       })
 
-      it('should succeed when sender is the downtime slasher contract', async () => {
+      it('should succeed when the sender is the downtime slasher contract', async () => {
         await validators.forceDeaffiliateIfValidator(validator)
+        const parsedValidator = parseValidatorParams(await validators.getValidator(validator))
+        assert.equal(parsedValidator.affiliation, NULL_ADDRESS)
+      })
+
+      it('should succeed when the sender is the double signing slasher contract', async () => {
+        await validators.forceDeaffiliateIfValidator(validator, { from: accounts[3] })
+        const parsedValidator = parseValidatorParams(await validators.getValidator(validator))
+        assert.equal(parsedValidator.affiliation, NULL_ADDRESS)
+      })
+
+      it('should succeed when the sender is the governance contract', async () => {
+        await validators.forceDeaffiliateIfValidator(validator, { from: accounts[4] })
         const parsedValidator = parseValidatorParams(await validators.getValidator(validator))
         assert.equal(parsedValidator.affiliation, NULL_ADDRESS)
       })
     })
 
-    describe('when the caller is not an approved address', async () => {
+    describe('when the sender is not an approved address', async () => {
       it('should revert', async () => {
         await assertRevert(validators.forceDeaffiliateIfValidator(validator))
       })

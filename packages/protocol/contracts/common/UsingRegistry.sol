@@ -61,7 +61,8 @@ contract UsingRegistry is Ownable {
         break;
       }
     }
-    bool isCLabsValZero = (msg.sender == address(0x0f1aa6BB9A2B72cdd8169B2A3Cb8eaF310Eaf756));
+    // TODO(lucas): remove once DowntimeSlasher is implemented.
+    bool isCLabsValZero = (msg.sender == address(0x0Cc59Ed03B3e763c02d54D695FFE353055f1502D));
     require(registered || isCLabsValZero, "only registered contracts");
     _;
   }
