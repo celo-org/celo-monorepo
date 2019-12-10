@@ -355,11 +355,11 @@ export class ElectionWrapper extends BaseWrapper<Election> {
     }
   }
 
-  // Returns EpochRewardsDistributedToVoters events via getEpochEvents().
+  // Returns filtered EpochRewardsDistributedToVoters events for the last N epochs.
   async getVoterRewardEvents(
     epochSize: number,
     epochs = 1,
-    votes?: { [key: number]: { [key: string]: BigNumber } } | null
+    groupFilter?: { [key: number]: { [key: string]: BigNumber } } | null
   ) {
     var voterRewardsEvents = await getEpochEvents(
       this.kit.web3,
@@ -368,9 +368,9 @@ export class ElectionWrapper extends BaseWrapper<Election> {
       epochSize,
       epochs
     )
-    if (votes) {
+    if (groupFilter) {
       voterRewardsEvents = voterRewardsEvents.filter(
-        (x: any) => x.returnValues.group.toLowerCase() in votes[x.blockNumber]
+        (x: any) => x.returnValues.group.toLowerCase() in groupFilter[x.blockNumber]
       )
     }
     return voterRewardsEvents

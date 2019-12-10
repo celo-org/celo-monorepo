@@ -436,8 +436,8 @@ export class ValidatorsWrapper extends BaseWrapper<Validators> {
     )
   }
 
-  // Returns ValidatorEpochPaymentDistributed events via getEpochEvents().
-  async getValidatorRewardEvents(epochSize: number, epochs = 1, address?: string) {
+  // Returns filtered alidatorEpochPaymentDistributed events for the last N epochs.
+  async getValidatorRewardEvents(epochSize: number, epochs = 1, addressFilter?: string) {
     var validatorRewardsEvents = await getEpochEvents(
       this.kit.web3,
       await this.kit._web3Contracts.getValidators(),
@@ -445,18 +445,18 @@ export class ValidatorsWrapper extends BaseWrapper<Validators> {
       epochSize,
       epochs
     )
-    if (address) {
-      const lowerAddress = address.toLowerCase()
+    if (addressFilter) {
+      const lowerAddressFilter = addressFilter.toLowerCase()
       validatorRewardsEvents = validatorRewardsEvents.filter(
         (x: any) =>
-          x.returnValues.validator.toLowerCase() == lowerAddress ||
-          x.returnValues.group.toLowerCase() == lowerAddress
+          x.returnValues.validator.toLowerCase() == lowerAddressFilter ||
+          x.returnValues.group.toLowerCase() == lowerAddressFilter
       )
     }
     return validatorRewardsEvents
   }
 
-  // Returns map of Validator objects via Promise.all().
+  // Returns map from Validator address to Validator.
   async getUniqueValidators(
     listWithValidators: any,
     getValidatorAddress: any,
@@ -472,7 +472,7 @@ export class ValidatorsWrapper extends BaseWrapper<Validators> {
     return uniqueValidators
   }
 
-  // Returns map of ValidatorGroup objects via Promise.all().
+  // Returns map from ValidatorGroup address to ValidatorGroup.
   async getUniqueValidatorGroups(listWithValidatorGroups: any, getValidatorGroupAddress: any) {
     const uniqueValidatorGroups: { [key: string]: any } = {}
     for (const validatorGroup of listWithValidatorGroups) {

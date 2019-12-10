@@ -48,7 +48,7 @@ export default class Show extends BaseCommand {
           const votes: { [key: string]: BigNumber } = {}
           voter.votes.forEach(function(x) {
             const group: string = x.group.toLowerCase()
-            votes[group] = (votes[group] || new BigNumber(0)).plus(x.pending)
+            votes[group] = (votes[group] || new BigNumber(0)).plus(x.active)
           })
           return votes
         },
@@ -57,7 +57,7 @@ export default class Show extends BaseCommand {
       )
     }
 
-    // voterRewards applies to address when voterReward.group in addressVotes.
+    // voterRewards applies to address when voterReward.group in addressVotes[voterReward.blockNumber].
     const voterRewards = await election.getVoterRewardEvents(
       epochSize,
       res.flags.epochs,
@@ -84,6 +84,7 @@ export default class Show extends BaseCommand {
       res.flags.epochs
     )
 
+    // For correctness use the Validator Group name at each epoch?
     const validatorGroupDetails = await validators.getUniqueValidatorGroups(
       voterRewards,
       (x: any) => x.returnValues.group.toLowerCase()
