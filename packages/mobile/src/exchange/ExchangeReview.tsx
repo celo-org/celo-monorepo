@@ -71,7 +71,7 @@ class ExchangeReview extends React.Component<Props, State> {
   state: State = {
     makerToken: CURRENCY_ENUM.GOLD,
     inputToken: CURRENCY_ENUM.GOLD,
-    inputTokenCode: 'gold',
+    inputTokenCode: this.props.t('global:gold'),
     inputAmount: new BigNumber(0),
   }
 
@@ -91,7 +91,7 @@ class ExchangeReview extends React.Component<Props, State> {
       'exchangeInput'
     )
     if (!makerToken || !inputAmount || !inputToken || !inputTokenCode) {
-      throw new Error('Maker token or maker token balance missing from nav props')
+      throw new Error('Missing exchange input from nav props')
     }
     this.setState({
       makerToken,
@@ -126,7 +126,7 @@ class ExchangeReview extends React.Component<Props, State> {
     this.getExchangePropertiesFromNavProps()
   }
 
-  getAmountInToken(token: CURRENCY_ENUM) {
+  getInputAmountInToken(token: CURRENCY_ENUM) {
     let amount = this.state.inputAmount
     if (this.state.inputToken !== token) {
       const conversionRate = getRateForMakerToken(
@@ -147,7 +147,7 @@ class ExchangeReview extends React.Component<Props, State> {
       this.state.makerToken,
       CURRENCY_ENUM.DOLLAR
     )
-    const dollarAmount = this.getAmountInToken(CURRENCY_ENUM.DOLLAR)
+    const dollarAmount = this.getInputAmountInToken(CURRENCY_ENUM.DOLLAR)
 
     const buttonText =
       this.state.makerToken === CURRENCY_ENUM.DOLLAR
@@ -211,7 +211,7 @@ class ExchangeReview extends React.Component<Props, State> {
               buttonText +
               ' ' +
               getMoneyDisplayValue(
-                this.getAmountInToken(CURRENCY_ENUM.GOLD),
+                this.getInputAmountInToken(CURRENCY_ENUM.GOLD),
                 CURRENCY_ENUM.GOLD,
                 false,
                 3
