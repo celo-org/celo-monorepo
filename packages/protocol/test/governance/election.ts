@@ -375,10 +375,10 @@ contract('Election', (accounts: string[]) => {
               })
 
               describe('when the voter has already voted for this group', () => {
-                let resp: any
+                let response: any
                 beforeEach(async () => {
                   await mockLockedGold.incrementNonvotingAccountBalance(voter, value)
-                  resp = await election.vote(group, value, NULL_ADDRESS, NULL_ADDRESS)
+                  response = await election.vote(group, value, NULL_ADDRESS, NULL_ADDRESS)
                 })
 
                 it('should not change the list of groups the account has voted for', async () => {
@@ -416,8 +416,8 @@ contract('Election', (accounts: string[]) => {
                 })
 
                 it('should emit the ValidatorGroupVoteCast event', async () => {
-                  assert.equal(resp.logs.length, 1)
-                  const log = resp.logs[0]
+                  assert.equal(response.logs.length, 1)
+                  const log = response.logs[0]
                   assertContainSubset(log, {
                     event: 'ValidatorGroupVoteCast',
                     args: {

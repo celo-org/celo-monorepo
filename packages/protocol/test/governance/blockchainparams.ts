@@ -1,6 +1,6 @@
-import { assertContainSubset, assertRevert, assertEqualBN } from '@celo/protocol/lib/test-utils'
-import { BlockchainParametersContract, BlockchainParametersInstance } from 'types'
+import { assertContainSubset, assertEqualBN, assertRevert } from '@celo/protocol/lib/test-utils'
 import { BigNumber } from 'bignumber.js'
+import { BlockchainParametersContract, BlockchainParametersInstance } from 'types'
 
 const BlockchainParameters: BlockchainParametersContract = artifacts.require('BlockchainParameters')
 

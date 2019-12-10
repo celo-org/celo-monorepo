@@ -136,7 +136,7 @@ contract('Attestations', (accounts: string[]) => {
     const mockValidators = await MockValidators.new()
     attestations = await Attestations.new()
     random = await Random.new()
-    random.addTestRandomness(0, '0x00')
+    await random.addTestRandomness(0, '0x00')
     mockLockedGold = await MockLockedGold.new()
     registry = await Registry.new()
     await accountsInstance.initialize(registry.address)
@@ -554,12 +554,12 @@ contract('Attestations', (accounts: string[]) => {
     })
 
     it('should increment the number of completed verification requests', async () => {
-      let [numCompleted, numTotal] = await attestations.getAttestationStats(phoneHash, caller)
+      const [numCompleted] = await attestations.getAttestationStats(phoneHash, caller)
       assert.equal(numCompleted.toNumber(), 0)
 
       await attestations.complete(phoneHash, v, r, s)
-      ;[numCompleted, numTotal] = await attestations.getAttestationStats(phoneHash, caller)
-      assert.equal(numCompleted.toNumber(), 1)
+      const [numCompleted2, numTotal] = await attestations.getAttestationStats(phoneHash, caller)
+      assert.equal(numCompleted2.toNumber(), 1)
       assert.equal(numTotal.toNumber(), attestationsRequested)
     })
 
