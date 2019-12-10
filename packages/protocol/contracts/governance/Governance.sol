@@ -856,8 +856,8 @@ contract Governance is
     uint256 tally = 0;
     uint256 n = numberValidatorsInCurrentSet();
     for (uint256 idx = 0; idx < n; idx++) {
-      address validator = validatorAddressFromCurrentSet(idx);
-      if (hotfixes[hash].whitelisted[validator]) {
+      address validatorSigner = validatorSignerAddressFromCurrentSet(idx);
+      if (hotfixes[hash].whitelisted[validatorSigner]) {
         tally = tally.add(1);
       }
     }

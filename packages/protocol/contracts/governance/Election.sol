@@ -814,7 +814,7 @@ contract Election is
     uint256 n = numberValidatorsInCurrentSet();
     address[] memory res = new address[](n);
     for (uint256 idx = 0; idx < n; idx++) {
-      res[idx] = validatorAddressFromCurrentSet(idx);
+      res[idx] = validatorSignerAddressFromCurrentSet(idx);
     }
     return res;
   }
