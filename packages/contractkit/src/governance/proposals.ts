@@ -80,7 +80,7 @@ export class ProposalBuilder {
       if (!method) {
         throw new Error(`Method ${methodName} not found on ${tx.contract}`)
       }
-      const txo = method(tx.args)
+      const txo = method(...tx.args)
       if (!txo) {
         throw new Error(`Arguments ${tx.args} did not match ${methodName} signature`)
       }
