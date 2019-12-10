@@ -6,33 +6,37 @@ import { CUSD } from './consts'
 
 // Firebase stored exchange rate
 interface ExchangeRateObject {
-  pair: string
   exchangeRate: string
   timestamp: number // timestamp in milliseconds
 }
 
 // Binary search in sorted array
-function findClosestIndex(arr: number[], target: number) {
-  if (target < arr[0]) {
-    return 0
-  }
-  if (target > arr[arr.length - 1]) {
-    return arr.length - 1
-  }
-
+function findClosestRate(
+  rates: ExchangeRateObject[],
+  timestamp: number
+): ExchangeRateObject | undefined {
   let lo = 0
-  let hi = arr.length - 1
+  let hi = rates.length - 1
   while (lo <= hi) {
     const mid = Math.floor((lo + hi) / 2)
-    if (target < arr[mid]) {
+    const rate = rates[mid]
+    if (timestamp < rate.timestamp) {
       hi = mid - 1
-    } else if (target > arr[mid]) {
+    } else if (timestamp > rate.timestamp) {
       lo = mid + 1
     } else {
-      return mid
+      return rate
     }
   }
-  return arr[lo] - target < target - arr[hi] ? lo : hi
+
+  // At this point lo = hi + 1
+  const loRate = rates[lo]
+  const hiRate = rates[hi]
+  if (!loRate || !hiRate) {
+    return loRate || hiRate
+  }
+
+  return loRate.timestamp - timestamp < timestamp - hiRate.timestamp ? loRate : hiRate
 }
 
 export default class GoldExchangeRateAPI<TContext = any> extends DataSource {
@@ -53,24 +57,19 @@ export default class GoldExchangeRateAPI<TContext = any> extends DataSource {
   }: CurrencyConversionArgs): Promise<BigNumber> {
     const date = timestamp ? new Date(timestamp) : new Date()
 
-    const filterPair = `${sourceCurrencyCode || CUSD}/${currencyCode}`
+    const pair = `${sourceCurrencyCode || CUSD}/${currencyCode}`
 
-    const ref = database.ref('exchangeRates')
+    const ref = database.ref(`exchangeRates/${pair}`)
     const snapshot = await ref
       .orderByChild('timestamp')
       .startAt(date.getTime() - 30 * 60 * 1000)
       .endAt(date.getTime() + 30 * 60 * 1000)
       .once('value')
 
-    const rates: ExchangeRateObject[] = Object.values(snapshot.val())
-    const filteredRates = rates.filter((item) => item.pair === filterPair)
-    const closestIndex = findClosestIndex(
-      filteredRates.map((item) => item.timestamp),
-      date.getTime()
-    )
-    const closestItem = filteredRates[closestIndex]
+    const rates: ExchangeRateObject[] = Object.values(snapshot.val() || {})
+    const closestItem = findClosestRate(rates, date.getTime())
     if (!closestItem) {
-      throw new Error(`No matching data for ${filterPair}`)
+      throw new Error(`No matching data for ${pair}`)
     }
 
     return new BigNumber(closestItem.exchangeRate)

@@ -34,7 +34,11 @@
     "exchangeRates": {
       ".read": false,
       ".write": false,
-      ".indexOn": ["timestamp"]
+      "$from": {
+        "$to": {
+          ".indexOn": ["timestamp"]
+        }
+      }
     }
   }
 }
