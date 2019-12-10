@@ -13,11 +13,9 @@ exports[`NotificationList renders correctly 1`] = `
     <View>
       <View
         style={
-          Array [
-            Object {
-              "margin": 16,
-            },
-          ]
+          Object {
+            "margin": 16,
+          }
         }
       >
         <Text>

@@ -29,7 +29,7 @@ interface OwnProps {
 
 type Props = OwnProps & WithNamespaces
 
-const avatarSize = 40
+const AVATAR_SIZE = 40
 
 export class IncomingPaymentRequestListItem extends React.Component<Props> {
   onPay = () => {
@@ -81,7 +81,7 @@ export class IncomingPaymentRequestListItem extends React.Component<Props> {
         <BaseNotification
           icon={
             <ContactCircle
-              size={avatarSize}
+              size={AVATAR_SIZE}
               address={requester.address}
               name={requester.displayName}
               thumbnailPath={getRecipientThumbnail(requester)}
@@ -109,8 +109,8 @@ const styles = StyleSheet.create({
     marginBottom: 16,
   },
   unknownUser: {
-    height: avatarSize,
-    width: avatarSize,
+    height: AVATAR_SIZE,
+    width: AVATAR_SIZE,
     justifyContent: 'center',
     alignItems: 'center',
   },

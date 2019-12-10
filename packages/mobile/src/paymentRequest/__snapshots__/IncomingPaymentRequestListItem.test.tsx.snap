@@ -51,7 +51,6 @@ exports[`IncomingPaymentRequestListItem renders correctly 1`] = `
       style={
         Object {
           "alignItems": "center",
-          "flexDirection": "column",
           "paddingRight": 16,
         }
       }
@@ -133,14 +132,12 @@ exports[`IncomingPaymentRequestListItem renders correctly 1`] = `
       >
         <Text
           style={
-            Array [
-              Object {
-                "color": "#2E3338",
-                "fontFamily": "Hind-Regular",
-                "fontSize": 14,
-                "lineHeight": 18,
-              },
-            ]
+            Object {
+              "color": "#2E3338",
+              "fontFamily": "Hind-Regular",
+              "fontSize": 14,
+              "lineHeight": 18,
+            }
           }
         >
           Hey thanks for the loan, Ill pay you back ASAP. LOVE YOU

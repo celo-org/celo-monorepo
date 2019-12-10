@@ -43,11 +43,9 @@ exports[`OutgoingPaymentRequestListScreen renders correctly with requests 1`] = 
     <View>
       <View
         style={
-          Array [
-            Object {
-              "margin": 16,
-            },
-          ]
+          Object {
+            "margin": 16,
+          }
         }
       >
         <View>
@@ -86,7 +84,6 @@ exports[`OutgoingPaymentRequestListScreen renders correctly with requests 1`] = 
                   style={
                     Object {
                       "alignItems": "center",
-                      "flexDirection": "column",
                       "paddingRight": 16,
                     }
                   }
@@ -168,14 +165,12 @@ exports[`OutgoingPaymentRequestListScreen renders correctly with requests 1`] = 
                   >
                     <Text
                       style={
-                        Array [
-                          Object {
-                            "color": "#2E3338",
-                            "fontFamily": "Hind-Regular",
-                            "fontSize": 14,
-                            "lineHeight": 18,
-                          },
-                        ]
+                        Object {
+                          "color": "#2E3338",
+                          "fontFamily": "Hind-Regular",
+                          "fontSize": 14,
+                          "lineHeight": 18,
+                        }
                       }
                     >
                       Just the best
@@ -303,7 +298,6 @@ exports[`OutgoingPaymentRequestListScreen renders correctly with requests 1`] = 
                   style={
                     Object {
                       "alignItems": "center",
-                      "flexDirection": "column",
                       "paddingRight": 16,
                     }
                   }
@@ -385,14 +379,12 @@ exports[`OutgoingPaymentRequestListScreen renders correctly with requests 1`] = 
                   >
                     <Text
                       style={
-                        Array [
-                          Object {
-                            "color": "#2E3338",
-                            "fontFamily": "Hind-Regular",
-                            "fontSize": 14,
-                            "lineHeight": 18,
-                          },
-                        ]
+                        Object {
+                          "color": "#2E3338",
+                          "fontFamily": "Hind-Regular",
+                          "fontSize": 14,
+                          "lineHeight": 18,
+                        }
                       }
                     >
                       Just the best for the best. Thanos & Zeus Gods of ultimate Power
@@ -520,7 +512,6 @@ exports[`OutgoingPaymentRequestListScreen renders correctly with requests 1`] = 
                   style={
                     Object {
                       "alignItems": "center",
-                      "flexDirection": "column",
                       "paddingRight": 16,
                     }
                   }
@@ -602,14 +593,12 @@ exports[`OutgoingPaymentRequestListScreen renders correctly with requests 1`] = 
                   >
                     <Text
                       style={
-                        Array [
-                          Object {
-                            "color": "#2E3338",
-                            "fontFamily": "Hind-Regular",
-                            "fontSize": 14,
-                            "lineHeight": 18,
-                          },
-                        ]
+                        Object {
+                          "color": "#2E3338",
+                          "fontFamily": "Hind-Regular",
+                          "fontSize": 14,
+                          "lineHeight": 18,
+                        }
                       }
                     >
                       Just the best but less

@@ -126,19 +126,17 @@ exports[`NotificationBox renders correctly for with all notifications 1`] = `
                     >
                       <Text
                         style={
-                          Array [
-                            Object {
-                              "color": "#81868B",
-                              "fontFamily": "Hind-Regular",
-                              "fontSize": 14,
-                              "lineHeight": 20,
-                            },
-                          ]
+                          Object {
+                            "color": "#81868B",
+                            "fontFamily": "Hind-Regular",
+                            "fontSize": 14,
+                            "lineHeight": 20,
+                          }
                         }
                       >
                         +14155550000
                          
-                        global:for
+                        for
                       </Text>
                       <Text
                         style={
@@ -169,19 +167,17 @@ exports[`NotificationBox renders correctly for with all notifications 1`] = `
                     >
                       <Text
                         style={
-                          Array [
-                            Object {
-                              "color": "#81868B",
-                              "fontFamily": "Hind-Regular",
-                              "fontSize": 14,
-                              "lineHeight": 20,
-                            },
-                          ]
+                          Object {
+                            "color": "#81868B",
+                            "fontFamily": "Hind-Regular",
+                            "fontSize": 14,
+                            "lineHeight": 20,
+                          }
                         }
                       >
                         +14155550000
                          
-                        global:for
+                        for
                       </Text>
                       <Text
                         style={
@@ -289,7 +285,6 @@ exports[`NotificationBox renders correctly for with all notifications 1`] = `
               style={
                 Object {
                   "alignItems": "center",
-                  "flexDirection": "column",
                   "paddingRight": 16,
                 }
               }
@@ -444,7 +439,6 @@ exports[`NotificationBox renders correctly for with all notifications 1`] = `
               style={
                 Object {
                   "alignItems": "center",
-                  "flexDirection": "column",
                   "paddingRight": 16,
                 }
               }
@@ -635,7 +629,6 @@ exports[`NotificationBox renders correctly for with all notifications 1`] = `
               style={
                 Object {
                   "alignItems": "center",
-                  "flexDirection": "column",
                   "paddingRight": 16,
                 }
               }
@@ -826,7 +819,6 @@ exports[`NotificationBox renders correctly for with all notifications 1`] = `
               style={
                 Object {
                   "alignItems": "center",
-                  "flexDirection": "column",
                   "paddingRight": 16,
                 }
               }

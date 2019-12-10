@@ -115,7 +115,7 @@ exports[`EscrowedPaymentReminderSummaryNotification renders correctly 1`] = `
               >
                 +491522345678
                  
-                global:for
+                for
               </Text>
               <Text
                 style={
@@ -160,7 +160,7 @@ exports[`EscrowedPaymentReminderSummaryNotification renders correctly 1`] = `
               >
                 +491522345678
                  
-                global:for
+                for
               </Text>
               <Text
                 style={
@@ -272,7 +272,6 @@ exports[`EscrowedPaymentReminderSummaryNotification when more 1 requests renders
           style={
             Object {
               "alignItems": "center",
-              "flexDirection": "column",
               "paddingRight": 16,
             }
           }
@@ -323,14 +322,12 @@ exports[`EscrowedPaymentReminderSummaryNotification when more 1 requests renders
           >
             <Text
               style={
-                Array [
-                  Object {
-                    "color": "#2E3338",
-                    "fontFamily": "Hind-Regular",
-                    "fontSize": 14,
-                    "lineHeight": 18,
-                  },
-                ]
+                Object {
+                  "color": "#2E3338",
+                  "fontFamily": "Hind-Regular",
+                  "fontSize": 14,
+                  "lineHeight": 18,
+                }
               }
             >
               test message
@@ -539,7 +536,7 @@ exports[`EscrowedPaymentReminderSummaryNotification when more than 2 requests re
               >
                 +491522345678
                  
-                global:for
+                for
               </Text>
               <Text
                 style={
@@ -584,7 +581,7 @@ exports[`EscrowedPaymentReminderSummaryNotification when more than 2 requests re
               >
                 +491522345678
                  
-                global:for
+                for
               </Text>
               <Text
                 style={

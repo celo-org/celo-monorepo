@@ -29,7 +29,6 @@ exports[`SimpleNotification renders correctly 1`] = `
       style={
         Object {
           "alignItems": "center",
-          "flexDirection": "column",
           "paddingRight": 16,
         }
       }

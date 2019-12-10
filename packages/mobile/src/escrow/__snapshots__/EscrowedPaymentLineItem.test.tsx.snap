@@ -24,7 +24,7 @@ exports[`renders correctly 1`] = `
   >
     +491522345678
      
-    global:for
+    for
   </Text>
   <Text
     style={
