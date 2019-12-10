@@ -1,11 +1,11 @@
-import { cli } from 'cli-ux'
-import { Flags } from '../../utils/command'
+import { mapEachEpochAsync } from '@celo/contractkit/lib/utils/web3-utils'
 import { flags } from '@oclif/command'
+import BigNumber from 'bignumber.js'
+import { cli } from 'cli-ux'
 import { BaseCommand } from '../../base'
 import { newCheckBuilder } from '../../utils/checks'
 import { printValueMapRecursive } from '../../utils/cli'
-import { mapEachEpochAsync } from '@celo/contractkit/lib/utils/web3-utils'
-import BigNumber from 'bignumber.js'
+import { Flags } from '../../utils/command'
 
 export default class Show extends BaseCommand {
   static description = 'Show rewards.'
@@ -46,7 +46,7 @@ export default class Show extends BaseCommand {
           printValueMapRecursive(voter)
 
           const votes: { [key: string]: BigNumber } = {}
-          voter.votes.forEach(function(x) {
+          voter.votes.forEach((x) => {
             const group: string = x.group.toLowerCase()
             votes[group] = (votes[group] || new BigNumber(0)).plus(x.active)
           })

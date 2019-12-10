@@ -116,7 +116,7 @@ export class ElectionWrapper extends BaseWrapper<Election> {
     group: Address,
     blockNumber?: number
   ): Promise<GroupVote> {
-    var pending
+    let pending
     if (blockNumber) {
       const contract = await this.kit._web3Contracts.getElection()
       pending = await contract.methods
@@ -127,7 +127,7 @@ export class ElectionWrapper extends BaseWrapper<Election> {
       pending = await this.contract.methods.getPendingVotesForGroupByAccount(group, account).call()
     }
 
-    var active
+    let active
     if (blockNumber) {
       const contract = await this.kit._web3Contracts.getElection()
       active = await contract.methods
@@ -146,7 +146,7 @@ export class ElectionWrapper extends BaseWrapper<Election> {
   }
 
   async getVoter(account: Address, blockNumber?: number): Promise<Voter> {
-    var groups: string[]
+    let groups: string[]
     if (blockNumber) {
       const contract = await this.kit._web3Contracts.getElection()
       // @ts-ignore: Expected 0-1 arguments, but got 2
@@ -361,7 +361,7 @@ export class ElectionWrapper extends BaseWrapper<Election> {
     epochs = 1,
     groupFilter?: { [key: number]: { [key: string]: BigNumber } } | null
   ) {
-    var voterRewardsEvents = await getEpochEvents(
+    let voterRewardsEvents = await getEpochEvents(
       this.kit.web3,
       await this.kit._web3Contracts.getElection(),
       'EpochRewardsDistributedToVoters',

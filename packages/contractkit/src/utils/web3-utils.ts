@@ -44,10 +44,11 @@ export async function forEachEpochAsync(web3: Web3, callback: any, epochSize: nu
   const currentBlock = await web3.eth.getBlockNumber()
   const lastEpochBlock = Math.floor(currentBlock / epochSize) * epochSize
   const fromBlock: number = lastEpochBlock - epochSize * (epochs - 1)
-  var results = []
-  for (var blockNumber = fromBlock; blockNumber <= lastEpochBlock; blockNumber += epochSize)
+  const results = []
+  for (let blockNumber = fromBlock; blockNumber <= lastEpochBlock; blockNumber += epochSize) {
     results.push(callback(blockNumber))
-  return await Promise.all(results)
+  }
+  return Promise.all(results)
 }
 
 // Returns map from block number to await callback(blockNumber) for the last N epochs.
@@ -55,14 +56,16 @@ export async function mapEachEpochAsync(web3: Web3, callback: any, epochSize: nu
   const currentBlock = await web3.eth.getBlockNumber()
   const lastEpochBlock = Math.floor(currentBlock / epochSize) * epochSize
   const fromBlock: number = lastEpochBlock - epochSize * (epochs - 1)
-  var promises = []
-  for (var blockNumber = fromBlock; blockNumber <= lastEpochBlock; blockNumber += epochSize)
+  const promises = []
+  for (let blockNumber = fromBlock; blockNumber <= lastEpochBlock; blockNumber += epochSize) {
     promises.push(callback(blockNumber))
+  }
   const results = await Promise.all(promises)
 
-  var index = 0
+  let index = 0
   const dict: { [key: number]: any } = {}
-  for (var blockNumber = fromBlock; blockNumber <= lastEpochBlock; blockNumber += epochSize)
+  for (let blockNumber = fromBlock; blockNumber <= lastEpochBlock; blockNumber += epochSize) {
     dict[blockNumber] = results[index++]
+  }
   return dict
 }

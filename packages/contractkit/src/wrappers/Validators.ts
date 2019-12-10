@@ -4,8 +4,8 @@ import { fromFixed, toFixed } from '@celo/utils/lib/fixidity'
 import BigNumber from 'bignumber.js'
 import { Address, NULL_ADDRESS } from '../base'
 import { Validators } from '../generated/types/Validators'
-import { getEpochEvents } from '../utils/web3-utils'
 import { promisedProperties } from '../utils/async-utils'
+import { getEpochEvents } from '../utils/web3-utils'
 import {
   BaseWrapper,
   CeloTransactionObject,
@@ -203,7 +203,7 @@ export class ValidatorsWrapper extends BaseWrapper<Validators> {
 
   /** Get Validator information */
   async getValidator(address: Address, blockNumber?: number): Promise<Validator> {
-    var res
+    let res
     if (blockNumber) {
       const contract = await this.kit._web3Contracts.getValidators()
       // @ts-ignore: Expected 0-1 arguments, but got 2
@@ -212,7 +212,7 @@ export class ValidatorsWrapper extends BaseWrapper<Validators> {
       res = await this.contract.methods.getValidator(address).call()
     }
 
-    var name
+    let name
     if (blockNumber) {
       const accounts = await this.kit._web3Contracts.getAccounts()
       // @ts-ignore: Expected 0-1 arguments, but got 2
@@ -437,9 +437,9 @@ export class ValidatorsWrapper extends BaseWrapper<Validators> {
     )
   }
 
-  // Returns filtered alidatorEpochPaymentDistributed events for the last N epochs.
+  // Returns filtered ValidatorEpochPaymentDistributed events for the last N epochs.
   async getValidatorRewardEvents(epochSize: number, epochs = 1, addressFilter?: string) {
-    var validatorRewardsEvents = await getEpochEvents(
+    let validatorRewardsEvents = await getEpochEvents(
       this.kit.web3,
       await this.kit._web3Contracts.getValidators(),
       'ValidatorEpochPaymentDistributed',
@@ -450,8 +450,8 @@ export class ValidatorsWrapper extends BaseWrapper<Validators> {
       const lowerAddressFilter = addressFilter.toLowerCase()
       validatorRewardsEvents = validatorRewardsEvents.filter(
         (x: any) =>
-          x.returnValues.validator.toLowerCase() == lowerAddressFilter ||
-          x.returnValues.group.toLowerCase() == lowerAddressFilter
+          x.returnValues.validator.toLowerCase() === lowerAddressFilter ||
+          x.returnValues.group.toLowerCase() === lowerAddressFilter
       )
     }
     return validatorRewardsEvents
@@ -466,10 +466,11 @@ export class ValidatorsWrapper extends BaseWrapper<Validators> {
     const uniqueValidators: { [key: string]: any } = {}
     for (const validator of listWithValidators) {
       const validatorAddress = getValidatorAddress(validator)
-      if (!(validatorAddress in uniqueValidators))
+      if (!(validatorAddress in uniqueValidators)) {
         uniqueValidators[validatorAddress] = this.getValidator(validatorAddress, blockNumber)
+      }
     }
-    return await promisedProperties(uniqueValidators)
+    return promisedProperties(uniqueValidators)
   }
 
   // Returns map from ValidatorGroup address to ValidatorGroup.
@@ -477,9 +478,10 @@ export class ValidatorsWrapper extends BaseWrapper<Validators> {
     const uniqueValidatorGroups: { [key: string]: any } = {}
     for (const validatorGroup of listWithValidatorGroups) {
       const validatorGroupAddress = getValidatorGroupAddress(validatorGroup)
-      if (!(validatorGroupAddress in uniqueValidatorGroups))
+      if (!(validatorGroupAddress in uniqueValidatorGroups)) {
         uniqueValidatorGroups[validatorGroupAddress] = this.getValidatorGroup(validatorGroupAddress)
+      }
     }
-    return await promisedProperties(uniqueValidatorGroups)
+    return promisedProperties(uniqueValidatorGroups)
   }
 }
