@@ -59,7 +59,7 @@ export const verifyAccountClaim = async (
 
   const accountClaims = metadata.filterClaims(ClaimTypes.ACCOUNT)
 
-  if (accountClaims.find((x) => x.address === address) === undefined) {
+  if (accountClaims.find((x) => x.address.toLowerCase() === address.toLowerCase()) === undefined) {
     return `${claim.address} did not claim ${address}`
   }
 
