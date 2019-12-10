@@ -70,13 +70,13 @@ export const handler = async (argv: ValidatorsExecArgv) => {
   const instanceNames = []
   if (argv.only === null) {
     const nodeCount = getNodeCount(argv.nodeType)
-    console.log(`Node Count: ${nodeCount}`)
+    console.info(`Node Count: ${nodeCount}`)
     for (let i = 0; i < nodeCount; i++) {
       const instanceName = await getNodeVmName(argv.celoEnv, argv.nodeType, i)
       instanceNames.push(instanceName)
     }
   } else {
-    console.log(`Only Index: ${argv.only}`)
+    console.info(`Only Index: ${argv.only}`)
     const instanceName = await getNodeVmName(argv.celoEnv, argv.nodeType, argv.only)
     instanceNames.push(instanceName)
   }
