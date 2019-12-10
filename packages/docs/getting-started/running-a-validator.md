@@ -119,6 +119,7 @@ export NETWORK_ID=12219
 
 ### Pull the Celo Docker image
 
+<a name="pull-image"></a>
 In all the commands we are going to see the `CELO_IMAGE` variable to refer to the right Docker image to use. Now we can get the Docker image:
 
 ```bash
@@ -145,6 +146,7 @@ export CELO_VALIDATOR_GROUP_ADDRESS=<YOUR-VALIDATOR-GROUP-ADDRESS>
 export CELO_VALIDATOR_ADDRESS=<YOUR-VALIDATOR-ADDRESS>
 ```
 
+<a name="starting-celo-accounts"></a>
 Next, we'll run a node on your local machine so that we can use these accounts to lock Celo Gold and authorize the keys needed to run your validator. To do this, we need to run the following commands, which fetch the genesis block and a list of other nodes in the network to connect to.
 
 ```bash
@@ -217,6 +219,7 @@ We'll get back to this machine later, but for now, let's give it a proxy.
 
 ### Deploy a proxy
 
+<a name="starting-celo-proxy"></a>
 To avoid exposing the validator to the public internet, we are deploying a proxy node which is responsible to communicate with the network. On our Proxy machine, we'll setup the node as per usual now:
 
 ```bash
@@ -241,6 +244,8 @@ docker run --name celo-proxy -it --restart always -p 30303:30303 -p 30303:30303/
 
 Once the proxy is running, we will need to retrieve its enode and IP address so that the validator will be able to connect to it.
 
+<a name="getting-proxy-info"></a>
+
 ```bash
 # On the proxy machine, retrieve the proxy enode
 echo $(docker exec celo-proxy geth --exec "admin.nodeInfo['enode'].split('//')[1].split('@')[0]" attach | tr -d '"')
@@ -258,6 +263,8 @@ Let's connect the validator to the proxy:
 
 ### Connect the Validator to the Proxy
 
+<a name="deploy_validator"></a>
+
 When starting up your validator, it will attempt to create a network connection between the validator machine and the proxy machine. You will need make sure that your proxy machine has the appropriate firewall settings to allow the validator to connect to it.
 
 Specifically, on the proxy machine, port 30303 should allow TCP and UDP connections from all IP addresses. And port 30503 should allow TCP connections from the IP address of your validator machine.
@@ -274,10 +281,11 @@ The `mine` flag does not mean the node starts mining blocks, but rather starts t
 
 The `networkid` parameter value of `12219` indicates we are connecting to the Baklava network, Stake Off Phase 1.
 
-Note that if you are running the validator and the proxy on the same machine, then you should set the validator's listening port to something other than `30303`.  E.g. you could use the flag `--port 30313` and set the docker port forwarding rules accordingly (e.g. use the flags `-p 30313:30313` and `-p 30313:30313/udp`).
+Note that if you are running the validator and the proxy on the same machine, then you should set the validator's listening port to something other than `30303`. E.g. you could use the flag `--port 30313` and set the docker port forwarding rules accordingly (e.g. use the flags `-p 30313:30313` and `-p 30313:30313/udp`).
 
 ### Register the Accounts
 
+<a name="register-accounts"></a>
 You've now done all the infrastructure setup to get a validator and proxy running. The C-Labs team will review your submission to receive funds and send you 12,000 testnet Celo Gold to each of your Validator and Validator Group account addresses. These funds have no real world value but will allow you to submit transactions to the network via [`celocli`](../command-line-interface/introduction.md) and put up a stake to register as a validator and validator group.
 
 You can view your Celo Gold balances by running the following commands:
