@@ -29,6 +29,7 @@ export async function removeHelmRelease(celoEnv: string) {
 
 function helmParameters(celoEnv: string) {
   return [
+    `--set domain.name=${fetchEnv(envVar.CLUSTER_DOMAIN_NAME)}`,
     `--set imageRepository=${fetchEnv(envVar.CELOTOOL_DOCKER_IMAGE_REPOSITORY)}`,
     `--set imageTag=${fetchEnv(envVar.CELOTOOL_DOCKER_IMAGE_TAG)}`,
     `--set gethImageRepository=${fetchEnv(envVar.GETH_NODE_DOCKER_IMAGE_REPOSITORY)}`,
@@ -37,6 +38,10 @@ function helmParameters(celoEnv: string) {
     `--set mnemonic="${fetchEnv(envVar.MNEMONIC)}"`,
     `--set twilio.accountSid="${fetchEnv(envVar.TWILIO_ACCOUNT_SID)}"`,
     `--set twilio.authToken="${fetchEnv(envVar.TWILIO_ACCOUNT_AUTH_TOKEN)}"`,
+    `--set twilio.addressSid="${fetchEnv(envVar.TWILIO_ADDRESS_SID)}"`,
+    `--set initialWaitSeconds=${fetchEnv(envVar.ATTESTATION_BOT_INITIAL_WAIT_SECONDS)}`,
+    `--set inBetweenWaitSeconds=${fetchEnv(envVar.ATTESTATION_BOT_IN_BETWEEN_WAIT_SECONDS)}`,
+    `--set maxAttestations=${fetchEnv(envVar.ATTESTATION_BOT_MAX_ATTESTATIONS)}`,
     `--set networkID=${fetchEnv(envVar.NETWORK_ID)}`,
     `--set geth.verbosity=${fetchEnv('GETH_VERBOSITY')}`,
   ]

@@ -40,7 +40,7 @@ export const Channel = memo(function _Channel(props: ChannelProps & ExternalChan
           </View>
           <Text
             style={[
-              fonts.h5,
+              fonts.h6,
               props.alignCenter && textStyles.center,
               styles.channelTitle,
               props.isDarkMode && textStyles.invert,

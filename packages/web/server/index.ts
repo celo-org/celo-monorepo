@@ -13,6 +13,7 @@ import ecoFundSubmission from '../server/EcoFundApp'
 import { RequestType } from '../src/fauceting/FaucetInterfaces'
 import nextI18next from '../src/i18n'
 import latestAnnouncements from './Announcement'
+import getAssets from './AssetBase'
 import { faucetOrInviteController } from './controllers'
 import getFormattedEvents from './EventHelpers'
 import { submitFellowApp } from './FellowshipApp'
@@ -74,11 +75,20 @@ function wwwRedirect(req, res, nextAction) {
     })
   })
 
+  server.get('/brand', (_, res) => {
+    res.redirect('/experience/brand')
+  })
+
   server.get('/connect', (_, res) => {
     res.redirect('/community')
   })
+
   server.get('/tos', (_, res) => {
     res.redirect('/user-agreement')
+  })
+
+  server.get('/stake-off', (_, res) => {
+    res.redirect('https://forum.celo.org/t/the-great-celo-stake-off-the-details/136')
   })
 
   server.use(bodyParser.json())
@@ -141,6 +151,15 @@ function wwwRedirect(req, res, nextAction) {
     }
   })
 
+  server.get('/brand/api/assets/:asset', async (req, res) => {
+    try {
+      const assets = await getAssets(req.params.asset)
+      res.json(assets)
+    } catch (e) {
+      res.status(e.statusCode || 500).json({ message: e.message || 'unknownError' })
+    }
+  })
+
   server.post('/partnerships-email', async (req, res) => {
     const { email } = req.body
     await mailer({
@@ -154,13 +173,21 @@ function wwwRedirect(req, res, nextAction) {
   })
 
   server.get('/proxy/medium', async (_, res) => {
-    const articlesdata = await getFormattedMediumArticles()
-    res.json(articlesdata)
+    try {
+      const articlesdata = await getFormattedMediumArticles()
+      res.json(articlesdata)
+    } catch (e) {
+      res.status(e.statusCode || 500).json({ message: e.message || 'unknownError' })
+    }
   })
 
   server.get('/proxy/events/', async (_, res) => {
-    const events = await getFormattedEvents()
-    res.json(events)
+    try {
+      const events = await getFormattedEvents()
+      res.json(events)
+    } catch (e) {
+      res.status(e.statusCode || 500).json({ message: e.message || 'unknownError' })
+    }
   })
 
   server.get('*', (req, res) => {

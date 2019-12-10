@@ -24,6 +24,8 @@ files=(
   ".env.mnemonic"
   ".env.mnemonic.alfajores"
   ".env.mnemonic.alfajoresstaging"
+  ".env.mnemonic.baklava"
+  ".env.mnemonic.baklavastaging"
   ".env.mnemonic.integration"
   ".env.mnemonic.integrationtesting"
   ".env.mnemonic.pilot"

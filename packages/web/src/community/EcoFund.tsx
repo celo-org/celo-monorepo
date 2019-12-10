@@ -8,7 +8,7 @@ import { ErrorMessage, Form, LabeledInput } from 'src/forms/FormComponents'
 import { I18nProps, NameSpaces, withNamespaces } from 'src/i18n'
 import { Cell, GridRow, Spans } from 'src/layout/GridRow'
 import { ScreenProps, ScreenSizes, withScreenSize } from 'src/layout/ScreenSize'
-import Rings from 'src/logos/RingsLight'
+import Rings from 'src/logos/RingsGlyph'
 import Button, { BTN, SIZE } from 'src/shared/Button.3'
 import menuItems, { hashNav } from 'src/shared/menu-items'
 import Navigation from 'src/shared/navigation'
@@ -54,7 +54,7 @@ class EcoFund extends React.PureComponent<I18nProps & ScreenProps, State> {
           <Text style={[fonts.p, standardStyles.elementalMargin]}>{t('ecoFund.description')}</Text>
           <View style={[standardStyles.row, standardStyles.elementalMargin, standardStyles.wrap]}>
             <View style={styles.partners}>
-              <Text style={[fonts.h5, styles.partnerText]}>{t('ecoFund.generalPartner')}</Text>
+              <Text style={[fonts.h6, styles.partnerText]}>{t('ecoFund.generalPartner')}</Text>
               <Image
                 resizeMode="contain"
                 accessibilityLabel="Polychain"
@@ -63,7 +63,7 @@ class EcoFund extends React.PureComponent<I18nProps & ScreenProps, State> {
               />
             </View>
             <View style={styles.partners}>
-              <Text style={[fonts.h5, styles.partnerText]}>{t('ecoFund.limitedPartners')}</Text>
+              <Text style={[fonts.h6, styles.partnerText]}>{t('ecoFund.limitedPartners')}</Text>
               <View style={[standardStyles.row, styles.limitedPartners]}>
                 <Rings color={colors.dark} height={40} />
                 <Image

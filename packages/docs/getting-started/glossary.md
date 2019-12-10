@@ -177,6 +177,14 @@ The system that determines the participants in a Byzantine Fault Tolerant consen
 
 A common practice in societies without easy access to banking (source); a peer-to-peer savings and loan group.
 
+## SBAT
+
+Should Be Able To (Acronym used in GitHub issue title)
+
+## SNBAT
+
+Should Not Be Able To (Acronym used in GitHub issue title)
+
 ## Sync
 
 The process, when a node joins the network, of requesting and receiving block headers so that the node catches up to the network's latest state.

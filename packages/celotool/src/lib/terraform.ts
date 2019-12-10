@@ -62,11 +62,50 @@ export function destroyTerraformModule(moduleName: string, vars: TerraformVars) 
   )
 }
 
+// Taints a resource or multiple resources with the same prefix if the resource name
+// ends with '.*'
 export function taintTerraformModuleResource(moduleName: string, resourceName: string) {
+  if (resourceName.endsWith('.*')) {
+    return taintEveryResourceWithPrefix(moduleName, resourceName.replace('.*', ''))
+  } else {
+    return taintResource(moduleName, resourceName)
+  }
+}
+
+// Untaints a resource or multiple resources with the same prefix if the resource name
+// ends with '.*'
+export function untaintTerraformModuleResource(moduleName: string, resourceName: string) {
+  if (resourceName.endsWith('.*')) {
+    return untaintEveryResourceWithPrefix(moduleName, resourceName.replace('.*', ''))
+  } else {
+    return untaintResource(moduleName, resourceName)
+  }
+}
+
+async function taintEveryResourceWithPrefix(moduleName: string, resourceName: string) {
+  const matches = await getEveryResourceWithPrefix(moduleName, resourceName)
+  for (const match of matches) {
+    await taintResource(moduleName, match)
+  }
+}
+
+async function untaintEveryResourceWithPrefix(moduleName: string, resourceName: string) {
+  const matches = await getEveryResourceWithPrefix(moduleName, resourceName)
+  for (const match of matches) {
+    await untaintResource(moduleName, match)
+  }
+}
+
+async function getEveryResourceWithPrefix(moduleName: string, resourcePrefix: string) {
+  const resources = await getTerraformModuleResourceNames(moduleName)
+  return resources.filter((resource: string) => resource.startsWith(resourcePrefix))
+}
+
+function taintResource(moduleName: string, resourceName: string) {
   return execTerraformCmd(`terraform taint ${resourceName}`, getModulePath(moduleName), false)
 }
 
-export function untaintTerraformModuleResource(moduleName: string, resourceName: string) {
+function untaintResource(moduleName: string, resourceName: string) {
   return execTerraformCmd(`terraform untaint ${resourceName}`, getModulePath(moduleName), false)
 }
 
