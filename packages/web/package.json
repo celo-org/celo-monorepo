@@ -18,7 +18,7 @@
     "test": "jest --runInBand"
   },
   "dependencies": {
-    "@celo/utils": "^0.1.4",
+    "@celo/utils": "0.1.5-dev",
     "@segment/in-eu": "^0.2.1",
     "@sentry/browser": "^5.6.2",
     "@sentry/node": "^5.6.2",
