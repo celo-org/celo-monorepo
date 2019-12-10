@@ -6,6 +6,8 @@ import { AccountsWrapper } from './Accounts'
 import { LockedGoldWrapper } from './LockedGold'
 import { ValidatorsWrapper } from './Validators'
 
+jest.setTimeout(10 * 10000)
+
 /*
 TEST NOTES:
 - In migrations: The only account that has cUSD is accounts[0]
