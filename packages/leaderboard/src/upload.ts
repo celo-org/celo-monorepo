@@ -21,6 +21,10 @@ async function getMetadata(kit: ContractKit, address: string) {
   }
 }
 
+function dedup(lst: string[]): string[] {
+  return [...new Set(lst)]
+}
+
 async function getClaims(
   kit: ContractKit,
   address: string,
@@ -50,7 +54,7 @@ async function getClaims(
         break
     }
   }
-  return res
+  return dedup(res)
 }
 
 // If modifying these scopes, delete token.json.
