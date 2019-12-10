@@ -5,7 +5,6 @@ import React, { useEffect } from 'react'
 import { ScrollView, StyleSheet, Text, View } from 'react-native'
 import SafeAreaView from 'react-native-safe-area-view'
 import {
-  NavigationInjectedProps,
   NavigationParams,
   NavigationProp,
   NavigationScreenProp,
@@ -25,7 +24,7 @@ interface OwnProps<T> {
   items: T[]
 }
 
-type Props<T> = NavigationInjectedProps & OwnProps<T>
+type Props<T> = OwnProps<T>
 
 export function NotificationList<T>(props: Props<T>) {
   return (

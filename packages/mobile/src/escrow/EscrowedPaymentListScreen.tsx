@@ -53,7 +53,6 @@ const EscrowedPaymentListScreen = (props: Props) => {
   useBalanceInNavigationParam(dollarBalance, navigation)
   return (
     <NotificationList<EscrowedPayment>
-      navigation={props.navigation}
       items={props.sentEscrowedPayments}
       listItemRenderer={listItemRenderer}
       dollarBalance={props.dollarBalance}

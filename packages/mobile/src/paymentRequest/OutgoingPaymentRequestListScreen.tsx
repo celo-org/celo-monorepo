@@ -67,7 +67,6 @@ const OutgoingPaymentRequestListScreen = (props: Props) => {
   useBalanceInNavigationParam(dollarBalance, navigation)
   return (
     <NotificationList<PaymentRequest>
-      navigation={props.navigation}
       items={props.paymentRequests}
       listItemRenderer={listItemRenderer(props)}
       dollarBalance={props.dollarBalance}
