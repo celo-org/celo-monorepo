@@ -5,7 +5,7 @@ export LC_ALL=en_US.UTF-8
 
 # Usage: run-network.sh <COMMAND> <DATA_DIR>
 COMMAND=${1:-"pull,accounts,run-validator,run-proxy,status,print-env"}
-DATA_DIR=${2:-"/tmp/celo/network"}
+DATA_DIR=${2:-"$HOME/.celo/network"}
 
 export CELO_IMAGE=${3:-"us.gcr.io/celo-testnet/celo-node:baklava"}
 export NETWORK_ID=${4:-"12219"}
@@ -19,9 +19,12 @@ export VALIDATOR_NAME=johndoe_$(cat /dev/urandom | tr -dc 'a-z0-9' | fold -w 8 |
 export VALIDATOR_GROUP_NAME=tijuana_$(cat /dev/urandom | tr -dc 'a-z0-9' | fold -w 8 | head -n 1)
 
 export CELOCLI="npx celocli"
-export NEXMO_KEY="xx"
-export NEXMO_SECRET="xx"
-export NEXMO_BLACKLIST=""
+
+export TWILIO_MESSAGING_SERVICE_SID=MG00000000000000000000000000000000
+export TWILIO_ACCOUNT_SID=AC00000000000000000000000000000000
+export TWILIO_BLACKLIST=""
+export TWILIO_AUTH_TOKEN="ffffffffffffffffffffffffffffffff"
+
 HOSTNAME=$(hostname)
 export ETHSTATS_ARG="$HOSTNAME@$NETWORK_NAME-ethstats.celo-testnet.org"
 
@@ -56,15 +59,6 @@ fi
 remove_containers () {
     echo -e "\tRemoving previous celo containers"
     docker rm -f celo-proxy celo-validator celo-attestation-service celo-accounts || echo -e "Containers removed"
-}
-
-download_genesis () {
-    echo -e "\tDownload genesis.json and static-nodes.json to the container"
-    docker run -v $PWD/proxy:/root/.celo --entrypoint /bin/sh -it $CELO_IMAGE -c "wget https://www.googleapis.com/storage/v1/b/static_nodes/o/$NETWORK_NAME?alt=media -O /root/.celo/static-nodes.json"
-    docker run -v $PWD/proxy:/root/.celo --entrypoint /bin/sh -it $CELO_IMAGE -c "wget https://www.googleapis.com/storage/v1/b/genesis_blocks/o/$NETWORK_NAME?alt=media -O /root/.celo/genesis.json"
-    
-    docker run -v $PWD/validator:/root/.celo --entrypoint /bin/sh -it $CELO_IMAGE -c "wget https://www.googleapis.com/storage/v1/b/genesis_blocks/o/$NETWORK_NAME?alt=media -O /root/.celo/genesis.json"
-
 }
 
 make_status_requests () {
@@ -105,7 +99,7 @@ if [[ $COMMAND == *"help"* ]]; then
     echo -e "Options:"
     echo -e "$0 <COMMAND> <DATA_DIR> <CELO_IMAGE> <NETWORK_ID> <NETWORK_NAME> <PASSWORD>"
     echo -e "\t - Command; comma separated list of actions to execute. Options are: help, pull, clean, accounts, run-validator, run-proxy, run-attestation, run-fullnode, status, print-env, get-cooking. Default: pull,accounts,run-validator,run-proxy,status"
-    echo -e "\t - Data Dir; Local folder where will be created the data dir for the nodes. Default: /tmp/celo/network"
+    echo -e "\t - Data Dir; Local folder where will be created the data dir for the nodes. Default: $HOME/.celo/network"
     echo -e "\t - Celo Image; Image to download"
     echo -e "\t - Celo Network; Docker image network to use (typically alfajores or baklava, but you can use a commit). "
     echo -e "\t - Network Id; 31417 for integration, 44785 for alfajores, etc."
@@ -172,40 +166,9 @@ if [[ $COMMAND == *"accounts"* ]]; then
     echo -e "Starting local Docker holding the accounts. You can attach to it running 'screen -r -S celo-accounts'\n"
     screen -S celo-accounts -d -m docker run --name celo-accounts --restart always -p 8545:8545 -v $PWD:/root/.celo $CELO_IMAGE --verbosity 3 --networkid $NETWORK_ID --syncmode full --rpc --rpcaddr 0.0.0.0 --rpcapi eth,net,web3,debug,admin,personal
     
-
-
-fi
-
-if [[ $COMMAND == *"run-proxy"* ]]; then
-
-    echo -e "* Let's run the Proxy ..."
-    cd $PROXY_DIR
     
-    docker rm -f celo-proxy || echo -e "Containers removed"
-
-    initialize_geth
-    
-    screen -S celo-proxy -d -m docker run --name celo-proxy --restart always -p 30313:30303 -p 30313:30303/udp -p 30503:30503 -p 30503:30503/udp -v $PWD:/root/.celo $CELO_IMAGE --verbosity 3 --networkid $NETWORK_ID --syncmode full --proxy.proxy --proxy.proxiedvalidatoraddress $CELO_VALIDATOR_SIGNER_ADDRESS --proxy.internalendpoint :30503 --etherbase $CELO_VALIDATOR_SIGNER_ADDRESS --ethstats=proxy-$ETHSTATS_ARG
-    
-    sleep 5s
-    export PROXY_ENODE=$(docker exec celo-proxy geth --exec "admin.nodeInfo['enode'].split('//')[1].split('@')[0]" attach | tr -d '"')
-    export PROXY_IP=$(docker inspect -f '{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' celo-proxy)
-    echo -e "The Proxy should be starting. You can attach to it running 'screen -r -S celo-proxy'\n"
-
-fi
-
-
-
-
-
-if [[ $COMMAND == *"run-validator"* ]]; then
-
-    echo -e "* Let's run the Validator ..."
-    cd $VALIDATOR_DIR
-
-    docker rm -f celo-validator || echo -e "Containers removed"
-
     echo -e "\tGenerating the Validator Proof of Possesion"
+    cd $VALIDATOR_DIR
 
     __POS=$(docker run -v $PWD:/root/.celo --entrypoint /bin/sh -it $CELO_IMAGE -c " printf '%s\n' $DEFAULT_PASSWORD $DEFAULT_PASSWORD | geth account proof-of-possession $CELO_VALIDATOR_SIGNER_ADDRESS $CELO_VALIDATOR_ADDRESS "| tail -2 )
     export CELO_VALIDATOR_SIGNER_PUBLIC_KEY=$(echo $__POS | cut -d' ' -f 6| tr -cd "[:alnum:]\n" )
@@ -222,6 +185,38 @@ if [[ $COMMAND == *"run-validator"* ]]; then
     
     echo -e "\tCELO_VALIDATOR_SIGNER_BLS_PUBLIC_KEY=$CELO_VALIDATOR_SIGNER_BLS_PUBLIC_KEY"
     echo -e "\tCELO_VALIDATOR_SIGNER_BLS_SIGNATURE=$CELO_VALIDATOR_SIGNER_BLS_SIGNATURE"
+
+fi
+
+if [[ $COMMAND == *"run-proxy"* ]]; then
+
+    echo -e "* Let's run the Proxy ..."
+    cd $PROXY_DIR
+    
+    docker rm -f celo-proxy || echo -e "Containers removed"
+
+    initialize_geth
+    
+    screen -S celo-proxy -d -m docker run --name celo-proxy --restart always -p 30313:30303 -p 30313:30303/udp -p 30503:30503 -p 30503:30503/udp -v $PWD:/root/.celo $CELO_IMAGE --verbosity 3 --networkid $NETWORK_ID --syncmode full --proxy.proxy --proxy.proxiedvalidatoraddress $CELO_VALIDATOR_SIGNER_ADDRESS --proxy.internalendpoint :30503 --etherbase $CELO_VALIDATOR_SIGNER_ADDRESS --ethstats=proxy-$ETHSTATS_ARG
+    
+    sleep 5s
+   
+    echo -e "The Proxy should be starting. You can attach to it running 'screen -r -S celo-proxy'\n"
+
+fi
+
+
+
+
+
+if [[ $COMMAND == *"run-validator"* ]]; then
+
+    echo -e "* Let's run the Validator ..."
+    cd $VALIDATOR_DIR
+
+    docker rm -f celo-validator || echo -e "Containers removed"
+    export PROXY_ENODE=$(docker exec celo-proxy geth --exec "admin.nodeInfo['enode'].split('//')[1].split('@')[0]" attach | tr -d '"')
+    export PROXY_IP=$(docker inspect -f '{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' celo-proxy)
     
     
     echo -e "\tConnecting Validator to Proxy running at enode://$PROXY_ENODE@$PROXY_IP"
@@ -244,8 +239,8 @@ if [[ $COMMAND == *"run-attestation"* ]]; then
     
     export ATTESTATION_KEY=0x$($CELOCLI account:new| tail -3| head -1| cut -d' ' -f 2| tr -cd "[:alnum:]\n")
     echo -e "\tATTESTATION_KEY=$ATTESTATION_KEY"
-    
-    screen -S attestation-service -d -m  docker run -v $PWD/attestation-service:/celo-monorepo/packages/attestation-service/db --name celo-attestation-service -d --restart always --entrypoint /bin/bash -e ATTESTATION_KEY=$ATTESTATION_KEY -e ACCOUNT_ADDRESS=0x$CELO_VALIDATOR_ADDRESS -e CELO_PROVIDER=$CELO_PROVIDER -e DATABASE_URL=$DATABASE_URL -e SMS_PROVIDERS=nexmo -e NEXMO_KEY=$NEXMO_KEY -e NEXMO_SECRET=$NEXMO_SECRET -e NEXMO_BLACKLIST=$NEXMO_BLACKLIST  -p 3000:80 -v $PWD/attestation-service:/root/.celo $CELO_IMAGE_ATTESTATION -c " cd /celo-monorepo/packages/attestation-service && touch db/attestation.db && yarn run db:migrate && yarn start "
+        
+    screen -S attestation-service -d -m docker run --name celo-attestation-service -v $PWD/attestations:/celo-monorepo/packages/attestation-service/db -d --restart always --entrypoint /bin/bash -e ATTESTATION_SIGNER_ADDRESS=0x$CELO_ATTESTATION_SIGNER_ADDRESS -e CELO_VALIDATOR_ADDRESS=0x$CELO_VALIDATOR_ADDRESS -e CELO_PROVIDER=$CELO_PROVIDER -e DATABASE_URL=$DATABASE_URL -e SMS_PROVIDERS=twilio -e TWILIO_MESSAGING_SERVICE_SID=$TWILIO_MESSAGING_SERVICE_SID -e TWILIO_ACCOUNT_SID=$TWILIO_ACCOUNT_SID -e TWILIO_BLACKLIST=$TWILIO_BLACKLIST -e TWILIO_AUTH_TOKEN=$TWILIO_AUTH_TOKEN -p 3000:80 $CELO_IMAGE_ATTESTATION -c " cd /celo-monorepo/packages/attestation-service && yarn run db:migrate && yarn start "
     
     echo -e "\tAttestation service should be running, you can check running 'screen -ls'"
     echo -e "\tYou can re-attach to the attestation-service running:"

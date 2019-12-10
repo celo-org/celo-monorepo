@@ -20,7 +20,7 @@ const FeatureComponent = React.memo(function Feature({ title, graphic, text }: P
           <Image resizeMode="contain" onLoad={load} source={graphic} style={styles.graphic} />
         )}
       </FadeIn>
-      <Text style={[fonts.h5, textStyles.invert, textStyles.center, styles.title]}>{title}</Text>
+      <Text style={[fonts.h6, textStyles.invert, textStyles.center, styles.title]}>{title}</Text>
       <Text style={[fonts.mini, textStyles.center, textStyles.readingOnDark]}>{text}</Text>
     </View>
   )
