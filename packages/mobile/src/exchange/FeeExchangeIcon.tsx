@@ -10,18 +10,24 @@ function navigateToEducate() {
   navigate(Screens.FeeExchangeEducation, {})
 }
 
-const FeeIcon = () => (
-  <Touchable
-    onPress={navigateToEducate}
-    style={styles.area}
-    borderless={true}
-    hitSlop={iconHitslop}
-  >
-    <InfoIcon size={12} />
-  </Touchable>
-)
+interface Props {
+  isGrey?: boolean
+}
 
-export default FeeIcon
+export default class FeeIcon extends React.Component<Props> {
+  render() {
+    return (
+      <Touchable
+        onPress={navigateToEducate}
+        style={styles.area}
+        borderless={true}
+        hitSlop={iconHitslop}
+      >
+        <InfoIcon size={12} isGrey={this.props.isGrey} />
+      </Touchable>
+    )
+  }
+}
 
 const styles = StyleSheet.create({
   area: {

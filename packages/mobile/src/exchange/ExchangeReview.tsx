@@ -183,14 +183,14 @@ class ExchangeReview extends React.Component<Props, State> {
               <View style={[styles.rowContainer, styles.feeRowContainer]}>
                 <View style={styles.feeTextWithIconContainer}>
                   <Text style={[fontStyles.body, styles.exchangeBodyText]}>{t('exchangeFee')}</Text>
-                  <FeeIcon />
+                  <FeeIcon isGrey={true} />
                 </View>
                 <Text style={[fontStyles.body, styles.exchangeBodyText]}>{fee}</Text>
               </View>
               <View style={[styles.rowContainer, styles.feeRowContainer]}>
                 <View style={styles.feeTextWithIconContainer}>
                   <Text style={[fontStyles.body, styles.exchangeBodyText]}>{t('securityFee')}</Text>
-                  <FeeIcon />
+                  <FeeIcon isGrey={true} />
                 </View>
                 <Text style={[fontStyles.body, styles.exchangeBodyText]}>{fee}</Text>
               </View>
