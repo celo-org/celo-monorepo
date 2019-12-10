@@ -497,10 +497,10 @@ contract('Attestations', (accounts: string[]) => {
           })
 
           it('should no longer list the attestations in getCompletableAttestations', async () => {
-            const [
-              attestationBlockNumbers,
-              _attestationIssuers,
-            ] = await attestations.getCompletableAttestations(phoneHash, caller)
+            const [attestationBlockNumbers] = await attestations.getCompletableAttestations(
+              phoneHash,
+              caller
+            )
 
             assert.lengthOf(attestationBlockNumbers, 0)
           })
@@ -591,11 +591,8 @@ contract('Attestations', (accounts: string[]) => {
 
     it('should no longer list the attestation in getCompletableAttestationStats', async () => {
       await attestations.complete(phoneHash, v, r, s)
-      const [
-        _attestationBlockNumbers,
-        attestationIssuers,
-      ] = await attestations.getCompletableAttestations(phoneHash, caller)
-      assert.equal(attestationIssuers.indexOf(issuer), -1)
+      const [attestationIssuers] = await attestations.getCompletableAttestations(phoneHash, caller)
+      assert.equal(attestationIssuers.indexOf(new BigNumber(issuer)), -1)
     })
 
     it('should emit the AttestationCompleted event', async () => {
@@ -635,11 +632,7 @@ contract('Attestations', (accounts: string[]) => {
 
       it('should mark the attestation by the issuer as complete', async () => {
         await attestations.complete(phoneHash, v, r, s)
-        const [status, _blockNumber] = await attestations.getAttestationState(
-          phoneHash,
-          caller,
-          issuer
-        )
+        const [status] = await attestations.getAttestationState(phoneHash, caller, issuer)
         assert.equal(status.toNumber(), 2)
       })
     })

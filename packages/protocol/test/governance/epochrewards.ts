@@ -1,3 +1,4 @@
+/* globals artifacts, web3, beforeEach, it, */
 import { CeloContractName } from '@celo/protocol/lib/registry-utils'
 import {
   assertContainSubset,
@@ -6,20 +7,20 @@ import {
   assertRevert,
   timeTravel,
 } from '@celo/protocol/lib/test-utils'
+import { fromFixed, toFixed } from '@celo/utils/lib/fixidity'
 import BigNumber from 'bignumber.js'
 import {
+  EpochRewardsTestContract,
+  EpochRewardsTestInstance,
   MockElectionContract,
   MockElectionInstance,
   MockGoldTokenContract,
   MockGoldTokenInstance,
   MockSortedOraclesContract,
   MockSortedOraclesInstance,
-  EpochRewardsTestContract,
-  EpochRewardsTestInstance,
   RegistryContract,
   RegistryInstance,
 } from 'types'
-import { fromFixed, toFixed } from '@celo/utils/lib/fixidity'
 
 const EpochRewards: EpochRewardsTestContract = artifacts.require('EpochRewardsTest')
 const MockElection: MockElectionContract = artifacts.require('MockElection')
