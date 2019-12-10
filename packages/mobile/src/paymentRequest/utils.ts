@@ -1,4 +1,4 @@
-import { PaymentRequest } from 'src/account'
+import { PaymentRequest } from 'src/account/types'
 import { NumberToRecipient, Recipient, RecipientKind } from 'src/recipients/recipient'
 
 export function getRecipientFromPaymentRequest(
