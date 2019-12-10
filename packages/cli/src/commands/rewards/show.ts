@@ -32,7 +32,7 @@ export default class Show extends BaseCommand {
     const epochSize = await validators.getEpochSize()
 
     // Map the votes cast by address at each epoch.
-    var addressVotes: { [key: number]: { [key: string]: BigNumber } }
+    var addressVotes: { [key: number]: { [key: string]: BigNumber } } = {}
     if (res.flags.address) {
       const address = res.flags.address
       await newCheckBuilder(this)
@@ -71,7 +71,7 @@ export default class Show extends BaseCommand {
       res.flags.address
     )
 
-    // Get the Validator scores at each epoch
+    // Get the Validator scores at each epoch.
     const validatorDetails = await mapEachEpochAsync(
       this.web3,
       (blockNumber: number) =>
@@ -112,7 +112,7 @@ export default class Show extends BaseCommand {
         },
         validator: { get: (x: any) => x.returnValues.validator },
         validatorPayment: { get: (x: any) => x.returnValues.validatorPayment },
-        currentValidatorScore: {
+        validatorScore: {
           get: (x: any) =>
             validatorDetails[x.blockNumber][x.returnValues.validator.toLowerCase()].score.toFixed(),
         },

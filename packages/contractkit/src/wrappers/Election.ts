@@ -119,9 +119,9 @@ export class ElectionWrapper extends BaseWrapper<Election> {
     var pending
     if (blockNumber) {
       const contract = await this.kit._web3Contracts.getElection()
-      // @ts-ignore: Expected 0-1 arguments, but got 2
       pending = await contract.methods
         .getPendingVotesForGroupByAccount(group, account)
+        // @ts-ignore: Expected 0-1 arguments, but got 2
         .call({}, blockNumber)
     } else {
       pending = await this.contract.methods.getPendingVotesForGroupByAccount(group, account).call()
@@ -130,9 +130,9 @@ export class ElectionWrapper extends BaseWrapper<Election> {
     var active
     if (blockNumber) {
       const contract = await this.kit._web3Contracts.getElection()
-      // @ts-ignore: Expected 0-1 arguments, but got 2
       active = await contract.methods
         .getActiveVotesForGroupByAccount(group, account)
+        // @ts-ignore: Expected 0-1 arguments, but got 2
         .call({}, blockNumber)
     } else {
       active = await this.contract.methods.getActiveVotesForGroupByAccount(group, account).call()

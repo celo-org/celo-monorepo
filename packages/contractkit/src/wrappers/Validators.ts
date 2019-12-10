@@ -5,6 +5,7 @@ import BigNumber from 'bignumber.js'
 import { Address, NULL_ADDRESS } from '../base'
 import { Validators } from '../generated/types/Validators'
 import { getEpochEvents } from '../utils/web3-utils'
+import { promisedProperties } from '../utils/async-utils'
 import {
   BaseWrapper,
   CeloTransactionObject,
@@ -465,11 +466,10 @@ export class ValidatorsWrapper extends BaseWrapper<Validators> {
     const uniqueValidators: { [key: string]: any } = {}
     for (const validator of listWithValidators) {
       const validatorAddress = getValidatorAddress(validator)
-      // Better to use Promise.all()
       if (!(validatorAddress in uniqueValidators))
-        uniqueValidators[validatorAddress] = await this.getValidator(validatorAddress, blockNumber)
+        uniqueValidators[validatorAddress] = this.getValidator(validatorAddress, blockNumber)
     }
-    return uniqueValidators
+    return await promisedProperties(uniqueValidators)
   }
 
   // Returns map from ValidatorGroup address to ValidatorGroup.
@@ -477,12 +477,9 @@ export class ValidatorsWrapper extends BaseWrapper<Validators> {
     const uniqueValidatorGroups: { [key: string]: any } = {}
     for (const validatorGroup of listWithValidatorGroups) {
       const validatorGroupAddress = getValidatorGroupAddress(validatorGroup)
-      // Better to use Promise.all()
       if (!(validatorGroupAddress in uniqueValidatorGroups))
-        uniqueValidatorGroups[validatorGroupAddress] = await this.getValidatorGroup(
-          validatorGroupAddress
-        )
+        uniqueValidatorGroups[validatorGroupAddress] = this.getValidatorGroup(validatorGroupAddress)
     }
-    return uniqueValidatorGroups
+    return await promisedProperties(uniqueValidatorGroups)
   }
 }
