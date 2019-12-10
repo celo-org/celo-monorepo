@@ -1,0 +1,37 @@
+apiVersion: batch/v1beta1
+kind: CronJob
+metadata:
+  name: {{ .Release.Name }}
+  labels:
+    app: voting-bot
+    chart: voting-bot
+    release: {{ .Release.Service }}
+    component: voting-bot
+spec:
+  schedule: "{{ .Values.cronSchedule }}"
+  concurrencyPolicy: Forbid
+  jobTemplate:
+    spec:
+      backoffLimit: 1
+      template:
+        spec:
+          containers:
+          - name: voting-bot
+            image: {{ .Values.imageRepository }}.{{ .Values.imageTag }}
+            imagePullPolicy: {{ .Values.imagePullPolicy }}
+            command:
+              - bash
+              - "-c"
+              - |
+                CELOTOOL="/celo-monorepo/packages/celotool/bin/celtooljs.sh";
+
+                $CELOTOOL bots voting-bot --celoProvider https://{{ .Release.Namespace }}-forno.{{ .Values.domain.name }}.org
+            env:
+            - name: MNEMONIC
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.environment }}-voting-bot-secrets
+                  key: mnemonic
+          volumes:
+          - name: data
+            emptyDir: {}
