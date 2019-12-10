@@ -1,6 +1,6 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`BaseNotification renders correctly 1`] = `
+exports[`PaymentsSummaryNotification renders correctly 1`] = `
 <View>
   <View
     style={
@@ -28,6 +28,17 @@ exports[`BaseNotification renders correctly 1`] = `
     <View
       style={
         Object {
+          "alignItems": "center",
+          "flexDirection": "column",
+          "paddingRight": 16,
+        }
+      }
+    >
+      <View />
+    </View>
+    <View
+      style={
+        Object {
           "flex": 1,
           "justifyContent": "space-between",
         }
@@ -36,8 +47,8 @@ exports[`BaseNotification renders correctly 1`] = `
       <Text
         style={
           Object {
-            "color": "#81868B",
-            "fontFamily": "Hind-Regular",
+            "color": "#2E3338",
+            "fontFamily": "Hind-Bold",
             "fontSize": 14,
             "lineHeight": 18,
           }
@@ -50,13 +61,29 @@ exports[`BaseNotification renders correctly 1`] = `
           Object {
             "justifyContent": "space-between",
             "minHeight": 60,
-            "paddingTop": 8,
           }
         }
       >
-        <Text>
-          Test
-        </Text>
+        <View
+          style={
+            Object {
+              "flexDirection": "row",
+              "marginTop": 5,
+            }
+          }
+        >
+          <View
+            style={
+              Object {
+                "flex": 1,
+              }
+            }
+          >
+            <Text>
+              test-a
+            </Text>
+          </View>
+        </View>
         <View
           style={
             Object {
@@ -98,7 +125,7 @@ exports[`BaseNotification renders correctly 1`] = `
                 ]
               }
             >
-              it goes boom
+              walletFlow5:review
             </Text>
           </View>
         </View>
