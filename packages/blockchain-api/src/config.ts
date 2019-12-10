@@ -15,7 +15,10 @@ function getSecrets(deployEnv: string) {
 }
 
 export function getFirebaseAdminCreds(admin: any) {
-  if (DEPLOY_ENV === 'local') {
+  // TODO: move project to celo-org-mobile
+  // until then, using serviceAccountKey for all envs
+  // tslint:disable-next-line: no-constant-condition
+  if (true /* DEPLOY_ENV === 'local' */) {
     try {
       const serviceAccount = require('../serviceAccountKey.json')
       return admin.credential.cert(serviceAccount)
