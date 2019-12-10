@@ -56,10 +56,9 @@ See [Developer's Guide](https://docs.celo.org/) for full details about the desig
 
 See the [issue backlog](https://github.com/celo-org/celo-monorepo/issues) for a list of active or proposed tasks. Feel free to create new issues to report bugs and/or request features. Please add labels to your issues, tagging the appropriate package/area.
 
-
 ### ✍️ Contributing
 
-Feel free to jump on the Celo 🚂🚋🚋🚋.  Improvements and contributions are highly encouraged! 🙏👊
+Feel free to jump on the Celo 🚂🚋🚋🚋. Improvements and contributions are highly encouraged! 🙏👊
 
 See the [contributing guide](CONTRIBUTING.md) for details on how to participate.
 [![GitHub issues by-label](https://img.shields.io/github/issues/celo-org/celo-monorepo/1%20hour%20tasks)](https://github.com/celo-org/celo-monorepo/issues?q=is%3Aopen+is%3Aissue+label%3A%221+hour+tasks%22)
@@ -72,6 +71,7 @@ twitter intent generator - http://tech.cymi.org/tweet-intents
 -->
 
 ### 💬 Ask questions, find answers, and get in touch:
+
 - [Website](https://celo.org/)
 - [Docs](https://docs.celo.org/)
 - [Blog](https://medium.com/celohq) 📖
@@ -81,7 +81,6 @@ twitter intent generator - http://tech.cymi.org/tweet-intents
 - [Twitter](https://twitter.com/celohq)
 - [Reddit](https://www.reddit.com/r/CeloHQ/)
 - [Community Events](https://celo.org/community) 🎉
-
 
 ### 📜 License
 
