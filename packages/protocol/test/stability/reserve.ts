@@ -356,6 +356,29 @@ contract('Reserve', (accounts: string[]) => {
         await assertRevert(reserve.addOtherReserveAddress(anAddress))
       })
     })
+
+    it('should incude the other reserve addresses in the reserve balance', async () => {
+      await reserve.addOtherReserveAddress(anAddress)
+      const otherReserveAddresses = await reserve.getOtherReserveAddresses()
+      assert.equal(otherReserveAddresses.length, 1)
+      assert.equal(otherReserveAddresses[0].toLowerCase(), anAddress.toLowerCase())
+
+      const reserveGoldBalance = new BigNumber(10).pow(18).times(6)
+      const otherReserveGoldBalance = new BigNumber(10).pow(18).times(4)
+      await web3.eth.sendTransaction({
+        from: accounts[0],
+        to: reserve.address,
+        value: reserveGoldBalance,
+      })
+      await web3.eth.sendTransaction({
+        from: accounts[0],
+        to: anAddress,
+        value: otherReserveGoldBalance,
+      })
+
+      const reserveBalance = await reserve.getReserveGoldBalance()
+      assertEqualBN(reserveBalance, reserveGoldBalance.plus(otherReserveGoldBalance))
+    })
   })
 
   describe('#removeOtherReserveAddress()', () => {
@@ -367,20 +390,17 @@ contract('Reserve', (accounts: string[]) => {
 
     describe('when another reserve address has already been added', async () => {
       beforeEach(async () => {
-        await mockSortedOracles.setMedianRate(anAddress, sortedOraclesDenominator)
         await reserve.addOtherReserveAddress(anAddress)
-        const otherReserveAddressCount = (await reserve.getOtherReserveAddressCount()).toNumber()
-        index = -1
-        for (let i = 0; i < otherReserveAddressCount; i++) {
-          if ((await reserve.otherReserveAddresses(i)).toLowerCase() === anAddress.toLowerCase()) {
-            index = i
-          }
-        }
+        const otherReserveAddresses = await reserve.getOtherReserveAddresses()
+        assert.equal(otherReserveAddresses.length, 1)
+        assert.equal(otherReserveAddresses[0].toLowerCase(), anAddress.toLowerCase())
       })
 
       it('should allow owner to remove another reserve address', async () => {
         await reserve.removeOtherReserveAddress(anAddress, index)
         assert.isFalse(await reserve.isOtherReserveAddress(anAddress))
+        const otherReserveAddresses = await reserve.getOtherReserveAddresses()
+        assert.equal(otherReserveAddresses.length, 0)
       })
 
       it('should not allow other users to remove another reserve address', async () => {
@@ -398,30 +418,40 @@ contract('Reserve', (accounts: string[]) => {
     })
   })
 
-  describe('#setAssetAllocations', () => {
+  describe.only('#setAssetAllocations', () => {
     const newAssetAllocationSymbols = [
       web3.utils.padRight(web3.utils.utf8ToHex('cGLD'), 64),
       web3.utils.padRight(web3.utils.utf8ToHex('BTC'), 64),
+      web3.utils.padRight(web3.utils.utf8ToHex('ETH'), 64),
     ]
     const newAssetAllocationWeights = [
-      new BigNumber(500000000000000000000000),
-      new BigNumber(500000000000000000000000),
+      new BigNumber(10)
+        .pow(24)
+        .dividedBy(new BigNumber(3))
+        .integerValue()
+        .plus(new BigNumber(1)),
+      new BigNumber(10)
+        .pow(24)
+        .dividedBy(new BigNumber(3))
+        .integerValue(),
+      new BigNumber(10)
+        .pow(24)
+        .dividedBy(new BigNumber(3))
+        .integerValue(),
     ]
 
     it('should allow owner to set asset allocations', async () => {
       await reserve.setAssetAllocations(newAssetAllocationSymbols, newAssetAllocationWeights)
-      const assetAllocationCount = (await reserve.getAssetAllocationCount()).toNumber()
-      assert.equal(newAssetAllocationSymbols.length, assetAllocationCount)
-      assert.equal(web3.utils.hexToUtf8(await reserve.assetAllocationSymbols(0)), 'cGLD')
-      assert.equal(web3.utils.hexToUtf8(await reserve.assetAllocationSymbols(1)), 'BTC')
-      assert.equal(
-        newAssetAllocationWeights[0].isEqualTo(await reserve.assetAllocationWeights(0)),
-        true
-      )
-      assert.equal(
-        newAssetAllocationWeights[1].isEqualTo(await reserve.assetAllocationWeights(1)),
-        true
-      )
+      var assetAllocationSymbols = await reserve.getAssetAllocationSymbols()
+      var assetAllocationWeights = await reserve.getAssetAllocationWeights()
+      assert.equal(assetAllocationSymbols.length, newAssetAllocationSymbols.length)
+      assert.equal(assetAllocationWeights.length, newAssetAllocationWeights.length)
+      assert.equal(web3.utils.hexToUtf8(assetAllocationSymbols[0]), 'cGLD')
+      assert.equal(web3.utils.hexToUtf8(assetAllocationSymbols[1]), 'BTC')
+      assert.equal(web3.utils.hexToUtf8(assetAllocationSymbols[2]), 'ETH')
+      assert.equal(newAssetAllocationWeights[0].isEqualTo(assetAllocationWeights[0]), true)
+      assert.equal(newAssetAllocationWeights[1].isEqualTo(assetAllocationWeights[1]), true)
+      assert.equal(newAssetAllocationWeights[2].isEqualTo(assetAllocationWeights[2]), true)
     })
 
     it('should not allow other users to set asset allocations', async () => {
@@ -440,12 +470,24 @@ contract('Reserve', (accounts: string[]) => {
       const events = response.logs
       assert.equal(events.length, 1)
       assert.equal(events[0].event, 'AssetAllocationSet')
-      assert.equal(events[0].args.symbols.length, 2)
-      assert.equal(events[0].args.weights.length, 2)
+      assert.equal(events[0].args.symbols.length, 3)
+      assert.equal(events[0].args.weights.length, 3)
       assert.equal(web3.utils.hexToUtf8(events[0].args.symbols[0]), 'cGLD')
       assert.equal(web3.utils.hexToUtf8(events[0].args.symbols[1]), 'BTC')
+      assert.equal(web3.utils.hexToUtf8(events[0].args.symbols[2]), 'ETH')
       assert.equal(newAssetAllocationWeights[0].isEqualTo(events[0].args.weights[0]), true)
       assert.equal(newAssetAllocationWeights[1].isEqualTo(events[0].args.weights[1]), true)
+      assert.equal(newAssetAllocationWeights[2].isEqualTo(events[0].args.weights[2]), true)
+    })
+
+    it("should fail if the asset allocation doesn't sum to one", async () => {
+      var badAssetAllocationWeights = newAssetAllocationWeights
+      badAssetAllocationWeights[0] = badAssetAllocationWeights[0].minus(1)
+      await assertRevert(
+        reserve.setAssetAllocations(newAssetAllocationSymbols, badAssetAllocationWeights)
+      )
+      var assetAllocationWeights = await reserve.getAssetAllocationWeights()
+      assert.equal(assetAllocationWeights.length, 0)
     })
   })
 })

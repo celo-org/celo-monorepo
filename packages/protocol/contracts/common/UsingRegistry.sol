@@ -79,12 +79,12 @@ contract UsingRegistry is Ownable {
     return ILockedGold(registry.getAddressForOrDie(LOCKED_GOLD_REGISTRY_ID));
   }
 
-  function getReserve() internal view returns (IReserve) {
-    return IReserve(registry.getAddressForOrDie(RESERVE_REGISTRY_ID));
-  }
-
   function getRandom() internal view returns (IRandom) {
     return IRandom(registry.getAddressForOrDie(RANDOM_REGISTRY_ID));
+  }
+
+  function getReserve() internal view returns (IReserve) {
+    return IReserve(registry.getAddressForOrDie(RESERVE_REGISTRY_ID));
   }
 
   function getSortedOracles() internal view returns (ISortedOracles) {
