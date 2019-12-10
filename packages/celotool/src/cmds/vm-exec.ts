@@ -64,16 +64,28 @@ export const handler = async (argv: ValidatorsExecArgv) => {
       `Node Count: ${nodeCount}`
   )
 
-  const runCmds = []
+  // For proxy / tx-nodes that have random suffixes, we are forced to run a
+  // gcloud command and await it in order to get the full instance name.
+  // Because of this, we end up calling the SSH command, and then moving on to get the
+  // next instance name, which takes time, so the previous SSH command is nearly finished.
+  // By doing this in two steps, we more closely make the exec across all instances
+  // happen in parallel
+  const instanceNames = []
   if (argv.only === null) {
     for (let i = 0; i < nodeCount; i++) {
       const instanceName = await getNodeVmName(argv.celoEnv, argv.nodeType, i)
-      runCmds.push(runSshCommand(instanceName, cmd))
+      instanceNames.push(instanceName)
     }
   } else {
     const instanceName = await getNodeVmName(argv.celoEnv, argv.nodeType, argv.only)
+    instanceNames.push(instanceName)
+  }
+
+  const runCmds = []
+  for (const instanceName of instanceNames) {
     runCmds.push(runSshCommand(instanceName, cmd))
   }
+
   await Promise.all(runCmds)
 
   console.info('Done.')

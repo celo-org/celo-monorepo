@@ -422,13 +422,14 @@ export function getVmSshCommand(instanceName: string) {
 
 export async function getNodeVmName(celoEnv: string, nodeType: string, index?: number) {
   const nodeTypesWithRandomSuffixes = ['tx-node', 'proxy']
+  const nodeTypesWithNoIndex = ['bootnode']
 
   let instanceName
   if (nodeTypesWithRandomSuffixes.includes(nodeType)) {
     instanceName = await getNodeVmNameWithRandomSuffix(celoEnv, nodeType, index || 0)
   } else {
     instanceName = `${celoEnv}-${nodeType}`
-    if (index !== undefined) {
+    if (!nodeTypesWithNoIndex.includes(nodeType) && index !== undefined) {
       instanceName += `-${index}`
     }
   }
