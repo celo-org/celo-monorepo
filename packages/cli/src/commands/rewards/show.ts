@@ -8,12 +8,12 @@ import { printValueMapRecursive } from '../../utils/cli'
 import { Flags } from '../../utils/command'
 
 export default class Show extends BaseCommand {
-  static description = 'Show rewards.'
+  static description =
+    'Show rewards information about a voter, registered Validator, or Validator Group'
 
   static flags = {
     ...BaseCommand.flags,
     address: Flags.address({ required: false, description: 'Address to filter' }),
-    group: Flags.address({ required: false, description: 'Group to filter' }),
     epochs: flags.integer({ required: false, description: 'Number of epochs' }),
     'no-truncate': flags.boolean({
       required: false,
@@ -32,7 +32,7 @@ export default class Show extends BaseCommand {
     const epochSize = await validators.getEpochSize()
 
     // Map the votes cast by address at each epoch.
-    var addressVotes: { [key: number]: { [key: string]: BigNumber } } = {}
+    let addressVotes: { [key: number]: { [key: string]: BigNumber } } = {}
     if (res.flags.address) {
       const address = res.flags.address
       await newCheckBuilder(this)
@@ -64,7 +64,7 @@ export default class Show extends BaseCommand {
       res.flags.address ? addressVotes : null
     )
 
-    // validatorRewards applies to address when validatorReward.validator is address.
+    // validatorRewards applies to address when validatorReward.validator (or .group) is address.
     const validatorRewards = await validators.getValidatorRewardEvents(
       epochSize,
       res.flags.epochs,
