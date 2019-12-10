@@ -1,7 +1,6 @@
-import { NativeModules } from 'react-native'
-
-NativeModules.RNSmsRetrieverModule = {}
-
-const smsRetrieverMock = jest.genMockFromModule('@celo/react-native-sms-retriever')
-
-module.exports = smsRetrieverMock
+export default {
+  requestPhoneNumber: jest.fn(),
+  startSmsRetriever: jest.fn(),
+  addSmsListener: jest.fn(),
+  removeSmsListener: jest.fn(),
+}

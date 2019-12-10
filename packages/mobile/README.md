@@ -25,7 +25,7 @@ This makes Gradle faster:
 export GRADLE_OPTS='-Dorg.gradle.daemon=true -Dorg.gradle.parallel=true -Dorg.gradle.jvmargs="-Xmx4096m -XX:+HeapDumpOnOutOfMemoryError"'
 ```
 
-## Running
+## Running the App
 
 1.  If you haven't already, run `yarn` from the monorepo root to install dependencies.
 
@@ -89,13 +89,15 @@ components in react or overloading the should component update method
 ### Connecting to networks
 
 By default, we have the `alfajores` network set up. If you have other testnets
-that you want to use with the app, update `.env.ENV-NAME` and `packages/mobile/.env.ENV-NAME` with the new network name and settings, then run
+that you want to use with the app, update `.env.ENV-NAME` and `packages/mobile/.env.ENV-NAME` with
+the new network name and settings, then rebuild the app. Note that this will assume the testnets
+have a corresponding `/blockchain-api` and `/notification-service` set up.
 
-```bash
-yarn run build-sdk TESTNET
-```
+### Running Wallet app in ZeroSync mode
 
-before rebuilding the app. Note that this will assume the testnets have a corresponding `/blockchain-api` and `/notification-service` set up.
+By default, the mobile wallet app runs geth in ultralight sync mode where all the epoch headers are fetched. The default sync mode is defined in [packages/mobile/.env](https://github.com/celo-org/celo-monorepo/blob/master/packages/mobile/.env#L4) file.
+
+To run the wallet in zero sync mode, using a trusted node rather than the local geth node as a provider, turn it on from the Celo Lite page in settings or update the zero sync initially enabled parameter in the .env file linked above. When zero sync mode is turned back off, the wallet will switch to the default sync mode as specified in the .env file. By default, the trusted node is `https://{TESTNET}-forno.celo-testnet.org`, however any trusted node can be used by updating `DEFAULT_FORNO_URL`. In zero sync mode, the wallet signs transactions locally in web3 then sends them to the trusted node.
 
 ## Testing
 
@@ -160,6 +162,11 @@ export CELO_RELEASE_KEY_PASSWORD=celoFakeReleaseKeyPass
 ### Building an APK or Bundle
 
 ```sh
+# With fastlane:
+bundle install
+bundle exec fastlane android build_apk env:YOUR_BUILDING_VARIANT sdkEnv:YOUR_SDK_ENV
+
+# Or, manually
 cd android/
 ./gradlew clean
 ./gradlew bundle{YOUR_BUILDING_VARIANT}JsAndAssets
@@ -171,25 +178,25 @@ cd android/
 
 Where `YOUR_BUILD_VARIANT` can be any of the app's build variants, such as debug or release.
 
+## Configuring the SMS Retriever
+
+On android, the wallet app uses the SMS Retriever API to automatically input codes during phone number verification.
+
+The service that route SMS messages to the app needs to be configured to [append this app signature to the message][sms retriever]. Note, the signature will need to be computed using the signing key from the google play dashboard.
+
 ## Generating GraphQL Types
 
 We're using [GraphQL Code Generator][graphql code generator] to properly type
 GraphQL queries. If you make a change to a query, run `yarn build:gen-graphql-types` to update the typings in the `typings` directory.
 
-## Running Wallet app in ZeroSync mode
-
-By default, the mobile wallet app runs geth in ultralight sync mode where all the epoch headers are fetched. The default sync mode is defined in [packages/mobile/.env](https://github.com/celo-org/celo-monorepo/blob/master/packages/mobile/.env#L4) file.
-
-To run wallet in zero sync mode, where it would connect to the remote nodes and sign transactions in web3, change the default sync mode in the aforementioned file to -1. The mode has only been tested on Android and is hard-coded to be [crash](https://github.com/celo-org/celo-monorepo/blob/aeddeefbfb230db51d2ef76d50c5f882644a1cd3/packages/mobile/src/web3/contracts.ts#L73) on iOS.
-=======
 ## How we handle Geth crashes in wallet app on Android
 
 Our Celo app has three types of codes.
 
-1. Javascript code - generated from Typescript, this runs in Javascript interpreter.
-2. Java bytecode - This runs on Dalvik/Art Virtual Machine.
-3. Native code - Geth code is written in Golang which compiles to native code - this runs directly on the
-CPU, no virtual machines involved.
+1.  Javascript code - generated from Typescript, this runs in Javascript interpreter.
+2.  Java bytecode - This runs on Dalvik/Art Virtual Machine.
+3.  Native code - Geth code is written in Golang which compiles to native code - this runs directly on the
+    CPU, no virtual machines involved.
 
 One should note that, on iOS, there is no byte code and therefore, there are only two layers, one is the Javascript code, and the other is the Native code. Till now, we have been blind towards native crashes except Google Playstore logs.
 
@@ -199,14 +206,14 @@ We cannot use libraries like [Bugsnag](https://www.bugsnag.com) since they do no
 
 Relevant code references:
 
-1. [NDKCrashService](https://github.com/celo-org/celo-monorepo/blob/master/packages/mobile/android/app/src/main/java/org/celo/mobile/NdkCrashService.java)
-2. [Initialization](https://github.com/celo-org/celo-monorepo/blob/8689634a1d10d74ba6d4f3b36b2484db60a95bdb/packages/mobile/android/app/src/main/java/org/celo/mobile/MainApplication.java#L156) of the NDKCrashService
-3. [Sentry code](https://github.com/celo-org/celo-monorepo/blob/799d74675dc09327543c210e88cbf5cc796721a0/packages/mobile/src/sentry/Sentry.ts#L53) to read NDK crash logs on restart
+1.  [NDKCrashService](https://github.com/celo-org/celo-monorepo/blob/master/packages/mobile/android/app/src/main/java/org/celo/mobile/NdkCrashService.java)
+2.  [Initialization](https://github.com/celo-org/celo-monorepo/blob/8689634a1d10d74ba6d4f3b36b2484db60a95bdb/packages/mobile/android/app/src/main/java/org/celo/mobile/MainApplication.java#L156) of the NDKCrashService
+3.  [Sentry code](https://github.com/celo-org/celo-monorepo/blob/799d74675dc09327543c210e88cbf5cc796721a0/packages/mobile/src/sentry/Sentry.ts#L53) to read NDK crash logs on restart
 
 There are two major differencs in ZeroSync mode:
 
-1. Geth won't run at all. The web3 would instead connect to <testnet>-infura.celo-testnet.org using an https provider, for example, [https://integration-infura.celo-testnet.org](https://integration-infura.celo-testnet.org).
-2. Changes to [sendTransactionAsyncWithWeb3Signing](https://github.com/celo-org/celo-monorepo/blob/8689634a1d10d74ba6d4f3b36b2484db60a95bdb/packages/walletkit/src/contract-utils.ts#L362) in walletkit to poll after sending a transaction for the transaction to succeed. This is needed because http provider, unliked web sockets and IPC provider, does not support subscriptions.
+1.  Geth won't run at all. The web3 would instead connect to <testnet>-forno.celo-testnet.org using an https provider, for example, [https://integration-forno.celo-testnet.org](https://integration-forno.celo-testnet.org).
+2.  Changes to [sendTransactionAsyncWithWeb3Signing](https://github.com/celo-org/celo-monorepo/blob/8689634a1d10d74ba6d4f3b36b2484db60a95bdb/packages/walletkit/src/contract-utils.ts#L362) in walletkit to poll after sending a transaction for the transaction to succeed. This is needed because http provider, unliked web sockets and IPC provider, does not support subscriptions.
 
 #### Why http(s) provider?
 
@@ -254,3 +261,4 @@ $ adb kill-server && adb start-server
 [rntl-docs]: https://callstack.github.io/react-native-testing-library/
 [jest]: https://jestjs.io/docs/en/snapshot-testing
 [redux-saga-test-plan]: https://github.com/jfairbank/redux-saga-test-plan
+[sms retriever]: https://developers.google.com/identity/sms-retriever/verify#1_construct_a_verification_message

@@ -1,6 +1,6 @@
 import { addCeloEnvMiddleware, CeloEnvArgv, envVar, fetchEnv } from 'src/lib/env-utils'
 import { execCmd } from 'src/lib/utils'
-import * as yargs from 'yargs'
+import yargs from 'yargs'
 
 export const command = 'ssh-vm-node <nodeType> [nodeIndex]'
 
@@ -8,7 +8,7 @@ export const describe =
   'Generates a command to ssh into a vm-testnet node. To execute the ssh command, run `eval $(<this cmd>)`'
 
 interface SshVmNodeArgv extends CeloEnvArgv {
-  nodeType: 'validator' | 'tx-node' | 'bootnode'
+  nodeType: 'validator' | 'tx-node' | 'bootnode' | 'proxy'
   nodeIndex?: number
 }
 
@@ -16,7 +16,7 @@ export const builder = (argv: yargs.Argv) => {
   return addCeloEnvMiddleware(argv)
     .positional('nodeType', {
       describe: 'Type of node',
-      choices: ['validator', 'tx-node', 'bootnode'],
+      choices: ['validator', 'tx-node', 'bootnode', 'proxy'],
       type: 'string',
     })
     .positional('nodeIndex', {
@@ -35,10 +35,16 @@ export const builder = (argv: yargs.Argv) => {
 export const handler = async (argv: SshVmNodeArgv) => {
   const project = fetchEnv(envVar.TESTNET_PROJECT_NAME)
   const zone = fetchEnv(envVar.KUBERNETES_CLUSTER_ZONE)
+  const nodeTypesWithRandomSuffixes = ['tx-node', 'proxy']
 
   let instanceName
-  if (argv.nodeType === 'tx-node') {
-    instanceName = await getTxNodeVmName(argv.celoEnv, argv.nodeIndex || 0)
+  if (nodeTypesWithRandomSuffixes.includes(argv.nodeType)) {
+    instanceName = await getNodeVmNameWithRandomSuffix(
+      project,
+      argv.celoEnv,
+      argv.nodeType,
+      argv.nodeIndex || 0
+    )
   } else {
     instanceName = `${argv.celoEnv}-${argv.nodeType}`
     if (argv.nodeIndex !== undefined) {
@@ -49,15 +55,20 @@ export const handler = async (argv: SshVmNodeArgv) => {
   console.info(getSshCommand(project, zone, instanceName))
 }
 
-function getSshCommand(gcloudProject: string, gcloudZone: string, instanceName: string) {
-  return `gcloud beta compute --project '${gcloudProject}' ssh --zone '${gcloudZone}' ${instanceName}`
+export function getSshCommand(gcloudProject: string, gcloudZone: string, instanceName: string) {
+  return `gcloud beta compute --project '${gcloudProject}' ssh --zone '${gcloudZone}' ${instanceName} --tunnel-through-iap`
 }
 
-// Tx-nodes names have a randomly generated suffix. This returns the full name
+// Some VM names have a randomly generated suffix. This returns the full name
 // of the instance given only the celoEnv and index.
-async function getTxNodeVmName(celoEnv: string, index: number) {
+async function getNodeVmNameWithRandomSuffix(
+  gcloudProject: string,
+  celoEnv: string,
+  nodeType: string,
+  index: number
+) {
   const [nodeName] = await execCmd(
-    `gcloud compute instances list --filter="NAME ~ ${celoEnv}-tx-node-${index}-.*" --format get\\(NAME\\)`
+    `gcloud compute instances list --project '${gcloudProject}' --filter="NAME ~ ${celoEnv}-${nodeType}-${index}-.*" --format get\\(NAME\\)`
   )
   return nodeName.trim()
 }

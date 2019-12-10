@@ -10,7 +10,11 @@ import ExchangeRate from 'src/exchange/ExchangeRate'
 import FeeExchangeIcon from 'src/exchange/FeeExchangeIcon'
 import { CURRENCY_ENUM } from 'src/geth/consts'
 import { Namespaces } from 'src/i18n'
-import { useLocalCurrencySymbol } from 'src/localCurrency/hooks'
+import {
+  useDollarsToLocalAmount,
+  useLocalCurrencyCode,
+  useLocalCurrencySymbol,
+} from 'src/localCurrency/hooks'
 import FeeIcon from 'src/send/FeeIcon'
 import RoundedArrow from 'src/shared/RoundedArrow'
 import { getMoneyDisplayValue } from 'src/utils/formatting'
@@ -84,13 +88,22 @@ export function ExchangeConfirmationCard(props: Props) {
     fee,
   } = props
 
+  const localCurrencyCode = useLocalCurrencyCode()
   const localCurrencySymbol = useLocalCurrencySymbol()
+  const localMakerAmount = useDollarsToLocalAmount(props.makerAmount)
+  const localTakerAmount = useDollarsToLocalAmount(props.takerAmount)
+
+  const takerToken = getTakerToken(props)
 
   return (
     <View style={styles.container}>
       <View style={styles.exchange}>
         <CurrencyDisplay
-          amount={makerAmount}
+          amount={
+            props.makerToken === CURRENCY_ENUM.DOLLAR && localCurrencyCode
+              ? new BigNumber(localMakerAmount || 0)
+              : makerAmount
+          }
           size={36}
           type={props.makerToken}
           currencySymbol={localCurrencySymbol}
@@ -99,9 +112,13 @@ export function ExchangeConfirmationCard(props: Props) {
           <RoundedArrow />
         </View>
         <CurrencyDisplay
-          amount={takerAmount}
+          amount={
+            takerToken === CURRENCY_ENUM.DOLLAR && localCurrencyCode
+              ? new BigNumber(localTakerAmount || 0)
+              : takerAmount
+          }
           size={36}
-          type={getTakerToken(props)}
+          type={takerToken}
           currencySymbol={localCurrencySymbol}
         />
       </View>
@@ -112,13 +129,13 @@ export function ExchangeConfirmationCard(props: Props) {
 
       <View style={styles.feeContainer}>
         <LineItemRow
-          currencySymbol={getTakerToken(props)}
+          currencySymbol={takerToken}
           amount={fee}
           title={t('securityFee')}
           titleIcon={<FeeIcon />}
         />
         <LineItemRow
-          currencySymbol={getTakerToken(props)}
+          currencySymbol={takerToken}
           amount={'0.01'}
           title={t('exchangeFee')}
           titleIcon={<FeeExchangeIcon />}
@@ -134,11 +151,10 @@ export function ExchangeConfirmationCard(props: Props) {
 
 const styles = StyleSheet.create({
   container: {
-    minHeight: 300,
-    flex: 1,
     borderWidth: 1,
     borderColor: colors.darkLightest,
     justifyContent: 'center',
+    paddingHorizontal: 20,
   },
   feeContainer: {
     marginBottom: 10,
@@ -169,9 +185,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   titleContainer: {
-    paddingTop: 30,
-    paddingBottom: 20,
-    flex: 1,
+    paddingTop: 15,
     justifyContent: 'center',
     alignItems: 'center',
   },

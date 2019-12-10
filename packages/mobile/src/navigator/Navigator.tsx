@@ -1,5 +1,16 @@
 import { Platform } from 'react-native'
-import { createStackNavigator, createSwitchNavigator, StackNavigatorConfig } from 'react-navigation'
+import {
+  CreateNavigatorConfig,
+  createSwitchNavigator,
+  NavigationRoute,
+  NavigationStackRouterConfig,
+} from 'react-navigation'
+import {
+  createStackNavigator,
+  NavigationStackConfig,
+  NavigationStackOptions,
+  NavigationStackProp,
+} from 'react-navigation-stack'
 import Account from 'src/account/Account'
 import Analytics from 'src/account/Analytics'
 import CeloLite from 'src/account/CeloLite'
@@ -24,6 +35,7 @@ import BackupSocialIntro from 'src/backup/BackupSocialIntro'
 import DappKitAccountScreen from 'src/dappkit/DappKitAccountScreen'
 import DappKitSignTxScreen from 'src/dappkit/DappKitSignTxScreen'
 import DappKitTxDataScreen from 'src/dappkit/DappKitTxDataScreen'
+import EscrowedPaymentListScreen from 'src/escrow/EscrowedPaymentListScreen'
 import ReclaimPaymentConfirmationScreen from 'src/escrow/ReclaimPaymentConfirmationScreen'
 import ExchangeReview from 'src/exchange/ExchangeReview'
 import ExchangeTradeScreen from 'src/exchange/ExchangeTradeScreen'
@@ -38,8 +50,9 @@ import Language from 'src/language/Language'
 import SelectLocalCurrency from 'src/localCurrency/SelectLocalCurrency'
 import { Screens, Stacks } from 'src/navigator/Screens'
 import TabNavigator from 'src/navigator/TabNavigator'
+import IncomingPaymentRequestListScreen from 'src/paymentRequest/IncomingPaymentRequestListScreen'
+import OutgoingPaymentRequestListScreen from 'src/paymentRequest/OutgoingPaymentRequestListScreen'
 import PaymentRequestConfirmation from 'src/paymentRequest/PaymentRequestConfirmation'
-import PaymentRequestListScreen from 'src/paymentRequest/PaymentRequestListScreen'
 import PincodeConfirmation from 'src/pincode/PincodeConfirmation'
 import PincodeEducation from 'src/pincode/PincodeEducation'
 import PincodeSet from 'src/pincode/PincodeSet'
@@ -51,12 +64,19 @@ import SendAmount from 'src/send/SendAmount'
 import SendConfirmation from 'src/send/SendConfirmation'
 import SetClock from 'src/set-clock/SetClock'
 import TransactionReviewScreen from 'src/transactions/TransactionReviewScreen'
-import VerifyInput from 'src/verify/Input'
-import VerifyVerified from 'src/verify/Verified'
-import VerifyVerifying from 'src/verify/Verifying'
-import VerifyEducation from 'src/verify/VerifyPhoneEducation'
+import VerificationEducationScreen from 'src/verify/VerificationEducationScreen'
+import VerificationInputScreen from 'src/verify/VerificationInputScreen'
+import VerificationInterstitialScreen from 'src/verify/VerificationInterstitialScreen'
+import VerificationLearnMoreScreen from 'src/verify/VerificationLearnMoreScreen'
+import VerificationLoadingScreen from 'src/verify/VerificationLoadingScreen'
+import VerificationSuccessScreen from 'src/verify/VerificationSuccessScreen'
 
-export const headerArea: StackNavigatorConfig = {
+export const headerArea: CreateNavigatorConfig<
+  NavigationStackConfig,
+  NavigationStackRouterConfig,
+  NavigationStackOptions,
+  NavigationStackProp<NavigationRoute, any>
+> = {
   // Force this for now on iOS so screen transitions look normal
   // given we intentionally hide the bottom separator from the nav bar
   headerMode: 'screen',
@@ -96,13 +116,18 @@ const NuxStack = createStackNavigator(
     [Screens.ImportWalletSocial]: { screen: ImportWalletSocial },
     [Screens.ImportWalletEmpty]: { screen: ImportWalletEmpty },
     [Screens.ImportContacts]: { screen: ImportContacts },
-    [Screens.VerifyEducation]: { screen: VerifyEducation },
-    [Screens.VerifyInput]: { screen: VerifyInput },
-    [Screens.VerifyVerifying]: { screen: VerifyVerifying },
-    [Screens.VerifyVerified]: { screen: VerifyVerified },
+    [Screens.VerificationEducationScreen]: { screen: VerificationEducationScreen },
+    [Screens.VerificationLearnMoreScreen]: { screen: VerificationLearnMoreScreen },
+    [Screens.VerificationLoadingScreen]: { screen: VerificationLoadingScreen },
+    [Screens.VerificationInterstitialScreen]: { screen: VerificationInterstitialScreen },
+    [Screens.VerificationInputScreen]: { screen: VerificationInputScreen },
+    [Screens.VerificationSuccessScreen]: { screen: VerificationSuccessScreen },
     ...commonScreens,
   },
   {
+    navigationOptions: {
+      header: null,
+    },
     ...headerArea,
     initialRouteName: Screens.Language,
   }
@@ -158,9 +183,9 @@ const ExchangeStack = createStackNavigator(
   }
 )
 
-const RequestStack = createStackNavigator(
+const IncomingRequestStack = createStackNavigator(
   {
-    [Screens.PaymentRequestListScreen]: { screen: PaymentRequestListScreen },
+    [Screens.IncomingPaymentRequestListScreen]: { screen: IncomingPaymentRequestListScreen },
     [Screens.SendConfirmation]: { screen: SendConfirmation },
   },
   {
@@ -168,7 +193,36 @@ const RequestStack = createStackNavigator(
       header: null,
     },
     ...headerArea,
-    initialRouteName: Screens.PaymentRequestListScreen,
+    initialRouteName: Screens.IncomingPaymentRequestListScreen,
+  }
+)
+
+const OutgoingRequestStack = createStackNavigator(
+  {
+    [Screens.OutgoingPaymentRequestListScreen]: { screen: OutgoingPaymentRequestListScreen },
+  },
+  {
+    navigationOptions: {
+      header: null,
+    },
+    ...headerArea,
+    initialRouteName: Screens.OutgoingPaymentRequestListScreen,
+  }
+)
+
+const EscrowStack = createStackNavigator(
+  {
+    [Screens.EscrowedPaymentListScreen]: { screen: EscrowedPaymentListScreen },
+    [Screens.ReclaimPaymentConfirmationScreen]: {
+      screen: ReclaimPaymentConfirmationScreen,
+    },
+  },
+  {
+    navigationOptions: {
+      header: null,
+    },
+    ...headerArea,
+    initialRouteName: Screens.EscrowedPaymentListScreen,
   }
 )
 
@@ -203,6 +257,12 @@ const SettingsStack = createStackNavigator(
     [Screens.InviteReview]: { screen: InviteReview },
     [Screens.SelectLocalCurrency]: { screen: SelectLocalCurrency },
     [Screens.Licenses]: { screen: Licenses },
+    [Screens.VerificationEducationScreen]: { screen: VerificationEducationScreen },
+    [Screens.VerificationLearnMoreScreen]: { screen: VerificationLearnMoreScreen },
+    [Screens.VerificationLoadingScreen]: { screen: VerificationLoadingScreen },
+    [Screens.VerificationInterstitialScreen]: { screen: VerificationInterstitialScreen },
+    [Screens.VerificationInputScreen]: { screen: VerificationInputScreen },
+    [Screens.VerificationSuccessScreen]: { screen: VerificationSuccessScreen },
   },
   {
     navigationOptions: {
@@ -220,15 +280,15 @@ const AppStack = createStackNavigator(
     [Stacks.SendStack]: { screen: SendStack },
     [Stacks.QRSendStack]: { screen: QRSendStack },
     [Stacks.ExchangeStack]: { screen: ExchangeStack },
-    [Stacks.RequestStack]: { screen: RequestStack },
+    [Stacks.IncomingRequestStack]: { screen: IncomingRequestStack },
+    [Stacks.OutgoingRequestStack]: { screen: OutgoingRequestStack },
+    [Stacks.EscrowStack]: { screen: EscrowStack },
     [Stacks.SettingsStack]: { screen: SettingsStack },
     [Screens.SetClock]: { screen: SetClock },
     [Screens.DollarEducation]: { screen: DollarEducation },
     [Screens.TransactionReview]: { screen: TransactionReviewScreen },
     [Screens.PhotosEducation]: { screen: PhotosEducation },
     [Screens.GoldEducation]: { screen: GoldEducation },
-    [Screens.PaymentRequestListScreen]: { screen: PaymentRequestListScreen },
-    [Screens.ReclaimPaymentConfirmationScreen]: { screen: ReclaimPaymentConfirmationScreen },
     [Screens.FeeEducation]: { screen: FeeEducation },
     ...commonScreens,
   },

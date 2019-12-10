@@ -4,26 +4,6 @@ description: View and manage locked Celo Gold
 
 ## Commands
 
-### Authorize
-
-Authorize validating or voting address for a Locked Gold account
-
-```
-USAGE
-  $ celocli lockedgold:authorize
-
-OPTIONS
-  -r, --role=voter|validator                         Role to delegate
-  --from=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) Account Address
-  --to=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d    (required) Account Address
-
-EXAMPLE
-  authorize --from 0x5409ED021D9299bf6814279A6A1411A7e866A631 --role voter --to
-  0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d
-```
-
-_See code: [packages/cli/src/commands/lockedgold/authorize.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/lockedgold/authorize.ts)_
-
 ### Lock
 
 Locks Celo Gold to be used in governance and validator elections.
@@ -34,34 +14,17 @@ USAGE
 
 OPTIONS
   --from=from    (required)
-  --value=value  (required) unit amount of Celo Gold (cGLD)
+  --value=value  (required) The unit amount of Celo Gold (cGLD)
 
 EXAMPLE
-  lock --from 0x47e172F6CfB6c7D01C1574fa3E2Be7CC73269D95 --value 1000000000000000000
+  lock --from 0x47e172F6CfB6c7D01C1574fa3E2Be7CC73269D95 --value 10000000000000000000000
 ```
 
 _See code: [packages/cli/src/commands/lockedgold/lock.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/lockedgold/lock.ts)_
 
-### Register
-
-Register an account for Locked Gold
-
-```
-USAGE
-  $ celocli lockedgold:register
-
-OPTIONS
-  --from=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) Account Address
-
-EXAMPLE
-  register
-```
-
-_See code: [packages/cli/src/commands/lockedgold/register.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/lockedgold/register.ts)_
-
 ### Show
 
-Show Locked Gold information for a given account
+Show Locked Gold information for a given account. This includes the total amount of locked gold, the amount being used for voting in Validator Elections, the Locked Gold balance this account is required to maintain due to a registered Validator or Validator Group, and any pending withdrawals that have been initiated via "lockedgold:unlock".
 
 ```
 USAGE
@@ -75,7 +38,7 @@ _See code: [packages/cli/src/commands/lockedgold/show.ts](https://github.com/cel
 
 ### Unlock
 
-Unlocks Celo Gold, which can be withdrawn after the unlocking period.
+Unlocks Celo Gold, which can be withdrawn after the unlocking period. Unlocked gold will appear as a "pending withdrawal" until the unlocking period is over, after which it can be withdrawn via "lockedgold:withdraw".
 
 ```
 USAGE
@@ -83,7 +46,7 @@ USAGE
 
 OPTIONS
   --from=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) Account Address
-  --value=value                                      (required) unit amount of Celo Gold (cGLD)
+  --value=value                                      (required) The unit amount of Celo Gold (cGLD)
 
 EXAMPLE
   unlock --from 0x47e172F6CfB6c7D01C1574fa3E2Be7CC73269D95 --value 500000000
@@ -93,7 +56,7 @@ _See code: [packages/cli/src/commands/lockedgold/unlock.ts](https://github.com/c
 
 ### Withdraw
 
-Withdraw unlocked gold whose unlocking period has passed.
+Withdraw any pending withdrawals created via "lockedgold:unlock" that have become available.
 
 ```
 USAGE

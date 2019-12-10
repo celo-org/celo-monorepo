@@ -10,6 +10,9 @@ exports[`ImportWallet renders correctly and is disabled with no text 1`] = `
     }
   }
 >
+  <NavigationEvents
+    onDidFocus={[Function]}
+  />
   <RCTScrollView
     contentContainerStyle={
       Object {
@@ -23,7 +26,7 @@ exports[`ImportWallet renders correctly and is disabled with no text 1`] = `
       <Image
         source={
           Object {
-            "testUri": "../../../src/images/backup-icon.png",
+            "testUri": "../../../packages/mobile/src/images/backup-icon.png",
           }
         }
         style={
@@ -181,6 +184,7 @@ exports[`ImportWallet renders correctly and is disabled with no text 1`] = `
   >
     <View
       accessible={true}
+      focusable={false}
       isTVSelectable={true}
       nativeBackgroundAndroid={
         Object {
@@ -188,6 +192,7 @@ exports[`ImportWallet renders correctly and is disabled with no text 1`] = `
           "type": "ThemeAttrAndroid",
         }
       }
+      onClick={[Function]}
       onResponderGrant={[Function]}
       onResponderMove={[Function]}
       onResponderRelease={[Function]}
@@ -265,6 +270,7 @@ exports[`ImportWallet renders correctly and is disabled with no text 1`] = `
   >
     <View
       accessible={true}
+      focusable={true}
       isTVSelectable={true}
       nativeBackgroundAndroid={
         Object {
@@ -272,6 +278,7 @@ exports[`ImportWallet renders correctly and is disabled with no text 1`] = `
           "type": "ThemeAttrAndroid",
         }
       }
+      onClick={[Function]}
       onResponderGrant={[Function]}
       onResponderMove={[Function]}
       onResponderRelease={[Function]}

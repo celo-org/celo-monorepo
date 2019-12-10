@@ -17,11 +17,24 @@
 	<key>CFBundlePackageType</key>
 	<string>APPL</string>
 	<key>CFBundleShortVersionString</key>
-	<string>1.4.2</string>
+	<string>1.5.2</string>
 	<key>CFBundleSignature</key>
 	<string>????</string>
+	<key>CFBundleURLTypes</key>
+	<array>
+		<dict>
+			<key>CFBundleTypeRole</key>
+			<string>Editor</string>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>celo</string>
+			</array>
+		</dict>
+	</array>
 	<key>CFBundleVersion</key>
-	<string>7</string>
+	<string>15</string>
+	<key>ITSAppUsesNonExemptEncryption</key>
+	<false/>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
 	<key>NSAppTransportSecurity</key>
@@ -39,10 +52,6 @@
 	<string>This is so you can scan QR codes.</string>
 	<key>NSContactsUsageDescription</key>
 	<string>This is so you can invite and transact with them.</string>
-	<key>NSLocationAlwaysUsageDescription</key>
-	<string>N/A</string>
-	<key>NSLocationWhenInUseUsageDescription</key>
-	<string>N/A</string>
 	<key>UIAppFonts</key>
 	<array>
 		<string>Hind-Bold.ttf</string>
@@ -65,6 +74,8 @@
 	<array>
 		<string>UIInterfaceOrientationPortrait</string>
 	</array>
+	<key>UIUserInterfaceStyle</key>
+	<string>Light</string>
 	<key>UIViewControllerBasedStatusBarAppearance</key>
 	<false/>
 </dict>

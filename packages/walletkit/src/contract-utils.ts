@@ -1,7 +1,6 @@
 import BigNumber from 'bignumber.js'
 import { values } from 'lodash'
 import sleep from 'sleep-promise'
-import * as util from 'util'
 import Web3 from 'web3'
 import Contract from 'web3/eth/contract'
 import { TransactionObject } from 'web3/eth/types'
@@ -14,7 +13,10 @@ import { getGasPriceMinimumContract } from './contracts'
 import { getGoldTokenAddress } from './erc20-utils'
 import { Logger } from './logger'
 
-const gasInflateFactor = 1.3
+const gasInflateFactor = 1.5
+
+// TODO(nategraf): Allow this parameter to be fetched from the full-node peer.
+const defaultGatewayFee = new BigNumber(10000)
 
 export function selectContractByAddress(contracts: Contract[], address: string) {
   const addresses = contracts.map((contract) => contract.options.address)
@@ -64,7 +66,7 @@ export async function sendTransaction(
       ...txParams,
       gas: estGas.toString(),
       // Hack to prevent web3 from adding the suggested gold gas price, allowing geth to add
-      // the suggested price in the selected gasCurrency.
+      // the suggested price in the selected feeCurrency.
       gasPrice: '0',
     })
     .on('transactionHash', (hash: string) => {
@@ -216,14 +218,14 @@ function Exception(error: Error): Exception {
 
 async function getGasPrice(
   web3: Web3,
-  gasCurrency: string | undefined
+  feeCurrency: string | undefined
 ): Promise<string | undefined> {
   // Gold Token
-  if (gasCurrency === undefined) {
+  if (feeCurrency === undefined) {
     return String(await web3.eth.getGasPrice())
   }
   const gasPriceMinimum: GasPriceMinimumType = await getGasPriceMinimumContract(web3)
-  const gasPrice: string = await gasPriceMinimum.methods.getGasPriceMinimum(gasCurrency).call()
+  const gasPrice: string = await gasPriceMinimum.methods.getGasPriceMinimum(feeCurrency).call()
   Logger.debug('contract-utils@getGasPrice', `Gas price is ${gasPrice}`)
   return String(parseInt(gasPrice, 10) * 10)
 }
@@ -242,14 +244,14 @@ const currentNonce = new Map<string, number>()
  *       sendTransaction
  * @param tx The transaction object itself
  * @param account The address from which the transaction should be sent
- * @param gasCurrencyContract The contract instance of the Token in which to pay gas for
+ * @param feeCurrencyContract The contract instance of the Token in which to pay gas for
  * @param logger An object whose log level functions can be passed a function to pass
  *               a transaction ID
  */
 export async function sendTransactionAsync<T>(
   tx: TransactionObject<T>,
   account: string,
-  gasCurrencyContract: StableToken | GoldToken,
+  feeCurrencyContract: StableToken | GoldToken,
   logger: TxLogger = emptyTxLogger,
   estimatedGas?: number | undefined
 ): Promise<TxPromises> {
@@ -284,7 +286,7 @@ export async function sendTransactionAsync<T>(
     logger(Started)
     const txParams: any = {
       from: account,
-      gasCurrency: gasCurrencyContract._address,
+      feeCurrency: feeCurrencyContract._address,
       gasPrice: '0',
     }
 
@@ -296,10 +298,10 @@ export async function sendTransactionAsync<T>(
     tx.send({
       from: account,
       // @ts-ignore
-      gasCurrency: gasCurrencyContract._address,
+      feeCurrency: feeCurrencyContract._address,
       gas: estimatedGas,
       // Hack to prevent web3 from adding the suggested gold gas price, allowing geth to add
-      // the suggested price in the selected gasCurrency.
+      // the suggested price in the selected feeCurrency.
       gasPrice: '0',
     })
       .on('receipt', (r: TransactionReceipt) => {
@@ -347,15 +349,14 @@ export async function sendTransactionAsync<T>(
  * sendTransactionAsyncWithWeb3Signing is same as sendTransactionAsync except it fills
  * in the missing fields and locally signs the transaction. It will fail if the `from`
  * is not one of the account whose local signing keys are available. This method
- * should only be used in Zero sync (infura-like) mode where Geth is running
- * remotely.
+ * should only be used in forno mode where Geth is running remotely.
  *
  * This separate function is temporary and contractkit uses a unified function
  * for both web3 (local) and remote (geth) siging.
  *
  * @param tx The transaction object itself
  * @param account The address from which the transaction should be sent
- * @param gasCurrencyContract The contract instance of the Token in which to pay gas for
+ * @param feeCurrencyContract The contract instance of the Token in which to pay gas for
  * @param logger An object whose log level functions can be passed a function to pass
  *               a transaction ID
  */
@@ -363,7 +364,7 @@ export async function sendTransactionAsyncWithWeb3Signing<T>(
   web3: Web3,
   tx: TransactionObject<T>,
   account: string,
-  gasCurrencyContract: StableToken | GoldToken,
+  feeCurrencyContract: StableToken | GoldToken,
   logger: TxLogger = emptyTxLogger,
   estimatedGas?: number | undefined
 ): Promise<TxPromises> {
@@ -399,7 +400,7 @@ export async function sendTransactionAsyncWithWeb3Signing<T>(
     logger(Started)
     const txParams: any = {
       from: account,
-      gasCurrency: gasCurrencyContract._address,
+      feeCurrency: feeCurrencyContract._address,
       gasPrice: '0',
     }
 
@@ -410,14 +411,15 @@ export async function sendTransactionAsyncWithWeb3Signing<T>(
     // Ideally, we should fill these fields in CeloProvider but as of now,
     // we don't have access to web3 inside it, so, in the short-term
     // fill the fields here.
-    let gasCurrency = gasCurrencyContract._address
-    const gasFeeRecipient = await web3.eth.getCoinbase()
-    Logger.debug(tag, `Gas fee recipient is ${gasFeeRecipient}`)
-    const gasPrice = await getGasPrice(web3, gasCurrency)
-    if (gasCurrency === undefined) {
-      gasCurrency = await getGoldTokenAddress(web3)
+    let feeCurrency = feeCurrencyContract._address
+    const gatewayFeeRecipient = await web3.eth.getCoinbase()
+    const gatewayFee = defaultGatewayFee.toString()
+    Logger.debug(tag, `Gateway fee is ${gatewayFee} paid to ${gatewayFeeRecipient}`)
+    const gasPrice = await getGasPrice(web3, feeCurrency)
+    if (feeCurrency === undefined) {
+      feeCurrency = await getGoldTokenAddress(web3)
     }
-    Logger.debug(tag, `Gas currency: ${gasCurrency}`)
+    Logger.debug(tag, `Fee currency: ${feeCurrency}`)
 
     let recievedTxHash: string | null = null
     let alreadyInformedResolversAboutConfirmation = false
@@ -459,20 +461,20 @@ export async function sendTransactionAsyncWithWeb3Signing<T>(
       from: account,
       nonce,
       // @ts-ignore
-      gasCurrency,
+      feeCurrency,
       gas: estimatedGas,
       // Hack to prevent web3 from adding the suggested gold gas price, allowing geth to add
-      // the suggested price in the selected gasCurrency.
+      // the suggested price in the selected feeCurrency.
       gasPrice,
-      gasFeeRecipient,
+      gatewayFeeRecipient,
+      gatewayFee,
     }
     // Increment and store nonce for the next call to sendTransaction.
     currentNonce.set(account, nonce + 1)
     try {
       await tx.send(celoTx)
     } catch (e) {
-      Logger.debug(tag, `Ignoring error: ${util.inspect(e)}`)
-      Logger.debug(tag, `error message: ${e.message}`)
+      Logger.debug(tag, `Ignoring error with message: ${e.message}`)
       // Ideally, I want to only ignore error whose messsage contains
       // "Failed to subscribe to new newBlockHeaders" but seems like another wrapped
       // error (listed below) gets thrown and there is no way to catch that.
@@ -496,7 +498,7 @@ export async function sendTransactionAsyncWithWeb3Signing<T>(
         // Ignore this error
         Logger.warn(tag, `Expected error ignored: ${JSON.stringify(e)}`)
       } else {
-        Logger.debug(tag, `Unexpected error ignored: ${util.inspect(e)}`)
+        Logger.debug(tag, `Unexpected error ignored: ${e.message}`)
       }
       const signedTxn = await web3.eth.signTransaction(celoTx)
       recievedTxHash = web3.utils.sha3(signedTxn.raw)
@@ -506,7 +508,7 @@ export async function sendTransactionAsyncWithWeb3Signing<T>(
         resolvers.transactionHash(recievedTxHash)
       }
     }
-    // This code is required for infura-like setup.
+    // This code is required for forno setup.
     // When mobile client directly connects to the remote full node then
     // it gets `receipt` but not other notifications.
     let sleepTimeInSecs = 1
@@ -529,7 +531,7 @@ export async function sendTransactionAsyncWithWeb3Signing<T>(
       }
     }
   } catch (error) {
-    Logger.warn(tag, `Transaction failed with error "${util.inspect(error)}"`)
+    Logger.warn(tag, `Transaction failed with error "${error.name + ' ' + error.message}"`)
     logger(Exception(error))
     rejectAll(error)
   }

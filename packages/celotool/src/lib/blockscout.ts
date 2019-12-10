@@ -1,7 +1,7 @@
 import { fetchEnv, fetchEnvOrFallback, isVmBased } from './env-utils'
 import { installGenericHelmChart, removeGenericHelmChart } from './helm_deploy'
 import { execCmdWithExitOnFailure } from './utils'
-import { getTxNodeLoadBalancerIP } from './vm-testnet-utils'
+import { getInternalTxNodeLoadBalancerIP } from './vm-testnet-utils'
 
 export async function installHelmChart(
   celoEnv: string,
@@ -59,8 +59,7 @@ async function helmParameters(
   const params = [
     `--set domain.name=${fetchEnv('CLUSTER_DOMAIN_NAME')}`,
     `--set blockscout.image.repository=${fetchEnv('BLOCKSCOUT_DOCKER_IMAGE_REPOSITORY')}`,
-    `--set blockscout.image.webTag=${fetchEnv('BLOCKSCOUT_WEB_DOCKER_IMAGE_TAG')}`,
-    `--set blockscout.image.indexerTag=${fetchEnv('BLOCKSCOUT_INDEXER_DOCKER_IMAGE_TAG')}`,
+    `--set blockscout.image.tag=${fetchEnv('BLOCKSCOUT_DOCKER_IMAGE_TAG')}`,
     `--set blockscout.db.username=${blockscoutDBUsername}`,
     `--set blockscout.db.password=${blockscoutDBPassword}`,
     `--set blockscout.db.connection_name=${blockscoutDBConnectionName.trim()}`,
@@ -70,7 +69,7 @@ async function helmParameters(
     `--set promtosd.export_interval=${fetchEnv('PROMTOSD_EXPORT_INTERVAL')}`,
   ]
   if (isVmBased()) {
-    const txNodeLbIp = getTxNodeLoadBalancerIP(celoEnv)
+    const txNodeLbIp = await getInternalTxNodeLoadBalancerIP(celoEnv)
     params.push(`--set blockscout.jsonrpc_http_url=http://${txNodeLbIp}:8545`)
     params.push(`--set blockscout.jsonrpc_ws_url=ws://${txNodeLbIp}:8546`)
   }

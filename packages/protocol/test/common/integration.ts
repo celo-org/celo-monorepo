@@ -8,6 +8,7 @@ import { getDeployedProxiedContract } from '@celo/protocol/lib/web3-utils'
 import { config } from '@celo/protocol/migrationsConfig'
 import BigNumber from 'bignumber.js'
 import {
+  AccountsInstance,
   ExchangeInstance,
   GoldTokenInstance,
   GovernanceInstance,
@@ -27,6 +28,7 @@ enum VoteValue {
 contract('Integration: Governance', (accounts: string[]) => {
   const proposalId = 1
   const dequeuedIndex = 0
+  let accountsInstance: AccountsInstance
   let lockedGold: LockedGoldInstance
   let governance: GovernanceInstance
   let registry: RegistryInstance
@@ -34,11 +36,11 @@ contract('Integration: Governance', (accounts: string[]) => {
   const value = new BigNumber('1000000000000000000')
 
   before(async () => {
+    accountsInstance = await getDeployedProxiedContract('Accounts', artifacts)
     lockedGold = await getDeployedProxiedContract('LockedGold', artifacts)
     governance = await getDeployedProxiedContract('Governance', artifacts)
     registry = await getDeployedProxiedContract('Registry', artifacts)
-    // Set up a LockedGold account with which we can vote.
-    await lockedGold.createAccount()
+    await accountsInstance.createAccount()
     // @ts-ignore
     await lockedGold.lock({ value })
     proposalTransactions = [
@@ -67,7 +69,7 @@ contract('Integration: Governance', (accounts: string[]) => {
     ]
   })
 
-  describe('When making a governance proposal', async () => {
+  describe('When making a governance proposal', () => {
     before(async () => {
       await governance.propose(
         proposalTransactions.map((x: any) => x.value),
@@ -85,7 +87,7 @@ contract('Integration: Governance', (accounts: string[]) => {
     })
   })
 
-  describe('When upvoting that proposal', async () => {
+  describe('When upvoting that proposal', () => {
     before(async () => {
       await governance.upvote(proposalId, 0, 0)
     })
@@ -95,7 +97,7 @@ contract('Integration: Governance', (accounts: string[]) => {
     })
   })
 
-  describe('When approving that proposal', async () => {
+  describe('When approving that proposal', () => {
     before(async () => {
       await timeTravel(config.governance.dequeueFrequency, web3)
       await governance.approve(proposalId, dequeuedIndex)
@@ -106,7 +108,7 @@ contract('Integration: Governance', (accounts: string[]) => {
     })
   })
 
-  describe('When voting on that proposal', async () => {
+  describe('When voting on that proposal', () => {
     before(async () => {
       await timeTravel(config.governance.approvalStageDuration, web3)
       await governance.vote(proposalId, dequeuedIndex, VoteValue.Yes)
@@ -118,7 +120,7 @@ contract('Integration: Governance', (accounts: string[]) => {
     })
   })
 
-  describe('When executing that proposal', async () => {
+  describe('When executing that proposal', () => {
     before(async () => {
       await timeTravel(config.governance.referendumStageDuration, web3)
       await governance.execute(proposalId, dequeuedIndex)

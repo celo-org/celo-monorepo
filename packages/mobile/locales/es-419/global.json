@@ -38,6 +38,7 @@
   "startEarning": "Comenzar a ganar",
   "backToWallet": "Volver a el Monedero",
   "exchangeForGold": "Cambiar a Oro",
+  "missingFullName": "El nombre no puede estar vacío",
   "invalidPhone": "Número de teléfono inválido",
   "cantSelectInvalidPhone": "No se puede seleccionar el contacto: número de teléfono no válido",
   "needMoreFundsToSend": "Necesita más fondos para enviar el pago",
@@ -56,6 +57,9 @@
   "invalidAccount": "Cuenta inválida",
   "delete": "Eliminar",
   "cancel": "Cancelar",
+  "remind": "Recordar",
+  "pay": "Paga",
+  "decline": "Disminución",
   "to": "Para",
   "for": "Por",
   "celoGold": "Celo Oro",
@@ -93,6 +97,10 @@
   "web3FailedToSync": "Fallo la sincronización, por favor verifica tu conexión",
   "errorDuringSync": "Ocurrió un error duranet la sincronización, por favor intente más tarde",
   "calculateFeeFailed": "No se pudo calcular la comisión",
+  "failedToSwitchSyncModes": "Error al cambiar de red modos",
   "gold": "Oro",
-  "localCurrencyTitle": "Seleccione el tipo de moneda"
+  "localCurrencyTitle": "Seleccione el tipo de moneda",
+  "or": "o",
+  "accepted": "Aceptado",
+  "processing": "Procesando"
 }

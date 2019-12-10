@@ -17,8 +17,8 @@ const BAD_STATES = new Set([RequestState.Failed, RequestState.Invalid])
 
 export function ContextualInfo({ requestState, t, isFaucet }: InfoProps) {
   const contextStyle = [
-    fonts.small,
-    !isFaucet && textStyles.invert,
+    fonts.micro,
+    !isFaucet && textStyles.readingOnDark,
     BAD_STATES.has(requestState) && textStyles.error,
   ]
 
@@ -49,7 +49,7 @@ export function HashingStatus({
       style={isFaucet ? [std.row, styles.statusesContainerTicker] : styles.statusesContainerLog}
     >
       {[
-        goldTxHash && t('cGLDsent'),
+        goldTxHash && isFaucet && t('cGLDsent'),
         dollarTxHash && t('cUSDsent'),
         escrowTxHash && t('walletBuilt'),
       ]
@@ -57,7 +57,7 @@ export function HashingStatus({
         .map((message) => (
           <Fade key={message} when={!done} appear={true}>
             <View style={isFaucet ? styles.ticker : styles.log}>
-              <Text style={[fonts.h5, !isFaucet && textStyles.invert]}>
+              <Text style={[fonts.h6, !isFaucet && textStyles.invert]}>
                 <Checkmark size={12} color={colors.primary} /> {message}
               </Text>
             </View>
@@ -97,6 +97,7 @@ export function ButtonWithFeedback({
       kind={isNotStarted ? BTN.PRIMARY : BTN.SECONDARY}
       text={buttonText({ requestState, t, isFaucet })}
       onPress={onSubmit}
+      onDarkBackground={!isFaucet}
       iconLeft={icon}
       align={'flex-start'}
       style={!isFaucet && isEnded && [textStyles.invert, styles.message]}

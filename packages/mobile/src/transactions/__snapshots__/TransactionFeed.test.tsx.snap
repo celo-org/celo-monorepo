@@ -14,7 +14,7 @@ exports[`filters out Failed 1`] = `
     resizeMode="contain"
     source={
       Object {
-        "testUri": "../../../src/images/exchange.png",
+        "testUri": "../../../packages/mobile/src/images/exchange.png",
       }
     }
     style={
@@ -184,6 +184,7 @@ exports[`renders for gold to dollar exchange properly 1`] = `
     >
       <View
         accessible={true}
+        focusable={true}
         isTVSelectable={true}
         nativeBackgroundAndroid={
           Object {
@@ -191,6 +192,7 @@ exports[`renders for gold to dollar exchange properly 1`] = `
             "type": "ThemeAttrAndroid",
           }
         }
+        onClick={[Function]}
         onResponderGrant={[Function]}
         onResponderMove={[Function]}
         onResponderRelease={[Function]}
@@ -247,7 +249,7 @@ exports[`renders for gold to dollar exchange properly 1`] = `
                 <Image
                   source={
                     Object {
-                      "testUri": "../../../src/images/unknown-user-icon.png",
+                      "testUri": "../../../packages/mobile/src/images/unknown-user-icon.png",
                     }
                   }
                   style={
@@ -308,7 +310,6 @@ exports[`renders for gold to dollar exchange properly 1`] = `
                 -
                 $
                 133.00
-                MXN
               </Text>
             </View>
             <Text
@@ -339,34 +340,22 @@ exports[`renders for gold to dollar exchange properly 1`] = `
             >
               <Text
                 style={
-                  Array [
-                    Object {
-                      "color": "#2E3338",
-                      "fontFamily": "Hind-Regular",
-                      "fontSize": 14,
-                      "lineHeight": 18,
-                    },
-                    Object {
-                      "color": "#BDBDBD",
-                    },
-                  ]
+                  Object {
+                    "color": "#BDBDBD",
+                    "fontFamily": "Hind-Regular",
+                    "fontSize": 14,
+                    "lineHeight": 18,
+                  }
                 }
               >
                 <Text
                   style={
-                    Array [
-                      Object {
-                        "color": "#2E3338",
-                        "fontFamily": "Hind-Bold",
-                        "fontSize": 14,
-                        "lineHeight": 18,
-                      },
-                      Object {
-                        "color": "#42D689",
-                        "fontSize": 13,
-                        "lineHeight": 18,
-                      },
-                    ]
+                    Object {
+                      "color": "#42D689",
+                      "fontFamily": "Hind-Bold",
+                      "fontSize": 13,
+                      "lineHeight": 18,
+                    }
                   }
                 >
                   confirmingPayment
@@ -393,6 +382,7 @@ exports[`renders for gold to dollar exchange properly 1`] = `
     >
       <View
         accessible={true}
+        focusable={true}
         isTVSelectable={true}
         nativeBackgroundAndroid={
           Object {
@@ -400,6 +390,7 @@ exports[`renders for gold to dollar exchange properly 1`] = `
             "type": "ThemeAttrAndroid",
           }
         }
+        onClick={[Function]}
         onResponderGrant={[Function]}
         onResponderMove={[Function]}
         onResponderRelease={[Function]}
@@ -432,7 +423,7 @@ exports[`renders for gold to dollar exchange properly 1`] = `
               resizeMode="contain"
               source={
                 Object {
-                  "testUri": "../../../src/transactions/ExchangeGreenGold.png",
+                  "testUri": "../../../packages/mobile/src/transactions/ExchangeGreenGold.png",
                 }
               }
               style={
@@ -486,8 +477,7 @@ exports[`renders for gold to dollar exchange properly 1`] = `
                   ]
                 }
               >
-                -
-                $26.60MXN
+                -$26.60MXN
               </Text>
             </View>
             <View
@@ -570,34 +560,22 @@ exports[`renders for gold to dollar exchange properly 1`] = `
             >
               <Text
                 style={
-                  Array [
-                    Object {
-                      "color": "#2E3338",
-                      "fontFamily": "Hind-Regular",
-                      "fontSize": 14,
-                      "lineHeight": 18,
-                    },
-                    Object {
-                      "color": "#BDBDBD",
-                    },
-                  ]
+                  Object {
+                    "color": "#BDBDBD",
+                    "fontFamily": "Hind-Regular",
+                    "fontSize": 14,
+                    "lineHeight": 18,
+                  }
                 }
               >
                 <Text
                   style={
-                    Array [
-                      Object {
-                        "color": "#2E3338",
-                        "fontFamily": "Hind-Bold",
-                        "fontSize": 14,
-                        "lineHeight": 18,
-                      },
-                      Object {
-                        "color": "#42D689",
-                        "fontSize": 13,
-                        "lineHeight": 18,
-                      },
-                    ]
+                    Object {
+                      "color": "#42D689",
+                      "fontFamily": "Hind-Bold",
+                      "fontSize": 13,
+                      "lineHeight": 18,
+                    }
                   }
                 >
                   confirmingExchange
@@ -624,6 +602,7 @@ exports[`renders for gold to dollar exchange properly 1`] = `
     >
       <View
         accessible={true}
+        focusable={true}
         isTVSelectable={true}
         nativeBackgroundAndroid={
           Object {
@@ -631,6 +610,7 @@ exports[`renders for gold to dollar exchange properly 1`] = `
             "type": "ThemeAttrAndroid",
           }
         }
+        onClick={[Function]}
         onResponderGrant={[Function]}
         onResponderMove={[Function]}
         onResponderRelease={[Function]}
@@ -659,7 +639,7 @@ exports[`renders for gold to dollar exchange properly 1`] = `
             <Image
               source={
                 Object {
-                  "testUri": "../../../src/images/coins-logo.png",
+                  "testUri": "../../../packages/mobile/src/images/coins-logo.png",
                 }
               }
               style={
@@ -718,7 +698,6 @@ exports[`renders for gold to dollar exchange properly 1`] = `
                 
                 $
                 &lt;0.001
-                MXN
               </Text>
             </View>
             <Text
@@ -749,34 +728,22 @@ exports[`renders for gold to dollar exchange properly 1`] = `
             >
               <Text
                 style={
-                  Array [
-                    Object {
-                      "color": "#2E3338",
-                      "fontFamily": "Hind-Regular",
-                      "fontSize": 14,
-                      "lineHeight": 18,
-                    },
-                    Object {
-                      "color": "#BDBDBD",
-                    },
-                  ]
+                  Object {
+                    "color": "#BDBDBD",
+                    "fontFamily": "Hind-Regular",
+                    "fontSize": 14,
+                    "lineHeight": 18,
+                  }
                 }
               >
                 <Text
                   style={
-                    Array [
-                      Object {
-                        "color": "#2E3338",
-                        "fontFamily": "Hind-Bold",
-                        "fontSize": 14,
-                        "lineHeight": 18,
-                      },
-                      Object {
-                        "color": "#42D689",
-                        "fontSize": 13,
-                        "lineHeight": 18,
-                      },
-                    ]
+                    Object {
+                      "color": "#42D689",
+                      "fontFamily": "Hind-Bold",
+                      "fontSize": 13,
+                      "lineHeight": 18,
+                    }
                   }
                 >
                   confirmingPayment
@@ -803,6 +770,7 @@ exports[`renders for gold to dollar exchange properly 1`] = `
     >
       <View
         accessible={true}
+        focusable={true}
         isTVSelectable={true}
         nativeBackgroundAndroid={
           Object {
@@ -810,6 +778,7 @@ exports[`renders for gold to dollar exchange properly 1`] = `
             "type": "ThemeAttrAndroid",
           }
         }
+        onClick={[Function]}
         onResponderGrant={[Function]}
         onResponderMove={[Function]}
         onResponderRelease={[Function]}
@@ -842,7 +811,7 @@ exports[`renders for gold to dollar exchange properly 1`] = `
               resizeMode="contain"
               source={
                 Object {
-                  "testUri": "../../../src/transactions/ExchangeGreenGold.png",
+                  "testUri": "../../../packages/mobile/src/transactions/ExchangeGreenGold.png",
                 }
               }
               style={
@@ -896,8 +865,7 @@ exports[`renders for gold to dollar exchange properly 1`] = `
                   ]
                 }
               >
-                -
-                $39.90MXN
+                -$39.90MXN
               </Text>
             </View>
             <View
@@ -980,17 +948,12 @@ exports[`renders for gold to dollar exchange properly 1`] = `
             >
               <Text
                 style={
-                  Array [
-                    Object {
-                      "color": "#2E3338",
-                      "fontFamily": "Hind-Regular",
-                      "fontSize": 14,
-                      "lineHeight": 18,
-                    },
-                    Object {
-                      "color": "#BDBDBD",
-                    },
-                  ]
+                  Object {
+                    "color": "#BDBDBD",
+                    "fontFamily": "Hind-Regular",
+                    "fontSize": 14,
+                    "lineHeight": 18,
+                  }
                 }
               />
             </View>
@@ -1069,6 +1032,7 @@ exports[`renders for loading 1`] = `
     >
       <View
         accessible={true}
+        focusable={true}
         isTVSelectable={true}
         nativeBackgroundAndroid={
           Object {
@@ -1076,6 +1040,7 @@ exports[`renders for loading 1`] = `
             "type": "ThemeAttrAndroid",
           }
         }
+        onClick={[Function]}
         onResponderGrant={[Function]}
         onResponderMove={[Function]}
         onResponderRelease={[Function]}
@@ -1132,7 +1097,7 @@ exports[`renders for loading 1`] = `
                 <Image
                   source={
                     Object {
-                      "testUri": "../../../src/images/unknown-user-icon.png",
+                      "testUri": "../../../packages/mobile/src/images/unknown-user-icon.png",
                     }
                   }
                   style={
@@ -1193,7 +1158,6 @@ exports[`renders for loading 1`] = `
                 -
                 $
                 133.00
-                MXN
               </Text>
             </View>
             <Text
@@ -1224,34 +1188,22 @@ exports[`renders for loading 1`] = `
             >
               <Text
                 style={
-                  Array [
-                    Object {
-                      "color": "#2E3338",
-                      "fontFamily": "Hind-Regular",
-                      "fontSize": 14,
-                      "lineHeight": 18,
-                    },
-                    Object {
-                      "color": "#BDBDBD",
-                    },
-                  ]
+                  Object {
+                    "color": "#BDBDBD",
+                    "fontFamily": "Hind-Regular",
+                    "fontSize": 14,
+                    "lineHeight": 18,
+                  }
                 }
               >
                 <Text
                   style={
-                    Array [
-                      Object {
-                        "color": "#2E3338",
-                        "fontFamily": "Hind-Bold",
-                        "fontSize": 14,
-                        "lineHeight": 18,
-                      },
-                      Object {
-                        "color": "#42D689",
-                        "fontSize": 13,
-                        "lineHeight": 18,
-                      },
-                    ]
+                    Object {
+                      "color": "#42D689",
+                      "fontFamily": "Hind-Bold",
+                      "fontSize": 13,
+                      "lineHeight": 18,
+                    }
                   }
                 >
                   confirmingPayment
@@ -1278,6 +1230,7 @@ exports[`renders for loading 1`] = `
     >
       <View
         accessible={true}
+        focusable={true}
         isTVSelectable={true}
         nativeBackgroundAndroid={
           Object {
@@ -1285,6 +1238,7 @@ exports[`renders for loading 1`] = `
             "type": "ThemeAttrAndroid",
           }
         }
+        onClick={[Function]}
         onResponderGrant={[Function]}
         onResponderMove={[Function]}
         onResponderRelease={[Function]}
@@ -1317,7 +1271,7 @@ exports[`renders for loading 1`] = `
               resizeMode="contain"
               source={
                 Object {
-                  "testUri": "../../../src/transactions/ExchangeGreenGold.png",
+                  "testUri": "../../../packages/mobile/src/transactions/ExchangeGreenGold.png",
                 }
               }
               style={
@@ -1371,8 +1325,7 @@ exports[`renders for loading 1`] = `
                   ]
                 }
               >
-                -
-                $26.60MXN
+                -$26.60MXN
               </Text>
             </View>
             <View
@@ -1455,34 +1408,22 @@ exports[`renders for loading 1`] = `
             >
               <Text
                 style={
-                  Array [
-                    Object {
-                      "color": "#2E3338",
-                      "fontFamily": "Hind-Regular",
-                      "fontSize": 14,
-                      "lineHeight": 18,
-                    },
-                    Object {
-                      "color": "#BDBDBD",
-                    },
-                  ]
+                  Object {
+                    "color": "#BDBDBD",
+                    "fontFamily": "Hind-Regular",
+                    "fontSize": 14,
+                    "lineHeight": 18,
+                  }
                 }
               >
                 <Text
                   style={
-                    Array [
-                      Object {
-                        "color": "#2E3338",
-                        "fontFamily": "Hind-Bold",
-                        "fontSize": 14,
-                        "lineHeight": 18,
-                      },
-                      Object {
-                        "color": "#42D689",
-                        "fontSize": 13,
-                        "lineHeight": 18,
-                      },
-                    ]
+                    Object {
+                      "color": "#42D689",
+                      "fontFamily": "Hind-Bold",
+                      "fontSize": 13,
+                      "lineHeight": 18,
+                    }
                   }
                 >
                   confirmingExchange
@@ -1509,6 +1450,7 @@ exports[`renders for loading 1`] = `
     >
       <View
         accessible={true}
+        focusable={true}
         isTVSelectable={true}
         nativeBackgroundAndroid={
           Object {
@@ -1516,6 +1458,7 @@ exports[`renders for loading 1`] = `
             "type": "ThemeAttrAndroid",
           }
         }
+        onClick={[Function]}
         onResponderGrant={[Function]}
         onResponderMove={[Function]}
         onResponderRelease={[Function]}
@@ -1544,7 +1487,7 @@ exports[`renders for loading 1`] = `
             <Image
               source={
                 Object {
-                  "testUri": "../../../src/images/coins-logo.png",
+                  "testUri": "../../../packages/mobile/src/images/coins-logo.png",
                 }
               }
               style={
@@ -1603,7 +1546,6 @@ exports[`renders for loading 1`] = `
                 
                 $
                 &lt;0.001
-                MXN
               </Text>
             </View>
             <Text
@@ -1634,34 +1576,22 @@ exports[`renders for loading 1`] = `
             >
               <Text
                 style={
-                  Array [
-                    Object {
-                      "color": "#2E3338",
-                      "fontFamily": "Hind-Regular",
-                      "fontSize": 14,
-                      "lineHeight": 18,
-                    },
-                    Object {
-                      "color": "#BDBDBD",
-                    },
-                  ]
+                  Object {
+                    "color": "#BDBDBD",
+                    "fontFamily": "Hind-Regular",
+                    "fontSize": 14,
+                    "lineHeight": 18,
+                  }
                 }
               >
                 <Text
                   style={
-                    Array [
-                      Object {
-                        "color": "#2E3338",
-                        "fontFamily": "Hind-Bold",
-                        "fontSize": 14,
-                        "lineHeight": 18,
-                      },
-                      Object {
-                        "color": "#42D689",
-                        "fontSize": 13,
-                        "lineHeight": 18,
-                      },
-                    ]
+                    Object {
+                      "color": "#42D689",
+                      "fontFamily": "Hind-Bold",
+                      "fontSize": 13,
+                      "lineHeight": 18,
+                    }
                   }
                 >
                   confirmingPayment
@@ -1744,6 +1674,7 @@ exports[`renders for no transactions 1`] = `
     >
       <View
         accessible={true}
+        focusable={true}
         isTVSelectable={true}
         nativeBackgroundAndroid={
           Object {
@@ -1751,6 +1682,7 @@ exports[`renders for no transactions 1`] = `
             "type": "ThemeAttrAndroid",
           }
         }
+        onClick={[Function]}
         onResponderGrant={[Function]}
         onResponderMove={[Function]}
         onResponderRelease={[Function]}
@@ -1807,7 +1739,7 @@ exports[`renders for no transactions 1`] = `
                 <Image
                   source={
                     Object {
-                      "testUri": "../../../src/images/unknown-user-icon.png",
+                      "testUri": "../../../packages/mobile/src/images/unknown-user-icon.png",
                     }
                   }
                   style={
@@ -1868,7 +1800,6 @@ exports[`renders for no transactions 1`] = `
                 -
                 $
                 133.00
-                MXN
               </Text>
             </View>
             <Text
@@ -1899,34 +1830,22 @@ exports[`renders for no transactions 1`] = `
             >
               <Text
                 style={
-                  Array [
-                    Object {
-                      "color": "#2E3338",
-                      "fontFamily": "Hind-Regular",
-                      "fontSize": 14,
-                      "lineHeight": 18,
-                    },
-                    Object {
-                      "color": "#BDBDBD",
-                    },
-                  ]
+                  Object {
+                    "color": "#BDBDBD",
+                    "fontFamily": "Hind-Regular",
+                    "fontSize": 14,
+                    "lineHeight": 18,
+                  }
                 }
               >
                 <Text
                   style={
-                    Array [
-                      Object {
-                        "color": "#2E3338",
-                        "fontFamily": "Hind-Bold",
-                        "fontSize": 14,
-                        "lineHeight": 18,
-                      },
-                      Object {
-                        "color": "#42D689",
-                        "fontSize": 13,
-                        "lineHeight": 18,
-                      },
-                    ]
+                    Object {
+                      "color": "#42D689",
+                      "fontFamily": "Hind-Bold",
+                      "fontSize": 13,
+                      "lineHeight": 18,
+                    }
                   }
                 >
                   confirmingPayment
@@ -1953,6 +1872,7 @@ exports[`renders for no transactions 1`] = `
     >
       <View
         accessible={true}
+        focusable={true}
         isTVSelectable={true}
         nativeBackgroundAndroid={
           Object {
@@ -1960,6 +1880,7 @@ exports[`renders for no transactions 1`] = `
             "type": "ThemeAttrAndroid",
           }
         }
+        onClick={[Function]}
         onResponderGrant={[Function]}
         onResponderMove={[Function]}
         onResponderRelease={[Function]}
@@ -1992,7 +1913,7 @@ exports[`renders for no transactions 1`] = `
               resizeMode="contain"
               source={
                 Object {
-                  "testUri": "../../../src/transactions/ExchangeGreenGold.png",
+                  "testUri": "../../../packages/mobile/src/transactions/ExchangeGreenGold.png",
                 }
               }
               style={
@@ -2046,8 +1967,7 @@ exports[`renders for no transactions 1`] = `
                   ]
                 }
               >
-                -
-                $26.60MXN
+                -$26.60MXN
               </Text>
             </View>
             <View
@@ -2130,34 +2050,22 @@ exports[`renders for no transactions 1`] = `
             >
               <Text
                 style={
-                  Array [
-                    Object {
-                      "color": "#2E3338",
-                      "fontFamily": "Hind-Regular",
-                      "fontSize": 14,
-                      "lineHeight": 18,
-                    },
-                    Object {
-                      "color": "#BDBDBD",
-                    },
-                  ]
+                  Object {
+                    "color": "#BDBDBD",
+                    "fontFamily": "Hind-Regular",
+                    "fontSize": 14,
+                    "lineHeight": 18,
+                  }
                 }
               >
                 <Text
                   style={
-                    Array [
-                      Object {
-                        "color": "#2E3338",
-                        "fontFamily": "Hind-Bold",
-                        "fontSize": 14,
-                        "lineHeight": 18,
-                      },
-                      Object {
-                        "color": "#42D689",
-                        "fontSize": 13,
-                        "lineHeight": 18,
-                      },
-                    ]
+                    Object {
+                      "color": "#42D689",
+                      "fontFamily": "Hind-Bold",
+                      "fontSize": 13,
+                      "lineHeight": 18,
+                    }
                   }
                 >
                   confirmingExchange
@@ -2184,6 +2092,7 @@ exports[`renders for no transactions 1`] = `
     >
       <View
         accessible={true}
+        focusable={true}
         isTVSelectable={true}
         nativeBackgroundAndroid={
           Object {
@@ -2191,6 +2100,7 @@ exports[`renders for no transactions 1`] = `
             "type": "ThemeAttrAndroid",
           }
         }
+        onClick={[Function]}
         onResponderGrant={[Function]}
         onResponderMove={[Function]}
         onResponderRelease={[Function]}
@@ -2219,7 +2129,7 @@ exports[`renders for no transactions 1`] = `
             <Image
               source={
                 Object {
-                  "testUri": "../../../src/images/coins-logo.png",
+                  "testUri": "../../../packages/mobile/src/images/coins-logo.png",
                 }
               }
               style={
@@ -2278,7 +2188,6 @@ exports[`renders for no transactions 1`] = `
                 
                 $
                 &lt;0.001
-                MXN
               </Text>
             </View>
             <Text
@@ -2309,34 +2218,22 @@ exports[`renders for no transactions 1`] = `
             >
               <Text
                 style={
-                  Array [
-                    Object {
-                      "color": "#2E3338",
-                      "fontFamily": "Hind-Regular",
-                      "fontSize": 14,
-                      "lineHeight": 18,
-                    },
-                    Object {
-                      "color": "#BDBDBD",
-                    },
-                  ]
+                  Object {
+                    "color": "#BDBDBD",
+                    "fontFamily": "Hind-Regular",
+                    "fontSize": 14,
+                    "lineHeight": 18,
+                  }
                 }
               >
                 <Text
                   style={
-                    Array [
-                      Object {
-                        "color": "#2E3338",
-                        "fontFamily": "Hind-Bold",
-                        "fontSize": 14,
-                        "lineHeight": 18,
-                      },
-                      Object {
-                        "color": "#42D689",
-                        "fontSize": 13,
-                        "lineHeight": 18,
-                      },
-                    ]
+                    Object {
+                      "color": "#42D689",
+                      "fontFamily": "Hind-Bold",
+                      "fontSize": 13,
+                      "lineHeight": 18,
+                    }
                   }
                 >
                   confirmingPayment
@@ -2419,6 +2316,7 @@ exports[`renders for standbyTransactions 1`] = `
     >
       <View
         accessible={true}
+        focusable={true}
         isTVSelectable={true}
         nativeBackgroundAndroid={
           Object {
@@ -2426,6 +2324,7 @@ exports[`renders for standbyTransactions 1`] = `
             "type": "ThemeAttrAndroid",
           }
         }
+        onClick={[Function]}
         onResponderGrant={[Function]}
         onResponderMove={[Function]}
         onResponderRelease={[Function]}
@@ -2482,7 +2381,7 @@ exports[`renders for standbyTransactions 1`] = `
                 <Image
                   source={
                     Object {
-                      "testUri": "../../../src/images/unknown-user-icon.png",
+                      "testUri": "../../../packages/mobile/src/images/unknown-user-icon.png",
                     }
                   }
                   style={
@@ -2543,7 +2442,6 @@ exports[`renders for standbyTransactions 1`] = `
                 -
                 $
                 133.00
-                MXN
               </Text>
             </View>
             <Text
@@ -2574,34 +2472,22 @@ exports[`renders for standbyTransactions 1`] = `
             >
               <Text
                 style={
-                  Array [
-                    Object {
-                      "color": "#2E3338",
-                      "fontFamily": "Hind-Regular",
-                      "fontSize": 14,
-                      "lineHeight": 18,
-                    },
-                    Object {
-                      "color": "#BDBDBD",
-                    },
-                  ]
+                  Object {
+                    "color": "#BDBDBD",
+                    "fontFamily": "Hind-Regular",
+                    "fontSize": 14,
+                    "lineHeight": 18,
+                  }
                 }
               >
                 <Text
                   style={
-                    Array [
-                      Object {
-                        "color": "#2E3338",
-                        "fontFamily": "Hind-Bold",
-                        "fontSize": 14,
-                        "lineHeight": 18,
-                      },
-                      Object {
-                        "color": "#42D689",
-                        "fontSize": 13,
-                        "lineHeight": 18,
-                      },
-                    ]
+                    Object {
+                      "color": "#42D689",
+                      "fontFamily": "Hind-Bold",
+                      "fontSize": 13,
+                      "lineHeight": 18,
+                    }
                   }
                 >
                   confirmingPayment
@@ -2628,6 +2514,7 @@ exports[`renders for standbyTransactions 1`] = `
     >
       <View
         accessible={true}
+        focusable={true}
         isTVSelectable={true}
         nativeBackgroundAndroid={
           Object {
@@ -2635,6 +2522,7 @@ exports[`renders for standbyTransactions 1`] = `
             "type": "ThemeAttrAndroid",
           }
         }
+        onClick={[Function]}
         onResponderGrant={[Function]}
         onResponderMove={[Function]}
         onResponderRelease={[Function]}
@@ -2667,7 +2555,7 @@ exports[`renders for standbyTransactions 1`] = `
               resizeMode="contain"
               source={
                 Object {
-                  "testUri": "../../../src/transactions/ExchangeGreenGold.png",
+                  "testUri": "../../../packages/mobile/src/transactions/ExchangeGreenGold.png",
                 }
               }
               style={
@@ -2721,8 +2609,7 @@ exports[`renders for standbyTransactions 1`] = `
                   ]
                 }
               >
-                -
-                $26.60MXN
+                -$26.60MXN
               </Text>
             </View>
             <View
@@ -2805,34 +2692,22 @@ exports[`renders for standbyTransactions 1`] = `
             >
               <Text
                 style={
-                  Array [
-                    Object {
-                      "color": "#2E3338",
-                      "fontFamily": "Hind-Regular",
-                      "fontSize": 14,
-                      "lineHeight": 18,
-                    },
-                    Object {
-                      "color": "#BDBDBD",
-                    },
-                  ]
+                  Object {
+                    "color": "#BDBDBD",
+                    "fontFamily": "Hind-Regular",
+                    "fontSize": 14,
+                    "lineHeight": 18,
+                  }
                 }
               >
                 <Text
                   style={
-                    Array [
-                      Object {
-                        "color": "#2E3338",
-                        "fontFamily": "Hind-Bold",
-                        "fontSize": 14,
-                        "lineHeight": 18,
-                      },
-                      Object {
-                        "color": "#42D689",
-                        "fontSize": 13,
-                        "lineHeight": 18,
-                      },
-                    ]
+                    Object {
+                      "color": "#42D689",
+                      "fontFamily": "Hind-Bold",
+                      "fontSize": 13,
+                      "lineHeight": 18,
+                    }
                   }
                 >
                   confirmingExchange
@@ -2859,6 +2734,7 @@ exports[`renders for standbyTransactions 1`] = `
     >
       <View
         accessible={true}
+        focusable={true}
         isTVSelectable={true}
         nativeBackgroundAndroid={
           Object {
@@ -2866,6 +2742,7 @@ exports[`renders for standbyTransactions 1`] = `
             "type": "ThemeAttrAndroid",
           }
         }
+        onClick={[Function]}
         onResponderGrant={[Function]}
         onResponderMove={[Function]}
         onResponderRelease={[Function]}
@@ -2894,7 +2771,7 @@ exports[`renders for standbyTransactions 1`] = `
             <Image
               source={
                 Object {
-                  "testUri": "../../../src/images/coins-logo.png",
+                  "testUri": "../../../packages/mobile/src/images/coins-logo.png",
                 }
               }
               style={
@@ -2953,7 +2830,6 @@ exports[`renders for standbyTransactions 1`] = `
                 
                 $
                 &lt;0.001
-                MXN
               </Text>
             </View>
             <Text
@@ -2984,34 +2860,22 @@ exports[`renders for standbyTransactions 1`] = `
             >
               <Text
                 style={
-                  Array [
-                    Object {
-                      "color": "#2E3338",
-                      "fontFamily": "Hind-Regular",
-                      "fontSize": 14,
-                      "lineHeight": 18,
-                    },
-                    Object {
-                      "color": "#BDBDBD",
-                    },
-                  ]
+                  Object {
+                    "color": "#BDBDBD",
+                    "fontFamily": "Hind-Regular",
+                    "fontSize": 14,
+                    "lineHeight": 18,
+                  }
                 }
               >
                 <Text
                   style={
-                    Array [
-                      Object {
-                        "color": "#2E3338",
-                        "fontFamily": "Hind-Bold",
-                        "fontSize": 14,
-                        "lineHeight": 18,
-                      },
-                      Object {
-                        "color": "#42D689",
-                        "fontSize": 13,
-                        "lineHeight": 18,
-                      },
-                    ]
+                    Object {
+                      "color": "#42D689",
+                      "fontFamily": "Hind-Bold",
+                      "fontSize": 13,
+                      "lineHeight": 18,
+                    }
                   }
                 >
                   confirmingPayment

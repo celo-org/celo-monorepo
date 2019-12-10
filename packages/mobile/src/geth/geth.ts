@@ -79,7 +79,7 @@ async function createNewGeth(): Promise<typeof RNGeth> {
   const genesis: string = await readGenesisBlockFile(nodeDir)
   const networkID: number = GenesisBlockUtils.getChainIdFromGenesis(genesis)
 
-  Logger.debug('Geth@newGeth', `Network ID is ${networkID}`)
+  Logger.debug('Geth@newGeth', `Network ID is ${networkID}, syncMode is ${syncMode}`)
 
   const gethOptions: any = {
     nodeDir,
@@ -134,11 +134,7 @@ async function initGeth() {
     } catch (e) {
       const errorType = getGethErrorType(e)
       if (errorType === ErrorType.GethAlreadyRunning) {
-        // Geth is already running, this is most likely RN restart.
-        Logger.info('Geth@init/startInstance', 'Geth start reported geth already running')
-        // Note: Unfortunately, RN-Geth doesn't currently support connecting to the
-        // already running geth instance, which we would need to subscribe to head updates.
-        // In the meantime, we need to force an app reset. See #3227
+        Logger.error('Geth@init/startInstance', 'Geth start reported geth already running')
         throw new Error('Geth already running, need to restart app')
       } else if (errorType === ErrorType.CorruptChainData) {
         Logger.warn('Geth@init/startInstance', 'Geth start reported chain data error')
@@ -184,6 +180,12 @@ async function ensureStaticNodesInitialized(): Promise<boolean> {
       return true
     }
     return false
+  }
+}
+
+export async function stopGethIfInitialized() {
+  if (gethInstance) {
+    await stop()
   }
 }
 
@@ -332,7 +334,7 @@ async function uploadLogs(gethLogFilePath: string, reactNativeLogFilePath: strin
     // Phone number might not be verified here but that does not matter for logging.
     const phoneNumber = (await DeviceInfo.getPhoneNumber()) || 'unknown'
     const timestamp = new Date().getTime()
-    const deviceId = DeviceInfo.getUniqueID()
+    const deviceId = DeviceInfo.getUniqueId()
     const uploadId = `${timestamp}_${deviceId}`
     const gethUploadFileName = `${phoneNumber}_${uploadId}_geth.txt`
     const reactNativeUploadFileName = `${phoneNumber}_${uploadId}_rn.txt`

@@ -1,11 +1,14 @@
 export type Address = string
 
 export enum CeloContract {
+  Accounts = 'Accounts',
   Attestations = 'Attestations',
+  BlockchainParameters = 'BlockchainParameters',
   Election = 'Election',
+  EpochRewards = 'EpochRewards',
   Escrow = 'Escrow',
   Exchange = 'Exchange',
-  GasCurrencyWhitelist = 'GasCurrencyWhitelist',
+  FeeCurrencyWhitelist = 'FeeCurrencyWhitelist',
   GasPriceMinimum = 'GasPriceMinimum',
   GoldToken = 'GoldToken',
   Governance = 'Governance',

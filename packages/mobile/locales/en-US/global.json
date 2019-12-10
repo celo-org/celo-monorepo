@@ -38,7 +38,8 @@
   "startEarning": "Start Earning",
   "backToWallet": "Back to Wallet",
   "exchangeForGold": "Exchange for Gold",
-  "invalidPhone": "Invalid Phone Number",
+  "missingFullName": "Name cannot be empty",
+  "invalidPhone": "Invalid phone number",
   "cantSelectInvalidPhone": "Cannot select contact: invalid phone number",
   "needMoreFundsToSend": "Need more funds to send payment",
   "invalidAmount": "Invalid amount",
@@ -56,6 +57,9 @@
   "invalidAccount": "Invalid Account",
   "delete": "Delete",
   "cancel": "Cancel",
+  "remind": "Remind",
+  "pay": "Pay",
+  "decline": "Decline",
   "to": "To",
   "for": "For",
   "celoGold": "Celo Gold",
@@ -92,6 +96,10 @@
   "web3FailedToSync": "Failing to sync, check your network connection",
   "errorDuringSync": "Error occurred during sync, please try again later",
   "calculateFeeFailed": "Could not calculate fee",
+  "failedToSwitchSyncModes": "Failed to switch sync modes",
   "gold": "Gold",
-  "localCurrencyTitle": "Select Currency"
+  "localCurrencyTitle": "Select Currency",
+  "or": "or",
+  "accepted": "Accepted",
+  "processing": "Processing"
 }

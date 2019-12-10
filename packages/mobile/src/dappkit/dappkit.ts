@@ -68,7 +68,7 @@ function* produceTxSignature(action: RequestTxSignatureAction) {
         nonce: tx.nonce,
         value: tx.value,
         // @ts-ignore
-        gasCurrency: action.request.gasCurrency,
+        feeCurrency: action.request.feeCurrency,
       }
       if (tx.to) {
         params.to = tx.to

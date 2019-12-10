@@ -7,11 +7,13 @@ const TAG = 'web3/actions'
 
 export enum Actions {
   SET_ACCOUNT = 'WEB3/SET_ACCOUNT',
+  SET_ACCOUNT_IN_WEB3_KEYSTORE = 'WEB3/SET_ACCOUNT_IN_WEB3_KEYSTORE',
   SET_COMMENT_KEY = 'WEB3/SET_COMMENT_KEY',
   SET_PROGRESS = 'WEB3/SET_PROGRESS',
   SET_IS_READY = 'WEB3/SET_IS_READY',
   SET_IS_ZERO_SYNC = 'WEB3/SET_IS_ZERO_SYNC',
-  SET_BLOCK_NUMBER = 'WEB3/SET_BLOCK_NUMBER',
+  TOGGLE_IS_ZERO_SYNC = 'WEB3/TOGGLE_IS_ZERO_SYNC',
+  COMPLETE_WEB3_SYNC = 'WEB3/COMPLETE_WEB3_SYNC',
   REQUEST_SYNC_PROGRESS = 'WEB3/REQUEST_SYNC_PROGRESS',
   UPDATE_WEB3_SYNC_PROGRESS = 'WEB3/UPDATE_WEB3_SYNC_PROGRESS',
 }
@@ -21,8 +23,18 @@ export interface SetAccountAction {
   address: string
 }
 
+export interface SetAccountInWeb3KeystoreAction {
+  type: Actions.SET_ACCOUNT_IN_WEB3_KEYSTORE
+  address: string
+}
+
 export interface SetIsZeroSyncAction {
   type: Actions.SET_IS_ZERO_SYNC
+  zeroSyncMode: boolean
+}
+
+export interface ToggleIsZeroSyncAction {
+  type: Actions.TOGGLE_IS_ZERO_SYNC
   zeroSyncMode: boolean
 }
 
@@ -31,8 +43,8 @@ export interface SetCommentKeyAction {
   commentKey: string
 }
 
-export interface SetLatestBlockNumberAction {
-  type: Actions.SET_BLOCK_NUMBER
+export interface CompleteWeb3SyncAction {
+  type: Actions.COMPLETE_WEB3_SYNC
   latestBlockNumber: number
 }
 
@@ -47,16 +59,32 @@ export interface UpdateWeb3SyncProgressAction {
 
 export type ActionTypes =
   | SetAccountAction
+  | SetAccountInWeb3KeystoreAction
   | SetIsZeroSyncAction
+  | ToggleIsZeroSyncAction
   | SetCommentKeyAction
-  | SetLatestBlockNumberAction
+  | CompleteWeb3SyncAction
   | UpdateWeb3SyncProgressAction
 
 export const setAccount = (address: string): SetAccountAction => {
   CeloAnalytics.track(DefaultEventNames.accountSet)
   return {
     type: Actions.SET_ACCOUNT,
+    address: address.toLowerCase(),
+  }
+}
+
+export const setAccountInWeb3Keystore = (address: string): SetAccountInWeb3KeystoreAction => {
+  return {
+    type: Actions.SET_ACCOUNT_IN_WEB3_KEYSTORE,
     address,
+  }
+}
+
+export const toggleZeroSyncMode = (zeroSyncMode: boolean): ToggleIsZeroSyncAction => {
+  return {
+    type: Actions.TOGGLE_IS_ZERO_SYNC,
+    zeroSyncMode,
   }
 }
 
@@ -74,16 +102,20 @@ export const setPrivateCommentKey = (commentKey: string): SetCommentKeyAction =>
   }
 }
 
-export const setLatestBlockNumber = (latestBlockNumber: number): SetLatestBlockNumberAction => ({
-  type: Actions.SET_BLOCK_NUMBER,
+export const completeWeb3Sync = (latestBlockNumber: number): CompleteWeb3SyncAction => ({
+  type: Actions.COMPLETE_WEB3_SYNC,
   latestBlockNumber,
 })
 
-export const updateWeb3SyncProgress = (payload: {
+export interface Web3SyncProgress {
   startingBlock: number
   currentBlock: number
   highestBlock: number
-}): UpdateWeb3SyncProgressAction => ({
+}
+
+export const updateWeb3SyncProgress = (
+  payload: Web3SyncProgress
+): UpdateWeb3SyncProgressAction => ({
   type: Actions.UPDATE_WEB3_SYNC_PROGRESS,
   payload,
 })

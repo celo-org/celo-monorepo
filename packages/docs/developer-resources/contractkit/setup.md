@@ -19,7 +19,7 @@ To start working with contractkit you need a `kit` instance:
 ```ts
 import { newKit } from '@celo/contractkit'
 
-const kit = newKit('https://alfajores-infura.celo-testnet.org')
+const kit = newKit('https://alfajores-forno.celo-testnet.org')
 ```
 
 To access web3:
@@ -40,7 +40,7 @@ import { CeloContract } from '@celo/contractkit'
 // default from
 kit.defaultAccount = myAddress
 // paid gas in celo dollars
-await kit.setGasCurrency(CeloContract.StableToken)
+await kit.setFeeCurrency(CeloContract.StableToken)
 ```
 
 You're ready to start using ContractKit! See the [Examples](examples.md) section to learn more.

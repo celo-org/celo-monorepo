@@ -1,4 +1,4 @@
-import { StyleSheet } from 'react-native'
+import { StyleSheet, TextStyle } from 'react-native'
 
 export enum colors {
   white = '#FFFFFF',
@@ -15,7 +15,7 @@ export enum colors {
   primary = '#35D07F',
   primaryPress = '#0FB972',
   primaryHover = '#4CDD91',
-  inactive = 'rgba(69, 214, 138, 0.5)',
+  inactive = 'rgba(69, 214, 138, 0.7)',
 
   orange = '#FFB765',
   error = '#FF7F6D',
@@ -23,25 +23,37 @@ export enum colors {
   purple = '#BF97FF',
   deepBlue = '#3488EC',
   lightBlue = '#73DDFF',
+  cyan = '#3DBFFF',
   turquoise = '#29EDFF',
 
   greenScreen = '#0CDA6E',
   purpleScreen = '#924EFF',
   redScreen = '#FF6553',
   blueScreen = '#52B6FF',
+
+  // added
+  faintGray = '#F8F9F9',
+  faintPurple = '#EFE5FF',
+  faintGold = '#FEF2D6',
+  faintRed = '#FEDEDA',
+  faintCyan = '#DCF6FF',
+  lightGray = '#EDEEEF',
+
+  grayHeavy = '#ABADAF',
+  black = '#000',
 }
 
 export enum typeFaces {
-  futura = 'futura-pt, sans-serif',
-  garamond = 'eb-garamond, serif',
+  futura = 'Jost, futura-pt, futura, sans-serif',
+  garamond = 'EB Garamond, eb-garamond, Garamond, serif',
 }
 
-export const fonts = StyleSheet.create({
+export const fontInfo: Record<string, TextStyle> = {
   h1: {
     fontFamily: typeFaces.garamond,
     textRendering: 'geometricPrecision',
     fontSize: 48,
-    lineHeight: 52,
+    lineHeight: 56,
     color: colors.dark,
   },
   h1Mobile: {
@@ -54,7 +66,7 @@ export const fonts = StyleSheet.create({
   h2: {
     fontFamily: typeFaces.garamond,
     textRendering: 'geometricPrecision',
-    fontSize: 44,
+    fontSize: 40,
     lineHeight: 48,
     color: colors.dark,
   },
@@ -68,14 +80,15 @@ export const fonts = StyleSheet.create({
   h3: {
     fontFamily: typeFaces.futura,
     fontSize: 28,
-    lineHeight: 32,
+    lineHeight: 36,
+    fontWeight: '400',
     color: colors.dark,
     textRendering: 'geometricPrecision',
   },
   h3Mobile: {
     fontFamily: typeFaces.futura,
-    fontSize: 20,
-    lineHeight: 24,
+    fontSize: 24,
+    lineHeight: 32,
     color: colors.dark,
     textRendering: 'geometricPrecision',
   },
@@ -89,11 +102,19 @@ export const fonts = StyleSheet.create({
   h4Mobile: {
     fontFamily: typeFaces.garamond,
     textRendering: 'geometricPrecision',
-    fontSize: 20,
-    lineHeight: 24,
+    fontSize: 24,
+    lineHeight: 32,
     color: colors.dark,
   },
   h5: {
+    fontFamily: typeFaces.futura,
+    fontSize: 20,
+    lineHeight: 24,
+    fontWeight: '500',
+    color: colors.dark,
+    textRendering: 'geometricPrecision',
+  },
+  h6: {
     fontFamily: typeFaces.futura,
     fontSize: 16,
     lineHeight: 18,
@@ -139,9 +160,15 @@ export const fonts = StyleSheet.create({
     lineHeight: 16,
     color: colors.dark,
   },
-  small: {
+  micro: {
     fontFamily: typeFaces.futura,
     fontSize: 14,
+    color: colors.dark,
+    textRendering: 'geometricPrecision',
+  },
+  uiSmall: {
+    fontFamily: typeFaces.futura,
+    fontSize: 12,
     color: colors.dark,
     textRendering: 'geometricPrecision',
   },
@@ -151,14 +178,17 @@ export const fonts = StyleSheet.create({
     fontFamily: typeFaces.futura,
     textRendering: 'geometricPrecision',
   },
-  // @ts-ignore
   specialOneOff: {
     fontFamily: typeFaces.garamond,
     textRendering: 'geometricPrecision',
+    // @ts-ignore
     fontSize: 'calc(33px + 0.25vw)',
+    // @ts-ignore
     lineHeight: `calc(33px + 0.25vw)`,
   },
-})
+}
+
+export const fonts = StyleSheet.create(fontInfo)
 
 export const textStyles = StyleSheet.create({
   center: {
@@ -185,6 +215,9 @@ export const textStyles = StyleSheet.create({
   },
   invert: {
     color: colors.white,
+  },
+  readingOnDark: {
+    color: colors.gray,
   },
   caption: {
     paddingTop: 5,

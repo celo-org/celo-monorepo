@@ -1,5 +1,6 @@
 import * as React from 'react'
 import { StyleSheet, Text, View } from 'react-native'
+import { RequestType } from 'src/fauceting/FaucetInterfaces'
 import RequestFunds from 'src/fauceting/RequestFunds'
 import { RequestState } from 'src/fauceting/utils'
 import { H1 } from 'src/fonts/Fonts'
@@ -7,10 +8,10 @@ import OpenGraph from 'src/header/OpenGraph'
 import { I18nProps, NameSpaces, Trans, withNamespaces } from 'src/i18n'
 import SideTitledSection from 'src/layout/SideTitledSection'
 import Button, { BTN, SIZE } from 'src/shared/Button.3'
+import InlineAnchor from 'src/shared/InlineAnchor'
 import { CeloLinks } from 'src/shared/menu-items'
 import { HEADER_HEIGHT } from 'src/shared/Styles'
 import { colors, fonts, standardStyles, textStyles } from 'src/styles'
-import { RequestType } from '../../server/FirebaseClient'
 interface State {
   address: string
   requestState: RequestState
@@ -39,8 +40,8 @@ class FaucetPage extends React.Component<I18nProps, State> {
             title={t('getTestnetAddress')}
             text={
               <Trans i18nKey={'getTestnetText'}>
-                <Link href={CeloLinks.walletApp}>INVITE</Link>{' '}
-                <Link href={CeloLinks.tutorial}>CLI</Link>
+                <InlineAnchor href={CeloLinks.walletApp}>INVITE</InlineAnchor>{' '}
+                <InlineAnchor href={CeloLinks.tutorial}>CLI</InlineAnchor>
               </Trans>
             }
           />
@@ -85,10 +86,6 @@ class FaucetPage extends React.Component<I18nProps, State> {
       </>
     )
   }
-}
-
-function Link({ children, href }) {
-  return <Button kind={BTN.INLINE} text={children} href={href} />
 }
 
 function ContentWithCTA({ emphasis, text, btnText, href }) {

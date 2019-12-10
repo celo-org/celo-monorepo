@@ -3,7 +3,6 @@ import QRCode from '@celo/react-components/icons/QRCode'
 import colors from '@celo/react-components/styles/colors'
 import { fontStyles } from '@celo/react-components/styles/fonts'
 import variables from '@celo/react-components/styles/variables'
-import * as _ from 'lodash'
 import * as React from 'react'
 import { WithNamespaces, withNamespaces } from 'react-i18next'
 import { Platform, StyleSheet, Text, View } from 'react-native'
@@ -24,23 +23,48 @@ interface DispatchProps {
   handleBarcodeDetected: typeof handleBarcodeDetected
 }
 
+interface State {
+  isScanningEnabled: boolean
+}
+
 type Props = DispatchProps & WithNamespaces & NavigationFocusInjectedProps
 
-class QRScanner extends React.Component<Props> {
+class QRScanner extends React.Component<Props, State> {
   static navigationOptions = () => ({
     ...headerWithBackButton,
     headerTitle: i18n.t('sendFlow7:scanCode'),
   })
 
+  timeout: undefined | number = undefined
+
+  state = {
+    isScanningEnabled: true,
+  }
+
   camera: RNCamera | null = null
 
-  onBardCodeDetected = _.debounce((rawData: any) => {
-    Logger.debug('QRScanner', 'Bar code detected')
-    this.props.handleBarcodeDetected(rawData)
-  }, 1000)
+  // This method would be called multiple times with the same
+  // QR code, so we need to catch only the first one
+  onBardCodeDetected = (rawData: any) => {
+    if (this.state.isScanningEnabled) {
+      this.setState({ isScanningEnabled: false }, () => {
+        Logger.debug('QRScanner', 'Bar code detected')
+        this.props.handleBarcodeDetected(rawData)
+      })
+      this.timeout = window.setTimeout(() => {
+        this.setState({ isScanningEnabled: true })
+      }, 1000)
+    }
+  }
 
   onPressShowYourCode = () => {
     navigate(Screens.QRCode)
+  }
+
+  componentWillUnmount() {
+    if (this.timeout) {
+      clearTimeout(this.timeout)
+    }
   }
 
   render() {

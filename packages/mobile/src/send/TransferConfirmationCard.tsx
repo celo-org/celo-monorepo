@@ -1,8 +1,10 @@
 import HorizontalLine from '@celo/react-components/components/HorizontalLine'
+import Link from '@celo/react-components/components/Link'
 import { MoneyAmount } from '@celo/react-components/components/MoneyAmount'
 import colors from '@celo/react-components/styles/colors'
 import { fontStyles } from '@celo/react-components/styles/fonts'
 import { componentStyles } from '@celo/react-components/styles/styles'
+import variables from '@celo/react-components/styles/variables'
 import { CURRENCIES } from '@celo/utils'
 import BigNumber from 'bignumber.js'
 import * as React from 'react'
@@ -67,10 +69,13 @@ const renderTopSection = (props: Props) => {
 const renderAmountSection = (props: Props) => {
   const { currency, type, value } = props
 
+  // tslint:disable react-hooks-nesting
   const localCurrencyCode = useLocalCurrencyCode()
   const localCurrencySymbol = useLocalCurrencySymbol()
+  const localValue = useDollarsToLocalAmount(value) || 0
+  // tslint:enable react-hooks-nesting
   const transactionValue = getMoneyDisplayValue(
-    localCurrencyCode ? useDollarsToLocalAmount(value) || 0 : value
+    currency === CURRENCY_ENUM.DOLLAR && localCurrencyCode ? localValue : value
   )
 
   switch (type) {
@@ -87,7 +92,10 @@ const renderAmountSection = (props: Props) => {
     default:
       return (
         <MoneyAmount
-          symbol={localCurrencySymbol || CURRENCIES[currency].symbol}
+          symbol={
+            (currency === CURRENCY_ENUM.DOLLAR && localCurrencySymbol) ||
+            CURRENCIES[currency].symbol
+          }
           amount={transactionValue}
         />
       )
@@ -113,9 +121,7 @@ const renderBottomSection = (props: Props) => {
       <View>
         <Text style={style.pSmall}>
           {t('walletFlow5:networkFeeExplanation.0')}
-          <Text onPress={onPressGoToFaq} style={fontStyles.link}>
-            {t('walletFlow5:networkFeeExplanation.1')}
-          </Text>
+          <Link onPress={onPressGoToFaq}>{t('walletFlow5:networkFeeExplanation.1')}</Link>
         </Text>
       </View>
     )
@@ -153,22 +159,18 @@ export function TransferConfirmationCard(props: Props) {
 
 const style = StyleSheet.create({
   container: {
-    flex: 1,
-    justifyContent: 'flex-start',
-    flexDirection: 'column',
-    paddingVertical: 25,
-    paddingHorizontal: 40,
+    paddingVertical: 40,
+    paddingHorizontal: 20,
+    marginVertical: 20,
+    minWidth: variables.width * 0.75,
   },
   bottomContainer: {
     marginTop: 5,
-    flexDirection: 'column',
-    alignItems: 'stretch',
   },
   icon: {
     height: iconSize,
     width: iconSize,
-    marginTop: 25,
-    marginBottom: 40,
+    marginVertical: 20,
     alignSelf: 'center',
   },
   pSmall: {
@@ -179,7 +181,7 @@ const style = StyleSheet.create({
     textAlign: 'center',
   },
   inviteLine: {
-    marginVertical: 30,
+    marginVertical: 20,
   },
   inviteTitle: {
     ...fontStyles.pCurrency,

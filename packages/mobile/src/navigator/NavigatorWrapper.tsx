@@ -1,11 +1,40 @@
+import AsyncStorage from '@react-native-community/async-storage'
 import * as React from 'react'
 import { StyleSheet, View } from 'react-native'
 import { createAppContainer, NavigationState } from 'react-navigation'
 import { connect } from 'react-redux'
 import AlertBanner from 'src/alert/AlertBanner'
+import { DEV_RESTORE_NAV_STATE_ON_RELOAD } from 'src/config'
 import { recordStateChange, setTopLevelNavigator } from 'src/navigator/NavigationService'
 import Navigator from 'src/navigator/Navigator'
 import BackupPrompt from 'src/shared/BackupPrompt'
+import Logger from 'src/utils/Logger'
+
+// This uses RN Navigation's experimental nav state persistence
+// to improve the hot reloading experience when in DEV mode
+// https://reactnavigation.org/docs/en/state-persistence.html
+function getPersistenceFunctions() {
+  if (!__DEV__ || !DEV_RESTORE_NAV_STATE_ON_RELOAD) {
+    return undefined
+  }
+
+  const persistenceKey = 'NAV_STATE_PERSIST_KEY'
+  const persistNavigationState = async (navState: any) => {
+    try {
+      await AsyncStorage.setItem(persistenceKey, JSON.stringify(navState))
+    } catch (e) {
+      Logger.error('NavigatorWrapper', 'Error persisting nav state', e)
+    }
+  }
+  const loadNavigationState = async () => {
+    const state = await AsyncStorage.getItem(persistenceKey)
+    return state && JSON.parse(state)
+  }
+  return {
+    persistNavigationState,
+    loadNavigationState,
+  }
+}
 
 const navigationStateChange = (prev: NavigationState, current: NavigationState) =>
   recordStateChange(prev, current)
@@ -26,7 +55,11 @@ export class NavigatorWrapper extends React.Component<Props> {
   render() {
     return (
       <View style={styles.container}>
-        <AppContainer ref={this.setNavigator} onNavigationStateChange={navigationStateChange} />
+        <AppContainer
+          ref={this.setNavigator}
+          onNavigationStateChange={navigationStateChange}
+          {...getPersistenceFunctions()}
+        />
         <View style={styles.floating}>
           <BackupPrompt />
           <AlertBanner />

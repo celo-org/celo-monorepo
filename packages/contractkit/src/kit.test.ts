@@ -62,7 +62,7 @@ describe('kit.sendTransactionObject()', () => {
   test('should use inflation factor on gas', async () => {
     const txo = txoStub()
     txo.estimateGasMock.mockResolvedValue(1000)
-    kit.gasInflactionFactor = 2
+    kit.gasInflationFactor = 2
     await kit.sendTransactionObject(txo)
     expect(txo.send).toBeCalledWith(
       expect.objectContaining({
@@ -73,11 +73,11 @@ describe('kit.sendTransactionObject()', () => {
 
   test('should forward txoptions to txo.send()', async () => {
     const txo = txoStub()
-    await kit.sendTransactionObject(txo, { gas: 555, gasCurrency: 'XXX', from: '0xAAFFF' })
+    await kit.sendTransactionObject(txo, { gas: 555, feeCurrency: 'XXX', from: '0xAAFFF' })
     expect(txo.send).toBeCalledWith({
       gasPrice: '0',
       gas: 555,
-      gasCurrency: 'XXX',
+      feeCurrency: 'XXX',
       from: '0xAAFFF',
     })
   })

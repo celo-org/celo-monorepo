@@ -1,6 +1,8 @@
+import BigNumber from 'bignumber.js'
 import { assert } from 'chai'
 import { spawn, SpawnOptions } from 'child_process'
 import fs from 'fs'
+import _ from 'lodash'
 import { join as joinPath, resolve as resolvePath } from 'path'
 import { Admin } from 'web3-eth-admin'
 import {
@@ -8,10 +10,8 @@ import {
   generateGenesis,
   getPrivateKeysFor,
   getValidators,
-  privateKeyToPublicKey,
   Validator,
 } from '../lib/generate_utils'
-import { getEnodeAddress } from '../lib/geth'
 import { ensure0x } from '../lib/utils'
 
 export interface GethInstanceConfig {
@@ -24,7 +24,7 @@ export interface GethInstanceConfig {
   lightserv?: boolean
   privateKey?: string
   etherbase?: string
-  peers?: string[]
+  peers?: number[]
   pid?: number
 }
 
@@ -32,12 +32,36 @@ export interface GethTestConfig {
   migrate?: boolean
   migrateTo?: number
   instances: GethInstanceConfig[]
+  genesisConfig?: any
+  migrationOverrides?: any
 }
 
 const TEST_DIR = '/tmp/e2e'
 const GENESIS_PATH = `${TEST_DIR}/genesis.json`
 const NetworkId = 1101
 const MonorepoRoot = resolvePath(joinPath(__dirname, '../..', '../..'))
+
+export async function waitToFinishSyncing(web3: any) {
+  while ((await web3.eth.isSyncing()) || (await web3.eth.getBlockNumber()) === 0) {
+    await sleep(0.1)
+  }
+}
+
+export function assertAlmostEqual(
+  actual: BigNumber,
+  expected: BigNumber,
+  delta: BigNumber = new BigNumber(10).pow(12).times(5)
+) {
+  if (expected.isZero()) {
+    assert.equal(actual.toFixed(), expected.toFixed())
+  } else {
+    const isCloseTo = actual.plus(delta).gte(expected) || actual.minus(delta).lte(expected)
+    assert(
+      isCloseTo,
+      `expected ${actual.toString()} to almost equal ${expected.toString()} +/- ${delta.toString()}`
+    )
+  }
+}
 
 export function spawnWithLog(cmd: string, args: string[], logsFilepath: string) {
   try {
@@ -81,6 +105,7 @@ export async function execCmdWithExitOnFailure(
 ) {
   const code = await execCmd(cmd, args, options)
   if (code !== 0) {
+    console.error('execCmd failed for: ' + [cmd].concat(args).join(' '))
     process.exit(1)
   }
 }
@@ -171,13 +196,15 @@ async function setupTestDir(testDir: string) {
   await execCmd('mkdir', [testDir])
 }
 
-function writeGenesis(validators: Validator[], path: string) {
+function writeGenesis(validators: Validator[], path: string, configOverrides: any = {}) {
   const genesis = generateGenesis({
     validators,
     blockTime: 0,
     epoch: 10,
+    lookback: 2,
     requestTimeout: 3000,
     chainId: NetworkId,
+    ...configOverrides,
   })
   fs.writeFileSync(path, genesis)
 }
@@ -194,7 +221,7 @@ export async function init(gethBinaryPath: string, datadir: string, genesisPath:
 }
 
 export async function importPrivateKey(gethBinaryPath: string, instance: GethInstanceConfig) {
-  const keyFile = '/tmp/key.txt'
+  const keyFile = `/${getDatadir(instance)}/key.txt`
   fs.writeFileSync(keyFile, instance.privateKey)
   console.info(`geth:${instance.name}: import account`)
   await execCmdWithExitOnFailure(
@@ -215,7 +242,8 @@ export async function killInstance(instance: GethInstanceConfig) {
   }
 }
 
-export async function addStaticPeers(datadir: string, enodes: string[]) {
+export async function addStaticPeers(datadir: string, ports: number[]) {
+  const enodes = await Promise.all(ports.map((port) => getEnode(port)))
   fs.writeFileSync(`${datadir}/static-nodes.json`, JSON.stringify(enodes))
 }
 
@@ -224,13 +252,12 @@ async function isPortOpen(host: string, port: number) {
 }
 
 async function waitForPortOpen(host: string, port: number, seconds: number) {
-  while (seconds > 0) {
+  const deadline = Date.now() + seconds * 1000
+  do {
     if (await isPortOpen(host, port)) {
       return true
     }
-    seconds -= 1
-    await sleep(1)
-  }
+  } while (Date.now() < deadline)
   return false
 }
 
@@ -298,9 +325,13 @@ export async function startGeth(gethBinaryPath: string, instance: GethInstanceCo
   }
 
   if (validating) {
-    gethArgs.push('--password=/dev/null', `--unlock=0`)
-    gethArgs.push('--mine', '--minerthreads=10', `--nodekeyhex=${privateKey}`)
+    gethArgs.push('--mine')
   }
+
+  if (privateKey) {
+    gethArgs.push('--password=/dev/null', `--unlock=0`)
+  }
+
   const gethProcess = spawnWithLog(gethBinaryPath, gethArgs, `${datadir}/logs.txt`)
   instance.pid = gethProcess.pid
 
@@ -318,15 +349,32 @@ export async function startGeth(gethBinaryPath: string, instance: GethInstanceCo
   return instance
 }
 
-export async function migrateContracts(validatorPrivateKeys: string[], to: number = 1000) {
-  const migrationOverrides = {
-    validators: {
-      validatorKeys: validatorPrivateKeys.map(ensure0x),
+export async function migrateContracts(
+  validatorPrivateKeys: string[],
+  attestationKeys: string[],
+  validators: string[],
+  to: number = 1000,
+  overrides: any = {}
+) {
+  const migrationOverrides = _.merge(
+    {
+      election: {
+        minElectableValidators: '1',
+      },
+      stableToken: {
+        initialBalances: {
+          addresses: validators.map(ensure0x),
+          values: validators.map(() => '10000000000000000000000'),
+        },
+      },
+      validators: {
+        validatorKeys: validatorPrivateKeys.map(ensure0x),
+        attestationKeys: attestationKeys.map(ensure0x),
+      },
     },
-    election: {
-      minElectableValidators: '1',
-    },
-  }
+    overrides
+  )
+
   const args = [
     '--cwd',
     `${MonorepoRoot}/packages/protocol`,
@@ -389,16 +437,37 @@ export async function initAndStartGeth(gethBinaryPath: string, instance: GethIns
   return startGeth(gethBinaryPath, instance)
 }
 
+// Add validator 0 as a peer of each other validator.
+async function connectValidatorPeers(gethConfig: GethTestConfig) {
+  const admins = gethConfig.instances
+    .filter(({ wsport, rpcport, validating }) => validating && (wsport || rpcport))
+    .map(
+      ({ wsport, rpcport }) =>
+        new Admin(`${wsport ? 'ws' : 'http'}://localhost:${wsport || rpcport}`)
+    )
+  const enodes = await Promise.all(admins.map(async (admin) => (await admin.getNodeInfo()).enode))
+  await Promise.all(
+    admins.map(async (admin, i) => {
+      await Promise.all(
+        enodes.map(async (enode, j) => {
+          if (i === j) {
+            return
+          }
+          await admin.addPeer(enode)
+        })
+      )
+    })
+  )
+}
+
 export function getContext(gethConfig: GethTestConfig) {
   const mnemonic =
     'jazz ripple brown cloth door bridge pen danger deer thumb cable prepare negative library vast'
   const validatorInstances = gethConfig.instances.filter((x: any) => x.validating)
   const numValidators = validatorInstances.length
   const validatorPrivateKeys = getPrivateKeysFor(AccountType.VALIDATOR, mnemonic, numValidators)
+  const attestationKeys = getPrivateKeysFor(AccountType.ATTESTATION, mnemonic, numValidators)
   const validators = getValidators(mnemonic, numValidators)
-  const validatorEnodes = validatorPrivateKeys.map((x: any, i: number) =>
-    getEnodeAddress(privateKeyToPublicKey(x), '127.0.0.1', validatorInstances[i].port)
-  )
   const argv = require('minimist')(process.argv.slice(2))
   const branch = argv.branch || 'master'
   const gethRepoPath = argv.localgeth || '/tmp/geth'
@@ -410,22 +479,24 @@ export function getContext(gethConfig: GethTestConfig) {
     }
     await buildGeth(gethRepoPath)
     await setupTestDir(TEST_DIR)
-    await writeGenesis(validators, GENESIS_PATH)
+    await writeGenesis(validators, GENESIS_PATH, gethConfig.genesisConfig)
     let validatorIndex = 0
     for (const instance of gethConfig.instances) {
       if (instance.validating) {
-        // Automatically connect validator nodes to eachother.
-        const otherValidators = validatorEnodes.filter(
-          (_: string, i: number) => i !== validatorIndex
-        )
-        instance.peers = (instance.peers || []).concat(otherValidators)
         instance.privateKey = instance.privateKey || validatorPrivateKeys[validatorIndex]
         validatorIndex++
       }
       await initAndStartGeth(gethBinaryPath, instance)
     }
+    await connectValidatorPeers(gethConfig)
     if (gethConfig.migrate || gethConfig.migrateTo) {
-      await migrateContracts(validatorPrivateKeys, gethConfig.migrateTo)
+      await migrateContracts(
+        validatorPrivateKeys,
+        attestationKeys,
+        validators.map((x) => x.address),
+        gethConfig.migrateTo,
+        gethConfig.migrationOverrides
+      )
     }
     await killGeth()
     await sleep(2)
@@ -439,16 +510,23 @@ export function getContext(gethConfig: GethTestConfig) {
   const restart = async () => {
     await killGeth()
     let validatorIndex = 0
+    const validatorIndices: number[] = []
     for (const instance of gethConfig.instances) {
-      await restoreDatadir(instance)
-      if (!instance.privateKey && instance.validating) {
-        instance.privateKey = validatorPrivateKeys[validatorIndex]
-      }
-      await startGeth(gethBinaryPath, instance)
+      validatorIndices.push(validatorIndex)
       if (instance.validating) {
         validatorIndex++
       }
     }
+    await Promise.all(
+      gethConfig.instances.map(async (instance, i) => {
+        await restoreDatadir(instance)
+        if (!instance.privateKey && instance.validating) {
+          instance.privateKey = validatorPrivateKeys[validatorIndices[i]]
+        }
+        return startGeth(gethBinaryPath, instance)
+      })
+    )
+    await connectValidatorPeers(gethConfig)
   }
 
   const after = () => killGeth()

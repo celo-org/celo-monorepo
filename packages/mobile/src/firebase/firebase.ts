@@ -1,13 +1,16 @@
+import * as Sentry from '@sentry/react-native'
+import DeviceInfo from 'react-native-device-info'
 import firebase, { Firebase } from 'react-native-firebase'
 import { RemoteMessage } from 'react-native-firebase/messaging'
 import { Notification, NotificationOpen } from 'react-native-firebase/notifications'
-import { Sentry } from 'react-native-sentry'
 import { eventChannel, EventChannel } from 'redux-saga'
 import { call, put, select, spawn, take } from 'redux-saga/effects'
-import { NotificationReceiveState, PaymentRequest } from 'src/account'
+import { NotificationReceiveState } from 'src/account/types'
 import { showError } from 'src/alert/actions'
 import { ErrorMessages } from 'src/app/ErrorMessages'
 import { currentLanguageSelector } from 'src/app/reducers'
+import { FIREBASE_ENABLED } from 'src/config'
+import { WritePaymentRequest } from 'src/firebase/actions'
 import { handleNotification } from 'src/firebase/notifications'
 import { navigate } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
@@ -129,9 +132,9 @@ export function* initializeCloudMessaging(app: Firebase, address: string) {
 
 export async function onBackgroundNotification(remoteMessage: RemoteMessage) {
   Logger.info(TAG, 'recieved Notification while app in Background')
-  Sentry.captureMessage(`Received Unknown RNFirebaseBackgroundMessage `, {
-    extra: remoteMessage,
-  })
+  Sentry.captureMessage(
+    `Received Unknown RNFirebaseBackgroundMessage ${JSON.stringify(remoteMessage)}`
+  )
   // https://facebook.github.io/react-native/docs/0.44/appregistry#registerheadlesstask
   return Promise.resolve() // need to return a resolved promise so native code releases the JS context
 }
@@ -149,7 +152,7 @@ export const registerTokenToDb = async (app: Firebase, address: string, fcmToken
   }
 }
 
-export function* writePaymentRequest(paymentInfo: PaymentRequest) {
+export function* paymentRequestWriter({ paymentInfo }: WritePaymentRequest) {
   try {
     Logger.info(TAG, `Writing pending request to database`)
     const pendingRequestRef = firebase.database().ref(`pendingRequests`)
@@ -162,13 +165,45 @@ export function* writePaymentRequest(paymentInfo: PaymentRequest) {
   }
 }
 
-export async function getVersionInfo(version: string) {
-  const versionFSPath = version.split('.').join('/')
-  Logger.info(TAG, `Checking version info ${version}`)
-  return (await firebase
+export function isVersionBelowMinimum(version: string, minVersion: string): boolean {
+  const minVersionArray = minVersion.split('.')
+  const versionArray = version.split('.')
+  const minVersionLength = Math.min(minVersionArray.length, version.length)
+  for (let i = 0; i < minVersionLength; i++) {
+    if (minVersionArray[i] > versionArray[i]) {
+      return true
+    } else if (minVersionArray[i] < versionArray[i]) {
+      return false
+    }
+  }
+  if (minVersionArray.length > versionArray.length) {
+    return true
+  }
+  return false
+}
+
+/*
+Get the Version deprecation information.
+Firebase DB Format: 
+  (New) Add minVersion child to versions category with a string of the mininum version as string
+*/
+export async function isAppVersionDeprecated() {
+  if (!FIREBASE_ENABLED) {
+    return false
+  }
+
+  Logger.info(TAG, 'Checking version info')
+  const version = DeviceInfo.getVersion()
+
+  const versionsInfo = (await firebase
     .database()
-    .ref(`versions/${versionFSPath}`)
+    .ref('versions')
     .once('value')).val()
+  if (!versionsInfo || !versionsInfo.minVersion) {
+    return false
+  }
+  const minVersion: string = versionsInfo.minVersion
+  return isVersionBelowMinimum(version, minVersion)
 }
 
 export async function setUserLanguage(address: string, language: string) {

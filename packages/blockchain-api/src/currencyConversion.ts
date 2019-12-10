@@ -1,19 +1,19 @@
 import { RESTDataSource } from 'apollo-datasource-rest'
-import { EXCHANGE_RATES_API } from './config'
+import { EXCHANGE_RATES_API, EXCHANGE_RATES_API_ACCESS_KEY } from './config'
 import { CurrencyConversionArgs, ExchangeRate } from './schema'
 import { formatDateString } from './utils'
 
 interface ExchangeRateApiResult {
-  rates: { [currencyCode: string]: number }
+  success: boolean
+  quotes: { [currencyCode: string]: number }
   base: string
   date: string
 }
 
-export class CurrencyConversionAPI extends RESTDataSource {
-  // TODO move this caching to FirebaseDb
-  // Currency code to date string to exchange rate
-  exchangeRateCache = new Map<string, Map<string, number>>()
+// ttl in seconds!
+const MIN_TTL = 12 * 3600 // 12 hours
 
+export class CurrencyConversionAPI extends RESTDataSource {
   constructor() {
     super()
     this.baseURL = EXCHANGE_RATES_API
@@ -28,16 +28,9 @@ export class CurrencyConversionAPI extends RESTDataSource {
       if (!currencyCode) {
         throw new Error('No currency code specified')
       }
+
       const date = timestamp ? new Date(timestamp) : new Date()
-
-      const cachedRate = this.getRateForCurrencyCode(currencyCode, date)
-      if (cachedRate) {
-        console.debug('Found cached exchange rate', currencyCode, cachedRate)
-        return { rate: cachedRate }
-      }
-
       const fetchedRate = await this.queryExchangeRate(currencyCode, date)
-      this.setRateForCurrencyCode(currencyCode, date, fetchedRate)
 
       return { rate: fetchedRate }
     } catch (error) {
@@ -48,29 +41,29 @@ export class CurrencyConversionAPI extends RESTDataSource {
 
   private async queryExchangeRate(currencyCode: string, date: Date) {
     console.debug('Querying exchange rate', currencyCode, date)
-    const path = `/${formatDateString(date)}`
+    const path = `/historical`
     const params = {
-      base: 'USD',
-      symbols: currencyCode,
+      access_key: EXCHANGE_RATES_API_ACCESS_KEY,
+      date: formatDateString(date),
     }
-    const result = await this.get<ExchangeRateApiResult>(path, params)
-    const rate = result.rates[currencyCode]
+    const result = await this.get<ExchangeRateApiResult>(path, params, {
+      cacheOptions: { ttl: this.getCacheTtl(date) },
+    })
+    if (result.success !== true) {
+      throw new Error(`Invalid response result: ${JSON.stringify(result)}`)
+    }
+    const rate = result.quotes[`USD${currencyCode}`]
     console.debug('Retrieved rate', currencyCode, rate)
     return rate
   }
 
-  private getRateForCurrencyCode(currencyCode: string, date: Date) {
-    return (
-      (this.exchangeRateCache.get(currencyCode) &&
-        this.exchangeRateCache.get(currencyCode)!.get(date.toDateString())) ||
-      undefined
-    )
-  }
-
-  private setRateForCurrencyCode(currencyCode: string, date: Date, rate: number) {
-    if (!this.exchangeRateCache.get(currencyCode)) {
-      this.exchangeRateCache.set(currencyCode, new Map())
+  // Returns ttl (in seconds)
+  private getCacheTtl(date: Date) {
+    if (Date.now() - date.getTime() >= 24 * 3600 * 1000) {
+      // Cache indefinitely if requesting a date prior to the last 24 hours
+      return Number.MAX_SAFE_INTEGER
+    } else {
+      return MIN_TTL
     }
-    this.exchangeRateCache.get(currencyCode)!.set(date.toDateString(), rate)
   }
 }

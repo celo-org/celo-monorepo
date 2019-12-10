@@ -1,10 +1,10 @@
 {
   "requests": "Requests",
   "empty": "You have no Payment Requests",
-  "paymentRequests": "Payment Requests",
+  "incomingPaymentRequests": "Requests Waiting for You",
+  "outgoingPaymentRequests": "Payments You’ve Requested",
   "celoDollarBalance": "{{CeloDollar}} Balance",
-  "pay": "Pay",
-  "decline": "Decline",
   "requestDeclined": "Request Declined",
-  "requestPaid": "Request Paid"
+  "requestPaid": "Request Paid",
+  "paymentRequestUpdateFailed": "Cannot update payment request"
 }

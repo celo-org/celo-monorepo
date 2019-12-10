@@ -8,8 +8,8 @@ import ForwardChevron from '@celo/react-components/icons/ForwardChevron'
 import QRCode from '@celo/react-components/icons/QRCode'
 import colors from '@celo/react-components/styles/colors'
 import { fontStyles } from '@celo/react-components/styles/fonts'
+import { isValidAddress } from '@celo/utils/src/address'
 import { parsePhoneNumber } from '@celo/utils/src/phoneNumbers'
-import { isValidAddress } from '@celo/utils/src/signatureUtils'
 import { TranslationFunction } from 'i18next'
 import * as React from 'react'
 import { withNamespaces, WithNamespaces } from 'react-i18next'
@@ -46,7 +46,8 @@ import { requestContactsPermission } from 'src/utils/permissions'
 import { assertUnreachable } from 'src/utils/typescript'
 
 const RecipientSearchInput = withTextInputPasteAware(
-  withTextInputLabeling<TextInputProps>(TextInput)
+  withTextInputLabeling<TextInputProps>(TextInput),
+  { right: 22 }
 )
 
 const goToQrCodeScreen = () => {
