@@ -18,7 +18,7 @@ class JobRowBase extends React.PureComponent<LeverJob & ScreenProps & I18nProps>
               accessibilityRole="link"
               target="blank"
               href={this.props.hostedUrl}
-              style={fonts.h5}
+              style={fonts.h6}
             >
               {text}
             </Text>

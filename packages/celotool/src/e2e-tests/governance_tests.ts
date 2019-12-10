@@ -133,6 +133,7 @@ describe('governance tests', () => {
   let epochRewards: any
   let goldToken: any
   let registry: any
+  let reserve: any
   let validators: any
   let accounts: any
   let kit: ContractKit
@@ -153,6 +154,7 @@ describe('governance tests', () => {
     sortedOracles = await kit._web3Contracts.getSortedOracles()
     validators = await kit._web3Contracts.getValidators()
     registry = await kit._web3Contracts.getRegistry()
+    reserve = await kit._web3Contracts.getReserve()
     election = await kit._web3Contracts.getElection()
     epochRewards = await kit._web3Contracts.getEpochRewards()
     accounts = await kit._web3Contracts.getAccounts()
@@ -612,12 +614,20 @@ describe('governance tests', () => {
         await assertBalanceChanged(governance.options.address, blockNumber, expected, goldToken)
       }
 
+      const assertReserveBalanceChanged = async (blockNumber: number, expected: BigNumber) => {
+        await assertBalanceChanged(reserve.options.address, blockNumber, expected, goldToken)
+      }
+
       const assertVotesUnchanged = async (blockNumber: number) => {
         await assertVotesChanged(blockNumber, new BigNumber(0))
       }
 
       const assertLockedGoldBalanceUnchanged = async (blockNumber: number) => {
         await assertLockedGoldBalanceChanged(blockNumber, new BigNumber(0))
+      }
+
+      const assertReserveBalanceUnchanged = async (blockNumber: number) => {
+        await assertReserveBalanceChanged(blockNumber, new BigNumber(0))
       }
 
       const getStableTokenSupplyChange = async (blockNumber: number) => {
@@ -669,11 +679,13 @@ describe('governance tests', () => {
             blockNumber,
             expectedInfraReward.plus(await blockBaseGasFee(blockNumber))
           )
+          await assertReserveBalanceChanged(blockNumber, stableTokenSupplyChange.div(exchangeRate))
           await assertGoldTokenTotalSupplyChanged(blockNumber, expectedGoldTotalSupplyChange)
         } else {
           await assertVotesUnchanged(blockNumber)
           await assertGoldTokenTotalSupplyUnchanged(blockNumber)
           await assertLockedGoldBalanceUnchanged(blockNumber)
+          await assertReserveBalanceUnchanged(blockNumber)
           await assertGovernanceBalanceChanged(blockNumber, await blockBaseGasFee(blockNumber))
         }
       }
@@ -701,6 +713,28 @@ describe('governance tests', () => {
           await assertTargetVotingYieldUnchanged(blockNumber)
         }
       }
+    })
+
+    it('should have emitted the correct events when paying epoch rewards', async () => {
+      const currentBlock = await web3.eth.getBlockNumber()
+      const epochRewardsEvents = await epochRewards.getPastEvents('TargetVotingYieldUpdated', {
+        fromBlock: currentBlock - 10,
+        currentBlock,
+      })
+      const validatorRewardsEvents = await validators.getPastEvents(
+        'ValidatorEpochPaymentDistributed',
+        { fromBlock: currentBlock - 10, currentBlock }
+      )
+      const electionRewardsEvents = await election.getPastEvents(
+        'EpochRewardsDistributedToVoters',
+        { fromBlock: currentBlock - 10, currentBlock }
+      )
+      assert(epochRewardsEvents.every((a: any) => a.blockNumber % 10 === 0))
+      assert(validatorRewardsEvents.every((a: any) => a.blockNumber % 10 === 0))
+      assert(electionRewardsEvents.every((a: any) => a.blockNumber % 10 === 0))
+      assert(epochRewardsEvents.length > 0)
+      assert(validatorRewardsEvents.length > 0)
+      assert(electionRewardsEvents.length > 0)
     })
   })
 

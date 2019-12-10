@@ -98,7 +98,7 @@ function EmailForm({
 
                   {formState.errors.length > 0 &&
                     formState.errors.map((error) => (
-                      <Text style={[fonts.h5, textStyles.error]} key={error}>
+                      <Text style={[fonts.h6, textStyles.error]} key={error}>
                         {t(`validationErrors.${error}`)}
                       </Text>
                     ))}
@@ -113,7 +113,7 @@ function EmailForm({
 }
 
 export function After({ t }) {
-  return <Text style={[fonts.h5, textStyles.invert]}>{t('stayConnectedThanks')}</Text>
+  return <Text style={[fonts.h6, textStyles.invert]}>{t('stayConnectedThanks')}</Text>
 }
 
 const borderWidth = 1

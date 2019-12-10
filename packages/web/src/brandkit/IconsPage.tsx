@@ -39,7 +39,7 @@ const Overview = withNamespaces(NameSpaces.brand)(function _Overview({ t }: I18n
   return (
     <View style={styles.container}>
       <PageHeadline title={t('icons.title')} headline={t('icons.headline')} />
-      <Text style={[fonts.h5a, brandStyles.gap, standardStyles.blockMarginTop]}>
+      <Text style={[fonts.h5, brandStyles.gap, standardStyles.blockMarginTop]}>
         {t('licenseTitle')}
       </Text>
       <Text style={[fonts.p, brandStyles.gap, standardStyles.elementalMargin]}>
