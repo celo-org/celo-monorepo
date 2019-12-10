@@ -1,9 +1,7 @@
-import { AddressType, isValidUrl, PublicKeyType } from '@celo/utils/lib/io'
+import { AddressType, PublicKeyType } from '@celo/utils/lib/io'
 import { pubToAddress, toChecksumAddress } from 'ethereumjs-util'
 import { either, isLeft } from 'fp-ts/lib/Either'
 import * as t from 'io-ts'
-import { Address } from '../../base'
-import { IdentityMetadataWrapper } from '../metadata'
 import { ClaimTypes, now, TimestampType } from './types'
 
 // Provide the type minus the validation that the public key and address are derived from the same private key
@@ -50,40 +48,4 @@ export const createAccountClaim = (address: string, publicKey?: string): Account
   }
 
   return parsedClaim.right
-}
-
-/**
- * A function that can asynchronously fetch the metadata URL for an account address
- * Should virtually always be Accounts#getMetadataURL
- */
-export type MetadataURLGetter = (address: Address) => Promise<string>
-
-export const verifyAccountClaim = async (
-  claim: AccountClaim,
-  address: string,
-  metadataURLGetter: MetadataURLGetter
-) => {
-  const metadataURL = await metadataURLGetter(claim.address)
-
-  console.info(JSON.stringify(metadataURL))
-  if (!isValidUrl(metadataURL)) {
-    return `Metadata URL of ${claim.address} could not be retrieved`
-  }
-
-  let metadata: IdentityMetadataWrapper
-  try {
-    metadata = await IdentityMetadataWrapper.fetchFromURL(metadataURL)
-  } catch (error) {
-    return `Metadata could not be fetched for ${
-      claim.address
-    } at ${metadataURL}: ${error.toString()}`
-  }
-
-  const accountClaims = metadata.filterClaims(ClaimTypes.ACCOUNT)
-
-  if (accountClaims.find((x) => x.address === address) === undefined) {
-    return `${claim.address} did not claim ${address}`
-  }
-
-  return
 }
