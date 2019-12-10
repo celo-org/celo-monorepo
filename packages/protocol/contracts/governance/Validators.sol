@@ -775,6 +775,7 @@ contract Validators is
       uint256 multiplier = Math.max(1, groups[account].members.numElements);
       uint256[] storage sizeHistory = groups[account].sizeHistory;
       if (sizeHistory.length > 0) {
+        // TODO(lucas): Why isn't this >=
         for (uint256 i = sizeHistory.length.sub(1); i > 0; i = i.sub(1)) {
           if (sizeHistory[i].add(groupLockedGoldRequirements.duration) >= now) {
             multiplier = Math.max(i, multiplier);
@@ -1199,5 +1200,31 @@ contract Validators is
     require(isValidatorGroup(account));
     ValidatorGroup storage group = groups[account];
     return group.slashInfo.multiplier.unwrap();
+  }
+
+  /**
+   * @notice Returns the group that `account` was a member of during `epochNumber`.
+   * @param account The account whose group membership should be returned.
+   * @param epochNumber The epoch number we are querying this account's membership at.
+   * @param index The index into the validator's history struct for their history at `epochNumber`.
+   * @return The group that `account` was a member of during `epochNumber`.
+   */
+  function groupMembershipInEpoch(address account, uint256 epochNumber, uint256 index)
+    external
+    view
+    onlyRegisteredContracts(canForceDeaffiliation)
+    returns (address)
+  {
+    require(isValidator(account) && epochNumber <= getEpochNumber());
+    MembershipHistory storage history = validators[account].membershipHistory;
+    if (
+      history.entries[index].epochNumber == epochNumber ||
+      (history.entries[index].epochNumber < epochNumber &&
+        (history.entries[index.add(1)].epochNumber > epochNumber ||
+          history.entries[index.add(1)].epochNumber == 0))
+    ) {
+      return history.entries[index].group;
+    }
+    require(false, "provided index does not match provided epochNumber in history.");
   }
 }
