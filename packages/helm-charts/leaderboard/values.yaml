@@ -2,15 +2,14 @@ nodeSelector: {}
 
 # Expects cron schedule syntax
 leaderboard:
-  schedule: "*/1 * * * *"
-  database: "blockscout"
+  schedule: "*/5 * * * *"
   image:
-    repository: jcortejoso/leaderboard
-    tag: latest
+    repository: us.gcr.io/celo-testnet/celo-monorepo
+    tag: leaderboard-2708d6459b6efe2ab3ec04084d9c3819e202699f
   database: blockscout
-  web3: https://baklavastaging-forno.celo-testnet.org/
-  sheet: 1HCs1LZv1BOB1v2bVlH4qNPnxVRlYVhQ7CKhkMibE4EY
+  web3: https://baklava-forno.celo-testnet.org/
+  sheet: 
   db:
-    username: ls880fd3
-    password: dg7mTjVB2khgkDFd
-    connection_name: celo-testnet:us-west1:baklavastaging0
+    username:
+    password:
+    connection_name: 
