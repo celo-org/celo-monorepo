@@ -10,16 +10,10 @@ function insertIf<T>(condition: boolean, element: T) {
 }
 
 export default class CurrencyConversionAPI<TContext = any> extends DataSource {
-  // httpCache!: HTTPCache;
-  // context!: TContext;
-  // memoizedResults = new Map<string, Promise<any>>();
-
   exchangeRateAPI = new ExchangeRateAPI()
   goldExchangeRateAPI = new GoldExchangeRateAPI()
 
   initialize(config: DataSourceConfig<TContext>): void {
-    // this.context = config.context;
-    // this.httpCache = new HTTPCache(config.cache);
     this.exchangeRateAPI.initialize(config)
     this.goldExchangeRateAPI.initialize(config)
   }
@@ -47,6 +41,9 @@ export default class CurrencyConversionAPI<TContext = any> extends DataSource {
     return rates.reduce((acc, rate) => acc.multipliedBy(rate), new BigNumber(1))
   }
 
+  // Get conversion steps given the data we have today
+  // Going from cGLD to local currency (or vice versa) is currently assumed to be the same as cGLD -> cUSD -> USD -> local currency.
+  // And similar to cUSD to local currency, but with one less step.
   private getConversionSteps(fromCode: string, toCode: string) {
     if (fromCode === toCode) {
       // Same code, nothing to do
@@ -82,6 +79,7 @@ export default class CurrencyConversionAPI<TContext = any> extends DataSource {
     const pair = `${fromCode}/${toCode}`
 
     if (pair === 'cUSD/USD' || pair === 'USD/cUSD') {
+      // TODO: use real rates once we have the data
       return Promise.resolve(new BigNumber(1))
     } else if (pair === 'cGLD/cUSD' || pair === 'cUSD/cGLD') {
       return this.goldExchangeRateAPI.getExchangeRate({

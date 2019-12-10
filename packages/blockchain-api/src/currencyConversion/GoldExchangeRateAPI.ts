@@ -40,13 +40,11 @@ function findClosestRate(
 }
 
 export default class GoldExchangeRateAPI<TContext = any> extends DataSource {
-  // httpCache!: HTTPCache;
-  // context!: TContext;
+  // TODO(jeanregisser): memoize results
   // memoizedResults = new Map<string, Promise<any>>();
 
   initialize(config: DataSourceConfig<TContext>): void {
-    // this.context = config.context;
-    // this.httpCache = new HTTPCache(config.cache);
+    // TODO(jeanregisser): keep config.cache
   }
 
   // TODO(jeanregisser): add caching (using config.cache)
