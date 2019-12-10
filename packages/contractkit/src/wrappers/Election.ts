@@ -111,13 +111,33 @@ export class ElectionWrapper extends BaseWrapper<Election> {
     this.contract.methods.getGroupsVotedForByAccount
   )
 
-  async getVotesForGroupByAccount(account: Address, group: Address): Promise<GroupVote> {
-    const pending = await this.contract.methods
-      .getPendingVotesForGroupByAccount(group, account)
-      .call()
-    const active = await this.contract.methods
-      .getActiveVotesForGroupByAccount(group, account)
-      .call()
+  async getVotesForGroupByAccount(
+    account: Address,
+    group: Address,
+    blockNumber?: number
+  ): Promise<GroupVote> {
+    var pending
+    if (blockNumber) {
+      const contract = await this.kit._web3Contracts.getElection()
+      // @ts-ignore: Expected 0-1 arguments, but got 2
+      pending = await contract.methods
+        .getPendingVotesForGroupByAccount(group, account)
+        .call({}, blockNumber)
+    } else {
+      pending = await this.contract.methods.getPendingVotesForGroupByAccount(group, account).call()
+    }
+
+    var active
+    if (blockNumber) {
+      const contract = await this.kit._web3Contracts.getElection()
+      // @ts-ignore: Expected 0-1 arguments, but got 2
+      active = await contract.methods
+        .getActiveVotesForGroupByAccount(group, account)
+        .call({}, blockNumber)
+    } else {
+      active = await this.contract.methods.getActiveVotesForGroupByAccount(group, account).call()
+    }
+
     return {
       group,
       pending: toBigNumber(pending),
@@ -125,9 +145,18 @@ export class ElectionWrapper extends BaseWrapper<Election> {
     }
   }
 
-  async getVoter(account: Address): Promise<Voter> {
-    const groups = await this.contract.methods.getGroupsVotedForByAccount(account).call()
-    const votes = await Promise.all(groups.map((g) => this.getVotesForGroupByAccount(account, g)))
+  async getVoter(account: Address, blockNumber?: number): Promise<Voter> {
+    var groups: string[]
+    if (blockNumber) {
+      const contract = await this.kit._web3Contracts.getElection()
+      // @ts-ignore: Expected 0-1 arguments, but got 2
+      groups = await contract.methods.getGroupsVotedForByAccount(account).call({}, blockNumber)
+    } else {
+      groups = await this.contract.methods.getGroupsVotedForByAccount(account).call()
+    }
+    const votes = await Promise.all(
+      groups.map((g) => this.getVotesForGroupByAccount(account, g, blockNumber))
+    )
     return { address: account, votes }
   }
 
@@ -330,7 +359,7 @@ export class ElectionWrapper extends BaseWrapper<Election> {
   async getVoterRewardEvents(
     epochSize: number,
     epochs = 1,
-    votes?: { [key: string]: BigNumber } | null
+    votes?: { [key: number]: { [key: string]: BigNumber } } | null
   ) {
     var voterRewardsEvents = await getEpochEvents(
       this.kit.web3,
@@ -341,7 +370,7 @@ export class ElectionWrapper extends BaseWrapper<Election> {
     )
     if (votes) {
       voterRewardsEvents = voterRewardsEvents.filter(
-        (x: any) => x.returnValues.group.toLowerCase() in votes
+        (x: any) => x.returnValues.group.toLowerCase() in votes[x.blockNumber]
       )
     }
     return voterRewardsEvents

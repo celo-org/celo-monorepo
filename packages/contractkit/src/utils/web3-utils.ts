@@ -49,3 +49,20 @@ export async function forEachEpochAsync(web3: Web3, callback: any, epochSize: nu
     results.push(callback(blockNumber))
   return await Promise.all(results)
 }
+
+// Waits on callback(blockNumber) for the last N epochs.
+export async function mapEachEpochAsync(web3: Web3, callback: any, epochSize: number, epochs = 1) {
+  const currentBlock = await web3.eth.getBlockNumber()
+  const lastEpochBlock = Math.floor(currentBlock / epochSize) * epochSize
+  const fromBlock: number = lastEpochBlock - epochSize * (epochs - 1)
+  var promises = []
+  for (var blockNumber = fromBlock; blockNumber <= lastEpochBlock; blockNumber += epochSize)
+    promises.push(callback(blockNumber))
+  const results = await Promise.all(promises)
+
+  var index = 0
+  const dict: { [key: number]: any } = {}
+  for (var blockNumber = fromBlock; blockNumber <= lastEpochBlock; blockNumber += epochSize)
+    dict[blockNumber] = results[index++]
+  return dict
+}

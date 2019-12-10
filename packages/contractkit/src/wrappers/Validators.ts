@@ -201,19 +201,26 @@ export class ValidatorsWrapper extends BaseWrapper<Validators> {
   }
 
   /** Get Validator information */
-  async getValidator(address: Address /*, blockNumber?: number*/): Promise<Validator> {
-    // Expected 0-1 arguments, but got 2
-    //const contract = await this.kit._web3Contracts.getValidators()
-    //const res = await contract.methods.getValidator(address).call({}, blockNumber)
+  async getValidator(address: Address, blockNumber?: number): Promise<Validator> {
+    var res
+    if (blockNumber) {
+      const contract = await this.kit._web3Contracts.getValidators()
+      // @ts-ignore: Expected 0-1 arguments, but got 2
+      res = await contract.methods.getValidator(address).call({}, blockNumber)
+    } else {
+      res = await this.contract.methods.getValidator(address).call()
+    }
 
-    // Expected 0-1 arguments, but got 2
-    //const contract2 = await this.kit._web3Contracts.getAccounts()
-    //const res2 = await contract2.methods.getValidatorSigner(address).call({}, blockNumber)
+    var name
+    if (blockNumber) {
+      const accounts = await this.kit._web3Contracts.getAccounts()
+      // @ts-ignore: Expected 0-1 arguments, but got 2
+      name = (await accounts.methods.getName(address).call({}, blockNumber)) || ''
+    } else {
+      const accounts = await this.kit.contracts.getAccounts()
+      name = (await accounts.getName(address)) || ''
+    }
 
-    const res = await this.contract.methods.getValidator(address).call()
-
-    const accounts = await this.kit.contracts.getAccounts()
-    const name = (await accounts.getName(address)) || ''
     return {
       name,
       address,
@@ -450,13 +457,17 @@ export class ValidatorsWrapper extends BaseWrapper<Validators> {
   }
 
   // Returns map of Validator objects via Promise.all().
-  async getUniqueValidators(listWithValidators: any, getValidatorAddress: any) {
+  async getUniqueValidators(
+    listWithValidators: any,
+    getValidatorAddress: any,
+    blockNumber?: number
+  ) {
     const uniqueValidators: { [key: string]: any } = {}
     for (const validator of listWithValidators) {
       const validatorAddress = getValidatorAddress(validator)
       // Better to use Promise.all()
       if (!(validatorAddress in uniqueValidators))
-        uniqueValidators[validatorAddress] = await this.getValidator(validatorAddress)
+        uniqueValidators[validatorAddress] = await this.getValidator(validatorAddress, blockNumber)
     }
     return uniqueValidators
   }

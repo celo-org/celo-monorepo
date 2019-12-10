@@ -4,6 +4,7 @@ import { flags } from '@oclif/command'
 import { BaseCommand } from '../../base'
 import { newCheckBuilder } from '../../utils/checks'
 import { printValueMapRecursive } from '../../utils/cli'
+import { mapEachEpochAsync } from '@celo/contractkit/lib/utils/web3-utils'
 import BigNumber from 'bignumber.js'
 
 export default class Show extends BaseCommand {
@@ -26,22 +27,34 @@ export default class Show extends BaseCommand {
 
   async run() {
     const res = this.parse(Show)
-    const addressVotes: { [key: string]: BigNumber } = {}
     const election = await this.kit.contracts.getElection()
     const validators = await this.kit.contracts.getValidators()
     const epochSize = await validators.getEpochSize()
 
-    // Map the currently cast votes by address.
+    // Map the votes cast by address at each epoch.
+    var addressVotes: { [key: number]: { [key: string]: BigNumber } }
     if (res.flags.address) {
+      const address = res.flags.address
       await newCheckBuilder(this)
-        .isAccount(res.flags.address)
+        .isAccount(address)
         .runChecks()
-      const voter = await election.getVoter(res.flags.address)
-      voter.votes.forEach(function(x) {
-        const group: string = x.group.toLowerCase()
-        addressVotes[group] = (addressVotes[group] || new BigNumber(0)).plus(x.pending)
-      })
-      printValueMapRecursive(voter)
+
+      addressVotes = await mapEachEpochAsync(
+        this.web3,
+        async (blockNumber: number) => {
+          const voter = await election.getVoter(address, blockNumber)
+          printValueMapRecursive(voter)
+
+          const votes: { [key: string]: BigNumber } = {}
+          voter.votes.forEach(function(x) {
+            const group: string = x.group.toLowerCase()
+            votes[group] = (votes[group] || new BigNumber(0)).plus(x.pending)
+          })
+          return votes
+        },
+        epochSize,
+        res.flags.epochs
+      )
     }
 
     // voterRewards applies to address when voterReward.group in addressVotes.
@@ -58,9 +71,19 @@ export default class Show extends BaseCommand {
       res.flags.address
     )
 
-    const validatorDetails = await validators.getUniqueValidators(validatorRewards, (x: any) =>
-      x.returnValues.validator.toLowerCase()
+    // Get the Validator scores at each epoch
+    const validatorDetails = await mapEachEpochAsync(
+      this.web3,
+      (blockNumber: number) =>
+        validators.getUniqueValidators(
+          validatorRewards,
+          (x: any) => x.returnValues.validator.toLowerCase(),
+          blockNumber
+        ),
+      epochSize,
+      res.flags.epochs
     )
+
     const validatorGroupDetails = await validators.getUniqueValidatorGroups(
       voterRewards,
       (x: any) => x.returnValues.group.toLowerCase()
@@ -83,12 +106,14 @@ export default class Show extends BaseCommand {
       validatorRewards,
       {
         name: {
-          get: (x: any) => validatorDetails[x.returnValues.validator.toLowerCase()].name,
+          get: (x: any) =>
+            validatorDetails[x.blockNumber][x.returnValues.validator.toLowerCase()].name,
         },
         validator: { get: (x: any) => x.returnValues.validator },
         validatorPayment: { get: (x: any) => x.returnValues.validatorPayment },
         currentValidatorScore: {
-          get: (x: any) => validatorDetails[x.returnValues.validator.toLowerCase()].score.toFixed(),
+          get: (x: any) =>
+            validatorDetails[x.blockNumber][x.returnValues.validator.toLowerCase()].score.toFixed(),
         },
         group: { get: (x: any) => x.returnValues.group },
         groupPayment: { get: (x: any) => x.returnValues.groupPayment },
