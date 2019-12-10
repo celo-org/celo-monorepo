@@ -220,6 +220,13 @@ export function isVmBased() {
   return fetchEnv(envVar.VM_BASED) === 'true'
 }
 
+export function failIfNotVmBased() {
+  if (!isVmBased()) {
+    console.error('The celo env is not intended for a VM-based testnet, aborting')
+    process.exit(1)
+  }
+}
+
 export function failIfVmBased() {
   if (isVmBased()) {
     console.error('The celo env is intended for a VM-based testnet, aborting')
