@@ -110,9 +110,9 @@ export class ExchangeTradeScreen extends React.Component<Props, State> {
     const { inputToken, inputAmount } = this.state
     const inputTokenCode = this.getInputTokenDisplayText()
     navigate(Screens.ExchangeReview, {
-      makerToken: this.state.makerToken,
-      makerTokenBalance: this.state.makerTokenAvailableBalance,
       exchangeInput: {
+        makerToken: this.state.makerToken,
+        makerTokenBalance: this.state.makerTokenAvailableBalance,
         inputToken,
         inputTokenCode,
         inputAmount: parseInputAmount(inputAmount),

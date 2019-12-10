@@ -165,7 +165,7 @@ class ExchangeReview extends React.Component<Props, State> {
                   {t('amount') + ` (${this.state.inputTokenCode})`}
                 </Text>
                 <Text style={[fontStyles.body, styles.currencyAmountText]}>
-                  {this.state.inputAmount.toString()}
+                  {getMoneyDisplayValue(this.state.inputAmount, this.state.inputToken, true)}
                 </Text>
               </View>
               <View style={styles.line} />
@@ -251,7 +251,12 @@ const styles = StyleSheet.create({
   exchangeBodyText: { fontSize: 15 },
   currencyAmountText: { fontSize: 24, lineHeight: 39, color: colors.celoGreen },
   feeTextWithIconContainer: { flexDirection: 'row', alignItems: 'center' },
-  rowContainer: { flexDirection: 'row', flex: 1, justifyContent: 'space-between' },
+  rowContainer: {
+    flexDirection: 'row',
+    flex: 1,
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
   feeRowContainer: { marginVertical: 5 },
   amountRow: { marginTop: 30 },
 })
