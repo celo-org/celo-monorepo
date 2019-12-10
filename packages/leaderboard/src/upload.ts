@@ -4,7 +4,7 @@ import { google } from 'googleapis'
 import { ContractKit, newKitFromWeb3, IdentityMetadataWrapper } from '@celo/contractkit'
 import Web3 from 'web3'
 import { ClaimTypes } from '@celo/contractkit/lib/identity'
-import { verifyAccountClaim } from '@celo/contractkit/lib/identity/claims/account'
+import { verifyAccountClaim } from '@celo/contractkit/lib/identity/claims/verify'
 import { BigNumber } from 'bignumber.js'
 
 async function getMetadata(kit: ContractKit, address: string) {
