@@ -51,11 +51,10 @@ export const handler = async (argv: EthstatsArgv) => {
       kit.web3,
       validatorsProxyAddress
     )
-    const desiredImplementationAddress = '0x1D8d4472DC1bE4B277b4c4825A9f1c021cd27014'
-
+    const desiredImplementationAddress = '0xd18620a5eBE0235023602bB4d490E1e96703EddD'
     console.info('Current Implementation Address: ', currentValidatorsImplementationAddress)
 
-    console.info('Build Proposal')
+    console.info('\nBuild Proposal')
 
     const proposalBuilder = new ProposalBuilder(kit)
 
@@ -79,7 +78,7 @@ export const handler = async (argv: EthstatsArgv) => {
 
     console.info(`Proposal Hash: ${proposalHash.toString('hex')}`)
 
-    console.info('Whitelist the hotfix')
+    console.info('\nWhitelist the hotfix')
     await concurrentMap(25, addresses, async (address, index) => {
       try {
         await governance.whitelistHotfix(proposalHash).sendAndWaitForReceipt({ from: address })
@@ -96,6 +95,7 @@ export const handler = async (argv: EthstatsArgv) => {
     hotfixRecord = await governance.getHotfixRecord(proposalHash)
     console.info('Hotfix Record: ', hotfixRecord)
 
+    // This is on master, but not on baklava yet
     const canPass = await governance.isHotfixPassing(proposalHash)
     const tally = await governance.hotfixWhitelistValidatorTally(proposalHash)
 
