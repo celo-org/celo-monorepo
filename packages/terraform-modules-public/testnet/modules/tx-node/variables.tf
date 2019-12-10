@@ -3,11 +3,6 @@ variable block_time {
   description = "Number of seconds between each block"
 }
 
-variable bootnode_ip_address {
-  type        = string
-  description = "The external IP address of the bootnode"
-}
-
 variable celo_env {
   type        = string
   description = "Name of the testnet Celo environment"
@@ -68,8 +63,7 @@ variable tx_node_count {
   description = "Number of tx-nodes to create"
 }
 
-variable bootnode_enode_address {
+variable static_nodes_base64 {
   type        = string
-  description = "Network bootnode enode address"
+  description = "Content of the genesis file encoded in base64"
 }
-

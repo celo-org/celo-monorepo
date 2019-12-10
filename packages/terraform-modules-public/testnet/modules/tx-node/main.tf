@@ -52,7 +52,6 @@ resource "google_compute_instance" "tx_node" {
   metadata_startup_script = templatefile(
     format("%s/startup.sh", path.module), {
       block_time : var.block_time,
-      bootnode_ip_address : var.bootnode_ip_address,
       ethstats_host : var.ethstats_host,
       genesis_content_base64 : var.genesis_content_base64,
       geth_exporter_docker_image_repository : var.geth_exporter_docker_image_repository,
@@ -64,9 +63,8 @@ resource "google_compute_instance" "tx_node" {
       ip_address : google_compute_address.tx_node[count.index].address,
       max_peers : var.tx_node_count * 2,
       network_id : var.network_id,
+      static_nodes_base64 : var.static_nodes_base64,
       rid : count.index,
-      tx_node_name : "${var.celo_env}-tx-node-${count.index}",
-      bootnode_enode_address : var.bootnode_enode_address
     }
   )
 

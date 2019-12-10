@@ -139,7 +139,6 @@ module "tx_node" {
   source = "./modules/tx-node"
   # variables
   block_time                            = var.block_time
-  bootnode_ip_address                   = var.bootnode_ip_address
   celo_env                              = var.celo_env
   ethstats_host                         = var.ethstats_host
   genesis_content_base64                = base64encode(data.http.genesis.body)
@@ -152,8 +151,7 @@ module "tx_node" {
   network_id                            = var.network_id
   network_name                          = var.network_name
   tx_node_count                         = var.tx_node_count
-
-  bootnode_enode_address = var.bootnode_enode_address
+  static_nodes_base64                   = base64encode(data.http.static-nodes.body)
 }
 
 # used for access by blockscout
@@ -170,7 +168,6 @@ module "proxy" {
   source = "./modules/proxy"
   # variables
   block_time                            = var.block_time
-  bootnode_ip_address                   = var.bootnode_ip_address
   celo_env                              = var.celo_env
   ethstats_host                         = var.ethstats_host
   genesis_content_base64                = base64encode(data.http.genesis.body)
@@ -192,7 +189,6 @@ module "proxy" {
   validator_account_addresses = var.validator_account_addresses
   validator_account_passwords = var.validator_account_passwords
   validator_private_keys      = var.validator_private_keys
-  bootnode_enode_address      = var.bootnode_enode_address
   static_nodes_base64         = base64encode(data.http.static-nodes.body)
 }
 
@@ -200,7 +196,6 @@ module "validator" {
   source = "./modules/validator"
   # variables
   block_time                            = var.block_time
-  bootnode_ip_address                   = var.bootnode_ip_address
   celo_env                              = var.celo_env
   ethstats_host                         = var.ethstats_host
   genesis_content_base64                = base64encode(data.http.genesis.body)
@@ -224,7 +219,6 @@ module "validator" {
   proxy_enodes                = var.proxy_enodes
   proxy_internal_ips          = module.proxy.internal_ip_addresses
   proxy_external_ips          = module.proxy.external_ip_addresses
-  bootnode_enode_address      = var.bootnode_enode_address
   static_nodes_base64         = base64encode(data.http.static-nodes.body)
 }
 

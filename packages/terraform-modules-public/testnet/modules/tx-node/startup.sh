@@ -34,11 +34,6 @@ DATA_DIR=/root/.celo
 
 GETH_NODE_DOCKER_IMAGE=${geth_node_docker_image_repository}:${geth_node_docker_image_tag}
 
-echo "Bootnode enode address: ${bootnode_enode_address}"
-
-BOOTNODE_ENODE=${bootnode_enode_address}@${bootnode_ip_address}:30301
-echo "Bootnode enode: $BOOTNODE_ENODE"
-
 echo "Pulling geth..."
 docker pull $GETH_NODE_DOCKER_IMAGE
 
@@ -47,10 +42,9 @@ IN_MEMORY_DISCOVERY_TABLE_FLAG=""
 
 mkdir -p $DATA_DIR/account
 echo -n '${genesis_content_base64}' | base64 -d > $DATA_DIR/genesis.json
+echo -n '${static_nodes_base64}' | base64 -d > $DATA_DIR/static-nodes.json
 echo -n '${rid}' > $DATA_DIR/replica_id
 echo -n '${ip_address}' > $DATA_DIR/ipAddress
-echo -n '${bootnode_enode_address}' > $DATA_DIR/bootnodeEnodeAddress
-echo -n '$BOOTNODE_ENODE' > $DATA_DIR/bootnodeEnode
 
 
 echo "Starting geth..."
@@ -79,7 +73,6 @@ ExecStart=/usr/bin/docker run \\
   --entrypoint /bin/sh \\
   $GETH_NODE_DOCKER_IMAGE -c "\\
     geth \\
-      --bootnodes=enode://$BOOTNODE_ENODE \\
       --lightserv 90 \\
       --lightpeers 1000 \\
       --maxpeers 1100 \\
@@ -97,7 +90,6 @@ ExecStart=/usr/bin/docker run \\
       --consoleformat=json \\
       --consoleoutput=stdout \\
       --verbosity=${geth_verbosity} \\
-      --ethstats=${tx_node_name}@${ethstats_host} \\
       --nat=extip:${ip_address} \\
       --metrics \\
       $IN_MEMORY_DISCOVERY_TABLE_FLAG \\

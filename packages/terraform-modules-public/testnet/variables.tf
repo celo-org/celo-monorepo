@@ -114,18 +114,6 @@ variable proxy_private_keys {
   description = "Array with the Proxy private keys"
 }
 
-variable bootnode_enode_address {
-  type        = string
-  description = "Network bootnode enode address (without enode://)"
-  default     = ""
-}
-
-variable bootnode_ip_address {
-  type        = string
-  description = "Network bootnode ip address"
-  default     = ""
-}
-
 variable deploy_txnode_lb {
   type        = bool
   description = "Deploy or not the Load Balancer for the TX Nodes"

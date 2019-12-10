@@ -3,11 +3,6 @@ variable block_time {
   description = "Number of seconds between each block"
 }
 
-variable bootnode_ip_address {
-  type        = string
-  description = "The external IP address of the bootnode"
-}
-
 variable celo_env {
   type        = string
   description = "Name of the testnet Celo environment"
@@ -96,11 +91,6 @@ variable validator_account_passwords {
 variable validator_private_keys {
   type        = list(string)
   description = "Array with the Validator private keys"
-}
-
-variable bootnode_enode_address {
-  type        = string
-  description = "Network bootnode enode address"
 }
 
 variable static_nodes_base64 {

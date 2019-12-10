@@ -103,16 +103,6 @@ variable proxy_external_ips {
   description = "Array list with the proxy external addresses"
 }
 
-variable bootnode_enode_address {
-  type        = string
-  description = "Network bootnode enode address (without enode://)"
-}
-
-variable bootnode_ip_address {
-  type        = string
-  description = "The external IP address of the bootnode"
-}
-
 variable static_nodes_base64 {
   type        = string
   description = "Content of the genesis file encoded in base64"

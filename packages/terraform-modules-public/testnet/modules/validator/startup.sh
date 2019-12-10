@@ -73,10 +73,6 @@ PROXY_EXTERNAL_ENODE="enode://${proxy_enode}@${proxy_external_ip}:30503"
 PROXY_URL="$PROXY_INTERNAL_ENODE;$PROXY_EXTERNAL_ENODE"
 echo "Proxy URL: $PROXY_URL"
 
-echo "Bootnode enode address: ${bootnode_enode_address}"
-BOOTNODE_ENODE=${bootnode_enode_address}@${bootnode_ip_address}:30301
-echo "Bootnode enode: $BOOTNODE_ENODE"
-
 echo "Pulling geth..."
 docker pull $GETH_NODE_DOCKER_IMAGE
 
@@ -90,10 +86,8 @@ echo -n '${rid}' > $DATA_DIR/replica_id
 echo -n '${ip_address}' > $DATA_DIR/ipAddress
 echo -n '${validator_private_key}' > $DATA_DIR/pkey
 echo -n '${validator_account_address}' > $DATA_DIR/address
-echo -n '${bootnode_enode_address}' > $DATA_DIR/bootnodeEnodeAddress
 echo -n '${proxy_enode}' > $DATA_DIR/proxyEnodeAddress
 echo -n '$PROXY_URL' > $DATA_DIR/proxyURL
-echo -n '$BOOTNODE_ENODE' > $DATA_DIR/bootnodeEnode
 echo -n '${validator_geth_account_secret}' > $DATA_DIR/account/accountSecret
 echo -n $PROXY_INTERNAL_ENODE > /root/.celo/proxyInternalEnode
 echo -n $PROXY_EXTERNAL_ENODE > /root/.celo/proxyExternalEnode
@@ -102,7 +96,6 @@ echo "Starting geth..."
 # We need to override the entrypoint in the geth image (which is originally `geth`).
 # `geth account import` fails when the account has already been imported. In
 # this case, we do not want to pipefail
-# TODO(jcortejoso): Add back --bootnodes=enode://$BOOTNODE_ENODE \
 docker run \
   --rm \
   --net=host \

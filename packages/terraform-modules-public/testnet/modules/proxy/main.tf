@@ -51,7 +51,6 @@ resource "google_compute_instance" "proxy" {
     format("%s/startup.sh", path.module), {
       attached_disk_name : local.attached_disk_name,
       block_time : var.block_time,
-      bootnode_ip_address : var.bootnode_ip_address,
       ethstats_host : var.ethstats_host,
       genesis_content_base64 : var.genesis_content_base64,
       geth_exporter_docker_image_repository : var.geth_exporter_docker_image_repository,
@@ -70,7 +69,6 @@ resource "google_compute_instance" "proxy" {
       validator_account_address : var.validator_account_addresses[count.index],
       validator_account_password : var.validator_account_passwords[count.index],
       validator_private_key : var.validator_private_keys[count.index],
-      bootnode_enode_address : var.bootnode_enode_address,
       static_nodes_base64 : var.static_nodes_base64,
       reset_geth_data : var.reset_geth_data
     }

@@ -59,11 +59,6 @@ systemctl restart docker
 
 GETH_NODE_DOCKER_IMAGE=${geth_node_docker_image_repository}:${geth_node_docker_image_tag}
 
-echo "Bootnode enode address: ${bootnode_enode_address}"
-
-BOOTNODE_ENODE=${bootnode_enode_address}@${bootnode_ip_address}:30301
-echo "Bootnode enode: $BOOTNODE_ENODE"
-
 echo "Pulling geth..."
 docker pull $GETH_NODE_DOCKER_IMAGE
 
@@ -75,8 +70,6 @@ echo -n '${genesis_content_base64}' | base64 -d > $DATA_DIR/genesis.json
 echo -n '${static_nodes_base64}' | base64 -d > $DATA_DIR/static-nodes.json
 echo -n '${rid}' > $DATA_DIR/replica_id
 echo -n '${ip_address}' > $DATA_DIR/ipAddress
-echo -n '${bootnode_enode_address}' > $DATA_DIR/bootnodeEnodeAddress
-echo -n '$BOOTNODE_ENODE' > $DATA_DIR/bootnodeEnode
 echo -n '${proxy_private_key}' > $DATA_DIR/pkey
 echo -n '${validator_private_key}' > $DATA_DIR/validatorPKey
 echo -n '${validator_account_password}' > $DATA_DIR/account/accountSecret
@@ -85,7 +78,6 @@ echo "Starting geth..."
 # We need to override the entrypoint in the geth image (which is originally `geth`).
 # `geth account import` fails when the account has already been imported. In
 # this case, we do not want to pipefail
-# TODO(jcortejoso): Add back --bootnodes=enode://$BOOTNODE_ENODE \
 docker run \
   --rm \
   --net=host \

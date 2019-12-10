@@ -41,7 +41,6 @@ resource "google_compute_instance" "validator" {
     format("%s/startup.sh", path.module), {
       attached_disk_name : local.attached_disk_name,
       block_time : var.block_time,
-      bootnode_ip_address : var.bootnode_ip_address,
       ethstats_host : var.ethstats_host,
       genesis_content_base64 : var.genesis_content_base64,
       geth_exporter_docker_image_repository : var.geth_exporter_docker_image_repository,
@@ -62,7 +61,6 @@ resource "google_compute_instance" "validator" {
       proxy_enode : var.proxy_enodes[count.index],
       proxy_internal_ip : var.proxy_internal_ips[count.index],
       proxy_external_ip : var.proxy_external_ips[count.index],
-      bootnode_enode_address : var.bootnode_enode_address,
       static_nodes_base64 : var.static_nodes_base64,
       reset_geth_data : var.reset_geth_data
     }
