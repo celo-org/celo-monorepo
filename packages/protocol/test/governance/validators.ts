@@ -1781,8 +1781,8 @@ contract('Validators', (accounts: string[]) => {
         })
       }
 
-      describe('when only zero is provided', () => {
-        testGroupUptimeCalculation([0])
+      describe('when only zeros are provided', () => {
+        testGroupUptimeCalculation([0, 0, 0, 0])
       })
 
       describe('when there are zeros in the uptimes', () => {

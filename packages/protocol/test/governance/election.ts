@@ -964,9 +964,9 @@ contract('Election', (accounts: string[]) => {
     const voter = accounts[0]
     const group1 = accounts[1]
     const group2 = accounts[2]
-    const voteValue1 = new BigNumber(2000000)
-    const voteValue2 = new BigNumber(1000000)
-    const totalRewardValue = new BigNumber(3000000)
+    const voteValue1 = new BigNumber(2000000000)
+    const voteValue2 = new BigNumber(1000000000)
+    const totalRewardValue = new BigNumber(3000000000)
     beforeEach(async () => {
       await registry.setAddressFor(CeloContractName.Validators, accounts[0])
       await election.markGroupEligible(group1, NULL_ADDRESS, NULL_ADDRESS)
@@ -1029,6 +1029,7 @@ contract('Election', (accounts: string[]) => {
         .div(voteValue1.plus(voteValue2))
         .times(totalRewardValue)
         .dp(0)
+        .minus(1) // minus 1 wei for rounding errors.
       beforeEach(async () => {
         await mineBlocks(EPOCH, web3)
         await election.activate(group1)

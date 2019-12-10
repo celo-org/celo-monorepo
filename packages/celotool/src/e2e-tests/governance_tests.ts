@@ -716,31 +716,36 @@ describe('governance tests', () => {
     })
 
     it('should have emitted the correct events when paying epoch rewards', async () => {
-      const currentBlock = await web3.eth.getBlockNumber()
-      const epochRewardsEvents = await epochRewards.getPastEvents('TargetVotingYieldUpdated', {
-        fromBlock: currentBlock - 10,
-        currentBlock,
-      })
-      const validatorRewardsEvents = await validators.getPastEvents(
-        'ValidatorEpochPaymentDistributed',
-        { fromBlock: currentBlock - 10, currentBlock }
-      )
-      const validatorScoreEvents = await validators.getPastEvents('ValidatorScoreUpdated', {
-        fromBlock: currentBlock - 10,
-        currentBlock,
-      })
-      const electionRewardsEvents = await election.getPastEvents(
-        'EpochRewardsDistributedToVoters',
-        { fromBlock: currentBlock - 10, currentBlock }
-      )
-      assert(epochRewardsEvents.every((a: any) => a.blockNumber % 10 === 0))
-      assert(validatorRewardsEvents.every((a: any) => a.blockNumber % 10 === 0))
-      assert(validatorScoreEvents.every((a: any) => a.blockNumber % 10 === 0))
-      assert(electionRewardsEvents.every((a: any) => a.blockNumber % 10 === 0))
-      assert(epochRewardsEvents.length > 0)
-      assert(validatorRewardsEvents.length > 0)
-      assert(validatorScoreEvents.length > 0)
-      assert(electionRewardsEvents.length > 0)
+      const currentBlock = (await web3.eth.getBlock('latest')).number
+      const events = [
+        {
+          contract: epochRewards,
+          name: 'TargetVotingYieldUpdated',
+        },
+        {
+          contract: validators,
+          name: 'ValidatorEpochPaymentDistributed',
+        },
+        {
+          contract: validators,
+          name: 'ValidatorScoreUpdated',
+        },
+        {
+          contract: election,
+          name: 'EpochRewardsDistributedToVoters',
+        },
+      ]
+      for (const event of events) {
+        const eventLogs = await event.contract.getPastEvents(event.name, {
+          fromBlock: currentBlock - 10,
+          currentBlock,
+        })
+        assert(
+          eventLogs.every((a: any) => a.blockNumber % 10 === 0),
+          `every ${event.name} event occured on the last block of the epoch`
+        )
+        assert(eventLogs.length > 0, `at least one ${event.name} event occured`)
+      }
     })
   })
 
