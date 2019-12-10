@@ -7,7 +7,6 @@ import * as React from 'react'
 import { ApolloProvider, Query } from 'react-apollo'
 import LeaderBoard from 'src/dev/LeaderBoard'
 import LeaderBoardError from 'src/dev/LeaderBoardError'
-import LeaderBoardLoading from 'src/dev/LeaderBoardLoading'
 import { I18nProps, withNamespaces } from 'src/i18n'
 
 const graphqlURI = getConfig().publicRuntimeConfig.LEADERBOARD.uri
@@ -30,6 +29,8 @@ const query = gql`
   }
 `
 
+const loadingLeaders = new Array(8).fill({ points: 0, identity: ' ' })
+
 class LeaderBoardApp extends React.PureComponent<I18nProps> {
   render() {
     if (!getConfig().publicRuntimeConfig.FLAGS.LEADERBOARD) {
@@ -39,14 +40,11 @@ class LeaderBoardApp extends React.PureComponent<I18nProps> {
       <ApolloProvider client={createApolloClient()}>
         <Query query={query}>
           {({ loading, error, data }) => {
-            if (loading) {
-              return <LeaderBoardLoading />
-            }
             if (error) {
               return <LeaderBoardError error={error} />
             }
-            const leaders = data.leaderboard
-            return <LeaderBoard leaders={leaders} />
+            const leaders = loading ? loadingLeaders : data.leaderboard
+            return <LeaderBoard leaders={leaders} isLoading={loading} />
           }}
         </Query>
       </ApolloProvider>
