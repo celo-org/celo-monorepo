@@ -50,8 +50,6 @@ export const handler = async (argv: ValidatorsExecArgv) => {
   const project = fetchEnv(envVar.TESTNET_PROJECT_NAME)
   const zone = fetchEnv(envVar.KUBERNETES_CLUSTER_ZONE)
 
-  const nodeCount = getNodeCount(argv.nodeType)
-
   const cmd = argv.cmd === null ? `sudo docker ${argv.docker} geth` : argv.cmd
 
   console.info(
@@ -60,8 +58,7 @@ export const handler = async (argv: ValidatorsExecArgv) => {
       `Env: ${argv.celoEnv}\n` +
       `Project: ${project}\n` +
       `Zone: ${zone}\n` +
-      `Node Type: ${argv.nodeType}\n` +
-      `Node Count: ${nodeCount}`
+      `Node Type: ${argv.nodeType}`
   )
 
   // For proxy / tx-nodes that have random suffixes, we are forced to run a
@@ -72,11 +69,14 @@ export const handler = async (argv: ValidatorsExecArgv) => {
   // happen in parallel
   const instanceNames = []
   if (argv.only === null) {
+    const nodeCount = getNodeCount(argv.nodeType)
+    console.log(`Node Count: ${nodeCount}`)
     for (let i = 0; i < nodeCount; i++) {
       const instanceName = await getNodeVmName(argv.celoEnv, argv.nodeType, i)
       instanceNames.push(instanceName)
     }
   } else {
+    console.log(`Only Index: ${argv.only}`)
     const instanceName = await getNodeVmName(argv.celoEnv, argv.nodeType, argv.only)
     instanceNames.push(instanceName)
   }
