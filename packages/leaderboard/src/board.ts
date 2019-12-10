@@ -1,9 +1,10 @@
-import { ContractKit, newKitFromWeb3, CeloContract } from '@celo/contractkit'
+import { ContractKit, newKitFromWeb3 } from '@celo/contractkit'
 import { AccountsWrapper } from '@celo/contractkit/lib/wrappers/Accounts'
 import Web3 from 'web3'
 import { Client } from 'pg'
-import { verifyClaim, Claim } from '@celo/contractkit/lib/identity/claims/claim'
+import { Claim } from '@celo/contractkit/lib/identity/claims/claim'
 import { ClaimTypes, IdentityMetadataWrapper } from '@celo/contractkit/lib/identity'
+import { verifyAccountClaim } from '@celo/contractkit/lib/identity/claims/account'
 
 const GoogleSpreadsheet = require('google-spreadsheet')
 
@@ -83,31 +84,6 @@ async function updateDB(lst: any[], remove: any[]) {
   await readAssoc(lst.map((a: any) => a.address.toString()))
 }
 
-async function updateRate(kit: ContractKit) {
-  const client = new Client({ database: LEADERBOARD_DATABASE })
-  await client.connect()
-  const token = await kit.contracts.getStableToken()
-  const oracle = await kit.contracts.getSortedOracles()
-  const rate = (await oracle.medianRate(CeloContract.StableToken)).rate.toNumber()
-
-  console.log(token.address)
-
-  const res = await client.query(
-    'INSERT INTO exchange_rates (token, rate) VALUES ($1, $2)' +
-      ' ON CONFLICT (token) DO UPDATE SET rate = EXCLUDED.rate RETURNING *',
-    [Buffer.from(token.address.substr(2), 'hex'), rate]
-  )
-  console.log(res.rows)
-  const date = new Date().toLocaleDateString()
-  const res2 = await client.query(
-    'INSERT INTO market_history (date, closing_price, opening_price) VALUES ($1, $2, $3)' +
-      ' ON CONFLICT (date) DO UPDATE SET closing_price = EXCLUDED.closing_price, opening_price = EXCLUDED.opening_price RETURNING *',
-    [date, rate, rate]
-  )
-  console.log(res2.rows)
-  await client.end()
-}
-
 async function processClaims(kit: ContractKit, address: string, info: IdentityMetadataWrapper) {
   try {
     // const info: any = JSON.parse(data)
@@ -122,7 +98,7 @@ async function processClaims(kit: ContractKit, address: string, info: IdentityMe
         case ClaimTypes.KEYBASE:
           break
         case ClaimTypes.ACCOUNT:
-          const status = await verifyClaim(claim, '0x' + address, accounts.getMetadataURL)
+          const status = await verifyAccountClaim(claim, '0x' + address, accounts.getMetadataURL)
           if (status) console.error('Cannot verify claim:', status)
           else {
             console.log('Claim success', address, claim.address)
@@ -157,7 +133,6 @@ async function processClaims(kit: ContractKit, address: string, info: IdentityMe
 async function readAssoc(lst: string[]) {
   const web3 = new Web3(LEADERBOARD_WEB3)
   const kit: ContractKit = newKitFromWeb3(web3)
-  updateRate(kit)
   const accounts: AccountsWrapper = await kit.contracts.getAccounts()
   lst.forEach(async (a) => {
     try {
