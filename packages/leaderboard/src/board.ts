@@ -2,9 +2,8 @@ import { ContractKit, newKitFromWeb3 } from '@celo/contractkit'
 import { AccountsWrapper } from '@celo/contractkit/lib/wrappers/Accounts'
 import Web3 from 'web3'
 import { Client } from 'pg'
-import { Claim } from '@celo/contractkit/lib/identity/claims/claim'
 import { ClaimTypes, IdentityMetadataWrapper } from '@celo/contractkit/lib/identity'
-import { verifyAccountClaim } from '@celo/contractkit/lib/identity/claims/account'
+import { verifyAccountClaim } from '@celo/contractkit/lib/identity/claims/verify'
 
 const GoogleSpreadsheet = require('google-spreadsheet')
 
@@ -84,31 +83,45 @@ async function updateDB(lst: any[], remove: any[]) {
   await readAssoc(lst.map((a: any) => a.address.toString()))
 }
 
-async function processClaims(kit: ContractKit, address: string, info: IdentityMetadataWrapper) {
-  try {
-    // const info: any = JSON.parse(data)
-    const orig_lst: Claim[] = info.claims
+function dedup(lst: string[]): string[] {
+  return [...new Set(lst)]
+}
 
-    const lst: string[] = []
-    const accounts = await kit.contracts.getAccounts()
-    for (let i = 0; i < orig_lst.length; i++) {
-      console.log('processing claim for', address, orig_lst[i])
-      let claim: Claim = orig_lst[i]
-      switch (claim.type) {
-        case ClaimTypes.KEYBASE:
-          break
-        case ClaimTypes.ACCOUNT:
+async function getClaims(
+  kit: ContractKit,
+  address: string,
+  data: IdentityMetadataWrapper
+): Promise<string[]> {
+  if (address.substr(0, 2) === '0x') {
+    address = address.substr(2)
+  }
+  const res = [address]
+  const accounts = await kit.contracts.getAccounts()
+  for (const claim of data.claims) {
+    switch (claim.type) {
+      case ClaimTypes.KEYBASE:
+        break
+      case ClaimTypes.ACCOUNT:
+        try {
           const status = await verifyAccountClaim(claim, '0x' + address, accounts.getMetadataURL)
           if (status) console.error('Cannot verify claim:', status)
           else {
             console.log('Claim success', address, claim.address)
-            lst.push(claim.address)
+            res.push(claim.address)
           }
-        default:
-          break
-      }
+        } catch (err) {
+          console.error('Cannot fetch metadata', err)
+        }
+      default:
+        break
     }
-    lst.push(address)
+  }
+  return dedup(res)
+}
+
+async function processClaims(kit: ContractKit, address: string, info: IdentityMetadataWrapper) {
+  try {
+    const lst: string[] = await getClaims(kit, address, info)
     const client = new Client({ database: LEADERBOARD_DATABASE })
     await client.connect()
     await client.query(
