@@ -25,7 +25,7 @@ export function ErrorMessage({ allErrors, field, t }) {
 
   return allErrors.includes(field) ? (
     <Fade>
-      <Text style={[fonts.h5, textStyles.error]}>{t(`validationErrors.${key}`)}</Text>
+      <Text style={[fonts.h6, textStyles.error]}>{t(`validationErrors.${key}`)}</Text>
     </Fade>
   ) : (
     <View style={styles.errorPlaceholder} />

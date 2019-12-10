@@ -10,7 +10,7 @@ interface RacerProps {
   color: colors
 }
 
-const COIN_OFFSET = 5
+const COIN_OFFSET = 3
 
 export default React.memo(function Racer({
   color,
@@ -20,21 +20,10 @@ export default React.memo(function Racer({
   const lineAnimationKeyframes = [
     {
       from: {
-        transform: [{ scaleX: 1 }],
+        transform: [{ translateX: -relativePoints }],
       },
       to: {
-        transform: [{ scaleX: relativePoints }],
-      },
-    },
-  ]
-
-  const coinAnimationKeyframes = [
-    {
-      from: {
-        transform: [{ translateX: -COIN_OFFSET }],
-      },
-      to: {
-        transform: [{ translateX: relativePoints - COIN_OFFSET }],
+        transform: [{ translateX: 0 }],
       },
     },
   ]
@@ -42,27 +31,18 @@ export default React.memo(function Racer({
   const animationTimingFunction = `cubic-bezier(${Math.random()},${Math.random()},${Math.random()},${Math.random()})`
 
   return (
-    <View style={[standardStyles.elementalMarginTop]}>
+    <View style={[standardStyles.elementalMarginTop, styles.containment]}>
       <Text style={[fonts.legal, { color }]}>{identity}</Text>
-      <View style={[standardStyles.row, styles.lineGroup]}>
-        <View
-          style={[
-            styles.line,
-            styles.animatable,
-            {
-              backgroundColor: color,
-              animationKeyframes: lineAnimationKeyframes,
-              animationTimingFunction,
-            },
-          ]}
-        />
-        <View
-          style={[
-            styles.onLine,
-            styles.animatable,
-            { animationKeyframes: coinAnimationKeyframes, animationTimingFunction },
-          ]}
-        >
+      <View
+        style={[
+          standardStyles.row,
+          styles.lineGroup,
+          styles.animatable,
+          { animationKeyframes: lineAnimationKeyframes, animationTimingFunction },
+        ]}
+      >
+        <View style={[styles.line, { width: relativePoints, backgroundColor: color }]} />
+        <View style={styles.onLine}>
           <OvalCoin color={color} size={20} />
         </View>
       </View>
@@ -71,10 +51,10 @@ export default React.memo(function Racer({
 })
 
 const styles = StyleSheet.create({
+  containment: { overflow: 'hidden' },
   line: {
     height: 2,
-    width: 1,
-    transformOrigin: 'left',
+    minWidth: COIN_OFFSET,
   },
   onLine: {
     transform: [{ translateX: -COIN_OFFSET }],
@@ -82,6 +62,7 @@ const styles = StyleSheet.create({
   lineGroup: {
     marginTop: 5,
     alignItems: 'center',
+    transformOrigin: 'left',
   },
   animatable: {
     animationDuration: '2s',
