@@ -211,8 +211,6 @@ export class ExchangeTradeScreen extends React.Component<Props, State> {
   render() {
     const { t, exchangeRatePair } = this.props
 
-    console.log('@getRateForMakerToken about to call with', ` makerToken ${this.state.makerToken}`)
-
     const exchangeRateDisplay = getRateForMakerToken(
       exchangeRatePair,
       this.state.makerToken,
