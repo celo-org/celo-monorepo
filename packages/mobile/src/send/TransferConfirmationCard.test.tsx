@@ -74,7 +74,7 @@ describe('TransferConfirmationCard', () => {
     expect(tree).toMatchSnapshot()
   })
 
-  it('renders correctly for received transaction drilldown', () => {
+  it('renders correctly for received escrow transaction drilldown', () => {
     const props = {
       type: TransactionTypes.ESCROW_RECEIVED,
       address: mockAccount,
@@ -113,7 +113,7 @@ describe('TransferConfirmationCard', () => {
     expect(tree).toMatchSnapshot()
   })
 
-  it('renders correctly for escrow sent transaction drilldown', () => {
+  it('renders correctly for sent escrow transaction drilldown', () => {
     const props = {
       type: TransactionTypes.ESCROW_SENT,
       address: mockAccount,
