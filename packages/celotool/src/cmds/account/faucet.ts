@@ -119,7 +119,7 @@ export const handler = async (argv: FaucetArgv) => {
     if (argv.blockscout) {
       // Open addresses in blockscout
       await sleep(1 + parseInt(fetchEnv(envVar.BLOCK_TIME), 10) * 1000)
-      const blockscoutUrl = getBlockscoutUrl(argv)
+      const blockscoutUrl = getBlockscoutUrl(argv.celoEnv)
       for (const address of addresses) {
         await execCmd(`open ${blockscoutUrl}/address/${address}`)
       }

@@ -36,7 +36,7 @@ class Agreement extends React.PureComponent<I18nProps> {
           </GridRow>
           <GridRow>
             <Cell span={Spans.fourth}>
-              <Text style={fonts.h5}>Valid as of July 17, 2019</Text>
+              <Text style={fonts.h6}>Valid as of July 17, 2019</Text>
             </Cell>
             <Cell span={Spans.three4th}>
               <Text style={fonts.p}>
