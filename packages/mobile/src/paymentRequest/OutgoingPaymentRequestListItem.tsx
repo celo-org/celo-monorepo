@@ -82,7 +82,7 @@ export class OutgoingPaymentRequestListItem extends React.Component<Props> {
           })}
           ctas={this.getCTA()}
         >
-          <Text style={[fontStyles.bodySmall]}>{this.props.comment || t('defaultComment')}</Text>
+          <Text style={fontStyles.bodySmall}>{this.props.comment || t('defaultComment')}</Text>
         </BaseNotification>
       </View>
     )

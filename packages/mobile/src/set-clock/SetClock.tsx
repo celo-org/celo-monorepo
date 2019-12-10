@@ -21,6 +21,7 @@ export class SetClock extends React.Component<WithNamespaces> {
     if (Platform.OS === 'android') {
       return AndroidOpenSettings.dateSettings()
     } else {
+      // TODO: Implement Date Setting on iOS
       navigate(Screens.WalletHome)
     }
   }

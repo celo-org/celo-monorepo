@@ -32,7 +32,7 @@ export function NotificationList<T>(props: Props<T>) {
       <DisconnectBanner />
       {props.items.length > 0 ? (
         <ScrollView>
-          <View style={[styles.scrollArea]}>{props.items.map(props.listItemRenderer)}</View>
+          <View style={styles.scrollArea}>{props.items.map(props.listItemRenderer)}</View>
         </ScrollView>
       ) : (
         <Text style={[fontStyles.bodySecondary, styles.empty]}>{i18n.t('global:emptyList')}</Text>
@@ -45,8 +45,8 @@ export function titleWithBalanceNavigationOptions(title: string) {
   return ({ navigation }: { navigation: NavigationProp<NavigationState> }) => ({
     ...headerWithBackButton,
     headerTitle: (
-      <View style={{ alignItems: 'center', flex: 1 }}>
-        {title && <Text style={{ ...fontStyles.bodyBold }}>{title}</Text>}
+      <View style={styles.header}>
+        {title && <Text style={fontStyles.bodyBold}>{title}</Text>}
         <Text style={styles.balanceText}>
           {(navigation.state.params &&
             navigation.state.params.dollarBalance &&
@@ -76,6 +76,10 @@ const styles = StyleSheet.create({
   empty: {
     textAlign: 'center',
     marginTop: 30,
+  },
+  header: {
+    alignItems: 'center',
+    flex: 1,
   },
 })
 

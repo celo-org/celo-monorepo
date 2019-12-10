@@ -85,7 +85,6 @@ const styles = StyleSheet.create({
   },
   iconArea: {
     paddingRight: contentPadding,
-    flexDirection: 'column',
     alignItems: 'center',
   },
   contentArea: {

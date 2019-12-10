@@ -1,10 +1,11 @@
 import * as React from 'react'
 import { Text, View } from 'react-native'
 import * as renderer from 'react-test-renderer'
+import { placeholder } from 'src/images/Images'
 import SummaryNotification from 'src/notifications/SummaryNotification'
 
 const props = () => ({
-  image: require('src/images/placeholder.png'),
+  image: placeholder,
   icon: <View />,
   title: 'Test',
   items: ['a'],

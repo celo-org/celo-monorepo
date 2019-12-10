@@ -63,9 +63,7 @@ const styles = StyleSheet.create({
   items: {
     flex: 1,
   },
-  moreWithCountText: {
-    ...fontStyles.subSmall,
-  },
+  moreWithCountText: fontStyles.subSmall,
 })
 
 export default PaymentsSummaryNotification

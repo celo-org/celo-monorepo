@@ -86,7 +86,7 @@ export class EscrowedPaymentListItem extends React.PureComponent<Props> {
           icon={<Image source={inviteFriendsIcon} style={styles.image} resizeMode="contain" />}
           ctas={this.getCTA()}
         >
-          <Text style={[fontStyles.bodySmall]}>{payment.message || t('defaultComment')}</Text>
+          <Text style={fontStyles.bodySmall}>{payment.message || t('defaultComment')}</Text>
         </BaseNotification>
       </View>
     )

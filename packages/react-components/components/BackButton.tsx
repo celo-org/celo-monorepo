@@ -27,7 +27,7 @@ const SIZE = 16
 
 const style = StyleSheet.create({
   container: {
-    marginLeft: -2,
+    padding: 5,
     justifyContent: 'center',
     alignItems: 'center',
   },
