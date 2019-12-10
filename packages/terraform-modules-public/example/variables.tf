@@ -112,6 +112,18 @@ variable attestation_service_accounts {
   }
 }
 
+variable validator_name {
+  type        = string
+  description = "The validator Name for ethstats"
+  default     = "myvalidator"
+}
+
+variable proxy_name {
+  type        = string
+  description = "The proxy Name for ethstats"
+  default     = "myvalidator-proxy"
+}
+
 # Attestation variables
 variable deploy_attestation_service {
   description = "Deploy the Load Balancer for Transmission nodes (if txnode > 0)"
@@ -219,15 +231,4 @@ variable reset_geth_data {
   type        = bool
   description = "Specifies if the existing chain data should be removed while creating the instance"
   default     = true
-}
-
-# TODO: Switch to this
-variable bootnode {
-  description = "The bootnode connection details"
-  type        = map(string)
-
-  default = {
-    ip    = "1.2.3.4"
-    enode = "1182aa8c9dbb96cd1aa71b74e2b6b481085971e08b210bab3b64c39d54876d4b1370f3f2c3cc3c0f52806a0e5772aa3fe937b4ceda8b97c5bf647a34170555e4"
-  }
 }

@@ -13,14 +13,17 @@ terraform {
 }
 
 resource "google_project_service" "compute" {
-  project = var.google["project"]
-  service = "compute.googleapis.com"
+  project                    = var.google["project"]
+  service                    = "compute.googleapis.com"
   disable_dependent_services = true
+  disable_on_destroy         = false
 }
+
 resource "google_project_service" "db" {
-  project = var.google["project"]
-  service = "sqladmin.googleapis.com"
+  project                    = var.google["project"]
+  service                    = "sqladmin.googleapis.com"
   disable_dependent_services = true
+  disable_on_destroy         = false
 }
 
 resource "google_compute_network" "celo_network" {
@@ -60,7 +63,7 @@ resource "google_compute_router_nat" "nat" {
 }
 
 module "celo_cluster" {
-  source             = "../testnet"
+  source             = "/Users/jcortejoso/Projects/Celo/celo-monorepo/packages/terraform-modules-public/testnet"
   network_depends_on = [google_compute_network.celo_network]
 
   gcloud_project = var.google["project"]
@@ -77,8 +80,11 @@ module "celo_cluster" {
   validator_private_keys      = var.validator_accounts["private_keys"]
   validator_account_passwords = var.validator_accounts["account_passwords"]
 
-  proxy_private_node_keys = var.proxy_accounts["private_node_keys"]
-  proxy_enodes            = var.proxy_accounts["enodes"]
+  proxy_private_keys = var.proxy_accounts["private_keys"]
+  proxy_enodes       = var.proxy_accounts["enodes"]
+
+  validator_name = var.validator_name
+  proxy_name     = var.proxy_name
 
   reset_geth_data = var.reset_geth_data
 
@@ -110,5 +116,5 @@ module "celo_cluster" {
   attestation_service_twilio_messaging_service_sid = var.attestation_service_credentials["twilio_messaging_service_sid"]
   attestation_service_twilio_auth_token            = var.attestation_service_credentials["twilio_auth_token"]
   attestation_service_twilio_blacklist             = var.attestation_service_credentials["twilio_blacklist"]
-  attestation_service_celo_provider = "https://baklava-forno.celo-testnet.org/"
+  attestation_service_celo_provider                = "https://baklavastaging-forno.celo-testnet.org/"
 }

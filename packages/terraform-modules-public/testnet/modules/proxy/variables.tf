@@ -118,3 +118,9 @@ variable proxy_name {
   type        = string
   description = "The proxy Name for ethstats"
 }
+
+variable proxy_max_peers {
+  type        = number
+  description = "Max number of peers to connect with"
+  default     = 120
+}

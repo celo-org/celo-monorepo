@@ -153,7 +153,7 @@ module "tx_node" {
   network_name                          = var.network_name
   tx_node_count                         = var.tx_node_count
 
-  bootnode_enode_address   = var.bootnode_enode_address
+  bootnode_enode_address = var.bootnode_enode_address
 }
 
 # used for access by blockscout
@@ -187,10 +187,11 @@ module "proxy" {
   validator_count                       = var.validator_count
   reset_geth_data                       = var.reset_geth_data
 
-  proxy_private_keys     = var.proxy_private_keys
+  proxy_name                  = var.proxy_name
+  proxy_private_keys          = var.proxy_private_keys
   validator_account_addresses = var.validator_account_addresses
   validator_account_passwords = var.validator_account_passwords
-  validator_private_keys       = var.validator_private_keys
+  validator_private_keys      = var.validator_private_keys
   bootnode_enode_address      = var.bootnode_enode_address
   static_nodes_base64         = base64encode(data.http.static-nodes.body)
 }
@@ -216,6 +217,7 @@ module "validator" {
   validator_count                       = var.validator_count
   reset_geth_data                       = var.reset_geth_data
 
+  validator_name              = var.validator_name
   validator_account_addresses = var.validator_account_addresses
   validator_private_keys      = var.validator_private_keys
   validator_account_passwords = var.validator_account_passwords

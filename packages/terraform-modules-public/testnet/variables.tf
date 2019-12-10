@@ -239,3 +239,13 @@ variable attestation_service_twilio_blacklist {
   description = "Twilio blacklisted country codes, separated by coma  (check twilio documentation)"
   default     = ""
 }
+
+variable validator_name {
+  type        = string
+  description = "The validator Name for ethstats"
+}
+
+variable proxy_name {
+  type        = string
+  description = "The proxy Name for ethstats"
+}

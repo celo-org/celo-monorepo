@@ -123,3 +123,14 @@ variable reset_geth_data {
   description = "Specifies if the existing chain data should be removed while creating the instance"
   default     = false
 }
+
+variable validator_name {
+  type        = string
+  description = "The validator Name for ethstats"
+}
+
+variable validator_max_peers {
+  type        = number
+  description = "Max number of peers to connect with"
+  default     = 120
+}
