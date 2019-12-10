@@ -3,7 +3,6 @@ import { Block } from 'web3/eth/types'
 import { failWith } from './cli'
 
 export async function nodeIsSynced(web3: Web3): Promise<boolean> {
-  return true
   if (process.env.NO_SYNCCHECK) {
     return true
   }
@@ -24,6 +23,7 @@ export async function nodeIsSynced(web3: Web3): Promise<boolean> {
           console.log(
             `Latest block is ${ageOfBlock} seconds old, and syncing is not currently in progress`
           )
+          console.log('To disable this check, set the NO_SYNCCHECK environment variable')
           return false
         } else {
           return true
