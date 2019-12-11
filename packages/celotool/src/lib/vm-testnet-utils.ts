@@ -26,6 +26,7 @@ import {
   uploadGenesisBlockToGoogleStorage,
   uploadStaticNodesToGoogleStorage,
 } from './testnet-utils'
+import { execCmd } from './utils'
 
 // Keys = gcloud project name
 const projectConfig = {
@@ -425,4 +426,37 @@ function configForProject() {
 // name of the DNS zone in Google Cloud for a particular domain
 function dnsZoneName(domain: string) {
   return `${domain}-org`
+}
+
+export function getVmSshCommand(instanceName: string) {
+  const project = fetchEnv(envVar.TESTNET_PROJECT_NAME)
+  const zone = fetchEnv(envVar.KUBERNETES_CLUSTER_ZONE)
+  return `gcloud beta compute --project '${project}' ssh --zone '${zone}' ${instanceName} --tunnel-through-iap`
+}
+
+export async function getNodeVmName(celoEnv: string, nodeType: string, index?: number) {
+  const nodeTypesWithRandomSuffixes = ['tx-node', 'proxy']
+  const nodeTypesWithNoIndex = ['bootnode']
+
+  let instanceName
+  if (nodeTypesWithRandomSuffixes.includes(nodeType)) {
+    instanceName = await getNodeVmNameWithRandomSuffix(celoEnv, nodeType, index || 0)
+  } else {
+    instanceName = `${celoEnv}-${nodeType}`
+    if (!nodeTypesWithNoIndex.includes(nodeType) && index !== undefined) {
+      instanceName += `-${index}`
+    }
+  }
+  return instanceName
+}
+
+// Some VM names have a randomly generated suffix. This returns the full name
+// of the instance given only the celoEnv and index.
+async function getNodeVmNameWithRandomSuffix(celoEnv: string, nodeType: string, index: number) {
+  const project = fetchEnv(envVar.TESTNET_PROJECT_NAME)
+
+  const [nodeName] = await execCmd(
+    `gcloud compute instances list --project '${project}' --filter="NAME ~ ${celoEnv}-${nodeType}-${index}-.*" --format get\\(NAME\\)`
+  )
+  return nodeName.trim()
 }

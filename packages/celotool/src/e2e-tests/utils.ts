@@ -55,7 +55,10 @@ export function assertAlmostEqual(
   if (expected.isZero()) {
     assert.equal(actual.toFixed(), expected.toFixed())
   } else {
-    const isCloseTo = actual.plus(delta).gte(expected) || actual.minus(delta).lte(expected)
+    const isCloseTo = actual
+      .minus(expected)
+      .abs()
+      .lte(delta)
     assert(
       isCloseTo,
       `expected ${actual.toString()} to almost equal ${expected.toString()} +/- ${delta.toString()}`
@@ -201,7 +204,7 @@ function writeGenesis(validators: Validator[], path: string, configOverrides: an
     validators,
     blockTime: 0,
     epoch: 10,
-    lookback: 2,
+    lookbackwindow: 2,
     requestTimeout: 3000,
     chainId: NetworkId,
     ...configOverrides,

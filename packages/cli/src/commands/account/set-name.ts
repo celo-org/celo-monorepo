@@ -17,7 +17,7 @@ export default class SetName extends BaseCommand {
   static args = []
 
   static examples = [
-    'register --account 0x5409ed021d9299bf6814279a6a1411a7e866a631 --name test-account',
+    'set-name --account 0x5409ed021d9299bf6814279a6a1411a7e866a631 --name test-account',
   ]
 
   async run() {
