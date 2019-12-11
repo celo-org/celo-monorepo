@@ -157,7 +157,7 @@ To run the node:
 
 ```bash
 # On your local machine
-docker run --name celo-accounts -it --restart always -p 8545:8545 -v $PWD:/root/.celo $CELO_IMAGE --verbosity 3 --networkid $NETWORK_ID --syncmode full --rpc --rpcaddr 0.0.0.0 --rpcapi eth,net,web3,debug,admin,personal
+docker run --name celo-accounts -it --restart always -p 127.0.0.1:8545:8545 -v $PWD:/root/.celo $CELO_IMAGE --verbosity 3 --networkid $NETWORK_ID --syncmode full --rpc --rpcaddr 0.0.0.0 --rpcapi eth,net,web3,debug,admin,personal
 ```
 
 ### Obtain and lock up some Celo Gold for staking
@@ -446,11 +446,11 @@ celocli election:list
 
 If you find your Validator still not getting elected you may need to faucet yourself more funds and lock more gold in order to be able to cast more votes for your Validator Group!
 
-At any moment you can check the currently elected validators by running the following command:
+You can check the status of your validator, including whether it is elected and signing blocks, by running:
 
 ```bash
-# On your local machine
-celocli election:current
+# On your local machine with celocli >= 0.0.30-beta9
+celocli validator:status --validator $CELO_VALIDATOR_ADDRESS
 ```
 
 ### Running the Attestation Service
