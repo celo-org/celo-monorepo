@@ -41,7 +41,7 @@ export class Team extends React.Component<Props & I18nProps> {
                     </AspectRatio>
                   </LazyLoad>
                   <H4>{person.name}</H4>
-                  <Text style={fonts.h5}>{(t(person.role) as string).toUpperCase()}</Text>
+                  <Text style={fonts.h6}>{(t(person.role) as string).toUpperCase()}</Text>
                 </View>
               </Responsive>
             ))}

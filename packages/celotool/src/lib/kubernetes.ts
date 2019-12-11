@@ -1,5 +1,5 @@
 import { envVar, fetchEnv } from './env-utils'
-import { execCmdWithExitOnFailure } from './utils'
+import { execCmd, execCmdWithExitOnFailure } from './utils'
 
 const NUMBER_OF_TX_NODES = 4
 
@@ -7,9 +7,11 @@ export async function scaleResource(
   celoEnv: string,
   type: string,
   resourceName: string,
-  replicaCount: number
+  replicaCount: number,
+  allowFail: boolean = false
 ) {
-  await execCmdWithExitOnFailure(
+  const execFn = allowFail ? execCmd : execCmdWithExitOnFailure
+  await execFn(
     `kubectl scale ${type} ${resourceName} --replicas=${replicaCount} --namespace ${celoEnv}`
   )
 }

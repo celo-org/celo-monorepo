@@ -10,13 +10,11 @@ export default class ElectionRun extends BaseCommand {
     ...BaseCommand.flags,
   }
 
-  static examples = ['run']
-
   async run() {
     cli.action.start('Running mock election')
     const election = await this.kit.contracts.getElection()
     const validators = await this.kit.contracts.getValidators()
-    const signers = await election.getCurrentValidatorSigners()
+    const signers = await election.electValidatorSigners()
     const validatorList = await Promise.all(
       signers.map((addr) => validators.getValidatorFromSigner(addr))
     )
