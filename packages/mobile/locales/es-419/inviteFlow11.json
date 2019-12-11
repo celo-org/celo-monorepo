@@ -26,5 +26,7 @@
   "inviteComplete": "Invitación completa",
   "inviteReceived": "Invitación recibida",
   "escrowPaymentNotificationTitle": "~~Invited ({{amount}}) {{mobile}}",
+  "escrowPaymentNotificationLine": "~~<0>{{recipientPhone}} for</0> <1>{{amount}}</1>",
+  "escrowPaymentNotificationLine_missingRecipientPhone": "~~<0>Unknown for</0> <1>{{amount}}</1>",
   "defaultComment": "~~Invitation sent"
 }

@@ -1,6 +1,6 @@
 import fontStyles from '@celo/react-components/styles/fonts'
 import * as React from 'react'
-import { WithNamespaces, withNamespaces } from 'react-i18next'
+import { Trans, withNamespaces, WithNamespaces } from 'react-i18next'
 import { StyleSheet, Text } from 'react-native'
 import { CURRENCIES, CURRENCY_ENUM } from 'src/geth/consts'
 import { Recipient } from 'src/recipients/recipient'
@@ -13,15 +13,20 @@ interface Props {
 }
 
 function PaymentRequestNotificationInner(props: Props & WithNamespaces) {
-  const { t, requesterE164Number, amount, requesterRecipient } = props
+  const { requesterE164Number, amount, requesterRecipient } = props
+  const displayName = (requesterRecipient && requesterRecipient.displayName) || requesterE164Number
   return (
     <Text numberOfLines={1} ellipsizeMode="middle" style={styles.oneLine}>
-      <Text style={fontStyles.subSmall}>
-        {(requesterRecipient && requesterRecipient.displayName) || requesterE164Number} {t('for')}
-      </Text>
-      <Text style={[fontStyles.subSmall, fontStyles.semiBold]}>
-        {' ' + CURRENCIES[CURRENCY_ENUM.DOLLAR].symbol + getCentAwareMoneyDisplay(amount)}
-      </Text>
+      <Trans
+        i18nKey="paymentRequestNotificationLine"
+        values={{
+          amount: CURRENCIES[CURRENCY_ENUM.DOLLAR].symbol + getCentAwareMoneyDisplay(amount),
+          displayName,
+        }}
+      >
+        <Text style={fontStyles.subSmall}>{{ displayName }} for </Text>
+        <Text style={[fontStyles.subSmall, fontStyles.semiBold]}>{{ amount }}</Text>
+      </Trans>
     </Text>
   )
 }
@@ -32,4 +37,4 @@ const styles = StyleSheet.create({
   },
 })
 
-export default withNamespaces('global')(PaymentRequestNotificationInner)
+export default withNamespaces('paymentRequestFlow')(PaymentRequestNotificationInner)

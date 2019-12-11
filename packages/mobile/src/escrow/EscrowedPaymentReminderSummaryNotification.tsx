@@ -25,8 +25,8 @@ export class EscrowedPaymentReminderSummaryNotification extends React.Component<
     navigate(Stacks.EscrowStack)
   }
 
-  itemRenderer = (item: EscrowedPayment, key: number) => {
-    return <EscrowedPaymentLineItem payment={item} key={key} />
+  itemRenderer = (item: EscrowedPayment) => {
+    return <EscrowedPaymentLineItem payment={item} key={item.paymentID} />
   }
 
   render() {

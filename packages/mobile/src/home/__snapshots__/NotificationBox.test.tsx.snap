@@ -135,8 +135,7 @@ exports[`NotificationBox renders correctly for with all notifications 1`] = `
                         }
                       >
                         +14155550000
-                         
-                        for
+                         for 
                       </Text>
                       <Text
                         style={
@@ -153,7 +152,7 @@ exports[`NotificationBox renders correctly for with all notifications 1`] = `
                           ]
                         }
                       >
-                         $12.34
+                        12.34
                       </Text>
                     </Text>
                     <Text
@@ -176,8 +175,7 @@ exports[`NotificationBox renders correctly for with all notifications 1`] = `
                         }
                       >
                         +14155550000
-                         
-                        for
+                         for 
                       </Text>
                       <Text
                         style={
@@ -194,7 +192,7 @@ exports[`NotificationBox renders correctly for with all notifications 1`] = `
                           ]
                         }
                       >
-                         $12.34
+                        12.34
                       </Text>
                     </Text>
                   </View>

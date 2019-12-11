@@ -60,10 +60,10 @@ export class IncomingPaymentRequestSummaryNotification extends React.Component<P
     navigate(Stacks.IncomingRequestStack)
   }
 
-  itemRenderer = (item: PaymentRequest, key: number) => {
+  itemRenderer = (item: PaymentRequest) => {
     return (
       <PaymentRequestNotificationInner
-        key={key}
+        key={item.uid}
         amount={item.amount}
         requesterE164Number={item.requesterE164Number}
         requesterRecipient={this.getRequesterRecipient(item.requesterE164Number)}

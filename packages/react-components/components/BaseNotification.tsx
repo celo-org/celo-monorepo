@@ -1,17 +1,11 @@
 import TextButton from '@celo/react-components/components/TextButton'
+import Touchable from '@celo/react-components/components/Touchable'
 import colors from '@celo/react-components/styles/colors'
 import fontStyles from '@celo/react-components/styles/fonts'
 import { elevationShadowStyle } from '@celo/react-components/styles/styles'
 import variables from '@celo/react-components/styles/variables'
 import * as React from 'react'
-import {
-  Platform,
-  StyleSheet,
-  Text,
-  TouchableNativeFeedback,
-  TouchableOpacity,
-  View,
-} from 'react-native'
+import { StyleSheet, Text, View } from 'react-native'
 
 const { contentPadding } = variables
 
@@ -29,15 +23,7 @@ export interface CTA {
 }
 
 function Wrapper({ onPress, children }: { children: React.ReactNode; onPress?: () => unknown }) {
-  return onPress ? (
-    Platform.OS === 'android' ? (
-      <TouchableNativeFeedback onPress={onPress}>{children}</TouchableNativeFeedback>
-    ) : (
-      <TouchableOpacity onPress={onPress}>{children}</TouchableOpacity>
-    )
-  ) : (
-    <View>{children}</View>
-  )
+  return onPress ? <Touchable onPress={onPress}>{children}</Touchable> : <View>{children}</View>
 }
 
 export default function BaseNotification({ icon, title, children, ctas, onPress }: Props) {

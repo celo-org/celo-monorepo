@@ -54,7 +54,6 @@
   "balanceNeedUpdating": "Saldo necesita actualizarse",
   "refreshBalances": "Actualizar saldos",
   "escrowedPaymentReminder": "Reacuerda al receptor aceptar el pago",
-  "escrowedPaymentReminderWithCount_plural": "Recordar {{count}} receptores to aceptar el pago",
   "escrowedPaymentReminderSms":
     "¡Un recordatorio amistoso de que aún no ha canjeado sus dólares de celo!",
   "testnetAlert": {
