@@ -6,7 +6,7 @@ import {
   mineBlocks,
   NULL_ADDRESS,
 } from '@celo/protocol/lib/test-utils'
-import { toFixed } from '@celo/utils/lib/fixidity'
+import { fixed1, toFixed } from '@celo/utils/lib/fixidity'
 import BigNumber from 'bignumber.js'
 import {
   AccountsContract,
@@ -964,9 +964,9 @@ contract('Election', (accounts: string[]) => {
     const voter = accounts[0]
     const group1 = accounts[1]
     const group2 = accounts[2]
-    const voteValue1 = new BigNumber(2000000)
-    const voteValue2 = new BigNumber(1000000)
-    const totalRewardValue = new BigNumber(3000000)
+    const voteValue1 = new BigNumber(2000000000)
+    const voteValue2 = new BigNumber(1000000000)
+    const totalRewardValue = new BigNumber(3000000000)
     beforeEach(async () => {
       await registry.setAddressFor(CeloContractName.Validators, accounts[0])
       await election.markGroupEligible(group1, NULL_ADDRESS, NULL_ADDRESS)
@@ -988,11 +988,28 @@ contract('Election', (accounts: string[]) => {
       })
 
       describe('when the group meets the locked gold requirements ', () => {
-        it('should return the total reward value', async () => {
-          assertEqualBN(
-            await election.getGroupEpochRewards(group1, totalRewardValue),
-            totalRewardValue
-          )
+        describe('when group uptime is 100%', () => {
+          it('should return the total reward value', async () => {
+            assertEqualBN(
+              await election.getGroupEpochRewards(group1, totalRewardValue, [fixed1]),
+              totalRewardValue
+            )
+          })
+        })
+
+        describe('when group uptime is less than 100%', () => {
+          it('should return part of the total reward value', async () => {
+            assertEqualBN(
+              await election.getGroupEpochRewards(group1, totalRewardValue, [toFixed(0.5)]),
+              totalRewardValue.idiv(2)
+            )
+          })
+        })
+
+        describe('when group uptime is zero', () => {
+          it('should return zero', async () => {
+            assertEqualBN(await election.getGroupEpochRewards(group1, totalRewardValue, [0]), 0)
+          })
         })
       })
 
@@ -1002,7 +1019,7 @@ contract('Election', (accounts: string[]) => {
         })
 
         it('should return zero', async () => {
-          assertEqualBN(await election.getGroupEpochRewards(group1, totalRewardValue), 0)
+          assertEqualBN(await election.getGroupEpochRewards(group1, totalRewardValue, [fixed1]), 0)
         })
       })
     })
@@ -1012,6 +1029,7 @@ contract('Election', (accounts: string[]) => {
         .div(voteValue1.plus(voteValue2))
         .times(totalRewardValue)
         .dp(0)
+        .minus(1) // minus 1 wei for rounding errors.
       beforeEach(async () => {
         await mineBlocks(EPOCH, web3)
         await election.activate(group1)
@@ -1024,12 +1042,12 @@ contract('Election', (accounts: string[]) => {
         })
 
         it('should return zero for that group', async () => {
-          assertEqualBN(await election.getGroupEpochRewards(group2, totalRewardValue), 0)
+          assertEqualBN(await election.getGroupEpochRewards(group2, totalRewardValue, [fixed1]), 0)
         })
 
         it('should return the proportional reward value for the other group', async () => {
           assertEqualBN(
-            await election.getGroupEpochRewards(group1, totalRewardValue),
+            await election.getGroupEpochRewards(group1, totalRewardValue, [fixed1]),
             expectedGroup1EpochRewards
           )
         })
@@ -1039,7 +1057,7 @@ contract('Election', (accounts: string[]) => {
     describe('when the group does not have active votes', () => {
       describe('when the group meets the locked gold requirements ', () => {
         it('should return zero', async () => {
-          assertEqualBN(await election.getGroupEpochRewards(group1, totalRewardValue), 0)
+          assertEqualBN(await election.getGroupEpochRewards(group1, totalRewardValue, [fixed1]), 0)
         })
       })
     })

@@ -1,4 +1,3 @@
-import { flags } from '@oclif/command'
 import { BaseCommand } from '../../base'
 import { displaySendTx } from '../../utils/cli'
 import { Flags } from '../../utils/command'
@@ -20,7 +19,6 @@ export default class ExchangeDollars extends BaseCommand {
       required: true,
       description: 'The minimum value of Celo Gold to receive in return',
     }),
-    commission: flags.string({ required: true }),
   }
 
   static args = []
