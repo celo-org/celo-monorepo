@@ -123,7 +123,6 @@ export NETWORK_ID=76172
 
 ### Pull the Celo Docker image
 
-<a name="pull-image"></a>
 In all the commands we are going to see the `CELO_IMAGE` variable to refer to the right Docker image to use. Now we can get the Docker image:
 
 ```bash
@@ -289,7 +288,6 @@ Note that if you are running the validator and the proxy on the same machine, th
 
 ### Register the Accounts
 
-<a name="register-accounts"></a>
 You've now done all the infrastructure setup to get a validator and proxy running. The C-Labs team will review your submission to receive funds and send you 12,000 testnet Celo Gold to each of your Validator and Validator Group account addresses. These funds have no real world value but will allow you to submit transactions to the network via [`celocli`](../command-line-interface/introduction.md) and put up a stake to register as a validator and validator group.
 
 You can view your Celo Gold balances by running the following commands:

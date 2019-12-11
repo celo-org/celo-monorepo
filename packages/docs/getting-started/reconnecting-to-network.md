@@ -70,7 +70,7 @@ rm -rf geth* && rm static-nodes.json
 
 ### Pulling the latest Celo Docker image
 
-First, pull the Celo image as described [here](running-a-validator.md#pull-image). Be sure to pull the image on your local, validator, proxy, and attestations machines.
+First, pull the Celo image as described [here](running-a-validator.md#pull-the-celo-docker-image). Be sure to pull the image on your local, validator, proxy, and attestations machines.
 
 ```bash
 # On all machines
