@@ -121,6 +121,7 @@ contract Validators is
   event ValidatorDeaffiliated(address indexed validator, address indexed group);
   event ValidatorEcdsaPublicKeyUpdated(address indexed validator, bytes ecdsaPublicKey);
   event ValidatorBlsPublicKeyUpdated(address indexed validator, bytes blsPublicKey);
+  event ValidatorScoreUpdated(address indexed validator, uint256 score, uint256 epochScore);
   event ValidatorGroupRegistered(address indexed group, uint256 commission);
   event ValidatorGroupDeregistered(address indexed group);
   event ValidatorGroupMemberAdded(address indexed group, address indexed validator);
@@ -325,6 +326,43 @@ contract Validators is
   }
 
   /**
+   * @notice Calculates the validator score for an epoch from the uptime value for the epoch.
+   * @param uptime The Fixidity representation of the validator's uptime, between 0 and 1.
+   * @dev epoxh_score = uptime ** exponent
+   * @return Fixidity representation of the epoch score btween 0 and 1.
+   */
+  function calculateEpochScore(uint256 uptime) public view returns (uint256) {
+    require(uptime <= FixidityLib.fixed1().unwrap());
+    uint256 numerator;
+    uint256 denominator;
+    (numerator, denominator) = fractionMulExp(
+      FixidityLib.fixed1().unwrap(),
+      FixidityLib.fixed1().unwrap(),
+      uptime,
+      FixidityLib.fixed1().unwrap(),
+      validatorScoreParameters.exponent,
+      18
+    );
+    return FixidityLib.newFixedFraction(numerator, denominator).unwrap();
+  }
+
+  /**
+   * @notice Calculates the aggregate score of a group for an epoch from individual uptimes.
+   * @param uptimes Array of Fixidity representations of the validators' uptimes, between 0 and 1.
+   * @dev group_score = average(uptimes ** exponent)
+   * @return Fixidity representation of the group epoch score btween 0 and 1.
+   */
+  function calculateGroupEpochScore(uint256[] calldata uptimes) external view returns (uint256) {
+    require(uptimes.length > 0);
+    require(uptimes.length <= maxGroupSize);
+    FixidityLib.Fraction memory sum;
+    for (uint256 i = 0; i < uptimes.length; i = i.add(1)) {
+      sum = sum.add(FixidityLib.wrap(calculateEpochScore(uptimes[i])));
+    }
+    return sum.divide(FixidityLib.newFixed(uptimes.length)).unwrap();
+  }
+
+  /**
    * @notice Updates a validator's score based on its uptime for the epoch.
    * @param signer The validator signer of the validator account whose score needs updating.
    * @param uptime The Fixidity representation of the validator's uptime, between 0 and 1.
@@ -344,22 +382,8 @@ contract Validators is
   function _updateValidatorScoreFromSigner(address signer, uint256 uptime) internal {
     address account = getAccounts().signerToAccount(signer);
     require(isValidator(account));
-    require(uptime <= FixidityLib.fixed1().unwrap());
 
-    uint256 numerator;
-    uint256 denominator;
-    (numerator, denominator) = fractionMulExp(
-      FixidityLib.fixed1().unwrap(),
-      FixidityLib.fixed1().unwrap(),
-      uptime,
-      FixidityLib.fixed1().unwrap(),
-      validatorScoreParameters.exponent,
-      18
-    );
-
-    FixidityLib.Fraction memory epochScore = FixidityLib.wrap(numerator).divide(
-      FixidityLib.wrap(denominator)
-    );
+    FixidityLib.Fraction memory epochScore = FixidityLib.wrap(calculateEpochScore(uptime));
     FixidityLib.Fraction memory newComponent = validatorScoreParameters.adjustmentSpeed.multiply(
       epochScore
     );
@@ -371,6 +395,7 @@ contract Validators is
     validators[account].score = FixidityLib.wrap(
       Math.min(epochScore.unwrap(), newComponent.add(currentComponent).unwrap())
     );
+    emit ValidatorScoreUpdated(account, validators[account].score.unwrap(), epochScore.unwrap());
   }
 
   /**
@@ -1082,5 +1107,28 @@ contract Validators is
     validator.affiliation = address(0);
     emit ValidatorDeaffiliated(validatorAccount, affiliation);
     return true;
+  }
+
+  bytes32[] canForceDeaffiliation = [
+    DOWNTIME_SLASHER_REGISTRY_ID,
+    DOUBLE_SIGNING_SLASHER_REGISTRY_ID,
+    GOVERNANCE_REGISTRY_ID
+  ];
+
+  /**
+   * @notice Removes a validator from the group for which it is a member.
+   * @param validatorAccount The validator to deaffiliate from their affiliated validator group.
+   */
+  function forceDeaffiliateIfValidator(address validatorAccount)
+    external
+    nonReentrant
+    onlyRegisteredContracts(canForceDeaffiliation)
+  {
+    if (isValidator(validatorAccount)) {
+      Validator storage validator = validators[validatorAccount];
+      if (validator.affiliation != address(0)) {
+        _deaffiliate(validator, validatorAccount);
+      }
+    }
   }
 }
