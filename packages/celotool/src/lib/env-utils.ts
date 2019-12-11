@@ -42,6 +42,7 @@ export enum envVar {
   FAUCET_GENESIS_ACCOUNTS = 'FAUCET_GENESIS_ACCOUNTS',
   FAUCET_GENESIS_BALANCE = 'FAUCET_GENESIS_BALANCE',
   ORACLE_GENESIS_BALANCE = 'ORACLE_GENESIS_BALANCE',
+  GENESIS_ACCOUNTS = 'GENESIS_ACCOUNTS',
   GETH_ACCOUNT_SECRET = 'GETH_ACCOUNT_SECRET',
   GETH_BOOTNODE_DOCKER_IMAGE_REPOSITORY = 'GETH_BOOTNODE_DOCKER_IMAGE_REPOSITORY',
   GETH_BOOTNODE_DOCKER_IMAGE_TAG = 'GETH_BOOTNODE_DOCKER_IMAGE_TAG',
@@ -221,6 +222,13 @@ export function addCeloEnvMiddleware(argv: yargs.Argv) {
 
 export function isVmBased() {
   return fetchEnv(envVar.VM_BASED) === 'true'
+}
+
+export function failIfNotVmBased() {
+  if (!isVmBased()) {
+    console.error('The celo env is not intended for a VM-based testnet, aborting')
+    process.exit(1)
+  }
 }
 
 export function failIfVmBased() {
