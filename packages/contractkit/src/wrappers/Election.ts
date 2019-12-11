@@ -4,7 +4,6 @@ import { zip } from '@celo/utils/lib/collections'
 import BigNumber from 'bignumber.js'
 import { Address, NULL_ADDRESS } from '../base'
 import { Election } from '../generated/types/Election'
-import { getEpochEvents } from '../utils/web3-utils'
 import {
   BaseWrapper,
   CeloTransactionObject,
@@ -118,10 +117,9 @@ export class ElectionWrapper extends BaseWrapper<Election> {
   ): Promise<GroupVote> {
     let pending
     if (blockNumber) {
-      const contract = await this.kit._web3Contracts.getElection()
-      pending = await contract.methods
+      // @ts-ignore: Expected 0-1 arguments, but got 2
+      pending = await this.contract.methods
         .getPendingVotesForGroupByAccount(group, account)
-        // @ts-ignore: Expected 0-1 arguments, but got 2
         .call({}, blockNumber)
     } else {
       pending = await this.contract.methods.getPendingVotesForGroupByAccount(group, account).call()
@@ -129,10 +127,9 @@ export class ElectionWrapper extends BaseWrapper<Election> {
 
     let active
     if (blockNumber) {
-      const contract = await this.kit._web3Contracts.getElection()
-      active = await contract.methods
+      // @ts-ignore: Expected 0-1 arguments, but got 2
+      active = await this.contract.methods
         .getActiveVotesForGroupByAccount(group, account)
-        // @ts-ignore: Expected 0-1 arguments, but got 2
         .call({}, blockNumber)
     } else {
       active = await this.contract.methods.getActiveVotesForGroupByAccount(group, account).call()
@@ -148,9 +145,8 @@ export class ElectionWrapper extends BaseWrapper<Election> {
   async getVoter(account: Address, blockNumber?: number): Promise<Voter> {
     let groups: string[]
     if (blockNumber) {
-      const contract = await this.kit._web3Contracts.getElection()
       // @ts-ignore: Expected 0-1 arguments, but got 2
-      groups = await contract.methods.getGroupsVotedForByAccount(account).call({}, blockNumber)
+      groups = await this.contract.methods.getGroupsVotedForByAccount(account).call({}, blockNumber)
     } else {
       groups = await this.contract.methods.getGroupsVotedForByAccount(account).call()
     }
@@ -353,26 +349,5 @@ export class ElectionWrapper extends BaseWrapper<Election> {
       lesser: newIdx === 0 ? NULL_ADDRESS : currentVotes[newIdx - 1].address,
       greater: newIdx === currentVotes.length - 1 ? NULL_ADDRESS : currentVotes[newIdx + 1].address,
     }
-  }
-
-  // Returns filtered EpochRewardsDistributedToVoters events for the last N epochs.
-  async getVoterRewardEvents(
-    epochSize: number,
-    epochs = 1,
-    groupFilter?: { [key: number]: { [key: string]: BigNumber } } | null
-  ) {
-    let voterRewardsEvents = await getEpochEvents(
-      this.kit.web3,
-      await this.kit._web3Contracts.getElection(),
-      'EpochRewardsDistributedToVoters',
-      epochSize,
-      epochs
-    )
-    if (groupFilter) {
-      voterRewardsEvents = voterRewardsEvents.filter(
-        (x: any) => x.returnValues.group.toLowerCase() in groupFilter[x.blockNumber]
-      )
-    }
-    return voterRewardsEvents
   }
 }

@@ -4,8 +4,6 @@ import { fromFixed, toFixed } from '@celo/utils/lib/fixidity'
 import BigNumber from 'bignumber.js'
 import { Address, NULL_ADDRESS } from '../base'
 import { Validators } from '../generated/types/Validators'
-import { promisedProperties } from '../utils/async-utils'
-import { getEpochEvents } from '../utils/web3-utils'
 import {
   BaseWrapper,
   CeloTransactionObject,
@@ -205,9 +203,8 @@ export class ValidatorsWrapper extends BaseWrapper<Validators> {
   async getValidator(address: Address, blockNumber?: number): Promise<Validator> {
     let res
     if (blockNumber) {
-      const contract = await this.kit._web3Contracts.getValidators()
       // @ts-ignore: Expected 0-1 arguments, but got 2
-      res = await contract.methods.getValidator(address).call({}, blockNumber)
+      res = await this.contract.methods.getValidator(address).call({}, blockNumber)
     } else {
       res = await this.contract.methods.getValidator(address).call()
     }
@@ -435,53 +432,5 @@ export class ValidatorsWrapper extends BaseWrapper<Validators> {
       this.kit,
       this.contract.methods.reorderMember(validator, nextMember, prevMember)
     )
-  }
-
-  // Returns filtered ValidatorEpochPaymentDistributed events for the last N epochs.
-  async getValidatorRewardEvents(epochSize: number, epochs = 1, addressFilter?: string) {
-    let validatorRewardsEvents = await getEpochEvents(
-      this.kit.web3,
-      await this.kit._web3Contracts.getValidators(),
-      'ValidatorEpochPaymentDistributed',
-      epochSize,
-      epochs
-    )
-    if (addressFilter) {
-      const lowerAddressFilter = addressFilter.toLowerCase()
-      validatorRewardsEvents = validatorRewardsEvents.filter(
-        (x: any) =>
-          x.returnValues.validator.toLowerCase() === lowerAddressFilter ||
-          x.returnValues.group.toLowerCase() === lowerAddressFilter
-      )
-    }
-    return validatorRewardsEvents
-  }
-
-  // Returns map from Validator address to Validator.
-  async getUniqueValidators(
-    listWithValidators: any,
-    getValidatorAddress: any,
-    blockNumber?: number
-  ) {
-    const uniqueValidators: { [key: string]: any } = {}
-    for (const validator of listWithValidators) {
-      const validatorAddress = getValidatorAddress(validator)
-      if (!(validatorAddress in uniqueValidators)) {
-        uniqueValidators[validatorAddress] = this.getValidator(validatorAddress, blockNumber)
-      }
-    }
-    return promisedProperties(uniqueValidators)
-  }
-
-  // Returns map from ValidatorGroup address to ValidatorGroup.
-  async getUniqueValidatorGroups(listWithValidatorGroups: any, getValidatorGroupAddress: any) {
-    const uniqueValidatorGroups: { [key: string]: any } = {}
-    for (const validatorGroup of listWithValidatorGroups) {
-      const validatorGroupAddress = getValidatorGroupAddress(validatorGroup)
-      if (!(validatorGroupAddress in uniqueValidatorGroups)) {
-        uniqueValidatorGroups[validatorGroupAddress] = this.getValidatorGroup(validatorGroupAddress)
-      }
-    }
-    return promisedProperties(uniqueValidatorGroups)
   }
 }
