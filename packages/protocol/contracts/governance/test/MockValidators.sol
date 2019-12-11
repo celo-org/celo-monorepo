@@ -6,6 +6,8 @@ import "../interfaces/IValidators.sol";
  * @title Holds a list of addresses of validators
  */
 contract MockValidators is IValidators {
+  uint256 private constant FIXED1_UINT = 1000000000000000000000000;
+
   mapping(address => bool) public isValidator;
   mapping(address => uint256) private numGroupMembers;
   mapping(address => uint256) private lockedGoldRequirements;
@@ -51,6 +53,10 @@ contract MockValidators is IValidators {
 
   function getAccountLockedGoldRequirement(address account) external view returns (uint256) {
     return lockedGoldRequirements[account];
+  }
+
+  function calculateGroupEpochScore(uint256[] calldata uptimes) external view returns (uint256) {
+    return uptimes[0];
   }
 
   function getTopGroupValidators(address group, uint256 n)
