@@ -256,6 +256,11 @@ export async function getInternalValidatorIPs(celoEnv: string) {
   return outputs.validator_internal_ip_addresses.value
 }
 
+export async function getInternalProxyIPs(celoEnv: string) {
+  const outputs = await getTestnetOutputs(celoEnv)
+  return outputs.proxy_internal_ip_addresses.value
+}
+
 export async function getInternalTxNodeIPs(celoEnv: string) {
   const outputs = await getTestnetOutputs(celoEnv)
   return outputs.tx_node_internal_ip_addresses.value
