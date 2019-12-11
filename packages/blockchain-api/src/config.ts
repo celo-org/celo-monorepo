@@ -22,9 +22,10 @@ export function getFirebaseAdminCreds(admin: any) {
     try {
       const serviceAccount = require('../serviceAccountKey.json')
       return admin.credential.cert(serviceAccount)
-    } catch {
+    } catch (error) {
       console.error(
-        'Error: Could not initialize admin credentials. Is serviceAccountKey.json missing?'
+        'Error: Could not initialize admin credentials. Is serviceAccountKey.json missing?',
+        error
       )
     }
   } else {
