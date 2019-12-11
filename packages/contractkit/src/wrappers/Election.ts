@@ -66,8 +66,8 @@ export class ElectionWrapper extends BaseWrapper<Election> {
     undefined,
     toBigNumber
   )
-  validatorAddressFromCurrentSet: (index: number) => Promise<Address> = proxyCall(
-    this.contract.methods.validatorAddressFromCurrentSet,
+  validatorSignerAddressFromCurrentSet: (index: number) => Promise<Address> = proxyCall(
+    this.contract.methods.validatorSignerAddressFromCurrentSet,
     tupleParser<number, number>(identity)
   )
 

@@ -13,7 +13,6 @@ USAGE
   $ celocli exchange:dollars
 
 OPTIONS
-  --commission=commission                            (required)
   --for=10000000000000000000000                      (required) The minimum value of Celo Gold to receive in return
   --from=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) The address with Celo Dollars to exchange
   --[no-]truncate                                    Truncate fields to fit line
@@ -34,7 +33,6 @@ USAGE
   $ celocli exchange:gold
 
 OPTIONS
-  --commission=commission                            (required)
   --for=10000000000000000000000                      (required) The minimum value of Celo Dollars to receive in return
   --from=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) The address with Celo Gold to exchange
   --[no-]truncate                                    Truncate fields to fit line

@@ -412,21 +412,29 @@ contract Election is
    * @notice Returns the amount of rewards that voters for `group` are due at the end of an epoch.
    * @param group The group to calculate epoch rewards for.
    * @param totalEpochRewards The total amount of rewards going to all voters.
+   * @param uptimes Array of Fixidity representations of the validators' uptimes, between 0 and 1.
    * @return The amount of rewards that voters for `group` are due at the end of an epoch.
    * @dev Eligible groups that have received their maximum number of votes cannot receive more.
    */
-  function getGroupEpochRewards(address group, uint256 totalEpochRewards)
-    external
-    view
-    returns (uint256)
-  {
-    // The group must meet the balance requirements in order for their voters to receive epoch
-    // rewards.
-    if (getValidators().meetsAccountLockedGoldRequirements(group) && votes.active.total > 0) {
-      return totalEpochRewards.mul(votes.active.forGroup[group].total).div(votes.active.total);
-    } else {
+  function getGroupEpochRewards(
+    address group,
+    uint256 totalEpochRewards,
+    uint256[] calldata uptimes
+  ) external view returns (uint256) {
+    // The group must meet the balance requirements for their voters to receive epoch rewards.
+    if (!getValidators().meetsAccountLockedGoldRequirements(group) || votes.active.total <= 0) {
       return 0;
     }
+
+    FixidityLib.Fraction memory votePortion = FixidityLib.newFixedFraction(
+      votes.active.forGroup[group].total,
+      votes.active.total
+    );
+    FixidityLib.Fraction memory score = FixidityLib.wrap(
+      getValidators().calculateGroupEpochScore(uptimes)
+    );
+    return
+      FixidityLib.newFixed(totalEpochRewards).multiply(votePortion).multiply(score).fromFixed();
   }
 
   /**
@@ -814,7 +822,7 @@ contract Election is
     uint256 n = numberValidatorsInCurrentSet();
     address[] memory res = new address[](n);
     for (uint256 idx = 0; idx < n; idx++) {
-      res[idx] = validatorAddressFromCurrentSet(idx);
+      res[idx] = validatorSignerAddressFromCurrentSet(idx);
     }
     return res;
   }
