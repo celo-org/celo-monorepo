@@ -40,12 +40,14 @@ In addition, to get things started, it will be useful to temporarily run a node 
 ### Software requirements
 
 #### On each machine
+
 - **You have Docker installed.**
 
   If you don’t have it already, follow the instructions here: [Get Started with Docker](https://www.docker.com/get-started). It will involve creating or signing in with a Docker account, downloading a desktop app, and then launching the app to be able to use the Docker CLI. If you are running on a Linux server, follow the instructions for your distro [here](https://docs.docker.com/install/#server). You may be required to run Docker with `sudo` depending on your installation environment.
   You can check you have Docker installed and running if the command `docker info` works properly.
 
 #### On your local machine
+
 - **You have celocli installed.**
 
   See [Command Line Interface \(CLI\) ](../command-line-interface/introduction.md)for instructions on how to get set up.
@@ -148,7 +150,8 @@ export CELO_VALIDATOR_GROUP_ADDRESS=<YOUR-VALIDATOR-GROUP-ADDRESS>
 export CELO_VALIDATOR_ADDRESS=<YOUR-VALIDATOR-ADDRESS>
 ```
 
-<a name="starting-celo-accounts"></a>
+### Start your Accounts node
+
 Next, we'll run a node on your local machine so that we can use these accounts to lock Celo Gold and authorize the keys needed to run your validator. To do this, we need to run the following commands, which fetch the genesis block and a list of other nodes in the network to connect to.
 
 ```bash
@@ -225,7 +228,6 @@ We'll get back to this machine later, but for now, let's give it a proxy.
 
 ### Deploy a proxy
 
-<a name="starting-celo-proxy"></a>
 To avoid exposing the validator to the public internet, we are deploying a proxy node which is responsible to communicate with the network. On our Proxy machine, we'll setup the node as per usual now:
 
 ```bash
@@ -248,9 +250,9 @@ export CELO_VALIDATOR_SIGNER_ADDRESS=<YOUR-VALIDATOR-SIGNER-ADDRESS>
 docker run --name celo-proxy -it --restart always -p 30303:30303 -p 30303:30303/udp -p 30503:30503 -p 30503:30503/udp -v $PWD:/root/.celo $CELO_IMAGE --verbosity 3 --networkid $NETWORK_ID --syncmode full --proxy.proxy --proxy.proxiedvalidatoraddress $CELO_VALIDATOR_SIGNER_ADDRESS --proxy.internalendpoint :30503 --etherbase $CELO_VALIDATOR_SIGNER_ADDRESS --ethstats=<YOUR-VALIDATOR-NAME>-proxy@baklava-ethstats.celo-testnet.org
 ```
 
-Once the proxy is running, we will need to retrieve its enode and IP address so that the validator will be able to connect to it.
+### Get your Proxy's connection info
 
-<a name="getting-proxy-info"></a>
+Once the proxy is running, we will need to retrieve its enode and IP address so that the validator will be able to connect to it.
 
 ```bash
 # On the proxy machine, retrieve the proxy enode
@@ -268,8 +270,6 @@ export PROXY_IP=<PROXY-MACHINE-EXTERNAL-IP-ADDRESS>
 Let's connect the validator to the proxy:
 
 ### Connect the Validator to the Proxy
-
-<a name="deploy_validator"></a>
 
 When starting up your validator, it will attempt to create a network connection between the validator machine and the proxy machine. You will need make sure that your proxy machine has the appropriate firewall settings to allow the validator to connect to it.
 
