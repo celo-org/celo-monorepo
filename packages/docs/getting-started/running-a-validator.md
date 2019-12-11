@@ -160,6 +160,10 @@ To run the node:
 docker run --name celo-accounts -it --restart always -p 127.0.0.1:8545:8545 -v $PWD:/root/.celo $CELO_IMAGE --verbosity 3 --networkid $NETWORK_ID --syncmode full --rpc --rpcaddr 0.0.0.0 --rpcapi eth,net,web3,debug,admin,personal
 ```
 
+{% hint style="danger" %}
+**Security**: The command line above includes the parameter `--rpcaddr 0.0.0.0` which makes the Celo Blockchain software listen for incoming RPC requests on all network adaptors. Exercise extreme caution in doing this when running outside Docker, as it means that any unlocked accounts and their funds may be accessed from other machines on the Internet. In the context of running a Docker container on your local machine, this together with the `docker -p 127.0.0.1:localport:containerport` flags allows you to make RPC calls from outside the container, i.e from your local host, but not from outside your machine. Read more about [Docker Networking](https://docs.docker.com/network/network-tutorial-standalone/#use-user-defined-bridge-networks) here.
+{% endhint %}
+
 ### Obtain and lock up some Celo Gold for staking
 
 To participate in The Great Celo Stake Off (aka TGCSO) and get fauceted it's necessary to register online via an [online form](https://docs.google.com/forms/d/e/1FAIpQLSfbn5hTJ4UIWpN92-o2qMTUB0UnrFsL0fm97XqGe4VhhN_r5A/viewform). Once the C-Labs team receives your registration, they'll send you instructions to get fauceted. Follow those instructions now. Then, while you wait, let's deploy the remaining components:
@@ -673,35 +677,15 @@ And you can remove the containers (not the data dir) running:
 docker rm -f celo-validator celo-proxy
 ```
 
-### Reference Script
-
-If you want to run everything locally, you can use (and modify if you want) this [reference bash script](../../../scripts/run-docker-validator-network.sh) automating all the above steps.
-
-**Warning:** The script requires `Docker` and `screen`.
-
-You can see all the options using the following command:
-
-```bash
-./run-docker-validator-network.sh help
-```
-
-If you want to create the local accounts, run a Proxy and a Validator connected to it, you can use the following command:
-
-```bash
-./run-docker-validator-network.sh pull,clean,accounts,run-validator,run-proxy,status,print-env
-```
-
-After doing that you can copy all the `CELO_*` environment variables in the `validator-config.rc` file. The script will source the variables from there avoiding the accounts multiple times.
-
-If you have already your accounts, proxy and validator set up, you can run the following command to run TGCSO:
-
-```bash
-./run-docker-validator-network.sh game
-```
-
 ## Stop Validating
 
-If for some reason you need to stop running your Validator, please do one or all of the following so that it will no longer be chosen as a participant in BFT:
+If for some reason you need to stop running your Validator, and it is currently elected, you first need to stop it getting re-elected at the end of the current epoch. After that you can stop the validator, proxy and Attestation Service processes, containers or machines.
+
+{% hint style="danger" %}
+**Validated Uptime and Network Stability**: If you stop your validator while it is still elected, you will receive fewer rewards on account of downtime, may be slashed, and also potentially affect the stability and performance of the network.
+{% endhint %}
+
+Please do one or all of the following so that at the end of the current epoch your validator will not be re-elected:
 
 - Deregister your validator:
 
