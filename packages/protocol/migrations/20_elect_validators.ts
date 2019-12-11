@@ -242,7 +242,9 @@ module.exports = async (_deployer: any, networkName: string) => {
       : config.validators.groupName,
     // Make first and last group high votes so we can maintain presence.
     lockedGold:
-      i === 0 || i === 13 ? lockedGoldPerValEachGroup.times(10) : lockedGoldPerValEachGroup,
+      i === 0 || i === valKeyGroups.length - 1
+        ? lockedGoldPerValEachGroup.times(5)
+        : lockedGoldPerValEachGroup,
     account: null,
   }))
 
