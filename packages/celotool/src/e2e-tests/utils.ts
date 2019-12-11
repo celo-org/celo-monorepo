@@ -1,3 +1,4 @@
+import { waitForPortOpen } from '@celo/dev-utils/lib/network'
 import BigNumber from 'bignumber.js'
 import { assert } from 'chai'
 import { spawn, SpawnOptions } from 'child_process'
@@ -248,20 +249,6 @@ export async function killInstance(instance: GethInstanceConfig) {
 export async function addStaticPeers(datadir: string, ports: number[]) {
   const enodes = await Promise.all(ports.map((port) => getEnode(port)))
   fs.writeFileSync(`${datadir}/static-nodes.json`, JSON.stringify(enodes))
-}
-
-async function isPortOpen(host: string, port: number) {
-  return (await execCmd('nc', ['-z', host, port.toString()], { silent: true })) === 0
-}
-
-async function waitForPortOpen(host: string, port: number, seconds: number) {
-  const deadline = Date.now() + seconds * 1000
-  do {
-    if (await isPortOpen(host, port)) {
-      return true
-    }
-  } while (Date.now() < deadline)
-  return false
 }
 
 export function sleep(seconds: number) {
