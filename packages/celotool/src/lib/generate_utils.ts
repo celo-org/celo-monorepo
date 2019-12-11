@@ -181,6 +181,7 @@ export const getFaucetedAccounts = (mnemonic: string) => {
 export const generateGenesisFromEnv = (enablePetersburg: boolean = true) => {
   const mnemonic = fetchEnv(envVar.MNEMONIC)
   const validatorEnv = fetchEnv(envVar.VALIDATORS)
+  const genesisAccountsEnv = fetchEnvOrFallback(envVar.GENESIS_ACCOUNTS, '')
   const validators = getValidators(mnemonic, parseInt(validatorEnv, 10))
 
   const consensusType = fetchEnv(envVar.CONSENSUS_TYPE) as ConsensusType
@@ -201,6 +202,16 @@ export const generateGenesisFromEnv = (enablePetersburg: boolean = true) => {
   const chainId = parseInt(fetchEnv(envVar.NETWORK_ID), 10)
 
   const initialAccounts = getFaucetedAccounts(mnemonic)
+  if (genesisAccountsEnv !== '') {
+    const genesisAccountsPath = path.resolve(monorepoRoot, genesisAccountsEnv)
+    const genesisAccounts = JSON.parse(fs.readFileSync(genesisAccountsPath).toString())
+    for (const addr of genesisAccounts.addresses) {
+      initialAccounts.push({
+        address: addr,
+        balance: genesisAccounts.value,
+      })
+    }
+  }
 
   return generateGenesis({
     validators,
