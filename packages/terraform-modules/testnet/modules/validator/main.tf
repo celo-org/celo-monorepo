@@ -121,27 +121,27 @@ resource "google_compute_subnetwork" "validator" {
 module "proxy" {
   source = "../full-node"
   # variables
-  block_time                        = var.block_time
-  bootnode_ip_address               = var.bootnode_ip_address
-  celo_env                          = var.celo_env
-  ethstats_host                     = var.ethstats_host
-  gcloud_secrets_base_path          = var.gcloud_secrets_base_path
-  gcloud_secrets_bucket             = var.gcloud_secrets_bucket
-  gcloud_vm_service_account_email   = var.gcloud_vm_service_account_email
-  genesis_content_base64            = var.genesis_content_base64
+  block_time                            = var.block_time
+  bootnode_ip_address                   = var.bootnode_ip_address
+  celo_env                              = var.celo_env
+  ethstats_host                         = var.ethstats_host
+  gcloud_secrets_base_path              = var.gcloud_secrets_base_path
+  gcloud_secrets_bucket                 = var.gcloud_secrets_bucket
+  gcloud_vm_service_account_email       = var.gcloud_vm_service_account_email
+  genesis_content_base64                = var.genesis_content_base64
   geth_exporter_docker_image_repository = var.geth_exporter_docker_image_repository
-  geth_exporter_docker_image_tag    = var.geth_exporter_docker_image_tag
-  geth_node_docker_image_repository = var.geth_node_docker_image_repository
-  geth_node_docker_image_tag        = var.geth_node_docker_image_tag
-  geth_verbosity                    = var.geth_verbosity
-  in_memory_discovery_table         = var.in_memory_discovery_table
-  instance_tags                     = ["${var.celo_env}-proxy"]
-  name                              = "proxy"
-  network_id                        = var.network_id
-  network_name                      = var.network_name
+  geth_exporter_docker_image_tag        = var.geth_exporter_docker_image_tag
+  geth_node_docker_image_repository     = var.geth_node_docker_image_repository
+  geth_node_docker_image_tag            = var.geth_node_docker_image_tag
+  geth_verbosity                        = var.geth_verbosity
+  in_memory_discovery_table             = var.in_memory_discovery_table
+  instance_tags                         = ["${var.celo_env}-proxy"]
+  name                                  = "proxy"
+  network_id                            = var.network_id
+  network_name                          = var.network_name
   # NOTE this assumes only one proxy will be used
-  node_count            = var.proxied_validator_count
-  proxy                             = true
+  node_count = var.proxied_validator_count
+  proxy      = true
 }
 
 # if there are no proxied validators, we don't have to worry about

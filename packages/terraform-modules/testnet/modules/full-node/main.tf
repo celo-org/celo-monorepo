@@ -1,6 +1,6 @@
 locals {
   attached_disk_name = "celo-data"
-  name_prefix = "${var.celo_env}-${var.name}"
+  name_prefix        = "${var.celo_env}-${var.name}"
 }
 
 resource "google_compute_address" "full_node" {

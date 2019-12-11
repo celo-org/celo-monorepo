@@ -1,5 +1,5 @@
 locals {
-  name_prefix = "${var.celo_env}-tx-node-lb"
+  name_prefix             = "${var.celo_env}-tx-node-lb"
   target_https_proxy_name = "${var.celo_env}-tx-node-lb-external-http-proxy"
 }
 
@@ -158,7 +158,7 @@ resource "google_dns_record_set" "external" {
 }
 
 data "google_dns_managed_zone" "external" {
-  name = var.dns_zone_name
+  name    = var.dns_zone_name
   project = var.dns_gcloud_project
 }
 
