@@ -1,3 +1,9 @@
+variable additional_geth_flags {
+  type        = string
+  description = "Additional flags to be passed when running geth"
+  default     = ""
+}
+
 variable block_time {
   type        = number
   description = "Number of seconds between each block"
@@ -14,7 +20,7 @@ variable celo_env {
 }
 
 variable ethstats_host {
-  type        = "string"
+  type        = string
   description = "Ethstats url or IP address"
 }
 
@@ -60,12 +66,23 @@ variable geth_node_docker_image_tag {
 
 variable geth_verbosity {
   type        = number
-  description = "Verbosity of the tx-nodes"
+  description = "Verbosity of the nodes"
 }
 
 variable in_memory_discovery_table {
   type        = bool
   description = "Specifies whether to use an in memory discovery table"
+}
+
+variable instance_tags {
+  type        = list(string)
+  description = "Tags to set for the instance"
+  default     = []
+}
+
+variable name {
+  type        = string
+  description = "Name of the nodes"
 }
 
 variable network_id {
@@ -75,10 +92,16 @@ variable network_id {
 
 variable network_name {
   type        = string
-  description = "Name of the GCP network the tx-node VM is in"
+  description = "Name of the GCP network the node VM is in"
 }
 
-variable tx_node_count {
+variable node_count {
   type        = number
-  description = "Number of tx-nodes to create"
+  description = "Number of nodes to create"
+}
+
+variable proxy {
+  type        = bool
+  description = "Whether the node is a proxy for a validator"
+  default     = false
 }

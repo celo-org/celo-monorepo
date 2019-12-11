@@ -61,15 +61,6 @@ remove_containers () {
     docker rm -f celo-proxy celo-validator celo-attestation-service celo-accounts || echo -e "Containers removed"
 }
 
-download_genesis () {
-    echo -e "\tDownload genesis.json and static-nodes.json to the container"
-    docker run -v $PWD/proxy:/root/.celo --entrypoint /bin/sh -it $CELO_IMAGE -c "wget https://www.googleapis.com/storage/v1/b/static_nodes/o/$NETWORK_NAME?alt=media -O /root/.celo/static-nodes.json"
-    docker run -v $PWD/proxy:/root/.celo --entrypoint /bin/sh -it $CELO_IMAGE -c "wget https://www.googleapis.com/storage/v1/b/genesis_blocks/o/$NETWORK_NAME?alt=media -O /root/.celo/genesis.json"
-    
-    docker run -v $PWD/validator:/root/.celo --entrypoint /bin/sh -it $CELO_IMAGE -c "wget https://www.googleapis.com/storage/v1/b/genesis_blocks/o/$NETWORK_NAME?alt=media -O /root/.celo/genesis.json"
-
-}
-
 make_status_requests () {
     echo -e "Checking Proxy and Validator state:"
     
@@ -173,42 +164,11 @@ if [[ $COMMAND == *"accounts"* ]]; then
     cd $ACCOUNTS_DIR
 
     echo -e "Starting local Docker holding the accounts. You can attach to it running 'screen -r -S celo-accounts'\n"
-    screen -S celo-accounts -d -m docker run --name celo-accounts --restart always -p 8545:8545 -v $PWD:/root/.celo $CELO_IMAGE --verbosity 3 --networkid $NETWORK_ID --syncmode full --rpc --rpcaddr 0.0.0.0 --rpcapi eth,net,web3,debug,admin,personal
+    screen -S celo-accounts -d -m docker run --name celo-accounts --restart always -p 127.0.0.1:8545:8545 -v $PWD:/root/.celo $CELO_IMAGE --verbosity 3 --networkid $NETWORK_ID --syncmode full --rpc --rpcaddr 0.0.0.0 --rpcapi eth,net,web3,debug,admin,personal
     
-
-
-fi
-
-if [[ $COMMAND == *"run-proxy"* ]]; then
-
-    echo -e "* Let's run the Proxy ..."
-    cd $PROXY_DIR
     
-    docker rm -f celo-proxy || echo -e "Containers removed"
-
-    initialize_geth
-    
-    screen -S celo-proxy -d -m docker run --name celo-proxy --restart always -p 30313:30303 -p 30313:30303/udp -p 30503:30503 -p 30503:30503/udp -v $PWD:/root/.celo $CELO_IMAGE --verbosity 3 --networkid $NETWORK_ID --syncmode full --proxy.proxy --proxy.proxiedvalidatoraddress $CELO_VALIDATOR_SIGNER_ADDRESS --proxy.internalendpoint :30503 --etherbase $CELO_VALIDATOR_SIGNER_ADDRESS --ethstats=proxy-$ETHSTATS_ARG
-    
-    sleep 5s
-    export PROXY_ENODE=$(docker exec celo-proxy geth --exec "admin.nodeInfo['enode'].split('//')[1].split('@')[0]" attach | tr -d '"')
-    export PROXY_IP=$(docker inspect -f '{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' celo-proxy)
-    echo -e "The Proxy should be starting. You can attach to it running 'screen -r -S celo-proxy'\n"
-
-fi
-
-
-
-
-
-if [[ $COMMAND == *"run-validator"* ]]; then
-
-    echo -e "* Let's run the Validator ..."
-    cd $VALIDATOR_DIR
-
-    docker rm -f celo-validator || echo -e "Containers removed"
-
     echo -e "\tGenerating the Validator Proof of Possesion"
+    cd $VALIDATOR_DIR
 
     __POS=$(docker run -v $PWD:/root/.celo --entrypoint /bin/sh -it $CELO_IMAGE -c " printf '%s\n' $DEFAULT_PASSWORD $DEFAULT_PASSWORD | geth account proof-of-possession $CELO_VALIDATOR_SIGNER_ADDRESS $CELO_VALIDATOR_ADDRESS "| tail -2 )
     export CELO_VALIDATOR_SIGNER_PUBLIC_KEY=$(echo $__POS | cut -d' ' -f 6| tr -cd "[:alnum:]\n" )
@@ -225,6 +185,38 @@ if [[ $COMMAND == *"run-validator"* ]]; then
     
     echo -e "\tCELO_VALIDATOR_SIGNER_BLS_PUBLIC_KEY=$CELO_VALIDATOR_SIGNER_BLS_PUBLIC_KEY"
     echo -e "\tCELO_VALIDATOR_SIGNER_BLS_SIGNATURE=$CELO_VALIDATOR_SIGNER_BLS_SIGNATURE"
+
+fi
+
+if [[ $COMMAND == *"run-proxy"* ]]; then
+
+    echo -e "* Let's run the Proxy ..."
+    cd $PROXY_DIR
+    
+    docker rm -f celo-proxy || echo -e "Containers removed"
+
+    initialize_geth
+    
+    screen -S celo-proxy -d -m docker run --name celo-proxy --restart always -p 30313:30303 -p 30313:30303/udp -p 30503:30503 -p 30503:30503/udp -v $PWD:/root/.celo $CELO_IMAGE --verbosity 3 --networkid $NETWORK_ID --syncmode full --proxy.proxy --proxy.proxiedvalidatoraddress $CELO_VALIDATOR_SIGNER_ADDRESS --proxy.internalendpoint :30503 --etherbase $CELO_VALIDATOR_SIGNER_ADDRESS --ethstats=proxy-$ETHSTATS_ARG
+    
+    sleep 5s
+   
+    echo -e "The Proxy should be starting. You can attach to it running 'screen -r -S celo-proxy'\n"
+
+fi
+
+
+
+
+
+if [[ $COMMAND == *"run-validator"* ]]; then
+
+    echo -e "* Let's run the Validator ..."
+    cd $VALIDATOR_DIR
+
+    docker rm -f celo-validator || echo -e "Containers removed"
+    export PROXY_ENODE=$(docker exec celo-proxy geth --exec "admin.nodeInfo['enode'].split('//')[1].split('@')[0]" attach | tr -d '"')
+    export PROXY_IP=$(docker inspect -f '{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' celo-proxy)
     
     
     echo -e "\tConnecting Validator to Proxy running at enode://$PROXY_ENODE@$PROXY_IP"
