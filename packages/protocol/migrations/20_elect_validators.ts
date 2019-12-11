@@ -229,24 +229,37 @@ module.exports = async (_deployer: any, networkName: string) => {
     valKeyGroups.push(valKeys.slice(i, Math.min(i + maxGroupSize, valKeys.length)))
   }
 
-  const lockedGoldPerValEachGroup = new BigNumber(config.validators.groupLockedGold.value)
+  // WARNING HACK
+  valKeyGroups.shift()
+  valKeyGroups[1].shift()
+  valKeyGroups[1].shift()
+  valKeyGroups[1].shift()
+
+  const lockedGoldPerVal = new BigNumber(config.validators.groupLockedGoldRequirements.value)
 
   const groups = valKeyGroups.map((keys, i) => ({
     valKeys: keys,
     name: valKeyGroups.length
-      ? config.validators.groupName + `(${i + 1})`
+      ? config.validators.groupName + `(${i + 2})`
       : config.validators.groupName,
     // Make first and last group high votes so we can maintain presence.
-    lockedGold:
+    lockedGold: lockedGoldPerVal.times(keys.length),
+    votingGold:
       i === 0 || i === valKeyGroups.length - 1
-        ? lockedGoldPerValEachGroup.times(5)
-        : lockedGoldPerValEachGroup,
+        ? lockedGoldPerVal.times(keys.length)
+        : lockedGoldPerVal,
     account: null,
   }))
 
   for (const [idx, group] of groups.entries()) {
+    if (idx === 0) {
+      continue
+    }
+
     console.info(
-      `  Registering validator group: ${group.name} with: ${group.lockedGold} CG locked...`
+      `  Registering validator group: ${group.name} with: ${group.lockedGold} CG locked, ${
+        group.votingGold
+      } voting...`
     )
     group.account = await registerValidatorGroup(
       group.name,
@@ -260,7 +273,7 @@ module.exports = async (_deployer: any, networkName: string) => {
     console.info(`  * Registering ${group.valKeys.length} validators ...`)
     await Promise.all(
       group.valKeys.map((key, i) => {
-        const index = idx * config.validators.maxGroupSize + i
+        const index = idx * config.validators.maxGroupSize + i + 8 // HACK
         return registerValidator(
           accounts,
           lockedGold,
@@ -280,7 +293,7 @@ module.exports = async (_deployer: any, networkName: string) => {
       console.info(`    - Adding ${address} ...`)
       if (i === 0) {
         const groupsWithVotes = groups.slice(0, idx)
-        groupsWithVotes.sort((a, b) => a.lockedGold.comparedTo(b.lockedGold))
+        groupsWithVotes.sort((a, b) => a.votingGold.comparedTo(b.votingGold))
 
         // @ts-ignore
         const addTx = validators.contract.methods.addFirstMember(
@@ -302,7 +315,7 @@ module.exports = async (_deployer: any, networkName: string) => {
 
     // Determine the lesser and greater group addresses after voting.
     const sortedGroups = groups.slice(0, idx + 1)
-    sortedGroups.sort((a, b) => a.lockedGold.comparedTo(b.lockedGold))
+    sortedGroups.sort((a, b) => a.votingGold.comparedTo(b.votingGold))
     const groupSortedIndex = sortedGroups.indexOf(group)
     const lesser =
       groupSortedIndex > 0 ? sortedGroups[groupSortedIndex - 1].account.address : NULL_ADDRESS
@@ -314,7 +327,7 @@ module.exports = async (_deployer: any, networkName: string) => {
     // @ts-ignore
     const voteTx = election.contract.methods.vote(
       group.account.address,
-      '0x' + group.lockedGold.toString(16),
+      '0x' + group.votingGold.toString(16),
       lesser,
       greater
     )
