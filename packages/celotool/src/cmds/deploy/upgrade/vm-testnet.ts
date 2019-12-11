@@ -30,12 +30,14 @@ export const builder = (argv: yargs.Argv) => {
 export const handler = async (argv: VmTestnetArgv) => {
   await switchToClusterFromEnv()
 
-  let onDeployFailed = () => Promise.resolve()
-  if (argv.reset) {
-    onDeployFailed = () => untaintTestnet(argv.celoEnv)
-    await taintTestnet(argv.celoEnv)
+  if (false) {
+    let onDeployFailed = () => Promise.resolve()
+    if (argv.reset) {
+      onDeployFailed = () => untaintTestnet(argv.celoEnv)
+      await taintTestnet(argv.celoEnv)
+    }
+    await deploy(argv.celoEnv, !argv.skipSecretGeneration, onDeployFailed)
   }
-  await deploy(argv.celoEnv, !argv.skipSecretGeneration, onDeployFailed)
 
   // upgrade prom to sd statefulset
   await upgradeHelmChart(argv.celoEnv)

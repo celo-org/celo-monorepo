@@ -3,7 +3,11 @@ import { envVar, fetchEnv } from 'src/lib/env-utils'
 import { installGenericHelmChart, removeGenericHelmChart } from 'src/lib/helm_deploy'
 import { scaleResource } from 'src/lib/kubernetes'
 import { execCmdWithExitOnFailure } from 'src/lib/utils'
-import { getInternalTxNodeIPs, getInternalValidatorIPs } from 'src/lib/vm-testnet-utils'
+import {
+  getInternalProxyIPs,
+  getInternalTxNodeIPs,
+  getInternalValidatorIPs,
+} from 'src/lib/vm-testnet-utils'
 
 const helmChartPath = '../helm-charts/prometheus-to-sd'
 
@@ -59,7 +63,7 @@ async function helmParameters(celoEnv: string) {
     validatorPodIds.push(`${celoEnv}-validator-${i}`)
   }
 
-  const proxyIpAddresses = await getInternalTxNodeIPs(celoEnv)
+  const proxyIpAddresses = await getInternalProxyIPs(celoEnv)
   const proxyCount = parseInt(fetchEnv(envVar.PROXIED_VALIDATORS), 10)
   const proxyPodIds = []
   for (let i = 0; i < proxyCount; i++) {
