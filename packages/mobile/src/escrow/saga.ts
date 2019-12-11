@@ -84,7 +84,7 @@ function* registerStandbyTransaction(id: string, value: string, address: string)
   yield put(
     addStandbyTransaction({
       id,
-      type: TransactionTypes.SENT,
+      type: TransactionTypes.ESCROW_SENT,
       status: TransactionStatus.Pending,
       value,
       symbol: CURRENCY_ENUM.DOLLAR,
@@ -249,7 +249,6 @@ function* doFetchSentPayments() {
     for (let i = 0; i < sentPaymentsRaw.length; i++) {
       const id = sentPaymentIDs[i].toLowerCase()
       const recipientPhoneNumber = tempAddresstoRecipientPhoneNumber[id]
-
       const payment = sentPaymentsRaw[i]
       if (!payment) {
         continue

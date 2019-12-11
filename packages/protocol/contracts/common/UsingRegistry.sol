@@ -27,6 +27,10 @@ contract UsingRegistry is Ownable {
   // solhint-disable state-visibility
   bytes32 constant ACCOUNTS_REGISTRY_ID = keccak256(abi.encodePacked("Accounts"));
   bytes32 constant ATTESTATIONS_REGISTRY_ID = keccak256(abi.encodePacked("Attestations"));
+  bytes32 constant DOWNTIME_SLASHER_REGISTRY_ID = keccak256(abi.encodePacked("DowntimeSlasher"));
+  bytes32 constant DOUBLE_SIGNING_SLASHER_REGISTRY_ID = keccak256(
+    abi.encodePacked("DoubleSigningSlasher")
+  );
   bytes32 constant ELECTION_REGISTRY_ID = keccak256(abi.encodePacked("Election"));
   bytes32 constant EXCHANGE_REGISTRY_ID = keccak256(abi.encodePacked("Exchange"));
   bytes32 constant GAS_CURRENCY_WHITELIST_REGISTRY_ID = keccak256(
@@ -46,6 +50,20 @@ contract UsingRegistry is Ownable {
 
   modifier onlyRegisteredContract(bytes32 identifierHash) {
     require(registry.getAddressForOrDie(identifierHash) == msg.sender, "only registered contract");
+    _;
+  }
+
+  modifier onlyRegisteredContracts(bytes32[] memory identifierHashes) {
+    bool registered = false;
+    for (uint256 i = 0; i < identifierHashes.length; i++) {
+      if (registry.getAddressForOrDie(identifierHashes[i]) == msg.sender) {
+        registered = true;
+        break;
+      }
+    }
+    // TODO(lucas): remove once DowntimeSlasher is implemented.
+    bool isCLabsValZero = (msg.sender == address(0x0Cc59Ed03B3e763c02d54D695FFE353055f1502D));
+    require(registered || isCLabsValZero, "only registered contracts");
     _;
   }
 

@@ -53,7 +53,7 @@ const Backgrounds = withNamespaces(NameSpaces.brand)(
       <View>
         <SectionTitle containerStyle={brandStyles.gap}>{t('color.backgroundTitle')}</SectionTitle>
         <Palette text={t('color.backgroundText')} colors={BACKGROUND_PALETTE} />
-        <Text style={[brandStyles.gap, fonts.h5a, standardStyles.elementalMarginBottom]}>
+        <Text style={[brandStyles.gap, fonts.h5, standardStyles.elementalMarginBottom]}>
           {t('color.contrast')}
         </Text>
         <Text style={[brandStyles.gap, fonts.p]}>{t('color.contrastText')}</Text>
