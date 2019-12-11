@@ -307,6 +307,7 @@ export async function sendTransactionAsync<T>(
       // the suggested price in the selected feeCurrency.
       gasPrice: '0',
     })
+      // @ts-ignore
       .on('receipt', (r: TransactionReceipt) => {
         logger(ReceiptReceived(r))
         if (resolvers.receipt) {
