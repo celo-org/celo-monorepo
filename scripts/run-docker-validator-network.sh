@@ -164,7 +164,7 @@ if [[ $COMMAND == *"accounts"* ]]; then
     cd $ACCOUNTS_DIR
 
     echo -e "Starting local Docker holding the accounts. You can attach to it running 'screen -r -S celo-accounts'\n"
-    screen -S celo-accounts -d -m docker run --name celo-accounts --restart always -p 8545:8545 -v $PWD:/root/.celo $CELO_IMAGE --verbosity 3 --networkid $NETWORK_ID --syncmode full --rpc --rpcaddr 0.0.0.0 --rpcapi eth,net,web3,debug,admin,personal
+    screen -S celo-accounts -d -m docker run --name celo-accounts --restart always -p 127.0.0.1:8545:8545 -v $PWD:/root/.celo $CELO_IMAGE --verbosity 3 --networkid $NETWORK_ID --syncmode full --rpc --rpcaddr 0.0.0.0 --rpcapi eth,net,web3,debug,admin,personal
     
     
     echo -e "\tGenerating the Validator Proof of Possesion"
