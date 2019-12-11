@@ -32,8 +32,6 @@ export const hasEntryInRegistry: string[] = [
   CeloContractName.Accounts,
   CeloContractName.Attestations,
   CeloContractName.BlockchainParameters,
-  CeloContractName.DoubleSigningSlasher,
-  CeloContractName.DowntimeSlasher,
   CeloContractName.Election,
   CeloContractName.Escrow,
   CeloContractName.Exchange,
