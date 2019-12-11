@@ -57,7 +57,7 @@ First, make sure you have the proper environment variables set:
 ```bash
 # On your local machine
 export CELO_IMAGE=us.gcr.io/celo-testnet/celo-node:baklava
-export NETWORK_ID=12219
+export NETWORK_ID=76172
 ```
 
 Follow [these instructions](running-a-validator.md#start-your-accounts-node) to restart your accounts node on your local machine.
