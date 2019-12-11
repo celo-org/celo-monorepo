@@ -54,7 +54,7 @@
     "net": "^1.0.2",
     "network-speed": "^2.0.3",
     "next": "^8.0.3",
-    "next-i18next": "^0.36.5",
+    "next-i18next": "^2.1.1",
     "next-images": "^1.1.1",
     "next-plugin-transpile-modules": "^2.0.0",
     "nuka-carousel": "git://github.com/cmcewen/nuka-carousel#fee86bf",

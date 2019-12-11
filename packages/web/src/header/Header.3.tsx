@@ -3,10 +3,10 @@ import throttle from 'lodash.throttle'
 import dynamic from 'next/dynamic'
 import { SingletonRouter as Router, withRouter } from 'next/router'
 import * as React from 'react'
-import { WithNamespaces, withNamespaces } from 'react-i18next'
 import { Animated, Dimensions, Easing, StyleSheet, View } from 'react-native'
-import BlueBanner, { BANNER_HEIGHT, styles as bannerStyle } from 'src/header/BlueBanner'
+import BlueBanner, { styles as bannerStyle } from 'src/header/BlueBanner'
 import cssStyles from 'src/header/Header.3.scss'
+import { I18nProps, withNamespaces } from 'src/i18n'
 import MediumLogo from 'src/icons/MediumLogo'
 import Octocat from 'src/icons/Octocat'
 import LogoDarkBg from 'src/logos/LogoDarkBg'
@@ -37,7 +37,7 @@ interface OwnProps {
   router: Router
 }
 
-type Props = OwnProps & WithNamespaces
+type Props = OwnProps & I18nProps
 
 interface State {
   showDesktopMenu: boolean
