@@ -3,8 +3,8 @@ import { getParsedSignatureOfAddress } from '@celo/protocol/lib/signing-utils'
 import {
   assertContainSubset,
   assertEqualBN,
-  assertEqualDpBN,
   assertEqualBNArray,
+  assertEqualDpBN,
   assertRevert,
   assertSameAddress,
   mineBlocks,
@@ -1758,15 +1758,15 @@ contract('Validators', (accounts: string[]) => {
 
   describe('#calculateGroupEpochScore', () => {
     describe('when all uptimes are in the interval [0, 1.0]', () => {
-      const testGroupUptimeCalculation = (uptimes) => {
-        const expected = uptimes
+      const testGroupUptimeCalculation = (_uptimes) => {
+        const expected = _uptimes
           .map((uptime) => new BigNumber(uptime))
           .map((uptime) => uptime.pow(validatorScoreParameters.exponent.toNumber()))
           .reduce((sum, n) => sum.plus(n))
-          .div(uptimes.length)
+          .div(_uptimes.length)
         it('should calculate the group score correctly', async () => {
           assertEqualDpBN(
-            fromFixed(await validators.calculateGroupEpochScore(uptimes.map(toFixed))),
+            fromFixed(await validators.calculateGroupEpochScore(_uptimes.map(toFixed))),
             expected,
             8
           )
