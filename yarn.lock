@@ -22754,6 +22754,11 @@ netmask@^1.0.6:
   resolved "https://registry.yarnpkg.com/netmask/-/netmask-1.0.6.tgz#20297e89d86f6f6400f250d9f4f6b4c1945fcd35"
   integrity sha1-ICl+idhvb2QA8lDZ9Pa0wZRfzTU=
 
+network-speed@^2.0.3:
+  version "2.0.3"
+  resolved "https://registry.yarnpkg.com/network-speed/-/network-speed-2.0.3.tgz#28d7d25672a0b76c53efa6ac42565cdcd4956ff8"
+  integrity sha512-c8LWfNHSAsqlsYUI4Yjj7LcdmvX/JNWUzAixoHPNLPmhK7JLShoCZ+8tVLCKcZxS2F0wmx8HCvqr/U7NqNGIQw==
+
 nexmo@2.4.2:
   version "2.4.2"
   resolved "https://registry.yarnpkg.com/nexmo/-/nexmo-2.4.2.tgz#12187611c85e490b22ac8d7c639a1bf49b0f561c"
