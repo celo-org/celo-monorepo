@@ -49,7 +49,7 @@ function helmParameters(celoEnv: string) {
     `--set ethstats.reserved_addresses='${String(
       fetchEnv(envVar.ETHSTATS_RESERVED_ADDRESSES)
     ).replace(/,/g, '\\,')}'`,
-    `--set ethstats.network_name='Celo ${celoEnv} Network'`,
+    `--set ethstats.network_name='Celo ${celoEnv}'`,
     `--set ethstats.blockscout_url='${getBlockscoutUrl(celoEnv)}'`,
   ]
 }
