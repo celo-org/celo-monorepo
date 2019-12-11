@@ -2,6 +2,7 @@ import { Validator, ValidatorGroup } from '@celo/contractkit/lib/wrappers/Valida
 import { flags } from '@oclif/command'
 import BigNumber from 'bignumber.js'
 import { cli } from 'cli-ux'
+import { EventLog } from 'web3/types'
 import { BaseCommand } from '../../base'
 import { newCheckBuilder } from '../../utils/checks'
 import { Flags } from '../../utils/command'
@@ -42,13 +43,12 @@ export default class Show extends BaseCommand {
     const validatorDetails: { [key: number]: { [key: string]: Validator } } = {}
     const validatorGroupDetails: { [key: number]: { [key: string]: ValidatorGroup } } = {}
     const lowerAddress = res.flags.address ? res.flags.address.toLowerCase() : res.flags.address
-    let voterRewardsEvents: any[] = []
-    let validatorRewardsEvents: any[] = []
+    let voterRewardsEvents: EventLog[] = []
+    let validatorRewardsEvents: EventLog[] = []
 
     if (res.flags.address) {
-      const address = res.flags.address
       await newCheckBuilder(this)
-        .isAccount(address)
+        .isAccount(res.flags.address)
         .runChecks()
     }
 
@@ -111,7 +111,7 @@ export default class Show extends BaseCommand {
           )
         }
       }
-      validatorDetails[blockNumber] = await this.promisedProperties(uniqueValidators)
+      validatorDetails[blockNumber] = await promisedProperties(uniqueValidators)
 
       // Get the Validator Group names.
       const uniqueValidatorGroups: { [key: string]: Promise<ValidatorGroup> } = {}
@@ -123,9 +123,10 @@ export default class Show extends BaseCommand {
           )
         }
       }
-      validatorGroupDetails[blockNumber] = await this.promisedProperties(uniqueValidatorGroups)
+      validatorGroupDetails[blockNumber] = await promisedProperties(uniqueValidatorGroups)
     }
 
+    // Present Voter rewards.
     if (voterRewardsEvents.length > 0) {
       console.info('')
       console.info('Voter rewards:')
@@ -144,13 +145,12 @@ export default class Show extends BaseCommand {
       )
     }
 
-    let validatorRewards = validatorRewardsEvents
-    if (res.flags.address) {
-      const address = res.flags.address.toLowerCase()
-      validatorRewards = validatorRewardsEvents.filter(
-        (x) => x.returnValues.validator.toLowerCase() === address
-      )
-    }
+    // Present Validator rewards.
+    const validatorRewards = res.flags.address
+      ? validatorRewardsEvents.filter(
+          (x) => x.returnValues.validator.toLowerCase() === lowerAddress
+        )
+      : validatorRewardsEvents
 
     if (validatorRewards.length > 0) {
       console.info('')
@@ -177,13 +177,10 @@ export default class Show extends BaseCommand {
       )
     }
 
-    let validatorGroupRewards = validatorRewardsEvents
-    if (res.flags.address) {
-      const address = res.flags.address.toLowerCase()
-      validatorGroupRewards = validatorRewardsEvents.filter(
-        (x) => x.returnValues.group.toLowerCase() === address
-      )
-    }
+    // Present Validator Group rewards.
+    const validatorGroupRewards = res.flags.address
+      ? validatorRewardsEvents.filter((x) => x.returnValues.group.toLowerCase() === lowerAddress)
+      : validatorRewardsEvents
 
     if (validatorGroupRewards.length > 0) {
       console.info('')
@@ -218,17 +215,17 @@ export default class Show extends BaseCommand {
       console.info('No rewards.')
     }
   }
+}
 
-  // Return the object with Promise properties resolved.
-  promisedProperties(object: { [key: string]: any }) {
-    const properties: any[] = []
-    const objectKeys = Object.keys(object)
-    objectKeys.forEach((key) => properties.push(object[key]))
-    return Promise.all(properties).then((resolvedValues) => {
-      return resolvedValues.reduce((resolvedObject, property, index) => {
-        resolvedObject[objectKeys[index]] = property
-        return resolvedObject
-      }, object)
-    })
-  }
+// Return the object with Promise properties resolved.
+function promisedProperties(object: { [key: string]: Promise<any> }) {
+  const properties: Array<Promise<any>> = []
+  const objectKeys = Object.keys(object)
+  objectKeys.forEach((key) => properties.push(object[key]))
+  return Promise.all(properties).then((resolvedValues) => {
+    return resolvedValues.reduce((resolvedObject, property, index) => {
+      resolvedObject[objectKeys[index]] = property
+      return resolvedObject
+    }, object)
+  })
 }

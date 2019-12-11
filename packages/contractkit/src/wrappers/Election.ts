@@ -116,16 +116,16 @@ export class ElectionWrapper extends BaseWrapper<Election> {
     blockNumber?: number
   ): Promise<GroupVote> {
     const pending = blockNumber
-      ? // @ts-ignore: Expected 0-1 arguments, but got 2
-        await this.contract.methods
+      ? await this.contract.methods
           .getPendingVotesForGroupByAccount(group, account)
+          // @ts-ignore: Expected 0-1 arguments, but got 2
           .call({}, blockNumber)
       : await this.contract.methods.getPendingVotesForGroupByAccount(group, account).call()
 
     const active = blockNumber
-      ? // @ts-ignore: Expected 0-1 arguments, but got 2
-        await this.contract.methods
+      ? await this.contract.methods
           .getActiveVotesForGroupByAccount(group, account)
+          // @ts-ignore: Expected 0-1 arguments, but got 2
           .call({}, blockNumber)
       : await this.contract.methods.getActiveVotesForGroupByAccount(group, account).call()
 
@@ -138,8 +138,10 @@ export class ElectionWrapper extends BaseWrapper<Election> {
 
   async getVoter(account: Address, blockNumber?: number): Promise<Voter> {
     const groups: Address[] = blockNumber
-      ? // @ts-ignore: Expected 0-1 arguments, but got 2
-        await this.contract.methods.getGroupsVotedForByAccount(account).call({}, blockNumber)
+      ? await this.contract.methods
+          .getGroupsVotedForByAccount(account)
+          // @ts-ignore: Expected 0-1 arguments, but got 2
+          .call({}, blockNumber)
       : await this.contract.methods.getGroupsVotedForByAccount(account).call()
 
     const votes = await Promise.all(
