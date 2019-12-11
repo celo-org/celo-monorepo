@@ -135,6 +135,7 @@ module "proxy" {
   geth_node_docker_image_tag        = var.geth_node_docker_image_tag
   geth_verbosity                    = var.geth_verbosity
   in_memory_discovery_table         = var.in_memory_discovery_table
+  instance_tags                     = ["${var.celo_env}-proxy"]
   name                              = "proxy"
   network_id                        = var.network_id
   network_name                      = var.network_name

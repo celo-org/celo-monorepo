@@ -20,7 +20,7 @@ resource "google_compute_instance" "full_node" {
 
   count = var.node_count
 
-  tags = ["${var.celo_env}-node", "${var.celo_env}-tx-node"]
+  tags = concat(["${var.celo_env}-node"], var.instance_tags)
 
   allow_stopping_for_update = true
 
@@ -90,6 +90,10 @@ resource "google_compute_disk" "full_node" {
   # in GB
   size                      = 25
   physical_block_size_bytes = 4096
+
+  lifecycle {
+    create_before_destroy = true
+  }
 }
 
 resource "random_id" "full_node" {
