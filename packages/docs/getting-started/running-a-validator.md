@@ -131,7 +131,7 @@ First we are going to setup the main environment variables related with the `Bak
 
 ```bash
 export CELO_IMAGE=us.gcr.io/celo-testnet/celo-node:baklava
-export NETWORK_ID=12219
+export NETWORK_ID=76172
 ```
 
 ### Pull the Celo Docker image
@@ -161,6 +161,8 @@ This should generate two accounts in your current directory and print them out, 
 export CELO_VALIDATOR_GROUP_ADDRESS=<YOUR-VALIDATOR-GROUP-ADDRESS>
 export CELO_VALIDATOR_ADDRESS=<YOUR-VALIDATOR-ADDRESS>
 ```
+
+### Start your Accounts node
 
 Next, we'll run a node on your local machine so that we can use these accounts to lock Celo Gold and authorize the keys needed to run your validator. To do this, we need to run the following commands, which fetch the genesis block and a list of other nodes in the network to connect to.
 
@@ -193,10 +195,9 @@ To actually register as a validator, we'll need to generate a validating signer 
 # On the validator machine
 # Note that you have to export $CELO_IMAGE and $NETWORK_ID on this machine
 export CELO_IMAGE=us.gcr.io/celo-testnet/celo-node:baklava
-export NETWORK_ID=12219
+export NETWORK_ID=76172
 mkdir celo-validator-node
 cd celo-validator-node
-docker run -v $PWD:/root/.celo $CELO_IMAGE init /celo/genesis.json
 docker run -v $PWD:/root/.celo -it $CELO_IMAGE account new
 export CELO_VALIDATOR_SIGNER_ADDRESS=<YOUR-VALIDATOR-SIGNER-ADDRESS>
 ```
@@ -255,10 +256,12 @@ You can then run the proxy with the following command. Be sure to replace `<YOUR
 ```bash
 # On the proxy machine
 # Note that you'll have to export CELO_VALIDATOR_SIGNER_ADDRESS and $NETWORK_ID on this machine
-export NETWORK_ID=12219
+export NETWORK_ID=76172
 export CELO_VALIDATOR_SIGNER_ADDRESS=<YOUR-VALIDATOR-SIGNER-ADDRESS>
 docker run --name celo-proxy -it --restart always -p 30303:30303 -p 30303:30303/udp -p 30503:30503 -p 30503:30503/udp -v $PWD:/root/.celo $CELO_IMAGE --verbosity 3 --networkid $NETWORK_ID --syncmode full --proxy.proxy --proxy.proxiedvalidatoraddress $CELO_VALIDATOR_SIGNER_ADDRESS --proxy.internalendpoint :30503 --etherbase $CELO_VALIDATOR_SIGNER_ADDRESS --ethstats=<YOUR-VALIDATOR-NAME>-proxy@baklava-ethstats.celo-testnet.org
 ```
+
+### Get your Proxy's connection info
 
 Once the proxy is running, we will need to retrieve its enode and IP address so that the validator will be able to connect to it.
 
@@ -286,8 +289,6 @@ export PROXY_EXTERNAL_IP=<PROXY-MACHINE-EXTERNAL-IP-ADDRESS>
 export PROXY_INTERNAL_IP=<PROXY-MACHINE-INTERNAL-IP-ADDRESS>
 ```
 
-Let's connect the validator to the proxy:
-
 ### Connect the Validator to the Proxy
 
 When starting up your validator, it will attempt to create a network connection between the validator machine and the proxy machine. You will need make sure that your proxy machine has the appropriate firewall settings to allow the validator to connect to it.
@@ -312,12 +313,13 @@ Once that is completed, go ahead and run the validator. Be sure to replace `<VAL
 ```bash
 # On the validator machine
 echo <VALIDATOR-SIGNER-PASSWORD> > .password
+docker run -v $PWD:/root/.celo $CELO_IMAGE init /celo/genesis.json
 docker run --name celo-validator -it --restart always -p 30303:30303 -p 30303:30303/udp -v $PWD:/root/.celo $CELO_IMAGE --verbosity 3 --networkid $NETWORK_ID --syncmode full --mine --istanbul.blockperiod=5 --istanbul.requesttimeout=3000 --etherbase $CELO_VALIDATOR_SIGNER_ADDRESS --nodiscover --proxy.proxied --proxy.proxyenodeurlpair=enode://$PROXY_ENODE@$PROXY_INTERNAL_IP:30503\;enode://$PROXY_ENODE@$PROXY_EXTERNAL_IP:30303  --unlock=$CELO_VALIDATOR_SIGNER_ADDRESS --password /root/.celo/.password --ethstats=<YOUR-VALIDATOR-NAME>@baklava-ethstats.celo-testnet.org
 ```
 
 The `mine` flag does not mean the node starts mining blocks, but rather starts trying to participate in the BFT consensus protocol. It cannot do this until it gets elected -- so next we need to stand for election.
 
-The `networkid` parameter value of `12219` indicates we are connecting to the Baklava network, Stake Off Phase 1.
+The `networkid` parameter value of `76172` indicates we are connecting to the Baklava network, Stake Off Phase 1.
 
 Note that if you are running the validator and the proxy on the same machine, then you should set the validator's listening port to something other than `30303`. E.g. you could use the flag `--port 30313` and set the docker port forwarding rules accordingly (e.g. use the flags `-p 30313:30313` and `-p 30313:30313/udp`).
 
@@ -508,7 +510,7 @@ Just like with the Validator signer, we'll want to authorize a separate Attestat
 # On the Attestation machine
 # Note that you have to export CELO_IMAGE, NETWORK_ID and CELO_VALIDATOR_ADDRESS on this machine
 export CELO_IMAGE=us.gcr.io/celo-testnet/celo-node:baklava
-export NETWORK_ID=12219
+export NETWORK_ID=76172
 export CELO_VALIDATOR_ADDRESS=<CELO_VALIDATOR_ADDRESS>
 mkdir celo-attestations-node
 cd celo-attestations-node
