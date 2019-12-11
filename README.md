@@ -51,6 +51,18 @@ Celo, pronounced /ˈtselo/, means ‘purpose’ in Esperanto. In a similar spiri
   <i>What if money were beautiful?</i>
 </p>
 
+### 🚩Table of Contents
+<!-- TOC -->
+- [Celo's Mission - Prosperity for All](#celos-mission---prosperity-for-all)
+- [The Celo Stack](#the-celo-stack)
+- [Documentation](#-documentation)
+- [Issues](#-issues)
+- [Contributing](#%EF%B8%8F-contributing)
+- [Ask questions, find answers, and get in touch:](#-ask-questions-find-answers-and-get-in-touch)
+- [Project leaders](#project-leaders)
+- [Contributors](#-contributors)
+- [License](#-license)
+<!-- /TOC -->
 ### The Celo Stack
 
 Celo is oriented around providing the simplest possible experience for end users, who may have no familiarity with cryptocurrencies, and may be using low cost devices with limited connectivity. To achieve this, the project takes a full-stack approach, where each layer of the stack is designed with the end user in mind whilst considering other stakeholders \(e.g. operators of nodes in the network\) involved in enabling the end user experience.
