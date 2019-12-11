@@ -39,11 +39,13 @@ In addition, to get things started, it will be useful to temporarily run a node 
 
 ### Software requirements
 
+#### On each machine
 - **You have Docker installed.**
 
   If you don’t have it already, follow the instructions here: [Get Started with Docker](https://www.docker.com/get-started). It will involve creating or signing in with a Docker account, downloading a desktop app, and then launching the app to be able to use the Docker CLI. If you are running on a Linux server, follow the instructions for your distro [here](https://docs.docker.com/install/#server). You may be required to run Docker with `sudo` depending on your installation environment.
   You can check you have Docker installed and running if the command `docker info` works properly.
 
+#### On your local machine
 - **You have celocli installed.**
 
   See [Command Line Interface \(CLI\) ](../command-line-interface/introduction.md)for instructions on how to get set up.
