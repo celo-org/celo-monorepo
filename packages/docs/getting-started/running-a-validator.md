@@ -270,6 +270,15 @@ echo $(docker exec celo-proxy geth --exec "admin.nodeInfo['enode'].split('//')[1
 Now we need to set the proxy enode and proxy IP address in environment variables on the validator machine.
 If you don't have an internal IP address over which the Validator and Proxy can communicate, feel free to set the internal IP address to the external IP address.
 
+If you don't know your Proxy's external IP address, you can get it by running the following command:
+
+```bash
+# On the proxy machine
+dig +short myip.opendns.com @resolver1.opendns.com
+```
+
+Then, export the variables on your validator machine.
+
 ```bash
 # On the validator machine
 export PROXY_ENODE=<YOUR-PROXY-ENODE>
