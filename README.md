@@ -4,6 +4,11 @@
   </a>
 </p>
 
+**Celo Monorepo - Official repository for core projects comprising the Celo platform**
+
+This repository contains the source code for the Celo core projects including the [smart contracts](https://github.com/celo-org/celo-monorepo/tree/master/packages/protocol), [wallet app](https://github.com/celo-org/celo-monorepo/tree/master/packages/mobile),
+and other packages. The source code for the Celo Blockchain which operates a node on the Celo Network is kept in a separate repo [here](https://github.com/celo-org/celo-blockchain).
+
 <!-- row 1 - status -->
 
 [![CircleCI](https://img.shields.io/circleci/build/github/celo-org/celo-monorepo/master)](https://circleci.com/gh/celo-org/celo-monorepo/tree/master)
@@ -31,14 +36,25 @@
 [![GitHub pull requests by-label](https://img.shields.io/github/issues-pr-raw/celo-org/celo-monorepo)](https://github.com/celo-org/celo-monorepo/pulls)
 [![GitHub Issues](https://img.shields.io/github/issues-raw/celo-org/celo-monorepo.svg)](https://github.com/celo-org/celo-monorepo/issues)
 [![GitHub issues by-label](https://img.shields.io/github/issues/celo-org/celo-monorepo/1%20hour%20tasks)](https://github.com/celo-org/celo-monorepo/issues?q=is%3Aopen+is%3Aissue+label%3A%221+hour+tasks%22)
+[![GitHub issues by-label](https://img.shields.io/github/issues/celo-org/celo-monorepo/betanet-phase-2)](https://github.com/celo-org/celo-monorepo/issues?q=is%3Aopen+is%3Aissue+label%3Abetanet-phase-2)
 [![GitHub issues by-label](https://img.shields.io/github/issues/celo-org/celo-monorepo/betanet-phase-3)](https://github.com/celo-org/celo-monorepo/issues?q=is%3Aopen+is%3Aissue+label%3Abetanet-phase-3)
 
-# Celo Monorepo - Official repository for core projects comprising the Celo platform 📱💵🔑🔗📡🌍❤️🚀
+Contents:
 
-This repository contains the source code for the Celo core projects including the [smart contracts](https://github.com/celo-org/celo-monorepo/tree/master/packages/protocol), [wallet app](https://github.com/celo-org/celo-monorepo/tree/master/packages/mobile),
-and other packages. The source code for the Celo Blockchain which operates a node on the Celo Network is kept in a separate repo [here](https://github.com/celo-org/celo-blockchain).
+<!-- TOC -->
 
-### Celo's Mission - Prosperity for All
+- [Celo's Mission - Prosperity for All](#celos-mission---prosperity-for-all)
+- [The Celo Stack](#the-celo-stack)
+- [Documentation](#documentation)
+- [Issues](#issues)
+- [Contributing](#%EF%B8%8F-contributing)
+- [Ask questions, find answers, and get in touch:](#-ask-questions-find-answers-and-get-in-touch)
+- [Project leaders](#project-leaders)
+- [Contributors](#-contributors)
+- [License](#-license)
+  <!-- /TOC -->
+
+## 🥅 Celo's Mission - Prosperity for All
 
 Celo, pronounced /ˈtselo/, means ‘purpose’ in Esperanto. In a similar spirit, we are aiming to create a new platform to connect people globally and bring financial stability to those who need it most. We believe blockchain technology is one of the most exciting innovations in recent history and as a community we look to push the boundaries of what is possible with it today. More importantly, we are driven by purpose -- to solve real-world problems such as lack of access to sound currency, or friction for cash-transfer programs aimed to alleviate poverty. Our mission is to build a monetary system that creates the conditions for prosperity for all.
 
@@ -51,19 +67,7 @@ Celo, pronounced /ˈtselo/, means ‘purpose’ in Esperanto. In a similar spiri
   <i>What if money were beautiful?</i>
 </p>
 
-### 🚩Table of Contents
-<!-- TOC -->
-- [Celo's Mission - Prosperity for All](#celos-mission---prosperity-for-all)
-- [The Celo Stack](#the-celo-stack)
-- [Documentation](#-documentation)
-- [Issues](#-issues)
-- [Contributing](#%EF%B8%8F-contributing)
-- [Ask questions, find answers, and get in touch:](#-ask-questions-find-answers-and-get-in-touch)
-- [Project leaders](#project-leaders)
-- [Contributors](#-contributors)
-- [License](#-license)
-<!-- /TOC -->
-### The Celo Stack
+## 🧱 The Celo Stack
 
 Celo is oriented around providing the simplest possible experience for end users, who may have no familiarity with cryptocurrencies, and may be using low cost devices with limited connectivity. To achieve this, the project takes a full-stack approach, where each layer of the stack is designed with the end user in mind whilst considering other stakeholders \(e.g. operators of nodes in the network\) involved in enabling the end user experience.
 
@@ -89,15 +93,17 @@ The Celo stack is structured into the following logical layers:
 
 - **Applications:** Applications for end users built on the Celo platform. The Celo Wallet app, the first of an ecosystem of applications, allows end users to manage accounts and make payments securely and simply by taking advantage of the innovations in the Celo protocol. Applications take the form of external mobile or backend software: they interact with the Celo Blockchain to issue transactions and invoke code that forms the Celo Core Contracts’ API. Third parties can also deploy custom smart contracts that their own applications can invoke, which in turn can leverage Celo Core Contracts. Applications may use centralized cloud services to provide some of their functionality: in the case of the Celo Wallet, push notifications and a transaction activity feed.
 
-### 📚 Documentation
+## 📚 Documentation
+
+Follow the instructions in [SETUP.md](SETUP.md) to get a development environment set up.
 
 See [Developer's Guide](https://docs.celo.org/) for full details about the design of the Celo protocol and other information about running these projects.
 
-### 🙋 Issues
+## 🙋 Issues
 
 See the [issue backlog](https://github.com/celo-org/celo-monorepo/issues) for a list of active or proposed tasks. Feel free to create new issues to report bugs and/or request features.
 
-### 📂 Repo structure
+## 📂 Repo structure
 
 The repository has the following packages (sub projects):
 
@@ -127,7 +133,7 @@ The repository has the following packages (sub projects):
 
 Code owners for each package can be found in [.github/CODEOWNERS](.github/CODEOWNERS).
 
-### ✍️ Contributing
+## ✍️ Contributing
 
 Feel free to jump on the Celo 🚂🚋🚋🚋. Improvements and contributions are highly encouraged! 🙏👊
 
@@ -141,18 +147,18 @@ Twitter
 twitter intent generator - http://tech.cymi.org/tweet-intents
 -->
 
-### 💬 Ask questions, find answers, and get in touch
+## 💬 Ask questions, find answers, and get in touch
 
 - [Website](https://celo.org/)
 - [Docs](https://docs.celo.org/)
-- [Blog](https://medium.com/celohq) 📖
-- [YouTube](https://www.youtube.com/channel/UCCZgos_YAJSXm5QX5D5Wkcw/videos?view=0&sort=p&flow=grid) 🎬
+- [Blog](https://medium.com/celohq)
+- [YouTube](https://www.youtube.com/channel/UCCZgos_YAJSXm5QX5D5Wkcw/videos?view=0&sort=p&flow=grid)
 - [Forum](https://forum.celo.org)
-- [Discord](https://discord.gg/JvJ66Wc) 🎙
+- [Discord](https://discord.gg/JvJ66Wc)
 - [Twitter](https://twitter.com/CeloDevs)
 - [Reddit](https://www.reddit.com/r/CeloHQ/)
-- [Community Events](https://celo.org/community) 🎉
+- [Community Events](https://celo.org/community)
 
-### 📜 License
+## 📜 License
 
-All packages are licensed under the terms of the Apache 2.0 License unless otherwise specified in the LICENSE file at package's root.
+All packages are licensed under the terms of the [Apache 2.0 License](LICENSE) unless otherwise specified in the LICENSE file at package's root.
