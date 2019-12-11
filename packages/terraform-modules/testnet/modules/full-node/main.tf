@@ -88,7 +88,7 @@ resource "google_compute_disk" "full_node" {
 
   type = "pd-ssd"
   # in GB
-  size                      = 25
+  size                      = 15
   physical_block_size_bytes = 4096
 
   lifecycle {
