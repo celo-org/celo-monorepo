@@ -617,6 +617,15 @@ contract Governance is
   }
 
   /**
+   * @notice Returns whether given hotfix hash has been whitelisted by given address.
+   * @param hash The abi encoded keccak256 hash of the hotfix transaction(s) to be whitelisted.
+   * @param whitelister Address to check whitelist status of.
+   */
+  function isHotfixWhitelistedBy(bytes32 hash, address whitelister) public view returns (bool) {
+    return hotfixes[hash].whitelisted[whitelister];
+  }
+
+  /**
    * @notice Whitelists the hash of a hotfix transaction(s).
    * @param hash The abi encoded keccak256 hash of the hotfix transaction(s) to be whitelisted.
    */
@@ -856,8 +865,12 @@ contract Governance is
     uint256 tally = 0;
     uint256 n = numberValidatorsInCurrentSet();
     for (uint256 idx = 0; idx < n; idx++) {
-      address validator = validatorAddressFromCurrentSet(idx);
-      if (hotfixes[hash].whitelisted[validator]) {
+      address validatorSigner = validatorSignerAddressFromCurrentSet(idx);
+      address validatorAccount = getAccounts().validatorSignerToAccount(validatorSigner);
+      if (
+        isHotfixWhitelistedBy(hash, validatorSigner) ||
+        isHotfixWhitelistedBy(hash, validatorAccount)
+      ) {
         tally = tally.add(1);
       }
     }
