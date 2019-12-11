@@ -276,7 +276,7 @@ OPTIONS
   --name=name                                           (required)
 
 EXAMPLE
-  register --account 0x5409ed021d9299bf6814279a6a1411a7e866a631 --name test-account
+  set-name --account 0x5409ed021d9299bf6814279a6a1411a7e866a631 --name test-account
 ```
 
 _See code: [packages/cli/src/commands/account/set-name.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/account/set-name.ts)_
