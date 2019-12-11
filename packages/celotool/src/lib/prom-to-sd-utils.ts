@@ -91,7 +91,7 @@ async function helmParameters(celoEnv: string) {
 function getReplicaCount() {
   const txNodeCount = parseInt(fetchEnv(envVar.TX_NODES), 10)
   const validatorCount = parseInt(fetchEnv(envVar.VALIDATORS), 10)
-  const proxyCount = parseInt(fetchEnvOrFallback(envVar.PROXIED_VALIDATORS, '0'), 10)
+  const proxyCount = parseInt(fetchEnv(envVar.PROXIED_VALIDATORS), 10)
 
   return txNodeCount + validatorCount + proxyCount
 }

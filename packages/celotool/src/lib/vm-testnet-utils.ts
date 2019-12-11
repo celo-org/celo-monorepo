@@ -216,6 +216,7 @@ export async function taintTestnet(celoEnv: string) {
   for (const resource of testnetResourcesToReset) {
     console.info(`Tainting ${resource}`)
     await taintTerraformModuleResource(testnetTerraformModule, resource)
+    // To avoid getting errors for too many gcloud storage API requests
     await sleep(2000)
   }
 }
@@ -232,6 +233,7 @@ export async function untaintTestnet(celoEnv: string) {
   for (const resource of testnetResourcesToReset) {
     console.info(`Untainting ${resource}`)
     await untaintTerraformModuleResource(testnetTerraformModule, resource)
+    // To avoid getting errors for too many gcloud storage API requests
     await sleep(2000)
   }
 }
