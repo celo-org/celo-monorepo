@@ -396,7 +396,7 @@ describe('governance tests', () => {
         )
       )
 
-      await sleep(10)
+      await sleep(10, true)
 
       validatorAccounts = await getValidatorGroupMembers()
       assert.equal(validatorAccounts.length, 5)

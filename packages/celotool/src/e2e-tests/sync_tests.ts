@@ -14,6 +14,7 @@ describe('sync tests', function(this: any) {
     runPath: TMP_PATH,
     gethRepoPath: '../../../celo-blockchain',
     migrate: true,
+    verbosity: 1,
     instances: [],
   }
 
@@ -102,9 +103,9 @@ describe('sync tests', function(this: any) {
         const syncWeb3 = new Web3(`http://localhost:8555`)
         await waitToFinishSyncing(syncWeb3)
         // Give the validators time to create more blocks.
-        await sleep(20)
+        await sleep(20, true)
         const validatingLatestBlock = await validatingWeb3.eth.getBlockNumber()
-        await sleep(10)
+        await sleep(20, true)
         const syncLatestBlock = await syncWeb3.eth.getBlockNumber()
         assert.isAbove(validatingLatestBlock, 1)
         // Assert that the validator is still producing blocks.
@@ -127,7 +128,7 @@ describe('sync tests', function(this: any) {
       const instance: GethInstanceConfig = gethConfig.instances[0]
       await killInstance(instance)
       await initAndStartGeth(hooks.gethBinaryPath, { ...instance, peers: ['8547'] }, true)
-      await sleep(120) // wait for round change / resync
+      await sleep(120, true) // wait for round change / resync
       const address = (await web3.eth.getAccounts())[0]
       const currentBlock = await web3.eth.getBlock('latest')
       for (let i = 0; i < gethConfig.instances.length; i++) {

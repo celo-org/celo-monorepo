@@ -1,3 +1,4 @@
+import { consoleLogger } from '@celo/utils/lib/logger'
 import BigNumber from 'bignumber.js'
 import { assert } from 'chai'
 import fs from 'fs'
@@ -72,7 +73,10 @@ export async function killInstance(instance: GethInstanceConfig) {
   }
 }
 
-export function sleep(seconds: number) {
+export function sleep(seconds: number, verbose: boolean = false) {
+  if (verbose) {
+    consoleLogger(`Sleeping for ${seconds} seconds. Stay tuned!`)
+  }
   return new Promise<void>((resolve) => setTimeout(resolve, seconds * 1000))
 }
 
@@ -259,7 +263,7 @@ export function getContext(gethConfig: GethRunConfig) {
     await connectValidatorPeers(gethConfig, true)
 
     // Give validators time to connect to each other
-    await sleep(60)
+    await sleep(60, true)
 
     if (gethConfig.migrate || gethConfig.migrateTo) {
       await migrateContracts(

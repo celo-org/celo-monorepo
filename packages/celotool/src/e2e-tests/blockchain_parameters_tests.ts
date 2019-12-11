@@ -84,7 +84,7 @@ describe('Blockchain parameters tests', function(this: any) {
     it('should exit when minimum version is updated', async () => {
       this.timeout(0)
       await setMinimumClientVersion(1, 8, 99)
-      await sleep(120)
+      await sleep(120, true)
       try {
         // It should have exited by now, call RPC to trigger error
         await kit.web3.eth.getBlockNumber()
