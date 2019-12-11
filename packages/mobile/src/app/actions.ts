@@ -31,7 +31,7 @@ interface SetNumberVerifiedAction {
   numberVerified: boolean
 }
 
-export interface SetLanguageAction {
+export interface SetLanguage {
   type: Actions.SET_LANGUAGE
   language: string
 }
@@ -76,7 +76,7 @@ export type ActionTypes =
   | SetLoggedIn
   | SetNumberVerifiedAction
   | ResetAppOpenedState
-  | SetLanguageAction
+  | SetLanguage
   | OpenDeepLink
   | EnterBackupFlow
   | ExitBackupFlow
@@ -95,7 +95,7 @@ export const setNumberVerified = (numberVerified: boolean) => ({
   numberVerified,
 })
 
-export const setLanguage = (language: string, nextScreen?: Screens): SetLanguageAction => {
+export const setLanguage = (language: string, nextScreen?: Screens) => {
   numeral.locale(language.substring(0, 2))
   i18n.changeLanguage(language)
 

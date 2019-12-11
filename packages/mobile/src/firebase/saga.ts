@@ -20,7 +20,7 @@ import {
 } from 'src/account/actions'
 import { PaymentRequest, PaymentRequestStatus } from 'src/account/types'
 import { showError } from 'src/alert/actions'
-import { Actions as AppActions, SetLanguageAction } from 'src/app/actions'
+import { Actions as AppActions, SetLanguage } from 'src/app/actions'
 import { ErrorMessages } from 'src/app/ErrorMessages'
 import { FIREBASE_ENABLED } from 'src/config'
 import {
@@ -201,7 +201,7 @@ export function* watchPaymentRequestNotifiedUpdates() {
   yield takeLeading(Actions.PAYMENT_REQUEST_UPDATE_NOTIFIED, updatePaymentRequestNotified)
 }
 
-export function* syncLanguageSelection({ language }: SetLanguageAction) {
+export function* syncLanguageSelection({ language }: SetLanguage) {
   yield call(waitForFirebaseAuth)
   const address = yield select(currentAccountSelector)
   try {
