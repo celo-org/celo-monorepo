@@ -1,8 +1,8 @@
 import { chain, omitBy } from 'lodash'
 import Web3 from 'web3'
+import { Log } from 'web3-core'
+import { Transaction } from 'web3-eth'
 import { ABIDefinition } from 'web3/eth/abi'
-import { Transaction } from 'web3/eth/types'
-import { Log } from 'web3/types'
 import { CeloContract } from './contract-utils'
 
 interface FunctionABICacheEntry {
