@@ -56,6 +56,36 @@ See [Developer's Guide](https://docs.celo.org/) for full details about the desig
 
 See the [issue backlog](https://github.com/celo-org/celo-monorepo/issues) for a list of active or proposed tasks. Feel free to create new issues to report bugs and/or request features. Please add labels to your issues, tagging the appropriate package/area.
 
+### 📂 Repo structure
+
+The repository has the following packages (sub projects):
+
+- [analytics](packages/analytics) - Cloud Dataflow/Apache Beam jobs for processing Celo Wallet logs and telemetry
+- [attestation-service](packages/attestation-service) - service run by validators on the Celo network to send SMS messages, enabling attestations of user phone numbers and their accounts on the Celo network
+- [blockchain-api](packages/analytics) - service that uses Blockscout to present view of transactions by account for Celo Wallet activity feed
+- [celotool](packages/celotool) - scripts for deploying and managing testnets
+- [cli](packages/cli) - tool that uses ContractKit to interact with the Celo protocol ([docs](https://docs.celo.org/getting-started/using-the-cli))
+- [contractkit](packages/contractkit) - library to help developers and validators interact with the protocol and it's smart contracts ([docs](https://docs.celo.org/celo-sdk/contractkit))
+- [dappkit](packages/dappkit) - set of functions for mobile DApps to work with the wallet app (ex. sign transactions and access the user's account) ([docs](https://docs.celo.org/celo-sdk/dappkit))
+- [dev-utils](packages/dev-utils) - a utils package for use as a dev dependency
+- [docs](packages/docs) - technical documentation for the Celo project ([live](https://docs.celo.org/))
+- [faucet](packages/faucet) - faucet deployment configuration ([live](https://celo.org/build/faucet))
+- [helm-charts](packages/helm-charts) - templatized deployments of entire environments to Kubernetes clusters
+- [mobile](packages/mobile) - Android wallet app for the Celo platform ([docs](https://docs.celo.org/getting-started/using-the-mobile-wallet), [live](https://play.google.com/store/apps/details?id=org.celo.mobile.alfajores))
+- [notification-service](packages/notification-service) - service for managing push notifications for Celo Wallet
+- [protocol](packages/protocol) - identity, stability and other smart contracts for the Celo protocol ([docs](https://docs.celo.org/celo-codebase/protocol))
+- [react-components](packages/react-components) - no README available (improve?)
+- [terraform-modules](packages/terraform-modules) - templatized deployments of entire VM-based testnets for Google Cloud Platform
+- [transaction-metrics-exporter](packages/transaction-metrics-exporter) - monitoring tool that executes transactions on the network and exports testnet-level prometheus metrics
+- [typescript](packages/typescript) - no README available (improve?)
+- [utils](packages/utils) - no README available (improve?)
+- [verification-pool-api](packages/verification-pool-api) - service that handles a pool of Verifier App instances and requests them to direct SMS for attestation purposes (deprecated)
+- [verifier](packages/verifier) - Android verifier app to send SMS messages, enabling attestations of user phone numbers and their accounts on the Celo network
+- [walletkit](packages/walletkit) - common functions to access smart contracts used by Celo Wallet (deprecated)
+- [web](packages/web) - Celo website ([live](https://celo.org/))
+
+Code owners for each package can be found in [.github/CODEOWNERS](.github/CODEOWNERS).
+
 ### ✍️ Contributing
 
 Feel free to jump on the Celo 🚂🚋🚋🚋. Improvements and contributions are highly encouraged! 🙏👊
@@ -70,7 +100,7 @@ Twitter
 twitter intent generator - http://tech.cymi.org/tweet-intents
 -->
 
-### 💬 Ask questions, find answers, and get in touch:
+### 💬 Ask questions, find answers, and get in touch
 
 - [Website](https://celo.org/)
 - [Docs](https://docs.celo.org/)
@@ -78,7 +108,7 @@ twitter intent generator - http://tech.cymi.org/tweet-intents
 - [YouTube](https://www.youtube.com/channel/UCCZgos_YAJSXm5QX5D5Wkcw/videos?view=0&sort=p&flow=grid) 🎬
 - [Forum](https://forum.celo.org)
 - [Discord](https://discord.gg/JvJ66Wc) 🎙
-- [Twitter](https://twitter.com/celohq)
+- [Twitter](https://twitter.com/CeloDevs)
 - [Reddit](https://www.reddit.com/r/CeloHQ/)
 - [Community Events](https://celo.org/community) 🎉
 
