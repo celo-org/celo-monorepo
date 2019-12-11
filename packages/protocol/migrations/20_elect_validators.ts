@@ -233,26 +233,12 @@ module.exports = async (_deployer: any, networkName: string) => {
     valKeyGroups.push(valKeys.slice(i, Math.min(i + maxGroupSize, valKeys.length)))
   }
 
-  // Calculate per validator locked gold for first group...
-  const lockedGoldPerValAtFirstGroup = new BigNumber(
-    config.validators.groupLockedGoldRequirements.value
-  )
-  // ...and the delta for each subsequent group
-  const lockedGoldPerValEachGroup = new BigNumber(
-    config.validators.votesRatioOfLastVsFirstGroup - 1
-  )
-    .times(lockedGoldPerValAtFirstGroup)
-    .div(Math.max(valKeyGroups.length - 1, 1))
-    .integerValue()
-
   const groups = valKeyGroups.map((keys, i) => ({
     valKeys: keys,
     name: valKeyGroups.length
       ? config.validators.groupName + `(${i + 1})`
       : config.validators.groupName,
-    lockedGold: lockedGoldPerValAtFirstGroup
-      .plus(lockedGoldPerValEachGroup.times(i))
-      .times(keys.length),
+    lockedGold: config.validators.groupLockedGold.value,
     account: null,
   }))
 
