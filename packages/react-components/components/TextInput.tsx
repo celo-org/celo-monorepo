@@ -11,7 +11,7 @@ import {
   StyleSheet,
   TextInput as RNTextInput,
   TextInputFocusEventData,
-  TextInputProps,
+  TextInputProps as RNTextInputProps,
   View,
 } from 'react-native'
 
@@ -22,7 +22,7 @@ interface OwnProps {
   forwardedRef?: React.RefObject<RNTextInput>
 }
 
-type Props = OwnProps & TextInputProps
+type Props = OwnProps & RNTextInputProps
 
 interface State {
   isFocused: boolean
@@ -69,7 +69,7 @@ export class CTextInput extends React.Component<Props, State> {
       <View style={[style.container, propsStyle]}>
         <RNTextInput
           ref={forwardedRef}
-          style={[fontStyles.regular, style.borderedText, style.numberInput]}
+          style={style.borderedText}
           value={value}
           {...passThroughProps}
           onFocus={this.handleInputFocus}
@@ -108,15 +108,15 @@ const style = StyleSheet.create({
     alignItems: 'center',
   },
   borderedText: {
+    ...fontStyles.regular,
+    flex: 1,
     borderColor: colors.inputBorder,
     borderRadius: 3,
     padding: 8,
-  },
-  numberInput: {
     backgroundColor: '#FFFFFF',
-    flex: 1,
   },
   iconStyle: {
     marginRight: 8,
+    zIndex: 100,
   },
 })

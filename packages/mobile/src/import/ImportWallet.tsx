@@ -1,84 +1,71 @@
-import { BtnTypes } from '@celo/react-components/components/Button'
+import Button, { BtnTypes } from '@celo/react-components/components/Button'
+import KeyboardAwareScrollView from '@celo/react-components/components/KeyboardAwareScrollView'
+import KeyboardSpacer from '@celo/react-components/components/KeyboardSpacer'
 import colors from '@celo/react-components/styles/colors'
 import { fontStyles } from '@celo/react-components/styles/fonts'
 import { componentStyles } from '@celo/react-components/styles/styles'
 import * as React from 'react'
 import { WithNamespaces, withNamespaces } from 'react-i18next'
-import { ActivityIndicator, Keyboard, StyleSheet, Text, TextInput, View } from 'react-native'
-import { validateMnemonic } from 'react-native-bip39'
-import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'
+import { ActivityIndicator, Image, Keyboard, StyleSheet, Text, View } from 'react-native'
+import SafeAreaView from 'react-native-safe-area-view'
+import { NavigationEvents, NavigationInjectedProps } from 'react-navigation'
 import { connect } from 'react-redux'
-import { hideAlert, showError } from 'src/alert/actions'
-import { errorSelector } from 'src/alert/reducer'
+import { hideAlert } from 'src/alert/actions'
 import CeloAnalytics from 'src/analytics/CeloAnalytics'
 import { CustomEventNames } from 'src/analytics/constants'
-import { ErrorMessages } from 'src/app/ErrorMessages'
+import BackupPhraseContainer, {
+  BackupPhraseContainerMode,
+  BackupPhraseType,
+} from 'src/backup/BackupPhraseContainer'
+import {
+  formatBackupPhraseOnEdit,
+  formatBackupPhraseOnSubmit,
+  isValidBackupPhrase,
+} from 'src/backup/utils'
 import GethAwareButton from 'src/geth/GethAwareButton'
 import { Namespaces } from 'src/i18n'
-import NuxLogo from 'src/icons/NuxLogo'
+import { backupIcon } from 'src/images/Images'
 import { importBackupPhrase } from 'src/import/actions'
 import { nuxNavigationOptions } from 'src/navigator/Headers'
+import { navigate } from 'src/navigator/NavigationService'
+import { Screens } from 'src/navigator/Screens'
 import { RootState } from 'src/redux/reducers'
-import Logger from 'src/utils/Logger'
-
-const TAG = 'ImportWallet'
-
-// Because of a RN bug, we can't fully clean the text as the user types
-// https://github.com/facebook/react-native/issues/11068
-export const formatBackupPhraseOnEdit = (phrase: string) => phrase.replace(/\s+/gm, ' ')
-// Note(Ashish) The wordlists seem to use NFD and contains lower-case words for English and Spanish.
-// I am not sure if the words are lower-case for Japanese as well but I am assuming that for now.
-export const formatBackupPhraseOnSubmit = (phrase: string) =>
-  formatBackupPhraseOnEdit(phrase)
-    .trim()
-    .normalize('NFD')
-    .toLocaleLowerCase()
 
 interface State {
   backupPhrase: string
-  isSubmitting: boolean
 }
 
 interface DispatchProps {
   importBackupPhrase: typeof importBackupPhrase
-  showError: typeof showError
   hideAlert: typeof hideAlert
 }
 
 interface StateProps {
-  error: ErrorMessages | null
+  isImportingWallet: boolean
 }
 
-type Props = StateProps & DispatchProps & WithNamespaces
+type Props = StateProps & DispatchProps & WithNamespaces & NavigationInjectedProps
 
 const mapStateToProps = (state: RootState): StateProps => {
   return {
-    error: errorSelector(state),
+    isImportingWallet: state.imports.isImportingWallet,
   }
-}
-
-const displayedErrors = [ErrorMessages.INVALID_BACKUP, ErrorMessages.IMPORT_BACKUP_FAILED]
-
-const hasDisplayedError = (error: ErrorMessages | null) => {
-  return error && displayedErrors.includes(error)
 }
 
 export class ImportWallet extends React.Component<Props, State> {
   static navigationOptions = nuxNavigationOptions
 
-  static getDerivedStateFromProps(props: Props, state: State): State | null {
-    if (hasDisplayedError(props.error) && state.isSubmitting) {
-      return {
-        ...state,
-        isSubmitting: false,
-      }
-    }
-    return null
-  }
-
   state = {
     backupPhrase: '',
-    isSubmitting: false,
+  }
+
+  checkCleanBackupPhrase() {
+    if (this.props.navigation.getParam('clean')) {
+      this.setState({
+        backupPhrase: '',
+      })
+      this.props.navigation.setParams({ clean: false })
+    }
   }
 
   setBackupPhrase = (input: string) => {
@@ -88,107 +75,76 @@ export class ImportWallet extends React.Component<Props, State> {
     })
   }
 
-  onEndEditing = () => {
-    CeloAnalytics.track(CustomEventNames.import_phrase_input)
+  onPressRestore = () => {
+    Keyboard.dismiss()
+    this.props.hideAlert()
+    CeloAnalytics.track(CustomEventNames.import_wallet_submit)
+
+    const formattedPhrase = formatBackupPhraseOnSubmit(this.state.backupPhrase)
+    this.setState({
+      backupPhrase: formattedPhrase,
+    })
+
+    this.props.importBackupPhrase(formattedPhrase, false)
   }
 
-  onSubmit = () => {
-    try {
-      this.setState({
-        isSubmitting: true,
-      })
-
-      Keyboard.dismiss()
-      this.props.hideAlert()
-      CeloAnalytics.track(CustomEventNames.import_wallet_submit)
-
-      const formattedPhrase = formatBackupPhraseOnSubmit(this.state.backupPhrase)
-      this.setState({
-        backupPhrase: formattedPhrase,
-      })
-
-      if (!validateMnemonic(formattedPhrase)) {
-        Logger.warn(TAG, 'Invalid mnemonic')
-        this.props.showError(ErrorMessages.INVALID_BACKUP)
-        this.setState({
-          isSubmitting: false,
-        })
-        return
-      }
-
-      this.props.importBackupPhrase(formattedPhrase)
-    } catch (error) {
-      this.setState({
-        isSubmitting: false,
-      })
-      Logger.error(TAG, 'Error importing wallet', error)
-      this.props.showError(ErrorMessages.IMPORT_BACKUP_FAILED)
-    }
-  }
-
-  isBackupPhraseValid() {
-    return this.state.backupPhrase.trim().split(/\s+/g).length >= 12
+  onPressRestoreSocial = () => {
+    navigate(Screens.ImportWalletSocial)
   }
 
   render() {
-    const { backupPhrase, isSubmitting } = this.state
-    const { t, error } = this.props
+    const { backupPhrase } = this.state
+    const { t, isImportingWallet } = this.props
 
     return (
-      <View style={styles.container}>
+      <SafeAreaView style={styles.container}>
+        <NavigationEvents onDidFocus={this.checkCleanBackupPhrase} />
         <KeyboardAwareScrollView
           contentContainerStyle={styles.scrollContainer}
           keyboardShouldPersistTaps="always"
         >
-          <NuxLogo />
-          <Text style={[fontStyles.h1, styles.h1]}>{t('restoreYourWallet.title')}</Text>
-          <Text style={[fontStyles.bodySmall, styles.body]}>
-            {t('restoreYourWallet.userYourBackupKey')}
+          <Image source={backupIcon} style={styles.logo} />
+          <Text style={fontStyles.h1}>{t('title')}</Text>
+          <Text style={fontStyles.body}>{t('userYourBackupKey')}</Text>
+          <BackupPhraseContainer
+            onChangeText={this.setBackupPhrase}
+            value={backupPhrase}
+            testID="ImportWalletBackupKeyInputField"
+            mode={BackupPhraseContainerMode.INPUT}
+            type={BackupPhraseType.BACKUP_KEY}
+            style={componentStyles.marginTop20}
+          />
+          <Text style={styles.tip}>
+            <Text style={fontStyles.semiBold}>{t('tip')}</Text>
+            {t('backupKeyTip')}
           </Text>
-          <Text style={[fontStyles.bodySmall, styles.body]}>{t('backupKeyTip')}</Text>
-          <Text style={[fontStyles.bodySmall, styles.body]}>
-            <Text style={[styles.warning, fontStyles.medium]}>
-              {t('restoreYourWallet.warning')}
-            </Text>
-            {t('restoreYourWallet.restoreInPrivate')}
-          </Text>
-          <View
-            style={[
-              componentStyles.row,
-              styles.backupInput,
-              hasDisplayedError(error) && styles.inputError,
-            ]}
-          >
-            <TextInput
-              onChangeText={this.setBackupPhrase}
-              onEndEditing={this.onEndEditing}
-              value={backupPhrase}
-              style={componentStyles.input}
-              underlineColorAndroid="transparent"
-              placeholder={t('backupKeyPrompt')}
-              placeholderTextColor={colors.inactive}
-              enablesReturnKeyAutomatically={true}
-              multiline={true}
-              autoCorrect={false}
-              autoCapitalize={'none'}
-              testID="ImportWalletBackupKeyInputField"
-            />
-          </View>
         </KeyboardAwareScrollView>
-        {isSubmitting && (
+
+        {isImportingWallet && (
           <View style={styles.loadingSpinnerContainer} testID="ImportWalletLoadingCircle">
             <ActivityIndicator size="large" color={colors.celoGreen} />
           </View>
         )}
+
         <GethAwareButton
-          disabled={isSubmitting || !this.isBackupPhraseValid()}
-          onPress={this.onSubmit}
+          disabled={isImportingWallet || !isValidBackupPhrase(backupPhrase)}
+          onPress={this.onPressRestore}
           text={t('restoreWallet')}
           standard={false}
           type={BtnTypes.PRIMARY}
           testID="ImportWalletButton"
         />
-      </View>
+
+        <Button
+          disabled={isImportingWallet}
+          onPress={this.onPressRestoreSocial}
+          text={t('restoreSocial')}
+          standard={false}
+          type={BtnTypes.SECONDARY}
+          testID="ImportWalletSocialButton"
+        />
+        <KeyboardSpacer />
+      </SafeAreaView>
     )
   }
 }
@@ -199,39 +155,30 @@ const styles = StyleSheet.create({
     backgroundColor: colors.background,
     justifyContent: 'space-between',
   },
-  cancel: {
-    alignItems: 'flex-start',
-  },
   scrollContainer: {
     padding: 20,
     paddingTop: 0,
   },
-  h1: {
-    textAlign: 'center',
-    color: colors.dark,
+  logo: {
+    alignSelf: 'center',
+    height: 75,
+    width: 75,
   },
-  body: {
-    paddingBottom: 15,
-  },
-  warning: {
-    color: colors.errorRed,
-  },
-  backupInput: {
-    height: 124,
+  tip: {
+    ...fontStyles.bodySmall,
+    color: colors.darkSecondary,
+    marginTop: 20,
+    marginHorizontal: 2,
   },
   loadingSpinnerContainer: {
-    marginVertical: 30,
-  },
-  inputError: {
-    borderColor: colors.errorRed,
+    marginVertical: 20,
   },
 })
 
-export default connect<StateProps, DispatchProps, {}, RootState>(
+export default connect<StateProps, DispatchProps, any, RootState>(
   mapStateToProps,
   {
     importBackupPhrase,
-    showError,
     hideAlert,
   }
 )(withNamespaces(Namespaces.nuxRestoreWallet3)(ImportWallet))

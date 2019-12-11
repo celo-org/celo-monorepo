@@ -6,11 +6,11 @@ import BackButton from 'src/components/BackButton'
 import CancelButton from 'src/components/CancelButton'
 import DisconnectBanner from 'src/shared/DisconnectBanner'
 
+export const noHeader = {
+  headerLeft: <View />,
+}
+
 export const nuxNavigationOptions = {
-  headerStyle: {
-    elevation: 0,
-    height: 45,
-  },
   headerLeftContainerStyle: { paddingHorizontal: 10 },
   headerLeft: <BackButton />,
   headerRightContainerStyle: { paddingHorizontal: 10 },

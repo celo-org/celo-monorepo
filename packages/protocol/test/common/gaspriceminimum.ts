@@ -23,7 +23,6 @@ contract('GasPriceMinimum', (accounts: string[]) => {
   const initialGasPriceMinimum = new BigNumber(500)
   const targetDensity = toFixed(1 / 2)
   const adjustmentSpeed = toFixed(1 / 2)
-  const infrastructureFraction = toFixed(1 / 2)
 
   beforeEach(async () => {
     registry = await Registry.new()
@@ -33,8 +32,7 @@ contract('GasPriceMinimum', (accounts: string[]) => {
       registry.address,
       initialGasPriceMinimum,
       targetDensity,
-      adjustmentSpeed,
-      infrastructureFraction
+      adjustmentSpeed
     )
   })
 
@@ -59,19 +57,13 @@ contract('GasPriceMinimum', (accounts: string[]) => {
       assertEqualBN(actualAdjustmentSpeed, adjustmentSpeed)
     })
 
-    it('should set the infrastructure fraction', async () => {
-      const actualInfrastructureFraction = await gasPriceMinimum.infrastructureFraction()
-      assertEqualBN(actualInfrastructureFraction, infrastructureFraction)
-    })
-
     it('should not be callable again', async () => {
       await assertRevert(
         gasPriceMinimum.initialize(
           registry.address,
           initialGasPriceMinimum,
           targetDensity,
-          adjustmentSpeed,
-          infrastructureFraction
+          adjustmentSpeed
         )
       )
     })
@@ -137,38 +129,6 @@ contract('GasPriceMinimum', (accounts: string[]) => {
         gasPriceMinimum.setTargetDensity(newTargetDensity, {
           from: nonOwner,
         })
-      )
-    })
-  })
-
-  describe('#setInfrastructureFraction', () => {
-    const newInfrastructureFraction = toFixed(1 / 3)
-
-    it('should set the adjustment speed', async () => {
-      await gasPriceMinimum.setInfrastructureFraction(newInfrastructureFraction)
-      const actualInfrastructureFraction = await gasPriceMinimum.infrastructureFraction()
-      assertEqualBN(actualInfrastructureFraction, newInfrastructureFraction)
-    })
-
-    it('should emit the InfrastructureFractionSet event', async () => {
-      const resp = await gasPriceMinimum.setInfrastructureFraction(newInfrastructureFraction)
-      assert.equal(resp.logs.length, 1)
-      const log = resp.logs[0]
-      assertLogMatches2(log, {
-        event: 'InfrastructureFractionSet',
-        args: {
-          infrastructureFraction: newInfrastructureFraction,
-        },
-      })
-    })
-
-    it('should revert when the provided fraction is greater than one', async () => {
-      await assertRevert(gasPriceMinimum.setInfrastructureFraction(toFixed(3 / 2)))
-    })
-
-    it('should revert when called by anyone other than the owner', async () => {
-      await assertRevert(
-        gasPriceMinimum.setInfrastructureFraction(newInfrastructureFraction, { from: nonOwner })
       )
     })
   })

@@ -3,62 +3,39 @@
 import { setAndInitializeImplementation } from '@celo/protocol/lib/proxy-utils'
 import { CeloContractName } from '@celo/protocol/lib/registry-utils'
 import { signTransaction } from '@celo/protocol/lib/signing-utils'
+import { privateKeyToAddress } from '@celo/utils/lib/address'
 import { BigNumber } from 'bignumber.js'
-import { ec as EC } from 'elliptic'
-import {
-  EscrowInstance,
-  GoldTokenInstance,
-  MultiSigInstance,
-  OwnableInstance,
-  ProxyContract,
-  ProxyInstance,
-  RegistryInstance,
-  StableTokenInstance,
-} from 'types'
+import { EscrowInstance, GoldTokenInstance, MultiSigInstance, OwnableInstance, ProxyContract, ProxyInstance, RegistryInstance, StableTokenInstance } from 'types'
 import { TransactionObject } from 'web3/eth/types'
 
 import Web3 = require('web3')
 
-const ec = new EC('secp256k1')
-const cachedWeb3 = new Web3()
-
-export function add0x(str: string) {
-  return '0x' + str
-}
-
-export function generatePublicKeyFromPrivateKey(privateKey: string) {
-  const ecPrivateKey = ec.keyFromPrivate(Buffer.from(privateKey, 'hex'))
-  const ecPublicKey: string = ecPrivateKey.getPublic('hex')
-  return ecPublicKey.slice(2)
-}
-
-export function generateAccountAddressFromPrivateKey(privateKey: string) {
-  if (!privateKey.startsWith('0x')) {
-    privateKey = '0x' + privateKey
-  }
-  // @ts-ignore-next-line
-  return cachedWeb3.eth.accounts.privateKeyToAccount(privateKey).address
-}
-
 export async function sendTransactionWithPrivateKey<T>(
   web3: Web3,
-  tx: TransactionObject<T>,
+  tx: TransactionObject<T> | null,
   privateKey: string,
   txArgs: any
 ) {
-  const address = generateAccountAddressFromPrivateKey(privateKey.slice(2))
-  const encodedTxData = tx.encodeABI()
-  const estimatedGas = await tx.estimateGas({
-    ...txArgs,
-    from: address,
-  })
+  const address = privateKeyToAddress(privateKey)
+
+  // Encode data and estimate gas or use default values for a transfer.
+  let encodedTxData: string|undefined
+  let estimatedGas = 21000 // Gas cost of a basic transfer.
+  if (tx !== null) {
+    encodedTxData = tx.encodeABI()
+    estimatedGas = await tx.estimateGas({
+      ...txArgs,
+      from: address,
+    })
+  }
+
   const signedTx: any = await signTransaction(
     web3,
     {
       ...txArgs,
       data: encodedTxData,
       from: address,
-      gas: estimatedGas * 2,
+      gas: estimatedGas * 10,
     },
     privateKey
   )
@@ -172,11 +149,14 @@ export async function setInitialProxyImplementation<
     (abi: any) => abi.type === 'function' && abi.name === 'initialize'
   )
 
-  // TODO(Martin): check types, not just argument number
-  checkFunctionArgsLength(args, initializerAbi)
-
-  console.log(`  Setting initial ${Contract.contractName} implementation on proxy`)
-  await setAndInitializeImplementation(web3, proxy, implementation.address, initializerAbi, ...args)
+  if (initializerAbi) {
+    // TODO(Martin): check types, not just argument number
+    checkFunctionArgsLength(args, initializerAbi)
+    console.log(`  Setting initial ${Contract.contractName} implementation on proxy`)
+    await setAndInitializeImplementation(web3, proxy, implementation.address, initializerAbi, ...args)
+  } else {
+    await proxy._setImplementation(implementation.address)
+  }
 
   return Contract.at(proxy.address) as ContractInstance
 }

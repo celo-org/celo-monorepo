@@ -1,11 +1,13 @@
 import Button, { BtnTypes } from '@celo/react-components/components/Button'
+import KeyboardSpacer from '@celo/react-components/components/KeyboardSpacer'
 import PhoneNumberInput from '@celo/react-components/components/PhoneNumberInput'
 import TextInput from '@celo/react-components/components/TextInput'
 import colors from '@celo/react-components/styles/colors'
 import { fontStyles } from '@celo/react-components/styles/fonts'
 import * as React from 'react'
 import { WithNamespaces, withNamespaces } from 'react-i18next'
-import { ScrollView, StyleSheet, Text, View } from 'react-native'
+import { ScrollView, StyleSheet, Text } from 'react-native'
+import SafeAreaView from 'react-native-safe-area-view'
 import { connect } from 'react-redux'
 import { setName, setPhoneNumber } from 'src/account/actions'
 import { PincodeType } from 'src/account/reducer'
@@ -124,8 +126,13 @@ export class JoinCelo extends React.Component<Props, State> {
       return
     }
 
-    if (!name || !e164Number || !isValidNumber || !countryCode) {
+    if (!e164Number || !isValidNumber || !countryCode) {
       this.props.showError(ErrorMessages.INVALID_PHONE_NUMBER)
+      return
+    }
+
+    if (!name) {
+      this.props.showError(ErrorMessages.MISSING_FULL_NAME)
       return
     }
 
@@ -139,7 +146,7 @@ export class JoinCelo extends React.Component<Props, State> {
     const { name } = this.state
 
     return (
-      <View style={styles.container}>
+      <SafeAreaView style={styles.container}>
         <DevSkipButton nextScreen={Screens.PincodeEducation} />
         <ScrollView
           contentContainerStyle={styles.scrollContainer}
@@ -176,9 +183,9 @@ export class JoinCelo extends React.Component<Props, State> {
               this.props.cachedNumber !== '' ? this.props.cachedNumber : undefined
             }
           />
-          <Text style={[fontStyles.bodyXSmall, styles.disclaimer]}>
+          <Text style={styles.disclaimer}>
             {t('joinText.1')}
-            <Text onPress={this.onPressGoToTerms} style={fontStyles.link}>
+            <Text onPress={this.onPressGoToTerms} style={styles.disclamerLink}>
               {t('joinText.2')}
             </Text>
           </Text>
@@ -191,7 +198,8 @@ export class JoinCelo extends React.Component<Props, State> {
           disabled={!this.state.isValidNumber}
           testID={'JoinCeloContinueButton'}
         />
-      </View>
+        <KeyboardSpacer />
+      </SafeAreaView>
     )
   }
 }
@@ -218,7 +226,12 @@ const styles = StyleSheet.create({
     height: 50,
   },
   disclaimer: {
+    ...fontStyles.bodyXSmall,
     marginTop: 25,
+  },
+  disclamerLink: {
+    ...fontStyles.bodyXSmall,
+    textDecorationLine: 'underline',
   },
 })
 

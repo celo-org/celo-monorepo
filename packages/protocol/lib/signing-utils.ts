@@ -1,5 +1,6 @@
 // Originally taken from https://github.com/ethereum/web3.js/blob/1.x/packages/web3-eth-accounts/src/index.js
 
+import { parseSignature } from "@celo/utils/lib/signatureUtils"
 import { bytes, hash, nat, RLP } from 'eth-lib'
 import * as _ from 'underscore'
 import * as helpers from 'web3-core-helpers'
@@ -26,6 +27,12 @@ function makeEven(hex: string) {
   return hex
 }
 
+export const getParsedSignatureOfAddress = async (web3: Web3, address: string, signer: string) => {
+  const addressHash = web3.utils.soliditySha3({ type: 'address', value: address })
+  const signature = await web3.eth.sign(addressHash, signer)
+  return parseSignature(addressHash, signature, signer)
+}
+
 export async function signTransaction(web3: Web3, txn: any, privateKey: string) {
   let result: any
 
@@ -50,15 +57,17 @@ export async function signTransaction(web3: Web3, txn: any, privateKey: string) 
       transaction.data = tx.data || '0x'
       transaction.value = tx.value || '0x'
       transaction.chainId = utils.numberToHex(tx.chainId)
-      transaction.gasCurrency = tx.gasCurrency || '0x'
-      transaction.gasFeeRecipient = tx.gasFeeRecipient || '0x'
+      transaction.feeCurrency = tx.feeCurrency || '0x'
+      transaction.gatewayFeeRecipient = tx.gatewayFeeRecipient || '0x'
+      transaction.gatewayFee = tx.gatewayFee || '0x'
 
       const rlpEncoded = RLP.encode([
         bytes.fromNat(transaction.nonce),
         bytes.fromNat(transaction.gasPrice),
         bytes.fromNat(transaction.gas),
-        transaction.gasCurrency.toLowerCase(),
-        transaction.gasFeeRecipient.toLowerCase(),
+        transaction.feeCurrency.toLowerCase(),
+        transaction.gatewayFeeRecipient.toLowerCase(),
+        bytes.fromNat(transaction.gatewayFee),
         transaction.to.toLowerCase(),
         bytes.fromNat(transaction.value),
         transaction.data,
@@ -75,21 +84,21 @@ export async function signTransaction(web3: Web3, txn: any, privateKey: string) 
       )
 
       const rawTx = RLP.decode(rlpEncoded)
-        .slice(0, 8)
+        .slice(0, 9)
         .concat(Account.decodeSignature(signature))
 
-      rawTx[8] = makeEven(trimLeadingZero(rawTx[8]))
       rawTx[9] = makeEven(trimLeadingZero(rawTx[9]))
       rawTx[10] = makeEven(trimLeadingZero(rawTx[10]))
+      rawTx[11] = makeEven(trimLeadingZero(rawTx[11]))
 
       const rawTransaction = RLP.encode(rawTx)
 
       const values = RLP.decode(rawTransaction)
       result = {
         messageHash,
-        v: trimLeadingZero(values[8]),
-        r: trimLeadingZero(values[9]),
-        s: trimLeadingZero(values[10]),
+        v: trimLeadingZero(values[9]),
+        r: trimLeadingZero(values[10]),
+        s: trimLeadingZero(values[11]),
         rawTransaction,
       }
     } catch (e) {

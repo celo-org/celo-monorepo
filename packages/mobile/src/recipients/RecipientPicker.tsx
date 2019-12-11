@@ -1,4 +1,5 @@
 import Button, { BtnTypes } from '@celo/react-components/components/Button'
+import KeyboardSpacer from '@celo/react-components/components/KeyboardSpacer'
 import SectionHead from '@celo/react-components/components/SectionHead'
 import TextInput, { TextInputProps } from '@celo/react-components/components/TextInput'
 import withTextInputLabeling from '@celo/react-components/components/WithTextInputLabeling'
@@ -7,8 +8,8 @@ import ForwardChevron from '@celo/react-components/icons/ForwardChevron'
 import QRCode from '@celo/react-components/icons/QRCode'
 import colors from '@celo/react-components/styles/colors'
 import { fontStyles } from '@celo/react-components/styles/fonts'
+import { isValidAddress } from '@celo/utils/src/address'
 import { parsePhoneNumber } from '@celo/utils/src/phoneNumbers'
-import { isValidAddress } from '@celo/utils/src/signatureUtils'
 import { TranslationFunction } from 'i18next'
 import * as React from 'react'
 import { withNamespaces, WithNamespaces } from 'react-i18next'
@@ -40,12 +41,13 @@ import RecipientItem from 'src/recipients/RecipientItem'
 import { recipientCacheSelector } from 'src/recipients/reducer'
 import { RootState } from 'src/redux/reducers'
 import DisconnectBanner from 'src/shared/DisconnectBanner'
-import { requestContactsPermission } from 'src/utils/androidPermissions'
 import Logger from 'src/utils/Logger'
+import { requestContactsPermission } from 'src/utils/permissions'
 import { assertUnreachable } from 'src/utils/typescript'
 
 const RecipientSearchInput = withTextInputPasteAware(
-  withTextInputLabeling<TextInputProps>(TextInput)
+  withTextInputLabeling<TextInputProps>(TextInput),
+  { right: 22 }
 )
 
 const goToQrCodeScreen = () => {
@@ -263,6 +265,7 @@ export class RecipientPicker extends React.Component<RecipientProps> {
           keyboardShouldPersistTaps="handled"
         />
         {this.renderRequestContactPermission()}
+        <KeyboardSpacer />
       </View>
     )
   }

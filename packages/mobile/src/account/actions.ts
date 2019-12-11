@@ -3,6 +3,7 @@ import { PaymentRequest } from 'src/account/types'
 import CeloAnalytics from 'src/analytics/CeloAnalytics'
 import { DefaultEventNames } from 'src/analytics/constants'
 
+// TODO(Rossy): Remove the _ACTION suffix from these actions for consistency with other other names
 export enum Actions {
   SET_NAME = 'ACCOUNT/SET_NAME',
   SET_PHONE_NUMBER = 'ACCOUNT/SET_PHONE_NUMBER',
@@ -14,9 +15,13 @@ export enum Actions {
   SET_ACCOUNT_CREATION_TIME_ACTION = 'ACCOUNT/SET_ACCOUNT_CREATION_TIME_ACTION',
   SET_BACKUP_COMPLETED_ACTION = 'ACCOUNT/SET_BACKUP_COMPLETED_ACTION',
   SET_BACKUP_DELAYED_ACTION = 'ACCOUNT/SET_BACKUP_DELAYED_ACTION',
-  UPDATE_PAYMENT_REQUESTS = 'ACCOUNT/UPDATE_PAYMENT_REQUESTS',
+  SET_SOCIAL_BACKUP_COMPLETED_ACTION = 'ACCOUNT/SET_SOCIAL_BACKUP_COMPLETED_ACTION',
+  RESET_BACKUP_STATE = 'ACCOUNT/RESET_BACKUP_STATE',
+  UPDATE_INCOMING_PAYMENT_REQUESTS = 'ACCOUNT/UPDATE_INCOMING_PAYMENT_REQUESTS',
+  UPDATE_OUTGOING_PAYMENT_REQUESTS = 'ACCOUNT/UPDATE_OUTGOING_PAYMENT_REQUESTS',
   DISMISS_EARN_REWARDS = 'ACCOUNT/DISMISS_EARN_REWARDS',
   DISMISS_INVITE_FRIENDS = 'ACCOUNT/DISMISS_INVITE_FRIENDS',
+  DISMISS_GET_VERIFIED = 'ACCOUNT/DISMISS_GET_VERIFIED',
   SET_USER_CONTACT_DETAILS = 'ACCOUNT/SET_USER_CONTACT_DETAILS',
 }
 
@@ -66,17 +71,34 @@ export interface SetBackupDelayedAction {
   type: Actions.SET_BACKUP_DELAYED_ACTION
 }
 
-export interface UpdatePaymentRequestsAction {
-  type: Actions.UPDATE_PAYMENT_REQUESTS
+export interface SetSocialBackupCompletedAction {
+  type: Actions.SET_SOCIAL_BACKUP_COMPLETED_ACTION
+}
+
+export interface ResetBackupState {
+  type: Actions.RESET_BACKUP_STATE
+}
+
+export interface UpdateIncomingPaymentRequestsAction {
+  type: Actions.UPDATE_INCOMING_PAYMENT_REQUESTS
   paymentRequests: PaymentRequest[]
 }
 
-export interface DismissEarnRewards {
+export interface UpdateOutgoingPaymentRequestsAction {
+  type: Actions.UPDATE_OUTGOING_PAYMENT_REQUESTS
+  paymentRequests: PaymentRequest[]
+}
+
+export interface DismissEarnRewardsAction {
   type: Actions.DISMISS_EARN_REWARDS
 }
 
-export interface DismissInviteFriends {
+export interface DismissInviteFriendsAction {
   type: Actions.DISMISS_INVITE_FRIENDS
+}
+
+export interface DismissGetVerifiedAction {
+  type: Actions.DISMISS_GET_VERIFIED
 }
 
 export interface SetContactDetailsAction {
@@ -96,9 +118,13 @@ export type ActionTypes =
   | SetAccountCreationAction
   | SetBackupCompletedAction
   | SetBackupDelayedAction
-  | UpdatePaymentRequestsAction
-  | DismissEarnRewards
-  | DismissInviteFriends
+  | SetSocialBackupCompletedAction
+  | ResetBackupState
+  | DismissEarnRewardsAction
+  | DismissInviteFriendsAction
+  | DismissGetVerifiedAction
+  | UpdateIncomingPaymentRequestsAction
+  | UpdateOutgoingPaymentRequestsAction
   | SetContactDetailsAction
 
 export function setName(name: string): SetNameAction {
@@ -152,19 +178,38 @@ export const setBackupDelayed = (): SetBackupDelayedAction => ({
   type: Actions.SET_BACKUP_DELAYED_ACTION,
 })
 
-export const updatePaymentRequests = (
+export const setSocialBackupCompleted = (): SetSocialBackupCompletedAction => ({
+  type: Actions.SET_SOCIAL_BACKUP_COMPLETED_ACTION,
+})
+
+export const resetBackupState = (): ResetBackupState => ({
+  type: Actions.RESET_BACKUP_STATE,
+})
+
+export const updateIncomingPaymentRequests = (
   paymentRequests: PaymentRequest[]
-): UpdatePaymentRequestsAction => ({
-  type: Actions.UPDATE_PAYMENT_REQUESTS,
+): UpdateIncomingPaymentRequestsAction => ({
+  type: Actions.UPDATE_INCOMING_PAYMENT_REQUESTS,
   paymentRequests,
 })
 
-export const dismissEarnRewards = (): DismissEarnRewards => ({
+export const updateOutgoingPaymentRequests = (
+  paymentRequests: PaymentRequest[]
+): UpdateOutgoingPaymentRequestsAction => ({
+  type: Actions.UPDATE_OUTGOING_PAYMENT_REQUESTS,
+  paymentRequests,
+})
+
+export const dismissEarnRewards = (): DismissEarnRewardsAction => ({
   type: Actions.DISMISS_EARN_REWARDS,
 })
 
-export const dismissInviteFriends = (): DismissInviteFriends => ({
+export const dismissInviteFriends = (): DismissInviteFriendsAction => ({
   type: Actions.DISMISS_INVITE_FRIENDS,
+})
+
+export const dismissGetVerified = (): DismissGetVerifiedAction => ({
+  type: Actions.DISMISS_GET_VERIFIED,
 })
 
 export const setUserContactDetails = (

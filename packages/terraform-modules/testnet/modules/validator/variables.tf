@@ -14,7 +14,7 @@ variable celo_env {
 }
 
 variable ethstats_host {
-  type        = "string"
+  type        = string
   description = "Ethstats url or IP address"
 }
 
@@ -38,6 +38,16 @@ variable genesis_content_base64 {
   description = "Content of the genesis file encoded in base64"
 }
 
+variable geth_exporter_docker_image_repository {
+  type        = string
+  description = "Repository of the geth exporter docker image"
+}
+
+variable geth_exporter_docker_image_tag {
+  type        = string
+  description = "Tag of the geth exporter docker image"
+}
+
 variable geth_node_docker_image_repository {
   type        = string
   description = "Repository of the geth docker image"
@@ -53,6 +63,16 @@ variable geth_verbosity {
   description = "Verbosity of the validator nodes"
 }
 
+variable in_memory_discovery_table {
+  type        = bool
+  description = "Specifies whether to use an in memory discovery table"
+}
+
+variable istanbul_request_timeout_ms {
+  type        = number
+  description = "The number of ms for the istanbul request timeout"
+}
+
 variable network_id {
   type        = number
   description = "The network ID number"
@@ -63,6 +83,11 @@ variable network_name {
   description = "Name of the GCP network the validator VM is in"
 }
 
+variable proxied_validator_count {
+  type        = number
+  description = "Number of validator_count validators that are hidden behind proxies"
+}
+
 variable tx_node_count {
   type        = number
   description = "Number of tx-nodes that are created"
@@ -71,9 +96,4 @@ variable tx_node_count {
 variable validator_count {
   type        = number
   description = "Number of validators to create"
-}
-
-variable verification_pool_url {
-  type        = string
-  description = "URL of the verification pool"
 }

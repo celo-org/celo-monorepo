@@ -1,7 +1,7 @@
 {
   "name": "@celo/celocli",
   "description": "CLI Tool for transacting with the Celo protocol",
-  "version": "0.0.18",
+  "version": "0.0.30-beta9",
   "author": "Celo",
   "license": "Apache-2.0",
   "repository": "celo-org/celo-monorepo",
@@ -25,25 +25,28 @@
     "build": "tsc -b .",
     "docs": "yarn oclif-dev readme --multi --dir=../docs/command-line-interface && yarn prettier ../docs/command-line-interface/*.md --write",
     "lint": "tslint -c tslint.json --project tsconfig.json",
-    "prepublishOnly": "yarn run build && oclif-dev manifest && oclif-dev readme",
-    "test": "TZ=UTC jest"
+    "prepack": "yarn run build && oclif-dev manifest && oclif-dev readme",
+    "test:reset": "yarn --cwd ../protocol devchain generate .devchain --migration_override ../dev-utils/src/migration-override.json",
+    "test:livechain": "yarn --cwd ../protocol devchain run .devchain",
+    "test": "TZ=UTC jest --runInBand"
   },
   "dependencies": {
-    "@celo/utils": "0.1.2-dev",
-    "@celo/contractkit": "0.2.0-dev",
+    "@celo/contractkit": "0.2.8-dev",
+    "@celo/utils": "^0.1.0",
     "@oclif/command": "^1",
     "@oclif/config": "^1",
     "@oclif/plugin-help": "^2",
-    "ethereumjs-util": "^5.2.0",
     "bip32": "^1.0.2",
     "bip39": "^2.5.0",
+    "bls12377js": "https://github.com/celo-org/bls12377js#ea09eba5c54fe63617af494a0c198fcc47582e0c",
     "chalk": "^2.4.2",
     "cli-table": "^0.3.1",
     "cli-ux": "^5.3.1",
     "debug": "^4.1.1",
     "elliptic": "^6.4.1",
+    "ethereumjs-util": "^5.2.0",
     "events": "^3.0.0",
-    "firebase": "^6.2.4",
+    "firebase": "^7.2.2",
     "fs-extra": "^8.1.0",
     "moment": "2.24.0",
     "path": "^0.12.7",
@@ -52,18 +55,19 @@
   },
   "devDependencies": {
     "@celo/dev-cli": "^2.0.3",
+    "@celo/dev-utils": "0.0.1-dev",
     "@types/bip32": "^1.0.1",
     "@types/bip39": "^2.4.2",
-    "@types/elliptic": "^6.4.9",
-    "@types/mocha": "^5.2.7",
     "@types/cli-table": "^0.3.0",
     "@types/debug": "^4.1.4",
+    "@types/elliptic": "^6.4.9",
     "@types/fs-extra": "^8.0.0",
+    "@types/mocha": "^5.2.7",
     "@types/node": "^10",
     "@types/web3": "^1.0.18",
     "globby": "^8",
     "prettier": "1.13.5",
-    "typescript": "^3.6.3"
+    "typescript": "^3.7.3"
   },
   "files": [
     "README.md",
@@ -75,25 +79,31 @@
     "commands": "./lib/commands",
     "topics": {
       "account": {
-        "description": "Manage your account, send and receive Celo Gold and Celo Dollars"
-      },
-      "bonds": {
-        "description": "Manage Locked Gold to participate in governance and earn rewards"
+        "description": "Manage your account, keys, and metadata"
       },
       "config": {
         "description": "Configure CLI options which persist across commands"
       },
-      "node": {
-        "description": "Manage your full node"
-      },
-      "validator": {
-        "description": "View validator information and register your own"
-      },
-      "validatorgroup": {
-        "description": "View validator group information and cast votes"
+      "election": {
+        "description": "Participate in and view the state of Validator Elections"
       },
       "exchange": {
-        "description": "Commands for interacting with the Exchange"
+        "description": "Exchange Celo Dollars and Celo Gold via the stability mechanism"
+      },
+      "lockedgold": {
+        "description": "View and manage locked Celo Gold"
+      },
+      "node": {
+        "description": "Manage your Celo node"
+      },
+      "transfer": {
+        "description": "Transfer Celo Gold and Celo Dollars"
+      },
+      "validator": {
+        "description": "View and manage Validators"
+      },
+      "validatorgroup": {
+        "description": "View and manage Validator Groups"
       }
     },
     "bin": "celocli",

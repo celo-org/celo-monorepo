@@ -46,11 +46,21 @@ export class TransactionResult {
 
   /** Get (& wait for) transaction hash */
   getHash() {
-    return this.hashFuture.wait()
+    return this.hashFuture.wait().catch((err) => {
+      // if hashFuture fails => receiptFuture also fails
+      // we wait for it here; so not UnhandlePromise error occurrs
+      this.receiptFuture.wait().catch(() => {
+        // ignore
+      })
+      throw err
+    })
   }
 
   /** Get (& wait for) transaction receipt */
-  waitReceipt() {
+  async waitReceipt() {
+    // Make sure `getHash()` promise is consumed
+    await this.getHash()
+
     return this.receiptFuture.wait()
   }
 }

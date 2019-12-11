@@ -6,9 +6,8 @@ exports[`renders correctly with giant numbers 1`] = `
     Object {
       "borderColor": "#EEEEEE",
       "borderWidth": 1,
-      "flex": 1,
       "justifyContent": "center",
-      "minHeight": 300,
+      "paddingHorizontal": 20,
     }
   }
 >
@@ -71,7 +70,7 @@ exports[`renders correctly with giant numbers 1`] = `
           ]
         }
       >
-        24,000,000.00
+        31,920,000.00
       </Text>
     </View>
     <View
@@ -200,6 +199,195 @@ exports[`renders correctly with giant numbers 1`] = `
   <View
     style={
       Object {
+        "marginBottom": 10,
+        "paddingHorizontal": 50,
+      }
+    }
+  >
+    <View
+      style={
+        Object {
+          "flexDirection": "row",
+          "justifyContent": "space-between",
+          "marginTop": 5,
+        }
+      }
+    >
+      <View
+        style={
+          Object {
+            "alignItems": "flex-start",
+            "flexDirection": "row",
+          }
+        }
+      >
+        <Text
+          style={
+            Object {
+              "color": "#2E3338",
+              "fontFamily": "Hind-Regular",
+              "fontSize": 14,
+              "lineHeight": 20,
+            }
+          }
+        >
+          securityFee
+        </Text>
+        <View
+          accessible={true}
+          focusable={true}
+          hitSlop={
+            Object {
+              "bottom": 10,
+              "left": 10,
+              "right": 10,
+              "top": 10,
+            }
+          }
+          isTVSelectable={true}
+          nativeBackgroundAndroid={
+            Object {
+              "attribute": "selectableItemBackgroundBorderless",
+              "type": "ThemeAttrAndroid",
+            }
+          }
+          onClick={[Function]}
+          onResponderGrant={[Function]}
+          onResponderMove={[Function]}
+          onResponderRelease={[Function]}
+          onResponderTerminate={[Function]}
+          onResponderTerminationRequest={[Function]}
+          onStartShouldSetResponder={[Function]}
+          style={
+            Object {
+              "alignItems": "center",
+              "justifyContent": "flex-end",
+              "paddingHorizontal": 5,
+            }
+          }
+        >
+          <Image
+            source={
+              Object {
+                "testUri": "../../../packages/mobile/src/images/info.png",
+              }
+            }
+            style={
+              Object {
+                "height": 12,
+                "width": 12,
+              }
+            }
+          />
+        </View>
+      </View>
+      <Text
+        style={
+          Object {
+            "color": "#2E3338",
+            "fontFamily": "Hind-Regular",
+            "fontSize": 14,
+            "lineHeight": 20,
+          }
+        }
+      >
+        0.01
+      </Text>
+    </View>
+    <View
+      style={
+        Object {
+          "flexDirection": "row",
+          "justifyContent": "space-between",
+          "marginTop": 5,
+        }
+      }
+    >
+      <View
+        style={
+          Object {
+            "alignItems": "flex-start",
+            "flexDirection": "row",
+          }
+        }
+      >
+        <Text
+          style={
+            Object {
+              "color": "#2E3338",
+              "fontFamily": "Hind-Regular",
+              "fontSize": 14,
+              "lineHeight": 20,
+            }
+          }
+        >
+          exchangeFee
+        </Text>
+        <View
+          accessible={true}
+          focusable={true}
+          hitSlop={
+            Object {
+              "bottom": 10,
+              "left": 10,
+              "right": 10,
+              "top": 10,
+            }
+          }
+          isTVSelectable={true}
+          nativeBackgroundAndroid={
+            Object {
+              "attribute": "selectableItemBackgroundBorderless",
+              "type": "ThemeAttrAndroid",
+            }
+          }
+          onClick={[Function]}
+          onResponderGrant={[Function]}
+          onResponderMove={[Function]}
+          onResponderRelease={[Function]}
+          onResponderTerminate={[Function]}
+          onResponderTerminationRequest={[Function]}
+          onStartShouldSetResponder={[Function]}
+          style={
+            Object {
+              "alignItems": "center",
+              "justifyContent": "flex-end",
+              "paddingHorizontal": 5,
+            }
+          }
+        >
+          <Image
+            source={
+              Object {
+                "testUri": "../../../packages/mobile/src/images/info.png",
+              }
+            }
+            style={
+              Object {
+                "height": 12,
+                "width": 12,
+              }
+            }
+          />
+        </View>
+      </View>
+      <Text
+        style={
+          Object {
+            "color": "#2E3338",
+            "fontFamily": "Hind-Regular",
+            "fontSize": 14,
+            "lineHeight": 20,
+          }
+        }
+      >
+        0.01
+      </Text>
+    </View>
+  </View>
+  <View
+    style={
+      Object {
         "marginBottom": 20,
       }
     }
@@ -217,10 +405,8 @@ exports[`renders correctly with giant numbers 1`] = `
       style={
         Object {
           "alignItems": "center",
-          "flex": 1,
           "justifyContent": "center",
-          "paddingBottom": 20,
-          "paddingTop": 30,
+          "paddingTop": 15,
         }
       }
     >
@@ -337,9 +523,8 @@ exports[`renders correctly with no exchange rate 1`] = `
     Object {
       "borderColor": "#EEEEEE",
       "borderWidth": 1,
-      "flex": 1,
       "justifyContent": "center",
-      "minHeight": 300,
+      "paddingHorizontal": 20,
     }
   }
 >
@@ -480,7 +665,7 @@ exports[`renders correctly with no exchange rate 1`] = `
           ]
         }
       >
-        1.99
+        2.64
       </Text>
     </View>
   </View>
@@ -531,6 +716,195 @@ exports[`renders correctly with no exchange rate 1`] = `
   <View
     style={
       Object {
+        "marginBottom": 10,
+        "paddingHorizontal": 50,
+      }
+    }
+  >
+    <View
+      style={
+        Object {
+          "flexDirection": "row",
+          "justifyContent": "space-between",
+          "marginTop": 5,
+        }
+      }
+    >
+      <View
+        style={
+          Object {
+            "alignItems": "flex-start",
+            "flexDirection": "row",
+          }
+        }
+      >
+        <Text
+          style={
+            Object {
+              "color": "#2E3338",
+              "fontFamily": "Hind-Regular",
+              "fontSize": 14,
+              "lineHeight": 20,
+            }
+          }
+        >
+          securityFee
+        </Text>
+        <View
+          accessible={true}
+          focusable={true}
+          hitSlop={
+            Object {
+              "bottom": 10,
+              "left": 10,
+              "right": 10,
+              "top": 10,
+            }
+          }
+          isTVSelectable={true}
+          nativeBackgroundAndroid={
+            Object {
+              "attribute": "selectableItemBackgroundBorderless",
+              "type": "ThemeAttrAndroid",
+            }
+          }
+          onClick={[Function]}
+          onResponderGrant={[Function]}
+          onResponderMove={[Function]}
+          onResponderRelease={[Function]}
+          onResponderTerminate={[Function]}
+          onResponderTerminationRequest={[Function]}
+          onStartShouldSetResponder={[Function]}
+          style={
+            Object {
+              "alignItems": "center",
+              "justifyContent": "flex-end",
+              "paddingHorizontal": 5,
+            }
+          }
+        >
+          <Image
+            source={
+              Object {
+                "testUri": "../../../packages/mobile/src/images/info.png",
+              }
+            }
+            style={
+              Object {
+                "height": 12,
+                "width": 12,
+              }
+            }
+          />
+        </View>
+      </View>
+      <Text
+        style={
+          Object {
+            "color": "#2E3338",
+            "fontFamily": "Hind-Regular",
+            "fontSize": 14,
+            "lineHeight": 20,
+          }
+        }
+      >
+        0.01
+      </Text>
+    </View>
+    <View
+      style={
+        Object {
+          "flexDirection": "row",
+          "justifyContent": "space-between",
+          "marginTop": 5,
+        }
+      }
+    >
+      <View
+        style={
+          Object {
+            "alignItems": "flex-start",
+            "flexDirection": "row",
+          }
+        }
+      >
+        <Text
+          style={
+            Object {
+              "color": "#2E3338",
+              "fontFamily": "Hind-Regular",
+              "fontSize": 14,
+              "lineHeight": 20,
+            }
+          }
+        >
+          exchangeFee
+        </Text>
+        <View
+          accessible={true}
+          focusable={true}
+          hitSlop={
+            Object {
+              "bottom": 10,
+              "left": 10,
+              "right": 10,
+              "top": 10,
+            }
+          }
+          isTVSelectable={true}
+          nativeBackgroundAndroid={
+            Object {
+              "attribute": "selectableItemBackgroundBorderless",
+              "type": "ThemeAttrAndroid",
+            }
+          }
+          onClick={[Function]}
+          onResponderGrant={[Function]}
+          onResponderMove={[Function]}
+          onResponderRelease={[Function]}
+          onResponderTerminate={[Function]}
+          onResponderTerminationRequest={[Function]}
+          onStartShouldSetResponder={[Function]}
+          style={
+            Object {
+              "alignItems": "center",
+              "justifyContent": "flex-end",
+              "paddingHorizontal": 5,
+            }
+          }
+        >
+          <Image
+            source={
+              Object {
+                "testUri": "../../../packages/mobile/src/images/info.png",
+              }
+            }
+            style={
+              Object {
+                "height": 12,
+                "width": 12,
+              }
+            }
+          />
+        </View>
+      </View>
+      <Text
+        style={
+          Object {
+            "color": "#2E3338",
+            "fontFamily": "Hind-Regular",
+            "fontSize": 14,
+            "lineHeight": 20,
+          }
+        }
+      >
+        0.01
+      </Text>
+    </View>
+  </View>
+  <View
+    style={
+      Object {
         "marginBottom": 20,
       }
     }
@@ -548,10 +922,8 @@ exports[`renders correctly with no exchange rate 1`] = `
       style={
         Object {
           "alignItems": "center",
-          "flex": 1,
           "justifyContent": "center",
-          "paddingBottom": 20,
-          "paddingTop": 30,
+          "paddingTop": 15,
         }
       }
     >

@@ -110,6 +110,15 @@ export function isE164Number(phoneNumber: string) {
   return E164RegEx.test(phoneNumber)
 }
 
+// Actually runs through the parsing instead of using a regex
+export function isE164NumberStrict(phoneNumber: string) {
+  const parsedPhoneNumber = phoneUtil.parse(phoneNumber)
+  if (!phoneUtil.isValidNumber(parsedPhoneNumber)) {
+    return false
+  }
+  return phoneUtil.format(parsedPhoneNumber, PhoneNumberFormat.E164) === phoneNumber
+}
+
 export function parsePhoneNumber(
   phoneNumberRaw: string,
   defaultCountryCode: string
@@ -181,6 +190,10 @@ function handleSpecialCasesForDisplay(parsedNumber: PhoneNumber, countryCode?: n
       return phoneUtil
         .format(parsedNumber, PhoneNumberFormat.INTERNATIONAL)
         .replace(/\+54(\s)?/, '')
+
+    case 231:
+      const formatted = phoneUtil.format(parsedNumber, PhoneNumberFormat.NATIONAL)
+      return formatted && formatted[0] === '0' ? formatted.slice(1) : formatted
 
     default:
       return phoneUtil.format(parsedNumber, PhoneNumberFormat.NATIONAL)

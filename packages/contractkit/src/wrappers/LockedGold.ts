@@ -1,16 +1,16 @@
 import { zip } from '@celo/utils/lib/collections'
 import BigNumber from 'bignumber.js'
-import Web3 from 'web3'
-import { TransactionObject } from 'web3/eth/types'
 import { Address } from '../base'
 import { LockedGold } from '../generated/types/LockedGold'
 import {
   BaseWrapper,
   CeloTransactionObject,
+  NumberLike,
+  parseNumber,
   proxyCall,
   proxySend,
   toBigNumber,
-  wrapSend,
+  tupleParser,
 } from '../wrappers/BaseWrapper'
 
 export interface VotingDetails {
@@ -20,28 +20,22 @@ export interface VotingDetails {
   weight: BigNumber
 }
 
-interface Commitment {
+interface AccountSummary {
+  lockedGold: {
+    total: BigNumber
+    nonvoting: BigNumber
+    requirement: BigNumber
+  }
+  pendingWithdrawals: PendingWithdrawal[]
+}
+
+interface PendingWithdrawal {
   time: BigNumber
   value: BigNumber
 }
 
-export interface Commitments {
-  locked: Commitment[]
-  notified: Commitment[]
-  total: {
-    gold: BigNumber
-    weight: BigNumber
-  }
-}
-
-export enum Roles {
-  Validating = '0',
-  Voting = '1',
-  Rewards = '2',
-}
-
 export interface LockedGoldConfig {
-  maxNoticePeriod: BigNumber
+  unlockingPeriod: BigNumber
 }
 
 /**
@@ -49,248 +43,145 @@ export interface LockedGoldConfig {
  */
 export class LockedGoldWrapper extends BaseWrapper<LockedGold> {
   /**
-   * Notifies a Locked Gold commitment, allowing funds to be withdrawn after the notice
-   *   period.
-   * @param value The amount of the commitment to eventually withdraw.
-   * @param noticePeriod The notice period of the Locked Gold commitment.
-   * @return CeloTransactionObject
+   * Withdraws a gold that has been unlocked after the unlocking period has passed.
+   * @param index The index of the pending withdrawal to withdraw.
    */
-  notifyCommitment: (
-    value: string | number,
-    noticePeriod: string | number
-  ) => CeloTransactionObject<string> = proxySend(this.kit, this.contract.methods.notifyCommitment)
-
-  /**
-   * Creates an account.
-   * @return CeloTransactionObject
-   */
-  createAccount: () => CeloTransactionObject<boolean> = proxySend(
+  withdraw: (index: number) => CeloTransactionObject<void> = proxySend(
     this.kit,
-    this.contract.methods.createAccount
+    this.contract.methods.withdraw
   )
 
   /**
-   * Withdraws a notified commitment after the duration of the notice period.
-   * @param availabilityTime The availability time of the notified commitment.
-   * @return CeloTransactionObject
+   * Locks gold to be used for voting.
+   * The gold to be locked, must be specified as the `tx.value`
    */
-  withdrawCommitment: (
-    availabilityTime: string | number
-  ) => CeloTransactionObject<string> = proxySend(this.kit, this.contract.methods.withdrawCommitment)
+  lock = proxySend(this.kit, this.contract.methods.lock)
 
   /**
-   * Redeems rewards accrued since the last redemption for the specified account.
-   * @return CeloTransactionObject
+   * Unlocks gold that becomes withdrawable after the unlocking period.
+   * @param value The amount of gold to unlock.
    */
-  redeemRewards: () => CeloTransactionObject<string> = proxySend(
+  unlock: (value: NumberLike) => CeloTransactionObject<void> = proxySend(
     this.kit,
-    this.contract.methods.redeemRewards
+    this.contract.methods.unlock,
+    tupleParser(parseNumber)
+  )
+
+  async getPendingWithdrawalsTotalValue(account: Address) {
+    const pendingWithdrawals = await this.getPendingWithdrawals(account)
+    // Ensure there are enough pending withdrawals to relock.
+    const values = pendingWithdrawals.map((pw: PendingWithdrawal) => pw.value)
+    const reducer = (total: BigNumber, pw: BigNumber) => pw.plus(total)
+    return values.reduce(reducer, new BigNumber(0))
+  }
+
+  /**
+   * Relocks gold that has been unlocked but not withdrawn.
+   * @param value The value to relock from pending withdrawals.
+   */
+  async relock(account: Address, value: NumberLike): Promise<Array<CeloTransactionObject<void>>> {
+    const pendingWithdrawals = await this.getPendingWithdrawals(account)
+    // Ensure there are enough pending withdrawals to relock.
+    const totalValue = await this.getPendingWithdrawalsTotalValue(account)
+    if (totalValue.isLessThan(value)) {
+      throw new Error(`Not enough pending withdrawals to relock ${value}`)
+    }
+    // Assert pending withdrawals are sorted by time (increasing), so that we can re-lock starting
+    // with those furthest away from being available (at the end).
+    const throwIfNotSorted = (pw: PendingWithdrawal, i: number) => {
+      if (i > 0 && !pw.time.isGreaterThanOrEqualTo(pendingWithdrawals[i - 1].time)) {
+        throw new Error('Pending withdrawals not sorted by timestamp')
+      }
+    }
+    pendingWithdrawals.forEach(throwIfNotSorted)
+
+    let remainingToRelock = new BigNumber(value)
+    const relockPw = (
+      acc: Array<CeloTransactionObject<void>>,
+      pw: PendingWithdrawal,
+      i: number
+    ) => {
+      const valueToRelock = BigNumber.minimum(pw.value, remainingToRelock)
+      if (!valueToRelock.isZero()) {
+        remainingToRelock = remainingToRelock.minus(valueToRelock)
+        acc.push(this._relock(i, valueToRelock))
+      }
+      return acc
+    }
+    return pendingWithdrawals.reduceRight(relockPw, []) as Array<CeloTransactionObject<void>>
+  }
+
+  /**
+   * Relocks gold that has been unlocked but not withdrawn.
+   * @param index The index of the pending withdrawal to relock from.
+   * @param value The value to relock from the specified pending withdrawal.
+   */
+  _relock: (index: number, value: NumberLike) => CeloTransactionObject<void> = proxySend(
+    this.kit,
+    this.contract.methods.relock,
+    tupleParser(parseNumber, parseNumber)
   )
 
   /**
-   * Adds a Locked Gold commitment to `msg.sender`'s account.
-   * @param noticePeriod The notice period for the commitment.
-   * @return CeloTransactionObject
+   * Returns the total amount of locked gold for an account.
+   * @param account The account.
+   * @return The total amount of locked gold for an account.
    */
-  newCommitment: (noticePeriod: string | number) => CeloTransactionObject<string> = proxySend(
-    this.kit,
-    this.contract.methods.newCommitment
+  getAccountTotalLockedGold = proxyCall(
+    this.contract.methods.getAccountTotalLockedGold,
+    undefined,
+    toBigNumber
   )
 
   /**
-   * Rebonds a notified commitment, with notice period >= the remaining time to
-   * availability.
-   *
-   * @param value The amount of the commitment to rebond.
-   * @param availabilityTime The availability time of the notified commitment.
-   * @return CeloTransactionObject
+   * Returns the total amount of non-voting locked gold for an account.
+   * @param account The account.
+   * @return The total amount of non-voting locked gold for an account.
    */
-  extendCommitment: (
-    value: string | number,
-    availabilityTime: string | number
-  ) => CeloTransactionObject<string> = proxySend(this.kit, this.contract.methods.extendCommitment)
-
-  /**
-   * Returns whether or not a specified account is voting.
-   * @param account The address of the account.
-   * @return Whether or not the account is voting.
-   */
-  isVoting = proxyCall(this.contract.methods.isVoting)
-
-  /**
-   * Query maximum notice period.
-   * @returns Current maximum notice period.
-   */
-  maxNoticePeriod = proxyCall(this.contract.methods.maxNoticePeriod, undefined, toBigNumber)
-
-  /**
-   * Returns the weight of a specified account.
-   * @param _account The address of the account.
-   * @return The weight of the specified account.
-   */
-  getAccountWeight = proxyCall(this.contract.methods.getAccountWeight, undefined, toBigNumber)
-  /**
-   * Get the delegate for a role.
-   * @param account Address of the active account.
-   * @param role one of Roles Enum ("validating", "voting", "rewards")
-   * @return Address of the delegate
-   */
-  getDelegateFromAccountAndRole: (account: string, role: Roles) => Promise<Address> = proxyCall(
-    this.contract.methods.getDelegateFromAccountAndRole
+  getAccountNonvotingLockedGold = proxyCall(
+    this.contract.methods.getAccountNonvotingLockedGold,
+    undefined,
+    toBigNumber
   )
 
   /**
    * Returns current configuration parameters.
    */
-
   async getConfig(): Promise<LockedGoldConfig> {
     return {
-      maxNoticePeriod: await this.maxNoticePeriod(),
+      unlockingPeriod: toBigNumber(await this.contract.methods.unlockingPeriod().call()),
     }
   }
 
-  /**
-   * Get voting details for an address
-   * @param accountOrVoterAddress Accout or Voter address
-   */
-  async getVotingDetails(accountOrVoterAddress: Address): Promise<VotingDetails> {
-    const accountAddress = await this.contract.methods
-      .getAccountFromDelegateAndRole(accountOrVoterAddress, Roles.Voting)
-      .call()
-
+  async getAccountSummary(account: string): Promise<AccountSummary> {
+    const nonvoting = await this.getAccountNonvotingLockedGold(account)
+    const total = await this.getAccountTotalLockedGold(account)
+    const validators = await this.kit.contracts.getValidators()
+    const requirement = await validators.getAccountLockedGoldRequirement(account)
+    const pendingWithdrawals = await this.getPendingWithdrawals(account)
     return {
-      accountAddress,
-      voterAddress: accountOrVoterAddress,
-      weight: await this.getAccountWeight(accountAddress),
-    }
-  }
-
-  async getLockedCommitmentValue(account: Address, noticePeriod: string): Promise<BigNumber> {
-    const commitment = await this.contract.methods.getLockedCommitment(account, noticePeriod).call()
-    return this.getValueFromCommitment(commitment)
-  }
-
-  async getLockedCommitments(account: Address): Promise<Commitment[]> {
-    return this.zipAccountTimesAndValuesToCommitments(
-      account,
-      this.contract.methods.getNoticePeriods,
-      this.getLockedCommitmentValue.bind(this)
-    )
-  }
-
-  async getNotifiedCommitmentValue(account: Address, availTime: string): Promise<BigNumber> {
-    const commitment = await this.contract.methods.getNotifiedCommitment(account, availTime).call()
-    return this.getValueFromCommitment(commitment)
-  }
-
-  async getNotifiedCommitments(account: Address): Promise<Commitment[]> {
-    return this.zipAccountTimesAndValuesToCommitments(
-      account,
-      this.contract.methods.getAvailabilityTimes,
-      this.getNotifiedCommitmentValue.bind(this)
-    )
-  }
-
-  /**
-   * Get commitments for an Account
-   * @param account Account address
-   */
-  async getCommitments(account: Address): Promise<Commitments> {
-    const locked = await this.getLockedCommitments(account)
-    const notified = await this.getNotifiedCommitments(account)
-    const weight = await this.getAccountWeight(account)
-
-    const totalLocked = locked.reduce(
-      (acc, commitment) => acc.plus(commitment.value),
-      new BigNumber(0)
-    )
-    const gold = notified.reduce((acc, commitment) => acc.plus(commitment.value), totalLocked)
-
-    return {
-      locked,
-      notified,
-      total: { weight, gold },
+      lockedGold: {
+        total,
+        nonvoting,
+        requirement,
+      },
+      pendingWithdrawals,
     }
   }
 
   /**
-   * Delegate a Role to another account.
-   * @param account Address of the active account.
-   * @param delegate Address of the delegate
-   * @param role one of Roles Enum ("Validating", "Voting", "Rewards")
-   * @return A CeloTransactionObject
+   * Returns the pending withdrawals from unlocked gold for an account.
+   * @param account The address of the account.
+   * @return The value and timestamp for each pending withdrawal.
    */
-  async delegateRoleTx(
-    account: Address,
-    delegate: Address,
-    role: Roles
-  ): Promise<CeloTransactionObject<void>> {
-    const sig = await this.getParsedSignatureOfAddress(account, delegate)
-    return wrapSend(
-      this.kit,
-      this.contract.methods.delegateRole(role, delegate, sig.v, sig.r, sig.s)
-    )
-  }
-
-  /**
-   * Delegate a Rewards to another account.
-   * @param account Address of the active account.
-   * @param delegate Address of the delegate
-   * @return A CeloTransactionObject
-   */
-  async delegateRewards(account: Address, delegate: Address): Promise<CeloTransactionObject<void>> {
-    return this.delegateRoleTx(account, delegate, Roles.Rewards)
-  }
-
-  /**
-   * Delegate a voting to another account.
-   * @param account Address of the active account.
-   * @param delegate Address of the delegate
-   * @return A CeloTransactionObject
-   */
-  async delegateVoting(account: Address, delegate: Address): Promise<CeloTransactionObject<void>> {
-    return this.delegateRoleTx(account, delegate, Roles.Voting)
-  }
-
-  /**
-   * Delegate a validating to another account.
-   * @param account Address of the active account.
-   * @param delegate Address of the delegate
-   * @return A CeloTransactionObject
-   */
-  async delegateValidating(
-    account: Address,
-    delegate: Address
-  ): Promise<CeloTransactionObject<void>> {
-    return this.delegateRoleTx(account, delegate, Roles.Validating)
-  }
-
-  private getValueFromCommitment(commitment: { 0: string; 1: string }) {
-    return new BigNumber(commitment[0])
-  }
-
-  private async getParsedSignatureOfAddress(address: Address, signer: string) {
-    const hash = Web3.utils.soliditySha3({ type: 'address', value: address })
-    const signature = (await this.kit.web3.eth.sign(hash, signer)).slice(2)
-    return {
-      r: `0x${signature.slice(0, 64)}`,
-      s: `0x${signature.slice(64, 128)}`,
-      v: Web3.utils.hexToNumber(signature.slice(128, 130)) + 27,
-    }
-  }
-
-  private async zipAccountTimesAndValuesToCommitments(
-    account: Address,
-    timesFunc: (account: string) => TransactionObject<string[]>,
-    valueFunc: (account: string, time: string) => Promise<BigNumber>
-  ) {
-    const accountTimes = await timesFunc(account).call()
-    const accountValues = await Promise.all(accountTimes.map((time) => valueFunc(account, time)))
+  async getPendingWithdrawals(account: string) {
+    const withdrawals = await this.contract.methods.getPendingWithdrawals(account).call()
     return zip(
-      // tslint:disable-next-line: no-object-literal-type-assertion
-      (time, value) => ({ time, value } as Commitment),
-      accountTimes.map((time) => new BigNumber(time)),
-      accountValues
+      (time, value) =>
+        // tslint:disable-next-line: no-object-literal-type-assertion
+        ({ time: toBigNumber(time), value: toBigNumber(value) } as PendingWithdrawal),
+      withdrawals[1],
+      withdrawals[0]
     )
   }
 }

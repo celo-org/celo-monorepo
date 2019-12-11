@@ -1,36 +1,67 @@
-import { getPaymentRequests } from 'src/account/selectors'
-import { PaymentRequestStatuses } from 'src/account/types'
+import { getIncomingPaymentRequests, getOutgoingPaymentRequests } from 'src/account/selectors'
+import { PaymentRequestStatus } from 'src/account/types'
 import { paymentRequestDouble } from 'src/paymentRequest/__mocks__'
 
 describe('selectors', () => {
-  describe(getPaymentRequests, () => {
+  describe(getIncomingPaymentRequests, () => {
     it('excludes declined and completed requests', () => {
       const state: any = {
         account: {
-          paymentRequests: [
-            paymentRequestDouble({ status: PaymentRequestStatuses.DECLINED }),
-            paymentRequestDouble({ status: PaymentRequestStatuses.COMPLETED }),
+          incomingPaymentRequests: [
+            paymentRequestDouble({ status: PaymentRequestStatus.DECLINED }),
+            paymentRequestDouble({ status: PaymentRequestStatus.COMPLETED }),
           ],
         },
       }
-      expect(getPaymentRequests(state)).toEqual([])
+      expect(getIncomingPaymentRequests(state)).toEqual([])
     })
 
     it('returns requested payments', () => {
-      const goodRequest = paymentRequestDouble({ status: PaymentRequestStatuses.REQUESTED })
+      const goodRequest = paymentRequestDouble({ status: PaymentRequestStatus.REQUESTED })
 
       const state: any = {
         account: {
-          paymentRequests: [
+          incomingPaymentRequests: [
             paymentRequestDouble({
-              status: PaymentRequestStatuses.COMPLETED,
+              status: PaymentRequestStatus.COMPLETED,
             }),
             goodRequest,
           ],
         },
       }
 
-      expect(getPaymentRequests(state)).toEqual([goodRequest])
+      expect(getIncomingPaymentRequests(state)).toEqual([goodRequest])
+    })
+  })
+
+  describe(getOutgoingPaymentRequests, () => {
+    it('excludes declined and completed requests', () => {
+      const state: any = {
+        account: {
+          outgoingPaymentRequests: [
+            paymentRequestDouble({ status: PaymentRequestStatus.DECLINED }),
+            paymentRequestDouble({ status: PaymentRequestStatus.COMPLETED }),
+          ],
+        },
+      }
+      expect(getOutgoingPaymentRequests(state)).toEqual([])
+    })
+
+    it('returns requested payments', () => {
+      const goodRequest = paymentRequestDouble({ status: PaymentRequestStatus.REQUESTED })
+
+      const state: any = {
+        account: {
+          outgoingPaymentRequests: [
+            paymentRequestDouble({
+              status: PaymentRequestStatus.COMPLETED,
+            }),
+            goodRequest,
+          ],
+        },
+      }
+
+      expect(getOutgoingPaymentRequests(state)).toEqual([goodRequest])
     })
   })
 })

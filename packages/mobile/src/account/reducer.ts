@@ -2,6 +2,7 @@ import { isE164Number } from '@celo/utils/src/phoneNumbers'
 import { Actions, ActionTypes } from 'src/account/actions'
 import { PaymentRequest } from 'src/account/types'
 import { DEV_SETTINGS_ACTIVE_INITIALLY } from 'src/config'
+import { getRehydratePayload, REHYDRATE, RehydrateAction } from 'src/redux/persist-helper'
 import { RootState } from 'src/redux/reducers'
 import { getRemoteTime } from 'src/utils/time'
 
@@ -18,9 +19,12 @@ export interface State {
   accountCreationTime: number
   backupCompleted: boolean
   backupDelayedTime: number
-  paymentRequests: PaymentRequest[]
+  socialBackupCompleted: boolean
+  incomingPaymentRequests: PaymentRequest[]
+  outgoingPaymentRequests: PaymentRequest[]
   dismissedEarnRewards: boolean
   dismissedInviteFriends: boolean
+  dismissedGetVerified: boolean
 }
 
 export enum PincodeType {
@@ -48,15 +52,29 @@ export const initialState = {
   pincodeType: PincodeType.Unset,
   isSettingPin: false,
   accountCreationTime: 99999999999999,
-  paymentRequests: [],
+  incomingPaymentRequests: [],
+  outgoingPaymentRequests: [],
   backupCompleted: false,
   backupDelayedTime: 0,
+  socialBackupCompleted: false,
   dismissedEarnRewards: false,
   dismissedInviteFriends: false,
+  dismissedGetVerified: false,
 }
 
-export const reducer = (state: State | undefined = initialState, action: ActionTypes): State => {
+export const reducer = (
+  state: State | undefined = initialState,
+  action: ActionTypes | RehydrateAction
+): State => {
   switch (action.type) {
+    case REHYDRATE: {
+      // Ignore some persisted properties
+      return {
+        ...state,
+        ...getRehydratePayload(action, 'account'),
+        dismissedGetVerified: false,
+      }
+    }
     case Actions.SET_NAME:
       return {
         ...state,
@@ -115,10 +133,27 @@ export const reducer = (state: State | undefined = initialState, action: ActionT
         ...state,
         backupDelayedTime: getRemoteTime(),
       }
-    case Actions.UPDATE_PAYMENT_REQUESTS:
+    case Actions.SET_SOCIAL_BACKUP_COMPLETED_ACTION:
       return {
         ...state,
-        paymentRequests: action.paymentRequests,
+        socialBackupCompleted: true,
+      }
+    case Actions.RESET_BACKUP_STATE:
+      return {
+        ...state,
+        backupCompleted: false,
+        socialBackupCompleted: false,
+        backupDelayedTime: 0,
+      }
+    case Actions.UPDATE_INCOMING_PAYMENT_REQUESTS:
+      return {
+        ...state,
+        incomingPaymentRequests: action.paymentRequests,
+      }
+    case Actions.UPDATE_OUTGOING_PAYMENT_REQUESTS:
+      return {
+        ...state,
+        outgoingPaymentRequests: action.paymentRequests,
       }
     case Actions.DISMISS_EARN_REWARDS:
       return {
@@ -129,6 +164,11 @@ export const reducer = (state: State | undefined = initialState, action: ActionT
       return {
         ...state,
         dismissedInviteFriends: true,
+      }
+    case Actions.DISMISS_GET_VERIFIED:
+      return {
+        ...state,
+        dismissedGetVerified: true,
       }
     case Actions.SET_USER_CONTACT_DETAILS:
       return {

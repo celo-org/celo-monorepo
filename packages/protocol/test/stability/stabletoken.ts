@@ -1,3 +1,4 @@
+import { CeloContractName } from '@celo/protocol/lib/registry-utils'
 import {
   assertLogMatches,
   assertLogMatches2,
@@ -28,15 +29,17 @@ contract('StableToken', (accounts: string[]) => {
   beforeEach(async () => {
     registry = await Registry.new()
     stableToken = await StableToken.new()
-    await stableToken.initialize(
+    const response = await stableToken.initialize(
       'Celo Dollar',
       'cUSD',
       18,
       registry.address,
       fixed1,
-      SECONDS_IN_A_WEEK
+      SECONDS_IN_A_WEEK,
+      [],
+      []
     )
-    initializationTime = (await web3.eth.getBlock('latest')).timestamp
+    initializationTime = (await web3.eth.getBlock(response.receipt.blockNumber)).timestamp
   })
 
   describe('#initialize()', () => {
@@ -86,7 +89,9 @@ contract('StableToken', (accounts: string[]) => {
           18,
           registry.address,
           fixed1,
-          SECONDS_IN_A_WEEK
+          SECONDS_IN_A_WEEK,
+          [],
+          []
         )
       )
     })
@@ -106,34 +111,32 @@ contract('StableToken', (accounts: string[]) => {
     })
   })
 
-  describe('#setMinter()', () => {
-    const minter = accounts[0]
-    it('should allow owner to set minter', async () => {
-      await stableToken.setMinter(minter)
-      assert.equal(await stableToken.minter(), minter)
-    })
-
-    it('should not allow anyone else to set minter', async () => {
-      await assertRevert(stableToken.setMinter(minter, { from: accounts[1] }))
-    })
-  })
-
   describe('#mint()', () => {
-    const minter = accounts[0]
+    const exchange = accounts[0]
+    const validators = accounts[1]
     beforeEach(async () => {
-      await stableToken.setMinter(minter)
+      await registry.setAddressFor(CeloContractName.Exchange, exchange)
+      await registry.setAddressFor(CeloContractName.Validators, validators)
     })
 
-    it('should allow minter to mint', async () => {
-      await stableToken.mint(minter, amountToMint)
-      const balance = (await stableToken.balanceOf(minter)).toNumber()
+    it('should allow the registered exchange contract to mint', async () => {
+      await stableToken.mint(exchange, amountToMint)
+      const balance = (await stableToken.balanceOf(exchange)).toNumber()
+      assert.equal(balance, amountToMint)
+      const supply = (await stableToken.totalSupply()).toNumber()
+      assert.equal(supply, amountToMint)
+    })
+
+    it('should allow the registered validators contract to mint', async () => {
+      await stableToken.mint(validators, amountToMint, { from: validators })
+      const balance = (await stableToken.balanceOf(validators)).toNumber()
       assert.equal(balance, amountToMint)
       const supply = (await stableToken.totalSupply()).toNumber()
       assert.equal(supply, amountToMint)
     })
 
     it('should not allow anyone else to mint', async () => {
-      await assertRevert(stableToken.mint(minter, amountToMint, { from: accounts[1] }))
+      await assertRevert(stableToken.mint(validators, amountToMint, { from: accounts[2] }))
     })
   })
 
@@ -143,7 +146,7 @@ contract('StableToken', (accounts: string[]) => {
     const comment = 'tacos at lunch'
 
     beforeEach(async () => {
-      await stableToken.setMinter(sender)
+      await registry.setAddressFor(CeloContractName.Exchange, sender)
       await stableToken.mint(sender, amountToMint)
     })
 
@@ -211,12 +214,13 @@ contract('StableToken', (accounts: string[]) => {
     it('should emit an InflationParametersUpdated event', async () => {
       const newUpdatePeriod = SECONDS_IN_A_WEEK + 5
       const res = await stableToken.setInflationParameters(inflationRate, newUpdatePeriod)
+      const latestBlock = await web3.eth.getBlock('latest')
       assertLogMatches2(res.logs[0], {
         event: 'InflationParametersUpdated',
         args: {
           rate: inflationRate,
           updatePeriod: newUpdatePeriod,
-          lastUpdated: initializationTime,
+          lastUpdated: latestBlock.timestamp,
         },
       })
     })
@@ -251,7 +255,7 @@ contract('StableToken', (accounts: string[]) => {
     const mintAmount = 1000
 
     beforeEach(async () => {
-      await stableToken.setMinter(minter)
+      await registry.setAddressFor(CeloContractName.Exchange, minter)
       await stableToken.mint(minter, mintAmount)
     })
 
@@ -350,7 +354,7 @@ contract('StableToken', (accounts: string[]) => {
     const minter = accounts[0]
     const amountToBurn = 5
     beforeEach(async () => {
-      await stableToken.setMinter(minter)
+      await registry.setAddressFor(CeloContractName.Exchange, minter)
       await stableToken.mint(minter, amountToMint)
     })
 
@@ -376,7 +380,7 @@ contract('StableToken', (accounts: string[]) => {
       const amount = new BigNumber(10000000000000000000)
 
       beforeEach(async () => {
-        await stableToken.setMinter(sender)
+        await registry.setAddressFor(CeloContractName.Exchange, sender)
         await stableToken.mint(sender, amount.times(2))
         await stableToken.setInflationParameters(inflationRate, SECONDS_IN_A_WEEK)
         await timeTravel(SECONDS_IN_A_WEEK, web3)
@@ -438,7 +442,7 @@ contract('StableToken', (accounts: string[]) => {
     const transferAmount = 1
 
     beforeEach(async () => {
-      await stableToken.setMinter(sender)
+      await registry.setAddressFor(CeloContractName.Exchange, sender)
       await stableToken.mint(sender, amountToMint)
     })
 
@@ -451,6 +455,22 @@ contract('StableToken', (accounts: string[]) => {
     describe('#approve()', () => {
       it('should set "allowed"', async () => {
         await stableToken.approve(receiver, transferAmount)
+        assert.equal((await stableToken.allowance(sender, receiver)).toNumber(), transferAmount)
+      })
+    })
+
+    describe('#increaseAllowance()', () => {
+      it('should increase "allowed"', async () => {
+        await stableToken.increaseAllowance(receiver, transferAmount)
+        await stableToken.increaseAllowance(receiver, transferAmount)
+        assert.equal((await stableToken.allowance(sender, receiver)).toNumber(), 2 * transferAmount)
+      })
+    })
+
+    describe('#decreaseAllowance()', () => {
+      it('should decrease "allowed"', async () => {
+        await stableToken.approve(receiver, 2 * transferAmount)
+        await stableToken.decreaseAllowance(receiver, transferAmount)
         assert.equal((await stableToken.allowance(sender, receiver)).toNumber(), transferAmount)
       })
     })

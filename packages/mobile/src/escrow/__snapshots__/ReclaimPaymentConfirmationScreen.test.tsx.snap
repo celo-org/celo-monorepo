@@ -1,7 +1,7 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`ReclaimPaymentConfirmationScreen renders correctly 1`] = `
-<View
+<SafeAreaView
   style={
     Object {
       "backgroundColor": "#FFFFFF",
@@ -16,6 +16,7 @@ exports[`ReclaimPaymentConfirmationScreen renders correctly 1`] = `
         Object {
           "backgroundColor": "#FFFFFF",
           "flex": 1,
+          "justifyContent": "space-between",
         },
         undefined,
       ]
@@ -24,8 +25,9 @@ exports[`ReclaimPaymentConfirmationScreen renders correctly 1`] = `
     <RCTScrollView
       contentContainerStyle={
         Object {
-          "flex": 1,
-          "justifyContent": "space-between",
+          "alignItems": "center",
+          "justifyContent": "flex-start",
+          "paddingVertical": 10,
         }
       }
     >
@@ -33,50 +35,39 @@ exports[`ReclaimPaymentConfirmationScreen renders correctly 1`] = `
         <View
           style={
             Object {
-              "backgroundColor": "#FFFFFF",
+              "alignItems": "center",
               "flex": 1,
+              "justifyContent": "center",
+              "marginTop": 10,
             }
           }
         >
-          <View
+          <Text
             style={
-              Object {
-                "alignItems": "center",
-                "flex": 1,
-                "justifyContent": "center",
-                "marginTop": 10,
-              }
+              Array [
+                Object {
+                  "color": "#2E3338",
+                  "fontFamily": "Hind-Light",
+                  "fontSize": 22,
+                  "paddingBottom": 20,
+                  "textAlign": "center",
+                },
+                Object {
+                  "alignSelf": "center",
+                  "color": "#2E3338",
+                  "padding": 10,
+                  "paddingBottom": 10,
+                },
+              ]
             }
           >
-            <Text
-              style={
-                Array [
-                  Object {
-                    "color": "#2E3338",
-                    "fontFamily": "Hind-Light",
-                    "fontSize": 22,
-                    "paddingBottom": 20,
-                    "textAlign": "center",
-                  },
-                  Object {
-                    "alignSelf": "center",
-                    "color": "#2E3338",
-                    "padding": 10,
-                    "paddingBottom": 10,
-                  },
-                ]
-              }
-            >
-              reclaimPayment
-            </Text>
-          </View>
+            reclaimPayment
+          </Text>
         </View>
         <View
           style={
             Object {
-              "flex": 4,
-              "marginHorizontal": 20,
-              "marginVertical": 10,
+              "margin": 20,
             }
           }
         >
@@ -109,7 +100,7 @@ exports[`ReclaimPaymentConfirmationScreen renders correctly 1`] = `
                 resizeMode="contain"
                 source={
                   Object {
-                    "testUri": "../../../src/images/coins-logo.png",
+                    "testUri": "../../../packages/mobile/src/images/coins-logo.png",
                   }
                 }
                 style={
@@ -349,6 +340,7 @@ exports[`ReclaimPaymentConfirmationScreen renders correctly 1`] = `
                   </Text>
                   <View
                     accessible={true}
+                    focusable={true}
                     hitSlop={
                       Object {
                         "bottom": 10,
@@ -364,6 +356,7 @@ exports[`ReclaimPaymentConfirmationScreen renders correctly 1`] = `
                         "type": "ThemeAttrAndroid",
                       }
                     }
+                    onClick={[Function]}
                     onResponderGrant={[Function]}
                     onResponderMove={[Function]}
                     onResponderRelease={[Function]}
@@ -381,7 +374,7 @@ exports[`ReclaimPaymentConfirmationScreen renders correctly 1`] = `
                     <Image
                       source={
                         Object {
-                          "testUri": "../../../src/images/info.png",
+                          "testUri": "../../../packages/mobile/src/images/info.png",
                         }
                       }
                       style={
@@ -490,6 +483,7 @@ exports[`ReclaimPaymentConfirmationScreen renders correctly 1`] = `
       >
         <View
           accessible={true}
+          focusable={false}
           isTVSelectable={true}
           nativeBackgroundAndroid={
             Object {
@@ -497,6 +491,7 @@ exports[`ReclaimPaymentConfirmationScreen renders correctly 1`] = `
               "type": "ThemeAttrAndroid",
             }
           }
+          onClick={[Function]}
           onResponderGrant={[Function]}
           onResponderMove={[Function]}
           onResponderRelease={[Function]}
@@ -578,6 +573,7 @@ exports[`ReclaimPaymentConfirmationScreen renders correctly 1`] = `
       >
         <View
           accessible={true}
+          focusable={true}
           isTVSelectable={true}
           nativeBackgroundAndroid={
             Object {
@@ -585,6 +581,7 @@ exports[`ReclaimPaymentConfirmationScreen renders correctly 1`] = `
               "type": "ThemeAttrAndroid",
             }
           }
+          onClick={[Function]}
           onResponderGrant={[Function]}
           onResponderMove={[Function]}
           onResponderRelease={[Function]}
@@ -645,11 +642,11 @@ exports[`ReclaimPaymentConfirmationScreen renders correctly 1`] = `
       </View>
     </View>
   </View>
-</View>
+</SafeAreaView>
 `;
 
 exports[`ReclaimPaymentConfirmationScreen renders correctly when fee calculation fails 1`] = `
-<View
+<SafeAreaView
   style={
     Object {
       "backgroundColor": "#FFFFFF",
@@ -664,6 +661,7 @@ exports[`ReclaimPaymentConfirmationScreen renders correctly when fee calculation
         Object {
           "backgroundColor": "#FFFFFF",
           "flex": 1,
+          "justifyContent": "space-between",
         },
         undefined,
       ]
@@ -672,8 +670,9 @@ exports[`ReclaimPaymentConfirmationScreen renders correctly when fee calculation
     <RCTScrollView
       contentContainerStyle={
         Object {
-          "flex": 1,
-          "justifyContent": "space-between",
+          "alignItems": "center",
+          "justifyContent": "flex-start",
+          "paddingVertical": 10,
         }
       }
     >
@@ -681,50 +680,39 @@ exports[`ReclaimPaymentConfirmationScreen renders correctly when fee calculation
         <View
           style={
             Object {
-              "backgroundColor": "#FFFFFF",
+              "alignItems": "center",
               "flex": 1,
+              "justifyContent": "center",
+              "marginTop": 10,
             }
           }
         >
-          <View
+          <Text
             style={
-              Object {
-                "alignItems": "center",
-                "flex": 1,
-                "justifyContent": "center",
-                "marginTop": 10,
-              }
+              Array [
+                Object {
+                  "color": "#2E3338",
+                  "fontFamily": "Hind-Light",
+                  "fontSize": 22,
+                  "paddingBottom": 20,
+                  "textAlign": "center",
+                },
+                Object {
+                  "alignSelf": "center",
+                  "color": "#2E3338",
+                  "padding": 10,
+                  "paddingBottom": 10,
+                },
+              ]
             }
           >
-            <Text
-              style={
-                Array [
-                  Object {
-                    "color": "#2E3338",
-                    "fontFamily": "Hind-Light",
-                    "fontSize": 22,
-                    "paddingBottom": 20,
-                    "textAlign": "center",
-                  },
-                  Object {
-                    "alignSelf": "center",
-                    "color": "#2E3338",
-                    "padding": 10,
-                    "paddingBottom": 10,
-                  },
-                ]
-              }
-            >
-              reclaimPayment
-            </Text>
-          </View>
+            reclaimPayment
+          </Text>
         </View>
         <View
           style={
             Object {
-              "flex": 4,
-              "marginHorizontal": 20,
-              "marginVertical": 10,
+              "margin": 20,
             }
           }
         >
@@ -757,7 +745,7 @@ exports[`ReclaimPaymentConfirmationScreen renders correctly when fee calculation
                 resizeMode="contain"
                 source={
                   Object {
-                    "testUri": "../../../src/images/coins-logo.png",
+                    "testUri": "../../../packages/mobile/src/images/coins-logo.png",
                   }
                 }
                 style={
@@ -997,6 +985,7 @@ exports[`ReclaimPaymentConfirmationScreen renders correctly when fee calculation
                   </Text>
                   <View
                     accessible={true}
+                    focusable={true}
                     hitSlop={
                       Object {
                         "bottom": 10,
@@ -1012,6 +1001,7 @@ exports[`ReclaimPaymentConfirmationScreen renders correctly when fee calculation
                         "type": "ThemeAttrAndroid",
                       }
                     }
+                    onClick={[Function]}
                     onResponderGrant={[Function]}
                     onResponderMove={[Function]}
                     onResponderRelease={[Function]}
@@ -1029,7 +1019,7 @@ exports[`ReclaimPaymentConfirmationScreen renders correctly when fee calculation
                     <Image
                       source={
                         Object {
-                          "testUri": "../../../src/images/info.png",
+                          "testUri": "../../../packages/mobile/src/images/info.png",
                         }
                       }
                       style={
@@ -1138,6 +1128,7 @@ exports[`ReclaimPaymentConfirmationScreen renders correctly when fee calculation
       >
         <View
           accessible={true}
+          focusable={false}
           isTVSelectable={true}
           nativeBackgroundAndroid={
             Object {
@@ -1145,6 +1136,7 @@ exports[`ReclaimPaymentConfirmationScreen renders correctly when fee calculation
               "type": "ThemeAttrAndroid",
             }
           }
+          onClick={[Function]}
           onResponderGrant={[Function]}
           onResponderMove={[Function]}
           onResponderRelease={[Function]}
@@ -1226,6 +1218,7 @@ exports[`ReclaimPaymentConfirmationScreen renders correctly when fee calculation
       >
         <View
           accessible={true}
+          focusable={true}
           isTVSelectable={true}
           nativeBackgroundAndroid={
             Object {
@@ -1233,6 +1226,7 @@ exports[`ReclaimPaymentConfirmationScreen renders correctly when fee calculation
               "type": "ThemeAttrAndroid",
             }
           }
+          onClick={[Function]}
           onResponderGrant={[Function]}
           onResponderMove={[Function]}
           onResponderRelease={[Function]}
@@ -1293,11 +1287,11 @@ exports[`ReclaimPaymentConfirmationScreen renders correctly when fee calculation
       </View>
     </View>
   </View>
-</View>
+</SafeAreaView>
 `;
 
 exports[`ReclaimPaymentConfirmationScreen renders correctly when fee calculation fails 2`] = `
-<View
+<SafeAreaView
   style={
     Object {
       "backgroundColor": "#FFFFFF",
@@ -1312,6 +1306,7 @@ exports[`ReclaimPaymentConfirmationScreen renders correctly when fee calculation
         Object {
           "backgroundColor": "#FFFFFF",
           "flex": 1,
+          "justifyContent": "space-between",
         },
         undefined,
       ]
@@ -1320,8 +1315,9 @@ exports[`ReclaimPaymentConfirmationScreen renders correctly when fee calculation
     <RCTScrollView
       contentContainerStyle={
         Object {
-          "flex": 1,
-          "justifyContent": "space-between",
+          "alignItems": "center",
+          "justifyContent": "flex-start",
+          "paddingVertical": 10,
         }
       }
     >
@@ -1329,50 +1325,39 @@ exports[`ReclaimPaymentConfirmationScreen renders correctly when fee calculation
         <View
           style={
             Object {
-              "backgroundColor": "#FFFFFF",
+              "alignItems": "center",
               "flex": 1,
+              "justifyContent": "center",
+              "marginTop": 10,
             }
           }
         >
-          <View
+          <Text
             style={
-              Object {
-                "alignItems": "center",
-                "flex": 1,
-                "justifyContent": "center",
-                "marginTop": 10,
-              }
+              Array [
+                Object {
+                  "color": "#2E3338",
+                  "fontFamily": "Hind-Light",
+                  "fontSize": 22,
+                  "paddingBottom": 20,
+                  "textAlign": "center",
+                },
+                Object {
+                  "alignSelf": "center",
+                  "color": "#2E3338",
+                  "padding": 10,
+                  "paddingBottom": 10,
+                },
+              ]
             }
           >
-            <Text
-              style={
-                Array [
-                  Object {
-                    "color": "#2E3338",
-                    "fontFamily": "Hind-Light",
-                    "fontSize": 22,
-                    "paddingBottom": 20,
-                    "textAlign": "center",
-                  },
-                  Object {
-                    "alignSelf": "center",
-                    "color": "#2E3338",
-                    "padding": 10,
-                    "paddingBottom": 10,
-                  },
-                ]
-              }
-            >
-              reclaimPayment
-            </Text>
-          </View>
+            reclaimPayment
+          </Text>
         </View>
         <View
           style={
             Object {
-              "flex": 4,
-              "marginHorizontal": 20,
-              "marginVertical": 10,
+              "margin": 20,
             }
           }
         >
@@ -1405,7 +1390,7 @@ exports[`ReclaimPaymentConfirmationScreen renders correctly when fee calculation
                 resizeMode="contain"
                 source={
                   Object {
-                    "testUri": "../../../src/images/coins-logo.png",
+                    "testUri": "../../../packages/mobile/src/images/coins-logo.png",
                   }
                 }
                 style={
@@ -1645,6 +1630,7 @@ exports[`ReclaimPaymentConfirmationScreen renders correctly when fee calculation
                   </Text>
                   <View
                     accessible={true}
+                    focusable={true}
                     hitSlop={
                       Object {
                         "bottom": 10,
@@ -1660,6 +1646,7 @@ exports[`ReclaimPaymentConfirmationScreen renders correctly when fee calculation
                         "type": "ThemeAttrAndroid",
                       }
                     }
+                    onClick={[Function]}
                     onResponderGrant={[Function]}
                     onResponderMove={[Function]}
                     onResponderRelease={[Function]}
@@ -1677,7 +1664,7 @@ exports[`ReclaimPaymentConfirmationScreen renders correctly when fee calculation
                     <Image
                       source={
                         Object {
-                          "testUri": "../../../src/images/info.png",
+                          "testUri": "../../../packages/mobile/src/images/info.png",
                         }
                       }
                       style={
@@ -1780,6 +1767,7 @@ exports[`ReclaimPaymentConfirmationScreen renders correctly when fee calculation
       >
         <View
           accessible={true}
+          focusable={false}
           isTVSelectable={true}
           nativeBackgroundAndroid={
             Object {
@@ -1787,6 +1775,7 @@ exports[`ReclaimPaymentConfirmationScreen renders correctly when fee calculation
               "type": "ThemeAttrAndroid",
             }
           }
+          onClick={[Function]}
           onResponderGrant={[Function]}
           onResponderMove={[Function]}
           onResponderRelease={[Function]}
@@ -1868,6 +1857,7 @@ exports[`ReclaimPaymentConfirmationScreen renders correctly when fee calculation
       >
         <View
           accessible={true}
+          focusable={true}
           isTVSelectable={true}
           nativeBackgroundAndroid={
             Object {
@@ -1875,6 +1865,7 @@ exports[`ReclaimPaymentConfirmationScreen renders correctly when fee calculation
               "type": "ThemeAttrAndroid",
             }
           }
+          onClick={[Function]}
           onResponderGrant={[Function]}
           onResponderMove={[Function]}
           onResponderRelease={[Function]}
@@ -1935,5 +1926,5 @@ exports[`ReclaimPaymentConfirmationScreen renders correctly when fee calculation
       </View>
     </View>
   </View>
-</View>
+</SafeAreaView>
 `;

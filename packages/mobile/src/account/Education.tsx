@@ -4,7 +4,7 @@ import colors from '@celo/react-components/styles/colors'
 import { fontStyles } from '@celo/react-components/styles/fonts'
 import * as React from 'react'
 import { WithNamespaces, withNamespaces } from 'react-i18next'
-import { Dimensions, Image, StyleSheet, Text, View, ViewStyle } from 'react-native'
+import { Dimensions, Image, StyleSheet, Text, View } from 'react-native'
 import Swiper from 'react-native-swiper'
 import CeloAnalytics from 'src/analytics/CeloAnalytics'
 import { CustomEventNames } from 'src/analytics/constants'
@@ -93,10 +93,8 @@ class Education extends React.Component<Props, State> {
           showsButtons={false}
           showsPagination={true}
           style={style.swiper}
-          // @ts-ignore
-          dotStyle={passiveDotStyle}
-          // @ts-ignore
-          activeDotStyle={activeDotStyle}
+          dotStyle={style.circlePassive}
+          activeDotStyle={style.circleActive}
           containerStyle={style.swiperContainer}
         >
           {children}
@@ -145,6 +143,12 @@ class Education extends React.Component<Props, State> {
   }
 }
 
+const circle = {
+  flex: 0,
+  backgroundColor: colors.inactive,
+  borderRadius: 8,
+}
+
 const { width } = Dimensions.get('window')
 const style = StyleSheet.create({
   container: {
@@ -189,30 +193,14 @@ const style = StyleSheet.create({
     flex: 1,
     paddingHorizontal: 20,
   },
-  footerLink: {
-    color: colors.celoGreen,
-    textAlign: 'center',
-    marginTop: 10,
-    marginBottom: 25,
-  },
-  circleContainer: {
-    flex: 0,
-    width: PROGRESS_CIRCLE_PASSIVE_SIZE,
-    height: PROGRESS_CIRCLE_PASSIVE_SIZE,
-    alignItems: 'center',
-    justifyContent: 'center',
-    margin: 5,
-  },
-  circle: {
-    flex: 0,
-    backgroundColor: colors.inactive,
-    borderRadius: 8,
-  },
+  circle,
   circlePassive: {
+    ...circle,
     height: PROGRESS_CIRCLE_PASSIVE_SIZE,
     width: PROGRESS_CIRCLE_PASSIVE_SIZE,
   },
   circleActive: {
+    ...circle,
     height: PROGRESS_CIRCLE_ACTIVE_SIZE,
     width: PROGRESS_CIRCLE_ACTIVE_SIZE,
   },
@@ -230,8 +218,5 @@ const style = StyleSheet.create({
     marginBottom: 60,
   },
 })
-
-const activeDotStyle: ViewStyle = StyleSheet.flatten([style.circle, style.circleActive])
-const passiveDotStyle: ViewStyle = StyleSheet.flatten([style.circle, style.circlePassive])
 
 export default componentWithAnalytics(withNamespaces(Namespaces.nuxCurrencyPhoto4)(Education))

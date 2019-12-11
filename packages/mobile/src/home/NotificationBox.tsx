@@ -4,8 +4,9 @@ import * as React from 'react'
 import { withNamespaces, WithNamespaces } from 'react-i18next'
 import { NativeScrollEvent, ScrollView, StyleSheet, View } from 'react-native'
 import { connect } from 'react-redux'
-import { dismissEarnRewards, dismissInviteFriends, PaymentRequest } from 'src/account'
-import { getPaymentRequests } from 'src/account/selectors'
+import { dismissEarnRewards, dismissGetVerified, dismissInviteFriends } from 'src/account/actions'
+import { getIncomingPaymentRequests, getOutgoingPaymentRequests } from 'src/account/selectors'
+import { PaymentRequest } from 'src/account/types'
 import CeloAnalytics from 'src/analytics/CeloAnalytics'
 import { CustomEventNames } from 'src/analytics/constants'
 import { componentWithAnalytics } from 'src/analytics/wrapper'
@@ -14,11 +15,18 @@ import { EscrowedPayment } from 'src/escrow/actions'
 import { getReclaimableEscrowPayments } from 'src/escrow/saga'
 import { setEducationCompleted as setGoldEducationCompleted } from 'src/goldToken/actions'
 import i18n, { Namespaces } from 'src/i18n'
-import { backupIcon, homeIcon, inviteFriendsIcon, rewardsAppIcon } from 'src/images/Images'
+import {
+  backupIcon,
+  getVerifiedIcon,
+  homeIcon,
+  inviteFriendsIcon,
+  rewardsAppIcon,
+} from 'src/images/Images'
 import { navigate } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
-import EscrowedPaymentReminderNotification from 'src/notifications/EscrowedPaymentReminderNotification'
-import PaymentRequestSummaryNotification from 'src/notifications/PaymentRequestSummaryNotification'
+import EscrowedPaymentReminderSummaryNotification from 'src/notifications/EscrowedPaymentReminderSummaryNotification'
+import IncomingPaymentRequestSummaryNotification from 'src/notifications/IncomingPaymentRequestSummaryNotification'
+import OutgoingPaymentRequestSummaryNotification from 'src/notifications/OutgoingPaymentRequestSummaryNotification'
 import SimpleNotification from 'src/notifications/SimpleNotification'
 import { RootState } from 'src/redux/reducers'
 import { isBackupTooLate } from 'src/redux/selectors'
@@ -26,10 +34,13 @@ import { navigateToVerifierApp } from 'src/utils/linking'
 
 interface StateProps {
   backupCompleted: boolean
+  numberVerified: boolean
   goldEducationCompleted: boolean
   dismissedEarnRewards: boolean
   dismissedInviteFriends: boolean
-  paymentRequests: PaymentRequest[]
+  dismissedGetVerified: boolean
+  incomingPaymentRequests: PaymentRequest[]
+  outgoingPaymentRequests: PaymentRequest[]
   backupTooLate: boolean
   sentEscrowPayments: EscrowedPayment[]
 }
@@ -37,6 +48,7 @@ interface StateProps {
 interface DispatchProps {
   dismissEarnRewards: typeof dismissEarnRewards
   dismissInviteFriends: typeof dismissInviteFriends
+  dismissGetVerified: typeof dismissGetVerified
   setGoldEducationCompleted: typeof setGoldEducationCompleted
 }
 
@@ -44,10 +56,13 @@ type Props = DispatchProps & StateProps & WithNamespaces
 
 const mapStateToProps = (state: RootState): StateProps => ({
   backupCompleted: state.account.backupCompleted,
+  numberVerified: state.app.numberVerified,
   goldEducationCompleted: state.goldToken.educationCompleted,
-  paymentRequests: getPaymentRequests(state),
+  incomingPaymentRequests: getIncomingPaymentRequests(state),
+  outgoingPaymentRequests: getOutgoingPaymentRequests(state),
   dismissedEarnRewards: state.account.dismissedEarnRewards,
   dismissedInviteFriends: state.account.dismissedInviteFriends,
+  dismissedGetVerified: state.account.dismissedGetVerified,
   backupTooLate: isBackupTooLate(state),
   sentEscrowPayments: state.escrow.sentEscrowedPayments,
 })
@@ -55,6 +70,7 @@ const mapStateToProps = (state: RootState): StateProps => ({
 const mapDispatchToProps = {
   dismissEarnRewards,
   dismissInviteFriends,
+  dismissGetVerified,
   setGoldEducationCompleted,
 }
 
@@ -68,15 +84,29 @@ export class NotificationBox extends React.Component<Props, State> {
   }
 
   escrowedPaymentReminderNotification = () => {
-    return getReclaimableEscrowPayments(this.props.sentEscrowPayments).map((payment) => (
-      <EscrowedPaymentReminderNotification key={payment.paymentID} payment={payment} />
-    ))
+    const escrowPayments = getReclaimableEscrowPayments(this.props.sentEscrowPayments)
+    if (escrowPayments && escrowPayments.length) {
+      return [<EscrowedPaymentReminderSummaryNotification key={1} payments={escrowPayments} />]
+    }
+    return []
   }
 
-  paymentRequestsNotification = (): Array<React.ReactElement<any>> => {
-    const { paymentRequests } = this.props
-    if (paymentRequests && paymentRequests.length) {
-      return [<PaymentRequestSummaryNotification key={1} requests={paymentRequests} />]
+  incomingPaymentRequestsNotification = (): Array<React.ReactElement<any>> => {
+    const { incomingPaymentRequests } = this.props
+    if (incomingPaymentRequests && incomingPaymentRequests.length) {
+      return [
+        <IncomingPaymentRequestSummaryNotification key={1} requests={incomingPaymentRequests} />,
+      ]
+    }
+    return []
+  }
+
+  outgoingPaymentRequestsNotification = (): Array<React.ReactElement<any>> => {
+    const { outgoingPaymentRequests } = this.props
+    if (outgoingPaymentRequests && outgoingPaymentRequests.length) {
+      return [
+        <OutgoingPaymentRequestSummaryNotification key={1} requests={outgoingPaymentRequests} />,
+      ]
     }
     return []
   }
@@ -85,23 +115,47 @@ export class NotificationBox extends React.Component<Props, State> {
     const {
       t,
       backupCompleted,
+      numberVerified,
       goldEducationCompleted,
       dismissedEarnRewards,
       dismissedInviteFriends,
+      dismissedGetVerified,
     } = this.props
     const actions = []
 
     if (!backupCompleted) {
       actions.push({
-        title: t('getBackupKey'),
-        text: t('setBackupKey'),
+        title: t('backupKeyFlow6:yourBackupKey'),
+        text: t('backupKeyFlow6:backupKeyNotification'),
         image: backupIcon,
         ctaList: [
           {
-            text: t('getBackupKey'),
+            text: t('backupKeyFlow6:getBackupKey'),
             onPress: () => {
               CeloAnalytics.track(CustomEventNames.get_backup_key)
-              navigate(Screens.Backup)
+              navigate(Screens.BackupIntroduction)
+            },
+          },
+        ],
+      })
+    }
+
+    if (!dismissedGetVerified && !numberVerified) {
+      actions.push({
+        title: t('nuxVerification2:notification.title'),
+        text: t('nuxVerification2:notification.body'),
+        image: getVerifiedIcon,
+        ctaList: [
+          {
+            text: t('nuxVerification2:notification.cta'),
+            onPress: () => {
+              navigate(Screens.VerificationEducationScreen)
+            },
+          },
+          {
+            text: t('maybeLater'),
+            onPress: () => {
+              this.props.dismissGetVerified()
             },
           },
         ],
@@ -196,7 +250,7 @@ export class NotificationBox extends React.Component<Props, State> {
           return (
             <View
               key={i}
-              style={this.state.currentIndex === i ? activeDotStyle : passiveDotStyle}
+              style={this.state.currentIndex === i ? styles.circleActive : styles.circlePassive}
             />
           )
         })}
@@ -212,7 +266,8 @@ export class NotificationBox extends React.Component<Props, State> {
 
   render() {
     const notifications = [
-      ...this.paymentRequestsNotification(),
+      ...this.incomingPaymentRequestsNotification(),
+      ...this.outgoingPaymentRequestsNotification(),
       ...this.escrowedPaymentReminderNotification(),
       ...this.generalNotifications(),
     ]
@@ -245,6 +300,12 @@ export class NotificationBox extends React.Component<Props, State> {
 const PROGRESS_CIRCLE_PASSIVE_SIZE = 6
 const PROGRESS_CIRCLE_ACTIVE_SIZE = 8
 
+const circle = {
+  flex: 0,
+  borderRadius: 8,
+  marginHorizontal: 5,
+}
+
 const styles = StyleSheet.create({
   body: {
     maxWidth: variables.width,
@@ -261,25 +322,20 @@ const styles = StyleSheet.create({
     paddingBottom: variables.contentPadding,
     alignItems: 'center',
   },
-  circle: {
-    flex: 0,
-    borderRadius: 8,
-    marginHorizontal: 5,
-  },
+  circle,
   circlePassive: {
+    ...circle,
     backgroundColor: colors.inactive,
     height: PROGRESS_CIRCLE_PASSIVE_SIZE,
     width: PROGRESS_CIRCLE_PASSIVE_SIZE,
   },
   circleActive: {
+    ...circle,
     backgroundColor: colors.celoGreen,
     height: PROGRESS_CIRCLE_ACTIVE_SIZE,
     width: PROGRESS_CIRCLE_ACTIVE_SIZE,
   },
 })
-
-const activeDotStyle = StyleSheet.flatten([styles.circle, styles.circleActive])
-const passiveDotStyle = StyleSheet.flatten([styles.circle, styles.circlePassive])
 
 export default componentWithAnalytics(
   connect<StateProps, DispatchProps, {}, RootState>(

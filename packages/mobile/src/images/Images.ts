@@ -1,6 +1,3 @@
-export const profile = require('src/images/profile.jpg')
-export const defaultAvatar = require('src/images/default-avatar.png')
-
 export const welcomeRocketIcon = require('src/images/welcome-rocket-icon.png')
 export const backupIcon = require('src/images/backup-icon.png')
 export const clockIcon = require('src/images/clock-icon.png')
@@ -35,4 +32,5 @@ export const rewardsAppIcon = require('src/images/Rewards-app-icon.png')
 export const inviteFriendsIcon = require('src/images/Invite-Friends.png')
 export const sendDollar = require('src/images/send-dollar.png')
 export const unknownUserIcon = require('src/images/unknown-user-icon.png')
+export const ringsPlusCircle = require('src/images/rings-plus-circle.png')
 // it looks like jests tests fail when a sub component references image via this file rather than require direct

@@ -1,19 +1,10 @@
-import { CeloContractName } from '@celo/protocol/lib/registry-utils'
-import {
-  assertBalance,
-  assertEqualBN,
-  assertLogMatches2,
-  assertRevert,
-  matchAny,
-  NULL_ADDRESS,
-  stripHexEncoding,
-  timeTravel,
-} from '@celo/protocol/lib/test-utils'
-import { toFixed, multiply, fixed1 } from '@celo/utils/lib/fixidity'
 import BigNumber from 'bignumber.js'
+import { keccak256 } from 'ethereumjs-util'
 import {
-  GovernanceContract,
-  GovernanceInstance,
+  AccountsContract,
+  AccountsInstance,
+  GovernanceTestContract,
+  GovernanceTestInstance,
   MockLockedGoldContract,
   MockLockedGoldInstance,
   RegistryContract,
@@ -22,7 +13,22 @@ import {
   TestTransactionsInstance,
 } from 'types'
 
-const Governance: GovernanceContract = artifacts.require('Governance')
+import { CeloContractName } from '@celo/protocol/lib/registry-utils'
+import {
+  assertBalance,
+  assertEqualBN,
+  assertLogMatches2,
+  assertRevert,
+  matchAny,
+  mineBlocks,
+  NULL_ADDRESS,
+  stripHexEncoding,
+  timeTravel,
+} from '@celo/protocol/lib/test-utils'
+import { fixed1, multiply, toFixed } from '@celo/utils/lib/fixidity'
+
+const Governance: GovernanceTestContract = artifacts.require('GovernanceTest')
+const Accounts: AccountsContract = artifacts.require('Accounts')
 const MockLockedGold: MockLockedGoldContract = artifacts.require('MockLockedGold')
 const Registry: RegistryContract = artifacts.require('Registry')
 const TestTransactions: TestTransactionsContract = artifacts.require('TestTransactions')
@@ -55,10 +61,20 @@ enum VoteValue {
   Yes,
 }
 
+interface Transaction {
+  value: number
+  destination: string
+  data: Buffer
+}
+
+// hard coded in ganache
+const EPOCH = 100
+
 // TODO(asa): Test dequeueProposalsIfReady
 // TODO(asa): Dequeue explicitly to make the gas cost of operations more clear
 contract('Governance', (accounts: string[]) => {
-  let governance: GovernanceInstance
+  let governance: GovernanceTestInstance
+  let accountsInstance: AccountsInstance
   let mockLockedGold: MockLockedGoldInstance
   let testTransactions: TestTransactionsInstance
   let registry: RegistryInstance
@@ -84,11 +100,13 @@ contract('Governance', (accounts: string[]) => {
   const expectedParticipationBaseline = multiply(baselineUpdateFactor, participation).plus(
     multiply(fixed1.minus(baselineUpdateFactor), participationBaseline)
   )
-
-  let transactionSuccess1
-  let transactionSuccess2
-  let transactionFail
+  let transactionSuccess1: Transaction
+  let transactionSuccess2: Transaction
+  let transactionFail: Transaction
+  let proposalHash: Buffer
+  let proposalHashStr: string
   beforeEach(async () => {
+    accountsInstance = await Accounts.new()
     governance = await Governance.new()
     mockLockedGold = await MockLockedGold.new()
     registry = await Registry.new()
@@ -108,9 +126,11 @@ contract('Governance', (accounts: string[]) => {
       baselineUpdateFactor,
       baselineQuorumFactor
     )
+    await registry.setAddressFor(CeloContractName.Accounts, accountsInstance.address)
     await registry.setAddressFor(CeloContractName.LockedGold, mockLockedGold.address)
-    await mockLockedGold.setWeight(account, weight)
-    await mockLockedGold.setTotalWeight(weight)
+    await accountsInstance.createAccount()
+    await mockLockedGold.setAccountTotalLockedGold(account, weight)
+    await mockLockedGold.setTotalLockedGold(weight)
     transactionSuccess1 = {
       value: 0,
       destination: testTransactions.address,
@@ -144,6 +164,18 @@ contract('Governance', (accounts: string[]) => {
         'hex'
       ),
     }
+    proposalHash = keccak256(
+      web3.eth.abi.encodeParameters(
+        ['uint256[]', 'address[]', 'bytes', 'uint256[]'],
+        [
+          [String(transactionSuccess1.value)],
+          [transactionSuccess1.destination.toString()],
+          transactionSuccess1.data,
+          [String(transactionSuccess1.data.length)],
+        ]
+      )
+    ) as Buffer
+    proposalHashStr = '0x' + proposalHash.toString('hex')
   })
 
   describe('#initialize()', () => {
@@ -217,7 +249,7 @@ contract('Governance', (accounts: string[]) => {
   })
 
   describe('#setApprover', () => {
-    const newApprover = accounts[1]
+    const newApprover = accounts[2]
     it('should set the approver', async () => {
       await governance.setApprover(newApprover)
       assert.equal(await governance.approver(), newApprover)
@@ -538,9 +570,7 @@ contract('Governance', (accounts: string[]) => {
 
     it('should revert when called by anyone other than the owner', async () => {
       await assertRevert(
-        governance.setBaselineUpdateFactor(differentBaselineUpdateFactor, {
-          from: nonOwner,
-        })
+        governance.setBaselineUpdateFactor(differentBaselineUpdateFactor, { from: nonOwner })
       )
     })
   })
@@ -572,9 +602,7 @@ contract('Governance', (accounts: string[]) => {
 
     it('should revert when called by anyone other than the owner', async () => {
       await assertRevert(
-        governance.setBaselineQuorumFactor(differentBaselineQuorumFactor, {
-          from: nonOwner,
-        })
+        governance.setBaselineQuorumFactor(differentBaselineQuorumFactor, { from: nonOwner })
       )
     })
   })
@@ -687,6 +715,7 @@ contract('Governance', (accounts: string[]) => {
       const id = await governance.propose.call(
         [transactionSuccess1.value],
         [transactionSuccess1.destination],
+        // @ts-ignore bytes type
         transactionSuccess1.data,
         [transactionSuccess1.data.length],
         // @ts-ignore: TODO(mcortesi) fix typings for TransactionDetails
@@ -699,6 +728,7 @@ contract('Governance', (accounts: string[]) => {
       await governance.propose(
         [transactionSuccess1.value],
         [transactionSuccess1.destination],
+        // @ts-ignore bytes type
         transactionSuccess1.data,
         [transactionSuccess1.data.length],
         // @ts-ignore: TODO(mcortesi) fix typings for TransactionDetails
@@ -711,6 +741,7 @@ contract('Governance', (accounts: string[]) => {
       await governance.propose(
         [transactionSuccess1.value],
         [transactionSuccess1.destination],
+        // @ts-ignore bytes type
         transactionSuccess1.data,
         [transactionSuccess1.data.length],
         // @ts-ignore: TODO(mcortesi) fix typings for TransactionDetails
@@ -758,6 +789,7 @@ contract('Governance', (accounts: string[]) => {
         await governance.propose(
           [transactionSuccess1.value],
           [transactionSuccess1.destination],
+          // @ts-ignore bytes type
           transactionSuccess1.data,
           [transactionSuccess1.data.length],
           // @ts-ignore: TODO(mcortesi) fix typings for TransactionDetails
@@ -775,6 +807,7 @@ contract('Governance', (accounts: string[]) => {
         await governance.propose(
           [transactionSuccess1.value],
           [transactionSuccess1.destination],
+          // @ts-ignore bytes type
           transactionSuccess1.data,
           [transactionSuccess1.data.length],
           // @ts-ignore: TODO(mcortesi) fix typings for TransactionDetails
@@ -794,6 +827,7 @@ contract('Governance', (accounts: string[]) => {
         const resp = await governance.propose(
           [transactionSuccess1.value],
           [transactionSuccess1.destination],
+          // @ts-ignore bytes type
           transactionSuccess1.data,
           [transactionSuccess1.data.length],
           // @ts-ignore: TODO(mcortesi) fix typings for TransactionDetails
@@ -893,6 +927,7 @@ contract('Governance', (accounts: string[]) => {
         await governance.propose(
           [transactionSuccess1.value],
           [transactionSuccess1.destination],
+          // @ts-ignore bytes type
           transactionSuccess1.data,
           [transactionSuccess1.data.length],
           // @ts-ignore: TODO(mcortesi) fix typings for TransactionDetails
@@ -905,6 +940,7 @@ contract('Governance', (accounts: string[]) => {
         await governance.propose(
           [transactionSuccess1.value],
           [transactionSuccess1.destination],
+          // @ts-ignore bytes type
           transactionSuccess1.data,
           [transactionSuccess1.data.length],
           // @ts-ignore: TODO(mcortesi) fix typings for TransactionDetails
@@ -920,10 +956,11 @@ contract('Governance', (accounts: string[]) => {
   describe('#upvote()', () => {
     const proposalId = new BigNumber(1)
     beforeEach(async () => {
-      await mockLockedGold.setWeight(account, weight)
+      await mockLockedGold.setAccountTotalLockedGold(account, weight)
       await governance.propose(
         [transactionSuccess1.value],
         [transactionSuccess1.destination],
+        // @ts-ignore bytes type
         transactionSuccess1.data,
         [transactionSuccess1.data.length],
         // @ts-ignore: TODO(mcortesi) fix typings for TransactionDetails
@@ -938,7 +975,9 @@ contract('Governance', (accounts: string[]) => {
 
     it('should mark the account as having upvoted the proposal', async () => {
       await governance.upvote(proposalId, 0, 0)
-      assertEqualBN(await governance.getUpvotedProposal(account), proposalId)
+      const [recordId, recordWeight] = await governance.getUpvoteRecord(account)
+      assertEqualBN(recordId, proposalId)
+      assertEqualBN(recordWeight, weight)
     })
 
     it('should return true', async () => {
@@ -960,16 +999,6 @@ contract('Governance', (accounts: string[]) => {
       })
     })
 
-    it('should revert when the account is frozen', async () => {
-      await mockLockedGold.setVotingFrozen(account)
-      await assertRevert(governance.upvote(proposalId, 0, 0))
-    })
-
-    it('should revert when the account weight is 0', async () => {
-      await mockLockedGold.setWeight(account, 0)
-      await assertRevert(governance.upvote(proposalId, 0, 0))
-    })
-
     it('should revert when upvoting a proposal that is not queued', async () => {
       await assertRevert(governance.upvote(proposalId.plus(1), 0, 0))
     })
@@ -980,6 +1009,7 @@ contract('Governance', (accounts: string[]) => {
         await governance.propose(
           [transactionSuccess1.value],
           [transactionSuccess1.destination],
+          // @ts-ignore bytes type
           transactionSuccess1.data,
           [transactionSuccess1.data.length],
           // @ts-ignore: TODO(mcortesi) fix typings for TransactionDetails
@@ -1003,14 +1033,15 @@ contract('Governance', (accounts: string[]) => {
         await governance.propose(
           [transactionSuccess1.value],
           [transactionSuccess1.destination],
+          // @ts-ignore bytes type
           transactionSuccess1.data,
           [transactionSuccess1.data.length],
           // @ts-ignore: TODO(mcortesi) fix typings for TransactionDetails
           { value: minDeposit }
         )
         const otherAccount = accounts[1]
-        await mockLockedGold.setWeight(otherAccount, weight)
-        await mockLockedGold.setTotalWeight(weight * 2)
+        await accountsInstance.createAccount({ from: otherAccount })
+        await mockLockedGold.setAccountTotalLockedGold(otherAccount, weight)
         await governance.upvote(otherProposalId, proposalId, 0, { from: otherAccount })
         await timeTravel(queueExpiry, web3)
       })
@@ -1046,6 +1077,7 @@ contract('Governance', (accounts: string[]) => {
         await governance.propose(
           [transactionSuccess1.value],
           [transactionSuccess1.destination],
+          // @ts-ignore bytes type
           transactionSuccess1.data,
           [transactionSuccess1.data.length],
           // @ts-ignore: TODO(mcortesi) fix typings for TransactionDetails
@@ -1069,15 +1101,78 @@ contract('Governance', (accounts: string[]) => {
         await assertRevert(governance.upvote(proposalId, 0, 0))
       })
     })
+
+    describe('when the previously upvoted proposal is in the queue and expired', () => {
+      const upvotedProposalId = 2
+      // Expire the upvoted proposal without dequeueing it.
+      const queueExpiry = 60
+      beforeEach(async () => {
+        await governance.setQueueExpiry(60)
+        await governance.upvote(proposalId, 0, 0)
+        await timeTravel(queueExpiry, web3)
+        await governance.propose(
+          [transactionSuccess1.value],
+          [transactionSuccess1.destination],
+          // @ts-ignore
+          transactionSuccess1.data,
+          [transactionSuccess1.data.length],
+          // @ts-ignore: TODO(mcortesi) fix typings for TransactionDetails
+          { value: minDeposit }
+        )
+      })
+
+      it('should increase the number of upvotes for the proposal', async () => {
+        await governance.upvote(upvotedProposalId, 0, 0)
+        assertEqualBN(await governance.getUpvotes(upvotedProposalId), weight)
+      })
+
+      it('should mark the account as having upvoted the proposal', async () => {
+        await governance.upvote(upvotedProposalId, 0, 0)
+        const [recordId, recordWeight] = await governance.getUpvoteRecord(account)
+        assertEqualBN(recordId, upvotedProposalId)
+        assertEqualBN(recordWeight, weight)
+      })
+
+      it('should return true', async () => {
+        const success = await governance.upvote.call(upvotedProposalId, 0, 0)
+        assert.isTrue(success)
+      })
+
+      it('should emit the ProposalExpired event', async () => {
+        const resp = await governance.upvote(upvotedProposalId, 0, 0)
+        assert.equal(resp.logs.length, 2)
+        const log = resp.logs[0]
+        assertLogMatches2(log, {
+          event: 'ProposalExpired',
+          args: {
+            proposalId: new BigNumber(proposalId),
+          },
+        })
+      })
+      it('should emit the ProposalUpvoted event', async () => {
+        const resp = await governance.upvote(upvotedProposalId, 0, 0)
+        assert.equal(resp.logs.length, 2)
+        const log = resp.logs[1]
+        assertLogMatches2(log, {
+          event: 'ProposalUpvoted',
+          args: {
+            proposalId: new BigNumber(upvotedProposalId),
+            account,
+            upvotes: new BigNumber(weight),
+          },
+        })
+      })
+    })
   })
 
   describe('#revokeUpvote()', () => {
     const proposalId = new BigNumber(1)
     beforeEach(async () => {
-      await mockLockedGold.setWeight(account, weight)
+      await mockLockedGold.setAccountTotalLockedGold(account, weight)
       await governance.propose(
         [transactionSuccess1.value],
         [transactionSuccess1.destination],
+        // @ts-ignore bytes type
         transactionSuccess1.data,
         [transactionSuccess1.data.length],
         // @ts-ignore: TODO(mcortesi) fix typings for TransactionDetails
@@ -1098,12 +1193,9 @@ contract('Governance', (accounts: string[]) => {
 
     it('should mark the account as not having upvoted a proposal', async () => {
       await governance.revokeUpvote(0, 0)
-      assertEqualBN(await governance.getUpvotedProposal(account), 0)
-    })
-
-    it('should succeed when the account is frozen', async () => {
-      await mockLockedGold.setVotingFrozen(account)
-      await governance.revokeUpvote(0, 0)
+      const [recordId, recordWeight] = await governance.getUpvoteRecord(account)
+      assertEqualBN(recordId, 0)
+      assertEqualBN(recordWeight, 0)
     })
 
     it('should emit the ProposalUpvoteRevoked event', async () => {
@@ -1125,11 +1217,6 @@ contract('Governance', (accounts: string[]) => {
       await assertRevert(governance.revokeUpvote(0, 0))
     })
 
-    it('should revert when the account weight is 0', async () => {
-      await mockLockedGold.setWeight(account, 0)
-      await assertRevert(governance.revokeUpvote(0, 0))
-    })
-
     describe('when the upvoted proposal has expired', () => {
       beforeEach(async () => {
         await timeTravel(queueExpiry, web3)
@@ -1145,7 +1232,9 @@ contract('Governance', (accounts: string[]) => {
 
       it('should mark the account as not having upvoted a proposal', async () => {
         await governance.revokeUpvote(0, 0)
-        assertEqualBN(await governance.getUpvotedProposal(account), 0)
+        const [recordId, recordWeight] = await governance.getUpvoteRecord(account)
+        assertEqualBN(recordId, 0)
+        assertEqualBN(recordWeight, 0)
       })
 
       it('should emit the ProposalExpired event', async () => {
@@ -1175,7 +1264,9 @@ contract('Governance', (accounts: string[]) => {
 
       it('should mark the account as not having upvoted a proposal', async () => {
         await governance.revokeUpvote(0, 0)
-        assertEqualBN(await governance.getUpvotedProposal(account), 0)
+        const [recordId, recordWeight] = await governance.getUpvoteRecord(account)
+        assertEqualBN(recordId, 0)
+        assertEqualBN(recordWeight, 0)
       })
     })
   })
@@ -1187,6 +1278,7 @@ contract('Governance', (accounts: string[]) => {
       await governance.propose(
         [transactionSuccess1.value],
         [transactionSuccess1.destination],
+        // @ts-ignore bytes type
         transactionSuccess1.data,
         [transactionSuccess1.data.length],
         // @ts-ignore: TODO(mcortesi) fix typings for TransactionDetails
@@ -1222,6 +1314,7 @@ contract('Governance', (accounts: string[]) => {
       await governance.propose(
         [transactionSuccess1.value],
         [transactionSuccess1.destination],
+        // @ts-ignore bytes type
         transactionSuccess1.data,
         [transactionSuccess1.data.length],
         // @ts-ignore: TODO(mcortesi) fix typings for TransactionDetails
@@ -1269,6 +1362,7 @@ contract('Governance', (accounts: string[]) => {
       await governance.propose(
         [transactionSuccess1.value],
         [transactionSuccess1.destination],
+        // @ts-ignore bytes type
         transactionSuccess1.data,
         [transactionSuccess1.data.length],
         // @ts-ignore: TODO(mcortesi) fix typings for TransactionDetails
@@ -1287,6 +1381,7 @@ contract('Governance', (accounts: string[]) => {
       await governance.propose(
         [transactionSuccess1.value],
         [transactionSuccess1.destination],
+        // @ts-ignore bytes type
         transactionSuccess1.data,
         [transactionSuccess1.data.length],
         // @ts-ignore: TODO(mcortesi) fix typings for TransactionDetails
@@ -1306,6 +1401,7 @@ contract('Governance', (accounts: string[]) => {
         await governance.propose(
           [transactionSuccess1.value],
           [transactionSuccess1.destination],
+          // @ts-ignore bytes type
           transactionSuccess1.data,
           [transactionSuccess1.data.length],
           // @ts-ignore: TODO(mcortesi) fix typings for TransactionDetails
@@ -1351,6 +1447,7 @@ contract('Governance', (accounts: string[]) => {
       await governance.propose(
         [transactionSuccess1.value],
         [transactionSuccess1.destination],
+        // @ts-ignore bytes type
         transactionSuccess1.data,
         [transactionSuccess1.data.length],
         // @ts-ignore: TODO(mcortesi) fix typings for TransactionDetails
@@ -1359,7 +1456,7 @@ contract('Governance', (accounts: string[]) => {
       await timeTravel(dequeueFrequency, web3)
       await governance.approve(proposalId, index)
       await timeTravel(approvalStageDuration, web3)
-      await mockLockedGold.setWeight(account, weight)
+      await mockLockedGold.setAccountTotalLockedGold(account, weight)
     })
 
     it('should return true', async () => {
@@ -1403,13 +1500,8 @@ contract('Governance', (accounts: string[]) => {
       })
     })
 
-    it('should revert when the account is frozen', async () => {
-      await mockLockedGold.setVotingFrozen(account)
-      await assertRevert(governance.vote(proposalId, index, value))
-    })
-
     it('should revert when the account weight is 0', async () => {
-      await mockLockedGold.setWeight(account, 0)
+      await mockLockedGold.setAccountTotalLockedGold(account, 0)
       await assertRevert(governance.vote(proposalId, index, value))
     })
 
@@ -1417,6 +1509,7 @@ contract('Governance', (accounts: string[]) => {
       await governance.propose(
         [transactionSuccess1.value],
         [transactionSuccess1.destination],
+        // @ts-ignore bytes type
         transactionSuccess1.data,
         [transactionSuccess1.data.length],
         // @ts-ignore: TODO(mcortesi) fix typings for TransactionDetails
@@ -1544,6 +1637,7 @@ contract('Governance', (accounts: string[]) => {
           await governance.propose(
             [transactionSuccess1.value],
             [transactionSuccess1.destination],
+            // @ts-ignore bytes type
             transactionSuccess1.data,
             [transactionSuccess1.data.length],
             // @ts-ignore: TODO(mcortesi) fix typings for TransactionDetails
@@ -1552,7 +1646,7 @@ contract('Governance', (accounts: string[]) => {
           await timeTravel(dequeueFrequency, web3)
           await governance.approve(proposalId, index)
           await timeTravel(approvalStageDuration, web3)
-          await mockLockedGold.setWeight(account, weight)
+          await mockLockedGold.setAccountTotalLockedGold(account, weight)
           await governance.vote(proposalId, index, value)
           await timeTravel(referendumStageDuration, web3)
         })
@@ -1608,6 +1702,7 @@ contract('Governance', (accounts: string[]) => {
           await governance.propose(
             [transactionFail.value],
             [transactionFail.destination],
+            // @ts-ignore bytes type
             transactionFail.data,
             [transactionFail.data.length],
             // @ts-ignore: TODO(mcortesi) fix typings for TransactionDetails
@@ -1616,7 +1711,31 @@ contract('Governance', (accounts: string[]) => {
           await timeTravel(dequeueFrequency, web3)
           await governance.approve(proposalId, index)
           await timeTravel(approvalStageDuration, web3)
-          await mockLockedGold.setWeight(account, weight)
+          await mockLockedGold.setAccountTotalLockedGold(account, weight)
+          await governance.vote(proposalId, index, value)
+          await timeTravel(referendumStageDuration, web3)
+        })
+
+        it('should revert', async () => {
+          await assertRevert(governance.execute(proposalId, index))
+        })
+      })
+
+      describe('when the proposal cannot execute because it is not a contract address', () => {
+        beforeEach(async () => {
+          await governance.propose(
+            [transactionSuccess1.value],
+            [accounts[1]],
+            // @ts-ignore
+            transactionSuccess1.data,
+            [transactionSuccess1.data.length],
+            // @ts-ignore: TODO(mcortesi) fix typings for TransactionDetails
+            { value: minDeposit }
+          )
+          await timeTravel(dequeueFrequency, web3)
+          await governance.approve(proposalId, index)
+          await timeTravel(approvalStageDuration, web3)
+          await mockLockedGold.setAccountTotalLockedGold(account, weight)
           await governance.vote(proposalId, index, value)
           await timeTravel(referendumStageDuration, web3)
         })
@@ -1642,7 +1761,7 @@ contract('Governance', (accounts: string[]) => {
           await timeTravel(dequeueFrequency, web3)
           await governance.approve(proposalId, index)
           await timeTravel(approvalStageDuration, web3)
-          await mockLockedGold.setWeight(account, weight)
+          await mockLockedGold.setAccountTotalLockedGold(account, weight)
           await governance.vote(proposalId, index, value)
           await timeTravel(referendumStageDuration, web3)
         })
@@ -1709,7 +1828,7 @@ contract('Governance', (accounts: string[]) => {
             await timeTravel(dequeueFrequency, web3)
             await governance.approve(proposalId, index)
             await timeTravel(approvalStageDuration, web3)
-            await mockLockedGold.setWeight(account, weight)
+            await mockLockedGold.setAccountTotalLockedGold(account, weight)
             await governance.vote(proposalId, index, value)
             await timeTravel(referendumStageDuration, web3)
           })
@@ -1733,7 +1852,7 @@ contract('Governance', (accounts: string[]) => {
             await timeTravel(dequeueFrequency, web3)
             await governance.approve(proposalId, index)
             await timeTravel(approvalStageDuration, web3)
-            await mockLockedGold.setWeight(account, weight)
+            await mockLockedGold.setAccountTotalLockedGold(account, weight)
             await governance.vote(proposalId, index, value)
             await timeTravel(referendumStageDuration, web3)
           })
@@ -1750,6 +1869,7 @@ contract('Governance', (accounts: string[]) => {
         await governance.propose(
           [transactionSuccess1.value],
           [transactionSuccess1.destination],
+          // @ts-ignore bytes type
           transactionSuccess1.data,
           [transactionSuccess1.data.length],
           // @ts-ignore: TODO(mcortesi) fix typings for TransactionDetails
@@ -1758,7 +1878,7 @@ contract('Governance', (accounts: string[]) => {
         await timeTravel(dequeueFrequency, web3)
         await governance.approve(proposalId, index)
         await timeTravel(approvalStageDuration, web3)
-        await mockLockedGold.setWeight(account, weight)
+        await mockLockedGold.setAccountTotalLockedGold(account, weight)
         await governance.vote(proposalId, index, value)
         await timeTravel(referendumStageDuration, web3)
         await timeTravel(executionStageDuration, web3)
@@ -1806,6 +1926,202 @@ contract('Governance', (accounts: string[]) => {
     })
   })
 
+  describe('#approveHotfix()', () => {
+    it('should mark the hotfix record approved when called by approver', async () => {
+      await governance.approveHotfix(proposalHashStr, { from: approver })
+      const [approved, ,] = await governance.getHotfixRecord.call(proposalHashStr)
+      assert.isTrue(approved)
+    })
+
+    it('should emit the HotfixApproved event', async () => {
+      const resp = await governance.approveHotfix(proposalHashStr, { from: approver })
+      assert.equal(resp.logs.length, 1)
+      const log = resp.logs[0]
+      assertLogMatches2(log, {
+        event: 'HotfixApproved',
+        args: {
+          hash: matchAny,
+        },
+      })
+      assert.isTrue(Buffer.from(stripHexEncoding(log.args.hash), 'hex').equals(proposalHash))
+    })
+
+    it('should revert when called by non-approver', async () => {
+      await assertRevert(governance.approveHotfix(proposalHashStr, { from: accounts[2] }))
+    })
+  })
+
+  describe('#whitelistHotfix()', () => {
+    beforeEach(async () => {
+      // from GovernanceTest
+      await governance.addValidator(accounts[2])
+      await governance.addValidator(accounts[3])
+    })
+
+    it('should emit the HotfixWhitelist event', async () => {
+      const resp = await governance.whitelistHotfix(proposalHashStr, { from: accounts[3] })
+      assert.equal(resp.logs.length, 1)
+      const log = resp.logs[0]
+      assertLogMatches2(log, {
+        event: 'HotfixWhitelisted',
+        args: {
+          hash: matchAny,
+          whitelister: accounts[3],
+        },
+      })
+      assert.isTrue(Buffer.from(stripHexEncoding(log.args.hash), 'hex').equals(proposalHash))
+    })
+  })
+
+  describe('#isHotfixPassing', () => {
+    beforeEach(async () => {
+      await governance.addValidator(accounts[2])
+      await governance.addValidator(accounts[3])
+      await accountsInstance.createAccount({ from: accounts[2] })
+      await accountsInstance.createAccount({ from: accounts[3] })
+    })
+
+    it('should return false when hotfix has not been whitelisted', async () => {
+      const passing = await governance.isHotfixPassing.call(proposalHashStr)
+      assert.isFalse(passing)
+    })
+
+    it('should return false when hotfix has been whitelisted but not by quorum', async () => {
+      await governance.whitelistHotfix(proposalHashStr, { from: accounts[2] })
+      const passing = await governance.isHotfixPassing.call(proposalHashStr)
+      assert.isFalse(passing)
+    })
+
+    it('should return true when hotfix is whitelisted by quorum', async () => {
+      await governance.whitelistHotfix(proposalHashStr, { from: accounts[2] })
+      await governance.whitelistHotfix(proposalHashStr, { from: accounts[3] })
+      const passing = await governance.isHotfixPassing.call(proposalHashStr)
+      assert.isTrue(passing)
+    })
+  })
+
+  describe('#prepareHotfix()', () => {
+    beforeEach(async () => {
+      await governance.addValidator(accounts[2])
+      await accountsInstance.createAccount({ from: accounts[2] })
+    })
+
+    it('should revert when hotfix is not passing', async () => {
+      await assertRevert(governance.prepareHotfix(proposalHashStr))
+    })
+
+    describe('when hotfix is passing', () => {
+      beforeEach(async () => {
+        await mineBlocks(EPOCH, web3)
+        await governance.whitelistHotfix(proposalHashStr, { from: accounts[2] })
+      })
+
+      it('should mark the hotfix record prepared epoch', async () => {
+        await governance.prepareHotfix(proposalHashStr)
+        const [, , preparedEpoch] = await governance.getHotfixRecord.call(proposalHashStr)
+        const currEpoch = new BigNumber(await governance.getEpochNumber())
+        assertEqualBN(preparedEpoch, currEpoch)
+      })
+
+      it('should emit the HotfixPrepared event', async () => {
+        const resp = await governance.prepareHotfix(proposalHashStr)
+        const currEpoch = new BigNumber(await governance.getEpochNumber())
+        assert.equal(resp.logs.length, 1)
+        const log = resp.logs[0]
+        assertLogMatches2(log, {
+          event: 'HotfixPrepared',
+          args: {
+            hash: matchAny,
+            epoch: currEpoch,
+          },
+        })
+        assert.isTrue(Buffer.from(stripHexEncoding(log.args.hash), 'hex').equals(proposalHash))
+      })
+
+      it('should revert when epoch == preparedEpoch', async () => {
+        await governance.prepareHotfix(proposalHashStr)
+        await assertRevert(governance.prepareHotfix(proposalHashStr))
+      })
+
+      it('should succeed for epoch != preparedEpoch', async () => {
+        await governance.prepareHotfix(proposalHashStr)
+        await mineBlocks(EPOCH, web3)
+        await governance.prepareHotfix(proposalHashStr)
+      })
+    })
+  })
+
+  describe('#executeHotfix()', () => {
+    const executeHotfixTx = () =>
+      governance.executeHotfix(
+        [transactionSuccess1.value],
+        [transactionSuccess1.destination],
+        // @ts-ignore bytes type
+        transactionSuccess1.data,
+        [transactionSuccess1.data.length]
+      )
+
+    it('should revert when hotfix not approved', async () => {
+      await assertRevert(executeHotfixTx())
+    })
+
+    it('should revert when hotfix not prepared for current epoch', async () => {
+      await mineBlocks(EPOCH, web3)
+      await governance.approveHotfix(proposalHashStr, { from: approver })
+      await assertRevert(executeHotfixTx())
+    })
+
+    it('should revert when hotfix prepared but not for current epoch', async () => {
+      await governance.approveHotfix(proposalHashStr, { from: approver })
+      await governance.addValidator(accounts[2])
+      await accountsInstance.createAccount({ from: accounts[2] })
+      await governance.whitelistHotfix(proposalHashStr, { from: accounts[2] })
+      await governance.prepareHotfix(proposalHashStr, { from: accounts[2] })
+      await mineBlocks(EPOCH, web3)
+      await assertRevert(executeHotfixTx())
+    })
+
+    describe('when hotfix is approved and prepared for current epoch', () => {
+      beforeEach(async () => {
+        await governance.approveHotfix(proposalHashStr, { from: approver })
+        await mineBlocks(EPOCH, web3)
+        await governance.addValidator(accounts[2])
+        await accountsInstance.createAccount({ from: accounts[2] })
+        await governance.whitelistHotfix(proposalHashStr, { from: accounts[2] })
+        await governance.prepareHotfix(proposalHashStr)
+      })
+
+      it('should execute the hotfix tx', async () => {
+        await executeHotfixTx()
+        assert.equal(await testTransactions.getValue(1).valueOf(), 1)
+      })
+
+      it('should mark the hotfix record as executed', async () => {
+        await executeHotfixTx()
+        const [, executed] = await governance.getHotfixRecord.call(proposalHashStr)
+        assert.isTrue(executed)
+      })
+
+      it('should emit the HotfixExecuted event', async () => {
+        const resp = await executeHotfixTx()
+        assert.equal(resp.logs.length, 1)
+        const log = resp.logs[0]
+        assertLogMatches2(log, {
+          event: 'HotfixExecuted',
+          args: {
+            hash: matchAny,
+          },
+        })
+        assert.isTrue(Buffer.from(stripHexEncoding(log.args.hash), 'hex').equals(proposalHash))
+      })
+
+      it('should not be executable again', async () => {
+        await executeHotfixTx()
+        await assertRevert(executeHotfixTx())
+      })
+    })
+  })
+
   describe('#isVoting()', () => {
     describe('when the account has never acted on a proposal', () => {
       it('should return false', async () => {
@@ -1816,10 +2132,11 @@ contract('Governance', (accounts: string[]) => {
     describe('when the account has upvoted a proposal', () => {
       const proposalId = 1
       beforeEach(async () => {
-        await mockLockedGold.setWeight(account, weight)
+        await mockLockedGold.setAccountTotalLockedGold(account, weight)
         await governance.propose(
           [transactionSuccess1.value],
           [transactionSuccess1.destination],
+          // @ts-ignore bytes type
           transactionSuccess1.data,
           [transactionSuccess1.data.length],
           // @ts-ignore: TODO(mcortesi) fix typings for TransactionDetails
@@ -1861,6 +2178,7 @@ contract('Governance', (accounts: string[]) => {
         await governance.propose(
           [transactionSuccess1.value],
           [transactionSuccess1.destination],
+          // @ts-ignore bytes type
           transactionSuccess1.data,
           [transactionSuccess1.data.length],
           // @ts-ignore: TODO(mcortesi) fix typings for TransactionDetails
@@ -1869,7 +2187,7 @@ contract('Governance', (accounts: string[]) => {
         await timeTravel(dequeueFrequency, web3)
         await governance.approve(proposalId, index)
         await timeTravel(approvalStageDuration, web3)
-        await mockLockedGold.setWeight(account, weight)
+        await mockLockedGold.setAccountTotalLockedGold(account, weight)
         await governance.vote(proposalId, index, value)
       })
 
@@ -1893,9 +2211,11 @@ contract('Governance', (accounts: string[]) => {
     const proposalId = 1
     const index = 0
     beforeEach(async () => {
+      await accountsInstance.createAccount({ from: otherAccount })
       await governance.propose(
         [transactionSuccess1.value],
         [transactionSuccess1.destination],
+        // @ts-ignore bytes type
         transactionSuccess1.data,
         [transactionSuccess1.data.length],
         // @ts-ignore: TODO(mcortesi) fix typings for TransactionDetails
@@ -1908,8 +2228,8 @@ contract('Governance', (accounts: string[]) => {
 
     describe('when the adjusted support is greater than threshold', () => {
       beforeEach(async () => {
-        await mockLockedGold.setWeight(account, (weight * 51) / 100)
-        await mockLockedGold.setWeight(otherAccount, (weight * 49) / 100)
+        await mockLockedGold.setAccountTotalLockedGold(account, (weight * 51) / 100)
+        await mockLockedGold.setAccountTotalLockedGold(otherAccount, (weight * 49) / 100)
         await governance.vote(proposalId, index, VoteValue.Yes)
         await governance.vote(proposalId, index, VoteValue.No, { from: otherAccount })
       })
@@ -1922,8 +2242,8 @@ contract('Governance', (accounts: string[]) => {
 
     describe('when the adjusted support is less than or equal to threshold', () => {
       beforeEach(async () => {
-        await mockLockedGold.setWeight(account, (weight * 50) / 100)
-        await mockLockedGold.setWeight(otherAccount, (weight * 50) / 100)
+        await mockLockedGold.setAccountTotalLockedGold(account, (weight * 50) / 100)
+        await mockLockedGold.setAccountTotalLockedGold(otherAccount, (weight * 50) / 100)
         await governance.vote(proposalId, index, VoteValue.Yes)
         await governance.vote(proposalId, index, VoteValue.No, { from: otherAccount })
       })

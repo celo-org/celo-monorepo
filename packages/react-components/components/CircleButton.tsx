@@ -1,5 +1,6 @@
 import SmoothX from '@celo/react-components/icons/SmoothX'
 import colors from '@celo/react-components/styles/colors'
+import { iconHitslop } from '@celo/react-components/styles/variables'
 import * as React from 'react'
 import { StyleSheet, TouchableOpacity, View } from 'react-native'
 
@@ -35,7 +36,12 @@ export default class CircleButton extends React.PureComponent<ButtonProps> {
 
     return (
       <View style={[style.row, this.props.style]}>
-        <TouchableOpacity onPress={onPress} disabled={disabled} style={buttonStyle}>
+        <TouchableOpacity
+          onPress={onPress}
+          disabled={disabled}
+          style={buttonStyle}
+          hitSlop={iconHitslop}
+        >
           <SmoothX height={Math.floor(size! * 0.4)} color={xColor} />
         </TouchableOpacity>
       </View>

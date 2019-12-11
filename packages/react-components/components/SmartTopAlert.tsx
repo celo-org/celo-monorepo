@@ -3,14 +3,15 @@ import Error from '@celo/react-components/icons/Error'
 import colors from '@celo/react-components/styles/colors'
 import { fontStyles } from '@celo/react-components/styles/fonts'
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
-import { Animated, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
+import { Animated, StyleSheet, Text, TouchableWithoutFeedback, View } from 'react-native'
+import { useSafeArea } from 'react-native-safe-area-context'
 
 export enum NotificationTypes {
   MESSAGE = 'message',
   ERROR = 'error',
 }
 
-interface Props {
+interface AlertProps {
   title?: string | null
   text: string | null
   onPress: () => void
@@ -19,9 +20,14 @@ interface Props {
   buttonMessage?: string | null
 }
 
+interface Props extends AlertProps {
+  timestamp: number
+}
+
 // This component needs to be always mounted for the hide animation to be visible
 function SmartTopAlert(props: Props) {
-  const [visibleAlertState, setVisibleAlertState] = useState<Props | null>(null)
+  const [visibleAlertState, setVisibleAlertState] = useState<AlertProps | null>(null)
+  const insets = useSafeArea()
   const yOffset = useRef(new Animated.Value(-500))
   const containerRef = useRef<View>()
   const animatedRef = useCallback((node) => {
@@ -46,7 +52,15 @@ function SmartTopAlert(props: Props) {
         return null
       }
     },
-    [props.type, props.title, props.text, props.buttonMessage, props.dismissAfter, props.onPress]
+    [
+      props.timestamp,
+      props.type,
+      props.title,
+      props.text,
+      props.buttonMessage,
+      props.dismissAfter,
+      props.onPress,
+    ]
   )
 
   function hide() {
@@ -132,14 +146,18 @@ function SmartTopAlert(props: Props) {
 
   return (
     <View style={styles.overflowContainer} testID={testID}>
-      <TouchableOpacity onPress={onPress}>
+      <TouchableWithoutFeedback onPress={onPress}>
         <Animated.View
           ref={animatedRef}
           style={[
             styles.container,
             buttonMessage && styles.containerWithButton,
             isError && styles.containerError,
-            { transform: [{ translateY: yOffset.current }] },
+            {
+              // TODO(jeanregisser): Handle case where SmartTopAlert are stacked and only the first one would need the inset
+              paddingTop: insets.top + PADDING_VERTICAL,
+              transform: [{ translateY: yOffset.current }],
+            },
           ]}
         >
           {isError && <Error style={styles.errorIcon} />}
@@ -158,10 +176,12 @@ function SmartTopAlert(props: Props) {
             />
           )}
         </Animated.View>
-      </TouchableOpacity>
+      </TouchableWithoutFeedback>
     </View>
   )
 }
+
+const PADDING_VERTICAL = 10
 
 const styles = StyleSheet.create({
   overflowContainer: {
@@ -172,7 +192,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     backgroundColor: colors.messageBlue,
-    paddingVertical: 10,
+    paddingBottom: PADDING_VERTICAL,
     paddingHorizontal: 25,
   },
   containerError: {

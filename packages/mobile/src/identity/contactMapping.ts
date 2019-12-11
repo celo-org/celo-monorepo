@@ -1,11 +1,10 @@
+import { AttestationsWrapper } from '@celo/contractkit/lib/wrappers/Attestations'
 import { getPhoneHash } from '@celo/utils/src/phoneNumbers'
-import { getAttestationsContract, lookupPhoneNumbers } from '@celo/walletkit'
-import { Attestations as AttestationsType } from '@celo/walletkit/types/Attestations'
 import BigNumber from 'bignumber.js'
 import { chunk } from 'lodash'
 import { MinimalContact } from 'react-native-contacts'
 import { all, call, put, select } from 'redux-saga/effects'
-import { setUserContactDetails } from 'src/account'
+import { setUserContactDetails } from 'src/account/actions'
 import { defaultCountryCodeSelector, e164NumberSelector } from 'src/account/reducer'
 import { showError } from 'src/alert/actions'
 import { ErrorMessages } from 'src/app/ErrorMessages'
@@ -21,10 +20,10 @@ import {
 } from 'src/identity/reducer'
 import { setRecipientCache } from 'src/recipients/actions'
 import { contactsToRecipients, NumberToRecipient } from 'src/recipients/recipient'
-import { checkContactsPermission } from 'src/utils/androidPermissions'
 import { getAllContacts } from 'src/utils/contacts'
 import Logger from 'src/utils/Logger'
-import { web3 } from 'src/web3/contracts'
+import { checkContactsPermission } from 'src/utils/permissions'
+import { contractKit } from 'src/web3/contracts'
 import { getConnectedAccount } from 'src/web3/saga'
 
 const TAG = 'identity/contactMapping'
@@ -119,7 +118,10 @@ function* lookupNewRecipients(
   }
   Logger.debug(TAG, `Total new recipients found: ${newE164Numbers.length}`)
 
-  const attestationsContract: AttestationsType = yield call(getAttestationsContract, web3)
+  const attestationsWrapper: AttestationsWrapper = yield call([
+    contractKit.contracts,
+    contractKit.contracts.getAttestations,
+  ])
 
   // If chunk sizes are too large, or number of parallel lookups too high
   // we see errors from web3. So we break things down and limit parallelization
@@ -133,7 +135,7 @@ function* lookupNewRecipients(
   for (const requestChunk of requestChunks) {
     yield all(
       requestChunk.map((numberChunk) =>
-        call(fetchAndStoreAddressMappings, attestationsContract, numberChunk)
+        call(fetchAndStoreAddressMappings, attestationsWrapper, numberChunk)
       )
     )
   }
@@ -150,10 +152,10 @@ function* lookupNewRecipients(
   yield call(updateRecipientsCache, e164NumberToRecipients, otherRecipients)
 }
 
-async function getAddresses(e164Numbers: string[], attestationsContract: AttestationsType) {
+async function getAddresses(e164Numbers: string[], attestationsWrapper: AttestationsWrapper) {
   Logger.debug(TAG, `Get addresses for ${e164Numbers.length} phone numbers`)
   const phoneHashes = e164Numbers.map((phoneNumber) => getPhoneHash(phoneNumber))
-  const results = await lookupPhoneNumbers(attestationsContract, phoneHashes)
+  const results = await attestationsWrapper.lookupPhoneNumbers(phoneHashes)
   if (!results) {
     return null
   }
@@ -162,7 +164,7 @@ async function getAddresses(e164Numbers: string[], attestationsContract: Attesta
   for (const hash of phoneHashes) {
     if (results[hash]) {
       // TODO(Rossy) Add support for handling multiple addresses per number
-      const address = Object.keys(results[hash]!)[0]
+      const address = Object.keys(results[hash])[0]
       addresses.push(address.toLowerCase())
     } else {
       addresses.push(null)
@@ -175,13 +177,13 @@ const isValidAddress = (address: string) =>
   typeof address === 'string' && !new BigNumber(address).isZero()
 
 export function* fetchAndStoreAddressMappings(
-  attestationsContract: AttestationsType,
+  attestationsWrapper: AttestationsWrapper,
   e164Numbers: string[]
 ) {
   try {
     Logger.debug(TAG, `Fetch and store address mapping for ${e164Numbers.length} phone numbers`)
 
-    const addresses: Array<string | null> = yield getAddresses(e164Numbers, attestationsContract)
+    const addresses: Array<string | null> = yield getAddresses(e164Numbers, attestationsWrapper)
 
     if (!addresses || addresses.length !== e164Numbers.length) {
       throw new Error('Address lookup length did not match numbers list length')
@@ -222,11 +224,14 @@ export function* fetchPhoneAddresses(action: FetchPhoneAddressesAction) {
   const e164NumberToAddressUpdates: any = {}
   e164Numbers.map((n) => (e164NumberToAddressUpdates[n] = undefined))
   yield put(updateE164PhoneNumberAddresses(e164NumberToAddressUpdates, {}))
-  const attestationsContract: AttestationsType = yield call(getAttestationsContract, web3)
-  yield call(fetchAndStoreAddressMappings, attestationsContract, e164Numbers)
+  const attestationsWrapper: AttestationsWrapper = yield call([
+    contractKit.contracts,
+    contractKit.contracts.getAttestations,
+  ])
+  yield call(fetchAndStoreAddressMappings, attestationsWrapper, e164Numbers)
 }
 
-export enum VerificationStatus {
+export enum RecipientVerificationStatus {
   UNVERIFIED = 0,
   VERIFIED = 1,
   UNKNOWN = 2,
@@ -246,19 +251,19 @@ export function getAddressFromPhoneNumber(
 export function getVerificationStatusFromPhoneNumber(
   e164Number: string,
   e164NumberToAddress: E164NumberToAddressType
-): VerificationStatus {
+): RecipientVerificationStatus {
   const address = getAddressFromPhoneNumber(e164Number, e164NumberToAddress)
 
   // Undefined means the mapping has no entry for that number
   // or the entry has been cleared
   if (address === undefined) {
-    return VerificationStatus.UNKNOWN
+    return RecipientVerificationStatus.UNKNOWN
   }
   // null means we have checked and found that number to be unverified
   if (address === null) {
-    return VerificationStatus.UNVERIFIED
+    return RecipientVerificationStatus.UNVERIFIED
   }
 
   // Otherwise, verified
-  return VerificationStatus.VERIFIED
+  return RecipientVerificationStatus.VERIFIED
 }

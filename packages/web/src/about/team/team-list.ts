@@ -71,11 +71,6 @@ const people: Person[] = [
     photo: require('./dan@2x.png'),
   },
   {
-    name: 'Isabelle Wei',
-    role: 'Engineering',
-    photo: require('./isabelle@2x.png'),
-  },
-  {
     name: 'Katharina Chiu',
     role: 'People',
     photo: require('./katharina@2x.jpg'),
@@ -87,7 +82,7 @@ const people: Person[] = [
   },
   {
     name: 'Markus Franke',
-    role: 'Finance',
+    role: 'Economics',
     photo: require('./markus@2x.jpg'),
   },
   {
@@ -100,7 +95,6 @@ const people: Person[] = [
     role: 'Finance',
     photo: require('./mz-hammer@2x.png'),
   },
-
   {
     name: 'Nam Chu Hoai',
     role: 'Engineering',
@@ -123,7 +117,7 @@ const people: Person[] = [
   },
   {
     name: 'Roman Croessmann',
-    role: 'Finance',
+    role: 'Data Science',
     photo: require('./roman@2x.png'),
   },
   {
@@ -140,11 +134,6 @@ const people: Person[] = [
     name: 'Will Le',
     role: 'Go-to-Market',
     photo: require('./will@2x.png'),
-  },
-  {
-    name: 'Joe Bacon',
-    role: 'Operations',
-    photo: require('./joe@2x.jpg'),
   },
   {
     name: 'Kevin Jue',
