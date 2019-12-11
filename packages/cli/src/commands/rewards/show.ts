@@ -12,7 +12,11 @@ export default class Show extends BaseCommand {
   static flags = {
     ...BaseCommand.flags,
     address: Flags.address({ required: false, description: 'Address to filter' }),
-    epochs: flags.integer({ required: false, description: 'Number of epochs' }),
+    epochs: flags.integer({
+      default: 1,
+      required: false,
+      description: 'Show results for the last N epochs',
+    }),
     'no-truncate': flags.boolean({
       required: false,
       description: "Don't truncate fields to fit line",
@@ -27,62 +31,63 @@ export default class Show extends BaseCommand {
     const res = this.parse(Show)
     const election = await this.kit.contracts.getElection()
     const validators = await this.kit.contracts.getValidators()
+    const electionContract = await this.kit._web3Contracts.getElection()
+    const validatorsContract = await this.kit._web3Contracts.getValidators()
     const epochSize = await validators.getEpochSize()
+    const currentBlock = await this.web3.eth.getBlockNumber()
+    const lastEpochBlock = Math.floor(currentBlock / epochSize) * epochSize
+    const fromBlock: number = lastEpochBlock - epochSize * ((res.flags.epochs || 1) - 1)
+    const addressVotes: { [key: number]: { [key: string]: BigNumber } } = {}
+    const validatorDetails: { [key: number]: { [key: string]: any } } = {}
+    const validatorGroupDetails: { [key: number]: { [key: string]: any } } = {}
+    let voterRewardsEvents: any[] = []
+    let validatorRewardsEvents: any[] = []
 
-    // Map the votes cast by address at each epoch.
-    let addressVotes: { [key: number]: { [key: string]: BigNumber } } = {}
     if (res.flags.address) {
       const address = res.flags.address
       await newCheckBuilder(this)
         .isAccount(address)
         .runChecks()
-
-      addressVotes = await this.mapEachEpochAsync(
-        async (blockNumber: number) => {
-          const voter = await election.getVoter(address, blockNumber)
-          const votes: { [key: string]: BigNumber } = {}
-          voter.votes.forEach((x) => {
-            const group: string = x.group.toLowerCase()
-            votes[group] = (votes[group] || new BigNumber(0)).plus(x.active)
-          })
-          return votes
-        },
-        epochSize,
-        res.flags.epochs
-      )
     }
 
-    // voterRewards applies to address when voterReward.group in addressVotes[voterReward.blockNumber].
-    const voterRewardsEvents = await this.getVoterRewardEvents(
-      epochSize,
-      res.flags.epochs,
-      res.flags.address ? addressVotes : null
-    )
+    for (let blockNumber = fromBlock; blockNumber <= lastEpochBlock; blockNumber += epochSize) {
+      if (res.flags.address) {
+        const address = res.flags.address
+        const voter = await election.getVoter(address, blockNumber)
+        voter.votes.forEach((x) => {
+          const group: string = x.group.toLowerCase()
+          addressVotes[blockNumber][group] = (
+            addressVotes[blockNumber][group] || new BigNumber(0)
+          ).plus(x.active)
+        })
+      }
 
-    // validatorRewards applies to address when validatorReward.validator (or .group) is address.
-    const validatorRewardsEvents = await this.getValidatorRewardEvents(
-      epochSize,
-      res.flags.epochs,
-      res.flags.address
-    )
+      // voterRewards applies to address when voterReward.group in addressVotes[voterReward.blockNumber].
+      voterRewardsEvents = voterRewardsEvents.concat(
+        await this.getVoterRewardEvents(
+          electionContract,
+          blockNumber,
+          res.flags.address ? addressVotes : null
+        )
+      )
 
-    // Get the Validator scores at each epoch.
-    const validatorDetails = await this.mapEachEpochAsync(
-      (blockNumber: number) =>
-        this.getUniqueValidators(
-          validatorRewardsEvents,
-          (x: any) => x.returnValues.validator.toLowerCase(),
-          blockNumber
-        ),
-      epochSize,
-      res.flags.epochs
-    )
+      // validatorRewards applies to address when validatorReward.validator (or .group) is address.
+      validatorRewardsEvents = validatorRewardsEvents.concat(
+        await this.getValidatorRewardEvents(validatorsContract, blockNumber, res.flags.address)
+      )
 
-    // For correctness use the Validator Group name at each epoch?
-    const validatorGroupDetails = await this.getUniqueValidatorGroups(
-      voterRewardsEvents,
-      (x: any) => x.returnValues.group.toLowerCase()
-    )
+      // Get the Validator scores at each epoch.
+      validatorDetails[blockNumber] = await this.getUniqueValidators(
+        validatorRewardsEvents,
+        (x: any) => x.returnValues.validator.toLowerCase(),
+        blockNumber
+      )
+
+      validatorGroupDetails[blockNumber] = await this.getUniqueValidatorGroups(
+        voterRewardsEvents,
+        (x: any) => x.returnValues.group.toLowerCase()
+      )
+    }
 
     if (voterRewardsEvents.length > 0) {
       console.info('')
@@ -91,7 +96,8 @@ export default class Show extends BaseCommand {
         voterRewardsEvents,
         {
           name: {
-            get: (x: any) => validatorGroupDetails[x.returnValues.group.toLowerCase()].name,
+            get: (x: any) =>
+              validatorGroupDetails[x.blockNumber][x.returnValues.group.toLowerCase()].name,
           },
           group: { get: (x: any) => x.returnValues.group },
           value: { get: (x: any) => x.returnValues.value },
@@ -149,7 +155,8 @@ export default class Show extends BaseCommand {
         validatorGroupRewards,
         {
           name: {
-            get: (x: any) => validatorGroupDetails[x.returnValues.group.toLowerCase()].name,
+            get: (x: any) =>
+              validatorGroupDetails[x.blockNumber][x.returnValues.group.toLowerCase()].name,
           },
           group: { get: (x: any) => x.returnValues.group },
           groupPayment: { get: (x: any) => x.returnValues.groupPayment },
@@ -175,100 +182,41 @@ export default class Show extends BaseCommand {
     }
   }
 
-  // Return the object with Promise properties resolved.
-  promisedProperties(object: { [key: string]: any }) {
-    const properties: any[] = []
-    const objectKeys = Object.keys(object)
-    objectKeys.forEach((key) => properties.push(object[key]))
-    return Promise.all(properties).then((resolvedValues) => {
-      return resolvedValues.reduce((resolvedObject, property, index) => {
-        resolvedObject[objectKeys[index]] = property
-        return resolvedObject
-      }, object)
-    })
-  }
-
-  // Returns contract events from the last N epochs.
-  async getEpochEvents(contract: any, eventName: string, epochSize: number, epochs = 1) {
-    return [].concat.apply(
-      [],
-      await this.forEachEpochAsync(
-        (blockNumber: number) =>
-          contract.getPastEvents(eventName, { fromBlock: blockNumber, toBlock: blockNumber }),
-        epochSize,
-        epochs
-      )
-    )
-  }
-
-  // Returns array of await callback(blockNumber) for the last N epochs.
-  async forEachEpochAsync(callback: any, epochSize: number, epochs = 1) {
-    const currentBlock = await this.web3.eth.getBlockNumber()
-    const lastEpochBlock = Math.floor(currentBlock / epochSize) * epochSize
-    const fromBlock: number = lastEpochBlock - epochSize * (epochs - 1)
-    const results = []
-    for (let blockNumber = fromBlock; blockNumber <= lastEpochBlock; blockNumber += epochSize) {
-      results.push(callback(blockNumber))
-    }
-    return Promise.all(results)
-  }
-
-  // Returns map from block number to await callback(blockNumber) for the last N epochs.
-  async mapEachEpochAsync(callback: any, epochSize: number, epochs = 1) {
-    const currentBlock = await this.web3.eth.getBlockNumber()
-    const lastEpochBlock = Math.floor(currentBlock / epochSize) * epochSize
-    const fromBlock: number = lastEpochBlock - epochSize * (epochs - 1)
-    const promises = []
-    for (let blockNumber = fromBlock; blockNumber <= lastEpochBlock; blockNumber += epochSize) {
-      promises.push(callback(blockNumber))
-    }
-    const results = await Promise.all(promises)
-
-    let index = 0
-    const dict: { [key: number]: any } = {}
-    for (let blockNumber = fromBlock; blockNumber <= lastEpochBlock; blockNumber += epochSize) {
-      dict[blockNumber] = results[index++]
-    }
-    return dict
-  }
-
-  // Returns filtered EpochRewardsDistributedToVoters events for the last N epochs.
+  // Returns filtered EpochRewardsDistributedToVoters events for blockNumber.
   async getVoterRewardEvents(
-    epochSize: number,
-    epochs = 1,
+    contract: any,
+    blockNumber: number,
     groupFilter?: { [key: number]: { [key: string]: BigNumber } } | null
   ) {
-    let voterRewardsEvents = await this.getEpochEvents(
-      await this.kit._web3Contracts.getElection(),
-      'EpochRewardsDistributedToVoters',
-      epochSize,
-      epochs
-    )
-    if (groupFilter) {
-      voterRewardsEvents = voterRewardsEvents.filter(
+    const voterRewardsEvents = contract.getPastEvents('EpochRewardsDistributedToVoters', {
+      fromBlock: blockNumber,
+      toBlock: blockNumber,
+    })
+    if (!groupFilter) {
+      return voterRewardsEvents
+    } else {
+      return voterRewardsEvents.filter(
         (x: any) => x.returnValues.group.toLowerCase() in groupFilter[x.blockNumber]
       )
     }
-    return voterRewardsEvents
   }
 
-  // Returns filtered ValidatorEpochPaymentDistributed events for the last N epochs.
-  async getValidatorRewardEvents(epochSize: number, epochs = 1, addressFilter?: string) {
-    let validatorRewardsEvents = await this.getEpochEvents(
-      await this.kit._web3Contracts.getValidators(),
-      'ValidatorEpochPaymentDistributed',
-      epochSize,
-      epochs
-    )
-    if (addressFilter) {
+  // Returns filtered ValidatorEpochPaymentDistributed events for blockNumber.
+  async getValidatorRewardEvents(contract: any, blockNumber: number, addressFilter?: string) {
+    const validatorRewardsEvents = contract.getPastEvents('ValidatorEpochPaymentDistributed', {
+      fromBlock: blockNumber,
+      toBlock: blockNumber,
+    })
+    if (!addressFilter) {
+      return validatorRewardsEvents
+    } else {
       const lowerAddressFilter = addressFilter.toLowerCase()
-      validatorRewardsEvents = validatorRewardsEvents.filter(
+      return validatorRewardsEvents.filter(
         (x: any) =>
           x.returnValues.validator.toLowerCase() === lowerAddressFilter ||
           x.returnValues.group.toLowerCase() === lowerAddressFilter
       )
     }
-    return validatorRewardsEvents
   }
 
   // Returns map from Validator address to Validator.
@@ -301,5 +249,18 @@ export default class Show extends BaseCommand {
       }
     }
     return this.promisedProperties(uniqueValidatorGroups)
+  }
+
+  // Return the object with Promise properties resolved.
+  promisedProperties(object: { [key: string]: any }) {
+    const properties: any[] = []
+    const objectKeys = Object.keys(object)
+    objectKeys.forEach((key) => properties.push(object[key]))
+    return Promise.all(properties).then((resolvedValues) => {
+      return resolvedValues.reduce((resolvedObject, property, index) => {
+        resolvedObject[objectKeys[index]] = property
+        return resolvedObject
+      }, object)
+    })
   }
 }
