@@ -115,25 +115,19 @@ export class ElectionWrapper extends BaseWrapper<Election> {
     group: Address,
     blockNumber?: number
   ): Promise<GroupVote> {
-    let pending
-    if (blockNumber) {
-      pending = await this.contract.methods
-        .getPendingVotesForGroupByAccount(group, account)
-        // @ts-ignore: Expected 0-1 arguments, but got 2
-        .call({}, blockNumber)
-    } else {
-      pending = await this.contract.methods.getPendingVotesForGroupByAccount(group, account).call()
-    }
+    const pending = blockNumber
+      ? // @ts-ignore: Expected 0-1 arguments, but got 2
+        await this.contract.methods
+          .getPendingVotesForGroupByAccount(group, account)
+          .call({}, blockNumber)
+      : await this.contract.methods.getPendingVotesForGroupByAccount(group, account).call()
 
-    let active
-    if (blockNumber) {
-      active = await this.contract.methods
-        .getActiveVotesForGroupByAccount(group, account)
-        // @ts-ignore: Expected 0-1 arguments, but got 2
-        .call({}, blockNumber)
-    } else {
-      active = await this.contract.methods.getActiveVotesForGroupByAccount(group, account).call()
-    }
+    const active = blockNumber
+      ? // @ts-ignore: Expected 0-1 arguments, but got 2
+        await this.contract.methods
+          .getActiveVotesForGroupByAccount(group, account)
+          .call({}, blockNumber)
+      : await this.contract.methods.getActiveVotesForGroupByAccount(group, account).call()
 
     return {
       group,

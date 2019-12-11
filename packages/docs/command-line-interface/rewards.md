@@ -14,7 +14,7 @@ USAGE
 
 OPTIONS
   --address=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  Address to filter
-  --epochs=epochs                                       Number of epochs
+  --epochs=epochs                                       [default: 1] Show results for the last N epochs
   --no-truncate                                         Don't truncate fields to fit line
 
 EXAMPLE

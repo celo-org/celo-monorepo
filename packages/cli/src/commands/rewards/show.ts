@@ -1,3 +1,4 @@
+import { Validator, ValidatorGroup } from '@celo/contractkit/lib/wrappers/Validators'
 import { flags } from '@oclif/command'
 import BigNumber from 'bignumber.js'
 import { cli } from 'cli-ux'
@@ -38,8 +39,8 @@ export default class Show extends BaseCommand {
     const lastEpochBlock = Math.floor(currentBlock / epochSize) * epochSize
     const fromBlock: number = lastEpochBlock - epochSize * ((res.flags.epochs || 1) - 1)
     const addressVotes: { [key: number]: { [key: string]: BigNumber } } = {}
-    const validatorDetails: { [key: number]: { [key: string]: any } } = {}
-    const validatorGroupDetails: { [key: number]: { [key: string]: any } } = {}
+    const validatorDetails: { [key: number]: { [key: string]: Validator } } = {}
+    const validatorGroupDetails: { [key: number]: { [key: string]: ValidatorGroup } } = {}
     const lowerAddress = res.flags.address ? res.flags.address.toLowerCase() : res.flags.address
     let voterRewardsEvents: any[] = []
     let validatorRewardsEvents: any[] = []
@@ -76,7 +77,7 @@ export default class Show extends BaseCommand {
       voterRewardsEvents = voterRewardsEvents.concat(
         res.flags.address
           ? epochVoterRewardsEvents.filter(
-              (x: any) => x.returnValues.group.toLowerCase() in addressVotes[x.blockNumber]
+              (x) => x.returnValues.group.toLowerCase() in addressVotes[x.blockNumber]
             )
           : epochVoterRewardsEvents
       )
@@ -92,7 +93,7 @@ export default class Show extends BaseCommand {
       validatorRewardsEvents = validatorRewardsEvents.concat(
         res.flags.address
           ? epochValidatorRewardsEvents.filter(
-              (x: any) =>
+              (x) =>
                 x.returnValues.validator.toLowerCase() === lowerAddress ||
                 x.returnValues.group.toLowerCase() === lowerAddress
             )
@@ -100,7 +101,7 @@ export default class Show extends BaseCommand {
       )
 
       // Get the Validator scores.
-      const uniqueValidators: { [key: string]: any } = {}
+      const uniqueValidators: { [key: string]: Promise<Validator> } = {}
       for (const event of validatorRewardsEvents) {
         const validatorAddress = event.returnValues.validator.toLowerCase()
         if (!(validatorAddress in uniqueValidators)) {
@@ -113,7 +114,7 @@ export default class Show extends BaseCommand {
       validatorDetails[blockNumber] = await this.promisedProperties(uniqueValidators)
 
       // Get the Validator Group names.
-      const uniqueValidatorGroups: { [key: string]: any } = {}
+      const uniqueValidatorGroups: { [key: string]: Promise<ValidatorGroup> } = {}
       for (const event of validatorRewardsEvents) {
         const validatorGroupAddress = event.returnValues.group.toLowerCase()
         if (!(validatorGroupAddress in uniqueValidatorGroups)) {
@@ -132,11 +133,11 @@ export default class Show extends BaseCommand {
         voterRewardsEvents,
         {
           name: {
-            get: (x: any) =>
+            get: (x) =>
               validatorGroupDetails[x.blockNumber][x.returnValues.group.toLowerCase()].name,
           },
-          group: { get: (x: any) => x.returnValues.group },
-          value: { get: (x: any) => x.returnValues.value },
+          group: { get: (x) => x.returnValues.group },
+          value: { get: (x) => x.returnValues.value },
           blockNumber: {},
         },
         { 'no-truncate': res.flags['no-truncate'] }
@@ -147,7 +148,7 @@ export default class Show extends BaseCommand {
     if (res.flags.address) {
       const address = res.flags.address.toLowerCase()
       validatorRewards = validatorRewardsEvents.filter(
-        (x: any) => x.returnValues.validator.toLowerCase() === address
+        (x) => x.returnValues.validator.toLowerCase() === address
       )
     }
 
@@ -158,18 +159,18 @@ export default class Show extends BaseCommand {
         validatorRewards,
         {
           name: {
-            get: (x: any) =>
+            get: (x) =>
               validatorDetails[x.blockNumber][x.returnValues.validator.toLowerCase()].name,
           },
-          validator: { get: (x: any) => x.returnValues.validator },
-          validatorPayment: { get: (x: any) => x.returnValues.validatorPayment },
+          validator: { get: (x) => x.returnValues.validator },
+          validatorPayment: { get: (x) => x.returnValues.validatorPayment },
           validatorScore: {
-            get: (x: any) =>
+            get: (x) =>
               validatorDetails[x.blockNumber][
                 x.returnValues.validator.toLowerCase()
               ].score.toFixed(),
           },
-          group: { get: (x: any) => x.returnValues.group },
+          group: { get: (x) => x.returnValues.group },
           blockNumber: {},
         },
         { 'no-truncate': res.flags['no-truncate'] }
@@ -180,7 +181,7 @@ export default class Show extends BaseCommand {
     if (res.flags.address) {
       const address = res.flags.address.toLowerCase()
       validatorGroupRewards = validatorRewardsEvents.filter(
-        (x: any) => x.returnValues.group.toLowerCase() === address
+        (x) => x.returnValues.group.toLowerCase() === address
       )
     }
 
@@ -191,14 +192,14 @@ export default class Show extends BaseCommand {
         validatorGroupRewards,
         {
           name: {
-            get: (x: any) =>
+            get: (x) =>
               validatorGroupDetails[x.blockNumber][x.returnValues.group.toLowerCase()].name,
           },
-          group: { get: (x: any) => x.returnValues.group },
-          groupPayment: { get: (x: any) => x.returnValues.groupPayment },
-          validator: { get: (x: any) => x.returnValues.validator },
+          group: { get: (x) => x.returnValues.group },
+          groupPayment: { get: (x) => x.returnValues.groupPayment },
+          validator: { get: (x) => x.returnValues.validator },
           validatorScore: {
-            get: (x: any) =>
+            get: (x) =>
               validatorDetails[x.blockNumber][
                 x.returnValues.validator.toLowerCase()
               ].score.toFixed(),
