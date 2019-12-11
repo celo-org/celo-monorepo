@@ -10,6 +10,7 @@ import {
 import { ensure0x } from './utils'
 
 const DEFAULT_FAUCET_CUSD_WEI = '60000000000000000000000' /* 60k Celo Dollars */
+const DEFAULT_INITIAL_GOLD_PRICE = '10'
 
 export function minerForEnv() {
   return privateKeyToAddress(
@@ -47,6 +48,11 @@ export function migrationOverrides() {
       attestationKeys: getAttestationKeys(),
     },
     stableToken: {
+      // TODO(yerdua): handle the case of this not being an integer
+      goldPrice: parseInt(
+        fetchEnvOrFallback(envVar.INITIAL_GOLD_PRICE, DEFAULT_INITIAL_GOLD_PRICE),
+        10
+      ),
       initialBalances: {
         addresses: initialAddresses,
         values: initialAddresses.map(() => initialBalance),
