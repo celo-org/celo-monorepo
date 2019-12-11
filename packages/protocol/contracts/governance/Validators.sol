@@ -1225,6 +1225,6 @@ contract Validators is
     ) {
       return history.entries[index].group;
     }
-    require(false, "provided index does not match provided epochNumber in history.");
+    require(false, "provided index does not match provided epochNumber at index in history.");
   }
 }

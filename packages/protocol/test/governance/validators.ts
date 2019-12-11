@@ -1,10 +1,33 @@
 import { CeloContractName } from '@celo/protocol/lib/registry-utils'
 import { getParsedSignatureOfAddress } from '@celo/protocol/lib/signing-utils'
-import { assertContainSubset, assertEqualBN, assertEqualBNArray, assertEqualDpBN, assertRevert, assertSameAddress, mineBlocks, NULL_ADDRESS, timeTravel } from '@celo/protocol/lib/test-utils'
+import {
+  assertContainSubset,
+  assertEqualBN,
+  assertEqualBNArray,
+  assertEqualDpBN,
+  assertRevert,
+  assertSameAddress,
+  mineBlocks,
+  NULL_ADDRESS,
+  timeTravel,
+} from '@celo/protocol/lib/test-utils'
 import { fixed1, fromFixed, toFixed } from '@celo/utils/lib/fixidity'
 import { addressToPublicKey } from '@celo/utils/lib/signatureUtils'
 import BigNumber from 'bignumber.js'
-import { AccountsContract, AccountsInstance, MockElectionContract, MockElectionInstance, MockLockedGoldContract, MockLockedGoldInstance, MockStableTokenContract, MockStableTokenInstance, RegistryContract, RegistryInstance, ValidatorsTestContract, ValidatorsTestInstance } from 'types'
+import {
+  AccountsContract,
+  AccountsInstance,
+  MockElectionContract,
+  MockElectionInstance,
+  MockLockedGoldContract,
+  MockLockedGoldInstance,
+  MockStableTokenContract,
+  MockStableTokenInstance,
+  RegistryContract,
+  RegistryInstance,
+  ValidatorsTestContract,
+  ValidatorsTestInstance,
+} from 'types'
 
 const Accounts: AccountsContract = artifacts.require('Accounts')
 const Validators: ValidatorsTestContract = artifacts.require('ValidatorsTest')
@@ -2185,96 +2208,118 @@ contract('Validators', (accounts: string[]) => {
     describe('when the sender is not an approved address', async () => {
       it('should revert', async () => {
         await assertRevert(validators.forceDeaffiliateIfValidator(validator))
-        describe.only('#groupMembershipInEpoch', async () => {
-          const validator = accounts[0]
-          const groups = accounts.slice(1, -1)
+      })
+    })
+  })
 
-          describe('when the validator is added to different groups sequantially', async () => {
-            const epochs = []
-            beforeEach(async () => {
-              await registerValidator(validator)
-              for (const group of groups) {
-                await registerValidatorGroup(group)
-              }
-              for (let i = 0; i < membershipHistoryLength.plus(1).toNumber(); i++) {
-                const blockNumber = await web3.eth.getBlockNumber()
-                const epochNumber = Math.floor(blockNumber / EPOCH)
-                const blocksUntilNextEpoch = (epochNumber + 1) * EPOCH - blockNumber
-                epochs.push(epochNumber)
-                await mineBlocks(blocksUntilNextEpoch, web3)
+  describe('#groupMembershipInEpoch', async () => {
+    const validator = accounts[0]
+    const groups = accounts.slice(1, -1)
 
-                await validators.affiliate(groups[i])
-                await validators.addFirstMember(validator, NULL_ADDRESS, NULL_ADDRESS, {
-                  from: groups[i],
-                })
-              }
-            })
+    beforeEach(async () => {
+      await registry.setAddressFor(CeloContractName.DowntimeSlasher, validator)
+      await registry.setAddressFor(CeloContractName.DoubleSigningSlasher, accounts[3])
+      await registry.setAddressFor(CeloContractName.Governance, accounts[4])
+    })
 
-            it('should always return the correct membership for the given epoch', async () => {
-              for (let i = 0; i < membershipHistoryLength.toNumber(); i++) {
-                assert.equal(
-                  await validators.groupMembershipInEpoch(validator, epochs[i + 1] + 1, 2 + i),
-                  groups[i + 1]
-                )
-              }
-            })
+    describe('when the validator is added to different groups sequantially', async () => {
+      const epochs = []
+      beforeEach(async () => {
+        await registerValidator(validator)
+        for (const group of groups) {
+          await registerValidatorGroup(group)
+        }
+        for (let i = 0; i < membershipHistoryLength.plus(1).toNumber(); i++) {
+          const blockNumber = await web3.eth.getBlockNumber()
+          const epochNumber = Math.floor(blockNumber / EPOCH)
+          const blocksUntilNextEpoch = (epochNumber + 1) * EPOCH - blockNumber
+          epochs.push(epochNumber)
+          await mineBlocks(blocksUntilNextEpoch, web3)
+
+          await validators.affiliate(groups[i])
+          await validators.addFirstMember(validator, NULL_ADDRESS, NULL_ADDRESS, {
+            from: groups[i],
           })
+        }
+      })
 
-          describe('when the validator is added to different groups with gaps in between epochs', async () => {
-            let epochs = []
+      it('should always return the correct membership for the given epoch', async () => {
+        for (let i = 0; i < membershipHistoryLength.toNumber(); i++) {
+          assert.equal(
+            await validators.groupMembershipInEpoch(validator, epochs[i + 1] + 1, 2 + i),
+            groups[i + 1]
+          )
+        }
+      })
+    })
 
-            beforeEach(async () => {
-              epochs = []
-              await registerValidator(validator)
-              for (const group of groups) {
-                await registerValidatorGroup(group)
-              }
-              for (let i = 0; i < membershipHistoryLength.multipliedBy(3).toNumber(); i++) {
-                const blockNumber = await web3.eth.getBlockNumber()
-                const epochNumber = Math.floor(blockNumber / EPOCH)
-                const blocksUntilNextEpoch = (epochNumber + 1) * EPOCH - blockNumber
-                await mineBlocks(blocksUntilNextEpoch, web3)
+    describe('when the validator is added to different groups with gaps in between epochs', async () => {
+      let epochs = []
 
-                if (i % 3 === 0) {
-                  epochs.push([epochNumber, groups[i / 3]])
-                  await validators.affiliate(groups[i / 3])
-                  await validators.addFirstMember(validator, NULL_ADDRESS, NULL_ADDRESS, {
-                    from: groups[i / 3],
-                  })
-                }
-              }
+      beforeEach(async () => {
+        epochs = []
+        await registerValidator(validator)
+        for (const group of groups) {
+          await registerValidatorGroup(group)
+        }
+        for (let i = 0; i < membershipHistoryLength.multipliedBy(3).toNumber(); i++) {
+          const blockNumber = await web3.eth.getBlockNumber()
+          const epochNumber = Math.floor(blockNumber / EPOCH)
+          const blocksUntilNextEpoch = (epochNumber + 1) * EPOCH - blockNumber
+          await mineBlocks(blocksUntilNextEpoch, web3)
+
+          if (i % 3 === 0) {
+            epochs.push([epochNumber, groups[i / 3]])
+            await validators.affiliate(groups[i / 3])
+            await validators.addFirstMember(validator, NULL_ADDRESS, NULL_ADDRESS, {
+              from: groups[i / 3],
             })
+          }
+        }
+      })
 
-            it('should correctly get the group address for exact epoch numbers', async () => {
-              for (let i = 0; i < membershipHistoryLength.toNumber(); i++) {
-                assert.equal(
-                  await validators.groupMembershipInEpoch(validator, epochs[i][0] + 1, 1 + i),
-                  groups[i]
-                )
-              }
-            })
+      it('should correctly get the group address for exact epoch numbers', async () => {
+        for (let i = 0; i < membershipHistoryLength.toNumber(); i++) {
+          assert.equal(
+            await validators.groupMembershipInEpoch(validator, epochs[i][0] + 1, 1 + i),
+            groups[i]
+          )
+        }
+      })
 
-            it('should correctly get the group address of epoch numbers between switches', async () => {
-              assert.equal(await validators.groupMembershipInEpoch(validator, 24, 1), groups[0])
-              assert.equal(await validators.groupMembershipInEpoch(validator, 25, 1), groups[0])
-              assert.equal(await validators.groupMembershipInEpoch(validator, 27, 2), groups[1])
-            })
+      it('should correctly get the group address of epoch numbers between switches', async () => {
+        // Also test other contract address approvals
+        assert.equal(
+          await validators.groupMembershipInEpoch(validator, 24, 1, { from: accounts[3] }),
+          groups[0]
+        )
+        assert.equal(
+          await validators.groupMembershipInEpoch(validator, 25, 1, { from: accounts[4] }),
+          groups[0]
+        )
+        assert.equal(await validators.groupMembershipInEpoch(validator, 27, 2), groups[1])
+      })
 
-            describe('when called with various malformed inputs', async () => {
-              it('should revert when epochNumber at given index is greater than provided epochNumber', async () => {
-                await assertRevert(validators.groupMembershipInEpoch(validator, 49, 5))
-              })
-
-              it("should revert when epochNumber fits into a different index's bucket", async () => {
-                await assertRevert(validators.groupMembershipInEpoch(validator, 57, 1))
-              })
-
-              it("should revert when epochNumber is greater than the chain's current epochNumber", async () => {
-                await assertRevert(validators.groupMembershipInEpoch(validator, 81, 5))
-              })
-            })
-          })
+      describe('when called with various malformed inputs', async () => {
+        it('should revert when epochNumber at given index is greater than provided epochNumber', async () => {
+          await assertRevert(validators.groupMembershipInEpoch(validator, 49, 5))
         })
+
+        it("should revert when epochNumber fits into a different index's bucket", async () => {
+          await assertRevert(validators.groupMembershipInEpoch(validator, 57, 1))
+        })
+
+        it("should revert when epochNumber is greater than the chain's current epochNumber", async () => {
+          await assertRevert(validators.groupMembershipInEpoch(validator, 81, 5))
+        })
+      })
+    })
+
+    describe('when the sender is not an approved address', async () => {
+      it('should revert', async () => {
+        await assertRevert(
+          validators.groupMembershipInEpoch(validator, 95, 1, { from: accounts[1] })
+        )
       })
     })
   })
