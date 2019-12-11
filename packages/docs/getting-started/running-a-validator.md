@@ -43,10 +43,11 @@ In order for your Validator to participate in consensus and complete attestation
 
 Your Proxy and Attestations nodes must have static, external IP addresses, and your Validator node must be able to communicate with your proxy, either via an internal network or via the Proxy's external IP address.
 
-Additionally, the following ports should be exposed on the Proxy machine:
+On Port 30303, TCP and UDP connections from all IP addresses should be allowed. This port is used by the Proxy and the Attestations node to communicate with other nodes in the network.
 
-- Port 30303: TCP and UDP connections from all IP addresses should be allowed. This port is used by the Proxy to communicate with other nodes in the network.
-- Port 30503: TCP connections from the IP address of your Validator machine should be allowed. This port is used by the Proxy to communicate with the Validator.
+For the Proxy, Port 30503 TCP connections from the IP address of your Validator machine should be allowed. This port is used by the Proxy to communicate with the Validator.
+
+For the Attestations node, Port 80 TCP connections from all IP addresses should be allowed. This port is used by users to request attestations from you.
 
 ### Software requirements
 
