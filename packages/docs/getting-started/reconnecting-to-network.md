@@ -105,7 +105,14 @@ If any of the environment variables are missing, you have two options:
 1.  Find the shell where you ran the original instructions and look for the missing environment variables. Then, export them again.
 2.  If you can't find that information, but you have the `CELO_VALIDATOR_ADDRESS`, `CELO_VALIDATOR_GROUP_ADDRESS` and `CELO_VALIDATOR_SIGNER_ADDRESS` variables, the other Celo variables are deterministic and generated using as input those variables. So you can refer to the point of the documentation where the missing variables were created, and create them again.
 
-#### Re-register your Validator
+#### Run the celocli
+
+First, make sure you have the latest version of the celocli.
+
+```bash
+# On your local machine
+npm uninstall -g @celo/celocli && npm install -g @celo/celocli
+```
 
 At this point you should be able to continue the steps described in the [Running a Validator](running-a-validator.md) documentation page, starting at the [Register the Accounts](running-a-validator.md#register-the-accounts) section.
 
