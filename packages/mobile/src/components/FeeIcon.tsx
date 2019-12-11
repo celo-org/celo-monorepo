@@ -6,19 +6,30 @@ import InfoIcon from 'src/icons/InfoIcon'
 import { navigate } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
 
-function navigateToEducate() {
-  navigate(Screens.FeeExchangeEducation, {})
-}
-
 interface Props {
+  isExchange?: boolean
   isGrey?: boolean
 }
 
 export default class FeeIcon extends React.Component<Props> {
+  static defaultProps = {
+    isExchange: false,
+    isGrey: false,
+  }
+
+  navigateToEducate() {
+    console.log(JSON.stringify(this.props))
+    if (this.props.isExchange) {
+      navigate(Screens.FeeExchangeEducation, {})
+    } else {
+      navigate(Screens.FeeEducation, {})
+    }
+  }
+
   render() {
     return (
       <Touchable
-        onPress={navigateToEducate}
+        onPress={this.navigateToEducate}
         style={styles.area}
         borderless={true}
         hitSlop={iconHitslop}
