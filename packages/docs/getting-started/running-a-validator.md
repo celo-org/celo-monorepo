@@ -294,7 +294,7 @@ telnet $PROXY_EXTERNAL_IP 30303
 
 ```bash
 # On your Validator machine, test that your Proxy is accepting TCP connections over port 30503.
-telnet $PROXY_INTERNAL_IP 30303
+telnet $PROXY_INTERNAL_IP 30503
 ```
 
 Once that is completed, go ahead and run the validator. Be sure to replace `<VALIDATOR-SIGNER-PASSWORD>` with the password for your Validator signer. You should see the validator begin syncing via the Proxy within a few seconds.
