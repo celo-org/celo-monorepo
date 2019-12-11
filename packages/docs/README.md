@@ -117,11 +117,8 @@ Ask questions, find answers, and get in touch:
 
 - [Celo Forum](https://forum.celo.org)
 - [Celo Developer Chat on Discord](https://discord.gg/JvJ66Wc)
-  - There are office hours twice weekly when core developers on Celo are always available:
-    - Mondays 8am PDT, 11am EDT, 3pm GMT, 4pm BST, 5pm CEST
-    - Wednesdays 2pm EDT, 5pm PDT = Thursday 8am CST, 9am JST
 - [Celo Subreddit](https://www.reddit.com/r/CeloHQ/)
-- [Celo Community Page](https://celo.org/community)
+- [Celo Website](https://celo.org/build)
 - [Host a Meetup](https://airtable.com/shrTCM7LddTxOm3r6)
 
 ### Notes <a id="notes"></a>
