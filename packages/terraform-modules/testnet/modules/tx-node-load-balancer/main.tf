@@ -27,9 +27,14 @@ resource "random_id" "internal" {
   byte_length = 8
 }
 
+data "google_compute_subnetwork" "subnet" {
+  name = var.network_name
+}
+
 resource "google_compute_address" "internal" {
   name         = "${local.name_prefix}-internal-address"
   address_type = "INTERNAL"
+  subnetwork   = data.google_compute_subnetwork.subnet.self_link
 }
 
 resource "google_compute_forwarding_rule" "internal" {
