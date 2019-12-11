@@ -1,4 +1,5 @@
 import { writeFileSync } from 'fs'
+import sleep from 'sleep-promise'
 import { confirmAction, envVar, fetchEnv, fetchEnvOrFallback } from './env-utils'
 import {
   AccountType,
@@ -215,6 +216,7 @@ export async function taintTestnet(celoEnv: string) {
   for (const resource of testnetResourcesToReset) {
     console.info(`Tainting ${resource}`)
     await taintTerraformModuleResource(testnetTerraformModule, resource)
+    await sleep(2000)
   }
 }
 
@@ -230,6 +232,7 @@ export async function untaintTestnet(celoEnv: string) {
   for (const resource of testnetResourcesToReset) {
     console.info(`Untainting ${resource}`)
     await untaintTerraformModuleResource(testnetTerraformModule, resource)
+    await sleep(2000)
   }
 }
 

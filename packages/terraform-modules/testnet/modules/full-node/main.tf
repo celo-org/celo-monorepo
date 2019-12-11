@@ -14,14 +14,6 @@ resource "google_compute_address" "full_node" {
   }
 }
 
-resource "google_compute_address" "full_node_internal" {
-  name         = "${local.name_prefix}-internal-address-${count.index}-${random_id.full_node[count.index].hex}"
-  address_type = "INTERNAL"
-  purpose      = "GCE_ENDPOINT"
-
-  count = var.node_count
-}
-
 resource "google_compute_instance" "full_node" {
   name         = "${local.name_prefix}-${count.index}-${random_id.full_node[count.index].hex}"
   machine_type = "n1-standard-2"
@@ -45,7 +37,6 @@ resource "google_compute_instance" "full_node" {
 
   network_interface {
     network = var.network_name
-    network_ip = google_compute_address.full_node_internal[count.index].address
     access_config {
       nat_ip = google_compute_address.full_node[count.index].address
     }

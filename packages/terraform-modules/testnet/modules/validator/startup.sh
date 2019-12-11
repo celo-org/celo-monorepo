@@ -111,7 +111,6 @@ IN_MEMORY_DISCOVERY_TABLE_FLAG=""
 mkdir -p $DATA_DIR/account
 echo -n "${genesis_content_base64}" | base64 -d > $DATA_DIR/genesis.json
 echo -n "${rid}" > $DATA_DIR/replica_id
-echo -n "$PRIVATE_KEY" > $DATA_DIR/pkey
 echo -n "$ACCOUNT_ADDRESS" > $DATA_DIR/address
 echo -n "$BOOTNODE_ENODE_ADDRESS" > $DATA_DIR/bootnodeEnodeAddress
 echo -n "$BOOTNODE_ENODE" > $DATA_DIR/bootnodeEnode
@@ -154,7 +153,6 @@ docker run \
     --wsaddr 0.0.0.0 \
     --wsorigins=* \
     --wsapi=eth,net,web3 \
-    --nodekey=$DATA_DIR/pkey \
     --etherbase=$ACCOUNT_ADDRESS \
     --networkid=${network_id} \
     --syncmode=full \
