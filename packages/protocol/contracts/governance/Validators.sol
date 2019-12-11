@@ -1108,4 +1108,27 @@ contract Validators is
     emit ValidatorDeaffiliated(validatorAccount, affiliation);
     return true;
   }
+
+  bytes32[] canForceDeaffiliation = [
+    DOWNTIME_SLASHER_REGISTRY_ID,
+    DOUBLE_SIGNING_SLASHER_REGISTRY_ID,
+    GOVERNANCE_REGISTRY_ID
+  ];
+
+  /**
+   * @notice Removes a validator from the group for which it is a member.
+   * @param validatorAccount The validator to deaffiliate from their affiliated validator group.
+   */
+  function forceDeaffiliateIfValidator(address validatorAccount)
+    external
+    nonReentrant
+    onlyRegisteredContracts(canForceDeaffiliation)
+  {
+    if (isValidator(validatorAccount)) {
+      Validator storage validator = validators[validatorAccount];
+      if (validator.affiliation != address(0)) {
+        _deaffiliate(validator, validatorAccount);
+      }
+    }
+  }
 }

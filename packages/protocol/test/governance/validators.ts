@@ -859,7 +859,7 @@ contract('Validators', (accounts: string[]) => {
                   assert.equal(parsedValidator.affiliation, otherGroup)
                 })
 
-                it('should emit the ValidatorDeafilliated event', async () => {
+                it('should emit the ValidatorDeaffilliated event', async () => {
                   assert.equal(resp.logs.length, 2)
                   const log = resp.logs[0]
                   assertContainSubset(log, {
@@ -2138,6 +2138,49 @@ contract('Validators', (accounts: string[]) => {
         it('should return zero', async () => {
           assertEqualBN(ret, 0)
         })
+      })
+    })
+  })
+
+  describe('#forceDeaffiliateIfValidator', async () => {
+    const validator = accounts[0]
+    const group = accounts[1]
+
+    beforeEach(async () => {
+      await registerValidator(validator)
+      await registerValidatorGroup(group)
+      await validators.affiliate(group)
+    })
+
+    describe('when the sender is one of three approved contract addresses', async () => {
+      beforeEach(async () => {
+        await registry.setAddressFor(CeloContractName.DowntimeSlasher, validator)
+        await registry.setAddressFor(CeloContractName.DoubleSigningSlasher, accounts[3])
+        await registry.setAddressFor(CeloContractName.Governance, accounts[4])
+      })
+
+      it('should succeed when the sender is the downtime slasher contract', async () => {
+        await validators.forceDeaffiliateIfValidator(validator)
+        const parsedValidator = parseValidatorParams(await validators.getValidator(validator))
+        assert.equal(parsedValidator.affiliation, NULL_ADDRESS)
+      })
+
+      it('should succeed when the sender is the double signing slasher contract', async () => {
+        await validators.forceDeaffiliateIfValidator(validator, { from: accounts[3] })
+        const parsedValidator = parseValidatorParams(await validators.getValidator(validator))
+        assert.equal(parsedValidator.affiliation, NULL_ADDRESS)
+      })
+
+      it('should succeed when the sender is the governance contract', async () => {
+        await validators.forceDeaffiliateIfValidator(validator, { from: accounts[4] })
+        const parsedValidator = parseValidatorParams(await validators.getValidator(validator))
+        assert.equal(parsedValidator.affiliation, NULL_ADDRESS)
+      })
+    })
+
+    describe('when the sender is not an approved address', async () => {
+      it('should revert', async () => {
+        await assertRevert(validators.forceDeaffiliateIfValidator(validator))
       })
     })
   })
