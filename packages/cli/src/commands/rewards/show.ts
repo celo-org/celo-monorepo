@@ -43,8 +43,6 @@ export default class Show extends BaseCommand {
         this.web3,
         async (blockNumber: number) => {
           const voter = await election.getVoter(address, blockNumber)
-          printValueMapRecursive(voter)
-
           const votes: { [key: string]: BigNumber } = {}
           voter.votes.forEach((x) => {
             const group: string = x.group.toLowerCase()
@@ -58,14 +56,14 @@ export default class Show extends BaseCommand {
     }
 
     // voterRewards applies to address when voterReward.group in addressVotes[voterReward.blockNumber].
-    const voterRewards = await election.getVoterRewardEvents(
+    const voterRewardsEvents = await election.getVoterRewardEvents(
       epochSize,
       res.flags.epochs,
       res.flags.address ? addressVotes : null
     )
 
     // validatorRewards applies to address when validatorReward.validator (or .group) is address.
-    const validatorRewards = await validators.getValidatorRewardEvents(
+    const validatorRewardsEvents = await validators.getValidatorRewardEvents(
       epochSize,
       res.flags.epochs,
       res.flags.address
@@ -76,7 +74,7 @@ export default class Show extends BaseCommand {
       this.web3,
       (blockNumber: number) =>
         validators.getUniqueValidators(
-          validatorRewards,
+          validatorRewardsEvents,
           (x: any) => x.returnValues.validator.toLowerCase(),
           blockNumber
         ),
@@ -86,41 +84,90 @@ export default class Show extends BaseCommand {
 
     // For correctness use the Validator Group name at each epoch?
     const validatorGroupDetails = await validators.getUniqueValidatorGroups(
-      voterRewards,
+      voterRewardsEvents,
       (x: any) => x.returnValues.group.toLowerCase()
     )
 
-    cli.table(
-      voterRewards,
-      {
-        name: {
-          get: (x: any) => validatorGroupDetails[x.returnValues.group.toLowerCase()].name,
+    if (voterRewardsEvents.length > 0) {
+      console.info('')
+      console.info('Voter rewards:')
+      cli.table(
+        voterRewardsEvents,
+        {
+          name: {
+            get: (x: any) => validatorGroupDetails[x.returnValues.group.toLowerCase()].name,
+          },
+          group: { get: (x: any) => x.returnValues.group },
+          value: { get: (x: any) => x.returnValues.value },
+          blockNumber: {},
         },
-        group: { get: (x: any) => x.returnValues.group },
-        value: { get: (x: any) => x.returnValues.value },
-        blockNumber: {},
-      },
-      { 'no-truncate': res.flags['no-truncate'] }
-    )
+        { 'no-truncate': res.flags['no-truncate'] }
+      )
+    }
 
-    cli.table(
-      validatorRewards,
-      {
-        name: {
-          get: (x: any) =>
-            validatorDetails[x.blockNumber][x.returnValues.validator.toLowerCase()].name,
+    let validatorRewards = validatorRewardsEvents
+    if (res.flags.address) {
+      const address = res.flags.address.toLowerCase()
+      validatorRewards = validatorRewardsEvents.filter(
+        (x: any) => x.returnValues.validator.toLowerCase() === address
+      )
+    }
+
+    if (validatorRewards.length > 0) {
+      console.info('')
+      console.info('Validator rewards:')
+      cli.table(
+        validatorRewards,
+        {
+          name: {
+            get: (x: any) =>
+              validatorDetails[x.blockNumber][x.returnValues.validator.toLowerCase()].name,
+          },
+          validator: { get: (x: any) => x.returnValues.validator },
+          validatorPayment: { get: (x: any) => x.returnValues.validatorPayment },
+          validatorScore: {
+            get: (x: any) =>
+              validatorDetails[x.blockNumber][
+                x.returnValues.validator.toLowerCase()
+              ].score.toFixed(),
+          },
+          group: { get: (x: any) => x.returnValues.group },
+          blockNumber: {},
         },
-        validator: { get: (x: any) => x.returnValues.validator },
-        validatorPayment: { get: (x: any) => x.returnValues.validatorPayment },
-        validatorScore: {
-          get: (x: any) =>
-            validatorDetails[x.blockNumber][x.returnValues.validator.toLowerCase()].score.toFixed(),
+        { 'no-truncate': res.flags['no-truncate'] }
+      )
+    }
+
+    let validatorGroupRewards = validatorRewardsEvents
+    if (res.flags.address) {
+      const address = res.flags.address.toLowerCase()
+      validatorGroupRewards = validatorRewardsEvents.filter(
+        (x: any) => x.returnValues.group.toLowerCase() === address
+      )
+    }
+
+    if (validatorGroupRewards.length > 0) {
+      console.info('')
+      console.info('Validator Group rewards:')
+      cli.table(
+        validatorGroupRewards,
+        {
+          name: {
+            get: (x: any) => validatorGroupDetails[x.returnValues.group.toLowerCase()].name,
+          },
+          group: { get: (x: any) => x.returnValues.group },
+          groupPayment: { get: (x: any) => x.returnValues.groupPayment },
+          validator: { get: (x: any) => x.returnValues.validator },
+          validatorScore: {
+            get: (x: any) =>
+              validatorDetails[x.blockNumber][
+                x.returnValues.validator.toLowerCase()
+              ].score.toFixed(),
+          },
+          blockNumber: {},
         },
-        group: { get: (x: any) => x.returnValues.group },
-        groupPayment: { get: (x: any) => x.returnValues.groupPayment },
-        blockNumber: {},
-      },
-      { 'no-truncate': res.flags['no-truncate'] }
-    )
+        { 'no-truncate': res.flags['no-truncate'] }
+      )
+    }
   }
 }
