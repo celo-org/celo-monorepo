@@ -5699,11 +5699,6 @@
   version "1.0.0"
   resolved "git://github.com/umpirsky/country-list#05fda51cd97b3294e8175ffed06104c44b3c71d7"
 
-"@umpirsky/country-list@git://github.com/umpirsky/country-list.git#05fda51":
-  version "1.0.0"
-  uid "05fda51cd97b3294e8175ffed06104c44b3c71d7"
-  resolved "git://github.com/umpirsky/country-list.git#05fda51cd97b3294e8175ffed06104c44b3c71d7"
-
 "@ungap/url-search-params@^0.1.2":
   version "0.1.2"
   resolved "https://registry.yarnpkg.com/@ungap/url-search-params/-/url-search-params-0.1.2.tgz#8ba8c0527543fe675d1c29ae0a2daca842e8ee4f"
@@ -8848,19 +8843,6 @@ block-stream@0.0.9:
   integrity sha1-E+v+d4oDIFz+A3UUgeu0szAMEmo=
   dependencies:
     inherits "~2.0.0"
-
-"bls12377js@git+https://github.com/celo-org/bls12377js.git#ea09eba5c54fe63617af494a0c198fcc47582e0c":
-  version "0.1.0"
-  uid ea09eba5c54fe63617af494a0c198fcc47582e0c
-  resolved "git+https://github.com/celo-org/bls12377js.git#ea09eba5c54fe63617af494a0c198fcc47582e0c"
-  dependencies:
-    "@stablelib/blake2xs" "0.10.4"
-    "@types/node" "^12.11.7"
-    big-integer "^1.6.44"
-    chai "^4.2.0"
-    mocha "^6.2.2"
-    ts-node "^8.4.1"
-    typescript "^3.6.4"
 
 "bls12377js@https://github.com/celo-org/bls12377js#ea09eba5c54fe63617af494a0c198fcc47582e0c":
   version "0.1.0"

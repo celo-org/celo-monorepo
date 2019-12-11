@@ -32,15 +32,16 @@ export async function nodeIsSynced(web3: Web3): Promise<boolean> {
     }
     return false
   } catch (error) {
-    console.log('An error occurred while trying to reach the node.')
-    console.log(error)
+    console.log(
+      "An error occurred while trying to reach the node. Perhaps your node isn't running?"
+    )
     return false
   }
 }
 
 export async function requireNodeIsSynced(web3: Web3) {
   if (!(await nodeIsSynced(web3))) {
-    failWith('Node is not currently synced. Run node:synced to check its status')
+    failWith('Node is not currently synced. Run node:synced to check its status.')
   }
 }
 
