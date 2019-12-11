@@ -5,7 +5,7 @@ import { DefaultEventNames } from '@celo/react-components/analytics/constants'
 import ReactNativeLogger from '@celo/react-components/services/ReactNativeLogger'
 import * as React from 'react'
 // tslint:disable-next-line
-import { Component, ComponentClass, forwardRef, Ref } from 'react'
+import { Component, ComponentType, forwardRef, Ref } from 'react'
 
 function getDisplayName<P extends {}>(WrappedComponent: React.ComponentType<P>) {
   return WrappedComponent.displayName || WrappedComponent.name || 'Component'
@@ -16,9 +16,10 @@ export default function Initializer(CeloAnalytics: CeloAnalyticsType, Logger: Re
   // Component name: https://reactjs.org/docs/forwarding-refs.html
 
   function componentWithAnalytics<ComposedComponentProps extends {}>(
-    ComposedComponent: ComponentClass<ComposedComponentProps>
+    ComposedComponent: ComponentType<ComposedComponentProps>
   ) {
     const displayName = getDisplayName(ComposedComponent)
+    // @ts-ignore
     type ComposedComponentInstance = InstanceType<typeof ComposedComponent>
     type WrapperComponentProps = ComposedComponentProps & {
       wrapperComponentProp: number
