@@ -2300,7 +2300,7 @@
     lodash "^4.17.14"
     web3-utils "1.0.0-beta.37"
 
-"@celo/utils@^0.1.0":
+"@celo/utils@0.1.4", "@celo/utils@^0.1.0":
   version "0.1.4"
   resolved "https://registry.yarnpkg.com/@celo/utils/-/utils-0.1.4.tgz#c117441d21699a371da03fcb5d9960ec30eba0f6"
   integrity sha512-pIvLQVjKTpsUon2N/3kPrASF2ndTf3Bf+KhC9cE1P5DPl5R5L/pKIHy5gb4Z89IZt93gWb8/0/h3JQbA+MLGNw==
