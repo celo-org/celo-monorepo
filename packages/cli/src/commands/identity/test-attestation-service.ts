@@ -27,7 +27,6 @@ export default class TestAttestationService extends BaseCommand {
     const address = flags.from
     const { phoneNumber, message } = flags
 
-    console.log(address)
     await newCheckBuilder(this)
       .isAccount(address)
       .canSign(address)
