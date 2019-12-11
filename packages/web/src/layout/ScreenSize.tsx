@@ -66,7 +66,9 @@ export interface ScreenProps {
   screen: ScreenSizes
 }
 
-export function withScreenSize<T>(Component: React.ComponentType<T>) {
+export function withScreenSize<T>(
+  Component: React.ComponentType<T>
+): React.ComponentType<Omit<T, 'screen'>> {
   return function ScreenSizeContainer(props: T) {
     return (
       <ScreenSizeContext.Consumer>
