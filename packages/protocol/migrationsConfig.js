@@ -120,7 +120,6 @@ const DefaultConfig = {
     votesRatioOfLastVsFirstGroup: 2.0,
     groupLockedGold: {
       value: '22000000000000000000000', // 22k gold per group
-      duration: 60 * 24 * 60 * 60, // 60 days
     },
   },
 }
