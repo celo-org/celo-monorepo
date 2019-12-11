@@ -101,12 +101,24 @@ async function getEveryResourceWithPrefix(moduleName: string, resourcePrefix: st
   return resources.filter((resource: string) => resource.startsWith(resourcePrefix))
 }
 
+// Allow failures
 function taintResource(moduleName: string, resourceName: string) {
-  return execTerraformCmd(`terraform taint ${resourceName}`, getModulePath(moduleName), false)
+  try {
+    return execTerraformCmd(`terraform taint ${resourceName}`, getModulePath(moduleName), false)
+  } catch (e) {
+    console.info(`Could not taint ${resourceName}`, e)
+    return Promise.resolve()
+  }
 }
 
+// Allow failures
 function untaintResource(moduleName: string, resourceName: string) {
-  return execTerraformCmd(`terraform untaint ${resourceName}`, getModulePath(moduleName), false)
+  try {
+    return execTerraformCmd(`terraform untaint ${resourceName}`, getModulePath(moduleName), false)
+  } catch (e) {
+    console.info(`Could not taint ${resourceName}`, e)
+    return Promise.resolve()
+  }
 }
 
 // pulls remote state
