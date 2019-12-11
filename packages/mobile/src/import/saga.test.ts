@@ -13,10 +13,9 @@ import {
 } from 'src/import/actions'
 import { importBackupPhraseSaga } from 'src/import/saga'
 import { redeemInviteSuccess } from 'src/invite/actions'
-import { waitWeb3LastBlock } from 'src/networkInfo/saga'
 import { fetchTokenBalanceInWeiWithRetry } from 'src/tokens/saga'
 import { setKey } from 'src/utils/keyStore'
-import { assignAccountFromPrivateKey } from 'src/web3/saga'
+import { assignAccountFromPrivateKey, waitWeb3LastBlock } from 'src/web3/saga'
 import { mockAccount } from 'test/values'
 
 const mockPhraseValid =
