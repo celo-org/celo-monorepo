@@ -265,7 +265,7 @@ export const getDatetimeDisplayString = (
 ) => {
   const timeFormatted = formatFeedTime(timestamp, i18next)
   const dateFormatted = formatFeedDate(timestamp, i18next)
-  return `${dateFormatted} ${t('at')} ${timeFormatted}`
+  return `${dateFormatted} ${t('global:at')} ${timeFormatted}`
 }
 
 export const getRemoteTime = () => {
