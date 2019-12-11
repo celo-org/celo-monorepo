@@ -43,18 +43,17 @@ Contents:
 
 <!-- TOC -->
 
-- [Celo's Mission - Prosperity for All](#celos-mission---prosperity-for-all)
-- [The Celo Stack](#the-celo-stack)
+- [Celo's Mission - Prosperity for All](#mission)
+- [The Celo Stack](#stack)
 - [Documentation](#documentation)
 - [Issues](#issues)
-- [Contributing](#%EF%B8%8F-contributing)
-- [Ask questions, find answers, and get in touch:](#-ask-questions-find-answers-and-get-in-touch)
-- [Project leaders](#project-leaders)
-- [Contributors](#-contributors)
-- [License](#-license)
+- [Repo Structure](#repo)
+- [Contributing](#contributing)
+- [Ask Questions, Find Answers, Get in Touch](#ask)
+- [License](#license)
   <!-- /TOC -->
 
-## 🥅 Celo's Mission - Prosperity for All
+## 🥅 <a id="mission"></a>Celo's Mission - Prosperity for All
 
 Celo, pronounced /ˈtselo/, means ‘purpose’ in Esperanto. In a similar spirit, we are aiming to create a new platform to connect people globally and bring financial stability to those who need it most. We believe blockchain technology is one of the most exciting innovations in recent history and as a community we look to push the boundaries of what is possible with it today. More importantly, we are driven by purpose -- to solve real-world problems such as lack of access to sound currency, or friction for cash-transfer programs aimed to alleviate poverty. Our mission is to build a monetary system that creates the conditions for prosperity for all.
 
@@ -67,7 +66,7 @@ Celo, pronounced /ˈtselo/, means ‘purpose’ in Esperanto. In a similar spiri
   <i>What if money were beautiful?</i>
 </p>
 
-## 🧱 The Celo Stack
+## 🧱 <a id="stack"></a>The Celo Stack
 
 Celo is oriented around providing the simplest possible experience for end users, who may have no familiarity with cryptocurrencies, and may be using low cost devices with limited connectivity. To achieve this, the project takes a full-stack approach, where each layer of the stack is designed with the end user in mind whilst considering other stakeholders \(e.g. operators of nodes in the network\) involved in enabling the end user experience.
 
@@ -93,17 +92,17 @@ The Celo stack is structured into the following logical layers:
 
 - **Applications:** Applications for end users built on the Celo platform. The Celo Wallet app, the first of an ecosystem of applications, allows end users to manage accounts and make payments securely and simply by taking advantage of the innovations in the Celo protocol. Applications take the form of external mobile or backend software: they interact with the Celo Blockchain to issue transactions and invoke code that forms the Celo Core Contracts’ API. Third parties can also deploy custom smart contracts that their own applications can invoke, which in turn can leverage Celo Core Contracts. Applications may use centralized cloud services to provide some of their functionality: in the case of the Celo Wallet, push notifications and a transaction activity feed.
 
-## 📚 Documentation
+## 📚 <a id="docs"></a>Documentation
 
 Follow the instructions in [SETUP.md](SETUP.md) to get a development environment set up.
 
 See [Developer's Guide](https://docs.celo.org/) for full details about the design of the Celo protocol and other information about running these projects.
 
-## 🙋 Issues
+## 🙋 <a id="issues"></a>Issues
 
 See the [issue backlog](https://github.com/celo-org/celo-monorepo/issues) for a list of active or proposed tasks. Feel free to create new issues to report bugs and/or request features.
 
-## 📂 Repo structure
+## 📂 <a id="repo"></a>Repo Structure
 
 The repository has the following packages (sub projects):
 
@@ -133,7 +132,7 @@ The repository has the following packages (sub projects):
 
 Code owners for each package can be found in [.github/CODEOWNERS](.github/CODEOWNERS).
 
-## ✍️ Contributing
+## ✍️ <a id="contributing"></a>Contributing
 
 Feel free to jump on the Celo 🚂🚋🚋🚋. Improvements and contributions are highly encouraged! 🙏👊
 
@@ -147,7 +146,7 @@ Twitter
 twitter intent generator - http://tech.cymi.org/tweet-intents
 -->
 
-## 💬 Ask questions, find answers, and get in touch
+## 💬 <a id="ask"></a>Ask Questions, Find Answers, Get in Touch
 
 - [Website](https://celo.org/)
 - [Docs](https://docs.celo.org/)
@@ -159,6 +158,6 @@ twitter intent generator - http://tech.cymi.org/tweet-intents
 - [Reddit](https://www.reddit.com/r/CeloHQ/)
 - [Community Events](https://celo.org/community)
 
-## 📜 License
+## 📜 <a id="license"></a>License
 
 All packages are licensed under the terms of the [Apache 2.0 License](LICENSE) unless otherwise specified in the LICENSE file at package's root.
