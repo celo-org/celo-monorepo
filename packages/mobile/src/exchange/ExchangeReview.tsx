@@ -62,7 +62,7 @@ const mapStateToProps = (state: RootState): StateProps => ({
   appConnected: isAppConnected(state),
 })
 
-class ExchangeReview extends React.Component<Props, State> {
+export class ExchangeReview extends React.Component<Props, State> {
   static navigationOptions = ({ navigation }: NavigationInjectedProps<NavProps>) => {
     const { makerToken, makerTokenBalance } = navigation.getParam('exchangeInput')
     return ExchangeHeader(makerToken, makerTokenBalance)

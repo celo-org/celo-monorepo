@@ -23,12 +23,6 @@ const store = createMockStore({
   exchange: {
     exchangeRatePair,
   },
-  goldToken: {
-    balance: '100',
-  },
-  stableToken: {
-    balance: '200',
-  },
 })
 
 describe(ExchangeTradeScreen, () => {
