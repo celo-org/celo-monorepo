@@ -18,12 +18,11 @@ import {
 import { redeemInviteSuccess } from 'src/invite/actions'
 import { navigate } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
-import { waitWeb3LastBlock } from 'src/networkInfo/saga'
 import { fetchTokenBalanceInWeiWithRetry } from 'src/tokens/saga'
 import { setKey } from 'src/utils/keyStore'
 import Logger from 'src/utils/Logger'
 import { web3 } from 'src/web3/contracts'
-import { assignAccountFromPrivateKey } from 'src/web3/saga'
+import { assignAccountFromPrivateKey, waitWeb3LastBlock } from 'src/web3/saga'
 
 const TAG = 'import/saga'
 
