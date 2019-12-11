@@ -40,6 +40,7 @@ export default class Show extends BaseCommand {
     const addressVotes: { [key: number]: { [key: string]: BigNumber } } = {}
     const validatorDetails: { [key: number]: { [key: string]: any } } = {}
     const validatorGroupDetails: { [key: number]: { [key: string]: any } } = {}
+    const lowerAddress = res.flags.address ? res.flags.address.toLowerCase() : res.flags.address
     let voterRewardsEvents: any[] = []
     let validatorRewardsEvents: any[] = []
 
@@ -50,43 +51,78 @@ export default class Show extends BaseCommand {
         .runChecks()
     }
 
+    // For each epoch..
     for (let blockNumber = fromBlock; blockNumber <= lastEpochBlock; blockNumber += epochSize) {
+      // Get the groups that address voted for.
       if (res.flags.address) {
         const address = res.flags.address
         const voter = await election.getVoter(address, blockNumber)
-        voter.votes.forEach((x) => {
-          const group: string = x.group.toLowerCase()
+        for (const vote of voter.votes) {
+          const group: string = vote.group.toLowerCase()
           addressVotes[blockNumber][group] = (
             addressVotes[blockNumber][group] || new BigNumber(0)
-          ).plus(x.active)
-        })
+          ).plus(vote.active)
+        }
       }
 
-      // voterRewards applies to address when voterReward.group in addressVotes[voterReward.blockNumber].
+      // voterReward applies to address when voterReward.group in addressVotes[voterReward.blockNumber].
+      const epochVoterRewardsEvents = await electionContract.getPastEvents(
+        'EpochRewardsDistributedToVoters',
+        {
+          fromBlock: blockNumber,
+          toBlock: blockNumber,
+        }
+      )
       voterRewardsEvents = voterRewardsEvents.concat(
-        await this.getVoterRewardEvents(
-          electionContract,
-          blockNumber,
-          res.flags.address ? addressVotes : null
-        )
+        res.flags.address
+          ? epochVoterRewardsEvents.filter(
+              (x: any) => x.returnValues.group.toLowerCase() in addressVotes[x.blockNumber]
+            )
+          : epochVoterRewardsEvents
       )
 
-      // validatorRewards applies to address when validatorReward.validator (or .group) is address.
+      // validatorReward applies to address when validatorReward.validator (or .group) is address.
+      const epochValidatorRewardsEvents = await validatorsContract.getPastEvents(
+        'ValidatorEpochPaymentDistributed',
+        {
+          fromBlock: blockNumber,
+          toBlock: blockNumber,
+        }
+      )
       validatorRewardsEvents = validatorRewardsEvents.concat(
-        await this.getValidatorRewardEvents(validatorsContract, blockNumber, res.flags.address)
+        res.flags.address
+          ? epochValidatorRewardsEvents.filter(
+              (x: any) =>
+                x.returnValues.validator.toLowerCase() === lowerAddress ||
+                x.returnValues.group.toLowerCase() === lowerAddress
+            )
+          : epochValidatorRewardsEvents
       )
 
-      // Get the Validator scores at each epoch.
-      validatorDetails[blockNumber] = await this.getUniqueValidators(
-        validatorRewardsEvents,
-        (x: any) => x.returnValues.validator.toLowerCase(),
-        blockNumber
-      )
+      // Get the Validator scores.
+      const uniqueValidators: { [key: string]: any } = {}
+      for (const event of validatorRewardsEvents) {
+        const validatorAddress = event.returnValues.validator.toLowerCase()
+        if (!(validatorAddress in uniqueValidators)) {
+          uniqueValidators[validatorAddress] = validators.getValidator(
+            validatorAddress,
+            blockNumber
+          )
+        }
+      }
+      validatorDetails[blockNumber] = await this.promisedProperties(uniqueValidators)
 
-      validatorGroupDetails[blockNumber] = await this.getUniqueValidatorGroups(
-        voterRewardsEvents,
-        (x: any) => x.returnValues.group.toLowerCase()
-      )
+      // Get the Validator Group names.
+      const uniqueValidatorGroups: { [key: string]: any } = {}
+      for (const event of validatorRewardsEvents) {
+        const validatorGroupAddress = event.returnValues.group.toLowerCase()
+        if (!(validatorGroupAddress in uniqueValidatorGroups)) {
+          uniqueValidatorGroups[validatorGroupAddress] = validators.getValidatorGroup(
+            validatorGroupAddress
+          )
+        }
+      }
+      validatorGroupDetails[blockNumber] = await this.promisedProperties(uniqueValidatorGroups)
     }
 
     if (voterRewardsEvents.length > 0) {
@@ -174,81 +210,12 @@ export default class Show extends BaseCommand {
     }
 
     if (
-      voterRewardsEvents.length == 0 &&
-      validatorRewards.length == 0 &&
-      validatorGroupRewards.length == 0
+      voterRewardsEvents.length === 0 &&
+      validatorRewards.length === 0 &&
+      validatorGroupRewards.length === 0
     ) {
       console.info('No rewards.')
     }
-  }
-
-  // Returns filtered EpochRewardsDistributedToVoters events for blockNumber.
-  async getVoterRewardEvents(
-    contract: any,
-    blockNumber: number,
-    groupFilter?: { [key: number]: { [key: string]: BigNumber } } | null
-  ) {
-    const voterRewardsEvents = contract.getPastEvents('EpochRewardsDistributedToVoters', {
-      fromBlock: blockNumber,
-      toBlock: blockNumber,
-    })
-    if (!groupFilter) {
-      return voterRewardsEvents
-    } else {
-      return voterRewardsEvents.filter(
-        (x: any) => x.returnValues.group.toLowerCase() in groupFilter[x.blockNumber]
-      )
-    }
-  }
-
-  // Returns filtered ValidatorEpochPaymentDistributed events for blockNumber.
-  async getValidatorRewardEvents(contract: any, blockNumber: number, addressFilter?: string) {
-    const validatorRewardsEvents = contract.getPastEvents('ValidatorEpochPaymentDistributed', {
-      fromBlock: blockNumber,
-      toBlock: blockNumber,
-    })
-    if (!addressFilter) {
-      return validatorRewardsEvents
-    } else {
-      const lowerAddressFilter = addressFilter.toLowerCase()
-      return validatorRewardsEvents.filter(
-        (x: any) =>
-          x.returnValues.validator.toLowerCase() === lowerAddressFilter ||
-          x.returnValues.group.toLowerCase() === lowerAddressFilter
-      )
-    }
-  }
-
-  // Returns map from Validator address to Validator.
-  async getUniqueValidators(
-    listWithValidators: any,
-    getValidatorAddress: any,
-    blockNumber?: number
-  ) {
-    const validators = await this.kit.contracts.getValidators()
-    const uniqueValidators: { [key: string]: any } = {}
-    for (const validator of listWithValidators) {
-      const validatorAddress = getValidatorAddress(validator)
-      if (!(validatorAddress in uniqueValidators)) {
-        uniqueValidators[validatorAddress] = validators.getValidator(validatorAddress, blockNumber)
-      }
-    }
-    return this.promisedProperties(uniqueValidators)
-  }
-
-  // Returns map from ValidatorGroup address to ValidatorGroup.
-  async getUniqueValidatorGroups(listWithValidatorGroups: any, getValidatorGroupAddress: any) {
-    const validators = await this.kit.contracts.getValidators()
-    const uniqueValidatorGroups: { [key: string]: any } = {}
-    for (const validatorGroup of listWithValidatorGroups) {
-      const validatorGroupAddress = getValidatorGroupAddress(validatorGroup)
-      if (!(validatorGroupAddress in uniqueValidatorGroups)) {
-        uniqueValidatorGroups[validatorGroupAddress] = validators.getValidatorGroup(
-          validatorGroupAddress
-        )
-      }
-    }
-    return this.promisedProperties(uniqueValidatorGroups)
   }
 
   // Return the object with Promise properties resolved.

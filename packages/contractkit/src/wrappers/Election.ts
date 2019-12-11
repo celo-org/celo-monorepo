@@ -143,13 +143,11 @@ export class ElectionWrapper extends BaseWrapper<Election> {
   }
 
   async getVoter(account: Address, blockNumber?: number): Promise<Voter> {
-    let groups: string[]
-    if (blockNumber) {
-      // @ts-ignore: Expected 0-1 arguments, but got 2
-      groups = await this.contract.methods.getGroupsVotedForByAccount(account).call({}, blockNumber)
-    } else {
-      groups = await this.contract.methods.getGroupsVotedForByAccount(account).call()
-    }
+    const groups: Address[] = blockNumber
+      ? // @ts-ignore: Expected 0-1 arguments, but got 2
+        await this.contract.methods.getGroupsVotedForByAccount(account).call({}, blockNumber)
+      : await this.contract.methods.getGroupsVotedForByAccount(account).call()
+
     const votes = await Promise.all(
       groups.map((g) => this.getVotesForGroupByAccount(account, g, blockNumber))
     )

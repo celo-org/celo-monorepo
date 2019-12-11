@@ -201,13 +201,10 @@ export class ValidatorsWrapper extends BaseWrapper<Validators> {
 
   /** Get Validator information */
   async getValidator(address: Address, blockNumber?: number): Promise<Validator> {
-    let res
-    if (blockNumber) {
-      // @ts-ignore: Expected 0-1 arguments, but got 2
-      res = await this.contract.methods.getValidator(address).call({}, blockNumber)
-    } else {
-      res = await this.contract.methods.getValidator(address).call()
-    }
+    const res = blockNumber
+      ? // @ts-ignore: Expected 0-1 arguments, but got 2
+        await this.contract.methods.getValidator(address).call({}, blockNumber)
+      : await this.contract.methods.getValidator(address).call()
 
     let name
     if (blockNumber) {
