@@ -1977,6 +1977,8 @@ contract('Governance', (accounts: string[]) => {
     beforeEach(async () => {
       await governance.addValidator(accounts[2])
       await governance.addValidator(accounts[3])
+      await accountsInstance.createAccount({ from: accounts[2] })
+      await accountsInstance.createAccount({ from: accounts[3] })
     })
 
     it('should return false when hotfix has not been whitelisted', async () => {
@@ -2001,6 +2003,7 @@ contract('Governance', (accounts: string[]) => {
   describe('#prepareHotfix()', () => {
     beforeEach(async () => {
       await governance.addValidator(accounts[2])
+      await accountsInstance.createAccount({ from: accounts[2] })
     })
 
     it('should revert when hotfix is not passing', async () => {
@@ -2071,6 +2074,7 @@ contract('Governance', (accounts: string[]) => {
     it('should revert when hotfix prepared but not for current epoch', async () => {
       await governance.approveHotfix(proposalHashStr, { from: approver })
       await governance.addValidator(accounts[2])
+      await accountsInstance.createAccount({ from: accounts[2] })
       await governance.whitelistHotfix(proposalHashStr, { from: accounts[2] })
       await governance.prepareHotfix(proposalHashStr, { from: accounts[2] })
       await mineBlocks(EPOCH, web3)
@@ -2082,6 +2086,7 @@ contract('Governance', (accounts: string[]) => {
         await governance.approveHotfix(proposalHashStr, { from: approver })
         await mineBlocks(EPOCH, web3)
         await governance.addValidator(accounts[2])
+        await accountsInstance.createAccount({ from: accounts[2] })
         await governance.whitelistHotfix(proposalHashStr, { from: accounts[2] })
         await governance.prepareHotfix(proposalHashStr)
       })

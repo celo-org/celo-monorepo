@@ -41,7 +41,7 @@ steps:
   ]
   waitFor: ['-']
 
-  - id: "docker:leaderboard"
+- id: "docker:leaderboard"
   name: gcr.io/kaniko-project/executor:latest
   args: [
     "--dockerfile=dockerfiles/leaderboard/Dockerfile",
