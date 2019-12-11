@@ -659,11 +659,13 @@ describe('governance tests', () => {
           const targetVotingYield = new BigNumber(
             (await epochRewards.methods.getTargetVotingYieldParameters().call({}, blockNumber))[0]
           )
+          assert.isFalse(targetVotingYield.isZero())
           // We need to calculate the rewards multiplier for the previous block, before
           // the rewards actually are awarded.
           const rewardsMultiplier = new BigNumber(
             await epochRewards.methods.getRewardsMultiplier().call({}, blockNumber - 1)
           )
+          assert.isFalse(rewardsMultiplier.isZero())
           const expectedEpochReward = activeVotes
             .times(fromFixed(targetVotingYield))
             .times(fromFixed(rewardsMultiplier))
