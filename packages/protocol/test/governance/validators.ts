@@ -55,6 +55,8 @@ const parseValidatorGroupParams = (groupParams: any) => {
     members: groupParams[0],
     commission: groupParams[1],
     sizeHistory: groupParams[2],
+    slashingMultiplier: groupParams[3],
+    lastSlashedTimestamp: groupParams[4],
   }
 }
 
@@ -2181,6 +2183,48 @@ contract('Validators', (accounts: string[]) => {
     describe('when the sender is not an approved address', async () => {
       it('should revert', async () => {
         await assertRevert(validators.forceDeaffiliateIfValidator(validator))
+      })
+    })
+  })
+
+  describe.only('#halveSlashingMultiplier', async () => {
+    const validator = accounts[0]
+    const group = accounts[1]
+
+    beforeEach(async () => {
+      await registerValidator(validator)
+      await registerValidatorGroup(group)
+      await validators.affiliate(group)
+    })
+
+    describe('when run from an approved address', async () => {
+      beforeEach(async () => {
+        registry.setAddressFor(CeloContractName.DowntimeSlasher, accounts[2])
+        registry.setAddressFor(CeloContractName.DoubleSigningSlasher, accounts[3])
+      })
+
+      it('should halve the slashing multiplier of a group', async () => {
+        let multiplier = 1.0
+        for (let i = 0; i < 10; i++) {
+          await validators.halveSlashingMultiplier(group, { from: accounts[2] })
+          multiplier /= 2
+          const parsedGroup = parseValidatorGroupParams(await validators.getValidatorGroup(group))
+          assertEqualBN(parsedGroup.slashingMultiplier, toFixed(multiplier))
+        }
+      })
+
+      it('should update `lastSlashedTimestamp', async () => {
+        let parsedGroup = parseValidatorGroupParams(await validators.getValidatorGroup(group))
+        const initialTimestamp = parsedGroup.lastSlashedTimestamp
+        await validators.halveSlashingMultiplier(group, { from: accounts[2] })
+        parsedGroup = parseValidatorGroupParams(await validators.getValidatorGroup(group))
+        assert(parsedGroup.lastSlashedTimestamp > initialTimestamp)
+      })
+    })
+
+    describe('when called from an unapproved address', async () => {
+      it('should fail', async () => {
+        await assertRevert(validators.halveSlashingMultiplier(group))
       })
     })
   })

@@ -60,6 +60,7 @@ contract Validators is
     FixidityLib.Fraction commission;
     // sizeHistory[i] contains the last time the group contained i members.
     uint256[] sizeHistory;
+    GroupSlashInfo slashInfo;
   }
 
   // Stores the epoch number at which a validator joined a particular group.
@@ -79,6 +80,11 @@ contract Validators is
     uint256 numEntries;
     mapping(uint256 => MembershipHistoryEntry) entries;
     uint256 lastRemovedFromGroupTimestamp;
+  }
+
+  struct GroupSlashInfo {
+    FixidityLib.Fraction slashingMultiplier;
+    uint256 lastSlashedTimestamp;
   }
 
   struct PublicKeys {
@@ -108,6 +114,7 @@ contract Validators is
   ValidatorScoreParameters private validatorScoreParameters;
   uint256 public membershipHistoryLength;
   uint256 public maxGroupSize;
+  uint256 public slashingMultiplierResetPeriod;
 
   event MaxGroupSizeSet(uint256 size);
   event ValidatorEpochPaymentSet(uint256 value);
@@ -610,6 +617,7 @@ contract Validators is
     ValidatorGroup storage group = groups[account];
     group.exists = true;
     group.commission = FixidityLib.wrap(commission);
+    group.slashInfo = GroupSlashInfo(FixidityLib.fixed1(), 0);
     registeredGroups.push(account);
     emit ValidatorGroupRegistered(account, commission);
     return true;
@@ -837,11 +845,17 @@ contract Validators is
   function getValidatorGroup(address account)
     external
     view
-    returns (address[] memory, uint256, uint256[] memory)
+    returns (address[] memory, uint256, uint256[] memory, uint256, uint256)
   {
     require(isValidatorGroup(account));
     ValidatorGroup storage group = groups[account];
-    return (group.members.getKeys(), group.commission.unwrap(), group.sizeHistory);
+    return (
+      group.members.getKeys(),
+      group.commission.unwrap(),
+      group.sizeHistory,
+      group.slashInfo.slashingMultiplier.unwrap(),
+      group.slashInfo.lastSlashedTimestamp
+    );
   }
 
   /**
@@ -1130,5 +1144,44 @@ contract Validators is
         _deaffiliate(validator, validatorAccount);
       }
     }
+  }
+
+  /**
+	 * @notice Sets the slashingMultiplierRestPeriod property if called by owner
+	 * @param value New reset period for slashing multiplier
+	 */
+  function setSlashingMultiplierResetPeriod(uint256 value) external nonReentrant onlyOwner {
+    slashingMultiplierResetPeriod = value;
+  }
+
+  /**
+	 * @notice Resets a group's slashing multiplier if it has been >= the reset period since 
+   *         the last time the group was slashed.
+	 */
+  function resetSlashingMultiplier() external nonReentrant {
+    address account = getAccounts().signerToAccount(msg.sender);
+    require(isValidatorGroup(account));
+    ValidatorGroup storage group = groups[account];
+    if (now >= group.slashInfo.lastSlashedTimestamp + slashingMultiplierResetPeriod) {
+      group.slashInfo.slashingMultiplier = FixidityLib.fixed1();
+    }
+  }
+
+  bytes32[] canHalveSlashingMultiplier = [
+    DOWNTIME_SLASHER_REGISTRY_ID,
+    DOUBLE_SIGNING_SLASHER_REGISTRY_ID
+  ];
+
+  function halveSlashingMultiplier(address groupAddress)
+    external
+    nonReentrant
+    onlyRegisteredContracts(canHalveSlashingMultiplier)
+  {
+    require(isValidatorGroup(groupAddress));
+    ValidatorGroup storage group = groups[groupAddress];
+    group.slashInfo.slashingMultiplier = group.slashInfo.slashingMultiplier.divide(
+      FixidityLib.newFixed(2)
+    );
+    group.slashInfo.lastSlashedTimestamp = now;
   }
 }
