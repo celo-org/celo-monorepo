@@ -2,9 +2,31 @@
 
 If you were running a Validator and Proxy in a previous phase of the `baklava` network, this page contains instructions about how to set up your Validator on the current phase.
 
+## Stop all your nodes
+
+```bash
+# On your local machine
+docker stop celo-accounts && docker rm celo-accounts
+```
+
+```bash
+# On your validator machine
+docker stop celo-validator && docker rm celo-validator
+```
+
+```bash
+# On your proxy machine
+docker stop celo-proxy && docker rm celo-proxy
+```
+
+```bash
+# On your attestations machine
+docker stop celo-attestations && docker rm celo-attestations
+```
+
 ## Double check that you still have your keys
 
-First, you should check that you didn't accidentally remove your Validator, Validator Group, and Validator signer private keys. You can do so by listing the contents of your `keystore` directory on each machine. You should see a file ending with the address of the corresponding key.
+Make sure that you still have your Validator, Validator Group, and Validator signer private keys, as you will be able to re-use them in the next phase of the network. You can do so by listing the contents of your `keystore` directory on each machine. You should see a file ending with the address of the corresponding key.
 
 ```bash
 # On your local machine
@@ -48,17 +70,16 @@ rm -rf geth* && rm static-nodes.json
 
 ### Pulling the latest Celo Docker image
 
-First, pull the Celo image as described [here](running-a-validator.md#pull-image) section. Be sure to pull the image on your local, validator, proxy, and attestations machines.
-
-### Restart your Accounts node
-
-First, make sure you have the proper environment variables set:
+First, pull the Celo image as described [here](running-a-validator.md#pull-image). Be sure to pull the image on your local, validator, proxy, and attestations machines.
 
 ```bash
-# On your local machine
+# On all machines
 export CELO_IMAGE=us.gcr.io/celo-testnet/celo-node:baklava
 export NETWORK_ID=76172
+docker pull $CELO_IMAGE
 ```
+
+### Restart your Accounts node
 
 Follow [these instructions](running-a-validator.md#start-your-accounts-node) to restart your accounts node on your local machine.
 
@@ -68,14 +89,22 @@ Follow [these instructions](running-a-validator.md#deploy-a-proxy) to restart yo
 
 ### Restart your Validator node
 
-In order to restart your Validator, you'll need to have the proxy info environment variables set. If not, follow [these instructions](running-a-validator.md#get-your-proxy's-connection-info) to recover them.
+In order to restart your Validator, you'll need to have the proxy info environment variables set. If not, follow [these instructions](running-a-validator.md#get-your-proxys-connection-info) to recover them.
 
-Remember, `PROXY_IP` should be set to the external IP address of your Proxy machine.
+Remember, `PROXY_EXTERNAL_IP` should be set to the external IP address of your Proxy machine.
 
 ```bash
 # On your validator machine
-echo $PROXY_IP
+echo $PROXY_INTERNAL_IP
+echo $PROXY_EXTERNAL_IP
 echo $PROXY_ENODE
+```
+
+You'll also need to make sure your Validator signer address is set:
+
+```bash
+# On your validator machine
+export CELO_VALIDATOR_SIGNER_ADDRESS=<YOUR-CELO-VALIDATOR-SIGNER-ADDRESS>
 ```
 
 Next, follow [these instructions](running-a-validator.md#connect-the-validator-to-the-proxy) to restart your validator node on your validator machine.
