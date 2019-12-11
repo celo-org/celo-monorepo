@@ -14,6 +14,7 @@ USAGE
 
 OPTIONS
   --from=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) Voter's address
+  --[no-]truncate                                    Truncate fields to fit line
   --wait                                             Wait until all pending votes become activatable
 
 EXAMPLES
@@ -30,6 +31,9 @@ Outputs the set of validators currently participating in BFT to create blocks. A
 ```
 USAGE
   $ celocli election:current
+
+OPTIONS
+  --[no-]truncate  Truncate fields to fit line
 ```
 
 _See code: [packages/cli/src/commands/election/current.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/election/current.ts)_
@@ -41,6 +45,9 @@ Prints the list of validator groups, the number of votes they have received, the
 ```
 USAGE
   $ celocli election:list
+
+OPTIONS
+  --[no-]truncate  Truncate fields to fit line
 
 EXAMPLE
   list
@@ -59,6 +66,7 @@ USAGE
 OPTIONS
   --for=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d   (required) ValidatorGroup's address
   --from=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) Voter's address
+  --[no-]truncate                                    Truncate fields to fit line
   --value=value                                      (required) Value of votes to revoke
 
 EXAMPLE
@@ -75,6 +83,9 @@ Runs a "mock" election and prints out the validators that would be elected if th
 ```
 USAGE
   $ celocli election:run
+
+OPTIONS
+  --[no-]truncate  Truncate fields to fit line
 ```
 
 _See code: [packages/cli/src/commands/election/run.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/election/run.ts)_
@@ -91,8 +102,9 @@ ARGUMENTS
   ADDRESS  Voter or Validator Groups's address
 
 OPTIONS
-  --group  Show information about a group running in Validator elections
-  --voter  Show information about an account voting in Validator elections
+  --group          Show information about a group running in Validator elections
+  --[no-]truncate  Truncate fields to fit line
+  --voter          Show information about an account voting in Validator elections
 
 EXAMPLES
   show 0x97f7333c51897469E8D98E7af8653aAb468050a3 --voter
@@ -112,6 +124,7 @@ USAGE
 OPTIONS
   --for=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d   (required) ValidatorGroup's address
   --from=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) Voter's address
+  --[no-]truncate                                    Truncate fields to fit line
   --value=value                                      (required) Amount of Gold used to vote for group
 
 EXAMPLE

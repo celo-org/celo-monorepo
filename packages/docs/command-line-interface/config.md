@@ -11,6 +11,9 @@ Output network node configuration
 ```
 USAGE
   $ celocli config:get
+
+OPTIONS
+  --[no-]truncate  Truncate fields to fit line
 ```
 
 _See code: [packages/cli/src/commands/config/get.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/config/get.ts)_
@@ -25,6 +28,7 @@ USAGE
 
 OPTIONS
   -n, --node=node  (required) [default: http://localhost:8545] URL of the node to run commands against
+  --[no-]truncate  Truncate fields to fit line
 
 EXAMPLE
   set  --node ws://localhost:2500

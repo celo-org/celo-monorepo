@@ -13,8 +13,9 @@ USAGE
   $ celocli lockedgold:lock
 
 OPTIONS
-  --from=from    (required)
-  --value=value  (required) The unit amount of Celo Gold (cGLD)
+  --from=from      (required)
+  --[no-]truncate  Truncate fields to fit line
+  --value=value    (required) The unit amount of Celo Gold (cGLD)
 
 EXAMPLE
   lock --from 0x47e172F6CfB6c7D01C1574fa3E2Be7CC73269D95 --value 10000000000000000000000
@@ -29,6 +30,9 @@ Show Locked Gold information for a given account. This includes the total amount
 ```
 USAGE
   $ celocli lockedgold:show ACCOUNT
+
+OPTIONS
+  --[no-]truncate  Truncate fields to fit line
 
 EXAMPLE
   show 0x5409ed021d9299bf6814279a6a1411a7e866a631
@@ -46,6 +50,7 @@ USAGE
 
 OPTIONS
   --from=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) Account Address
+  --[no-]truncate                                    Truncate fields to fit line
   --value=value                                      (required) The unit amount of Celo Gold (cGLD)
 
 EXAMPLE
@@ -64,6 +69,7 @@ USAGE
 
 OPTIONS
   --from=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) Account Address
+  --[no-]truncate                                    Truncate fields to fit line
 
 EXAMPLE
   withdraw --from 0x47e172F6CfB6c7D01C1574fa3E2Be7CC73269D95

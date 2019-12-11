@@ -19,10 +19,6 @@ export default class Show extends BaseCommand {
       required: false,
       description: 'Show results for the last N epochs',
     }),
-    'no-truncate': flags.boolean({
-      required: false,
-      description: "Don't truncate fields to fit line",
-    }),
   }
 
   static args = []
@@ -141,7 +137,7 @@ export default class Show extends BaseCommand {
           value: { get: (x) => x.returnValues.value },
           blockNumber: {},
         },
-        { 'no-truncate': res.flags['no-truncate'] }
+        { 'no-truncate': !res.flags.truncate }
       )
     }
 
@@ -173,7 +169,7 @@ export default class Show extends BaseCommand {
           group: { get: (x) => x.returnValues.group },
           blockNumber: {},
         },
-        { 'no-truncate': res.flags['no-truncate'] }
+        { 'no-truncate': !res.flags.truncate }
       )
     }
 
@@ -203,7 +199,7 @@ export default class Show extends BaseCommand {
           },
           blockNumber: {},
         },
-        { 'no-truncate': res.flags['no-truncate'] }
+        { 'no-truncate': !res.flags.truncate }
       )
     }
 

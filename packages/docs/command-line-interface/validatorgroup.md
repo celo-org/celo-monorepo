@@ -15,6 +15,7 @@ USAGE
 OPTIONS
   --commission=commission                            (required)
   --from=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) Address for the Validator Group
+  --[no-]truncate                                    Truncate fields to fit line
 
 EXAMPLE
   commission --from 0x47e172F6CfB6c7D01C1574fa3E2Be7CC73269D95 --commission 0.1
@@ -32,6 +33,7 @@ USAGE
 
 OPTIONS
   --from=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) Signer or ValidatorGroup's address
+  --[no-]truncate                                    Truncate fields to fit line
 
 EXAMPLE
   deregister --from 0x47e172f6cfb6c7d01c1574fa3e2be7cc73269d95
@@ -46,6 +48,9 @@ List registered Validator Groups, their names (if provided), commission, and mem
 ```
 USAGE
   $ celocli validatorgroup:list
+
+OPTIONS
+  --[no-]truncate  Truncate fields to fit line
 
 EXAMPLE
   list
@@ -69,6 +74,7 @@ OPTIONS
   --from=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) ValidatorGroup's address
   --remove                                           Remove a validator from the members list
   --reorder=reorder                                  Reorder a validator within the members list
+  --[no-]truncate                                    Truncate fields to fit line
 
 EXAMPLES
   member --from 0x47e172f6cfb6c7d01c1574fa3e2be7cc73269d95 --accept 0x97f7333c51897469e8d98e7af8653aab468050a3
@@ -92,6 +98,8 @@ OPTIONS
 
   --from=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) Address for the Validator Group
 
+  --[no-]truncate                                    Truncate fields to fit line
+
 EXAMPLE
   register --from 0x47e172F6CfB6c7D01C1574fa3E2Be7CC73269D95 --commission 0.1
 ```
@@ -108,6 +116,9 @@ USAGE
 
 ARGUMENTS
   GROUPADDRESS  ValidatorGroup's address
+
+OPTIONS
+  --[no-]truncate  Truncate fields to fit line
 
 EXAMPLE
   show 0x97f7333c51897469E8D98E7af8653aAb468050a3

@@ -212,7 +212,7 @@ export class ValidatorsWrapper extends BaseWrapper<Validators> {
     if (blockNumber) {
       const accounts = await this.kit._web3Contracts.getAccounts()
       // @ts-ignore: Expected 0-1 arguments, but got 2
-      name = (await accounts.contract.methods.getName(address).call({}, blockNumber)) || ''
+      name = (await accounts.methods.getName(address).call({}, blockNumber)) || ''
     } else {
       const accounts = await this.kit.contracts.getAccounts()
       name = (await accounts.getName(address)) || ''

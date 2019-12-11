@@ -15,6 +15,9 @@ USAGE
 ARGUMENTS
   TOKEN  (StableToken) [default: StableToken] Token to get the rates for
 
+OPTIONS
+  --[no-]truncate  Truncate fields to fit line
+
 EXAMPLES
   rates StableToken
   rates
@@ -41,6 +44,8 @@ OPTIONS
 
   --numerator=numerator                              (required) Amount of the specified token equal to the amount of
                                                      cGLD in the denominator
+
+  --[no-]truncate                                    Truncate fields to fit line
 
 EXAMPLES
   report StableToken --numerator 1.02 --from 0x8c349AAc7065a35B7166f2659d6C35D75A3893C1

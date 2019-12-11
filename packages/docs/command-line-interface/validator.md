@@ -17,6 +17,7 @@ ARGUMENTS
 
 OPTIONS
   --from=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) Signer or Validator's address
+  --[no-]truncate                                    Truncate fields to fit line
 
 EXAMPLE
   affiliate --from 0x47e172f6cfb6c7d01c1574fa3e2be7cc73269d95 0x97f7333c51897469e8d98e7af8653aab468050a3
@@ -34,6 +35,7 @@ USAGE
 
 OPTIONS
   --from=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) Signer or Validator's address
+  --[no-]truncate                                    Truncate fields to fit line
 
 EXAMPLE
   deaffiliate --from 0x47e172f6cfb6c7d01c1574fa3e2be7cc73269d95
@@ -51,6 +53,7 @@ USAGE
 
 OPTIONS
   --from=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) Signer or Validator's address
+  --[no-]truncate                                    Truncate fields to fit line
 
 EXAMPLE
   deregister --from 0x47e172f6cfb6c7d01c1574fa3e2be7cc73269d95
@@ -67,7 +70,7 @@ USAGE
   $ celocli validator:list
 
 OPTIONS
-  --no-truncate  Don't truncate fields to fit line
+  --[no-]truncate  Truncate fields to fit line
 
 EXAMPLE
   list
@@ -88,6 +91,7 @@ OPTIONS
   --blsSignature=0x                                  (required) BLS Proof-of-Possession
   --ecdsaKey=0x                                      (required) ECDSA Public Key
   --from=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) Address for the Validator
+  --[no-]truncate                                    Truncate fields to fit line
 
 EXAMPLE
   register --from 0x47e172F6CfB6c7D01C1574fa3E2Be7CC73269D95 --ecdsaKey
@@ -108,6 +112,9 @@ List the Locked Gold requirements for registering a Validator. This consists of 
 USAGE
   $ celocli validator:requirements
 
+OPTIONS
+  --[no-]truncate  Truncate fields to fit line
+
 EXAMPLE
   requirements
 ```
@@ -124,6 +131,9 @@ USAGE
 
 ARGUMENTS
   VALIDATORADDRESS  Validator's address
+
+OPTIONS
+  --[no-]truncate  Truncate fields to fit line
 
 EXAMPLE
   show 0x97f7333c51897469E8D98E7af8653aAb468050a3
@@ -144,6 +154,8 @@ OPTIONS
                                                           activity
 
   --signer=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d     address of the signer to check if elected and validating
+
+  --[no-]truncate                                         Truncate fields to fit line
 
   --validator=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  address of the validator to check if elected and validating
 
@@ -167,6 +179,7 @@ OPTIONS
   --blsKey=0x                                        (required) BLS Public Key
   --blsPop=0x                                        (required) BLS Proof-of-Possession
   --from=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) Validator's address
+  --[no-]truncate                                    Truncate fields to fit line
 
 EXAMPLE
   update-bls-key --from 0x47e172F6CfB6c7D01C1574fa3E2Be7CC73269D95 --blsKey
