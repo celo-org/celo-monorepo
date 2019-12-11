@@ -189,7 +189,7 @@ exports[`ExchangeFeedItem renders correctly 1`] = `
             }
           }
         >
-          Dec 31 at 5:00 PM
+          Dec 31 global:at 5:00 PM
         </Text>
       </View>
     </View>

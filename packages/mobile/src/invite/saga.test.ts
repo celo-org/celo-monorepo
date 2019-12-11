@@ -17,10 +17,9 @@ import {
   storeInviteeData,
 } from 'src/invite/actions'
 import { watchRedeemInvite, watchSendInvite, withdrawFundsFromTempAccount } from 'src/invite/saga'
-import { waitWeb3LastBlock } from 'src/networkInfo/saga'
 import { fetchDollarBalance } from 'src/stableToken/actions'
 import { transactionConfirmed } from 'src/transactions/actions'
-import { getConnectedUnlockedAccount, getOrCreateAccount } from 'src/web3/saga'
+import { getConnectedUnlockedAccount, getOrCreateAccount, waitWeb3LastBlock } from 'src/web3/saga'
 import { createMockStore, mockContractKitBalance, mockContractKitContract } from 'test/utils'
 import { mockAccount, mockE164Number, mockName } from 'test/values'
 
