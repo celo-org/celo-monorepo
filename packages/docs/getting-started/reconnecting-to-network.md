@@ -48,7 +48,7 @@ rm -rf geth* && rm static-nodes.json
 
 ### Pulling the latest Celo Docker image
 
-First, pull the Celo image as described at the (Pull the Celo Docker image)[running-a-validator.md#pull-image] section. Be sure to pull the image on your local, validator, proxy, and attestations machines.
+First, pull the Celo image as described [here](running-a-validator.md#pull-image) section. Be sure to pull the image on your local, validator, proxy, and attestations machines.
 
 ### Restart your Accounts node
 
@@ -102,15 +102,8 @@ echo CELO_VALIDATOR_SIGNER_BLS_SIGNATURE=$CELO_VALIDATOR_SIGNER_BLS_SIGNATURE
 
 If any of the environment variables are missing, you have two options:
 
-1.  Find the shell when you run the instructions and look for the environment variable missing. You can export it again using the following command:
-
-    ```bash
-    export CELO_VALIDATOR_ADDRESS=<MY CELO VALIDATOR ADDRESS>
-    ```
-
-    Please, replace the environment variable name for the one you don't have exported in your system.
-
-2.  If you can't find that information, but you have the `CELO_VALIDATOR_ADDRESS`, `CELO_VALIDATOR_GROUP_ADDRESS` and `CELO_VALIDATOR_SIGNER_ADDRESS` variables, the other Celo variables are deterministic and generated using as input those variables. So you can refer to the point of the documentation where were created and do it again.
+1.  Find the shell where you ran the original instructions and look for the missing environment variables. Then, export them again.
+2.  If you can't find that information, but you have the `CELO_VALIDATOR_ADDRESS`, `CELO_VALIDATOR_GROUP_ADDRESS` and `CELO_VALIDATOR_SIGNER_ADDRESS` variables, the other Celo variables are deterministic and generated using as input those variables. So you can refer to the point of the documentation where the missing variables were created, and create them again.
 
 #### Re-register your Validator
 
