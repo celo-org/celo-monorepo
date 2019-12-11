@@ -62,7 +62,7 @@ export default class Show extends BaseCommand {
         }
       }
 
-      // voterReward applies to address when voterReward.group in addressVotes[voterReward.blockNumber].
+      // voterRewardEvent applies to address when voterRewardEvent.group in addressVotes[voterRewardEvent.blockNumber].
       const epochVoterRewardsEvents = await electionContract.getPastEvents(
         'EpochRewardsDistributedToVoters',
         {
@@ -73,12 +73,12 @@ export default class Show extends BaseCommand {
       voterRewardsEvents = voterRewardsEvents.concat(
         res.flags.address
           ? epochVoterRewardsEvents.filter(
-              (x) => x.returnValues.group.toLowerCase() in addressVotes[x.blockNumber]
+              (x: EventLog) => x.returnValues.group.toLowerCase() in addressVotes[x.blockNumber]
             )
           : epochVoterRewardsEvents
       )
 
-      // validatorReward applies to address when validatorReward.validator (or .group) is address.
+      // validatorRewardEvent applies to address when validatorRewardEvent.validator (or .group) is address.
       const epochValidatorRewardsEvents = await validatorsContract.getPastEvents(
         'ValidatorEpochPaymentDistributed',
         {
@@ -89,7 +89,7 @@ export default class Show extends BaseCommand {
       validatorRewardsEvents = validatorRewardsEvents.concat(
         res.flags.address
           ? epochValidatorRewardsEvents.filter(
-              (x) =>
+              (x: EventLog) =>
                 x.returnValues.validator.toLowerCase() === lowerAddress ||
                 x.returnValues.group.toLowerCase() === lowerAddress
             )
@@ -130,11 +130,11 @@ export default class Show extends BaseCommand {
         voterRewardsEvents,
         {
           name: {
-            get: (x) =>
+            get: (x: EventLog) =>
               validatorGroupDetails[x.blockNumber][x.returnValues.group.toLowerCase()].name,
           },
-          group: { get: (x) => x.returnValues.group },
-          value: { get: (x) => x.returnValues.value },
+          group: { get: (x: EventLog) => x.returnValues.group },
+          value: { get: (x: EventLog) => x.returnValues.value },
           blockNumber: {},
         },
         { 'no-truncate': !res.flags.truncate }
@@ -144,7 +144,7 @@ export default class Show extends BaseCommand {
     // Present Validator rewards.
     const validatorRewards = res.flags.address
       ? validatorRewardsEvents.filter(
-          (x) => x.returnValues.validator.toLowerCase() === lowerAddress
+          (x: EventLog) => x.returnValues.validator.toLowerCase() === lowerAddress
         )
       : validatorRewardsEvents
 
@@ -155,18 +155,18 @@ export default class Show extends BaseCommand {
         validatorRewards,
         {
           name: {
-            get: (x) =>
+            get: (x: EventLog) =>
               validatorDetails[x.blockNumber][x.returnValues.validator.toLowerCase()].name,
           },
-          validator: { get: (x) => x.returnValues.validator },
-          validatorPayment: { get: (x) => x.returnValues.validatorPayment },
+          validator: { get: (x: EventLog) => x.returnValues.validator },
+          validatorPayment: { get: (x: EventLog) => x.returnValues.validatorPayment },
           validatorScore: {
-            get: (x) =>
+            get: (x: EventLog) =>
               validatorDetails[x.blockNumber][
                 x.returnValues.validator.toLowerCase()
               ].score.toFixed(),
           },
-          group: { get: (x) => x.returnValues.group },
+          group: { get: (x: EventLog) => x.returnValues.group },
           blockNumber: {},
         },
         { 'no-truncate': !res.flags.truncate }
@@ -175,7 +175,9 @@ export default class Show extends BaseCommand {
 
     // Present Validator Group rewards.
     const validatorGroupRewards = res.flags.address
-      ? validatorRewardsEvents.filter((x) => x.returnValues.group.toLowerCase() === lowerAddress)
+      ? validatorRewardsEvents.filter(
+          (x: EventLog) => x.returnValues.group.toLowerCase() === lowerAddress
+        )
       : validatorRewardsEvents
 
     if (validatorGroupRewards.length > 0) {
@@ -185,14 +187,14 @@ export default class Show extends BaseCommand {
         validatorGroupRewards,
         {
           name: {
-            get: (x) =>
+            get: (x: EventLog) =>
               validatorGroupDetails[x.blockNumber][x.returnValues.group.toLowerCase()].name,
           },
-          group: { get: (x) => x.returnValues.group },
-          groupPayment: { get: (x) => x.returnValues.groupPayment },
-          validator: { get: (x) => x.returnValues.validator },
+          group: { get: (x: EventLog) => x.returnValues.group },
+          groupPayment: { get: (x: EventLog) => x.returnValues.groupPayment },
+          validator: { get: (x: EventLog) => x.returnValues.validator },
           validatorScore: {
-            get: (x) =>
+            get: (x: EventLog) =>
               validatorDetails[x.blockNumber][
                 x.returnValues.validator.toLowerCase()
               ].score.toFixed(),
