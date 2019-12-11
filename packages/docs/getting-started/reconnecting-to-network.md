@@ -115,3 +115,5 @@ If any of the environment variables are missing, you have two options:
 #### Re-register your Validator
 
 At this point you should be able to continue the steps described in the [Running a Validator](running-a-validator.md) documentation page, starting at the [Register the Accounts](running-a-validator.md#register-the-accounts) section.
+
+Note that if you were fauceted in phase 1.0 of The Great Celo Stakeoff, your accounts should have been included in the genesis block for subsequent phases, so you will not need to be fauceted again.
