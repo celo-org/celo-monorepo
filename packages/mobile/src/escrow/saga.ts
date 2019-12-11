@@ -144,7 +144,7 @@ function* withdrawFromEscrow() {
     signature = signature.slice(2)
     const r = `0x${signature.slice(0, 64)}`
     const s = `0x${signature.slice(64, 128)}`
-    const v = web3.utils.hexToNumber(signature.slice(128, 130))
+    const v = web3.utils.hexToNumber(`0x${signature.slice(128, 130)}`)
 
     const withdrawTx = escrow.methods.withdraw(tempWalletAddress, v, r, s)
     const txID = generateStandbyTransactionId(account)
