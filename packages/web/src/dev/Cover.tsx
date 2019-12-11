@@ -1,5 +1,4 @@
 import * as React from 'react'
-import LazyLoad from 'react-lazyload'
 import { Image, StyleSheet, Text, View } from 'react-native'
 import Fade from 'react-reveal/Fade'
 import Transceive from 'src/dev/Transceive'
@@ -52,9 +51,8 @@ const CoverComponent = React.memo(function Cover({ t }: I18nProps) {
           <H3 style={textStyles.invert}>{t('purposeTitle')}</H3>
         </Cell>
         <Cell span={Spans.half}>
-          <H4 style={[textStyles.invert, standardStyles.elementalMarginBottom, styles.purposeText]}>
-            <Trans i18nKey={t('purposeText')}>
-              Learn how to run a node on Celo’s peer-to-peer network and win up to{' '}
+          <H4 style={[textStyles.invert, standardStyles.elementalMarginBottom]}>
+            <Trans i18nKey={'purposeText'}>
               <Text href={CeloLinks.discourse} style={styles.colorEmphasis}>
                 2 million Celo Gold in rewards.
               </Text>*
@@ -83,7 +81,7 @@ const CoverComponent = React.memo(function Cover({ t }: I18nProps) {
             size={SIZE}
             kind={BTN.PRIMARY}
             text={t('challengeBtnText')}
-            href="https://medium.com/celohq/announcing-the-great-celo-stake-off-12eb15dd5eb0"
+            href="https://forum.celo.org/t/the-great-celo-stake-off-the-details/136"
           />
         </Cell>
       </GridRow>
@@ -99,17 +97,15 @@ const CoverComponent = React.memo(function Cover({ t }: I18nProps) {
           <Text style={[fonts.p, textStyles.invert]}>{t('whoText')}</Text>
         </Cell>
       </GridRow>
-      <LazyLoad>
-        <GridRow
-          desktopStyle={standardStyles.blockMarginBottom}
-          tabletStyle={standardStyles.blockMarginBottomTablet}
-          mobileStyle={standardStyles.blockMarginBottomMobile}
-        >
-          <Cell span={Spans.full}>
-            <LeaderBoardApp />
-          </Cell>
-        </GridRow>
-      </LazyLoad>
+      <GridRow
+        desktopStyle={standardStyles.blockMarginBottom}
+        tabletStyle={standardStyles.blockMarginBottomTablet}
+        mobileStyle={standardStyles.blockMarginBottomMobile}
+      >
+        <Cell span={Spans.full}>
+          <LeaderBoardApp />
+        </Cell>
+      </GridRow>
     </View>
   )
 })
@@ -182,9 +178,6 @@ const styles = StyleSheet.create({
   },
   colorEmphasis: {
     color: colors.gold,
-  },
-  purposeText: {
-    maxWidth: 385,
   },
 })
 

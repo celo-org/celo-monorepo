@@ -91,6 +91,7 @@ contract('EpochRewards', (accounts: string[]) => {
 
     await epochRewards.initialize(
       registry.address,
+      accounts[0],
       targetVotingYieldParams.initial,
       targetVotingYieldParams.max,
       targetVotingYieldParams.adjustmentFactor,
@@ -130,6 +131,7 @@ contract('EpochRewards', (accounts: string[]) => {
       await assertRevert(
         epochRewards.initialize(
           registry.address,
+          accounts[0],
           targetVotingYieldParams.initial,
           targetVotingYieldParams.max,
           targetVotingYieldParams.adjustmentFactor,
@@ -358,9 +360,10 @@ contract('EpochRewards', (accounts: string[]) => {
       })
 
       it('should return 600MM + 200MM * t / 15', async () => {
-        assertEqualBN(
+        assertEqualDpBN(
           await epochRewards.getTargetGoldTotalSupply(),
-          getExpectedTargetTotalSupply(timeDelta)
+          getExpectedTargetTotalSupply(timeDelta),
+          8
         )
       })
     })
@@ -435,8 +438,8 @@ contract('EpochRewards', (accounts: string[]) => {
         const expected = new BigNumber(1).plus(
           fromFixed(rewardsMultiplier.adjustments.underspend).times(0.1)
         )
-        // Assert equal to 9 decimal places due to fixidity imprecision.
-        assertEqualDpBN(actual, expected, 9)
+        // Assert equal to 8 decimal places due to fixidity imprecision.
+        assertEqualDpBN(actual, expected, 8)
       })
     })
 
@@ -576,6 +579,21 @@ contract('EpochRewards', (accounts: string[]) => {
           .times(expectedMultiplier)
         assertEqualBN((await epochRewards.calculateTargetEpochPaymentAndRewards())[1], expected)
       })
+    })
+  })
+
+  describe('when the contract is frozen', () => {
+    beforeEach(async () => {
+      await epochRewards.freeze()
+    })
+
+    it('should make calculateTargetEpochPaymentAndRewards return zeroes', async () => {
+      const [
+        validatorPayment,
+        voterRewards,
+      ] = await epochRewards.calculateTargetEpochPaymentAndRewards()
+      assertEqualBN(validatorPayment, 0)
+      assertEqualBN(voterRewards, 0)
     })
   })
 })

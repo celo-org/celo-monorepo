@@ -9,7 +9,7 @@ import {
   mineBlocks,
   NULL_ADDRESS,
 } from '@celo/protocol/lib/test-utils'
-import { attestToIdentifier } from '@celo/utils'
+import { AttestationUtils } from '@celo/utils'
 import { privateKeyToAddress } from '@celo/utils/lib/address'
 import { parseSolidityStringArray } from '@celo/utils/lib/parsing'
 import { getPhoneHash } from '@celo/utils/lib/phoneNumbers'
@@ -87,7 +87,7 @@ contract('Attestations', (accounts: string[]) => {
     issuer: string
   ): Promise<[number, string, string]> {
     const privateKey = accountPrivateKeys[accounts.indexOf(issuer)]
-    const { v, r, s } = attestToIdentifier(phoneNumber, account, privateKey)
+    const { v, r, s } = AttestationUtils.attestToIdentifier(phoneNumber, account, privateKey)
     return [v, r, s]
   }
 
@@ -620,7 +620,7 @@ contract('Attestations', (accounts: string[]) => {
           accountsInstance.authorizeAttestationSigner,
           issuer
         )
-        ;({ v, r, s } = attestToIdentifier(phoneNumber, caller, attestationKey))
+        ;({ v, r, s } = AttestationUtils.attestToIdentifier(phoneNumber, caller, attestationKey))
       })
 
       it('should correctly complete the attestation', async () => {
