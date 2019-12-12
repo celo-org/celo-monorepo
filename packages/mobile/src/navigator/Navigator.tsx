@@ -296,6 +296,7 @@ const AppStack = createStackNavigator(
     [Screens.PhotosEducation]: { screen: PhotosEducation },
     [Screens.GoldEducation]: { screen: GoldEducation },
     [Screens.FeeEducation]: { screen: FeeEducation },
+    [Screens.FeeExchangeEducation]: { screen: FeeExchangeEducation },
     ...commonScreens,
   },
   {

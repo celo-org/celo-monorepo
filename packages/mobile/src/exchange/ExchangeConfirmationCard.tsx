@@ -5,9 +5,9 @@ import * as React from 'react'
 import { withNamespaces, WithNamespaces } from 'react-i18next'
 import { StyleSheet, Text, View } from 'react-native'
 import CurrencyDisplay from 'src/components/CurrencyDisplay'
+import FeeIcon from 'src/components/FeeIcon'
 import LineItemRow from 'src/components/LineItemRow'
 import ExchangeRate from 'src/exchange/ExchangeRate'
-import FeeExchangeIcon from 'src/exchange/FeeExchangeIcon'
 import { CURRENCY_ENUM } from 'src/geth/consts'
 import { Namespaces } from 'src/i18n'
 import {
@@ -15,7 +15,6 @@ import {
   useLocalCurrencyCode,
   useLocalCurrencySymbol,
 } from 'src/localCurrency/hooks'
-import FeeIcon from 'src/send/FeeIcon'
 import RoundedArrow from 'src/shared/RoundedArrow'
 import { getMoneyDisplayValue } from 'src/utils/formatting'
 
@@ -132,7 +131,7 @@ export function ExchangeConfirmationCard(props: Props) {
       <View style={styles.feeContainer}>
         <LineItemRow
           currencySymbol={takerToken}
-          amount={fee}
+          amount={fee || '0.00'}
           title={t('securityFee')}
           titleIcon={<FeeIcon />}
         />
@@ -140,7 +139,7 @@ export function ExchangeConfirmationCard(props: Props) {
           currencySymbol={takerToken}
           amount={tobinTax}
           title={t('exchangeFee')}
-          titleIcon={<FeeExchangeIcon />}
+          titleIcon={<FeeIcon isExchange={true} />}
         />
       </View>
 

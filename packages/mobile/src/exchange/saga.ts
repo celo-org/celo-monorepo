@@ -86,7 +86,6 @@ export function* doFetchTobinTax({ makerAmount, makerToken }: FetchTobinTaxActio
 
 export function* doFetchExchangeRate({ makerAmount, makerToken }: FetchExchangeRateAction) {
   Logger.debug(TAG, 'Calling @doFetchExchangeRate')
-
   try {
     // If makerAmount and makerToken are given, use them to estimate the exchange rate,
     // as exchange rate depends on amount sold. Else default to preset large sell amount.
@@ -108,6 +107,27 @@ export function* doFetchExchangeRate({ makerAmount, makerToken }: FetchExchangeR
     }
 
     yield call(getConnectedAccount)
+
+    let makerAmountInWei
+    if (makerAmount && makerToken) {
+      makerAmountInWei = (yield call(
+        convertToContractDecimals,
+        makerAmount,
+        makerToken
+      )).integerValue()
+    }
+
+    // If makerAmount and makerToken are given, use them to estimate the exchange rate,
+    // as exchange rate depends on amount sold. Else default to preset large sell amount.
+    const goldMakerAmount =
+      makerAmountInWei && makerToken === CURRENCY_ENUM.GOLD
+        ? makerAmountInWei
+        : LARGE_GOLD_SELL_AMOUNT_IN_WEI
+    const dollarMakerAmount =
+      makerAmountInWei && makerToken === CURRENCY_ENUM.DOLLAR
+        ? makerAmountInWei
+        : LARGE_DOLLARS_SELL_AMOUNT_IN_WEI
+
     const exchange = yield call([contractKit.contracts, contractKit.contracts.getExchange])
 
     const [dollarMakerExchangeRate, goldMakerExchangeRate]: [BigNumber, BigNumber] = yield all([
