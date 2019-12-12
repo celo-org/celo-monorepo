@@ -1,3 +1,4 @@
+import { Validator, ValidatorGroup } from '@celo/contractkit/lib/wrappers/Validators'
 import { flags } from '@oclif/command'
 import BigNumber from 'bignumber.js'
 import { cli } from 'cli-ux'
@@ -92,7 +93,7 @@ export default class Show extends BaseCommand {
         }
       )
 
-      const voterRewardsValidatorGroupDetails = await Promise.all(
+      const voterRewardsValidatorGroupDetails: ValidatorGroup[] = await Promise.all(
         epochVoterRewardsEvents.map((e: EventLog) =>
           validators.getValidatorGroup(e.returnValues.group)
         )
@@ -123,7 +124,7 @@ export default class Show extends BaseCommand {
         }
       )
 
-      const epochValidatorDetails = await Promise.all(
+      const epochValidatorDetails: Validator[] = await Promise.all(
         epochValidatorRewardsEvents.map((e: EventLog) =>
           validators.getValidator(e.returnValues.validator, blockNumber)
         )
@@ -143,7 +144,7 @@ export default class Show extends BaseCommand {
       )
 
       // validatorRewardEvent applies to address when validatorRewardEvent.group is address.
-      const epochValidatorGroupDetails = await Promise.all(
+      const epochValidatorGroupDetails: ValidatorGroup[] = await Promise.all(
         epochValidatorRewardsEvents.map((e: EventLog) =>
           validators.getValidatorGroup(e.returnValues.group)
         )
