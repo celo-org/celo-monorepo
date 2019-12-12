@@ -1,13 +1,13 @@
 import * as React from 'react'
-import { withNamespaces } from 'react-i18next'
-import { StyleSheet, Text, View } from 'react-native'
+import { Text } from 'react-native'
 import Page from 'src/brandkit/common/Page'
+import { NameSpaces, withNamespaces } from 'src/i18n'
 import { hashNav } from 'src/shared/menu-items'
 
 const { brandImagery } = hashNav
 
 // TODO in v 1.1
-const KeyImageryWrapped = withNamespaces()(
+const KeyImageryWrapped = withNamespaces(NameSpaces.brand)(
   React.memo(function KeyImagery() {
     return (
       <Page
