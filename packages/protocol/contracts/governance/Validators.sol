@@ -1211,16 +1211,17 @@ contract Validators is
   function groupMembershipInEpoch(address account, uint256 epochNumber, uint256 index)
     external
     view
-    onlyRegisteredContracts(canForceDeaffiliation)
     returns (address)
   {
     require(isValidator(account) && epochNumber <= getEpochNumber());
     MembershipHistory storage history = validators[account].membershipHistory;
     require(
-      history.entries[index].epochNumber == epochNumber ||
+      (history.numEntries > 0 &&
+        index >= history.tail &&
+        history.entries[index].epochNumber == epochNumber) ||
         (history.entries[index].epochNumber < epochNumber &&
           (history.entries[index.add(1)].epochNumber > epochNumber ||
-            index == history.numEntries.sub(1))),
+            index.sub(history.tail) == history.numEntries.sub(1))),
       "provided index does not match provided epochNumber at index in history."
     );
     return history.entries[index].group;
