@@ -34,6 +34,7 @@ interface AutoVerifyArgv extends BotsArgv {
   inBetweenWaitSeconds: number
   attestationMax: number
   celoProvider: string
+  index: number
 }
 
 export const builder = (yargs: Argv) => {
@@ -58,6 +59,11 @@ export const builder = (yargs: Argv) => {
       description: 'The node to use',
       default: 'http://localhost:8545',
     })
+    .option('index', {
+      type: 'number',
+      description: 'The index of the account to use',
+      default: 0,
+    })
 }
 
 export const handler = async function autoVerify(argv: AutoVerifyArgv) {
@@ -70,7 +76,9 @@ export const handler = async function autoVerify(argv: AutoVerifyArgv) {
     const kit = newKit(argv.celoProvider)
     const mnemonic = fetchEnv(envVar.MNEMONIC)
     // This really should be the ATTESTATION_BOT key, but somehow we can't get it to have cUSD
-    const clientKey = ensure0x(generatePrivateKey(mnemonic, AccountType.VALIDATOR, 0))
+    const clientKey = ensure0x(
+      generatePrivateKey(mnemonic, AccountType.ATTESTATION_BOT, argv.index)
+    )
     const clientAddress = privateKeyToAddress(clientKey)
     logger = logger.child({ address: clientAddress })
     kit.addAccount(clientKey)

@@ -1,4 +1,5 @@
 import { writeFileSync } from 'fs'
+import sleep from 'sleep-promise'
 import { confirmAction, envVar, fetchEnv, fetchEnvOrFallback } from './env-utils'
 import {
   AccountType,
@@ -90,9 +91,13 @@ const testnetResourcesToReset = [
   // validator proxies
   'module.validator.module.proxy.random_id.full_node.*',
   'module.validator.module.proxy.google_compute_instance.full_node.*',
+  'module.validator.module.proxy.random_id.full_node_disk.*',
+  'module.validator.module.proxy.google_compute_disk.full_node.*',
   // tx-nodes
   'module.tx_node.random_id.full_node.*',
   'module.tx_node.google_compute_instance.full_node.*',
+  'module.tx_node.random_id.full_node_disk.*',
+  'module.tx_node.google_compute_disk.full_node.*',
   // tx-node load balancer instance group
   'module.tx_node_lb.random_id.external',
   'module.tx_node_lb.google_compute_instance_group.external',
@@ -212,6 +217,8 @@ export async function taintTestnet(celoEnv: string) {
   for (const resource of testnetResourcesToReset) {
     console.info(`Tainting ${resource}`)
     await taintTerraformModuleResource(testnetTerraformModule, resource)
+    // To avoid getting errors for too many gcloud storage API requests
+    await sleep(2000)
   }
 }
 
@@ -227,6 +234,8 @@ export async function untaintTestnet(celoEnv: string) {
   for (const resource of testnetResourcesToReset) {
     console.info(`Untainting ${resource}`)
     await untaintTerraformModuleResource(testnetTerraformModule, resource)
+    // To avoid getting errors for too many gcloud storage API requests
+    await sleep(2000)
   }
 }
 
@@ -248,6 +257,11 @@ export async function getInternalTxNodeLoadBalancerIP(celoEnv: string) {
 export async function getInternalValidatorIPs(celoEnv: string) {
   const outputs = await getTestnetOutputs(celoEnv)
   return outputs.validator_internal_ip_addresses.value
+}
+
+export async function getInternalProxyIPs(celoEnv: string) {
+  const outputs = await getTestnetOutputs(celoEnv)
+  return outputs.proxy_internal_ip_addresses.value
 }
 
 export async function getInternalTxNodeIPs(celoEnv: string) {
