@@ -1,4 +1,5 @@
 import { writeFileSync } from 'fs'
+import sleep from 'sleep-promise'
 import { confirmAction, envVar, fetchEnv, fetchEnvOrFallback } from './env-utils'
 import {
   AccountType,
@@ -25,6 +26,7 @@ import {
   uploadGenesisBlockToGoogleStorage,
   uploadStaticNodesToGoogleStorage,
 } from './testnet-utils'
+import { execCmd } from './utils'
 
 // Keys = gcloud project name
 const projectConfig = {
@@ -89,9 +91,13 @@ const testnetResourcesToReset = [
   // validator proxies
   'module.validator.module.proxy.random_id.full_node.*',
   'module.validator.module.proxy.google_compute_instance.full_node.*',
+  'module.validator.module.proxy.random_id.full_node_disk.*',
+  'module.validator.module.proxy.google_compute_disk.full_node.*',
   // tx-nodes
   'module.tx_node.random_id.full_node.*',
   'module.tx_node.google_compute_instance.full_node.*',
+  'module.tx_node.random_id.full_node_disk.*',
+  'module.tx_node.google_compute_disk.full_node.*',
   // tx-node load balancer instance group
   'module.tx_node_lb.random_id.external',
   'module.tx_node_lb.google_compute_instance_group.external',
@@ -211,6 +217,8 @@ export async function taintTestnet(celoEnv: string) {
   for (const resource of testnetResourcesToReset) {
     console.info(`Tainting ${resource}`)
     await taintTerraformModuleResource(testnetTerraformModule, resource)
+    // To avoid getting errors for too many gcloud storage API requests
+    await sleep(2000)
   }
 }
 
@@ -226,6 +234,8 @@ export async function untaintTestnet(celoEnv: string) {
   for (const resource of testnetResourcesToReset) {
     console.info(`Untainting ${resource}`)
     await untaintTerraformModuleResource(testnetTerraformModule, resource)
+    // To avoid getting errors for too many gcloud storage API requests
+    await sleep(2000)
   }
 }
 
@@ -247,6 +257,11 @@ export async function getInternalTxNodeLoadBalancerIP(celoEnv: string) {
 export async function getInternalValidatorIPs(celoEnv: string) {
   const outputs = await getTestnetOutputs(celoEnv)
   return outputs.validator_internal_ip_addresses.value
+}
+
+export async function getInternalProxyIPs(celoEnv: string) {
+  const outputs = await getTestnetOutputs(celoEnv)
+  return outputs.proxy_internal_ip_addresses.value
 }
 
 export async function getInternalTxNodeIPs(celoEnv: string) {
@@ -411,4 +426,37 @@ function configForProject() {
 // name of the DNS zone in Google Cloud for a particular domain
 function dnsZoneName(domain: string) {
   return `${domain}-org`
+}
+
+export function getVmSshCommand(instanceName: string) {
+  const project = fetchEnv(envVar.TESTNET_PROJECT_NAME)
+  const zone = fetchEnv(envVar.KUBERNETES_CLUSTER_ZONE)
+  return `gcloud beta compute --project '${project}' ssh --zone '${zone}' ${instanceName} --tunnel-through-iap`
+}
+
+export async function getNodeVmName(celoEnv: string, nodeType: string, index?: number) {
+  const nodeTypesWithRandomSuffixes = ['tx-node', 'proxy']
+  const nodeTypesWithNoIndex = ['bootnode']
+
+  let instanceName
+  if (nodeTypesWithRandomSuffixes.includes(nodeType)) {
+    instanceName = await getNodeVmNameWithRandomSuffix(celoEnv, nodeType, index || 0)
+  } else {
+    instanceName = `${celoEnv}-${nodeType}`
+    if (!nodeTypesWithNoIndex.includes(nodeType) && index !== undefined) {
+      instanceName += `-${index}`
+    }
+  }
+  return instanceName
+}
+
+// Some VM names have a randomly generated suffix. This returns the full name
+// of the instance given only the celoEnv and index.
+async function getNodeVmNameWithRandomSuffix(celoEnv: string, nodeType: string, index: number) {
+  const project = fetchEnv(envVar.TESTNET_PROJECT_NAME)
+
+  const [nodeName] = await execCmd(
+    `gcloud compute instances list --project '${project}' --filter="NAME ~ ${celoEnv}-${nodeType}-${index}-.*" --format get\\(NAME\\)`
+  )
+  return nodeName.trim()
 }

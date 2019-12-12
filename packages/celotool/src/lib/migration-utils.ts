@@ -36,7 +36,7 @@ function getAttestationKeys() {
 export function migrationOverrides() {
   const mnemonic = fetchEnv(envVar.MNEMONIC)
   const faucetedAccountAddresses = getFaucetedAccounts(mnemonic).map((account) => account.address)
-  const attestationBotAddresses = getAddressesFor(AccountType.ATTESTATION_BOT, mnemonic, 1)
+  const attestationBotAddresses = getAddressesFor(AccountType.ATTESTATION_BOT, mnemonic, 10)
   const initialAddresses = [...faucetedAccountAddresses, ...attestationBotAddresses]
 
   const initialBalance = fetchEnvOrFallback(envVar.FAUCET_CUSD_WEI, DEFAULT_FAUCET_CUSD_WEI)

@@ -92,7 +92,7 @@ contract UsingPrecompiles {
    * @param index Index of requested validator in the validator set as sorted by the election.
    * @return Address of validator at the requested index.
    */
-  function validatorAddressFromCurrentSet(uint256 index) public view returns (address) {
+  function validatorSignerAddressFromCurrentSet(uint256 index) public view returns (address) {
     address validatorAddress;
     assembly {
       let newCallDataPosition := mload(0x40)
