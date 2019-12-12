@@ -48,7 +48,7 @@ export default class Show extends BaseCommand {
         .runChecks()
     }
 
-    // For each epoch..
+    // For each epoch...
     for (let blockNumber = fromBlock; blockNumber <= lastEpochBlock; blockNumber += epochSize) {
       // Get the groups that address voted for.
       if (res.flags.address) {
@@ -122,8 +122,15 @@ export default class Show extends BaseCommand {
       validatorGroupDetails[blockNumber] = await promisedProperties(uniqueValidatorGroups)
     }
 
-    // Present Voter rewards.
+    // First present Validator rewards.
     if (voterRewardsEvents.length > 0) {
+      // At the end of each epoch, R, the total amount of rewards in gold to be allocated to stakers
+      // for this epoch is programmatically derived from considering the tradeoff between paying rewards
+      // now vs. saving rewards for later.
+      // Let T be the total gold voting for groups eligible for rewards in this epoch. For each account
+      // holder, for each group, the amount of gold the account holder has voting for that group is increased
+      // by average_epoch_score_of_elected_validators_in_group * account_gold_voting_for_group * R * M / T.
+
       console.info('')
       console.info('Voter rewards:')
       cli.table(
@@ -141,7 +148,7 @@ export default class Show extends BaseCommand {
       )
     }
 
-    // Present Validator rewards.
+    // Next present Validator rewards.
     const validatorRewards = res.flags.address
       ? validatorRewardsEvents.filter(
           (x: EventLog) => x.returnValues.validator.toLowerCase() === lowerAddress
@@ -149,6 +156,22 @@ export default class Show extends BaseCommand {
       : validatorRewardsEvents
 
     if (validatorRewards.length > 0) {
+      // Each validator maintains a running validator score Sv:
+      //
+      // - At the end of an epoch, if a validator was elected, define its uptime:
+      //   U = counter / (blocks_in_epoch - [9])
+      //
+      // - Define the validator’s epoch score:
+      //   Sve = U ^ k, where k is governable.
+      //
+      // - If the validator is elected, Sv = min(Sve, Sve * x + Sv-1 * (1 -x)) where 0 < x < 1 and is
+      //   governable. Otherwise, Sv = Sv-1
+      //
+      // At the end of each epoch, provided that the validator and its group have the required minimum
+      // stake, Validators are paid Pv * Sv * M * (1 - C) Celo Dollars where
+      // C is group share for the group the validator was a member of when it was elected and
+      // Pv is the max payout to validators and is governable.
+
       console.info('')
       console.info('Validator rewards:')
       cli.table(
@@ -173,7 +196,7 @@ export default class Show extends BaseCommand {
       )
     }
 
-    // Present Validator Group rewards.
+    // Last present Validator Group rewards.
     const validatorGroupRewards = res.flags.address
       ? validatorRewardsEvents.filter(
           (x: EventLog) => x.returnValues.group.toLowerCase() === lowerAddress
@@ -181,6 +204,13 @@ export default class Show extends BaseCommand {
       : validatorRewardsEvents
 
     if (validatorGroupRewards.length > 0) {
+      // At the end of each epoch, for each validator that was elected, the group a validator was
+      // elected as a member of is paid Pv * Sv * C * M Celo Dollars where:
+      // C is the current group share for the group the validator was a member of when it was elected,
+      // Pv is the max payout to validators during this epoch programmatically derived from
+      // considering the tradeoff between paying rewards now vs. saving rewards for later, and
+      // M is the group’s current slashing penalty (M=1 initially, 0<M<=1)
+
       console.info('')
       console.info('Validator Group rewards:')
       cli.table(
@@ -216,14 +246,14 @@ export default class Show extends BaseCommand {
 }
 
 // Return the object with Promise properties resolved.
-function promisedProperties(object: { [key: string]: Promise<any> }) {
+function promisedProperties(x: { [key: string]: Promise<any> }) {
   const properties: Array<Promise<any>> = []
-  const objectKeys = Object.keys(object)
-  objectKeys.forEach((key) => properties.push(object[key]))
+  const objectKeys = Object.keys(x)
+  objectKeys.forEach((key) => properties.push(x[key]))
   return Promise.all(properties).then((resolvedValues) => {
     return resolvedValues.reduce((resolvedObject, property, index) => {
       resolvedObject[objectKeys[index]] = property
       return resolvedObject
-    }, object)
+    }, x)
   })
 }
