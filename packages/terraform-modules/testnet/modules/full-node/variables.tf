@@ -74,6 +74,12 @@ variable in_memory_discovery_table {
   description = "Specifies whether to use an in memory discovery table"
 }
 
+variable instance_tags {
+  type        = list(string)
+  description = "Tags to set for the instance"
+  default     = []
+}
+
 variable name {
   type        = string
   description = "Name of the nodes"

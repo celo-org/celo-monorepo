@@ -95,6 +95,11 @@ echo "
 " > /etc/google-fluentd/config.d/docker.conf
 systemctl restart google-fluentd
 
+# ---- Set Up Monitoring Agent ----
+
+curl -sSO https://dl.google.com/cloudagents/install-monitoring-agent.sh
+bash install-monitoring-agent.sh
+
 # ---- Install Docker ----
 
 echo "Installing Docker..."
