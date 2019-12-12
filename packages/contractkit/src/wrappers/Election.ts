@@ -175,8 +175,11 @@ export class ElectionWrapper extends BaseWrapper<Election> {
     const votes = await this.contract.methods.getTotalVotesForGroup(address).call()
     const eligible = await this.contract.methods.getGroupEligibility(address).call()
     const numVotesReceivable = await this.contract.methods.getNumVotesReceivable(address).call()
+    const accounts = await this.kit.contracts.getAccounts()
+    const name = (await accounts.getName(address)) || ''
     return {
       address,
+      name,
       votes: toBigNumber(votes),
       capacity: toBigNumber(numVotesReceivable).minus(votes),
       eligible,

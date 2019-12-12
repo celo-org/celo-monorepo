@@ -1518,15 +1518,34 @@ contract('Validators', (accounts: string[]) => {
         })
 
         describe('when the group does not meet the locked gold requirements', () => {
-          beforeEach(async () => {
-            await mockLockedGold.setAccountTotalLockedGold(
-              group,
-              groupLockedGoldRequirements.value.minus(1)
-            )
+          describe('when the group does not have a member', () => {
+            beforeEach(async () => {
+              await mockLockedGold.setAccountTotalLockedGold(
+                group,
+                groupLockedGoldRequirements.value.minus(1)
+              )
+            })
+
+            it('should revert', async () => {
+              await assertRevert(validators.addFirstMember(validator, NULL_ADDRESS, NULL_ADDRESS))
+            })
           })
 
-          it('should revert', async () => {
-            await assertRevert(validators.addFirstMember(validator, NULL_ADDRESS, NULL_ADDRESS))
+          describe('when the group already has a member', () => {
+            const validator2 = accounts[2]
+            beforeEach(async () => {
+              await mockLockedGold.setAccountTotalLockedGold(
+                group,
+                groupLockedGoldRequirements.value.times(2).minus(1)
+              )
+              await validators.addFirstMember(validator, NULL_ADDRESS, NULL_ADDRESS)
+              await registerValidator(validator2)
+              await validators.affiliate(group, { from: validator2 })
+            })
+
+            it('should succeed', async () => {
+              await assertRevert(validators.addMember(validator2))
+            })
           })
         })
       })
