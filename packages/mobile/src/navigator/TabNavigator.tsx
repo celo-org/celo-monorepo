@@ -163,7 +163,7 @@ const styles = StyleSheet.create({
     marginLeft: 3,
   },
   alignPaymentIcon: {
-    marginBottom: 15,
+    marginBottom: 8,
   },
 })
 

@@ -262,7 +262,6 @@ exports[`ReclaimPaymentConfirmationScreen renders correctly 1`] = `
                   "alignItems": "stretch",
                   "justifyContent": "center",
                   "marginBottom": 10,
-                  "marginTop": 10,
                 }
               }
             >
@@ -907,7 +906,6 @@ exports[`ReclaimPaymentConfirmationScreen renders correctly when fee calculation
                   "alignItems": "stretch",
                   "justifyContent": "center",
                   "marginBottom": 10,
-                  "marginTop": 10,
                 }
               }
             >
@@ -1552,7 +1550,6 @@ exports[`ReclaimPaymentConfirmationScreen renders correctly when fee calculation
                   "alignItems": "stretch",
                   "justifyContent": "center",
                   "marginBottom": 10,
-                  "marginTop": 10,
                 }
               }
             >

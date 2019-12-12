@@ -18,7 +18,6 @@ export function SimpleNotification(props: Props) {
       title={props.title}
       icon={<Image source={props.image} style={styles.image} resizeMode="contain" />}
       ctas={props.ctaList}
-      roundedBorders={true}
     >
       <View style={styles.body}>
         <Text style={fontStyles.subSmall}>{props.text}</Text>
