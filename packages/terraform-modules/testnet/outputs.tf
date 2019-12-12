@@ -13,3 +13,7 @@ output tx_node_lb_internal_ip_address {
 output validator_internal_ip_addresses {
   value = module.validator.internal_ip_addresses
 }
+
+output proxy_internal_ip_addresses {
+  value = module.validator.proxy_internal_ip_addresses
+}

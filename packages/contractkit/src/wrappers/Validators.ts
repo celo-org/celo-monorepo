@@ -344,6 +344,11 @@ export class ValidatorsWrapper extends BaseWrapper<Validators> {
 
   deaffiliate = proxySend(this.kit, this.contract.methods.deaffiliate)
 
+  forceDeaffiliateIfValidator = proxySend(
+    this.kit,
+    this.contract.methods.forceDeaffiliateIfValidator
+  )
+
   /**
    * Adds a member to the end of a validator group's list of members.
    * Fails if `validator` has not set their affiliation to this account.

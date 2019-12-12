@@ -77,6 +77,6 @@ export function* rootSaga() {
   yield spawn(dappKitSaga)
   yield spawn(feesSaga)
   yield spawn(localCurrencySaga)
-  yield spawn(web3Saga)
   yield spawn(sentrySaga)
+  yield spawn(web3Saga)
 }
