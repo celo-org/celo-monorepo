@@ -1,7 +1,8 @@
+import * as React from 'react'
 import * as renderer from 'react-test-renderer'
 import Showcase from 'src/brandkit/common/Showcase'
 
-describe(Showcase, () => {
+describe('Showcase', () => {
   it('renders', () => {
     const showCase = renderer
       .create(
