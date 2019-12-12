@@ -3,7 +3,7 @@ import 'react-native'
 import { Provider } from 'react-redux'
 import * as renderer from 'react-test-renderer'
 import { escrowPaymentDouble } from 'src/escrow/__mocks__'
-import EscrowedPaymentReminderSummaryNotification from 'src/notifications/EscrowedPaymentReminderSummaryNotification'
+import EscrowedPaymentReminderSummaryNotification from 'src/escrow/EscrowedPaymentReminderSummaryNotification'
 import { createMockStore } from 'test/utils'
 
 const fakePayments = [escrowPaymentDouble({}), escrowPaymentDouble({})]
