@@ -657,6 +657,13 @@ If everything goes well users should be able to see your claims by running:
 celocli account:get-metadata $CELO_VALIDATOR_ADDRESS
 ```
 
+You can run the following command to test if you properly setup your attestation service:
+
+```bash
+# On your local machine
+celocli identity:test-attestation-service --from $CELO_VALIDATOR_ADDRESS --phoneNumber <YOUR-PHONE-NUMBER-E164-FORMAT> --message <YOUR_MESSAGE>
+```
+
 You should see that your claim for `$CELO_VALIDATOR_GROUP_ADDRESS` could not be verified! We need to create the corresponding claim from `$CELO_VALIDATOR_GROUP_ADDRESS` otherwise anyone could claim it!
 
 ```bash
