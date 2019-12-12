@@ -3,6 +3,7 @@ import { getParsedSignatureOfAddress } from '@celo/protocol/lib/signing-utils'
 import {
   assertContainSubset,
   assertEqualBN,
+  assertEqualDpBN,
   assertEqualBNArray,
   assertRevert,
   assertSameAddress,
@@ -858,7 +859,7 @@ contract('Validators', (accounts: string[]) => {
                   assert.equal(parsedValidator.affiliation, otherGroup)
                 })
 
-                it('should emit the ValidatorDeafilliated event', async () => {
+                it('should emit the ValidatorDeaffilliated event', async () => {
                   assert.equal(resp.logs.length, 2)
                   const log = resp.logs[0]
                   assertContainSubset(log, {
@@ -1729,6 +1730,87 @@ contract('Validators', (accounts: string[]) => {
     })
   })
 
+  describe('#calculateEpochScore', () => {
+    describe('when uptime is in the interval [0, 1.0]', () => {
+      const uptime = new BigNumber(0.99)
+      // @ts-ignore
+      const expected = uptime.pow(validatorScoreParameters.exponent)
+
+      it('should calculate the score correctly', async () => {
+        // Compare expected and actual to 8 decimal places.
+        assertEqualDpBN(
+          fromFixed(await validators.calculateEpochScore(toFixed(uptime))),
+          expected,
+          8
+        )
+        assertEqualDpBN(fromFixed(await validators.calculateEpochScore(new BigNumber(0))), 0, 8)
+        assertEqualDpBN(fromFixed(await validators.calculateEpochScore(fixed1)), 1, 8)
+      })
+    })
+
+    describe('when uptime > 1.0', () => {
+      const uptime = new BigNumber(1.01)
+      it('should revert', async () => {
+        await assertRevert(validators.calculateEpochScore(toFixed(uptime)))
+      })
+    })
+  })
+
+  describe('#calculateGroupEpochScore', () => {
+    describe('when all uptimes are in the interval [0, 1.0]', () => {
+      const testGroupUptimeCalculation = (uptimes) => {
+        const expected = uptimes
+          .map((uptime) => new BigNumber(uptime))
+          .map((uptime) => uptime.pow(validatorScoreParameters.exponent.toNumber()))
+          .reduce((sum, n) => sum.plus(n))
+          .div(uptimes.length)
+        it('should calculate the group score correctly', async () => {
+          assertEqualDpBN(
+            fromFixed(await validators.calculateGroupEpochScore(uptimes.map(toFixed))),
+            expected,
+            8
+          )
+        })
+      }
+
+      // 5 random uptimes between zero and one.
+      const uptimes = [0.969, 0.485, 0.456, 0.744, 0.257]
+      for (const count of [1, 3, 5]) {
+        describe(`when there are ${count} validators in the group`, () => {
+          testGroupUptimeCalculation(uptimes.slice(0, count))
+        })
+      }
+
+      describe('when only zeros are provided', () => {
+        testGroupUptimeCalculation([0, 0, 0, 0])
+      })
+
+      describe('when there are zeros in the uptimes', () => {
+        testGroupUptimeCalculation([0.75, 0, 0.95])
+      })
+
+      describe('when there are more than maxGroupSize uptimes', () => {
+        it('should revert', async () => {
+          await assertRevert(
+            validators.calculateGroupEpochScore([0.9, 0.9, 0.9, 0.9, 0.9, 0.9].map(toFixed))
+          )
+        })
+      })
+    })
+
+    describe('when no uptimes are provided', () => {
+      it('should revert', async () => {
+        await assertRevert(validators.calculateGroupEpochScore([]))
+      })
+    })
+
+    describe('when uptimes are > 1.0', () => {
+      it('should revert', async () => {
+        await assertRevert(validators.calculateGroupEpochScore([0.95, 1.01, 0.99].map(toFixed)))
+      })
+    })
+  })
+
   describe('#updateValidatorScoreFromSigner', () => {
     const validator = accounts[0]
     beforeEach(async () => {
@@ -2056,6 +2138,49 @@ contract('Validators', (accounts: string[]) => {
         it('should return zero', async () => {
           assertEqualBN(ret, 0)
         })
+      })
+    })
+  })
+
+  describe('#forceDeaffiliateIfValidator', async () => {
+    const validator = accounts[0]
+    const group = accounts[1]
+
+    beforeEach(async () => {
+      await registerValidator(validator)
+      await registerValidatorGroup(group)
+      await validators.affiliate(group)
+    })
+
+    describe('when the sender is one of three approved contract addresses', async () => {
+      beforeEach(async () => {
+        await registry.setAddressFor(CeloContractName.DowntimeSlasher, validator)
+        await registry.setAddressFor(CeloContractName.DoubleSigningSlasher, accounts[3])
+        await registry.setAddressFor(CeloContractName.Governance, accounts[4])
+      })
+
+      it('should succeed when the sender is the downtime slasher contract', async () => {
+        await validators.forceDeaffiliateIfValidator(validator)
+        const parsedValidator = parseValidatorParams(await validators.getValidator(validator))
+        assert.equal(parsedValidator.affiliation, NULL_ADDRESS)
+      })
+
+      it('should succeed when the sender is the double signing slasher contract', async () => {
+        await validators.forceDeaffiliateIfValidator(validator, { from: accounts[3] })
+        const parsedValidator = parseValidatorParams(await validators.getValidator(validator))
+        assert.equal(parsedValidator.affiliation, NULL_ADDRESS)
+      })
+
+      it('should succeed when the sender is the governance contract', async () => {
+        await validators.forceDeaffiliateIfValidator(validator, { from: accounts[4] })
+        const parsedValidator = parseValidatorParams(await validators.getValidator(validator))
+        assert.equal(parsedValidator.affiliation, NULL_ADDRESS)
+      })
+    })
+
+    describe('when the sender is not an approved address', async () => {
+      it('should revert', async () => {
+        await assertRevert(validators.forceDeaffiliateIfValidator(validator))
       })
     })
   })

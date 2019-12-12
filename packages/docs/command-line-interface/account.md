@@ -82,7 +82,7 @@ ARGUMENTS
 
 OPTIONS
   --from=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) Addess of the account to set metadata for
-  --url=htttps://www.celo.org                        (required) The url you want to claim
+  --url=https://www.celo.org                         (required) The url you want to claim
 
 EXAMPLE
   claim-attestation-service-url ~/metadata.json --url http://test.com/myurl --from
@@ -255,7 +255,7 @@ USAGE
 
 OPTIONS
   --from=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) Addess of the account to set metadata for
-  --url=htttps://www.celo.org                        (required) The url to the metadata you want to register
+  --url=https://www.celo.org                         (required) The url to the metadata you want to register
 
 EXAMPLE
   register-metadata --url https://www.mywebsite.com/celo-metadata --from 0x47e172F6CfB6c7D01C1574fa3E2Be7CC73269D95
@@ -276,7 +276,7 @@ OPTIONS
   --name=name                                           (required)
 
 EXAMPLE
-  register --account 0x5409ed021d9299bf6814279a6a1411a7e866a631 --name test-account
+  set-name --account 0x5409ed021d9299bf6814279a6a1411a7e866a631 --name test-account
 ```
 
 _See code: [packages/cli/src/commands/account/set-name.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/account/set-name.ts)_

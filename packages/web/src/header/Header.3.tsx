@@ -47,6 +47,7 @@ interface State {
   menuFaded: boolean
   belowFoldUpScroll: boolean
   isBannerShowing: boolean
+  bannerHeight: number
 }
 
 function scrollOffset() {
@@ -121,6 +122,7 @@ export class Header extends React.PureComponent<Props, State> {
       mobileMenuActive: false,
       belowFoldUpScroll: false,
       isBannerShowing: false,
+      bannerHeight: 0,
     }
   }
 
@@ -183,6 +185,10 @@ export class Header extends React.PureComponent<Props, State> {
     this.setState({ isBannerShowing })
   }
 
+  setBannerHeight = (height: number) => {
+    this.setState({ bannerHeight: height })
+  }
+
   render() {
     const { t } = this.props
     const foreground = this.getForegroundColor()
@@ -195,7 +201,7 @@ export class Header extends React.PureComponent<Props, State> {
         style={[
           styles.container,
           bannerStyle.slideDown,
-          { top: isHomePage && this.state.isBannerShowing ? BANNER_HEIGHT : 0 },
+          { top: isHomePage && this.state.isBannerShowing ? this.state.bannerHeight : 0 },
           this.state.mobileMenuActive && styles.mobileMenuActive,
         ]}
       >
@@ -206,7 +212,9 @@ export class Header extends React.PureComponent<Props, State> {
             background-color: ${hamburger} !important;
           }
         `}</style>
-        {isHomePage && <BlueBanner onVisibilityChange={this.toggleBanner} />}
+        {isHomePage && (
+          <BlueBanner onVisibilityChange={this.toggleBanner} getHeight={this.setBannerHeight} />
+        )}
         {this.state.menuFaded || (
           <Animated.View
             style={[

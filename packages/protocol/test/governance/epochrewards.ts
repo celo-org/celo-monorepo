@@ -360,9 +360,10 @@ contract('EpochRewards', (accounts: string[]) => {
       })
 
       it('should return 600MM + 200MM * t / 15', async () => {
-        assertEqualBN(
+        assertEqualDpBN(
           await epochRewards.getTargetGoldTotalSupply(),
-          getExpectedTargetTotalSupply(timeDelta)
+          getExpectedTargetTotalSupply(timeDelta),
+          8
         )
       })
     })
@@ -437,8 +438,8 @@ contract('EpochRewards', (accounts: string[]) => {
         const expected = new BigNumber(1).plus(
           fromFixed(rewardsMultiplier.adjustments.underspend).times(0.1)
         )
-        // Assert equal to 9 decimal places due to fixidity imprecision.
-        assertEqualDpBN(actual, expected, 9)
+        // Assert equal to 8 decimal places due to fixidity imprecision.
+        assertEqualDpBN(actual, expected, 8)
       })
     })
 
