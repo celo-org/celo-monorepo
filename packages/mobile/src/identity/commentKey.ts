@@ -1,12 +1,11 @@
-import { AccountsWrapper } from '@celo/contractkit/lib/wrappers/Accounts'
 import { stripHexLeader } from '@celo/utils/src/address'
 import { encryptComment as encryptCommentRaw } from '@celo/utils/src/commentEncryption'
-import { contractKit } from 'src/web3/contracts'
+import { getAttestationsContract, getDataEncryptionKey } from '@celo/walletkit'
+import { web3 } from 'src/web3/contracts'
 
 export async function getCommentKey(address: string): Promise<Buffer | null> {
-  const accountsWrapper: AccountsWrapper = await contractKit.contracts.getAccounts()
-
-  const hexString = (await accountsWrapper.getDataEncryptionKey(address)).join()
+  const attestations = await getAttestationsContract(web3)
+  const hexString = await getDataEncryptionKey(attestations, address)
   // No comment key -> empty string returned from getDEK. This is expected for old addresses created before comment encryption change
   if (!hexString) {
     return null
