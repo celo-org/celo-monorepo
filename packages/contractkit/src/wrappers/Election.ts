@@ -92,14 +92,15 @@ export class ElectionWrapper extends BaseWrapper<Election> {
   /**
    * Returns the total votes for `group` made by `account`.
    * @param group The address of the validator group.
-   * @param account The address of the voting account.
-   * @return The total votes for `group` made by `account`.
+   * @return The total votes for `group`.
    */
-  getTotalVotesForGroup = proxyCall(
-    this.contract.methods.getTotalVotesForGroup,
-    undefined,
-    toBigNumber
-  )
+  async getTotalVotesForGroup(group: Address, blockNumber?: number): Promise<BigNumber> {
+    const votes = blockNumber
+      ? // @ts-ignore: Expected 0-1 arguments, but got 2
+        await this.contract.methods.getTotalVotesForGroup(group).call({}, blockNumber)
+      : await this.contract.methods.getTotalVotesForGroup(group).call()
+    return toBigNumber(votes)
+  }
 
   /**
    * Returns the groups that `account` has voted for.

@@ -13,6 +13,7 @@ interface VoterReward {
   value: BigNumber
   blockNumber: number
   addressVotes?: BigNumber
+  totalGroupVotes?: BigNumber
 }
 
 interface ValidatorReward {
@@ -74,13 +75,17 @@ export default class Show extends BaseCommand {
 
     // For each epoch...
     for (let blockNumber = fromBlock; blockNumber <= lastEpochBlock; blockNumber += epochSize) {
-      // Get the groups that address voted for at this epoch.
+      // Get the groups that address voted for at this epoch, and those groups' total votes.
       const addressVotes: { [key: string]: BigNumber } = {}
+      const totalGroupVotes: { [key: string]: BigNumber } = {}
       if (res.flags.address) {
         const voter = await election.getVoter(res.flags.address, blockNumber)
         for (const vote of voter.votes) {
           const group: string = vote.group.toLowerCase()
           addressVotes[group] = (addressVotes[group] || new BigNumber(0)).plus(vote.active)
+          totalGroupVotes[group] = (totalGroupVotes[group] || new BigNumber(0)).plus(
+            await election.getTotalVotesForGroup(group, blockNumber)
+          )
         }
       }
 
@@ -106,6 +111,7 @@ export default class Show extends BaseCommand {
           value: e.returnValues.value,
           blockNumber: e.blockNumber,
           addressVotes: addressVotes[e.returnValues.group],
+          totalGroupVotes: totalGroupVotes[e.returnValues.group],
         })
       )
 
@@ -164,9 +170,13 @@ export default class Show extends BaseCommand {
       )
     }
 
-    // At the end of each epoch, R, the total amount of rewards in gold to be allocated to stakers
+    // At the end of each epoch: R, the total amount of rewards in gold to be allocated to stakers
     // for this epoch is programmatically derived from considering the tradeoff between paying rewards
     // now vs. saving rewards for later.
+    //
+    // Every validator group has a slashing penalty M, initially M=1.0. All rewards to the group and to
+    // voters for the group are weighted by this factor.
+    //
     // Let T be the total gold voting for groups eligible for rewards in this epoch. For each account
     // holder, for each group, the amount of gold the account holder has voting for that group is increased
     // by average_epoch_score_of_elected_validators_in_group * account_gold_voting_for_group * R * M / T.
@@ -179,6 +189,12 @@ export default class Show extends BaseCommand {
           name: {},
           group: {},
           value: {},
+          myReward: {
+            get: (e) =>
+              e.addressVotes && e.totalGroupVotes
+                ? e.value.times(e.addressVotes.dividedBy(e.totalGroupVotes))
+                : '0',
+          },
           blockNumber: {},
         },
         { 'no-truncate': !res.flags.truncate }
