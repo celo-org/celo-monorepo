@@ -6,7 +6,7 @@ import {
   isSameAddress,
   timeTravel,
 } from '@celo/protocol/lib/test-utils'
-import { fixed1, toFixed, fromFixed, multiply } from '@celo/utils/lib/fixidity'
+import { fixed1, fromFixed, multiply, toFixed } from '@celo/utils/lib/fixidity'
 import BigNumber from 'bignumber.js'
 import {
   ExchangeInstance,

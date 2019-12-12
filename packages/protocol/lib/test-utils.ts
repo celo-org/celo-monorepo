@@ -41,7 +41,9 @@ export async function jsonRpc(web3: Web3, method: string, params: any[] = []): P
         jsonrpc: '2.0',
         method,
         params,
-        id: new Date().getTime(),
+        // salt id generation, milliseconds might not be
+        // enough to generate unique ids
+        id: new Date().getTime() + Math.floor(Math.random() * ( 1 + 100 - 1 )),
       },
       // @ts-ignore
       (err: any, result: any) => {
@@ -240,13 +242,13 @@ export function assertLogMatches(
 }
 
 export function assertEqualBN(
-  value: number | BN | BigNumber,
+  actual: number | BN | BigNumber,
   expected: number | BN | BigNumber,
   msg?: string
 ) {
   assert(
-    web3.utils.toBN(value).eq(web3.utils.toBN(expected)),
-    `expected ${expected.toString()} and got ${value.toString()}. ${msg || ''}`
+    web3.utils.toBN(actual).eq(web3.utils.toBN(expected)),
+    `expected ${expected.toString(10)} and got ${actual.toString(10)}. ${msg || ''}`
   )
 }
 

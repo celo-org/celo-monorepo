@@ -103,6 +103,11 @@ echo "
 " > /etc/google-fluentd/config.d/docker.conf
 systemctl restart google-fluentd
 
+# ---- Set Up Monitoring Agent ----
+
+curl -sSO https://dl.google.com/cloudagents/install-monitoring-agent.sh
+bash install-monitoring-agent.sh
+
 # ---- Set Up Persistent Disk ----
 
 # gives a path similar to `/dev/sdb`
@@ -196,14 +201,12 @@ IN_MEMORY_DISCOVERY_TABLE_FLAG=""
 mkdir -p $DATA_DIR/account
 echo -n "${genesis_content_base64}" | base64 -d > $DATA_DIR/genesis.json
 echo -n "${rid}" > $DATA_DIR/replica_id
-echo -n "$PRIVATE_KEY" > $DATA_DIR/pkey
 echo -n "$ACCOUNT_ADDRESS" > $DATA_DIR/address
 echo -n "$BOOTNODE_ENODE_ADDRESS" > $DATA_DIR/bootnodeEnodeAddress
 echo -n "$BOOTNODE_ENODE" > $DATA_DIR/bootnodeEnode
 echo -n "$GETH_ACCOUNT_SECRET" > $DATA_DIR/account/accountSecret
 if [ "${ip_address}" ]; then
   echo -n "${ip_address}" > $DATA_DIR/ipAddress
-  NAT_FLAG="--nat=extip:${ip_address}"
 fi
 
 echo "Starting geth..."
@@ -240,7 +243,6 @@ docker run \
     --wsaddr 0.0.0.0 \
     --wsorigins=* \
     --wsapi=eth,net,web3 \
-    --nodekey=$DATA_DIR/pkey \
     --etherbase=$ACCOUNT_ADDRESS \
     --networkid=${network_id} \
     --syncmode=full \
@@ -252,7 +254,6 @@ docker run \
     --istanbul.requesttimeout=${istanbul_request_timeout_ms} \
     --maxpeers=${max_peers} \
     --metrics \
-    $NAT_FLAG \
     $IN_MEMORY_DISCOVERY_TABLE_FLAG \
     $PROXIED_FLAGS"
 
