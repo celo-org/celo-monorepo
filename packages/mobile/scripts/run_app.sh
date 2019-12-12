@@ -9,18 +9,18 @@ set -euo pipefail
 # -n: Name of the network to run on
 # -p: Platform (android or ios)
 # -f: Fast (skip steps not required unless network or depedencies changes)
-# -h: Hot Reload (Restore nav state on reload)
+# -r: Hot Reload (Restore nav state on reload)
 
 NETWORK=""
 PLATFORM=""
 FAST=false
 HOT_RELOAD=false
-while getopts 'n:p:fh' flag; do
+while getopts 'n:p:fr' flag; do
   case "${flag}" in
     n) NETWORK="$OPTARG" ;;
     p) PLATFORM="$OPTARG" ;;
     f) FAST=true ;;
-    h) HOT_RELOAD=true ;;
+    r) HOT_RELOAD=true ;;
     *) error "Unexpected option ${flag}" ;;
   esac
 done
@@ -103,10 +103,10 @@ if [ $PLATFORM = "android" ]; then
     echo "FULLCMD: $OSASCRIPT_CMD"
     osascript -e "$OSASCRIPT_CMD"
     # Run android without packager because RN cli doesn't work with yarn workspaces
-    yarn react-native run-android --appIdSuffix \"debug\" --no-packager
+    yarn react-native run-android --appIdSuffix "debug" --no-packager
   else 
     # Run android without packager because RN cli doesn't work with yarn workspaces
-    yarn react-native run-android --appIdSuffix \"debug\" --no-packager
+    yarn react-native run-android --appIdSuffix "debug" --no-packager
     yarn react-native start 
   fi
 
