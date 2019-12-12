@@ -2222,7 +2222,7 @@ contract('Validators', (accounts: string[]) => {
       await registry.setAddressFor(CeloContractName.Governance, accounts[4])
     })
 
-    describe('when the validator is added to different groups sequantially', async () => {
+    describe('when the validator is added to different groups sequentially', async () => {
       const epochs = []
       beforeEach(async () => {
         await registerValidator(validator)
@@ -2236,10 +2236,14 @@ contract('Validators', (accounts: string[]) => {
           epochs.push(epochNumber)
           await mineBlocks(blocksUntilNextEpoch, web3)
 
-          await validators.affiliate(groups[i])
-          await validators.addFirstMember(validator, NULL_ADDRESS, NULL_ADDRESS, {
-            from: groups[i],
-          })
+          if (i != 4) {
+            await validators.affiliate(groups[i])
+            await validators.addFirstMember(validator, NULL_ADDRESS, NULL_ADDRESS, {
+              from: groups[i],
+            })
+          } else {
+            await validators.forceDeaffiliateIfValidator(validator)
+          }
         }
       })
 
@@ -2247,7 +2251,7 @@ contract('Validators', (accounts: string[]) => {
         for (let i = 0; i < membershipHistoryLength.toNumber(); i++) {
           assert.equal(
             await validators.groupMembershipInEpoch(validator, epochs[i + 1] + 1, 2 + i),
-            groups[i + 1]
+            i != 3 ? groups[i + 1] : NULL_ADDRESS
           )
         }
       })
@@ -2269,11 +2273,15 @@ contract('Validators', (accounts: string[]) => {
           await mineBlocks(blocksUntilNextEpoch, web3)
 
           if (i % 3 === 0) {
-            epochs.push([epochNumber, groups[i / 3]])
-            await validators.affiliate(groups[i / 3])
-            await validators.addFirstMember(validator, NULL_ADDRESS, NULL_ADDRESS, {
-              from: groups[i / 3],
-            })
+            epochs.push([epochNumber, i != 9 ? groups[i / 3] : NULL_ADDRESS])
+            if (i != 9) {
+              await validators.affiliate(groups[i / 3])
+              await validators.addFirstMember(validator, NULL_ADDRESS, NULL_ADDRESS, {
+                from: groups[i / 3],
+              })
+            } else {
+              await validators.forceDeaffiliateIfValidator(validator)
+            }
           }
         }
       })
@@ -2282,7 +2290,7 @@ contract('Validators', (accounts: string[]) => {
         for (let i = 0; i < membershipHistoryLength.toNumber(); i++) {
           assert.equal(
             await validators.groupMembershipInEpoch(validator, epochs[i][0] + 1, 1 + i),
-            groups[i]
+            i != 3 ? groups[i] : NULL_ADDRESS
           )
         }
       })
@@ -2298,6 +2306,11 @@ contract('Validators', (accounts: string[]) => {
           groups[0]
         )
         assert.equal(await validators.groupMembershipInEpoch(validator, 27, 2), groups[1])
+        assert.equal(await validators.groupMembershipInEpoch(validator, 36, 5), groups[4])
+        // Epoch 29 join group A, epoch 32 deaffiliate, epoch 35 join group B.
+        // This verifies we don't mistake 0 addresses as the end of history.
+        await assertRevert(validators.groupMembershipInEpoch(validator, 35, 3))
+        await assertRevert(validators.groupMembershipInEpoch(validator, 32, 3))
       })
 
       describe('when called with various malformed inputs', async () => {

@@ -775,7 +775,6 @@ contract Validators is
       uint256 multiplier = Math.max(1, groups[account].members.numElements);
       uint256[] storage sizeHistory = groups[account].sizeHistory;
       if (sizeHistory.length > 0) {
-        // TODO(lucas): Why isn't this >=
         for (uint256 i = sizeHistory.length.sub(1); i > 0; i = i.sub(1)) {
           if (sizeHistory[i].add(groupLockedGoldRequirements.duration) >= now) {
             multiplier = Math.max(i, multiplier);
@@ -1217,14 +1216,13 @@ contract Validators is
   {
     require(isValidator(account) && epochNumber <= getEpochNumber());
     MembershipHistory storage history = validators[account].membershipHistory;
-    if (
+    require(
       history.entries[index].epochNumber == epochNumber ||
-      (history.entries[index].epochNumber < epochNumber &&
-        (history.entries[index.add(1)].epochNumber > epochNumber ||
-          history.entries[index.add(1)].epochNumber == 0))
-    ) {
-      return history.entries[index].group;
-    }
-    require(false, "provided index does not match provided epochNumber at index in history.");
+        (history.entries[index].epochNumber < epochNumber &&
+          (history.entries[index.add(1)].epochNumber > epochNumber ||
+            index == history.numEntries.sub(1))),
+      "provided index does not match provided epochNumber at index in history."
+    );
+    return history.entries[index].group;
   }
 }
