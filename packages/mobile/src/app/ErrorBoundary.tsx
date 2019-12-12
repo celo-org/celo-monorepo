@@ -5,6 +5,7 @@ import { withNamespaces, WithNamespaces } from 'react-i18next'
 import CeloAnalytics from 'src/analytics/CeloAnalytics'
 import { DefaultEventNames } from 'src/analytics/constants'
 import ErrorScreen from 'src/app/ErrorScreen'
+import { Namespaces } from 'src/i18n'
 
 interface State {
   childError: Error | null
@@ -37,4 +38,4 @@ class ErrorBoundary extends React.Component<Props, State> {
   }
 }
 
-export default withNamespaces('global')(ErrorBoundary)
+export default withNamespaces(Namespaces.global)(ErrorBoundary)
