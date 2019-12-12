@@ -40,7 +40,7 @@ const HOUR = 60 * 60
 const DAY = 24 * HOUR
 
 contract('LockedGold', (accounts: string[]) => {
-  let account = accounts[0]
+  const account = accounts[0]
   const nonOwner = accounts[1]
   const unlockingPeriod = 3 * DAY
   let accountsInstance: AccountsInstance

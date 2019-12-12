@@ -413,7 +413,7 @@ export async function sendTransactionAsyncWithWeb3Signing<T>(
     // fill the fields here.
     let feeCurrency = feeCurrencyContract._address
     const gatewayFeeRecipient = await web3.eth.getCoinbase()
-    const gatewayFee = defaultGatewayFee.toString()
+    const gatewayFee = '0x' + defaultGatewayFee.toString(16)
     Logger.debug(tag, `Gateway fee is ${gatewayFee} paid to ${gatewayFeeRecipient}`)
     const gasPrice = await getGasPrice(web3, feeCurrency)
     if (feeCurrency === undefined) {
