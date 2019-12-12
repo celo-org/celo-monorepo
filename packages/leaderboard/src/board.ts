@@ -1,9 +1,9 @@
 import { ContractKit, newKitFromWeb3 } from '@celo/contractkit'
-import { AccountsWrapper } from '@celo/contractkit/lib/wrappers/Accounts'
-import Web3 from 'web3'
-import { Client } from 'pg'
 import { ClaimTypes, IdentityMetadataWrapper } from '@celo/contractkit/lib/identity'
 import { verifyAccountClaim } from '@celo/contractkit/lib/identity/claims/verify'
+import { AccountsWrapper } from '@celo/contractkit/lib/wrappers/Accounts'
+import { Client } from 'pg'
+import Web3 from 'web3'
 
 const GoogleSpreadsheet = require('google-spreadsheet')
 
@@ -25,10 +25,12 @@ const LEADERBOARD_DATABASE = process.env['LEADERBOARD_DATABASE'] || 'blockscout'
 const LEADERBOARD_SHEET =
   process.env['LEADERBOARD_SHEET'] || '1HCs1LZv1BOB1v2bVlH4qNPnxVRlYVhQ7CKhkMibE4EY'
 const LEADERBOARD_WEB3 = process.env['LEADERBOARD_WEB3'] || 'http://localhost:8545'
+const client = new Client({ database: LEADERBOARD_DATABASE })
 
-function readSheet() {
+async function readSheet() {
   // spreadsheet key is the long id in the sheets URL
   const doc = new GoogleSpreadsheet(LEADERBOARD_SHEET)
+  await client.connect()
 
   doc.getInfo(function(_err: any, info: any) {
     let sheet = info.worksheets[0]
@@ -61,12 +63,12 @@ function readSheet() {
       }
     )
   })
+  await client.end()
 }
 
 async function updateDB(lst: any[], remove: any[]) {
   console.log('Adding', lst)
-  const client = new Client({ database: LEADERBOARD_DATABASE })
-  await client.connect()
+
   await client.query(
     'INSERT INTO competitors (address, multiplier)' +
       " SELECT decode(m.address, 'hex') AS address, m.multiplier FROM json_populate_recordset(null::json_type, $1) AS m" +
@@ -79,7 +81,6 @@ async function updateDB(lst: any[], remove: any[]) {
       "DELETE FROM competitors WHERE address = '\\x" + elem.address.toString() + "'"
     )
   }
-  await client.end()
   await readAssoc(lst.map((a: any) => a.address.toString()))
 }
 
@@ -122,8 +123,6 @@ async function getClaims(
 async function processClaims(kit: ContractKit, address: string, info: IdentityMetadataWrapper) {
   try {
     const lst: string[] = await getClaims(kit, address, info)
-    const client = new Client({ database: LEADERBOARD_DATABASE })
-    await client.connect()
     await client.query(
       'INSERT INTO claims (address, claimed_address)' +
         " SELECT decode(m.address,'hex'), decode(m.claimed_address,'hex') FROM json_populate_recordset(null::json_assoc, $1) AS m" +
@@ -137,7 +136,6 @@ async function processClaims(kit: ContractKit, address: string, info: IdentityMe
         ),
       ]
     )
-    await client.end()
   } catch (err) {
     console.error('Cannot process claims', err)
   }
