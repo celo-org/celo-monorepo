@@ -97,6 +97,7 @@ class SendConfirmation extends React.Component<Props, State> {
     if (confirmationInput === '') {
       throw new Error('Confirmation input missing')
     }
+    confirmationInput.amount = new BigNumber(confirmationInput.amount)
     return confirmationInput
   }
 
@@ -128,9 +129,8 @@ class SendConfirmation extends React.Component<Props, State> {
     const { onCancel } = this.getNavParams()
     if (onCancel) {
       onCancel()
-    } else {
-      navigateBack()
     }
+    navigateBack()
   }
 
   renderHeader = () => {

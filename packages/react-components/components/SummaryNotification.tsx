@@ -1,11 +1,10 @@
 import TextButton from '@celo/react-components/components/TextButton'
-import Touchable from '@celo/react-components/components/Touchable'
 import colors from '@celo/react-components/styles/colors'
 import fontStyles from '@celo/react-components/styles/fonts'
 import { elevationShadowStyle } from '@celo/react-components/styles/styles'
 import variables from '@celo/react-components/styles/variables'
 import * as React from 'react'
-import { StyleSheet, Text, View } from 'react-native'
+import { StyleSheet, Text, TouchableOpacity, View } from 'react-native'
 
 const { contentPadding } = variables
 
@@ -13,7 +12,7 @@ interface Props {
   icon?: React.ReactNode
   title: string
   children: React.ReactNode
-  ctas: CTA[]
+  reviewCTA: CTA
   onPress?: () => unknown
 }
 
@@ -23,24 +22,26 @@ export interface CTA {
 }
 
 function Wrapper({ onPress, children }: { children: React.ReactNode; onPress?: () => unknown }) {
-  return onPress ? <Touchable onPress={onPress}>{children}</Touchable> : <View>{children}</View>
+  return onPress ? (
+    <TouchableOpacity onPress={onPress}>{children}</TouchableOpacity>
+  ) : (
+    <View>{children}</View>
+  )
 }
 
-export default function BaseNotification({ icon, title, children, ctas, onPress }: Props) {
+export default function SummaryNotification({ icon, title, children, reviewCTA, onPress }: Props) {
   return (
     <Wrapper onPress={onPress}>
       <View style={[styles.container, elevationShadowStyle(2)]}>
         {icon && <View style={styles.iconArea}>{icon}</View>}
         <View style={styles.contentArea}>
-          <Text style={fontStyles.bodySmallSecondary}>{title}</Text>
+          <Text style={fontStyles.bodySmallBold}>{title}</Text>
           <View style={styles.body}>
             {children}
             <View style={styles.ctas}>
-              {ctas.map((cta, j) => (
-                <TextButton key={j} style={styles.action} onPress={cta.onPress}>
-                  {cta.text}
-                </TextButton>
-              ))}
+              <TextButton style={styles.action} onPress={reviewCTA.onPress}>
+                {reviewCTA.text}
+              </TextButton>
             </View>
           </View>
         </View>
@@ -58,7 +59,6 @@ const styles = StyleSheet.create({
     paddingEnd: 15,
   },
   body: {
-    paddingTop: 8,
     minHeight: 60,
     justifyContent: 'space-between',
   },
@@ -71,6 +71,7 @@ const styles = StyleSheet.create({
   },
   iconArea: {
     paddingRight: contentPadding,
+    flexDirection: 'column',
     alignItems: 'center',
   },
   contentArea: {
