@@ -1,6 +1,7 @@
 /* tslint:disable: no-console */
 import { CeloContract, ContractKit, newKit } from '@celo/contractkit'
 import { TransactionResult } from '@celo/contractkit/lib/utils/tx-result'
+import { waitForPortOpen } from '@celo/dev-utils/lib/network'
 import { consoleLogger } from '@celo/utils/lib/logger'
 import {
   convertToContractDecimals,
@@ -1062,20 +1063,6 @@ export function writeGenesis(validators: Validator[], gethConfig: GethRunConfig)
   console.log('writing genesis')
   fs.writeFileSync(genesisPath, genesis)
   console.log(`wrote   genesis to ${genesisPath}`)
-}
-
-async function isPortOpen(host: string, port: number) {
-  return (await spawnCmd('nc', ['-z', host, port.toString()], { silent: true })) === 0
-}
-
-async function waitForPortOpen(host: string, port: number, seconds: number) {
-  const deadline = Date.now() + seconds * 1000
-  do {
-    if (await isPortOpen(host, port)) {
-      return true
-    }
-  } while (Date.now() < deadline)
-  return false
 }
 
 export async function snapshotDatadir(instance: GethInstanceConfig, verbose: boolean) {
