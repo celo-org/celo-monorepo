@@ -22,11 +22,14 @@ docker stop celo-proxy && docker rm celo-proxy
 ```bash
 # On your attestations machine
 docker stop celo-attestations && docker rm celo-attestations
+docker stop celo-attestation-service && docker rm celo-attestation-service
 ```
+
+If you have provided attestations, you will want to wipe the database that you configured the attestation service to.
 
 ## Double check that you still have your keys
 
-Make sure that you still have your Validator, Validator Group, and Validator signer private keys, as you will be able to re-use them in the next phase of the network. You can do so by listing the contents of your `keystore` directory on each machine. You should see a file ending with the address of the corresponding key.
+Make sure that you still have your Validator, Validator Group, Validator signer and Attestation signer private keys, as you will be able to re-use them in the next phase of the network. You can do so by listing the contents of your `keystore` directory on each machine. You should see a file ending with the address of the corresponding key.
 
 ```bash
 # On your local machine
@@ -38,6 +41,12 @@ ls celo-accounts-node/keystore
 # On your validator machine
 # You should see the keystore file for your Validator signer key.
 ls celo-validator-node/keystore
+```
+
+```bash
+# On your Attestation machine
+# You should see the keystore file for your Attestation signer key.
+ls celo-attestations-node/keystore
 ```
 
 ## Delete chain data from your nodes
@@ -63,6 +72,13 @@ mv nodekey geth/nodekey
 ```bash
 # On your validator machine
 cd celo-validator-node
+rm -rf geth* && rm static-nodes.json
+```
+
+```bash
+# On your Attestation machine
+cd celo-attestations-node
+cd celo-accounts-node
 rm -rf geth* && rm static-nodes.json
 ```
 
@@ -108,6 +124,10 @@ export CELO_VALIDATOR_SIGNER_ADDRESS=<YOUR-CELO-VALIDATOR-SIGNER-ADDRESS>
 ```
 
 Next, follow [these instructions](running-a-validator.md#connect-the-validator-to-the-proxy) to restart your validator node on your validator machine.
+
+### Restart your Attestation node and service
+
+Follow [these instructions](running-a-validator.md#running-the-attestation-service) to restart your Attestation node and service on your Attestation machine. Remember you do not have to create another account/proof-of-posession if you still have your keys.
 
 ### Re-register your Validator
 
