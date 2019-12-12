@@ -67,10 +67,6 @@ resource "google_compute_instance" "tx_node" {
       rid : count.index,
     }
   )
-
-  lifecycle {
-    create_before_destroy = false
-  }
 }
 
 resource "random_id" "tx_node" {

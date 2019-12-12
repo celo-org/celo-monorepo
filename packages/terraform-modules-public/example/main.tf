@@ -71,6 +71,7 @@ module "celo_cluster" {
   gcloud_zone    = var.google["zone"]
   network_name   = google_compute_network.celo_network.name
   celo_env       = var.celo_env
+  instance_types = var.instance_types
 
   tx_node_count    = var.replicas["txnode"]
   validator_count  = var.replicas["validator"]
@@ -98,10 +99,8 @@ module "celo_cluster" {
   geth_verbosity                        = var.geth_verbosity
   geth_exporter_docker_image_repository = var.geth_exporter_docker_image["repository"]
   geth_exporter_docker_image_tag        = var.geth_exporter_docker_image["tag"]
-  bootnode_enode_address                = var.bootnode["enode"]
-  bootnode_ip_address                   = var.bootnode["ip"]
 
-  deploy_attestation_service                       = var.deploy_attestation_service
+  attestation_service_count                        = var.replicas["attestation_service"]
   attestation_service_db_username                  = var.attestation_service_db["username"]
   attestation_service_db_password                  = var.attestation_service_db["password"]
   attestation_service_docker_image_repository      = var.attestation_service_docker_image["repository"]
@@ -116,5 +115,5 @@ module "celo_cluster" {
   attestation_service_twilio_messaging_service_sid = var.attestation_service_credentials["twilio_messaging_service_sid"]
   attestation_service_twilio_auth_token            = var.attestation_service_credentials["twilio_auth_token"]
   attestation_service_twilio_blacklist             = var.attestation_service_credentials["twilio_blacklist"]
-  attestation_service_celo_provider                = "https://baklavastaging-forno.celo-testnet.org/"
+  // attestation_service_celo_provider                = "https://baklava-forno.celo-testnet.org/"
 }

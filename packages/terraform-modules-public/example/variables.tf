@@ -31,6 +31,19 @@ variable replicas {
   default = {
     validator = 1 # Also used for proxy
     txnode    = 0
+    attestation_service = 1
+  }
+}
+
+variable instance_types {
+  description = "The instance type for each component"
+  type        = map(string)
+
+  default = {
+    validator           = "n1-standard-1"
+    proxy               = "n1-standard-1"
+    txnode              = "n1-standard-1"
+    attestation_service = "n1-standard-1"
   }
 }
 
@@ -125,13 +138,6 @@ variable proxy_name {
 }
 
 # Attestation variables
-variable deploy_attestation_service {
-  description = "Deploy the Load Balancer for Transmission nodes (if txnode > 0)"
-  type        = bool
-
-  default = true
-}
-
 variable attestation_service_db {
   description = "Configuration for the Postgres Cloud SQL DB"
   type        = map(string)
@@ -180,7 +186,7 @@ variable geth_verbosity {
 variable ethstats_host {
   description = "Ethstats host to report data"
   type        = string
-  default     = "https://baklava-ethstats.celo-testnet.org"
+  default     = "baklava-ethstats.celo-testnet.org"
 }
 
 variable in_memory_discovery_table {
@@ -194,15 +200,15 @@ variable geth_node_docker_image {
   type        = map(string)
 
   default = {
-    repository = "us.gcr.io/celo-testnet/geth"
-    tag        = "c39d61c8847387727d0b01f85719240957bb585c"
+    repository = "us.gcr.io/celo-testnet/celo-node"
+    tag        = "geth"
   }
 }
 
 variable network_id {
   description = "The ethereum network ID"
   type        = number
-  default     = 12219
+  default     = 121119
 }
 
 variable block_time {
