@@ -45,8 +45,8 @@ export const handler = async (argv: TraceArgv) => {
     try {
       web3AndContracts = await getWeb3AndTokensContracts()
       // tslint:disable-next-line: no-shadowed-variable
-      const { web3 } = web3AndContracts!
-      const latestBlock = await web3.eth.getBlock('latest')
+      const { kit } = web3AndContracts!
+      const latestBlock = await kit.web3.eth.getBlock('latest')
       if (latestBlock.number === 0) {
         throw new Error('Latest block is zero')
       } else {
@@ -67,7 +67,7 @@ export const handler = async (argv: TraceArgv) => {
     process.exit(1)
   }
 
-  const { web3, goldToken, stableToken } = web3AndContracts!
+  const { kit, goldToken, stableToken } = web3AndContracts!
 
   // This is needed to turn off debug logging which is made in `sendTransaction`
   // and needed only for mobile client.
@@ -76,7 +76,7 @@ export const handler = async (argv: TraceArgv) => {
   }
 
   await traceTransactions(
-    web3,
+    kit,
     goldToken,
     stableToken,
     [address1, address2],
