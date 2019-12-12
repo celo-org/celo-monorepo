@@ -1,6 +1,6 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`BaseNotification renders correctly 1`] = `
+exports[`SummaryNotification renders correctly 1`] = `
 <View>
   <View
     style={
@@ -36,8 +36,8 @@ exports[`BaseNotification renders correctly 1`] = `
       <Text
         style={
           Object {
-            "color": "#81868B",
-            "fontFamily": "Hind-Regular",
+            "color": "#2E3338",
+            "fontFamily": "Hind-Bold",
             "fontSize": 14,
             "lineHeight": 18,
           }
@@ -50,7 +50,6 @@ exports[`BaseNotification renders correctly 1`] = `
           Object {
             "justifyContent": "space-between",
             "minHeight": 60,
-            "paddingTop": 8,
           }
         }
       >

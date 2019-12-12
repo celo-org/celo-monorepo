@@ -5,6 +5,7 @@ import { ApolloError } from 'apollo-boost'
 import * as React from 'react'
 import { withNamespaces, WithNamespaces } from 'react-i18next'
 import { ActivityIndicator, Image, StyleSheet, Text, View } from 'react-native'
+import { Namespaces } from 'src/i18n'
 import { exchangeIcon, shinyDollar } from 'src/images/Images'
 import { navigate } from 'src/navigator/NavigationService'
 import { Stacks } from 'src/navigator/Screens'
@@ -94,4 +95,4 @@ const styles = StyleSheet.create({
   },
 })
 
-export default withNamespaces('walletFlow5')(NoActivity)
+export default withNamespaces(Namespaces.walletFlow5)(NoActivity)
