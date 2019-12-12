@@ -74,10 +74,12 @@ class ReclaimPaymentConfirmationCard extends React.PureComponent<Props> {
               {recipientContact.displayName}
             </Text>
           )}
-          <PhoneNumberWithFlag
-            e164PhoneNumber={recipientPhone}
-            defaultCountryCode={defaultCountryCode}
-          />
+          {recipientPhone && (
+            <PhoneNumberWithFlag
+              e164PhoneNumber={recipientPhone}
+              defaultCountryCode={defaultCountryCode}
+            />
+          )}
         </View>
         <View style={style.feeContainer}>
           <LineItemRow
@@ -111,7 +113,6 @@ const style = StyleSheet.create({
     padding: 20,
   },
   feeContainer: {
-    marginTop: 10,
     marginBottom: 10,
     justifyContent: 'center',
     alignItems: 'stretch',

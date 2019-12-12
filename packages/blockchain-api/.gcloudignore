@@ -6,3 +6,6 @@ dist/
 # Exclude dependencies
 node_modules/
 .env
+
+# Exclude tests
+*.test.ts

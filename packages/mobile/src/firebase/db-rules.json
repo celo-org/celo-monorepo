@@ -30,6 +30,15 @@
         "auth.uid != null && (query.orderByChild == 'requesterAddress' || query.orderByChild == 'requesteeAddress') && query.equalTo == root.child('users').child(auth.uid).child('address').val()",
       ".write": true,
       ".indexOn": ["requesterAddress", "requesteeAddress"]
+    },
+    "exchangeRates": {
+      ".read": false,
+      ".write": false,
+      "$from": {
+        "$to": {
+          ".indexOn": ["timestamp"]
+        }
+      }
     }
   }
 }

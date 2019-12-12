@@ -6,6 +6,6 @@ module.exports = {
     navigator: true,
     window: true,
   },
-  preset: './node_modules/react-native-web/jest-preset.js',
+  preset: 'react-native-web',
   testEnvironment: 'node',
 }
