@@ -248,7 +248,8 @@ async function updateAttestations(kit: ContractKit, rows: any[][], sheets: any) 
           filter: { issuer: address },
         })).length
         console.log('Attestations requested', req, 'fulfilled', full, 'by', address)
-        data.push(full / req)
+        if (req == 0) data.push(0)
+        else data.push(full / req)
       } catch (err) {
         console.error('Cannot resolve attestations for', address, err)
         data.push('')
