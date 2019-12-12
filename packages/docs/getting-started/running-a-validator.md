@@ -16,7 +16,7 @@ You can find more details about Celo mission and why to become a Validator [in o
 
 ## Register for the Stake Off
 
-Participation in The Great Celo Stake Off is subject to these [Terms and Conditions](https://docs.google.com/document/d/1b5SzeRbq60nx50NeezAEMpwLkaBDQ9hjZc0QAh4Mbdk/). If you agree to those, register online via an [online form](https://docs.google.com/forms/d/e/1FAIpQLSfbn5hTJ4UIWpN92-o2qMTUB0UnrFsL0fm97XqGe4VhhN_r5A/viewform). **Once the C-Labs team receive your registration, they will send you instructions to get fauceted funds to run a Validator on the Baklava testnet.** Do this first.
+Participation in The Great Celo Stake Off is subject to these [Terms and Conditions](https://docs.google.com/document/d/1b5SzeRbq60nx50NeezAEMpwLkaBDQ9hjZc0QAh4Mbdk/). If you agree to those, register online via an [online form](https://docs.google.com/forms/d/e/1FAIpQLSfbn5hTJ4UIWpN92-o2qMTUB0UnrFsL0fm97XqGe4VhhN_r5A/viewform). **Once the C-Labs team receives your registration, they will send you instructions to get fauceted funds to run a Validator on the Baklava testnet.** Do this first.
 
 ## Prerequisites
 
