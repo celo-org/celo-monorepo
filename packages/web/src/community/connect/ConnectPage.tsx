@@ -39,7 +39,7 @@ export class ConnectPage extends React.Component<Props> {
         />
         <View>
           <CoverArea />
-          <EventData />
+          <EventData limitedPreview={true} />
           <Contribute />
           <ArticleData />
           <Tenets />

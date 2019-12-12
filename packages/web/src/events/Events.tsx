@@ -17,7 +17,10 @@ interface OwnProps {
   pastEvents?: EventProps[]
   topEvent?: EventProps | null
   loading?: boolean
+  limitedPreview: boolean
 }
+
+const PREVIEW_SIZE = 3
 
 type Props = I18nProps & OwnProps
 
@@ -54,10 +57,12 @@ class Events extends React.PureComponent<Props, State> {
   }
 
   getSections = () => {
-    const { t, topEvent, upcomingEvents, pastEvents } = this.props
+    const { t, topEvent, upcomingEvents, pastEvents, limitedPreview } = this.props
+    const shownEvents =
+      upcomingEvents && limitedPreview ? upcomingEvents.slice(0, PREVIEW_SIZE) : upcomingEvents
     return [
       this.getSection([topEvent], t('events.highlightEvent')),
-      this.getSection(upcomingEvents, t('events.upcomingEvents')),
+      this.getSection(shownEvents, t('events.upcomingEvents')),
       this.getSection(pastEvents, t('events.pastEvents')),
     ].filter((section) => section)
   }
@@ -126,24 +131,35 @@ class Events extends React.PureComponent<Props, State> {
         <Cell span={Spans.three4th}>
           <SectionList
             sections={this.getSections()}
-            renderSectionHeader={SectionHeader}
-            // @ts-ignore
+            renderSectionHeader={SectionHeader} // @ts-ignore
             renderItem={this.renderItem}
             keyExtractor={keyExtractor}
             ListEmptyComponent={this.renderNotFound}
             contentContainerStyle={styles.container}
           />
-          {!this.props.pastEvents && (
+          {this.props.limitedPreview && (
             <View style={[standardStyles.centered, standardStyles.blockMarginTop]}>
               <Button
                 kind={BTN.DARKNAKED}
                 size={SIZE.normal}
-                text={t('events.pastEvents')}
-                href={menuItems.PAST_EVENTS.link}
+                text={t('events.allEvents')}
+                href={menuItems.EVENTS.link}
                 target={'_new'}
               />
             </View>
           )}
+          {!this.props.limitedPreview &&
+            !this.props.pastEvents && (
+              <View style={[standardStyles.centered, standardStyles.blockMarginTop]}>
+                <Button
+                  kind={BTN.DARKNAKED}
+                  size={SIZE.normal}
+                  text={t('events.pastEvents')}
+                  href={menuItems.PAST_EVENTS.link}
+                  target={'_new'}
+                />
+              </View>
+            )}
         </Cell>
       </GridRow>
     )

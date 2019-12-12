@@ -98,6 +98,7 @@
   "events": {
     "pastEvents": "Past Events",
     "upcomingEvents": "Upcoming Events",
+    "allEvents": "See More Events",
     "highlightEvent": "Highlight Event",
     "title": "Connect in person",
     "events": "Events",

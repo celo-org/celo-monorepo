@@ -12,7 +12,11 @@ export async function getEvents() {
   return res.json()
 }
 
-export default class EventData extends React.PureComponent {
+interface Props {
+  limitedPreview: boolean
+}
+
+export default class EventData extends React.PureComponent<Props> {
   state = { upcomingEvents: [], topEvent: null, loaded: false }
 
   componentDidMount = async () => {
@@ -25,6 +29,7 @@ export default class EventData extends React.PureComponent {
 
     return (
       <Events
+        limitedPreview={this.props.limitedPreview}
         upcomingEvents={state.upcomingEvents}
         topEvent={state.topEvent}
         loading={!state.loaded}

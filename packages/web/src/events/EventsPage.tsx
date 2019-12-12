@@ -5,7 +5,7 @@ import ConnectionFooter from 'src/shared/ConnectionFooter'
 export default function EventsPage() {
   return (
     <View>
-      <EventsData />
+      <EventsData limitedPreview={false} />
       <ConnectionFooter />
     </View>
   )

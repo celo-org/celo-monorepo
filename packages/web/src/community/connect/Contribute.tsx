@@ -33,7 +33,7 @@ function Contribute({ t, isMobile }: I18nProps & ScreenProps) {
           <CoverAction
             containerStyle={styles.actionArea}
             title={t('contribute.codeTitle')}
-            graphic={require('src/community/EcosystemFund.png')}
+            graphic={require('src/dev/features/evm.png')}
             isMobile={isMobile}
             text={t('contribute.codeText')}
             link={{ text: t('contribute.codeLink'), href: menuItems.BUILD.link }}
