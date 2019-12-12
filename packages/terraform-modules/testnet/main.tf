@@ -41,6 +41,7 @@ locals {
   target_tags_all = [
     local.target_tag_bootnode,
     local.target_tag_node,
+    local.target_tag_proxy,
     local.target_tag_ssl
   ]
 }
@@ -147,6 +148,7 @@ module "tx_node" {
   geth_node_docker_image_tag            = var.geth_node_docker_image_tag
   geth_verbosity                        = var.geth_verbosity
   in_memory_discovery_table             = var.in_memory_discovery_table
+  instance_tags                         = [local.target_tag_tx_node]
   name                                  = "tx-node"
   network_id                            = var.network_id
   network_name                          = data.google_compute_network.network.name

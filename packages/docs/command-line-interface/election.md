@@ -6,7 +6,7 @@ description: Participate in and view the state of Validator Elections
 
 ### Activate
 
-Activate pending votes in validator elections to begin earning rewards
+Activate pending votes in validator elections to begin earning rewards. To earn rewards as a voter, it is required to activate your pending votes at some point after the end of the epoch in which they were made.
 
 ```
 USAGE
@@ -14,7 +14,7 @@ USAGE
 
 OPTIONS
   --from=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) Voter's address
-  --wait                                             Wait until all pending votes become activatable
+  --wait                                             Wait until all pending votes can be activated
 
 EXAMPLES
   activate --from 0x4443d0349e8b3075cba511a0a87796597602a0f1

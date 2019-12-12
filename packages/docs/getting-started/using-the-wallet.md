@@ -18,7 +18,7 @@ To download the app on the Play Store, go [here](https://play.google.com/store/a
 
 ### Running the Celo Wallet Locally
 
-For more information on how to run the Celo Wallet locally, please refer to the [mobile wallet setup instructions](../../celo-codebase/wallet/intro.md)
+For more information on how to run the Celo Wallet locally, please refer to the [mobile wallet setup instructions](../celo-codebase/wallet/intro.md)
 
 ### Get More Funds!
 

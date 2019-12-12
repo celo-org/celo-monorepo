@@ -2,9 +2,9 @@ import { AttestationServiceStatusResponseType, SignatureType } from '@celo/utils
 import express from 'express'
 import * as t from 'io-ts'
 import { kit } from '../db'
+import { getAccountAddress, getAttestationSignerAddress } from '../env'
 import { ErrorMessages, respondWithError } from '../request'
 import { blacklistRegionCodes, configuredSmsProviders } from '../sms'
-import { getAccountAddress, getAttestationSignerAddress } from './attestation'
 
 export const SIGNATURE_PREFIX = 'attestation-service-status-signature:'
 export const StatusRequestType = t.type({
