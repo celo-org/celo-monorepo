@@ -31,7 +31,7 @@ export const handler = async (argv: VmTestnetArgv) => {
   await switchToClusterFromEnv()
 
   let onDeployFailed = () => Promise.resolve()
-  if (argv.reset) {
+  if (argv.reset === true) {
     onDeployFailed = () => untaintTestnet(argv.celoEnv)
     await taintTestnet(argv.celoEnv)
   }
