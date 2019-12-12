@@ -237,8 +237,16 @@ export class AccountsWrapper extends BaseWrapper<Accounts> {
   /**
    * Returns the set name for the account
    * @param account Account
+   * @param blockNumber Height of result, defaults to tip.
    */
-  getName = proxyCall(this.contract.methods.getName)
+  async getName(account: Address, blockNumber?: number): Promise<string> {
+    return blockNumber
+      ? this.contract.methods
+          .getName(account)
+          // @ts-ignore: Expected 0-1 arguments, but got 2
+          .call({}, blockNumber)
+      : this.contract.methods.getName(account).call()
+  }
 
   /**
    * Returns the set data encryption key for the account

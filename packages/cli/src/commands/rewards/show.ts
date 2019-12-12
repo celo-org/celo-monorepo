@@ -1,4 +1,5 @@
 import { Validator, ValidatorGroup } from '@celo/contractkit/lib/wrappers/Validators'
+import { eqAddress } from '@celo/utils/lib/address'
 import { flags } from '@oclif/command'
 import BigNumber from 'bignumber.js'
 import { cli } from 'cli-ux'
@@ -40,10 +41,9 @@ export default class Show extends BaseCommand {
 
   static flags = {
     ...BaseCommand.flags,
-    address: Flags.address({ required: false, description: 'Address to filter' }),
+    address: Flags.address({ description: 'Address to filter' }),
     epochs: flags.integer({
       default: 1,
-      required: false,
       description: 'Show results for the last N epochs',
     }),
   }
@@ -56,20 +56,18 @@ export default class Show extends BaseCommand {
     const res = this.parse(Show)
     const election = await this.kit.contracts.getElection()
     const validators = await this.kit.contracts.getValidators()
-    const electionContract = await this.kit._web3Contracts.getElection()
-    const validatorsContract = await this.kit._web3Contracts.getValidators()
     const epochSize = await validators.getEpochSize()
     const currentBlock = await this.web3.eth.getBlockNumber()
     const lastEpochBlock = Math.floor(currentBlock / epochSize) * epochSize
     const fromBlock: number = lastEpochBlock - epochSize * ((res.flags.epochs || 1) - 1)
-    const lowerAddress = res.flags.address ? res.flags.address.toLowerCase() : res.flags.address
+    const address = res.flags.address || ''
     let voterRewards: VoterReward[] = []
     let validatorRewards: ValidatorReward[] = []
     let validatorGroupRewards: ValidatorGroupReward[] = []
 
-    if (res.flags.address) {
+    if (address) {
       await newCheckBuilder(this)
-        .isAccount(res.flags.address)
+        .isAccount(address)
         .runChecks()
     }
 
@@ -78,8 +76,8 @@ export default class Show extends BaseCommand {
       // Get the groups that address voted for at this epoch, and those groups' total votes.
       const addressVotes: { [key: string]: BigNumber } = {}
       const totalGroupVotes: { [key: string]: BigNumber } = {}
-      if (res.flags.address) {
-        const voter = await election.getVoter(res.flags.address, blockNumber)
+      if (address) {
+        const voter = await election.getVoter(address, blockNumber)
         for (const vote of voter.votes) {
           const group: string = vote.group.toLowerCase()
           addressVotes[group] = (addressVotes[group] || new BigNumber(0)).plus(vote.active)
@@ -90,7 +88,7 @@ export default class Show extends BaseCommand {
       }
 
       // voterRewardsEvent applies to address when voterRewardsEvent.group in addressVotes.
-      const epochVoterRewardsEvents = await electionContract.getPastEvents(
+      const epochVoterRewardsEvents = await election.getPastEvents(
         'EpochRewardsDistributedToVoters',
         {
           fromBlock: blockNumber,
@@ -116,13 +114,13 @@ export default class Show extends BaseCommand {
       )
 
       voterRewards = voterRewards.concat(
-        res.flags.address
+        address
           ? epochVoterRewards.filter((e: VoterReward) => e.group.toLowerCase() in addressVotes)
           : epochVoterRewards
       )
 
       // validatorRewardEvent applies to address when validatorRewardEvent.validator is address.
-      const epochValidatorRewardsEvents = await validatorsContract.getPastEvents(
+      const epochValidatorRewardsEvents = await validators.getPastEvents(
         'ValidatorEpochPaymentDistributed',
         {
           fromBlock: blockNumber,
@@ -220,10 +218,8 @@ export default class Show extends BaseCommand {
       console.info('')
       console.info('Validator rewards:')
       cli.table(
-        res.flags.address
-          ? validatorRewards.filter(
-              (e: ValidatorReward) => e.validator.toLowerCase() === lowerAddress
-            )
+        address
+          ? validatorRewards.filter((e: ValidatorReward) => eqAddress(e.validator, address))
           : validatorRewards,
         {
           name: {},
@@ -247,10 +243,8 @@ export default class Show extends BaseCommand {
       console.info('')
       console.info('Validator Group rewards:')
       cli.table(
-        res.flags.address
-          ? validatorGroupRewards.filter(
-              (e: ValidatorGroupReward) => e.group.toLowerCase() === lowerAddress
-            )
+        address
+          ? validatorGroupRewards.filter((e: ValidatorGroupReward) => eqAddress(e.group, address))
           : validatorGroupRewards,
         {
           name: {},
