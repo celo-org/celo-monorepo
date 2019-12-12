@@ -82,6 +82,10 @@ export function* sendTransactionPromises(
       `${TAG}@sendTransactionPromises`,
       `Sending transaction with id ${txId} using web3 signing`
     )
+    Logger.debug(
+      `${TAG}@sendTransactionPromises`,
+      `About to use wallet kit to send transaction: account: ${account}, stableToken: ${stableToken} static gas ${staticGas}`
+    )
     const transactionPromises = yield call(
       sendTransactionAsyncWithWeb3Signing,
       web3,
