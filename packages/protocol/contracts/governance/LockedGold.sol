@@ -13,17 +13,7 @@ import "../common/UsingRegistry.sol";
 contract LockedGold is ILockedGold, ReentrancyGuard, Initializable, UsingRegistry {
   using SafeMath for uint256;
 
-  struct Authorizations {
-    // The address that is authorized to vote on behalf of the account.
-    // The account can vote as well, whether or not an authorized voter has been specified.
-    address voting;
-    // The address that is authorized to validate on behalf of the account.
-    // The account can manage the validator, whether or not an authorized validator has been
-    // specified. However if an authorized validator has been specified, only that key may actually
-    // participate in consensus.
-    address validating;
-  }
-
+  
   struct PendingWithdrawal {
     // The value of the pending withdrawal.
     uint256 value;
@@ -41,19 +31,10 @@ contract LockedGold is ILockedGold, ReentrancyGuard, Initializable, UsingRegistr
     PendingWithdrawal[] pendingWithdrawals;
   }
 
-  struct Account {
-    bool exists;
-    // Each account may authorize additional keys to use for voting or valdiating.
-    // These keys may not be keys of other accounts, and may not be authorized by any other
-    // account for any purpose.
-    Authorizations authorizations;
-    Balances balances;
-  }
-
-  mapping(address => Account) private accounts;
+  
+  mapping(address => Balances) internal balances;
   // Maps voting and validating keys to the account that provided the authorization.
-  // Authorized addresses may not be reused.
-  mapping(address => address) private authorizedBy;
+ 
   uint256 public totalNonvoting;
   uint256 public unlockingPeriod;
 
@@ -120,7 +101,7 @@ contract LockedGold is ILockedGold, ReentrancyGuard, Initializable, UsingRegistr
    * @param value The amount by which to increment.
    */
   function _incrementNonvotingAccountBalance(address account, uint256 value) private {
-    accounts[account].balances.nonvoting = accounts[account].balances.nonvoting.add(value);
+    balances[account].nonvoting = balances[account].nonvoting.add(value);
     totalNonvoting = totalNonvoting.add(value);
   }
 
@@ -130,7 +111,7 @@ contract LockedGold is ILockedGold, ReentrancyGuard, Initializable, UsingRegistr
    * @param value The amount by which to decrement.
    */
   function _decrementNonvotingAccountBalance(address account, uint256 value) private {
-    accounts[account].balances.nonvoting = accounts[account].balances.nonvoting.sub(value);
+     balances[account].nonvoting = balances[account].nonvoting.sub(value);
     totalNonvoting = totalNonvoting.sub(value);
   }
 
@@ -138,9 +119,8 @@ contract LockedGold is ILockedGold, ReentrancyGuard, Initializable, UsingRegistr
    * @notice Unlocks gold that becomes withdrawable after the unlocking period.
    * @param value The amount of gold to unlock.
    */
-  function unlock(uint256 value) external nonReentrant {
+  function unlock(uint256 value) public nonReentrant {
     require(getAccounts().isAccount(msg.sender));
-    Account storage account = accounts[msg.sender];
     // Prevent unlocking gold when voting on governance proposals so that the gold cannot be
     // used to vote more than once.
     require(!getGovernance().isVoting(msg.sender));
@@ -151,7 +131,7 @@ contract LockedGold is ILockedGold, ReentrancyGuard, Initializable, UsingRegistr
     );
     _decrementNonvotingAccountBalance(msg.sender, value);
     uint256 available = now.add(unlockingPeriod);
-    account.balances.pendingWithdrawals.push(PendingWithdrawal(value, available));
+    balances[msg.sender].pendingWithdrawals.push(PendingWithdrawal(value, available));
     emit GoldUnlocked(msg.sender, value, available);
   }
 
@@ -162,12 +142,11 @@ contract LockedGold is ILockedGold, ReentrancyGuard, Initializable, UsingRegistr
    */
   function relock(uint256 index, uint256 value) external nonReentrant {
     require(getAccounts().isAccount(msg.sender));
-    Account storage account = accounts[msg.sender];
-    require(index < account.balances.pendingWithdrawals.length);
-    PendingWithdrawal storage pendingWithdrawal = account.balances.pendingWithdrawals[index];
+    //require(index < balances[msg.sender].pendingWithdrawals.length);
+    PendingWithdrawal storage pendingWithdrawal = balances[msg.sender].pendingWithdrawals[index];
     require(value <= pendingWithdrawal.value);
     if (value == pendingWithdrawal.value) {
-      deletePendingWithdrawal(account.balances.pendingWithdrawals, index);
+      deletePendingWithdrawal(balances[msg.sender].pendingWithdrawals, index);
     } else {
       pendingWithdrawal.value = pendingWithdrawal.value.sub(value);
     }
@@ -181,13 +160,12 @@ contract LockedGold is ILockedGold, ReentrancyGuard, Initializable, UsingRegistr
    */
   function withdraw(uint256 index) external nonReentrant {
     require(getAccounts().isAccount(msg.sender));
-    Account storage account = accounts[msg.sender];
-    require(index < account.balances.pendingWithdrawals.length);
-    PendingWithdrawal storage pendingWithdrawal = account.balances.pendingWithdrawals[index];
+    require(index < balances[msg.sender].pendingWithdrawals.length);
+    PendingWithdrawal storage pendingWithdrawal = balances[msg.sender].pendingWithdrawals[index];
     require(now >= pendingWithdrawal.timestamp);
-    uint256 value = pendingWithdrawal.value;
-    deletePendingWithdrawal(account.balances.pendingWithdrawals, index);
-    require(getGoldToken().transfer(msg.sender, value));
+    uint256 value = balances[msg.sender].pendingWithdrawals[index].value;
+    deletePendingWithdrawal(balances[msg.sender].pendingWithdrawals, index);
+    require( getGoldToken()/* @certora GoldTokenHarness */.transfer(msg.sender, value));
     emit GoldWithdrawn(msg.sender, value);
   }
 
@@ -214,7 +192,7 @@ contract LockedGold is ILockedGold, ReentrancyGuard, Initializable, UsingRegistr
    * @return The total amount of locked gold for an account.
    */
   function getAccountTotalLockedGold(address account) public view returns (uint256) {
-    uint256 total = accounts[account].balances.nonvoting;
+    uint256 total = balances[account].nonvoting;
     return total.add(getElection().getTotalVotesByAccount(account));
   }
 
@@ -224,7 +202,7 @@ contract LockedGold is ILockedGold, ReentrancyGuard, Initializable, UsingRegistr
    * @return The total amount of non-voting locked gold for an account.
    */
   function getAccountNonvotingLockedGold(address account) external view returns (uint256) {
-    return accounts[account].balances.nonvoting;
+    return balances[account].nonvoting;
   }
 
   /**
@@ -238,12 +216,12 @@ contract LockedGold is ILockedGold, ReentrancyGuard, Initializable, UsingRegistr
     returns (uint256[] memory, uint256[] memory)
   {
     require(getAccounts().isAccount(account));
-    uint256 length = accounts[account].balances.pendingWithdrawals.length;
+    uint256 length = balances[account].pendingWithdrawals.length;
     uint256[] memory values = new uint256[](length);
     uint256[] memory timestamps = new uint256[](length);
     for (uint256 i = 0; i < length; i++) {
       PendingWithdrawal memory pendingWithdrawal = (
-        accounts[account].balances.pendingWithdrawals[i]
+        balances[account].pendingWithdrawals[i]
       );
       values[i] = pendingWithdrawal.value;
       timestamps[i] = pendingWithdrawal.timestamp;
