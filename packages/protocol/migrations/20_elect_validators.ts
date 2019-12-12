@@ -103,77 +103,104 @@ async function registerValidator(
 ) {
   const valName = `CLabs Validator #${index} on ${networkName}`
 
-  console.info(`    - lockGold ${valName}`)
-  await lockGold(
-    accounts,
-    lockedGold,
-    config.validators.validatorLockedGoldRequirements.value,
-    validatorPrivateKey
-  )
+  const validatorAddress = privateKeyToPublicKey(validatorPrivateKey)
+  if (new BigNumber(await lockedGold.getAccountTotalLockedGold(validatorAddress)).isZero()) {
+    console.info(`    - lockGold ${valName}`)
+    await lockGold(
+      accounts,
+      lockedGold,
+      config.validators.validatorLockedGoldRequirements.value,
+      validatorPrivateKey
+    )
+  }
 
-  console.info(`    - setName ${valName}`)
+  if ((await accounts.getName(validatorAddress)) === '') {
+    console.info(`    - setName ${valName}`)
+    // @ts-ignore
+    const setNameTx = accounts.contract.methods.setName(valName)
+    await sendTransactionWithPrivateKey(web3, setNameTx, validatorPrivateKey, {
+      to: accounts.address,
+    })
+  }
 
-  // @ts-ignore
-  const setNameTx = accounts.contract.methods.setName(valName)
-  await sendTransactionWithPrivateKey(web3, setNameTx, validatorPrivateKey, {
-    to: accounts.address,
-  })
+  if (!(await validators.isValidator(validatorAddress))) {
+    console.info(`    - registerValidator ${valName}`)
+    const publicKey = privateKeyToPublicKey(validatorPrivateKey)
+    const blsPublicKey = getBlsPublicKey(validatorPrivateKey)
+    const blsPoP = getBlsPoP(privateKeyToAddress(validatorPrivateKey), validatorPrivateKey)
 
-  console.info(`    - registerValidator ${valName}`)
-  const publicKey = privateKeyToPublicKey(validatorPrivateKey)
-  const blsPublicKey = getBlsPublicKey(validatorPrivateKey)
-  const blsPoP = getBlsPoP(privateKeyToAddress(validatorPrivateKey), validatorPrivateKey)
+    // @ts-ignore
+    const registerTx = validators.contract.methods.registerValidator(
+      publicKey,
+      blsPublicKey,
+      blsPoP
+    )
 
-  // @ts-ignore
-  const registerTx = validators.contract.methods.registerValidator(publicKey, blsPublicKey, blsPoP)
+    await sendTransactionWithPrivateKey(web3, registerTx, validatorPrivateKey, {
+      to: validators.address,
+    })
 
-  await sendTransactionWithPrivateKey(web3, registerTx, validatorPrivateKey, {
-    to: validators.address,
-  })
+    console.info(`    - affiliate ${valName}`)
+    // @ts-ignore
+    const affiliateTx = validators.contract.methods.affiliate(groupAddress)
 
-  console.info(`    - affiliate ${valName}`)
+    await sendTransactionWithPrivateKey(web3, affiliateTx, validatorPrivateKey, {
+      to: validators.address,
+    })
+  }
 
-  // @ts-ignore
-  const affiliateTx = validators.contract.methods.affiliate(groupAddress)
+  if ((await accounts.getDataEncryptionKey(validatorAddress)) === '') {
+    console.info(`    - setAccountDataEncryptionKey ${valName}`)
 
-  await sendTransactionWithPrivateKey(web3, affiliateTx, validatorPrivateKey, {
-    to: validators.address,
-  })
+    // @ts-ignore
+    const registerDataEncryptionKeyTx = accounts.contract.methods.setAccountDataEncryptionKey(
+      privateKeyToPublicKey(validatorPrivateKey)
+    )
 
-  console.info(`    - setAccountDataEncryptionKey ${valName}`)
+    await sendTransactionWithPrivateKey(web3, registerDataEncryptionKeyTx, validatorPrivateKey, {
+      to: accounts.address,
+    })
+  }
 
-  // @ts-ignore
-  const registerDataEncryptionKeyTx = accounts.contract.methods.setAccountDataEncryptionKey(
-    privateKeyToPublicKey(validatorPrivateKey)
-  )
-
-  await sendTransactionWithPrivateKey(web3, registerDataEncryptionKeyTx, validatorPrivateKey, {
-    to: accounts.address,
-  })
-
-  // Authorize the attestation signer
   const attestationKeyAddress = privateKeyToAddress(attestationKey)
-  console.info(`    - authorizeAttestationSigner ${valName}->${attestationKeyAddress}`)
-  const message = web3.utils.soliditySha3({
-    type: 'address',
-    value: privateKeyToAddress(validatorPrivateKey),
-  })
-  const signature = signMessage(message, attestationKey, attestationKeyAddress)
+  if (
+    (await accounts.getAttestationSigner(validatorAddress)).toLowerCase() !=
+    attestationKeyAddress.toLowerCase()
+  ) {
+    // Authorize the attestation signer
+    console.info(`    - authorizeAttestationSigner ${valName}->${attestationKeyAddress}`)
+    const message = web3.utils.soliditySha3({
+      type: 'address',
+      value: privateKeyToAddress(validatorPrivateKey),
+    })
+    const signature = signMessage(message, attestationKey, attestationKeyAddress)
 
-  // @ts-ignore
-  const registerAttestationKeyTx = accounts.contract.methods.authorizeAttestationSigner(
-    attestationKeyAddress,
-    signature.v,
-    signature.r,
-    signature.s
-  )
+    // @ts-ignore
+    const registerAttestationKeyTx = accounts.contract.methods.authorizeAttestationSigner(
+      attestationKeyAddress,
+      signature.v,
+      signature.r,
+      signature.s
+    )
 
-  await sendTransactionWithPrivateKey(web3, registerAttestationKeyTx, validatorPrivateKey, {
-    to: accounts.address,
-  })
+    await sendTransactionWithPrivateKey(web3, registerAttestationKeyTx, validatorPrivateKey, {
+      to: accounts.address,
+    })
+  }
 
   console.info(`    - done ${valName}`)
   return
+}
+
+const getValidatorGroupAccount = async (
+  groupAddress: string,
+  accounts: any,
+  encryptionKey: string
+) => {
+  const name = await accounts.methods.getName(groupAddress).call()
+  const encryptedKeystore64 = name.split(' ')[1]
+  const encryptedKeystore = JSON.parse(Buffer.from(encryptedKeystore64, 'base64').toString())
+  return web3.eth.accounts.decrypt(encryptedKeystore, encryptionKey)
 }
 
 module.exports = async (_deployer: any, networkName: string) => {
@@ -242,6 +269,11 @@ module.exports = async (_deployer: any, networkName: string) => {
       i === 0 || i === valKeyGroups.length - 1
         ? lockedGoldPerVal.times(keys.length)
         : lockedGoldPerVal,
+    desiredVotingGold:
+      i === 0 || i === valKeyGroups.length - 1
+        ? lockedGoldPerVal.times(keys.length)
+        : lockedGoldPerVal,
+    account: null,
     account: null,
   }))
   groups[0].account = {
@@ -308,30 +340,34 @@ module.exports = async (_deployer: any, networkName: string) => {
     address: '0xB92629423Fb271A2e3027326aCE8BC2e4720f378',
   }
   groups[12].votingGold = new BigNumber('0')
+  groups[13].account = {
+    address: '0x976D3F25709f3F8eC74eA97693F505610F25e678',
+  }
+  groups[13].votingGold = new BigNumber('0')
 
   for (const [idx, group] of groups.entries()) {
-    if (idx < 13) {
-      continue
+    if (false) {
+      console.info(
+        `  Registering validator group: ${group.name} with: ${group.lockedGold} CG locked, ${
+          group.votingGold
+        } voting...`
+      )
+      group.account = await registerValidatorGroup(
+        group.name,
+        accounts,
+        lockedGold,
+        validators,
+        validator0Key,
+        group.lockedGold
+      )
+    } else {
+      group.account = await getValidatorGroupAccount(group.account.address, accounts, validator0Key)
     }
-
-    console.info(
-      `  Registering validator group: ${group.name} with: ${group.lockedGold} CG locked, ${
-        group.votingGold
-      } voting...`
-    )
-    group.account = await registerValidatorGroup(
-      group.name,
-      accounts,
-      lockedGold,
-      validators,
-      validator0Key,
-      group.lockedGold
-    )
 
     console.info(`  * Registering ${group.valKeys.length} validators ...`)
     await Promise.all(
       group.valKeys.map((key, i) => {
-        const index = idx * config.validators.maxGroupSize + i // HACK
+        const index = idx * config.validators.maxGroupSize + i
         return registerValidator(
           accounts,
           lockedGold,
@@ -346,7 +382,14 @@ module.exports = async (_deployer: any, networkName: string) => {
     )
 
     console.info(`  * Adding Validators to ${group.name} ...`)
+    const numMembersAlready = parseInt(
+      await validators.getGroupNumMembers(group.account.address),
+      10
+    )
     for (const [i, key] of group.valKeys.entries()) {
+      if (i < numMembersAlready) {
+        continue
+      }
       const address = privateKeyToAddress(key)
       console.info(`    - Adding ${address} ...`)
       if (i === 0) {
@@ -372,6 +415,7 @@ module.exports = async (_deployer: any, networkName: string) => {
     }
 
     // Determine the lesser and greater group addresses after voting.
+    groups[idx].votingGold = groups[idx].desiredVotingGold
     const sortedGroups = groups.slice(0, idx + 1)
     sortedGroups.sort((a, b) => a.votingGold.comparedTo(b.votingGold))
     const groupSortedIndex = sortedGroups.indexOf(group)
