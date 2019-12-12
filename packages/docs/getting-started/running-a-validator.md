@@ -10,15 +10,15 @@ While other Validator Groups will exist on the Celo Networks, the fastest way to
 
 Because of the importance of Validator security and availability, Validators are expected to run one or more additional "proxy" nodes. In this setup, the proxy node connects with the rest of the network, and the machine running the Validator communicates only with the proxy, ideally via a private network.
 
-Additionally, Validators are expected to run an [Attestation Service](running-attestation-service.md) as part of the [lightweight identity protocol](../celo-codebase/protocol/identity), to provide attestations that allow users to map their phone number to a Celo address.
+Additionally, Validators are expected to run an [Attestation Service](https://github.com/celo-org/celo-monorepo/tree/master/packages/attestation-service) as part of the [lightweight identity protocol](../celo-codebase/protocol/identity), to provide attestations that allow users to map their phone number to a Celo address.
 
 You can find more details about Celo mission and why to become a Validator [in our Medium article](https://medium.com/celohq/calling-all-chefs-become-a-celo-validator-c75d1c2909aa).
 
+## Register for the Stake Off
+
+Participation in The Great Celo Stake Off is subject to these [Terms and Conditions](https://docs.google.com/document/d/1b5SzeRbq60nx50NeezAEMpwLkaBDQ9hjZc0QAh4Mbdk/). If you agree to those, register online via an [online form](https://docs.google.com/forms/d/e/1FAIpQLSfbn5hTJ4UIWpN92-o2qMTUB0UnrFsL0fm97XqGe4VhhN_r5A/viewform). **Once the C-Labs team receives your registration, they will send you instructions to get fauceted funds to run a Validator on the Baklava testnet.** Do this first.
+
 ## Prerequisites
-
-### Register for the Stake Off
-
-Participation in The Great Celo Stake Off is subject to these [Terms and Conditions](https://docs.google.com/document/d/1b5SzeRbq60nx50NeezAEMpwLkaBDQ9hjZc0QAh4Mbdk/). If you agree to those, register online via an [online form](https://docs.google.com/forms/d/e/1FAIpQLSfbn5hTJ4UIWpN92-o2qMTUB0UnrFsL0fm97XqGe4VhhN_r5A/viewform). **Once the C-Labs team receive your registration, they will send you instructions to get fauceted.** Do this first.
 
 ### Hardware requirements
 
@@ -96,10 +96,10 @@ Running a Celo Validator node requires the management of several different keys,
 
 | Name of the key        | Purpose                                                                                                                                                                                                                                                               |
 | ---------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Account key            | This is the key with the highest level of permissions, and is thus the most sensitive. It can be used to lock and unlock Celo Gold, and authorize vote, validator, and attestation keys. Note that the account key also has all of the permissions of the other keys. |  |
-| Validator signer key   | This is the key that has permission to register and manage a Validator or Validator Group, and participate in BFT consensus.                                                                                                                                          |  |
-| Vote signer key        | This key can be used to vote in Validator elections and on-chain governance.                                                                                                                                                                                          |  |
-| Attestation signer key | This key is used to sign attestations in Celo's lightweight identity protocol.                                                                                                                                                                                        |  |
+| Account key            | This is the key with the highest level of permissions, and is thus the most sensitive. It can be used to lock and unlock Celo Gold, and authorize vote, validator, and attestation keys. Note that the account key also has all of the permissions of the other keys. |
+| Validator signer key   | This is the key that has permission to register and manage a Validator or Validator Group, and participate in BFT consensus.                                                                                                                                          |
+| Vote signer key        | This key can be used to vote in Validator elections and on-chain governance.                                                                                                                                                                                          |
+| Attestation signer key | This key is used to sign attestations in Celo's lightweight identity protocol.                                                                                                                                                                                        |
 
 Note that account and signer keys must be unique and may not be reused.
 
@@ -107,24 +107,24 @@ Note that account and signer keys must be unique and may not be reused.
 
 | Variable                             | Explanation                                                                                                                          |
 | ------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------ |
-| CELO_IMAGE                           | The Docker image used for the Validator and Proxy containers                                                                         |  |
-| NETWORK_ID                           | The Celo Baklava network chain ID                                                                                                    |  |
-| CELO_VALIDATOR_GROUP_ADDRESS         | The account address for the Validator Group                                                                                          |  |
-| CELO_VALIDATOR_ADDRESS               | The account address for the Validator                                                                                                |  |
-| CELO_VALIDATOR_SIGNER_ADDRESS        | The address of the validator signer authorized by the validator account                                                              |  |
-| CELO_VALIDATOR_SIGNER_PUBLIC_KEY     | The ECDSA public key associated with the validator signer address                                                                    |  |
-| CELO_VALIDATOR_SIGNER_SIGNATURE      | The proof-of-possession of the validator signer key                                                                                  |  |
-| CELO_VALIDATOR_SIGNER_BLS_PUBLIC_KEY | The BLS public key for the Validator instance                                                                                        |  |
-| CELO_VALIDATOR_SIGNER_BLS_SIGNATURE  | A proof-of-possession of the BLS public key                                                                                          |  |
-| PROXY_ENODE                          | The enode address for the Validator proxy                                                                                            |  |
-| PROXY_INTERNAL_IP                    | (Optional) The internal IP address over which your Validator can communicate with your Proxy                                         |  |
-| PROXY_EXTERNAL_IP                    | The external IP address of the Proxy. May be used by the Validator to communicate with the Proxy if PROXY_INTERNAL_IP is unspecified |  |
-| ATTESTATION_SIGNER_ADDRESS           | The address of the attestation signer authorized by the validator account                                                            |  |
-| ATTESTATION_SIGNER_SIGNATURE         | The proof-of-possession of the attestation signer key                                                                                |  |
-| ATTESTATION_SERVICE_URL              | The URL to access the deployed Attestation Service                                                                                   |  |
-| METADATA_URL                         | The URL to access the metadata file for your Attestation Service                                                                     |  |
+| CELO_IMAGE                           | The Docker image used for the Validator and Proxy containers                                                                         |
+| NETWORK_ID                           | The Celo Baklava network chain ID                                                                                                    |
+| CELO_VALIDATOR_GROUP_ADDRESS         | The account address for the Validator Group                                                                                          |
+| CELO_VALIDATOR_ADDRESS               | The account address for the Validator                                                                                                |
+| CELO_VALIDATOR_SIGNER_ADDRESS        | The address of the validator signer authorized by the validator account                                                              |
+| CELO_VALIDATOR_SIGNER_PUBLIC_KEY     | The ECDSA public key associated with the validator signer address                                                                    |
+| CELO_VALIDATOR_SIGNER_SIGNATURE      | The proof-of-possession of the validator signer key                                                                                  |
+| CELO_VALIDATOR_SIGNER_BLS_PUBLIC_KEY | The BLS public key for the Validator instance                                                                                        |
+| CELO_VALIDATOR_SIGNER_BLS_SIGNATURE  | A proof-of-possession of the BLS public key                                                                                          |
+| PROXY_ENODE                          | The enode address for the Validator proxy                                                                                            |
+| PROXY_INTERNAL_IP                    | (Optional) The internal IP address over which your Validator can communicate with your Proxy                                         |
+| PROXY_EXTERNAL_IP                    | The external IP address of the Proxy. May be used by the Validator to communicate with the Proxy if PROXY_INTERNAL_IP is unspecified |
+| ATTESTATION_SIGNER_ADDRESS           | The address of the attestation signer authorized by the validator account                                                            |
+| ATTESTATION_SIGNER_SIGNATURE         | The proof-of-possession of the attestation signer key                                                                                |
+| ATTESTATION_SERVICE_URL              | The URL to access the deployed Attestation Service                                                                                   |
+| METADATA_URL                         | The URL to access the metadata file for your Attestation Service                                                                     |
 | DATABASE_URL                         | The URL under which your database is accessible, currently supported are `postgres://`, `mysql://` and `sqlite://`                   |
-| APP_SIGNATURE                        | The hash with which clients can auto-read SMS messages on android                                                                    |  |
+| APP_SIGNATURE                        | The hash with which clients can auto-read SMS messages on android                                                                    |
 | SMS_PROVIDERS                        | A comma-separated list of providers you want to configure, we currently support `nexmo` & `twilio`                                   |
 
 First we are going to setup the main environment variables related with the `Baklava` network. Run:
@@ -144,7 +144,12 @@ docker pull $CELO_IMAGE
 
 ### Create the Validator and Validator Group accounts
 
-First, you'll need to generate account keys for your Validator and Validator Group. These are the keys that will have access to your locked Celo Gold, and thus should be handled with care. For the purposes of this guide, we will be storing these keys on your local machine, but we recommend that you store them in a more secure manner.
+First, you'll need to generate account keys for your Validator and Validator Group.
+
+{% hint style="danger" %}
+These keys will control your locked Celo Gold, and thus should be handled with care.
+Store and back these keys up in a secure manner, as there will be no way to recover if them if lost or stolen.
+{% endhint %}
 
 ```bash
 # On your local machine
@@ -154,7 +159,8 @@ docker run -v $PWD:/root/.celo -it $CELO_IMAGE account new
 docker run -v $PWD:/root/.celo -it $CELO_IMAGE account new
 ```
 
-This should generate two accounts in your current directory and print them out, set them in environment variables:
+This will create a new keystore in the current directory with two new accounts.
+Copy the addresses from the terminal and set the following environment variables:
 
 ```bash
 # On your local machine
@@ -168,8 +174,8 @@ Next, we'll run a node on your local machine so that we can use these accounts t
 
 ```bash
 # On your local machine
-docker run -v $PWD:/root/.celo $CELO_IMAGE init /celo/genesis.json
-docker run -v $PWD:/root/.celo --entrypoint cp $CELO_IMAGE /celo/static-nodes.json /root/.celo/
+docker run -v $PWD:/root/.celo -it $CELO_IMAGE init /celo/genesis.json
+docker run -v $PWD:/root/.celo -it --entrypoint cp $CELO_IMAGE /celo/static-nodes.json /root/.celo/
 ```
 
 To run the node:
@@ -247,8 +253,8 @@ To avoid exposing the validator to the public internet, we are deploying a proxy
 export CELO_IMAGE=us.gcr.io/celo-testnet/celo-node:baklava
 mkdir celo-proxy-node
 cd celo-proxy-node
-docker run -v $PWD:/root/.celo $CELO_IMAGE init /celo/genesis.json
-docker run -v $PWD:/root/.celo --entrypoint cp $CELO_IMAGE /celo/static-nodes.json /root/.celo/
+docker run -v $PWD:/root/.celo -it $CELO_IMAGE init /celo/genesis.json
+docker run -v $PWD:/root/.celo -it --entrypoint cp $CELO_IMAGE /celo/static-nodes.json /root/.celo/
 ```
 
 You can then run the proxy with the following command. Be sure to replace `<YOUR-VALIDATOR-NAME>` with the name you'd like to use for your Validator account.
@@ -260,6 +266,10 @@ export NETWORK_ID=121119
 export CELO_VALIDATOR_SIGNER_ADDRESS=<YOUR-VALIDATOR-SIGNER-ADDRESS>
 docker run --name celo-proxy -it --restart always -p 30303:30303 -p 30303:30303/udp -p 30503:30503 -p 30503:30503/udp -v $PWD:/root/.celo $CELO_IMAGE --verbosity 3 --networkid $NETWORK_ID --syncmode full --proxy.proxy --proxy.proxiedvalidatoraddress $CELO_VALIDATOR_SIGNER_ADDRESS --proxy.internalendpoint :30503 --etherbase $CELO_VALIDATOR_SIGNER_ADDRESS --ethstats=<YOUR-VALIDATOR-NAME>-proxy@baklava-ethstats.celo-testnet.org
 ```
+
+{% hint style="info" %}
+You can detach from the running container by pressing `ctrl+p ctrl+q`, or start it without `-d` instead of `it` to start detached. Access the logs for a container in the background with the `docker logs` command.
+{% endhint %}
 
 ### Get your Proxy's connection info
 
@@ -313,7 +323,7 @@ Once that is completed, go ahead and run the validator. Be sure to replace `<VAL
 ```bash
 # On the validator machine
 echo <VALIDATOR-SIGNER-PASSWORD> > .password
-docker run -v $PWD:/root/.celo $CELO_IMAGE init /celo/genesis.json
+docker run -v $PWD:/root/.celo -it $CELO_IMAGE init /celo/genesis.json
 docker run --name celo-validator -it --restart always -p 30303:30303 -p 30303:30303/udp -v $PWD:/root/.celo $CELO_IMAGE --verbosity 3 --networkid $NETWORK_ID --syncmode full --mine --istanbul.blockperiod=5 --istanbul.requesttimeout=3000 --etherbase $CELO_VALIDATOR_SIGNER_ADDRESS --nodiscover --proxy.proxied --proxy.proxyenodeurlpair=enode://$PROXY_ENODE@$PROXY_INTERNAL_IP:30503\;enode://$PROXY_ENODE@$PROXY_EXTERNAL_IP:30303  --unlock=$CELO_VALIDATOR_SIGNER_ADDRESS --password /root/.celo/.password --ethstats=<YOUR-VALIDATOR-NAME>@baklava-ethstats.celo-testnet.org
 ```
 
@@ -379,7 +389,7 @@ celocli lockedgold:show $CELO_VALIDATOR_ADDRESS
 
 ### Run for election
 
-In order to be elected as a Validator, you will first need to register your group and Validator. Note that when registering a Validator Group, you need to specify a commission, which is the fraction of epoch rewards paid to the group by its members.
+In order to be elected as a Validator, you will first need to register your group and Validator. Note that when registering a Validator Group, you need to specify a [commission](../celo-codebase/protocol/proof-of-stake/validator-groups.md#group-share), which is the fraction of epoch rewards paid to the group by its members.
 
 We don't want to use our account key for validating, so first let's authorize the validator signing key:
 
@@ -493,11 +503,18 @@ celocli election:list
 
 If you find your Validator still not getting elected you may need to faucet yourself more funds and lock more gold in order to be able to cast more votes for your Validator Group!
 
-You can check the status of your validator, including whether it is elected and signing blocks, by running:
+You can check the status of your validator, including whether it is elected and signing blocks, at [baklava-ethstats.celo-testnet.org](https://baklava-ethstats.celo-testnet.org) or by running:
 
 ```bash
 # On your local machine with celocli >= 0.0.30-beta9
 celocli validator:status --validator $CELO_VALIDATOR_ADDRESS
+```
+
+You can see additional information about your validator, including uptime score, by running:
+
+```bash
+# On your local machine
+celocli validator:show $CELO_VALIDATOR_ADDRESS
 ```
 
 ### Running the Attestation Service
@@ -514,8 +531,8 @@ export NETWORK_ID=121119
 export CELO_VALIDATOR_ADDRESS=<CELO_VALIDATOR_ADDRESS>
 mkdir celo-attestations-node
 cd celo-attestations-node
-docker run -v $PWD:/root/.celo $CELO_IMAGE init /celo/genesis.json
-docker run -v $PWD:/root/.celo --entrypoint cp $CELO_IMAGE /celo/static-nodes.json /root/.celo/
+docker run -v $PWD:/root/.celo -it $CELO_IMAGE init /celo/genesis.json
+docker run -v $PWD:/root/.celo -it --entrypoint cp $CELO_IMAGE /celo/static-nodes.json /root/.celo/
 docker run -v $PWD:/root/.celo -it $CELO_IMAGE account new
 export CELO_ATTESTATION_SIGNER_ADDRESS=<YOUR-ATTESTATION-SIGNER-ADDRESS>
 ```
@@ -713,7 +730,7 @@ screen -r -S celo-validator
 ### Stopping containers
 
 You can stop the Docker containers at any time without problem. If you stop your containers that means those containers stop providing service.
-The data dir of the validator and the proxy are Docker volumes mounted in the containers from the `celo-data-dir` you created at the very beginning. So if you don't remove that folder, you can stop or restart the containers without losing any data.
+The data dir of the validator and the proxy are Docker volumes mounted in the containers from the `celo-*-dir` you created at the very beginning. So if you don't remove that folder, you can stop or restart the containers without losing any data.
 
 You can stop the `celo-validator` and `celo-proxy` containers running:
 
