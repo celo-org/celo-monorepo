@@ -8,33 +8,27 @@ import { Screens } from 'src/navigator/Screens'
 
 interface Props {
   isExchange?: boolean
-  isGrey?: boolean
+  tintColor?: string
 }
 
 export default class FeeIcon extends React.Component<Props> {
-  static defaultProps = {
-    isExchange: false,
-    isGrey: false,
+  navigateToEducate() {
+    navigate(Screens.FeeEducation, {})
   }
 
-  navigateToEducate() {
-    console.log(JSON.stringify(this.props))
-    if (this.props.isExchange) {
-      navigate(Screens.FeeExchangeEducation, {})
-    } else {
-      navigate(Screens.FeeEducation, {})
-    }
+  navigateToExchangeEducate() {
+    navigate(Screens.FeeExchangeEducation, {})
   }
 
   render() {
     return (
       <Touchable
-        onPress={this.navigateToEducate}
+        onPress={this.props.isExchange ? this.navigateToExchangeEducate : this.navigateToEducate}
         style={styles.area}
         borderless={true}
         hitSlop={iconHitslop}
       >
-        <InfoIcon size={12} isGrey={this.props.isGrey} />
+        <InfoIcon size={12} tintColor={this.props.tintColor} />
       </Touchable>
     )
   }

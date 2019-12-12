@@ -100,7 +100,7 @@ describe(ExchangeTradeScreen, () => {
       expect(mockShowError).toBeCalledWith(ErrorMessages.NSF_DOLLARS) // Can't afford 20 cUSD worth of gold
     })
 
-    it.only('validates amount', () => {
+    it('validates amount', () => {
       const navigation = createMockNavigationProp({
         makerToken: CURRENCY_ENUM.DOLLAR,
         makerTokenBalance: '200',

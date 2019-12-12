@@ -18,10 +18,10 @@ import componentWithAnalytics from 'src/analytics/wrapper'
 import { ErrorMessages } from 'src/app/ErrorMessages'
 import { DOLLAR_TRANSACTION_MIN_AMOUNT, GOLD_TRANSACTION_MIN_AMOUNT } from 'src/config'
 import { fetchExchangeRate } from 'src/exchange/actions'
-import { ExchangeHeader } from 'src/exchange/ExchangeHeader'
 import { ExchangeRatePair } from 'src/exchange/reducer'
 import { CURRENCIES, CURRENCY_ENUM } from 'src/geth/consts'
 import { Namespaces } from 'src/i18n'
+import { exchangeHeader } from 'src/navigator/Headers'
 import { navigate } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
 import { RootState } from 'src/redux/reducers'
@@ -64,7 +64,9 @@ const mapStateToProps = (state: RootState): StateProps => ({
 export class ExchangeTradeScreen extends React.Component<Props, State> {
   static navigationOptions = ({ navigation }: NavigationInjectedProps<NavProps>) => {
     const { makerToken, makerTokenBalance } = navigation.getParam('makerTokenDisplay')
-    return ExchangeHeader(makerToken, makerTokenBalance)
+    return {
+      ...exchangeHeader(makerToken, makerTokenBalance),
+    }
   }
 
   state: State = {
@@ -240,11 +242,11 @@ export class ExchangeTradeScreen extends React.Component<Props, State> {
               <View style={[styles.rowContainer, styles.goldInputRow]}>
                 <View style={{ flexDirection: 'column' }}>
                   <Text style={[fontStyles.bodyBold, styles.exchangeBodyText]}>
-                    {t('amount') + ` (${this.getInputTokenDisplayText()})`}
+                    {t('exchangeAmount', { tokenName: this.getInputTokenDisplayText() })}
                   </Text>
                   <TouchableOpacity onPress={this.switchInputToken}>
                     <Text style={[fontStyles.subSmall, { textDecorationLine: 'underline' }]}>
-                      {t('switchTo') + ' ' + this.getOppositeInputTokenDisplayText()}
+                      {t('switchTo', { tokenName: this.getOppositeInputTokenDisplayText() })}
                     </Text>
                   </TouchableOpacity>
                 </View>
@@ -261,8 +263,10 @@ export class ExchangeTradeScreen extends React.Component<Props, State> {
               <View style={styles.line} />
               <View style={styles.rowContainer}>
                 <Text style={[fontStyles.body, styles.exchangeBodyText]}>
-                  {this.isDollarInput() ? t('global:celoGold') : t('subtotal')}
-                  {` (@ ${getMoneyDisplayValue(exchangeRateDisplay, CURRENCY_ENUM.DOLLAR, true)})`}
+                  {t('inputSubtotal', {
+                    goldOrSubtotal: this.isDollarInput() ? t('global:celoGold') : t('subtotal'),
+                    rate: getMoneyDisplayValue(exchangeRateDisplay, CURRENCY_ENUM.DOLLAR, true),
+                  })}
                 </Text>
                 <Text style={fontStyles.regular}>{this.getSubtotalDisplayValue()}</Text>
               </View>

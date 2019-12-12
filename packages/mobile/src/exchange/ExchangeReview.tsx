@@ -14,10 +14,10 @@ import { CustomEventNames } from 'src/analytics/constants'
 import componentWithAnalytics from 'src/analytics/wrapper'
 import FeeIcon from 'src/components/FeeIcon'
 import { exchangeTokens, fetchExchangeRate } from 'src/exchange/actions'
-import { ExchangeHeader } from 'src/exchange/ExchangeHeader'
 import { ExchangeRatePair } from 'src/exchange/reducer'
 import { CURRENCY_ENUM } from 'src/geth/consts'
 import { Namespaces } from 'src/i18n'
+import { exchangeHeader } from 'src/navigator/Headers'
 import { navigate } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
 import { RootState } from 'src/redux/reducers'
@@ -65,7 +65,9 @@ const mapStateToProps = (state: RootState): StateProps => ({
 export class ExchangeReview extends React.Component<Props, State> {
   static navigationOptions = ({ navigation }: NavigationInjectedProps<NavProps>) => {
     const { makerToken, makerTokenBalance } = navigation.getParam('exchangeInput')
-    return ExchangeHeader(makerToken, makerTokenBalance)
+    return {
+      ...exchangeHeader(makerToken, makerTokenBalance),
+    }
   }
 
   state: State = {
@@ -149,53 +151,48 @@ export class ExchangeReview extends React.Component<Props, State> {
     )
     const dollarAmount = this.getInputAmountInToken(CURRENCY_ENUM.DOLLAR)
 
-    const buttonText =
-      this.state.makerToken === CURRENCY_ENUM.DOLLAR
-        ? t(`${Namespaces.exchangeFlow9}:buy`)
-        : t(`${Namespaces.exchangeFlow9}:sell`)
-
     return (
       <SafeAreaView style={styles.container}>
         <View style={styles.paddedContainer}>
           <DisconnectBanner />
           <ScrollView>
             <View style={styles.column}>
-              <View style={[styles.rowContainer, styles.amountRow]}>
-                <Text style={[fontStyles.body, styles.exchangeBodyText]}>
-                  {t('amount') + ` (${this.state.inputTokenCode})`}
+              <View style={styles.amountRow}>
+                <Text style={styles.exchangeBodyText}>
+                  {t('exchangeAmount', { tokenName: t(`global:${this.state.inputTokenCode}`) })}
                 </Text>
-                <Text style={[fontStyles.body, styles.currencyAmountText]}>
+                <Text style={styles.currencyAmountText}>
                   {getMoneyDisplayValue(this.state.inputAmount, this.state.inputToken, true)}
                 </Text>
               </View>
               <View style={styles.line} />
-              <View style={[styles.rowContainer, styles.feeRowContainer]}>
-                <Text style={[fontStyles.body, styles.exchangeBodyText]}>
-                  {t('subtotal') +
-                    ' @ ' +
-                    getMoneyDisplayValue(exchangeRate, CURRENCY_ENUM.DOLLAR, true)}
+              <View style={styles.feeRowContainer}>
+                <Text style={styles.exchangeBodyText}>
+                  {t('subtotalAmount', {
+                    rate: getMoneyDisplayValue(exchangeRate, CURRENCY_ENUM.DOLLAR, true),
+                  })}
                 </Text>
-                <Text style={[fontStyles.body, styles.exchangeBodyText]}>
+                <Text style={styles.exchangeBodyText}>
                   {getMoneyDisplayValue(dollarAmount, CURRENCY_ENUM.DOLLAR, true)}
                 </Text>
               </View>
-              <View style={[styles.rowContainer, styles.feeRowContainer]}>
+              <View style={styles.feeRowContainer}>
                 <View style={styles.feeTextWithIconContainer}>
-                  <Text style={[fontStyles.body, styles.exchangeBodyText]}>{t('exchangeFee')}</Text>
-                  <FeeIcon isGrey={true} />
+                  <Text style={styles.exchangeBodyText}>{t('exchangeFee')}</Text>
+                  <FeeIcon tintColor={colors.lightGray} isExchange={true} />
                 </View>
-                <Text style={[fontStyles.body, styles.exchangeBodyText]}>{fee}</Text>
+                <Text style={styles.exchangeBodyText}>{fee}</Text>
               </View>
-              <View style={[styles.rowContainer, styles.feeRowContainer]}>
+              <View style={styles.feeRowContainer}>
                 <View style={styles.feeTextWithIconContainer}>
-                  <Text style={[fontStyles.body, styles.exchangeBodyText]}>{t('securityFee')}</Text>
-                  <FeeIcon isGrey={true} />
+                  <Text style={styles.exchangeBodyText}>{t('securityFee')}</Text>
+                  <FeeIcon tintColor={colors.lightGray} />
                 </View>
-                <Text style={[fontStyles.body, styles.exchangeBodyText]}>{fee}</Text>
+                <Text style={styles.exchangeBodyText}>{fee}</Text>
               </View>
               <View style={styles.line} />
               <View style={styles.rowContainer}>
-                <Text style={[fontStyles.bodyBold]}>{t('sendFlow7:total')}</Text>
+                <Text style={fontStyles.bodyBold}>{t('sendFlow7:total')}</Text>
                 <Text style={fontStyles.bodyBold}>
                   {getMoneyDisplayValue(dollarAmount.plus(fee), CURRENCY_ENUM.DOLLAR, true)}
                 </Text>
@@ -207,18 +204,16 @@ export class ExchangeReview extends React.Component<Props, State> {
         <View style={componentStyles.bottomContainer}>
           <Button
             onPress={this.onPressConfirm}
-            text={
-              buttonText +
-              ' ' +
-              getMoneyDisplayValue(
+            text={t('buyOrSellGoldAmount', {
+              buyOrSell: this.state.makerToken === CURRENCY_ENUM.DOLLAR ? t('buy') : t('sell'),
+              total: getMoneyDisplayValue(
                 this.getInputAmountInToken(CURRENCY_ENUM.GOLD),
                 CURRENCY_ENUM.GOLD,
                 false,
                 3
-              ) +
-              ' ' +
-              t('global:gold')
-            }
+              ),
+              gold: t(`global:gold`),
+            })}
             standard={false}
             disabled={!appConnected || exchangeRate.isZero()}
             type={BtnTypes.PRIMARY}
@@ -239,7 +234,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
   },
   column: {
-    flexDirection: 'column',
     justifyContent: 'flex-start',
   },
   headerTextContainer: { flex: 1, alignSelf: 'center', alignItems: 'center' },
@@ -248,17 +242,24 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
     marginVertical: 10,
   },
-  exchangeBodyText: { fontSize: 15 },
-  currencyAmountText: { fontSize: 24, lineHeight: 39, color: colors.celoGreen },
+  exchangeBodyText: { ...fontStyles.body, fontSize: 15 },
+  currencyAmountText: { ...fontStyles.body, fontSize: 24, lineHeight: 39, color: colors.celoGreen },
   feeTextWithIconContainer: { flexDirection: 'row', alignItems: 'center' },
   rowContainer: {
     flexDirection: 'row',
-    flex: 1,
+    justifyContent: 'space-between',
+  },
+  feeRowContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginVertical: 5,
+  },
+  amountRow: {
+    flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
+    marginTop: 30,
   },
-  feeRowContainer: { marginVertical: 5 },
-  amountRow: { marginTop: 30 },
 })
 
 export default componentWithAnalytics(
