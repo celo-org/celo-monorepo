@@ -1,16 +1,17 @@
-import BaseNotification from '@celo/react-components/components/BaseNotification'
 import variables from '@celo/react-components/styles/variables'
 import * as React from 'react'
 import { WithNamespaces, withNamespaces } from 'react-i18next'
-import { Image, StyleSheet, View } from 'react-native'
+import { Image, StyleSheet } from 'react-native'
 import CeloAnalytics from 'src/analytics/CeloAnalytics'
 import { CustomEventNames } from 'src/analytics/constants'
 import { EscrowedPayment } from 'src/escrow/actions'
 import EscrowedPaymentLineItem from 'src/escrow/EscrowedPaymentLineItem'
+import { listItemRenderer } from 'src/escrow/EscrowedPaymentListScreen'
 import { Namespaces } from 'src/i18n'
 import { inviteFriendsIcon } from 'src/images/Images'
 import { navigate } from 'src/navigator/NavigationService'
 import { Stacks } from 'src/navigator/Screens'
+import SummaryNotification from 'src/notifications/SummaryNotification'
 
 interface OwnProps {
   payments: EscrowedPayment[]
@@ -18,47 +19,28 @@ interface OwnProps {
 
 type Props = OwnProps & WithNamespaces
 
-const PREVIEW_SIZE = 2
-
 export class EscrowedPaymentReminderSummaryNotification extends React.Component<Props> {
-  getTotal() {
-    return this.props.payments.length
+  onReview = () => {
+    CeloAnalytics.track(CustomEventNames.escrowed_payment_review)
+    navigate(Stacks.EscrowStack)
   }
 
-  getTitle() {
-    const { t } = this.props
-    return this.getTotal() > 1
-      ? t('escrowedPaymentReminderWithCount_plural', { count: this.getTotal() })
-      : t('escrowedPaymentReminder')
+  itemRenderer = (item: EscrowedPayment) => {
+    return <EscrowedPaymentLineItem payment={item} key={item.paymentID} />
   }
-  getCTA = () => {
-    return [
-      {
-        text: this.props.t('review'),
-        onPress: () => {
-          CeloAnalytics.track(CustomEventNames.escrowed_payment_review)
-          navigate(Stacks.EscrowStack)
-        },
-      },
-    ]
-  }
+
   render() {
-    const { payments } = this.props
-    return (
-      <BaseNotification
-        title={this.getTitle()}
+    const { payments, t } = this.props
+    return payments.length === 1 ? (
+      listItemRenderer(payments[0])
+    ) : (
+      <SummaryNotification<EscrowedPayment>
+        items={payments}
+        title={t('escrowedPaymentReminder')}
         icon={<Image source={inviteFriendsIcon} style={styles.image} resizeMode="contain" />}
-        ctas={this.getCTA()}
-        roundedBorders={true}
-      >
-        <View style={styles.body}>
-          <View style={styles.requests}>
-            {payments.slice(0, PREVIEW_SIZE).map((payment, key) => {
-              return <EscrowedPaymentLineItem payment={payment} key={key} />
-            })}
-          </View>
-        </View>
-      </BaseNotification>
+        onReview={this.onReview}
+        itemRenderer={this.itemRenderer}
+      />
     )
   }
 }

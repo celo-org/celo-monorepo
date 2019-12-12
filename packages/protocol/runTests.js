@@ -70,7 +70,7 @@ async function test() {
       const testFiles = glob.readdirSync(testGlob)
       if (testFiles.length === 0) {
         // tslint:disable-next-line: no-console
-        console.error(`No tests matched with ${argv._}`)
+        console.error(`No test files matched with ${testGlob}`)
         process.exit(1)
       }
       testArgs = testArgs.concat(testFiles)
