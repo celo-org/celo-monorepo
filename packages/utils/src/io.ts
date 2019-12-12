@@ -93,6 +93,13 @@ export const AttestationServiceStatusResponseType = t.type({
   signature: t.union([SignatureType, t.undefined]),
 })
 
+export const AttestationServiceTestRequestType = t.type({
+  phoneNumber: E164PhoneNumberType,
+  message: t.string,
+  signature: SignatureType,
+})
+export type AttestationServiceTestRequest = t.TypeOf<typeof AttestationServiceTestRequestType>
+
 export type Signature = t.TypeOf<typeof SignatureType>
 export type Address = t.TypeOf<typeof AddressType>
 export type E164Number = t.TypeOf<typeof E164PhoneNumberType>
