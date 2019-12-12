@@ -572,6 +572,11 @@ contract Attestations is
       seed = keccak256(abi.encodePacked(seed));
       validator = validatorSignerAddressFromCurrentSet(uint256(seed) % numberValidators);
       issuer = getAccounts().validatorSignerToAccount(validator);
+
+      if (!getAccounts().hasAuthorizedAttestationSigner(issuer)) {
+        continue;
+      }
+
       Attestation storage attestation = state.issuedAttestations[issuer];
 
       // Attestation issuers can only be added if they haven't been already.
