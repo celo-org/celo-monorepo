@@ -93,7 +93,9 @@ class Invite extends React.Component<Props, State> {
   buildSections = (): Section[] => {
     const { t, recipientCache } = this.props
     // Only recipients without an address are invitable
-    const invitableRecipients = Object.values(recipientCache).filter((val) => !val.address)
+    const invitableRecipients = Object.values(recipientCache)
+      .filter((val) => !val.address)
+      .sort(({ displayName: a }, { displayName: b }) => (b > a ? -1 : 1))
 
     const queryRecipients = (recipients: Recipient[]) =>
       filterRecipients(recipients, this.state.searchQuery)
@@ -134,15 +136,6 @@ const style = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: colors.background,
-  },
-  inviteHeadline: {
-    fontSize: 24,
-    lineHeight: 39,
-    color: colors.dark,
-  },
-  label: {
-    alignSelf: 'center',
-    textAlign: 'center',
   },
 })
 

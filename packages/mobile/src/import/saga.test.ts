@@ -2,21 +2,20 @@ import BigNumber from 'bignumber.js'
 import { expectSaga } from 'redux-saga-test-plan'
 import * as matchers from 'redux-saga-test-plan/matchers'
 import { call } from 'redux-saga/effects'
-import { setBackupCompleted } from 'src/account'
+import { setBackupCompleted } from 'src/account/actions'
 import { showError } from 'src/alert/actions'
 import { ErrorMessages } from 'src/app/ErrorMessages'
 import { refreshAllBalances } from 'src/home/actions'
 import {
-  importBackupPhraseEmpty,
+  backupPhraseEmpty,
   importBackupPhraseFailure,
   importBackupPhraseSuccess,
 } from 'src/import/actions'
 import { importBackupPhraseSaga } from 'src/import/saga'
 import { redeemInviteSuccess } from 'src/invite/actions'
-import { waitWeb3LastBlock } from 'src/networkInfo/saga'
-import { fetchTokenBalanceWithRetry } from 'src/tokens/saga'
+import { fetchTokenBalanceInWeiWithRetry } from 'src/tokens/saga'
 import { setKey } from 'src/utils/keyStore'
-import { assignAccountFromPrivateKey } from 'src/web3/saga'
+import { assignAccountFromPrivateKey, waitWeb3LastBlock } from 'src/web3/saga'
 import { mockAccount } from 'test/values'
 
 const mockPhraseValid =
@@ -30,7 +29,7 @@ describe('Import wallet saga', () => {
     await expectSaga(importBackupPhraseSaga, { phrase: mockPhraseValid, useEmptyWallet: false })
       .provide([
         [call(waitWeb3LastBlock), true],
-        [matchers.call.fn(fetchTokenBalanceWithRetry), new BigNumber(10)],
+        [matchers.call.fn(fetchTokenBalanceInWeiWithRetry), new BigNumber(10)],
         [matchers.call.fn(assignAccountFromPrivateKey), mockAccount],
         [call(setKey, 'mnemonic', mockPhraseValid), true],
       ])
@@ -55,9 +54,9 @@ describe('Import wallet saga', () => {
     await expectSaga(importBackupPhraseSaga, { phrase: mockPhraseValid, useEmptyWallet: false })
       .provide([
         [call(waitWeb3LastBlock), true],
-        [matchers.call.fn(fetchTokenBalanceWithRetry), new BigNumber(0)],
+        [matchers.call.fn(fetchTokenBalanceInWeiWithRetry), new BigNumber(0)],
       ])
-      .put(importBackupPhraseEmpty())
+      .put(backupPhraseEmpty())
       .run()
   })
 })

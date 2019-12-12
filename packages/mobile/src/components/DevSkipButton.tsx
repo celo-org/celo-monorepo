@@ -16,7 +16,7 @@ interface DispatchProps {
   devModeTriggerClicked: typeof devModeTriggerClicked
 }
 
-type Props = { nextScreen: Screens } & StateProps & DispatchProps
+type Props = { nextScreen: Screens; onSkip?: () => void } & StateProps & DispatchProps
 
 const mapStateToProps = (state: RootState): StateProps => {
   return {
@@ -24,8 +24,11 @@ const mapStateToProps = (state: RootState): StateProps => {
   }
 }
 
-export class DevSkipButton extends React.Component<Props> {
+class DevSkipButton extends React.Component<Props> {
   skip = () => {
+    if (this.props.onSkip) {
+      this.props.onSkip()
+    }
     navigate(this.props.nextScreen)
   }
 

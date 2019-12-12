@@ -1,242 +1,416 @@
 import { eqAddress } from '@celo/utils/lib/address'
 import { zip } from '@celo/utils/lib/collections'
+import { fromFixed, toFixed } from '@celo/utils/lib/fixidity'
 import BigNumber from 'bignumber.js'
 import { Address, NULL_ADDRESS } from '../base'
 import { Validators } from '../generated/types/Validators'
 import {
   BaseWrapper,
   CeloTransactionObject,
+  parseBytes,
   proxyCall,
   proxySend,
   toBigNumber,
   toNumber,
-  wrapSend,
+  toTransactionObject,
+  tupleParser,
 } from './BaseWrapper'
 
 export interface Validator {
-  address: Address
-  id: string
   name: string
-  url: string
-  publicKey: string
+  address: Address
+  ecdsaPublicKey: string
+  blsPublicKey: string
   affiliation: string | null
+  score: BigNumber
+  signer: Address
 }
 
 export interface ValidatorGroup {
-  address: Address
-  id: string
   name: string
-  url: string
-  members: Address[]
-}
-
-export interface ValidatorGroupVote {
   address: Address
-  votes: BigNumber
+  members: Address[]
+  affiliates: Address[]
+  commission: BigNumber
 }
 
-export interface RegistrationRequirement {
-  minLockedGoldValue: BigNumber
-  minLockedGoldNoticePeriod: BigNumber
+export interface LockedGoldRequirements {
+  value: BigNumber
+  duration: BigNumber
 }
 
-export interface ValidatorConfig {
-  minElectableValidators: BigNumber
-  maxElectableValidators: BigNumber
-  electionThreshold: BigNumber
-  registrationRequirement: RegistrationRequirement
+export interface ValidatorsConfig {
+  groupLockedGoldRequirements: LockedGoldRequirements
+  validatorLockedGoldRequirements: LockedGoldRequirements
+  maxGroupSize: BigNumber
+}
+
+export interface GroupMembership {
+  epoch: number
+  group: Address
 }
 
 /**
  * Contract for voting for validators and managing validator groups.
  */
+// TODO(asa): Support validator signers
 export class ValidatorsWrapper extends BaseWrapper<Validators> {
-  affiliate = proxySend(this.kit, this.contract.methods.affiliate)
-  deaffiliate = proxySend(this.kit, this.contract.methods.deaffiliate)
-  addMember = proxySend(this.kit, this.contract.methods.addMember)
-  removeMember = proxySend(this.kit, this.contract.methods.removeMember)
-  registerValidator = proxySend(this.kit, this.contract.methods.registerValidator)
-  registerValidatorGroup = proxySend(this.kit, this.contract.methods.registerValidatorGroup)
+  async updateCommission(commission: BigNumber): Promise<CeloTransactionObject<boolean>> {
+    return toTransactionObject(
+      this.kit,
+      this.contract.methods.updateCommission(toFixed(commission).toFixed())
+    )
+  }
   /**
-   * Returns the minimum number of validators that can be elected.
-   * @returns The minimum number of validators that can be elected.
+   * Returns the Locked Gold requirements for validators.
+   * @returns The Locked Gold requirements for validators.
    */
-  minElectableValidators = proxyCall(
-    this.contract.methods.minElectableValidators,
-    undefined,
-    toBigNumber
-  )
-  /**
-   * Returns the maximum number of validators that can be elected.
-   * @returns The maximum number of validators that can be elected.
-   */
-  maxElectableValidators = proxyCall(
-    this.contract.methods.maxElectableValidators,
-    undefined,
-    toBigNumber
-  )
-  /**
-   * Returns the current election threshold.
-   * @returns Election threshold.
-   */
-  electionThreshold = proxyCall(this.contract.methods.getElectionThreshold, undefined, toBigNumber)
-  validatorAddressFromCurrentSet = proxyCall(this.contract.methods.validatorAddressFromCurrentSet)
-  numberValidatorsInCurrentSet = proxyCall(
-    this.contract.methods.numberValidatorsInCurrentSet,
-    undefined,
-    toNumber
-  )
-
-  getVoteFrom: (validatorAddress: Address) => Promise<Address | null> = proxyCall(
-    this.contract.methods.voters
-  )
-
-  /**
-   * Returns the current registrations requirements.
-   * @returns Minimum deposit and notice period.
-   */
-  async getRegistrationRequirement(): Promise<RegistrationRequirement> {
-    const res = await this.contract.methods.getRegistrationRequirement().call()
+  async getValidatorLockedGoldRequirements(): Promise<LockedGoldRequirements> {
+    const res = await this.contract.methods.getValidatorLockedGoldRequirements().call()
     return {
-      minLockedGoldValue: toBigNumber(res[0]),
-      minLockedGoldNoticePeriod: toBigNumber(res[0]),
+      value: toBigNumber(res[0]),
+      duration: toBigNumber(res[1]),
     }
   }
+
+  /**
+   * Returns the Locked Gold requirements for validator groups.
+   * @returns The Locked Gold requirements for validator groups.
+   */
+  async getGroupLockedGoldRequirements(): Promise<LockedGoldRequirements> {
+    const res = await this.contract.methods.getGroupLockedGoldRequirements().call()
+    return {
+      value: toBigNumber(res[0]),
+      duration: toBigNumber(res[1]),
+    }
+  }
+
+  /**
+   * Returns the Locked Gold requirements for specific account.
+   * @returns The Locked Gold requirements for a specific account.
+   */
+  getAccountLockedGoldRequirement = proxyCall(
+    this.contract.methods.getAccountLockedGoldRequirement,
+    undefined,
+    toBigNumber
+  )
 
   /**
    * Returns current configuration parameters.
    */
-  async getConfig(): Promise<ValidatorConfig> {
+  async getConfig(): Promise<ValidatorsConfig> {
     const res = await Promise.all([
-      this.minElectableValidators(),
-      this.maxElectableValidators(),
-      this.electionThreshold(),
-      this.getRegistrationRequirement(),
+      this.getValidatorLockedGoldRequirements(),
+      this.getGroupLockedGoldRequirements(),
+      this.contract.methods.maxGroupSize().call(),
     ])
     return {
-      minElectableValidators: res[0],
-      maxElectableValidators: res[1],
-      electionThreshold: res[2],
-      registrationRequirement: res[3],
+      validatorLockedGoldRequirements: res[0],
+      groupLockedGoldRequirements: res[1],
+      maxGroupSize: toBigNumber(res[2]),
     }
   }
 
-  async getRegisteredValidators(): Promise<Validator[]> {
-    const vgAddresses = await this.contract.methods.getRegisteredValidators().call()
+  /**
+   * Returns the account associated with `signer`.
+   * @param signer The address of an account or currently authorized validator signer.
+   * @dev Fails if the `signer` is not an account or currently authorized validator.
+   * @return The associated account.
+   */
+  async validatorSignerToAccount(signerAddress: Address) {
+    const accounts = await this.kit.contracts.getAccounts()
+    return accounts.validatorSignerToAccount(signerAddress)
+  }
 
+  /**
+   * Returns the account associated with `signer`.
+   * @param signer The address of the account or previously authorized signer.
+   * @dev Fails if the `signer` is not an account or previously authorized signer.
+   * @return The associated account.
+   */
+  async signerToAccount(signerAddress: Address) {
+    const accounts = await this.kit.contracts.getAccounts()
+    return accounts.signerToAccount(signerAddress)
+  }
+
+  /**
+   * Updates a validator's BLS key.
+   * @param blsPublicKey The BLS public key that the validator is using for consensus, should pass proof
+   *   of possession. 48 bytes.
+   * @param blsPop The BLS public key proof-of-possession, which consists of a signature on the
+   *   account address. 96 bytes.
+   * @return True upon success.
+   */
+  updateBlsPublicKey: (
+    blsPublicKey: string,
+    blsPop: string
+  ) => CeloTransactionObject<boolean> = proxySend(
+    this.kit,
+    this.contract.methods.updateBlsPublicKey,
+    tupleParser(parseBytes, parseBytes)
+  )
+
+  /**
+   * Returns whether a particular account has a registered validator.
+   * @param account The account.
+   * @return Whether a particular address is a registered validator.
+   */
+  isValidator = proxyCall(this.contract.methods.isValidator)
+
+  /**
+   * Returns whether a particular account has a registered validator group.
+   * @param account The account.
+   * @return Whether a particular address is a registered validator group.
+   */
+  isValidatorGroup = proxyCall(this.contract.methods.isValidatorGroup)
+
+  /**
+   * Returns whether an account meets the requirements to register a validator.
+   * @param account The account.
+   * @return Whether an account meets the requirements to register a validator.
+   */
+  meetsValidatorBalanceRequirements = async (address: Address) => {
+    const lockedGold = await this.kit.contracts.getLockedGold()
+    const total = await lockedGold.getAccountTotalLockedGold(address)
+    const reqs = await this.getValidatorLockedGoldRequirements()
+    return reqs.value.lte(total)
+  }
+
+  /**
+   * Returns whether an account meets the requirements to register a group.
+   * @param account The account.
+   * @return Whether an account meets the requirements to register a group.
+   */
+
+  meetsValidatorGroupBalanceRequirements = async (address: Address) => {
+    const lockedGold = await this.kit.contracts.getLockedGold()
+    const total = await lockedGold.getAccountTotalLockedGold(address)
+    const reqs = await this.getGroupLockedGoldRequirements()
+    return reqs.value.lte(total)
+  }
+
+  /** Get Validator information */
+  async getValidator(address: Address): Promise<Validator> {
+    const res = await this.contract.methods.getValidator(address).call()
+    const accounts = await this.kit.contracts.getAccounts()
+    const name = (await accounts.getName(address)) || ''
+    return {
+      name,
+      address,
+      ecdsaPublicKey: (res.ecdsaPublicKey as unknown) as string,
+      blsPublicKey: (res.blsPublicKey as unknown) as string,
+      affiliation: res.affiliation,
+      score: fromFixed(new BigNumber(res.score)),
+      signer: res.signer,
+    }
+  }
+
+  async getValidatorFromSigner(address: Address): Promise<Validator> {
+    const account = await this.signerToAccount(address)
+    return this.getValidator(account)
+  }
+
+  /** Get ValidatorGroup information */
+  async getValidatorGroup(address: Address): Promise<ValidatorGroup> {
+    const res = await this.contract.methods.getValidatorGroup(address).call()
+    const accounts = await this.kit.contracts.getAccounts()
+    const name = (await accounts.getName(address)) || ''
+    const validators = await this.getRegisteredValidators()
+    const affiliates = validators
+      .filter((v) => v.affiliation === address)
+      .filter((v) => !res[0].includes(v.address))
+    return {
+      name,
+      address,
+      members: res[0],
+      commission: fromFixed(new BigNumber(res[1])),
+      affiliates: affiliates.map((v) => v.address),
+    }
+  }
+
+  /**
+   * Returns the Validator's group membership history
+   * @param validator The validator whose membership history to return.
+   * @return The group membership history of a validator.
+   */
+  getValidatorMembershipHistory: (validator: Address) => Promise<GroupMembership[]> = proxyCall(
+    this.contract.methods.getMembershipHistory,
+    undefined,
+    (res) =>
+      // tslint:disable-next-line: no-object-literal-type-assertion
+      zip((epoch, group) => ({ epoch: toNumber(epoch), group } as GroupMembership), res[0], res[1])
+  )
+
+  /** Get the size (amount of members) of a ValidatorGroup */
+  getValidatorGroupSize: (group: Address) => Promise<number> = proxyCall(
+    this.contract.methods.getGroupNumMembers,
+    undefined,
+    toNumber
+  )
+
+  /** Get list of registered validator addresses */
+  getRegisteredValidatorsAddresses: () => Promise<Address[]> = proxyCall(
+    this.contract.methods.getRegisteredValidators
+  )
+
+  /** Get list of registered validator group addresses */
+  getRegisteredValidatorGroupsAddresses: () => Promise<Address[]> = proxyCall(
+    this.contract.methods.getRegisteredValidatorGroups
+  )
+
+  /** Get list of registered validators */
+  async getRegisteredValidators(): Promise<Validator[]> {
+    const vgAddresses = await this.getRegisteredValidatorsAddresses()
     return Promise.all(vgAddresses.map((addr) => this.getValidator(addr)))
   }
 
-  async getValidatorSetAddresses(): Promise<string[]> {
-    const numberValidators = await this.numberValidatorsInCurrentSet()
-
-    const validatorAddressPromises = []
-
-    for (let i = 0; i < numberValidators; i++) {
-      validatorAddressPromises.push(this.validatorAddressFromCurrentSet(i))
-    }
-
-    return Promise.all(validatorAddressPromises)
-  }
-
-  async getValidator(address: Address): Promise<Validator> {
-    const res = await this.contract.methods.getValidator(address).call()
-    return {
-      address,
-      id: res[0],
-      name: res[1],
-      url: res[2],
-      publicKey: res[3] as any,
-      affiliation: res[4],
-    }
-  }
-
+  /** Get list of registered validator groups */
   async getRegisteredValidatorGroups(): Promise<ValidatorGroup[]> {
-    const vgAddresses = await this.contract.methods.getRegisteredValidatorGroups().call()
+    const vgAddresses = await this.getRegisteredValidatorGroupsAddresses()
     return Promise.all(vgAddresses.map((addr) => this.getValidatorGroup(addr)))
   }
 
-  async getValidatorGroup(address: Address): Promise<ValidatorGroup> {
-    const res = await this.contract.methods.getValidatorGroup(address).call()
-    return { address, id: res[0], name: res[1], url: res[2], members: res[3] }
+  /**
+   * Registers a validator unaffiliated with any validator group.
+   *
+   * Fails if the account is already a validator or validator group.
+   *
+   * @param validatorAddress The address that the validator is using for consensus, should match
+   *   the validator signer.
+   * @param ecdsaPublicKey The ECDSA public key that the validator is using for consensus. 64 bytes.
+   * @param blsPublicKey The BLS public key that the validator is using for consensus, should pass proof
+   *   of possession. 48 bytes.
+   * @param blsPop The BLS public key proof-of-possession, which consists of a signature on the
+   *   account address. 96 bytes.
+   */
+  registerValidator = proxySend(this.kit, this.contract.methods.registerValidator)
+
+  /**
+   * De-registers a validator, removing it from the group for which it is a member.
+   * @param validatorAddress Address of the validator to deregister
+   */
+  async deregisterValidator(validatorAddress: Address) {
+    const allValidators = await this.getRegisteredValidatorsAddresses()
+    const idx = allValidators.findIndex((addr) => eqAddress(validatorAddress, addr))
+
+    if (idx < 0) {
+      throw new Error(`${validatorAddress} is not a registered validator`)
+    }
+    return toTransactionObject(this.kit, this.contract.methods.deregisterValidator(idx))
   }
 
-  async getValidatorGroupsVotes(): Promise<ValidatorGroupVote[]> {
-    const vgAddresses = await this.contract.methods.getRegisteredValidatorGroups().call()
-    const res = await this.contract.methods.getValidatorGroupVotes().call()
-    const r = zip((a, b) => ({ address: a, votes: new BigNumber(b) }), res[0], res[1])
-    for (const vgAddress of vgAddresses) {
-      if (!res[0].includes(vgAddress)) {
-        r.push({ address: vgAddress, votes: new BigNumber(0) })
-      }
-    }
-    return r
-  }
-
-  async revokeVote(): Promise<CeloTransactionObject<boolean>> {
-    if (this.kit.defaultAccount == null) {
-      throw new Error(`missing from at new ValdidatorUtils()`)
-    }
-
-    const lockedGold = await this.kit.contracts.getLockedGold()
-    const votingDetails = await lockedGold.getVotingDetails(this.kit.defaultAccount)
-    const votedGroup = await this.getVoteFrom(votingDetails.accountAddress)
-
-    if (votedGroup == null) {
-      throw new Error(`Not current vote for ${this.kit.defaultAccount}`)
-    }
-
-    const { lesser, greater } = await this.findLesserAndGreaterAfterVote(
-      votedGroup,
-      votingDetails.weight.negated()
+  /**
+   * Registers a validator group with no member validators.
+   * Fails if the account is already a validator or validator group.
+   * Fails if the account does not have sufficient weight.
+   *
+   * @param commission the commission this group receives on epoch payments made to its members.
+   */
+  async registerValidatorGroup(commission: BigNumber): Promise<CeloTransactionObject<boolean>> {
+    return toTransactionObject(
+      this.kit,
+      this.contract.methods.registerValidatorGroup(toFixed(commission).toFixed())
     )
-
-    return wrapSend(this.kit, this.contract.methods.revokeVote(lesser, greater))
   }
 
-  async vote(validatorGroup: Address): Promise<CeloTransactionObject<boolean>> {
-    if (this.kit.defaultAccount == null) {
-      throw new Error(`missing from at new ValdidatorUtils()`)
+  /**
+   * De-registers a validator Group
+   * @param validatorGroupAddress Address of the validator group to deregister
+   */
+  async deregisterValidatorGroup(validatorGroupAddress: Address) {
+    const allGroups = await this.getRegisteredValidatorGroupsAddresses()
+    const idx = allGroups.findIndex((addr) => eqAddress(validatorGroupAddress, addr))
+
+    if (idx < 0) {
+      throw new Error(`${validatorGroupAddress} is not a registered validator`)
     }
-
-    const lockedGold = await this.kit.contracts.getLockedGold()
-    const votingDetails = await lockedGold.getVotingDetails(this.kit.defaultAccount)
-
-    const { lesser, greater } = await this.findLesserAndGreaterAfterVote(
-      validatorGroup,
-      votingDetails.weight
-    )
-
-    return wrapSend(this.kit, this.contract.methods.vote(validatorGroup, lesser, greater))
+    return toTransactionObject(this.kit, this.contract.methods.deregisterValidatorGroup(idx))
   }
 
-  private async findLesserAndGreaterAfterVote(
-    votedGroup: Address,
-    voteWeight: BigNumber
-  ): Promise<{ lesser: Address; greater: Address }> {
-    const currentVotes = (await this.getValidatorGroupsVotes()).filter((g) => !g.votes.isZero())
+  /**
+   * Affiliates a validator with a group, allowing it to be added as a member.
+   * De-affiliates with the previously affiliated group if present.
+   * @param group The validator group with which to affiliate.
+   */
+  affiliate: (group: Address) => CeloTransactionObject<boolean> = proxySend(
+    this.kit,
+    this.contract.methods.affiliate
+  )
 
-    const selectedGroup = currentVotes.find((cv) => eqAddress(cv.address, votedGroup))
+  /**
+   * De-affiliates a validator, removing it from the group for which it is a member.
+   * Fails if the account is not a validator with non-zero affiliation.
+   */
 
-    // modify the list
-    if (selectedGroup) {
-      selectedGroup.votes = selectedGroup.votes.plus(voteWeight)
+  deaffiliate = proxySend(this.kit, this.contract.methods.deaffiliate)
+
+  forceDeaffiliateIfValidator = proxySend(
+    this.kit,
+    this.contract.methods.forceDeaffiliateIfValidator
+  )
+
+  /**
+   * Adds a member to the end of a validator group's list of members.
+   * Fails if `validator` has not set their affiliation to this account.
+   * @param validator The validator to add to the group
+   */
+  async addMember(group: Address, validator: Address): Promise<CeloTransactionObject<boolean>> {
+    const numMembers = await this.getValidatorGroupSize(group)
+    if (numMembers === 0) {
+      const election = await this.kit.contracts.getElection()
+      const voteWeight = await election.getTotalVotesForGroup(group)
+      const { lesser, greater } = await election.findLesserAndGreaterAfterVote(group, voteWeight)
+
+      return toTransactionObject(
+        this.kit,
+        this.contract.methods.addFirstMember(validator, lesser, greater)
+      )
     } else {
-      currentVotes.push({
-        address: votedGroup,
-        votes: voteWeight,
-      })
+      return toTransactionObject(this.kit, this.contract.methods.addMember(validator))
+    }
+  }
+
+  /**
+   * Removes a member from a ValidatorGroup
+   * The ValidatorGroup is specified by the `from` of the tx.
+   *
+   * @param validator The Validator to remove from the group
+   */
+  removeMember = proxySend(this.kit, this.contract.methods.removeMember)
+
+  /**
+   * Reorders a member within a validator group.
+   * Fails if `validator` is not a member of the account's validator group.
+   * @param groupAddr The validator group
+   * @param validator The validator to reorder.
+   * @param newIndex New position for the validator
+   */
+  async reorderMember(groupAddr: Address, validator: Address, newIndex: number) {
+    const group = await this.getValidatorGroup(groupAddr)
+
+    if (newIndex < 0 || newIndex >= group.members.length) {
+      throw new Error(`Invalid index ${newIndex}; max index is ${group.members.length - 1}`)
     }
 
-    // re-sort
-    currentVotes.sort((a, b) => a.votes.comparedTo(b.votes))
-
-    // find new index
-    const newIdx = currentVotes.findIndex((cv) => eqAddress(cv.address, votedGroup))
-
-    return {
-      lesser: newIdx === 0 ? NULL_ADDRESS : currentVotes[newIdx - 1].address,
-      greater: newIdx === currentVotes.length - 1 ? NULL_ADDRESS : currentVotes[newIdx + 1].address,
+    const currentIdx = group.members.indexOf(validator)
+    if (currentIdx < 0) {
+      throw new Error(`ValidatorGroup ${groupAddr} does not inclue ${validator}`)
+    } else if (currentIdx === newIndex) {
+      throw new Error(`Validator is already in position ${newIndex}`)
     }
+
+    // remove the element
+    group.members.splice(currentIdx, 1)
+    // add it on new position
+    group.members.splice(newIndex, 0, validator)
+
+    const nextMember =
+      newIndex === group.members.length - 1 ? NULL_ADDRESS : group.members[newIndex + 1]
+    const prevMember = newIndex === 0 ? NULL_ADDRESS : group.members[newIndex - 1]
+
+    return toTransactionObject(
+      this.kit,
+      this.contract.methods.reorderMember(validator, nextMember, prevMember)
+    )
   }
 }

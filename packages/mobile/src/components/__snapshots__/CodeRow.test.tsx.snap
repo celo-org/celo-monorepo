@@ -1,0 +1,232 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`CodeRow renders correctly for all CodeRowStatus states 1`] = `
+<View
+  style={
+    Object {
+      "backgroundColor": "#F0F0F0",
+      "borderColor": "#D1D5D8",
+      "borderRadius": 3,
+      "borderWidth": 1,
+      "height": 50,
+      "justifyContent": "center",
+      "marginVertical": 5,
+      "paddingHorizontal": 10,
+    }
+  }
+>
+  <Text
+    style={
+      Object {
+        "color": "#81868B",
+        "fontFamily": "Hind-Regular",
+        "fontSize": 15,
+        "lineHeight": 24,
+      }
+    }
+  >
+    placeholder
+  </Text>
+</View>
+`;
+
+exports[`CodeRow renders correctly for all CodeRowStatus states 2`] = `
+<View
+  style={
+    Object {
+      "position": "relative",
+    }
+  }
+>
+  <View
+    style={
+      Array [
+        Object {
+          "alignItems": "center",
+          "flex": 1,
+          "flexDirection": "row",
+          "justifyContent": "center",
+        },
+        Object {
+          "backgroundColor": "#FFF",
+          "borderColor": "#D1D5D8",
+          "borderRadius": 3,
+          "borderWidth": 1,
+          "flex": 0,
+          "height": 50,
+          "marginVertical": 5,
+        },
+      ]
+    }
+  >
+    <TextInput
+      allowFontScaling={true}
+      onBlur={[Function]}
+      onChangeText={[MockFunction]}
+      onFocus={[Function]}
+      placeholder="placeholder"
+      rejectResponderTermination={true}
+      shouldShowClipboard={[MockFunction]}
+      style={
+        Object {
+          "backgroundColor": "#FFFFFF",
+          "borderColor": "#D1D5D8",
+          "borderRadius": 3,
+          "flex": 1,
+          "fontFamily": "Hind-Regular",
+          "padding": 8,
+        }
+      }
+      underlineColorAndroid="transparent"
+      value="test"
+    />
+  </View>
+</View>
+`;
+
+exports[`CodeRow renders correctly for all CodeRowStatus states 3`] = `
+<View
+  style={
+    Object {
+      "backgroundColor": "#FFF",
+      "borderColor": "#D1D5D8",
+      "borderRadius": 3,
+      "borderWidth": 1,
+      "height": 50,
+      "justifyContent": "center",
+      "marginVertical": 5,
+      "paddingHorizontal": 10,
+      "position": "relative",
+    }
+  }
+>
+  <Text
+    style={
+      Object {
+        "color": "#81868B",
+        "fontFamily": "Hind-Regular",
+        "fontSize": 15,
+        "lineHeight": 24,
+      }
+    }
+  >
+    test...
+  </Text>
+  <ActivityIndicator
+    animating={true}
+    color="#42D689"
+    hidesWhenStopped={true}
+    size="small"
+    style={
+      Object {
+        "backgroundColor": "#FFF",
+        "padding": 10,
+        "position": "absolute",
+        "right": 3,
+        "top": 5,
+      }
+    }
+  />
+</View>
+`;
+
+exports[`CodeRow renders correctly for all CodeRowStatus states 4`] = `
+<View
+  style={
+    Object {
+      "backgroundColor": "#EEEEEE",
+      "borderRadius": 3,
+      "height": 50,
+      "justifyContent": "center",
+      "marginVertical": 5,
+      "paddingHorizontal": 10,
+    }
+  }
+>
+  <Text
+    ellipsizeMode="tail"
+    numberOfLines={1}
+    style={
+      Object {
+        "color": "#81868B",
+        "fontFamily": "Hind-Regular",
+        "fontSize": 15,
+        "lineHeight": 24,
+      }
+    }
+  >
+    test...
+  </Text>
+</View>
+`;
+
+exports[`CodeRow renders correctly for all CodeRowStatus states 5`] = `
+<View
+  style={
+    Object {
+      "backgroundColor": "#EEEEEE",
+      "borderRadius": 3,
+      "height": 50,
+      "justifyContent": "center",
+      "marginVertical": 5,
+      "paddingHorizontal": 10,
+    }
+  }
+>
+  <Text
+    ellipsizeMode="tail"
+    numberOfLines={1}
+    style={
+      Object {
+        "color": "#81868B",
+        "fontFamily": "Hind-Regular",
+        "fontSize": 15,
+        "lineHeight": 24,
+      }
+    }
+  >
+    test...
+  </Text>
+  <View
+    style={
+      Object {
+        "backgroundColor": "#EEEEEE",
+        "padding": 10,
+        "position": "absolute",
+        "right": 3,
+        "top": 3,
+      }
+    }
+  >
+    <svg
+      fill="none"
+      height={20}
+      style={Object {}}
+      viewBox="0 0 18 18"
+      width={20}
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      <rect
+        fill="#45CD86"
+        height="2"
+        rx="1"
+        style={Object {}}
+        transform="rotate(-135 6.89185 17.0205)"
+        width="8.33324"
+        x="6.89185"
+        y="17.0205"
+      />
+      <rect
+        fill="#45CD86"
+        height="2"
+        rx="1"
+        style={Object {}}
+        transform="rotate(-45 5.47778 15.6064)"
+        width="14.9998"
+        x="5.47778"
+        y="15.6064"
+      />
+    </svg>
+  </View>
+</View>
+`;

@@ -1,6 +1,6 @@
 import Touchable from '@celo/react-components/components/Touchable'
 import colors from '@celo/react-components/styles/colors'
-import fonts from '@celo/react-components/styles/fonts'
+import { fontStyles } from '@celo/react-components/styles/fonts'
 import * as React from 'react'
 import { StyleSheet, Text, TextStyle, ViewStyle } from 'react-native'
 
@@ -19,7 +19,16 @@ const TOUCH_OVERFLOW = 7
 
 export default class SmallButton extends React.Component<ButtonProps> {
   render() {
-    const { onPress, text, accessibilityLabel, solid, disabled, style, textStyle } = this.props
+    const {
+      onPress,
+      text,
+      accessibilityLabel,
+      solid,
+      disabled,
+      style,
+      textStyle,
+      children,
+    } = this.props
     return (
       <Touchable
         testID={this.props.testID}
@@ -33,17 +42,20 @@ export default class SmallButton extends React.Component<ButtonProps> {
         }}
         style={[styles.button, solid ? styles.solid : styles.hollow, style]}
       >
-        <Text
-          accessibilityLabel={accessibilityLabel}
-          style={[
-            fonts.linkSmall,
-            styles.text,
-            solid ? { color: colors.white } : { color: colors.celoGreen },
-            textStyle,
-          ]}
-        >
-          {text}
-        </Text>
+        <>
+          {children}
+          <Text
+            accessibilityLabel={accessibilityLabel}
+            style={[
+              styles.text,
+              solid ? { color: colors.white } : { color: colors.celoGreen },
+              children ? styles.textPadding : null,
+              textStyle,
+            ]}
+          >
+            {text}
+          </Text>
+        </>
       </Touchable>
     )
   }
@@ -54,12 +66,11 @@ const PADDING_HORIZONTAL = 16
 
 const styles = StyleSheet.create({
   button: {
-    minWidth: 160,
-    textAlign: 'center',
-    paddingVertical: PADDING_VERTICAL,
-    paddingHorizontal: PADDING_HORIZONTAL,
+    flexDirection: 'row',
     alignSelf: 'flex-start',
     alignItems: 'center',
+    paddingVertical: PADDING_VERTICAL,
+    paddingHorizontal: PADDING_HORIZONTAL,
     borderRadius: 2,
   },
   solid: {
@@ -73,6 +84,14 @@ const styles = StyleSheet.create({
     borderColor: colors.celoGreen,
   },
   text: {
+    ...fontStyles.semiBold,
+    fontSize: 13,
     lineHeight: 20,
+    color: colors.darkSecondary,
+    textAlign: 'center',
+  },
+  textPadding: {
+    paddingLeft: 10,
+    paddingTop: 7,
   },
 })

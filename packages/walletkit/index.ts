@@ -7,13 +7,12 @@ import { Web3Utils } from './src/web3-utils'
 
 export {
   Attestations,
-  LockedGold,
   Escrow,
   Exchange,
-  GasCurrencyWhitelist,
   GasPriceMinimum,
   GoldToken,
   Governance,
+  LockedGold,
   Random,
   Registry,
   Reserve,
@@ -31,29 +30,6 @@ export {
   parseLog,
 } from './src/abi'
 export { unlockAccount } from './src/account-utils'
-export {
-  ActionableAttestation,
-  attestationMessageToSign,
-  AttestationState,
-  decodeAttestationCode,
-  extractAttestationCodeFromMessage,
-  findMatchingIssuer,
-  getActionableAttestations,
-  getAttestationFee,
-  getAttestationState,
-  getDataEncryptionKey,
-  getWalletAddress,
-  lookupPhoneNumbers,
-  makeApproveAttestationFeeTx,
-  makeCompleteTx,
-  makeRequestTx,
-  makeRevealTx,
-  makeSetAccountTx,
-  makeSetWalletAddressTx,
-  messageContainsAttestationCode,
-  sanitizeBase64,
-  validateAttestationCode,
-} from './src/attestations'
 export {
   awaitConfirmation,
   CeloContract,
@@ -91,10 +67,10 @@ export {
   transferToken,
   transferTokenWithComment,
 } from './src/erc20-utils'
+export { addLocalAccount, getAccountAddressFromPrivateKey } from './src/new-web3-utils'
 export { ContractUtils }
 export { GenesisBlockUtils }
 export { GoogleStorageUtils }
 export { Logger as WalletKitLogger, LogLevel as WalletKitLogLevel }
 export { StaticNodeUtils }
 export { Web3Utils }
-export { addLocalAccount, getAccountAddressFromPrivateKey } from './src/new-web3-utils'

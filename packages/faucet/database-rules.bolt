@@ -3,9 +3,12 @@
  */
 type Request {
   beneficiary: String,       // Address or phone number for the request's beneficiary
-  txHash: String | Null,     // Transaction Hash for the executed Request
-  status: RequestStatus,     // Request Status enum
-  type: RequestType,         // Request Type enum
+  mobileOS: String | Null,
+  dollarTxHash: String | Null,    // Transaction Hash for the executed Request
+  goldTxHash: String | Null,
+  escrowTxHash: String | Null,     
+  status: RequestStatus,          // Request Status enum
+  type: RequestType,               // Request Type enum
 }
 
 type Account {

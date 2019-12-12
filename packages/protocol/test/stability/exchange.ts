@@ -1,3 +1,4 @@
+import { CeloContractName } from '@celo/protocol/lib/registry-utils'
 import {
   assertEqualBN,
   assertLogMatches2,
@@ -59,8 +60,8 @@ contract('Exchange', (accounts: string[]) => {
   const initialGoldBucket = initialReserveBalance
     .times(fromFixed(reserveFraction))
     .integerValue(BigNumber.ROUND_FLOOR)
-  const stableAmountForRate = new BigNumber(2)
-  const goldAmountForRate = new BigNumber(1)
+  const goldAmountForRate = new BigNumber('0x10000000000000000')
+  const stableAmountForRate = new BigNumber(2).times(goldAmountForRate)
   const initialStableBucket = initialGoldBucket.times(stableAmountForRate).div(goldAmountForRate)
   function getBuyTokenAmount(
     sellAmount: BigNumber,
@@ -87,10 +88,10 @@ contract('Exchange', (accounts: string[]) => {
   beforeEach(async () => {
     registry = await Registry.new()
     goldToken = await GoldToken.new()
-    await registry.setAddressFor('GoldToken', goldToken.address)
+    await registry.setAddressFor(CeloContractName.GoldToken, goldToken.address)
 
     mockReserve = await MockReserve.new()
-    await registry.setAddressFor('Reserve', mockReserve.address)
+    await registry.setAddressFor(CeloContractName.Reserve, mockReserve.address)
     await mockReserve.setGoldToken(goldToken.address)
 
     stableToken = await StableToken.new()
@@ -101,16 +102,14 @@ contract('Exchange', (accounts: string[]) => {
       decimals,
       registry.address,
       fixed1,
-      SECONDS_IN_A_WEEK
+      SECONDS_IN_A_WEEK,
+      [],
+      []
     )
 
     mockSortedOracles = await MockSortedOracles.new()
-    await registry.setAddressFor('SortedOracles', mockSortedOracles.address)
-    await mockSortedOracles.setMedianRate(
-      stableToken.address,
-      stableAmountForRate,
-      goldAmountForRate
-    )
+    await registry.setAddressFor(CeloContractName.SortedOracles, mockSortedOracles.address)
+    await mockSortedOracles.setMedianRate(stableToken.address, stableAmountForRate)
     await mockSortedOracles.setMedianTimestampToNow(stableToken.address)
     await mockSortedOracles.setNumRates(stableToken.address, 2)
 
@@ -119,14 +118,14 @@ contract('Exchange', (accounts: string[]) => {
     exchange = await Exchange.new()
     await exchange.initialize(
       registry.address,
+      accounts[0],
       stableToken.address,
       spread,
       reserveFraction,
       updateFrequency,
       minimumReports
     )
-
-    await stableToken.setMinter(exchange.address)
+    await registry.setAddressFor(CeloContractName.Exchange, exchange.address)
   })
 
   describe('#initialize()', () => {
@@ -139,6 +138,7 @@ contract('Exchange', (accounts: string[]) => {
       await assertRevert(
         exchange.initialize(
           registry.address,
+          accounts[0],
           stableToken.address,
           spread,
           reserveFraction,
@@ -326,7 +326,7 @@ contract('Exchange', (accounts: string[]) => {
 
     describe('after an oracle update', () => {
       beforeEach(async () => {
-        await mockSortedOracles.setMedianRate(stableToken.address, 4, 1)
+        await mockSortedOracles.setMedianRate(stableToken.address, goldAmountForRate.times(4))
       })
 
       it(`should return the same value if updateFrequency seconds haven't passed yet`, async () => {
@@ -588,9 +588,9 @@ contract('Exchange', (accounts: string[]) => {
       let oldGoldBalance: BigNumber
       let oldReserveGoldBalance: BigNumber
       beforeEach(async () => {
-        await stableToken.setMinter(owner)
+        await registry.setAddressFor(CeloContractName.Exchange, owner)
         await stableToken.mint(user, stableTokenBalance)
-        await stableToken.setMinter(exchange.address)
+        await registry.setAddressFor(CeloContractName.Exchange, exchange.address)
 
         oldReserveGoldBalance = await goldToken.balanceOf(mockReserve.address)
         await stableToken.approve(exchange.address, stableTokenBalance, { from: user })
@@ -790,6 +790,17 @@ contract('Exchange', (accounts: string[]) => {
           // Gold Bucket value), minus the amount purchased during the exchange
           assertEqualBN(newStableBucket, updatedStableBucket.plus(stableTokenBalance))
         })
+      })
+    })
+
+    describe('when the contract is frozen', () => {
+      beforeEach(async () => {
+        await exchange.freeze()
+      })
+
+      it('should revert', async () => {
+        await goldToken.approve(exchange.address, 1000)
+        await assertRevert(exchange.exchange(1000, 1, true))
       })
     })
   })

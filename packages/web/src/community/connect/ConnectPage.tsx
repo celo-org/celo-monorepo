@@ -1,13 +1,13 @@
 import * as React from 'react'
 import { View } from 'react-native'
+import Contribute from 'src/community/connect/Contribute'
 import CoverArea from 'src/community/connect/CoverArea'
 import Tenets from 'src/community/connect/Tenets'
 import EventData from 'src/events/EventsData'
 import OpenGraph from 'src/header/OpenGraph'
 import { I18nProps, NameSpaces, withNamespaces } from 'src/i18n'
+import { hashNav } from 'src/shared/menu-items'
 import ArticleData from './ArticleData'
-
-import Contribute from 'src/community/connect/Contribute'
 import ConnectionFooter from 'src/shared/ConnectionFooter'
 
 const preview = require('src/community/connect/preview.jpg')
@@ -43,7 +43,9 @@ export class ConnectPage extends React.Component<Props> {
           <Contribute />
           <ArticleData />
           <Tenets />
-          <ConnectionFooter />
+          <View nativeID={hashNav.connect.newsletter}>
+            <ConnectionFooter includeDividerLine={true} />
+          </View>
         </View>
       </>
     )

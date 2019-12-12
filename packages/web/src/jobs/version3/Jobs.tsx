@@ -157,7 +157,7 @@ class Jobs extends React.Component<Props, State> {
                     <Text style={[fonts.h3Mobile, textStyles.heading]}>
                       {t('careerOpportunities')}
                     </Text>
-                    <Text style={[fonts.h5, styles.optionsLabel]}>{t('filter')}</Text>
+                    <Text style={[fonts.h6, styles.optionsLabel]}>{t('filter')}</Text>
                     <DropDownGroup
                       data={[
                         {

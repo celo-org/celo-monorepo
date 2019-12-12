@@ -11,7 +11,7 @@ import LoaderButton from 'src/shared/LoaderButton'
 
 import { Cell, GridRow, Spans } from 'src/layout/GridRow'
 import { ScreenProps, ScreenSizes, withScreenSize } from 'src/layout/ScreenSize'
-import Rings from 'src/logos/RingsLight'
+import Rings from 'src/logos/RingsGlyph'
 import Button, { BTN, SIZE } from 'src/shared/Button.3'
 import menuItems, { hashNav } from 'src/shared/menu-items'
 

@@ -14,7 +14,11 @@ import {
 } from 'src/shared/SocialChannels'
 import { colors, fonts, standardStyles } from 'src/styles'
 
-function ConnectionFooter({ t }: I18nProps) {
+interface Props {
+  includeDividerLine: boolean
+}
+
+function ConnectionFooter({ t, includeDividerLine }: I18nProps & Props) {
   return (
     <>
       <GridRow
@@ -22,7 +26,7 @@ function ConnectionFooter({ t }: I18nProps) {
         tabletStyle={standardStyles.blockMarginTablet}
         mobileStyle={standardStyles.blockMarginMobile}
       >
-        <View style={[styles.line]} />
+        {includeDividerLine && <View style={[styles.line]} />}
       </GridRow>
       <BookLayout label={t('conductLabel')}>
         <Text style={[fonts.p, standardStyles.elementalMarginBottom]}>{t('conductText')}</Text>
@@ -37,7 +41,11 @@ function ConnectionFooter({ t }: I18nProps) {
           <EventsChannel isDarkMode={false} />
         </View>
         <View>
-          <Image source={{ uri: require('src/dev/devNews.png') }} style={styles.emailLogo} />
+          <Image
+            resizeMode="contain"
+            source={{ uri: require('src/dev/devNews.png') }}
+            style={styles.emailLogo}
+          />
           <View style={styles.form}>
             <H3 style={styles.formTitle}>{t('stayConnected')}</H3>
             <Text style={[fonts.p, standardStyles.elementalMarginBottom]}>

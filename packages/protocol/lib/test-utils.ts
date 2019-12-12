@@ -2,14 +2,12 @@ import { hasEntryInRegistry, usesRegistry } from '@celo/protocol/lib/registry-ut
 import BigNumber from 'bignumber.js'
 import * as chai from 'chai'
 import * as chaiSubset from 'chai-subset'
-import { spawn } from 'child_process'
+import { spawn, SpawnOptions } from 'child_process'
 import { keccak256 } from 'ethereumjs-util'
 import {
-  ExchangeInstance,
   ProxyInstance,
   RegistryInstance,
   ReserveInstance,
-  StableTokenInstance,
   UsingRegistryInstance,
 } from 'types'
 const soliditySha3 = new (require('web3'))().utils.soliditySha3
@@ -36,30 +34,6 @@ export function assertContainSubset(superset: any, subset: any) {
   return assert2.containSubset(superset, subset)
 }
 
-export async function advanceBlockNum(numBlocks: number, web3: Web3) {
-  let returnValue: any
-  for (let i: number = 0; i < numBlocks; i++) {
-    returnValue = new Promise((resolve, reject) => {
-      web3.currentProvider.send(
-        {
-          jsonrpc: '2.0',
-          method: 'evm_mine',
-          params: [],
-          id: new Date().getTime(),
-        },
-        // @ts-ignore
-        (err: any, result: any) => {
-          if (err) {
-            return reject(err)
-          }
-          return resolve(result)
-        }
-      )
-    })
-  }
-  return returnValue
-}
-
 export async function jsonRpc(web3: Web3, method: string, params: any[] = []): Promise<any> {
   return new Promise((resolve, reject) => {
     web3.currentProvider.send(
@@ -83,6 +57,12 @@ export async function jsonRpc(web3: Web3, method: string, params: any[] = []): P
 export async function timeTravel(seconds: number, web3: Web3) {
   await jsonRpc(web3, 'evm_increaseTime', [seconds])
   await jsonRpc(web3, 'evm_mine', [])
+}
+
+export async function mineBlocks(blocks: number, web3: Web3) {
+  for (let i = 0; i < blocks; i++) {
+    await jsonRpc(web3, 'evm_mine', [])
+  }
 }
 
 export async function assertBalance(address: string, balance: BigNumber) {
@@ -127,6 +107,41 @@ export async function exec(command: string, args: string[]) {
       }
     })
   })
+}
+
+function execCmd(
+  cmd: string,
+  args: string[],
+  options?: SpawnOptions & { silent?: boolean }
+) {
+  return new Promise<number>(async (resolve, reject) => {
+    const { silent, ...spawnOptions } = options || { silent: false }
+    if (!silent) {
+      console.debug('$ ' + [cmd].concat(args).join(' '))
+    }
+    const process = spawn(cmd, args, { ...spawnOptions, stdio: silent ? 'ignore' : 'inherit' })
+    process.on('close', (code) => {
+      try {
+        resolve(code)
+      } catch (error) {
+        reject(error)
+      }
+    })
+  })
+}
+
+async function isPortOpen(host: string, port: number) {
+  return (await execCmd('nc', ['-z', host, port.toString()], { silent: true })) === 0
+}
+
+export async function waitForPortOpen(host: string, port: number, seconds: number) {
+  const deadline = Date.now() + seconds * 1000
+  do {
+    if (await isPortOpen(host, port)) {
+      return true
+    }
+  } while (Date.now() < deadline)
+  return false
 }
 
 export const assertProxiesSet = async (getContract: any) => {
@@ -176,16 +191,6 @@ export const assertContractsOwnedByMultiSig = async (getContract: any) => {
     const proxyOwner = await (await getContract(contractName, 'proxy'))._getOwner()
     assert.equal(proxyOwner, multiSigAddress, contractName + 'Proxy is not owned by the MultiSig')
   }
-}
-
-export const assertStableTokenMinter = async (getContract: any) => {
-  const stableToken: StableTokenInstance = await getContract('StableToken', 'proxiedContract')
-  const exchange: ExchangeInstance = await getContract('Exchange', 'proxiedContract')
-  assert.equal(
-    await stableToken.minter(),
-    exchange.address,
-    'StableToken minter not set to Exchange'
-  )
 }
 
 export const assertFloatEquality = (
@@ -243,6 +248,26 @@ export function assertEqualBN(
     web3.utils.toBN(value).eq(web3.utils.toBN(expected)),
     `expected ${expected.toString()} and got ${value.toString()}. ${msg || ''}`
   )
+}
+
+export function assertEqualDpBN(
+  value: number | BN | BigNumber,
+  expected: number | BN | BigNumber,
+  decimals: number,
+  msg?: string
+) {
+  const valueDp = new BigNumber(value.toString()).dp(decimals)
+  const expectedDp = new BigNumber(expected.toString()).dp(decimals)
+  assert(
+    valueDp.isEqualTo(expectedDp),
+    `expected ${expectedDp.toString()} and got ${valueDp.toString()}. ${msg || ''}`
+  )
+}
+
+
+export function assertEqualBNArray(value: number[] | BN[] | BigNumber[], expected: number[] | BN[] | BigNumber[], msg?: string) {
+  assert.equal(value.length, expected.length, msg)
+  value.forEach((x, i) => assertEqualBN(x, expected[i]))
 }
 
 export function assertGteBN(
@@ -328,7 +353,6 @@ export const matchAny = () => {
 }
 
 export default {
-  advanceBlockNum,
   assertContainSubset,
   assertRevert,
   timeTravel,

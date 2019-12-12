@@ -1,69 +1,36 @@
+import { AddressType, SignatureType } from '@celo/utils/lib/io'
+import { Signer, verifySignature } from '@celo/utils/lib/signatureUtils'
 import fetch from 'cross-fetch'
 import { isLeft } from 'fp-ts/lib/Either'
 import { readFileSync } from 'fs'
 import * as t from 'io-ts'
 import { PathReporter } from 'io-ts/lib/PathReporter'
+import { Claim, ClaimPayload, ClaimType, hashOfClaims, isOfType } from './claims/claim'
+import { ClaimTypes, SINGULAR_CLAIM_TYPES } from './claims/types'
+export { ClaimTypes } from './claims/types'
 
-export enum ClaimTypes {
-  ATTESTATION_SERVICE_URL = 'ATTESTATION_SERVICE_URL',
-  DOMAIN = 'DOMAIN',
-  NAME = 'NAME',
-  PROFILE_PICTURE = 'PROFILE_PICTURE',
-  TWITTER = 'TWITTER',
-}
-
-const UrlType = t.string
-const SignatureType = t.string
-const TimestampType = t.number
-
-const AttestationServiceURLClaimType = t.type({
-  type: t.literal(ClaimTypes.ATTESTATION_SERVICE_URL),
-  timestamp: TimestampType,
-  url: UrlType,
-})
-
-const DomainClaimType = t.type({
-  type: t.literal(ClaimTypes.DOMAIN),
-  timestamp: TimestampType,
-  domain: t.string,
-})
-
-const NameClaimType = t.type({
-  type: t.literal(ClaimTypes.NAME),
-  timestamp: TimestampType,
-  name: t.string,
-})
-
-export const ClaimType = t.union([AttestationServiceURLClaimType, DomainClaimType, NameClaimType])
-export const SignedClaimType = t.type({
-  payload: ClaimType,
+const MetaType = t.type({
+  address: AddressType,
   signature: SignatureType,
 })
 
 export const IdentityMetadataType = t.type({
-  claims: t.array(SignedClaimType),
+  claims: t.array(ClaimType),
+  meta: MetaType,
 })
-
-export type SignedClaim = t.TypeOf<typeof SignedClaimType>
-export type AttestationServiceURLClaim = t.TypeOf<typeof AttestationServiceURLClaimType>
-export type DomainClaim = t.TypeOf<typeof DomainClaimType>
-export type NameClaim = t.TypeOf<typeof NameClaimType>
 export type IdentityMetadata = t.TypeOf<typeof IdentityMetadataType>
-export type Claim = AttestationServiceURLClaim | DomainClaim | NameClaim
-
-type ClaimPayload<K extends ClaimTypes> = K extends typeof ClaimTypes.DOMAIN
-  ? DomainClaim
-  : K extends typeof ClaimTypes.NAME ? NameClaim : AttestationServiceURLClaim
-
-const isOfType = <K extends ClaimTypes>(type: K) => (
-  data: SignedClaim['payload']
-): data is ClaimPayload<K> => data.type === type
 
 export class IdentityMetadataWrapper {
   data: IdentityMetadata
 
-  static emptyData: IdentityMetadata = {
-    claims: [],
+  static fromEmpty(address: string) {
+    return new IdentityMetadataWrapper({
+      claims: [],
+      meta: {
+        address,
+        signature: '',
+      },
+    })
   }
 
   static async fetchFromURL(url: string) {
@@ -80,25 +47,35 @@ export class IdentityMetadataWrapper {
 
   static fromRawString(rawData: string) {
     const data = JSON.parse(rawData)
-    // TODO: We should validate:
-    // 1. data.claims being an array
-    // 2. payload being JSON-parsable
-    // This is hard to put into io-ts + we need to eventually do signature checking
-    const parsedData = {
-      claims: data.claims.map((claim: any) => ({
-        payload: JSON.parse(claim.payload),
-        signature: claim.signature,
-      })),
-    }
 
-    const validatedData = IdentityMetadataType.decode(parsedData)
+    const validatedData = IdentityMetadataType.decode(data)
 
     if (isLeft(validatedData)) {
       // TODO: We could probably return a more useful error in the future
       throw new Error(PathReporter.report(validatedData).join(', '))
     }
 
-    return new IdentityMetadataWrapper(validatedData.right)
+    // Verify signature on the data
+    const claims = validatedData.right.claims
+    const hash = hashOfClaims(claims)
+    if (
+      claims.length > 0 &&
+      !verifySignature(hash, validatedData.right.meta.signature, validatedData.right.meta.address)
+    ) {
+      throw new Error('Signature could not be validated')
+    }
+
+    const res = new IdentityMetadataWrapper(validatedData.right)
+
+    // Verify that singular claim types appear at most once
+    SINGULAR_CLAIM_TYPES.forEach((claimType) => {
+      const results = res.filterClaims(claimType)
+      if (results.length > 1) {
+        throw new Error(`Found ${results.length} claims of type ${claimType}, should be at most 1`)
+      }
+    })
+
+    return res
   }
 
   constructor(data: IdentityMetadata) {
@@ -109,46 +86,45 @@ export class IdentityMetadataWrapper {
     return this.data.claims
   }
 
+  hashOfClaims() {
+    return hashOfClaims(this.data.claims)
+  }
+
   toString() {
     return JSON.stringify({
-      claims: this.data.claims.map((claim) => ({
-        payload: JSON.stringify(claim.payload),
-        signature: claim.signature,
-      })),
+      claims: this.data.claims,
+      meta: this.data.meta,
     })
   }
 
-  addClaim(claim: Claim) {
-    this.data.claims.push(this.signClaim(claim))
+  async addClaim(claim: Claim, signer: Signer) {
+    switch (claim.type) {
+      case ClaimTypes.ACCOUNT:
+        if (claim.address === this.data.meta.address) {
+          throw new Error("Can't claim self")
+        }
+        break
+
+      default:
+        break
+    }
+
+    if (SINGULAR_CLAIM_TYPES.includes(claim.type)) {
+      const index = this.data.claims.findIndex(isOfType(claim.type))
+      if (index !== -1) {
+        this.data.claims.splice(index, 1)
+      }
+    }
+
+    this.data.claims.push(claim)
+    this.data.meta.signature = await signer.sign(this.hashOfClaims())
   }
 
   findClaim<K extends ClaimTypes>(type: K): ClaimPayload<K> | undefined {
-    return this.data.claims.map((x) => x.payload).find(isOfType(type))
+    return this.data.claims.find(isOfType(type))
   }
 
-  private signClaim = (claim: Claim): SignedClaim => ({
-    payload: claim,
-    // TOOD: Actually sign the claim
-    signature: '',
-  })
+  filterClaims<K extends ClaimTypes>(type: K): Array<ClaimPayload<K>> {
+    return this.data.claims.filter(isOfType(type))
+  }
 }
-
-const now = () => Math.round(new Date().getTime() / 1000)
-
-export const createAttestationServiceURLClaim = (url: string): AttestationServiceURLClaim => ({
-  url,
-  timestamp: now(),
-  type: ClaimTypes.ATTESTATION_SERVICE_URL,
-})
-
-export const createNameClaim = (name: string): NameClaim => ({
-  name,
-  timestamp: now(),
-  type: ClaimTypes.NAME,
-})
-
-export const createDomainClaim = (domain: string): DomainClaim => ({
-  domain,
-  timestamp: now(),
-  type: ClaimTypes.DOMAIN,
-})

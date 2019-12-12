@@ -8,7 +8,7 @@ const tag = 'stableToken/saga'
 
 export const stableTokenFetch = tokenFetchFactory({
   actionName: Actions.FETCH_BALANCE,
-  contractGetter: getStableTokenContract,
+  token: CURRENCY_ENUM.DOLLAR,
   actionCreator: setBalance,
   tag,
 })

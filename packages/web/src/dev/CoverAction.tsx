@@ -1,16 +1,16 @@
 import * as React from 'react'
 import FadeIn from 'react-lazyload-fadein'
-import { Image, ImageSourcePropType, StyleSheet, Text, View } from 'react-native'
+import { Image, ImageSourcePropType, StyleSheet, Text, View, ViewStyle } from 'react-native'
 import { H3 } from 'src/fonts/Fonts'
 import Button, { BTN, SIZE } from 'src/shared/Button.3'
 import { fonts, standardStyles, textStyles } from 'src/styles'
-import { ViewStyle } from 'react-native'
 
 interface Props {
   title: string
   text?: string
   graphic: ImageSourcePropType
   link?: { href: string; text: string }
+  style?: ViewStyle
   isMobile: boolean
   containerStyle?: ViewStyle
 }
@@ -43,7 +43,7 @@ export default function CoverAction({
         <Text
           style={[
             fonts.p,
-            textStyles.invert,
+            textStyles.readingOnDark,
             standardStyles.elementalMarginBottom,
             isMobile && textStyles.center,
           ]}
@@ -63,7 +63,6 @@ const styles = StyleSheet.create({
   },
   container: {
     flex: 1,
-    height: '100%',
     maxWidth: 270,
     minWidth: 160,
     marginTop: 30,

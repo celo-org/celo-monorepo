@@ -11,3 +11,6 @@ export $(grep -v '^#' $ENV_FILENAME | xargs)
 echo "Building sdk for testnet $DEFAULT_TESTNET"
 yarn build:sdk $DEFAULT_TESTNET
 echo "Done building sdk"
+echo "Jetifying react native libraries"
+cd ../../ && yarn run jetify
+echo "Jetified"

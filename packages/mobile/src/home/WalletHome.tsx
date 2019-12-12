@@ -5,6 +5,7 @@ import colors from '@celo/react-components/styles/colors'
 import fontStyles from '@celo/react-components/styles/fonts'
 import { componentStyles, TOP_BAR_HEIGHT } from '@celo/react-components/styles/styles'
 import variables from '@celo/react-components/styles/variables'
+import * as _ from 'lodash'
 import * as React from 'react'
 import { WithNamespaces, withNamespaces } from 'react-i18next'
 import {
@@ -19,11 +20,10 @@ import {
 import SafeAreaView from 'react-native-safe-area-view'
 import { BoxShadow } from 'react-native-shadow'
 import { connect } from 'react-redux'
-import { bindActionCreators } from 'redux'
 import { hideAlert, showMessage } from 'src/alert/actions'
 import componentWithAnalytics from 'src/analytics/wrapper'
 import { exitBackupFlow } from 'src/app/actions'
-import { ALERT_BANNER_DURATION, SHOW_TESTNET_BANNER } from 'src/config'
+import { ALERT_BANNER_DURATION, DEFAULT_TESTNET, SHOW_TESTNET_BANNER } from 'src/config'
 import { refreshAllBalances, setLoading } from 'src/home/actions'
 import CeloDollarsOverview from 'src/home/CeloDollarsOverview'
 import HeaderButton from 'src/home/HeaderButton'
@@ -39,7 +39,7 @@ import { NumberToRecipient } from 'src/recipients/recipient'
 import { recipientCacheSelector } from 'src/recipients/reducer'
 import { RootState } from 'src/redux/reducers'
 import { isAppConnected } from 'src/redux/selectors'
-import { initializeSentryUserContext } from 'src/sentry/Sentry'
+import { initializeSentryUserContext } from 'src/sentry/actions'
 import DisconnectBanner from 'src/shared/DisconnectBanner'
 import { resetStandbyTransactions } from 'src/transactions/actions'
 import { currentAccountSelector } from 'src/web3/selectors'
@@ -70,22 +70,16 @@ interface DispatchProps {
 
 type Props = StateProps & DispatchProps & WithNamespaces
 
-// Use bindActionCreators to workaround a typescript error with the shorthand syntax with redux-thunk actions
-// see https://github.com/DefinitelyTyped/DefinitelyTyped/issues/37369
-const mapDispatchToProps = (dispatch: any) =>
-  bindActionCreators(
-    {
-      refreshAllBalances,
-      resetStandbyTransactions,
-      initializeSentryUserContext,
-      exitBackupFlow,
-      setLoading,
-      showMessage,
-      hideAlert,
-      importContacts,
-    },
-    dispatch
-  )
+const mapDispatchToProps = {
+  refreshAllBalances,
+  resetStandbyTransactions,
+  initializeSentryUserContext,
+  exitBackupFlow,
+  setLoading,
+  showMessage,
+  hideAlert,
+  importContacts,
+}
 
 const mapStateToProps = (state: RootState): StateProps => ({
   loading: state.home.loading,
@@ -163,7 +157,12 @@ export class WalletHome extends React.Component<Props> {
 
   showTestnetBanner = () => {
     const { t } = this.props
-    this.props.showMessage(t('testnetAlert.1'), ALERT_BANNER_DURATION, null, t('testnetAlert.0'))
+    this.props.showMessage(
+      t('testnetAlert.1', { testnet: _.startCase(DEFAULT_TESTNET) }),
+      ALERT_BANNER_DURATION,
+      null,
+      t('testnetAlert.0', { testnet: _.startCase(DEFAULT_TESTNET) })
+    )
   }
 
   importContactsIfNeeded = () => {
@@ -261,7 +260,7 @@ const styles = StyleSheet.create({
     backgroundColor: colors.background,
     position: 'relative',
   },
-  banner: { paddingVertical: 15 },
+  banner: { paddingVertical: 15, marginTop: 50 },
   containerFeed: {
     paddingBottom: 40,
   },

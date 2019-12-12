@@ -17,6 +17,7 @@ export enum NameSpaces {
   common = 'common',
   about = 'about',
   applications = 'applications',
+  brand = 'brand',
   codeofconduct = 'codeofconduct',
   community = 'community',
   download = 'download',

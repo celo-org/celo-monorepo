@@ -2,7 +2,7 @@ import { getEscrowContract, getStableTokenContract } from '@celo/walletkit'
 import { Escrow } from '@celo/walletkit/lib/types/Escrow'
 import { StableToken } from '@celo/walletkit/types/StableToken'
 import BigNumber from 'bignumber.js'
-import { all, call, put, select, spawn, takeLeading } from 'redux-saga/effects'
+import { all, call, put, select, spawn, take, takeLeading } from 'redux-saga/effects'
 import { showError } from 'src/alert/actions'
 import { ErrorMessages } from 'src/app/ErrorMessages'
 import { ESCROW_PAYMENT_EXPIRY_SECONDS } from 'src/config'
@@ -19,8 +19,8 @@ import {
 import { calculateFee } from 'src/fees/saga'
 import { CURRENCY_ENUM, SHORT_CURRENCIES } from 'src/geth/consts'
 import i18n from 'src/i18n'
-import { Actions as IdentityActions, EndVerificationAction } from 'src/identity/actions'
-import { NUM_ATTESTATIONS_REQUIRED } from 'src/identity/verification'
+import { Actions as IdentityActions, SetVerificationStatusAction } from 'src/identity/actions'
+import { NUM_ATTESTATIONS_REQUIRED, VerificationStatus } from 'src/identity/verification'
 import { Invitees } from 'src/invite/actions'
 import { inviteesSelector } from 'src/invite/reducer'
 import { TEMP_PW } from 'src/invite/saga'
@@ -34,8 +34,9 @@ import { TransactionStatus, TransactionTypes } from 'src/transactions/reducer'
 import { sendAndMonitorTransaction } from 'src/transactions/saga'
 import { sendTransaction } from 'src/transactions/send'
 import Logger from 'src/utils/Logger'
-import { addLocalAccount, isZeroSyncMode, web3 } from 'src/web3/contracts'
+import { addLocalAccount, web3 } from 'src/web3/contracts'
 import { getConnectedAccount, getConnectedUnlockedAccount } from 'src/web3/saga'
+import { zeroSyncSelector } from 'src/web3/selectors'
 
 const TAG = 'escrow/saga'
 
@@ -83,7 +84,7 @@ function* registerStandbyTransaction(id: string, value: string, address: string)
   yield put(
     addStandbyTransaction({
       id,
-      type: TransactionTypes.SENT,
+      type: TransactionTypes.ESCROW_SENT,
       status: TransactionStatus.Pending,
       value,
       symbol: CURRENCY_ENUM.DOLLAR,
@@ -94,12 +95,7 @@ function* registerStandbyTransaction(id: string, value: string, address: string)
   )
 }
 
-function* withdrawFromEscrow(action: EndVerificationAction) {
-  if (!action.success) {
-    Logger.debug(TAG + '@withdrawFromEscrow', 'Skipping withdrawal because verification failed')
-    return
-  }
-
+function* withdrawFromEscrow() {
   try {
     Logger.debug(TAG + '@withdrawFromEscrow', 'Withdrawing escrowed payment')
 
@@ -115,7 +111,8 @@ function* withdrawFromEscrow(action: EndVerificationAction) {
     }
 
     const tempWalletAddress = web3.eth.accounts.privateKeyToAccount(tmpWalletPrivateKey).address
-    if (isZeroSyncMode()) {
+    const zeroSyncMode = yield select(zeroSyncSelector)
+    if (zeroSyncMode) {
       addLocalAccount(web3, tmpWalletPrivateKey)
     }
     Logger.debug(TAG + '@withdrawFromEscrow', 'Added temp account to wallet: ' + tempWalletAddress)
@@ -128,7 +125,7 @@ function* withdrawFromEscrow(action: EndVerificationAction) {
       return
     }
 
-    if (isZeroSyncMode()) {
+    if (zeroSyncMode) {
       Logger.info(
         TAG + '@withdrawFromEscrow',
         'Geth free mode is on, no need to unlock the temporary account'
@@ -176,7 +173,7 @@ export async function getReclaimEscrowGas(account: string, paymentID: string) {
   const tx = await createReclaimTransaction(paymentID)
   const txParams = {
     from: account,
-    gasCurrency: (await getStableTokenContract(web3))._address,
+    feeCurrency: (await getStableTokenContract(web3))._address,
   }
   const gas = new BigNumber(await tx.estimateGas(txParams))
   Logger.debug(`${TAG}/getReclaimEscrowGas`, `Estimated gas of ${gas.toString()}}`)
@@ -252,7 +249,6 @@ function* doFetchSentPayments() {
     for (let i = 0; i < sentPaymentsRaw.length; i++) {
       const id = sentPaymentIDs[i].toLowerCase()
       const recipientPhoneNumber = tempAddresstoRecipientPhoneNumber[id]
-
       const payment = sentPaymentsRaw[i]
       if (!payment) {
         continue
@@ -297,7 +293,12 @@ export function* watchFetchSentPayments() {
 }
 
 export function* watchVerificationEnd() {
-  yield takeLeading(IdentityActions.END_VERIFICATION, withdrawFromEscrow)
+  while (true) {
+    const update: SetVerificationStatusAction = yield take(IdentityActions.SET_VERIFICATION_STATUS)
+    if (update.status === VerificationStatus.Done) {
+      yield call(withdrawFromEscrow)
+    }
+  }
 }
 
 export function* escrowSaga() {

@@ -1,9 +1,9 @@
-import airtableInit, { AirRecord } from '../server/airtable'
-
 import getConfig from 'next/config'
 import { EventProps } from '../fullstack/EventProps'
 import Sentry from '../fullstack/sentry'
-
+import airtableInit, { AirRecord } from '../server/airtable'
+import { abort } from '../src/utils/abortableFetch'
+const TABLE_NAME = 'Community Calendar'
 // Intermediate step Event With all String Values
 interface IncomingEvent {
   link: string // url
@@ -26,7 +26,7 @@ interface State {
 
 // From the airtable sheet column names
 const KEY_CONVERSION = Object.freeze({
-  name: 'Title',
+  name: 'Event Title',
   description: 'Description of Event',
   link: 'Event Link',
   location: 'Location (Format: City, Country)',
@@ -37,7 +37,7 @@ const KEY_CONVERSION = Object.freeze({
 })
 
 export interface RawAirTableEvent {
-  Title: string
+  'Event Title': string
   'Notes / Run Of Show': string
   Photos: object
   Process: 'Complete' | 'Scheduled' | 'In conversation' | 'To organize'
@@ -57,7 +57,10 @@ export interface RawAirTableEvent {
 }
 
 export default async function getFormattedEvents() {
-  const eventData = await fetchEventsFromAirtable()
+  const eventData = await Promise.race([
+    fetchEventsFromAirtable(),
+    abort('Events from Airtable', 1000),
+  ])
   return splitEvents(normalizeEvents(eventData as RawAirTableEvent[]))
 }
 
@@ -81,7 +84,7 @@ function fetchEventsFromAirtable() {
 }
 
 function getAirtable() {
-  return airtableInit(getConfig().serverRuntimeConfig.AIRTABLE_EVENTS_ID)('Schedule')
+  return airtableInit(getConfig().serverRuntimeConfig.AIRTABLE_EVENTS_ID)(TABLE_NAME)
 }
 
 function convertKeys(rawEvent: RawAirTableEvent): IncomingEvent {
