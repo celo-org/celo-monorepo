@@ -28,6 +28,7 @@ import {
   ValidatorsTestContract,
   ValidatorsTestInstance,
 } from 'types'
+import Web3 = require('web3')
 
 const Accounts: AccountsContract = artifacts.require('Accounts')
 const Validators: ValidatorsTestContract = artifacts.require('ValidatorsTest')
@@ -2169,7 +2170,7 @@ contract('Validators', (accounts: string[]) => {
     })
   })
 
-  describe('#forceDeaffiliateIfValidator', async () => {
+  describe('#forceDeaffiliateIfValidator', () => {
     const validator = accounts[0]
     const group = accounts[1]
 
@@ -2179,7 +2180,7 @@ contract('Validators', (accounts: string[]) => {
       await validators.affiliate(group)
     })
 
-    describe('when the sender is one of three approved contract addresses', async () => {
+    describe('when the sender is one of three approved contract addresses', () => {
       beforeEach(async () => {
         await registry.setAddressFor(CeloContractName.DowntimeSlasher, validator)
         await registry.setAddressFor(CeloContractName.DoubleSigningSlasher, accounts[3])
@@ -2212,7 +2213,7 @@ contract('Validators', (accounts: string[]) => {
     })
   })
 
-  describe('#groupMembershipInEpoch', async () => {
+  describe('#groupMembershipInEpoch', () => {
     const validator = accounts[0]
     const groups = accounts.slice(1, -1)
 
@@ -2222,7 +2223,7 @@ contract('Validators', (accounts: string[]) => {
       await registry.setAddressFor(CeloContractName.Governance, accounts[4])
     })
 
-    describe('when the validator is added to different groups sequentially', async () => {
+    describe('when the validator is added to different groups sequentially', () => {
       const epochs = []
       beforeEach(async () => {
         await registerValidator(validator)
@@ -2233,10 +2234,9 @@ contract('Validators', (accounts: string[]) => {
           const blockNumber = await web3.eth.getBlockNumber()
           const epochNumber = Math.floor(blockNumber / EPOCH)
           const blocksUntilNextEpoch = (epochNumber + 1) * EPOCH - blockNumber
-          epochs.push(epochNumber)
-          await mineBlocks(blocksUntilNextEpoch, web3)
+          epochs.push([epochNumber, i !== 4 ? groups[i] : NULL_ADDRESS])
 
-          if (i != 4) {
+          if (i !== 4) {
             await validators.affiliate(groups[i])
             await validators.addFirstMember(validator, NULL_ADDRESS, NULL_ADDRESS, {
               from: groups[i],
@@ -2244,20 +2244,21 @@ contract('Validators', (accounts: string[]) => {
           } else {
             await validators.forceDeaffiliateIfValidator(validator)
           }
+          await mineBlocks(blocksUntilNextEpoch, web3)
         }
       })
 
       it('should always return the correct membership for the given epoch', async () => {
         for (let i = 0; i < membershipHistoryLength.toNumber(); i++) {
           assert.equal(
-            await validators.groupMembershipInEpoch(validator, epochs[i + 1] + 1, 2 + i),
-            i != 3 ? groups[i + 1] : NULL_ADDRESS
+            await validators.groupMembershipInEpoch(validator, epochs[i + 1][0], 2 + i),
+            i !== 3 ? epochs[i + 1][1] : NULL_ADDRESS
           )
         }
       })
     })
 
-    describe('when the validator is added to different groups with gaps in between epochs', async () => {
+    describe('when the validator is added to different groups with gaps in between epochs', () => {
       let epochs = []
 
       beforeEach(async () => {
@@ -2273,14 +2274,14 @@ contract('Validators', (accounts: string[]) => {
           await mineBlocks(blocksUntilNextEpoch, web3)
 
           if (i % 3 === 0) {
-            epochs.push([epochNumber, i != 9 ? groups[i / 3] : NULL_ADDRESS])
-            if (i != 9) {
+            epochs.push([epochNumber, i !== 9 ? groups[i / 3] : NULL_ADDRESS])
+            if (i !== 9) {
               await validators.affiliate(groups[i / 3])
               await validators.addFirstMember(validator, NULL_ADDRESS, NULL_ADDRESS, {
                 from: groups[i / 3],
               })
             } else {
-              await validators.forceDeaffiliateIfValidator(validator)
+              await validators.deaffiliate()
             }
           }
         }
@@ -2290,7 +2291,7 @@ contract('Validators', (accounts: string[]) => {
         for (let i = 0; i < membershipHistoryLength.toNumber(); i++) {
           assert.equal(
             await validators.groupMembershipInEpoch(validator, epochs[i][0] + 1, 1 + i),
-            i != 3 ? groups[i] : NULL_ADDRESS
+            i !== 3 ? epochs[i][1] : NULL_ADDRESS
           )
         }
       })
