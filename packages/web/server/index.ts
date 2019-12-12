@@ -19,7 +19,6 @@ import getFormattedEvents from './EventHelpers'
 import { submitFellowApp } from './FellowshipApp'
 import mailer from './mailer'
 import { getFormattedMediumArticles } from './mediumAPI'
-import { Tables } from 'fullstack/EcoFundFields'
 const port = parseInt(process.env.PORT, 10) || 3000
 
 const dev = process.env.NEXT_DEV === 'true'
