@@ -142,13 +142,13 @@ class CheckBuilder {
 
   isNotAccount = (address: Address) =>
     this.addCheck(
-      `${address} is not an Account`,
+      `${address} is not a registered Account`,
       this.withAccounts((accs) => negate(accs.isAccount(address)))
     )
 
   isSignerOrAccount = () =>
     this.addCheck(
-      `${this.signer!} is Signer or Account`,
+      `${this.signer!} is Signer or registered Account`,
       this.withAccounts(async (accs) => {
         const res = (await accs.isAccount(this.signer!)) || (await accs.isSigner(this.signer!))
         return res
