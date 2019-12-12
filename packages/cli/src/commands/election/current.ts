@@ -1,14 +1,14 @@
 import { cli } from 'cli-ux'
 import { BaseCommand } from '../../base'
+import { validatorTable } from '../validator/list'
 
 export default class ElectionCurrent extends BaseCommand {
-  static description = 'Outputs the currently elected validator set'
+  static description =
+    'Outputs the set of validators currently participating in BFT to create blocks. An election is run to select the validator set at the end of every epoch.'
 
   static flags = {
     ...BaseCommand.flags,
   }
-
-  static examples = ['current']
 
   async run() {
     cli.action.start('Fetching currently elected Validators')
@@ -19,13 +19,6 @@ export default class ElectionCurrent extends BaseCommand {
       signers.map((addr) => validators.getValidatorFromSigner(addr))
     )
     cli.action.stop()
-    cli.table(validatorList, {
-      address: {},
-      name: {},
-      affiliation: {},
-      score: {},
-      ecdsaPublicKey: {},
-      blsPublicKey: {},
-    })
+    cli.table(validatorList, validatorTable)
   }
 }

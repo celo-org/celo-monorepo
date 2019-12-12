@@ -1,12 +1,12 @@
 ---
-description: Manage your full node
+description: Manage your Celo node
 ---
 
 ## Commands
 
 ### Accounts
 
-List node accounts
+List the addresses that this node has the private keys for.
 
 ```
 USAGE

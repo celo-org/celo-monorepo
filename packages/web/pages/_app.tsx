@@ -3,11 +3,12 @@ import getConfig from 'next/config'
 import * as React from 'react'
 import { View } from 'react-native'
 import config from 'react-reveal/globals'
+import scrollIntoView from 'scroll-into-view'
 import { canTrack } from 'src/analytics/analytics'
 import Header from 'src/header/Header.3'
 import { ScreenSizeProvider } from 'src/layout/ScreenSize'
 import Footer from 'src/shared/Footer.3'
-import { scrollTo } from 'src/utils/utils'
+import { HEADER_HEIGHT } from 'src/shared/Styles'
 import Sentry, { initSentry } from '../fullstack/sentry'
 import { appWithTranslation } from '../src/i18n'
 
@@ -17,22 +18,25 @@ class MyApp extends App {
     if (canTrack()) {
       initSentry()
     }
-
     if (window.location.hash) {
-      setTimeout(() => {
-        scrollTo(window.location.hash.slice(1), 'start')
-      }, 200)
+      hashScroller(window.location.hash)
     }
+
+    window.addEventListener('hashchange', () => hashScroller(window.location.hash))
 
     if (getConfig().publicRuntimeConfig.FLAGS.ENV === 'development') {
       checkH1Count()
     }
   }
 
-  // there are a few pages we dont want the header on for artist reasons
-  // currently this is just the animation demo pages
+  // there are a few pages we dont want the header on
+  // currently this is just the animation demo pages and brand kit
   skipHeader() {
-    return this.props.router.asPath.startsWith('/animation')
+    return this.props.router.asPath.startsWith('/animation') || this.isBrand()
+  }
+
+  isBrand = () => {
+    return this.props.router.asPath.startsWith('/experience')
   }
 
   componentDidCatch = (error: Error, info: object) => {
@@ -71,4 +75,10 @@ function checkH1Count() {
       )
     }
   }, 500)
+}
+
+function hashScroller(id: string) {
+  const element = document.getElementById(id.replace('#', ''))
+
+  scrollIntoView(element, { time: 100, align: { top: 0, topOffset: HEADER_HEIGHT + 100 } })
 }

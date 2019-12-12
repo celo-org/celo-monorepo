@@ -642,7 +642,7 @@ contract('Governance', (accounts: string[]) => {
           args: {
             destination,
             functionId: web3.utils.padRight(functionId, 64),
-            threshold: threshold,
+            threshold,
           },
         })
       })
@@ -675,7 +675,7 @@ contract('Governance', (accounts: string[]) => {
           args: {
             destination,
             functionId: web3.utils.padRight(functionId, 64),
-            threshold: threshold,
+            threshold,
           },
         })
       })
@@ -777,7 +777,7 @@ contract('Governance', (accounts: string[]) => {
             proposalId: new BigNumber(1),
             proposer: accounts[0],
             deposit: new BigNumber(minDeposit),
-            timestamp: timestamp,
+            timestamp,
             transactionCount: 0,
           },
         })
@@ -842,7 +842,7 @@ contract('Governance', (accounts: string[]) => {
             proposalId: new BigNumber(1),
             proposer: accounts[0],
             deposit: new BigNumber(minDeposit),
-            timestamp: timestamp,
+            timestamp,
             transactionCount: 1,
           },
         })
@@ -915,7 +915,7 @@ contract('Governance', (accounts: string[]) => {
             proposalId: new BigNumber(1),
             proposer: accounts[0],
             deposit: new BigNumber(minDeposit),
-            timestamp: timestamp,
+            timestamp,
             transactionCount: 2,
           },
         })
@@ -1039,10 +1039,10 @@ contract('Governance', (accounts: string[]) => {
           // @ts-ignore: TODO(mcortesi) fix typings for TransactionDetails
           { value: minDeposit }
         )
-        const otherAccount = accounts[1]
-        await accountsInstance.createAccount({ from: otherAccount })
-        await mockLockedGold.setAccountTotalLockedGold(otherAccount, weight)
-        await governance.upvote(otherProposalId, proposalId, 0, { from: otherAccount })
+        const otherAccount1 = accounts[1]
+        await accountsInstance.createAccount({ from: otherAccount1 })
+        await mockLockedGold.setAccountTotalLockedGold(otherAccount1, weight)
+        await governance.upvote(otherProposalId, proposalId, 0, { from: otherAccount1 })
         await timeTravel(queueExpiry, web3)
       })
 
@@ -1105,11 +1105,11 @@ contract('Governance', (accounts: string[]) => {
     describe('when the previously upvoted proposal is in the queue and expired', () => {
       const upvotedProposalId = 2
       // Expire the upvoted proposal without dequeueing it.
-      const queueExpiry = 60
+      const queueExpiry1 = 60
       beforeEach(async () => {
         await governance.setQueueExpiry(60)
         await governance.upvote(proposalId, 0, 0)
-        await timeTravel(queueExpiry, web3)
+        await timeTravel(queueExpiry1, web3)
         await governance.propose(
           [transactionSuccess1.value],
           [transactionSuccess1.destination],
@@ -1977,6 +1977,8 @@ contract('Governance', (accounts: string[]) => {
     beforeEach(async () => {
       await governance.addValidator(accounts[2])
       await governance.addValidator(accounts[3])
+      await accountsInstance.createAccount({ from: accounts[2] })
+      await accountsInstance.createAccount({ from: accounts[3] })
     })
 
     it('should return false when hotfix has not been whitelisted', async () => {
@@ -2001,6 +2003,7 @@ contract('Governance', (accounts: string[]) => {
   describe('#prepareHotfix()', () => {
     beforeEach(async () => {
       await governance.addValidator(accounts[2])
+      await accountsInstance.createAccount({ from: accounts[2] })
     })
 
     it('should revert when hotfix is not passing', async () => {
@@ -2071,6 +2074,7 @@ contract('Governance', (accounts: string[]) => {
     it('should revert when hotfix prepared but not for current epoch', async () => {
       await governance.approveHotfix(proposalHashStr, { from: approver })
       await governance.addValidator(accounts[2])
+      await accountsInstance.createAccount({ from: accounts[2] })
       await governance.whitelistHotfix(proposalHashStr, { from: accounts[2] })
       await governance.prepareHotfix(proposalHashStr, { from: accounts[2] })
       await mineBlocks(EPOCH, web3)
@@ -2082,6 +2086,7 @@ contract('Governance', (accounts: string[]) => {
         await governance.approveHotfix(proposalHashStr, { from: approver })
         await mineBlocks(EPOCH, web3)
         await governance.addValidator(accounts[2])
+        await accountsInstance.createAccount({ from: accounts[2] })
         await governance.whitelistHotfix(proposalHashStr, { from: accounts[2] })
         await governance.prepareHotfix(proposalHashStr)
       })

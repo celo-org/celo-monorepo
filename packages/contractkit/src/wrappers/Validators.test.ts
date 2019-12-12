@@ -12,7 +12,7 @@ TEST NOTES:
 - In migrations: The only account that has cUSD is accounts[0]
 */
 
-const minLockedGoldValue = Web3.utils.toWei('10', 'ether') // 10 gold
+const minLockedGoldValue = Web3.utils.toWei('10000', 'ether') // 10k gold
 
 const blsPublicKey =
   '0x4fa3f67fc913878b068d1fa1cdddc54913d3bf988dbe5a36a20fa888f20d4894c408a6773f3d7bde11154f2a3076b700d345a42fd25a0e5e83f4db5586ac7979ac2053cd95d8f2efd3e959571ceccaa743e02cf4be3f5d7aaddb0b06fc9aff00'
@@ -48,13 +48,14 @@ testWithGanache('Validators Wrapper', (web3) => {
   }
 
   const setupValidator = async (validatorAccount: string) => {
-    const publicKey = await addressToPublicKey(validatorAccount, web3.eth.sign)
     await registerAccountWithLockedGold(validatorAccount)
-    // set account1 as the validator
+    const ecdsaPublicKey = await addressToPublicKey(validatorAccount, kit.web3.eth.sign)
     await validators
       // @ts-ignore
-      .registerValidator(publicKey, blsPublicKey, blsPoP)
-      .sendAndWaitForReceipt({ from: validatorAccount })
+      .registerValidator(ecdsaPublicKey, blsPublicKey, blsPoP)
+      .sendAndWaitForReceipt({
+        from: validatorAccount,
+      })
   }
 
   test('SBAT registerValidatorGroup', async () => {
@@ -130,6 +131,8 @@ testWithGanache('Validators Wrapper', (web3) => {
     })
 
     test('move last to first', async () => {
+      jest.setTimeout(30 * 1000)
+
       await validators
         .reorderMember(groupAccount, validator2, 0)
         .then((x) => x.sendAndWaitForReceipt({ from: groupAccount }))
@@ -137,10 +140,13 @@ testWithGanache('Validators Wrapper', (web3) => {
       const membersAfter = await validators
         .getValidatorGroup(groupAccount)
         .then((group) => group.members)
+
       expect(membersAfter).toEqual([validator2, validator1])
     })
 
     test('move first to last', async () => {
+      jest.setTimeout(30 * 1000)
+
       await validators
         .reorderMember(groupAccount, validator1, 1)
         .then((x) => x.sendAndWaitForReceipt({ from: groupAccount }))
@@ -148,6 +154,7 @@ testWithGanache('Validators Wrapper', (web3) => {
       const membersAfter = await validators
         .getValidatorGroup(groupAccount)
         .then((group) => group.members)
+
       expect(membersAfter).toEqual([validator2, validator1])
     })
   })

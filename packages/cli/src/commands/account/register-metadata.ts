@@ -4,7 +4,8 @@ import { displaySendTx } from '../../utils/cli'
 import { Flags } from '../../utils/command'
 
 export default class RegisterMetadata extends BaseCommand {
-  static description = 'Register metadata about an address'
+  static description =
+    'Register metadata URL for an account where users will be able to retieve the metadata file and verify your claims'
 
   static flags = {
     ...BaseCommand.flags,
@@ -18,7 +19,9 @@ export default class RegisterMetadata extends BaseCommand {
     }),
   }
 
-  static examples = ['register-metadata --url https://www.celo.org --from 0x0']
+  static examples = [
+    'register-metadata --url https://www.mywebsite.com/celo-metadata --from 0x47e172F6CfB6c7D01C1574fa3E2Be7CC73269D95',
+  ]
 
   async run() {
     const { flags } = this.parse(RegisterMetadata)

@@ -1,13 +1,12 @@
 import { AttestationState } from '@celo/contractkit/lib/wrappers/Attestations'
-import { attestToIdentifier, SignatureUtils } from '@celo/utils'
-import { isValidPrivateKey, toChecksumAddress } from '@celo/utils/lib/address'
+import { AttestationUtils } from '@celo/utils'
 import { AddressType, E164PhoneNumberType } from '@celo/utils/lib/io'
 import Logger from 'bunyan'
-import { isValidAddress } from 'ethereumjs-util'
 import express from 'express'
 import * as t from 'io-ts'
 import { Transaction } from 'sequelize'
 import { existingAttestationRequestRecord, getAttestationTable, kit, sequelize } from '../db'
+import { getAccountAddress, getAttestationSignerAddress } from '../env'
 import { Counters } from '../metrics'
 import { AttestationModel, AttestationStatus } from '../models/attestation'
 import { respondWithError, Response } from '../request'
@@ -27,33 +26,12 @@ export const AttestationRequestType = t.type({
 
 export type AttestationRequest = t.TypeOf<typeof AttestationRequestType>
 
-export function getAttestationKey() {
-  if (
-    process.env.ATTESTATION_KEY === undefined ||
-    !isValidPrivateKey(process.env.ATTESTATION_KEY)
-  ) {
-    console.error('Did not specify valid ATTESTATION_KEY')
-    throw new Error('Did not specify valid ATTESTATION_KEY')
-  }
-
-  return process.env.ATTESTATION_KEY
-}
-
-export function getAccountAddress() {
-  if (process.env.ACCOUNT_ADDRESS === undefined || !isValidAddress(process.env.ACCOUNT_ADDRESS)) {
-    console.error('Did not specify valid ACCOUNT_ADDRESS')
-    throw new Error('Did not specify valid ACCOUNT_ADDRESS')
-  }
-
-  return toChecksumAddress(process.env.ACCOUNT_ADDRESS)
-}
-
 function toBase64(str: string) {
   return Buffer.from(str.slice(2), 'hex').toString('base64')
 }
 
 function createAttestationTextMessage(attestationCode: string) {
-  return `<#> ${toBase64(attestationCode)} ${process.env.APP_SIGNATURE}`
+  return `<#> celo://wallet/v/${toBase64(attestationCode)} ${process.env.APP_SIGNATURE}`
 }
 
 async function ensureLockedRecord(
@@ -141,13 +119,12 @@ class AttestationRequestHandler {
   }
 
   signAttestation() {
-    const signature = attestToIdentifier(
+    const message = AttestationUtils.getAttestationMessageToSignFromIdentifier(
       this.attestationRequest.phoneNumber,
-      this.attestationRequest.account,
-      getAttestationKey()
+      this.attestationRequest.account
     )
 
-    return SignatureUtils.serializeSignature(signature)
+    return kit.web3.eth.sign(message, getAttestationSignerAddress())
   }
 
   async validateAttestation(attestationCode: string) {
@@ -189,6 +166,7 @@ class AttestationRequestHandler {
 
       try {
         await provider.sendSms(this.attestationRequest.phoneNumber, textMessage)
+        this.logger.info('Sent sms')
         Counters.attestationRequestsSentSms.inc()
         await attestationRecord.update(
           { status: AttestationStatus.SENT, smsProvider: provider.type },
@@ -251,7 +229,7 @@ export async function handleAttestationRequest(
     Counters.attestationRequestsTotal.inc()
     await handler.validateAttestationRequest()
     Counters.attestationRequestsValid.inc()
-    attestationCode = handler.signAttestation()
+    attestationCode = await handler.signAttestation()
     await handler.validateAttestation(attestationCode)
   } catch (err) {
     handler.logger.info({ err })

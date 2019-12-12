@@ -166,7 +166,8 @@ contract Attestations is
 
     require(
       state.unselectedRequests[msg.sender].blockNumber == 0 ||
-        isAttestationExpired(state.unselectedRequests[msg.sender].blockNumber),
+        isAttestationExpired(state.unselectedRequests[msg.sender].blockNumber) ||
+        !isAttestationRequestSelectable(state.unselectedRequests[msg.sender].blockNumber),
       "There exists an unexpired, unselected attestation request"
     );
 
@@ -569,7 +570,7 @@ contract Attestations is
 
     while (currentIndex < unselectedRequest.attestationsRequested) {
       seed = keccak256(abi.encodePacked(seed));
-      validator = validatorAddressFromCurrentSet(uint256(seed) % numberValidators);
+      validator = validatorSignerAddressFromCurrentSet(uint256(seed) % numberValidators);
       issuer = getAccounts().validatorSignerToAccount(validator);
       Attestation storage attestation = state.issuedAttestations[issuer];
 
@@ -600,5 +601,13 @@ contract Attestations is
   function isAttestationCompletable(Attestation storage attestation) internal view returns (bool) {
     return (attestation.status == AttestationStatus.Incomplete &&
       !isAttestationExpired(attestation.blockNumber));
+  }
+
+  function isAttestationRequestSelectable(uint256 attestationRequestBlock)
+    internal
+    view
+    returns (bool)
+  {
+    return block.number < attestationRequestBlock.add(getRandom().randomnessBlockRetentionWindow());
   }
 }

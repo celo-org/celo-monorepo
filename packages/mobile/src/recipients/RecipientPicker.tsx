@@ -46,7 +46,8 @@ import { requestContactsPermission } from 'src/utils/permissions'
 import { assertUnreachable } from 'src/utils/typescript'
 
 const RecipientSearchInput = withTextInputPasteAware(
-  withTextInputLabeling<TextInputProps>(TextInput)
+  withTextInputLabeling<TextInputProps>(TextInput),
+  { right: 22 }
 )
 
 const goToQrCodeScreen = () => {

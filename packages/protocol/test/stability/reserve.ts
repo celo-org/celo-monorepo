@@ -6,6 +6,7 @@ import {
   timeTravel,
 } from '@celo/protocol/lib/test-utils'
 import BigNumber from 'bignumber.js'
+import BN = require('bn.js')
 import {
   MockGoldTokenInstance,
   MockSortedOraclesInstance,
@@ -13,7 +14,6 @@ import {
   RegistryInstance,
   ReserveInstance,
 } from 'types'
-import BN = require('bn.js')
 
 const Registry: Truffle.Contract<RegistryInstance> = artifacts.require('Registry')
 const Reserve: Truffle.Contract<ReserveInstance> = artifacts.require('Reserve')
@@ -104,7 +104,7 @@ contract('Reserve', (accounts: string[]) => {
       await assertRevert(reserve.addToken(web3.utils.randomHex(20)))
     })
 
-    describe('when the token has already been added', async () => {
+    describe('when the token has already been added', () => {
       beforeEach(async () => {
         await reserve.addToken(anAddress)
       })
@@ -122,7 +122,7 @@ contract('Reserve', (accounts: string[]) => {
       await assertRevert(reserve.removeToken(anAddress, index))
     })
 
-    describe('when the token has already been added', async () => {
+    describe('when the token has already been added', () => {
       beforeEach(async () => {
         await mockSortedOracles.setMedianRate(anAddress, sortedOraclesDenominator)
         await reserve.addToken(anAddress)

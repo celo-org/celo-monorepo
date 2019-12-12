@@ -15,6 +15,6 @@
     "target": "es5",
     "downlevelIteration": true
   },
-  "exclude": ["test/", "node_modules"],
+  "exclude": ["node_modules"],
   "references": [{ "path": "../utils" }]
 }

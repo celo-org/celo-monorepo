@@ -110,6 +110,8 @@ contract Election is
 
   event ValidatorGroupVoteRevoked(address indexed account, address indexed group, uint256 value);
 
+  event EpochRewardsDistributedToVoters(address indexed group, uint256 value);
+
   /**
    * @notice Initializes critical variables.
    * @param registryAddress The address of the registry contract.
@@ -208,17 +210,20 @@ contract Election is
   {
     require(votes.total.eligible.contains(group));
     require(0 < value);
-    require(canReceiveVotes(group, value));
+    require(canReceiveVotes(group, value), "Unable to receive votes");
     address account = getAccounts().voteSignerToAccount(msg.sender);
 
     // Add group to the groups voted for by the account.
+    bool alreadyVotedForGroup = false;
     address[] storage groups = votes.groupsVotedFor[account];
-    require(groups.length < maxNumGroupsVotedFor);
     for (uint256 i = 0; i < groups.length; i = i.add(1)) {
-      require(groups[i] != group);
+      alreadyVotedForGroup = alreadyVotedForGroup || groups[i] == group;
+    }
+    if (!alreadyVotedForGroup) {
+      require(groups.length < maxNumGroupsVotedFor);
+      groups.push(group);
     }
 
-    groups.push(group);
     incrementPendingVotes(group, account, value);
     incrementTotalVotes(group, value, lesser, greater);
     getLockedGold().decrementNonvotingAccountBalance(account, value);
@@ -241,6 +246,19 @@ contract Election is
     decrementPendingVotes(group, account, value);
     incrementActiveVotes(group, account, value);
     emit ValidatorGroupVoteActivated(account, group, value);
+    return true;
+  }
+
+  /**
+   * @notice Returns whether or not an account's votes for the specified group can be activated.
+   * @param account The account with pending votes.
+   * @param group The validator group that `account` has pending votes for.
+   * @return Whether or not `account` has activatable votes for `group`.
+   * @dev Pending votes cannot be activated until an election has been held.
+   */
+  function hasActivatablePendingVotes(address account, address group) external view returns (bool) {
+    PendingVote storage pendingVote = votes.pending.forGroup[group].byAccount[account];
+    return pendingVote.epoch < getEpochNumber() && pendingVote.value > 0;
   }
 
   /**
@@ -394,21 +412,29 @@ contract Election is
    * @notice Returns the amount of rewards that voters for `group` are due at the end of an epoch.
    * @param group The group to calculate epoch rewards for.
    * @param totalEpochRewards The total amount of rewards going to all voters.
+   * @param uptimes Array of Fixidity representations of the validators' uptimes, between 0 and 1.
    * @return The amount of rewards that voters for `group` are due at the end of an epoch.
    * @dev Eligible groups that have received their maximum number of votes cannot receive more.
    */
-  function getGroupEpochRewards(address group, uint256 totalEpochRewards)
-    external
-    view
-    returns (uint256)
-  {
-    // The group must meet the balance requirements in order for their voters to receive epoch
-    // rewards.
-    if (getValidators().meetsAccountLockedGoldRequirements(group) && votes.active.total > 0) {
-      return totalEpochRewards.mul(votes.active.forGroup[group].total).div(votes.active.total);
-    } else {
+  function getGroupEpochRewards(
+    address group,
+    uint256 totalEpochRewards,
+    uint256[] calldata uptimes
+  ) external view returns (uint256) {
+    // The group must meet the balance requirements for their voters to receive epoch rewards.
+    if (!getValidators().meetsAccountLockedGoldRequirements(group) || votes.active.total <= 0) {
       return 0;
     }
+
+    FixidityLib.Fraction memory votePortion = FixidityLib.newFixedFraction(
+      votes.active.forGroup[group].total,
+      votes.active.total
+    );
+    FixidityLib.Fraction memory score = FixidityLib.wrap(
+      getValidators().calculateGroupEpochScore(uptimes)
+    );
+    return
+      FixidityLib.newFixed(totalEpochRewards).multiply(votePortion).multiply(score).fromFixed();
   }
 
   /**
@@ -443,6 +469,7 @@ contract Election is
 
     votes.active.forGroup[group].total = votes.active.forGroup[group].total.add(value);
     votes.active.total = votes.active.total.add(value);
+    emit EpochRewardsDistributedToVoters(group, value);
   }
 
   /**
@@ -751,8 +778,7 @@ contract Election is
         totalNumMembersElected = totalNumMembersElected.add(1);
       }
     }
-    // Shuffle the validator set using validator-supplied entropy
-    return shuffleArray(electedValidators);
+    return electedValidators;
   }
 
   /**
@@ -789,21 +815,6 @@ contract Election is
   }
 
   /**
-   * @notice Randomly permutes an array of addresses.
-   * @param array The array to permute.
-   * @return The permuted array.
-   */
-  function shuffleArray(address[] memory array) private view returns (address[] memory) {
-    bytes32 r = getRandom().getBlockRandomness(block.number);
-    for (uint256 i = array.length - 1; i > 0; i = i.sub(1)) {
-      uint256 j = uint256(r) % (i + 1);
-      (array[i], array[j]) = (array[j], array[i]);
-      r = keccak256(abi.encodePacked(r));
-    }
-    return array;
-  }
-
-  /**
    * @notice Returns get current validator signers using the precompiles.
    * @return List of current validator signers.
    */
@@ -811,7 +822,7 @@ contract Election is
     uint256 n = numberValidatorsInCurrentSet();
     address[] memory res = new address[](n);
     for (uint256 idx = 0; idx < n; idx++) {
-      res[idx] = validatorAddressFromCurrentSet(idx);
+      res[idx] = validatorSignerAddressFromCurrentSet(idx);
     }
     return res;
   }

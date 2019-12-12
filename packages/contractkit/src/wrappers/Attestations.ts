@@ -1,10 +1,9 @@
-import { PhoneNumberUtils, SignatureUtils } from '@celo/utils'
+import { AttestationUtils, PhoneNumberUtils, SignatureUtils } from '@celo/utils'
 import { concurrentMap, sleep } from '@celo/utils/lib/async'
 import { notEmpty, zip3 } from '@celo/utils/lib/collections'
 import { parseSolidityStringArray } from '@celo/utils/lib/parsing'
 import BigNumber from 'bignumber.js'
 import fetch from 'cross-fetch'
-import * as Web3Utils from 'web3-utils'
 import { Address, CeloContract, NULL_ADDRESS } from '../base'
 import { Attestations } from '../generated/types/Attestations'
 import { ClaimTypes, IdentityMetadataWrapper } from '../identity'
@@ -50,14 +49,17 @@ export interface ActionableAttestation {
   issuer: Address
   blockNumber: number
   attestationServiceURL: string
+  name: string | undefined
 }
 
-function attestationMessageToSign(phoneHash: string, account: Address) {
-  const messageHash: string = Web3Utils.soliditySha3(
-    { type: 'bytes32', value: phoneHash },
-    { type: 'address', value: account }
-  )
-  return messageHash
+type AttestationServiceRunningCheckResult =
+  | { isValid: true; result: ActionableAttestation }
+  | { isValid: false; issuer: Address }
+
+export interface UnselectedRequest {
+  blockNumber: number
+  attestationsRequested: number
+  attestationRequestFeeToken: string
 }
 
 interface GetCompletableAttestationsResponse {
@@ -137,7 +139,7 @@ export class AttestationsWrapper extends BaseWrapper<Attestations> {
     // TODO: Use subscription if provider supports
     while (Date.now() - startTime < timeoutSeconds * 1000) {
       const blockNumber = await this.kit.web3.eth.getBlockNumber()
-      if (blockNumber >= unselectedRequest.blockNumber + waitBlocks) {
+      if (blockNumber >= unselectedRequest.blockNumber + waitBlocks - 1) {
         return
       }
       await sleep(pollDurationSeconds * 1000)
@@ -200,7 +202,7 @@ export class AttestationsWrapper extends BaseWrapper<Attestations> {
   async approveAttestationFee(attestationsRequested: number) {
     const tokenContract = await this.kit.contracts.getContract(CeloContract.StableToken)
     const fee = await this.attestationFeeRequired(attestationsRequested)
-    return tokenContract.approve(this.address, fee.toString())
+    return tokenContract.approve(this.address, fee.toFixed())
   }
 
   /**
@@ -217,33 +219,63 @@ export class AttestationsWrapper extends BaseWrapper<Attestations> {
 
     const result = await this.contract.methods.getCompletableAttestations(phoneHash, account).call()
 
+    const results = await concurrentMap(
+      5,
+      parseGetCompletableAttestations(result),
+      this.isIssuerRunningAttestationService
+    )
+
+    return results.map((_) => (_.isValid ? _.result : null)).filter(notEmpty)
+  }
+
+  /**
+   * Returns an array of issuer addresses that were found to not run the attestation service
+   * @param phoneNumber
+   * @param account
+   */
+  async getNonCompliantIssuers(phoneNumber: string, account: Address): Promise<Address[]> {
+    const phoneHash = PhoneNumberUtils.getPhoneHash(phoneNumber)
+
+    const result = await this.contract.methods.getCompletableAttestations(phoneHash, account).call()
+
     const withAttestationServiceURLs = await concurrentMap(
       5,
       parseGetCompletableAttestations(result),
-      async ({ blockNumber, issuer, metadataURL }) => {
-        try {
-          const metadata = await IdentityMetadataWrapper.fetchFromURL(metadataURL)
-          const attestationServiceURLClaim = metadata.findClaim(ClaimTypes.ATTESTATION_SERVICE_URL)
-
-          if (attestationServiceURLClaim === undefined) {
-            throw new Error(`No attestation service URL registered for ${issuer}`)
-          }
-
-          // TODO: Once we have status indicators, we should check if service is up
-          // https://github.com/celo-org/celo-monorepo/issues/1586
-          return {
-            blockNumber,
-            issuer,
-            attestationServiceURL: attestationServiceURLClaim.url,
-          }
-        } catch (error) {
-          console.error(error)
-          return null
-        }
-      }
+      this.isIssuerRunningAttestationService
     )
 
-    return withAttestationServiceURLs.filter(notEmpty)
+    return withAttestationServiceURLs.map((_) => (_.isValid ? null : _.issuer)).filter(notEmpty)
+  }
+
+  private async isIssuerRunningAttestationService(arg: {
+    blockNumber: number
+    issuer: string
+    metadataURL: string
+  }): Promise<AttestationServiceRunningCheckResult> {
+    try {
+      const metadata = await IdentityMetadataWrapper.fetchFromURL(arg.metadataURL)
+      const attestationServiceURLClaim = metadata.findClaim(ClaimTypes.ATTESTATION_SERVICE_URL)
+
+      if (attestationServiceURLClaim === undefined) {
+        throw new Error(`No attestation service URL registered for ${arg.issuer}`)
+      }
+
+      const nameClaim = metadata.findClaim(ClaimTypes.NAME)
+
+      // TODO: Once we have status indicators, we should check if service is up
+      // https://github.com/celo-org/celo-monorepo/issues/1586
+      return {
+        isValid: true,
+        result: {
+          blockNumber: arg.blockNumber,
+          issuer: arg.issuer,
+          attestationServiceURL: attestationServiceURLClaim.url,
+          name: nameClaim ? nameClaim.name : undefined,
+        },
+      }
+    } catch (error) {
+      return { isValid: false, issuer: arg.issuer }
+    }
   }
 
   /**
@@ -253,10 +285,15 @@ export class AttestationsWrapper extends BaseWrapper<Attestations> {
    * @param issuer The issuer of the attestation
    * @param code The code received by the validator
    */
-  complete(phoneNumber: string, account: Address, issuer: Address, code: string) {
+  async complete(phoneNumber: string, account: Address, issuer: Address, code: string) {
     const phoneHash = PhoneNumberUtils.getPhoneHash(phoneNumber)
-    const expectedSourceMessage = attestationMessageToSign(phoneHash, account)
-    const { r, s, v } = parseSignature(expectedSourceMessage, code, issuer.toLowerCase())
+    const accounts = await this.kit.contracts.getAccounts()
+    const attestationSigner = await accounts.getAttestationSigner(issuer)
+    const expectedSourceMessage = AttestationUtils.getAttestationMessageToSignFromPhoneHash(
+      phoneHash,
+      account
+    )
+    const { r, s, v } = parseSignature(expectedSourceMessage, code, attestationSigner)
     return toTransactionObject(this.kit, this.contract.methods.complete(phoneHash, v, r, s))
   }
 
@@ -267,20 +304,25 @@ export class AttestationsWrapper extends BaseWrapper<Attestations> {
    * @param code The code received by the validator
    * @param issuers The list of potential issuers
    */
-  findMatchingIssuer(
+  async findMatchingIssuer(
     phoneNumber: string,
     account: Address,
     code: string,
     issuers: string[]
-  ): string | null {
+  ): Promise<string | null> {
     const phoneHash = PhoneNumberUtils.getPhoneHash(phoneNumber)
+    const accounts = await this.kit.contracts.getAccounts()
+    const expectedSourceMessage = AttestationUtils.getAttestationMessageToSignFromPhoneHash(
+      phoneHash,
+      account
+    )
     for (const issuer of issuers) {
-      const expectedSourceMessage = attestationMessageToSign(phoneHash, account)
+      const attestationSigner = await accounts.getAttestationSigner(issuer)
+
       try {
-        parseSignature(expectedSourceMessage, code, issuer.toLowerCase())
+        parseSignature(expectedSourceMessage, code, attestationSigner)
         return issuer
       } catch (error) {
-        console.log(error)
         continue
       }
     }
@@ -364,14 +406,13 @@ export class AttestationsWrapper extends BaseWrapper<Attestations> {
   /**
    * Selects the issuers for previously requested attestations for a phone number
    * @param phoneNumber The phone number for which to request attestations for
-   * @param token The token with which to pay for the attestation fee
    */
-  async selectIssuers(phoneNumber: string) {
+  selectIssuers(phoneNumber: string) {
     const phoneHash = PhoneNumberUtils.getPhoneHash(phoneNumber)
     return toTransactionObject(this.kit, this.contract.methods.selectIssuers(phoneHash))
   }
 
-  async revealPhoneNumberToIssuer(
+  revealPhoneNumberToIssuer(
     phoneNumber: string,
     account: Address,
     issuer: Address,
@@ -403,9 +444,14 @@ export class AttestationsWrapper extends BaseWrapper<Attestations> {
     issuer: Address,
     code: string
   ) {
+    const accounts = await this.kit.contracts.getAccounts()
+    const attestationSigner = await accounts.getAttestationSigner(issuer)
     const phoneHash = PhoneNumberUtils.getPhoneHash(phoneNumber)
-    const expectedSourceMessage = attestationMessageToSign(phoneHash, account)
-    const { r, s, v } = parseSignature(expectedSourceMessage, code, issuer.toLowerCase())
+    const expectedSourceMessage = AttestationUtils.getAttestationMessageToSignFromPhoneHash(
+      phoneHash,
+      account
+    )
+    const { r, s, v } = parseSignature(expectedSourceMessage, code, attestationSigner)
     const result = await this.contract.methods
       .validateAttestationCode(phoneHash, account, v, r, s)
       .call()

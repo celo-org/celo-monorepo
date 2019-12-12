@@ -4,7 +4,8 @@ import { displaySendTx } from '../../utils/cli'
 import { Flags } from '../../utils/command'
 
 export default class ValidatorUpdateBlsPublicKey extends BaseCommand {
-  static description = 'Update BLS key for a validator'
+  static description =
+    'Update the BLS public key for a Validator to be used in consensus. Regular (ECDSA and BLS) key rotation is recommended for Validator operational security.'
 
   static flags = {
     ...BaseCommand.flags,
