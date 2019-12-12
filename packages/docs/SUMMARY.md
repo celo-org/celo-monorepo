@@ -19,7 +19,7 @@
 - [Celo Protocol](celo-codebase/protocol/README.md)
   - [Consensus](celo-codebase/protocol/consensus/README.md)
     - [Validator Set Differences](celo-codebase/protocol/consensus/validator-set-differences.md)
-    - [Locating Validators](celo-codebase/protocol/consensus/locating-validators.md)
+    - [Locating Nodes](celo-codebase/protocol/consensus/locating-nodes.md)
     - [Ultralight Sync](celo-codebase/protocol/consensus/ultralight-sync.md)
   - [Proof of Stake](celo-codebase/protocol/proof-of-stake/README.md)
     - [Validator Groups](celo-codebase/protocol/proof-of-stake/validator-groups.md)
