@@ -96,8 +96,10 @@ export class ElectionWrapper extends BaseWrapper<Election> {
    */
   async getTotalVotesForGroup(group: Address, blockNumber?: number): Promise<BigNumber> {
     const votes = blockNumber
-      ? // @ts-ignore: Expected 0-1 arguments, but got 2
-        await this.contract.methods.getTotalVotesForGroup(group).call({}, blockNumber)
+      ? await this.contract.methods
+          .getTotalVotesForGroup(group)
+          // @ts-ignore: Expected 0-1 arguments, but got 2
+          .call({}, blockNumber)
       : await this.contract.methods.getTotalVotesForGroup(group).call()
     return toBigNumber(votes)
   }
