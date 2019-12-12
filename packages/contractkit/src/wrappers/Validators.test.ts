@@ -131,6 +131,8 @@ testWithGanache('Validators Wrapper', (web3) => {
     })
 
     test('move last to first', async () => {
+      jest.setTimeout(30 * 1000)
+
       await validators
         .reorderMember(groupAccount, validator2, 0)
         .then((x) => x.sendAndWaitForReceipt({ from: groupAccount }))
@@ -138,10 +140,13 @@ testWithGanache('Validators Wrapper', (web3) => {
       const membersAfter = await validators
         .getValidatorGroup(groupAccount)
         .then((group) => group.members)
+
       expect(membersAfter).toEqual([validator2, validator1])
     })
 
     test('move first to last', async () => {
+      jest.setTimeout(30 * 1000)
+
       await validators
         .reorderMember(groupAccount, validator1, 1)
         .then((x) => x.sendAndWaitForReceipt({ from: groupAccount }))
@@ -149,6 +154,7 @@ testWithGanache('Validators Wrapper', (web3) => {
       const membersAfter = await validators
         .getValidatorGroup(groupAccount)
         .then((group) => group.members)
+
       expect(membersAfter).toEqual([validator2, validator1])
     })
   })

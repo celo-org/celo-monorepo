@@ -236,7 +236,7 @@ contract('StableToken', (accounts: string[]) => {
       assertLogMatches2(res.logs[0], {
         event: 'InflationFactorUpdated',
         args: {
-          factor: factor,
+          factor,
           lastUpdated,
         },
       })
