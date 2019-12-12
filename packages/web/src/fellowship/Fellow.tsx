@@ -1,9 +1,9 @@
 import * as React from 'react'
 import { Image, ImageSourcePropType, StyleSheet, Text, View } from 'react-native'
 import { H4 } from 'src/fonts/Fonts'
+import { ScreenProps, withScreenSize } from 'src/layout/ScreenSize'
 import AspectRatio from 'src/shared/AspectRatio'
 import { colors, fonts, standardStyles } from 'src/styles'
-import { withScreenSize, ScreenProps } from 'src/layout/ScreenSize'
 
 interface FellowProps {
   image: ImageSourcePropType

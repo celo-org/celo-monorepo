@@ -1,12 +1,12 @@
-import { StyleSheet, View } from 'react-native'
 import * as React from 'react'
+import { StyleSheet, View } from 'react-native'
 import QuarterCircle from 'src/community/connect/QuarterCircle'
 import { H2 } from 'src/fonts/Fonts'
 import { I18nProps, NameSpaces, withNamespaces } from 'src/i18n'
 import { Cell, GridRow, Spans } from 'src/layout/GridRow'
+import { ScreenProps, withScreenSize } from 'src/layout/ScreenSize'
 import Button, { BTN, SIZE } from 'src/shared/Button.3'
 import { colors, standardStyles, textStyles } from 'src/styles'
-import { withScreenSize, ScreenProps } from 'src/layout/ScreenSize'
 
 function FellowCover({ t, isMobile }: I18nProps & ScreenProps) {
   return (

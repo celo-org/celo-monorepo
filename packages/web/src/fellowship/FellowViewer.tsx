@@ -2,10 +2,10 @@ import * as React from 'react'
 import { View } from 'react-native'
 import Fade from 'react-reveal/Fade'
 import Fellow from 'src/fellowship/Fellow'
+import { I18nProps, NameSpaces, withNamespaces } from 'src/i18n'
+import BookLayout from 'src/layout/BookLayout'
 import { ScreenProps, withScreenSize } from 'src/layout/ScreenSize'
 import Button, { BTN } from 'src/shared/Button.3'
-import BookLayout from 'src/layout/BookLayout'
-import { withNamespaces, NameSpaces, I18nProps } from 'src/i18n'
 
 const fellows = [
   {

@@ -3,9 +3,9 @@ import Sweep from 'src/community/connect/Sweep'
 import { H2 } from 'src/fonts/Fonts'
 import { I18nProps, NameSpaces, withNamespaces } from 'src/i18n'
 import { Cell, GridRow, Spans } from 'src/layout/GridRow'
+import { ScreenProps, ScreenSizes, withScreenSize } from 'src/layout/ScreenSize'
 import Button, { BTN, SIZE } from 'src/shared/Button.3'
 import { colors, standardStyles, textStyles } from 'src/styles'
-import { withScreenSize, ScreenProps, ScreenSizes } from 'src/layout/ScreenSize'
 
 function EcoCover({ t, screen }: I18nProps & ScreenProps) {
   const isMobile = screen === ScreenSizes.MOBILE

@@ -5,9 +5,9 @@ import Events from 'src/events/Events'
 import { getEvents } from 'src/events/EventsData'
 import OpenGraph from 'src/header/OpenGraph'
 import { NameSpaces } from 'src/i18n'
-import { standardStyles } from 'src/styles'
-import menuItems from 'src/shared/menu-items'
 import ConnectionFooter from 'src/shared/ConnectionFooter'
+import menuItems from 'src/shared/menu-items'
+import { standardStyles } from 'src/styles'
 
 const preview = require('src/community/connect/preview.jpg')
 

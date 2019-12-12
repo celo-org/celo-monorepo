@@ -3,9 +3,9 @@ import CoverAction from 'src/dev/CoverAction'
 import { H1, H3 } from 'src/fonts/Fonts'
 import { I18nProps, NameSpaces, withNamespaces } from 'src/i18n'
 import { Cell, GridRow, Spans } from 'src/layout/GridRow'
-import { CeloLinks } from 'src/shared/menu-items'
+import { ScreenProps, withScreenSize } from 'src/layout/ScreenSize'
+import menuItems from 'src/shared/menu-items'
 import { colors, standardStyles, textStyles } from 'src/styles'
-import { withScreenSize, ScreenProps } from 'src/layout/ScreenSize'
 
 function Contribute({ t, isMobile }: I18nProps & ScreenProps) {
   return (
@@ -33,10 +33,10 @@ function Contribute({ t, isMobile }: I18nProps & ScreenProps) {
           <CoverAction
             containerStyle={styles.actionArea}
             title={t('contribute.codeTitle')}
-            graphic={require('src/dev/SDK.png')}
+            graphic={require('src/community/EcosystemFund.png')}
             isMobile={isMobile}
             text={t('contribute.codeText')}
-            link={{ text: t('contribute.codeLink'), href: CeloLinks.faucet }}
+            link={{ text: t('contribute.codeLink'), href: menuItems.BUILD.link }}
           />
         </Cell>
         <Cell span={Spans.third}>
@@ -46,7 +46,7 @@ function Contribute({ t, isMobile }: I18nProps & ScreenProps) {
             graphic={require('src/community/EcosystemFund.png')}
             isMobile={isMobile}
             text={t('contribute.fundText')}
-            link={{ text: t('contribute.fundLink'), href: CeloLinks.faucet }}
+            link={{ text: t('contribute.fundLink'), href: menuItems.ECOSYSTEM.link }}
           />
         </Cell>
         <Cell span={Spans.third}>
@@ -56,7 +56,7 @@ function Contribute({ t, isMobile }: I18nProps & ScreenProps) {
             graphic={require('src/community/Fellowship.png')}
             isMobile={isMobile}
             text={t('contribute.fellowText')}
-            link={{ text: t('contribute.fellowLink'), href: CeloLinks.faucet }}
+            link={{ text: t('contribute.fellowLink'), href: menuItems.FELLOWSHIP.link }}
           />
         </Cell>
       </GridRow>

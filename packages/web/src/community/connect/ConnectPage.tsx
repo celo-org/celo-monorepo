@@ -6,9 +6,9 @@ import Tenets from 'src/community/connect/Tenets'
 import EventData from 'src/events/EventsData'
 import OpenGraph from 'src/header/OpenGraph'
 import { I18nProps, NameSpaces, withNamespaces } from 'src/i18n'
+import ConnectionFooter from 'src/shared/ConnectionFooter'
 import { hashNav } from 'src/shared/menu-items'
 import ArticleData from './ArticleData'
-import ConnectionFooter from 'src/shared/ConnectionFooter'
 
 const preview = require('src/community/connect/preview.jpg')
 

@@ -1,12 +1,12 @@
 import * as React from 'react'
-import { View, Text } from 'react-native'
+import { Text, View } from 'react-native'
 import FellowCover from 'src/fellowship/FellowCover'
-import { HEADER_HEIGHT } from 'src/shared/Styles'
-import BookLayout from 'src/layout/BookLayout'
-import { I18nProps, withNamespaces, NameSpaces } from 'src/i18n'
 import FellowshipForm from 'src/fellowship/FellowshipForm'
 import FellowViewer from 'src/fellowship/FellowViewer'
+import { I18nProps, NameSpaces, withNamespaces } from 'src/i18n'
+import BookLayout from 'src/layout/BookLayout'
 import ConnectionFooter from 'src/shared/ConnectionFooter'
+import { HEADER_HEIGHT } from 'src/shared/Styles'
 
 function FellowshipPage({ t }: I18nProps) {
   return (
