@@ -1,3 +1,4 @@
+import { waitForPortOpen } from '@celo/dev-utils/lib/network'
 import { consoleLogger } from '@celo/utils/lib/logger'
 import BigNumber from 'bignumber.js'
 import { assert } from 'chai'
