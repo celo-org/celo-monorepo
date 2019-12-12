@@ -15,7 +15,6 @@ USAGE
 OPTIONS
   --from=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) Address of the sender
   --to=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d    (required) Address of the receiver
-  --[no-]truncate                                    Truncate fields to fit line
   --value=value                                      (required) Amount to transfer (in wei)
 
 EXAMPLE
@@ -36,7 +35,6 @@ USAGE
 OPTIONS
   --from=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) Address of the sender
   --to=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d    (required) Address of the receiver
-  --[no-]truncate                                    Truncate fields to fit line
   --value=value                                      (required) Amount to transfer (in wei)
 
 EXAMPLE

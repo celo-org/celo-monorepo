@@ -15,6 +15,7 @@ export abstract class LocalCommand extends Command {
     truncate: flags.boolean({
       default: true,
       required: false,
+      hidden: true,
       allowNo: true,
       description: 'Truncate fields to fit line',
     }),
