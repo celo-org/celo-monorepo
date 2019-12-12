@@ -72,13 +72,12 @@ mv nodekey geth/nodekey
 ```bash
 # On your validator machine
 cd celo-validator-node
-rm -rf geth* && rm static-nodes.json
+rm -rf geth*
 ```
 
 ```bash
 # On your Attestation machine
 cd celo-attestations-node
-cd celo-accounts-node
 rm -rf geth* && rm static-nodes.json
 ```
 
@@ -93,6 +92,12 @@ First, pull the Celo image as described [here](running-a-validator.md#pull-the-c
 export CELO_IMAGE=us.gcr.io/celo-testnet/celo-node:baklava
 export NETWORK_ID=121119
 docker pull $CELO_IMAGE
+```
+
+```bash
+# On your attestation machine
+export CELO_IMAGE_ATTESTATION=us.gcr.io/celo-testnet/celo-monorepo:attestation-service-baklava
+docker pull $CELO_IMAGE_ATTESTATION
 ```
 
 ### Restart your Accounts node
@@ -127,7 +132,7 @@ Next, follow [these instructions](running-a-validator.md#connect-the-validator-t
 
 ### Restart your Attestation node and service
 
-Follow [these instructions](running-a-validator.md#running-the-attestation-service) to restart your Attestation node and service on your Attestation machine. Remember you do not have to create another account/proof-of-posession if you still have your keys.
+Follow [these instructions](running-a-validator.md#running-the-attestation-service) to restart your Attestation node and service on your Attestation machine.
 
 ### Re-register your Validator
 
@@ -147,6 +152,8 @@ echo CELO_VALIDATOR_SIGNER_PUBLIC_KEY=$CELO_VALIDATOR_SIGNER_PUBLIC_KEY
 echo CELO_VALIDATOR_SIGNER_SIGNATURE=$CELO_VALIDATOR_SIGNER_SIGNATURE
 echo CELO_VALIDATOR_SIGNER_BLS_PUBLIC_KEY=$CELO_VALIDATOR_SIGNER_BLS_PUBLIC_KEY
 echo CELO_VALIDATOR_SIGNER_BLS_SIGNATURE=$CELO_VALIDATOR_SIGNER_BLS_SIGNATURE
+echo CELO_ATTESTATION_SIGNER_ADDRESS=$CELO_ATTESTATION_SIGNER_ADDRESS
+echo CELO_ATTESTATION_SIGNER_SIGNATURE=$CELO_ATTESTATION_SIGNER_SIGNATURE
 ```
 
 If any of the environment variables are missing, you have two options:
@@ -163,6 +170,6 @@ First, make sure you have the latest version of the celocli.
 npm uninstall -g @celo/celocli && npm install -g @celo/celocli
 ```
 
-At this point you should be able to continue the steps described in the [Running a Validator](running-a-validator.md) documentation page, starting at the [Register the Accounts](running-a-validator.md#register-the-accounts) section.
+At this point you should be able to continue the steps described in the [Running a Validator](running-a-validator.md) documentation page, starting at the [Register the Accounts](running-a-validator.md#register-the-accounts) section. Also remember to [register your Metadata](running-a-validator.md#registering-metadata) to be able to serve attestations and claim all your funds for the leaderboard.
 
 Note that if you were fauceted in phase 1.0 of The Great Celo Stakeoff, your accounts should have been included in the genesis block for subsequent phases, so you will not need to be fauceted again.
