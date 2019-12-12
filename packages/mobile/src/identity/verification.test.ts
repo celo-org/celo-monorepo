@@ -1,4 +1,4 @@
-import { AttestationState, getAttestationsContract, getStableTokenContract } from '@celo/walletkit'
+import { ActionableAttestation } from '@celo/contractkit/lib/wrappers/Attestations'
 import { expectSaga } from 'redux-saga-test-plan'
 import * as matchers from 'redux-saga-test-plan/matchers'
 import { throwError } from 'redux-saga-test-plan/providers'
@@ -9,7 +9,11 @@ import CeloAnalytics from 'src/analytics/CeloAnalytics'
 import { CustomEventNames, DefaultEventNames } from 'src/analytics/constants'
 import { setNumberVerified } from 'src/app/actions'
 import { ErrorMessages } from 'src/app/ErrorMessages'
-import { cancelVerification, completeAttestationCode, endVerification } from 'src/identity/actions'
+import {
+  cancelVerification,
+  completeAttestationCode,
+  setVerificationStatus,
+} from 'src/identity/actions'
 import { attestationCodesSelector } from 'src/identity/reducer'
 import {
   AttestationCode,
@@ -17,24 +21,23 @@ import {
   requestAndRetrieveAttestations,
   startVerification,
   VERIFICATION_TIMEOUT,
+  VerificationStatus,
 } from 'src/identity/verification'
-import { web3 } from 'src/web3/contracts'
+import { contractKit } from 'src/web3/contracts'
 import { getConnectedAccount, getConnectedUnlockedAccount } from 'src/web3/saga'
 import { privateCommentKeySelector } from 'src/web3/selectors'
-import { createMockContract, sleep } from 'test/utils'
-import {
-  mockAccount,
-  mockAccount2,
-  mockE164Number,
-  mockPrivateDEK,
-  mockPublicDEK,
-} from 'test/values'
+import { sleep } from 'test/utils'
+import { mockAccount, mockE164Number, mockPrivateDEK, mockPublicDEK } from 'test/values'
 
 const MockedAnalytics = CeloAnalytics as any
 
 jest.mock('src/transactions/send', () => ({
   sendTransaction: jest.fn(),
-  sendTransactionPromises: jest.fn(() => ({ confirmation: true, transactionHash: true })),
+  sendTransactionPromises: jest.fn(() => ({
+    confirmation: true,
+    transactionHash: true,
+    receipt: true,
+  })),
 }))
 
 jest.mock('@celo/react-native-sms-retriever', () => ({
@@ -43,10 +46,22 @@ jest.mock('@celo/react-native-sms-retriever', () => ({
   removeSmsListener: jest.fn(),
 }))
 
-jest.mock('@celo/utils', () => ({
-  ...jest.requireActual('@celo/utils'),
-  ECIES: { Encrypt: jest.fn(() => Buffer.from('0', 'hex')) },
-  SignatureUtils: { parseSignature: jest.fn(() => ({ r: 'r', s: 's', v: 'v' })) },
+jest.mock('@celo/utils', () => {
+  const mockParseSig = jest.fn(() => ({ r: 'r', s: 's', v: 'v' }))
+  return {
+    ...jest.requireActual('@celo/utils'),
+    ECIES: { Encrypt: jest.fn(() => Buffer.from('0', 'hex')) },
+    SignatureUtils: { parseSignature: mockParseSig, parseSignatureWithoutPrefix: mockParseSig },
+  }
+})
+
+jest.mock('src/web3/contracts', () => ({
+  contractKit: {
+    contracts: {
+      getAttestations: jest.fn(),
+      getAccounts: jest.fn(),
+    },
+  },
 }))
 
 const attestationCode0: AttestationCode = {
@@ -69,37 +84,59 @@ const attestationCode2: AttestationCode = {
 
 const attestationCodes = [attestationCode0, attestationCode1, attestationCode2]
 
-const stubUserVerified = {
-  getAttestationStats: [3, 3],
+const mockContractKitTxObject = { txo: {} }
+
+const mockActionableAttestations: ActionableAttestation[] = [
+  {
+    issuer: attestationCode0.issuer,
+    blockNumber: 100,
+    attestationServiceURL: 'https://fake.celo.org/0',
+    name: '',
+  },
+  {
+    issuer: attestationCode1.issuer,
+    blockNumber: 110,
+    attestationServiceURL: 'https://fake.celo.org/1',
+    name: '',
+  },
+  {
+    issuer: attestationCode2.issuer,
+    blockNumber: 120,
+    attestationServiceURL: 'https://fake.celo.org/2',
+    name: '',
+  },
+]
+
+const mockAttestationsWrapperVerified = {
+  getAttestationStat: jest.fn(() => ({ completed: 3, total: 3 })),
 }
 
-const stubUserUnverified = {
-  request: null,
-  reveal: null,
-  getAttestationRequestFee: Math.pow(10, 18),
-  getAttestationStats: [0, 0],
-  attestationExpirySeconds: '86400', // 1 day
-  getAttestationIssuers: [
-    attestationCode0.issuer,
-    attestationCode1.issuer,
-    attestationCode2.issuer,
-  ],
-  getAttestationState: [AttestationState.Incomplete, Date.now()],
-  getWalletAddress: mockAccount2,
-  getDataEncryptionKey: mockPublicDEK,
-  setAccount: null,
-  validateAttestationCode: true,
-  complete: null,
+const mockAttestationsWrapperUnverified = {
+  getAttestationStat: jest.fn(() => ({ completed: 0, total: 0 })),
+  getActionableAttestations: jest
+    .fn()
+    .mockImplementationOnce(() => [])
+    .mockImplementationOnce(() => mockActionableAttestations),
+  getUnselectedRequest: jest.fn(() => ({ blockNumber: 0 })),
+  approveAttestationFee: jest.fn(() => mockContractKitTxObject),
+  request: jest.fn(() => mockContractKitTxObject),
+  waitForSelectingIssuers: jest.fn(),
+  selectIssuers: jest.fn(() => mockContractKitTxObject),
+  findMatchingIssuer: jest.fn(() => 'mockIssuer'),
+  validateAttestationCode: jest.fn(() => true),
+  revealPhoneNumberToIssuer: jest.fn(() => ({ ok: true })),
+  complete: jest.fn(() => mockContractKitTxObject),
 }
 
-const stubUserPartlyVerified = {
-  ...stubUserUnverified,
-  getAttestationIssuers: [attestationCode0.issuer],
-  getAttestationStats: [2, 3],
+const mockAttestationsWrapperPartlyVerified = {
+  ...mockAttestationsWrapperUnverified,
+  getAttestationStat: jest.fn(() => ({ completed: 2, total: 3 })),
+  getActionableAttestations: jest.fn(() => mockActionableAttestations),
 }
 
-const stableTokenStub = {
-  approve: null,
+const mockAccountsWrapper = {
+  getWalletAddress: jest.fn(() => mockAccount),
+  getDataEncryptionKey: jest.fn(() => [mockPublicDEK]),
 }
 
 describe('Start Verification Saga', () => {
@@ -141,13 +178,15 @@ describe('Start Verification Saga', () => {
 
 describe('Do Verification Saga', () => {
   it('succeeds for unverified users', async () => {
-    const attestationContract = createMockContract(stubUserUnverified)
     await expectSaga(doVerificationFlow)
       .provide([
         [call(getConnectedUnlockedAccount), mockAccount],
         [select(privateCommentKeySelector), mockPrivateDEK.toString('hex')],
-        [call(getAttestationsContract, web3), attestationContract],
-        [call(getStableTokenContract, web3), createMockContract(stableTokenStub)],
+        [
+          call([contractKit.contracts, contractKit.contracts.getAttestations]),
+          mockAttestationsWrapperUnverified,
+        ],
+        [call([contractKit.contracts, contractKit.contracts.getAccounts]), mockAccountsWrapper],
         [select(e164NumberSelector), mockE164Number],
         [select(attestationCodesSelector), attestationCodes],
         [select(attestationCodesSelector), attestationCodes],
@@ -156,59 +195,63 @@ describe('Do Verification Saga', () => {
       .put(completeAttestationCode())
       .put(completeAttestationCode())
       .put(completeAttestationCode())
-      .put(endVerification())
+      .put(setVerificationStatus(VerificationStatus.Done))
       .put(setNumberVerified(true))
       .returns(true)
       .run()
   })
 
   it('succeeds for partly verified users', async () => {
-    const attestationContract = createMockContract(stubUserPartlyVerified)
     await expectSaga(doVerificationFlow)
       .provide([
         [call(getConnectedUnlockedAccount), mockAccount],
         [select(privateCommentKeySelector), mockPrivateDEK.toString('hex')],
-        [call(getAttestationsContract, web3), attestationContract],
-        [call(getStableTokenContract, web3), createMockContract(stableTokenStub)],
+        [
+          call([contractKit.contracts, contractKit.contracts.getAttestations]),
+          mockAttestationsWrapperPartlyVerified,
+        ],
+        [call([contractKit.contracts, contractKit.contracts.getAccounts]), mockAccountsWrapper],
         [select(e164NumberSelector), mockE164Number],
         [select(attestationCodesSelector), attestationCodes],
       ])
       .put(completeAttestationCode())
-      .put(endVerification())
+      .put(setVerificationStatus(VerificationStatus.Done))
       .put(setNumberVerified(true))
       .returns(true)
       .run()
   })
 
   it('succeeds for verified users', async () => {
-    const attestationContract = createMockContract(stubUserVerified)
     await expectSaga(doVerificationFlow)
       .provide([
         [call(getConnectedUnlockedAccount), mockAccount],
         [select(privateCommentKeySelector), mockPrivateDEK.toString('hex')],
-        [call(getAttestationsContract, web3), attestationContract],
-        [call(getStableTokenContract, web3), createMockContract({})],
+        [
+          call([contractKit.contracts, contractKit.contracts.getAttestations]),
+          mockAttestationsWrapperVerified,
+        ],
         [select(e164NumberSelector), mockE164Number],
       ])
-      .put(endVerification())
+      .put(setVerificationStatus(VerificationStatus.Done))
       .put(setNumberVerified(true))
       .returns(true)
       .run()
   })
 
   it('shows errors on failure', async () => {
-    const attestationContract = createMockContract(stubUserUnverified)
     await expectSaga(doVerificationFlow)
       .provide([
         [call(getConnectedUnlockedAccount), mockAccount],
         [select(privateCommentKeySelector), mockPrivateDEK.toString('hex')],
-        [call(getAttestationsContract, web3), attestationContract],
-        [call(getStableTokenContract, web3), createMockContract({})],
+        [
+          call([contractKit.contracts, contractKit.contracts.getAttestations]),
+          mockAttestationsWrapperUnverified,
+        ],
         [select(e164NumberSelector), mockE164Number],
         [matchers.call.fn(requestAndRetrieveAttestations), throwError(new Error('fake error'))],
       ])
       .put(showError(ErrorMessages.VERIFICATION_FAILURE))
-      .put(endVerification(false))
+      .put(setVerificationStatus(VerificationStatus.Failed))
       .returns(false)
       .run()
   })

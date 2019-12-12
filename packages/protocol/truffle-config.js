@@ -9,6 +9,8 @@ const argv = require('minimist')(process.argv.slice(2), { string: ['truffle_over
 
 const SOLC_VERSION = '0.5.8'
 const ALFAJORES_NETWORKID = 44785
+const BAKLAVA_NETWORKID = 76172
+const BAKLAVASTAGING_NETWORKID = 31416
 
 const OG_FROM = '0xfeE1a22F43BeeCB912B5a4912ba87527682ef0fC'
 const DEVELOPMENT_FROM = '0x5409ed021d9299bf6814279a6a1411a7e866a631'
@@ -41,7 +43,7 @@ const networks = {
     from: DEVELOPMENT_FROM,
     gasPrice: 0,
     gas: gasLimit,
-    defaultBalance: 1000000,
+    defaultBalance: 200000000,
     mnemonic: 'concert load couple harbor equip island argue ramp clarify fence smart topic',
   },
   coverage: {
@@ -133,6 +135,14 @@ const networks = {
     ...defaultConfig,
     from: PILOTSTAGING_FROM,
   },
+  baklava: {
+    ...defaultConfig,
+    network_id: BAKLAVA_NETWORKID,
+  },
+  baklavastaging: {
+    ...defaultConfig,
+    network_id: BAKLAVASTAGING_NETWORKID,
+  },
 }
 // If an override was provided, apply it.
 // If the network is missing from networks, start with the default config.
@@ -146,7 +156,7 @@ if (argv.truffle_override || !(argv.network in networks)) {
 }
 
 module.exports = {
-  plugins: ['truffle-security'],
+  plugins: ['truffle-security', 'truffle-plugin-blockscout-verify'],
   compilers: {
     solc: {
       version: SOLC_VERSION,
@@ -162,7 +172,7 @@ if (process.argv.includes('--gas')) {
         version: '0.5.8',
       },
     },
-    plugins: ['truffle-security'],
+    plugins: ['truffle-security', 'truffle-plugin-blockscout-verify'],
     networks,
     reporter: 'eth-gas-reporter',
     reporterOptions: {

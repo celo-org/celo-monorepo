@@ -14,11 +14,12 @@ contract BlockchainParameters is Ownable, Initializable {
   }
 
   ClientVersion private minimumClientVersion;
-
-  uint256 public intrinsicGasForAlternativeGasCurrency;
+  uint256 public blockGasLimit;
+  uint256 public intrinsicGasForAlternativeFeeCurrency;
 
   event MinimumClientVersionSet(uint256 major, uint256 minor, uint256 patch);
-  event IntrinsicGasForAlternativeGasCurrencySet(uint256 gas);
+  event IntrinsicGasForAlternativeFeeCurrencySet(uint256 gas);
+  event BlockGasLimitSet(uint256 limit);
 
   /**
    * @notice Initializes critical variables.
@@ -28,14 +29,20 @@ contract BlockchainParameters is Ownable, Initializable {
    * minor version.
    * @param patch Minimum client version that can be used in the chain,
    * patch level.
+   * @param _gasForNonGoldCurrencies Intrinsic gas for non-gold gas currencies.
+   * @param gasLimit Block gas limit.
    */
-  function initialize(uint256 major, uint256 minor, uint256 patch, uint256 _gasForNonGoldCurrencies)
-    external
-    initializer
-  {
+  function initialize(
+    uint256 major,
+    uint256 minor,
+    uint256 patch,
+    uint256 _gasForNonGoldCurrencies,
+    uint256 gasLimit
+  ) external initializer {
     _transferOwnership(msg.sender);
     setMinimumClientVersion(major, minor, patch);
-    setIntrinsicGasForAlternativeGasCurrency(_gasForNonGoldCurrencies);
+    setBlockGasLimit(gasLimit);
+    setIntrinsicGasForAlternativeFeeCurrency(_gasForNonGoldCurrencies);
   }
 
   /**
@@ -53,12 +60,26 @@ contract BlockchainParameters is Ownable, Initializable {
     emit MinimumClientVersionSet(major, minor, patch);
   }
 
-  function setIntrinsicGasForAlternativeGasCurrency(uint256 gas) public onlyOwner {
-    intrinsicGasForAlternativeGasCurrency = gas;
-    emit IntrinsicGasForAlternativeGasCurrencySet(gas);
+  /**
+   * @notice Sets the block gas limit.
+   * @param gasLimit New block gas limit.
+   */
+  function setBlockGasLimit(uint256 gasLimit) public onlyOwner {
+    blockGasLimit = gasLimit;
+    emit BlockGasLimitSet(gasLimit);
   }
 
-  /** @notice Query minimum client version.
+  /**
+   * @notice Sets the intrinsic gas for non-gold gas currencies.
+   * @param gas Intrinsic gas for non-gold gas currencies.
+   */
+  function setIntrinsicGasForAlternativeFeeCurrency(uint256 gas) public onlyOwner {
+    intrinsicGasForAlternativeFeeCurrency = gas;
+    emit IntrinsicGasForAlternativeFeeCurrencySet(gas);
+  }
+
+  /**
+   * @notice Query minimum client version.
    * @return Returns major, minor, and patch version numbers.
    */
   function getMinimumClientVersion()

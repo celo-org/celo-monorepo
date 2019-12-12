@@ -12,7 +12,7 @@ import { getWeb3Client } from 'src/lib/blockchain'
 import { switchToClusterFromEnv } from 'src/lib/cluster'
 import { getBlockscoutUrl } from 'src/lib/endpoints'
 import Web3 from 'web3'
-import * as yargs from 'yargs'
+import yargs from 'yargs'
 import { TransactionsArgv } from '../transactions'
 
 export const command = 'list <address>'
@@ -40,7 +40,7 @@ export const handler = async (argv: ListArgv) => {
   )
 
   const web3 = await getWeb3Client(argv.celoEnv)
-  const blockscoutURL = getBlockscoutUrl(argv)
+  const blockscoutURL = getBlockscoutUrl(argv.celoEnv)
   const resp = await fetch(
     `${blockscoutURL}/api?module=account&action=txlist&address=${argv.address}&sort=desc`
   )

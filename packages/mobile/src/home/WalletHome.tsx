@@ -260,7 +260,7 @@ const styles = StyleSheet.create({
     backgroundColor: colors.background,
     position: 'relative',
   },
-  banner: { paddingVertical: 15 },
+  banner: { paddingVertical: 15, marginTop: 50 },
   containerFeed: {
     paddingBottom: 40,
   },
