@@ -139,7 +139,7 @@ export class AttestationsWrapper extends BaseWrapper<Attestations> {
     // TODO: Use subscription if provider supports
     while (Date.now() - startTime < timeoutSeconds * 1000) {
       const blockNumber = await this.kit.web3.eth.getBlockNumber()
-      if (blockNumber >= unselectedRequest.blockNumber + waitBlocks) {
+      if (blockNumber >= unselectedRequest.blockNumber + waitBlocks - 1) {
         return
       }
       await sleep(pollDurationSeconds * 1000)
