@@ -13,7 +13,7 @@ import { Provider } from 'web3/providers'
 const tag = 'web3/contracts'
 
 export const web3: Web3 = getWeb3()
-// @ts-ignore
+// @ts-ignore - need to align web3 versions in contractkit
 export const contractKit = newKitFromWeb3(web3)
 
 export function isInitiallyZeroSyncMode() {
