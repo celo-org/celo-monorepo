@@ -603,6 +603,7 @@ describe('governance tests', () => {
       // Returns the gas fee base for a given block, which is distributed to the governance contract.
       const blockBaseGasFee = async (blockNumber: number): Promise<BigNumber> => {
         const gas = (await web3.eth.getBlock(blockNumber)).gasUsed
+        // @ts-ignore
         const gpm = await gasPriceMinimum.methods.gasPriceMinimum().call({}, blockNumber)
         return new BigNumber(gpm).times(new BigNumber(gas))
       }
