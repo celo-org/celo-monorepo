@@ -14,6 +14,7 @@ const initializeArgs = async (): Promise<any[]> => {
     config.validators.validatorScoreParameters.exponent,
     toFixed(config.validators.validatorScoreParameters.adjustmentSpeed).toFixed(),
     config.validators.membershipHistoryLength,
+    config.validators.slashingMultiplierResetPeriod,
     config.validators.maxGroupSize,
   ]
 }

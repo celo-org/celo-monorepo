@@ -169,6 +169,7 @@ contract Validators is
     uint256 validatorScoreExponent,
     uint256 validatorScoreAdjustmentSpeed,
     uint256 _membershipHistoryLength,
+    uint256 _slashingMultiplierResetPeriod,
     uint256 _maxGroupSize
   ) external initializer {
     _transferOwnership(msg.sender);
@@ -178,6 +179,7 @@ contract Validators is
     setValidatorScoreParameters(validatorScoreExponent, validatorScoreAdjustmentSpeed);
     setMaxGroupSize(_maxGroupSize);
     setMembershipHistoryLength(_membershipHistoryLength);
+    setSlashingMultiplierResetPeriod(_slashingMultiplierResetPeriod);
   }
 
   /**
@@ -1147,21 +1149,24 @@ contract Validators is
   }
 
   /**
-	 * @notice Sets the slashingMultiplierRestPeriod property if called by owner
-	 * @param value New reset period for slashing multiplier
-	 */
-  function setSlashingMultiplierResetPeriod(uint256 value) external nonReentrant onlyOwner {
+   * @notice Sets the slashingMultiplierRestPeriod property if called by owner
+   * @param value New reset period for slashing multiplier
+   */
+  function setSlashingMultiplierResetPeriod(uint256 value) public nonReentrant onlyOwner {
+    // Is this necessary? following precedent
+    require(value != slashingMultiplierResetPeriod);
     slashingMultiplierResetPeriod = value;
   }
 
   /**
-	 * @notice Resets a group's slashing multiplier if it has been >= the reset period since 
+   * @notice Resets a group's slashing multiplier if it has been >= the reset period since 
    *         the last time the group was slashed.
-	 */
+   */
   function resetSlashingMultiplier() external nonReentrant {
     address account = getAccounts().signerToAccount(msg.sender);
     require(isValidatorGroup(account));
     ValidatorGroup storage group = groups[account];
+    // TODO: Should this fail silently or revert? Or return bool/multiplier value
     if (now >= group.slashInfo.lastSlashedTimestamp + slashingMultiplierResetPeriod) {
       group.slashInfo.slashingMultiplier = FixidityLib.fixed1();
     }
@@ -1172,6 +1177,10 @@ contract Validators is
     DOUBLE_SIGNING_SLASHER_REGISTRY_ID
   ];
 
+  /**
+   * @notice Halves the group's slashing multiplier.
+   * @param groupAddress The group being slashed.
+   */
   function halveSlashingMultiplier(address groupAddress)
     external
     nonReentrant

@@ -93,6 +93,9 @@ contract('Validators', (accounts: string[]) => {
     exponent: new BigNumber(5),
     adjustmentSpeed: toFixed(0.25),
   }
+  const validatorSlashParameters = {
+    slashingMultiplierResetPeriod: 30 * DAY,
+  }
   const membershipHistoryLength = new BigNumber(5)
   const maxGroupSize = new BigNumber(5)
 
@@ -126,6 +129,7 @@ contract('Validators', (accounts: string[]) => {
       validatorScoreParameters.exponent,
       validatorScoreParameters.adjustmentSpeed,
       membershipHistoryLength,
+      validatorSlashParameters.slashingMultiplierResetPeriod,
       maxGroupSize
     )
   })
@@ -207,6 +211,7 @@ contract('Validators', (accounts: string[]) => {
           validatorScoreParameters.exponent,
           validatorScoreParameters.adjustmentSpeed,
           membershipHistoryLength,
+          validatorSlashParameters.slashingMultiplierResetPeriod,
           maxGroupSize
         )
       )
@@ -2187,7 +2192,7 @@ contract('Validators', (accounts: string[]) => {
     })
   })
 
-  describe.only('#halveSlashingMultiplier', async () => {
+  describe('#halveSlashingMultiplier', async () => {
     const validator = accounts[0]
     const group = accounts[1]
 
@@ -2223,8 +2228,59 @@ contract('Validators', (accounts: string[]) => {
     })
 
     describe('when called from an unapproved address', async () => {
-      it('should fail', async () => {
+      it('should revert', async () => {
         await assertRevert(validators.halveSlashingMultiplier(group))
+      })
+    })
+  })
+
+  describe('#resetSlashingMultiplier', async () => {
+    const validator = accounts[0]
+    const group = accounts[1]
+
+    beforeEach(async () => {
+      await registerValidator(validator)
+      await registerValidatorGroup(group)
+      await validators.affiliate(group)
+      registry.setAddressFor(CeloContractName.DowntimeSlasher, accounts[0])
+      registry.setAddressFor(CeloContractName.Governance, accounts[2])
+    })
+
+    describe('when the slashing multiplier is reset after reset period', async () => {
+      it('should return to default 1.0', async () => {
+        await validators.halveSlashingMultiplier(group)
+        let parsedGroup = parseValidatorGroupParams(await validators.getValidatorGroup(group))
+        assertEqualBN(parsedGroup.slashingMultiplier, toFixed(0.5))
+        await timeTravel(validatorSlashParameters.slashingMultiplierResetPeriod, web3)
+        await validators.resetSlashingMultiplier({ from: group })
+        parsedGroup = parseValidatorGroupParams(await validators.getValidatorGroup(group))
+        assertEqualBN(parsedGroup.slashingMultiplier, toFixed(1))
+      })
+    })
+
+    describe('when the slashing multiplier is reset before reset period', async () => {
+      it('should not update the multiplier', async () => {
+        await validators.halveSlashingMultiplier(group)
+        let parsedGroup = parseValidatorGroupParams(await validators.getValidatorGroup(group))
+        assertEqualBN(parsedGroup.slashingMultiplier, toFixed(0.5))
+        await timeTravel(validatorSlashParameters.slashingMultiplierResetPeriod - 1, web3)
+        await validators.resetSlashingMultiplier({ from: group })
+        parsedGroup = parseValidatorGroupParams(await validators.getValidatorGroup(group))
+        assertEqualBN(parsedGroup.slashingMultiplier, toFixed(0.5))
+      })
+    })
+
+    describe('when the slashing reset period is changed', async () => {
+      it('should be read properly', async () => {
+        const newPeriod = 60 * 60 * 24 * 10 // 10 days
+        await validators.setSlashingMultiplierResetPeriod(newPeriod)
+        await validators.halveSlashingMultiplier(group)
+        let parsedGroup = parseValidatorGroupParams(await validators.getValidatorGroup(group))
+        assertEqualBN(parsedGroup.slashingMultiplier, toFixed(0.5))
+        await timeTravel(newPeriod, web3)
+        await validators.resetSlashingMultiplier({ from: group })
+        parsedGroup = parseValidatorGroupParams(await validators.getValidatorGroup(group))
+        assertEqualBN(parsedGroup.slashingMultiplier, toFixed(1))
       })
     })
   })
