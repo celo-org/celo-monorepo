@@ -3,6 +3,7 @@ import BigNumber from 'bignumber.js'
 import * as React from 'react'
 import { withNamespaces, WithNamespaces } from 'react-i18next'
 import { StyleSheet, Text, View } from 'react-native'
+import { Namespaces } from 'src/i18n'
 import { getMoneyDisplayValue } from 'src/utils/formatting'
 
 interface Props {
@@ -26,4 +27,4 @@ const style = StyleSheet.create({
   },
 })
 
-export default withNamespaces('sendFlow7')(Fee)
+export default withNamespaces(Namespaces.sendFlow7)(Fee)
