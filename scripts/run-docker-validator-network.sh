@@ -216,12 +216,14 @@ if [[ $COMMAND == *"run-validator"* ]]; then
 
     docker rm -f celo-validator || echo -e "Containers removed"
     export PROXY_ENODE=$(docker exec celo-proxy geth --exec "admin.nodeInfo['enode'].split('//')[1].split('@')[0]" attach | tr -d '"')
-    export PROXY_IP=$(docker inspect -f '{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' celo-proxy)
+    export PROXY_INTERNAL_IP=$(docker inspect -f '{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' celo-proxy)
+    export PROXY_EXTERNAL_IP=$(curl -s ipecho.net/plain; echo| tr -cd "[:alnum:]\n")
     
+    export ENODE="enode://$PROXY_ENODE@$PROXY_INTERNAL_IP:30503;enode://$PROXY_ENODE@$PROXY_EXTERNAL_IP:30303"
     
-    echo -e "\tConnecting Validator to Proxy running at enode://$PROXY_ENODE@$PROXY_IP"
+    echo -e "\tConnecting Validator to Proxy running at $ENODE"
     docker run -v $PWD:/root/.celo --entrypoint sh --rm $CELO_IMAGE -c "echo $DEFAULT_PASSWORD > /root/.celo/.password"
-    screen -S celo-validator -d -m docker run --name celo-validator --restart always -p 30303:30303 -p 30303:30303/udp -v $PWD:/root/.celo $CELO_IMAGE --verbosity 3 --networkid $NETWORK_ID --syncmode full --mine --istanbul.blockperiod=5 --istanbul.requesttimeout=3000 --etherbase $CELO_VALIDATOR_SIGNER_ADDRESS --nodiscover --proxy.proxied --proxy.proxyenodeurlpair=enode://$PROXY_ENODE@$PROXY_IP:30503\;enode://$PROXY_ENODE@$PROXY_IP:30303  --unlock=$CELO_VALIDATOR_SIGNER_ADDRESS --password /root/.celo/.password --ethstats=validator-$ETHSTATS_ARG
+    screen -S celo-validator -d -m docker run --name celo-validator --restart always -p 30303:30303 -p 30303:30303/udp -v $PWD:/root/.celo $CELO_IMAGE --verbosity 3 --networkid $NETWORK_ID --syncmode full --mine --istanbul.blockperiod=5 --istanbul.requesttimeout=3000 --etherbase $CELO_VALIDATOR_SIGNER_ADDRESS --nodiscover --proxy.proxied --proxy.proxyenodeurlpair=$ENODE  --unlock=$CELO_VALIDATOR_SIGNER_ADDRESS --password /root/.celo/.password --ethstats=validator-$ETHSTATS_ARG
 
     sleep 5s
      
@@ -257,23 +259,25 @@ fi
 if [[ $COMMAND == *"run-fullnode"* ]]; then
 
     echo -e "* Let's run the full node ..."
-    cd $DATA_DIR
+    cd $FULLNODE_DIR
 
     docker rm -f celo-fullnode || echo -e "Container removed"
 
     export CELO_ACCOUNT_ADDRESS=$($CELOCLI account:new |tail -1| cut -d' ' -f 2| tr -cd "[:alnum:]\n")
 
-    docker run -v $PWD/fullnode:/root/.celo --entrypoint /bin/sh -it $CELO_IMAGE -c "wget https://www.googleapis.com/storage/v1/b/static_nodes/o/$NETWORK_NAME?alt=media -O /root/.celo/static-nodes.json"
+    docker run -v $PWD:/root/.celo --entrypoint /bin/sh -it $CELO_IMAGE -c "wget https://www.googleapis.com/storage/v1/b/static_nodes/o/$NETWORK_NAME?alt=media -O /root/.celo/static-nodes.json"
 
-    docker run -v $PWD/fullnode:/root/.celo --entrypoint /bin/sh -it $CELO_IMAGE -c "wget https://www.googleapis.com/storage/v1/b/genesis_blocks/o/$NETWORK_NAME?alt=media -O /root/.celo/genesis.json"
-    docker run -v $PWD/fullnode:/root/.celo $CELO_IMAGE init /root/.celo/genesis.json
+    docker run -v $PWD:/root/.celo --entrypoint /bin/sh -it $CELO_IMAGE -c "wget https://www.googleapis.com/storage/v1/b/genesis_blocks/o/$NETWORK_NAME?alt=media -O /root/.celo/genesis.json"
+    docker run -v $PWD:/root/.celo $CELO_IMAGE init /root/.celo/genesis.json
 
     echo -e "\tStarting the Full Node"
 
-    screen -S celo-fullnode -d -m docker run --name celo-fullnode --restart always -p 127.0.0.1:8545:8545 -p 127.0.0.1:8546:8546 -p 30303:30303 -p 30303:30303/udp -v $PWD/fullnode:/root/.celo $CELO_IMAGE --verbosity 3 --networkid $NETWORK_ID --syncmode full --rpc --rpcaddr 0.0.0.0 --rpcapi eth,net,web3,debug,admin,personal,txpool --lightserv 90 --lightpeers 1000 --maxpeers 1100 --etherbase $CELO_ACCOUNT_ADDRESS --ethstats=fullnode-$ETHSTATS_ARG
+    screen -S celo-fullnode -d -m docker run --name celo-fullnode --restart always -p 127.0.0.1:8545:8545 -p 127.0.0.1:8546:8546 -p 30303:30303 -p 30303:30303/udp -v $PWD:/root/.celo $CELO_IMAGE --verbosity 3 --networkid $NETWORK_ID --syncmode full --rpc --rpcaddr 0.0.0.0 --rpcapi eth,net,web3,debug,admin,personal,txpool --lightserv 90 --lightpeers 1000 --maxpeers 1100 --etherbase $CELO_ACCOUNT_ADDRESS --ethstats=fullnode-$ETHSTATS_ARG
     
     sleep 2s
 
+    echo -e "CELO_ACCOUNT_ADDRESS=$CELO_ACCOUNT_ADDRESS"
+    
     echo -e "\tEverything should be running, you can check running 'screen -ls'"
     screen -ls
 
@@ -312,12 +316,19 @@ if [[ $COMMAND == *"get-cooking"* ]]; then
     $CELOCLI lockedgold:lock --from $CELO_VALIDATOR_GROUP_ADDRESS --value 10000000000000000000000
     $CELOCLI lockedgold:lock --from $CELO_VALIDATOR_ADDRESS --value 10000000000000000000000
 
+    $CELOCLI lockedgold:show $CELO_VALIDATOR_GROUP_ADDRESS
+    $CELOCLI lockedgold:show $CELO_VALIDATOR_ADDRESS
+    
     echo -e "\t4. Run for election .."
     echo -e "\t   * Authorize the validator signing key"
     $CELOCLI account:authorize --from $CELO_VALIDATOR_ADDRESS --role validator --signature 0x$CELO_VALIDATOR_SIGNER_SIGNATURE --signer 0x$CELO_VALIDATOR_SIGNER_ADDRESS || echo -e "Validator Signing Key $CELO_VALIDATOR_ADDRESS already authorized"
     
+    $CELOCLI account:show $CELO_VALIDATOR_ADDRESS
+    
     echo -e "\t   * Register Validator Group address"
     $CELOCLI validatorgroup:register --from $CELO_VALIDATOR_GROUP_ADDRESS --commission 0.1 || echo -e "Validator Group  $CELO_VALIDATOR_GROUP_ADDRESS already registered"
+
+    celocli validatorgroup:show $CELO_VALIDATOR_GROUP_ADDRESS
 
     echo -e "\t   * Register Validator"
     $CELOCLI validator:register --from $CELO_VALIDATOR_ADDRESS --ecdsaKey $CELO_VALIDATOR_SIGNER_PUBLIC_KEY --blsKey $CELO_VALIDATOR_SIGNER_BLS_PUBLIC_KEY --blsSignature $CELO_VALIDATOR_SIGNER_BLS_SIGNATURE || echo -e "Validator $CELO_VALIDATOR_GROUP_ADDRESS already registered"
@@ -328,15 +339,26 @@ if [[ $COMMAND == *"get-cooking"* ]]; then
     echo -e "\t   * Accept affiliation"
     $CELOCLI validatorgroup:member --accept $CELO_VALIDATOR_ADDRESS --from $CELO_VALIDATOR_GROUP_ADDRESS
 
+    $CELOCLI validator:show $CELO_VALIDATOR_ADDRESS
+    $CELOCLI validatorgroup:show $CELO_VALIDATOR_GROUP_ADDRESS
+    
     echo -e "\t   * Vote Validator Group"
     $CELOCLI election:vote --from $CELO_VALIDATOR_ADDRESS --for $CELO_VALIDATOR_GROUP_ADDRESS --value 10000000000000000000000 || echo -e "Validator $CELO_VALIDATOR_ADDRESS already vote to $CELO_VALIDATOR_GROUP_ADDRESS"
     $CELOCLI election:vote --from $CELO_VALIDATOR_GROUP_ADDRESS --for $CELO_VALIDATOR_GROUP_ADDRESS --value 10000000000000000000000 || echo -e "Validator $CELO_VALIDATOR_ADDRESS already vote to $CELO_VALIDATOR_GROUP_ADDRESS"
+    
+    echo -e "\t   * Checking votes"
+    $CELOCLI election:show $CELO_VALIDATOR_GROUP_ADDRESS --group
+    $CELOCLI election:show $CELO_VALIDATOR_GROUP_ADDRESS --voter
+    $CELOCLI election:show $CELO_VALIDATOR_ADDRESS --voter
     
     echo -e "\t State of the validation elections"
     $CELOCLI election:list
 
     echo -e "\t Current elected validators"
     $CELOCLI election:current
+
+    echo -e "\t Checking if validator is elected and signing blocks"
+    $CELOCLI validator:status --validator $CELO_VALIDATOR_ADDRESS
 
 fi
 
