@@ -100,6 +100,7 @@ export const hashNav = {
     applications: 'applications',
     contracts: 'contracts',
     blockchain: 'blockchain',
+    leaderboard: 'leaderboard',
   },
   connect: {
     tenets: 'tenets',

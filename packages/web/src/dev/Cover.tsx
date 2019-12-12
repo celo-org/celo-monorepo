@@ -1,5 +1,4 @@
 import * as React from 'react'
-import LazyLoad from 'react-lazyload'
 import { Image, StyleSheet, Text, View } from 'react-native'
 import Fade from 'react-reveal/Fade'
 import Transceive from 'src/dev/Transceive'
@@ -98,17 +97,15 @@ const CoverComponent = React.memo(function Cover({ t }: I18nProps) {
           <Text style={[fonts.p, textStyles.invert]}>{t('whoText')}</Text>
         </Cell>
       </GridRow>
-      <LazyLoad>
-        <GridRow
-          desktopStyle={standardStyles.blockMarginBottom}
-          tabletStyle={standardStyles.blockMarginBottomTablet}
-          mobileStyle={standardStyles.blockMarginBottomMobile}
-        >
-          <Cell span={Spans.full}>
-            <LeaderBoardApp />
-          </Cell>
-        </GridRow>
-      </LazyLoad>
+      <GridRow
+        desktopStyle={standardStyles.blockMarginBottom}
+        tabletStyle={standardStyles.blockMarginBottomTablet}
+        mobileStyle={standardStyles.blockMarginBottomMobile}
+      >
+        <Cell span={Spans.full}>
+          <LeaderBoardApp />
+        </Cell>
+      </GridRow>
     </View>
   )
 })

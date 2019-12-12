@@ -88,6 +88,10 @@ function wwwRedirect(req: express.Request, res: express.Response, nextAction: ()
     res.redirect('/user-agreement')
   })
 
+  server.get('/stake-off', (_, res) => {
+    res.redirect('https://forum.celo.org/t/the-great-celo-stake-off-the-details/136')
+  })
+
   server.use(bodyParser.json())
   server.use(nextI18NextMiddleware(nextI18next))
 

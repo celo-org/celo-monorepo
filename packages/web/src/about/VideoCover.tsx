@@ -8,12 +8,7 @@ import { PlayCircle2 } from 'src/shared/PlayCircle'
 import VideoModal from 'src/shared/VideoModal'
 import { standardStyles, textStyles } from 'src/styles'
 
-import {
-  Capacity,
-  getDeviceCapacity,
-  getEffectiveConnection,
-  SLOW_CONNECTIONS,
-} from 'src/utils/utils'
+import { hasGoodConnection } from 'src/utils/utils'
 interface State {
   isHovering: boolean
   supportsVideo: boolean
@@ -45,9 +40,8 @@ class VideoCover extends React.PureComponent<I18nProps & ScreenProps, State> {
     this.setState({ isHovering: false })
   }
 
-  componentDidMount = () => {
-    const connectionType = getEffectiveConnection(window.navigator)
-    if (!SLOW_CONNECTIONS.has(connectionType) && getDeviceCapacity() === Capacity.high) {
+  componentDidMount = async () => {
+    if (await hasGoodConnection()) {
       this.setState({ supportsVideo: true })
     }
   }

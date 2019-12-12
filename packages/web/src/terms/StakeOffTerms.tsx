@@ -36,7 +36,7 @@ class StakeoffTerms extends React.PureComponent<I18nProps> {
           </GridRow>
           <GridRow>
             <Cell span={Spans.fourth}>
-              <Text style={fonts.h5}>Last Updated October, 29 2019</Text>
+              <Text style={fonts.h6}>Last Updated October, 29 2019</Text>
             </Cell>
             <Cell span={Spans.three4th}>
               <Text

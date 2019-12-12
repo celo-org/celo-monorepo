@@ -21,7 +21,7 @@ export function execCmd(
 
     const execProcess = exec(
       cmd,
-      { maxBuffer: 1024 * 1000, ...execOptions },
+      { maxBuffer: 1024 * 10000, ...execOptions },
       (err, stdout, stderr) => {
         if (process.env.CELOTOOL_VERBOSE === 'true') {
           console.debug(stdout.toString())
@@ -73,7 +73,7 @@ export function execBackgroundCmd(cmd: string) {
   if (process.env.CELOTOOL_VERBOSE === 'true') {
     console.debug('$ ' + cmd)
   }
-  return exec(cmd, { maxBuffer: 1024 * 1000 }, (err, stdout, stderr) => {
+  return exec(cmd, { maxBuffer: 1024 * 10000 }, (err, stdout, stderr) => {
     if (process.env.CELOTOOL_VERBOSE === 'true') {
       console.debug(stdout)
       console.error(stderr)
