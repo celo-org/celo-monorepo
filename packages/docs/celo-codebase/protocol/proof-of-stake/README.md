@@ -24,7 +24,7 @@ Most of Celo's Proof of Stake mechanism is implemented as smart contracts, and a
 
 - [`Validators.sol`](https://github.com/celo-org/celo-monorepo/blob/master/packages/protocol/contracts/governance/Validators.sol) handles registration, deregistration, staking, key management and epoch rewards for validators and validator groups, as well as routines to manage the members of groups.
 
-- [`Elections.sol`](https://github.com/celo-org/celo-monorepo/blob/master/packages/protocol/contracts/governance/Elections.sol) manages Locked Gold voting and epoch rewards and runs Validator Elections.
+- [`Election.sol`](https://github.com/celo-org/celo-monorepo/blob/master/packages/protocol/contracts/governance/Election.sol) manages Locked Gold voting and epoch rewards and runs Validator Elections.
 
 In Celo blockchain:
 

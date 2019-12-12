@@ -2,54 +2,59 @@
 
 exports[`IncomingPaymentRequestListItem renders correctly 1`] = `
 <View
-  accessible={true}
-  focusable={true}
-  isTVSelectable={true}
-  onClick={[Function]}
-  onResponderGrant={[Function]}
-  onResponderMove={[Function]}
-  onResponderRelease={[Function]}
-  onResponderTerminate={[Function]}
-  onResponderTerminationRequest={[Function]}
-  onStartShouldSetResponder={[Function]}
   style={
     Object {
-      "opacity": 1,
+      "marginBottom": 16,
     }
   }
 >
   <View
-    style={
-      Array [
-        Object {
-          "flexDirection": "row",
-          "justifyContent": "space-between",
-          "padding": 16,
-          "width": "100%",
-        },
-        false,
-      ]
+    accessible={true}
+    focusable={true}
+    isTVSelectable={true}
+    nativeBackgroundAndroid={
+      Object {
+        "attribute": "selectableItemBackground",
+        "type": "ThemeAttrAndroid",
+      }
     }
+    onClick={[Function]}
+    onResponderGrant={[Function]}
+    onResponderMove={[Function]}
+    onResponderRelease={[Function]}
+    onResponderTerminate={[Function]}
+    onResponderTerminationRequest={[Function]}
+    onStartShouldSetResponder={[Function]}
   >
     <View
       style={
-        Object {
-          "alignItems": "center",
-          "flexDirection": "column",
-          "paddingRight": 16,
-        }
+        Array [
+          Object {
+            "backgroundColor": "#FFFFFF",
+            "flexDirection": "row",
+            "justifyContent": "space-between",
+            "padding": 16,
+            "width": "100%",
+          },
+          Object {
+            "elevation": 2,
+            "shadowColor": "black",
+            "shadowOffset": Object {
+              "height": 1,
+              "width": 0,
+            },
+            "shadowOpacity": 0.3,
+            "shadowRadius": 1.6,
+          },
+        ]
       }
     >
       <View
         style={
-          Array [
-            Object {
-              "alignItems": "center",
-              "flexDirection": "row",
-              "justifyContent": "center",
-            },
-            undefined,
-          ]
+          Object {
+            "alignItems": "center",
+            "paddingRight": 16,
+          }
         }
       >
         <View
@@ -57,89 +62,93 @@ exports[`IncomingPaymentRequestListItem renders correctly 1`] = `
             Array [
               Object {
                 "alignItems": "center",
+                "flexDirection": "row",
                 "justifyContent": "center",
               },
-              Object {
-                "backgroundColor": "#7AD6FE",
-                "borderRadius": 15,
-                "height": 30,
-                "width": 30,
-              },
+              undefined,
             ]
           }
         >
-          <Text
+          <View
             style={
               Array [
                 Object {
-                  "color": "#FFFFFF",
-                  "fontFamily": "Hind-Medium",
-                  "fontSize": 16,
+                  "alignItems": "center",
+                  "justifyContent": "center",
                 },
                 Object {
-                  "fontSize": 15,
+                  "backgroundColor": "#7AD6FE",
+                  "borderRadius": 20,
+                  "height": 40,
+                  "width": 40,
                 },
               ]
             }
           >
-            5
-          </Text>
+            <Image
+              source={
+                Object {
+                  "testUri": "../../../packages/mobile/src/images/unknown-user-icon.png",
+                }
+              }
+              style={
+                Object {
+                  "alignItems": "center",
+                  "height": 40,
+                  "justifyContent": "center",
+                  "width": 40,
+                }
+              }
+            />
+          </View>
         </View>
       </View>
-    </View>
-    <View
-      style={
-        Object {
-          "flex": 1,
-          "justifyContent": "space-between",
-        }
-      }
-    >
-      <Text
+      <View
         style={
           Object {
-            "color": "#2E3338",
-            "fontFamily": "Hind-Bold",
-            "fontSize": 14,
-            "lineHeight": 18,
+            "flex": 1,
+            "justifyContent": "space-between",
           }
         }
       >
-        5126608970
-      </Text>
-      <View>
+        <Text
+          style={
+            Object {
+              "color": "#81868B",
+              "fontFamily": "Hind-Regular",
+              "fontSize": 14,
+              "lineHeight": 18,
+            }
+          }
+        >
+          incomingPaymentRequestNotificationTitle
+        </Text>
         <View
           style={
             Object {
               "justifyContent": "space-between",
-              "minHeight": 70,
+              "minHeight": 60,
+              "paddingTop": 8,
             }
           }
         >
-          <View>
-            <Text
-              style={
-                Array [
-                  Object {
-                    "color": "#81868B",
-                    "fontFamily": "Hind-Regular",
-                    "fontSize": 14,
-                    "lineHeight": 20,
-                  },
-                  Object {
-                    "paddingTop": 16,
-                  },
-                ]
+          <Text
+            style={
+              Object {
+                "color": "#2E3338",
+                "fontFamily": "Hind-Regular",
+                "fontSize": 14,
+                "lineHeight": 18,
               }
-            >
-              Hey thanks for the loan, Ill pay you back ASAP. LOVE YOU
-            </Text>
-          </View>
+            }
+          >
+            Hey thanks for the loan, Ill pay you back ASAP. LOVE YOU
+          </Text>
           <View
             style={
               Object {
                 "flexDirection": "row",
-                "marginTop": 15,
+                "marginTop": 5,
               }
             }
           >
@@ -176,7 +185,7 @@ exports[`IncomingPaymentRequestListItem renders correctly 1`] = `
                   ]
                 }
               >
-                pay
+                global:pay
               </Text>
             </View>
             <View
@@ -212,38 +221,11 @@ exports[`IncomingPaymentRequestListItem renders correctly 1`] = `
                   ]
                 }
               >
-                decline
+                global:decline
               </Text>
             </View>
           </View>
         </View>
-      </View>
-    </View>
-    <View
-      style={
-        Object {
-          "paddingLeft": 16,
-        }
-      }
-    >
-      <View>
-        <Text
-          style={
-            Array [
-              Object {
-                "color": "#2E3338",
-                "fontFamily": "Hind-SemiBold",
-                "fontSize": 14,
-                "lineHeight": 18,
-              },
-              Object {
-                "color": "#81868B",
-              },
-            ]
-          }
-        >
-          $24
-        </Text>
       </View>
     </View>
   </View>

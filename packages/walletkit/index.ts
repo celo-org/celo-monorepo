@@ -20,15 +20,6 @@ export {
   StableToken,
   Validators,
 } from './contracts/index'
-export {
-  CeloFunctionCall,
-  CeloLog,
-  constructFunctionABICache,
-  FunctionABICache,
-  getFunctionSignatureFromInput,
-  parseFunctionCall,
-  parseLog,
-} from './src/abi'
 export { unlockAccount } from './src/account-utils'
 export {
   awaitConfirmation,

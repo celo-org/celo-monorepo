@@ -209,10 +209,6 @@ module.exports = async (_deployer: any, networkName: string) => {
     return
   }
 
-  if (config.validators.votesRatioOfLastVsFirstGroup < 1) {
-    throw new Error(`votesRatioOfLastVsFirstGroup needs to be >= 1`)
-  }
-
   // Assumptions about where funds are located:
   // * Validator 0 holds funds for all groups' stakes
   // * Validator 1-n holds funds needed for their own stake
@@ -233,26 +229,18 @@ module.exports = async (_deployer: any, networkName: string) => {
     valKeyGroups.push(valKeys.slice(i, Math.min(i + maxGroupSize, valKeys.length)))
   }
 
-  // Calculate per validator locked gold for first group...
-  const lockedGoldPerValAtFirstGroup = new BigNumber(
-    config.validators.groupLockedGoldRequirements.value
-  )
-  // ...and the delta for each subsequent group
-  const lockedGoldPerValEachGroup = new BigNumber(
-    config.validators.votesRatioOfLastVsFirstGroup - 1
-  )
-    .times(lockedGoldPerValAtFirstGroup)
-    .div(Math.max(valKeyGroups.length - 1, 1))
-    .integerValue()
+  const lockedGoldPerValEachGroup = new BigNumber(config.validators.groupLockedGold.value)
 
   const groups = valKeyGroups.map((keys, i) => ({
     valKeys: keys,
     name: valKeyGroups.length
       ? config.validators.groupName + `(${i + 1})`
       : config.validators.groupName,
-    lockedGold: lockedGoldPerValAtFirstGroup
-      .plus(lockedGoldPerValEachGroup.times(i))
-      .times(keys.length),
+    // Make first and last group high votes so we can maintain presence.
+    lockedGold:
+      i === 0 || i === valKeyGroups.length - 1
+        ? lockedGoldPerValEachGroup.times(5)
+        : lockedGoldPerValEachGroup,
     account: null,
   }))
 

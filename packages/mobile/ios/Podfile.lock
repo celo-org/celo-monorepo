@@ -408,11 +408,11 @@ PODS:
     - React
   - RNSVG (9.11.1):
     - React
-  - Segment-Firebase (2.4.0):
+  - Segment-Firebase (2.5.0):
     - Analytics (~> 3.2)
     - Firebase/Core (~> 5.0)
-    - Segment-Firebase/Core (= 2.4.0)
-  - Segment-Firebase/Core (2.4.0):
+    - Segment-Firebase/Core (= 2.5.0)
+  - Segment-Firebase/Core (2.5.0):
     - Analytics (~> 3.2)
     - Firebase/Core (~> 5.0)
   - Sentry (4.4.0):
@@ -488,6 +488,7 @@ DEPENDENCIES:
   - "RNSentry (from `../../../node_modules/@sentry/react-native`)"
   - RNShare (from `../../../node_modules/react-native-share`)
   - RNSVG (from `../../../node_modules/react-native-svg`)
+  - Segment-Firebase (from `https://github.com/celo-org/analytics-ios-integration-firebase.git`, commit `e849d040239a7e56e02df96aabc0851e56a4cb19`)
   - Yoga (from `../../../node_modules/react-native/ReactCommon/yoga`)
 
 SPEC REPOS:
@@ -512,7 +513,6 @@ SPEC REPOS:
     - leveldb-library
     - nanopb
     - Protobuf
-    - Segment-Firebase
     - Sentry
 
 EXTERNAL SOURCES:
@@ -632,8 +632,16 @@ EXTERNAL SOURCES:
     :path: "../../../node_modules/react-native-share"
   RNSVG:
     :path: "../../../node_modules/react-native-svg"
+  Segment-Firebase:
+    :commit: e849d040239a7e56e02df96aabc0851e56a4cb19
+    :git: https://github.com/celo-org/analytics-ios-integration-firebase.git
   Yoga:
     :path: "../../../node_modules/react-native/ReactCommon/yoga"
+
+CHECKOUT OPTIONS:
+  Segment-Firebase:
+    :commit: e849d040239a7e56e02df96aabc0851e56a4cb19
+    :git: https://github.com/celo-org/analytics-ios-integration-firebase.git
 
 SPEC CHECKSUMS:
   Analytics: 77fd5fb102a4a5eedafa2c2b0245ceb7b7c15e45
@@ -714,10 +722,10 @@ SPEC CHECKSUMS:
   RNSentry: e57b6acd2424e185ba2e23ef78aa2186a40e83e0
   RNShare: 8b171d4b43c1d886917fdd303bf7a4b87167b05c
   RNSVG: be27aa7c58819f97399388ae53d7fa0572f32c7f
-  Segment-Firebase: cac4b742228ef74d50ed886f3fc731e4bc8b7d29
+  Segment-Firebase: 5ab5aa1e962148c60e5582734ad68b320c647cef
   Sentry: 26650184fe71eb7476dfd2737acb5ea6cc64b4b1
   Yoga: 14927e37bd25376d216b150ab2a561773d57911f
 
-PODFILE CHECKSUM: 0d3a8018c6a563abba8559d74620bf8b8b370fe8
+PODFILE CHECKSUM: c90541c405c955c1e09dcc49def3121d9e91ac81
 
 COCOAPODS: 1.7.5
