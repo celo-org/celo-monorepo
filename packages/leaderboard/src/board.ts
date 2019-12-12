@@ -63,7 +63,6 @@ async function readSheet() {
       }
     )
   })
-  await client.end()
 }
 
 async function updateDB(lst: any[], remove: any[]) {
@@ -145,18 +144,21 @@ async function readAssoc(lst: string[]) {
   const web3 = new Web3(LEADERBOARD_WEB3)
   const kit: ContractKit = newKitFromWeb3(web3)
   const accounts: AccountsWrapper = await kit.contracts.getAccounts()
-  lst.forEach(async (a) => {
-    try {
-      const url = await accounts.getMetadataURL(a)
-      console.log(a, 'has url', url)
-      let metadata: IdentityMetadataWrapper
-      if (url == '') metadata = IdentityMetadataWrapper.fromEmpty(a)
-      else metadata = await IdentityMetadataWrapper.fetchFromURL(url)
-      processClaims(kit, a, metadata)
-    } catch (err) {
-      console.error('Bad address', a, err.toString())
-    }
-  })
+  await Promise.all(
+    lst.map(async (a) => {
+      try {
+        const url = await accounts.getMetadataURL(a)
+        console.log(a, 'has url', url)
+        let metadata: IdentityMetadataWrapper
+        if (url == '') metadata = IdentityMetadataWrapper.fromEmpty(a)
+        else metadata = await IdentityMetadataWrapper.fetchFromURL(url)
+        await processClaims(kit, a, metadata)
+      } catch (err) {
+        console.error('Bad address', a, err.toString())
+      }
+    })
+  )
+  client.end()
 }
 
 readSheet()
