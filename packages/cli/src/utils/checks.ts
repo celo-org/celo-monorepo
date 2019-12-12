@@ -2,6 +2,7 @@ import { Address } from '@celo/contractkit'
 import { AccountsWrapper } from '@celo/contractkit/lib/wrappers/Accounts'
 import { LockedGoldWrapper } from '@celo/contractkit/lib/wrappers/LockedGold'
 import { ValidatorsWrapper } from '@celo/contractkit/lib/wrappers/Validators'
+import { verifySignature } from '@celo/utils/lib/signatureUtils'
 import BigNumber from 'bignumber.js'
 import chalk from 'chalk'
 import { BaseCommand } from '../base'
@@ -81,6 +82,18 @@ class CheckBuilder {
     this.checks.push(check(name, predicate, errorMessage))
     return this
   }
+
+  canSign = (account: Address) =>
+    this.addCheck('Account can sign', async () => {
+      try {
+        const message = 'test'
+        const signature = await this.kit.web3.eth.sign(message, account)
+        return verifySignature(message, signature, account)
+      } catch (error) {
+        console.error(error)
+        return false
+      }
+    })
 
   canSignValidatorTxs = () =>
     this.addCheck(
