@@ -295,7 +295,7 @@ exports[`Testnet banner Renders when connected with backup complete 1`] = `
       style={
         Object {
           "color": "#2E3338",
-          "fontFamily": "Hind-Medium",
+          "fontFamily": "Hind-Bold",
           "fontSize": 14,
           "opacity": 0,
         }
@@ -1660,7 +1660,7 @@ exports[`Testnet banner Shows testnet banner for 5 seconds 1`] = `
       style={
         Object {
           "color": "#2E3338",
-          "fontFamily": "Hind-Medium",
+          "fontFamily": "Hind-Bold",
           "fontSize": 14,
           "opacity": 0,
         }
