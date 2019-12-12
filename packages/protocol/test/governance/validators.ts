@@ -3,8 +3,8 @@ import { getParsedSignatureOfAddress } from '@celo/protocol/lib/signing-utils'
 import {
   assertContainSubset,
   assertEqualBN,
-  assertEqualDpBN,
   assertEqualBNArray,
+  assertEqualDpBN,
   assertRevert,
   assertSameAddress,
   mineBlocks,
@@ -152,7 +152,7 @@ contract('Validators', (accounts: string[]) => {
     for (const validator of members) {
       await registerValidator(validator)
       await validators.affiliate(group, { from: validator })
-      if (validator == members[0]) {
+      if (validator === members[0]) {
         await validators.addFirstMember(validator, NULL_ADDRESS, NULL_ADDRESS, { from: group })
       } else {
         await validators.addMember(validator, { from: group })
@@ -607,7 +607,7 @@ contract('Validators', (accounts: string[]) => {
             args: {
               validator,
               ecdsaPublicKey: publicKey,
-              blsPublicKey: blsPublicKey,
+              blsPublicKey,
             },
           })
         })
@@ -908,7 +908,7 @@ contract('Validators', (accounts: string[]) => {
                     await validators.getMembershipHistory(validator)
                   )
                   let expectedEntries = 1
-                  if (registrationEpoch != additionEpoch || additionEpoch != affiliationEpoch) {
+                  if (registrationEpoch !== additionEpoch || additionEpoch !== affiliationEpoch) {
                     expectedEntries = 2
                   }
                   assert.equal(membershipHistory.epochs.length, expectedEntries)
@@ -1036,7 +1036,7 @@ contract('Validators', (accounts: string[]) => {
           await validators.getMembershipHistory(validator)
         )
         let expectedEntries = 1
-        if (registrationEpoch != additionEpoch || additionEpoch != deaffiliationEpoch) {
+        if (registrationEpoch !== additionEpoch || additionEpoch !== deaffiliationEpoch) {
           expectedEntries = 2
         }
         assert.equal(membershipHistory.epochs.length, expectedEntries)
@@ -1434,7 +1434,7 @@ contract('Validators', (accounts: string[]) => {
             })
 
             it("should update the member's membership history", async () => {
-              const expectedEntries = registrationEpoch == additionEpoch ? 1 : 2
+              const expectedEntries = registrationEpoch === additionEpoch ? 1 : 2
               const membershipHistory = parseMembershipHistory(
                 await validators.getMembershipHistory(validator)
               )
@@ -1480,14 +1480,14 @@ contract('Validators', (accounts: string[]) => {
                 assert.equal(expectedSizeHistory.length, 1)
                 for (let i = 2; i < maxGroupSize.toNumber() + 1; i++) {
                   const numMembers = i
-                  const validator = accounts[i]
-                  await registerValidator(validator)
-                  await validators.affiliate(group, { from: validator })
+                  const validator1 = accounts[i]
+                  await registerValidator(validator1)
+                  await validators.affiliate(group, { from: validator1 })
                   await mockLockedGold.setAccountTotalLockedGold(
                     group,
                     groupLockedGoldRequirements.value.times(numMembers)
                   )
-                  await validators.addMember(validator)
+                  await validators.addMember(validator1)
                   expectedSizeHistory.push((await web3.eth.getBlock('latest')).timestamp)
                   const parsedGroup = parseValidatorGroupParams(
                     await validators.getValidatorGroup(group)
@@ -1579,9 +1579,9 @@ contract('Validators', (accounts: string[]) => {
       // Depending on test timing, we may or may not span an epoch boundary between registration
       // and removal.
       const numEntries = membershipHistory.epochs.length
-      assert.isTrue(numEntries == 1 || numEntries == 2)
+      assert.isTrue(numEntries === 1 || numEntries === 2)
       assert.equal(membershipHistory.groups.length, numEntries)
-      if (numEntries == 1) {
+      if (numEntries === 1) {
         assertEqualBN(membershipHistory.epochs[0], expectedEpoch)
         assertSameAddress(membershipHistory.groups[0], NULL_ADDRESS)
       } else {
@@ -1758,15 +1758,15 @@ contract('Validators', (accounts: string[]) => {
 
   describe('#calculateGroupEpochScore', () => {
     describe('when all uptimes are in the interval [0, 1.0]', () => {
-      const testGroupUptimeCalculation = (uptimes) => {
-        const expected = uptimes
+      const testGroupUptimeCalculation = (_uptimes) => {
+        const expected = _uptimes
           .map((uptime) => new BigNumber(uptime))
           .map((uptime) => uptime.pow(validatorScoreParameters.exponent.toNumber()))
           .reduce((sum, n) => sum.plus(n))
-          .div(uptimes.length)
+          .div(_uptimes.length)
         it('should calculate the group score correctly', async () => {
           assertEqualDpBN(
-            fromFixed(await validators.calculateGroupEpochScore(uptimes.map(toFixed))),
+            fromFixed(await validators.calculateGroupEpochScore(_uptimes.map(toFixed))),
             expected,
             8
           )
@@ -1962,7 +1962,7 @@ contract('Validators', (accounts: string[]) => {
             from: groups[i],
           })
 
-          if (i == 0) {
+          if (i === 0) {
             assert.equal(await validators.getMembershipInLastEpoch(validator), NULL_ADDRESS)
           } else {
             assert.equal(await validators.getMembershipInLastEpoch(validator), groups[i - 1])
@@ -1994,7 +1994,7 @@ contract('Validators', (accounts: string[]) => {
             group,
             groupLockedGoldRequirements.value.times(i)
           )
-          if (i == 1) {
+          if (i === 1) {
             await validators.addFirstMember(validator, NULL_ADDRESS, NULL_ADDRESS)
           } else {
             await validators.addMember(validator)

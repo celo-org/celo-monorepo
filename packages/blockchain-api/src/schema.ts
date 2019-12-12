@@ -51,6 +51,7 @@ export interface ExchangeRate {
 }
 
 export interface CurrencyConversionArgs {
+  sourceCurrencyCode?: string
   currencyCode: string
   timestamp?: number
 }
@@ -105,7 +106,11 @@ export const typeDefs = gql`
       offset: Int
     ): [Transfer]
 
-    currencyConversion(currencyCode: String!, timestamp: Float): ExchangeRate
+    currencyConversion(
+      sourceCurrencyCode: String
+      currencyCode: String!
+      timestamp: Float
+    ): ExchangeRate
   }
 `
 
@@ -126,7 +131,8 @@ export const resolvers = {
       args: CurrencyConversionArgs,
       { dataSources }: Context
     ) => {
-      return dataSources.currencyConversionAPI.getExchangeRate(args)
+      const rate = await dataSources.currencyConversionAPI.getExchangeRate(args)
+      return { rate: rate.toNumber() }
     },
   },
   // TODO(kamyar):  see the comment about union causing problems

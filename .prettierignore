@@ -21,7 +21,7 @@ packages/protocol/types/
 !packages/protocol/lib/**/*.ts
 packages/protocol/scripts/**/*.js
 packages/protocol/migrations/**/*.js
-packages/protocol/tests/**/*.js
+packages/protocol/test/**/*.js
 
 packages/verification-pool-api/contracts/*.ts
 
