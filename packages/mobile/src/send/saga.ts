@@ -42,7 +42,7 @@ export async function getSendTxGas(
   const tokenContract = await contractGetter(web3)
   const txParams = { from: account, feeCurrency: tokenContract._address }
   const gas = new BigNumber(await tx.estimateGas(txParams))
-  Logger.debug(`${TAG}/getSendTxGas`, `Estimated gas of ${gas.toString()}}`)
+  Logger.debug(`${TAG}/getSendTxGas`, `Estimated gas of ${gas.toString()}`)
   return gas
 }
 

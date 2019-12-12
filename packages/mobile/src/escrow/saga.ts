@@ -243,7 +243,6 @@ function* doFetchSentPayments() {
     const sentPaymentsRaw = yield all(
       sentPaymentIDs.map((paymentID) => call(getEscrowedPayment, escrow, paymentID))
     )
-
     const tempAddresstoRecipientPhoneNumber: Invitees = yield select(inviteesSelector)
     const sentPayments: EscrowedPayment[] = []
     for (let i = 0; i < sentPaymentsRaw.length; i++) {
