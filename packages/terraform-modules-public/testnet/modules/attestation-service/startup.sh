@@ -4,7 +4,7 @@ function save_variable {
   local var=$1
   local file=$2
 
-  [ ! -z "$var" ] && echo -n "$var" > "$file"
+  [ -n "$var" ] && echo -n "$var" > "$file"
 }
 
 # ---- Set Up Logging ----

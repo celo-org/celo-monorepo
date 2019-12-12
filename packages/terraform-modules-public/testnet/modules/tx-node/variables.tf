@@ -8,6 +8,12 @@ variable celo_env {
   description = "Name of the testnet Celo environment"
 }
 
+variable instance_type {
+  description = "The instance type"
+  type        = string
+  default = "n1-standard-1"
+}
+
 variable ethstats_host {
   type        = string
   description = "Ethstats url or IP address"

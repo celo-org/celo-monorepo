@@ -23,7 +23,7 @@ resource "google_compute_address" "tx_node_internal" {
 
 resource "google_compute_instance" "tx_node" {
   name         = "${local.name_prefix}-${count.index}-${random_id.tx_node[count.index].hex}"
-  machine_type = "n1-standard-1"
+  machine_type = var.instance_type
 
   count = var.tx_node_count
 

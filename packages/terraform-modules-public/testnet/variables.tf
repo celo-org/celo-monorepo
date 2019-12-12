@@ -23,6 +23,18 @@ variable gcloud_project {
 //   description = "Content of the genesis file encoded in base64"
 // }
 
+variable instance_types {
+  description = "The instance type for each component"
+  type        = map(string)
+
+  default = {
+    validator           = "n1-standard-1"
+    proxy               = "n1-standard-1"
+    txnode              = "n1-standard-1"
+    attestation_service = "n1-standard-1"
+  }
+}
+
 variable geth_exporter_docker_image_repository {
   type        = string
   description = "Repository of the geth exporter docker image"
@@ -131,10 +143,9 @@ variable reset_geth_data {
 }
 
 # Attestation service vars
-variable deploy_attestation_service {
-  type        = bool
-  description = "Deploy or not the Attestation Service"
-  default     = false
+variable attestation_service_count {
+  type        = number
+  description = "Number of Attestation Service to deploy"
 }
 
 variable attestation_service_db_username {

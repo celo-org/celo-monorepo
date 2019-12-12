@@ -3,7 +3,7 @@ locals {
 }
 
 resource "google_sql_database_instance" "master" {
-  count            = var.deploy_attestation_service ? 1 : 0
+  count            = var.attestation_service_count > 0 ? 1 : 0
   name             = "${local.name_prefix}-db-${random_id.db_name.hex}"
   database_version = "POSTGRES_9_6"
   region           = var.gcloud_region
@@ -14,29 +14,29 @@ resource "google_sql_database_instance" "master" {
 }
 
 resource "google_sql_user" "celo" {
-  count    = var.deploy_attestation_service ? 1 : 0
+  count    = var.attestation_service_count > 0 ? 1 : 0
   name     = var.db_username
   instance = google_sql_database_instance.master[0].name
   password = var.db_password
 }
 
 resource "google_compute_address" "attestation_service" {
-  count        = var.deploy_attestation_service ? 1 : 0
+  count        = var.attestation_service_count > 0 ? var.attestation_service_count : 0
   name         = "${local.name_prefix}-address"
   address_type = "EXTERNAL"
 }
 
 resource "google_compute_address" "attestation_service_internal" {
-  count        = var.deploy_attestation_service ? 1 : 0
+  count        = var.attestation_service_count > 0 ? var.attestation_service_count : 0
   name         = "${local.name_prefix}-internal-address"
   address_type = "INTERNAL"
   purpose      = "GCE_ENDPOINT"
 }
 
 resource "google_compute_instance" "attestation_service" {
-  count        = var.deploy_attestation_service ? 1 : 0
+  count        = var.attestation_service_count > 0 ? var.attestation_service_count : 0
   name         = "${local.name_prefix}-instance"
-  machine_type = "n1-standard-1"
+  machine_type = var.instance_type
 
   tags = ["${var.celo_env}-attestation-service"]
 
@@ -62,6 +62,7 @@ resource "google_compute_instance" "attestation_service" {
 
   metadata_startup_script = templatefile(
     format("%s/startup.sh", path.module), {
+      rid : count.index,
       attestation_key : "0x${var.attestation_key[count.index]}",
       account_address : var.account_address[count.index],
       celo_provider : var.celo_provider,

@@ -20,7 +20,7 @@ resource "google_compute_address" "proxy_internal" {
 
 resource "google_compute_instance" "proxy" {
   name         = "${local.name_prefix}-${count.index}"
-  machine_type = "n1-standard-1"
+  machine_type = var.instance_type
 
   count = var.validator_count
 

@@ -1,6 +1,6 @@
-variable deploy_attestation_service {
-  type        = bool
-  description = "Deploy or not the Attestation Service"
+variable attestation_service_count {
+  type        = number
+  description = "Number of Attestation Service to deploy"
 }
 
 variable celo_env {
@@ -11,6 +11,12 @@ variable celo_env {
 variable gcloud_region {
   type        = string
   description = "Name of the Google Cloud region to use"
+}
+
+variable instance_type {
+  description = "The instance type"
+  type        = string
+  default = "n1-standard-1"
 }
 
 variable attestation_service_docker_image_repository {

@@ -140,6 +140,7 @@ module "tx_node" {
   # variables
   block_time                            = var.block_time
   celo_env                              = var.celo_env
+  instance_type                         = var.instance_types["txnode"]
   ethstats_host                         = var.ethstats_host
   genesis_content_base64                = base64encode(data.http.genesis.body)
   geth_exporter_docker_image_repository = var.geth_exporter_docker_image_repository
@@ -169,6 +170,7 @@ module "proxy" {
   # variables
   block_time                            = var.block_time
   celo_env                              = var.celo_env
+  instance_type                         = var.instance_types["proxy"]
   ethstats_host                         = var.ethstats_host
   genesis_content_base64                = base64encode(data.http.genesis.body)
   geth_exporter_docker_image_repository = var.geth_exporter_docker_image_repository
@@ -197,6 +199,7 @@ module "validator" {
   # variables
   block_time                            = var.block_time
   celo_env                              = var.celo_env
+  instance_type                         = var.instance_types["validator"]
   ethstats_host                         = var.ethstats_host
   genesis_content_base64                = base64encode(data.http.genesis.body)
   geth_exporter_docker_image_repository = var.geth_exporter_docker_image_repository
@@ -227,8 +230,9 @@ module "attestation-service" {
   # Variables
   celo_env                                    = var.celo_env
   gcloud_region                               = var.gcloud_region
+  instance_type                               = var.instance_types["attestation_service"]
   network_name                                = var.network_name
-  deploy_attestation_service                  = var.deploy_attestation_service
+  attestation_service_count                   = var.attestation_service_count
   db_username                                 = var.attestation_service_db_username
   db_password                                 = var.attestation_service_db_password
   attestation_service_docker_image_repository = var.attestation_service_docker_image_repository
