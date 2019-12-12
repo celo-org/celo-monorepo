@@ -87,9 +87,7 @@ function* sendPayment(
   currency: CURRENCY_ENUM
 ) {
   try {
-    Logger.debug('@sendPayment', ` called`)
     const txId = generateStandbyTransactionId(recipientAddress)
-    Logger.debug('@sendPayment', ` txId is ${txId}`)
 
     switch (currency) {
       case CURRENCY_ENUM.GOLD: {
@@ -104,8 +102,6 @@ function* sendPayment(
         break
       }
       case CURRENCY_ENUM.DOLLAR: {
-        Logger.debug('@sendPayment', ` sending dollars`)
-
         yield put(
           transferStableToken({
             recipientAddress,
@@ -135,7 +131,6 @@ export function* sendPaymentOrInviteSaga({
   onConfirm,
 }: SendPaymentOrInviteAction) {
   try {
-    Logger.debug('@sendPaymentOrInviteSaga', ` called`)
     recipientAddress
       ? CeloAnalytics.track(CustomEventNames.send_dollar_confirm)
       : CeloAnalytics.track(CustomEventNames.send_invite)
@@ -144,20 +139,12 @@ export function* sendPaymentOrInviteSaga({
     }
 
     const ownAddress = yield select(currentAccountSelector)
-    Logger.debug('@sendPaymentOrInviteSaga', ` own address is ${ownAddress}`)
-
     const comment = features.USE_COMMENT_ENCRYPTION
       ? yield call(encryptComment, reason, recipientAddress, ownAddress)
       : reason
 
-    Logger.debug('@sendPaymentOrInviteSaga', ` comment is ${comment}`)
-
     if (recipientAddress) {
-      Logger.debug('@sendPaymentOrInviteSaga', ` recipientAddress ${recipientAddress}`)
-
       yield call(sendPayment, recipientAddress, amount, comment, CURRENCY_ENUM.DOLLAR)
-      Logger.debug('@sendPaymentOrInviteSaga', ` sent payment to ${recipientAddress}`)
-
       CeloAnalytics.track(CustomEventNames.send_dollar_transaction)
     } else if (recipient.e164PhoneNumber) {
       yield call(
