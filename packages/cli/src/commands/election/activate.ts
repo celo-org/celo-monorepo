@@ -8,7 +8,7 @@ import { Flags } from '../../utils/command'
 
 export default class ElectionVote extends BaseCommand {
   static description =
-    'Activate pending votes in validator elections to begin earning rewards. It is required to activate your pending votes at some point after the end of the epoch in which they were made.'
+    'Activate pending votes in validator elections to begin earning rewards. To earn rewards as a voter, it is required to activate your pending votes at some point after the end of the epoch in which they were made.'
 
   static flags = {
     ...BaseCommand.flags,
