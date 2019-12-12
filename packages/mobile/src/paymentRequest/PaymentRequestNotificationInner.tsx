@@ -3,6 +3,7 @@ import * as React from 'react'
 import { Trans, withNamespaces, WithNamespaces } from 'react-i18next'
 import { StyleSheet, Text } from 'react-native'
 import { CURRENCIES, CURRENCY_ENUM } from 'src/geth/consts'
+import { Namespaces } from 'src/i18n'
 import { Recipient } from 'src/recipients/recipient'
 import { getCentAwareMoneyDisplay } from 'src/utils/formatting'
 
@@ -37,4 +38,4 @@ const styles = StyleSheet.create({
   },
 })
 
-export default withNamespaces('paymentRequestFlow')(PaymentRequestNotificationInner)
+export default withNamespaces(Namespaces.paymentRequestFlow)(PaymentRequestNotificationInner)

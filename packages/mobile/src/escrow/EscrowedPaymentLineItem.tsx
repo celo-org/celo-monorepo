@@ -4,6 +4,7 @@ import { Trans, withNamespaces, WithNamespaces } from 'react-i18next'
 import { StyleSheet, Text } from 'react-native'
 import { EscrowedPayment } from 'src/escrow/actions'
 import { CURRENCIES, CURRENCY_ENUM } from 'src/geth/consts'
+import { Namespaces } from 'src/i18n'
 import { divideByWei, getCentAwareMoneyDisplay } from 'src/utils/formatting'
 
 interface Props {
@@ -25,8 +26,8 @@ function EscrowedPaymentLineItem(props: Props & WithNamespaces) {
           recipientPhone,
         }}
       >
-        <Text style={fontStyles.subSmall}>{{ recipientPhone }} for </Text>
-        <Text style={[fontStyles.subSmall, fontStyles.semiBold]}>{{ amount }}</Text>
+        <Text style={styles.phone}>{{ recipientPhone }} for </Text>
+        <Text style={styles.amount}>{{ amount }}</Text>
       </Trans>
     </Text>
   )
@@ -36,6 +37,11 @@ const styles = StyleSheet.create({
   oneLine: {
     flexDirection: 'row',
   },
+  phone: fontStyles.subSmall,
+  amount: {
+    ...fontStyles.subSmall,
+    ...fontStyles.semiBold,
+  },
 })
 
-export default withNamespaces('inviteFlow11')(EscrowedPaymentLineItem)
+export default withNamespaces(Namespaces.inviteFlow11)(EscrowedPaymentLineItem)
