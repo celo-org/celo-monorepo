@@ -95,6 +95,11 @@ export class LogExplorer {
 
     const returnValues = abi.decodeLog(matchedAbi.inputs || [], log.data || '', log.topics.slice(1))
     delete (returnValues as any).__length__
+    Object.keys(returnValues).forEach((key) => {
+      if (Number.parseInt(key, 10) >= 0) {
+        delete (returnValues as any)[key]
+      }
+    })
 
     const logEvent: EventLog & { signature: string } = {
       address: log.address,

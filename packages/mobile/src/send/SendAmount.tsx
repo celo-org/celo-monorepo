@@ -404,7 +404,7 @@ export class SendAmount extends React.Component<Props, State> {
             lng={this.props.lng}
           />
           <CommentInput
-            title={t('for')}
+            title={t('global:for')}
             placeholder={t('groceriesRent')}
             value={this.state.reason}
             maxLength={70}

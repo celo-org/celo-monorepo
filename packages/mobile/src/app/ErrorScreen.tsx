@@ -4,6 +4,7 @@ import * as React from 'react'
 import { withNamespaces, WithNamespaces } from 'react-i18next'
 import { Text, View } from 'react-native'
 import { NavigationParams, NavigationScreenProp } from 'react-navigation'
+import { Namespaces } from 'src/i18n'
 import { deleteChainDataAndRestartApp, RESTART_APP_I18N_KEY } from 'src/utils/AppRestart'
 
 interface OwnProps {
@@ -44,4 +45,4 @@ class ErrorScreen extends React.Component<Props> {
   }
 }
 
-export default withNamespaces('global')(ErrorScreen)
+export default withNamespaces(Namespaces.global)(ErrorScreen)

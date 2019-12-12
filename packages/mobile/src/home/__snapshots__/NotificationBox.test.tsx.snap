@@ -24,73 +24,79 @@ exports[`NotificationBox renders correctly for with all notifications 1`] = `
           }
         }
       >
-        <View
-          style={
-            Array [
-              Object {
-                "flexDirection": "row",
-                "justifyContent": "space-between",
-                "padding": 16,
-                "width": "100%",
-              },
-              Object {
-                "borderColor": "#EEEEEE",
-                "borderRadius": 3,
-                "borderWidth": 1,
-              },
-            ]
-          }
-        >
+        <View>
           <View
             style={
-              Object {
-                "alignItems": "center",
-                "flexDirection": "column",
-                "paddingRight": 16,
-              }
+              Array [
+                Object {
+                  "backgroundColor": "#FFFFFF",
+                  "flexDirection": "row",
+                  "justifyContent": "space-between",
+                  "padding": 16,
+                  "width": "100%",
+                },
+                Object {
+                  "elevation": 2,
+                  "shadowColor": "black",
+                  "shadowOffset": Object {
+                    "height": 1,
+                    "width": 0,
+                  },
+                  "shadowOpacity": 0.3,
+                  "shadowRadius": 1.6,
+                },
+              ]
             }
           >
-            <Image
-              resizeMode="contain"
-              source={
-                Object {
-                  "testUri": "../../../packages/mobile/src/images/send-dollar.png",
-                }
-              }
+            <View
               style={
                 Object {
-                  "height": 30,
-                  "width": 30,
-                }
-              }
-            />
-          </View>
-          <View
-            style={
-              Object {
-                "flex": 1,
-                "justifyContent": "space-between",
-              }
-            }
-          >
-            <Text
-              style={
-                Object {
-                  "color": "#2E3338",
-                  "fontFamily": "Hind-Bold",
-                  "fontSize": 14,
-                  "lineHeight": 18,
+                  "alignItems": "center",
+                  "flexDirection": "column",
+                  "paddingRight": 16,
                 }
               }
             >
-              incomingPaymentRequest
-            </Text>
-            <View>
+              <Image
+                resizeMode="contain"
+                source={
+                  Object {
+                    "testUri": "../../../packages/mobile/src/images/send-dollar.png",
+                  }
+                }
+                style={
+                  Object {
+                    "height": 40,
+                    "width": 40,
+                  }
+                }
+              />
+            </View>
+            <View
+              style={
+                Object {
+                  "flex": 1,
+                  "justifyContent": "space-between",
+                }
+              }
+            >
+              <Text
+                style={
+                  Object {
+                    "color": "#2E3338",
+                    "fontFamily": "Hind-Bold",
+                    "fontSize": 14,
+                    "lineHeight": 18,
+                  }
+                }
+              >
+                incomingPaymentRequests
+              </Text>
               <View
                 style={
                   Object {
                     "justifyContent": "space-between",
-                    "minHeight": 70,
+                    "minHeight": 60,
                   }
                 }
               >
@@ -120,19 +126,16 @@ exports[`NotificationBox renders correctly for with all notifications 1`] = `
                     >
                       <Text
                         style={
-                          Array [
-                            Object {
-                              "color": "#81868B",
-                              "fontFamily": "Hind-Regular",
-                              "fontSize": 14,
-                              "lineHeight": 20,
-                            },
-                          ]
+                          Object {
+                            "color": "#81868B",
+                            "fontFamily": "Hind-Regular",
+                            "fontSize": 14,
+                            "lineHeight": 20,
+                          }
                         }
                       >
                         +14155550000
-                         - 
-                        Rent request for June, it is already late!!!
+                         for 
                       </Text>
                       <Text
                         style={
@@ -149,7 +152,47 @@ exports[`NotificationBox renders correctly for with all notifications 1`] = `
                           ]
                         }
                       >
-                         $12.34
+                        12.34
+                      </Text>
+                    </Text>
+                    <Text
+                      ellipsizeMode="middle"
+                      numberOfLines={1}
+                      style={
+                        Object {
+                          "flexDirection": "row",
+                        }
+                      }
+                    >
+                      <Text
+                        style={
+                          Object {
+                            "color": "#81868B",
+                            "fontFamily": "Hind-Regular",
+                            "fontSize": 14,
+                            "lineHeight": 20,
+                          }
+                        }
+                      >
+                        +14155550000
+                         for 
+                      </Text>
+                      <Text
+                        style={
+                          Array [
+                            Object {
+                              "color": "#81868B",
+                              "fontFamily": "Hind-Regular",
+                              "fontSize": 14,
+                              "lineHeight": 20,
+                            },
+                            Object {
+                              "fontFamily": "Hind-SemiBold",
+                            },
+                          ]
+                        }
+                      >
+                        12.34
                       </Text>
                     </Text>
                   </View>
@@ -158,7 +201,7 @@ exports[`NotificationBox renders correctly for with all notifications 1`] = `
                   style={
                     Object {
                       "flexDirection": "row",
-                      "marginTop": 15,
+                      "marginTop": 5,
                     }
                   }
                 >
@@ -195,7 +238,7 @@ exports[`NotificationBox renders correctly for with all notifications 1`] = `
                         ]
                       }
                     >
-                      review
+                      walletFlow5:review
                     </Text>
                   </View>
                 </View>
@@ -212,73 +255,79 @@ exports[`NotificationBox renders correctly for with all notifications 1`] = `
           }
         }
       >
-        <View
-          style={
-            Array [
-              Object {
-                "flexDirection": "row",
-                "justifyContent": "space-between",
-                "padding": 16,
-                "width": "100%",
-              },
-              Object {
-                "borderColor": "#EEEEEE",
-                "borderRadius": 3,
-                "borderWidth": 1,
-              },
-            ]
-          }
-        >
+        <View>
           <View
             style={
-              Object {
-                "alignItems": "center",
-                "flexDirection": "column",
-                "paddingRight": 16,
-              }
+              Array [
+                Object {
+                  "backgroundColor": "#FFFFFF",
+                  "flexDirection": "row",
+                  "justifyContent": "space-between",
+                  "padding": 16,
+                  "width": "100%",
+                },
+                Object {
+                  "elevation": 2,
+                  "shadowColor": "black",
+                  "shadowOffset": Object {
+                    "height": 1,
+                    "width": 0,
+                  },
+                  "shadowOpacity": 0.3,
+                  "shadowRadius": 1.6,
+                },
+              ]
             }
           >
-            <Image
-              resizeMode="contain"
-              source={
-                Object {
-                  "testUri": "../../../packages/mobile/src/images/backup-icon.png",
-                }
-              }
+            <View
               style={
                 Object {
-                  "height": 30,
-                  "width": 30,
-                }
-              }
-            />
-          </View>
-          <View
-            style={
-              Object {
-                "flex": 1,
-                "justifyContent": "space-between",
-              }
-            }
-          >
-            <Text
-              style={
-                Object {
-                  "color": "#2E3338",
-                  "fontFamily": "Hind-Bold",
-                  "fontSize": 14,
-                  "lineHeight": 18,
+                  "alignItems": "center",
+                  "paddingRight": 16,
                 }
               }
             >
-              backupKeyFlow6:yourBackupKey
-            </Text>
-            <View>
+              <Image
+                resizeMode="contain"
+                source={
+                  Object {
+                    "testUri": "../../../packages/mobile/src/images/backup-icon.png",
+                  }
+                }
+                style={
+                  Object {
+                    "height": 30,
+                    "width": 30,
+                  }
+                }
+              />
+            </View>
+            <View
+              style={
+                Object {
+                  "flex": 1,
+                  "justifyContent": "space-between",
+                }
+              }
+            >
+              <Text
+                style={
+                  Object {
+                    "color": "#81868B",
+                    "fontFamily": "Hind-Regular",
+                    "fontSize": 14,
+                    "lineHeight": 18,
+                  }
+                }
+              >
+                backupKeyFlow6:yourBackupKey
+              </Text>
               <View
                 style={
                   Object {
                     "justifyContent": "space-between",
-                    "minHeight": 70,
+                    "minHeight": 60,
+                    "paddingTop": 8,
                   }
                 }
               >
@@ -306,7 +355,7 @@ exports[`NotificationBox renders correctly for with all notifications 1`] = `
                   style={
                     Object {
                       "flexDirection": "row",
-                      "marginTop": 15,
+                      "marginTop": 5,
                     }
                   }
                 >
@@ -360,73 +409,79 @@ exports[`NotificationBox renders correctly for with all notifications 1`] = `
           }
         }
       >
-        <View
-          style={
-            Array [
-              Object {
-                "flexDirection": "row",
-                "justifyContent": "space-between",
-                "padding": 16,
-                "width": "100%",
-              },
-              Object {
-                "borderColor": "#EEEEEE",
-                "borderRadius": 3,
-                "borderWidth": 1,
-              },
-            ]
-          }
-        >
+        <View>
           <View
             style={
-              Object {
-                "alignItems": "center",
-                "flexDirection": "column",
-                "paddingRight": 16,
-              }
+              Array [
+                Object {
+                  "backgroundColor": "#FFFFFF",
+                  "flexDirection": "row",
+                  "justifyContent": "space-between",
+                  "padding": 16,
+                  "width": "100%",
+                },
+                Object {
+                  "elevation": 2,
+                  "shadowColor": "black",
+                  "shadowOffset": Object {
+                    "height": 1,
+                    "width": 0,
+                  },
+                  "shadowOpacity": 0.3,
+                  "shadowRadius": 1.6,
+                },
+              ]
             }
           >
-            <Image
-              resizeMode="contain"
-              source={
-                Object {
-                  "testUri": "../../../packages/mobile/src/images/get-verified-icon.png",
-                }
-              }
+            <View
               style={
                 Object {
-                  "height": 30,
-                  "width": 30,
-                }
-              }
-            />
-          </View>
-          <View
-            style={
-              Object {
-                "flex": 1,
-                "justifyContent": "space-between",
-              }
-            }
-          >
-            <Text
-              style={
-                Object {
-                  "color": "#2E3338",
-                  "fontFamily": "Hind-Bold",
-                  "fontSize": 14,
-                  "lineHeight": 18,
+                  "alignItems": "center",
+                  "paddingRight": 16,
                 }
               }
             >
-              nuxVerification2:notification.title
-            </Text>
-            <View>
+              <Image
+                resizeMode="contain"
+                source={
+                  Object {
+                    "testUri": "../../../packages/mobile/src/images/get-verified-icon.png",
+                  }
+                }
+                style={
+                  Object {
+                    "height": 30,
+                    "width": 30,
+                  }
+                }
+              />
+            </View>
+            <View
+              style={
+                Object {
+                  "flex": 1,
+                  "justifyContent": "space-between",
+                }
+              }
+            >
+              <Text
+                style={
+                  Object {
+                    "color": "#81868B",
+                    "fontFamily": "Hind-Regular",
+                    "fontSize": 14,
+                    "lineHeight": 18,
+                  }
+                }
+              >
+                nuxVerification2:notification.title
+              </Text>
               <View
                 style={
                   Object {
                     "justifyContent": "space-between",
-                    "minHeight": 70,
+                    "minHeight": 60,
+                    "paddingTop": 8,
                   }
                 }
               >
@@ -454,7 +509,7 @@ exports[`NotificationBox renders correctly for with all notifications 1`] = `
                   style={
                     Object {
                       "flexDirection": "row",
-                      "marginTop": 15,
+                      "marginTop": 5,
                     }
                   }
                 >
@@ -544,73 +599,79 @@ exports[`NotificationBox renders correctly for with all notifications 1`] = `
           }
         }
       >
-        <View
-          style={
-            Array [
-              Object {
-                "flexDirection": "row",
-                "justifyContent": "space-between",
-                "padding": 16,
-                "width": "100%",
-              },
-              Object {
-                "borderColor": "#EEEEEE",
-                "borderRadius": 3,
-                "borderWidth": 1,
-              },
-            ]
-          }
-        >
+        <View>
           <View
             style={
-              Object {
-                "alignItems": "center",
-                "flexDirection": "column",
-                "paddingRight": 16,
-              }
+              Array [
+                Object {
+                  "backgroundColor": "#FFFFFF",
+                  "flexDirection": "row",
+                  "justifyContent": "space-between",
+                  "padding": 16,
+                  "width": "100%",
+                },
+                Object {
+                  "elevation": 2,
+                  "shadowColor": "black",
+                  "shadowOffset": Object {
+                    "height": 1,
+                    "width": 0,
+                  },
+                  "shadowOpacity": 0.3,
+                  "shadowRadius": 1.6,
+                },
+              ]
             }
           >
-            <Image
-              resizeMode="contain"
-              source={
-                Object {
-                  "testUri": "../../../packages/mobile/src/images/home-icon.png",
-                }
-              }
+            <View
               style={
                 Object {
-                  "height": 30,
-                  "width": 30,
-                }
-              }
-            />
-          </View>
-          <View
-            style={
-              Object {
-                "flex": 1,
-                "justifyContent": "space-between",
-              }
-            }
-          >
-            <Text
-              style={
-                Object {
-                  "color": "#2E3338",
-                  "fontFamily": "Hind-Bold",
-                  "fontSize": 14,
-                  "lineHeight": 18,
+                  "alignItems": "center",
+                  "paddingRight": 16,
                 }
               }
             >
-              global:celoGold
-            </Text>
-            <View>
+              <Image
+                resizeMode="contain"
+                source={
+                  Object {
+                    "testUri": "../../../packages/mobile/src/images/home-icon.png",
+                  }
+                }
+                style={
+                  Object {
+                    "height": 30,
+                    "width": 30,
+                  }
+                }
+              />
+            </View>
+            <View
+              style={
+                Object {
+                  "flex": 1,
+                  "justifyContent": "space-between",
+                }
+              }
+            >
+              <Text
+                style={
+                  Object {
+                    "color": "#81868B",
+                    "fontFamily": "Hind-Regular",
+                    "fontSize": 14,
+                    "lineHeight": 18,
+                  }
+                }
+              >
+                global:celoGold
+              </Text>
               <View
                 style={
                   Object {
                     "justifyContent": "space-between",
-                    "minHeight": 70,
+                    "minHeight": 60,
+                    "paddingTop": 8,
                   }
                 }
               >
@@ -638,7 +699,7 @@ exports[`NotificationBox renders correctly for with all notifications 1`] = `
                   style={
                     Object {
                       "flexDirection": "row",
-                      "marginTop": 15,
+                      "marginTop": 5,
                     }
                   }
                 >
@@ -728,73 +789,79 @@ exports[`NotificationBox renders correctly for with all notifications 1`] = `
           }
         }
       >
-        <View
-          style={
-            Array [
-              Object {
-                "flexDirection": "row",
-                "justifyContent": "space-between",
-                "padding": 16,
-                "width": "100%",
-              },
-              Object {
-                "borderColor": "#EEEEEE",
-                "borderRadius": 3,
-                "borderWidth": 1,
-              },
-            ]
-          }
-        >
+        <View>
           <View
             style={
-              Object {
-                "alignItems": "center",
-                "flexDirection": "column",
-                "paddingRight": 16,
-              }
+              Array [
+                Object {
+                  "backgroundColor": "#FFFFFF",
+                  "flexDirection": "row",
+                  "justifyContent": "space-between",
+                  "padding": 16,
+                  "width": "100%",
+                },
+                Object {
+                  "elevation": 2,
+                  "shadowColor": "black",
+                  "shadowOffset": Object {
+                    "height": 1,
+                    "width": 0,
+                  },
+                  "shadowOpacity": 0.3,
+                  "shadowRadius": 1.6,
+                },
+              ]
             }
           >
-            <Image
-              resizeMode="contain"
-              source={
-                Object {
-                  "testUri": "../../../packages/mobile/src/images/Invite-Friends.png",
-                }
-              }
+            <View
               style={
                 Object {
-                  "height": 30,
-                  "width": 30,
-                }
-              }
-            />
-          </View>
-          <View
-            style={
-              Object {
-                "flex": 1,
-                "justifyContent": "space-between",
-              }
-            }
-          >
-            <Text
-              style={
-                Object {
-                  "color": "#2E3338",
-                  "fontFamily": "Hind-Bold",
-                  "fontSize": 14,
-                  "lineHeight": 18,
+                  "alignItems": "center",
+                  "paddingRight": 16,
                 }
               }
             >
-              inviteFlow11:inviteFriendsToCelo
-            </Text>
-            <View>
+              <Image
+                resizeMode="contain"
+                source={
+                  Object {
+                    "testUri": "../../../packages/mobile/src/images/Invite-Friends.png",
+                  }
+                }
+                style={
+                  Object {
+                    "height": 30,
+                    "width": 30,
+                  }
+                }
+              />
+            </View>
+            <View
+              style={
+                Object {
+                  "flex": 1,
+                  "justifyContent": "space-between",
+                }
+              }
+            >
+              <Text
+                style={
+                  Object {
+                    "color": "#81868B",
+                    "fontFamily": "Hind-Regular",
+                    "fontSize": 14,
+                    "lineHeight": 18,
+                  }
+                }
+              >
+                inviteFlow11:inviteFriendsToCelo
+              </Text>
               <View
                 style={
                   Object {
                     "justifyContent": "space-between",
-                    "minHeight": 70,
+                    "minHeight": 60,
+                    "paddingTop": 8,
                   }
                 }
               >
@@ -822,7 +889,7 @@ exports[`NotificationBox renders correctly for with all notifications 1`] = `
                   style={
                     Object {
                       "flexDirection": "row",
-                      "marginTop": 15,
+                      "marginTop": 5,
                     }
                   }
                 >
