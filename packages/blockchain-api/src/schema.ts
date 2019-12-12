@@ -8,6 +8,8 @@ export enum EventTypes {
   FAUCET = 'FAUCET',
   VERIFICATION_REWARD = 'VERIFICATION_REWARD',
   VERIFICATION_FEE = 'VERIFICATION_FEE',
+  ESCROW_SENT = 'ESCROW_SENT',
+  ESCROW_RECEIVED = 'ESCROW_RECEIVED',
 }
 
 export interface ExchangeEvent {
@@ -49,6 +51,7 @@ export interface ExchangeRate {
 }
 
 export interface CurrencyConversionArgs {
+  sourceCurrencyCode?: string
   currencyCode: string
   timestamp?: number
 }
@@ -103,7 +106,11 @@ export const typeDefs = gql`
       offset: Int
     ): [Transfer]
 
-    currencyConversion(currencyCode: String!, timestamp: Float): ExchangeRate
+    currencyConversion(
+      sourceCurrencyCode: String
+      currencyCode: String!
+      timestamp: Float
+    ): ExchangeRate
   }
 `
 
@@ -124,7 +131,8 @@ export const resolvers = {
       args: CurrencyConversionArgs,
       { dataSources }: Context
     ) => {
-      return dataSources.currencyConversionAPI.getExchangeRate(args)
+      const rate = await dataSources.currencyConversionAPI.getExchangeRate(args)
+      return { rate: rate.toNumber() }
     },
   },
   // TODO(kamyar):  see the comment about union causing problems
@@ -135,6 +143,8 @@ export const resolvers = {
       }
       if (
         obj.type === EventTypes.RECEIVED ||
+        obj.type === EventTypes.ESCROW_RECEIVED ||
+        obj.type === EventTypes.ESCROW_SENT ||
         obj.type === EventTypes.SENT ||
         obj.type === EventTypes.FAUCET ||
         obj.type === EventTypes.VERIFICATION_FEE ||
