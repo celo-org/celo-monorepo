@@ -5,6 +5,8 @@ import * as t from 'io-ts'
 import { rootLogger } from './logger'
 
 export enum ErrorMessages {
+  INVALID_SIGNATURE = 'Invalid signature provided',
+  NO_PROVIDER_SETUP = 'No provider was setup for this phone number',
   UNKNOWN_ERROR = 'Something went wrong',
 }
 
