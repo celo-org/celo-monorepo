@@ -31,7 +31,6 @@ export interface ExchangeConfirmationCardProps {
 type Props = ExchangeConfirmationCardProps & WithNamespaces
 
 const getTakerToken = (props: Props) => {
-  console.log('@getTakerToken')
   return props.makerToken === CURRENCY_ENUM.DOLLAR ? CURRENCY_ENUM.GOLD : CURRENCY_ENUM.DOLLAR
 }
 
@@ -87,8 +86,6 @@ export function ExchangeConfirmationCard(props: Props) {
     makerToken: token,
     fee,
   } = props
-
-  console.log('@getTakerToken', JSON.stringify(token))
 
   const localCurrencyCode = useLocalCurrencyCode()
   const localCurrencySymbol = useLocalCurrencySymbol()

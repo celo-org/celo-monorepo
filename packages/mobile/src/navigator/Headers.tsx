@@ -47,7 +47,6 @@ export const headerWithCancelButton = {
 }
 
 export const exchangeHeader = (makerToken: CURRENCY_ENUM, makerTokenBalance: string) => {
-  console.log('Rendering exchangeHeader')
   const title =
     makerToken === CURRENCY_ENUM.DOLLAR
       ? i18n.t('exchangeFlow9:buyGold')
