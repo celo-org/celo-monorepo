@@ -14,10 +14,9 @@ function EscrowedPaymentLineItem(props: Props & WithNamespaces) {
   const { amount, recipientPhone } = props.payment
   return (
     <Text numberOfLines={1} ellipsizeMode="middle" style={styles.oneLine}>
-      {/* 
-      // @ts-ignore tOptions prop is missing in type bindings, but exists in the implementation */}
       <Trans
         i18nKey="escrowPaymentNotificationLine"
+        // @ts-ignore tOptions prop is missing in type bindings, but exists in the implementation
         tOptions={{ context: !recipientPhone ? 'missingRecipientPhone' : null }}
         values={{
           amount:
