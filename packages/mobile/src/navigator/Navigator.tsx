@@ -278,6 +278,12 @@ const AppStack = createStackNavigator(
     // Note, WalletHome isn't in this stack because it's part of the tab navigator
     [Screens.TabNavigator]: { screen: TabNavigator },
     [Stacks.SendStack]: { screen: SendStack },
+    // Adding this screen, so it possbile to go back to Home screen from it
+    [Screens.SendConfirmation]: { screen: SendConfirmation },
+    // Adding this screen, so it possbile to go back to Home screen from it
+    [Screens.ReclaimPaymentConfirmationScreen]: {
+      screen: ReclaimPaymentConfirmationScreen,
+    },
     [Stacks.QRSendStack]: { screen: QRSendStack },
     [Stacks.ExchangeStack]: { screen: ExchangeStack },
     [Stacks.IncomingRequestStack]: { screen: IncomingRequestStack },

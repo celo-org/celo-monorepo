@@ -1,7 +1,7 @@
 {
   "name": "@celo/celocli",
   "description": "CLI Tool for transacting with the Celo protocol",
-  "version": "0.0.30-beta9",
+  "version": "0.0.32-beta3",
   "author": "Celo",
   "license": "Apache-2.0",
   "repository": "celo-org/celo-monorepo",
@@ -67,7 +67,7 @@
     "@types/web3": "^1.0.18",
     "globby": "^8",
     "prettier": "1.13.5",
-    "typescript": "^3.5.3"
+    "typescript": "^3.7.3"
   },
   "files": [
     "README.md",

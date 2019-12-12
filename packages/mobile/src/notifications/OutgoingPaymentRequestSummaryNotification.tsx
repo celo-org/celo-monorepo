@@ -95,7 +95,6 @@ export class OutgoingPaymentRequestSummaryNotification extends React.Component<P
         title={this.getTitle()}
         icon={<Image source={sendDollar} style={styles.image} resizeMode="contain" />}
         ctas={this.getCTA()}
-        roundedBorders={true}
       >
         <View style={styles.body}>
           <View style={styles.requests}>
@@ -104,7 +103,6 @@ export class OutgoingPaymentRequestSummaryNotification extends React.Component<P
                 <PaymentRequestNotificationInner
                   key={key}
                   amount={item.amount}
-                  comment={item.comment}
                   requesterE164Number={item.requesterE164Number}
                   requesterRecipient={this.getRequesterRecipient(item.requesterE164Number)}
                 />
