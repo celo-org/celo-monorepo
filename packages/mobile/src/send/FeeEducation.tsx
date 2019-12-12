@@ -5,6 +5,7 @@ import * as React from 'react'
 import { withNamespaces, WithNamespaces } from 'react-i18next'
 import { Image, StyleSheet, Text, View } from 'react-native'
 import componentWithAnalytics from 'src/analytics/wrapper'
+import { Namespaces } from 'src/i18n'
 import { sendFee } from 'src/images/Images'
 import { navigateBack } from 'src/navigator/NavigationService'
 
@@ -55,4 +56,4 @@ const styles = StyleSheet.create({
   },
 })
 
-export default componentWithAnalytics(withNamespaces('sendFlow7')(FeeEducation))
+export default componentWithAnalytics(withNamespaces(Namespaces.sendFlow7)(FeeEducation))
