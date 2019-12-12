@@ -2,20 +2,19 @@ import BaseNotification from '@celo/react-components/components/BaseNotification
 import ContactCircle from '@celo/react-components/components/ContactCircle'
 import colors from '@celo/react-components/styles/colors'
 import fontStyles from '@celo/react-components/styles/fonts'
-import variables from '@celo/react-components/styles/variables'
 import * as React from 'react'
 import { WithNamespaces, withNamespaces } from 'react-i18next'
-import { StyleSheet, Text, View } from 'react-native'
+import { Image, StyleSheet, Text, View } from 'react-native'
 import { PaymentRequestStatus } from 'src/account/types'
 import CeloAnalytics from 'src/analytics/CeloAnalytics'
 import { CustomEventNames } from 'src/analytics/constants'
 import { updatePaymentRequestNotified, updatePaymentRequestStatus } from 'src/firebase/actions'
+import { CURRENCIES, CURRENCY_ENUM } from 'src/geth/consts'
 import { Namespaces } from 'src/i18n'
-import { navigate } from 'src/navigator/NavigationService'
-import { Screens } from 'src/navigator/Screens'
-import NotificationAmount from 'src/paymentRequest/NotificationAmount'
+import { unknownUserIcon } from 'src/images/Images'
 import { getRecipientThumbnail, Recipient } from 'src/recipients/recipient'
-import { multiplyByWei } from 'src/utils/formatting'
+import { getCentAwareMoneyDisplay } from 'src/utils/formatting'
+import Logger from 'src/utils/Logger'
 
 interface OwnProps {
   requester: Recipient
@@ -26,14 +25,16 @@ interface OwnProps {
   updatePaymentRequestNotified: typeof updatePaymentRequestNotified
 }
 
+const AVATAR_SIZE = 40
+
 type Props = OwnProps & WithNamespaces
 
 export class OutgoingPaymentRequestListItem extends React.Component<Props> {
   onRemind = () => {
-    const { id } = this.props
+    const { id, t } = this.props
     this.props.updatePaymentRequestNotified(id.toString(), false)
     CeloAnalytics.track(CustomEventNames.outgoing_request_payment_remind)
-    this.onFinalized()
+    Logger.showMessage(t('sendFlow7:requestSent'))
   }
 
   onCancel = () => {
@@ -42,18 +43,14 @@ export class OutgoingPaymentRequestListItem extends React.Component<Props> {
     CeloAnalytics.track(CustomEventNames.outgoing_request_payment_cancel)
   }
 
-  onFinalized = () => {
-    navigate(Screens.OutgoingPaymentRequestListScreen)
-  }
-
   getCTA = () => {
     return [
       {
-        text: this.props.t('remind'),
+        text: this.props.t('global:remind'),
         onPress: this.onRemind,
       },
       {
-        text: this.props.t('cancel'),
+        text: this.props.t('global:cancel'),
         onPress: this.onCancel,
       },
     ]
@@ -64,42 +61,47 @@ export class OutgoingPaymentRequestListItem extends React.Component<Props> {
   }
 
   render() {
-    const { requester } = this.props
+    const { requester, t } = this.props
     return (
-      <BaseNotification
-        icon={
-          <ContactCircle
-            size={30}
-            address={requester.address}
-            name={requester.displayName}
-            thumbnailPath={getRecipientThumbnail(requester)}
-          />
-        }
-        title={requester.displayName}
-        ctas={this.getCTA()}
-        roundedBorders={false}
-        callout={<NotificationAmount amount={multiplyByWei(this.props.amount)} />}
-      >
-        <View>
-          {this.isDisplayingNumber() && (
-            <Text style={[fontStyles.subSmall, styles.phoneNumber]}>
-              {this.props.requester.displayId}
-            </Text>
-          )}
-          <Text style={[fontStyles.subSmall, styles.comment]}>{this.props.comment}</Text>
-        </View>
-      </BaseNotification>
+      <View style={styles.container}>
+        <BaseNotification
+          icon={
+            <ContactCircle
+              size={AVATAR_SIZE}
+              address={requester.address}
+              name={requester.displayName}
+              thumbnailPath={getRecipientThumbnail(requester)}
+            >
+              <Image source={unknownUserIcon} style={styles.unknownUser} />
+            </ContactCircle>
+          }
+          title={t('outgoingPaymentRequestNotificationTitle', {
+            name: requester.displayName,
+            amount:
+              CURRENCIES[CURRENCY_ENUM.DOLLAR].symbol + getCentAwareMoneyDisplay(this.props.amount),
+          })}
+          ctas={this.getCTA()}
+        >
+          <Text style={fontStyles.bodySmall}>{this.props.comment || t('defaultComment')}</Text>
+        </BaseNotification>
+      </View>
     )
   }
 }
 
 const styles = StyleSheet.create({
-  comment: {
-    paddingTop: variables.contentPadding,
-  },
   phoneNumber: {
     color: colors.dark,
   },
+  container: {
+    marginBottom: 16,
+  },
+  unknownUser: {
+    height: AVATAR_SIZE,
+    width: AVATAR_SIZE,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
 })
 
-export default withNamespaces(Namespaces.global)(OutgoingPaymentRequestListItem)
+export default withNamespaces(Namespaces.paymentRequestFlow)(OutgoingPaymentRequestListItem)

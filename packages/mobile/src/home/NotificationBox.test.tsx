@@ -83,7 +83,23 @@ describe('NotificationBox', () => {
     expect(getByText('inviteFlow11:inviteFriendsToCelo')).toBeTruthy()
   })
 
-  it('renders payment requests when they exist', () => {
+  it('renders incoming payment request when they exist', () => {
+    const store = createMockStore({
+      ...storeDataNotificationsDisabled,
+      account: {
+        ...storeDataNotificationsDisabled.account,
+        incomingPaymentRequests: [mockPaymentRequests[0]],
+      },
+    })
+    const { getByText } = render(
+      <Provider store={store}>
+        <NotificationBox />
+      </Provider>
+    )
+    expect(getByText('incomingPaymentRequestNotificationTitle')).toBeTruthy()
+  })
+
+  it('renders incoming payment requests when they exist', () => {
     const store = createMockStore({
       ...storeDataNotificationsDisabled,
       account: {
@@ -96,7 +112,39 @@ describe('NotificationBox', () => {
         <NotificationBox />
       </Provider>
     )
-    expect(getByText('incomingPaymentRequest')).toBeTruthy()
+    expect(getByText('incomingPaymentRequests')).toBeTruthy()
+  })
+
+  it('renders outgoing payment requests when they exist', () => {
+    const store = createMockStore({
+      ...storeDataNotificationsDisabled,
+      account: {
+        ...storeDataNotificationsDisabled.account,
+        outgoingPaymentRequests: mockPaymentRequests,
+      },
+    })
+    const { getByText } = render(
+      <Provider store={store}>
+        <NotificationBox />
+      </Provider>
+    )
+    expect(getByText('outgoingPaymentRequests')).toBeTruthy()
+  })
+
+  it('renders outgoing payment request when they exist', () => {
+    const store = createMockStore({
+      ...storeDataNotificationsDisabled,
+      account: {
+        ...storeDataNotificationsDisabled.account,
+        outgoingPaymentRequests: [mockPaymentRequests[0]],
+      },
+    })
+    const { getByText } = render(
+      <Provider store={store}>
+        <NotificationBox />
+      </Provider>
+    )
+    expect(getByText('outgoingPaymentRequestNotificationTitle')).toBeTruthy()
   })
 
   it('renders verification reminder when not verified', () => {
