@@ -1,5 +1,5 @@
 locals {
-  name_prefix = "${var.celo_env}-tx-node-lb"
+  name_prefix             = "${var.celo_env}-tx-node-lb"
   target_https_proxy_name = "${var.celo_env}-tx-node-lb-external-http-proxy"
 }
 
@@ -27,9 +27,14 @@ resource "random_id" "internal" {
   byte_length = 8
 }
 
+data "google_compute_subnetwork" "subnet" {
+  name = var.network_name
+}
+
 resource "google_compute_address" "internal" {
   name         = "${local.name_prefix}-internal-address"
   address_type = "INTERNAL"
+  subnetwork   = data.google_compute_subnetwork.subnet.self_link
 }
 
 resource "google_compute_forwarding_rule" "internal" {
@@ -158,7 +163,7 @@ resource "google_dns_record_set" "external" {
 }
 
 data "google_dns_managed_zone" "external" {
-  name = var.dns_zone_name
+  name    = var.dns_zone_name
   project = var.dns_gcloud_project
 }
 

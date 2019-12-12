@@ -10,6 +10,7 @@ import {
 import { ensure0x } from './utils'
 
 const DEFAULT_FAUCET_CUSD_WEI = '60000000000000000000000' /* 60k Celo Dollars */
+const DEFAULT_INITIAL_GOLD_PRICE = '10'
 
 export function minerForEnv() {
   return privateKeyToAddress(
@@ -36,7 +37,7 @@ function getAttestationKeys() {
 export function migrationOverrides() {
   const mnemonic = fetchEnv(envVar.MNEMONIC)
   const faucetedAccountAddresses = getFaucetedAccounts(mnemonic).map((account) => account.address)
-  const attestationBotAddresses = getAddressesFor(AccountType.ATTESTATION_BOT, mnemonic, 1)
+  const attestationBotAddresses = getAddressesFor(AccountType.ATTESTATION_BOT, mnemonic, 10)
   const initialAddresses = [...faucetedAccountAddresses, ...attestationBotAddresses]
 
   const initialBalance = fetchEnvOrFallback(envVar.FAUCET_CUSD_WEI, DEFAULT_FAUCET_CUSD_WEI)
@@ -47,6 +48,11 @@ export function migrationOverrides() {
       attestationKeys: getAttestationKeys(),
     },
     stableToken: {
+      // TODO(yerdua): handle the case of this not being an integer
+      goldPrice: parseInt(
+        fetchEnvOrFallback(envVar.INITIAL_GOLD_PRICE, DEFAULT_INITIAL_GOLD_PRICE),
+        10
+      ),
       initialBalances: {
         addresses: initialAddresses,
         values: initialAddresses.map(() => initialBalance),

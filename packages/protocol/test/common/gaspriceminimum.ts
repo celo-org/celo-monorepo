@@ -160,14 +160,14 @@ contract('GasPriceMinimum', (accounts: string[]) => {
       const getUpdatedGasPriceMinimum = (
         previousGasPriceMinimum,
         density,
-        targetDensity,
-        adjustmentSpeed
+        _targetDensity,
+        _adjustmentSpeed
       ) => {
         const one = new BigNumber(1)
         return previousGasPriceMinimum
           .times(
             one.plus(
-              fromFixed(adjustmentSpeed).times(fromFixed(density).minus(fromFixed(targetDensity)))
+              fromFixed(_adjustmentSpeed).times(fromFixed(density).minus(fromFixed(_targetDensity)))
             )
           )
           .plus(one)
