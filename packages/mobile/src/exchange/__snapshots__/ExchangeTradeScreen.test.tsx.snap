@@ -74,7 +74,7 @@ exports[`ExchangeTradeScreen renders correctly 1`] = `
                   ]
                 }
               >
-                amount (global:gold)
+                exchangeAmount
               </Text>
               <View
                 accessible={true}
@@ -108,7 +108,7 @@ exports[`ExchangeTradeScreen renders correctly 1`] = `
                     ]
                   }
                 >
-                  switchTo USD
+                  switchTo
                 </Text>
               </View>
             </View>
@@ -174,8 +174,7 @@ exports[`ExchangeTradeScreen renders correctly 1`] = `
                 ]
               }
             >
-              subtotal
-               (@ $9.09)
+              inputSubtotal
             </Text>
             <Text
               style={
