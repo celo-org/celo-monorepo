@@ -34,6 +34,7 @@ export default class Show extends BaseCommand {
     const validators = await this.kit.contracts.getValidators()
     const currentEpoch = await this.kit.getCurrentEpoch()
     const checkBuilder = newCheckBuilder(this)
+    const epochs = Math.max(1, res.flags.epochs || 1)
 
     if (res.flags.validator) {
       if (res.flags.voter || res.flags.group) {
@@ -56,7 +57,7 @@ export default class Show extends BaseCommand {
 
     // Accumulate the rewards from each epoch
     for (
-      let epochNumber = currentEpoch - (res.flags.epochs || 1);
+      let epochNumber = Math.max(0, currentEpoch - epochs + 1);
       epochNumber <= currentEpoch;
       epochNumber++
     ) {

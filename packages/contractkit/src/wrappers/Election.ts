@@ -366,7 +366,7 @@ export class ElectionWrapper extends BaseWrapper<Election> {
   }
 
   /**
-   * Retrieves GroupVoterRewards for epochNumber.
+   * Retrieves GroupVoterRewards at epochNumber.
    * @param epochNumber The epoch to retrieve GroupVoterRewards at.
    */
   async getGroupVoterRewards(epochNumber: number): Promise<GroupVoterReward[]> {
@@ -390,7 +390,7 @@ export class ElectionWrapper extends BaseWrapper<Election> {
 
   /**
    * Retrieves VoterRewards for address at epochNumber.
-   * @param epochNumber The address to retrieve VoterRewards for.
+   * @param address The address to retrieve VoterRewards for.
    * @param epochNumber The epoch to retrieve VoterRewards at.
    */
   async getVoterRewards(address: Address, epochNumber: number): Promise<VoterReward[]> {
