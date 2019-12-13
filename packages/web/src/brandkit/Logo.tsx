@@ -50,7 +50,7 @@ const Overview = withNamespaces(NameSpaces.brand)(
       <View style={styles.container}>
         <View style={styles.gap}>
           <H1 style={standardStyles.elementalMarginBottom}>{t('logo.title')}</H1>
-          <H4 style={[standardStyles.elementalMarginBottom]}>{t('logo.overviewCopy')}</H4>
+          <H4 style={standardStyles.elementalMarginBottom}>{t('logo.overviewCopy')}</H4>
           <Button
             kind={BTN.PRIMARY}
             text={t('logo.overviewBtn')}
