@@ -13,7 +13,7 @@ const DefaultConfig = {
     selectIssuersWaitBlocks: 4,
   },
   blockchainParameters: {
-    gasForNonGoldCurrencies: 166000,
+    gasForNonGoldCurrencies: 50000,
     minimumClientVersion: {
       major: 1,
       minor: 8,
@@ -117,7 +117,9 @@ const DefaultConfig = {
     attestationKeys: [],
     groupName: 'C-Labs',
     commission: 0.1,
-    votesRatioOfLastVsFirstGroup: 2.0,
+    groupLockedGold: {
+      value: '22000000000000000000000', // 22k gold per group
+    },
   },
 }
 

@@ -74,9 +74,48 @@ describe('TransferConfirmationCard', () => {
     expect(tree).toMatchSnapshot()
   })
 
+  it('renders correctly for received escrow transaction drilldown', () => {
+    const props = {
+      type: TransactionTypes.ESCROW_RECEIVED,
+      address: mockAccount,
+      comment: '',
+      value: new BigNumber(100),
+      currency: CURRENCY_ENUM.DOLLAR,
+      contact: mockContactWithPhone,
+      e164PhoneNumber: mockE164Number,
+    }
+
+    const tree = renderer.create(
+      <Provider store={store}>
+        <TransferConfirmationCard {...props} />
+      </Provider>
+    )
+    expect(tree).toMatchSnapshot()
+  })
+
   it('renders correctly for sent transaction drilldown', () => {
     const props = {
       type: TransactionTypes.SENT,
+      address: mockAccount,
+      comment: mockComment,
+      value: new BigNumber(100),
+      currency: CURRENCY_ENUM.DOLLAR,
+      contact: mockContactWithPhone,
+      e164PhoneNumber: mockE164Number,
+      fee: new BigNumber(0.01),
+    }
+
+    const tree = renderer.create(
+      <Provider store={store}>
+        <TransferConfirmationCard {...props} />
+      </Provider>
+    )
+    expect(tree).toMatchSnapshot()
+  })
+
+  it('renders correctly for sent escrow transaction drilldown', () => {
+    const props = {
+      type: TransactionTypes.ESCROW_SENT,
       address: mockAccount,
       comment: mockComment,
       value: new BigNumber(100),

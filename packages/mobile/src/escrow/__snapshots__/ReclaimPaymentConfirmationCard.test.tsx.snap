@@ -192,7 +192,6 @@ exports[`ReclaimPaymentConfirmationCard renders correctly for send payment confi
         "alignItems": "stretch",
         "justifyContent": "center",
         "marginBottom": 10,
-        "marginTop": 10,
       }
     }
   >

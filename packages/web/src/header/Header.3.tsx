@@ -3,10 +3,10 @@ import throttle from 'lodash.throttle'
 import dynamic from 'next/dynamic'
 import { SingletonRouter as Router, withRouter } from 'next/router'
 import * as React from 'react'
-import { WithNamespaces, withNamespaces } from 'react-i18next'
 import { Animated, Dimensions, Easing, StyleSheet, View } from 'react-native'
-import BlueBanner, { BANNER_HEIGHT, styles as bannerStyle } from 'src/header/BlueBanner'
+import BlueBanner, { styles as bannerStyle } from 'src/header/BlueBanner'
 import cssStyles from 'src/header/Header.3.scss'
+import { I18nProps, withNamespaces } from 'src/i18n'
 import MediumLogo from 'src/icons/MediumLogo'
 import Octocat from 'src/icons/Octocat'
 import LogoDarkBg from 'src/logos/LogoDarkBg'
@@ -37,7 +37,7 @@ interface OwnProps {
   router: Router
 }
 
-type Props = OwnProps & WithNamespaces
+type Props = OwnProps & I18nProps
 
 interface State {
   showDesktopMenu: boolean
@@ -47,6 +47,7 @@ interface State {
   menuFaded: boolean
   belowFoldUpScroll: boolean
   isBannerShowing: boolean
+  bannerHeight: number
 }
 
 function scrollOffset() {
@@ -121,6 +122,7 @@ export class Header extends React.PureComponent<Props, State> {
       mobileMenuActive: false,
       belowFoldUpScroll: false,
       isBannerShowing: false,
+      bannerHeight: 0,
     }
   }
 
@@ -183,6 +185,10 @@ export class Header extends React.PureComponent<Props, State> {
     this.setState({ isBannerShowing })
   }
 
+  setBannerHeight = (height: number) => {
+    this.setState({ bannerHeight: height })
+  }
+
   render() {
     const { t } = this.props
     const foreground = this.getForegroundColor()
@@ -195,7 +201,7 @@ export class Header extends React.PureComponent<Props, State> {
         style={[
           styles.container,
           bannerStyle.slideDown,
-          { top: isHomePage && this.state.isBannerShowing ? BANNER_HEIGHT : 0 },
+          { top: isHomePage && this.state.isBannerShowing ? this.state.bannerHeight : 0 },
           this.state.mobileMenuActive && styles.mobileMenuActive,
         ]}
       >
@@ -206,7 +212,9 @@ export class Header extends React.PureComponent<Props, State> {
             background-color: ${hamburger} !important;
           }
         `}</style>
-        {isHomePage && <BlueBanner onVisibilityChange={this.toggleBanner} />}
+        {isHomePage && (
+          <BlueBanner onVisibilityChange={this.toggleBanner} getHeight={this.setBannerHeight} />
+        )}
         {this.state.menuFaded || (
           <Animated.View
             style={[

@@ -105,21 +105,21 @@ const commands = [
   {
     command: 'blockscout',
     description: 'blockscout, the block explorer',
-    url: getBlockscoutUrl,
+    url: (argv: CeloEnvArgv) => getBlockscoutUrl(argv.celoEnv),
     explanation:
       'Blockscout can be useful to take a look at Blocks, Transactions and Token Transfers and they made it onto the blockchain.',
   },
   {
     command: 'ethstats',
     description: 'ethstats',
-    url: getEthstatsUrl,
+    url: (argv: CeloEnvArgv) => getEthstatsUrl(argv.celoEnv),
     explanation:
       'Ethstats gives us quick insight into what the geth nodes are reporting as their peer number, their latest block, etc.',
   },
   {
     command: 'blockchain-api',
     description: 'blockchain-api',
-    url: getBlockchainApiUrl,
+    url: (argv: CeloEnvArgv) => getBlockchainApiUrl(argv.celoEnv),
     explanation:
       'The blockchain-api exposes a GraphQL Explorer through which you can verify some queries the service itself uses',
   },

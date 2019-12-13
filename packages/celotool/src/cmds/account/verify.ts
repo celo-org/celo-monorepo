@@ -78,7 +78,7 @@ async function verifyCmd(argv: VerifyArgv) {
   const currentWalletAddress = await accounts.getWalletAddress(account)
 
   if (currentWalletAddress !== account) {
-    const setWalletAddressTx = await accounts.setWalletAddress(account)
+    const setWalletAddressTx = accounts.setWalletAddress(account)
     const result = await setWalletAddressTx.send()
     await result.waitReceipt()
   }

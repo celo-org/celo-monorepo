@@ -72,5 +72,10 @@
     "body1": "An issue has occured while verifying your phone number.",
     "body2": "You can skip verification for now and try again later."
   },
-  "congratsVerified": "Congratulations you are now verified!"
+  "congratsVerified": "Congratulations you are now verified!",
+  "notification": {
+    "title": "Verify Your Phone",
+    "body": "Verifying allows you to send and receive with your phone contacts.",
+    "cta": "Get Verified"
+  }
 }
