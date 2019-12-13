@@ -4,45 +4,29 @@ import CeloAnalyticsType from '@celo/react-components/analytics/CeloAnalytics'
 import { DefaultEventNames } from '@celo/react-components/analytics/constants'
 import ReactNativeLogger from '@celo/react-components/services/ReactNativeLogger'
 import * as React from 'react'
-// tslint:disable-next-line
-import { Component, ComponentType, forwardRef, Ref } from 'react'
 
 function getDisplayName<P extends {}>(WrappedComponent: React.ComponentType<P>) {
   return WrappedComponent.displayName || WrappedComponent.name || 'Component'
 }
 
+interface ForwardedRef {
+  forwardedRef?: React.Ref<React.ReactElement<any>>
+}
+
 export default function Initializer(CeloAnalytics: CeloAnalyticsType, Logger: ReactNativeLogger) {
-  // Wrapper type: https://gist.github.com/OliverJAsh/d2f462b03b3e6c24f5588ca7915d010e
+  // Wrapper type: https://medium.com/@jrwebdev/react-higher-order-component-patterns-in-typescript-42278f7590fb
   // Component name: https://reactjs.org/docs/forwarding-refs.html
 
-  function componentWithAnalytics<ComposedComponentProps extends {}>(
-    ComposedComponent: ComponentType<ComposedComponentProps>
-  ) {
-    const displayName = getDisplayName(ComposedComponent)
-    // @ts-ignore
-    type ComposedComponentInstance = InstanceType<typeof ComposedComponent>
-    type WrapperComponentProps = ComposedComponentProps & {
-      wrapperComponentProp: number
-    }
-    type WrapperComponentPropsWithForwardedRef = WrapperComponentProps & {
-      forwardedRef: Ref<ComposedComponentInstance>
-    }
+  function componentWithAnalytics<P extends {}>(
+    WrappedComponent: React.ComponentType<P>
+  ): React.ComponentClass<P> {
+    const displayName = getDisplayName(WrappedComponent)
 
-    class WrapperComponent extends Component<WrapperComponentPropsWithForwardedRef, {}> {
+    class ComponentWithAnalytics extends React.Component<P & ForwardedRef> {
       timestamp: number | undefined
 
       render() {
-        const { forwardedRef, wrapperComponentProp, ...composedComponentProps } = this.props
-
-        return (
-          <ComposedComponent
-            ref={forwardedRef}
-            // We need a cast because:
-            // https://github.com/DefinitelyTyped/DefinitelyTyped/issues/32355
-            // https://github.com/Microsoft/TypeScript/issues/28938#issuecomment-450636046
-            {...composedComponentProps as ComposedComponentProps}
-          />
-        )
+        return <WrappedComponent {...this.props} ref={this.props.forwardedRef} />
       }
 
       trackEvent(event: any, props: any, attachDeviceInfo = false) {
@@ -74,16 +58,13 @@ export default function Initializer(CeloAnalytics: CeloAnalyticsType, Logger: Re
       }
     }
 
-    function forward(props: WrapperComponentProps, ref: Ref<ComposedComponentInstance>) {
-      return <WrapperComponent forwardedRef={ref} {...props} />
+    function forwardRef(props: P, ref: any) {
+      return <ComponentWithAnalytics {...props} forwardedRef={ref} />
     }
 
-    forward.displayName = `WithAnalytics(${displayName})`
+    forwardRef.displayName = `WithAnalytics(${displayName})`
 
-    return hoistNonReactStatics(
-      forwardRef<ComposedComponentInstance, WrapperComponentProps>(forward),
-      ComposedComponent
-    )
+    return hoistNonReactStatics(React.forwardRef(forwardRef), WrappedComponent)
   }
   return componentWithAnalytics
 }

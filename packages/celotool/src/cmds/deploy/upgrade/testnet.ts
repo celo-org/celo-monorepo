@@ -31,7 +31,7 @@ export const handler = async (argv: TestnetArgv) => {
 
   await upgradeStaticIPs(argv.celoEnv)
 
-  if (argv.reset === true) {
+  if (argv.reset) {
     await resetAndUpgradeHelmChart(argv.celoEnv)
     await uploadGenesisBlockToGoogleStorage(argv.celoEnv)
   } else {
