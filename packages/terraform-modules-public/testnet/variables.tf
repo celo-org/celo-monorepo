@@ -126,17 +126,6 @@ variable proxy_private_keys {
   description = "Array with the Proxy private keys"
 }
 
-variable deploy_txnode_lb {
-  type        = bool
-  description = "Deploy or not the Load Balancer for the TX Nodes"
-  default     = false
-}
-
-// variable static_nodes_base64 {
-//   type        = string
-//   description = "Content of the genesis file encoded in base64"
-// }
-
 variable reset_geth_data {
   type        = bool
   description = "Specifies if the existing chain data should be removed while creating the instance"

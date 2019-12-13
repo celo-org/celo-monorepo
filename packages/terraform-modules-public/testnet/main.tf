@@ -9,7 +9,6 @@ locals {
   firewall_target_tags_validator           = ["${var.celo_env}-validator"]
   firewall_target_tags_proxy               = ["${var.celo_env}-proxy"]
   firewall_target_tags_attestation_service = ["${var.celo_env}-attestation-service"]
-  deploy_txnode_lb                         = var.tx_node_count > 0 ? var.deploy_txnode_lb : false
 }
 
 # Dummy variable for network dependency
@@ -153,16 +152,6 @@ module "tx_node" {
   network_name                          = var.network_name
   tx_node_count                         = var.tx_node_count
   static_nodes_base64                   = base64encode(data.http.static-nodes.body)
-}
-
-# used for access by blockscout
-module "tx_node_lb" {
-  source = "./modules/tx-node-load-balancer"
-  # variables
-  celo_env           = var.celo_env
-  network_name       = var.network_name
-  tx_node_self_links = module.tx_node.self_links
-  deploy_txnode_lb   = local.deploy_txnode_lb
 }
 
 module "proxy" {
