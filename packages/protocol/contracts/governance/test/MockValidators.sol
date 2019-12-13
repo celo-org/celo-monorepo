@@ -79,4 +79,8 @@ contract MockValidators is IValidators {
     }
     return numMembers;
   }
+
+  function getValidatorGroupSlashingMultiplier(address) external view returns (uint256) {
+    return FIXED1_UINT;
+  }
 }

@@ -1193,4 +1193,14 @@ contract Validators is
     );
     group.slashInfo.lastSlashedTimestamp = now;
   }
+
+  function getValidatorGroupSlashingMultiplier(address groupAddress)
+    external
+    view
+    returns (uint256)
+  {
+    require(isValidatorGroup(groupAddress));
+    ValidatorGroup storage group = groups[groupAddress];
+    return group.slashInfo.slashingMultiplier.unwrap();
+  }
 }

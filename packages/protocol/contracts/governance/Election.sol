@@ -433,8 +433,16 @@ contract Election is
     FixidityLib.Fraction memory score = FixidityLib.wrap(
       getValidators().calculateGroupEpochScore(uptimes)
     );
+    FixidityLib.Fraction memory slashingMultiplier = FixidityLib.wrap(
+      getValidators().getValidatorGroupSlashingMultiplier(group)
+    );
     return
-      FixidityLib.newFixed(totalEpochRewards).multiply(votePortion).multiply(score).fromFixed();
+      FixidityLib
+        .newFixed(totalEpochRewards)
+        .multiply(votePortion)
+        .multiply(score)
+        .multiply(slashingMultiplier)
+        .fromFixed();
   }
 
   /**
