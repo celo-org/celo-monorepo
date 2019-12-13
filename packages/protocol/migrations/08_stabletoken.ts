@@ -58,9 +58,6 @@ module.exports = deploymentForCoreContract<StableTokenInstance>(
     }
     await sortedOracles.report(
       stableToken.address,
-      // TODO(maybe) (yerdua): goldPrice is assumed to be an integer, and will
-      //    probably fail if it is not. Handle decimal values here if we need it
-      //    to set the initial value in mainnet
       config.stableToken.goldPrice,
       1,
       NULL_ADDRESS,
