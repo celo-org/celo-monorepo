@@ -364,6 +364,7 @@ exports[`when defaultCountry is truthy does not render an AutoComplete 1`] = `
         onBlur={[Function]}
         onChangeText={[Function]}
         onFocus={[Function]}
+        placeholder="(000) 000-0000"
         placeholderTextColor="#D1D5D8"
         rejectResponderTermination={true}
         style={
