@@ -2233,7 +2233,8 @@ contract('Validators', (accounts: string[]) => {
           const blockNumber = await web3.eth.getBlockNumber()
           const epochNumber = Math.floor(blockNumber / EPOCH)
           const blocksUntilNextEpoch = (epochNumber + 1) * EPOCH - blockNumber
-          epochs.push([epochNumber, i !== 4 ? groups[i] : NULL_ADDRESS])
+          await mineBlocks(blocksUntilNextEpoch, web3)
+          epochs.push([epochNumber + 1, i !== 4 ? groups[i] : NULL_ADDRESS])
 
           if (i !== 4) {
             await validators.affiliate(groups[i])
@@ -2243,7 +2244,6 @@ contract('Validators', (accounts: string[]) => {
           } else {
             await validators.forceDeaffiliateIfValidator(validator)
           }
-          await mineBlocks(blocksUntilNextEpoch, web3)
         }
       })
 
@@ -2273,7 +2273,7 @@ contract('Validators', (accounts: string[]) => {
           await mineBlocks(blocksUntilNextEpoch, web3)
 
           if (i % 3 === 0) {
-            epochs.push([epochNumber, i !== 9 ? groups[i / 3] : NULL_ADDRESS])
+            epochs.push([epochNumber + 1, i !== 9 ? groups[i / 3] : NULL_ADDRESS])
             if (i !== 9) {
               await validators.affiliate(groups[i / 3])
               await validators.addFirstMember(validator, NULL_ADDRESS, NULL_ADDRESS, {
@@ -2289,41 +2289,51 @@ contract('Validators', (accounts: string[]) => {
       it('should correctly get the group address for exact epoch numbers', async () => {
         for (let i = 0; i < membershipHistoryLength.toNumber(); i++) {
           assert.equal(
-            await validators.groupMembershipInEpoch(validator, epochs[i][0] + 1, 1 + i),
+            await validators.groupMembershipInEpoch(validator, epochs[i][0], 1 + i),
             i !== 3 ? epochs[i][1] : NULL_ADDRESS
           )
         }
       })
 
       it('should correctly get the group address of epoch numbers between switches', async () => {
-        // Also test other contract address approvals
+        // Also tests other contract address approvals
         assert.equal(
-          await validators.groupMembershipInEpoch(validator, 24, 1, { from: accounts[3] }),
-          groups[0]
+          await validators.groupMembershipInEpoch(validator, epochs[0][0] + 2, 1, {
+            from: accounts[3],
+          }),
+          epochs[0][1]
         )
         assert.equal(
-          await validators.groupMembershipInEpoch(validator, 25, 1, { from: accounts[4] }),
-          groups[0]
+          await validators.groupMembershipInEpoch(validator, epochs[0][0] + 1, 1, {
+            from: accounts[4],
+          }),
+          epochs[0][1]
         )
-        assert.equal(await validators.groupMembershipInEpoch(validator, 27, 2), groups[1])
-        assert.equal(await validators.groupMembershipInEpoch(validator, 36, 5), groups[4])
+        assert.equal(
+          await validators.groupMembershipInEpoch(validator, epochs[1][0] + 2, 2),
+          epochs[1][1]
+        )
+        assert.equal(
+          await validators.groupMembershipInEpoch(validator, epochs[4][0] + 1, 5),
+          epochs[4][1]
+        )
         // Epoch 29 join group A, epoch 32 deaffiliate, epoch 35 join group B.
         // This verifies we don't mistake 0 addresses as the end of history.
-        await assertRevert(validators.groupMembershipInEpoch(validator, 35, 3))
-        await assertRevert(validators.groupMembershipInEpoch(validator, 32, 3))
+        await assertRevert(validators.groupMembershipInEpoch(validator, epochs[4][0], 3))
+        await assertRevert(validators.groupMembershipInEpoch(validator, epochs[3][0], 3))
       })
 
       describe('when called with various malformed inputs', () => {
         it('should revert when epochNumber at given index is greater than provided epochNumber', async () => {
-          await assertRevert(validators.groupMembershipInEpoch(validator, 49, 5))
+          await assertRevert(validators.groupMembershipInEpoch(validator, epochs[4][0] - 1, 5))
         })
 
         it("should revert when epochNumber fits into a different index's bucket", async () => {
-          await assertRevert(validators.groupMembershipInEpoch(validator, 57, 1))
+          await assertRevert(validators.groupMembershipInEpoch(validator, epochs[2][0], 1))
         })
 
         it("should revert when epochNumber is greater than the chain's current epochNumber", async () => {
-          await assertRevert(validators.groupMembershipInEpoch(validator, 81, 5))
+          await assertRevert(validators.groupMembershipInEpoch(validator, epochs[4][0] + 10, 5))
         })
       })
     })
@@ -2331,7 +2341,7 @@ contract('Validators', (accounts: string[]) => {
     describe('when the sender is not an approved address', () => {
       it('should revert', async () => {
         await assertRevert(
-          validators.groupMembershipInEpoch(validator, 95, 1, { from: accounts[1] })
+          validators.groupMembershipInEpoch(validator, 0, 1, { from: accounts[1] })
         )
       })
     })
