@@ -140,6 +140,7 @@ export default class PhoneNumberInput extends React.Component<Props, State> {
           countryQuery,
           countryCallingCode,
           regionCode,
+          // @ts-ignore
           inputPhonePlaceholder: country.countryPhonePlaceholder.national,
         },
         // Reparse phone number in case user entered that first
