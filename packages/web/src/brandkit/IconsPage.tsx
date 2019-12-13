@@ -1,14 +1,11 @@
 import * as React from 'react'
-import { withNamespaces } from 'react-i18next'
 import { StyleSheet, Text, View } from 'react-native'
-
 import { brandStyles, GAP } from 'src/brandkit/common/constants'
+import Fetch from 'src/brandkit/common/Fetch'
 import Page from 'src/brandkit/common/Page'
 import PageHeadline from 'src/brandkit/common/PageHeadline'
-import { I18nProps, NameSpaces, Trans } from 'src/i18n'
-
-import Fetch from 'src/brandkit/common/Fetch'
 import IconShowcase from 'src/brandkit/common/Showcase'
+import { I18nProps, NameSpaces, Trans, withNamespaces } from 'src/i18n'
 import InlineAnchor from 'src/shared/InlineAnchor'
 import { CeloLinks, hashNav } from 'src/shared/menu-items'
 import { fonts, standardStyles } from 'src/styles'
