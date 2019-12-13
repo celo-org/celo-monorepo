@@ -151,7 +151,14 @@ async function readAssoc(lst: string[]) {
         console.log(a, 'has url', url)
         let metadata: IdentityMetadataWrapper
         if (url == '') metadata = IdentityMetadataWrapper.fromEmpty(a)
-        else metadata = await IdentityMetadataWrapper.fetchFromURL(url)
+        else {
+          try {
+            metadata = await IdentityMetadataWrapper.fetchFromURL(url)
+          } catch (err) {
+            console.error('Error reading metadata', a, err.toString())
+            metadata = IdentityMetadataWrapper.fromEmpty(a)
+          }
+        }
         await processClaims(kit, a, metadata)
       } catch (err) {
         console.error('Bad address', a, err.toString())
