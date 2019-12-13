@@ -9,7 +9,7 @@ function getAirtable() {
 }
 
 export async function submitFellowApp(fields: FellowApp): Promise<AirRecord<FellowApp>> {
-  return getAirtable().create(migrate(fields))
+  return getAirtable().create(migrate(fields)) as Promise<AirRecord<FellowApp>>
 }
 
 function migrate(fields: FellowApp) {

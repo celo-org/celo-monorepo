@@ -13,7 +13,7 @@ declare module 'react-native' {
   interface TextStyle {
     textRendering?: string
     listStyle?: 'disc' | 'circle' | 'square' | 'decimal' | 'none' | 'lower-alpha'
-    display?: 'list-item' | 'inline' | 'none' | 'inline-flex'
+    display?: 'list-item' | 'inline' | 'none' | 'inline-flex' | 'flex'
     transitionProperty?: string
     transitionDuration?: string
   }
@@ -31,7 +31,7 @@ declare module 'react-native' {
     animationTimingFunction?: string
     scrollPadding?: number
     cursor?: string
-    display?: 'none' | 'flex' | 'inline' | 'inline-flex'
+    display?: 'none' | 'flex' | 'inline' | 'inline-flex' | 'list-item'
     fill?: string
     filter?: string
   }
