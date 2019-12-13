@@ -177,7 +177,7 @@ const getEnodesWithIpAddresses = async (namespace: string, getExternalIP: boolea
   const txNodesNum = parseInt(fetchEnv(envVar.TX_NODES), 10)
   const txAddresses = await retrieveTxNodeAddresses(namespace, txNodesNum)
   const txNodesRange = range(0, txNodesNum)
-  const enodes = Promise.all(
+  return Promise.all(
     txNodesRange.map(async (index) => {
       const privateKey = generatePrivateKey(fetchEnv(envVar.MNEMONIC), AccountType.TX_NODE, index)
       const nodeId = privateKeyToPublicKey(privateKey)
@@ -196,7 +196,6 @@ const getEnodesWithIpAddresses = async (namespace: string, getExternalIP: boolea
       return getEnodeAddress(nodeId, address, DISCOVERY_PORT)
     })
   )
-  return enodes
 }
 
 export const getEnodesAddresses = async (namespace: string) => {
