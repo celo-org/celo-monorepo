@@ -28,7 +28,7 @@ const Overview = withNamespaces(NameSpaces.brand)(function _Overview({ t }: I18n
       <H4 style={standardStyles.blockMarginBottom}>{t('home.introduction')}</H4>
       <Text style={[fonts.h5, standardStyles.elementalMarginBottom]}>{t('home.useageTitle')}</Text>
       <Text style={fonts.p}>
-        <Trans i18nKey="home.useageText">
+        <Trans ns={NameSpaces.brand} i18nKey="home.useageText">
           <InlineAnchor href={menuItems.CODE_OF_CONDUCT.link}>Code Of Conduct</InlineAnchor>
         </Trans>
       </Text>
