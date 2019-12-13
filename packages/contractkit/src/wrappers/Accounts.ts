@@ -240,12 +240,8 @@ export class AccountsWrapper extends BaseWrapper<Accounts> {
    * @param blockNumber Height of result, defaults to tip.
    */
   async getName(account: Address, blockNumber?: number): Promise<string> {
-    return blockNumber
-      ? this.contract.methods
-          .getName(account)
-          // @ts-ignore: Expected 0-1 arguments, but got 2
-          .call({}, blockNumber)
-      : this.contract.methods.getName(account).call()
+    // @ts-ignore: Expected 0-1 arguments, but got 2
+    return this.contract.methods.getName(account).call({}, blockNumber)
   }
 
   /**

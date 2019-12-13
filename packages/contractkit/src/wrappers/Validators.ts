@@ -2,6 +2,8 @@ import { eqAddress } from '@celo/utils/lib/address'
 import { zip } from '@celo/utils/lib/collections'
 import { fromFixed, toFixed } from '@celo/utils/lib/fixidity'
 import BigNumber from 'bignumber.js'
+import { BlockType } from 'web3/eth/types'
+import { EventLog } from 'web3/types'
 import { Address, NULL_ADDRESS } from '../base'
 import { Validators } from '../generated/types/Validators'
 import {
@@ -201,13 +203,8 @@ export class ValidatorsWrapper extends BaseWrapper<Validators> {
 
   /** Get Validator information */
   async getValidator(address: Address, blockNumber?: number): Promise<Validator> {
-    const res = blockNumber
-      ? await this.contract.methods
-          .getValidator(address)
-          // @ts-ignore: Expected 0-1 arguments, but got 2
-          .call({}, blockNumber)
-      : await this.contract.methods.getValidator(address).call()
-
+    // @ts-ignore: Expected 0-1 arguments, but got 2
+    const res = await this.contract.methods.getValidator(address).call({}, blockNumber)
     const accounts = await this.kit.contracts.getAccounts()
     const name = await accounts.getName(address, blockNumber)
 
@@ -429,5 +426,14 @@ export class ValidatorsWrapper extends BaseWrapper<Validators> {
       this.kit,
       this.contract.methods.reorderMember(validator, nextMember, prevMember)
     )
+  }
+
+  async getPastValidatorRewards(options?: {
+    filter?: object
+    fromBlock?: BlockType
+    toBlock?: BlockType
+    topics?: string[]
+  }): Promise<EventLog[]> {
+    return this.getPastEvents('ValidatorEpochPaymentDistributed', options)
   }
 }

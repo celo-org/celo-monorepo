@@ -2,6 +2,8 @@ import { eqAddress } from '@celo/utils/lib/address'
 import { concurrentMap } from '@celo/utils/lib/async'
 import { zip } from '@celo/utils/lib/collections'
 import BigNumber from 'bignumber.js'
+import { BlockType } from 'web3/eth/types'
+import { EventLog } from 'web3/types'
 import { Address, NULL_ADDRESS } from '../base'
 import { Election } from '../generated/types/Election'
 import {
@@ -90,17 +92,24 @@ export class ElectionWrapper extends BaseWrapper<Election> {
   electValidatorSigners = proxyCall(this.contract.methods.electValidatorSigners)
 
   /**
-   * Returns the total votes for `group` made by `account`.
+   * Returns the total votes for `group`.
    * @param group The address of the validator group.
    * @return The total votes for `group`.
    */
   async getTotalVotesForGroup(group: Address, blockNumber?: number): Promise<BigNumber> {
-    const votes = blockNumber
-      ? await this.contract.methods
-          .getTotalVotesForGroup(group)
-          // @ts-ignore: Expected 0-1 arguments, but got 2
-          .call({}, blockNumber)
-      : await this.contract.methods.getTotalVotesForGroup(group).call()
+    // @ts-ignore: Expected 0-1 arguments, but got 2
+    const votes = await this.contract.methods.getTotalVotesForGroup(group).call({}, blockNumber)
+    return toBigNumber(votes)
+  }
+
+  /**
+   * Returns the active votes for `group`.
+   * @param group The address of the validator group.
+   * @return The active votes for `group`.
+   */
+  async getActiveVotesForGroup(group: Address, blockNumber?: number): Promise<BigNumber> {
+    // @ts-ignore: Expected 0-1 arguments, but got 2
+    const votes = await this.contract.methods.getActiveVotesForGroup(group).call({}, blockNumber)
     return toBigNumber(votes)
   }
 
@@ -118,19 +127,15 @@ export class ElectionWrapper extends BaseWrapper<Election> {
     group: Address,
     blockNumber?: number
   ): Promise<GroupVote> {
-    const pending = blockNumber
-      ? await this.contract.methods
-          .getPendingVotesForGroupByAccount(group, account)
-          // @ts-ignore: Expected 0-1 arguments, but got 2
-          .call({}, blockNumber)
-      : await this.contract.methods.getPendingVotesForGroupByAccount(group, account).call()
+    const pending = await this.contract.methods
+      .getPendingVotesForGroupByAccount(group, account)
+      // @ts-ignore: Expected 0-1 arguments, but got 2
+      .call({}, blockNumber)
 
-    const active = blockNumber
-      ? await this.contract.methods
-          .getActiveVotesForGroupByAccount(group, account)
-          // @ts-ignore: Expected 0-1 arguments, but got 2
-          .call({}, blockNumber)
-      : await this.contract.methods.getActiveVotesForGroupByAccount(group, account).call()
+    const active = await this.contract.methods
+      .getActiveVotesForGroupByAccount(group, account)
+      // @ts-ignore: Expected 0-1 arguments, but got 2
+      .call({}, blockNumber)
 
     return {
       group,
@@ -140,15 +145,13 @@ export class ElectionWrapper extends BaseWrapper<Election> {
   }
 
   async getVoter(account: Address, blockNumber?: number): Promise<Voter> {
-    const groups: Address[] = blockNumber
-      ? await this.contract.methods
-          .getGroupsVotedForByAccount(account)
-          // @ts-ignore: Expected 0-1 arguments, but got 2
-          .call({}, blockNumber)
-      : await this.contract.methods.getGroupsVotedForByAccount(account).call()
+    const groups: Address[] = await this.contract.methods
+      .getGroupsVotedForByAccount(account)
+      // @ts-ignore: Expected 0-1 arguments, but got 2
+      .call({}, blockNumber)
 
-    const votes = await Promise.all(
-      groups.map((g) => this.getVotesForGroupByAccount(account, g, blockNumber))
+    const votes = await concurrentMap(10, groups, (g) =>
+      this.getVotesForGroupByAccount(account, g, blockNumber)
     )
     return { address: account, votes }
   }
@@ -346,5 +349,14 @@ export class ElectionWrapper extends BaseWrapper<Election> {
       lesser: newIdx === 0 ? NULL_ADDRESS : currentVotes[newIdx - 1].address,
       greater: newIdx === currentVotes.length - 1 ? NULL_ADDRESS : currentVotes[newIdx + 1].address,
     }
+  }
+
+  async getPastVoterRewards(options?: {
+    filter?: object
+    fromBlock?: BlockType
+    toBlock?: BlockType
+    topics?: string[]
+  }): Promise<EventLog[]> {
+    return this.getPastEvents('EpochRewardsDistributedToVoters', options)
   }
 }
