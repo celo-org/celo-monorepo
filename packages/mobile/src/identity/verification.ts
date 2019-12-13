@@ -522,7 +522,10 @@ async function isAccountUpToDate(
     accountsWrapper.getDataEncryptionKey(address),
   ])
   return (
-    eqAddress(currentWalletAddress, address) && currentDEK && eqAddress(currentDEK.join(), dataKey)
+    // currentDEK is actually a string instead of an array
+    eqAddress(currentWalletAddress, address) &&
+    currentDEK &&
+    eqAddress([currentDEK].join(), dataKey)
   )
 }
 
