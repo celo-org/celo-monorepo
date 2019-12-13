@@ -28,7 +28,6 @@ import {
   ValidatorsTestContract,
   ValidatorsTestInstance,
 } from 'types'
-import Web3 = require('web3')
 
 const Accounts: AccountsContract = artifacts.require('Accounts')
 const Validators: ValidatorsTestContract = artifacts.require('ValidatorsTest')
@@ -2206,7 +2205,7 @@ contract('Validators', (accounts: string[]) => {
       })
     })
 
-    describe('when the sender is not an approved address', async () => {
+    describe('when the sender is not an approved address', () => {
       it('should revert', async () => {
         await assertRevert(validators.forceDeaffiliateIfValidator(validator))
       })
@@ -2314,7 +2313,7 @@ contract('Validators', (accounts: string[]) => {
         await assertRevert(validators.groupMembershipInEpoch(validator, 32, 3))
       })
 
-      describe('when called with various malformed inputs', async () => {
+      describe('when called with various malformed inputs', () => {
         it('should revert when epochNumber at given index is greater than provided epochNumber', async () => {
           await assertRevert(validators.groupMembershipInEpoch(validator, 49, 5))
         })
@@ -2329,7 +2328,7 @@ contract('Validators', (accounts: string[]) => {
       })
     })
 
-    describe('when the sender is not an approved address', async () => {
+    describe('when the sender is not an approved address', () => {
       it('should revert', async () => {
         await assertRevert(
           validators.groupMembershipInEpoch(validator, 95, 1, { from: accounts[1] })
