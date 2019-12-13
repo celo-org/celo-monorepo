@@ -1153,7 +1153,7 @@ contract Validators is
    * @param value New reset period for slashing multiplier
    */
   function setSlashingMultiplierResetPeriod(uint256 value) public nonReentrant onlyOwner {
-    // Is this necessary? following precedent
+    // TODO(reviewer): is this necessary? This is done in `setMaxGroupSize`
     require(value != slashingMultiplierResetPeriod);
     slashingMultiplierResetPeriod = value;
   }
@@ -1194,6 +1194,9 @@ contract Validators is
     group.slashInfo.lastSlashedTimestamp = now;
   }
 
+  /**
+	 * @notice Getter for a group's slashing multiplier
+	 */
   function getValidatorGroupSlashingMultiplier(address groupAddress)
     external
     view
