@@ -11,7 +11,7 @@ import {
   StyleSheet,
   TextInput as RNTextInput,
   TextInputFocusEventData,
-  TextInputProps as RNTextInputProps,
+  TextInputProps,
   View,
 } from 'react-native'
 
@@ -22,7 +22,7 @@ interface OwnProps {
   forwardedRef?: React.RefObject<RNTextInput>
 }
 
-type Props = OwnProps & RNTextInputProps
+type Props = OwnProps & TextInputProps
 
 interface State {
   isFocused: boolean
