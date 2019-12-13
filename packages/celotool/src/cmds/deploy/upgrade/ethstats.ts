@@ -23,7 +23,7 @@ export const handler = async (argv: EthstatsArgv) => {
   await createClusterIfNotExists()
   await switchToClusterFromEnv()
 
-  if (argv.reset === true) {
+  if (argv.reset) {
     await removeHelmRelease(argv.celoEnv)
     await installHelmChart(argv.celoEnv)
   } else {
