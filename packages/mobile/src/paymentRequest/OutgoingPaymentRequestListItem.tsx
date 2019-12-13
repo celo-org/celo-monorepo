@@ -17,7 +17,7 @@ import { getCentAwareMoneyDisplay } from 'src/utils/formatting'
 import Logger from 'src/utils/Logger'
 
 interface OwnProps {
-  requester: Recipient
+  requestee: Recipient
   amount: string
   comment: string
   id: string
@@ -56,27 +56,23 @@ export class OutgoingPaymentRequestListItem extends React.Component<Props> {
     ]
   }
 
-  isDisplayingNumber = () => {
-    return this.props.requester.displayId !== this.props.requester.displayName
-  }
-
   render() {
-    const { requester, t } = this.props
+    const { requestee, t } = this.props
     return (
       <View style={styles.container}>
         <BaseNotification
           icon={
             <ContactCircle
               size={AVATAR_SIZE}
-              address={requester.address}
-              name={requester.displayName}
-              thumbnailPath={getRecipientThumbnail(requester)}
+              address={requestee.address}
+              name={requestee.displayName}
+              thumbnailPath={getRecipientThumbnail(requestee)}
             >
               <Image source={unknownUserIcon} style={styles.unknownUser} />
             </ContactCircle>
           }
           title={t('outgoingPaymentRequestNotificationTitle', {
-            name: requester.displayName,
+            name: requestee.displayName,
             amount:
               CURRENCIES[CURRENCY_ENUM.DOLLAR].symbol + getCentAwareMoneyDisplay(this.props.amount),
           })}

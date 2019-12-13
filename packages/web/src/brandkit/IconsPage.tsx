@@ -40,7 +40,7 @@ const Overview = withNamespaces(NameSpaces.brand)(function _Overview({ t }: I18n
         {t('licenseTitle')}
       </Text>
       <Text style={[fonts.p, brandStyles.gap, standardStyles.elementalMargin]}>
-        <Trans i18nKey="icons.license">
+        <Trans ns={NameSpaces.brand} i18nKey="icons.license">
           <InlineAnchor href={CeloLinks.iconsLicense}>
             Creative Commons Attribution-NoDerivatives 4.0 International License
           </InlineAnchor>

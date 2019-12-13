@@ -140,7 +140,7 @@ const Details = React.memo(function _Details({ t }: { t: I18nProps['t'] }) {
       </Responsive>
       <Responsive medium={[textStyles.left, styles.detailsText, fonts.legal]}>
         <Text style={[textStyles.center, styles.detailsText, fonts.legal]}>
-          <Trans i18nKey={'footerReadMoreTerms'}>
+          <Trans ns={NameSpaces.common} i18nKey={'footerReadMoreTerms'}>
             <InlineAnchor href={menu.TERMS.link}>Terms of Service</InlineAnchor>
           </Trans>
         </Text>
