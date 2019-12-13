@@ -4,14 +4,14 @@ import Palette from 'src/brandkit/color/Palette'
 import { brandStyles, GAP } from 'src/brandkit/common/constants'
 import { BACKGROUND_PALETTE } from 'src/brandkit/common/data'
 import DownloadButton from 'src/brandkit/common/DownloadButton'
-import Page from 'src/brandkit/common/Page'
+import Page, { LOGO_PATH } from 'src/brandkit/common/Page'
 import SectionTitle from 'src/brandkit/common/SectionTitle'
 import TripplePairing from 'src/brandkit/common/TripplePairing'
 import Judgement, { Value } from 'src/brandkit/logo/Judgement'
 import LogoExample, { Logos } from 'src/brandkit/logo/LogoExample'
 import LogoWithBackground from 'src/brandkit/logo/LogoWithBackground'
 import { Digital, Print } from 'src/brandkit/logo/Minimums'
-import { H1, H3 } from 'src/fonts/Fonts'
+import { H1 } from 'src/fonts/Fonts'
 import { I18nProps, NameSpaces, Trans, withNamespaces } from 'src/i18n'
 import { ScreenProps, ScreenSizes, withScreenSize } from 'src/layout/ScreenSize'
 import LogoLightBg from 'src/logos/LogoLightBg'
@@ -22,26 +22,22 @@ import InlineAnchor from 'src/shared/InlineAnchor'
 import menuItems, { hashNav } from 'src/shared/menu-items'
 import { colors, fonts, standardStyles } from 'src/styles'
 
-export default React.memo(function Logo() {
-  return (
-    <Page
-      sections={[
-        {
-          id: hashNav.brandLogo.overview,
-          children: <Overview />,
-        },
-        {
-          id: hashNav.brandLogo.space,
-          children: <Clearspace />,
-        },
-        {
-          id: hashNav.brandLogo.backgrounds,
-          children: <Backgrounds />,
-        },
-      ]}
-    />
-  )
-})
+export default React.memo(
+  withNamespaces(NameSpaces.brand)(function Logo({ t }: I18nProps) {
+    return (
+      <Page
+        title={t('logo.title')}
+        metaDescription={'logo.overviewCopy'}
+        path={LOGO_PATH}
+        sections={[
+          { id: hashNav.brandLogo.overview, children: <Overview /> },
+          { id: hashNav.brandLogo.space, children: <Clearspace /> },
+          { id: hashNav.brandLogo.backgrounds, children: <Backgrounds /> },
+        ]}
+      />
+    )
+  })
+)
 
 const Overview = withNamespaces(NameSpaces.brand)(
   withScreenSize<I18nProps>(function _Overview({ t, screen }: I18nProps & ScreenProps) {

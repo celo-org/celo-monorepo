@@ -1,25 +1,27 @@
 import * as React from 'react'
 import { Text, View } from 'react-native'
 import { brandStyles } from 'src/brandkit/common/constants'
-import Page from 'src/brandkit/common/Page'
+import Page, { ROOT } from 'src/brandkit/common/Page'
 import { H1, H4 } from 'src/fonts/Fonts'
 import { I18nProps, NameSpaces, Trans, withNamespaces } from 'src/i18n'
 import InlineAnchor from 'src/shared/InlineAnchor'
 import menuItems from 'src/shared/menu-items'
 import { fonts, standardStyles } from 'src/styles'
 
-export default React.memo(function Intro() {
-  return (
-    <Page
-      sections={[
-        {
-          id: 'overview',
-          children: <Overview />,
-        },
-      ]}
-    />
-  )
-})
+export default React.memo(
+  withNamespaces(NameSpaces.brand)(function Intro({ t }: I18nProps) {
+    return (
+      <>
+        <Page
+          title="Home"
+          path={ROOT}
+          metaDescription={t('home.introduction')}
+          sections={[{ id: 'overview', children: <Overview /> }]}
+        />
+      </>
+    )
+  })
+)
 
 const Overview = withNamespaces(NameSpaces.brand)(function _Overview({ t }: I18nProps) {
   return (
