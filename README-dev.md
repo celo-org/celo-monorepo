@@ -35,7 +35,7 @@ In order to maintain this, create and merge a PR to the `master` branch bumping 
 Update all references to that package in the monorepo to the new version (i.e. `x.y.z+1`)
 Prefer appending a `-dev` suffix to the version number to ensure an internal dependency will never be mistaken for a published one.
 
-> Note: Services deployed to App Engine must only depend on published NPM packages. These packages are `attestation-service`, `verification-pool-api`, `blockchain-api` and `notification-service`.
+> Note: Services deployed to App Engine must only depend on published NPM packages. These packages are `verification-pool-api`, `blockchain-api` and `notification-service`.
 
 ### Checkout the commit to be published and verify version numbers
 
