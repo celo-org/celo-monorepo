@@ -1,9 +1,9 @@
+// tslint:disable: no-console
 // tslint:disable-next-line: no-reference (Required to make this work w/ ts-node)
 /// <reference path="../../../contractkit/types/web3.d.ts" />
 import { ContractKit, newKitFromWeb3 } from '@celo/contractkit'
 import { getBlsPoP, getBlsPublicKey } from '@celo/utils/lib/bls'
 import { fromFixed, toFixed } from '@celo/utils/lib/fixidity'
-import { consoleLogger } from '@celo/utils/lib/logger'
 import BigNumber from 'bignumber.js'
 import { assert } from 'chai'
 import path from 'path'
@@ -410,7 +410,7 @@ describe('governance tests', () => {
       await waitForEpochTransition(epoch)
 
       const groupWeb3Url = 'ws://localhost:8555'
-      consoleLogger(groupWeb3Url)
+      console.log(groupWeb3Url)
 
       // Prepare for member swapping.
       const groupWeb3 = new Web3(groupWeb3Url)
@@ -430,7 +430,7 @@ describe('governance tests', () => {
       const memberSwapper = await newMemberSwapper(groupKit, membersToSwap)
 
       const validatorRpc = 'http://localhost:8549'
-      consoleLogger(validatorRpc)
+      console.log(validatorRpc)
 
       // Prepare for key rotation.
       const validatorWeb3 = new Web3(validatorRpc)
@@ -438,7 +438,7 @@ describe('governance tests', () => {
       const authWeb31 = 'ws://localhost:8559'
       const authWeb32 = 'ws://localhost:8561'
 
-      consoleLogger(authWeb31, authWeb32)
+      console.log(authWeb31, authWeb32)
 
       const authorizedWeb3s = [new Web3(authWeb31), new Web3(authWeb32)]
 

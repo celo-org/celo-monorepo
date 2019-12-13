@@ -1,4 +1,4 @@
-import { consoleLogger } from '@celo/utils/lib/logger'
+/* tslint:disable: no-console */
 import BigNumber from 'bignumber.js'
 import { assert } from 'chai'
 import fs from 'fs'
@@ -75,7 +75,7 @@ export async function killInstance(instance: GethInstanceConfig) {
 
 export function sleep(seconds: number, verbose: boolean = false) {
   if (verbose) {
-    consoleLogger(`Sleeping for ${seconds} seconds. Stay tuned!`)
+    console.log(`Sleeping for ${seconds} seconds. Stay tuned!`)
   }
   return new Promise<void>((resolve) => setTimeout(resolve, seconds * 1000))
 }

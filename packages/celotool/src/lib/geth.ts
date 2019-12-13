@@ -2,7 +2,6 @@
 import { CeloContract, ContractKit, newKit } from '@celo/contractkit'
 import { TransactionResult } from '@celo/contractkit/lib/utils/tx-result'
 import { waitForPortOpen } from '@celo/dev-utils/lib/network'
-import { consoleLogger } from '@celo/utils/lib/logger'
 import {
   convertToContractDecimals,
   GoldToken,
@@ -883,7 +882,7 @@ export async function getEnode(port: string, ws: boolean = false) {
 export async function addStaticPeers(datadir: string, ports: string[], verbose: boolean) {
   const staticPeersPath = `${datadir}/static-nodes.json`
   if (verbose) {
-    consoleLogger(`Writing static peers to ${staticPeersPath}`)
+    console.log(`Writing static peers to ${staticPeersPath}`)
   }
   const enodes = await Promise.all(ports.map((port) => getEnode(port)))
   fs.writeFileSync(staticPeersPath, JSON.stringify(enodes, null, 2))
@@ -1067,7 +1066,7 @@ export function writeGenesis(validators: Validator[], gethConfig: GethRunConfig)
 
 export async function snapshotDatadir(instance: GethInstanceConfig, verbose: boolean) {
   if (verbose) {
-    consoleLogger('snapshotting data dir')
+    console.log('snapshotting data dir')
   }
 
   // Sometimes the socket is still present, preventing us from snapshotting.
