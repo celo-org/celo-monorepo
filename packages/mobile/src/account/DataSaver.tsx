@@ -38,10 +38,10 @@ interface State {
   modalVisible: boolean
 }
 
-export class CeloLite extends React.Component<Props, State> {
+export class DataSaver extends React.Component<Props, State> {
   static navigationOptions = () => ({
     ...headerWithBackButton,
-    headerTitle: i18n.t('accountScreen10:celoLite'),
+    headerTitle: i18n.t('accountScreen10:dataSaver'),
   })
 
   state = {
@@ -78,9 +78,9 @@ export class CeloLite extends React.Component<Props, State> {
         <SettingsSwitchItem
           switchValue={zeroSyncEnabled}
           onSwitchChange={this.handleZeroSyncToggle}
-          details={t('celoLiteDetail')}
+          details={t('dataSaverDetail')}
         >
-          <Text style={fontStyles.body}>{t('enableCeloLite')}</Text>
+          <Text style={fontStyles.body}>{t('enableDataSaver')}</Text>
         </SettingsSwitchItem>
         <Modal isVisible={this.state.modalVisible}>
           <View style={styles.modalContainer}>
@@ -139,4 +139,4 @@ const styles = StyleSheet.create({
 export default connect<StateProps, DispatchProps, {}, RootState>(
   mapStateToProps,
   mapDispatchToProps
-)(withNamespaces(Namespaces.accountScreen10)(CeloLite))
+)(withNamespaces(Namespaces.accountScreen10)(DataSaver))
