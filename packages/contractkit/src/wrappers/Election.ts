@@ -2,10 +2,11 @@ import { eqAddress } from '@celo/utils/lib/address'
 import { concurrentMap } from '@celo/utils/lib/async'
 import { zip } from '@celo/utils/lib/collections'
 import BigNumber from 'bignumber.js'
-import { BlockType } from 'web3/eth/types'
 import { EventLog } from 'web3/types'
+import { ValidatorGroup } from './Validators'
 import { Address, NULL_ADDRESS } from '../base'
 import { Election } from '../generated/types/Election'
+
 import {
   BaseWrapper,
   CeloTransactionObject,
@@ -30,10 +31,23 @@ export interface Voter {
   votes: GroupVote[]
 }
 
+export interface VoterReward {
+  address: Address
+  addressPayment: BigNumber
+  group: ValidatorGroup
+  epochNumber: number
+}
+
 export interface GroupVote {
   group: Address
   pending: BigNumber
   active: BigNumber
+}
+
+export interface GroupVoterReward {
+  group: ValidatorGroup
+  groupVoterPayment: BigNumber
+  epochNumber: number
 }
 
 export interface ElectableValidators {
@@ -352,16 +366,58 @@ export class ElectionWrapper extends BaseWrapper<Election> {
   }
 
   /**
-   * Retrieves past EpochRewardsDistributedToVoters events matching filter.
-   * Requires carefully choosing the filter parameters.
-   * @param options The options used for deployment.
+   * Retrieves GroupVoterRewards for epochNumber.
+   * @param epochNumber The epoch to retrieve GroupVoterRewards at.
    */
-  async getPastVoterRewards(options?: {
-    filter?: object
-    fromBlock?: BlockType
-    toBlock?: BlockType
-    topics?: string[]
-  }): Promise<EventLog[]> {
-    return this.getPastEvents('EpochRewardsDistributedToVoters', options)
+  async getGroupVoterRewards(epochNumber: number): Promise<GroupVoterReward[]> {
+    const blockNumber = await this.kit.epochToBlockNumber(epochNumber)
+    const events = await this.getPastEvents('EpochRewardsDistributedToVoters', {
+      fromBlock: blockNumber,
+      toBlock: blockNumber,
+    })
+    const validators = await this.kit.contracts.getValidators()
+    const validatorGroup: ValidatorGroup[] = await concurrentMap(10, events, (e: EventLog) =>
+      validators.getValidatorGroup(e.returnValues.group, blockNumber)
+    )
+    return events.map(
+      (e: EventLog, index: number): GroupVoterReward => ({
+        group: validatorGroup[index],
+        groupVoterPayment: e.returnValues.value,
+        epochNumber: epochNumber,
+      })
+    )
+  }
+
+  /**
+   * Retrieves VoterRewards for address at epochNumber.
+   * @param epochNumber The address to retrieve VoterRewards for.
+   * @param epochNumber The epoch to retrieve VoterRewards at.
+   */
+  async getVoterRewards(address: Address, epochNumber: number): Promise<VoterReward[]> {
+    const groupRewards = await this.getGroupVoterRewards(epochNumber)
+    const blockNumber = await this.kit.epochToBlockNumber(epochNumber)
+    const voter = await this.getVoter(address, blockNumber)
+    const activeAddressVotes: { [key: string]: BigNumber } = {}
+    const activeGroupVotes: { [key: string]: BigNumber } = {}
+    for (const vote of voter.votes) {
+      const group: string = vote.group.toLowerCase()
+      activeAddressVotes[group] = (activeAddressVotes[group] || new BigNumber(0)).plus(vote.active)
+      activeGroupVotes[group] = (activeGroupVotes[group] || new BigNumber(0)).plus(
+        await this.getTotalVotesForGroup(group, blockNumber)
+      )
+    }
+    const voterRewards = groupRewards.filter(
+      (e: GroupVoterReward) => e.group.address.toLowerCase() in activeAddressVotes
+    )
+    return voterRewards.map(
+      (e: GroupVoterReward): VoterReward => ({
+        address: address,
+        addressPayment: e.groupVoterPayment.times(
+          activeAddressVotes[e.group.address].dividedBy(activeGroupVotes[e.group.address])
+        ),
+        group: e.group,
+        epochNumber: e.epochNumber,
+      })
+    )
   }
 }

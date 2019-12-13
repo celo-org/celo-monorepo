@@ -239,4 +239,17 @@ export class ContractKit {
       ...tx,
     }
   }
+
+  async getCurrentEpoch(): Promise<number> {
+    const validators = await this.contracts.getValidators()
+    const epochSize = await validators.getEpochSize()
+    const currentBlock = await this.web3.eth.getBlockNumber()
+    return Math.floor(currentBlock / epochSize)
+  }
+
+  async epochToBlockNumber(epochNumber: number): Promise<number> {
+    const validators = await this.contracts.getValidators()
+    const epochSize = await validators.getEpochSize()
+    return epochNumber * epochSize
+  }
 }

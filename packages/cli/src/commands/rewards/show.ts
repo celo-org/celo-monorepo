@@ -1,40 +1,11 @@
-import { Validator, ValidatorGroup } from '@celo/contractkit/lib/wrappers/Validators'
+import { GroupVoterReward, VoterReward } from '@celo/contractkit/lib/wrappers/Election'
+import { ValidatorReward } from '@celo/contractkit/lib/wrappers/Validators'
 import { eqAddress } from '@celo/utils/lib/address'
-import { concurrentMap } from '@celo/utils/lib/async'
 import { flags } from '@oclif/command'
-import BigNumber from 'bignumber.js'
 import { cli } from 'cli-ux'
-import { EventLog } from 'web3/types'
 import { BaseCommand } from '../../base'
 import { newCheckBuilder } from '../../utils/checks'
 import { Flags } from '../../utils/command'
-
-interface VoterReward {
-  group: string
-  groupName: string
-  totalVoterPayment: BigNumber
-  blockNumber: number
-  activeAddressVotes?: BigNumber
-  activeGroupVotes?: BigNumber
-}
-
-interface ValidatorReward {
-  validator: string
-  validatorName: string
-  validatorPayment: BigNumber
-  validatorScore: BigNumber
-  group: string
-  blockNumber: number
-}
-
-interface ValidatorGroupReward {
-  group: string
-  groupName: string
-  validator: string
-  groupPayment: BigNumber
-  validatorScore: BigNumber
-  blockNumber: number
-}
 
 export default class Show extends BaseCommand {
   static description =
@@ -57,143 +28,73 @@ export default class Show extends BaseCommand {
 
   async run() {
     const res = this.parse(Show)
+    const filter =
+      Boolean(res.flags.voter) || Boolean(res.flags.validator) || Boolean(res.flags.group)
     const election = await this.kit.contracts.getElection()
     const validators = await this.kit.contracts.getValidators()
-    const epochSize = await validators.getEpochSize()
-    const currentBlock = await this.web3.eth.getBlockNumber()
-    const lastEpochBlock = Math.floor(currentBlock / epochSize) * epochSize
-    const fromBlock: number = lastEpochBlock - epochSize * ((res.flags.epochs || 1) - 1)
-    let voterRewards: VoterReward[] = []
-    let validatorRewards: ValidatorReward[] = []
-    let validatorGroupRewards: ValidatorGroupReward[] = []
-    let address = ''
-
-    if (res.flags.voter) {
-      address = res.flags.voter
-      await newCheckBuilder(this)
-        .isAccount(address)
-        .runChecks()
-    }
+    const currentEpoch = await this.kit.getCurrentEpoch()
+    const checkBuilder = newCheckBuilder(this)
 
     if (res.flags.validator) {
-      if (address) throw Error('Must select --voter, --validator, or --group')
-      address = res.flags.validator
-      await newCheckBuilder(this)
-        .isValidator(address)
-        .runChecks()
+      if (res.flags.voter || res.flags.group) {
+        throw Error('Cannot select --validator with --voter or --group')
+      }
+      checkBuilder.isValidator(res.flags.validator)
     }
-
     if (res.flags.group) {
-      if (address) throw Error('Must select --voter, --validator, or --group')
-      address = res.flags.group
-      await newCheckBuilder(this)
-        .isValidatorGroup(address)
-        .runChecks()
+      checkBuilder.isValidatorGroup(res.flags.group)
     }
+    if (res.flags.voter) {
+      checkBuilder.isAccount(res.flags.voter)
+    }
+    checkBuilder.runChecks()
 
-    // For each epoch...
-    for (let blockNumber = fromBlock; blockNumber <= lastEpochBlock; blockNumber += epochSize) {
-      // Get the groups that address voted for at this epoch, and those groups' total votes.
-      const activeAddressVotes: { [key: string]: BigNumber } = {}
-      const activeGroupVotes: { [key: string]: BigNumber } = {}
-      if (address) {
-        const voter = await election.getVoter(address, blockNumber)
-        for (const vote of voter.votes) {
-          const group: string = vote.group.toLowerCase()
-          activeAddressVotes[group] = (activeAddressVotes[group] || new BigNumber(0)).plus(
-            vote.active
-          )
-          activeGroupVotes[group] = (activeGroupVotes[group] || new BigNumber(0)).plus(
-            await election.getTotalVotesForGroup(group, blockNumber)
-          )
-        }
+    let voterRewards: VoterReward[] = []
+    let groupVoterRewards: GroupVoterReward[] = []
+    let validatorRewards: ValidatorReward[] = []
+    let validatorGroupRewards: ValidatorReward[] = []
+
+    // Accumulate the rewards from each epoch
+    for (
+      let epochNumber = currentEpoch - (res.flags.epochs || 1);
+      epochNumber <= currentEpoch;
+      epochNumber++
+    ) {
+      const epochValidatorRewards: ValidatorReward[] =
+        !filter || res.flags.validator || res.flags.group
+          ? await validators.getValidatorRewards(epochNumber)
+          : []
+
+      if (!filter) {
+        const epochoGroupVoterRewards = await election.getGroupVoterRewards(epochNumber)
+        groupVoterRewards = groupVoterRewards.concat(epochoGroupVoterRewards)
+      } else if (res.flags.voter) {
+        const address = res.flags.voter
+        const epochVoterRewards = await election.getVoterRewards(address, epochNumber)
+        voterRewards = voterRewards.concat(epochVoterRewards)
       }
 
-      // voterRewardsEvent applies to address when voterRewardsEvent.group in activeAddressVotes.
-      const epochVoterRewardsEvents = await election.getPastVoterRewards({
-        fromBlock: blockNumber,
-        toBlock: blockNumber,
-      })
+      if (!filter || res.flags.validator) {
+        const address = res.flags.validator
+        validatorRewards = validatorRewards.concat(
+          address
+            ? epochValidatorRewards.filter((e: ValidatorReward) =>
+                eqAddress(e.validator.address, address)
+              )
+            : epochValidatorRewards
+        )
+      }
 
-      const voterRewardsValidatorGroupDetails: ValidatorGroup[] = await concurrentMap(
-        10,
-        epochVoterRewardsEvents,
-        (e: EventLog) => validators.getValidatorGroup(e.returnValues.group)
-      )
-
-      const epochVoterRewards = epochVoterRewardsEvents.map(
-        (e: EventLog, index: number): VoterReward => ({
-          group: e.returnValues.group,
-          groupName: voterRewardsValidatorGroupDetails[index].name,
-          totalVoterPayment: e.returnValues.value,
-          blockNumber: e.blockNumber,
-          activeAddressVotes: activeAddressVotes[e.returnValues.group],
-          activeGroupVotes: activeGroupVotes[e.returnValues.group],
-        })
-      )
-
-      voterRewards = voterRewards.concat(
-        address
-          ? epochVoterRewards.filter(
-              (e: VoterReward) => e.group.toLowerCase() in activeAddressVotes
-            )
-          : epochVoterRewards
-      )
-
-      // validatorRewardEvent applies to address when validatorRewardEvent.validator is address.
-      const epochValidatorRewardsEvents = await validators.getPastValidatorRewards({
-        fromBlock: blockNumber,
-        toBlock: blockNumber,
-      })
-
-      const epochValidatorDetails: Validator[] = await concurrentMap(
-        10,
-        epochValidatorRewardsEvents,
-        (e: EventLog) => validators.getValidator(e.returnValues.validator, blockNumber)
-      )
-
-      const epochValidatorRewards = epochValidatorRewardsEvents.map(
-        (e: EventLog, index: number): ValidatorReward => ({
-          validator: e.returnValues.validator,
-          validatorName: epochValidatorDetails[index].name,
-          validatorPayment: e.returnValues.validatorPayment,
-          validatorScore: epochValidatorDetails[index].score,
-          group: e.returnValues.group,
-          blockNumber: e.blockNumber,
-        })
-      )
-
-      validatorRewards = validatorRewards.concat(
-        address
-          ? epochValidatorRewards.filter((e: ValidatorReward) => eqAddress(e.validator, address))
-          : epochValidatorRewards
-      )
-
-      // validatorRewardEvent applies to address when validatorRewardEvent.group is address.
-      const epochValidatorGroupDetails: ValidatorGroup[] = await concurrentMap(
-        10,
-        epochValidatorRewardsEvents,
-        (e: EventLog) => validators.getValidatorGroup(e.returnValues.group)
-      )
-
-      const epochValidatorGroupRewards = epochValidatorRewardsEvents.map(
-        (e: EventLog, index: number): ValidatorGroupReward => ({
-          group: e.returnValues.group,
-          groupName: epochValidatorGroupDetails[index].name,
-          groupPayment: e.returnValues.groupPayment,
-          validator: e.returnValues.validator,
-          validatorScore: epochValidatorDetails[index].score,
-          blockNumber: e.blockNumber,
-        })
-      )
-
-      validatorGroupRewards = validatorGroupRewards.concat(
-        address
-          ? epochValidatorGroupRewards.filter((e: ValidatorGroupReward) =>
-              eqAddress(e.group, address)
-            )
-          : epochValidatorGroupRewards
-      )
+      if (!filter || res.flags.group) {
+        const address = res.flags.group
+        validatorGroupRewards = validatorGroupRewards.concat(
+          address
+            ? epochValidatorRewards.filter((e: ValidatorReward) =>
+                eqAddress(e.group.address, address)
+              )
+            : epochValidatorRewards
+        )
+      }
     }
 
     // At the end of each epoch: R, the total amount of rewards in gold to be allocated to stakers
@@ -212,16 +113,23 @@ export default class Show extends BaseCommand {
       cli.table(
         voterRewards,
         {
-          groupName: {},
-          group: {},
-          voterPayment: {
-            get: (e) =>
-              e.activeAddressVotes && e.activeGroupVotes
-                ? e.totalVoterPayment.times(e.activeAddressVotes.dividedBy(e.activeGroupVotes))
-                : '0',
-          },
-          totalVoterPayment: {},
-          blockNumber: {},
+          address: {},
+          addressPayment: {},
+          group: { get: (e) => e.group.address },
+          epochNumber: {},
+        },
+        { 'no-truncate': !res.flags.truncate }
+      )
+    } else if (groupVoterRewards.length > 0) {
+      console.info('')
+      console.info('Group voter rewards:')
+      cli.table(
+        groupVoterRewards,
+        {
+          groupName: { get: (e) => e.group.name },
+          group: { get: (e) => e.group.address },
+          groupVoterPayment: {},
+          epochNumber: {},
         },
         { 'no-truncate': !res.flags.truncate }
       )
@@ -248,12 +156,12 @@ export default class Show extends BaseCommand {
       cli.table(
         validatorRewards,
         {
-          validatorName: {},
-          validator: {},
+          validatorName: { get: (e) => e.validator.name },
+          validator: { get: (e) => e.validator.address },
           validatorPayment: {},
-          validatorScore: { get: (e) => e.validatorScore.toFixed() },
-          group: {},
-          blockNumber: {},
+          validatorScore: { get: (e) => e.validator.score.toFixed() },
+          group: { get: (e) => e.group.address },
+          epochNumber: {},
         },
         { 'no-truncate': !res.flags.truncate }
       )
@@ -271,12 +179,12 @@ export default class Show extends BaseCommand {
       cli.table(
         validatorGroupRewards,
         {
-          gropupName: {},
-          group: {},
+          groupName: { get: (e) => e.group.name },
+          group: { get: (e) => e.group.address },
           groupPayment: {},
-          validator: {},
-          validatorScore: { get: (e) => e.validatorScore.toFixed() },
-          blockNumber: {},
+          validator: { get: (e) => e.validator.address },
+          validatorScore: { get: (e) => e.validator.score.toFixed() },
+          epochNumber: {},
         },
         { 'no-truncate': !res.flags.truncate }
       )
@@ -284,6 +192,7 @@ export default class Show extends BaseCommand {
 
     if (
       voterRewards.length === 0 &&
+      groupVoterRewards.length === 0 &&
       validatorRewards.length === 0 &&
       validatorGroupRewards.length === 0
     ) {

@@ -1,8 +1,8 @@
 import { eqAddress } from '@celo/utils/lib/address'
+import { concurrentMap } from '@celo/utils/lib/async'
 import { zip } from '@celo/utils/lib/collections'
 import { fromFixed, toFixed } from '@celo/utils/lib/fixidity'
 import BigNumber from 'bignumber.js'
-import { BlockType } from 'web3/eth/types'
 import { EventLog } from 'web3/types'
 import { Address, NULL_ADDRESS } from '../base'
 import { Validators } from '../generated/types/Validators'
@@ -34,6 +34,14 @@ export interface ValidatorGroup {
   members: Address[]
   affiliates: Address[]
   commission: BigNumber
+}
+
+export interface ValidatorReward {
+  validator: Validator
+  validatorPayment: BigNumber
+  group: ValidatorGroup
+  groupPayment: BigNumber
+  epochNumber: number
 }
 
 export interface LockedGoldRequirements {
@@ -225,11 +233,12 @@ export class ValidatorsWrapper extends BaseWrapper<Validators> {
   }
 
   /** Get ValidatorGroup information */
-  async getValidatorGroup(address: Address): Promise<ValidatorGroup> {
-    const res = await this.contract.methods.getValidatorGroup(address).call()
+  async getValidatorGroup(address: Address, blockNumber?: number): Promise<ValidatorGroup> {
+    // @ts-ignore: Expected 0-1 arguments, but got 2
+    const res = await this.contract.methods.getValidatorGroup(address).call({}, blockNumber)
     const accounts = await this.kit.contracts.getAccounts()
-    const name = (await accounts.getName(address)) || ''
-    const validators = await this.getRegisteredValidators()
+    const name = (await accounts.getName(address, blockNumber)) || ''
+    const validators = await this.getRegisteredValidators(blockNumber)
     const affiliates = validators
       .filter((v) => v.affiliation === address)
       .filter((v) => !res[0].includes(v.address))
@@ -263,9 +272,10 @@ export class ValidatorsWrapper extends BaseWrapper<Validators> {
   )
 
   /** Get list of registered validator addresses */
-  getRegisteredValidatorsAddresses: () => Promise<Address[]> = proxyCall(
-    this.contract.methods.getRegisteredValidators
-  )
+  async getRegisteredValidatorsAddresses(blockNumber?: number): Promise<Address[]> {
+    // @ts-ignore: Expected 0-1 arguments, but got 2
+    return this.contract.methods.getRegisteredValidators().call({}, blockNumber)
+  }
 
   /** Get list of registered validator group addresses */
   getRegisteredValidatorGroupsAddresses: () => Promise<Address[]> = proxyCall(
@@ -273,9 +283,9 @@ export class ValidatorsWrapper extends BaseWrapper<Validators> {
   )
 
   /** Get list of registered validators */
-  async getRegisteredValidators(): Promise<Validator[]> {
-    const vgAddresses = await this.getRegisteredValidatorsAddresses()
-    return Promise.all(vgAddresses.map((addr) => this.getValidator(addr)))
+  async getRegisteredValidators(blockNumber?: number): Promise<Validator[]> {
+    const vgAddresses = await this.getRegisteredValidatorsAddresses(blockNumber)
+    return Promise.all(vgAddresses.map((addr) => this.getValidator(addr, blockNumber)))
   }
 
   /** Get list of registered validator groups */
@@ -429,16 +439,29 @@ export class ValidatorsWrapper extends BaseWrapper<Validators> {
   }
 
   /**
-   * Retrieves past ValidatorEpochPaymentDistributed events matching filter.
-   * Requires carefully choosing the filter parameters.
-   * @param options The options used for deployment.
+   * Retrieves ValidatorRewards for epochNumber.
+   * @param epochNumber The epoch to retrieve ValidatorRewards at.
    */
-  async getPastValidatorRewards(options?: {
-    filter?: object
-    fromBlock?: BlockType
-    toBlock?: BlockType
-    topics?: string[]
-  }): Promise<EventLog[]> {
-    return this.getPastEvents('ValidatorEpochPaymentDistributed', options)
+  async getValidatorRewards(epochNumber: number): Promise<ValidatorReward[]> {
+    const blockNumber = await this.kit.epochToBlockNumber(epochNumber)
+    const events = await this.getPastEvents('ValidatorEpochPaymentDistributed', {
+      fromBlock: blockNumber,
+      toBlock: blockNumber,
+    })
+    const validator: Validator[] = await concurrentMap(10, events, (e: EventLog) =>
+      this.getValidator(e.returnValues.validator, blockNumber)
+    )
+    const validatorGroup: ValidatorGroup[] = await concurrentMap(10, events, (e: EventLog) =>
+      this.getValidatorGroup(e.returnValues.group, blockNumber)
+    )
+    return events.map(
+      (e: EventLog, index: number): ValidatorReward => ({
+        validator: validator[index],
+        validatorPayment: e.returnValues.validatorPayment,
+        group: validatorGroup[index],
+        groupPayment: e.returnValues.groupPayment,
+        epochNumber: epochNumber,
+      })
+    )
   }
 }
