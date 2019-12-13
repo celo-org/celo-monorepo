@@ -6,6 +6,7 @@ import "openzeppelin-solidity/contracts/ownership/Ownable.sol";
 import "openzeppelin-solidity/contracts/utils/ReentrancyGuard.sol";
 
 import "./interfaces/IElection.sol";
+import "./interfaces/IValidators.sol";
 import "../common/Initializable.sol";
 import "../common/FixidityLib.sol";
 import "../common/linkedlists/AddressSortedLinkedList.sol";
@@ -421,8 +422,9 @@ contract Election is
     uint256 totalEpochRewards,
     uint256[] calldata uptimes
   ) external view returns (uint256) {
+    IValidators validators = getValidators();
     // The group must meet the balance requirements for their voters to receive epoch rewards.
-    if (!getValidators().meetsAccountLockedGoldRequirements(group) || votes.active.total <= 0) {
+    if (!validators.meetsAccountLockedGoldRequirements(group) || votes.active.total <= 0) {
       return 0;
     }
 
@@ -431,10 +433,10 @@ contract Election is
       votes.active.total
     );
     FixidityLib.Fraction memory score = FixidityLib.wrap(
-      getValidators().calculateGroupEpochScore(uptimes)
+      validators.calculateGroupEpochScore(uptimes)
     );
     FixidityLib.Fraction memory slashingMultiplier = FixidityLib.wrap(
-      getValidators().getValidatorGroupSlashingMultiplier(group)
+      validators.getValidatorGroupSlashingMultiplier(group)
     );
     return
       FixidityLib

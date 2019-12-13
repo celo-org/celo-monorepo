@@ -60,7 +60,7 @@ contract Validators is
     FixidityLib.Fraction commission;
     // sizeHistory[i] contains the last time the group contained i members.
     uint256[] sizeHistory;
-    GroupSlashInfo slashInfo;
+    SlashingInfo slashInfo;
   }
 
   // Stores the epoch number at which a validator joined a particular group.
@@ -82,9 +82,9 @@ contract Validators is
     uint256 lastRemovedFromGroupTimestamp;
   }
 
-  struct GroupSlashInfo {
-    FixidityLib.Fraction slashingMultiplier;
-    uint256 lastSlashedTimestamp;
+  struct SlashingInfo {
+    FixidityLib.Fraction penalty;
+    uint256 lastSlashed;
   }
 
   struct PublicKeys {
@@ -114,7 +114,7 @@ contract Validators is
   ValidatorScoreParameters private validatorScoreParameters;
   uint256 public membershipHistoryLength;
   uint256 public maxGroupSize;
-  uint256 public slashingMultiplierResetPeriod;
+  uint256 public slashingPenaltyResetPeriod;
 
   event MaxGroupSizeSet(uint256 size);
   event ValidatorEpochPaymentSet(uint256 value);
@@ -169,7 +169,7 @@ contract Validators is
     uint256 validatorScoreExponent,
     uint256 validatorScoreAdjustmentSpeed,
     uint256 _membershipHistoryLength,
-    uint256 _slashingMultiplierResetPeriod,
+    uint256 _slashingPenaltyResetPeriod,
     uint256 _maxGroupSize
   ) external initializer {
     _transferOwnership(msg.sender);
@@ -179,7 +179,7 @@ contract Validators is
     setValidatorScoreParameters(validatorScoreExponent, validatorScoreAdjustmentSpeed);
     setMaxGroupSize(_maxGroupSize);
     setMembershipHistoryLength(_membershipHistoryLength);
-    setSlashingMultiplierResetPeriod(_slashingMultiplierResetPeriod);
+    setSlashingMultiplierResetPeriod(_slashingPenaltyResetPeriod);
   }
 
   /**
@@ -291,7 +291,7 @@ contract Validators is
     bytes calldata blsPublicKey,
     bytes calldata blsPop
   ) external nonReentrant returns (bool) {
-    address account = getAccounts().signerToAccount(msg.sender);
+    address account = getAccounts().validatorSignerToAccount(msg.sender);
     require(!isValidator(account) && !isValidatorGroup(account));
     uint256 lockedGoldBalance = getLockedGold().getAccountTotalLockedGold(account);
     require(lockedGoldBalance >= validatorLockedGoldRequirements.value);
@@ -463,7 +463,7 @@ contract Validators is
    * @dev Fails if the validator has been a member of a group too recently.
    */
   function deregisterValidator(uint256 index) external nonReentrant returns (bool) {
-    address account = getAccounts().signerToAccount(msg.sender);
+    address account = getAccounts().validatorSignerToAccount(msg.sender);
     require(isValidator(account));
 
     // Require that the validator has not been a member of a validator group for
@@ -491,7 +491,7 @@ contract Validators is
    * @dev De-affiliates with the previously affiliated group if present.
    */
   function affiliate(address group) external nonReentrant returns (bool) {
-    address account = getAccounts().signerToAccount(msg.sender);
+    address account = getAccounts().validatorSignerToAccount(msg.sender);
     require(isValidator(account) && isValidatorGroup(group));
     require(meetsAccountLockedGoldRequirements(account));
     require(meetsAccountLockedGoldRequirements(group));
@@ -510,7 +510,7 @@ contract Validators is
    * @dev Fails if the account is not a validator with non-zero affiliation.
    */
   function deaffiliate() external nonReentrant returns (bool) {
-    address account = getAccounts().signerToAccount(msg.sender);
+    address account = getAccounts().validatorSignerToAccount(msg.sender);
     require(isValidator(account));
     Validator storage validator = validators[account];
     require(validator.affiliation != address(0));
@@ -530,7 +530,7 @@ contract Validators is
     external
     returns (bool)
   {
-    address account = getAccounts().signerToAccount(msg.sender);
+    address account = getAccounts().validatorSignerToAccount(msg.sender);
     require(isValidator(account));
     Validator storage validator = validators[account];
     _updateBlsPublicKey(validator, account, blsPublicKey, blsPop);
@@ -612,14 +612,14 @@ contract Validators is
    */
   function registerValidatorGroup(uint256 commission) external nonReentrant returns (bool) {
     require(commission <= FixidityLib.fixed1().unwrap(), "Commission can't be greater than 100%");
-    address account = getAccounts().signerToAccount(msg.sender);
+    address account = getAccounts().validatorSignerToAccount(msg.sender);
     require(!isValidator(account) && !isValidatorGroup(account));
     uint256 lockedGoldBalance = getLockedGold().getAccountTotalLockedGold(account);
     require(lockedGoldBalance >= groupLockedGoldRequirements.value);
     ValidatorGroup storage group = groups[account];
     group.exists = true;
     group.commission = FixidityLib.wrap(commission);
-    group.slashInfo = GroupSlashInfo(FixidityLib.fixed1(), 0);
+    group.slashInfo = SlashingInfo(FixidityLib.fixed1(), 0);
     registeredGroups.push(account);
     emit ValidatorGroupRegistered(account, commission);
     return true;
@@ -633,7 +633,7 @@ contract Validators is
    * @dev Fails if the group has had members too recently.
    */
   function deregisterValidatorGroup(uint256 index) external nonReentrant returns (bool) {
-    address account = getAccounts().signerToAccount(msg.sender);
+    address account = getAccounts().validatorSignerToAccount(msg.sender);
     // Only Validator Groups that have never had members or have been empty for at least
     // `groupLockedGoldRequirements.duration` seconds can be deregistered.
     require(isValidatorGroup(account) && groups[account].members.numElements == 0);
@@ -655,7 +655,7 @@ contract Validators is
    * @dev Fails if the group has zero members.
    */
   function addMember(address validator) external nonReentrant returns (bool) {
-    address account = getAccounts().signerToAccount(msg.sender);
+    address account = getAccounts().validatorSignerToAccount(msg.sender);
     require(groups[account].members.numElements > 0);
     return _addMember(account, validator, address(0), address(0));
   }
@@ -674,7 +674,7 @@ contract Validators is
     nonReentrant
     returns (bool)
   {
-    address account = getAccounts().signerToAccount(msg.sender);
+    address account = getAccounts().validatorSignerToAccount(msg.sender);
     require(groups[account].members.numElements == 0);
     return _addMember(account, validator, lesser, greater);
   }
@@ -717,7 +717,7 @@ contract Validators is
    * @dev Fails if `validator` is not a member of the account's group.
    */
   function removeMember(address validator) external nonReentrant returns (bool) {
-    address account = getAccounts().signerToAccount(msg.sender);
+    address account = getAccounts().validatorSignerToAccount(msg.sender);
     require(isValidatorGroup(account) && isValidator(validator), "is not group and validator");
     return _removeMember(account, validator);
   }
@@ -737,7 +737,7 @@ contract Validators is
     nonReentrant
     returns (bool)
   {
-    address account = getAccounts().signerToAccount(msg.sender);
+    address account = getAccounts().validatorSignerToAccount(msg.sender);
     require(isValidatorGroup(account) && isValidator(validator));
     ValidatorGroup storage group = groups[account];
     require(group.members.contains(validator));
@@ -753,7 +753,7 @@ contract Validators is
    * @return True upon success.
    */
   function updateCommission(uint256 commission) external returns (bool) {
-    address account = getAccounts().signerToAccount(msg.sender);
+    address account = getAccounts().validatorSignerToAccount(msg.sender);
     require(isValidatorGroup(account));
     ValidatorGroup storage group = groups[account];
     require(commission <= FixidityLib.fixed1().unwrap(), "Commission can't be greater than 100%");
@@ -855,8 +855,8 @@ contract Validators is
       group.members.getKeys(),
       group.commission.unwrap(),
       group.sizeHistory,
-      group.slashInfo.slashingMultiplier.unwrap(),
-      group.slashInfo.lastSlashedTimestamp
+      group.slashInfo.penalty.unwrap(),
+      group.slashInfo.lastSlashed
     );
   }
 
@@ -1149,13 +1149,11 @@ contract Validators is
   }
 
   /**
-   * @notice Sets the slashingMultiplierRestPeriod property if called by owner
-   * @param value New reset period for slashing multiplier
+   * @notice Sets the slashingMultiplierRestPeriod property if called by owner.
+   * @param value New reset period for slashing multiplier.
    */
   function setSlashingMultiplierResetPeriod(uint256 value) public nonReentrant onlyOwner {
-    // TODO(reviewer): is this necessary? This is done in `setMaxGroupSize`
-    require(value != slashingMultiplierResetPeriod);
-    slashingMultiplierResetPeriod = value;
+    slashingPenaltyResetPeriod = value;
   }
 
   /**
@@ -1163,13 +1161,14 @@ contract Validators is
    *         the last time the group was slashed.
    */
   function resetSlashingMultiplier() external nonReentrant {
-    address account = getAccounts().signerToAccount(msg.sender);
+    address account = getAccounts().validatorSignerToAccount(msg.sender);
     require(isValidatorGroup(account));
     ValidatorGroup storage group = groups[account];
-    // TODO: Should this fail silently or revert? Or return bool/multiplier value
-    if (now >= group.slashInfo.lastSlashedTimestamp + slashingMultiplierResetPeriod) {
-      group.slashInfo.slashingMultiplier = FixidityLib.fixed1();
-    }
+    require(
+      now >= group.slashInfo.lastSlashed.add(slashingPenaltyResetPeriod),
+      "`resetSlashingMultiplier` called before resetPeriod expired"
+    );
+    group.slashInfo.penalty = FixidityLib.fixed1();
   }
 
   bytes32[] canHalveSlashingMultiplier = [
@@ -1179,31 +1178,26 @@ contract Validators is
 
   /**
    * @notice Halves the group's slashing multiplier.
-   * @param groupAddress The group being slashed.
+   * @param account The group being slashed.
    */
-  function halveSlashingMultiplier(address groupAddress)
+  function halveSlashingMultiplier(address account)
     external
     nonReentrant
     onlyRegisteredContracts(canHalveSlashingMultiplier)
   {
-    require(isValidatorGroup(groupAddress));
-    ValidatorGroup storage group = groups[groupAddress];
-    group.slashInfo.slashingMultiplier = group.slashInfo.slashingMultiplier.divide(
-      FixidityLib.newFixed(2)
-    );
-    group.slashInfo.lastSlashedTimestamp = now;
+    require(isValidatorGroup(account));
+    ValidatorGroup storage group = groups[account];
+    group.slashInfo.penalty = FixidityLib.wrap(group.slashInfo.penalty.unwrap().div(2));
+    group.slashInfo.lastSlashed = now;
   }
 
   /**
-	 * @notice Getter for a group's slashing multiplier
-	 */
-  function getValidatorGroupSlashingMultiplier(address groupAddress)
-    external
-    view
-    returns (uint256)
-  {
-    require(isValidatorGroup(groupAddress));
-    ValidatorGroup storage group = groups[groupAddress];
-    return group.slashInfo.slashingMultiplier.unwrap();
+   * @notice Getter for a group's slashing multiplier.
+   * @param account The group to fetch slashing multiplier for.
+   */
+  function getValidatorGroupSlashingMultiplier(address account) external view returns (uint256) {
+    require(isValidatorGroup(account));
+    ValidatorGroup storage group = groups[account];
+    return group.slashInfo.penalty.unwrap();
   }
 }
