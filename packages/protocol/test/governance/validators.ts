@@ -55,8 +55,8 @@ const parseValidatorGroupParams = (groupParams: any) => {
     members: groupParams[0],
     commission: groupParams[1],
     sizeHistory: groupParams[2],
-    slashingMultiplier: groupParams[3],
-    lastSlashedTimestamp: groupParams[4],
+    slashingPenalty: groupParams[3],
+    lastSlashed: groupParams[4],
   }
 }
 
@@ -94,7 +94,7 @@ contract('Validators', (accounts: string[]) => {
     adjustmentSpeed: toFixed(0.25),
   }
   const validatorSlashParameters = {
-    slashingMultiplierResetPeriod: 30 * DAY,
+    slashingPenaltyResetPeriod: 30 * DAY,
   }
   const membershipHistoryLength = new BigNumber(5)
   const maxGroupSize = new BigNumber(5)
@@ -129,7 +129,7 @@ contract('Validators', (accounts: string[]) => {
       validatorScoreParameters.exponent,
       validatorScoreParameters.adjustmentSpeed,
       membershipHistoryLength,
-      validatorSlashParameters.slashingMultiplierResetPeriod,
+      validatorSlashParameters.slashingPenaltyResetPeriod,
       maxGroupSize
     )
   })
@@ -211,7 +211,7 @@ contract('Validators', (accounts: string[]) => {
           validatorScoreParameters.exponent,
           validatorScoreParameters.adjustmentSpeed,
           membershipHistoryLength,
-          validatorSlashParameters.slashingMultiplierResetPeriod,
+          validatorSlashParameters.slashingPenaltyResetPeriod,
           maxGroupSize
         )
       )
@@ -2246,7 +2246,7 @@ contract('Validators', (accounts: string[]) => {
 
     describe('when the slashing multiplier is reset after reset period', async () => {
       it('should return to default 1.0', async () => {
-        await timeTravel(validatorSlashParameters.slashingMultiplierResetPeriod, web3)
+        await timeTravel(validatorSlashParameters.slashingPenaltyResetPeriod, web3)
         await validators.resetSlashingMultiplier({ from: group })
         const parsedGroup = parseValidatorGroupParams(await validators.getValidatorGroup(group))
         assertEqualBN(parsedGroup.slashingMultiplier, toFixed(1))

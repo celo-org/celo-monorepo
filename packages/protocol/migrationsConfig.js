@@ -120,7 +120,7 @@ const DefaultConfig = {
     groupLockedGold: {
       value: '22000000000000000000000', // 22k gold per group
     },
-    slashingMultiplierResetPeriod: 60 * 60 * 24 * 30, // 30 Days
+    slashingPenaltyResetPeriod: 60 * 60 * 24 * 30, // 30 Days
   },
 }
 
