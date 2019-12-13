@@ -328,7 +328,7 @@ if [[ $COMMAND == *"get-cooking"* ]]; then
     echo -e "\t   * Register Validator Group address"
     $CELOCLI validatorgroup:register --from $CELO_VALIDATOR_GROUP_ADDRESS --commission 0.1 || echo -e "Validator Group  $CELO_VALIDATOR_GROUP_ADDRESS already registered"
 
-    celocli validatorgroup:show $CELO_VALIDATOR_GROUP_ADDRESS
+    $CELOCLI validatorgroup:show $CELO_VALIDATOR_GROUP_ADDRESS
 
     echo -e "\t   * Register Validator"
     $CELOCLI validator:register --from $CELO_VALIDATOR_ADDRESS --ecdsaKey $CELO_VALIDATOR_SIGNER_PUBLIC_KEY --blsKey $CELO_VALIDATOR_SIGNER_BLS_PUBLIC_KEY --blsSignature $CELO_VALIDATOR_SIGNER_BLS_SIGNATURE || echo -e "Validator $CELO_VALIDATOR_GROUP_ADDRESS already registered"
