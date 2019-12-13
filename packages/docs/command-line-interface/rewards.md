@@ -13,8 +13,10 @@ USAGE
   $ celocli rewards:show
 
 OPTIONS
-  --address=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  Address to filter
-  --epochs=epochs                                       [default: 1] Show results for the last N epochs
+  --epochs=epochs                                         [default: 1] Show results for the last N epochs
+  --group=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d      Validator Group to show rewards for
+  --validator=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  Validator to show rewards for
+  --voter=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d      Voter to show rewards for
 
 EXAMPLE
   show --address 0x5409ed021d9299bf6814279a6a1411a7e866a631

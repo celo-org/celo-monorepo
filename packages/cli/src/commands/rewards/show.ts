@@ -12,7 +12,7 @@ import { Flags } from '../../utils/command'
 interface VoterReward {
   group: string
   groupName: string
-  voterPayment: BigNumber
+  totalVoterPayment: BigNumber
   blockNumber: number
   activeAddressVotes?: BigNumber
   activeGroupVotes?: BigNumber
@@ -125,7 +125,7 @@ export default class Show extends BaseCommand {
         (e: EventLog, index: number): VoterReward => ({
           group: e.returnValues.group,
           groupName: voterRewardsValidatorGroupDetails[index].name,
-          voterPayment: e.returnValues.value,
+          totalVoterPayment: e.returnValues.value,
           blockNumber: e.blockNumber,
           activeAddressVotes: activeAddressVotes[e.returnValues.group],
           activeGroupVotes: activeGroupVotes[e.returnValues.group],
@@ -214,13 +214,13 @@ export default class Show extends BaseCommand {
         {
           groupName: {},
           group: {},
-          voterPayment: {},
-          addressPayment: {
+          voterPayment: {
             get: (e) =>
               e.activeAddressVotes && e.activeGroupVotes
-                ? e.voterPayment.times(e.activeAddressVotes.dividedBy(e.activeGroupVotes))
+                ? e.totalVoterPayment.times(e.activeAddressVotes.dividedBy(e.activeGroupVotes))
                 : '0',
           },
+          totalVoterPayment: {},
           blockNumber: {},
         },
         { 'no-truncate': !res.flags.truncate }
