@@ -10,17 +10,17 @@ import { newCheckBuilder } from '../../utils/checks'
 import { Flags } from '../../utils/command'
 
 interface VoterReward {
-  name: string
   group: string
-  value: BigNumber
+  groupName: string
+  voterPayment: BigNumber
   blockNumber: number
   activeAddressVotes?: BigNumber
   activeGroupVotes?: BigNumber
 }
 
 interface ValidatorReward {
-  name: string
   validator: string
+  validatorName: string
   validatorPayment: BigNumber
   validatorScore: BigNumber
   group: string
@@ -28,8 +28,8 @@ interface ValidatorReward {
 }
 
 interface ValidatorGroupReward {
-  name: string
   group: string
+  groupName: string
   validator: string
   groupPayment: BigNumber
   validatorScore: BigNumber
@@ -42,7 +42,9 @@ export default class Show extends BaseCommand {
 
   static flags = {
     ...BaseCommand.flags,
-    address: Flags.address({ description: 'Address to filter' }),
+    voter: Flags.address({ description: 'Voter to show rewards for' }),
+    validator: Flags.address({ description: 'Validator to show rewards for' }),
+    group: Flags.address({ description: 'Validator Group to show rewards for' }),
     epochs: flags.integer({
       default: 1,
       description: 'Show results for the last N epochs',
@@ -61,14 +63,31 @@ export default class Show extends BaseCommand {
     const currentBlock = await this.web3.eth.getBlockNumber()
     const lastEpochBlock = Math.floor(currentBlock / epochSize) * epochSize
     const fromBlock: number = lastEpochBlock - epochSize * ((res.flags.epochs || 1) - 1)
-    const address = res.flags.address || ''
     let voterRewards: VoterReward[] = []
     let validatorRewards: ValidatorReward[] = []
     let validatorGroupRewards: ValidatorGroupReward[] = []
+    let address = ''
 
-    if (address) {
+    if (res.flags.voter) {
+      address = res.flags.voter
       await newCheckBuilder(this)
         .isAccount(address)
+        .runChecks()
+    }
+
+    if (res.flags.validator) {
+      if (address) throw Error('Must select --voter, --validator, or --group')
+      address = res.flags.validator
+      await newCheckBuilder(this)
+        .isValidator(address)
+        .runChecks()
+    }
+
+    if (res.flags.group) {
+      if (address) throw Error('Must select --voter, --validator, or --group')
+      address = res.flags.group
+      await newCheckBuilder(this)
+        .isValidatorGroup(address)
         .runChecks()
     }
 
@@ -104,9 +123,9 @@ export default class Show extends BaseCommand {
 
       const epochVoterRewards = epochVoterRewardsEvents.map(
         (e: EventLog, index: number): VoterReward => ({
-          name: voterRewardsValidatorGroupDetails[index].name,
           group: e.returnValues.group,
-          value: e.returnValues.value,
+          groupName: voterRewardsValidatorGroupDetails[index].name,
+          voterPayment: e.returnValues.value,
           blockNumber: e.blockNumber,
           activeAddressVotes: activeAddressVotes[e.returnValues.group],
           activeGroupVotes: activeGroupVotes[e.returnValues.group],
@@ -135,8 +154,8 @@ export default class Show extends BaseCommand {
 
       const epochValidatorRewards = epochValidatorRewardsEvents.map(
         (e: EventLog, index: number): ValidatorReward => ({
-          name: epochValidatorDetails[index].name,
           validator: e.returnValues.validator,
+          validatorName: epochValidatorDetails[index].name,
           validatorPayment: e.returnValues.validatorPayment,
           validatorScore: epochValidatorDetails[index].score,
           group: e.returnValues.group,
@@ -159,8 +178,8 @@ export default class Show extends BaseCommand {
 
       const epochValidatorGroupRewards = epochValidatorRewardsEvents.map(
         (e: EventLog, index: number): ValidatorGroupReward => ({
-          name: epochValidatorGroupDetails[index].name,
           group: e.returnValues.group,
+          groupName: epochValidatorGroupDetails[index].name,
           groupPayment: e.returnValues.groupPayment,
           validator: e.returnValues.validator,
           validatorScore: epochValidatorDetails[index].score,
@@ -193,13 +212,13 @@ export default class Show extends BaseCommand {
       cli.table(
         voterRewards,
         {
-          name: {},
+          groupName: {},
           group: {},
-          value: {},
-          myReward: {
+          voterPayment: {},
+          addressPayment: {
             get: (e) =>
               e.activeAddressVotes && e.activeGroupVotes
-                ? e.value.times(e.activeAddressVotes.dividedBy(e.activeGroupVotes))
+                ? e.voterPayment.times(e.activeAddressVotes.dividedBy(e.activeGroupVotes))
                 : '0',
           },
           blockNumber: {},
@@ -229,7 +248,7 @@ export default class Show extends BaseCommand {
       cli.table(
         validatorRewards,
         {
-          name: {},
+          validatorName: {},
           validator: {},
           validatorPayment: {},
           validatorScore: { get: (e) => e.validatorScore.toFixed() },
@@ -252,7 +271,7 @@ export default class Show extends BaseCommand {
       cli.table(
         validatorGroupRewards,
         {
-          name: {},
+          gropupName: {},
           group: {},
           groupPayment: {},
           validator: {},

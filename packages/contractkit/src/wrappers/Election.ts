@@ -351,6 +351,11 @@ export class ElectionWrapper extends BaseWrapper<Election> {
     }
   }
 
+  /**
+   * Retrieves past EpochRewardsDistributedToVoters events matching filter.
+   * Requires carefully choosing the filter parameters.
+   * @param options The options used for deployment.
+   */
   async getPastVoterRewards(options?: {
     filter?: object
     fromBlock?: BlockType

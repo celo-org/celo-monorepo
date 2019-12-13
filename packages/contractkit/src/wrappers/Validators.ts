@@ -428,6 +428,11 @@ export class ValidatorsWrapper extends BaseWrapper<Validators> {
     )
   }
 
+  /**
+   * Retrieves past ValidatorEpochPaymentDistributed events matching filter.
+   * Requires carefully choosing the filter parameters.
+   * @param options The options used for deployment.
+   */
   async getPastValidatorRewards(options?: {
     filter?: object
     fromBlock?: BlockType
