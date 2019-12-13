@@ -24,13 +24,35 @@ variable celo_env {
   default = "baklava"
 }
 
+variable network_id {
+  description = "The ethereum network ID"
+  type        = number
+  default     = 121119
+}
+
+variable ethstats_host {
+  description = "Ethstats host to report data"
+  type        = string
+  default     = "baklava-ethstats.celo-testnet.org"
+}
+
+variable geth_node_docker_image {
+  description = "The Celo Blockchain docker image"
+  type        = map(string)
+
+  default = {
+    repository = "us.gcr.io/celo-testnet/celo-node"
+    tag        = "baklava"
+  }
+}
+
 variable replicas {
   description = "The replica number for each component"
   type        = map(number)
 
   default = {
-    validator = 1 # Also used for proxy
-    txnode    = 0
+    validator           = 1 # Also used for proxy
+    txnode              = 0
     attestation_service = 1
   }
 }
@@ -47,13 +69,6 @@ variable instance_types {
   }
 }
 
-variable deploy_txnode_loadbalancer {
-  description = "Deploy the Load Balancer for Transmission nodes (if txnode > 0)"
-  type        = bool
-
-  default = false
-}
-
 variable proxy_accounts {
   description = "The account data for the proxy nodes"
   type        = map
@@ -63,12 +78,6 @@ variable proxy_accounts {
       "0xF2...",
     ]
     private_keys = [
-      "1b...",
-    ]
-    account_passwords = [
-      "secret1",
-    ]
-    private_node_keys = [
       "1b...",
     ]
     enodes = [
@@ -87,23 +96,6 @@ variable validator_accounts {
     ]
     private_keys = [
       "7a2...",
-    ]
-    account_passwords = [
-      "secret1",
-    ]
-  }
-}
-
-variable txnode_accounts {
-  description = "The account data for the validator nodes"
-  type        = map
-
-  default = {
-    account_addresses = [
-      "0x13...",
-    ]
-    private_keys = [
-      "76...",
     ]
     account_passwords = [
       "secret1",
@@ -148,6 +140,19 @@ variable attestation_service_db {
   }
 }
 
+variable reset_geth_data {	
+  type        = bool	
+  description = "Specifies if the existing chain data should be removed while creating the instance"	
+  default     = false	
+}	
+  
+variable geth_verbosity {	
+  description = "Geth log level"	
+  type        = number	
+  default     = 3	
+}	
+
+# Attestation variables
 variable attestation_service_docker_image {
   description = "The attestation_service docker image"
   type        = map(string)
@@ -175,40 +180,12 @@ variable attestation_service_credentials {
   }
 }
 
-# Customization parameters
-variable geth_verbosity {
-  description = "Geth log level"
-  type        = number
-  default     = 3
-}
-
+##################
 # The next variables have a default value are not intended to be changed if you do not have a reason for it
-variable ethstats_host {
-  description = "Ethstats host to report data"
-  type        = string
-  default     = "baklava-ethstats.celo-testnet.org"
-}
-
 variable in_memory_discovery_table {
   description = "Geth parameter"
   type        = bool
   default     = false
-}
-
-variable geth_node_docker_image {
-  description = "The Celo Blockchain docker image"
-  type        = map(string)
-
-  default = {
-    repository = "us.gcr.io/celo-testnet/celo-node"
-    tag        = "geth"
-  }
-}
-
-variable network_id {
-  description = "The ethereum network ID"
-  type        = number
-  default     = 121119
 }
 
 variable block_time {
@@ -231,10 +208,4 @@ variable geth_exporter_docker_image {
     repository = "jcortejoso/ge"
     tag        = "test"
   }
-}
-
-variable reset_geth_data {
-  type        = bool
-  description = "Specifies if the existing chain data should be removed while creating the instance"
-  default     = true
 }

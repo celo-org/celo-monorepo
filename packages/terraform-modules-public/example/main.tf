@@ -75,7 +75,6 @@ module "celo_cluster" {
 
   tx_node_count    = var.replicas["txnode"]
   validator_count  = var.replicas["validator"]
-  deploy_txnode_lb = var.deploy_txnode_loadbalancer
 
   validator_account_addresses = var.validator_accounts["account_addresses"]
   validator_private_keys      = var.validator_accounts["private_keys"]
