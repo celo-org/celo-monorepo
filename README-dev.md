@@ -72,7 +72,13 @@ Let's say the published package version number 0.0.20, verify that it is install
 Add a tag with the most recent git commit of the published branch. Note that this commit comes before package.json is updated with the new package version.
 
 ```
-$ npm dist-tag add <package-name>@<version> [<tag>]
+$ npm dist-tag add <package-name>@<version> <tag>
+```
+
+Additionally, if this version is intended to be used on a deployed network (e.g. `baklava` or `alfajores`), tag the version with all appropriate network names.
+
+```
+$ npm dist-tag add <package-name>@<version> <network>
 ```
 
 Once you publish do some manual tests, for example, after publishing `celocli`
