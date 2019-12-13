@@ -76,6 +76,7 @@ export class OutgoingPaymentRequestSummaryNotification extends React.Component<P
     const { recipientCache, requests, t } = this.props
     return requests.length === 1 ? (
       listItemRenderer({
+        addressToE164Number: this.props.addressToE164Number,
         updatePaymentRequestStatus: this.props.updatePaymentRequestStatus,
         updatePaymentRequestNotified: this.props.updatePaymentRequestNotified,
         recipientCache,
