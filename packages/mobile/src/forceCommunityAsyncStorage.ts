@@ -1,5 +1,5 @@
-import ReactNative, { AsyncStorage as RNAsyncStorage } from 'react-native'
 import AsyncStorage from '@react-native-community/async-storage'
+import ReactNative from 'react-native'
 
 // Monkey patch React Native so it uses the community implementation of AsyncStorage.
 // This is to fix the problem of loosing AsyncStorage data on iOS when some modules
