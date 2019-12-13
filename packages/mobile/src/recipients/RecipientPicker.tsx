@@ -4,13 +4,10 @@ import SectionHead from '@celo/react-components/components/SectionHead'
 import TextInput, { TextInputProps } from '@celo/react-components/components/TextInput'
 import withTextInputLabeling from '@celo/react-components/components/WithTextInputLabeling'
 import withTextInputPasteAware from '@celo/react-components/components/WithTextInputPasteAware'
-import ForwardChevron from '@celo/react-components/icons/ForwardChevron'
-import QRCode from '@celo/react-components/icons/QRCode'
 import colors from '@celo/react-components/styles/colors'
 import { fontStyles } from '@celo/react-components/styles/fonts'
 import { isValidAddress } from '@celo/utils/src/address'
 import { parsePhoneNumber } from '@celo/utils/src/phoneNumbers'
-import { TranslationFunction } from 'i18next'
 import * as React from 'react'
 import { withNamespaces, WithNamespaces } from 'react-i18next'
 import {
@@ -19,7 +16,6 @@ import {
   SectionListData,
   StyleSheet,
   Text,
-  TouchableOpacity,
   View,
 } from 'react-native'
 import { connect } from 'react-redux'
@@ -27,8 +23,6 @@ import { componentWithAnalytics } from 'src/analytics/wrapper'
 import { Namespaces } from 'src/i18n'
 import Search from 'src/icons/Search'
 import { AddressToE164NumberType } from 'src/identity/reducer'
-import { navigate } from 'src/navigator/NavigationService'
-import { Screens } from 'src/navigator/Screens'
 import {
   getRecipientFromAddress,
   NumberToRecipient,
@@ -50,23 +44,6 @@ const RecipientSearchInput = withTextInputPasteAware(
   { right: 22 }
 )
 
-const goToQrCodeScreen = () => {
-  navigate(Screens.QRScanner)
-}
-
-const QRCodeCTA = ({ t }: { t: TranslationFunction }) => (
-  <TouchableOpacity onPress={goToQrCodeScreen} style={style.qrcodeRow}>
-    <View style={style.qrcodeIconLeft}>
-      <QRCode />
-    </View>
-    <View style={style.qrcodeTextContainer}>
-      <Text style={[fontStyles.bodySmallSemiBold, style.qrcodeText]}> {t('scanCode')} </Text>
-      <Text style={[fontStyles.bodySmall, style.qrcodeText]}>{t('toSentOrRequestPayment')}</Text>
-    </View>
-    <ForwardChevron height={15} />
-  </TouchableOpacity>
-)
-
 interface Section {
   key: string
   data: Recipient[]
@@ -74,7 +51,6 @@ interface Section {
 
 interface Props {
   testID?: string
-  showQRCode: boolean
   searchQuery: string
   sections: Section[]
   defaultCountryCode: string
@@ -244,15 +220,16 @@ export class RecipientPicker extends React.Component<RecipientProps> {
     return (
       <View style={style.body} testID={this.props.testID}>
         <DisconnectBanner />
-        <RecipientSearchInput
-          placeholder={t('nameOrPhoneNumber')}
-          value={this.props.searchQuery}
-          onChangeText={this.props.onSearchQueryChanged}
-          icon={<Search />}
-          style={style.textInput}
-          shouldShowClipboard={isValidAddress}
-        />
-        {this.props.showQRCode && <QRCodeCTA t={t} />}
+        <View style={style.textInputContainer}>
+          <RecipientSearchInput
+            placeholder={t('nameOrPhoneNumber')}
+            value={this.props.searchQuery}
+            onChangeText={this.props.onSearchQueryChanged}
+            icon={<Search />}
+            style={style.textInput}
+            shouldShowClipboard={isValidAddress}
+          />
+        </View>
         <SectionList
           renderItem={this.renderItem}
           renderSectionHeader={this.renderSectionHeader}
@@ -279,6 +256,11 @@ const style = StyleSheet.create({
     marginTop: 30,
     paddingHorizontal: 20,
     paddingVertical: 5,
+  },
+  textInputContainer: {
+    paddingBottom: 5,
+    borderBottomColor: colors.listBorder,
+    borderBottomWidth: 1,
   },
   textInput: {
     alignSelf: 'center',

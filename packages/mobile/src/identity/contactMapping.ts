@@ -12,6 +12,7 @@ import {
   endImportContacts,
   FetchPhoneAddressesAction,
   updateE164PhoneNumberAddresses,
+  updateImportSyncProgress,
 } from 'src/identity/actions'
 import {
   AddressToE164NumberType,
@@ -28,7 +29,7 @@ import { getConnectedAccount } from 'src/web3/saga'
 
 const TAG = 'identity/contactMapping'
 const MAPPING_CHUNK_SIZE = 25
-const NUM_PARALLEL_REQUESTS = 3
+const NUM_PARALLEL_REQUESTS = 2
 
 export function* doImportContacts() {
   Logger.debug(TAG, 'Importing user contacts')
@@ -107,7 +108,8 @@ function* lookupNewRecipients(
   // Iterate through all numbers found in recipients and lookup any
   // numbers we haven't checked before
   const newE164Numbers: string[] = []
-  for (const e164Number of Object.keys(e164NumberToRecipients)) {
+  const allE164Numbers = Object.keys(e164NumberToRecipients)
+  for (const e164Number of allE164Numbers) {
     if (e164Number && e164NumberToAddress[e164Number] === undefined) {
       newE164Numbers.push(e164Number)
     }
@@ -117,6 +119,10 @@ function* lookupNewRecipients(
     return Logger.debug(`${TAG}@refreshContactMapping`, 'No new numbers to check')
   }
   Logger.debug(TAG, `Total new recipients found: ${newE164Numbers.length}`)
+
+  yield put(
+    updateImportSyncProgress(allE164Numbers.length - newE164Numbers.length, allE164Numbers.length)
+  )
 
   const attestationsWrapper: AttestationsWrapper = yield call([
     contractKit.contracts,
@@ -133,6 +139,8 @@ function* lookupNewRecipients(
     `Lookup up: ${numberChunks.length} number chunks across ${requestChunks.length} request rounds`
   )
   for (const requestChunk of requestChunks) {
+    // TODO add progress updates here or in the fetchAndStoreAddressMappings method
+    // Also add immediate retry logic for failed chunks
     yield all(
       requestChunk.map((numberChunk) =>
         call(fetchAndStoreAddressMappings, attestationsWrapper, numberChunk)

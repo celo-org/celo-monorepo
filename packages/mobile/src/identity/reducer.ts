@@ -15,6 +15,11 @@ export interface E164NumberToAddressType {
   [e164PhoneNumber: string]: string | null // null means unverified
 }
 
+export interface ContactMappingProgress {
+  current: number
+  total: number
+}
+
 export interface State {
   attestationCodes: AttestationCode[]
   // we store acceptedAttestationCodes to tell user if code
@@ -27,6 +32,7 @@ export interface State {
   e164NumberToAddress: E164NumberToAddressType
   askedContactsPermission: boolean
   isLoadingImportContacts: boolean
+  contactMappingProgress: ContactMappingProgress
 }
 
 const initialState: State = {
@@ -39,6 +45,10 @@ const initialState: State = {
   e164NumberToAddress: {},
   askedContactsPermission: false,
   isLoadingImportContacts: false,
+  contactMappingProgress: {
+    current: 0,
+    total: 0,
+  },
 }
 
 export const reducer = (
@@ -52,6 +62,7 @@ export const reducer = (
         ...state,
         ...getRehydratePayload(action, 'identity'),
         verificationStatus: VerificationStatus.Stopped,
+        isLoadingImportContacts: false,
       }
     }
     case Actions.RESET_VERIFICATION:
@@ -96,11 +107,23 @@ export const reducer = (
         ...state,
         isLoadingImportContacts: true,
         askedContactsPermission: true,
+        contactMappingProgress: { current: 0, total: 0 },
+      }
+    case Actions.UPDATE_IMPORT_SYNC_PROGRESS:
+      return {
+        ...state,
+        contactMappingProgress: { current: action.current, total: action.total },
       }
     case Actions.END_IMPORT_CONTACTS:
       return {
         ...state,
         isLoadingImportContacts: false,
+        contactMappingProgress: action.success
+          ? {
+              current: state.contactMappingProgress.total,
+              total: state.contactMappingProgress.total,
+            }
+          : state.contactMappingProgress,
       }
     case Actions.DENY_IMPORT_CONTACTS:
       return {

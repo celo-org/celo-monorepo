@@ -1,3 +1,5 @@
+import Touchable from '@celo/react-components/components/Touchable'
+import QRCode from '@celo/react-components/icons/QRCode'
 import colors from '@celo/react-components/styles/colors'
 import { fontStyles } from '@celo/react-components/styles/fonts'
 import { throttle } from 'lodash'
@@ -98,10 +100,23 @@ const mapDispatchToProps = {
 
 type FilterType = (searchQuery: string) => Recipient[]
 
+function QRCodeIcon() {
+  const onQrCodePress = React.useCallback(() => {
+    navigate(Screens.QRScanner)
+  }, [])
+
+  return (
+    <Touchable onPress={onQrCodePress} style={style.qrCodeContainer}>
+      <QRCode height={28} />
+    </Touchable>
+  )
+}
+
 class Send extends React.Component<Props, State> {
   static navigationOptions = () => ({
     ...headerWithCancelButton,
     headerTitle: i18n.t('sendFlow7:sendOrRequest'),
+    headerRight: <QRCodeIcon />,
   })
 
   throttledSearch: (searchQuery: string) => void
@@ -219,7 +234,7 @@ class Send extends React.Component<Props, State> {
         {loading ? (
           <View style={style.container}>
             <ActivityIndicator style={style.icon} size="large" color={colors.celoGreen} />
-            <Text style={[fontStyles.bodySecondary]}>{t('loadingContacts')}</Text>
+            <Text style={fontStyles.bodySecondary}>{t('loadingContacts')}</Text>
           </View>
         ) : (
           <RecipientPicker
@@ -230,7 +245,6 @@ class Send extends React.Component<Props, State> {
             hasAcceptedContactPermission={this.state.hasGivenPermission}
             onSelectRecipient={this.onSelectRecipient}
             onSearchQueryChanged={this.onSearchQueryChanged}
-            showQRCode={true}
             onPermissionsAccepted={this.onPermissionsAccepted}
           />
         )}
@@ -254,6 +268,9 @@ const style = StyleSheet.create({
     marginBottom: 20,
     height: 60,
     width: 60,
+  },
+  qrCodeContainer: {
+    paddingRight: 15,
   },
 })
 

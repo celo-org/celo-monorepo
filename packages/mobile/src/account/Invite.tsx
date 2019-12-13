@@ -124,7 +124,6 @@ class Invite extends React.Component<Props, State> {
           hasAcceptedContactPermission={this.state.hasGivenPermission}
           onSelectRecipient={this.onSelectRecipient}
           onSearchQueryChanged={this.onSearchQueryChanged}
-          showQRCode={false}
           onPermissionsAccepted={this.onPermissionsAccepted}
         />
       </SafeAreaView>
