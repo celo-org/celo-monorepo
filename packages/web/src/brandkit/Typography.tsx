@@ -39,7 +39,7 @@ export default React.memo(function Typography() {
 })
 
 const Overview = withNamespaces(NameSpaces.brand)(
-  React.memo(function _Overview({ t }: I18nProps) {
+  React.memo(function _Overview({ t, i18n }: I18nProps) {
     return (
       <View>
         <PageHeadline
@@ -50,7 +50,7 @@ const Overview = withNamespaces(NameSpaces.brand)(
         <View style={brandStyles.gap}>
           <Text style={fonts.h5}>{t('typography.facesTitle')}</Text>
           <Text style={[fonts.p, standardStyles.elementalMargin]}>
-            <Trans i18nKey={'typography.facesText'}>
+            <Trans ns={NameSpaces.brand} i18nKey={'typography.facesText'}>
               <InlineAnchor href="https://medium.com/celohq/the-why-of-the-celo-coin-part-1-of-3-5e5701805847">
                 philosophy
               </InlineAnchor>
@@ -79,7 +79,7 @@ const TYPEFACES = [
   { font: fonts.h2, name: 'Heading Two', data: fontInfo.h2 },
   { font: fonts.h3, name: 'Heading Three', data: fontInfo.h3 },
   { font: fonts.h4, name: 'Heading Four', data: fontInfo.h4 },
-  { font: fonts.h5, name: 'Heading Five', data: fontInfo.h5a },
+  { font: fonts.h5, name: 'Heading Five', data: fontInfo.h5 },
   { font: fonts.h6, name: 'Heading Six', data: fontInfo.h6 },
   { font: fonts.p, name: 'Body', data: fontInfo.p },
   { font: fonts.legal, name: 'Small', data: fontInfo.legal },
