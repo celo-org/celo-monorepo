@@ -2201,7 +2201,7 @@ contract('Validators', (accounts: string[]) => {
 
     describe('when run from an approved address', async () => {
       beforeEach(async () => {
-        registry.setAddressFor(CeloContractName.DowntimeSlasher, accounts[2])
+        await registry.setAddressFor(CeloContractName.DowntimeSlasher, accounts[2])
       })
 
       it('should halve the slashing multiplier of a group', async () => {
@@ -2238,7 +2238,7 @@ contract('Validators', (accounts: string[]) => {
       await registerValidator(validator)
       await registerValidatorGroup(group)
       await validators.affiliate(group)
-      registry.setAddressFor(CeloContractName.DowntimeSlasher, accounts[2])
+      await registry.setAddressFor(CeloContractName.DowntimeSlasher, accounts[2])
       await validators.halveSlashingMultiplier(group, { from: accounts[2] })
       const parsedGroup = parseValidatorGroupParams(await validators.getValidatorGroup(group))
       assertEqualBN(parsedGroup.slashingMultiplier, toFixed(0.5))
