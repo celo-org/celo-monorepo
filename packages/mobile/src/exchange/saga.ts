@@ -134,8 +134,9 @@ export function* exchangeGoldAndStableTokens(action: ExchangeTokensAction) {
     }
 
     // Ensure the user gets makerAmount at least as good as displayed (rounded to EXCHANGE_DIFFERENCE_TOLERATED)
-    const minimumTakerAmount = getTakerAmount(makerAmount, exchangeRate).minus(
-      EXCHANGE_DIFFERENCE_TOLERATED
+    const minimumTakerAmount = BigNumber.maximum(
+      getTakerAmount(makerAmount, exchangeRate).minus(EXCHANGE_DIFFERENCE_TOLERATED),
+      '0'
     )
     const updatedTakerAmount = getTakerAmount(makerAmount, updatedExchangeRate)
     if (minimumTakerAmount.isGreaterThan(updatedTakerAmount)) {
@@ -149,6 +150,7 @@ export function* exchangeGoldAndStableTokens(action: ExchangeTokensAction) {
 
     const takerToken =
       makerToken === CURRENCY_ENUM.DOLLAR ? CURRENCY_ENUM.GOLD : CURRENCY_ENUM.DOLLAR
+    Logger.debug(TAG, `Taker token: ${takerToken}, min taker amount: ${minimumTakerAmount}`)
     const convertedTakerAmount: BigNumber = roundDown(
       yield call(convertToContractDecimals, minimumTakerAmount, takerToken),
       0

@@ -47,11 +47,19 @@ export function* sendAndMonitorTransaction(
       TAG,
       txId
     )
+    Logger.debug(TAG + '@sendAndMonitorTransaction', `Got tx promises for tx ${tx}`)
+
     const hash = yield transactionHash
+    Logger.debug(TAG + '@sendAndMonitorTransaction', `Got hash: ${hash}`)
     yield put(addHashToStandbyTransaction(txId, hash))
 
     yield confirmation
+    Logger.debug(
+      TAG + '@sendAndMonitorTransaction',
+      `Yielded confirmation ${confirmation} for ${txId}`
+    )
     yield put(transactionConfirmed(txId))
+    Logger.debug(TAG + '@sendAndMonitorTransaction', `Confirmed transaction ${txId}`) // Gets here but still says confirming
 
     if (currency === CURRENCY_ENUM.GOLD) {
       yield put(fetchGoldBalance())
@@ -67,7 +75,7 @@ export function* sendAndMonitorTransaction(
     yield call(onSendAndMonitorTransactionError, txId)
     Logger.error(
       TAG + '@sendAndMonitorTransaction',
-      `Transaction caught: ${txId} Error: ${error.message}`
+      `Transaction caught: ${txId} Error: ${JSON.stringify(error.message)}`
     )
   }
 }

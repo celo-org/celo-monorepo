@@ -32,6 +32,7 @@ import DisconnectBanner from 'src/shared/DisconnectBanner'
 import { fetchDollarBalance } from 'src/stableToken/actions'
 import { TransactionTypes } from 'src/transactions/reducer'
 import { currentAccountSelector } from 'src/web3/selectors'
+import Logger from 'src/utils/Logger'
 
 export interface ConfirmationInput {
   recipient: Recipient
@@ -113,6 +114,7 @@ class SendConfirmation extends React.Component<Props, State> {
   sendOrInvite = (inviteMethod?: InviteBy) => {
     const { amount, reason, recipient, recipientAddress } = this.getConfirmationInput()
     const { onConfirm } = this.getNavParams()
+    Logger.debug('SendConfirmation@sendOrInvite', `onConfirm: ${onConfirm}`)
 
     this.props.sendPaymentOrInvite(
       amount,
