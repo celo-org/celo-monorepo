@@ -83,7 +83,7 @@ The width is proportional to how long it took to load. If it is grey, it was not
 re-rendered at that 'commit' or DOM change. Details on the react native profiler
 are [here][rn profiler]. The biggest thing to look for are large number of
 renders when no state has changed. Reducing renders can be done via pure
-components in react or overloading the should component updat e method
+components in react or overloading the should component update method
 [example here][rn optimize example].
 
 ### Connecting to networks
