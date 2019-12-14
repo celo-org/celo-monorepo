@@ -37,7 +37,7 @@ class FeaturedVideo extends React.PureComponent<I18nProps> {
             {
               <VideoModal
                 previewImage={image}
-                videoID={'F5SnS1v9fNo'}
+                videoID={'vwfHiaVzc2E'}
                 ariaDescription="Video on working on Celo"
               />
             }

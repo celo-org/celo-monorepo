@@ -6,6 +6,7 @@ import {
   timeTravel,
 } from '@celo/protocol/lib/test-utils'
 import BigNumber from 'bignumber.js'
+import BN = require('bn.js')
 import {
   MockGoldTokenInstance,
   MockSortedOraclesInstance,
@@ -13,7 +14,6 @@ import {
   RegistryInstance,
   ReserveInstance,
 } from 'types'
-import BN = require('bn.js')
 
 const Registry: Truffle.Contract<RegistryInstance> = artifacts.require('Registry')
 const Reserve: Truffle.Contract<ReserveInstance> = artifacts.require('Reserve')

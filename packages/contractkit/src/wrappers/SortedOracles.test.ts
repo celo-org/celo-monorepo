@@ -3,6 +3,9 @@ import { Address, CeloContract } from '../base'
 import { newKitFromWeb3 } from '../kit'
 import { OracleRate, SortedOraclesWrapper } from './SortedOracles'
 
+// set timeout to 10 seconds
+jest.setTimeout(10 * 1000)
+
 /*
 TEST NOTES:
 - In migrations: The only account that has cUSD is accounts[0]

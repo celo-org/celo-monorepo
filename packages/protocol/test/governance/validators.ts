@@ -4,6 +4,7 @@ import {
   assertContainSubset,
   assertEqualBN,
   assertEqualBNArray,
+  assertEqualDpBN,
   assertRevert,
   assertSameAddress,
   mineBlocks,
@@ -151,7 +152,7 @@ contract('Validators', (accounts: string[]) => {
     for (const validator of members) {
       await registerValidator(validator)
       await validators.affiliate(group, { from: validator })
-      if (validator == members[0]) {
+      if (validator === members[0]) {
         await validators.addFirstMember(validator, NULL_ADDRESS, NULL_ADDRESS, { from: group })
       } else {
         await validators.addMember(validator, { from: group })
@@ -606,7 +607,7 @@ contract('Validators', (accounts: string[]) => {
             args: {
               validator,
               ecdsaPublicKey: publicKey,
-              blsPublicKey: blsPublicKey,
+              blsPublicKey,
             },
           })
         })
@@ -858,7 +859,7 @@ contract('Validators', (accounts: string[]) => {
                   assert.equal(parsedValidator.affiliation, otherGroup)
                 })
 
-                it('should emit the ValidatorDeafilliated event', async () => {
+                it('should emit the ValidatorDeaffilliated event', async () => {
                   assert.equal(resp.logs.length, 2)
                   const log = resp.logs[0]
                   assertContainSubset(log, {
@@ -907,7 +908,7 @@ contract('Validators', (accounts: string[]) => {
                     await validators.getMembershipHistory(validator)
                   )
                   let expectedEntries = 1
-                  if (registrationEpoch != additionEpoch || additionEpoch != affiliationEpoch) {
+                  if (registrationEpoch !== additionEpoch || additionEpoch !== affiliationEpoch) {
                     expectedEntries = 2
                   }
                   assert.equal(membershipHistory.epochs.length, expectedEntries)
@@ -1035,7 +1036,7 @@ contract('Validators', (accounts: string[]) => {
           await validators.getMembershipHistory(validator)
         )
         let expectedEntries = 1
-        if (registrationEpoch != additionEpoch || additionEpoch != deaffiliationEpoch) {
+        if (registrationEpoch !== additionEpoch || additionEpoch !== deaffiliationEpoch) {
           expectedEntries = 2
         }
         assert.equal(membershipHistory.epochs.length, expectedEntries)
@@ -1433,7 +1434,7 @@ contract('Validators', (accounts: string[]) => {
             })
 
             it("should update the member's membership history", async () => {
-              const expectedEntries = registrationEpoch == additionEpoch ? 1 : 2
+              const expectedEntries = registrationEpoch === additionEpoch ? 1 : 2
               const membershipHistory = parseMembershipHistory(
                 await validators.getMembershipHistory(validator)
               )
@@ -1479,14 +1480,14 @@ contract('Validators', (accounts: string[]) => {
                 assert.equal(expectedSizeHistory.length, 1)
                 for (let i = 2; i < maxGroupSize.toNumber() + 1; i++) {
                   const numMembers = i
-                  const validator = accounts[i]
-                  await registerValidator(validator)
-                  await validators.affiliate(group, { from: validator })
+                  const validator1 = accounts[i]
+                  await registerValidator(validator1)
+                  await validators.affiliate(group, { from: validator1 })
                   await mockLockedGold.setAccountTotalLockedGold(
                     group,
                     groupLockedGoldRequirements.value.times(numMembers)
                   )
-                  await validators.addMember(validator)
+                  await validators.addMember(validator1)
                   expectedSizeHistory.push((await web3.eth.getBlock('latest')).timestamp)
                   const parsedGroup = parseValidatorGroupParams(
                     await validators.getValidatorGroup(group)
@@ -1578,9 +1579,9 @@ contract('Validators', (accounts: string[]) => {
       // Depending on test timing, we may or may not span an epoch boundary between registration
       // and removal.
       const numEntries = membershipHistory.epochs.length
-      assert.isTrue(numEntries == 1 || numEntries == 2)
+      assert.isTrue(numEntries === 1 || numEntries === 2)
       assert.equal(membershipHistory.groups.length, numEntries)
-      if (numEntries == 1) {
+      if (numEntries === 1) {
         assertEqualBN(membershipHistory.epochs[0], expectedEpoch)
         assertSameAddress(membershipHistory.groups[0], NULL_ADDRESS)
       } else {
@@ -1725,6 +1726,87 @@ contract('Validators', (accounts: string[]) => {
         it('should revert', async () => {
           await assertRevert(validators.updateCommission(fixed1.plus(1)))
         })
+      })
+    })
+  })
+
+  describe('#calculateEpochScore', () => {
+    describe('when uptime is in the interval [0, 1.0]', () => {
+      const uptime = new BigNumber(0.99)
+      // @ts-ignore
+      const expected = uptime.pow(validatorScoreParameters.exponent)
+
+      it('should calculate the score correctly', async () => {
+        // Compare expected and actual to 8 decimal places.
+        assertEqualDpBN(
+          fromFixed(await validators.calculateEpochScore(toFixed(uptime))),
+          expected,
+          8
+        )
+        assertEqualDpBN(fromFixed(await validators.calculateEpochScore(new BigNumber(0))), 0, 8)
+        assertEqualDpBN(fromFixed(await validators.calculateEpochScore(fixed1)), 1, 8)
+      })
+    })
+
+    describe('when uptime > 1.0', () => {
+      const uptime = new BigNumber(1.01)
+      it('should revert', async () => {
+        await assertRevert(validators.calculateEpochScore(toFixed(uptime)))
+      })
+    })
+  })
+
+  describe('#calculateGroupEpochScore', () => {
+    describe('when all uptimes are in the interval [0, 1.0]', () => {
+      const testGroupUptimeCalculation = (_uptimes) => {
+        const expected = _uptimes
+          .map((uptime) => new BigNumber(uptime))
+          .map((uptime) => uptime.pow(validatorScoreParameters.exponent.toNumber()))
+          .reduce((sum, n) => sum.plus(n))
+          .div(_uptimes.length)
+        it('should calculate the group score correctly', async () => {
+          assertEqualDpBN(
+            fromFixed(await validators.calculateGroupEpochScore(_uptimes.map(toFixed))),
+            expected,
+            8
+          )
+        })
+      }
+
+      // 5 random uptimes between zero and one.
+      const uptimes = [0.969, 0.485, 0.456, 0.744, 0.257]
+      for (const count of [1, 3, 5]) {
+        describe(`when there are ${count} validators in the group`, () => {
+          testGroupUptimeCalculation(uptimes.slice(0, count))
+        })
+      }
+
+      describe('when only zeros are provided', () => {
+        testGroupUptimeCalculation([0, 0, 0, 0])
+      })
+
+      describe('when there are zeros in the uptimes', () => {
+        testGroupUptimeCalculation([0.75, 0, 0.95])
+      })
+
+      describe('when there are more than maxGroupSize uptimes', () => {
+        it('should revert', async () => {
+          await assertRevert(
+            validators.calculateGroupEpochScore([0.9, 0.9, 0.9, 0.9, 0.9, 0.9].map(toFixed))
+          )
+        })
+      })
+    })
+
+    describe('when no uptimes are provided', () => {
+      it('should revert', async () => {
+        await assertRevert(validators.calculateGroupEpochScore([]))
+      })
+    })
+
+    describe('when uptimes are > 1.0', () => {
+      it('should revert', async () => {
+        await assertRevert(validators.calculateGroupEpochScore([0.95, 1.01, 0.99].map(toFixed)))
       })
     })
   })
@@ -1880,7 +1962,7 @@ contract('Validators', (accounts: string[]) => {
             from: groups[i],
           })
 
-          if (i == 0) {
+          if (i === 0) {
             assert.equal(await validators.getMembershipInLastEpoch(validator), NULL_ADDRESS)
           } else {
             assert.equal(await validators.getMembershipInLastEpoch(validator), groups[i - 1])
@@ -1912,7 +1994,7 @@ contract('Validators', (accounts: string[]) => {
             group,
             groupLockedGoldRequirements.value.times(i)
           )
-          if (i == 1) {
+          if (i === 1) {
             await validators.addFirstMember(validator, NULL_ADDRESS, NULL_ADDRESS)
           } else {
             await validators.addMember(validator)
@@ -2056,6 +2138,49 @@ contract('Validators', (accounts: string[]) => {
         it('should return zero', async () => {
           assertEqualBN(ret, 0)
         })
+      })
+    })
+  })
+
+  describe('#forceDeaffiliateIfValidator', async () => {
+    const validator = accounts[0]
+    const group = accounts[1]
+
+    beforeEach(async () => {
+      await registerValidator(validator)
+      await registerValidatorGroup(group)
+      await validators.affiliate(group)
+    })
+
+    describe('when the sender is one of three approved contract addresses', async () => {
+      beforeEach(async () => {
+        await registry.setAddressFor(CeloContractName.DowntimeSlasher, validator)
+        await registry.setAddressFor(CeloContractName.DoubleSigningSlasher, accounts[3])
+        await registry.setAddressFor(CeloContractName.Governance, accounts[4])
+      })
+
+      it('should succeed when the sender is the downtime slasher contract', async () => {
+        await validators.forceDeaffiliateIfValidator(validator)
+        const parsedValidator = parseValidatorParams(await validators.getValidator(validator))
+        assert.equal(parsedValidator.affiliation, NULL_ADDRESS)
+      })
+
+      it('should succeed when the sender is the double signing slasher contract', async () => {
+        await validators.forceDeaffiliateIfValidator(validator, { from: accounts[3] })
+        const parsedValidator = parseValidatorParams(await validators.getValidator(validator))
+        assert.equal(parsedValidator.affiliation, NULL_ADDRESS)
+      })
+
+      it('should succeed when the sender is the governance contract', async () => {
+        await validators.forceDeaffiliateIfValidator(validator, { from: accounts[4] })
+        const parsedValidator = parseValidatorParams(await validators.getValidator(validator))
+        assert.equal(parsedValidator.affiliation, NULL_ADDRESS)
+      })
+    })
+
+    describe('when the sender is not an approved address', async () => {
+      it('should revert', async () => {
+        await assertRevert(validators.forceDeaffiliateIfValidator(validator))
       })
     })
   })

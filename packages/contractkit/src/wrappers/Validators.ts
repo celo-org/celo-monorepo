@@ -197,10 +197,8 @@ export class ValidatorsWrapper extends BaseWrapper<Validators> {
     return {
       name,
       address,
-      // @ts-ignore Incorrect type for bytes
-      ecdsaPublicKey: res.ecdsaPublicKey,
-      // @ts-ignore Incorrect type for bytes
-      blsPublicKey: res.blsPublicKey,
+      ecdsaPublicKey: (res.ecdsaPublicKey as unknown) as string,
+      blsPublicKey: (res.blsPublicKey as unknown) as string,
       affiliation: res.affiliation,
       score: fromFixed(new BigNumber(res.score)),
       signer: res.signer,
@@ -345,6 +343,11 @@ export class ValidatorsWrapper extends BaseWrapper<Validators> {
    */
 
   deaffiliate = proxySend(this.kit, this.contract.methods.deaffiliate)
+
+  forceDeaffiliateIfValidator = proxySend(
+    this.kit,
+    this.contract.methods.forceDeaffiliateIfValidator
+  )
 
   /**
    * Adds a member to the end of a validator group's list of members.

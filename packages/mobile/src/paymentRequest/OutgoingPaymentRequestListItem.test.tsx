@@ -9,7 +9,7 @@ const commonProps = {
   amount: '24',
   comment: 'Hey thanks for the loan, Ill pay you back ASAP. LOVE YOU',
   updatePaymentRequestStatus: jest.fn(),
-  requester: {
+  requestee: {
     kind: RecipientKind.MobileNumber,
     e164PhoneNumber: '5126608970',
     displayId: '5126608970',

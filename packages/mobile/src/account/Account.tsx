@@ -112,8 +112,8 @@ export class Account extends React.Component<Props, State> {
     navigate(Screens.Analytics, { nextScreen: Screens.Account })
   }
 
-  goToCeloLite() {
-    navigate(Screens.CeloLite, { nextScreen: Screens.Account })
+  goToDataSaver() {
+    navigate(Screens.DataSaver, { nextScreen: Screens.Account })
   }
 
   goToFAQ() {
@@ -173,11 +173,11 @@ export class Account extends React.Component<Props, State> {
     } else {
       return (
         <View style={style.devSettings}>
-          <View style={style.devSettingsItem}>
+          {/* <View style={style.devSettingsItem}>
             <TouchableOpacity onPress={this.revokeNumberVerification}>
               <Text>Revoke Number Verification</Text>
             </TouchableOpacity>
-          </View>
+          </View> */}
           <View style={style.devSettingsItem}>
             <TouchableOpacity onPress={this.resetAppOpenedState}>
               <Text>Reset app opened state</Text>
@@ -238,7 +238,7 @@ export class Account extends React.Component<Props, State> {
               <SettingsItem title={t('celoRewards')} onPress={navigateToVerifierApp} />
             )}
             <SettingsItem title={t('analytics')} onPress={this.goToAnalytics} />
-            <SettingsItem title={t('celoLite')} onPress={this.goToCeloLite} />
+            <SettingsItem title={t('dataSaver')} onPress={this.goToDataSaver} />
             <SettingsItem title={t('languageSettings')} onPress={this.goToLanguageSetting} />
             <SettingsItem
               title={t('localCurrencySetting')}
