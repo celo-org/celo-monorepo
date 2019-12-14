@@ -149,7 +149,7 @@ contract Reserve is IReserve, Ownable, Initializable, UsingRegistry, ReentrancyG
     nonReentrant
     returns (bool)
   {
-    require(!isOtherReserveAddress[reserveAddress], "reserve addr already registered");
+    require(!isOtherReserveAddress[reserveAddress], "reserve addr already added");
     isOtherReserveAddress[reserveAddress] = true;
     otherReserveAddresses.push(reserveAddress);
     emit OtherReserveAddressAdded(reserveAddress);
@@ -166,7 +166,7 @@ contract Reserve is IReserve, Ownable, Initializable, UsingRegistry, ReentrancyG
     onlyOwner
     returns (bool)
   {
-    require(isOtherReserveAddress[reserveAddress], "reserve addr was never registered");
+    require(isOtherReserveAddress[reserveAddress], "reserve addr was never added");
     require(
       index < otherReserveAddresses.length && otherReserveAddresses[index] == reserveAddress,
       "index into reserve list not mapped to address"
