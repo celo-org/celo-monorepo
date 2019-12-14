@@ -1215,13 +1215,13 @@ contract Validators is
   {
     require(isValidator(account) && epochNumber <= getEpochNumber());
     MembershipHistory storage history = validators[account].membershipHistory;
+    require(index >= history.tail && history.numEntries > 0, "index out of bounds");
+    bool isExactMatch = history.entries[index].epochNumber == epochNumber;
+    bool isLastEntry = index.sub(history.tail) == history.numEntries.sub(1);
+    bool isWithinRange = history.entries[index].epochNumber < epochNumber &&
+      (history.entries[index.add(1)].epochNumber > epochNumber || isLastEntry);
     require(
-      (history.numEntries > 0 &&
-        index >= history.tail &&
-        history.entries[index].epochNumber == epochNumber) ||
-        (history.entries[index].epochNumber < epochNumber &&
-          (history.entries[index.add(1)].epochNumber > epochNumber ||
-            index.sub(history.tail) == history.numEntries.sub(1))),
+      isExactMatch || isWithinRange,
       "provided index does not match provided epochNumber at index in history."
     );
     return history.entries[index].group;
