@@ -142,13 +142,16 @@ contract('Validators', (accounts: string[]) => {
     )
   }
 
-  const registerValidatorGroup = async (group: string) => {
-    await mockLockedGold.setAccountTotalLockedGold(group, groupLockedGoldRequirements.value)
+  const registerValidatorGroup = async (group: string, numMembers: number = 1) => {
+    await mockLockedGold.setAccountTotalLockedGold(
+      group,
+      groupLockedGoldRequirements.value.times(numMembers)
+    )
     await validators.registerValidatorGroup(commission, { from: group })
   }
 
   const registerValidatorGroupWithMembers = async (group: string, members: string[]) => {
-    await registerValidatorGroup(group)
+    await registerValidatorGroup(group, members.length)
     for (const validator of members) {
       await registerValidator(validator)
       await validators.affiliate(group, { from: validator })
@@ -743,9 +746,9 @@ contract('Validators', (accounts: string[]) => {
             await validators.removeMember(validator, { from: group })
           })
 
-          describe('when it has been more than `validatorLockedGoldRequirements.duration` since the validator was removed from the group', () => {
+          describe('when it has been `validatorLockedGoldRequirements.duration` since the validator was removed from the group', () => {
             beforeEach(async () => {
-              await timeTravel(validatorLockedGoldRequirements.duration.plus(1).toNumber(), web3)
+              await timeTravel(validatorLockedGoldRequirements.duration.toNumber(), web3)
               resp = await validators.deregisterValidator(index)
             })
 
@@ -774,9 +777,9 @@ contract('Validators', (accounts: string[]) => {
             })
           })
 
-          describe('when it has been `validatorLockedGoldRequirements.duration` since the validator was removed from the group', () => {
+          describe('when it has been less than `validatorLockedGoldRequirements.duration` since the validator was removed from the group', () => {
             beforeEach(async () => {
-              await timeTravel(validatorLockedGoldRequirements.duration.toNumber(), web3)
+              await timeTravel(validatorLockedGoldRequirements.duration.minus(1).toNumber(), web3)
             })
 
             it('should revert', async () => {
