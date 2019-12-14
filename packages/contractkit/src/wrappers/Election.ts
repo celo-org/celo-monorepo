@@ -1,5 +1,5 @@
 import { eqAddress } from '@celo/utils/lib/address'
-import { concurrentMap } from '@celo/utils/lib/async'
+import { concurrentMap, concurrentValuesMap } from '@celo/utils/lib/async'
 import { zip } from '@celo/utils/lib/collections'
 import BigNumber from 'bignumber.js'
 import { EventLog } from 'web3/types'
@@ -394,26 +394,30 @@ export class ElectionWrapper extends BaseWrapper<Election> {
    * @param epochNumber The epoch to retrieve VoterRewards at.
    */
   async getVoterRewards(address: Address, epochNumber: number): Promise<VoterReward[]> {
-    const groupRewards = await this.getGroupVoterRewards(epochNumber)
     const blockNumber = await this.kit.epochToBlockNumber(epochNumber)
     const voter = await this.getVoter(address, blockNumber)
-    const activeAddressVotes: { [key: string]: BigNumber } = {}
-    const activeGroupVotes: { [key: string]: BigNumber } = {}
+    const activeVoterVotes: { [key: string]: BigNumber } = {}
+    const activeGroupVotesQuery: { [key: string]: Promise<BigNumber> } = {}
     for (const vote of voter.votes) {
       const group: string = vote.group.toLowerCase()
-      activeAddressVotes[group] = (activeAddressVotes[group] || new BigNumber(0)).plus(vote.active)
-      activeGroupVotes[group] = (activeGroupVotes[group] || new BigNumber(0)).plus(
-        await this.getTotalVotesForGroup(group, blockNumber)
-      )
+      activeVoterVotes[group] = vote.active
+      activeGroupVotesQuery[group] = this.getTotalVotesForGroup(group, blockNumber)
     }
-    const voterRewards = groupRewards.filter(
-      (e: GroupVoterReward) => e.group.address.toLowerCase() in activeAddressVotes
+    const activeGroupVotes: { [key: string]: BigNumber } = await concurrentValuesMap(
+      10,
+      activeGroupVotesQuery,
+      (e) => e
+    )
+
+    const groupVoterRewards = await this.getGroupVoterRewards(epochNumber)
+    const voterRewards = groupVoterRewards.filter(
+      (e: GroupVoterReward) => e.group.address.toLowerCase() in activeVoterVotes
     )
     return voterRewards.map(
       (e: GroupVoterReward): VoterReward => ({
         address: address,
         addressPayment: e.groupVoterPayment.times(
-          activeAddressVotes[e.group.address].dividedBy(activeGroupVotes[e.group.address])
+          activeVoterVotes[e.group.address].dividedBy(activeGroupVotes[e.group.address])
         ),
         group: e.group,
         epochNumber: e.epochNumber,

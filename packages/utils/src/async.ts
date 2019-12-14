@@ -75,3 +75,25 @@ export async function concurrentMap<A, B>(
   }
   return res
 }
+
+/**
+ * Map an async function over the values in Object x with a given concurrency level
+ *
+ * @param concurrency number of `mapFn` concurrent executions
+ * @param x associative array of values
+ * @param mapFn mapping function
+ */
+export async function concurrentValuesMap(
+  concurrency: number,
+  x: { [key: string]: any },
+  mapFn: (val: any, idx: number) => Promise<any>
+): Promise<{ [key: string]: any }> {
+  const xk = Object.keys(x)
+  const xv: Array<any> = []
+  xk.forEach((k) => xv.push(x[k]))
+  const res = await concurrentMap(concurrency, xv, mapFn)
+  return res.reduce((output, value, index) => {
+    output[xk[index]] = value
+    return output
+  }, {})
+}
