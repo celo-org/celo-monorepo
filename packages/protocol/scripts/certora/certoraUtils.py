@@ -12,6 +12,7 @@ import platform
 from collections import OrderedDict
 from datetime import datetime
 import distutils.dir_util
+import shlex
 
 DEBUG = False
 config_path = "%s/%s" % (os.getcwd().replace("\\","/"), ".certora_config2")
@@ -76,6 +77,18 @@ def run_cmd(cmd,name):
 				except Exception:
 					print("Failed to run %s" % (cmd)) 
 					raise
+
+def run_cmd_slim(cmd,name):
+	try:
+		exitcode = subprocess.call(shlex.split(cmd))
+		if exitcode:
+			print("Failed to run %s, got exitcode %d" % (cmd,exitcode))
+			sys.exit(1)
+		else:
+			debug_print("Exitcode %d" % (exitcode))
+	except Exception:
+		print("Failed to run %s" % (cmd)) 
+		raise
 
 def current_conf_to_file(parsed_options, files, fileToContractName):
 	out = {}

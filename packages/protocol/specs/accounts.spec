@@ -6,9 +6,6 @@ methods {
 	init_state() 
 	isAccount(address) returns bool	envfree
 	_getAuthorizedBy(address) returns address envfree
-	getAttestationSigner(address) returns bool envfree
-	getVoteSigner(address) returns bool envfree
-	getValidatorSigner(address) returns bool envfree
 	_getDataEncryptionKeyLen(address) returns uint256 
 	_getNameLen(address) returns uint256 
 	getWalletAddress(address) returns address envfree

@@ -1,0 +1,66 @@
+{
+	"rules": {
+	"authorizedBy_can_not_be_moved": {
+		"SUCCESS": ["0", "setAccountDataEncryptionKey(bytes)", "initialized()", "getWalletAddress(address)", "isAccount(address)", "getVoteSigner(address)", "authorizeVoteSigner(address,uint8,bytes32,bytes32)", "isAuthorizedSigner(address)", "getValidatorSigner(address)", "getName(address)", "getAttestationSigner(address)", "validatorSignerToAccount(address)", "voteSignerToAccount(address)", "_getDataEncryptionKeyLen(address)", "renounceOwnership()", "authorizeValidatorSigner(address,bytes,uint8,bytes32,bytes32)", "setMetadataURL(string)", "authorizeAttestationSigner(address,uint8,bytes32,bytes32)", "registry()", "attestationSignerToAccount(address)", "_getValidatorSigner(address)", "batchGetMetadataURL(address[])", "owner()", "isOwner()", "signerToAccount(address)", "init_state()", "createAccount()", "_getNameLen(address)", "setAccount(string,bytes,address)", "_getVoteSigner(address)", "getMetadataURL(address)", "setRegistry(address)", "setWalletAddress(address)", "getDataEncryptionKey(address)", "_getAttestationSigner(address)", "authorizedBy(address)", "authorizeValidatorSigner(address,uint8,bytes32,bytes32)", "setName(string)", "initialize(address)", "_getAuthorizedBy(address)", "transferOwnership(address)"],
+		"FAIL": [],
+		"UNKNOWN": [],
+		"TIMEOUT": []
+	},
+	"account_empty_if_not_exsist_preserve": {
+		"SUCCESS": ["0", "setAccountDataEncryptionKey(bytes)", "initialized()", "getWalletAddress(address)", "isAccount(address)", "getVoteSigner(address)", "authorizeVoteSigner(address,uint8,bytes32,bytes32)", "isAuthorizedSigner(address)", "getValidatorSigner(address)", "getName(address)", "getAttestationSigner(address)", "validatorSignerToAccount(address)", "voteSignerToAccount(address)", "_getDataEncryptionKeyLen(address)", "renounceOwnership()", "authorizeValidatorSigner(address,bytes,uint8,bytes32,bytes32)", "setMetadataURL(string)", "authorizeAttestationSigner(address,uint8,bytes32,bytes32)", "registry()", "attestationSignerToAccount(address)", "_getValidatorSigner(address)", "batchGetMetadataURL(address[])", "owner()", "isOwner()", "signerToAccount(address)", "init_state()", "createAccount()", "_getNameLen(address)", "setAccount(string,bytes,address)", "_getVoteSigner(address)", "getMetadataURL(address)", "setRegistry(address)", "setWalletAddress(address)", "getDataEncryptionKey(address)", "_getAttestationSigner(address)", "authorizedBy(address)", "authorizeValidatorSigner(address,uint8,bytes32,bytes32)", "setName(string)", "initialize(address)", "_getAuthorizedBy(address)", "transferOwnership(address)"],
+		"FAIL": [],
+		"UNKNOWN": [],
+		"TIMEOUT": []
+	},
+	"account_empty_if_not_exsist_instate": "SUCCESS",
+	"address_zero_cannot_become_an_account_preserve": {
+		"SUCCESS": ["0", "setAccountDataEncryptionKey(bytes)", "initialized()", "getWalletAddress(address)", "isAccount(address)", "getVoteSigner(address)", "authorizeVoteSigner(address,uint8,bytes32,bytes32)", "isAuthorizedSigner(address)", "getValidatorSigner(address)", "getName(address)", "getAttestationSigner(address)", "validatorSignerToAccount(address)", "voteSignerToAccount(address)", "_getDataEncryptionKeyLen(address)", "renounceOwnership()", "authorizeValidatorSigner(address,bytes,uint8,bytes32,bytes32)", "setMetadataURL(string)", "authorizeAttestationSigner(address,uint8,bytes32,bytes32)", "registry()", "attestationSignerToAccount(address)", "_getValidatorSigner(address)", "batchGetMetadataURL(address[])", "owner()", "isOwner()", "signerToAccount(address)", "init_state()", "_getNameLen(address)", "setAccount(string,bytes,address)", "_getVoteSigner(address)", "getMetadataURL(address)", "setRegistry(address)", "setWalletAddress(address)", "getDataEncryptionKey(address)", "_getAttestationSigner(address)", "authorizedBy(address)", "authorizeValidatorSigner(address,uint8,bytes32,bytes32)", "setName(string)", "initialize(address)", "_getAuthorizedBy(address)", "transferOwnership(address)","createAccount()"],
+		"FAIL": [],
+		"UNKNOWN": [],
+		"TIMEOUT": []
+	},
+	"address_zero_cannot_become_an_account_instate": "SUCCESS",
+	"address_cant_be_both_account_and_delegate_preserve": {
+		"SUCCESS": ["0", "setAccountDataEncryptionKey(bytes)", "initialized()", "getWalletAddress(address)", "isAccount(address)", "getVoteSigner(address)", "authorizeVoteSigner(address,uint8,bytes32,bytes32)", "isAuthorizedSigner(address)", "getValidatorSigner(address)", "getName(address)", "getAttestationSigner(address)", "validatorSignerToAccount(address)", "voteSignerToAccount(address)", "_getDataEncryptionKeyLen(address)", "renounceOwnership()", "authorizeValidatorSigner(address,bytes,uint8,bytes32,bytes32)", "setMetadataURL(string)", "authorizeAttestationSigner(address,uint8,bytes32,bytes32)", "registry()", "attestationSignerToAccount(address)", "_getValidatorSigner(address)", "batchGetMetadataURL(address[])", "owner()", "isOwner()", "signerToAccount(address)", "init_state()", "_getNameLen(address)", "setAccount(string,bytes,address)", "_getVoteSigner(address)", "getMetadataURL(address)", "setRegistry(address)", "setWalletAddress(address)", "getDataEncryptionKey(address)", "_getAttestationSigner(address)", "authorizedBy(address)", "authorizeValidatorSigner(address,uint8,bytes32,bytes32)", "setName(string)", "initialize(address)", "_getAuthorizedBy(address)", "transferOwnership(address)","createAccount()"],
+		"FAIL": [],
+		"UNKNOWN": [],
+		"TIMEOUT": []
+	},
+	"address_cant_be_both_account_and_delegate_instate": "SUCCESS",
+	"address_delegated_iff_authorizedby_preserve": {
+		"SUCCESS": ["0", "setAccountDataEncryptionKey(bytes)", "initialized()", "getWalletAddress(address)", "isAccount(address)", "getVoteSigner(address)", "isAuthorizedSigner(address)", "getValidatorSigner(address)", "getName(address)", "getAttestationSigner(address)", "validatorSignerToAccount(address)", "voteSignerToAccount(address)", "_getDataEncryptionKeyLen(address)", "renounceOwnership()", "setMetadataURL(string)", "registry()", "attestationSignerToAccount(address)", "_getValidatorSigner(address)", "batchGetMetadataURL(address[])", "owner()", "isOwner()", "signerToAccount(address)", "init_state()", "_getNameLen(address)", "setAccount(string,bytes,address)", "_getVoteSigner(address)", "getMetadataURL(address)", "setRegistry(address)", "setWalletAddress(address)", "getDataEncryptionKey(address)", "_getAttestationSigner(address)", "authorizedBy(address)", "setName(string)", "initialize(address)", "_getAuthorizedBy(address)", "transferOwnership(address)","authorizeVoteSigner(address,uint8,bytes32,bytes32)", "authorizeValidatorSigner(address,bytes,uint8,bytes32,bytes32)", "authorizeAttestationSigner(address,uint8,bytes32,bytes32)", "createAccount()", "authorizeValidatorSigner(address,uint8,bytes32,bytes32)"],
+		"FAIL": [],
+		"UNKNOWN": [],
+		"TIMEOUT": []
+	},
+	"address_delegated_iff_authorizedby_instate": "SUCCESS",
+	"address_cant_be_both_delegate_of_two_address_preserve": {
+		"SUCCESS": ["0", "setAccountDataEncryptionKey(bytes)", "initialized()", "getWalletAddress(address)", "isAccount(address)", "getVoteSigner(address)", "isAuthorizedSigner(address)", "getValidatorSigner(address)", "getName(address)", "getAttestationSigner(address)", "validatorSignerToAccount(address)", "voteSignerToAccount(address)", "_getDataEncryptionKeyLen(address)", "renounceOwnership()", "setMetadataURL(string)", "registry()", "attestationSignerToAccount(address)", "_getValidatorSigner(address)", "batchGetMetadataURL(address[])", "owner()", "isOwner()", "signerToAccount(address)", "init_state()", "_getNameLen(address)", "setAccount(string,bytes,address)", "_getVoteSigner(address)", "getMetadataURL(address)", "setRegistry(address)", "setWalletAddress(address)", "getDataEncryptionKey(address)", "_getAttestationSigner(address)", "authorizedBy(address)", "setName(string)", "initialize(address)", "_getAuthorizedBy(address)", "transferOwnership(address)"],
+		"FAIL": ["authorizeVoteSigner(address,uint8,bytes32,bytes32)", "authorizeValidatorSigner(address,bytes,uint8,bytes32,bytes32)", "authorizeAttestationSigner(address,uint8,bytes32,bytes32)", "createAccount()", "authorizeValidatorSigner(address,uint8,bytes32,bytes32)"],
+		"UNKNOWN": [],
+		"TIMEOUT": []
+	},
+	"address_cant_be_both_delegate_of_two_address_instate": "SUCCESS",
+	"address_can_authorize_two_address_preserve": {
+		"SUCCESS": ["0", "setAccountDataEncryptionKey(bytes)", "initialized()", "getWalletAddress(address)", "isAccount(address)", "getVoteSigner(address)", "isAuthorizedSigner(address)", "getValidatorSigner(address)", "getName(address)", "getAttestationSigner(address)", "validatorSignerToAccount(address)", "voteSignerToAccount(address)", "_getDataEncryptionKeyLen(address)", "renounceOwnership()", "setMetadataURL(string)", "registry()", "attestationSignerToAccount(address)", "_getValidatorSigner(address)", "batchGetMetadataURL(address[])", "owner()", "isOwner()", "signerToAccount(address)", "init_state()", "_getNameLen(address)", "setAccount(string,bytes,address)", "_getVoteSigner(address)", "getMetadataURL(address)", "setRegistry(address)", "setWalletAddress(address)", "getDataEncryptionKey(address)", "_getAttestationSigner(address)", "authorizedBy(address)", "setName(string)", "initialize(address)", "_getAuthorizedBy(address)", "transferOwnership(address)", "authorizeVoteSigner(address,uint8,bytes32,bytes32)", "authorizeValidatorSigner(address,bytes,uint8,bytes32,bytes32)", "authorizeAttestationSigner(address,uint8,bytes32,bytes32)", "createAccount()", "authorizeValidatorSigner(address,uint8,bytes32,bytes32)"],
+		"FAIL": [],
+		"UNKNOWN": [],
+		"TIMEOUT": []
+	},
+	"address_can_authorize_two_address_instate": "SUCCESS",
+	"envfreeFuncsAreNonpayable": {
+		"SUCCESS": ["getWalletAddress(address)", "isAccount(address)", "_getValidatorSigner(address)", "_getVoteSigner(address)", "_getAttestationSigner(address)", "_getAuthorizedBy(address)"],
+		"FAIL": [],
+		"UNKNOWN": [],
+		"TIMEOUT": []
+	},
+	"envfreeFuncsStaticCheck": {
+		"SUCCESS": ["isAccount", "_getAuthorizedBy", "getWalletAddress", "_getAttestationSigner", "_getVoteSigner", "_getValidatorSigner"],
+		"FAIL": [],
+		"UNKNOWN": [],
+		"TIMEOUT": []
+	}
+	},
+	"assertMessages": {
+	}
+}
