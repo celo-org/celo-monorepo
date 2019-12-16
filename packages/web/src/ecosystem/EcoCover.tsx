@@ -38,7 +38,6 @@ function EcoCover({ t, screen }: I18nProps & ScreenProps) {
   )
 }
 
-// TODO masked circle will need to change for tablet and mobile
 export default withScreenSize(withNamespaces(NameSpaces.ecosystem)(EcoCover))
 
 const styles = StyleSheet.create({
