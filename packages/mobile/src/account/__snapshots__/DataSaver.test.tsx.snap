@@ -1,6 +1,6 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`CeloLite renders correctly 1`] = `
+exports[`DataSaver renders correctly 1`] = `
 <RCTScrollView
   keyboardShouldPersistTaps="handled"
   style={
@@ -48,7 +48,7 @@ exports[`CeloLite renders correctly 1`] = `
               }
             }
           >
-            enableCeloLite
+            enableDataSaver
           </Text>
         </View>
         <View
@@ -84,7 +84,7 @@ exports[`CeloLite renders correctly 1`] = `
         }
       >
         <Text>
-          celoLiteDetail
+          dataSaverDetail
         </Text>
       </View>
     </View>
