@@ -168,7 +168,6 @@ export function* exchangeGoldAndStableTokens(action: ExchangeTokensAction) {
 
     const takerToken =
       makerToken === CURRENCY_ENUM.DOLLAR ? CURRENCY_ENUM.GOLD : CURRENCY_ENUM.DOLLAR
-    Logger.debug(TAG, `Taker token: ${takerToken}, min taker amount: ${minimumTakerAmount}`)
     const convertedTakerAmount: BigNumber = roundDown(
       yield call(convertToContractDecimals, minimumTakerAmount, takerToken),
       0
