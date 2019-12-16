@@ -38,7 +38,8 @@ type Props = {
   error: ApolloError | undefined
   data: UserTransactionsData | undefined
   standbyTransactions: StandbyTransaction[]
-  standbyTransactionFilter?: (tx: StandbyTransaction) => boolean
+  standbyTransactionsToRemove: StandbyTransaction[]
+  transactionFilter?: (tx: StandbyTransaction) => boolean
 } & StateProps
 
 const mapStateToProps = (state: RootState): StateProps => ({
@@ -147,7 +148,7 @@ export class TransactionFeed extends React.PureComponent<Props> {
       error,
       data,
       standbyTransactions,
-      standbyTransactionFilter,
+      transactionFilter,
       commentKey,
     } = this.props
 
@@ -160,7 +161,6 @@ export class TransactionFeed extends React.PureComponent<Props> {
     const commentKeyBuffer = commentKey ? Buffer.from(commentKey, 'hex') : null
 
     const queryDataTxIDs = new Set(events.map((event: Event) => event.hash))
-    // Logger.debug('@TransactionFeed', `tx IDs: ${[...queryDataTxIDs].join(' ')}`)
     const notInQueryTxs = (tx: StandbyTransaction) =>
       !queryDataTxIDs.has(tx.id) && tx.status !== TransactionStatus.Failed
 
@@ -171,8 +171,8 @@ export class TransactionFeed extends React.PureComponent<Props> {
       }
     }
 
-    if (standbyTransactionFilter) {
-      filteredStandbyTxs = filteredStandbyTxs.filter(standbyTransactionFilter)
+    if (transactionFilter) {
+      filteredStandbyTxs = filteredStandbyTxs.filter(transactionFilter)
     }
 
     // TODO move filter to gql
