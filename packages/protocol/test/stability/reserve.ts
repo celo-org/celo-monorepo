@@ -382,7 +382,7 @@ contract('Reserve', (accounts: string[]) => {
   })
 
   describe('#removeOtherReserveAddress()', () => {
-    let index: number = 0
+    const index: number = 0
 
     it('should not allow owner to remove an unadded reserve address', async () => {
       await assertRevert(reserve.removeOtherReserveAddress(anAddress, index))
@@ -442,8 +442,8 @@ contract('Reserve', (accounts: string[]) => {
 
     it('should allow owner to set asset allocations', async () => {
       await reserve.setAssetAllocations(newAssetAllocationSymbols, newAssetAllocationWeights)
-      var assetAllocationSymbols = await reserve.getAssetAllocationSymbols()
-      var assetAllocationWeights = await reserve.getAssetAllocationWeights()
+      let assetAllocationSymbols = await reserve.getAssetAllocationSymbols()
+      let assetAllocationWeights = await reserve.getAssetAllocationWeights()
       assert.equal(assetAllocationSymbols.length, newAssetAllocationSymbols.length)
       assert.equal(assetAllocationWeights.length, newAssetAllocationWeights.length)
       assert.equal(web3.utils.hexToUtf8(assetAllocationSymbols[0]), 'cGLD')
@@ -481,12 +481,12 @@ contract('Reserve', (accounts: string[]) => {
     })
 
     it("should fail if the asset allocation doesn't sum to one", async () => {
-      var badAssetAllocationWeights = newAssetAllocationWeights
+      let badAssetAllocationWeights = newAssetAllocationWeights
       badAssetAllocationWeights[0] = badAssetAllocationWeights[0].minus(1)
       await assertRevert(
         reserve.setAssetAllocations(newAssetAllocationSymbols, badAssetAllocationWeights)
       )
-      var assetAllocationWeights = await reserve.getAssetAllocationWeights()
+      let assetAllocationWeights = await reserve.getAssetAllocationWeights()
       assert.equal(assetAllocationWeights.length, 0)
     })
   })
