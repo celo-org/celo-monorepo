@@ -78,7 +78,7 @@ const CoverComponent = React.memo(function Cover({ t }: I18nProps) {
             {t('challengeText')}
           </Text>
           <Button
-            size={SIZE}
+            size={SIZE.normal}
             kind={BTN.PRIMARY}
             text={t('challengeBtnText')}
             href="https://forum.celo.org/t/the-great-celo-stake-off-the-details/136"

@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { StyleSheet, Text, TextStyle, View, ViewStyle } from 'react-native'
+import { StyleSheet, Text, TextStyle, View } from 'react-native'
 import Chevron from 'src/icons/chevron'
 import Hoverable from 'src/shared/Hoverable'
 import Link from 'src/shared/Link'
@@ -31,7 +31,6 @@ interface AllButtonProps {
   iconRight?: React.ReactNode
   iconLeft?: React.ReactNode
   align?: 'center' | 'flex-start' | 'flex-end'
-  style?: ViewStyle | TextStyle
 }
 
 type NakedProps = {
@@ -47,6 +46,7 @@ type PrimaryProps = {
 
 type InlineProps = {
   kind: BTN.INLINE
+  style?: TextStyle | TextStyle[]
 } & AllButtonProps
 
 type NavProps = {
