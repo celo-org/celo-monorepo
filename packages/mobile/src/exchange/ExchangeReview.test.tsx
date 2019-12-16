@@ -31,7 +31,7 @@ describe(ExchangeReview, () => {
       makerToken: CURRENCY_ENUM.GOLD,
       makerTokenBalance: '20',
       inputToken: CURRENCY_ENUM.GOLD,
-      inputTokenCode: 'gold',
+      inputTokenDisplayName: 'gold',
       inputAmount: new BigNumber(10),
     })
     const tree = renderer.create(

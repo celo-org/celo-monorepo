@@ -1,4 +1,5 @@
 import Button, { BtnTypes } from '@celo/react-components/components/Button'
+import HorizontalLine from '@celo/react-components/components/HorizontalLine'
 import colors from '@celo/react-components/styles/colors'
 import { fontStyles } from '@celo/react-components/styles/fonts'
 import { componentStyles } from '@celo/react-components/styles/styles'
@@ -42,7 +43,7 @@ interface NavProps {
     makerToken: CURRENCY_ENUM
     makerTokenBalance: string
     inputToken: CURRENCY_ENUM
-    inputTokenCode: string
+    inputTokenDisplayName: string
     inputAmount: BigNumber
   }
 }
@@ -50,7 +51,7 @@ interface NavProps {
 interface State {
   makerToken: CURRENCY_ENUM
   inputToken: CURRENCY_ENUM
-  inputTokenCode: string
+  inputTokenDisplayName: string
   inputAmount: BigNumber
 }
 
@@ -73,7 +74,7 @@ export class ExchangeReview extends React.Component<Props, State> {
   state: State = {
     makerToken: CURRENCY_ENUM.GOLD,
     inputToken: CURRENCY_ENUM.GOLD,
-    inputTokenCode: this.props.t('global:gold'),
+    inputTokenDisplayName: this.props.t('global:gold'),
     inputAmount: new BigNumber(0),
   }
 
@@ -89,16 +90,20 @@ export class ExchangeReview extends React.Component<Props, State> {
   }
 
   getExchangePropertiesFromNavProps() {
-    const { makerToken, inputAmount, inputToken, inputTokenCode } = this.props.navigation.getParam(
-      'exchangeInput'
-    )
-    if (!makerToken || !inputAmount || !inputToken || !inputTokenCode) {
+    console.log(JSON.stringify(this.props.navigation.getParam('exchangeInput')))
+    const {
+      makerToken,
+      inputAmount,
+      inputToken,
+      inputTokenDisplayName,
+    } = this.props.navigation.getParam('exchangeInput')
+    if (!makerToken || !inputAmount || !inputToken || !inputTokenDisplayName) {
       throw new Error('Missing exchange input from nav props')
     }
     this.setState({
       makerToken,
       inputToken,
-      inputTokenCode,
+      inputTokenDisplayName,
       inputAmount,
     })
     // Update exchange rate based on makerToken and makerAmount
@@ -156,16 +161,18 @@ export class ExchangeReview extends React.Component<Props, State> {
         <View style={styles.paddedContainer}>
           <DisconnectBanner />
           <ScrollView>
-            <View style={styles.column}>
+            <View style={styles.flexStart}>
               <View style={styles.amountRow}>
                 <Text style={styles.exchangeBodyText}>
-                  {t('exchangeAmount', { tokenName: t(`global:${this.state.inputTokenCode}`) })}
+                  {t('exchangeAmount', {
+                    tokenName: t(`global:${this.state.inputTokenDisplayName}`),
+                  })}
                 </Text>
                 <Text style={styles.currencyAmountText}>
                   {getMoneyDisplayValue(this.state.inputAmount, this.state.inputToken, true)}
                 </Text>
               </View>
-              <View style={styles.line} />
+              <HorizontalLine />
               <View style={styles.feeRowContainer}>
                 <Text style={styles.exchangeBodyText}>
                   {t('subtotalAmount', {
@@ -190,7 +197,7 @@ export class ExchangeReview extends React.Component<Props, State> {
                 </View>
                 <Text style={styles.exchangeBodyText}>{fee}</Text>
               </View>
-              <View style={styles.line} />
+              <HorizontalLine />
               <View style={styles.rowContainer}>
                 <Text style={fontStyles.bodyBold}>{t('sendFlow7:total')}</Text>
                 <Text style={fontStyles.bodyBold}>
@@ -227,21 +234,15 @@ export class ExchangeReview extends React.Component<Props, State> {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    flexDirection: 'column',
     justifyContent: 'space-between',
   },
   paddedContainer: {
     paddingHorizontal: 16,
   },
-  column: {
+  flexStart: {
     justifyContent: 'flex-start',
   },
   headerTextContainer: { flex: 1, alignSelf: 'center', alignItems: 'center' },
-  line: {
-    borderBottomColor: colors.darkLightest,
-    borderBottomWidth: 1,
-    marginVertical: 10,
-  },
   exchangeBodyText: { ...fontStyles.body, fontSize: 15 },
   currencyAmountText: { ...fontStyles.body, fontSize: 24, lineHeight: 39, color: colors.celoGreen },
   feeTextWithIconContainer: { flexDirection: 'row', alignItems: 'center' },

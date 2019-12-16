@@ -110,13 +110,13 @@ export class ExchangeTradeScreen extends React.Component<Props, State> {
 
   goToReview = () => {
     const { inputToken, inputAmount } = this.state
-    const inputTokenCode = this.getInputTokenDisplayText()
+    const inputTokenDisplayName = this.getInputTokenDisplayText()
     navigate(Screens.ExchangeReview, {
       exchangeInput: {
         makerToken: this.state.makerToken,
         makerTokenBalance: this.state.makerTokenAvailableBalance,
         inputToken,
-        inputTokenCode,
+        inputTokenDisplayName,
         inputAmount: parseInputAmount(inputAmount),
       },
     })

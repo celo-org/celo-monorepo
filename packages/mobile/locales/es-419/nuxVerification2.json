@@ -1,7 +1,6 @@
 {
   "getVerified": "Verificar el Teléfono",
   "notReadyForCode": "Aún no está listo para ingresar el código",
-  "missingFullName": "Nombre completo perdido",
   "emptyVerificationCode": "Sin Código en el Portapapeles",
   "invalidVerificationCode": "Código de Verification Inválido",
   "repeatVerificationCode": "Código de Verificación Repetido",

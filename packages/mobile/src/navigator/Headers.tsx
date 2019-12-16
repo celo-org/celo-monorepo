@@ -55,7 +55,7 @@ export const exchangeHeader = (makerToken: CURRENCY_ENUM, makerTokenBalance: str
     ...headerWithCancelButton,
     headerTitle: (
       <View style={styles.headerTextContainer}>
-        <Text style={fontStyles.headerBoldTitle}>{title}</Text>
+        <Text style={fontStyles.headerTitle}>{title}</Text>
         <View>
           <Text style={fontStyles.subSmall}>
             {i18n.t('exchangeFlow9:moneyAvailable', {
