@@ -90,7 +90,6 @@ export class ExchangeReview extends React.Component<Props, State> {
   }
 
   getExchangePropertiesFromNavProps() {
-    console.log(JSON.stringify(this.props.navigation.getParam('exchangeInput')))
     const {
       makerToken,
       inputAmount,
