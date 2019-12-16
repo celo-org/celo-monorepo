@@ -379,6 +379,7 @@ exports[`ReclaimPaymentConfirmationScreen renders correctly 1`] = `
                       style={
                         Object {
                           "height": 12,
+                          "tintColor": "#42D689",
                           "width": 12,
                         }
                       }
@@ -1023,6 +1024,7 @@ exports[`ReclaimPaymentConfirmationScreen renders correctly when fee calculation
                       style={
                         Object {
                           "height": 12,
+                          "tintColor": "#42D689",
                           "width": 12,
                         }
                       }
@@ -1667,6 +1669,7 @@ exports[`ReclaimPaymentConfirmationScreen renders correctly when fee calculation
                       style={
                         Object {
                           "height": 12,
+                          "tintColor": "#42D689",
                           "width": 12,
                         }
                       }
