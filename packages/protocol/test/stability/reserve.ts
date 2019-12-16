@@ -442,8 +442,8 @@ contract('Reserve', (accounts: string[]) => {
 
     it('should allow owner to set asset allocations', async () => {
       await reserve.setAssetAllocations(newAssetAllocationSymbols, newAssetAllocationWeights)
-      let assetAllocationSymbols = await reserve.getAssetAllocationSymbols()
-      let assetAllocationWeights = await reserve.getAssetAllocationWeights()
+      const assetAllocationSymbols = await reserve.getAssetAllocationSymbols()
+      const assetAllocationWeights = await reserve.getAssetAllocationWeights()
       assert.equal(assetAllocationSymbols.length, newAssetAllocationSymbols.length)
       assert.equal(assetAllocationWeights.length, newAssetAllocationWeights.length)
       assert.equal(web3.utils.hexToUtf8(assetAllocationSymbols[0]), 'cGLD')
@@ -481,12 +481,12 @@ contract('Reserve', (accounts: string[]) => {
     })
 
     it("should fail if the asset allocation doesn't sum to one", async () => {
-      let badAssetAllocationWeights = newAssetAllocationWeights
+      const badAssetAllocationWeights = newAssetAllocationWeights
       badAssetAllocationWeights[0] = badAssetAllocationWeights[0].minus(1)
       await assertRevert(
         reserve.setAssetAllocations(newAssetAllocationSymbols, badAssetAllocationWeights)
       )
-      let assetAllocationWeights = await reserve.getAssetAllocationWeights()
+      const assetAllocationWeights = await reserve.getAssetAllocationWeights()
       assert.equal(assetAllocationWeights.length, 0)
     })
   })
