@@ -8,14 +8,18 @@ import { PaymentRequest } from 'src/account/types'
 import { updatePaymentRequestNotified, updatePaymentRequestStatus } from 'src/firebase/actions'
 import i18n, { Namespaces } from 'src/i18n'
 import { fetchPhoneAddresses } from 'src/identity/actions'
-import { e164NumberToAddressSelector, E164NumberToAddressType } from 'src/identity/reducer'
+import {
+  AddressToE164NumberType,
+  e164NumberToAddressSelector,
+  E164NumberToAddressType,
+} from 'src/identity/reducer'
 import {
   NotificationList,
   titleWithBalanceNavigationOptions,
   useBalanceInNavigationParam,
 } from 'src/notifications/NotificationList'
 import OutgoingPaymentRequestListItem from 'src/paymentRequest/OutgoingPaymentRequestListItem'
-import { getRecipientFromPaymentRequest } from 'src/paymentRequest/utils'
+import { getSenderFromPaymentRequest } from 'src/paymentRequest/utils'
 import { NumberToRecipient } from 'src/recipients/recipient'
 import { recipientCacheSelector } from 'src/recipients/reducer'
 import { RootState } from 'src/redux/reducers'
@@ -25,6 +29,7 @@ interface StateProps {
   paymentRequests: PaymentRequest[]
   e164PhoneNumberAddressMapping: E164NumberToAddressType
   recipientCache: NumberToRecipient
+  addressToE164Number: AddressToE164NumberType
 }
 
 interface DispatchProps {
@@ -38,16 +43,22 @@ const mapStateToProps = (state: RootState): StateProps => ({
   paymentRequests: getOutgoingPaymentRequests(state),
   e164PhoneNumberAddressMapping: e164NumberToAddressSelector(state),
   recipientCache: recipientCacheSelector(state),
+  addressToE164Number: state.identity.addressToE164Number,
 })
 
 type Props = NavigationInjectedProps & WithNamespaces & StateProps & DispatchProps
 
 export const listItemRenderer = (params: {
   recipientCache: NumberToRecipient
+  addressToE164Number: AddressToE164NumberType
   updatePaymentRequestStatus: typeof updatePaymentRequestStatus
   updatePaymentRequestNotified: typeof updatePaymentRequestNotified
 }) => (request: PaymentRequest, key: number | undefined = undefined) => {
-  const requester = getRecipientFromPaymentRequest(request, params.recipientCache)
+  const requestee = getSenderFromPaymentRequest(
+    request,
+    params.addressToE164Number,
+    params.recipientCache
+  )
   return (
     <View key={key}>
       <OutgoingPaymentRequestListItem
@@ -55,7 +66,7 @@ export const listItemRenderer = (params: {
         amount={request.amount}
         updatePaymentRequestStatus={params.updatePaymentRequestStatus}
         updatePaymentRequestNotified={params.updatePaymentRequestNotified}
-        requester={requester}
+        requestee={requestee}
         comment={request.comment}
       />
     </View>
