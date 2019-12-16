@@ -235,22 +235,25 @@ if [[ $COMMAND == *"run-attestation"* ]]; then
 
     echo -e "* Let's run the attestation service ..."
     cd $ATTESTATION_DIR
-    docker rm -f celo-attestation || echo -e "Containers removed"
+    docker rm -f celo-attestations celo-attestation-service || echo -e "Containers removed"
 
     initialize_geth
     
     echo -e "\tPulling docker image: $CELO_IMAGE_ATTESTATION"
     docker pull $CELO_IMAGE_ATTESTATION
     
-    export CELO_ATTESTATION_SIGNER_ADDRESS=$(docker run -v $PWD:/root/.celo --entrypoint /bin/sh -it $CELO_IMAGE -c " printf '%s\n' $DEFAULT_PASSWORD $DEFAULT_PASSWORD | geth account new " |tail -1| cut -d'{' -f 2| tr -cd "[:alnum:]\n" )
+    if [ -z ${CELO_ATTESTATION_SIGNER_ADDRESS+x} ]; then 
+        echo -e "CELO_ATTESTATION_SIGNER_ADDRESS is unset. Generating address.";
+        export CELO_ATTESTATION_SIGNER_ADDRESS=$(docker run -v $PWD:/root/.celo --entrypoint /bin/sh -it $CELO_IMAGE -c " printf '%s\n' $DEFAULT_PASSWORD $DEFAULT_PASSWORD | geth account new " |tail -1| cut -d'{' -f 2| tr -cd "[:alnum:]\n" )
+    else
+        echo -e "Using existing CELO_ATTESTATION_SIGNER_ADDRESS=$CELO_ATTESTATION_SIGNER_ADDRESS";
+    fi
+    
     
     echo -e "\tGenerating attestation proof of possession"
     __POS=$(docker run -v $PWD:/root/.celo --entrypoint /bin/sh -it $CELO_IMAGE -c " printf '%s\n' $DEFAULT_PASSWORD $DEFAULT_PASSWORD | geth account proof-of-possession $CELO_ATTESTATION_SIGNER_ADDRESS $CELO_VALIDATOR_ADDRESS "| tail -2 )
     export CELO_ATTESTATION_SIGNER_PUBLIC_KEY=$(echo $__POS | cut -d' ' -f 6| tr -cd "[:alnum:]\n" )
     export CELO_ATTESTATION_SIGNER_SIGNATURE=$(echo $__POS | cut -d' ' -f 2| tr -cd "[:alnum:]\n" )
-    
-    echo -e "\tAuthorizing the attestation signer"
-    $CELOCLI account:authorize --from $CELO_VALIDATOR_ADDRESS --role attestation --signature 0x$CELO_ATTESTATION_SIGNER_SIGNATURE --signer 0x$CELO_ATTESTATION_SIGNER_ADDRESS
     
     echo -e "\tStarting celo-attestations node"
     docker run -v $PWD:/root/.celo --entrypoint sh --rm $CELO_IMAGE -c "echo $DEFAULT_PASSWORD > /root/.celo/.password"
@@ -258,15 +261,24 @@ if [[ $COMMAND == *"run-attestation"* ]]; then
     export CELO_PROVIDER=http://localhost:8545
 
     echo -e "\tStarting attestation service"
-    screen -S attestation-service -d -m docker run --name celo-attestation-service -it --restart always --entrypoint /bin/bash --network host -e ATTESTATION_SIGNER_ADDRESS=0x$CELO_ATTESTATION_SIGNER_ADDRESS -e CELO_VALIDATOR_ADDRESS=0x$CELO_VALIDATOR_ADDRESS -e CELO_PROVIDER=$CELO_PROVIDER -e DATABASE_URL=$DATABASE_URL -e SMS_PROVIDERS=twilio -e TWILIO_MESSAGING_SERVICE_SID=$TWILIO_MESSAGING_SERVICE_SID -e TWILIO_ACCOUNT_SID=$TWILIO_ACCOUNT_SID -e TWILIO_BLACKLIST=$TWILIO_BLACKLIST -e TWILIO_AUTH_TOKEN=$TWILIO_AUTH_TOKEN -e PORT=80 -p 80:80 $CELO_IMAGE_ATTESTATION -c " cd /celo-monorepo/packages/attestation-service && yarn run db:migrate && yarn start "
+    screen -S celo-attestation-service -d -m docker run --name celo-attestation-service -it --restart always --entrypoint /bin/bash --network host -e ATTESTATION_SIGNER_ADDRESS=0x$CELO_ATTESTATION_SIGNER_ADDRESS -e CELO_VALIDATOR_ADDRESS=0x$CELO_VALIDATOR_ADDRESS -e CELO_PROVIDER=$CELO_PROVIDER -e DATABASE_URL=$DATABASE_URL -e SMS_PROVIDERS=twilio -e TWILIO_MESSAGING_SERVICE_SID=$TWILIO_MESSAGING_SERVICE_SID -e TWILIO_ACCOUNT_SID=$TWILIO_ACCOUNT_SID -e TWILIO_BLACKLIST=$TWILIO_BLACKLIST -e TWILIO_AUTH_TOKEN=$TWILIO_AUTH_TOKEN -e PORT=80 -p 80:80 $CELO_IMAGE_ATTESTATION -c " cd /celo-monorepo/packages/attestation-service && yarn run db:migrate && yarn start "
     
     echo -e "\tAttestation service should be running, you can check running 'screen -ls'"
-    echo -e "\tYou can re-attach to the attestation-service running:"
+    echo -e "\tYou can re-attach to the attestation-service node running:"
+    echo -e "\t 'screen -r -S celo-attestations'\n"
+    echo -e "\tOr the attestations service running:"
     echo -e "\t 'screen -r -S celo-attestation-service'\n"
 
     echo -e "\n************************************************************************\n"
     echo -e "Attestation Celo Environment Variables (copy to validator-config.rc to re-use them!):\n\n"
     echo -e "CELO_ATTESTATION_SIGNER_ADDRESS=$CELO_ATTESTATION_SIGNER_ADDRESS"
+    echo -e "\n************************************************************************\n"    
+    
+    echo -e "\tFor authorizing the attestation signer you need to run the following commands where you are running celo-accounts"
+    echo -e "\n************************************************************************\n"
+    echo -e "export CELO_ATTESTATION_SIGNER_SIGNATURE=$CELO_ATTESTATION_SIGNER_SIGNATURE"
+    echo -e "export CELO_ATTESTATION_SIGNER_ADDRESS=$CELO_ATTESTATION_SIGNER_ADDRESS"
+    echo -e $CELOCLI account:authorize --from $CELO_VALIDATOR_ADDRESS --role attestation --signature 0x$CELO_ATTESTATION_SIGNER_SIGNATURE --signer 0x$CELO_ATTESTATION_SIGNER_ADDRESS
     echo -e "\n************************************************************************\n"
     
     
@@ -279,7 +291,7 @@ if [[ $COMMAND == *"register-metadata"* ]]; then
     if [ -z ${CELO_VALIDATOR_GROUP_ADDRESS+x} ]; then echo "CELO_VALIDATOR_GROUP_ADDRESS is unset"; exit 1; fi
     if [ -z ${ATTESTATION_SERVICE_URL+x} ]; then echo "ATTESTATION_SERVICE_URL is unset"; exit 1; fi
     if [ -z ${METADATA_URL+x} ]; then echo "METADATA_URL is unset"; exit 1; fi
-    if [ -z ${GROUP_METADATA_URL+x} ]; then echo "METADATA_URL is unset"; exit 1; fi
+    if [ -z ${GROUP_METADATA_URL+x} ]; then echo "GROUP_METADATA_URL is unset"; exit 1; fi
 
     
     echo -e "* Registering attestation metadata ..."
