@@ -63,6 +63,7 @@
   "decline": "Decline",
   "to": "To",
   "for": "For",
+  "reclaim": "Reclaim",
   "celoGold": "Celo Gold",
   "celoDollars": "{{CeloDollars}}",
   "oops": "Oops!",
@@ -102,5 +103,8 @@
   "localCurrencyTitle": "Select Currency",
   "or": "or",
   "accepted": "Accepted",
-  "processing": "Processing"
+  "processing": "Processing",
+  "moreWithCount": "+{{count }} more",
+  "unknown": "Unknown",
+  "emptyList": "Empty list"
 }
