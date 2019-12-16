@@ -89,7 +89,7 @@ export async function concurrentValuesMap(
   mapFn: (val: any, idx: number) => Promise<any>
 ): Promise<{ [key: string]: any }> {
   const xk = Object.keys(x)
-  const xv: Array<any> = []
+  const xv: any[] = []
   xk.forEach((k) => xv.push(x[k]))
   const res = await concurrentMap(concurrency, xv, mapFn)
   return res.reduce((output, value, index) => {
