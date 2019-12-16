@@ -168,7 +168,7 @@ export class TransactionFeed extends React.PureComponent<Props> {
       filteredStandbyTxs = filteredStandbyTxs.filter(standbyTransactionFilter)
     }
 
-    // TODO move  filter to gql
+    // TODO move filter to gql
     const queryFilter = this.getQueryFilter()
     const filteredQueryTxs = events.filter(queryFilter)
     const txData = [...filteredStandbyTxs, ...filteredQueryTxs]
