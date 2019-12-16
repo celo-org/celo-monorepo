@@ -1,15 +1,6 @@
 import 'react-native'
 
 declare module 'react-native' {
-  interface TextProps {
-    accessibilityRole?: 'button' | 'heading' | 'label' | 'link' | 'listitem'
-    tabIndex?: number
-    href?: string
-    target?: string
-    id?: string
-    onClick?: () => void
-  }
-
   interface TextStyle {
     textRendering?: string
     listStyle?: 'disc' | 'circle' | 'square' | 'decimal' | 'none' | 'lower-alpha'
@@ -26,7 +17,7 @@ declare module 'react-native' {
     animationDelay?: string
     animationDuration?: string
     animationFillMode?: 'both' | 'backwards' | 'forwards' | 'none'
-    animationIterationCount?: string | number
+    animationIterationCount?: 'infinite' | number
     animationKeyframes?: unknown[]
     animationTimingFunction?: string
     scrollPadding?: number
@@ -34,6 +25,7 @@ declare module 'react-native' {
     display?: 'none' | 'flex' | 'inline' | 'inline-flex' | 'list-item'
     fill?: string
     filter?: string
+    mixBlendMode?: 'multiply' | 'screen'
   }
 
   interface ImageProps {
@@ -43,9 +35,20 @@ declare module 'react-native' {
     className?: string
   }
 
+  interface TextProps {
+    accessibilityRole?: 'button' | 'heading' | 'label' | 'link' | 'listitem'
+    tabIndex?: number
+    href?: string
+    target?: string
+    id?: string
+    onClick?: () => void
+    style?: StyleProp<TextStyle>
+  }
+
   interface ViewProps {
     onClick?: () => void
     accessibilityRole?: 'list' | 'link' | 'button'
+    style?: StyleProp<ViewStyle>
   }
 
   interface TextInputProps {

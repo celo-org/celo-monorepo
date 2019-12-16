@@ -371,7 +371,7 @@ const styles = StyleSheet.create({
     animationTimingFunction: 'ease-in',
   },
   coinFall: {
-    animationIterationCount: '1',
+    animationIterationCount: 1,
     animationTimingFunction: 'ease-out',
   },
 })
