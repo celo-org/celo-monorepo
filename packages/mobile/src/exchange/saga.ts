@@ -124,11 +124,10 @@ export function* exchangeGoldAndStableTokens(action: ExchangeTokensAction) {
     const stableTokenContract: StableTokenType = yield call(getStableTokenContract, web3)
     const exchangeContract: ExchangeType = yield call(getExchangeContract, web3)
 
-    const convertedMakerAmount: BigNumber = yield call(
-      convertToContractDecimals,
-      makerAmount,
-      makerToken
-    )
+    const convertedMakerAmount: BigNumber = roundDown(
+      yield call(convertToContractDecimals, makerAmount, makerToken),
+      0
+    ) // Nearest integer in wei
     const sellGold = makerToken === CURRENCY_ENUM.GOLD
 
     const updatedExchangeRate: BigNumber = yield call(
@@ -155,7 +154,7 @@ export function* exchangeGoldAndStableTokens(action: ExchangeTokensAction) {
     // Ensure the user gets makerAmount at least as good as displayed (rounded to EXCHANGE_DIFFERENCE_TOLERATED)
     const minimumTakerAmount = BigNumber.maximum(
       getTakerAmount(makerAmount, exchangeRate).minus(EXCHANGE_DIFFERENCE_TOLERATED),
-      '0'
+      0
     )
     const updatedTakerAmount = getTakerAmount(makerAmount, updatedExchangeRate)
     if (minimumTakerAmount.isGreaterThan(updatedTakerAmount)) {

@@ -38,7 +38,6 @@ type Props = {
   error: ApolloError | undefined
   data: UserTransactionsData | undefined
   standbyTransactions: StandbyTransaction[]
-  standbyTransactionsToRemove: StandbyTransaction[]
   transactionFilter?: (tx: StandbyTransaction) => boolean
 } & StateProps
 
