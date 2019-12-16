@@ -2,14 +2,14 @@ import * as React from 'react'
 import 'react-native'
 import { Provider } from 'react-redux'
 import * as renderer from 'react-test-renderer'
-import CeloLite from 'src/account/CeloLite'
+import DataSaver from 'src/account/DataSaver'
 import { createMockStore } from 'test/utils'
 
-describe('CeloLite', () => {
+describe('DataSaver', () => {
   it('renders correctly', () => {
     const tree = renderer.create(
       <Provider store={createMockStore({})}>
-        <CeloLite />
+        <DataSaver />
       </Provider>
     )
     expect(tree).toMatchSnapshot()

@@ -13,7 +13,7 @@ import {
 } from 'react-navigation-stack'
 import Account from 'src/account/Account'
 import Analytics from 'src/account/Analytics'
-import CeloLite from 'src/account/CeloLite'
+import DataSaver from 'src/account/DataSaver'
 import DollarEducation from 'src/account/DollarEducation'
 import EditProfile from 'src/account/EditProfile'
 import GoldEducation from 'src/account/GoldEducation'
@@ -250,7 +250,7 @@ const SettingsStack = createStackNavigator(
     [Stacks.BackupStack]: { screen: BackupStack },
     [Screens.Language]: { screen: Language },
     [Screens.Analytics]: { screen: Analytics },
-    [Screens.CeloLite]: { screen: CeloLite },
+    [Screens.DataSaver]: { screen: DataSaver },
     [Screens.EditProfile]: { screen: EditProfile },
     [Screens.Profile]: { screen: Profile },
     [Screens.Invite]: { screen: Invite },
