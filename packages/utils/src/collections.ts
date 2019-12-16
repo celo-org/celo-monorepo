@@ -44,28 +44,40 @@ export function intersection<T>(arrays: T[][]): T[] {
 
 // List of sorted from greater to smaller
 
-export type item = { address: string; value: BigNumber }
+export interface Item {
+  address: string
+  value: BigNumber
+}
 
 const nilAddress = '0x0000000000000000000000000000000000000000'
 
-function insert(sortedList: item[], change: item) {
+function insert(sortedList: Item[], change: Item) {
   const oldIdx = sortedList.findIndex((a) => a.address === change.address)
   sortedList.splice(oldIdx, 1)
   const newIdx = sortedList.findIndex((a) => a.value.lt(change.value))
-  if (newIdx === -1) sortedList.push(change)
-  else sortedList.splice(newIdx, 0, change)
+  if (newIdx === -1) {
+    sortedList.push(change)
+  } else {
+    sortedList.splice(newIdx, 0, change)
+  }
 }
 
-export function linkedListChanges(sortedList: item[], changeList: item[]) {
+export function linkedListChanges(sortedList: Item[], changeList: Item[]) {
   const lesser: string[] = []
   const greater: string[] = []
   for (const it of changeList) {
     insert(sortedList, it)
     const idx = sortedList.findIndex((a) => a.address === it.address)
-    if (idx === 0) greater.push(nilAddress)
-    else greater.push(sortedList[idx - 1].address)
-    if (idx === sortedList.length - 1) lesser.push(nilAddress)
-    else lesser.push(sortedList[idx + 1].address)
+    if (idx === 0) {
+      greater.push(nilAddress)
+    } else {
+      greater.push(sortedList[idx - 1].address)
+    }
+    if (idx === sortedList.length - 1) {
+      lesser.push(nilAddress)
+    } else {
+      lesser.push(sortedList[idx + 1].address)
+    }
   }
   return { lesser, greater }
 }
