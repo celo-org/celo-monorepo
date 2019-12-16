@@ -1,4 +1,5 @@
 import { AttestationsWrapper } from '@celo/contractkit/lib/wrappers/Attestations'
+import { retryAsync } from '@celo/utils/src/async'
 import { getPhoneHash } from '@celo/utils/src/phoneNumbers'
 import BigNumber from 'bignumber.js'
 import { chunk } from 'lodash'
@@ -11,6 +12,7 @@ import { ErrorMessages } from 'src/app/ErrorMessages'
 import {
   endImportContacts,
   FetchPhoneAddressesAction,
+  incrementImportSyncProgress,
   updateE164PhoneNumberAddresses,
   updateImportSyncProgress,
 } from 'src/identity/actions'
@@ -29,7 +31,7 @@ import { getConnectedAccount } from 'src/web3/saga'
 
 const TAG = 'identity/contactMapping'
 const MAPPING_CHUNK_SIZE = 25
-const NUM_PARALLEL_REQUESTS = 2
+const NUM_PARALLEL_REQUESTS = 1
 
 export function* doImportContacts() {
   Logger.debug(TAG, 'Importing user contacts')
@@ -60,6 +62,8 @@ export function* doImportContacts() {
     // We call this here before we've refreshed the contact mapping
     //   so that users can see a recipients list asap
     yield call(updateRecipientsCache, e164NumberToRecipients, otherRecipients)
+
+    yield put(updateImportSyncProgress(0, Object.keys(e164NumberToRecipients).length))
 
     yield call(lookupNewRecipients, e164NumberToAddress, e164NumberToRecipients, otherRecipients)
 
@@ -120,9 +124,7 @@ function* lookupNewRecipients(
   }
   Logger.debug(TAG, `Total new recipients found: ${newE164Numbers.length}`)
 
-  yield put(
-    updateImportSyncProgress(allE164Numbers.length - newE164Numbers.length, allE164Numbers.length)
-  )
+  yield put(incrementImportSyncProgress(allE164Numbers.length - newE164Numbers.length))
 
   const attestationsWrapper: AttestationsWrapper = yield call([
     contractKit.contracts,
@@ -139,8 +141,6 @@ function* lookupNewRecipients(
     `Lookup up: ${numberChunks.length} number chunks across ${requestChunks.length} request rounds`
   )
   for (const requestChunk of requestChunks) {
-    // TODO add progress updates here or in the fetchAndStoreAddressMappings method
-    // Also add immediate retry logic for failed chunks
     yield all(
       requestChunk.map((numberChunk) =>
         call(fetchAndStoreAddressMappings, attestationsWrapper, numberChunk)
@@ -178,6 +178,11 @@ async function getAddresses(e164Numbers: string[], attestationsWrapper: Attestat
       addresses.push(null)
     }
   }
+
+  if (!addresses || addresses.length !== e164Numbers.length) {
+    throw new Error('Address lookup length did not match numbers list length')
+  }
+
   return addresses
 }
 
@@ -191,11 +196,10 @@ export function* fetchAndStoreAddressMappings(
   try {
     Logger.debug(TAG, `Fetch and store address mapping for ${e164Numbers.length} phone numbers`)
 
-    const addresses: Array<string | null> = yield getAddresses(e164Numbers, attestationsWrapper)
-
-    if (!addresses || addresses.length !== e164Numbers.length) {
-      throw new Error('Address lookup length did not match numbers list length')
-    }
+    const addresses: Array<string | null> = yield call(retryAsync, getAddresses, 3, [
+      e164Numbers,
+      attestationsWrapper,
+    ])
 
     Logger.debug(TAG, `Retrieved ${addresses.length} addresses`)
 
@@ -219,8 +223,10 @@ export function* fetchAndStoreAddressMappings(
     yield put(
       updateE164PhoneNumberAddresses(e164NumberToAddressUpdates, addressToE164NumberUpdates)
     )
+    yield put(incrementImportSyncProgress(e164Numbers.length))
   } catch (error) {
     Logger.error(TAG, `Error fetching addresses for chunk: ${e164Numbers}`, error)
+    throw new Error('Phone number lookup error')
   }
 }
 

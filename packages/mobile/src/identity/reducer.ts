@@ -114,6 +114,14 @@ export const reducer = (
         ...state,
         contactMappingProgress: { current: action.current, total: action.total },
       }
+    case Actions.INCREMENT_IMPORT_SYNC_PROGRESS:
+      return {
+        ...state,
+        contactMappingProgress: {
+          current: state.contactMappingProgress.current + action.increment,
+          total: state.contactMappingProgress.total,
+        },
+      }
     case Actions.END_IMPORT_CONTACTS:
       return {
         ...state,
