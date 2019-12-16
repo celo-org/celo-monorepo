@@ -771,5 +771,5 @@ celocli election:revoke --from $CELO_VALIDATOR_GROUP_ADDRESS --for $CELO_VALIDAT
 - Deregister your validator group:
 
 ```bash
-celocli validatorgroup:deregister --from $CELO_VALIDATOR_GORUP_ADDRESS
+celocli validatorgroup:deregister --from $CELO_VALIDATOR_GROUP_ADDRESS
 ```

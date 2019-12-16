@@ -39,7 +39,7 @@ class FaucetPage extends React.Component<I18nProps, State> {
           <SideTitledSection
             title={t('getTestnetAddress')}
             text={
-              <Trans i18nKey={'getTestnetText'}>
+              <Trans ns={NameSpaces.faucet} i18nKey={'getTestnetText'}>
                 <InlineAnchor href={CeloLinks.walletApp}>INVITE</InlineAnchor>{' '}
                 <InlineAnchor href={CeloLinks.tutorial}>CLI</InlineAnchor>
               </Trans>
@@ -48,7 +48,7 @@ class FaucetPage extends React.Component<I18nProps, State> {
           <SideTitledSection
             title={t('haveAnAccount')}
             text={
-              <Trans i18nKey={'haveAccountText'}>
+              <Trans ns={NameSpaces.faucet} i18nKey={'haveAccountText'}>
                 You can access an existing account from the Celo Wallet by pressing `Import It` on
                 the first screen and entering your seed phrase.
               </Trans>
