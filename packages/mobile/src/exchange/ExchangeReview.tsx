@@ -173,7 +173,7 @@ export class ExchangeReview extends React.Component<Props, State> {
                 </Text>
               </View>
               <HorizontalLine />
-              <View style={styles.feeRowContainer}>
+              <View style={styles.subtotalRowContainer}>
                 <Text style={styles.exchangeBodyText}>
                   {t('subtotalAmount', {
                     rate: getMoneyDisplayValue(exchangeRate, CURRENCY_ENUM.DOLLAR, true),
@@ -249,6 +249,13 @@ const styles = StyleSheet.create({
   rowContainer: {
     flexDirection: 'row',
     justifyContent: 'space-between',
+    marginTop: 20,
+  },
+  subtotalRowContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginVertical: 5,
+    marginTop: 20,
   },
   feeRowContainer: {
     flexDirection: 'row',

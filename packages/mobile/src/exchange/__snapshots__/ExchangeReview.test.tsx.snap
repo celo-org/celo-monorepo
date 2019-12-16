@@ -5,7 +5,6 @@ exports[`ExchangeReview renders correctly 1`] = `
   style={
     Object {
       "flex": 1,
-      "flexDirection": "column",
       "justifyContent": "space-between",
     }
   }
@@ -64,9 +63,11 @@ exports[`ExchangeReview renders correctly 1`] = `
           <View
             style={
               Object {
-                "borderBottomColor": "#EEEEEE",
-                "borderBottomWidth": 1,
-                "marginVertical": 10,
+                "borderStyle": "solid",
+                "borderTopColor": "#EEEEEE",
+                "borderTopWidth": 1,
+                "marginTop": 10,
+                "width": "100%",
               }
             }
           />
@@ -75,6 +76,7 @@ exports[`ExchangeReview renders correctly 1`] = `
               Object {
                 "flexDirection": "row",
                 "justifyContent": "space-between",
+                "marginTop": 20,
                 "marginVertical": 5,
               }
             }
@@ -289,9 +291,11 @@ exports[`ExchangeReview renders correctly 1`] = `
           <View
             style={
               Object {
-                "borderBottomColor": "#EEEEEE",
-                "borderBottomWidth": 1,
-                "marginVertical": 10,
+                "borderStyle": "solid",
+                "borderTopColor": "#EEEEEE",
+                "borderTopWidth": 1,
+                "marginTop": 10,
+                "width": "100%",
               }
             }
           />
@@ -300,6 +304,7 @@ exports[`ExchangeReview renders correctly 1`] = `
               Object {
                 "flexDirection": "row",
                 "justifyContent": "space-between",
+                "marginTop": 20,
               }
             }
           >
