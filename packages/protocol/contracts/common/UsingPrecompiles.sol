@@ -146,7 +146,8 @@ contract UsingPrecompiles {
   function getParentHashFromHeader(bytes memory header) public view returns (bytes32) {}
 
   // Verifies the BLS signature on the header and returns the seal bitmap.
-  // The validator set used for verification is retrieved based on the parent hash field of the header.
+  // The validator set used for verification is retrieved based on the parent
+  // hash field of the header.
   // If the parent hash is not in the blockchain, verification fails.
   function getVerifiedSealBitmap(bytes memory header) public view returns (bytes32) {}
 

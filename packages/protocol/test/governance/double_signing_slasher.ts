@@ -12,10 +12,10 @@ import {
   MockLockedGoldInstance,
   RegistryContract,
   RegistryInstance,
-  ValidatorsTestContract,
-  ValidatorsTestInstance,
   TestDoubleSigningSlasherContract,
   TestDoubleSigningSlasherInstance,
+  ValidatorsTestContract,
+  ValidatorsTestInstance,
 } from 'types'
 
 const Accounts: AccountsContract = artifacts.require('Accounts')
@@ -45,8 +45,6 @@ contract('DoubleSigningSlasher', (accounts: string[]) => {
   let mockElection: MockElectionInstance
   let mockLockedGold: MockLockedGoldInstance
   let slasher: TestDoubleSigningSlasherInstance
-  const nonOwner = accounts[1]
-  const validator = accounts[1]
 
   const validatorLockedGoldRequirements = {
     value: new BigNumber(1000),
@@ -70,9 +68,9 @@ contract('DoubleSigningSlasher', (accounts: string[]) => {
     '0xcdb77255037eb68897cd487fdd85388cbda448f617f874449d4b11588b0b7ad8ddc20d9bb450b513bb35664ea3923900'
   const commission = toFixed(1 / 100)
 
-  const registerValidator = async (validator: string) => {
-    await mockLockedGold.setAccountTotalLockedGold(validator, validatorLockedGoldRequirements.value)
-    const publicKey = await addressToPublicKey(validator, web3.eth.sign)
+  const registerValidator = async (address: string) => {
+    await mockLockedGold.setAccountTotalLockedGold(address, validatorLockedGoldRequirements.value)
+    const publicKey = await addressToPublicKey(address, web3.eth.sign)
     await validators.registerValidator(
       // @ts-ignore bytes type
       publicKey,
@@ -80,7 +78,7 @@ contract('DoubleSigningSlasher', (accounts: string[]) => {
       blsPublicKey,
       // @ts-ignore bytes type
       blsPoP,
-      { from: validator }
+      { from: address }
     )
   }
 
@@ -91,16 +89,19 @@ contract('DoubleSigningSlasher', (accounts: string[]) => {
 
   const registerValidatorGroupWithMembers = async (group: string, members: string[]) => {
     await registerValidatorGroup(group)
-    for (const validator of members) {
-      await registerValidator(validator)
-      await validators.affiliate(group, { from: validator })
-      if (validator === members[0]) {
-        await validators.addFirstMember(validator, NULL_ADDRESS, NULL_ADDRESS, { from: group })
+    for (const address of members) {
+      await registerValidator(address)
+      await validators.affiliate(group, { from: address })
+      if (address === members[0]) {
+        await validators.addFirstMember(address, NULL_ADDRESS, NULL_ADDRESS, { from: group })
       } else {
-        await validators.addMember(validator, { from: group })
+        await validators.addMember(address, { from: group })
       }
     }
   }
+
+  const nonOwner = accounts[1]
+  const validator = accounts[1]
 
   beforeEach(async () => {
     accountsInstance = await Accounts.new()
@@ -172,9 +173,8 @@ contract('DoubleSigningSlasher', (accounts: string[]) => {
     const blockC = ['0x11', '0x13', '0x14']
     beforeEach(async () => {
       blockNumber = await web3.eth.getBlockNumber()
-      let res = await web3.eth.getBlock(blockNumber)
-      // console.info(res)
-      let hash = res.parentHash
+      const block = await web3.eth.getBlock(blockNumber)
+      const hash = block.parentHash
       await slasher.setParentHashFromHeader(blockA, hash)
       await slasher.setParentHashFromHeader(blockB, '0x34')
       await slasher.setParentHashFromHeader(blockC, hash)

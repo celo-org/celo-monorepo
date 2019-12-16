@@ -6,18 +6,16 @@ import BigNumber from 'bignumber.js'
 import {
   AccountsContract,
   AccountsInstance,
+  GovernanceSlasherContract,
+  GovernanceSlasherInstance,
   MockElectionContract,
   MockElectionInstance,
   MockLockedGoldContract,
   MockLockedGoldInstance,
-  //  MockStableTokenContract,
-  //  MockStableTokenInstance,
   RegistryContract,
   RegistryInstance,
   ValidatorsTestContract,
   ValidatorsTestInstance,
-  GovernanceSlasherContract,
-  GovernanceSlasherInstance,
 } from 'types'
 
 const Accounts: AccountsContract = artifacts.require('Accounts')
@@ -71,9 +69,9 @@ contract('GovernanceSlasher', (accounts: string[]) => {
     '0xcdb77255037eb68897cd487fdd85388cbda448f617f874449d4b11588b0b7ad8ddc20d9bb450b513bb35664ea3923900'
   const commission = toFixed(1 / 100)
 
-  const registerValidator = async (validator: string) => {
-    await mockLockedGold.setAccountTotalLockedGold(validator, validatorLockedGoldRequirements.value)
-    const publicKey = await addressToPublicKey(validator, web3.eth.sign)
+  const registerValidator = async (address: string) => {
+    await mockLockedGold.setAccountTotalLockedGold(address, validatorLockedGoldRequirements.value)
+    const publicKey = await addressToPublicKey(address, web3.eth.sign)
     await validators.registerValidator(
       // @ts-ignore bytes type
       publicKey,
@@ -81,7 +79,7 @@ contract('GovernanceSlasher', (accounts: string[]) => {
       blsPublicKey,
       // @ts-ignore bytes type
       blsPoP,
-      { from: validator }
+      { from: address }
     )
   }
 
@@ -92,13 +90,13 @@ contract('GovernanceSlasher', (accounts: string[]) => {
 
   const registerValidatorGroupWithMembers = async (group: string, members: string[]) => {
     await registerValidatorGroup(group)
-    for (const validator of members) {
-      await registerValidator(validator)
-      await validators.affiliate(group, { from: validator })
-      if (validator === members[0]) {
-        await validators.addFirstMember(validator, NULL_ADDRESS, NULL_ADDRESS, { from: group })
+    for (const address of members) {
+      await registerValidator(address)
+      await validators.affiliate(group, { from: address })
+      if (address === members[0]) {
+        await validators.addFirstMember(address, NULL_ADDRESS, NULL_ADDRESS, { from: group })
       } else {
-        await validators.addMember(validator, { from: group })
+        await validators.addMember(address, { from: group })
       }
     }
   }
