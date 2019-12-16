@@ -4,7 +4,7 @@ import { Provider } from 'react-redux'
 import * as renderer from 'react-test-renderer'
 import { PaymentRequestStatus } from 'src/account/types'
 import { SHORT_CURRENCIES } from 'src/geth/consts'
-import OutgoingPaymentRequestSummaryNotification from 'src/notifications/OutgoingPaymentRequestSummaryNotification'
+import IncomingPaymentRequestSummaryNotification from 'src/paymentRequest/IncomingPaymentRequestSummaryNotification'
 import { createMockStore } from 'test/utils'
 
 const requesterE164Number = '+491522345678'
@@ -57,11 +57,11 @@ const fakeRequests = [
 ]
 const store = createMockStore()
 
-describe('OutgoingPaymentRequestSummaryNotification', () => {
+describe('IncomingPaymentRequestSummaryNotification', () => {
   it('renders correctly', () => {
     const tree = renderer.create(
       <Provider store={store}>
-        <OutgoingPaymentRequestSummaryNotification requests={fakeRequests} />
+        <IncomingPaymentRequestSummaryNotification requests={fakeRequests} />
       </Provider>
     )
     expect(tree).toMatchSnapshot()
@@ -71,7 +71,7 @@ describe('OutgoingPaymentRequestSummaryNotification', () => {
     it('renders just two', () => {
       const tree = renderer.create(
         <Provider store={store}>
-          <OutgoingPaymentRequestSummaryNotification requests={fakeRequests} />
+          <IncomingPaymentRequestSummaryNotification requests={fakeRequests} />
         </Provider>
       )
       expect(tree).toMatchSnapshot()
@@ -81,7 +81,7 @@ describe('OutgoingPaymentRequestSummaryNotification', () => {
     it('renders just it alone', () => {
       const tree = renderer.create(
         <Provider store={store}>
-          <OutgoingPaymentRequestSummaryNotification requests={fakeRequests.slice(0, 1)} />
+          <IncomingPaymentRequestSummaryNotification requests={fakeRequests.slice(0, 1)} />
         </Provider>
       )
       expect(tree).toMatchSnapshot()
