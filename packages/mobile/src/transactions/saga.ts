@@ -31,7 +31,7 @@ function* onSendAndMonitorTransactionError(txId: string) {
   yield put(showError(ErrorMessages.TRANSACTION_FAILED))
 }
 
-// TODO listen for transaction confirmed, put in
+// TODO listen for transaction confirmed, update activity feed
 
 export function* sendAndMonitorTransaction(
   txId: string,
@@ -63,6 +63,7 @@ export function* sendAndMonitorTransaction(
     yield put(transactionConfirmed(txId))
     Logger.debug(TAG + '@sendAndMonitorTransaction', `Confirmed transaction ${txId}`) // Gets here but still says confirming
     // TODO(anna) do something after receiving confirmation
+    yield put(removeStandbyTransaction(txId)) // Remove standby transaction. TODO ensure confirmed transaction appears in feed
 
     if (currency === CURRENCY_ENUM.GOLD) {
       yield put(fetchGoldBalance())

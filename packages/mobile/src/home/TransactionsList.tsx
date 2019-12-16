@@ -9,8 +9,8 @@ import { RootState } from 'src/redux/reducers'
 import { removeStandbyTransaction } from 'src/transactions/actions'
 import { StandbyTransaction, TransactionStatus } from 'src/transactions/reducer'
 import TransactionFeed, { FeedType } from 'src/transactions/TransactionFeed'
-import { currentAccountSelector } from 'src/web3/selectors'
 import Logger from 'src/utils/Logger'
+import { currentAccountSelector } from 'src/web3/selectors'
 
 interface StateProps {
   address?: string | null
@@ -77,7 +77,6 @@ export class TransactionsList extends React.PureComponent<Props> {
       return
     }
 
-    Logger.debug('@TransactionsList', `txsFetched called`)
     const events = data.events
     const queryDataTxIDs = new Set(events.map((event: Event) => event.hash))
     Logger.debug('@TransactionsList', `tx IDs: ${[...queryDataTxIDs].join(' ')}`)
@@ -87,6 +86,7 @@ export class TransactionsList extends React.PureComponent<Props> {
     Logger.debug('@TransactionsList', `filteredStandbyTxs: ${filteredStandbyTxs.join(' ')}`)
 
     filteredStandbyTxs.forEach((tx) => {
+      Logger.debug('@TransactionsList', `removing filteredStandbyTx: ${JSON.stringify(tx)}`)
       this.props.removeStandbyTransaction(tx.id)
     })
   }
