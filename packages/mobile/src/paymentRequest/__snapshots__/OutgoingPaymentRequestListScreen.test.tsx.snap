@@ -108,7 +108,7 @@ exports[`OutgoingPaymentRequestListScreen renders correctly with requests 1`] = 
                             "justifyContent": "center",
                           },
                           Object {
-                            "backgroundColor": "#7AD6FE",
+                            "backgroundColor": "#FEB45E",
                             "borderRadius": 20,
                             "height": 40,
                             "width": 40,
@@ -322,7 +322,7 @@ exports[`OutgoingPaymentRequestListScreen renders correctly with requests 1`] = 
                             "justifyContent": "center",
                           },
                           Object {
-                            "backgroundColor": "#7AD6FE",
+                            "backgroundColor": "#FEB45E",
                             "borderRadius": 20,
                             "height": 40,
                             "width": 40,
@@ -536,7 +536,7 @@ exports[`OutgoingPaymentRequestListScreen renders correctly with requests 1`] = 
                             "justifyContent": "center",
                           },
                           Object {
-                            "backgroundColor": "#7AD6FE",
+                            "backgroundColor": "#FEB45E",
                             "borderRadius": 20,
                             "height": 40,
                             "width": 40,
