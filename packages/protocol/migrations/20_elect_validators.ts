@@ -164,7 +164,7 @@ async function registerValidator(
 
   const attestationKeyAddress = privateKeyToAddress(attestationKey)
   if (
-    (await accounts.getAttestationSigner(validatorAddress)).toLowerCase() !=
+    (await accounts.getAttestationSigner(validatorAddress)).toLowerCase() !==
     attestationKeyAddress.toLowerCase()
   ) {
     // Authorize the attestation signer
@@ -283,109 +283,23 @@ module.exports = async (_deployer: any, networkName: string) => {
         : lockedGoldPerVal,
     account: null,
   }))
-  groups[0].account = {
-    address: '0x59D2271F8916A46810fadB3999F39215e5E65Cbc',
-  }
-  groups[0].votingGold = new BigNumber('110000000000000000000000')
-
-  groups[1].account = {
-    address: '0xCF0AF81CEA34B02d8f76a8eD81D5C4aAD4946E3d',
-  }
-  groups[1].votingGold = new BigNumber('0')
-
-  groups[2].account = {
-    address: '0x1f0CbEA9aCbECADe1f538C1Aafcb609E913D2aAb',
-  }
-  groups[2].votingGold = new BigNumber('0')
-
-  groups[3].account = {
-    address: '0x84F75628a787a390E03c3f1E45bf7e2BB0D211E3',
-  }
-  groups[3].votingGold = new BigNumber('0')
-
-  groups[4].account = {
-    address: '0xee65707aD00F5f335ae56a0E3d7bEBB1303F061A',
-  }
-  groups[4].votingGold = new BigNumber('10000000000000000000000')
-
-  groups[5].account = {
-    address: '0xE70a7D2b31b314F520a84d94Eb5A5d2A9B40987f',
-  }
-  groups[5].votingGold = new BigNumber('10000000000000000000000')
-
-  groups[6].account = {
-    address: '0x60F5fa58A4B6a9a3aFeafF7F01bCD92Ee1C9896D',
-  }
-  groups[6].votingGold = new BigNumber('10000000000000000000000')
-
-  groups[7].account = {
-    address: '0x2cABAdab281d6F00f71d007881153Ad3F21E6863',
-  }
-  groups[7].votingGold = new BigNumber('10000000000000000000000')
-
-  groups[8].account = {
-    address: '0xecc08E02771a5179925b7C0422550BffCeF3F6BA',
-  }
-  groups[8].votingGold = new BigNumber('10000000000000000000000')
-
-  groups[9].account = {
-    address: '0xD93C39C4E9BA65e158d1E5711CEFCD3375a85EB2',
-  }
-  groups[9].votingGold = new BigNumber('10000000000000000000000')
-
-  groups[10].account = {
-    address: '0x679136d0AFfe19A1642B6aB6e478dBF28D783373',
-  }
-  groups[10].votingGold = new BigNumber('10000000000000000000000')
-
-  groups[11].account = {
-    address: '0x6c93A7d292eCf3ca2DA8df004Ada8bD743E6D0F2',
-  }
-  groups[11].votingGold = new BigNumber('0')
-
-  groups[12].account = {
-    address: '0xB92629423Fb271A2e3027326aCE8BC2e4720f378',
-  }
-  groups[12].votingGold = new BigNumber('0')
-  groups[13].account = {
-    address: '0x976D3F25709f3F8eC74eA97693F505610F25e678',
-  }
-  groups[13].votingGold = new BigNumber('0')
 
   for (const [idx, group] of groups.entries()) {
-    if (false) {
-      console.info(
-        `  Registering validator group: ${group.name} with: ${group.lockedGold} CG locked, ${
-          group.votingGold
-        } voting...`
-      )
-      group.account = await registerValidatorGroup(
-        group.name,
-        accounts,
-        lockedGold,
-        validators,
-        validator0Key,
-        group.lockedGold
-      )
-    } else {
-      group.account = await getValidatorGroupAccount(group.account.address, accounts, validator0Key)
-      if (idx === 2) {
-        const value = new BigNumber('30000000000000000000000')
-        console.info(`Sending funds to group ${group.account.address}`)
-        await sendTransactionWithPrivateKey(web3, null, validator0Key, {
-          to: group.account.address,
-          value: value,
-        })
-        // await lockGold(accounts, lockedGold, value, group.account.privateKey)
-        // @ts-ignore
-        const lockTx = lockedGold.contract.methods.lock()
+    console.info(
+      `  Registering validator group: ${group.name} with: ${group.lockedGold} CG locked, ${
+        group.votingGold
+      } voting...`
+    )
+    group.account = await registerValidatorGroup(
+      group.name,
+      accounts,
+      lockedGold,
+      validators,
+      validator0Key,
+      group.lockedGold
+    )
 
-        await sendTransactionWithPrivateKey(web3, lockTx, group.account.privateKey, {
-          to: lockedGold.address,
-          value,
-        })
-      }
-    }
+    group.account = await getValidatorGroupAccount(group.account.address, accounts, validator0Key)
 
     console.info(`  * Registering ${group.valKeys.length} validators ...`)
     await Promise.all(
@@ -445,7 +359,7 @@ module.exports = async (_deployer: any, networkName: string) => {
       }
     }
 
-    if (false && (await election.getTotalVotesForGroup(group.account.address)).isZero()) {
+    if ((await election.getTotalVotesForGroup(group.account.address)).isZero()) {
       // Determine the lesser and greater group addresses after voting.
       groups[idx].votingGold = groups[idx].desiredVotingGold
       const sortedGroups = groups.slice(0, idx + 1)
