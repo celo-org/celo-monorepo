@@ -327,7 +327,12 @@ if [[ $COMMAND == *"run-fullnode"* ]]; then
 
     docker rm -f celo-fullnode || echo -e "Container removed"
 
-    export CELO_ACCOUNT_ADDRESS=$($CELOCLI account:new |tail -1| cut -d' ' -f 2| tr -cd "[:alnum:]\n")
+    if [ -z ${CELO_ACCOUNT_ADDRESS+x} ]; then 
+        echo "CELO_ACCOUNT_ADDRESS is unset, creating account";
+        export CELO_ACCOUNT_ADDRESS=$(docker run -v $PWD:/root/.celo --entrypoint /bin/sh -it $CELO_IMAGE -c " printf '%s\n' $DEFAULT_PASSWORD $DEFAULT_PASSWORD | geth account new " |tail -1| cut -d'{' -f 2| tr -cd "[:alnum:]\n" )
+    else 
+        echo "CELO_ACCOUNT_ADDRESS is set to '$CELO_ACCOUNT_ADDRESS'"; 
+    fi
 
     docker run -v $PWD:/root/.celo --entrypoint /bin/sh -it $CELO_IMAGE -c "wget https://www.googleapis.com/storage/v1/b/static_nodes/o/$NETWORK_NAME?alt=media -O /root/.celo/static-nodes.json"
 
