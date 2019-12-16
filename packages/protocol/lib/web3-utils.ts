@@ -38,7 +38,7 @@ export async function sendTransactionWithPrivateKey<T>(
       from: address,
       // make sure to use enough gas but dont overspend
       // or we will run into "block gas limit exceeded" errors
-      gas: estimatedGas + 1000,
+      gas: estimatedGas * 2,
     },
     privateKey
   )
