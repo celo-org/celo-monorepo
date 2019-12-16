@@ -46,10 +46,27 @@ contract DoubleSigningSlasher is Ownable, Initializable, UsingRegistry, UsingPre
   // the two block hashes are different, have the same height, have a
   // quorum of signatures, and that `signer` was part of the quorum.
   // Returns the block number of the provided blocks.
-  function eval(address signer, bytes memory blockA, bytes memory blockB)
-    internal
-    returns (uint256 blockNumber)
-  {}
+  function eval(
+    address signer,
+    uint256 index,
+    uint256 blockNumber,
+    bytes memory blockA,
+    bytes memory blockB
+  ) internal {
+    require(keccak256(blockA) != keccak256(blockB), "Block headers have to be different");
+    uint256 epoch = blockNumber / getEpochSize();
+    bytes32 hashA = getParentHashFromHeader(blockA);
+    bytes32 hashB = getParentHashFromHeader(blockB);
+    require(
+      hashA == hashB && blockhash(blockNumber - 1) == hashA,
+      "Both parent hashes have to equal block at that number"
+    );
+    require(signer == getEpochSigner(epoch, index), "Wasn't a signer with given index");
+    bytes32 mapA = getVerifiedSealBitmap(blockA);
+    bytes32 mapB = getVerifiedSealBitmap(blockB);
+    require(uint256(mapA) & (1 << index) != 0, "Didn't sign first block");
+    require(uint256(mapB) & (1 << index) != 0, "Didn't sign second block");
+  }
 
   // Requires that `eval` returns true and that this evidence has not
   // already been used to slash `signer`.
@@ -61,6 +78,8 @@ contract DoubleSigningSlasher is Ownable, Initializable, UsingRegistry, UsingPre
   // Finally, stores that hash(signer, blockNumber) has been slashed.
   function slash(
     address signer,
+    uint256 index,
+    uint256 blockNumber,
     bytes memory blockA,
     bytes memory blockB,
     uint256 groupMembershipHistoryIndex,
@@ -71,7 +90,7 @@ contract DoubleSigningSlasher is Ownable, Initializable, UsingRegistry, UsingPre
     address[] memory groupElectionGreaters,
     uint256[] memory groupElectionIndices
   ) internal returns (bool) {
-    uint256 blockNumber = eval(signer, blockA, blockB);
+    eval(signer, index, blockNumber, blockA, blockB);
     require(blockNumber > 0, "No double signing detected");
     address validator = getAccounts().signerToAccount(signer);
     require(!isSlashed[keccak256(abi.encodePacked(validator, blockNumber))], "Already slashed");

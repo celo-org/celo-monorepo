@@ -141,4 +141,21 @@ contract UsingPrecompiles {
     return success;
   }
 
+  // RLP decode and retrieve the parent hash from this header.
+  // Used to verify that the hash is the same as the block as the given height.
+  function getParentHashFromHeader(bytes memory header) public view returns (bytes32) {}
+
+  // Verifies the BLS signature on the header and returns the seal bitmap.
+  // The validator set used for verification is retrieved based on the parent hash field of the header.
+  // If the parent hash is not in the blockchain, verification fails.
+  function getVerifiedSealBitmap(bytes memory header) public view returns (bytes32) {}
+
+  // Retrieves the block header from the database and returns the Istanbul seal bitmap.
+  function getSealBitmap(uint256 blockNumber) public view returns (bytes32) {}
+
+  // Retrieves the block header from the database and returns the Istanbul parent seal bitmap.
+  function getParentSealBitmap(uint256 blockNumber) public view returns (bytes32) {}
+
+  function getEpochSigner(uint256 epoch, uint256 index) public view returns (address) {}
+
 }
