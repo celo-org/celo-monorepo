@@ -9,13 +9,13 @@
   "shareAnalytics": "Share Analytics",
   "shareAnalytics_detail":
     "We collect anonymized data about how you use Celo to help improve the application for everyone.",
-  "celoLite": "Celo Lite",
-  "enableCeloLite": "Enable Celo Lite",
-  "celoLiteDetail":
-    "Celo Lite mode allows you to communicate with the Celo Network through a trusted node. You can always change this mode in app settings.",
+  "dataSaver": "Data Saver",
+  "enableDataSaver": "Enable Data Saver",
+  "dataSaverDetail":
+    "Data Saver mode allows you to communicate with the Celo Network through a trusted node. You can always change this mode in app settings.",
   "restartModal": {
-    "header": "Restart To Switch Off Celo Lite",
-    "body": "To switch Celo Lite on and off repeatedly, you will need to restart the app.",
+    "header": "Restart To Switch Off Data Saver",
+    "body": "To switch Data Saver on and off repeatedly, you will need to restart the app.",
     "restart": "Restart to Switch"
   },
   "testFaqLink": "Celo Wallet FAQ",

@@ -93,11 +93,11 @@ that you want to use with the app, update `.env.ENV-NAME` and `packages/mobile/.
 the new network name and settings, then rebuild the app. Note that this will assume the testnets
 have a corresponding `/blockchain-api` and `/notification-service` set up.
 
-### Running Wallet app in ZeroSync mode
+### Running Wallet app in zero sync (Data Saver) mode
 
 By default, the mobile wallet app runs geth in ultralight sync mode where all the epoch headers are fetched. The default sync mode is defined in [packages/mobile/.env](https://github.com/celo-org/celo-monorepo/blob/master/packages/mobile/.env#L4) file.
 
-To run the wallet in zero sync mode, using a trusted node rather than the local geth node as a provider, turn it on from the Celo Lite page in settings or update the zero sync initially enabled parameter in the .env file linked above. When zero sync mode is turned back off, the wallet will switch to the default sync mode as specified in the .env file. By default, the trusted node is `https://{TESTNET}-forno.celo-testnet.org`, however any trusted node can be used by updating `DEFAULT_FORNO_URL`. In zero sync mode, the wallet signs transactions locally in web3 then sends them to the trusted node.
+To run the wallet in zero sync (Data Saver) mode, using a trusted node rather than the local geth node as a provider, turn it on from the Data Saver page in settings or update the `ZERO_SYNC_ENABLED_INITIALLY` parameter in the .env file linked above. When zero sync mode is turned back off, the wallet will switch to the default sync mode as specified in the .env file. By default, the trusted node is `https://{TESTNET}-forno.celo-testnet.org`, however any trusted node can be used by updating `DEFAULT_FORNO_URL`. In zero sync mode, the wallet signs transactions locally in web3 then sends them to the trusted node.
 
 To debug network requests in zero sync mode, we use Charles, a proxy for monitoring network traffic to see Celo JSON RPC calls and responses. Follow instructions [here](https://community.tealiumiq.com/t5/Tealium-for-Android/Setting-up-Charles-to-Proxy-your-Android-Device/ta-p/5121) to configure Charles to proxy a test device.
 
