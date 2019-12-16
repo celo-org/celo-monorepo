@@ -10,6 +10,7 @@ import { removeStandbyTransaction } from 'src/transactions/actions'
 import { StandbyTransaction, TransactionStatus } from 'src/transactions/reducer'
 import TransactionFeed, { FeedType } from 'src/transactions/TransactionFeed'
 import { currentAccountSelector } from 'src/web3/selectors'
+import Logger from 'src/utils/Logger'
 
 interface StateProps {
   address?: string | null
@@ -76,11 +77,15 @@ export class TransactionsList extends React.PureComponent<Props> {
       return
     }
 
+    Logger.debug('@TransactionsList', `txsFetched called`)
     const events = data.events
     const queryDataTxIDs = new Set(events.map((event: Event) => event.hash))
+    Logger.debug('@TransactionsList', `tx IDs: ${[...queryDataTxIDs].join(' ')}`)
     const inQueryTxs = (tx: StandbyTransaction) =>
       tx.hash && queryDataTxIDs.has(tx.hash) && tx.status !== TransactionStatus.Failed
     const filteredStandbyTxs = this.props.standbyTransactions.filter(inQueryTxs)
+    Logger.debug('@TransactionsList', `filteredStandbyTxs: ${filteredStandbyTxs.join(' ')}`)
+
     filteredStandbyTxs.forEach((tx) => {
       this.props.removeStandbyTransaction(tx.id)
     })

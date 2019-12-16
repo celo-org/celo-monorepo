@@ -160,9 +160,16 @@ export class TransactionFeed extends React.PureComponent<Props> {
     const commentKeyBuffer = commentKey ? Buffer.from(commentKey, 'hex') : null
 
     const queryDataTxIDs = new Set(events.map((event: Event) => event.hash))
+    // Logger.debug('@TransactionFeed', `tx IDs: ${[...queryDataTxIDs].join(' ')}`)
     const notInQueryTxs = (tx: StandbyTransaction) =>
       !queryDataTxIDs.has(tx.id) && tx.status !== TransactionStatus.Failed
+
     let filteredStandbyTxs = standbyTransactions.filter(notInQueryTxs)
+    for (const tx of filteredStandbyTxs) {
+      if (tx.timestamp > 1576526245) {
+        Logger.debug('@TransactionFeed', `tx IDs: ${JSON.stringify(tx)}`)
+      }
+    }
 
     if (standbyTransactionFilter) {
       filteredStandbyTxs = filteredStandbyTxs.filter(standbyTransactionFilter)
@@ -172,6 +179,7 @@ export class TransactionFeed extends React.PureComponent<Props> {
     const queryFilter = this.getQueryFilter()
     const filteredQueryTxs = events.filter(queryFilter)
     const txData = [...filteredStandbyTxs, ...filteredQueryTxs]
+    // Logger.debug('@TransactionFeed', `tx IDs: ${JSON.stringify(txData)}`)
 
     if (txData.length > 0) {
       return (
