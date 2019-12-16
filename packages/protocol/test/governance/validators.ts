@@ -2156,7 +2156,7 @@ contract('Validators', (accounts: string[]) => {
       beforeEach(async () => {
         await registry.setAddressFor(CeloContractName.DowntimeSlasher, validator)
         await registry.setAddressFor(CeloContractName.DoubleSigningSlasher, accounts[3])
-        await registry.setAddressFor(CeloContractName.Governance, accounts[4])
+        await registry.setAddressFor(CeloContractName.GovernanceSlasher, accounts[4])
       })
 
       it('should succeed when the sender is the downtime slasher contract', async () => {
@@ -2171,7 +2171,7 @@ contract('Validators', (accounts: string[]) => {
         assert.equal(parsedValidator.affiliation, NULL_ADDRESS)
       })
 
-      it('should succeed when the sender is the governance contract', async () => {
+      it('should succeed when the sender is the governance slasher contract', async () => {
         await validators.forceDeaffiliateIfValidator(validator, { from: accounts[4] })
         const parsedValidator = parseValidatorParams(await validators.getValidator(validator))
         assert.equal(parsedValidator.affiliation, NULL_ADDRESS)

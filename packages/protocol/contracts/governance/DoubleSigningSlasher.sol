@@ -84,7 +84,7 @@ contract DoubleSigningSlasher is Ownable, Initializable, UsingRegistry, UsingPre
       validatorElectionGreaters,
       validatorElectionIndices
     );
-    getValidators().removeSlashedMember(validator);
+    getValidators().forceDeaffiliateIfValidator(validator);
 
     address group = getValidators().groupMembershipAtBlock(
       validator,

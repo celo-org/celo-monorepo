@@ -21,6 +21,10 @@ const DefaultConfig = {
     },
     blockGasLimit: 20000000,
   },
+  doubleSigningSlasher: {
+    reward: '10000000000000000000', // 10 cGLD
+    penalty: '1000000000000000000000', // 1000 cGLD
+  },
   election: {
     minElectableValidators: '22',
     maxElectableValidators: '100',

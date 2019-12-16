@@ -1112,7 +1112,7 @@ contract Validators is
   bytes32[] canForceDeaffiliation = [
     DOWNTIME_SLASHER_REGISTRY_ID,
     DOUBLE_SIGNING_SLASHER_REGISTRY_ID,
-    GOVERNANCE_REGISTRY_ID
+    GOVERNANCE_SLASHER_REGISTRY_ID
   ];
 
   /**
@@ -1141,7 +1141,5 @@ contract Validators is
   }
 
   function halveSlashingMultiplier(address group) external {}
-
-  function removeSlashedMember(address validator) external {}
 
 }

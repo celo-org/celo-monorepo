@@ -15,5 +15,5 @@ interface IValidators {
     view
     returns (address);
   function halveSlashingMultiplier(address group) external;
-  function removeSlashedMember(address validator) external;
+  function forceDeaffiliateIfValidator(address validator) external;
 }

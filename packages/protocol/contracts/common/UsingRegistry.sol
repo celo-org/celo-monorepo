@@ -38,6 +38,9 @@ contract UsingRegistry is Ownable {
   );
   bytes32 constant GOLD_TOKEN_REGISTRY_ID = keccak256(abi.encodePacked("GoldToken"));
   bytes32 constant GOVERNANCE_REGISTRY_ID = keccak256(abi.encodePacked("Governance"));
+  bytes32 constant GOVERNANCE_SLASHER_REGISTRY_ID = keccak256(
+    abi.encodePacked("GovernanceSlasher")
+  );
   bytes32 constant LOCKED_GOLD_REGISTRY_ID = keccak256(abi.encodePacked("LockedGold"));
   bytes32 constant RESERVE_REGISTRY_ID = keccak256(abi.encodePacked("Reserve"));
   bytes32 constant RANDOM_REGISTRY_ID = keccak256(abi.encodePacked("Random"));
