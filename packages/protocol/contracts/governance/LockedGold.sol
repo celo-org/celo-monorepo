@@ -236,4 +236,14 @@ contract LockedGold is ILockedGold, ReentrancyGuard, Initializable, UsingRegistr
     list[index] = list[lastIndex];
     list.length = lastIndex;
   }
+
+  function slash(
+    address account,
+    uint256 penalty,
+    address reporter,
+    uint256 reward,
+    address[] calldata lessers,
+    address[] calldata greaters,
+    uint256[] calldata indices
+  ) external {}
 }

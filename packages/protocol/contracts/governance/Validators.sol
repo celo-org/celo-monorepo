@@ -1131,4 +1131,17 @@ contract Validators is
       }
     }
   }
+
+  function groupMembershipAtBlock(address account, uint256 epochNumber, uint256 index)
+    external
+    view
+    returns (address)
+  {
+    return address(0);
+  }
+
+  function halveSlashingMultiplier(address group) external {}
+
+  function removeSlashedMember(address validator) external {}
+
 }
