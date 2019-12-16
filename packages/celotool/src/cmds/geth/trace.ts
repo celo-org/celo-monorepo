@@ -78,6 +78,7 @@ export const handler = async (argv: TraceArgv) => {
   await traceTransactions(
     kit,
     goldToken,
+    // @ts-ignore - not sure why this is needed
     stableToken,
     [address1, address2],
     getBlockscoutUrl(argv.celoEnv)
