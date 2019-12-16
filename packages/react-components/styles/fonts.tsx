@@ -167,11 +167,6 @@ export const fontStyles = StyleSheet.create({
     fontFamily: HindSilguri.Bold,
     color: colors.dark,
   },
-  headerBoldTitle: {
-    fontSize: 15,
-    fontFamily: HindSilguri.Bold,
-    color: colors.dark,
-  },
   headerButton: {
     fontSize: 14,
     fontFamily: HindSilguri.SemiBold,
