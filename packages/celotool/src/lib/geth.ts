@@ -1,8 +1,8 @@
 /* tslint:disable: no-console */
 import { CeloContract, ContractKit, newKit } from '@celo/contractkit'
 import { TransactionResult } from '@celo/contractkit/lib/utils/tx-result'
-import { GoldTokenWrapper } from '@celo/contractkit/src/wrappers/GoldTokenWrapper'
-import { StableTokenWrapper } from '@celo/contractkit/src/wrappers/StableTokenWrapper'
+import { GoldTokenWrapper } from '@celo/contractkit/lib/wrappers/GoldTokenWrapper'
+import { StableTokenWrapper } from '@celo/contractkit/lib/wrappers/StableTokenWrapper'
 import { unlockAccount } from '@celo/walletkit'
 import BigNumber from 'bignumber.js'
 import fs from 'fs'
