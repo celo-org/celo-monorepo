@@ -8,6 +8,10 @@ import { AccountType, getPrivateKeysFor, privateKeyToAddress } from 'src/lib/gen
 import { ensure0x } from 'src/lib/utils'
 import { Argv } from 'yargs'
 
+export const command = 'voting'
+
+export const describe = 'for each of the voting bot accounts, vote for the best groups available'
+
 interface SimulateVotingArgv extends BotsArgv {
   celoProvider: string
 }
@@ -28,6 +32,7 @@ export const handler = async function simulateVoting(argv: SimulateVotingArgv) {
     const mnemonic = fetchEnv(envVar.MNEMONIC)
     const numVotingBots = parseInt(fetchEnv(envVar.VOTING_BOTS), 10)
     const election = await kit.contracts.getElection()
+    const validators = await kit.contracts.getValidators()
 
     // TODO: this should not be 1. Pick a real value and also deal with TS's terrible float-handling
     // Maybe this should even be variable, based on how "happy" the staker is with their current vote
