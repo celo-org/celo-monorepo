@@ -162,13 +162,7 @@ export class TransactionFeed extends React.PureComponent<Props> {
     const queryDataTxIDs = new Set(events.map((event: Event) => event.hash))
     const notInQueryTxs = (tx: StandbyTransaction) =>
       !queryDataTxIDs.has(tx.id) && tx.status !== TransactionStatus.Failed
-
     let filteredStandbyTxs = standbyTransactions.filter(notInQueryTxs)
-    for (const tx of filteredStandbyTxs) {
-      if (tx.timestamp > 1576526245) {
-        Logger.debug('@TransactionFeed', `tx IDs: ${JSON.stringify(tx)}`)
-      }
-    }
 
     if (transactionFilter) {
       filteredStandbyTxs = filteredStandbyTxs.filter(transactionFilter)
@@ -178,7 +172,6 @@ export class TransactionFeed extends React.PureComponent<Props> {
     const queryFilter = this.getQueryFilter()
     const filteredQueryTxs = events.filter(queryFilter)
     const txData = [...filteredStandbyTxs, ...filteredQueryTxs]
-    // Logger.debug('@TransactionFeed', `tx IDs: ${JSON.stringify(txData)}`)
 
     if (txData.length > 0) {
       return (

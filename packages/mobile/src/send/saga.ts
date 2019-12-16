@@ -158,7 +158,6 @@ export function* sendPaymentOrInviteSaga({
     }
 
     if (onConfirm) {
-      Logger.debug('@sendPaymentOrInviteSaga', `onConfirm`)
       // TODO(jeanregisser): rework this, we don't want a callback like this in sagas
       yield call(onConfirm)
     } else {
