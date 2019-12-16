@@ -1,5 +1,7 @@
+// Order is important, please don't change it unless you know what you're doing :D
 import 'node-libs-react-native/globals'
 import 'src/missingGlobals'
+import 'src/forceCommunityAsyncStorage'
 import { AppRegistry } from 'react-native'
 import Logger from 'src/utils/Logger'
 import App from 'src/app/App'
