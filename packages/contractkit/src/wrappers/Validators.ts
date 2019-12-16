@@ -456,11 +456,11 @@ export class ValidatorsWrapper extends BaseWrapper<Validators> {
     )
     return events.map(
       (e: EventLog, index: number): ValidatorReward => ({
+        epochNumber,
         validator: validator[index],
         validatorPayment: e.returnValues.validatorPayment,
         group: validatorGroup[index],
         groupPayment: e.returnValues.groupPayment,
-        epochNumber: epochNumber,
       })
     )
   }

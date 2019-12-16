@@ -3,9 +3,9 @@ import { concurrentMap, concurrentValuesMap } from '@celo/utils/lib/async'
 import { zip } from '@celo/utils/lib/collections'
 import BigNumber from 'bignumber.js'
 import { EventLog } from 'web3/types'
-import { ValidatorGroup } from './Validators'
 import { Address, NULL_ADDRESS } from '../base'
 import { Election } from '../generated/types/Election'
+import { ValidatorGroup } from './Validators'
 
 import {
   BaseWrapper,
@@ -381,9 +381,9 @@ export class ElectionWrapper extends BaseWrapper<Election> {
     )
     return events.map(
       (e: EventLog, index: number): GroupVoterReward => ({
+        epochNumber,
         group: validatorGroup[index],
         groupVoterPayment: e.returnValues.value,
-        epochNumber: epochNumber,
       })
     )
   }
@@ -415,7 +415,7 @@ export class ElectionWrapper extends BaseWrapper<Election> {
     )
     return voterRewards.map(
       (e: GroupVoterReward): VoterReward => ({
-        address: address,
+        address,
         addressPayment: e.groupVoterPayment.times(
           activeVoterVotes[e.group.address].dividedBy(activeGroupVotes[e.group.address])
         ),
