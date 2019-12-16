@@ -76,22 +76,17 @@ contract DoubleSigningSlasher is Ownable, Initializable, UsingRegistry, UsingPre
   // Calls `Validators.removeSlashedMember` to remove the validator from its
   // current group if it is a member of one.
   // Finally, stores that hash(signer, blockNumber) has been slashed.
-  function slash(
+  function _slash(
     address signer,
     uint256 index,
     uint256 blockNumber,
     bytes memory blockA,
     bytes memory blockB,
-    uint256 groupMembershipHistoryIndex,
     address[] memory validatorElectionLessers,
     address[] memory validatorElectionGreaters,
-    uint256[] memory validatorElectionIndices,
-    address[] memory groupElectionLessers,
-    address[] memory groupElectionGreaters,
-    uint256[] memory groupElectionIndices
+    uint256[] memory validatorElectionIndices
   ) internal returns (bool) {
     eval(signer, index, blockNumber, blockA, blockB);
-    require(blockNumber > 0, "No double signing detected");
     address validator = getAccounts().signerToAccount(signer);
     require(!isSlashed[keccak256(abi.encodePacked(validator, blockNumber))], "Already slashed");
     getLockedGold().slash(
@@ -104,7 +99,17 @@ contract DoubleSigningSlasher is Ownable, Initializable, UsingRegistry, UsingPre
       validatorElectionIndices
     );
     getValidators().forceDeaffiliateIfValidator(validator);
+  }
 
+  function _slashGroup(
+    address signer,
+    uint256 blockNumber,
+    uint256 groupMembershipHistoryIndex,
+    address[] memory groupElectionLessers,
+    address[] memory groupElectionGreaters,
+    uint256[] memory groupElectionIndices
+  ) internal {
+    address validator = getAccounts().signerToAccount(signer);
     address group = getValidators().groupMembershipAtBlock(
       validator,
       blockNumber / getEpochSize(),
@@ -122,4 +127,37 @@ contract DoubleSigningSlasher is Ownable, Initializable, UsingRegistry, UsingPre
     getValidators().halveSlashingMultiplier(group);
     isSlashed[keccak256(abi.encodePacked(validator, blockNumber))] = true;
   }
+
+  function slash(
+    address signer,
+    uint256 index,
+    uint256 blockNumber,
+    bytes memory blockA,
+    bytes memory blockB,
+    uint256 groupMembershipHistoryIndex,
+    address[] memory validatorElectionLessers,
+    address[] memory validatorElectionGreaters,
+    uint256[] memory validatorElectionIndices,
+    address[] memory groupElectionLessers,
+    address[] memory groupElectionGreaters,
+    uint256[] memory groupElectionIndices
+  ) public returns (bool) {
+    _slash(
+      signer,
+      index,
+      blockNumber,
+      blockA,
+      blockB,
+      validatorElectionLessers,
+      validatorElectionGreaters,
+      validatorElectionIndices
+    );
+    /*
+    _slashGroup(
+      signer, blockNumber, groupMembershipHistoryIndex,
+      groupElectionLessers, groupElectionGreaters, groupElectionIndices
+    );*/
+    return true;
+  }
+
 }

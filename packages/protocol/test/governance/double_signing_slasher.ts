@@ -10,42 +10,41 @@ import {
   MockElectionInstance,
   MockLockedGoldContract,
   MockLockedGoldInstance,
-  //  MockStableTokenContract,
-  //  MockStableTokenInstance,
   RegistryContract,
   RegistryInstance,
   ValidatorsTestContract,
   ValidatorsTestInstance,
-  GovernanceSlasherContract,
-  GovernanceSlasherInstance,
+  TestDoubleSigningSlasherContract,
+  TestDoubleSigningSlasherInstance,
 } from 'types'
 
 const Accounts: AccountsContract = artifacts.require('Accounts')
 const Validators: ValidatorsTestContract = artifacts.require('ValidatorsTest')
-const GovernanceSlasher: GovernanceSlasherContract = artifacts.require('GovernanceSlasher')
+const DoubleSigningSlasher: TestDoubleSigningSlasherContract = artifacts.require(
+  'TestDoubleSigningSlasher'
+)
 const MockElection: MockElectionContract = artifacts.require('MockElection')
 const MockLockedGold: MockLockedGoldContract = artifacts.require('MockLockedGold')
-// const MockStableToken: MockStableTokenContract = artifacts.require('MockStableToken')
 const Registry: RegistryContract = artifacts.require('Registry')
 
 // @ts-ignore
 // TODO(mcortesi): Use BN
 Validators.numberFormat = 'BigNumber'
 // @ts-ignore
-GovernanceSlasher.numberFormat = 'BigNumber'
+DoubleSigningSlasher.numberFormat = 'BigNumber'
 
 const HOUR = 60 * 60
 const DAY = 24 * HOUR
 // Hard coded in ganache.
-// const EPOCH = 100
+const EPOCH = 100
 
-contract('GovernanceSlasher', (accounts: string[]) => {
+contract('DoubleSigningSlasher', (accounts: string[]) => {
   let accountsInstance: AccountsInstance
   let validators: ValidatorsTestInstance
   let registry: RegistryInstance
   let mockElection: MockElectionInstance
   let mockLockedGold: MockLockedGoldInstance
-  let slasher: GovernanceSlasherInstance
+  let slasher: TestDoubleSigningSlasherInstance
   const nonOwner = accounts[1]
   const validator = accounts[1]
 
@@ -113,13 +112,16 @@ contract('GovernanceSlasher', (accounts: string[]) => {
     mockLockedGold = await MockLockedGold.new()
     registry = await Registry.new()
     validators = await Validators.new()
-    slasher = await GovernanceSlasher.new()
+    slasher = await DoubleSigningSlasher.new()
     await accountsInstance.initialize(registry.address)
     await registry.setAddressFor(CeloContractName.Accounts, accountsInstance.address)
     await registry.setAddressFor(CeloContractName.Election, mockElection.address)
     await registry.setAddressFor(CeloContractName.LockedGold, mockLockedGold.address)
     await registry.setAddressFor(CeloContractName.Validators, validators.address)
-    await registry.setAddressFor(CeloContractName.GovernanceSlasher, slasher.address)
+    await registry.setAddressFor(CeloContractName.DoubleSigningSlasher, slasher.address)
+    await registry.setAddressFor(CeloContractName.DowntimeSlasher, accounts[5])
+    await registry.setAddressFor(CeloContractName.GovernanceSlasher, accounts[6])
+    await registry.setAddressFor(CeloContractName.Governance, accounts[7])
     await validators.initialize(
       registry.address,
       groupLockedGoldRequirements.value,
@@ -133,8 +135,9 @@ contract('GovernanceSlasher', (accounts: string[]) => {
     )
     const group = accounts[0]
     await registerValidatorGroupWithMembers(group, [validator])
-    await slasher.initialize(registry.address)
-    await mockLockedGold.incrementNonvotingAccountBalance(validator, 5000)
+    await registerValidatorGroupWithMembers(accounts[3], [accounts[4]])
+    await slasher.initialize(registry.address, 10000, 100)
+    await mockLockedGold.incrementNonvotingAccountBalance(validator, 50000)
   })
 
   describe('#initialize()', () => {
@@ -142,28 +145,117 @@ contract('GovernanceSlasher', (accounts: string[]) => {
       const owner: string = await slasher.owner()
       assert.equal(owner, accounts[0])
     })
+    it('should have set slashing incentives', async () => {
+      const res = await slasher.slashingIncentives()
+      assert.equal(res[0].toNumber(), 10000)
+      assert.equal(res[1].toNumber(), 100)
+    })
   })
 
-  describe('#approveSlashing()', () => {
-    it('should set slashable amount', async () => {
-      await slasher.approveSlashing(accounts[2], 1000)
-      const sum = await slasher.getApprovedSlashing(accounts[2])
-      assert.equal(sum.toNumber(), 1000)
+  describe('#setSlashingIncentives()', () => {
+    it('can only be set by the owner', async () => {
+      await assertRevert(slasher.setSlashingIncentives(123, 67, { from: nonOwner }))
     })
-    it('can only be called by owner', async () => {
-      await assertRevert(slasher.approveSlashing(accounts[2], 1000, { from: nonOwner }))
+    it('should have set slashing incentives', async () => {
+      await slasher.setSlashingIncentives(123, 67)
+      const res = await slasher.slashingIncentives()
+      assert.equal(res[0].toNumber(), 123)
+      assert.equal(res[1].toNumber(), 67)
     })
   })
 
   describe('#slash()', () => {
-    it('fails if there is nothing to slash', async () => {
-      await assertRevert(slasher.slash(validator, [], [], []))
+    let blockNumber: number
+    const validatorIndex = 23
+    const blockA = ['0x12', '0x12', '0x12']
+    const blockB = ['0x13', '0x13', '0x13']
+    const blockC = ['0x11', '0x13', '0x14']
+    beforeEach(async () => {
+      blockNumber = await web3.eth.getBlockNumber()
+      let res = await web3.eth.getBlock(blockNumber)
+      // console.info(res)
+      let hash = res.parentHash
+      await slasher.setParentHashFromHeader(blockA, hash)
+      await slasher.setParentHashFromHeader(blockB, '0x34')
+      await slasher.setParentHashFromHeader(blockC, hash)
+      await slasher.setEpochSigner(Math.floor(blockNumber / EPOCH), validatorIndex, validator)
+      await slasher.setEpochSigner(Math.floor(blockNumber / EPOCH), validatorIndex + 1, validator)
+      const bitmap = '0x0000000000000000000000000000000000000000000000000000000000800000'
+      await slasher.setVerifiedSealBitmap(blockA, bitmap)
+      await slasher.setVerifiedSealBitmap(blockB, bitmap)
+      await slasher.setVerifiedSealBitmap(blockC, bitmap)
     })
-    it('decrements gold', async () => {
-      await slasher.approveSlashing(validator, 1000)
-      await slasher.slash(validator, [], [], [])
+    it('fails if parent hashes do not match', async () => {
+      await assertRevert(
+        slasher.slash(
+          validator,
+          validatorIndex,
+          blockNumber,
+          blockA,
+          blockB,
+          0,
+          [],
+          [],
+          [],
+          [],
+          [],
+          []
+        )
+      )
+    })
+    it('fails if is not signed at index', async () => {
+      await assertRevert(
+        slasher.slash(
+          validator,
+          validatorIndex + 1,
+          blockNumber,
+          blockA,
+          blockC,
+          0,
+          [],
+          [],
+          [],
+          [],
+          [],
+          []
+        )
+      )
+    })
+    it('fails if epoch signer is wrong', async () => {
+      await assertRevert(
+        slasher.slash(
+          accounts[4],
+          validatorIndex,
+          blockNumber,
+          blockA,
+          blockC,
+          0,
+          [],
+          [],
+          [],
+          [],
+          [],
+          []
+        )
+      )
+    })
+    it('decrements gold when success', async () => {
+      await slasher.slash(
+        validator,
+        validatorIndex,
+        blockNumber,
+        blockA,
+        blockC,
+        0,
+        [],
+        [],
+        [],
+        [],
+        [],
+        []
+      )
       const sum = await mockLockedGold.nonvotingAccountBalance(validator)
-      assert.equal(sum.toNumber(), 4000)
+      assert.equal(sum.toNumber(), 40000)
     })
   })
 })

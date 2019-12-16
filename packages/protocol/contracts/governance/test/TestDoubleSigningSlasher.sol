@@ -34,4 +34,17 @@ contract TestDoubleSigningSlasher is DoubleSigningSlasher {
   function getEpochSigner(uint256 epoch, uint256 index) public view returns (address) {
     return epochSigner[keccak256(abi.encodePacked(epoch, index))];
   }
+
+  function debug(uint256 index, uint256 blockNumber, bytes memory blockA, bytes memory blockB)
+    public
+    view
+    returns (address, bytes32, bytes32, uint256, uint256)
+  {
+    uint256 epoch = blockNumber / getEpochSize();
+    bytes32 mapA = getVerifiedSealBitmap(blockA);
+    bytes32 mapB = getVerifiedSealBitmap(blockB);
+    //    require(uint256(mapA) & (1 << index) != 0, "Didn't sign first block");
+    //    require(uint256(mapB) & (1 << index) != 0, "Didn't sign second block");
+    return (getEpochSigner(epoch, index), mapA, mapB, uint256(1) << index, index);
+  }
 }
