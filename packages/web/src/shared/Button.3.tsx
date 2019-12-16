@@ -120,6 +120,7 @@ export default class Button extends React.PureComponent<ButtonsProps, State> {
     const { text, href, align, iconRight, iconLeft } = this.props
     const ButtonComponent = this.getButtonComponent()
     const renderedButton = (
+      // @ts-ignore
       <ButtonComponent status={this.getStatus()} {...this.props}>
         {iconLeft && <View style={baseStyles.iconLeft}>{iconLeft}</View>}
         {text}
