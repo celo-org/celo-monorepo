@@ -122,7 +122,7 @@ export const getAddressesFor = (accountType: AccountType, mnemonic: string, n: n
 export const getStrippedAddressesFor = (accountType: AccountType, mnemonic: string, n: number) =>
   getAddressesFor(accountType, mnemonic, n).map(strip0x)
 
-export const getValidators = (mnemonic: string, n: number) => {
+export const getValidatorsInformation = (mnemonic: string, n: number) => {
   return getPrivateKeysFor(AccountType.VALIDATOR, mnemonic, n).map((key, i) => {
     const blsKeyBytes = blsPrivateKeyToProcessedPrivateKey(key)
     return {
@@ -182,7 +182,7 @@ export const generateGenesisFromEnv = (enablePetersburg: boolean = true) => {
   const mnemonic = fetchEnv(envVar.MNEMONIC)
   const validatorEnv = fetchEnv(envVar.VALIDATORS)
   const genesisAccountsEnv = fetchEnvOrFallback(envVar.GENESIS_ACCOUNTS, '')
-  const validators = getValidators(mnemonic, parseInt(validatorEnv, 10))
+  const validators = getValidatorsInformation(mnemonic, parseInt(validatorEnv, 10))
 
   const consensusType = fetchEnv(envVar.CONSENSUS_TYPE) as ConsensusType
 
@@ -286,7 +286,7 @@ export const generateGenesis = ({
   chainId: number
   requestTimeout: number
   enablePetersburg?: boolean
-}) => {
+}): string => {
   const genesis: any = { ...TEMPLATE }
 
   if (!enablePetersburg) {
@@ -342,5 +342,5 @@ export const generateGenesis = ({
     }
   }
 
-  return JSON.stringify(genesis)
+  return JSON.stringify(genesis, null, 2)
 }

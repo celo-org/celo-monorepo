@@ -1,3 +1,4 @@
+// tslint:disable: no-console
 // tslint:disable-next-line: no-reference (Required to make this work w/ ts-node)
 /// <reference path="../../../contractkit/types/web3.d.ts" />
 import { ContractKit, newKitFromWeb3 } from '@celo/contractkit'
@@ -5,20 +6,16 @@ import { getBlsPoP, getBlsPublicKey } from '@celo/utils/lib/bls'
 import { fromFixed, toFixed } from '@celo/utils/lib/fixidity'
 import BigNumber from 'bignumber.js'
 import { assert } from 'chai'
+import path from 'path'
 import Web3 from 'web3'
-import {
-  assertAlmostEqual,
-  getContext,
-  GethInstanceConfig,
-  importGenesis,
-  initAndStartGeth,
-  sleep,
-  waitToFinishSyncing,
-} from './utils'
+import { GethInstanceConfig, GethRunConfig, importGenesis, initAndStartGeth } from '../lib/geth'
+import { assertAlmostEqual, getContext, sleep, waitToFinishSyncing } from './utils'
 
 interface MemberSwapper {
   swap(): Promise<void>
 }
+
+const TMP_PATH = '/tmp/e2e'
 
 async function newMemberSwapper(kit: ContractKit, members: string[]): Promise<MemberSwapper> {
   let index = 0
@@ -112,18 +109,60 @@ async function newKeyRotator(
 
 // TODO(asa): Test independent rotation of ecdsa, bls keys.
 describe('governance tests', () => {
-  const gethConfig = {
+  const gethConfig: GethRunConfig = {
+    gethRepoPath: '../../../celo-blockchain',
     migrate: true,
-    instances: [
-      // Validators 0 and 1 are swapped in and out of the group.
-      { name: 'validator0', validating: true, syncmode: 'full', port: 30303, rpcport: 8545 },
-      { name: 'validator1', validating: true, syncmode: 'full', port: 30305, rpcport: 8547 },
-      // Validator 2 will authorize a validating key every other epoch.
-      { name: 'validator2', validating: true, syncmode: 'full', port: 30307, rpcport: 8549 },
-      { name: 'validator3', validating: true, syncmode: 'full', port: 30309, rpcport: 8551 },
-      { name: 'validator4', validating: true, syncmode: 'full', port: 30311, rpcport: 8553 },
-    ],
+    runPath: TMP_PATH,
+    verbosity: 0,
+    networkId: 1101,
+    network: 'local',
+    instances: [],
   }
+
+  gethConfig.instances = [
+    // Validators 0 and 1 are swapped in and out of the group.
+    {
+      gethRunConfig: gethConfig,
+      name: 'validator-0',
+      validating: true,
+      syncmode: 'full',
+      port: 30303,
+      rpcport: 8545,
+    },
+    {
+      gethRunConfig: gethConfig,
+      name: 'validator-1',
+      validating: true,
+      syncmode: 'full',
+      port: 30305,
+      rpcport: 8547,
+    },
+    // Validator 2 will authorize a validating key every other epoch.
+    {
+      gethRunConfig: gethConfig,
+      name: 'validator-2',
+      validating: true,
+      syncmode: 'full',
+      port: 30307,
+      rpcport: 8549,
+    },
+    {
+      gethRunConfig: gethConfig,
+      name: 'validator-3',
+      validating: true,
+      syncmode: 'full',
+      port: 30309,
+      rpcport: 8551,
+    },
+    {
+      gethRunConfig: gethConfig,
+      name: 'validator-4',
+      validating: true,
+      syncmode: 'full',
+      port: 30311,
+      rpcport: 8553,
+    },
+  ]
 
   const context: any = getContext(gethConfig)
   let web3: any
@@ -149,6 +188,7 @@ describe('governance tests', () => {
     await context.hooks.restart()
     web3 = new Web3('http://localhost:8545')
     kit = newKitFromWeb3(web3)
+
     goldToken = await kit._web3Contracts.getGoldToken()
     stableToken = await kit._web3Contracts.getStableToken()
     sortedOracles = await kit._web3Contracts.getSortedOracles()
@@ -287,19 +327,25 @@ describe('governance tests', () => {
   }
 
   describe('when the validator set is changing', () => {
-    let epoch: number
     const blockNumbers: number[] = []
+    let epoch: number
     let validatorAccounts: string[]
+
     before(async function(this: any) {
       this.timeout(0) // Disable test timeout
+
       await restart()
+
       const groupPrivateKey = await getValidatorGroupPrivateKey()
+
       const rotation0PrivateKey =
         '0xa42ac9c99f6ab2c96ee6cae1b40d36187f65cd878737f6623cd363fb94ba7087'
       const rotation1PrivateKey =
         '0x4519cae145fb9499358be484ca60c80d8f5b7f9c13ff82c88ec9e13283e9de1a'
+
       const additionalNodes: GethInstanceConfig[] = [
         {
+          gethRunConfig: gethConfig,
           name: 'validatorGroup',
           validating: false,
           syncmode: 'full',
@@ -307,43 +353,50 @@ describe('governance tests', () => {
           wsport: 8555,
           rpcport: 8557,
           privateKey: groupPrivateKey.slice(2),
-          peers: [8545],
+          peers: ['8545'],
         },
       ]
+
       await Promise.all(
         additionalNodes.map((nodeConfig) =>
-          initAndStartGeth(context.hooks.gethBinaryPath, nodeConfig)
+          initAndStartGeth(context.hooks.gethBinaryPath, nodeConfig, true)
         )
       )
+
       // Connect the validating nodes to the non-validating nodes, to test that announce messages
       // are properly gossiped.
       const additionalValidatingNodes = [
         {
-          name: 'validator2KeyRotation0',
+          gethRunConfig: gethConfig,
+          name: 'validator-2-KeyRotation-0',
           validating: true,
           syncmode: 'full',
           lightserv: false,
           port: 30315,
           wsport: 8559,
           privateKey: rotation0PrivateKey.slice(2),
-          peers: [8557],
+          peers: ['8557'],
         },
         {
-          name: 'validator2KeyRotation1',
+          gethRunConfig: gethConfig,
+          name: 'validator-2-KeyRotation-1',
           validating: true,
           syncmode: 'full',
           lightserv: false,
           port: 30317,
           wsport: 8561,
           privateKey: rotation1PrivateKey.slice(2),
-          peers: [8557],
+          peers: ['8557'],
         },
       ]
+
       await Promise.all(
         additionalValidatingNodes.map((nodeConfig) =>
-          initAndStartGeth(context.hooks.gethBinaryPath, nodeConfig)
+          initAndStartGeth(context.hooks.gethBinaryPath, nodeConfig, true)
         )
       )
+
+      await sleep(10, true)
 
       validatorAccounts = await getValidatorGroupMembers()
       assert.equal(validatorAccounts.length, 5)
@@ -356,11 +409,17 @@ describe('governance tests', () => {
       // Wait for an extra epoch transition to ensure everyone is connected to one another.
       await waitForEpochTransition(epoch)
 
+      const groupWeb3Url = 'ws://localhost:8555'
+      console.log(groupWeb3Url)
+
       // Prepare for member swapping.
-      const groupWeb3 = new Web3('ws://localhost:8555')
+      const groupWeb3 = new Web3(groupWeb3Url)
+      console.info('Waiting to finish syncing')
       await waitToFinishSyncing(groupWeb3)
+
       const groupKit = newKitFromWeb3(groupWeb3)
       const group: string = (await groupWeb3.eth.getAccounts())[0]
+
       const txos = await (await groupKit.contracts.getElection()).activate(group)
       for (const txo of txos) {
         await txo.sendAndWaitForReceipt({ from: group })
@@ -370,10 +429,21 @@ describe('governance tests', () => {
       const membersToSwap = [validatorAccounts[0], validatorAccounts[1]]
       const memberSwapper = await newMemberSwapper(groupKit, membersToSwap)
 
+      const validatorRpc = 'http://localhost:8549'
+      console.log(validatorRpc)
+
       // Prepare for key rotation.
-      const validatorWeb3 = new Web3('http://localhost:8549')
-      const authorizedWeb3s = [new Web3('ws://localhost:8559'), new Web3('ws://localhost:8561')]
+      const validatorWeb3 = new Web3(validatorRpc)
+
+      const authWeb31 = 'ws://localhost:8559'
+      const authWeb32 = 'ws://localhost:8561'
+
+      console.log(authWeb31, authWeb32)
+
+      const authorizedWeb3s = [new Web3(authWeb31), new Web3(authWeb32)]
+
       await Promise.all(authorizedWeb3s.map((w) => waitToFinishSyncing(w)))
+
       const authorizedPrivateKeys = [rotation0PrivateKey, rotation1PrivateKey]
       const keyRotator = await newKeyRotator(
         newKitFromWeb3(validatorWeb3),
@@ -400,9 +470,11 @@ describe('governance tests', () => {
 
       const subscription = await groupWeb3.eth.subscribe('newBlockHeaders')
       subscription.on('data', changeValidatorSet)
+
       // Wait for a few epochs while changing the validator set.
       await sleep(epoch * 4)
       ;(subscription as any).unsubscribe()
+
       // Wait for the current epoch to complete.
       await sleep(epoch)
       assert.equal(errorWhileChangingValidatorSet, '')
@@ -788,7 +860,7 @@ describe('governance tests', () => {
     beforeEach(async function(this: any) {
       this.timeout(0) // Disable test timeout
       await restart()
-      const genesis = await importGenesis()
+      const genesis = await importGenesis(path.join(gethConfig.runPath, 'genesis.json'))
       Object.keys(genesis.alloc).forEach((address) => {
         goldGenesisSupply = goldGenesisSupply.plus(genesis.alloc[address].balance)
       })

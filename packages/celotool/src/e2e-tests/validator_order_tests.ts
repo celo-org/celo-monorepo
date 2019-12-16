@@ -1,27 +1,37 @@
 import { assert } from 'chai'
 import _ from 'lodash'
 import Web3 from 'web3'
-import { getContext, GethTestConfig, sleep } from './utils'
+import { GethRunConfig } from '../lib/geth'
+import { getContext, sleep } from './utils'
 
 const VALIDATORS = 10
 const EPOCH = 20
 const EPOCHS_TO_WAIT = 3
 const BLOCK_COUNT = EPOCH * EPOCHS_TO_WAIT
 
+const TMP_PATH = '/tmp/e2e'
+
 describe('governance tests', () => {
-  const gethConfig: GethTestConfig = {
+  const gethConfig: GethRunConfig = {
+    gethRepoPath: '../../../celo-blockchain',
+    networkId: 1101,
+    network: 'local',
+    runPath: TMP_PATH,
     migrateTo: 15,
-    instances: _.range(VALIDATORS).map((i) => ({
-      name: `validator${i}`,
-      validating: true,
-      syncmode: 'full',
-      port: 30303 + 2 * i,
-      rpcport: 8545 + 2 * i,
-    })),
+    instances: [],
     genesisConfig: {
       epoch: EPOCH,
     },
   }
+
+  gethConfig.instances = _.range(VALIDATORS).map((i) => ({
+    gethRunConfig: gethConfig,
+    name: `validator${i}`,
+    validating: true,
+    syncmode: 'full',
+    port: 30303 + 2 * i,
+    rpcport: 8545 + 2 * i,
+  }))
 
   const context: any = getContext(gethConfig)
   let web3: Web3
