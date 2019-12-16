@@ -14,7 +14,7 @@ const people: Backer[] = [
   },
   {
     name: 'General Catalyst',
-    photo: require('./general-catalist.jpg'),
+    photo: require('./general-catalyst.jpg'),
   },
   {
     name: 'Reid Hoffman',
