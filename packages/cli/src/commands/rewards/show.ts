@@ -48,7 +48,7 @@ export default class Show extends BaseCommand {
     if (res.flags.voter) {
       checkBuilder.isAccount(res.flags.voter)
     }
-    checkBuilder.runChecks()
+    await checkBuilder.runChecks()
 
     let voterRewards: VoterReward[] = []
     let groupVoterRewards: GroupVoterReward[] = []
