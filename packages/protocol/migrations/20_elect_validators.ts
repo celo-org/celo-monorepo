@@ -347,7 +347,6 @@ module.exports = async (_deployer: any, networkName: string) => {
         const addTx = validators.contract.methods.addMember(address)
         console.log(
           'adding validator',
-          group.account.privateKey,
           validators.address,
           group.account.address,
           numMembersAlready,
@@ -371,13 +370,7 @@ module.exports = async (_deployer: any, networkName: string) => {
         groupSortedIndex < idx ? sortedGroups[groupSortedIndex + 1].account.address : NULL_ADDRESS
 
       // Note: Only the groups vote for themselves here. The validators do not vote.
-      console.info(
-        '  * Group voting for itself ...',
-        lesser,
-        greater,
-        sortedGroups,
-        groupSortedIndex
-      )
+      console.info('  * Group voting for itself ...')
       // @ts-ignore
       const voteTx = election.contract.methods.vote(
         group.account.address,
