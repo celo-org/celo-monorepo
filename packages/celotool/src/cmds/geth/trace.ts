@@ -44,9 +44,8 @@ export const handler = async (argv: TraceArgv) => {
   outerwhile: while (iterations-- > 0) {
     try {
       web3AndContracts = await getWeb3AndTokensContracts()
-      // tslint:disable-next-line: no-shadowed-variable
-      const { kit } = web3AndContracts!
-      const latestBlock = await kit.web3.eth.getBlock('latest')
+      const { kit: kit1 } = web3AndContracts
+      const latestBlock = await kit1.web3.eth.getBlock('latest')
       if (latestBlock.number === 0) {
         throw new Error('Latest block is zero')
       } else {
@@ -78,7 +77,7 @@ export const handler = async (argv: TraceArgv) => {
   await traceTransactions(
     kit,
     goldToken,
-    // @ts-ignore - not sure why this is needed
+    // @ts-ignore - TODO: remove when web3 upgrade completed everywhere
     stableToken,
     [address1, address2],
     getBlockscoutUrl(argv.celoEnv)
