@@ -1138,7 +1138,8 @@ contract Validators is
     view
     returns (address)
   {
-    return address(0);
+    Validator storage validator = validators[account];
+    return validator.affiliation;
   }
 
   function halveSlashingMultiplier(address group) external {}

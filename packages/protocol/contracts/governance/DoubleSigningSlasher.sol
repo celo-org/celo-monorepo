@@ -42,30 +42,35 @@ contract DoubleSigningSlasher is Ownable, Initializable, UsingRegistry, UsingPre
     emit SlashingIncentivesSet(penalty, reward);
   }
 
+  function countSetBits(uint256 v) internal pure returns (uint256) {
+    uint256 res = 0;
+    uint256 acc = v;
+    for (uint256 i = 0; i < 256; i++) {
+      if (acc & 1 == 1) res++;
+      acc = acc >> 1;
+    }
+    return res;
+  }
+
   // Given two RLP encoded blocks, calls into a precompile that requires that
   // the two block hashes are different, have the same height, have a
   // quorum of signatures, and that `signer` was part of the quorum.
   // Returns the block number of the provided blocks.
-  function eval(
-    address signer,
-    uint256 index,
-    uint256 blockNumber,
-    bytes memory blockA,
-    bytes memory blockB
-  ) internal {
-    require(keccak256(blockA) != keccak256(blockB), "Block headers have to be different");
+  function eval(address signer, uint256 index, uint256 blockNumber, bytes memory blockA) internal {
+    require(keccak256(blockA) != blockhash(blockNumber), "Block headers have to be different");
     uint256 epoch = blockNumber / getEpochSize();
     bytes32 hashA = getParentHashFromHeader(blockA);
-    bytes32 hashB = getParentHashFromHeader(blockB);
     require(
-      hashA == hashB && blockhash(blockNumber - 1) == hashA,
+      blockhash(blockNumber - 1) == hashA,
       "Both parent hashes have to equal block at that number"
     );
     require(signer == getEpochSigner(epoch, index), "Wasn't a signer with given index");
-    bytes32 mapA = getVerifiedSealBitmap(blockA);
-    bytes32 mapB = getVerifiedSealBitmap(blockB);
-    require(uint256(mapA) & (1 << index) != 0, "Didn't sign first block");
-    require(uint256(mapB) & (1 << index) != 0, "Didn't sign second block");
+    uint256 mapA = uint256(getVerifiedSealBitmap(blockA));
+    require(mapA & (1 << index) != 0, "Didn't sign first block");
+    require(
+      countSetBits(mapA) >= (2 * numberValidators(blockNumber)) / 3,
+      "Not enough signers in the block"
+    );
   }
 
   // Requires that `eval` returns true and that this evidence has not
@@ -81,12 +86,11 @@ contract DoubleSigningSlasher is Ownable, Initializable, UsingRegistry, UsingPre
     uint256 index,
     uint256 blockNumber,
     bytes memory blockA,
-    bytes memory blockB,
     address[] memory validatorElectionLessers,
     address[] memory validatorElectionGreaters,
     uint256[] memory validatorElectionIndices
   ) internal returns (bool) {
-    eval(signer, index, blockNumber, blockA, blockB);
+    eval(signer, index, blockNumber, blockA);
     address validator = getAccounts().signerToAccount(signer);
     require(!isSlashed[keccak256(abi.encodePacked(validator, blockNumber))], "Already slashed");
     getLockedGold().slash(
@@ -115,6 +119,7 @@ contract DoubleSigningSlasher is Ownable, Initializable, UsingRegistry, UsingPre
       blockNumber / getEpochSize(),
       groupMembershipHistoryIndex
     );
+    if (group == address(0)) return;
     getLockedGold().slash(
       group,
       slashingIncentives.penalty,
@@ -133,7 +138,6 @@ contract DoubleSigningSlasher is Ownable, Initializable, UsingRegistry, UsingPre
     uint256 index,
     uint256 blockNumber,
     bytes memory blockA,
-    bytes memory blockB,
     uint256 groupMembershipHistoryIndex,
     address[] memory validatorElectionLessers,
     address[] memory validatorElectionGreaters,
@@ -147,16 +151,18 @@ contract DoubleSigningSlasher is Ownable, Initializable, UsingRegistry, UsingPre
       index,
       blockNumber,
       blockA,
-      blockB,
       validatorElectionLessers,
       validatorElectionGreaters,
       validatorElectionIndices
     );
-    /*
     _slashGroup(
-      signer, blockNumber, groupMembershipHistoryIndex,
-      groupElectionLessers, groupElectionGreaters, groupElectionIndices
-    );*/
+      signer,
+      blockNumber,
+      groupMembershipHistoryIndex,
+      groupElectionLessers,
+      groupElectionGreaters,
+      groupElectionIndices
+    );
     return true;
   }
 
