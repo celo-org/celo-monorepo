@@ -819,8 +819,9 @@ export async function initAndStartGeth(
   if (instance.privateKey) {
     await importPrivateKey(gethBinaryPath, instance, verbose)
   }
+
   if (instance.peers) {
-    await addStaticPeers(getDatadir(instance), instance.peers, verbose)
+    await addStaticPeers(datadir, instance.peers, verbose)
   }
 
   return startGeth(gethBinaryPath, instance, verbose)
@@ -872,19 +873,44 @@ export async function importPrivateKey(
   await spawnCmdWithExitOnFailure(gethBinaryPath, args, { silent: true })
 }
 
-export async function getEnode(port: string, ws: boolean = false) {
+export async function getEnode(peer: string, ws: boolean = false) {
+  // do we have already an enode?
+  if (peer.toLowerCase().startsWith('enode')) {
+    // yes return peer
+    return peer
+  }
+
+  // no, try to build it
   const p = ws ? 'ws' : 'http'
-  const admin = new Admin(`${p}://localhost:${port}`)
-  return (await admin.getNodeInfo()).enode
+  const enodeRpcUrl = `${p}://localhost:${peer}`
+  const admin = new Admin(enodeRpcUrl)
+
+  let nodeInfo: any = {
+    enode: null,
+  }
+
+  try {
+    nodeInfo = await admin.getNodeInfo()
+  } catch {
+    console.error(`Unable to get node info from ${enodeRpcUrl}`)
+  }
+
+  return nodeInfo.enode
 }
 
-export async function addStaticPeers(datadir: string, ports: string[], verbose: boolean) {
+export async function addStaticPeers(datadir: string, peers: string[], verbose: boolean) {
   const staticPeersPath = `${datadir}/static-nodes.json`
-  if (verbose) {
+  if (verbose || true) {
     console.log(`Writing static peers to ${staticPeersPath}`)
   }
-  const enodes = await Promise.all(ports.map((port) => getEnode(port)))
-  fs.writeFileSync(staticPeersPath, JSON.stringify(enodes, null, 2))
+
+  const enodes = await Promise.all(peers.map((peer) => getEnode(peer)))
+  const enodesString = JSON.stringify(enodes, null, 2)
+  fs.writeFileSync(staticPeersPath, enodesString)
+
+  if (verbose || true) {
+    console.log(enodesString)
+  }
 }
 
 export async function addProxyPeer(gethBinaryPath: string, instance: GethInstanceConfig) {
@@ -905,7 +931,10 @@ export async function startGeth(
   verbose: boolean
 ) {
   if (verbose) {
-    console.log('starting geth')
+    const instanceConfig = { ...instance }
+    delete instanceConfig.gethRunConfig
+
+    console.log('starting geth with config', JSON.stringify(instanceConfig, null, 2))
   }
 
   const datadir = getDatadir(instance)
@@ -1011,7 +1040,7 @@ export async function startGeth(
     gethArgs.push(`--ethstats=${instance.name}@${ethstats}`, '--etherbase=0')
   }
 
-  const gethProcess = spawnWithLog(gethBinaryPath, gethArgs, `${datadir}/logs.txt`, verbose)
+  const gethProcess = spawnWithLog(gethBinaryPath, gethArgs, `${datadir}/logs.txt`, true)
   instance.pid = gethProcess.pid
 
   gethProcess.on('error', (err) => {
@@ -1115,7 +1144,9 @@ export function spawnWithLog(cmd: string, args: string[], logsFilepath: string, 
 
   const logStream = fs.createWriteStream(logsFilepath, { flags: 'a' })
 
-  console.log(cmd, ...args)
+  if (verbose) {
+    console.log(cmd, ...args)
+  }
 
   const p = spawn(cmd, args)
 

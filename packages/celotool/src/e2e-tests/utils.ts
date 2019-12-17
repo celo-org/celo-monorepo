@@ -4,7 +4,6 @@ import { assert } from 'chai'
 import fs from 'fs'
 import _ from 'lodash'
 import { join as joinPath, resolve as resolvePath } from 'path'
-import { Admin } from 'web3-eth-admin'
 import {
   AccountType,
   getPrivateKeysFor,
@@ -78,12 +77,6 @@ export function sleep(seconds: number, verbose: boolean = false) {
     console.log(`Sleeping for ${seconds} seconds. Stay tuned!`)
   }
   return new Promise<void>((resolve) => setTimeout(resolve, seconds * 1000))
-}
-
-export async function getEnode(port: number, ws: boolean = false) {
-  const p = ws ? 'ws' : 'http'
-  const admin = new Admin(`${p}://localhost:${port}`)
-  return (await admin.getNodeInfo()).enode
 }
 
 export async function migrateContracts(
@@ -162,7 +155,7 @@ export function getHooks(gethConfig: GethRunConfig) {
   return getContext(gethConfig).hooks
 }
 
-export function getContext(gethConfig: GethRunConfig) {
+export function getContext(gethConfig: GethRunConfig, verbose: boolean = verboseOutput) {
   const mnemonic =
     'jazz ripple brown cloth door bridge pen danger deer thumb cable prepare negative library vast'
   const validatorInstances = gethConfig.instances.filter((x: any) => x.validating)
@@ -193,7 +186,7 @@ export function getContext(gethConfig: GethRunConfig) {
     await buildGeth(gethRepoPath)
 
     if (!gethConfig.keepData && fs.existsSync(gethConfig.runPath)) {
-      await resetDataDir(gethConfig.runPath, verboseOutput)
+      await resetDataDir(gethConfig.runPath, verbose)
     }
 
     if (!fs.existsSync(gethConfig.runPath)) {
@@ -206,7 +199,7 @@ export function getContext(gethConfig: GethRunConfig) {
     let bootnodeEnode: string = ''
 
     if (gethConfig.useBootnode) {
-      bootnodeEnode = await startBootnode(bootnodeBinaryPath, mnemonic, gethConfig, verboseOutput)
+      bootnodeEnode = await startBootnode(bootnodeBinaryPath, mnemonic, gethConfig, verbose)
     }
 
     let validatorIndex = 0
@@ -257,7 +250,7 @@ export function getContext(gethConfig: GethRunConfig) {
 
     // Start all the instances
     for (const instance of gethConfig.instances) {
-      await initAndStartGeth(gethBinaryPath, instance, verboseOutput)
+      await initAndStartGeth(gethBinaryPath, instance, verbose)
     }
 
     await connectValidatorPeers(gethConfig, true)
@@ -281,7 +274,7 @@ export function getContext(gethConfig: GethRunConfig) {
     // Snapshot the datadir after the contract migrations so we can start from a "clean slate"
     // for every test.
     for (const instance of gethConfig.instances) {
-      await snapshotDatadir(instance, verboseOutput)
+      await snapshotDatadir(instance, verbose)
     }
   }
 
@@ -290,7 +283,7 @@ export function getContext(gethConfig: GethRunConfig) {
 
     if (gethConfig.useBootnode) {
       await killBootnode()
-      await startBootnode(bootnodeBinaryPath, mnemonic, gethConfig, verboseOutput)
+      await startBootnode(bootnodeBinaryPath, mnemonic, gethConfig, verbose)
     }
 
     // just in case
@@ -312,7 +305,7 @@ export function getContext(gethConfig: GethRunConfig) {
         if (!instance.privateKey && instance.validating) {
           instance.privateKey = validatorPrivateKeys[validatorIndices[i]]
         }
-        return startGeth(gethBinaryPath, instance, verboseOutput)
+        return startGeth(gethBinaryPath, instance, verbose)
       })
     )
     await connectValidatorPeers(gethConfig, true)

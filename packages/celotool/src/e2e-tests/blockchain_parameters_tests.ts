@@ -9,7 +9,7 @@ import { GethRunConfig } from '../lib/geth'
 import { getHooks, sleep } from './utils'
 
 const TMP_PATH = '/tmp/e2e'
-const url = 'http://localhost:8545'
+const rpcURL = 'http://localhost:8545'
 
 describe('Blockchain parameters tests', function(this: any) {
   this.timeout(0)
@@ -52,8 +52,9 @@ describe('Blockchain parameters tests', function(this: any) {
     // TODO(mcortesi): magic sleep. without it unlockAccount sometimes fails
     await sleep(2)
 
-    console.log(url)
-    kit = newKit(url)
+    console.log('rpcURL', rpcURL)
+
+    kit = newKit(rpcURL)
 
     await kit.web3.eth.personal.unlockAccount(validatorAddress, '', 1000)
     parameters = await kit.contracts.getBlockchainParameters()

@@ -16,6 +16,7 @@ interface MemberSwapper {
 }
 
 const TMP_PATH = '/tmp/e2e'
+const verbose = false
 
 async function newMemberSwapper(kit: ContractKit, members: string[]): Promise<MemberSwapper> {
   let index = 0
@@ -123,7 +124,7 @@ describe('governance tests', () => {
     // Validators 0 and 1 are swapped in and out of the group.
     {
       gethRunConfig: gethConfig,
-      name: 'validator-0',
+      name: 'validator0',
       validating: true,
       syncmode: 'full',
       port: 30303,
@@ -131,7 +132,7 @@ describe('governance tests', () => {
     },
     {
       gethRunConfig: gethConfig,
-      name: 'validator-1',
+      name: 'validator1',
       validating: true,
       syncmode: 'full',
       port: 30305,
@@ -140,7 +141,7 @@ describe('governance tests', () => {
     // Validator 2 will authorize a validating key every other epoch.
     {
       gethRunConfig: gethConfig,
-      name: 'validator-2',
+      name: 'validator2',
       validating: true,
       syncmode: 'full',
       port: 30307,
@@ -148,7 +149,7 @@ describe('governance tests', () => {
     },
     {
       gethRunConfig: gethConfig,
-      name: 'validator-3',
+      name: 'validator3',
       validating: true,
       syncmode: 'full',
       port: 30309,
@@ -156,7 +157,7 @@ describe('governance tests', () => {
     },
     {
       gethRunConfig: gethConfig,
-      name: 'validator-4',
+      name: 'validator4',
       validating: true,
       syncmode: 'full',
       port: 30311,
@@ -328,6 +329,7 @@ describe('governance tests', () => {
 
   describe('when the validator set is changing', () => {
     const blockNumbers: number[] = []
+
     let epoch: number
     let validatorAccounts: string[]
 
@@ -358,8 +360,8 @@ describe('governance tests', () => {
       ]
 
       await Promise.all(
-        additionalNodes.map((nodeConfig) =>
-          initAndStartGeth(context.hooks.gethBinaryPath, nodeConfig, true)
+        additionalNodes.map((nodeConfig: GethInstanceConfig) =>
+          initAndStartGeth(context.hooks.gethBinaryPath, nodeConfig, verbose)
         )
       )
 
@@ -368,7 +370,7 @@ describe('governance tests', () => {
       const additionalValidatingNodes = [
         {
           gethRunConfig: gethConfig,
-          name: 'validator-2-KeyRotation-0',
+          name: 'validator2KeyRotation0',
           validating: true,
           syncmode: 'full',
           lightserv: false,
@@ -379,7 +381,7 @@ describe('governance tests', () => {
         },
         {
           gethRunConfig: gethConfig,
-          name: 'validator-2-KeyRotation-1',
+          name: 'validator2KeyRotation1',
           validating: true,
           syncmode: 'full',
           lightserv: false,
@@ -391,8 +393,8 @@ describe('governance tests', () => {
       ]
 
       await Promise.all(
-        additionalValidatingNodes.map((nodeConfig) =>
-          initAndStartGeth(context.hooks.gethBinaryPath, nodeConfig, true)
+        additionalValidatingNodes.map((nodeConfig: GethInstanceConfig) =>
+          initAndStartGeth(context.hooks.gethBinaryPath, nodeConfig, verbose)
         )
       )
 
@@ -410,10 +412,14 @@ describe('governance tests', () => {
       await waitForEpochTransition(epoch)
 
       const groupWeb3Url = 'ws://localhost:8555'
-      console.log(groupWeb3Url)
+
+      if (verbose) {
+        console.log('groupWeb3Url', groupWeb3Url)
+      }
 
       // Prepare for member swapping.
       const groupWeb3 = new Web3(groupWeb3Url)
+
       console.info('Waiting to finish syncing')
       await waitToFinishSyncing(groupWeb3)
 
@@ -430,7 +436,9 @@ describe('governance tests', () => {
       const memberSwapper = await newMemberSwapper(groupKit, membersToSwap)
 
       const validatorRpc = 'http://localhost:8549'
-      console.log(validatorRpc)
+      if (verbose) {
+        console.log('validatorRpc', validatorRpc)
+      }
 
       // Prepare for key rotation.
       const validatorWeb3 = new Web3(validatorRpc)
@@ -438,7 +446,10 @@ describe('governance tests', () => {
       const authWeb31 = 'ws://localhost:8559'
       const authWeb32 = 'ws://localhost:8561'
 
-      console.log(authWeb31, authWeb32)
+      if (verbose) {
+        console.log('authWeb31', authWeb31)
+        console.log('authWeb32', authWeb32)
+      }
 
       const authorizedWeb3s = [new Web3(authWeb31), new Web3(authWeb32)]
 
@@ -675,6 +686,7 @@ describe('governance tests', () => {
       // Returns the gas fee base for a given block, which is distributed to the governance contract.
       const blockBaseGasFee = async (blockNumber: number): Promise<BigNumber> => {
         const gas = (await web3.eth.getBlock(blockNumber)).gasUsed
+        // @ts-ignore
         const gpm = await gasPriceMinimum.methods.gasPriceMinimum().call({}, blockNumber)
         return new BigNumber(gpm).times(new BigNumber(gas))
       }

@@ -17,6 +17,7 @@ interface StartArgv extends GethArgv {
   rpcport: number
   wsport: number
   verbosity: number
+  verbose: boolean
   amount: number
   purge: boolean
   withProxy: boolean
@@ -74,6 +75,11 @@ export const builder = (argv: yargs.Argv) => {
       description: 'Verbosity level',
       default: 5,
     })
+    .option('verbose', {
+      type: 'boolean',
+      description: 'Verbose',
+      default: false,
+    })
     .option('purge', {
       type: 'boolean',
       description: 'purge',
@@ -87,6 +93,7 @@ export const builder = (argv: yargs.Argv) => {
 
 export const handler = async (argv: StartArgv) => {
   const verbosity = argv.verbosity
+  const verbose = argv.verbose
 
   const gethDir = argv.gethDir
   const datadir = argv.dataDir
@@ -116,6 +123,7 @@ export const handler = async (argv: StartArgv) => {
     runPath: datadir,
     keepData: !purge,
     gethRepoPath: gethDir,
+    verbosity,
     networkId,
     network,
     instances: [],
@@ -155,6 +163,6 @@ export const handler = async (argv: StartArgv) => {
     gethConfig,
     validators,
     validatorPrivateKeys,
-    verbose: verbosity > 3,
+    verbose,
   })
 }
