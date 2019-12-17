@@ -324,10 +324,7 @@ contract EpochRewards is Ownable, Initializable, UsingPrecompiles, UsingRegistry
    * @return The fraction of floating Gold being used for voting in validator elections.
    */
   function getVotingGoldFraction() public view returns (uint256) {
-    // TODO(asa): Ignore custodial accounts.
-    address reserveAddress = registry.getAddressForOrDie(RESERVE_REGISTRY_ID);
-    uint256 liquidGold = getGoldToken().totalSupply().sub(reserveAddress.balance);
-    // TODO(asa): Should this be active votes?
+    uint256 liquidGold = getGoldToken().totalSupply().sub(getReserve().getReserveGoldBalance());
     uint256 votingGold = getElection().getTotalVotes();
     return FixidityLib.newFixed(votingGold).divide(FixidityLib.newFixed(liquidGold)).unwrap();
   }

@@ -362,6 +362,7 @@ exports[`TransferReviewCard renders correctly for invite review 1`] = `
               style={
                 Object {
                   "height": 12,
+                  "tintColor": "#42D689",
                   "width": 12,
                 }
               }
@@ -758,6 +759,7 @@ exports[`TransferReviewCard renders correctly for pay request review 1`] = `
               style={
                 Object {
                   "height": 12,
+                  "tintColor": "#42D689",
                   "width": 12,
                 }
               }
@@ -1132,6 +1134,7 @@ exports[`TransferReviewCard renders correctly for send review 1`] = `
               style={
                 Object {
                   "height": 12,
+                  "tintColor": "#42D689",
                   "width": 12,
                 }
               }

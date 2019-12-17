@@ -233,15 +233,22 @@ export class ValidatorsWrapper extends BaseWrapper<Validators> {
   }
 
   /** Get ValidatorGroup information */
-  async getValidatorGroup(address: Address, blockNumber?: number): Promise<ValidatorGroup> {
+  async getValidatorGroup(
+    address: Address,
+    getAffiliates: boolean = true,
+    blockNumber?: number
+  ): Promise<ValidatorGroup> {
     // @ts-ignore: Expected 0-1 arguments, but got 2
     const res = await this.contract.methods.getValidatorGroup(address).call({}, blockNumber)
     const accounts = await this.kit.contracts.getAccounts()
     const name = (await accounts.getName(address, blockNumber)) || ''
-    const validators = await this.getRegisteredValidators(blockNumber)
-    const affiliates = validators
-      .filter((v) => v.affiliation === address)
-      .filter((v) => !res[0].includes(v.address))
+    let affiliates: Validator[] = []
+    if (getAffiliates) {
+      const validators = await this.getRegisteredValidators(blockNumber)
+      affiliates = validators
+        .filter((v) => v.affiliation === address)
+        .filter((v) => !res[0].includes(v.address))
+    }
     return {
       name,
       address,
@@ -291,7 +298,7 @@ export class ValidatorsWrapper extends BaseWrapper<Validators> {
   /** Get list of registered validator groups */
   async getRegisteredValidatorGroups(): Promise<ValidatorGroup[]> {
     const vgAddresses = await this.getRegisteredValidatorGroupsAddresses()
-    return Promise.all(vgAddresses.map((addr) => this.getValidatorGroup(addr)))
+    return Promise.all(vgAddresses.map((addr) => this.getValidatorGroup(addr, false)))
   }
 
   /**
@@ -452,7 +459,7 @@ export class ValidatorsWrapper extends BaseWrapper<Validators> {
       this.getValidator(e.returnValues.validator, blockNumber)
     )
     const validatorGroup: ValidatorGroup[] = await concurrentMap(10, events, (e: EventLog) =>
-      this.getValidatorGroup(e.returnValues.group, blockNumber)
+      this.getValidatorGroup(e.returnValues.group, true, blockNumber)
     )
     return events.map(
       (e: EventLog, index: number): ValidatorReward => ({

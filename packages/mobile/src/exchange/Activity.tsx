@@ -49,7 +49,7 @@ export class Activity extends React.Component<Props> {
               loading={loading}
               error={error}
               data={data}
-              standbyTransactionFilter={filterToExchangeTxs}
+              transactionFilter={filterToExchangeTxs}
             />
           )
         }}

@@ -377,7 +377,7 @@ export class ElectionWrapper extends BaseWrapper<Election> {
     })
     const validators = await this.kit.contracts.getValidators()
     const validatorGroup: ValidatorGroup[] = await concurrentMap(10, events, (e: EventLog) =>
-      validators.getValidatorGroup(e.returnValues.group, blockNumber)
+      validators.getValidatorGroup(e.returnValues.group, true, blockNumber)
     )
     return events.map(
       (e: EventLog, index: number): GroupVoterReward => ({
