@@ -40,8 +40,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   image: {
-    width: 240,
-    height: 220,
+    width: '65%',
   },
   textBox: {
     marginVertical: 30,
@@ -50,11 +49,11 @@ const styles = StyleSheet.create({
   },
   text: {
     textAlign: 'center',
-    fontSize: 24,
-    lineHeight: 30,
+    fontSize: 18,
+    lineHeight: 24,
   },
   buttonContainer: {
-    marginVertical: 40,
+    marginVertical: 30,
   },
 })
 
