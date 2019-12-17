@@ -21,6 +21,7 @@ export default class List extends BaseCommand {
       groupVotes,
       {
         address: {},
+        name: {},
         votes: { get: (g) => g.votes.toFixed() },
         capacity: { get: (g) => g.capacity.toFixed() },
         eligible: {},
