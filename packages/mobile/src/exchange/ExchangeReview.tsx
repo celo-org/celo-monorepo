@@ -116,14 +116,14 @@ export class ExchangeReview extends React.Component<Props, State> {
   }
 
   getMakerAmount() {
-    const input = this.state.inputAmount
+    let input = this.state.inputAmount
     if (this.state.makerToken !== this.state.inputToken) {
       const exchangeRate = getRateForMakerToken(
         this.props.exchangeRatePair,
         this.state.makerToken,
         this.state.inputToken
       )
-      getTakerAmount(input, exchangeRate)
+      input = getTakerAmount(input, exchangeRate)
     }
     return input
   }
