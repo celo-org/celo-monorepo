@@ -1212,4 +1212,39 @@ contract('Election', (accounts: string[]) => {
       })
     })
   })
+
+  describe.only('#slashVotes', () => {
+    const voter = accounts[0]
+    const group = accounts[1]
+    const value = new BigNumber(1000)
+
+    beforeEach(async () => {
+      await mockValidators.setMembers(group, [accounts[9]])
+      await registry.setAddressFor(CeloContractName.Validators, accounts[0])
+      await election.markGroupEligible(group, NULL_ADDRESS, NULL_ADDRESS)
+      await registry.setAddressFor(CeloContractName.Validators, mockValidators.address)
+      await mockLockedGold.setTotalLockedGold(value)
+      await mockValidators.setNumRegisteredValidators(1)
+      await mockLockedGold.incrementNonvotingAccountBalance(voter, value)
+      await election.vote(group, value, NULL_ADDRESS, NULL_ADDRESS)
+      await registry.setAddressFor(CeloContractName.LockedGold, accounts[2])
+    })
+
+    describe('when the account has voted for one group', () => {
+      describe('when the account is slashed for the total voted gold', () => {
+        it('should decrement voted gold to zero', async () => {
+          assert.deepEqual(await election.getGroupsVotedForByAccount(voter), [group])
+          await election.slashVotes(voter, value, [NULL_ADDRESS], [NULL_ADDRESS], [0], {
+            from: accounts[2],
+          })
+          assertEqualBN(await election.getPendingVotesForGroupByAccount(group, voter), value)
+          assertEqualBN(await election.getTotalVotesForGroupByAccount(group, voter), value)
+          assertEqualBN(await election.getTotalVotesByAccount(voter), value)
+          assertEqualBN(await election.getTotalVotesForGroup(group), value)
+          assertEqualBN(await election.getTotalVotes(), value)
+          assertEqualBN(await mockLockedGold.nonvotingAccountBalance(voter), 0)
+        })
+      })
+    })
+  })
 })

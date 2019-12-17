@@ -857,4 +857,64 @@ contract Election is
     }
     return res;
   }
+
+  // Iterates in reverse order over all groups voted for by `account`,
+  // reducing the total amount of voting gold by `value` in total.
+  // For each group, if there `value` gold has left to be slashed, reduces
+  // the number of pending and active votes for that group by as much as
+  // possible without exceeding the total value that needs to be slashed.
+  function slashVotes(
+    address account,
+    uint256 value,
+    address[] calldata lessers,
+    address[] calldata greaters,
+    uint256[] calldata indices
+  ) external onlyRegisteredContract(LOCKED_GOLD_REGISTRY_ID) returns (bool) {
+    address[] storage groups = votes.groupsVotedFor[account];
+    uint256 remainingValue = value;
+    for (uint256 i = groups.length; i > 0; i = i.sub(1)) {
+      // What is eligible
+      if (votes.total.eligible.contains(groups[i.sub(1)])) {
+        address group = groups[i.sub(1)];
+        uint256 maxRemoveableVotes = remainingValue;
+        uint256 pendingVotes = getPendingVotesForGroupByAccount(group, account);
+        uint256 activeVotes = getActiveVotesForGroupByAccount(group, account);
+        if (pendingVotes < maxRemoveableVotes) {
+          maxRemoveableVotes = pendingVotes;
+        }
+        // No if else since a revert means something bad (bad group or bad storage)
+        require(
+          revokePending(
+            group,
+            maxRemoveableVotes,
+            lessers[i.sub(1)],
+            greaters[i.sub(1)],
+            indices[i.sub(1)]
+          )
+        );
+        remainingValue = remainingValue.sub(maxRemoveableVotes);
+        if (remainingValue == 0) {
+          return true;
+        }
+        maxRemoveableVotes = remainingValue;
+        if (activeVotes < remainingValue) {
+          maxRemoveableVotes = activeVotes;
+        }
+        require(
+          revokeActive(
+            group,
+            maxRemoveableVotes,
+            lessers[i.sub(1)],
+            greaters[i.sub(1)],
+            indices[i.sub(1)]
+          )
+        );
+        remainingValue = remainingValue.sub(maxRemoveableVotes);
+        if (remainingValue == 0) {
+          return true;
+        }
+      }
+    }
+    return false;
+  }
 }
