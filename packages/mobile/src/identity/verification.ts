@@ -519,7 +519,8 @@ async function isAccountUpToDate(
 ) {
   const [currentWalletAddress, currentDEK] = await Promise.all([
     accountsWrapper.getWalletAddress(address),
-    accountsWrapper.getDataEncryptionKey(address),
+    // getDataEncryptionKey actually returns a string instead of an array
+    accountsWrapper.getDataEncryptionKey(address).then((key) => [key]),
   ])
   return (
     eqAddress(currentWalletAddress, address) && currentDEK && eqAddress(currentDEK.join(), dataKey)

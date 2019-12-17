@@ -142,13 +142,16 @@ contract('Validators', (accounts: string[]) => {
     )
   }
 
-  const registerValidatorGroup = async (group: string) => {
-    await mockLockedGold.setAccountTotalLockedGold(group, groupLockedGoldRequirements.value)
+  const registerValidatorGroup = async (group: string, numMembers: number = 1) => {
+    await mockLockedGold.setAccountTotalLockedGold(
+      group,
+      groupLockedGoldRequirements.value.times(numMembers)
+    )
     await validators.registerValidatorGroup(commission, { from: group })
   }
 
   const registerValidatorGroupWithMembers = async (group: string, members: string[]) => {
-    await registerValidatorGroup(group)
+    await registerValidatorGroup(group, members.length)
     for (const validator of members) {
       await registerValidator(validator)
       await validators.affiliate(group, { from: validator })
@@ -774,9 +777,9 @@ contract('Validators', (accounts: string[]) => {
             })
           })
 
-          describe('when it has been `validatorLockedGoldRequirements.duration` since the validator was removed from the group', () => {
+          describe('when it has been less than `validatorLockedGoldRequirements.duration` since the validator was removed from the group', () => {
             beforeEach(async () => {
-              await timeTravel(validatorLockedGoldRequirements.duration.toNumber(), web3)
+              await timeTravel(validatorLockedGoldRequirements.duration.minus(1).toNumber(), web3)
             })
 
             it('should revert', async () => {
@@ -1518,15 +1521,34 @@ contract('Validators', (accounts: string[]) => {
         })
 
         describe('when the group does not meet the locked gold requirements', () => {
-          beforeEach(async () => {
-            await mockLockedGold.setAccountTotalLockedGold(
-              group,
-              groupLockedGoldRequirements.value.minus(1)
-            )
+          describe('when the group does not have a member', () => {
+            beforeEach(async () => {
+              await mockLockedGold.setAccountTotalLockedGold(
+                group,
+                groupLockedGoldRequirements.value.minus(1)
+              )
+            })
+
+            it('should revert', async () => {
+              await assertRevert(validators.addFirstMember(validator, NULL_ADDRESS, NULL_ADDRESS))
+            })
           })
 
-          it('should revert', async () => {
-            await assertRevert(validators.addFirstMember(validator, NULL_ADDRESS, NULL_ADDRESS))
+          describe('when the group already has a member', () => {
+            const validator2 = accounts[2]
+            beforeEach(async () => {
+              await mockLockedGold.setAccountTotalLockedGold(
+                group,
+                groupLockedGoldRequirements.value.times(2).minus(1)
+              )
+              await validators.addFirstMember(validator, NULL_ADDRESS, NULL_ADDRESS)
+              await registerValidator(validator2)
+              await validators.affiliate(group, { from: validator2 })
+            })
+
+            it('should revert', async () => {
+              await assertRevert(validators.addMember(validator2))
+            })
           })
         })
       })
