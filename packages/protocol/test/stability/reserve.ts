@@ -100,10 +100,6 @@ contract('Reserve', (accounts: string[]) => {
       assert.equal(events[0].args.token.toLowerCase(), anAddress.toLowerCase())
     })
 
-    it('should revert when the token does not have an exchange rate with gold', async () => {
-      await assertRevert(reserve.addToken(web3.utils.randomHex(20)))
-    })
-
     describe('when the token has already been added', () => {
       beforeEach(async () => {
         await reserve.addToken(anAddress)
