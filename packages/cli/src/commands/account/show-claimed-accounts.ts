@@ -1,6 +1,8 @@
 import BigNumber from 'bignumber.js'
+
 import { ContractKit } from '@celo/contractkit'
 import { ClaimTypes, IdentityMetadataWrapper } from '@celo/contractkit/lib/identity'
+import { AccountClaim } from '@celo/contractkit/lib/identity/claims/account'
 import { verifyAccountClaim } from '@celo/contractkit/lib/identity/claims/verify'
 import { ensureHexLeader } from '@celo/utils/lib/address'
 import { notEmpty } from '@celo/utils/lib/collections'
@@ -8,7 +10,6 @@ import { notEmpty } from '@celo/utils/lib/collections'
 import { BaseCommand } from '../../base'
 import { printValueMap } from '../../utils/cli'
 import { Args } from '../../utils/command'
-import { AccountClaim } from '@celo/contractkit/lib/identity/claims/account'
 
 async function getMetadata(kit: ContractKit, address: string) {
   const accounts = await kit.contracts.getAccounts()
