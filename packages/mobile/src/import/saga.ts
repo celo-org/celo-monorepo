@@ -74,7 +74,7 @@ export function* importBackupPhraseSaga({ phrase, useEmptyWallet }: ImportBackup
     // Set redeem invite complete so user isn't brought back into nux flow
     yield put(redeemInviteSuccess())
     yield put(refreshAllBalances())
-    navigate(Screens.ImportContacts)
+    navigate(Screens.VerificationEducationScreen)
     yield put(importBackupPhraseSuccess())
   } catch (error) {
     Logger.error(TAG + '@importBackupPhraseSaga', 'Error importing backup phrase', error)

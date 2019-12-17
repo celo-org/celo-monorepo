@@ -90,7 +90,7 @@ export class EnterInviteCode extends React.Component<Props, State> {
   }
 
   onPressContinue = () => {
-    navigate(Screens.ImportContacts)
+    navigate(Screens.VerificationEducationScreen)
   }
 
   onPressGoToFaucet = () => {
@@ -133,7 +133,7 @@ export class EnterInviteCode extends React.Component<Props, State> {
           keyboardShouldPersistTaps={'always'}
         >
           <View>
-            <DevSkipButton nextScreen={Screens.ImportContacts} />
+            <DevSkipButton nextScreen={Screens.VerificationEducationScreen} />
             <Text style={styles.h1} testID={'InviteCodeTitle'}>
               {t('inviteCodeText.title')}
             </Text>
