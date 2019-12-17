@@ -21,6 +21,7 @@ import {
 
 export interface ValidatorGroupVote {
   address: Address
+  name: string
   votes: BigNumber
   capacity: BigNumber
   eligible: boolean
@@ -215,8 +216,11 @@ export class ElectionWrapper extends BaseWrapper<Election> {
     const votes = await this.contract.methods.getTotalVotesForGroup(address).call()
     const eligible = await this.contract.methods.getGroupEligibility(address).call()
     const numVotesReceivable = await this.contract.methods.getNumVotesReceivable(address).call()
+    const accounts = await this.kit.contracts.getAccounts()
+    const name = (await accounts.getName(address)) || ''
     return {
       address,
+      name,
       votes: toBigNumber(votes),
       capacity: toBigNumber(numVotesReceivable).minus(votes),
       eligible,
@@ -227,7 +231,7 @@ export class ElectionWrapper extends BaseWrapper<Election> {
    */
   async getValidatorGroupsVotes(): Promise<ValidatorGroupVote[]> {
     const validators = await this.kit.contracts.getValidators()
-    const groups = (await validators.getRegisteredValidatorGroups()).map((g) => g.address)
+    const groups = await validators.getRegisteredValidatorGroupsAddresses()
     return concurrentMap(5, groups, (g) => this.getValidatorGroupVotes(g))
   }
 
@@ -323,6 +327,7 @@ export class ElectionWrapper extends BaseWrapper<Election> {
     return zip(
       (a, b) => ({
         address: a,
+        name: '',
         votes: new BigNumber(b),
         capacity: new BigNumber(0),
         eligible: true,
@@ -346,6 +351,7 @@ export class ElectionWrapper extends BaseWrapper<Election> {
     } else {
       currentVotes.push({
         address: votedGroup,
+        name: '',
         votes: voteWeight,
         // Not used for the purposes of finding lesser and greater.
         capacity: new BigNumber(0),
