@@ -1,27 +1,8 @@
 import { CeloContractName } from '@celo/protocol/lib/registry-utils'
-import {
-  assertContainSubset,
-  assertEqualBN,
-  assertRevert,
-  mineBlocks,
-  NULL_ADDRESS,
-} from '@celo/protocol/lib/test-utils'
+import { assertContainSubset, assertEqualBN, assertRevert, mineBlocks, NULL_ADDRESS } from '@celo/protocol/lib/test-utils'
 import { fixed1, toFixed } from '@celo/utils/lib/fixidity'
 import BigNumber from 'bignumber.js'
-import {
-  AccountsContract,
-  AccountsInstance,
-  ElectionTestContract,
-  ElectionTestInstance,
-  MockLockedGoldContract,
-  MockLockedGoldInstance,
-  MockRandomContract,
-  MockRandomInstance,
-  MockValidatorsContract,
-  MockValidatorsInstance,
-  RegistryContract,
-  RegistryInstance,
-} from 'types'
+import { AccountsContract, AccountsInstance, ElectionTestContract, ElectionTestInstance, MockLockedGoldContract, MockLockedGoldInstance, MockRandomContract, MockRandomInstance, MockValidatorsContract, MockValidatorsInstance, RegistryContract, RegistryInstance } from 'types'
 
 const Accounts: AccountsContract = artifacts.require('Accounts')
 const ElectionTest: ElectionTestContract = artifacts.require('ElectionTest')
