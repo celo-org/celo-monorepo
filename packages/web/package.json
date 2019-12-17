@@ -30,6 +30,7 @@
     "colortranslator": "^1.1.1",
     "compression": "^1.7.4",
     "connect-slashes": "^1.4.0",
+    "core-js": "^2.6.9",
     "cross-fetch": "^3.0.4",
     "debounce": "^1.2.0",
     "express": "^4.17.1",
