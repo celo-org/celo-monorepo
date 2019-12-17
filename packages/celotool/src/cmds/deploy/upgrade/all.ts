@@ -31,7 +31,7 @@ export const handler = async (argv: TestnetArgv) => {
   console.info('Deploy blockscout')
   await blockscoutHandler(argv)
 
-  if (argv.reset) {
+  if (argv.reset === true) {
     console.info('Sleeping for 5 minutes to let pods come up')
     await sleep(300000)
     console.info('Deploy contracts')
