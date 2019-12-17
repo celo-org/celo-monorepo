@@ -48,8 +48,8 @@ export async function getGenesisBlockFromGoogleStorage(networkName: string) {
 export async function uploadStaticNodesToGoogleStorage(networkName: string) {
   console.info(`\nUploading static nodes for ${networkName} to Google cloud storage...`)
   // Get node json file
-  const nodesJsonData: string[] | null = await retryCmd(
-    async () => await getEnodesWithExternalIPAddresses(networkName)
+  const nodesJsonData: string[] | null = await retryCmd(() =>
+    getEnodesWithExternalIPAddresses(networkName)
   )
   if (nodesJsonData === null) {
     throw new Error('Fail to get static nodes information')
@@ -66,7 +66,7 @@ export async function uploadStaticNodesToGoogleStorage(networkName: string) {
 
 export async function uploadBootnodeToGoogleStorage(networkName: string) {
   console.info(`\nUploading bootnode for ${networkName} to Google Cloud Storage...`)
-  const [bootnodeEnode] = await retryCmd(async () => await getBootnodeEnode(networkName))
+  const [bootnodeEnode] = await retryCmd(() => getBootnodeEnode(networkName))
   if (!bootnodeEnode) {
     throw new Error('Failed to get bootnode enode')
   }
