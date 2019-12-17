@@ -401,6 +401,15 @@ contract Election is
   }
 
   /**
+   * @notice Returns the active votes made for `group`.
+   * @param group The address of the validator group.
+   * @return The active votes made for `group`.
+   */
+  function getActiveVotesForGroup(address group) public view returns (uint256) {
+    return votes.active.forGroup[group].total;
+  }
+
+  /**
    * @notice Returns whether or not a group is eligible to receive votes.
    * @return Whether or not a group is eligible to receive votes.
    * @dev Eligible groups that have received their maximum number of votes cannot receive more.
