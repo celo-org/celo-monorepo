@@ -82,7 +82,6 @@ export class TransactionFeed extends React.PureComponent<Props> {
 
     if (tx.type === TransactionTypes.EXCHANGE) {
       return (
-        // @ts-ignore
         <ExchangeFeedItem
           status={TransactionStatus.Complete}
           showGoldAmount={kind === FeedType.EXCHANGE}

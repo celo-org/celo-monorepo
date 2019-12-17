@@ -1,27 +1,14 @@
-import BigNumber from 'bignumber.js'
-import { CURRENCY_ENUM } from 'src/geth/consts'
+import { ExchangeTransaction, TransferTransaction } from 'src/apollo/types'
 import { Actions, ActionTypes } from 'src/transactions/actions'
 
-export interface ExchangeStandby {
+export interface ExchangeStandby extends ExchangeTransaction {
   id: string
-  type: TransactionTypes.EXCHANGE
   status: TransactionStatus
-  inSymbol: CURRENCY_ENUM
-  inValue: string
-  outSymbol: CURRENCY_ENUM
-  outValue: string
-  timestamp: number
   hash?: string
 }
-export interface TransferStandby {
+export interface TransferStandby extends TransferTransaction {
   id: string
-  type: TransferTransactionTypes
   status: TransactionStatus
-  value: string | BigNumber
-  comment: string
-  symbol: CURRENCY_ENUM
-  timestamp: number
-  address: string
   hash?: string
 }
 
