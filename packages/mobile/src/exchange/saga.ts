@@ -84,28 +84,11 @@ export function* doFetchTobinTax({ makerAmount, makerToken }: FetchTobinTaxActio
   }
 }
 
-export function* doFetchExchangeRate({ makerAmount, makerToken }: FetchExchangeRateAction) {
+export function* doFetchExchangeRate(action: FetchExchangeRateAction) {
   Logger.debug(TAG, 'Calling @doFetchExchangeRate')
-  try {
-    // If makerAmount and makerToken are given, use them to estimate the exchange rate,
-    // as exchange rate depends on amount sold. Else default to preset large sell amount.
-    let goldMakerAmount
-    let dollarMakerAmount
-    if (makerAmount && makerToken) {
-      const makerAmountInWei: BigNumber = yield call(
-        convertToContractDecimals,
-        makerAmount,
-        makerToken
-      )
-      goldMakerAmount =
-        makerToken === CURRENCY_ENUM.GOLD ? makerAmountInWei : LARGE_GOLD_SELL_AMOUNT_IN_WEI
-      dollarMakerAmount =
-        makerToken === CURRENCY_ENUM.DOLLAR ? makerAmountInWei : LARGE_DOLLARS_SELL_AMOUNT_IN_WEI
-    } else {
-      goldMakerAmount = LARGE_GOLD_SELL_AMOUNT_IN_WEI
-      dollarMakerAmount = LARGE_DOLLARS_SELL_AMOUNT_IN_WEI
-    }
 
+  const { makerToken, makerAmount } = action
+  try {
     yield call(getConnectedAccount)
 
     let makerAmountInWei
@@ -183,11 +166,10 @@ export function* exchangeGoldAndStableTokens(action: ExchangeTokensAction) {
     const stableTokenContract: StableTokenType = yield call(getStableTokenContract, web3)
     const exchangeContract: ExchangeType = yield call(getExchangeContract, web3)
 
-    const convertedMakerAmount: BigNumber = yield call(
-      convertToContractDecimals,
-      makerAmount,
-      makerToken
-    )
+    const convertedMakerAmount: BigNumber = roundDown(
+      yield call(convertToContractDecimals, makerAmount, makerToken),
+      0
+    ) // Nearest integer in wei
     const sellGold = makerToken === CURRENCY_ENUM.GOLD
 
     const updatedExchangeRate: BigNumber = yield call(
@@ -212,8 +194,9 @@ export function* exchangeGoldAndStableTokens(action: ExchangeTokensAction) {
     }
 
     // Ensure the user gets makerAmount at least as good as displayed (rounded to EXCHANGE_DIFFERENCE_TOLERATED)
-    const minimumTakerAmount = getTakerAmount(makerAmount, exchangeRate).minus(
-      EXCHANGE_DIFFERENCE_TOLERATED
+    const minimumTakerAmount = BigNumber.maximum(
+      getTakerAmount(makerAmount, exchangeRate).minus(EXCHANGE_DIFFERENCE_TOLERATED),
+      0
     )
     const updatedTakerAmount = getTakerAmount(makerAmount, updatedExchangeRate)
     if (minimumTakerAmount.isGreaterThan(updatedTakerAmount)) {

@@ -275,6 +275,7 @@ exports[`renders correctly with giant numbers 1`] = `
             style={
               Object {
                 "height": 12,
+                "tintColor": "#42D689",
                 "width": 12,
               }
             }
@@ -365,6 +366,7 @@ exports[`renders correctly with giant numbers 1`] = `
             style={
               Object {
                 "height": 12,
+                "tintColor": "#42D689",
                 "width": 12,
               }
             }
@@ -780,6 +782,7 @@ exports[`renders correctly with no exchange rate 1`] = `
             style={
               Object {
                 "height": 12,
+                "tintColor": "#42D689",
                 "width": 12,
               }
             }
@@ -870,6 +873,7 @@ exports[`renders correctly with no exchange rate 1`] = `
             style={
               Object {
                 "height": 12,
+                "tintColor": "#42D689",
                 "width": 12,
               }
             }

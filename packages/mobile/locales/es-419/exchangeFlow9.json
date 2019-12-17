@@ -17,6 +17,7 @@
   "subtotal": "Total parcial",
   "inputSubtotal": "{{goldOrSubtotal}} (@ {{rate}}",
   "cancel": "Cancelar",
+  "buyOrSellGoldAmount": "{{buyOrSell}} {{total}} {{gold}}",
   "includeExchangeFee": "* incluye la comisión de cambio",
   "available": "Disponible",
   "moneyAvailable": "{{moneyAmount}} disponible",
