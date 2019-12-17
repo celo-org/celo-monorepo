@@ -11,7 +11,12 @@ import BigNumber from 'bignumber.js'
 import { all, call, put, select, spawn, takeEvery, takeLatest } from 'redux-saga/effects'
 import { showError } from 'src/alert/actions'
 import { ErrorMessages } from 'src/app/ErrorMessages'
-import { Actions, ExchangeTokensAction, setExchangeRate } from 'src/exchange/actions'
+import {
+  Actions,
+  ExchangeTokensAction,
+  FetchExchangeRateAction,
+  setExchangeRate,
+} from 'src/exchange/actions'
 import { ExchangeRatePair, exchangeRatePairSelector } from 'src/exchange/reducer'
 import { CURRENCY_ENUM } from 'src/geth/consts'
 import { convertToContractDecimals } from 'src/tokens/saga'
@@ -36,20 +41,34 @@ const LARGE_DOLLARS_SELL_AMOUNT_IN_WEI = new BigNumber(1000 * 100000000000000000
 const LARGE_GOLD_SELL_AMOUNT_IN_WEI = new BigNumber(100 * 1000000000000000000)
 const EXCHANGE_DIFFERENCE_TOLERATED = 0.01 // Maximum difference between actual and displayed takerAmount
 
-export function* doFetchExchangeRate(makerAmount?: BigNumber, makerToken?: CURRENCY_ENUM) {
+export function* doFetchExchangeRate(action: FetchExchangeRateAction) {
   Logger.debug(TAG, 'Calling @doFetchExchangeRate')
 
-  // If makerAmount and makerToken are given, use them to estimate the exchange rate,
-  // as exchange rate depends on amount sold. Else default to preset large sell amount.
-  const goldMakerAmount =
-    makerAmount && makerToken === CURRENCY_ENUM.GOLD ? makerAmount : LARGE_GOLD_SELL_AMOUNT_IN_WEI
-  const dollarMakerAmount =
-    makerAmount && makerToken === CURRENCY_ENUM.DOLLAR
-      ? makerAmount
-      : LARGE_DOLLARS_SELL_AMOUNT_IN_WEI
+  const { makerToken, makerAmount } = action
 
   try {
     yield call(getConnectedAccount)
+
+    let makerAmountInWei
+    if (makerAmount && makerToken) {
+      makerAmountInWei = (yield call(
+        convertToContractDecimals,
+        makerAmount,
+        makerToken
+      )).integerValue()
+    }
+
+    // If makerAmount and makerToken are given, use them to estimate the exchange rate,
+    // as exchange rate depends on amount sold. Else default to preset large sell amount.
+    const goldMakerAmount =
+      makerAmountInWei && makerToken === CURRENCY_ENUM.GOLD
+        ? makerAmountInWei
+        : LARGE_GOLD_SELL_AMOUNT_IN_WEI
+    const dollarMakerAmount =
+      makerAmountInWei && makerToken === CURRENCY_ENUM.DOLLAR
+        ? makerAmountInWei
+        : LARGE_DOLLARS_SELL_AMOUNT_IN_WEI
+
     const exchange = yield call([contractKit.contracts, contractKit.contracts.getExchange])
 
     const [dollarMakerExchangeRate, goldMakerExchangeRate]: [BigNumber, BigNumber] = yield all([
@@ -105,11 +124,10 @@ export function* exchangeGoldAndStableTokens(action: ExchangeTokensAction) {
     const stableTokenContract: StableTokenType = yield call(getStableTokenContract, web3)
     const exchangeContract: ExchangeType = yield call(getExchangeContract, web3)
 
-    const convertedMakerAmount: BigNumber = yield call(
-      convertToContractDecimals,
-      makerAmount,
-      makerToken
-    )
+    const convertedMakerAmount: BigNumber = roundDown(
+      yield call(convertToContractDecimals, makerAmount, makerToken),
+      0
+    ) // Nearest integer in wei
     const sellGold = makerToken === CURRENCY_ENUM.GOLD
 
     const updatedExchangeRate: BigNumber = yield call(
@@ -134,8 +152,9 @@ export function* exchangeGoldAndStableTokens(action: ExchangeTokensAction) {
     }
 
     // Ensure the user gets makerAmount at least as good as displayed (rounded to EXCHANGE_DIFFERENCE_TOLERATED)
-    const minimumTakerAmount = getTakerAmount(makerAmount, exchangeRate).minus(
-      EXCHANGE_DIFFERENCE_TOLERATED
+    const minimumTakerAmount = BigNumber.maximum(
+      getTakerAmount(makerAmount, exchangeRate).minus(EXCHANGE_DIFFERENCE_TOLERATED),
+      0
     )
     const updatedTakerAmount = getTakerAmount(makerAmount, updatedExchangeRate)
     if (minimumTakerAmount.isGreaterThan(updatedTakerAmount)) {
