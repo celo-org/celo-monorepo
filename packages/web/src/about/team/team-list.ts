@@ -102,7 +102,7 @@ const people: Person[] = [
   },
   {
     name: 'Nitya Subramanian',
-    role: 'Engineering',
+    role: 'Product',
     photo: require('./nitya@2x.png'),
   },
   {
