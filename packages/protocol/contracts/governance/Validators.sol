@@ -1213,12 +1213,9 @@ contract Validators is
     view
     returns (address)
   {
-    require(
-      isValidator(account) &&
-        epochNumber <= getEpochNumber() &&
-        index < history.tail.add(history.numEntries)
-    );
+    require(isValidator(account) && epochNumber <= getEpochNumber());
     MembershipHistory storage history = validators[account].membershipHistory;
+    require(index < history.tail.add(history.numEntries));
     require(index >= history.tail && history.numEntries > 0, "index out of bounds");
     bool isExactMatch = history.entries[index].epochNumber == epochNumber;
     bool isLastEntry = index.sub(history.tail) == history.numEntries.sub(1);

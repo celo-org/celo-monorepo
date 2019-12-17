@@ -2215,6 +2215,9 @@ contract('Validators', (accounts: string[]) => {
   describe('#groupMembershipInEpoch', () => {
     const validator = accounts[0]
     const groups = accounts.slice(1, -1)
+    const gapSize = 3
+    const totalEpochs = membershipHistoryLength.multipliedBy(5).toNumber()
+    let contractIndex = 0
 
     describe('when the validator is added to different groups with gaps in between epochs', () => {
       let epochs = []
@@ -2227,23 +2230,29 @@ contract('Validators', (accounts: string[]) => {
         for (const group of groups) {
           await registerValidatorGroup(group)
         }
+        contractIndex += 1
         // Magic gapSize to allow for tests of off by one in both directions
-        const gapSize = 3
-        for (let i = 0; i < membershipHistoryLength.multipliedBy(gapSize).toNumber(); i++) {
+        for (let i = 0; i < totalEpochs; i++) {
           const blockNumber = await web3.eth.getBlockNumber()
           const epochNumber = Math.floor(blockNumber / EPOCH)
           const blocksUntilNextEpoch = (epochNumber + 1) * EPOCH - blockNumber
           await mineBlocks(blocksUntilNextEpoch, web3)
 
+          // Current epochNumber is 1 greater since we just called `mineBlocks`
+          // We set the 4th (3 index) entry to 0x00 to test possible initialization bugs
+          epochs.push([
+            epochNumber + 1,
+            i !== gapSize * gapSize
+              ? groups[Math.floor(i / gapSize) % groups.length]
+              : NULL_ADDRESS,
+          ])
           if (i % gapSize === 0) {
-            // Current epochNumber is 1 greater since we just called `mineBlocks`
-            // We set the 4th (3 index) entry to 0x00 to test possible initialization bugs
-            epochs.push([epochNumber + 1, i !== gapSize * 3 ? groups[i / gapSize] : NULL_ADDRESS])
-            // If not 4th entry (0 indexed)
-            if (i !== gapSize * 3) {
-              await validators.affiliate(groups[i / gapSize])
+            contractIndex += 1
+            // deaffiliate every gapSize^2 entry
+            if (i !== gapSize * gapSize) {
+              await validators.affiliate(groups[Math.floor(i / gapSize) % groups.length])
               await validators.addFirstMember(validator, NULL_ADDRESS, NULL_ADDRESS, {
-                from: groups[i / gapSize],
+                from: groups[Math.floor(i / gapSize) % groups.length],
               })
             } else {
               await validators.deaffiliate()
@@ -2254,48 +2263,51 @@ contract('Validators', (accounts: string[]) => {
 
       it('should correctly get the group address for exact epoch numbers', async () => {
         // Change to just loop over epochs from 0 - whatever and increase index every gap:
-        for (let i = 0; i < membershipHistoryLength.toNumber(); i++) {
-          assert.equal(
-            await validators.groupMembershipInEpoch(validator, epochs[i][0], 1 + i),
-            i !== 3 ? epochs[i][1] : NULL_ADDRESS
-          )
+        for (let i = 0; i < totalEpochs; i++) {
+          if (totalEpochs - i <= membershipHistoryLength.toNumber()) {
+            assert.equal(
+              await validators.groupMembershipInEpoch(
+                validator,
+                epochs[i][0],
+                1 + Math.floor(i / gapSize)
+              ),
+              i !== 3 ? epochs[i][1] : NULL_ADDRESS
+            )
+          } else {
+            await assertRevert(
+              validators.groupMembershipInEpoch(
+                validator,
+                epochs[i][0],
+                1 + Math.floor(i / gapSize)
+              )
+            )
+          }
         }
-      })
-
-      it('should correctly get the group address of epoch numbers between switches', async () => {
-        assert.equal(
-          await validators.groupMembershipInEpoch(validator, epochs[0][0] + 2, 1),
-          epochs[0][1]
-        )
-        assert.equal(
-          await validators.groupMembershipInEpoch(validator, epochs[0][0] + 1, 1),
-          epochs[0][1]
-        )
-        assert.equal(
-          await validators.groupMembershipInEpoch(validator, epochs[1][0] + 2, 2),
-          epochs[1][1]
-        )
-        assert.equal(
-          await validators.groupMembershipInEpoch(validator, epochs[4][0] + 1, 5),
-          epochs[4][1]
-        )
-        // `epochs`[2][0] join group A, epoch `epochs`[3][0] deaffiliate, `epochs`[4][0] join group B.
-        // This verifies we don't mistake 0 addresses as the end of history.
-        await assertRevert(validators.groupMembershipInEpoch(validator, epochs[4][0], 3))
-        await assertRevert(validators.groupMembershipInEpoch(validator, epochs[3][0], 3))
       })
 
       describe('when called with various malformed inputs', () => {
         it('should revert when epochNumber at given index is greater than provided epochNumber', async () => {
-          await assertRevert(validators.groupMembershipInEpoch(validator, epochs[4][0] - 1, 5))
+          await assertRevert(
+            validators.groupMembershipInEpoch(validator, epochs[totalEpochs - 5][0], contractIndex)
+          )
         })
 
         it("should revert when epochNumber fits into a different index's bucket", async () => {
-          await assertRevert(validators.groupMembershipInEpoch(validator, epochs[2][0], 1))
+          await assertRevert(
+            validators.groupMembershipInEpoch(
+              validator,
+              epochs[totalEpochs - 1][0],
+              contractIndex - 2
+            )
+          )
         })
 
         it("should revert when epochNumber is greater than the chain's current epochNumber", async () => {
-          await assertRevert(validators.groupMembershipInEpoch(validator, epochs[4][0] + 10, 5))
+          const blockNumber = await web3.eth.getBlockNumber()
+          const epochNumber = Math.floor(blockNumber / EPOCH)
+          await assertRevert(
+            validators.groupMembershipInEpoch(validator, epochNumber + 1, contractIndex)
+          )
         })
       })
     })
