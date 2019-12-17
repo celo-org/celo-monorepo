@@ -1,17 +1,15 @@
+import { AttestationServiceTestRequestType } from '@celo/utils/lib/io'
 import express from 'express'
 import RateLimiter from 'express-rate-limit'
 import requestIdMiddleware from 'express-request-id'
 import * as PromClient from 'prom-client'
 import { initializeDB, initializeKit } from './db'
+import { getAccountAddress, getAttestationSignerAddress } from './env'
 import { rootLogger } from './logger'
 import { createValidatedHandler, loggerMiddleware } from './request'
-import {
-  AttestationRequestType,
-  getAccountAddress,
-  getAttestationSignerAddress,
-  handleAttestationRequest,
-} from './requestHandlers/attestation'
+import { AttestationRequestType, handleAttestationRequest } from './requestHandlers/attestation'
 import { handleStatusRequest, StatusRequestType } from './requestHandlers/status'
+import { handleTestAttestationRequest } from './requestHandlers/test_attestation'
 import { initializeSmsProviders } from './sms'
 
 async function init() {
@@ -40,6 +38,10 @@ async function init() {
   app.post(
     '/attestations',
     createValidatedHandler(AttestationRequestType, handleAttestationRequest)
+  )
+  app.post(
+    '/test_attestations',
+    createValidatedHandler(AttestationServiceTestRequestType, handleTestAttestationRequest)
   )
 }
 

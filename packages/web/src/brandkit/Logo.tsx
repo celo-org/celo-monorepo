@@ -11,7 +11,7 @@ import Judgement, { Value } from 'src/brandkit/logo/Judgement'
 import LogoExample, { Logos } from 'src/brandkit/logo/LogoExample'
 import LogoWithBackground from 'src/brandkit/logo/LogoWithBackground'
 import { Digital, Print } from 'src/brandkit/logo/Minimums'
-import { H1, H3 } from 'src/fonts/Fonts'
+import { H1, H4 } from 'src/fonts/Fonts'
 import { I18nProps, NameSpaces, Trans, withNamespaces } from 'src/i18n'
 import { ScreenProps, ScreenSizes, withScreenSize } from 'src/layout/ScreenSize'
 import LogoLightBg from 'src/logos/LogoLightBg'
@@ -44,15 +44,13 @@ export default React.memo(function Logo() {
 })
 
 const Overview = withNamespaces(NameSpaces.brand)(
-  withScreenSize<I18nProps>(function _Overview({ t, screen }: I18nProps & ScreenProps) {
+  withScreenSize(function _Overview({ t, screen }: I18nProps & ScreenProps) {
     const glyphAreaStyle = screen === ScreenSizes.DESKTOP ? styles.pilar : styles.square
     return (
       <View style={styles.container}>
         <View style={styles.gap}>
           <H1 style={standardStyles.elementalMarginBottom}>{t('logo.title')}</H1>
-          <Text style={[fonts.p, standardStyles.elementalMarginBottom]}>
-            {t('logo.overviewCopy')}
-          </Text>
+          <H4 style={standardStyles.elementalMarginBottom}>{t('logo.overviewCopy')}</H4>
           <Button
             kind={BTN.PRIMARY}
             text={t('logo.overviewBtn')}
@@ -62,7 +60,7 @@ const Overview = withNamespaces(NameSpaces.brand)(
           <Text
             style={[fonts.p, standardStyles.blockMarginBottom, standardStyles.elementalMarginTop]}
           >
-            <Trans i18nKey="logo.license">
+            <Trans ns={NameSpaces.brand} i18nKey="logo.license">
               <InlineAnchor href={menuItems.CODE_OF_CONDUCT.link}>here</InlineAnchor>
             </Trans>
           </Text>

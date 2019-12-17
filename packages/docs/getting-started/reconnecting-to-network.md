@@ -22,11 +22,14 @@ docker stop celo-proxy && docker rm celo-proxy
 ```bash
 # On your attestations machine
 docker stop celo-attestations && docker rm celo-attestations
+docker stop celo-attestation-service && docker rm celo-attestation-service
 ```
+
+If you have provided attestations, you will want to wipe the database that you configured the attestation service to.
 
 ## Double check that you still have your keys
 
-Make sure that you still have your Validator, Validator Group, and Validator signer private keys, as you will be able to re-use them in the next phase of the network. You can do so by listing the contents of your `keystore` directory on each machine. You should see a file ending with the address of the corresponding key.
+Make sure that you still have your Validator, Validator Group, Validator signer and Attestation signer private keys, as you will be able to re-use them in the next phase of the network. You can do so by listing the contents of your `keystore` directory on each machine. You should see a file ending with the address of the corresponding key.
 
 ```bash
 # On your local machine
@@ -38,6 +41,12 @@ ls celo-accounts-node/keystore
 # On your validator machine
 # You should see the keystore file for your Validator signer key.
 ls celo-validator-node/keystore
+```
+
+```bash
+# On your Attestation machine
+# You should see the keystore file for your Attestation signer key.
+ls celo-attestations-node/keystore
 ```
 
 ## Delete chain data from your nodes
@@ -63,6 +72,12 @@ mv nodekey geth/nodekey
 ```bash
 # On your validator machine
 cd celo-validator-node
+rm -rf geth*
+```
+
+```bash
+# On your Attestation machine
+cd celo-attestations-node
 rm -rf geth* && rm static-nodes.json
 ```
 
@@ -75,8 +90,14 @@ First, pull the Celo image as described [here](running-a-validator.md#pull-the-c
 ```bash
 # On all machines
 export CELO_IMAGE=us.gcr.io/celo-testnet/celo-node:baklava
-export NETWORK_ID=76172
+export NETWORK_ID=121119
 docker pull $CELO_IMAGE
+```
+
+```bash
+# On your attestation machine
+export CELO_IMAGE_ATTESTATION=us.gcr.io/celo-testnet/celo-monorepo:attestation-service-baklava
+docker pull $CELO_IMAGE_ATTESTATION
 ```
 
 ### Restart your Accounts node
@@ -109,6 +130,10 @@ export CELO_VALIDATOR_SIGNER_ADDRESS=<YOUR-CELO-VALIDATOR-SIGNER-ADDRESS>
 
 Next, follow [these instructions](running-a-validator.md#connect-the-validator-to-the-proxy) to restart your validator node on your validator machine.
 
+### Restart your Attestation node and service
+
+Follow [these instructions](running-a-validator.md#running-the-attestation-service) to restart your Attestation node and service on your Attestation machine.
+
 ### Re-register your Validator
 
 #### Restore any missing environment variables
@@ -127,6 +152,8 @@ echo CELO_VALIDATOR_SIGNER_PUBLIC_KEY=$CELO_VALIDATOR_SIGNER_PUBLIC_KEY
 echo CELO_VALIDATOR_SIGNER_SIGNATURE=$CELO_VALIDATOR_SIGNER_SIGNATURE
 echo CELO_VALIDATOR_SIGNER_BLS_PUBLIC_KEY=$CELO_VALIDATOR_SIGNER_BLS_PUBLIC_KEY
 echo CELO_VALIDATOR_SIGNER_BLS_SIGNATURE=$CELO_VALIDATOR_SIGNER_BLS_SIGNATURE
+echo CELO_ATTESTATION_SIGNER_ADDRESS=$CELO_ATTESTATION_SIGNER_ADDRESS
+echo CELO_ATTESTATION_SIGNER_SIGNATURE=$CELO_ATTESTATION_SIGNER_SIGNATURE
 ```
 
 If any of the environment variables are missing, you have two options:
@@ -143,6 +170,6 @@ First, make sure you have the latest version of the celocli.
 npm uninstall -g @celo/celocli && npm install -g @celo/celocli
 ```
 
-At this point you should be able to continue the steps described in the [Running a Validator](running-a-validator.md) documentation page, starting at the [Register the Accounts](running-a-validator.md#register-the-accounts) section.
+At this point you should be able to continue the steps described in the [Running a Validator](running-a-validator.md) documentation page, starting at the [Register the Accounts](running-a-validator.md#register-the-accounts) section. Also remember to [register your Metadata](running-a-validator.md#registering-metadata) to be able to serve attestations and claim all your funds for the leaderboard.
 
 Note that if you were fauceted in phase 1.0 of The Great Celo Stakeoff, your accounts should have been included in the genesis block for subsequent phases, so you will not need to be fauceted again.

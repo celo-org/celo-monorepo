@@ -39,7 +39,7 @@ bash ./scripts/unlock.sh
 echo "Killing previous metro server (if any)"
 react-native-kill-packager || echo 'Failed to kill for some reason'
 echo "Start metro server"
-yarn start:bg
+yarn react-native start &
 
 
 echo "Waiting for device to connect to Wifi, this is a good proxy the device is ready"

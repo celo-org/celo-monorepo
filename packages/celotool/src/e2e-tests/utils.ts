@@ -203,7 +203,7 @@ async function setupTestDir(testDir: string) {
 function writeGenesis(validators: Validator[], path: string, configOverrides: any = {}) {
   const genesis = generateGenesis({
     validators,
-    blockTime: 0,
+    blockTime: 2, // Slow down block times to improve reliability.
     epoch: 10,
     lookbackwindow: 2,
     requestTimeout: 3000,
