@@ -3,7 +3,12 @@ import { ApolloError } from 'apollo-boost'
 import * as React from 'react'
 import { FlatList } from 'react-native'
 import { connect } from 'react-redux'
-import { Event, UserTransactionsData } from 'src/apollo/types'
+import {
+  ExchangeTransaction,
+  Transaction,
+  TransferTransaction,
+  UserTransactionsData,
+} from 'src/apollo/types'
 import { CURRENCY_ENUM, resolveCurrency } from 'src/geth/consts'
 import { AddressToE164NumberType } from 'src/identity/reducer'
 import { Invitees, SENTINEL_INVITE_COMMENT } from 'src/invite/actions'
@@ -54,7 +59,7 @@ const mapStateToProps = (state: RootState): StateProps => ({
   recipientCache: recipientCacheSelector(state),
 })
 
-function exchangeFilter(tx: Event) {
+function exchangeFilter(tx: Transaction) {
   return (
     tx !== null &&
     // Show exchange and gold transactions in exchange tab feed
@@ -62,7 +67,7 @@ function exchangeFilter(tx: Event) {
   )
 }
 
-function defaultFilter(tx: Event) {
+function defaultFilter(tx: Transaction) {
   return (
     tx !== null &&
     // Show exchange and stableToken transactions in home feed
@@ -71,11 +76,10 @@ function defaultFilter(tx: Event) {
 }
 
 export class TransactionFeed extends React.PureComponent<Props> {
-  // TODO(cmcewen): Clean this up. Standby txs should have the same data shape
   renderItem = (commentKeyBuffer: Buffer | null) => ({
     item: tx,
   }: {
-    item: Event | StandbyTransaction
+    item: ExchangeTransaction | TransferTransaction
     index: number
   }) => {
     const { kind, addressToE164Number, invitees, recipientCache } = this.props
@@ -83,7 +87,7 @@ export class TransactionFeed extends React.PureComponent<Props> {
     if (tx.type === TransactionTypes.EXCHANGE) {
       return (
         <ExchangeFeedItem
-          status={TransactionStatus.Complete}
+          status={tx.status ? tx.status : TransactionStatus.Complete}
           showGoldAmount={kind === FeedType.EXCHANGE}
           {...tx}
         />
@@ -100,9 +104,8 @@ export class TransactionFeed extends React.PureComponent<Props> {
         }
       }
       return (
-        // @ts-ignore
         <TransferFeedItem
-          status={TransactionStatus.Complete}
+          status={tx.status ? tx.status : TransactionStatus.Complete}
           invitees={invitees}
           addressToE164Number={addressToE164Number}
           recipientCache={recipientCache}
@@ -117,7 +120,7 @@ export class TransactionFeed extends React.PureComponent<Props> {
     }
   }
 
-  keyExtractor = (item: Event | StandbyTransaction) => {
+  keyExtractor = (item: Transaction) => {
     return item.hash + item.timestamp.toString()
   }
 
@@ -148,7 +151,7 @@ export class TransactionFeed extends React.PureComponent<Props> {
     const events = (data && data.events) || []
     const commentKeyBuffer = commentKey ? Buffer.from(commentKey, 'hex') : null
 
-    const queryDataTxIDs = new Set(events.map((event: Event) => event.hash))
+    const queryDataTxIDs = new Set(events.map((event: Transaction) => event.hash))
     const notInQueryTxs = (tx: StandbyTransaction) =>
       !queryDataTxIDs.has(tx.id) && tx.status !== TransactionStatus.Failed
     let filteredStandbyTxs = standbyTransactions.filter(notInQueryTxs)

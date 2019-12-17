@@ -4,12 +4,10 @@ import { Actions, ActionTypes } from 'src/transactions/actions'
 export interface ExchangeStandby extends ExchangeTransaction {
   id: string
   status: TransactionStatus
-  hash?: string
 }
 export interface TransferStandby extends TransferTransaction {
   id: string
   status: TransactionStatus
-  hash?: string
 }
 
 export type StandbyTransaction = ExchangeStandby | TransferStandby
