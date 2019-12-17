@@ -698,9 +698,9 @@ contract Validators is
     require(_group.members.numElements < maxGroupSize, "group would exceed maximum size");
     require(validators[validator].affiliation == group && !_group.members.contains(validator));
     uint256 numMembers = _group.members.numElements.add(1);
+    _group.members.push(validator);
     require(meetsAccountLockedGoldRequirements(group));
     require(meetsAccountLockedGoldRequirements(validator));
-    _group.members.push(validator);
     if (numMembers == 1) {
       getElection().markGroupEligible(group, lesser, greater);
     }
