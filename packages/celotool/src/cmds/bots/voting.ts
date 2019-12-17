@@ -40,23 +40,42 @@ export const handler = async function simulateVoting(argv: SimulateVotingArgv) {
     // Maybe this should even be variable, based on how "happy" the staker is with their current vote
     const changeVoteProbability = 1
 
-    // sort the validators into groups
-    const validatorGroupScores = new Map<string, BigNumber[]>()
+    // Determine which of the groups can accept more votes
+    const groupCapacities = new Map<string, BigNumber>()
+    for (const vgv of await election.getValidatorGroupsVotes()) {
+      if (vgv.eligible && vgv.capacity.isGreaterThan(0)) {
+        groupCapacities.set(vgv.address, vgv.capacity)
+      }
+    }
+    console.info(groupCapacities)
+
+    // Collect validator scores for each group
+    const groupScores = new Map<string, BigNumber[]>()
     for (const valSigner of await election.electValidatorSigners()) {
       const val = await validators.getValidatorFromSigner(valSigner)
       const groupAddress = val.affiliation!
-      validatorGroupScores.set(
-        groupAddress,
-        (validatorGroupScores.get(groupAddress) || []).concat(val.score)
-      )
+      if (groupScores.has(groupAddress)) {
+        groupScores.get(groupAddress)!.push(val.score)
+      } else {
+        groupScores.set(groupAddress, [val.score])
+      }
+    }
+    console.info(groupScores)
+
+    // Calculate scores for the group by averaging the collected scores
+    const groupAvgScores = new Map<string, BigNumber>()
+    for (const group of groupScores.keys()) {
+      const scores = groupScores.get(group)!
+      // This shouldn't end up being 0, but handle the edge case and avoid division by 0
+      if (scores.length > 0) {
+        const avg = scores.reduce((a, b) => a.plus(b), new BigNumber(0)).div(scores.length)
+        groupAvgScores.set(group, avg)
+      } else {
+        groupAvgScores.set(group, new BigNumber(0))
+      }
     }
 
-    const groupAvgScores = new Map<string, BigNumber>()
-    for (const group of validatorGroupScores.keys()) {
-      const scores = validatorGroupScores.get(group)!
-      const avg = scores.reduce((a, b) => a.plus(b), new BigNumber(0)).div(scores.length)
-      groupAvgScores.set(group, avg)
-    }
+    console.info(groupAvgScores)
 
     const sortedGroups = [...groupAvgScores.keys()].sort((a, b) => {
       return groupAvgScores.get(b)!.comparedTo(groupAvgScores.get(a)!)
@@ -76,8 +95,9 @@ export const handler = async function simulateVoting(argv: SimulateVotingArgv) {
         kit.addAccount(key)
         const account = privateKeyToAddress(key)
         console.info(`handling vote for ${account}`)
-        // const groupVotes = await election.getValidatorGroupsVotes()
-        // console.info(groupVotes)
+
+        // what groups did this account already vote for?
+        // const currentVotes = await election.getGroupsVotedForByAccount(account)
       }
       //    select new group, based on weighted probability of the "state of the world"
       //    cast new vote
