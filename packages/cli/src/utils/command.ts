@@ -4,6 +4,7 @@ import { URL_REGEX } from '@celo/utils/lib/io'
 import { flags } from '@oclif/command'
 import { CLIError } from '@oclif/errors'
 import { IArg, ParseFn } from '@oclif/parser/lib/args'
+import BigNumber from 'bignumber.js'
 import { pathExistsSync } from 'fs-extra'
 import Web3 from 'web3'
 
@@ -37,6 +38,14 @@ const parseAddress: ParseFn<string> = (input) => {
     return input
   } else {
     throw new CLIError(`${input} is not a valid address`)
+  }
+}
+
+const parseWei: ParseFn<BigNumber> = (input) => {
+  try {
+    return new BigNumber(input)
+  } catch (_err) {
+    throw new CLIError(`${input} is not a valid token amount`)
   }
 }
 
@@ -91,7 +100,12 @@ export const Flags = {
   url: flags.build({
     parse: parseUrl,
     description: 'URL',
-    helpValue: 'htttps://www.celo.org',
+    helpValue: 'https://www.celo.org',
+  }),
+  wei: flags.build({
+    parse: parseWei,
+    description: 'Token value without decimals',
+    helpValue: '10000000000000000000000',
   }),
 }
 
