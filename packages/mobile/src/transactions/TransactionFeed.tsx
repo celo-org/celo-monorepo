@@ -38,7 +38,7 @@ type Props = {
   error: ApolloError | undefined
   data: UserTransactionsData | undefined
   standbyTransactions: StandbyTransaction[]
-  standbyTransactionFilter?: (tx: StandbyTransaction) => boolean
+  transactionFilter?: (tx: StandbyTransaction) => boolean
 } & StateProps
 
 const mapStateToProps = (state: RootState): StateProps => ({
@@ -147,7 +147,7 @@ export class TransactionFeed extends React.PureComponent<Props> {
       error,
       data,
       standbyTransactions,
-      standbyTransactionFilter,
+      transactionFilter,
       commentKey,
     } = this.props
 
@@ -164,8 +164,8 @@ export class TransactionFeed extends React.PureComponent<Props> {
       !queryDataTxIDs.has(tx.id) && tx.status !== TransactionStatus.Failed
     let filteredStandbyTxs = standbyTransactions.filter(notInQueryTxs)
 
-    if (standbyTransactionFilter) {
-      filteredStandbyTxs = filteredStandbyTxs.filter(standbyTransactionFilter)
+    if (transactionFilter) {
+      filteredStandbyTxs = filteredStandbyTxs.filter(transactionFilter)
     }
 
     // TODO move filter to gql
