@@ -80,18 +80,26 @@ export class TransactionFeed extends React.PureComponent<Props> {
   }) => {
     const { kind, addressToE164Number, invitees, recipientCache } = this.props
 
-    if (tx.hasOwnProperty('comment')) {
-      // @ts-ignore
-      if (tx.comment === SENTINEL_INVITE_COMMENT) {
-        if (tx.type === TransactionTypes.SENT) {
-          tx.type = TransactionTypes.INVITE_SENT
-        } else if (tx.type === TransactionTypes.RECEIVED) {
-          tx.type = TransactionTypes.INVITE_RECEIVED
+    if (tx.type === TransactionTypes.EXCHANGE) {
+      return (
+        // @ts-ignore
+        <ExchangeFeedItem
+          status={TransactionStatus.Complete}
+          showGoldAmount={kind === FeedType.EXCHANGE}
+          {...tx}
+        />
+      )
+    } else if (isTransferType(tx.type)) {
+      // Identify invite txs
+      if (tx.hasOwnProperty('comment')) {
+        if (tx.comment === SENTINEL_INVITE_COMMENT) {
+          if (tx.type === TransactionTypes.SENT) {
+            tx.type = TransactionTypes.INVITE_SENT
+          } else if (tx.type === TransactionTypes.RECEIVED) {
+            tx.type = TransactionTypes.INVITE_RECEIVED
+          }
         }
       }
-    }
-
-    if (isTransferType(tx.type)) {
       return (
         // @ts-ignore
         <TransferFeedItem
@@ -104,16 +112,8 @@ export class TransactionFeed extends React.PureComponent<Props> {
           {...tx}
         />
       )
-    } else if (tx.type === TransactionTypes.EXCHANGE) {
-      return (
-        // @ts-ignore
-        <ExchangeFeedItem
-          status={TransactionStatus.Complete}
-          showGoldAmount={kind === FeedType.EXCHANGE}
-          {...tx}
-        />
-      )
     } else {
+      Logger.error('TransactionFeed', `Unexpected transaction type ${tx.type}`)
       return <React.Fragment />
     }
   }
