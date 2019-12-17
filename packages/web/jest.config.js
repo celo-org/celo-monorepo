@@ -9,6 +9,7 @@ module.exports = {
     },
   },
   moduleNameMapper: {
+    '^[./a-zA-Z0-9$_-]+\\.(png|jpg)$': '<rootDir>/__mocks__/ImageStub.ts',
     'src/(.*)$': '<rootDir>/src/$1',
   },
   preset: 'react-native-web',
