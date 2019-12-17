@@ -15,22 +15,22 @@ export default class ExchangeDollars extends BaseCommand {
       required: true,
       description: 'The value of Celo Dollars to exchange for Celo Gold',
     }),
-    for: Flags.wei({
-      required: true,
-      description: 'The minimum value of Celo Gold to receive in return',
+    forAtLeast: Flags.wei({
+      description: 'Optional, the minimum value of Celo Gold to receive in return',
     }),
   }
 
   static args = []
 
   static examples = [
-    'dollars --value 10000000000000 --for 50000000000000 --from 0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d',
+    'dollars --value 10000000000000 --from 0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d',
+    'dollars --value 10000000000000 --forAtLeast 50000000000000 --from 0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d',
   ]
 
   async run() {
     const res = this.parse(ExchangeDollars)
     const sellAmount = res.flags.value
-    const minBuyAmount = res.flags.for
+    const minBuyAmount = res.flags.forAtLeast
 
     this.kit.defaultAccount = res.flags.from
     const stableToken = await this.kit.contracts.getStableToken()

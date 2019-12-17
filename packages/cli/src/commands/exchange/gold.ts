@@ -12,16 +12,17 @@ export default class ExchangeGold extends BaseCommand {
       required: true,
       description: 'The value of Celo Gold to exchange for Celo Dollars',
     }),
-    for: Flags.wei({
-      required: true,
-      description: 'The minimum value of Celo Dollars to receive in return',
+    forAtLeast: Flags.wei({
+      required: false,
+      description: 'Optional, the minimum value of Celo Dollars to receive in return',
     }),
   }
 
   static args = []
 
   static examples = [
-    'gold --value 5000000000000 --for 100000000000000 --from 0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d',
+    'gold --value 5000000000000 --from 0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d',
+    'gold --value 5000000000000 --forAtLeast 100000000000000 --from 0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d',
   ]
 
   async run() {
