@@ -79,4 +79,12 @@ contract MockValidators is IValidators {
     }
     return numMembers;
   }
+
+  function groupMembershipAtBlock(address, uint256, uint256) external view returns (address) {
+    return address(0);
+  }
+
+  function halveSlashingMultiplier(address) external {}
+
+  function forceDeaffiliateIfValidator(address validator) external {}
 }
