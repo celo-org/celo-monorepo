@@ -31,6 +31,7 @@ interface AllButtonProps {
   iconRight?: React.ReactNode
   iconLeft?: React.ReactNode
   align?: 'center' | 'flex-start' | 'flex-end'
+  style?: TextStyle | TextStyle[]
 }
 
 type NakedProps = {
@@ -46,7 +47,6 @@ type PrimaryProps = {
 
 type InlineProps = {
   kind: BTN.INLINE
-  style?: TextStyle | TextStyle[]
 } & AllButtonProps
 
 type NavProps = {

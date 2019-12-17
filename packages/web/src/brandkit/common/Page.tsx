@@ -21,7 +21,7 @@ export const COLOR_PATH = `${ROOT}/color`
 
 export const TYPE_PATH = `${ROOT}/typography`
 
-// const IMAGERY_PATH = `${ROOT}/key-imagery`
+export const IMAGERY_PATH = `${ROOT}/key-imagery`
 export const ICONS_PATH = `${ROOT}/icons`
 
 const PAGES = [

@@ -32,7 +32,6 @@ export default class MyDocument extends Document {
     const page = context.renderPage()
     const styles = React.Children.toArray([
       // <style key={'normalize-style'} dangerouslySetInnerHTML={{ __html: normalizeNextElements }} />,
-      page.styles,
       getStyleElement(),
     ])
 

@@ -44,7 +44,7 @@ export default React.memo(
 )
 
 const Overview = withNamespaces(NameSpaces.brand)(
-  React.memo(function _Overview({ t, i18n }: I18nProps) {
+  React.memo(function _Overview({ t }: I18nProps) {
     return (
       <View>
         <PageHeadline
