@@ -29,7 +29,7 @@ describe('ExchangeFeedItem', () => {
         <ExchangeFeedItem
           status={TransactionStatus.Complete}
           __typename={EventTypeNames.Exchange}
-          type={'EXCHANGE' as TransactionTypes}
+          type={'EXCHANGE' as TransactionTypes.EXCHANGE}
           hash={'0x'}
           inValue={1}
           outValue={10}
