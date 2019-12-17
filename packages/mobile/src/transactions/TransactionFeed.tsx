@@ -57,6 +57,7 @@ const mapStateToProps = (state: RootState): StateProps => ({
 function exchangeFilter(tx: Event) {
   return (
     tx !== null &&
+    // Show exchange and gold transactions in exchange tab feed
     (tx.type === TransactionTypes.EXCHANGE || resolveCurrency(tx.symbol) === CURRENCY_ENUM.GOLD)
   )
 }
@@ -64,6 +65,7 @@ function exchangeFilter(tx: Event) {
 function defaultFilter(tx: Event) {
   return (
     tx !== null &&
+    // Show exchange and stableToken transactions in home feed
     (tx.type === TransactionTypes.EXCHANGE || resolveCurrency(tx.symbol) !== CURRENCY_ENUM.GOLD)
   )
 }
@@ -93,7 +95,6 @@ export class TransactionFeed extends React.PureComponent<Props> {
       return (
         // @ts-ignore
         <TransferFeedItem
-          // type={tx.type}
           status={TransactionStatus.Complete}
           invitees={invitees}
           addressToE164Number={addressToE164Number}
@@ -111,23 +112,6 @@ export class TransactionFeed extends React.PureComponent<Props> {
           {...tx}
         />
       )
-      /*
-    } else if (tx.type === TransactionTypes.EXCHANGE) {
-      return <ExchangeFeedItem showGoldAmount={kind === FeedType.EXCHANGE} {...tx} />
-
-       } else if (tx.type) {
-      return (
-        // @ts-ignore
-        <TransferFeedItem
-          recipientCache={recipientCache}
-          addressToE164Number={addressToE164Number}
-          invitees={invitees}
-          commentKey={commentKeyBuffer}
-          showLocalCurrency={kind === FeedType.HOME}
-          {...tx}
-        />
-      )
-      */
     } else {
       return <React.Fragment />
     }
