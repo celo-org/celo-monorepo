@@ -2253,6 +2253,7 @@ contract('Validators', (accounts: string[]) => {
       })
 
       it('should correctly get the group address for exact epoch numbers', async () => {
+        // Change to just loop over epochs from 0 - whatever and increase index every gap:
         for (let i = 0; i < membershipHistoryLength.toNumber(); i++) {
           assert.equal(
             await validators.groupMembershipInEpoch(validator, epochs[i][0], 1 + i),
