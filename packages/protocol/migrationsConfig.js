@@ -111,6 +111,7 @@ const DefaultConfig = {
     },
     membershipHistoryLength: 60,
     maxGroupSize: '5',
+    slashingPenaltyResetPeriod: 60 * 60 * 24 * 30, // 30 Days
 
     // We register a number of C-Labs groups to contain an initial set of validators to run the network.
     validatorKeys: [],
@@ -120,7 +121,6 @@ const DefaultConfig = {
     groupLockedGold: {
       value: '22000000000000000000000', // 22k gold per group
     },
-    slashingPenaltyResetPeriod: 60 * 60 * 24 * 30, // 30 Days
   },
 }
 

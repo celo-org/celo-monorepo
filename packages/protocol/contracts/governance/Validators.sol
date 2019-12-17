@@ -83,7 +83,7 @@ contract Validators is
   }
 
   struct SlashingInfo {
-    FixidityLib.Fraction penalty;
+    FixidityLib.Fraction multiplier;
     uint256 lastSlashed;
   }
 
@@ -114,7 +114,7 @@ contract Validators is
   ValidatorScoreParameters private validatorScoreParameters;
   uint256 public membershipHistoryLength;
   uint256 public maxGroupSize;
-  uint256 public slashingPenaltyResetPeriod;
+  uint256 public slashingMultiplierResetPeriod;
 
   event MaxGroupSizeSet(uint256 size);
   event ValidatorEpochPaymentSet(uint256 value);
@@ -169,7 +169,7 @@ contract Validators is
     uint256 validatorScoreExponent,
     uint256 validatorScoreAdjustmentSpeed,
     uint256 _membershipHistoryLength,
-    uint256 _slashingPenaltyResetPeriod,
+    uint256 _slashingMultiplierResetPeriod,
     uint256 _maxGroupSize
   ) external initializer {
     _transferOwnership(msg.sender);
@@ -179,7 +179,7 @@ contract Validators is
     setValidatorScoreParameters(validatorScoreExponent, validatorScoreAdjustmentSpeed);
     setMaxGroupSize(_maxGroupSize);
     setMembershipHistoryLength(_membershipHistoryLength);
-    setSlashingMultiplierResetPeriod(_slashingPenaltyResetPeriod);
+    setSlashingMultiplierResetPeriod(_slashingMultiplierResetPeriod);
   }
 
   /**
@@ -855,7 +855,7 @@ contract Validators is
       group.members.getKeys(),
       group.commission.unwrap(),
       group.sizeHistory,
-      group.slashInfo.penalty.unwrap(),
+      group.slashInfo.multiplier.unwrap(),
       group.slashInfo.lastSlashed
     );
   }
@@ -1153,7 +1153,7 @@ contract Validators is
    * @param value New reset period for slashing multiplier.
    */
   function setSlashingMultiplierResetPeriod(uint256 value) public nonReentrant onlyOwner {
-    slashingPenaltyResetPeriod = value;
+    slashingMultiplierResetPeriod = value;
   }
 
   /**
@@ -1165,10 +1165,10 @@ contract Validators is
     require(isValidatorGroup(account));
     ValidatorGroup storage group = groups[account];
     require(
-      now >= group.slashInfo.lastSlashed.add(slashingPenaltyResetPeriod),
+      now >= group.slashInfo.lastSlashed.add(slashingMultiplierResetPeriod),
       "`resetSlashingMultiplier` called before resetPeriod expired"
     );
-    group.slashInfo.penalty = FixidityLib.fixed1();
+    group.slashInfo.multiplier = FixidityLib.fixed1();
   }
 
   bytes32[] canHalveSlashingMultiplier = [
@@ -1187,7 +1187,7 @@ contract Validators is
   {
     require(isValidatorGroup(account));
     ValidatorGroup storage group = groups[account];
-    group.slashInfo.penalty = FixidityLib.wrap(group.slashInfo.penalty.unwrap().div(2));
+    group.slashInfo.multiplier = FixidityLib.wrap(group.slashInfo.multiplier.unwrap().div(2));
     group.slashInfo.lastSlashed = now;
   }
 
@@ -1198,6 +1198,6 @@ contract Validators is
   function getValidatorGroupSlashingMultiplier(address account) external view returns (uint256) {
     require(isValidatorGroup(account));
     ValidatorGroup storage group = groups[account];
-    return group.slashInfo.penalty.unwrap();
+    return group.slashInfo.multiplier.unwrap();
   }
 }
