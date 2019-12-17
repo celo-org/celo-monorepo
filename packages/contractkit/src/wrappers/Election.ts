@@ -5,7 +5,7 @@ import BigNumber from 'bignumber.js'
 import { EventLog } from 'web3/types'
 import { Address, NULL_ADDRESS } from '../base'
 import { Election } from '../generated/types/Election'
-import { ValidatorGroup } from './Validators'
+import { Validator, ValidatorGroup } from './Validators'
 
 import {
   BaseWrapper,
@@ -36,6 +36,7 @@ export interface VoterReward {
   address: Address
   addressPayment: BigNumber
   group: ValidatorGroup
+  validators: Validator[]
   epochNumber: number
 }
 
@@ -48,6 +49,7 @@ export interface GroupVote {
 export interface GroupVoterReward {
   group: ValidatorGroup
   groupVoterPayment: BigNumber
+  validators: Validator[]
   epochNumber: number
 }
 
@@ -385,11 +387,18 @@ export class ElectionWrapper extends BaseWrapper<Election> {
     const validatorGroup: ValidatorGroup[] = await concurrentMap(10, events, (e: EventLog) =>
       validators.getValidatorGroup(e.returnValues.group, true, blockNumber)
     )
+    const signers = await this.getCurrentValidatorSigners()
+    const electedValidators = await concurrentMap(10, signers, (addr) =>
+      validators.getValidatorFromSigner(addr)
+    )
     return events.map(
       (e: EventLog, index: number): GroupVoterReward => ({
         epochNumber,
         group: validatorGroup[index],
         groupVoterPayment: e.returnValues.value,
+        validators: electedValidators.filter((vali) =>
+          eqAddress(vali.affiliation || '', e.returnValues.group)
+        ),
       })
     )
   }
@@ -427,6 +436,7 @@ export class ElectionWrapper extends BaseWrapper<Election> {
         ),
         group: e.group,
         epochNumber: e.epochNumber,
+        validators: e.validators,
       })
     )
   }

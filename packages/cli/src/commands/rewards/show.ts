@@ -1,7 +1,8 @@
 import { GroupVoterReward, VoterReward } from '@celo/contractkit/lib/wrappers/Election'
-import { ValidatorReward } from '@celo/contractkit/lib/wrappers/Validators'
+import { Validator, ValidatorReward } from '@celo/contractkit/lib/wrappers/Validators'
 import { eqAddress } from '@celo/utils/lib/address'
 import { flags } from '@oclif/command'
+import BigNumber from 'bignumber.js'
 import { cli } from 'cli-ux'
 import { BaseCommand } from '../../base'
 import { newCheckBuilder } from '../../utils/checks'
@@ -61,11 +62,6 @@ export default class Show extends BaseCommand {
       epochNumber <= currentEpoch;
       epochNumber++
     ) {
-      const epochValidatorRewards: ValidatorReward[] =
-        !filter || res.flags.validator || res.flags.group
-          ? await validators.getValidatorRewards(epochNumber)
-          : []
-
       if (!filter) {
         const epochoGroupVoterRewards = await election.getGroupVoterRewards(epochNumber)
         groupVoterRewards = groupVoterRewards.concat(epochoGroupVoterRewards)
@@ -75,26 +71,32 @@ export default class Show extends BaseCommand {
         voterRewards = voterRewards.concat(epochVoterRewards)
       }
 
-      if (!filter || res.flags.validator) {
-        const address = res.flags.validator
-        validatorRewards = validatorRewards.concat(
-          address
-            ? epochValidatorRewards.filter((e: ValidatorReward) =>
-                eqAddress(e.validator.address, address)
-              )
-            : epochValidatorRewards
+      if (!filter || res.flags.validator || res.flags.group) {
+        const epochValidatorRewards: ValidatorReward[] = await validators.getValidatorRewards(
+          epochNumber
         )
-      }
 
-      if (!filter || res.flags.group) {
-        const address = res.flags.group
-        validatorGroupRewards = validatorGroupRewards.concat(
-          address
-            ? epochValidatorRewards.filter((e: ValidatorReward) =>
-                eqAddress(e.group.address, address)
-              )
-            : epochValidatorRewards
-        )
+        if (!filter || res.flags.validator) {
+          const address = res.flags.validator
+          validatorRewards = validatorRewards.concat(
+            address
+              ? epochValidatorRewards.filter((e: ValidatorReward) =>
+                  eqAddress(e.validator.address, address)
+                )
+              : epochValidatorRewards
+          )
+        }
+
+        if (!filter || res.flags.group) {
+          const address = res.flags.group
+          validatorGroupRewards = validatorGroupRewards.concat(
+            address
+              ? epochValidatorRewards.filter((e: ValidatorReward) =>
+                  eqAddress(e.group.address, address)
+                )
+              : epochValidatorRewards
+          )
+        }
       }
     }
 
@@ -117,6 +119,12 @@ export default class Show extends BaseCommand {
           address: {},
           addressPayment: {},
           group: { get: (e) => e.group.address },
+          averageValidatorScore: {
+            get: (e: VoterReward) =>
+              e.validators
+                .reduce((sum: BigNumber, vali: Validator) => sum.plus(vali.score), new BigNumber(0))
+                .dividedBy(e.validators.length || 1),
+          },
           epochNumber: {},
         },
         { 'no-truncate': !res.flags.truncate }
@@ -130,6 +138,12 @@ export default class Show extends BaseCommand {
           groupName: { get: (e) => e.group.name },
           group: { get: (e) => e.group.address },
           groupVoterPayment: {},
+          averageValidatorScore: {
+            get: (e: GroupVoterReward) =>
+              e.validators
+                .reduce((sum: BigNumber, vali: Validator) => sum.plus(vali.score), new BigNumber(0))
+                .dividedBy(e.validators.length || 1),
+          },
           epochNumber: {},
         },
         { 'no-truncate': !res.flags.truncate }
