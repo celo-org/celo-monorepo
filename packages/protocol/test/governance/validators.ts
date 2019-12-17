@@ -1546,7 +1546,7 @@ contract('Validators', (accounts: string[]) => {
               await validators.affiliate(group, { from: validator2 })
             })
 
-            it('should succeed', async () => {
+            it('should revert', async () => {
               await assertRevert(validators.addMember(validator2))
             })
           })
