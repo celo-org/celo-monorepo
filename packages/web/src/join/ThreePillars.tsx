@@ -108,7 +108,6 @@ class Animation extends React.PureComponent<ScreenProps> {
           <View
             style={[
               styles.movingCoin,
-              // @ts-ignore
               { mixBlendMode: 'multiply', top: coinsSize / 3, left: (-coinsSize * ratio) / 6 },
             ]}
           >
@@ -123,7 +122,7 @@ class Animation extends React.PureComponent<ScreenProps> {
           <View
             style={[
               styles.movingCoin,
-              // @ts-ignore - mixBlendMode get stripped out when used in stylesheet
+              // mixBlendMode get stripped out when used in stylesheet
               { mixBlendMode: 'multiply', top: 0 },
             ]}
           >
@@ -137,7 +136,6 @@ class Animation extends React.PureComponent<ScreenProps> {
           <View
             style={[
               styles.movingCoin,
-              // @ts-ignore
               { mixBlendMode: 'multiply', top: -coinsSize / 2, left: (coinsSize * ratio) / 3 },
             ]}
           >
