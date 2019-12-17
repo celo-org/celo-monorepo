@@ -159,6 +159,12 @@ contract UsingPrecompiles {
 
   function getEpochSigner(uint256 epoch, uint256 index) public view returns (address) {}
 
+  function validatorSignerAddress(uint256 index, uint256 blockNumber)
+    public
+    view
+    returns (address)
+  {}
+
   function numberValidators(uint256 blockNumber) public view returns (uint256) {}
 
 }

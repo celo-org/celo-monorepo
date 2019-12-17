@@ -5,7 +5,10 @@ import "../DoubleSigningSlasher.sol";
 contract SlashingTestUtils {
   mapping(bytes32 => bytes32) parentHash;
   mapping(bytes32 => bytes32) verifiedSealBitmap;
+  mapping(uint256 => bytes32) parentSealBitmap;
   mapping(bytes32 => address) epochSigner;
+
+  uint256 numValidators;
 
   function setParentHashFromHeader(bytes memory header, bytes32 _parentHash) public {
     parentHash[keccak256(abi.encodePacked(header))] = _parentHash;
@@ -25,7 +28,13 @@ contract SlashingTestUtils {
 
   function getSealBitmap(uint256 blockNumber) public view returns (bytes32) {}
 
-  function getParentSealBitmap(uint256 blockNumber) public view returns (bytes32) {}
+  function getParentSealBitmap(uint256 blockNumber) public view returns (bytes32) {
+    return parentSealBitmap[blockNumber];
+  }
+
+  function setParentSealBitmap(uint256 blockNumber, bytes32 bitmap) public {
+    parentSealBitmap[blockNumber] = bitmap;
+  }
 
   function setEpochSigner(uint256 epoch, uint256 index, address signer) public {
     epochSigner[keccak256(abi.encodePacked(epoch, index))] = signer;
@@ -35,7 +44,13 @@ contract SlashingTestUtils {
     return epochSigner[keccak256(abi.encodePacked(epoch, index))];
   }
 
-  uint256 numValidators;
+  function validatorSignerAddress(uint256 index, uint256 blockNumber)
+    public
+    view
+    returns (address)
+  {
+    return epochSigner[keccak256(abi.encodePacked(blockNumber / 100, index))];
+  }
 
   function setNumberValidators(uint256 num) public {
     numValidators = num;
