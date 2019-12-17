@@ -1,14 +1,14 @@
 import BigNumber from 'bignumber.js'
-
 import { ContractKit } from '@celo/contractkit'
 import { ClaimTypes, IdentityMetadataWrapper } from '@celo/contractkit/lib/identity'
 import { verifyAccountClaim } from '@celo/contractkit/lib/identity/claims/verify'
-import { ensureHexLeader } from '@celo/utils/src/address'
-import { notEmpty } from '@celo/utils/src/collections'
+import { ensureHexLeader } from '@celo/utils/lib/address'
+import { notEmpty } from '@celo/utils/lib/collections'
 
 import { BaseCommand } from '../../base'
 import { printValueMap } from '../../utils/cli'
 import { Args } from '../../utils/command'
+import { AccountClaim } from '@celo/contractkit/lib/identity/claims/account'
 
 async function getMetadata(kit: ContractKit, address: string) {
   const accounts = await kit.contracts.getAccounts()
@@ -28,16 +28,13 @@ async function getClaims(
   data: IdentityMetadataWrapper
 ): Promise<string[]> {
   const accounts = await kit.contracts.getAccounts()
-  const res = (await Promise.all(
-    data
-      .filterClaims(ClaimTypes.ACCOUNT)
-      .map(
-        async (claim) =>
-          (await verifyAccountClaim(claim, ensureHexLeader(address), accounts.getMetadataURL))
-            ? null
-            : claim.address
-      )
-  )).filter(notEmpty)
+  const getClaim = async (claim: AccountClaim) => {
+    const error = await verifyAccountClaim(claim, ensureHexLeader(address), accounts.getMetadataURL)
+    return error ? null : claim.address.toLowerCase()
+  }
+  const res = (await Promise.all(data.filterClaims(ClaimTypes.ACCOUNT).map(getClaim))).filter(
+    notEmpty
+  )
   res.push(address)
   return dedup(res)
 }
