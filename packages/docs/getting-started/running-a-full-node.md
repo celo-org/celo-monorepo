@@ -53,7 +53,7 @@ In this step, you'll create an account on the network. If you've already done th
 Run the command to create a new account:
 
 ```bash
-docker run -v $PWD:/root/.celo -it $CELO_IMAGE account new
+docker run -v $PWD:/root/.celo --rm -it $CELO_IMAGE account new
 ```
 
 It will prompt you for a passphrase, ask you to confirm it, and then will output your account address: `Address: {<YOUR-ACCOUNT-ADDRESS>}`
@@ -71,7 +71,7 @@ _Note: this environment variable will only persist while you have this terminal 
 The genesis block is the first block in the chain, and is specific to each network. This command gets the `genesis.json` file for baklava and uses it to initialize your nodes' data directory.
 
 ```bash
-docker run -v $PWD:/root/.celo $CELO_IMAGE init /celo/genesis.json
+docker run -v $PWD:/root/.celo --rm $CELO_IMAGE init /celo/genesis.json
 ```
 
 In order to allow the node to sync with the network, get the enode URLs of the bootnodes:
