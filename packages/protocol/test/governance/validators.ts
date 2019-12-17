@@ -746,9 +746,9 @@ contract('Validators', (accounts: string[]) => {
             await validators.removeMember(validator, { from: group })
           })
 
-          describe('when it has been `validatorLockedGoldRequirements.duration` since the validator was removed from the group', () => {
+          describe('when it has been more than `validatorLockedGoldRequirements.duration` since the validator was removed from the group', () => {
             beforeEach(async () => {
-              await timeTravel(validatorLockedGoldRequirements.duration.toNumber(), web3)
+              await timeTravel(validatorLockedGoldRequirements.duration.plus(1).toNumber(), web3)
               resp = await validators.deregisterValidator(index)
             })
 
