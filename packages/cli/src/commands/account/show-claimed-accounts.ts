@@ -7,6 +7,8 @@ import { verifyAccountClaim } from '@celo/contractkit/lib/identity/claims/verify
 import { BaseCommand } from '../../base'
 import { printValueMap } from '../../utils/cli'
 import { Args } from '../../utils/command'
+import { ensureHexLeader } from '@celo/utils/src/address'
+import { notEmpty } from '@celo/utils/src/collections'
 
 async function getMetadata(kit: ContractKit, address: string) {
   const accounts = await kit.contracts.getAccounts()
@@ -25,26 +27,18 @@ async function getClaims(
   address: string,
   data: IdentityMetadataWrapper
 ): Promise<string[]> {
-  if (address.substr(0, 2) === '0x') {
-    address = address.substr(2)
-  }
-  const res = [address]
   const accounts = await kit.contracts.getAccounts()
-  for (const claim of data.claims) {
-    switch (claim.type) {
-      case ClaimTypes.KEYBASE:
-        break
-      case ClaimTypes.ACCOUNT:
-        const status = await verifyAccountClaim(claim, '0x' + address, accounts.getMetadataURL)
-        if (status) console.error('Cannot verify claim:', status)
-        else {
-          console.log('Claim success', address, claim.address)
-          res.push(claim.address)
-        }
-      default:
-        break
-    }
-  }
+  const res = (await Promise.all(
+    data
+      .filterClaims(ClaimTypes.ACCOUNT)
+      .map(
+        async (claim) =>
+          (await verifyAccountClaim(claim, ensureHexLeader(address), accounts.getMetadataURL))
+            ? null
+            : claim.address
+      )
+  )).filter(notEmpty)
+  res.push(address)
   return dedup(res)
 }
 
