@@ -452,6 +452,7 @@ exports[`InviteReview renders correctly 1`] = `
                         style={
                           Object {
                             "height": 12,
+                            "tintColor": "#42D689",
                             "width": 12,
                           }
                         }
