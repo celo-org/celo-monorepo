@@ -3,7 +3,7 @@ import { ApolloError } from 'apollo-boost'
 import * as React from 'react'
 import { FlatList } from 'react-native'
 import { connect } from 'react-redux'
-import { Event, EventTypeNames, UserTransactionsData } from 'src/apollo/types'
+import { Event, UserTransactionsData } from 'src/apollo/types'
 import { CURRENCY_ENUM, resolveCurrency } from 'src/geth/consts'
 import { AddressToE164NumberType } from 'src/identity/reducer'
 import { Invitees, SENTINEL_INVITE_COMMENT } from 'src/invite/actions'
@@ -12,7 +12,12 @@ import { recipientCacheSelector } from 'src/recipients/reducer'
 import { RootState } from 'src/redux/reducers'
 import ExchangeFeedItem from 'src/transactions/ExchangeFeedItem'
 import NoActivity from 'src/transactions/NoActivity'
-import { StandbyTransaction, TransactionStatus, TransactionTypes } from 'src/transactions/reducer'
+import {
+  isTransferType,
+  StandbyTransaction,
+  TransactionStatus,
+  TransactionTypes,
+} from 'src/transactions/reducer'
 import TransferFeedItem from 'src/transactions/TransferFeedItem'
 import Logger from 'src/utils/Logger'
 import { privateCommentKeySelector } from 'src/web3/selectors'
@@ -52,14 +57,14 @@ const mapStateToProps = (state: RootState): StateProps => ({
 function exchangeFilter(tx: Event) {
   return (
     tx !== null &&
-    (tx.__typename === EventTypeNames.Exchange || resolveCurrency(tx.symbol) === CURRENCY_ENUM.GOLD)
+    (tx.type === TransactionTypes.EXCHANGE || resolveCurrency(tx.symbol) === CURRENCY_ENUM.GOLD)
   )
 }
 
 function defaultFilter(tx: Event) {
   return (
     tx !== null &&
-    (tx.__typename === EventTypeNames.Exchange || resolveCurrency(tx.symbol) !== CURRENCY_ENUM.GOLD)
+    (tx.type === TransactionTypes.EXCHANGE || resolveCurrency(tx.symbol) !== CURRENCY_ENUM.GOLD)
   )
 }
 
@@ -84,11 +89,11 @@ export class TransactionFeed extends React.PureComponent<Props> {
       }
     }
 
-    // @ts-ignore
-    if (tx.__typename && tx.__typename === EventTypeNames.Transfer) {
+    if (isTransferType(tx.type)) {
       return (
         // @ts-ignore
         <TransferFeedItem
+          // type={tx.type}
           status={TransactionStatus.Complete}
           invitees={invitees}
           addressToE164Number={addressToE164Number}
@@ -98,20 +103,19 @@ export class TransactionFeed extends React.PureComponent<Props> {
           {...tx}
         />
       )
-      // @ts-ignore
-    } else if (tx.__typename && tx.__typename === EventTypeNames.Exchange) {
+    } else if (tx.type === TransactionTypes.EXCHANGE) {
       return (
-        // @ts-ignore
         <ExchangeFeedItem
           status={TransactionStatus.Complete}
           showGoldAmount={kind === FeedType.EXCHANGE}
           {...tx}
         />
       )
-    } else if (tx.type && tx.type === TransactionTypes.EXCHANGE) {
-      // @ts-ignore
+      /*
+    } else if (tx.type === TransactionTypes.EXCHANGE) {
       return <ExchangeFeedItem showGoldAmount={kind === FeedType.EXCHANGE} {...tx} />
-    } else if (tx.type) {
+
+       } else if (tx.type) {
       return (
         // @ts-ignore
         <TransferFeedItem
@@ -123,6 +127,7 @@ export class TransactionFeed extends React.PureComponent<Props> {
           {...tx}
         />
       )
+      */
     } else {
       return <React.Fragment />
     }

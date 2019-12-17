@@ -153,7 +153,9 @@ export function parsePhoneNumber(
         }
       : null
   } catch (error) {
-    console.debug(`phoneNumbers/parsePhoneNumber/Failed to parse phone number, error: ${error}`)
+    console.debug(
+      `phoneNumbers/parsePhoneNumber/Failed to parse phone number ${phoneNumberRaw}, error: ${error}`
+    )
     return null
   }
 }

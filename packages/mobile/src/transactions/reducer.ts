@@ -49,7 +49,7 @@ export enum TransactionTypes {
   NETWORK_FEE = 'NETWORK_FEE',
 }
 
-type TransferTransactionTypes =
+export type TransferTransactionTypes =
   | TransactionTypes.SENT
   | TransactionTypes.RECEIVED
   | TransactionTypes.ESCROW_RECEIVED
@@ -60,6 +60,24 @@ type TransferTransactionTypes =
   | TransactionTypes.INVITE_SENT
   | TransactionTypes.INVITE_RECEIVED
   | TransactionTypes.NETWORK_FEE
+
+export const isTransferType = (txType: TransactionTypes) => {
+  if (
+    txType === TransactionTypes.SENT ||
+    txType === TransactionTypes.RECEIVED ||
+    txType === TransactionTypes.ESCROW_RECEIVED ||
+    txType === TransactionTypes.ESCROW_SENT ||
+    txType === TransactionTypes.FAUCET ||
+    txType === TransactionTypes.VERIFICATION_REWARD ||
+    txType === TransactionTypes.VERIFICATION_FEE ||
+    txType === TransactionTypes.INVITE_SENT ||
+    txType === TransactionTypes.INVITE_RECEIVED ||
+    txType === TransactionTypes.NETWORK_FEE
+  ) {
+    return true
+  }
+  return false
+}
 
 export interface State {
   standbyTransactions: StandbyTransaction[]
