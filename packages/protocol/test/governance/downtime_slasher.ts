@@ -172,7 +172,7 @@ contract('DowntimeSlasher', (accounts: string[]) => {
       blockNumber = await web3.eth.getBlockNumber()
       endBlock = blockNumber - 10
       await slasher.setSlashableDowntime(2)
-      let epoch = Math.floor(blockNumber / EPOCH)
+      const epoch = Math.floor(blockNumber / EPOCH)
       await slasher.setEpochSigner(epoch, validatorIndex, validator)
       await slasher.setEpochSigner(epoch - 1, validatorIndex, validator)
       await slasher.setEpochSigner(epoch + 1, validatorIndex, validator)
