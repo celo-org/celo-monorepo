@@ -119,12 +119,7 @@ export default class Show extends BaseCommand {
           address: {},
           addressPayment: {},
           group: { get: (e) => e.group.address },
-          averageValidatorScore: {
-            get: (e: VoterReward) =>
-              e.validators
-                .reduce((sum: BigNumber, vali: Validator) => sum.plus(vali.score), new BigNumber(0))
-                .dividedBy(e.validators.length || 1),
-          },
+          averageValidatorScore: { get: (e) => averageValidatorScore(e.validators).toFixed() },
           epochNumber: {},
         },
         { 'no-truncate': !res.flags.truncate }
@@ -138,12 +133,7 @@ export default class Show extends BaseCommand {
           groupName: { get: (e) => e.group.name },
           group: { get: (e) => e.group.address },
           groupVoterPayment: {},
-          averageValidatorScore: {
-            get: (e: GroupVoterReward) =>
-              e.validators
-                .reduce((sum: BigNumber, vali: Validator) => sum.plus(vali.score), new BigNumber(0))
-                .dividedBy(e.validators.length || 1),
-          },
+          averageValidatorScore: { get: (e) => averageValidatorScore(e.validators).toFixed() },
           epochNumber: {},
         },
         { 'no-truncate': !res.flags.truncate }
@@ -214,4 +204,10 @@ export default class Show extends BaseCommand {
       console.info('No rewards.')
     }
   }
+}
+
+function averageValidatorScore(validators: Validator[]): BigNumber {
+  return validators
+    .reduce((sumScore: BigNumber, vali: Validator) => sumScore.plus(vali.score), new BigNumber(0))
+    .dividedBy(validators.length || 1)
 }
