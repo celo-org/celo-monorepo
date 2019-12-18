@@ -87,4 +87,7 @@ contract MockValidators is IValidators {
   function halveSlashingMultiplier(address) external {}
 
   function forceDeaffiliateIfValidator(address validator) external {}
+  function getValidatorGroupSlashingMultiplier(address) external view returns (uint256) {
+    return FIXED1_UINT;
+  }
 }

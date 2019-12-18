@@ -55,6 +55,8 @@ const parseValidatorGroupParams = (groupParams: any) => {
     members: groupParams[0],
     commission: groupParams[1],
     sizeHistory: groupParams[2],
+    slashingMultiplier: groupParams[3],
+    lastSlashed: groupParams[4],
   }
 }
 
@@ -91,6 +93,7 @@ contract('Validators', (accounts: string[]) => {
     exponent: new BigNumber(5),
     adjustmentSpeed: toFixed(0.25),
   }
+  const slashingMultiplierResetPeriod = 30 * DAY
   const membershipHistoryLength = new BigNumber(5)
   const maxGroupSize = new BigNumber(5)
 
@@ -124,6 +127,7 @@ contract('Validators', (accounts: string[]) => {
       validatorScoreParameters.exponent,
       validatorScoreParameters.adjustmentSpeed,
       membershipHistoryLength,
+      slashingMultiplierResetPeriod,
       maxGroupSize
     )
   })
@@ -142,13 +146,16 @@ contract('Validators', (accounts: string[]) => {
     )
   }
 
-  const registerValidatorGroup = async (group: string) => {
-    await mockLockedGold.setAccountTotalLockedGold(group, groupLockedGoldRequirements.value)
+  const registerValidatorGroup = async (group: string, numMembers: number = 1) => {
+    await mockLockedGold.setAccountTotalLockedGold(
+      group,
+      groupLockedGoldRequirements.value.times(numMembers)
+    )
     await validators.registerValidatorGroup(commission, { from: group })
   }
 
   const registerValidatorGroupWithMembers = async (group: string, members: string[]) => {
-    await registerValidatorGroup(group)
+    await registerValidatorGroup(group, members.length)
     for (const validator of members) {
       await registerValidator(validator)
       await validators.affiliate(group, { from: validator })
@@ -205,6 +212,7 @@ contract('Validators', (accounts: string[]) => {
           validatorScoreParameters.exponent,
           validatorScoreParameters.adjustmentSpeed,
           membershipHistoryLength,
+          slashingMultiplierResetPeriod,
           maxGroupSize
         )
       )
@@ -774,9 +782,9 @@ contract('Validators', (accounts: string[]) => {
             })
           })
 
-          describe('when it has been `validatorLockedGoldRequirements.duration` since the validator was removed from the group', () => {
+          describe('when it has been less than `validatorLockedGoldRequirements.duration` since the validator was removed from the group', () => {
             beforeEach(async () => {
-              await timeTravel(validatorLockedGoldRequirements.duration.toNumber(), web3)
+              await timeTravel(validatorLockedGoldRequirements.duration.minus(1).toNumber(), web3)
             })
 
             it('should revert', async () => {
@@ -1518,15 +1526,34 @@ contract('Validators', (accounts: string[]) => {
         })
 
         describe('when the group does not meet the locked gold requirements', () => {
-          beforeEach(async () => {
-            await mockLockedGold.setAccountTotalLockedGold(
-              group,
-              groupLockedGoldRequirements.value.minus(1)
-            )
+          describe('when the group does not have a member', () => {
+            beforeEach(async () => {
+              await mockLockedGold.setAccountTotalLockedGold(
+                group,
+                groupLockedGoldRequirements.value.minus(1)
+              )
+            })
+
+            it('should revert', async () => {
+              await assertRevert(validators.addFirstMember(validator, NULL_ADDRESS, NULL_ADDRESS))
+            })
           })
 
-          it('should revert', async () => {
-            await assertRevert(validators.addFirstMember(validator, NULL_ADDRESS, NULL_ADDRESS))
+          describe('when the group already has a member', () => {
+            const validator2 = accounts[2]
+            beforeEach(async () => {
+              await mockLockedGold.setAccountTotalLockedGold(
+                group,
+                groupLockedGoldRequirements.value.times(2).minus(1)
+              )
+              await validators.addFirstMember(validator, NULL_ADDRESS, NULL_ADDRESS)
+              await registerValidator(validator2)
+              await validators.affiliate(group, { from: validator2 })
+            })
+
+            it('should revert', async () => {
+              await assertRevert(validators.addMember(validator2))
+            })
           })
         })
       })
@@ -2182,6 +2209,86 @@ contract('Validators', (accounts: string[]) => {
     describe('when the sender is not an approved address', async () => {
       it('should revert', async () => {
         await assertRevert(validators.forceDeaffiliateIfValidator(validator))
+      })
+    })
+  })
+
+  describe('#halveSlashingMultiplier', async () => {
+    const group = accounts[1]
+
+    beforeEach(async () => {
+      await registerValidatorGroup(group)
+    })
+
+    describe('when run from an approved address', async () => {
+      beforeEach(async () => {
+        await registry.setAddressFor(CeloContractName.DowntimeSlasher, accounts[2])
+      })
+
+      it('should halve the slashing multiplier of a group', async () => {
+        let multiplier = 1.0
+        for (let i = 0; i < 10; i++) {
+          await validators.halveSlashingMultiplier(group, { from: accounts[2] })
+          multiplier /= 2
+          const parsedGroup = parseValidatorGroupParams(await validators.getValidatorGroup(group))
+          assertEqualBN(parsedGroup.slashingMultiplier, toFixed(multiplier))
+        }
+      })
+
+      it('should update `lastSlashed timestamp', async () => {
+        let parsedGroup = parseValidatorGroupParams(await validators.getValidatorGroup(group))
+        const initialTimestamp = parsedGroup.lastSlashed
+        await validators.halveSlashingMultiplier(group, { from: accounts[2] })
+        parsedGroup = parseValidatorGroupParams(await validators.getValidatorGroup(group))
+        assert(parsedGroup.lastSlashed > initialTimestamp)
+      })
+    })
+
+    describe('when called from an unapproved address', async () => {
+      it('should revert', async () => {
+        await assertRevert(validators.halveSlashingMultiplier(group))
+      })
+    })
+  })
+
+  describe('#resetSlashingMultiplier', async () => {
+    const validator = accounts[0]
+    const group = accounts[1]
+
+    beforeEach(async () => {
+      await registerValidator(validator)
+      await registerValidatorGroup(group)
+      await validators.affiliate(group)
+      await registry.setAddressFor(CeloContractName.DowntimeSlasher, accounts[2])
+      await validators.halveSlashingMultiplier(group, { from: accounts[2] })
+      const parsedGroup = parseValidatorGroupParams(await validators.getValidatorGroup(group))
+      assertEqualBN(parsedGroup.slashingMultiplier, toFixed(0.5))
+    })
+
+    describe('when the slashing multiplier is reset after reset period', async () => {
+      it('should return to default 1.0', async () => {
+        await timeTravel(slashingMultiplierResetPeriod, web3)
+        await validators.resetSlashingMultiplier({ from: group })
+        const parsedGroup = parseValidatorGroupParams(await validators.getValidatorGroup(group))
+        assertEqualBN(parsedGroup.slashingMultiplier, toFixed(1))
+      })
+    })
+
+    describe('when the slashing multiplier is reset before reset period', async () => {
+      it('should revert', async () => {
+        await timeTravel(slashingMultiplierResetPeriod - 1, web3)
+        await assertRevert(validators.resetSlashingMultiplier({ from: group }))
+      })
+    })
+
+    describe('when the slashing reset period is changed', async () => {
+      it('should be read properly', async () => {
+        const newPeriod = 60 * 60 * 24 * 10 // 10 days
+        await validators.setSlashingMultiplierResetPeriod(newPeriod)
+        await timeTravel(newPeriod, web3)
+        await validators.resetSlashingMultiplier({ from: group })
+        const parsedGroup = parseValidatorGroupParams(await validators.getValidatorGroup(group))
+        assertEqualBN(parsedGroup.slashingMultiplier, toFixed(1))
       })
     })
   })

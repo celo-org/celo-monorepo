@@ -13,6 +13,7 @@ import "../governance/interfaces/IValidators.sol";
 
 import "../identity/interfaces/IRandom.sol";
 
+import "../stability/interfaces/IReserve.sol";
 import "../stability/interfaces/ISortedOracles.sol";
 import "../stability/interfaces/IStableToken.sol";
 
@@ -101,6 +102,10 @@ contract UsingRegistry is Ownable {
 
   function getRandom() internal view returns (IRandom) {
     return IRandom(registry.getAddressForOrDie(RANDOM_REGISTRY_ID));
+  }
+
+  function getReserve() internal view returns (IReserve) {
+    return IReserve(registry.getAddressForOrDie(RESERVE_REGISTRY_ID));
   }
 
   function getSortedOracles() internal view returns (ISortedOracles) {
