@@ -13,3 +13,5 @@ console.error = (message) => {
 Math.random = function random() {
   return 0.5
 }
+
+require('jest-fetch-mock').enableMocks()

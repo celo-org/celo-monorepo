@@ -48,13 +48,10 @@ export default class FullCircle extends React.PureComponent<Props, State> {
     color: colors.greenScreen,
   }
 
-  componentWillMount = () => {
+  componentDidMount = () => {
     if (this.props.init) {
       this.props.init()
     }
-  }
-
-  componentDidMount = () => {
     this.clock = setTimeout(() => this.setPlaying(), WAIT_TO_PLAY_MS)
   }
 
