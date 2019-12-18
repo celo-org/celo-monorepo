@@ -5,8 +5,6 @@ import {
   AccountsInstance,
   GovernanceSlasherContract,
   GovernanceSlasherInstance,
-  MockElectionContract,
-  MockElectionInstance,
   MockLockedGoldContract,
   MockLockedGoldInstance,
   MockValidatorsContract,
@@ -18,7 +16,6 @@ import {
 const Accounts: AccountsContract = artifacts.require('Accounts')
 const MockValidators: MockValidatorsContract = artifacts.require('MockValidators')
 const GovernanceSlasher: GovernanceSlasherContract = artifacts.require('GovernanceSlasher')
-const MockElection: MockElectionContract = artifacts.require('MockElection')
 const MockLockedGold: MockLockedGoldContract = artifacts.require('MockLockedGold')
 const Registry: RegistryContract = artifacts.require('Registry')
 
@@ -30,7 +27,6 @@ contract('GovernanceSlasher', (accounts: string[]) => {
   let accountsInstance: AccountsInstance
   let validators: MockValidatorsInstance
   let registry: RegistryInstance
-  let mockElection: MockElectionInstance
   let mockLockedGold: MockLockedGoldInstance
   let slasher: GovernanceSlasherInstance
   const nonOwner = accounts[1]
@@ -39,17 +35,14 @@ contract('GovernanceSlasher', (accounts: string[]) => {
   beforeEach(async () => {
     accountsInstance = await Accounts.new()
     await Promise.all(accounts.map((account) => accountsInstance.createAccount({ from: account })))
-    mockElection = await MockElection.new()
     mockLockedGold = await MockLockedGold.new()
     registry = await Registry.new()
     validators = await MockValidators.new()
     slasher = await GovernanceSlasher.new()
     await accountsInstance.initialize(registry.address)
     await registry.setAddressFor(CeloContractName.Accounts, accountsInstance.address)
-    await registry.setAddressFor(CeloContractName.Election, mockElection.address)
     await registry.setAddressFor(CeloContractName.LockedGold, mockLockedGold.address)
     await registry.setAddressFor(CeloContractName.Validators, validators.address)
-    await registry.setAddressFor(CeloContractName.GovernanceSlasher, slasher.address)
     await slasher.initialize(registry.address)
     await mockLockedGold.incrementNonvotingAccountBalance(validator, 5000)
   })

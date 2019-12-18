@@ -183,7 +183,8 @@ library Proposals {
           transactions[i].value,
           transactions[i].data.length,
           transactions[i].data
-        )
+        ),
+        "Executing transaction failed"
       );
     }
   }

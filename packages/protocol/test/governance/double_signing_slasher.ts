@@ -4,8 +4,6 @@ import BigNumber from 'bignumber.js'
 import {
   AccountsContract,
   AccountsInstance,
-  MockElectionContract,
-  MockElectionInstance,
   MockLockedGoldContract,
   MockLockedGoldInstance,
   MockValidatorsContract,
@@ -21,7 +19,6 @@ const MockValidators: MockValidatorsContract = artifacts.require('MockValidators
 const DoubleSigningSlasher: TestDoubleSigningSlasherContract = artifacts.require(
   'TestDoubleSigningSlasher'
 )
-const MockElection: MockElectionContract = artifacts.require('MockElection')
 const MockLockedGold: MockLockedGoldContract = artifacts.require('MockLockedGold')
 const Registry: RegistryContract = artifacts.require('Registry')
 
@@ -35,7 +32,6 @@ contract('DoubleSigningSlasher', (accounts: string[]) => {
   let accountsInstance: AccountsInstance
   let validators: MockValidatorsInstance
   let registry: RegistryInstance
-  let mockElection: MockElectionInstance
   let mockLockedGold: MockLockedGoldInstance
   let slasher: TestDoubleSigningSlasherInstance
 
@@ -45,20 +41,14 @@ contract('DoubleSigningSlasher', (accounts: string[]) => {
   beforeEach(async () => {
     accountsInstance = await Accounts.new()
     await Promise.all(accounts.map((account) => accountsInstance.createAccount({ from: account })))
-    mockElection = await MockElection.new()
     mockLockedGold = await MockLockedGold.new()
     registry = await Registry.new()
     validators = await MockValidators.new()
     slasher = await DoubleSigningSlasher.new()
     await accountsInstance.initialize(registry.address)
     await registry.setAddressFor(CeloContractName.Accounts, accountsInstance.address)
-    await registry.setAddressFor(CeloContractName.Election, mockElection.address)
     await registry.setAddressFor(CeloContractName.LockedGold, mockLockedGold.address)
     await registry.setAddressFor(CeloContractName.Validators, validators.address)
-    await registry.setAddressFor(CeloContractName.DoubleSigningSlasher, slasher.address)
-    await registry.setAddressFor(CeloContractName.DowntimeSlasher, accounts[5])
-    await registry.setAddressFor(CeloContractName.GovernanceSlasher, accounts[6])
-    await registry.setAddressFor(CeloContractName.Governance, accounts[7])
     const group = accounts[0]
     await validators.affiliate(group, { from: validator })
     await validators.affiliate(accounts[3], { from: accounts[4] })

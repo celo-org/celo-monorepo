@@ -592,12 +592,15 @@ contract Governance is
   function execute(uint256 proposalId, uint256 index) external nonReentrant returns (bool) {
     dequeueProposalsIfReady();
     Proposals.Proposal storage proposal = proposals[proposalId];
-    require(isDequeuedProposal(proposal, proposalId, index));
+    require(isDequeuedProposal(proposal, proposalId, index), "Proposal not dequeued");
     Proposals.Stage stage = proposal.getDequeuedStage(stageDurations);
     bool expired = isDequeuedProposalExpired(proposal, stage);
     if (!expired) {
       // TODO(asa): Think through the effects of changing the passing function
-      require(stage == Proposals.Stage.Execution && _isProposalPassing(proposal));
+      require(
+        stage == Proposals.Stage.Execution && _isProposalPassing(proposal),
+        "Proposal not passing"
+      );
       proposal.execute();
       emit ProposalExecuted(proposalId);
     }
