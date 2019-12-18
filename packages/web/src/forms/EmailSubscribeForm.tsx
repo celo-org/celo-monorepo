@@ -141,7 +141,6 @@ const styles = StyleSheet.create({
   },
 })
 
-// @ts-ignore
 const htmlStyles: any = {
   select: {
     display: 'inline-block',

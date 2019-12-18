@@ -43,7 +43,6 @@ export const BANNER_HEIGHT = 50
 
 export const styles = StyleSheet.create({
   container: {
-    // @ts-ignore-next-line
     position: 'fixed',
     top: 0,
     backgroundColor: '#3C9BF4',
