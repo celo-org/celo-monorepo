@@ -3,6 +3,7 @@ import { zip } from '@celo/utils/lib/collections'
 import { fromFixed, toFixed } from '@celo/utils/lib/fixidity'
 import { bitIsSet, parseBlockExtraData } from '@celo/utils/lib/istanbul'
 import BigNumber from 'bignumber.js'
+import { Block } from 'web3/eth/types'
 import { Address, NULL_ADDRESS } from '../base'
 import { Validators } from '../generated/types/Validators'
 import {
@@ -349,14 +350,14 @@ export class ValidatorsWrapper extends BaseWrapper<Validators> {
   )
 
   async getStatus(
-    validator: Address,
-    blocks: any[],
+    signer: Address,
+    blocks: Block[],
     electedSigners: Address[],
     frontRunnerSigners: Address[]
   ): Promise<ValidatorStatus> {
     const accounts = await this.kit.contracts.getAccounts()
+    const validator = await accounts.signerToAccount(signer)
     const name = (await accounts.getName(validator)) || ''
-    const signer = await accounts.getValidatorSigner(validator)
     const electedIndex = electedSigners.map((a) => eqAddress(a, signer)).indexOf(true)
     const frontRunnerIndex = frontRunnerSigners.map((a) => eqAddress(a, signer)).indexOf(true)
     const proposedCount = blocks.filter((b) => b.miner === signer).length

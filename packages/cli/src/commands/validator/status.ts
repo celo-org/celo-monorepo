@@ -15,7 +15,6 @@ export const statusTable = {
   elected: {},
   frontRunner: {},
   proposed: {},
-  signatures: {},
   signatures: { get: (v: Validator) => parseInt(v.signatures * 100) + '%' },
 }
 
@@ -27,11 +26,15 @@ export default class ValidatorStatus extends BaseCommand {
     ...BaseCommand.flags,
     validator: Flags.address({
       description: 'address of the validator to check if elected and validating',
-      exclusive: ['all'],
+      exclusive: ['all', 'signer'],
+    }),
+    signer: Flags.address({
+      description: 'address of the signer to check if elected and validating',
+      exclusive: ['validator', 'all'],
     }),
     all: flags.boolean({
       description: 'get the status of all registered validators',
-      exclusive: ['validator'],
+      exclusive: ['validator', 'signer'],
     }),
     lookback: flags.integer({
       description: 'how many blocks to look back for signer activity',
@@ -45,19 +48,30 @@ export default class ValidatorStatus extends BaseCommand {
   ]
 
   requireSynced = true
+  name = (await accounts.getName(validator)) || ''
+  signer = await accounts.getValidatorSigner(validator)
 
   async run() {
     const res = this.parse(ValidatorStatus)
+    const accounts = await this.kit.contracts.getAccounts()
     const validators = await this.kit.contracts.getValidators()
-    let accounts: string[] = []
+    let signers: string[] = []
     const checker = newCheckBuilder(this)
-    if (res.flags.validator) {
-      accounts = [res.flags.validator]
+    if (res.flags.signer) {
+      signers = [res.flags.signer]
       checker.isAccount(res.flags.validator).isValidator(res.flags.validator)
       await checker.runChecks()
+    } else if (res.flags.validator) {
+      const validator = await accounts.signerToAccount(res.flags.signer)
+      signers = [validator]
+      checker.isAccount(validator).isValidator(validator)
+      await checker.runChecks()
     } else {
-      accounts = await validators.getRegisteredValidatorsAddresses()
+      signers = concurrentMap(10, await validators.getRegisteredValidatorsAddresses(), (a) =>
+        accounts.getValidatorSigner(a)
+      )
     }
+
     const election = await this.kit.contracts.getElection()
     const electedSigners = await election.getCurrentValidatorSigners()
     const frontRunnerSigners = await election.electValidatorSigners()
