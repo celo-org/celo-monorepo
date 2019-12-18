@@ -1,7 +1,7 @@
 import { CURRENCY_ENUM as Tokens } from '@celo/utils'
 import { BigNumber } from 'bignumber.js'
 import sleep from 'sleep-promise'
-import { TransactionReceipt } from 'web3/types'
+import { TransactionReceipt } from 'web3-eth'
 import { NETWORK_NAME } from '../contracts/network-name'
 import ContractUtils from '../src/contract-utils-v2'
 import { Logger, LogLevel } from '../src/logger'
