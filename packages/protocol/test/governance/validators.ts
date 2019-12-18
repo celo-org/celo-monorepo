@@ -2249,7 +2249,7 @@ contract('Validators', (accounts: string[]) => {
             // Current epochNumber is 1 greater since we just called `mineBlocks`
             epochs.push([epochNumber + 1, group])
             // deaffiliate every gapSize^2 entry
-            if (i % (gapSize * gapSize) !== 0 || i === 0) {
+            if (i % (gapSize * gapSize) !== 0) {
               await validators.affiliate(group)
               await validators.addFirstMember(validator, NULL_ADDRESS, NULL_ADDRESS, {
                 from: group,
