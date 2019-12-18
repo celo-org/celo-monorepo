@@ -18,6 +18,7 @@ export default class List extends BaseCommand {
     cli.action.stop()
     cli.table(groupVotes, {
       address: {},
+      name: {},
       votes: { get: (g) => g.votes.toFixed() },
       capacity: { get: (g) => g.capacity.toFixed() },
       eligible: {},

@@ -103,10 +103,19 @@ const getExternalEnodeAddresses = async (namespace: string) => {
 }
 
 export const getBootnodeEnode = async (namespace: string) => {
-  const ip = await retrieveIPAddress(`${namespace}-bootnode`)
+  const ip = await retrieveBootnodeIPAddress(namespace)
   const privateKey = generatePrivateKey(fetchEnv(envVar.MNEMONIC), AccountType.BOOTNODE, 0)
   const nodeId = privateKeyToPublicKey(privateKey)
   return [getEnodeAddress(nodeId, ip, DISCOVERY_PORT)]
+}
+
+const retrieveBootnodeIPAddress = async (namespace: string) => {
+  if (isVmBased()) {
+    const outputs = await getTestnetOutputs(namespace)
+    return outputs.bootnode_ip_address.value
+  } else {
+    return retrieveIPAddress(`${namespace}-bootnode`)
+  }
 }
 
 const retrieveTxNodeAddresses = async (namespace: string, txNodesNum: number) => {

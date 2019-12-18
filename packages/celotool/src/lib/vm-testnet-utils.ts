@@ -1,4 +1,3 @@
-import { writeFileSync } from 'fs'
 import sleep from 'sleep-promise'
 import { confirmAction, envVar, fetchEnv, fetchEnvOrFallback } from './env-utils'
 import {
@@ -20,12 +19,7 @@ import {
   TerraformVars,
   untaintTerraformModuleResource,
 } from './terraform'
-import {
-  uploadEnvFileToGoogleStorage,
-  uploadFileToGoogleStorage,
-  uploadGenesisBlockToGoogleStorage,
-  uploadStaticNodesToGoogleStorage,
-} from './testnet-utils'
+import { uploadDataToGoogleStorage, uploadTestnetInfoToGoogleStorage } from './testnet-utils'
 import { execCmd } from './utils'
 
 // Keys = gcloud project name
@@ -125,10 +119,7 @@ export async function deploy(
       await generateAndUploadSecrets(celoEnv)
     }
   })
-
-  await uploadGenesisBlockToGoogleStorage(celoEnv)
-  await uploadStaticNodesToGoogleStorage(celoEnv)
-  await uploadEnvFileToGoogleStorage(celoEnv)
+  await uploadTestnetInfoToGoogleStorage(celoEnv)
 }
 
 async function deployModule(
@@ -340,11 +331,9 @@ export async function generateAndUploadSecrets(celoEnv: string) {
 }
 
 function uploadSecrets(celoEnv: string, secrets: string, resourceName: string) {
-  const localTmpFilePath = `/tmp/${celoEnv}-${resourceName}-secrets`
-  writeFileSync(localTmpFilePath, secrets)
   const cloudStorageFileName = `${secretsBasePath(celoEnv)}/.env.${resourceName}`
-  return uploadFileToGoogleStorage(
-    localTmpFilePath,
+  return uploadDataToGoogleStorage(
+    secrets,
     secretsBucketName(),
     cloudStorageFileName,
     false,
