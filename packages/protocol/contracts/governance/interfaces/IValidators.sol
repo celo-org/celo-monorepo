@@ -17,4 +17,5 @@ interface IValidators {
   function halveSlashingMultiplier(address group) external;
   function forceDeaffiliateIfValidator(address validator) external;
   function getValidatorGroupSlashingMultiplier(address) external view returns (uint256);
+  function affiliate(address group) external returns (bool);
 }
