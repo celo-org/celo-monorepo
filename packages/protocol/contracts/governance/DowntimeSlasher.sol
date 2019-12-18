@@ -65,7 +65,13 @@ contract DowntimeSlasher is Ownable, Initializable, UsingRegistry, UsingPrecompi
   }
 
   function getEpoch(uint256 blockNumber) internal view returns (uint256) {
-    return blockNumber / getEpochSize();
+    uint256 sz = getEpochSize();
+    return blockNumber.add(sz).sub(1) / sz;
+  }
+
+  function getEpochBlock(uint256 blockNumber) internal view returns (uint256) {
+    uint256 sz = getEpochSize();
+    return blockNumber.add(sz).sub(1) % sz;
   }
 
   function groupMembershipAtBlock(
@@ -73,13 +79,10 @@ contract DowntimeSlasher is Ownable, Initializable, UsingRegistry, UsingPrecompi
     uint256 blockNumber,
     uint256 groupMembershipHistoryIndex
   ) internal returns (address) {
-    uint256 epoch = blockNumber / getEpochSize();
+    uint256 epoch = getEpoch(blockNumber);
     require(epoch != 0, "Cannot slash on epoch 0");
-    address group = getValidators().groupMembershipInEpoch(
-      validator,
-      epoch.sub(1),
-      groupMembershipHistoryIndex
-    );
+    return
+      getValidators().groupMembershipInEpoch(validator, epoch.sub(1), groupMembershipHistoryIndex);
   }
 
   /**
@@ -112,6 +115,7 @@ contract DowntimeSlasher is Ownable, Initializable, UsingRegistry, UsingPrecompi
     return startBlock + slashableDowntime - 1;
   }
 
+  /**
   function debugSlashed(address validator, uint256 startBlock)
     public
     view
@@ -129,11 +133,12 @@ contract DowntimeSlasher is Ownable, Initializable, UsingRegistry, UsingPrecompi
       isSlashed[keccak256(abi.encodePacked(validator, endEpoch))]
     );
   }
+*/
 
   function checkIfAlreadySlashed(address validator, uint256 startBlock) internal {
     uint256 endBlock = getEndBlock(startBlock);
-    uint256 startEpochBlock = (startBlock % getEpochSize());
-    uint256 endEpochBlock = endBlock % getEpochSize();
+    uint256 startEpochBlock = getEpochBlock(startBlock);
+    uint256 endEpochBlock = getEpochBlock(endBlock);
     uint256 startEpoch = getEpoch(startBlock);
     uint256 endEpoch = getEpoch(endBlock);
     require(

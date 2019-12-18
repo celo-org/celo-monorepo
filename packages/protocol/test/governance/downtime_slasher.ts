@@ -36,6 +36,7 @@ contract('DowntimeSlasher', (accounts: string[]) => {
 
   const nonOwner = accounts[1]
   const validator = accounts[1]
+  const group = accounts[0]
 
   beforeEach(async () => {
     accountsInstance = await Accounts.new()
@@ -48,12 +49,12 @@ contract('DowntimeSlasher', (accounts: string[]) => {
     await registry.setAddressFor(CeloContractName.Accounts, accountsInstance.address)
     await registry.setAddressFor(CeloContractName.LockedGold, mockLockedGold.address)
     await registry.setAddressFor(CeloContractName.Validators, validators.address)
-    const group = accounts[0]
     await validators.affiliate(group, { from: validator })
     await validators.affiliate(accounts[3], { from: accounts[4] })
     await slasher.initialize(registry.address, 10000, 100, 3)
-    await mockLockedGold.incrementNonvotingAccountBalance(validator, 50000)
-    await mockLockedGold.incrementNonvotingAccountBalance(group, 60000)
+    await Promise.all(
+      accounts.map((account) => mockLockedGold.incrementNonvotingAccountBalance(account, 50000))
+    )
   })
 
   describe('#initialize()', () => {
@@ -196,6 +197,23 @@ contract('DowntimeSlasher', (accounts: string[]) => {
         []
       )
       const balance = await mockLockedGold.nonvotingAccountBalance(validator)
+      assert.equal(balance.toNumber(), 40000)
+    })
+    it('also slashes group', async () => {
+      await slasher.slash(
+        validator,
+        startBlock,
+        validatorIndex,
+        validatorIndex,
+        0,
+        [],
+        [],
+        [],
+        [],
+        [],
+        []
+      )
+      const balance = await mockLockedGold.nonvotingAccountBalance(group)
       assert.equal(balance.toNumber(), 40000)
     })
     it('cannot be slashed twice', async () => {

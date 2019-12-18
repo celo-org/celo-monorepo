@@ -36,6 +36,10 @@ contract DoubleSigningSlasher is Ownable, Initializable, UsingRegistry, UsingPre
     setSlashingIncentives(_penalty, _reward);
   }
 
+  function getEpoch(uint256 blockNumber) internal view returns (uint256) {
+    return blockNumber.sub(1) / getEpochSize();
+  }
+
   /** @notice Sets slashing incentives.
    * @param penalty Penalty for the slashed signer.
    * @param reward Reward that the informer gets.
@@ -108,13 +112,10 @@ contract DoubleSigningSlasher is Ownable, Initializable, UsingRegistry, UsingPre
     uint256 blockNumber,
     uint256 groupMembershipHistoryIndex
   ) internal returns (address) {
-    uint256 epoch = blockNumber / getEpochSize();
+    uint256 epoch = getEpoch(blockNumber);
     require(epoch != 0, "Cannot slash on epoch 0");
-    address group = getValidators().groupMembershipInEpoch(
-      validator,
-      epoch.sub(1),
-      groupMembershipHistoryIndex
-    );
+    return
+      getValidators().groupMembershipInEpoch(validator, epoch.sub(1), groupMembershipHistoryIndex);
   }
 
   /**
