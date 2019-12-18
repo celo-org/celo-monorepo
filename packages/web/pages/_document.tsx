@@ -12,11 +12,15 @@ interface NextReq {
   locale: string
 }
 
+interface Props {
+  locale: string
+}
+
 interface PropContext {
   req: DocumentContext['req'] & NextReq
 }
 
-export default class MyDocument extends Document {
+export default class MyDocument extends Document<Props> {
   static async getInitialProps(context: DocumentContext & PropContext) {
     const locale = context.req.locale
     const userAgent = context.req.headers['user-agent']
@@ -43,8 +47,7 @@ export default class MyDocument extends Document {
   }
 
   render() {
-    // @ts-ignore
-    const { locale, pathname } = this.props
+    const { locale } = this.props
     return (
       <html lang={locale} style={{ height: '100%', width: '100%' }}>
         <Head>

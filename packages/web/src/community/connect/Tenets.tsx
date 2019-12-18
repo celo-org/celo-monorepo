@@ -112,8 +112,6 @@ class Tenet extends React.PureComponent<TenetProps> {
               {number}. {title}
             </H3>
             <H4 style={standardStyles.elementalMarginBottom}>{headline}</H4>
-            {/*
-            // @ts-ignore */}
             <ResponsiveImage
               ratio={1015 / 650}
               sources={IMAGE_MAP[imageKey]}
