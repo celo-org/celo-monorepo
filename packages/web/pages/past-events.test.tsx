@@ -1,10 +1,10 @@
 import * as React from 'react'
 import * as renderer from 'react-test-renderer'
-import Color from './color'
+import PastEventsPage from './past-events'
 
-describe('Experience/Color', () => {
+describe('PastEventsPage', () => {
   it('renders', () => {
-    const tree = renderer.create(<Color />).toJSON()
+    const tree = renderer.create(<PastEventsPage />).toJSON()
     expect(tree).toMatchSnapshot()
   })
 })

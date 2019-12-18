@@ -1,3 +1,4 @@
+import * as React from 'react'
 import { CarouselSlideRenderControlProps } from 'nuka-carousel'
 import { StyleSheet, TouchableOpacity, View } from 'react-native'
 import { colors } from 'src/styles'

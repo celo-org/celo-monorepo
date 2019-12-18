@@ -1,10 +1,10 @@
 import * as React from 'react'
 import * as renderer from 'react-test-renderer'
-import Color from './color'
+import HomePage from './index'
 
-describe('Experience/Color', () => {
+describe('HomePage', () => {
   it('renders', () => {
-    const tree = renderer.create(<Color />).toJSON()
+    const tree = renderer.create(<HomePage />).toJSON()
     expect(tree).toMatchSnapshot()
   })
 })

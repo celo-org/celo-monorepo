@@ -1,10 +1,11 @@
 import * as React from 'react'
 import * as renderer from 'react-test-renderer'
-import Color from './color'
 
-describe('Experience/Color', () => {
+import Icons from './icons'
+
+describe('Experience/Icons', () => {
   it('renders', () => {
-    const tree = renderer.create(<Color />).toJSON()
+    const tree = renderer.create(<Icons />).toJSON()
     expect(tree).toMatchSnapshot()
   })
 })

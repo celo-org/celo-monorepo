@@ -1,10 +1,10 @@
 import * as React from 'react'
 import * as renderer from 'react-test-renderer'
-import Color from './color'
+import Rise from './rise'
 
-describe('Experience/Color', () => {
+describe('Animations/Rise', () => {
   it('renders', () => {
-    const tree = renderer.create(<Color />).toJSON()
+    const tree = renderer.create(<Rise />).toJSON()
     expect(tree).toMatchSnapshot()
   })
 })

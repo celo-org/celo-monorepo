@@ -1,10 +1,10 @@
 import * as React from 'react'
 import * as renderer from 'react-test-renderer'
-import Color from './color'
+import Community from './community'
 
-describe('Experience/Color', () => {
+describe('Community', () => {
   it('renders', () => {
-    const tree = renderer.create(<Color />).toJSON()
+    const tree = renderer.create(<Community />).toJSON()
     expect(tree).toMatchSnapshot()
   })
 })

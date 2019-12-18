@@ -1,10 +1,11 @@
 import * as React from 'react'
 import * as renderer from 'react-test-renderer'
-import Color from './color'
 
-describe('Experience/Color', () => {
+import Brandkit from './index'
+
+describe('Experience/Brandkit', () => {
   it('renders', () => {
-    const tree = renderer.create(<Color />).toJSON()
+    const tree = renderer.create(<Brandkit />).toJSON()
     expect(tree).toMatchSnapshot()
   })
 })

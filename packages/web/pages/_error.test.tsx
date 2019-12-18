@@ -1,10 +1,10 @@
 import * as React from 'react'
 import * as renderer from 'react-test-renderer'
-import Color from './color'
+import Error from './_error'
 
-describe('Experience/Color', () => {
+describe('Error', () => {
   it('renders', () => {
-    const tree = renderer.create(<Color />).toJSON()
+    const tree = renderer.create(<Error statusCode={404} />).toJSON()
     expect(tree).toMatchSnapshot()
   })
 })

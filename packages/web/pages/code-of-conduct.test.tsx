@@ -1,10 +1,10 @@
 import * as React from 'react'
 import * as renderer from 'react-test-renderer'
-import Color from './color'
+import CodeOfConduct from './code-of-conduct'
 
-describe('Experience/Color', () => {
+describe('CodeOfConduct', () => {
   it('renders', () => {
-    const tree = renderer.create(<Color />).toJSON()
+    const tree = renderer.create(<CodeOfConduct />).toJSON()
     expect(tree).toMatchSnapshot()
   })
 })
