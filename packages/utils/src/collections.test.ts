@@ -1,6 +1,6 @@
 import BigNumber from 'bignumber.js'
-import { Item, linkedListChanges, linkedListChange } from './collections'
 import { NULL_ADDRESS } from './address'
+import { Item, linkedListChange, linkedListChanges } from './collections'
 
 describe('Collection', () => {
   describe('linkedListChange', () => {

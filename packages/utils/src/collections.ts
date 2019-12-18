@@ -52,7 +52,9 @@ export interface Item {
 
 function upsert(sortedList: Item[], change: Item) {
   const oldIdx = sortedList.findIndex((a) => a.address === change.address)
-  if (oldIdx == -1) throw new Error('')
+  if (oldIdx === -1) {
+    throw new Error('')
+  }
   sortedList.splice(oldIdx, 1)
   const newIdx = sortedList.findIndex((a) => a.value.lt(change.value))
   if (newIdx === -1) {
@@ -64,20 +66,10 @@ function upsert(sortedList: Item[], change: Item) {
 
 // Warning: sortedList is modified
 function _linkedListChange(sortedList: Item[], change: Item) {
-  let lesser: string
-  let greater: string
   upsert(sortedList, change)
   const idx = sortedList.findIndex((a) => a.address === change.address)
-  if (idx === 0) {
-    greater = NULL_ADDRESS
-  } else {
-    greater = sortedList[idx - 1].address
-  }
-  if (idx === sortedList.length - 1) {
-    lesser = NULL_ADDRESS
-  } else {
-    lesser = sortedList[idx + 1].address
-  }
+  const greater = idx === 0 ? NULL_ADDRESS : sortedList[idx - 1].address
+  const lesser = idx === sortedList.length - 1 ? NULL_ADDRESS : sortedList[idx + 1].address
   return { lesser, greater }
 }
 
