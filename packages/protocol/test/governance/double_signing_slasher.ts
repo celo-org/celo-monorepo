@@ -59,6 +59,7 @@ contract('DoubleSigningSlasher', (accounts: string[]) => {
     adjustmentSpeed: toFixed(0.25),
   }
   const membershipHistoryLength = new BigNumber(5)
+  const slashingMultiplierResetPeriod = 30 * DAY
   const maxGroupSize = new BigNumber(5)
 
   // A random 64 byte hex string.
@@ -132,6 +133,7 @@ contract('DoubleSigningSlasher', (accounts: string[]) => {
       validatorScoreParameters.exponent,
       validatorScoreParameters.adjustmentSpeed,
       membershipHistoryLength,
+      slashingMultiplierResetPeriod,
       maxGroupSize
     )
     const group = accounts[0]

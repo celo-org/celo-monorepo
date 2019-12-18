@@ -134,16 +134,11 @@ contract DoubleSigningSlasher is Ownable, Initializable, UsingRegistry, UsingPre
     address[] memory groupElectionLessers,
     address[] memory groupElectionGreaters,
     uint256[] memory groupElectionIndices
-  ) public returns (bool) {
+  ) public {
     require(!isSlashed[keccak256(abi.encodePacked(signer, headerA, headerB))], "Already slashed");
     uint256 blockNumber = eval(signer, index, headerA, headerB);
     isSlashed[keccak256(abi.encodePacked(signer, headerA, headerB))] = true;
     address validator = getAccounts().signerToAccount(signer);
-    address group = getValidators().groupMembershipAtBlock(
-      validator,
-      blockNumber / getEpochSize(),
-      groupMembershipHistoryIndex
-    );
     getLockedGold().slash(
       validator,
       slashingIncentives.penalty,
@@ -153,6 +148,12 @@ contract DoubleSigningSlasher is Ownable, Initializable, UsingRegistry, UsingPre
       groupElectionGreaters,
       groupElectionIndices
     );
+    address group = getValidators().groupMembershipAtBlock(
+      validator,
+      blockNumber / getEpochSize(),
+      groupMembershipHistoryIndex
+    );
+    if (group == address(0)) return;
     getLockedGold().slash(
       group,
       slashingIncentives.penalty,
