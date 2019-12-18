@@ -4,9 +4,20 @@ import { concurrentMap } from '@celo/utils/lib/async'
 import { bitIsSet, parseBlockExtraData } from '@celo/utils/lib/istanbul'
 import { flags } from '@oclif/command'
 import { cli } from 'cli-ux'
+import { Block } from 'web3/eth/types'
 import { BaseCommand } from '../../base'
 import { newCheckBuilder } from '../../utils/checks'
 import { Flags } from '../../utils/command'
+
+interface ValidatorStatusEntry {
+  name: string
+  address: Address
+  signer: Address
+  elected: boolean
+  frontRunner: boolean
+  signatures: number
+  proposed: number
+}
 
 export const statusTable = {
   address: {},
@@ -15,12 +26,12 @@ export const statusTable = {
   elected: {},
   frontRunner: {},
   proposed: {},
-  signatures: { get: (v: Validator) => parseInt(v.signatures * 100) + '%' },
+  signatures: { get: (v: ValidatorStatusEntry) => parseInt(v.signatures * 100) + '%' },
 }
 
 export default class ValidatorStatus extends BaseCommand {
   static description =
-    'Show information about whether the validator signer is elected and validating. This command will check that the validator meets the registration requirements, and its signer is currently elected and actively signing blocks.'
+    'Shows the consensus status of a validator. This command will show whether a validator is currently elected, would be elected if an election were to be run right now, and the percentage of blocks signed and number of blocks successfully proposed within a given window.'
 
   static flags = {
     ...BaseCommand.flags,
@@ -48,8 +59,35 @@ export default class ValidatorStatus extends BaseCommand {
   ]
 
   requireSynced = true
-  name = (await accounts.getName(validator)) || ''
-  signer = await accounts.getValidatorSigner(validator)
+
+  async getStatus(
+    signer: Address,
+    blocks: Block[],
+    electedSigners: Address[],
+    frontRunnerSigners: Address[]
+  ): Promise<ValidatorStatusEntry> {
+    const accounts = await this.kit.contracts.getAccounts()
+    const validator = await accounts.signerToAccount(signer)
+    const name = (await accounts.getName(validator)) || ''
+    const electedIndex = electedSigners.map((a) => eqAddress(a, signer)).indexOf(true)
+    const frontRunnerIndex = frontRunnerSigners.map((a) => eqAddress(a, signer)).indexOf(true)
+    const proposedCount = blocks.filter((b) => b.miner === signer).length
+    let signedCount = 0
+    if (electedIndex >= 0) {
+      signedCount = blocks.filter((b) =>
+        bitIsSet(parseBlockExtraData(b.extraData).parentAggregatedSeal.bitmap, electedIndex)
+      ).length
+    }
+    return {
+      name,
+      address: validator,
+      signer,
+      elected: electedIndex >= 0,
+      frontRunner: frontRunnerIndex >= 0,
+      proposed: proposedCount,
+      signatures: signedCount / blocks.length,
+    }
+  }
 
   async run() {
     const res = this.parse(ValidatorStatus)
@@ -80,7 +118,7 @@ export default class ValidatorStatus extends BaseCommand {
       this.web3.eth.getBlock(latest.number - i)
     )
     const validatorStatuses = await concurrentMap(10, accounts, (a) =>
-      validators.getStatus(a, blocks, electedSigners, frontRunnerSigners)
+      getStatus(a, blocks, electedSigners, frontRunnerSigners)
     )
     cli.action.stop()
     cli.table(validatorStatuses, statusTable, { 'no-truncate': res.flags['no-truncate'] })

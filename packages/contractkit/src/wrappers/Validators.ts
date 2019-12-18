@@ -1,9 +1,7 @@
 import { eqAddress } from '@celo/utils/lib/address'
 import { zip } from '@celo/utils/lib/collections'
 import { fromFixed, toFixed } from '@celo/utils/lib/fixidity'
-import { bitIsSet, parseBlockExtraData } from '@celo/utils/lib/istanbul'
 import BigNumber from 'bignumber.js'
-import { Block } from 'web3/eth/types'
 import { Address, NULL_ADDRESS } from '../base'
 import { Validators } from '../generated/types/Validators'
 import {
@@ -26,16 +24,6 @@ export interface Validator {
   affiliation: string | null
   score: BigNumber
   signer: Address
-}
-
-export interface ValidatorStatus {
-  name: string
-  address: Address
-  signer: Address
-  elected: boolean
-  frontRunner: boolean
-  signatures: number
-  proposed: number
 }
 
 export interface ValidatorGroup {
@@ -348,35 +336,6 @@ export class ValidatorsWrapper extends BaseWrapper<Validators> {
     this.kit,
     this.contract.methods.affiliate
   )
-
-  async getStatus(
-    signer: Address,
-    blocks: Block[],
-    electedSigners: Address[],
-    frontRunnerSigners: Address[]
-  ): Promise<ValidatorStatus> {
-    const accounts = await this.kit.contracts.getAccounts()
-    const validator = await accounts.signerToAccount(signer)
-    const name = (await accounts.getName(validator)) || ''
-    const electedIndex = electedSigners.map((a) => eqAddress(a, signer)).indexOf(true)
-    const frontRunnerIndex = frontRunnerSigners.map((a) => eqAddress(a, signer)).indexOf(true)
-    const proposedCount = blocks.filter((b) => b.miner === signer).length
-    let signedCount = 0
-    if (electedIndex >= 0) {
-      signedCount = blocks.filter((b) =>
-        bitIsSet(parseBlockExtraData(b.extraData).parentAggregatedSeal.bitmap, electedIndex)
-      ).length
-    }
-    return {
-      name,
-      address: validator,
-      signer,
-      elected: electedIndex >= 0,
-      frontRunner: frontRunnerIndex >= 0,
-      proposed: proposedCount,
-      signatures: signedCount / blocks.length,
-    }
-  }
 
   /**
    * De-affiliates a validator, removing it from the group for which it is a member.
