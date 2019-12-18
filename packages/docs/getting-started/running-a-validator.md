@@ -752,24 +752,8 @@ If for some reason you need to stop running your Validator, and it is currently 
 **Validated Uptime and Network Stability**: If you stop your validator while it is still elected, you will receive fewer rewards on account of downtime, may be slashed, and also potentially affect the stability and performance of the network.
 {% endhint %}
 
-Please do one or all of the following so that at the end of the current epoch your validator will not be re-elected:
-
-- Deregister your validator:
+Please remove your validator from its group so that at the end of the current epoch it will not be re-elected:
 
 ```bash
-celocli validator:deaffiliate --from $CELO_VALIDATOR_ADDRESS
-celocli validator:deregister --from $CELO_VALIDATOR_ADDRESS
-```
-
-- Stop voting for your validator group:
-
-```bash
-celocli election:revoke --from $CELO_VALIDATOR_ADDRESS --for $CELO_VALIDATOR_GROUP_ADDRESS --value 10000000000000000000000
-celocli election:revoke --from $CELO_VALIDATOR_GROUP_ADDRESS --for $CELO_VALIDATOR_GROUP_ADDRESS --value 10000000000000000000000
-```
-
-- Deregister your validator group:
-
-```bash
-celocli validatorgroup:deregister --from $CELO_VALIDATOR_GROUP_ADDRESS
+celocli validatorgroup:member --from $CELO_VALIDATOR_GROUP_ADDRESS --remove $CELO_VALIDATOR_ADDRESS
 ```
