@@ -8,6 +8,8 @@ import "../common/UsingRegistry.sol";
 import "../common/UsingPrecompiles.sol";
 
 contract DowntimeSlasher is Ownable, Initializable, UsingRegistry, UsingPrecompiles {
+  using SafeMath for uint256;
+
   struct SlashingIncentives {
     // Value of LockedGold to slash from the account.
     uint256 penalty;
@@ -64,6 +66,20 @@ contract DowntimeSlasher is Ownable, Initializable, UsingRegistry, UsingPrecompi
 
   function getEpoch(uint256 blockNumber) internal view returns (uint256) {
     return blockNumber / getEpochSize();
+  }
+
+  function groupMembershipAtBlock(
+    address validator,
+    uint256 blockNumber,
+    uint256 groupMembershipHistoryIndex
+  ) internal returns (address) {
+    uint256 epoch = blockNumber / getEpochSize();
+    require(epoch != 0, "Cannot slash on epoch 0");
+    address group = getValidators().groupMembershipInEpoch(
+      validator,
+      epoch.sub(1),
+      groupMembershipHistoryIndex
+    );
   }
 
   /**
@@ -180,11 +196,7 @@ contract DowntimeSlasher is Ownable, Initializable, UsingRegistry, UsingPrecompi
       validatorElectionGreaters,
       validatorElectionIndices
     );
-    address group = getValidators().groupMembershipAtBlock(
-      validator,
-      startBlock,
-      groupMembershipHistoryIndex
-    );
+    address group = groupMembershipAtBlock(validator, startBlock, groupMembershipHistoryIndex);
     if (group == address(0)) return;
     getLockedGold().slash(
       group,

@@ -8,6 +8,8 @@ import "../common/UsingRegistry.sol";
 import "../common/UsingPrecompiles.sol";
 
 contract DoubleSigningSlasher is Ownable, Initializable, UsingRegistry, UsingPrecompiles {
+  using SafeMath for uint256;
+
   struct SlashingIncentives {
     // Value of LockedGold to slash from the account.
     uint256 penalty;
@@ -101,6 +103,20 @@ contract DoubleSigningSlasher is Ownable, Initializable, UsingRegistry, UsingPre
     return blockNumber;
   }
 
+  function groupMembershipAtBlock(
+    address validator,
+    uint256 blockNumber,
+    uint256 groupMembershipHistoryIndex
+  ) internal returns (address) {
+    uint256 epoch = blockNumber / getEpochSize();
+    require(epoch != 0, "Cannot slash on epoch 0");
+    address group = getValidators().groupMembershipInEpoch(
+      validator,
+      epoch.sub(1),
+      groupMembershipHistoryIndex
+    );
+  }
+
   /**
    * @notice Requires that `eval` returns true and that this evidence has not
    * already been used to slash `signer`.
@@ -148,11 +164,7 @@ contract DoubleSigningSlasher is Ownable, Initializable, UsingRegistry, UsingPre
       validatorElectionGreaters,
       validatorElectionIndices
     );
-    address group = getValidators().groupMembershipAtBlock(
-      validator,
-      blockNumber,
-      groupMembershipHistoryIndex
-    );
+    address group = groupMembershipAtBlock(validator, blockNumber, groupMembershipHistoryIndex);
     if (group == address(0)) return;
     getLockedGold().slash(
       group,

@@ -86,7 +86,7 @@ contract MockValidators is IValidators {
     return numMembers;
   }
 
-  function groupMembershipAtBlock(address addr, uint256, uint256) external view returns (address) {
+  function groupMembershipInEpoch(address addr, uint256, uint256) external view returns (address) {
     return affiliations[addr];
   }
 

@@ -1149,7 +1149,8 @@ contract Validators is
     }
   }
 
-  function groupMembershipAtBlock(address account, uint256 blockNumber, uint256 index)
+  // TODO: stub
+  function groupMembershipInEpoch(address account, uint256, uint256)
     external
     view
     returns (address)
