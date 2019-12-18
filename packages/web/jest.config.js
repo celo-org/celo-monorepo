@@ -8,6 +8,7 @@ module.exports = {
       tsConfig: 'tsconfig.jest.json',
     },
   },
+  setupFiles: ['./jestSetup.js'],
   moduleNameMapper: {
     '\\.(png|jpg|jpeg)$': '<rootDir>/__mocks__/ImageStub.ts',
     'src/(.*)$': '<rootDir>/src/$1',
