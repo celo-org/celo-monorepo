@@ -9,10 +9,10 @@ import {
   MockElectionInstance,
   MockLockedGoldContract,
   MockLockedGoldInstance,
-  RegistryContract,
-  RegistryInstance,
   MockValidatorsContract,
   MockValidatorsInstance,
+  RegistryContract,
+  RegistryInstance,
 } from 'types'
 
 const Accounts: AccountsContract = artifacts.require('Accounts')

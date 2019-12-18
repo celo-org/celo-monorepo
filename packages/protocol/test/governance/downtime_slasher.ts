@@ -1,5 +1,5 @@
 import { CeloContractName } from '@celo/protocol/lib/registry-utils'
-import { assertRevert, assertContainSubset } from '@celo/protocol/lib/test-utils'
+import { assertContainSubset, assertRevert } from '@celo/protocol/lib/test-utils'
 import BigNumber from 'bignumber.js'
 import {
   AccountsContract,
@@ -8,12 +8,12 @@ import {
   MockElectionInstance,
   MockLockedGoldContract,
   MockLockedGoldInstance,
+  MockValidatorsContract,
+  MockValidatorsInstance,
   RegistryContract,
   RegistryInstance,
   TestDowntimeSlasherContract,
   TestDowntimeSlasherInstance,
-  MockValidatorsContract,
-  MockValidatorsInstance,
 } from 'types'
 
 const Accounts: AccountsContract = artifacts.require('Accounts')

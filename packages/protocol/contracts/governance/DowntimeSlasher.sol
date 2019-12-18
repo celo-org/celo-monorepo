@@ -109,7 +109,8 @@ contract DowntimeSlasher is Ownable, Initializable, UsingRegistry, UsingPrecompi
    * @param startBlock First block of the downtime.
    * @param signerIndex0 Validator index at the first block.
    * @param signerIndex1 Validator index at the last block.
-   * @param groupMembershipHistoryIndex Group membership index from where the group should be found. (For start block)
+   * @param groupMembershipHistoryIndex Group membership index from where
+   * the group should be found. (For start block)
    * @param validatorElectionLessers Lesser pointers for validator slashing.
    * @param validatorElectionGreaters Greater pointers for validator slashing.
    * @param validatorElectionIndices Vote indices for validator slashing.
