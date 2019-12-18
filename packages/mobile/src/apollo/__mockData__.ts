@@ -6,7 +6,7 @@ import { TransactionTypes, TransferTransactionTypes } from 'src/transactions/red
 export const invitedAddress = '0x1b173'
 
 const exchangeDollar: HomeExchangeFragment = {
-  type: 'EXCHANGE' as TransactionTypes.EXCHANGE,
+  type: TransactionTypes.EXCHANGE,
   hash: '1',
   inValue: 19080,
   timestamp: Date.now(),
@@ -16,7 +16,7 @@ const exchangeDollar: HomeExchangeFragment = {
 }
 
 const exchangeGold: HomeExchangeFragment = {
-  type: 'EXCHANGE' as TransactionTypes.EXCHANGE,
+  type: TransactionTypes.EXCHANGE,
   hash: '1',
   inValue: 190,
   timestamp: Date.now(),
@@ -26,7 +26,7 @@ const exchangeGold: HomeExchangeFragment = {
 }
 
 const sent: HomeTransferFragment = {
-  type: 'SENT' as TransferTransactionTypes,
+  type: TransactionTypes.SENT,
   value: 987161,
   symbol: 'Celo Gold' as CURRENCY_ENUM,
   timestamp: Date.now(),
@@ -36,7 +36,7 @@ const sent: HomeTransferFragment = {
 }
 
 const sentInvite: HomeTransferFragment = {
-  type: 'SENT' as TransferTransactionTypes,
+  type: TransactionTypes.SENT,
   value: 0.33,
   symbol: 'Celo Dollar' as CURRENCY_ENUM,
   timestamp: Date.now(),
@@ -46,7 +46,7 @@ const sentInvite: HomeTransferFragment = {
 }
 
 const recieved: HomeTransferFragment = {
-  type: 'RECEIVED' as TransferTransactionTypes,
+  type: TransactionTypes.RECEIVED,
   value: 587161,
   symbol: 'Celo Gold' as CURRENCY_ENUM,
   timestamp: Date.now(),
@@ -55,7 +55,7 @@ const recieved: HomeTransferFragment = {
   hash: '01010',
 }
 const faucet: HomeTransferFragment = {
-  type: 'FAUCET' as TransferTransactionTypes,
+  type: TransactionTypes.FAUCET,
   value: 387161,
   symbol: 'Celo Dollar' as CURRENCY_ENUM,
   timestamp: Date.now(),
