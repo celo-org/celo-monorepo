@@ -117,7 +117,7 @@
     "react-native-splash-screen": "^3.2.0",
     "react-native-svg": "^9.11.1",
     "react-native-swiper": "^1.5.14",
-    "react-native-tcp": "https://github.com/cmcewen/react-native-tcp#408b674",
+    "react-native-tcp": "https://github.com/cmcewen/react-native-tcp#65a1e45",
     "react-native-udp": "git+https://github.com/celo-org/react-native-udp#730f295",
     "react-native-version-check": "^3.3.0",
     "react-native-webview": "^7.4.1",
