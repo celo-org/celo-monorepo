@@ -20,28 +20,36 @@ contract DoubleSigningSlasher is Ownable, Initializable, UsingRegistry, UsingPre
 
   event SlashingIncentivesSet(uint256 penalty, uint256 reward);
 
+  /** @notice Initializer
+   * @param registryAddress Sets the registry address. Useful for testing.
+   * @param _penalty Penalty for the slashed signer.
+   * @param _reward Reward that the informer gets.
+   */
   function initialize(address registryAddress, uint256 _penalty, uint256 _reward)
     external
     initializer
   {
     _transferOwnership(msg.sender);
     setRegistry(registryAddress);
-    _setSlashingIncentives(_penalty, _reward);
+    setSlashingIncentives(_penalty, _reward);
   }
 
-  // Require that `reward` is less than `penalty`.
-  function setSlashingIncentives(uint256 penalty, uint256 reward) external onlyOwner {
-    _setSlashingIncentives(penalty, reward);
-  }
-
-  // Require that `reward` is less than `penalty`.
-  function _setSlashingIncentives(uint256 penalty, uint256 reward) internal {
+  /** @notice Sets slashing incentives.
+   * @param penalty Penalty for the slashed signer.
+   * @param reward Reward that the informer gets.
+   */
+  function setSlashingIncentives(uint256 penalty, uint256 reward) public onlyOwner {
     require(penalty > reward, "Penalty has to be larger than reward");
     slashingIncentives.penalty = penalty;
     slashingIncentives.reward = reward;
     emit SlashingIncentivesSet(penalty, reward);
   }
 
+  /**
+   * @notice Counts the number of set bits.
+   * @param v Bitmap.
+   * @return Number of set bits.
+   */
   function countSetBits(uint256 v) internal pure returns (uint256) {
     uint256 res = 0;
     uint256 acc = v;
@@ -56,10 +64,15 @@ contract DoubleSigningSlasher is Ownable, Initializable, UsingRegistry, UsingPre
    * @notice Given two RLP encoded blocks, calls into a precompile that requires that
    * the two block hashes are different, have the same height, have a
    * quorum of signatures, and that `signer` was part of the quorum.
-   * @return Block number.
+   * @param signer The signer to be slashed.
+   * @param index Validator index at the block.
+   * @param blockA First double signed block.
+   * @param blockB Second double signed block.
+   * @return Block number where double signing occured.
    */
   function eval(address signer, uint256 index, bytes memory blockA, bytes memory blockB)
-    internal
+    public
+    view
     returns (uint256)
   {
     require(keccak256(blockA) != keccak256(blockB), "Block headers have to be different");
@@ -68,9 +81,11 @@ contract DoubleSigningSlasher is Ownable, Initializable, UsingRegistry, UsingPre
       blockNumber == getBlockNumberFromHeader(blockB),
       "Block headers are from different height"
     );
-    uint256 epoch = blockNumber / getEpochSize();
     require(index < numberValidators(blockNumber), "Bad validator index");
-    require(signer == getEpochSigner(epoch, index), "Wasn't a signer with given index");
+    require(
+      signer == validatorSignerAddress(index, blockNumber),
+      "Wasn't a signer with given index"
+    );
     uint256 mapA = uint256(getVerifiedSealBitmap(blockA));
     uint256 mapB = uint256(getVerifiedSealBitmap(blockB));
     require(mapA & (1 << index) != 0, "Didn't sign first block");
@@ -86,59 +101,6 @@ contract DoubleSigningSlasher is Ownable, Initializable, UsingRegistry, UsingPre
     return blockNumber;
   }
 
-  function _slash(
-    address signer,
-    uint256 index,
-    bytes memory blockA,
-    bytes memory blockB,
-    address[] memory validatorElectionLessers,
-    address[] memory validatorElectionGreaters,
-    uint256[] memory validatorElectionIndices
-  ) internal returns (uint256) {
-    uint256 blockNumber = eval(signer, index, blockA, blockB);
-    address validator = getAccounts().signerToAccount(signer);
-    require(!isSlashed[keccak256(abi.encodePacked(validator, blockNumber))], "Already slashed");
-    getLockedGold().slash(
-      validator,
-      slashingIncentives.penalty,
-      msg.sender,
-      slashingIncentives.reward,
-      validatorElectionLessers,
-      validatorElectionGreaters,
-      validatorElectionIndices
-    );
-    return blockNumber;
-  }
-
-  function _slashGroup(
-    address signer,
-    uint256 blockNumber,
-    uint256 groupMembershipHistoryIndex,
-    address[] memory groupElectionLessers,
-    address[] memory groupElectionGreaters,
-    uint256[] memory groupElectionIndices
-  ) internal returns (address) {
-    address validator = getAccounts().signerToAccount(signer);
-    require(validator != address(0), "Validator not found");
-    address group = getValidators().groupMembershipAtBlock(
-      validator,
-      blockNumber,
-      groupMembershipHistoryIndex
-    );
-    getValidators().forceDeaffiliateIfValidator(validator);
-    getLockedGold().slash(
-      group,
-      slashingIncentives.penalty,
-      msg.sender,
-      slashingIncentives.reward,
-      groupElectionLessers,
-      groupElectionGreaters,
-      groupElectionIndices
-    );
-    getValidators().halveSlashingMultiplier(group);
-    isSlashed[keccak256(abi.encodePacked(validator, blockNumber))] = true;
-  }
-
   /**
    * @notice Requires that `eval` returns true and that this evidence has not
    * already been used to slash `signer`.
@@ -148,12 +110,23 @@ contract DoubleSigningSlasher is Ownable, Initializable, UsingRegistry, UsingPre
    * Calls `Validators.removeSlashedMember` to remove the validator from its
    * current group if it is a member of one.
    * Finally, stores that hash(signer, blockNumber) has been slashed.
+   * @param signer The signer to be slashed.
+   * @param index Validator index at the block.
+   * @param headerA First double signed block.
+   * @param headerB Second double signed block.
+   * @param groupMembershipHistoryIndex Group membership index from where the group should be found.
+   * @param validatorElectionLessers Lesser pointers for validator slashing.
+   * @param validatorElectionGreaters Greater pointers for validator slashing.
+   * @param validatorElectionIndices Vote indices for validator slashing.
+   * @param groupElectionLessers Lesser pointers for group slashing.
+   * @param groupElectionGreaters Greater pointers for group slashing.
+   * @param groupElectionIndices Vote indices for group slashing.
    */
   function slash(
     address signer,
     uint256 index,
-    bytes memory blockA,
-    bytes memory blockB,
+    bytes memory headerA,
+    bytes memory headerB,
     uint256 groupMembershipHistoryIndex,
     address[] memory validatorElectionLessers,
     address[] memory validatorElectionGreaters,
@@ -161,25 +134,36 @@ contract DoubleSigningSlasher is Ownable, Initializable, UsingRegistry, UsingPre
     address[] memory groupElectionLessers,
     address[] memory groupElectionGreaters,
     uint256[] memory groupElectionIndices
-  ) public returns (address) {
-    uint256 blockNumber = _slash(
-      signer,
-      index,
-      blockA,
-      blockB,
-      validatorElectionLessers,
-      validatorElectionGreaters,
-      validatorElectionIndices
+  ) public returns (bool) {
+    require(!isSlashed[keccak256(abi.encodePacked(signer, headerA, headerB))], "Already slashed");
+    uint256 blockNumber = eval(signer, index, headerA, headerB);
+    isSlashed[keccak256(abi.encodePacked(signer, headerA, headerB))] = true;
+    address validator = getAccounts().signerToAccount(signer);
+    address group = getValidators().groupMembershipAtBlock(
+      validator,
+      blockNumber / getEpochSize(),
+      groupMembershipHistoryIndex
     );
-    return
-      _slashGroup(
-        signer,
-        blockNumber,
-        groupMembershipHistoryIndex,
-        groupElectionLessers,
-        groupElectionGreaters,
-        groupElectionIndices
-      );
+    getLockedGold().slash(
+      validator,
+      slashingIncentives.penalty,
+      msg.sender,
+      slashingIncentives.reward,
+      groupElectionLessers,
+      groupElectionGreaters,
+      groupElectionIndices
+    );
+    getLockedGold().slash(
+      group,
+      slashingIncentives.penalty,
+      msg.sender,
+      slashingIncentives.reward,
+      groupElectionLessers,
+      groupElectionGreaters,
+      groupElectionIndices
+    );
+    getValidators().forceDeaffiliateIfValidator(validator);
+    getValidators().halveSlashingMultiplier(group);
   }
 
 }

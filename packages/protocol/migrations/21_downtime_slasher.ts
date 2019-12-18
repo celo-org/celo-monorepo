@@ -8,6 +8,7 @@ const initializeArgs = async (_: string): Promise<any[]> => {
     config.registry.predeployedProxyAddress,
     config.downtimeSlasher.penalty,
     config.downtimeSlasher.reward,
+    config.downtimeSlasher.slashableDowntime,
   ]
 }
 

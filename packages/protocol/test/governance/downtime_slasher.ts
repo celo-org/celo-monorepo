@@ -1,5 +1,5 @@
 import { CeloContractName } from '@celo/protocol/lib/registry-utils'
-import { assertRevert, NULL_ADDRESS } from '@celo/protocol/lib/test-utils'
+import { assertRevert, NULL_ADDRESS, assertContainSubset } from '@celo/protocol/lib/test-utils'
 import { toFixed } from '@celo/utils/lib/fixidity'
 import { addressToPublicKey } from '@celo/utils/lib/signatureUtils'
 import BigNumber from 'bignumber.js'
@@ -81,7 +81,10 @@ contract('DowntimeSlasher', (accounts: string[]) => {
   }
 
   const registerValidatorGroup = async (group: string) => {
-    await mockLockedGold.setAccountTotalLockedGold(group, groupLockedGoldRequirements.value)
+    await mockLockedGold.setAccountTotalLockedGold(
+      group,
+      groupLockedGoldRequirements.value.multipliedBy(maxGroupSize)
+    )
     await validators.registerValidatorGroup(commission, { from: group })
   }
 
@@ -103,10 +106,7 @@ contract('DowntimeSlasher', (accounts: string[]) => {
 
   beforeEach(async () => {
     accountsInstance = await Accounts.new()
-    // Do not register an account for the last address so it can be used as an authorized validator signer.
-    await Promise.all(
-      accounts.slice(0, -1).map((account) => accountsInstance.createAccount({ from: account }))
-    )
+    await Promise.all(accounts.map((account) => accountsInstance.createAccount({ from: account })))
     mockElection = await MockElection.new()
     mockLockedGold = await MockLockedGold.new()
     registry = await Registry.new()
@@ -135,7 +135,7 @@ contract('DowntimeSlasher', (accounts: string[]) => {
     const group = accounts[0]
     await registerValidatorGroupWithMembers(group, [validator])
     await registerValidatorGroupWithMembers(accounts[3], [accounts[4]])
-    await slasher.initialize(registry.address, 10000, 100)
+    await slasher.initialize(registry.address, 10000, 100, 3)
     await mockLockedGold.incrementNonvotingAccountBalance(validator, 50000)
     await mockLockedGold.incrementNonvotingAccountBalance(group, 60000)
   })
@@ -150,6 +150,13 @@ contract('DowntimeSlasher', (accounts: string[]) => {
       assert.equal(res[0].toNumber(), 10000)
       assert.equal(res[1].toNumber(), 100)
     })
+    it('should have set slashable downtime', async () => {
+      const res = await slasher.slashableDowntime()
+      assert.equal(res.toNumber(), 3)
+    })
+    it('can only be called once', async () => {
+      await assertRevert(slasher.initialize(registry.address, 10000, 100, 2))
+    })
   })
 
   describe('#setSlashingIncentives()', () => {
@@ -162,32 +169,73 @@ contract('DowntimeSlasher', (accounts: string[]) => {
       assert.equal(res[0].toNumber(), 123)
       assert.equal(res[1].toNumber(), 67)
     })
+    it('reward cannot be larger than penalty', async () => {
+      await assertRevert(slasher.setSlashingIncentives(123, 678))
+    })
+    it('should emit the corresponding event', async () => {
+      const resp = await slasher.setSlashingIncentives(123, 67)
+      assert.equal(resp.logs.length, 1)
+      const log = resp.logs[0]
+      assertContainSubset(log, {
+        event: 'SlashingIncentivesSet',
+        args: {
+          penalty: new BigNumber(123),
+          reward: new BigNumber(67),
+        },
+      })
+    })
+  })
+
+  describe('#setSlashableDowntime()', () => {
+    it('can only be set by the owner', async () => {
+      await assertRevert(slasher.setSlashableDowntime(23, { from: nonOwner }))
+    })
+    it('slashable downtime has to be smaller than epoch length', async () => {
+      await assertRevert(slasher.setSlashableDowntime(123))
+    })
+    it('should have set slashable downtime', async () => {
+      await slasher.setSlashableDowntime(23)
+      const res = await slasher.slashableDowntime()
+      assert.equal(res.toNumber(), 23)
+    })
+    it('should emit the corresponding event', async () => {
+      const resp = await slasher.setSlashableDowntime(23)
+      assert.equal(resp.logs.length, 1)
+      const log = resp.logs[0]
+      assertContainSubset(log, {
+        event: 'SlashableDowntimeSet',
+        args: {
+          interval: new BigNumber(23),
+        },
+      })
+    })
   })
 
   describe('#slash()', () => {
     let blockNumber: number
-    let endBlock: number
-    const validatorIndex = 23
+    let startBlock: number
+    const validatorIndex = 0
     beforeEach(async () => {
       blockNumber = await web3.eth.getBlockNumber()
-      endBlock = blockNumber - 10
-      await slasher.setSlashableDowntime(2)
+      startBlock = blockNumber - 20
       const epoch = Math.floor(blockNumber / EPOCH)
       await slasher.setEpochSigner(epoch, validatorIndex, validator)
       await slasher.setEpochSigner(epoch - 1, validatorIndex, validator)
       await slasher.setEpochSigner(epoch + 1, validatorIndex, validator)
-      const bitmap = '0x0000000000000000000000000000000000000000000000000000000000800001'
-      const bitmap2 = '0x0000000000000000000000000000000000000000000000000000000000800000'
+      // Signed by validators 0 and 1
+      const bitmap = '0x0000000000000000000000000000000000000000000000000000000000000003'
+      // Signed by validator 1
+      const bitmap2 = '0x0000000000000000000000000000000000000000000000000000000000000002'
       await slasher.setParentSealBitmap(blockNumber, bitmap)
-      await slasher.setParentSealBitmap(blockNumber - 1, bitmap)
-      await slasher.setParentSealBitmap(blockNumber - 3, bitmap2)
+      await slasher.setParentSealBitmap(blockNumber + 1, bitmap)
+      await slasher.setParentSealBitmap(blockNumber + 2, bitmap2)
       await slasher.setNumberValidators(2)
     })
     it('fails if epoch signer is wrong', async () => {
       await assertRevert(
         slasher.slash(
           accounts[4],
-          endBlock,
+          startBlock,
           validatorIndex,
           validatorIndex,
           0,
@@ -220,7 +268,7 @@ contract('DowntimeSlasher', (accounts: string[]) => {
     it('decrements gold when success', async () => {
       await slasher.slash(
         validator,
-        endBlock,
+        startBlock,
         validatorIndex,
         validatorIndex,
         0,
@@ -231,8 +279,38 @@ contract('DowntimeSlasher', (accounts: string[]) => {
         [],
         []
       )
-      const sum = await mockLockedGold.nonvotingAccountBalance(validator)
-      assert.equal(sum.toNumber(), 40000)
+      const balance = await mockLockedGold.nonvotingAccountBalance(validator)
+      assert.equal(balance.toNumber(), 40000)
+    })
+    it('cannot be slashed twice', async () => {
+      await slasher.slash(
+        validator,
+        startBlock + 1,
+        validatorIndex,
+        validatorIndex,
+        0,
+        [],
+        [],
+        [],
+        [],
+        [],
+        []
+      )
+      await assertRevert(
+        slasher.slash(
+          validator,
+          startBlock,
+          validatorIndex,
+          validatorIndex,
+          0,
+          [],
+          [],
+          [],
+          [],
+          [],
+          []
+        )
+      )
     })
   })
 })

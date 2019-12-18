@@ -17,53 +17,68 @@ contract DowntimeSlasher is Ownable, Initializable, UsingRegistry, UsingPrecompi
 
   SlashingIncentives public slashingIncentives;
   mapping(bytes32 => bool) isSlashed;
+  uint256 public slashableDowntime;
 
   event SlashingIncentivesSet(uint256 penalty, uint256 reward);
+  event SlashableDowntimeSet(uint256 interval);
 
-  function initialize(address registryAddress, uint256 _penalty, uint256 _reward)
-    external
-    initializer
-  {
+  /** @notice Initializer
+   * @param registryAddress Sets the registry address. Useful for testing.
+   * @param _penalty Penalty for the slashed signer.
+   * @param _reward Reward that the informer gets.
+   * @param  _slashableDowntime Slashable downtime in blocks.
+   */
+  function initialize(
+    address registryAddress,
+    uint256 _penalty,
+    uint256 _reward,
+    uint256 _slashableDowntime
+  ) external initializer {
     _transferOwnership(msg.sender);
     setRegistry(registryAddress);
-    _setSlashingIncentives(_penalty, _reward);
+    setSlashingIncentives(_penalty, _reward);
+    setSlashableDowntime(_slashableDowntime);
   }
 
-  // Require that `reward` is less than `penalty`.
-  function setSlashingIncentives(uint256 penalty, uint256 reward) external onlyOwner {
-    _setSlashingIncentives(penalty, reward);
-  }
-
-  // Require that `reward` is less than `penalty`.
-  function _setSlashingIncentives(uint256 penalty, uint256 reward) internal {
+  /** @notice Sets slashing incentives.
+   * @param penalty Penalty for the slashed signer.
+   * @param reward Reward that the informer gets.
+   */
+  function setSlashingIncentives(uint256 penalty, uint256 reward) public onlyOwner {
     require(penalty > reward, "Penalty has to be larger than reward");
     slashingIncentives.penalty = penalty;
     slashingIncentives.reward = reward;
     emit SlashingIncentivesSet(penalty, reward);
   }
 
-  uint256 public slashableDowntime;
-
-  function setSlashableDowntime(uint256 interval) external onlyOwner {
-    require(
-      slashableDowntime < getEpochSize(),
-      "Slashable downtime must be smaller than epoch size"
-    );
+  /**
+   * @notice Sets the slashable downtime
+   * @param interval Slashable downtime in blocks.
+   */
+  function setSlashableDowntime(uint256 interval) public onlyOwner {
+    require(interval != 0, "Slashable downtime cannot be zero");
+    require(interval < getEpochSize(), "Slashable downtime must be smaller than epoch size");
     slashableDowntime = interval;
+    emit SlashableDowntimeSet(interval);
   }
 
   function getEpoch(uint256 blockNumber) internal view returns (uint256) {
     return blockNumber / getEpochSize();
   }
 
+  /**
+   * @notice Test if a validator has been down.
+   */
   function isDown(
     address account,
     uint256 startSignerIndex,
     uint256 endSignerIndex,
-    uint256 endBlock
+    uint256 startBlock
   ) internal view returns (bool) {
+    uint256 endBlock = getEndBlock(startBlock);
     require(endBlock < block.number, "end block must be smaller than current block");
-    uint256 startBlock = endBlock - slashableDowntime;
+    require(startSignerIndex < numberValidators(startBlock), "Bad validator index at start block");
+    require(endSignerIndex < numberValidators(endBlock), "Bad validator index at end block");
     address startSigner = validatorSignerAddress(startSignerIndex, startBlock);
     address endSigner = validatorSignerAddress(endSignerIndex, endBlock);
     require(account == getAccounts().signerToAccount(startSigner), "Wrong start index");
@@ -77,18 +92,34 @@ contract DowntimeSlasher is Ownable, Initializable, UsingRegistry, UsingPrecompi
     return true;
   }
 
-  // Requires that `eval` returns true and that the account corresponding to
-  // `signer` has not already been slashed for downtime for the epoch
-  // corresponding to `startBlock`.
-  // If so, fetches the `account` associated with `signer` and the group that
-  // `signer` was a member of during the corresponding epoch.
-  // Then, calls `LockedGold.slash` on both the validator and group accounts.
-  // Calls `Validators.removeSlashedMember` to remove the validator from its
-  // current group if it is a member of one.
-  // Finally, stores that (account, epochNumber) has been slashed.
+  function getEndBlock(uint256 startBlock) internal view returns (uint256) {
+    return startBlock + slashableDowntime - 1;
+  }
+
+  /** @notice Requires that `eval` returns true and that the account corresponding to
+   * `signer` has not already been slashed for downtime for the epoch
+   * corresponding to `startBlock`.
+   * If so, fetches the `account` associated with `signer` and the group that
+   * `signer` was a member of during the corresponding epoch.
+   * Then, calls `LockedGold.slash` on both the validator and group accounts.
+   * Calls `Validators.removeSlashedMember` to remove the validator from its
+   * current group if it is a member of one.
+   * Finally, stores that (account, epochNumber) has been slashed.
+   * @param validator The validator to be slashed.
+   * @param startBlock First block of the downtime.
+   * @param signerIndex0 Validator index at the first block.
+   * @param signerIndex1 Validator index at the last block.
+   * @param groupMembershipHistoryIndex Group membership index from where the group should be found. (For start block)
+   * @param validatorElectionLessers Lesser pointers for validator slashing.
+   * @param validatorElectionGreaters Greater pointers for validator slashing.
+   * @param validatorElectionIndices Vote indices for validator slashing.
+   * @param groupElectionLessers Lesser pointers for group slashing.
+   * @param groupElectionGreaters Greater pointers for group slashing.
+   * @param groupElectionIndices Vote indices for group slashing.
+   */
   function slash(
     address validator,
-    uint256 endBlock,
+    uint256 startBlock,
     uint256 signerIndex0,
     uint256 signerIndex1,
     uint256 groupMembershipHistoryIndex,
@@ -98,40 +129,18 @@ contract DowntimeSlasher is Ownable, Initializable, UsingRegistry, UsingPrecompi
     address[] memory groupElectionLessers,
     address[] memory groupElectionGreaters,
     uint256[] memory groupElectionIndices
-  ) public returns (bool) {
-    _slash(
-      validator,
-      endBlock,
-      signerIndex0,
-      signerIndex1,
-      validatorElectionLessers,
-      validatorElectionGreaters,
-      validatorElectionIndices
+  ) public {
+    require(isDown(validator, signerIndex0, signerIndex1, startBlock), "Wasn't down");
+    require(
+      !isSlashed[keccak256(abi.encodePacked(validator, getEpoch(startBlock)))],
+      "Already slashed"
     );
-    _slashGroup(
-      validator,
-      endBlock,
-      groupMembershipHistoryIndex,
-      groupElectionLessers,
-      groupElectionGreaters,
-      groupElectionIndices
+    require(
+      !isSlashed[keccak256(abi.encodePacked(validator, getEpoch(getEndBlock(startBlock))))],
+      "Already slashed"
     );
-    return true;
-  }
-
-  function _slash(
-    address validator,
-    uint256 endBlock,
-    uint256 signerIndex0,
-    uint256 signerIndex1,
-    address[] memory validatorElectionLessers,
-    address[] memory validatorElectionGreaters,
-    uint256[] memory validatorElectionIndices
-  ) internal returns (bool) {
-    require(isDown(validator, signerIndex0, signerIndex1, endBlock), "Wasn't down");
-    uint256 epoch = getEpoch(endBlock);
-    require(!isSlashed[keccak256(abi.encodePacked(validator, epoch))], "Already slashed");
-    isSlashed[keccak256(abi.encodePacked(validator, epoch))] = true;
+    isSlashed[keccak256(abi.encodePacked(validator, getEpoch(startBlock)))] = true;
+    isSlashed[keccak256(abi.encodePacked(validator, getEpoch(getEndBlock(startBlock))))] = true;
     getLockedGold().slash(
       validator,
       slashingIncentives.penalty,
@@ -142,19 +151,9 @@ contract DowntimeSlasher is Ownable, Initializable, UsingRegistry, UsingPrecompi
       validatorElectionIndices
     );
     getValidators().forceDeaffiliateIfValidator(validator);
-  }
-
-  function _slashGroup(
-    address validator,
-    uint256 blockNumber,
-    uint256 groupMembershipHistoryIndex,
-    address[] memory groupElectionLessers,
-    address[] memory groupElectionGreaters,
-    uint256[] memory groupElectionIndices
-  ) internal {
     address group = getValidators().groupMembershipAtBlock(
       validator,
-      blockNumber / getEpochSize(),
+      startBlock,
       groupMembershipHistoryIndex
     );
     if (group == address(0)) return;

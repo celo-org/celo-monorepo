@@ -1,5 +1,5 @@
 import { CeloContractName } from '@celo/protocol/lib/registry-utils'
-import { assertRevert, NULL_ADDRESS } from '@celo/protocol/lib/test-utils'
+import { assertRevert, NULL_ADDRESS, assertContainSubset } from '@celo/protocol/lib/test-utils'
 import { toFixed } from '@celo/utils/lib/fixidity'
 import { addressToPublicKey } from '@celo/utils/lib/signatureUtils'
 import BigNumber from 'bignumber.js'
@@ -83,7 +83,10 @@ contract('DoubleSigningSlasher', (accounts: string[]) => {
   }
 
   const registerValidatorGroup = async (group: string) => {
-    await mockLockedGold.setAccountTotalLockedGold(group, groupLockedGoldRequirements.value)
+    await mockLockedGold.setAccountTotalLockedGold(
+      group,
+      groupLockedGoldRequirements.value.multipliedBy(maxGroupSize)
+    )
     await validators.registerValidatorGroup(commission, { from: group })
   }
 
@@ -149,17 +152,35 @@ contract('DoubleSigningSlasher', (accounts: string[]) => {
       assert.equal(res[0].toNumber(), 10000)
       assert.equal(res[1].toNumber(), 100)
     })
+    it('can only be called once', async () => {
+      await assertRevert(slasher.initialize(registry.address, 10000, 100))
+    })
   })
 
   describe('#setSlashingIncentives()', () => {
     it('can only be set by the owner', async () => {
       await assertRevert(slasher.setSlashingIncentives(123, 67, { from: nonOwner }))
     })
+    it('reward cannot be larger than penalty', async () => {
+      await assertRevert(slasher.setSlashingIncentives(123, 678))
+    })
     it('should have set slashing incentives', async () => {
       await slasher.setSlashingIncentives(123, 67)
       const res = await slasher.slashingIncentives()
       assert.equal(res[0].toNumber(), 123)
       assert.equal(res[1].toNumber(), 67)
+    })
+    it('should emit the corresponding event', async () => {
+      const resp = await slasher.setSlashingIncentives(123, 67)
+      assert.equal(resp.logs.length, 1)
+      const log = resp.logs[0]
+      assertContainSubset(log, {
+        event: 'SlashingIncentivesSet',
+        args: {
+          penalty: new BigNumber(123),
+          reward: new BigNumber(67),
+        },
+      })
     })
   })
 
@@ -175,6 +196,7 @@ contract('DoubleSigningSlasher', (accounts: string[]) => {
       await slasher.setBlockNumber(blockC, blockNumber)
       await slasher.setEpochSigner(Math.floor(blockNumber / EPOCH), validatorIndex, validator)
       await slasher.setEpochSigner(Math.floor(blockNumber / EPOCH), validatorIndex + 1, validator)
+      // Signed by validators 0 to 5
       const bitmap = '0x000000000000000000000000000000000000000000000000000000000000003f'
       await slasher.setNumberValidators(7)
       await slasher.setVerifiedSealBitmap(blockA, bitmap)
@@ -194,6 +216,12 @@ contract('DoubleSigningSlasher', (accounts: string[]) => {
     it('fails if epoch signer is wrong', async () => {
       await assertRevert(
         slasher.slash(accounts[4], validatorIndex, blockA, blockC, 0, [], [], [], [], [], [])
+      )
+    })
+    it('fails if there are not enough signers', async () => {
+      await slasher.setNumberValidators(100)
+      await assertRevert(
+        slasher.slash(validator, validatorIndex, blockA, blockC, 0, [], [], [], [], [], [])
       )
     })
     it('decrements gold when success', async () => {

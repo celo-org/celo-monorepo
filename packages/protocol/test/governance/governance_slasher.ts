@@ -84,7 +84,10 @@ contract('GovernanceSlasher', (accounts: string[]) => {
   }
 
   const registerValidatorGroup = async (group: string) => {
-    await mockLockedGold.setAccountTotalLockedGold(group, groupLockedGoldRequirements.value)
+    await mockLockedGold.setAccountTotalLockedGold(
+      group,
+      groupLockedGoldRequirements.value.multipliedBy(maxGroupSize)
+    )
     await validators.registerValidatorGroup(commission, { from: group })
   }
 
@@ -103,10 +106,7 @@ contract('GovernanceSlasher', (accounts: string[]) => {
 
   beforeEach(async () => {
     accountsInstance = await Accounts.new()
-    // Do not register an account for the last address so it can be used as an authorized validator signer.
-    await Promise.all(
-      accounts.slice(0, -1).map((account) => accountsInstance.createAccount({ from: account }))
-    )
+    await Promise.all(accounts.map((account) => accountsInstance.createAccount({ from: account })))
     mockElection = await MockElection.new()
     mockLockedGold = await MockLockedGold.new()
     registry = await Registry.new()
@@ -140,13 +140,22 @@ contract('GovernanceSlasher', (accounts: string[]) => {
       const owner: string = await slasher.owner()
       assert.equal(owner, accounts[0])
     })
+    it('can only be called once', async () => {
+      await assertRevert(slasher.initialize(registry.address))
+    })
   })
 
   describe('#approveSlashing()', () => {
     it('should set slashable amount', async () => {
       await slasher.approveSlashing(accounts[2], 1000)
-      const sum = await slasher.getApprovedSlashing(accounts[2])
-      assert.equal(sum.toNumber(), 1000)
+      const amount = await slasher.getApprovedSlashing(accounts[2])
+      assert.equal(amount.toNumber(), 1000)
+    })
+    it('should increment slashable amount when approved twice', async () => {
+      await slasher.approveSlashing(accounts[2], 1000)
+      await slasher.approveSlashing(accounts[2], 1000)
+      const amount = await slasher.getApprovedSlashing(accounts[2])
+      assert.equal(amount.toNumber(), 2000)
     })
     it('can only be called by owner', async () => {
       await assertRevert(slasher.approveSlashing(accounts[2], 1000, { from: nonOwner }))
@@ -160,8 +169,14 @@ contract('GovernanceSlasher', (accounts: string[]) => {
     it('decrements gold', async () => {
       await slasher.approveSlashing(validator, 1000)
       await slasher.slash(validator, [], [], [])
-      const sum = await mockLockedGold.nonvotingAccountBalance(validator)
-      assert.equal(sum.toNumber(), 4000)
+      const amount = await mockLockedGold.nonvotingAccountBalance(validator)
+      assert.equal(amount.toNumber(), 4000)
+    })
+    it('has set the approved slashing to zero', async () => {
+      await slasher.approveSlashing(validator, 1000)
+      await slasher.slash(validator, [], [], [])
+      const amount = await slasher.getApprovedSlashing(validator)
+      assert.equal(amount.toNumber(), 0)
     })
   })
 })
