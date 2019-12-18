@@ -20,7 +20,7 @@
     "target": "es5",
     "esModuleInterop": true
   },
-  "include": [".", "src/**/*", "types/**/*", "contracts/**/*", "type-dec.d.ts"],
+  "include": [".", "src/**/*", "types/**/*", "contracts/**/*"],
   "exclude": ["lib", "node_modules"],
   "references": [{ "path": "../utils" }]
 }
