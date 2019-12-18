@@ -1,4 +1,5 @@
 import BigNumber from 'bignumber.js'
+import { NULL_ADDRESS } from './address'
 
 export function zip<A, B, C>(fn: (a: A, b: B) => C, as: A[], bs: B[]) {
   const len = Math.min(as.length, bs.length)
@@ -42,17 +43,16 @@ export function intersection<T>(arrays: T[][]): T[] {
   return res
 }
 
-// List of sorted from greater to smaller
+// List of address value pairs sorted from greater to smaller
 
 export interface Item {
   address: string
   value: BigNumber
 }
 
-const nilAddress = '0x0000000000000000000000000000000000000000'
-
-function insert(sortedList: Item[], change: Item) {
+function upsert(sortedList: Item[], change: Item) {
   const oldIdx = sortedList.findIndex((a) => a.address === change.address)
+  if (oldIdx == -1) throw new Error('')
   sortedList.splice(oldIdx, 1)
   const newIdx = sortedList.findIndex((a) => a.value.lt(change.value))
   if (newIdx === -1) {
@@ -62,22 +62,39 @@ function insert(sortedList: Item[], change: Item) {
   }
 }
 
-export function linkedListChanges(sortedList: Item[], changeList: Item[]) {
-  const lesser: string[] = []
-  const greater: string[] = []
-  for (const it of changeList) {
-    insert(sortedList, it)
-    const idx = sortedList.findIndex((a) => a.address === it.address)
-    if (idx === 0) {
-      greater.push(nilAddress)
-    } else {
-      greater.push(sortedList[idx - 1].address)
-    }
-    if (idx === sortedList.length - 1) {
-      lesser.push(nilAddress)
-    } else {
-      lesser.push(sortedList[idx + 1].address)
-    }
+// Warning: sortedList is modified
+function _linkedListChange(sortedList: Item[], change: Item) {
+  let lesser: string
+  let greater: string
+  upsert(sortedList, change)
+  const idx = sortedList.findIndex((a) => a.address === change.address)
+  if (idx === 0) {
+    greater = NULL_ADDRESS
+  } else {
+    greater = sortedList[idx - 1].address
+  }
+  if (idx === sortedList.length - 1) {
+    lesser = NULL_ADDRESS
+  } else {
+    lesser = sortedList[idx + 1].address
   }
   return { lesser, greater }
+}
+
+export function linkedListChange(sortedList: Item[], change: Item) {
+  const list = sortedList.concat()
+  const { lesser, greater } = _linkedListChange(list, change)
+  return { lesser, greater, list }
+}
+
+export function linkedListChanges(sortedList: Item[], changeList: Item[]) {
+  const list = sortedList.concat()
+  const lessers: string[] = []
+  const greaters: string[] = []
+  for (const it of changeList) {
+    const { lesser, greater } = _linkedListChange(sortedList, it)
+    lessers.push(lesser)
+    greaters.push(greater)
+  }
+  return { lessers, greaters, list }
 }
