@@ -82,14 +82,11 @@ export async function assertBalance(address: string, balance: BigNumber) {
 export async function assertRevert(promise: any, errorMessage: string = '') {
   try {
     await promise
-    assert.fail('Expected revert not received')
+    assert.fail('Expected transaction to revert')
   } catch (error) {
-    const revertFound = error.message.search('revert') >= 0
-    if (errorMessage === '') {
-      assert(revertFound, `Expected "revert", got ${error} instead`)
-    } else {
-      assert(revertFound, errorMessage)
-    }
+    const revertFound = error.message.search('VM Exception while processing transaction: revert') >= 0
+    const msg = errorMessage === '' ? `Expected "revert", got ${error} instead` : errorMessage
+    assert(revertFound, msg)
   }
 }
 
