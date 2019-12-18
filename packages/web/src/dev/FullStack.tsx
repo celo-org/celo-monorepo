@@ -276,4 +276,5 @@ const styles = StyleSheet.create({
     transitionProperty: 'opacity',
     transitionDuration: '100ms',
   },
+  base: {},
 })

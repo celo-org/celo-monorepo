@@ -214,7 +214,7 @@ function ringStyle({ color, playing, duration }) {
 
 const styles = StyleSheet.create({
   animatedBase: {
-    animationIterationCount: '1',
+    animationIterationCount: 1,
     animationTimingFunction: 'ease-in',
     willChange: 'fill',
   },
