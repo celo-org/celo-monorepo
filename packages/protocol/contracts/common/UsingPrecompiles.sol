@@ -167,4 +167,7 @@ contract UsingPrecompiles {
 
   function numberValidators(uint256 blockNumber) public view returns (uint256) {}
 
+  // RLP decode and retreive the block number from the given header.
+  function getBlockNumberFromHeader(bytes memory header) public view returns (uint256) {}
+
 }

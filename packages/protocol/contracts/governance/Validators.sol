@@ -1133,7 +1133,7 @@ contract Validators is
     }
   }
 
-  function groupMembershipAtBlock(address account, uint256 epochNumber, uint256 index)
+  function groupMembershipAtBlock(address account, uint256 blockNumber, uint256 index)
     external
     view
     returns (address)

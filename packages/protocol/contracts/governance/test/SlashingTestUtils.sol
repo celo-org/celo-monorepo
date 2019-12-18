@@ -59,4 +59,15 @@ contract SlashingTestUtils {
   function numberValidators(uint256 blockNumber) public view returns (uint256) {
     return numValidators;
   }
+
+  mapping(bytes32 => uint256) blockNumbers;
+
+  function getBlockNumberFromHeader(bytes memory header) public view returns (uint256) {
+    return blockNumbers[keccak256(abi.encodePacked(header))];
+  }
+
+  function setBlockNumber(bytes memory header, uint256 number) public returns (uint256) {
+    blockNumbers[keccak256(abi.encodePacked(header))] = number;
+  }
+
 }

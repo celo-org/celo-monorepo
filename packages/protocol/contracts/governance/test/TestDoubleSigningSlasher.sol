@@ -7,15 +7,15 @@ contract TestDoubleSigningSlasher is DoubleSigningSlasher, SlashingTestUtils {
   function debugGroup(address signer, uint256 blockNumber, uint256 groupMembershipHistoryIndex)
     public
     view
-    returns (address)
+    returns (address, address, address)
   {
     address validator = getAccounts().signerToAccount(signer);
     address group = getValidators().groupMembershipAtBlock(
       validator,
-      blockNumber / getEpochSize(),
+      blockNumber,
       groupMembershipHistoryIndex
     );
-    return group;
+    return (signer, validator, group);
   }
 
   function debug(uint256 index, uint256 blockNumber, bytes memory blockA, bytes memory blockB)

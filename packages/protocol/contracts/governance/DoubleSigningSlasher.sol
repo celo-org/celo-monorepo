@@ -52,45 +52,50 @@ contract DoubleSigningSlasher is Ownable, Initializable, UsingRegistry, UsingPre
     return res;
   }
 
-  // Given two RLP encoded blocks, calls into a precompile that requires that
-  // the two block hashes are different, have the same height, have a
-  // quorum of signatures, and that `signer` was part of the quorum.
-  // Returns the block number of the provided blocks.
-  function eval(address signer, uint256 index, uint256 blockNumber, bytes memory blockA) internal {
-    require(keccak256(blockA) != blockhash(blockNumber), "Block headers have to be different");
-    uint256 epoch = blockNumber / getEpochSize();
-    bytes32 hashA = getParentHashFromHeader(blockA);
+  /**
+   * @notice Given two RLP encoded blocks, calls into a precompile that requires that
+   * the two block hashes are different, have the same height, have a
+   * quorum of signatures, and that `signer` was part of the quorum.
+   * @return Block number.
+   */
+  function eval(address signer, uint256 index, bytes memory blockA, bytes memory blockB)
+    internal
+    returns (uint256)
+  {
+    require(keccak256(blockA) != keccak256(blockB), "Block headers have to be different");
+    uint256 blockNumber = getBlockNumberFromHeader(blockA);
     require(
-      blockhash(blockNumber - 1) == hashA,
-      "Both parent hashes have to equal block at that number"
+      blockNumber == getBlockNumberFromHeader(blockB),
+      "Block headers are from different height"
     );
+    uint256 epoch = blockNumber / getEpochSize();
+    require(index < numberValidators(blockNumber), "Bad validator index");
     require(signer == getEpochSigner(epoch, index), "Wasn't a signer with given index");
     uint256 mapA = uint256(getVerifiedSealBitmap(blockA));
+    uint256 mapB = uint256(getVerifiedSealBitmap(blockB));
     require(mapA & (1 << index) != 0, "Didn't sign first block");
+    require(mapB & (1 << index) != 0, "Didn't sign second block");
     require(
       countSetBits(mapA) >= (2 * numberValidators(blockNumber)) / 3,
-      "Not enough signers in the block"
+      "Not enough signers in the first block"
     );
+    require(
+      countSetBits(mapB) >= (2 * numberValidators(blockNumber)) / 3,
+      "Not enough signers in the second block"
+    );
+    return blockNumber;
   }
 
-  // Requires that `eval` returns true and that this evidence has not
-  // already been used to slash `signer`.
-  // If so, fetches the `account` associated with `signer` and the group that
-  // `signer` was a member of during the corresponding epoch.
-  // Then, calls `LockedGold.slash` on both the validator and group accounts.
-  // Calls `Validators.removeSlashedMember` to remove the validator from its
-  // current group if it is a member of one.
-  // Finally, stores that hash(signer, blockNumber) has been slashed.
   function _slash(
     address signer,
     uint256 index,
-    uint256 blockNumber,
     bytes memory blockA,
+    bytes memory blockB,
     address[] memory validatorElectionLessers,
     address[] memory validatorElectionGreaters,
     uint256[] memory validatorElectionIndices
-  ) internal returns (bool) {
-    eval(signer, index, blockNumber, blockA);
+  ) internal returns (uint256) {
+    uint256 blockNumber = eval(signer, index, blockA, blockB);
     address validator = getAccounts().signerToAccount(signer);
     require(!isSlashed[keccak256(abi.encodePacked(validator, blockNumber))], "Already slashed");
     getLockedGold().slash(
@@ -102,7 +107,7 @@ contract DoubleSigningSlasher is Ownable, Initializable, UsingRegistry, UsingPre
       validatorElectionGreaters,
       validatorElectionIndices
     );
-    getValidators().forceDeaffiliateIfValidator(validator);
+    return blockNumber;
   }
 
   function _slashGroup(
@@ -112,14 +117,15 @@ contract DoubleSigningSlasher is Ownable, Initializable, UsingRegistry, UsingPre
     address[] memory groupElectionLessers,
     address[] memory groupElectionGreaters,
     uint256[] memory groupElectionIndices
-  ) internal {
+  ) internal returns (address) {
     address validator = getAccounts().signerToAccount(signer);
+    require(validator != address(0), "Validator not found");
     address group = getValidators().groupMembershipAtBlock(
       validator,
-      blockNumber / getEpochSize(),
+      blockNumber,
       groupMembershipHistoryIndex
     );
-    if (group == address(0)) return;
+    getValidators().forceDeaffiliateIfValidator(validator);
     getLockedGold().slash(
       group,
       slashingIncentives.penalty,
@@ -133,11 +139,21 @@ contract DoubleSigningSlasher is Ownable, Initializable, UsingRegistry, UsingPre
     isSlashed[keccak256(abi.encodePacked(validator, blockNumber))] = true;
   }
 
+  /**
+   * @notice Requires that `eval` returns true and that this evidence has not
+   * already been used to slash `signer`.
+   * If so, fetches the `account` associated with `signer` and the group that
+   * `signer` was a member of during the corresponding epoch.
+   * Then, calls `LockedGold.slash` on both the validator and group accounts.
+   * Calls `Validators.removeSlashedMember` to remove the validator from its
+   * current group if it is a member of one.
+   * Finally, stores that hash(signer, blockNumber) has been slashed.
+   */
   function slash(
     address signer,
     uint256 index,
-    uint256 blockNumber,
     bytes memory blockA,
+    bytes memory blockB,
     uint256 groupMembershipHistoryIndex,
     address[] memory validatorElectionLessers,
     address[] memory validatorElectionGreaters,
@@ -145,25 +161,25 @@ contract DoubleSigningSlasher is Ownable, Initializable, UsingRegistry, UsingPre
     address[] memory groupElectionLessers,
     address[] memory groupElectionGreaters,
     uint256[] memory groupElectionIndices
-  ) public returns (bool) {
-    _slash(
+  ) public returns (address) {
+    uint256 blockNumber = _slash(
       signer,
       index,
-      blockNumber,
       blockA,
+      blockB,
       validatorElectionLessers,
       validatorElectionGreaters,
       validatorElectionIndices
     );
-    _slashGroup(
-      signer,
-      blockNumber,
-      groupMembershipHistoryIndex,
-      groupElectionLessers,
-      groupElectionGreaters,
-      groupElectionIndices
-    );
-    return true;
+    return
+      _slashGroup(
+        signer,
+        blockNumber,
+        groupMembershipHistoryIndex,
+        groupElectionLessers,
+        groupElectionGreaters,
+        groupElectionIndices
+      );
   }
 
 }
