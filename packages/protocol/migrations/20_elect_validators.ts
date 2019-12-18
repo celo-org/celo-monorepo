@@ -322,4 +322,6 @@ module.exports = async (_deployer: any, networkName: string) => {
       to: election.address,
     })
   }
+
+  const votingBotKeys = config.election.votingBotKeys
 }

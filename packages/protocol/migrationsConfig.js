@@ -26,6 +26,9 @@ const DefaultConfig = {
     maxElectableValidators: '100',
     maxVotesPerAccount: 3,
     electabilityThreshold: 1 / 1000,
+    // These are used to run a bot on testnets to simulate non-validator stakers
+    // participating in elections
+    votingBotKeys: [],
   },
   epochRewards: {
     targetVotingYieldParameters: {
