@@ -180,7 +180,6 @@ contract DowntimeSlasher is Ownable, Initializable, UsingRegistry, UsingPrecompi
       validatorElectionGreaters,
       validatorElectionIndices
     );
-    getValidators().forceDeaffiliateIfValidator(validator);
     address group = getValidators().groupMembershipAtBlock(
       validator,
       startBlock,
@@ -196,6 +195,7 @@ contract DowntimeSlasher is Ownable, Initializable, UsingRegistry, UsingPrecompi
       groupElectionGreaters,
       groupElectionIndices
     );
+    getValidators().forceDeaffiliateIfValidator(validator);
     getValidators().halveSlashingMultiplier(group);
   }
 

@@ -144,13 +144,13 @@ contract DoubleSigningSlasher is Ownable, Initializable, UsingRegistry, UsingPre
       slashingIncentives.penalty,
       msg.sender,
       slashingIncentives.reward,
-      groupElectionLessers,
-      groupElectionGreaters,
-      groupElectionIndices
+      validatorElectionLessers,
+      validatorElectionGreaters,
+      validatorElectionIndices
     );
     address group = getValidators().groupMembershipAtBlock(
       validator,
-      blockNumber / getEpochSize(),
+      blockNumber,
       groupMembershipHistoryIndex
     );
     if (group == address(0)) return;

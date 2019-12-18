@@ -133,7 +133,7 @@ contract('DowntimeSlasher', (accounts: string[]) => {
     const validatorIndex = 0
     beforeEach(async () => {
       blockNumber = await web3.eth.getBlockNumber()
-      startBlock = blockNumber - 20
+      startBlock = blockNumber - 50
       const epoch = Math.floor(blockNumber / EPOCH)
       await slasher.setEpochSigner(epoch, validatorIndex, validator)
       await slasher.setEpochSigner(epoch - 1, validatorIndex, validator)
@@ -242,9 +242,9 @@ contract('DowntimeSlasher', (accounts: string[]) => {
         [],
         []
       )
-      slasher.slash(
+      await slasher.slash(
         validator,
-        startBlock + 100,
+        startBlock + 20,
         validatorIndex,
         validatorIndex,
         0,
