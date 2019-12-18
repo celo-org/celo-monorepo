@@ -14,7 +14,7 @@ interface BTNProps {
 interface Props {
   title: string
   text: string
-  label: string
+  label?: string
   id: string
   children: React.ReactNode
   buttonOne: BTNProps
