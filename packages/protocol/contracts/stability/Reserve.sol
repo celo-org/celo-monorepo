@@ -8,6 +8,7 @@ import "./interfaces/IReserve.sol";
 import "./interfaces/ISortedOracles.sol";
 import "./interfaces/IStableToken.sol";
 
+import "../common/FixidityLib.sol";
 import "../common/Initializable.sol";
 import "../common/UsingRegistry.sol";
 
@@ -16,6 +17,7 @@ import "../common/UsingRegistry.sol";
  */
 contract Reserve is IReserve, Ownable, Initializable, UsingRegistry, ReentrancyGuard {
   using SafeMath for uint256;
+  using FixidityLib for FixidityLib.Fraction;
 
   struct TobinTaxCache {
     uint128 numerator;
@@ -26,14 +28,23 @@ contract Reserve is IReserve, Ownable, Initializable, UsingRegistry, ReentrancyG
   address[] private _tokens;
   TobinTaxCache public tobinTaxCache;
   uint256 public tobinTaxStalenessThreshold;
-  uint256 public constant TOBIN_TAX_DENOMINATOR = 1000;
+  uint256 public constant TOBIN_TAX_NUMERATOR = 5000000000000000000000; // 0.005
   mapping(address => bool) public isSpender;
+
+  mapping(address => bool) public isOtherReserveAddress;
+  address[] public otherReserveAddresses;
+
+  bytes32[] public assetAllocationSymbols;
+  uint256[] public assetAllocationWeights;
 
   event TobinTaxStalenessThresholdSet(uint256 value);
   event TokenAdded(address token);
   event TokenRemoved(address token, uint256 index);
   event SpenderAdded(address spender);
   event SpenderRemoved(address spender);
+  event OtherReserveAddressAdded(address otherReserveAddress);
+  event OtherReserveAddressRemoved(address otherReserveAddress, uint256 index);
+  event AssetAllocationSet(bytes32[] symbols, uint256[] weights);
 
   modifier isStableToken(address token) {
     require(isToken[token], "token addr was never registered");
@@ -42,23 +53,48 @@ contract Reserve is IReserve, Ownable, Initializable, UsingRegistry, ReentrancyG
 
   function() external payable {} // solhint-disable no-empty-blocks
 
+  /**
+   * @notice Initializes critical variables.
+   * @param registryAddress The address of the registry contract.
+   * @param _tobinTaxStalenessThreshold The initial number of seconds to cache tobin tax value for.
+   */
   function initialize(address registryAddress, uint256 _tobinTaxStalenessThreshold)
     external
     initializer
   {
     _transferOwnership(msg.sender);
     setRegistry(registryAddress);
-    tobinTaxStalenessThreshold = _tobinTaxStalenessThreshold;
+    setTobinTaxStalenessThreshold(_tobinTaxStalenessThreshold);
   }
 
   /**
    * @notice Sets the number of seconds to cache the tobin tax value for.
    * @param value The number of seconds to cache the tobin tax value for.
    */
-  function setTobinTaxStalenessThreshold(uint256 value) external onlyOwner {
+  function setTobinTaxStalenessThreshold(uint256 value) public onlyOwner {
     require(value > 0, "value was zero");
     tobinTaxStalenessThreshold = value;
     emit TobinTaxStalenessThresholdSet(value);
+  }
+
+  /**
+   * @notice Sets target allocations for Celo Gold and a diversified basket of non-Celo assets.
+   * @param symbols The symbol of each asset in the Reserve portfolio.
+   * @param weights The weight for the corresponding asset as unwrapped Fixidity.Fraction.
+   */
+  function setAssetAllocations(bytes32[] calldata symbols, uint256[] calldata weights)
+    external
+    onlyOwner
+  {
+    require(symbols.length == weights.length);
+    FixidityLib.Fraction memory sum = FixidityLib.wrap(0);
+    for (uint256 i = 0; i < weights.length; i++) {
+      sum = sum.add(FixidityLib.wrap(weights[i]));
+    }
+    require(sum.equals(FixidityLib.fixed1()));
+    assetAllocationSymbols = symbols;
+    assetAllocationWeights = weights;
+    emit AssetAllocationSet(symbols, weights);
   }
 
   /**
@@ -104,6 +140,46 @@ contract Reserve is IReserve, Ownable, Initializable, UsingRegistry, ReentrancyG
   }
 
   /**
+   * @notice Add a reserve address whose balance shall be included in the reserve ratio.
+   * @param reserveAddress The reserve address to add.
+   */
+  function addOtherReserveAddress(address reserveAddress)
+    external
+    onlyOwner
+    nonReentrant
+    returns (bool)
+  {
+    require(!isOtherReserveAddress[reserveAddress], "reserve addr already added");
+    isOtherReserveAddress[reserveAddress] = true;
+    otherReserveAddresses.push(reserveAddress);
+    emit OtherReserveAddressAdded(reserveAddress);
+    return true;
+  }
+
+  /**
+   * @notice Remove reserve address whose balance shall no longer be included in the reserve ratio.
+   * @param reserveAddress The reserve address to remove.
+   * @param index The index of the reserve address in otherReserveAddresses.
+   */
+  function removeOtherReserveAddress(address reserveAddress, uint256 index)
+    external
+    onlyOwner
+    returns (bool)
+  {
+    require(isOtherReserveAddress[reserveAddress], "reserve addr was never added");
+    require(
+      index < otherReserveAddresses.length && otherReserveAddresses[index] == reserveAddress,
+      "index into reserve list not mapped to address"
+    );
+    isOtherReserveAddress[reserveAddress] = false;
+    address lastItem = otherReserveAddresses[otherReserveAddresses.length - 1];
+    otherReserveAddresses[index] = lastItem;
+    otherReserveAddresses.length--;
+    emit OtherReserveAddressRemoved(reserveAddress, index);
+    return true;
+  }
+
+  /**
    * @notice Gives an address permission to spend Reserve funds.
    * @param spender The address that is allowed to spend Reserve funds.
    */
@@ -139,14 +215,34 @@ contract Reserve is IReserve, Ownable, Initializable, UsingRegistry, ReentrancyG
   function getOrComputeTobinTax() external nonReentrant returns (uint256, uint256) {
     // solhint-disable-next-line not-rely-on-time
     if (now.sub(tobinTaxCache.timestamp) > tobinTaxStalenessThreshold) {
-      tobinTaxCache.numerator = uint128(computeTobinTax());
+      tobinTaxCache.numerator = uint128(computeTobinTax().unwrap());
       tobinTaxCache.timestamp = uint128(now); // solhint-disable-line not-rely-on-time
     }
-    return (uint256(tobinTaxCache.numerator), TOBIN_TAX_DENOMINATOR);
+    return (uint256(tobinTaxCache.numerator), FixidityLib.fixed1().unwrap());
   }
 
   function getTokens() external view returns (address[] memory) {
     return _tokens;
+  }
+
+  function getOtherReserveAddresses() external view returns (address[] memory) {
+    return otherReserveAddresses;
+  }
+
+  function getAssetAllocationSymbols() external view returns (bytes32[] memory) {
+    return assetAllocationSymbols;
+  }
+
+  function getAssetAllocationWeights() external view returns (uint256[] memory) {
+    return assetAllocationWeights;
+  }
+
+  function getReserveGoldBalance() public view returns (uint256) {
+    uint256 reserveGoldBalance = address(this).balance;
+    for (uint256 i = 0; i < otherReserveAddresses.length; i++) {
+      reserveGoldBalance = reserveGoldBalance.add(otherReserveAddresses[i].balance);
+    }
+    return reserveGoldBalance;
   }
 
   /*
@@ -156,10 +252,10 @@ contract Reserve is IReserve, Ownable, Initializable, UsingRegistry, ReentrancyG
    * @notice Computes a tobin tax based on the reserve ratio.
    * @return The numerator of the tobin tax amount, where the denominator is 1000.
    */
-  function computeTobinTax() private view returns (uint256) {
+  function computeTobinTax() private view returns (FixidityLib.Fraction memory) {
     address sortedOraclesAddress = registry.getAddressForOrDie(SORTED_ORACLES_REGISTRY_ID);
     ISortedOracles sortedOracles = ISortedOracles(sortedOraclesAddress);
-    uint256 reserveGoldBalance = address(this).balance;
+    uint256 reserveGoldBalance = getReserveGoldBalance();
     uint256 stableTokensValueInGold = 0;
 
     for (uint256 i = 0; i < _tokens.length; i++) {
@@ -175,9 +271,9 @@ contract Reserve is IReserve, Ownable, Initializable, UsingRegistry, ReentrancyG
     // The protocol aims to keep half of the reserve value in gold, thus the reserve ratio
     // is two when the value of gold in the reserve is equal to the total supply of stable tokens.
     if (reserveGoldBalance >= stableTokensValueInGold) {
-      return 0;
+      return FixidityLib.wrap(0);
     } else {
-      return 5;
+      return FixidityLib.wrap(TOBIN_TAX_NUMERATOR);
     }
   }
 
