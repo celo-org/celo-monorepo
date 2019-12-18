@@ -14,7 +14,7 @@ interface Props {
 export class BlueBanner extends React.PureComponent<Props> {
   ref = React.createRef<View>()
   componentDidUpdate = () => {
-    this.ref.current.measure((x, y, w, height) => {
+    this.ref.current.measure((_x, _y, _w, height) => {
       this.props.getRealHeight(height)
     })
   }
