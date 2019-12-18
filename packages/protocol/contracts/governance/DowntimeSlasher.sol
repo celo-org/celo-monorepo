@@ -16,7 +16,7 @@ contract DowntimeSlasher is Ownable, Initializable, UsingRegistry, UsingPrecompi
   }
 
   SlashingIncentives public slashingIncentives;
-  mapping(bytes32 => bool) isSlashed;
+  mapping(bytes32 => uint256) isSlashed;
   uint256 public slashableDowntime;
 
   event SlashingIncentivesSet(uint256 penalty, uint256 reward);
@@ -96,6 +96,44 @@ contract DowntimeSlasher is Ownable, Initializable, UsingRegistry, UsingPrecompi
     return startBlock + slashableDowntime - 1;
   }
 
+  function debugSlashed(address validator, uint256 startBlock)
+    public
+    view
+    returns (uint256, uint256, uint256, uint256)
+  {
+    uint256 endBlock = getEndBlock(startBlock);
+    uint256 startEpochBlock = (startBlock % getEpochSize());
+    uint256 endEpochBlock = endBlock % getEpochSize();
+    uint256 startEpoch = getEpoch(startBlock);
+    uint256 endEpoch = getEpoch(endBlock);
+    return (
+      startEpochBlock,
+      endEpochBlock,
+      isSlashed[keccak256(abi.encodePacked(validator, startEpoch))],
+      isSlashed[keccak256(abi.encodePacked(validator, endEpoch))]
+    );
+  }
+
+  function checkIfAlreadySlashed(address validator, uint256 startBlock) internal {
+    uint256 endBlock = getEndBlock(startBlock);
+    uint256 startEpochBlock = (startBlock % getEpochSize());
+    uint256 endEpochBlock = endBlock % getEpochSize();
+    uint256 startEpoch = getEpoch(startBlock);
+    uint256 endEpoch = getEpoch(endBlock);
+    require(
+      isSlashed[keccak256(abi.encodePacked(validator, startEpoch))] < startEpochBlock,
+      "Already slashed"
+    );
+    require(
+      isSlashed[keccak256(abi.encodePacked(validator, endEpoch))] < endEpochBlock,
+      "Already slashed"
+    );
+    isSlashed[keccak256(abi.encodePacked(validator, startEpoch))] =
+      startEpochBlock +
+      slashableDowntime;
+    isSlashed[keccak256(abi.encodePacked(validator, endEpoch))] = endEpochBlock + 1;
+  }
+
   /** @notice Requires that `eval` returns true and that the account corresponding to
    * `signer` has not already been slashed for downtime for the epoch
    * corresponding to `startBlock`.
@@ -132,16 +170,7 @@ contract DowntimeSlasher is Ownable, Initializable, UsingRegistry, UsingPrecompi
     uint256[] memory groupElectionIndices
   ) public {
     require(isDown(validator, signerIndex0, signerIndex1, startBlock), "Wasn't down");
-    require(
-      !isSlashed[keccak256(abi.encodePacked(validator, getEpoch(startBlock)))],
-      "Already slashed"
-    );
-    require(
-      !isSlashed[keccak256(abi.encodePacked(validator, getEpoch(getEndBlock(startBlock))))],
-      "Already slashed"
-    );
-    isSlashed[keccak256(abi.encodePacked(validator, getEpoch(startBlock)))] = true;
-    isSlashed[keccak256(abi.encodePacked(validator, getEpoch(getEndBlock(startBlock))))] = true;
+    checkIfAlreadySlashed(validator, startBlock);
     getLockedGold().slash(
       validator,
       slashingIncentives.penalty,

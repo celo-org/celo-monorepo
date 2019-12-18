@@ -201,7 +201,7 @@ contract('DowntimeSlasher', (accounts: string[]) => {
     it('cannot be slashed twice', async () => {
       await slasher.slash(
         validator,
-        startBlock + 1,
+        startBlock,
         validatorIndex,
         validatorIndex,
         0,
@@ -215,7 +215,7 @@ contract('DowntimeSlasher', (accounts: string[]) => {
       await assertRevert(
         slasher.slash(
           validator,
-          startBlock,
+          startBlock + 1,
           validatorIndex,
           validatorIndex,
           0,
@@ -226,6 +226,34 @@ contract('DowntimeSlasher', (accounts: string[]) => {
           [],
           []
         )
+      )
+    })
+    it('but can be slashed later on', async () => {
+      await slasher.slash(
+        validator,
+        startBlock,
+        validatorIndex,
+        validatorIndex,
+        0,
+        [],
+        [],
+        [],
+        [],
+        [],
+        []
+      )
+      slasher.slash(
+        validator,
+        startBlock + 100,
+        validatorIndex,
+        validatorIndex,
+        0,
+        [],
+        [],
+        [],
+        [],
+        [],
+        []
       )
     })
   })
