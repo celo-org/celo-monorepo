@@ -1,6 +1,6 @@
 export default function getConfig() {
   return {
-    publicRuntimeConfig: {},
+    publicRuntimeConfig: { FLAGS: {} },
     serverRunTimeConfig: {},
   }
 }
