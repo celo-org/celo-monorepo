@@ -12,11 +12,11 @@ import {
   ExchangeInstance,
   GoldTokenInstance,
   GovernanceInstance,
+  GovernanceSlasherInstance,
   LockedGoldInstance,
   RegistryInstance,
   ReserveInstance,
   StableTokenInstance,
-  GovernanceSlasherInstance,
 } from 'types'
 
 enum VoteValue {
