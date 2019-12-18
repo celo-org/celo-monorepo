@@ -67,7 +67,7 @@ exports[`FAQ renders 1`] = `
     >
       <h1
         aria-level="1"
-        className="css-reset-4rbku5 css-text-76zvg2"
+        className="css-reset-4rbku5 css-text-901oao"
         dir="auto"
         role="heading"
         style={
@@ -127,7 +127,7 @@ exports[`FAQ renders 1`] = `
       }
     >
       <div
-        className="css-text-76zvg2"
+        className="css-text-901oao"
         dir="auto"
         style={
           Object {
@@ -162,7 +162,7 @@ exports[`FAQ renders 1`] = `
       }
     >
       <div
-        className="css-text-76zvg2"
+        className="css-text-901oao"
         dir="auto"
         style={
           Object {
@@ -192,13 +192,14 @@ exports[`FAQ renders 1`] = `
           }
         >
           <a
-            className="css-reset-4rbku5 css-cursor-18t94o4 css-text-76zvg2 css-textHasAncestor-16my406"
+            className="css-reset-4rbku5 css-cursor-18t94o4 css-text-901oao css-textHasAncestor-16my406"
             data-focusable={true}
             dir="auto"
             href="https://celo.org"
             role="link"
             style={
               Object {
+                "WebkitTextDecorationLine": "underline",
                 "color": "rgba(46,51,56,1.00)",
                 "cursor": "pointer",
                 "display": "inline",
@@ -206,7 +207,7 @@ exports[`FAQ renders 1`] = `
                 "fontSize": "20px",
                 "lineHeight": "28px",
                 "opacity": 1,
-                "textDecoration": "underline",
+                "textDecorationLine": "underline",
                 "textRendering": "geometricPrecision",
               }
             }
@@ -259,7 +260,7 @@ exports[`FAQ renders 1`] = `
       }
     >
       <div
-        className="css-text-76zvg2"
+        className="css-text-901oao"
         dir="auto"
         style={
           Object {
@@ -294,7 +295,7 @@ exports[`FAQ renders 1`] = `
       }
     >
       <div
-        className="css-text-76zvg2"
+        className="css-text-901oao"
         dir="auto"
         style={
           Object {
@@ -351,7 +352,7 @@ exports[`FAQ renders 1`] = `
       }
     >
       <div
-        className="css-text-76zvg2"
+        className="css-text-901oao"
         dir="auto"
         style={
           Object {
@@ -386,7 +387,7 @@ exports[`FAQ renders 1`] = `
       }
     >
       <div
-        className="css-text-76zvg2"
+        className="css-text-901oao"
         dir="auto"
         style={
           Object {
@@ -443,7 +444,7 @@ exports[`FAQ renders 1`] = `
       }
     >
       <div
-        className="css-text-76zvg2"
+        className="css-text-901oao"
         dir="auto"
         style={
           Object {
@@ -478,7 +479,7 @@ exports[`FAQ renders 1`] = `
       }
     >
       <div
-        className="css-text-76zvg2"
+        className="css-text-901oao"
         dir="auto"
         style={
           Object {
@@ -535,7 +536,7 @@ exports[`FAQ renders 1`] = `
       }
     >
       <div
-        className="css-text-76zvg2"
+        className="css-text-901oao"
         dir="auto"
         style={
           Object {
@@ -570,7 +571,7 @@ exports[`FAQ renders 1`] = `
       }
     >
       <div
-        className="css-text-76zvg2"
+        className="css-text-901oao"
         dir="auto"
         style={
           Object {
@@ -627,7 +628,7 @@ exports[`FAQ renders 1`] = `
       }
     >
       <div
-        className="css-text-76zvg2"
+        className="css-text-901oao"
         dir="auto"
         style={
           Object {
@@ -662,7 +663,7 @@ exports[`FAQ renders 1`] = `
       }
     >
       <div
-        className="css-text-76zvg2"
+        className="css-text-901oao"
         dir="auto"
         style={
           Object {
@@ -719,7 +720,7 @@ exports[`FAQ renders 1`] = `
       }
     >
       <div
-        className="css-text-76zvg2"
+        className="css-text-901oao"
         dir="auto"
         style={
           Object {
@@ -754,7 +755,7 @@ exports[`FAQ renders 1`] = `
       }
     >
       <div
-        className="css-text-76zvg2"
+        className="css-text-901oao"
         dir="auto"
         style={
           Object {
@@ -811,7 +812,7 @@ exports[`FAQ renders 1`] = `
       }
     >
       <div
-        className="css-text-76zvg2"
+        className="css-text-901oao"
         dir="auto"
         style={
           Object {
@@ -846,7 +847,7 @@ exports[`FAQ renders 1`] = `
       }
     >
       <div
-        className="css-text-76zvg2"
+        className="css-text-901oao"
         dir="auto"
         style={
           Object {
@@ -903,7 +904,7 @@ exports[`FAQ renders 1`] = `
       }
     >
       <div
-        className="css-text-76zvg2"
+        className="css-text-901oao"
         dir="auto"
         style={
           Object {
@@ -938,7 +939,7 @@ exports[`FAQ renders 1`] = `
       }
     >
       <div
-        className="css-text-76zvg2"
+        className="css-text-901oao"
         dir="auto"
         style={
           Object {
@@ -995,7 +996,7 @@ exports[`FAQ renders 1`] = `
       }
     >
       <div
-        className="css-text-76zvg2"
+        className="css-text-901oao"
         dir="auto"
         style={
           Object {
@@ -1030,7 +1031,7 @@ exports[`FAQ renders 1`] = `
       }
     >
       <div
-        className="css-text-76zvg2"
+        className="css-text-901oao"
         dir="auto"
         style={
           Object {
@@ -1087,7 +1088,7 @@ exports[`FAQ renders 1`] = `
       }
     >
       <div
-        className="css-text-76zvg2"
+        className="css-text-901oao"
         dir="auto"
         style={
           Object {
@@ -1122,7 +1123,7 @@ exports[`FAQ renders 1`] = `
       }
     >
       <div
-        className="css-text-76zvg2"
+        className="css-text-901oao"
         dir="auto"
         style={
           Object {
@@ -1179,7 +1180,7 @@ exports[`FAQ renders 1`] = `
       }
     >
       <div
-        className="css-text-76zvg2"
+        className="css-text-901oao"
         dir="auto"
         style={
           Object {
@@ -1214,7 +1215,7 @@ exports[`FAQ renders 1`] = `
       }
     >
       <div
-        className="css-text-76zvg2"
+        className="css-text-901oao"
         dir="auto"
         style={
           Object {
@@ -1271,7 +1272,7 @@ exports[`FAQ renders 1`] = `
       }
     >
       <div
-        className="css-text-76zvg2"
+        className="css-text-901oao"
         dir="auto"
         style={
           Object {
@@ -1306,7 +1307,7 @@ exports[`FAQ renders 1`] = `
       }
     >
       <div
-        className="css-text-76zvg2"
+        className="css-text-901oao"
         dir="auto"
         style={
           Object {
@@ -1363,7 +1364,7 @@ exports[`FAQ renders 1`] = `
       }
     >
       <div
-        className="css-text-76zvg2"
+        className="css-text-901oao"
         dir="auto"
         style={
           Object {
@@ -1398,7 +1399,7 @@ exports[`FAQ renders 1`] = `
       }
     >
       <div
-        className="css-text-76zvg2"
+        className="css-text-901oao"
         dir="auto"
         style={
           Object {
@@ -1428,13 +1429,14 @@ exports[`FAQ renders 1`] = `
           }
         >
           <a
-            className="css-reset-4rbku5 css-cursor-18t94o4 css-text-76zvg2 css-textHasAncestor-16my406"
+            className="css-reset-4rbku5 css-cursor-18t94o4 css-text-901oao css-textHasAncestor-16my406"
             data-focusable={true}
             dir="auto"
             href="https://celo.org/privacy"
             role="link"
             style={
               Object {
+                "WebkitTextDecorationLine": "underline",
                 "color": "rgba(46,51,56,1.00)",
                 "cursor": "pointer",
                 "display": "inline",
@@ -1442,7 +1444,7 @@ exports[`FAQ renders 1`] = `
                 "fontSize": "20px",
                 "lineHeight": "28px",
                 "opacity": 1,
-                "textDecoration": "underline",
+                "textDecorationLine": "underline",
                 "textRendering": "geometricPrecision",
               }
             }
@@ -1495,7 +1497,7 @@ exports[`FAQ renders 1`] = `
       }
     >
       <div
-        className="css-text-76zvg2"
+        className="css-text-901oao"
         dir="auto"
         style={
           Object {
@@ -1530,7 +1532,7 @@ exports[`FAQ renders 1`] = `
       }
     >
       <div
-        className="css-text-76zvg2"
+        className="css-text-901oao"
         dir="auto"
         style={
           Object {
@@ -1587,7 +1589,7 @@ exports[`FAQ renders 1`] = `
       }
     >
       <div
-        className="css-text-76zvg2"
+        className="css-text-901oao"
         dir="auto"
         style={
           Object {
@@ -1622,7 +1624,7 @@ exports[`FAQ renders 1`] = `
       }
     >
       <div
-        className="css-text-76zvg2"
+        className="css-text-901oao"
         dir="auto"
         style={
           Object {
@@ -1652,13 +1654,14 @@ exports[`FAQ renders 1`] = `
           }
         >
           <a
-            className="css-reset-4rbku5 css-cursor-18t94o4 css-text-76zvg2 css-textHasAncestor-16my406"
+            className="css-reset-4rbku5 css-cursor-18t94o4 css-text-901oao css-textHasAncestor-16my406"
             data-focusable={true}
             dir="auto"
             href="https://docs.celo.org/celo-codebase/protocol/identity"
             role="link"
             style={
               Object {
+                "WebkitTextDecorationLine": "underline",
                 "color": "rgba(46,51,56,1.00)",
                 "cursor": "pointer",
                 "display": "inline",
@@ -1666,7 +1669,7 @@ exports[`FAQ renders 1`] = `
                 "fontSize": "20px",
                 "lineHeight": "28px",
                 "opacity": 1,
-                "textDecoration": "underline",
+                "textDecorationLine": "underline",
                 "textRendering": "geometricPrecision",
               }
             }
@@ -1718,7 +1721,7 @@ exports[`FAQ renders 1`] = `
       }
     >
       <div
-        className="css-text-76zvg2"
+        className="css-text-901oao"
         dir="auto"
         style={
           Object {
@@ -1753,7 +1756,7 @@ exports[`FAQ renders 1`] = `
       }
     >
       <div
-        className="css-text-76zvg2"
+        className="css-text-901oao"
         dir="auto"
         style={
           Object {
@@ -1783,13 +1786,14 @@ exports[`FAQ renders 1`] = `
           }
         >
           <a
-            className="css-reset-4rbku5 css-cursor-18t94o4 css-text-76zvg2 css-textHasAncestor-16my406"
+            className="css-reset-4rbku5 css-cursor-18t94o4 css-text-901oao css-textHasAncestor-16my406"
             data-focusable={true}
             dir="auto"
             href="https://celo.org/rewards"
             role="link"
             style={
               Object {
+                "WebkitTextDecorationLine": "underline",
                 "color": "rgba(46,51,56,1.00)",
                 "cursor": "pointer",
                 "display": "inline",
@@ -1797,7 +1801,7 @@ exports[`FAQ renders 1`] = `
                 "fontSize": "20px",
                 "lineHeight": "28px",
                 "opacity": 1,
-                "textDecoration": "underline",
+                "textDecorationLine": "underline",
                 "textRendering": "geometricPrecision",
               }
             }
@@ -1850,7 +1854,7 @@ exports[`FAQ renders 1`] = `
       }
     >
       <div
-        className="css-text-76zvg2"
+        className="css-text-901oao"
         dir="auto"
         style={
           Object {
@@ -1885,7 +1889,7 @@ exports[`FAQ renders 1`] = `
       }
     >
       <div
-        className="css-text-76zvg2"
+        className="css-text-901oao"
         dir="auto"
         style={
           Object {
@@ -1942,7 +1946,7 @@ exports[`FAQ renders 1`] = `
       }
     >
       <div
-        className="css-text-76zvg2"
+        className="css-text-901oao"
         dir="auto"
         style={
           Object {
@@ -1977,7 +1981,7 @@ exports[`FAQ renders 1`] = `
       }
     >
       <div
-        className="css-text-76zvg2"
+        className="css-text-901oao"
         dir="auto"
         style={
           Object {
@@ -2007,13 +2011,14 @@ exports[`FAQ renders 1`] = `
           }
         >
           <a
-            className="css-reset-4rbku5 css-cursor-18t94o4 css-text-76zvg2 css-textHasAncestor-16my406"
+            className="css-reset-4rbku5 css-cursor-18t94o4 css-text-901oao css-textHasAncestor-16my406"
             data-focusable={true}
             dir="auto"
             href="mailto:community@celo.org"
             role="link"
             style={
               Object {
+                "WebkitTextDecorationLine": "underline",
                 "color": "rgba(46,51,56,1.00)",
                 "cursor": "pointer",
                 "display": "inline",
@@ -2021,7 +2026,7 @@ exports[`FAQ renders 1`] = `
                 "fontSize": "20px",
                 "lineHeight": "28px",
                 "opacity": 1,
-                "textDecoration": "underline",
+                "textDecorationLine": "underline",
                 "textRendering": "geometricPrecision",
               }
             }

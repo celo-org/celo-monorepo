@@ -67,7 +67,7 @@ exports[`Terms renders 1`] = `
     >
       <h1
         aria-level="1"
-        className="css-reset-4rbku5 css-text-76zvg2"
+        className="css-reset-4rbku5 css-text-901oao"
         dir="auto"
         role="heading"
         style={
@@ -128,7 +128,7 @@ exports[`Terms renders 1`] = `
     >
       <h3
         aria-level="3"
-        className="css-reset-4rbku5 css-text-76zvg2"
+        className="css-reset-4rbku5 css-text-901oao"
         dir="auto"
         role="heading"
         style={
@@ -165,7 +165,7 @@ exports[`Terms renders 1`] = `
       }
     >
       <div
-        className="css-text-76zvg2"
+        className="css-text-901oao"
         dir="auto"
         style={
           Object {
@@ -228,7 +228,7 @@ exports[`Terms renders 1`] = `
             }
           >
             <a
-              className="css-reset-4rbku5 css-cursor-18t94o4 css-text-76zvg2"
+              className="css-reset-4rbku5 css-cursor-18t94o4 css-text-901oao"
               data-focusable={true}
               dir="auto"
               href="/user-agreement"
@@ -322,7 +322,7 @@ exports[`Terms renders 1`] = `
             }
           >
             <a
-              className="css-reset-4rbku5 css-cursor-18t94o4 css-text-76zvg2"
+              className="css-reset-4rbku5 css-cursor-18t94o4 css-text-901oao"
               data-focusable={true}
               dir="auto"
               href="/faq"
@@ -416,7 +416,7 @@ exports[`Terms renders 1`] = `
             }
           >
             <a
-              className="css-reset-4rbku5 css-cursor-18t94o4 css-text-76zvg2"
+              className="css-reset-4rbku5 css-cursor-18t94o4 css-text-901oao"
               data-focusable={true}
               dir="auto"
               href="/privacy"
@@ -510,7 +510,7 @@ exports[`Terms renders 1`] = `
             }
           >
             <a
-              className="css-reset-4rbku5 css-cursor-18t94o4 css-text-76zvg2"
+              className="css-reset-4rbku5 css-cursor-18t94o4 css-text-901oao"
               data-focusable={true}
               dir="auto"
               href="https://docs.celo.org/important-information/alfajores-testnet-disclaimer"
@@ -610,7 +610,7 @@ exports[`Terms renders 1`] = `
     >
       <h3
         aria-level="3"
-        className="css-reset-4rbku5 css-text-76zvg2"
+        className="css-reset-4rbku5 css-text-901oao"
         dir="auto"
         role="heading"
         style={
@@ -647,7 +647,7 @@ exports[`Terms renders 1`] = `
       }
     >
       <div
-        className="css-text-76zvg2"
+        className="css-text-901oao"
         dir="auto"
         style={
           Object {
@@ -660,7 +660,7 @@ exports[`Terms renders 1`] = `
         }
       />
       <div
-        className="css-text-76zvg2"
+        className="css-text-901oao"
         dir="auto"
         style={
           Object {
@@ -714,7 +714,7 @@ exports[`Terms renders 1`] = `
           }
         >
           <a
-            className="css-reset-4rbku5 css-cursor-18t94o4 css-text-76zvg2"
+            className="css-reset-4rbku5 css-cursor-18t94o4 css-text-901oao"
             data-focusable={true}
             dir="auto"
             href="https://docs.celo.org/celo-codebase/protocol/privacy"
