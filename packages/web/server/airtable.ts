@@ -1,7 +1,7 @@
-import * as AirtableAPI from 'airtable'
+import AirtableAPI from 'airtable'
 import getConfig from 'next/config'
 
-let airTableSingleton
+let airTableSingleton: AirtableAPI
 
 export default function airtableInit(baseID: string) {
   const { serverRuntimeConfig } = getConfig()
