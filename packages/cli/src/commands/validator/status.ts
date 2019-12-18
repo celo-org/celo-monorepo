@@ -97,13 +97,14 @@ export default class ValidatorStatus extends BaseCommand {
     const checker = newCheckBuilder(this)
     if (res.flags.signer) {
       signers = [res.flags.signer]
-      checker.isAccount(res.flags.validator).isValidator(res.flags.validator)
-      await checker.runChecks()
-    } else if (res.flags.validator) {
       const validator = await accounts.signerToAccount(res.flags.signer)
-      signers = [validator]
       checker.isAccount(validator).isValidator(validator)
       await checker.runChecks()
+    } else if (res.flags.validator) {
+      checker.isAccount(res.flags.validator).isValidator(res.flags.validator)
+      await checker.runChecks()
+      const signer = await accounts.getValidatorSigner(res.flags.validator)
+      signers = [res.flags.validator]
     } else {
       signers = concurrentMap(10, await validators.getRegisteredValidatorsAddresses(), (a) =>
         accounts.getValidatorSigner(a)
