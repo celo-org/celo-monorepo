@@ -217,7 +217,6 @@ exports[`UserAgreement renders 1`] = `
             role="link"
             style={
               Object {
-                "WebkitTextDecorationLine": "underline",
                 "color": "rgba(46,51,56,1.00)",
                 "cursor": "pointer",
                 "display": "inline",
@@ -225,7 +224,7 @@ exports[`UserAgreement renders 1`] = `
                 "fontSize": "20px",
                 "lineHeight": "28px",
                 "opacity": 1,
-                "textDecorationLine": "underline",
+                "textDecoration": "underline",
                 "textRendering": "geometricPrecision",
               }
             }
@@ -269,7 +268,6 @@ You understand that you are participating in a test, and that the Celo Services 
             role="link"
             style={
               Object {
-                "WebkitTextDecorationLine": "underline",
                 "color": "rgba(46,51,56,1.00)",
                 "cursor": "pointer",
                 "display": "inline",
@@ -277,7 +275,7 @@ You understand that you are participating in a test, and that the Celo Services 
                 "fontSize": "20px",
                 "lineHeight": "28px",
                 "opacity": 1,
-                "textDecorationLine": "underline",
+                "textDecoration": "underline",
                 "textRendering": "geometricPrecision",
               }
             }
@@ -326,7 +324,6 @@ The Company reserves the right in its sole and absolute discretion to terminate 
             role="link"
             style={
               Object {
-                "WebkitTextDecorationLine": "underline",
                 "color": "rgba(46,51,56,1.00)",
                 "cursor": "pointer",
                 "display": "inline",
@@ -334,7 +331,7 @@ The Company reserves the right in its sole and absolute discretion to terminate 
                 "fontSize": "20px",
                 "lineHeight": "28px",
                 "opacity": 1,
-                "textDecorationLine": "underline",
+                "textDecoration": "underline",
                 "textRendering": "geometricPrecision",
               }
             }

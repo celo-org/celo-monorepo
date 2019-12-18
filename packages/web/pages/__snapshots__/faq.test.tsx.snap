@@ -199,7 +199,6 @@ exports[`FAQ renders 1`] = `
             role="link"
             style={
               Object {
-                "WebkitTextDecorationLine": "underline",
                 "color": "rgba(46,51,56,1.00)",
                 "cursor": "pointer",
                 "display": "inline",
@@ -207,7 +206,7 @@ exports[`FAQ renders 1`] = `
                 "fontSize": "20px",
                 "lineHeight": "28px",
                 "opacity": 1,
-                "textDecorationLine": "underline",
+                "textDecoration": "underline",
                 "textRendering": "geometricPrecision",
               }
             }
@@ -1436,7 +1435,6 @@ exports[`FAQ renders 1`] = `
             role="link"
             style={
               Object {
-                "WebkitTextDecorationLine": "underline",
                 "color": "rgba(46,51,56,1.00)",
                 "cursor": "pointer",
                 "display": "inline",
@@ -1444,7 +1442,7 @@ exports[`FAQ renders 1`] = `
                 "fontSize": "20px",
                 "lineHeight": "28px",
                 "opacity": 1,
-                "textDecorationLine": "underline",
+                "textDecoration": "underline",
                 "textRendering": "geometricPrecision",
               }
             }
@@ -1661,7 +1659,6 @@ exports[`FAQ renders 1`] = `
             role="link"
             style={
               Object {
-                "WebkitTextDecorationLine": "underline",
                 "color": "rgba(46,51,56,1.00)",
                 "cursor": "pointer",
                 "display": "inline",
@@ -1669,7 +1666,7 @@ exports[`FAQ renders 1`] = `
                 "fontSize": "20px",
                 "lineHeight": "28px",
                 "opacity": 1,
-                "textDecorationLine": "underline",
+                "textDecoration": "underline",
                 "textRendering": "geometricPrecision",
               }
             }
@@ -1793,7 +1790,6 @@ exports[`FAQ renders 1`] = `
             role="link"
             style={
               Object {
-                "WebkitTextDecorationLine": "underline",
                 "color": "rgba(46,51,56,1.00)",
                 "cursor": "pointer",
                 "display": "inline",
@@ -1801,7 +1797,7 @@ exports[`FAQ renders 1`] = `
                 "fontSize": "20px",
                 "lineHeight": "28px",
                 "opacity": 1,
-                "textDecorationLine": "underline",
+                "textDecoration": "underline",
                 "textRendering": "geometricPrecision",
               }
             }
@@ -2018,7 +2014,6 @@ exports[`FAQ renders 1`] = `
             role="link"
             style={
               Object {
-                "WebkitTextDecorationLine": "underline",
                 "color": "rgba(46,51,56,1.00)",
                 "cursor": "pointer",
                 "display": "inline",
@@ -2026,7 +2021,7 @@ exports[`FAQ renders 1`] = `
                 "fontSize": "20px",
                 "lineHeight": "28px",
                 "opacity": 1,
-                "textDecorationLine": "underline",
+                "textDecoration": "underline",
                 "textRendering": "geometricPrecision",
               }
             }

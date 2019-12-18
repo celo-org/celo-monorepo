@@ -1,0 +1,4397 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`About renders 1`] = `
+<div
+  className="css-view-1dbjc4n"
+  style={
+    Object {
+      "WebkitAlignItems": "stretch",
+      "WebkitBoxAlign": "stretch",
+      "WebkitBoxDirection": "normal",
+      "WebkitBoxFlex": 1,
+      "WebkitBoxOrient": "vertical",
+      "WebkitFlexBasis": "0%",
+      "WebkitFlexDirection": "column",
+      "WebkitFlexGrow": 1,
+      "WebkitFlexShrink": 1,
+      "alignItems": "stretch",
+      "display": "flex",
+      "flexBasis": "0%",
+      "flexDirection": "column",
+      "flexGrow": 1,
+      "flexShrink": 1,
+      "msFlexAlign": "stretch",
+      "msFlexDirection": "column",
+      "msFlexNegative": 1,
+      "msFlexPositive": 1,
+      "msFlexPreferredSize": "0%",
+    }
+  }
+>
+  <div
+    className="css-view-1dbjc4n"
+    style={
+      Object {
+        "height": "100vh",
+        "width": "100vw",
+      }
+    }
+  >
+    <div
+      className="css-view-1dbjc4n"
+      style={
+        Object {
+          "height": "100vh",
+          "position": "absolute",
+          "width": "100vw",
+        }
+      }
+    >
+      <video
+        autoPlay={true}
+        loop={true}
+        muted={true}
+        poster="/static/AboutPreview.jpg"
+        style={
+          Object {
+            "MozTransitionProperty": "filter",
+            "WebkitFilter": "saturate(0.6) brightness(0.70)",
+            "WebkitTransitionDuration": "400ms",
+            "WebkitTransitionProperty": "-webkit-filter,filter",
+            "filter": "saturate(0.6) brightness(0.70)",
+            "height": "100%",
+            "objectFit": "cover",
+            "transitionDuration": "400ms",
+            "transitionProperty": "-webkit-filter,filter",
+          }
+        }
+      >
+        }
+        <div
+          className="css-view-1dbjc4n"
+          style={
+            Object {
+              "WebkitFlexBasis": "auto",
+              "flexBasis": "auto",
+              "height": "100%",
+              "msFlexPreferredSize": "auto",
+              "overflowX": "hidden",
+              "overflowY": "hidden",
+              "width": "100%",
+              "zIndex": 0,
+            }
+          }
+        >
+          <div
+            className="css-view-1dbjc4n"
+            style={
+              Object {
+                "backgroundColor": "rgba(0,0,0,0.00)",
+                "backgroundImage": "url(\\"/static/AboutPreview.jpg\\")",
+                "backgroundPosition": "center",
+                "backgroundRepeat": "no-repeat",
+                "backgroundSize": "cover",
+                "bottom": "0px",
+                "height": "100%",
+                "left": "0px",
+                "position": "absolute",
+                "right": "0px",
+                "top": "0px",
+                "width": "100%",
+                "zIndex": -1,
+              }
+            }
+          />
+          <img
+            alt=""
+            className="css-accessibilityImage-9pa8cd"
+            draggable={false}
+            src="/static/AboutPreview.jpg"
+          />
+        </div>
+      </video>
+    </div>
+    <div
+      className="css-view-1dbjc4n"
+      style={
+        Object {
+          "WebkitAlignItems": "center",
+          "WebkitBoxAlign": "center",
+          "WebkitBoxPack": "center",
+          "WebkitJustifyContent": "center",
+          "alignItems": "center",
+          "height": "100%",
+          "justifyContent": "center",
+          "msFlexAlign": "center",
+          "msFlexPack": "center",
+          "width": "100%",
+        }
+      }
+    >
+      <style>
+        
+            .ReactModal__Body--open {
+              position: fixed;
+            }
+
+            .ReactModal__Content iframe {
+              position: absolute;
+              bottom: 60px;
+              left: 0;
+              width: 100%;
+              height: calc(90% - 100px)
+            }
+
+            .ReactModal__Overlay {
+              transform: translateY(-100vh);
+              transition: transform 1000ms ease-in-out;
+            }
+            
+            .ReactModal__Overlay--after-open{
+              transform: translateY(0);
+            }
+
+            .ReactModal__Overlay--before-close {
+              transform: translateY(-100vh);
+            }
+          
+      </style>
+      <div
+        className="css-view-1dbjc4n"
+        onClick={[Function]}
+        onMouseDown={[Function]}
+        onMouseEnter={[Function]}
+        onMouseLeave={[Function]}
+        onMouseUp={[Function]}
+        onResponderGrant={[Function]}
+        onResponderRelease={[Function]}
+        style={
+          Object {
+            "MozTransitionProperty": "transform",
+            "WebkitAlignItems": "center",
+            "WebkitBoxAlign": "center",
+            "WebkitBoxPack": "center",
+            "WebkitJustifyContent": "center",
+            "WebkitTransitionDuration": "500ms",
+            "WebkitTransitionProperty": "-webkit-transform,transform",
+            "alignItems": "center",
+            "cursor": "pointer",
+            "justifyContent": "center",
+            "msFlexAlign": "center",
+            "msFlexPack": "center",
+            "paddingBottom": "15px",
+            "paddingLeft": "15px",
+            "paddingRight": "15px",
+            "paddingTop": "15px",
+            "transitionDuration": "500ms",
+            "transitionProperty": "-webkit-transform,transform",
+          }
+        }
+      >
+        <h1
+          aria-level="1"
+          className="css-reset-4rbku5 css-text-901oao"
+          dir="auto"
+          role="heading"
+          style={
+            Object {
+              "color": "rgba(255,255,255,1.00)",
+              "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
+              "fontSize": "64px",
+              "lineHeight": "72px",
+              "marginBottom": "20px",
+              "textAlign": "center",
+              "textRendering": "geometricPrecision",
+              "textTransform": "none",
+            }
+          }
+        >
+          prosperityForAll
+        </h1>
+        <div
+          className="css-view-1dbjc4n"
+          style={
+            Object {
+              "WebkitAlignItems": "center",
+              "WebkitBoxAlign": "center",
+              "WebkitBoxDirection": "normal",
+              "WebkitBoxOrient": "horizontal",
+              "WebkitBoxPack": "center",
+              "WebkitFlexDirection": "row",
+              "WebkitJustifyContent": "center",
+              "alignItems": "center",
+              "flexDirection": "row",
+              "justifyContent": "center",
+              "marginBottom": "20px",
+              "marginTop": "20px",
+              "msFlexAlign": "center",
+              "msFlexDirection": "row",
+              "msFlexPack": "center",
+            }
+          }
+        >
+          <svg
+            fill="none"
+            height={40}
+            style={Object {}}
+            viewBox="0 0 40 40"
+            width={40}
+          >
+            <path
+              clipRule="evenodd"
+              d="M20 40C31.0457 40 40 31.0457 40 20C40 8.9543 31.0457 0 20 0C8.9543 0 0 8.9543 0 20C0 31.0457 8.9543 40 20 40ZM16.7857 24.9487L26.4286 20L16.7857 15.0513V24.9487Z"
+              fill="#FFFFFF"
+              fillRule="evenodd"
+              style={Object {}}
+            />
+          </svg>
+          <h3
+            aria-level="3"
+            className="css-reset-4rbku5 css-text-901oao"
+            dir="auto"
+            role="heading"
+            style={
+              Object {
+                "color": "rgba(255,255,255,1.00)",
+                "fontFamily": "Jost, futura-pt, futura, sans-serif",
+                "fontSize": "24px",
+                "lineHeight": "32px",
+                "marginLeft": "10px",
+                "textAlign": "center",
+                "textRendering": "geometricPrecision",
+                "textTransform": "none",
+              }
+            }
+          >
+            whatIfMoney
+          </h3>
+        </div>
+      </div>
+      <div />
+    </div>
+  </div>
+  <div
+    className="css-view-1dbjc4n"
+    style={
+      Object {
+        "WebkitAlignItems": "center",
+        "WebkitAlignSelf": "center",
+        "WebkitBoxAlign": "center",
+        "WebkitBoxDirection": "normal",
+        "WebkitBoxOrient": "vertical",
+        "WebkitBoxPack": "center",
+        "WebkitFlexDirection": "column",
+        "WebkitJustifyContent": "center",
+        "alignItems": "center",
+        "alignSelf": "center",
+        "flexDirection": "column",
+        "justifyContent": "center",
+        "marginBottom": "50px",
+        "marginTop": "50px",
+        "maxWidth": "100vw",
+        "msFlexAlign": "center",
+        "msFlexDirection": "column",
+        "msFlexItemAlign": "center",
+        "msFlexPack": "center",
+        "paddingLeft": "10px",
+        "paddingRight": "10px",
+        "width": "100%",
+      }
+    }
+  >
+    <div
+      className="css-view-1dbjc4n"
+      style={
+        Object {
+          "WebkitBoxFlex": 0,
+          "WebkitFlexGrow": 0,
+          "WebkitFlexShrink": 0,
+          "flexGrow": 0,
+          "flexShrink": 0,
+          "msFlexNegative": 0,
+          "msFlexPositive": 0,
+          "paddingBottom": "10px",
+          "paddingLeft": "10px",
+          "paddingRight": "10px",
+          "paddingTop": "10px",
+          "width": "100%",
+        }
+      }
+    >
+      <h2
+        aria-level="2"
+        className="css-reset-4rbku5 css-text-901oao"
+        dir="auto"
+        role="heading"
+        style={
+          Object {
+            "color": "rgba(46,51,56,1.00)",
+            "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
+            "fontSize": "36px",
+            "lineHeight": "40px",
+            "marginBottom": "20px",
+            "textAlign": "center",
+            "textRendering": "geometricPrecision",
+            "textTransform": "none",
+          }
+        }
+      >
+        missionMeaning
+      </h2>
+      <div
+        className="css-text-901oao"
+        dir="auto"
+        style={
+          Object {
+            "color": "rgba(46,51,56,1.00)",
+            "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
+            "fontSize": "20px",
+            "lineHeight": "28px",
+            "textRendering": "geometricPrecision",
+          }
+        }
+      >
+        missionText
+      </div>
+    </div>
+  </div>
+  <div
+    className="css-view-1dbjc4n"
+    style={
+      Object {
+        "WebkitAlignItems": "center",
+        "WebkitBoxAlign": "center",
+        "WebkitBoxDirection": "normal",
+        "WebkitBoxFlex": 1,
+        "WebkitBoxOrient": "vertical",
+        "WebkitBoxPack": "start",
+        "WebkitFlexBasis": "0%",
+        "WebkitFlexDirection": "column",
+        "WebkitFlexGrow": 1,
+        "WebkitFlexShrink": 1,
+        "WebkitJustifyContent": "flex-start",
+        "alignItems": "center",
+        "flexBasis": "0%",
+        "flexDirection": "column",
+        "flexGrow": 1,
+        "flexShrink": 1,
+        "justifyContent": "flex-start",
+        "msFlexAlign": "center",
+        "msFlexDirection": "column",
+        "msFlexNegative": 1,
+        "msFlexPack": "start",
+        "msFlexPositive": 1,
+        "msFlexPreferredSize": "0%",
+      }
+    }
+  >
+    <div
+      className="css-view-1dbjc4n"
+      style={
+        Object {
+          "WebkitAlignItems": "center",
+          "WebkitAlignSelf": "center",
+          "WebkitBoxAlign": "center",
+          "WebkitBoxDirection": "normal",
+          "WebkitBoxOrient": "vertical",
+          "WebkitBoxPack": "center",
+          "WebkitFlexDirection": "column",
+          "WebkitJustifyContent": "center",
+          "alignItems": "center",
+          "alignSelf": "center",
+          "flexDirection": "column",
+          "justifyContent": "center",
+          "maxWidth": "100vw",
+          "msFlexAlign": "center",
+          "msFlexDirection": "column",
+          "msFlexItemAlign": "center",
+          "msFlexPack": "center",
+          "paddingLeft": "10px",
+          "paddingRight": "10px",
+          "width": "100%",
+        }
+      }
+    >
+      <div
+        className="css-view-1dbjc4n"
+        style={
+          Object {
+            "WebkitBoxFlex": 0,
+            "WebkitFlexGrow": 0,
+            "WebkitFlexShrink": 0,
+            "flexGrow": 0,
+            "flexShrink": 0,
+            "msFlexNegative": 0,
+            "msFlexPositive": 0,
+            "paddingBottom": "10px",
+            "paddingLeft": "10px",
+            "paddingRight": "10px",
+            "paddingTop": "10px",
+            "width": "100%",
+          }
+        }
+      >
+        <h2
+          aria-level="2"
+          className="css-reset-4rbku5 css-text-901oao"
+          dir="auto"
+          role="heading"
+          style={
+            Object {
+              "color": "rgba(46,51,56,1.00)",
+              "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
+              "fontSize": "36px",
+              "lineHeight": "40px",
+              "marginBottom": "20px",
+              "textAlign": "center",
+              "textRendering": "geometricPrecision",
+              "textTransform": "none",
+            }
+          }
+        >
+          coreContributors
+        </h2>
+        <h4
+          aria-level="4"
+          className="css-reset-4rbku5 css-text-901oao"
+          dir="auto"
+          role="heading"
+          style={
+            Object {
+              "color": "rgba(46,51,56,1.00)",
+              "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
+              "fontSize": "24px",
+              "lineHeight": "32px",
+              "textAlign": "center",
+              "textRendering": "geometricPrecision",
+              "textTransform": "none",
+            }
+          }
+        >
+          InNoOrder
+        </h4>
+      </div>
+    </div>
+    <div
+      className="css-view-1dbjc4n"
+      style={
+        Object {
+          "WebkitAlignItems": "center",
+          "WebkitBoxAlign": "center",
+          "WebkitBoxPack": "center",
+          "WebkitJustifyContent": "center",
+          "alignItems": "center",
+          "justifyContent": "center",
+          "maxWidth": "1260px",
+          "msFlexAlign": "center",
+          "msFlexPack": "center",
+        }
+      }
+    >
+      <div
+        className="css-view-1dbjc4n"
+        style={
+          Object {
+            "WebkitAlignItems": "center",
+            "WebkitBoxAlign": "center",
+            "WebkitBoxDirection": "normal",
+            "WebkitBoxLines": "multiple",
+            "WebkitBoxOrient": "horizontal",
+            "WebkitBoxPack": "center",
+            "WebkitFlexDirection": "row",
+            "WebkitFlexWrap": "wrap",
+            "WebkitJustifyContent": "center",
+            "alignItems": "center",
+            "flexDirection": "row",
+            "flexWrap": "wrap",
+            "justifyContent": "center",
+            "maxWidth": "1025px",
+            "msFlexAlign": "center",
+            "msFlexDirection": "row",
+            "msFlexPack": "center",
+            "msFlexWrap": "wrap",
+            "paddingLeft": "10px",
+            "paddingRight": "10px",
+          }
+        }
+      >
+        <div
+          className="css-view-1dbjc4n"
+          style={
+            Object {
+              "WebkitBoxDirection": "normal",
+              "WebkitBoxOrient": "vertical",
+              "WebkitFlexDirection": "column",
+              "flexDirection": "column",
+              "marginBottom": "5px",
+              "marginLeft": "5px",
+              "marginRight": "5px",
+              "marginTop": "5px",
+              "minHeight": "400px",
+              "msFlexDirection": "column",
+              "width": "176px",
+            }
+          }
+        >
+          <div
+            className="lazyload-placeholder"
+            style={
+              Object {
+                "height": 200,
+              }
+            }
+          />
+          <h4
+            aria-level="4"
+            className="css-reset-4rbku5 css-text-901oao"
+            dir="auto"
+            role="heading"
+            style={
+              Object {
+                "color": "rgba(46,51,56,1.00)",
+                "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
+                "fontSize": "24px",
+                "lineHeight": "32px",
+                "textRendering": "geometricPrecision",
+                "textTransform": "none",
+              }
+            }
+          >
+            Sep Kamvar
+          </h4>
+          <div
+            className="css-text-901oao"
+            dir="auto"
+            style={
+              Object {
+                "color": "rgba(46,51,56,1.00)",
+                "fontFamily": "Jost, futura-pt, futura, sans-serif",
+                "fontSize": "16px",
+                "fontWeight": "500",
+                "lineHeight": "18px",
+                "textRendering": "geometricPrecision",
+              }
+            }
+          >
+            ENGINEERING
+          </div>
+        </div>
+        <div
+          className="css-view-1dbjc4n"
+          style={
+            Object {
+              "WebkitBoxDirection": "normal",
+              "WebkitBoxOrient": "vertical",
+              "WebkitFlexDirection": "column",
+              "flexDirection": "column",
+              "marginBottom": "5px",
+              "marginLeft": "5px",
+              "marginRight": "5px",
+              "marginTop": "5px",
+              "minHeight": "400px",
+              "msFlexDirection": "column",
+              "width": "176px",
+            }
+          }
+        >
+          <div
+            className="lazyload-placeholder"
+            style={
+              Object {
+                "height": 200,
+              }
+            }
+          />
+          <h4
+            aria-level="4"
+            className="css-reset-4rbku5 css-text-901oao"
+            dir="auto"
+            role="heading"
+            style={
+              Object {
+                "color": "rgba(46,51,56,1.00)",
+                "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
+                "fontSize": "24px",
+                "lineHeight": "32px",
+                "textRendering": "geometricPrecision",
+                "textTransform": "none",
+              }
+            }
+          >
+            Anna Kazlauskas
+          </h4>
+          <div
+            className="css-text-901oao"
+            dir="auto"
+            style={
+              Object {
+                "color": "rgba(46,51,56,1.00)",
+                "fontFamily": "Jost, futura-pt, futura, sans-serif",
+                "fontSize": "16px",
+                "fontWeight": "500",
+                "lineHeight": "18px",
+                "textRendering": "geometricPrecision",
+              }
+            }
+          >
+            ENGINEERING
+          </div>
+        </div>
+        <div
+          className="css-view-1dbjc4n"
+          style={
+            Object {
+              "WebkitBoxDirection": "normal",
+              "WebkitBoxOrient": "vertical",
+              "WebkitFlexDirection": "column",
+              "flexDirection": "column",
+              "marginBottom": "5px",
+              "marginLeft": "5px",
+              "marginRight": "5px",
+              "marginTop": "5px",
+              "minHeight": "400px",
+              "msFlexDirection": "column",
+              "width": "176px",
+            }
+          }
+        >
+          <div
+            className="lazyload-placeholder"
+            style={
+              Object {
+                "height": 200,
+              }
+            }
+          />
+          <h4
+            aria-level="4"
+            className="css-reset-4rbku5 css-text-901oao"
+            dir="auto"
+            role="heading"
+            style={
+              Object {
+                "color": "rgba(46,51,56,1.00)",
+                "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
+                "fontSize": "24px",
+                "lineHeight": "32px",
+                "textRendering": "geometricPrecision",
+                "textTransform": "none",
+              }
+            }
+          >
+            Eran Tromer
+          </h4>
+          <div
+            className="css-text-901oao"
+            dir="auto"
+            style={
+              Object {
+                "color": "rgba(46,51,56,1.00)",
+                "fontFamily": "Jost, futura-pt, futura, sans-serif",
+                "fontSize": "16px",
+                "fontWeight": "500",
+                "lineHeight": "18px",
+                "textRendering": "geometricPrecision",
+              }
+            }
+          >
+            ADVISOR
+          </div>
+        </div>
+        <div
+          className="css-view-1dbjc4n"
+          style={
+            Object {
+              "WebkitBoxDirection": "normal",
+              "WebkitBoxOrient": "vertical",
+              "WebkitFlexDirection": "column",
+              "flexDirection": "column",
+              "marginBottom": "5px",
+              "marginLeft": "5px",
+              "marginRight": "5px",
+              "marginTop": "5px",
+              "minHeight": "400px",
+              "msFlexDirection": "column",
+              "width": "176px",
+            }
+          }
+        >
+          <div
+            className="lazyload-placeholder"
+            style={
+              Object {
+                "height": 200,
+              }
+            }
+          />
+          <h4
+            aria-level="4"
+            className="css-reset-4rbku5 css-text-901oao"
+            dir="auto"
+            role="heading"
+            style={
+              Object {
+                "color": "rgba(46,51,56,1.00)",
+                "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
+                "fontSize": "24px",
+                "lineHeight": "32px",
+                "textRendering": "geometricPrecision",
+                "textTransform": "none",
+              }
+            }
+          >
+            Markus Franke
+          </h4>
+          <div
+            className="css-text-901oao"
+            dir="auto"
+            style={
+              Object {
+                "color": "rgba(46,51,56,1.00)",
+                "fontFamily": "Jost, futura-pt, futura, sans-serif",
+                "fontSize": "16px",
+                "fontWeight": "500",
+                "lineHeight": "18px",
+                "textRendering": "geometricPrecision",
+              }
+            }
+          >
+            ECONOMICS
+          </div>
+        </div>
+        <div
+          className="css-view-1dbjc4n"
+          style={
+            Object {
+              "WebkitBoxDirection": "normal",
+              "WebkitBoxOrient": "vertical",
+              "WebkitFlexDirection": "column",
+              "flexDirection": "column",
+              "marginBottom": "5px",
+              "marginLeft": "5px",
+              "marginRight": "5px",
+              "marginTop": "5px",
+              "minHeight": "400px",
+              "msFlexDirection": "column",
+              "width": "176px",
+            }
+          }
+        >
+          <div
+            className="lazyload-placeholder"
+            style={
+              Object {
+                "height": 200,
+              }
+            }
+          />
+          <h4
+            aria-level="4"
+            className="css-reset-4rbku5 css-text-901oao"
+            dir="auto"
+            role="heading"
+            style={
+              Object {
+                "color": "rgba(46,51,56,1.00)",
+                "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
+                "fontSize": "24px",
+                "lineHeight": "32px",
+                "textRendering": "geometricPrecision",
+                "textTransform": "none",
+              }
+            }
+          >
+            Asa Oines
+          </h4>
+          <div
+            className="css-text-901oao"
+            dir="auto"
+            style={
+              Object {
+                "color": "rgba(46,51,56,1.00)",
+                "fontFamily": "Jost, futura-pt, futura, sans-serif",
+                "fontSize": "16px",
+                "fontWeight": "500",
+                "lineHeight": "18px",
+                "textRendering": "geometricPrecision",
+              }
+            }
+          >
+            ENGINEERING
+          </div>
+        </div>
+        <div
+          className="css-view-1dbjc4n"
+          style={
+            Object {
+              "WebkitBoxDirection": "normal",
+              "WebkitBoxOrient": "vertical",
+              "WebkitFlexDirection": "column",
+              "flexDirection": "column",
+              "marginBottom": "5px",
+              "marginLeft": "5px",
+              "marginRight": "5px",
+              "marginTop": "5px",
+              "minHeight": "400px",
+              "msFlexDirection": "column",
+              "width": "176px",
+            }
+          }
+        >
+          <div
+            className="lazyload-placeholder"
+            style={
+              Object {
+                "height": 200,
+              }
+            }
+          />
+          <h4
+            aria-level="4"
+            className="css-reset-4rbku5 css-text-901oao"
+            dir="auto"
+            role="heading"
+            style={
+              Object {
+                "color": "rgba(46,51,56,1.00)",
+                "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
+                "fontSize": "24px",
+                "lineHeight": "32px",
+                "textRendering": "geometricPrecision",
+                "textTransform": "none",
+              }
+            }
+          >
+            Nam Chu Hoai
+          </h4>
+          <div
+            className="css-text-901oao"
+            dir="auto"
+            style={
+              Object {
+                "color": "rgba(46,51,56,1.00)",
+                "fontFamily": "Jost, futura-pt, futura, sans-serif",
+                "fontSize": "16px",
+                "fontWeight": "500",
+                "lineHeight": "18px",
+                "textRendering": "geometricPrecision",
+              }
+            }
+          >
+            ENGINEERING
+          </div>
+        </div>
+        <div
+          className="css-view-1dbjc4n"
+          style={
+            Object {
+              "WebkitBoxDirection": "normal",
+              "WebkitBoxOrient": "vertical",
+              "WebkitFlexDirection": "column",
+              "flexDirection": "column",
+              "marginBottom": "5px",
+              "marginLeft": "5px",
+              "marginRight": "5px",
+              "marginTop": "5px",
+              "minHeight": "400px",
+              "msFlexDirection": "column",
+              "width": "176px",
+            }
+          }
+        >
+          <div
+            className="lazyload-placeholder"
+            style={
+              Object {
+                "height": 200,
+              }
+            }
+          />
+          <h4
+            aria-level="4"
+            className="css-reset-4rbku5 css-text-901oao"
+            dir="auto"
+            role="heading"
+            style={
+              Object {
+                "color": "rgba(46,51,56,1.00)",
+                "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
+                "fontSize": "24px",
+                "lineHeight": "32px",
+                "textRendering": "geometricPrecision",
+                "textTransform": "none",
+              }
+            }
+          >
+            Claire Belmont
+          </h4>
+          <div
+            className="css-text-901oao"
+            dir="auto"
+            style={
+              Object {
+                "color": "rgba(46,51,56,1.00)",
+                "fontFamily": "Jost, futura-pt, futura, sans-serif",
+                "fontSize": "16px",
+                "fontWeight": "500",
+                "lineHeight": "18px",
+                "textRendering": "geometricPrecision",
+              }
+            }
+          >
+            PRODUCT
+          </div>
+        </div>
+        <div
+          className="css-view-1dbjc4n"
+          style={
+            Object {
+              "WebkitBoxDirection": "normal",
+              "WebkitBoxOrient": "vertical",
+              "WebkitFlexDirection": "column",
+              "flexDirection": "column",
+              "marginBottom": "5px",
+              "marginLeft": "5px",
+              "marginRight": "5px",
+              "marginTop": "5px",
+              "minHeight": "400px",
+              "msFlexDirection": "column",
+              "width": "176px",
+            }
+          }
+        >
+          <div
+            className="lazyload-placeholder"
+            style={
+              Object {
+                "height": 200,
+              }
+            }
+          />
+          <h4
+            aria-level="4"
+            className="css-reset-4rbku5 css-text-901oao"
+            dir="auto"
+            role="heading"
+            style={
+              Object {
+                "color": "rgba(46,51,56,1.00)",
+                "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
+                "fontSize": "24px",
+                "lineHeight": "32px",
+                "textRendering": "geometricPrecision",
+                "textTransform": "none",
+              }
+            }
+          >
+            Mariano Cortesi
+          </h4>
+          <div
+            className="css-text-901oao"
+            dir="auto"
+            style={
+              Object {
+                "color": "rgba(46,51,56,1.00)",
+                "fontFamily": "Jost, futura-pt, futura, sans-serif",
+                "fontSize": "16px",
+                "fontWeight": "500",
+                "lineHeight": "18px",
+                "textRendering": "geometricPrecision",
+              }
+            }
+          >
+            ENGINEERING
+          </div>
+        </div>
+        <div
+          className="css-view-1dbjc4n"
+          style={
+            Object {
+              "WebkitBoxDirection": "normal",
+              "WebkitBoxOrient": "vertical",
+              "WebkitFlexDirection": "column",
+              "flexDirection": "column",
+              "marginBottom": "5px",
+              "marginLeft": "5px",
+              "marginRight": "5px",
+              "marginTop": "5px",
+              "minHeight": "400px",
+              "msFlexDirection": "column",
+              "width": "176px",
+            }
+          }
+        >
+          <div
+            className="lazyload-placeholder"
+            style={
+              Object {
+                "height": 200,
+              }
+            }
+          />
+          <h4
+            aria-level="4"
+            className="css-reset-4rbku5 css-text-901oao"
+            dir="auto"
+            role="heading"
+            style={
+              Object {
+                "color": "rgba(46,51,56,1.00)",
+                "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
+                "fontSize": "24px",
+                "lineHeight": "32px",
+                "textRendering": "geometricPrecision",
+                "textTransform": "none",
+              }
+            }
+          >
+            Roman Croessmann
+          </h4>
+          <div
+            className="css-text-901oao"
+            dir="auto"
+            style={
+              Object {
+                "color": "rgba(46,51,56,1.00)",
+                "fontFamily": "Jost, futura-pt, futura, sans-serif",
+                "fontSize": "16px",
+                "fontWeight": "500",
+                "lineHeight": "18px",
+                "textRendering": "geometricPrecision",
+              }
+            }
+          >
+            DATA SCIENCE
+          </div>
+        </div>
+        <div
+          className="css-view-1dbjc4n"
+          style={
+            Object {
+              "WebkitBoxDirection": "normal",
+              "WebkitBoxOrient": "vertical",
+              "WebkitFlexDirection": "column",
+              "flexDirection": "column",
+              "marginBottom": "5px",
+              "marginLeft": "5px",
+              "marginRight": "5px",
+              "marginTop": "5px",
+              "minHeight": "400px",
+              "msFlexDirection": "column",
+              "width": "176px",
+            }
+          }
+        >
+          <div
+            className="lazyload-placeholder"
+            style={
+              Object {
+                "height": 200,
+              }
+            }
+          />
+          <h4
+            aria-level="4"
+            className="css-reset-4rbku5 css-text-901oao"
+            dir="auto"
+            role="heading"
+            style={
+              Object {
+                "color": "rgba(46,51,56,1.00)",
+                "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
+                "fontSize": "24px",
+                "lineHeight": "32px",
+                "textRendering": "geometricPrecision",
+                "textTransform": "none",
+              }
+            }
+          >
+            Tim Moreton
+          </h4>
+          <div
+            className="css-text-901oao"
+            dir="auto"
+            style={
+              Object {
+                "color": "rgba(46,51,56,1.00)",
+                "fontFamily": "Jost, futura-pt, futura, sans-serif",
+                "fontSize": "16px",
+                "fontWeight": "500",
+                "lineHeight": "18px",
+                "textRendering": "geometricPrecision",
+              }
+            }
+          >
+            ENGINEERING
+          </div>
+        </div>
+        <div
+          className="css-view-1dbjc4n"
+          style={
+            Object {
+              "WebkitBoxDirection": "normal",
+              "WebkitBoxOrient": "vertical",
+              "WebkitFlexDirection": "column",
+              "flexDirection": "column",
+              "marginBottom": "5px",
+              "marginLeft": "5px",
+              "marginRight": "5px",
+              "marginTop": "5px",
+              "minHeight": "400px",
+              "msFlexDirection": "column",
+              "width": "176px",
+            }
+          }
+        >
+          <div
+            className="lazyload-placeholder"
+            style={
+              Object {
+                "height": 200,
+              }
+            }
+          />
+          <h4
+            aria-level="4"
+            className="css-reset-4rbku5 css-text-901oao"
+            dir="auto"
+            role="heading"
+            style={
+              Object {
+                "color": "rgba(46,51,56,1.00)",
+                "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
+                "fontSize": "24px",
+                "lineHeight": "32px",
+                "textRendering": "geometricPrecision",
+                "textTransform": "none",
+              }
+            }
+          >
+            Kevin Jue
+          </h4>
+          <div
+            className="css-text-901oao"
+            dir="auto"
+            style={
+              Object {
+                "color": "rgba(46,51,56,1.00)",
+                "fontFamily": "Jost, futura-pt, futura, sans-serif",
+                "fontSize": "16px",
+                "fontWeight": "500",
+                "lineHeight": "18px",
+                "textRendering": "geometricPrecision",
+              }
+            }
+          >
+            ENGINEERING
+          </div>
+        </div>
+        <div
+          className="css-view-1dbjc4n"
+          style={
+            Object {
+              "WebkitBoxDirection": "normal",
+              "WebkitBoxOrient": "vertical",
+              "WebkitFlexDirection": "column",
+              "flexDirection": "column",
+              "marginBottom": "5px",
+              "marginLeft": "5px",
+              "marginRight": "5px",
+              "marginTop": "5px",
+              "minHeight": "400px",
+              "msFlexDirection": "column",
+              "width": "176px",
+            }
+          }
+        >
+          <div
+            className="lazyload-placeholder"
+            style={
+              Object {
+                "height": 200,
+              }
+            }
+          />
+          <h4
+            aria-level="4"
+            className="css-reset-4rbku5 css-text-901oao"
+            dir="auto"
+            role="heading"
+            style={
+              Object {
+                "color": "rgba(46,51,56,1.00)",
+                "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
+                "fontSize": "24px",
+                "lineHeight": "32px",
+                "textRendering": "geometricPrecision",
+                "textTransform": "none",
+              }
+            }
+          >
+            Vanessa Slavich
+          </h4>
+          <div
+            className="css-text-901oao"
+            dir="auto"
+            style={
+              Object {
+                "color": "rgba(46,51,56,1.00)",
+                "fontFamily": "Jost, futura-pt, futura, sans-serif",
+                "fontSize": "16px",
+                "fontWeight": "500",
+                "lineHeight": "18px",
+                "textRendering": "geometricPrecision",
+              }
+            }
+          >
+            COMMUNITY
+          </div>
+        </div>
+        <div
+          className="css-view-1dbjc4n"
+          style={
+            Object {
+              "WebkitBoxDirection": "normal",
+              "WebkitBoxOrient": "vertical",
+              "WebkitFlexDirection": "column",
+              "flexDirection": "column",
+              "marginBottom": "5px",
+              "marginLeft": "5px",
+              "marginRight": "5px",
+              "marginTop": "5px",
+              "minHeight": "400px",
+              "msFlexDirection": "column",
+              "width": "176px",
+            }
+          }
+        >
+          <div
+            className="lazyload-placeholder"
+            style={
+              Object {
+                "height": 200,
+              }
+            }
+          />
+          <h4
+            aria-level="4"
+            className="css-reset-4rbku5 css-text-901oao"
+            dir="auto"
+            role="heading"
+            style={
+              Object {
+                "color": "rgba(46,51,56,1.00)",
+                "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
+                "fontSize": "24px",
+                "lineHeight": "32px",
+                "textRendering": "geometricPrecision",
+                "textTransform": "none",
+              }
+            }
+          >
+            Corey Lee
+          </h4>
+          <div
+            className="css-text-901oao"
+            dir="auto"
+            style={
+              Object {
+                "color": "rgba(46,51,56,1.00)",
+                "fontFamily": "Jost, futura-pt, futura, sans-serif",
+                "fontSize": "16px",
+                "fontWeight": "500",
+                "lineHeight": "18px",
+                "textRendering": "geometricPrecision",
+              }
+            }
+          >
+            DESIGN
+          </div>
+        </div>
+        <div
+          className="css-view-1dbjc4n"
+          style={
+            Object {
+              "WebkitBoxDirection": "normal",
+              "WebkitBoxOrient": "vertical",
+              "WebkitFlexDirection": "column",
+              "flexDirection": "column",
+              "marginBottom": "5px",
+              "marginLeft": "5px",
+              "marginRight": "5px",
+              "marginTop": "5px",
+              "minHeight": "400px",
+              "msFlexDirection": "column",
+              "width": "176px",
+            }
+          }
+        >
+          <div
+            className="lazyload-placeholder"
+            style={
+              Object {
+                "height": 200,
+              }
+            }
+          />
+          <h4
+            aria-level="4"
+            className="css-reset-4rbku5 css-text-901oao"
+            dir="auto"
+            role="heading"
+            style={
+              Object {
+                "color": "rgba(46,51,56,1.00)",
+                "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
+                "fontSize": "24px",
+                "lineHeight": "32px",
+                "textRendering": "geometricPrecision",
+                "textTransform": "none",
+              }
+            }
+          >
+            Ashish Bhatia
+          </h4>
+          <div
+            className="css-text-901oao"
+            dir="auto"
+            style={
+              Object {
+                "color": "rgba(46,51,56,1.00)",
+                "fontFamily": "Jost, futura-pt, futura, sans-serif",
+                "fontSize": "16px",
+                "fontWeight": "500",
+                "lineHeight": "18px",
+                "textRendering": "geometricPrecision",
+              }
+            }
+          >
+            ENGINEERING
+          </div>
+        </div>
+        <div
+          className="css-view-1dbjc4n"
+          style={
+            Object {
+              "WebkitBoxDirection": "normal",
+              "WebkitBoxOrient": "vertical",
+              "WebkitFlexDirection": "column",
+              "flexDirection": "column",
+              "marginBottom": "5px",
+              "marginLeft": "5px",
+              "marginRight": "5px",
+              "marginTop": "5px",
+              "minHeight": "400px",
+              "msFlexDirection": "column",
+              "width": "176px",
+            }
+          }
+        >
+          <div
+            className="lazyload-placeholder"
+            style={
+              Object {
+                "height": 200,
+              }
+            }
+          />
+          <h4
+            aria-level="4"
+            className="css-reset-4rbku5 css-text-901oao"
+            dir="auto"
+            role="heading"
+            style={
+              Object {
+                "color": "rgba(46,51,56,1.00)",
+                "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
+                "fontSize": "24px",
+                "lineHeight": "32px",
+                "textRendering": "geometricPrecision",
+                "textTransform": "none",
+              }
+            }
+          >
+            Denisse Halm
+          </h4>
+          <div
+            className="css-text-901oao"
+            dir="auto"
+            style={
+              Object {
+                "color": "rgba(46,51,56,1.00)",
+                "fontFamily": "Jost, futura-pt, futura, sans-serif",
+                "fontSize": "16px",
+                "fontWeight": "500",
+                "lineHeight": "18px",
+                "textRendering": "geometricPrecision",
+              }
+            }
+          >
+            GO-TO-MARKET
+          </div>
+        </div>
+        <div
+          className="css-view-1dbjc4n"
+          style={
+            Object {
+              "WebkitBoxDirection": "normal",
+              "WebkitBoxOrient": "vertical",
+              "WebkitFlexDirection": "column",
+              "flexDirection": "column",
+              "marginBottom": "5px",
+              "marginLeft": "5px",
+              "marginRight": "5px",
+              "marginTop": "5px",
+              "minHeight": "400px",
+              "msFlexDirection": "column",
+              "width": "176px",
+            }
+          }
+        >
+          <div
+            className="lazyload-placeholder"
+            style={
+              Object {
+                "height": 200,
+              }
+            }
+          />
+          <h4
+            aria-level="4"
+            className="css-reset-4rbku5 css-text-901oao"
+            dir="auto"
+            role="heading"
+            style={
+              Object {
+                "color": "rgba(46,51,56,1.00)",
+                "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
+                "fontSize": "24px",
+                "lineHeight": "32px",
+                "textRendering": "geometricPrecision",
+                "textTransform": "none",
+              }
+            }
+          >
+            Rene Reinsberg
+          </h4>
+          <div
+            className="css-text-901oao"
+            dir="auto"
+            style={
+              Object {
+                "color": "rgba(46,51,56,1.00)",
+                "fontFamily": "Jost, futura-pt, futura, sans-serif",
+                "fontSize": "16px",
+                "fontWeight": "500",
+                "lineHeight": "18px",
+                "textRendering": "geometricPrecision",
+              }
+            }
+          >
+            BUSINESS
+          </div>
+        </div>
+        <div
+          className="css-view-1dbjc4n"
+          style={
+            Object {
+              "WebkitBoxDirection": "normal",
+              "WebkitBoxOrient": "vertical",
+              "WebkitFlexDirection": "column",
+              "flexDirection": "column",
+              "marginBottom": "5px",
+              "marginLeft": "5px",
+              "marginRight": "5px",
+              "marginTop": "5px",
+              "minHeight": "400px",
+              "msFlexDirection": "column",
+              "width": "176px",
+            }
+          }
+        >
+          <div
+            className="lazyload-placeholder"
+            style={
+              Object {
+                "height": 200,
+              }
+            }
+          />
+          <h4
+            aria-level="4"
+            className="css-reset-4rbku5 css-text-901oao"
+            dir="auto"
+            role="heading"
+            style={
+              Object {
+                "color": "rgba(46,51,56,1.00)",
+                "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
+                "fontSize": "24px",
+                "lineHeight": "32px",
+                "textRendering": "geometricPrecision",
+                "textTransform": "none",
+              }
+            }
+          >
+            Marek Olszewski
+          </h4>
+          <div
+            className="css-text-901oao"
+            dir="auto"
+            style={
+              Object {
+                "color": "rgba(46,51,56,1.00)",
+                "fontFamily": "Jost, futura-pt, futura, sans-serif",
+                "fontSize": "16px",
+                "fontWeight": "500",
+                "lineHeight": "18px",
+                "textRendering": "geometricPrecision",
+              }
+            }
+          >
+            ENGINEERING
+          </div>
+        </div>
+        <div
+          className="css-view-1dbjc4n"
+          style={
+            Object {
+              "WebkitBoxDirection": "normal",
+              "WebkitBoxOrient": "vertical",
+              "WebkitFlexDirection": "column",
+              "flexDirection": "column",
+              "marginBottom": "5px",
+              "marginLeft": "5px",
+              "marginRight": "5px",
+              "marginTop": "5px",
+              "minHeight": "400px",
+              "msFlexDirection": "column",
+              "width": "176px",
+            }
+          }
+        >
+          <div
+            className="lazyload-placeholder"
+            style={
+              Object {
+                "height": 200,
+              }
+            }
+          />
+          <h4
+            aria-level="4"
+            className="css-reset-4rbku5 css-text-901oao"
+            dir="auto"
+            role="heading"
+            style={
+              Object {
+                "color": "rgba(46,51,56,1.00)",
+                "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
+                "fontSize": "24px",
+                "lineHeight": "32px",
+                "textRendering": "geometricPrecision",
+                "textTransform": "none",
+              }
+            }
+          >
+            Connor McEwen
+          </h4>
+          <div
+            className="css-text-901oao"
+            dir="auto"
+            style={
+              Object {
+                "color": "rgba(46,51,56,1.00)",
+                "fontFamily": "Jost, futura-pt, futura, sans-serif",
+                "fontSize": "16px",
+                "fontWeight": "500",
+                "lineHeight": "18px",
+                "textRendering": "geometricPrecision",
+              }
+            }
+          >
+            ENGINEERING
+          </div>
+        </div>
+        <div
+          className="css-view-1dbjc4n"
+          style={
+            Object {
+              "WebkitBoxDirection": "normal",
+              "WebkitBoxOrient": "vertical",
+              "WebkitFlexDirection": "column",
+              "flexDirection": "column",
+              "marginBottom": "5px",
+              "marginLeft": "5px",
+              "marginRight": "5px",
+              "marginTop": "5px",
+              "minHeight": "400px",
+              "msFlexDirection": "column",
+              "width": "176px",
+            }
+          }
+        >
+          <div
+            className="lazyload-placeholder"
+            style={
+              Object {
+                "height": 200,
+              }
+            }
+          />
+          <h4
+            aria-level="4"
+            className="css-reset-4rbku5 css-text-901oao"
+            dir="auto"
+            role="heading"
+            style={
+              Object {
+                "color": "rgba(46,51,56,1.00)",
+                "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
+                "fontSize": "24px",
+                "lineHeight": "32px",
+                "textRendering": "geometricPrecision",
+                "textTransform": "none",
+              }
+            }
+          >
+            Martín Volpe
+          </h4>
+          <div
+            className="css-text-901oao"
+            dir="auto"
+            style={
+              Object {
+                "color": "rgba(46,51,56,1.00)",
+                "fontFamily": "Jost, futura-pt, futura, sans-serif",
+                "fontSize": "16px",
+                "fontWeight": "500",
+                "lineHeight": "18px",
+                "textRendering": "geometricPrecision",
+              }
+            }
+          >
+            ENGINEERING
+          </div>
+        </div>
+        <div
+          className="css-view-1dbjc4n"
+          style={
+            Object {
+              "WebkitBoxDirection": "normal",
+              "WebkitBoxOrient": "vertical",
+              "WebkitFlexDirection": "column",
+              "flexDirection": "column",
+              "marginBottom": "5px",
+              "marginLeft": "5px",
+              "marginRight": "5px",
+              "marginTop": "5px",
+              "minHeight": "400px",
+              "msFlexDirection": "column",
+              "width": "176px",
+            }
+          }
+        >
+          <div
+            className="lazyload-placeholder"
+            style={
+              Object {
+                "height": 200,
+              }
+            }
+          />
+          <h4
+            aria-level="4"
+            className="css-reset-4rbku5 css-text-901oao"
+            dir="auto"
+            role="heading"
+            style={
+              Object {
+                "color": "rgba(46,51,56,1.00)",
+                "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
+                "fontSize": "24px",
+                "lineHeight": "32px",
+                "textRendering": "geometricPrecision",
+                "textTransform": "none",
+              }
+            }
+          >
+            Trevor Porter
+          </h4>
+          <div
+            className="css-text-901oao"
+            dir="auto"
+            style={
+              Object {
+                "color": "rgba(46,51,56,1.00)",
+                "fontFamily": "Jost, futura-pt, futura, sans-serif",
+                "fontSize": "16px",
+                "fontWeight": "500",
+                "lineHeight": "18px",
+                "textRendering": "geometricPrecision",
+              }
+            }
+          >
+            ENGINEERING
+          </div>
+        </div>
+        <div
+          className="css-view-1dbjc4n"
+          style={
+            Object {
+              "WebkitBoxDirection": "normal",
+              "WebkitBoxOrient": "vertical",
+              "WebkitFlexDirection": "column",
+              "flexDirection": "column",
+              "marginBottom": "5px",
+              "marginLeft": "5px",
+              "marginRight": "5px",
+              "marginTop": "5px",
+              "minHeight": "400px",
+              "msFlexDirection": "column",
+              "width": "176px",
+            }
+          }
+        >
+          <div
+            className="lazyload-placeholder"
+            style={
+              Object {
+                "height": 200,
+              }
+            }
+          />
+          <h4
+            aria-level="4"
+            className="css-reset-4rbku5 css-text-901oao"
+            dir="auto"
+            role="heading"
+            style={
+              Object {
+                "color": "rgba(46,51,56,1.00)",
+                "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
+                "fontSize": "24px",
+                "lineHeight": "32px",
+                "textRendering": "geometricPrecision",
+                "textTransform": "none",
+              }
+            }
+          >
+            Nitya Subramanian
+          </h4>
+          <div
+            className="css-text-901oao"
+            dir="auto"
+            style={
+              Object {
+                "color": "rgba(46,51,56,1.00)",
+                "fontFamily": "Jost, futura-pt, futura, sans-serif",
+                "fontSize": "16px",
+                "fontWeight": "500",
+                "lineHeight": "18px",
+                "textRendering": "geometricPrecision",
+              }
+            }
+          >
+            PRODUCT
+          </div>
+        </div>
+        <div
+          className="css-view-1dbjc4n"
+          style={
+            Object {
+              "WebkitBoxDirection": "normal",
+              "WebkitBoxOrient": "vertical",
+              "WebkitFlexDirection": "column",
+              "flexDirection": "column",
+              "marginBottom": "5px",
+              "marginLeft": "5px",
+              "marginRight": "5px",
+              "marginTop": "5px",
+              "minHeight": "400px",
+              "msFlexDirection": "column",
+              "width": "176px",
+            }
+          }
+        >
+          <div
+            className="lazyload-placeholder"
+            style={
+              Object {
+                "height": 200,
+              }
+            }
+          />
+          <h4
+            aria-level="4"
+            className="css-reset-4rbku5 css-text-901oao"
+            dir="auto"
+            role="heading"
+            style={
+              Object {
+                "color": "rgba(46,51,56,1.00)",
+                "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
+                "fontSize": "24px",
+                "lineHeight": "32px",
+                "textRendering": "geometricPrecision",
+                "textTransform": "none",
+              }
+            }
+          >
+            J M Rossy
+          </h4>
+          <div
+            className="css-text-901oao"
+            dir="auto"
+            style={
+              Object {
+                "color": "rgba(46,51,56,1.00)",
+                "fontFamily": "Jost, futura-pt, futura, sans-serif",
+                "fontSize": "16px",
+                "fontWeight": "500",
+                "lineHeight": "18px",
+                "textRendering": "geometricPrecision",
+              }
+            }
+          >
+            ENGINEERING
+          </div>
+        </div>
+        <div
+          className="css-view-1dbjc4n"
+          style={
+            Object {
+              "WebkitBoxDirection": "normal",
+              "WebkitBoxOrient": "vertical",
+              "WebkitFlexDirection": "column",
+              "flexDirection": "column",
+              "marginBottom": "5px",
+              "marginLeft": "5px",
+              "marginRight": "5px",
+              "marginTop": "5px",
+              "minHeight": "400px",
+              "msFlexDirection": "column",
+              "width": "176px",
+            }
+          }
+        >
+          <div
+            className="lazyload-placeholder"
+            style={
+              Object {
+                "height": 200,
+              }
+            }
+          />
+          <h4
+            aria-level="4"
+            className="css-reset-4rbku5 css-text-901oao"
+            dir="auto"
+            role="heading"
+            style={
+              Object {
+                "color": "rgba(46,51,56,1.00)",
+                "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
+                "fontSize": "24px",
+                "lineHeight": "32px",
+                "textRendering": "geometricPrecision",
+                "textTransform": "none",
+              }
+            }
+          >
+            Taylor Lahey
+          </h4>
+          <div
+            className="css-text-901oao"
+            dir="auto"
+            style={
+              Object {
+                "color": "rgba(46,51,56,1.00)",
+                "fontFamily": "Jost, futura-pt, futura, sans-serif",
+                "fontSize": "16px",
+                "fontWeight": "500",
+                "lineHeight": "18px",
+                "textRendering": "geometricPrecision",
+              }
+            }
+          >
+            DESIGN
+          </div>
+        </div>
+        <div
+          className="css-view-1dbjc4n"
+          style={
+            Object {
+              "WebkitBoxDirection": "normal",
+              "WebkitBoxOrient": "vertical",
+              "WebkitFlexDirection": "column",
+              "flexDirection": "column",
+              "marginBottom": "5px",
+              "marginLeft": "5px",
+              "marginRight": "5px",
+              "marginTop": "5px",
+              "minHeight": "400px",
+              "msFlexDirection": "column",
+              "width": "176px",
+            }
+          }
+        >
+          <div
+            className="lazyload-placeholder"
+            style={
+              Object {
+                "height": 200,
+              }
+            }
+          />
+          <h4
+            aria-level="4"
+            className="css-reset-4rbku5 css-text-901oao"
+            dir="auto"
+            role="heading"
+            style={
+              Object {
+                "color": "rgba(46,51,56,1.00)",
+                "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
+                "fontSize": "24px",
+                "lineHeight": "32px",
+                "textRendering": "geometricPrecision",
+                "textTransform": "none",
+              }
+            }
+          >
+            Audrey Penven
+          </h4>
+          <div
+            className="css-text-901oao"
+            dir="auto"
+            style={
+              Object {
+                "color": "rgba(46,51,56,1.00)",
+                "fontFamily": "Jost, futura-pt, futura, sans-serif",
+                "fontSize": "16px",
+                "fontWeight": "500",
+                "lineHeight": "18px",
+                "textRendering": "geometricPrecision",
+              }
+            }
+          >
+            ENGINEERING
+          </div>
+        </div>
+        <div
+          className="css-view-1dbjc4n"
+          style={
+            Object {
+              "WebkitBoxDirection": "normal",
+              "WebkitBoxOrient": "vertical",
+              "WebkitFlexDirection": "column",
+              "flexDirection": "column",
+              "marginBottom": "5px",
+              "marginLeft": "5px",
+              "marginRight": "5px",
+              "marginTop": "5px",
+              "minHeight": "400px",
+              "msFlexDirection": "column",
+              "width": "176px",
+            }
+          }
+        >
+          <div
+            className="lazyload-placeholder"
+            style={
+              Object {
+                "height": 200,
+              }
+            }
+          />
+          <h4
+            aria-level="4"
+            className="css-reset-4rbku5 css-text-901oao"
+            dir="auto"
+            role="heading"
+            style={
+              Object {
+                "color": "rgba(46,51,56,1.00)",
+                "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
+                "fontSize": "24px",
+                "lineHeight": "32px",
+                "textRendering": "geometricPrecision",
+                "textTransform": "none",
+              }
+            }
+          >
+            Dan Race
+          </h4>
+          <div
+            className="css-text-901oao"
+            dir="auto"
+            style={
+              Object {
+                "color": "rgba(46,51,56,1.00)",
+                "fontFamily": "Jost, futura-pt, futura, sans-serif",
+                "fontSize": "16px",
+                "fontWeight": "500",
+                "lineHeight": "18px",
+                "textRendering": "geometricPrecision",
+              }
+            }
+          >
+            COMMUNICATION
+          </div>
+        </div>
+        <div
+          className="css-view-1dbjc4n"
+          style={
+            Object {
+              "WebkitBoxDirection": "normal",
+              "WebkitBoxOrient": "vertical",
+              "WebkitFlexDirection": "column",
+              "flexDirection": "column",
+              "marginBottom": "5px",
+              "marginLeft": "5px",
+              "marginRight": "5px",
+              "marginTop": "5px",
+              "minHeight": "400px",
+              "msFlexDirection": "column",
+              "width": "176px",
+            }
+          }
+        >
+          <div
+            className="lazyload-placeholder"
+            style={
+              Object {
+                "height": 200,
+              }
+            }
+          />
+          <h4
+            aria-level="4"
+            className="css-reset-4rbku5 css-text-901oao"
+            dir="auto"
+            role="heading"
+            style={
+              Object {
+                "color": "rgba(46,51,56,1.00)",
+                "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
+                "fontSize": "24px",
+                "lineHeight": "32px",
+                "textRendering": "geometricPrecision",
+                "textTransform": "none",
+              }
+            }
+          >
+            Laurence Delisle
+          </h4>
+          <div
+            className="css-text-901oao"
+            dir="auto"
+            style={
+              Object {
+                "color": "rgba(46,51,56,1.00)",
+                "fontFamily": "Jost, futura-pt, futura, sans-serif",
+                "fontSize": "16px",
+                "fontWeight": "500",
+                "lineHeight": "18px",
+                "textRendering": "geometricPrecision",
+              }
+            }
+          >
+            OPERATIONS
+          </div>
+        </div>
+        <div
+          className="css-view-1dbjc4n"
+          style={
+            Object {
+              "WebkitBoxDirection": "normal",
+              "WebkitBoxOrient": "vertical",
+              "WebkitFlexDirection": "column",
+              "flexDirection": "column",
+              "marginBottom": "5px",
+              "marginLeft": "5px",
+              "marginRight": "5px",
+              "marginTop": "5px",
+              "minHeight": "400px",
+              "msFlexDirection": "column",
+              "width": "176px",
+            }
+          }
+        >
+          <div
+            className="lazyload-placeholder"
+            style={
+              Object {
+                "height": 200,
+              }
+            }
+          />
+          <h4
+            aria-level="4"
+            className="css-reset-4rbku5 css-text-901oao"
+            dir="auto"
+            role="heading"
+            style={
+              Object {
+                "color": "rgba(46,51,56,1.00)",
+                "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
+                "fontSize": "24px",
+                "lineHeight": "32px",
+                "textRendering": "geometricPrecision",
+                "textTransform": "none",
+              }
+            }
+          >
+            Chuck Kimble
+          </h4>
+          <div
+            className="css-text-901oao"
+            dir="auto"
+            style={
+              Object {
+                "color": "rgba(46,51,56,1.00)",
+                "fontFamily": "Jost, futura-pt, futura, sans-serif",
+                "fontSize": "16px",
+                "fontWeight": "500",
+                "lineHeight": "18px",
+                "textRendering": "geometricPrecision",
+              }
+            }
+          >
+            PARTNERSHIPS
+          </div>
+        </div>
+        <div
+          className="css-view-1dbjc4n"
+          style={
+            Object {
+              "WebkitBoxDirection": "normal",
+              "WebkitBoxOrient": "vertical",
+              "WebkitFlexDirection": "column",
+              "flexDirection": "column",
+              "marginBottom": "5px",
+              "marginLeft": "5px",
+              "marginRight": "5px",
+              "marginTop": "5px",
+              "minHeight": "400px",
+              "msFlexDirection": "column",
+              "width": "176px",
+            }
+          }
+        >
+          <div
+            className="lazyload-placeholder"
+            style={
+              Object {
+                "height": 200,
+              }
+            }
+          />
+          <h4
+            aria-level="4"
+            className="css-reset-4rbku5 css-text-901oao"
+            dir="auto"
+            role="heading"
+            style={
+              Object {
+                "color": "rgba(46,51,56,1.00)",
+                "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
+                "fontSize": "24px",
+                "lineHeight": "32px",
+                "textRendering": "geometricPrecision",
+                "textTransform": "none",
+              }
+            }
+          >
+            Brynly Llyr
+          </h4>
+          <div
+            className="css-text-901oao"
+            dir="auto"
+            style={
+              Object {
+                "color": "rgba(46,51,56,1.00)",
+                "fontFamily": "Jost, futura-pt, futura, sans-serif",
+                "fontSize": "16px",
+                "fontWeight": "500",
+                "lineHeight": "18px",
+                "textRendering": "geometricPrecision",
+              }
+            }
+          >
+            LEGAL
+          </div>
+        </div>
+        <div
+          className="css-view-1dbjc4n"
+          style={
+            Object {
+              "WebkitBoxDirection": "normal",
+              "WebkitBoxOrient": "vertical",
+              "WebkitFlexDirection": "column",
+              "flexDirection": "column",
+              "marginBottom": "5px",
+              "marginLeft": "5px",
+              "marginRight": "5px",
+              "marginTop": "5px",
+              "minHeight": "400px",
+              "msFlexDirection": "column",
+              "width": "176px",
+            }
+          }
+        >
+          <div
+            className="lazyload-placeholder"
+            style={
+              Object {
+                "height": 200,
+              }
+            }
+          />
+          <h4
+            aria-level="4"
+            className="css-reset-4rbku5 css-text-901oao"
+            dir="auto"
+            role="heading"
+            style={
+              Object {
+                "color": "rgba(46,51,56,1.00)",
+                "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
+                "fontSize": "24px",
+                "lineHeight": "32px",
+                "textRendering": "geometricPrecision",
+                "textTransform": "none",
+              }
+            }
+          >
+            Will Le
+          </h4>
+          <div
+            className="css-text-901oao"
+            dir="auto"
+            style={
+              Object {
+                "color": "rgba(46,51,56,1.00)",
+                "fontFamily": "Jost, futura-pt, futura, sans-serif",
+                "fontSize": "16px",
+                "fontWeight": "500",
+                "lineHeight": "18px",
+                "textRendering": "geometricPrecision",
+              }
+            }
+          >
+            GO-TO-MARKET
+          </div>
+        </div>
+        <div
+          className="css-view-1dbjc4n"
+          style={
+            Object {
+              "WebkitBoxDirection": "normal",
+              "WebkitBoxOrient": "vertical",
+              "WebkitFlexDirection": "column",
+              "flexDirection": "column",
+              "marginBottom": "5px",
+              "marginLeft": "5px",
+              "marginRight": "5px",
+              "marginTop": "5px",
+              "minHeight": "400px",
+              "msFlexDirection": "column",
+              "width": "176px",
+            }
+          }
+        >
+          <div
+            className="lazyload-placeholder"
+            style={
+              Object {
+                "height": 200,
+              }
+            }
+          />
+          <h4
+            aria-level="4"
+            className="css-reset-4rbku5 css-text-901oao"
+            dir="auto"
+            role="heading"
+            style={
+              Object {
+                "color": "rgba(46,51,56,1.00)",
+                "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
+                "fontSize": "24px",
+                "lineHeight": "32px",
+                "textRendering": "geometricPrecision",
+                "textTransform": "none",
+              }
+            }
+          >
+            Anca Bogdana Rusu
+          </h4>
+          <div
+            className="css-text-901oao"
+            dir="auto"
+            style={
+              Object {
+                "color": "rgba(46,51,56,1.00)",
+                "fontFamily": "Jost, futura-pt, futura, sans-serif",
+                "fontSize": "16px",
+                "fontWeight": "500",
+                "lineHeight": "18px",
+                "textRendering": "geometricPrecision",
+              }
+            }
+          >
+            GO-TO-MARKET
+          </div>
+        </div>
+        <div
+          className="css-view-1dbjc4n"
+          style={
+            Object {
+              "WebkitBoxDirection": "normal",
+              "WebkitBoxOrient": "vertical",
+              "WebkitFlexDirection": "column",
+              "flexDirection": "column",
+              "marginBottom": "5px",
+              "marginLeft": "5px",
+              "marginRight": "5px",
+              "marginTop": "5px",
+              "minHeight": "400px",
+              "msFlexDirection": "column",
+              "width": "176px",
+            }
+          }
+        >
+          <div
+            className="lazyload-placeholder"
+            style={
+              Object {
+                "height": 200,
+              }
+            }
+          />
+          <h4
+            aria-level="4"
+            className="css-reset-4rbku5 css-text-901oao"
+            dir="auto"
+            role="heading"
+            style={
+              Object {
+                "color": "rgba(46,51,56,1.00)",
+                "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
+                "fontSize": "24px",
+                "lineHeight": "32px",
+                "textRendering": "geometricPrecision",
+                "textTransform": "none",
+              }
+            }
+          >
+            Katharina Chiu
+          </h4>
+          <div
+            className="css-text-901oao"
+            dir="auto"
+            style={
+              Object {
+                "color": "rgba(46,51,56,1.00)",
+                "fontFamily": "Jost, futura-pt, futura, sans-serif",
+                "fontSize": "16px",
+                "fontWeight": "500",
+                "lineHeight": "18px",
+                "textRendering": "geometricPrecision",
+              }
+            }
+          >
+            PEOPLE
+          </div>
+        </div>
+        <div
+          className="css-view-1dbjc4n"
+          style={
+            Object {
+              "WebkitBoxDirection": "normal",
+              "WebkitBoxOrient": "vertical",
+              "WebkitFlexDirection": "column",
+              "flexDirection": "column",
+              "marginBottom": "5px",
+              "marginLeft": "5px",
+              "marginRight": "5px",
+              "marginTop": "5px",
+              "minHeight": "400px",
+              "msFlexDirection": "column",
+              "width": "176px",
+            }
+          }
+        >
+          <div
+            className="lazyload-placeholder"
+            style={
+              Object {
+                "height": 200,
+              }
+            }
+          />
+          <h4
+            aria-level="4"
+            className="css-reset-4rbku5 css-text-901oao"
+            dir="auto"
+            role="heading"
+            style={
+              Object {
+                "color": "rgba(46,51,56,1.00)",
+                "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
+                "fontSize": "24px",
+                "lineHeight": "32px",
+                "textRendering": "geometricPrecision",
+                "textTransform": "none",
+              }
+            }
+          >
+            Michael Zhang
+          </h4>
+          <div
+            className="css-text-901oao"
+            dir="auto"
+            style={
+              Object {
+                "color": "rgba(46,51,56,1.00)",
+                "fontFamily": "Jost, futura-pt, futura, sans-serif",
+                "fontSize": "16px",
+                "fontWeight": "500",
+                "lineHeight": "18px",
+                "textRendering": "geometricPrecision",
+              }
+            }
+          >
+            FINANCE
+          </div>
+        </div>
+        <div
+          className="css-view-1dbjc4n"
+          style={
+            Object {
+              "WebkitBoxDirection": "normal",
+              "WebkitBoxOrient": "vertical",
+              "WebkitFlexDirection": "column",
+              "flexDirection": "column",
+              "marginBottom": "5px",
+              "marginLeft": "5px",
+              "marginRight": "5px",
+              "marginTop": "5px",
+              "minHeight": "400px",
+              "msFlexDirection": "column",
+              "width": "176px",
+            }
+          }
+        >
+          <div
+            className="lazyload-placeholder"
+            style={
+              Object {
+                "height": 200,
+              }
+            }
+          />
+          <h4
+            aria-level="4"
+            className="css-reset-4rbku5 css-text-901oao"
+            dir="auto"
+            role="heading"
+            style={
+              Object {
+                "color": "rgba(46,51,56,1.00)",
+                "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
+                "fontSize": "24px",
+                "lineHeight": "32px",
+                "textRendering": "geometricPrecision",
+                "textTransform": "none",
+              }
+            }
+          >
+            Martin Chrzanowski
+          </h4>
+          <div
+            className="css-text-901oao"
+            dir="auto"
+            style={
+              Object {
+                "color": "rgba(46,51,56,1.00)",
+                "fontFamily": "Jost, futura-pt, futura, sans-serif",
+                "fontSize": "16px",
+                "fontWeight": "500",
+                "lineHeight": "18px",
+                "textRendering": "geometricPrecision",
+              }
+            }
+          >
+            ENGINEERING
+          </div>
+        </div>
+        <div
+          className="css-view-1dbjc4n"
+          style={
+            Object {
+              "WebkitBoxDirection": "normal",
+              "WebkitBoxOrient": "vertical",
+              "WebkitFlexDirection": "column",
+              "flexDirection": "column",
+              "marginBottom": "5px",
+              "marginLeft": "5px",
+              "marginRight": "5px",
+              "marginTop": "5px",
+              "minHeight": "400px",
+              "msFlexDirection": "column",
+              "width": "176px",
+            }
+          }
+        >
+          <div
+            className="lazyload-placeholder"
+            style={
+              Object {
+                "height": 200,
+              }
+            }
+          />
+          <h4
+            aria-level="4"
+            className="css-reset-4rbku5 css-text-901oao"
+            dir="auto"
+            role="heading"
+            style={
+              Object {
+                "color": "rgba(46,51,56,1.00)",
+                "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
+                "fontSize": "24px",
+                "lineHeight": "32px",
+                "textRendering": "geometricPrecision",
+                "textTransform": "none",
+              }
+            }
+          >
+            Marissa Florant
+          </h4>
+          <div
+            className="css-text-901oao"
+            dir="auto"
+            style={
+              Object {
+                "color": "rgba(46,51,56,1.00)",
+                "fontFamily": "Jost, futura-pt, futura, sans-serif",
+                "fontSize": "16px",
+                "fontWeight": "500",
+                "lineHeight": "18px",
+                "textRendering": "geometricPrecision",
+              }
+            }
+          >
+            PEOPLE
+          </div>
+        </div>
+        <div
+          className="css-view-1dbjc4n"
+          style={
+            Object {
+              "height": "0px",
+              "width": "186px",
+            }
+          }
+        />
+        <div
+          className="css-view-1dbjc4n"
+          style={
+            Object {
+              "height": "0px",
+              "width": "186px",
+            }
+          }
+        />
+      </div>
+    </div>
+  </div>
+  <div
+    className="css-view-1dbjc4n"
+    style={
+      Object {
+        "WebkitAlignSelf": "center",
+        "WebkitBoxDirection": "normal",
+        "WebkitBoxOrient": "vertical",
+        "WebkitFlexDirection": "column",
+        "alignSelf": "center",
+        "flexDirection": "column",
+        "marginBottom": "50px",
+        "marginTop": "50px",
+        "maxWidth": "100vw",
+        "msFlexDirection": "column",
+        "msFlexItemAlign": "center",
+        "paddingLeft": "10px",
+        "paddingRight": "10px",
+        "width": "100%",
+      }
+    }
+  >
+    <div
+      className="css-view-1dbjc4n"
+      style={
+        Object {
+          "WebkitBoxFlex": 0,
+          "WebkitFlexGrow": 0,
+          "WebkitFlexShrink": 0,
+          "flexGrow": 0,
+          "flexShrink": 0,
+          "msFlexNegative": 0,
+          "msFlexPositive": 0,
+          "paddingBottom": "10px",
+          "paddingLeft": "10px",
+          "paddingRight": "10px",
+          "paddingTop": "10px",
+          "width": "100%",
+        }
+      }
+    >
+      <div
+        className="css-view-1dbjc4n"
+        style={
+          Object {
+            "display": "block",
+            "height": "300px",
+            "overflowX": "hidden",
+            "overflowY": "hidden",
+            "width": "100%",
+          }
+        }
+      >
+        <div
+          style={
+            Object {
+              "display": "block",
+              "paddingBottom": "72.47524752475248%",
+              "width": "100%",
+            }
+          }
+        />
+        <div
+          style={
+            Object {
+              "bottom": "0px",
+              "height": "100%",
+              "left": "0px",
+              "position": "absolute",
+              "top": "0px",
+              "width": "100%",
+            }
+          }
+        >
+          <div
+            className="css-view-1dbjc4n"
+            style={
+              Object {
+                "WebkitFlexBasis": "auto",
+                "flexBasis": "auto",
+                "height": "100%",
+                "msFlexPreferredSize": "auto",
+                "overflowX": "hidden",
+                "overflowY": "hidden",
+                "width": "100%",
+                "zIndex": 0,
+              }
+            }
+          >
+            <div
+              className="css-view-1dbjc4n"
+              style={
+                Object {
+                  "backgroundColor": "rgba(0,0,0,0.00)",
+                  "backgroundImage": "url(\\"image.png\\")",
+                  "backgroundPosition": "center",
+                  "backgroundRepeat": "no-repeat",
+                  "backgroundSize": "contain",
+                  "bottom": "0px",
+                  "height": "100%",
+                  "left": "0px",
+                  "position": "absolute",
+                  "right": "0px",
+                  "top": "0px",
+                  "width": "100%",
+                  "zIndex": -1,
+                }
+              }
+            />
+            <img
+              alt=""
+              className="css-accessibilityImage-9pa8cd"
+              draggable={false}
+              src="image.png"
+            />
+          </div>
+        </div>
+      </div>
+    </div>
+    <div
+      className="css-view-1dbjc4n"
+      style={
+        Object {
+          "WebkitBoxFlex": 0,
+          "WebkitFlexGrow": 0,
+          "WebkitFlexShrink": 0,
+          "flexGrow": 0,
+          "flexShrink": 0,
+          "msFlexNegative": 0,
+          "msFlexPositive": 0,
+          "paddingBottom": "10px",
+          "paddingLeft": "10px",
+          "paddingRight": "10px",
+          "paddingTop": "10px",
+          "width": "100%",
+        }
+      }
+    >
+      <h4
+        aria-level="4"
+        className="css-reset-4rbku5 css-text-901oao"
+        dir="auto"
+        role="heading"
+        style={
+          Object {
+            "color": "rgba(46,51,56,1.00)",
+            "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
+            "fontSize": "24px",
+            "lineHeight": "32px",
+            "marginBottom": "20px",
+            "textRendering": "geometricPrecision",
+            "textTransform": "none",
+          }
+        }
+      >
+        joinUsText
+      </h4>
+      <div
+        className="css-view-1dbjc4n"
+        onClick={[Function]}
+        onMouseDown={[Function]}
+        onMouseEnter={[Function]}
+        onMouseLeave={[Function]}
+        onMouseUp={[Function]}
+        onResponderGrant={[Function]}
+        onResponderRelease={[Function]}
+      >
+        <a
+          className="css-reset-4rbku5 css-cursor-18t94o4 css-text-901oao"
+          data-focusable={true}
+          dir="auto"
+          href="/jobs"
+          role="link"
+          style={
+            Object {
+              "WebkitAlignItems": "center",
+              "WebkitBoxAlign": "center",
+              "WebkitBoxFlex": 0,
+              "WebkitBoxPack": "center",
+              "WebkitFlexGrow": 0,
+              "WebkitJustifyContent": "center",
+              "alignItems": "center",
+              "backgroundColor": "rgba(53,208,127,1.00)",
+              "borderBottomColor": "rgba(53,208,127,1.00)",
+              "borderBottomLeftRadius": "3px",
+              "borderBottomRightRadius": "3px",
+              "borderBottomWidth": "1px",
+              "borderLeftColor": "rgba(53,208,127,1.00)",
+              "borderLeftWidth": "1px",
+              "borderRightColor": "rgba(53,208,127,1.00)",
+              "borderRightWidth": "1px",
+              "borderTopColor": "rgba(53,208,127,1.00)",
+              "borderTopLeftRadius": "3px",
+              "borderTopRightRadius": "3px",
+              "borderTopWidth": "1px",
+              "color": "rgba(255,255,255,1.00)",
+              "cursor": "pointer",
+              "display": "inline-flex",
+              "flexGrow": 0,
+              "fontFamily": "Jost, futura-pt, futura, sans-serif",
+              "fontSize": "20px",
+              "fontWeight": "500",
+              "justifyContent": "center",
+              "lineHeight": "16px",
+              "minWidth": "200px",
+              "msFlexAlign": "center",
+              "msFlexPack": "center",
+              "msFlexPositive": 0,
+              "opacity": 1,
+              "paddingBottom": "20px",
+              "paddingLeft": "30px",
+              "paddingRight": "30px",
+              "paddingTop": "20px",
+              "textAlign": "center",
+              "textRendering": "geometricPrecision",
+              "width": "fit-content",
+            }
+          }
+        >
+          joinUsBtn
+        </a>
+      </div>
+    </div>
+  </div>
+  <div
+    className="css-view-1dbjc4n"
+    style={
+      Object {
+        "WebkitAlignItems": "center",
+        "WebkitAlignSelf": "center",
+        "WebkitBoxAlign": "center",
+        "WebkitBoxDirection": "normal",
+        "WebkitBoxOrient": "vertical",
+        "WebkitBoxPack": "center",
+        "WebkitFlexDirection": "column",
+        "WebkitJustifyContent": "center",
+        "alignItems": "center",
+        "alignSelf": "center",
+        "flexDirection": "column",
+        "justifyContent": "center",
+        "maxWidth": "100vw",
+        "msFlexAlign": "center",
+        "msFlexDirection": "column",
+        "msFlexItemAlign": "center",
+        "msFlexPack": "center",
+        "paddingLeft": "10px",
+        "paddingRight": "10px",
+        "width": "100%",
+      }
+    }
+  >
+    <div
+      className="css-view-1dbjc4n"
+      style={
+        Object {
+          "WebkitBoxFlex": 0,
+          "WebkitFlexGrow": 0,
+          "WebkitFlexShrink": 0,
+          "flexGrow": 0,
+          "flexShrink": 0,
+          "msFlexNegative": 0,
+          "msFlexPositive": 0,
+          "paddingBottom": "10px",
+          "paddingLeft": "10px",
+          "paddingRight": "10px",
+          "paddingTop": "10px",
+          "width": "100%",
+        }
+      }
+    >
+      <h2
+        aria-level="2"
+        className="css-reset-4rbku5 css-text-901oao"
+        dir="auto"
+        id="backers"
+        role="heading"
+        style={
+          Object {
+            "color": "rgba(46,51,56,1.00)",
+            "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
+            "fontSize": "36px",
+            "lineHeight": "40px",
+            "marginBottom": "20px",
+            "textAlign": "center",
+            "textRendering": "geometricPrecision",
+            "textTransform": "none",
+          }
+        }
+      >
+        celoBackers
+      </h2>
+      <h4
+        aria-level="4"
+        className="css-reset-4rbku5 css-text-901oao"
+        dir="auto"
+        role="heading"
+        style={
+          Object {
+            "color": "rgba(46,51,56,1.00)",
+            "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
+            "fontSize": "24px",
+            "lineHeight": "32px",
+            "textAlign": "center",
+            "textRendering": "geometricPrecision",
+            "textTransform": "none",
+          }
+        }
+      >
+        celoBackersText
+      </h4>
+    </div>
+  </div>
+  <div
+    className="css-view-1dbjc4n"
+    style={
+      Object {
+        "WebkitAlignSelf": "center",
+        "WebkitBoxDirection": "normal",
+        "WebkitBoxOrient": "vertical",
+        "WebkitFlexDirection": "column",
+        "alignSelf": "center",
+        "flexDirection": "column",
+        "maxWidth": "100vw",
+        "msFlexDirection": "column",
+        "msFlexItemAlign": "center",
+        "paddingLeft": "10px",
+        "paddingRight": "10px",
+        "width": "100%",
+      }
+    }
+  >
+    <div
+      className="css-view-1dbjc4n"
+      style={
+        Object {
+          "WebkitBoxFlex": 0,
+          "WebkitFlexGrow": 0,
+          "WebkitFlexShrink": 0,
+          "flexGrow": 0,
+          "flexShrink": 0,
+          "msFlexNegative": 0,
+          "msFlexPositive": 0,
+          "paddingBottom": "10px",
+          "paddingLeft": "10px",
+          "paddingRight": "10px",
+          "paddingTop": "10px",
+          "width": "100%",
+        }
+      }
+    >
+      <div
+        className="css-view-1dbjc4n"
+        style={
+          Object {
+            "WebkitAlignItems": "center",
+            "WebkitBoxAlign": "center",
+            "WebkitBoxDirection": "normal",
+            "WebkitBoxLines": "multiple",
+            "WebkitBoxOrient": "horizontal",
+            "WebkitBoxPack": "center",
+            "WebkitFlexDirection": "row",
+            "WebkitFlexWrap": "wrap",
+            "WebkitJustifyContent": "center",
+            "alignItems": "center",
+            "flexDirection": "row",
+            "flexWrap": "wrap",
+            "justifyContent": "center",
+            "msFlexAlign": "center",
+            "msFlexDirection": "row",
+            "msFlexPack": "center",
+            "msFlexWrap": "wrap",
+            "paddingLeft": "10px",
+            "paddingRight": "10px",
+          }
+        }
+      >
+        <div
+          className="css-view-1dbjc4n"
+          style={
+            Object {
+              "WebkitBoxDirection": "normal",
+              "WebkitBoxOrient": "vertical",
+              "WebkitFlexDirection": "column",
+              "flexDirection": "column",
+              "marginBottom": "25px",
+              "marginLeft": "25px",
+              "marginRight": "25px",
+              "marginTop": "25px",
+              "msFlexDirection": "column",
+              "width": "200px",
+            }
+          }
+        >
+          <div
+            className="css-view-1dbjc4n"
+            style={
+              Object {
+                "WebkitFlexBasis": "auto",
+                "flexBasis": "auto",
+                "height": "40px",
+                "msFlexPreferredSize": "auto",
+                "overflowX": "hidden",
+                "overflowY": "hidden",
+                "width": "100%",
+                "zIndex": 0,
+              }
+            }
+          >
+            <div
+              className="css-view-1dbjc4n"
+              style={
+                Object {
+                  "backgroundColor": "rgba(0,0,0,0.00)",
+                  "backgroundPosition": "center",
+                  "backgroundRepeat": "no-repeat",
+                  "backgroundSize": "contain",
+                  "bottom": "0px",
+                  "height": "100%",
+                  "left": "0px",
+                  "position": "absolute",
+                  "right": "0px",
+                  "top": "0px",
+                  "width": "100%",
+                  "zIndex": -1,
+                }
+              }
+            />
+          </div>
+        </div>
+        <div
+          className="css-view-1dbjc4n"
+          style={
+            Object {
+              "WebkitBoxDirection": "normal",
+              "WebkitBoxOrient": "vertical",
+              "WebkitFlexDirection": "column",
+              "flexDirection": "column",
+              "marginBottom": "25px",
+              "marginLeft": "25px",
+              "marginRight": "25px",
+              "marginTop": "25px",
+              "msFlexDirection": "column",
+              "width": "200px",
+            }
+          }
+        >
+          <div
+            className="css-view-1dbjc4n"
+            style={
+              Object {
+                "WebkitFlexBasis": "auto",
+                "flexBasis": "auto",
+                "height": "40px",
+                "msFlexPreferredSize": "auto",
+                "overflowX": "hidden",
+                "overflowY": "hidden",
+                "width": "100%",
+                "zIndex": 0,
+              }
+            }
+          >
+            <div
+              className="css-view-1dbjc4n"
+              style={
+                Object {
+                  "backgroundColor": "rgba(0,0,0,0.00)",
+                  "backgroundPosition": "center",
+                  "backgroundRepeat": "no-repeat",
+                  "backgroundSize": "contain",
+                  "bottom": "0px",
+                  "height": "100%",
+                  "left": "0px",
+                  "position": "absolute",
+                  "right": "0px",
+                  "top": "0px",
+                  "width": "100%",
+                  "zIndex": -1,
+                }
+              }
+            />
+          </div>
+        </div>
+        <div
+          className="css-view-1dbjc4n"
+          style={
+            Object {
+              "WebkitBoxDirection": "normal",
+              "WebkitBoxOrient": "vertical",
+              "WebkitFlexDirection": "column",
+              "flexDirection": "column",
+              "marginBottom": "25px",
+              "marginLeft": "25px",
+              "marginRight": "25px",
+              "marginTop": "25px",
+              "msFlexDirection": "column",
+              "width": "200px",
+            }
+          }
+        >
+          <div
+            className="css-view-1dbjc4n"
+            style={
+              Object {
+                "WebkitFlexBasis": "auto",
+                "flexBasis": "auto",
+                "height": "40px",
+                "msFlexPreferredSize": "auto",
+                "overflowX": "hidden",
+                "overflowY": "hidden",
+                "width": "100%",
+                "zIndex": 0,
+              }
+            }
+          >
+            <div
+              className="css-view-1dbjc4n"
+              style={
+                Object {
+                  "backgroundColor": "rgba(0,0,0,0.00)",
+                  "backgroundPosition": "center",
+                  "backgroundRepeat": "no-repeat",
+                  "backgroundSize": "contain",
+                  "bottom": "0px",
+                  "height": "100%",
+                  "left": "0px",
+                  "position": "absolute",
+                  "right": "0px",
+                  "top": "0px",
+                  "width": "100%",
+                  "zIndex": -1,
+                }
+              }
+            />
+          </div>
+        </div>
+        <div
+          className="css-view-1dbjc4n"
+          style={
+            Object {
+              "WebkitBoxDirection": "normal",
+              "WebkitBoxOrient": "vertical",
+              "WebkitFlexDirection": "column",
+              "flexDirection": "column",
+              "marginBottom": "25px",
+              "marginLeft": "25px",
+              "marginRight": "25px",
+              "marginTop": "25px",
+              "msFlexDirection": "column",
+              "width": "200px",
+            }
+          }
+        >
+          <div
+            className="css-text-901oao"
+            dir="auto"
+            style={
+              Object {
+                "color": "rgba(46,51,56,1.00)",
+                "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
+                "fontSize": "28px",
+                "lineHeight": "36px",
+                "textAlign": "center",
+                "textRendering": "geometricPrecision",
+              }
+            }
+          >
+            Reid Hoffman
+          </div>
+        </div>
+        <div
+          className="css-view-1dbjc4n"
+          style={
+            Object {
+              "WebkitBoxDirection": "normal",
+              "WebkitBoxOrient": "vertical",
+              "WebkitFlexDirection": "column",
+              "flexDirection": "column",
+              "marginBottom": "25px",
+              "marginLeft": "25px",
+              "marginRight": "25px",
+              "marginTop": "25px",
+              "msFlexDirection": "column",
+              "width": "200px",
+            }
+          }
+        >
+          <div
+            className="css-view-1dbjc4n"
+            style={
+              Object {
+                "WebkitFlexBasis": "auto",
+                "flexBasis": "auto",
+                "height": "40px",
+                "msFlexPreferredSize": "auto",
+                "overflowX": "hidden",
+                "overflowY": "hidden",
+                "width": "100%",
+                "zIndex": 0,
+              }
+            }
+          >
+            <div
+              className="css-view-1dbjc4n"
+              style={
+                Object {
+                  "backgroundColor": "rgba(0,0,0,0.00)",
+                  "backgroundPosition": "center",
+                  "backgroundRepeat": "no-repeat",
+                  "backgroundSize": "contain",
+                  "bottom": "0px",
+                  "height": "100%",
+                  "left": "0px",
+                  "position": "absolute",
+                  "right": "0px",
+                  "top": "0px",
+                  "width": "100%",
+                  "zIndex": -1,
+                }
+              }
+            />
+          </div>
+        </div>
+        <div
+          className="css-view-1dbjc4n"
+          style={
+            Object {
+              "WebkitBoxDirection": "normal",
+              "WebkitBoxOrient": "vertical",
+              "WebkitFlexDirection": "column",
+              "flexDirection": "column",
+              "marginBottom": "25px",
+              "marginLeft": "25px",
+              "marginRight": "25px",
+              "marginTop": "25px",
+              "msFlexDirection": "column",
+              "width": "200px",
+            }
+          }
+        >
+          <div
+            className="css-view-1dbjc4n"
+            style={
+              Object {
+                "WebkitFlexBasis": "auto",
+                "flexBasis": "auto",
+                "height": "40px",
+                "msFlexPreferredSize": "auto",
+                "overflowX": "hidden",
+                "overflowY": "hidden",
+                "width": "100%",
+                "zIndex": 0,
+              }
+            }
+          >
+            <div
+              className="css-view-1dbjc4n"
+              style={
+                Object {
+                  "backgroundColor": "rgba(0,0,0,0.00)",
+                  "backgroundPosition": "center",
+                  "backgroundRepeat": "no-repeat",
+                  "backgroundSize": "contain",
+                  "bottom": "0px",
+                  "height": "100%",
+                  "left": "0px",
+                  "position": "absolute",
+                  "right": "0px",
+                  "top": "0px",
+                  "width": "100%",
+                  "zIndex": -1,
+                }
+              }
+            />
+          </div>
+        </div>
+        <div
+          className="css-view-1dbjc4n"
+          style={
+            Object {
+              "WebkitBoxDirection": "normal",
+              "WebkitBoxOrient": "vertical",
+              "WebkitFlexDirection": "column",
+              "flexDirection": "column",
+              "marginBottom": "25px",
+              "marginLeft": "25px",
+              "marginRight": "25px",
+              "marginTop": "25px",
+              "msFlexDirection": "column",
+              "width": "200px",
+            }
+          }
+        >
+          <div
+            className="css-view-1dbjc4n"
+            style={
+              Object {
+                "WebkitFlexBasis": "auto",
+                "flexBasis": "auto",
+                "height": "40px",
+                "msFlexPreferredSize": "auto",
+                "overflowX": "hidden",
+                "overflowY": "hidden",
+                "width": "100%",
+                "zIndex": 0,
+              }
+            }
+          >
+            <div
+              className="css-view-1dbjc4n"
+              style={
+                Object {
+                  "backgroundColor": "rgba(0,0,0,0.00)",
+                  "backgroundPosition": "center",
+                  "backgroundRepeat": "no-repeat",
+                  "backgroundSize": "contain",
+                  "bottom": "0px",
+                  "height": "100%",
+                  "left": "0px",
+                  "position": "absolute",
+                  "right": "0px",
+                  "top": "0px",
+                  "width": "100%",
+                  "zIndex": -1,
+                }
+              }
+            />
+          </div>
+        </div>
+        <div
+          className="css-view-1dbjc4n"
+          style={
+            Object {
+              "WebkitBoxDirection": "normal",
+              "WebkitBoxOrient": "vertical",
+              "WebkitFlexDirection": "column",
+              "flexDirection": "column",
+              "marginBottom": "25px",
+              "marginLeft": "25px",
+              "marginRight": "25px",
+              "marginTop": "25px",
+              "msFlexDirection": "column",
+              "width": "200px",
+            }
+          }
+        >
+          <div
+            className="css-view-1dbjc4n"
+            style={
+              Object {
+                "WebkitFlexBasis": "auto",
+                "flexBasis": "auto",
+                "height": "40px",
+                "msFlexPreferredSize": "auto",
+                "overflowX": "hidden",
+                "overflowY": "hidden",
+                "width": "100%",
+                "zIndex": 0,
+              }
+            }
+          >
+            <div
+              className="css-view-1dbjc4n"
+              style={
+                Object {
+                  "backgroundColor": "rgba(0,0,0,0.00)",
+                  "backgroundPosition": "center",
+                  "backgroundRepeat": "no-repeat",
+                  "backgroundSize": "contain",
+                  "bottom": "0px",
+                  "height": "100%",
+                  "left": "0px",
+                  "position": "absolute",
+                  "right": "0px",
+                  "top": "0px",
+                  "width": "100%",
+                  "zIndex": -1,
+                }
+              }
+            />
+          </div>
+        </div>
+        <div
+          className="css-view-1dbjc4n"
+          style={
+            Object {
+              "WebkitBoxDirection": "normal",
+              "WebkitBoxOrient": "vertical",
+              "WebkitFlexDirection": "column",
+              "flexDirection": "column",
+              "marginBottom": "25px",
+              "marginLeft": "25px",
+              "marginRight": "25px",
+              "marginTop": "25px",
+              "msFlexDirection": "column",
+              "width": "200px",
+            }
+          }
+        >
+          <div
+            className="css-view-1dbjc4n"
+            style={
+              Object {
+                "WebkitFlexBasis": "auto",
+                "flexBasis": "auto",
+                "height": "40px",
+                "msFlexPreferredSize": "auto",
+                "overflowX": "hidden",
+                "overflowY": "hidden",
+                "width": "100%",
+                "zIndex": 0,
+              }
+            }
+          >
+            <div
+              className="css-view-1dbjc4n"
+              style={
+                Object {
+                  "backgroundColor": "rgba(0,0,0,0.00)",
+                  "backgroundPosition": "center",
+                  "backgroundRepeat": "no-repeat",
+                  "backgroundSize": "contain",
+                  "bottom": "0px",
+                  "height": "100%",
+                  "left": "0px",
+                  "position": "absolute",
+                  "right": "0px",
+                  "top": "0px",
+                  "width": "100%",
+                  "zIndex": -1,
+                }
+              }
+            />
+          </div>
+        </div>
+        <div
+          className="css-view-1dbjc4n"
+          style={
+            Object {
+              "WebkitBoxDirection": "normal",
+              "WebkitBoxOrient": "vertical",
+              "WebkitFlexDirection": "column",
+              "flexDirection": "column",
+              "marginBottom": "25px",
+              "marginLeft": "25px",
+              "marginRight": "25px",
+              "marginTop": "25px",
+              "msFlexDirection": "column",
+              "width": "200px",
+            }
+          }
+        >
+          <div
+            className="css-text-901oao"
+            dir="auto"
+            style={
+              Object {
+                "color": "rgba(46,51,56,1.00)",
+                "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
+                "fontSize": "28px",
+                "lineHeight": "36px",
+                "textAlign": "center",
+                "textRendering": "geometricPrecision",
+              }
+            }
+          >
+            Jack Dorsey
+          </div>
+        </div>
+        <div
+          className="css-view-1dbjc4n"
+          style={
+            Object {
+              "WebkitBoxDirection": "normal",
+              "WebkitBoxOrient": "vertical",
+              "WebkitFlexDirection": "column",
+              "flexDirection": "column",
+              "marginBottom": "25px",
+              "marginLeft": "25px",
+              "marginRight": "25px",
+              "marginTop": "25px",
+              "msFlexDirection": "column",
+              "width": "200px",
+            }
+          }
+        >
+          <div
+            className="css-text-901oao"
+            dir="auto"
+            style={
+              Object {
+                "color": "rgba(46,51,56,1.00)",
+                "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
+                "fontSize": "28px",
+                "lineHeight": "36px",
+                "textAlign": "center",
+                "textRendering": "geometricPrecision",
+              }
+            }
+          >
+            Naval Ravikant
+          </div>
+        </div>
+        <div
+          className="css-view-1dbjc4n"
+          style={
+            Object {
+              "WebkitBoxDirection": "normal",
+              "WebkitBoxOrient": "vertical",
+              "WebkitFlexDirection": "column",
+              "flexDirection": "column",
+              "marginBottom": "25px",
+              "marginLeft": "25px",
+              "marginRight": "25px",
+              "marginTop": "25px",
+              "msFlexDirection": "column",
+              "width": "200px",
+            }
+          }
+        >
+          <div
+            className="css-text-901oao"
+            dir="auto"
+            style={
+              Object {
+                "color": "rgba(46,51,56,1.00)",
+                "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
+                "fontSize": "28px",
+                "lineHeight": "36px",
+                "textAlign": "center",
+                "textRendering": "geometricPrecision",
+              }
+            }
+          >
+            Casey Neistat
+          </div>
+        </div>
+        <div
+          className="css-view-1dbjc4n"
+          style={
+            Object {
+              "WebkitBoxDirection": "normal",
+              "WebkitBoxOrient": "vertical",
+              "WebkitFlexDirection": "column",
+              "flexDirection": "column",
+              "marginBottom": "25px",
+              "marginLeft": "25px",
+              "marginRight": "25px",
+              "marginTop": "25px",
+              "msFlexDirection": "column",
+              "width": "200px",
+            }
+          }
+        >
+          <div
+            className="css-text-901oao"
+            dir="auto"
+            style={
+              Object {
+                "color": "rgba(46,51,56,1.00)",
+                "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
+                "fontSize": "28px",
+                "lineHeight": "36px",
+                "textAlign": "center",
+                "textRendering": "geometricPrecision",
+              }
+            }
+          >
+            Arianna Simpson
+          </div>
+        </div>
+        <div
+          className="css-view-1dbjc4n"
+          style={
+            Object {
+              "WebkitBoxDirection": "normal",
+              "WebkitBoxOrient": "vertical",
+              "WebkitFlexDirection": "column",
+              "flexDirection": "column",
+              "marginBottom": "25px",
+              "marginLeft": "25px",
+              "marginRight": "25px",
+              "marginTop": "25px",
+              "msFlexDirection": "column",
+              "width": "200px",
+            }
+          }
+        >
+          <div
+            className="css-text-901oao"
+            dir="auto"
+            style={
+              Object {
+                "color": "rgba(46,51,56,1.00)",
+                "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
+                "fontSize": "28px",
+                "lineHeight": "36px",
+                "textAlign": "center",
+                "textRendering": "geometricPrecision",
+              }
+            }
+          >
+            Tanguy Chau
+          </div>
+        </div>
+        <div
+          className="css-view-1dbjc4n"
+          style={
+            Object {
+              "WebkitBoxDirection": "normal",
+              "WebkitBoxOrient": "vertical",
+              "WebkitFlexDirection": "column",
+              "flexDirection": "column",
+              "marginBottom": "25px",
+              "marginLeft": "25px",
+              "marginRight": "25px",
+              "marginTop": "25px",
+              "msFlexDirection": "column",
+              "width": "200px",
+            }
+          }
+        >
+          <div
+            className="css-text-901oao"
+            dir="auto"
+            style={
+              Object {
+                "color": "rgba(46,51,56,1.00)",
+                "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
+                "fontSize": "28px",
+                "lineHeight": "36px",
+                "textAlign": "center",
+                "textRendering": "geometricPrecision",
+              }
+            }
+          >
+            Elad Gil
+          </div>
+        </div>
+        <div
+          className="css-view-1dbjc4n"
+          style={
+            Object {
+              "WebkitBoxDirection": "normal",
+              "WebkitBoxOrient": "vertical",
+              "WebkitFlexDirection": "column",
+              "flexDirection": "column",
+              "marginBottom": "25px",
+              "marginLeft": "25px",
+              "marginRight": "25px",
+              "marginTop": "25px",
+              "msFlexDirection": "column",
+              "width": "200px",
+            }
+          }
+        >
+          <div
+            className="css-view-1dbjc4n"
+            style={
+              Object {
+                "WebkitFlexBasis": "auto",
+                "flexBasis": "auto",
+                "height": "40px",
+                "msFlexPreferredSize": "auto",
+                "overflowX": "hidden",
+                "overflowY": "hidden",
+                "width": "100%",
+                "zIndex": 0,
+              }
+            }
+          >
+            <div
+              className="css-view-1dbjc4n"
+              style={
+                Object {
+                  "backgroundColor": "rgba(0,0,0,0.00)",
+                  "backgroundPosition": "center",
+                  "backgroundRepeat": "no-repeat",
+                  "backgroundSize": "contain",
+                  "bottom": "0px",
+                  "height": "100%",
+                  "left": "0px",
+                  "position": "absolute",
+                  "right": "0px",
+                  "top": "0px",
+                  "width": "100%",
+                  "zIndex": -1,
+                }
+              }
+            />
+          </div>
+        </div>
+        <div
+          className="css-view-1dbjc4n"
+          style={
+            Object {
+              "WebkitBoxDirection": "normal",
+              "WebkitBoxOrient": "vertical",
+              "WebkitFlexDirection": "column",
+              "flexDirection": "column",
+              "marginBottom": "25px",
+              "marginLeft": "25px",
+              "marginRight": "25px",
+              "marginTop": "25px",
+              "msFlexDirection": "column",
+              "width": "200px",
+            }
+          }
+        >
+          <div
+            className="css-view-1dbjc4n"
+            style={
+              Object {
+                "WebkitFlexBasis": "auto",
+                "flexBasis": "auto",
+                "height": "40px",
+                "msFlexPreferredSize": "auto",
+                "overflowX": "hidden",
+                "overflowY": "hidden",
+                "width": "100%",
+                "zIndex": 0,
+              }
+            }
+          >
+            <div
+              className="css-view-1dbjc4n"
+              style={
+                Object {
+                  "backgroundColor": "rgba(0,0,0,0.00)",
+                  "backgroundPosition": "center",
+                  "backgroundRepeat": "no-repeat",
+                  "backgroundSize": "contain",
+                  "bottom": "0px",
+                  "height": "100%",
+                  "left": "0px",
+                  "position": "absolute",
+                  "right": "0px",
+                  "top": "0px",
+                  "width": "100%",
+                  "zIndex": -1,
+                }
+              }
+            />
+          </div>
+        </div>
+        <div
+          className="css-view-1dbjc4n"
+          style={
+            Object {
+              "WebkitBoxDirection": "normal",
+              "WebkitBoxOrient": "vertical",
+              "WebkitFlexDirection": "column",
+              "flexDirection": "column",
+              "marginBottom": "25px",
+              "marginLeft": "25px",
+              "marginRight": "25px",
+              "marginTop": "25px",
+              "msFlexDirection": "column",
+              "width": "200px",
+            }
+          }
+        >
+          <div
+            className="css-view-1dbjc4n"
+            style={
+              Object {
+                "WebkitFlexBasis": "auto",
+                "flexBasis": "auto",
+                "height": "40px",
+                "msFlexPreferredSize": "auto",
+                "overflowX": "hidden",
+                "overflowY": "hidden",
+                "width": "100%",
+                "zIndex": 0,
+              }
+            }
+          >
+            <div
+              className="css-view-1dbjc4n"
+              style={
+                Object {
+                  "backgroundColor": "rgba(0,0,0,0.00)",
+                  "backgroundPosition": "center",
+                  "backgroundRepeat": "no-repeat",
+                  "backgroundSize": "contain",
+                  "bottom": "0px",
+                  "height": "100%",
+                  "left": "0px",
+                  "position": "absolute",
+                  "right": "0px",
+                  "top": "0px",
+                  "width": "100%",
+                  "zIndex": -1,
+                }
+              }
+            />
+          </div>
+        </div>
+        <div
+          className="css-view-1dbjc4n"
+          style={
+            Object {
+              "WebkitBoxDirection": "normal",
+              "WebkitBoxOrient": "vertical",
+              "WebkitFlexDirection": "column",
+              "flexDirection": "column",
+              "marginBottom": "25px",
+              "marginLeft": "25px",
+              "marginRight": "25px",
+              "marginTop": "25px",
+              "msFlexDirection": "column",
+              "width": "200px",
+            }
+          }
+        >
+          <div
+            className="css-view-1dbjc4n"
+            style={
+              Object {
+                "WebkitFlexBasis": "auto",
+                "flexBasis": "auto",
+                "height": "40px",
+                "msFlexPreferredSize": "auto",
+                "overflowX": "hidden",
+                "overflowY": "hidden",
+                "width": "100%",
+                "zIndex": 0,
+              }
+            }
+          >
+            <div
+              className="css-view-1dbjc4n"
+              style={
+                Object {
+                  "backgroundColor": "rgba(0,0,0,0.00)",
+                  "backgroundPosition": "center",
+                  "backgroundRepeat": "no-repeat",
+                  "backgroundSize": "contain",
+                  "bottom": "0px",
+                  "height": "100%",
+                  "left": "0px",
+                  "position": "absolute",
+                  "right": "0px",
+                  "top": "0px",
+                  "width": "100%",
+                  "zIndex": -1,
+                }
+              }
+            />
+          </div>
+        </div>
+        <div
+          className="css-view-1dbjc4n"
+          style={
+            Object {
+              "WebkitBoxDirection": "normal",
+              "WebkitBoxOrient": "vertical",
+              "WebkitFlexDirection": "column",
+              "flexDirection": "column",
+              "marginBottom": "25px",
+              "marginLeft": "25px",
+              "marginRight": "25px",
+              "marginTop": "25px",
+              "msFlexDirection": "column",
+              "width": "200px",
+            }
+          }
+        >
+          <div
+            className="css-view-1dbjc4n"
+            style={
+              Object {
+                "WebkitFlexBasis": "auto",
+                "flexBasis": "auto",
+                "height": "40px",
+                "msFlexPreferredSize": "auto",
+                "overflowX": "hidden",
+                "overflowY": "hidden",
+                "width": "100%",
+                "zIndex": 0,
+              }
+            }
+          >
+            <div
+              className="css-view-1dbjc4n"
+              style={
+                Object {
+                  "backgroundColor": "rgba(0,0,0,0.00)",
+                  "backgroundPosition": "center",
+                  "backgroundRepeat": "no-repeat",
+                  "backgroundSize": "contain",
+                  "bottom": "0px",
+                  "height": "100%",
+                  "left": "0px",
+                  "position": "absolute",
+                  "right": "0px",
+                  "top": "0px",
+                  "width": "100%",
+                  "zIndex": -1,
+                }
+              }
+            />
+          </div>
+        </div>
+        <div
+          className="css-view-1dbjc4n"
+          style={
+            Object {
+              "WebkitBoxDirection": "normal",
+              "WebkitBoxOrient": "vertical",
+              "WebkitFlexDirection": "column",
+              "flexDirection": "column",
+              "marginBottom": "25px",
+              "marginLeft": "25px",
+              "marginRight": "25px",
+              "marginTop": "25px",
+              "msFlexDirection": "column",
+              "width": "200px",
+            }
+          }
+        >
+          <div
+            className="css-text-901oao"
+            dir="auto"
+            style={
+              Object {
+                "color": "rgba(46,51,56,1.00)",
+                "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
+                "fontSize": "28px",
+                "lineHeight": "36px",
+                "textAlign": "center",
+                "textRendering": "geometricPrecision",
+              }
+            }
+          >
+            Keisuke Honda
+          </div>
+        </div>
+        <div
+          className="css-view-1dbjc4n"
+          style={
+            Object {
+              "WebkitBoxDirection": "normal",
+              "WebkitBoxOrient": "vertical",
+              "WebkitFlexDirection": "column",
+              "flexDirection": "column",
+              "marginBottom": "25px",
+              "marginLeft": "25px",
+              "marginRight": "25px",
+              "marginTop": "25px",
+              "msFlexDirection": "column",
+              "width": "200px",
+            }
+          }
+        >
+          <div
+            className="css-text-901oao"
+            dir="auto"
+            style={
+              Object {
+                "color": "rgba(46,51,56,1.00)",
+                "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
+                "fontSize": "28px",
+                "lineHeight": "36px",
+                "textAlign": "center",
+                "textRendering": "geometricPrecision",
+              }
+            }
+          >
+            Kilowatt Capital
+          </div>
+        </div>
+        <div
+          className="css-view-1dbjc4n"
+          style={
+            Object {
+              "WebkitBoxDirection": "normal",
+              "WebkitBoxOrient": "vertical",
+              "WebkitFlexDirection": "column",
+              "flexDirection": "column",
+              "marginBottom": "25px",
+              "marginLeft": "25px",
+              "marginRight": "25px",
+              "marginTop": "25px",
+              "msFlexDirection": "column",
+              "width": "200px",
+            }
+          }
+        >
+          <div
+            className="css-view-1dbjc4n"
+            style={
+              Object {
+                "WebkitFlexBasis": "auto",
+                "flexBasis": "auto",
+                "height": "40px",
+                "msFlexPreferredSize": "auto",
+                "overflowX": "hidden",
+                "overflowY": "hidden",
+                "width": "100%",
+                "zIndex": 0,
+              }
+            }
+          >
+            <div
+              className="css-view-1dbjc4n"
+              style={
+                Object {
+                  "backgroundColor": "rgba(0,0,0,0.00)",
+                  "backgroundPosition": "center",
+                  "backgroundRepeat": "no-repeat",
+                  "backgroundSize": "contain",
+                  "bottom": "0px",
+                  "height": "100%",
+                  "left": "0px",
+                  "position": "absolute",
+                  "right": "0px",
+                  "top": "0px",
+                  "width": "100%",
+                  "zIndex": -1,
+                }
+              }
+            />
+          </div>
+        </div>
+        <div
+          className="css-view-1dbjc4n"
+          style={
+            Object {
+              "WebkitBoxDirection": "normal",
+              "WebkitBoxOrient": "vertical",
+              "WebkitFlexDirection": "column",
+              "flexDirection": "column",
+              "marginBottom": "25px",
+              "marginLeft": "25px",
+              "marginRight": "25px",
+              "marginTop": "25px",
+              "msFlexDirection": "column",
+              "width": "200px",
+            }
+          }
+        >
+          <div
+            className="css-text-901oao"
+            dir="auto"
+            style={
+              Object {
+                "color": "rgba(46,51,56,1.00)",
+                "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
+                "fontSize": "28px",
+                "lineHeight": "36px",
+                "textAlign": "center",
+                "textRendering": "geometricPrecision",
+              }
+            }
+          >
+            Julia Popowitz
+          </div>
+        </div>
+        <div
+          className="css-view-1dbjc4n"
+          style={
+            Object {
+              "WebkitBoxDirection": "normal",
+              "WebkitBoxOrient": "vertical",
+              "WebkitFlexDirection": "column",
+              "flexDirection": "column",
+              "marginBottom": "25px",
+              "marginLeft": "25px",
+              "marginRight": "25px",
+              "marginTop": "25px",
+              "msFlexDirection": "column",
+              "width": "200px",
+            }
+          }
+        >
+          <div
+            className="css-text-901oao"
+            dir="auto"
+            style={
+              Object {
+                "color": "rgba(46,51,56,1.00)",
+                "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
+                "fontSize": "28px",
+                "lineHeight": "36px",
+                "textAlign": "center",
+                "textRendering": "geometricPrecision",
+              }
+            }
+          >
+            Linda Xie
+          </div>
+        </div>
+        <div
+          className="css-view-1dbjc4n"
+          style={
+            Object {
+              "WebkitBoxDirection": "normal",
+              "WebkitBoxOrient": "vertical",
+              "WebkitFlexDirection": "column",
+              "flexDirection": "column",
+              "marginBottom": "25px",
+              "marginLeft": "25px",
+              "marginRight": "25px",
+              "marginTop": "25px",
+              "msFlexDirection": "column",
+              "width": "200px",
+            }
+          }
+        >
+          <div
+            className="css-text-901oao"
+            dir="auto"
+            style={
+              Object {
+                "color": "rgba(46,51,56,1.00)",
+                "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
+                "fontSize": "28px",
+                "lineHeight": "36px",
+                "textAlign": "center",
+                "textRendering": "geometricPrecision",
+              }
+            }
+          >
+            Vijay Pandurangan
+          </div>
+        </div>
+        <div
+          className="css-view-1dbjc4n"
+          style={
+            Object {
+              "WebkitBoxDirection": "normal",
+              "WebkitBoxOrient": "vertical",
+              "WebkitFlexDirection": "column",
+              "flexDirection": "column",
+              "marginBottom": "25px",
+              "marginLeft": "25px",
+              "marginRight": "25px",
+              "marginTop": "25px",
+              "msFlexDirection": "column",
+              "width": "200px",
+            }
+          }
+        >
+          <div
+            className="css-text-901oao"
+            dir="auto"
+            style={
+              Object {
+                "color": "rgba(46,51,56,1.00)",
+                "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
+                "fontSize": "28px",
+                "lineHeight": "36px",
+                "textAlign": "center",
+                "textRendering": "geometricPrecision",
+              }
+            }
+          >
+            R&R Ventures
+          </div>
+        </div>
+        <div
+          className="css-view-1dbjc4n"
+          style={
+            Object {
+              "WebkitBoxDirection": "normal",
+              "WebkitBoxOrient": "vertical",
+              "WebkitFlexDirection": "column",
+              "flexDirection": "column",
+              "marginBottom": "25px",
+              "marginLeft": "25px",
+              "marginRight": "25px",
+              "marginTop": "25px",
+              "msFlexDirection": "column",
+              "width": "200px",
+            }
+          }
+        >
+          <div
+            className="css-text-901oao"
+            dir="auto"
+            style={
+              Object {
+                "color": "rgba(46,51,56,1.00)",
+                "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
+                "fontSize": "28px",
+                "lineHeight": "36px",
+                "textAlign": "center",
+                "textRendering": "geometricPrecision",
+              }
+            }
+          >
+            Nitesh Banta
+          </div>
+        </div>
+        <div
+          className="css-view-1dbjc4n"
+          style={
+            Object {
+              "WebkitBoxDirection": "normal",
+              "WebkitBoxOrient": "vertical",
+              "WebkitFlexDirection": "column",
+              "flexDirection": "column",
+              "marginBottom": "25px",
+              "marginLeft": "25px",
+              "marginRight": "25px",
+              "marginTop": "25px",
+              "msFlexDirection": "column",
+              "width": "200px",
+            }
+          }
+        >
+          <div
+            className="css-text-901oao"
+            dir="auto"
+            style={
+              Object {
+                "color": "rgba(46,51,56,1.00)",
+                "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
+                "fontSize": "28px",
+                "lineHeight": "36px",
+                "textAlign": "center",
+                "textRendering": "geometricPrecision",
+              }
+            }
+          >
+            Warren Hogarth
+          </div>
+        </div>
+        <div
+          className="css-view-1dbjc4n"
+          style={
+            Object {
+              "WebkitBoxDirection": "normal",
+              "WebkitBoxOrient": "vertical",
+              "WebkitFlexDirection": "column",
+              "flexDirection": "column",
+              "marginBottom": "25px",
+              "marginLeft": "25px",
+              "marginRight": "25px",
+              "marginTop": "25px",
+              "msFlexDirection": "column",
+              "width": "200px",
+            }
+          }
+        >
+          <div
+            className="css-text-901oao"
+            dir="auto"
+            style={
+              Object {
+                "color": "rgba(46,51,56,1.00)",
+                "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
+                "fontSize": "28px",
+                "lineHeight": "36px",
+                "textAlign": "center",
+                "textRendering": "geometricPrecision",
+              }
+            }
+          >
+            Curious Endeavors
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div
+    className="css-view-1dbjc4n"
+    style={
+      Object {
+        "WebkitAlignSelf": "center",
+        "WebkitBoxDirection": "normal",
+        "WebkitBoxOrient": "vertical",
+        "WebkitFlexDirection": "column",
+        "alignSelf": "center",
+        "flexDirection": "column",
+        "marginBottom": "50px",
+        "marginTop": "50px",
+        "maxWidth": "100vw",
+        "msFlexDirection": "column",
+        "msFlexItemAlign": "center",
+        "paddingLeft": "10px",
+        "paddingRight": "10px",
+        "width": "100%",
+      }
+    }
+  >
+    <div
+      className="css-view-1dbjc4n"
+      style={
+        Object {
+          "WebkitBoxFlex": 0,
+          "WebkitFlexGrow": 0,
+          "WebkitFlexShrink": 0,
+          "flexGrow": 0,
+          "flexShrink": 0,
+          "msFlexNegative": 0,
+          "msFlexPositive": 0,
+          "paddingBottom": "10px",
+          "paddingLeft": "10px",
+          "paddingRight": "10px",
+          "paddingTop": "10px",
+          "width": "100%",
+        }
+      }
+    >
+      <h2
+        aria-level="2"
+        className="css-reset-4rbku5 css-text-901oao"
+        dir="auto"
+        id="backers"
+        role="heading"
+        style={
+          Object {
+            "color": "rgba(46,51,56,1.00)",
+            "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
+            "fontSize": "36px",
+            "lineHeight": "40px",
+            "marginBottom": "20px",
+            "textAlign": "center",
+            "textRendering": "geometricPrecision",
+            "textTransform": "none",
+          }
+        }
+      >
+        Press and Media
+      </h2>
+      <div
+        className="css-text-901oao"
+        dir="auto"
+        style={
+          Object {
+            "color": "rgba(46,51,56,1.00)",
+            "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
+            "fontSize": "20px",
+            "lineHeight": "28px",
+            "textAlign": "center",
+            "textRendering": "geometricPrecision",
+          }
+        }
+      >
+        pressText
+         
+        <div
+          className="css-view-1dbjc4n"
+          onClick={[Function]}
+          onMouseDown={[Function]}
+          onMouseEnter={[Function]}
+          onMouseLeave={[Function]}
+          onMouseUp={[Function]}
+          onResponderGrant={[Function]}
+          onResponderRelease={[Function]}
+          style={
+            Object {
+              "display": "inline",
+            }
+          }
+        >
+          <a
+            className="css-reset-4rbku5 css-cursor-18t94o4 css-text-901oao css-textHasAncestor-16my406"
+            data-focusable={true}
+            dir="auto"
+            href="mailto:press@celo.org"
+            role="link"
+            style={
+              Object {
+                "color": "rgba(46,51,56,1.00)",
+                "cursor": "pointer",
+                "display": "inline",
+                "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
+                "fontSize": "20px",
+                "lineHeight": "28px",
+                "opacity": 1,
+                "textDecoration": "underline",
+                "textRendering": "geometricPrecision",
+              }
+            }
+          >
+            press@celo.org
+          </a>
+        </div>
+        .
+      </div>
+    </div>
+  </div>
+</div>
+`;

@@ -287,7 +287,6 @@ YOUR PARTICIPATION IN TGCSO IS ENTIRELY VOLUNTARY, BUT IF YOU ARE PARTICIPATING 
               role="link"
               style={
                 Object {
-                  "WebkitTextDecorationLine": "underline",
                   "color": "rgba(46,51,56,1.00)",
                   "cursor": "pointer",
                   "display": "inline",
@@ -295,7 +294,7 @@ YOUR PARTICIPATION IN TGCSO IS ENTIRELY VOLUNTARY, BUT IF YOU ARE PARTICIPATING 
                   "fontSize": "20px",
                   "lineHeight": "28px",
                   "opacity": 1,
-                  "textDecorationLine": "underline",
+                  "textDecoration": "underline",
                   "textRendering": "geometricPrecision",
                 }
               }
@@ -363,7 +362,6 @@ YOUR PARTICIPATION IN TGCSO IS ENTIRELY VOLUNTARY, BUT IF YOU ARE PARTICIPATING 
               role="link"
               style={
                 Object {
-                  "WebkitTextDecorationLine": "underline",
                   "color": "rgba(46,51,56,1.00)",
                   "cursor": "pointer",
                   "display": "inline",
@@ -371,7 +369,7 @@ YOUR PARTICIPATION IN TGCSO IS ENTIRELY VOLUNTARY, BUT IF YOU ARE PARTICIPATING 
                   "fontSize": "20px",
                   "lineHeight": "28px",
                   "opacity": 1,
-                  "textDecorationLine": "underline",
+                  "textDecoration": "underline",
                   "textRendering": "geometricPrecision",
                 }
               }
@@ -681,7 +679,6 @@ YOUR PARTICIPATION IN TGCSO IS ENTIRELY VOLUNTARY, BUT IF YOU ARE PARTICIPATING 
               role="link"
               style={
                 Object {
-                  "WebkitTextDecorationLine": "underline",
                   "color": "rgba(46,51,56,1.00)",
                   "cursor": "pointer",
                   "display": "inline",
@@ -689,7 +686,7 @@ YOUR PARTICIPATION IN TGCSO IS ENTIRELY VOLUNTARY, BUT IF YOU ARE PARTICIPATING 
                   "fontSize": "20px",
                   "lineHeight": "28px",
                   "opacity": 1,
-                  "textDecorationLine": "underline",
+                  "textDecoration": "underline",
                   "textRendering": "geometricPrecision",
                 }
               }
@@ -770,7 +767,6 @@ YOUR PARTICIPATION IN TGCSO IS ENTIRELY VOLUNTARY, BUT IF YOU ARE PARTICIPATING 
                   role="link"
                   style={
                     Object {
-                      "WebkitTextDecorationLine": "underline",
                       "color": "rgba(46,51,56,1.00)",
                       "cursor": "pointer",
                       "display": "inline",
@@ -778,7 +774,7 @@ YOUR PARTICIPATION IN TGCSO IS ENTIRELY VOLUNTARY, BUT IF YOU ARE PARTICIPATING 
                       "fontSize": "20px",
                       "lineHeight": "28px",
                       "opacity": 1,
-                      "textDecorationLine": "underline",
+                      "textDecoration": "underline",
                       "textRendering": "geometricPrecision",
                     }
                   }
@@ -1446,7 +1442,6 @@ YOUR PARTICIPATION IN TGCSO IS ENTIRELY VOLUNTARY, BUT IF YOU ARE PARTICIPATING 
               role="link"
               style={
                 Object {
-                  "WebkitTextDecorationLine": "underline",
                   "color": "rgba(46,51,56,1.00)",
                   "cursor": "pointer",
                   "display": "inline",
@@ -1454,7 +1449,7 @@ YOUR PARTICIPATION IN TGCSO IS ENTIRELY VOLUNTARY, BUT IF YOU ARE PARTICIPATING 
                   "fontSize": "20px",
                   "lineHeight": "28px",
                   "opacity": 1,
-                  "textDecorationLine": "underline",
+                  "textDecoration": "underline",
                   "textRendering": "geometricPrecision",
                 }
               }
