@@ -2311,6 +2311,16 @@ contract('Validators', (accounts: string[]) => {
             validators.groupMembershipInEpoch(validator, epochNumber, contractIndex + 1)
           )
         })
+
+        it('should revert when provided index is less than `tail` index on chain', async () => {
+          await assertRevert(
+            validators.groupMembershipInEpoch(
+              validator,
+              epochs[epochs.length - membershipHistoryLength.toNumber() - 1][0],
+              contractIndex - membershipHistoryLength.toNumber()
+            )
+          )
+        })
       })
     })
   })
