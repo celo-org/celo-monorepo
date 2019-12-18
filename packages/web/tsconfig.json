@@ -11,7 +11,7 @@
     "noUnusedLocals": true,
     "noUnusedParameters": true,
     "preserveConstEnums": true,
-    "removeComments": false,
+    "removeComments": true,
     "sourceMap": true,
     "skipLibCheck": true,
     "target": "esnext",
