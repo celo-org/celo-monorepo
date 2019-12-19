@@ -302,6 +302,44 @@ contract Election is
     return true;
   }
 
+  function _revokeVotes(
+    address account,
+    address group,
+    uint256 value,
+    address lesser,
+    address greater,
+    uint256 index
+  ) public returns (uint256) {
+    require(group != address(0) && 0 < value, "null group");
+    uint256 remainingValue = value;
+    uint256 pendingVotes = getPendingVotesForGroupByAccount(group, account);
+    if (pendingVotes > 0) {
+      uint256 maxValue = remainingValue;
+      if (pendingVotes < maxValue) {
+        maxValue = pendingVotes;
+      }
+      decrementPendingVotes(group, account, maxValue);
+      remainingValue = remainingValue.sub(maxValue);
+    }
+    uint256 activeVotes = getActiveVotesForGroupByAccount(group, account);
+    if (activeVotes > 0) {
+      uint256 maxValue = remainingValue;
+      if (activeVotes < maxValue) {
+        maxValue = activeVotes;
+      }
+      decrementActiveVotes(group, account, maxValue);
+      remainingValue = remainingValue.sub(maxValue);
+    }
+    uint256 difference = value.sub(remainingValue);
+    decrementTotalVotes(group, difference, lesser, greater);
+    getLockedGold().incrementNonvotingAccountBalance(account, difference);
+    if (getTotalVotesForGroupByAccount(group, account) == 0) {
+      deleteElement(votes.groupsVotedFor[account], group, index);
+    }
+    emit ValidatorGroupVoteRevoked(account, group, difference);
+    return difference;
+  }
+
   /**
    * @notice Revokes `value` active votes for `group`
    * @param group The validator group to revoke votes from.
@@ -858,6 +896,11 @@ contract Election is
     return res;
   }
 
+  struct SlashVotesInfo {
+    address[] groups;
+    uint256 remainingValue;
+  }
+
   // Iterates in reverse order over all groups voted for by `account`,
   // reducing the total amount of voting gold by `value` in total.
   // For each group, if there `value` gold has left to be slashed, reduces
@@ -869,50 +912,21 @@ contract Election is
     address[] calldata lessers,
     address[] calldata greaters,
     uint256[] calldata indices
-  ) external onlyRegisteredContract(LOCKED_GOLD_REGISTRY_ID) returns (bool) {
-    address[] storage groups = votes.groupsVotedFor[account];
-    uint256 remainingValue = value;
-    for (uint256 i = groups.length; i > 0; i = i.sub(1)) {
-      // What is eligible
-      if (votes.total.eligible.contains(groups[i.sub(1)])) {
-        address group = groups[i.sub(1)];
-        uint256 maxRemoveableVotes = remainingValue;
-        uint256 pendingVotes = getPendingVotesForGroupByAccount(group, account);
-        uint256 activeVotes = getActiveVotesForGroupByAccount(group, account);
-        if (pendingVotes < maxRemoveableVotes) {
-          maxRemoveableVotes = pendingVotes;
-        }
-        // No if else since a revert means something bad (bad group or bad storage)
-        require(
-          revokePending(
-            group,
-            maxRemoveableVotes,
-            lessers[i.sub(1)],
-            greaters[i.sub(1)],
-            indices[i.sub(1)]
-          )
-        );
-        remainingValue = remainingValue.sub(maxRemoveableVotes);
-        if (remainingValue == 0) {
-          return true;
-        }
-        maxRemoveableVotes = remainingValue;
-        if (activeVotes < remainingValue) {
-          maxRemoveableVotes = activeVotes;
-        }
-        require(
-          revokeActive(
-            group,
-            maxRemoveableVotes,
-            lessers[i.sub(1)],
-            greaters[i.sub(1)],
-            indices[i.sub(1)]
-          )
-        );
-        remainingValue = remainingValue.sub(maxRemoveableVotes);
-        if (remainingValue == 0) {
-          return true;
-        }
+  ) external nonReentrant returns (bool) {
+    SlashVotesInfo memory info = SlashVotesInfo(votes.groupsVotedFor[account], value);
+    for (uint256 i = info.groups.length; i > 0; i = i.sub(1)) {
+      info.remainingValue = info.remainingValue.sub(
+        _revokeVotes(
+          account,
+          info.groups[i.sub(1)],
+          info.remainingValue,
+          lessers[i.sub(1)],
+          greaters[i.sub(1)],
+          indices[i.sub(1)]
+        )
+      );
+      if (info.remainingValue == 0) {
+        return true;
       }
     }
     return false;
