@@ -83,10 +83,11 @@ contract DowntimeSlasher is SlasherUtil {
     address endSigner = validatorSignerAddress(endSignerIndex, endBlock);
     require(account == getAccounts().signerToAccount(startSigner), "Wrong start index");
     require(account == getAccounts().signerToAccount(endSigner), "Wrong end index");
-    uint256 startEpoch = getEpoch(startBlock);
-    // uint256 endEpoch = getEpoch(endBlock);
+    uint256 startEpoch = getEpochNumberOfBlock(startBlock);
     for (uint256 n = startBlock; n <= endBlock; n++) {
-      uint256 signerIndex = getEpoch(n) == startEpoch ? startSignerIndex : endSignerIndex;
+      uint256 signerIndex = getEpochNumberOfBlock(n) == startEpoch
+        ? startSignerIndex
+        : endSignerIndex;
       if (uint256(getParentSealBitmap(n)) & (1 << signerIndex) != 0) return false;
     }
     return true;
@@ -101,8 +102,8 @@ contract DowntimeSlasher is SlasherUtil {
 
   function checkIfAlreadySlashed(address validator, uint256 startBlock) internal {
     uint256 endBlock = getEndBlock(startBlock);
-    uint256 startEpoch = getEpoch(startBlock);
-    uint256 endEpoch = getEpoch(endBlock);
+    uint256 startEpoch = getEpochNumberOfBlock(startBlock);
+    uint256 endEpoch = getEpochNumberOfBlock(endBlock);
     require(isSlashed[validator][startEpoch] < startBlock, "Already slashed");
     require(isSlashed[validator][endEpoch] < endBlock, "Already slashed");
     isSlashed[validator][startEpoch] = endBlock + 1;

@@ -111,7 +111,7 @@ contract('DoubleSigningSlasher', (accounts: string[]) => {
       await slasher.setBlockNumber(headerA, blockNumber)
       await slasher.setBlockNumber(headerB, blockNumber + 1)
       await slasher.setBlockNumber(headerC, blockNumber)
-      const epoch = (await slasher.getEpoch(blockNumber)).toNumber()
+      const epoch = (await slasher.getEpochNumberOfBlock(blockNumber)).toNumber()
       await slasher.setEpochSigner(epoch, validatorIndex, validator)
       await slasher.setEpochSigner(epoch, validatorIndex + 1, accounts[4])
       // Signed by validators 0 to 5

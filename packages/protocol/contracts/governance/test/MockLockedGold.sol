@@ -46,11 +46,11 @@ contract MockLockedGold is ILockedGold {
   function slash(
     address account,
     uint256 penalty,
-    address reporter,
-    uint256 reward,
-    address[] calldata lessers,
-    address[] calldata greaters,
-    uint256[] calldata indices
+    address,
+    uint256,
+    address[] calldata,
+    address[] calldata,
+    uint256[] calldata
   ) external {
     accountTotalLockedGold[account] = accountTotalLockedGold[account].sub(penalty);
   }

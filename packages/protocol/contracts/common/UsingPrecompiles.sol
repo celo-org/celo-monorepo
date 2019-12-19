@@ -82,13 +82,22 @@ contract UsingPrecompiles {
     return ret;
   }
 
+  /**
+   * @notice Returns the epoch number at a block.
+   * @param blockNumber Block number where epoch number is calculated.
+   * @return Epoch number.
+   */
+  function getEpochNumberOfBlock(uint256 blockNumber) public view returns (uint256) {
+    uint256 sz = getEpochSize();
+    return blockNumber.add(sz).sub(1) / sz;
+  }
+
+  /**
+   * @notice Returns the epoch number at a block.
+   * @return Current epoch number.
+   */
   function getEpochNumber() public view returns (uint256) {
-    uint256 epochSize = getEpochSize();
-    uint256 epochNumber = block.number / epochSize;
-    if (block.number % epochSize == 0) {
-      epochNumber = epochNumber - 1;
-    }
-    return epochNumber;
+    return getEpochNumberOfBlock(block.number);
   }
 
   /**
@@ -143,11 +152,6 @@ contract UsingPrecompiles {
       abi.encodePacked(sender, blsKey, blsPop)
     );
     return success;
-  }
-
-  function getEpoch(uint256 blockNumber) public view returns (uint256) {
-    uint256 sz = getEpochSize();
-    return blockNumber.add(sz).sub(1) / sz;
   }
 
   // RLP decode and retrieve the parent hash from this header.
