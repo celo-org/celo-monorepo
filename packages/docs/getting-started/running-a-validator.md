@@ -519,7 +519,7 @@ celocli validator:show $CELO_VALIDATOR_ADDRESS
 
 ### Running the Attestation Service
 
-As part of the [lightweight identity protocol](/celo-codebase/protocol/identity), Validators are expected to run an [Attestation Service](https://github.com/celo-org/celo-monorepo/tree/master/packages/attestation-service) to provide attestations that allow users to map their phone number to an account on Celo.
+As part of the [lightweight identity protocol](/celo-codebase/protocol/identity), Validators are expected to run an [Attestation Service](https://github.com/celo-org/celo-monorepo/tree/master/packages/attestation-service) to provide attestations that allow users to map their phone number to an account on Celo. Be sure to allow TCP connections to your Attestations machine on port 80 for all IP addresses.
 
 Just like with the Validator signer, we'll want to authorize a separate Attestation signer. For that let's start our node on the Attestations machine:
 
