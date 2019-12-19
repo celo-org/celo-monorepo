@@ -7,9 +7,9 @@ import {
   NULL_ADDRESS,
   timeTravel,
 } from '@celo/protocol/lib/test-utils'
+import { toFixed } from '@celo/utils/lib/fixidity'
 import BigNumber from 'bignumber.js'
 import { SortedOraclesContract, SortedOraclesInstance } from 'types'
-import { toFixed } from '@celo/utils/lib/fixidity'
 
 const SortedOracles: SortedOraclesContract = artifacts.require('SortedOracles')
 
