@@ -2,6 +2,7 @@ import { Address } from '@celo/contractkit'
 import { AccountsWrapper } from '@celo/contractkit/lib/wrappers/Accounts'
 import { LockedGoldWrapper } from '@celo/contractkit/lib/wrappers/LockedGold'
 import { ValidatorsWrapper } from '@celo/contractkit/lib/wrappers/Validators'
+import { verifySignature } from '@celo/utils/lib/signatureUtils'
 import BigNumber from 'bignumber.js'
 import chalk from 'chalk'
 import { BaseCommand } from '../base'
@@ -70,7 +71,7 @@ class CheckBuilder {
     }
   }
 
-  withAccounts<A>(f: (lockedGold: AccountsWrapper) => A): () => Promise<Resolve<A>> {
+  withAccounts<A>(f: (accounts: AccountsWrapper) => A): () => Promise<Resolve<A>> {
     return async () => {
       const accounts = await this.kit.contracts.getAccounts()
       return f(accounts) as Resolve<A>
@@ -81,6 +82,18 @@ class CheckBuilder {
     this.checks.push(check(name, predicate, errorMessage))
     return this
   }
+
+  canSign = (account: Address) =>
+    this.addCheck('Account can sign', async () => {
+      try {
+        const message = 'test'
+        const signature = await this.kit.web3.eth.sign(message, account)
+        return verifySignature(message, signature, account)
+      } catch (error) {
+        console.error(error)
+        return false
+      }
+    })
 
   canSignValidatorTxs = () =>
     this.addCheck(
@@ -122,21 +135,33 @@ class CheckBuilder {
 
   signerMeetsValidatorGroupBalanceRequirements = () =>
     this.addCheck(
-      `Signer's account has enough locked gold for registration`,
+      `Signer's account has enough locked gold for group registration`,
       this.withValidators((v, _signer, account) =>
         v.meetsValidatorGroupBalanceRequirements(account)
       )
     )
 
+  meetsValidatorBalanceRequirements = (account: Address) =>
+    this.addCheck(
+      `${account} has enough locked gold for registration`,
+      this.withValidators((v) => v.meetsValidatorBalanceRequirements(account))
+    )
+
+  meetsValidatorGroupBalanceRequirements = (account: Address) =>
+    this.addCheck(
+      `${account} has enough locked gold for group registration`,
+      this.withValidators((v) => v.meetsValidatorGroupBalanceRequirements(account))
+    )
+
   isNotAccount = (address: Address) =>
     this.addCheck(
-      `${address} is not an Account`,
+      `${address} is not a registered Account`,
       this.withAccounts((accs) => negate(accs.isAccount(address)))
     )
 
   isSignerOrAccount = () =>
     this.addCheck(
-      `${this.signer!} is Signer or Account`,
+      `${this.signer!} is Signer or registered Account`,
       this.withAccounts(async (accs) => {
         const res = (await accs.isAccount(this.signer!)) || (await accs.isSigner(this.signer!))
         return res

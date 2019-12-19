@@ -6,6 +6,7 @@ import "openzeppelin-solidity/contracts/ownership/Ownable.sol";
 import "openzeppelin-solidity/contracts/utils/ReentrancyGuard.sol";
 
 import "./interfaces/IElection.sol";
+import "./interfaces/IValidators.sol";
 import "../common/Initializable.sol";
 import "../common/FixidityLib.sol";
 import "../common/linkedlists/AddressSortedLinkedList.sol";
@@ -109,6 +110,8 @@ contract Election is
   event ValidatorGroupVoteActivated(address indexed account, address indexed group, uint256 value);
 
   event ValidatorGroupVoteRevoked(address indexed account, address indexed group, uint256 value);
+
+  event EpochRewardsDistributedToVoters(address indexed group, uint256 value);
 
   /**
    * @notice Initializes critical variables.
@@ -410,6 +413,15 @@ contract Election is
   }
 
   /**
+   * @notice Returns the active votes made for `group`.
+   * @param group The address of the validator group.
+   * @return The active votes made for `group`.
+   */
+  function getActiveVotesForGroup(address group) public view returns (uint256) {
+    return votes.active.forGroup[group].total;
+  }
+
+  /**
    * @notice Returns whether or not a group is eligible to receive votes.
    * @return Whether or not a group is eligible to receive votes.
    * @dev Eligible groups that have received their maximum number of votes cannot receive more.
@@ -422,21 +434,38 @@ contract Election is
    * @notice Returns the amount of rewards that voters for `group` are due at the end of an epoch.
    * @param group The group to calculate epoch rewards for.
    * @param totalEpochRewards The total amount of rewards going to all voters.
+   * @param uptimes Array of Fixidity representations of the validators' uptimes, between 0 and 1.
    * @return The amount of rewards that voters for `group` are due at the end of an epoch.
    * @dev Eligible groups that have received their maximum number of votes cannot receive more.
    */
-  function getGroupEpochRewards(address group, uint256 totalEpochRewards)
-    external
-    view
-    returns (uint256)
-  {
-    // The group must meet the balance requirements in order for their voters to receive epoch
-    // rewards.
-    if (getValidators().meetsAccountLockedGoldRequirements(group) && votes.active.total > 0) {
-      return totalEpochRewards.mul(votes.active.forGroup[group].total).div(votes.active.total);
-    } else {
+  function getGroupEpochRewards(
+    address group,
+    uint256 totalEpochRewards,
+    uint256[] calldata uptimes
+  ) external view returns (uint256) {
+    IValidators validators = getValidators();
+    // The group must meet the balance requirements for their voters to receive epoch rewards.
+    if (!validators.meetsAccountLockedGoldRequirements(group) || votes.active.total <= 0) {
       return 0;
     }
+
+    FixidityLib.Fraction memory votePortion = FixidityLib.newFixedFraction(
+      votes.active.forGroup[group].total,
+      votes.active.total
+    );
+    FixidityLib.Fraction memory score = FixidityLib.wrap(
+      validators.calculateGroupEpochScore(uptimes)
+    );
+    FixidityLib.Fraction memory slashingMultiplier = FixidityLib.wrap(
+      validators.getValidatorGroupSlashingMultiplier(group)
+    );
+    return
+      FixidityLib
+        .newFixed(totalEpochRewards)
+        .multiply(votePortion)
+        .multiply(score)
+        .multiply(slashingMultiplier)
+        .fromFixed();
   }
 
   /**
@@ -471,6 +500,7 @@ contract Election is
 
     votes.active.forGroup[group].total = votes.active.forGroup[group].total.add(value);
     votes.active.total = votes.active.total.add(value);
+    emit EpochRewardsDistributedToVoters(group, value);
   }
 
   /**
@@ -823,7 +853,7 @@ contract Election is
     uint256 n = numberValidatorsInCurrentSet();
     address[] memory res = new address[](n);
     for (uint256 idx = 0; idx < n; idx++) {
-      res[idx] = validatorAddressFromCurrentSet(idx);
+      res[idx] = validatorSignerAddressFromCurrentSet(idx);
     }
     return res;
   }

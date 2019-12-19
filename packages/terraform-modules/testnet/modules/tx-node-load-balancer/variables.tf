@@ -3,6 +3,41 @@ variable celo_env {
   description = "Name of the testnet Celo environment"
 }
 
+variable dns_gcloud_project {
+  type        = string
+  description = "Name of the Google Cloud project where Cloud DNS is"
+}
+
+variable dns_zone_name {
+  type        = string
+  description = "Name of the DNS zone for the domain used for the forno setup"
+}
+
+variable forno_host {
+  type        = string
+  description = "The host name to use for the tx node forno setup"
+}
+
+variable gcloud_credentials_path {
+  type        = string
+  description = "Path to the file containing the Google Cloud credentials to use"
+}
+
+variable gcloud_project {
+  type        = string
+  description = "Name of the Google Cloud project to use"
+}
+
+variable gcloud_vm_service_account_email {
+  type        = string
+  description = "The email of the service account to associate virtual machines with"
+}
+
+variable letsencrypt_email {
+  type        = string
+  description = "The email to create letsencrypt certificates with"
+}
+
 variable network_name {
   type        = string
   description = "Name of the GCP network the tx-node load balancer is in"

@@ -1,19 +1,20 @@
-/* tslint:disable no-console */
-
-import { Address, CeloTransactionParams, ContractKit, newKit } from '@celo/contractkit'
+import { Address, CeloTransactionParams, newKit } from '@celo/contractkit'
 import {
   ActionableAttestation,
   AttestationsWrapper,
 } from '@celo/contractkit/lib/wrappers/Attestations'
 import { privateKeyToAddress } from '@celo/utils/lib/address'
+import { notEmpty } from '@celo/utils/lib/collections'
 import BigNumber from 'bignumber.js'
+import Logger, { createLogger, stdSerializers } from 'bunyan'
+import { createStream } from 'bunyan-gke-stackdriver'
+import { Level } from 'bunyan-gke-stackdriver/dist/types'
 import moment from 'moment'
 import sleep from 'sleep-promise'
 import {
   fetchLatestMessagesFromToday,
   findValidCode,
   getPhoneNumber,
-  printAndIgnoreRequestErrors,
   requestAttestationsFromIssuers,
   requestMoreAttestations,
 } from 'src/lib/attestation'
@@ -33,6 +34,7 @@ interface AutoVerifyArgv extends BotsArgv {
   inBetweenWaitSeconds: number
   attestationMax: number
   celoProvider: string
+  index: number
 }
 
 export const builder = (yargs: Argv) => {
@@ -57,22 +59,29 @@ export const builder = (yargs: Argv) => {
       description: 'The node to use',
       default: 'http://localhost:8545',
     })
+    .option('index', {
+      type: 'number',
+      description: 'The index of the account to use',
+      default: 0,
+    })
 }
 
-const ADDRESS_SID = 'ADfc7d865c6bb0489ff21f29fa0b0531fa'
-
 export const handler = async function autoVerify(argv: AutoVerifyArgv) {
+  let logger: Logger = createLogger({
+    name: 'attestation-bot',
+    serializers: stdSerializers,
+    streams: [createStream(Level.INFO)],
+  })
   try {
     const kit = newKit(argv.celoProvider)
     const mnemonic = fetchEnv(envVar.MNEMONIC)
-    const validator0Key = ensure0x(generatePrivateKey(mnemonic, AccountType.VALIDATOR, 0))
-    const validator0Address = privateKeyToAddress(validator0Key)
-    const clientKey = ensure0x(generatePrivateKey(mnemonic, AccountType.ATTESTATION, 0))
+    // This really should be the ATTESTATION_BOT key, but somehow we can't get it to have cUSD
+    const clientKey = ensure0x(
+      generatePrivateKey(mnemonic, AccountType.ATTESTATION_BOT, argv.index)
+    )
     const clientAddress = privateKeyToAddress(clientKey)
-    kit.addAccount(validator0Key)
+    logger = logger.child({ address: clientAddress })
     kit.addAccount(clientKey)
-
-    await fundClient(kit, validator0Address, clientAddress, argv.attestationMax)
 
     const twilioClient = twilio(
       fetchEnv(envVar.TWILIO_ACCOUNT_SID),
@@ -84,22 +93,25 @@ export const handler = async function autoVerify(argv: AutoVerifyArgv) {
     const gasPriceMinimum = await kit.contracts.getGasPriceMinimum()
 
     const waitTime = Math.random() * argv.initialWaitSeconds
-    console.log(`Waiting ${waitTime} seconds (from ${argv.initialWaitSeconds})`)
     await sleep(waitTime * 1000)
+    logger.info({ waitTime, initialWaitSeconds: argv.initialWaitSeconds }, 'Initial Wait')
 
     const phoneNumber = await getPhoneNumber(
       attestations,
       twilioClient,
-      ADDRESS_SID,
+      fetchEnv(envVar.TWILIO_ADDRESS_SID),
       argv.attestationMax
     )
 
-    console.log('Using ', phoneNumber)
+    const nonCompliantIssuersAlreadyLogged: string[] = []
+
+    logger = logger.child({ phoneNumber })
+    logger.info('Initialized phone number')
 
     let stat = await attestations.getAttestationStat(phoneNumber, clientAddress)
 
     while (stat.total < argv.attestationMax) {
-      console.log(`Starting, we completed ${stat.completed} out of ${stat.total} attestations`)
+      logger.info({ ...stat }, 'Start Attestation')
 
       const gasPrice = new BigNumber(
         await gasPriceMinimum.getGasPriceMinimum(stableToken.address)
@@ -110,7 +122,7 @@ export const handler = async function autoVerify(argv: AutoVerifyArgv) {
         gasPrice: gasPrice.toString(),
       }
 
-      console.info('request attestations')
+      logger.info('Request Attestation')
       await requestMoreAttestations(attestations, phoneNumber, 1, clientAddress, txParams)
 
       const attestationsToComplete = await attestations.getActionableAttestations(
@@ -118,7 +130,19 @@ export const handler = async function autoVerify(argv: AutoVerifyArgv) {
         clientAddress
       )
 
-      console.info('reveal to issuer')
+      const nonCompliantIssuers = await attestations.getNonCompliantIssuers(
+        phoneNumber,
+        clientAddress
+      )
+      nonCompliantIssuers
+        .filter((_) => !nonCompliantIssuersAlreadyLogged.includes(_))
+        .forEach((issuer) => {
+          logger.info({ issuer }, 'Did not run the attestation service')
+          nonCompliantIssuersAlreadyLogged.push(issuer)
+        })
+
+      logger.info({ attestationsToComplete }, 'Reveal to issuers')
+
       const possibleErrors = await requestAttestationsFromIssuers(
         attestationsToComplete,
         attestations,
@@ -126,30 +150,43 @@ export const handler = async function autoVerify(argv: AutoVerifyArgv) {
         clientAddress
       )
 
-      printAndIgnoreRequestErrors(possibleErrors)
+      logger.info(
+        { possibleErrors: possibleErrors.filter((_) => _ && _.known).length },
+        'Reveal errors'
+      )
 
-      console.info('wait for messages')
+      possibleErrors.filter(notEmpty).forEach((error) => {
+        if (error.known) {
+          logger.info({ ...error }, 'Error while requesting from attestation service')
+        } else {
+          logger.info({ ...error }, 'Unknown error while revealing to issuer')
+        }
+      })
+
       await pollForMessagesAndCompleteAttestations(
         attestations,
         twilioClient,
         phoneNumber,
         clientAddress,
         attestationsToComplete,
-        txParams
+        txParams,
+        logger
       )
 
       const sleepTime = Math.random() * argv.inBetweenWaitSeconds
-      console.info(`Sleeping ${sleepTime} seconds (from ${argv.inBetweenWaitSeconds} seconds)`)
+      logger.info(
+        { waitTime: sleepTime, inBetweenWaitSeconds: argv.inBetweenWaitSeconds },
+        `InBetween Wait`
+      )
 
       await sleep(sleepTime * 1000)
       stat = await attestations.getAttestationStat(phoneNumber, clientAddress)
     }
 
-    console.log(`In the end, we completed ${stat.completed} out of ${stat.total} attestations`)
+    logger.info({ ...stat }, 'Completed attestations for phone number')
     process.exit(0)
   } catch (error) {
-    console.error('Something went wrong')
-    console.error(error)
+    logger.error({ err: error })
     process.exit(1)
   }
 }
@@ -163,11 +200,14 @@ async function pollForMessagesAndCompleteAttestations(
   phoneNumber: string,
   account: Address,
   attestationsToComplete: ActionableAttestation[],
-  txParams: CeloTransactionParams = {}
+  txParams: CeloTransactionParams = {},
+  logger: Logger
 ) {
   const startDate = moment()
+  logger.info({ pollingWait: POLLING_WAIT }, 'Poll for the attestation code')
   while (
-    moment().isBefore(startDate.add(TIME_TO_WAIT_FOR_ATTESTATIONS_IN_MINUTES, 'minutes')) &&
+    moment.duration(moment().diff(startDate)).asMinutes() <
+      TIME_TO_WAIT_FOR_ATTESTATIONS_IN_MINUTES &&
     attestationsToComplete.length > 0
   ) {
     const messages = await fetchLatestMessagesFromToday(client, phoneNumber, 100)
@@ -185,33 +225,18 @@ async function pollForMessagesAndCompleteAttestations(
       await sleep(POLLING_WAIT)
       continue
     }
-    console.log('')
+    console.info('')
+
+    logger.info(
+      { waitingTime: moment.duration(moment().diff(startDate)).asSeconds() },
+      'Received valid code'
+    )
 
     const completeTx = await attestations.complete(phoneNumber, account, res.issuer, res.code)
 
     await completeTx.sendAndWaitForReceipt(txParams)
 
+    logger.info({ issuer: res.issuer }, 'Completed attestation')
     attestationsToComplete = await attestations.getActionableAttestations(phoneNumber, account)
-    console.log(
-      `Completed attestation for ${res.issuer}, ${attestationsToComplete.length} remaining`
-    )
   }
-}
-
-export async function fundClient(
-  kit: ContractKit,
-  funder: Address,
-  recipient: Address,
-  numberOfAttestations: number
-) {
-  const [stableToken, attestations] = await Promise.all([
-    kit.contracts.getStableToken(),
-    kit.contracts.getAttestations(),
-    kit.contracts.getEscrow(),
-  ])
-  const attestationFee = new BigNumber(
-    await attestations.attestationRequestFees(stableToken.address)
-  )
-  const fundingAmount = attestationFee.times(3 * numberOfAttestations).toString()
-  await stableToken.transfer(recipient, fundingAmount).sendAndWaitForReceipt({ from: funder })
 }

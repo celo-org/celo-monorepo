@@ -127,15 +127,12 @@ const styles = StyleSheet.create({
   },
   scrollContainer: {
     flex: 1,
-    paddingTop: 60,
+    paddingTop: 30,
     alignItems: 'center',
     justifyContent: 'space-between',
   },
   buttonCancelContainer: {
-    position: 'absolute',
-    top: 20,
     left: 5,
-    zIndex: 10,
   },
   statusContainer: {
     alignItems: 'center',

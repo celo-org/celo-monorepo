@@ -13,7 +13,7 @@ const DefaultConfig = {
     selectIssuersWaitBlocks: 4,
   },
   blockchainParameters: {
-    gasForNonGoldCurrencies: 166000,
+    gasForNonGoldCurrencies: 50000,
     minimumClientVersion: {
       major: 1,
       minor: 8,
@@ -111,13 +111,16 @@ const DefaultConfig = {
     },
     membershipHistoryLength: 60,
     maxGroupSize: '5',
+    slashingPenaltyResetPeriod: 60 * 60 * 24 * 30, // 30 Days
 
     // We register a number of C-Labs groups to contain an initial set of validators to run the network.
     validatorKeys: [],
     attestationKeys: [],
     groupName: 'C-Labs',
     commission: 0.1,
-    votesRatioOfLastVsFirstGroup: 2.0,
+    groupLockedGold: {
+      value: '22000000000000000000000', // 22k gold per group
+    },
   },
 }
 

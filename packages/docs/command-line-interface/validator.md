@@ -58,6 +58,25 @@ EXAMPLE
 
 _See code: [packages/cli/src/commands/validator/deregister.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/validator/deregister.ts)_
 
+### Force-deaffiliate
+
+Force deaffiliate a Validator from a Validator Group, and remove it from the Group if it is also a member. Used by stake-off admins in order to remove validators from the next epoch's validator set if they are down and consistently unresponsive, in order to preserve the health of the network. This feature will be removed once slashing for downtime is implemented.
+
+```
+USAGE
+  $ celocli validator:force-deaffiliate
+
+OPTIONS
+  --from=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d       (required) Initiator
+  --validator=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) Validator's address
+
+EXAMPLE
+  force-deaffiliate --from 0x47e172f6cfb6c7d01c1574fa3e2be7cc73269d95 --validator
+  0xb7ef0985bdb4f19460A29d9829aA1514B181C4CD
+```
+
+_See code: [packages/cli/src/commands/validator/force-deaffiliate.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/validator/force-deaffiliate.ts)_
+
 ### List
 
 List registered Validators, their name (if provided), affiliation, uptime score, and public keys used for validating.
@@ -130,6 +149,30 @@ EXAMPLE
 ```
 
 _See code: [packages/cli/src/commands/validator/show.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/validator/show.ts)_
+
+### Status
+
+Show information about whether the validator signer is elected and validating. This command will check that the validator meets the registration requirements, and its signer is currently elected and actively signing blocks.
+
+```
+USAGE
+  $ celocli validator:status
+
+OPTIONS
+  --lookback=lookback                                     [default: 100] how many blocks to look back for signer
+                                                          activity
+
+  --signer=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d     address of the signer to check if elected and validating
+
+  --validator=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  address of the validator to check if elected and validating
+
+EXAMPLES
+  status --validator 0x5409ED021D9299bf6814279A6A1411A7e866A631
+  status --signer 0x738337030fAeb1E805253228881d844b5332fB4c
+  status --signer 0x738337030fAeb1E805253228881d844b5332fB4c --lookback 100
+```
+
+_See code: [packages/cli/src/commands/validator/status.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/validator/status.ts)_
 
 ### Update-bls-public-key
 

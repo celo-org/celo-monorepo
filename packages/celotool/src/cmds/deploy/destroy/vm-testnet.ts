@@ -10,6 +10,7 @@ export const builder = {}
 export const handler = async (argv: DestroyArgv) => {
   await switchToClusterFromEnv()
   await destroy(argv.celoEnv)
+
   // destroy prometheus to stackdriver statefulset
   await removeHelmRelease(argv.celoEnv)
 }

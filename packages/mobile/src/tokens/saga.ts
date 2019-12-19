@@ -12,7 +12,7 @@ import { TransactionStatus, TransactionTypes } from 'src/transactions/reducer'
 import { sendAndMonitorTransaction } from 'src/transactions/saga'
 import Logger from 'src/utils/Logger'
 import { contractKit, web3 } from 'src/web3/contracts'
-import { getConnectedAccount, getConnectedUnlockedAccount, waitForWeb3Sync } from 'src/web3/saga'
+import { getConnectedAccount, getConnectedUnlockedAccount } from 'src/web3/saga'
 import * as utf8 from 'utf8'
 
 const TAG = 'tokens/saga'
@@ -41,12 +41,11 @@ export async function convertFromContractDecimals(value: BigNumber, token: CURRE
 
 export async function convertToContractDecimals(value: BigNumber, token: CURRENCY_ENUM) {
   const weiPerUnit = await getWeiPerUnit(token)
-  return value.times(weiPerUnit)
+  return weiPerUnit.multipliedBy(value)
 }
 
 export async function getTokenContract(token: CURRENCY_ENUM) {
   Logger.debug(TAG + '@getTokenContract', `Fetching contract for ${token}`)
-  await waitForWeb3Sync()
   switch (token) {
     case CURRENCY_ENUM.GOLD:
       return contractKit.contracts.getGoldToken()

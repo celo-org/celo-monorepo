@@ -24,7 +24,7 @@ interface VerifyContractsInitialArgv extends InitialArgv {
 export const handler = async (argv: VerifyContractsInitialArgv) => {
   await switchToClusterFromEnv()
   // Check if blockscout is deployed and online?
-  const blockscoutUrl = getBlockscoutUrl(argv)
+  const blockscoutUrl = getBlockscoutUrl(argv.celoEnv)
 
   console.debug(
     `Validating smart contracts ${argv.contract} in ${argv.celoEnv} for URL ${blockscoutUrl}`

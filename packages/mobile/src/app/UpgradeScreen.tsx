@@ -2,6 +2,7 @@ import FullscreenCTA from '@celo/react-components/components/FullscreenCTA'
 import * as React from 'react'
 import { withNamespaces, WithNamespaces } from 'react-i18next'
 import { NavigationParams, NavigationScreenProp } from 'react-navigation'
+import { Namespaces } from 'src/i18n'
 import { navigateToWalletPlayStorePage } from 'src/utils/linking'
 
 interface OwnProps {
@@ -27,4 +28,4 @@ class UpgradeScreen extends React.Component<Props> {
   }
 }
 
-export default withNamespaces('global')(UpgradeScreen)
+export default withNamespaces(Namespaces.global)(UpgradeScreen)

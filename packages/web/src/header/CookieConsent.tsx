@@ -47,7 +47,7 @@ export class CookieConsent extends React.PureComponent<I18nProps, State> {
 
     return (
       <View style={styles.container}>
-        <Text style={[fonts.p, styles.infoMessageText, styles.infoMessageTextFirstBlock]}>
+        <Text style={[fonts.p, styles.infoMessageText]}>
           <Text style={styles.infoMessageTextPrefix}>{t('weUseCookies')} </Text>
           {t('weUseCookiesReasons')}
         </Text>
@@ -94,7 +94,6 @@ export class CookieConsent extends React.PureComponent<I18nProps, State> {
 const styles = StyleSheet.create({
   container: {
     bottom: 0,
-    // @ts-ignore-next-line
     position: 'fixed',
     backgroundColor: '#3C9BF4',
     width: '100%',

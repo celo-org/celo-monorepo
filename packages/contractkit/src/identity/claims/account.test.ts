@@ -4,8 +4,9 @@ import { privateKeyToAddress, privateKeyToPublicKey } from '@celo/utils/lib/addr
 import { NativeSigner } from '@celo/utils/lib/signatureUtils'
 import { newKitFromWeb3 } from '../../kit'
 import { IdentityMetadataWrapper } from '../metadata'
-import { createAccountClaim, MetadataURLGetter } from './account'
-import { Claim, verifyClaim } from './claim'
+import { createAccountClaim } from './account'
+import { Claim } from './claim'
+import { MetadataURLGetter, verifyClaim } from './verify'
 
 testWithGanache('Account claims', (web3) => {
   const kit = newKitFromWeb3(web3)

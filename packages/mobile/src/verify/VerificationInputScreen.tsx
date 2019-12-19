@@ -4,7 +4,7 @@ import Link from '@celo/react-components/components/Link'
 import TextButton from '@celo/react-components/components/TextButton'
 import colors from '@celo/react-components/styles/colors'
 import fontStyles from '@celo/react-components/styles/fonts'
-import { extractAttestationCodeFromMessage } from '@celo/walletkit'
+import { extractAttestationCodeFromMessage } from '@celo/utils/src/attestations'
 import dotProp from 'dot-prop-immutable'
 import { padStart } from 'lodash'
 import * as React from 'react'
@@ -266,14 +266,10 @@ const styles = StyleSheet.create({
     paddingTop: 0,
   },
   buttonCancelContainer: {
-    position: 'absolute',
-    top: 20,
     left: 5,
-    zIndex: 10,
   },
   timerContainer: {
     alignItems: 'center',
-    marginTop: 30,
     marginBottom: 10,
   },
   timerText: {
