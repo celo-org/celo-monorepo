@@ -1,3 +1,4 @@
+import KeyboardSpacer from '@celo/react-components/components/KeyboardSpacer'
 import SectionHead from '@celo/react-components/components/SectionHead'
 import colors from '@celo/react-components/styles/colors'
 import { fontStyles } from '@celo/react-components/styles/fonts'
@@ -14,7 +15,6 @@ import {
   View,
 } from 'react-native'
 import { connect } from 'react-redux'
-import { componentWithAnalytics } from 'src/analytics/wrapper'
 import { Namespaces } from 'src/i18n'
 import { AddressToE164NumberType } from 'src/identity/reducer'
 import {
@@ -41,6 +41,7 @@ interface Props {
   searchQuery: string
   sections: Section[]
   defaultCountryCode: string
+  listHeaderComponent?: React.ComponentType<any>
   onSelectRecipient(recipient: Recipient): void
 }
 
@@ -176,7 +177,7 @@ export class RecipientPicker extends React.Component<RecipientProps> {
   }
 
   render() {
-    const { sections, addressToE164Number, recipientCache } = this.props
+    const { sections, addressToE164Number, recipientCache, listHeaderComponent } = this.props
     const showFooter = sections.length > 0
 
     return (
@@ -186,12 +187,14 @@ export class RecipientPicker extends React.Component<RecipientProps> {
           renderSectionHeader={this.renderSectionHeader}
           sections={sections}
           ItemSeparatorComponent={this.renderItemSeparator}
+          ListHeaderComponent={listHeaderComponent}
           ListFooterComponent={showFooter ? this.renderFooter : undefined}
           ListEmptyComponent={this.renderEmptyView(addressToE164Number, recipientCache)}
           keyExtractor={this.keyExtractor}
           initialNumToRender={30}
-          keyboardShouldPersistTaps="handled"
+          keyboardShouldPersistTaps="always"
         />
+        <KeyboardSpacer />
       </View>
     )
   }
@@ -230,9 +233,7 @@ const style = StyleSheet.create({
   },
 })
 
-export default componentWithAnalytics(
-  connect(
-    mapStateToProps,
-    {}
-  )(withNamespaces(Namespaces.sendFlow7)(RecipientPicker))
-)
+export default connect(
+  mapStateToProps,
+  {}
+)(withNamespaces(Namespaces.sendFlow7)(RecipientPicker))

@@ -21,12 +21,13 @@ interface SendSearchInputProps {
 
 // Input field for Send screen
 export function SendSearchInput(props: SendSearchInputProps) {
+  const { isPhoneEnabled, onInputChange, t } = props
   const [input, setInput] = React.useState('')
 
-  const onInputChanged = React.useCallback(
+  const handleInputChanged = React.useCallback(
     (value: string) => {
       setInput(value)
-      props.onInputChange(value)
+      onInputChange(value)
     },
     [setInput]
   )
@@ -34,10 +35,10 @@ export function SendSearchInput(props: SendSearchInputProps) {
   return (
     <View style={styles.textInputContainer}>
       <RecipientSearchInput
-        placeholder={props.t('nameOrPhoneNumber')}
+        placeholder={isPhoneEnabled ? t('nameOrPhoneNumber') : t('walletAddress')}
         value={input}
-        onChangeText={onInputChanged}
-        icon={<Search />}
+        onChangeText={handleInputChanged}
+        icon={isPhoneEnabled ? <Search /> : <Search />}
         style={styles.textInput}
         shouldShowClipboard={isValidAddress}
       />

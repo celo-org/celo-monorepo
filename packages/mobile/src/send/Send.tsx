@@ -1,5 +1,3 @@
-import KeyboardAwareScrollView from '@celo/react-components/components/KeyboardAwareScrollView'
-import KeyboardSpacer from '@celo/react-components/components/KeyboardSpacer'
 import VerifyPhone from '@celo/react-components/icons/VerifyPhone'
 import colors from '@celo/react-components/styles/colors'
 import { throttle } from 'lodash'
@@ -16,7 +14,7 @@ import { componentWithAnalytics } from 'src/analytics/wrapper'
 import { ErrorMessages } from 'src/app/ErrorMessages'
 import { estimateFee, FeeType } from 'src/fees/actions'
 import i18n, { Namespaces } from 'src/i18n'
-import VerifyAddressBook from 'src/icons/VerifyAddressBook'
+import ContactPermission from 'src/icons/ContactPermission'
 import { importContacts } from 'src/identity/actions'
 import { E164NumberToAddressType } from 'src/identity/reducer'
 import { headerWithCancelButton } from 'src/navigator/Headers'
@@ -226,51 +224,63 @@ class Send extends React.Component<Props, State> {
     return sections
   }
 
+  renderListHeader = () => {
+    const { t, numberVerified } = this.props
+    const { hasGivenContactPermission } = this.state
+
+    return (
+      <>
+        {!numberVerified && (
+          <SendCallToAction
+            icon={<VerifyPhone height={49} />}
+            header={t('verificationCta.header')}
+            body={t('verificationCta.body')}
+            cta={t('verificationCta.cta')}
+            onPressCta={this.onPressStartVerification}
+          />
+        )}
+        {(numberVerified && !hasGivenContactPermission) ||
+          (true && (
+            <SendCallToAction
+              icon={<ContactPermission />}
+              header={t('importContactsCta.header')}
+              body={t('importContactsCta.body')}
+              cta={t('importContactsCta.cta')}
+              onPressCta={this.onPressContactsSettings}
+            />
+          ))}
+        <ContactSyncBanner />
+      </>
+    )
+  }
+
   render() {
     const { t, defaultCountryCode, numberVerified } = this.props
-    const { searchQuery, hasGivenContactPermission } = this.state
+    const { searchQuery } = this.state
 
     return (
       <SafeAreaView style={style.body}>
-        <KeyboardAwareScrollView keyboardShouldPersistTaps={'always'}>
-          <DisconnectBanner />
-          <SendSearchInput t={t} isPhoneEnabled={false} onInputChange={this.onSearchQueryChanged} />
-          {!numberVerified && (
-            <SendCallToAction
-              icon={<VerifyPhone height={49} />}
-              header={t('verificationCta.header')}
-              body={t('verificationCta.body')}
-              cta={t('verificationCta.cta')}
-              onPressCta={this.onPressStartVerification}
-            />
-          )}
-          {(numberVerified && !hasGivenContactPermission) ||
-            (true && (
-              <SendCallToAction
-                icon={<VerifyAddressBook />}
-                header={t('importContactsCta.header')}
-                body={t('importContactsCta.body')}
-                cta={t('importContactsCta.cta')}
-                onPressCta={this.onPressContactsSettings}
-              />
-            ))}
-          <ContactSyncBanner />
+        <DisconnectBanner />
+        <SendSearchInput
+          t={t}
+          isPhoneEnabled={numberVerified}
+          onInputChange={this.onSearchQueryChanged}
+        />
 
-          {/* {loading ? (
+        {/* {loading ? (
           <View style={style.container}>
             <ActivityIndicator style={style.icon} size="large" color={colors.celoGreen} />
             <Text style={fontStyles.bodySecondary}>{t('loadingContacts')}</Text>
           </View>
         ) : ( */}
-          <RecipientPicker
-            testID={'RecipientPicker'}
-            sections={this.buildSections()}
-            searchQuery={searchQuery}
-            defaultCountryCode={defaultCountryCode}
-            onSelectRecipient={this.onSelectRecipient}
-          />
-        </KeyboardAwareScrollView>
-        <KeyboardSpacer />
+        <RecipientPicker
+          testID={'RecipientPicker'}
+          sections={this.buildSections()}
+          searchQuery={searchQuery}
+          defaultCountryCode={defaultCountryCode}
+          listHeaderComponent={this.renderListHeader}
+          onSelectRecipient={this.onSelectRecipient}
+        />
       </SafeAreaView>
     )
   }
