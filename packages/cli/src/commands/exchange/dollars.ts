@@ -1,3 +1,4 @@
+import BigNumber from 'bignumber.js'
 import { BaseCommand } from '../../base'
 import { displaySendTx } from '../../utils/cli'
 import { Flags } from '../../utils/command'
@@ -17,6 +18,7 @@ export default class ExchangeDollars extends BaseCommand {
     }),
     forAtLeast: Flags.wei({
       description: 'Optional, the minimum value of Celo Gold to receive in return',
+      default: new BigNumber(0),
     }),
   }
 
@@ -38,7 +40,7 @@ export default class ExchangeDollars extends BaseCommand {
 
     await displaySendTx('approve', stableToken.approve(exchange.address, sellAmount.toFixed()))
 
-    const exchangeTx = exchange.exchange(sellAmount.toFixed(), minBuyAmount.toFixed(), false)
+    const exchangeTx = exchange.exchange(sellAmount.toFixed(), minBuyAmount!.toFixed(), false)
     await displaySendTx('exchange', exchangeTx)
   }
 }

@@ -1,7 +1,8 @@
+import { IArg } from '@oclif/parser/lib/args'
 import { flags } from '@oclif/command'
 import { cli } from 'cli-ux'
 import { BaseCommand } from '../../base'
-import { Flags } from '../../utils/command'
+import { Args } from '../../utils/command'
 
 export default class Unlock extends BaseCommand {
   static description = 'Unlock an account address to send transactions or validate blocks'
