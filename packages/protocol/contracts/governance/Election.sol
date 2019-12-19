@@ -302,6 +302,44 @@ contract Election is
     return true;
   }
 
+  function _revokeVotes(
+    address account,
+    address group,
+    uint256 value,
+    address lesser,
+    address greater,
+    uint256 index
+  ) public returns (uint256) {
+    require(group != address(0) && 0 < value, "null group");
+    uint256 remainingValue = value;
+    uint256 pendingVotes = getPendingVotesForGroupByAccount(group, account);
+    if (pendingVotes > 0) {
+      uint256 maxValue = remainingValue;
+      if (pendingVotes < maxValue) {
+        maxValue = pendingVotes;
+      }
+      decrementPendingVotes(group, account, maxValue);
+      remainingValue = remainingValue.sub(maxValue);
+    }
+    uint256 activeVotes = getActiveVotesForGroupByAccount(group, account);
+    if (activeVotes > 0) {
+      uint256 maxValue = remainingValue;
+      if (activeVotes < maxValue) {
+        maxValue = activeVotes;
+      }
+      decrementActiveVotes(group, account, maxValue);
+      remainingValue = remainingValue.sub(maxValue);
+    }
+    uint256 difference = value.sub(remainingValue);
+    decrementTotalVotes(group, difference, lesser, greater);
+    getLockedGold().incrementNonvotingAccountBalance(account, difference);
+    if (getTotalVotesForGroupByAccount(group, account) == 0) {
+      deleteElement(votes.groupsVotedFor[account], group, index);
+    }
+    emit ValidatorGroupVoteRevoked(account, group, difference);
+    return difference;
+  }
+
   /**
    * @notice Revokes `value` active votes for `group`
    * @param group The validator group to revoke votes from.
