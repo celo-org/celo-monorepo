@@ -1213,7 +1213,7 @@ contract('Election', (accounts: string[]) => {
     })
   })
 
-  describe.only('#slashVotes', () => {
+  describe('#slashVotes', () => {
     const voter = accounts[0]
     const group = accounts[1]
     const value = 1000
@@ -1234,18 +1234,28 @@ contract('Election', (accounts: string[]) => {
       describe('when the account only has pending votes', () => {
         describe('when the account is slashed for the total pending voted gold', () => {
           const index = 0
-          const revokedValue = value
-          const remaining = value - revokedValue
+          const slashedValue = value
+          const remaining = value - slashedValue
+          beforeEach(async () => {
+            await election.slashVotes(voter, slashedValue, [NULL_ADDRESS], [NULL_ADDRESS], [index])
+          })
 
-          it('should decrement pending voted gold to zero', async () => {
-            assert.deepEqual(await election.getGroupsVotedForByAccount(voter), [group])
-            await election.slashVotes(voter, revokedValue, [NULL_ADDRESS], [NULL_ADDRESS], [index])
+          it('should decrement pending votes to zero', async () => {
             assertEqualBN(await election.getPendingVotesForGroupByAccount(group, voter), remaining)
+          })
+
+          it('should decrement total votes to zero', async () => {
             assertEqualBN(await election.getTotalVotesForGroupByAccount(group, voter), remaining)
             assertEqualBN(await election.getTotalVotesByAccount(voter), remaining)
             assertEqualBN(await election.getTotalVotesForGroup(group), remaining)
             assertEqualBN(await election.getTotalVotes(), remaining)
-            assertEqualBN(await mockLockedGold.nonvotingAccountBalance(voter), revokedValue)
+          })
+
+          it("should increment `voter`'s nonvoting account balance", async () => {
+            assertEqualBN(await mockLockedGold.nonvotingAccountBalance(voter), slashedValue)
+          })
+
+          it("should remove the group from the voter's voted set", async () => {
             assert.deepEqual(await election.getGroupsVotedForByAccount(voter), [])
           })
         })
@@ -1259,18 +1269,28 @@ contract('Election', (accounts: string[]) => {
 
         describe('when the account is slashed for the total active voting gold', () => {
           const index = 0
-          const revokedValue = value
-          const remaining = value - revokedValue
+          const slashedValue = value
+          const remaining = value - slashedValue
+          beforeEach(async () => {
+            await election.slashVotes(voter, slashedValue, [NULL_ADDRESS], [NULL_ADDRESS], [index])
+          })
 
           it('should decrement active voted gold to zero', async () => {
-            assert.deepEqual(await election.getGroupsVotedForByAccount(voter), [group])
-            await election.slashVotes(voter, revokedValue, [NULL_ADDRESS], [NULL_ADDRESS], [index])
             assertEqualBN(await election.getActiveVotesForGroupByAccount(group, voter), remaining)
+          })
+
+          it('should decrement total voted gold to zero', async () => {
             assertEqualBN(await election.getTotalVotesForGroupByAccount(group, voter), remaining)
             assertEqualBN(await election.getTotalVotesByAccount(voter), remaining)
             assertEqualBN(await election.getTotalVotesForGroup(group), remaining)
             assertEqualBN(await election.getTotalVotes(), remaining)
-            assertEqualBN(await mockLockedGold.nonvotingAccountBalance(voter), revokedValue)
+          })
+
+          it("should increment `voter`'s nonvoting account balance", async () => {
+            assertEqualBN(await mockLockedGold.nonvotingAccountBalance(voter), slashedValue)
+          })
+
+          it("should remove the group from the voter's voted set", async () => {
             assert.deepEqual(await election.getGroupsVotedForByAccount(voter), [])
           })
         })
@@ -1296,33 +1316,43 @@ contract('Election', (accounts: string[]) => {
 
       describe('when the accounts only have pending votes', () => {
         describe('when both accounts are slashed for the total pending voted gold', () => {
-          const revokedValue = value
+          const slashedValue = value
+          const remaining = value - slashedValue
 
-          it('should decrement pending voted gold to zero', async () => {
-            assert.deepEqual(await election.getGroupsVotedForByAccount(voter), [group, group2])
+          beforeEach(async () => {
             await election.slashVotes(
               voter,
-              revokedValue,
+              slashedValue,
               [group2, NULL_ADDRESS],
               [NULL_ADDRESS, group],
               [0, 1]
             )
-            assertEqualBN(await election.getTotalVotesForGroupByAccount(group, voter), 0)
-            assertEqualBN(await election.getTotalVotesByAccount(voter), 0)
-            assertEqualBN(await election.getTotalVotesForGroup(group), 0)
-            assertEqualBN(await election.getTotalVotesForGroup(group2), 0)
-            assertEqualBN(await election.getTotalVotes(), 0)
-            assertEqualBN(await mockLockedGold.nonvotingAccountBalance(voter), value)
+          })
+
+          it("should decrement both group's pending votes to zero", async () => {
+            assertEqualBN(await election.getPendingVotesForGroupByAccount(group, voter), remaining)
+            assertEqualBN(await election.getPendingVotesForGroupByAccount(group2, voter), remaining)
+          })
+
+          it("should decrement both group's total votes to zero", async () => {
+            assertEqualBN(await election.getTotalVotesForGroupByAccount(group, voter), remaining)
+            assertEqualBN(await election.getTotalVotesByAccount(voter), remaining)
+            assertEqualBN(await election.getTotalVotesForGroup(group), remaining)
+            assertEqualBN(await election.getTotalVotesForGroup(group2), remaining)
+            assertEqualBN(await election.getTotalVotes(), remaining)
+          })
+
+          it("should increment `voter`'s nonvoting account balance", async () => {
+            assertEqualBN(await mockLockedGold.nonvotingAccountBalance(voter), slashedValue)
+          })
+
+          it("should remove the groups from the voter's voted set", async () => {
             assert.deepEqual(await election.getGroupsVotedForByAccount(voter), [])
           })
         })
       })
     })
 
-    // Tests to write:
-    // multi groups: full wipe pending/acticve
-    //            half wipe show it takes all pending and some active of group 1
-    //            half wipe show it takes all pending/active of group1 and some of group2
     describe('when the account has voted for more than one group inequally', () => {
       const group2 = accounts[7]
       const value2 = value * 1.5
@@ -1332,62 +1362,166 @@ contract('Election', (accounts: string[]) => {
         await mockValidators.setMembers(group2, [accounts[8]])
         await registry.setAddressFor(CeloContractName.Validators, accounts[0])
         await election.markGroupEligible(group, NULL_ADDRESS, NULL_ADDRESS)
-        console.log('Set eligible')
         await election.markGroupEligible(group2, group, NULL_ADDRESS)
-        console.log('Set eligible')
         await registry.setAddressFor(CeloContractName.Validators, mockValidators.address)
-        console.log('Set lcoked gold')
         await mockLockedGold.setTotalLockedGold(value + value2)
-        console.log('Set')
-        await mockValidators.setNumRegisteredValidators(1)
-        console.log('NUm vals')
+        await mockValidators.setNumRegisteredValidators(2)
         await mockLockedGold.incrementNonvotingAccountBalance(voter, value + value2)
         await election.vote(group2, value2 / 2, group, NULL_ADDRESS)
         await election.vote(group, value / 2, NULL_ADDRESS, group2)
       })
 
       describe('when both groups have both passive and active votes', async () => {
-        describe("when we slash 1 more vote than group 2's passive vote total", async () => {
-          const revokedValue = value2 / 2
-          const remaining = value2 - revokedValue
+        beforeEach(async () => {
+          await mineBlocks(EPOCH, web3)
+          await election.activate(group)
+          await mineBlocks(EPOCH, web3)
+          await election.activate(group2)
+          await election.vote(group2, value2 / 2, group, NULL_ADDRESS)
+          await election.vote(group, value / 2, NULL_ADDRESS, group2)
+        })
+
+        describe("when we slash 1 more vote than group 1's passive vote total", async () => {
+          const slashedValue = value / 2 + 1
+          const remaining = value - slashedValue
           beforeEach(async () => {
-            // await mineBlocks(EPOCH, web3)
-            // await election.activate(group)
-            // await mineBlocks(EPOCH, web3)
-            // await election.activate(group2)
-            // await election.vote(group2, value2 / 2, group, NULL_ADDRESS)
-            // await election.vote(group, value / 2, NULL_ADDRESS, group2)
-            // await election.slashVotes(voter, revokedValue, [group2, NULL_ADDRESS], [NULL_ADDRESS, group],
-            //                           [0, 1])
             await election.slashVotes(
               voter,
-              revokedValue,
-              [NULL_ADDRESS, group],
-              [group2, NULL_ADDRESS],
+              slashedValue,
+              [NULL_ADDRESS, NULL_ADDRESS],
+              [group, group2],
               [0, 1]
             )
           })
 
-          it('should not affect group 1', async () => {
-            assertEqualBN(await election.getTotalVotesForGroupByAccount(group, voter), value)
-            assertEqualBN(await election.getTotalVotesForGroup(group), value)
+          it('should not affect group 2', async () => {
+            assertEqualBN(await election.getTotalVotesForGroupByAccount(group2, voter), value2)
+            assertEqualBN(await election.getTotalVotesForGroup(group2), value2)
           })
 
-          it("should reduce group 2's votes", async () => {
-            assertEqualBN(await election.getTotalVotesForGroupByAccount(group2, voter), remaining)
-            assertEqualBN(await election.getTotalVotesForGroup(group2), remaining)
+          it("should reduce group 1's votes", async () => {
+            assertEqualBN(await election.getTotalVotesForGroupByAccount(group, voter), remaining)
+            assertEqualBN(await election.getTotalVotesForGroup(group), remaining)
           })
 
-          it("should reduce `voter`'s votes", async () => {
-            assertEqualBN(await election.getTotalVotesByAccount(voter), value + remaining)
+          it("should reduce `voter`'s total votes", async () => {
+            assertEqualBN(await election.getTotalVotesByAccount(voter), value2 + remaining)
           })
 
-          it("should reduce `group2`'s pending votes to 0", async () => {
-            assertEqualBN(await election.getPendingVotesForGroupByAccount(group2, voter), 0)
+          it("should reduce `group1`'s pending votes to 0", async () => {
+            assertEqualBN(await election.getPendingVotesForGroupByAccount(group, voter), 0)
           })
 
-          it("should reduce `group2`'s' active votes by 1", async () => {
-            assertEqualBN(await election.getTotalVotesForGroupByAccount(group2, voter), remaining)
+          it("should reduce `group1`'s' active votes by 1", async () => {
+            assertEqualBN(await election.getActiveVotesForGroupByAccount(group, voter), remaining)
+          })
+        })
+
+        describe("when we slash all of group 1's votes and some of group 2's", async () => {
+          const slashedValue = value + 1
+          const totalRemaining = value + value2 - slashedValue
+          const group1Remaining = 0
+          const group2TotalRemaining = value2 - 1
+          // 1 vote is removed from group2, pending is removed first
+          const group2PendingRemaining = value2 / 2 - 1
+          const group2ActiveRemaining = value2 / 2
+          beforeEach(async () => {
+            await election.slashVotes(
+              voter,
+              slashedValue,
+              [group, NULL_ADDRESS],
+              [NULL_ADDRESS, group2],
+              [0, 1]
+            )
+          })
+
+          it("should decrement group 1's votes to 0", async () => {
+            assertEqualBN(
+              await election.getTotalVotesForGroupByAccount(group, voter),
+              group1Remaining
+            )
+            assertEqualBN(await election.getTotalVotesForGroup(group), group1Remaining)
+            assertEqualBN(
+              await election.getPendingVotesForGroupByAccount(group, voter),
+              group1Remaining
+            )
+            assertEqualBN(
+              await election.getActiveVotesForGroupByAccount(group, voter),
+              group1Remaining
+            )
+          })
+
+          it("should decrement group 2's total votes by 1", async () => {
+            assertEqualBN(
+              await election.getTotalVotesForGroupByAccount(group2, voter),
+              group2TotalRemaining
+            )
+            assertEqualBN(await election.getTotalVotesForGroup(group2), group2TotalRemaining)
+          })
+
+          it("should reduce `voter`'s total votes", async () => {
+            assertEqualBN(await election.getTotalVotesByAccount(voter), totalRemaining)
+          })
+
+          it("should reduce `group2`'s pending votes by 1", async () => {
+            assertEqualBN(
+              await election.getPendingVotesForGroupByAccount(group2, voter),
+              group2PendingRemaining
+            )
+          })
+
+          it("should not reduce `group2`'s active votes", async () => {
+            assertEqualBN(
+              await election.getActiveVotesForGroupByAccount(group2, voter),
+              group2ActiveRemaining
+            )
+          })
+        })
+      })
+
+      describe('when `slashVotes` is called with malformed inputs', () => {
+        describe('when called to slash more value than groups have', () => {
+          it('should revert', async () => {
+            await assertRevert(
+              election.slashVotes(
+                voter,
+                value + value2 + 1,
+                [group, NULL_ADDRESS],
+                [NULL_ADDRESS, group2],
+                [0, 1]
+              )
+            )
+          })
+        })
+
+        describe('when called to slash with incorrect lessers/greaters', () => {
+          it('should revert', async () => {
+            const slashedValue = value
+            // `group` should be listed as a lesser for index 0 (group2's lesser)
+            await assertRevert(
+              election.slashVotes(
+                voter,
+                slashedValue,
+                [NULL_ADDRESS, NULL_ADDRESS],
+                [NULL_ADDRESS, group2],
+                [0, 1]
+              )
+            )
+          })
+        })
+
+        describe('when called to slash with incorrect indices', () => {
+          it('should revert', async () => {
+            const slashedValue = value
+            await assertRevert(
+              election.slashVotes(
+                voter,
+                slashedValue,
+                [group, NULL_ADDRESS],
+                [NULL_ADDRESS, group2],
+                [0, 0]
+              )
+            )
           })
         })
       })
