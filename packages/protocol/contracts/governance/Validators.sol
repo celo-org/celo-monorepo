@@ -1149,16 +1149,6 @@ contract Validators is
     }
   }
 
-  // TODO: stub
-  function groupMembershipInEpoch(address account, uint256, uint256)
-    external
-    view
-    returns (address)
-  {
-    Validator storage validator = validators[account];
-    return validator.affiliation;
-  }
-
   /**
    * @notice Sets the slashingMultiplierRestPeriod property if called by owner.
    * @param value New reset period for slashing multiplier.
