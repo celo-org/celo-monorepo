@@ -49,6 +49,15 @@ describe('Slashing tests', function(this: any) {
       assert.equal(blockNumber, 1)
     })
 
+    it('should parse blockNumber from current header', async () => {
+      const contract = await kit._web3Contracts.getElection()
+      const current = await kit.web3.eth.getBlockNumber()
+      const block = await kit.web3.eth.getBlock(current)
+      const rlpEncodedBlock = rlp.encode(reconstructHeaderArray(kit.web3, block))
+      const blockNumber = await contract.methods.getBlockNumberFromHeader(rlpEncodedBlock).call()
+      assert.equal(blockNumber, current)
+    })
+
     it('should hash test header correctly', async () => {
       const contract = await kit._web3Contracts.getElection()
       const header = kit.web3.utils.hexToBytes(
@@ -67,7 +76,7 @@ describe('Slashing tests', function(this: any) {
       assert.equal(blockHash, block.hash)
     })
 
-    it('slashing four double signing', async () => {
+    it('slashing for double signing', async () => {
       const contract = await kit._web3Contracts.getElection()
       const current = await kit.web3.eth.getBlockNumber()
       const block = await kit.web3.eth.getBlock(current)
@@ -81,8 +90,10 @@ describe('Slashing tests', function(this: any) {
       const doubleSignedBlockHash = await contract.methods
         .hashHeader(rlpEncodedDoubleSignedBlock)
         .call()
-      console.info('Canonical block hash: ' + blockHash)
-      console.info('Double signed block hash: ' + doubleSignedBlockHash)
+      console.info('Canonical block hash (blockNumber ' + current + '): ' + blockHash)
+      console.info(
+        'Double signed block hash (blockNumber  ' + current + '): ' + doubleSignedBlockHash
+      )
     })
   })
 })

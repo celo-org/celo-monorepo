@@ -163,7 +163,6 @@ contract UsingPrecompiles {
    * @return Header hash.
    */
   function hashHeader(bytes memory header) public returns (bytes32) {
-    //return IHashHeader(HASH_HEADER).hashHeader(header);
     bytes memory hash;
     bool success;
     (success, hash) = HASH_HEADER.call.value(0).gas(gasleft())(abi.encodePacked(header));
