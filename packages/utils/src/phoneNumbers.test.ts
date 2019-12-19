@@ -2,6 +2,7 @@ import {
   getCountryCode,
   getDisplayPhoneNumber,
   getE164Number,
+  getExampleNumber,
   getRegionCode,
   getRegionCodeFromCountryCode,
   isE164Number,
@@ -13,6 +14,7 @@ const COUNTRY_CODES = {
   DE: '+49',
   AR: '+54',
   MX: '+52',
+  LR: '+231',
 }
 
 const TEST_PHONE_NUMBERS = {
@@ -30,10 +32,13 @@ const TEST_PHONE_NUMBERS = {
   VALID_MX_1: '33 1234-5678',
   VALID_MX_2: '1 33 1234-5678',
   VALID_MX_3: '+52 1 33 1234-5678',
+  VALID_LR: '881551952',
   FORMATTED_AR: '+5491126431111',
   FORMATTED_MX: '+523312345678',
+  FORMATTED_LR: '+231881551952',
   DISPLAY_AR: '9 11 2643-1111',
   DISPLAY_MX: '33 1234 5678',
+  DISPLAY_LR: '88 155 1952',
   INVALID_EMPTY: '',
   TOO_SHORT: '123',
 }
@@ -96,6 +101,12 @@ describe('Phone number formatting and utilities', () => {
     it('Format MX phone with country code', () => {
       expect(getE164Number(TEST_PHONE_NUMBERS.VALID_MX_3, COUNTRY_CODES.MX)).toBe(
         TEST_PHONE_NUMBERS.FORMATTED_MX
+      )
+    })
+
+    it('Format LR phone with country code', () => {
+      expect(getE164Number(TEST_PHONE_NUMBERS.VALID_LR, COUNTRY_CODES.LR)).toBe(
+        TEST_PHONE_NUMBERS.FORMATTED_LR
       )
     })
   })
@@ -170,6 +181,12 @@ describe('Phone number formatting and utilities', () => {
         TEST_PHONE_NUMBERS.DISPLAY_MX
       )
     })
+
+    it('Format LR phone with no country code', () => {
+      expect(getDisplayPhoneNumber(TEST_PHONE_NUMBERS.VALID_LR, COUNTRY_CODES.LR)).toBe(
+        TEST_PHONE_NUMBERS.DISPLAY_LR
+      )
+    })
   })
 
   describe('Number Parsing', () => {
@@ -241,6 +258,26 @@ describe('Phone number formatting and utilities', () => {
       expect(isE164Number(TEST_PHONE_NUMBERS.VALID_US_2)).toBe(false)
       expect(isE164Number(TEST_PHONE_NUMBERS.VALID_US_3)).toBe(true)
       expect(isE164Number(TEST_PHONE_NUMBERS.VALID_US_4)).toBe(false)
+    })
+  })
+
+  describe('Example phones', () => {
+    it('gets example by country showing zeros', () => {
+      expect(getExampleNumber(COUNTRY_CODES.AR)).toBe('000 0000-0000')
+      expect(getExampleNumber(COUNTRY_CODES.DE)).toBe('000 000000')
+      expect(getExampleNumber(COUNTRY_CODES.US)).toBe('(000) 000-0000')
+    })
+
+    it('gets example by country', () => {
+      expect(getExampleNumber(COUNTRY_CODES.AR, false)).toBe('011 2345-6789')
+      expect(getExampleNumber(COUNTRY_CODES.DE, false)).toBe('030 123456')
+      expect(getExampleNumber(COUNTRY_CODES.US, false)).toBe('(201) 555-0123')
+    })
+
+    it('gets example by country showing zeros in international way', () => {
+      expect(getExampleNumber(COUNTRY_CODES.AR, true, true)).toBe('+54 00 0000-0000')
+      expect(getExampleNumber(COUNTRY_CODES.DE, true, true)).toBe('+49 00 000000')
+      expect(getExampleNumber(COUNTRY_CODES.US, true, true)).toBe('+1 000-000-0000')
     })
   })
 })

@@ -1,31 +1,104 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`VerificationLearnMoreScreen renders correctly 1`] = `
-<SafeAreaView
-  style={
+<RCTScrollView
+  contentContainerStyle={
     Object {
-      "backgroundColor": "#FFFFFF",
       "flex": 1,
-      "justifyContent": "space-between",
+      "padding": 30,
+      "paddingTop": 0,
     }
   }
 >
-  <RCTScrollView
-    contentContainerStyle={
-      Object {
-        "alignItems": "center",
-        "flex": 1,
-        "justifyContent": "center",
-        "padding": 30,
-        "paddingTop": 0,
+  <View>
+    <SafeAreaView
+      style={
+        Object {
+          "backgroundColor": "#FFFFFF",
+          "flex": 1,
+        }
       }
-    }
-  >
-    <View>
-      <Text>
-        Learn more stuff
+    >
+      <Text
+        style={
+          Object {
+            "color": "#2E3338",
+            "fontFamily": "Hind-Light",
+            "fontSize": 22,
+            "paddingBottom": 20,
+            "textAlign": "center",
+          }
+        }
+        testID="VerificationLearnMoreHeader"
+      >
+        learnMore.header
       </Text>
-    </View>
-  </RCTScrollView>
-</SafeAreaView>
+      <Text
+        style={
+          Object {
+            "color": "#2E3338",
+            "fontFamily": "Hind-Regular",
+            "fontSize": 16,
+            "lineHeight": 24,
+            "marginTop": 10,
+          }
+        }
+      >
+        learnMore.intro
+      </Text>
+      <Text
+        style={
+          Object {
+            "color": "#2E3338",
+            "fontFamily": "Hind-Bold",
+            "fontSize": 16,
+            "lineHeight": 24,
+            "marginTop": 20,
+          }
+        }
+      >
+        learnMore.section1Header
+      </Text>
+      <Text
+        style={
+          Object {
+            "color": "#2E3338",
+            "fontFamily": "Hind-Regular",
+            "fontSize": 16,
+            "lineHeight": 24,
+            "marginTop": 10,
+          }
+        }
+      >
+        learnMore.section1Body
+      </Text>
+      <Text
+        style={
+          Object {
+            "color": "#2E3338",
+            "fontFamily": "Hind-Bold",
+            "fontSize": 16,
+            "lineHeight": 24,
+            "marginTop": 20,
+          }
+        }
+      >
+        learnMore.section2Header
+      </Text>
+      <Text
+        style={
+          Object {
+            "color": "#2E3338",
+            "fontFamily": "Hind-Regular",
+            "fontSize": 16,
+            "lineHeight": 24,
+            "marginTop": 10,
+          }
+        }
+      >
+        learnMore.section2Body
+      </Text>
+    </SafeAreaView>
+  </View>
+</RCTScrollView>
 `;

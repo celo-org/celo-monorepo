@@ -1,8 +1,9 @@
+import { ensureHexLeader } from '@celo/utils/src/address'
 import { getEscrowContract, getStableTokenContract } from '@celo/walletkit'
 import { Escrow } from '@celo/walletkit/lib/types/Escrow'
 import { StableToken } from '@celo/walletkit/types/StableToken'
 import BigNumber from 'bignumber.js'
-import { all, call, put, select, spawn, takeLeading } from 'redux-saga/effects'
+import { all, call, put, select, spawn, take, takeLeading } from 'redux-saga/effects'
 import { showError } from 'src/alert/actions'
 import { ErrorMessages } from 'src/app/ErrorMessages'
 import { ESCROW_PAYMENT_EXPIRY_SECONDS } from 'src/config'
@@ -19,8 +20,8 @@ import {
 import { calculateFee } from 'src/fees/saga'
 import { CURRENCY_ENUM, SHORT_CURRENCIES } from 'src/geth/consts'
 import i18n from 'src/i18n'
-import { Actions as IdentityActions, EndVerificationAction } from 'src/identity/actions'
-import { NUM_ATTESTATIONS_REQUIRED } from 'src/identity/verification'
+import { Actions as IdentityActions, SetVerificationStatusAction } from 'src/identity/actions'
+import { NUM_ATTESTATIONS_REQUIRED, VerificationStatus } from 'src/identity/verification'
 import { Invitees } from 'src/invite/actions'
 import { inviteesSelector } from 'src/invite/reducer'
 import { TEMP_PW } from 'src/invite/saga'
@@ -84,7 +85,7 @@ function* registerStandbyTransaction(id: string, value: string, address: string)
   yield put(
     addStandbyTransaction({
       id,
-      type: TransactionTypes.SENT,
+      type: TransactionTypes.ESCROW_SENT,
       status: TransactionStatus.Pending,
       value,
       symbol: CURRENCY_ENUM.DOLLAR,
@@ -95,12 +96,7 @@ function* registerStandbyTransaction(id: string, value: string, address: string)
   )
 }
 
-function* withdrawFromEscrow(action: EndVerificationAction) {
-  if (!action.success) {
-    Logger.debug(TAG + '@withdrawFromEscrow', 'Skipping withdrawal because verification failed')
-    return
-  }
-
+function* withdrawFromEscrow() {
   try {
     Logger.debug(TAG + '@withdrawFromEscrow', 'Withdrawing escrowed payment')
 
@@ -149,7 +145,7 @@ function* withdrawFromEscrow(action: EndVerificationAction) {
     signature = signature.slice(2)
     const r = `0x${signature.slice(0, 64)}`
     const s = `0x${signature.slice(64, 128)}`
-    const v = web3.utils.hexToNumber(signature.slice(128, 130))
+    const v = web3.utils.hexToNumber(ensureHexLeader(signature.slice(128, 130)))
 
     const withdrawTx = escrow.methods.withdraw(tempWalletAddress, v, r, s)
     const txID = generateStandbyTransactionId(account)
@@ -178,7 +174,7 @@ export async function getReclaimEscrowGas(account: string, paymentID: string) {
   const tx = await createReclaimTransaction(paymentID)
   const txParams = {
     from: account,
-    gasCurrency: (await getStableTokenContract(web3))._address,
+    feeCurrency: (await getStableTokenContract(web3))._address,
   }
   const gas = new BigNumber(await tx.estimateGas(txParams))
   Logger.debug(`${TAG}/getReclaimEscrowGas`, `Estimated gas of ${gas.toString()}}`)
@@ -248,13 +244,11 @@ function* doFetchSentPayments() {
     const sentPaymentsRaw = yield all(
       sentPaymentIDs.map((paymentID) => call(getEscrowedPayment, escrow, paymentID))
     )
-
     const tempAddresstoRecipientPhoneNumber: Invitees = yield select(inviteesSelector)
     const sentPayments: EscrowedPayment[] = []
     for (let i = 0; i < sentPaymentsRaw.length; i++) {
       const id = sentPaymentIDs[i].toLowerCase()
       const recipientPhoneNumber = tempAddresstoRecipientPhoneNumber[id]
-
       const payment = sentPaymentsRaw[i]
       if (!payment) {
         continue
@@ -299,7 +293,12 @@ export function* watchFetchSentPayments() {
 }
 
 export function* watchVerificationEnd() {
-  yield takeLeading(IdentityActions.END_VERIFICATION, withdrawFromEscrow)
+  while (true) {
+    const update: SetVerificationStatusAction = yield take(IdentityActions.SET_VERIFICATION_STATUS)
+    if (update.status === VerificationStatus.Done) {
+      yield call(withdrawFromEscrow)
+    }
+  }
 }
 
 export function* escrowSaga() {

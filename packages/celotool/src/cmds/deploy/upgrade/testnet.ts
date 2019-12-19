@@ -1,11 +1,12 @@
 import { switchToClusterFromEnv } from 'src/lib/cluster'
+import { failIfVmBased } from 'src/lib/env-utils'
 import { resetAndUpgradeHelmChart, upgradeHelmChart, upgradeStaticIPs } from 'src/lib/helm_deploy'
 import {
   uploadEnvFileToGoogleStorage,
   uploadGenesisBlockToGoogleStorage,
   uploadStaticNodesToGoogleStorage,
 } from 'src/lib/testnet-utils'
-import * as yargs from 'yargs'
+import yargs from 'yargs'
 import { UpgradeArgv } from '../../deploy/upgrade'
 
 export const command = 'testnet'
@@ -24,11 +25,13 @@ export const builder = (argv: yargs.Argv) => {
 }
 
 export const handler = async (argv: TestnetArgv) => {
+  failIfVmBased()
+
   await switchToClusterFromEnv()
 
   await upgradeStaticIPs(argv.celoEnv)
 
-  if (argv.reset) {
+  if (argv.reset === true) {
     await resetAndUpgradeHelmChart(argv.celoEnv)
     await uploadGenesisBlockToGoogleStorage(argv.celoEnv)
   } else {

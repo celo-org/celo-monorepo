@@ -1,7 +1,7 @@
-import { assertRevert, assertEqualBN, assertContainSubset } from '@celo/protocol/lib/test-utils'
+import { assertContainSubset, assertEqualBN, assertRevert } from '@celo/protocol/lib/test-utils'
 
-import { TestRandomContract, TestRandomInstance } from 'types'
 import { BigNumber } from 'bignumber.js'
+import { TestRandomContract, TestRandomInstance } from 'types'
 
 const Random: TestRandomContract = artifacts.require('TestRandom')
 
@@ -14,7 +14,7 @@ contract('Random', (accounts: string[]) => {
 
   beforeEach(async () => {
     random = await Random.new()
-    random.initialize(256)
+    await random.initialize(256)
   })
 
   describe('#setRandomnessRetentionWindow()', () => {
@@ -36,7 +36,7 @@ contract('Random', (accounts: string[]) => {
     })
 
     it('only owner can set', async () => {
-      assertRevert(random.setRandomnessBlockRetentionWindow(1000, { from: accounts[1] }))
+      await assertRevert(random.setRandomnessBlockRetentionWindow(1000, { from: accounts[1] }))
     })
   })
 
@@ -75,7 +75,7 @@ contract('Random', (accounts: string[]) => {
         assert.equal(randomValues[5], await random.getTestRandomness(5, 5))
       })
       it('cannot read old blocks', async () => {
-        assertRevert(random.getTestRandomness(3, 5))
+        await assertRevert(random.getTestRandomness(3, 5))
       })
     })
 
@@ -93,7 +93,7 @@ contract('Random', (accounts: string[]) => {
         assert.equal(randomValues[5], await random.getTestRandomness(5, 5))
       })
       it('cannot read old blocks', async () => {
-        assertRevert(random.getTestRandomness(1, 5))
+        await assertRevert(random.getTestRandomness(1, 5))
       })
       it('old values are preserved', async () => {
         await random.addTestRandomness(5, randomValues[5])

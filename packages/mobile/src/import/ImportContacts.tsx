@@ -98,7 +98,7 @@ class ImportContacts extends React.Component<Props, State> {
 
     return (
       <SafeAreaView style={style.container}>
-        <DevSkipButton nextScreen={Screens.VerifyEducation} />
+        <DevSkipButton nextScreen={Screens.VerificationEducationScreen} />
         <ScrollView contentContainerStyle={style.scrollContainer}>
           <View style={style.header} />
           <View>
@@ -129,6 +129,7 @@ class ImportContacts extends React.Component<Props, State> {
             testID="importContactsEnable"
           />
           <Button
+            disabled={isSubmitting}
             text={t('global:skip')}
             onPress={this.onPressSkip}
             standard={false}

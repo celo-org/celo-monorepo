@@ -2,7 +2,8 @@ import { cli } from 'cli-ux'
 import { BaseCommand } from '../../base'
 
 export default class ValidatorGroupList extends BaseCommand {
-  static description = 'List existing Validator Groups'
+  static description =
+    'List registered Validator Groups, their names (if provided), commission, and members.'
 
   static flags = {
     ...BaseCommand.flags,

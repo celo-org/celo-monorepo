@@ -6,9 +6,8 @@ exports[`renders correctly with giant numbers 1`] = `
     Object {
       "borderColor": "#EEEEEE",
       "borderWidth": 1,
-      "flex": 1,
       "justifyContent": "center",
-      "minHeight": 300,
+      "paddingHorizontal": 20,
     }
   }
 >
@@ -276,6 +275,7 @@ exports[`renders correctly with giant numbers 1`] = `
             style={
               Object {
                 "height": 12,
+                "tintColor": "#42D689",
                 "width": 12,
               }
             }
@@ -366,6 +366,7 @@ exports[`renders correctly with giant numbers 1`] = `
             style={
               Object {
                 "height": 12,
+                "tintColor": "#42D689",
                 "width": 12,
               }
             }
@@ -406,10 +407,8 @@ exports[`renders correctly with giant numbers 1`] = `
       style={
         Object {
           "alignItems": "center",
-          "flex": 1,
           "justifyContent": "center",
-          "paddingBottom": 20,
-          "paddingTop": 30,
+          "paddingTop": 15,
         }
       }
     >
@@ -526,9 +525,8 @@ exports[`renders correctly with no exchange rate 1`] = `
     Object {
       "borderColor": "#EEEEEE",
       "borderWidth": 1,
-      "flex": 1,
       "justifyContent": "center",
-      "minHeight": 300,
+      "paddingHorizontal": 20,
     }
   }
 >
@@ -796,6 +794,7 @@ exports[`renders correctly with no exchange rate 1`] = `
             style={
               Object {
                 "height": 12,
+                "tintColor": "#42D689",
                 "width": 12,
               }
             }
@@ -886,6 +885,7 @@ exports[`renders correctly with no exchange rate 1`] = `
             style={
               Object {
                 "height": 12,
+                "tintColor": "#42D689",
                 "width": 12,
               }
             }
@@ -926,10 +926,8 @@ exports[`renders correctly with no exchange rate 1`] = `
       style={
         Object {
           "alignItems": "center",
-          "flex": 1,
           "justifyContent": "center",
-          "paddingBottom": 20,
-          "paddingTop": 30,
+          "paddingTop": 15,
         }
       }
     >

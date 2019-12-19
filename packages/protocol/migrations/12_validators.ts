@@ -13,8 +13,8 @@ const initializeArgs = async (): Promise<any[]> => {
     config.validators.validatorLockedGoldRequirements.duration,
     config.validators.validatorScoreParameters.exponent,
     toFixed(config.validators.validatorScoreParameters.adjustmentSpeed).toFixed(),
-    config.validators.validatorEpochPayment,
     config.validators.membershipHistoryLength,
+    config.validators.slashingPenaltyResetPeriod,
     config.validators.maxGroupSize,
   ]
 }

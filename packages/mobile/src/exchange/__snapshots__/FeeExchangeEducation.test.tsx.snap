@@ -20,8 +20,7 @@ exports[`renders correctly 1`] = `
     }
     style={
       Object {
-        "height": 220,
-        "width": 240,
+        "width": "65%",
       }
     }
   />
@@ -44,8 +43,8 @@ exports[`renders correctly 1`] = `
             "textAlignVertical": "center",
           },
           Object {
-            "fontSize": 24,
-            "lineHeight": 30,
+            "fontSize": 18,
+            "lineHeight": 24,
             "textAlign": "center",
           },
         ]
@@ -57,7 +56,7 @@ exports[`renders correctly 1`] = `
   <View
     style={
       Object {
-        "marginVertical": 40,
+        "marginVertical": 30,
       }
     }
   >
@@ -76,6 +75,14 @@ exports[`renders correctly 1`] = `
       <View
         accessible={true}
         focusable={true}
+        hitSlop={
+          Object {
+            "bottom": 10,
+            "left": 10,
+            "right": 10,
+            "top": 10,
+          }
+        }
         isTVSelectable={true}
         onClick={[Function]}
         onResponderGrant={[Function]}

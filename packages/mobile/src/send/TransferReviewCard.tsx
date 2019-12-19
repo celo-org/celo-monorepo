@@ -8,6 +8,7 @@ import * as React from 'react'
 import { withNamespaces, WithNamespaces } from 'react-i18next'
 import { StyleSheet, Text, View } from 'react-native'
 import Avatar from 'src/components/Avatar'
+import FeeIcon from 'src/components/FeeIcon'
 import LineItemRow from 'src/components/LineItemRow'
 import { CURRENCIES, CURRENCY_ENUM } from 'src/geth/consts'
 import { Namespaces } from 'src/i18n'
@@ -18,7 +19,6 @@ import {
   useLocalCurrencyCode,
 } from 'src/localCurrency/hooks'
 import { Recipient } from 'src/recipients/recipient'
-import FeeIcon from 'src/send/FeeIcon'
 import { TransactionTypes } from 'src/transactions/reducer'
 import { getFeeDisplayValue, getMoneyDisplayValue } from 'src/utils/formatting'
 
@@ -115,11 +115,10 @@ function TransferReviewCard({
 
 const style = StyleSheet.create({
   container: {
-    flex: 1,
+    flexGrow: 1,
     justifyContent: 'flex-start',
-    flexDirection: 'column',
     paddingBottom: 25,
-    paddingHorizontal: 40,
+    paddingHorizontal: 20,
   },
   bottomContainer: {
     marginTop: 5,

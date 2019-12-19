@@ -6,7 +6,7 @@ import {
   mineBlocks,
   NULL_ADDRESS,
 } from '@celo/protocol/lib/test-utils'
-import { toFixed } from '@celo/utils/lib/fixidity'
+import { fixed1, toFixed } from '@celo/utils/lib/fixidity'
 import BigNumber from 'bignumber.js'
 import {
   AccountsContract,
@@ -323,50 +323,110 @@ contract('Election', (accounts: string[]) => {
 
         describe('when the voter can vote for an additional group', () => {
           describe('when the voter has sufficient non-voting balance', () => {
-            let resp: any
             beforeEach(async () => {
               await mockLockedGold.incrementNonvotingAccountBalance(voter, value)
-              resp = await election.vote(group, value, NULL_ADDRESS, NULL_ADDRESS)
             })
 
-            it('should add the group to the list of groups the account has voted for', async () => {
-              assert.deepEqual(await election.getGroupsVotedForByAccount(voter), [group])
-            })
+            describe('when the voter has not already voted for this group', () => {
+              let resp: any
+              beforeEach(async () => {
+                resp = await election.vote(group, value, NULL_ADDRESS, NULL_ADDRESS)
+              })
 
-            it("should increment the account's pending votes for the group", async () => {
-              assertEqualBN(await election.getPendingVotesForGroupByAccount(group, voter), value)
-            })
+              it('should add the group to the list of groups the account has voted for', async () => {
+                assert.deepEqual(await election.getGroupsVotedForByAccount(voter), [group])
+              })
 
-            it("should increment the account's total votes for the group", async () => {
-              assertEqualBN(await election.getTotalVotesForGroupByAccount(group, voter), value)
-            })
+              it("should increment the account's pending votes for the group", async () => {
+                assertEqualBN(await election.getPendingVotesForGroupByAccount(group, voter), value)
+              })
 
-            it("should increment the account's total votes", async () => {
-              assertEqualBN(await election.getTotalVotesByAccount(voter), value)
-            })
+              it("should increment the account's total votes for the group", async () => {
+                assertEqualBN(await election.getTotalVotesForGroupByAccount(group, voter), value)
+              })
 
-            it('should increment the total votes for the group', async () => {
-              assertEqualBN(await election.getTotalVotesForGroup(group), value)
-            })
+              it("should increment the account's total votes", async () => {
+                assertEqualBN(await election.getTotalVotesByAccount(voter), value)
+              })
 
-            it('should increment the total votes', async () => {
-              assertEqualBN(await election.getTotalVotes(), value)
-            })
+              it('should increment the total votes for the group', async () => {
+                assertEqualBN(await election.getTotalVotesForGroup(group), value)
+              })
 
-            it("should decrement the account's nonvoting locked gold balance", async () => {
-              assertEqualBN(await mockLockedGold.nonvotingAccountBalance(voter), 0)
-            })
+              it('should increment the total votes', async () => {
+                assertEqualBN(await election.getTotalVotes(), value)
+              })
 
-            it('should emit the ValidatorGroupVoteCast event', async () => {
-              assert.equal(resp.logs.length, 1)
-              const log = resp.logs[0]
-              assertContainSubset(log, {
-                event: 'ValidatorGroupVoteCast',
-                args: {
-                  account: voter,
-                  group,
-                  value: new BigNumber(value),
-                },
+              it("should decrement the account's nonvoting locked gold balance", async () => {
+                assertEqualBN(await mockLockedGold.nonvotingAccountBalance(voter), 0)
+              })
+
+              it('should emit the ValidatorGroupVoteCast event', async () => {
+                assert.equal(resp.logs.length, 1)
+                const log = resp.logs[0]
+                assertContainSubset(log, {
+                  event: 'ValidatorGroupVoteCast',
+                  args: {
+                    account: voter,
+                    group,
+                    value: new BigNumber(value),
+                  },
+                })
+              })
+
+              describe('when the voter has already voted for this group', () => {
+                let response: any
+                beforeEach(async () => {
+                  await mockLockedGold.incrementNonvotingAccountBalance(voter, value)
+                  response = await election.vote(group, value, NULL_ADDRESS, NULL_ADDRESS)
+                })
+
+                it('should not change the list of groups the account has voted for', async () => {
+                  assert.deepEqual(await election.getGroupsVotedForByAccount(voter), [group])
+                })
+
+                it("should increment the account's pending votes for the group", async () => {
+                  assertEqualBN(
+                    await election.getPendingVotesForGroupByAccount(group, voter),
+                    value.times(2)
+                  )
+                })
+
+                it("should increment the account's total votes for the group", async () => {
+                  assertEqualBN(
+                    await election.getTotalVotesForGroupByAccount(group, voter),
+                    value.times(2)
+                  )
+                })
+
+                it("should increment the account's total votes", async () => {
+                  assertEqualBN(await election.getTotalVotesByAccount(voter), value.times(2))
+                })
+
+                it('should increment the total votes for the group', async () => {
+                  assertEqualBN(await election.getTotalVotesForGroup(group), value.times(2))
+                })
+
+                it('should increment the total votes', async () => {
+                  assertEqualBN(await election.getTotalVotes(), value.times(2))
+                })
+
+                it("should decrement the account's nonvoting locked gold balance", async () => {
+                  assertEqualBN(await mockLockedGold.nonvotingAccountBalance(voter), 0)
+                })
+
+                it('should emit the ValidatorGroupVoteCast event', async () => {
+                  assert.equal(response.logs.length, 1)
+                  const log = response.logs[0]
+                  assertContainSubset(log, {
+                    event: 'ValidatorGroupVoteCast',
+                    args: {
+                      account: voter,
+                      group,
+                      value: new BigNumber(value),
+                    },
+                  })
+                })
               })
             })
           })
@@ -751,7 +811,7 @@ contract('Election', (accounts: string[]) => {
     })
   })
 
-  describe('#electValidators', () => {
+  describe('#electValidatorSigners', () => {
     let random: MockRandomInstance
     let totalLockedGold: number
     const group1 = accounts[0]
@@ -766,7 +826,6 @@ contract('Election', (accounts: string[]) => {
     const validator7 = accounts[9]
 
     const hash1 = '0xa5b9d60f32436310afebcfda832817a68921beb782fabf7915cc0460b443116a'
-    const hash2 = '0xa832817a68921b10afebcfd0460b443116aeb782fabf7915cca5b9d60f324363'
 
     // If voterN votes for groupN:
     //   group1 gets 20 votes per member
@@ -812,7 +871,7 @@ contract('Election', (accounts: string[]) => {
 
       it("should return that group's member list", async () => {
         await setRandomness(hash1)
-        assertSameAddresses(await election.electValidators(), [
+        assertSameAddresses(await election.electValidatorSigners(), [
           validator1,
           validator2,
           validator3,
@@ -830,7 +889,7 @@ contract('Election', (accounts: string[]) => {
 
       it('should return maxElectableValidators elected validators', async () => {
         await setRandomness(hash1)
-        assertSameAddresses(await election.electValidators(), [
+        assertSameAddresses(await election.electValidatorSigners(), [
           validator1,
           validator2,
           validator3,
@@ -838,23 +897,6 @@ contract('Election', (accounts: string[]) => {
           validator6,
           validator7,
         ])
-      })
-    })
-
-    describe('when different random values are provided', () => {
-      beforeEach(async () => {
-        await election.vote(group1, voter1.weight, group2, NULL_ADDRESS, { from: voter1.address })
-        await election.vote(group2, voter2.weight, NULL_ADDRESS, group1, { from: voter2.address })
-        await election.vote(group3, voter3.weight, NULL_ADDRESS, group2, { from: voter3.address })
-      })
-
-      it('should return different results', async () => {
-        await setRandomness(hash1)
-        const valsWithHash1 = (await election.electValidators()).map((x) => x.toLowerCase())
-        await setRandomness(hash2)
-        const valsWithHash2 = (await election.electValidators()).map((x) => x.toLowerCase())
-        assert.sameMembers(valsWithHash1, valsWithHash2)
-        assert.notDeepEqual(valsWithHash1, valsWithHash2)
       })
     })
 
@@ -872,7 +914,7 @@ contract('Election', (accounts: string[]) => {
 
       it('should elect only n members from that group', async () => {
         await setRandomness(hash1)
-        assertSameAddresses(await election.electValidators(), [
+        assertSameAddresses(await election.electValidatorSigners(), [
           validator7,
           validator1,
           validator2,
@@ -894,7 +936,7 @@ contract('Election', (accounts: string[]) => {
 
       it('should not elect any members from that group', async () => {
         await setRandomness(hash1)
-        assertSameAddresses(await election.electValidators(), [
+        assertSameAddresses(await election.electValidatorSigners(), [
           validator1,
           validator2,
           validator3,
@@ -913,7 +955,7 @@ contract('Election', (accounts: string[]) => {
 
       it('should revert', async () => {
         await setRandomness(hash1)
-        await assertRevert(election.electValidators())
+        await assertRevert(election.electValidatorSigners())
       })
     })
   })
@@ -922,9 +964,9 @@ contract('Election', (accounts: string[]) => {
     const voter = accounts[0]
     const group1 = accounts[1]
     const group2 = accounts[2]
-    const voteValue1 = new BigNumber(2000000)
-    const voteValue2 = new BigNumber(1000000)
-    const totalRewardValue = new BigNumber(3000000)
+    const voteValue1 = new BigNumber(2000000000)
+    const voteValue2 = new BigNumber(1000000000)
+    const totalRewardValue = new BigNumber(3000000000)
     beforeEach(async () => {
       await registry.setAddressFor(CeloContractName.Validators, accounts[0])
       await election.markGroupEligible(group1, NULL_ADDRESS, NULL_ADDRESS)
@@ -946,11 +988,28 @@ contract('Election', (accounts: string[]) => {
       })
 
       describe('when the group meets the locked gold requirements ', () => {
-        it('should return the total reward value', async () => {
-          assertEqualBN(
-            await election.getGroupEpochRewards(group1, totalRewardValue),
-            totalRewardValue
-          )
+        describe('when group uptime is 100%', () => {
+          it('should return the total reward value', async () => {
+            assertEqualBN(
+              await election.getGroupEpochRewards(group1, totalRewardValue, [fixed1]),
+              totalRewardValue
+            )
+          })
+        })
+
+        describe('when group uptime is less than 100%', () => {
+          it('should return part of the total reward value', async () => {
+            assertEqualBN(
+              await election.getGroupEpochRewards(group1, totalRewardValue, [toFixed(0.5)]),
+              totalRewardValue.idiv(2)
+            )
+          })
+        })
+
+        describe('when group uptime is zero', () => {
+          it('should return zero', async () => {
+            assertEqualBN(await election.getGroupEpochRewards(group1, totalRewardValue, [0]), 0)
+          })
         })
       })
 
@@ -960,7 +1019,7 @@ contract('Election', (accounts: string[]) => {
         })
 
         it('should return zero', async () => {
-          assertEqualBN(await election.getGroupEpochRewards(group1, totalRewardValue), 0)
+          assertEqualBN(await election.getGroupEpochRewards(group1, totalRewardValue, [fixed1]), 0)
         })
       })
     })
@@ -970,6 +1029,7 @@ contract('Election', (accounts: string[]) => {
         .div(voteValue1.plus(voteValue2))
         .times(totalRewardValue)
         .dp(0)
+        .minus(1) // minus 1 wei for rounding errors.
       beforeEach(async () => {
         await mineBlocks(EPOCH, web3)
         await election.activate(group1)
@@ -982,12 +1042,12 @@ contract('Election', (accounts: string[]) => {
         })
 
         it('should return zero for that group', async () => {
-          assertEqualBN(await election.getGroupEpochRewards(group2, totalRewardValue), 0)
+          assertEqualBN(await election.getGroupEpochRewards(group2, totalRewardValue, [fixed1]), 0)
         })
 
         it('should return the proportional reward value for the other group', async () => {
           assertEqualBN(
-            await election.getGroupEpochRewards(group1, totalRewardValue),
+            await election.getGroupEpochRewards(group1, totalRewardValue, [fixed1]),
             expectedGroup1EpochRewards
           )
         })
@@ -997,7 +1057,7 @@ contract('Election', (accounts: string[]) => {
     describe('when the group does not have active votes', () => {
       describe('when the group meets the locked gold requirements ', () => {
         it('should return zero', async () => {
-          assertEqualBN(await election.getGroupEpochRewards(group1, totalRewardValue), 0)
+          assertEqualBN(await election.getGroupEpochRewards(group1, totalRewardValue, [fixed1]), 0)
         })
       })
     })

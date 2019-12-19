@@ -82,6 +82,12 @@ export const fontStyles = StyleSheet.create({
     fontFamily: HindSilguri.Regular,
     color: colors.dark,
   },
+  bodySmallSecondary: {
+    fontSize: 14,
+    lineHeight: 18,
+    fontFamily: HindSilguri.Regular,
+    color: colors.darkSecondary,
+  },
   bodySmallBold: {
     fontSize: 14,
     lineHeight: 18,
@@ -158,7 +164,7 @@ export const fontStyles = StyleSheet.create({
   },
   headerTitle: {
     fontSize: 14,
-    fontFamily: HindSilguri.Medium,
+    fontFamily: HindSilguri.Bold,
     color: colors.dark,
   },
   headerButton: {

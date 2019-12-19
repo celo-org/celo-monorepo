@@ -60,7 +60,7 @@ class CoverArea extends React.PureComponent<Props> {
                 >
                   {t('cover.title')}
                 </H1>
-                <Text style={[fonts.p, textStyles.invert, styles.formName]}>
+                <Text style={[fonts.p, textStyles.readingOnDark, styles.formName]}>
                   {t('cover.joinMovement')}
                 </Text>
                 <EmailForm
@@ -186,7 +186,7 @@ const styles = StyleSheet.create({
     animationDuration: `4s`,
     animationDelay: '3s',
     animationFillMode: 'both',
-    animationIterationCount: '8',
+    animationIterationCount: 8,
     animationKeyframes: [
       {
         '0%': {
