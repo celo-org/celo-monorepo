@@ -198,6 +198,7 @@ export class Header extends React.PureComponent<Props, State> {
     const isHomePage = this.props.router.pathname === menu.HOME.link
     return (
       <View
+        // @ts-ignore
         style={[
           styles.container,
           bannerStyle.slideDown,
@@ -324,7 +325,6 @@ export class Header extends React.PureComponent<Props, State> {
 
 const styles = StyleSheet.create({
   container: {
-    // @ts-ignore
     position: 'fixed',
     left: 0,
     right: 0,
@@ -411,8 +411,7 @@ const styles = StyleSheet.create({
     display: 'none',
   },
   logoLeftVisible: {
-    // @ts-ignore
-    display: 'visible',
+    display: 'flex',
   },
   medium: {
     display: 'flex',
