@@ -3,7 +3,7 @@ import colors from '@celo/react-components/styles/colors'
 import fontStyles from '@celo/react-components/styles/fonts'
 import { componentStyles } from '@celo/react-components/styles/styles'
 import * as React from 'react'
-import { withNamespaces, WithNamespaces } from 'react-i18next'
+import { WithTranslation, withTranslation } from 'react-i18next'
 import { StyleSheet, Text, View } from 'react-native'
 import Modal from 'react-native-modal'
 import { Namespaces } from 'src/i18n'
@@ -13,7 +13,7 @@ interface OwnProps {
   isVisible: boolean
 }
 
-type Props = OwnProps & WithNamespaces
+type Props = OwnProps & WithTranslation
 
 function VerificationFailedModal(props: Props) {
   const onSkip = () => {
@@ -63,4 +63,4 @@ const styles = StyleSheet.create({
   },
 })
 
-export default withNamespaces(Namespaces.nuxVerification2)(VerificationFailedModal)
+export default withTranslation(Namespaces.nuxVerification2)(VerificationFailedModal)

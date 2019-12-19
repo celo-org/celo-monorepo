@@ -4,7 +4,7 @@ import colors from '@celo/react-components/styles/colors'
 import { CURRENCY_ENUM } from '@celo/utils/src/currencies'
 import BigNumber from 'bignumber.js'
 import * as React from 'react'
-import { withNamespaces, WithNamespaces } from 'react-i18next'
+import { WithTranslation, withTranslation } from 'react-i18next'
 import { ActivityIndicator, StyleSheet, View } from 'react-native'
 import Modal from 'react-native-modal'
 import SafeAreaView from 'react-native-safe-area-view'
@@ -74,7 +74,7 @@ interface State {
   buttonReset: boolean
 }
 
-type Props = NavigationInjectedProps & DispatchProps & StateProps & WithNamespaces
+type Props = NavigationInjectedProps & DispatchProps & StateProps & WithTranslation
 
 class SendConfirmation extends React.Component<Props, State> {
   static navigationOptions = { header: null }
@@ -295,5 +295,5 @@ export default componentWithAnalytics(
   connect<StateProps, DispatchProps, {}, RootState>(
     mapStateToProps,
     mapDispatchToProps
-  )(withNamespaces(Namespaces.sendFlow7)(SendConfirmation))
+  )(withTranslation(Namespaces.sendFlow7)(SendConfirmation))
 )

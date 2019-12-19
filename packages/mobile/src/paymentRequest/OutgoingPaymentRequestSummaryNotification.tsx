@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { WithNamespaces, withNamespaces } from 'react-i18next'
+import { WithTranslation, withTranslation } from 'react-i18next'
 import { Image, StyleSheet } from 'react-native'
 import { connect } from 'react-redux'
 import { PaymentRequest } from 'src/account/types'
@@ -32,7 +32,7 @@ interface DispatchProps {
   updatePaymentRequestNotified: typeof updatePaymentRequestNotified
 }
 
-type Props = OwnProps & DispatchProps & WithNamespaces & StateProps
+type Props = OwnProps & DispatchProps & WithTranslation & StateProps
 
 interface StateProps {
   e164PhoneNumberAddressMapping: E164NumberToAddressType
@@ -106,4 +106,4 @@ export default connect<StateProps, DispatchProps, {}, RootState>(
     updatePaymentRequestStatus,
     updatePaymentRequestNotified,
   }
-)(withNamespaces(Namespaces.walletFlow5)(OutgoingPaymentRequestSummaryNotification))
+)(withTranslation(Namespaces.walletFlow5)(OutgoingPaymentRequestSummaryNotification))

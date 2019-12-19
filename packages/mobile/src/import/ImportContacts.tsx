@@ -3,7 +3,7 @@ import colors from '@celo/react-components/styles/colors'
 import { fontStyles } from '@celo/react-components/styles/fonts'
 import { componentStyles } from '@celo/react-components/styles/styles'
 import * as React from 'react'
-import { WithNamespaces, withNamespaces } from 'react-i18next'
+import { WithTranslation, withTranslation } from 'react-i18next'
 import { ActivityIndicator, ScrollView, StyleSheet, Text, View } from 'react-native'
 import SafeAreaView from 'react-native-safe-area-view'
 import { connect } from 'react-redux'
@@ -35,7 +35,7 @@ interface State {
   isSubmitting: boolean
 }
 
-type Props = WithNamespaces & DispatchProps & StateProps
+type Props = WithTranslation & DispatchProps & StateProps
 
 const mapStateToProps = (state: RootState): StateProps => {
   return {
@@ -190,5 +190,5 @@ export default componentWithAnalytics(
       importContacts,
       denyImportContacts,
     }
-  )(withNamespaces(Namespaces.nuxNamePin1)(ImportContacts))
+  )(withTranslation(Namespaces.nuxNamePin1)(ImportContacts))
 )

@@ -3,7 +3,7 @@ import ContactCircle from '@celo/react-components/components/ContactCircle'
 import colors from '@celo/react-components/styles/colors'
 import fontStyles from '@celo/react-components/styles/fonts'
 import * as React from 'react'
-import { WithNamespaces, withNamespaces } from 'react-i18next'
+import { WithTranslation, withTranslation } from 'react-i18next'
 import { Image, StyleSheet, Text, View } from 'react-native'
 import { PaymentRequestStatus } from 'src/account/types'
 import CeloAnalytics from 'src/analytics/CeloAnalytics'
@@ -27,7 +27,7 @@ interface OwnProps {
 
 const AVATAR_SIZE = 40
 
-type Props = OwnProps & WithNamespaces
+type Props = OwnProps & WithTranslation
 
 export class OutgoingPaymentRequestListItem extends React.Component<Props> {
   onRemind = () => {
@@ -100,4 +100,4 @@ const styles = StyleSheet.create({
   },
 })
 
-export default withNamespaces(Namespaces.paymentRequestFlow)(OutgoingPaymentRequestListItem)
+export default withTranslation(Namespaces.paymentRequestFlow)(OutgoingPaymentRequestListItem)

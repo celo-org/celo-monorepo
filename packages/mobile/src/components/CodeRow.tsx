@@ -5,7 +5,7 @@ import colors from '@celo/react-components/styles/colors'
 import fontStyles from '@celo/react-components/styles/fonts'
 import { componentStyles } from '@celo/react-components/styles/styles'
 import * as React from 'react'
-import { withNamespaces, WithNamespaces } from 'react-i18next'
+import { WithTranslation, withTranslation } from 'react-i18next'
 import { ActivityIndicator, StyleSheet, Text, View } from 'react-native'
 import { Namespaces } from 'src/i18n'
 
@@ -27,7 +27,7 @@ export interface CodeRowProps {
   shouldShowClipboard: (value: string) => boolean
 }
 
-type Props = CodeRowProps & WithNamespaces
+type Props = CodeRowProps & WithTranslation
 
 function CodeRow({
   status,
@@ -152,4 +152,4 @@ const styles = StyleSheet.create({
   },
 })
 
-export default withNamespaces(Namespaces.global)(CodeRow)
+export default withTranslation(Namespaces.global)(CodeRow)

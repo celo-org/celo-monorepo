@@ -4,7 +4,7 @@ import Button, { BtnTypes } from '@celo/react-components/components/Button'
 import colors from '@celo/react-components/styles/colors'
 import { fontStyles } from '@celo/react-components/styles/fonts'
 import * as React from 'react'
-import { withNamespaces, WithNamespaces } from 'react-i18next'
+import { WithTranslation, withTranslation } from 'react-i18next'
 import { Image, Platform, StyleSheet, Text, View } from 'react-native'
 import * as AndroidOpenSettings from 'react-native-android-open-settings'
 import { componentWithAnalytics } from 'src/analytics/wrapper'
@@ -14,7 +14,7 @@ import { navigate } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
 import { getLocalTimezone, getRemoteTime } from 'src/utils/time'
 
-export class SetClock extends React.Component<WithNamespaces> {
+export class SetClock extends React.Component<WithTranslation> {
   static navigationOptions = { header: null }
 
   goToSettings = () => {
@@ -88,4 +88,4 @@ const style = StyleSheet.create({
   },
 })
 
-export default componentWithAnalytics(withNamespaces(Namespaces.global)(SetClock))
+export default componentWithAnalytics(withTranslation(Namespaces.global)(SetClock))

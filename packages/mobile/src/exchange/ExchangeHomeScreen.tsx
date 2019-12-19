@@ -3,7 +3,7 @@ import ScrollContainer from '@celo/react-components/components/ScrollContainer'
 import SectionHeadNew from '@celo/react-components/components/SectionHeadNew'
 import BigNumber from 'bignumber.js'
 import * as React from 'react'
-import { withNamespaces, WithNamespaces } from 'react-i18next'
+import { WithTranslation, withTranslation } from 'react-i18next'
 import { StyleSheet, View } from 'react-native'
 import SafeAreaView from 'react-native-safe-area-view'
 import { connect } from 'react-redux'
@@ -30,7 +30,7 @@ interface DispatchProps {
   fetchExchangeRate: typeof fetchExchangeRate
 }
 
-type Props = StateProps & DispatchProps & WithNamespaces
+type Props = StateProps & DispatchProps & WithTranslation
 
 const mapStateToProps = (state: RootState): StateProps => ({
   exchangeRate: getRateForMakerToken(state.exchange.exchangeRatePair, CURRENCY_ENUM.DOLLAR),
@@ -111,7 +111,7 @@ export default componentWithAnalytics(
     {
       fetchExchangeRate,
     }
-  )(withNamespaces(Namespaces.exchangeFlow9)(ExchangeHomeScreen))
+  )(withTranslation(Namespaces.exchangeFlow9)(ExchangeHomeScreen))
 )
 
 const styles = StyleSheet.create({

@@ -6,7 +6,7 @@ import colors from '@celo/react-components/styles/colors'
 import fontStyles from '@celo/react-components/styles/fonts'
 import { componentStyles } from '@celo/react-components/styles/styles'
 import * as React from 'react'
-import { withNamespaces, WithNamespaces } from 'react-i18next'
+import { WithTranslation, withTranslation } from 'react-i18next'
 import { ScrollView, StyleSheet, Text, View } from 'react-native'
 import Modal from 'react-native-modal'
 import SafeAreaView from 'react-native-safe-area-view'
@@ -22,7 +22,7 @@ interface DispatchProps {
   setHasSeenVerificationNux: typeof setHasSeenVerificationNux
 }
 
-type Props = WithNamespaces & DispatchProps
+type Props = WithTranslation & DispatchProps
 
 interface State {
   isModalVisible: boolean
@@ -168,5 +168,5 @@ export default componentWithAnalytics(
   connect<{}, DispatchProps>(
     null,
     mapDispatchToProps
-  )(withNamespaces(Namespaces.nuxVerification2)(VerificationEducationScreen))
+  )(withTranslation(Namespaces.nuxVerification2)(VerificationEducationScreen))
 )

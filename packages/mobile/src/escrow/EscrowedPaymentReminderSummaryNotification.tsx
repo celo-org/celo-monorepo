@@ -1,6 +1,6 @@
 import variables from '@celo/react-components/styles/variables'
 import * as React from 'react'
-import { WithNamespaces, withNamespaces } from 'react-i18next'
+import { WithTranslation, withTranslation } from 'react-i18next'
 import { Image, StyleSheet } from 'react-native'
 import CeloAnalytics from 'src/analytics/CeloAnalytics'
 import { CustomEventNames } from 'src/analytics/constants'
@@ -17,7 +17,7 @@ interface OwnProps {
   payments: EscrowedPayment[]
 }
 
-type Props = OwnProps & WithNamespaces
+type Props = OwnProps & WithTranslation
 
 export class EscrowedPaymentReminderSummaryNotification extends React.Component<Props> {
   onReview = () => {
@@ -63,4 +63,4 @@ const styles = StyleSheet.create({
   },
 })
 
-export default withNamespaces(Namespaces.walletFlow5)(EscrowedPaymentReminderSummaryNotification)
+export default withTranslation(Namespaces.walletFlow5)(EscrowedPaymentReminderSummaryNotification)

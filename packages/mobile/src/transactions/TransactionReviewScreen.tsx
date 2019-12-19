@@ -1,7 +1,7 @@
 import ReviewFrame from '@celo/react-components/components/ReviewFrame'
 import ReviewHeader from '@celo/react-components/components/ReviewHeader'
 import * as React from 'react'
-import { withNamespaces, WithNamespaces } from 'react-i18next'
+import { WithTranslation, withTranslation } from 'react-i18next'
 import { StyleSheet } from 'react-native'
 import SafeAreaView from 'react-native-safe-area-view'
 import { NavigationInjectedProps } from 'react-navigation'
@@ -23,7 +23,7 @@ export interface ReviewProps {
   header: string
 }
 
-type Props = NavigationInjectedProps<NavigationPropsWrapper> & WithNamespaces
+type Props = NavigationInjectedProps<NavigationPropsWrapper> & WithTranslation
 
 class TransactionReviewScreen extends React.PureComponent<Props> {
   static navigationOptions = { header: null }
@@ -92,4 +92,4 @@ const styles = StyleSheet.create({
   },
 })
 
-export default withNamespaces()(TransactionReviewScreen)
+export default withTranslation()(TransactionReviewScreen)

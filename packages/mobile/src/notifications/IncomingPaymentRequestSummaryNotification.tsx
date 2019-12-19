@@ -3,7 +3,7 @@ import colors from '@celo/react-components/styles/colors'
 import fontStyles from '@celo/react-components/styles/fonts'
 import variables from '@celo/react-components/styles/variables'
 import * as React from 'react'
-import { WithNamespaces, withNamespaces } from 'react-i18next'
+import { WithTranslation, withTranslation } from 'react-i18next'
 import { Image, StyleSheet, Text, View } from 'react-native'
 import { connect } from 'react-redux'
 import { PaymentRequest } from 'src/account/types'
@@ -28,7 +28,7 @@ interface OwnProps {
   requests: PaymentRequest[]
 }
 
-type Props = OwnProps & WithNamespaces & StateProps
+type Props = OwnProps & WithTranslation & StateProps
 
 interface StateProps {
   e164PhoneNumberAddressMapping: E164NumberToAddressType
@@ -141,5 +141,5 @@ const styles = StyleSheet.create({
 })
 
 export default connect<StateProps, {}, {}, RootState>(mapStateToProps)(
-  withNamespaces(Namespaces.walletFlow5)(IncomingPaymentRequestSummaryNotification)
+  withTranslation(Namespaces.walletFlow5)(IncomingPaymentRequestSummaryNotification)
 )

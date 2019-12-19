@@ -5,7 +5,7 @@ import { fontStyles } from '@celo/react-components/styles/fonts'
 import variables from '@celo/react-components/styles/variables'
 import BigNumber from 'bignumber.js'
 import * as React from 'react'
-import { WithNamespaces, withNamespaces } from 'react-i18next'
+import { WithTranslation, withTranslation } from 'react-i18next'
 import { Image, StyleSheet, Text, View } from 'react-native'
 import { HomeExchangeFragment } from 'src/apollo/types'
 import { CURRENCY_ENUM, resolveCurrency } from 'src/geth/consts'
@@ -23,7 +23,7 @@ import { getMoneyDisplayValue } from 'src/utils/formatting'
 import { formatFeedTime, getDatetimeDisplayString } from 'src/utils/time'
 
 type Props = (HomeExchangeFragment | ExchangeStandby) &
-  WithNamespaces & {
+  WithTranslation & {
     status?: TransactionStatus
     showGoldAmount: boolean
   }
@@ -289,4 +289,4 @@ const styles = StyleSheet.create({
   },
 })
 
-export default withNamespaces(Namespaces.walletFlow5)(React.memo(ExchangeFeedItem))
+export default withTranslation(Namespaces.walletFlow5)(React.memo(ExchangeFeedItem))

@@ -3,7 +3,7 @@ import colors from '@celo/react-components/styles/colors'
 import fontStyles from '@celo/react-components/styles/fonts'
 import { AccountAuthRequest } from '@celo/utils/src/dappkit'
 import * as React from 'react'
-import { withNamespaces, WithNamespaces } from 'react-i18next'
+import { WithTranslation, withTranslation } from 'react-i18next'
 import { ScrollView, StyleSheet, Text, View } from 'react-native'
 import SafeAreaView from 'react-native-safe-area-view'
 import { NavigationParams, NavigationScreenProp } from 'react-navigation'
@@ -32,7 +32,7 @@ interface StateProps {
   phoneNumber: string | null
 }
 
-type Props = OwnProps & StateProps & WithNamespaces
+type Props = OwnProps & StateProps & WithTranslation
 
 const mapStateToProps = (state: RootState): StateProps => ({
   account: currentAccountSelector(state),
@@ -186,5 +186,5 @@ const styles = StyleSheet.create({
 })
 
 export default connect<StateProps, null, {}, RootState>(mapStateToProps)(
-  withNamespaces(Namespaces.dappkit)(DappKitAccountAuthScreen)
+  withTranslation(Namespaces.dappkit)(DappKitAccountAuthScreen)
 )

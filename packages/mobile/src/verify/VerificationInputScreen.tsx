@@ -8,7 +8,7 @@ import { extractAttestationCodeFromMessage } from '@celo/utils/src/attestations'
 import dotProp from 'dot-prop-immutable'
 import { padStart } from 'lodash'
 import * as React from 'react'
-import { withNamespaces, WithNamespaces } from 'react-i18next'
+import { WithTranslation, withTranslation } from 'react-i18next'
 import { EmitterSubscription, StyleSheet, Text, View } from 'react-native'
 import Modal from 'react-native-modal'
 import SafeAreaView from 'react-native-safe-area-view'
@@ -50,7 +50,7 @@ interface DispatchProps {
   hideAlert: typeof hideAlert
 }
 
-type Props = StateProps & DispatchProps & WithNamespaces
+type Props = StateProps & DispatchProps & WithTranslation
 
 interface State {
   timer: number
@@ -331,5 +331,5 @@ export default componentWithAnalytics(
   connect<StateProps, DispatchProps, {}, RootState>(
     mapStateToProps,
     mapDispatchToProps
-  )(withNamespaces(Namespaces.nuxVerification2)(VerificationInputScreen))
+  )(withTranslation(Namespaces.nuxVerification2)(VerificationInputScreen))
 )

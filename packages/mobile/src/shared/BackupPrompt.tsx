@@ -1,6 +1,6 @@
 import SmartTopAlert, { NotificationTypes } from '@celo/react-components/components/SmartTopAlert'
 import * as React from 'react'
-import { withNamespaces, WithNamespaces } from 'react-i18next'
+import { WithTranslation, withTranslation } from 'react-i18next'
 import { connect } from 'react-redux'
 import { Namespaces } from 'src/i18n'
 import { navigate } from 'src/navigator/NavigationService'
@@ -15,7 +15,7 @@ interface StateProps {
   backupTooLate: boolean
 }
 
-type Props = WithNamespaces & StateProps
+type Props = WithTranslation & StateProps
 
 const mapStateToProps = (state: RootState): StateProps => {
   return {
@@ -43,15 +43,15 @@ export class BackupPrompt extends React.Component<Props> {
     return (
       <SmartTopAlert
         timestamp={Date.now()}
-        text={isVisible && t('backupPrompt')}
+        text={isVisible ? t('backupPrompt') : null}
         onPress={this.goToBackup}
         type={NotificationTypes.MESSAGE}
-        buttonMessage={isVisible && t('getBackupKey')}
+        buttonMessage={isVisible ? t('getBackupKey') : null}
       />
     )
   }
 }
 
 export default connect<StateProps, {}, {}, RootState>(mapStateToProps)(
-  withNamespaces(Namespaces.backupKeyFlow6)(BackupPrompt)
+  withTranslation(Namespaces.backupKeyFlow6)(BackupPrompt)
 )

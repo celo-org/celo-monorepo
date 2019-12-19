@@ -3,7 +3,7 @@ import Touchable from '@celo/react-components/components/Touchable'
 import colors from '@celo/react-components/styles/colors'
 import { fontStyles } from '@celo/react-components/styles/fonts'
 import * as React from 'react'
-import { WithNamespaces, withNamespaces } from 'react-i18next'
+import { WithTranslation, withTranslation } from 'react-i18next'
 import { Dimensions, Image, StyleSheet, Text, View } from 'react-native'
 import Swiper from 'react-native-swiper'
 import CeloAnalytics from 'src/analytics/CeloAnalytics'
@@ -37,7 +37,7 @@ interface CustomizedProps {
   onFinishAlternate?: () => void
 }
 
-type Props = WithNamespaces & CustomizedProps
+type Props = WithTranslation & CustomizedProps
 
 class Education extends React.Component<Props, State> {
   state = {
@@ -219,4 +219,4 @@ const style = StyleSheet.create({
   },
 })
 
-export default componentWithAnalytics(withNamespaces(Namespaces.nuxCurrencyPhoto4)(Education))
+export default componentWithAnalytics(withTranslation(Namespaces.nuxCurrencyPhoto4)(Education))

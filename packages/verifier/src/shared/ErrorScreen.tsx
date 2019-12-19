@@ -1,7 +1,7 @@
 import FullscreenCTA from '@celo/react-components/components/FullscreenCTA'
 import { componentStyles } from '@celo/react-components/styles/styles'
 import * as React from 'react'
-import { withNamespaces, WithNamespaces } from 'react-i18next'
+import { WithTranslation, withTranslation } from 'react-i18next'
 import { Text, View } from 'react-native'
 import { RestartAndroid } from 'react-native-restart-android'
 
@@ -9,7 +9,7 @@ interface OwnProps {
   errorMessage: string
 }
 
-type Props = OwnProps & WithNamespaces
+type Props = OwnProps & WithTranslation
 
 class ErrorScreen extends React.Component<Props> {
   static navigationOptions = { header: null }
@@ -33,4 +33,4 @@ class ErrorScreen extends React.Component<Props> {
   }
 }
 
-export default withNamespaces('global')(ErrorScreen)
+export default withTranslation('global')(ErrorScreen)
