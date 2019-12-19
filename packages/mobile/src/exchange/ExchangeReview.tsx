@@ -5,7 +5,7 @@ import { fontStyles } from '@celo/react-components/styles/fonts'
 import { componentStyles } from '@celo/react-components/styles/styles'
 import BigNumber from 'bignumber.js'
 import * as React from 'react'
-import { withNamespaces, WithNamespaces } from 'react-i18next'
+import { WithTranslation, withTranslation } from 'react-i18next'
 import { ScrollView, StyleSheet, Text, View } from 'react-native'
 import SafeAreaView from 'react-native-safe-area-view'
 import { NavigationInjectedProps } from 'react-navigation'
@@ -55,7 +55,7 @@ interface State {
   inputAmount: BigNumber
 }
 
-type Props = StateProps & WithNamespaces & DispatchProps & NavigationInjectedProps
+type Props = StateProps & WithTranslation & DispatchProps & NavigationInjectedProps
 
 const mapStateToProps = (state: RootState): StateProps => ({
   exchangeRatePair: state.exchange.exchangeRatePair,
@@ -273,5 +273,5 @@ export default componentWithAnalytics(
   connect<StateProps, DispatchProps, {}, RootState>(
     mapStateToProps,
     { exchangeTokens, fetchExchangeRate }
-  )(withNamespaces(Namespaces.exchangeFlow9)(ExchangeReview))
+  )(withTranslation(Namespaces.exchangeFlow9)(ExchangeReview))
 )

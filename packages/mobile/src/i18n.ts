@@ -1,10 +1,11 @@
 import locales from '@celo/mobile/locales'
 import { currencyTranslations } from '@celo/utils/src/currencies'
-// @ts-ignore
-import i18n from 'i18next'
-import { reactI18nextModule } from 'react-i18next'
+import i18n, { LanguageDetectorModule } from 'i18next'
+import { initReactI18next } from 'react-i18next'
 import * as RNLocalize from 'react-native-localize'
 import Logger from 'src/utils/Logger'
+
+const TAG = 'i18n'
 
 export enum Namespaces {
   accountScreen10 = 'accountScreen10',
@@ -40,14 +41,15 @@ function getLanguage() {
   return languageTag
 }
 
-const languageDetector = {
+const languageDetector: LanguageDetectorModule = {
   type: 'languageDetector',
-  async: false,
   detect: getLanguage,
-  // tslint:disable-next-line
-  init: () => {},
-  // tslint:disable-next-line
-  cacheUserLanguage: () => {},
+  init: () => {
+    Logger.debug(TAG, 'Initing language detector')
+  },
+  cacheUserLanguage: (lng: string) => {
+    Logger.debug(TAG, `Skipping user language cache ${lng}`)
+  },
 }
 
 const currencyInterpolator = (text: string, value: any) => {
@@ -67,7 +69,7 @@ const currencyInterpolator = (text: string, value: any) => {
 
 i18n
   .use(languageDetector)
-  .use(reactI18nextModule)
+  .use(initReactI18next)
   .init({
     fallbackLng: {
       default: ['en-US'],
@@ -82,9 +84,12 @@ i18n
     },
     missingInterpolationHandler: currencyInterpolator,
   })
+  .catch((reason: any) => Logger.error(TAG, 'Failed init i18n', reason))
 
 RNLocalize.addEventListener('change', () => {
-  i18n.changeLanguage(getLanguage())
+  i18n
+    .changeLanguage(getLanguage())
+    .catch((reason: any) => Logger.error(TAG, 'Failed to change i18n language', reason))
 })
 
 export default i18n

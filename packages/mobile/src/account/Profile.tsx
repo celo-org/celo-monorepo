@@ -1,6 +1,6 @@
 import ContactCircle from '@celo/react-components/components/ContactCircle'
 import * as React from 'react'
-import { WithNamespaces, withNamespaces } from 'react-i18next'
+import { WithTranslation, withTranslation } from 'react-i18next'
 import { ScrollView, StyleSheet, View } from 'react-native'
 import { connect } from 'react-redux'
 import { UserContactDetails, userContactDetailsSelector } from 'src/account/reducer'
@@ -22,7 +22,7 @@ interface OwnProps {
   navigation: any
 }
 
-type Props = OwnProps & StateProps & WithNamespaces
+type Props = OwnProps & StateProps & WithTranslation
 const mapStateToProps = (state: RootState) => {
   return {
     name: state.account.name,
@@ -88,5 +88,5 @@ const style = StyleSheet.create({
 })
 
 export default connect<StateProps, {}, OwnProps, RootState>(mapStateToProps)(
-  withNamespaces(Namespaces.accountScreen10)(Profile)
+  withTranslation(Namespaces.accountScreen10)(Profile)
 )

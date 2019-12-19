@@ -25,6 +25,9 @@ import { apolloClient } from 'src/services/Apollo'
 import { initializeFirebase } from 'src/services/FirebaseDb'
 import ErrorBoundary from 'src/shared/ErrorBoundary'
 import ErrorScreen from 'src/shared/ErrorScreen'
+import logger from 'src/utils/logger'
+
+const TAG = 'App.tsx'
 
 YellowBox.ignoreWarnings([
   'Warning: isMounted(...) is deprecated',
@@ -98,7 +101,9 @@ const mapStateToProps = (state: RootState): NavigatorStateProps => {
 class Navigator extends React.Component<Props> {
   async componentDidMount() {
     if (this.props.language) {
-      i18n.changeLanguage(this.props.language)
+      i18n
+        .changeLanguage(this.props.language)
+        .catch((reason: any) => logger.error(TAG, 'Failed to change i18n language', reason))
       this.props.setLanguage(this.props.language)
     }
 

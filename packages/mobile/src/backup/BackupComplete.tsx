@@ -1,7 +1,7 @@
 import colors from '@celo/react-components/styles/colors'
 import { fontStyles } from '@celo/react-components/styles/fonts'
 import * as React from 'react'
-import { WithNamespaces, withNamespaces } from 'react-i18next'
+import { WithTranslation, withTranslation } from 'react-i18next'
 import { StyleSheet, Text, View } from 'react-native'
 import SafeAreaView from 'react-native-safe-area-view'
 import { connect } from 'react-redux'
@@ -22,7 +22,7 @@ interface DispatchProps {
   exitBackupFlow: typeof exitBackupFlow
 }
 
-type Props = StateProps & DispatchProps & WithNamespaces
+type Props = StateProps & DispatchProps & WithTranslation
 
 const mapStateToProps = (state: RootState): StateProps => {
   return {
@@ -97,5 +97,5 @@ export default componentWithAnalytics(
     {
       exitBackupFlow,
     }
-  )(withNamespaces(Namespaces.backupKeyFlow6)(BackupComplete))
+  )(withTranslation(Namespaces.backupKeyFlow6)(BackupComplete))
 )

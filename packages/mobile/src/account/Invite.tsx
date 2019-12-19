@@ -1,6 +1,6 @@
 import colors from '@celo/react-components/styles/colors'
 import * as React from 'react'
-import { withNamespaces, WithNamespaces } from 'react-i18next'
+import { WithTranslation, withTranslation } from 'react-i18next'
 import { StyleSheet } from 'react-native'
 import SafeAreaView from 'react-native-safe-area-view'
 import { NavigationInjectedProps, withNavigation } from 'react-navigation'
@@ -51,7 +51,7 @@ const mapDispatchToProps = {
   importContacts,
 }
 
-type Props = StateProps & DispatchProps & WithNamespaces & NavigationInjectedProps
+type Props = StateProps & DispatchProps & WithTranslation & NavigationInjectedProps
 
 const mapStateToProps = (state: RootState): StateProps => ({
   defaultCountryCode: defaultCountryCodeSelector(state),
@@ -143,5 +143,5 @@ export default componentWithAnalytics(
   connect<StateProps, DispatchProps, {}, RootState>(
     mapStateToProps,
     mapDispatchToProps
-  )(withNamespaces(Namespaces.sendFlow7)(withNavigation(Invite)))
+  )(withTranslation(Namespaces.sendFlow7)(withNavigation(Invite)))
 )

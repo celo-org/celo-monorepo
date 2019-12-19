@@ -3,7 +3,7 @@ import ContactCircle from '@celo/react-components/components/ContactCircle'
 import fontStyles from '@celo/react-components/styles/fonts'
 import BigNumber from 'bignumber.js'
 import * as React from 'react'
-import { WithNamespaces, withNamespaces } from 'react-i18next'
+import { WithTranslation, withTranslation } from 'react-i18next'
 import { Image, StyleSheet, Text, View } from 'react-native'
 import { PaymentRequestStatus } from 'src/account/types'
 import CeloAnalytics from 'src/analytics/CeloAnalytics'
@@ -27,7 +27,7 @@ interface OwnProps {
   updatePaymentRequestStatus: typeof updatePaymentRequestStatus
 }
 
-type Props = OwnProps & WithNamespaces
+type Props = OwnProps & WithTranslation
 
 const AVATAR_SIZE = 40
 
@@ -116,4 +116,4 @@ const styles = StyleSheet.create({
   },
 })
 
-export default withNamespaces(Namespaces.paymentRequestFlow)(IncomingPaymentRequestListItem)
+export default withTranslation(Namespaces.paymentRequestFlow)(IncomingPaymentRequestListItem)

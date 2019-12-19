@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { withNamespaces, WithNamespaces } from 'react-i18next'
+import { WithTranslation, withTranslation } from 'react-i18next'
 import { Platform, StyleSheet } from 'react-native'
 import { WebView } from 'react-native-webview'
 import componentWithAnalytics from 'src/analytics/wrapper'
@@ -11,7 +11,7 @@ const licenseURI = Platform.select({
   android: 'file:///android_asset/custom/LicenseDisclaimer.txt',
 })
 
-type Props = {} & WithNamespaces
+type Props = {} & WithTranslation
 
 class Licenses extends React.Component<Props> {
   static navigationOptions = () => ({
@@ -36,4 +36,4 @@ const styles = StyleSheet.create({
   },
 })
 
-export default componentWithAnalytics(withNamespaces(Namespaces.accountScreen10)(Licenses))
+export default componentWithAnalytics(withTranslation(Namespaces.accountScreen10)(Licenses))

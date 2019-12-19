@@ -1,5 +1,5 @@
 import React from 'react'
-import { WithNamespaces, withNamespaces } from 'react-i18next'
+import { WithTranslation, withTranslation } from 'react-i18next'
 import { NavigationInjectedProps } from 'react-navigation'
 import { connect } from 'react-redux'
 import { getIncomingPaymentRequests } from 'src/account/selectors'
@@ -38,7 +38,7 @@ const mapStateToProps = (state: RootState): StateProps => ({
   recipientCache: recipientCacheSelector(state),
 })
 
-type Props = NavigationInjectedProps & WithNamespaces & StateProps & DispatchProps
+type Props = NavigationInjectedProps & WithTranslation & StateProps & DispatchProps
 
 export const listItemRenderer = (params: {
   recipientCache: NumberToRecipient
@@ -83,4 +83,4 @@ export default connect<StateProps, DispatchProps, {}, RootState>(
     updatePaymentRequestStatus,
     fetchPhoneAddresses,
   }
-)(withNamespaces(Namespaces.paymentRequestFlow)(IncomingPaymentRequestListScreen))
+)(withTranslation(Namespaces.paymentRequestFlow)(IncomingPaymentRequestListScreen))

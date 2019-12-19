@@ -4,7 +4,7 @@ import { fontStyles } from '@celo/react-components/styles/fonts'
 import { anonymizedPhone, isE164Number } from '@celo/utils/src/phoneNumbers'
 import * as Sentry from '@sentry/react-native'
 import * as React from 'react'
-import { WithNamespaces, withNamespaces } from 'react-i18next'
+import { WithTranslation, withTranslation } from 'react-i18next'
 import { Clipboard, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
 import DeviceInfo from 'react-native-device-info'
 import SafeAreaView from 'react-native-safe-area-view'
@@ -43,7 +43,7 @@ interface StateProps {
   numberVerified: boolean
 }
 
-type Props = StateProps & DispatchProps & WithNamespaces
+type Props = StateProps & DispatchProps & WithTranslation
 
 interface State {
   version: string
@@ -315,4 +315,4 @@ const style = StyleSheet.create({
 export default connect<StateProps, DispatchProps, {}, RootState>(
   mapStateToProps,
   mapDispatchToProps
-)(withNamespaces(Namespaces.accountScreen10)(Account))
+)(withTranslation(Namespaces.accountScreen10)(Account))

@@ -2,7 +2,7 @@ import colors from '@celo/react-components/styles/colors'
 import { fontStyles } from '@celo/react-components/styles/fonts'
 import BigNumber from 'bignumber.js'
 import * as React from 'react'
-import { withNamespaces, WithNamespaces } from 'react-i18next'
+import { WithTranslation, withTranslation } from 'react-i18next'
 import { StyleSheet, Text, View } from 'react-native'
 import CurrencyDisplay from 'src/components/CurrencyDisplay'
 import FeeIcon from 'src/components/FeeIcon'
@@ -28,7 +28,7 @@ export interface ExchangeConfirmationCardProps {
   newGoldBalance?: BigNumber
 }
 
-type Props = ExchangeConfirmationCardProps & WithNamespaces
+type Props = ExchangeConfirmationCardProps & WithTranslation
 
 const getTakerToken = (props: Props) => {
   return props.makerToken === CURRENCY_ENUM.DOLLAR ? CURRENCY_ENUM.GOLD : CURRENCY_ENUM.DOLLAR
@@ -202,4 +202,4 @@ const styles = StyleSheet.create({
   },
 })
 
-export default withNamespaces(Namespaces.exchangeFlow9)(ExchangeConfirmationCard)
+export default withTranslation(Namespaces.exchangeFlow9)(ExchangeConfirmationCard)

@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { WithNamespaces, withNamespaces } from 'react-i18next'
+import { WithTranslation, withTranslation } from 'react-i18next'
 import { View } from 'react-native'
 import { NavigationInjectedProps } from 'react-navigation'
 import { connect } from 'react-redux'
@@ -38,7 +38,7 @@ const mapStateToProps = (state: RootState): StateProps => ({
   recipientCache: recipientCacheSelector(state),
 })
 
-type Props = NavigationInjectedProps & WithNamespaces & StateProps & DispatchProps
+type Props = NavigationInjectedProps & WithTranslation & StateProps & DispatchProps
 
 export const listItemRenderer = (payment: EscrowedPayment, key: number | undefined = undefined) => {
   return (
@@ -70,4 +70,4 @@ export default connect<StateProps, DispatchProps, {}, RootState>(
     updatePaymentRequestStatus,
     fetchPhoneAddresses,
   }
-)(withNamespaces(Namespaces.global)(EscrowedPaymentListScreen))
+)(withTranslation(Namespaces.global)(EscrowedPaymentListScreen))

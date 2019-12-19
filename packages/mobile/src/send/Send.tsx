@@ -2,7 +2,7 @@ import colors from '@celo/react-components/styles/colors'
 import { fontStyles } from '@celo/react-components/styles/fonts'
 import { throttle } from 'lodash'
 import * as React from 'react'
-import { withNamespaces, WithNamespaces } from 'react-i18next'
+import { WithTranslation, withTranslation } from 'react-i18next'
 import { ActivityIndicator, StyleSheet, Text, View } from 'react-native'
 import SafeAreaView from 'react-native-safe-area-view'
 import { NavigationInjectedProps, withNavigation } from 'react-navigation'
@@ -75,7 +75,7 @@ interface DispatchProps {
   estimateFee: typeof estimateFee
 }
 
-type Props = StateProps & DispatchProps & WithNamespaces & NavigationInjectedProps
+type Props = StateProps & DispatchProps & WithTranslation & NavigationInjectedProps
 
 const mapStateToProps = (state: RootState): StateProps => ({
   defaultCountryCode: state.account.defaultCountryCode,
@@ -261,5 +261,5 @@ export default componentWithAnalytics(
   connect<StateProps, DispatchProps, {}, RootState>(
     mapStateToProps,
     mapDispatchToProps
-  )(withNamespaces(Namespaces.sendFlow7)(withNavigation(Send)))
+  )(withTranslation(Namespaces.sendFlow7)(withNavigation(Send)))
 )
