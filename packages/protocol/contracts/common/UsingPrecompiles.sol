@@ -159,7 +159,7 @@ contract UsingPrecompiles {
   function getParentHashFromHeader(bytes memory header) public view returns (bytes32) {}
 
   // Get hash from header
-  function blockHashFromHeader(bytes memory header) public view returns (bytes32) {}
+  function hashHeader(bytes memory header) public view returns (bytes32) {}
 
   // Verifies the BLS signature on the header and returns the seal bitmap.
   // The validator set used for verification is retrieved based on the parent

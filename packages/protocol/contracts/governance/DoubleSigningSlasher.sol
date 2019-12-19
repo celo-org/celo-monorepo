@@ -86,10 +86,7 @@ contract DoubleSigningSlasher is SlasherUtil {
     bytes memory blockA,
     bytes memory blockB
   ) public view returns (uint256) {
-    require(
-      blockHashFromHeader(blockA) != blockHashFromHeader(blockB),
-      "Block hashes have to be different"
-    );
+    require(hashHeader(blockA) != hashHeader(blockB), "Block hashes have to be different");
     uint256 blockNumber = getBlockNumberFromHeader(blockA);
     require(
       blockNumber == getBlockNumberFromHeader(blockB),
@@ -149,11 +146,11 @@ contract DoubleSigningSlasher is SlasherUtil {
     address[] memory groupElectionGreaters,
     uint256[] memory groupElectionIndices
   ) public {
-    require(!isSlashed[signer][blockHashFromHeader(headerA)], "Already slashed");
-    require(!isSlashed[signer][blockHashFromHeader(headerB)], "Already slashed");
+    require(!isSlashed[signer][hashHeader(headerA)], "Already slashed");
+    require(!isSlashed[signer][hashHeader(headerB)], "Already slashed");
     uint256 blockNumber = checkForDoubleSigning(signer, index, headerA, headerB);
-    isSlashed[signer][blockHashFromHeader(headerA)] = true;
-    isSlashed[signer][blockHashFromHeader(headerB)] = true;
+    isSlashed[signer][hashHeader(headerA)] = true;
+    isSlashed[signer][hashHeader(headerB)] = true;
     address validator = getAccounts().signerToAccount(signer);
     getLockedGold().slash(
       validator,

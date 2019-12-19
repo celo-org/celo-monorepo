@@ -75,7 +75,7 @@ contract MockUsingPrecompiles {
     blockNumbers[keccak256(abi.encodePacked(header))] = number;
   }
 
-  function blockHashFromHeader(bytes memory header) public view returns (bytes32) {
+  function hashHeader(bytes memory header) public view returns (bytes32) {
     return keccak256(header);
   }
 
