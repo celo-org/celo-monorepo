@@ -149,7 +149,6 @@ const styles = StyleSheet.create({
   container: {
     transitionProperty: 'transform',
     transitionDuration: '200ms',
-    // @ts-ignore
     position: 'fixed',
   },
   iconPlaceholder: { width: COIN_SIZE },
@@ -158,7 +157,6 @@ const styles = StyleSheet.create({
     margin: 5,
   },
   section: {
-    // @ts-ignore
     transformOrigin: 'top',
     transform: [{ scaleY: 0 }],
     marginLeft: 20,

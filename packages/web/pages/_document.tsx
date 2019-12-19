@@ -1,4 +1,4 @@
-import Document, { Head, Main, NextScript } from 'next/document'
+import Document, { DocumentContext, Head, Main, NextScript } from 'next/document'
 import * as React from 'react'
 import { AppRegistry, I18nManager } from 'react-native-web'
 import analytics from 'src/analytics/analytics'
@@ -8,18 +8,20 @@ import { isLocaleRTL } from '../server/i18nSetup'
 // @ts-ignore
 const a = analytics
 
-interface NextInitalProps {
-  pathname: string
-  query: any
-  asPath: string
-  req?: any
-  res?: object
-  err?: object
-  renderPage: () => any
+interface NextReq {
+  locale: string
 }
 
-export default class MyDocument extends Document {
-  static async getInitialProps(context: NextInitalProps) {
+interface Props {
+  locale: string
+}
+
+interface PropContext {
+  req: DocumentContext['req'] & NextReq
+}
+
+export default class MyDocument extends Document<Props> {
+  static async getInitialProps(context: DocumentContext & PropContext) {
     const locale = context.req.locale
     const userAgent = context.req.headers['user-agent']
     setDimensionsForScreen(userAgent)
@@ -34,7 +36,6 @@ export default class MyDocument extends Document {
     const page = context.renderPage()
     const styles = React.Children.toArray([
       // <style key={'normalize-style'} dangerouslySetInnerHTML={{ __html: normalizeNextElements }} />,
-      page.styles,
       getStyleElement(),
     ])
 
@@ -46,8 +47,7 @@ export default class MyDocument extends Document {
   }
 
   render() {
-    // @ts-ignore
-    const { locale, pathname } = this.props
+    const { locale } = this.props
     return (
       <html lang={locale} style={{ height: '100%', width: '100%' }}>
         <Head>

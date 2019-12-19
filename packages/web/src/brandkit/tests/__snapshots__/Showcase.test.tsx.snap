@@ -113,7 +113,7 @@ exports[`Showcase renders 1`] = `
     }
   >
     <div
-      className="css-text-76zvg2"
+      className="css-text-901oao"
       dir="auto"
       style={
         Object {
@@ -131,7 +131,7 @@ exports[`Showcase renders 1`] = `
       test
     </div>
     <div
-      className="css-text-76zvg2"
+      className="css-text-901oao"
       dir="auto"
       style={
         Object {
@@ -157,7 +157,7 @@ exports[`Showcase renders 1`] = `
     onResponderRelease={[Function]}
   >
     <a
-      className="css-reset-4rbku5 css-cursor-18t94o4 css-text-76zvg2"
+      className="css-reset-4rbku5 css-cursor-18t94o4 css-text-901oao"
       data-focusable={true}
       dir="auto"
       href="example.com"
