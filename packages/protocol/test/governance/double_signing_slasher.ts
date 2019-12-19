@@ -22,8 +22,6 @@ const DoubleSigningSlasher: TestDoubleSigningSlasherContract = artifacts.require
 const MockLockedGold: MockLockedGoldContract = artifacts.require('MockLockedGold')
 const Registry: RegistryContract = artifacts.require('Registry')
 
-const EPOCH = 100
-
 // @ts-ignore
 // TODO(mcortesi): Use BN
 DoubleSigningSlasher.numberFormat = 'BigNumber'
@@ -39,6 +37,9 @@ contract('DoubleSigningSlasher', (accounts: string[]) => {
   const validator = accounts[1]
   const group = accounts[0]
 
+  const slashingPenalty = 10000
+  const slashingReward = 100
+
   beforeEach(async () => {
     accountsInstance = await Accounts.new()
     await Promise.all(accounts.map((account) => accountsInstance.createAccount({ from: account })))
@@ -52,9 +53,9 @@ contract('DoubleSigningSlasher', (accounts: string[]) => {
     await registry.setAddressFor(CeloContractName.Validators, validators.address)
     await validators.affiliate(group, { from: validator })
     await validators.affiliate(accounts[3], { from: accounts[4] })
-    await slasher.initialize(registry.address, 10000, 100)
+    await slasher.initialize(registry.address, slashingPenalty, slashingReward)
     await Promise.all(
-      accounts.map((account) => mockLockedGold.incrementNonvotingAccountBalance(account, 50000))
+      accounts.map((account) => mockLockedGold.setAccountTotalLockedGold(account, 50000))
     )
   })
 
@@ -103,57 +104,58 @@ contract('DoubleSigningSlasher', (accounts: string[]) => {
   describe('#slash()', () => {
     const blockNumber = 100
     const validatorIndex = 5
-    const blockA = ['0x12', '0x12', '0x12']
-    const blockB = ['0x13', '0x13', '0x13']
-    const blockC = ['0x11', '0x13', '0x14']
+    const headerA = ['0x12', '0x12', '0x12']
+    const headerB = ['0x13', '0x13', '0x13']
+    const headerC = ['0x11', '0x13', '0x14']
     beforeEach(async () => {
-      await slasher.setBlockNumber(blockA, blockNumber)
-      await slasher.setBlockNumber(blockB, blockNumber + 1)
-      await slasher.setBlockNumber(blockC, blockNumber)
-      await slasher.setEpochSigner(Math.floor(blockNumber / EPOCH), validatorIndex, validator)
-      await slasher.setEpochSigner(Math.floor(blockNumber / EPOCH), validatorIndex + 1, validator)
+      await slasher.setBlockNumber(headerA, blockNumber)
+      await slasher.setBlockNumber(headerB, blockNumber + 1)
+      await slasher.setBlockNumber(headerC, blockNumber)
+      const epoch = (await slasher.getEpoch(blockNumber)).toNumber()
+      await slasher.setEpochSigner(epoch, validatorIndex, validator)
+      await slasher.setEpochSigner(epoch, validatorIndex + 1, accounts[4])
       // Signed by validators 0 to 5
       const bitmap = '0x000000000000000000000000000000000000000000000000000000000000003f'
       await slasher.setNumberValidators(7)
-      await slasher.setVerifiedSealBitmap(blockA, bitmap)
-      await slasher.setVerifiedSealBitmap(blockB, bitmap)
-      await slasher.setVerifiedSealBitmap(blockC, bitmap)
+      await slasher.setVerifiedSealBitmap(headerA, bitmap)
+      await slasher.setVerifiedSealBitmap(headerB, bitmap)
+      await slasher.setVerifiedSealBitmap(headerC, bitmap)
     })
     it('fails if block numbers do not match', async () => {
       await assertRevert(
-        slasher.slash(validator, validatorIndex, blockA, blockB, 0, [], [], [], [], [], [])
+        slasher.slash(validator, validatorIndex, headerA, headerB, 0, [], [], [], [], [], [])
       )
     })
     it('fails if is not signed at index', async () => {
       await assertRevert(
-        slasher.slash(validator, validatorIndex + 1, blockA, blockC, 0, [], [], [], [], [], [])
+        slasher.slash(accounts[4], validatorIndex + 1, headerA, headerC, 0, [], [], [], [], [], [])
       )
     })
     it('fails if epoch signer is wrong', async () => {
       await assertRevert(
-        slasher.slash(accounts[4], validatorIndex, blockA, blockC, 0, [], [], [], [], [], [])
+        slasher.slash(accounts[4], validatorIndex, headerA, headerC, 0, [], [], [], [], [], [])
       )
     })
     it('fails if there are not enough signers', async () => {
       await slasher.setNumberValidators(100)
       await assertRevert(
-        slasher.slash(validator, validatorIndex, blockA, blockC, 0, [], [], [], [], [], [])
+        slasher.slash(validator, validatorIndex, headerA, headerC, 0, [], [], [], [], [], [])
       )
     })
     it('decrements gold when success', async () => {
-      await slasher.slash(validator, validatorIndex, blockA, blockC, 0, [], [], [], [], [], [])
-      const balance = await mockLockedGold.nonvotingAccountBalance(validator)
+      await slasher.slash(validator, validatorIndex, headerA, headerC, 0, [], [], [], [], [], [])
+      const balance = await mockLockedGold.accountTotalLockedGold(validator)
       assert.equal(balance.toNumber(), 40000)
     })
     it('also slashes group', async () => {
-      await slasher.slash(validator, validatorIndex, blockA, blockC, 0, [], [], [], [], [], [])
-      const balance = await mockLockedGold.nonvotingAccountBalance(group)
+      await slasher.slash(validator, validatorIndex, headerA, headerC, 0, [], [], [], [], [], [])
+      const balance = await mockLockedGold.accountTotalLockedGold(group)
       assert.equal(balance.toNumber(), 40000)
     })
     it('fails when tried second time', async () => {
-      await slasher.slash(validator, validatorIndex, blockA, blockC, 0, [], [], [], [], [], [])
+      await slasher.slash(validator, validatorIndex, headerA, headerC, 0, [], [], [], [], [], [])
       await assertRevert(
-        slasher.slash(validator, validatorIndex, blockA, blockC, 0, [], [], [], [], [], [])
+        slasher.slash(validator, validatorIndex, headerA, headerC, 0, [], [], [], [], [], [])
       )
     })
   })

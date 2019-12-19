@@ -1,7 +1,11 @@
 pragma solidity ^0.5.3;
 
+import "openzeppelin-solidity/contracts/math/SafeMath.sol";
+
 // TODO(asa): Limit assembly usage by using X.staticcall instead.
 contract UsingPrecompiles {
+  using SafeMath for uint256;
+
   address constant PROOF_OF_POSSESSION = address(0xff - 4);
 
   /**
@@ -141,9 +145,17 @@ contract UsingPrecompiles {
     return success;
   }
 
+  function getEpoch(uint256 blockNumber) public view returns (uint256) {
+    uint256 sz = getEpochSize();
+    return blockNumber.add(sz).sub(1) / sz;
+  }
+
   // RLP decode and retrieve the parent hash from this header.
   // Used to verify that the hash is the same as the block as the given height.
   function getParentHashFromHeader(bytes memory header) public view returns (bytes32) {}
+
+  // Get hash from header
+  function blockHashFromHeader(bytes memory header) public view returns (bytes32) {}
 
   // Verifies the BLS signature on the header and returns the seal bitmap.
   // The validator set used for verification is retrieved based on the parent

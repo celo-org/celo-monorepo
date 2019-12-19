@@ -1,13 +1,10 @@
 pragma solidity ^0.5.3;
 
-import "openzeppelin-solidity/contracts/ownership/Ownable.sol";
 import "openzeppelin-solidity/contracts/math/SafeMath.sol";
 
-import "../common/Initializable.sol";
-import "../common/UsingRegistry.sol";
-import "../common/UsingPrecompiles.sol";
+import "./SlasherUtil.sol";
 
-contract DoubleSigningSlasher is Ownable, Initializable, UsingRegistry, UsingPrecompiles {
+contract DoubleSigningSlasher is SlasherUtil {
   using SafeMath for uint256;
 
   struct SlashingIncentives {
@@ -18,14 +15,17 @@ contract DoubleSigningSlasher is Ownable, Initializable, UsingRegistry, UsingPre
   }
 
   SlashingIncentives public slashingIncentives;
-  mapping(bytes32 => bool) isSlashed;
+
+  // For each signer address, check if a block header has already been slashed
+  mapping(address => mapping(bytes32 => bool)) isSlashed;
 
   event SlashingIncentivesSet(uint256 penalty, uint256 reward);
 
-  /** @notice Initializer
+  /**
+   * @notice Initializer
    * @param registryAddress Sets the registry address. Useful for testing.
    * @param _penalty Penalty for the slashed signer.
-   * @param _reward Reward that the informer gets.
+   * @param _reward Reward that the observer gets.
    */
   function initialize(address registryAddress, uint256 _penalty, uint256 _reward)
     external
@@ -36,13 +36,10 @@ contract DoubleSigningSlasher is Ownable, Initializable, UsingRegistry, UsingPre
     setSlashingIncentives(_penalty, _reward);
   }
 
-  function getEpoch(uint256 blockNumber) internal view returns (uint256) {
-    return blockNumber.sub(1) / getEpochSize();
-  }
-
-  /** @notice Sets slashing incentives.
+  /**
+   * @notice Sets slashing incentives.
    * @param penalty Penalty for the slashed signer.
-   * @param reward Reward that the informer gets.
+   * @param reward Reward that the observer gets.
    */
   function setSlashingIncentives(uint256 penalty, uint256 reward) public onlyOwner {
     require(penalty > reward, "Penalty has to be larger than reward");
@@ -52,7 +49,7 @@ contract DoubleSigningSlasher is Ownable, Initializable, UsingRegistry, UsingPre
   }
 
   /**
-   * @notice Counts the number of set bits.
+   * @notice Counts the number of set bits (Hamming weight).
    * @param v Bitmap.
    * @return Number of set bits.
    */
@@ -67,21 +64,32 @@ contract DoubleSigningSlasher is Ownable, Initializable, UsingRegistry, UsingPre
   }
 
   /**
-   * @notice Given two RLP encoded blocks, calls into a precompile that requires that
+   * @notice Returns the minimum number of required signers for a given block number.
+   */
+  function minQuorumSize(uint256 blockNumber) internal view returns (uint256) {
+    return (2 * numberValidators(blockNumber) + 2) / 3;
+  }
+
+  /**
+   * @notice Given two RLP encoded blocks, calls into precompiles to require that
    * the two block hashes are different, have the same height, have a
    * quorum of signatures, and that `signer` was part of the quorum.
    * @param signer The signer to be slashed.
    * @param index Validator index at the block.
    * @param blockA First double signed block.
    * @param blockB Second double signed block.
-   * @return Block number where double signing occured.
+   * @return Block number where double signing occured. Throws if no double signing is detected.
    */
-  function eval(address signer, uint256 index, bytes memory blockA, bytes memory blockB)
-    public
-    view
-    returns (uint256)
-  {
-    require(keccak256(blockA) != keccak256(blockB), "Block headers have to be different");
+  function checkForDoubleSigning(
+    address signer,
+    uint256 index,
+    bytes memory blockA,
+    bytes memory blockB
+  ) public view returns (uint256) {
+    require(
+      blockHashFromHeader(blockA) != blockHashFromHeader(blockB),
+      "Block hashes have to be different"
+    );
     uint256 blockNumber = getBlockNumberFromHeader(blockA);
     require(
       blockNumber == getBlockNumberFromHeader(blockB),
@@ -97,25 +105,14 @@ contract DoubleSigningSlasher is Ownable, Initializable, UsingRegistry, UsingPre
     require(mapA & (1 << index) != 0, "Didn't sign first block");
     require(mapB & (1 << index) != 0, "Didn't sign second block");
     require(
-      countSetBits(mapA) >= (2 * numberValidators(blockNumber)) / 3,
+      countSetBits(mapA) >= minQuorumSize(blockNumber),
       "Not enough signers in the first block"
     );
     require(
-      countSetBits(mapB) >= (2 * numberValidators(blockNumber)) / 3,
+      countSetBits(mapB) >= minQuorumSize(blockNumber),
       "Not enough signers in the second block"
     );
     return blockNumber;
-  }
-
-  function groupMembershipAtBlock(
-    address validator,
-    uint256 blockNumber,
-    uint256 groupMembershipHistoryIndex
-  ) internal returns (address) {
-    uint256 epoch = getEpoch(blockNumber);
-    require(epoch != 0, "Cannot slash on epoch 0");
-    return
-      getValidators().groupMembershipInEpoch(validator, epoch.sub(1), groupMembershipHistoryIndex);
   }
 
   /**
@@ -152,9 +149,11 @@ contract DoubleSigningSlasher is Ownable, Initializable, UsingRegistry, UsingPre
     address[] memory groupElectionGreaters,
     uint256[] memory groupElectionIndices
   ) public {
-    require(!isSlashed[keccak256(abi.encodePacked(signer, headerA, headerB))], "Already slashed");
-    uint256 blockNumber = eval(signer, index, headerA, headerB);
-    isSlashed[keccak256(abi.encodePacked(signer, headerA, headerB))] = true;
+    require(!isSlashed[signer][blockHashFromHeader(headerA)], "Already slashed");
+    require(!isSlashed[signer][blockHashFromHeader(headerB)], "Already slashed");
+    uint256 blockNumber = checkForDoubleSigning(signer, index, headerA, headerB);
+    isSlashed[signer][blockHashFromHeader(headerA)] = true;
+    isSlashed[signer][blockHashFromHeader(headerB)] = true;
     address validator = getAccounts().signerToAccount(signer);
     getLockedGold().slash(
       validator,
@@ -166,7 +165,7 @@ contract DoubleSigningSlasher is Ownable, Initializable, UsingRegistry, UsingPre
       validatorElectionIndices
     );
     address group = groupMembershipAtBlock(validator, blockNumber, groupMembershipHistoryIndex);
-    if (group == address(0)) return;
+    if (group == address(0)) return; // Should never be true
     getLockedGold().slash(
       group,
       slashingIncentives.penalty,

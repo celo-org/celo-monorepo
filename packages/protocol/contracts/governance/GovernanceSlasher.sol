@@ -14,7 +14,8 @@ contract GovernanceSlasher is Ownable, Initializable, UsingRegistry {
 
   event SlashingApproved(address indexed account, uint256 amount);
 
-  /** @notice Initializer
+  /**
+   * @notice Initializer
    * @param registryAddress Sets the registry address. Useful for testing.
    */
   function initialize(address registryAddress) external initializer {

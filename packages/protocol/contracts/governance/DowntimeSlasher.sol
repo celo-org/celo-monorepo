@@ -3,11 +3,9 @@ pragma solidity ^0.5.3;
 import "openzeppelin-solidity/contracts/ownership/Ownable.sol";
 import "openzeppelin-solidity/contracts/math/SafeMath.sol";
 
-import "../common/Initializable.sol";
-import "../common/UsingRegistry.sol";
-import "../common/UsingPrecompiles.sol";
+import "./SlasherUtil.sol";
 
-contract DowntimeSlasher is Ownable, Initializable, UsingRegistry, UsingPrecompiles {
+contract DowntimeSlasher is SlasherUtil {
   using SafeMath for uint256;
 
   struct SlashingIncentives {
@@ -18,16 +16,19 @@ contract DowntimeSlasher is Ownable, Initializable, UsingRegistry, UsingPrecompi
   }
 
   SlashingIncentives public slashingIncentives;
-  mapping(bytes32 => uint256) isSlashed;
+
+  // For each address, associate each epoch with the last block that was slashed on that epoch
+  mapping(address => mapping(uint256 => uint256)) isSlashed;
   uint256 public slashableDowntime;
 
   event SlashingIncentivesSet(uint256 penalty, uint256 reward);
   event SlashableDowntimeSet(uint256 interval);
 
-  /** @notice Initializer
+  /**
+   * @notice Initializer
    * @param registryAddress Sets the registry address. Useful for testing.
    * @param _penalty Penalty for the slashed signer.
-   * @param _reward Reward that the informer gets.
+   * @param _reward Reward that the observer gets.
    * @param  _slashableDowntime Slashable downtime in blocks.
    */
   function initialize(
@@ -42,9 +43,10 @@ contract DowntimeSlasher is Ownable, Initializable, UsingRegistry, UsingPrecompi
     setSlashableDowntime(_slashableDowntime);
   }
 
-  /** @notice Sets slashing incentives.
+  /**
+   * @notice Sets slashing incentives.
    * @param penalty Penalty for the slashed signer.
-   * @param reward Reward that the informer gets.
+   * @param reward Reward that the observer gets.
    */
   function setSlashingIncentives(uint256 penalty, uint256 reward) public onlyOwner {
     require(penalty > reward, "Penalty has to be larger than reward");
@@ -62,27 +64,6 @@ contract DowntimeSlasher is Ownable, Initializable, UsingRegistry, UsingPrecompi
     require(interval < getEpochSize(), "Slashable downtime must be smaller than epoch size");
     slashableDowntime = interval;
     emit SlashableDowntimeSet(interval);
-  }
-
-  function getEpoch(uint256 blockNumber) internal view returns (uint256) {
-    uint256 sz = getEpochSize();
-    return blockNumber.add(sz).sub(1) / sz;
-  }
-
-  function getEpochBlock(uint256 blockNumber) internal view returns (uint256) {
-    uint256 sz = getEpochSize();
-    return blockNumber.add(sz).sub(1) % sz;
-  }
-
-  function groupMembershipAtBlock(
-    address validator,
-    uint256 blockNumber,
-    uint256 groupMembershipHistoryIndex
-  ) internal returns (address) {
-    uint256 epoch = getEpoch(blockNumber);
-    require(epoch != 0, "Cannot slash on epoch 0");
-    return
-      getValidators().groupMembershipInEpoch(validator, epoch.sub(1), groupMembershipHistoryIndex);
   }
 
   /**
@@ -111,51 +92,25 @@ contract DowntimeSlasher is Ownable, Initializable, UsingRegistry, UsingPrecompi
     return true;
   }
 
+  /**
+   * @notice Returns the end block for the interval.
+   */
   function getEndBlock(uint256 startBlock) internal view returns (uint256) {
     return startBlock + slashableDowntime - 1;
   }
 
-  /**
-  function debugSlashed(address validator, uint256 startBlock)
-    public
-    view
-    returns (uint256, uint256, uint256, uint256)
-  {
-    uint256 endBlock = getEndBlock(startBlock);
-    uint256 startEpochBlock = (startBlock % getEpochSize());
-    uint256 endEpochBlock = endBlock % getEpochSize();
-    uint256 startEpoch = getEpoch(startBlock);
-    uint256 endEpoch = getEpoch(endBlock);
-    return (
-      startEpochBlock,
-      endEpochBlock,
-      isSlashed[keccak256(abi.encodePacked(validator, startEpoch))],
-      isSlashed[keccak256(abi.encodePacked(validator, endEpoch))]
-    );
-  }
-*/
-
   function checkIfAlreadySlashed(address validator, uint256 startBlock) internal {
     uint256 endBlock = getEndBlock(startBlock);
-    uint256 startEpochBlock = getEpochBlock(startBlock);
-    uint256 endEpochBlock = getEpochBlock(endBlock);
     uint256 startEpoch = getEpoch(startBlock);
     uint256 endEpoch = getEpoch(endBlock);
-    require(
-      isSlashed[keccak256(abi.encodePacked(validator, startEpoch))] < startEpochBlock,
-      "Already slashed"
-    );
-    require(
-      isSlashed[keccak256(abi.encodePacked(validator, endEpoch))] < endEpochBlock,
-      "Already slashed"
-    );
-    isSlashed[keccak256(abi.encodePacked(validator, startEpoch))] =
-      startEpochBlock +
-      slashableDowntime;
-    isSlashed[keccak256(abi.encodePacked(validator, endEpoch))] = endEpochBlock + 1;
+    require(isSlashed[validator][startEpoch] < startBlock, "Already slashed");
+    require(isSlashed[validator][endEpoch] < endBlock, "Already slashed");
+    isSlashed[validator][startEpoch] = endBlock + 1;
+    isSlashed[validator][endEpoch] = endBlock + 1;
   }
 
-  /** @notice Requires that `eval` returns true and that the account corresponding to
+  /**
+   * @notice Requires that `isDown` returns true and that the account corresponding to
    * `signer` has not already been slashed for downtime for the epoch
    * corresponding to `startBlock`.
    * If so, fetches the `account` associated with `signer` and the group that
@@ -202,7 +157,7 @@ contract DowntimeSlasher is Ownable, Initializable, UsingRegistry, UsingPrecompi
       validatorElectionIndices
     );
     address group = groupMembershipAtBlock(validator, startBlock, groupMembershipHistoryIndex);
-    if (group == address(0)) return;
+    if (group == address(0)) return; // Should never be true
     getLockedGold().slash(
       group,
       slashingIncentives.penalty,

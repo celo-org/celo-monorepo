@@ -44,7 +44,7 @@ contract('GovernanceSlasher', (accounts: string[]) => {
     await registry.setAddressFor(CeloContractName.LockedGold, mockLockedGold.address)
     await registry.setAddressFor(CeloContractName.Validators, validators.address)
     await slasher.initialize(registry.address)
-    await mockLockedGold.incrementNonvotingAccountBalance(validator, 5000)
+    await mockLockedGold.setAccountTotalLockedGold(validator, 5000)
   })
 
   describe('#initialize()', () => {
@@ -81,7 +81,7 @@ contract('GovernanceSlasher', (accounts: string[]) => {
     it('decrements gold', async () => {
       await slasher.approveSlashing(validator, 1000)
       await slasher.slash(validator, [], [], [])
-      const amount = await mockLockedGold.nonvotingAccountBalance(validator)
+      const amount = await mockLockedGold.accountTotalLockedGold(validator)
       assert.equal(amount.toNumber(), 4000)
     })
     it('has set the approved slashing to zero', async () => {

@@ -24,9 +24,6 @@ const Registry: RegistryContract = artifacts.require('Registry')
 // TODO(mcortesi): Use BN
 DowntimeSlasher.numberFormat = 'BigNumber'
 
-// Hard coded in ganache.
-const EPOCH = 100
-
 contract('DowntimeSlasher', (accounts: string[]) => {
   let accountsInstance: AccountsInstance
   let validators: MockValidatorsInstance
@@ -37,6 +34,10 @@ contract('DowntimeSlasher', (accounts: string[]) => {
   const nonOwner = accounts[1]
   const validator = accounts[1]
   const group = accounts[0]
+
+  const slashingPenalty = 10000
+  const slashingReward = 100
+  const slashableDowntime = 3
 
   beforeEach(async () => {
     accountsInstance = await Accounts.new()
@@ -51,9 +52,9 @@ contract('DowntimeSlasher', (accounts: string[]) => {
     await registry.setAddressFor(CeloContractName.Validators, validators.address)
     await validators.affiliate(group, { from: validator })
     await validators.affiliate(accounts[3], { from: accounts[4] })
-    await slasher.initialize(registry.address, 10000, 100, 3)
+    await slasher.initialize(registry.address, slashingPenalty, slashingReward, slashableDowntime)
     await Promise.all(
-      accounts.map((account) => mockLockedGold.incrementNonvotingAccountBalance(account, 50000))
+      accounts.map((account) => mockLockedGold.setAccountTotalLockedGold(account, 50000))
     )
   })
 
@@ -135,7 +136,7 @@ contract('DowntimeSlasher', (accounts: string[]) => {
     beforeEach(async () => {
       blockNumber = await web3.eth.getBlockNumber()
       startBlock = blockNumber - 50
-      const epoch = Math.floor(blockNumber / EPOCH)
+      const epoch = (await slasher.getEpoch(blockNumber)).toNumber()
       await slasher.setEpochSigner(epoch, validatorIndex, validator)
       await slasher.setEpochSigner(epoch - 1, validatorIndex, validator)
       await slasher.setEpochSigner(epoch + 1, validatorIndex, validator)
@@ -196,7 +197,7 @@ contract('DowntimeSlasher', (accounts: string[]) => {
         [],
         []
       )
-      const balance = await mockLockedGold.nonvotingAccountBalance(validator)
+      const balance = await mockLockedGold.accountTotalLockedGold(validator)
       assert.equal(balance.toNumber(), 40000)
     })
     it('also slashes group', async () => {
@@ -213,7 +214,7 @@ contract('DowntimeSlasher', (accounts: string[]) => {
         [],
         []
       )
-      const balance = await mockLockedGold.nonvotingAccountBalance(group)
+      const balance = await mockLockedGold.accountTotalLockedGold(group)
       assert.equal(balance.toNumber(), 40000)
     })
     it('cannot be slashed twice', async () => {

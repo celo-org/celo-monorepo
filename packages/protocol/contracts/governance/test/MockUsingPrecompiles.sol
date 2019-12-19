@@ -2,7 +2,7 @@ pragma solidity ^0.5.3;
 
 import "../DoubleSigningSlasher.sol";
 
-contract SlashingTestUtils {
+contract MockUsingPrecompiles {
   mapping(bytes32 => bytes32) parentHash;
   mapping(bytes32 => bytes32) verifiedSealBitmap;
   mapping(uint256 => bytes32) parentSealBitmap;
@@ -44,19 +44,24 @@ contract SlashingTestUtils {
     return epochSigner[keccak256(abi.encodePacked(epoch, index))];
   }
 
+  function calcEpoch(uint256 blockNumber) internal pure returns (uint256) {
+    uint256 sz = 100;
+    return (blockNumber + sz - 1) / sz;
+  }
+
   function validatorSignerAddress(uint256 index, uint256 blockNumber)
     public
     view
     returns (address)
   {
-    return epochSigner[keccak256(abi.encodePacked(blockNumber / 100, index))];
+    return epochSigner[keccak256(abi.encodePacked(calcEpoch(blockNumber), index))];
   }
 
   function setNumberValidators(uint256 num) public {
     numValidators = num;
   }
 
-  function numberValidators(uint256 blockNumber) public view returns (uint256) {
+  function numberValidators(uint256) public view returns (uint256) {
     return numValidators;
   }
 
@@ -68,6 +73,10 @@ contract SlashingTestUtils {
 
   function setBlockNumber(bytes memory header, uint256 number) public returns (uint256) {
     blockNumbers[keccak256(abi.encodePacked(header))] = number;
+  }
+
+  function blockHashFromHeader(bytes memory header) public view returns (bytes32) {
+    return keccak256(header);
   }
 
 }

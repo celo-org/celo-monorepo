@@ -52,6 +52,6 @@ contract MockLockedGold is ILockedGold {
     address[] calldata greaters,
     uint256[] calldata indices
   ) external {
-    decrementNonvotingAccountBalance(account, penalty);
+    accountTotalLockedGold[account] = accountTotalLockedGold[account].sub(penalty);
   }
 }
