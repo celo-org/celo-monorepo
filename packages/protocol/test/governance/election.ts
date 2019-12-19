@@ -1216,35 +1216,105 @@ contract('Election', (accounts: string[]) => {
   describe.only('#slashVotes', () => {
     const voter = accounts[0]
     const group = accounts[1]
-    const value = new BigNumber(1000)
-
-    beforeEach(async () => {
-      await mockValidators.setMembers(group, [accounts[9]])
-      await registry.setAddressFor(CeloContractName.Validators, accounts[0])
-      await election.markGroupEligible(group, NULL_ADDRESS, NULL_ADDRESS)
-      await registry.setAddressFor(CeloContractName.Validators, mockValidators.address)
-      await mockLockedGold.setTotalLockedGold(value)
-      await mockValidators.setNumRegisteredValidators(1)
-      await mockLockedGold.incrementNonvotingAccountBalance(voter, value)
-      await election.vote(group, value, NULL_ADDRESS, NULL_ADDRESS)
-      await registry.setAddressFor(CeloContractName.LockedGold, accounts[2])
-    })
+    const value = 1000
 
     describe('when the account has voted for one group', () => {
-      describe('when the account is slashed for the total voted gold', () => {
-        it('should decrement voted gold to zero', async () => {
-          assert.deepEqual(await election.getGroupsVotedForByAccount(voter), [group])
-          await election.slashVotes(voter, value, [NULL_ADDRESS], [NULL_ADDRESS], [0], {
-            from: accounts[2],
+      beforeEach(async () => {
+        await mockValidators.setMembers(group, [accounts[9]])
+        await registry.setAddressFor(CeloContractName.Validators, accounts[0])
+        await election.markGroupEligible(group, NULL_ADDRESS, NULL_ADDRESS)
+        await registry.setAddressFor(CeloContractName.Validators, mockValidators.address)
+        await mockLockedGold.setTotalLockedGold(value)
+        await mockValidators.setNumRegisteredValidators(1)
+        await mockLockedGold.incrementNonvotingAccountBalance(voter, value)
+        await election.vote(group, value, NULL_ADDRESS, NULL_ADDRESS)
+        // await accountsInstance.createAccount({ from: mockLockedGold.address })
+      })
+
+      describe('when the account only has pending votes', () => {
+        describe('when the account is slashed for the total pending voted gold', () => {
+          const index = 0
+          const revokedValue = value
+          const remaining = value - revokedValue
+
+          it('should decrement pending voted gold to zero', async () => {
+            assert.deepEqual(await election.getGroupsVotedForByAccount(voter), [group])
+            await election.slashVotes(voter, revokedValue, [NULL_ADDRESS], [NULL_ADDRESS], [index])
+            assertEqualBN(await election.getPendingVotesForGroupByAccount(group, voter), remaining)
+            assertEqualBN(await election.getTotalVotesForGroupByAccount(group, voter), remaining)
+            assertEqualBN(await election.getTotalVotesByAccount(voter), remaining)
+            assertEqualBN(await election.getTotalVotesForGroup(group), remaining)
+            assertEqualBN(await election.getTotalVotes(), remaining)
+            assertEqualBN(await mockLockedGold.nonvotingAccountBalance(voter), revokedValue)
+            assert.deepEqual(await election.getGroupsVotedForByAccount(voter), [])
           })
-          assertEqualBN(await election.getPendingVotesForGroupByAccount(group, voter), value)
-          assertEqualBN(await election.getTotalVotesForGroupByAccount(group, voter), value)
-          assertEqualBN(await election.getTotalVotesByAccount(voter), value)
-          assertEqualBN(await election.getTotalVotesForGroup(group), value)
-          assertEqualBN(await election.getTotalVotes(), value)
-          assertEqualBN(await mockLockedGold.nonvotingAccountBalance(voter), 0)
+        })
+      })
+
+      describe('when the account only has active votes', () => {
+        beforeEach(async () => {
+          await mineBlocks(EPOCH, web3)
+          await election.activate(group)
+        })
+        describe('when the account is slashed for the total active voting gold', () => {
+          const index = 0
+          const revokedValue = value
+          const remaining = value - revokedValue
+
+          it('should decrement active voted gold to zero', async () => {
+            assert.deepEqual(await election.getGroupsVotedForByAccount(voter), [group])
+            await election.slashVotes(voter, revokedValue, [NULL_ADDRESS], [NULL_ADDRESS], [index])
+            assertEqualBN(await election.getActiveVotesForGroupByAccount(group, voter), remaining)
+            assertEqualBN(await election.getTotalVotesForGroupByAccount(group, voter), remaining)
+            assertEqualBN(await election.getTotalVotesByAccount(voter), remaining)
+            assertEqualBN(await election.getTotalVotesForGroup(group), remaining)
+            assertEqualBN(await election.getTotalVotes(), remaining)
+            assertEqualBN(await mockLockedGold.nonvotingAccountBalance(voter), revokedValue)
+            assert.deepEqual(await election.getGroupsVotedForByAccount(voter), [])
+          })
         })
       })
     })
+
+    // describe('when the voter has active votes', () => {
+    //     await mineBlocks(EPOCH, web3)
+    //     await election.activate(group)
+    //   })
+
+    //   describe('when the revoked value is less than the pending votes', () => {
+    //     const index = 0
+    //     const revokedValue = value - 1
+    //     const remaining = value - revokedValue
+    //     let resp: any
+    //     beforeEach(async () => {
+    //       resp = await election.revokePending(
+    //         group,
+    //         revokedValue,
+    //         NULL_ADDRESS,
+    //         NULL_ADDRESS,
+    //         index
+    //       )
+    //     })
+
+    //     it("should decrement the account's pending votes for the group", async () => {
+    //       assertEqualBN(await election.getPendingVotesForGroupByAccount(group, voter), remaining)
+    //     })
+
+    //   describe('when the revoked value is less than the active votes', () => {
+    //     const index = 0
+    //     const revokedValue = value - 1
+    //     const remaining = value - revokedValue
+    //     let resp: any
+    //     beforeEach(async () => {
+    //       resp = await election.revokeActive(group, revokedValue, NULL_ADDRESS, NULL_ADDRESS, index)
+    //     })
+
+    //     it("should decrement the account's active votes for the group", async () => {
+    //       assertEqualBN(await election.getActiveVotesForGroupByAccount(group, voter), remaining)
+    //     })
+
+    //     it("should decrement the account's total votes for the group", async () => {
+    //       assertEqualBN(await election.getTotalVotesForGroupByAccount(group, voter), remaining)
+    //     })
   })
 })
