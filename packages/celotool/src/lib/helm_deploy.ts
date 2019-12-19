@@ -427,7 +427,8 @@ export async function pollForBootnodeLoadBalancer(celoEnv: string) {
     await sleep(LOAD_BALANCER_POLL_INTERVAL)
   }
 
-  await sleep(1000 * 60 * 5)
+  console.info('Sleeping 1 minute...')
+  await sleep(1000 * 60) // 1 minute
 
   console.info(`\nReset all pods now that the bootnode load balancer has provisioned`)
   await execCmdWithExitOnFailure(`kubectl delete pod -n ${celoEnv} --selector=component=validators`)

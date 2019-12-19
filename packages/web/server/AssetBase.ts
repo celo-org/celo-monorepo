@@ -34,7 +34,7 @@ export default function getAssets(sheet: AssetSheet) {
 }
 
 function getAirtable(sheet: AssetSheet): Table<Fields> {
-  return airtableInit(getConfig().serverRuntimeConfig.AIRTABLE_BRANDKIT_ID)(sheet)
+  return airtableInit(getConfig().serverRuntimeConfig.AIRTABLE_BRANDKIT_ID)(sheet) as Table<Fields>
 }
 
 const IS_APROVED = 'Approved=1'

@@ -54,12 +54,12 @@ export const handler = async (argv: TransferArgv) => {
 
   checkGethStarted(dataDir)
 
-  const { web3, goldToken, stableToken } = await getWeb3AndTokensContracts()
+  const { kit, goldToken, stableToken } = await getWeb3AndTokensContracts()
 
   const transferrableToken = tokenType === CELO_GOLD ? goldToken : stableToken
 
   await transferERC20Token(
-    web3,
+    kit,
     transferrableToken,
     senderAddress,
     receiverAddress,
