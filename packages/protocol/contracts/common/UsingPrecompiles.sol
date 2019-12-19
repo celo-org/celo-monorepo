@@ -3,6 +3,8 @@ pragma solidity ^0.5.3;
 // TODO(asa): Limit assembly usage by using X.staticcall instead.
 contract UsingPrecompiles {
   address constant PROOF_OF_POSSESSION = address(0xff - 4);
+  address constant GET_BLOCK_NUMBER_FROM_HEADER = address(0xff - 8);
+  address constant HASH_HEADER = address(0xff - 9);
 
   /**
    * @notice calculate a * b^x for fractions a, b to `decimals` precision
@@ -139,5 +141,62 @@ contract UsingPrecompiles {
       abi.encodePacked(sender, blsKey, blsPop)
     );
     return success;
+  }
+
+  /**
+   * @notice Parses block number out of header.
+   * @param header RLP encoded header
+   * @return Block number.
+   */
+  function getBlockNumberFromHeader(bytes memory header) public returns (uint256) {
+    bytes memory blockNumber;
+    bool success;
+    (success, blockNumber) = GET_BLOCK_NUMBER_FROM_HEADER.call.value(0).gas(gasleft())(
+      abi.encodePacked(header)
+    );
+    return getUint256FromBytes(blockNumber, 0);
+  }
+
+  /**
+   * @notice Computes hash of header.
+   * @param header RLP encoded header
+   * @return Header hash.
+   */
+  function hashHeader(bytes memory header) public returns (bytes32) {
+    //return IHashHeader(HASH_HEADER).hashHeader(header);
+    bytes memory hash;
+    bool success;
+    (success, hash) = HASH_HEADER.call.value(0).gas(gasleft())(abi.encodePacked(header));
+    return getBytes32fromBytes(hash, 0);
+  }
+
+  /**
+   * @notice Converts bytes to bytes32.
+   * @param bs byte[] data
+   * @param start offset into byte data to convert
+   * @return bytes32 data
+   */
+  function getBytes32fromBytes(bytes memory bs, uint256 start) internal pure returns (bytes32) {
+    require(bs.length >= start + 32, "slicing out of range");
+    bytes32 x;
+    assembly {
+      x := mload(add(bs, add(0x20, start)))
+    }
+    return x;
+  }
+
+  /**
+   * @notice Converts bytes to uint256.
+   * @param bs byte[] data
+   * @param start offset into byte data to convert
+   * @return uint256 data
+   */
+  function getUint256FromBytes(bytes memory bs, uint256 start) internal pure returns (uint256) {
+    require(bs.length >= start + 32, "slicing out of range");
+    uint256 x;
+    assembly {
+      x := mload(add(bs, add(0x20, start)))
+    }
+    return x;
   }
 }
