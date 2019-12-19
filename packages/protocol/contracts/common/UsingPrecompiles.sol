@@ -1,9 +1,5 @@
 pragma solidity ^0.5.3;
 
-interface IHashHeader {
-  function hashHeader(bytes calldata header) external view returns (bytes32);
-}
-
 // TODO(asa): Limit assembly usage by using X.staticcall instead.
 contract UsingPrecompiles {
   address constant PROOF_OF_POSSESSION = address(0xff - 4);
@@ -158,7 +154,7 @@ contract UsingPrecompiles {
     (success, blockNumber) = GET_BLOCK_NUMBER_FROM_HEADER.call.value(0).gas(gasleft())(
       abi.encodePacked(header)
     );
-    return bytesToUint256(blockNumber, 0);
+    return getUint256FromBytes(blockNumber, 0);
   }
 
   /**
@@ -171,19 +167,16 @@ contract UsingPrecompiles {
     bytes memory hash;
     bool success;
     (success, hash) = HASH_HEADER.call.value(0).gas(gasleft())(abi.encodePacked(header));
-    return bytesToBytes32(hash, 0);
+    return getBytes32fromBytes(hash, 0);
   }
 
-  /*function bytesToBytes32Loop(bytes memory b, uint offset) private pure returns (bytes32) {
-    bytes32 out;
-
-    for (uint i = 0; i < 32; i++) {
-      out |= bytes32(b[offset + i] & 0xFF) >> (i * 8);
-    }
-    return out;
-  }*/
-
-  function bytesToBytes32(bytes memory bs, uint256 start) internal pure returns (bytes32) {
+  /**
+   * @notice Converts bytes to bytes32.
+   * @param bs byte[] data
+   * @param start offset into byte data to convert
+   * @return bytes32 data
+   */
+  function getBytes32fromBytes(bytes memory bs, uint256 start) internal pure returns (bytes32) {
     require(bs.length >= start + 32, "slicing out of range");
     bytes32 x;
     assembly {
@@ -192,7 +185,13 @@ contract UsingPrecompiles {
     return x;
   }
 
-  function bytesToUint256(bytes memory bs, uint256 start) internal pure returns (uint256) {
+  /**
+   * @notice Converts bytes to uint256.
+   * @param bs byte[] data
+   * @param start offset into byte data to convert
+   * @return uint256 data
+   */
+  function getUint256FromBytes(bytes memory bs, uint256 start) internal pure returns (uint256) {
     require(bs.length >= start + 32, "slicing out of range");
     uint256 x;
     assembly {
