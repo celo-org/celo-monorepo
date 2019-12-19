@@ -26,7 +26,7 @@ export const statusTable = {
   elected: {},
   frontRunner: {},
   proposed: {},
-  signatures: { get: (v: ValidatorStatusEntry) => parseInt(v.signatures * 100) + '%' },
+  signatures: { get: (v: ValidatorStatusEntry) => Math.round(v.signatures * 100) + '%' },
 }
 
 export default class ValidatorStatus extends BaseCommand {
@@ -50,6 +50,10 @@ export default class ValidatorStatus extends BaseCommand {
     lookback: flags.integer({
       description: 'how many blocks to look back for signer activity',
       default: 100,
+    }),
+    'no-truncate': flags.boolean({
+      description: "Don't truncate fields to fit line",
+      required: false,
     }),
   }
 
@@ -104,9 +108,9 @@ export default class ValidatorStatus extends BaseCommand {
       checker.isAccount(res.flags.validator).isValidator(res.flags.validator)
       await checker.runChecks()
       const signer = await accounts.getValidatorSigner(res.flags.validator)
-      signers = [res.flags.validator]
+      signers = [signer]
     } else {
-      signers = concurrentMap(10, await validators.getRegisteredValidatorsAddresses(), (a) =>
+      signers = await concurrentMap(10, await validators.getRegisteredValidatorsAddresses(), (a) =>
         accounts.getValidatorSigner(a)
       )
     }
@@ -118,8 +122,8 @@ export default class ValidatorStatus extends BaseCommand {
     const blocks = await concurrentMap(10, [...Array(res.flags.lookback).keys()], (i) =>
       this.web3.eth.getBlock(latest.number - i)
     )
-    const validatorStatuses = await concurrentMap(10, accounts, (a) =>
-      getStatus(a, blocks, electedSigners, frontRunnerSigners)
+    const validatorStatuses = await concurrentMap(10, signers, (s) =>
+      this.getStatus(s, blocks, electedSigners, frontRunnerSigners)
     )
     cli.action.stop()
     cli.table(validatorStatuses, statusTable, { 'no-truncate': res.flags['no-truncate'] })
