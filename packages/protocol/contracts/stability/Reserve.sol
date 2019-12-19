@@ -37,6 +37,10 @@ contract Reserve is IReserve, Ownable, Initializable, UsingRegistry, ReentrancyG
   bytes32[] public assetAllocationSymbols;
   uint256[] public assetAllocationWeights;
 
+  uint256 private lastSpendingDay;
+  FixidityLib.Fraction public spendingRatio;
+  uint256 private spendingLimit;
+
   event TobinTaxStalenessThresholdSet(uint256 value);
   event TokenAdded(address token);
   event TokenRemoved(address token, uint256 index);
@@ -65,6 +69,7 @@ contract Reserve is IReserve, Ownable, Initializable, UsingRegistry, ReentrancyG
     _transferOwnership(msg.sender);
     setRegistry(registryAddress);
     setTobinTaxStalenessThreshold(_tobinTaxStalenessThreshold);
+    spendingRatio = FixidityLib.fixed1();
   }
 
   /**
@@ -75,6 +80,22 @@ contract Reserve is IReserve, Ownable, Initializable, UsingRegistry, ReentrancyG
     require(value > 0, "value was zero");
     tobinTaxStalenessThreshold = value;
     emit TobinTaxStalenessThresholdSet(value);
+  }
+
+  /**
+   * @notice Set the ratio of reserve that is spendable per day.
+   * @param ratio Spending ratio as unwrapped Fraction.
+   */
+  function setDailySpendingRatio(uint256 ratio) public onlyOwner {
+    spendingRatio = FixidityLib.wrap(ratio);
+  }
+
+  /**
+   * @notice Get daily spending ratio.
+   * @return Spending ratio as unwrapped Fraction.
+   */
+  function getDailySpendingRatio() public view onlyOwner returns (uint256) {
+    return spendingRatio.unwrap();
   }
 
   /**
@@ -204,6 +225,14 @@ contract Reserve is IReserve, Ownable, Initializable, UsingRegistry, ReentrancyG
    */
   function transferGold(address to, uint256 value) external returns (bool) {
     require(isSpender[msg.sender], "sender not allowed to transfer Reserve funds");
+    uint256 currentDay = now / 1 days;
+    if (currentDay > lastSpendingDay) {
+      uint256 balance = getGoldToken().balanceOf(address(this));
+      lastSpendingDay = currentDay;
+      spendingLimit = spendingRatio.multiply(FixidityLib.newFixed(balance)).fromFixed();
+    }
+    require(spendingLimit >= value, "Exceeding spending limit");
+    spendingLimit = spendingLimit.sub(value);
     require(getGoldToken().transfer(to, value), "transfer of gold token failed");
     return true;
   }

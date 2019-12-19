@@ -5,6 +5,7 @@ import {
   assertSameAddress,
   timeTravel,
 } from '@celo/protocol/lib/test-utils'
+import { toFixed } from '@celo/utils/lib/fixidity'
 import BigNumber from 'bignumber.js'
 import BN = require('bn.js')
 import {
@@ -64,6 +65,16 @@ contract('Reserve', (accounts: string[]) => {
 
     it('should not be callable again', async () => {
       await assertRevert(reserve.initialize(registry.address, aTobinTaxStalenessThreshold))
+    })
+  })
+
+  describe('#setDailySpendingRatio()', async () => {
+    it('should allow owner to set the ratio', async () => {
+      await reserve.setDailySpendingRatio(123)
+      assert.equal(123, (await reserve.getDailySpendingRatio()).toNumber())
+    })
+    it('should not allow other users to set the ratio', async () => {
+      await assertRevert(reserve.setDailySpendingRatio(123, { from: nonOwner }))
     })
   })
 
@@ -152,18 +163,32 @@ contract('Reserve', (accounts: string[]) => {
   })
 
   describe('#transferGold()', () => {
-    const aValue = 10
+    const aValue = 10000
     beforeEach(async () => {
-      await web3.eth.sendTransaction({
-        from: accounts[0],
-        to: reserve.address,
-        value: aValue,
-      })
+      await mockGoldToken.setBalanceOf(reserve.address, aValue)
       await reserve.addSpender(spender)
     })
 
     it('should allow a spender to call transferGold', async () => {
       await reserve.transferGold(nonOwner, aValue, { from: spender })
+    })
+
+    it('should not allow a spender to transfer more than daily ratio', async () => {
+      await reserve.setDailySpendingRatio(toFixed(0.2))
+      await assertRevert(reserve.transferGold(nonOwner, aValue / 2, { from: spender }))
+    })
+
+    it('daily spending accumulates', async () => {
+      await reserve.setDailySpendingRatio(toFixed(0.15))
+      await reserve.transferGold(nonOwner, aValue * 0.1, { from: spender })
+      await assertRevert(reserve.transferGold(nonOwner, aValue * 0.1, { from: spender }))
+    })
+
+    it('daily spending limit should be reset after 24 hours', async () => {
+      await reserve.setDailySpendingRatio(toFixed(0.15))
+      await reserve.transferGold(nonOwner, aValue * 0.1, { from: spender })
+      await timeTravel(3600 * 24, web3)
+      await reserve.transferGold(nonOwner, aValue * 0.1, { from: spender })
     })
 
     it('should not allow a removed spender to call transferGold', async () => {
@@ -414,7 +439,7 @@ contract('Reserve', (accounts: string[]) => {
     })
   })
 
-  describe.only('#setAssetAllocations', () => {
+  describe('#setAssetAllocations', () => {
     const newAssetAllocationSymbols = [
       web3.utils.padRight(web3.utils.utf8ToHex('cGLD'), 64),
       web3.utils.padRight(web3.utils.utf8ToHex('BTC'), 64),
