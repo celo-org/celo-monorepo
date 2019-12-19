@@ -1211,4 +1211,31 @@ contract Validators is
     ValidatorGroup storage group = groups[account];
     return group.slashInfo.multiplier.unwrap();
   }
+
+  /**
+   * @notice Returns the group that `account` was a member of during `epochNumber`.
+   * @param account The account whose group membership should be returned.
+   * @param epochNumber The epoch number we are querying this account's membership at.
+   * @param index The index into the validator's history struct for their history at `epochNumber`.
+   * @return The group that `account` was a member of during `epochNumber`.
+   */
+  function groupMembershipInEpoch(address account, uint256 epochNumber, uint256 index)
+    external
+    view
+    returns (address)
+  {
+    require(isValidator(account) && epochNumber <= getEpochNumber());
+    MembershipHistory storage history = validators[account].membershipHistory;
+    require(index < history.tail.add(history.numEntries));
+    require(index >= history.tail && history.numEntries > 0, "index out of bounds");
+    bool isExactMatch = history.entries[index].epochNumber == epochNumber;
+    bool isLastEntry = index.sub(history.tail) == history.numEntries.sub(1);
+    bool isWithinRange = history.entries[index].epochNumber < epochNumber &&
+      (history.entries[index.add(1)].epochNumber > epochNumber || isLastEntry);
+    require(
+      isExactMatch || isWithinRange,
+      "provided index does not match provided epochNumber at index in history."
+    );
+    return history.entries[index].group;
+  }
 }
