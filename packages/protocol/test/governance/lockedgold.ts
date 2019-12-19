@@ -4,6 +4,7 @@ import {
   assertLogMatches,
   assertLogMatches2,
   assertRevert,
+  NULL_ADDRESS,
   timeTravel,
 } from '@celo/protocol/lib/test-utils'
 import BigNumber from 'bignumber.js'
@@ -409,6 +410,39 @@ contract('LockedGold', (accounts: string[]) => {
     describe('when a pending withdrawal does not exist', () => {
       it('should revert', async () => {
         await assertRevert(lockedGold.withdraw(index))
+      })
+    })
+  })
+
+  describe('#slash', () => {
+    const value = 1000
+    const reporter = accounts[2]
+
+    beforeEach(async () => {
+      // @ts-ignore: TODO(mcortesi) fix typings for TransactionDetails
+      await lockedGold.lock({ value })
+      await lockedGold.addSlasher(account)
+    })
+
+    describe('when the account is slashed for all of its locked gold', () => {
+      beforeEach(async () => {
+        await lockedGold.slash(
+          account,
+          value,
+          reporter,
+          value / 2,
+          [NULL_ADDRESS],
+          [NULL_ADDRESS],
+          [0]
+        )
+      })
+
+      it("should reduce account's locked gold balance to 0", async () => {
+        assertEqualBN(await lockedGold.getAccountNonvotingLockedGold(account), 0)
+      })
+
+      it("should increase the reporter's locked gold", async () => {
+        assertEqualBN(await lockedGold.getAccountNonvotingLockedGold(reporter), value / 2)
       })
     })
   })
