@@ -40,18 +40,19 @@ export const handler = async function simulateVoting(argv: SimulateVotingArgv) {
     // Maybe this should even be variable, based on how "happy" the staker is with their current vote
     const changeVoteProbability = 1
 
-    // Determine which of the groups can accept more votes
     const groupCapacities = new Map<string, BigNumber>()
-    for (const vgv of await election.getValidatorGroupsVotes()) {
+    for (const groupAddress of await validators.getRegisteredValidatorGroupsAddresses()) {
+      const vgv = await election.getValidatorGroupVotes(groupAddress)
       if (vgv.eligible && vgv.capacity.isGreaterThan(0)) {
-        groupCapacities.set(vgv.address, vgv.capacity)
+        groupCapacities.set(groupAddress, vgv.capacity)
       }
     }
-    console.info(groupCapacities)
 
     // Collect validator scores for each group
     const groupScores = new Map<string, BigNumber[]>()
-    for (const valSigner of await election.electValidatorSigners()) {
+
+    // for (const val of await validators.getRegisteredValidators())
+    for (const valSigner of await election.getCurrentValidatorSigners()) {
       const val = await validators.getValidatorFromSigner(valSigner)
       const groupAddress = val.affiliation!
       if (groupScores.has(groupAddress)) {
@@ -60,28 +61,37 @@ export const handler = async function simulateVoting(argv: SimulateVotingArgv) {
         groupScores.set(groupAddress, [val.score])
       }
     }
-    console.info(groupScores)
 
-    // Calculate scores for the group by averaging the collected scores
-    const groupAvgScores = new Map<string, BigNumber>()
+    const groupWeightedProbability = new Map<string, BigNumber>()
+    let sumOfProbabilities = new BigNumber(0)
     for (const group of groupScores.keys()) {
       const scores = groupScores.get(group)!
       // This shouldn't end up being 0, but handle the edge case and avoid division by 0
       if (scores.length > 0) {
         const avg = scores.reduce((a, b) => a.plus(b), new BigNumber(0)).div(scores.length)
-        groupAvgScores.set(group, avg)
+        const prob = avg.pow(20)
+        sumOfProbabilities = sumOfProbabilities.plus(prob)
+        groupWeightedProbability.set(group, avg.pow(20))
       } else {
-        groupAvgScores.set(group, new BigNumber(0))
+        groupWeightedProbability.set(group, new BigNumber(0))
       }
     }
 
-    console.info(groupAvgScores)
+    for (const groupAddress of groupWeightedProbability.keys()) {
+      const finalProb = groupWeightedProbability.get(groupAddress)!.div(sumOfProbabilities)
+      groupWeightedProbability.set(groupAddress, finalProb)
+    }
+    console.info(groupWeightedProbability)
 
-    const sortedGroups = [...groupAvgScores.keys()].sort((a, b) => {
-      return groupAvgScores.get(b)!.comparedTo(groupAvgScores.get(a)!)
-    })
-    console.info(sortedGroups)
+    // const sortedGroups = [...groupAvgScores.keys()].sort((a, b) => {
+    //   return groupAvgScores.get(b)!.comparedTo(groupAvgScores.get(a)!)
+    // })
+    // console.info('sortedGroups')
+    // console.info(sortedGroups)
+    // console.info(`groups with scores: ${sortedGroups.length}`)
 
+    console.info('finished up to the return ------------------')
+    return
     // Get keys + accounts for the voting bot accounts (based on mnemonic, envvar count of bot accounts)
     const votingBotKeys: string[] = getPrivateKeysFor(
       AccountType.VOTING_BOT,

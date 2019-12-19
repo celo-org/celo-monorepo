@@ -203,6 +203,7 @@ module.exports = async (_deployer: any, networkName: string) => {
 
   const valKeys: string[] = config.validators.validatorKeys
   const attestationKeys: string[] = config.validators.attestationKeys
+  const votingBotKeys: string[] = config.election.votingBotKeys
 
   if (valKeys.length === 0) {
     console.info('  No validators to register')
@@ -323,5 +324,5 @@ module.exports = async (_deployer: any, networkName: string) => {
     })
   }
 
-  const votingBotKeys = config.election.votingBotKeys
+  // If we're running a voting bot on this network, lock up some gold
 }
